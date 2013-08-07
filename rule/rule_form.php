@@ -162,7 +162,8 @@ class dataformrule_notification_form extends dataformrule_form {
         $grp[] = &$mform->createElement('select', 'param5', null, $this->menu_roles_used_in_context());
         $grp[] = &$mform->createElement('advcheckbox', 'admin', null, get_string('admin'), null, array(0,8));
         $grp[] = &$mform->createElement('advcheckbox', 'email', null, get_string('email'), null, array(0,16));
-        $grp[] = &$mform->createElement('text', 'param6', null, array('size' => 32));
+        $emailfield = $grp[] = &$mform->createElement('text', 'param6', null, array('size' => 32));
+        $emailfield->setType(PARAM_EMAIL);
         $br = html_writer::empty_tag('br');
         $sp = '   ';
         $mform->addGroup($grp, 'recipientgrp', get_string('to'), array($br, $sp, $br, $sp, $br, $br, $sp), false);
