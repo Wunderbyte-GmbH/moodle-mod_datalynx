@@ -263,6 +263,7 @@ abstract class dataformrule_notification extends dataformrule_base {
     const RECP_ROLES = 4;
     const RECP_ADMIN = 8;
     const RECP_EMAIL = 16;
+    const RECP_TEAM = 32;
 
     public $type = 'unknown';
     protected $sendmethod;
@@ -327,7 +328,19 @@ abstract class dataformrule_notification extends dataformrule_base {
             }
         }
         return true;
-    } 
+    }
+
+    public function menu_team_member_select_fields() {
+        global $DB;
+        $query = "SELECT f.id, f.name
+                    FROM {dataform_fields} f
+                   WHERE f.dataid = :dataid
+                     AND f.type = :type";
+
+        $menu = $DB->get_records_sql_menu($query, array('dataid' => $this->df->id(), 'type' => 'teammemberselect'));
+
+        return $menu;
+    }
 
     /**
      *
@@ -361,8 +374,53 @@ abstract class dataformrule_notification extends dataformrule_base {
                     $recipients[] = $user; 
                 }              
             }
+
+            // team members
+            if ($recp_type & self::RECP_TEAM) {
+                $fieldid = $this->rule->param9;
+                $recipients = array_merge($recipients, $this->get_recepient_team_members($fieldid, array_keys($items)));
+            }
         }
         return $recipients;
+    }
+
+    protected function get_recepient_team_members($fieldid, $entryids) {
+        global $DB;
+
+        list($insql, $params) = $DB->get_in_or_equal($entryids, SQL_PARAMS_NAMED);
+        $query = "SELECT c.*
+                    FROM {dataform_contents} c
+              INNER JOIN {dataform_fields} f ON c.fieldid = f.id
+                   WHERE c.entryid $insql
+                     AND f.type = :type";
+        $params['type'] = 'teammemberselect';
+        $contents = $DB->get_records_sql($query, $params);
+        $userids = array();
+        foreach ($contents as $content) {
+            $userids = array_merge($userids, json_decode($content->content, true));
+        }
+
+        $userids = array_unique($userids);
+        list($insql, $params) = $DB->get_in_or_equal($userids);
+        $query = "SELECT u.*
+                    FROM {user} u
+                   WHERE u.id $insql";
+        $users = $DB->get_records_sql($query, $params);
+
+        foreach ($users as $user) {
+            list($insql, $params) = $DB->get_in_or_equal($entryids, SQL_PARAMS_NAMED);
+            $query = "SELECT dc.entryid
+                        FROM mdl_dataform_contents dc
+                       INNER JOIN mdl_dataform_fields df ON dc.fieldid = df.id
+                       WHERE df.type LIKE :type
+                         AND dc.content LIKE :jsonuserid
+                         AND dc.entryid $insql";
+            $params['type'] = 'teammemberselect';
+            $params['jsonuserid'] = "%\"{$user->id}\"%";
+            $user->teamentries = $DB->get_fieldset_sql($query, $params);
+        }
+
+        return $users;
     }
 
     /**

@@ -361,6 +361,7 @@ class dataform_notification_handler {
      *
      */
     public static function notify_entry($data) {
+        self::notify_teammembers($data);
         // Create links to entries and store in data->entrylinks
         $entrylinks = array();
         $baseurl = $data->view->get_baseurl();
@@ -370,7 +371,26 @@ class dataform_notification_handler {
         $data->entrylinks = implode(',', $entrylinks);
         self::notify($data);
     }
-    
+
+    public static function notify_teammembers(&$data) {
+        $users = $data->users;
+        foreach ($users as $id => $user) {
+            if (isset($user->teamentries)) {
+                $entrylinks = array();
+                $baseurl = $data->view->get_baseurl();
+                foreach ($user->teamentries as $entryid) {
+                    $entrylinks[] = html_writer::link(new moodle_url($baseurl, array('eids' => $entryid)), $entryid);
+                }
+                $data->users = array($user);
+                $data->entrylinks = implode(',', $entrylinks);
+                self::notify($data);
+                unset($users[$id]);
+            }
+        }
+        $data->users = $users;
+        unset($data->entrylinks);
+    }
+
     /**
      *
      */

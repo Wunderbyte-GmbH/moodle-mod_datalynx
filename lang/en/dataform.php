@@ -545,4 +545,22 @@ $string['view'] = 'view';
 $string['viewvisibility'] = 'Visibility';
 $string['wrongdataid'] = 'Wrong dataform id provided';
 
+// === teammemberselect strings ====================================================================================================
 
+$string['teamsize'] = 'Maximum team size';
+$string['teamsize_help'] = 'Specify the maximum size of the team. It must be a positive integer.';
+$string['teamsize_error_required'] = 'This field is required!';
+$string['teamsize_error_value'] = 'The value must be a positive integer!';
+$string['admissibleroles'] = 'Admissible roles';
+$string['admissibleroles_help'] = 'Users possessing any of the selected roles will be admissible to the team. At least one role must be selected.';
+$string['admissibleroles_error'] = 'Please select at least one role!';
+$string['notifyteam'] = 'Notification rule';
+$string['notifyteam_help'] = 'Select notification rule to be applied to all team members selected in this field.';
+$string['teammemberselectmultiple'] = 'A single person can be selected only once as a team member!';
+$string['listformat'] = 'List format';
+$string['listformat_newline'] = 'Newline separated';
+$string['listformat_space'] = 'Space separated';
+$string['listformat_comma'] = 'Comma separated';
+$string['listformat_commaspace'] = 'Comma separated with space';
+$string['listformat_ul'] = 'Unordered list';
+$string['teammembers'] = 'Team members';
