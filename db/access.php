@@ -375,4 +375,15 @@ $capabilities = array(
             'manager' => CAP_ALLOW,
         )
     ),
+
+    // Allow viewing of entries marked as draft
+    'mod/dataform:editrestrictedfields' => array(
+
+        'riskbitmask' => RISK_PERSONAL,
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+        )
+    ),
 );

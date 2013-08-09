@@ -219,6 +219,16 @@ abstract class dataformfield_renderer {
             }
             $replacements = $labelreplacement + $replacements;
         }
+
+        if (in_array("[[$fieldname:restricted]]", $tags)) {
+            if ($edit && has_capability('mod/dataform:editrestrictedfields', $this->_field->df()->context)) {
+                $labelreplacement["[[$fieldname:restricted]]"] = array('', array(array($this , 'display_edit'), array($entry)));
+            } else {
+                $labelreplacement["[[$fieldname:restricted]]"] = array('html', $this->display_browse($entry));
+            }
+            $replacements = $labelreplacement + $replacements;
+        }
+
         return $replacements;
     }
 
@@ -283,7 +293,8 @@ abstract class dataformfield_renderer {
 
         $patterns = array();
         $patterns["[[$fieldname@]]"] = array(true);
-        
+        $patterns["[[$fieldname:restricted]]"] = array(true);
+
         return $patterns;
     }
 }
