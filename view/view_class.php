@@ -1474,6 +1474,7 @@ class dataformview_base {
         $approve = optional_param('approve', '', PARAM_SEQUENCE);  // approve entries (all) or by record ids (comma delimited eids)
         $disapprove = optional_param('disapprove', '', PARAM_SEQUENCE);  // disapprove entries (all) or by record ids (comma delimited eids)
         $append = optional_param('append', '', PARAM_SEQUENCE);  // append entries (all) or by record ids (comma delimited eids)
+        $status = optional_param('status', '', PARAM_SEQUENCE);  // append entries (all) or by record ids (comma delimited eids)
 
         $confirmed = optional_param('confirmed', 0, PARAM_BOOL);
 
@@ -1497,6 +1498,8 @@ class dataformview_base {
         // Append any requested entries to the initiating entry
         } else if ($append and confirm_sesskey()) {
             return $this->_entries->process_entries('append', $append, null, true);
+        } else if ($status and confirm_sesskey()) {
+            return $this->_entries->process_entries('status', $status, null, true);
         }
 
         return true;

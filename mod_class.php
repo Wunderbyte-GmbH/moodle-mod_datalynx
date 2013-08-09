@@ -1510,6 +1510,9 @@ class dataform {
                     return false;   // who are you anyway???
                 }
 
+                if (!($entry->status == dataformfield__status::STATUS_DRAFT || $entry->status == dataformfield__status::STATUS_SUBMISSION)) {
+                    return false;
+                }
                 // ok owner, what's the time (limit)?
                 if ($this->data->timelimit != -1) {
                     $timelimitsec = ($this->data->timelimit * 60);

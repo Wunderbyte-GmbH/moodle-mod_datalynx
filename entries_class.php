@@ -160,10 +160,18 @@ class dataform_entries {
             }
         }
 
+        // STATUS filtering (visibility)
+        $wherestatus = '';
+        if (!has_capability('mod/dataform:viewdrafts', $df->context)) {
+            $wherestatus = " AND (e.status = :{$this->sqlparams($params, 'status', dataformfield__status::STATUS_SUBMISSION)}
+                              OR  e.status = :{$this->sqlparams($params, 'status', dataformfield__status::STATUS_FINAL_SUBMISSION)}
+                              OR  e.userid = :{$this->sqlparams($params, 'userid', $USER->id)}) ";
+        }
+
         // sql for fetching the entries
         $what = ' DISTINCT '.
                 // entry
-                ' e.id, e.approved, e.timecreated, e.timemodified, e.userid, e.groupid, '.
+                ' e.id, e.approved, e.timecreated, e.timemodified, e.userid, e.groupid, e.status, '.
                 // user
                 user_picture::fields('u', array('idnumber', 'username'), 'uid '). ', '.
                 // group (TODO g.description AS groupdesc need to be varchar for MSSQL)
@@ -480,7 +488,8 @@ class dataform_entries {
                                 dataformfield__approve::_APPROVED,
                                 dataformfield__user::_USERID,
                                 dataformfield__user::_USERNAME,
-                                dataformfield__group::_GROUP
+                                dataformfield__group::_GROUP,
+                                dataformfield__status::_STATUS
                             );
 
                             // Iterate the data and extract entry and fields content
