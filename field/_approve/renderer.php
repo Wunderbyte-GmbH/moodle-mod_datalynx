@@ -95,8 +95,8 @@ class dataformfield__approve_renderer extends dataformfield_renderer {
      * 
      */
     protected function display_browse($entry, $params = null) {
-        global $OUTPUT;
-        
+        global $PAGE, $OUTPUT;
+
         $field = $this->_field;
         if ($entry and $entry->approved) {
             $approved = 'approved';
@@ -115,14 +115,31 @@ class dataformfield__approve_renderer extends dataformfield_renderer {
                                                             'title' => $strapproved));
                                                             
         if (has_capability('mod/dataform:approve', $field->df()->context)) {
+            $PAGE->requires->js_init_call(
+                'M.dataformfield__approve.init',
+                array($OUTPUT->pix_url('i/tick_green_big')->__toString(), $OUTPUT->pix_url('i/cross_red_big')->__toString()),
+                false,
+                $this->get_js_module());
+
             return html_writer::link(
                 new moodle_url($entry->baseurl, array($approval => $entry->id, 'sesskey' => sesskey())),
-                $approvedimage
+                $approvedimage, array('class' =>  'dataformfield__approve')
             );
         } else {
             return $approvedimage;
         }
     }
+
+
+    private function get_js_module() {
+        $jsmodule = array(
+            'name' => 'dataformfield__approve',
+            'fullpath' => '/mod/dataform/field/_approve/_approve.js',
+            'requires' => array('node', 'event', 'node-event-delegate', 'io'),
+            );
+        return $jsmodule;
+    }
+
 
     /**
      * Array of patterns this field supports 
