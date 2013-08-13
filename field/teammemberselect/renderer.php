@@ -73,27 +73,21 @@ class dataformfield_teammemberselect_renderer extends dataformfield_renderer {
         $field = $this->_field;
         $fieldid = $field->id();
         $entryid = $entry->id;
-        $menuoptions = $field->options_menu();
         $fieldname = "field_{$fieldid}_$entryid";
-        // $required = !empty($options['required']);
-        $selected = !empty($entry->{"c{$fieldid}_content"}) ? json_decode($entry->{"c{$fieldid}_content"}, true) : array_fill(0, $field->teamsize, 0);
+        $fieldnamedropdown = "dataformfield_dropdown_{$fieldid}_$entryid";
+        $classname = "teammemberselect_{$fieldid}_{$entryid}";
 
-        $elements = array();
         for ($i = 0; $i < $field->teamsize; $i++) {
-            $select = &$mform->createElement('select', $i, null, $menuoptions, array('class' => "teammemberselect_{$fieldid}_{$entryid}" ));
-            $select->setSelected($selected[$i]);
-            // if ($required) {
-            //     $mform->addRule($fieldname, null, 'required', null, 'client');
-            // }
-            $elements[] = $select;
+            $mform->addElement('select', "{$fieldname}[{$i}]", null, $field->options_menu(true),
+                array('class' => "dataformfield_teammemberselect_select $classname"));
+            $mform->addElement('text', "{$fieldnamedropdown}[{$i}]", null,
+                array('class' => "dataformfield_teammemberselect_dropdown $classname"));
+            $mform->setType("{$fieldnamedropdown}[{$i}]", PARAM_TEXT);
         }
-        $group = &$mform->addGroup($elements, $fieldname, null, '<br/>');
-        $mform->registerRule('compare_different_ignore_zero', 'callback', 'compare_different_ignore_zero_callback', 'dataformfield_teammemberselect_renderer');
-        $mform->addRule($fieldname, get_string('teammemberselectmultiple', 'dataform'), 'compare_different_ignore_zero');
 
         $PAGE->requires->js_init_call(
                 'M.dataformfield_teammemberselect.init_entry_form',
-                array($entryid, $fieldid),
+                array($field->options_menu()),
                 false,
                 $this->get_js_module());
     }
@@ -118,7 +112,7 @@ class dataformfield_teammemberselect_renderer extends dataformfield_renderer {
         $jsmodule = array(
             'name' => 'dataformfield_teammemberselect',
             'fullpath' => '/mod/dataform/field/teammemberselect/teammemberselect.js',
-            'requires' => array('node', 'event', 'node-event-delegate'),
+            'requires' => array('node', 'event', 'node-event-delegate', 'autocomplete', 'autocomplete-filters', 'autocomplete-highlighters', 'event-outside'),
             );
         return $jsmodule;
     }
@@ -133,7 +127,7 @@ class dataformfield_teammemberselect_renderer extends dataformfield_renderer {
 
         if (isset($entry->{"c{$fieldid}_content"})) {
             $selected = json_decode($entry->{"c{$fieldid}_content"}, true);
-            $options = $field->options_menu();
+            $options = $field->options_menu(false, true);
 
             $str = array();
             foreach ($selected as $id) {

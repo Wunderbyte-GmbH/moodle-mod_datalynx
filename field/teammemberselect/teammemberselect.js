@@ -27,30 +27,101 @@
 
 M.dataformfield_teammemberselect = {};
 
-M.dataformfield_teammemberselect.init_entry_form = function (Y, entryid, fieldid) {
-    return;
-    var dropdowns = Y.all(".teammemberselect_" + fieldid + "_" + entryid);
-    dropdowns.each(function (dropdown) {
-        remove_selected_users();
-        dropdown.on('change', remove_selected_users);
+/**
+ * Initializes team member select field's autocomplete objects with a list of available users. It attaches event listeners to text fields.
+ * @param  YUI      Y               YUI object
+ * @param  object   userlistobject  list of users in format {"userid" : "username (email)", ...}
+ */
+M.dataformfield_teammemberselect.init_entry_form = function (Y, userlistobject) {
+    var key, source = [], autocompletes = [], lastvalues = [];
+
+    for (key in userlistobject) {
+        source.push(userlistobject[key]);
+    }
+
+    // initializes autocomplete objects for text fields
+    Y.all('input[type="text"][name^="dataformfield_dropdown"]').each(function (input) {
+        var autocomplete = new Y.AutoCompleteList({
+            inputNode: input,
+            source: source.slice(0),
+            render: true,
+            minQueryLength: 3,
+            tabSelect: true,
+            activateFirstItem: true,
+            circular: true,
+            maxResults: 5,
+            resultFilters: 'subWordMatch',
+            queryDelay: 40,
+            width: "400px",
+        });
+
+        // attaches event listeners after the selection has been made
+        autocomplete.after('select', function () {
+            select_hidden_option(input);
+            refresh_user_list();
+        });
+
+        // store references to all autocomplete object for later list updates
+        autocompletes.push(autocomplete);
     });
 
-    function remove_selected_users () {
-        var selectedvalue = 0;
-        dropdowns.each(function (dropdown) {
-            selectedvalue = dropdown.get('value');
-                dropdowns.each(function (otherdropdown) {
-                    if (dropdown.get('id') !== otherdropdown.get('id')) {
-                        otherdropdown.all("option").each(function (option) {
-                            option.removeAttribute('disabled');
-                        });
-                        if (selectedvalue > 0) {
-                            otherdropdown.one("option[value='" + selectedvalue + "']").set('disabled', 'disabled');
-                        }
-                    }
-                });
+    /**
+     * Selects the appropriate option in the hidden select element associated with the text field
+     * @param  YNode    field text field element wrapped in YUI 3 YNode object
+     */
+    function select_hidden_option(field) {
+        var name = field.get('name').replace('dataformfield_dropdown', 'field'),
+        select = Y.one('select[name="' + name + '"]');
+        select.get("options").each(function (option) {
+            console.log(option.get('text') + " " + field.get('value'));
+            if (option.get('text') === field.get('value')) {
+                option.set('selected', true);
+                lastvalues[field.get('name')] = field.get('value');
+                return;
+            }
         });
     }
+
+    /**
+     * Reloads the full auto complete source list and removes already selected values from it
+     */
+    function refresh_user_list() {
+        var newuserlist = source.slice(0), i;
+
+        Y.all('input[type="text"][name^="dataformfield_dropdown"]').each(function (field) {
+            if (newuserlist.indexOf(field.get('value')) !== -1) {
+                newuserlist.splice(newuserlist.indexOf(field.get('value')), 1);
+            }
+        });
+
+        for (i = 0; i < autocompletes.length; i++) {
+            autocompletes[i].set('source', newuserlist.slice(0));
+        }
+    }
+
+    // update autocomplete lists once after loading to account for preselected values
+    refresh_user_list();
+
+    // clears the text field and the respective select box, saving the previous value for undo action
+    Y.all('input[type="text"][name^="dataformfield_dropdown"]').on('click', function (e) {
+        var name = e.target.get('name').replace('dataformfield_dropdown', 'field');
+        e.target.set('value', '');
+        Y.one('select[name="' + name + '"] option[value="0"]').set('selected', true);
+
+        refresh_user_list();
+    });
+
+    // undo action allows restoring previous value of a text field by pressing Ctrl+Z while focused on the field
+    Y.all('input[type="text"][name^="dataformfield_dropdown"]').on('keydown', function (e) {
+        var field = e.target;
+        if (e.ctrlKey === true && e.keyCode === 90 && lastvalues.hasOwnProperty(field.get('name'))) {
+            e.preventDefault();
+            e.stopPropagation();
+            field.set('value', lastvalues[field.get('name')]);
+            select_hidden_option(field);
+            refresh_user_list();
+        }
+    });
 };
 
 

@@ -63,7 +63,7 @@ class dataformfield_teammemberselect extends dataformfield_base {
         $this->rules = array_merge(array(0 => '...'), $this->rules);
     }
 
-    public function options_menu() {
+    public function options_menu($addnoselection = false, $makelinks = false) {
         global $DB, $USER, $COURSE;
 
         list($insql, $params) = $DB->get_in_or_equal($this->admissibleroles, SQL_PARAMS_NAMED);
@@ -76,13 +76,21 @@ class dataformfield_teammemberselect extends dataformfield_base {
                     JOIN {user} u ON u.id = ra.userid
                    WHERE c.id = :courseid
                      AND ra.roleid $insql
-                     AND u.id <> :userid";
-
+                     AND u.id <> :userid
+                ORDER BY u.lastname ASC, u.firstname ASC, u.email ASC";
         $results = $DB->get_records_sql($query, $params);
-        $options = array(0 => '...');
-        $baseurl = new moodle_url('/user/view.php', array('course' => $params['courseid']));
+
+        $options = array();
+        if ($addnoselection) {
+            $options[0] = '...';
+        }
         foreach ($results as $result) {
-            $options[$result->id] = html_writer::link(new moodle_url($baseurl, array('id' => $result->id)), fullname($result));
+            if ($makelinks) {
+                $baseurl = new moodle_url('/user/view.php', array('id' => $result->id, 'course' => $params['courseid']));
+                $options[$result->id] = html_writer::link($baseurl, fullname($result));
+            } else {
+                $options[$result->id] = fullname($result) . " ({$result->email})";
+            }
         }
 
         return $options;

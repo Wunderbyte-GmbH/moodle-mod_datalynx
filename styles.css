@@ -25,7 +25,7 @@
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
- 
+
 #page-mod-dataform-view #sortsearch .c0 {
   text-align: right;
 }
@@ -122,4 +122,20 @@
 
 .mform div.fdescription.required {
     display: none;
+}
+
+.dataformfield_teammemberselect_select {
+  display: inherit;
+}
+
+.jsenabled .dataformfield_teammemberselect_select {
+  display: none;
+}
+
+.dataformfield_teammemberselect_dropdown {
+  display: none;
+}
+
+.jsenabled .dataformfield_teammemberselect_dropdown {
+  display: inherit;
 }
