@@ -13,7 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
- 
+
 /**
  * @package dataformfield
  * @subpackage select
@@ -33,7 +33,7 @@ class dataformfield_select_form extends dataformfield_form {
 
     //-------------------------------------------------------------------------------
         $mform->addElement('header', 'fieldattributeshdr', get_string('fieldattributes', 'dataform'));
-        
+
         // options
         $mform->addElement('textarea', 'param1', get_string('fieldoptions', 'dataform'), 'wrap="virtual" rows="5" cols="30"');
 
@@ -45,6 +45,9 @@ class dataformfield_select_form extends dataformfield_form {
 
         // allow add option
         $mform->addElement('selectyesno', 'param4', get_string('allowaddoption', 'dataform'));
-        
+
+        // allow add option
+        $mform->addElement('checkbox', 'param5', get_string('limitchoice', 'dataform'));
+        $mform->addHelpButton('param5', 'limitchoice', 'dataform');
     }
 }

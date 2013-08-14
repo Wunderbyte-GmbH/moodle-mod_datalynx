@@ -30,6 +30,19 @@ class dataformfield_select extends dataformfield_base {
     protected $_options = array();
 
     /**
+     * Class constructor
+     *
+     * @param var $df       dataform id or class object
+     * @param var $field    field id or DB record
+     */
+    public function __construct($df = 0, $field = 0) {
+        parent::__construct($df, $field);
+
+        // Set the options
+        $this->options_menu();
+    }
+
+    /**
      * Update a field in the database
      */
     public function update_field($fromform = null) {
@@ -154,13 +167,22 @@ class dataformfield_select extends dataformfield_base {
      * 
      */
     public function options_menu($forceget = false) {
+        global $DB, $USER;
         if (!$this->_options or $forceget) {
             if (!empty($this->field->param1)) {
-                $rawoptions = explode("\n",$this->field->param1);
+                $rawoptions = explode("\n", $this->field->param1);
                 foreach ($rawoptions as $key => $option) {
                     $option = trim($option);
                     if ($option != '') {
-                        $this->_options[$key + 1] = $option;
+                        $sql = "SELECT COUNT(1)
+                                  FROM {dataform_entries} de
+                                 WHERE de.userid = :userid
+                                   AND de.dataid = :dataid";
+                        $params = array('userid' => $USER->id, 'dataid' => $this->df->id());
+                        $count = $DB->get_field_sql($sql, $params);
+                        if ($count == 0) {
+                            $this->_options[$key + 1] = $option;
+                        }
                     }
                 }
             }
