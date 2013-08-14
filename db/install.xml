@@ -38,7 +38,8 @@
         <FIELD NAME="js" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="cssincludes" NEXT="jsincludes"/>
         <FIELD NAME="jsincludes" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="js" NEXT="defaultview"/>
         <FIELD NAME="defaultview" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="jsincludes" NEXT="defaultfilter"/>
-        <FIELD NAME="defaultfilter" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="defaultview"/>
+        <FIELD NAME="defaultfilter" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="defaultview" NEXT="completionentries"/>
+        <FIELD NAME="completionentries" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="defaultfilter"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

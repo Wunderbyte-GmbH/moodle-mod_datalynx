@@ -569,3 +569,6 @@ $string['status_notcreated'] = 'Not created yet';
 $string['status_draft'] = 'Draft';
 $string['status_submission'] = 'Submission';
 $string['status_finalsubmission'] = 'Final submission';
+$string['completionentries'] = 'Number of approved entries';
+$string['completionentriesgroup'] = 'Require approved entries';
+$string['completionentriesgroup_help'] = 'Make sure you enable approval for entries above!';

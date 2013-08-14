@@ -488,5 +488,21 @@ function xmldb_dataform_upgrade($oldversion) {
 
     }
 
+    if ($oldversion < 2013051103) {
+        // add field selection to dataform_entries
+        $table = new xmldb_table('dataform');
+        $field = new xmldb_field('completionentries', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', 'defaultfilter');
+
+        // Launch add field selection
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // dataform savepoint reached
+        upgrade_mod_savepoint(true, 2013051103, 'dataform');
+
+
+    }
+
     return true;
 }

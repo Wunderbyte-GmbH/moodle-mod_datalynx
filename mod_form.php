@@ -255,4 +255,26 @@ class mod_dataform_mod_form extends moodleform_mod {
         return $data;
     }
 
+    public function add_completion_rules() {
+        $mform =& $this->_form;
+
+        $group = array();
+        $group[] = &$mform->createElement('checkbox', 'completionpostsenabled', '', get_string('completionentries', 'dataform'));
+        $group[] = &$mform->createElement('text', 'completionentries', '', array('size' => 3));
+        $mform->setType('completionentries', PARAM_INT);
+        $mform->addGroup($group, 'completionentriesgroup', get_string('completionentriesgroup', 'dataform'), array(' '), false);
+        $mform->disabledIf('completionentries', 'completionpostsenabled', 'notchecked');
+        $mform->disabledIf('completionpostsenabled', 'approval', 'eq', '0');
+        $mform->addHelpButton('completionentriesgroup', 'completionentriesgroup', 'dataform');
+
+        return array('completionentriesgroup');
+    }
+
+    public function completion_rule_enabled($data) {
+        return (!empty($data['approval']) &&
+                $data['approval'] == 1 &&
+                !empty($data['completionpostsenabled']) &&
+                $data['completionentries'] > 0);
+    }
+
 }

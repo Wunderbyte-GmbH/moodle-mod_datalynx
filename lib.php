@@ -369,6 +369,7 @@ function dataform_supports($feature) {
         case FEATURE_MOD_INTRO:               return true;
         case FEATURE_SHOW_DESCRIPTION:        return true;
         case FEATURE_COMPLETION_TRACKS_VIEWS: return true;
+        case FEATURE_COMPLETION_HAS_RULES:    return true;
         //case FEATURE_GRADE_HAS_GRADE:         return true;
         //case FEATURE_ADVANCED_GRADING:        return true;
         case FEATURE_GRADE_OUTCOMES:          return true;
@@ -1616,4 +1617,38 @@ function dataform_cron_TODO() {
 
 
     return true;
+}
+
+/**
+ * Obtains the automatic completion state for this dataform based on conditions dataform settings.
+ *
+ * @global object
+ * @global object
+ * @param object $course Course
+ * @param object $cm Course-module
+ * @param int $userid User ID
+ * @param bool $type Type of comparison (or/and; can be used as return value if no conditions)
+ * @return bool True if completed, false if not. (If no conditions, then return
+ *   value depends on comparison type)
+ */
+function dataform_get_completion_state($course, $cm, $userid, $type) {
+    global $CFG, $DB;
+
+    if (!($dataform = $DB->get_record('dataform', array('id' => $cm->instance)))) {
+        throw new Exception("Can't find dataform {$cm->instance}");
+    }
+
+    if (!isset($dataform->completionentries)) {
+        throw new Exception("'completionentries' field does not exist in 'dataform' table! Upgrade your database!");
+    }
+
+    $params = array('userid' => $userid, 'dataid' => $dataform->id);
+    $sql = "SELECT COUNT(1)
+              FROM {dataform_entries} de
+             WHERE de.userid = :userid
+               AND de.dataid = :dataid
+               AND de.approved = 1";
+    $count = $DB->get_field_sql($sql, $params);
+
+    return $count > $dataform->completionentries;
 }
