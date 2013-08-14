@@ -62,11 +62,13 @@ class dataformfield__approve_renderer extends dataformfield_renderer {
         $fieldid = $field->id();
 
         $options = array(0 => ucfirst(get_string('approvednot', 'dataform')), 1 => ucfirst(get_string('approved', 'dataform')));
-        $select = &$mform->addElement('select', "f_{$i}_$fieldid", null, $options);
+        $select = &$mform->createElement('select', "f_{$i}_$fieldid", null, $options);
         $select->setSelected($value);
         // disable the 'not' and 'operator' fields
         $mform->disabledIf("searchnot$i", "f_{$i}_$fieldid", 'neq', 2);
         $mform->disabledIf("searchoperator$i", "f_{$i}_$fieldid", 'neq', 2);
+        
+        return array($select, null);
     }
 
     /**

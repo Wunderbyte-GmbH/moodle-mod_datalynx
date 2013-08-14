@@ -85,12 +85,23 @@ class dataformfield_multiselect_renderer extends dataformfield_renderer {
             $selected = $field->default_values();
         }
 
-        $this->render($mform, "{$fieldname}_selected", $menuoptions, $selected, $required);
+        list($elem, $separators) = $this->render($mform, "{$fieldname}_selected", $menuoptions, $selected, $required);
+        // Add group or element
+        if (is_array($elem)) {
+            $mform->addGroup($elem, "{$fieldname}_grp",null, $separators, false);
+        } else {
+            $mform->addElement($elem);
+        }
+        
+        if ($required) {
+            $this->set_required($mform, $fieldname, $selected);
+        }
 
         // Input field for adding a new option
         if (!empty($options['addnew'])) {
             if ($field->get('param4') or has_capability('mod/dataform:managetemplates', $field->df()->context)) {
                 $mform->addElement('text', "{$fieldname}_newvalue", get_string('newvalue', 'dataform'));
+                $mform->setType("{$fieldname}_newvalue", PARAM_TEXT);
                 $mform->disabledIf("{$fieldname}_newvalue", "{$fieldname}_selected", 'neq', 0);
             }
             return;
@@ -166,23 +177,33 @@ class dataformfield_multiselect_renderer extends dataformfield_renderer {
         $options = $field->options_menu();
 
         $fieldname = "f_{$i}_$fieldid";
-        $this->render($mform, $fieldname, $options, $selected);
+        list($elem, $separators) = $this->render($mform, $fieldname, $options, $selected);
+        $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
         
-        $mform->addElement('checkbox', "{$fieldname}_allreq", null, ucfirst(get_string('requiredall', 'dataform')));
+        $allreq = &$mform->createElement('checkbox', "{$fieldname}_allreq", null, ucfirst(get_string('requiredall', 'dataform')));
         $mform->setDefault("{$fieldname}_allreq", $allrequired);
+        $mform->disabledIf("{$fieldname}_allreq", "searchoperator$i", 'eq', '');
+        
+        return array(array_merge($elem, $allreq), $separators);
     }
 
     /**
      *
      */
     protected function render(&$mform, $fieldname, $options, $selected, $required = false) {
-        $select = &$mform->addElement('select', $fieldname, null, $options);
+        $select = &$mform->createElement('select', $fieldname, null, $options);
         $select->setMultiple(true);
         $select->setSelected($selected);
-        if ($required) {
-            $mform->addRule($fieldname, null, 'required', null, 'client');
-        }      
+        return $select;
     }
+
+    /**
+     *
+     */
+    protected function set_required(&$mform, $fieldname, $selected) {
+        $mform->addRule($fieldname, null, 'required', null, 'client');
+    }
+
 
     /**
      * Array of patterns this field supports 

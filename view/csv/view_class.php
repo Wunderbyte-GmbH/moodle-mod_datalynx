@@ -22,7 +22,7 @@
  */
 require_once("$CFG->dirroot/mod/dataform/view/aligned/view_class.php");
 
-class dataform_view_csv extends dataform_view_aligned {
+class dataformview_csv extends dataformview_aligned {
 
     const EXPORT_ALL = 'all';
     const EXPORT_PAGE = 'page';
@@ -70,7 +70,7 @@ class dataform_view_csv extends dataform_view_aligned {
     /**
      * Overridden to show import form without entries
      */
-    public function display(array $params = null) {
+    public function display(array $params = array()) {
         global $OUTPUT;
 
         if ($this->_showimportform) {
@@ -344,12 +344,8 @@ class dataform_view_csv extends dataform_view_aligned {
         global $CFG;
         require_once("$CFG->dirroot/mod/dataform/view/csv/import_form.php");
 
-        $custom_data = array();
-        $custom_data['view'] = $this;
-        $custom_data['df'] = $this->_df;
-        
         $actionurl = new moodle_url($this->_baseurl, array('importcsv' => 1)); 
-        return new dataformview_csv_import_form($actionurl, $custom_data);
+        return new dataformview_csv_import_form($this, $actionurl);
     }
 
     /**

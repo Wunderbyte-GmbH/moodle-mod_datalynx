@@ -57,7 +57,7 @@ class dataformfield__entry_renderer extends dataformfield_renderer {
                     case '##delete##': $str = $managable ? $this->display_delete($entry): ''; break;
                     case '##export##': $str = $this->display_export($entry); break;
                     case '##duplicate##': $str = $managable ? $this->display_duplicate($entry) : ''; break;
-                    default: $str = $entry->id;
+                    default: $str = '';
                 }
                 $replacements[$tag] = array('html', $str);
             } 

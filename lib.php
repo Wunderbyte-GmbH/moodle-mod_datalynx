@@ -614,14 +614,14 @@ function dataform_extend_settings_navigation(settings_navigation $settings, navi
     if ($templatesmanager or $entriesmanager) {
         $manage = $dfnode->add(get_string('manage', 'dataform'));
         if ($templatesmanager) {
-            $manage->add(get_string('presets', 'dataform'), new moodle_url('/mod/dataform/preset/index.php', array('id' => $PAGE->cm->id)));
-            $manage->add(get_string('fields', 'dataform'), new moodle_url('/mod/dataform/field/index.php', array('id' => $PAGE->cm->id)));
             $manage->add(get_string('views', 'dataform'), new moodle_url('/mod/dataform/view/index.php', array('id' => $PAGE->cm->id)));
+            $manage->add(get_string('fields', 'dataform'), new moodle_url('/mod/dataform/field/index.php', array('id' => $PAGE->cm->id)));
             $manage->add(get_string('filters', 'dataform'), new moodle_url('/mod/dataform/filter/index.php', array('id' => $PAGE->cm->id)));
             $manage->add(get_string('rules', 'dataform'), new moodle_url('/mod/dataform/rule/index.php', array('id' => $PAGE->cm->id)));
             $manage->add(get_string('tools', 'dataform'), new moodle_url('/mod/dataform/tool/index.php', array('id' => $PAGE->cm->id)));
             $manage->add(get_string('jsinclude', 'dataform'), new moodle_url('/mod/dataform/js.php', array('id' => $PAGE->cm->id, 'jsedit' => 1)));
             $manage->add(get_string('cssinclude', 'dataform'), new moodle_url('/mod/dataform/css.php', array('id' => $PAGE->cm->id, 'cssedit' => 1)));
+            $manage->add(get_string('presets', 'dataform'), new moodle_url('/mod/dataform/preset/index.php', array('id' => $PAGE->cm->id)));
         }
         $manage->add(get_string('import', 'dataform'), new moodle_url('/mod/dataform/import.php', array('id' => $PAGE->cm->id)));
     }

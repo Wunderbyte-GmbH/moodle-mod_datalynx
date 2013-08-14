@@ -26,6 +26,8 @@ $string['pluginname'] = 'PDF';
 $string['image'] = 'Image';
 // PDF Settings
 $string['pdfsettings'] = 'PDF settings';
+$string['docname'] = 'Document name';
+$string['docname_help'] = 'A Pattern for the name of the downloaded PDF document. The name pattern can consist of any of the field patterns included in the view.';
 $string['format'] = 'Format';
 $string['orientation'] = 'Orientation';
 $string['auto'] = 'Auto';

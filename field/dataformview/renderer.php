@@ -176,12 +176,14 @@ class dataformfield_dataformview_renderer extends dataformfield_renderer {
     
         // Custom sort
         if ($soptions = $this->get_sort_options()) {
-            $usort = dataform_filter::get_sort_url_query($soptions);
+            $fm = $this->_df->get_filter_manager();
+            $usort = $fm::get_sort_url_query($soptions);
             $params['usort'] = $usort;
         }
         // Custom search
         if ($soptions = $this->get_search_options($entry)) {
-            $usearch = dataform_filter::get_search_url_query($soptions);
+            $fm = $this->_df->get_filter_manager();
+            $usearch = $fm::get_search_url_query($soptions);
             $params['usearch'] = $usearch;
         }
 
@@ -259,7 +261,7 @@ class dataformfield_dataformview_renderer extends dataformfield_renderer {
                 }
                 // Convert direction to 0/1
                 $dir = $dir == 'DESC' ? 1 : 0;
-                $soptions[] = array($rfieldid, $dir);
+                $soptions[$rfieldid] = $dir;
             }
         }
         return $soptions;
@@ -270,45 +272,51 @@ class dataformfield_dataformview_renderer extends dataformfield_renderer {
      */
     protected function get_search_options($entry) {
         $field = $this->_field;
-
-        $refdataform = $field->refdataform;
-        $refview = $field->refview;
-        $localview = $field->localview;
-
         $soptions = array();
+
         // Custom search (AND/OR,ref-field-patten,[NOT],OPT,local-field-pattern/value
-        if (!empty($field->field->param5)) {
-            foreach (explode("\n", $field->field->param5) as $key => $searchy) {
-                list($andor, $refpattern, $not, $operator, $localpattern) = explode(',', $searchy);
-                // And/or
-                if (empty($andor) or !in_array($andor, array('AND', 'OR'))) {
-                    continue;
-                }
-                // Get the ref field id from pattern
-                if (!$rfieldid = $refview->get_pattern_fieldid($refpattern)) {
-                    continue;
-                }
-                // Get value for local pattern or use as value
-                $value = '';
-                if (!$localfieldid = $localview->get_pattern_fieldid($localpattern)) {
-                    $value = $localpattern;
-                } else if ($localfield = $field->df->get_field_from_id($localfieldid)) {
-                    // Get the array of values for the patterns
-                    if ($replacements = $localfield->renderer()->get_replacements(array($localpattern), $entry)) {
-                        // Take the first: array('html', value)
-                        $first = reset($replacements);
-                        // extract the value part
-                        $value = $first[1];
-                    }
-                }
-                
-                // Add to the search options
-                if (empty($soptions[$rfieldid])) {
-                    $soptions[$rfieldid] = array('AND' => array(), 'OR' => array());
-                }
-                $soptions[$rfieldid][$andor][] = array($not, $operator, $value);
-            }
+        if (empty($field->field->param5)) {
+            return $soptions;
         }
+
+        if (!$refdataform = $field->refdataform or !$refview = $field->refview or !$localview = $field->localview) {
+            return $soptions;
+        }
+
+        foreach (explode("\n", $field->field->param5) as $key => $searchy) {
+            list($andor, $refpattern, $not, $operator, $localpattern) = explode(',', $searchy);
+            // And/or
+            if (empty($andor) or !in_array($andor, array('AND', 'OR'))) {
+                continue;
+            }
+            // Get the ref field id from pattern
+            if (!$rfieldid = $refview->get_pattern_fieldid($refpattern)) {
+                continue;
+            }
+            // Get value for local pattern or use as value
+            $value = '';
+            if (!$localfieldid = $localview->get_pattern_fieldid($localpattern)) {
+                $value = $localpattern;
+            } else if ($localfield = $field->df->get_field_from_id($localfieldid)) {
+                // Get the array of values for the patterns
+                if ($replacements = $localfield->renderer()->get_replacements(array($localpattern), $entry)) {
+                    // Take the first: array('html', value)
+                    $first = reset($replacements);
+                    // extract the value part
+                    $value = $first[1];
+                    // Make sure this is the search value
+                    // (select fields search by key)
+                    $value = $localfield->get_search_value($value);
+                }
+            }
+            
+            // Add to the search options
+            if (empty($soptions[$rfieldid])) {
+                $soptions[$rfieldid] = array('AND' => array(), 'OR' => array());
+            }
+            $soptions[$rfieldid][$andor][] = array($not, $operator, $value);
+        }
+
         return $soptions;
     }
     

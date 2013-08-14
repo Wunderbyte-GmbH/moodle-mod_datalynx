@@ -217,12 +217,11 @@ abstract class dataformfield_base {
             require_once($CFG->dirroot. '/mod/dataform/field/field_form.php');
             $formclass = 'dataformfield_form';
         }
-        $custom_data = array('field' => $this);
         $actionurl = new moodle_url(
             '/mod/dataform/field/field_edit.php',
             array('d' => $this->df->id(), 'fid' => $this->id(), 'type' => $this->type)
         );
-        return new $formclass($actionurl, $custom_data);
+        return new $formclass($this, $actionurl);
     }
 
     /**
@@ -580,29 +579,64 @@ abstract class dataformfield_base {
         $fieldid = $this->field->id;
         $name = "df_{$fieldid}_{$i}";
 
-        $varcharcontent = $this->get_sql_compare_text();
-        $equal = ($not === ''); 
+        // For all NOT criteria except NOT Empty, exclude entries
+        // which don't meet the positive criterion
+        // because some fields may not have content records
+        // and the respective entries may be filter out 
+        // despite meeting the criterion
+        $excludeentries = (($not and $operator !== '') or (!$not and $operator === ''));
+        
+        if ($excludeentries) {
+            $varcharcontent = $DB->sql_compare_text('content');
+        } else {
+            $varcharcontent = $this->get_sql_compare_text();
+        }
 
-        if ($operator === 'IN') {
-            $searchvalue = array_map('trim', $value);
-            list($sql, $params) = $DB->get_in_or_equal($searchvalue, SQL_PARAMS_NAMED, "df_{$fieldid}_", $equal);
-            return array(" $varcharcontent $sql ", $params);
+        if ($operator === '') {
+            list($sql, $params) = $DB->get_in_or_equal('', SQL_PARAMS_NAMED, "df_{$fieldid}_", false);
+            $sql = " $varcharcontent $sql ";
         } else if ($operator === '=') {
             $searchvalue = trim($value);
-            list($sql, $params) = $DB->get_in_or_equal($searchvalue, SQL_PARAMS_NAMED, "df_{$fieldid}_", $equal);
-            return array(" $varcharcontent $sql ", $params);
+            list($sql, $params) = $DB->get_in_or_equal($searchvalue, SQL_PARAMS_NAMED, "df_{$fieldid}_");
+            $sql = " $varcharcontent $sql ";
+        } else if ($operator === 'IN') {
+            $searchvalue = array_map('trim', $value);
+            list($sql, $params) = $DB->get_in_or_equal($searchvalue, SQL_PARAMS_NAMED, "df_{$fieldid}_");
+            $sql = " $varcharcontent $sql ";
         } else if (in_array($operator, array('LIKE', 'BETWEEN', ''))) {
             $params = array($name => "%$value%");
-            if ($not) {
-                return array($DB->sql_like($varcharcontent, ":$name", false, true, true), $params);
+            $sql = $DB->sql_like($varcharcontent, ":$name", false);
+        } else {
+            $params = array($name => "'$value'");
+            $sql = " $varcharcontent $operator :$name ";
+        }
+        // 
+        if ($excludeentries) {
+            // Get entry ids for entries that meet the criterion
+            if ($eids = $this->get_entry_ids_for_content($sql, $params)) {
+                // Get NOT IN sql 
+                list($notinids, $params) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED, "df_{$fieldid}_", false);
+                $sql = " e.id $notinids ";
+                return array($sql, $params, false);
             } else {
-                return array($DB->sql_like($varcharcontent, ":$name", false), $params);
+                return null;
             }
         } else {
-            return array(" $not $varcharcontent $operator :$name ", array($name => "'$value'"));
+            return array($sql, $params, true);
         }
     }
 
+    /**
+     *
+     */
+    protected function get_entry_ids_for_content($sql, $params) {
+        global $DB;
+        
+        $sql = " fieldid = :fieldid AND $sql ";
+        $params['fieldid'] = $this->id();
+        return $DB->get_records_select_menu('dataform_contents', $sql, $params, '', 'id,entryid');
+    }
+    
     /**
      *
      */
@@ -624,10 +658,10 @@ abstract class dataformfield_base {
     }
 
     /**
-     * Validate form data in entries form
+     *
      */
-    public function validate($eid, $patterns, $formdata) {
-        return $this->renderer()->validate_data($eid, $patterns, $formdata);
+    public function get_search_value($value) {
+        return $value;
     }
 
     /**
@@ -655,6 +689,13 @@ abstract class dataformfield_base {
      */
     public function is_dataform_content() {
         return true;
+    }
+
+    /**
+     * Validate form data in entries form
+     */
+    public function validate($eid, $patterns, $formdata) {
+        return $this->renderer()->validate_data($eid, $patterns, $formdata);
     }
 
     /**

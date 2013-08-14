@@ -46,14 +46,14 @@ class dataformview_pdf_patterns extends dataformview_patterns{
         foreach ($tags as $tag) {
             switch ($tag) {
                 case '##export:all##':
-                    $actionurl = new moodle_url($baseurl, array('exportpdf' => $view::EXPORT_ALL));
+                    $actionurl = new moodle_url($baseurl, array('pdfexportall' => true));
                     //$label = $OUTPUT->pix_icon('f/pdf', get_string('multiexport', 'dataform'));
                     $label = html_writer::tag('span', get_string('exportall', 'dataform'));
                     $replacements[$tag] = html_writer::link($actionurl, $label, array('class' => 'actionlink exportall'));
 
                     break;
                 case '##export:page##':
-                    $actionurl = new moodle_url($baseurl, array('exportPDF' => $view::EXPORT_PAGE));
+                    $actionurl = new moodle_url($baseurl, array('pdfexportpage' => true));
                     //$label = $OUTPUT->pix_icon('f/pdf', get_string('multiexport', 'dataform'));
                     $label = html_writer::tag('span', get_string('exportpage', 'dataform'));
                     $replacements[$tag] = html_writer::link($actionurl, $label, array('class' => 'actionlink exportpage'));

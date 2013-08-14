@@ -103,11 +103,11 @@ class dataformfield__time extends dataformfield_no_content {
                 $operator = '=';
             }
             $params[$namefrom] = from;
-            return array(" $not $varcharcontent $operator :$namefrom ", $params);
+            return array(" $not $varcharcontent $operator :$namefrom ", $params, false);
         } else {
             $params[$namefrom] = from;
             $params[$nameto] = to;
-            return array(" ($not $varcharcontent >= :$namefrom AND $varcharcontent <= :$nameto) ", $params);
+            return array(" ($not $varcharcontent >= :$namefrom AND $varcharcontent <= :$nameto) ", $params, false);
         }
     }
 

@@ -30,11 +30,11 @@ class dataformview_grid_form extends dataformview_base_form {
      */
     function view_definition_after_gps() {
 
-        $view = $this->_customdata['view'];
+        $view = $this->_view;
         $editoroptions = $view->editors();
         $editorattr = array('cols' => 40, 'rows' => 12);
 
-        $mform =& $this->_form;
+        $mform = &$this->_form;
 
         // Grid layout (param3)
         //-------------------------------------------------------------------------------
@@ -51,7 +51,7 @@ class dataformview_grid_form extends dataformview_base_form {
 
         // repeated entry (param2)
         //-------------------------------------------------------------------------------
-        $mform->addElement('header', 'viewlistbodyhdr', get_string('viewlistbody', 'dataform'));
+        $mform->addElement('header', 'entrytemplatehdr', get_string('entrytemplate', 'dataform'));
 
         $mform->addElement('editor', 'eparam2_editor', '', $editorattr, $editoroptions['param2']);
         $mform->setDefault("eparam2_editor[format]", FORMAT_PLAIN);

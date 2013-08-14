@@ -39,6 +39,7 @@ class dataformfield_select_form extends dataformfield_form {
 
         // default value
         $mform->addElement('text', 'param2', get_string('default'));
+        $mform->setType('param2', PARAM_TEXT);
 
         // reserve param3 for options separator (e.g. radiobutton, image button)
 

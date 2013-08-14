@@ -16,7 +16,7 @@
  
 /**
  * @package dataformfield
- * @copyright 2012 Itamar Tzadok
+ * @copyright 2013 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die;
@@ -27,9 +27,14 @@ class dataformfield_form extends moodleform {
     protected $_field = null;
     protected $_df = null;
 
+    public function __construct($field, $action = null, $customdata = null, $method = 'post', $target = '', $attributes = null, $editable = true) {
+        $this->_field = $field;
+        $this->_df = $field->df();
+        
+        parent::__construct($action, $customdata, $method, $target, $attributes, $editable);       
+    }
+    
     function definition() {        
-        $this->_field = $this->_customdata['field'];
-        $this->_df = $this->_field->df();
         $mform = &$this->_form;
 
         // buttons

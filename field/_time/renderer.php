@@ -53,7 +53,9 @@ class dataformfield__time_renderer extends dataformfield_renderer {
                     case 'day': $format = '%a'; break; 
                     case 'week': $format = '%V'; break; 
                     case 'month': $format = '%b'; break; 
-                    case 'year': $format = '%G'; break;
+                    case 'm': $format = '%m'; break; 
+                    case 'year':
+                    case 'Y': $format = '%Y'; break;
                 }
                 $replacements[$tag] = array('html', userdate($entry->{$fieldname}, $format));
             }
@@ -79,14 +81,21 @@ class dataformfield__time_renderer extends dataformfield_renderer {
         $elements = array();
         $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_from", get_string('from'));
         $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_to", get_string('to'));
-        $mform->addGroup($elements, "searchelements$i", null, '<br />', false);
+
         $mform->setDefault("f_{$i}_{$fieldid}_from", $from);
         $mform->setDefault("f_{$i}_{$fieldid}_to", $to);
         foreach (array('year','month','day','hour','minute') as $fieldidentifier) {
             $mform->disabledIf("f_{$i}_{$fieldid}_to[$fieldidentifier]", "searchoperator$i", 'neq', 'BETWEEN');
         }
-        $mform->disabledIf("searchelements$i", "searchoperator$i", 'eq', 'IN');
-        $mform->disabledIf("searchelements$i", "searchoperator$i", 'eq', 'LIKE');
+        $mform->disabledIf("f_{$i}_{$fieldid}_from", "searchoperator$i", 'eq', '');
+        $mform->disabledIf("f_{$i}_{$fieldid}_from", "searchoperator$i", 'eq', 'IN');
+        $mform->disabledIf("f_{$i}_{$fieldid}_from", "searchoperator$i", 'eq', 'LIKE');
+        $mform->disabledIf("f_{$i}_{$fieldid}_to", "searchoperator$i", 'eq', '');
+        $mform->disabledIf("f_{$i}_{$fieldid}_to", "searchoperator$i", 'eq', 'IN');
+        $mform->disabledIf("f_{$i}_{$fieldid}_to", "searchoperator$i", 'eq', 'LIKE');
+        
+        $separators = array('<br />'. get_string('from'), '<br />'. get_string('to'));
+        return array($elements, $separators);
     }
     
     /**

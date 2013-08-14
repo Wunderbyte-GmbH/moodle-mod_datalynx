@@ -180,7 +180,7 @@ class dataformfield_coursegroup extends dataformfield_base {
             $usergroups = array(-1);
         }
         list($ingroups, $groupids) = $DB->get_in_or_equal($usergroups, SQL_PARAMS_NAMED, "df_{$fieldid}_");           
-        return array(" $varcharcontent $ingroups ", $groupids);
+        return array(" $varcharcontent $ingroups ", $groupids, true);
     }
 
     /**

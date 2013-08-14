@@ -218,10 +218,12 @@ class dataformfield_coursegroup_renderer extends dataformfield_renderer {
         $elements[] = &$mform->createElement('text', "f_{$i}_{$fieldid}_course");
         // Number field for group id
         $elements[] = &$mform->createElement('text', "f_{$i}_{$fieldid}_group");
-        $mform->addGroup($elements, "searchelements$i", get_string('member', 'dataformfield_coursegroup'), array('<br />'. get_string('course'). ' ','<br />'. get_string('group'). ' '), false);
         $mform->setDefault("f_{$i}_{$fieldid}_member", $member);
         $mform->setDefault("f_{$i}_{$fieldid}_course", $course);
         $mform->setDefault("f_{$i}_{$fieldid}_group", $group);
+        $mform->disabledIf("coursegroupelements$i", "searchoperator$i", 'eq', '');
+        
+        return array($elements, array(get_string('member', 'dataformfield_coursegroup'), '<br />'. get_string('course'). ' ','<br />'. get_string('group'). ' '));
     }
 
     /**

@@ -29,7 +29,7 @@ class dataformview_gridext_form extends dataformview_grid_form {
      */
     function view_definition_after_gps() {
 
-        $view = $this->_customdata['view'];
+        $view = $this->_view;
         $editoroptions = $view->editors();
         $editorattr = array('cols' => 40, 'rows' => 5);
 

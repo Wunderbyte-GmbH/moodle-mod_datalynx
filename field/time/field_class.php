@@ -137,12 +137,12 @@ class dataformfield_time extends dataformfield_base {
             if (!$operator) {
                 $operator = '=';
             }
-            $params[$namefrom] = $from;
-            return array(" $not $varcharcontent $operator :$namefrom ", $params);
+            $params[$namefrom] = $from; 
+            return array(" $not $varcharcontent $operator :$namefrom ", $params, true);
         } else {
             $params[$namefrom] = $from;
             $params[$nameto] = $to;
-            return array(" ($not $varcharcontent >= :$namefrom AND $varcharcontent < :$nameto) ", $params);
+            return array(" ($not $varcharcontent >= :$namefrom AND $varcharcontent < :$nameto) ", $params, true);
         }
     }
 

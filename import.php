@@ -12,8 +12,8 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
+// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+ 
 /**
  * @package mod
  * @subpackage dataform
@@ -61,8 +61,11 @@ if ($urlparams->vid and confirm_sesskey()) {
     if ($urlparams->import and confirm_sesskey()) {
         if ($view->process_data()) {
             redirect(new moodle_url('/mod/dataform/view.php', array('d' => $urlparams->d)));
+        } else {
+            // proceed to display list of import views
         }
-        // or display form
+
+    // or display form
     } else {
         // print header
         $df->print_header(array('tab' => 'import', 'urlparams' => $urlparams));
@@ -88,8 +91,8 @@ if ($urlparams->duplicate and confirm_sesskey()) {  // Duplicate any requested v
 // any notifications?
 $df->notifications['bad']['defaultview'] = '';
 $df->notifications['bad']['getstartedviews'] = '';
-if (!$views = $df->get_views_by_type('import', false, true)) {
-    $df->notifications['bad'][] = get_string('importnoneindataform', 'dataform');  // nothing in database
+if (!$views = $df->get_views_by_type('import', true)) {
+    $df->notifications['bad'][] = get_string('importnoneindataform','dataform');  // nothing in database
 }
 
 // print header
@@ -98,8 +101,8 @@ $df->print_header(array('tab' => 'import', 'urlparams' => $urlparams));
 // print add import link
 $addimporturl = new moodle_url('/mod/dataform/view/view_edit.php',
                             array('d' => $df->id(), 'type' => 'import', 'sesskey' => sesskey()));
-$addimportlink = html_writer::link($addimporturl, get_string('importadd', 'dataform'));
-$br = html_writer::empty_tag('br');
+$addimportlink = html_writer::link($addimporturl, get_string('importadd','dataform'));
+$br = html_writer::empty_tag('br'); 
 echo html_writer::tag('div', $addimportlink. $br. $br, array('class'=>'mdl-align'));
 
 // if there are import views print admin style list of them
@@ -109,7 +112,7 @@ if ($views) {
     $editbaseurl = '/mod/dataform/view/view_edit.php';
     $actionbaseurl = '/mod/dataform/import.php';
     $linkparams = array('d' => $df->id(), 'sesskey' => sesskey());
-
+                        
     // table headings
     $strviews = get_string('views', 'dataform');
     $strdescription = get_string('description');
@@ -119,11 +122,11 @@ if ($views) {
     $strduplicate =  get_string('duplicate');
 
     $selectallnone = html_writer::checkbox(null, null, false, null, array('onclick' => 'select_allnone(\'view\'&#44;this.checked)'));
-    $multidelete = html_writer::tag('button',
-                                $OUTPUT->pix_icon('t/delete', get_string('multidelete', 'dataform')),
+    $multidelete = html_writer::tag('button', 
+                                $OUTPUT->pix_icon('t/delete', get_string('multidelete', 'dataform')), 
                                 array('name' => 'multidelete',
                                         'onclick' => 'bulk_action(\'view\'&#44; \''. htmlspecialchars_decode(new moodle_url($actionbaseurl, $linkparams)). '\'&#44; \'delete\')'));
-
+    
     $table = new html_table();
     $table->head = array($strviews,
                         $strdescription,
@@ -147,9 +150,9 @@ if ($views) {
                         false,
                         false);
     $table->attributes['align'] = 'center';
-
+    
     foreach ($views as $viewid => $view) {
-
+        
         $viewname = html_writer::link(new moodle_url($viewbaseurl, $linkparams + array('vid' => $viewid)), $view->name());
         $viewdescription = shorten_text($view->view->description, 30);
         $viewedit = html_writer::link(new moodle_url($editbaseurl, $linkparams + array('vedit' => $viewid)),
@@ -170,7 +173,7 @@ if ($views) {
             $viewreset,
             $viewdelete,
             $viewselector
-        );
+       );
     }
     echo html_writer::table($table);
 }

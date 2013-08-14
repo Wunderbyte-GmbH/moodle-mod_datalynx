@@ -41,7 +41,7 @@ if (isloggedin() and $is_templatemanager) {
     // Browse/Management
     $row = array();
     $row[] = new tabobject('browse', new moodle_url('/mod/dataform/view.php', array('d' => $this->id())), get_string('browse','dataform'));
-    $row[] = new tabobject('manage', new moodle_url('/mod/dataform/preset/index.php', array('d' => $this->id())), get_string('manage','dataform'));
+    $row[] = new tabobject('manage', new moodle_url('/mod/dataform/view/index.php', array('d' => $this->id())), get_string('manage','dataform'));
     // Add view edit tab
     if ($currenttab == 'browse' and !empty($this->_currentview)) {
         $params = array('d' => $this->id(), 'sesskey' => sesskey(), 'vedit' => $this->_currentview->id());
@@ -59,14 +59,14 @@ if (isloggedin() and $is_templatemanager) {
         $row  = array();
         // template manager can do everything
         if ($is_templatemanager)  {
-            $row[] = new tabobject('presets', new moodle_url('/mod/dataform/preset/index.php', array('d' => $this->id())), get_string('presets', 'dataform'));
-            $row[] = new tabobject('fields', new moodle_url('/mod/dataform/field/index.php', array('d' => $this->id())), get_string('fields','dataform'));
             $row[] = new tabobject('views', new moodle_url('/mod/dataform/view/index.php', array('d' => $this->id())), get_string('views','dataform'));
+            $row[] = new tabobject('fields', new moodle_url('/mod/dataform/field/index.php', array('d' => $this->id())), get_string('fields','dataform'));
             $row[] = new tabobject('filters', new moodle_url('/mod/dataform/filter/index.php', array('d' => $this->id())), get_string('filters','dataform'));
             $row[] = new tabobject('rules', new moodle_url('/mod/dataform/rule/index.php', array('d' => $this->id())), get_string('rules','dataform'));
             $row[] = new tabobject('tools', new moodle_url('/mod/dataform/tool/index.php', array('d' => $this->id())), get_string('tools','dataform'));
             $row[] = new tabobject('js', new moodle_url('/mod/dataform/js.php', array('d' => $this->id(), 'jsedit' => 1)), get_string('jsinclude', 'dataform'));
             $row[] = new tabobject('css', new moodle_url('/mod/dataform/css.php', array('d' => $this->id(), 'cssedit' => 1)), get_string('cssinclude', 'dataform'));
+            $row[] = new tabobject('presets', new moodle_url('/mod/dataform/preset/index.php', array('d' => $this->id())), get_string('presets', 'dataform'));
             $row[] = new tabobject('import', new moodle_url('/mod/dataform/import.php', array('d' => $this->id())), get_string('import', 'dataform'));
             //$row[] = new tabobject('reports', new moodle_url('/mod/dataform/reports.php', array('d' => $this->id())), get_string('reports','dataform'));
 

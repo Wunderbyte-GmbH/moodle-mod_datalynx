@@ -38,10 +38,10 @@ class dataformfield_dataformview extends dataformfield_no_content {
         parent::__construct($df, $field);
 
         // Get the dataform
-        if (empty($this->field->param1) or !$data = $DB->record_exists('dataform', array('id' => $this->field->param1))) {
+        if (empty($this->field->param1) or !$data = $DB->get_record('dataform', array('id' => $this->field->param1))) {
             return;
         }
-        
+
         $dataform = new dataform($data, null, true);
         // TODO Add capability check on view entries
         

@@ -16,18 +16,58 @@
  
 /**
  * @package dataformview
- * @subpackage grid
- * @copyright 2012 Itamar Tzadok 
+ * @subpackage single
+ * @copyright 2013 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once("$CFG->dirroot/mod/dataform/view/view_class.php");
+require_once("$CFG->dirroot/mod/dataform/view/grid/view_class.php");
 
-class dataformview_grid extends dataformview_base {
+/**
+ * A dataform view class that displays one new entry for adding.
+ * This may be useful for applications such as 'contact us' where anonymous
+ * users can post messages to site admin but not see any posted messages.
+ * TODO Implement return to caller view
+ */
+class dataformview_single extends dataformview_base {
 
-    protected $type = 'grid';
+    protected $type = 'single';
     protected $_editors = array('section', 'param2');
-    
+    protected $_vieweditors = array('section', 'param2');
+
+    /**
+     *
+     */
+    public function set_content() {
+        if ($this->_returntoentriesform) {
+            return;
+        }
+        
+        // Editing a new entry
+        if ($this->_editentries < 0) {
+            // Make sure only 1 entry
+            $this->_editentries = -1;
+            return;
+        }
+        
+        // If not new, must have an entry to edit/display
+        if (!$eid = $this->_editentries and !$eid = required_param('eids', PARAM_INT)) {
+            return;
+        }   
+
+        $this->set_filter(array('eids' => $eid));
+        
+        $options = array();
+         // do we need ratings?
+        if ($ratingoptions = $this->is_rating()) {
+            $options['ratings'] = $ratingoptions;
+        }
+        // do we need comments?
+
+        // Get the entries
+        $this->_entries->set_content($options);
+    }
+
     /**
      * Returns a fieldset of view options
      */
@@ -37,42 +77,9 @@ class dataformview_grid extends dataformview_base {
             return; // you shouldn't get that far if there are no user fields
         }
 
-        // set views and filters menus and quick search
-        $table = new html_table();
-        $table->attributes['align'] = 'center';
-        $table->attributes['cellpadding'] = '2';
-        // first row: menus
-        $row1 = new html_table_row();
-        $viewsmenu = new html_table_cell('##viewsmenu##');
-        $seperator = new html_table_cell('     ');
-        $filtersmenu = new html_table_cell('##filtersmenu##');
-        $quicksearch = new html_table_cell('##quicksearch##');
-        $quickperpage = new html_table_cell('##quickperpage##');
-        $row1->cells = array($viewsmenu, $seperator, $filtersmenu, $quicksearch, $quickperpage);
-        foreach ($row1->cells as $cell) {
-            $cell->style = 'border:0 none;';
-        }
-        // second row: add entries 
-        $row2 = new html_table_row();
-        $addentries = new html_table_cell('##addnewentry##');
-        $addentries->colspan = 5;
-        $row2->cells = array($addentries);
-        foreach ($row2->cells as $cell) {
-            $cell->style = 'border:0 none;';
-        }        
-        // third row: paging bar
-        $row3 = new html_table_row();
-        $pagingbar = new html_table_cell('##pagingbar##');
-        $pagingbar->colspan = 5;
-        $row3->cells = array($pagingbar);
-        foreach ($row3->cells as $cell) {
-            $cell->style = 'border:0 none;';
-        }
-        // construct the table
-        $table->data = array($row1, $row2, $row3);
-        $sectiondefault = html_writer::table($table);
-        $this->view->esection = html_writer::tag('div', $sectiondefault, array('class' => 'mdl-align'));
-
+        $viewsmenu = html_writer::tag('div', '##viewsmenu##', array('class' => 'mdl-align'));
+        $addnewentry = html_writer::tag('div', '##addnewentry##', array('class' => 'mdl-align'));
+        $this->view->esection = html_writer::tag('div', $viewsmenu. $addnewentry);
 
         // set content
         $table = new html_table();
@@ -97,7 +104,7 @@ class dataformview_grid extends dataformview_base {
         $table->data[] = $row;
         // construct the table
         $entrydefault = html_writer::table($table);
-        $this->view->eparam2 = html_writer::tag('div', $entrydefault, array('class' => 'entry'));
+        $this->view->eparam2 = html_writer::tag('div', $entrydefault, array('class' => 'mdl-align'));
     }
 
     /**
@@ -108,50 +115,9 @@ class dataformview_grid extends dataformview_base {
         
         $elements = array();
 
-        // Prepare grid table if needed
-        if ($name != 'newentry' and !empty($this->view->param3)) {
-            $entriescount = count($entriesset);
-            list($cols, $rows) = explode(' ', $this->view->param3);
-            if ($entriescount < $cols) {
-                $cols = $entriescount;
-                $rows = 1;
-            } else {
-                if ($rows) {
-                    $rows = ceil($entriescount/$cols);
-                } else {
-                    $rows = 1;
-                    $percol = ceil($entriescount/$cols) > 1 ? ceil($entriescount/$cols) : null;
-                }
-            }
-
-            $table = $this->make_table($cols, $rows);                    
-            $grouphtml = html_writer::table($table);
-            // now split $tablehtml to cells by ##begintablecell##
-            $cells = explode('##begintablecell##', $grouphtml);
-            // the first part is everything before first cell
-            $elements[] = array('html', array_shift($cells));
-        }
-
         // flatten the set to a list of elements
-        $count = 0;
         foreach ($entriesset as $entry_definitions) {
             $elements = array_merge($elements, $entry_definitions);
-            if (!empty($cells)) {
-                if (empty($percol) or $count >= $percol - 1) {
-                    $count = 0;
-                    $elements[] = array('html', array_shift($cells));
-
-                } else {
-                    $count++;
-                }                
-            }
-        }
-
-        // Add remaining cells
-        if (!empty($cells)) {
-            foreach ($cells as $cell) {
-                $elements[] = array('html', $cell);
-            }                
         }
 
         // Add group heading 
@@ -225,27 +191,5 @@ class dataformview_grid extends dataformview_base {
         
         return $elements;
     }
-
-    /**
-     *
-     */
-    protected function make_table($cols, $rows) {
-        $table = new html_table();
-        $table->align = array_fill(0, $cols, 'center');
-        //$table->wrap = array_fill(0, $cols, 'false');
-        $table->attributes['align'] = 'center';
-        for ($r = 0; $r < $rows; $r++) {
-            $row = new html_table_row();
-            for ($c = 0; $c < $cols; $c++) {
-                $cell = new html_table_cell();
-                $cell->text = '##begintablecell##';
-                $row->cells[] = $cell;
-            }
-            $table->data[] =  $row;
-        }
-        
-        return $table;
-    }
-
 
 }

@@ -48,41 +48,8 @@ class dataform_filter {
     protected $_searchfields = null;
     protected $_sortfields = null;
     protected $_joins = null;
+    protected $_entriesexcluded = array();
 
-    /**
-     *
-     */
-    public static function get_sort_url_query(array $sorties) {
-        $usort = null;
-        if ($sorties) {
-            $usort = implode(',', array_map(function($a) {return implode(' ', $a);}, $sorties));
-            $usort = urlencode($usort);
-        }
-        return $usort;
-    }
-    
-    /**
-     *
-     */
-    public static function get_search_url_query(array $searchies) {
-        $usearch = null;
-        if ($searchies) {
-            $usearch = array();
-            foreach ($searchies as $fieldid => $andor) {
-                foreach ($andor as $key => $soptions) {
-                    if (empty($soptions)) {
-                        continue;
-                    }
-                    $options = implode('#', array_map(function($a) {return implode(',', $a);}, $soptions));
-                    $usearch[] = "$fieldid:$key:$options";
-                }
-            }
-            $usearch = implode('@', $usearch);
-            $usearch = urlencode($usearch);
-        }
-        return $usearch;
-    }
-    
     /**
      * constructor
      */
@@ -105,6 +72,27 @@ class dataform_filter {
         $this->users = empty($filterdata->users) ? null : $filterdata->users;
         $this->groups = empty($filterdata->groups) ? null : $filterdata->groups;
         $this->page = empty($filterdata->page) ? 0 : $filterdata->page;
+    }
+
+    /**
+     *
+     */
+    public function get_filter_obj() {
+        $filter = new object;
+        $filter->id = $this->id;
+        $filter->dataid = $this->dataid;
+        $filter->name = $this->name;
+        $filter->description = $this->description;
+        $filter->visible = $this->visible;
+
+        $filter->perpage = $this->perpage;
+        $filter->selection = $this->selection;
+        $filter->groupby = $this->groupby;
+        $filter->customsort = $this->customsort;
+        $filter->customsearch = $this->customsearch;
+        $filter->search = $this->search;
+        
+        return $filter;
     }
 
     /**
@@ -135,9 +123,16 @@ class dataform_filter {
      */
     public function init_filter_sql() {
         $this->_filteredtables = null;
-        $this->_searchfields = $this->customsearch ? unserialize($this->customsearch) : array();
-        $this->_sortfields = $this->customsort ? unserialize($this->customsort) : array();
+        $this->_searchfields = array();
+        $this->_sortfields = array();
         $this->_joins = array();
+               
+        if ($this->customsearch) {
+            $this->_searchfields = is_array($this->customsearch) ? $this->customsearch : unserialize($this->customsearch);
+        }
+        if ($this->customsort) {
+            $this->_sortfields = is_array($this->customsort) ? $this->customsort : unserialize($this->customsort);
+        }
     }
     
     /**
@@ -155,18 +150,18 @@ class dataform_filter {
         $searchtables = '';
 
         if ($searchfields) {
-
+        
             $whereand = array();
             $whereor = array();
             foreach($searchfields as $fieldid => $searchfield) {
                 // if we got this far there must be some actual search values
-                $field = $fields[$fieldid];
-
-                // Search from is required only for non-internal fields
-                if (!$field::is_internal()) {
-                    $searchfrom[] = $fieldid;
+                if (empty($fields[$fieldid])) {
+                    continue;
                 }
                 
+                $field = $fields[$fieldid];
+                $internalfield = $field::is_internal();
+
                 // Register join field if applicable
                 $this->register_join_field($field);
 
@@ -174,9 +169,14 @@ class dataform_filter {
                 if (!empty($searchfield['AND'])) {
                     foreach ($searchfield['AND'] as $option) {
                         if ($fieldsqloptions = $field->get_search_sql($option)) {
-                            list($fieldsql, $fieldparams) = $fieldsqloptions;
+                            list($fieldsql, $fieldparams, $fromcontent) = $fieldsqloptions;
                             $whereand[] = $fieldsql;
                             $searchparams = array_merge($searchparams, $fieldparams);
+                            
+                            // Add searchfrom (JOIN) only for search in dataform content or external tables.
+                            if (!$internalfield and $fromcontent) {
+                                $searchfrom[$fieldid] = $fieldid;
+                            }
                         }
                     }
                 }
@@ -185,22 +185,18 @@ class dataform_filter {
                 if (!empty($searchfield['OR'])) {
                     foreach ($searchfield['OR'] as $option) {
                         if ($fieldsqloptions = $field->get_search_sql($option)) {
-                            list($fieldsql, $fieldparams) = $fieldsqloptions;
+                            list($fieldsql, $fieldparams, $fromcontent) = $fieldsqloptions;
                             $whereor[] = $fieldsql;
                             $searchparams = array_merge($searchparams, $fieldparams);
+
+                            // Add searchfrom (JOIN) only for search in dataform content or external tables.
+                            if (!$internalfield and $fromcontent) {
+                                $searchfrom[$fieldid] = $fieldid;
+                            }
                         }
                     }
                 }
-            }
 
-            if ($searchfrom) {
-                $searchwhere[] = implode(' AND ', array_map(function($fieldid) {return " c$fieldid.fieldid = $fieldid ";}, $searchfrom));
-            }
-            if ($whereand) {
-                $searchwhere[] = implode(' AND ', $whereand);
-            }
-            if ($whereor) {
-                $searchwhere[] = '('. implode(' OR ', $whereor). ')';
             }
 
             // compile sql for search settings
@@ -212,6 +208,16 @@ class dataform_filter {
                         $searchtables .= $fields[$fieldid]->get_search_from_sql();
                     } 
                 }
+            }
+
+            if ($searchfrom) {
+                $searchwhere[] = implode(' AND ', array_map(function($fieldid) {return " c$fieldid.fieldid = $fieldid ";}, $searchfrom));
+            }
+            if ($whereand) {
+                $searchwhere[] = implode(' AND ', $whereand);
+            }
+            if ($whereor) {
+                $searchwhere[] = '('. implode(' OR ', $whereor). ')';
             }
 
         } else if ($simplesearch) {
@@ -292,11 +298,11 @@ class dataform_filter {
         $contentfields = $this->contentfields;
 
         $params = array();
+        $dataformcontent = array();
         $whatcontent = ' ';
         $contenttables = ' ';
         
         if ($contentfields) {
-            $dataformcontent = array();
             $whatcontent = array();
             $contentfrom = array();
             $paramcount = 0;
@@ -366,8 +372,7 @@ class dataform_filter {
     public function append_sort_options(array $sorties) {
         if ($sorties) {
             $sortoptions = $this->customsort ? unserialize($this->customsort) : array();
-            foreach ($sorties as $sorty) {
-                list($fieldid, $sortdir) = $sorty;
+            foreach ($sorties as $fieldid => $sortdir) {
                 $sortoptions[$fieldid] = $sortdir;
             }
             $this->customsort = serialize($sortoptions);
@@ -401,10 +406,10 @@ class dataform_filter {
  */
 class dataform_filter_manager {
 
-    const USER_FILTER = -1;
+    const USER_FILTER_MAX_NUM = 5;
+    const BLANK_FILTER = -1;
     const USER_FILTER_SET = -2;
-    const USER_FILTER_RESET = -3;
-    const BLANK_FILTER = -9;
+    const USER_FILTER_ID_START = -10;
     
     protected $_df;
     protected $_filters;
@@ -416,58 +421,50 @@ class dataform_filter_manager {
         $this->_df = $df;
         $this->_filters = array();
     }
-
+   
     /**
      *
      */
-    public function get_filter_from_id($filterid = 0) {
+    public function get_filter_from_id($filterid = 0, array $options = null) {
         global $DB;
         
         $df = $this->_df;
+        $dfid = $df->id();
 
-        // Set user preferences
-        if ($filterid == self::USER_FILTER_SET) {
-            set_user_preference('dataform_'. $df->id(). '_perpage', optional_param('userperpage', get_user_preferences('dataform_'. $df->id(). '_perpage', 0), PARAM_INT));
-            set_user_preference('dataform_'. $df->id(). '_selection', optional_param('userselection', get_user_preferences('dataform_'. $df->id(). '_selection', 0), PARAM_INT));
-            set_user_preference('dataform_'. $df->id(). '_groupby', optional_param('usergroupby', get_user_preferences('dataform_'. $df->id(). '_groupby', ''), PARAM_INT));
-            set_user_preference('dataform_'. $df->id(). '_search', optional_param('usersearch', get_user_preferences('dataform_'. $df->id(). '_search', ''), PARAM_NOTAGS));
-            set_user_preference('dataform_'. $df->id(). '_customsort', optional_param('usercustomsort', get_user_preferences('dataform_'. $df->id(). '_customsort', ''), PARAM_NOTAGS));
-            set_user_preference('dataform_'. $df->id(). '_customsearch', optional_param('usercustomsearch', get_user_preferences('dataform_'. $df->id(). '_customsearch', ''), PARAM_NOTAGS));
-            $filterid = self::USER_FILTER;
-        // Reset user preferences
-        } else if ($filterid == self::USER_FILTER_RESET) {
-            unset_user_preference('dataform_'. $df->id(). '_perpage');
-            unset_user_preference('dataform_'. $df->id(). '_selection');
-            unset_user_preference('dataform_'. $df->id(). '_groupby');
-            unset_user_preference('dataform_'. $df->id(). '_search');
-            unset_user_preference('dataform_'. $df->id(). '_customsort');
-            unset_user_preference('dataform_'. $df->id(). '_customsearch');
-            $filterid = 0;
-        }
-        
-        // User preferences
-        if ($filterid == self::USER_FILTER) {
-            $filter = new object;
-            $filter->id = $filterid;
-            $filter->dataid = $df->id();
-            $filter->perpage = get_user_preferences('dataform_'. $df->id(). '_perpage', 0);
-            $filter->selection = get_user_preferences('dataform_'. $df->id(). '_selection', 0);
-            $filter->groupby = get_user_preferences('dataform_'. $df->id(). '_groupby', '');
-            $filter->search = trim(get_user_preferences('dataform_'. $df->id(). '_search', ''));
-            $filter->customsort = trim(get_user_preferences('dataform_'. $df->id(). '_customsort', ''));
-            $filter->customsearch = trim(get_user_preferences('dataform_'. $df->id(). '_customsearch', ''));
-            return new dataform_filter($filter);
-        }
-            
         // Blank filter
         if ($filterid == self::BLANK_FILTER) {
             $filter = new object;
             $filter->dataid = $df->id();
             $filter->name = get_string('filternew', 'dataform');
-            $filter->perpage = 10;
+            $filter->perpage = 0;
 
             return new dataform_filter($filter);
         }
+        
+        // User filter
+        if ($filterid < 0) {
+            // For actual user filters we need a view and whether advanced
+            $view = !empty($options['view']) ? $options['view'] : null;
+            $viewid = $view ? $view->id() : 0;
+            $advanced = !empty($options['advanced']);
+            
+            // User preferences
+            if (($filterid == self::USER_FILTER_SET or $advanced) and $view and $view->is_active()) {
+                $filter = $this->set_user_filter($filterid, $view, $advanced);
+                return new dataform_filter($filter);
+            }
+        
+            // Retrieve existing user filter (filter id > blank filter)
+            if ($filterid != self::USER_FILTER_SET and $filter = get_user_preferences("dataformfilter-$dfid-$viewid-$filterid", null)) {
+                $filter = unserialize($filter);
+                $filter->dataid = $dfid;
+                return new dataform_filter($filter);
+            }
+            
+            // For all other "negative" cases proceed with defaults
+            $filterid = 0;
+        }
+                
             
         // Dataform default filter
         if ($filterid == 0) {
@@ -488,8 +485,30 @@ class dataform_filter_manager {
         if ($this->get_filters() and isset($this->_filters[$filterid])) {
             return clone($this->_filters[$filterid]);
         } else {
-            throw new moodle_exception("Filter $filterid not found for Dataform ". $df->id());
+            throw new moodle_exception("Filter $filterid not found for Dataform $dfid");
         }
+    }
+
+    /**
+     *
+     */
+    public function get_filter_from_url($url, $raw = false) {
+        global $DB;
+        
+        $df = $this->_df;
+        $dfid = $df->id();
+
+        if ($options = self::get_filter_options_from_url($url)) {
+            $options['dataid'] = $dfid;
+            $filter = new dataform_filter((object) $options);
+            
+            if ($raw) {
+                return $filter->get_filter_obj();
+            } else {
+                return $filter;
+            }
+        }
+        return null;
     }
 
     /**
@@ -582,22 +601,17 @@ class dataform_filter_manager {
                             break;
                         }
                         
-                        // Generate filter from form data
+                        // Regenerate form and filter to obtain custom search data
                         $formdata = $mform->get_submitted_data();
                         $filter = $this->get_filter_from_form($filter, $formdata);
-                        
-                        // Regenerate form and filter to obtain custom search data
                         $filterform = $this->get_filter_form($filter);
-                        $formdata = $filterform->get_submitted_data();
-                        
+
                         // return to form (on reload button press)
-                        if ($mform->no_submit_button_pressed()) {
-                            // Get raw filter from formdata
-                            $filter = $this->get_filter_from_form($filter, $formdata);
+                        if ($filterform->no_submit_button_pressed()) {
                             $this->display_filter_form($filterform, $filter);
 
                         // process validated
-                        } else if ($mform->get_data()) {
+                        } else if ($formdata = $filterform->get_data()) {
                             // Get clean filter from formdata
                             $filter = $this->get_filter_from_form($filter, $formdata, true);
 
@@ -680,14 +694,13 @@ class dataform_filter_manager {
      */
     public function get_filter_form($filter) {
         global $CFG;
-
+        
         require_once("$CFG->dirroot/mod/dataform/filter/filter_form.php");
-
         $formurl = new moodle_url(
             '/mod/dataform/filter/index.php',
             array('d' => $this->_df->id(), 'fid' => $filter->id, 'update' => 1)
         );
-        $mform = new mod_dataform_filter_form($formurl, array('df' => $this->_df, 'filter' => $filter));
+        $mform = new mod_dataform_filter_form($this->_df, $filter, $formurl);
         return $mform;        
     }
 
@@ -710,12 +723,12 @@ class dataform_filter_manager {
     /**
      *
      */
-    protected function get_filter_from_form($filter, $formdata, $finalize = false) {
+    public function get_filter_from_form($filter, $formdata, $finalize = false) {
         $filter->name = $formdata->name;
-        $filter->description = $formdata->description;
-        $filter->perpage = $formdata->perpage;
+        $filter->description = !empty($formdata->description) ? $formdata->description : '';
+        $filter->perpage = !empty($formdata->perpage) ? $formdata->perpage : 0;
         $filter->selection = !empty($formdata->selection) ? $formdata->selection : 0;
-        $filter->groupby = $formdata->groupby;
+        $filter->groupby = !empty($formdata->groupby) ? $formdata->groupby : 0;
         $filter->search = isset($formdata->search) ? $formdata->search : '';
         $filter->customsort = $this->get_sort_options_from_form($formdata);
         $filter->customsearch = $this->get_search_options_from_form($formdata, $finalize);
@@ -762,16 +775,16 @@ class dataform_filter_manager {
                 // check if trying to define a search criterion
                 if ($searchandor = $formdata->{"searchandor$i"}) {
                     if ($searchfieldid = $formdata->{"searchfield$i"}) {
-                        $parsedvalue = $fields[$searchfieldid]->parse_search($formdata, $i);
-                        $not = isset($formdata->{"searchnot$i"}) ? 'NOT' : '';
+                        $not = !empty($formdata->{"searchnot$i"}) ? $formdata->{"searchnot$i"} : '';
                         $operator = isset($formdata->{"searchoperator$i"}) ? $formdata->{"searchoperator$i"} : '';
-                        // Don't add empty criteria on cleanup
-                        if ($finalize and !$parsedvalue) {
+                        $parsedvalue = $fields[$searchfieldid]->parse_search($formdata, $i);
+                        // Don't add empty criteria on cleanup (unless operator is Empty and thus doesn't need search value)
+                        if ($finalize and $operator and !$parsedvalue) {
                             continue;
                         }
 
                         // If finalizing, aggregate by fieldid and searchandor,
-                        // otherwise just make a flat array (of arrrays)
+                        // otherwise just make a flat array (of arrays)
                         if ($finalize) {
                             if (!isset($searchfields[$searchfieldid])) {
                                 $searchfields[$searchfieldid] = array();
@@ -872,7 +885,7 @@ class dataform_filter_manager {
                 // Get field objects
                 $fields = $df->get_fields();
                 
-                // Parse filter sort settings
+                // CUSTOM SORT
                 $sortfields = array();
                 if ($filter->customsort) {
                     $sortfields = unserialize($filter->customsort);
@@ -883,6 +896,7 @@ class dataform_filter_manager {
                     $sorturlarr = array();
                     foreach ($sortfields as $fieldid => $sortdir) {
                         if (empty($fields[$fieldid])) {
+                            unset($sortfields[$fieldid]);
                             continue;
                         }
                         
@@ -894,11 +908,14 @@ class dataform_filter_manager {
                         $strsortdir = $sortdir ? 'Descending' : 'Ascending';
                         $sortarr[] = $OUTPUT->pix_icon('t/'. ($sortdir ? 'down' : 'up'), $strsortdir). ' '. $fields[$fieldid]->field->name;
                     }
-                    $sortoptions = implode('<br />', $sortarr);
-                    $sorturlquery = implode(',', $sorturlarr);
-                }            
+                    if ($sortfields) {
+                        $sortoptions = implode('<br />', $sortarr);                       
+                        $sorturlquery = '&usort='. urlencode(implode(',', $sorturlarr));
+                    }
+                }
+                $sortoptions = !empty($sortoptions) ? $sortoptions : '---';               
                 
-                // Parse filter search settings
+                // CUSTOM SEARCH
                 $searchfields = array();
                 if ($filter->customsearch) {
                     $searchfields = unserialize($filter->customsearch);
@@ -914,7 +931,6 @@ class dataform_filter_manager {
                         }
                         $fieldoptions = array();
                         if (!empty($searchfield['AND'])) {
-                            //$andoptions = array_map("$fields[$fieldid]->format_search_value", $searchfield['AND']);
                             $options = array();
                             foreach ($searchfield['AND'] as $option) {
                                 if ($option) {
@@ -922,10 +938,8 @@ class dataform_filter_manager {
                                 }
                             }
                             $fieldoptions[] = '<b>'. $fields[$fieldid]->field->name. '</b>:'. implode(' <b>and</b> ', $options);
-                            $searchurlarr[] = "$fieldid:AND:". implode('#', array_map(function($a) {return implode(',', $a);}, $searchfield['AND']));
                         }
                         if (!empty($searchfield['OR'])) {
-                            //$oroptions = array_map("$fields[$fieldid]->format_search_value", $searchfield['OR']);
                             $options = array();
                             foreach ($searchfield['OR'] as $option) {
                                 if ($option) {
@@ -933,7 +947,6 @@ class dataform_filter_manager {
                                 }
                             }
                             $fieldoptions[] = '<b>'. $fields[$fieldid]->field->name. '</b> '. implode(' <b>or</b> ', $options);
-                            $searchurlarr[] = "$fieldid:OR:". implode('#', array_map(function($a) {return implode(',', $a);}, $searchfield['OR']));
                         }
                         if ($fieldoptions) {
                             $searcharr[] = implode('<br />', $fieldoptions);
@@ -943,28 +956,17 @@ class dataform_filter_manager {
                         $searchoptions = implode('<br />', $searcharr);
                     }
                 } else {
-                    $searchoptions = $filter->search ? $filter->search : '';
+                    $searchoptions = $filter->search ? $filter->search : '---';
                 }
                 
-                if ($searchurlarr) {
-                    $searchurlquery = implode('@', $searchurlarr);
-                }
+            }         
+            if (!empty($searchoptions)) {
+                $searchurlquery = '&usearch='. self::get_search_url_query($searchfields);
             }
-            
-            $sortoptions = !empty($sortoptions) ? $sortoptions : '---';
-            $searchoptions = !empty($searchoptions) ? $searchoptions : '---';
-            
+           
             // Per page
             $perpage = empty($filter->perpage) ?  '---' : $filter->perpage;
 
-            // Url query
-            $urlquery = '';
-            if ($sorturlquery)  {
-                $urlquery .= '&usort='. urlencode($sorturlquery);
-            }
-            if ($searchurlquery)  {
-                $urlquery .= '&usearch='. urlencode($searchurlquery);
-            }
 
             $table->data[] = array(
                 $filtername,
@@ -972,7 +974,7 @@ class dataform_filter_manager {
                 $perpage,
                 $sortoptions,
                 $searchoptions,
-                $urlquery,
+                $sorturlquery. $searchurlquery,
                 $visible,
                 $defaultfilter,
                 $filteredit,
@@ -997,4 +999,266 @@ class dataform_filter_manager {
         echo html_writer::empty_tag('br');
     }
 
+    // ADVANCED FILTER
+    
+    /**
+     *
+     */
+    public function get_advanced_filter_form($filter, $view) {
+        global $CFG;
+        
+        require_once("$CFG->dirroot/mod/dataform/filter/filter_form.php");
+        $formurl = new moodle_url($view->get_baseurl(), array('filter' => $filter->id, 'afilter' => 1));         $mform = new mod_dataform_advanced_filter_form($this->_df, $filter, $formurl, array('view' => $view));
+        return $mform;        
+    }
+
+    /**
+     *
+     */
+    public function get_user_filters_menu($viewid) {
+        $filters = array();
+        
+        $df = $this->_df;
+        $dfid = $df->id();
+        if ($filternames = get_user_preferences("dataformfilter-$dfid-$viewid-userfilters", '')) {
+            foreach (explode(';', $filternames) as $filteridname) {
+                list($filterid, $name) = explode(' ', $filteridname, 2);
+                $filters[$filterid] = $name;
+            }
+        }
+        return $filters;
+    }
+
+    /**
+     *
+     */
+    public function set_user_filter($filterid, $view, $advanced = false) {
+        $df = $this->_df;
+        $dfid = $df->id();
+        $viewid = $view->id();
+
+        // Advanced filter
+        if ($advanced) {
+            $filter = new dataform_filter((object) array('id' => $filterid, 'dataid' => $dfid));
+            $mform = $this->get_advanced_filter_form($filter, $view);
+
+            // Regenerate form and filter to obtain custom search data
+            $formdata = $mform->get_submitted_data();
+            $filter = $this->get_filter_from_form($filter, $formdata);
+            $filter->id = $filterid;
+            $filterform = $this->get_advanced_filter_form($filter, $view);
+
+            // return to form (on reload button press)
+            if ($filterform->no_submit_button_pressed()) {
+                return $filter;
+                
+            // process validated
+            } else if ($formdata = $filterform->get_data()) {
+                // Get clean filter from formdata
+                $filter = $this->get_filter_from_form($filter, $formdata, true);
+                $modifycurrent = !empty($formdata->savebutton);
+            }
+        }
+        
+        // Quick filters    
+        if (!$advanced) {
+            if (!$filter = $this->get_filter_from_url(null, true)) {
+                return null;
+            }
+        }
+        
+        // Set user filter
+        if ($userfilters = $this->get_user_filters_menu($viewid)) {
+            if (empty($modifycurrent) or empty($userfilters[$filterid])) {
+                $filterid = key($userfilters)-1;
+            }
+        } else {
+            $filterid = self::USER_FILTER_ID_START;
+        }
+
+        // If max number of user filters pop the last
+        if (count($userfilters) >= self::USER_FILTER_MAX_NUM) {
+            $fids = array_keys($userfilters);
+            while (count($fids) >= self::USER_FILTER_MAX_NUM) {
+                $fid = array_pop($fids);
+                unset($userfilters[$fid]);
+                unset_user_preference("dataformfilter-$dfid-$viewid-$fid");
+            }
+        }
+
+        // Save the new filter
+        $filter->id = $filterid;
+        $filter->dataid = $dfid;
+        if (empty($filter->name)) {
+            $filter->name = get_string('filtermy', 'dataform'). ' '. abs($filterid);
+        }
+        set_user_preference("dataformfilter-$dfid-$viewid-$filterid", serialize($filter));
+        
+        // Add the new filter to the beginning of the userfilters
+        $userfilters = array($filterid => $filter->name) + $userfilters;
+        foreach ($userfilters as $filterid => $name) {
+            $userfilters[$filterid] = "$filterid $name";
+        }
+        set_user_preference("dataformfilter-$dfid-$viewid-userfilters", implode(';', $userfilters));
+
+
+        return $filter;        
+    }
+
+    // HELPERS
+    
+    /**
+     *
+     */
+    public static function get_filter_url_query($filter) {
+        $urlquery = array();
+        
+        if ($filter->customsort) {
+            $urlquery[] = 'usort='. self::get_sort_url_query(unserialize($filter->customsort));
+        }
+        if ($filter->customsearch) {
+            $urlquery[] = 'usearch='. self::get_search_url_query(unserialize($filter->customsearch));
+        }
+
+        if ($urlquery) {
+            return implode('&', $urlquery);
+        }
+        return '';
+    }
+    
+    /**
+     *
+     */
+    public static function get_sort_url_query(array $sorties) {
+        if ($sorties) {
+            $usort = array();
+            foreach ($sorties as $fieldid => $dir) {
+                $usort[] = "$fieldid $dir";
+            }
+            return urlencode(implode(',', $usort));
+        }
+        return '';
+    }
+    
+    /**
+     *
+     */
+    public static function get_sort_options_from_query($query) {
+        $usort = null;
+        if ($query) {
+            $usort = urldecode($query);
+            $usort = array_map(function($a) {return explode(' ', $a);}, explode(',', $usort));
+        }
+        return $usort;
+    }
+    
+    /**
+     *
+     */
+    public static function get_search_url_query(array $searchies) {
+        $usearch = null;
+        if ($searchies) {
+            $usearch = array();
+            foreach ($searchies as $fieldid => $andor) {
+                foreach ($andor as $key => $soptions) {
+                    if (empty($soptions)) {
+                        continue;
+                    }
+                    foreach ($soptions as $options) {
+                        if (empty($options)) {
+                            continue;
+                        }
+                        list($not, $op, $value) = $options;
+                        $searchvalue = is_array($value) ? implode('|', $value) : $value;
+                        $usearch[] = "$fieldid:$key:$not,$op,$searchvalue";
+                    }
+                }
+            }
+            $usearch = implode('@', $usearch);
+            $usearch = urlencode($usearch);
+        }
+        return $usearch;
+    }
+    
+    /**
+     *
+     */
+    public static function get_search_options_from_query($query) {
+        $soptions = array();
+        if ($query) {
+            $usearch = urldecode($query);
+            $searchies = explode('@', $usearch);
+            foreach ($searchies as $key => $searchy) {
+                list($fieldid, $andor, $options) = explode(':', $searchy);
+                $soptions[$fieldid] = array($andor => array_map(function($a) {return explode(',', $a);}, explode('#', $options)));
+            }
+        }
+        return $soptions;
+    }
+    
+    /**
+     * 
+     */
+    public static function get_filter_options_from_url($url = null) {
+        $filteroptions = array(
+            'filterid' => array('filter', 0, PARAM_INT),
+            'perpage' => array('uperpage', 0, PARAM_INT),
+            'selection' => array('uselection', 0, PARAM_INT),
+            'groupby' => array('ugroupby', 0, PARAM_INT),
+            'customsort' => array('usort', '', PARAM_RAW),
+            'customsearch' => array('usearch', '', PARAM_RAW),
+            'page' => array('page', 0, PARAM_INT),
+            'eids' => array('eids', 0, PARAM_INT),
+            'users' => array('users', '', PARAM_SEQUENCE),
+            'groups' => array('groups', '', PARAM_SEQUENCE),
+            'afilter' => array('afilter', 0, PARAM_INT),
+        );
+
+        $options = array();
+        
+        // Url provided
+        if ($url) {
+            if ($url instanceof moodle_url) {
+                foreach ($filteroptions as $option => $args) {
+                    list($name, ,) = $args;
+                    if ($val = $url->get_param($name)) {
+                        if ($option == 'customsort') {
+                            $options[$option] = self::get_sort_options_from_query($val);
+                        } else if ($option == 'customsearch') {
+                            $searchoptions = self::get_search_options_from_query($val);
+                            if (is_array($searchoptions)) {
+                                $options['customsearch'] = $searchoptions;
+                            } else {
+                                $options['search'] = $searchoptions;
+                            }
+                        } else {
+                            $options[$option] = $val;
+                        }
+                    }
+                }
+            }
+            return $options;
+        }
+
+        // Optional params
+        foreach ($filteroptions as $option => $args) {
+            list($name, $default, $type) = $args;
+            if ($val = optional_param($name, $default, $type)) {
+                if ($option == 'customsort') {
+                    $options[$option] = self::get_sort_options_from_query($val);
+                } else if ($option == 'customsearch') {
+                    $searchoptions = self::get_search_options_from_query($val);
+                    if (is_array($searchoptions)) {
+                        $options['customsearch'] = $searchoptions;
+                    } else {
+                        $options['search'] = $searchoptions;
+                    }
+                } else {
+                    $options[$option] = $val;
+                }
+            }
+        }
+        
+        return $options;
+    }    
 }

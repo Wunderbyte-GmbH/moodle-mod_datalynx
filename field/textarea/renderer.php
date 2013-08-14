@@ -159,7 +159,7 @@ class dataformfield_textarea_renderer extends dataformfield_renderer {
 
             $data = file_prepare_standard_editor($data, $fieldname, $field->editor_options(), $field->df()->context, 'mod_dataform', 'content', $contentid);
 
-            $mform->addElement('editor', "{$fieldname}_editor", null, $attr , $field->editor_options());
+            $mform->addElement('editor', "{$fieldname}_editor", null, $attr , $field->editor_options() + array('collapsed' => true));
             $mform->setDefault("{$fieldname}_editor", $data->{"{$fieldname}_editor"});
             $mform->setDefault("{$fieldname}[text]", $data->$fieldname);
             $mform->setDefault("{$fieldname}[format]", $data->{"{$fieldname}format"});

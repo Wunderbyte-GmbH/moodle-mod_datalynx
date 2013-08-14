@@ -24,15 +24,16 @@
 require_once("$CFG->dirroot/mod/dataform/view/view_class.php");
 require_once("$CFG->libdir/pdflib.php");
 
-class dataform_view_pdf extends dataform_view_base {
+class dataformview_pdf extends dataformview_base {
 
     const EXPORT_ALL = 'all';
     const EXPORT_PAGE = 'page';
+    const EXPORT_ENTRY = 'entry';
     const PAGE_BREAK = '<div class="pdfpagebreak"></div>';
 
     protected $type = 'pdf';
     protected $_editors = array('section', 'param2', 'param3', 'param4');
-    protected $_vieweditors = array('section', 'param2');
+    protected $_vieweditors = array('section', 'param2', 'param3', 'param4');
     protected $_settings = null;
     protected $_tmpfiles = null;
 
@@ -63,6 +64,7 @@ class dataform_view_pdf extends dataform_view_base {
         }    
         
         $this->_settings = (object) array(
+            'docname' => !empty($settings->docname) ? $settings->docname : '',
             'orientation' => !empty($settings->orientation) ? $settings->orientation : '',
             'unit' => !empty($settings->unit) ? $settings->unit : 'mm',
             'format' => !empty($settings->format) ? $settings->format : 'LETTER',
@@ -81,6 +83,7 @@ class dataform_view_pdf extends dataform_view_base {
                 'marginleft' => !empty($settings->header->marginleft) ? $settings->header->marginleft : 10,
             ),
             'footer' => (object) array(
+                'text' => !empty($this->view->eparam4) ? $this->view->eparam4 : '',
                 'enabled' => !empty($settings->footer->enabled) ? $settings->footer->enabled : false,
                 'margin' => !empty($settings->footer->margin) ? $settings->footer->margin : 10,
             ),
@@ -117,8 +120,12 @@ class dataform_view_pdf extends dataform_view_base {
         global $CFG;
 
         // proces pdf export request
-        if ($exportpdf = optional_param('exportpdf','', PARAM_ALPHA)) {
-            $this->process_export($exportpdf);
+        if (optional_param('pdfexportall', 0, PARAM_INT)) {
+            $this->process_export(self::EXPORT_ALL);
+        } else if (optional_param('pdfexportpage', 0, PARAM_INT)) {
+            $this->process_export(self::EXPORT_PAGE);
+        } else if ($exportentry = optional_param('pdfexportentry', 0, PARAM_INT)) {
+            $this->process_export($exportentry);
         }
 
         // Do standard view processing
@@ -128,7 +135,7 @@ class dataform_view_pdf extends dataform_view_base {
     /**
      *
      */
-    public function process_export($range = self::EXPORT_PAGE) {
+    public function process_export($export = self::EXPORT_PAGE) {
         global $CFG;
       
         $settings = $this->_settings;
@@ -172,29 +179,23 @@ class dataform_view_pdf extends dataform_view_base {
         if (empty($settings->pagebreak)) {
             $pdf->SetAutoPageBreak(false, 0);
         }
-/*        
+
         // Set the content
-        if ($range == self::EXPORT_ALL) {
-            $entries = new dataform_entries($this->_df, $this);
-            $options = array();
-            // Set a filter to take it all
-            $filter = $this->get_filter();
-            $filter->perpage = 0;
-            $options['filter'] = $filter;
-            // do we need ratings?
-            if ($ratingoptions = $this->is_rating()) {
-                $options['ratings'] = $ratingoptions;
-            }
-            // do we need comments?
-            
-            // Get the entries
-            $entries->set_content($options);
-            $this->_entries->set_content(array('entriesset' => $entries));
-        } else {
-            $this->set_content();
+        if ($export == self::EXPORT_ALL) {
+            $this->_filter->perpage = 0;
+        } else if ($export == self::EXPORT_PAGE) {
+            // Nothing to change in filter
+        } else if ($export) {
+            // Specific entry requested
+            $this->_filter->eids = $export;
         }
-*/
+
         $this->set_content();
+
+        // Exit if no entries
+        if (!$this->_entries->entries()) {
+            return;
+        }
         
         $content = array();
         if ($settings->pagebreak == 'entry') {
@@ -247,7 +248,9 @@ class dataform_view_pdf extends dataform_view_base {
         }
 
         // Send the pdf
-        $pdf->Output('doc.pdf', $settings->destination);
+        $documentname = optional_param('docname', $this->get_documentname($settings->docname), PARAM_TEXT);
+        $destination = optional_param('dest', $settings->destination, PARAM_ALPHA);
+        $pdf->Output("$documentname.pdf", $destination);
 
         // Clean up temp files
         if ($this->_tmpfiles) {
@@ -290,8 +293,8 @@ class dataform_view_pdf extends dataform_view_base {
     /**
      * Overridden to process pdf specific area files
      */
-    public function to_form() {
-        $data = parent::to_form();
+    public function to_form($data = null) {
+        $data = parent::to_form($data);
       
         // Save pdf specific template files
         $contextid = $this->_df->context->id;
@@ -328,7 +331,7 @@ class dataform_view_pdf extends dataform_view_base {
         if (!empty($options['tohtml'])) {
             $displaycontent = parent::display($options);
             // Remove the bookmark patterns
-            $displaycontent = preg_match_all("%#@PDF-[G]*BM:\d+:[^@]*@#%", '', $displaycontent);
+            $displaycontent = preg_replace("%#@PDF-[G]*BM:\d+:[^@]*@#%", '', $displaycontent);
         
             return $displaycontent;
         } else {
@@ -673,7 +676,7 @@ class dataform_view_pdf extends dataform_view_base {
         );
 
         $content = $this->process_content_images($content);
-        //$pdf->SetFooterData('', 0, '', $content);               
+        $pdf->SetFooterData('', 0, '', $content);               
     }
 
     /**
@@ -726,6 +729,16 @@ class dataform_view_pdf extends dataform_view_base {
         $pdf->writeHTML($content);
     }
     
+    /**
+     *
+     */
+    protected function get_documentname($namepattern) {
+        $docname = 'doc';
+
+        
+        return "$docname.pdf";
+    }
+    
 }
 
 // Extend the TCPDF class to create custom Header and Footer
@@ -743,18 +756,28 @@ class dfpdf extends pdf {
         // Adjust X to override left margin
         $x = $this->GetX();
         $this->SetX($this->_dfsettings->header->marginleft);
-        $this->writeHtml($this->header_string);
+        if (!empty($this->header_string)) {
+            $text = $this->set_page_numbers($this->header_string);
+            $this->writeHtml($text);
+        }
         // Reset X to original
         $this->SetX($x);
     }
 
     // Page footer
     public function Footer() {
-        // Position at 15 mm from bottom
-        $this->SetY(-15);
-        // Set font
-        $this->SetFont('helvetica', 'I', 8);
-        // Page number
-        $this->Cell(0, 10, 'Page '.$this->getAliasNumPage().'/'.$this->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');
+        if (!empty($this->_dfsettings->footer->text)) {
+            $text = $this->set_page_numbers($this->_dfsettings->footer->text);
+            $this->writeHtml($text);
+        }
+    }
+    
+    protected function set_page_numbers($text) {
+        $replacements = array(
+            '##pagenumber##' => $this->getAliasNumPage(),
+            '##totalpages##' => $this->getAliasNbPages(),
+        );
+        $text = str_replace(array_keys($replacements), $replacements, $text);
+        return $text;
     }
 }

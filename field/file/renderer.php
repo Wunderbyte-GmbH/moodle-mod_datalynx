@@ -170,6 +170,7 @@ class dataformfield_file_renderer extends dataformfield_renderer {
 
         $options = array();
         $options['context'] = $field->df()->context;
+        $options['collapsed'] = true;
 //        $options['trusttext'] = true;
 //        $options['maxbytes'] = $field->df()->course->maxbytes;
 //        $options['maxfiles'] = EDITOR_UNLIMITED_FILES;

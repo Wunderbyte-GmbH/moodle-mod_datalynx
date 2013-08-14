@@ -66,7 +66,7 @@ class dataformfield__approve extends dataformfield_no_content {
      */
     public function get_search_sql($search) {
         $value = $search[2];
-        return array(" e.approved = $value ", array()); 
+        return array(" e.approved = $value ", array(), false); 
     }
 
     /**

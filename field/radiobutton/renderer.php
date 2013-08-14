@@ -34,19 +34,39 @@ class dataformfield_radiobutton_renderer extends dataformfield_select_renderer {
      */
     protected function render(&$mform, $fieldname, $options, $selected, $required = false) {
         $field = $this->_field;
-
+        $separator = $field->separators[(int) $field->get('param3')]['chr'];
         $elemgrp = array();
+        $separators = array();
         foreach ($options as $key => $option) {
-            $elemgrp[] = &$mform->createElement('radio', $fieldname, null, $option, $key);
+            $elemgrp[] = &$mform->createElement('radio', $fieldname, $separator, $option, $key);
         }
-        $mform->addGroup($elemgrp, "{$fieldname}_grp", null, $field->separators[(int) $field->get('param3')]['chr'], false);
         if (!empty($selected)) {
             $mform->setDefault($fieldname, (int) $selected);
         }
-        if ($required) {
-            $mform->addRule("{$fieldname}_grp", null, 'required', null, 'client');
-        }
+        return array($elemgrp, array($separator));
+    }
+
+    /**
+     *
+     */
+    protected function set_required(&$mform, $fieldname, $selected) {
+        global $PAGE;
         
+        $mform->addRule("{$fieldname}_grp", null, 'required', null, 'client');
+        // JS Error message
+        $options = array(
+            'fieldname' => $fieldname,
+            'selected' => !empty($selected),
+            'message' => get_string('err_required', 'form'),
+        );
+
+        $module = array(
+            'name' => 'M.dataformfield_radiobutton_required',
+            'fullpath' => '/mod/dataform/field/radiobutton/radiobutton.js',
+            'requires' => array('base','node')
+        );
+
+        $PAGE->requires->js_init_call('M.dataformfield_radiobutton_required.init', array($options), false, $module);            
     }
 
 }

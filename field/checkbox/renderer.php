@@ -33,23 +33,47 @@ class dataformfield_checkbox_renderer extends dataformfield_multiselect_renderer
      *
      */
     protected function render(&$mform, $fieldname, $options, $selected, $required = false) {
-        $field = $this->_field;
+        global $PAGE;
         
+        $field = $this->_field;
+        $separator = $field->separators[(int) $field->get('param2')]['chr'];
+
         $elemgrp = array();
         foreach ($options as $i => $option) {
-            $cb = &$mform->createElement('advcheckbox', $fieldname. '_'. $i, null, $option, array('group' => 1), array(0, $i));
+            $cb = &$mform->createElement('advcheckbox', $fieldname. '_'. $i, null, $option, array('group' => $fieldname), array(0, $i));
             $elemgrp[] = $cb;
             if (in_array($i, $selected)) {
                 $cb->setChecked(true);
             }
         }
-        $mform->addGroup($elemgrp, "{$fieldname}_grp",null, $field->separators[(int) $field->get('param2')]['chr'], false);
-        if ($required) {
-            $mform->addRule("{$fieldname}_grp", null, 'required', null, 'client');
-        }
         // add checkbox controller
+        
+        return array($elemgrp, array($separator));
     }
     
+    /**
+     *
+     */
+    protected function set_required(&$mform, $fieldname, $selected) {
+        global $PAGE;
+        
+        $mform->addRule("{$fieldname}_grp", null, 'required', null, 'client');
+        // JS Error message
+        $options = array(
+            'fieldname' => $fieldname,
+            'selected' => !empty($selected),
+            'message' => get_string('err_required', 'form'),
+        );
+
+        $module = array(
+            'name' => 'M.dataformfield_checkbox_required',
+            'fullpath' => '/mod/dataform/field/checkbox/checkbox.js',
+            'requires' => array('base','node')
+        );
+
+        $PAGE->requires->js_init_call('M.dataformfield_checkbox_required.init', array($options), false, $module);            
+    }
+
     /**
      *
      */

@@ -15,20 +15,23 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package mod
- * @subpackage dataform
+ * @package dataformview
+ * @subpackage single
  * @copyright 2013 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * The Dataform has been developed as an enhanced counterpart
- * of Moodle's Database activity module (1.9.11+ (20110323)).
- * To the extent that Dataform code corresponds to Database code,
- * certain copyrights on the Database module may obtain.
  */
 
-$module->component = 'mod_dataform';
-$module->version  = 2013080700;
-$module->release = '2.3.0';
-$module->requires = 2010112400;
-$module->maturity = MATURITY_BETA;
-//$module->cron     = 60;
+$string['entrynew'] = 'New message';
+$string['pluginname'] = 'Single';
+$string['responsedefault'] = 'Thank you';
+$string['responsemessage'] = 'Response to submission';
+$string['responsetimeout'] = 'Response timeout';
+$string['returncaller'] = 'Return to caller view';
+$string['returnnew'] = 'Open new entry form';
+$string['returnself'] = 'Display the entry';
+$string['showcancel'] = 'Show \'cancel\' button';
+$string['showsavecontinue'] = 'Show \'save and continue\' button';
+$string['submitfailure'] = 'Your submission could not be saved. Please try again.';
+$string['submitlabel'] = 'Submit button label';
+$string['submitreturn'] = 'After submission';
+

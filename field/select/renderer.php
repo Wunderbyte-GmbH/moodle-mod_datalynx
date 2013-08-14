@@ -54,6 +54,8 @@ class dataformfield_select_renderer extends dataformfield_renderer {
             } else {
                 if ($cleantag == "[[$fieldname:options]]") {
                     $replacements[$tag] = array('html', $this->display_browse($entry, array('options' => true)));
+                } else if ($cleantag == "[[$fieldname:key]]") {
+                    $replacements[$tag] = array('html', $this->display_category($entry, array('key' => true)));
                 } else if ($cleantag == "[[$fieldname:cat]]") {
                     $replacements[$tag] = array('html', $this->display_category($entry));
                 } else {
@@ -61,7 +63,6 @@ class dataformfield_select_renderer extends dataformfield_renderer {
                 }
             }
         }
-
         return $replacements;
     }
 
@@ -82,12 +83,23 @@ class dataformfield_select_renderer extends dataformfield_renderer {
             $selected = (int) array_search($defaultval, $menuoptions);
         }
 
-        $this->render($mform, "{$fieldname}_selected", $menuoptions, $selected, $required);
+        list($elem, $separators) = $this->render($mform, "{$fieldname}_selected", $menuoptions, $selected, $required);
+        // Add group or element
+        if (is_array($elem)) {
+            $mform->addGroup($elem, "{$fieldname}_grp",null, $separators, false);
+        } else {
+            $mform->addElement($elem);
+        }
+        
+        if ($required) {
+            $this->set_required($mform, $fieldname, $selected);
+        }
 
         // Input field for adding a new option
         if (!empty($options['addnew'])) {
             if ($field->get('param4') or has_capability('mod/dataform:managetemplates', $field->df()->context)) {
                 $mform->addElement('text', "{$fieldname}_newvalue", get_string('newvalue', 'dataform'));
+                $mform->setType("{$fieldname}_newvalue", PARAM_TEXT);
                 $mform->disabledIf("{$fieldname}_newvalue", "{$fieldname}_selected", 'neq', 0);
             }
             return;
@@ -100,27 +112,35 @@ class dataformfield_select_renderer extends dataformfield_renderer {
     public function display_browse($entry, $params = null) {
         $field = $this->_field;
         $fieldid = $field->id();
-        $str = '';
 
         if (isset($entry->{"c{$fieldid}_content"})) {
             $selected = (int) $entry->{"c{$fieldid}_content"};
             $options = $field->options_menu();
 
-            $showalloptions = !empty($params['options']);
-            if ($showalloptions) {
+            if (!empty($params['options'])) {
                 $str = array();           
                 foreach ($options as $key => $option) {
                     $isselected = (int) ($key == $selected);
                     $str[] = "$isselected $option";
                 }
                 $str = implode(',', $str);
+                return $str;
+            }
 
-            } else if ($selected and $selected <= count($options)) {
-                $str = $options[$selected];
+            if (!empty($params['key'])) {
+                if ($selected) {
+                    return $selected;
+                } else {
+                    return '';
+                }
+            }
+
+            if ($selected and $selected <= count($options)) {
+                return $options[$selected];
             }
         }
         
-        return $str;
+        return '';
     }
 
     /**
@@ -133,7 +153,14 @@ class dataformfield_select_renderer extends dataformfield_renderer {
         $options = $field->options_menu();
         $selected = $value ? (int) $value : '';
         $fieldname = "f_{$i}_$fieldid";
-        $this->render($mform, $fieldname, $options, $selected);
+        list($elem, $separator) = $this->render($mform, $fieldname, $options, $selected);
+        $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
+        
+        // Return group or element
+        if (!is_array($elem)) {
+            $elem = array($elem);
+        }
+        return array($elem, $separator);
     }
 
     /**
@@ -181,11 +208,16 @@ class dataformfield_select_renderer extends dataformfield_renderer {
      * 
      */
     protected function render(&$mform, $fieldname, $options, $selected, $required = false) {
-        $select = &$mform->addElement('select', $fieldname, null, array('' => get_string('choosedots')) + $options);
+        $select = &$mform->createElement('select', $fieldname, null, array('' => get_string('choosedots')) + $options);
         $select->setSelected($selected);
-        if ($required) {
-            $mform->addRule($fieldname, null, 'required', null, 'client');
-        }        
+        return array($select, null);
+    }
+
+    /**
+     *
+     */
+    protected function set_required(&$mform, $fieldname, $selected) {
+        $mform->addRule($fieldname, null, 'required', null, 'client');
     }
 
     /**
@@ -199,6 +231,7 @@ class dataformfield_select_renderer extends dataformfield_renderer {
         $patterns["[[$fieldname:addnew]]"] = array(false);
         $patterns["[[$fieldname:options]]"] = array(false);
         $patterns["[[$fieldname:cat]]"] = array(false);
+        $patterns["[[$fieldname:key]]"] = array(false);
 
         return $patterns; 
     }

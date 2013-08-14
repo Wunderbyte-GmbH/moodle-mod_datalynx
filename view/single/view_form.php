@@ -15,40 +15,40 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * This file is part of the Dataform module for Moodle - http://moodle.org/. 
- *
  * @package dataformview
- * @subpackage tabular
- * @copyright 2012 Itamar Tzadok 
+ * @subpackage single
+ * @copyright 2013 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require_once("$CFG->dirroot/mod/dataform/view/view_form.php");
 
-class dataformview_tabular_form extends dataformview_base_form {
+class dataformview_single_form extends dataformview_base_form {
 
     /**
      *
      */
     function view_definition_after_gps() {
+        parent::view_definition_after_gps();
 
         $view = $this->_view;
         $editoroptions = $view->editors();
-        $editorattr = array('cols' => 40, 'rows' => 12);
 
         $mform = &$this->_form;
+        
+        // Remove unnecessary view settings
+        $mform->removeElement('filter');
+        $mform->removeElement('groupby');
+        $mform->removeElement('perpage');
 
-        // content
+        // repeated entry (param2)
         //-------------------------------------------------------------------------------
         $mform->addElement('header', 'entrytemplatehdr', get_string('entrytemplate', 'dataform'));
+        $mform->addHelpButton('entrytemplatehdr', 'entrytemplate', 'dataform');
 
-        $mform->addElement('selectyesno', 'param3', get_string('headerrow', 'dataformview_tabular'));
-        $mform->setDefault('param3', 1);
-        
-        $mform->addElement('editor', 'eparam2_editor', get_string('table', 'dataformview_tabular'), $editorattr, $editoroptions['param2']);
-        $this->add_tags_selector('eparam2_editor', 'general');
-        $this->add_tags_selector('eparam2_editor', 'field');        
-
+        $mform->addElement('editor', 'eparam2_editor', '', null, $editoroptions['param2']);
+        $mform->setDefault("eparam2_editor[format]", FORMAT_PLAIN);
+        $this->add_tags_selector('eparam2_editor', 'field');
+        $this->add_tags_selector('eparam2_editor', 'character'); 
     }
-
 }

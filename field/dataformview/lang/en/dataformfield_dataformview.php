@@ -38,9 +38,8 @@ $string['customsort_help'] = 'You can add custom sort criteria that would be app
 <br />##author:firstname##,ASC
 <br />[[Count]],DESC';
 $string['customsearch'] = 'Custom search';
-$string['customsearch_help'] = 'You can add custom search criteria that would be applied to the displayed view. Each criterion is a comma separated AND/OR,remote field pattern,0/1,operator,local field pattern/value. One criterion per line. The pattern must be included in the selected view template. For example, assuming the patterns ##author:firstname## and [[Count]] are included in the selected view template, by the following criteria the view will display the entries sorted by the author first name in ascending order and counts in descending order:
-<br />##author:firstname##,ASC
-<br />[[Count]],DESC';
+$string['customsearch_help'] = 'You can add custom search criteria that would be applied to the displayed view. Each criterion is a comma separated AND/OR,remote field pattern,0/1,operator,local field pattern/value. One criterion per line. The pattern must be included in the selected view template. For example, assuming the patterns ##author:firstname## is included in the selected view template, by the following criteria the view will display only entries by the author first name:
+AND,##author:firstname##,0,=,##author:firstname##';
 $string['filterby'] = 'Filter by';
 $string['filterby_help'] = 'Select Entry author to include in the displayed view only entries by the author of the hosting entry.
 <br />Select Entry group to include in the displayed view only entries by members of the hosting entry author\'s group.';

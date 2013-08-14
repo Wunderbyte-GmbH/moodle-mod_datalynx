@@ -72,9 +72,19 @@ class dataform_entries {
         } else if (!empty($options['user'])) {
             $entriesset = $this->get_entries(array('search' => array('userid' => $options['user'])));
         } else {
-            $entriesset = $this->get_entries();
+            $entriesset = $this->get_entries($options);
         }            
 
+        // Apply entry content rules
+        $rm = $this->_df->get_rule_manager();
+        if (!empty($entriesset->entries) and $rules = $rm->get_rules_by_plugintype('entrycontent')) {
+            foreach ($rules as $rule) {
+                if ($rule->is_enabled()) {
+                    $entriesset->entries = $rule->apply($entriesset->entries);
+                }
+            }
+        }
+        
         $this->_entries = !empty($entriesset->entries) ? $entriesset->entries : array();
         $this->_entriestotalcount = !empty($entriesset->max) ? $entriesset->max : count($this->_entries);
         $this->_entriesfiltercount = !empty($entriesset->found) ? $entriesset->found : count($this->_entries);
@@ -180,7 +190,6 @@ class dataform_entries {
         $sqlmax = "SELECT $count FROM $tables WHERE $wheredfid $whereoptions $whereuser $wheregroup $whereapprove";
         // number of entries in this particular view call (with filtering)
         $sqlcount   = "SELECT $count FROM $fromsql WHERE $wheresql";
-
         // base params + search params
         $baseparams = array();
         foreach ($params as $paramset) {

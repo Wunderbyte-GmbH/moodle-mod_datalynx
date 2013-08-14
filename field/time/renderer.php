@@ -55,13 +55,19 @@ class dataformfield_time_renderer extends dataformfield_renderer {
                 $format = (strpos($tag, "$fieldname:") !== false ? str_replace("$fieldname:", '', trim($tag, '[]')) : $field->display_format);
                 // For specialized tags convert format to the userdate format string
                 switch ($format) {            
-                    case 'date': $format = get_string('strftimedate'); break; 
+                    case 'date': $format = get_string('strftimedate', 'langconfig'); break; 
                     case 'minute': $format = '%M'; break; 
                     case 'hour': $format = '%H'; break; 
                     case 'day': $format = '%a'; break; 
                     case 'week': $format = '%V'; break; 
                     case 'month': $format = '%b'; break; 
-                    case 'year': $format = '%G'; break;
+                    case 'm': $format = '%m'; break; 
+                    case 'year':
+                    case 'Y': $format = '%Y'; break;
+                    default:
+                        if (!$format and $field->date_only) {
+                            $format = get_string('strftimedate', 'langconfig');
+                        }
                 }
                 $replacements[$tag] = array('html', $this->display_browse($entry, array('format' => $format)));
             }
@@ -128,14 +134,20 @@ class dataformfield_time_renderer extends dataformfield_renderer {
         $elements = array();
         $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_from", get_string('from'));
         $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_to", get_string('to'));
-        $mform->addGroup($elements, "searchelements$i", null, '<br />', false);
         $mform->setDefault("f_{$i}_{$fieldid}_from", $from);
         $mform->setDefault("f_{$i}_{$fieldid}_to", $to);
         foreach (array('year','month','day','hour','minute') as $fieldidentifier) {
             $mform->disabledIf("f_{$i}_{$fieldid}_to[$fieldidentifier]", "searchoperator$i", 'neq', 'BETWEEN');
         }
-        $mform->disabledIf("searchelements$i", "searchoperator$i", 'eq', 'IN');
-        $mform->disabledIf("searchelements$i", "searchoperator$i", 'eq', 'LIKE');
+        $mform->disabledIf("f_{$i}_{$fieldid}_from", "searchoperator$i", 'eq', '');
+        $mform->disabledIf("f_{$i}_{$fieldid}_from", "searchoperator$i", 'eq', 'IN');
+        $mform->disabledIf("f_{$i}_{$fieldid}_from", "searchoperator$i", 'eq', 'LIKE');
+        $mform->disabledIf("f_{$i}_{$fieldid}_to", "searchoperator$i", 'eq', '');
+        $mform->disabledIf("f_{$i}_{$fieldid}_to", "searchoperator$i", 'eq', 'IN');
+        $mform->disabledIf("f_{$i}_{$fieldid}_to", "searchoperator$i", 'eq', 'LIKE');
+        
+        $separators = array('<br />'. get_string('from'), '<br />'. get_string('to'));
+        return array($elements, $separators);
     }
     
     /**

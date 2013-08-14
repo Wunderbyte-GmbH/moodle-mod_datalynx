@@ -31,15 +31,15 @@ class dataformview_pdf_form extends dataformview_base_form {
     function view_definition_after_gps() {
         global $COURSE;
 
-        $view = $this->_customdata['view'];
+        $view = $this->_view;
         $editoroptions = $view->editors();
         $editorattr = array('cols' => 40, 'rows' => 12);
 
-        $mform =& $this->_form;
+        $mform = &$this->_form;
 
         // repeated entry (param2)
         //-------------------------------------------------------------------------------
-        $mform->addElement('header', 'viewlisthdr', get_string('viewlistbody', 'dataform'));
+        $mform->addElement('header', 'viewlisthdr', get_string('entrytemplate', 'dataform'));
 
         $mform->addElement('editor', 'eparam2_editor', '', $editorattr, $editoroptions['param2']);
         $mform->setDefault("eparam2_editor[format]", FORMAT_PLAIN);
@@ -49,6 +49,10 @@ class dataformview_pdf_form extends dataformview_base_form {
         // PDF settings (param1)
         //-------------------------------------------------------------------------------
         $mform->addElement('header', 'pdfsettingshdr', get_string('pdfsettings', 'dataformview_pdf'));
+        // Document name
+        $mform->addElement('text', 'docname', get_string('docname', 'dataformview_pdf'), array('size' => 64));
+        $mform->setType('docname', PARAM_TEXT);
+        $mform->addHelpButton('docname', 'docname', 'dataformview_pdf');
         // Orientation: Portrait, Landscape
         $options = array(
             '' => get_string('auto', 'dataformview_pdf'),
@@ -242,7 +246,7 @@ class dataformview_pdf_form extends dataformview_base_form {
     function data_preprocessing(&$data){
         parent::data_preprocessing($data);
 
-        $view = $this->_customdata['view'];
+        $view = $this->_view;
 
         // Pdf settings
         if ($settings = $view->get_pdf_settings()) {            
@@ -279,7 +283,7 @@ class dataformview_pdf_form extends dataformview_base_form {
      *
      */
     protected function data_preprocess_protection(&$data, $protection){
-        $view = $this->_customdata['view'];
+        $view = $this->_view;
         $perms = $view::get_permission_options();
         foreach ($perms as $perm => $unused) {
             if (in_array($perm, $protection->permissions)) {
@@ -321,7 +325,7 @@ class dataformview_pdf_form extends dataformview_base_form {
         }
         
         // Pdf settings
-        $view = $this->_customdata['view'];
+        $view = $this->_view;
         if ($settings = $view->get_pdf_settings()) {
             foreach ($settings as $name => $value) {
                 if ($name == 'header') {
@@ -365,7 +369,7 @@ class dataformview_pdf_form extends dataformview_base_form {
      *
      */
     protected function data_postprocess_protection(&$settings, $data) {
-        $view = $this->_customdata['view'];
+        $view = $this->_view;
 
         $protection = $settings->protection;
         $protection->permissions = array();

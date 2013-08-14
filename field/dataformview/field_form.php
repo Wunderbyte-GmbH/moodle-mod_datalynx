@@ -93,7 +93,7 @@ class dataformfield_dataformview_form extends dataformfield_form {
 
         // Custom search options
         $mform->addElement('textarea', 'param5', get_string('customsearch', 'dataformfield_dataformview'), array('rows'=>'5', 'cols'=>'60'));
-        $mform->setType('param4', PARAM_NOTAGS);
+        $mform->setType('param5', PARAM_NOTAGS);
         $mform->disabledIf('param5', 'param1', 'eq', 0);
         $mform->disabledIf('param5', 'param2', 'eq', 0);
         $mform->addHelpButton('param5', 'customsearch', 'dataformfield_dataformview');

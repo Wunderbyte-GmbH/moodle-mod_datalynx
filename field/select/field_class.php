@@ -30,19 +30,6 @@ class dataformfield_select extends dataformfield_base {
     protected $_options = array();
 
     /**
-     * Class constructor
-     *
-     * @param var $df       dataform id or class object
-     * @param var $field    field id or DB record
-     */
-    public function __construct($df = 0, $field = 0) {
-        parent::__construct($df, $field);
-        
-        // Set the options
-        $this->options_menu();
-    }
-
-    /**
      * Update a field in the database
      */
     public function update_field($fromform = null) {
@@ -152,6 +139,18 @@ class dataformfield_select extends dataformfield_base {
     }
 
     /**
+     *
+     */
+    public function get_search_value($value) {
+        $options = $this->options_menu();
+        if ($key = array_search($value, $options)) {
+            return $key;
+        } else {
+            return '';
+        }
+    }
+
+    /**
      * 
      */
     public function options_menu($forceget = false) {
@@ -178,7 +177,7 @@ class dataformfield_select extends dataformfield_base {
             $fieldid = $this->field->id;
             $fieldname = $this->name();
             $csvname = $importsettings[$fieldname]['name'];
-            $allownew = $importsettings[$fieldname]['allownew'];
+            $allownew = !empty($importsettings[$fieldname]['allownew']) ? true : false;
             $label = !empty($csvrecord[$csvname]) ? $csvrecord[$csvname] : null;
             
             if ($label) {

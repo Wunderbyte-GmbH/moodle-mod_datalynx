@@ -142,9 +142,15 @@ abstract class dataformfield_renderer {
      */
     public function display_search(&$mform, $i = 0, $value = '') {
         $fieldid = $this->_field->id();
-        $mform->addElement('text', "f_{$i}_$fieldid", null, array('size'=>'32'));
-        $mform->setType("f_{$i}_$fieldid", PARAM_NOTAGS);
-        $mform->setDefault("f_{$i}_$fieldid", $value);
+        $fieldname = "f_{$i}_$fieldid";
+        
+        $arr = array();
+        $arr[] = &$mform->createElement('text', $fieldname, null, array('size'=>'32'));
+        $mform->setType($fieldname, PARAM_NOTAGS);
+        $mform->setDefault($fieldname, $value);
+        $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
+        
+        return array($arr, null);
     }
 
     /**

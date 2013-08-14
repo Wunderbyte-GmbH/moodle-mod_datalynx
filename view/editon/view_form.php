@@ -21,9 +21,9 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once("$CFG->dirroot/mod/dataform/view/grid/view_form.php");
+require_once("$CFG->dirroot/mod/dataform/view/view_form.php");
 
-class dataformview_editon_form extends dataformview_grid_form {
+class dataformview_editon_form extends dataformview_base_form {
 
     /**
      *
@@ -31,11 +31,11 @@ class dataformview_editon_form extends dataformview_grid_form {
     function view_definition_after_gps() {
         parent::view_definition_after_gps();
 
-        $view = $this->_customdata['view'];
+        $view = $this->_view;
         $editoroptions = $view->editors();
         $editorattr = array('cols' => 40, 'rows' => 12);
 
-        $mform =& $this->_form;
+        $mform = &$this->_form;
 
         // Disable unrequired parent fields
         //$mform->disabledIf('filter', 'filter', 'eq', 0);

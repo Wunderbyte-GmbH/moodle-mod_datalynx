@@ -100,6 +100,7 @@ class dataformview_import_import_form extends moodleform {
 
         // enclosure
         $mform->addElement('text', 'enclosure', get_string('csvenclosure', 'dataform'), array('size'=>'10'));
+        $mform->setType('enclosure', PARAM_NOTAGS);
         $mform->setDefault('enclosure', '');
 
         // encoding
