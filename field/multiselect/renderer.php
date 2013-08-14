@@ -194,7 +194,7 @@ class dataformfield_multiselect_renderer extends dataformfield_renderer {
         $select = &$mform->createElement('select', $fieldname, null, $options);
         $select->setMultiple(true);
         $select->setSelected($selected);
-        return $select;
+        return array($select, null);
     }
 
     /**
