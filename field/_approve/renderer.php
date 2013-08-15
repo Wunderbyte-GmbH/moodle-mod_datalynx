@@ -67,8 +67,8 @@ class dataformfield__approve_renderer extends dataformfield_renderer {
         // disable the 'not' and 'operator' fields
         $mform->disabledIf("searchnot$i", "f_{$i}_$fieldid", 'neq', 2);
         $mform->disabledIf("searchoperator$i", "f_{$i}_$fieldid", 'neq', 2);
-        
-        return array($select, null);
+
+        return array(array($select), null);
     }
 
     /**
