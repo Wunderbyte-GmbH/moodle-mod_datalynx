@@ -43,7 +43,7 @@ class backup_dataform_activity_structure_step extends backup_activity_structure_
             'timelimit', 'approval', 'grouped', 'rating', 'comments',
             'locks', 'singleedit', 'singleview',
             'rssarticles', 'rss', 'css', 'cssincludes', 'js', 'jsincludes',
-            'defaultview', 'defaultfilter'));
+            'defaultview', 'defaultfilter', 'completionentries'));
  
         $module = new backup_nested_element('module', array('id'), array('groupmode'));
         
@@ -74,7 +74,7 @@ class backup_dataform_activity_structure_step extends backup_activity_structure_
 
         $entries = new backup_nested_element('entries');
         $entry = new backup_nested_element('entry', array('id'), array(
-            'userid', 'groupid', 'timecreated', 'timemodified', 'approved'));
+            'userid', 'groupid', 'timecreated', 'timemodified', 'approved', 'status'));
 
         $contents = new backup_nested_element('contents');
         $content = new backup_nested_element('content', array('id'), array(
