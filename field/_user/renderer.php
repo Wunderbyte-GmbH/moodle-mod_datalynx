@@ -90,7 +90,7 @@ class dataformfield__user_renderer extends dataformfield_renderer {
 
         static $usersmenu = null;
         if (is_null($usersmenu)) {
-            $users = $field->df()->get_gradebook_users();
+            $users = get_users_by_capability($field->df->context, 'mod/dataform:writeentry');
             // add a supervisor's id
             if (!in_array($entry->userid, array_keys($users))) {
                 $user = new object;
@@ -240,7 +240,7 @@ class dataformfield__user_renderer extends dataformfield_renderer {
         $patterns["##author:{$fieldinternalname}##"] = array(true, $cat);
         // for user name add edit tag
         if ($fieldinternalname == 'name') {
-            $patterns["##author:edit##"] = array(false, $cat);
+            $patterns["##author:edit##"] = array(true, $cat);
         }
         // for user picture add the large picture
         if ($fieldinternalname == 'picture') {
