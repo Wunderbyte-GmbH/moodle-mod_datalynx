@@ -60,10 +60,11 @@ class dataformfield__status_renderer extends dataformfield_renderer {
         $field = $this->_field;
         $fieldid = $field->id();
         $entryid = $entry->id;
+        $status = isset($entry->status) ? $entry->status : dataformfield__status::STATUS_DRAFT;
 
         $fieldname = "field_{$fieldid}_{$entryid}";
         $mform->addElement('select', $fieldname, get_string('status', 'dataform'), $this->menu_status());
-        $mform->setDefault($fieldname, $entry->status);
+        $mform->setDefault($fieldname, $status);
     }
 
     /**
