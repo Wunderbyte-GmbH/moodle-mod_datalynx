@@ -103,7 +103,45 @@ class dataformfield_select extends dataformfield_base {
     protected function content_names() {
         return array('selected', 'newvalue');
     }
-    
+
+    /**
+     * Computes which values of this field have already been chosen by the given user and
+     * determines which ones have reached their limit
+     * @param  int      $userid  ID of the user modifying an entry; if not specified defaults to $USER->id
+     * @return array    an array of disabled values
+     */
+    public function get_disabled_values_for_user($userid = 0) {
+        global $DB, $USER;
+
+        if ($userid == 0) {
+            $userid = $USER->id;
+        }
+
+        $countsql = "SELECT COUNT(dc2.id)
+                       FROM {dataform_contents} dc2
+                 INNER JOIN {dataform_fields} df2 ON dc2.fieldid = df2.id
+                 INNER JOIN {dataform_entries} de2 ON dc2.entryid = de2.id
+                      WHERE dc2.fieldid = :fieldid1
+                        AND dc2.content = dc.content";
+
+        $sql = "SELECT dc.content, ({$countsql}) AS count
+                  FROM {dataform_contents} dc
+            INNER JOIN {dataform_entries} de ON dc.entryid = de.id
+                 WHERE de.userid = :userid
+                   AND de.dataid = :dataid
+                   AND dc.fieldid = :fieldid2
+                HAVING count >= 1";
+
+        $params = array('userid'    => $userid,
+                        'dataid'    => $this->df->id(),
+                        'fieldid1'  => $this->field->id,
+                        'fieldid2'  => $this->field->id);
+
+        $results = $DB->get_records_sql($sql, $params);
+
+        return array_keys($results);
+    }
+
     /**
      *
      */
@@ -174,15 +212,7 @@ class dataformfield_select extends dataformfield_base {
                 foreach ($rawoptions as $key => $option) {
                     $option = trim($option);
                     if ($option != '') {
-                        $sql = "SELECT COUNT(1)
-                                  FROM {dataform_entries} de
-                                 WHERE de.userid = :userid
-                                   AND de.dataid = :dataid";
-                        $params = array('userid' => $USER->id, 'dataid' => $this->df->id());
-                        $count = $DB->get_field_sql($sql, $params);
-                        if ($count == 0) {
-                            $this->_options[$key + 1] = $option;
-                        }
+                        $this->_options[$key + 1] = $option;
                     }
                 }
             }

@@ -574,3 +574,4 @@ $string['completionentriesgroup'] = 'Require approved entries';
 $string['completionentriesgroup_help'] = 'Make sure you enable approval for entries above!';
 $string['limitchoice'] = 'Limit choices for users';
 $string['limitchoice_help'] = 'Enable this to prevent a user from choosing the same option more than once in separate entries.';
+$string['limitchoice_error'] = 'You have already selected option \'$a\' the maximum allowed number of times!';

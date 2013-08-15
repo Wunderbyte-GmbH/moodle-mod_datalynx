@@ -46,7 +46,7 @@ class dataformfield_select_form extends dataformfield_form {
         // allow add option
         $mform->addElement('selectyesno', 'param4', get_string('allowaddoption', 'dataform'));
 
-        // allow add option
+        // allow choice limit
         $mform->addElement('checkbox', 'param5', get_string('limitchoice', 'dataform'));
         $mform->addHelpButton('param5', 'limitchoice', 'dataform');
     }

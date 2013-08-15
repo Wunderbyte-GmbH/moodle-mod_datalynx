@@ -208,9 +208,56 @@ class dataformfield_select_renderer extends dataformfield_renderer {
      * 
      */
     protected function render(&$mform, $fieldname, $options, $selected, $required = false) {
-        $select = &$mform->createElement('select', $fieldname, null, array('' => get_string('choosedots')) + $options);
+        $select = &$mform->createElement('select', $fieldname, null);
+
+        if (isset($this->_field->field->param5)) {
+            $disabled = $this->_field->get_disabled_values_for_user();
+        } else {
+            $disabled = array();
+        }
+
+        $options = array('' => get_string('choosedots')) + $options;
+        foreach ($options as $id => $name) {
+            if (array_search($id, $disabled) === false || $id == $selected) {
+                $select->addOption($name, $id);
+            } else {
+                $select->addOption($name, $id, array('disabled' => 'disabled'));
+            }
+        }
+
         $select->setSelected($selected);
         return array($select, null);
+    }
+
+    /**
+     *
+     */
+    public function validate_data($entryid, $tags, $data) {
+        $field = $this->_field;
+        $fieldid = $field->id();
+        $fieldname = $field->name();
+
+        global $DB;
+        $query = "SELECT dc.content
+                    FROM {dataform_contents} dc
+                   WHERE dc.entryid = :entryid
+                     AND dc.fieldid = :fieldid";
+        $params = array('entryid' => $entryid, 'fieldid' => $fieldid);
+
+        $oldcontent = $DB->get_field_sql($query, $params);
+
+        $formfieldname = "field_{$fieldid}_{$entryid}_selected";
+
+        if (isset($field->field->param5)) {
+            $disabled = $field->get_disabled_values_for_user();
+            $content = clean_param($data->{$formfieldname}, PARAM_INT);
+            if ($content != $oldcontent && array_search($content, $disabled) !== false) {
+                $menu = $field->options_menu();
+                return array($formfieldname => get_string('limitchoice_error', 'dataform', $menu[$content]));
+            }
+        } else {
+            return null;
+        }
     }
 
     /**
