@@ -96,7 +96,7 @@ class dataformfield_duration_renderer extends dataformfield_renderer {
             $fieldattr['style'] = 'width:'. s($field->get('param2')). s($field->get('param3')). ';';
         }
 
-        $elem = &$mform->addElement('duration', $fieldname, array('optional' => null), $fieldattr);
+        $elem = &$mform->addElement('duration', $fieldname, '', array('optional' => null), $fieldattr);
         $mform->setDefault($fieldname, $number);
         $required = !empty($options['required']);
         if ($required) {
