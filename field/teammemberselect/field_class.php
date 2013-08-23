@@ -99,7 +99,7 @@ class dataformfield_teammemberselect extends dataformfield_base {
     /**
      *
      */
-    protected function format_content($entry, array $values = null) {
+    protected function format_content($entry, array $values = array()) {
         $fieldid = $this->field->id;
         $oldcontents = array();
         $contents = array();
@@ -110,7 +110,8 @@ class dataformfield_teammemberselect extends dataformfield_base {
         }
 
         // parse values
-        $selected = !empty(reset($values)) ? reset($values) : array();
+        $first = reset($values);
+        $selected = !empty($first) ? $first : array();
 
         // new contents
         if (!empty($selected)) {
