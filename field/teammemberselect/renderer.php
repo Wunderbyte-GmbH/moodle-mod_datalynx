@@ -46,7 +46,6 @@ class dataformfield_teammemberselect_renderer extends dataformfield_renderer {
         $replacements = array_fill_keys($tags, '');
         // rules support
         $tags = $this->add_clean_pattern_keys($tags);
-
         foreach ($tags as $tag => $cleantag) {
             if ($edit) {
                 $params = array('required' => $this->is_required($tag));
@@ -74,15 +73,25 @@ class dataformfield_teammemberselect_renderer extends dataformfield_renderer {
         $fieldid = $field->id();
         $entryid = $entry->id;
         $fieldname = "field_{$fieldid}_$entryid";
-        $fieldnamedropdown = "dataformfield_dropdown_{$fieldid}_$entryid";
+        $fieldnamedropdown = "field_{$fieldid}_{$entryid}_dropdown";
         $classname = "teammemberselect_{$fieldid}_{$entryid}";
 
+        $selected = !empty($entry->{"c{$fieldid}_content"}) ? json_decode($entry->{"c{$fieldid}_content"}, true) : array();
+        $menu = $field->options_menu(true);
+
         for ($i = 0; $i < $field->teamsize; $i++) {
-            $mform->addElement('select', "{$fieldname}[{$i}]", null, $field->options_menu(true),
+            if (!isset($selected[$i])) {
+                $selected[$i] = 0;
+            }
+            $select = $mform->addElement('select', "{$fieldname}[{$i}]", null, $menu,
                 array('class' => "dataformfield_teammemberselect_select $classname"));
-            $mform->addElement('text', "{$fieldnamedropdown}[{$i}]", null,
+            $mform->setType("{$fieldname}[{$i}]", PARAM_INT);
+            $text = $mform->addElement('text', "{$fieldnamedropdown}[{$i}]", null,
                 array('class' => "dataformfield_teammemberselect_dropdown $classname"));
             $mform->setType("{$fieldnamedropdown}[{$i}]", PARAM_TEXT);
+
+            $select->setSelected($selected[$i]);
+            $text->setValue($menu[$selected[$i]]);
         }
 
         $PAGE->requires->js_init_call(
