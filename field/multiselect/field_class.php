@@ -31,7 +31,8 @@ class dataformfield_multiselect extends dataformfield_base {
             array('name' => 'New line', 'chr' => '<br />'),
             array('name' => 'Space', 'chr' => '&#32;'),
             array('name' => ',', 'chr' => '&#44;'),
-            array('name' => ', (with space)', 'chr' => '&#44;&#32;')
+            array('name' => ', (with space)', 'chr' => '&#44;&#32;'),
+            array('name' => 'Unordered list', 'chr' => '</li><li>')
     );
 
     

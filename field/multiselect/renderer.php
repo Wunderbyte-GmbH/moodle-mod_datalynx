@@ -124,7 +124,7 @@ class dataformfield_multiselect_renderer extends dataformfield_renderer {
 
             $contents = explode('#', $content);
 
-            $str = array();           
+            $str = array();
             foreach ($options as $key => $option) {
                 $selected = (int) in_array($key, $contents);
                 if ($showalloptions) {
@@ -134,7 +134,11 @@ class dataformfield_multiselect_renderer extends dataformfield_renderer {
                 }
             }
             $separator = $showalloptions ? ',' : $field->separators[(int) $field->get('param3')]['chr'];
-            $str = implode($separator, $str);
+            if ($separator == '</li><li>' && count($str) > 0) {
+                $str = '<ul><li>' . implode($separator, $str) . '</li></ul>';
+            } else {
+                $str = implode($separator, $str);
+            }
         } else {
             $str = '';
         }
