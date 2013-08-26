@@ -1375,12 +1375,13 @@ class dataformview_base {
      *
      */
     protected function get_entries_form() {
-        global $CFG;
-        
-        // prepare params for form
-        $actionparams = array(            
+        global $CFG, $DB;
+        $viewid = $DB->get_field('dataform_views', 'param4', array('id' => $this->id()));
+        $viewid = $viewid ? $viewid : $this->id();
+        // prepare params for forcontentm
+        $actionparams = array(
             'd' => $this->_df->id(),
-            'view' => $this->id(),
+            'view' => $viewid,
             'filter' => $this->_filter->id,
             'page' => $this->_filter->page,
             'eids' => $this->_filter->eids,

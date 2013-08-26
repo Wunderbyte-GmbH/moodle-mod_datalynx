@@ -96,7 +96,13 @@ class dataformview_base_form extends moodleform {
                             20=>20,30=>30,40=>40,50=>50,100=>100,200=>200,300=>300,400=>400,500=>500,1000=>1000);
         $mform->addElement('select', 'perpage', get_string('viewperpage', 'dataform'), $perpageoptions);
         $mform->setDefault('perpage', 10);
-                            
+
+        global $DB;
+        $mform->addElement('header', 'redirectsettings', get_string('redirectsettings', 'dataform'));
+        $mform->addHelpButton('redirectsettings', 'redirectsettings', 'dataform');
+        $mform->addElement('select', 'param4', get_string('redirectto', 'dataform'), $this->get_view_menu());
+        $mform->setDefault('param4', $DB->get_field('dataform', 'defaultview', array('id' => $this->_df->id())));
+        $mform->setType('param4', PARAM_INT);
 
         // view specific definition
         //-------------------------------------------------------------------------------
@@ -123,6 +129,24 @@ class dataformview_base_form extends moodleform {
         // buttons
         //-------------------------------------------------------------------------------
         $this->add_action_buttons();
+    }
+
+    function get_view_menu() {
+        global $DB;
+        $dataid = $this->_df->id();
+        $query = "SELECT dv.id, dv.name
+                    FROM {dataform_views} dv
+                   WHERE dv.dataid = :dataid";
+        $dviewid = $DB->get_field('dataform', 'defaultview', array('id' => $dataid));
+        $eviewid = $DB->get_field('dataform', 'singleedit', array('id' => $dataid));
+        $mviewid = $DB->get_field('dataform', 'singleview', array('id' => $dataid));
+        $menu = array(0 => get_string('targetview_this', 'dataform'));
+        $menu = $menu + $DB->get_records_sql_menu($query, array('dataid' => $dataid));
+        $menu[$dviewid] .= ' ' . get_string('targetview_default', 'dataform');
+        $menu[$eviewid] .= ' ' . get_string('targetview_edit', 'dataform');
+        $menu[$mviewid] .= ' ' . get_string('targetview_more', 'dataform');
+
+        return $menu;
     }
 
     /**
