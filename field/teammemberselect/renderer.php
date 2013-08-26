@@ -160,7 +160,11 @@ class dataformfield_teammemberselect_renderer extends dataformfield_renderer {
                     break;
                 case dataformfield_teammemberselect::TEAMMEMBERSELECT_FORMAT_UL:
                 default:
-                    $str = '<ul><li>' . implode('</li><li>', $str) . '</li></ul>';
+                    if (count($str) > 0) {
+                        $str = '<ul><li>' . implode('</li><li>', $str) . '</li></ul>';
+                    } else {
+                        $str = '';
+                    }
                     break;
 
             }

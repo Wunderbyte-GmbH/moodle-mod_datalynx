@@ -58,13 +58,9 @@ class dataformfield_teammemberselect_form extends dataformfield_form {
         $mform->addHelpButton('param2', 'admissibleroles', 'dataform');
         $mform->addGroupRule('param2', get_string('admissibleroles_error', 'dataform'), 'required', null, 1, 'client');
 
-        $mform->addElement('select', 'param3', get_string('notifyteam', 'dataform'), $this->_field->rules);
-        $mform->addHelpButton('param3', 'notifyteam', 'dataform');
-        $mform->setType('param3', PARAM_INT);
-        $mform->setDefault('param3', 0);
-
         $mform->addElement('select', 'param4', get_string('listformat', 'dataform'), $this->_field->separators);
         $mform->setType('param4', PARAM_INT);
+        $mform->setDefault('param4', dataformfield_teammemberselect::TEAMMEMBERSELECT_FORMAT_UL);
     }
 
     /**
@@ -73,6 +69,7 @@ class dataformfield_teammemberselect_form extends dataformfield_form {
      */
     public function set_data($data) {
         $elements = json_decode($data->param2, true);
+        $elements = $elements == null ? array() : $elements;
         $data->param2 = array();
         foreach ($elements as $element) {
             $data->param2[$element] = 1;
