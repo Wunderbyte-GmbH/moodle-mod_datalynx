@@ -112,7 +112,6 @@ class dataformview_patterns {
         $edit = !empty($options['edit']) ? $options['edit'] : false;
 
         $replacements = array();
-
         foreach ($tags as $tag) {
             if (in_array($tag, $info)) {
                 $replacements[$tag] = $this->get_info_replacements($tag, $entry, $options);
@@ -170,6 +169,21 @@ class dataformview_patterns {
                     $linkparams = array('sesskey' => sesskey());
                     $viewlink = new moodle_url($view->get_baseurl(), $linkparams);
                     return html_writer::link($viewlink->out(false). "&$urlquery", $linktext);
+                }
+            }
+        }
+
+        static $fields = null;
+        if ($fields === null) {
+            $fields = $df->get_fields(null, true);
+        }
+
+        foreach ($fields as $id => $fieldname) {
+            if (strpos($tag, "%%{$fieldname}:bulkedit%%") === 0) {
+                if(true) { // if (isset($options['edit'])) {
+                    return html_writer::checkbox("field_{$id}_bulkedit", 1, false, '');
+                } else {
+                    return '';
                 }
             }
         }
@@ -525,7 +539,8 @@ class dataformview_patterns {
             $this->ref_patterns(),
             $this->userpref_patterns(),
             $this->action_patterns(),
-            $this->paging_patterns()
+            $this->paging_patterns(),
+            $this->bulkedit_patterns()
         );
         return $patterns;
     }
@@ -604,6 +619,7 @@ class dataformview_patterns {
             '##multiexport:icon##' => array(true, $cat),
             '##multiimport##' => array(true, $cat),
             '##multiimporty:icon##' => array(true, $cat),
+
         );
         return $patterns;
     }
@@ -637,6 +653,20 @@ class dataformview_patterns {
                 $patterns["#{{viewsesslink:$viewname;[^;]*;[^;]*;}}#"] = array(true, $cat);
             }
         }
+
+        return $patterns;
+    }
+
+    protected function bulkedit_patterns() {
+        $df = $this->_view->get_df();
+
+        $patterns = array();
+
+        $fields = $df->get_fields(null, true);
+        $cat = get_string('reference', 'dataform');
+        foreach ($fields as $fieldname) {
+            $patterns["%%{$fieldname}:bulkedit%%"] = array(true, $cat);
+        }
         return $patterns;
     }
 
@@ -659,6 +689,17 @@ class dataformview_patterns {
                 if (strpos($pattern, "#{{viewsesslink:$viewname;") === 0) {
                     return true;
                 }
+            }
+        }
+
+        static $fields = null;
+        if ($fields === null) {
+            $fields = $df->get_fields(null, true);
+        }
+
+        foreach ($fields as $fieldname) {
+            if (strpos($pattern, "%%{$fieldname}:bulkedit%%") === 0) {
+                return true;
             }
         }
         return false;

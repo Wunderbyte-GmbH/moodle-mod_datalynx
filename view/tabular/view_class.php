@@ -103,7 +103,7 @@ class dataformview_tabular extends dataformview_base {
         // fields
         foreach ($fields as $field) {
             if ($field->field->id > 0) {
-                $header[] = $field->field->name;
+                $header[] = $field->field->name . " %%{$field->field->name}:bulkedit%%";
                 $entry[] = '[['. $field->field->name. ']]';
                 $align[] = 'left';
             }
@@ -132,7 +132,26 @@ class dataformview_tabular extends dataformview_base {
         $this->view->eparam2 = html_writer::table($table);
 
     }
-    
+
+    public function display(array $options = array()) {
+        parent::display($options);
+        global $PAGE;
+        $PAGE->requires->js_init_call(
+                'M.dataformview_tabular.init',
+                array(),
+                false,
+                $this->get_js_module());
+    }
+
+    private function get_js_module() {
+        $jsmodule = array(
+            'name' => 'dataformview_tabular',
+            'fullpath' => '/mod/dataform/view/tabular/tabular.js',
+            'requires' => array('node', 'event', 'node-event-delegate'),
+            );
+        return $jsmodule;
+    }
+
     /**
      *
      */
