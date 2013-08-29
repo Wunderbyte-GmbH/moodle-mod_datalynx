@@ -725,8 +725,10 @@ class dataformview_pdf extends dataformview_base {
             $style = html_writer::tag('style', $this->_df->data->css, array('type' => 'text/css'));
             $content = $style. $content;
         }
-        
+        $root = $_SERVER['DOCUMENT_ROOT'];
+        unset($_SERVER['DOCUMENT_ROOT']);
         $pdf->writeHTML($content);
+        $_SERVER['DOCUMENT_ROOT'] = $root;
     }
     
     /**
