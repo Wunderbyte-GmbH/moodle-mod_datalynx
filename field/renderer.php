@@ -57,6 +57,7 @@ abstract class dataformfield_renderer {
         // Capture label patterns
         if (strpos($text, "[[$fieldname@]]") !== false and !empty($this->_field->field->label)) {
             $found[] = "[[$fieldname@]]";
+            $found[] = "[[$fieldname]]";
             
             $text = str_replace("[[$fieldname@]]", $this->_field->field->label, $text);
         }
