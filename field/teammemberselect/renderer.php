@@ -136,7 +136,7 @@ class dataformfield_teammemberselect_renderer extends dataformfield_renderer {
 
         if (isset($entry->{"c{$fieldid}_content"})) {
             $selected = json_decode($entry->{"c{$fieldid}_content"}, true);
-            $options = $field->options_menu(false, true);
+            $options = $field->options_menu(false, true, true);
 
             $str = array();
             foreach ($selected as $id) {

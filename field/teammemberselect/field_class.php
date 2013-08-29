@@ -63,12 +63,12 @@ class dataformfield_teammemberselect extends dataformfield_base {
         $this->rules = array_merge(array(0 => '...'), $this->rules);
     }
 
-    public function options_menu($addnoselection = false, $makelinks = false) {
+    public function options_menu($addnoselection = false, $makelinks = false, $includeuser = false) {
         global $DB, $USER, $COURSE;
 
         list($insql, $params) = $DB->get_in_or_equal($this->admissibleroles, SQL_PARAMS_NAMED);
         $params['courseid'] = $COURSE->id;
-        $params['userid'] = $USER->id;
+        $params['userid'] = $includeuser ? 0 : $USER->id;
         $query = "SELECT u.id, u.username, u.firstname, u.lastname, u.email
                     FROM {course} c
                     JOIN {context} ct ON c.id = ct.instanceid
