@@ -69,10 +69,10 @@ class dataformview_base_form extends moodleform {
             $mform->setType('description', PARAM_CLEAN);
         }
 
-         // visibility
-        $visibilityoptions = array(0=>'disabled',1=>'enabled',2=>'visible');
-        $mform->addElement('select', 'visible', get_string('viewvisibility', 'dataform'), $visibilityoptions);
-        $mform->setDefault('visible', 2);
+        $mform->addElement('checkbox', 'visible[1]', get_string('visibleto', 'dataform'), get_string('visible_1', 'dataform'), 1);
+        $mform->addElement('checkbox', 'visible[2]', '', get_string('visible_2', 'dataform'), 1);
+        $mform->addElement('checkbox', 'visible[4]', '', get_string('visible_4', 'dataform'), 1);
+        $mform->addElement('checkbox', 'visible[8]', '', get_string('visible_8', 'dataform'), 1);
 
         // filter
         if (!$filtersmenu = $df->get_filter_manager()->get_filters(null, true)) {
@@ -129,6 +129,31 @@ class dataformview_base_form extends moodleform {
         // buttons
         //-------------------------------------------------------------------------------
         $this->add_action_buttons();
+    }
+
+    function get_data() {
+        $data = parent::get_data();
+        if (isset($data) && isset($data->visible) && !empty($data->visible)) {
+            $data->visible = array_sum(array_keys($data->visible));
+        } else if (isset($data)) {
+            $data->visible = 0;
+        }
+
+        return $data;
+    }
+
+    function set_data($data) {
+        if ($data->visible) {
+            $visible = $data->visible;
+            $data->visible = array(
+                1 => $visible & 1 ? 1 : null,
+                2 => $visible & 2 ? 1 : null,
+                4 => $visible & 4 ? 1 : null,
+                8 => $visible & 8 ? 1 : null);
+        } else {
+            $data->visible = array();
+        }
+        parent::set_data($data);
     }
 
     function get_view_menu() {

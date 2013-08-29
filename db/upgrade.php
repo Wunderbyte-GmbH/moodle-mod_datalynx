@@ -504,5 +504,21 @@ function xmldb_dataform_upgrade($oldversion) {
 
     }
 
+    if ($oldversion < 2013082800) {
+
+        // Changing precision of field visible on table dataform_views to (4).
+        $table = new xmldb_table('dataform_views');
+        $field = new xmldb_field('visible', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'description');
+
+        // Launch change of precision for field visible.
+        $dbman->change_field_precision($table, $field);
+
+        $DB->set_field('dataform_views', 'visible', '15', array('visible' => '2'));
+        $DB->set_field('dataform_views', 'visible', '1', array('visible' => '1'));
+
+        // Dataform savepoint reached.
+        upgrade_mod_savepoint(true, 2013082800, 'dataform');
+    }
+
     return true;
 }

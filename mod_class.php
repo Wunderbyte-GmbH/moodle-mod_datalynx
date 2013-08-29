@@ -943,18 +943,43 @@ class dataform {
  *********************************************************************************/
 
     /**
-     *
+     * Retrieves the view entries associated with the current
+     * dataform instance visible to the current user.
+     * @param  boolean $forceget        if true, the entries will be reread form the database
+     * @param  string  $sort            SQL ORDER BY clause
+     * @param  boolean $checkvisibility if true, only the entries of views visible to the current user will be retrieved
+     * @return array   an array of dataform_views entry objects
      */
-    protected function get_view_records($forceget = false, $sort = '') {
+    protected function get_view_records($forceget = false, $sort = '', $checkvisibility = true) {
         global $DB;
 
         if (empty($this->views) or $forceget) {
-            $this->views = array();
-            if (!$this->views = $DB->get_records('dataform_views', array('dataid' => $this->id()), $sort)) {
+            $views = array();
+            if (!$views = $DB->get_records('dataform_views', array('dataid' => $this->id()), $sort)) {
                 return false;
+            }
+            $this->views = array();
+            foreach ($views as $viewid => $view) {
+                if (!$checkvisibility || $this->is_visible_to_user($view)) {
+                    $this->views[$viewid] = $view;
+                }
             }
         }
         return $this->views;
+    }
+
+    /**
+     * Verifies whether the current user has the needed
+     * permission to access a particular dataform view.
+     * @param  stdClass     $view   dataform_views entry
+     * @return boolean              true if user can see the view, false otherwise
+     */
+    public function is_visible_to_user($view) {
+        $mask = (has_capability('mod/dataform:viewprivilegemanager', $this->context) ? 1 : 0) |
+                (has_capability('mod/dataform:viewprivilegeteacher', $this->context) ? 2 : 0) |
+                (has_capability('mod/dataform:viewprivilegestudent', $this->context) ? 4 : 0) |
+                (has_capability('mod/dataform:viewprivilegeguest',   $this->context) ? 8 : 0);
+        return $view->visible & $mask;
     }
 
     /**

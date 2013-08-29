@@ -210,14 +210,11 @@ if ($views) {
                         $OUTPUT->pix_icon('t/delete', $strdelete));
         $viewselector = html_writer::checkbox("viewselector", $viewid, false);
 
-        // visible
-        if ($visible = $view->view->visible) {
-            $visibleicon = $OUTPUT->pix_icon('t/hide', $strhide);
-            $visibleicon = $visible == 1 ? "($visibleicon)" : $visibleicon;
-        } else {
-           $visibleicon = $OUTPUT->pix_icon('t/show', $strshow);
+        $viewvisible = '';
+        for ($i = 1; $i < 16; $i = $i << 1) {
+            $viewvisible .= html_writer::checkbox("visible[{$i}]", 1, ($i & $view->view->visible), '',
+                                array('disabled' => '', 'title' => get_string("visible_{$i}", 'dataform')));
         }
-        $viewvisible = html_writer::link(new moodle_url($actionbaseurl, $linkparams + array('visible' => $viewid)), $visibleicon);
 
         // default view
         if ($viewid == $df->data->defaultview) {
