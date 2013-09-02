@@ -113,17 +113,6 @@ abstract class mod_dataform_filter_base_form extends moodleform {
             '' => get_string('is', 'dataform'),
             'NOT' => get_string('not', 'dataform'),
         );
-        $operatoroptions = array(
-            '' => get_string('empty', 'dataform'),
-            '=' => get_string('equal', 'dataform'),
-            '>' => get_string('greaterthan', 'dataform'),
-            '<' => get_string('lessthan', 'dataform'),
-            '>=' => get_string('greaterorequal', 'dataform'),
-            '<=' => get_string('lessorequal', 'dataform'),
-            'BETWEEN' => get_string('between', 'dataform'),
-            'LIKE' => get_string('contains', 'dataform'),
-            'IN' => get_string('in', 'dataform'),
-        );
 
         $fieldlabel = get_string('filtersearchfieldlabel', 'dataform');
         $count = 0;
@@ -178,6 +167,9 @@ abstract class mod_dataform_filter_base_form extends moodleform {
                 $arr[] = &$mform->createElement('select', 'searchnot'. $count, null, $isnotoptions);
                 $mform->setDefault('searchnot'. $count, $not);
                 // search operator
+                if ($fieldid) {
+                    $operatoroptions = $df->get_field_from_id($fieldid)->get_supported_search_operators();
+                }
                 $arr[] = &$mform->createElement('select', 'searchoperator'. $count, '', $operatoroptions);
                 $mform->setDefault('searchoperator'. $count, $operator);
                 // field search elements

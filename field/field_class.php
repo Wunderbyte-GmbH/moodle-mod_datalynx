@@ -711,6 +711,27 @@ abstract class dataformfield_base {
         }
     }
 
+    /**
+     * Returns operators supported by this field.
+     * It contains all operators present in the previous
+     * version and should therefore be overridden by a concrete
+     * field class to remove unsupported operators from the list.
+     * @return array an array of operators
+     */
+    public function get_supported_search_operators() {
+        return array(
+            '' => get_string('empty', 'dataform'),
+            '=' => get_string('equal', 'dataform'),
+            '>' => get_string('greaterthan', 'dataform'),
+            '<' => get_string('lessthan', 'dataform'),
+            '>=' => get_string('greaterorequal', 'dataform'),
+            '<=' => get_string('lessorequal', 'dataform'),
+            'BETWEEN' => get_string('between', 'dataform'),
+            'LIKE' => get_string('contains', 'dataform'),
+            'IN' => get_string('in', 'dataform'),
+        );
+    }
+
 }
 
 /**

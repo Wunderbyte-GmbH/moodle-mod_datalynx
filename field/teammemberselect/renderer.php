@@ -129,6 +129,33 @@ class dataformfield_teammemberselect_renderer extends dataformfield_renderer {
     /**
      *
      */
+    public function display_search(&$mform, $i = 0, $value = '') {
+        global $PAGE;
+
+        $field = $this->_field;
+        $fieldid = $field->id();
+        $fieldname = "f_{$i}_{$fieldid}";
+        $fieldnamedropdown = "{$fieldname}_dropdown";
+        $menu = $field->options_menu(true, false, true);
+
+        $elements = array();
+        $elements[] = $mform->createElement('hidden', "{$fieldname}", null);
+        $mform->setType("{$fieldname}", PARAM_INT);
+        $elements[] = $mform->createElement('text', "{$fieldnamedropdown}", null);
+        $mform->setType("{$fieldnamedropdown}", PARAM_TEXT);
+
+        $PAGE->requires->js_init_call(
+                'M.dataformfield_teammemberselect.init_filter_search_form',
+                array($menu),
+                false,
+                $this->get_js_module());
+
+        return array($elements, null);
+    }
+
+    /**
+     *
+     */
     public function display_browse($entry, $params = null) {
         $field = $this->_field;
         $fieldid = $field->id();

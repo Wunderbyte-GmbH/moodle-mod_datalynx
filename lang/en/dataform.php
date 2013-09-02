@@ -587,3 +587,5 @@ $string['visible_1'] = 'Manager';
 $string['visible_2'] = 'Teacher';
 $string['visible_4'] = 'Student';
 $string['visible_8'] = 'Guest';
+$string['iamteammember'] = 'I am a teammember';
+$string['useristeammember'] = 'A user is a teammember';

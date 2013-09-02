@@ -124,4 +124,69 @@ M.dataformfield_teammemberselect.init_entry_form = function (Y, userlistobject) 
     });
 };
 
+M.dataformfield_teammemberselect.init_filter_search_form = function (Y, userlistobject) {
+    var key, stringtoid = [], source = [], autocompletes = [], lastvalues = [];
+
+    console.log(userlistobject);
+    for (key in userlistobject) {
+        source.push(userlistobject[key]);
+        stringtoid[userlistobject[key]] = key;
+    }
+
+    // initializes autocomplete objects for text fields
+    Y.all('input[type="text"][name^="f_"][name*="_dropdown"]').each(function (input) {
+        var autocomplete = new Y.AutoCompleteList({
+            inputNode: input,
+            source: source.slice(0),
+            render: true,
+            minQueryLength: 3,
+            tabSelect: true,
+            activateFirstItem: true,
+            circular: true,
+            maxResults: 5,
+            resultFilters: 'subWordMatch',
+            queryDelay: 40,
+            width: "400px",
+        });
+
+        // attaches event listeners after the selection has been made
+        autocomplete.after('select', function () {
+            select_hidden_option(input);
+        });
+
+        // store references to all autocomplete object for later list updates
+        autocompletes.push(autocomplete);
+    });
+
+    /**
+     * Selects the appropriate option in the hidden select element associated with the text field
+     * @param  YNode    field text field element wrapped in YUI 3 YNode object
+     */
+    function select_hidden_option(field) {
+        var name = field.get('name').replace('_dropdown', '');
+        Y.one('input[type="hidden"][name="' + name + '"]').set('value', stringtoid[field.get('value')]);
+    }
+
+    // clears the text field and the respective select box, saving the previous value for undo action
+    Y.all('input[type="text"][name^="f_"][name*="_dropdown"]').on('click', function (e) {
+        var name = e.target.get('name').replace('_dropdown', '');
+        e.target.set('value', '');
+        Y.one('input[type="hidden"][name="' + name + '"]').set('value', 0);
+    });
+
+    // undo action allows restoring previous value of a text field by pressing Ctrl+Z while focused on the field
+    Y.all('input[type="text"][name^="f_"][name*="_dropdown"]').on('keydown', function (e) {
+        var field = e.target;
+        select_hidden_option(field);
+        if (e.ctrlKey === true && e.keyCode === 90 && lastvalues.hasOwnProperty(field.get('name'))) {
+            e.preventDefault();
+            e.stopPropagation();
+            field.set('value', lastvalues[field.get('name')]);
+            select_hidden_option(field);
+        } else {
+            lastvalues[field.get('name')] = field.get('value');
+        }
+    });
+};
+
 

@@ -92,8 +92,55 @@ class dataformfield_teammemberselect extends dataformfield_base {
                 $options[$result->id] = fullname($result) . " ({$result->email})";
             }
         }
-
         return $options;
+    }
+
+    /**
+     *
+     */
+    public function get_search_sql($search) {
+        global $DB, $USER;
+        static $i = 0;
+        list($not, $operator, $value) = $search;
+        print_object($search);
+        $i++;
+        $fieldid = $this->field->id;
+        $name = "df_{$fieldid}_{$i}";
+        $params = array();
+
+        $content = "c{$fieldid}.content";
+        $paramname = "{$name}_user";
+
+        if ($operator == 'USER') {
+            global $USER;
+            $like = $DB->sql_like($content, ":{$paramname}");
+            $params[$paramname] = "%\"{$USER->id}\"%";
+            return array(" $not $like", $params, true);
+        } else if ($operator == 'OTHER_USER') {
+            $like = $DB->sql_like($content, ":{$paramname}");
+            $params[$paramname] = "%\"{$value}\"%";
+            print_object($like);
+            return array(" $not $like", $params, true);
+        } else {
+           return array(" ", $params);
+        }
+    }
+
+    /**
+     *
+     */
+    public function parse_search($formdata, $i) {
+        global $USER;
+        $fieldid = $this->field->id;
+        $operator = !empty($formdata->{"searchoperator{$i}"}) ? $formdata->{"searchoperator{$i}"} : '';
+        $fieldvalue = !empty($formdata->{"f_{$i}_$fieldid"}) ? $formdata->{"f_{$i}_$fieldid"} : false;
+        if ($operator == 'USER') {
+            return $USER->id;
+        } else if ($operator == 'OTHER_USER') {
+            return $fieldvalue;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -119,5 +166,13 @@ class dataformfield_teammemberselect extends dataformfield_base {
         }
 
         return array($contents, $oldcontents);
+    }
+
+    public function get_supported_search_operators() {
+        return array(
+            ''     => '&lt;' . get_string('choose') . '&gt;',
+            'USER' => get_string('iamteammember', 'dataform'),
+            'OTHER_USER' => get_string('useristeammember', 'dataform')
+        );
     }
 }
