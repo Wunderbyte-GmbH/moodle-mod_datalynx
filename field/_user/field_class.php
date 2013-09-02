@@ -98,15 +98,38 @@ class dataformfield__user extends dataformfield_no_content {
      */
     public function get_search_sql($search) {
         global $USER;
-        // set search value -1 in id and name to user->id
         $internalname = $this->field->internalname;
-        if ($internalname == 'id' or $internalname == 'name') {
-            if ($search[2] == -1) {
+
+        if ($internalname == 'id' || $internalname == 'name') {
+            if ($search[1] == 'ME') {
+                $search[1] = '=';
                 $search[2] = $USER->id;
+            } else if ($search[1] == 'OTHER_USER') {
+                $search[1] = '=';
             }
         }
-        
+
         return parent::get_search_sql($search);
+    }
+
+    public function parse_search($formdata, $i) {
+        global $USER;
+        $fieldid = $this->field->id;
+        $internalname = $this->field->internalname;
+        $operator = !empty($formdata->{"searchoperator{$i}"}) ? $formdata->{"searchoperator{$i}"} : '';
+        $fieldvalue = !empty($formdata->{"f_{$i}_$fieldid"}) ? $formdata->{"f_{$i}_$fieldid"} : false;
+        if ($internalname == 'id' || $internalname == 'name') {
+            if ($operator == 'ME') {
+                return $USER->id;
+            } else if ($operator == 'OTHER_USER') {
+                return $fieldvalue;
+            } else {
+                return false;
+            }
+        } else {
+            return parent::parse_search($dataform, $i);
+        }
+
     }
 
     /**
@@ -139,5 +162,19 @@ class dataformfield__user extends dataformfield_no_content {
             }
         }
         return $distinctvalues;
+    }
+
+    public function get_supported_search_operators() {
+        switch($this->field->internalname) {
+            case 'id':
+            case 'name':
+                return array(
+                    '' => '&lt;' . get_string('choose') . '&gt;',
+                    'ME' => get_string('me', 'dataform'),
+                    'OTHER_USER' => get_string('otheruser', 'dataform'),
+                );
+            default:
+                return parent::get_supported_search_operators();
+        }
     }
 }
