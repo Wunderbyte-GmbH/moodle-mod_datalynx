@@ -210,7 +210,7 @@ class dataform_filter {
                 }
             }
 
-            if ($searchfrom) {
+            if ($searchfrom && is_numeric($fieldid)) {
                 $searchwhere[] = implode(' AND ', array_map(function($fieldid) {return " c$fieldid.fieldid = $fieldid ";}, $searchfrom));
             }
             if ($whereand) {
