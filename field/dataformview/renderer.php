@@ -229,13 +229,25 @@ class dataformfield_dataformview_renderer extends dataformfield_renderer {
             list($filterauthor, $filtergroup) = explode(',', $field->field->param6);
             // Entry author
             if ($filterauthor) {
-                $users = $urlquery ? $entry->userid : array($entry->userid);
-                $options['users'] = $users;
+                if ($entry->id != -1) {
+                    $users = $urlquery ? $entry->userid : array($entry->userid);
+                    $options['users'] = $users;
+                } else {
+                    global $USER;
+                    $users = $urlquery ? $USER->id : array($USER->id);
+                    $options['users'] = $users;
+                }
             }
             // Entry group
             if ($filtergroup) {
-                $groups = $urlquery ? $entry->groupid : array($entry->groupid);
-                $options['groups'] = $groups;            
+                if ($entry->id != -1) {
+                    $groups = $urlquery ? $entry->groupid : array($entry->groupid);
+                    $options['groups'] = $groups;
+                } else {
+                    $allgroups = groups_get_user_groups($this->_df->course);
+                    $groups = $urlquery ? implode(',', $allgroups[0]) : $allgroups[0];
+                    $options['groups'] = $groups;
+                }
             }
         }
         return $options;
