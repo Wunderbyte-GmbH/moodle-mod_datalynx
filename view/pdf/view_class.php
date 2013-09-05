@@ -196,7 +196,7 @@ class dataformview_pdf extends dataformview_base {
         if (!$this->_entries->entries()) {
             return;
         }
-        
+
         $content = array();
         if ($settings->pagebreak == 'entry') {
             $entries = $this->_entries->entries();
@@ -735,12 +735,29 @@ class dataformview_pdf extends dataformview_base {
      *
      */
     protected function get_documentname($namepattern) {
-        $docname = 'doc';
-
-        
-        return "$docname.pdf";
+        $namepattern = !empty($namepattern) ? $namepattern : '';
+        $foundtags = array();
+        $replacements = array();
+        if (count($this->_entries->entries()) == 1 && $fields = $this->_df->get_fields()) {
+            $entries = $this->_entries->entries();
+            $entry = reset($entries);
+            foreach ($fields as $fieldid => $field) {
+                $addtags = $field->renderer()->search($namepattern);
+                $additional = $field->get_definitions($foundtags, $entry, array());
+                if ($addtags && $additional) {
+                    $foundtags += $addtags;
+                    $replacements += $additional;
+                }
+            }
+        }
+        $foundtags += $this->patterns()->search($namepattern);
+        $replacements += $this->patterns()->get_replacements($foundtags);
+        foreach ($foundtags as $foundtag) {
+            $namepattern = str_replace($foundtag, $replacements[$foundtag][1], $namepattern);
+        }
+        $namepattern = clean_param($namepattern, PARAM_FILE);
+        return "$namepattern.pdf";
     }
-    
 }
 
 // Extend the TCPDF class to create custom Header and Footer
