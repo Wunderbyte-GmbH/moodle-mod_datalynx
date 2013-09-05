@@ -56,8 +56,8 @@ abstract class dataformfield_renderer {
         
         // Capture label patterns
         if (strpos($text, "[[$fieldname@]]") !== false and !empty($this->_field->field->label)) {
-            $found[] = "[[$fieldname@]]";
             $found[] = "[[$fieldname]]";
+            $found[] = "[[$fieldname@]]";
             
             $text = str_replace("[[$fieldname@]]", $this->_field->field->label, $text);
         }
@@ -86,7 +86,7 @@ abstract class dataformfield_renderer {
             }
         }
 
-        return $found;
+        return array_unique($found);
     }
 
     /**
@@ -293,6 +293,7 @@ abstract class dataformfield_renderer {
         $fieldname = $this->_field->name();
 
         $patterns = array();
+        $patterns["[[$fieldname]]"] = array(true);
         $patterns["[[$fieldname@]]"] = array(true);
         $patterns["[[$fieldname:restricted]]"] = array(true);
 
