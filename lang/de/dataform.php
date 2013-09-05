@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // This file is part of Moodle - http://moodle.org/.
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -543,9 +543,9 @@ $string['completionentriesgroup'] = 'Zulassung der Abgaben fordern';
 $string['completionentriesgroup_help'] = 'Schalten Sie unbedingt die Zulassung der Abgaben oben im Formular frei!';
 $string['limitchoice'] = 'Auswahlbeschränkung';
 $string['limitchoice_help'] = 'Schalten Sie dies frei, um die Auswahlmöglichkeit der BenutzerInnen auf nur eine Option zu beschränken.';
-$string['limitchoice_error'] = 'You have already selected option \'$a\' maximum allowed number of times!';
+$string['limitchoice_error'] = 'Sie können die \'{$a}\' Option nicht nochmal auswählen, weil Sie die Höchstzahl der Auswahl dieser Option bereits erreicht haben.';
 $string['redirectsettings'] = 'Umleitung nach Abgabe';
-$string['redirectsettings_help'] = 'Use this fields to specify which view should the browser redirect to upon leaving the edit view.';
+$string['redirectsettings_help'] = 'Benuzten Sie diese Felder, um die Zielansicht nach Bearbeitung der Einträge anzugeben.';
 $string['redirectto'] = 'Zielansicht';
 $string['targetview_this'] = 'Diese Ansicht (Neu)';
 $string['targetview_default'] = '(Standard)';
