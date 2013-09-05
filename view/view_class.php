@@ -1445,13 +1445,13 @@ class dataformview_base {
                         }                        
 
                         // so that return after adding new entry will return the added entry 
-                        $this->_editentries = implode(',',$processed[1]);
+                        $this->_editentries = is_array($processed[1]) ? implode(',', $processed[1]) : $processed[1];
                         $this->_returntoentriesform = true;
                         return true;
                     } else {
                         // So that we can show the new entries if we so wish
                         if ($this->_editentries < 0) {
-                            $this->_editentries = implode(',',$processed[1]);
+                            $this->_editentries = is_array($processed[1]) ? implode(',', $processed[1]) : $processed[1];
                         } else {
                             $this->_editentries = '';
                         }

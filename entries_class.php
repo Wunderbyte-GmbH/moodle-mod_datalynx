@@ -423,7 +423,7 @@ class dataform_entries {
                     // new entries ($eid is the number of new entries
                     } else if ($eid < 0) {
                         $addcount++;
-                        if ($addmax <= $addcount) {
+                        if ($addmax >= $addcount) {
                             $entry->id = 0;
                             $entry->groupid = $df->currentgroup;
                             $entry->userid = $USER->id;

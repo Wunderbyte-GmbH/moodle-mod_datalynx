@@ -96,7 +96,7 @@ class dataformfield__status_renderer extends dataformfield_renderer {
     protected function display_browse($entry, $params = array()) {
         $field = $this->_field;
         $menu = $this->menu_status(true);
-        if ($entry and $entry->status) {
+        if (isset($entry) && isset($entry->status)) {
             return $menu[$entry->status];
         } else {
             return $menu[dataformfield__status::STATUS_NOT_CREATED];
