@@ -68,6 +68,7 @@ if (isloggedin() and $is_templatemanager) {
             $row[] = new tabobject('css', new moodle_url('/mod/dataform/css.php', array('d' => $this->id(), 'cssedit' => 1)), get_string('cssinclude', 'dataform'));
             $row[] = new tabobject('presets', new moodle_url('/mod/dataform/preset/index.php', array('d' => $this->id())), get_string('presets', 'dataform'));
             $row[] = new tabobject('import', new moodle_url('/mod/dataform/import.php', array('d' => $this->id())), get_string('import', 'dataform'));
+            $row[] = new tabobject('statistics', new moodle_url('/mod/dataform/statistics/index.php', array('d' => $this->id())), get_string('statistics', 'dataform'));
             //$row[] = new tabobject('reports', new moodle_url('/mod/dataform/reports.php', array('d' => $this->id())), get_string('reports','dataform'));
 
         // entries manager can do import

@@ -427,4 +427,16 @@ $capabilities = array(
             'guest' => CAP_ALLOW,
         )
     ),
+
+    'mod/dataform:viewstatistics' => array(
+
+        'riskbitmask' => RISK_PERSONAL,
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+        )
+    ),
 );
