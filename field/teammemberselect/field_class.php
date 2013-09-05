@@ -102,7 +102,6 @@ class dataformfield_teammemberselect extends dataformfield_base {
         global $DB, $USER;
         static $i = 0;
         list($not, $operator, $value) = $search;
-        print_object($search);
         $i++;
         $fieldid = $this->field->id;
         $name = "df_{$fieldid}_{$i}";
@@ -119,7 +118,6 @@ class dataformfield_teammemberselect extends dataformfield_base {
         } else if ($operator == 'OTHER_USER') {
             $like = $DB->sql_like($content, ":{$paramname}");
             $params[$paramname] = "%\"{$value}\"%";
-            print_object($like);
             return array(" $not $like", $params, true);
         } else {
            return array(" ", $params);
