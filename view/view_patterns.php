@@ -56,7 +56,8 @@ class dataformview_patterns {
         // Regexp patterns
         if ($patterns = array_keys($this->regexp_patterns())) {
             foreach ($patterns as $pattern) {
-                if (preg_match_all("/$pattern/", $text, $matches)) {
+                $pattern = preg_quote($pattern, '/');
+                if (preg_match_all("/{$pattern}/", $text, $matches)) {
                     foreach ($matches[0] as $match) {
                         $found[$match] = $match;
                     }
