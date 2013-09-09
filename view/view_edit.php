@@ -33,6 +33,7 @@ $urlparams->returnurl  = optional_param('returnurl', '', PARAM_URL);
 $df = new dataform($urlparams->d);
 
 $df->set_page('view/view_edit', array('modjs' => true, 'urlparams' => $urlparams));
+require_sesskey();
 require_capability('mod/dataform:managetemplates', $df->context);
 
 if ($urlparams->vedit) {

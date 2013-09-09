@@ -34,6 +34,7 @@ $df = new dataform($urlparams->d);
 
 $df->set_page('field/field_edit', array('urlparams' => $urlparams));
 
+require_sesskey();
 require_capability('mod/dataform:managetemplates', $df->context);
 
 if ($urlparams->fid) {
