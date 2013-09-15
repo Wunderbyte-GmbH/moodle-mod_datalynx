@@ -727,8 +727,7 @@ class dataformview_patterns {
             // Display the view form jump list
             $baseurl = $baseurl->out_omit_querystring();
             $baseurlparams = array('d' => $df->id(),
-                                    'sesskey' => sesskey(),
-                                    'filter' => $filter->id);
+                                    'sesskey' => sesskey());
             $viewselect = new single_select(new moodle_url($baseurl, $baseurlparams), 'view', $menuviews, $view->id(), array(''=>'choosedots'), 'viewbrowse_jump');
             $viewselect->set_label(get_string('viewcurrent','dataform'). '&nbsp;');
             $viewjump = $OUTPUT->render($viewselect);
