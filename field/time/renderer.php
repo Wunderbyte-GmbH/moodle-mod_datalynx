@@ -79,12 +79,12 @@ class dataformfield_time_renderer extends dataformfield_renderer {
     /**
      * 
      */
-    public function display_edit(&$mform, $entry, array $options = null) {
+    public function display_edit(&$mform, $entry, array $options = array()) {
         $field = $this->_field;
         $fieldid = $field->id();
         $entryid = $entry->id;
         $fieldname = "field_{$fieldid}_{$entryid}";
-       
+
         $content = 0;
         if ($entryid > 0 and !empty($entry->{"c{$fieldid}_content"})){
             $content = $entry->{"c{$fieldid}_content"};
@@ -93,9 +93,9 @@ class dataformfield_time_renderer extends dataformfield_renderer {
         $includetime = empty($options['date']) ? true : false;
 
         if ($field->masked) {
-            $this->render_masked_selector($mform, $entry, $content, $includetime);
+            $this->render_masked_selector($mform, $entry, $content, $includetime, $options);
         } else {
-            $this->render_standard_selector($mform, $entry, $content, $includetime);
+            $this->render_standard_selector($mform, $entry, $content, $includetime, $options);
         }
     }
     
@@ -153,7 +153,7 @@ class dataformfield_time_renderer extends dataformfield_renderer {
     /**
      * 
      */
-    protected function render_standard_selector(&$mform, $entry, $content, $includetime = true) {
+    protected function render_standard_selector(&$mform, $entry, $content, $includetime = true, array $options = array()) {
         $field = $this->_field;
         $fieldid = $field->id();
         $entryid = $entry->id;
@@ -161,25 +161,29 @@ class dataformfield_time_renderer extends dataformfield_renderer {
        
         // If date only don't add time to selector
         $time = $includetime ? 'time_' : '';      
-        $options = array();
+        $elementoptions = array();
         // Optional
-        $options['optional'] = (!empty($options['required']) ? false : true);
+        $elementoptions['optional'] = true; // (!empty($options['required']) ? null : true);
         // Start year
         if ($field->start_year) {
-            $options['startyear'] = $field->start_year;
+            $elementoptions['startyear'] = $field->start_year;
         }
         // End year
         if ($field->stop_year) {
-            $options['stopyear'] = $field->stop_year;
+            $elementoptions['stopyear'] = $field->stop_year;
         }
-        $mform->addElement("date_{$time}selector", $fieldname, null, $options);
-        $mform->setDefault($fieldname, $content);      
+        $mform->addElement("date_{$time}selector", $fieldname, null, $elementoptions);
+        $mform->setDefault($fieldname, $content);
+        $required = !empty($options['required']);
+        if ($required) {
+            $mform->addRule($fieldname, null, 'required', null, 'client');
+        }
     }
-    
+
     /**
-     * 
+     *
      */
-    protected function render_masked_selector(&$mform, $entry, $content, $includetime = true) {
+    protected function render_masked_selector(&$mform, $entry, $content, $includetime = true, array $options = array()) {
         $field = $this->_field;
         $entryid = $entry->id;
         $fieldid = $field->id();
@@ -245,6 +249,22 @@ class dataformfield_time_renderer extends dataformfield_renderer {
         // Add enabled fake field
         $mform->addElement('hidden', "{$fieldname}[enabled]", 1);
         $mform->setType("{$fieldname}[enabled]", PARAM_INT);
+        $required = !empty($options['required']);
+        if ($required) {
+            if ($includetime) {
+                $mform->addGroupRule("grp$fieldname", array(
+                    "{$fieldname}[day]" => array(array(get_string('time_field_required', 'dataform', get_string('day')), 'nonzero', null, 'client')),
+                    "{$fieldname}[month]" => array(array(get_string('time_field_required', 'dataform', get_string('month')), 'nonzero', null, 'client')),
+                    "{$fieldname}[year]" => array(array(get_string('time_field_required', 'dataform', get_string('year')), 'nonzero', null, 'client')),
+                    "{$fieldname}[hour]" => array(array(get_string('time_field_required', 'dataform', get_string('hour')), 'nonzero', null, 'client')),
+                    "{$fieldname}[minute]" => array(array(get_string('time_field_required', 'dataform', get_string('minute')), 'nonzero', null, 'client'))));
+            } else {
+                $mform->addGroupRule("grp$fieldname", array(
+                    "{$fieldname}[day]" => array(array(get_string('time_field_required', 'dataform', get_string('day')), 'nonzero', null, 'client')),
+                    "{$fieldname}[month]" => array(array(get_string('time_field_required', 'dataform', get_string('month')), 'nonzero', null, 'client')),
+                    "{$fieldname}[year]" => array(array(get_string('time_field_required', 'dataform', get_string('year')), 'nonzero', null, 'client'))));
+            }
+        }
     }
     
     /**

@@ -618,3 +618,4 @@ $string['numdeletedentries'] = 'Number of deleted entries';
 $string['numvisits'] = 'Number of visits';
 $string['modearray'] = 'Display mode';
 $string['modearray_help'] = '\'To\' date is always considered when available until 23:59:59.';
+$string['time_field_required'] = '{$a} field is required!';

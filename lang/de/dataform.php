@@ -587,3 +587,4 @@ $string['numdeletedentries'] = 'Anzahl an gelöschtë Einträge';
 $string['numvisits'] = 'Anzahl an Aufrufen';
 $string['modearray'] = 'Darstellungsmodus';
 $string['modearray_help'] = 'Das \'Bis\' Datum wird immer zur Gänze wahrgenommen.';
+$string['time_field_required'] = '{$a} Feld ist erforderlich!';
