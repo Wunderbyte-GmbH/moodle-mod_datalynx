@@ -56,8 +56,7 @@ class dataformview_patterns {
         // Regexp patterns
         if ($patterns = array_keys($this->regexp_patterns())) {
             foreach ($patterns as $pattern) {
-                $pattern = preg_quote($pattern, '/');
-                if (preg_match_all("/{$pattern}/", $text, $matches)) {
+                if (preg_match_all("/$pattern/", $text, $matches)) {
                     foreach ($matches[0] as $match) {
                         $found[$match] = $match;
                     }
@@ -650,6 +649,7 @@ class dataformview_patterns {
             // View link
             $cat = get_string('reference', 'dataform');
             foreach ($views as $viewname) {
+                $viewname = preg_quote($viewname, '/');
                 $patterns["#{{viewlink:$viewname;[^;]*;[^;]*;}}#"] = array(true, $cat);
                 $patterns["#{{viewsesslink:$viewname;[^;]*;[^;]*;}}#"] = array(true, $cat);
             }
@@ -666,6 +666,7 @@ class dataformview_patterns {
         $fields = $df->get_fields(null, true);
         $cat = get_string('reference', 'dataform');
         foreach ($fields as $fieldname) {
+            $fieldname = preg_quote($fieldname, '/');
             $patterns["%%{$fieldname}:bulkedit%%"] = array(true, $cat);
         }
         return $patterns;
