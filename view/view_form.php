@@ -158,6 +158,7 @@ class dataformview_base_form extends moodleform {
 
     function get_view_menu() {
         global $DB;
+        $viewid = $this->_view->view->id;
         $dataid = $this->_df->id();
         $query = "SELECT dv.id, dv.name
                     FROM {dataform_views} dv
@@ -165,12 +166,21 @@ class dataformview_base_form extends moodleform {
         $dviewid = $DB->get_field('dataform', 'defaultview', array('id' => $dataid));
         $eviewid = $DB->get_field('dataform', 'singleedit', array('id' => $dataid));
         $mviewid = $DB->get_field('dataform', 'singleview', array('id' => $dataid));
-        $menu = array(0 => get_string('targetview_this', 'dataform'));
-        $menu = $menu + $DB->get_records_sql_menu($query, array('dataid' => $dataid));
-        $menu[$dviewid] .= ' ' . get_string('targetview_default', 'dataform');
-        $menu[$eviewid] .= ' ' . get_string('targetview_edit', 'dataform');
-        $menu[$mviewid] .= ' ' . get_string('targetview_more', 'dataform');
-
+        $menu = $DB->get_records_sql_menu($query, array('dataid' => $dataid));
+        if (isset($menu[$dviewid])) {
+            $menu[$dviewid] .= ' ' . get_string('targetview_default', 'dataform');
+        }
+        if (isset($menu[$eviewid])) {
+            $menu[$eviewid] .= ' ' . get_string('targetview_edit', 'dataform');
+        }
+        if (isset($menu[$mviewid])) {
+            $menu[$mviewid] .= ' ' . get_string('targetview_more', 'dataform');
+        }
+        if (!$viewid) {
+            $menu = array(0 => get_string('targetview_this_new', 'dataform')) + $menu;
+        } else {
+            $menu[$viewid] .= ' ' . get_string('targetview_this', 'dataform');
+        }
         return $menu;
     }
 
