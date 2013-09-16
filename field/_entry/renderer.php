@@ -34,6 +34,8 @@ class dataformfield__entry_renderer extends dataformfield_renderer {
      */
     protected function replacements(array $tags = null, $entry = null, array $options = null) {
         $managable = !empty($options['managable']) ? $options['managable'] : false;
+        $managable = $managable && ($entry->status != dataformfield__status::STATUS_FINAL_SUBMISSION ||
+                       has_capability('mod/dataform:manageentries', $this->_field->df->context));
         
         // no edit mode
         $replacements = array();

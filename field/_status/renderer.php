@@ -37,16 +37,24 @@ class dataformfield__status_renderer extends dataformfield_renderer {
      * @return array          an array of replacements (either HTML for browse mode or callback info for the edit mode)
      */
     protected function replacements(array $tags = array(), $entry = null, array $options = array()) {
-
         $edit = !empty($options['edit']) ? $options['edit'] : false;
 
         $replacements = array();
-        if (!$entry or $edit) {
-            $replacements['##status##'] = array('', array(array($this, 'display_edit'), array($entry)));
-        } else {
-            $replacements['##status##'] = array('html', $this->display_browse($entry));
-        }
+        // rules support
+        $tags = $this->add_clean_pattern_keys($tags);
 
+        foreach ($tags as $tag => $cleantag) {
+            if (!$entry or $edit) {
+                if ($cleantag == "##status##") {
+                    $required = $this->is_required($tag);
+                    $replacements[$tag] = array('', array(array($this, 'display_edit'), array($entry, array('required' => $required))));
+                }
+            } else {
+                if ($cleantag == "##status##") {
+                    $replacements[$tag] = array('html', $this->display_browse($entry));
+                }
+            }
+        }
         return $replacements;
     }
 
@@ -60,29 +68,33 @@ class dataformfield__status_renderer extends dataformfield_renderer {
         $field = $this->_field;
         $fieldid = $field->id();
         $entryid = $entry->id;
-        $status = isset($entry->status) ? $entry->status : dataformfield__status::STATUS_DRAFT;
+        $status = isset($entry->status) ? $entry->status : dataformfield__status::STATUS_NOT_SET;
+        $required = !empty($options['required']);
 
         $fieldname = "field_{$fieldid}_{$entryid}";
-        $mform->addElement('select', $fieldname, get_string('status', 'dataform'), $this->menu_status());
+        $menu = $this->menu_status(!isset($entry->status));
+        $select = &$mform->addElement('select', $fieldname, '', $menu);
         $mform->setDefault($fieldname, $status);
+        if ($required) {
+            $mform->addRule($fieldname, get_string('statusrequired', 'dataform'), 'nonzero', null, 'client');
+        }
     }
 
     /**
      * Creates menu items for submission status
-     * @param  boolean $includenotcreated if STATUS_NOT_CREATED should be included in the menu (default false)
+     * @param  boolean $includenotcreated if STATUS_NOT_SET should be included in the menu (default false)
      * @return array   (int) statusid => (string) label
      */
-    private function menu_status($includenotcreated = false) {
-        if ($includenotcreated) {
+    private function menu_status($newentry = false) {
+        if (!$newentry) {
             return array(
-                dataformfield__status::STATUS_NOT_CREATED => get_string('status_notcreated', 'dataform'),
+                dataformfield__status::STATUS_NOT_SET => get_string('status_notcreated', 'dataform'),
                 dataformfield__status::STATUS_DRAFT => get_string('status_draft', 'dataform'),
-                dataformfield__status::STATUS_SUBMISSION => get_string('status_submission', 'dataform'),
                 dataformfield__status::STATUS_FINAL_SUBMISSION => get_string('status_finalsubmission', 'dataform'));
         } else {
             return array(
+                dataformfield__status::STATUS_NOT_SET => get_string('choosedots'),
                 dataformfield__status::STATUS_DRAFT => get_string('status_draft', 'dataform'),
-                dataformfield__status::STATUS_SUBMISSION => get_string('status_submission', 'dataform'),
                 dataformfield__status::STATUS_FINAL_SUBMISSION => get_string('status_finalsubmission', 'dataform'));
         }
     }
@@ -95,11 +107,11 @@ class dataformfield__status_renderer extends dataformfield_renderer {
      */
     protected function display_browse($entry, $params = array()) {
         $field = $this->_field;
-        $menu = $this->menu_status(true);
+        $menu = $this->menu_status();
         if (isset($entry) && isset($entry->status)) {
             return $menu[$entry->status];
         } else {
-            return $menu[dataformfield__status::STATUS_NOT_CREATED];
+            return $menu[dataformfield__status::STATUS_NOT_SET];
         }
 
     }
@@ -115,5 +127,14 @@ class dataformfield__status_renderer extends dataformfield_renderer {
         $patterns["##status##"] = array(true, $cat);
 
         return $patterns;
+    }
+
+    /**
+     * Array of patterns this field supports
+     */
+    protected function supports_rules() {
+        return array(
+            self::RULE_REQUIRED
+        );
     }
 }

@@ -163,8 +163,7 @@ class dataform_entries {
         // STATUS filtering (visibility)
         $wherestatus = '';
         if (!has_capability('mod/dataform:viewdrafts', $df->context)) {
-            $wherestatus = " AND (e.status = :{$this->sqlparams($params, 'status', dataformfield__status::STATUS_SUBMISSION)}
-                              OR  e.status = :{$this->sqlparams($params, 'status', dataformfield__status::STATUS_FINAL_SUBMISSION)}
+            $wherestatus = " AND (e.status = :{$this->sqlparams($params, 'status', dataformfield__status::STATUS_FINAL_SUBMISSION)}
                               OR  e.userid = :{$this->sqlparams($params, 'userid', $USER->id)}) ";
         }
 
@@ -702,6 +701,10 @@ class dataform_entries {
 
                 if ($updatetime) {
                     $entry->timemodified = time();
+                }
+
+                if (has_capability('mod/dataform:writeentry', $df->context)) {
+                    $entry->status = isset($data['status']) ? $data['status'] : $entry->status;
                 }
 
                 if ($DB->update_record('dataform_entries',$entry)) {

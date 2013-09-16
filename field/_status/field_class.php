@@ -29,7 +29,7 @@ class dataformfield__status extends dataformfield_no_content {
 
     const _STATUS = 'status';
 
-    const STATUS_NOT_CREATED        = 0; // 00
+    const STATUS_NOT_SET            = 0; // 00
     const STATUS_DRAFT              = 1; // 01
     const STATUS_FINAL_SUBMISSION   = 2; // 10
     const STATUS_SUBMISSION         = 3; // 11
@@ -57,7 +57,11 @@ class dataformfield__status extends dataformfield_no_content {
      * @return boolean always true
      */
     public static function is_internal() {
-        true;
+        return true;
+    }
+
+    public function is_editable() {
+        return true;
     }
 
     /**

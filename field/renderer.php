@@ -64,9 +64,8 @@ abstract class dataformfield_renderer {
         
         // Search and collate field patterns
         $patterns = array_keys($this->patterns());
-        $wrapopen = $fieldid > 0 ? '\[\[' : '##';
-        $wrapclose =  $fieldid > 0 ? '\]\]' : '##';
-        
+        $wrapopen = is_numeric($fieldid) && $fieldid > 0 ? '\[\[' : '##';
+        $wrapclose = is_numeric($fieldid) && $fieldid > 0 ? '\]\]' : '##';
         $labelpattern = false;
         if ($rules = implode('', $this->supports_rules())) {
             // Patterns may have rule prefix

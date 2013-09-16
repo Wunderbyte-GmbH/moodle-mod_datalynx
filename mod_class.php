@@ -1535,7 +1535,8 @@ class dataform {
                     return false;   // who are you anyway???
                 }
 
-                if (!($entry->status == dataformfield__status::STATUS_DRAFT || $entry->status == dataformfield__status::STATUS_SUBMISSION)) {
+                require_once('field/_status/field_class.php');
+                if (!($entry->status == dataformfield__status::STATUS_DRAFT || $entry->status == dataformfield__status::STATUS_NOT_SET)) {
                     return false;
                 }
                 // ok owner, what's the time (limit)?
