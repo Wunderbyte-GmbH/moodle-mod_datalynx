@@ -403,7 +403,7 @@ class dataform_entries {
                 $perinterval = ($df->data->intervalcount > 1);
                 if ($addmax != -1 and has_capability('mod/dataform:manageentries', $df->context)) {
                     $addmax = -1;
-                } else {
+                } else if ($addmax != -1) {
                     $addmax = max(0, $addmax - $df->user_num_entries($perinterval));
                 }   
                 
@@ -422,7 +422,7 @@ class dataform_entries {
                     // new entries ($eid is the number of new entries
                     } else if ($eid < 0) {
                         $addcount++;
-                        if ($addmax >= $addcount) {
+                        if ($addmax == -1 || $addmax >= $addcount) {
                             $entry->id = 0;
                             $entry->groupid = $df->currentgroup;
                             $entry->userid = $USER->id;
