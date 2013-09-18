@@ -86,8 +86,22 @@ class dataform_statistics_form extends moodleform {
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
-        if($data['from'] && $data['to'] && ($data['from'] > $data['to'])) {
-            $errors['from'] = get_string('fromto_error', 'dataform');
+        switch ($data['mode']) {
+            case dataform_statistics_class::MODE_PERIOD:
+                if($data['from'] && $data['to'] && ($data['from'] > $data['to'])) {
+                    $errors['from'] = get_string('fromto_error', 'dataform');
+                }
+                break;
+            case dataform_statistics_class::MODE_FROM_DATE:
+                if($data['from'] && ($data['from'] > time())) {
+                    $errors['from'] = get_string('fromaftertoday_error', 'dataform');
+                }
+                break;
+            case dataform_statistics_class::MODE_ON_DATE:
+            case dataform_statistics_class::MODE_UNTIL_DATE:
+            case dataform_statistics_class::MODE_ALL_TIME:
+            default:
+                break;
         }
 
         return $errors;

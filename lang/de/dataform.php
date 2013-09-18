@@ -589,3 +589,4 @@ $string['modearray'] = 'Darstellungsmodus';
 $string['modearray_help'] = 'Das \'Bis\' Datum wird immer zur Gänze wahrgenommen.';
 $string['time_field_required'] = '{$a} Feld ist erforderlich!';
 $string['statusrequired'] = 'Status muss gesetzt werden!';
+$string['fromaftertoday_error'] = 'Das \'Von\' Datum darf nicht zeitlich nach dem heutigen Datum liegen!';

@@ -620,3 +620,4 @@ $string['modearray'] = 'Display mode';
 $string['modearray_help'] = '\'To\' date is always considered when available until 23:59:59.';
 $string['time_field_required'] = '{$a} field is required!';
 $string['statusrequired'] = 'Status must be set!';
+$string['fromaftertoday_error'] = '\'From\' date cannot be set after today\'s date!';
