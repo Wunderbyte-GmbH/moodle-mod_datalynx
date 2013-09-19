@@ -67,7 +67,7 @@ class dataformfield_teammemberselect_renderer extends dataformfield_renderer {
      * @return [type]          [description]
      */
     public function display_edit(MoodleQuickForm &$mform, $entry, array $options = null) {
-        global $PAGE;
+        global $PAGE, $USER;
 
         $field = $this->_field;
         $fieldid = $field->id();
@@ -77,7 +77,8 @@ class dataformfield_teammemberselect_renderer extends dataformfield_renderer {
         $classname = "teammemberselect_{$fieldid}_{$entryid}";
 
         $selected = !empty($entry->{"c{$fieldid}_content"}) ? json_decode($entry->{"c{$fieldid}_content"}, true) : array();
-        $menu = $field->options_menu(true, false, $entry->userid);
+        $authorid = isset($entry->userid) ? $entry->userid : $USER->id;
+        $menu = $field->options_menu(true, false, $authorid);
 
         for ($i = 0; $i < $field->teamsize; $i++) {
             if (!isset($selected[$i]) || !isset($menu[$selected[$i]])) {
@@ -96,7 +97,7 @@ class dataformfield_teammemberselect_renderer extends dataformfield_renderer {
 
         $PAGE->requires->js_init_call(
                 'M.dataformfield_teammemberselect.init_entry_form',
-                array($field->options_menu(false, false, $entry->userid), $fieldid),
+                array($field->options_menu(false, false, $authorid), $fieldid),
                 false,
                 $this->get_js_module());
     }

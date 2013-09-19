@@ -64,7 +64,7 @@ class dataformfield_teammemberselect extends dataformfield_base {
     }
 
     public function options_menu($addnoselection = false, $makelinks = false, $excludeuser = 0, $allowall = false) {
-        global $DB, $USER, $COURSE;
+        global $DB, $COURSE;
 
         $admissibleroles = $allowall ? $DB->get_fieldset_sql("SELECT DISTINCT id FROM {role} WHERE 1") : $this->admissibleroles;
         list($insql, $params) = $DB->get_in_or_equal($admissibleroles, SQL_PARAMS_NAMED);
