@@ -92,7 +92,7 @@ class dataformfield_select_renderer extends dataformfield_renderer {
         }
         
         if ($required) {
-            $this->set_required($mform, $fieldname, $selected);
+            $this->set_required($mform, "{$fieldname}_selected", $selected);
         }
 
         // Input field for adding a new option
