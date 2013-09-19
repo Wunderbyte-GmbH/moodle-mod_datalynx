@@ -72,7 +72,7 @@ class dataformfield__status_renderer extends dataformfield_renderer {
         $required = !empty($options['required']);
 
         $fieldname = "field_{$fieldid}_{$entryid}";
-        $menu = $this->menu_status(!isset($entry->status));
+        $menu = $this->menu_status();
         $select = &$mform->addElement('select', $fieldname, '', $menu);
         $mform->setDefault($fieldname, $status);
         if ($required) {
@@ -85,8 +85,8 @@ class dataformfield__status_renderer extends dataformfield_renderer {
      * @param  boolean $includenotcreated if STATUS_NOT_SET should be included in the menu (default false)
      * @return array   (int) statusid => (string) label
      */
-    private function menu_status($newentry = false) {
-        if (!$newentry) {
+    private function menu_status($shownotset = false) {
+        if ($shownotset) {
             return array(
                 dataformfield__status::STATUS_NOT_SET => get_string('status_notcreated', 'dataform'),
                 dataformfield__status::STATUS_DRAFT => get_string('status_draft', 'dataform'),
@@ -107,7 +107,7 @@ class dataformfield__status_renderer extends dataformfield_renderer {
      */
     protected function display_browse($entry, $params = array()) {
         $field = $this->_field;
-        $menu = $this->menu_status();
+        $menu = $this->menu_status(true);
         if (isset($entry) && isset($entry->status)) {
             return $menu[$entry->status];
         } else {
