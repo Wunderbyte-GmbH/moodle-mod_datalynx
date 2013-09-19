@@ -703,9 +703,7 @@ class dataform_entries {
                     $entry->timemodified = time();
                 }
 
-                if (has_capability('mod/dataform:writeentry', $df->context)) {
-                    $entry->status = isset($data['status']) ? $data['status'] : $entry->status;
-                }
+                $entry->status = isset($data['status']) ? $data['status'] : $entry->status;
 
                 if ($DB->update_record('dataform_entries',$entry)) {
                     return $entry->id;
@@ -718,12 +716,12 @@ class dataform_entries {
         } else if ($df->user_can_manage_entry(null)) {
             // identify non-logged-in users (in anonymous entries) as guests
             $userid = empty($USER->id) ? $CFG->siteguest : $USER->id; 
-               
             $entry->dataid = $df->id();
             $entry->userid = !empty($entry->userid) ? $entry->userid : $userid;
             if (!isset($entry->groupid)) $entry->groupid = $df->currentgroup;
             if (!isset($entry->timecreated)) $entry->timecreated = time();
             if (!isset($entry->timemodified)) $entry->timemodified = time();
+            $entry->status = isset($data['status']) ? $data['status'] : 0;
             $entryid = $DB->insert_record('dataform_entries', $entry);
             return $entryid;
         }
