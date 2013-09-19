@@ -63,13 +63,14 @@ class dataformfield_teammemberselect extends dataformfield_base {
         $this->rules = array_merge(array(0 => '...'), $this->rules);
     }
 
-    public function options_menu($addnoselection = false, $makelinks = false, $includeuser = false) {
+    public function options_menu($addnoselection = false, $makelinks = false, $excludeuser = 0, $allowall = false) {
         global $DB, $USER, $COURSE;
 
-        list($insql, $params) = $DB->get_in_or_equal($this->admissibleroles, SQL_PARAMS_NAMED);
+        $admissibleroles = $allowall ? $DB->get_fieldset_sql("SELECT DISTINCT id FROM {role} WHERE 1") : $this->admissibleroles;
+        list($insql, $params) = $DB->get_in_or_equal($admissibleroles, SQL_PARAMS_NAMED);
         $params['courseid'] = $COURSE->id;
-        $params['userid'] = $includeuser ? 0 : $USER->id;
-        $query = "SELECT u.id, u.username, u.firstname, u.lastname, u.email
+        $params['userid'] = $excludeuser;
+        $query = "SELECT DISTINCT u.id, u.username, u.firstname, u.lastname, u.email
                     FROM {course} c
                     JOIN {context} ct ON c.id = ct.instanceid
                     JOIN {role_assignments} ra ON ct.id = ra.contextid

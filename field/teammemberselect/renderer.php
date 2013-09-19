@@ -77,10 +77,10 @@ class dataformfield_teammemberselect_renderer extends dataformfield_renderer {
         $classname = "teammemberselect_{$fieldid}_{$entryid}";
 
         $selected = !empty($entry->{"c{$fieldid}_content"}) ? json_decode($entry->{"c{$fieldid}_content"}, true) : array();
-        $menu = $field->options_menu(true);
+        $menu = $field->options_menu(true, false, $entry->userid);
 
         for ($i = 0; $i < $field->teamsize; $i++) {
-            if (!isset($selected[$i])) {
+            if (!isset($selected[$i]) || !isset($menu[$selected[$i]])) {
                 $selected[$i] = 0;
             }
             $select = $mform->addElement('select', "{$fieldname}[{$i}]", null, $menu,
@@ -96,7 +96,7 @@ class dataformfield_teammemberselect_renderer extends dataformfield_renderer {
 
         $PAGE->requires->js_init_call(
                 'M.dataformfield_teammemberselect.init_entry_form',
-                array($field->options_menu()),
+                array($field->options_menu(false, false, $entry->userid), $fieldid),
                 false,
                 $this->get_js_module());
     }
@@ -136,17 +136,19 @@ class dataformfield_teammemberselect_renderer extends dataformfield_renderer {
         $fieldid = $field->id();
         $fieldname = "f_{$i}_{$fieldid}";
         $fieldnamedropdown = "{$fieldname}_dropdown";
-        $menu = $field->options_menu(true, false, true);
+        $menu = $field->options_menu(true, false, 0);
 
         $elements = array();
         $elements[] = $mform->createElement('hidden', "{$fieldname}", null);
         $mform->setType("{$fieldname}", PARAM_INT);
         $elements[] = $mform->createElement('text', "{$fieldnamedropdown}", null);
         $mform->setType("{$fieldnamedropdown}", PARAM_TEXT);
+        $mform->disabledIf($fieldnamedropdown, "searchoperator{$i}", 'eq', '');
+        $mform->disabledIf($fieldnamedropdown, "searchoperator{$i}", 'eq', 'USER');
 
         $PAGE->requires->js_init_call(
                 'M.dataformfield_teammemberselect.init_filter_search_form',
-                array($menu),
+                array($menu, $fieldid),
                 false,
                 $this->get_js_module());
 
@@ -163,7 +165,7 @@ class dataformfield_teammemberselect_renderer extends dataformfield_renderer {
 
         if (isset($entry->{"c{$fieldid}_content"})) {
             $selected = json_decode($entry->{"c{$fieldid}_content"}, true);
-            $options = $field->options_menu(false, true, true);
+            $options = $field->options_menu(false, true, 0, true);
 
             $str = array();
             foreach ($selected as $id) {

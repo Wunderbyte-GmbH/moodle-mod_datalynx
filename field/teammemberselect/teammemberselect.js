@@ -27,20 +27,27 @@
 
 M.dataformfield_teammemberselect = {};
 
+M.dataformfield_teammemberselect.sources = [];
+
 /**
  * Initializes team member select field's autocomplete objects with a list of available users. It attaches event listeners to text fields.
  * @param  YUI      Y               YUI object
  * @param  object   userlistobject  list of users in format {"userid" : "username (email)", ...}
  */
-M.dataformfield_teammemberselect.init_entry_form = function (Y, userlistobject) {
-    var key, source = [], autocompletes = [], lastvalues = [];
+M.dataformfield_teammemberselect.init_entry_form = function (Y, userlistobject, fieldid) {
+    var key = 0,
+        dropdowns = Y.all('input[type="text"][name^="field_' + fieldid + '"][name*="_dropdown"]'),
+        source = M.dataformfield_teammemberselect.sources[fieldid] = [],
+        autocompletes = [],
+        lastvalues = {};
 
+    // move the object's contents into the appropriate array
     for (key in userlistobject) {
         source.push(userlistobject[key]);
     }
 
     // initializes autocomplete objects for text fields
-    Y.all('input[type="text"][name^="field_"][name*="_dropdown"]').each(function (input) {
+    dropdowns.each(function (input) {
         var autocomplete = new Y.AutoCompleteList({
             inputNode: input,
             source: source.slice(0),
@@ -73,7 +80,6 @@ M.dataformfield_teammemberselect.init_entry_form = function (Y, userlistobject) 
         var name = field.get('name').replace('_dropdown', ''),
         select = Y.one('select[name="' + name + '"]');
         select.get("options").each(function (option) {
-            console.log(option.get('text') + " " + field.get('value'));
             if (option.get('text') === field.get('value')) {
                 option.set('selected', true);
                 lastvalues[field.get('name')] = field.get('value');
@@ -87,8 +93,7 @@ M.dataformfield_teammemberselect.init_entry_form = function (Y, userlistobject) 
      */
     function refresh_user_list(input) {
         var newuserlist = source.slice(0), i;
-        console.log(input.get('name'));
-        Y.all('input[type="text"][name^="field_"][name*="_dropdown"]').each(function (field) {
+        dropdowns.each(function (field) {
             if (newuserlist.indexOf(field.get('value')) !== -1) {
                 newuserlist.splice(newuserlist.indexOf(field.get('value')), 1);
             }
@@ -100,10 +105,10 @@ M.dataformfield_teammemberselect.init_entry_form = function (Y, userlistobject) 
     }
 
     // update autocomplete lists once after loading to account for preselected values
-    Y.all('input[type="text"][name^="field_"][name*="_dropdown"]').each(refresh_user_list);
+    dropdowns.each(refresh_user_list);
 
     // clears the text field and the respective select box, saving the previous value for undo action
-    Y.all('input[type="text"][name^="field_"][name*="_dropdown"]').on('click', function (e) {
+    dropdowns.on('click', function (e) {
         var name = e.target.get('name').replace('_dropdown', '');
         e.target.set('value', '');
         Y.one('select[name="' + name + '"] option[value="0"]').set('selected', true);
@@ -112,7 +117,7 @@ M.dataformfield_teammemberselect.init_entry_form = function (Y, userlistobject) 
     });
 
     // undo action allows restoring previous value of a text field by pressing Ctrl+Z while focused on the field
-    Y.all('input[type="text"][name^="field_"][name*="_dropdown"]').on('keydown', function (e) {
+    dropdowns.on('keydown', function (e) {
         var field = e.target;
         if (e.ctrlKey === true && e.keyCode === 90 && lastvalues.hasOwnProperty(field.get('name'))) {
             e.preventDefault();
@@ -124,17 +129,22 @@ M.dataformfield_teammemberselect.init_entry_form = function (Y, userlistobject) 
     });
 };
 
-M.dataformfield_teammemberselect.init_filter_search_form = function (Y, userlistobject) {
-    var key, stringtoid = [], source = [], autocompletes = [], lastvalues = [];
+M.dataformfield_teammemberselect.init_filter_search_form = function (Y, userlistobject, fieldid) {
+    var key = 0,
+    dropdowns = Y.all('input[type="text"][name^="f_"][name*="' + fieldid + '_dropdown"]'),
+    stringtoid = [],
+    source = M.dataformfield_teammemberselect.sources[fieldid] = [],
+    autocompletes = [],
+    lastvalues = {};
 
-    console.log(userlistobject);
+    // move the object's contents into the appropriate array
     for (key in userlistobject) {
         source.push(userlistobject[key]);
         stringtoid[userlistobject[key]] = key;
     }
 
     // initializes autocomplete objects for text fields
-    Y.all('input[type="text"][name^="f_"][name*="_dropdown"]').each(function (input) {
+    dropdowns.each(function (input) {
         var autocomplete = new Y.AutoCompleteList({
             inputNode: input,
             source: source.slice(0),
@@ -165,26 +175,24 @@ M.dataformfield_teammemberselect.init_filter_search_form = function (Y, userlist
     function select_hidden_option(field) {
         var name = field.get('name').replace('_dropdown', '');
         Y.one('input[type="hidden"][name="' + name + '"]').set('value', stringtoid[field.get('value')]);
+        lastvalues[field.get('name')] = field.get('value');
     }
 
     // clears the text field and the respective select box, saving the previous value for undo action
-    Y.all('input[type="text"][name^="f_"][name*="_dropdown"]').on('click', function (e) {
+    dropdowns.on('click', function (e) {
         var name = e.target.get('name').replace('_dropdown', '');
         e.target.set('value', '');
         Y.one('input[type="hidden"][name="' + name + '"]').set('value', 0);
     });
 
     // undo action allows restoring previous value of a text field by pressing Ctrl+Z while focused on the field
-    Y.all('input[type="text"][name^="f_"][name*="_dropdown"]').on('keydown', function (e) {
+    dropdowns.on('keydown', function (e) {
         var field = e.target;
-        select_hidden_option(field);
         if (e.ctrlKey === true && e.keyCode === 90 && lastvalues.hasOwnProperty(field.get('name'))) {
             e.preventDefault();
             e.stopPropagation();
             field.set('value', lastvalues[field.get('name')]);
             select_hidden_option(field);
-        } else {
-            lastvalues[field.get('name')] = field.get('value');
         }
     });
 };
