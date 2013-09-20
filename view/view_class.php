@@ -1065,13 +1065,19 @@ class dataformview_base {
 
         $definitions = array();
         foreach ($this->_tags['field'] as $fieldid => $patterns) {
-            if (!isset($fields[$fieldid])) {
-                continue;
-            } 
-            $field = $fields[$fieldid];
-            if ($fielddefinitions = $field->get_definitions($patterns, $entry, $options)) {
-                $definitions = array_merge($definitions, $fielddefinitions);
+            if (isset($fields[$fieldid])) {
+                $field = $fields[$fieldid];
+                if ($fielddefinitions = $field->get_definitions($patterns, $entry, $options)) {
+                    $definitions = array_merge($definitions, $fielddefinitions);
+                }
             }
+        }
+        if ($patterns = $this->patterns()->get_replacements($this->_tags['view'], null, $options)) {
+            $viewdefinitions = array();
+            foreach ($patterns as $tag => $pattern) {
+                $viewdefinitions[$tag] = array('html', $pattern);
+            }
+            $definitions = array_merge($definitions, $viewdefinitions);
         }
         return $definitions;
     }
@@ -1080,11 +1086,10 @@ class dataformview_base {
      * @param array $patterns array of arrays of pattern replacement pairs
      */
     protected function split_tags($patterns, $subject) {
+        foreach ($patterns as $id => $pattern) {
+            $patterns[$id] = preg_quote($pattern, '/');
+        }
         $delims = implode('|', $patterns);
-        // escape [ and ] and the pattern rule character *
-        // TODO organize this
-        $delims = str_replace(array('[', ']', '*', '^'), array('\[', '\]', '\*', '\^'), $delims);
-
         $elements = preg_split("/($delims)/", $subject, null, PREG_SPLIT_DELIM_CAPTURE);
 
         return $elements;
