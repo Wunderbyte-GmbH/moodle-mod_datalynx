@@ -190,7 +190,7 @@ class dataform_entries {
         }
 
         $fromsql  = " $tables $filtertables ";
-        $wheresql = " $wheredfid $whereoptions $whereuser $wheregroup $whereapprove $wheresearch";
+        $wheresql = " $wheredfid $whereoptions $whereuser $wheregroup $whereapprove $wherestatus $wheresearch";
         $sqlselect  = "SELECT $what FROM $fromsql WHERE $wheresql $sortorder";
 
         // total number of entries the user is authorized to view (without additional filtering)
