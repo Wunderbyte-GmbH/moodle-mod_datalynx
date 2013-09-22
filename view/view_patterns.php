@@ -675,7 +675,7 @@ class dataformview_patterns {
     /**
      *
      */
-    protected function is_regexp_pattern($pattern) {
+    public function is_regexp_pattern($pattern) {
         $df = $this->_view->get_df();
 
         static $views = null;

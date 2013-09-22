@@ -1063,18 +1063,34 @@ class dataformview_base {
         $fields = $this->_df->get_fields();
         $entry->baseurl = $this->_baseurl;
 
+        $htmloptions = $options;
+        unset($htmloptions['edit']);
         $definitions = array();
+        $htmldefinitions = array();
         foreach ($this->_tags['field'] as $fieldid => $patterns) {
             if (isset($fields[$fieldid])) {
                 $field = $fields[$fieldid];
                 if ($fielddefinitions = $field->get_definitions($patterns, $entry, $options)) {
                     $definitions = array_merge($definitions, $fielddefinitions);
                 }
+                if ($fielddefinitions = $field->get_definitions($patterns, $entry, $htmloptions)) {
+                    $htmldefinitions = array_merge($htmldefinitions, $fielddefinitions);
+                }
             }
         }
+
         if ($patterns = $this->patterns()->get_replacements($this->_tags['view'], null, $options)) {
             $viewdefinitions = array();
             foreach ($patterns as $tag => $pattern) {
+                if ($this->patterns()->is_regexp_pattern($tag)) {
+                    foreach ($htmldefinitions as $fieldpattern => $replacement) {
+                        $fieldpattern = preg_quote($fieldpattern, '/');
+                        $replacement = (!empty($replacement) && is_array($replacement) && $replacement[0] == 'html')
+                                        ? ($replacement[1] ? $replacement[1] : '')
+                                        : '';
+                        $pattern = preg_replace("/{$fieldpattern}/", $replacement, $pattern);
+                    }
+                }
                 $viewdefinitions[$tag] = array('html', $pattern);
             }
             $definitions = array_merge($definitions, $viewdefinitions);
