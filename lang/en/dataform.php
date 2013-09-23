@@ -621,3 +621,5 @@ $string['modearray_help'] = '\'To\' date is always considered when available unt
 $string['time_field_required'] = '{$a} field is required!';
 $string['statusrequired'] = 'Status must be set!';
 $string['fromaftertoday_error'] = '\'From\' date cannot be set after today\'s date!';
+$string['editmode'] = 'Edit mode';
+$string['managemode'] = 'Manage mode';

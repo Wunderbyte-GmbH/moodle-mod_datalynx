@@ -410,7 +410,35 @@ class dataform {
                 $completion->set_module_viewed($this->cm);
             }
 
-            $PAGE->set_title($this->name());
+            $modulename = $this->name();
+            $viewid = (!empty($urlparams['view']) ? $urlparams['view'] : (!empty($this->data->defaultview) ? $this->data->defaultview : 0));
+            if ($page == 'view' && $viewid) {
+                global $DB;
+                $viewname = $DB->get_field('dataform_views', 'name', array('id' => $viewid));
+                $pagestring = get_string('page');
+                $fm = $this->get_filter_manager();
+                $filteroptions = $fm::get_filter_options_from_url();
+                $pagenum = !empty($filteroptions['page']) ? $filteroptions['page'] + 1 : 1;
+                $editmode = optional_param('editentries', 0, PARAM_SEQUENCE);
+                $editstring = get_string('editmode', 'dataform');
+                $edit = $editmode ? " ({$editstring})" : "";
+                $pagename = "{$modulename}: {$viewname}: {$pagestring} {$pagenum}{$edit}";
+                $PAGE->set_title($pagename);
+            } else {
+                $manage = get_string('managemode', 'dataform');
+                $what = strpos($page, 'view') !== false ? get_string('views','dataform') : '???';
+                $what = strpos($page, 'field') !== false ? get_string('fields','dataform') : $what;
+                $what = strpos($page, 'filter') !== false ? get_string('filters','dataform') : $what;
+                $what = strpos($page, 'rule') !== false ? get_string('rules','dataform') : $what;
+                $what = strpos($page, 'tool') !== false ? get_string('tools','dataform') : $what;
+                $what = strpos($page, 'js') !== false ? get_string('jsinclude','dataform') : $what;
+                $what = strpos($page, 'css') !== false ? get_string('cssinclude','dataform') : $what;
+                $what = strpos($page, 'preset') !== false ? get_string('presets','dataform') : $what;
+                $what = strpos($page, 'import') !== false ? get_string('import','dataform') : $what;
+                $what = strpos($page, 'statistics') !== false ? get_string('statistics','dataform') : $what;
+                $pagename = "{$modulename}: {$what} ({$manage})";
+                $PAGE->set_title($pagename);
+            }
             $PAGE->set_heading($this->course->fullname);
             
             // Include blocks dragdrop when editing
