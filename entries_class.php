@@ -194,7 +194,7 @@ class dataform_entries {
         $sqlselect  = "SELECT $what FROM $fromsql WHERE $wheresql $sortorder";
 
         // total number of entries the user is authorized to view (without additional filtering)
-        $sqlmax = "SELECT $count FROM $tables WHERE $wheredfid $whereoptions $whereuser $wheregroup $whereapprove";
+        $sqlmax = "SELECT $count FROM $tables WHERE $wheredfid $whereoptions $whereuser $wheregroup $whereapprove $wherestatus";
         // number of entries in this particular view call (with filtering)
         $sqlcount   = "SELECT $count FROM $fromsql WHERE $wheresql";
         // base params + search params
