@@ -1403,9 +1403,8 @@ class dataformview_base {
         $actionparams = array(
             'd' => $this->_df->id(),
             'view' => $viewid,
-            'filter' => $this->_filter->id,
             'page' => $this->_filter->page,
-            'eids' => $this->_filter->eids,
+            //'eids' => $this->_filter->eids,
             'update' => $this->_editentries
         );
         $actionurl = new moodle_url("/mod/dataform/{$this->_df->pagefile()}.php", $actionparams);
