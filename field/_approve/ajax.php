@@ -33,7 +33,8 @@ $entryid = required_param('entryid', PARAM_INT);
 $sesskey = required_param('sesskey', PARAM_TEXT);
 
 $cm = get_coursemodule_from_instance('dataform', $d, 0, false, MUST_EXIST);
-$course = $DB->get_record('course', array('id'=>$cm->course), '*', MUST_EXIST);
+$course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
+$data = $DB->get_record('dataform', array('id' => $d), '*', MUST_EXIST);
 
 require_sesskey();
 
@@ -42,16 +43,22 @@ require_login($course, true, $cm);
 require_capability('mod/dataform:approve', $context);
 
 global $DB;
-
+$completiontype = COMPLETION_UNKNOWN;
 if ($action == 'approve') {
     $DB->set_field('dataform_entries', 'approved', 1, array('id' => $entryid));
     $return = $DB->get_field('dataform_entries', 'approved', array('id' => $entryid)) == 1;
+    $completiontype = COMPLETION_COMPLETE;
 } else if ($action == 'disapprove') {
     $DB->set_field('dataform_entries', 'approved', 0, array('id' => $entryid));
     $return = $DB->get_field('dataform_entries', 'approved', array('id' => $entryid)) == 0;
+    $completiontype = COMPLETION_INCOMPLETE;
 } else {
     $return = false;
 }
-
+// Update completion state
+$completion = new completion_info($course);
+if($completion->is_enabled($cm) && $data->completionentries) {
+    $completion->update_state($cm, $completiontype);
+}
 echo json_encode($return);
 die;

@@ -468,10 +468,12 @@ class dataform_entries {
 
             } else {
                 $processed = array();
+                $completiontype = COMPLETION_UNKNOWN;
                 $strnotify = '';
 
                 switch ($action) {
                     case 'update':
+                        $completiontype = COMPLETION_UNKNOWN;
                         $strnotify = 'entriesupdated';
 
                         if (!is_null($data)) {
@@ -543,6 +545,7 @@ class dataform_entries {
                         break;
 
                     case 'duplicate':
+                        $completiontype = COMPLETION_COMPLETE;
                         foreach ($entries as $entry) {
                             // can user add anymore entries?
                             if (!$df->user_can_manage_entry()) {
@@ -584,6 +587,7 @@ class dataform_entries {
                         break;
 
                     case 'approve':
+                        $completiontype = COMPLETION_COMPLETE;
                         // approvable entries should be filtered above
                         $entryids = array_keys($entries);
                         $ids = implode(',', $entryids);
@@ -598,6 +602,7 @@ class dataform_entries {
                         break;
 
                     case 'disapprove':
+                        $completiontype = COMPLETION_COMPLETE;
                         // disapprovable entries should be filtered above
                         $entryids = array_keys($entries);
                         $ids = implode(',', $entryids);
@@ -612,6 +617,7 @@ class dataform_entries {
                         break;
 
                     case 'delete':
+                        $completiontype = COMPLETION_INCOMPLETE;
                         // deletable entries should be filtered above
                         foreach ($entries as $entry) {
                             $fields = $df->get_fields();
@@ -631,7 +637,7 @@ class dataform_entries {
                         break;
 
                     case 'append':
-         
+                        $completiontype = COMPLETION_UNKNOWN;
                         $nodeid = required_param('node', PARAM_INT);
                         $parentid = required_param('parent', PARAM_INT);
                         $siblingid = optional_param('sibling', 0, PARAM_INT);
@@ -661,6 +667,12 @@ class dataform_entries {
                 $df->add_to_log($action);
 
                 if ($processed) {
+                    // Update completion state
+                    $completion = new completion_info($df->course);
+                    if($completion->is_enabled($df->cm) && $df->data->completionentries) {
+                        $completion->update_state($df->cm, $completiontype);
+                    }
+
                     $strnotify = get_string($strnotify, 'dataform', count($processed));
                 } else {
                     $strnotify = get_string($strnotify, 'dataform', get_string('no'));

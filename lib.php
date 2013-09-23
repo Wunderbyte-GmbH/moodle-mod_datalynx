@@ -837,7 +837,9 @@ function dataform_comment_add($newcomment, $comment_param) {
  * @param string $contextid the context id
  * @param string $component the component to get rating permissions for
  * @param string $ratingarea the rating area to get permissions for
- * @return array an associative array of the user's rating permissions
+ * @return arr * @param bool $type Type of comparison (or/and; can be used as return value if no conditions)
+ * @return bool True if completed, false if not. (If no conditions, then return
+ *   value depends on comparison tyay an associative array of the user's rating permissions
  */
 function dataform_rating_permissions($contextid, $component, $ratingarea) {
     $context = context::instance_by_id($contextid, MUST_EXIST);
@@ -1650,5 +1652,5 @@ function dataform_get_completion_state($course, $cm, $userid, $type) {
                AND de.approved = 1";
     $count = $DB->get_field_sql($sql, $params);
 
-    return $count > $dataform->completionentries;
+    return $count >= $dataform->completionentries;
 }

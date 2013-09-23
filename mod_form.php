@@ -219,12 +219,12 @@ class mod_dataform_mod_form extends moodleform_mod {
     /**
      *
      */
-    function data_preprocessing(&$data){
-        if (!empty($data->notification)) {
-            $notification = $data->notification;
-            foreach (dataform::get_notification_types() as $type => $key) {
-                $data->$type = $notification & $key;
-            }
+    function data_preprocessing(&$data) {
+        parent::data_preprocessing($data);
+        $data['completionentriesenabled'] = !empty($data['approval']) &&
+                                            !empty($data['completionentries']) ? 1 : 0;
+        if (empty($data['completionentries'])) {
+            $data['completionentries'] = 1;
         }
     }
 
@@ -232,7 +232,12 @@ class mod_dataform_mod_form extends moodleform_mod {
      *
      */
     function set_data($data) {
-        $this->data_preprocessing($data);
+        if (!empty($data->notification)) {
+            $notification = $data->notification;
+            foreach (dataform::get_notification_types() as $type => $key) {
+                $data->$type = $notification & $key;
+            }
+        }
         parent::set_data($data);
     }
 
@@ -259,21 +264,31 @@ class mod_dataform_mod_form extends moodleform_mod {
         $mform =& $this->_form;
 
         $group = array();
-        $group[] = &$mform->createElement('checkbox', 'completionpostsenabled', '', get_string('completionentries', 'dataform'));
+        $group[] = &$mform->createElement('checkbox', 'completionentriesenabled', '', get_string('completionentries', 'dataform'));
         $group[] = &$mform->createElement('text', 'completionentries', '', array('size' => 3));
         $mform->setType('completionentries', PARAM_INT);
         $mform->addGroup($group, 'completionentriesgroup', get_string('completionentriesgroup', 'dataform'), array(' '), false);
-        $mform->disabledIf('completionentries', 'completionpostsenabled', 'notchecked');
-        $mform->disabledIf('completionpostsenabled', 'approval', 'eq', '0');
+        $mform->disabledIf('completionentries', 'completionentriesenabled', 'notchecked');
+        $mform->disabledIf('completionentries', 'approval', 'eq', '0');
+        $mform->disabledIf('completionentriesenabled', 'approval', 'eq', '0');
         $mform->addHelpButton('completionentriesgroup', 'completionentriesgroup', 'dataform');
 
         return array('completionentriesgroup');
     }
 
-    public function completion_rule_enabled($data) {
+    function definition_after_data() {
+        parent::data_preprocessing($data);
+        $data['completionentriesenabled'] = !empty($data['approval']) &&
+                                            !empty($data['completionentries']) ? 1 : 0;
+        if (empty($data['completionentries'])) {
+            $data['completionentries'] = 0;
+        }
+    }
+
+    function completion_rule_enabled($data) {
         return (!empty($data['approval']) &&
                 $data['approval'] == 1 &&
-                !empty($data['completionpostsenabled']) &&
+                !empty($data['completionentriesenabled']) &&
                 $data['completionentries'] > 0);
     }
 
