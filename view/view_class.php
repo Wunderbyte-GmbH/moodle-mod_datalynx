@@ -86,7 +86,7 @@ class dataformview_base {
             $this->view->dataid = $this->_df->id();
             $this->view->name = get_string('pluginname', "dataformview_{$this->type}");
             $this->view->description = '';
-            $this->view->visible = 2;
+            $this->view->visible = 7;
             $this->view->filter = 0;
             $this->view->perpage = 0;
             $this->view->groupby = '';
@@ -514,7 +514,6 @@ class dataformview_base {
                 redirect(new moodle_url('/portfolio/add.php', $exportparams));
             }
         }
-
         // Process entries data
         $processed = $this->process_entries_data();
         if (is_array($processed)) {
