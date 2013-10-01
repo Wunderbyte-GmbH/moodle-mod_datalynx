@@ -277,6 +277,7 @@ class mod_dataform_mod_form extends moodleform_mod {
     }
 
     function definition_after_data() {
+        parent::definition_after_data();
         parent::data_preprocessing($data);
         $data['completionentriesenabled'] = !empty($data['approval']) &&
                                             !empty($data['completionentries']) ? 1 : 0;
