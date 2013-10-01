@@ -485,7 +485,10 @@ class dataform_filter_manager {
         if ($this->get_filters() and isset($this->_filters[$filterid])) {
             return clone($this->_filters[$filterid]);
         } else {
-            throw new moodle_exception("Filter $filterid not found for Dataform $dfid");
+            $filter = new object;
+            $filter->dataid = $df->id();
+
+            return new dataform_filter($filter);
         }
     }
 
