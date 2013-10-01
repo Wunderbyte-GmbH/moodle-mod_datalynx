@@ -63,36 +63,58 @@ class dataformfield_teammemberselect extends dataformfield_base {
         $this->rules = array_merge(array(0 => '...'), $this->rules);
     }
 
-    public function options_menu($addnoselection = false, $makelinks = false, $excludeuser = 0, $allowall = false) {
+    protected static $allusers = null;
+    protected static $allowedusers = null;
+    protected static $alluserslinks = null;
+    protected static $alloweduserslinks = null;
+
+    protected function init_user_menu() {
         global $DB, $COURSE;
 
-        $admissibleroles = $allowall ? $DB->get_fieldset_sql("SELECT DISTINCT id FROM {role} WHERE 1") : $this->admissibleroles;
-        list($insql, $params) = $DB->get_in_or_equal($admissibleroles, SQL_PARAMS_NAMED);
-        $params['courseid'] = $COURSE->id;
-        $params['userid'] = $excludeuser;
-        $query = "SELECT DISTINCT u.id, u.username, u.firstname, u.lastname, u.email
-                    FROM {course} c
-                    JOIN {context} ct ON c.id = ct.instanceid
-                    JOIN {role_assignments} ra ON ct.id = ra.contextid
-                    JOIN {user} u ON u.id = ra.userid
-                   WHERE c.id = :courseid
-                     AND ra.roleid $insql
-                     AND u.id <> :userid
-                ORDER BY u.lastname ASC, u.firstname ASC, u.email ASC";
-        $results = $DB->get_records_sql($query, $params);
+        $context = context_course::instance($COURSE->id);
+        $query = "SELECT DISTINCT u.id, u.username, u.firstname, u.lastname, u.email, ra.roleid
+                    FROM {role_assignments} ra
+              INNER JOIN {user} u ON u.id = ra.userid
+                   WHERE ra.contextid = :contextid
+                ORDER BY u.lastname ASC, u.firstname ASC, u.email ASC, u.username ASC";
+        $results = $DB->get_records_sql($query, array('contextid' => $context->id));
+
+        self::$allusers = array();
+        self::$alluserslinks = array();
+        self::$allowedusers = array();
+        self::$alloweduserslinks = array();
+
+        foreach ($results as $result) {
+            self::$allusers[$result->id] = fullname($result) . " ({$result->email})";
+
+            $baseurl = new moodle_url('/user/view.php', array('id' => $result->id, 'course' => $COURSE->id));
+            self::$alluserslinks[$result->id] = html_writer::link($baseurl, fullname($result));
+
+            if (array_search($result->roleid, $this->admissibleroles) !== false) {
+                self::$allowedusers[$result->id] = self::$allusers[$result->id];
+                self::$alloweduserslinks[$result->id] = self::$alluserslinks[$result->id];
+            }
+        }
+    }
+
+    public function options_menu($addnoselection = false, $makelinks = false, $excludeuser = 0, $allowall = false) {
+        if (self::$allusers === null) {
+            $this->init_user_menu();
+        }
 
         $options = array();
         if ($addnoselection) {
             $options[0] = '...';
         }
-        foreach ($results as $result) {
-            if ($makelinks) {
-                $baseurl = new moodle_url('/user/view.php', array('id' => $result->id, 'course' => $params['courseid']));
-                $options[$result->id] = html_writer::link($baseurl, fullname($result));
-            } else {
-                $options[$result->id] = fullname($result) . " ({$result->email})";
-            }
+
+        $options += $makelinks ?
+                    ($allowall ? self::$alluserslinks : self::$alloweduserslinks) :
+                    ($allowall ? self::$allusers : self::$allowedusers);
+
+        if (isset($options[$excludeuser])) {
+            unset($options[$excludeuser]);
         }
+
         return $options;
     }
 

@@ -545,8 +545,8 @@ class dataform {
         
         // if a new dataform or incomplete design, direct manager to manage area
         if ($manager) {
-            $views = $this->get_views();
-            if (!$views) {
+            $viewrecords = $this->get_view_records();
+            if (empty($viewrecords)) {
                 if ($page == 'view' or $page == 'embed') {
                     $getstarted = new object;
                     $getstarted->presets = html_writer::link(new moodle_url('/mod/dataform/preset/index.php', array('d' => $thisid)), get_string('presets', 'dataform'));
@@ -978,7 +978,7 @@ class dataform {
      * @param  boolean $checkvisibility if true, only the entries of views visible to the current user will be retrieved
      * @return array   an array of dataform_views entry objects
      */
-    protected function get_view_records($forceget = false, $sort = '', $checkvisibility = true) {
+    public function get_view_records($forceget = false, $sort = '', $checkvisibility = true) {
         global $DB;
 
         if (empty($this->views) or $forceget) {
@@ -1073,10 +1073,9 @@ class dataform {
                 $type = $viewortype;
                 $viewortype = 0;
             }
-            require_once($CFG->dirroot. '/mod/dataform/view/'. $type. '/view_class.php');
-            $viewclass = 'dataformview_'. $type;
-            $view = new $viewclass($this, $viewortype, $active);
-            return $view;
+            require_once($CFG->dirroot . '/mod/dataform/view/' . $type . '/view_class.php');
+            $viewclass = 'dataformview_' . $type;
+            return new $viewclass($this, $viewortype, $active);
         }
     }
 

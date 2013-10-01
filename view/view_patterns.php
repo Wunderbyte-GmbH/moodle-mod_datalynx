@@ -141,12 +141,21 @@ class dataformview_patterns {
 
         static $views = null;
         if ($views === null) {
-            $views = $df->get_views();
+            $views = $df->get_view_records();
+            foreach ($views as $view) {
+                $viewname = $view->name;
+
+                $baseurlparams = array();
+                $baseurlparams['d'] = $view->dataid;
+                $baseurlparams['view'] = $view->id;
+
+                $view->baseurl = new moodle_url("/mod/dataform/{$this->_view->get_df()->pagefile()}.php", $baseurlparams);
+            }
         }
 
         if ($views) {
             foreach ($views as $view) {
-                $viewname = $view->name();
+                $viewname = $view->name;
                 if (strpos($tag, "#{{viewlink:$viewname;") === 0) {
                     list(, $linktext, $urlquery, ) = explode(';', $tag);
                     // Pix icon for text
@@ -156,7 +165,7 @@ class dataformview_patterns {
                     }    
                     // Replace pipes in urlquery with &
                     $urlquery = str_replace('|', '&', $urlquery);
-                    return html_writer::link($view->get_baseurl()->out(false). "&$urlquery", $linktext);
+                    return html_writer::link($view->baseurl->out(false). "&$urlquery", $linktext);
                 }
                 if (strpos($tag, "#{{viewsesslink:$viewname;") === 0) {
                     list(, $linktext, $urlquery, ) = explode(';', $tag);
@@ -167,7 +176,7 @@ class dataformview_patterns {
                     }    
                     $urlquery = str_replace('|', '&', $urlquery);
                     $linkparams = array('sesskey' => sesskey());
-                    $viewlink = new moodle_url($view->get_baseurl(), $linkparams);
+                    $viewlink = new moodle_url($view->baseurl, $linkparams);
                     return html_writer::link($viewlink->out(false). "&$urlquery", $linktext);
                 }
             }
