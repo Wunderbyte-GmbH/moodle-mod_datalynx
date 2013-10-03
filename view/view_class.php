@@ -52,7 +52,8 @@ class dataformview_base {
     protected $_editentries = 0;
     protected $_entriesform = null;
     protected $_display_definition = array();
-    protected $_returntoentriesform = false;
+    protected $_returntoentriesform = null;
+    protected $_redirect = 0;
 
     /**
      * Constructor
@@ -90,7 +91,10 @@ class dataformview_base {
             $this->view->filter = 0;
             $this->view->perpage = 0;
             $this->view->groupby = '';
+            $this->view->param4 = 0;
         }
+
+        $this->_redirect = $this->view->param4;
 
         // set editors and patterns
         $this->set__editors();
@@ -643,11 +647,18 @@ class dataformview_base {
         } else {
             echo html_writer::start_tag('div', array('class' => $viewname));
             echo $notifications;
-            echo $print_before;
-            if ($displayentries) {
-                $this->display_entries($options);
+
+            if (($this->_returntoentriesform === false)) {
+                $redirectid = $this->_redirect ? $this->_redirect : $this->id();
+                $url = new moodle_url($this->_baseurl, array('view' => $redirectid));
+                echo $OUTPUT->continue_button($url);
+            } else {
+                echo $print_before;
+                if ($displayentries) {
+                    $this->display_entries($options);
+                }
+                echo $print_after;
             }
-            echo $print_after;
             echo html_writer::end_tag('div');
         }
     }
@@ -1396,14 +1407,11 @@ class dataformview_base {
      */
     protected function get_entries_form() {
         global $CFG, $DB;
-        $viewid = $DB->get_field('dataform_views', 'param4', array('id' => $this->id()));
-        $viewid = $viewid ? $viewid : $this->id();
-        // prepare params for forcontentm
+        // prepare params for for content management
         $actionparams = array(
             'd' => $this->_df->id(),
-            'view' => $viewid,
+            'view' => $this->id(),
             'page' => $this->_filter->page,
-            //'eids' => $this->_filter->eids,
             'update' => $this->_editentries
         );
         $actionurl = new moodle_url("/mod/dataform/{$this->_df->pagefile()}.php", $actionparams);
