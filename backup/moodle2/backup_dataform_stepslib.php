@@ -158,7 +158,8 @@ class backup_dataform_activity_structure_step extends backup_activity_structure_
 
         // Define file annotations
         $dataform->annotate_files('mod_dataform', 'intro', null); // This file area hasn't itemid
-        $view->annotate_files('mod_dataform', 'view', 'id'); // By view->id
+        $view->annotate_files('mod_dataform', 'viewsection', 'id'); // By view->id
+        $view->annotate_files('mod_dataform', 'viewparam2', 'id'); // By view->id
         $content->annotate_files('mod_dataform', 'content', 'id'); // By content->id
 
         // Return the root element (data), wrapped into standard activity structure

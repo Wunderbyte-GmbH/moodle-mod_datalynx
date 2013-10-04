@@ -1311,13 +1311,39 @@ class dataform {
                             // TODO: check for limit
 
                             // set name
+                            if ($this->name_exists('views', $view->name())) {
+                                $copyname = $view->view->name = 'Copy of '. $view->name();
+                            }
+                            $i = 2;
                             while ($this->name_exists('views', $view->name())) {
-                                $view->view->name = 'Copy of '. $view->name();
+                                $view->view->name = $copyname . " ($i)";
+                                $i++;
                             }
                             // reset id
+                            $oldviewid = $view->view->id;
                             $view->view->id = 0;
                             
                             $viewid = $view->add($view->view);
+
+                            $newviewid = $viewid;
+                            $contextid = $this->context->id;
+                            $component = 'mod_dataform';
+                            $fs = get_file_storage();
+                            foreach (array('viewsection', 'viewparam2') as $filearea) {
+                                $files = $fs->get_area_files($contextid, $component, $filearea, $oldviewid);
+                                foreach ($files as $file) {
+                                    if ($file->is_directory() and $file->get_filepath() === '/') {
+                                        continue;
+                                    }
+                                    $file_record = array(
+                                            'contextid' => $contextid,
+                                            'component' => $component,
+                                            'filearea'  => $filearea,
+                                            'itemid'    => $newviewid);
+                                    $fs->create_file_from_storedfile($file_record, $file);
+                                }
+                            }
+
 
                             $processedvids[] = $viewid;
                         }
