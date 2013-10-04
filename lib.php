@@ -388,8 +388,59 @@ function dataform_supports($feature) {
  * @return array
  */
 function dataform_get_file_areas($course, $cm, $context) {
-    $areas = array();
+    $areas = array(
+        'viewsection' => 'View template files',
+        'viewparam2' => 'Entry template files',
+        'content' => 'Entry content files');
+
     return $areas;
+}
+
+
+/**
+ * File browsing support for dataform module.
+ *
+ * @param file_browser $browser
+ * @param array $areas
+ * @param stdClass $course
+ * @param cm_info $cm
+ * @param context $context
+ * @param string $filearea
+ * @param int $itemid
+ * @param string $filepath
+ * @param string $filename
+ * @return file_info_stored file_info_stored instance or null if not found
+ */
+function dataform_get_file_info($browser, $areas, $course, $cm, $context, $filearea, $itemid, $filepath, $filename) {
+    global $CFG, $DB, $USER;
+
+    if ($context->contextlevel != CONTEXT_MODULE) {
+        return null;
+    }
+
+    if (!isset($areas[$filearea])) {
+        return null;
+    }
+
+    if (is_null($itemid)) {
+        require_once($CFG->dirroot.'/mod/dataform/locallib.php');
+        return new dataform_file_info_container($browser, $course, $cm, $context, $areas, $filearea);
+    }
+
+    if (!$view = $DB->get_record('dataform_views', array('id' => $itemid))) {
+        return null;
+    }
+
+    $fs = get_file_storage();
+    $filepath = is_null($filepath) ? '/' : $filepath;
+    $filename = is_null($filename) ? '.' : $filename;
+    if (!($storedfile = $fs->get_file($context->id, 'mod_dataform', $filearea, $itemid, $filepath, $filename))) {
+        return null;
+    }
+
+    $urlbase = $CFG->wwwroot.'/pluginfile.php';
+
+    return new file_info_stored($browser, $context, $storedfile, $urlbase, s($view->name), true, true, false, false);
 }
 
 /**

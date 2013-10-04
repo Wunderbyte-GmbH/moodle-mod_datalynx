@@ -322,23 +322,12 @@ class dataformview_base {
 
         $this->set_view($data);
 
-        if (!$this->view->id = $DB->insert_record('dataform_views', $this->view)){
+        if (!$this->view->id = $DB->insert_record('dataform_views', $this->view)) {
             echo $OUTPUT->notification('Insertion of new view failed!');
             return false;
         }
 
-        // update item id of files area
-        $fs = get_file_storage();
-        $files = $fs->get_area_files($this->_df->context->id, 'mod_dataform', 'view', 0);
-        if (count($files) > 1) {
-            foreach ($files as $file) {
-                $filerec = new object;
-                $filerec->itemid = $this->view->id;
-                $fs->create_file_from_storedfile($filerec, $file);
-            }
-        }
-        $fs->delete_area_files($this->_df->context->id, 'mod_dataform', 'view', 0);
-
+        $this->update($data);
 
         return $this->view->id;
     }
@@ -353,10 +342,12 @@ class dataformview_base {
         if ($data) {
             $this->set_view($data);
         }
+
         if (!$DB->update_record('dataform_views', $this->view)) {
             echo $OUTPUT->notification('updating view failed!');
             return false;
         }
+
         return true;
     }
 
@@ -372,7 +363,7 @@ class dataformview_base {
                 $editor = "e$editorname";
                 $fs->delete_area_files($this->_df->context->id,
                                         'mod_dataform',
-                                        'view',
+                                        "view$editorname",
                                         $this->id(). $key);
             }
 
@@ -446,17 +437,19 @@ class dataformview_base {
         if (!$editors = $this->editors()) {
             return $data;
         }
+        if ($this->view->id) {
+            foreach ($editors as $editorname => $options) {
+                $data = file_postupdate_standard_editor($data,
+                                                        "e$editorname",
+                                                        $options,
+                                                        $this->_df->context,
+                                                        'mod_dataform',
+                                                        "view$editorname",
+                                                        $this->view->id);
 
-        foreach ($editors as $editorname => $options) {
-            $data = file_postupdate_standard_editor($data,
-                                                    "e$editorname",
-                                                    $options,
-                                                    $this->_df->context,
-                                                    'mod_dataform',
-                                                    "view$editorname",
-                                                    $this->view->id);
-        } 
-        
+            }
+        }
+
         return $data;
     }
 
