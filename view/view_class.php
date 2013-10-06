@@ -1399,6 +1399,12 @@ class dataformview_base {
      *
      */
     protected function get_entries_form() {
+        static $entriesform = null;
+
+        if ($entriesform != null) {
+            return $entriesform;
+        }
+
         global $CFG, $DB;
         // prepare params for for content management
         $actionparams = array(
@@ -1418,7 +1424,8 @@ class dataformview_base {
         $loctype = $type ? "/$type" : '';
         $formclass = 'dataformview'. $classtype. '_entries_form';
         require_once("$CFG->dirroot/mod/dataform/view". $loctype. '/view_entries_form.php');
-        return new $formclass($actionurl, $custom_data);
+        $entriesform = new $formclass($actionurl, $custom_data);
+        return $entriesform;
     }
 
     /**

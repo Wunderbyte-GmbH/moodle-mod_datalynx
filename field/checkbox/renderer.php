@@ -95,7 +95,7 @@ class dataformfield_checkbox_renderer extends dataformfield_multiselect_renderer
                 }
             }
             if ($emptyfield) {
-                return array("{$fieldname}_grp", get_string('fieldrequired', 'dataform'));
+                return array("{$fieldname}_grp" => get_string('fieldrequired', 'dataform'));
             }
         }
         return null;

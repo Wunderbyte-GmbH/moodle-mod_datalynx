@@ -108,16 +108,16 @@ class dataformfield_textarea_renderer extends dataformfield_renderer {
             $tag = array_search($cleantag, $tags);
             if ($tag !== false and $this->is_required($tag)) {
                 if (empty($data->$formfieldname)) {
-                    return array($formfieldname, get_string('fieldrequired', 'dataform'));
+                    return array($formfieldname => get_string('fieldrequired', 'dataform'));
                 }
                 if (!$field->is_editor() or !can_use_html_editor()) {
                     if (!$content = clean_param($data->$formfieldname, $cleanformat)) {
-                        return array($formfieldname, get_string('fieldrequired', 'dataform'));
+                        return array($formfieldname => get_string('fieldrequired', 'dataform'));
                     }
                 } else {
                     $editorobj = $data->$formfieldname;
                     if (!$content = clean_param($editorobj['text'], $cleanformat)) {
-                        return array($formfieldname, get_string('fieldrequired', 'dataform'));
+                        return array($formfieldname => get_string('fieldrequired', 'dataform'));
                     }
                 }
             }

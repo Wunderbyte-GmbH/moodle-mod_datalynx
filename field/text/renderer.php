@@ -84,7 +84,7 @@ class dataformfield_text_renderer extends dataformfield_renderer {
         // only [[$fieldname]] is editable so check it if exists
         if (array_key_exists("[[*$fieldname]]", $tags) and isset($data->$formfieldname)) {
             if (!$content = clean_param($data->$formfieldname, PARAM_NOTAGS)) {
-                return array($formfieldname, get_string('fieldrequired', 'dataform'));
+                return array($formfieldname => get_string('fieldrequired', 'dataform'));
             }
         }
         return null;
