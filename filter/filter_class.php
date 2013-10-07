@@ -1011,7 +1011,8 @@ class dataform_filter_manager {
         global $CFG;
         
         require_once("$CFG->dirroot/mod/dataform/filter/filter_form.php");
-        $formurl = new moodle_url($view->get_baseurl(), array('filter' => $filter->id, 'afilter' => 1));         $mform = new mod_dataform_advanced_filter_form($this->_df, $filter, $formurl, array('view' => $view));
+        $formurl = new moodle_url($view->get_baseurl(), array('filter' => self::USER_FILTER_SET, 'afilter' => 1));
+        $mform = new mod_dataform_advanced_filter_form($this->_df, $filter, $formurl, array('view' => $view));
         return $mform;        
     }
 
