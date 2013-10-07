@@ -624,5 +624,6 @@ $string['fromaftertoday_error'] = '\'From\' date cannot be set after today\'s da
 $string['editmode'] = 'Edit mode';
 $string['managemode'] = 'Manage mode';
 $string['minteamsize'] = 'Minimum team size';
+$string['minteamsize_help'] = 'Enter the miminum allowed number of team members here.';
 $string['minteamsize_error_value'] = 'Minimum team size cannot be greater than the maximum team size!';
 $string['minteamsize_error_form'] = 'You must select at least {$a} team members!';
