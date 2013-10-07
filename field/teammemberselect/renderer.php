@@ -75,31 +75,65 @@ class dataformfield_teammemberselect_renderer extends dataformfield_renderer {
         $fieldname = "field_{$fieldid}_$entryid";
         $fieldnamedropdown = "field_{$fieldid}_{$entryid}_dropdown";
         $classname = "teammemberselect_{$fieldid}_{$entryid}";
+        $required = !empty($options['required']);
 
         $selected = !empty($entry->{"c{$fieldid}_content"}) ? json_decode($entry->{"c{$fieldid}_content"}, true) : array();
         $authorid = isset($entry->userid) ? $entry->userid : $USER->id;
         $menu = $field->options_menu(true, false, $authorid);
 
+        $selectgroup = array();
+        $dropdowngroup = array();
         for ($i = 0; $i < $field->teamsize; $i++) {
             if (!isset($selected[$i]) || !isset($menu[$selected[$i]])) {
                 $selected[$i] = 0;
             }
-            $select = $mform->addElement('select', "{$fieldname}[{$i}]", null, $menu,
+            $select = $mform->createElement('select', "{$fieldname}[{$i}]", null, $menu,
                 array('class' => "dataformfield_teammemberselect_select $classname"));
             $mform->setType("{$fieldname}[{$i}]", PARAM_INT);
-            $text = $mform->addElement('text', "{$fieldnamedropdown}[{$i}]", null,
+            $text = $mform->createElement('text', "{$fieldnamedropdown}[{$i}]", null,
                 array('class' => "dataformfield_teammemberselect_dropdown $classname"));
             $mform->setType("{$fieldnamedropdown}[{$i}]", PARAM_TEXT);
 
             $select->setSelected($selected[$i]);
             $text->setValue($menu[$selected[$i]]);
+            $selectgroup[] = $select;
+            $dropdowngroup[] = $text;
         }
-
+        $mform->addGroup($dropdowngroup, "{$fieldname}_dropdown_grp", null, null, false);
+        $mform->addGroup($selectgroup, "{$fieldname}_grp", null, null, false);
+        if ($required) {
+            $mform->addGroupRule("{$fieldname}_dropdown_grp", '', 'required', null, 0, 'client');
+        }
+        $PAGE->requires->string_for_js('minteamsize_error_form', 'dataform');
         $PAGE->requires->js_init_call(
                 'M.dataformfield_teammemberselect.init_entry_form',
-                array($field->options_menu(false, false, $authorid), $fieldid),
+                array($field->options_menu(false, false, $authorid), $fieldid, $entryid, $field->minteamsize),
                 false,
                 $this->get_js_module());
+    }
+
+    /**
+     *
+     */
+    public function validate_data($entryid, $tags, $data) {
+        $field = $this->_field;
+        $fieldid = $field->id();
+        $fieldname = $field->name();
+
+        $formfieldname = "field_{$fieldid}_{$entryid}";
+        $tags = $this->add_clean_pattern_keys($tags);
+        if (array_key_exists("[[*$fieldname]]", $tags) and isset($data->$formfieldname)) {
+            $numvalues = 0;
+            foreach ($data->$formfieldname as $value) {
+                if ($value != 0) {
+                    $numvalues++;
+                }
+            }
+            if ($numvalues < $field->minteamsize) {
+                return array("{$formfieldname}_dropdown_grp" => get_string('minteamsize_error_form', 'dataform', $field->minteamsize));
+            }
+        }
+        return null;
     }
 
     public static function compare_different_ignore_zero_callback($data) {
@@ -213,5 +247,14 @@ class dataformfield_teammemberselect_renderer extends dataformfield_renderer {
         $patterns["[[$fieldname]]"] = array(true);
 
         return $patterns;
+    }
+
+    /**
+     * Array of patterns this field supports
+     */
+    protected function supports_rules() {
+        return array(
+            self::RULE_REQUIRED
+        );
     }
 }

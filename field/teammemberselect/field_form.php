@@ -45,6 +45,13 @@ class dataformfield_teammemberselect_form extends dataformfield_form {
         $mform->addRule('param1', get_string('teamsize_error_required', 'dataform'), 'required', null, 'client');
         $mform->addRule(array('param1', 'zero'), get_string('teamsize_error_value', 'dataform'), 'compare', 'gt');
 
+        // Minimum required team size
+        $mform->addElement('text', 'param3', get_string('minteamsize', 'dataform'), array('size' => 3));
+        $mform->addHelpButton('param3', 'minteamsize', 'dataform');
+        $mform->setType('param3', PARAM_INT);
+        $mform->addRule(array('param3', 'param1'), get_string('minteamsize_error_value', 'dataform'), 'compare', 'lte');
+        $mform->setDefault('param3', 0);
+
         // Admissible roles
         $group = array();
         $context = context_system::instance();

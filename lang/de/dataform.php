@@ -592,3 +592,7 @@ $string['statusrequired'] = 'Status muss gesetzt werden!';
 $string['fromaftertoday_error'] = 'Das \'Von\' Datum darf nicht zeitlich nach dem heutigen Datum liegen!';
 $string['editmode'] = 'Bearbeitungsmodus';
 $string['managemode'] = 'Verwaltungsmodus';
+$string['minteamsize'] = 'Mindestzahl an Teammitgliedern';
+$string['minteamsize_help'] = 'Geben Sie hier die Mindestzahl an Teammitgliedern ein.';
+$string['minteamsize_error_value'] = 'Die Mindestzahl an Teammitgliedern darf nicht höher als die Höchstzahl an Teammitgliedern sein!';
+$string['minteamsize_error_form'] = 'Sie müssen mindestens {$a} Teammitglieder auswählen!';

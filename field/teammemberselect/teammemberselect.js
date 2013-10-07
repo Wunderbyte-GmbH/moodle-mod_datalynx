@@ -34,9 +34,10 @@ M.dataformfield_teammemberselect.sources = [];
  * @param  YUI      Y               YUI object
  * @param  object   userlistobject  list of users in format {"userid" : "username (email)", ...}
  */
-M.dataformfield_teammemberselect.init_entry_form = function (Y, userlistobject, fieldid) {
+M.dataformfield_teammemberselect.init_entry_form = function (Y, userlistobject, fieldid, entryid, minteamsize) {
     var key = 0,
         dropdowns = Y.all('input[type="text"][name^="field_' + fieldid + '"][name*="_dropdown"]'),
+        form = dropdowns.item(0).get('form'),
         source = M.dataformfield_teammemberselect.sources[fieldid] = [],
         autocompletes = [],
         lastvalues = {};
@@ -71,6 +72,33 @@ M.dataformfield_teammemberselect.init_entry_form = function (Y, userlistobject, 
         // store references to all autocomplete object for later list updates
         autocompletes.push(autocomplete);
     });
+
+    form.on('submit', validate, form, fieldid, entryid);
+
+    function validate(e, fieldid, entryid) {
+        var i = 0,
+            selects = Y.all('select[name^="field_' + fieldid + '_' + entryid + '"]'),
+            errormsg = '',
+            fieldset = dropdowns.item(0).ancestor();
+        selects.each(function (select) {
+            if (select.get('value') != 0) {
+                i++;
+            }
+        });
+        if (i < minteamsize) {
+            if (!fieldset.one('.error')) {
+            fieldset.addClass('error');
+            errormsg = Y.Node.create('<span class="error">' + M.util.get_string('minteamsize_error_form', 'dataform', minteamsize) +
+                                        '<br></span>');
+            fieldset.prepend(errormsg);
+            console.log(M.util.get_string('minteamsize_error_form', 'dataform', minteamsize));
+            e.preventDefault();
+            }
+        } else {
+            fieldset.removeClass('error');
+            fieldset.all('.error').remove();
+        }
+    }
 
     /**
      * Selects the appropriate option in the hidden select element associated with the text field

@@ -34,7 +34,7 @@ class dataformfield_teammemberselect extends dataformfield_base {
 
     public $teamsize;
     public $admissibleroles;
-    public $notifyteam;
+    public $minteamsize;
     public $listformat;
 
     public $separators;
@@ -45,7 +45,7 @@ class dataformfield_teammemberselect extends dataformfield_base {
         global $DB;
         $this->teamsize = $this->field->param1;
         $this->admissibleroles = json_decode($this->field->param2, true);
-        $this->notifyteam = $this->field->param3;
+        $this->minteamsize = $this->field->param3;
         $this->listformat = $this->field->param4;
         $this->separators = array(
                 self::TEAMMEMBERSELECT_FORMAT_NEWLINE => get_string('listformat_newline', 'dataform'),
@@ -72,7 +72,7 @@ class dataformfield_teammemberselect extends dataformfield_base {
         global $DB, $COURSE;
 
         $context = context_course::instance($COURSE->id);
-        $query = "SELECT DISTINCT u.id, u.username, u.firstname, u.lastname, u.email, ra.roleid
+        $query = "SELECT DISTINCT CONCAT(u.id, '-', ra.roleid) AS mainid, u.id, u.username, u.firstname, u.lastname, u.email, ra.roleid
                     FROM {role_assignments} ra
               INNER JOIN {user} u ON u.id = ra.userid
                    WHERE ra.contextid = :contextid
