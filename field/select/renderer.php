@@ -153,7 +153,7 @@ class dataformfield_select_renderer extends dataformfield_renderer {
         $options = $field->options_menu();
         $selected = $value ? (int) $value : '';
         $fieldname = "f_{$i}_$fieldid";
-        list($elem, $separator) = $this->render($mform, $fieldname, $options, $selected);
+        list($elem, $separator) = $this->render($mform, $fieldname, $options, $selected, false, true);
         $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
         
         // Return group or element
@@ -207,10 +207,10 @@ class dataformfield_select_renderer extends dataformfield_renderer {
     /**
      * 
      */
-    protected function render(&$mform, $fieldname, $options, $selected, $required = false) {
+    protected function render(&$mform, $fieldname, $options, $selected, $required = false, $overridedisabled = false) {
         $select = &$mform->createElement('select', $fieldname, null);
 
-        if (isset($this->_field->field->param5)) {
+        if (isset($this->_field->field->param5) && !$overridedisabled) {
             $disabled = $this->_field->get_disabled_values_for_user();
         } else {
             $disabled = array();
