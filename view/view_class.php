@@ -100,10 +100,7 @@ class dataformview_base {
         $this->set__editors();
         $this->set__patterns();
 
-        // filter
-        $fm = $this->_df->get_filter_manager();
-        $options = $filteroptions ? $fm::get_filter_options_from_url() : array();
-        $this->set_filter($options);
+        $this->set_filter($filteroptions);
 
         // base url params
         $baseurlparams = array();
@@ -246,27 +243,40 @@ class dataformview_base {
     /**
      *
      */
-    public function set_filter($options) {
+    public function get_view_filter_options() {
+        $options = array();
+        $options['filterid'] = $this->view->filter;
+        $options['perpage'] = $this->view->perpage;
+        $options['groupby'] = $this->view->groupby;
+        return $options;
+    }
+
+    /**
+     *
+     */
+    public function set_filter($filteroptions = true) {
         $fm = $this->_df->get_filter_manager($this);
 
-        $fid = !empty($options['filterid']) ? $options['filterid'] : 0;
-        $afilter = !empty($options['afilter']) ? $options['afilter'] : 0;
-        $eids = !empty($options['eids']) ? $options['eids'] : null;
-        $users = !empty($options['users']) ? $options['users'] : null;
-        $groups = !empty($options['groups']) ? $options['groups'] : null;
-        $page = !empty($options['page']) ? $options['page'] : 0;
-        $usort = !empty($options['usort']) ? $options['usort'] : null;
-        $usearch = !empty($options['usearch']) ? $options['usearch'] : null;
-        $csort = !empty($options['csort']) ? $options['csort'] : null;
-        $csearch = !empty($options['csearch']) ? $options['csearch'] : null;
+        $urloptions = $filteroptions ? $fm::get_filter_options_from_url() : array();
+        $viewoptions = $this->get_view_filter_options();
 
-        // set filter
-        $filter = $this->filter_options();
-        if (!$filterid = $filter['filterid']) {
-            $filterid = $fid;
-        }
+        $fid = !empty($urloptions['filterid']) ? $urloptions['filterid'] : 0;
+        $afilter = !empty($urloptions['afilter']) ? $urloptions['afilter'] : 0;
+        $eids = !empty($urloptions['eids']) ? $urloptions['eids'] : null;
+        $users = !empty($urloptions['users']) ? $urloptions['users'] : null;
+        $groups = !empty($urloptions['groups']) ? $urloptions['groups'] : null;
+        $page = !empty($urloptions['page']) ? $urloptions['page'] : 0;
+
+        $perpage = !empty($urloptions['perpage']) ? $urloptions['perpage'] : 0;
+        $groupby = !empty($urloptions['groupby']) ? $urloptions['groupby'] : 0;
+
+        $csort = !empty($urloptions['customsort']) ? $urloptions['customsort'] : null;
+        $csearch = !empty($urloptions['customsearch']) ? $urloptions['customsearch'] : null;
+
+        $filterid = $fid ? $fid : ($viewoptions['filterid'] ? $viewoptions['filterid'] : 0);
+
         $this->_filter = $fm->get_filter_from_id($filterid, array('view' => $this, 'advanced' => $afilter));
-        
+
         // set specific entry id
         $this->_filter->eids = $eids;
         // set specific user id
@@ -277,28 +287,16 @@ class dataformview_base {
         if ($groups) {
             $this->_filter->groups = is_array($groups) ? $groups : explode(',', $groups);
         }
-        // add view specific perpage
-        if ($filter['perpage']) {
-            $this->_filter->perpage = $filter['perpage'];
-        }
-        // add view specific groupby
-        if ($filter['groupby']) {
-            $this->_filter->groupby = $filter['groupby'];
-        }
+
+        $this->_filter->perpage = $perpage ? $perpage : (!empty($viewoptions['perpage']) ? $viewoptions['perpage'] : $this->_filter->perpage);
+
+        $this->_filter->groupby = $groupby ? $groupby : (!empty($viewoptions['groupby']) ? $viewoptions['groupby'] : $this->_filter->groupby);
+
         // add page
-        $this->_filter->page = !empty($filter['page']) ? $filter['page'] : $page;
+        $this->_filter->page = $page ? $page : (!empty($viewoptions['page']) ? $viewoptions['page'] : 0);
         // content fields
         $this->_filter->contentfields = array_keys($this->get__patterns('field'));
-        // Append url sort options
-        if ($usort) {
-            $sortoptions = dataform_filter_manager::get_sort_options_from_query($usort);
-            $this->_filter->append_sort_options($sortoptions);
-        }
-        // Append url search options
-        if ($usearch) {
-            $searchoptions = dataform_filter_manager::get_search_options_from_query($usearch);
-            $this->_filter->append_search_options($searchoptions);
-        }
+
         // Append custom sort options
         if ($csort) {
             $this->_filter->append_sort_options($csort);
@@ -793,17 +791,6 @@ class dataformview_base {
         }
 
         return $viewfields;
-    }
-
-    /**
-     *
-     */
-    public function filter_options() {
-        $options = array();
-        $options['filterid'] = $this->view->filter;
-        $options['perpage'] = $this->view->perpage;
-        $options['groupby'] = $this->view->groupby;
-        return $options;
     }
 
     /**

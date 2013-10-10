@@ -1148,11 +1148,15 @@ class dataform_filter_manager {
      *
      */
     public static function get_sort_options_from_query($query) {
-        $usort = null;
+        $usort = array();
         if ($query) {
-            $usort = urldecode($query);
-            $usort = array_map(function($a) {return explode(' ', $a);}, explode(',', $usort));
+            $tempusort = urldecode($query);
+            $tempusort = array_map(function($a) {return explode(' ', $a);}, explode(',', $usort));
         }
+        foreach ($tempusort as $data) {
+            $usort[$data[0]] = $data[1];
+        }
+
         return $usort;
     }
     

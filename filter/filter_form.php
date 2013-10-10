@@ -353,8 +353,8 @@ class mod_dataform_advanced_filter_form extends mod_dataform_filter_base_form {
         // entries per page
         $options = array(0=>get_string('choose'),1=>1,2=>2,3=>3,4=>4,5=>5,6=>6,7=>7,8=>8,9=>9,10=>10,15=>15,
                             20=>20,30=>30,40=>40,50=>50,100=>100,200=>200,300=>300,400=>400,500=>500,1000=>1000);
-        $mform->addElement('select', 'perpage', get_string('viewperpage', 'dataform'), $options);
-        $mform->setDefault('perpage', $filter->perpage);
+        $mform->addElement('select', 'uperpage', get_string('viewperpage', 'dataform'), $options);
+        $mform->setDefault('uperpage', $filter->perpage);
 
         // selection method
         //$options = array(0 => get_string('filterbypage', 'dataform'), 1 => get_string('random', 'dataform'));
