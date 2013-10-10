@@ -63,7 +63,7 @@ if ($mform->is_cancelled()){
     $resettodefault = optional_param('resetdefaultbutton', '', PARAM_ALPHA);
     if ($resettodefault) {
         $urlparams->resetdefault = 1;
-        redirect(new moodle_url('/mod/dataform/view/view_edit.php', (array) $urlparams));
+        redirect(new moodle_url('/mod/dataform/view/view_edit.php', ((array) $urlparams) + array('sesskey' => sesskey())));
         
     }
 
