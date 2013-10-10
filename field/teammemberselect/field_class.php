@@ -63,10 +63,10 @@ class dataformfield_teammemberselect extends dataformfield_base {
         $this->rules = array_merge(array(0 => '...'), $this->rules);
     }
 
-    protected static $allusers = null;
-    protected static $allowedusers = null;
-    protected static $alluserslinks = null;
-    protected static $alloweduserslinks = null;
+    protected static $allusers = array();
+    protected static $allowedusers = array();
+    protected static $alluserslinks = array();
+    protected static $alloweduserslinks = array();
 
     protected function init_user_menu() {
         global $DB, $COURSE;
@@ -79,37 +79,38 @@ class dataformfield_teammemberselect extends dataformfield_base {
                 ORDER BY u.lastname ASC, u.firstname ASC, u.email ASC, u.username ASC";
         $results = $DB->get_records_sql($query, array('contextid' => $context->id));
 
-        self::$allusers = array();
-        self::$alluserslinks = array();
-        self::$allowedusers = array();
-        self::$alloweduserslinks = array();
+        $fieldid = $this->field->id;
+        self::$allusers[$fieldid] = array();
+        self::$alluserslinks[$fieldid] = array();
+        self::$allowedusers[$fieldid] = array();
+        self::$alloweduserslinks[$fieldid] = array();
 
         foreach ($results as $result) {
-            self::$allusers[$result->id] = fullname($result) . " ({$result->email})";
+            self::$allusers[$fieldid][$result->id] = fullname($result) . " ({$result->email})";
 
             $baseurl = new moodle_url('/user/view.php', array('id' => $result->id, 'course' => $COURSE->id));
-            self::$alluserslinks[$result->id] = html_writer::link($baseurl, fullname($result));
+            self::$alluserslinks[$fieldid][$result->id] = html_writer::link($baseurl, fullname($result));
 
             if (array_search($result->roleid, $this->admissibleroles) !== false) {
-                self::$allowedusers[$result->id] = self::$allusers[$result->id];
-                self::$alloweduserslinks[$result->id] = self::$alluserslinks[$result->id];
+                self::$allowedusers[$fieldid][$result->id] = self::$allusers[$fieldid][$result->id];
+                self::$alloweduserslinks[$fieldid][$result->id] = self::$alluserslinks[$fieldid][$result->id];
             }
         }
     }
 
     public function options_menu($addnoselection = false, $makelinks = false, $excludeuser = 0, $allowall = false) {
-        if (self::$allusers === null) {
+        $fieldid = $this->field->id;
+        if (!isset(self::$allusers[$fieldid])) {
             $this->init_user_menu();
         }
-
         $options = array();
         if ($addnoselection) {
             $options[0] = '...';
         }
 
         $options += $makelinks ?
-                    ($allowall ? self::$alluserslinks : self::$alloweduserslinks) :
-                    ($allowall ? self::$allusers : self::$allowedusers);
+                    ($allowall ? self::$alluserslinks[$fieldid] : self::$alloweduserslinks[$fieldid]) :
+                    ($allowall ? self::$allusers[$fieldid] : self::$allowedusers[$fieldid]);
 
         if (isset($options[$excludeuser])) {
             unset($options[$excludeuser]);
