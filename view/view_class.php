@@ -173,23 +173,27 @@ class dataformview_base {
                 } else {
                     list($format, $trust, $text) = array(FORMAT_HTML, 1, '');
                 }
-                $this->view->{"e$editor".'format'} = $format;
-                $this->view->{"e$editor".'trust'} = $trust;
-                $this->view->{"e$editor"} = $text;                    
+                $this->view->{"e{$editor}".'format'} = $format;
+                $this->view->{"e{$editor}".'trust'} = $trust;
+                $this->view->{"e{$editor}"} = $text;
 
             // view from form or editor areas updated
             } else {
-                $format = !empty($data->{"e$editor".'format'}) ? $data->{"e$editor".'format'} : FORMAT_HTML;
-                $trust = !empty($data->{"e$editor".'trust'}) ? $data->{"e$editor".'trust'} : 1;
-                $text = !empty($data->{"e$editor"}) ? $data->{"e$editor"} : '';
+                if ($currenteditor = $data->{"e{$editor}_editor"}) {
+                    $format = !empty($currenteditor['format']) ? $currenteditor['format'] : FORMAT_HTML;
+                    $trust = !empty($currenteditor['trust']) ? $currenteditor['trust'] : 1;
+                    $text = !empty($currenteditor['text']) ? $currenteditor['text'] : '';
 
-                // replace \n in non text format
-                if ($format != FORMAT_PLAIN) {
-                    $text = str_replace("\n","",$text);
-                }
+                    // replace \n in non text format
+                    if ($format != FORMAT_PLAIN) {
+                        $text = str_replace("\n","",$text);
+                    }
 
-                if (!empty($text)) {
-                    $this->view->$editor = "ft:{$format}tr:{$trust}ct:$text";
+                    if (!empty($text)) {
+                        $this->view->$editor = "ft:{$format}tr:{$trust}ct:$text";
+                    } else {
+                        $this->view->$editor = null;
+                    }
                 } else {
                     $this->view->$editor = null;
                 }
@@ -214,7 +218,9 @@ class dataformview_base {
             $this->_tags = array('view' => array(), 'field' => array());
             $text = '';
             foreach ($this->_editors as $editor) {
-                $text .= !empty($data->{"e$editor"}) ? ' '. $data->{"e$editor"} : '';
+                if ($currenteditor = $data->{"e{$editor}_editor"}) {
+                    $text .= !empty($currenteditor['text']) ? ' '. $currenteditor['text'] : '';
+                }
             }
 
             if (trim($text)) {
@@ -324,8 +330,6 @@ class dataformview_base {
             echo $OUTPUT->notification('Insertion of new view failed!');
             return false;
         }
-
-        $this->update($data);
 
         return $this->view->id;
     }
