@@ -627,3 +627,7 @@ $string['minteamsize'] = 'Minimum team size';
 $string['minteamsize_help'] = 'Enter the miminum allowed number of team members here.';
 $string['minteamsize_error_value'] = 'Minimum team size cannot be greater than the maximum team size!';
 $string['minteamsize_error_form'] = 'You must select at least {$a} team members!';
+$string['teamfield'] = 'Team field';
+$string['teamfield_help'] = 'Check this box to designate this field as a team field. When approving an entry with a specified team that entry will be copied and assigned to every team member. Only one field per Dataform instance may be designated as a team field.';
+$string['referencefield'] = 'Reference field';
+$string['referencefield_help'] = 'Select a field to serve as a duplicate prevention field. This will skip creating entries for users who already have an approved entry with the same field value as the one being approved.';

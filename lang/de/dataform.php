@@ -596,3 +596,7 @@ $string['minteamsize'] = 'Mindestzahl an Teammitgliedern';
 $string['minteamsize_help'] = 'Geben Sie hier die Mindestzahl an Teammitgliedern ein.';
 $string['minteamsize_error_value'] = 'Die Mindestzahl an Teammitgliedern darf nicht höher als die Höchstzahl an Teammitgliedern sein!';
 $string['minteamsize_error_form'] = 'Sie müssen mindestens {$a} Teammitglieder auswählen!';
+$string['teamfield'] = 'Teamfeld';
+$string['teamfield_help'] = 'Haken sie diese Checkbox an, um dieses Feld als Teamfeld zu bezeichnen. Bei Freigabe eines Eintrags wird dieser jeder Person in diesem Feld zugewiesen. Nur ein Feld darf pro eine Dataform-Instanz als Teamfeld bezeichnet werden.';
+$string['referencefield'] = 'Referenzfeld';
+$string['referencefield_help'] = 'Wählen Sie hier ein Referenzfeld aus.';

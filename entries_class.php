@@ -593,6 +593,9 @@ class dataform_entries {
                         $ids = implode(',', $entryids);
                         $DB->set_field_select('dataform_entries', 'approved', 1, " dataid = ? AND id IN ($ids) ", array($df->id()));        
                         $processed = $entries;
+
+                        $processed += $this->create_approved_entries_for_team($entryids);
+
                         if ($processed) {
                             $eventdata = (object) array('view' => $this->_view, 'items' => $processed);
                             $df->events_trigger("entryupdated", $eventdata);
@@ -669,7 +672,7 @@ class dataform_entries {
                 if ($processed) {
                     // Update completion state
                     $completion = new completion_info($df->course);
-                    if($completion->is_enabled($df->cm) && $df->data->completionentries) {
+                    if($completion->is_enabled($df->cm) && $df->cm->completion == COMPLETION_TRACKING_AUTOMATIC && $df->data->completionentries) {
                         $completion->update_state($df->cm, $completiontype);
                     }
 
@@ -681,6 +684,102 @@ class dataform_entries {
                 return array($strnotify, array_keys($processed));
             }
         }
+    }
+
+    public function create_approved_entries_for_team($entryids) {
+        global $DB;
+
+        $df = $this->_df;
+
+        $fields = $df->get_fields();
+        $teamfield = false;
+        foreach ($fields as $field) {
+            if ($field->type == 'teammemberselect' && $field->referencefieldid) {
+                $teamfield = $field;
+                break;
+            }
+        }
+
+        $processed = array();
+
+        if ($teamfield) {
+            foreach ($entryids as $entryid) {
+                // Get content of entry to duplicate
+                $contents = $DB->get_records('dataform_contents', array('entryid' => $entryid));
+
+                $teammemberids = json_decode($DB->get_field('dataform_contents', 'content',
+                                    array('entryid' => $entryid, 'fieldid' => $teamfield->id())), true);
+
+                if ($teamfield->referencefieldid != -1) {
+                    $sqllike = $DB->sql_like('dc.content', ':content', false);
+                    $likecontent = '';
+                    foreach($contents as $content) {
+                        if ($content->fieldid == $teamfield->referencefieldid) {
+                            $likecontent = $content->content;
+                            break;
+                        }
+                    }
+                } else {
+                    $sqllike = '1';
+                    $likecontent = '';
+                }
+
+                $entry = $DB->get_record('dataform_entries', array('id' => $entryid));
+                $userid = $entry->userid;
+
+                foreach ($teammemberids as $teammemberid) {
+                    $query = "SELECT DISTINCT de.id
+                                FROM {dataform_entries} de
+                          INNER JOIN {dataform_contents} dc ON de.id = dc.entryid
+                               WHERE de.dataid = :dataid
+                                 AND de.userid = :userid
+                                 AND dc.fieldid = :fieldid
+                                 AND $sqllike";
+                    $existingentryid = $DB->get_field_sql($query,
+                                            array('dataid' => $df->id(),
+                                                  'userid' => $teammemberid,
+                                                  'fieldid' => $teamfield->referencefieldid,
+                                                  'content' => $likecontent));
+
+                    $newteammemberids = array_diff($teammemberids, array($teammemberid));
+                    $newteammemberids[] = $userid;
+
+                    $newentry = clone $entry;
+                    $newentry->userid = $teammemberid;
+                    $newentry->dataid = $df->id();
+                    $newentry->groupid = $df->currentgroup;
+                    $newentry->timecreated = $newentry->timemodified = time();
+                    $newentry->approved = 1;
+
+                    if (!empty($existingentryid)) {
+                        if ($approved = $DB->get_field('dataform_entries', 'approved', array('id' => $existingentryid))) {
+                            // TODO: We'll see if additional processing is required
+                        } else {
+                            $newentry->id = $existingentryid;
+                            $DB->update_record('dataform_entries', $newentry);
+                        }
+                    } else {
+                        $newentry->id = $DB->insert_record('dataform_entries', $newentry);
+                    }
+
+                    foreach ($contents as $content) {
+                        $newcontent = $content;
+                        if ($content->fieldid == $teamfield->id()) {
+                            $newcontent->content = json_encode($newteammemberids, true);
+                        }
+
+                        $newcontent->entryid = $newentry->id;
+                        if (!$DB->insert_record('dataform_contents', $newcontent)) {
+                            throw new moodle_exception('cannotinsertrecord', null, null, $newentry->id);
+                        }
+                    }
+
+                    $processed[$newentry->id] = $newentry;
+                }
+            }
+        }
+
+        return $processed;
     }
 
     /**
@@ -711,13 +810,19 @@ class dataform_entries {
                     $entry->approved = 0;
                 }
 
+                $oldapproved = $DB->get_field('dataform_entries', 'approved', array('id' => $entry->id));
+                $newapproved = isset($entry->approved) ? $entry->approved : 0;
+
                 if ($updatetime) {
                     $entry->timemodified = time();
                 }
 
                 $entry->status = isset($data['status']) ? $data['status'] : $entry->status;
 
-                if ($DB->update_record('dataform_entries',$entry)) {
+                if ($DB->update_record('dataform_entries', $entry)) {
+                    if (!$oldapproved && $newapproved) {
+                        $this->create_approved_entries_for_team(array($entry->id));
+                    }
                     return $entry->id;
                 } else {
                     return false;
@@ -735,6 +840,9 @@ class dataform_entries {
             if (!isset($entry->timemodified)) $entry->timemodified = time();
             $entry->status = isset($data['status']) ? $data['status'] : 0;
             $entryid = $DB->insert_record('dataform_entries', $entry);
+            if (isset($entry->approved) && $entry->approved) {
+                $this->create_approved_entries_for_team(array($entryid));
+            }
             return $entryid;
         }
 

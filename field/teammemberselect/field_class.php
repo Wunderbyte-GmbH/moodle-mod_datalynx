@@ -36,6 +36,8 @@ class dataformfield_teammemberselect extends dataformfield_base {
     public $admissibleroles;
     public $minteamsize;
     public $listformat;
+    public $teamfield;
+    public $referencefieldid;
 
     public $separators;
     public $rules;
@@ -47,6 +49,8 @@ class dataformfield_teammemberselect extends dataformfield_base {
         $this->admissibleroles = json_decode($this->field->param2, true);
         $this->minteamsize = $this->field->param3;
         $this->listformat = $this->field->param4;
+        $this->teamfield = $this->field->param5 != 0;
+        $this->referencefieldid = $this->field->param5;
         $this->separators = array(
                 self::TEAMMEMBERSELECT_FORMAT_NEWLINE => get_string('listformat_newline', 'dataform'),
                 self::TEAMMEMBERSELECT_FORMAT_SPACE => get_string('listformat_space', 'dataform'),
@@ -96,6 +100,19 @@ class dataformfield_teammemberselect extends dataformfield_base {
                 self::$alloweduserslinks[$fieldid][$result->id] = self::$alluserslinks[$fieldid][$result->id];
             }
         }
+    }
+
+    public function get_teamfield() {
+        global $DB;
+
+        $query = "SELECT *
+                    FROM {dataform_fields} df
+                   WHERE df.dataid = :dataid
+                     AND df.type LIKE 'teammemberselect'
+                     AND df.param5 IS NOT NULL
+                     AND df.param5 <> 0";
+
+        return $DB->get_record_sql($query, array('dataid' => $this->df->id()));
     }
 
     public function options_menu($addnoselection = false, $makelinks = false, $excludeuser = 0, $allowall = false) {

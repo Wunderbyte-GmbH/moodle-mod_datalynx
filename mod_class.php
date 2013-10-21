@@ -694,7 +694,7 @@ class dataform {
     /**
      * Initialize if needed and return the internal fields
      */
-    protected function get_internal_fields() {
+    public function get_internal_fields() {
         global $CFG;
         
         if (!$this->internalfields) {
