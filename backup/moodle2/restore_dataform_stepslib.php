@@ -292,6 +292,15 @@ class restore_dataform_activity_structure_step extends restore_activity_structur
         $data->fieldid = $this->get_mappingid('dataform_field', $data->fieldid);
         $data->entryid = $this->get_new_parentid('dataform_entry');
 
+        $users = json_decode($data->content, true);
+        if (json_last_error() == JSON_ERROR_NONE) {
+            $newusers = array();
+            foreach($users as $user) {
+                $newusers[] = $this->get_mappingid('user', $user);
+            }
+            $data->content = json_encode($newusers);
+        }
+
         // insert the data_content record
         $newitemid = $DB->insert_record('dataform_contents', $data);
         $this->set_mapping('dataform_content', $oldid, $newitemid, true); // files by this item id

@@ -205,7 +205,9 @@ class dataformfield_teammemberselect_renderer extends dataformfield_renderer {
             $str = array();
             foreach ($selected as $id) {
                 if ($id > 0) {
-                    $str[] = $options[$id];
+                    if (isset($options[$id])) {
+                        $str[] = $options[$id];
+                    }
                 }
             }
 
