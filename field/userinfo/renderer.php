@@ -178,7 +178,7 @@ class dataformfield_userinfo_renderer extends dataformfield_renderer {
         $fieldname = $this->_field->name();
         $cat = get_string('authorinfo', 'dataform');
 
-        $patterns = parent::patterns();
+        $patterns = array();
         $patterns["##author:$fieldname##"] = array(true, $cat);
 
         return $patterns;
