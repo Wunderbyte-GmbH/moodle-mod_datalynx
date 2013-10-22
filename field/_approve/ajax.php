@@ -30,6 +30,7 @@ require_once("$CFG->dirroot/mod/dataform/mod_class.php");
 require_once("$CFG->dirroot/mod/dataform/entries_class.php");
 
 $d = required_param('d', PARAM_INT);
+$viewid = required_param('view', PARAM_INT);
 $action = required_param('action', PARAM_ALPHA);
 $entryid = required_param('entryid', PARAM_INT);
 $sesskey = required_param('sesskey', PARAM_TEXT);
@@ -48,8 +49,13 @@ global $DB;
 $completiontype = COMPLETION_UNKNOWN;
 if ($action == 'approve') {
     $DB->set_field('dataform_entries', 'approved', 1, array('id' => $entryid));
-    $entriesclass = new dataform_entries($d);
-    $teamentries = $entriesclass->create_approved_entries_for_team(array($entryid));
+    $df = new dataform($d);
+    $entriesclass = new dataform_entries($df);
+    $processed = $entriesclass->create_approved_entries_for_team(array($entryid));
+    if ($processed) {
+        $eventdata = (object) array('view' => $df->get_view_from_id($viewid), 'items' => $processed);
+        $df->events_trigger("entryupdated", $eventdata);
+    }
     $return = $DB->get_field('dataform_entries', 'approved', array('id' => $entryid)) == 1;
     $completiontype = COMPLETION_COMPLETE;
 } else if ($action == 'disapprove') {
