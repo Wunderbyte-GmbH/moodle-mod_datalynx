@@ -743,6 +743,7 @@ class dataform_entries {
 
                     $newteammemberids = array_diff($teammemberids, array($teammemberid));
                     $newteammemberids[] = $userid;
+                    $newteammemberids = array_values($newteammemberids);
 
                     $newentry = clone $entry;
                     $newentry->userid = $teammemberid;
@@ -757,24 +758,38 @@ class dataform_entries {
                         } else {
                             $newentry->id = $existingentryid;
                             $DB->update_record('dataform_entries', $newentry);
+
+                            foreach ($contents as $content) {
+                                $newcontent = $content;
+                                if ($content->fieldid == $teamfield->id()) {
+                                    $newcontent->content = json_encode($newteammemberids);
+                                }
+
+                                $newcontent->entryid = $newentry->id;
+                                if (!$DB->update_record('dataform_contents', $newcontent)) {
+                                    throw new moodle_exception('cannotupdaterecord', null, null, $newentry->id);
+                                }
+                            }
+
+                            $processed[$newentry->id] = $newentry;
                         }
                     } else {
                         $newentry->id = $DB->insert_record('dataform_entries', $newentry);
-                    }
 
-                    foreach ($contents as $content) {
-                        $newcontent = $content;
-                        if ($content->fieldid == $teamfield->id()) {
-                            $newcontent->content = json_encode($newteammemberids, true);
+                        foreach ($contents as $content) {
+                            $newcontent = $content;
+                            if ($content->fieldid == $teamfield->id()) {
+                                $newcontent->content = json_encode($newteammemberids);
+                            }
+
+                            $newcontent->entryid = $newentry->id;
+                            if (!$DB->insert_record('dataform_contents', $newcontent)) {
+                                throw new moodle_exception('cannotinsertrecord', null, null, $newentry->id);
+                            }
                         }
 
-                        $newcontent->entryid = $newentry->id;
-                        if (!$DB->insert_record('dataform_contents', $newcontent)) {
-                            throw new moodle_exception('cannotinsertrecord', null, null, $newentry->id);
-                        }
+                        $processed[$newentry->id] = $newentry;
                     }
-
-                    $processed[$newentry->id] = $newentry;
                 }
             }
         }
