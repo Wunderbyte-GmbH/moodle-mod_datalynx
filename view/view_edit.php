@@ -68,14 +68,11 @@ if ($mform->is_cancelled()){
     }
 
 // process validated    
-} else if ($data = $mform->get_data()) { 
-    $data = $view->from_form($data);
-
+} else if ($data = $mform->get_data()) {
     // add new view
     if (!$view->id()) {
         $view->add($data);
         $log = get_string('viewsadded','dataform');
-
     // update view
     } else {
         $view->update($data);

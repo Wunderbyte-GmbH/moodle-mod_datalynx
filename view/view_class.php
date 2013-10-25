@@ -173,13 +173,29 @@ class dataformview_base {
                 } else {
                     list($format, $trust, $text) = array(FORMAT_HTML, 1, '');
                 }
+
                 $this->view->{"e{$editor}".'format'} = $format;
                 $this->view->{"e{$editor}".'trust'} = $trust;
                 $this->view->{"e{$editor}"} = $text;
 
             // view from form or editor areas updated
             } else {
-                if ($currenteditor = $data->{"e{$editor}_editor"}) {
+                if (isset($data->{"e{$editor}"})) {
+                    $format = isset($data->{"e{$editor}format"}) && !empty($data->{"e{$editor}format"}) ? $data->{"e{$editor}format"} : FORMAT_HTML;
+                    $trust = isset($data->{"e{$editor}trust"}) && !empty($data->{"e{$editor}trust"}) ? $data->{"e{$editor}trust"} : 1;
+                    $text = isset($data->{"e{$editor}"}) ? $data->{"e{$editor}"} : '';
+
+                    // replace \n in non text format
+                    if ($format != FORMAT_PLAIN) {
+                        $text = str_replace("\n","",$text);
+                    }
+
+                    if (!empty($text)) {
+                        $this->view->$editor = "ft:{$format}tr:{$trust}ct:$text";
+                    } else {
+                        $this->view->$editor = null;
+                    }
+                } else if ($currenteditor = $data->{"e{$editor}_editor"}) {
                     $format = !empty($currenteditor['format']) ? $currenteditor['format'] : FORMAT_HTML;
                     $trust = !empty($currenteditor['trust']) ? $currenteditor['trust'] : 1;
                     $text = !empty($currenteditor['text']) ? $currenteditor['text'] : '';
@@ -331,6 +347,8 @@ class dataformview_base {
             return false;
         }
 
+        $this->update($data);
+
         return $this->view->id;
     }
 
@@ -342,6 +360,7 @@ class dataformview_base {
         global $DB, $OUTPUT;
 
         if ($data) {
+            $data = $this->from_form($data);
             $this->set_view($data);
         }
 
@@ -439,6 +458,7 @@ class dataformview_base {
         if (!$editors = $this->editors()) {
             return $data;
         }
+
         if ($this->view->id) {
             foreach ($editors as $editorname => $options) {
                 $data = file_postupdate_standard_editor($data,
@@ -448,10 +468,8 @@ class dataformview_base {
                                                         'mod_dataform',
                                                         "view$editorname",
                                                         $this->view->id);
-
             }
         }
-
         return $data;
     }
 
