@@ -279,9 +279,27 @@ $string['maxsize'] = 'Maximale Größe';
 $string['mediafile'] = 'Mediendatei';
 $string['menus'] = 'Menüs';
 /// Message strings
-$string['message_entryadded'] = 'Die folgenden Einträge wurden hinzugefügt zu {$a->dataformlink} von {$a->senderprofilelink}: {$a->entrylinks}.';
-$string['message_entryupdated'] = 'Die folgenden Einträge wurden von {$a->senderprofilelink} in {$a->dataformlink} aktualisiert: {$a->entrylinks}.';
-$string['message_entrydeleted'] = 'Die folgenden Einträge wurden gelöscht von {$a->dataformlink} von {$a->senderprofilelink}: {$a->entrylinks}.';
+$string['message_entryadded'] =
+'Hello {$a->fullname},
+
+the content in {$a->dataformlink} has been modified by {$a->senderprofilelink}.
+
+The following entry has been created: {$a->viewlink}.';
+
+$string['message_entryupdated'] =
+'Hello {$a->fullname},
+
+the content in {$a->dataformlink} has been modified by {$a->senderprofilelink}.
+
+The following entry has been updated: {$a->viewlink}.';
+
+$string['message_entrydeleted'] =
+'Hello {$a->fullname},
+
+the content in {$a->dataformlink} has been modified by {$a->senderprofilelink}.
+
+The following entry has been deleted: {$a->entryid}.';
+
 $string['message_commentadded'] = 'Dataform Kommentar hinzugefügt';
 $string['message_ratingadded'] = 'Dataform Bewertung hinzugefügt';
 $string['message_ratingupdated'] = 'Dataform Bewertung aktualisiert';
@@ -600,3 +618,4 @@ $string['teamfield'] = 'Teamfeld';
 $string['teamfield_help'] = 'Haken sie diese Checkbox an, um dieses Feld als Teamfeld zu bezeichnen. Bei Freigabe eines Eintrags wird dieser jeder Person in diesem Feld zugewiesen. Nur ein Feld darf pro eine Dataform-Instanz als Teamfeld bezeichnet werden.';
 $string['referencefield'] = 'Referenzfeld';
 $string['referencefield_help'] = 'Wählen Sie hier ein Referenzfeld aus.';
+$string['linktoentry'] = 'Link zum Eintrag';

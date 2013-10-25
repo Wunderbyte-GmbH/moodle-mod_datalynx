@@ -416,13 +416,16 @@ class dataform_notification_handler {
      *
      */
     protected static function notify($data) {
-        global $SITE, $CFG;
+        global $SITE, $CFG, $DB;
 
 		if (empty($data->users) or empty($data->event)) {
             return true;
         }
         
-        $users = $data->users;
+        $users = array();
+        foreach ($data->users as $user) {
+            $users[] = $DB->get_record('user', array('id' => $user->id));
+        }
         $event = $data->event;
         
         // Prepare message
@@ -431,13 +434,19 @@ class dataform_notification_handler {
         $data->siteurl = $CFG->wwwroot;
         $data->coursename = !empty($data->coursename) ? $data->coursename : 'Unspecified course';
         $data->dataformname = !empty($data->dataformname) ? $data->dataformname : 'Unspecified dataform';
-        $data->dataformurl = !empty($data->dataformurl) ? $data->dataformurl : '';
+        $baseurl = $data->view->get_baseurl();
+        $data->dataformlink = html_writer::link($baseurl, $data->dataformname);
+        $entryurl = new moodle_url($baseurl);
+        $entryurl->params(array('view' => $data->viewid));
+        if ($event != 'delete') {
+            $entryurl->params(array('eids' => implode(array_keys($data->items), ',')));
+        }
+        $name = $DB->get_field('dataform_views', 'name', array('id' => $data->viewid));
+        $data->viewlink = html_writer::link($entryurl, get_string('linktoentry', 'dataform'));
+        $data->entryid = implode(array_keys($data->items), ',');
+
         $notename = get_string("messageprovider:dataform_$event", 'dataform');
-        $notedetails = get_string("message_$event", 'dataform', $data);
-        
 		$subject = "$sitename -> $data->coursename -> $strdataform $data->dataformname:  $notename";
-		$content = $notedetails;
-		$contenthtml = text_to_html($content, false, false, true);
 		
         // Send message
         $message = new object;
@@ -447,16 +456,20 @@ class dataform_notification_handler {
         $message->context         = $data->context;
         $message->userfrom        = $data->sender;
         $message->subject         = $subject;
-        $message->fullmessage     = $content;
         $message->fullmessageformat = $data->notificationformat;
-        $message->fullmessagehtml = $contenthtml;
         $message->smallmessage    = '';
         if (!empty($data->notification)) {
             $message->notification = 1;
-        }           
+        }
 
         foreach ($users as $user) {
             $message->userto = $user;
+            $data->fullname = fullname($user);
+            $notedetails = get_string("message_$event", 'dataform', $data);
+            $contenthtml = text_to_html($notedetails, false, false, true);
+            $content = html_to_text($notedetails);
+            $message->fullmessage = $content;
+            $message->fullmessagehtml = $contenthtml;
             message_send($message);
         }
 

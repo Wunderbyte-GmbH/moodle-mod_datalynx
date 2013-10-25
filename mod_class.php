@@ -1775,6 +1775,7 @@ class dataform {
         $data->event = $event;
         $data->notification = 1;
         $data->notificationformat = $this->data->notificationformat;
+        $data->viewid = $this->data->singleview ? $this->data->singleview : $this->data->defaultview;
         events_trigger("dataform_$event", $data);
     }
     

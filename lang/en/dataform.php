@@ -304,9 +304,27 @@ $string['maxsize'] = 'Maximum size';
 $string['mediafile'] = 'Media file';
 $string['reference'] = 'Reference';
 /// Message strings
-$string['message_entryadded'] = 'The following entries have been added to {$a->dataformlink} by {$a->senderprofilelink}: {$a->entrylinks}.';
-$string['message_entryupdated'] = 'The following entries have been updated in {$a->dataformlink} by {$a->senderprofilelink}: {$a->entrylinks}.';
-$string['message_entrydeleted'] = 'The following entries have been deleted from {$a->dataformlink} by {$a->senderprofilelink}: {$a->entrylinks}.';
+$string['message_entryadded'] =
+'Hello {$a->fullname},
+
+the content in {$a->dataformlink} has been modified by {$a->senderprofilelink}.
+
+The following entry has been created: {$a->viewlink}.';
+
+$string['message_entryupdated'] =
+'Hello {$a->fullname},
+
+the content in {$a->dataformlink} has been modified by {$a->senderprofilelink}.
+
+The following entry has been updated: {$a->viewlink}.';
+
+$string['message_entrydeleted'] =
+'Hello {$a->fullname},
+
+the content in {$a->dataformlink} has been modified by {$a->senderprofilelink}.
+
+The following entry has been deleted: {$a->entryid}.';
+
 $string['message_commentadded'] = 'Dataform comment added';
 $string['message_ratingadded'] = 'Dataform rating added';
 $string['message_ratingupdated'] = 'Dataform rating updated';
@@ -631,3 +649,4 @@ $string['teamfield'] = 'Team field';
 $string['teamfield_help'] = 'Check this box to designate this field as a team field. When approving an entry with a specified team that entry will be copied and assigned to every team member. Only one field per Dataform instance may be designated as a team field.';
 $string['referencefield'] = 'Reference field';
 $string['referencefield_help'] = 'Select a field to serve as a duplicate prevention field. This will skip creating entries for users who already have an approved entry with the same field value as the one being approved.';
+$string['linktoentry'] = 'Link to entry';
