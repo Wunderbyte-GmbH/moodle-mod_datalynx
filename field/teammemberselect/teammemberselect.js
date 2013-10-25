@@ -98,6 +98,11 @@ M.dataformfield_teammemberselect.init_entry_form = function (Y, userlistobject, 
             fieldset.removeClass('error');
             fieldset.all('.error').remove();
         }
+        dropdowns.each(function (dropdown) {
+            if (!dropdown.get('value')) {
+                dropdown.set('value', '...');
+            }
+        });
     }
 
     /**
