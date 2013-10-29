@@ -686,7 +686,13 @@ class dataform_entries {
         }
     }
 
-    public function create_approved_entries_for_team($entryids) {
+    /**
+     * Creates copies of approved entries for each selected team member that doesn't have one.
+     * If an entry exists the contents will be copied into it in order to maintain consistency.
+     * @param  array $entryids An array containing IDs of entries to create approved entries from
+     * @return array An array of processed and/or added entries (id => entry)
+     */
+    public function create_approved_entries_for_team(array $entryids) {
         global $DB;
 
         $df = $this->_df;
@@ -704,8 +710,7 @@ class dataform_entries {
 
         if ($teamfield) {
             foreach ($entryids as $entryid) {
-                // Get content of entry to duplicate
-                $contents = $DB->get_records('dataform_contents', array('entryid' => $entryid));
+                $oldcontents = $contents = $DB->get_records('dataform_contents', array('entryid' => $entryid));
 
                 $teammemberids = json_decode($DB->get_field('dataform_contents', 'content',
                                     array('entryid' => $entryid, 'fieldid' => $teamfield->id())), true);
@@ -728,68 +733,68 @@ class dataform_entries {
                 $userid = $entry->userid;
 
                 foreach ($teammemberids as $teammemberid) {
-                    $query = "SELECT DISTINCT de.id
+                    $newteammemberids = array_diff($teammemberids, array($teammemberid));
+                    $newteammemberids[] = $userid;
+                    $newteammemberids = array_values($newteammemberids);
+
+                    if ($teamfield->referencefieldid != -1) {
+                        $query = "SELECT DISTINCT de.id
                                 FROM {dataform_entries} de
                           INNER JOIN {dataform_contents} dc ON de.id = dc.entryid
                                WHERE de.dataid = :dataid
                                  AND de.userid = :userid
                                  AND dc.fieldid = :fieldid
                                  AND $sqllike";
-                    $existingentryid = $DB->get_field_sql($query,
+                        $existingentryid = $DB->get_field_sql($query,
                                             array('dataid' => $df->id(),
                                                   'userid' => $teammemberid,
                                                   'fieldid' => $teamfield->referencefieldid,
                                                   'content' => $likecontent));
-
-                    $newteammemberids = array_diff($teammemberids, array($teammemberid));
-                    $newteammemberids[] = $userid;
-                    $newteammemberids = array_values($newteammemberids);
-
-                    $newentry = clone $entry;
-                    $newentry->userid = $teammemberid;
-                    $newentry->dataid = $df->id();
-                    $newentry->groupid = $df->currentgroup;
-                    $newentry->timecreated = $newentry->timemodified = time();
-                    $newentry->approved = 1;
-
-                    if (!empty($existingentryid)) {
-                        if ($approved = $DB->get_field('dataform_entries', 'approved', array('id' => $existingentryid))) {
-                            // TODO: We'll see if additional processing is required
-                        } else {
-                            $newentry->id = $existingentryid;
-                            $DB->update_record('dataform_entries', $newentry);
-
-                            foreach ($contents as $content) {
-                                $newcontent = $content;
-                                if ($content->fieldid == $teamfield->id()) {
-                                    $newcontent->content = json_encode($newteammemberids);
-                                }
-
-                                $newcontent->entryid = $newentry->id;
-                                if (!$DB->update_record('dataform_contents', $newcontent)) {
-                                    throw new moodle_exception('cannotupdaterecord', null, null, $newentry->id);
-                                }
-                            }
-
-                            $processed[$newentry->id] = $newentry;
-                        }
                     } else {
+                        $existingentryid = false;
+                    }
+
+                    if ($existingentryid) {
+                        $existingentry = $DB->get_record('dataform_entries', array('id' => $existingentryid));
+                        $existingentry->approved = 1;
+                        foreach ($contents as $content) {
+                            $newcontent = clone $content;
+                            if ($content->fieldid == $teamfield->id()) {
+                                $newcontent->content = json_encode($newteammemberids);
+                            }
+                            $DB->set_field('dataform_contents', 'content', $newcontent->content,
+                                array('entryid' => $existingentry->id, 'fieldid' => $newcontent->fieldid));
+                        }
+                        $DB->update_record('dataform_entries', $existingentry);
+                        $processed[$existingentry->id] = $existingentry;
+                    } else {
+                        $newentry = clone $entry;
+                        $newentry->userid = $teammemberid;
+                        $newentry->dataid = $df->id();
+                        $newentry->groupid = $df->currentgroup;
+                        $newentry->timecreated = $newentry->timemodified = time();
+                        $newentry->approved = 1;
                         $newentry->id = $DB->insert_record('dataform_entries', $newentry);
 
                         foreach ($contents as $content) {
-                            $newcontent = $content;
+                            $newcontent = clone $content;
                             if ($content->fieldid == $teamfield->id()) {
                                 $newcontent->content = json_encode($newteammemberids);
                             }
 
                             $newcontent->entryid = $newentry->id;
-                            if (!$DB->insert_record('dataform_contents', $newcontent)) {
-                                throw new moodle_exception('cannotinsertrecord', null, null, $newentry->id);
-                            }
+                            $DB->insert_record('dataform_contents', $newcontent);
                         }
 
                         $processed[$newentry->id] = $newentry;
                     }
+                }
+
+                $DB->update_record('dataform_entries', $entry);
+
+                foreach ($oldcontents as $content) {
+                    $content->entryid = $entry->id;
+                    $DB->update_record('dataform_contents', $content);
                 }
             }
         }
