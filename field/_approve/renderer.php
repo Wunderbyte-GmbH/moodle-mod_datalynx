@@ -101,11 +101,11 @@ class dataformfield__approve_renderer extends dataformfield_renderer {
         if ($entry and $entry->approved) {
             $approved = 'approved';
             $approval = 'disapprove';
-            $approvedimagesrc = 'i/tick_green_big';
+            $approvedimagesrc = 'i/completion-auto-pass';
         } else {
             $approved = 'disapproved';
             $approval = 'approve';
-            $approvedimagesrc = 'i/cross_red_big';
+            $approvedimagesrc = 'i/completion-auto-n';
         }
         $strapproved = get_string($approved, 'dataform');
         
@@ -117,7 +117,7 @@ class dataformfield__approve_renderer extends dataformfield_renderer {
         if (has_capability('mod/dataform:approve', $field->df()->context)) {
             $PAGE->requires->js_init_call(
                 'M.dataformfield__approve.init',
-                array($OUTPUT->pix_url('i/tick_green_big')->__toString(), $OUTPUT->pix_url('i/cross_red_big')->__toString()),
+                array($OUTPUT->pix_url('i/completion-auto-pass')->__toString(), $OUTPUT->pix_url('i/completion-auto-n')->__toString()),
                 false,
                 $this->get_js_module());
 
