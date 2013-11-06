@@ -250,7 +250,7 @@ class dataformview_pdf extends dataformview_base {
         // Send the pdf
         $documentname = optional_param('docname', $this->get_documentname($settings->docname), PARAM_TEXT);
         $destination = optional_param('dest', $settings->destination, PARAM_ALPHA);
-        $pdf->Output("$documentname.pdf", $destination);
+        $pdf->Output("$documentname", $destination);
 
         // Clean up temp files
         if ($this->_tmpfiles) {
