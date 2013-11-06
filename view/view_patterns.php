@@ -162,7 +162,7 @@ class dataformview_patterns {
                     if (strpos($linktext, '_pixicon:') === 0) {
                         list(, $icon, $titletext) = explode(':', $linktext);
                         $linktext = $OUTPUT->pix_icon($icon, $titletext);
-                    }    
+                    }
                     // Replace pipes in urlquery with &
                     $urlquery = str_replace('|', '&', $urlquery);
                     return html_writer::link($view->baseurl->out(false). "&$urlquery", $linktext);
@@ -173,11 +173,15 @@ class dataformview_patterns {
                     if (strpos($linktext, '_pixicon:') === 0) {
                         list(, $icon, $titletext) = explode(':', $linktext);
                         $linktext = $OUTPUT->pix_icon($icon, $titletext);
-                    }    
+                    }
                     $urlquery = str_replace('|', '&', $urlquery);
                     $linkparams = array('sesskey' => sesskey());
                     $viewlink = new moodle_url($view->baseurl, $linkparams);
-                    return html_writer::link($viewlink->out(false). "&$urlquery", $linktext);
+                    if (strpos($urlquery, 'new=1') === false || $this->user_can_add_new_entry()) {
+                        return html_writer::link($viewlink->out(false). "&$urlquery", $linktext);
+                    } else {
+                        return '';
+                    }
                 }
             }
         }
@@ -198,6 +202,24 @@ class dataformview_patterns {
         }
 
         return '';
+    }
+
+    private function user_can_add_new_entry($userid = 0) {
+        global $USER, $DB;
+        $userid = $userid ? $userid : $USER->id;
+        $df = $this->_view->get_df();
+        $maxentries = $df->data->maxentries;
+        if ($maxentries == -1) {
+            return true;
+        }
+        $params = array('userid' => $userid, 'dataid' => $df->id());
+        $sql = "SELECT COUNT(1)
+                  FROM {dataform_entries} de
+                 WHERE de.userid = :userid
+                   AND de.dataid = :dataid";
+        $count = $DB->get_field_sql($sql, $params);
+
+        return $count < $maxentries;
     }
 
     /**
