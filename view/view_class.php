@@ -1503,6 +1503,10 @@ class dataformview_base {
                     $this->_returntoentriesform = true;
                     return false;
                 }
+            } else {
+                $redirectid = $this->_redirect ? $this->_redirect : $this->id();
+                $url = new moodle_url($this->_baseurl, array('view' => $redirectid));
+                redirect($url);
             }
         }
 
