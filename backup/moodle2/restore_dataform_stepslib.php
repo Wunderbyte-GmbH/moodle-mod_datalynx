@@ -293,7 +293,7 @@ class restore_dataform_activity_structure_step extends restore_activity_structur
         $data->entryid = $this->get_new_parentid('dataform_entry');
 
         $users = json_decode($data->content, true);
-        if (json_last_error() == JSON_ERROR_NONE) {
+        if (json_last_error() == JSON_ERROR_NONE && is_array($users)) {
             $newusers = array();
             foreach($users as $user) {
                 $newusers[] = $this->get_mappingid('user', $user);
