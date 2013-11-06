@@ -98,7 +98,7 @@ class dataformfield__approve_renderer extends dataformfield_renderer {
         global $PAGE, $OUTPUT;
 
         $field = $this->_field;
-        if ($entry and $entry->approved) {
+        if ($entry && isset($entry->approved) && $entry->approved) {
             $approved = 'approved';
             $approval = 'disapprove';
             $approvedimagesrc = 'i/completion-auto-pass';
