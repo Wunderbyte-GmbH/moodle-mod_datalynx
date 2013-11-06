@@ -280,25 +280,25 @@ $string['mediafile'] = 'Mediendatei';
 $string['menus'] = 'Menüs';
 /// Message strings
 $string['message_entryadded'] =
-'Hello {$a->fullname},
+'Guten Tag {$a->fullname},
 
-the content in {$a->dataformlink} has been modified by {$a->senderprofilelink}.
+{$a->dataformlink} wurde von {$a->senderprofilelink} bearbeitet.
 
-The following entry has been created: {$a->viewlink}.';
+Unter folgendem Link können Sie den Eintrag einsehen: {$a->viewlink}.';
 
 $string['message_entryupdated'] =
-'Hello {$a->fullname},
+'Guten Tag {$a->fullname},
 
-the content in {$a->dataformlink} has been modified by {$a->senderprofilelink}.
+{$a->dataformlink} wurde von {$a->senderprofilelink} bearbeitet.
 
-The following entry has been updated: {$a->viewlink}.';
+Unter folgendem Link können Sie den Eintrag einsehen: {$a->viewlink}.';
 
 $string['message_entrydeleted'] =
-'Hello {$a->fullname},
+'Guten Tag {$a->fullname},
 
-the content in {$a->dataformlink} has been modified by {$a->senderprofilelink}.
+{$a->dataformlink} wurde von {$a->senderprofilelink} bearbeitet.
 
-The following entry has been deleted: {$a->entryid}.';
+Folgender Eintrag wurde gelöscht: {$a->entryid}.';
 
 $string['message_commentadded'] = 'Dataform Kommentar hinzugefügt';
 $string['message_ratingadded'] = 'Dataform Bewertung hinzugefügt';
