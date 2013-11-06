@@ -68,7 +68,8 @@ if ($action == 'approve') {
 // Update completion state
 $completion = new completion_info($course);
 if($completion->is_enabled($cm) && $cm->completion == COMPLETION_TRACKING_AUTOMATIC && $data->completionentries) {
-    $completion->update_state($cm, $completiontype);
+    $userid = $DB->get_field('dataform_entries', 'userid', array('id' => $entryid));
+    $completion->update_state($cm, $completiontype, $userid);
 }
 
 ob_clean();

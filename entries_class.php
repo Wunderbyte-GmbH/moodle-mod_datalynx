@@ -672,8 +672,10 @@ class dataform_entries {
                 if ($processed) {
                     // Update completion state
                     $completion = new completion_info($df->course);
-                    if($completion->is_enabled($df->cm) && $df->cm->completion == COMPLETION_TRACKING_AUTOMATIC && $df->data->completionentries) {
-                        $completion->update_state($df->cm, $completiontype);
+                    if ($completion->is_enabled($df->cm) && $df->cm->completion == COMPLETION_TRACKING_AUTOMATIC && $df->data->completionentries) {
+                        foreach ($processed as $entry) {
+                            $completion->update_state($df->cm, $completiontype, $entry->userid);
+                        }
                     }
 
                     $strnotify = get_string($strnotify, 'dataform', count($processed));
