@@ -280,6 +280,9 @@ class dataformview_base {
         $fm = $this->_df->get_filter_manager($this);
 
         $urloptions = $filteroptions ? $fm::get_filter_options_from_url() : array();
+        if (is_array($filteroptions)) {
+            $urloptions = array_merge($urloptions, $filteroptions);
+        }
         $viewoptions = $this->get_view_filter_options();
 
         $fid = !empty($urloptions['filterid']) ? $urloptions['filterid'] : 0;
