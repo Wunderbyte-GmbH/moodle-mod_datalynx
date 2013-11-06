@@ -906,18 +906,6 @@ class dataform {
                         $strnotify = 'fieldsupdated';
                         break;
 
-                    case 'visible':
-                        foreach ($fields as $fid => $field) {
-                            // hide = 0; (show to owner) = 1; show to everyone = 2
-                            $visible = (($field->field->visible + 1) % 3);
-                            $DB->set_field('dataform_fields', 'visible', $visible, array('id' => $fid));
-
-                            $processedfids[] = $fid;
-                        }
-
-                        $strnotify = '';
-                        break;
-
                     case 'editable':
                         foreach ($fields as $fid => $field) {
                             // lock = 0; unlock = -1;
@@ -1263,7 +1251,6 @@ class dataform {
                                 continue;
                             } else {
                                 $updateview->id = $vid;
-                                $updateview->visible = (($view->view->visible + 1) % 3);  // hide = 0; (show) = 1; show = 2
                                 $DB->update_record('dataform_views', $updateview);
 
                                 $processedvids[] = $vid;
@@ -1369,7 +1356,6 @@ class dataform {
                             if ($view->view->visible != 2) {
                                 $updateview = new object();
                                 $updateview->id = $vid;
-                                $updateview->visible = 2;
                                 $DB->update_record('dataform_views', $updateview);
                             }
 
