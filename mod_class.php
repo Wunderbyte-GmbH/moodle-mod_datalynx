@@ -991,11 +991,12 @@ class dataform {
      * @return boolean              true if user can see the view, false otherwise
      */
     public function is_visible_to_user($view) {
-        $mask = (has_capability('mod/dataform:viewprivilegemanager', $this->context) ? 1 : 0) |
-                (has_capability('mod/dataform:viewprivilegeteacher', $this->context) ? 2 : 0) |
-                (has_capability('mod/dataform:viewprivilegestudent', $this->context) ? 4 : 0) |
-                (has_capability('mod/dataform:viewprivilegeguest',   $this->context) ? 8 : 0);
-        return $view->visible & $mask;
+        $isadmin = has_capability('mod/dataform:viewprivilegeadmin', $this->context, null, true);
+        $mask = (has_capability('mod/dataform:viewprivilegemanager', $this->context, null, false) ? 1 : 0) |
+                (has_capability('mod/dataform:viewprivilegeteacher', $this->context, null, false) ? 2 : 0) |
+                (has_capability('mod/dataform:viewprivilegestudent', $this->context, null, false) ? 4 : 0) |
+                (has_capability('mod/dataform:viewprivilegeguest',   $this->context, null, false) ? 8 : 0);
+        return $isadmin || ($view->visible & $mask);
     }
 
     /**

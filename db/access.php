@@ -387,6 +387,14 @@ $capabilities = array(
         )
     ),
 
+    'mod/dataform:viewprivilegeadmin' => array(
+
+        'riskbitmask' => RISK_PERSONAL,
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array()
+    ),
+
     'mod/dataform:viewprivilegemanager' => array(
 
         'riskbitmask' => RISK_PERSONAL,
