@@ -100,9 +100,9 @@ class dataformview_base_form extends moodleform {
         global $DB;
         $mform->addElement('header', 'redirectsettings', get_string('redirectsettings', 'dataform'));
         $mform->addHelpButton('redirectsettings', 'redirectsettings', 'dataform');
-        $mform->addElement('select', 'param4', get_string('redirectto', 'dataform'), $this->get_view_menu());
-        $mform->setDefault('param4', $DB->get_field('dataform', 'defaultview', array('id' => $this->_df->id())));
-        $mform->setType('param4', PARAM_INT);
+        $mform->addElement('select', 'param10', get_string('redirectto', 'dataform'), $this->get_view_menu());
+        $mform->setDefault('param10', $DB->get_field('dataform', 'defaultview', array('id' => $this->_df->id())));
+        $mform->setType('param10', PARAM_INT);
 
         // view specific definition
         //-------------------------------------------------------------------------------

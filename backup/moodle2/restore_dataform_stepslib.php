@@ -292,15 +292,6 @@ class restore_dataform_activity_structure_step extends restore_activity_structur
         $data->fieldid = $this->get_mappingid('dataform_field', $data->fieldid);
         $data->entryid = $this->get_new_parentid('dataform_entry');
 
-        $users = json_decode($data->content, true);
-        if (json_last_error() == JSON_ERROR_NONE && is_array($users)) {
-            $newusers = array();
-            foreach($users as $user) {
-                $newusers[] = $this->get_mappingid('user', $user);
-            }
-            $data->content = json_encode($newusers);
-        }
-
         // insert the data_content record
         $newitemid = $DB->insert_record('dataform_contents', $data);
         $this->set_mapping('dataform_content', $oldid, $newitemid, true); // files by this item id
@@ -342,12 +333,13 @@ class restore_dataform_activity_structure_step extends restore_activity_structur
 
         $newitemid = $DB->insert_record('rating', $data);
     }
-    
+
     /**
      *
      */
     protected function after_execute() {
         global $DB;
+
         // Add data related files, no need to match by itemname (just internally handled context)
         $this->add_related_files('mod_dataform', 'intro', null);
 
@@ -361,8 +353,17 @@ class restore_dataform_activity_structure_step extends restore_activity_structur
         // TODO Add preset related files, matching by itemname (data_content)
         //$this->add_related_files('mod_dataform', 'course_presets', 'dataform');
 
+        // Add view template related files, matching by item id (dataform_view)
+        $this->add_related_files('mod_dataform', 'viewsection', 'dataform_view');
+
+        // Add entry template related files, matching by item id (dataform_view)
+        for ($i = 2; $i <= 9; $i++) {
+            $this->add_related_files('mod_dataform', "viewparam{$i}", 'dataform_view');
+        }
+
+
         $dataformnewid = $this->get_new_parentid('dataform');
-        
+
         // default view
         if ($defaultview = $DB->get_field('dataform', 'defaultview', array('id' => $dataformnewid))) {
             if ($defaultview = $this->get_mappingid('dataform_view', $defaultview)) {
@@ -392,8 +393,49 @@ class restore_dataform_activity_structure_step extends restore_activity_structur
         }
 
         // Update group mode if the original was set to internal mode
-        
 
+        // Update teammmemberselect user ids
+        $sqllike = $DB->sql_like('df.type', ':type', false);
+        $sql = "SELECT dc.id, dc.content
+                  FROM {dataform_contents} dc
+            INNER JOIN {dataform_fields} df ON dc.fieldid = df.id
+                 WHERE $sqllike
+                   AND df.dataid = :dataid";
+        $results = $DB->get_records_sql_menu($sql, array('type' => 'teammemberselect', 'dataid' => $dataformnewid));
+        foreach ($results as $id => $content) {
+            $users = json_decode($content, true);
+            if (json_last_error() == JSON_ERROR_NONE && is_array($users)) {
+                $newusers = array();
+                foreach($users as $user) {
+                    $newusers[] = $this->get_mappingid('user', $user);
+                }
+                $newcontent = json_encode($newusers);
+                $DB->set_field('dataform_contents', 'content', $newcontent, array('id' => $id));
+            }
+        }
+
+        // Update teammmemberselect reference field ids
+        $sqllike = $DB->sql_like('df.type', ':type', false);
+        $sql = "SELECT df.id, df.param5
+                  FROM {dataform_fields} df
+                 WHERE $sqllike
+                   AND df.dataid = :dataid
+                   AND df.param5 NOT IN (0, -1)";
+        $results = $DB->get_records_sql_menu($sql, array('type' => 'teammemberselect', 'dataid' => $dataformnewid));
+        foreach ($results as $id => $referencefieldid) {
+            $newreferencefieldid = $this->get_mappingid('dataform_field', $referencefieldid);
+            $DB->set_field('dataform_fields', 'param5', $newreferencefieldid, array('id' => $id));
+        }
+
+        // Update redirect on submit ids
+        $sql = "SELECT dv.id, dv.param10
+                  FROM {dataform_views} dv
+                 WHERE dv.dataid = :dataid";
+        $results = $DB->get_records_sql_menu($sql, array('dataid' => $dataformnewid));
+        foreach ($results as $id => $redirectid) {
+            $newredirectid = $this->get_mappingid('dataform_view', $redirectid);
+            $DB->set_field('dataform_views', 'param10', $newredirectid, array('id' => $id));
+        }
 
         // Update id of userinfo fields if needed
         // TODO can we condition this on restore to new site?

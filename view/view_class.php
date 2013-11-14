@@ -91,10 +91,10 @@ class dataformview_base {
             $this->view->filter = 0;
             $this->view->perpage = 0;
             $this->view->groupby = '';
-            $this->view->param4 = 0;
+            $this->view->param10 = 0;
         }
 
-        $this->_redirect = $this->view->param4;
+        $this->_redirect = $this->view->param10;
 
         // set editors and patterns
         $this->set__editors();
