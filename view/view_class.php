@@ -234,9 +234,7 @@ class dataformview_base {
             $this->_tags = array('view' => array(), 'field' => array());
             $text = '';
             foreach ($this->_editors as $editor) {
-                if ($currenteditor = $data->{"e{$editor}_editor"}) {
-                    $text .= !empty($currenteditor['text']) ? ' '. $currenteditor['text'] : '';
-                }
+                $text .= isset($data->{"e{$editor}"}) ? $data->{"e{$editor}"} : '';
             }
 
             if (trim($text)) {
@@ -458,12 +456,19 @@ class dataformview_base {
      * Update view editors from form
      */
     public function update_view_editors($data) {
-        if (!$editors = $this->editors()) {
-            return $data;
-        }
-
-        if ($this->view->id) {
+        $editors = $this->editors();
+        if ($editors && $this->view->id) {
             foreach ($editors as $editorname => $options) {
+                if (isset($data->{"e{$editorname}_editor"}) && is_array($data->{"e{$editorname}_editor"})) {
+                    // editor OK, proceed
+                } else if (isset($data->{"e{$editorname}"})) {
+                    $format = isset($data->{"e{$editorname}format"}) && !empty($data->{"e{$editorname}format"}) ? $data->{"e{$editorname}format"} : FORMAT_HTML;
+                    $trust = isset($data->{"e{$editorname}trust"}) && !empty($data->{"e{$editorname}trust"}) ? $data->{"e{$editorname}trust"} : 1;
+                    $text = isset($data->{"e{$editorname}"}) ? $data->{"e{$editorname}"} : '';
+                    $data->{"e{$editorname}_editor"} = array('format' => $format, 'trust' => $trust, 'text' => $text);
+                } else {
+                    $data->{"e{$editorname}_editor"} = array('format' => FORMAT_HTML, 'trust' => 1, 'text' => '');
+                }
                 $data = file_postupdate_standard_editor($data,
                                                         "e$editorname",
                                                         $options,
