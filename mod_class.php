@@ -1310,7 +1310,6 @@ class dataform {
                             // reset id
                             $oldviewid = $view->view->id;
                             $view->view->id = 0;
-                            
                             $viewid = $view->add($view->view);
 
                             $newviewid = $viewid;
@@ -1354,12 +1353,6 @@ class dataform {
 
                     case 'default':
                         foreach ($views as $vid => $view) { // there should be only one
-                            if ($view->view->visible != 2) {
-                                $updateview = new object();
-                                $updateview->id = $vid;
-                                $DB->update_record('dataform_views', $updateview);
-                            }
-
                             $this->set_default_view($vid);
                             $processedvids[] = $vid;
                             break;
