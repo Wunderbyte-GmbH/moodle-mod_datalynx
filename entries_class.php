@@ -735,6 +735,10 @@ class dataform_entries {
                 $userid = $entry->userid;
 
                 foreach ($teammemberids as $teammemberid) {
+                    if (!$teammemberid) {
+                        continue;
+                    }
+
                     $newteammemberids = array_diff($teammemberids, array($teammemberid));
                     $newteammemberids[] = $userid;
                     $newteammemberids = array_values($newteammemberids);
