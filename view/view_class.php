@@ -440,6 +440,11 @@ class dataformview_base {
     public function prepare_view_editors($data) {
         $editors = $this->editors();
 
+        foreach ($data as $key => $value) {
+            if (is_string($value)) {
+                $data->{$key} = str_replace('##moreurl##', '$$moreurl$$', $value);
+            }
+        }
         foreach ($editors as $editorname => $options) {
              $data = file_prepare_standard_editor($data,
                                                 "e$editorname",
@@ -448,6 +453,18 @@ class dataformview_base {
                                                 'mod_dataform',
                                                 "view$editorname",
                                                 $this->view->id);
+        }
+
+        foreach ($data as $key => $value) {
+            if (is_string($value)) {
+                $data->{$key} = str_replace('$$moreurl$$', '##moreurl##', $value);
+            } else if (is_array($value)) {
+                foreach ($value as $subkey => $subvalue) {
+                    if (is_string($subvalue)) {
+                        $data->{$key}[$subkey] = str_replace('$$moreurl$$', '##moreurl##', $subvalue);
+                    }
+                }
+            }
         }
         return $data;
     }
