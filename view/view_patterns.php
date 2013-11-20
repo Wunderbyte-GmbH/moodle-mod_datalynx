@@ -125,6 +125,8 @@ class dataformview_patterns {
                 $replacements[$tag] = $this->get_paging_replacements($tag, $entry, $options);
             } else if ($this->is_regexp_pattern($tag)) {
                 $replacements[$tag] = $this->get_regexp_replacements($tag, $entry, $options);
+            } else {
+                $replacements[$tag] = '';
             }
         }
 
