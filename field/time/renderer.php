@@ -193,9 +193,9 @@ class dataformfield_time_renderer extends dataformfield_renderer {
         $step = 5;
         $startyear = $field->start_year ? $field->start_year : 1970;
         $stopyear = $field->stop_year ? $field->stop_year : 2020;
-        $maskday = get_string('day', 'dataformfield_time');
-        $maskmonth = get_string('month', 'dataformfield_time');
-        $maskyear = get_string('year', 'dataformfield_time');
+        $maskday = get_string('day');
+        $maskmonth = get_string('month');
+        $maskyear = get_string('year');
        
         $days = array();
         for ($i=1; $i<=31; $i++) {
