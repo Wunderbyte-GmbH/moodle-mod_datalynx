@@ -494,7 +494,7 @@ class dataform_entries {
                             );
 
                             // Iterate the data and extract entry and fields content
-                            foreach ($data as $name => $value){
+                            foreach ($data as $name => $value) {
                                // assuming only field names contain field_
                                 if (strpos($name, 'field_') !== false) {
                                     list(, $fieldid, $entryid) = explode('_', $name);
@@ -523,19 +523,38 @@ class dataform_entries {
 
                             // now update entry and contents
                             $addorupdate = '';
+                            $teamfieldid = $this->get_team_field_id($df->id(), true);
                             foreach ($entries as $eid => $entry) {
                                 if ($entry->id = $this->update_entry($entry, $contents[$eid]['info'])) {
                                     // $eid should be different from $entryid only in new entries
+                                    if ($entry->id != $eid) {
+                                        $oldcontent = array();
+                                    } else {
+                                        global $DB;
+                                        $oldcontent = json_decode($DB->get_field('dataform_contents', 'content',
+                                            array('fieldid' => $fieldid,
+                                                  'entryid' => $entryid)), true);
+
+                                    }
+                                    $newcontent = array();
                                     foreach ($contents[$eid]['fields'] as $fieldid => $content) {
+                                        if ($fieldid == $teamfieldid) {
+                                            $newcontent = $content[''];
+                                        }
                                         $fields[$fieldid]->update_content($entry, $content);
                                     }
                                     $processed[$entry->id] = $entry;
-                                    
+
+                                    if ($fieldid == $teamfieldid) {
+                                        $field = $DB->get_record('dataform_fields', array('id' => $teamfieldid));
+                                        $this->notify_team_members($entry, $field, $oldcontent, $newcontent);
+                                    }
+
                                     if (!$addorupdate) {
                                         $addorupdate = $eid < 0 ? 'added' : 'updated';
                                     }
                                 }
-                            }                            
+                            }
                             if ($processed) {
                                 $eventdata = (object) array('view' => $this->_view, 'items' => $processed);
                                 $df->events_trigger("entry$addorupdate", $eventdata);
@@ -677,7 +696,6 @@ class dataform_entries {
                             $completion->update_state($df->cm, $completiontype, $entry->userid);
                         }
                     }
-
                     $strnotify = get_string($strnotify, 'dataform', count($processed));
                 } else {
                     $strnotify = get_string($strnotify, 'dataform', get_string('no'));
@@ -686,6 +704,53 @@ class dataform_entries {
                 return array($strnotify, array_keys($processed));
             }
         }
+    }
+
+    public function get_team_field_id($dataid, $notifyonly = false) {
+        global $CFG, $DB;
+        $query = "SELECT f.id
+                    FROM {dataform_fields} f
+                   WHERE f.type = 'teammemberselect'
+                     AND f.dataid = :dataid
+                     AND f.param5 <> 0
+                     AND (NOT :notifyonly OR f.param6 = 1)";
+        $params = array('dataid' => $dataid, 'notifyonly' => $notifyonly);
+        return $DB->get_field_sql($query, $params);
+    }
+
+    public function notify_team_members($entry, $field, $oldmembers, $newmembers) {
+        global $DB;
+
+        $df = $this->_df;
+        $oldmembers = !empty($oldmembers) ? array_filter($oldmembers) : array();
+        $newmembers = array_filter($newmembers);
+
+        $addedmemberids = array_diff($newmembers, $oldmembers);
+        $removedmemberids = array_diff($oldmembers, $newmembers);
+
+        if (!empty($addedmemberids)) {
+            list($insql, $params) = $DB->get_in_or_equal($addedmemberids);
+            $addedmembers = $DB->get_records_sql("SELECT * FROM {user} WHERE id $insql", $params);
+        } else {
+            $addedmembers = array();
+        }
+
+        if (!empty($removedmemberids)) {
+            list($insql, $params) = $DB->get_in_or_equal($removedmemberids);
+            $removedmembers = $DB->get_records_sql("SELECT * FROM {user} WHERE id $insql", $params);
+        } else {
+            $removedmembers = array();
+        }
+
+        $eventdata = array('items' => array($entry),
+                           'view' => $this->_view,
+                           'fieldname' => $field->name);
+
+        $eventdata['users'] = $addedmembers;
+        $df->events_trigger('memberadded', (object) $eventdata);
+
+        $eventdata['users'] = $removedmembers;
+        $df->events_trigger('memberremoved', (object) $eventdata);
     }
 
     /**

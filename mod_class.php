@@ -35,6 +35,8 @@ class dataform {
     const NOTIFICATION_ENTRY_UPDATED = 2;
     const NOTIFICATION_ENTRY_DELETED = 4;
     const NOTIFICATION_COMMENT_ADDED = 8;
+    const NOTIFICATION_MEMBER_ADDED = 16;
+    const NOTIFICATION_MEMBER_REMOVED = 32;
 
     const COUNT_ALL = 0;
     const COUNT_APPROVED = 1;
@@ -1729,23 +1731,28 @@ class dataform {
         if ($this->data->notification & $notificationtypes[$event]) {
             $capability = "mod/dataform:notify$event";
             $users = get_users_by_capability($this->context, $capability, 'u.id,u.email,u.auth,u.suspended,u.deleted,u.lastaccess,u.emailstop');
+        } else if ($event == 'memberadded' || $event == 'memberremoved') {
+            return;
         }
 
-        // Get event notificataion rule users
-        $rm = $this->get_rule_manager();
-        if ($rules = $rm->get_rules_by_plugintype('eventnotification')) {
-            foreach ($rules as $rule) {
-                if ($rule->is_enabled() and in_array($event, $rule->get_selected_events())) {
-                    $users = array_merge($users, $rule->get_recipient_users($event, $data->items));
+        if ($event != 'memberadded' && $event != 'memberremoved') {
+            // Get event notificataion rule users
+            $rm = $this->get_rule_manager();
+            if ($rules = $rm->get_rules_by_plugintype('eventnotification')) {
+                foreach ($rules as $rule) {
+                    if ($rule->is_enabled() and in_array($event, $rule->get_selected_events())) {
+                        $users = array_merge($users, $rule->get_recipient_users($event, $data->items));
+                    }
                 }
             }
+
+            if (empty($users)) {
+                return;
+            }
+
+            $data->users = $users;
         }
 
-        if (empty($users)) {
-            return;
-        }    
-       
-        $data->users = $users;       
         $data->coursename = $this->course->shortname;
         $data->dataformname = $this->name();
         $data->dataformlink = html_writer::link($data->view->get_baseurl(), $data->dataformname);
@@ -1768,6 +1775,8 @@ class dataform {
             'entryupdated' => self::NOTIFICATION_ENTRY_UPDATED,
             'entrydeleted' => self::NOTIFICATION_ENTRY_DELETED,
             'commentadded' => self::NOTIFICATION_COMMENT_ADDED,
+            'memberadded' => self::NOTIFICATION_MEMBER_ADDED,
+            'memberremoved' => self::NOTIFICATION_MEMBER_REMOVED,
         );
     }
             

@@ -636,3 +636,13 @@ $string['lessorequal'] = 'Kleiner oder gleich';
 $string['between'] = 'Zwischen';
 $string['contains'] = 'Enthält';
 $string['in'] = 'In';
+$string['notifyteammembers'] = 'Teammitglieder benachrichtigen';
+$string['notifyteammembers_help'] = 'Haken Sie diese Box an, um Teammitglieder über ihren Mitgliedsstatus zu benachrichtigen.';
+$string['messageprovider:dataform_memberadded'] = 'Teammitgliederstatusänderung';
+$string['messageprovider:dataform_memberremoved'] = 'Teammitgliederstatusänderung';
+$string['message_memberadded'] = 'Guten Tag {$a->fullname},
+
+Sie wurden eben von {$a->senderprofilelink} zu {$a->fieldname} hinzugefügt. Folgen Sie diesem Link {$a->dataformlink} für weitere Details';
+$string['message_memberremoved'] = 'Dear {$a->fullname},
+
+Sie wurden eben von {$a->senderprofilelink} von {$a->fieldname} entfernt. Folgen Sie diesem Link {$a->dataformlink} für weitere Details';
