@@ -194,22 +194,24 @@ class dataformview_grid extends dataformview_base {
      */
     protected function new_entry_definition($entryid = -1) {
         $elements = array();
-        
+
         // get patterns definitions
         $fields = $this->_df->get_fields();
         $tags = array();
         $patterndefinitions = array();
         $entry = new object;
         foreach ($this->_tags['field'] as $fieldid => $patterns) {
-            $field = $fields[$fieldid];
-            $entry->id = $entryid;
-            $options = array('edit' => true, 'manage' => true);
-            if ($fielddefinitions = $field->get_definitions($patterns, $entry, $options)) {
-                $patterndefinitions = array_merge($patterndefinitions, $fielddefinitions);
+            if (isset($fields[$fieldid])) {
+                $field = $fields[$fieldid];
+                $entry->id = $entryid;
+                $options = array('edit' => true, 'manage' => true);
+                if ($fielddefinitions = $field->get_definitions($patterns, $entry, $options)) {
+                    $patterndefinitions = array_merge($patterndefinitions, $fielddefinitions);
+                }
+                $tags = array_merge($tags, $patterns);
             }
-            $tags = array_merge($tags, $patterns);
-        }            
-            
+        }
+
         // split the entry template to tags and html
         $parts = $this->split_tags($tags, $this->view->eparam2);
 
@@ -222,7 +224,7 @@ class dataformview_grid extends dataformview_base {
                 $elements[] = array('html', $part);
             }
         }
-        
+
         return $elements;
     }
 
