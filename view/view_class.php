@@ -678,7 +678,14 @@ class dataformview_base {
             $html = $notifications;
             $html .= $print_before;
             if ($displayentries) {
-                $html .= $this->display_entries($options);
+                $entryoptions = $options;
+                $entryoptions['tohtml'] = 1;
+                $entryhtml = $this->display_entries($entryoptions);
+                if ($entryhtml) {
+                    $html .= $entryhtml;
+                } else {
+                    $html .= $this->display_no_entries();
+                }
             }
             $html .= $print_after;
             return html_writer::tag('div', $html, array('class' => $viewname));
@@ -692,13 +699,33 @@ class dataformview_base {
                 echo $OUTPUT->continue_button($url);
             } else {
                 echo $print_before;
-                if ($displayentries) {
-                    $this->display_entries($options);
+                $entryoptions = $options;
+                $entryoptions['tohtml'] = 1;
+                $entryhtml = $this->display_entries($entryoptions);
+                if ($entryhtml) {
+                    echo $entryhtml;
+                } else {
+                    echo $this->display_no_entries();
                 }
                 echo $print_after;
             }
             echo html_writer::end_tag('div');
         }
+    }
+
+    protected function display_no_entries() {
+        global $OUTPUT;
+
+        if ($this->_filter->id) {
+            $output = $OUTPUT->notification(get_string('nomatchingentries', 'dataform'));
+            $url = new moodle_url($this->_baseurl, array('filter' => 0));
+            $output .= str_replace(get_string('continue'),
+                                   get_string('resetsettings', 'dataform'),
+                                   $OUTPUT->continue_button($url));
+        } else {
+            $output = $OUTPUT->notification(get_string('noentries', 'dataform'));
+        }
+        return $output;
     }
 
     /**

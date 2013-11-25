@@ -646,3 +646,5 @@ Sie wurden eben von {$a->senderprofilelink} zu {$a->fieldname} hinzugefügt. Fol
 $string['message_memberremoved'] = 'Dear {$a->fullname},
 
 Sie wurden eben von {$a->senderprofilelink} von {$a->fieldname} entfernt. Folgen Sie diesem Link {$a->dataformlink} für weitere Details';
+$string['noentries'] = 'Derzeit gibt es keine angelegten Einträge.';
+$string['nomatchingentries'] = 'Es gibt keine Einträge, die dem ausgewählten Filter entsprechen.';
