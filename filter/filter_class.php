@@ -256,6 +256,10 @@ class dataform_filter {
 
             $orderby = array();
             foreach ($sortfields as $fieldid => $sortdir) {
+                if (empty($fields[$fieldid])) {
+                    continue;
+                }
+
                 $field = $fields[$fieldid];
                 
                 $sortname = $field->get_sort_sql();
