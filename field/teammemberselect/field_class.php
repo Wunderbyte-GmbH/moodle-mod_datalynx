@@ -38,6 +38,7 @@ class dataformfield_teammemberselect extends dataformfield_base {
     public $listformat;
     public $teamfield;
     public $referencefieldid;
+    public $notifyteammembers;
 
     public $separators;
     public $rules;
@@ -51,6 +52,7 @@ class dataformfield_teammemberselect extends dataformfield_base {
         $this->listformat = $this->field->param4;
         $this->teamfield = $this->field->param5 != 0;
         $this->referencefieldid = $this->field->param5;
+        $this->notifyteammembers = $this->field->param6 != 0;
         $this->separators = array(
                 self::TEAMMEMBERSELECT_FORMAT_NEWLINE => get_string('listformat_newline', 'dataform'),
                 self::TEAMMEMBERSELECT_FORMAT_SPACE => get_string('listformat_space', 'dataform'),
@@ -113,6 +115,30 @@ class dataformfield_teammemberselect extends dataformfield_base {
                      AND df.param5 <> 0";
 
         return $DB->get_record_sql($query, array('dataid' => $this->df->id()));
+    }
+
+    /**
+     * Update a field in the database
+     */
+    public function update_field($fromform = null) {
+        global $DB, $OUTPUT;
+        if (!empty($fromform)) {
+            $this->set_field($fromform);
+        }
+
+        if (!$DB->update_record('dataform_fields', $this->field)) {
+            echo $OUTPUT->notification('updating of field failed!');
+            return false;
+        }
+        $mask = dataform::NOTIFICATION_MEMBER_ADDED | dataform::NOTIFICATION_MEMBER_REMOVED;
+        if ($this->field->param6) {
+            $notification = $this->df->data->notification | $mask;
+        } else {
+            $notification = $this->df->data->notification & (~$mask);
+        }
+        $DB->set_field('dataform', 'notification', $notification, array('id' => $this->df->id()));
+        $this->df->data->notification = $notification;
+        return true;
     }
 
     public function options_menu($addnoselection = false, $makelinks = false, $excludeuser = 0, $allowall = false) {

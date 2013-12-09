@@ -49,4 +49,12 @@ $messageproviders = array (
         'capability' => 'mod/dataform:notifyratingadded',
     ),
 
+    'dataform_memberadded' => array (
+        'capability' => 'mod/dataform:notifymemberadded',
+    ),
+
+    'dataform_memberremoved' => array (
+        'capability' => 'mod/dataform:notifymemberremoved',
+    ),
+
 );

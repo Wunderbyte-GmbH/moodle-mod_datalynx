@@ -365,6 +365,34 @@ $capabilities = array(
         )
     ),
 
+    // Notified on updated rating
+    'mod/dataform:notifymemberadded' => array(
+
+        'riskbitmask' => RISK_PERSONAL,
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'student' => CAP_ALLOW,
+        )
+    ),
+
+    // Notified on updated rating
+    'mod/dataform:notifymemberremoved' => array(
+
+        'riskbitmask' => RISK_PERSONAL,
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'student' => CAP_ALLOW,
+        )
+    ),
+
     // Allow viewing of entries marked as draft
     'mod/dataform:viewdrafts' => array(
 

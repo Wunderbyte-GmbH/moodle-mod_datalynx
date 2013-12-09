@@ -361,7 +361,6 @@ class dataform_notification_handler {
      *
      */
     public static function notify_entry($data) {
-        self::notify_teammembers($data);
         // Create links to entries and store in data->entrylinks
         $entrylinks = array();
         $baseurl = $data->view->get_baseurl();
@@ -372,23 +371,11 @@ class dataform_notification_handler {
         self::notify($data);
     }
 
-    public static function notify_teammembers(&$data) {
-        $users = $data->users;
-        foreach ($users as $id => $user) {
-            if (isset($user->teamentries)) {
-                $entrylinks = array();
-                $baseurl = $data->view->get_baseurl();
-                foreach ($user->teamentries as $entryid) {
-                    $entrylinks[] = html_writer::link(new moodle_url($baseurl, array('eids' => $entryid)), $entryid);
-                }
-                $data->users = array($user);
-                $data->entrylinks = implode(',', $entrylinks);
-                self::notify($data);
-                unset($users[$id]);
-            }
-        }
-        $data->users = $users;
-        unset($data->entrylinks);
+    /**
+     *
+     */
+    public static function notify_memberaddedremoved($data) {
+        self::notify($data);
     }
 
     /**
@@ -421,13 +408,13 @@ class dataform_notification_handler {
 		if (empty($data->users) or empty($data->event)) {
             return true;
         }
-        
+
         $users = array();
         foreach ($data->users as $user) {
             $users[] = $DB->get_record('user', array('id' => $user->id));
         }
         $event = $data->event;
-        
+
         // Prepare message
 		$strdataform = get_string('pluginname', 'dataform');
         $sitename = format_string($SITE->fullname);
@@ -447,7 +434,7 @@ class dataform_notification_handler {
 
         $notename = get_string("messageprovider:dataform_$event", 'dataform');
 		$subject = "$sitename -> $data->coursename -> $strdataform $data->dataformname:  $notename";
-		
+
         // Send message
         $message = new object;
         $message->siteshortname   = format_string($SITE->shortname);

@@ -70,4 +70,19 @@ $handlers = array (
         'internal'         => 1,
     ),
 
+    'dataform_memberadded' => array (
+        'handlerfile'      => '/mod/dataform/locallib.php',
+        'handlerfunction'  => array('dataform_notification_handler', 'notify_memberaddedremoved'),
+        'schedule'         => 'instant',
+        'internal'         => 1,
+    ),
+
+    'dataform_memberremoved' => array (
+        'handlerfile'      => '/mod/dataform/locallib.php',
+        'handlerfunction'  => array('dataform_notification_handler', 'notify_memberaddedremoved'),
+        'schedule'         => 'instant',
+        'internal'         => 1,
+    ),
+
+
 );

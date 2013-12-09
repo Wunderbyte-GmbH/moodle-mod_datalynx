@@ -80,13 +80,18 @@ class dataformfield_teammemberselect_form extends dataformfield_form {
 
         $box = $mform->addElement('checkbox', 'teamfieldenable', get_string('teamfield', 'dataform'), $message, $attributes);
         $mform->addHelpButton('teamfieldenable', 'teamfield', 'dataform');
+
+        $mform->addElement('checkbox', 'param6', get_string('notifyteammembers', 'dataform'), null, 1);
+        $mform->addHelpButton('param6', 'notifyteammembers', 'dataform');
+        $mform->setType('param6', PARAM_BOOL);
+        $mform->disabledIf('param6', 'teamfieldenable', 'notchecked');
+
         $fieldmenu = $this->_df->get_fields(array_keys($this->_df->get_internal_fields()), true);
         $fieldmenu = array('-1' => 'No field') + $fieldmenu;
         $mform->addElement('select', 'param5', get_string('referencefield', 'dataform'), $fieldmenu);
         $mform->addHelpButton('param5', 'referencefield', 'dataform');
         $mform->setType('param5', PARAM_INT);
         $mform->disabledIf('param5', 'teamfieldenable', 'notchecked');
-
     }
 
     /**
@@ -101,7 +106,8 @@ class dataformfield_teammemberselect_form extends dataformfield_form {
             $data->param2[$element] = 1;
         }
         $data->param5 = isset($data->param5) ? $data->param5 : 0;
-        $data->teamfieldenable = $data->param5 != 0;
+        $data->param6 = isset($data->param6) ? $data->param6 : 0;
+        $data->teamfieldenable = $data->param5 != 0 || $data->param6 != 0;
         parent::set_data($data);
     }
 
@@ -114,6 +120,7 @@ class dataformfield_teammemberselect_form extends dataformfield_form {
         if ($data = parent::get_data($slashed)) {
             $data->param2 = json_encode(array_keys($data->param2));
             $data->param5 = isset($data->param5) ? $data->param5 : 0;
+            $data->param6 = isset($data->param6) ? $data->param6 : 0;
         }
         return $data;
     }

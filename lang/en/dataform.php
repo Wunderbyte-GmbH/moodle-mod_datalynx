@@ -650,3 +650,15 @@ $string['teamfield_help'] = 'Check this box to designate this field as a team fi
 $string['referencefield'] = 'Reference field';
 $string['referencefield_help'] = 'Select a field to serve as a duplicate prevention field. This will skip creating entries for users who already have an approved entry with the same field value as the one being approved.';
 $string['linktoentry'] = 'Link to entry';
+$string['notifyteammembers'] = 'Notify team members';
+$string['notifyteammembers_help'] = 'Select this option to inform team members of their membership status change.';
+$string['messageprovider:dataform_memberadded'] = 'Team membership status change';
+$string['messageprovider:dataform_memberremoved'] = 'Team membership status change';
+$string['message_memberadded'] = 'Dear {$a->fullname},
+
+you have been added to {$a->fieldname} by {$a->senderprofilelink}. Please go to {$a->dataformlink} for more details.';
+$string['message_memberremoved'] = 'Dear {$a->fullname},
+
+you have been removed from {$a->fieldname} by {$a->senderprofilelink}. Please go to {$a->dataformlink} for more details.';
+$string['noentries'] = 'No entries created yet.';
+$string['nomatchingentries'] = 'No entries matching the selected filter exist.';

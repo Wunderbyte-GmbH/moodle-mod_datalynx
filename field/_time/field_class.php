@@ -93,8 +93,8 @@ class dataformfield__time extends dataformfield_no_content {
         
         static $i=0;
         $i++;
-        $namefrom = "df__time_$i_from";
-        $nameto = "df__time_$i_to";
+        $namefrom = "df__time_{$i}_from";
+        $nameto = "df__time_{$i}_to";
         $varcharcontent = $this->get_sql_compare_text();
         $params = array();
         
@@ -102,11 +102,11 @@ class dataformfield__time extends dataformfield_no_content {
             if (!$operator or $operator == 'LIKE') {
                 $operator = '=';
             }
-            $params[$namefrom] = from;
+            $params[$namefrom] = $from;
             return array(" $not $varcharcontent $operator :$namefrom ", $params, false);
         } else {
-            $params[$namefrom] = from;
-            $params[$nameto] = to;
+            $params[$namefrom] = $from;
+            $params[$nameto] = $to;
             return array(" ($not $varcharcontent >= :$namefrom AND $varcharcontent <= :$nameto) ", $params, false);
         }
     }
