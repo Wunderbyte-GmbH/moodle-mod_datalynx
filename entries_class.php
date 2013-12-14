@@ -287,7 +287,7 @@ class dataform_entries {
                 $entries->entries = $DB->get_records_sql($sqlselect, $allparams);
             }
             // Now get the contents if required and add it to the entry objects
-            if ($dataformcontent) {
+            if ($dataformcontent && $entries->entries) {
                 //get the node content of the requested entries
                 list($fids, $fparams) = $DB->get_in_or_equal($dataformcontent, SQL_PARAMS_NAMED);
                 list($eids, $eparams) = $DB->get_in_or_equal(array_keys($entries->entries), SQL_PARAMS_NAMED);
