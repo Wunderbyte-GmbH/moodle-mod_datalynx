@@ -88,6 +88,7 @@ class dataform_entries {
         $this->_entries = !empty($entriesset->entries) ? $entriesset->entries : array();
         $this->_entriestotalcount = !empty($entriesset->max) ? $entriesset->max : count($this->_entries);
         $this->_entriesfiltercount = !empty($entriesset->found) ? $entriesset->found : count($this->_entries);
+        dataform::get_custom_user_fields($this->_entries);
     }
 
     /**
