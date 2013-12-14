@@ -524,7 +524,7 @@ class dataform_entries {
 
                             // now update entry and contents
                             $addorupdate = '';
-                            $teamfieldid = $this->get_team_field_id($df->id(), true);
+                            $teamfieldid = $this->get_teammemberselect_fields_to_notify($df->id(), true);
                             foreach ($entries as $eid => $entry) {
                                 if ($entry->id = $this->update_entry($entry, $contents[$eid]['info'])) {
                                     // $eid should be different from $entryid only in new entries
@@ -548,7 +548,9 @@ class dataform_entries {
 
                                     if ($fieldid == $teamfieldid) {
                                         $field = $DB->get_record('dataform_fields', array('id' => $teamfieldid));
-                                        $this->notify_team_members($entry, $field, $oldcontent, $newcontent);
+                                        if ($field->param6) {
+                                            $this->notify_team_members($entry, $field, $oldcontent, $newcontent);
+                                        }
                                     }
 
                                     if (!$addorupdate) {
@@ -707,16 +709,15 @@ class dataform_entries {
         }
     }
 
-    public function get_team_field_id($dataid, $notifyonly = false) {
+    public function get_teammemberselect_fields_to_notify($dataid) {
         global $CFG, $DB;
         $query = "SELECT f.id
                     FROM {dataform_fields} f
                    WHERE f.type = 'teammemberselect'
                      AND f.dataid = :dataid
-                     AND f.param5 <> 0
-                     AND (NOT :notifyonly OR f.param6 = 1)";
-        $params = array('dataid' => $dataid, 'notifyonly' => $notifyonly);
-        return $DB->get_field_sql($query, $params);
+                     AND f.param6 = 1";
+        $params = array('dataid' => $dataid);
+        return $DB->get_fieldset_sql($query, $params);
     }
 
     public function notify_team_members($entry, $field, $oldmembers, $newmembers) {
