@@ -722,6 +722,12 @@ class dataformview_base {
             $output .= str_replace(get_string('continue'),
                                    get_string('resetsettings', 'dataform'),
                                    $OUTPUT->continue_button($url));
+        } else if ($this->_filter->eids) {
+            $output = $OUTPUT->notification(get_string('nopermission', 'dataform'));
+            $url = new moodle_url($this->_baseurl, array('filter' => 0));
+            $output .= str_replace(get_string('continue'),
+                get_string('resetsettings', 'dataform'),
+                $OUTPUT->continue_button($url));
         } else {
             $output = $OUTPUT->notification(get_string('noentries', 'dataform'));
         }
