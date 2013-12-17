@@ -1817,7 +1817,7 @@ class dataform {
                 foreach ($fields as $fieldname => $data) {
                     $fieldid = array_search($fieldname, $fieldnames);
                     if ($DB->record_exists('user_info_data', array('userid' => $userid, 'fieldid' => $fieldid))) {
-                        $DB->set_field('user_info_data', 'data', $data);
+                        $DB->set_field('user_info_data', 'data', $data, array('userid' => $userid, 'fieldid' => $fieldid));
                     } else {
                         $record = array(
                             'userid' => $userid,
