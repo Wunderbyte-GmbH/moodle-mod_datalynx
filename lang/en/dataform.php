@@ -660,6 +660,6 @@ you have been added to {$a->fieldname} by {$a->senderprofilelink}. Please go to 
 $string['message_memberremoved'] = 'Dear {$a->fullname},
 
 you have been removed from {$a->fieldname} by {$a->senderprofilelink}. Please go to {$a->dataformlink} for more details.';
-$string['noentries'] = 'No entries created yet.';
+$string['noentries'] = 'There are no entries to display.';
 $string['nomatchingentries'] = 'No entries matching the selected filter exist.';
 $string['nopermission'] = 'You don not have the permission to view specified entries.';
