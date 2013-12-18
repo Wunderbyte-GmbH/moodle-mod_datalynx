@@ -636,6 +636,7 @@ class dataformview_base {
         $notify = isset($options['notify']) ? $options['notify'] : true;
         $tohtml = isset($options['tohtml']) ? $options['tohtml'] : false;
         $pluginfileurl = isset($options['pluginfileurl']) ? $options['pluginfileurl'] : null;      
+        $fieldview = isset($options['fieldview']) ? $options['fieldview'] : false;
 
         // build entries display definition
         $requiresmanageentries = $this->set__display_definition($options);
@@ -684,7 +685,7 @@ class dataformview_base {
                 if ($entryhtml) {
                     $html .= $entryhtml;
                 } else {
-                    $html .= $this->display_no_entries();
+                    $html .= $this->display_no_entries($fieldview);
                 }
             }
             $html .= $print_after;
@@ -713,22 +714,28 @@ class dataformview_base {
         }
     }
 
-    protected function display_no_entries() {
+    protected function display_no_entries($fieldview = false) {
         global $OUTPUT;
 
-        if ($this->_filter->id) {
+        if ($fieldview) {
+            return '';
+        }
+
+        if ($this->view->filter > 0) { // this view has a forced filter set
+            $output = $OUTPUT->notification(get_string('noentries', 'dataform'));
+        } else if ($this->_filter->id) { // this view has a user filter set
             $output = $OUTPUT->notification(get_string('nomatchingentries', 'dataform'));
             $url = new moodle_url($this->_baseurl, array('filter' => 0));
             $output .= str_replace(get_string('continue'),
                                    get_string('resetsettings', 'dataform'),
                                    $OUTPUT->continue_button($url));
-        } else if ($this->_filter->eids) {
+        } else if ($this->_filter->eids) { // this view displays only entries with chosen ids
             $output = $OUTPUT->notification(get_string('nopermission', 'dataform'));
             $url = new moodle_url($this->_baseurl, array('filter' => 0));
             $output .= str_replace(get_string('continue'),
                 get_string('resetsettings', 'dataform'),
                 $OUTPUT->continue_button($url));
-        } else {
+        } else { // there are no entries in this dataform
             $output = $OUTPUT->notification(get_string('noentries', 'dataform'));
         }
         return $output;
