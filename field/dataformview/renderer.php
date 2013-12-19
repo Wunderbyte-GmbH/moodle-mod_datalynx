@@ -153,6 +153,7 @@ class dataformfield_dataformview_renderer extends dataformfield_renderer {
         $refview->set_content();
         // Set to return html
         $options['tohtml'] = true;
+        $options['fieldview'] = true;
         return $refview->display($options);
     }
     
