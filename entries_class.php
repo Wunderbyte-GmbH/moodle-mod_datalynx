@@ -178,7 +178,7 @@ class dataform_entries {
         // STATUS filtering (visibility)
         $wherestatus = '';
         if (!has_capability('mod/dataform:viewdrafts', $df->context)) {
-            $wherestatus = " AND (e.status = :{$this->sqlparams($params, 'status', dataformfield__status::STATUS_FINAL_SUBMISSION)}
+            $wherestatus = " AND (e.status <> :{$this->sqlparams($params, 'status', dataformfield__status::STATUS_DRAFT)}
                               OR  e.userid = :{$this->sqlparams($params, 'userid', $USER->id)}) ";
         }
 
