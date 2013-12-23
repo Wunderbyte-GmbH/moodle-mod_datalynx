@@ -1775,8 +1775,6 @@ class dataform {
             'entryupdated' => self::NOTIFICATION_ENTRY_UPDATED,
             'entrydeleted' => self::NOTIFICATION_ENTRY_DELETED,
             'commentadded' => self::NOTIFICATION_COMMENT_ADDED,
-            'memberadded' => self::NOTIFICATION_MEMBER_ADDED,
-            'memberremoved' => self::NOTIFICATION_MEMBER_REMOVED,
         );
     }
 }
