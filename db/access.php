@@ -96,6 +96,7 @@ $capabilities = array(
         'archetypes' => array(
             'frontpage' => CAP_ALLOW, // needed for dataforms on the frontpage
             'guest' => CAP_ALLOW,
+            'user' => CAP_ALLOW,
             'student' => CAP_ALLOW,
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
@@ -461,6 +462,7 @@ $capabilities = array(
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
             'guest' => CAP_ALLOW,
+            'user' => CAP_ALLOW,
         )
     ),
 

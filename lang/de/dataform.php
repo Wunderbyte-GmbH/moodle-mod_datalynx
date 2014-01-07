@@ -649,3 +649,6 @@ Sie wurden eben von {$a->senderprofilelink} von {$a->fieldname} entfernt. Folgen
 $string['noentries'] = 'Keine anzeigbaren Einträge vorhanden.';
 $string['nomatchingentries'] = 'Es gibt keine Einträge, die dem ausgewählten Filter entsprechen.';
 $string['nopermission'] = 'Sie haben keine Genehmigung, um diese Einträge anzusehen.';
+$string['dataform:notifymemberadded'] = 'Nutzer benachrichtigen, wenn sie einem Team hinzugefügt werden';
+$string['dataform:notifymemberremoved'] = 'Nutzer benachrichtigen, wenn sie von einem Team entfernt werden';
+$string['dataform:viewprivilegeadmin'] = 'Administratorzugriffsrecht auf Ansichten';

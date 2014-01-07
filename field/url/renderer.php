@@ -87,6 +87,7 @@ class dataformfield_url_renderer extends dataformfield_renderer {
             'size' => 64
         );        
         $mform->addElement('url', "{$fieldname}_url", null, $options, array('usefilepicker' => $usepicker));
+        $mform->setType("{$fieldname}_url", PARAM_URL);
         $mform->setDefault("{$fieldname}_url", s($url));
 
         // add alt name if not forcing name

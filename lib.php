@@ -502,7 +502,7 @@ function mod_dataform_pluginfile($course, $cm, $context, $filearea, $args, $forc
         if ($entry->groupid) {
             $groupmode = groups_get_activity_groupmode($cm, $course);
             if ($groupmode == SEPARATEGROUPS and !has_capability('moodle/site:accessallgroups', $context)) {
-                if (!groups_is_member($record->groupid)) {
+                if (!groups_is_member($entry->groupid)) {
                     return false;
                 }
             }

@@ -178,7 +178,7 @@ class dataform_entries {
         // STATUS filtering (visibility)
         $wherestatus = '';
         if (!has_capability('mod/dataform:viewdrafts', $df->context)) {
-            $wherestatus = " AND (e.status = :{$this->sqlparams($params, 'status', dataformfield__status::STATUS_FINAL_SUBMISSION)}
+            $wherestatus = " AND (e.status <> :{$this->sqlparams($params, 'status', dataformfield__status::STATUS_DRAFT)}
                               OR  e.userid = :{$this->sqlparams($params, 'userid', $USER->id)}) ";
         }
 
@@ -248,7 +248,7 @@ class dataform_entries {
  
                 if ($entries->entries = $DB->get_records_sql($sqlselect, $allparams + $eidparams)) {
                     // if one entry was requested get its position
-                    if (!is_array($filter->eids) or count($filer->eids) == 1) {
+                    if (!is_array($filter->eids) or count($filter->eids) == 1) {
                         $sqlselect = "$sqlcount AND e.id $ineids $sortorder";
                         $eidposition = $DB->get_records_sql($sqlselect, $allparams + $eidparams);
                         
@@ -400,6 +400,7 @@ class dataform_entries {
         $entries = array();
         // some entries may be specified for action
         if ($eids) {
+            $importentryids = array();
             // adding or updating entries
             if ($action == 'update') {
                 if (!is_array($eids)) {
@@ -432,7 +433,7 @@ class dataform_entries {
 
                     // TODO existing entry *not* from view (import)
                     } else if ($eid > 0) {
-                        // need to collect these entries and get them from DB with their content
+                        $importentryids[] = $eid;
 
                     // new entries ($eid is the number of new entries
                     } else if ($eid < 0) {
@@ -449,6 +450,15 @@ class dataform_entries {
             // all other types of processing must refer to specific entry ids
             } else {
                 $entries = $DB->get_records_select('dataform_entries', "dataid = ? AND id IN ($eids)", array($df->id()));
+            }
+
+            if (!empty($importentryids)) {
+                $filterdata = array(
+                    'dataid' => $df->id(),
+                    'eids' => $importentryids
+                );
+                $filter = new dataform_filter((object) $filterdata);
+                $entries += $this->get_entries(array('filter' => $filter))->entries;
             }
 
             if ($entries) {
@@ -690,7 +700,7 @@ class dataform_entries {
                             if ($content->entryid != $parentid and $content->entryid != $siblingid) {
                                 $content->content = $parentid;
                                 $content->content1 = $siblingid;
-                                $DB->update_record($content);
+                                $DB->update_record('dataform_contents', $content);
                                 
                                 $processed[] = $content->entryid;
                             }
