@@ -520,5 +520,17 @@ function xmldb_dataform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2013082800, 'dataform');
     }
 
+    if ($oldversion < 2014010700) {
+        $query = "UPDATE {dataform_views} dv
+                     SET dv.param10 = dv.param4
+                   WHERE dv.param10 IS NULL
+                     AND dv.param4 IS NOT NULL
+                     AND dv.param4 <> 0";
+        $DB->execute($query);
+
+        // Dataform savepoint reached.
+        upgrade_mod_savepoint(true, 2014010700, 'dataform');
+    }
+
     return true;
 }
