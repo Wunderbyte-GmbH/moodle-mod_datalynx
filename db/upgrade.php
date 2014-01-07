@@ -532,5 +532,18 @@ function xmldb_dataform_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2014010700, 'dataform');
     }
 
+    if ($oldversion < 2014010701) {
+        $query = "UPDATE {dataform_views} dv
+                     SET dv.type = 'grid',
+                         dv.section = CONCAT(dv.section, dv.param4, '##entries##', dv.param5),
+                         dv.param4 = '',
+                         dv.param5 = ''
+                   WHERE dv.type = 'extgrid'";
+        $DB->execute($query);
+
+        // Dataform savepoint reached.
+        upgrade_mod_savepoint(true, 2014010701, 'dataform');
+    }
+
     return true;
 }
