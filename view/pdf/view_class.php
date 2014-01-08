@@ -625,7 +625,7 @@ class dataformview_pdf extends dataformview_base {
                 $signsettings = $this->_settings->signature;
                 $pdf->setSignature("file://$filepath", "file://$filepath", $signsettings->password, '', $signsettings->type, $signsettings->info);
             }
-            unlink($filepath);
+            $this->_tmpfiles[] = $filepath;
         }
     }
     

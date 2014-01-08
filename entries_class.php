@@ -528,7 +528,6 @@ class dataform_entries {
                                     } else {
                                         continue;
                                     }
-                                    
                                     // Entry info
                                     if (in_array($fieldid, $entryinfo)) {
                                         // TODO
@@ -546,36 +545,25 @@ class dataform_entries {
                                 }
                             }
 
+                            global $DB;
                             // now update entry and contents
                             $addorupdate = '';
-                            $teamfieldid = $this->get_teammemberselect_fields_to_notify($df->id(), true);
+                            $teamfieldid = $this->get_teammemberselect_fields_to_notify($df->id());
                             foreach ($entries as $eid => $entry) {
                                 if ($entry->id = $this->update_entry($entry, $contents[$eid]['info'])) {
                                     // $eid should be different from $entryid only in new entries
-                                    if ($entry->id != $eid) {
-                                        $oldcontent = array();
-                                    } else {
-                                        global $DB;
-                                        $oldcontent = json_decode($DB->get_field('dataform_contents', 'content',
-                                            array('fieldid' => $fieldid,
-                                                  'entryid' => $entryid)), true);
-
-                                    }
-                                    $newcontent = array();
                                     foreach ($contents[$eid]['fields'] as $fieldid => $content) {
-                                        if ($fieldid == $teamfieldid) {
+                                        if (array_search($fieldid, $teamfieldid) !== false) {
+                                            $oldcontent = json_decode($DB->get_field('dataform_contents', 'content',
+                                                                array('fieldid' => $fieldid,
+                                                                      'entryid' => $entryid)), true);
                                             $newcontent = $content[''];
+                                            $field = $DB->get_record('dataform_fields', array('id' => $fieldid));
+                                            $this->notify_team_members($entry, $field, $oldcontent, $newcontent);
                                         }
                                         $fields[$fieldid]->update_content($entry, $content);
                                     }
                                     $processed[$entry->id] = $entry;
-
-                                    if ($fieldid == $teamfieldid) {
-                                        $field = $DB->get_record('dataform_fields', array('id' => $teamfieldid));
-                                        if ($field->param6) {
-                                            $this->notify_team_members($entry, $field, $oldcontent, $newcontent);
-                                        }
-                                    }
 
                                     if (!$addorupdate) {
                                         $addorupdate = $eid < 0 ? 'added' : 'updated';
@@ -741,7 +729,9 @@ class dataform_entries {
                      AND f.dataid = :dataid
                      AND f.param6 = 1";
         $params = array('dataid' => $dataid);
-        return $DB->get_fieldset_sql($query, $params);
+        $results = $DB->get_fieldset_sql($query, $params);
+        $results = $results ? $results : array();
+        return $results;
     }
 
     public function notify_team_members($entry, $field, $oldmembers, $newmembers) {

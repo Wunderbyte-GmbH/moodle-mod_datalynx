@@ -1728,14 +1728,11 @@ class dataform {
         $users = array();
         // Get capability users if notifications for the event are enabled
         $notificationtypes = self::get_notification_types();
-        if ($this->data->notification & $notificationtypes[$event]) {
+        if ($event == 'memberadded' || $event == 'memberremoved') {
+            // skip this step
+        } else if ($this->data->notification & $notificationtypes[$event]) {
             $capability = "mod/dataform:notify$event";
             $users = get_users_by_capability($this->context, $capability, 'u.id,u.email,u.auth,u.suspended,u.deleted,u.lastaccess,u.emailstop');
-        } else if ($event == 'memberadded' || $event == 'memberremoved') {
-            return;
-        }
-
-        if ($event != 'memberadded' && $event != 'memberremoved') {
             // Get event notificataion rule users
             $rm = $this->get_rule_manager();
             if ($rules = $rm->get_rules_by_plugintype('eventnotification')) {
