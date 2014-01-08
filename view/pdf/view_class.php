@@ -170,10 +170,7 @@ class dataformview_pdf extends dataformview_base {
             $protection->owner_pass,
             $protection->mode
             //$protection->pubkeys
-        ); 
-
-        // Set document signature
-        $this->set_signature($pdf);
+        );
             
         // Paging
         if (empty($settings->pagebreak)) {
@@ -246,6 +243,9 @@ class dataformview_pdf extends dataformview_base {
             }
             $pdf->endTOCPage();
         }
+
+        // Set document signature
+        $this->set_signature($pdf);
 
         // Send the pdf
         $documentname = optional_param('docname', $this->get_documentname($settings->docname), PARAM_TEXT);
@@ -625,7 +625,7 @@ class dataformview_pdf extends dataformview_base {
                 $signsettings = $this->_settings->signature;
                 $pdf->setSignature("file://$filepath", "file://$filepath", $signsettings->password, '', $signsettings->type, $signsettings->info);
             }
-            unlink($filepath);
+            $this->_tmpfiles[] = $filepath;
         }
     }
     
