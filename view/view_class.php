@@ -715,7 +715,7 @@ class dataformview_base {
     }
 
     protected function display_no_entries($fieldview = false) {
-        global $OUTPUT;
+        global $OUTPUT, $DB;
 
         if ($fieldview) {
             return '';
@@ -730,7 +730,12 @@ class dataformview_base {
                                    get_string('resetsettings', 'dataform'),
                                    $OUTPUT->continue_button($url));
         } else if ($this->_filter->eids) { // this view displays only entries with chosen ids
-            $output = $OUTPUT->notification(get_string('nopermission', 'dataform'));
+            list($insql, $params) = $DB->get_in_or_equal($this->_filter->eids, SQL_PARAMS_NAMED);
+            if (!$DB->record_exists_select('dataform_entries', "id $insql", $params)) {
+                $output = $OUTPUT->notification(get_string('nosuchentries', 'dataform'));
+            } else {
+                $output = $OUTPUT->notification(get_string('nopermission', 'dataform'));
+            }
             $url = new moodle_url($this->_baseurl, array('filter' => 0));
             $output .= str_replace(get_string('continue'),
                 get_string('resetsettings', 'dataform'),
