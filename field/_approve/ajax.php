@@ -29,6 +29,8 @@ require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))).'/config.php'
 require_once("$CFG->dirroot/mod/dataform/mod_class.php");
 require_once("$CFG->dirroot/mod/dataform/entries_class.php");
 
+ob_start();
+
 $d = required_param('d', PARAM_INT);
 $viewid = required_param('view', PARAM_INT);
 $action = required_param('action', PARAM_ALPHA);
@@ -72,7 +74,9 @@ if($completion->is_enabled($cm) && $cm->completion == COMPLETION_TRACKING_AUTOMA
     $completion->update_state($cm, $completiontype, $userid);
 }
 
-ob_clean();
+if (ob_get_contents()) {
+    ob_clean();
+}
 echo json_encode($return);
 
 die;

@@ -110,7 +110,7 @@ class dataformfield__approve_renderer extends dataformfield_renderer {
         $strapproved = get_string($approved, 'dataform');
         
         $approvedimage = html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url($approvedimagesrc),
-                                                            'class' => "iconsmall",
+                                                            'class' => "iconsmall" . $entry->approved ? ' approved' : '',
                                                             'alt' => $strapproved,
                                                             'title' => $strapproved));
                                                             
