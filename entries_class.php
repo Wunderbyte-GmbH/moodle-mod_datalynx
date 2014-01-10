@@ -518,6 +518,9 @@ class dataform_entries {
                                 dataformfield__status::_STATUS
                             );
 
+                            $skipnotification = array();
+                            $notifyall = array();
+
                             // Iterate the data and extract entry and fields content
                             foreach ($data as $name => $value) {
                                // assuming only field names contain field_
@@ -535,6 +538,13 @@ class dataform_entries {
                                             $entryvar = 'userid';
                                         } else {
                                             $entryvar = $field->get_internalname();
+                                        }
+                                        if ($fieldid == dataformfield__status::_STATUS && $value == dataformfield__status::STATUS_DRAFT) {
+                                            $skipnotification[] = $entryid;
+                                        }
+                                        if ($fieldid == dataformfield__status::_STATUS && $value == dataformfield__status::STATUS_FINAL_SUBMISSION
+                                            && $entries[$entryid]->status == dataformfield__status::STATUS_DRAFT) {
+                                            $notifyall[] = $entryid;
                                         }
                                         $contents[$entryid]['info'][$entryvar] = $value;
 
@@ -559,7 +569,13 @@ class dataform_entries {
                                                                       'entryid' => $entryid)), true);
                                             $newcontent = $content[''];
                                             $field = $DB->get_record('dataform_fields', array('id' => $fieldid));
-                                            $this->notify_team_members($entry, $field, $oldcontent, $newcontent);
+                                            if (array_search($entry->id, $skipnotification) === false) {
+                                                $this->notify_team_members($entry, $field, $oldcontent, $newcontent);
+                                            }
+
+                                            if (array_search($entry->id, $notifyall) !== false) {
+                                                $this->notify_team_members($entry, $field, array(), $newcontent);
+                                            }
                                         }
                                         $fields[$fieldid]->update_content($entry, $content);
                                     }
