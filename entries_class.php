@@ -101,7 +101,7 @@ class dataform_entries {
             }
             array_unique($userids);
 
-            userinfosync_update_user_fields($userids);
+            userinfosync::update_user_fields($userids);
         }
     }
 
