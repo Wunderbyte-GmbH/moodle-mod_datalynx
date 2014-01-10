@@ -543,7 +543,7 @@ class dataform_entries {
                                             $skipnotification[] = $entryid;
                                         }
                                         if ($fieldid == dataformfield__status::_STATUS && $value == dataformfield__status::STATUS_FINAL_SUBMISSION
-                                            && $entries[$entryid]->status == dataformfield__status::STATUS_DRAFT) {
+                                            && (!isset($entries[$entryid]->status) || $entries[$entryid]->status == dataformfield__status::STATUS_DRAFT)) {
                                             $notifyall[] = $entryid;
                                         }
                                         $contents[$entryid]['info'][$entryvar] = $value;
