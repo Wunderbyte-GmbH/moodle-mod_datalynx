@@ -569,7 +569,7 @@ class dataform_entries {
                                                                       'entryid' => $entryid)), true);
                                             $newcontent = $content[''];
                                             $field = $DB->get_record('dataform_fields', array('id' => $fieldid));
-                                            if (array_search($entry->id, $skipnotification) === false) {
+                                            if (!(array_search($entry->id, $skipnotification) === false)) {
                                                 $this->notify_team_members($entry, $field, $oldcontent, $newcontent);
                                             }
 
