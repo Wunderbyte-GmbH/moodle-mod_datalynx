@@ -661,6 +661,7 @@ $string['message_memberremoved'] = 'Dear {$a->fullname},
 
 you have been removed from {$a->fieldname} by {$a->senderprofilelink}. Please go to {$a->dataformlink} for more details.';
 $string['noentries'] = 'There are no entries to display.';
+$string['nosuchentries'] = 'No entries available.';
 $string['nomatchingentries'] = 'No entries matching the selected filter exist.';
 $string['nopermission'] = 'You don not have the permission to view specified entries.';
 $string['dataform:notifymemberadded'] = 'Inform users about being added as a team member';

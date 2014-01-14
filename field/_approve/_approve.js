@@ -41,12 +41,14 @@ M.dataformfield__approve.init = function (Y, approvedicon, disapprovedicon) {
                 data: params,
                 on: {
                     success: function (id, o) {
-                        if (o.responseText === 'true' && e.target.get('src') === approvedicon) {
+                        if (o.responseText === 'true' && e.target.hasClass('approved')) {
+                            e.target.toggleClass('approved');
                             e.target.set('src', disapprovedicon);
                             e.target.set('alt', 'approve');
                             e.target.set('title', 'approve');
                             params.action = 'approve';
-                        } else if (o.responseText === 'true' && e.target.get('src') === disapprovedicon) {
+                        } else if (o.responseText === 'true' && !e.target.hasClass('approved')) {
+                            e.target.toggleClass('approved');
                             e.target.set('src', approvedicon);
                             e.target.set('alt', 'disapprove');
                             e.target.set('title', 'disapprove');

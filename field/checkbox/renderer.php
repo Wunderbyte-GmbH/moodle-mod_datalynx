@@ -77,6 +77,34 @@ class dataformfield_checkbox_renderer extends dataformfield_multiselect_renderer
     /**
      *
      */
+    public function display_search(&$mform, $i = 0, $value = '') {
+        $field = $this->_field;
+        $fieldid = $field->id();
+
+        if (is_array($value)){
+            $selected     = $value['selected'];
+            $allrequired = $value['allrequired'] ? 'checked = "checked"' : '';
+        } else {
+            $selected     = array();
+            $allrequired = '';
+        }
+
+        $options = $field->options_menu();
+
+        $fieldname = "f_{$i}_$fieldid";
+        list($elem, $separators) = $this->render($mform, $fieldname, $options, $selected);
+        $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
+
+        $allreq = &$mform->createElement('checkbox', "{$fieldname}_allreq", null, ucfirst(get_string('requiredall', 'dataform')));
+        $mform->setDefault("{$fieldname}_allreq", $allrequired);
+        $mform->disabledIf("{$fieldname}_allreq", "searchoperator$i", 'eq', '');
+
+        return array($elem + array($allreq), $separators);
+    }
+
+    /**
+     *
+     */
     public function validate_data($entryid, $tags, $data) {
         $field = $this->_field;
         $fieldid = $field->id();

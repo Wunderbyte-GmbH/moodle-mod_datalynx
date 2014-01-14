@@ -188,7 +188,7 @@ class dataformfield_multiselect_renderer extends dataformfield_renderer {
         $mform->setDefault("{$fieldname}_allreq", $allrequired);
         $mform->disabledIf("{$fieldname}_allreq", "searchoperator$i", 'eq', '');
         
-        return array(array_merge($elem, $allreq), $separators);
+        return array(array($elem, $allreq), $separators);
     }
 
     /**

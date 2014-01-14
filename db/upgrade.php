@@ -535,10 +535,15 @@ function xmldb_dataform_upgrade($oldversion) {
     if ($oldversion < 2014010701) {
         $query = "UPDATE {dataform_views} dv
                      SET dv.type = 'grid',
-                         dv.section = CONCAT(dv.section, dv.param4, '##entries##', dv.param5),
-                         dv.param4 = '',
-                         dv.param5 = ''
-                   WHERE dv.type = 'extgrid'";
+                         dv.section = CASE
+                                          WHEN dv.param4 IS NULL AND dv.param5 IS NULL THEN CONCAT(dv.section, '##entries##')
+                                          WHEN dv.param4 IS NOT NULL AND dv.param5 IS NULL THEN CONCAT(dv.section, dv.param4, '##entries##')
+                                          WHEN dv.param4 IS NULL AND dv.param5 IS NOT NULL THEN CONCAT(dv.section, '##entries##', dv.param5)
+                                          ELSE CONCAT(dv.section, dv.param4, '##entries##', dv.param5)
+                                      END,
+                         dv.param4 = NULL,
+                         dv.param5 = NULL
+                   WHERE dv.type = 'gridext'";
         $DB->execute($query);
 
         // Dataform savepoint reached.

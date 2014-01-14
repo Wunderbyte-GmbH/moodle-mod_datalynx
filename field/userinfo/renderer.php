@@ -71,19 +71,20 @@ class dataformfield_userinfo_renderer extends dataformfield_renderer {
 
         if (isset($entry->{"c{$fieldid}_content"})) {
             $content = $entry->{"c{$fieldid}_content"};
-
-            $params = array(
-                'disabled' => "disabled",
-                'type' => "checkbox",
-                'name' => $fieldname,
-            );
-            if (intval($content) === 1) {
-                $params['checked'] = 'checked';
-            }
-            return html_writer::empty_tag('input', $params);
+        } else {
+            global $USER, $DB;
+            $content = $DB->get_field('user_info_data', 'data', array('userid' => $USER->id, 'fieldid' => $field->infoid));
         }
 
-        return '';
+        $params = array(
+            'disabled' => "disabled",
+            'type' => "checkbox",
+            'name' => $fieldname,
+        );
+        if (intval($content) === 1) {
+            $params['checked'] = 'checked';
+        }
+        return html_writer::empty_tag('input', $params);
     }
 
     /**
@@ -95,18 +96,21 @@ class dataformfield_userinfo_renderer extends dataformfield_renderer {
 
         if (isset($entry->{"c{$fieldid}_content"})) {
             $content = $entry->{"c{$fieldid}_content"};
+        } else {
+            global $USER, $DB;
+            $content = $DB->get_field('user_info_data', 'data', array('userid' => $USER->id, 'fieldid' => $field->infoid));
+        }
 
-            // Check if time was specified
-            if (!empty($field->field->param8)) {
-                $format = get_string('strftimedaydatetime', 'langconfig');
-            } else {
-                $format = get_string('strftimedate', 'langconfig');
-            }
+        // Check if time was specified
+        if (!empty($field->field->param8)) {
+            $format = get_string('strftimedaydatetime', 'langconfig');
+        } else {
+            $format = get_string('strftimedate', 'langconfig');
+        }
 
-            // Check if a date has been specified
-            if (!empty($content)) {
-                return userdate($content, $format);
-            }
+        // Check if a date has been specified
+        if (!empty($content)) {
+            return userdate($content, $format);
         }
 
         return '';
@@ -119,15 +123,18 @@ class dataformfield_userinfo_renderer extends dataformfield_renderer {
         $field = $this->_field;
         $fieldid = $field->id();
 
-        if (!isset($entry->{"c{$fieldid}_content"})) {
-            return '';
+        if (isset($entry->{"c{$fieldid}_content"})) {
+            $content = $entry->{"c{$fieldid}_content"};
+        } else {
+            global $USER, $DB;
+            $content = $DB->get_field('user_info_data', 'data', array('userid' => $USER->id, 'fieldid' => $field->infoid));
         }
-        
-        if (!$content = $entry->{"c{$fieldid}_content"}) {
+
+        if (!$content) {
             return '';
         }
 
-        $options = new object();
+        $options = new stdClass();
         $options->para = false;
         $format = FORMAT_MOODLE;
         if (!$str = format_text($content, $format, $options)) {
@@ -146,7 +153,7 @@ class dataformfield_userinfo_renderer extends dataformfield_renderer {
             /// Create the link
             $str = html_writer::link(
                 str_replace('$$', urlencode($str), $this->field->param9),
-                htmlspecialchars($data),
+                htmlspecialchars($this->field->content),
                 $attributes
             );
         }
@@ -166,9 +173,14 @@ class dataformfield_userinfo_renderer extends dataformfield_renderer {
                 $format = isset($entry->{"c{$fieldid}_content1"}) ? $entry->{"c{$fieldid}_content1"} : FORMAT_PLAIN;
                 return format_text($content, $format, array('overflowdiv'=>true));
             }
+        } else {
+            global $USER, $DB;
+            $content = $DB->get_field('user_info_data', 'data', array('userid' => $USER->id, 'fieldid' => $field->infoid));
+            $format = FORMAT_PLAIN;
+            return format_text($content, $format, array('overflowdiv'=>true));
         }
 
-        return $str;
+        return '';
     }
 
     /**

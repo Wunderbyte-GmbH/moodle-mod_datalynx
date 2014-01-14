@@ -1181,7 +1181,11 @@ class dataform_filter_manager {
                             continue;
                         }
                         list($not, $op, $value) = $options;
-                        $searchvalue = is_array($value) ? implode('|', $value) : $value;
+                        if (is_array($value) && isset($value['selected'])) {
+                            $searchvalue = is_array($value['selected']) ? implode('|', $value['selected']) : $value['selected'];
+                        } else {
+                            $searchvalue = is_array($value) ? implode('|', $value) : $value;
+                        }
                         $usearch[] = "$fieldid:$key:$not,$op,$searchvalue";
                     }
                 }
