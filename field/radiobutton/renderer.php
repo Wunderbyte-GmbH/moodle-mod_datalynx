@@ -49,57 +49,10 @@ class dataformfield_radiobutton_renderer extends dataformfield_select_renderer {
     /**
      *
      */
-    public function display_edit(&$mform, $entry, array $options = null) {
-        $field = $this->_field;
-        $fieldid = $field->id();
-        $entryid = $entry->id;
-        $fieldname = "field_{$fieldid}_$entryid";
-        $menuoptions = $field->options_menu();
-        $required = !empty($options['required']);
-
-        $content = !empty($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : null;
-
-        if ($entryid > 0 and $content){
-            $selected = explode('#', $content);
-        } else {
-            $selected = array();
-        }
-
-        // check for default values
-        if (!$selected and $field->get('param2')) {
-            //$selected = $field->default_values();
-        }
-
-        list($elem, $separators) = $this->render($mform, "{$fieldname}", $menuoptions, $selected, $required);
-        // Add group or element
-        if (is_array($elem)) {
-            $mform->addGroup($elem, "{$fieldname}_grp",null, $separators, false);
-        } else {
-            $mform->addElement($elem);
-        }
-
-        if ($required) {
-            $this->set_required($mform, $fieldname, $selected);
-        }
-
-        // Input field for adding a new option
-        if (!empty($options['addnew'])) {
-            if ($field->get('param4') or has_capability('mod/dataform:managetemplates', $field->df()->context)) {
-                $mform->addElement('text', "{$fieldname}_newvalue", get_string('newvalue', 'dataform'));
-                $mform->setType("{$fieldname}_newvalue", PARAM_TEXT);
-                $mform->disabledIf("{$fieldname}_newvalue", "{$fieldname}_selected", 'neq', 0);
-            }
-            return;
-        }
-    }
-
-    /**
-     *
-     */
     protected function set_required(&$mform, $fieldname, $selected) {
         global $PAGE;
-        
-        $mform->addRule("{$fieldname}_grp", null, 'required', null, 'client');
+        list($label, $fieldid, $entryid,) = explode('_', $fieldname);
+        $mform->addRule("{$label}_{$fieldid}_{$entryid}_grp", null, 'required', null, 'client');
         // JS Error message
         $options = array(
             'fieldname' => $fieldname,
