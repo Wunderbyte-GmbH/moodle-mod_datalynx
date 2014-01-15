@@ -656,10 +656,10 @@ $string['messageprovider:dataform_memberadded'] = 'Team membership status change
 $string['messageprovider:dataform_memberremoved'] = 'Team membership status change';
 $string['message_memberadded'] = 'Dear {$a->fullname},
 
-you have been added to {$a->fieldname} by {$a->senderprofilelink}. Please go to {$a->dataformlink} for more details.';
+you have been added to {$a->fieldname} by {$a->senderprofilelink}. Please go to {$a->dataformbaselink} for more details.';
 $string['message_memberremoved'] = 'Dear {$a->fullname},
 
-you have been removed from {$a->fieldname} by {$a->senderprofilelink}. Please go to {$a->dataformlink} for more details.';
+you have been removed from {$a->fieldname} by {$a->senderprofilelink}. Please go to {$a->dataformbaselink} for more details.';
 $string['noentries'] = 'There are no entries to display.';
 $string['nosuchentries'] = 'No entries available.';
 $string['nomatchingentries'] = 'No entries matching the selected filter exist.';

@@ -1752,6 +1752,7 @@ class dataform {
 
         $data->coursename = $this->course->shortname;
         $data->dataformname = $this->name();
+        $data->dataformbaselink = html_writer::link($data->view->get_df()->get_baseurl(), $data->dataformname);
         $data->dataformlink = html_writer::link($data->view->get_baseurl(), $data->dataformname);
         $data->sender = $USER;
         $data->senderprofilelink = html_writer::link(new moodle_url('/user/profile.php', array('id' => $USER->id)), fullname($USER));
@@ -1761,6 +1762,13 @@ class dataform {
         $data->notificationformat = $this->data->notificationformat;
         $data->viewid = $this->data->singleview ? $this->data->singleview : $this->data->defaultview;
         events_trigger("dataform_$event", $data);
+    }
+
+    public function get_baseurl() {
+        // base url params
+        $baseurlparams = array();
+        $baseurlparams['d'] = $this->id();
+        return new moodle_url("/mod/dataform/{$this->pagefile()}.php", $baseurlparams);
     }
     
     /**
