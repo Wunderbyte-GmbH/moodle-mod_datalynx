@@ -663,7 +663,7 @@ you have been removed from {$a->fieldname} by {$a->senderprofilelink}. Please go
 $string['noentries'] = 'There are no entries to display.';
 $string['nosuchentries'] = 'No entries available.';
 $string['nomatchingentries'] = 'No entries matching the selected filter exist.';
-$string['nopermission'] = 'You don not have the permission to view specified entries.';
+$string['nopermission'] = 'You do not have the permission to view specified entries.';
 $string['dataform:notifymemberadded'] = 'Inform users about being added as a team member';
 $string['dataform:notifymemberremoved'] = 'Inform users about being removed as a team member';
 $string['dataform:viewprivilegeadmin'] = 'Administrator view access privilege';
