@@ -667,6 +667,7 @@ class dataformview_base {
             }
         }
 
+        $new = optional_param('new', 0, PARAM_INT);
         // print view
         $viewname = 'dataformview-'. str_replace(' ', '_', $this->name());
         if (strpos($this->view->esection, '##entries##') !== false) {
@@ -682,7 +683,7 @@ class dataformview_base {
                 $entryoptions = $options;
                 $entryoptions['tohtml'] = 1;
                 $entryhtml = $this->display_entries($entryoptions);
-                if ($entryhtml) {
+                if ($entryhtml && ($this->_entries->get_count() || $new)) {
                     $html .= $entryhtml;
                 } else {
                     $html .= $this->display_no_entries($fieldview);
@@ -703,7 +704,7 @@ class dataformview_base {
                 $entryoptions = $options;
                 $entryoptions['tohtml'] = 1;
                 $entryhtml = $this->display_entries($entryoptions);
-                if ($entryhtml) {
+                if ($entryhtml && ($this->_entries->get_count() || $new)) {
                     echo $entryhtml;
                 } else {
                     echo $this->display_no_entries();
@@ -733,13 +734,15 @@ class dataformview_base {
             list($insql, $params) = $DB->get_in_or_equal($this->_filter->eids, SQL_PARAMS_NAMED);
             if (!$DB->record_exists_select('dataform_entries', "id $insql", $params)) {
                 $output = $OUTPUT->notification(get_string('nosuchentries', 'dataform'));
+                $url = new moodle_url($this->_baseurl, array('filter' => 0));
+                $output .= str_replace(get_string('continue'),
+                    get_string('resetsettings', 'dataform'),
+                    $OUTPUT->continue_button($url));
             } else {
-                $output = $OUTPUT->notification(get_string('nopermission', 'dataform'));
+                $output = $OUTPUT->notification(get_string('nopermission', 'dataform')) .
+                          $OUTPUT->continue_button($this->_df->get_baseurl());
             }
-            $url = new moodle_url($this->_baseurl, array('filter' => 0));
-            $output .= str_replace(get_string('continue'),
-                get_string('resetsettings', 'dataform'),
-                $OUTPUT->continue_button($url));
+
         } else { // there are no entries in this dataform
             $output = $OUTPUT->notification(get_string('noentries', 'dataform'));
         }

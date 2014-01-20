@@ -51,8 +51,8 @@ class dataformfield_radiobutton_renderer extends dataformfield_select_renderer {
      */
     protected function set_required(&$mform, $fieldname, $selected) {
         global $PAGE;
-        
-        $mform->addRule("{$fieldname}_grp", null, 'required', null, 'client');
+        list($label, $fieldid, $entryid,) = explode('_', $fieldname);
+        $mform->addRule("{$label}_{$fieldid}_{$entryid}_grp", null, 'required', null, 'client');
         // JS Error message
         $options = array(
             'fieldname' => $fieldname,
