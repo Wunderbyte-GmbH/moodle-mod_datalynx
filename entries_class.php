@@ -80,7 +80,7 @@ class dataform_entries {
         if (!empty($entriesset->entries) and $rules = $rm->get_rules_by_plugintype('entrycontent')) {
             foreach ($rules as $rule) {
                 if ($rule->is_enabled()) {
-                    $entriesset->entries = $rule->apply($entriesset->entries);
+                    $entriesset->entries = $rule->trigger($entriesset->entries);
                 }
             }
         }

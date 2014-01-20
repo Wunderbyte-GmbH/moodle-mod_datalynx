@@ -15,7 +15,7 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package dataformrule
+ * @package dataform_rule
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -23,7 +23,7 @@
 require_once('../../../config.php');
 require_once("$CFG->dirroot/mod/dataform/mod_class.php");
 
-$urlparams = new object();
+$urlparams = new stdClass();
 $urlparams->d          = required_param('d', PARAM_INT);    // dataform ID
 
 $urlparams->type       = optional_param('type','' ,PARAM_ALPHA);   // type of a rule to edit
@@ -54,13 +54,13 @@ if ($mform->is_cancelled()){
 } else if ($data = $mform->get_data()) { 
 
    // add new rule
-    if (!$rule->id()) {
+    if (!$rule->get_id()) {
         $rule->insert_rule($data);
         add_to_log($df->course->id, 'dataform', 'rules add', 'rule_edit.php?d='. $df->id(), '', $df->cm->id);
 
     // update rule
     } else {
-        $data->id = $rule->id();
+        $data->id = $rule->get_id();
         $rule->update_rule($data);
         add_to_log($df->course->id, 'dataform', 'rules update', 'rule/index.php?d='. $df->id(). '&amp;id=', $urlparams->rid, $df->cm->id);
     }
@@ -79,7 +79,7 @@ navigation_node::override_active_url(new moodle_url('/mod/dataform/rule/index.ph
 // print header
 $df->print_header(array('tab' => 'rules', 'nonotifications' => true, 'urlparams' => $urlparams));
 
-$formheading = $rule->id() ? get_string('ruleedit', 'dataform', $rule->name()) : get_string('rulenew', 'dataform', $rule->typename());
+$formheading = $rule->get_id() ? get_string('ruleedit', 'dataform', $rule->get_name()) : get_string('rulenew', 'dataform', $rule->typename());
 echo html_writer::tag('h2', format_string($formheading), array('class' => 'mdl-align'));
 
 // display form

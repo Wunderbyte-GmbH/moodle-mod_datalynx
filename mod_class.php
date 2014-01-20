@@ -31,13 +31,6 @@
  */
 class dataform {
 
-    const NOTIFICATION_ENTRY_ADDED = 1;
-    const NOTIFICATION_ENTRY_UPDATED = 2;
-    const NOTIFICATION_ENTRY_DELETED = 4;
-    const NOTIFICATION_COMMENT_ADDED = 8;
-    const NOTIFICATION_MEMBER_ADDED = 16;
-    const NOTIFICATION_MEMBER_REMOVED = 32;
-
     const COUNT_ALL = 0;
     const COUNT_APPROVED = 1;
     const COUNT_UNAPPROVED = 2;
@@ -175,7 +168,7 @@ class dataform {
         // set rules manager
         if (!$this->_rulemanager) { 
             require_once('rule/rule_manager.php');
-            $this->_rulemanager = new dataformrule_manager($this);
+            $this->_rulemanager = new dataform_rule_manager($this);
         }
         return $this->_rulemanager;
     }
@@ -1723,44 +1716,15 @@ class dataform {
      * 
      */
     public function events_trigger($event, $data) {
-        global $USER;
-
-        $users = array();
-        // Get capability users if notifications for the event are enabled
-        $notificationtypes = self::get_notification_types();
-        if ($event == 'memberadded' || $event == 'memberremoved') {
-            // skip this step
-        } else if ($this->data->notification & $notificationtypes[$event]) {
-            $capability = "mod/dataform:notify$event";
-            $users = get_users_by_capability($this->context, $capability, 'u.id,u.email,u.auth,u.suspended,u.deleted,u.lastaccess,u.emailstop');
-            // Get event notificataion rule users
-            $rm = $this->get_rule_manager();
-            if ($rules = $rm->get_rules_by_plugintype('eventnotification')) {
-                foreach ($rules as $rule) {
-                    if ($rule->is_enabled() and in_array($event, $rule->get_selected_events())) {
-                        $users = array_merge($users, $rule->get_recipient_users($event, $data->items));
-                    }
-                }
-            }
-
-            if (empty($users)) {
-                return;
-            }
-
-            $data->users = $users;
-        }
-
+        $data->df = $this;
         $data->coursename = $this->course->shortname;
         $data->dataformname = $this->name();
         $data->dataformbaselink = html_writer::link($data->view->get_df()->get_baseurl(), $data->dataformname);
         $data->dataformlink = html_writer::link($data->view->get_baseurl(), $data->dataformname);
-        $data->sender = $USER;
-        $data->senderprofilelink = html_writer::link(new moodle_url('/user/profile.php', array('id' => $USER->id)), fullname($USER));
         $data->context = $this->context->id;
         $data->event = $event;
         $data->notification = 1;
-        $data->notificationformat = $this->data->notificationformat;
-        $data->viewid = $this->data->singleview ? $this->data->singleview : $this->data->defaultview;
+        $data->notificationformat = 1;
         events_trigger("dataform_$event", $data);
     }
 
@@ -1769,17 +1733,5 @@ class dataform {
         $baseurlparams = array();
         $baseurlparams['d'] = $this->id();
         return new moodle_url("/mod/dataform/{$this->pagefile()}.php", $baseurlparams);
-    }
-    
-    /**
-     * 
-     */
-    public static function get_notification_types() {
-        return array(
-            'entryadded' => self::NOTIFICATION_ENTRY_ADDED,
-            'entryupdated' => self::NOTIFICATION_ENTRY_UPDATED,
-            'entrydeleted' => self::NOTIFICATION_ENTRY_DELETED,
-            'commentadded' => self::NOTIFICATION_COMMENT_ADDED,
-        );
     }
 }

@@ -15,7 +15,7 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformrule
+ * @package dataform_rule
  * @copyright 2013 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -23,10 +23,9 @@
 /**
  * Rule manager class
  */
-class dataformrule_manager {
+class dataform_rule_manager {
 
     protected $_df;
-    protected $_predefinedrules;
     protected $_customrules;
 
     /**
@@ -34,30 +33,7 @@ class dataformrule_manager {
      */
     public function __construct($df) {
         $this->_df = $df;
-        $this->_predefinedrules = array();
         $this->_customrules = array();
-    }
-
-    /**
-     * initialize the predefined rules
-     */
-    protected function get_predefined_rules() {
-        if (!$this->_predefinedrules) {
-            $dataid = $this->_df->id();
-
-            // Notification rules
-            $notifyrules = array(
-                array('owner', 'entry', 'entryadded'),
-                array('owner', 'entry', 'entryupdated'),
-                array('owner', 'entry', 'entrydeleted'),
-                array('owner', 'entry', 'entryapproved'),
-                array('owner', 'entry', 'entrydisapproved')
-            );
-        }
-        //$rule = array('dataid' => $dataid, 'type' => '_entry', 'name' => get_string('entry', 'dataform'), //'description' => '', 'visible' => 2, 'predefinedname' => '');
-        //$this->_predefinedrules[self::_ENTRY] = $this->get_rule($rule);
-
-        return $this->_predefinedrules;
     }
 
     /**
@@ -85,11 +61,12 @@ class dataformrule_manager {
     /**
      * given a rule type returns the rule object from get_rules
      * Initializes get_rules if necessary
+     * @return dataform_rule_base[]
      */
-    public function get_rules_by_plugintype($plugintype, $menu = false) {
+    public function get_rules_by_plugintype($type, $menu = false) {
         $typerules = array();
         foreach  ($this->get_rules() as $ruleid => $rule) {
-            if ($rule->plugintype() === $plugintype) {
+            if ($rule->get_type() === $type) {
                 if ($menu) {
                     $typerules[$ruleid] = $rule->name();
                 } else {
@@ -98,6 +75,22 @@ class dataformrule_manager {
             }
         }
         return $typerules;
+    }
+
+    /**
+     * @param string $plugintype
+     * @param string $eventname
+     * @param bool $enabledonly
+     * @return dataform_rule_base[]
+     */
+    public function get_rules_for_event($plugintype, $eventname, $enabledonly = true) {
+        $rules = array();
+        foreach  ($this->get_rules() as $ruleid => $rule) {
+            if ($rule->get_type() === $plugintype && $rule->is_triggered_by($eventname) && (!$enabledonly || $rule->is_enabled())) {
+                $rules[$ruleid] = $rule;
+            }
+        }
+        return $rules;
     }
 
     /**
@@ -128,7 +121,7 @@ class dataformrule_manager {
                 $key = 0;
             }
             require_once($type. '/rule_class.php');
-            $ruleclass = 'dataformrule_'. $type;
+            $ruleclass = 'dataform_rule_'. $type;
             $rule = new $ruleclass($this->_df, $key);
             return $rule;
         } else {
@@ -152,8 +145,7 @@ class dataformrule_manager {
             }
         }
 
-        // collate all rules
-        $rules = $this->_customrules + $this->get_predefined_rules();
+        $rules = $this->_customrules;
         if (empty($exclude) and !$menu) {
             return $rules;
         } else {
@@ -350,7 +342,7 @@ class dataformrule_manager {
                 continue;
             }
             
-            $rulename = html_writer::link(new moodle_url($editbaseurl, $linkparams + array('rid' => $ruleid)), $rule->name());
+            $rulename = html_writer::link(new moodle_url($editbaseurl, $linkparams + array('rid' => $ruleid)), $rule->get_name());
             $ruleedit = html_writer::link(new moodle_url($editbaseurl, $linkparams + array('rid' => $ruleid)), $OUTPUT->pix_icon('t/edit', $stredit));
             $ruleduplicate = html_writer::link(new moodle_url($actionbaseurl, $linkparams + array('duplicate' => $ruleid)), $OUTPUT->pix_icon('t/copy', $strduplicate));
             $ruledelete = html_writer::link(new moodle_url($actionbaseurl, $linkparams + array('delete' => $ruleid)), $OUTPUT->pix_icon('t/delete', $strdelete));

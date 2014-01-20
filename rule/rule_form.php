@@ -15,18 +15,16 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformrule
+ * @package dataform_rule
  * @copyright 2013 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die;
 
 require_once("$CFG->libdir/formslib.php");
+require_once('../event_class.php');
 
-/**
- *
- */
-class dataformrule_form extends moodleform {
+class dataform_rule_form extends moodleform {
     protected $_rule = null;
     protected $_df = null;
 
@@ -36,11 +34,9 @@ class dataformrule_form extends moodleform {
         
         parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
     }
-    
-    /**
-     *
-     */
-    function definition() {        
+
+    function definition() {
+        global $CFG;
         $mform = &$this->_form;
 
         // buttons
@@ -60,12 +56,21 @@ class dataformrule_form extends moodleform {
             $mform->setType('name', PARAM_TEXT);
             $mform->setType('description', PARAM_TEXT);
         } else {
-            $mform->setType('name', PARAM_CLEAN);
-            $mform->setType('description', PARAM_CLEAN);
+            $mform->setType('name', PARAM_RAW);
+            $mform->setType('description', PARAM_RAW);
         }
 
         // enabled
-        $mform->addElement('selectyesno', 'enabled', get_string('ruleenabled', 'dataform'));
+        $mform->addElement('advcheckbox', 'enabled', get_string('ruleenabled', 'dataform'), '', null, array(0, 1));
+
+        // events
+        $mform->addElement('header', 'eventsettings', get_string('eventsettings', 'dataform'));
+        $eventmenu = dataform_event_handler::get_event_data(true);
+        $eventgroup = array();
+        foreach ($eventmenu as $eventname => $eventlabel) {
+            $eventgroup[] =& $mform->createElement('checkbox', $eventname, null, $eventlabel);
+        }
+        $mform->addGroup($eventgroup, 'eventsgroup', get_string('triggeringevent', 'dataform'), '<br />', false);
 
         //-------------------------------------------------------------------------------
         $this->rule_definition();
@@ -75,15 +80,30 @@ class dataformrule_form extends moodleform {
         $this->add_action_buttons();
     }
 
-    /**
-     *
-     */
-    protected function rule_definition() {
-    }    
-    
-    /**
-     *
-     */
+    function set_data($data) {
+        $selectedevents = unserialize($data->param1);
+        if ($selectedevents) {
+            foreach ($selectedevents as $eventname) {
+                $data->$eventname = true;
+            }
+        }
+        parent::set_data($data);
+    }
+
+    function get_data($slashed = true) {
+        if ($data = parent::get_data($slashed)) {
+            $eventmenu = dataform_event_handler::get_event_data(true);
+            $selectedevents = array();
+            foreach (array_keys($eventmenu) as $eventname) {
+                if (isset($data->$eventname)) {
+                    $selectedevents[] = $eventname;
+                }
+            }
+            $data->param1 = serialize($selectedevents);
+        }
+        return $data;
+    }
+
     public function add_action_buttons($cancel = true, $submit = null){
         $mform = &$this->_form;
 
@@ -98,135 +118,13 @@ class dataformrule_form extends moodleform {
         $mform->closeHeaderBefore('buttonar');
     }
 
-    /**
-     *
-     */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
-        if ($this->_df->name_exists('rules', $data['name'], $this->_rule->id())) {
+        if ($this->_df->name_exists('rules', $data['name'], $this->_rule->get_id())) {
             $errors['name'] = get_string('invalidname','dataform', get_string('rule', 'dataform'));
         }
 
         return $errors;
     }
-
-    /**
-     *
-     */
-    protected function menu_roles_used_in_context() {
-        $roles = array(0 => get_string('choosedots'));    
-        foreach (get_roles_used_in_context($this->_df->context) as $roleid => $role) {
-            $roles[$roleid] = $role->name;
-        }
-        return $roles;
-    }
-}
-
-/**
- *
- */
-class dataformrule_notification_form extends dataformrule_form {
-
-    /**
-     *
-     */
-    function rule_definition() {
-
-        $mform = &$this->_form;
-        $rule = $this->_rule;
-
-        //-------------------------------------------------------------------------------
-        $mform->addElement('header', 'settingshdr', get_string('settings'));
-        
-        // notification type: email, message
-        $options = array(
-            $rule::SEND_MESSAGE => get_string('message', 'message'),
-            $rule::SEND_EMAIL => get_string('email', 'dataform'),
-        );
-        $mform->addElement('select', 'param1', get_string('type', 'dataform'), $options);
-        
-        // sender: author, manager
-        $options = array(
-            get_string('author', 'dataform'),
-            get_string('manager', 'role')
-        );
-        $mform->addElement('select', 'param2', get_string('from'), $options);
-        
-        // recipient (param3): author, admin, roles, custom: user, email address
-        $grp=array();
-        $grp[] = &$mform->createElement('advcheckbox', 'author', null, get_string('author', 'dataform'), null, array(0,1));
-        $grp[] = &$mform->createElement('advcheckbox', 'user', null, get_string('user'), null, array(0,2));
-        $grp[] = &$mform->createElement('select', 'param4', null, array('' => get_string('choosedots')));
-        $grp[] = &$mform->createElement('advcheckbox', 'role', null, get_string('role'), null, array(0,4));
-        $grp[] = &$mform->createElement('select', 'param5', null, $this->menu_roles_used_in_context());
-        $grp[] = &$mform->createElement('advcheckbox', 'admin', null, get_string('admin'), null, array(0,8));
-        $grp[] = &$mform->createElement('advcheckbox', 'email', null, get_string('email'), null, array(0,16));
-        $emailfield = $grp[] = &$mform->createElement('text', 'param6', null, array('size' => 32));
-        $emailfield->setType(PARAM_EMAIL);
-        $br = html_writer::empty_tag('br');
-        $sp = '   ';
-        $mform->addGroup($grp, 'recipientgrp', get_string('to'), array($br, $sp, $br, $sp, $br, $br, $sp), false);
-        $mform->disabledIf('param4', 'user', 'notchecked');
-        $mform->disabledIf('param5', 'roles', 'notchecked');
-        $mform->disabledIf('param6', 'email', 'notchecked');        
-    }
-
-    /**
-     *
-     */
-    function data_preprocessing(&$data){
-        if (!empty($data->param3)) {
-            $recipients = (int) $data->param3;
-            foreach ($this->get_recipients() as $recipient => $key) {
-                $data->$recipient = $recipients & $key;
-            }
-        }
-    }
-
-    /**
-     *
-     */
-    function set_data($data) {
-        $this->data_preprocessing($data);
-        parent::set_data($data);
-    }
-
-    /**
-     *
-     */
-    function get_data($slashed = true) {
-        if ($data = parent::get_data($slashed)) {
-            // set recipient
-            $recipients = 0;
-            foreach ($this->get_recipients() as $recipient => $key) {
-                $recipients = !empty($data->$recipient) ? $recipients | $data->$recipient : $recipients;
-            }
-
-            $data->param3 = $recipients;
-        }
-        return $data;
-    }   
-
-    /**
-     *
-     */
-    function get_recipients() {
-        return array(
-            'author' => 1,
-            'user' => 2,
-            'role' => 4,
-            'admin' => 8,
-            'email' => 16,
-        );
-    }
-}/**
- *
- */
-
-/**
- *
- */
-class dataformrule_entrycontent_form extends dataformrule_form {
-
 }

@@ -121,22 +121,6 @@ class mod_dataform_mod_form extends moodleform_mod {
         // entry rating
         $mform->addElement('modgrade', 'rating', get_string('rating', 'dataform'));
         $mform->setDefault('rating', 0);
-
-        // Notifications
-        //-------------------------------------------------------------------------------
-        // Types
-        $mform->addElement('header', 'notificationshdr', get_string('notifications'));
-        $grp=array();
-        foreach (dataform::get_notification_types() as $type => $key) {
-            $grp[] = &$mform->createElement('advcheckbox', $type, null, get_string("messageprovider:dataform_$type", 'dataform'), null, array(0,$key));
-        }
-        $mform->addGroup($grp, 'notificationgrp', get_string('notificationenable', 'dataform'), html_writer::empty_tag('br'), false);
-        // Format
-        $options = array(
-            FORMAT_HTML => get_string('formathtml'),
-            FORMAT_HTML => get_string('formatplain'),
-        );
-        $mform->addElement('select', 'notificationformat', get_string('format'), $options);
         
         // entry settings
         //-------------------------------------------------------------------------------
@@ -231,30 +215,10 @@ class mod_dataform_mod_form extends moodleform_mod {
     /**
      *
      */
-    function set_data($data) {
-        if (!empty($data->notification)) {
-            $notification = $data->notification;
-            foreach (dataform::get_notification_types() as $type => $key) {
-                $data->$type = $notification & $key;
-            }
-        }
-        parent::set_data($data);
-    }
-
-    /**
-     *
-     */
     function get_data($slashed = true) {
         if ($data = parent::get_data($slashed)) {
             if (!empty($data->timeinterval)) {
                 $data->timedue = $data->timeavailable + ($data->timeinterval * $data->intervalcount);
-            }
-            // Set notification
-            $data->notification = 0;
-            foreach (dataform::get_notification_types() as $type => $key) {
-                if (!empty($data->$type)) {
-                    $data->notification = $data->notification | $key;
-                }
             }
         }
         return $data;

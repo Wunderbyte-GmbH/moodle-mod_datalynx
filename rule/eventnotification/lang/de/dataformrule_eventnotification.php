@@ -16,21 +16,9 @@
  
 /**
  * @package dataformrule
- * @subpackage entryaction
- * @copyright 2012 Itamar Tzadok
+ * @subpackage eventnotification
+ * @copyright 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-require_once("$CFG->dirroot/mod/dataform/rule/rule_class.php");
-
-class dataform_rule_entryaction extends dataform_rule_base {
-    public $type = 'entryaction';
-       
-    /**
-     * Update content and process entryaction
-     */
-    public function apply_rule($mode, $entry) {
-        return true;
-    }
-
-}
+$string['event'] = 'Dataform Ereignis';
+$string['pluginname'] = 'Ereignisbenachrichtigung';

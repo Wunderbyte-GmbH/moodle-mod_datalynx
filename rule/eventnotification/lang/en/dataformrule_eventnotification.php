@@ -20,13 +20,5 @@
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-$string['entryadded'] = 'Entry added';
-$string['entryupdated'] = 'Entry updated';
-$string['entrydeleted'] = 'Entry deleted';
-$string['entryapproved'] = 'Entry approved';
-$string['entrydisapproved'] = 'Entry disapproved';
-$string['commentadded'] = 'Comment added';
-$string['ratingadded'] = 'Rating added';
-$string['ratingdeleted'] = 'Rating deleted';
 $string['event'] = 'Dataform event';
 $string['pluginname'] = 'Event notification';
