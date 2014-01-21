@@ -50,7 +50,7 @@ class dataform_rule_eventnotification_form extends dataform_rule_form {
     }
 
     protected function menu_roles_used_in_context() {
-        $roles = array(); // 0 => 'Manager', 1 => 'Teacher', 2 => 'Student', 3 => 'Guest');
+        $roles = array();
         foreach (get_roles_used_in_context($this->_df->context) as $roleid => $role) {
             $roles[$roleid] = $role->coursealias ? $role->coursealias : $role->name;
         }

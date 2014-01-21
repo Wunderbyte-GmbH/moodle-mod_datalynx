@@ -329,7 +329,31 @@ $capabilities = array(
             'editingteacher' => CAP_ALLOW,
         )
     ),
-    
+
+    // Notified on approved entry
+    'mod/dataform:notifyentryapproved' => array(
+
+        'riskbitmask' => RISK_PERSONAL,
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+        )
+    ),
+
+    // Notified on disapproved entry
+    'mod/dataform:notifyentrydisapproved' => array(
+
+        'riskbitmask' => RISK_PERSONAL,
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+        )
+    ),
+
     // Notified on added comment
     'mod/dataform:notifycommentadded' => array(
 

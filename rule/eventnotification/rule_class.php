@@ -75,11 +75,6 @@ class dataform_rule_eventnotification extends dataform_rule_base {
         $data->dataformname = !empty($data->dataformname) ? $data->dataformname : 'Unspecified dataform';
         $data->dataformbaselink = html_writer::link($data->url, $data->dataformname);
         $data->dataformlink = html_writer::link($data->view->get_baseurl(), $data->dataformname);
-        $entryurl = new moodle_url($data->view->get_baseurl());
-        if ($event != 'delete') {
-            $entryurl->params(array('eids' => implode(array_keys($data->items), ',')));
-        }
-        $data->viewlink = html_writer::link($entryurl, get_string('linktoentry', 'dataform'));
         $data->entryid = implode(array_keys($data->items), ',');
 
         $notename = get_string("messageprovider:dataform_$event", 'dataform');
@@ -97,6 +92,11 @@ class dataform_rule_eventnotification extends dataform_rule_base {
         $message->notification = 1;
 
         foreach ($data->items as $entry) {
+            $entryurl = new moodle_url($data->view->get_baseurl());
+            if ($event != 'delete') {
+                $entryurl->params(array('eids' => $entry->id));
+            }
+            $data->viewlink = html_writer::link($entryurl, get_string('linktoentry', 'dataform'));
             $message->userfrom = $data->userfrom = $this->get_sender_for_entry($entry);
             $data->senderprofilelink = html_writer::link(new moodle_url('/user/profile.php', array('id' => $data->userfrom->id)), fullname($data->userfrom));
             foreach ($this->get_recipients_for_entry($entry) as $userid) {

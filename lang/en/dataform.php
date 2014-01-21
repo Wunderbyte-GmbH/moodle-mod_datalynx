@@ -325,6 +325,18 @@ the content in {$a->dataformlink} has been modified by {$a->senderprofilelink}.
 
 The following entry has been deleted: {$a->entryid}.';
 
+$string['message_entryapproved'] = 'Hello {$a->fullname},
+
+the content in {$a->dataformlink} has been approved by {$a->senderprofilelink}.
+
+The following entry has been approved: {$a->viewlink}.';
+
+$string['message_entrydisapproved'] = 'Hello {$a->fullname},
+
+the content in {$a->dataformlink} has been modified by {$a->senderprofilelink}.
+
+The following entry has been disapproved: {$a->viewlink}.';
+
 $string['message_commentadded'] = 'Dataform comment added';
 $string['message_ratingadded'] = 'Dataform rating added';
 $string['message_ratingupdated'] = 'Dataform rating updated';
@@ -333,6 +345,8 @@ $string['message_ratingupdated'] = 'Dataform rating updated';
 $string['messageprovider:dataform_entryadded'] = 'Dataform entry added';
 $string['messageprovider:dataform_entryupdated'] = 'Dataform entry updated';
 $string['messageprovider:dataform_entrydeleted'] = 'Dataform entry deleted';
+$string['messageprovider:dataform_entryapproved'] = 'Dataform entry approved';
+$string['messageprovider:dataform_entrydisapproved'] = 'Dataform entry disapproved';
 $string['messageprovider:dataform_commentadded'] = 'Dataform comment added';
 $string['messageprovider:dataform_ratingadded'] = 'Dataform rating added';
 $string['messageprovider:dataform_ratingupdated'] = 'Dataform rating updated';

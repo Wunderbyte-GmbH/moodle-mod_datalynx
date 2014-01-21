@@ -300,6 +300,21 @@ $string['message_entrydeleted'] =
 
 Folgender Eintrag wurde gelöscht: {$a->entryid}.';
 
+$string['message_entryapproved'] =
+'Guten Tag {$a->fullname},
+
+{$a->dataformlink} wurde von {$a->senderprofilelink} bearbeitet.
+
+Folgender Eintrag wurde zugelassen: {$a->viewlink}.';
+
+
+$string['message_entrydisapproved'] =
+'Guten Tag {$a->fullname},
+
+{$a->dataformlink} wurde von {$a->senderprofilelink} bearbeitet.
+
+Folgender Eintrag wurde abgelehnt: {$a->viewlink}.';
+
 $string['message_commentadded'] = 'Dataform Kommentar hinzugefügt';
 $string['message_ratingadded'] = 'Dataform Bewertung hinzugefügt';
 $string['message_ratingupdated'] = 'Dataform Bewertung aktualisiert';
@@ -308,6 +323,8 @@ $string['message_ratingupdated'] = 'Dataform Bewertung aktualisiert';
 $string['messageprovider:dataform_entryadded'] = 'Dataform Eintrag hinzugefügt';
 $string['messageprovider:dataform_entryupdated'] = 'Dataform Eintrag aktualisiert';
 $string['messageprovider:dataform_entrydeleted'] = 'Dataform Eintrag gelöscht';
+$string['messageprovider:dataform_entryapproved'] = 'Dataform Eintrag zugelassen';
+$string['messageprovider:dataform_entrydisapproved'] = 'Dataform Eintrag abgelehnt';
 $string['messageprovider:dataform_commentadded'] = 'Dataform Kommentar hinzugefügt';
 $string['messageprovider:dataform_ratingadded'] = 'Dataform Bewertung hinzugefügt';
 $string['messageprovider:dataform_ratingupdated'] = 'Dataform Bewertung aktualisiert';

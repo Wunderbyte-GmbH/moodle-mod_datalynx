@@ -582,7 +582,6 @@ class dataform_entries {
                                 $eventdata = (object) array('view' => $this->_view, 'items' => $processed);
                                 $df->events_trigger("entry$addorupdate", $eventdata);
                             }
-
                         }
                         break;
 
@@ -640,7 +639,7 @@ class dataform_entries {
 
                         if ($processed) {
                             $eventdata = (object) array('view' => $this->_view, 'items' => $processed);
-                            $df->events_trigger("entryupdated", $eventdata);
+                            $df->events_trigger("entryapproved", $eventdata);
                         }
 
                         $strnotify = 'entriesapproved';
@@ -655,7 +654,7 @@ class dataform_entries {
                         $processed = $entries;
                         if ($processed) {
                             $eventdata = (object) array('view' => $this->_view, 'items' => $processed);
-                            $df->events_trigger("entryupdated", $eventdata);
+                            $df->events_trigger("entrydisapproved", $eventdata);
                         }
 
                         $strnotify = 'entriesdisapproved';
