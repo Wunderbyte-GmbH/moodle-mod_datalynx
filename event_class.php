@@ -112,10 +112,61 @@ class dataform_event_handler {
 
     public static function handle_memberadded(stdClass $data) {
         self::trigger_rules($data, 'dataform_memberadded');
+        self::notify_team_members($data, 'memberadded');
     }
 
     public static function handle_memberremoved(stdClass $data) {
         self::trigger_rules($data, 'dataform_memberremoved');
+        self::notify_team_members($data, 'memberremoved');
     }
 
+    private static function notify_team_members(stdClass $data, $event) {
+        global $CFG, $SITE, $USER;
+
+        $df = $data->df;
+        $data->event = $event;
+
+        $data->dataforms = get_string('modulenameplural', 'dataform');
+        $data->dataform = get_string('modulename', 'dataform');
+        $data->activity = format_string($df->name(), true);
+        $data->url = "$CFG->wwwroot/mod/dataform/view.php?d=" . $df->id();
+
+        // Prepare message
+        $strdataform = get_string('pluginname', 'dataform');
+        $sitename = format_string($SITE->fullname);
+        $data->siteurl = $CFG->wwwroot;
+        $data->coursename = !empty($data->coursename) ? $data->coursename : 'Unspecified course';
+        $data->dataformname = !empty($data->dataformname) ? $data->dataformname : 'Unspecified dataform';
+        $data->dataformbaselink = html_writer::link($data->url, $data->dataformname);
+        $data->dataformlink = html_writer::link($data->view->get_baseurl(), $data->dataformname);
+        $entryurl = new moodle_url($data->view->get_baseurl());
+        $data->viewlink = html_writer::link($entryurl, get_string('linktoentry', 'dataform'));
+        $data->entryid = implode(array_keys($data->items), ',');
+
+        $notename = get_string("messageprovider:dataform_$event", 'dataform');
+        $subject = "$sitename -> $data->coursename -> $strdataform $data->dataformname:  $notename";
+
+        // prepare message object
+        $message = new stdClass();
+        $message->siteshortname   = format_string($SITE->shortname);
+        $message->component       = 'mod_dataform';
+        $message->name            = "dataform_$event";
+        $message->context         = $data->context;
+        $message->subject         = $subject;
+        $message->fullmessageformat = $data->notificationformat;
+        $message->smallmessage    = '';
+        $message->notification = 1;
+        $message->userfrom = $data->userfrom = $USER;
+        $data->senderprofilelink = html_writer::link(new moodle_url('/user/profile.php', array('id' => $data->userfrom->id)), fullname($data->userfrom));
+        foreach ($data->users as $user) {
+            $message->userto = $user;
+            $data->fullname = fullname($user);
+            $notedetails = get_string("message_$event", 'dataform', $data);
+            $contenthtml = text_to_html($notedetails, false, false, true);
+            $content = html_to_text($notedetails);
+            $message->fullmessage = $content;
+            $message->fullmessagehtml = $contenthtml;
+            message_send($message);
+        }
+    }
 }
