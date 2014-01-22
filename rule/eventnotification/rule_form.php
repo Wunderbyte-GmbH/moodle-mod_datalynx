@@ -74,7 +74,7 @@ class dataform_rule_eventnotification_form extends dataform_rule_form {
                 $recipients['author'] = 1;
             }
 
-            if (isset($data->rolesenable)) {
+            if (isset($data->roles)) {
                 $recipients['roles'] = $data->roles;
             }
             $data->param3 = serialize($recipients);
