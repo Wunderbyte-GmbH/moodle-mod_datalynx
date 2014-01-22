@@ -695,3 +695,5 @@ $string['dataform_ratingupdated'] = 'Rating updated';
 $string['dataform_ratingdeleted'] = 'Rating deleted';
 $string['dataform_memberadded'] = 'Team member added';
 $string['dataform_memberremoved'] = 'Team member removed';
+$string['blankfilter'] = 'Blank filter';
+$string['defaultfilterlabel'] = 'Default filter ({$a})';

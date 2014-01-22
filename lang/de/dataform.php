@@ -670,3 +670,5 @@ $string['nopermission'] = 'Sie haben keine Genehmigung, um diese Einträge anzus
 $string['dataform:notifymemberadded'] = 'Nutzer benachrichtigen, wenn sie einem Team hinzugefügt werden';
 $string['dataform:notifymemberremoved'] = 'Nutzer benachrichtigen, wenn sie von einem Team entfernt werden';
 $string['dataform:viewprivilegeadmin'] = 'Administratorzugriffsrecht auf Ansichten';
+$string['blankfilter'] = 'Leerer Filter';
+$string['defaultfilterlabel'] = 'Voreingestellter Filter ({$a})';
