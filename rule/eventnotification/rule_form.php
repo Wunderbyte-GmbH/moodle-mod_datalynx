@@ -21,9 +21,9 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once("$CFG->dirroot/mod/dataform/rule/rule_form.php");
+HTML_QuickForm::registerElementType('checkboxgroup', "$CFG->dirroot/mod/dataform/checkboxgroup/checkboxgroup.php", 'HTML_QuickForm_checkboxgroup');
 
 class dataform_rule_eventnotification_form extends dataform_rule_form {
-
     function rule_definition() {
         $br = html_writer::empty_tag('br');
         $sp = '    ';
@@ -42,11 +42,9 @@ class dataform_rule_eventnotification_form extends dataform_rule_form {
         // recipient
         $grp = array();
         $grp[] = &$mform->createElement('checkbox', 'author', null, get_string('author', 'dataform'), null);
-        $grp[] = &$mform->createElement('checkbox', 'rolesenable', null, get_string('roles'), null);
-        $select = $grp[] = &$mform->createElement('select', 'roles', get_string('roles'), $this->menu_roles_used_in_context());
-        $select->setMultiple(true);
-        $mform->addGroup($grp, 'recipientgrp', get_string('to'), array($br, $sp), false);
-        $mform->disabledIf('roles', 'rolesenable', 'notchecked');
+        $grp[] = &$mform->createElement('static', 'rolesheader', '', get_string('roles'));
+        $grp[] = &$mform->createElement('checkboxgroup', 'roles', get_string('roles'), $this->menu_roles_used_in_context(), '<br/>');
+        $mform->addGroup($grp, 'recipientgrp', get_string('to'), $br, false);
     }
 
     protected function menu_roles_used_in_context() {
@@ -64,7 +62,6 @@ class dataform_rule_eventnotification_form extends dataform_rule_form {
         }
         if (isset($recipients['roles'])) {
             $data->roles = $recipients['roles'];
-            $data->rolesenable = 1;
         }
         parent::set_data($data);
     }
