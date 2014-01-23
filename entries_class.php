@@ -519,7 +519,6 @@ class dataform_entries {
                             );
 
                             $skipnotification = array();
-                            $notifyall = array();
 
                             // Iterate the data and extract entry and fields content
                             foreach ($data as $name => $value) {
@@ -550,6 +549,33 @@ class dataform_entries {
                                     }
                                 }
                             }
+
+                            $firstentryid = min(array_keys($contents));
+                            $bulkeditfields = array();
+                            foreach ($contents[$firstentryid]['fields'] as $fieldid => $value) {
+                                if (optional_param("field_{$fieldid}_bulkedit", 0, PARAM_BOOL)) {
+                                    $bulkeditfields[] = $fieldid;
+                                }
+                            }
+                            $newcontents = array();
+                            foreach ($contents as $entryid => $oldcontent) {
+                                $newcontents[$entryid] = array();
+                                if ($entryid != $firstentryid) {
+                                    $newcontents[$entryid]['info'] = $oldcontent['info'];
+                                    $newfields = array();
+                                    foreach ($oldcontent['fields'] as $fieldid => $value) {
+                                        if (array_search($fieldid, $bulkeditfields) !== false) {
+                                            $newfields[$fieldid] = $contents[$firstentryid]['fields'][$fieldid];
+                                        } else {
+                                            $newfields[$fieldid] = $oldcontent['fields'][$fieldid];
+                                        }
+                                    }
+                                    $newcontents[$entryid]['fields'] = $newfields;
+                                } else {
+                                    $newcontents[$entryid] = $oldcontent;
+                                }
+                            }
+                            $contents = $newcontents;
 
                             global $DB;
                             // now update entry and contents

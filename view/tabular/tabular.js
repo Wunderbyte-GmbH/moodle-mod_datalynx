@@ -41,36 +41,5 @@ M.dataformview_tabular.init = function(Y) {
             this.set('disabled', (checkbox.get('checked') ? 'disabled' : null ));
         });
     });
-
-    var editedelement;
-    var mform = Y.one('#mform1');
-    if (mform) {
-        mform.on('submit', function () {
-            var editedentries = Y.one('[name="update"]').get('value').split(',');
-            editedentries.splice(editedentries.indexOf(firstentryid), 1);
-
-            Y.all('input[type="checkbox"][name$="bulkedit"]:checked').each(function (checkbox) {
-                var fieldid = checkbox.get('name').split('_')[1];
-                Y.all('[name^="field_' + fieldid + '"]').set('disabled', null);
-
-                Y.all('[name^="field_' + fieldid + '_' + firstentryid + '"]').each(function (field) {
-                    for (var i = 0; i < editedentries.length; i++) {
-                        var entryid = editedentries[i];
-                        editedelement = Y.one('[name^="' + field.get('name').replace(fieldid + '_' + firstentryid, fieldid + '_' + entryid) + '"]');
-                        editedelement.set('value', field.get('value'));
-                        editedelement.set('selected', field.get('selected'));
-                        editedelement.all('option').set('selected', false);
-                        console.log(field.all('option[selected]'));
-                        field.all('option[selected]').each(select_option);
-                        editedelement.set('checked', field.get('checked'));
-                    }
-                });
-            });
-        });
-    }
-
-    function select_option(selectedoption) {
-        editedelement.one('option[value="' + selectedoption.get('value') + '"]').set('selected', true);
-    }
-};
+}
 
