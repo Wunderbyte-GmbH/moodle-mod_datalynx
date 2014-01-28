@@ -519,6 +519,7 @@ class dataform_entries {
                             );
 
                             $skipnotification = array();
+                            $drafttofinal = array();
 
                             // Iterate the data and extract entry and fields content
                             foreach ($data as $name => $value) {
@@ -541,6 +542,12 @@ class dataform_entries {
                                         if ($fieldid == dataformfield__status::_STATUS && $value == dataformfield__status::STATUS_DRAFT) {
                                             $skipnotification[] = $entryid;
                                         }
+                                        if ($fieldid == dataformfield__status::_STATUS &&
+                                            $value == dataformfield__status::STATUS_FINAL_SUBMISSION &&
+                                            $entry->status == dataformfield__status::STATUS_DRAFT) {
+                                            $drafttofinal[] = $entryid;
+                                        }
+
                                         $contents[$entryid]['info'][$entryvar] = $value;
 
                                     // Entry content
@@ -585,15 +592,17 @@ class dataform_entries {
                                 if ($entry->id = $this->update_entry($entry, $contents[$eid]['info'])) {
                                     // $eid should be different from $entryid only in new entries
                                     foreach ($contents[$eid]['fields'] as $fieldid => $content) {
-                                        if (array_search($fieldid, $teamfieldid) !== false) {
-                                            $oldcontent = json_decode($DB->get_field('dataform_contents', 'content',
-                                                                array('fieldid' => $fieldid,
-                                                                      'entryid' => $entryid)), true);
+                                        if (array_search($fieldid, $teamfieldid) !== false && array_search($eid, $skipnotification) === false) {
+                                                if (array_search($eid, $drafttofinal) !== false) {
+                                                $oldcontent = array();
+                                            } else {
+                                                $oldcontent = json_decode($DB->get_field('dataform_contents', 'content',
+                                                                          array('fieldid' => $fieldid,
+                                                                                'entryid' => $entryid)), true);
+                                            }
                                             $newcontent = $content[''];
                                             $field = $DB->get_record('dataform_fields', array('id' => $fieldid));
-                                            if (array_search($eid, $skipnotification) === false) {
-                                                $this->notify_team_members($entry, $field, $oldcontent, $newcontent);
-                                            }
+                                            $this->notify_team_members($entry, $field, $oldcontent, $newcontent);
                                         }
                                         $fields[$fieldid]->update_content($entry, $content);
                                     }
