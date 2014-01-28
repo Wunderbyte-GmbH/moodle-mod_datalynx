@@ -800,7 +800,7 @@ class dataform_entries {
             $removedmembers = array();
         }
 
-        $eventdata = array('items' => array($entry),
+        $eventdata = array('items' => array($entry->id => $entry),
                            'view' => $this->_view,
                            'fieldname' => $field->name);
 

@@ -139,9 +139,16 @@ class dataform_event_handler {
         $data->dataformname = !empty($data->dataformname) ? $data->dataformname : 'Unspecified dataform';
         $data->dataformbaselink = html_writer::link($data->url, $data->dataformname);
         $data->dataformlink = html_writer::link($data->view->get_baseurl(), $data->dataformname);
-        $entryurl = new moodle_url($data->view->get_baseurl());
-        $data->viewlink = html_writer::link($entryurl, get_string('linktoentry', 'dataform'));
         $data->entryid = implode(array_keys($data->items), ',');
+
+        if ($df->data->singleview) {
+            $entryurl = new moodle_url($data->url, array('view' => $df->data->singleview, 'eids' => $data->entryid));
+        } else if ($df->data->defaultview) {
+            $entryurl = new moodle_url($data->url, array('view' => $df->data->singleview, 'eids' => $data->entryid));
+        } else {
+            $entryurl = new moodle_url($data->url);
+        }
+        $data->viewlink = html_writer::link($entryurl, get_string('linktoentry', 'dataform'));
 
         $notename = get_string("messageprovider:dataform_$event", 'dataform');
         $subject = "$sitename -> $data->coursename -> $strdataform $data->dataformname:  $notename";
