@@ -544,6 +544,7 @@ class dataform_entries {
                                         }
                                         if ($fieldid == dataformfield__status::_STATUS &&
                                             $value == dataformfield__status::STATUS_FINAL_SUBMISSION &&
+                                            isset($entry->status) &&
                                             $entry->status == dataformfield__status::STATUS_DRAFT) {
                                             $drafttofinal[] = $entryid;
                                         }
