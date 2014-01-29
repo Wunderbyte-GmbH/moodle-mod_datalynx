@@ -571,10 +571,10 @@ class dataform_entries {
                                 if ($entryid != $firstentryid) {
                                     $newcontents[$entryid]['info'] = $oldcontent['info'];
                                     $newfields = array();
-                                    foreach ($oldcontent['fields'] as $fieldid => $value) {
+                                    foreach ($contents[$firstentryid]['fields'] as $fieldid => $value) {
                                         if (array_search($fieldid, $bulkeditfields) !== false) {
                                             $newfields[$fieldid] = $contents[$firstentryid]['fields'][$fieldid];
-                                        } else {
+                                        } else if (isset($oldcontent['fields'][$fieldid])) {
                                             $newfields[$fieldid] = $oldcontent['fields'][$fieldid];
                                         }
                                     }
