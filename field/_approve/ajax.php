@@ -63,7 +63,7 @@ if ($action == 'approve') {
 } else if ($action == 'disapprove') {
     $DB->set_field('dataform_entries', 'approved', 0, array('id' => $entryid));
     $return = $DB->get_field('dataform_entries', 'approved', array('id' => $entryid)) == 0;
-    $processed = array($DB->get_record('dataform_entries', array('id' => $entryid)));
+    $processed = array($entryid => $DB->get_record('dataform_entries', array('id' => $entryid)));
     if ($processed) {
         $eventdata = (object) array('view' => $df->get_view_from_id($viewid), 'items' => $processed);
         $df->events_trigger("entrydisapproved", $eventdata);

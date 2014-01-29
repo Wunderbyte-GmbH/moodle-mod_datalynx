@@ -60,12 +60,13 @@ class dataform_rule_eventnotification extends dataform_rule_base {
             return true;
         }
 
+        $df = $data->df;
         $event = $data->event;
 
         $data->dataforms = get_string('modulenameplural', 'dataform');
         $data->dataform = get_string('modulename', 'dataform');
-        $data->activity = format_string($this->df()->name(), true);
-        $data->url = "$CFG->wwwroot/mod/dataform/view.php?d=" . $this->df()->id();
+        $data->activity = format_string($df->name(), true);
+        $data->url = "$CFG->wwwroot/mod/dataform/view.php?d=" . $df->id();
 
         // Prepare message
         $strdataform = get_string('pluginname', 'dataform');
@@ -73,10 +74,15 @@ class dataform_rule_eventnotification extends dataform_rule_base {
         $data->siteurl = $CFG->wwwroot;
         $data->coursename = !empty($data->coursename) ? $data->coursename : 'Unspecified course';
         $data->dataformname = !empty($data->dataformname) ? $data->dataformname : 'Unspecified dataform';
-        $data->dataformbaselink = html_writer::link($data->url, $data->dataformname);
-        $data->dataformlink = html_writer::link($data->view->get_baseurl(), $data->dataformname);
         $data->entryid = implode(array_keys($data->items), ',');
 
+        if ($df->data->singleview) {
+            $entryurl = new moodle_url($data->url, array('view' => $df->data->singleview, 'eids' => $data->entryid));
+        } else if ($df->data->defaultview) {
+            $entryurl = new moodle_url($data->url, array('view' => $df->data->defaultview, 'eids' => $data->entryid));
+        } else {
+            $entryurl = new moodle_url($data->url);
+        }
         $notename = get_string("messageprovider:dataform_$event", 'dataform');
         $subject = "$sitename -> $data->coursename -> $strdataform $data->dataformname:  $notename";
 
@@ -92,10 +98,6 @@ class dataform_rule_eventnotification extends dataform_rule_base {
         $message->notification = 1;
 
         foreach ($data->items as $entry) {
-            $entryurl = new moodle_url($data->view->get_baseurl());
-            if ($event != 'delete') {
-                $entryurl->params(array('eids' => $entry->id));
-            }
             $data->viewlink = html_writer::link($entryurl, get_string('linktoentry', 'dataform'));
             $message->userfrom = $data->userfrom = $this->get_sender_for_entry($entry);
             $data->senderprofilelink = html_writer::link(new moodle_url('/user/profile.php', array('id' => $data->userfrom->id)), fullname($data->userfrom));

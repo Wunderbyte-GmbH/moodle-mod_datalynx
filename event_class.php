@@ -137,14 +137,12 @@ class dataform_event_handler {
         $data->siteurl = $CFG->wwwroot;
         $data->coursename = !empty($data->coursename) ? $data->coursename : 'Unspecified course';
         $data->dataformname = !empty($data->dataformname) ? $data->dataformname : 'Unspecified dataform';
-        $data->dataformbaselink = html_writer::link($data->url, $data->dataformname);
-        $data->dataformlink = html_writer::link($data->view->get_baseurl(), $data->dataformname);
         $data->entryid = implode(array_keys($data->items), ',');
 
         if ($df->data->singleview) {
             $entryurl = new moodle_url($data->url, array('view' => $df->data->singleview, 'eids' => $data->entryid));
         } else if ($df->data->defaultview) {
-            $entryurl = new moodle_url($data->url, array('view' => $df->data->singleview, 'eids' => $data->entryid));
+            $entryurl = new moodle_url($data->url, array('view' => $df->data->defaultview, 'eids' => $data->entryid));
         } else {
             $entryurl = new moodle_url($data->url);
         }
