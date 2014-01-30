@@ -50,7 +50,7 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
     protected function menu_roles_used_in_context() {
         $roles = array();
         foreach (get_roles_used_in_context($this->_df->context) as $roleid => $role) {
-            $roles[$roleid] = $role->coursealias ? $role->coursealias : $role->name;
+            $roles[$roleid] = $role->coursealias ? $role->coursealias : ($role->name ? $role->name : $role->shortname);
         }
         return $roles;
     }
