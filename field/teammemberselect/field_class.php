@@ -130,12 +130,6 @@ class dataformfield_teammemberselect extends dataformfield_base {
             echo $OUTPUT->notification('updating of field failed!');
             return false;
         }
-        $mask = dataform::NOTIFICATION_MEMBER_ADDED | dataform::NOTIFICATION_MEMBER_REMOVED;
-        if ($this->field->param6) {
-            $notification = $this->df->data->notification | $mask;
-        }
-        $DB->set_field('dataform', 'notification', $notification, array('id' => $this->df->id()));
-        $this->df->data->notification = $notification;
         return true;
     }
 

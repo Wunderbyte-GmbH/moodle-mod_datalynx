@@ -49,20 +49,25 @@ require_capability('mod/dataform:approve', $context);
 
 global $DB;
 $completiontype = COMPLETION_UNKNOWN;
+$df = new dataform($d);
 if ($action == 'approve') {
     $DB->set_field('dataform_entries', 'approved', 1, array('id' => $entryid));
-    $df = new dataform($d);
     $entriesclass = new dataform_entries($df);
     $processed = $entriesclass->create_approved_entries_for_team(array($entryid));
     if ($processed) {
         $eventdata = (object) array('view' => $df->get_view_from_id($viewid), 'items' => $processed);
-        $df->events_trigger("entryupdated", $eventdata);
+        $df->events_trigger("entryapproved", $eventdata);
     }
     $return = $DB->get_field('dataform_entries', 'approved', array('id' => $entryid)) == 1;
     $completiontype = COMPLETION_COMPLETE;
 } else if ($action == 'disapprove') {
     $DB->set_field('dataform_entries', 'approved', 0, array('id' => $entryid));
     $return = $DB->get_field('dataform_entries', 'approved', array('id' => $entryid)) == 0;
+    $processed = array($entryid => $DB->get_record('dataform_entries', array('id' => $entryid)));
+    if ($processed) {
+        $eventdata = (object) array('view' => $df->get_view_from_id($viewid), 'items' => $processed);
+        $df->events_trigger("entrydisapproved", $eventdata);
+    }
     $completiontype = COMPLETION_INCOMPLETE;
 } else {
     $return = false;

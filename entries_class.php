@@ -519,7 +519,7 @@ class dataform_entries {
                             );
 
                             $skipnotification = array();
-                            $notifyall = array();
+                            $drafttofinal = array();
 
                             // Iterate the data and extract entry and fields content
                             foreach ($data as $name => $value) {
@@ -542,6 +542,13 @@ class dataform_entries {
                                         if ($fieldid == dataformfield__status::_STATUS && $value == dataformfield__status::STATUS_DRAFT) {
                                             $skipnotification[] = $entryid;
                                         }
+                                        if ($fieldid == dataformfield__status::_STATUS &&
+                                            $value == dataformfield__status::STATUS_FINAL_SUBMISSION &&
+                                            isset($entry->status) &&
+                                            $entry->status == dataformfield__status::STATUS_DRAFT) {
+                                            $drafttofinal[] = $entryid;
+                                        }
+
                                         $contents[$entryid]['info'][$entryvar] = $value;
 
                                     // Entry content
@@ -551,6 +558,33 @@ class dataform_entries {
                                 }
                             }
 
+                            $firstentryid = min(array_keys($contents));
+                            $bulkeditfields = array();
+                            foreach ($contents[$firstentryid]['fields'] as $fieldid => $value) {
+                                if (optional_param("field_{$fieldid}_bulkedit", 0, PARAM_BOOL)) {
+                                    $bulkeditfields[] = $fieldid;
+                                }
+                            }
+                            $newcontents = array();
+                            foreach ($contents as $entryid => $oldcontent) {
+                                $newcontents[$entryid] = array();
+                                if ($entryid != $firstentryid) {
+                                    $newcontents[$entryid]['info'] = $oldcontent['info'];
+                                    $newfields = array();
+                                    foreach ($contents[$firstentryid]['fields'] as $fieldid => $value) {
+                                        if (array_search($fieldid, $bulkeditfields) !== false) {
+                                            $newfields[$fieldid] = $contents[$firstentryid]['fields'][$fieldid];
+                                        } else if (isset($oldcontent['fields'][$fieldid])) {
+                                            $newfields[$fieldid] = $oldcontent['fields'][$fieldid];
+                                        }
+                                    }
+                                    $newcontents[$entryid]['fields'] = $newfields;
+                                } else {
+                                    $newcontents[$entryid] = $oldcontent;
+                                }
+                            }
+                            $contents = $newcontents;
+
                             global $DB;
                             // now update entry and contents
                             $addorupdate = '';
@@ -559,15 +593,17 @@ class dataform_entries {
                                 if ($entry->id = $this->update_entry($entry, $contents[$eid]['info'])) {
                                     // $eid should be different from $entryid only in new entries
                                     foreach ($contents[$eid]['fields'] as $fieldid => $content) {
-                                        if (array_search($fieldid, $teamfieldid) !== false) {
-                                            $oldcontent = json_decode($DB->get_field('dataform_contents', 'content',
-                                                                array('fieldid' => $fieldid,
-                                                                      'entryid' => $entryid)), true);
+                                        if (array_search($fieldid, $teamfieldid) !== false && array_search($eid, $skipnotification) === false) {
+                                                if (array_search($eid, $drafttofinal) !== false) {
+                                                $oldcontent = array();
+                                            } else {
+                                                $oldcontent = json_decode($DB->get_field('dataform_contents', 'content',
+                                                                          array('fieldid' => $fieldid,
+                                                                                'entryid' => $entryid)), true);
+                                            }
                                             $newcontent = $content[''];
                                             $field = $DB->get_record('dataform_fields', array('id' => $fieldid));
-                                            if (array_search($eid, $skipnotification) === false) {
-                                                $this->notify_team_members($entry, $field, $oldcontent, $newcontent);
-                                            }
+                                            $this->notify_team_members($entry, $field, $oldcontent, $newcontent);
                                         }
                                         $fields[$fieldid]->update_content($entry, $content);
                                     }
@@ -582,7 +618,6 @@ class dataform_entries {
                                 $eventdata = (object) array('view' => $this->_view, 'items' => $processed);
                                 $df->events_trigger("entry$addorupdate", $eventdata);
                             }
-
                         }
                         break;
 
@@ -640,7 +675,7 @@ class dataform_entries {
 
                         if ($processed) {
                             $eventdata = (object) array('view' => $this->_view, 'items' => $processed);
-                            $df->events_trigger("entryupdated", $eventdata);
+                            $df->events_trigger("entryapproved", $eventdata);
                         }
 
                         $strnotify = 'entriesapproved';
@@ -655,7 +690,7 @@ class dataform_entries {
                         $processed = $entries;
                         if ($processed) {
                             $eventdata = (object) array('view' => $this->_view, 'items' => $processed);
-                            $df->events_trigger("entryupdated", $eventdata);
+                            $df->events_trigger("entrydisapproved", $eventdata);
                         }
 
                         $strnotify = 'entriesdisapproved';
@@ -766,7 +801,7 @@ class dataform_entries {
             $removedmembers = array();
         }
 
-        $eventdata = array('items' => array($entry),
+        $eventdata = array('items' => array($entry->id => $entry),
                            'view' => $this->_view,
                            'fieldname' => $field->name);
 

@@ -325,6 +325,18 @@ the content in {$a->dataformlink} has been modified by {$a->senderprofilelink}.
 
 The following entry has been deleted: {$a->entryid}.';
 
+$string['message_entryapproved'] = 'Hello {$a->fullname},
+
+the content in {$a->dataformlink} has been approved by {$a->senderprofilelink}.
+
+The following entry has been approved: {$a->viewlink}.';
+
+$string['message_entrydisapproved'] = 'Hello {$a->fullname},
+
+the content in {$a->dataformlink} has been modified by {$a->senderprofilelink}.
+
+The following entry has been disapproved: {$a->viewlink}.';
+
 $string['message_commentadded'] = 'Dataform comment added';
 $string['message_ratingadded'] = 'Dataform rating added';
 $string['message_ratingupdated'] = 'Dataform rating updated';
@@ -333,6 +345,8 @@ $string['message_ratingupdated'] = 'Dataform rating updated';
 $string['messageprovider:dataform_entryadded'] = 'Dataform entry added';
 $string['messageprovider:dataform_entryupdated'] = 'Dataform entry updated';
 $string['messageprovider:dataform_entrydeleted'] = 'Dataform entry deleted';
+$string['messageprovider:dataform_entryapproved'] = 'Dataform entry approved';
+$string['messageprovider:dataform_entrydisapproved'] = 'Dataform entry disapproved';
 $string['messageprovider:dataform_commentadded'] = 'Dataform comment added';
 $string['messageprovider:dataform_ratingadded'] = 'Dataform rating added';
 $string['messageprovider:dataform_ratingupdated'] = 'Dataform rating updated';
@@ -656,10 +670,10 @@ $string['messageprovider:dataform_memberadded'] = 'Team membership status change
 $string['messageprovider:dataform_memberremoved'] = 'Team membership status change';
 $string['message_memberadded'] = 'Dear {$a->fullname},
 
-you have been added to {$a->fieldname} by {$a->senderprofilelink}. Please go to {$a->dataformbaselink} for more details.';
+you have been added to {$a->fieldname} by {$a->senderprofilelink}. Please go to {$a->viewlink} for more details.';
 $string['message_memberremoved'] = 'Dear {$a->fullname},
 
-you have been removed from {$a->fieldname} by {$a->senderprofilelink}. Please go to {$a->dataformbaselink} for more details.';
+you have been removed from {$a->fieldname} by {$a->senderprofilelink}. Please go to {$a->viewlink} for more details.';
 $string['noentries'] = 'There are no entries to display.';
 $string['nosuchentries'] = 'No entries available.';
 $string['nomatchingentries'] = 'No entries matching the selected filter exist.';
@@ -681,3 +695,5 @@ $string['dataform_ratingupdated'] = 'Rating updated';
 $string['dataform_ratingdeleted'] = 'Rating deleted';
 $string['dataform_memberadded'] = 'Team member added';
 $string['dataform_memberremoved'] = 'Team member removed';
+$string['blankfilter'] = 'Blank filter';
+$string['defaultfilterlabel'] = 'Default filter ({$a})';

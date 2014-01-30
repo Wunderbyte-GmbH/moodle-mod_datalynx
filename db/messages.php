@@ -37,6 +37,14 @@ $messageproviders = array (
         'capability' => 'mod/dataform:notifyentrydeleted',
     ),
 
+    'dataform_entryapproved' => array (
+        'capability' => 'mod/dataform:notifyentryapproved',
+    ),
+
+    'dataform_entrydisapproved' => array (
+        'capability' => 'mod/dataform:notifyentrydisapproved',
+    ),
+
     'dataform_commentadded' => array (
         'capability' => 'mod/dataform:notifycommentadded',
     ),

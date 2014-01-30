@@ -242,18 +242,26 @@ if ($views) {
             $viewfilterid = $view->view->filter;
             if ($viewfilterid and !in_array($viewfilterid, array_keys($filtersmenu))) {
                 $viewfilter = html_writer::link(new moodle_url($actionbaseurl, $linkparams + array('setfilter' => $viewid, 'fid' => -1)), $OUTPUT->pix_icon('i/risk_xss', $strreset));
-            
             } else {
+                $blankfilteroption = array(-1 => get_string('blankfilter', 'dataform'));
+                if ($df->data->defaultfilter) {
+                    $defaultfilter = $df->get_filter_manager()->get_filter_from_id($df->data->defaultfilter);
+                    $defaultfiltername = $defaultfilter->name;
+                    $defaultfilteroption = array(0 => get_string('defaultfilterlabel', 'dataform', $defaultfiltername));
+                } else {
+                    $defaultfilteroption = array(0 => get_string('defaultfilterlabel', 'dataform', get_string('blankfilter', 'dataform')));
+                }
+
                 if ($viewfilterid) {
                     $selected = $viewfilterid;
-                    $options = array(-1 => '* '. get_string('reset')) + $filtersmenu;
                 } else {
-                    $selected = '';
-                    $options = $filtersmenu;
+                    $selected = 0;
                 }
-                
+
+                $options = $blankfilteroption + $defaultfilteroption + $filtersmenu;
+
                 $selecturl = new moodle_url($actionbaseurl, $linkparams + array('setfilter' => $viewid));
-                $viewselect = new single_select($selecturl, 'fid', $options, $selected, array('' => 'choosedots'));
+                $viewselect = new single_select($selecturl, 'fid', $options, $selected, array());
 
                 $viewfilter = $OUTPUT->render($viewselect);
             }
