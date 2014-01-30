@@ -15,19 +15,19 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage file
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once("$CFG->dirroot/mod/dataform/field/renderer.php");
+require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
  *
  */
-class dataformfield_file_renderer extends dataformfield_renderer {
+class datalynxfield_file_renderer extends datalynxfield_renderer {
 
     /**
      * 
@@ -111,7 +111,7 @@ class dataformfield_file_renderer extends dataformfield_renderer {
                             'accepted_types' => explode(',', $field->get('param3')));
 
         $draftitemid = file_get_submitted_draft_itemid("{$fieldname}_filemanager");
-        file_prepare_draft_area($draftitemid, $field->df()->context->id, 'mod_dataform', 'content', $contentid, $fmoptions);
+        file_prepare_draft_area($draftitemid, $field->df()->context->id, 'mod_datalynx', 'content', $contentid, $fmoptions);
 
         // file manager
         $mform->addElement('filemanager', "{$fieldname}_filemanager", null, null, $fmoptions);
@@ -123,12 +123,12 @@ class dataformfield_file_renderer extends dataformfield_renderer {
 
         // alt text
         //$altoptions = array();
-        //$mform->addElement('text', "{$fieldname}_alttext", get_string('alttext','dataformfield_file'), $altoptions);
+        //$mform->addElement('text', "{$fieldname}_alttext", get_string('alttext','datalynxfield_file'), $altoptions);
         //$mform->setDefault("{$fieldname}_alttext", s($content1));
 
         // delete (only for multiple files)
         //if ($field->get('param2') > 1) {
-        //    $mform->addElement('checkbox', "{$fieldname}_delete", get_string('clearcontent','dataformfield_file'));
+        //    $mform->addElement('checkbox', "{$fieldname}_delete", get_string('clearcontent','datalynxfield_file'));
         //}
     }
 
@@ -147,7 +147,7 @@ class dataformfield_file_renderer extends dataformfield_renderer {
         
         // get the file content
         $fs = get_file_storage();
-        $files = $fs->get_area_files($field->df()->context->id, 'mod_dataform', 'content', $contentid);
+        $files = $fs->get_area_files($field->df()->context->id, 'mod_datalynx', 'content', $contentid);
         if (!$files or !(count($files) > 1)) {
             return '';
         }
@@ -179,7 +179,7 @@ class dataformfield_file_renderer extends dataformfield_renderer {
 //        $options['forcehttps'] = false;
 //        $options['noclean'] = true;
 
-        $data = file_prepare_standard_editor($data, $fieldname, $options, $field->df()->context, 'mod_dataform', 'content', $contentid);
+        $data = file_prepare_standard_editor($data, $fieldname, $options, $field->df()->context, 'mod_datalynx', 'content', $contentid);
 
         $attr = array();
         //$attr['cols'] = !$field->get('param2') ? 40 : $field->get('param2');
@@ -214,7 +214,7 @@ class dataformfield_file_renderer extends dataformfield_renderer {
         }
 
         $fs = get_file_storage();
-        $files = $fs->get_area_files($field->df()->context->id, 'mod_dataform', 'content', $contentid);
+        $files = $fs->get_area_files($field->df()->context->id, 'mod_datalynx', 'content', $contentid);
         if (!$files or !(count($files) > 1)) {
             return '';
         }
@@ -231,7 +231,7 @@ class dataformfield_file_renderer extends dataformfield_renderer {
 
                 $filename = $file->get_filename();
                 $filenameinfo = pathinfo($filename);
-                $path = "/{$field->df()->context->id}/mod_dataform/content/$contentid";
+                $path = "/{$field->df()->context->id}/mod_datalynx/content/$contentid";
 
                 $strfiles[] = $this->display_file($file, $path, $altname, $params);
             }
@@ -285,7 +285,7 @@ class dataformfield_file_renderer extends dataformfield_renderer {
         );
         if (!empty($params['download'])) {
             list(,$context,,,$contentid) = explode('/', $path);
-            $url = new moodle_url("/mod/dataform/field/file/download.php", array('cid' => $contentid, 'context' => $context, 'file' => $filename));
+            $url = new moodle_url("/mod/datalynx/field/file/download.php", array('cid' => $contentid, 'context' => $context, 'file' => $filename));
         } else {
             $url = moodle_url::make_file_url('/pluginfile.php', "$path/$filename");
         }                

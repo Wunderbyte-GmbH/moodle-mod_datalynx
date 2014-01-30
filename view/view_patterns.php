@@ -15,7 +15,7 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package dataformview
+ * @package datalynxview
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -24,7 +24,7 @@ defined('MOODLE_INTERNAL') or die;
 /**
  * Base class for view patterns
  */
-class dataformview_patterns {
+class datalynxview_patterns {
 
     const PATTERN_SHOW_IN_MENU = 0;
     const PATTERN_CATEGORY = 1;
@@ -79,7 +79,7 @@ class dataformview_patterns {
                 if (!empty($pattern[self::PATTERN_CATEGORY])) {
                     $cat = $pattern[self::PATTERN_CATEGORY];
                 } else {
-                    $cat = get_string('views', 'dataform');
+                    $cat = get_string('views', 'datalynx');
                 }
                 // prepare array
                 if (!isset($patternsmenu[$cat])) {
@@ -151,7 +151,7 @@ class dataformview_patterns {
                 $baseurlparams['d'] = $view->dataid;
                 $baseurlparams['view'] = $view->id;
 
-                $view->baseurl = new moodle_url("/mod/dataform/{$this->_view->get_df()->pagefile()}.php", $baseurlparams);
+                $view->baseurl = new moodle_url("/mod/datalynx/{$this->_view->get_df()->pagefile()}.php", $baseurlparams);
             }
         }
 
@@ -216,7 +216,7 @@ class dataformview_patterns {
         }
         $params = array('userid' => $userid, 'dataid' => $df->id());
         $sql = "SELECT COUNT(1)
-                  FROM {dataform_entries} de
+                  FROM {datalynx_entries} de
                  WHERE de.userid = :userid
                    AND de.dataid = :dataid";
         $count = $DB->get_field_sql($sql, $params);
@@ -305,7 +305,7 @@ class dataformview_patterns {
         $baseurl->param('sesskey', sesskey());
 
         $showentryactions = (!empty($options['showentryactions'])
-                                or has_capability('mod/dataform:manageentries', $df->context));
+                                or has_capability('mod/datalynx:manageentries', $df->context));
         // TODO: move to a view attribute so as to call only once
         // Can this user registered or anonymous add entries
         $usercanaddentries = $view->get_df()->user_can_manage_entry();
@@ -322,13 +322,13 @@ class dataformview_patterns {
                         $baseurl->param('view', $df->data->singleedit);
                     }
                     $baseurl->param('new', 1);
-                    $label = html_writer::tag('span', get_string('entryaddnew', 'dataform'));
+                    $label = html_writer::tag('span', get_string('entryaddnew', 'datalynx'));
                     $replacement = html_writer::link($baseurl, $label, array('class' => 'addnewentry'));
                 } else {
                     $range = range(1, 20);
                     $options = array_combine($range, $range);
-                    $select = new single_select(new moodle_url($baseurl), 'new', $options, null, array(0 => get_string('dots', 'dataform')), 'newentries_jump');
-                    $select->set_label(get_string('entryaddmultinew','dataform'). '&nbsp;');
+                    $select = new single_select(new moodle_url($baseurl), 'new', $options, null, array(0 => get_string('dots', 'datalynx')), 'newentries_jump');
+                    $select->set_label(get_string('entryaddmultinew','datalynx'). '&nbsp;');
                     $replacement = $OUTPUT->render($select);
                 }
 
@@ -339,14 +339,14 @@ class dataformview_patterns {
                     html_writer::empty_tag('input',
                                             array('type' => 'button',
                                                     'name' => 'multiduplicate',
-                                                    'value' => get_string('multiduplicate', 'dataform'),
+                                                    'value' => get_string('multiduplicate', 'datalynx'),
                                                     'onclick' => 'bulk_action(\'entry\'&#44; \''. $baseurl->out(false). '\'&#44; \'duplicate\')'));
                 break;
 
             case '##multiduplicate:icon##':
                 if ($showentryactions) {
                     $replacement = html_writer::tag('button',
-                                $OUTPUT->pix_icon('t/copy', get_string('multiduplicate', 'dataform')),
+                                $OUTPUT->pix_icon('t/copy', get_string('multiduplicate', 'datalynx')),
                                 array('type' => 'button',
                                         'name' => 'multiduplicate',
                                         'onclick' => 'bulk_action(\'entry\'&#44; \''. $baseurl->out(false). '\'&#44; \'duplicate\')'));
@@ -358,7 +358,7 @@ class dataformview_patterns {
                     $replacement = html_writer::empty_tag('input',
                                             array('type' => 'button',
                                                     'name' => 'multiedit',
-                                                    'value' => get_string('multiedit', 'dataform'),
+                                                    'value' => get_string('multiedit', 'datalynx'),
                                                     'onclick' => 'bulk_action(\'entry\'&#44; \''. $baseurl->out(false). '\'&#44; \'editentries\')'));
                 }
                 break;
@@ -366,7 +366,7 @@ class dataformview_patterns {
             case '##multiedit:icon##':
                 if ($showentryactions) {
                     $replacement = html_writer::tag('button',
-                                $OUTPUT->pix_icon('t/edit', get_string('multiedit', 'dataform')),
+                                $OUTPUT->pix_icon('t/edit', get_string('multiedit', 'datalynx')),
                                 array('type' => 'button',
                                         'name' => 'multiedit',
                                         'onclick' => 'bulk_action(\'entry\'&#44; \''. $baseurl->out(false). '\'&#44; \'editentries\')'));
@@ -378,7 +378,7 @@ class dataformview_patterns {
                     $replacement = html_writer::empty_tag('input',
                                             array('type' => 'button',
                                                     'name' => 'multidelete',
-                                                    'value' => get_string('multidelete', 'dataform'),
+                                                    'value' => get_string('multidelete', 'datalynx'),
                                                     'onclick' => 'bulk_action(\'entry\'&#44; \''. $baseurl->out(false). '\'&#44; \'delete\')'));
                 }
                 break;
@@ -386,7 +386,7 @@ class dataformview_patterns {
             case '##multidelete:icon##':
                 if ($showentryactions) {
                     $replacement = html_writer::tag('button',
-                                $OUTPUT->pix_icon('t/delete', get_string('multidelete', 'dataform')),
+                                $OUTPUT->pix_icon('t/delete', get_string('multidelete', 'datalynx')),
                                 array('type' => 'button',
                                         'name' => 'multidelete',
                                         'onclick' => 'bulk_action(\'entry\'&#44; \''. $baseurl->out(false). '\'&#44; \'delete\')'));
@@ -395,18 +395,18 @@ class dataformview_patterns {
 
             case '##multiapprove##':
             case '##multiapprove:icon##':
-                if ($df->data->approval and has_capability('mod/dataform:approve', $df->context)) {
+                if ($df->data->approval and has_capability('mod/datalynx:approve', $df->context)) {
                     if ($tag == '##multiapprove##') {
                         $replacement =
                             html_writer::empty_tag('input',
                                                     array('type' => 'button',
                                                             'name' => 'multiapprove',
-                                                            'value' => get_string('multiapprove', 'dataform'),
+                                                            'value' => get_string('multiapprove', 'datalynx'),
                                                             'onclick' => 'bulk_action(\'entry\'&#44; \''. $baseurl->out(false). '\'&#44; \'approve\')'));
                     } else {
                         $replacement =
                             html_writer::tag('button',
-                                        $OUTPUT->pix_icon('i/tick_green_big', get_string('multiapprove', 'dataform')),
+                                        $OUTPUT->pix_icon('i/tick_green_big', get_string('multiapprove', 'datalynx')),
                                         array('type' => 'button',
                                                 'name' => 'multiapprove',
                                                 'onclick' => 'bulk_action(\'entry\'&#44; \''. $baseurl->out(false). '\'&#44; \'approve\')'));
@@ -415,9 +415,9 @@ class dataformview_patterns {
                 break;
 
             case '##multiexport##':
-                $buttonval = get_string('multiexport', 'dataform');
+                $buttonval = get_string('multiexport', 'datalynx');
             case '##multiexport:icon##':
-                $buttonval = !isset($buttonval) ? $OUTPUT->pix_icon('t/portfolioadd', get_string('multiexport', 'dataform')) : $buttonval;
+                $buttonval = !isset($buttonval) ? $OUTPUT->pix_icon('t/portfolioadd', get_string('multiexport', 'datalynx')) : $buttonval;
 
                 if (!empty($CFG->enableportfolios)) {
                     if (!empty($format)) {
@@ -470,7 +470,7 @@ class dataformview_patterns {
             // Remove eids so that we return to list
             $url->remove_params('eids');
             // Make the link
-            $pagingbar = html_writer::link($url->out(false), get_string('viewreturntolist', 'dataform'));
+            $pagingbar = html_writer::link($url->out(false), get_string('viewreturntolist', 'datalynx'));
 
         // typical groupby, one group per page case. show paging bar as per number of groups
         } else if (isset($filter->pagenum)) {
@@ -582,7 +582,7 @@ class dataformview_patterns {
      *
      */
     protected function info_patterns() {
-        $cat = get_string('entries', 'dataform');
+        $cat = get_string('entries', 'datalynx');
         $patterns = array(
             '##numentriestotal##' => array(true, $cat),
             '##numentriesdisplayed##' => array(true, $cat),
@@ -594,7 +594,7 @@ class dataformview_patterns {
      *
      */
     protected function ref_patterns() {
-        $cat = get_string('reference', 'dataform');
+        $cat = get_string('reference', 'datalynx');
         $patterns = array(
             '##viewurl##' => array(true, $cat),
             '##viewsmenu##' => array(true, $cat),
@@ -622,7 +622,7 @@ class dataformview_patterns {
      *
      */
     protected function userpref_patterns() {
-        $cat = get_string('userpref', 'dataform');
+        $cat = get_string('userpref', 'datalynx');
         $patterns = array(
             '##quicksearch##' => array(true, $cat),
             '##quickperpage##' => array(true, $cat),
@@ -635,7 +635,7 @@ class dataformview_patterns {
      *
      */
     protected function action_patterns() {
-        $cat = get_string('generalactions', 'dataform');
+        $cat = get_string('generalactions', 'datalynx');
         $patterns = array(
             '##addnewentry##' => array(true, $cat),
             '##addnewentries##' => array(true, $cat),
@@ -661,7 +661,7 @@ class dataformview_patterns {
      *
      */
     protected function paging_patterns() {
-        $cat = get_string('pagingbar', 'dataform');
+        $cat = get_string('pagingbar', 'datalynx');
         $patterns = array(
             '##pagingbar##' => array(true, $cat),
         );
@@ -680,7 +680,7 @@ class dataformview_patterns {
         // Get list of views
         if ($views = $df->get_views_menu()) {
             // View link
-            $cat = get_string('reference', 'dataform');
+            $cat = get_string('reference', 'datalynx');
             foreach ($views as $viewname) {
                 $viewname = preg_quote($viewname, '/');
                 $patterns["#{{viewlink:$viewname;[^;]*;[^;]*;}}#"] = array(true, $cat);
@@ -697,7 +697,7 @@ class dataformview_patterns {
         $patterns = array();
 
         $fields = $df->get_fields(null, true);
-        $cat = get_string('reference', 'dataform');
+        $cat = get_string('reference', 'datalynx');
         foreach ($fields as $fieldname) {
             $fieldname = preg_quote($fieldname, '/');
             $patterns["%%{$fieldname}:bulkedit%%"] = array(true, $cat);
@@ -762,7 +762,7 @@ class dataformview_patterns {
             $baseurlparams = array('d' => $df->id(),
                                     'sesskey' => sesskey());
             $viewselect = new single_select(new moodle_url($baseurl, $baseurlparams), 'view', $menuviews, $view->id(), array(''=>'choosedots'), 'viewbrowse_jump');
-            $viewselect->set_label(get_string('viewcurrent','dataform'). '&nbsp;');
+            $viewselect->set_label(get_string('viewcurrent','datalynx'). '&nbsp;');
             $viewjump = $OUTPUT->render($viewselect);
         }
 
@@ -792,7 +792,7 @@ class dataformview_patterns {
                 $menufilters = array();
             }
             if ($userfilters = $fm->get_user_filters_menu($view->id())) {
-                $menufilters[] = array(get_string('filtermy', 'dataform') => $userfilters);
+                $menufilters[] = array(get_string('filtermy', 'datalynx') => $userfilters);
             }
             
             $baseurl = $baseurl->out_omit_querystring();
@@ -800,12 +800,12 @@ class dataformview_patterns {
                                     'sesskey' => sesskey(),
                                     'view' => $view->id());
             //if ($filter->id) {
-            //    $menufilters[0] = get_string('filtercancel', 'dataform');
+            //    $menufilters[0] = get_string('filtercancel', 'datalynx');
             //}
 
             // Display the filter form jump list
             $filterselect = new single_select(new moodle_url($baseurl, $baseurlparams), 'filter', $menufilters, $filter->id, array(''=>'choosedots'), 'filterbrowse_jump');
-            $filterselect->set_label(get_string('filtercurrent','dataform'). '&nbsp;');
+            $filterselect->set_label(get_string('filtercurrent','datalynx'). '&nbsp;');
             $filterjump = $OUTPUT->render($filterselect);
         }
         
@@ -832,7 +832,7 @@ class dataformview_patterns {
         $baseurlparams = array('d' => $df->id(),
                                 'sesskey' => sesskey(),
                                 'view' => $view->id(),
-                                'filter' => dataform_filter_manager::USER_FILTER_SET);
+                                'filter' => datalynx_filter_manager::USER_FILTER_SET);
 
         if ($filter->id < 0 and $filter->search) {
             $searchvalue = $filter->search;
@@ -887,7 +887,7 @@ class dataformview_patterns {
         $baseurlparams = array('d' => $df->id(),
                                 'sesskey' => sesskey(),
                                 'view' => $view->id(),
-                                'filter' => dataform_filter_manager::USER_FILTER_SET);
+                                'filter' => datalynx_filter_manager::USER_FILTER_SET);
 
         if ($filter->id < 0 and $filter->perpage) {
             $perpagevalue = $filter->perpage;
@@ -900,7 +900,7 @@ class dataformview_patterns {
 
         // Display the view form jump list
         $select = new single_select(new moodle_url($baseurl, $baseurlparams), 'uperpage', $perpage, $perpagevalue, array(''=>'choosedots'), 'perpage_jump');
-        $select->set_label(get_string('filterperpage','dataform'). '&nbsp;');
+        $select->set_label(get_string('filterperpage','datalynx'). '&nbsp;');
         $perpagejump = $OUTPUT->render($select);
 
         if ($return) {

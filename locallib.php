@@ -16,24 +16,24 @@
 
 /**
  * @package mod
- * @subpackage dataform
+ * @subpackage datalynx
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * The Dataform has been developed as an enhanced counterpart
+ * The Datalynx has been developed as an enhanced counterpart
  * of Moodle's Database activity module (1.9.11+ (20110323)).
- * To the extent that Dataform code corresponds to Database code,
+ * To the extent that Datalynx code corresponds to Database code,
  * certain copyrights on the Database module may obtain.
  */
 
 require_once("$CFG->libdir/portfolio/caller.php");
-require_once("$CFG->dirroot/mod/dataform/mod_class.php");
+require_once("$CFG->dirroot/mod/datalynx/mod_class.php");
 require_once($CFG->libdir . '/filelib.php');
 
 /**
- * The class to handle entry exports of a dataform module
+ * The class to handle entry exports of a datalynx module
  */
-class dataform_portfolio_caller extends portfolio_module_caller_base {
+class datalynx_portfolio_caller extends portfolio_module_caller_base {
 
     const CONTENT_NOFILES = 0;
     const CONTENT_WITHFILES = 1;
@@ -58,7 +58,7 @@ class dataform_portfolio_caller extends portfolio_module_caller_base {
      *  @return string
      */
     public static function display_name() {
-        return get_string('modulename', 'dataform');
+        return get_string('modulename', 'datalynx');
     }
 
     /**
@@ -79,8 +79,8 @@ class dataform_portfolio_caller extends portfolio_module_caller_base {
      * @global object $DB
      */
     public function load_data() {        
-        if (!$this->cm = get_coursemodule_from_id('dataform', $this->id)) {
-            throw new portfolio_caller_exception('invalidid', 'dataform');
+        if (!$this->cm = get_coursemodule_from_id('datalynx', $this->id)) {
+            throw new portfolio_caller_exception('invalidid', 'datalynx');
         }
     }
 
@@ -123,7 +123,7 @@ class dataform_portfolio_caller extends portfolio_module_caller_base {
      */
     public function prepare_package() {
         // set the exported view content
-        $df = new dataform(null, $this->id);
+        $df = new datalynx(null, $this->id);
         $view = $df->get_view_from_id($this->vid);
         $view->set_filter(array('filterid' => $this->fid, 'eids' => $this->eids));
         $view->set_content();
@@ -195,7 +195,7 @@ class dataform_portfolio_caller extends portfolio_module_caller_base {
         // spreadsheet selection
         $types = array('csv', 'ods', 'xls');
         $options = array_combine($types, $types); 
-        $mform->addElement('select', 'caller_spreadsheettype', get_string('spreadsheettype', 'dataform'), $options);
+        $mform->addElement('select', 'caller_spreadsheettype', get_string('spreadsheettype', 'datalynx'), $options);
         $mform->setDefault('caller_spreadsheettype', 'csv');
         $mform->disabledIf('caller_spreadsheettype', 'format', 'neq', PORTFOLIO_FORMAT_SPREADSHEET);
 
@@ -203,20 +203,20 @@ class dataform_portfolio_caller extends portfolio_module_caller_base {
         $options = array(self::CONTENT_NOFILES => 'Exclude embedded files',
                         self::CONTENT_WITHFILES => 'Include embedded files',
                         self::CONTENT_FILESONLY => 'embedded files only');
-        $mform->addElement('select', 'caller_contentformat', get_string('exportcontent', 'dataform'), $options);
+        $mform->addElement('select', 'caller_contentformat', get_string('exportcontent', 'datalynx'), $options);
         $mform->setDefault('caller_contentformat', self::CONTENT_NOFILES);
         $mform->disabledIf('caller_contentformat', 'format', 'neq', PORTFOLIO_FORMAT_RICHHTML);
 /*
         // document selection
         $types = array('htm', 'txt');
         $options = array_combine($types, $types); 
-        $mform->addElement('select', 'caller_documenttype', get_string('documenttype', 'dataform'), $options);
+        $mform->addElement('select', 'caller_documenttype', get_string('documenttype', 'datalynx'), $options);
         $mform->setDefault('caller_documenttype', 'htm');
         $mform->disabledIf('caller_documenttype', 'format', 'neq', PORTFOLIO_FORMAT_DOCUMENT);
         $mform->disabledIf('caller_documenttype', 'caller_content', 'eq', self::CONTENT_FILESONLY);
 */
         // each entry in a separate file
-        $mform->addElement('selectyesno', 'caller_separateentries', get_string('separateentries', 'dataform'));
+        $mform->addElement('selectyesno', 'caller_separateentries', get_string('separateentries', 'datalynx'));
 
     }
 
@@ -233,7 +233,7 @@ class dataform_portfolio_caller extends portfolio_module_caller_base {
     public function get_return_url() {
         global $CFG;
         
-        $returnurl = new moodle_url('/mod/dataform/view.php', array('id' =>$this->id, 'view' => $this->vid, 'filter' => $this->fid));;
+        $returnurl = new moodle_url('/mod/datalynx/view.php', array('id' =>$this->id, 'view' => $this->vid, 'filter' => $this->fid));;
         return $returnurl->out(false);                                                        
     }   
 }
@@ -245,7 +245,7 @@ class dataform_portfolio_caller extends portfolio_module_caller_base {
  * @copyright 2012 Itamar Tzadok
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class dataform_file_info_container extends file_info {
+class datalynx_file_info_container extends file_info {
     /** @var file_browser */
     protected $browser;
     /** @var stdClass */
@@ -276,7 +276,7 @@ class dataform_file_info_container extends file_info {
         $this->browser = $browser;
         $this->course = $course;
         $this->cm = $cm;
-        $this->component = 'mod_dataform';
+        $this->component = 'mod_datalynx';
         $this->context = $context;
         $this->areas = $areas;
         $this->filearea = $filearea;
@@ -335,7 +335,7 @@ class dataform_file_info_container extends file_info {
         $itemids = $DB->get_records('files', array('contextid' => $this->context->id, 'component' => $this->component,
             'filearea' => $this->filearea), 'itemid DESC', "DISTINCT itemid");
         foreach ($itemids as $itemid => $unused) {
-            if ($child = $this->browser->get_file_info($this->context, 'mod_dataform', $this->filearea, $itemid)) {
+            if ($child = $this->browser->get_file_info($this->context, 'mod_datalynx', $this->filearea, $itemid)) {
                 $children[] = $child;
             }
         }

@@ -15,14 +15,14 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage userinfo
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once("$CFG->dirroot/mod/dataform/field/field_form.php");
+require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
-class dataformfield_userinfo_form extends dataformfield_form {
+class datalynxfield_userinfo_form extends datalynxfield_form {
 
     /**
      *
@@ -33,12 +33,12 @@ class dataformfield_userinfo_form extends dataformfield_form {
         $mform =& $this->_form;
 
     //-------------------------------------------------------------------------------
-        $mform->addElement('header', 'fieldattributeshdr', get_string('fieldattributes', 'dataform'));
+        $mform->addElement('header', 'fieldattributeshdr', get_string('fieldattributes', 'datalynx'));
         
         // Info field
         $options = $DB->get_records_menu('user_info_field', array(), 'shortname', 'id,shortname');
         $options = array('' => get_string('choosedots')) + $options;
-        $mform->addElement('select', "param1", get_string('infofield', 'dataformfield_userinfo'), $options);
+        $mform->addElement('select', "param1", get_string('infofield', 'datalynxfield_userinfo'), $options);
     }
 
 }

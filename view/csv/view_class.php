@@ -15,14 +15,14 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformview
+ * @package datalynxview
  * @subpackage csv
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once("$CFG->dirroot/mod/dataform/view/aligned/view_class.php");
+require_once("$CFG->dirroot/mod/datalynx/view/aligned/view_class.php");
 
-class dataformview_csv extends dataformview_aligned {
+class datalynxview_csv extends datalynxview_aligned {
 
     const EXPORT_ALL = 'all';
     const EXPORT_PAGE = 'page';
@@ -79,7 +79,7 @@ class dataformview_csv extends dataformview_aligned {
         
             $tohtml = isset($params['tohtml']) ? $params['tohtml'] : false;
             // print view
-            $viewname = 'dataformview-'. str_replace(' ', '_', $this->name());
+            $viewname = 'datalynxview-'. str_replace(' ', '_', $this->name());
             if ($tohtml) {
                 return html_writer::tag('div', $mform->html(), array('class' => $viewname));
             } else {
@@ -104,9 +104,9 @@ class dataformview_csv extends dataformview_aligned {
         if (!$csvcontent = $this->get_csv_content($range)) {
             return;
         }
-        $dataformname = $this->_df->name();
+        $datalynxname = $this->_df->name();
         $delimiter = csv_import_reader::get_delimiter($this->_delimiter);
-        $filename = clean_filename("{$dataformname}-export");
+        $filename = clean_filename("{$datalynxname}-export");
         $filename .= clean_filename('-' . gmdate("Ymd_Hi"));
         $filename .= clean_filename("-{$this->_delimiter}_separated");
         $filename .= '.'. $this->_output;
@@ -148,7 +148,7 @@ class dataformview_csv extends dataformview_aligned {
     public function get_csv_content($range = self::EXPORT_PAGE) {
         // Set content
         if ($range == self::EXPORT_ALL) {
-            $entries = new dataform_entries($this->_df, $this);
+            $entries = new datalynx_entries($this->_df, $this);
             $options = array();
             // Set a filter to take it all
             $filter = $this->get_filter();
@@ -311,8 +311,8 @@ class dataformview_csv extends dataformview_aligned {
         @set_time_limit(0);
         raise_memory_limit(MEMORY_EXTRA);
     
-        $iid = csv_import_reader::get_new_iid('moddataform');
-        $cir = new csv_import_reader($iid, 'moddataform');
+        $iid = csv_import_reader::get_new_iid('moddatalynx');
+        $cir = new csv_import_reader($iid, 'moddatalynx');
     
         $delimiter = !empty($options['delimiter']) ? $options['delimiter'] : $this->_delimiter;
         $enclosure = !empty($options['enclosure']) ? $options['enclosure'] : $this->_enclosure;
@@ -364,10 +364,10 @@ class dataformview_csv extends dataformview_aligned {
      */
     public function get_import_form() {
         global $CFG;
-        require_once("$CFG->dirroot/mod/dataform/view/csv/import_form.php");
+        require_once("$CFG->dirroot/mod/datalynx/view/csv/import_form.php");
 
         $actionurl = new moodle_url($this->_baseurl, array('importcsv' => 1)); 
-        return new dataformview_csv_import_form($this, $actionurl);
+        return new datalynxview_csv_import_form($this, $actionurl);
     }
 
     /**

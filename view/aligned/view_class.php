@@ -15,15 +15,15 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformview
+ * @package datalynxview
  * @subpackage aligned
  * @copyright 2012 Itamar Tzadok 
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once("$CFG->dirroot/mod/dataform/view/view_class.php");
+require_once("$CFG->dirroot/mod/datalynx/view/view_class.php");
 
-class dataformview_aligned extends dataformview_base {
+class datalynxview_aligned extends datalynxview_base {
 
     protected $type = 'aligned';
     protected $_editors = array('section');
@@ -122,7 +122,7 @@ class dataformview_aligned extends dataformview_base {
         $elements[] = array('html', html_writer::end_tag('tbody'). html_writer::end_tag('table'));
 
         // Add group heading 
-        $name = ($name == 'newentry') ? get_string('entrynew', 'dataform') : $name;
+        $name = ($name == 'newentry') ? get_string('entrynew', 'datalynx') : $name;
         if ($name) {
             array_unshift($elements, array('html', $OUTPUT->heading($name, 3, 'main')));
         }

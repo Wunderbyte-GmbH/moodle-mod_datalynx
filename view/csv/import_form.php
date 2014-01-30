@@ -15,9 +15,9 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * This file is part of the Dataform module for Moodle - http://moodle.org/. 
+ * This file is part of the Datalynx module for Moodle - http://moodle.org/. 
  *
- * @package dataformview
+ * @package datalynxview
  * @subpackage csv
  * @copyright 2012 Itamar Tzadok 
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -31,7 +31,7 @@ require_once("$CFG->libdir/csvlib.class.php");
 /**
  *
  */
-class dataformview_csv_import_form extends moodleform {
+class datalynxview_csv_import_form extends moodleform {
     protected $_view;
 
     public function __construct($view, $action = null, $customdata = null, $method = 'post', $target = '', $attributes = null, $editable = true) {
@@ -57,7 +57,7 @@ class dataformview_csv_import_form extends moodleform {
 
         // action buttons
         //-------------------------------------------------------------------------------
-        $this->add_action_buttons(true, get_string('import', 'dataform'));
+        $this->add_action_buttons(true, get_string('import', 'datalynx'));
         
         // field settings
         //-------------------------------------------------------------------------------
@@ -69,7 +69,7 @@ class dataformview_csv_import_form extends moodleform {
         
         // action buttons
         //-------------------------------------------------------------------------------
-        $this->add_action_buttons(true, get_string('import', 'dataform'));
+        $this->add_action_buttons(true, get_string('import', 'datalynx'));
     }
 
     /**
@@ -80,7 +80,7 @@ class dataformview_csv_import_form extends moodleform {
         $df = $view->get_df();
         $mform = &$this->_form;
 
-        $mform->addElement('header', 'fieldsettingshdr', get_string('fieldsimportsettings', 'dataformview_import'));
+        $mform->addElement('header', 'fieldsettingshdr', get_string('fieldsimportsettings', 'datalynxview_import'));
         $columns = $view->get_columns();
         foreach ($columns as $column) {
             list($pattern, $header,) = $column;
@@ -115,15 +115,15 @@ class dataformview_csv_import_form extends moodleform {
         $view = $this->_view;
         $mform = &$this->_form;
 
-        $mform->addElement('header', 'csvsettingshdr', get_string('csvsettings', 'dataform'));
+        $mform->addElement('header', 'csvsettingshdr', get_string('csvsettings', 'datalynx'));
 
         // delimiter
         $delimiters = csv_import_reader::get_delimiter_list();
-        $mform->addElement('select', 'delimiter', get_string('csvdelimiter', 'dataform'), $delimiters);
+        $mform->addElement('select', 'delimiter', get_string('csvdelimiter', 'datalynx'), $delimiters);
         $mform->setDefault('delimiter', $view->get_delimiter());
 
         // enclosure
-        $mform->addElement('text', 'enclosure', get_string('csvenclosure', 'dataform'), array('size'=>'10'));
+        $mform->addElement('text', 'enclosure', get_string('csvenclosure', 'datalynx'), array('size'=>'10'));
         $mform->setType('enclosure', PARAM_NOTAGS);
         $mform->setDefault('enclosure', $view->get_enclosure());
 
@@ -133,16 +133,16 @@ class dataformview_csv_import_form extends moodleform {
         $mform->setDefault('encoding', $view->get_encoding());
 
         // upload file
-        $mform->addElement('filepicker', 'importfile', get_string('uploadfile', 'dataformview_import'));
+        $mform->addElement('filepicker', 'importfile', get_string('uploadfile', 'datalynxview_import'));
         
         // upload text
-        $mform->addElement('textarea', 'csvtext', get_string('uploadtext', 'dataformview_import'), array('wrap' => 'virtual', 'rows' => '5', 'style' => 'width:100%;'));
+        $mform->addElement('textarea', 'csvtext', get_string('uploadtext', 'datalynxview_import'), array('wrap' => 'virtual', 'rows' => '5', 'style' => 'width:100%;'));
         
         // update existing entries
-        $mform->addElement('selectyesno', 'updateexisting', get_string('updateexisting', 'dataformview_import'));
+        $mform->addElement('selectyesno', 'updateexisting', get_string('updateexisting', 'datalynxview_import'));
         
         // edit after import
-        //$mform->addElement('selectyesno', 'editafter', get_string('importeditimported', 'dataformview_import'));
+        //$mform->addElement('selectyesno', 'editafter', get_string('importeditimported', 'datalynxview_import'));
     }
 
 }

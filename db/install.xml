@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/dataform/db" VERSION="20120920" COMMENT="XMLDB file for Moodle mod/dataform"
+<XMLDB PATH="mod/datalynx/db" VERSION="20120920" COMMENT="XMLDB file for Moodle mod/datalynx"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="dataform" COMMENT="the dataform activity settings" NEXT="dataform_fields">
+    <TABLE NAME="datalynx" COMMENT="the datalynx activity settings" NEXT="datalynx_fields">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="course"/>
         <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="name"/>
@@ -48,7 +48,7 @@
         <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="dataform_fields" COMMENT="the available activity fields" PREVIOUS="dataform" NEXT="dataform_views">
+    <TABLE NAME="datalynx_fields" COMMENT="the available activity fields" PREVIOUS="datalynx" NEXT="datalynx_views">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="dataid"/>
         <FIELD NAME="dataid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="type"/>
@@ -71,13 +71,13 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="dataid"/>
-        <KEY NAME="dataid" TYPE="foreign" FIELDS="dataid" REFTABLE="dataform" REFFIELDS="id" PREVIOUS="primary"/>
+        <KEY NAME="dataid" TYPE="foreign" FIELDS="dataid" REFTABLE="datalynx" REFFIELDS="id" PREVIOUS="primary"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="type-dataid" UNIQUE="false" FIELDS="type, dataid" COMMENT="used by dataform linking filter"/>
+        <INDEX NAME="type-dataid" UNIQUE="false" FIELDS="type, dataid" COMMENT="used by datalynx linking filter"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="dataform_views" COMMENT="the available activity views" PREVIOUS="dataform_fields" NEXT="dataform_filters">
+    <TABLE NAME="datalynx_views" COMMENT="the available activity views" PREVIOUS="datalynx_fields" NEXT="datalynx_filters">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="dataid"/>
         <FIELD NAME="dataid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="type"/>
@@ -104,13 +104,13 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="dataid"/>
-        <KEY NAME="dataid" TYPE="foreign" FIELDS="dataid" REFTABLE="dataform" REFFIELDS="id" PREVIOUS="primary"/>
+        <KEY NAME="dataid" TYPE="foreign" FIELDS="dataid" REFTABLE="datalynx" REFFIELDS="id" PREVIOUS="primary"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="type-dataid" UNIQUE="false" FIELDS="type, dataid" COMMENT="used by dataform linking filter"/>
+        <INDEX NAME="type-dataid" UNIQUE="false" FIELDS="type, dataid" COMMENT="used by datalynx linking filter"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="dataform_filters" COMMENT="the available activity filters" PREVIOUS="dataform_views" NEXT="dataform_rules">
+    <TABLE NAME="datalynx_filters" COMMENT="the available activity filters" PREVIOUS="datalynx_views" NEXT="datalynx_rules">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="dataid"/>
         <FIELD NAME="dataid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="name"/>
@@ -126,10 +126,10 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="dataid"/>
-        <KEY NAME="dataid" TYPE="foreign" FIELDS="dataid" REFTABLE="dataform" REFFIELDS="id" PREVIOUS="primary"/>
+        <KEY NAME="dataid" TYPE="foreign" FIELDS="dataid" REFTABLE="datalynx" REFFIELDS="id" PREVIOUS="primary"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="dataform_rules" COMMENT="the available activity rules" PREVIOUS="dataform_filters" NEXT="dataform_entries">
+    <TABLE NAME="datalynx_rules" COMMENT="the available activity rules" PREVIOUS="datalynx_filters" NEXT="datalynx_entries">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="dataid"/>
         <FIELD NAME="dataid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="type"/>
@@ -150,13 +150,13 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="dataid"/>
-        <KEY NAME="dataid" TYPE="foreign" FIELDS="dataid" REFTABLE="dataform" REFFIELDS="id" PREVIOUS="primary"/>
+        <KEY NAME="dataid" TYPE="foreign" FIELDS="dataid" REFTABLE="datalynx" REFFIELDS="id" PREVIOUS="primary"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="type-dataid" UNIQUE="false" FIELDS="type, dataid" COMMENT="used by dataform linking filter"/>
+        <INDEX NAME="type-dataid" UNIQUE="false" FIELDS="type, dataid" COMMENT="used by datalynx linking filter"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="dataform_entries" COMMENT="the activity entries" PREVIOUS="dataform_rules" NEXT="dataform_contents">
+    <TABLE NAME="datalynx_entries" COMMENT="the activity entries" PREVIOUS="datalynx_rules" NEXT="datalynx_contents">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="dataid"/>
         <FIELD NAME="dataid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="userid"/>
@@ -169,10 +169,10 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="dataid"/>
-        <KEY NAME="dataid" TYPE="foreign" FIELDS="dataid" REFTABLE="dataform" REFFIELDS="id" PREVIOUS="primary"/>
+        <KEY NAME="dataid" TYPE="foreign" FIELDS="dataid" REFTABLE="datalynx" REFFIELDS="id" PREVIOUS="primary"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="dataform_contents" COMMENT="the content of each entry" PREVIOUS="dataform_entries">
+    <TABLE NAME="datalynx_contents" COMMENT="the content of each entry" PREVIOUS="datalynx_entries">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="fieldid"/>
         <FIELD NAME="fieldid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="entryid"/>
@@ -185,8 +185,8 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="entryid"/>
-        <KEY NAME="entryid" TYPE="foreign" FIELDS="entryid" REFTABLE="dataform_entries" REFFIELDS="id" PREVIOUS="primary" NEXT="fieldid"/>
-        <KEY NAME="fieldid" TYPE="foreign" FIELDS="fieldid" REFTABLE="dataform_fields" REFFIELDS="id" PREVIOUS="entryid"/>
+        <KEY NAME="entryid" TYPE="foreign" FIELDS="entryid" REFTABLE="datalynx_entries" REFFIELDS="id" PREVIOUS="primary" NEXT="fieldid"/>
+        <KEY NAME="fieldid" TYPE="foreign" FIELDS="fieldid" REFTABLE="datalynx_fields" REFFIELDS="id" PREVIOUS="entryid"/>
       </KEYS>
     </TABLE>
   </TABLES>

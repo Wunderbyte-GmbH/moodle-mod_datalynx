@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage teammemberselect
  * @copyright 2013 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -23,12 +23,12 @@
 
 defined('MOODLE_INTERNAL') or die;
 
-require_once("$CFG->dirroot/mod/dataform/field/renderer.php");
+require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
- * Renderer class for teammemberselect dataform field
+ * Renderer class for teammemberselect datalynx field
  */
-class dataformfield_teammemberselect_renderer extends dataformfield_renderer {
+class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
 
     /**
      * Returns array of replacements for the field patterns
@@ -88,10 +88,10 @@ class dataformfield_teammemberselect_renderer extends dataformfield_renderer {
                 $selected[$i] = 0;
             }
             $select = $mform->createElement('select', "{$fieldname}[{$i}]", null, $menu,
-                array('class' => "dataformfield_teammemberselect_select $classname"));
+                array('class' => "datalynxfield_teammemberselect_select $classname"));
             $mform->setType("{$fieldname}[{$i}]", PARAM_INT);
             $text = $mform->createElement('text', "{$fieldnamedropdown}[{$i}]", null,
-                array('class' => "dataformfield_teammemberselect_dropdown $classname"));
+                array('class' => "datalynxfield_teammemberselect_dropdown $classname"));
             $mform->setType("{$fieldnamedropdown}[{$i}]", PARAM_TEXT);
 
             $select->setSelected($selected[$i]);
@@ -104,9 +104,9 @@ class dataformfield_teammemberselect_renderer extends dataformfield_renderer {
         if ($required) {
             $mform->addGroupRule("{$fieldname}_dropdown_grp", '', 'required', null, 0, 'client');
         }
-        $PAGE->requires->string_for_js('minteamsize_error_form', 'dataform');
+        $PAGE->requires->string_for_js('minteamsize_error_form', 'datalynx');
         $PAGE->requires->js_init_call(
-                'M.dataformfield_teammemberselect.init_entry_form',
+                'M.datalynxfield_teammemberselect.init_entry_form',
                 array($field->options_menu(false, false, $authorid), $fieldid, $entryid, $field->minteamsize),
                 false,
                 $this->get_js_module());
@@ -130,7 +130,7 @@ class dataformfield_teammemberselect_renderer extends dataformfield_renderer {
                 }
             }
             if ($numvalues < $field->minteamsize) {
-                return array("{$formfieldname}_dropdown_grp" => get_string('minteamsize_error_form', 'dataform', $field->minteamsize));
+                return array("{$formfieldname}_dropdown_grp" => get_string('minteamsize_error_form', 'datalynx', $field->minteamsize));
             }
         }
         return null;
@@ -154,8 +154,8 @@ class dataformfield_teammemberselect_renderer extends dataformfield_renderer {
 
     private function get_js_module() {
         $jsmodule = array(
-            'name' => 'dataformfield_teammemberselect',
-            'fullpath' => '/mod/dataform/field/teammemberselect/teammemberselect.js',
+            'name' => 'datalynxfield_teammemberselect',
+            'fullpath' => '/mod/datalynx/field/teammemberselect/teammemberselect.js',
             'requires' => array('node', 'event', 'node-event-delegate', 'autocomplete', 'autocomplete-filters', 'autocomplete-highlighters', 'event-outside'),
             );
         return $jsmodule;
@@ -182,7 +182,7 @@ class dataformfield_teammemberselect_renderer extends dataformfield_renderer {
         $mform->disabledIf($fieldnamedropdown, "searchoperator{$i}", 'eq', 'USER');
 
         $PAGE->requires->js_init_call(
-                'M.dataformfield_teammemberselect.init_filter_search_form',
+                'M.datalynxfield_teammemberselect.init_filter_search_form',
                 array($menu, $fieldid),
                 false,
                 $this->get_js_module());
@@ -212,19 +212,19 @@ class dataformfield_teammemberselect_renderer extends dataformfield_renderer {
             }
 
             switch ($field->listformat) {
-                case dataformfield_teammemberselect::TEAMMEMBERSELECT_FORMAT_NEWLINE:
+                case datalynxfield_teammemberselect::TEAMMEMBERSELECT_FORMAT_NEWLINE:
                     $str = implode('<br />', $str);
                     break;
-                case dataformfield_teammemberselect::TEAMMEMBERSELECT_FORMAT_SPACE:
+                case datalynxfield_teammemberselect::TEAMMEMBERSELECT_FORMAT_SPACE:
                     $str = implode(' ', $str);
                     break;
-                case dataformfield_teammemberselect::TEAMMEMBERSELECT_FORMAT_COMMA:
+                case datalynxfield_teammemberselect::TEAMMEMBERSELECT_FORMAT_COMMA:
                     $str = implode(',', $str);
                     break;
-                case dataformfield_teammemberselect::TEAMMEMBERSELECT_FORMAT_COMMA_SPACE:
+                case datalynxfield_teammemberselect::TEAMMEMBERSELECT_FORMAT_COMMA_SPACE:
                     $str = implode(', ', $str);
                     break;
-                case dataformfield_teammemberselect::TEAMMEMBERSELECT_FORMAT_UL:
+                case datalynxfield_teammemberselect::TEAMMEMBERSELECT_FORMAT_UL:
                 default:
                     if (count($str) > 0) {
                         $str = '<ul><li>' . implode('</li><li>', $str) . '</li></ul>';

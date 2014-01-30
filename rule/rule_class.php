@@ -15,37 +15,37 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package dataform_rule
+ * @package datalynx_rule
  * @copyright 2013 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once("$CFG->dirroot/mod/dataform/mod_class.php");
+require_once("$CFG->dirroot/mod/datalynx/mod_class.php");
 
 /**
- * Base class for Dataform Rule Types
+ * Base class for Datalynx Rule Types
  */
-abstract class dataform_rule_base {
+abstract class datalynx_rule_base {
 
     public $type = 'unknown';  // Subclasses must override the type with their name
 
-    public $df = null;       // The dataform object that this rule belongs to
+    public $df = null;       // The datalynx object that this rule belongs to
     public $rule = null;      // The rule object itself, if we know it
 
     /**
      * Class constructor
      *
-     * @param var $df       dataform id or class object
+     * @param var $df       datalynx id or class object
      * @param var $rule    rule id or DB record
      */
     public function __construct($df = 0, $rule = 0) {
 
         if (empty($df)) {
-            throw new coding_exception('Dataform id or object must be passed to view constructor.');
-        } else if ($df instanceof dataform) {
+            throw new coding_exception('Datalynx id or object must be passed to view constructor.');
+        } else if ($df instanceof datalynx) {
             $this->df = $df;
-        } else {    // dataform id/object
-            $this->df = new dataform($df);
+        } else {    // datalynx id/object
+            $this->df = new datalynx($df);
         }
 
         if (!empty($rule)) {
@@ -57,7 +57,7 @@ abstract class dataform_rule_base {
             } else if ($ruleobj = $this->df->get_rule_from_id($rule)) {
                 $this->rule = $ruleobj->rule;
             } else {
-                throw new moodle_exception('invalidrule', 'dataform', null, null, $rule);
+                throw new moodle_exception('invalidrule', 'datalynx', null, null, $rule);
             }
         }
 
@@ -105,7 +105,7 @@ abstract class dataform_rule_base {
             $this->set_rule($fromform);
         }
 
-        if (!$this->rule->id = $DB->insert_record('dataform_rules', $this->rule)){
+        if (!$this->rule->id = $DB->insert_record('datalynx_rules', $this->rule)){
             echo $OUTPUT->notification('Insertion of new rule failed!');
             return false;
         } else {
@@ -122,7 +122,7 @@ abstract class dataform_rule_base {
             $this->set_rule($fromform);
         }
 
-        if (!$DB->update_record('dataform_rules', $this->rule)) {
+        if (!$DB->update_record('datalynx_rules', $this->rule)) {
             echo $OUTPUT->notification('updating of rule failed!');
             return false;
         }
@@ -136,7 +136,7 @@ abstract class dataform_rule_base {
         global $DB;
 
         if (!empty($this->rule->id)) {
-            $DB->delete_records('dataform_rules', array('id' => $this->rule->id));
+            $DB->delete_records('datalynx_rules', array('id' => $this->rule->id));
         }
         return true;
     }
@@ -173,7 +173,7 @@ abstract class dataform_rule_base {
      * Returns the type name of the rule
      */
     public function typename() {
-        return get_string('pluginname', "dataformrule_{$this->type}");
+        return get_string('pluginname', "datalynxrule_{$this->type}");
     }
 
     /**
@@ -189,15 +189,15 @@ abstract class dataform_rule_base {
     public function get_form() {
         global $CFG;
 
-        if (file_exists($CFG->dirroot. '/mod/dataform/rule/'. $this->type. '/rule_form.php')) {
-            require_once($CFG->dirroot. '/mod/dataform/rule/'. $this->type. '/rule_form.php');
-            $formclass = 'dataform_rule_'. $this->type. '_form';
+        if (file_exists($CFG->dirroot. '/mod/datalynx/rule/'. $this->type. '/rule_form.php')) {
+            require_once($CFG->dirroot. '/mod/datalynx/rule/'. $this->type. '/rule_form.php');
+            $formclass = 'datalynx_rule_'. $this->type. '_form';
         } else {
-            require_once($CFG->dirroot. '/mod/dataform/rule/rule_form.php');
-            $formclass = 'dataform_rule_form';
+            require_once($CFG->dirroot. '/mod/datalynx/rule/rule_form.php');
+            $formclass = 'datalynx_rule_form';
         }
         $actionurl = new moodle_url(
-            '/mod/dataform/rule/rule_edit.php',
+            '/mod/datalynx/rule/rule_edit.php',
             array('d' => $this->df->id(), 'rid' => $this->get_id(), 'type' => $this->type)
         );
         return new $formclass($this, $actionurl);
@@ -229,7 +229,7 @@ abstract class dataform_rule_base {
     public function get_sort_from_sql($paramname = 'sortie', $paramcount = '') {
         $ruleid = $this->rule->id;
         if ($ruleid > 0) {
-            $sql = " LEFT JOIN {dataform_contents} c$ruleid ON (c$ruleid.entryid = e.id AND c$ruleid.ruleid = :$paramname$paramcount) ";
+            $sql = " LEFT JOIN {datalynx_contents} c$ruleid ON (c$ruleid.entryid = e.id AND c$ruleid.ruleid = :$paramname$paramcount) ";
             return array($sql, $ruleid);
         } else {
             return null;

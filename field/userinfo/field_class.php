@@ -15,15 +15,15 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage userinfo
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once("$CFG->dirroot/mod/dataform/field/field_class.php");
+require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
-class dataformfield_userinfo extends dataformfield_base {
+class datalynxfield_userinfo extends datalynxfield_base {
 
     public $type = 'userinfo';
     
@@ -31,7 +31,7 @@ class dataformfield_userinfo extends dataformfield_base {
     public $infoshortname;
     public $infotype;
     public $defaultdata;
-    public $defaultdataformat;
+    public $defaultdatalynxat;
     
     public function __construct($df = 0, $field = 0) {       
         parent::__construct($df, $field);
@@ -39,7 +39,7 @@ class dataformfield_userinfo extends dataformfield_base {
         $this->infoshortname = $this->field->param2;
         $this->infotype = $this->field->param3;
         $this->defaultdata = $this->field->param4;
-        $this->defaultdataformat = $this->field->param5;
+        $this->defaultdatalynxat = $this->field->param5;
     }
 
     /**
@@ -52,12 +52,12 @@ class dataformfield_userinfo extends dataformfield_base {
         parent::set_field($forminput);
         
         if ($this->field->param1 and ($this->field->param1 != $infoid or !$this->field->param2)) {
-            $infoitems = 'shortname,datatype,defaultdata,defaultdataformat,param1,param2,param3,param4,param5';
+            $infoitems = 'shortname,datatype,defaultdata,defaultdatalynxat,param1,param2,param3,param4,param5';
             if ($info = $DB->get_record('user_info_field', array('id' => $this->field->param1), $infoitems)) {
                 $this->field->param2 = $info->shortname;
                 $this->field->param3 = $info->datatype;
                 $this->field->param4 = $info->defaultdata;
-                $this->field->param5 = $info->defaultdataformat;
+                $this->field->param5 = $info->defaultdatalynxat;
 
                 $this->field->param6 = $info->param1;
                 $this->field->param7 = $info->param2;
@@ -74,7 +74,7 @@ class dataformfield_userinfo extends dataformfield_base {
     public function get_select_sql() {
         $id = " c{$this->field->id}.id AS c{$this->field->id}_id ";
         $content = $this->get_sql_compare_text('data'). " AS c{$this->field->id}_content";
-        $content1 = $this->get_sql_compare_text('dataformat'). " AS c{$this->field->id}_content1";
+        $content1 = $this->get_sql_compare_text('datalynxat'). " AS c{$this->field->id}_content1";
         return " $id , $content , $content1 ";
     }
 
@@ -116,7 +116,7 @@ class dataformfield_userinfo extends dataformfield_base {
     /**
      *
      */
-    public function is_dataform_content() {
+    public function is_datalynx_content() {
         return false;
     }
 

@@ -15,15 +15,15 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage picture
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once("$CFG->dirroot/mod/dataform/field/file/field_class.php");
+require_once("$CFG->dirroot/mod/datalynx/field/file/field_class.php");
 
-class dataformfield_picture extends dataformfield_file {
+class datalynxfield_picture extends datalynxfield_file {
     public $type = 'picture';
 
     /**
@@ -43,9 +43,9 @@ class dataformfield_picture extends dataformfield_file {
                     ($updatefile = ($oldfield->param7 != $this->field->param7 or $oldfield->param8 != $this->field->param8)
                     or $updatethumb = ($oldfield->param9 != $this->field->param9 or $oldfield->param10 != $this->field->param10))) {
             // Check through all existing records and update the thumbnail
-            if ($contents = $DB->get_records('dataform_contents', array('fieldid' => $this->field->id))) {
+            if ($contents = $DB->get_records('datalynx_contents', array('fieldid' => $this->field->id))) {
                 if (count($contents) > 20) {
-                    echo $OUTPUT->notification(get_string('resizingimages', 'dataformfield_picture'), 'notifysuccess');
+                    echo $OUTPUT->notification(get_string('resizingimages', 'datalynxfield_picture'), 'notifysuccess');
                     echo "\n\n";
                     // To make sure that ob_flush() has the desired effect
                     ob_flush();
@@ -69,7 +69,7 @@ class dataformfield_picture extends dataformfield_file {
         $updatethumb = isset($params['updatethumb']) ? $params['updatethumb'] : true;
 
         $fs = get_file_storage();
-        if (!$files = $fs->get_area_files($this->df->context->id, 'mod_dataform', 'content', $contentid)) {
+        if (!$files = $fs->get_area_files($this->df->context->id, 'mod_datalynx', 'content', $contentid)) {
             return;
         }
 
@@ -99,14 +99,14 @@ class dataformfield_picture extends dataformfield_file {
                     $thumbheight = !empty($this->field->param10)?$this->field->param10:'';
                     $thumbname = 'thumb_'.$file->get_filename();
 
-                    if ($thumbfile = $fs->get_file($this->df->context->id, 'mod_dataform', 'content', $contentid, '/', $thumbname)) {
+                    if ($thumbfile = $fs->get_file($this->df->context->id, 'mod_datalynx', 'content', $contentid, '/', $thumbname)) {
                         $thumbfile->delete();
                     }
 
                     // If either width or height try to (re)generate, otherwise delete what exists
                     if ($thumbwidth or $thumbheight) {
 
-                        $file_record = array('contextid'=>$this->df->context->id, 'component'=>'mod_dataform', 'filearea'=>'content',
+                        $file_record = array('contextid'=>$this->df->context->id, 'component'=>'mod_datalynx', 'filearea'=>'content',
                                              'itemid'=>$contentid, 'filepath'=> '/',
                                              'filename'=>$thumbname, 'userid'=>$file->get_userid());
 

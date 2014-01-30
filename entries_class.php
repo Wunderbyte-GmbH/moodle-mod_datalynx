@@ -16,7 +16,7 @@
  
 /**
  * @package mod
- * @subpackage dataform
+ * @subpackage datalynx
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -24,14 +24,14 @@
 /**
  *
  */
-class dataform_entries {
+class datalynx_entries {
 
     const SELECT_FIRST_PAGE = 0;
     const SELECT_LAST_PAGE = -1;
     const SELECT_NEXT_PAGE = -2;
     const SELECT_RANDOM_PAGE = -3;
     
-    protected $_df = null;      // dataform object
+    protected $_df = null;      // datalynx object
     protected $_view = null;      // view object
 
     protected $_entries = null;
@@ -40,18 +40,18 @@ class dataform_entries {
 
     /**
      * Constructor
-     * View or dataform or both, each can be id or object
+     * View or datalynx or both, each can be id or object
      */
     public function __construct($df, $view = null) {
 
         if (empty($df) and empty($view)) {
-            throw new coding_exception('Dataform id or object must be passed to entries constructor.');
+            throw new coding_exception('Datalynx id or object must be passed to entries constructor.');
         }
         
         if (is_object($df)) {
             $this->_df = $df;
         } else {
-            $this->_df = new dataform($df);
+            $this->_df = new datalynx($df);
         }
 
         if (is_object($view)) {
@@ -127,7 +127,7 @@ class dataform_entries {
             $sortorder,
             $whatcontent,
             $filterparams,
-            $dataformcontent) = $filter->get_sql($fields);
+            $datalynxcontent) = $filter->get_sql($fields);
 
         // named params array for the sql
         $params = array();        
@@ -146,7 +146,7 @@ class dataform_entries {
             }
                 
             // exclude guest/anonymous
-            if (!has_capability('mod/dataform:viewanonymousentry', $df->context)) {
+            if (!has_capability('mod/datalynx:viewanonymousentry', $df->context)) {
                 $whereuser .= " AND e.userid <> :{$this->sqlparams($params, 'guestid', 1)} ";
             }
         }
@@ -166,7 +166,7 @@ class dataform_entries {
         
         // APPROVE filtering
         $whereapprove = '';
-        if ($df->data->approval and !has_capability('mod/dataform:manageentries', $df->context)) {
+        if ($df->data->approval and !has_capability('mod/datalynx:manageentries', $df->context)) {
             if (isloggedin()) {
                 $whereapprove = " AND (e.approved = :{$this->sqlparams($params, 'approved', 1)} 
                                         OR e.userid = :{$this->sqlparams($params, 'userid', $USER->id)}) ";
@@ -177,8 +177,8 @@ class dataform_entries {
 
         // STATUS filtering (visibility)
         $wherestatus = '';
-        if (!has_capability('mod/dataform:viewdrafts', $df->context)) {
-            $wherestatus = " AND (e.status <> :{$this->sqlparams($params, 'status', dataformfield__status::STATUS_DRAFT)}
+        if (!has_capability('mod/datalynx:viewdrafts', $df->context)) {
+            $wherestatus = " AND (e.status <> :{$this->sqlparams($params, 'status', datalynxfield__status::STATUS_DRAFT)}
                               OR  e.userid = :{$this->sqlparams($params, 'userid', $USER->id)}) ";
         }
 
@@ -193,7 +193,7 @@ class dataform_entries {
                 // content (including ratings and comments if required)
                 $whatcontent;
         $count = ' COUNT(e.id) ';
-        $tables = ' {dataform_entries} e
+        $tables = ' {datalynx_entries} e
                     JOIN {user} u ON u.id = e.userid 
                     LEFT JOIN {groups} g ON g.id = e.groupid ';
         $wheredfid =  " e.dataid = :{$this->sqlparams($params, 'dataid', $df->id())} ";
@@ -302,12 +302,12 @@ class dataform_entries {
                 $entries->entries = $DB->get_records_sql($sqlselect, $allparams);
             }
             // Now get the contents if required and add it to the entry objects
-            if ($dataformcontent && $entries->entries) {
+            if ($datalynxcontent && $entries->entries) {
                 //get the node content of the requested entries
-                list($fids, $fparams) = $DB->get_in_or_equal($dataformcontent, SQL_PARAMS_NAMED);
+                list($fids, $fparams) = $DB->get_in_or_equal($datalynxcontent, SQL_PARAMS_NAMED);
                 list($eids, $eparams) = $DB->get_in_or_equal(array_keys($entries->entries), SQL_PARAMS_NAMED);
                 $params = array_merge($eparams, $fparams);
-                $contents = $DB->get_records_select('dataform_contents', "entryid {$eids} AND fieldid {$fids}", $params);
+                $contents = $DB->get_records_select('datalynx_contents', "entryid {$eids} AND fieldid {$fids}", $params);
 
                 foreach ($contents as $contentid => $content) {
                     $entry = $entries->entries[$content->entryid];
@@ -377,7 +377,7 @@ class dataform_entries {
                         // TODO for Picture fields this does not distinguish between the images and their thumbs
                         //      but the view may not necessarily display both 
                         $files = array_merge($files, $fs->get_area_files($this->_df->context->id,
-                                                                        'mod_dataform',
+                                                                        'mod_datalynx',
                                                                         'content',
                                                                         $contentid,
                                                                         'sortorder, itemid, filepath, filename',
@@ -417,7 +417,7 @@ class dataform_entries {
                 $addcount = 0;
                 $addmax = $df->data->maxentries;
                 $perinterval = ($df->data->intervalcount > 1);
-                if ($addmax != -1 and has_capability('mod/dataform:manageentries', $df->context)) {
+                if ($addmax != -1 and has_capability('mod/datalynx:manageentries', $df->context)) {
                     $addmax = -1;
                 } else if ($addmax != -1) {
                     $addmax = max(0, $addmax - $df->user_num_entries($perinterval));
@@ -449,7 +449,7 @@ class dataform_entries {
 
             // all other types of processing must refer to specific entry ids
             } else {
-                $entries = $DB->get_records_select('dataform_entries', "dataid = ? AND id IN ($eids)", array($df->id()));
+                $entries = $DB->get_records_select('datalynx_entries', "dataid = ? AND id IN ($eids)", array($df->id()));
             }
 
             if (!empty($importentryids)) {
@@ -457,14 +457,14 @@ class dataform_entries {
                     'dataid' => $df->id(),
                     'eids' => $importentryids
                 );
-                $filter = new dataform_filter((object) $filterdata);
+                $filter = new datalynx_filter((object) $filterdata);
                 $entries += $this->get_entries(array('filter' => $filter))->entries;
             }
 
             if ($entries) {
                 foreach ($entries as $eid => $entry) {
                     // filter approvable entries
-                    if (($action == 'approve' or $action == 'disapprove') and !has_capability('mod/dataform:approve', $df->context)) {
+                    if (($action == 'approve' or $action == 'disapprove') and !has_capability('mod/datalynx:approve', $df->context)) {
                         unset($entries[$eid]);
                     
                     // filter managable entries
@@ -476,13 +476,13 @@ class dataform_entries {
         }
 
         if (empty($entries)) {
-            return array(get_string("entrynoneforaction",'dataform'), '');
+            return array(get_string("entrynoneforaction",'datalynx'), '');
         } else {
             if (!$confirmed) {
 
                 // Print a confirmation page
                 echo $OUTPUT->header();
-                echo $OUTPUT->confirm(get_string("entriesconfirm$action", 'dataform', count($entries)),
+                echo $OUTPUT->confirm(get_string("entriesconfirm$action", 'datalynx', count($entries)),
                                     new moodle_url($PAGE->url, array($action => implode(',', array_keys($entries)),
                                                                     'sesskey' => sesskey(),
                                                                     'confirmed' => true)),
@@ -508,14 +508,14 @@ class dataform_entries {
                             $contents = array_fill_keys(array_keys($entries), array('info' => array(), 'fields' => array()));
                             $calculations = array();
                             $entryinfo = array(
-                                dataformfield__entry::_ENTRY,
-                                dataformfield__time::_TIMECREATED,
-                                dataformfield__time::_TIMEMODIFIED,
-                                dataformfield__approve::_APPROVED,
-                                dataformfield__user::_USERID,
-                                dataformfield__user::_USERNAME,
-                                dataformfield__group::_GROUP,
-                                dataformfield__status::_STATUS
+                                datalynxfield__entry::_ENTRY,
+                                datalynxfield__time::_TIMECREATED,
+                                datalynxfield__time::_TIMEMODIFIED,
+                                datalynxfield__approve::_APPROVED,
+                                datalynxfield__user::_USERID,
+                                datalynxfield__user::_USERNAME,
+                                datalynxfield__group::_GROUP,
+                                datalynxfield__status::_STATUS
                             );
 
                             $skipnotification = array();
@@ -534,18 +534,18 @@ class dataform_entries {
                                     // Entry info
                                     if (in_array($fieldid, $entryinfo)) {
                                         // TODO
-                                        if ($fieldid == dataformfield__user::_USERID or $fieldid == dataformfield__user::_USERNAME) {
+                                        if ($fieldid == datalynxfield__user::_USERID or $fieldid == datalynxfield__user::_USERNAME) {
                                             $entryvar = 'userid';
                                         } else {
                                             $entryvar = $field->get_internalname();
                                         }
-                                        if ($fieldid == dataformfield__status::_STATUS && $value == dataformfield__status::STATUS_DRAFT) {
+                                        if ($fieldid == datalynxfield__status::_STATUS && $value == datalynxfield__status::STATUS_DRAFT) {
                                             $skipnotification[] = $entryid;
                                         }
-                                        if ($fieldid == dataformfield__status::_STATUS &&
-                                            $value == dataformfield__status::STATUS_FINAL_SUBMISSION &&
+                                        if ($fieldid == datalynxfield__status::_STATUS &&
+                                            $value == datalynxfield__status::STATUS_FINAL_SUBMISSION &&
                                             isset($entry->status) &&
-                                            $entry->status == dataformfield__status::STATUS_DRAFT) {
+                                            $entry->status == datalynxfield__status::STATUS_DRAFT) {
                                             $drafttofinal[] = $entryid;
                                         }
 
@@ -574,7 +574,7 @@ class dataform_entries {
                                     foreach ($contents[$firstentryid]['fields'] as $fieldid => $value) {
                                         if (array_search($fieldid, $bulkeditfields) !== false) {
                                             $newfields[$fieldid] = $contents[$firstentryid]['fields'][$fieldid];
-                                        } else if (isset($oldcontent['fields'][$fieldid])) {
+                                        } else {
                                             $newfields[$fieldid] = $oldcontent['fields'][$fieldid];
                                         }
                                     }
@@ -597,12 +597,12 @@ class dataform_entries {
                                                 if (array_search($eid, $drafttofinal) !== false) {
                                                 $oldcontent = array();
                                             } else {
-                                                $oldcontent = json_decode($DB->get_field('dataform_contents', 'content',
+                                                $oldcontent = json_decode($DB->get_field('datalynx_contents', 'content',
                                                                           array('fieldid' => $fieldid,
                                                                                 'entryid' => $entryid)), true);
                                             }
                                             $newcontent = $content[''];
-                                            $field = $DB->get_record('dataform_fields', array('id' => $fieldid));
+                                            $field = $DB->get_record('datalynx_fields', array('id' => $fieldid));
                                             $this->notify_team_members($entry, $field, $oldcontent, $newcontent);
                                         }
                                         $fields[$fieldid]->update_content($entry, $content);
@@ -631,7 +631,7 @@ class dataform_entries {
                             }
 
                             // Get content of entry to duplicate
-                            $contents = $DB->get_records('dataform_contents', array('entryid' => $entry->id));
+                            $contents = $DB->get_records('datalynx_contents', array('entryid' => $entry->id));
 
                             // Add a duplicated entry and content
                             $newentry = $entry;
@@ -640,15 +640,15 @@ class dataform_entries {
                             $newentry->groupid = $df->currentgroup;
                             $newentry->timecreated = $newentry->timemodified = time();
 
-                            if ($df->data->approval and !has_capability('mod/dataform:approve', $df->context)) {
+                            if ($df->data->approval and !has_capability('mod/datalynx:approve', $df->context)) {
                                 $newentry->approved = 0;
                             }
-                            $newentry->id = $DB->insert_record('dataform_entries',$newentry);
+                            $newentry->id = $DB->insert_record('datalynx_entries',$newentry);
 
                             foreach ($contents as $content) {
                                 $newcontent = $content;
                                 $newcontent->entryid = $newentry->id;
-                                if (!$DB->insert_record('dataform_contents', $newcontent)) {
+                                if (!$DB->insert_record('datalynx_contents', $newcontent)) {
                                     throw new moodle_exception('cannotinsertrecord', null, null, $newentry->id);
                                 }
                             }
@@ -668,7 +668,7 @@ class dataform_entries {
                         // approvable entries should be filtered above
                         $entryids = array_keys($entries);
                         $ids = implode(',', $entryids);
-                        $DB->set_field_select('dataform_entries', 'approved', 1, " dataid = ? AND id IN ($ids) ", array($df->id()));        
+                        $DB->set_field_select('datalynx_entries', 'approved', 1, " dataid = ? AND id IN ($ids) ", array($df->id()));        
                         $processed = $entries;
 
                         $processed += $this->create_approved_entries_for_team($entryids);
@@ -686,7 +686,7 @@ class dataform_entries {
                         // disapprovable entries should be filtered above
                         $entryids = array_keys($entries);
                         $ids = implode(',', $entryids);
-                        $DB->set_field_select('dataform_entries', 'approved', 0, " dataid = ? AND id IN ($ids) ", array($df->id()));        
+                        $DB->set_field_select('datalynx_entries', 'approved', 0, " dataid = ? AND id IN ($ids) ", array($df->id()));        
                         $processed = $entries;
                         if ($processed) {
                             $eventdata = (object) array('view' => $this->_view, 'items' => $processed);
@@ -705,7 +705,7 @@ class dataform_entries {
                                 $field->delete_content($entry->id);
                             }
 
-                            $DB->delete_records('dataform_entries', array('id' => $entry->id));
+                            $DB->delete_records('datalynx_entries', array('id' => $entry->id));
                             $processed[$entry->id] = $entry;
                         }
                         if ($processed) {
@@ -725,13 +725,13 @@ class dataform_entries {
                         //get the node content of the requested entries
                         list($eids, $params) = $DB->get_in_or_equal(array_keys($entries), SQL_PARAMS_NAMED);
                         $params['fieldid'] = $nodeid;
-                        $contents = $DB->get_records_select('dataform_contents', "fieldid = :fieldid AND entryid {$eids}", $params);
+                        $contents = $DB->get_records_select('datalynx_contents', "fieldid = :fieldid AND entryid {$eids}", $params);
                         //update node content of the entries
                         foreach ($contents as $content) {
                             if ($content->entryid != $parentid and $content->entryid != $siblingid) {
                                 $content->content = $parentid;
                                 $content->content1 = $siblingid;
-                                $DB->update_record('dataform_contents', $content);
+                                $DB->update_record('datalynx_contents', $content);
                                 
                                 $processed[] = $content->entryid;
                             }
@@ -754,9 +754,9 @@ class dataform_entries {
                             $completion->update_state($df->cm, $completiontype, $entry->userid);
                         }
                     }
-                    $strnotify = get_string($strnotify, 'dataform', count($processed));
+                    $strnotify = get_string($strnotify, 'datalynx', count($processed));
                 } else {
-                    $strnotify = get_string($strnotify, 'dataform', get_string('no'));
+                    $strnotify = get_string($strnotify, 'datalynx', get_string('no'));
                 }
 
                 return array($strnotify, array_keys($processed));
@@ -767,7 +767,7 @@ class dataform_entries {
     public function get_teammemberselect_fields_to_notify($dataid) {
         global $CFG, $DB;
         $query = "SELECT f.id
-                    FROM {dataform_fields} f
+                    FROM {datalynx_fields} f
                    WHERE f.type = 'teammemberselect'
                      AND f.dataid = :dataid
                      AND f.param6 = 1";
@@ -836,9 +836,9 @@ class dataform_entries {
 
         if ($teamfield) {
             foreach ($entryids as $entryid) {
-                $oldcontents = $contents = $DB->get_records('dataform_contents', array('entryid' => $entryid));
+                $oldcontents = $contents = $DB->get_records('datalynx_contents', array('entryid' => $entryid));
 
-                $teammemberids = json_decode($DB->get_field('dataform_contents', 'content',
+                $teammemberids = json_decode($DB->get_field('datalynx_contents', 'content',
                                     array('entryid' => $entryid, 'fieldid' => $teamfield->id())), true);
 
                 if ($teamfield->referencefieldid != -1) {
@@ -855,7 +855,7 @@ class dataform_entries {
                     $likecontent = '';
                 }
 
-                $entry = $DB->get_record('dataform_entries', array('id' => $entryid));
+                $entry = $DB->get_record('datalynx_entries', array('id' => $entryid));
                 $userid = $entry->userid;
 
                 foreach ($teammemberids as $teammemberid) {
@@ -869,8 +869,8 @@ class dataform_entries {
 
                     if ($teamfield->referencefieldid != -1) {
                         $query = "SELECT DISTINCT de.id
-                                FROM {dataform_entries} de
-                          INNER JOIN {dataform_contents} dc ON de.id = dc.entryid
+                                FROM {datalynx_entries} de
+                          INNER JOIN {datalynx_contents} dc ON de.id = dc.entryid
                                WHERE de.dataid = :dataid
                                  AND de.userid = :userid
                                  AND dc.fieldid = :fieldid
@@ -885,17 +885,17 @@ class dataform_entries {
                     }
 
                     if ($existingentryid) {
-                        $existingentry = $DB->get_record('dataform_entries', array('id' => $existingentryid));
+                        $existingentry = $DB->get_record('datalynx_entries', array('id' => $existingentryid));
                         $existingentry->approved = 1;
                         foreach ($contents as $content) {
                             $newcontent = clone $content;
                             if ($content->fieldid == $teamfield->id()) {
                                 $newcontent->content = json_encode($newteammemberids);
                             }
-                            $DB->set_field('dataform_contents', 'content', $newcontent->content,
+                            $DB->set_field('datalynx_contents', 'content', $newcontent->content,
                                 array('entryid' => $existingentry->id, 'fieldid' => $newcontent->fieldid));
                         }
-                        $DB->update_record('dataform_entries', $existingentry);
+                        $DB->update_record('datalynx_entries', $existingentry);
                         $processed[$existingentry->id] = $existingentry;
                     } else {
                         $newentry = clone $entry;
@@ -904,7 +904,7 @@ class dataform_entries {
                         $newentry->groupid = $df->currentgroup;
                         $newentry->timecreated = $newentry->timemodified = time();
                         $newentry->approved = 1;
-                        $newentry->id = $DB->insert_record('dataform_entries', $newentry);
+                        $newentry->id = $DB->insert_record('datalynx_entries', $newentry);
 
                         foreach ($contents as $content) {
                             $newcontent = clone $content;
@@ -913,18 +913,18 @@ class dataform_entries {
                             }
 
                             $newcontent->entryid = $newentry->id;
-                            $DB->insert_record('dataform_contents', $newcontent);
+                            $DB->insert_record('datalynx_contents', $newcontent);
                         }
 
                         $processed[$newentry->id] = $newentry;
                     }
                 }
 
-                $DB->update_record('dataform_entries', $entry);
+                $DB->update_record('datalynx_entries', $entry);
 
                 foreach ($oldcontents as $content) {
                     $content->entryid = $entry->id;
-                    $DB->update_record('dataform_contents', $content);
+                    $DB->update_record('datalynx_contents', $content);
                 }
             }
         }
@@ -940,7 +940,7 @@ class dataform_entries {
 
         $df = $this->_df;
         
-        if ($data and has_capability('mod/dataform:manageentries', $df->context)) {
+        if ($data and has_capability('mod/datalynx:manageentries', $df->context)) {
             foreach ($data as $key => $value) {
                 if ($key == 'name') {
                     $entry->userid = $value;
@@ -956,11 +956,11 @@ class dataform_entries {
         // update existing entry (only authenticated users)
         if ($entry->id > 0) {
             if ($df->user_can_manage_entry($entry)) { // just in case the user opens two forms at the same time
-                if (!has_capability('mod/dataform:approve', $df->context)) {
+                if (!has_capability('mod/datalynx:approve', $df->context)) {
                     $entry->approved = 0;
                 }
 
-                $oldapproved = $DB->get_field('dataform_entries', 'approved', array('id' => $entry->id));
+                $oldapproved = $DB->get_field('datalynx_entries', 'approved', array('id' => $entry->id));
                 $newapproved = isset($entry->approved) ? $entry->approved : 0;
 
                 if ($updatetime) {
@@ -969,7 +969,7 @@ class dataform_entries {
 
                 $entry->status = isset($data['status']) ? $data['status'] : $entry->status;
 
-                if ($DB->update_record('dataform_entries', $entry)) {
+                if ($DB->update_record('datalynx_entries', $entry)) {
                     if (!$oldapproved && $newapproved) {
                         $this->create_approved_entries_for_team(array($entry->id));
                     }
@@ -989,7 +989,7 @@ class dataform_entries {
             if (!isset($entry->timecreated)) $entry->timecreated = time();
             if (!isset($entry->timemodified)) $entry->timemodified = time();
             $entry->status = isset($data['status']) ? $data['status'] : 0;
-            $entryid = $DB->insert_record('dataform_entries', $entry);
+            $entryid = $DB->insert_record('datalynx_entries', $entry);
             if (isset($entry->approved) && $entry->approved) {
                 $this->create_approved_entries_for_team(array($entryid));
             }

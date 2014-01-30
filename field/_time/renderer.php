@@ -15,19 +15,19 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage _time
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die;
 
-require_once("$CFG->dirroot/mod/dataform/field/renderer.php");
+require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
  *
  */
-class dataformfield__time_renderer extends dataformfield_renderer {
+class datalynxfield__time_renderer extends datalynxfield_renderer {
 
     /**
      * 
@@ -103,7 +103,7 @@ class dataformfield__time_renderer extends dataformfield_renderer {
      */
     protected function patterns() {
         $fieldname = $this->_field->get('internalname');
-        $cat = get_string('entryinfo', 'dataform');
+        $cat = get_string('entryinfo', 'datalynx');
 
         $patterns = array();
         $patterns["##$fieldname##"] = array(true);

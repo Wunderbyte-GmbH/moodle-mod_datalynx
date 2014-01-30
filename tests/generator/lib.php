@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * mod_dataform data generator
+ * mod_datalynx data generator
  *
- * @package    mod_dataform
+ * @package    mod_datalynx
  * @category   phpunit
  * @copyright  2012 Itamar Tzadok
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -29,23 +29,23 @@ defined('MOODLE_INTERNAL') or die;
 /**
  * Page module PHPUnit data generator class
  *
- * @package    mod_dataform
+ * @package    mod_datalynx
  * @category   phpunit
  * @copyright  2012 Itamar Tzadok
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_dataform_generator extends phpunit_module_generator {
+class mod_datalynx_generator extends phpunit_module_generator {
 
     /**
-     * Create new dataform module instance
+     * Create new datalynx module instance
      * @param array|stdClass $record
      * @param array $options (mostly course_module properties)
      * @return stdClass activity record with extra cmid field
      */
     public function create_instance($record = null, array $options = null) {
         global $CFG;
-        require_once("$CFG->dirroot/mod/dataform/lib.php");
-        require_once("$CFG->dirroot/mod/dataform/locallib.php");
+        require_once("$CFG->dirroot/mod/datalynx/lib.php");
+        require_once("$CFG->dirroot/mod/datalynx/locallib.php");
 
         $this->instancecount++;
         $i = $this->instancecount;
@@ -57,10 +57,10 @@ class mod_dataform_generator extends phpunit_module_generator {
             throw new coding_exception('module generator requires $record->course');
         }
         if (!isset($record->name)) {
-            $record->name = get_string('pluginname', 'dataform').' '.$i;
+            $record->name = get_string('pluginname', 'datalynx').' '.$i;
         }
         if (!isset($record->intro)) {
-            $record->intro = 'Test dataform '.$i;
+            $record->intro = 'Test datalynx '.$i;
         }
         if (!isset($record->introformat)) {
             $record->introformat = FORMAT_MOODLE;
@@ -75,7 +75,7 @@ class mod_dataform_generator extends phpunit_module_generator {
         }
 
         $record->coursemodule = $this->precreate_course_module($record->course, $options);
-        $id = dataform_add_instance($record, null);
+        $id = datalynx_add_instance($record, null);
         return $this->post_add_instance($id, $record->coursemodule);
     }
 }

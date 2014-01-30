@@ -15,15 +15,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage _status
  * @copyright 2013 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once("$CFG->dirroot/mod/dataform/field/field_class.php");
+require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
-class dataformfield__status extends dataformfield_no_content {
+class datalynxfield__status extends datalynxfield_no_content {
 
     public $type = '_status';
 
@@ -44,7 +44,7 @@ class dataformfield__status extends dataformfield_no_content {
                 'id' => self::_STATUS,
                 'dataid' => $dataid,
                 'type' => '_status',
-                'name' => get_string('status', 'dataform'),
+                'name' => get_string('status', 'datalynx'),
                 'description' => '',
                 'visible' => 2,
                 'internalname' => 'status');

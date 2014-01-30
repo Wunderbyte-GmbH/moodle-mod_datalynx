@@ -16,19 +16,19 @@
  
 /**
  * @package mod
- * @subpackage dataform
+ * @subpackage datalynx
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * The Dataform has been developed as an enhanced counterpart
+ * The Datalynx has been developed as an enhanced counterpart
  * of Moodle's Database activity module (1.9.11+ (20110323)).
- * To the extent that Dataform code corresponds to Database code,
+ * To the extent that Datalynx code corresponds to Database code,
  * certain copyrights on the Database module may obtain
  */
 
 require_once("../../config.php");
-require_once("$CFG->dirroot/mod/dataform/mod_class.php");
-require_once("$CFG->dirroot/mod/dataform/lib.php");
+require_once("$CFG->dirroot/mod/datalynx/mod_class.php");
+require_once("$CFG->dirroot/mod/datalynx/lib.php");
 
 $id             = required_param('id', PARAM_INT);   // course
 //$add            = optional_param('add', '', PARAM_ALPHA);
@@ -46,20 +46,20 @@ if (!$course = $DB->get_record('course', array('id' => $id))) {
 $context = context_course::instance($course->id);
 require_course_login($course);
 
-add_to_log($course->id, "dataform", "view all", "index.php?id=$course->id", "");
+add_to_log($course->id, "datalynx", "view all", "index.php?id=$course->id", "");
 
-$modulename = get_string('modulename','dataform');
-$modulenameplural  = get_string('modulenameplural','dataform');
+$modulename = get_string('modulename','datalynx');
+$modulenameplural  = get_string('modulenameplural','datalynx');
 
-$PAGE->set_url('/mod/dataform/index.php', array('id' => $id));
+$PAGE->set_url('/mod/datalynx/index.php', array('id' => $id));
 $PAGE->set_pagelayout('incourse');
-$PAGE->navbar->add($modulename, new moodle_url('/mod/dataform/index.php', array('id'=>$course->id)));
+$PAGE->navbar->add($modulename, new moodle_url('/mod/datalynx/index.php', array('id'=>$course->id)));
 $PAGE->set_title($modulename);
 $PAGE->set_heading($course->fullname);
 
 echo $OUTPUT->header();
 
-if (!$dataforms = get_all_instances_in_course("dataform", $course)) {
+if (!$datalynxs = get_all_instances_in_course("datalynx", $course)) {
     notice(get_string('thereareno', 'moodle',$modulenameplural) , new moodle_url('/course/view.php', array('id', $course->id)));
 }
 
@@ -89,15 +89,15 @@ $table->head[] = get_string('description');
 $table->align[] = 'left';
 
 // number of entries
-$table->head[] = get_string('entries', 'dataform');
+$table->head[] = get_string('entries', 'datalynx');
 $table->align[] = 'center';
 
 // number of pending entries
-$table->head[] = get_string('entriespending', 'dataform');
+$table->head[] = get_string('entriespending', 'datalynx');
 $table->align[] = 'center';
 
 // rss
-$rss = (!empty($CFG->enablerssfeeds) and !empty($CFG->dataform_enablerssfeeds));
+$rss = (!empty($CFG->enablerssfeeds) and !empty($CFG->datalynx_enablerssfeeds));
 if ($rss) {
     require_once($CFG->libdir."/rsslib.php");
     $table->head[] = 'RSS';
@@ -118,48 +118,48 @@ $currentsection = null;
 $stredit = get_string('edit');
 $strdelete = get_string('delete');
 
-foreach ($dataforms as $dataform) {
+foreach ($datalynxs as $datalynx) {
     $tablerow = array();
     
-    $df = new dataform($dataform);
+    $df = new datalynx($datalynx);
 
-    if (!has_capability('mod/dataform:viewindex', $df->context)) {
+    if (!has_capability('mod/datalynx:viewindex', $df->context)) {
         continue;
     }
 
     // section
     if ($usesections) {
-        if ($dataform->section !== $currentsection) {
+        if ($datalynx->section !== $currentsection) {
             if ($currentsection !== null) {
                 $table->data[] = 'hr';
             }
-            $currentsection = $dataform->section;
-            $tablerow[] = get_section_name($course, $sections[$dataform->section]);
+            $currentsection = $datalynx->section;
+            $tablerow[] = get_section_name($course, $sections[$datalynx->section]);
         } else {
             $tablerow[] = '';
         }
     }
 
     // name (linked; dim if not visible)
-    $linkparams = !$dataform->visible ? array('class' => 'dimmed') : null;
-    $linkedname = html_writer::link(new moodle_url('/mod/dataform/view.php', array('id' => $dataform->coursemodule)),
-                                format_string($dataform->name, true),
+    $linkparams = !$datalynx->visible ? array('class' => 'dimmed') : null;
+    $linkedname = html_writer::link(new moodle_url('/mod/datalynx/view.php', array('id' => $datalynx->coursemodule)),
+                                format_string($datalynx->name, true),
                                 $linkparams);
     $tablerow[] = $linkedname;
 
     // description
-    $tablerow[] = format_text($dataform->intro, $dataform->introformat, $options);
+    $tablerow[] = format_text($datalynx->intro, $datalynx->introformat, $options);
 
     // number of entries
-    $tablerow[] = $df->get_entriescount(dataform::COUNT_ALL);
+    $tablerow[] = $df->get_entriescount(datalynx::COUNT_ALL);
     
     // number of pending entries
-    $tablerow[] = $df->get_entriescount(dataform::COUNT_LEFT);
+    $tablerow[] = $df->get_entriescount(datalynx::COUNT_LEFT);
     
     // rss
     if ($rss) {
-        if ($dataform->rssarticles > 0) {
-            $tablerow[] = rss_get_link($course->id, $USER->id, 'dataform', $dataform->id, 'RSS');
+        if ($datalynx->rssarticles > 0) {
+            $tablerow[] = rss_get_link($course->id, $USER->id, 'datalynx', $datalynx->id, 'RSS');
         } else {
             $tablerow[] = '';
         }
@@ -167,11 +167,11 @@ foreach ($dataforms as $dataform) {
 
     if ($showeditbuttons) {
         $buttons = array();
-        $editingurl->param('update', $dataform->coursemodule);
+        $editingurl->param('update', $datalynx->coursemodule);
         $buttons['edit'] = html_writer::link($editingurl, $OUTPUT->pix_icon('t/edit', $stredit));
         $editingurl->remove_params('update');
         
-        $editingurl->param('delete', $dataform->coursemodule);
+        $editingurl->param('delete', $datalynx->coursemodule);
         $buttons['delete'] = html_writer::link($editingurl, $OUTPUT->pix_icon('t/delete', $strdelete));
         $editingurl->remove_params('delete');
 

@@ -15,7 +15,7 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformview
+ * @package datalynxview
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,7 +27,7 @@ require_once("$CFG->libdir/formslib.php");
 /**
  *
  */
-class dataformview_base_form extends moodleform {
+class datalynxview_base_form extends moodleform {
     protected $_view = null;
     protected $_df = null;
 
@@ -53,8 +53,8 @@ class dataformview_base_form extends moodleform {
 
         // general
         //-------------------------------------------------------------------------------
-        $mform->addElement('header', 'general', get_string('viewgeneral', 'dataform'));
-        $mform->addHelpButton('general', 'viewgeneral', 'dataform');
+        $mform->addElement('header', 'general', get_string('viewgeneral', 'datalynx'));
+        $mform->addHelpButton('general', 'viewgeneral', 'datalynx');
 
         // name and description
         $mform->addElement('text', 'name', get_string('name'));
@@ -69,39 +69,39 @@ class dataformview_base_form extends moodleform {
             $mform->setType('description', PARAM_CLEAN);
         }
 
-        $mform->addElement('checkbox', 'visible[1]', get_string('visibleto', 'dataform'), get_string('visible_1', 'dataform'), 1);
-        $mform->addElement('checkbox', 'visible[2]', '', get_string('visible_2', 'dataform'), 1);
-        $mform->addElement('checkbox', 'visible[4]', '', get_string('visible_4', 'dataform'), 1);
-        $mform->addElement('checkbox', 'visible[8]', '', get_string('visible_8', 'dataform'), 1);
+        $mform->addElement('checkbox', 'visible[1]', get_string('visibleto', 'datalynx'), get_string('visible_1', 'datalynx'), 1);
+        $mform->addElement('checkbox', 'visible[2]', '', get_string('visible_2', 'datalynx'), 1);
+        $mform->addElement('checkbox', 'visible[4]', '', get_string('visible_4', 'datalynx'), 1);
+        $mform->addElement('checkbox', 'visible[8]', '', get_string('visible_8', 'datalynx'), 1);
 
         // filter
         if (!$filtersmenu = $df->get_filter_manager()->get_filters(null, true)) {
-            $filtersmenu = array(0 => get_string('filtersnonedefined', 'dataform'));
+            $filtersmenu = array(0 => get_string('filtersnonedefined', 'datalynx'));
         } else {
            $filtersmenu = array(0 => get_string('choose')) + $filtersmenu;
         }
-        $mform->addElement('select', 'filter', get_string('viewfilter', 'dataform'), $filtersmenu);
+        $mform->addElement('select', 'filter', get_string('viewfilter', 'datalynx'), $filtersmenu);
         $mform->setDefault('filter', 0);
 
         // group by
         if (!$fieldsmenu = $view->get_df()->get_fields(array('entry'), true)) {
-            $fieldsmenu = array('' => get_string('fieldsnonedefined', 'dataform'));
+            $fieldsmenu = array('' => get_string('fieldsnonedefined', 'datalynx'));
         } else {
            $fieldsmenu = array('' => get_string('choose')) + $fieldsmenu;
         }        
-        $mform->addElement('select', 'groupby', get_string('viewgroupby', 'dataform'), $fieldsmenu);
+        $mform->addElement('select', 'groupby', get_string('viewgroupby', 'datalynx'), $fieldsmenu);
 
         // entries per page
         $perpageoptions = array(0=>get_string('choose'),1=>1,2=>2,3=>3,4=>4,5=>5,6=>6,7=>7,8=>8,9=>9,10=>10,15=>15,
                             20=>20,30=>30,40=>40,50=>50,100=>100,200=>200,300=>300,400=>400,500=>500,1000=>1000);
-        $mform->addElement('select', 'perpage', get_string('viewperpage', 'dataform'), $perpageoptions);
+        $mform->addElement('select', 'perpage', get_string('viewperpage', 'datalynx'), $perpageoptions);
         $mform->setDefault('perpage', 10);
 
         global $DB;
-        $mform->addElement('header', 'redirectsettings', get_string('redirectsettings', 'dataform'));
-        $mform->addHelpButton('redirectsettings', 'redirectsettings', 'dataform');
-        $mform->addElement('select', 'param10', get_string('redirectto', 'dataform'), $this->get_view_menu());
-        $mform->setDefault('param10', $DB->get_field('dataform', 'defaultview', array('id' => $this->_df->id())));
+        $mform->addElement('header', 'redirectsettings', get_string('redirectsettings', 'datalynx'));
+        $mform->addHelpButton('redirectsettings', 'redirectsettings', 'datalynx');
+        $mform->addElement('select', 'param10', get_string('redirectto', 'datalynx'), $this->get_view_menu());
+        $mform->setDefault('param10', $DB->get_field('datalynx', 'defaultview', array('id' => $this->_df->id())));
         $mform->setType('param10', PARAM_INT);
 
         // view specific definition
@@ -110,12 +110,12 @@ class dataformview_base_form extends moodleform {
 
         // View template
         //-------------------------------------------------------------------------------
-        $mform->addElement('header', 'viewtemplatehdr', get_string('viewtemplate', 'dataform'));
-        $mform->addHelpButton('viewtemplatehdr', 'viewtemplate', 'dataform');
+        $mform->addElement('header', 'viewtemplatehdr', get_string('viewtemplate', 'datalynx'));
+        $mform->addHelpButton('viewtemplatehdr', 'viewtemplate', 'datalynx');
 
         // section position
         //$sectionposoptions = array(0 => 'top', 1 => 'left', 2 => 'right', 3 => 'bottom');
-        //$mform->addElement('select', 'sectionpos', get_string('viewsectionpos', 'dataform'), $sectionposoptions);
+        //$mform->addElement('select', 'sectionpos', get_string('viewsectionpos', 'datalynx'), $sectionposoptions);
         //$mform->setDefault('sectionpos', 0);
         
         // section
@@ -161,25 +161,25 @@ class dataformview_base_form extends moodleform {
         $viewid = $this->_view->view->id;
         $dataid = $this->_df->id();
         $query = "SELECT dv.id, dv.name
-                    FROM {dataform_views} dv
+                    FROM {datalynx_views} dv
                    WHERE dv.dataid = :dataid";
-        $dviewid = $DB->get_field('dataform', 'defaultview', array('id' => $dataid));
-        $eviewid = $DB->get_field('dataform', 'singleedit', array('id' => $dataid));
-        $mviewid = $DB->get_field('dataform', 'singleview', array('id' => $dataid));
+        $dviewid = $DB->get_field('datalynx', 'defaultview', array('id' => $dataid));
+        $eviewid = $DB->get_field('datalynx', 'singleedit', array('id' => $dataid));
+        $mviewid = $DB->get_field('datalynx', 'singleview', array('id' => $dataid));
         $menu = $DB->get_records_sql_menu($query, array('dataid' => $dataid));
         if (isset($menu[$dviewid])) {
-            $menu[$dviewid] .= ' ' . get_string('targetview_default', 'dataform');
+            $menu[$dviewid] .= ' ' . get_string('targetview_default', 'datalynx');
         }
         if (isset($menu[$eviewid])) {
-            $menu[$eviewid] .= ' ' . get_string('targetview_edit', 'dataform');
+            $menu[$eviewid] .= ' ' . get_string('targetview_edit', 'datalynx');
         }
         if (isset($menu[$mviewid])) {
-            $menu[$mviewid] .= ' ' . get_string('targetview_more', 'dataform');
+            $menu[$mviewid] .= ' ' . get_string('targetview_more', 'datalynx');
         }
         if (!$viewid) {
-            $menu = array(0 => get_string('targetview_this_new', 'dataform')) + $menu;
+            $menu = array(0 => get_string('targetview_this_new', 'datalynx')) + $menu;
         } else {
-            $menu[$viewid] .= ' ' . get_string('targetview_this', 'dataform');
+            $menu[$viewid] .= ' ' . get_string('targetview_this', 'datalynx');
         }
         return $menu;
     }
@@ -206,9 +206,9 @@ class dataformview_base_form extends moodleform {
         // save and display
         $buttonarray[] = &$mform->createElement('submit', 'submitbutton', get_string('savechanges'));
         // save and continue
-        $buttonarray[] = &$mform->createElement('submit', 'submitreturnbutton', get_string('savecontinue', 'dataform'));
+        $buttonarray[] = &$mform->createElement('submit', 'submitreturnbutton', get_string('savecontinue', 'datalynx'));
         // reset to default
-        $buttonarray[] = &$mform->createElement('submit', 'resetdefaultbutton', get_string('viewresettodefault', 'dataform'));
+        $buttonarray[] = &$mform->createElement('submit', 'resetdefaultbutton', get_string('viewresettodefault', 'datalynx'));
         $mform->registerNoSubmitButton('resetdefaultbutton');
         // switch editor
         // cancel
@@ -226,17 +226,17 @@ class dataformview_base_form extends moodleform {
         switch ($tagstype) {
             case 'general':
                 $tags = $view->patterns()->get_menu();
-                $label = get_string('viewgeneraltags','dataform');
+                $label = get_string('viewgeneraltags','datalynx');
                 break;
                 
             case 'field':
                 $tags = $view->field_tags();
-                $label = get_string('viewfieldtags','dataform');
+                $label = get_string('viewfieldtags','datalynx');
                 break;
                 
             case 'character':
                 $tags = $view->character_tags();
-                $label = get_string('viewcharactertags','dataform');
+                $label = get_string('viewcharactertags','datalynx');
                 break;
                 
             default:
@@ -270,7 +270,7 @@ class dataformview_base_form extends moodleform {
         $errors= array();
         
         if ($df->name_exists('views', $data['name'], $view->id())) {
-            $errors['name'] = get_string('invalidname','dataform', get_string('view', 'dataform'));
+            $errors['name'] = get_string('invalidname','datalynx', get_string('view', 'datalynx'));
         }
 
         return $errors;

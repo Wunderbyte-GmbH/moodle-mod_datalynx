@@ -15,19 +15,19 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage multiselect
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once("$CFG->dirroot/mod/dataform/field/renderer.php");
+require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
  *
  */
-class dataformfield_multiselect_renderer extends dataformfield_renderer {
+class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
 
     /**
      * 
@@ -99,8 +99,8 @@ class dataformfield_multiselect_renderer extends dataformfield_renderer {
 
         // Input field for adding a new option
         if (!empty($options['addnew'])) {
-            if ($field->get('param4') or has_capability('mod/dataform:managetemplates', $field->df()->context)) {
-                $mform->addElement('text', "{$fieldname}_newvalue", get_string('newvalue', 'dataform'));
+            if ($field->get('param4') or has_capability('mod/datalynx:managetemplates', $field->df()->context)) {
+                $mform->addElement('text', "{$fieldname}_newvalue", get_string('newvalue', 'datalynx'));
                 $mform->setType("{$fieldname}_newvalue", PARAM_TEXT);
                 $mform->disabledIf("{$fieldname}_newvalue", "{$fieldname}_selected", 'neq', 0);
             }
@@ -157,7 +157,7 @@ class dataformfield_multiselect_renderer extends dataformfield_renderer {
         $grp = array();
         $grp[] = &$mform->createElement('text', "{$name}_name", null, array('size'=>'16'));                   
         $grp[] = &$mform->createElement('selectyesno', "{$name}_allownew");
-        $mform->addGroup($grp, "grp$tagname", $tagname, ' '. get_string('newvalueallow', 'dataform'). ': ', false);
+        $mform->addGroup($grp, "grp$tagname", $tagname, ' '. get_string('newvalueallow', 'datalynx'). ': ', false);
                             
         $mform->setType("{$name}_name", PARAM_NOTAGS);
         $mform->setDefault("{$name}_name", $tagname);
@@ -184,7 +184,7 @@ class dataformfield_multiselect_renderer extends dataformfield_renderer {
         list($elem, $separators) = $this->render($mform, $fieldname, $options, $selected);
         $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
         
-        $allreq = &$mform->createElement('checkbox', "{$fieldname}_allreq", null, ucfirst(get_string('requiredall', 'dataform')));
+        $allreq = &$mform->createElement('checkbox', "{$fieldname}_allreq", null, ucfirst(get_string('requiredall', 'datalynx')));
         $mform->setDefault("{$fieldname}_allreq", $allrequired);
         $mform->disabledIf("{$fieldname}_allreq", "searchoperator$i", 'eq', '');
         

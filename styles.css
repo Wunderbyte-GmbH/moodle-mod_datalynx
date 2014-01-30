@@ -1,9 +1,9 @@
 /**
- * This file is part of the Dataform module for Moodle - http://moodle.org/.
+ * This file is part of the Datalynx module for Moodle - http://moodle.org/.
  *
- * The Dataform has been developed as an enhanced counterpart
+ * The Datalynx has been developed as an enhanced counterpart
  * of Moodle's Database activity module (1.9.11+ (20110323)).
- * To the extent that Dataform code corresponds to Database code,
+ * To the extent that Datalynx code corresponds to Database code,
  * certain copyrights on the Database module may obtain.
  *
  * Moodle is free software: you can redistribute it and/or modify
@@ -21,83 +21,83 @@
  */
 
 /**
- * @package mod-dataform
+ * @package mod-datalynx
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-#page-mod-dataform-view #sortsearch .c0 {
+#page-mod-datalynx-view #sortsearch .c0 {
   text-align: right;
 }
 
-#page-mod-dataform-view .approve img.icon {
+#page-mod-datalynx-view .approve img.icon {
   width:34px;
   height:34px;
 }
 
-#page-mod-dataform-view .approve img.icon {
+#page-mod-datalynx-view .approve img.icon {
   width:34px;
   height:34px;
 }
 
-#page-mod-dataform-view .tabtree {
+#page-mod-datalynx-view .tabtree {
   margin-bottom: 1em;
 }
 
-#page-mod-dataform-view .singleselect {
+#page-mod-datalynx-view .singleselect {
   margin: 0.5em 0;
 }
 
-#page-mod-dataform-embed .entriesview,
-#page-mod-dataform-view .entriesview {
+#page-mod-datalynx-embed .entriesview,
+#page-mod-datalynx-view .entriesview {
   overflow: auto;
 }
 
-#page-mod-dataform-embed.gecko .mform fieldset.hidden,
-#page-mod-dataform-view.gecko .mform fieldset.hidden {
+#page-mod-datalynx-embed.gecko .mform fieldset.hidden,
+#page-mod-datalynx-view.gecko .mform fieldset.hidden {
   display: table-column;
 }
 
-#page-mod-dataform-embed .mform .entriesview fieldset.hidden,
-#page-mod-dataform-embed .mform .entriesview fieldset.hidden div,
-#page-mod-dataform-view .mform .entriesview fieldset.hidden,
-#page-mod-dataform-view .mform .entriesview fieldset.hidden div{
+#page-mod-datalynx-embed .mform .entriesview fieldset.hidden,
+#page-mod-datalynx-embed .mform .entriesview fieldset.hidden div,
+#page-mod-datalynx-view .mform .entriesview fieldset.hidden,
+#page-mod-datalynx-view .mform .entriesview fieldset.hidden div{
   margin: 0;
   padding: 0;
 }
 
-#page-mod-dataform-embed .mform .fitem .fitemtitle,
-#page-mod-dataform-embed .mform .entriesview .fitem .fitemtitle,
-/*#page-mod-dataform-view .mform .fitem .fitemtitle,*/
-#page-mod-dataform-view .mform .entriesview .fitem .fitemtitle {
+#page-mod-datalynx-embed .mform .fitem .fitemtitle,
+#page-mod-datalynx-embed .mform .entriesview .fitem .fitemtitle,
+/*#page-mod-datalynx-view .mform .fitem .fitemtitle,*/
+#page-mod-datalynx-view .mform .entriesview .fitem .fitemtitle {
   float: left;
   text-align: left;
   width: auto;
 }
 
 
-#page-mod-dataform-embed .mform .fitem .felement,
-#page-mod-dataform-embed .mform .entriesview .fitem .felement,
-#page-mod-dataform-embed .mform .entriesview .fitem .feditor,
-/*#page-mod-dataform-view .mform .fitem .felement,*/
-#page-mod-dataform-view .mform .entriesview .fitem .felement,
-#page-mod-dataform-view .mform .entriesview .fitem .feditor {
+#page-mod-datalynx-embed .mform .fitem .felement,
+#page-mod-datalynx-embed .mform .entriesview .fitem .felement,
+#page-mod-datalynx-embed .mform .entriesview .fitem .feditor,
+/*#page-mod-datalynx-view .mform .fitem .felement,*/
+#page-mod-datalynx-view .mform .entriesview .fitem .felement,
+#page-mod-datalynx-view .mform .entriesview .fitem .feditor {
   margin-left: 0;
   width: 100%;
 }
 
-.mod-dataform-field .c0 {
+.mod-datalynx-field .c0 {
   text-align: right;
 }
 
-.mod-dataform-field .fieldadd,
-.mod-dataform-field .sortdefault {
+.mod-datalynx-field .fieldadd,
+.mod-datalynx-field .sortdefault {
   margin-bottom: 1em;
   margin-top: 1em;
 }
 
-.mod-dataform-field .fieldadd select,
-.mod-dataform-field .sortdefault select {
+.mod-datalynx-field .fieldadd select,
+.mod-datalynx-field .sortdefault select {
   margin-left: 1em;
 }
 
@@ -106,12 +106,12 @@
     border: 0 none !important;
 }
 
-#page-mod-dataform-embed {
+#page-mod-datalynx-embed {
     margin: 0;
     width: 100%;
 }
 
-#page-mod-dataform-embed.pagelayout-embedded #content {
+#page-mod-datalynx-embed.pagelayout-embedded #content {
     padding: 0;
 }
 
@@ -124,18 +124,18 @@
     display: none;
 }
 
-.dataformfield_teammemberselect_select {
+.datalynxfield_teammemberselect_select {
   display: inherit;
 }
 
-.jsenabled .dataformfield_teammemberselect_select {
+.jsenabled .datalynxfield_teammemberselect_select {
   display: none;
 }
 
-.dataformfield_teammemberselect_dropdown {
+.datalynxfield_teammemberselect_dropdown {
   display: none;
 }
 
-.jsenabled .dataformfield_teammemberselect_dropdown {
+.jsenabled .datalynxfield_teammemberselect_dropdown {
   display: inherit;
 }

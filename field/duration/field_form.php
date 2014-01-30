@@ -15,14 +15,14 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage duration
  * @copyright 2013 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once("$CFG->dirroot/mod/dataform/field/field_form.php");
+require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
-class dataformfield_duration_form extends dataformfield_form {
+class datalynxfield_duration_form extends datalynxfield_form {
 
     /**
      *
@@ -32,13 +32,13 @@ class dataformfield_duration_form extends dataformfield_form {
         $mform = &$this->_form;
 
     //-------------------------------------------------------------------------------
-        $mform->addElement('header', 'fieldattributeshdr', get_string('fieldattributes', 'dataform'));
+        $mform->addElement('header', 'fieldattributeshdr', get_string('fieldattributes', 'datalynx'));
         
         // field width
         $fieldwidthgrp=array();
         $fieldwidthgrp[] = &$mform->createElement('text', 'param2', null, array('size'=>'8'));
         $fieldwidthgrp[] = &$mform->createElement('select', 'param3', null, array('px' => 'px', 'em' => 'em', '%' => '%'));
-        $mform->addGroup($fieldwidthgrp, 'fieldwidthgrp', get_string('fieldwidth', 'dataform'), array(' '), false);
+        $mform->addGroup($fieldwidthgrp, 'fieldwidthgrp', get_string('fieldwidth', 'datalynx'), array(' '), false);
         $mform->setType('param2', PARAM_INT);
         $mform->addGroupRule('fieldwidthgrp', array('param2' => array(array(null, 'numeric', null, 'client'))));        
         $mform->disabledIf('param3', 'param2', 'eq', '');

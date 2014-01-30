@@ -15,19 +15,19 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage url
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die;
 
-require_once("$CFG->dirroot/mod/dataform/field/renderer.php");
+require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
  *
  */
-class dataformfield_url_renderer extends dataformfield_renderer {
+class datalynxfield_url_renderer extends datalynxfield_renderer {
 
     /**
      * 
@@ -92,7 +92,7 @@ class dataformfield_url_renderer extends dataformfield_renderer {
 
         // add alt name if not forcing name
         if (empty($field->field->param2)) {
-            $mform->addElement('text', "{$fieldname}_alt", get_string('alttext','dataformfield_url'));
+            $mform->addElement('text', "{$fieldname}_alt", get_string('alttext','datalynxfield_url'));
             $mform->setType("{$fieldname}_alt", PARAM_TEXT);
             $mform->setDefault("{$fieldname}_alt", s($alt));
         }

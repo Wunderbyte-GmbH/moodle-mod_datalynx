@@ -15,19 +15,19 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage time
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once("$CFG->dirroot/mod/dataform/field/renderer.php");
+require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
  *
  */
-class dataformfield_time_renderer extends dataformfield_renderer {
+class datalynxfield_time_renderer extends datalynxfield_renderer {
 
     /**
      * 
@@ -217,8 +217,8 @@ class dataformfield_time_renderer extends dataformfield_renderer {
 
         // If time add hours and minutes
         if ($includetime) {
-            $maskhour = get_string('hour', 'dataformfield_time');
-            $maskminute = get_string('minute', 'dataformfield_time');
+            $maskhour = get_string('hour', 'datalynxfield_time');
+            $maskminute = get_string('minute', 'datalynxfield_time');
 
             $hours = array();
             for ($i=0; $i<=23; $i++) {
@@ -253,16 +253,16 @@ class dataformfield_time_renderer extends dataformfield_renderer {
         if ($required) {
             if ($includetime) {
                 $mform->addGroupRule("grp$fieldname", array(
-                    "{$fieldname}[day]" => array(array(get_string('time_field_required', 'dataform', get_string('day')), 'nonzero', null, 'client')),
-                    "{$fieldname}[month]" => array(array(get_string('time_field_required', 'dataform', get_string('month')), 'nonzero', null, 'client')),
-                    "{$fieldname}[year]" => array(array(get_string('time_field_required', 'dataform', get_string('year')), 'nonzero', null, 'client')),
-                    "{$fieldname}[hour]" => array(array(get_string('time_field_required', 'dataform', get_string('hour')), 'nonzero', null, 'client')),
-                    "{$fieldname}[minute]" => array(array(get_string('time_field_required', 'dataform', get_string('minute')), 'nonzero', null, 'client'))));
+                    "{$fieldname}[day]" => array(array(get_string('time_field_required', 'datalynx', get_string('day')), 'nonzero', null, 'client')),
+                    "{$fieldname}[month]" => array(array(get_string('time_field_required', 'datalynx', get_string('month')), 'nonzero', null, 'client')),
+                    "{$fieldname}[year]" => array(array(get_string('time_field_required', 'datalynx', get_string('year')), 'nonzero', null, 'client')),
+                    "{$fieldname}[hour]" => array(array(get_string('time_field_required', 'datalynx', get_string('hour')), 'nonzero', null, 'client')),
+                    "{$fieldname}[minute]" => array(array(get_string('time_field_required', 'datalynx', get_string('minute')), 'nonzero', null, 'client'))));
             } else {
                 $mform->addGroupRule("grp$fieldname", array(
-                    "{$fieldname}[day]" => array(array(get_string('time_field_required', 'dataform', get_string('day')), 'nonzero', null, 'client')),
-                    "{$fieldname}[month]" => array(array(get_string('time_field_required', 'dataform', get_string('month')), 'nonzero', null, 'client')),
-                    "{$fieldname}[year]" => array(array(get_string('time_field_required', 'dataform', get_string('year')), 'nonzero', null, 'client'))));
+                    "{$fieldname}[day]" => array(array(get_string('time_field_required', 'datalynx', get_string('day')), 'nonzero', null, 'client')),
+                    "{$fieldname}[month]" => array(array(get_string('time_field_required', 'datalynx', get_string('month')), 'nonzero', null, 'client')),
+                    "{$fieldname}[year]" => array(array(get_string('time_field_required', 'datalynx', get_string('year')), 'nonzero', null, 'client'))));
             }
         }
     }

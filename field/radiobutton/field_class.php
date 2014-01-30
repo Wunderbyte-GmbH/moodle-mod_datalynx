@@ -15,15 +15,15 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage radiobutton
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once("$CFG->dirroot/mod/dataform/field/select/field_class.php");
+require_once("$CFG->dirroot/mod/datalynx/field/select/field_class.php");
 
-class dataformfield_radiobutton extends dataformfield_select {
+class datalynxfield_radiobutton extends datalynxfield_select {
 
     public $type = 'radiobutton';
     public $separators = array(

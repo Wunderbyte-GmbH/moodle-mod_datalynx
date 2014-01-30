@@ -15,19 +15,19 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage checkbox
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die;
 
-require_once("$CFG->dirroot/mod/dataform/field/multiselect/renderer.php");
+require_once("$CFG->dirroot/mod/datalynx/field/multiselect/renderer.php");
 
 /**
  * 
  */
-class dataformfield_checkbox_renderer extends dataformfield_multiselect_renderer {
+class datalynxfield_checkbox_renderer extends datalynxfield_multiselect_renderer {
 
     /**
      *
@@ -66,12 +66,12 @@ class dataformfield_checkbox_renderer extends dataformfield_multiselect_renderer
         );
 
         $module = array(
-            'name' => 'M.dataformfield_checkbox_required',
-            'fullpath' => '/mod/dataform/field/checkbox/checkbox.js',
+            'name' => 'M.datalynxfield_checkbox_required',
+            'fullpath' => '/mod/datalynx/field/checkbox/checkbox.js',
             'requires' => array('base','node')
         );
 
-        $PAGE->requires->js_init_call('M.dataformfield_checkbox_required.init', array($options), false, $module);            
+        $PAGE->requires->js_init_call('M.datalynxfield_checkbox_required.init', array($options), false, $module);            
     }
 
     /**
@@ -95,7 +95,7 @@ class dataformfield_checkbox_renderer extends dataformfield_multiselect_renderer
         list($elem, $separators) = $this->render($mform, $fieldname, $options, $selected);
         $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
 
-        $allreq = &$mform->createElement('checkbox', "{$fieldname}_allreq", null, ucfirst(get_string('requiredall', 'dataform')));
+        $allreq = &$mform->createElement('checkbox', "{$fieldname}_allreq", null, ucfirst(get_string('requiredall', 'datalynx')));
         $mform->setDefault("{$fieldname}_allreq", $allrequired);
         $mform->disabledIf("{$fieldname}_allreq", "searchoperator$i", 'eq', '');
 
@@ -123,7 +123,7 @@ class dataformfield_checkbox_renderer extends dataformfield_multiselect_renderer
                 }
             }
             if ($emptyfield) {
-                return array("{$fieldname}_grp" => get_string('fieldrequired', 'dataform'));
+                return array("{$fieldname}_grp" => get_string('fieldrequired', 'datalynx'));
             }
         }
         return null;

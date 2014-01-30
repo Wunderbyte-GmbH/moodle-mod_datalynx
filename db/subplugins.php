@@ -16,13 +16,13 @@
  
 /**
  * @package mod
- * @subpackage dataform
+ * @subpackage datalynx
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */ 
 $subplugins = array(
-    'dataformfield'  => 'mod/dataform/field',
-    'dataformview' => 'mod/dataform/view',
-    'dataformrule' => 'mod/dataform/rule',
-    'dataformtool' => 'mod/dataform/tool',
+    'datalynxfield'  => 'mod/datalynx/field',
+    'datalynxview' => 'mod/datalynx/view',
+    'datalynxrule' => 'mod/datalynx/rule',
+    'datalynxtool' => 'mod/datalynx/tool',
 );

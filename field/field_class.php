@@ -15,7 +15,7 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -23,9 +23,9 @@
 require_once(dirname(__FILE__). '/../mod_class.php');
 
 /**
- * Base class for Dataform Field Types
+ * Base class for Datalynx Field Types
  */
-abstract class dataformfield_base {
+abstract class datalynxfield_base {
 
     const VISIBLE_NONE = 0;
     const VISIBLE_OWNER = 1;
@@ -33,7 +33,7 @@ abstract class dataformfield_base {
 
     public $type = 'unknown';  // Subclasses must override the type with their name
 
-    public $df = null;       // The dataform object that this field belongs to
+    public $df = null;       // The datalynx object that this field belongs to
     public $field = null;      // The field object itself, if we know it
 
     protected $_renderer = null;
@@ -42,17 +42,17 @@ abstract class dataformfield_base {
     /**
      * Class constructor
      *
-     * @param var $df       dataform id or class object
+     * @param var $df       datalynx id or class object
      * @param var $field    field id or DB record
      */
     public function __construct($df = 0, $field = 0) {
 
         if (empty($df)) {
-            throw new coding_exception('Dataform id or object must be passed to view constructor.');
-        } else if ($df instanceof dataform) {
+            throw new coding_exception('Datalynx id or object must be passed to view constructor.');
+        } else if ($df instanceof datalynx) {
             $this->df = $df;
-        } else {    // dataform id/object
-            $this->df = new dataform($df);
+        } else {    // datalynx id/object
+            $this->df = new datalynx($df);
         }
 
         if (!empty($field)) {
@@ -64,7 +64,7 @@ abstract class dataformfield_base {
             } else if ($fieldobj = $this->df->get_field_from_id($field)) {
                 $this->field = $fieldobj->field;
             } else {
-                throw new moodle_exception('invalidfield', 'dataform', null, null, $field);
+                throw new moodle_exception('invalidfield', 'datalynx', null, null, $field);
             }
         }
 
@@ -101,7 +101,7 @@ abstract class dataformfield_base {
             $this->set_field($fromform);
         }
 
-        if (!$this->field->id = $DB->insert_record('dataform_fields', $this->field)){
+        if (!$this->field->id = $DB->insert_record('datalynx_fields', $this->field)){
             echo $OUTPUT->notification('Insertion of new field failed!');
             return false;
         } else {
@@ -118,7 +118,7 @@ abstract class dataformfield_base {
             $this->set_field($fromform);
         }
 
-        if (!$DB->update_record('dataform_fields', $this->field)) {
+        if (!$DB->update_record('datalynx_fields', $this->field)) {
             echo $OUTPUT->notification('updating of field failed!');
             return false;
         }
@@ -134,10 +134,10 @@ abstract class dataformfield_base {
         if (!empty($this->field->id)) {
             if ($filearea = $this->filearea()) {
                 $fs = get_file_storage();
-                $fs->delete_area_files($this->df->context->id, 'mod_dataform', $filearea);
+                $fs->delete_area_files($this->df->context->id, 'mod_datalynx', $filearea);
             }
             $this->delete_content();
-            $DB->delete_records('dataform_fields', array('id' => $this->field->id));
+            $DB->delete_records('datalynx_fields', array('id' => $this->field->id));
         }
         return true;
     }
@@ -179,7 +179,7 @@ abstract class dataformfield_base {
      * Returns the type name of the field
      */
     public function typename() {
-        return get_string('pluginname', "dataformfield_{$this->type}");
+        return get_string('pluginname', "datalynxfield_{$this->type}");
     }
 
     /**
@@ -191,7 +191,7 @@ abstract class dataformfield_base {
         $image = $OUTPUT->pix_icon(
                             'icon',
                             $this->type,
-                            "dataformfield_{$this->type}");
+                            "datalynxfield_{$this->type}");
 
         return $image;
 
@@ -210,15 +210,15 @@ abstract class dataformfield_base {
     public function get_form() {
         global $CFG;
 
-        if (file_exists($CFG->dirroot. '/mod/dataform/field/'. $this->type. '/field_form.php')) {
-            require_once($CFG->dirroot. '/mod/dataform/field/'. $this->type. '/field_form.php');
-            $formclass = 'dataformfield_'. $this->type. '_form';
+        if (file_exists($CFG->dirroot. '/mod/datalynx/field/'. $this->type. '/field_form.php')) {
+            require_once($CFG->dirroot. '/mod/datalynx/field/'. $this->type. '/field_form.php');
+            $formclass = 'datalynxfield_'. $this->type. '_form';
         } else {
-            require_once($CFG->dirroot. '/mod/dataform/field/field_form.php');
-            $formclass = 'dataformfield_form';
+            require_once($CFG->dirroot. '/mod/datalynx/field/field_form.php');
+            $formclass = 'datalynxfield_form';
         }
         $actionurl = new moodle_url(
-            '/mod/dataform/field/field_edit.php',
+            '/mod/datalynx/field/field_edit.php',
             array('d' => $this->df->id(), 'fid' => $this->id(), 'type' => $this->type)
         );
         return new $formclass($this, $actionurl);
@@ -238,8 +238,8 @@ abstract class dataformfield_base {
         global $CFG;
 
         if (!$this->_renderer) {
-            $rendererclass = "dataformfield_{$this->type}_renderer";
-            require_once("$CFG->dirroot/mod/dataform/field/{$this->type}/renderer.php");
+            $rendererclass = "datalynxfield_{$this->type}_renderer";
+            require_once("$CFG->dirroot/mod/datalynx/field/{$this->type}/renderer.php");
             $this->_renderer = new $rendererclass($this);
         }
         return $this->_renderer;
@@ -295,7 +295,7 @@ abstract class dataformfield_base {
             return true;
         } 
 
-        if ($canmanageentries = has_capability('mod/dataform:manageentries', $this->df()->context)) {
+        if ($canmanageentries = has_capability('mod/datalynx:manageentries', $this->df()->context)) {
             return true;
         }
         
@@ -312,7 +312,7 @@ abstract class dataformfield_base {
      */
     protected function is_editable() {
         if (empty($this->field->edits)
-                    and !has_capability('mod/dataform:manageentries', $this->df()->context)) {
+                    and !has_capability('mod/datalynx:manageentries', $this->df()->context)) {
             return false;
         }
         return true;
@@ -342,7 +342,7 @@ abstract class dataformfield_base {
 
         // insert only if no old contents and there is new contents
         if (is_null($contentid) and !empty($contents)) {
-            return $DB->insert_record('dataform_contents', $rec);
+            return $DB->insert_record('datalynx_contents', $rec);
         }
 
         // delete if old content but not new
@@ -355,7 +355,7 @@ abstract class dataformfield_base {
             foreach ($contents as $key => $content) {
                 if (!isset($oldcontents[$key]) or $content !== $oldcontents[$key]) {
                     $rec->id = $contentid; // MUST_EXIST
-                    return $DB->update_record('dataform_contents', $rec);
+                    return $DB->update_record('datalynx_contents', $rec);
                 }
             }
         }
@@ -375,16 +375,16 @@ abstract class dataformfield_base {
             $params = array('fieldid' => $this->field->id);
         }
 
-        $rs = $DB->get_recordset('dataform_contents', $params);
+        $rs = $DB->get_recordset('datalynx_contents', $params);
         if ($rs->valid()) {
             $fs = get_file_storage();
             foreach ($rs as $content) {
-                $fs->delete_area_files($this->df->context->id, 'mod_dataform', 'content', $content->id);
+                $fs->delete_area_files($this->df->context->id, 'mod_datalynx', 'content', $content->id);
             }
         }
         $rs->close();
 
-        return $DB->delete_records('dataform_contents', $params);
+        return $DB->delete_records('datalynx_contents', $params);
     }
 
     /**
@@ -393,17 +393,17 @@ abstract class dataformfield_base {
     public function transfer_content($tofieldid) {
         global $CFG, $DB;
 
-        if ($contents = $DB->get_records('dataform_contents', array('fieldid' => $this->field->id))) {
+        if ($contents = $DB->get_records('datalynx_contents', array('fieldid' => $this->field->id))) {
             if (!$tofieldid) {
                 return false;
             } else {
                 foreach ($contents as $content) {
                     $content->fieldid = $tofieldid;
-                    $DB->update_record('dataform_contents', $content);
+                    $DB->update_record('datalynx_contents', $content);
                 }
 
                 // rename content dir if exists
-                $path = $CFG->dataroot.'/'.$this->df->course->id.'/'.$CFG->moddata.'/dataform/'.$this->df->id();
+                $path = $CFG->dataroot.'/'.$this->df->course->id.'/'.$CFG->moddata.'/datalynx/'.$this->df->id();
                 $olddir = "$path/". $this->field->id;
                 $newdir = "$path/$tofieldid";
                 file_exists($olddir) and rename($olddir, $newdir);
@@ -425,7 +425,7 @@ abstract class dataformfield_base {
             $sortdir = $sortdir ? 'DESC' : 'ASC';
             $contentname = $this->get_sort_sql();
             $sql = "SELECT DISTINCT $contentname
-                        FROM {dataform_contents} c$fieldid
+                        FROM {datalynx_contents} c$fieldid
                         WHERE c$fieldid.fieldid = $fieldid AND $contentname IS NOT NULL
                         ORDER BY $contentname $sortdir";
 
@@ -540,7 +540,7 @@ abstract class dataformfield_base {
     public function get_sort_from_sql($paramname = 'sortie', $paramcount = '') {
         $fieldid = $this->field->id;
         if ($fieldid > 0) {
-            $sql = " LEFT JOIN {dataform_contents} c$fieldid ON (c$fieldid.entryid = e.id AND c$fieldid.fieldid = :$paramname$paramcount) ";
+            $sql = " LEFT JOIN {datalynx_contents} c$fieldid ON (c$fieldid.entryid = e.id AND c$fieldid.fieldid = :$paramname$paramcount) ";
             return array($sql, $fieldid);
         } else {
             return null;
@@ -560,7 +560,7 @@ abstract class dataformfield_base {
     public function get_search_from_sql() {
         $fieldid = $this->field->id;
         if ($fieldid > 0) {
-            return " JOIN {dataform_contents} c$fieldid ON c$fieldid.entryid = e.id ";
+            return " JOIN {datalynx_contents} c$fieldid ON c$fieldid.entryid = e.id ";
         } else {
             return '';
         }
@@ -634,7 +634,7 @@ abstract class dataformfield_base {
         
         $sql = " fieldid = :fieldid AND $sql ";
         $params['fieldid'] = $this->id();
-        return $DB->get_records_select_menu('dataform_contents', $sql, $params, '', 'id,entryid');
+        return $DB->get_records_select_menu('datalynx_contents', $sql, $params, '', 'id,entryid');
     }
     
     /**
@@ -683,11 +683,11 @@ abstract class dataformfield_base {
     }
 
     /**
-     * Whether this field content resides in dataform_contents
+     * Whether this field content resides in datalynx_contents
      *
      * @return bool
      */
-    public function is_dataform_content() {
+    public function is_datalynx_content() {
         return true;
     }
 
@@ -720,24 +720,24 @@ abstract class dataformfield_base {
      */
     public function get_supported_search_operators() {
         return array(
-            '' => get_string('empty', 'dataform'),
-            '=' => get_string('equal', 'dataform'),
-            '>' => get_string('greaterthan', 'dataform'),
-            '<' => get_string('lessthan', 'dataform'),
-            '>=' => get_string('greaterorequal', 'dataform'),
-            '<=' => get_string('lessorequal', 'dataform'),
-            'BETWEEN' => get_string('between', 'dataform'),
-            'LIKE' => get_string('contains', 'dataform'),
-            'IN' => get_string('in', 'dataform'),
+            '' => get_string('empty', 'datalynx'),
+            '=' => get_string('equal', 'datalynx'),
+            '>' => get_string('greaterthan', 'datalynx'),
+            '<' => get_string('lessthan', 'datalynx'),
+            '>=' => get_string('greaterorequal', 'datalynx'),
+            '<=' => get_string('lessorequal', 'datalynx'),
+            'BETWEEN' => get_string('between', 'datalynx'),
+            'LIKE' => get_string('contains', 'datalynx'),
+            'IN' => get_string('in', 'datalynx'),
         );
     }
 
 }
 
 /**
- * Base class for Dataform field types that require no content
+ * Base class for Datalynx field types that require no content
  */
-abstract class dataformfield_no_content extends dataformfield_base {
+abstract class datalynxfield_no_content extends datalynxfield_base {
     public function update_content($entry, array $values = null) {
         return true;
     }
@@ -769,7 +769,7 @@ abstract class dataformfield_no_content extends dataformfield_base {
     /**
      *
      */
-    public function is_dataform_content() {
+    public function is_datalynx_content() {
         return false;
     }
 

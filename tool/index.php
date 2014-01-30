@@ -15,7 +15,7 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformtool
+ * @package datalynxtool
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -24,7 +24,7 @@ require_once('../mod_class.php');
 
 $urlparams = new object();
 
-$urlparams->d = optional_param('d', 0, PARAM_INT);             // dataform id
+$urlparams->d = optional_param('d', 0, PARAM_INT);             // datalynx id
 $urlparams->id = optional_param('id', 0, PARAM_INT);           // course module id
 
 // views list actions
@@ -32,19 +32,19 @@ $urlparams->run    = optional_param('run', '', PARAM_PLUGIN);  // tool plugin to
 
 $urlparams->confirmed    = optional_param('confirmed', 0, PARAM_INT);
 
-// Set a dataform object
-$df = new dataform($urlparams->d, $urlparams->id);
-require_capability('mod/dataform:managetemplates', $df->context);
+// Set a datalynx object
+$df = new datalynx($urlparams->d, $urlparams->id);
+require_capability('mod/datalynx:managetemplates', $df->context);
 
 $df->set_page('tool/index', array('modjs' => true, 'urlparams' => $urlparams));
 
 // activate navigation node
-navigation_node::override_active_url(new moodle_url('/mod/dataform/tool/index.php', array('id' => $df->cm->id)));
+navigation_node::override_active_url(new moodle_url('/mod/datalynx/tool/index.php', array('id' => $df->cm->id)));
 
 // DATA PROCESSING
 if ($urlparams->run and confirm_sesskey()) {  // Run selected tool
-    $tooldir = "$CFG->dirroot/mod/dataform/tool/$urlparams->run";
-    $toolclass = "dataformtool_$urlparams->run";
+    $tooldir = "$CFG->dirroot/mod/datalynx/tool/$urlparams->run";
+    $toolclass = "datalynxtool_$urlparams->run";
     if (file_exists($tooldir)) {
         require_once("$tooldir/lib.php");
         if ($result = $toolclass::run($df)) {
@@ -58,19 +58,19 @@ if ($urlparams->run and confirm_sesskey()) {  // Run selected tool
 }
 
 // Get the list of tools
-$directories = get_list_of_plugins('mod/dataform/tool/');
+$directories = get_list_of_plugins('mod/datalynx/tool/');
 $tools = array();
 foreach ($directories as $directory){
     $tools[$directory] = (object) array(
-        'name' => get_string('pluginname',"dataformtool_$directory"),
-        'description' => get_string('pluginname_help',"dataformtool_$directory")
+        'name' => get_string('pluginname',"datalynxtool_$directory"),
+        'description' => get_string('pluginname_help',"datalynxtool_$directory")
     );
 }
 ksort($tools);    //sort in alphabetical order
 
 // any notifications?
 if (!$tools) {
-    $df->notifications['bad'][] = get_string('toolnoneindataform','dataform');  // nothing in database
+    $df->notifications['bad'][] = get_string('toolnoneindatalynx','datalynx');  // nothing in database
 }
 
 // print header
@@ -78,13 +78,13 @@ $df->print_header(array('tab' => 'tools', 'urlparams' => $urlparams));
 
 // if there are tools print admin style list of them
 if ($tools) {
-    $actionbaseurl = '/mod/dataform/tool/index.php';
+    $actionbaseurl = '/mod/datalynx/tool/index.php';
     $linkparams = array('d' => $df->id(), 'sesskey' => sesskey());
                         
     /// table headings
     $strname = get_string('name');
     $strdesc = get_string('description');
-    $strrun = get_string('toolrun','dataform');;
+    $strrun = get_string('toolrun','datalynx');;
 
     $table = new html_table();
     $table->head = array($strname, $strdesc, $strrun);

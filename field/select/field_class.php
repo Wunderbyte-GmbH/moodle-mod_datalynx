@@ -15,15 +15,15 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage select
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once("$CFG->dirroot/mod/dataform/field/field_class.php");
+require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
-class dataformfield_select extends dataformfield_base {
+class datalynxfield_select extends datalynxfield_base {
 
     public $type = 'select';
     
@@ -32,7 +32,7 @@ class dataformfield_select extends dataformfield_base {
     /**
      * Class constructor
      *
-     * @param var $df       dataform id or class object
+     * @param var $df       datalynx id or class object
      * @param var $field    field id or DB record
      */
     public function __construct($df = 0, $field = 0) {
@@ -69,7 +69,7 @@ class dataformfield_select extends dataformfield_base {
             // fetch all contents of the field whose content in keys
             list($incontent, $params) = $DB->get_in_or_equal(array_keys($adjustments));
             array_unshift($params, $this->field->id);
-            $contents = $DB->get_records_select_menu('dataform_contents',
+            $contents = $DB->get_records_select_menu('datalynx_contents',
                                         " fieldid = ? AND content $incontent ",
                                         $params,
                                         '',
@@ -77,10 +77,10 @@ class dataformfield_select extends dataformfield_base {
             if ($contents) {
                 if (count($contents) == 1) {
                     list($id, $content) = each($contents);
-                    $DB->set_field('dataform_contents', 'content', $adjustments[$content], array('id' => $id));
+                    $DB->set_field('datalynx_contents', 'content', $adjustments[$content], array('id' => $id));
                 } else { 
                     $params = array();
-                    $sql = "UPDATE {dataform_contents} SET content = CASE id ";
+                    $sql = "UPDATE {datalynx_contents} SET content = CASE id ";
                     foreach ($contents as $id => $content) {
                         $newcontent = $adjustments[$content];
                         $sql .= " WHEN ? THEN ? ";
@@ -118,15 +118,15 @@ class dataformfield_select extends dataformfield_base {
         }
 
         $countsql = "SELECT COUNT(dc2.id)
-                       FROM {dataform_contents} dc2
-                 INNER JOIN {dataform_fields} df2 ON dc2.fieldid = df2.id
-                 INNER JOIN {dataform_entries} de2 ON dc2.entryid = de2.id
+                       FROM {datalynx_contents} dc2
+                 INNER JOIN {datalynx_fields} df2 ON dc2.fieldid = df2.id
+                 INNER JOIN {datalynx_entries} de2 ON dc2.entryid = de2.id
                       WHERE dc2.fieldid = :fieldid1
                         AND dc2.content = dc.content";
 
         $sql = "SELECT dc.content, ({$countsql}) AS count
-                  FROM {dataform_contents} dc
-            INNER JOIN {dataform_entries} de ON dc.entryid = de.id
+                  FROM {datalynx_contents} dc
+            INNER JOIN {datalynx_entries} de ON dc.entryid = de.id
                  WHERE de.userid = :userid
                    AND de.dataid = :dataid
                    AND dc.fieldid = :fieldid2

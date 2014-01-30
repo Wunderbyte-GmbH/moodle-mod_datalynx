@@ -1,5 +1,5 @@
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage checkbox
  * @copyright  2013 Itamar Tzadok
  */
@@ -7,9 +7,9 @@
 /**
  * Select registrations for multiactions
  */
-M.dataformfield_checkbox_required = {};
+M.datalynxfield_checkbox_required = {};
 
-M.dataformfield_checkbox_required.init = function(Y, options) {
+M.datalynxfield_checkbox_required.init = function(Y, options) {
     YUI().use('node', function (Y) {
         var fieldname = options.fieldname;
         var selected = options.selected;

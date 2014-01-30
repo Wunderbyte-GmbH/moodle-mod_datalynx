@@ -15,19 +15,19 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage _rating
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die;
 
-require_once("$CFG->dirroot/mod/dataform/field/renderer.php");
+require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
  *
  */
-class dataformfield__rating_renderer extends dataformfield_renderer {
+class datalynxfield__rating_renderer extends datalynxfield_renderer {
 
     /**
      * 
@@ -64,13 +64,13 @@ class dataformfield__rating_renderer extends dataformfield_renderer {
             }
         }        
 
-        require_once("$CFG->dirroot/mod/dataform/field/_rating/lib.php");
-        $rm = new dataform_rating_manager();
+        require_once("$CFG->dirroot/mod/datalynx/field/_rating/lib.php");
+        $rm = new datalynx_rating_manager();
         // Get entry rating objects
         if ($entry->id > 0) {
             $options = new object;
             $options->context = $field->df()->context;
-            $options->component = 'mod_dataform';
+            $options->component = 'mod_datalynx';
             $options->ratingarea = 'entry';
             // ugly hack to work around the exception in generate_settings
             $options->aggregate = RATING_AGGREGATE_COUNT;  
@@ -80,7 +80,7 @@ class dataformfield__rating_renderer extends dataformfield_renderer {
             $rec = new object;
             $rec->itemid = $entry->id;
             $rec->context = $field->df()->context;
-            $rec->component = 'mod_dataform';
+            $rec->component = 'mod_datalynx';
             $rec->ratingarea = 'entry';
             $rec->settings = $rm->get_rating_settings_object($options);
             $rec->aggregate = array_keys($rm->get_aggregate_types());     
@@ -96,10 +96,10 @@ class dataformfield__rating_renderer extends dataformfield_renderer {
 
             $entry->rating = $rm->get_rating_object($entry, $rec);
 
-            $aggravg = round($entry->rating->aggregate[dataformfield__rating::AGGREGATE_AVG], 2);
-            $aggrmax = round($entry->rating->aggregate[dataformfield__rating::AGGREGATE_MAX], 2);
-            $aggrmin = round($entry->rating->aggregate[dataformfield__rating::AGGREGATE_MIN], 2);
-            $aggrsum = round($entry->rating->aggregate[dataformfield__rating::AGGREGATE_SUM], 2);
+            $aggravg = round($entry->rating->aggregate[datalynxfield__rating::AGGREGATE_AVG], 2);
+            $aggrmax = round($entry->rating->aggregate[datalynxfield__rating::AGGREGATE_MAX], 2);
+            $aggrmin = round($entry->rating->aggregate[datalynxfield__rating::AGGREGATE_MIN], 2);
+            $aggrsum = round($entry->rating->aggregate[datalynxfield__rating::AGGREGATE_SUM], 2);
 
             // Get all ratings for inline view
             if (in_array('##ratings:viewinline##', $tags)) {
@@ -180,10 +180,10 @@ class dataformfield__rating_renderer extends dataformfield_renderer {
     public function get_aggregations($patterns) {
 
         $aggr = array(
-            dataformfield__rating::AGGREGATE_AVG => '##ratings:avg##',
-            dataformfield__rating::AGGREGATE_MAX => '##ratings:max##',
-            dataformfield__rating::AGGREGATE_MIN => '##ratings:min##',
-            dataformfield__rating::AGGREGATE_SUM => '##ratings:sum##'
+            datalynxfield__rating::AGGREGATE_AVG => '##ratings:avg##',
+            datalynxfield__rating::AGGREGATE_MAX => '##ratings:max##',
+            datalynxfield__rating::AGGREGATE_MIN => '##ratings:min##',
+            datalynxfield__rating::AGGREGATE_SUM => '##ratings:sum##'
         );
         if ($aggregations = array_intersect($aggr, $patterns)) {
             return array_keys($aggregations);
@@ -293,7 +293,7 @@ class dataformfield__rating_renderer extends dataformfield_renderer {
             $innerstyle = 'width:100%;height:19px;position:absolute;top:0;left:0;';
             $bgdiv = html_writer::tag('div', '.', array('style' => "background:#ccc;color:#ccc;$innerstyle"));
             $bar = html_writer::tag('div', $this->display_bar($entry, $value), array('style' => "z-index:5;$innerstyle"));
-            $stars = implode('', array_fill(0, $numstars, $OUTPUT->pix_icon('star_grey', '', 'dataformfield__rating', array('style' => 'float:left;'))));
+            $stars = implode('', array_fill(0, $numstars, $OUTPUT->pix_icon('star_grey', '', 'datalynxfield__rating', array('style' => 'float:left;'))));
             $starsdiv = html_writer::tag('div', $stars, array('style' => "z-index:10;$innerstyle"));
             $wrapper = html_writer::tag('div', "$bgdiv $bar $starsdiv", array('style' => "width:{$width}px;position:relative;"));
             return $wrapper;
@@ -317,7 +317,7 @@ class dataformfield__rating_renderer extends dataformfield_renderer {
                 return null;//ratings are turned off
             }
     */
-            $rm = new dataform_rating_manager();
+            $rm = new datalynx_rating_manager();
             // Initialise the JavaScript so ratings can be done by AJAX.
             $rm->initialise_rating_javascript($PAGE);
 
@@ -333,7 +333,7 @@ class dataformfield__rating_renderer extends dataformfield_renderer {
             $formstart = null;
             // if the item doesn't belong to the current user, the user has permission to rate
             // and we're within the assessable period
-            if ($rating->user_can_rate() or has_capability('mod/dataform:manageratings', $this->_field->df()->context)) {
+            if ($rating->user_can_rate() or has_capability('mod/datalynx:manageratings', $this->_field->df()->context)) {
 
                 $rateurl = $rating->get_rate_url();
                 $inputs = $rateurl->params();
@@ -385,7 +385,7 @@ class dataformfield__rating_renderer extends dataformfield_renderer {
      */
     protected function patterns() {
         $fieldinternalname = $this->_field->get('internalname');
-        $cat = get_string('ratings', 'dataform');
+        $cat = get_string('ratings', 'datalynx');
 
         $patterns = array();
         switch($fieldinternalname) {

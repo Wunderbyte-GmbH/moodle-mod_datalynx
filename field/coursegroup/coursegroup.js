@@ -14,8 +14,8 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package mod-dataform
- * @subpackage dataformfield_coursegroup
+ * @package mod-datalynx
+ * @subpackage datalynxfield_coursegroup
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -23,9 +23,9 @@
 /**
  * Category coursegroups loader
  */
-M.dataformfield_coursegroup_load_course_groups = {};
+M.datalynxfield_coursegroup_load_course_groups = {};
 
-M.dataformfield_coursegroup_load_course_groups.init = function(Y, options) {
+M.datalynxfield_coursegroup_load_course_groups.init = function(Y, options) {
     YUI().use('node-base', 'event-base', 'io-base', function(Y) {
         // get field name from options
         var coursefield = options.coursefield;

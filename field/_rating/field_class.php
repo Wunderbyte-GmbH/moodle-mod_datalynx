@@ -15,7 +15,7 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage _rating
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -23,7 +23,7 @@
 
 require_once(dirname(__FILE__). '/../field_class.php');
 
-class dataformfield__rating extends dataformfield_no_content {
+class datalynxfield__rating extends datalynxfield_no_content {
 
     public $type = '_rating';
 
@@ -62,17 +62,17 @@ class dataformfield__rating extends dataformfield_no_content {
     public static function get_field_objects($dataid) {
         $fieldobjects = array();
         
-        $fieldobjects[self::_RATING] = (object) array('id' => self::_RATING, 'dataid' => $dataid, 'type' => '_rating', 'name' => get_string('ratings', 'dataform'), 'description' => '', 'visible' => 2, 'internalname' => 'ratings');
+        $fieldobjects[self::_RATING] = (object) array('id' => self::_RATING, 'dataid' => $dataid, 'type' => '_rating', 'name' => get_string('ratings', 'datalynx'), 'description' => '', 'visible' => 2, 'internalname' => 'ratings');
 
-        $fieldobjects[self::_RATINGAVG] = (object) array('id' => self::_RATINGAVG, 'dataid' => $dataid, 'type' => '_rating', 'name' => get_string('ratingsavg', 'dataform'), 'description' => '', 'visible' => 2, 'internalname' => 'avgratings');
+        $fieldobjects[self::_RATINGAVG] = (object) array('id' => self::_RATINGAVG, 'dataid' => $dataid, 'type' => '_rating', 'name' => get_string('ratingsavg', 'datalynx'), 'description' => '', 'visible' => 2, 'internalname' => 'avgratings');
 
-        $fieldobjects[self::_RATINGCOUNT] = (object) array('id' => self::_RATINGCOUNT, 'dataid' => $dataid, 'type' => '_rating', 'name' => get_string('ratingscount', 'dataform'), 'description' => '', 'visible' => 2, 'internalname' => 'countratings');
+        $fieldobjects[self::_RATINGCOUNT] = (object) array('id' => self::_RATINGCOUNT, 'dataid' => $dataid, 'type' => '_rating', 'name' => get_string('ratingscount', 'datalynx'), 'description' => '', 'visible' => 2, 'internalname' => 'countratings');
 
-        $fieldobjects[self::_RATINGMAX] = (object) array('id' => self::_RATINGMAX, 'dataid' => $dataid, 'type' => '_rating', 'name' => get_string('ratingsmax', 'dataform'), 'description' => '', 'visible' => 2, 'internalname' => 'maxratings');
+        $fieldobjects[self::_RATINGMAX] = (object) array('id' => self::_RATINGMAX, 'dataid' => $dataid, 'type' => '_rating', 'name' => get_string('ratingsmax', 'datalynx'), 'description' => '', 'visible' => 2, 'internalname' => 'maxratings');
 
-        $fieldobjects[self::_RATINGMIN] = (object) array('id' => self::_RATINGMIN, 'dataid' => $dataid, 'type' => '_rating', 'name' => get_string('ratingsmin', 'dataform'), 'description' => '', 'visible' => 2, 'internalname' => 'minratings');
+        $fieldobjects[self::_RATINGMIN] = (object) array('id' => self::_RATINGMIN, 'dataid' => $dataid, 'type' => '_rating', 'name' => get_string('ratingsmin', 'datalynx'), 'description' => '', 'visible' => 2, 'internalname' => 'minratings');
 
-        $fieldobjects[self::_RATINGSUM] = (object) array('id' => self::_RATINGSUM, 'dataid' => $dataid, 'type' => '_rating', 'name' => get_string('ratingssum', 'dataform'), 'description' => '', 'visible' => 2, 'internalname' => 'sumratings');
+        $fieldobjects[self::_RATINGSUM] = (object) array('id' => self::_RATINGSUM, 'dataid' => $dataid, 'type' => '_rating', 'name' => get_string('ratingssum', 'datalynx'), 'description' => '', 'visible' => 2, 'internalname' => 'sumratings');
 
         return $fieldobjects;
     }
@@ -116,7 +116,7 @@ class dataformfield__rating extends dataformfield_no_content {
         $params = array();
         $params['rcontextid'] = $this->df()->context->id;
         $params['ruserid']    = $USER->id;
-        $params['rcomponent'] = 'mod_dataform';
+        $params['rcomponent'] = 'mod_datalynx';
         $params['ratingarea'] = 'entry';
     
         $sql = "LEFT JOIN 
@@ -165,13 +165,13 @@ class dataformfield__rating extends dataformfield_no_content {
     public function validation($params) {
         global $DB, $USER;
         
-        // Check the component is mod_dataform
-        if ($params['component'] != 'mod_dataform') {
+        // Check the component is mod_datalynx
+        if ($params['component'] != 'mod_datalynx') {
             throw new rating_exception('invalidcomponent');
         }
 
         // you can't rate your own entries unless you can manage ratings
-        if (!has_capability('mod/dataform:manageratings', $params['context']) and $params['rateduserid'] == $USER->id) {
+        if (!has_capability('mod/datalynx:manageratings', $params['context']) and $params['rateduserid'] == $USER->id) {
             throw new rating_exception('nopermissiontorate');
         }
 

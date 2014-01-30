@@ -16,7 +16,7 @@
  
 /**
  * @package mod
- * @subpackage dataform
+ * @subpackage datalynx
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -26,7 +26,7 @@ require_once("$CFG->libdir/tablelib.php");
 
 $urlparams = new object();
 
-$urlparams->d = optional_param('d', 0, PARAM_INT);             // dataform id
+$urlparams->d = optional_param('d', 0, PARAM_INT);             // datalynx id
 $urlparams->id = optional_param('id', 0, PARAM_INT);           // course module id
 $urlparams->vedit = optional_param('vedit', 0, PARAM_INT);     // view id to edit
 
@@ -42,14 +42,14 @@ $urlparams->setfilter     = optional_param('setfilter', 0, PARAM_INT);  // id of
 
 $urlparams->confirmed    = optional_param('confirmed', 0, PARAM_INT);
 
-// Set a dataform object
-$df = new dataform($urlparams->d, $urlparams->id);
-require_capability('mod/dataform:managetemplates', $df->context);
+// Set a datalynx object
+$df = new datalynx($urlparams->d, $urlparams->id);
+require_capability('mod/datalynx:managetemplates', $df->context);
 
 $df->set_page('view/index', array('modjs' => true, 'urlparams' => $urlparams));
 
 // activate navigation node
-navigation_node::override_active_url(new moodle_url('/mod/dataform/view/index.php', array('id' => $df->cm->id)));
+navigation_node::override_active_url(new moodle_url('/mod/datalynx/view/index.php', array('id' => $df->cm->id)));
 
 // DATA PROCESSING
 if ($urlparams->duplicate and confirm_sesskey()) {  // Duplicate any requested views
@@ -88,45 +88,45 @@ if ($urlparams->duplicate and confirm_sesskey()) {  // Duplicate any requested v
 
 // any notifications?
 $df->notifications['bad']['defaultview'] = '';
-if (!$views = $df->get_views(null, true, flexible_table::get_sort_for_table('dataformviewsindex'. $df->id()))) {
-    $df->notifications['bad']['getstartedviews'] = get_string('viewnoneindataform','dataform');  // nothing in database
+if (!$views = $df->get_views(null, true, flexible_table::get_sort_for_table('datalynxviewsindex'. $df->id()))) {
+    $df->notifications['bad']['getstartedviews'] = get_string('viewnoneindatalynx','datalynx');  // nothing in database
 } else if (empty($df->data->defaultview)) {
-    $df->notifications['bad']['defaultview'] = get_string('viewnodefault','dataform', '');
+    $df->notifications['bad']['defaultview'] = get_string('viewnodefault','datalynx', '');
 }
 
 // print header
 $df->print_header(array('tab' => 'views', 'urlparams' => $urlparams));
 
 // Display the view form jump list
-$directories = get_list_of_plugins('mod/dataform/view/');
+$directories = get_list_of_plugins('mod/datalynx/view/');
 $menuview = array();
 
 foreach ($directories as $directory){
     if ($directory[0] != '_') {
-        $menuview[$directory] = get_string('pluginname',"dataformview_$directory");    //get from language files
+        $menuview[$directory] = get_string('pluginname',"datalynxview_$directory");    //get from language files
     }
 }
 asort($menuview);    //sort in alphabetical order
 
 $br = html_writer::empty_tag('br');
-$popupurl = $CFG->wwwroot.'/mod/dataform/view/view_edit.php?d='. $df->id().'&amp;sesskey='. sesskey();
+$popupurl = $CFG->wwwroot.'/mod/datalynx/view/view_edit.php?d='. $df->id().'&amp;sesskey='. sesskey();
 $viewselect = new single_select(new moodle_url($popupurl), 'type', $menuview, null, array(''=>'choosedots'), 'viewform');
-$viewselect->set_label(get_string('viewadd','dataform'). '&nbsp;');
+$viewselect->set_label(get_string('viewadd','datalynx'). '&nbsp;');
 echo html_writer::tag('div', $br. $OUTPUT->render($viewselect). $br, array('class'=>'fieldadd mdl-align'));
 
 // if there are views print admin style list of them
 if ($views) {
 
-    $viewbaseurl = '/mod/dataform/view.php';
-    $editbaseurl = '/mod/dataform/view/view_edit.php';
-    $actionbaseurl = '/mod/dataform/view/index.php';
+    $viewbaseurl = '/mod/datalynx/view.php';
+    $editbaseurl = '/mod/datalynx/view/view_edit.php';
+    $actionbaseurl = '/mod/datalynx/view/index.php';
     $linkparams = array('d' => $df->id(), 'sesskey' => sesskey());
                         
     /// table headings
-    $strdefault = get_string('defaultview', 'dataform');
-    $strsingleedit = get_string('singleedit', 'dataform');
-    $strsinglemore = get_string('singlemore', 'dataform');
-    $strfilter = get_string('filter', 'dataform');
+    $strdefault = get_string('defaultview', 'datalynx');
+    $strsingleedit = get_string('singleedit', 'datalynx');
+    $strsinglemore = get_string('singlemore', 'datalynx');
+    $strfilter = get_string('filter', 'datalynx');
     $stredit = get_string('edit');
     $strdelete = get_string('delete');
     $strduplicate =  get_string('duplicate');
@@ -136,11 +136,11 @@ if ($views) {
     $multiactionurl = new moodle_url($actionbaseurl, $linkparams);
     $multidelete = html_writer::tag(
         'button', 
-        $OUTPUT->pix_icon('t/delete', get_string('multidelete', 'dataform')), 
+        $OUTPUT->pix_icon('t/delete', get_string('multidelete', 'datalynx')), 
         array('name' => 'multidelete', 'onclick' => 'bulk_action(\'view\'&#44; \''. $multiactionurl->out(false). '\'&#44; \'delete\')'));
     $multiduplicate = html_writer::tag(
         'button', 
-        $OUTPUT->pix_icon('t/copy', get_string('multiduplicate', 'dataform')), 
+        $OUTPUT->pix_icon('t/copy', get_string('multiduplicate', 'datalynx')), 
         array('type' => 'button', 'name' => 'multiduplicate', 'onclick' => 'bulk_action(\'view\'&#44; \''. $multiactionurl->out(false). '\'&#44; \'duplicate\')')
     );
 
@@ -153,7 +153,7 @@ if ($views) {
     // table headers
     $headers = array(
         'name' => get_string('name'),
-        'type' => get_string('type', 'dataform'),
+        'type' => get_string('type', 'datalynx'),
         'description' => get_string('description'),
         'visible' => get_string('visible'),
         'default' => $strdefault, 
@@ -167,8 +167,8 @@ if ($views) {
         'selectallnone' => $selectallnone,
     );
 
-    $table = new flexible_table('dataformviewsindex'. $df->id());
-    $table->define_baseurl(new moodle_url('/mod/dataform/view/index.php', array('d' => $df->id())));
+    $table = new flexible_table('datalynxviewsindex'. $df->id());
+    $table->define_baseurl(new moodle_url('/mod/datalynx/view/index.php', array('d' => $df->id())));
     $table->define_columns(array_keys($headers));
     $table->define_headers(array_values($headers));
 
@@ -213,7 +213,7 @@ if ($views) {
         $viewvisible = '';
         for ($i = 1; $i < 16; $i = $i << 1) {
             $viewvisible .= html_writer::checkbox("visible[{$i}]", 1, ($i & $view->view->visible), '',
-                                array('disabled' => '', 'title' => get_string("visible_{$i}", 'dataform')));
+                                array('disabled' => '', 'title' => get_string("visible_{$i}", 'datalynx')));
         }
 
         // default view
@@ -243,13 +243,13 @@ if ($views) {
             if ($viewfilterid and !in_array($viewfilterid, array_keys($filtersmenu))) {
                 $viewfilter = html_writer::link(new moodle_url($actionbaseurl, $linkparams + array('setfilter' => $viewid, 'fid' => -1)), $OUTPUT->pix_icon('i/risk_xss', $strreset));
             } else {
-                $blankfilteroption = array(-1 => get_string('blankfilter', 'dataform'));
+                $blankfilteroption = array(-1 => get_string('blankfilter', 'datalynx'));
                 if ($df->data->defaultfilter) {
                     $defaultfilter = $df->get_filter_manager()->get_filter_from_id($df->data->defaultfilter);
                     $defaultfiltername = $defaultfilter->name;
-                    $defaultfilteroption = array(0 => get_string('defaultfilterlabel', 'dataform', $defaultfiltername));
+                    $defaultfilteroption = array(0 => get_string('defaultfilterlabel', 'datalynx', $defaultfiltername));
                 } else {
-                    $defaultfilteroption = array(0 => get_string('defaultfilterlabel', 'dataform', get_string('blankfilter', 'dataform')));
+                    $defaultfilteroption = array(0 => get_string('defaultfilterlabel', 'datalynx', get_string('blankfilter', 'datalynx')));
                 }
 
                 if ($viewfilterid) {
@@ -266,7 +266,7 @@ if ($views) {
                 $viewfilter = $OUTPUT->render($viewselect);
             }
         } else {
-            $viewfilter = get_string('filtersnonedefined', 'dataform');
+            $viewfilter = get_string('filtersnonedefined', 'datalynx');
         }
         
         $table->add_data(array(

@@ -15,19 +15,19 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage _user
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die;
 
-require_once("$CFG->dirroot/mod/dataform/field/renderer.php");
+require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
  *
  */
-class dataformfield__user_renderer extends dataformfield_renderer {
+class datalynxfield__user_renderer extends datalynxfield_renderer {
 
     /**
      * 
@@ -44,7 +44,7 @@ class dataformfield__user_renderer extends dataformfield_renderer {
         if ($fieldname == 'name') {
             // two tags are possible
             foreach ($tags as $tag) {
-                if ($tag == "##author:edit##" and $edit and has_capability('mod/dataform:manageentries', $field->df()->context)) {
+                if ($tag == "##author:edit##" and $edit and has_capability('mod/datalynx:manageentries', $field->df()->context)) {
                     $replacements[$tag] = array('', array(array($this,'display_edit'), array($entry)));
                 } else {
                     $replacements[$tag] = array('html', $this->{"display_$fieldname"}($entry));
@@ -90,7 +90,7 @@ class dataformfield__user_renderer extends dataformfield_renderer {
 
         static $usersmenu = null;
         if (is_null($usersmenu)) {
-            $users = get_users_by_capability($field->df->context, 'mod/dataform:writeentry');
+            $users = get_users_by_capability($field->df->context, 'mod/datalynx:writeentry');
             // add a supervisor's id
             if (!in_array($entry->userid, array_keys($users))) {
                 $user = new object;
@@ -234,7 +234,7 @@ class dataformfield__user_renderer extends dataformfield_renderer {
      */
     protected function patterns() {
         $fieldinternalname = $this->_field->get('internalname');
-        $cat = get_string('authorinfo', 'dataform');
+        $cat = get_string('authorinfo', 'datalynx');
 
         $patterns = array();
         $patterns["##author:{$fieldinternalname}##"] = array(true, $cat);

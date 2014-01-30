@@ -15,15 +15,15 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage duration
  * @copyright 2013 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once("$CFG->dirroot/mod/dataform/field/field_class.php");
+require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
-class dataformfield_duration extends dataformfield_base {
+class datalynxfield_duration extends datalynxfield_base {
     public $type = 'duration';
 
     public $width;

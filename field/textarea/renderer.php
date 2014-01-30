@@ -15,19 +15,19 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage textarea
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once("$CFG->dirroot/mod/dataform/field/renderer.php");
+require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
  *
  */
-class dataformfield_textarea_renderer extends dataformfield_renderer {
+class datalynxfield_textarea_renderer extends datalynxfield_renderer {
 
     /**
      *
@@ -108,16 +108,16 @@ class dataformfield_textarea_renderer extends dataformfield_renderer {
             $tag = array_search($cleantag, $tags);
             if ($tag !== false and $this->is_required($tag)) {
                 if (empty($data->$formfieldname)) {
-                    return array($formfieldname => get_string('fieldrequired', 'dataform'));
+                    return array($formfieldname => get_string('fieldrequired', 'datalynx'));
                 }
                 if (!$field->is_editor() or !can_use_html_editor()) {
                     if (!$content = clean_param($data->$formfieldname, $cleanformat)) {
-                        return array($formfieldname => get_string('fieldrequired', 'dataform'));
+                        return array($formfieldname => get_string('fieldrequired', 'datalynx'));
                     }
                 } else {
                     $editorobj = $data->$formfieldname;
                     if (!$content = clean_param($editorobj['text'], $cleanformat)) {
-                        return array($formfieldname => get_string('fieldrequired', 'dataform'));
+                        return array($formfieldname => get_string('fieldrequired', 'datalynx'));
                     }
                 }
             }
@@ -157,7 +157,7 @@ class dataformfield_textarea_renderer extends dataformfield_renderer {
             // format
             $data->{"{$fieldname}format"} = isset($entry->{"c{$fieldid}_content1"}) ? $entry->{"c{$fieldid}_content1"} : FORMAT_HTML;
 
-            $data = file_prepare_standard_editor($data, $fieldname, $field->editor_options(), $field->df()->context, 'mod_dataform', 'content', $contentid);
+            $data = file_prepare_standard_editor($data, $fieldname, $field->editor_options(), $field->df()->context, 'mod_datalynx', 'content', $contentid);
 
             $mform->addElement('editor', "{$fieldname}_editor", null, $attr , $field->editor_options() + array('collapsed' => true));
             $mform->setDefault("{$fieldname}_editor", $data->{"{$fieldname}_editor"});
@@ -197,7 +197,7 @@ class dataformfield_textarea_renderer extends dataformfield_renderer {
             $text = $entry->{"c{$fieldid}_content"};
             $format = isset($entry->{"c{$fieldid}_content1"}) ? $entry->{"c{$fieldid}_content1"} : FORMAT_PLAIN;
 
-            $text = file_rewrite_pluginfile_urls($text, 'pluginfile.php', $field->df()->context->id, 'mod_dataform', 'content', $contentid);
+            $text = file_rewrite_pluginfile_urls($text, 'pluginfile.php', $field->df()->context->id, 'mod_datalynx', 'content', $contentid);
 
             $options = new object();
             $options->para = false;

@@ -15,19 +15,19 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage nanogong
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once("$CFG->dirroot/mod/dataform/field/file/renderer.php");
+require_once("$CFG->dirroot/mod/datalynx/field/file/renderer.php");
 
 /**
  *
  */
-class dataformfield_nanogong_renderer extends dataformfield_file_renderer {
+class datalynxfield_nanogong_renderer extends datalynxfield_file_renderer {
 
     /**
      * 
@@ -57,10 +57,10 @@ class dataformfield_nanogong_renderer extends dataformfield_file_renderer {
                             'accepted_types' => array($field->get('param3')));
 
         $draftitemid = file_get_submitted_draft_itemid("{$fieldname}_filemanager");
-        file_prepare_draft_area($draftitemid, $field->df()->context->id, 'mod_dataform', 'content', $contentid, $fmoptions);
+        file_prepare_draft_area($draftitemid, $field->df()->context->id, 'mod_datalynx', 'content', $contentid, $fmoptions);
 
         if ($contentid) {
-            $fileurl = moodle_url::make_file_url('/pluginfile.php', "/{$field->df()->context->id}/mod_dataform/content/$contentid/voicefile_{$fieldid}_{$entryid}.wav");
+            $fileurl = moodle_url::make_file_url('/pluginfile.php', "/{$field->df()->context->id}/mod_datalynx/content/$contentid/voicefile_{$fieldid}_{$entryid}.wav");
             $paramfileurl = html_writer::empty_tag('param', array('name' => 'SoundFileURL', 'value' => $fileurl));
         } else {
             $paramfileurl = '';
@@ -70,7 +70,7 @@ class dataformfield_nanogong_renderer extends dataformfield_file_renderer {
         // applet
         $applet = html_writer::tag('applet',
                                     "$paramfileurl\n$paramaudioformat",
-                                    array('archive' => new moodle_url('/mod/dataform/field/nanogong/applet/nanogong.jar'),
+                                    array('archive' => new moodle_url('/mod/datalynx/field/nanogong/applet/nanogong.jar'),
                                             'id' => "id_{$fieldname}_filemanager",
                                             'code' => 'gong.NanoGong',
                                             'width' => '180px',
@@ -84,12 +84,12 @@ class dataformfield_nanogong_renderer extends dataformfield_file_renderer {
 
         // alt text
         $options = array();
-        $mform->addElement('text', "{$fieldname}_alttext", get_string('alttext','dataformfield_nanogong'), $options);
+        $mform->addElement('text', "{$fieldname}_alttext", get_string('alttext','datalynxfield_nanogong'), $options);
         $mform->setDefault("{$fieldname}_alttext", s($content1));
 
         // upload js 
         $filename = "voicefile_{$fieldid}_{$entryid}";
-        $fileuploaderphp = new moodle_url('/mod/dataform/field/nanogong/ngupload.php',
+        $fileuploaderphp = new moodle_url('/mod/datalynx/field/nanogong/ngupload.php',
                                         array('elname' => "id_{$fieldname}_filemanager",
                                             'userid' => $USER->id,
                                             'itemid' => $draftitemid,
@@ -104,16 +104,16 @@ class dataformfield_nanogong_renderer extends dataformfield_file_renderer {
         );
 
         $module = array(
-            'name' => 'M.dataformfield_nanogong_upload_recording',
-            'fullpath' => '/mod/dataform/field/nanogong/nanogong.js',
+            'name' => 'M.datalynxfield_nanogong_upload_recording',
+            'fullpath' => '/mod/datalynx/field/nanogong/nanogong.js',
             'requires' => array('base', 'node')
         );
 
-        $PAGE->requires->js_init_call('M.dataformfield_nanogong_upload_recording.init', array($options), false, $module);       
+        $PAGE->requires->js_init_call('M.datalynxfield_nanogong_upload_recording.init', array($options), false, $module);       
 
         // delete (only for multiple files)
         //if ($this->field->param2 > 1) {
-        //    $mform->addElement('checkbox', "{$fieldname}_delete", get_string('contentclear','dataform'));
+        //    $mform->addElement('checkbox', "{$fieldname}_delete", get_string('contentclear','datalynx'));
         //}
     }
 
@@ -153,7 +153,7 @@ class dataformfield_nanogong_renderer extends dataformfield_file_renderer {
                                         $paramaudiolevel. 
                                         $paramtime. 
                                         $paramrecordbutton,
-                                        array('archive' => new moodle_url('/mod/dataform/field/nanogong/applet/nanogong.jar'),
+                                        array('archive' => new moodle_url('/mod/datalynx/field/nanogong/applet/nanogong.jar'),
                                                 'code' => 'gong.NanoGong',
                                                 'width' => '100%',
                                                 'height' => '40px',

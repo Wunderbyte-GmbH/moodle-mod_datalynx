@@ -15,17 +15,17 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage textarea
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once($CFG->dirroot.'/mod/dataform/field/field_class.php');
+require_once($CFG->dirroot.'/mod/datalynx/field/field_class.php');
 require_once($CFG->dirroot.'/lib/filelib.php');
 require_once($CFG->dirroot.'/repository/lib.php');
 
-class dataformfield_textarea extends dataformfield_base {
+class datalynxfield_textarea extends datalynxfield_base {
 
     public $type = 'textarea';
 
@@ -83,7 +83,7 @@ class dataformfield_textarea extends dataformfield_base {
         $rec->entryid = $entryid;
 
         if (!$rec->id = $contentid) {
-            $rec->id = $DB->insert_record('dataform_contents', $rec);
+            $rec->id = $DB->insert_record('datalynx_contents', $rec);
         }        
 
         // Editor content
@@ -91,7 +91,7 @@ class dataformfield_textarea extends dataformfield_base {
             $data = (object) $values;
             $data->{'editor_editor'} = $data->editor;
 
-            $data = file_postupdate_standard_editor($data, 'editor', $this->editoroptions, $this->df->context, 'mod_dataform', 'content', $rec->id);
+            $data = file_postupdate_standard_editor($data, 'editor', $this->editoroptions, $this->df->context, 'mod_datalynx', 'content', $rec->id);
 
             $rec->content = $data->editor;
             $rec->content1 = $data->{'editorformat'};
@@ -106,7 +106,7 @@ class dataformfield_textarea extends dataformfield_base {
             $rec->content = clean_param($value, PARAM_NOTAGS);
         }            
         
-        return $DB->update_record('dataform_contents', $rec);
+        return $DB->update_record('datalynx_contents', $rec);
     }
 
     /**

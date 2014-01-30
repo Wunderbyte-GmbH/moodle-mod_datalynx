@@ -16,7 +16,7 @@
  
 /**
  * @package mod
- * @subpackage dataform
+ * @subpackage datalynx
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,7 +27,7 @@ require_once('preset_form.php');
 
 $urlparams = new object();
 
-$urlparams->d = optional_param('d', 0, PARAM_INT);             // dataform id
+$urlparams->d = optional_param('d', 0, PARAM_INT);             // datalynx id
 $urlparams->id = optional_param('id', 0, PARAM_INT);            // course module id
 
 // presets list actions
@@ -40,13 +40,13 @@ $urlparams->download =     optional_param('download', '', PARAM_SEQUENCE);     /
 
 $urlparams->confirmed = optional_param('confirmed', 0, PARAM_INT);
 
-// Set a dataform object
-$df = new dataform($urlparams->d, $urlparams->id);
-require_capability('mod/dataform:managetemplates', $df->context);
+// Set a datalynx object
+$df = new datalynx($urlparams->d, $urlparams->id);
+require_capability('mod/datalynx:managetemplates', $df->context);
 $df->set_page('preset/index', array('modjs' => true, 'urlparams' => $urlparams));
 
 // activate navigation node
-navigation_node::override_active_url(new moodle_url('/mod/dataform/preset/index.php', array('id' => $df->cm->id)));
+navigation_node::override_active_url(new moodle_url('/mod/datalynx/preset/index.php', array('id' => $df->cm->id)));
 
 $pm = $df->get_preset_manager();
 
@@ -58,7 +58,7 @@ $sharedpresets = $pm->get_user_presets($pm::PRESET_SITEAREA);
 
 // any notifications
 if (!$localpresets and !$sharedpresets) {
-    $df->notifications['bad'][] = get_string('presetnoneavailable','dataform');  // No presets in dataform
+    $df->notifications['bad'][] = get_string('presetnoneavailable','datalynx');  // No presets in datalynx
 }
 
 // print header

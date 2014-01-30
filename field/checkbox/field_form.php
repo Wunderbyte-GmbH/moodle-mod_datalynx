@@ -15,12 +15,12 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage checkbox
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once("$CFG->dirroot/mod/dataform/field/multiselect/field_form.php");
+require_once("$CFG->dirroot/mod/datalynx/field/multiselect/field_form.php");
 
-class dataformfield_checkbox_form extends dataformfield_multiselect_form {
+class datalynxfield_checkbox_form extends datalynxfield_multiselect_form {
 }

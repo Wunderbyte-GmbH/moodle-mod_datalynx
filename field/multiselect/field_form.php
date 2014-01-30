@@ -15,14 +15,14 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage multiselect
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once("$CFG->dirroot/mod/dataform/field/field_form.php");
+require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
-class dataformfield_multiselect_form extends dataformfield_form {
+class datalynxfield_multiselect_form extends datalynxfield_form {
 
     /**
      *
@@ -32,19 +32,19 @@ class dataformfield_multiselect_form extends dataformfield_form {
         $mform =& $this->_form;
 
     //-------------------------------------------------------------------------------
-        $mform->addElement('header', 'fieldattributeshdr', get_string('fieldattributes', 'dataform'));
+        $mform->addElement('header', 'fieldattributeshdr', get_string('fieldattributes', 'datalynx'));
         
         // options
-        $mform->addElement('textarea', 'param1', get_string('fieldoptions', 'dataform'), 'wrap="virtual" rows="10" cols="50"');
+        $mform->addElement('textarea', 'param1', get_string('fieldoptions', 'datalynx'), 'wrap="virtual" rows="10" cols="50"');
 
         // default options
-        $mform->addElement('textarea', 'param2', get_string('fieldoptionsdefault', 'dataform'), 'wrap="virtual" rows="5" cols="50"');
+        $mform->addElement('textarea', 'param2', get_string('fieldoptionsdefault', 'datalynx'), 'wrap="virtual" rows="5" cols="50"');
 
         // options separator
-        $mform->addElement('select', 'param3', get_string('fieldoptionsseparator', 'dataform'), array_map('current', $this->_field->separators));
+        $mform->addElement('select', 'param3', get_string('fieldoptionsseparator', 'datalynx'), array_map('current', $this->_field->separators));
 
         // allow add option
-        $mform->addElement('selectyesno', 'param4', get_string('allowaddoption', 'dataform'));
+        $mform->addElement('selectyesno', 'param4', get_string('allowaddoption', 'datalynx'));
 
     }
 }

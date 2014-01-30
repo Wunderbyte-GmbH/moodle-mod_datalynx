@@ -15,14 +15,14 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage time
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once("$CFG->dirroot/mod/dataform/field/field_form.php");
+require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
-class dataformfield_time_form extends dataformfield_form {
+class datalynxfield_time_form extends datalynxfield_form {
 
     /**
      *
@@ -32,34 +32,34 @@ class dataformfield_time_form extends dataformfield_form {
         $mform =& $this->_form;
 
     //-------------------------------------------------------------------------------
-        $mform->addElement('header', 'fieldattributeshdr', get_string('fieldattributes', 'dataform'));
+        $mform->addElement('header', 'fieldattributeshdr', get_string('fieldattributes', 'datalynx'));
         
         // Date
-        $mform->addElement('checkbox', 'param1', get_string('dateonly', 'dataformfield_time'));
-        $mform->addHelpButton('param1', 'dateonly', 'dataformfield_time');
+        $mform->addElement('checkbox', 'param1', get_string('dateonly', 'datalynxfield_time'));
+        $mform->addHelpButton('param1', 'dateonly', 'datalynxfield_time');
 
         // Masked
-        $mform->addElement('checkbox', 'param5', get_string('masked', 'dataformfield_time'));
-        $mform->addHelpButton('param5', 'masked', 'dataformfield_time');
+        $mform->addElement('checkbox', 'param5', get_string('masked', 'datalynxfield_time'));
+        $mform->addHelpButton('param5', 'masked', 'datalynxfield_time');
         
         // Start year
-        $mform->addElement('text', 'param2', get_string('startyear', 'dataformfield_time'));
+        $mform->addElement('text', 'param2', get_string('startyear', 'datalynxfield_time'));
         $mform->setType('param2', PARAM_INT);
         $mform->addRule('param2', null, 'numeric', null, 'client');
         $mform->addRule('param2', null, 'maxlength', 4, 'client');
-        $mform->addHelpButton('param2', 'startyear', 'dataformfield_time');
+        $mform->addHelpButton('param2', 'startyear', 'datalynxfield_time');
 
         // End year
-        $mform->addElement('text', 'param3', get_string('stopyear', 'dataformfield_time'));
+        $mform->addElement('text', 'param3', get_string('stopyear', 'datalynxfield_time'));
         $mform->setType('param3', PARAM_INT);
         $mform->addRule('param3', null, 'numeric', null, 'client');
         $mform->addRule('param3', null, 'maxlength', 4, 'client');
-        $mform->addHelpButton('param3', 'stopyear', 'dataformfield_time');
+        $mform->addHelpButton('param3', 'stopyear', 'datalynxfield_time');
 
         // Display format
-        $mform->addElement('text', 'param4', get_string('displayformat', 'dataformfield_time'));
+        $mform->addElement('text', 'param4', get_string('displayformat', 'datalynxfield_time'));
         $mform->setType('param4', PARAM_TEXT);
-        $mform->addHelpButton('param4', 'displayformat', 'dataformfield_time');
+        $mform->addHelpButton('param4', 'displayformat', 'datalynxfield_time');
     }
 
 }

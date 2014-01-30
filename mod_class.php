@@ -16,20 +16,20 @@
  
 /**
  * @package mod
- * @subpackage dataform
+ * @subpackage datalynx
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * The Dataform has been developed as an enhanced counterpart
+ * The Datalynx has been developed as an enhanced counterpart
  * of Moodle's Database activity module (1.9.11+ (20110323)).
- * To the extent that Dataform code corresponds to Database code,
+ * To the extent that Datalynx code corresponds to Database code,
  * certain copyrights on the Database module may obtain.
  */
 
 /**
- * Dataform class
+ * Datalynx class
  */
-class dataform {
+class datalynx {
 
     const COUNT_ALL = 0;
     const COUNT_APPROVED = 1;
@@ -38,7 +38,7 @@ class dataform {
 
     public $cm = NULL;       // The course module
     public $course = NULL;   // The course record
-    public $data = NULL;     // The dataform record
+    public $data = NULL;     // The datalynx record
     public $context = NULL;  //
 
     public $groupmode = 0;
@@ -69,29 +69,29 @@ class dataform {
     public function __construct($d = 0, $id = 0, $autologinguest = false) {
         global $DB;
 
-        // initialize from dataform id or object
+        // initialize from datalynx id or object
         if ($d) {
             if (is_object($d)) { // try object first
                 $this->data = $d;
-            } else if (!$this->data = $DB->get_record('dataform', array('id' => $d))) {
-                throw new moodle_exception('invaliddataform', 'dataform', null, null, "Dataform id: $d");
+            } else if (!$this->data = $DB->get_record('datalynx', array('id' => $d))) {
+                throw new moodle_exception('invaliddatalynx', 'datalynx', null, null, "Datalynx id: $d");
             }
             if (!$this->course = $DB->get_record('course', array('id' => $this->data->course))) {
-                throw new moodle_exception('invalidcourse', 'dataform', null, null, "Course id: {$this->data->course}");
+                throw new moodle_exception('invalidcourse', 'datalynx', null, null, "Course id: {$this->data->course}");
             }
-            if (!$this->cm = get_coursemodule_from_instance('dataform', $this->id(), $this->course->id)) {
-                throw new moodle_exception('invalidcoursemodule', 'dataform', null, null, "Cm id: {$this->id()}");
+            if (!$this->cm = get_coursemodule_from_instance('datalynx', $this->id(), $this->course->id)) {
+                throw new moodle_exception('invalidcoursemodule', 'datalynx', null, null, "Cm id: {$this->id()}");
             }
         // initialize from course module id
         } else if ($id) {
-            if (!$this->cm = get_coursemodule_from_id('dataform', $id)) {
-                throw new moodle_exception('invalidcoursemodule '. $id, 'dataform', null, null, "Cm id: $id");
+            if (!$this->cm = get_coursemodule_from_id('datalynx', $id)) {
+                throw new moodle_exception('invalidcoursemodule '. $id, 'datalynx', null, null, "Cm id: $id");
             }
             if (!$this->course = $DB->get_record('course', array('id' => $this->cm->course))) {
-                throw new moodle_exception('invalidcourse', 'dataform', null, null, "Course id: {$this->cm->course}");
+                throw new moodle_exception('invalidcourse', 'datalynx', null, null, "Course id: {$this->cm->course}");
             }
-            if (!$this->data = $DB->get_record('dataform', array('id' => $this->cm->instance))) {
-                throw new moodle_exception('invaliddataform', 'dataform', null, null, "Dataform id: {$this->cm->instance}");
+            if (!$this->data = $DB->get_record('datalynx', array('id' => $this->cm->instance))) {
+                throw new moodle_exception('invaliddatalynx', 'datalynx', null, null, "Datalynx id: {$this->cm->instance}");
             }
         }
 
@@ -107,10 +107,10 @@ class dataform {
         }
         
         // set fields manager
-        //$this->_fieldmanager = new dataformfield_manager($this);        
+        //$this->_fieldmanager = new datalynxfield_manager($this);        
 
         // set views manager
-        //$this->_viewmanager = new dataformview_manager($this);
+        //$this->_viewmanager = new datalynxview_manager($this);
 
     }
 
@@ -156,7 +156,7 @@ class dataform {
         // set filters manager
         if (!$this->_filtermanager) { 
             require_once('filter/filter_class.php');
-            $this->_filtermanager = new dataform_filter_manager($this);
+            $this->_filtermanager = new datalynx_filter_manager($this);
         }
         return $this->_filtermanager;
     }
@@ -168,7 +168,7 @@ class dataform {
         // set rules manager
         if (!$this->_rulemanager) { 
             require_once('rule/rule_manager.php');
-            $this->_rulemanager = new dataform_rule_manager($this);
+            $this->_rulemanager = new datalynx_rule_manager($this);
         }
         return $this->_rulemanager;
     }
@@ -180,7 +180,7 @@ class dataform {
         // set preset manager
         if (!$this->_presetmanager) { 
             require_once('preset/preset_manager.php');
-            $this->_presetmanager = new dataform_preset_manager($this);
+            $this->_presetmanager = new datalynx_preset_manager($this);
         }
         return $this->_presetmanager;
     }
@@ -193,7 +193,7 @@ class dataform {
         
         switch ($type) {
             case self::COUNT_ALL:
-                $count = $DB->count_records_sql('SELECT COUNT(e.id) FROM {dataform_entries} e WHERE e.dataid = ?', array($this->id()));
+                $count = $DB->count_records_sql('SELECT COUNT(e.id) FROM {datalynx_entries} e WHERE e.dataid = ?', array($this->id()));
                 break;
         
             case self::COUNT_APPROVED:
@@ -233,16 +233,16 @@ class dataform {
                 }
             }
             if ($updatedf) {
-                if (!$DB->update_record('dataform', $this->data)) {
+                if (!$DB->update_record('datalynx', $this->data)) {
                     if ($notify === true) {
-                        $this->notifications['bad'][] = get_string('dfupdatefailed', 'dataform');
+                        $this->notifications['bad'][] = get_string('dfupdatefailed', 'datalynx');
                     } else if ($notify) {
                         $this->notifications['bad'][] = $notify;
                     }
                     return false;
                 } else {
                     if ($notify === true) {
-                        //$this->notifications['good'][] = get_string('dfupdatefailed', 'dataform');
+                        //$this->notifications['good'][] = get_string('dfupdatefailed', 'datalynx');
                     } else if ($notify) {
                         $this->notifications['good'][] = $notify;
                     }
@@ -260,7 +260,7 @@ class dataform {
 
         // files
         $fs = get_file_storage();
-        $fs->delete_area_files($this->context->id, 'mod_dataform');
+        $fs->delete_area_files($this->context->id, 'mod_datalynx');
 
         // delete fields and their content
         if ($fields = $this->get_fields()) {
@@ -280,24 +280,24 @@ class dataform {
         }
 
         // delete filters
-        $DB->delete_records('dataform_filters', array('dataid'=>$this->data->id));
+        $DB->delete_records('datalynx_filters', array('dataid'=>$this->data->id));
         
         // delete entries
-        $DB->delete_records('dataform_entries', array('dataid'=>$this->data->id));
+        $DB->delete_records('datalynx_entries', array('dataid'=>$this->data->id));
 
         // delete ratings
         
         // delete comments
 
         // cleanup gradebook
-        dataform_grade_item_delete($this->data);
+        datalynx_grade_item_delete($this->data);
 
 
         return true;
     }
 
     /**
-     * sets the dataform page
+     * sets the datalynx page
      *
      * @param string $page current page
      * @param array $params 
@@ -330,32 +330,32 @@ class dataform {
             require_login($this->course->id, $autologinguest, $this->cm);
         }
 
-        // make sure there is at least dataform id param
+        // make sure there is at least datalynx id param
         $urlparams['d'] = $thisid;
 
-        $manager = has_capability('mod/dataform:managetemplates', $this->context);
+        $manager = has_capability('mod/datalynx:managetemplates', $this->context);
 
         // renew if requested
         if ($manager and !empty($urlparams['renew']) and confirm_sesskey()) {
             $this->renew();
         }
 
-        // if dataform activity closed don't let students in
+        // if datalynx activity closed don't let students in
         if (!$manager) {
             $timenow = time();
             if (!empty($this->data->timeavailable) and $this->data->timeavailable > $timenow) {
-                throw new moodle_exception('notopenyet', 'dataform', '', userdate($this->data->timeavailable));
+                throw new moodle_exception('notopenyet', 'datalynx', '', userdate($this->data->timeavailable));
             }
         }
 
         // RSS
         if (!empty($params->rss) and
                 !empty($CFG->enablerssfeeds) and
-                !empty($CFG->dataform_enablerssfeeds) and
+                !empty($CFG->datalynx_enablerssfeeds) and
                 $this->data->rssarticles > 0) {
             require_once("$CFG->libdir/rsslib.php");
             $rsstitle = format_string($this->course->shortname) . ': %fullname%';
-            rss_add_http_header($this->context, 'mod_dataform', $this->data, $rsstitle);
+            rss_add_http_header($this->context, 'mod_datalynx', $this->data, $rsstitle);
         }
         
         // COMMENTS
@@ -372,9 +372,9 @@ class dataform {
         if ($page != 'external') {
             // Is user editing
             $urlparams['edit'] = optional_param('edit', 0, PARAM_BOOL);
-            $PAGE->set_url("/mod/dataform/$page.php", $urlparams);
+            $PAGE->set_url("/mod/datalynx/$page.php", $urlparams);
             
-            // editing button (omit in embedded dataforms)
+            // editing button (omit in embedded datalynxs)
             if ($page != 'embed' and $PAGE->user_allowed_editing()) {
                  // teacher editing mode
                 if ($urlparams['edit'] != -1) {
@@ -409,28 +409,28 @@ class dataform {
             $viewid = (!empty($urlparams['view']) ? $urlparams['view'] : (!empty($this->data->defaultview) ? $this->data->defaultview : 0));
             if ($page == 'view' && $viewid) {
                 global $DB;
-                $viewname = $DB->get_field('dataform_views', 'name', array('id' => $viewid));
+                $viewname = $DB->get_field('datalynx_views', 'name', array('id' => $viewid));
                 $pagestring = get_string('page');
                 $fm = $this->get_filter_manager();
                 $filteroptions = $fm::get_filter_options_from_url();
                 $pagenum = !empty($filteroptions['page']) ? $filteroptions['page'] + 1 : 1;
                 $editmode = optional_param('editentries', 0, PARAM_SEQUENCE);
-                $editstring = get_string('editmode', 'dataform');
+                $editstring = get_string('editmode', 'datalynx');
                 $edit = $editmode ? " ({$editstring})" : "";
                 $pagename = "{$modulename}: {$viewname}: {$pagestring} {$pagenum}{$edit}";
                 $PAGE->set_title($pagename);
             } else {
-                $manage = get_string('managemode', 'dataform');
-                $what = strpos($page, 'view') !== false ? get_string('views','dataform') : '???';
-                $what = strpos($page, 'field') !== false ? get_string('fields','dataform') : $what;
-                $what = strpos($page, 'filter') !== false ? get_string('filters','dataform') : $what;
-                $what = strpos($page, 'rule') !== false ? get_string('rules','dataform') : $what;
-                $what = strpos($page, 'tool') !== false ? get_string('tools','dataform') : $what;
-                $what = strpos($page, 'js') !== false ? get_string('jsinclude','dataform') : $what;
-                $what = strpos($page, 'css') !== false ? get_string('cssinclude','dataform') : $what;
-                $what = strpos($page, 'preset') !== false ? get_string('presets','dataform') : $what;
-                $what = strpos($page, 'import') !== false ? get_string('import','dataform') : $what;
-                $what = strpos($page, 'statistics') !== false ? get_string('statistics','dataform') : $what;
+                $manage = get_string('managemode', 'datalynx');
+                $what = strpos($page, 'view') !== false ? get_string('views','datalynx') : '???';
+                $what = strpos($page, 'field') !== false ? get_string('fields','datalynx') : $what;
+                $what = strpos($page, 'filter') !== false ? get_string('filters','datalynx') : $what;
+                $what = strpos($page, 'rule') !== false ? get_string('rules','datalynx') : $what;
+                $what = strpos($page, 'tool') !== false ? get_string('tools','datalynx') : $what;
+                $what = strpos($page, 'js') !== false ? get_string('jsinclude','datalynx') : $what;
+                $what = strpos($page, 'css') !== false ? get_string('cssinclude','datalynx') : $what;
+                $what = strpos($page, 'preset') !== false ? get_string('presets','datalynx') : $what;
+                $what = strpos($page, 'import') !== false ? get_string('import','datalynx') : $what;
+                $what = strpos($page, 'statistics') !== false ? get_string('statistics','datalynx') : $what;
                 $pagename = "{$modulename}: {$what} ({$manage})";
                 $PAGE->set_title($pagename);
             }
@@ -450,7 +450,7 @@ class dataform {
         }
 
         ////////////////////////////////////
-        // PAGE setup for dataform content anywhere
+        // PAGE setup for datalynx content anywhere
         
         // Use this to return css if this df page is set after header 
         $output = '';
@@ -468,8 +468,8 @@ class dataform {
                 }
             }
             // Uploaded css files
-            if ($files = $fs->get_area_files($this->context->id, 'mod_dataform', 'css', 0, 'sortorder', false)) {
-                $path = "/{$this->context->id}/mod_dataform/css/0";
+            if ($files = $fs->get_area_files($this->context->id, 'mod_datalynx', 'css', 0, 'sortorder', false)) {
+                $path = "/{$this->context->id}/mod_datalynx/css/0";
                 foreach ($files as $file) {
                     $filename = $file->get_filename();
                     $cssurls[] = moodle_url::make_file_url('/pluginfile.php', "$path/$filename");
@@ -477,7 +477,7 @@ class dataform {
             }                
             // css code from the css template
             if ($this->data->css) {
-                $cssurls[] = new moodle_url('/mod/dataform/css.php', array('d' => $thisid));
+                $cssurls[] = new moodle_url('/mod/datalynx/css.php', array('d' => $thisid));
             }
         }
         if ($PAGE->state == moodle_page::STATE_BEFORE_HEADER) {
@@ -506,8 +506,8 @@ class dataform {
                 }
             }
             // Uploaded js files
-            if ($files = $fs->get_area_files($this->context->id, 'mod_dataform', 'js', 0, 'sortorder', false)) {
-                $path = "/{$this->context->id}/mod_dataform/js/0";
+            if ($files = $fs->get_area_files($this->context->id, 'mod_datalynx', 'js', 0, 'sortorder', false)) {
+                $path = "/{$this->context->id}/mod_datalynx/js/0";
                 foreach ($files as $file) {
                     $filename = $file->get_filename();
                     $jsurls[] = moodle_url::make_file_url('/pluginfile.php', "$path/$filename");
@@ -515,7 +515,7 @@ class dataform {
             }                
             // js code from the js template
             if ($this->data->js) {
-                $jsurls[] = new moodle_url('/mod/dataform/js.php', array('d' => $thisid));
+                $jsurls[] = new moodle_url('/mod/datalynx/js.php', array('d' => $thisid));
             }
         }
         foreach ($jsurls as $jsurl) {
@@ -524,7 +524,7 @@ class dataform {
        
         // MOD JS
         if (!empty($params->modjs)) {
-            $PAGE->requires->js('/mod/dataform/dataform.js');
+            $PAGE->requires->js('/mod/datalynx/datalynx.js');
         }
         
         // TODO
@@ -538,21 +538,21 @@ class dataform {
             $this->_currentview->set_page($page);
         }
         
-        // if a new dataform or incomplete design, direct manager to manage area
+        // if a new datalynx or incomplete design, direct manager to manage area
         if ($manager) {
             $viewrecords = $this->get_view_records();
             if (empty($viewrecords)) {
                 if ($page == 'view' or $page == 'embed') {
                     $getstarted = new object;
-                    $getstarted->presets = html_writer::link(new moodle_url('/mod/dataform/preset/index.php', array('d' => $thisid)), get_string('presets', 'dataform'));
-                    $getstarted->fields = html_writer::link(new moodle_url('/mod/dataform/field/index.php', array('d' => $thisid)), get_string('fields', 'dataform'));
-                    $getstarted->views = html_writer::link(new moodle_url('/mod/dataform/view/index.php', array('d' => $thisid)), get_string('views', 'dataform'));
+                    $getstarted->presets = html_writer::link(new moodle_url('/mod/datalynx/preset/index.php', array('d' => $thisid)), get_string('presets', 'datalynx'));
+                    $getstarted->fields = html_writer::link(new moodle_url('/mod/datalynx/field/index.php', array('d' => $thisid)), get_string('fields', 'datalynx'));
+                    $getstarted->views = html_writer::link(new moodle_url('/mod/datalynx/view/index.php', array('d' => $thisid)), get_string('views', 'datalynx'));
 
-                    $this->notifications['bad']['getstarted'] = html_writer::tag('div', get_string('getstarted', 'dataform', $getstarted), array('class' => 'mdl-left'));
+                    $this->notifications['bad']['getstarted'] = html_writer::tag('div', get_string('getstarted', 'datalynx', $getstarted), array('class' => 'mdl-left'));
                 }
             } else if (!$this->data->defaultview) {
-                $linktoviews = html_writer::link(new moodle_url('/mod/dataform/view/index.php', array('d' => $thisid)), get_string('views', 'dataform'));
-                $this->notifications['bad']['defaultview'] = get_string('viewnodefault','dataform', $linktoviews);
+                $linktoviews = html_writer::link(new moodle_url('/mod/datalynx/view/index.php', array('d' => $thisid)), get_string('views', 'datalynx'));
+                $this->notifications['bad']['defaultview'] = get_string('viewnodefault','datalynx', $linktoviews);
             }
         }
 
@@ -560,7 +560,7 @@ class dataform {
     }
 
     /**
-     * prints the header of the current dataform page
+     * prints the header of the current datalynx page
      *
      * @param array $params
      */
@@ -612,7 +612,7 @@ class dataform {
     }
 
     /**
-     * prints the footer of the current dataform page
+     * prints the footer of the current datalynx page
      *
      * @param array $params
      */
@@ -627,7 +627,7 @@ class dataform {
      */
     public function print_groups_menu($view, $filter) {
         if ($this->groupmode and !in_array($this->groupmode, $this->internalgroupmodes)) {
-            $returnurl = new moodle_url("/mod/dataform/{$this->pagefile}.php", 
+            $returnurl = new moodle_url("/mod/datalynx/{$this->pagefile}.php", 
                                         array('d' => $this->id(),
                                                 'view' => $view,
                                                 'filter' => $filter));
@@ -640,9 +640,9 @@ class dataform {
      */
     public function print_rsslink() {
         // Link to the RSS feed
-        if (!empty($CFG->enablerssfeeds) && !empty($CFG->dataform_enablerssfeeds) && $this->data->rssarticles > 0) {
+        if (!empty($CFG->enablerssfeeds) && !empty($CFG->datalynx_enablerssfeeds) && $this->data->rssarticles > 0) {
             echo '<div style="float:right;">';
-            rss_print_link($this->course->id, $USER->id, 'dataform', $this->id(), get_string('rsstype'));
+            rss_print_link($this->course->id, $USER->id, 'datalynx', $this->id(), get_string('rsstype'));
             echo '</div>';
             echo '<div style="clear:both;"></div>';
         }
@@ -658,7 +658,7 @@ class dataform {
         if ($this->data->intro) {
             $options = new stdClass();
             $options->noclean = true;
-            echo $OUTPUT->box(format_module_intro('dataform', $this->data, $this->cm->id), 'generalbox', 'intro');
+            echo $OUTPUT->box(format_module_intro('datalynx', $this->data, $this->cm->id), 'generalbox', 'intro');
         }
     }
     
@@ -677,7 +677,7 @@ class dataform {
      */
     public function display() {
         if (!empty($this->_currentview)) {
-            add_to_log($this->course->id, 'dataform', 'view', $this->pagefile. '.php?id='. $this->cm->id, $this->id(), $this->cm->id);
+            add_to_log($this->course->id, 'datalynx', 'view', $this->pagefile. '.php?id='. $this->cm->id, $this->id(), $this->cm->id);
             $this->_currentview->display();
         }
     }
@@ -693,14 +693,14 @@ class dataform {
         global $CFG;
         
         if (!$this->internalfields) {
-            $fieldplugins = get_list_of_plugins('mod/dataform/field/');
+            $fieldplugins = get_list_of_plugins('mod/datalynx/field/');
             foreach ($fieldplugins as $fieldname) {
                 // Internal should start with _
                 if (strpos($fieldname, '_') !== 0) {
                     continue;
                 }
-                require_once("$CFG->dirroot/mod/dataform/field/$fieldname/field_class.php");
-                $fieldclass = "dataformfield_$fieldname";
+                require_once("$CFG->dirroot/mod/datalynx/field/$fieldname/field_class.php");
+                $fieldclass = "datalynxfield_$fieldname";
                 $internalfields = $fieldclass::get_field_objects($this->data->id);
                 foreach ($internalfields as $fid => $field) {
                     $this->internalfields[$fid] = $this->get_field($field);
@@ -779,7 +779,7 @@ class dataform {
                 $key = 0;
             }
             require_once('field/'. $type. '/field_class.php');
-            $fieldclass = 'dataformfield_'. $type;
+            $fieldclass = 'datalynxfield_'. $type;
             $field = new $fieldclass($this, $key);
             return $field;
         } else {
@@ -796,7 +796,7 @@ class dataform {
         if (!$this->fields or $forceget) {
             $this->fields = array();
             // collate user fields
-            if ($fields = $DB->get_records('dataform_fields', array('dataid' => $this->id()), $sort)) {
+            if ($fields = $DB->get_records('datalynx_fields', array('dataid' => $this->id()), $sort)) {
                 foreach ($fields as $fieldid => $field) {
                     $this->fields[$fieldid] = $this->get_field($field);
                 }
@@ -830,7 +830,7 @@ class dataform {
     public function process_fields($action, $fids, $confirmed = false) {
         global $OUTPUT, $DB;
 
-        if (!has_capability('mod/dataform:managetemplates', $this->context)) {
+        if (!has_capability('mod/datalynx:managetemplates', $this->context)) {
             // TODO throw exception
             return false;
         }
@@ -850,7 +850,7 @@ class dataform {
         $strnotify = '';
 
         if (empty($fields) and $action != 'add') {
-            $this->notifications['bad'][] = get_string("fieldnoneforaction",'dataform');
+            $this->notifications['bad'][] = get_string("fieldnoneforaction",'datalynx');
             return false;
         } else {
             if (!$confirmed) {
@@ -858,12 +858,12 @@ class dataform {
                 $this->print_header('fields');
 
                 // Print a confirmation page
-                echo $OUTPUT->confirm(get_string("fieldsconfirm$action", 'dataform', count($fields)),
-                        new moodle_url('/mod/dataform/field/index.php', array('d' => $this->id(),
+                echo $OUTPUT->confirm(get_string("fieldsconfirm$action", 'datalynx', count($fields)),
+                        new moodle_url('/mod/datalynx/field/index.php', array('d' => $this->id(),
                                                                         $action => implode(',', array_keys($fields)),
                                                                         'sesskey' => sesskey(),
                                                                         'confirmed' => 1)),
-                        new moodle_url('/mod/dataform/field/index.php', array('d' => $this->id())));
+                        new moodle_url('/mod/datalynx/field/index.php', array('d' => $this->id())));
 
                 echo $OUTPUT->footer();
                 exit;
@@ -905,7 +905,7 @@ class dataform {
                         foreach ($fields as $fid => $field) {
                             // lock = 0; unlock = -1;
                             $editable = $field->field->edits ? 0 : -1;
-                            $DB->set_field('dataform_fields', 'edits', $editable, array('id' => $fid));
+                            $DB->set_field('datalynx_fields', 'edits', $editable, array('id' => $fid));
 
                             $processedfids[] = $fid;
                         }
@@ -919,7 +919,7 @@ class dataform {
                             while ($this->name_exists('fields', $field->name())) {
                                 $field->field->name .= '_1';
                             }
-                            $fieldid = $DB->insert_record('dataform_fields', $field->field);
+                            $fieldid = $DB->insert_record('datalynx_fields', $field->field);
                             $processedfids[] = $fieldid;
                         }
                         $strnotify = 'fieldsadded';
@@ -939,10 +939,10 @@ class dataform {
                         break;
                 }
 
-                add_to_log($this->course->id, 'dataform', 'field '. $action, 'field/index.php?id='. $this->cm->id, $this->id(), $this->cm->id);
+                add_to_log($this->course->id, 'datalynx', 'field '. $action, 'field/index.php?id='. $this->cm->id, $this->id(), $this->cm->id);
                 if ($strnotify) {
                     $fieldsprocessed = $processedfids ? count($processedfids) : 'No';
-                    $this->notifications['good'][] = get_string($strnotify, 'dataform', $fieldsprocessed);
+                    $this->notifications['good'][] = get_string($strnotify, 'datalynx', $fieldsprocessed);
                 }
                 return $processedfids;
             }
@@ -955,18 +955,18 @@ class dataform {
 
     /**
      * Retrieves the view entries associated with the current
-     * dataform instance visible to the current user.
+     * datalynx instance visible to the current user.
      * @param  boolean $forceget        if true, the entries will be reread form the database
      * @param  string  $sort            SQL ORDER BY clause
      * @param  boolean $checkvisibility if true, only the entries of views visible to the current user will be retrieved
-     * @return array   an array of dataform_views entry objects
+     * @return array   an array of datalynx_views entry objects
      */
     public function get_view_records($forceget = false, $sort = '', $checkvisibility = true) {
         global $DB;
 
         if (empty($this->views) or $forceget) {
             $views = array();
-            if (!$views = $DB->get_records('dataform_views', array('dataid' => $this->id()), $sort)) {
+            if (!$views = $DB->get_records('datalynx_views', array('dataid' => $this->id()), $sort)) {
                 return false;
             }
             $this->views = array();
@@ -981,16 +981,16 @@ class dataform {
 
     /**
      * Verifies whether the current user has the needed
-     * permission to access a particular dataform view.
-     * @param  stdClass     $view   dataform_views entry
+     * permission to access a particular datalynx view.
+     * @param  stdClass     $view   datalynx_views entry
      * @return boolean              true if user can see the view, false otherwise
      */
     public function is_visible_to_user($view) {
-        $isadmin = has_capability('mod/dataform:viewprivilegeadmin', $this->context, null, true);
-        $mask = (has_capability('mod/dataform:viewprivilegemanager', $this->context, null, false) ? 1 : 0) |
-                (has_capability('mod/dataform:viewprivilegeteacher', $this->context, null, false) ? 2 : 0) |
-                (has_capability('mod/dataform:viewprivilegestudent', $this->context, null, false) ? 4 : 0) |
-                (has_capability('mod/dataform:viewprivilegeguest',   $this->context, null, false) ? 8 : 0);
+        $isadmin = has_capability('mod/datalynx:viewprivilegeadmin', $this->context, null, true);
+        $mask = (has_capability('mod/datalynx:viewprivilegemanager', $this->context, null, false) ? 1 : 0) |
+                (has_capability('mod/datalynx:viewprivilegeteacher', $this->context, null, false) ? 2 : 0) |
+                (has_capability('mod/datalynx:viewprivilegestudent', $this->context, null, false) ? 4 : 0) |
+                (has_capability('mod/datalynx:viewprivilegeguest',   $this->context, null, false) ? 8 : 0);
         return $isadmin || ($view->visible & $mask);
     }
 
@@ -1057,8 +1057,8 @@ class dataform {
                 $type = $viewortype;
                 $viewortype = 0;
             }
-            require_once($CFG->dirroot . '/mod/dataform/view/' . $type . '/view_class.php');
-            $viewclass = 'dataformview_' . $type;
+            require_once($CFG->dirroot . '/mod/datalynx/view/' . $type . '/view_class.php');
+            $viewclass = 'datalynxview_' . $type;
             return new $viewclass($this, $viewortype, $active);
         }
     }
@@ -1129,7 +1129,7 @@ class dataform {
         $rec = new object();
         $rec->id = $this->id();
         $rec->defaultview = $viewid;
-        if (!$DB->update_record('dataform', $rec)) {
+        if (!$DB->update_record('datalynx', $rec)) {
             throw new moodle_exception('Failed to update the database');
         }
         $this->data->defaultview = $viewid;
@@ -1144,7 +1144,7 @@ class dataform {
         $rec = new object();
         $rec->id = $this->id();
         $rec->defaultfilter = $filterid;
-        if (!$DB->update_record('dataform', $rec)) {
+        if (!$DB->update_record('datalynx', $rec)) {
             throw new moodle_exception('Failed to update the database');
         }
         $this->data->defaultfilter = $filterid;
@@ -1159,7 +1159,7 @@ class dataform {
         $rec = new object();
         $rec->id = $this->id();
         $rec->singleedit = $viewid;
-        if (!$DB->update_record('dataform', $rec)) {
+        if (!$DB->update_record('datalynx', $rec)) {
             throw new moodle_exception('Failed to update the database');
         }
         $this->data->singleedit = $viewid;
@@ -1174,7 +1174,7 @@ class dataform {
         $rec = new object();
         $rec->id = $this->id();
         $rec->singleview = $viewid;
-        if (!$DB->update_record('dataform', $rec)) {
+        if (!$DB->update_record('datalynx', $rec)) {
             throw new moodle_exception('Failed to update the database');
         }
         $this->data->singleview = $viewid;
@@ -1199,7 +1199,7 @@ class dataform {
     public function process_views($action, $vids, $confirmed = false) {
         global $DB, $OUTPUT;
 
-        if (!has_capability('mod/dataform:managetemplates', $this->context)) {
+        if (!has_capability('mod/datalynx:managetemplates', $this->context)) {
             // TODO throw exception
             return false;
         }
@@ -1218,7 +1218,7 @@ class dataform {
         $strnotify = '';
 
         if (empty($views)) {
-            $this->notifications['bad'][] = get_string("viewnoneforaction",'dataform');
+            $this->notifications['bad'][] = get_string("viewnoneforaction",'datalynx');
             return false;
         } else {
             if (!$confirmed) {
@@ -1226,12 +1226,12 @@ class dataform {
                 $this->print_header('views');
 
                 // Print a confirmation page
-                echo $OUTPUT->confirm(get_string("viewsconfirm$action", 'dataform', count($views)),
-                        new moodle_url('/mod/dataform/view/index.php', array('d' => $this->id(),
+                echo $OUTPUT->confirm(get_string("viewsconfirm$action", 'datalynx', count($views)),
+                        new moodle_url('/mod/datalynx/view/index.php', array('d' => $this->id(),
                                                                         $action => implode(',', array_keys($views)),
                                                                         'sesskey' => sesskey(),
                                                                         'confirmed' => 1)),
-                        new moodle_url('/mod/dataform/view/index.php', array('d' => $this->id())));
+                        new moodle_url('/mod/datalynx/view/index.php', array('d' => $this->id())));
 
                 echo $OUTPUT->footer();
                 exit;
@@ -1247,7 +1247,7 @@ class dataform {
                                 continue;
                             } else {
                                 $updateview->id = $vid;
-                                $DB->update_record('dataform_views', $updateview);
+                                $DB->update_record('datalynx_views', $updateview);
 
                                 $processedvids[] = $vid;
                             }
@@ -1267,7 +1267,7 @@ class dataform {
                                 } else {
                                     $updateview->filter = $filterid;
                                 }
-                                $DB->update_record('dataform_views', $updateview);
+                                $DB->update_record('datalynx_views', $updateview);
                                 $processedvids[] = $vid;
                             }
                         }
@@ -1309,7 +1309,7 @@ class dataform {
 
                             $newviewid = $viewid;
                             $contextid = $this->context->id;
-                            $component = 'mod_dataform';
+                            $component = 'mod_datalynx';
                             $fs = get_file_storage();
                             foreach (array('viewsection', 'viewparam2') as $filearea) {
                                 $files = $fs->get_area_files($contextid, $component, $filearea, $oldviewid);
@@ -1359,10 +1359,10 @@ class dataform {
                         break;
                 }
 
-                add_to_log($this->course->id, 'dataform', 'view '. $action, 'view/index.php?id='. $this->cm->id, $this->id(), $this->cm->id);
+                add_to_log($this->course->id, 'datalynx', 'view '. $action, 'view/index.php?id='. $this->cm->id, $this->id(), $this->cm->id);
                 if ($strnotify) {
                     $viewsprocessed = $processedvids ? count($processedvids) : 'No';
-                    $this->notifications['good'][] = get_string($strnotify, 'dataform', $viewsprocessed);
+                    $this->notifications['good'][] = get_string($strnotify, 'datalynx', $viewsprocessed);
                 }
                 return $processedvids;
             }
@@ -1439,7 +1439,7 @@ class dataform {
      * @return boolean
      */
     public function user_at_max_entries($perinterval = false) {
-        if ($this->data->maxentries < 0 or has_capability('mod/dataform:manageentries', $this->context)) {
+        if ($this->data->maxentries < 0 or has_capability('mod/datalynx:manageentries', $this->context)) {
             return false;
         } else if ($this->data->maxentries == 0) {
             return true;
@@ -1454,7 +1454,7 @@ class dataform {
      */
     public function user_can_view_all_entries($options = null) {
         global $OUTPUT;
-        if (has_capability('mod/dataform:manageentries', $this->context)) {
+        if (has_capability('mod/datalynx:manageentries', $this->context)) {
             return true;
         } else {
             // Check the number of entries required against the number of entries already made
@@ -1462,7 +1462,7 @@ class dataform {
             if ($this->data->entriesrequired and $numentries < $this->data->entriesrequired) {
                 $entriesleft = $this->data->entriesrequired - $numentries;
                 if (!empty($options['notify'])) {
-                    echo $OUTPUT->notification(get_string('entrieslefttoadd', 'dataform', $entriesleft));
+                    echo $OUTPUT->notification(get_string('entrieslefttoadd', 'datalynx', $entriesleft));
                 }
             }
 
@@ -1474,7 +1474,7 @@ class dataform {
                 if ($this->data->entriestoview and $numentries < $this->data->entriestoview) {
                     $entrieslefttoview = $this->data->entriestoview - $numentries;
                     if (!empty($options['notify'])) {
-                        echo $OUTPUT->notification(get_string('entrieslefttoaddtoview', 'dataform', $entrieslefttoview));
+                        echo $OUTPUT->notification(get_string('entrieslefttoaddtoview', 'datalynx', $entrieslefttoview));
                     }
                     return false;
                 } else {
@@ -1493,13 +1493,13 @@ class dataform {
         if (!empty($CFG->enableportfolios)) {
 
             // can export all entries
-            if (has_capability('mod/dataform:exportallentries', $this->context)) {
+            if (has_capability('mod/datalynx:exportallentries', $this->context)) {
                 return true;
             }
             
             // for others, it depends on the entry
             if (isset($entry->id) and $entry->id > 0) {
-                if (has_capability('mod/dataform:exportownentry', $this->context)) {
+                if (has_capability('mod/datalynx:exportownentry', $this->context)) {
                     if (!$this->data->grouped and $USER->id == $entry->userid) {
                         return true;
                     } else if ($this->data->grouped and groups_is_member($entry->groupid)) {
@@ -1519,20 +1519,20 @@ class dataform {
         global $USER, $CFG;
 
         // teachers can always manage entries
-        if (has_capability('mod/dataform:manageentries',$this->context)) {
+        if (has_capability('mod/datalynx:manageentries',$this->context)) {
             return true;
         }
 
         // anonymous/guest can only add entries if enabled
         if ((!isloggedin() or isguestuser())
                     and empty($entry->id)
-                    and $CFG->dataform_anonymous
+                    and $CFG->datalynx_anonymous
                     and $this->data->anonymous) {
             return true;
         }
         
         // for others, it depends ...
-        if (has_capability('mod/dataform:writeentry', $this->context)) {
+        if (has_capability('mod/datalynx:writeentry', $this->context)) {
             $timeavailable = $this->data->timeavailable;
             $timedue = $this->data->timedue;
             $allowlate = $this->data->allowlate;
@@ -1564,7 +1564,7 @@ class dataform {
                 }
 
                 require_once('field/_status/field_class.php');
-                if (!($entry->status == dataformfield__status::STATUS_DRAFT || $entry->status == dataformfield__status::STATUS_NOT_SET)) {
+                if (!($entry->status == datalynxfield__status::STATUS_DRAFT || $entry->status == datalynxfield__status::STATUS_NOT_SET)) {
                     return false;
                 }
                 // ok owner, what's the time (limit)?
@@ -1648,7 +1648,7 @@ class dataform {
         }
 
         $sql = "SELECT COUNT(*)
-                FROM {dataform_entries}
+                FROM {datalynx_entries}
                 WHERE dataid = :dataid $and_whereuserorgroup $and_whereinterval";
         $entriescount = $DB->count_records_sql($sql, $params);
         
@@ -1680,7 +1680,7 @@ class dataform {
         );
         
         $where = " dataid = ? AND name = ? AND id <> ? ";
-        return $DB->record_exists_select("dataform_{$table}", $where, $params);
+        return $DB->record_exists_select("datalynx_{$table}", $where, $params);
     }
 
     /**
@@ -1709,7 +1709,7 @@ class dataform {
      * 
      */
     public function add_to_log($action) {
-        add_to_log($this->course->id, 'dataform', 'entry '. $action, $this->pagefile. '.php?id='. $this->cm->id, $this->id(), $this->cm->id);
+        add_to_log($this->course->id, 'datalynx', 'entry '. $action, $this->pagefile. '.php?id='. $this->cm->id, $this->id(), $this->cm->id);
     }
     
     /**
@@ -1718,20 +1718,20 @@ class dataform {
     public function events_trigger($event, $data) {
         $data->df = $this;
         $data->coursename = $this->course->shortname;
-        $data->dataformname = $this->name();
-        $data->dataformbaselink = html_writer::link($data->view->get_df()->get_baseurl(), $data->dataformname);
-        $data->dataformlink = html_writer::link($data->view->get_baseurl(), $data->dataformname);
+        $data->datalynxname = $this->name();
+        $data->datalynxbaselink = html_writer::link($data->view->get_df()->get_baseurl(), $data->datalynxname);
+        $data->datalynxlink = html_writer::link($data->view->get_baseurl(), $data->datalynxname);
         $data->context = $this->context->id;
         $data->event = $event;
         $data->notification = 1;
         $data->notificationformat = 1;
-        events_trigger("dataform_$event", $data);
+        events_trigger("datalynx_$event", $data);
     }
 
     public function get_baseurl() {
         // base url params
         $baseurlparams = array();
         $baseurlparams['d'] = $this->id();
-        return new moodle_url("/mod/dataform/{$this->pagefile()}.php", $baseurlparams);
+        return new moodle_url("/mod/datalynx/{$this->pagefile()}.php", $baseurlparams);
     }
 }

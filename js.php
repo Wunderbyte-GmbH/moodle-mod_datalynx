@@ -16,20 +16,20 @@
  
 /**
  * @package mod
- * @subpackage dataform
+ * @subpackage datalynx
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * The Dataform has been developed as an enhanced counterpart
+ * The Datalynx has been developed as an enhanced counterpart
  * of Moodle's Database activity module (1.9.11+ (20110323)).
- * To the extent that Dataform code corresponds to Database code,
+ * To the extent that Datalynx code corresponds to Database code,
  * certain copyrights on the Database module may obtain.
  */
 
 require_once('../../config.php');
 
 $urlparams = new object;
-$urlparams->d = optional_param('d', 0, PARAM_INT);   // dataform id
+$urlparams->d = optional_param('d', 0, PARAM_INT);   // datalynx id
 $urlparams->id = optional_param('id', 0, PARAM_INT);   // course module id
 $urlparams->jsedit = optional_param('jsedit', 0, PARAM_BOOL);   // edit mode
 
@@ -37,7 +37,7 @@ if ($urlparams->jsedit) {
     require_once('mod_class.php');
     require_once $CFG->libdir.'/formslib.php';
 
-    class mod_dataform_js_form extends moodleform {
+    class mod_datalynx_js_form extends moodleform {
 
         function definition() {
             global $CFG, $COURSE;
@@ -50,15 +50,15 @@ if ($urlparams->jsedit) {
 
             // js
             //-------------------------------------------------------------------------------
-            $mform->addElement('header', 'generalhdr', get_string('headerjs', 'dataform'));
+            $mform->addElement('header', 'generalhdr', get_string('headerjs', 'datalynx'));
 
             // includes
             $attributes = array('wrap' => 'virtual', 'rows' => 5, 'cols' => 60);
-            $mform->addElement('textarea', 'jsincludes', get_string('jsincludes', 'dataform'), $attributes);
+            $mform->addElement('textarea', 'jsincludes', get_string('jsincludes', 'datalynx'), $attributes);
 
             // code
             $attributes = array('wrap' => 'virtual', 'rows' => 15, 'cols' => 60);
-            $mform->addElement('textarea', 'js', get_string('jscode', 'dataform'), $attributes);
+            $mform->addElement('textarea', 'js', get_string('jscode', 'datalynx'), $attributes);
 
             // uploads
             $options = array(
@@ -67,7 +67,7 @@ if ($urlparams->jsedit) {
                 'maxfiles' => 10,
                 'accepted_types' => array('*.js')
             );
-            $mform->addElement('filemanager', 'jsupload', get_string('jsupload', 'dataform'), null, $options);
+            $mform->addElement('filemanager', 'jsupload', get_string('jsupload', 'datalynx'), null, $options);
             
             // buttons
             //-------------------------------------------------------------------------------
@@ -76,16 +76,16 @@ if ($urlparams->jsedit) {
 
     }
 
-    // Set a dataform object
-    $df = new dataform($urlparams->d, $urlparams->id);
-    require_capability('mod/dataform:managetemplates', $df->context);
+    // Set a datalynx object
+    $df = new datalynx($urlparams->d, $urlparams->id);
+    require_capability('mod/datalynx:managetemplates', $df->context);
 
     $df->set_page('js', array('urlparams' => $urlparams));
 
     // activate navigation node
-    navigation_node::override_active_url(new moodle_url('/mod/dataform/js.php', array('id' => $df->cm->id, 'jsedit' => 1)));
+    navigation_node::override_active_url(new moodle_url('/mod/datalynx/js.php', array('id' => $df->cm->id, 'jsedit' => 1)));
 
-    $mform = new mod_dataform_js_form(new moodle_url('/mod/dataform/js.php', array('d' => $df->id(), 'jsedit' => 1))); 
+    $mform = new mod_datalynx_js_form(new moodle_url('/mod/datalynx/js.php', array('d' => $df->id(), 'jsedit' => 1))); 
 
     if ($mform->is_cancelled()) {
     
@@ -93,7 +93,7 @@ if ($urlparams->jsedit) {
         $rec = new object();
         $rec->js = $data->js;
         $rec->jsincludes = $data->jsincludes;        
-        $df->update($rec, get_string('jssaved', 'dataform'));
+        $df->update($rec, get_string('jssaved', 'datalynx'));
         
         // add uploaded files
         $usercontext = context_user::instance($USER->id);
@@ -101,7 +101,7 @@ if ($urlparams->jsedit) {
         if ($files = $fs->get_area_files($usercontext->id, 'user', 'draft', $data->jsupload, 'sortorder', false)) {
             $filerec = new object;
             $filerec->contextid = $df->context->id;
-            $filerec->component = 'mod_dataform';
+            $filerec->component = 'mod_datalynx';
             $filerec->filearea = 'js';
             $filerec->filepath = '/';
             
@@ -112,7 +112,7 @@ if ($urlparams->jsedit) {
             $fs->delete_area_files($usercontext->id, 'user', 'draft', $data->jsupload);
         }
         
-        add_to_log($df->course->id, 'dataform', 'js saved', 'js.php?id='. $df->cm->id. '&amp;d='. $df->id(), $df->id(), $df->cm->id);
+        add_to_log($df->course->id, 'datalynx', 'js saved', 'js.php?id='. $df->cm->id. '&amp;d='. $df->id(), $df->id(), $df->cm->id);
     }
 
     $df->print_header(array('tab' => 'js', 'urlparams' => $urlparams));
@@ -123,7 +123,7 @@ if ($urlparams->jsedit) {
         'maxfiles' => 10,
     );
     $draftitemid = file_get_submitted_draft_itemid('jsupload');
-    file_prepare_draft_area($draftitemid, $df->context->id, 'mod_dataform', 'js', 0, $options);
+    file_prepare_draft_area($draftitemid, $df->context->id, 'mod_datalynx', 'js', 0, $options);
     $df->data->jsupload = $draftitemid;
 
     $mform->set_data($df->data);
@@ -136,9 +136,9 @@ if ($urlparams->jsedit) {
 
     $lifetime  = 600;                                   // Seconds to cache this stylesheet
     
-    $PAGE->set_url('/mod/dataform/js.php', array('d'=>$urlparams->d));
+    $PAGE->set_url('/mod/datalynx/js.php', array('d'=>$urlparams->d));
 
-    if ($jsdata = $DB->get_field('dataform', 'js', array('id' => $urlparams->d))) {
+    if ($jsdata = $DB->get_field('datalynx', 'js', array('id' => $urlparams->d))) {
         header('Last-Modified: ' . gmdate('D, d M Y H:i:s', time()) . ' GMT');
         header('Expires: ' . gmdate("D, d M Y H:i:s", time() + $lifetime) . ' GMT');
         header('Cache-control: max_age = '. $lifetime);

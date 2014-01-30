@@ -15,19 +15,19 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage _comment
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die;
 
-require_once("$CFG->dirroot/mod/dataform/field/renderer.php");
+require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
  *
  */
-class dataformfield__comment_renderer extends dataformfield_renderer {
+class datalynxfield__comment_renderer extends datalynxfield_renderer {
 
     /**
      * 
@@ -86,7 +86,7 @@ class dataformfield__comment_renderer extends dataformfield_renderer {
         $cmt->courseid  = $df->course->id;
         $cmt->cm      = $df->cm;
         $cmt->itemid  = $entry->id;
-        $cmt->component = 'mod_dataform';
+        $cmt->component = 'mod_datalynx';
         $cmt->area = !empty($options['area']) ? $options['area'] : 'entry';
         $cmt->showcount = isset($options['showcount']) ? $options['showcount'] : true;
             
@@ -108,7 +108,7 @@ class dataformfield__comment_renderer extends dataformfield_renderer {
      * Array of patterns this field supports 
      */
     protected function patterns() {
-        $cat = get_string('comments', 'dataform');
+        $cat = get_string('comments', 'datalynx');
 
         $patterns = array();
         $patterns['##comments##'] = array(true, $cat);

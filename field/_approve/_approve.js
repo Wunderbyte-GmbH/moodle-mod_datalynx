@@ -1,14 +1,14 @@
 /**
- * This file is part of the Dataform module for Moodle - http://moodle.org/.
+ * This file is part of the Datalynx module for Moodle - http://moodle.org/.
  *
- * @package mod-dataform
- * @subpackage dataformfield-nanogong
+ * @package mod-datalynx
+ * @subpackage datalynxfield-nanogong
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * The Dataform has been developed as an enhanced counterpart
+ * The Datalynx has been developed as an enhanced counterpart
  * of Moodle's Database activity module (1.9.11+ (20110323)).
- * To the extent that Dataform code corresponds to Database code,
+ * To the extent that Datalynx code corresponds to Database code,
  * certain copyrights on Database module may obtain.
  *
  * Moodle is free software: you can redistribute it and/or modify
@@ -25,10 +25,10 @@
  * along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-M.dataformfield__approve = {};
+M.datalynxfield__approve = {};
 
-M.dataformfield__approve.init = function (Y, approvedicon, disapprovedicon) {
-    Y.all('.dataformfield__approve').each(function (link) {
+M.datalynxfield__approve.init = function (Y, approvedicon, disapprovedicon) {
+    Y.all('.datalynxfield__approve').each(function (link) {
         var href = link.get('href');
         var params = extract_params(href.split('?')[1]);
         var child = link.get('firstChild');

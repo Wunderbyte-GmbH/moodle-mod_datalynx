@@ -15,15 +15,15 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /** 
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage _entry
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once("$CFG->dirroot/mod/dataform/field/field_class.php");
+require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
-class dataformfield__entry extends dataformfield_no_content {
+class datalynxfield__entry extends datalynxfield_no_content {
     public $type = '_entry';
 
     const _ENTRY = 'entry';
@@ -41,7 +41,7 @@ class dataformfield__entry extends dataformfield_no_content {
     public static function get_field_objects($dataid) {
         $fieldobjects = array();
         
-        $fieldobjects[self::_ENTRY] = (object) array('id' => self::_ENTRY, 'dataid' => $dataid, 'type' => '_entry', 'name' => get_string('entry', 'dataform'), 'description' => '', 'visible' => 2, 'internalname' => '');
+        $fieldobjects[self::_ENTRY] = (object) array('id' => self::_ENTRY, 'dataid' => $dataid, 'type' => '_entry', 'name' => get_string('entry', 'datalynx'), 'description' => '', 'visible' => 2, 'internalname' => '');
         
         return $fieldobjects;
     }

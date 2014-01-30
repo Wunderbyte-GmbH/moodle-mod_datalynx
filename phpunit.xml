@@ -24,7 +24,7 @@
 
 
         <testsuites>
-            <testsuite name="mod_dataform">
+            <testsuite name="mod_datalynx">
                 <directory suffix="_test.php">.</directory>
             </testsuite>
         </testsuites>

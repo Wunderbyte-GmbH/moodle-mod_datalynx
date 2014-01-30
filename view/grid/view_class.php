@@ -15,15 +15,15 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformview
+ * @package datalynxview
  * @subpackage grid
  * @copyright 2012 Itamar Tzadok 
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once("$CFG->dirroot/mod/dataform/view/view_class.php");
+require_once("$CFG->dirroot/mod/datalynx/view/view_class.php");
 
-class dataformview_grid extends dataformview_base {
+class datalynxview_grid extends datalynxview_base {
 
     protected $type = 'grid';
     protected $_editors = array('section', 'param2');
@@ -155,7 +155,7 @@ class dataformview_grid extends dataformview_base {
         }
 
         // Add group heading 
-        $name = ($name == 'newentry') ? get_string('entrynew', 'dataform') : $name;
+        $name = ($name == 'newentry') ? get_string('entrynew', 'datalynx') : $name;
         if ($name) {
             array_unshift($elements, array('html', $OUTPUT->heading($name, 3, 'main')));
         }
