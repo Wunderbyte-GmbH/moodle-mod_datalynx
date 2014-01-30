@@ -35,7 +35,7 @@ $urlparams->refresh = optional_param('refresh', 0, PARAM_INT);
 $urlparams->renew = optional_param('renew', 0, PARAM_INT);
 
 // Set a datalynx object with guest autologin
-$df = new datalynx($urlparams->d, $urlparams->id, true);
+$df = new datalynx($urlparams->d, $urlparams->id);
 
 $pageparams = array(
         'js' => true,

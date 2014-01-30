@@ -30,7 +30,7 @@ $urlparams->d   = optional_param('d', 0, PARAM_INT);             // datalynx id
 $urlparams->id  = optional_param('id', 0, PARAM_INT);            // course module id
 
 // Set a datalynx object
-$df = new datalynx($urlparams->d, $urlparams->id, true);
+$df = new datalynx($urlparams->d, $urlparams->id);
 require_capability('mod/datalynx:viewstatistics', $df->context);
 
 $df->set_page('statistics/index', array('modjs' => true, 'urlparams' => $urlparams));

@@ -66,7 +66,7 @@ class datalynx {
     /**
      * constructor
      */
-    public function __construct($d = 0, $id = 0, $autologinguest = false) {
+    public function __construct($d = 0, $id = 0) {
         global $DB;
 
         // initialize from datalynx id or object
@@ -318,17 +318,8 @@ class datalynx {
             }
         }
 
-        if (empty($params->nologin)) {
-            // guest auto login
-            $autologinguest = false;
-            if ($page == 'view' or $page == 'embed' or $page == 'external') {
-                $autologinguest = true;
+        require_login($this->course->id, true, $this->cm);
 
-            }
-            
-            // require login
-            require_login($this->course->id, $autologinguest, $this->cm);
-        }
 
         // make sure there is at least datalynx id param
         $urlparams['d'] = $thisid;

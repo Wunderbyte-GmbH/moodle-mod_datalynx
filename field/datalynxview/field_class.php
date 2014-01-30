@@ -42,7 +42,7 @@ class datalynxfield_datalynxview extends datalynxfield_no_content {
             return;
         }
 
-        $datalynx = new datalynx($data, null, true);
+        $datalynx = new datalynx($data, null);
         // TODO Add capability check on view entries
         
         // Get the view

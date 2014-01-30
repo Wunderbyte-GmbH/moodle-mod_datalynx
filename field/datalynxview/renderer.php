@@ -143,7 +143,6 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
                 'modjs' => true,
                 'completion' => true,
                 'comments' => true,
-                'nologin' => true,
         );
         
         // Ref datalynx page type defaults to external
