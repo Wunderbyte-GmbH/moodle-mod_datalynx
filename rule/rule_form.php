@@ -15,7 +15,7 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataform_rule
+ * @package datalynx_rule
  * @copyright 2013 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -24,7 +24,7 @@ defined('MOODLE_INTERNAL') or die;
 require_once("$CFG->libdir/formslib.php");
 require_once('../event_class.php');
 
-class dataform_rule_form extends moodleform {
+class datalynx_rule_form extends moodleform {
     protected $_rule = null;
     protected $_df = null;
 
@@ -61,16 +61,16 @@ class dataform_rule_form extends moodleform {
         }
 
         // enabled
-        $mform->addElement('advcheckbox', 'enabled', get_string('ruleenabled', 'dataform'), '', null, array(0, 1));
+        $mform->addElement('advcheckbox', 'enabled', get_string('ruleenabled', 'datalynx'), '', null, array(0, 1));
 
         // events
-        $mform->addElement('header', 'eventsettings', get_string('eventsettings', 'dataform'));
-        $eventmenu = dataform_event_handler::get_event_data(true);
+        $mform->addElement('header', 'eventsettings', get_string('eventsettings', 'datalynx'));
+        $eventmenu = datalynx_event_handler::get_event_data(true);
         $eventgroup = array();
         foreach ($eventmenu as $eventname => $eventlabel) {
             $eventgroup[] =& $mform->createElement('checkbox', $eventname, null, $eventlabel);
         }
-        $mform->addGroup($eventgroup, 'eventsgroup', get_string('triggeringevent', 'dataform'), '<br />', false);
+        $mform->addGroup($eventgroup, 'eventsgroup', get_string('triggeringevent', 'datalynx'), '<br />', false);
 
         //-------------------------------------------------------------------------------
         $this->rule_definition();
@@ -92,7 +92,7 @@ class dataform_rule_form extends moodleform {
 
     function get_data($slashed = true) {
         if ($data = parent::get_data($slashed)) {
-            $eventmenu = dataform_event_handler::get_event_data(true);
+            $eventmenu = datalynx_event_handler::get_event_data(true);
             $selectedevents = array();
             foreach (array_keys($eventmenu) as $eventname) {
                 if (isset($data->$eventname)) {
@@ -111,7 +111,7 @@ class dataform_rule_form extends moodleform {
         // save and display
         $buttonarray[] = &$mform->createElement('submit', 'submitbutton', get_string('savechanges'));
         // save and continue
-        $buttonarray[] = &$mform->createElement('submit', 'submitbutton', get_string('savecontinue', 'dataform'));
+        $buttonarray[] = &$mform->createElement('submit', 'submitbutton', get_string('savecontinue', 'datalynx'));
         // cancel
         $buttonarray[] = &$mform->createElement('cancel');
         $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
@@ -122,7 +122,7 @@ class dataform_rule_form extends moodleform {
         $errors = parent::validation($data, $files);
 
         if ($this->_df->name_exists('rules', $data['name'], $this->_rule->get_id())) {
-            $errors['name'] = get_string('invalidname','dataform', get_string('rule', 'dataform'));
+            $errors['name'] = get_string('invalidname','datalynx', get_string('rule', 'datalynx'));
         }
 
         return $errors;

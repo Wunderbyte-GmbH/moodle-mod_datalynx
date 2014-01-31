@@ -15,19 +15,19 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage duration
  * @copyright 2013 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die;
 
-require_once("$CFG->dirroot/mod/dataform/field/renderer.php");
+require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
  *
  */
-class dataformfield_duration_renderer extends dataformfield_renderer {
+class datalynxfield_duration_renderer extends datalynxfield_renderer {
 
     /**
      *
@@ -154,7 +154,7 @@ class dataformfield_duration_renderer extends dataformfield_renderer {
         // only [[$fieldname]] is editable so check it if exists
         if (array_key_exists("[[*$fieldname]]", $tags) and isset($data->$formfieldname)) {
             if (!$content = clean_param($data->$formfieldname, PARAM_INT)) {
-                return array("$formfieldname[number]" => get_string('fieldrequired', 'dataform'));
+                return array("$formfieldname[number]" => get_string('fieldrequired', 'datalynx'));
             }
         }
         return null;

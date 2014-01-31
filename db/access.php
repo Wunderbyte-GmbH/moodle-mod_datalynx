@@ -15,14 +15,14 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package mod-dataform
+ * @package mod-datalynx
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */ 
 
 $capabilities = array(
 
-    'mod/dataform:addinstance' => array(
+    'mod/datalynx:addinstance' => array(
         'riskbitmask' => RISK_XSS,
 
         'captype' => 'write',
@@ -34,8 +34,8 @@ $capabilities = array(
         'clonepermissionsfrom' => 'moodle/course:manageactivities'
     ),
 
-    // manage templates: do anything in the dataform
-    'mod/dataform:managetemplates' => array(
+    // manage templates: do anything in the datalynx
+    'mod/datalynx:managetemplates' => array(
 
         'riskbitmask' => RISK_SPAM | RISK_XSS,
 
@@ -48,7 +48,7 @@ $capabilities = array(
     ),
 
     // view index
-    'mod/dataform:viewindex' => array(
+    'mod/datalynx:viewindex' => array(
 
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
@@ -61,7 +61,7 @@ $capabilities = array(
 
 // ENTRIES
     // manage entries: view, write, delete, export etc.
-    'mod/dataform:manageentries' => array(
+    'mod/datalynx:manageentries' => array(
 
         'riskbitmask' => RISK_SPAM,
 
@@ -75,7 +75,7 @@ $capabilities = array(
     ),
 
     // approve an entry
-    'mod/dataform:approve' => array(
+    'mod/datalynx:approve' => array(
 
         'riskbitmask' => RISK_SPAM,
 
@@ -89,12 +89,12 @@ $capabilities = array(
     ),
 
     // view entries
-    'mod/dataform:viewentry' => array(
+    'mod/datalynx:viewentry' => array(
 
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
-            'frontpage' => CAP_ALLOW, // needed for dataforms on the frontpage
+            'frontpage' => CAP_ALLOW, // needed for datalynxs on the frontpage
             'guest' => CAP_ALLOW,
             'user' => CAP_ALLOW,
             'student' => CAP_ALLOW,
@@ -105,7 +105,7 @@ $capabilities = array(
     ),
 
     // write entries
-    'mod/dataform:writeentry' => array(
+    'mod/datalynx:writeentry' => array(
 
         'riskbitmask' => RISK_SPAM,
 
@@ -120,7 +120,7 @@ $capabilities = array(
     ),
 
     // view anonymous entries
-    'mod/dataform:viewanonymousentry' => array(
+    'mod/datalynx:viewanonymousentry' => array(
 
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
@@ -131,7 +131,7 @@ $capabilities = array(
     ),
 
     // export entries
-    'mod/dataform:exportentry' => array(
+    'mod/datalynx:exportentry' => array(
 
         'riskbitmask' => RISK_PERSONAL,
 
@@ -145,7 +145,7 @@ $capabilities = array(
     ),
 
     // export own entries
-    'mod/dataform:exportownentry' => array(
+    'mod/datalynx:exportownentry' => array(
 
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
@@ -158,7 +158,7 @@ $capabilities = array(
     ),
 
     // export all entries
-    'mod/dataform:exportallentries' => array(
+    'mod/datalynx:exportallentries' => array(
 
         'riskbitmask' => RISK_PERSONAL,
 
@@ -173,7 +173,7 @@ $capabilities = array(
 
 // COMMENTS
     // mangae comments
-    'mod/dataform:managecomments' => array(
+    'mod/datalynx:managecomments' => array(
 
         'riskbitmask' => RISK_SPAM,
 
@@ -187,7 +187,7 @@ $capabilities = array(
     ),
 
     // comment on entries
-    'mod/dataform:comment' => array(
+    'mod/datalynx:comment' => array(
 
         'riskbitmask' => RISK_SPAM,
 
@@ -203,7 +203,7 @@ $capabilities = array(
 
 // RATINGS
     // mangae ratings
-    'mod/dataform:manageratings' => array(
+    'mod/datalynx:manageratings' => array(
 
         'riskbitmask' => RISK_SPAM,
 
@@ -217,7 +217,7 @@ $capabilities = array(
     ),
 
     // rate entries
-    'mod/dataform:rate' => array(
+    'mod/datalynx:rate' => array(
 
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
@@ -229,7 +229,7 @@ $capabilities = array(
     ),
 
     // view entry ratings
-    'mod/dataform:ratingsview' => array(
+    'mod/datalynx:ratingsview' => array(
 
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
@@ -241,7 +241,7 @@ $capabilities = array(
     ),
 
     // ???
-    'mod/dataform:ratingsviewany' => array(
+    'mod/datalynx:ratingsviewany' => array(
 
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'read',
@@ -251,11 +251,11 @@ $capabilities = array(
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW
         ),
-        'clonepermissionsfrom' =>  'mod/dataform:ratingsview'
+        'clonepermissionsfrom' =>  'mod/datalynx:ratingsview'
     ),
 
     // ???
-    'mod/dataform:ratingsviewall' => array(
+    'mod/datalynx:ratingsviewall' => array(
 
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'read',
@@ -265,12 +265,12 @@ $capabilities = array(
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW
         ),
-        'clonepermissionsfrom' =>  'mod/dataform:ratingsview'
+        'clonepermissionsfrom' =>  'mod/datalynx:ratingsview'
     ),
 
 // PRESETS
     // manage user presets
-    'mod/dataform:managepresets' => array(
+    'mod/datalynx:managepresets' => array(
 
         'riskbitmask' => RISK_SPAM | RISK_XSS,
 
@@ -282,7 +282,7 @@ $capabilities = array(
     ),
 
     // view all user presets
-    'mod/dataform:presetsviewall' => array(
+    'mod/datalynx:presetsviewall' => array(
 
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
@@ -295,7 +295,7 @@ $capabilities = array(
     
 // NOTIFICATIONS
     // Notified on added entry
-    'mod/dataform:notifyentryadded' => array(
+    'mod/datalynx:notifyentryadded' => array(
 
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'read',
@@ -307,7 +307,7 @@ $capabilities = array(
     ),
     
     // Notified on updated entry
-    'mod/dataform:notifyentryupdated' => array(
+    'mod/datalynx:notifyentryupdated' => array(
 
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'read',
@@ -319,7 +319,7 @@ $capabilities = array(
     ),
     
     // Notified on deleted entry
-    'mod/dataform:notifyentrydeleted' => array(
+    'mod/datalynx:notifyentrydeleted' => array(
 
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'read',
@@ -331,7 +331,7 @@ $capabilities = array(
     ),
 
     // Notified on approved entry
-    'mod/dataform:notifyentryapproved' => array(
+    'mod/datalynx:notifyentryapproved' => array(
 
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'read',
@@ -343,7 +343,7 @@ $capabilities = array(
     ),
 
     // Notified on disapproved entry
-    'mod/dataform:notifyentrydisapproved' => array(
+    'mod/datalynx:notifyentrydisapproved' => array(
 
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'read',
@@ -355,7 +355,7 @@ $capabilities = array(
     ),
 
     // Notified on added comment
-    'mod/dataform:notifycommentadded' => array(
+    'mod/datalynx:notifycommentadded' => array(
 
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'read',
@@ -367,7 +367,7 @@ $capabilities = array(
     ),
     
     // Notified on added rating
-    'mod/dataform:notifyratingadded' => array(
+    'mod/datalynx:notifyratingadded' => array(
 
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'read',
@@ -379,7 +379,7 @@ $capabilities = array(
     ),
     
     // Notified on updated rating
-    'mod/dataform:notifyratingupdated' => array(
+    'mod/datalynx:notifyratingupdated' => array(
 
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'read',
@@ -391,7 +391,7 @@ $capabilities = array(
     ),
 
     // Notified on updated rating
-    'mod/dataform:notifymemberadded' => array(
+    'mod/datalynx:notifymemberadded' => array(
 
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'read',
@@ -405,7 +405,7 @@ $capabilities = array(
     ),
 
     // Notified on updated rating
-    'mod/dataform:notifymemberremoved' => array(
+    'mod/datalynx:notifymemberremoved' => array(
 
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'read',
@@ -419,7 +419,7 @@ $capabilities = array(
     ),
 
     // Allow viewing of entries marked as draft
-    'mod/dataform:viewdrafts' => array(
+    'mod/datalynx:viewdrafts' => array(
 
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'read',
@@ -430,7 +430,7 @@ $capabilities = array(
     ),
 
     // Allow viewing of entries marked as draft
-    'mod/dataform:editrestrictedfields' => array(
+    'mod/datalynx:editrestrictedfields' => array(
 
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'read',
@@ -440,7 +440,7 @@ $capabilities = array(
         )
     ),
 
-    'mod/dataform:viewprivilegeadmin' => array(
+    'mod/datalynx:viewprivilegeadmin' => array(
 
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'read',
@@ -448,7 +448,7 @@ $capabilities = array(
         'archetypes' => array()
     ),
 
-    'mod/dataform:viewprivilegemanager' => array(
+    'mod/datalynx:viewprivilegemanager' => array(
 
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'read',
@@ -458,7 +458,7 @@ $capabilities = array(
         )
     ),
 
-    'mod/dataform:viewprivilegeteacher' => array(
+    'mod/datalynx:viewprivilegeteacher' => array(
 
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'read',
@@ -469,7 +469,7 @@ $capabilities = array(
         )
     ),
 
-    'mod/dataform:viewprivilegestudent' => array(
+    'mod/datalynx:viewprivilegestudent' => array(
 
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'read',
@@ -479,7 +479,7 @@ $capabilities = array(
         )
     ),
 
-    'mod/dataform:viewprivilegeguest' => array(
+    'mod/datalynx:viewprivilegeguest' => array(
 
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'read',
@@ -490,7 +490,7 @@ $capabilities = array(
         )
     ),
 
-    'mod/dataform:viewstatistics' => array(
+    'mod/datalynx:viewstatistics' => array(
 
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'read',

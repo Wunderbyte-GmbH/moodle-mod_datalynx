@@ -17,7 +17,7 @@
 /**
  * PHPUnit data generator tests
  *
- * @package    mod_dataform
+ * @package    mod_datalynx
  * @category   phpunit
  * @copyright  2012 Petr Skoda {@link http://skodak.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -29,34 +29,34 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * PHPUnit data generator testcase
  *
- * @package    mod_dataform
+ * @package    mod_datalynx
  * @category   phpunit
  * @copyright  2012 Itamar Tzadok
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_dataform_generator_testcase extends advanced_testcase {
+class mod_datalynx_generator_testcase extends advanced_testcase {
     public function test_generator() {
         global $DB;
 
         $this->resetAfterTest(true);
 
-        $this->assertEquals(0, $DB->count_records('dataform'));
+        $this->assertEquals(0, $DB->count_records('datalynx'));
 
         $course = $this->getDataGenerator()->create_course();
 
-        /** @var mod_dataform_generator $generator */
-        $generator = $this->getDataGenerator()->get_plugin_generator('mod_dataform');
-        $this->assertInstanceOf('mod_dataform_generator', $generator);
-        $this->assertEquals('dataform', $generator->get_modulename());
+        /** @var mod_datalynx_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_datalynx');
+        $this->assertInstanceOf('mod_datalynx_generator', $generator);
+        $this->assertEquals('datalynx', $generator->get_modulename());
 
         $generator->create_instance(array('course'=>$course->id));
         $generator->create_instance(array('course'=>$course->id));
         $data = $generator->create_instance(array('course'=>$course->id));
-        $this->assertEquals(3, $DB->count_records('dataform'));
+        $this->assertEquals(3, $DB->count_records('datalynx'));
 
-        $cm = get_coursemodule_from_instance('dataform', $data->id);
+        $cm = get_coursemodule_from_instance('datalynx', $data->id);
         $this->assertEquals($data->id, $cm->instance);
-        $this->assertEquals('dataform', $cm->modname);
+        $this->assertEquals('datalynx', $cm->modname);
         $this->assertEquals($course->id, $cm->course);
 
         $context = context_module::instance($cm->id);
@@ -64,7 +64,7 @@ class mod_dataform_generator_testcase extends advanced_testcase {
 
         // test gradebook integration using low level DB access - DO NOT USE IN PLUGIN CODE!
         $data = $generator->create_instance(array('course'=>$course->id, 'grade'=>100));
-        $gitem = $DB->get_record('grade_items', array('courseid'=>$course->id, 'itemtype'=>'mod', 'itemmodule'=>'dataform', 'iteminstance'=>$data->id));
+        $gitem = $DB->get_record('grade_items', array('courseid'=>$course->id, 'itemtype'=>'mod', 'itemmodule'=>'datalynx', 'iteminstance'=>$data->id));
         $this->assertNotEmpty($gitem);
         $this->assertEquals(100, $gitem->grademax);
         $this->assertEquals(0, $gitem->grademin);

@@ -15,19 +15,19 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage radiobutton
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once("$CFG->dirroot/mod/dataform/field/select/renderer.php");
+require_once("$CFG->dirroot/mod/datalynx/field/select/renderer.php");
 
 /**
  * 
  */
-class dataformfield_radiobutton_renderer extends dataformfield_select_renderer {
+class datalynxfield_radiobutton_renderer extends datalynxfield_select_renderer {
 
     /**
      * 
@@ -61,12 +61,12 @@ class dataformfield_radiobutton_renderer extends dataformfield_select_renderer {
         );
 
         $module = array(
-            'name' => 'M.dataformfield_radiobutton_required',
-            'fullpath' => '/mod/dataform/field/radiobutton/radiobutton.js',
+            'name' => 'M.datalynxfield_radiobutton_required',
+            'fullpath' => '/mod/datalynx/field/radiobutton/radiobutton.js',
             'requires' => array('base','node')
         );
 
-        $PAGE->requires->js_init_call('M.dataformfield_radiobutton_required.init', array($options), false, $module);            
+        $PAGE->requires->js_init_call('M.datalynxfield_radiobutton_required.init', array($options), false, $module);            
     }
 
 }

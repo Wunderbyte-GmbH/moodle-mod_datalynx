@@ -16,7 +16,7 @@
  
 /**
  * @package mod
- * @subpackage dataform
+ * @subpackage datalynx
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -26,7 +26,7 @@ require_once('../mod_class.php');
 
 $urlparams = new object();
 
-$urlparams->d          = optional_param('d', 0, PARAM_INT);             // dataform id
+$urlparams->d          = optional_param('d', 0, PARAM_INT);             // datalynx id
 $urlparams->id         = optional_param('id', 0, PARAM_INT);            // course module id
 $urlparams->fid        = optional_param('fid', 0 , PARAM_INT);          // update filter id
 
@@ -44,14 +44,14 @@ $urlparams->confirmed  = optional_param('confirmed', 0, PARAM_INT);
 $urlparams->update     = optional_param('update', 0, PARAM_INT);   // update filter
 $urlparams->cancel     = optional_param('cancel', 0, PARAM_BOOL);
 
-// Set a dataform object
-$df = new dataform($urlparams->d, $urlparams->id);
-require_capability('mod/dataform:managetemplates', $df->context);
+// Set a datalynx object
+$df = new datalynx($urlparams->d, $urlparams->id);
+require_capability('mod/datalynx:managetemplates', $df->context);
 
 $df->set_page('filter/index', array('modjs' => true, 'urlparams' => $urlparams));
 
 // activate navigation node
-navigation_node::override_active_url(new moodle_url('/mod/dataform/filter/index.php', array('id' => $df->cm->id)));
+navigation_node::override_active_url(new moodle_url('/mod/datalynx/filter/index.php', array('id' => $df->cm->id)));
 
 $fm = $df->get_filter_manager();
 
@@ -92,7 +92,7 @@ if ($urlparams->new and confirm_sesskey()) {
 } else {    
     // Any notifications?
     if (!$filters = $fm->get_filters(null, false, true)) {
-        $df->notifications['bad'][] = get_string('filtersnoneindataform','dataform');  // nothing in dataform
+        $df->notifications['bad'][] = get_string('filtersnoneindatalynx','datalynx');  // nothing in datalynx
     }
 
     // Print header

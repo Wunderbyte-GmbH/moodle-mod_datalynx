@@ -15,15 +15,15 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataform_rule
+ * @package datalynx_rule
  * @subpackage eventnotification
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once("$CFG->dirroot/mod/dataform/rule/rule_form.php");
-HTML_QuickForm::registerElementType('checkboxgroup', "$CFG->dirroot/mod/dataform/checkboxgroup/checkboxgroup.php", 'HTML_QuickForm_checkboxgroup');
+require_once("$CFG->dirroot/mod/datalynx/rule/rule_form.php");
+HTML_QuickForm::registerElementType('checkboxgroup', "$CFG->dirroot/mod/datalynx/checkboxgroup/checkboxgroup.php", 'HTML_QuickForm_checkboxgroup');
 
-class dataform_rule_eventnotification_form extends dataform_rule_form {
+class datalynx_rule_eventnotification_form extends datalynx_rule_form {
     function rule_definition() {
         $br = html_writer::empty_tag('br');
         $sp = '    ';
@@ -34,14 +34,14 @@ class dataform_rule_eventnotification_form extends dataform_rule_form {
 
         // sender
         $options = array(
-            dataform_rule_eventnotification::FROM_AUTHOR => get_string('author', 'dataform'),
-            dataform_rule_eventnotification::FROM_CURRENT_USER => get_string('user')
+            datalynx_rule_eventnotification::FROM_AUTHOR => get_string('author', 'datalynx'),
+            datalynx_rule_eventnotification::FROM_CURRENT_USER => get_string('user')
         );
         $mform->addElement('select', 'param2', get_string('from'), $options);
 
         // recipient
         $grp = array();
-        $grp[] = &$mform->createElement('checkbox', 'author', null, get_string('author', 'dataform'), null);
+        $grp[] = &$mform->createElement('checkbox', 'author', null, get_string('author', 'datalynx'), null);
         $grp[] = &$mform->createElement('static', 'rolesheader', '', get_string('roles'));
         $grp[] = &$mform->createElement('checkboxgroup', 'roles', get_string('roles'), $this->menu_roles_used_in_context(), '<br/>');
         $mform->addGroup($grp, 'recipientgrp', get_string('to'), $br, false);
@@ -50,7 +50,7 @@ class dataform_rule_eventnotification_form extends dataform_rule_form {
     protected function menu_roles_used_in_context() {
         $roles = array();
         foreach (get_roles_used_in_context($this->_df->context) as $roleid => $role) {
-            $roles[$roleid] = $role->coursealias ? $role->coursealias : $role->name;
+            $roles[$roleid] = $role->coursealias ? $role->coursealias : ($role->name ? $role->name : $role->shortname);
         }
         return $roles;
     }

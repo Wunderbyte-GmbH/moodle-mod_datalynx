@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Unit tests for dataform_get_all_entriesids(), dataform_get_advance_search_ids(), dataform_get_entries_ids(),
- * and dataform_get_advanced_search_sql()
+ * Unit tests for datalynx_get_all_entriesids(), datalynx_get_advance_search_ids(), datalynx_get_entries_ids(),
+ * and datalynx_get_advanced_search_sql()
  *
- * @package    mod_dataform
+ * @package    mod_datalynx
  * @category   phpunit
  * @copyright  2012 Itamar Tzadok
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -27,7 +27,7 @@
 defined('MOODLE_INTERNAL') or die;
 
 global $CFG;
-require_once($CFG->dirroot . '/mod/dataform/lib.php');
+require_once($CFG->dirroot . '/mod/datalynx/lib.php');
 require_once($CFG->dirroot . '/lib/csvlib.class.php');
 
 
@@ -37,13 +37,13 @@ require_once($CFG->dirroot . '/lib/csvlib.class.php');
  *                {@see data_get_record_ids()}
  *                {@see data_get_advanced_search_sql()}
  *
- * @package    mod_dataform
+ * @package    mod_datalynx
  * @copyright  2012 Itamar Tzadok
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class dataform_advanced_search_sql_test extends advanced_testcase {
+class datalynx_advanced_search_sql_test extends advanced_testcase {
     /**
-     * @var stdObject $recorddata An object that holds information from the table dataform.
+     * @var stdObject $recorddata An object that holds information from the table datalynx.
      */
     public $recorddata = null;
     /**
@@ -81,7 +81,7 @@ class dataform_advanced_search_sql_test extends advanced_testcase {
     public $finalrecord = array();
 
     /**
-     * Set up function. In this instance we are setting up dataform
+     * Set up function. In this instance we are setting up datalynx
      * entries to be used in the unit tests.
      */
     protected function setUp() {
@@ -96,16 +96,16 @@ class dataform_advanced_search_sql_test extends advanced_testcase {
             $this->getDataGenerator()->create_user();
         }
 
-        // create dataform module - there should be more of these I guess
+        // create datalynx module - there should be more of these I guess
         $course = $this->getDataGenerator()->create_course();
-        $data = $this->getDataGenerator()->create_module('dataform', array('course'=>$course->id));
+        $data = $this->getDataGenerator()->create_module('datalynx', array('course'=>$course->id));
         $this->recorddata = $data;
 
         // Set up data for the test database.
         $files = array(
-            'dataform_fields'  => __DIR__.'/fixtures/test_dataform_fields.csv',
-            'dataform_entries' => __DIR__.'/fixtures/test_dataform_entries.csv',
-            'dataform_contents' => __DIR__.'/fixtures/test_dataform_contents.csv',
+            'datalynx_fields'  => __DIR__.'/fixtures/test_datalynx_fields.csv',
+            'datalynx_entries' => __DIR__.'/fixtures/test_datalynx_entries.csv',
+            'datalynx_contents' => __DIR__.'/fixtures/test_datalynx_contents.csv',
         );
         $this->loadDataSet($this->createCsvDataSet($files));
 

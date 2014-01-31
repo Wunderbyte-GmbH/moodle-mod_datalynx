@@ -16,7 +16,7 @@
  
 /**
  * @package mod
- * @subpackage dataform
+ * @subpackage datalynx
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -26,25 +26,25 @@ require_once("$CFG->libdir/formslib.php");
 /**
  *
  */
-class mod_dataform_preset_form extends moodleform {
+class mod_datalynx_preset_form extends moodleform {
 
     function definition() {
         global $COURSE;
 
         $mform = &$this->_form;
 
-        $mform->addElement('header', 'presetshdr', get_string('presetadd', 'dataform'));
+        $mform->addElement('header', 'presetshdr', get_string('presetadd', 'datalynx'));
         // preset source
         $grp = array();
-        $grp[] = &$mform->createElement('radio', 'preset_source', null, get_string('presetfromdataform', 'dataform'), 'current');
+        $grp[] = &$mform->createElement('radio', 'preset_source', null, get_string('presetfromdatalynx', 'datalynx'), 'current');
         
         $packdata = array(
-            'nodata' => get_string('presetnodata', 'dataform'),
-            'data' => get_string('presetdata', 'dataform'),
-            'dataanon' => get_string('presetdataanon', 'dataform'),
+            'nodata' => get_string('presetnodata', 'datalynx'),
+            'data' => get_string('presetdata', 'datalynx'),
+            'dataanon' => get_string('presetdataanon', 'datalynx'),
         );
         $grp[] = &$mform->createElement('select', 'preset_data', null, $packdata);
-        $grp[] = &$mform->createElement('radio', 'preset_source', null, get_string('presetfromfile', 'dataform'), 'file');
+        $grp[] = &$mform->createElement('radio', 'preset_source', null, get_string('presetfromfile', 'datalynx'), 'file');
         $mform->addGroup($grp, 'psourcegrp', null, array('  ', '<br />'), false);
         $mform->setDefault('preset_source', 'current');
         

@@ -15,15 +15,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage teammemberselect
  * @copyright 2013 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once("$CFG->dirroot/mod/dataform/field/field_class.php");
+require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
-class dataformfield_teammemberselect extends dataformfield_base {
+class datalynxfield_teammemberselect extends datalynxfield_base {
     public $type = 'teammemberselect';
 
     const TEAMMEMBERSELECT_FORMAT_NEWLINE = 0;
@@ -54,15 +54,15 @@ class dataformfield_teammemberselect extends dataformfield_base {
         $this->referencefieldid = $this->field->param5;
         $this->notifyteammembers = $this->field->param6 != 0;
         $this->separators = array(
-                self::TEAMMEMBERSELECT_FORMAT_NEWLINE => get_string('listformat_newline', 'dataform'),
-                self::TEAMMEMBERSELECT_FORMAT_SPACE => get_string('listformat_space', 'dataform'),
-                self::TEAMMEMBERSELECT_FORMAT_COMMA => get_string('listformat_comma', 'dataform'),
-                self::TEAMMEMBERSELECT_FORMAT_COMMA_SPACE => get_string('listformat_commaspace', 'dataform'),
-                self::TEAMMEMBERSELECT_FORMAT_UL => get_string('listformat_ul', 'dataform')
+                self::TEAMMEMBERSELECT_FORMAT_NEWLINE => get_string('listformat_newline', 'datalynx'),
+                self::TEAMMEMBERSELECT_FORMAT_SPACE => get_string('listformat_space', 'datalynx'),
+                self::TEAMMEMBERSELECT_FORMAT_COMMA => get_string('listformat_comma', 'datalynx'),
+                self::TEAMMEMBERSELECT_FORMAT_COMMA_SPACE => get_string('listformat_commaspace', 'datalynx'),
+                self::TEAMMEMBERSELECT_FORMAT_UL => get_string('listformat_ul', 'datalynx')
         );
 
         $query = "SELECT r.id, r.name
-                    FROM {dataform_rules} r
+                    FROM {datalynx_rules} r
                    WHERE r.dataid = :dataid
                      AND r.type LIKE :type";
         $this->rules = $DB->get_records_sql_menu($query, array('dataid' => $df->id(), 'type' => 'eventnotification'));
@@ -108,7 +108,7 @@ class dataformfield_teammemberselect extends dataformfield_base {
         global $DB;
 
         $query = "SELECT *
-                    FROM {dataform_fields} df
+                    FROM {datalynx_fields} df
                    WHERE df.dataid = :dataid
                      AND df.type LIKE 'teammemberselect'
                      AND df.param5 IS NOT NULL
@@ -126,7 +126,7 @@ class dataformfield_teammemberselect extends dataformfield_base {
             $this->set_field($fromform);
         }
 
-        if (!$DB->update_record('dataform_fields', $this->field)) {
+        if (!$DB->update_record('datalynx_fields', $this->field)) {
             echo $OUTPUT->notification('updating of field failed!');
             return false;
         }
@@ -228,8 +228,8 @@ class dataformfield_teammemberselect extends dataformfield_base {
     public function get_supported_search_operators() {
         return array(
             ''     => '&lt;' . get_string('choose') . '&gt;',
-            'USER' => get_string('iamteammember', 'dataform'),
-            'OTHER_USER' => get_string('useristeammember', 'dataform')
+            'USER' => get_string('iamteammember', 'datalynx'),
+            'OTHER_USER' => get_string('useristeammember', 'datalynx')
         );
     }
 }

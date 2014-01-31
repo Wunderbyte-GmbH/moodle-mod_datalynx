@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage _approve
  * @copyright 2013 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -26,8 +26,8 @@ if (!defined('AJAX_SCRIPT')) {
 }
 
 require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))).'/config.php');
-require_once("$CFG->dirroot/mod/dataform/mod_class.php");
-require_once("$CFG->dirroot/mod/dataform/entries_class.php");
+require_once("$CFG->dirroot/mod/datalynx/mod_class.php");
+require_once("$CFG->dirroot/mod/datalynx/entries_class.php");
 
 ob_start();
 
@@ -37,33 +37,33 @@ $action = required_param('action', PARAM_ALPHA);
 $entryid = required_param('entryid', PARAM_INT);
 $sesskey = required_param('sesskey', PARAM_TEXT);
 
-$cm = get_coursemodule_from_instance('dataform', $d, 0, false, MUST_EXIST);
+$cm = get_coursemodule_from_instance('datalynx', $d, 0, false, MUST_EXIST);
 $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-$data = $DB->get_record('dataform', array('id' => $d), '*', MUST_EXIST);
+$data = $DB->get_record('datalynx', array('id' => $d), '*', MUST_EXIST);
 
 require_sesskey();
 
 $context = context_module::instance($cm->id);
 require_login($course, true, $cm);
-require_capability('mod/dataform:approve', $context);
+require_capability('mod/datalynx:approve', $context);
 
 global $DB;
 $completiontype = COMPLETION_UNKNOWN;
-$df = new dataform($d);
+$df = new datalynx($d);
 if ($action == 'approve') {
-    $DB->set_field('dataform_entries', 'approved', 1, array('id' => $entryid));
-    $entriesclass = new dataform_entries($df);
+    $DB->set_field('datalynx_entries', 'approved', 1, array('id' => $entryid));
+    $entriesclass = new datalynx_entries($df);
     $processed = $entriesclass->create_approved_entries_for_team(array($entryid));
     if ($processed) {
         $eventdata = (object) array('view' => $df->get_view_from_id($viewid), 'items' => $processed);
         $df->events_trigger("entryapproved", $eventdata);
     }
-    $return = $DB->get_field('dataform_entries', 'approved', array('id' => $entryid)) == 1;
+    $return = $DB->get_field('datalynx_entries', 'approved', array('id' => $entryid)) == 1;
     $completiontype = COMPLETION_COMPLETE;
 } else if ($action == 'disapprove') {
-    $DB->set_field('dataform_entries', 'approved', 0, array('id' => $entryid));
-    $return = $DB->get_field('dataform_entries', 'approved', array('id' => $entryid)) == 0;
-    $processed = array($entryid => $DB->get_record('dataform_entries', array('id' => $entryid)));
+    $DB->set_field('datalynx_entries', 'approved', 0, array('id' => $entryid));
+    $return = $DB->get_field('datalynx_entries', 'approved', array('id' => $entryid)) == 0;
+    $processed = array($entryid => $DB->get_record('datalynx_entries', array('id' => $entryid)));
     if ($processed) {
         $eventdata = (object) array('view' => $df->get_view_from_id($viewid), 'items' => $processed);
         $df->events_trigger("entrydisapproved", $eventdata);
@@ -75,7 +75,7 @@ if ($action == 'approve') {
 // Update completion state
 $completion = new completion_info($course);
 if($completion->is_enabled($cm) && $cm->completion == COMPLETION_TRACKING_AUTOMATIC && $data->completionentries) {
-    $userid = $DB->get_field('dataform_entries', 'userid', array('id' => $entryid));
+    $userid = $DB->get_field('datalynx_entries', 'userid', array('id' => $entryid));
     $completion->update_state($cm, $completiontype, $userid);
 }
 

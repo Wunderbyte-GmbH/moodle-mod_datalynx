@@ -15,7 +15,7 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package     dataform
+ * @package     datalynx
  * @subpackage  statistics
  * @copyright   2013 Ivan Šakić
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -26,22 +26,22 @@ require_once('../mod_class.php');
 require_once('statistics_class.php');
 
 $urlparams = new stdClass();
-$urlparams->d   = optional_param('d', 0, PARAM_INT);             // dataform id
+$urlparams->d   = optional_param('d', 0, PARAM_INT);             // datalynx id
 $urlparams->id  = optional_param('id', 0, PARAM_INT);            // course module id
 
-// Set a dataform object
-$df = new dataform($urlparams->d, $urlparams->id, true);
-require_capability('mod/dataform:viewstatistics', $df->context);
+// Set a datalynx object
+$df = new datalynx($urlparams->d, $urlparams->id);
+require_capability('mod/datalynx:viewstatistics', $df->context);
 
 $df->set_page('statistics/index', array('modjs' => true, 'urlparams' => $urlparams));
 
 // activate navigation node
-navigation_node::override_active_url(new moodle_url('/mod/dataform/statistics/index.php', array('id' => $df->cm->id)));
+navigation_node::override_active_url(new moodle_url('/mod/datalynx/statistics/index.php', array('id' => $df->cm->id)));
 
 // Print header
 $df->print_header(array('tab' => 'statistics', 'urlparams' => $urlparams));
 
-$stats = new dataform_statistics_class($df);
+$stats = new datalynx_statistics_class($df);
 
 $mform = $stats->get_form();
 if ($data = $mform->get_data()) {
@@ -56,7 +56,7 @@ if ($data = $mform->get_data()) {
     $data = new stdClass();
     $data->from = 0;
     $data->to = time();
-    $data->mode = dataform_statistics_class::MODE_ALL_TIME;
+    $data->mode = datalynx_statistics_class::MODE_ALL_TIME;
     $data->show = array(1 => 1, 2 => 1, 4 => 1, 8 => 1);
     $mform->set_data($data);
 }

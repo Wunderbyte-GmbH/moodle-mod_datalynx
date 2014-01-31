@@ -15,18 +15,18 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package dataform
+ * @package datalynx
  * @subpackage statistics
  * @copyright 2013 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-class dataform_statistics_class {
+class datalynx_statistics_class {
 
     /*
     number of total entries ever made / deleted entries
     number of entries added for a selected time period (week, months, year)
-    number of visits (per view and per dataform instance, week, months, years)
+    number of visits (per view and per datalynx instance, week, months, years)
     number of approved entries for a selected time period
     number of not yet approved entries (work in progress) for a selected time period
     number of total entries ever made (including deleted)
@@ -52,11 +52,11 @@ class dataform_statistics_class {
 
     public function __construct($df = 0) {
         if (empty($df)) {
-            throw new coding_exception('Dataform id or object must be passed to field constructor.');
-        } else if ($df instanceof dataform) {
+            throw new coding_exception('Datalynx id or object must be passed to field constructor.');
+        } else if ($df instanceof datalynx) {
             $this->_df = $df;
         } else {
-            $this->_df = new dataform($df);
+            $this->_df = new datalynx($df);
         }
     }
 
@@ -90,8 +90,8 @@ class dataform_statistics_class {
             }
             list($total, $approved, $deleted, $visits) = $this->get_count($params->mode, $from, $to);
             $dateformat = get_string('strftimedate', 'langconfig');
-            $title = get_string('statisticsfor', 'dataform', $this->_df->name());
-            $timestring = get_string("timestring{$params->mode}", 'dataform',
+            $title = get_string('statisticsfor', 'datalynx', $this->_df->name());
+            $timestring = get_string("timestring{$params->mode}", 'datalynx',
                                         array('from' => userdate($from, $dateformat),
                                               'to' => userdate($to, $dateformat),
                                               'now' => userdate(time(), $dateformat)));
@@ -104,7 +104,7 @@ class dataform_statistics_class {
                 } else {
                     echo '<br />';
                 }
-                echo get_string('numtotalentries', 'dataform') . ": {$total}";
+                echo get_string('numtotalentries', 'datalynx') . ": {$total}";
             }
             if (isset($params->show[self::VIEW_ADDED_ENTRIES_COUNT])) {
                 if ($first) {
@@ -113,7 +113,7 @@ class dataform_statistics_class {
                 } else {
                     echo '<br />';
                 }
-                echo get_string('numapprovedentries', 'dataform') . ": {$approved}";
+                echo get_string('numapprovedentries', 'datalynx') . ": {$approved}";
             }
             if (isset($params->show[self::VIEW_DELETED_ENTRIES_COUNT])) {
                 if ($first) {
@@ -122,7 +122,7 @@ class dataform_statistics_class {
                 } else {
                     echo '<br />';
                 }
-                echo get_string('numdeletedentries', 'dataform') . ": {$deleted}";
+                echo get_string('numdeletedentries', 'datalynx') . ": {$deleted}";
             }
             if (isset($params->show[self::VIEW_VISITS_COUNT])) {
                 if ($first) {
@@ -131,7 +131,7 @@ class dataform_statistics_class {
                 } else {
                     echo '<br />';
                 }
-                echo get_string('numvisits', 'dataform') . ": {$visits}";
+                echo get_string('numvisits', 'datalynx') . ": {$visits}";
             }
             echo "<hr />";
         }
@@ -140,9 +140,9 @@ class dataform_statistics_class {
     public function get_form() {
         global $CFG;
 
-        $formclass = 'dataform_statistics_form';
+        $formclass = 'datalynx_statistics_form';
         $formparams = array('d' => $this->_df->id());
-        $actionurl = new moodle_url('/mod/dataform/statistics/index.php', $formparams);
+        $actionurl = new moodle_url('/mod/datalynx/statistics/index.php', $formparams);
         require_once('statistics_form.php');
         return new $formclass($this, $actionurl);
     }
@@ -156,13 +156,13 @@ class dataform_statistics_class {
             'todate' => $to + strtotime('+1 day', 0));
 
         $querytotal = "SELECT COUNT(de.id)
-                    FROM {dataform_entries} de
+                    FROM {datalynx_entries} de
                    WHERE de.dataid = :dataid
                      AND de.timecreated > :fromdate
                      AND de.timecreated < :todate";
 
         $queryapproved = "SELECT COUNT(de.id)
-                            FROM {dataform_entries} de
+                            FROM {datalynx_entries} de
                            WHERE de.dataid = :dataid
                              AND de.timecreated > :fromdate
                              AND de.timecreated < :todate
@@ -170,7 +170,7 @@ class dataform_statistics_class {
 
         $querydeleted = "SELECT COUNT(l.id)
                            FROM {log} l
-                          WHERE l.module LIKE 'dataform'
+                          WHERE l.module LIKE 'datalynx'
                             AND l.action LIKE 'entry delete'
                             AND l.info = :dataid
                             AND l.time > :fromdate
@@ -178,7 +178,7 @@ class dataform_statistics_class {
 
         $queryvisits = "SELECT COUNT(l.id)
                           FROM {log} l
-                         WHERE l.module LIKE 'dataform'
+                         WHERE l.module LIKE 'datalynx'
                            AND l.action LIKE 'view'
                            AND l.info = :dataid
                            AND l.time > :fromdate

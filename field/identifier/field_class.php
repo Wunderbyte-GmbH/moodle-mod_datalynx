@@ -15,15 +15,15 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage identifier
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once("$CFG->dirroot/mod/dataform/field/field_class.php");
+require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
-class dataformfield_identifier extends dataformfield_base {
+class datalynxfield_identifier extends datalynxfield_base {
 
     public $type = 'identifier';
 
@@ -32,10 +32,10 @@ class dataformfield_identifier extends dataformfield_base {
         
         $options = array(
             '' => get_string('none'),
-            'random' => get_string('random', 'dataform'),
+            'random' => get_string('random', 'datalynx'),
         );
         if (!empty($CFG->passwordsaltmain)) {
-            $options[] = get_string('system', 'dataformfield_identifier');
+            $options[] = get_string('system', 'datalynxfield_identifier');
         }
         return $options;
     }
@@ -135,7 +135,7 @@ class dataformfield_identifier extends dataformfield_base {
     protected function is_unique_key($key) {
         global $DB;
 
-        return $DB->record_exists('dataform_contents', array('fieldid' => $this->fieldid, 'content' => $key));
+        return $DB->record_exists('datalynx_contents', array('fieldid' => $this->fieldid, 'content' => $key));
     }
 }
 

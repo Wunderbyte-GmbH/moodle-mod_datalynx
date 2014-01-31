@@ -15,15 +15,15 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformview
+ * @package datalynxview
  * @subpackage csv
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once("$CFG->dirroot/mod/dataform/view/view_form.php");
+require_once("$CFG->dirroot/mod/datalynx/view/view_form.php");
 require_once("$CFG->libdir/csvlib.class.php");
 
-class dataformview_csv_form extends dataformview_base_form {
+class datalynxview_csv_form extends datalynxview_base_form {
 
     /**
      *
@@ -36,19 +36,19 @@ class dataformview_csv_form extends dataformview_base_form {
 
         // Export type
         $options = array(
-            'csv' => get_string('csv', 'dataformview_csv'),
-            'ods' => get_string('ods', 'dataformview_csv'),
-            'xls' => get_string('xls', 'dataformview_csv')
+            'csv' => get_string('csv', 'datalynxview_csv'),
+            'ods' => get_string('ods', 'datalynxview_csv'),
+            'xls' => get_string('xls', 'datalynxview_csv')
         );
-        $mform->addElement('select', 'param3', get_string('outputtype', 'dataformview_csv'), $options);
+        $mform->addElement('select', 'param3', get_string('outputtype', 'datalynxview_csv'), $options);
 
         // delimiter
         $delimiters = csv_import_reader::get_delimiter_list();
-        $mform->addElement('select', 'delimiter', get_string('csvdelimiter', 'dataform'), $delimiters);
+        $mform->addElement('select', 'delimiter', get_string('csvdelimiter', 'datalynx'), $delimiters);
         $mform->setDefault('delimiter', 'comma');
 
         // enclosure
-        $mform->addElement('text', 'enclosure', get_string('csvenclosure', 'dataform'), array('size'=>'10'));
+        $mform->addElement('text', 'enclosure', get_string('csvenclosure', 'datalynx'), array('size'=>'10'));
         $mform->setType('enclosure', PARAM_NOTAGS);
         $mform->setDefault('enclosure', '');
 
@@ -59,7 +59,7 @@ class dataformview_csv_form extends dataformview_base_form {
 
         // Fields to import
         $attributes = array('wrap' => 'virtual', 'rows' => 10, 'cols' => 50);
-        $mform->addElement('textarea', 'param2', get_string('exportfields', 'dataformview_csv'), $attributes);
+        $mform->addElement('textarea', 'param2', get_string('exportfields', 'datalynxview_csv'), $attributes);
         $mform->setDefault('param2', FORMAT_PLAIN);
         $this->add_tags_selector('param2', 'field');
         

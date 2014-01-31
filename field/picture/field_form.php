@@ -15,14 +15,14 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage picture
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once("$CFG->dirroot/mod/dataform/field/file/field_form.php");
+require_once("$CFG->dirroot/mod/datalynx/field/file/field_form.php");
 
-class dataformfield_picture_form extends dataformfield_file_form {
+class datalynxfield_picture_form extends datalynxfield_file_form {
 
     /**
      *
@@ -37,7 +37,7 @@ class dataformfield_picture_form extends dataformfield_file_form {
         $dispdimgrp[] = &$mform->createElement('text', 'param4', null, array('size'=>'8'));
         $dispdimgrp[] = &$mform->createElement('text', 'param5', null, array('size'=>'8'));
         $dispdimgrp[] = &$mform->createElement('select', 'param6', null, array('px'=>'px','em'=>'em','%'=>'%'));
-        $mform->addGroup($dispdimgrp, 'dispdim', get_string('displaydimensions', 'dataformfield_picture'), array('x',''), false);
+        $mform->addGroup($dispdimgrp, 'dispdim', get_string('displaydimensions', 'datalynxfield_picture'), array('x',''), false);
         $mform->setType('param4', PARAM_INT);
         $mform->setType('param5', PARAM_INT);
         $mform->addGroupRule('dispdim', array('param4' => array(array(null, 'numeric', null, 'client'))));
@@ -47,7 +47,7 @@ class dataformfield_picture_form extends dataformfield_file_form {
         $maxpicdimgrp=array();
         $maxpicdimgrp[] = &$mform->createElement('text', 'param7', null, array('size'=>'8'));
         $maxpicdimgrp[] = &$mform->createElement('text', 'param8', null, array('size'=>'8'));
-        $mform->addGroup($maxpicdimgrp, 'maxpicdim', get_string('maxdimensions', 'dataformfield_picture'), 'x', false);
+        $mform->addGroup($maxpicdimgrp, 'maxpicdim', get_string('maxdimensions', 'datalynxfield_picture'), 'x', false);
         $mform->setType('param7', PARAM_INT);
         $mform->setType('param8', PARAM_INT);
         $mform->addGroupRule('maxpicdim', array('param7' => array(array(null, 'numeric', null, 'client'))));
@@ -59,7 +59,7 @@ class dataformfield_picture_form extends dataformfield_file_form {
         $thumbnailgrp=array();
         $thumbnailgrp[] = &$mform->createElement('text', 'param9', null, array('size'=>'8'));
         $thumbnailgrp[] = &$mform->createElement('text', 'param10', null, array('size'=>'8'));
-        $mform->addGroup($thumbnailgrp, 'thumbnaildim', get_string('thumbdimensions', 'dataformfield_picture'), 'x', false);
+        $mform->addGroup($thumbnailgrp, 'thumbnaildim', get_string('thumbdimensions', 'datalynxfield_picture'), 'x', false);
         $mform->setType('param9', PARAM_INT);
         $mform->setType('param10', PARAM_INT);
         $mform->addGroupRule('thumbnaildim', array('param9' => array(array(null, 'numeric', null, 'client'))));
@@ -80,11 +80,11 @@ class dataformfield_picture_form extends dataformfield_file_form {
 
         // accetped types
         $options = array();
-        $options['*.jpg,*.gif,*.png'] = get_string('filetypeimage', 'dataform');
-        $options['*.jpg'] = get_string('filetypejpg', 'dataform');
-        $options['*.gif'] = get_string('filetypegif', 'dataform');
-        $options['*.png'] = get_string('filetypepng', 'dataform');
-        $mform->addElement('select', 'param3', get_string('filetypes', 'dataform'), $options);
+        $options['*.jpg,*.gif,*.png'] = get_string('filetypeimage', 'datalynx');
+        $options['*.jpg'] = get_string('filetypejpg', 'datalynx');
+        $options['*.gif'] = get_string('filetypegif', 'datalynx');
+        $options['*.png'] = get_string('filetypepng', 'datalynx');
+        $mform->addElement('select', 'param3', get_string('filetypes', 'datalynx'), $options);
 
     }
     

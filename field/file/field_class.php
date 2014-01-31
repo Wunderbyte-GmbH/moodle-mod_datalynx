@@ -15,18 +15,18 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage file
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once("$CFG->dirroot/mod/dataform/field/field_class.php");
+require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
 /**
  * 
  */
-class dataformfield_file extends dataformfield_base {
+class datalynxfield_file extends datalynxfield_base {
     public $type = 'file';
     
     // content - file manager
@@ -85,9 +85,9 @@ class dataformfield_file extends dataformfield_base {
 
             if (!empty($contentid)) {
                 $rec->id = $contentid;
-                $DB->update_record('dataform_contents', $rec);
+                $DB->update_record('datalynx_contents', $rec);
             } else {
-                $contentid = $DB->insert_record('dataform_contents', $rec);
+                $contentid = $DB->insert_record('datalynx_contents', $rec);
             }
             
             // now save files
@@ -96,7 +96,7 @@ class dataformfield_file extends dataformfield_base {
                                 'maxfiles' => $this->field->param2,
                                 'accepted_types' => $this->field->param3);
             $contextid = $this->df->context->id;
-            file_save_draft_area_files($filemanager, $contextid, 'mod_dataform', 'content', $contentid, $options);
+            file_save_draft_area_files($filemanager, $contextid, 'mod_datalynx', 'content', $contentid, $options);
 
             $this->update_content_files($contentid);
 
@@ -189,11 +189,11 @@ class dataformfield_file extends dataformfield_base {
 
         $options = array('context' => $this->df->context);
         $data = (object) $values;
-        $data = file_postupdate_standard_editor((object) $values, $fieldname, $options, $this->df->context, 'mod_dataform', 'content', $contentid);
+        $data = file_postupdate_standard_editor((object) $values, $fieldname, $options, $this->df->context, 'mod_datalynx', 'content', $contentid);
 
         // get the file content
         $fs = get_file_storage();
-        $file = reset($fs->get_area_files($this->df->context->id, 'mod_dataform', 'content', $contentid, 'sortorder', false));
+        $file = reset($fs->get_area_files($this->df->context->id, 'mod_datalynx', 'content', $contentid, 'sortorder', false));
         $filecontent = $file->get_content();
         
         // find content position (between body tags)
@@ -207,7 +207,7 @@ class dataformfield_file extends dataformfield_base {
         // prepare new file record
         $rec = new object;
         $rec->contextid = $this->df->context->id;
-        $rec->component = 'mod_dataform';
+        $rec->component = 'mod_datalynx';
         $rec->filearea = 'content';
         $rec->itemid = $contentid;
         $rec->filename = $file->get_filename();
@@ -219,7 +219,7 @@ class dataformfield_file extends dataformfield_base {
         $rec->license = $file->get_license();
         
         // delete old file
-        $fs->delete_area_files($this->df->context->id, 'mod_dataform', 'content', $contentid);
+        $fs->delete_area_files($this->df->context->id, 'mod_datalynx', 'content', $contentid);
         
         // create a new file from string
         $fs->create_file_from_string($rec, $filecontent);

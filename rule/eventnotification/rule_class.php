@@ -15,15 +15,15 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataform_rule
+ * @package datalynx_rule
  * @subpackage eventnotification
  * @copyright 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once("$CFG->dirroot/mod/dataform/rule/rule_class.php");
+require_once("$CFG->dirroot/mod/datalynx/rule/rule_class.php");
 
-class dataform_rule_eventnotification extends dataform_rule_base {
+class datalynx_rule_eventnotification extends datalynx_rule_base {
     const FROM_AUTHOR = 0;
     const FROM_CURRENT_USER = 1;
 
@@ -41,7 +41,7 @@ class dataform_rule_eventnotification extends dataform_rule_base {
     /**
      * Class constructor
      *
-     * @param var $df       dataform id or class object
+     * @param var $df       datalynx id or class object
      * @param var $rule    rule id or DB record
      */
     public function __construct($df = 0, $rule = 0) {
@@ -63,17 +63,17 @@ class dataform_rule_eventnotification extends dataform_rule_base {
         $df = $data->df;
         $event = $data->event;
 
-        $data->dataforms = get_string('modulenameplural', 'dataform');
-        $data->dataform = get_string('modulename', 'dataform');
+        $data->datalynxs = get_string('modulenameplural', 'datalynx');
+        $data->datalynx = get_string('modulename', 'datalynx');
         $data->activity = format_string($df->name(), true);
-        $data->url = "$CFG->wwwroot/mod/dataform/view.php?d=" . $df->id();
+        $data->url = "$CFG->wwwroot/mod/datalynx/view.php?d=" . $df->id();
 
         // Prepare message
-        $strdataform = get_string('pluginname', 'dataform');
+        $strdatalynx = get_string('pluginname', 'datalynx');
         $sitename = format_string($SITE->fullname);
         $data->siteurl = $CFG->wwwroot;
         $data->coursename = !empty($data->coursename) ? $data->coursename : 'Unspecified course';
-        $data->dataformname = !empty($data->dataformname) ? $data->dataformname : 'Unspecified dataform';
+        $data->datalynxname = !empty($data->datalynxname) ? $data->datalynxname : 'Unspecified datalynx';
         $data->entryid = implode(array_keys($data->items), ',');
 
         if ($df->data->singleview) {
@@ -83,14 +83,14 @@ class dataform_rule_eventnotification extends dataform_rule_base {
         } else {
             $entryurl = new moodle_url($data->url);
         }
-        $notename = get_string("messageprovider:dataform_$event", 'dataform');
-        $subject = "$sitename -> $data->coursename -> $strdataform $data->dataformname:  $notename";
+        $notename = get_string("messageprovider:datalynx_$event", 'datalynx');
+        $subject = "$sitename -> $data->coursename -> $strdatalynx $data->datalynxname:  $notename";
 
         // prepare message object
         $message = new stdClass();
         $message->siteshortname   = format_string($SITE->shortname);
-        $message->component       = 'mod_dataform';
-        $message->name            = "dataform_$event";
+        $message->component       = 'mod_datalynx';
+        $message->name            = "datalynx_$event";
         $message->context         = $data->context;
         $message->subject         = $subject;
         $message->fullmessageformat = $data->notificationformat;
@@ -98,14 +98,14 @@ class dataform_rule_eventnotification extends dataform_rule_base {
         $message->notification = 1;
 
         foreach ($data->items as $entry) {
-            $data->viewlink = html_writer::link($entryurl, get_string('linktoentry', 'dataform'));
+            $data->viewlink = html_writer::link($entryurl, get_string('linktoentry', 'datalynx'));
             $message->userfrom = $data->userfrom = $this->get_sender_for_entry($entry);
             $data->senderprofilelink = html_writer::link(new moodle_url('/user/profile.php', array('id' => $data->userfrom->id)), fullname($data->userfrom));
             foreach ($this->get_recipients_for_entry($entry) as $userid) {
                 $user = $DB->get_record('user', array('id' => $userid));
                 $message->userto = $user;
                 $data->fullname = fullname($user);
-                $notedetails = get_string("message_$event", 'dataform', $data);
+                $notedetails = get_string("message_$event", 'datalynx', $data);
                 $contenthtml = text_to_html($notedetails, false, false, true);
                 $content = html_to_text($notedetails);
                 $message->fullmessage = $content;

@@ -24,7 +24,7 @@
 /**
  * Preset manager class
  */
-class dataform_preset_manager {
+class datalynx_preset_manager {
 
     const PRESET_COURSEAREA = 'course_presets';
     const PRESET_SITEAREA = 'site_presets';
@@ -51,11 +51,11 @@ class dataform_preset_manager {
 
         $fs = get_file_storage();
         if ($presetarea == 'course_presets') {
-            $files = $fs->get_area_files($course_context->id, 'mod_dataform', $presetarea);
+            $files = $fs->get_area_files($course_context->id, 'mod_datalynx', $presetarea);
         } else if ($presetarea == 'site_presets') {
-            $files = $fs->get_area_files(self::PRESET_SITECONTEXT, 'mod_dataform', $presetarea);
+            $files = $fs->get_area_files(self::PRESET_SITECONTEXT, 'mod_datalynx', $presetarea);
         }
-        $canviewall = has_capability('mod/dataform:presetsviewall', $this->_df->context);
+        $canviewall = has_capability('mod/datalynx:presetsviewall', $this->_df->context);
         if (!empty($files)) {
             foreach ($files as $file) {
                 if ($file->is_directory() || ($file->get_userid() != $USER->id and !$canviewall)) {
@@ -82,7 +82,7 @@ class dataform_preset_manager {
     public function print_presets_list($localpresets, $sharedpresets) {
         global $CFG, $OUTPUT;
         
-        $targetpage = '/mod/dataform/preset/index.php';
+        $targetpage = '/mod/datalynx/preset/index.php';
         if ($localpresets or $sharedpresets) {
 
             $linkparams = array('d' => $this->_df->id(), 'sesskey' => sesskey());
@@ -95,19 +95,19 @@ class dataform_preset_manager {
             $strname = get_string('name');
             $strdescription = get_string('description');
             $strscreenshot = get_string('screenshot');
-            $strapply = get_string('presetapply', 'dataform');
-            $strmap = get_string('presetmap', 'dataform');
-            $strdownload = get_string('download', 'dataform');
+            $strapply = get_string('presetapply', 'datalynx');
+            $strmap = get_string('presetmap', 'datalynx');
+            $strdownload = get_string('download', 'datalynx');
             $strdelete = get_string('delete');
-            $strshare = get_string('presetshare', 'dataform');
+            $strshare = get_string('presetshare', 'datalynx');
 
             $selectallnone = html_writer::checkbox(null, null, false, null, array('onclick' => 'select_allnone(\'preset\'&#44;this.checked)'));
             
-            $multidownload = html_writer::tag('button', $OUTPUT->pix_icon('t/download', get_string('multidownload', 'dataform')), array('name' => 'multidownload', 'onclick' => 'bulk_action(\'preset\'&#44; \''. $actionurl. '\'&#44; \'download\')'));
+            $multidownload = html_writer::tag('button', $OUTPUT->pix_icon('t/download', get_string('multidownload', 'datalynx')), array('name' => 'multidownload', 'onclick' => 'bulk_action(\'preset\'&#44; \''. $actionurl. '\'&#44; \'download\')'));
             
-            $multidelete = html_writer::tag('button', $OUTPUT->pix_icon('t/delete', get_string('multidelete', 'dataform')), array('name' => 'multidelete', 'onclick' => 'bulk_action(\'preset\'&#44; \''. $actionurl. '\'&#44; \'delete\')'));
+            $multidelete = html_writer::tag('button', $OUTPUT->pix_icon('t/delete', get_string('multidelete', 'datalynx')), array('name' => 'multidelete', 'onclick' => 'bulk_action(\'preset\'&#44; \''. $actionurl. '\'&#44; \'delete\')'));
             
-            $multishare = html_writer::tag('button', $OUTPUT->pix_icon('i/group', get_string('multishare', 'dataform')), array('name' => 'multishare', 'onclick' => 'bulk_action(\'preset\'&#44; \''. $actionurl. '\'&#44; \'share\')'));
+            $multishare = html_writer::tag('button', $OUTPUT->pix_icon('i/group', get_string('multishare', 'datalynx')), array('name' => 'multishare', 'onclick' => 'bulk_action(\'preset\'&#44; \''. $actionurl. '\'&#44; \'share\')'));
 
             $table = new html_table();
             $table->head = array($strname, $strdescription, $strscreenshot, $strapply, $multidownload, $multishare, $multidelete, $selectallnone);
@@ -119,7 +119,7 @@ class dataform_preset_manager {
             if ($localpresets) {
                 // headingg
                 $lpheadingcell = new html_table_cell();
-                $lpheadingcell->text = html_writer::tag('h4', get_string('presetavailableincourse', 'dataform'));
+                $lpheadingcell->text = html_writer::tag('h4', get_string('presetavailableincourse', 'datalynx'));
                 $lpheadingcell->colspan = 9;
                 
                 $lpheadingrow = new html_table_row();
@@ -140,11 +140,11 @@ class dataform_preset_manager {
                     //$presetapplymap = html_writer::link(new moodle_url($targetpage, $linkparams + array('applymap' => $preset->id)),
                     //                $OUTPUT->pix_icon('t/switch_plus', $strapply));
                     $presetdownload = html_writer::link(
-                        moodle_url::make_file_url("/pluginfile.php", "/$preset->contextid/mod_dataform/course_presets/$preset->itemid/$preset->name"),
+                        moodle_url::make_file_url("/pluginfile.php", "/$preset->contextid/mod_datalynx/course_presets/$preset->itemid/$preset->name"),
                         $OUTPUT->pix_icon('t/download', $strdownload)
                     );
                     $presetshare = '';
-                    if (has_capability('mod/dataform:presetsviewall', $this->_df->context)) {
+                    if (has_capability('mod/datalynx:presetsviewall', $this->_df->context)) {
                         $presetshare = html_writer::link(new moodle_url($targetpage, $linkparams + array('share' => $preset->id)),
                                     $OUTPUT->pix_icon('i/group', $strshare));
                     }
@@ -170,7 +170,7 @@ class dataform_preset_manager {
             if ($sharedpresets) {
                 // heading
                 $lpheadingcell = new html_table_cell();
-                $lpheadingcell->text = html_writer::tag('h4', get_string('presetavailableinsite', 'dataform'));
+                $lpheadingcell->text = html_writer::tag('h4', get_string('presetavailableinsite', 'datalynx'));
                 $lpheadingcell->colspan = 9;
                 
                 $lpheadingrow = new html_table_row();
@@ -188,12 +188,12 @@ class dataform_preset_manager {
                     $presetapply = html_writer::link(new moodle_url($targetpage, $linkparams + array('apply' => $preset->id)), $OUTPUT->pix_icon('t/switch_whole', $strapply));
                     //$presetapplymap = html_writer::link(new moodle_url($targetpage, $linkparams + array('applymap' => $preset->id)), $OUTPUT->pix_icon('t/switch_plus', $strapply));
                     $presetdownload = html_writer::link(
-                        moodle_url::make_file_url("/pluginfile.php", "/$preset->contextid/mod_dataform/site_presets/$preset->itemid/$preset->name"),
+                        moodle_url::make_file_url("/pluginfile.php", "/$preset->contextid/mod_datalynx/site_presets/$preset->itemid/$preset->name"),
                         $OUTPUT->pix_icon('t/download', $strdownload)
                     );
                     $presetshare = '';
                     $presetdelete = '';
-                    if (has_capability('mod/dataform:managepresets', $this->_df->context)) {            
+                    if (has_capability('mod/datalynx:managepresets', $this->_df->context)) {            
                         $presetdelete = html_writer::link(new moodle_url($targetpage, $linkparams + array('delete' => $preset->id)), $OUTPUT->pix_icon('t/delete', $strdelete));
                     }                
                     $presetselector = html_writer::checkbox("presetselector", $preset->id, false);
@@ -221,7 +221,7 @@ class dataform_preset_manager {
      */
     public function print_preset_form() {
         echo html_writer::start_tag('div', array('style' => 'width:80%;margin:auto;'));
-        $mform = new mod_dataform_preset_form(new moodle_url('/mod/dataform/preset/index.php', array('d' => $this->_df->id(), 'sesskey' => sesskey(), 'add' => 1)));
+        $mform = new mod_datalynx_preset_form(new moodle_url('/mod/datalynx/preset/index.php', array('d' => $this->_df->id(), 'sesskey' => sesskey(), 'add' => 1)));
         $mform->set_data(null);
         $mform->display();
         echo html_writer::end_tag('div');
@@ -233,10 +233,10 @@ class dataform_preset_manager {
     public function process_presets($params) {
         global $CFG;
         
-        $mform = new mod_dataform_preset_form(new moodle_url('mod/dataform/preset/index.php', array('d' => $this->_df->id(), 'sesskey' => sesskey(), 'add' => 1)));
+        $mform = new mod_datalynx_preset_form(new moodle_url('mod/datalynx/preset/index.php', array('d' => $this->_df->id(), 'sesskey' => sesskey(), 'add' => 1)));
         // add presets
         if ($data = $mform->get_data()) { 
-            // preset this dataform
+            // preset this datalynx
             if ($data->preset_source == 'current') {
                 $this->create_preset_from_backup($data->preset_data);
 
@@ -247,7 +247,7 @@ class dataform_preset_manager {
         // apply a preset
         } else if ($params->apply and confirm_sesskey()) {
             $this->apply_preset($params->apply, $params->torestorer);
-            // rebuild course cache to show new dataform name on the course page
+            // rebuild course cache to show new datalynx name on the course page
             rebuild_course_cache($this->_df->course->id);
             
         // download (bulk in zip)
@@ -282,12 +282,12 @@ class dataform_preset_manager {
         }
         
         // store preset settings in $SESSION
-        $SESSION->{"dataform_{$this->_df->cm->id}_preset"} = "$users $anon";
+        $SESSION->{"datalynx_{$this->_df->cm->id}_preset"} = "$users $anon";
 
         $bc = new backup_controller(backup::TYPE_1ACTIVITY, $this->_df->cm->id, backup::FORMAT_MOODLE, backup::INTERACTIVE_NO, backup::MODE_GENERAL, $USER->id);
 
         // clear preset settings from $SESSION
-        unset($SESSION->{"dataform_{$this->_df->cm->id}_preset"});
+        unset($SESSION->{"datalynx_{$this->_df->cm->id}_preset"});
 
         // set users and anon in plan
         $bc->get_plan()->get_setting('users')->set_value($users);        
@@ -314,13 +314,13 @@ class dataform_preset_manager {
                 }
                 $preset = new object;
                 $preset->contextid = $course_context->id;
-                $preset->component = 'mod_dataform';
+                $preset->component = 'mod_datalynx';
                 $preset->filearea = self::PRESET_COURSEAREA;
                 $preset->filepath = '/';
                 $preset->filename = clean_filename(str_replace(' ', '_', $this->_df->data->name).
-                                    '-dataform-preset-'.
+                                    '-datalynx-preset-'.
                                     gmdate("Ymd_Hi"). '-'.
-                                    str_replace(' ', '-', get_string("preset$userdata", 'dataform')). '.mbz');
+                                    str_replace(' ', '-', get_string("preset$userdata", 'datalynx')). '.mbz');
 
                 $fs->create_file_from_storedfile($preset, $file);
                 $file->delete();
@@ -343,7 +343,7 @@ class dataform_preset_manager {
             $course_context = context_course::instance($this->_df->course->id);
             $preset = new object;
             $preset->contextid = $course_context->id;
-            $preset->component = 'mod_dataform';
+            $preset->component = 'mod_datalynx';
             $preset->filearea = self::PRESET_COURSEAREA;
             $preset->filepath = '/';
             
@@ -402,22 +402,22 @@ class dataform_preset_manager {
 
         $rc->execute_precheck();
 
-        // get the dataform restore activity task
+        // get the datalynx restore activity task
         $tasks = $rc->get_plan()->get_tasks();
-        $dataformtask = null;
+        $datalynxtask = null;
         foreach ($tasks as &$task) {
-            if ($task instanceof restore_dataform_activity_task) {
-                $dataformtask = &$task;
+            if ($task instanceof restore_datalynx_activity_task) {
+                $datalynxtask = &$task;
                 break;
             }
         }
 
-        if ($dataformtask) {
-            $dataformtask->set_activityid($this->_df->id());
-            $dataformtask->set_moduleid($this->_df->cm->id);
-            $dataformtask->set_contextid($this->_df->context->id);
+        if ($datalynxtask) {
+            $datalynxtask->set_activityid($this->_df->id());
+            $datalynxtask->set_moduleid($this->_df->cm->id);
+            $datalynxtask->set_contextid($this->_df->context->id);
             if ($torestorer) {
-                $dataformtask->set_ownerid($USER->id);
+                $datalynxtask->set_ownerid($USER->id);
             }
 
             $rc->set_status(backup::STATUS_AWAITING);
@@ -429,7 +429,7 @@ class dataform_preset_manager {
             // anonymous users cleanup
             $DB->delete_records_select('user', $DB->sql_like('firstname', '?'), array('%anonfirstname%'));
             
-            redirect(new moodle_url('/mod/dataform/view.php', array('d' => $this->_df->id())));        
+            redirect(new moodle_url('/mod/datalynx/view.php', array('d' => $this->_df->id())));        
         } else {
             $rc->destroy();
         }        
@@ -456,7 +456,7 @@ class dataform_preset_manager {
         $course_context = context_course::instance($this->_df->course->id);
         $contextid = $course_context->id;
 
-        if ($files = $fs->get_area_files($contextid, 'mod_dataform', self::PRESET_COURSEAREA)) {
+        if ($files = $fs->get_area_files($contextid, 'mod_datalynx', self::PRESET_COURSEAREA)) {
             foreach ($files as $file) {
                 if (empty($pids)) break;
                 
@@ -472,7 +472,7 @@ class dataform_preset_manager {
 
         // try site area
         if (!empty($pids)) {
-            if ($files = $fs->get_area_files(self::PRESET_SITECONTEXT, 'mod_dataform', self::PRESET_SITEAREA)) {
+            if ($files = $fs->get_area_files(self::PRESET_SITECONTEXT, 'mod_datalynx', self::PRESET_SITEAREA)) {
                 foreach ($files as $file) {
                     if (empty($pids)) break;
                     
@@ -512,14 +512,14 @@ class dataform_preset_manager {
     public function share_presets($presetids) {
         global $CFG, $USER;
 
-        if (!has_capability('mod/dataform:presetsviewall', $this->_df->context)) {
+        if (!has_capability('mod/datalynx:presetsviewall', $this->_df->context)) {
             return false;
         }
                     
         $fs = get_file_storage();
         $filerecord = new object;
         $filerecord->contextid = self::PRESET_SITECONTEXT;
-        $filerecord->component = 'mod_dataform';
+        $filerecord->component = 'mod_datalynx';
         $filerecord->filearea = self::PRESET_SITEAREA;
         $filerecord->filepath = '/';
 
@@ -537,7 +537,7 @@ class dataform_preset_manager {
             return false;
         }
         
-        if (!has_capability('mod/dataform:managepresets', $this->_df->context)) {
+        if (!has_capability('mod/datalynx:managepresets', $this->_df->context)) {
             return false;
         }
                     
@@ -547,7 +547,7 @@ class dataform_preset_manager {
         $course_context = context_course::instance($this->_df->course->id);
         $contextid = $course_context->id;
 
-        if ($files = $fs->get_area_files($contextid, 'mod_dataform', self::PRESET_COURSEAREA)) {
+        if ($files = $fs->get_area_files($contextid, 'mod_datalynx', self::PRESET_COURSEAREA)) {
             foreach ($files as $file) {
                 if (empty($pids)) break;
                 
@@ -563,7 +563,7 @@ class dataform_preset_manager {
 
         // try site area
         if (!empty($pids)) {
-            if ($files = $fs->get_area_files(self::PRESET_SITECONTEXT, 'mod_dataform', self::PRESET_SITEAREA)) {
+            if ($files = $fs->get_area_files(self::PRESET_SITECONTEXT, 'mod_datalynx', self::PRESET_SITEAREA)) {
                 foreach ($files as $file) {
                     if (empty($pids)) break;
                     

@@ -15,19 +15,19 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage _approve
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once("$CFG->dirroot/mod/dataform/field/renderer.php");
+require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
  *
  */
-class dataformfield__approve_renderer extends dataformfield_renderer {
+class datalynxfield__approve_renderer extends datalynxfield_renderer {
 
     /**
      * 
@@ -35,7 +35,7 @@ class dataformfield__approve_renderer extends dataformfield_renderer {
     protected function replacements(array $tags = null, $entry = null, array $options = null) {
         $df = $this->_field->df();
 
-        $canapprove = has_capability('mod/dataform:approve', $df->context);
+        $canapprove = has_capability('mod/datalynx:approve', $df->context);
         $edit = !empty($options['edit']) ? $options['edit'] and $canapprove : false;
         $replacements = array();
         // just one tag, empty until we check df settings
@@ -61,7 +61,7 @@ class dataformfield__approve_renderer extends dataformfield_renderer {
         $field = $this->_field;
         $fieldid = $field->id();
 
-        $options = array(0 => ucfirst(get_string('approvednot', 'dataform')), 1 => ucfirst(get_string('approved', 'dataform')));
+        $options = array(0 => ucfirst(get_string('approvednot', 'datalynx')), 1 => ucfirst(get_string('approved', 'datalynx')));
         $select = &$mform->createElement('select', "f_{$i}_$fieldid", null, $options);
         $select->setSelected($value);
         // disable the 'not' and 'operator' fields
@@ -107,23 +107,23 @@ class dataformfield__approve_renderer extends dataformfield_renderer {
             $approval = 'approve';
             $approvedimagesrc = 'i/completion-auto-n';
         }
-        $strapproved = get_string($approved, 'dataform');
+        $strapproved = get_string($approved, 'datalynx');
         
         $approvedimage = html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url($approvedimagesrc),
                                                             'class' => "iconsmall" . $entry->approved ? ' approved' : '',
                                                             'alt' => $strapproved,
                                                             'title' => $strapproved));
                                                             
-        if (has_capability('mod/dataform:approve', $field->df()->context)) {
+        if (has_capability('mod/datalynx:approve', $field->df()->context)) {
             $PAGE->requires->js_init_call(
-                'M.dataformfield__approve.init',
+                'M.datalynxfield__approve.init',
                 array($OUTPUT->pix_url('i/completion-auto-pass')->__toString(), $OUTPUT->pix_url('i/completion-auto-n')->__toString()),
                 false,
                 $this->get_js_module());
 
             return html_writer::link(
                 new moodle_url($entry->baseurl, array($approval => $entry->id, 'sesskey' => sesskey())),
-                $approvedimage, array('class' =>  'dataformfield__approve')
+                $approvedimage, array('class' =>  'datalynxfield__approve')
             );
         } else {
             return $approvedimage;
@@ -133,8 +133,8 @@ class dataformfield__approve_renderer extends dataformfield_renderer {
 
     private function get_js_module() {
         $jsmodule = array(
-            'name' => 'dataformfield__approve',
-            'fullpath' => '/mod/dataform/field/_approve/_approve.js',
+            'name' => 'datalynxfield__approve',
+            'fullpath' => '/mod/datalynx/field/_approve/_approve.js',
             'requires' => array('node', 'event', 'node-event-delegate', 'io'),
             );
         return $jsmodule;
@@ -145,7 +145,7 @@ class dataformfield__approve_renderer extends dataformfield_renderer {
      * Array of patterns this field supports 
      */
     protected function patterns() {
-        $cat = get_string('actions', 'dataform');
+        $cat = get_string('actions', 'datalynx');
 
         $patterns = array();
         $patterns["##approve##"] = array(true, $cat);

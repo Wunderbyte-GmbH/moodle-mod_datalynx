@@ -15,14 +15,14 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage file
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once("$CFG->dirroot/mod/dataform/field/field_form.php");
+require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
-class dataformfield_file_form extends dataformfield_form {
+class datalynxfield_file_form extends datalynxfield_form {
 
     /**
      *
@@ -33,17 +33,17 @@ class dataformfield_file_form extends dataformfield_form {
         $mform =& $this->_form;
 
     //-------------------------------------------------------------------------------
-        $mform->addElement('header', 'fieldattributeshdr', get_string('fieldattributes', 'dataform'));
+        $mform->addElement('header', 'fieldattributeshdr', get_string('fieldattributes', 'datalynx'));
         
         // max bytes (param1)
         $options = get_max_upload_sizes($CFG->maxbytes, $this->_df->course->maxbytes);
-        $mform->addElement('select', 'param1', get_string('filemaxsize', 'dataform'), $options);
+        $mform->addElement('select', 'param1', get_string('filemaxsize', 'datalynx'), $options);
 
         // max files (param2)
         $range = range(1, 100);
         $options = array_combine($range, $range);
         $options[-1] = get_string('unlimited');
-        $mform->addElement('select', 'param2', get_string('filesmax', 'dataform'), $options);
+        $mform->addElement('select', 'param2', get_string('filesmax', 'datalynx'), $options);
         $mform->setDefault('param2', -1);
 
         // accetped types
@@ -60,11 +60,11 @@ class dataformfield_file_form extends dataformfield_form {
 
         // accetped types (param3)
         $options = array();
-        $options['*'] = get_string('filetypeany', 'dataform');
-        $options['*.jpg,*.gif,*.png'] = get_string('filetypeimage', 'dataform');
-        $options['*.html'] = get_string('filetypehtml', 'dataform');
+        $options['*'] = get_string('filetypeany', 'datalynx');
+        $options['*.jpg,*.gif,*.png'] = get_string('filetypeimage', 'datalynx');
+        $options['*.html'] = get_string('filetypehtml', 'datalynx');
 
-        $mform->addElement('select', 'param3', get_string('filetypes', 'dataform'), $options);
+        $mform->addElement('select', 'param3', get_string('filetypes', 'datalynx'), $options);
         $mform->setDefault('param3', '*');
 
     }

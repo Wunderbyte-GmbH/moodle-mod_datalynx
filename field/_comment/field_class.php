@@ -15,15 +15,15 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /** 
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage _comment
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once("$CFG->dirroot/mod/dataform/field/field_class.php");
+require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
-class dataformfield__comment extends dataformfield_no_content {
+class datalynxfield__comment extends datalynxfield_no_content {
 
     public $type = '_comment';
 
@@ -42,7 +42,7 @@ class dataformfield__comment extends dataformfield_no_content {
     public static function get_field_objects($dataid) {
         $fieldobjects = array();
         
-        $fieldobjects[self::_COMMENT] = (object) array('id' => self::_COMMENT, 'dataid' => $dataid, 'type' => '_comment', 'name' => get_string('comments', 'dataform'), 'description' => '', 'visible' => 2, 'internalname' => 'comments');
+        $fieldobjects[self::_COMMENT] = (object) array('id' => self::_COMMENT, 'dataid' => $dataid, 'type' => '_comment', 'name' => get_string('comments', 'datalynx'), 'description' => '', 'visible' => 2, 'internalname' => 'comments');
 
         return $fieldobjects;
     }
@@ -52,7 +52,7 @@ class dataformfield__comment extends dataformfield_no_content {
      */
     public function get_sort_sql() {
         return '';
-        //return "(Select count(entryid) From mdl_dataform_comments as cm Where cm.entryid = e.id)";
+        //return "(Select count(entryid) From mdl_datalynx_comments as cm Where cm.entryid = e.id)";
     }
 
     /**
@@ -61,7 +61,7 @@ class dataformfield__comment extends dataformfield_no_content {
     public function permissions($params) {
         global $USER;
 
-        if (has_capability('mod/dataform:managecomments', $this->df->context)
+        if (has_capability('mod/datalynx:managecomments', $this->df->context)
                     or ($params->commentarea == 'activity' and $params->itemid == $USER->id)
                     or ($params->commentarea == 'entry')) {
             return array('post'=>true, 'view'=>true);
@@ -77,17 +77,17 @@ class dataformfield__comment extends dataformfield_no_content {
 
         // Validate context
         if (empty($params->context) or $params->context->id != $this->df->context->id) {
-            throw new comment_exception('invalidcontextid', 'dataform');
+            throw new comment_exception('invalidcontextid', 'datalynx');
         }
 
         // Validate course
         if ($params->courseid != $this->df->course->id) {
-            throw new comment_exception('invalidcourseid', 'dataform');
+            throw new comment_exception('invalidcourseid', 'datalynx');
         }
 
         // Validate cm
         if ($params->cm->id != $this->df->cm->id) {
-            throw new comment_exception('invalidcmid', 'dataform');
+            throw new comment_exception('invalidcmid', 'datalynx');
         }
 
         // validate comment area
@@ -96,7 +96,7 @@ class dataformfield__comment extends dataformfield_no_content {
         }
 
         // validation for non-comment-managers
-        if (!has_capability('mod/dataform:managecomments', $this->df->context)) {
+        if (!has_capability('mod/datalynx:managecomments', $this->df->context)) {
         
             // non-comment-managers can add/view comments on their own entries
             // but require df->data->comments for add/view on other entries (excluding grading entries)
@@ -112,11 +112,11 @@ class dataformfield__comment extends dataformfield_no_content {
 
                 // check if comments enabled
                 //if (!$this->df->data->comments) {
-                //    throw new comment_exception('commentsoff', 'dataform');
+                //    throw new comment_exception('commentsoff', 'datalynx');
                 //}
 
                 // validate entry
-                if (!$entry = $DB->get_record('dataform_entries', array('id' => $params->itemid))) {
+                if (!$entry = $DB->get_record('datalynx_entries', array('id' => $params->itemid))) {
                     throw new comment_exception('invalidcommentitemid');
                 }
 
@@ -124,8 +124,8 @@ class dataformfield__comment extends dataformfield_no_content {
                 //if ($this->df->data->approval
                 //            and !$entry->approved
                 //            and !($entry->userid === $USER->id)
-                //            and !has_capability('mod/dataform:approve', $context)) {
-                //    throw new comment_exception('notapproved', 'dataform');
+                //            and !has_capability('mod/datalynx:approve', $context)) {
+                //    throw new comment_exception('notapproved', 'datalynx');
                 //}
 
                 // group access

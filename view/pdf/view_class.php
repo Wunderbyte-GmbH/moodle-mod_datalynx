@@ -15,16 +15,16 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformview
+ * @package datalynxview
  * @subpackage pdf
  * @copyright 2012 Itamar Tzadok 
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once("$CFG->dirroot/mod/dataform/view/view_class.php");
+require_once("$CFG->dirroot/mod/datalynx/view/view_class.php");
 require_once("$CFG->libdir/pdflib.php");
 
-class dataformview_pdf extends dataformview_base {
+class datalynxview_pdf extends datalynxview_base {
 
     const EXPORT_ALL = 'all';
     const EXPORT_PAGE = 'page';
@@ -42,14 +42,14 @@ class dataformview_pdf extends dataformview_base {
      */
     public static function get_permission_options() {
         return array(
-            'print' => get_string('perm_print', 'dataformview_pdf'),
-            'modify' => get_string('perm_modify', 'dataformview_pdf'),
-            'copy' => get_string('perm_copy', 'dataformview_pdf'),
-            'fill-forms' => get_string('perm_fill-forms', 'dataformview_pdf'),
-            'extract' => get_string('perm_extract', 'dataformview_pdf'),
-            'assemble' => get_string('perm_assemble', 'dataformview_pdf'),
-            'print-high' => get_string('perm_print-high', 'dataformview_pdf'),
-            //'owner' => get_string('perm_owner', 'dataformview_pdf'),
+            'print' => get_string('perm_print', 'datalynxview_pdf'),
+            'modify' => get_string('perm_modify', 'datalynxview_pdf'),
+            'copy' => get_string('perm_copy', 'datalynxview_pdf'),
+            'fill-forms' => get_string('perm_fill-forms', 'datalynxview_pdf'),
+            'extract' => get_string('perm_extract', 'datalynxview_pdf'),
+            'assemble' => get_string('perm_assemble', 'datalynxview_pdf'),
+            'print-high' => get_string('perm_print-high', 'datalynxview_pdf'),
+            //'owner' => get_string('perm_owner', 'datalynxview_pdf'),
         );
     }
 
@@ -281,11 +281,11 @@ class dataformview_pdf extends dataformview_base {
         $certoptions = array('subdirs' => 0, 'maxbytes' => -1, 'maxfiles' => 1, 'accepted_types' => array('.crt'));
         
         // Pdf frame
-        file_save_draft_area_files($data->pdfframe, $contextid, 'mod_dataform', 'view_pdfframe', $this->id(), $imageoptions);
+        file_save_draft_area_files($data->pdfframe, $contextid, 'mod_datalynx', 'view_pdfframe', $this->id(), $imageoptions);
         // Pdf watermark
-        file_save_draft_area_files($data->pdfwmark, $contextid, 'mod_dataform', 'view_pdfwmark', $this->id(), $imageoptions);
+        file_save_draft_area_files($data->pdfwmark, $contextid, 'mod_datalynx', 'view_pdfwmark', $this->id(), $imageoptions);
         // Pdf cert
-        file_save_draft_area_files($data->pdfcert, $contextid, 'mod_dataform', 'view_pdfcert', $this->id(), $certoptions);
+        file_save_draft_area_files($data->pdfcert, $contextid, 'mod_datalynx', 'view_pdfcert', $this->id(), $certoptions);
 
         return $data;
     }
@@ -303,17 +303,17 @@ class dataformview_pdf extends dataformview_base {
 
         // Pdf frame
         $draftitemid = file_get_submitted_draft_itemid('pdfframe');
-        file_prepare_draft_area($draftitemid, $contextid, 'mod_dataform', 'view_pdfframe', $this->id(), $imageoptions);
+        file_prepare_draft_area($draftitemid, $contextid, 'mod_datalynx', 'view_pdfframe', $this->id(), $imageoptions);
         $data->pdfframe = $draftitemid;
 
         // Pdf watermark
         $draftitemid = file_get_submitted_draft_itemid('pdfwmark');
-        file_prepare_draft_area($draftitemid, $contextid, 'mod_dataform', 'view_pdfwmark', $this->id(), $imageoptions);
+        file_prepare_draft_area($draftitemid, $contextid, 'mod_datalynx', 'view_pdfwmark', $this->id(), $imageoptions);
         $data->pdfwmark = $draftitemid;
 
         // Pdf certification
         $draftitemid = file_get_submitted_draft_itemid('pdfcert');
-        file_prepare_draft_area($draftitemid, $contextid, 'mod_dataform', 'view_cert', $this->id(), $certoptions);
+        file_prepare_draft_area($draftitemid, $contextid, 'mod_datalynx', 'view_cert', $this->id(), $certoptions);
         $data->pdfcert = $draftitemid;
 
         return $data;
@@ -431,7 +431,7 @@ class dataformview_pdf extends dataformview_base {
         }
 
         // Add group heading 
-        $name = ($name == 'newentry') ? get_string('entrynew', 'dataform') : $name;
+        $name = ($name == 'newentry') ? get_string('entrynew', 'datalynx') : $name;
         if ($name) {
             array_unshift($elements, array('html', $OUTPUT->heading($name, 3, 'main')));
         }
@@ -548,7 +548,7 @@ class dataformview_pdf extends dataformview_base {
     protected function set_frame($pdf) {
         // Add to pdf frame image if any
         $fs = get_file_storage();
-        if ($frame = $fs->get_area_files($this->_df->context->id, 'mod_dataform', 'view_pdfframe', $this->id(), '', false)) {
+        if ($frame = $fs->get_area_files($this->_df->context->id, 'mod_datalynx', 'view_pdfframe', $this->id(), '', false)) {
             $frame = reset($frame);
 
             $tmpdir = make_temp_directory('');
@@ -584,7 +584,7 @@ class dataformview_pdf extends dataformview_base {
     protected function set_watermark($pdf) {
         // Add to pdf watermark image if any
         $fs = get_file_storage();
-        if ($wmark = $fs->get_area_files($this->_df->context->id, 'mod_dataform', 'view_pdfwmark', $this->id(), '', false)) {
+        if ($wmark = $fs->get_area_files($this->_df->context->id, 'mod_datalynx', 'view_pdfwmark', $this->id(), '', false)) {
             $wmark = reset($wmark);
 
             $tmpdir = make_temp_directory('');
@@ -615,7 +615,7 @@ class dataformview_pdf extends dataformview_base {
      */
     protected function set_signature($pdf) {
         $fs = get_file_storage();
-        if ($cert = $fs->get_area_files($this->_df->context->id, 'mod_dataform', 'view_pdfcert', $this->id(), '', false)) {
+        if ($cert = $fs->get_area_files($this->_df->context->id, 'mod_datalynx', 'view_pdfcert', $this->id(), '', false)) {
             $cert = reset($cert);
 
             $tmpdir = make_temp_directory('');
@@ -642,13 +642,13 @@ class dataformview_pdf extends dataformview_base {
             $this->view->eparam3,
             'pluginfile.php',
             $this->_df->context->id,
-            'mod_dataform',
+            'mod_datalynx',
             "viewparam3",
             $this->id()
         );
 
         $content = $this->process_content_images($content);
-        // Add the Dataform css to content
+        // Add the Datalynx css to content
         if ($this->_df->data->css) {
             $style = html_writer::tag('style', $this->_df->data->css, array('type' => 'text/css'));
             $content = $style. $content;
@@ -670,7 +670,7 @@ class dataformview_pdf extends dataformview_base {
             $this->view->eparam4,
             'pluginfile.php',
             $this->_df->context->id,
-            'mod_dataform',
+            'mod_datalynx',
             "viewparam4",
             $this->id()
         );
@@ -691,7 +691,7 @@ class dataformview_pdf extends dataformview_base {
         // Does not support theme images (until we find a way to process them)
 
         // Process pluginfile images
-        $imagetypes = get_string('imagetypes', 'dataformview_pdf');
+        $imagetypes = get_string('imagetypes', 'datalynxview_pdf');
         if (preg_match_all("%$CFG->wwwroot/pluginfile.php(/[^.]+.($imagetypes))%", $content, $matches)) {
             $replacements = array();
             
@@ -720,7 +720,7 @@ class dataformview_pdf extends dataformview_base {
      */
     protected function write_html($pdf, $content) {
         
-        // Add the Dataform css to content
+        // Add the Datalynx css to content
         if ($this->_df->data->css) {
             $style = html_writer::tag('style', $this->_df->data->css, array('type' => 'text/css'));
             $content = $style. $content;

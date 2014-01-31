@@ -19,7 +19,7 @@
  * Event handler definition.
  *
  * @package mod
- * @package dataform
+ * @package datalynx
  * @copyright  2014 Ivan Sakic
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -28,71 +28,71 @@ defined('MOODLE_INTERNAL') or die;
 
 /* List of handlers */
 $handlers = array (
-    'dataform_entryadded' => array (
-        'handlerfile'      => '/mod/dataform/event_class.php',
-        'handlerfunction'  => array('dataform_event_handler', 'handle_entryadded'),
+    'datalynx_entryadded' => array (
+        'handlerfile'      => '/mod/datalynx/event_class.php',
+        'handlerfunction'  => array('datalynx_event_handler', 'handle_entryadded'),
         'schedule'         => 'instant',
         'internal'         => 1,
     ),
 
-    'dataform_entryupdated' => array (
-        'handlerfile'      => '/mod/dataform/event_class.php',
-        'handlerfunction'  => array('dataform_event_handler', 'handle_entryupdated'),
+    'datalynx_entryupdated' => array (
+        'handlerfile'      => '/mod/datalynx/event_class.php',
+        'handlerfunction'  => array('datalynx_event_handler', 'handle_entryupdated'),
         'schedule'         => 'instant',
         'internal'         => 1,
     ),
 
-    'dataform_entrydeleted' => array (
-        'handlerfile'      => '/mod/dataform/event_class.php',
-        'handlerfunction'  => array('dataform_event_handler', 'handle_entrydeleted'),
+    'datalynx_entrydeleted' => array (
+        'handlerfile'      => '/mod/datalynx/event_class.php',
+        'handlerfunction'  => array('datalynx_event_handler', 'handle_entrydeleted'),
         'schedule'         => 'instant',
         'internal'         => 1,
     ),
 
-    'dataform_entryapproved' => array (
-        'handlerfile'      => '/mod/dataform/event_class.php',
-        'handlerfunction'  => array('dataform_event_handler', 'handle_entryapproved'),
+    'datalynx_entryapproved' => array (
+        'handlerfile'      => '/mod/datalynx/event_class.php',
+        'handlerfunction'  => array('datalynx_event_handler', 'handle_entryapproved'),
         'schedule'         => 'instant',
         'internal'         => 1,
     ),
 
-    'dataform_entrydisapproved' => array (
-        'handlerfile'      => '/mod/dataform/event_class.php',
-        'handlerfunction'  => array('dataform_event_handler', 'handle_entrydisapproved'),
+    'datalynx_entrydisapproved' => array (
+        'handlerfile'      => '/mod/datalynx/event_class.php',
+        'handlerfunction'  => array('datalynx_event_handler', 'handle_entrydisapproved'),
         'schedule'         => 'instant',
         'internal'         => 1,
     ),
-    'dataform_commentadded' => array (
-        'handlerfile'      => '/mod/dataform/event_class.php',
-        'handlerfunction'  => array('dataform_event_handler', 'handle_commentadded'),
-        'schedule'         => 'instant',
-        'internal'         => 1,
-    ),
-
-    'dataform_ratingadded' => array (
-        'handlerfile'      => '/mod/dataform/event_class.php',
-        'handlerfunction'  => array('dataform_event_handler', 'handle_ratingadded'),
+    'datalynx_commentadded' => array (
+        'handlerfile'      => '/mod/datalynx/event_class.php',
+        'handlerfunction'  => array('datalynx_event_handler', 'handle_commentadded'),
         'schedule'         => 'instant',
         'internal'         => 1,
     ),
 
-    'dataform_ratingupdated' => array (
-        'handlerfile'      => '/mod/dataform/event_class.php',
-        'handlerfunction'  => array('dataform_event_handler', 'handle_ratingupdated'),
+    'datalynx_ratingadded' => array (
+        'handlerfile'      => '/mod/datalynx/event_class.php',
+        'handlerfunction'  => array('datalynx_event_handler', 'handle_ratingadded'),
         'schedule'         => 'instant',
         'internal'         => 1,
     ),
 
-    'dataform_memberadded' => array (
-        'handlerfile'      => '/mod/dataform/event_class.php',
-        'handlerfunction'  => array('dataform_event_handler', 'handle_memberadded'),
+    'datalynx_ratingupdated' => array (
+        'handlerfile'      => '/mod/datalynx/event_class.php',
+        'handlerfunction'  => array('datalynx_event_handler', 'handle_ratingupdated'),
         'schedule'         => 'instant',
         'internal'         => 1,
     ),
 
-    'dataform_memberremoved' => array (
-        'handlerfile'      => '/mod/dataform/event_class.php',
-        'handlerfunction'  => array('dataform_event_handler', 'handle_memberremoved'),
+    'datalynx_memberadded' => array (
+        'handlerfile'      => '/mod/datalynx/event_class.php',
+        'handlerfunction'  => array('datalynx_event_handler', 'handle_memberadded'),
+        'schedule'         => 'instant',
+        'internal'         => 1,
+    ),
+
+    'datalynx_memberremoved' => array (
+        'handlerfile'      => '/mod/datalynx/event_class.php',
+        'handlerfunction'  => array('datalynx_event_handler', 'handle_memberremoved'),
         'schedule'         => 'instant',
         'internal'         => 1,
     ),

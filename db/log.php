@@ -15,7 +15,7 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package mod-dataform
+ * @package mod-datalynx
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,14 +27,14 @@
 defined('MOODLE_INTERNAL') or die;
 
 $logs = array(
-    array('module'=>'dataform', 'action'=>'view', 'mtable'=>'dataform', 'field'=>'name'),
-    array('module'=>'dataform', 'action'=>'add', 'mtable'=>'dataform', 'field'=>'name'),
-    array('module'=>'dataform', 'action'=>'update', 'mtable'=>'dataform', 'field'=>'name'),
-    array('module'=>'dataform', 'action'=>'record delete', 'mtable'=>'dataform', 'field'=>'name'),
-    array('module'=>'dataform', 'action'=>'fields add', 'mtable'=>'dataform_fields', 'field'=>'name'),
-    array('module'=>'dataform', 'action'=>'fields update', 'mtable'=>'dataform_fields', 'field'=>'name'),
-    array('module'=>'dataform', 'action'=>'views add', 'mtable'=>'dataform_views', 'field'=>'name'),
-    array('module'=>'dataform', 'action'=>'views update', 'mtable'=>'dataform_views', 'field'=>'name'),
-    array('module'=>'dataform', 'action'=>'filters add', 'mtable'=>'dataform_filters', 'field'=>'name'),
-    array('module'=>'dataform', 'action'=>'filters update', 'mtable'=>'dataform_filters', 'field'=>'name')
+    array('module'=>'datalynx', 'action'=>'view', 'mtable'=>'datalynx', 'field'=>'name'),
+    array('module'=>'datalynx', 'action'=>'add', 'mtable'=>'datalynx', 'field'=>'name'),
+    array('module'=>'datalynx', 'action'=>'update', 'mtable'=>'datalynx', 'field'=>'name'),
+    array('module'=>'datalynx', 'action'=>'record delete', 'mtable'=>'datalynx', 'field'=>'name'),
+    array('module'=>'datalynx', 'action'=>'fields add', 'mtable'=>'datalynx_fields', 'field'=>'name'),
+    array('module'=>'datalynx', 'action'=>'fields update', 'mtable'=>'datalynx_fields', 'field'=>'name'),
+    array('module'=>'datalynx', 'action'=>'views add', 'mtable'=>'datalynx_views', 'field'=>'name'),
+    array('module'=>'datalynx', 'action'=>'views update', 'mtable'=>'datalynx_views', 'field'=>'name'),
+    array('module'=>'datalynx', 'action'=>'filters add', 'mtable'=>'datalynx_filters', 'field'=>'name'),
+    array('module'=>'datalynx', 'action'=>'filters update', 'mtable'=>'datalynx_filters', 'field'=>'name')
 );

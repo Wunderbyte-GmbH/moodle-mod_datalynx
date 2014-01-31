@@ -16,7 +16,7 @@
  
 /**
  * @package mod
- * @subpackage dataform
+ * @subpackage datalynx
  * @copyright 2013 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -28,7 +28,7 @@ require_once ("$CFG->libdir/formslib.php");
 /*
  *
  */
-abstract class mod_dataform_filter_base_form extends moodleform {
+abstract class mod_datalynx_filter_base_form extends moodleform {
     protected $_filter = null;
     protected $_df = null;
 
@@ -50,10 +50,10 @@ abstract class mod_dataform_filter_base_form extends moodleform {
         $mform = &$this->_form;
         $df = $this->_df;
 
-        $diroptions = array(0 => get_string('ascending', 'dataform'),
-                            1 => get_string('descending', 'dataform'));
+        $diroptions = array(0 => get_string('ascending', 'datalynx'),
+                            1 => get_string('descending', 'datalynx'));
 
-        $fieldlabel = get_string('filtersortfieldlabel', 'dataform');
+        $fieldlabel = get_string('filtersortfieldlabel', 'datalynx');
         $count = 0;
 
 
@@ -105,16 +105,16 @@ abstract class mod_dataform_filter_base_form extends moodleform {
         $df = $this->_df;
 
         $andoroptions = array(
-            0 => get_string('andor', 'dataform'),
-            'AND' => get_string('and', 'dataform'),
-            'OR' => get_string('or', 'dataform'),
+            0 => get_string('andor', 'datalynx'),
+            'AND' => get_string('and', 'datalynx'),
+            'OR' => get_string('or', 'datalynx'),
         );
         $isnotoptions = array(
-            '' => get_string('is', 'dataform'),
-            'NOT' => get_string('not', 'dataform'),
+            '' => get_string('is', 'datalynx'),
+            'NOT' => get_string('not', 'datalynx'),
         );
 
-        $fieldlabel = get_string('filtersearchfieldlabel', 'dataform');
+        $fieldlabel = get_string('filtersearchfieldlabel', 'datalynx');
         $count = 0;
 
         // add current options
@@ -217,7 +217,7 @@ abstract class mod_dataform_filter_base_form extends moodleform {
 /*
  *
  */
-class mod_dataform_filter_form extends mod_dataform_filter_base_form {
+class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
 
     /*
      *
@@ -226,7 +226,7 @@ class mod_dataform_filter_form extends mod_dataform_filter_base_form {
     
         $df = $this->_df;
         $filter = $this->_filter;
-        $name = empty($filter->name) ? get_string('filternew', 'dataform') : $filter->name;
+        $name = empty($filter->name) ? get_string('filternew', 'datalynx') : $filter->name;
         $description = empty($filter->description) ? '' : $filter->description;
         $visible = !isset($filter->visible) ? 1 : $filter->visible;
         $fields = $df->get_fields();
@@ -234,7 +234,7 @@ class mod_dataform_filter_form extends mod_dataform_filter_base_form {
 
         $mform = &$this->_form;
         
-        //$mform->addElement('html', dataform_filter_manager::get_filter_url_query($filter));
+        //$mform->addElement('html', datalynx_filter_manager::get_filter_url_query($filter));
 
         // buttons
         //-------------------------------------------------------------------------------
@@ -257,23 +257,23 @@ class mod_dataform_filter_form extends mod_dataform_filter_base_form {
         $mform->setDefault('visible', $visible);
 
         //-------------------------------------------------------------------------------
-        $mform->addElement('header', 'filterhdr', get_string('viewfilter', 'dataform'));
+        $mform->addElement('header', 'filterhdr', get_string('viewfilter', 'datalynx'));
         $mform->setExpanded('filterhdr');
 
         // entries per page
         $options = array(0=>get_string('choose'),1=>1,2=>2,3=>3,4=>4,5=>5,6=>6,7=>7,8=>8,9=>9,10=>10,15=>15,
                             20=>20,30=>30,40=>40,50=>50,100=>100,200=>200,300=>300,400=>400,500=>500,1000=>1000);
-        $mform->addElement('select', 'perpage', get_string('viewperpage', 'dataform'), $options);
+        $mform->addElement('select', 'perpage', get_string('viewperpage', 'datalynx'), $options);
         $mform->setDefault('perpage', $filter->perpage);
 
         // selection method
-        $options = array(0 => get_string('filterbypage', 'dataform'), 1 => get_string('random', 'dataform'));
-        $mform->addElement('select', 'selection', get_string('filterselection', 'dataform'), $options);
+        $options = array(0 => get_string('filterbypage', 'datalynx'), 1 => get_string('random', 'datalynx'));
+        $mform->addElement('select', 'selection', get_string('filterselection', 'datalynx'), $options);
         $mform->setDefault('selection', $filter->selection);
         $mform->disabledIf('selection', 'perpage', 'eq', '0');
 
         // group by
-        $mform->addElement('select', 'groupby', get_string('filtergroupby', 'dataform'), $fieldoptions);
+        $mform->addElement('select', 'groupby', get_string('filtergroupby', 'datalynx'), $fieldoptions);
         $mform->setDefault('groupby', $filter->groupby);
 
         // search
@@ -283,14 +283,14 @@ class mod_dataform_filter_form extends mod_dataform_filter_base_form {
 
         // custom sort
         //-------------------------------------------------------------------------------
-        $mform->addElement('header', 'customsorthdr', get_string('filtercustomsort', 'dataform'));
+        $mform->addElement('header', 'customsorthdr', get_string('filtercustomsort', 'datalynx'));
         $mform->setExpanded('customsorthdr');
         
         $this->custom_sort_definition($filter->customsort, $fields, $fieldoptions, true);
         
         // custom search
         //-------------------------------------------------------------------------------
-        $mform->addElement('header', 'customsearchhdr', get_string('filtercustomsearch', 'dataform'));
+        $mform->addElement('header', 'customsearchhdr', get_string('filtercustomsearch', 'datalynx'));
         $mform->setExpanded('customsearchhdr');
 
         $this->custom_search_definition($filter->customsearch, $fields, $fieldoptions, true);
@@ -311,7 +311,7 @@ class mod_dataform_filter_form extends mod_dataform_filter_base_form {
 
         // validate unique name
         if (empty($data['name']) or $df->name_exists('filters', $data['name'], $filter->id)) {
-            $errors['name'] = get_string('invalidname','dataform', get_string('filter', 'dataform'));
+            $errors['name'] = get_string('invalidname','datalynx', get_string('filter', 'datalynx'));
         }
 
         return $errors;
@@ -321,7 +321,7 @@ class mod_dataform_filter_form extends mod_dataform_filter_base_form {
 /*
  *
  */
-class mod_dataform_advanced_filter_form extends mod_dataform_filter_base_form {
+class mod_datalynx_advanced_filter_form extends mod_datalynx_filter_base_form {
     /*
      *
      */
@@ -331,7 +331,7 @@ class mod_dataform_advanced_filter_form extends mod_dataform_filter_base_form {
         $filter = $this->_filter;
         $view = $this->_customdata['view'];
         
-        $name = empty($filter->name) ? get_string('filternew', 'dataform') : $filter->name;
+        $name = empty($filter->name) ? get_string('filternew', 'datalynx') : $filter->name;
 
         $fields = $view->get_view_fields();
         $fieldoptions = array(0 => get_string('choose'));
@@ -342,7 +342,7 @@ class mod_dataform_advanced_filter_form extends mod_dataform_filter_base_form {
         $mform = &$this->_form;
 
         //-------------------------------------------------------------------------------
-        $mform->addElement('header', 'advancedfilterhdr', get_string('filteradvanced', 'dataform'));
+        $mform->addElement('header', 'advancedfilterhdr', get_string('filteradvanced', 'datalynx'));
         $mform->setExpanded('advancedfilterhdr', false);
         
         // name and description
@@ -353,12 +353,12 @@ class mod_dataform_advanced_filter_form extends mod_dataform_filter_base_form {
         // entries per page
         $options = array(0=>get_string('choose'),1=>1,2=>2,3=>3,4=>4,5=>5,6=>6,7=>7,8=>8,9=>9,10=>10,15=>15,
                             20=>20,30=>30,40=>40,50=>50,100=>100,200=>200,300=>300,400=>400,500=>500,1000=>1000);
-        $mform->addElement('select', 'uperpage', get_string('viewperpage', 'dataform'), $options);
+        $mform->addElement('select', 'uperpage', get_string('viewperpage', 'datalynx'), $options);
         $mform->setDefault('uperpage', $filter->perpage);
 
         // selection method
-        //$options = array(0 => get_string('filterbypage', 'dataform'), 1 => get_string('random', 'dataform'));
-        //$mform->addElement('select', 'selection', get_string('filterselection', 'dataform'), $options);
+        //$options = array(0 => get_string('filterbypage', 'datalynx'), 1 => get_string('random', 'datalynx'));
+        //$mform->addElement('select', 'selection', get_string('filterselection', 'datalynx'), $options);
         //$mform->setDefault('selection', $filter->selection);
         //$mform->disabledIf('selection', 'perpage', 'eq', '0');
 

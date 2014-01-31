@@ -15,7 +15,7 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataform_rule
+ * @package datalynx_rule
  * @copyright 2013 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -23,7 +23,7 @@
 /**
  * Rule manager class
  */
-class dataform_rule_manager {
+class datalynx_rule_manager {
 
     protected $_df;
     protected $_customrules;
@@ -61,7 +61,7 @@ class dataform_rule_manager {
     /**
      * given a rule type returns the rule object from get_rules
      * Initializes get_rules if necessary
-     * @return dataform_rule_base[]
+     * @return datalynx_rule_base[]
      */
     public function get_rules_by_plugintype($type, $menu = false) {
         $typerules = array();
@@ -81,7 +81,7 @@ class dataform_rule_manager {
      * @param string $plugintype
      * @param string $eventname
      * @param bool $enabledonly
-     * @return dataform_rule_base[]
+     * @return datalynx_rule_base[]
      */
     public function get_rules_for_event($plugintype, $eventname, $enabledonly = true) {
         $rules = array();
@@ -121,7 +121,7 @@ class dataform_rule_manager {
                 $key = 0;
             }
             require_once($type. '/rule_class.php');
-            $ruleclass = 'dataform_rule_'. $type;
+            $ruleclass = 'datalynx_rule_'. $type;
             $rule = new $ruleclass($this->_df, $key);
             return $rule;
         } else {
@@ -138,7 +138,7 @@ class dataform_rule_manager {
         if (!$this->_customrules or $forceget) {
             $this->_customrules = array();
             // collate user rules
-            if ($rules = $DB->get_records('dataform_rules', array('dataid' => $this->_df->id()))) {
+            if ($rules = $DB->get_records('datalynx_rules', array('dataid' => $this->_df->id()))) {
                 foreach ($rules as $ruleid => $rule) {
                     $this->_customrules[$ruleid] = $this->get_rule($rule);
                 }
@@ -172,7 +172,7 @@ class dataform_rule_manager {
         
         $df = $this->_df;
         
-        if (!has_capability('mod/dataform:managetemplates', $df->context)) {
+        if (!has_capability('mod/datalynx:managetemplates', $df->context)) {
             // TODO throw exception
             return false;
         }
@@ -192,7 +192,7 @@ class dataform_rule_manager {
         $strnotify = '';
 
         if (empty($rules) and $action != 'add') {
-            $df->notifications['bad'][] = get_string("rulenoneforaction",'dataform');
+            $df->notifications['bad'][] = get_string("rulenoneforaction",'datalynx');
             return false;
         } else {
             if (!$confirmed) {
@@ -200,12 +200,12 @@ class dataform_rule_manager {
                 $df->print_header('rules');
 
                 // Print a confirmation page
-                echo $OUTPUT->confirm(get_string("rulesconfirm$action", 'dataform', count($rules)),
-                        new moodle_url('/mod/dataform/rule/index.php', array('d' => $df->id(),
+                echo $OUTPUT->confirm(get_string("rulesconfirm$action", 'datalynx', count($rules)),
+                        new moodle_url('/mod/datalynx/rule/index.php', array('d' => $df->id(),
                                                                         $action => implode(',', array_keys($rules)),
                                                                         'sesskey' => sesskey(),
                                                                         'confirmed' => 1)),
-                        new moodle_url('/mod/dataform/rule/index.php', array('d' => $df->id())));
+                        new moodle_url('/mod/datalynx/rule/index.php', array('d' => $df->id())));
 
                 $df->print_footer();
                 exit;
@@ -242,7 +242,7 @@ class dataform_rule_manager {
                         foreach ($rules as $rid => $rule) {
                             // disable = 0; enable = 1
                             $enabled = ($rule->rule->enabled ? 0 : 1);
-                            $DB->set_field('dataform_rules', 'enabled', $enabled, array('id' => $rid));
+                            $DB->set_field('datalynx_rules', 'enabled', $enabled, array('id' => $rid));
 
                             $processedrids[] = $rid;
                         }
@@ -256,7 +256,7 @@ class dataform_rule_manager {
                             while ($df->name_exists('rules', $rule->name())) {
                                 $rule->rule->name .= '_1';
                             }
-                            $ruleid = $DB->insert_record('dataform_rules', $rule->rule);
+                            $ruleid = $DB->insert_record('datalynx_rules', $rule->rule);
                             $processedrids[] = $ruleid;
                         }
                         $strnotify = 'rulesadded';
@@ -274,10 +274,10 @@ class dataform_rule_manager {
                         break;
                 }
 
-                add_to_log($df->course->id, 'dataform', 'rule '. $action, 'rule/index.php?id='. $df->cm->id, $df->id(), $df->cm->id);
+                add_to_log($df->course->id, 'datalynx', 'rule '. $action, 'rule/index.php?id='. $df->cm->id, $df->id(), $df->cm->id);
                 if ($strnotify) {
                     $rulesprocessed = $processedrids ? count($processedrids) : 'No';
-                    $df->notifications['good'][] = get_string($strnotify, 'dataform', $rulesprocessed);
+                    $df->notifications['good'][] = get_string($strnotify, 'datalynx', $rulesprocessed);
                 }
                 if (!empty($processedrids)) {
                     $this->get_rules(null, false, true);
@@ -296,18 +296,18 @@ class dataform_rule_manager {
         
         $df = $this->_df;
         
-        $editbaseurl = '/mod/dataform/rule/rule_edit.php';
-        $actionbaseurl = '/mod/dataform/rule/index.php';
+        $editbaseurl = '/mod/datalynx/rule/rule_edit.php';
+        $actionbaseurl = '/mod/datalynx/rule/index.php';
         $linkparams = array('d' => $df->id(), 'sesskey' => sesskey());
 
         // table headings
         $strname = get_string('name');
-        $strtype = get_string('type', 'dataform');
+        $strtype = get_string('type', 'datalynx');
         $strdescription = get_string('description');
         $stredit = get_string('edit');
         $strduplicate =  get_string('duplicate');
         $strdelete = get_string('delete');
-        $strenabled = get_string('enabled', 'dataform');
+        $strenabled = get_string('enabled', 'datalynx');
         $strhide = get_string('hide');
         $strshow = get_string('show');
 
@@ -317,12 +317,12 @@ class dataform_rule_manager {
         $multiactionurl = new moodle_url($actionbaseurl, $linkparams);
         $multidelete = html_writer::tag(
             'button', 
-            $OUTPUT->pix_icon('t/delete', get_string('multidelete', 'dataform')), 
+            $OUTPUT->pix_icon('t/delete', get_string('multidelete', 'datalynx')), 
             array('type' => 'button', 'name' => 'multidelete', 'onclick' => 'bulk_action(\'rule\'&#44; \''. $multiactionurl->out(false). '\'&#44; \'delete\')')
         );
         $multiduplicate = html_writer::tag(
             'button', 
-            $OUTPUT->pix_icon('t/copy', get_string('multiduplicate', 'dataform')), 
+            $OUTPUT->pix_icon('t/copy', get_string('multiduplicate', 'datalynx')), 
             array('type' => 'button', 'name' => 'multiduplicate', 'onclick' => 'bulk_action(\'rule\'&#44; \''. $multiactionurl->out(false). '\'&#44; \'duplicate\')')
         );
 
@@ -381,24 +381,24 @@ class dataform_rule_manager {
         global $OUTPUT;
         
         // Display the rule form jump list
-        $directories = get_list_of_plugins('mod/dataform/rule/');
+        $directories = get_list_of_plugins('mod/datalynx/rule/');
         $rulemenu = array();
 
         foreach ($directories as $directory){
             if ($directory[0] != '_') {
                 // Get name from language files
-                $rulemenu[$directory] = get_string('pluginname',"dataformrule_$directory");
+                $rulemenu[$directory] = get_string('pluginname',"datalynxrule_$directory");
             }
         }
         //sort in alphabetical order
         asort($rulemenu);
 
-        $popupurl = new moodle_url('/mod/dataform/rule/rule_edit.php', array('d' => $this->_df->id(), 'sesskey' => sesskey()));
+        $popupurl = new moodle_url('/mod/datalynx/rule/rule_edit.php', array('d' => $this->_df->id(), 'sesskey' => sesskey()));
         $ruleselect = new single_select($popupurl, 'type', $rulemenu, null, array(''=>'choosedots'), 'ruleform');
-        $ruleselect->set_label(get_string('ruleadd','dataform'). '&nbsp;');
+        $ruleselect->set_label(get_string('ruleadd','datalynx'). '&nbsp;');
         $br = html_writer::empty_tag('br');
         echo html_writer::tag('div', $br. $OUTPUT->render($ruleselect). $br, array('class'=>'ruleadd mdl-align'));
-        //echo $OUTPUT->help_icon('ruleadd', 'dataform');
+        //echo $OUTPUT->help_icon('ruleadd', 'datalynx');
     }
 
 }

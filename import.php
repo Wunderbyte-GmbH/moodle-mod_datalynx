@@ -16,7 +16,7 @@
  
 /**
  * @package mod
- * @subpackage dataform
+ * @subpackage datalynx
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -25,7 +25,7 @@ require_once('mod_class.php');
 
 $urlparams = new object();
 
-$urlparams->d          = optional_param('d', 0, PARAM_INT);             // dataform id
+$urlparams->d          = optional_param('d', 0, PARAM_INT);             // datalynx id
 $urlparams->id          = optional_param('id', 0, PARAM_INT);             // module id
 $urlparams->vid         = optional_param('vid', 0, PARAM_INT);       // view id
 $urlparams->vedit         = optional_param('vedit', 0, PARAM_INT); // view id to edit
@@ -38,19 +38,19 @@ $urlparams->duplicate  = optional_param('duplicate', 0, PARAM_SEQUENCE);   // id
 
 $urlparams->confirmed    = optional_param('confirmed', 0, PARAM_INT);
 
-// Set a dataform object
-$df = new dataform($urlparams->d, $urlparams->id);
+// Set a datalynx object
+$df = new datalynx($urlparams->d, $urlparams->id);
 
 // require capability
-if (!has_capability('mod/dataform:manageentries', $df->context)
-            or !has_capability('mod/dataform:managetemplates', $df->context)) {
-    throw new required_capability_exception($df->context, 'mod/dataform:manageentries', 'nopermissions', '');
+if (!has_capability('mod/datalynx:manageentries', $df->context)
+            or !has_capability('mod/datalynx:managetemplates', $df->context)) {
+    throw new required_capability_exception($df->context, 'mod/datalynx:manageentries', 'nopermissions', '');
 }
 
 $df->set_page('import', array('modjs' => true, 'urlparams' => $urlparams));
 
 // activate navigation node
-navigation_node::override_active_url(new moodle_url('/mod/dataform/import.php', array('id' => $df->cm->id)));
+navigation_node::override_active_url(new moodle_url('/mod/datalynx/import.php', array('id' => $df->cm->id)));
 
 // DATA PROCESSING
 // import
@@ -60,7 +60,7 @@ if ($urlparams->vid and confirm_sesskey()) {
     // process import
     if ($urlparams->import and confirm_sesskey()) {
         if ($view->process_data()) {
-            redirect(new moodle_url('/mod/dataform/view.php', array('d' => $urlparams->d)));
+            redirect(new moodle_url('/mod/datalynx/view.php', array('d' => $urlparams->d)));
         } else {
             // proceed to display list of import views
         }
@@ -92,29 +92,29 @@ if ($urlparams->duplicate and confirm_sesskey()) {  // Duplicate any requested v
 $df->notifications['bad']['defaultview'] = '';
 $df->notifications['bad']['getstartedviews'] = '';
 if (!$views = $df->get_views_by_type('import', true)) {
-    $df->notifications['bad'][] = get_string('importnoneindataform','dataform');  // nothing in database
+    $df->notifications['bad'][] = get_string('importnoneindatalynx','datalynx');  // nothing in database
 }
 
 // print header
 $df->print_header(array('tab' => 'import', 'urlparams' => $urlparams));
 
 // print add import link
-$addimporturl = new moodle_url('/mod/dataform/view/view_edit.php',
+$addimporturl = new moodle_url('/mod/datalynx/view/view_edit.php',
                             array('d' => $df->id(), 'type' => 'import', 'sesskey' => sesskey()));
-$addimportlink = html_writer::link($addimporturl, get_string('importadd','dataform'));
+$addimportlink = html_writer::link($addimporturl, get_string('importadd','datalynx'));
 $br = html_writer::empty_tag('br'); 
 echo html_writer::tag('div', $addimportlink. $br. $br, array('class'=>'mdl-align'));
 
 // if there are import views print admin style list of them
 if ($views) {
 
-    $viewbaseurl = '/mod/dataform/import.php';
-    $editbaseurl = '/mod/dataform/view/view_edit.php';
-    $actionbaseurl = '/mod/dataform/import.php';
+    $viewbaseurl = '/mod/datalynx/import.php';
+    $editbaseurl = '/mod/datalynx/view/view_edit.php';
+    $actionbaseurl = '/mod/datalynx/import.php';
     $linkparams = array('d' => $df->id(), 'sesskey' => sesskey());
                         
     // table headings
-    $strviews = get_string('views', 'dataform');
+    $strviews = get_string('views', 'datalynx');
     $strdescription = get_string('description');
     $stredit = get_string('edit');
     $strdelete = get_string('delete');
@@ -123,7 +123,7 @@ if ($views) {
 
     $selectallnone = html_writer::checkbox(null, null, false, null, array('onclick' => 'select_allnone(\'view\'&#44;this.checked)'));
     $multidelete = html_writer::tag('button', 
-                                $OUTPUT->pix_icon('t/delete', get_string('multidelete', 'dataform')), 
+                                $OUTPUT->pix_icon('t/delete', get_string('multidelete', 'datalynx')), 
                                 array('name' => 'multidelete',
                                         'onclick' => 'bulk_action(\'view\'&#44; \''. htmlspecialchars_decode(new moodle_url($actionbaseurl, $linkparams)). '\'&#44; \'delete\')'));
     

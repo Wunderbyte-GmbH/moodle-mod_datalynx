@@ -15,14 +15,14 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage nanogong
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once("$CFG->dirroot/mod/dataform/field/file/field_form.php");
+require_once("$CFG->dirroot/mod/datalynx/field/file/field_form.php");
 
-class dataformfield_nanogong_form extends dataformfield_file_form {
+class datalynxfield_nanogong_form extends datalynxfield_file_form {
 
     /**
      *
@@ -33,9 +33,9 @@ class dataformfield_nanogong_form extends dataformfield_file_form {
 
         // accetped types
         $options = array();
-        $options['*'] = get_string('filetypeany', 'dataform');
+        $options['*'] = get_string('filetypeany', 'datalynx');
 
-        $mform->addElement('select', 'param3', get_string('filetypes', 'dataform'), $options);
+        $mform->addElement('select', 'param3', get_string('filetypes', 'datalynx'), $options);
         $mform->setDefault('param3', '*');
 
     }

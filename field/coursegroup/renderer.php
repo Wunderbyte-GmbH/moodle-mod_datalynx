@@ -15,7 +15,7 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage coursegroup
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -23,12 +23,12 @@
 
 defined('MOODLE_INTERNAL') or die();
 
-require_once("$CFG->dirroot/mod/dataform/field/renderer.php");
+require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
  *
  */
-class dataformfield_coursegroup_renderer extends dataformfield_renderer {
+class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
 
     /**
      * 
@@ -88,7 +88,7 @@ class dataformfield_coursegroup_renderer extends dataformfield_renderer {
             $coursemenu[$cid] = $course->fullname;
         }
         if ($field->course) {
-            $cname = get_string('coursenotfound', 'dataformfield_coursegroup', $courseid);
+            $cname = get_string('coursenotfound', 'datalynxfield_coursegroup', $courseid);
             if (!empty($coursemenu[$courseid])) {
                 $cname = $coursemenu[$courseid];
             }
@@ -104,16 +104,16 @@ class dataformfield_coursegroup_renderer extends dataformfield_renderer {
             $options = array(
                 'coursefield' => "${fieldname}_course",
                 'groupfield' => "{$fieldname}_group",
-                'acturl' => "$CFG->wwwroot/mod/dataform/field/coursegroup/loadgroups.php"
+                'acturl' => "$CFG->wwwroot/mod/datalynx/field/coursegroup/loadgroups.php"
             );
 
             $module = array(
-                'name' => 'M.dataformfield_coursegroup_load_course_groups',
-                'fullpath' => '/mod/dataform/field/coursegroup/coursegroup.js',
+                'name' => 'M.datalynxfield_coursegroup_load_course_groups',
+                'fullpath' => '/mod/datalynx/field/coursegroup/coursegroup.js',
                 'requires' => array('base','io','node')
             );
 
-            $PAGE->requires->js_init_call('M.dataformfield_coursegroup_load_course_groups.init', array($options), false, $module);            
+            $PAGE->requires->js_init_call('M.datalynxfield_coursegroup_load_course_groups.init', array($options), false, $module);            
         }
 
         // group id
@@ -121,7 +121,7 @@ class dataformfield_coursegroup_renderer extends dataformfield_renderer {
             if ($group = $DB->get_record('groups', array('id' => $groupid), 'name')) {
                 $groupname = $group->name;
             } else {
-                $groupname = get_string('groupnotfound', 'dataformfield_coursegroup', $groupid);
+                $groupname = get_string('groupnotfound', 'datalynxfield_coursegroup', $groupid);
             }
             $mform->addElement('html', html_writer::tag('h3', $groupname));
         } else {
@@ -223,7 +223,7 @@ class dataformfield_coursegroup_renderer extends dataformfield_renderer {
         $mform->setDefault("f_{$i}_{$fieldid}_group", $group);
         $mform->disabledIf("coursegroupelements$i", "searchoperator$i", 'eq', '');
         
-        return array($elements, array(get_string('member', 'dataformfield_coursegroup'), '<br />'. get_string('course'). ' ','<br />'. get_string('group'). ' '));
+        return array($elements, array(get_string('member', 'datalynxfield_coursegroup'), '<br />'. get_string('course'). ' ','<br />'. get_string('group'). ' '));
     }
 
     /**

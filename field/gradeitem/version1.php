@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    dataformfield
+ * @package    datalynxfield
  * @subpackage gradeitem
  * @copyright  2012 Itamar Tzadok
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -25,4 +25,4 @@ defined('MOODLE_INTERNAL') or die;
 
 $plugin->version   = 2012061800;
 $plugin->requires  = 2010112400;
-$plugin->component = 'dataformfield_gradeitem';
+$plugin->component = 'datalynxfield_gradeitem';

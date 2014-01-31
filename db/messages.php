@@ -18,51 +18,51 @@
  * Defines message providers (types of messages being sent)
  *
  * @package mod
- * @package dataform
+ * @package datalynx
  * @copyright  2012 Itamar Tzadok
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 $messageproviders = array (
 
-    'dataform_entryadded' => array (
-        'capability' => 'mod/dataform:notifyentryadded',
+    'datalynx_entryadded' => array (
+        'capability' => 'mod/datalynx:notifyentryadded',
     ),
 
-    'dataform_entryupdated' => array (
-        'capability' => 'mod/dataform:notifyentryupdated',
+    'datalynx_entryupdated' => array (
+        'capability' => 'mod/datalynx:notifyentryupdated',
     ),
 
-    'dataform_entrydeleted' => array (
-        'capability' => 'mod/dataform:notifyentrydeleted',
+    'datalynx_entrydeleted' => array (
+        'capability' => 'mod/datalynx:notifyentrydeleted',
     ),
 
-    'dataform_entryapproved' => array (
-        'capability' => 'mod/dataform:notifyentryapproved',
+    'datalynx_entryapproved' => array (
+        'capability' => 'mod/datalynx:notifyentryapproved',
     ),
 
-    'dataform_entrydisapproved' => array (
-        'capability' => 'mod/dataform:notifyentrydisapproved',
+    'datalynx_entrydisapproved' => array (
+        'capability' => 'mod/datalynx:notifyentrydisapproved',
     ),
 
-    'dataform_commentadded' => array (
-        'capability' => 'mod/dataform:notifycommentadded',
+    'datalynx_commentadded' => array (
+        'capability' => 'mod/datalynx:notifycommentadded',
     ),
 
-    'dataform_ratingadded' => array (
-        'capability' => 'mod/dataform:notifyratingadded',
+    'datalynx_ratingadded' => array (
+        'capability' => 'mod/datalynx:notifyratingadded',
     ),
 
-    'dataform_ratingupdated' => array (
-        'capability' => 'mod/dataform:notifyratingadded',
+    'datalynx_ratingupdated' => array (
+        'capability' => 'mod/datalynx:notifyratingadded',
     ),
 
-    'dataform_memberadded' => array (
-        'capability' => 'mod/dataform:notifymemberadded',
+    'datalynx_memberadded' => array (
+        'capability' => 'mod/datalynx:notifymemberadded',
     ),
 
-    'dataform_memberremoved' => array (
-        'capability' => 'mod/dataform:notifymemberremoved',
+    'datalynx_memberremoved' => array (
+        'capability' => 'mod/datalynx:notifymemberremoved',
     ),
 
 );

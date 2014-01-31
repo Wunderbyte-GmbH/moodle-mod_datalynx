@@ -15,7 +15,7 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage nanogong
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -31,9 +31,9 @@ define("DEFAULT_HEIGHT", 100);
 define("DEFAULT_FOREGROUND", "#0000FF");
 define("DEFAULT_BACKGROUND", "#DDDDDD");
 
-require_once("$CFG->dirroot/mod/dataform/field/file/field_class.php");
+require_once("$CFG->dirroot/mod/datalynx/field/file/field_class.php");
 
-class dataformfield_nanogong extends dataformfield_file {
+class datalynxfield_nanogong extends datalynxfield_file {
     public $type = 'nanogong';
 
     /**
@@ -45,7 +45,7 @@ class dataformfield_nanogong extends dataformfield_file {
 
         // get the wavfile or exit
         $wavfile = null;
-        if ($files = $fs->get_area_files($this->df->context->id, 'mod_dataform', 'content', $contentid, 'sortorder', false)) {
+        if ($files = $fs->get_area_files($this->df->context->id, 'mod_datalynx', 'content', $contentid, 'sortorder', false)) {
             foreach ($files as $file) {
                 $pathinfo = pathinfo($file->get_filename());
                 if (!empty($pathinfo['extension']) and $pathinfo['extension'] == 'wav') {
@@ -132,13 +132,13 @@ class dataformfield_nanogong extends dataformfield_file {
 
         imagedestroy($img);
 
-        if ($imgfile = $fs->get_file($this->df->context->id, 'mod_dataform', 'content', $contentid, '/', 'voicefile.png')) {
+        if ($imgfile = $fs->get_file($this->df->context->id, 'mod_datalynx', 'content', $contentid, '/', 'voicefile.png')) {
             $imgfile->delete();
         }
 
         $file_record = array(
             'contextid'=> $this->df->context->id,
-            'component'=>'mod_dataform',
+            'component'=>'mod_datalynx',
             'filearea'=>'content',
             'itemid'=> $contentid,
             'filepath'=> '/',

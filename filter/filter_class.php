@@ -16,7 +16,7 @@
  
 /**
  * @package mod
- * @subpackage dataform
+ * @subpackage datalynx
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -24,7 +24,7 @@
 /**
  * Filter class
  */
-class dataform_filter {
+class datalynx_filter {
 
     public $id;
     public $dataid;
@@ -105,8 +105,8 @@ class dataform_filter {
         list($searchtables, $wheresearch, $searchparams) = $this->get_search_sql($fields);
         // SORT sql
         list($sorttables, $sortorder, $sortparams) = $this->get_sort_sql($fields);
-        // CONTENT sql ($dataformcontent is an array of fieldid whose content needs to be fetched)
-        list($dataformcontent, $whatcontent, $contenttables, $contentparams) = $this->get_content_sql($fields);
+        // CONTENT sql ($datalynxcontent is an array of fieldid whose content needs to be fetched)
+        list($datalynxcontent, $whatcontent, $contenttables, $contentparams) = $this->get_content_sql($fields);
     
         return array(
             " $searchtables $sorttables $contenttables ",
@@ -114,7 +114,7 @@ class dataform_filter {
             $sortorder,
             $whatcontent,
             array_merge($searchparams, $sortparams, $contentparams),
-            $dataformcontent
+            $datalynxcontent
         );
     }
 
@@ -173,7 +173,7 @@ class dataform_filter {
                             $whereand[] = $fieldsql;
                             $searchparams = array_merge($searchparams, $fieldparams);
                             
-                            // Add searchfrom (JOIN) only for search in dataform content or external tables.
+                            // Add searchfrom (JOIN) only for search in datalynx content or external tables.
                             if (!$internalfield and $fromcontent) {
                                 $searchfrom[$fieldid] = $fieldid;
                             }
@@ -189,7 +189,7 @@ class dataform_filter {
                             $whereor[] = $fieldsql;
                             $searchparams = array_merge($searchparams, $fieldparams);
 
-                            // Add searchfrom (JOIN) only for search in dataform content or external tables.
+                            // Add searchfrom (JOIN) only for search in datalynx content or external tables.
                             if (!$internalfield and $fromcontent) {
                                 $searchfrom[$fieldid] = $fieldid;
                             }
@@ -221,7 +221,7 @@ class dataform_filter {
             }
 
         } else if ($simplesearch) {
-            $searchtables .= " JOIN {dataform_contents} cs ON cs.entryid = e.id ";
+            $searchtables .= " JOIN {datalynx_contents} cs ON cs.entryid = e.id ";
             $searchlike = array(
                 'search1' => $DB->sql_like('cs.content', ':search1', false),
                 'search2' => $DB->sql_like('u.firstname', ':search2', false),
@@ -302,7 +302,7 @@ class dataform_filter {
         $contentfields = $this->contentfields;
 
         $params = array();
-        $dataformcontent = array();
+        $datalynxcontent = array();
         $whatcontent = ' ';
         $contenttables = ' ';
         
@@ -328,11 +328,11 @@ class dataform_filter {
                 if (in_array($fieldid, $this->_filteredtables)) {
                     $whatcontent[] = $selectsql;
                 
-                // If not in sort or search separate dataform_contents content b/c of limit on joins
+                // If not in sort or search separate datalynx_contents content b/c of limit on joins
                 // This content would be fetched after the entries and added to the entries
                 } else { 
-                    if ($field->is_dataform_content()) {
-                        $dataformcontent[] = $fieldid;
+                    if ($field->is_datalynx_content()) {
+                        $datalynxcontent[] = $fieldid;
                     } else {                    
                         $whatcontent[] = $selectsql;
                         $this->_filteredtables[] = $fieldid; 
@@ -354,7 +354,7 @@ class dataform_filter {
             $whatcontent = !empty($whatcontent) ? ', '. implode(', ', $whatcontent) : ' ';
             $contenttables = ' '. implode(' ', $contentfrom);
         }
-        return array($dataformcontent, $whatcontent, $contenttables, $params);
+        return array($datalynxcontent, $whatcontent, $contenttables, $params);
     }
 
     /**
@@ -408,7 +408,7 @@ class dataform_filter {
 /**
  * Filter manager class
  */
-class dataform_filter_manager {
+class datalynx_filter_manager {
 
     const USER_FILTER_MAX_NUM = 5;
     const BLANK_FILTER = -1;
@@ -439,10 +439,10 @@ class dataform_filter_manager {
         if ($filterid == self::BLANK_FILTER) {
             $filter = new object;
             $filter->dataid = $df->id();
-            $filter->name = get_string('filternew', 'dataform');
+            $filter->name = get_string('filternew', 'datalynx');
             $filter->perpage = 0;
 
-            return new dataform_filter($filter);
+            return new datalynx_filter($filter);
         }
         
         // User filter
@@ -455,14 +455,14 @@ class dataform_filter_manager {
             // User preferences
             if (($filterid == self::USER_FILTER_SET or $advanced) and $view and $view->is_active()) {
                 $filter = $this->set_user_filter($filterid, $view, $advanced);
-                return new dataform_filter($filter);
+                return new datalynx_filter($filter);
             }
         
             // Retrieve existing user filter (filter id > blank filter)
-            if ($filterid != self::USER_FILTER_SET and $filter = get_user_preferences("dataformfilter-$dfid-$viewid-$filterid", null)) {
+            if ($filterid != self::USER_FILTER_SET and $filter = get_user_preferences("datalynxfilter-$dfid-$viewid-$filterid", null)) {
                 $filter = unserialize($filter);
                 $filter->dataid = $dfid;
-                return new dataform_filter($filter);
+                return new datalynx_filter($filter);
             }
             
             // For all other "negative" cases proceed with defaults
@@ -470,14 +470,14 @@ class dataform_filter_manager {
         }
                 
             
-        // Dataform default filter
+        // Datalynx default filter
         if ($filterid == 0) {
             // If no default return empty
             if (!$df->data->defaultfilter) {
                 $filter = new object;
                 $filter->dataid = $df->id();
             
-                return new dataform_filter($filter);
+                return new datalynx_filter($filter);
                 
             // otherwise assign to filterid for the Existing filter check
             } else {
@@ -492,7 +492,7 @@ class dataform_filter_manager {
             $filter = new object;
             $filter->dataid = $df->id();
 
-            return new dataform_filter($filter);
+            return new datalynx_filter($filter);
         }
     }
 
@@ -507,7 +507,7 @@ class dataform_filter_manager {
 
         if ($options = self::get_filter_options_from_url($url)) {
             $options['dataid'] = $dfid;
-            $filter = new dataform_filter((object) $options);
+            $filter = new datalynx_filter((object) $options);
             
             if ($raw) {
                 return $filter->get_filter_obj();
@@ -525,9 +525,9 @@ class dataform_filter_manager {
         global $DB;
         if (!$this->_filters or $forceget) {
             $this->_filters = array();
-            if ($filters = $DB->get_records('dataform_filters', array('dataid' => $this->_df->id()))) {
+            if ($filters = $DB->get_records('datalynx_filters', array('dataid' => $this->_df->id()))) {
                 foreach ($filters as $filterid => $filterdata) {
-                    $this->_filters[$filterid] = new dataform_filter($filterdata);
+                    $this->_filters[$filterid] = new datalynx_filter($filterdata);
                 }
             }
         }
@@ -542,7 +542,7 @@ class dataform_filter_manager {
                         continue;
                     }
                     if ($menu) {
-                        if ($filter->visible or has_capability('mod/dataform:managetemplates', $this->_df->context)) {
+                        if ($filter->visible or has_capability('mod/datalynx:managetemplates', $this->_df->context)) {
                             $filters[$filterid] = $filter->name;
                         }
                     } else {
@@ -566,10 +566,10 @@ class dataform_filter_manager {
 
         $filters = array();
         // TODO may need new roles
-        if (has_capability('mod/dataform:managetemplates', $df->context)) {
+        if (has_capability('mod/datalynx:managetemplates', $df->context)) {
             // don't need record from database for filter form submission
             if ($fids) { // some filters are specified for action
-                $filters = $DB->get_records_select('dataform_filters', "id IN ($fids)");
+                $filters = $DB->get_records_select('datalynx_filters', "id IN ($fids)");
             } else if ($action == 'update') {
                 $filters[] = $this->get_filter_from_id(self::BLANK_FILTER);
             }
@@ -579,7 +579,7 @@ class dataform_filter_manager {
 
         // TODO update should be roled
         if (empty($filters)) {
-            $df->notifications['bad'][] = get_string("filternoneforaction", 'dataform');
+            $df->notifications['bad'][] = get_string("filternoneforaction", 'datalynx');
             return false;
         } else {
             if (!$confirmed) {
@@ -587,12 +587,12 @@ class dataform_filter_manager {
                 $df->print_header('filters');
 
                 // Print a confirmation page
-                echo $OUTPUT->confirm(get_string("filtersconfirm$action", 'dataform', count($filters)),
-                        new moodle_url('/mod/dataform/filter/index.php', array('d' => $df->id(),
+                echo $OUTPUT->confirm(get_string("filtersconfirm$action", 'datalynx', count($filters)),
+                        new moodle_url('/mod/datalynx/filter/index.php', array('d' => $df->id(),
                                                                         $action => implode(',', array_keys($filters)),
                                                                         'sesskey' => sesskey(),
                                                                         'confirmed' => 1)),
-                        new moodle_url('/mod/dataform/filter/index.php', array('d' => $df->id())));
+                        new moodle_url('/mod/datalynx/filter/index.php', array('d' => $df->id())));
 
                 echo $OUTPUT->footer();
                 exit;
@@ -623,11 +623,11 @@ class dataform_filter_manager {
                             $filter = $this->get_filter_from_form($filter, $formdata, true);
 
                             if ($filter->id) {
-                                $DB->update_record('dataform_filters', $filter);
+                                $DB->update_record('datalynx_filters', $filter);
                                 $processedfids[] = $filter->id;
                                 $strnotify = 'filtersupdated';
                             } else {
-                                $filter->id = $DB->insert_record('dataform_filters', $filter, true);
+                                $filter->id = $DB->insert_record('datalynx_filters', $filter, true);
                                 $processedfids[] = $filter->id;
                                 $strnotify = 'filtersadded';
                             }
@@ -645,7 +645,7 @@ class dataform_filter_manager {
                                 while ($df->name_exists('filters', $filter->name)) {
                                     $filter->name = 'Copy of '. $filter->name;
                                 }
-                                $filterid = $DB->insert_record('dataform_filters', $filter);
+                                $filterid = $DB->insert_record('datalynx_filters', $filter);
 
                                 $processedfids[] = $filterid;
                             }
@@ -658,7 +658,7 @@ class dataform_filter_manager {
                         foreach ($filters as $filter) {
                             $updatefilter->id = $filter->id;
                             $updatefilter->visible = (int) !$filter->visible;
-                            $DB->update_record('dataform_filters', $updatefilter);
+                            $DB->update_record('datalynx_filters', $updatefilter);
                             // Update cached filters
                             $filter->visible = $updatefilter->visible;
 
@@ -670,7 +670,7 @@ class dataform_filter_manager {
 
                     case 'delete':
                         foreach ($filters as $filter) {
-                            $DB->delete_records('dataform_filters', array('id' => $filter->id));
+                            $DB->delete_records('datalynx_filters', array('id' => $filter->id));
 
                             // reset default filter if needed
                             if ($filter->id == $df->data->defaultfilter) {
@@ -686,10 +686,10 @@ class dataform_filter_manager {
                         break;
                 }
 
-                add_to_log($df->course->id, 'dataform', 'filter '. $action, 'filter/index.php?id='. $df->cm->id, $df->id(), $df->cm->id);
+                add_to_log($df->course->id, 'datalynx', 'filter '. $action, 'filter/index.php?id='. $df->cm->id, $df->id(), $df->cm->id);
                 if (!empty($strnotify)) {
                     $filtersprocessed = $processedfids ? count($processedfids) : 'No';
-                    $df->notifications['good'][] = get_string($strnotify, 'dataform', $filtersprocessed);
+                    $df->notifications['good'][] = get_string($strnotify, 'datalynx', $filtersprocessed);
                 }
                 return $processedfids;
             }
@@ -702,12 +702,12 @@ class dataform_filter_manager {
     public function get_filter_form($filter) {
         global $CFG;
         
-        require_once("$CFG->dirroot/mod/dataform/filter/filter_form.php");
+        require_once("$CFG->dirroot/mod/datalynx/filter/filter_form.php");
         $formurl = new moodle_url(
-            '/mod/dataform/filter/index.php',
+            '/mod/datalynx/filter/index.php',
             array('d' => $this->_df->id(), 'fid' => $filter->id, 'update' => 1)
         );
-        $mform = new mod_dataform_filter_form($this->_df, $filter, $formurl);
+        $mform = new mod_datalynx_filter_form($this->_df, $filter, $formurl);
         return $mform;        
     }
 
@@ -716,7 +716,7 @@ class dataform_filter_manager {
      */
     public function display_filter_form($mform, $filter, $urlparams = null) {
 
-        $streditinga = $filter->id ? get_string('filteredit', 'dataform', $filter->name) : get_string('filternew', 'dataform');
+        $streditinga = $filter->id ? get_string('filteredit', 'datalynx', $filter->name) : get_string('filternew', 'datalynx');
         $heading = html_writer::tag('h2', format_string($streditinga), array('class' => 'mdl-align'));
 
         $this->_df->print_header(array('tab' => 'filters', 'urlparams' => $urlparams));
@@ -823,16 +823,16 @@ class dataform_filter_manager {
         
         $df = $this->_df;
         
-        $filterbaseurl = '/mod/dataform/filter/index.php';
+        $filterbaseurl = '/mod/datalynx/filter/index.php';
         $linkparams = array('d' => $df->id(), 'sesskey' => sesskey());
                         
         // table headings
         $strfilters = get_string('name');
         $strdescription = get_string('description');
-        $strperpage = get_string('filterperpage', 'dataform');
-        $strcustomsort = get_string('filtercustomsort', 'dataform');
-        $strcustomsearch = get_string('filtercustomsearch', 'dataform');
-        $strurlquery = get_string('filterurlquery', 'dataform');
+        $strperpage = get_string('filterperpage', 'datalynx');
+        $strcustomsort = get_string('filtercustomsort', 'datalynx');
+        $strcustomsearch = get_string('filtercustomsearch', 'datalynx');
+        $strurlquery = get_string('filterurlquery', 'datalynx');
         $strvisible = get_string('visible');
         $strhide = get_string('hide');
         $strshow = get_string('show');
@@ -844,7 +844,7 @@ class dataform_filter_manager {
 
         $selectallnone = html_writer::checkbox(null, null, false, null, array('onclick' => 'select_allnone(\'filter\'&#44;this.checked)'));
         $multidelete = html_writer::tag('button', 
-                                    $OUTPUT->pix_icon('t/delete', get_string('multidelete', 'dataform')), 
+                                    $OUTPUT->pix_icon('t/delete', get_string('multidelete', 'datalynx')), 
                                     array('name' => 'multidelete',
                                             'onclick' => 'bulk_action(\'filter\'&#44; \''. htmlspecialchars_decode(new moodle_url($filterbaseurl, $linkparams)). '\'&#44; \'delete\')'));
     
@@ -1000,8 +1000,8 @@ class dataform_filter_manager {
     public function print_add_filter() {
         echo html_writer::empty_tag('br');
         echo html_writer::start_tag('div', array('class'=>'fieldadd mdl-align'));
-        echo html_writer::link(new moodle_url('/mod/dataform/filter/index.php', array('d' => $this->_df->id(), 'sesskey' => sesskey(), 'new' => 1)), get_string('filteradd','dataform'));
-        //echo $OUTPUT->help_icon('filteradd', 'dataform');
+        echo html_writer::link(new moodle_url('/mod/datalynx/filter/index.php', array('d' => $this->_df->id(), 'sesskey' => sesskey(), 'new' => 1)), get_string('filteradd','datalynx'));
+        //echo $OUTPUT->help_icon('filteradd', 'datalynx');
         echo html_writer::end_tag('div');
         echo html_writer::empty_tag('br');
     }
@@ -1014,9 +1014,9 @@ class dataform_filter_manager {
     public function get_advanced_filter_form($filter, $view) {
         global $CFG;
         
-        require_once("$CFG->dirroot/mod/dataform/filter/filter_form.php");
+        require_once("$CFG->dirroot/mod/datalynx/filter/filter_form.php");
         $formurl = new moodle_url($view->get_baseurl(), array('filter' => self::USER_FILTER_SET, 'afilter' => 1));
-        $mform = new mod_dataform_advanced_filter_form($this->_df, $filter, $formurl, array('view' => $view));
+        $mform = new mod_datalynx_advanced_filter_form($this->_df, $filter, $formurl, array('view' => $view));
         return $mform;        
     }
 
@@ -1028,7 +1028,7 @@ class dataform_filter_manager {
         
         $df = $this->_df;
         $dfid = $df->id();
-        if ($filternames = get_user_preferences("dataformfilter-$dfid-$viewid-userfilters", '')) {
+        if ($filternames = get_user_preferences("datalynxfilter-$dfid-$viewid-userfilters", '')) {
             foreach (explode(';', $filternames) as $filteridname) {
                 list($filterid, $name) = explode(' ', $filteridname, 2);
                 $filters[$filterid] = $name;
@@ -1047,7 +1047,7 @@ class dataform_filter_manager {
 
         // Advanced filter
         if ($advanced) {
-            $filter = new dataform_filter((object) array('id' => $filterid, 'dataid' => $dfid));
+            $filter = new datalynx_filter((object) array('id' => $filterid, 'dataid' => $dfid));
             $mform = $this->get_advanced_filter_form($filter, $view);
 
             // Regenerate form and filter to obtain custom search data
@@ -1090,7 +1090,7 @@ class dataform_filter_manager {
             while (count($fids) >= self::USER_FILTER_MAX_NUM) {
                 $fid = array_pop($fids);
                 unset($userfilters[$fid]);
-                unset_user_preference("dataformfilter-$dfid-$viewid-$fid");
+                unset_user_preference("datalynxfilter-$dfid-$viewid-$fid");
             }
         }
 
@@ -1098,16 +1098,16 @@ class dataform_filter_manager {
         $filter->id = $filterid;
         $filter->dataid = $dfid;
         if (empty($filter->name)) {
-            $filter->name = get_string('filtermy', 'dataform'). ' '. abs($filterid);
+            $filter->name = get_string('filtermy', 'datalynx'). ' '. abs($filterid);
         }
-        set_user_preference("dataformfilter-$dfid-$viewid-$filterid", serialize($filter));
+        set_user_preference("datalynxfilter-$dfid-$viewid-$filterid", serialize($filter));
         
         // Add the new filter to the beginning of the userfilters
         $userfilters = array($filterid => $filter->name) + $userfilters;
         foreach ($userfilters as $filterid => $name) {
             $userfilters[$filterid] = "$filterid $name";
         }
-        set_user_preference("dataformfilter-$dfid-$viewid-userfilters", implode(';', $userfilters));
+        set_user_preference("datalynxfilter-$dfid-$viewid-userfilters", implode(';', $userfilters));
 
 
         return $filter;        

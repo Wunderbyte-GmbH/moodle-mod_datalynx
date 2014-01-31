@@ -15,7 +15,7 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataform_rule
+ * @package datalynx_rule
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -25,7 +25,7 @@ require_once('../mod_class.php');
 
 $urlparams = new stdClass();
 
-$urlparams->d          = optional_param('d', 0, PARAM_INT);             // dataform id
+$urlparams->d          = optional_param('d', 0, PARAM_INT);             // datalynx id
 $urlparams->id         = optional_param('id', 0, PARAM_INT);            // course module id
 $urlparams->rid        = optional_param('rid', -1 , PARAM_INT);          // update rule id
 
@@ -43,14 +43,14 @@ $urlparams->confirmed    = optional_param('confirmed', 0, PARAM_INT);
 $urlparams->update     = optional_param('update', 0, PARAM_INT);   // update rule
 $urlparams->cancel     = optional_param('cancel', 0, PARAM_BOOL);
 
-// Set a dataform object
-$df = new dataform($urlparams->d, $urlparams->id);
-require_capability('mod/dataform:managetemplates', $df->context);
+// Set a datalynx object
+$df = new datalynx($urlparams->d, $urlparams->id);
+require_capability('mod/datalynx:managetemplates', $df->context);
 
 $df->set_page('rule/index', array('modjs' => true, 'urlparams' => $urlparams));
 
 // activate navigation node
-navigation_node::override_active_url(new moodle_url('/mod/dataform/rule/index.php', array('id' => $df->cm->id)));
+navigation_node::override_active_url(new moodle_url('/mod/datalynx/rule/index.php', array('id' => $df->cm->id)));
 
 $rm = $df->get_rule_manager();
 
@@ -70,7 +70,7 @@ if ($urlparams->duplicate and confirm_sesskey()) {  // Duplicate any requested r
 
 // any notifications?
 if (!$rules = $rm->get_rules()) {
-    $df->notifications['bad'][] = get_string('rulesnoneindataform','dataform');  // nothing in dataform
+    $df->notifications['bad'][] = get_string('rulesnoneindatalynx','datalynx');  // nothing in datalynx
 }
 
 // print header

@@ -15,25 +15,25 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * This file is part of the Dataform module for Moodle - http://moodle.org/. 
+ * This file is part of the Datalynx module for Moodle - http://moodle.org/. 
  *
- * @package dataformview
+ * @package datalynxview
  * @subpackage tabular
  * @copyright 2012 Itamar Tzadok 
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once("$CFG->dirroot/mod/dataform/view/view_class.php"); 
+require_once("$CFG->dirroot/mod/datalynx/view/view_class.php"); 
  
 /**
- * A template for displaying dataform entries in a tabular list
+ * A template for displaying datalynx entries in a tabular list
  * Parameters used:
  * param1 - activity grading
  * param2 - repeated entry section
  * param3 - table header
  */
 
-class dataformview_tabular extends dataformview_base {
+class datalynxview_tabular extends datalynxview_base {
 
     protected $type = 'tabular';    
     protected $_editors = array('section', 'param2');
@@ -137,7 +137,7 @@ class dataformview_tabular extends dataformview_base {
         parent::display($options);
         global $PAGE;
         $PAGE->requires->js_init_call(
-                'M.dataformview_tabular.init',
+                'M.datalynxview_tabular.init',
                 array(),
                 false,
                 $this->get_js_module());
@@ -145,8 +145,8 @@ class dataformview_tabular extends dataformview_base {
 
     private function get_js_module() {
         $jsmodule = array(
-            'name' => 'dataformview_tabular',
-            'fullpath' => '/mod/dataform/view/tabular/tabular.js',
+            'name' => 'datalynxview_tabular',
+            'fullpath' => '/mod/datalynx/view/tabular/tabular.js',
             'requires' => array('node', 'event', 'node-event-delegate'),
             );
         return $jsmodule;
@@ -162,7 +162,7 @@ class dataformview_tabular extends dataformview_base {
         $opengroupdiv = html_writer::start_tag('div', array('class' => 'entriesview'));
         $closegroupdiv = html_writer::end_tag('div');
         if ($name) {
-            $name = ($name == 'newentry' ? get_string('entrynew', 'dataform') : $name); 
+            $name = ($name == 'newentry' ? get_string('entrynew', 'datalynx') : $name); 
         }
         $groupheading = $OUTPUT->heading($name, 3, 'main');
 

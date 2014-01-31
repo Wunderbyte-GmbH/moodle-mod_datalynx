@@ -15,19 +15,19 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage picture
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die;
 
-require_once("$CFG->dirroot/mod/dataform/field/file/renderer.php");
+require_once("$CFG->dirroot/mod/datalynx/field/file/renderer.php");
 
 /**
  *
  */
-class dataformfield_picture_renderer extends dataformfield_file_renderer {
+class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
 
     /**
      * 

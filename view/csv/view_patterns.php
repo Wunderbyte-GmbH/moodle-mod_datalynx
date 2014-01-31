@@ -15,19 +15,19 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package dataformview
+ * @package datalynxview
  * @subpackage csv
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die;
 
-require_once("$CFG->dirroot/mod/dataform/view/view_patterns.php");
+require_once("$CFG->dirroot/mod/datalynx/view/view_patterns.php");
 
 /**
  * Base class for view patterns
  */
-class dataformview_csv_patterns extends dataformview_patterns{
+class datalynxview_csv_patterns extends datalynxview_patterns{
 
     /**
      *
@@ -47,19 +47,19 @@ class dataformview_csv_patterns extends dataformview_patterns{
             switch ($tag) {
                 case '##export:all##':
                     $actionurl = new moodle_url($baseurl, array('exportcsv' => $view::EXPORT_ALL));
-                    $label = html_writer::tag('span', get_string('exportall', 'dataform'));
+                    $label = html_writer::tag('span', get_string('exportall', 'datalynx'));
                     $replacements[$tag] = html_writer::link($actionurl, $label, array('class' => 'actionlink exportall'));
 
                     break;
                 case '##export:page##':
                     $actionurl = new moodle_url($baseurl, array('exportcsv' => $view::EXPORT_PAGE));
-                    $label = html_writer::tag('span', get_string('exportpage', 'dataform'));
+                    $label = html_writer::tag('span', get_string('exportpage', 'datalynx'));
                     $replacements[$tag] = html_writer::link($actionurl, $label, array('class' => 'actionlink exportpage'));
 
                     break;
                 case '##import##':
                     $actionurl = new moodle_url($baseurl, array('importcsv' => 1));
-                    $label = html_writer::tag('span', get_string('import', 'dataform'));
+                    $label = html_writer::tag('span', get_string('import', 'datalynx'));
                     $replacements[$tag] = html_writer::link($actionurl, $label, array('class' => 'actionlink exportall'));
 
                     break;
@@ -74,7 +74,7 @@ class dataformview_csv_patterns extends dataformview_patterns{
      */
     protected function patterns() {
         $patterns = parent::patterns();
-        $cat = get_string('pluginname', 'dataformview_csv');
+        $cat = get_string('pluginname', 'datalynxview_csv');
         $patterns['##export:all##'] = array(true, $cat);
         $patterns['##export:page##'] =  array(true, $cat);
         $patterns['##import##'] = array(true, $cat);

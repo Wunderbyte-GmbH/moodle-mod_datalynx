@@ -15,7 +15,7 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    dataformtool
+ * @package    datalynxtool
  * @subpackage entryperuser
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -23,10 +23,10 @@
 
 defined('MOODLE_INTERNAL') or die;
 
-require_once("$CFG->dirroot/mod/dataform/entries_class.php");
-require_once("$CFG->dirroot/mod/dataform/field/_user/field_class.php");
+require_once("$CFG->dirroot/mod/datalynx/entries_class.php");
+require_once("$CFG->dirroot/mod/datalynx/field/_user/field_class.php");
 
-class dataformtool_entryperuser {
+class datalynxtool_entryperuser {
     /**
      *
      */
@@ -40,7 +40,7 @@ class dataformtool_entryperuser {
         
         // Construct entries data
         $data = (object) array('eids' => array());
-        $fieldid = dataformfield__user::_USERID;
+        $fieldid = datalynxfield__user::_USERID;
         $entryid = -1;
         foreach ($users as $userid => $unused) {
             $data->eids[$entryid] = $entryid;
@@ -48,7 +48,7 @@ class dataformtool_entryperuser {
             $entryid--;
         }
         // Add entries
-        $em = new dataform_entries($df);
+        $em = new datalynx_entries($df);
         $processed = $em->process_entries('update', $data->eids, $data, true);
         
         if (is_array($processed)) {
@@ -57,6 +57,6 @@ class dataformtool_entryperuser {
                return array('good', $strnotify);
             }
         }
-        return array('bad', get_string('entriesupdated', 'dataform', get_string('no')));                     
+        return array('bad', get_string('entriesupdated', 'datalynx', get_string('no')));                     
     }
 }

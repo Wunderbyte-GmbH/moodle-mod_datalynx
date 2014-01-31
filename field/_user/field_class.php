@@ -15,15 +15,15 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage _user
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once($CFG->dirroot.'/mod/dataform/field/field_class.php');
+require_once($CFG->dirroot.'/mod/datalynx/field/field_class.php');
 
-class dataformfield__user extends dataformfield_no_content {
+class datalynxfield__user extends datalynxfield_no_content {
 
     public $type = '_user';
 
@@ -49,21 +49,21 @@ class dataformfield__user extends dataformfield_no_content {
     public static function get_field_objects($dataid) {
         $fieldobjects = array();
         
-        $fieldobjects[self::_USERID] = (object) array('id' => self::_USERID, 'dataid' => $dataid, 'type' => '_user', 'name' => get_string('userid', 'dataformfield__user'), 'description' => '', 'visible' => 2, 'internalname' => 'id');
+        $fieldobjects[self::_USERID] = (object) array('id' => self::_USERID, 'dataid' => $dataid, 'type' => '_user', 'name' => get_string('userid', 'datalynxfield__user'), 'description' => '', 'visible' => 2, 'internalname' => 'id');
 
-        $fieldobjects[self::_USERNAME] = (object) array('id' => self::_USERNAME, 'dataid' => $dataid, 'type' => '_user', 'name' => get_string('username', 'dataformfield__user'), 'description' => '', 'visible' => 2, 'internalname' => 'name');
+        $fieldobjects[self::_USERNAME] = (object) array('id' => self::_USERNAME, 'dataid' => $dataid, 'type' => '_user', 'name' => get_string('username', 'datalynxfield__user'), 'description' => '', 'visible' => 2, 'internalname' => 'name');
 
-        $fieldobjects[self::_USERFIRSTNAME] = (object) array('id' => self::_USERFIRSTNAME, 'dataid' => $dataid, 'type' => '_user', 'name' => get_string('userfirstname', 'dataformfield__user'), 'description' => '', 'visible' => 2, 'internalname' => 'firstname');
+        $fieldobjects[self::_USERFIRSTNAME] = (object) array('id' => self::_USERFIRSTNAME, 'dataid' => $dataid, 'type' => '_user', 'name' => get_string('userfirstname', 'datalynxfield__user'), 'description' => '', 'visible' => 2, 'internalname' => 'firstname');
 
-        $fieldobjects[self::_USERLASTNAME] = (object) array('id' => self::_USERLASTNAME, 'dataid' => $dataid, 'type' => '_user', 'name' => get_string('userlastname', 'dataformfield__user'), 'description' => '', 'visible' => 2, 'internalname' => 'lastname');
+        $fieldobjects[self::_USERLASTNAME] = (object) array('id' => self::_USERLASTNAME, 'dataid' => $dataid, 'type' => '_user', 'name' => get_string('userlastname', 'datalynxfield__user'), 'description' => '', 'visible' => 2, 'internalname' => 'lastname');
 
-        $fieldobjects[self::_USERUSERNAME] = (object) array('id' => self::_USERUSERNAME, 'dataid' => $dataid, 'type' => '_user', 'name' => get_string('userusername', 'dataformfield__user'), 'description' => '', 'visible' => 2, 'internalname' => 'username');
+        $fieldobjects[self::_USERUSERNAME] = (object) array('id' => self::_USERUSERNAME, 'dataid' => $dataid, 'type' => '_user', 'name' => get_string('userusername', 'datalynxfield__user'), 'description' => '', 'visible' => 2, 'internalname' => 'username');
 
-        $fieldobjects[self::_USERIDNUMBER] = (object) array('id' => self::_USERIDNUMBER, 'dataid' => $dataid, 'type' => '_user', 'name' => get_string('useridnumber', 'dataformfield__user'), 'description' => '', 'visible' => 2, 'internalname' => 'idnumber');
+        $fieldobjects[self::_USERIDNUMBER] = (object) array('id' => self::_USERIDNUMBER, 'dataid' => $dataid, 'type' => '_user', 'name' => get_string('useridnumber', 'datalynxfield__user'), 'description' => '', 'visible' => 2, 'internalname' => 'idnumber');
 
-        $fieldobjects[self::_USERPICTURE] = (object) array('id' => self::_USERPICTURE, 'dataid' => $dataid, 'type' => '_user', 'name' => get_string('userpicture', 'dataformfield__user'), 'description' => '', 'visible' => 2, 'internalname' => 'picture');
+        $fieldobjects[self::_USERPICTURE] = (object) array('id' => self::_USERPICTURE, 'dataid' => $dataid, 'type' => '_user', 'name' => get_string('userpicture', 'datalynxfield__user'), 'description' => '', 'visible' => 2, 'internalname' => 'picture');
 
-        $fieldobjects[self::_USEREMAIL] = (object) array('id' => self::_USEREMAIL, 'dataid' => $dataid, 'type' => '_user', 'name' => get_string('useremail', 'dataformfield__user'), 'description' => '', 'visible' => 2, 'internalname' => 'email');
+        $fieldobjects[self::_USEREMAIL] = (object) array('id' => self::_USEREMAIL, 'dataid' => $dataid, 'type' => '_user', 'name' => get_string('useremail', 'datalynxfield__user'), 'description' => '', 'visible' => 2, 'internalname' => 'email');
 
         return $fieldobjects;
     }
@@ -127,7 +127,7 @@ class dataformfield__user extends dataformfield_no_content {
                 return false;
             }
         } else {
-            return parent::parse_search($dataform, $i);
+            return parent::parse_search($datalynx, $i);
         }
 
     }
@@ -142,7 +142,7 @@ class dataformfield__user extends dataformfield_no_content {
         $contentfull = $this->get_sort_sql();
         $sql = "SELECT DISTINCT $contentfull 
                   FROM {user} u 
-                       JOIN {dataform_entries} e ON u.id = e.userid 
+                       JOIN {datalynx_entries} e ON u.id = e.userid 
                  WHERE e.dataid = ? AND  $contentfull IS NOT NULL 
                  ORDER BY $contentfull $sortdir";
 
@@ -170,8 +170,8 @@ class dataformfield__user extends dataformfield_no_content {
             case 'name':
                 return array(
                     '' => '&lt;' . get_string('choose') . '&gt;',
-                    'ME' => get_string('me', 'dataform'),
-                    'OTHER_USER' => get_string('otheruser', 'dataform'),
+                    'ME' => get_string('me', 'datalynx'),
+                    'OTHER_USER' => get_string('otheruser', 'datalynx'),
                 );
             default:
                 return parent::get_supported_search_operators();

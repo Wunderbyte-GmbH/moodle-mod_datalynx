@@ -15,15 +15,15 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage multiselect
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once("$CFG->dirroot/mod/dataform/field/field_class.php");
+require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
-class dataformfield_multiselect extends dataformfield_base {
+class datalynxfield_multiselect extends datalynxfield_base {
 
     public $type = 'multiselect';
     protected $_options = array();
@@ -39,7 +39,7 @@ class dataformfield_multiselect extends dataformfield_base {
     /**
      * Class constructor
      *
-     * @param var $df       dataform id or class object
+     * @param var $df       datalynx id or class object
      * @param var $field    field id or DB record
      */
     public function __construct($df = 0, $field = 0) {
@@ -70,7 +70,7 @@ class dataformfield_multiselect extends dataformfield_base {
         list($not, $operator, $value) = $searchparams;
         if (is_array($value)){
             $selected = implode(', ', $value['selected']);
-            $allrequired = '('. ($value['allrequired'] ? get_string('requiredall') : get_string('requirednotall', 'dataform')). ')';
+            $allrequired = '('. ($value['allrequired'] ? get_string('requiredall') : get_string('requirednotall', 'datalynx')). ')';
             return $not. ' '. $operator. ' '. $selected. ' '. $allrequired;
         } else {
             return false;

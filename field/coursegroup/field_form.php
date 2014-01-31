@@ -15,14 +15,14 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage coursegroup
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once("$CFG->dirroot/mod/dataform/field/field_form.php");
+require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
-class dataformfield_coursegroup_form extends dataformfield_form {
+class datalynxfield_coursegroup_form extends datalynxfield_form {
 
     /**
      *
@@ -33,7 +33,7 @@ class dataformfield_coursegroup_form extends dataformfield_form {
         $mform =& $this->_form;
 
     //-------------------------------------------------------------------------------
-        $mform->addElement('header', 'fieldattributeshdr', get_string('fieldattributes', 'dataform'));
+        $mform->addElement('header', 'fieldattributeshdr', get_string('fieldattributes', 'datalynx'));
         
         // course
         $courses = get_courses("all", "c.sortorder ASC", "c.id,c.fullname"); 
@@ -59,16 +59,16 @@ class dataformfield_coursegroup_form extends dataformfield_form {
         $options = array(
             'coursefield' => 'param1',
             'groupfield' => 'param2',
-            'acturl' => "$CFG->wwwroot/mod/dataform/field/coursegroup/loadgroups.php"
+            'acturl' => "$CFG->wwwroot/mod/datalynx/field/coursegroup/loadgroups.php"
         );
 
         $module = array(
-            'name' => 'M.dataformfield_coursegroup_load_course_groups',
-            'fullpath' => '/mod/dataform/field/coursegroup/coursegroup.js',
+            'name' => 'M.datalynxfield_coursegroup_load_course_groups',
+            'fullpath' => '/mod/datalynx/field/coursegroup/coursegroup.js',
             'requires' => array('base','io','node')
         );
 
-        $PAGE->requires->js_init_call('M.dataformfield_coursegroup_load_course_groups.init', array($options), false, $module);       
+        $PAGE->requires->js_init_call('M.datalynxfield_coursegroup_load_course_groups.init', array($options), false, $module);       
     }
 
 }

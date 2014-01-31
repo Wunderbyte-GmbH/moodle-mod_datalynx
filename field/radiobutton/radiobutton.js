@@ -1,5 +1,5 @@
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage radiobutton
  * @copyright  2013 Itamar Tzadok
  */
@@ -7,9 +7,9 @@
 /**
  * Select registrations for multiactions
  */
-M.dataformfield_radiobutton_required = {};
+M.datalynxfield_radiobutton_required = {};
 
-M.dataformfield_radiobutton_required.init = function(Y, options) {
+M.datalynxfield_radiobutton_required.init = function(Y, options) {
     YUI().use('node', function (Y) {
         var fieldname = options.fieldname;
         var selected = options.selected;

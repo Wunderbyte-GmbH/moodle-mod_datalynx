@@ -16,13 +16,13 @@
  
 /**
  * @package mod
- * @subpackage dataform
+ * @subpackage datalynx
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * The Dataform has been developed as an enhanced counterpart
+ * The Datalynx has been developed as an enhanced counterpart
  * of Moodle's Database activity module (1.9.11+ (20110323)).
- * To the extent that Dataform code corresponds to Database code,
+ * To the extent that Datalynx code corresponds to Database code,
  * certain copyrights on the Database module may obtain.
  */
 
@@ -33,13 +33,13 @@
 defined('MOODLE_INTERNAL') or die;
 
 /**
- * Adds an instance of a dataform
+ * Adds an instance of a datalynx
  *
  * @global object
  * @param object $data
  * @return $int
  */
-function dataform_add_instance($data) {
+function datalynx_add_instance($data) {
     global $CFG, $DB;
 
     $data->timemodified = time();
@@ -49,15 +49,15 @@ function dataform_add_instance($data) {
         $data->grademethod = 0;
     }
 
-    if ($CFG->dataform_maxentries) {
-        $data->maxentries = $CFG->dataform_maxentries;
+    if ($CFG->datalynx_maxentries) {
+        $data->maxentries = $CFG->datalynx_maxentries;
     }
 
-    if (!$data->id = $DB->insert_record('dataform', $data)) {
+    if (!$data->id = $DB->insert_record('datalynx', $data)) {
         return false;
     }
 
-    dataform_grade_item_update($data);
+    datalynx_grade_item_update($data);
     return $data->id;
 }
 
@@ -68,7 +68,7 @@ function dataform_add_instance($data) {
  * @param object $data
  * @return bool
  */
-function dataform_update_instance($data) {
+function datalynx_update_instance($data) {
     global  $DB;
 
     $data->id = $data->instance;
@@ -80,11 +80,11 @@ function dataform_update_instance($data) {
         $data->grademethod = 0;
     }
 
-    if (!$DB->update_record('dataform', $data)) {
+    if (!$DB->update_record('datalynx', $data)) {
         return false;
     }
 
-    dataform_update_grades($data);
+    datalynx_update_grades($data);
 
     return true;
 }
@@ -96,35 +96,35 @@ function dataform_update_instance($data) {
  * @param int $id
  * @return bool
  */
-function dataform_delete_instance($id) {
+function datalynx_delete_instance($id) {
     global $DB;
 
-    if (!$data = $DB->get_record('dataform', array('id'=>$id))) {
+    if (!$data = $DB->get_record('datalynx', array('id'=>$id))) {
         return false;
     }
 
-    $cm = get_coursemodule_from_instance('dataform', $data->id);
+    $cm = get_coursemodule_from_instance('datalynx', $data->id);
     $context = context_module::instance($cm->id);
 
     // files
     $fs = get_file_storage();
-    $fs->delete_area_files($context->id, 'mod_dataform');
+    $fs->delete_area_files($context->id, 'mod_datalynx');
 
-    // get all the content in this dataform
-    $sql = "SELECT e.id FROM {dataform_entries} e WHERE e.dataid = ?";
-    $DB->delete_records_select('dataform_contents', "entryid IN ($sql)", array($id));
+    // get all the content in this datalynx
+    $sql = "SELECT e.id FROM {datalynx_entries} e WHERE e.dataid = ?";
+    $DB->delete_records_select('datalynx_contents', "entryid IN ($sql)", array($id));
 
     // delete fields views filters entries
-    $DB->delete_records('dataform_fields', array('dataid'=>$id));
-    $DB->delete_records('dataform_views', array('dataid'=>$id));
-    $DB->delete_records('dataform_filters', array('dataid'=>$id));
-    $DB->delete_records('dataform_entries', array('dataid'=>$id));
+    $DB->delete_records('datalynx_fields', array('dataid'=>$id));
+    $DB->delete_records('datalynx_views', array('dataid'=>$id));
+    $DB->delete_records('datalynx_filters', array('dataid'=>$id));
+    $DB->delete_records('datalynx_entries', array('dataid'=>$id));
 
     // Delete the instance itself
-    $result = $DB->delete_records('dataform', array('id'=>$id));
+    $result = $DB->delete_records('datalynx', array('id'=>$id));
 
     // cleanup gradebook
-    dataform_grade_item_delete($data);
+    datalynx_grade_item_delete($data);
 
     return $result;
 }
@@ -136,8 +136,8 @@ function dataform_delete_instance($id) {
  * @param stdClass $parentcontext Block's parent context
  * @param stdClass $currentcontext Current context of block
  */
-function dataform_page_type_list($pagetype, $parentcontext, $currentcontext) {
-    $module_pagetype = array('mod-dataform-*'=>get_string('page-mod-dataform-x', 'dataform'));
+function datalynx_page_type_list($pagetype, $parentcontext, $currentcontext) {
+    $module_pagetype = array('mod-datalynx-*'=>get_string('page-mod-datalynx-x', 'datalynx'));
     return $module_pagetype;
 }
 
@@ -151,26 +151,26 @@ function dataform_page_type_list($pagetype, $parentcontext, $currentcontext) {
  *
  * @param $mform form passed by reference
  */
-function dataform_reset_course_form_definition(&$mform) {
-    $mform->addElement('header', 'dataformheader', get_string('modulenameplural', 'dataform'));
-    $mform->addElement('checkbox', 'reset_dataform_data', get_string('entriesdeleteall','dataform'));
+function datalynx_reset_course_form_definition(&$mform) {
+    $mform->addElement('header', 'datalynxheader', get_string('modulenameplural', 'datalynx'));
+    $mform->addElement('checkbox', 'reset_datalynx_data', get_string('entriesdeleteall','datalynx'));
 
-    $mform->addElement('checkbox', 'reset_dataform_notenrolled', get_string('deletenotenrolled', 'dataform'));
-    $mform->disabledIf('reset_dataform_notenrolled', 'reset_dataform_data', 'checked');
+    $mform->addElement('checkbox', 'reset_datalynx_notenrolled', get_string('deletenotenrolled', 'datalynx'));
+    $mform->disabledIf('reset_datalynx_notenrolled', 'reset_datalynx_data', 'checked');
 
-    $mform->addElement('checkbox', 'reset_dataform_ratings', get_string('deleteallratings'));
-    $mform->disabledIf('reset_dataform_ratings', 'reset_dataform_data', 'checked');
+    $mform->addElement('checkbox', 'reset_datalynx_ratings', get_string('deleteallratings'));
+    $mform->disabledIf('reset_datalynx_ratings', 'reset_datalynx_data', 'checked');
 
-    $mform->addElement('checkbox', 'reset_dataform_comments', get_string('deleteallcomments'));
-    $mform->disabledIf('reset_dataform_comments', 'reset_dataform_data', 'checked');
+    $mform->addElement('checkbox', 'reset_datalynx_comments', get_string('deleteallcomments'));
+    $mform->disabledIf('reset_datalynx_comments', 'reset_datalynx_data', 'checked');
 }
 
 /**
  * Course reset form defaults.
  * @return array
  */
-function dataform_reset_course_form_defaults($course) {
-    return array('reset_dataform_data'=>0, 'reset_dataform_ratings'=>1, 'reset_dataform_comments'=>1, 'reset_dataform_notenrolled'=>0);
+function datalynx_reset_course_form_defaults($course) {
+    return array('reset_datalynx_data'=>0, 'reset_datalynx_ratings'=>1, 'reset_datalynx_comments'=>1, 'reset_datalynx_notenrolled'=>0);
 }
 
 /**
@@ -181,16 +181,16 @@ function dataform_reset_course_form_defaults($course) {
  * @param int $courseid
  * @param string $type optional type
  */
-function dataform_reset_gradebook($courseid, $type='') {
+function datalynx_reset_gradebook($courseid, $type='') {
     global $DB;
 
     $sql = "SELECT d.*, cm.idnumber as cmidnumber, d.course as courseid
-              FROM {dataform} d, {course_modules} cm, {modules} m
-             WHERE m.name='dataform' AND m.id=cm.module AND cm.instance=d.id AND d.course=?";
+              FROM {datalynx} d, {course_modules} cm, {modules} m
+             WHERE m.name='datalynx' AND m.id=cm.module AND cm.instance=d.id AND d.course=?";
 
-    if ($dataforms = $DB->get_records_sql($sql, array($courseid))) {
-        foreach ($dataforms as $dataform) {
-            dataform_grade_item_update($dataform, 'reset');
+    if ($datalynxs = $DB->get_records_sql($sql, array($courseid))) {
+        foreach ($datalynxs as $datalynx) {
+            datalynx_grade_item_update($datalynx, 'reset');
         }
     }
 }
@@ -204,40 +204,40 @@ function dataform_reset_gradebook($courseid, $type='') {
  * @param object $data the data submitted from the reset course.
  * @return array status array
  */
-function dataform_reset_userdata($data) {
+function datalynx_reset_userdata($data) {
     global $CFG, $DB;
 
     require_once($CFG->libdir.'/filelib.php');
     require_once($CFG->dirroot.'/rating/lib.php');
 
-    $componentstr = get_string('modulenameplural', 'dataform');
+    $componentstr = get_string('modulenameplural', 'datalynx');
     $status = array();
 
     $allrecordssql = "SELECT e.id
-                        FROM {dataform_entries} e
-                             INNER JOIN {dataform} d ON e.dataid = d.id
+                        FROM {datalynx_entries} e
+                             INNER JOIN {datalynx} d ON e.dataid = d.id
                        WHERE d.course = ?";
 
     $alldatassql = "SELECT d.id
-                      FROM {dataform} d
+                      FROM {datalynx} d
                      WHERE d.course=?";
 
     $rm = new rating_manager();
     $ratingdeloptions = new stdClass;
-    $ratingdeloptions->component = 'mod_dataform';
+    $ratingdeloptions->component = 'mod_datalynx';
     $ratingdeloptions->ratingarea = 'entry';
 
     // delete entries if requested
-    if (!empty($data->reset_dataform_data)) {
+    if (!empty($data->reset_datalynx_data)) {
         $DB->delete_records_select('comments', "itemid IN ($allrecordssql) AND commentarea='entry'", array($data->courseid));
-        $DB->delete_records_select('dataform_contents', "entryid IN ($allrecordssql)", array($data->courseid));
-        $DB->delete_records_select('dataform_entries', "dataid IN ($alldatassql)", array($data->courseid));
+        $DB->delete_records_select('datalynx_contents', "entryid IN ($allrecordssql)", array($data->courseid));
+        $DB->delete_records_select('datalynx_entries', "dataid IN ($alldatassql)", array($data->courseid));
 
         if ($datas = $DB->get_records_sql($alldatassql, array($data->courseid))) {
             foreach ($datas as $dataid=>$unused) {
-                fulldelete("$CFG->dataroot/$data->courseid/moddata/dataform/$dataid");
+                fulldelete("$CFG->dataroot/$data->courseid/moddata/datalynx/$dataid");
 
-                if (!$cm = get_coursemodule_from_instance('dataform', $dataid)) {
+                if (!$cm = get_coursemodule_from_instance('datalynx', $dataid)) {
                     continue;
                 }
                 $datacontext = context_module::instance($cm->id);
@@ -249,16 +249,16 @@ function dataform_reset_userdata($data) {
 
         if (empty($data->reset_gradebook_grades)) {
             // remove all grades from gradebook
-            dataform_reset_gradebook($data->courseid);
+            datalynx_reset_gradebook($data->courseid);
         }
-        $status[] = array('component'=>$componentstr, 'item'=>get_string('entriesdeleteall', 'dataform'), 'error'=>false);
+        $status[] = array('component'=>$componentstr, 'item'=>get_string('entriesdeleteall', 'datalynx'), 'error'=>false);
     }
 
     // remove entries by users not enrolled into course
-    if (!empty($data->reset_dataform_notenrolled)) {
+    if (!empty($data->reset_datalynx_notenrolled)) {
         $recordssql = "SELECT e.id, e.userid, e.dataid, u.id AS userexists, u.deleted AS userdeleted
-                         FROM {dataform_entries} e
-                              INNER JOIN {dataform} d ON e.dataid = d.id
+                         FROM {datalynx_entries} e
+                              INNER JOIN {datalynx} d ON e.dataid = d.id
                               LEFT OUTER JOIN {user} u ON e.userid = u.id
                         WHERE d.course = ? AND e.userid > 0";
 
@@ -270,7 +270,7 @@ function dataform_reset_userdata($data) {
             if (array_key_exists($record->userid, $notenrolled) or !$record->userexists or $record->userdeleted
               or !is_enrolled($course_context, $record->userid)) {
                 //delete ratings
-                if (!$cm = get_coursemodule_from_instance('dataform', $record->dataid)) {
+                if (!$cm = get_coursemodule_from_instance('datalynx', $record->dataid)) {
                     continue;
                 }
                 $datacontext = context_module::instance($cm->id);
@@ -279,31 +279,31 @@ function dataform_reset_userdata($data) {
                 $rm->delete_ratings($ratingdeloptions);
 
                 $DB->delete_records('comments', array('itemid'=>$record->id, 'commentarea'=>'entry'));
-                $DB->delete_records('dataform_contents', array('entryid'=>$record->id));
-                $DB->delete_records('dataform_entries', array('id'=>$record->id));
+                $DB->delete_records('datalynx_contents', array('entryid'=>$record->id));
+                $DB->delete_records('datalynx_entries', array('id'=>$record->id));
                 // HACK: this is ugly - the entryid should be before the fieldid!
                 if (!array_key_exists($record->dataid, $fields)) {
-                    if ($fs = $DB->get_records('dataform_fields', array('dataid'=>$record->dataid))) {
+                    if ($fs = $DB->get_records('datalynx_fields', array('dataid'=>$record->dataid))) {
                         $fields[$record->dataid] = array_keys($fs);
                     } else {
                         $fields[$record->dataid] = array();
                     }
                 }
                 foreach($fields[$record->dataid] as $fieldid) {
-                    fulldelete("$CFG->dataroot/$data->courseid/moddata/dataform/$record->dataid/$fieldid/$record->id");
+                    fulldelete("$CFG->dataroot/$data->courseid/moddata/datalynx/$record->dataid/$fieldid/$record->id");
                 }
                 $notenrolled[$record->userid] = true;
             }
             rs_close($rs);
-            $status[] = array('component'=>$componentstr, 'item'=>get_string('deletenotenrolled', 'dataform'), 'error'=>false);
+            $status[] = array('component'=>$componentstr, 'item'=>get_string('deletenotenrolled', 'datalynx'), 'error'=>false);
         }
     }
 
     // remove all ratings
-    if (!empty($data->reset_dataform_ratings)) {
+    if (!empty($data->reset_datalynx_ratings)) {
         if ($datas = $DB->get_records_sql($alldatassql, array($data->courseid))) {
             foreach ($datas as $dataid=>$unused) {
-                if (!$cm = get_coursemodule_from_instance('dataform', $dataid)) {
+                if (!$cm = get_coursemodule_from_instance('datalynx', $dataid)) {
                     continue;
                 }
                 $datacontext = context_module::instance($cm->id);
@@ -315,21 +315,21 @@ function dataform_reset_userdata($data) {
 
         if (empty($data->reset_gradebook_grades)) {
             // remove all grades from gradebook
-            dataform_reset_gradebook($data->courseid);
+            datalynx_reset_gradebook($data->courseid);
         }
 
         $status[] = array('component'=>$componentstr, 'item'=>get_string('deleteallratings'), 'error'=>false);
     }
 
     // remove all comments
-    if (!empty($data->reset_dataform_comments)) {
+    if (!empty($data->reset_datalynx_comments)) {
         $DB->delete_records_select('comments', "itemid IN ($allrecordssql) AND commentarea='entry'", array($data->courseid));
         $status[] = array('component'=>$componentstr, 'item'=>get_string('deleteallcomments'), 'error'=>false);
     }
 
     // updating dates - shift may be negative too
     if ($data->timeshift) {
-        shift_course_mod_dates('dataform', array('timeavailable', 'timedue'), $data->timeshift, $data->courseid);
+        shift_course_mod_dates('datalynx', array('timeavailable', 'timedue'), $data->timeshift, $data->courseid);
         $status[] = array('component'=>$componentstr, 'item'=>get_string('datechanged'), 'error'=>false);
     }
 
@@ -341,7 +341,7 @@ function dataform_reset_userdata($data) {
  *
  * @return array
  */
-function dataform_get_extra_capabilities() {
+function datalynx_get_extra_capabilities() {
     return array('moodle/site:accessallgroups',
                 'moodle/site:viewfullnames',
                 'moodle/rating:view',
@@ -357,7 +357,7 @@ function dataform_get_extra_capabilities() {
  * @param string $feature FEATURE_xx constant for requested feature
  * @return mixed True if module supports feature, null if doesn't know
  */
-function dataform_supports($feature) {
+function datalynx_supports($feature) {
     switch($feature) {
         case FEATURE_GROUPS:                  return true;
         case FEATURE_GROUPINGS:               return true;
@@ -383,7 +383,7 @@ function dataform_supports($feature) {
  * @param object $context
  * @return array
  */
-function dataform_get_file_areas($course, $cm, $context) {
+function datalynx_get_file_areas($course, $cm, $context) {
     $areas = array(
         'viewsection' => 'View template files',
         'viewparam2' => 'Entry template files',
@@ -394,7 +394,7 @@ function dataform_get_file_areas($course, $cm, $context) {
 
 
 /**
- * File browsing support for dataform module.
+ * File browsing support for datalynx module.
  *
  * @param file_browser $browser
  * @param array $areas
@@ -407,7 +407,7 @@ function dataform_get_file_areas($course, $cm, $context) {
  * @param string $filename
  * @return file_info_stored file_info_stored instance or null if not found
  */
-function dataform_get_file_info($browser, $areas, $course, $cm, $context, $filearea, $itemid, $filepath, $filename) {
+function datalynx_get_file_info($browser, $areas, $course, $cm, $context, $filearea, $itemid, $filepath, $filename) {
     global $CFG, $DB, $USER;
 
     if ($context->contextlevel != CONTEXT_MODULE) {
@@ -419,18 +419,18 @@ function dataform_get_file_info($browser, $areas, $course, $cm, $context, $filea
     }
 
     if (is_null($itemid)) {
-        require_once($CFG->dirroot.'/mod/dataform/locallib.php');
-        return new dataform_file_info_container($browser, $course, $cm, $context, $areas, $filearea);
+        require_once($CFG->dirroot.'/mod/datalynx/locallib.php');
+        return new datalynx_file_info_container($browser, $course, $cm, $context, $areas, $filearea);
     }
 
-    if (!$view = $DB->get_record('dataform_views', array('id' => $itemid))) {
+    if (!$view = $DB->get_record('datalynx_views', array('id' => $itemid))) {
         return null;
     }
 
     $fs = get_file_storage();
     $filepath = is_null($filepath) ? '/' : $filepath;
     $filename = is_null($filename) ? '.' : $filename;
-    if (!($storedfile = $fs->get_file($context->id, 'mod_dataform', $filearea, $itemid, $filepath, $filename))) {
+    if (!($storedfile = $fs->get_file($context->id, 'mod_datalynx', $filearea, $itemid, $filepath, $filename))) {
         return null;
     }
 
@@ -440,7 +440,7 @@ function dataform_get_file_info($browser, $areas, $course, $cm, $context, $filea
 }
 
 /**
- * Serves the dataform attachments. Implements needed access control ;-)
+ * Serves the datalynx attachments. Implements needed access control ;-)
  *
  * @param object $course
  * @param object $cm
@@ -450,7 +450,7 @@ function dataform_get_file_info($browser, $areas, $course, $cm, $context, $filea
  * @param bool $forcedownload
  * @return bool false if file not found, does not return if found - justsend the file
  */
-function mod_dataform_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload) {
+function mod_datalynx_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload) {
     global $CFG, $DB, $USER;
 
     // FIELD CONTENT files
@@ -458,11 +458,11 @@ function mod_dataform_pluginfile($course, $cm, $context, $filearea, $args, $forc
 
         $contentid = (int)array_shift($args);
 
-        if (!$content = $DB->get_record('dataform_contents', array('id'=>$contentid))) {
+        if (!$content = $DB->get_record('datalynx_contents', array('id'=>$contentid))) {
             return false;
         }
 
-        if (!$field = $DB->get_record('dataform_fields', array('id'=>$content->fieldid))) {
+        if (!$field = $DB->get_record('datalynx_fields', array('id'=>$content->fieldid))) {
             return false;
         }
 
@@ -476,21 +476,21 @@ function mod_dataform_pluginfile($course, $cm, $context, $filearea, $args, $forc
         }
         
 
-        if (!$entry = $DB->get_record('dataform_entries', array('id'=>$content->entryid))) {
+        if (!$entry = $DB->get_record('datalynx_entries', array('id'=>$content->entryid))) {
             return false;
         }
 
-        if (!$dataform = $DB->get_record('dataform', array('id'=>$field->dataid))) {
+        if (!$datalynx = $DB->get_record('datalynx', array('id'=>$field->dataid))) {
             return false;
         }
 
-        if ($dataform->id != $cm->instance) {
+        if ($datalynx->id != $cm->instance) {
             // hacker attempt - context does not match the contentid
             return false;
         }
 
         //check if approved
-        if ($dataform->approval and !has_capability('mod/dataform:approve', $context) and !$entry->approved and $USER->id != $entry->userid) {
+        if ($datalynx->approval and !has_capability('mod/datalynx:approve', $context) and !$entry->approved and $USER->id != $entry->userid) {
             return false;
         }
 
@@ -510,20 +510,20 @@ function mod_dataform_pluginfile($course, $cm, $context, $filearea, $args, $forc
             if (empty($USER->id)) {
                 return false;
             }
-            if ($USER->id != $entry->userid and !has_capability('mod/dataform:manageentries', $context)) {
+            if ($USER->id != $entry->userid and !has_capability('mod/datalynx:manageentries', $context)) {
                 return false;
             }
         }
 
         // TODO
         //require_once("field/$field->type/field_class.php");
-        //$fieldclass = "dataformfield_$field->type";
+        //$fieldclass = "datalynxfield_$field->type";
         //if (!$fieldclass::file_ok($relativepath)) {
         //    return false;
         //}
 
         $relativepath = implode('/', $args);
-        $fullpath = "/$context->id/mod_dataform/content/$contentid/$relativepath";
+        $fullpath = "/$context->id/mod_datalynx/content/$contentid/$relativepath";
 
         $fs = get_file_storage();
         if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
@@ -538,7 +538,7 @@ function mod_dataform_pluginfile($course, $cm, $context, $filearea, $args, $forc
         require_course_login($course, true, $cm);
 
         $relativepath = implode('/', $args);
-        $fullpath = "/$context->id/mod_dataform/$filearea/$relativepath";
+        $fullpath = "/$context->id/mod_datalynx/$filearea/$relativepath";
 
         $fs = get_file_storage();
         if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
@@ -555,7 +555,7 @@ function mod_dataform_pluginfile($course, $cm, $context, $filearea, $args, $forc
         require_course_login($course, true, $cm);
 
         $relativepath = implode('/', $args);
-        $fullpath = "/$context->id/mod_dataform/$filearea/$relativepath";
+        $fullpath = "/$context->id/mod_datalynx/$filearea/$relativepath";
 
         $fs = get_file_storage();
         if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
@@ -572,7 +572,7 @@ function mod_dataform_pluginfile($course, $cm, $context, $filearea, $args, $forc
         require_course_login($course, true, $cm);
 
         $relativepath = implode('/', $args);
-        $fullpath = "/$context->id/mod_dataform/$filearea/$relativepath";
+        $fullpath = "/$context->id/mod_datalynx/$filearea/$relativepath";
 
         $fs = get_file_storage();
         if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
@@ -588,7 +588,7 @@ function mod_dataform_pluginfile($course, $cm, $context, $filearea, $args, $forc
         require_course_login($course, true, $cm);
 
         $relativepath = implode('/', $args);
-        $fullpath = "/$context->id/mod_dataform/$filearea/$relativepath";
+        $fullpath = "/$context->id/mod_datalynx/$filearea/$relativepath";
 
         $fs = get_file_storage();
         if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
@@ -606,10 +606,10 @@ function mod_dataform_pluginfile($course, $cm, $context, $filearea, $args, $forc
         $itemid = (int)array_shift($args);
 
         $relativepath = implode('/', $args);
-        $fullpath = "/$context->id/mod_dataform/$filearea/$itemid/$relativepath";
+        $fullpath = "/$context->id/mod_datalynx/$filearea/$itemid/$relativepath";
 
         //require_once("field/$field->type/field_class.php");
-        //$fieldclass = "dataformfield_$field->type";
+        //$fieldclass = "datalynxfield_$field->type";
         //if (!$fieldclass::file_ok($relativepath)) {
         //    return false;
         //}
@@ -629,7 +629,7 @@ function mod_dataform_pluginfile($course, $cm, $context, $filearea, $args, $forc
 /**
  *
  */
-function dataform_extend_navigation($navigation, $course, $module, $cm) {
+function datalynx_extend_navigation($navigation, $course, $module, $cm) {
 }
 
 /**
@@ -638,20 +638,20 @@ function dataform_extend_navigation($navigation, $course, $module, $cm) {
  * @param settings_navigation $settings The settings navigation object
  * @param navigation_node $datanode The node to add module settings to
  */
-function dataform_extend_settings_navigation(settings_navigation $settings, navigation_node $dfnode) {
+function datalynx_extend_settings_navigation(settings_navigation $settings, navigation_node $dfnode) {
     global $PAGE, $USER;
     
-    $templatesmanager = has_capability('mod/dataform:managetemplates', $PAGE->cm->context);
-    $entriesmanager = has_capability('mod/dataform:manageentries', $PAGE->cm->context);
+    $templatesmanager = has_capability('mod/datalynx:managetemplates', $PAGE->cm->context);
+    $entriesmanager = has_capability('mod/datalynx:manageentries', $PAGE->cm->context);
 
     // delete
     if ($templatesmanager) {
-        $dfnode->add(get_string('renew', 'dataform'), new moodle_url('/mod/dataform/view.php', array('id' => $PAGE->cm->id, 'renew' => 1, 'sesskey' => sesskey())));    
+        $dfnode->add(get_string('renew', 'datalynx'), new moodle_url('/mod/datalynx/view.php', array('id' => $PAGE->cm->id, 'renew' => 1, 'sesskey' => sesskey())));    
         $dfnode->add(get_string('delete'), new moodle_url('/course/mod.php', array('delete' => $PAGE->cm->id, 'sesskey' => sesskey())));    
     }
 
     // index
-    $dfnode->add(get_string('index', 'dataform'), new moodle_url('/mod/dataform/index.php', array('id' => $PAGE->course->id)));    
+    $dfnode->add(get_string('index', 'datalynx'), new moodle_url('/mod/datalynx/index.php', array('id' => $PAGE->course->id)));    
 
     // notifications
     if (isloggedin() and !isguestuser()) {
@@ -660,18 +660,18 @@ function dataform_extend_settings_navigation(settings_navigation $settings, navi
     
     // manage
     if ($templatesmanager or $entriesmanager) {
-        $manage = $dfnode->add(get_string('manage', 'dataform'));
+        $manage = $dfnode->add(get_string('manage', 'datalynx'));
         if ($templatesmanager) {
-            $manage->add(get_string('views', 'dataform'), new moodle_url('/mod/dataform/view/index.php', array('id' => $PAGE->cm->id)));
-            $manage->add(get_string('fields', 'dataform'), new moodle_url('/mod/dataform/field/index.php', array('id' => $PAGE->cm->id)));
-            $manage->add(get_string('filters', 'dataform'), new moodle_url('/mod/dataform/filter/index.php', array('id' => $PAGE->cm->id)));
-            $manage->add(get_string('rules', 'dataform'), new moodle_url('/mod/dataform/rule/index.php', array('id' => $PAGE->cm->id)));
-            $manage->add(get_string('tools', 'dataform'), new moodle_url('/mod/dataform/tool/index.php', array('id' => $PAGE->cm->id)));
-            $manage->add(get_string('jsinclude', 'dataform'), new moodle_url('/mod/dataform/js.php', array('id' => $PAGE->cm->id, 'jsedit' => 1)));
-            $manage->add(get_string('cssinclude', 'dataform'), new moodle_url('/mod/dataform/css.php', array('id' => $PAGE->cm->id, 'cssedit' => 1)));
-            $manage->add(get_string('presets', 'dataform'), new moodle_url('/mod/dataform/preset/index.php', array('id' => $PAGE->cm->id)));
+            $manage->add(get_string('views', 'datalynx'), new moodle_url('/mod/datalynx/view/index.php', array('id' => $PAGE->cm->id)));
+            $manage->add(get_string('fields', 'datalynx'), new moodle_url('/mod/datalynx/field/index.php', array('id' => $PAGE->cm->id)));
+            $manage->add(get_string('filters', 'datalynx'), new moodle_url('/mod/datalynx/filter/index.php', array('id' => $PAGE->cm->id)));
+            $manage->add(get_string('rules', 'datalynx'), new moodle_url('/mod/datalynx/rule/index.php', array('id' => $PAGE->cm->id)));
+            $manage->add(get_string('tools', 'datalynx'), new moodle_url('/mod/datalynx/tool/index.php', array('id' => $PAGE->cm->id)));
+            $manage->add(get_string('jsinclude', 'datalynx'), new moodle_url('/mod/datalynx/js.php', array('id' => $PAGE->cm->id, 'jsedit' => 1)));
+            $manage->add(get_string('cssinclude', 'datalynx'), new moodle_url('/mod/datalynx/css.php', array('id' => $PAGE->cm->id, 'cssedit' => 1)));
+            $manage->add(get_string('presets', 'datalynx'), new moodle_url('/mod/datalynx/preset/index.php', array('id' => $PAGE->cm->id)));
         }
-        $manage->add(get_string('import', 'dataform'), new moodle_url('/mod/dataform/import.php', array('id' => $PAGE->cm->id)));
+        $manage->add(get_string('import', 'datalynx'), new moodle_url('/mod/datalynx/import.php', array('id' => $PAGE->cm->id)));
     }
 
 }
@@ -681,23 +681,23 @@ function dataform_extend_settings_navigation(settings_navigation $settings, navi
 //------------------------------------------------------------
 
 /**
- * returns a list of participants of this dataform
+ * returns a list of participants of this datalynx
  */
-function dataform_get_participants($dataid) {
+function datalynx_get_participants($dataid) {
     global $DB;
 
     $params = array('dataid' => $dataid);
 
     $sql = "SELECT DISTINCT u.id 
               FROM {user} u,
-                   {dataform_entries} e
+                   {datalynx_entries} e
              WHERE e.dataid = :dataid AND
                    u.id = e.userid";
     $entries = $DB->get_records_sql($sql, $params);
 
     $sql = "SELECT DISTINCT u.id 
               FROM {user} u,
-                   {dataform_entries} e,
+                   {datalynx_entries} e,
                    {comments} c
              WHERE e.dataid = ? AND
                    u.id = e.userid AND
@@ -707,12 +707,12 @@ function dataform_get_participants($dataid) {
 
     $sql = "SELECT DISTINCT u.id 
               FROM {user} u,
-                   {dataform_entries} e,
+                   {datalynx_entries} e,
                    {ratings} r
              WHERE e.dataid = ? AND
                    u.id = e.userid AND
                    e.id = r.itemid AND
-                   r.component = 'mod_dataform' AND
+                   r.component = 'mod_datalynx' AND
                    (r.ratingarea = 'entry' OR
                    r.ratingarea = 'activity')";
     $ratings = $DB->get_records_sql($sql, $params);
@@ -738,13 +738,13 @@ function dataform_get_participants($dataid) {
 }
 
 /**
- * returns a summary of dataform activity of this user
+ * returns a summary of datalynx activity of this user
  */
-function dataform_user_outline($course, $user, $mod, $data) {
+function datalynx_user_outline($course, $user, $mod, $data) {
     global $DB, $CFG;
     require_once("$CFG->libdir/gradelib.php");
 
-    $grades = grade_get_grades($course->id, 'mod', 'dataform', $data->id, $user->id);
+    $grades = grade_get_grades($course->id, 'mod', 'datalynx', $data->id, $user->id);
     if (empty($grades->items[0]->grades)) {
         $grade = false;
     } else {
@@ -752,11 +752,11 @@ function dataform_user_outline($course, $user, $mod, $data) {
     }
 
     $sqlparams = array('dataid' => $data->id, 'userid' => $user->id);
-    if ($countrecords = $DB->count_records('dataform_entries', $sqlparams)) {
+    if ($countrecords = $DB->count_records('datalynx_entries', $sqlparams)) {
         $result = new object();
-        $result->info = get_string('entriescount', 'dataform', $countrecords);
+        $result->info = get_string('entriescount', 'datalynx', $countrecords);
         $lastrecordset = $DB->get_records(
-            'dataform_entries',
+            'datalynx_entries',
             $sqlparams,
             'timemodified DESC',
             'id,timemodified',
@@ -781,11 +781,11 @@ function dataform_user_outline($course, $user, $mod, $data) {
 /**
  * TODO Prints all the records uploaded by this user
  */
-function dataform_user_complete($course, $user, $mod, $data) {
+function datalynx_user_complete($course, $user, $mod, $data) {
     global $DB, $CFG;
     require_once("$CFG->libdir/gradelib.php");
 
-    $grades = grade_get_grades($course->id, 'mod', 'dataform', $data->id, $user->id);
+    $grades = grade_get_grades($course->id, 'mod', 'datalynx', $data->id, $user->id);
     if (!empty($grades->items[0]->grades)) {
         $grade = reset($grades->items[0]->grades);
         echo '<p>'.get_string('grade').': '.$grade->str_long_grade.'</p>';
@@ -794,7 +794,7 @@ function dataform_user_complete($course, $user, $mod, $data) {
         }
     }
     $sqlparams = array('dataid' => $data->id, 'userid' => $user->id);
-    if ($countrecords = $DB->count_records('dataform_entries', $sqlparams)) {
+    if ($countrecords = $DB->count_records('datalynx_entries', $sqlparams)) {
         // TODO get the default view add a filter for user only and display
     }
 }
@@ -805,13 +805,13 @@ function dataform_user_complete($course, $user, $mod, $data) {
 
 /**
  */
-function dataform_get_view_actions() {
+function datalynx_get_view_actions() {
     return array('view');
 }
 
 /**
  */
-function dataform_get_post_actions() {
+function datalynx_get_post_actions() {
     return array('add','update','record delete');
 }
 
@@ -836,11 +836,11 @@ function dataform_get_post_actions() {
  * }
  * @return array
  */
-function dataform_comment_permissions($comment_param) {
+function datalynx_comment_permissions($comment_param) {
     global $CFG;
 
     //require_once("$CFG->field/_comment/field_class.php");
-    //$comment = new dataformfield__comment($comment_param->cm->instance);
+    //$comment = new datalynxfield__comment($comment_param->cm->instance);
     //return $comment->permissions($comment_param);
     return array('post'=>true, 'view'=>true);
 }
@@ -857,19 +857,19 @@ function dataform_comment_permissions($comment_param) {
  * }
  * @return boolean
  */
-function dataform_comment_validate($comment_param) {
+function datalynx_comment_validate($comment_param) {
     global $CFG;
 
     require_once("field/_comment/field_class.php");
-    $comment = new dataformfield__comment($comment_param->cm->instance);
+    $comment = new datalynxfield__comment($comment_param->cm->instance);
     return $comment->validation($comment_param);
 }
 
 /**
  *
  */
-function dataform_comment_add($newcomment, $comment_param) {
-    $df = new dataform($comment_param->cm->instance);
+function datalynx_comment_add($newcomment, $comment_param) {
+    $df = new datalynx($comment_param->cm->instance);
     $eventdata = (object) array('items' => $newcomment);
     $df->events_trigger("commentadded", $eventdata);
 }
@@ -888,14 +888,14 @@ function dataform_comment_add($newcomment, $comment_param) {
  * @return bool True if completed, false if not. (If no conditions, then return
  *   value depends on comparison tyay an associative array of the user's rating permissions
  */
-function dataform_rating_permissions($contextid, $component, $ratingarea) {
+function datalynx_rating_permissions($contextid, $component, $ratingarea) {
     $context = context::instance_by_id($contextid, MUST_EXIST);
-    if ($component == 'mod_dataform' and ($ratingarea == 'entry' or $ratingarea == 'activity')) {
+    if ($component == 'mod_datalynx' and ($ratingarea == 'entry' or $ratingarea == 'activity')) {
         return array(
-            'view'    => has_capability('mod/dataform:ratingsview',$context),
-            'viewany' => has_capability('mod/dataform:ratingsviewany',$context),
-            'viewall' => has_capability('mod/dataform:ratingsviewall',$context),
-            'rate'    => has_capability('mod/dataform:rate',$context)
+            'view'    => has_capability('mod/datalynx:ratingsview',$context),
+            'viewany' => has_capability('mod/datalynx:ratingsviewany',$context),
+            'viewall' => has_capability('mod/datalynx:ratingsviewall',$context),
+            'rate'    => has_capability('mod/datalynx:rate',$context)
         );
     }
     return null;
@@ -913,11 +913,11 @@ function dataform_rating_permissions($contextid, $component, $ratingarea) {
  *            aggregation => int the aggregation method to apply when calculating grades ie RATING_AGGREGATE_AVERAGE [required]
  * @return boolean true if the rating is valid. Will throw rating_exception if not
  */
-function dataform_rating_validate($params) {
+function datalynx_rating_validate($params) {
     require_once("mod_class.php");
     require_once("field/_rating/field_class.php");
-    $df = new dataform(null, $params['context']->instanceid);
-    $rating = $df->get_field_from_id(dataformfield__rating::_RATING);
+    $df = new datalynx(null, $params['context']->instanceid);
+    $rating = $df->get_field_from_id(datalynxfield__rating::_RATING);
     return $rating->validation($params);
 }
 
@@ -925,13 +925,13 @@ function dataform_rating_validate($params) {
  * Return grade for given user or all users.
  * @return array array of grades, false if none
  */
-function dataform_get_user_grades($data, $userid = 0) {
+function datalynx_get_user_grades($data, $userid = 0) {
     global $CFG;
 
     require_once("$CFG->dirroot/rating/lib.php");
 
     $options = new object();
-    $options->component = 'mod_dataform';
+    $options->component = 'mod_datalynx';
     if ($data->grade and !$data->grademethod) {
         $options->ratingarea = 'activity';
         $options->aggregationmethod = RATING_AGGREGATE_MAXIMUM;
@@ -943,11 +943,11 @@ function dataform_get_user_grades($data, $userid = 0) {
         $options->ratingarea = 'entry';
         $options->aggregationmethod = $data->grademethod;
 
-        $options->itemtable = 'dataform_entries';
+        $options->itemtable = 'datalynx_entries';
         $options->itemtableusercolumn = 'userid';
 
     }
-    $options->modulename = 'dataform';
+    $options->modulename = 'datalynx';
     $options->moduleid   = $data->id;
     $options->userid = $userid;
     $options->scaleid = $data->grade;
@@ -963,26 +963,26 @@ function dataform_get_user_grades($data, $userid = 0) {
  * @param bool $nullifnone
  * @param array $grades
  */
-function dataform_update_grades($data=null, $userid=0, $nullifnone=true, $grades=null) {
+function datalynx_update_grades($data=null, $userid=0, $nullifnone=true, $grades=null) {
     global $CFG, $DB;
     require_once("$CFG->libdir/gradelib.php");
 
     if ($data != null) {
         if ($data->grade) {
-            if ($grades or $grades = dataform_get_user_grades($data, $userid)) {
-                dataform_grade_item_update($data, $grades);
+            if ($grades or $grades = datalynx_get_user_grades($data, $userid)) {
+                datalynx_grade_item_update($data, $grades);
 
             } else if ($userid and $nullifnone) {
                 $grade = new object();
                 $grade->userid   = $userid;
                 $grade->rawgrade = NULL;
-                dataform_grade_item_update($data, $grade);
+                datalynx_grade_item_update($data, $grade);
 
             } else {
-                dataform_grade_item_update($data);
+                datalynx_grade_item_update($data);
             }
         } else {
-            dataform_grade_item_delete($data);
+            datalynx_grade_item_delete($data);
         }
     }
 }
@@ -992,17 +992,17 @@ function dataform_update_grades($data=null, $userid=0, $nullifnone=true, $grades
  *
  * @global object
  */
-function dataform_upgrade_grades() {
+function datalynx_upgrade_grades() {
     global $DB;
 
     $sql = "SELECT COUNT('x')
-              FROM {dataform} d, {course_modules} cm, {modules} m
-             WHERE m.name='dataform' AND m.id=cm.module AND cm.instance=d.id";
+              FROM {datalynx} d, {course_modules} cm, {modules} m
+             WHERE m.name='datalynx' AND m.id=cm.module AND cm.instance=d.id";
     $count = $DB->count_records_sql($sql);
 
     $sql = "SELECT d.*, cm.idnumber AS cmidnumber, d.course AS courseid
-              FROM {dataform} d, {course_modules} cm, {modules} m
-             WHERE m.name='dataform' AND m.id=cm.module AND cm.instance=d.id";
+              FROM {datalynx} d, {course_modules} cm, {modules} m
+             WHERE m.name='datalynx' AND m.id=cm.module AND cm.instance=d.id";
     $rs = $DB->get_recordset_sql($sql);
     if ($rs->valid()) {
         // too much debug output
@@ -1011,20 +1011,20 @@ function dataform_upgrade_grades() {
         foreach ($rs as $data) {
             $i++;
             upgrade_set_timeout(60*5); // set up timeout, may also abort execution
-            dataform_update_grades($data, 0, false);
-            $pbar->update($i, $count, "Updating Dataform grades ($i/$count).");
+            datalynx_update_grades($data, 0, false);
+            $pbar->update($i, $count, "Updating Datalynx grades ($i/$count).");
         }
     }
     $rs->close();
 }
 
 /**
- * Update/create grade item for given dataform
+ * Update/create grade item for given datalynx
  * @param object $data object with extra cmidnumber
  * @param mixed optional array/object of grade(s); 'reset' means reset grades in gradebook
  * @return object grade_item
  */
-function dataform_grade_item_update($data, $grades=NULL) {
+function datalynx_grade_item_update($data, $grades=NULL) {
     global $CFG;
     require_once("$CFG->libdir/gradelib.php");
 
@@ -1051,7 +1051,7 @@ function dataform_grade_item_update($data, $grades=NULL) {
         $grades = NULL;
     }
 
-    return grade_update('mod/dataform', $data->course, 'mod', 'dataform', $data->id, 0, $grades, $params);
+    return grade_update('mod/datalynx', $data->course, 'mod', 'datalynx', $data->id, 0, $grades, $params);
 }
 
 /**
@@ -1059,15 +1059,15 @@ function dataform_grade_item_update($data, $grades=NULL) {
  * @param object $data object
  * @return object grade_item
  */
-function dataform_grade_item_delete($data) {
+function datalynx_grade_item_delete($data) {
     global $CFG;
     require_once("$CFG->libdir/gradelib.php");
 
-    return grade_update('mod/dataform', $data->course, 'mod', 'dataform', $data->id, 0, NULL, array('deleted'=>1));
+    return grade_update('mod/datalynx', $data->course, 'mod', 'datalynx', $data->id, 0, NULL, array('deleted'=>1));
 }
 
 /**
- * Obtains the automatic completion state for this dataform based on conditions dataform settings.
+ * Obtains the automatic completion state for this datalynx based on conditions datalynx settings.
  *
  * @global object
  * @global object
@@ -1078,24 +1078,24 @@ function dataform_grade_item_delete($data) {
  * @return bool True if completed, false if not. (If no conditions, then return
  *   value depends on comparison type)
  */
-function dataform_get_completion_state($course, $cm, $userid, $type) {
+function datalynx_get_completion_state($course, $cm, $userid, $type) {
     global $CFG, $DB;
 
-    if (!($dataform = $DB->get_record('dataform', array('id' => $cm->instance)))) {
-        throw new Exception("Can't find dataform {$cm->instance}");
+    if (!($datalynx = $DB->get_record('datalynx', array('id' => $cm->instance)))) {
+        throw new Exception("Can't find datalynx {$cm->instance}");
     }
 
-    if (!isset($dataform->completionentries)) {
-        throw new Exception("'completionentries' field does not exist in 'dataform' table! Upgrade your database!");
+    if (!isset($datalynx->completionentries)) {
+        throw new Exception("'completionentries' field does not exist in 'datalynx' table! Upgrade your database!");
     }
 
-    $params = array('userid' => $userid, 'dataid' => $dataform->id);
+    $params = array('userid' => $userid, 'dataid' => $datalynx->id);
     $sql = "SELECT COUNT(1)
-              FROM {dataform_entries} de
+              FROM {datalynx_entries} de
              WHERE de.userid = :userid
                AND de.dataid = :dataid
                AND de.approved = 1";
     $count = $DB->get_field_sql($sql, $params);
 
-    return $count >= $dataform->completionentries;
+    return $count >= $datalynx->completionentries;
 }

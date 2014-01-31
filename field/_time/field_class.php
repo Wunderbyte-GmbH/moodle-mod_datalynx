@@ -15,15 +15,15 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage _time
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once("$CFG->dirroot/mod/dataform/field/field_class.php");
+require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
-class dataformfield__time extends dataformfield_no_content {
+class datalynxfield__time extends datalynxfield_no_content {
     public $type = '_time';
 
     const _TIMECREATED = 'timecreated';
@@ -42,9 +42,9 @@ class dataformfield__time extends dataformfield_no_content {
     public static function get_field_objects($dataid) {
         $fieldobjects = array();
         
-        $fieldobjects[self::_TIMECREATED] = (object) array('id' => self::_TIMECREATED, 'dataid' => $dataid, 'type' => '_time', 'name' => get_string('timecreated', 'dataform'), 'description' => '', 'visible' => 2, 'internalname' => 'timecreated');
+        $fieldobjects[self::_TIMECREATED] = (object) array('id' => self::_TIMECREATED, 'dataid' => $dataid, 'type' => '_time', 'name' => get_string('timecreated', 'datalynx'), 'description' => '', 'visible' => 2, 'internalname' => 'timecreated');
 
-        $fieldobjects[self::_TIMEMODIFIED] = (object) array('id' => self::_TIMEMODIFIED, 'dataid' => $dataid, 'type' => '_time', 'name' => get_string('timemodified', 'dataform'), 'description' => '', 'visible' => 2, 'internalname' => 'timemodified');
+        $fieldobjects[self::_TIMEMODIFIED] = (object) array('id' => self::_TIMEMODIFIED, 'dataid' => $dataid, 'type' => '_time', 'name' => get_string('timemodified', 'datalynx'), 'description' => '', 'visible' => 2, 'internalname' => 'timemodified');
 
         return $fieldobjects;
     }
@@ -137,7 +137,7 @@ class dataformfield__time extends dataformfield_no_content {
         $contentfull = $this->get_sort_sql();
         
         $sql = "SELECT DISTINCT $contentfull
-                    FROM {dataform_entries} e
+                    FROM {datalynx_entries} e
                     WHERE $contentfull IS NOT NULL'.
                     ORDER BY $contentfull $sortdir";
 

@@ -15,16 +15,16 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformview
+ * @package datalynxview
  * @subpackage interval
  * @copyright 2012 Itamar Tzadok 
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once("$CFG->dirroot/mod/dataform/view/grid/view_class.php");
-require_once("$CFG->dirroot/mod/dataform/entries_class.php");
+require_once("$CFG->dirroot/mod/datalynx/view/grid/view_class.php");
+require_once("$CFG->dirroot/mod/datalynx/entries_class.php");
 
-class dataformview_interval extends dataformview_grid {
+class datalynxview_interval extends datalynxview_grid {
 
     protected $type = 'interval';
     
@@ -41,7 +41,7 @@ class dataformview_interval extends dataformview_grid {
     public function __construct($df = 0, $view = 0) {
         parent::__construct($df, $view);
         
-        $this->selection = $this->_filter->onpage = dataform_entries::SELECT_FIRST_PAGE;
+        $this->selection = $this->_filter->onpage = datalynx_entries::SELECT_FIRST_PAGE;
         if (!empty($this->view->param4)) {
              $this->selection = $this->_filter->onpage = $this->view->param4;
         }
@@ -128,7 +128,7 @@ class dataformview_interval extends dataformview_grid {
                 break;
         
             case 'weekly':
-                $checktime = strtotime('last '. get_string('firstdayofweek', 'dataform'));
+                $checktime = strtotime('last '. get_string('firstdayofweek', 'datalynx'));
                 break;
                 
             case 'daily':
@@ -151,7 +151,7 @@ class dataformview_interval extends dataformview_grid {
         if ($checktime > $this->cache->time) {
             $this->cache->time = $checktime;
             
-            if ($this->selection == dataform_entries::SELECT_NEXT_PAGE) {
+            if ($this->selection == datalynx_entries::SELECT_NEXT_PAGE) {
                 $this->cache->next++;
                 if ($this->cache->next > $this->resetnext) {
                     $this->cache->next = 0;

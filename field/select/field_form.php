@@ -15,14 +15,14 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage select
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once("$CFG->dirroot/mod/dataform/field/field_form.php");
+require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
-class dataformfield_select_form extends dataformfield_form {
+class datalynxfield_select_form extends datalynxfield_form {
 
     /**
      *
@@ -32,10 +32,10 @@ class dataformfield_select_form extends dataformfield_form {
         $mform =& $this->_form;
 
     //-------------------------------------------------------------------------------
-        $mform->addElement('header', 'fieldattributeshdr', get_string('fieldattributes', 'dataform'));
+        $mform->addElement('header', 'fieldattributeshdr', get_string('fieldattributes', 'datalynx'));
 
         // options
-        $mform->addElement('textarea', 'param1', get_string('fieldoptions', 'dataform'), 'wrap="virtual" rows="5" cols="30"');
+        $mform->addElement('textarea', 'param1', get_string('fieldoptions', 'datalynx'), 'wrap="virtual" rows="5" cols="30"');
 
         // default value
         $mform->addElement('text', 'param2', get_string('default'));
@@ -44,10 +44,10 @@ class dataformfield_select_form extends dataformfield_form {
         // reserve param3 for options separator (e.g. radiobutton, image button)
 
         // allow add option
-        $mform->addElement('selectyesno', 'param4', get_string('allowaddoption', 'dataform'));
+        $mform->addElement('selectyesno', 'param4', get_string('allowaddoption', 'datalynx'));
 
         // allow choice limit
-        $mform->addElement('checkbox', 'param5', get_string('limitchoice', 'dataform'));
-        $mform->addHelpButton('param5', 'limitchoice', 'dataform');
+        $mform->addElement('checkbox', 'param5', get_string('limitchoice', 'datalynx'));
+        $mform->addHelpButton('param5', 'limitchoice', 'datalynx');
     }
 }

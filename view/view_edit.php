@@ -15,26 +15,26 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformview
+ * @package datalynxview
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once('../../../config.php');
-require_once("$CFG->dirroot/mod/dataform/mod_class.php");
+require_once("$CFG->dirroot/mod/datalynx/mod_class.php");
 
 $urlparams = new object();
-$urlparams->d          = required_param('d', PARAM_INT);    // dataform ID
+$urlparams->d          = required_param('d', PARAM_INT);    // datalynx ID
 
 $urlparams->type       = optional_param('type', '', PARAM_ALPHA);   // type of a view to edit
 $urlparams->vedit        = optional_param('vedit', 0, PARAM_INT);       // view id to edit
 $urlparams->returnurl  = optional_param('returnurl', '', PARAM_URL);
 
-// Set a dataform object
-$df = new dataform($urlparams->d);
+// Set a datalynx object
+$df = new datalynx($urlparams->d);
 
 $df->set_page('view/view_edit', array('modjs' => true, 'urlparams' => $urlparams));
 require_sesskey();
-require_capability('mod/dataform:managetemplates', $df->context);
+require_capability('mod/datalynx:managetemplates', $df->context);
 
 if ($urlparams->vedit) {
     $view = $df->get_view_from_id($urlparams->vedit);
@@ -53,7 +53,7 @@ if ($mform->is_cancelled()){
         if ($urlparams->returnurl) {
             redirect($urlparams->returnurl);
         } else {
-            redirect(new moodle_url('/mod/dataform/view/index.php', array('d' => $urlparams->d)));
+            redirect(new moodle_url('/mod/datalynx/view/index.php', array('d' => $urlparams->d)));
         }
 
 // no submit buttons: reset to default 
@@ -63,7 +63,7 @@ if ($mform->is_cancelled()){
     $resettodefault = optional_param('resetdefaultbutton', '', PARAM_ALPHA);
     if ($resettodefault) {
         $urlparams->resetdefault = 1;
-        redirect(new moodle_url('/mod/dataform/view/view_edit.php', ((array) $urlparams) + array('sesskey' => sesskey())));
+        redirect(new moodle_url('/mod/datalynx/view/view_edit.php', ((array) $urlparams) + array('sesskey' => sesskey())));
         
     }
 
@@ -72,15 +72,15 @@ if ($mform->is_cancelled()){
     // add new view
     if (!$view->id()) {
         $view->add($data);
-        $log = get_string('viewsadded','dataform');
+        $log = get_string('viewsadded','datalynx');
     // update view
     } else {
         $view->update($data);
-        $log = get_string('viewsupdated','dataform');
+        $log = get_string('viewsupdated','datalynx');
     }
     
     $df->notifications['good'][] = $log;
-    add_to_log($df->course->id, 'dataform', $log, 'view/index.php?d='. $df->id(). '&amp;vedit=', $view->id(), $df->cm->id);
+    add_to_log($df->course->id, 'datalynx', $log, 'view/index.php?d='. $df->id(). '&amp;vedit=', $view->id(), $df->cm->id);
 
     if (!isset($data->submitreturnbutton)) {
         // TODO: set default view       
@@ -88,7 +88,7 @@ if ($mform->is_cancelled()){
         if ($urlparams->returnurl) {
             redirect($urlparams->returnurl);
         } else {
-            redirect(new moodle_url('/mod/dataform/view/index.php', array('d' => $urlparams->d)));
+            redirect(new moodle_url('/mod/datalynx/view/index.php', array('d' => $urlparams->d)));
         }
     }
 
@@ -97,12 +97,12 @@ if ($mform->is_cancelled()){
 }
 
 // activate navigation node
-navigation_node::override_active_url(new moodle_url('/mod/dataform/view/index.php', array('id' => $df->cm->id)));
+navigation_node::override_active_url(new moodle_url('/mod/datalynx/view/index.php', array('id' => $df->cm->id)));
 
 // print header
 $df->print_header(array('tab' => 'views', 'nonotifications' => true, 'urlparams' => $urlparams));
 
-$formheading = $view->id() ? get_string('viewedit', 'dataform', $view->name()) : get_string('viewnew', 'dataform', $view->typename());
+$formheading = $view->id() ? get_string('viewedit', 'datalynx', $view->name()) : get_string('viewnew', 'datalynx', $view->typename());
 echo html_writer::tag('h2', format_string($formheading), array('class' => 'mdl-align'));
 
 // display form

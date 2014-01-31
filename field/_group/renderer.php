@@ -15,19 +15,19 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage _group
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once("$CFG->dirroot/mod/dataform/field/renderer.php");
+require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
  *
  */
-class dataformfield__group_renderer extends dataformfield_renderer {
+class datalynxfield__group_renderer extends datalynxfield_renderer {
 
     /**
      * 
@@ -81,7 +81,7 @@ class dataformfield__group_renderer extends dataformfield_renderer {
                     break;
 
                 case '##group:edit##':
-                    if ($edit and has_capability('mod/dataform:manageentries', $field->df()->context)) {
+                    if ($edit and has_capability('mod/datalynx:manageentries', $field->df()->context)) {
                         $replacements[$tag] = array('', array(array($this,'display_edit'), array($entry)));
                     } else {
                         $replacements[$tag] = array('html', $group->name);
@@ -121,7 +121,7 @@ class dataformfield__group_renderer extends dataformfield_renderer {
      * Array of patterns this field supports 
      */
     protected function patterns() {
-        $cat = get_string('groupinfo', 'dataform');
+        $cat = get_string('groupinfo', 'datalynx');
 
         $patterns = array();
         $patterns['##group:id##'] = array(true, $cat);

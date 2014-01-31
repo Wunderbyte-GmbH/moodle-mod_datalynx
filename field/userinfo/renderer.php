@@ -15,19 +15,19 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage userinfo
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die;
 
-require_once("$CFG->dirroot/mod/dataform/field/renderer.php");
+require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
  *
  */
-class dataformfield_userinfo_renderer extends dataformfield_renderer {
+class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
 
     /**
      *
@@ -188,7 +188,7 @@ class dataformfield_userinfo_renderer extends dataformfield_renderer {
      */
     protected function patterns() {
         $fieldname = $this->_field->name();
-        $cat = get_string('authorinfo', 'dataform');
+        $cat = get_string('authorinfo', 'datalynx');
 
         $patterns = array();
         $patterns["##author:$fieldname##"] = array(true, $cat);

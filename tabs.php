@@ -15,23 +15,23 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @preset mod-dataform
+ * @preset mod-datalynx
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * The Dataform has been developed as an enhanced counterpart
+ * The Datalynx has been developed as an enhanced counterpart
  * of Moodle's Database activity module (1.9.11+ (20110323)).
- * To the extent that Dataform code corresponds to Database code,
+ * To the extent that Datalynx code corresponds to Database code,
  * certain copyrights on the Database module may obtain.
  */
 
-$is_templatemanager = has_capability('mod/dataform:managetemplates', $this->context);
-$is_entriesmanager = has_capability('mod/dataform:manageentries', $this->context);
+$is_templatemanager = has_capability('mod/datalynx:managetemplates', $this->context);
+$is_entriesmanager = has_capability('mod/datalynx:manageentries', $this->context);
 
 // tabs are displayed only for template managers
 if (isloggedin() and $is_templatemanager) {
     if (empty($currenttab) or empty($this->data) or empty($this->course)) {
-        throw new moodle_exception('emptytab', 'dataform');
+        throw new moodle_exception('emptytab', 'datalynx');
     }
 
     $inactive = array();
@@ -40,13 +40,13 @@ if (isloggedin() and $is_templatemanager) {
 
     // Browse/Management
     $row = array();
-    $row[] = new tabobject('browse', new moodle_url('/mod/dataform/view.php', array('d' => $this->id())), get_string('browse','dataform'));
-    $row[] = new tabobject('manage', new moodle_url('/mod/dataform/view/index.php', array('d' => $this->id())), get_string('manage','dataform'));
+    $row[] = new tabobject('browse', new moodle_url('/mod/datalynx/view.php', array('d' => $this->id())), get_string('browse','datalynx'));
+    $row[] = new tabobject('manage', new moodle_url('/mod/datalynx/view/index.php', array('d' => $this->id())), get_string('manage','datalynx'));
     // Add view edit tab
     if ($currenttab == 'browse' and !empty($this->_currentview)) {
         $params = array('d' => $this->id(), 'sesskey' => sesskey(), 'vedit' => $this->_currentview->id());
-        $editviewurl = new moodle_url('/mod/dataform/view/view_edit.php', $params);
-        $row[] = new tabobject('editview', $editviewurl, $OUTPUT->pix_icon('t/edit', get_string('vieweditthis','dataform')));
+        $editviewurl = new moodle_url('/mod/datalynx/view/view_edit.php', $params);
+        $row[] = new tabobject('editview', $editviewurl, $OUTPUT->pix_icon('t/edit', get_string('vieweditthis','datalynx')));
     }
 
 
@@ -59,21 +59,21 @@ if (isloggedin() and $is_templatemanager) {
         $row  = array();
         // template manager can do everything
         if ($is_templatemanager)  {
-            $row[] = new tabobject('views', new moodle_url('/mod/dataform/view/index.php', array('d' => $this->id())), get_string('views','dataform'));
-            $row[] = new tabobject('fields', new moodle_url('/mod/dataform/field/index.php', array('d' => $this->id())), get_string('fields','dataform'));
-            $row[] = new tabobject('filters', new moodle_url('/mod/dataform/filter/index.php', array('d' => $this->id())), get_string('filters','dataform'));
-            $row[] = new tabobject('rules', new moodle_url('/mod/dataform/rule/index.php', array('d' => $this->id())), get_string('rules','dataform'));
-            $row[] = new tabobject('tools', new moodle_url('/mod/dataform/tool/index.php', array('d' => $this->id())), get_string('tools','dataform'));
-            $row[] = new tabobject('js', new moodle_url('/mod/dataform/js.php', array('d' => $this->id(), 'jsedit' => 1)), get_string('jsinclude', 'dataform'));
-            $row[] = new tabobject('css', new moodle_url('/mod/dataform/css.php', array('d' => $this->id(), 'cssedit' => 1)), get_string('cssinclude', 'dataform'));
-            $row[] = new tabobject('presets', new moodle_url('/mod/dataform/preset/index.php', array('d' => $this->id())), get_string('presets', 'dataform'));
-            $row[] = new tabobject('import', new moodle_url('/mod/dataform/import.php', array('d' => $this->id())), get_string('import', 'dataform'));
-            $row[] = new tabobject('statistics', new moodle_url('/mod/dataform/statistics/index.php', array('d' => $this->id())), get_string('statistics', 'dataform'));
-            //$row[] = new tabobject('reports', new moodle_url('/mod/dataform/reports.php', array('d' => $this->id())), get_string('reports','dataform'));
+            $row[] = new tabobject('views', new moodle_url('/mod/datalynx/view/index.php', array('d' => $this->id())), get_string('views','datalynx'));
+            $row[] = new tabobject('fields', new moodle_url('/mod/datalynx/field/index.php', array('d' => $this->id())), get_string('fields','datalynx'));
+            $row[] = new tabobject('filters', new moodle_url('/mod/datalynx/filter/index.php', array('d' => $this->id())), get_string('filters','datalynx'));
+            $row[] = new tabobject('rules', new moodle_url('/mod/datalynx/rule/index.php', array('d' => $this->id())), get_string('rules','datalynx'));
+            $row[] = new tabobject('tools', new moodle_url('/mod/datalynx/tool/index.php', array('d' => $this->id())), get_string('tools','datalynx'));
+            $row[] = new tabobject('js', new moodle_url('/mod/datalynx/js.php', array('d' => $this->id(), 'jsedit' => 1)), get_string('jsinclude', 'datalynx'));
+            $row[] = new tabobject('css', new moodle_url('/mod/datalynx/css.php', array('d' => $this->id(), 'cssedit' => 1)), get_string('cssinclude', 'datalynx'));
+            $row[] = new tabobject('presets', new moodle_url('/mod/datalynx/preset/index.php', array('d' => $this->id())), get_string('presets', 'datalynx'));
+            $row[] = new tabobject('import', new moodle_url('/mod/datalynx/import.php', array('d' => $this->id())), get_string('import', 'datalynx'));
+            $row[] = new tabobject('statistics', new moodle_url('/mod/datalynx/statistics/index.php', array('d' => $this->id())), get_string('statistics', 'datalynx'));
+            //$row[] = new tabobject('reports', new moodle_url('/mod/datalynx/reports.php', array('d' => $this->id())), get_string('reports','datalynx'));
 
         // entries manager can do import
         //} else if ($is_entriesmanager)  {
-        //    $row[] = new tabobject('import', new moodle_url('/mod/dataform/import.php', array('d' => $this->id())), get_string('import', 'dataform'));
+        //    $row[] = new tabobject('import', new moodle_url('/mod/datalynx/import.php', array('d' => $this->id())), get_string('import', 'datalynx'));
         }
 
         $tabs[] = $row;

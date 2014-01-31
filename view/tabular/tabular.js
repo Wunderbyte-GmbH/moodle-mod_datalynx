@@ -14,17 +14,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file is part of the Dataform module for Moodle - http://moodle.org/.
+ * This file is part of the Datalynx module for Moodle - http://moodle.org/.
  *
- * @package dataformview
+ * @package datalynxview
  * @subpackage tabular
  * @copyright 2013 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-M.dataformview_tabular = {};
+M.datalynxview_tabular = {};
 
-M.dataformview_tabular.init = function(Y) {
+M.datalynxview_tabular.init = function(Y) {
     var firstentryfield = Y.one('div.felement [name^="field_"]');
     if (!firstentryfield) {
         Y.all('input[type="checkbox"][name$="bulkedit"]').hide();

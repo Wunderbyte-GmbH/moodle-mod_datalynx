@@ -15,20 +15,20 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage _rating
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 /**
- * A class representing a single dataform rating 
+ * A class representing a single datalynx rating 
  * Extends the core rating class
  */
 
 require_once("$CFG->dirroot/rating/lib.php");
 
-class dataform_rating extends rating {
+class datalynx_rating extends rating {
 
     /**
      * Returns this ratings aggregate value
@@ -54,10 +54,10 @@ class dataform_rating extends rating {
 }
 
 /**
- * The dataform_rating_manager class extends the rating_manager class 
+ * The datalynx_rating_manager class extends the rating_manager class 
  * so as to retrieve sets of ratings from the database for sets of entries
  */
-class dataform_rating_manager extends rating_manager {
+class datalynx_rating_manager extends rating_manager {
 
     /**
      * Adds rating objects to an array of entries
@@ -248,7 +248,7 @@ class dataform_rating_manager extends rating_manager {
 
         $options = new object;
         $options->context = $rec->context;
-        $options->component = 'mod_dataform';
+        $options->component = 'mod_datalynx';
         $options->ratingarea = $rec->ratingarea; 
         $options->itemid = $item->id;
         $options->settings = $rec->settings;
@@ -280,7 +280,7 @@ class dataform_rating_manager extends rating_manager {
             }
         }
 
-        $rating = new dataform_rating($options);
+        $rating = new datalynx_rating($options);
         $rating->itemtimecreated = $this->get_item_time_created($item);
         if (!empty($item->userid)) {
             $rating->itemuserid = $item->userid;

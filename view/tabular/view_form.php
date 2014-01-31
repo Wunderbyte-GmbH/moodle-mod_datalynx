@@ -15,17 +15,17 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * This file is part of the Dataform module for Moodle - http://moodle.org/. 
+ * This file is part of the Datalynx module for Moodle - http://moodle.org/. 
  *
- * @package dataformview
+ * @package datalynxview
  * @subpackage tabular
  * @copyright 2012 Itamar Tzadok 
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once("$CFG->dirroot/mod/dataform/view/view_form.php");
+require_once("$CFG->dirroot/mod/datalynx/view/view_form.php");
 
-class dataformview_tabular_form extends dataformview_base_form {
+class datalynxview_tabular_form extends datalynxview_base_form {
 
     /**
      *
@@ -40,12 +40,12 @@ class dataformview_tabular_form extends dataformview_base_form {
 
         // content
         //-------------------------------------------------------------------------------
-        $mform->addElement('header', 'entrytemplatehdr', get_string('entrytemplate', 'dataform'));
+        $mform->addElement('header', 'entrytemplatehdr', get_string('entrytemplate', 'datalynx'));
 
-        $mform->addElement('selectyesno', 'param3', get_string('headerrow', 'dataformview_tabular'));
+        $mform->addElement('selectyesno', 'param3', get_string('headerrow', 'datalynxview_tabular'));
         $mform->setDefault('param3', 1);
         
-        $mform->addElement('editor', 'eparam2_editor', get_string('table', 'dataformview_tabular'), $editorattr, $editoroptions['param2']);
+        $mform->addElement('editor', 'eparam2_editor', get_string('table', 'datalynxview_tabular'), $editorattr, $editoroptions['param2']);
         $this->add_tags_selector('eparam2_editor', 'general');
         $this->add_tags_selector('eparam2_editor', 'field');        
 

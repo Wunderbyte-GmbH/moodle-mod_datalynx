@@ -15,7 +15,7 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -24,7 +24,7 @@ defined('MOODLE_INTERNAL') or die;
 /**
  * Base class for field patterns
  */
-abstract class dataformfield_renderer {
+abstract class datalynxfield_renderer {
 
     const PATTERN_SHOW_IN_MENU = 0;
     const PATTERN_CATEGORY = 1;
@@ -179,7 +179,7 @@ abstract class dataformfield_renderer {
                 if (!empty($pattern[self::PATTERN_CATEGORY])) {
                     $cat = $pattern[self::PATTERN_CATEGORY];
                 } else {
-                    $cat = get_string('fields', 'dataform');
+                    $cat = get_string('fields', 'datalynx');
                 }
                 // prepare array
                 if (!isset($patternsmenu[$cat])) {
@@ -221,7 +221,7 @@ abstract class dataformfield_renderer {
         }
 
         if (in_array("[[$fieldname:restricted]]", $tags)) {
-            if ($edit && has_capability('mod/dataform:editrestrictedfields', $this->_field->df()->context)) {
+            if ($edit && has_capability('mod/datalynx:editrestrictedfields', $this->_field->df()->context)) {
                 $labelreplacement["[[$fieldname:restricted]]"] = array('', array(array($this , 'display_edit'), array($entry)));
             } else {
                 $labelreplacement["[[$fieldname:restricted]]"] = array('html', $this->display_browse($entry));
@@ -277,7 +277,7 @@ abstract class dataformfield_renderer {
      * @return array pattern => array(visible in menu, category) 
      */
     protected function replacements(array $tags = null, $entry = null, array $options = null) {
-        throw new coding_exception('replacements() method needs to be overridden in each subclass of dataformfield_renderer');
+        throw new coding_exception('replacements() method needs to be overridden in each subclass of datalynxfield_renderer');
     }
 
     /**

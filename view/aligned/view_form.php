@@ -15,15 +15,15 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformview
+ * @package datalynxview
  * @subpackage aligned
  * @copyright 2012 Itamar Tzadok 
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once("$CFG->dirroot/mod/dataform/view/view_form.php");
+require_once("$CFG->dirroot/mod/datalynx/view/view_form.php");
 
-class dataformview_aligned_form extends dataformview_base_form {
+class datalynxview_aligned_form extends datalynxview_base_form {
 
     /**
      *
@@ -35,7 +35,7 @@ class dataformview_aligned_form extends dataformview_base_form {
 
         // repeated entry (param2)
         //-------------------------------------------------------------------------------
-        $mform->addElement('header', 'entrytemplatehdr', get_string('entrytemplate', 'dataform'));
+        $mform->addElement('header', 'entrytemplatehdr', get_string('entrytemplate', 'datalynx'));
 
         $mform->addElement('textarea', 'param2', '', array('cols' => 40, 'rows' => 12));
         $this->add_tags_selector('param2', 'view');

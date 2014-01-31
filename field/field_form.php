@@ -15,7 +15,7 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @copyright 2013 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -23,7 +23,7 @@ defined('MOODLE_INTERNAL') or die;
 
 require_once("$CFG->libdir/formslib.php");
 
-class dataformfield_form extends moodleform {
+class datalynxfield_form extends moodleform {
     protected $_field = null;
     protected $_df = null;
 
@@ -53,22 +53,22 @@ class dataformfield_form extends moodleform {
 
         // visible
         $options = array(
-            dataformfield_base::VISIBLE_NONE => get_string('fieldvisiblenone', 'dataform'),
-            dataformfield_base::VISIBLE_OWNER => get_string('fieldvisibleowner', 'dataform'),
-            dataformfield_base::VISIBLE_ALL => get_string('fieldvisibleall', 'dataform'),
+            datalynxfield_base::VISIBLE_NONE => get_string('fieldvisiblenone', 'datalynx'),
+            datalynxfield_base::VISIBLE_OWNER => get_string('fieldvisibleowner', 'datalynx'),
+            datalynxfield_base::VISIBLE_ALL => get_string('fieldvisibleall', 'datalynx'),
         );
-        $mform->addElement('select', 'visible', get_string('fieldvisibility', 'dataform'), $options);
+        $mform->addElement('select', 'visible', get_string('fieldvisibility', 'datalynx'), $options);
 
         // Editable
         //$options = array(-1 => get_string('unlimited'), 0 => get_string('none'));
         $options = array(-1 => get_string('yes'), 0 => get_string('no'));
         //$options = $options + array_combine(range(1,50), range(1,50));
-        $mform->addElement('select', 'edits', get_string('fieldeditable', 'dataform'), $options);
+        $mform->addElement('select', 'edits', get_string('fieldeditable', 'datalynx'), $options);
         $mform->setDefault('edits', -1);
 
         // Label
-        $mform->addElement('textarea', 'label', get_string('fieldlabel', 'dataform'), array('cols' => 60, 'rows' => 5));
-        $mform->addHelpButton('label', 'fieldlabel', 'dataform');
+        $mform->addElement('textarea', 'label', get_string('fieldlabel', 'datalynx'), array('cols' => 60, 'rows' => 5));
+        $mform->addHelpButton('label', 'fieldlabel', 'datalynx');
 
         // Strings strip tags
         if (!empty($CFG->formatstringstriptags)) {
@@ -105,7 +105,7 @@ class dataformfield_form extends moodleform {
         // save and display
         $buttonarray[] = &$mform->createElement('submit', 'submitbutton', get_string('savechanges'));
         // save and continue
-        $buttonarray[] = &$mform->createElement('submit', 'submitbutton', get_string('savecontinue', 'dataform'));
+        $buttonarray[] = &$mform->createElement('submit', 'submitbutton', get_string('savecontinue', 'datalynx'));
         // cancel
         $buttonarray[] = &$mform->createElement('cancel');
         $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
@@ -119,7 +119,7 @@ class dataformfield_form extends moodleform {
         $errors = parent::validation($data, $files);
 
         if ($this->_df->name_exists('fields', $data['name'], $this->_field->id())) {
-            $errors['name'] = get_string('invalidname','dataform', get_string('field', 'dataform'));
+            $errors['name'] = get_string('invalidname','datalynx', get_string('field', 'datalynx'));
         }
 
         return $errors;

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    mod_dataform
+ * @package    mod_datalynx
  * @category   phpunit
  * @copyright  2012 Itamar Tzadok
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -24,22 +24,22 @@
 defined('MOODLE_INTERNAL') or die;
 
 global $CFG;
-require_once("$CFG->dirroot/mod/dataform/lib.php");
-require_once("$CFG->dirroot/mod/dataform/mod_class.php");
-require_once("$CFG->dirroot/mod/dataform/view/import/view_class.php");
+require_once("$CFG->dirroot/mod/datalynx/lib.php");
+require_once("$CFG->dirroot/mod/datalynx/mod_class.php");
+require_once("$CFG->dirroot/mod/datalynx/view/import/view_class.php");
 
 /**
- * Unit tests for dataform import
+ * Unit tests for datalynx import
  *
- * @package    mod_dataform
+ * @package    mod_datalynx
  * @copyright  2012 Itamar Tzadok
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class dataform_import_test extends advanced_testcase {
-    public $dataform = null; // A dataform instance.
+class datalynx_import_test extends advanced_testcase {
+    public $datalynx = null; // A datalynx instance.
 
     /**
-     * Set up function. In this instance we are setting up a dataform
+     * Set up function. In this instance we are setting up a datalynx
      * with fields and views to be used in the unit tests.
      */
     protected function setUp() {
@@ -53,16 +53,16 @@ class dataform_import_test extends advanced_testcase {
         //    $this->getDataGenerator()->create_user();
         //}
 
-        // create a dataform module
+        // create a datalynx module
         $course = $this->getDataGenerator()->create_course();
-        $dataform = $this->getDataGenerator()->create_module('dataform', array('course'=>$course->id));
-        $this->dataform = new dataform($dataform);
+        $datalynx = $this->getDataGenerator()->create_module('datalynx', array('course'=>$course->id));
+        $this->datalynx = new datalynx($datalynx);
 
-        // Set up data for the test dataform.
+        // Set up data for the test datalynx.
         $files = array(
-            'dataform_fields'  => __DIR__.'/fixtures/test_dataform_fields.csv',
-            'dataform_views' => __DIR__.'/fixtures/test_dataform_views.csv',
-            'dataform_filters' => __DIR__.'/fixtures/test_dataform_filters.csv',
+            'datalynx_fields'  => __DIR__.'/fixtures/test_datalynx_fields.csv',
+            'datalynx_views' => __DIR__.'/fixtures/test_datalynx_views.csv',
+            'datalynx_filters' => __DIR__.'/fixtures/test_datalynx_filters.csv',
         );
 
         // do not use enclosure
@@ -76,13 +76,13 @@ class dataform_import_test extends advanced_testcase {
         global $DB;
 
         // Test 0: Setup
-        $this->assertEquals(2, $DB->count_records('dataform_fields'));
-        $this->assertEquals(1, $DB->count_records('dataform_views'));
-        $this->assertEquals(1, $DB->count_records('dataform_filters'));
+        $this->assertEquals(2, $DB->count_records('datalynx_fields'));
+        $this->assertEquals(1, $DB->count_records('datalynx_views'));
+        $this->assertEquals(1, $DB->count_records('datalynx_filters'));
         
         
         // Import entries
-        $importview = new dataformview_import($this->dataform, 1);
+        $importview = new datalynxview_import($this->datalynx, 1);
         $data = (object) array('eids' => array());
         $options = array('settings' => array(
             -6 => array('author:id' => array('name' => 'author:id')),
@@ -99,19 +99,19 @@ class dataform_import_test extends advanced_testcase {
         $this->setGuestUser();
         $importresult = $importview->execute_import($data);      
         $this->assertEquals(true, $importresult);
-        $this->assertEquals(0, $DB->count_records('dataform_entries'));
-        $this->assertEquals(0, $DB->count_records('dataform_contents'));
+        $this->assertEquals(0, $DB->count_records('datalynx_entries'));
+        $this->assertEquals(0, $DB->count_records('datalynx_contents'));
         
         // Test 2: Admin should be able to import entries
         $this->setAdminUser();
         $importresult = $importview->execute_import($data);      
         $this->assertEquals(true, $importresult);
-        $this->assertEquals(2, $DB->count_records('dataform_entries'));
-        $this->assertEquals(2, $DB->count_records('dataform_contents'));
+        $this->assertEquals(2, $DB->count_records('datalynx_entries'));
+        $this->assertEquals(2, $DB->count_records('datalynx_contents'));
 
         // Test 3: Filter
         $importview->set_filter(array('filterid' => 1));
-        $dfentries = new dataform_entries($this->dataform, $importview);
+        $dfentries = new datalynx_entries($this->datalynx, $importview);
         $entries = $dfentries->get_entries();
         $this->assertEquals(1, count($entries));
     }

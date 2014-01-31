@@ -15,27 +15,27 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package dataformfield
+ * @package datalynxfield
  * @subpackage _entry
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once("$CFG->dirroot/mod/dataform/field/renderer.php");
+require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
  *
  */
-class dataformfield__entry_renderer extends dataformfield_renderer {
+class datalynxfield__entry_renderer extends datalynxfield_renderer {
 
     /**
      * 
      */
     protected function replacements(array $tags = null, $entry = null, array $options = null) {
         $managable = !empty($options['managable']) ? $options['managable'] : false;
-        $managable = $managable && ($entry->status != dataformfield__status::STATUS_FINAL_SUBMISSION ||
-                       has_capability('mod/dataform:manageentries', $this->_field->df->context));
+        $managable = $managable && ($entry->status != datalynxfield__status::STATUS_FINAL_SUBMISSION ||
+                       has_capability('mod/datalynx:manageentries', $this->_field->df->context));
         
         // no edit mode
         $replacements = array();
@@ -82,7 +82,7 @@ class dataformfield__entry_renderer extends dataformfield_renderer {
             $url->param('ret', $url->param('view'));
             $url->param('view', $field->df()->data->singleview);
         }
-        $str = get_string('more', 'dataform');
+        $str = get_string('more', 'datalynx');
         if (!$href) {
             return html_writer::link($url->out(false), $OUTPUT->pix_icon('i/search', $str));
          } else {
@@ -160,7 +160,7 @@ class dataformfield__entry_renderer extends dataformfield_renderer {
         if ($canexportentry) {
             $field = $this->_field;
             $url = new moodle_url($entry->baseurl, array('export' => $entry->id, 'sesskey' => sesskey()));
-            $strexport = get_string('export', 'dataform');
+            $strexport = get_string('export', 'datalynx');
             return html_writer::link($url, $OUTPUT->pix_icon('t/portfolioadd', $strexport));
         }
         return $str;
@@ -174,7 +174,7 @@ class dataformfield__entry_renderer extends dataformfield_renderer {
         $patterns = array();
         
         // actions
-        $actions = get_string('actions', 'dataform');
+        $actions = get_string('actions', 'datalynx');
         $patterns["##edit##"] = array(true, $actions);
         $patterns["##delete##"] = array(true, $actions);
         $patterns["##select##"] = array(true, $actions);
@@ -182,13 +182,13 @@ class dataformfield__entry_renderer extends dataformfield_renderer {
         $patterns["##duplicate##"] = array(true, $actions);
         
         // reference
-        $reference = get_string('reference', 'dataform');
+        $reference = get_string('reference', 'datalynx');
         $patterns["##anchor##"] = array(true, $reference);
         $patterns["##more##"] = array(true, $reference);
         $patterns["##moreurl##"] = array(true, $reference);
 
         // entryinfo
-        $entryinfo = get_string('entryinfo', 'dataform');
+        $entryinfo = get_string('entryinfo', 'datalynx');
         $patterns["##entryid##"] = array(true, $entryinfo);
 
         return $patterns; 

@@ -1,14 +1,14 @@
 /**
- * This file is part of the Dataform module for Moodle - http://moodle.org/.
+ * This file is part of the Datalynx module for Moodle - http://moodle.org/.
  *
- * @package mod-dataform
- * @subpackage dataformfield-nanogong
+ * @package mod-datalynx
+ * @subpackage datalynxfield-nanogong
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * The Dataform has been developed as an enhanced counterpart
+ * The Datalynx has been developed as an enhanced counterpart
  * of Moodle's Database activity module (1.9.11+ (20110323)).
- * To the extent that Dataform code corresponds to Database code,
+ * To the extent that Datalynx code corresponds to Database code,
  * certain copyrights on Database module may obtain.
  *
  * Moodle is free software: you can redistribute it and/or modify
@@ -25,20 +25,20 @@
  * along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-M.dataformfield_teammemberselect = {};
+M.datalynxfield_teammemberselect = {};
 
-M.dataformfield_teammemberselect.sources = [];
+M.datalynxfield_teammemberselect.sources = [];
 
 /**
  * Initializes team member select field's autocomplete objects with a list of available users. It attaches event listeners to text fields.
  * @param  YUI      Y               YUI object
  * @param  object   userlistobject  list of users in format {"userid" : "username (email)", ...}
  */
-M.dataformfield_teammemberselect.init_entry_form = function (Y, userlistobject, fieldid, entryid, minteamsize) {
+M.datalynxfield_teammemberselect.init_entry_form = function (Y, userlistobject, fieldid, entryid, minteamsize) {
     var key = 0,
         dropdowns = Y.all('input[type="text"][name^="field_' + fieldid + '"][name*="_dropdown"]'),
         form = dropdowns.item(0).get('form'),
-        source = M.dataformfield_teammemberselect.sources[fieldid] = [],
+        source = M.datalynxfield_teammemberselect.sources[fieldid] = [],
         autocompletes = [],
         lastvalues = {};
 
@@ -88,10 +88,10 @@ M.dataformfield_teammemberselect.init_entry_form = function (Y, userlistobject, 
         if (i < minteamsize) {
             if (!fieldset.one('.error')) {
             fieldset.addClass('error');
-            errormsg = Y.Node.create('<span class="error">' + M.util.get_string('minteamsize_error_form', 'dataform', minteamsize) +
+            errormsg = Y.Node.create('<span class="error">' + M.util.get_string('minteamsize_error_form', 'datalynx', minteamsize) +
                                         '<br></span>');
             fieldset.prepend(errormsg);
-            console.log(M.util.get_string('minteamsize_error_form', 'dataform', minteamsize));
+            console.log(M.util.get_string('minteamsize_error_form', 'datalynx', minteamsize));
             e.preventDefault();
             }
         } else {
@@ -162,11 +162,11 @@ M.dataformfield_teammemberselect.init_entry_form = function (Y, userlistobject, 
     });
 };
 
-M.dataformfield_teammemberselect.init_filter_search_form = function (Y, userlistobject, fieldid) {
+M.datalynxfield_teammemberselect.init_filter_search_form = function (Y, userlistobject, fieldid) {
     var key = 0,
     dropdowns = Y.all('input[type="text"][name^="f_"][name*="' + fieldid + '_dropdown"]'),
     stringtoid = [],
-    source = M.dataformfield_teammemberselect.sources[fieldid] = [],
+    source = M.datalynxfield_teammemberselect.sources[fieldid] = [],
     autocompletes = [],
     lastvalues = {};
 

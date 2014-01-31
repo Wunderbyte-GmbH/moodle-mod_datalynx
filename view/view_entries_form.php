@@ -15,7 +15,7 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package dataformview
+ * @package datalynxview
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -24,7 +24,7 @@ require_once $CFG->libdir.'/formslib.php';
 /**
  *
  */
-class dataformview_entries_form extends moodleform {
+class datalynxview_entries_form extends moodleform {
 
     function definition() {
 
@@ -57,7 +57,7 @@ class dataformview_entries_form extends moodleform {
         $submitlabel = $submit ? $submit : get_string('savechanges');
         $arr[] = &$mform->createElement('submit', "submitbutton$i", $submitlabel);
         if ($this->add_action_save_continue()) {
-            $arr[] = &$mform->createElement('submit', "submitreturnbutton$i", get_string('savecontinue', 'dataform'));
+            $arr[] = &$mform->createElement('submit', "submitreturnbutton$i", get_string('savecontinue', 'datalynx'));
         }
         if ($cancel) {
             $arr[] = &$mform->createElement('cancel', "cancel$i");
