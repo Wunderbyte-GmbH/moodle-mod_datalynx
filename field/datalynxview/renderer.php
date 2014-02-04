@@ -147,7 +147,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         
         // Ref datalynx page type defaults to external
         $refpagetype = !empty($options['pagetype']) ? $options['pagetype'] : 'external';        
-        $pageoutput = $refdatalynx->set_page('external', $params);
+        $pageoutput = $refdatalynx->set_page('external', $params, true);
         
         $refview->set_content();
         // Set to return html
