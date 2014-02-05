@@ -524,11 +524,15 @@ function mod_datalynx_pluginfile($course, $cm, $context, $filearea, $args, $forc
 
         $relativepath = implode('/', $args);
         $fullpath = "/$context->id/mod_datalynx/content/$contentid/$relativepath";
+        $oldpath = "/$context->id/mod_dataform/content/$contentid/$relativepath";
 
         $fs = get_file_storage();
         if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
-            return false;
+            if (!$file = $fs->get_file_by_hash(sha1($oldpath)) or $file->is_directory()) {
+                return false;
+            }
         }
+
         // finally send the file
         send_stored_file($file, 0, 0, true); // download MUST be forced - security!
     }
@@ -539,10 +543,13 @@ function mod_datalynx_pluginfile($course, $cm, $context, $filearea, $args, $forc
 
         $relativepath = implode('/', $args);
         $fullpath = "/$context->id/mod_datalynx/$filearea/$relativepath";
+        $oldpath = "/$context->id/mod_dataform/$filearea/$relativepath";
 
         $fs = get_file_storage();
         if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
-            return false;
+            if (!$file = $fs->get_file_by_hash(sha1($oldpath)) or $file->is_directory()) {
+                return false;
+            }
         }
 
         // finally send the file
@@ -556,10 +563,13 @@ function mod_datalynx_pluginfile($course, $cm, $context, $filearea, $args, $forc
 
         $relativepath = implode('/', $args);
         $fullpath = "/$context->id/mod_datalynx/$filearea/$relativepath";
+        $oldpath = "/$context->id/mod_dataform/$filearea/$relativepath";
 
         $fs = get_file_storage();
         if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
-            return false;
+            if (!$file = $fs->get_file_by_hash(sha1($oldpath)) or $file->is_directory()) {
+                return false;
+            }
         }
 
         // finally send the file
@@ -568,15 +578,17 @@ function mod_datalynx_pluginfile($course, $cm, $context, $filearea, $args, $forc
 
     // PRESET files
     if (($filearea === 'course_presets' or $filearea === 'site_presets')) {
-//                and $context->contextlevel == CONTEXT_MODULE) {
         require_course_login($course, true, $cm);
 
         $relativepath = implode('/', $args);
         $fullpath = "/$context->id/mod_datalynx/$filearea/$relativepath";
+        $oldpath = "/$context->id/mod_dataform/$filearea/$relativepath";
 
         $fs = get_file_storage();
         if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
-            return false;
+            if (!$file = $fs->get_file_by_hash(sha1($oldpath)) or $file->is_directory()) {
+                return false;
+            }
         }
 
         // finally send the file
@@ -584,15 +596,17 @@ function mod_datalynx_pluginfile($course, $cm, $context, $filearea, $args, $forc
     }
 
     if (($filearea === 'js' or $filearea === 'css')) {
-//                and $context->contextlevel == CONTEXT_MODULE) {
         require_course_login($course, true, $cm);
 
         $relativepath = implode('/', $args);
         $fullpath = "/$context->id/mod_datalynx/$filearea/$relativepath";
+        $oldpath = "/$context->id/mod_dataform/$filearea/$relativepath";
 
         $fs = get_file_storage();
         if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
-            return false;
+            if (!$file = $fs->get_file_by_hash(sha1($oldpath)) or $file->is_directory()) {
+                return false;
+            }
         }
 
         // finally send the file
@@ -600,23 +614,19 @@ function mod_datalynx_pluginfile($course, $cm, $context, $filearea, $args, $forc
     }
 
     if (strpos($filearea, 'actor-') === 0 and $context->contextlevel == CONTEXT_MODULE) {
-
         require_course_login($course, true, $cm);
 
         $itemid = (int)array_shift($args);
 
         $relativepath = implode('/', $args);
         $fullpath = "/$context->id/mod_datalynx/$filearea/$itemid/$relativepath";
-
-        //require_once("field/$field->type/field_class.php");
-        //$fieldclass = "datalynxfield_$field->type";
-        //if (!$fieldclass::file_ok($relativepath)) {
-        //    return false;
-        //}
+        $oldpath = "/$context->id/mod_dataform/$filearea/$itemid/$relativepath";
 
         $fs = get_file_storage();
         if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
-            return false;
+            if (!$file = $fs->get_file_by_hash(sha1($oldpath)) or $file->is_directory()) {
+                return false;
+            }
         }
 
         // finally send the file

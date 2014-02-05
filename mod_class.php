@@ -302,7 +302,7 @@ class datalynx {
      * @param string $page current page
      * @param array $params 
      */
-    public function set_page($page = 'view', $params = null) {
+    public function set_page($page = 'view', $params = null, $skiplogincheck = false) {
         global $CFG, $PAGE, $USER, $OUTPUT;
         
         $this->pagefile = $page;
@@ -318,8 +318,9 @@ class datalynx {
             }
         }
 
-        require_login($this->course->id, true, $this->cm);
-
+        if (!$skiplogincheck) {
+            require_login($this->course->id, true, $this->cm);
+        }
 
         // make sure there is at least datalynx id param
         $urlparams['d'] = $thisid;
