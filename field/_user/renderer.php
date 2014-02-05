@@ -78,6 +78,7 @@ class datalynxfield__user_renderer extends datalynxfield_renderer {
         if ($entry->id < 0) { // new entry
             $entry->firstname =  $USER->firstname;
             $entry->lastname =  $USER->lastname;
+            $entry->email = $USER->email;
             $entry->userid =  $USER->id;
         }
 
@@ -90,20 +91,21 @@ class datalynxfield__user_renderer extends datalynxfield_renderer {
 
         static $usersmenu = null;
         if (is_null($usersmenu)) {
-            $users = get_users_by_capability($field->df->context, 'mod/datalynx:writeentry');
+            $users = get_users_by_capability($field->df->context, 'mod/datalynx:writeentry','u.id, u.firstname, u.lastname, u.email','u.lastname ASC');
             // add a supervisor's id
             if (!in_array($entry->userid, array_keys($users))) {
                 $user = new object;
                 $user->id = $entry->userid;
                 $user->firstname = $entry->firstname;
                 $user->lastname = $entry->lastname;
+                $user->email = $entry->email;
                 $users[$entry->userid] = $user;
             }           
         }
 
         $usermenu = array();
         foreach ($users as $userid => $user) {
-            $usermenu[$userid] = $user->firstname. ' '. $user->lastname;
+            $usermenu[$userid] = $user->lastname.' '. $user->firstname.' ('.$user->email.')';
         }
         $mform->addElement('select', $fieldname, null, $usermenu);
         $mform->setDefault($fieldname, $selected);
