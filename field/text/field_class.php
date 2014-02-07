@@ -27,5 +27,19 @@ class datalynxfield_text extends datalynxfield_base {
 
     public $type = 'text';
 
-}
+    public function validate($entryid, $tags, $formdata) {
+        $fieldid = $this->id();
+        $fieldname = $this->name();
 
+        $formfieldname = "field_{$fieldid}_{$entryid}";
+        $tags = $this->renderer()->add_clean_pattern_keys($tags);
+
+        if (array_key_exists("[[*$fieldname]]", $tags) and isset($formdata->$formfieldname)) {
+            if (!clean_param($formdata->$formfieldname, PARAM_NOTAGS)) {
+                return array($formfieldname => get_string('fieldrequired', 'datalynx'));
+            }
+        }
+        return null;
+    }
+
+}

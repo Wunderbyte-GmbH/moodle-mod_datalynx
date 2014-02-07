@@ -121,7 +121,7 @@ class datalynxfield_textarea extends datalynxfield_base {
      */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
         $fieldid = $this->field->id;
-   
+
         parent::prepare_import_content($data, $importsettings, $csvrecord, $entryid);
 
         // For editors reformat in editor structure
@@ -136,7 +136,6 @@ class datalynxfield_textarea extends datalynxfield_base {
                 unset($data->{"field_{$fieldid}_{$entryid}"});
             }
         }
-        
         return true;
     }
 
@@ -150,4 +149,44 @@ class datalynxfield_textarea extends datalynxfield_base {
             return array('');
         }
     }
+
+    public function validate($entryid, $tags, $formdata) {
+        $fieldid = $this->id();
+        $fieldname = $this->name();
+
+        $tags = $this->renderer()->add_clean_pattern_keys($tags);
+        $editabletags = array(
+            "[[$fieldname]]",
+            "[[$fieldname:text]]",
+            "[[$fieldname:textlinks]]"
+        );
+
+        if (!$this->is_editor() or !can_use_html_editor()) {
+            $formfieldname = "field_{$fieldid}_{$entryid}";
+            $cleanformat = PARAM_NOTAGS;
+        } else {
+            $formfieldname = "field_{$fieldid}_{$entryid}_editor";
+            $cleanformat = PARAM_CLEANHTML;
+        }
+
+        foreach ($editabletags as $cleantag) {
+            $tag = array_search($cleantag, $tags);
+            if ($tag !== false and $this->renderer()->is_required($tag)) {
+                if (empty($formdata->$formfieldname)) {
+                    return array($formfieldname => get_string('fieldrequired', 'datalynx'));
+                }
+                if (!$this->is_editor() or !can_use_html_editor()) {
+                    if (!clean_param($formdata->$formfieldname, $cleanformat)) {
+                        return array($formfieldname => get_string('fieldrequired', 'datalynx'));
+                    }
+                } else {
+                    if (!clean_param($formdata->$formfieldname['text'], $cleanformat)) {
+                        return array($formfieldname => get_string('fieldrequired', 'datalynx'));
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
 }

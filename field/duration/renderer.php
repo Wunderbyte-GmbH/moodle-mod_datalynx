@@ -139,26 +139,6 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
         }
         return '';
     }
-    
-    /**
-     *
-     */
-    public function validate_data($entryid, $tags, $data) {
-        $field = $this->_field;
-        $fieldid = $field->id();
-        $fieldname = $field->name();
-
-        $formfieldname = "field_{$fieldid}_{$entryid}";
-        $tags = $this->add_clean_pattern_keys($tags);
-
-        // only [[$fieldname]] is editable so check it if exists
-        if (array_key_exists("[[*$fieldname]]", $tags) and isset($data->$formfieldname)) {
-            if (!$content = clean_param($data->$formfieldname, PARAM_INT)) {
-                return array("$formfieldname[number]" => get_string('fieldrequired', 'datalynx'));
-            }
-        }
-        return null;
-    }
 
     /**
      * Array of patterns this field supports

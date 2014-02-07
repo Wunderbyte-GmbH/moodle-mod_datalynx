@@ -84,50 +84,6 @@ class datalynxfield_textarea_renderer extends datalynxfield_renderer {
     /**
      *
      */
-    public function validate_data($entryid, $tags, $data) {
-        $field = $this->_field;
-        $fieldid = $field->id();
-        $fieldname = $field->name();
-
-        $tags = $this->add_clean_pattern_keys($tags);
-        $editabletags = array(
-            "[[$fieldname]]",
-            "[[$fieldname:text]]",
-            "[[$fieldname:textlinks]]"
-        );
-
-        if (!$field->is_editor() or !can_use_html_editor()) {
-            $formfieldname = "field_{$fieldid}_{$entryid}";
-            $cleanformat = PARAM_NOTAGS;
-        } else {
-            $formfieldname = "field_{$fieldid}_{$entryid}_editor";
-            $cleanformat = PARAM_CLEANHTML;
-        }
-
-        foreach ($editabletags as $cleantag) {
-            $tag = array_search($cleantag, $tags);
-            if ($tag !== false and $this->is_required($tag)) {
-                if (empty($data->$formfieldname)) {
-                    return array($formfieldname => get_string('fieldrequired', 'datalynx'));
-                }
-                if (!$field->is_editor() or !can_use_html_editor()) {
-                    if (!$content = clean_param($data->$formfieldname, $cleanformat)) {
-                        return array($formfieldname => get_string('fieldrequired', 'datalynx'));
-                    }
-                } else {
-                    $editorobj = $data->$formfieldname;
-                    if (!$content = clean_param($editorobj['text'], $cleanformat)) {
-                        return array($formfieldname => get_string('fieldrequired', 'datalynx'));
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     *
-     */
     public function display_edit(&$mform, $entry, array $options = null) {
         global $PAGE, $CFG;
 

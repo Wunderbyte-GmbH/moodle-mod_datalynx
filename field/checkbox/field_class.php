@@ -92,4 +92,27 @@ class datalynxfield_checkbox extends datalynxfield_multiselect {
             return false;
         }
     }
+
+    public function validate($entryid, $tags, $formdata) {
+        $fieldid = $this->id();
+        $fieldname = $this->name();
+
+        $formfieldname = "field_{$fieldid}_{$entryid}_selected";
+
+        // only [[$fieldname]] is editable so check it if exists
+        if (in_array("[[*$fieldname]]", $tags)) {
+            $emptyfield  = true;
+            foreach (array_keys($this->options_menu()) as $key) {
+                $formelementname = "{$formfieldname}_$key";
+                if (!empty($formdata->$formelementname)) {
+                    $emptyfield = false;
+                    break;
+                }
+            }
+            if ($emptyfield) {
+                return array("{$fieldname}_grp" => get_string('fieldrequired', 'datalynx'));
+            }
+        }
+        return null;
+    }
 }

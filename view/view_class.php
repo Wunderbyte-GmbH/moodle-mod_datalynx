@@ -1542,6 +1542,10 @@ class datalynxview_base {
                 if ($data = $entriesform->get_data()) {
                     // validated successfully so process request
                     $processed = $this->_entries->process_entries('update', $update, $data, true);
+                    if (!$processed) {
+                        $this->_returntoentriesform = true;
+                        return false;
+                    }
 
                     if (!empty($data->submitreturnbutton)) {
                         // If we have just added new entries refresh the content

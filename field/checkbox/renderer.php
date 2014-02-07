@@ -101,32 +101,4 @@ class datalynxfield_checkbox_renderer extends datalynxfield_multiselect_renderer
 
         return array($elem + array($allreq), $separators);
     }
-
-    /**
-     *
-     */
-    public function validate_data($entryid, $tags, $data) {
-        $field = $this->_field;
-        $fieldid = $field->id();
-        $fieldname = $field->name();
-
-        $formfieldname = "field_{$fieldid}_{$entryid}_selected";
-
-        // only [[$fieldname]] is editable so check it if exists
-        if (in_array("[[*$fieldname]]", $tags)) {
-            $emptyfield  = true;
-            foreach ($field->options_menu() as $key => $unused) {
-                $formelementname = "{$formfieldname}_$key";
-                if (!empty($data->$formelementname)) {
-                    $emptyfield = false;
-                    break;
-                }
-            }
-            if ($emptyfield) {
-                return array("{$fieldname}_grp" => get_string('fieldrequired', 'datalynx'));
-            }
-        }
-        return null;
-    }
-    
 }

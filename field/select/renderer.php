@@ -232,37 +232,6 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
     /**
      *
      */
-    public function validate_data($entryid, $tags, $data) {
-        $field = $this->_field;
-        $fieldid = $field->id();
-        $fieldname = $field->name();
-
-        global $DB;
-        $query = "SELECT dc.content
-                    FROM {datalynx_contents} dc
-                   WHERE dc.entryid = :entryid
-                     AND dc.fieldid = :fieldid";
-        $params = array('entryid' => $entryid, 'fieldid' => $fieldid);
-
-        $oldcontent = $DB->get_field_sql($query, $params);
-
-        $formfieldname = "field_{$fieldid}_{$entryid}_selected";
-
-        if (isset($field->field->param5)) {
-            $disabled = $field->get_disabled_values_for_user();
-            $content = clean_param($data->{$formfieldname}, PARAM_INT);
-            if ($content != $oldcontent && array_search($content, $disabled) !== false) {
-                $menu = $field->options_menu();
-                return array($formfieldname => get_string('limitchoice_error', 'datalynx', $menu[$content]));
-            }
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     *
-     */
     protected function set_required(&$mform, $fieldname, $selected) {
         $mform->addRule($fieldname, null, 'required', null, 'client');
     }

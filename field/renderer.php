@@ -98,7 +98,7 @@ abstract class datalynxfield_renderer {
     /**
      * Cleans a pattern from auxiliary indicators (e.g. * for required)
      */
-    protected function add_clean_pattern_keys(array $patterns) {
+    public function add_clean_pattern_keys(array $patterns) {
         $keypatterns = array();
         foreach ($patterns as $pattern) {
             $keypatterns[$pattern] = str_replace($this->supports_rules(), '', $pattern);

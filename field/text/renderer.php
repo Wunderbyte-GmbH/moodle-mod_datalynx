@@ -73,26 +73,6 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
     /**
      *
      */
-    public function validate_data($entryid, $tags, $data) {
-        $field = $this->_field;
-        $fieldid = $field->id();
-        $fieldname = $field->name();
-
-        $formfieldname = "field_{$fieldid}_{$entryid}";
-        $tags = $this->add_clean_pattern_keys($tags);
-
-        // only [[$fieldname]] is editable so check it if exists
-        if (array_key_exists("[[*$fieldname]]", $tags) and isset($data->$formfieldname)) {
-            if (!$content = clean_param($data->$formfieldname, PARAM_NOTAGS)) {
-                return array($formfieldname => get_string('fieldrequired', 'datalynx'));
-            }
-        }
-        return null;
-    }
-
-    /**
-     *
-     */
     public function display_edit(&$mform, $entry, array $options = null) {
         $field = $this->_field;
         $fieldid = $field->id();

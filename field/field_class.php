@@ -693,9 +693,13 @@ abstract class datalynxfield_base {
 
     /**
      * Validate form data in entries form
+     * @param int $entryid
+     * @param string[] $tags
+     * @param stdClass $formdata
+     * @return string[]|null array of error messages
      */
-    public function validate($eid, $patterns, $formdata) {
-        return $this->renderer()->validate_data($eid, $patterns, $formdata);
+    public function validate($entryid, $tags, $formdata) {
+        return null;
     }
 
     /**

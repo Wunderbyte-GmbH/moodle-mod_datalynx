@@ -78,14 +78,24 @@ class datalynxfield_duration extends datalynxfield_base {
         return array($seconds, 1);
     }
 
-    /**
-     * 
-     */
     protected function get_sql_compare_text($column = 'content') {
-        global $DB;    
+        global $DB;
         return $DB->sql_cast_char2int("c{$this->field->id}.$column", true);
     }
 
-    
-}
+    public function validate($entryid, $tags, $formdata) {
+        $fieldid = $this->id();
+        $fieldname = $this->name();
 
+        $formfieldname = "field_{$fieldid}_{$entryid}";
+        $tags = $this->renderer()->add_clean_pattern_keys($tags);
+
+        if (array_key_exists("[[*$fieldname]]", $tags) and isset($formdata->$formfieldname)) {
+            if (!clean_param($formdata->$formfieldname, PARAM_INT)) {
+                return array("{$formfieldname}[number]" => get_string('fieldrequired', 'datalynx'));
+            }
+        }
+        return null;
+    }
+
+}

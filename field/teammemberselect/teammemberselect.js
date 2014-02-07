@@ -86,13 +86,13 @@ M.datalynxfield_teammemberselect.init_entry_form = function (Y, userlistobject, 
             }
         });
         if (i < minteamsize) {
-            if (!fieldset.one('.error')) {
-            fieldset.addClass('error');
-            errormsg = Y.Node.create('<span class="error">' + M.util.get_string('minteamsize_error_form', 'datalynx', minteamsize) +
-                                        '<br></span>');
-            fieldset.prepend(errormsg);
-            console.log(M.util.get_string('minteamsize_error_form', 'datalynx', minteamsize));
             e.preventDefault();
+            if (!fieldset.one('.error')) {
+                fieldset.addClass('error');
+                errormsg = Y.Node.create('<span class="error">' + M.util.get_string('minteamsize_error_form', 'datalynx', minteamsize) +
+                                            '<br></span>');
+                fieldset.prepend(errormsg);
+                console.log(M.util.get_string('minteamsize_error_form', 'datalynx', minteamsize));
             }
         } else {
             fieldset.removeClass('error');

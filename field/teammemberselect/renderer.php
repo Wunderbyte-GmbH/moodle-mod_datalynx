@@ -112,30 +112,6 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
                 $this->get_js_module());
     }
 
-    /**
-     *
-     */
-    public function validate_data($entryid, $tags, $data) {
-        $field = $this->_field;
-        $fieldid = $field->id();
-        $fieldname = $field->name();
-
-        $formfieldname = "field_{$fieldid}_{$entryid}";
-        $tags = $this->add_clean_pattern_keys($tags);
-        if (array_key_exists("[[*$fieldname]]", $tags) and isset($data->$formfieldname)) {
-            $numvalues = 0;
-            foreach ($data->$formfieldname as $value) {
-                if ($value != 0) {
-                    $numvalues++;
-                }
-            }
-            if ($numvalues < $field->minteamsize) {
-                return array("{$formfieldname}_dropdown_grp" => get_string('minteamsize_error_form', 'datalynx', $field->minteamsize));
-            }
-        }
-        return null;
-    }
-
     public static function compare_different_ignore_zero_callback($data) {
         $count = array_fill(0, max($data) + 1, 0);
 

@@ -42,6 +42,7 @@ class datalynxview_base_form extends moodleform {
      *
      */
     function definition() {
+        global $CFG;
         $view = $this->_view;
         $df = $this->_df;
         $editoroptions = $view->editors();
