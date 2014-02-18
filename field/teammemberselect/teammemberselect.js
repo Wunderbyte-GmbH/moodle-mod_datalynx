@@ -36,6 +36,7 @@ M.datalynxfield_teammemberselect.sources = [];
  */
 M.datalynxfield_teammemberselect.init_entry_form = function (Y, userlistobject, fieldid, entryid, minteamsize) {
     var key = 0,
+        formcancelled = false,
         dropdowns = Y.all('input[type="text"][name^="field_' + fieldid + '"][name*="_dropdown"]'),
         form = dropdowns.item(0).get('form'),
         source = M.datalynxfield_teammemberselect.sources[fieldid] = [],
@@ -73,6 +74,10 @@ M.datalynxfield_teammemberselect.init_entry_form = function (Y, userlistobject, 
         autocompletes.push(autocomplete);
     });
 
+    form.all('input[type="submit"][name*="cancel"]').on('click', function () {
+        formcancelled = true;
+    });
+
     form.on('submit', validate, form, fieldid, entryid);
 
     function validate(e, fieldid, entryid) {
@@ -80,6 +85,9 @@ M.datalynxfield_teammemberselect.init_entry_form = function (Y, userlistobject, 
             selects = Y.all('select[name^="field_' + fieldid + '_' + entryid + '"]'),
             errormsg = '',
             fieldset = dropdowns.item(0).ancestor();
+        if (formcancelled) {
+            return;
+        }
         selects.each(function (select) {
             if (select.get('value') != 0) {
                 i++;
@@ -92,7 +100,6 @@ M.datalynxfield_teammemberselect.init_entry_form = function (Y, userlistobject, 
                 errormsg = Y.Node.create('<span class="error">' + M.util.get_string('minteamsize_error_form', 'datalynx', minteamsize) +
                                             '<br></span>');
                 fieldset.prepend(errormsg);
-                console.log(M.util.get_string('minteamsize_error_form', 'datalynx', minteamsize));
             }
         } else {
             fieldset.removeClass('error');
