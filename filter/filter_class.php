@@ -733,7 +733,7 @@ class datalynx_filter_manager {
     public function get_filter_from_form($filter, $formdata, $finalize = false) {
         $filter->name = $formdata->name;
         $filter->description = !empty($formdata->description) ? $formdata->description : '';
-        $filter->perpage = !empty($formdata->perpage) ? $formdata->perpage : 0;
+        $filter->perpage = !empty($formdata->uperpage) ? $formdata->uperpage : 0;
         $filter->selection = !empty($formdata->selection) ? $formdata->selection : 0;
         $filter->groupby = !empty($formdata->groupby) ? $formdata->groupby : 0;
         $filter->search = isset($formdata->search) ? $formdata->search : '';
@@ -966,12 +966,12 @@ class datalynx_filter_manager {
                     $searchoptions = $filter->search ? $filter->search : '---';
                 }
                 
-            }         
+            }
             if (!empty($searchoptions)) {
                 $searchurlquery = '&usearch='. self::get_search_url_query($searchfields);
             }
            
-            // Per page
+            // P0)er page
             $perpage = empty($filter->perpage) ?  '---' : $filter->perpage;
 
 

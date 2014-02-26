@@ -134,7 +134,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
             $foptions['csearch'] = $soptions;
         }
 
-        $refview->set_filter($foptions);
+        $refview->set_filter($foptions, true);
 
         // Set the ref datalynx
         $params = array(

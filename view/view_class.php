@@ -263,25 +263,18 @@ class datalynxview_base {
     /**
      *
      */
-    public function get_view_filter_options() {
-        $options = array();
-        $options['filterid'] = $this->view->filter;
-        $options['perpage'] = $this->view->perpage;
-        $options['groupby'] = $this->view->groupby;
-        return $options;
-    }
-
-    /**
-     *
-     */
-    public function set_filter($filteroptions = true) {
+    public function set_filter($filteroptions = true, $ignoreurl = false) {
         $fm = $this->_df->get_filter_manager($this);
 
-        $urloptions = $filteroptions ? $fm::get_filter_options_from_url() : array();
+        if (!$ignoreurl) {
+            $urloptions = $filteroptions ? $fm::get_filter_options_from_url() : array();
+        } else {
+            $urloptions = array();
+        }
+
         if (is_array($filteroptions)) {
             $urloptions = array_merge($urloptions, $filteroptions);
         }
-        $viewoptions = $this->get_view_filter_options();
 
         $fid = !empty($urloptions['filterid']) ? $urloptions['filterid'] : 0;
         $afilter = !empty($urloptions['afilter']) ? $urloptions['afilter'] : 0;
@@ -296,7 +289,7 @@ class datalynxview_base {
         $csort = !empty($urloptions['customsort']) ? $urloptions['customsort'] : null;
         $csearch = !empty($urloptions['customsearch']) ? $urloptions['customsearch'] : null;
 
-        $filterid = $fid ? $fid : ($viewoptions['filterid'] ? $viewoptions['filterid'] : 0);
+        $filterid = $fid ? $fid : ($this->view->filter ? $this->view->filter : 0);
 
         $this->_filter = $fm->get_filter_from_id($filterid, array('view' => $this, 'advanced' => $afilter));
 
@@ -311,12 +304,12 @@ class datalynxview_base {
             $this->_filter->groups = is_array($groups) ? $groups : explode(',', $groups);
         }
 
-        $this->_filter->perpage = $perpage ? $perpage : (!empty($viewoptions['perpage']) ? $viewoptions['perpage'] : $this->_filter->perpage);
+        $this->_filter->perpage = $perpage ? $perpage : $this->_filter->perpage;
 
-        $this->_filter->groupby = $groupby ? $groupby : (!empty($viewoptions['groupby']) ? $viewoptions['groupby'] : $this->_filter->groupby);
+        $this->_filter->groupby = $groupby ? $groupby : $this->_filter->groupby;
 
         // add page
-        $this->_filter->page = $page ? $page : (!empty($viewoptions['page']) ? $viewoptions['page'] : 0);
+        $this->_filter->page = $page ? $page : 0;
         // content fields
         $this->_filter->contentfields = array_keys($this->get__patterns('field'));
 

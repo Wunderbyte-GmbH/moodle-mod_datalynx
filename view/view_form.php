@@ -84,20 +84,6 @@ class datalynxview_base_form extends moodleform {
         $mform->addElement('select', 'filter', get_string('viewfilter', 'datalynx'), $filtersmenu);
         $mform->setDefault('filter', 0);
 
-        // group by
-        if (!$fieldsmenu = $view->get_df()->get_fields(array('entry'), true)) {
-            $fieldsmenu = array('' => get_string('fieldsnonedefined', 'datalynx'));
-        } else {
-           $fieldsmenu = array('' => get_string('choose')) + $fieldsmenu;
-        }        
-        $mform->addElement('select', 'groupby', get_string('viewgroupby', 'datalynx'), $fieldsmenu);
-
-        // entries per page
-        $perpageoptions = array(0=>get_string('choose'),1=>1,2=>2,3=>3,4=>4,5=>5,6=>6,7=>7,8=>8,9=>9,10=>10,15=>15,
-                            20=>20,30=>30,40=>40,50=>50,100=>100,200=>200,300=>300,400=>400,500=>500,1000=>1000);
-        $mform->addElement('select', 'perpage', get_string('viewperpage', 'datalynx'), $perpageoptions);
-        $mform->setDefault('perpage', 10);
-
         global $DB;
         $mform->addElement('header', 'redirectsettings', get_string('redirectsettings', 'datalynx'));
         $mform->addHelpButton('redirectsettings', 'redirectsettings', 'datalynx');
