@@ -208,14 +208,20 @@ abstract class datalynxfield_renderer {
                 $labelreplacement["[[$fieldname@]]"] = array('', array(array($this ,'parse_label'), array($replacements)));
             } else {
                 $labelcontent = $field->field->label;
+                $hasvalue = true;
                 foreach ($replacements as $pattern => $replacement) {
                     if (empty($replacement)) {
                         continue;
                     }
+                    if (is_array($replacement) && empty($replacement[1])) {
+                        $hasvalue = false;
+                    }
                     list(,$content) = $replacement;                   
                     $labelcontent = str_replace($pattern, $content, $labelcontent);
                 }
-                $labelreplacement["[[$fieldname@]]"] = array('html', $labelcontent);
+                if ($hasvalue) {
+                    $labelreplacement["[[$fieldname@]]"] = array('html', $labelcontent);
+                }
             }
             $replacements = $labelreplacement + $replacements;
         }
