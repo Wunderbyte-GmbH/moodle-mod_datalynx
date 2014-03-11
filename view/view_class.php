@@ -283,7 +283,7 @@ class datalynxview_base {
         $groups = !empty($urloptions['groups']) ? $urloptions['groups'] : null;
         $page = !empty($urloptions['page']) ? $urloptions['page'] : 0;
 
-        $perpage = !empty($urloptions['perpage']) ? $urloptions['perpage'] : 50;
+        $perpage = !empty($urloptions['perpage']) ? $urloptions['perpage'] : 0;
         $groupby = !empty($urloptions['groupby']) ? $urloptions['groupby'] : 0;
 
         $csort = !empty($urloptions['customsort']) ? $urloptions['customsort'] : null;
@@ -304,7 +304,7 @@ class datalynxview_base {
             $this->_filter->groups = is_array($groups) ? $groups : explode(',', $groups);
         }
 
-        $this->_filter->perpage = $perpage ? $perpage : $this->_filter->perpage;
+        $this->_filter->perpage = $perpage ? $perpage : ($this->_filter->perpage ? $this->_filter->perpage : 50);
 
         $this->_filter->groupby = $groupby ? $groupby : $this->_filter->groupby;
 

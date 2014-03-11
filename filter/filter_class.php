@@ -733,7 +733,7 @@ class datalynx_filter_manager {
     public function get_filter_from_form($filter, $formdata, $finalize = false) {
         $filter->name = $formdata->name;
         $filter->description = !empty($formdata->description) ? $formdata->description : '';
-        $filter->perpage = !empty($formdata->uperpage) ? $formdata->uperpage : 0;
+        $filter->perpage = !empty($formdata->perpage) ? $formdata->perpage : 0;
         $filter->selection = !empty($formdata->selection) ? $formdata->selection : 0;
         $filter->groupby = !empty($formdata->groupby) ? $formdata->groupby : 0;
         $filter->search = isset($formdata->search) ? $formdata->search : '';
@@ -1218,7 +1218,7 @@ class datalynx_filter_manager {
     public static function get_filter_options_from_url($url = null) {
         $filteroptions = array(
             'filterid' => array('filter', 0, PARAM_INT),
-            'perpage' => array('uperpage', 50, PARAM_INT),
+            'perpage' => array('uperpage', 0, PARAM_INT),
             'selection' => array('uselection', 0, PARAM_INT),
             'groupby' => array('ugroupby', 0, PARAM_INT),
             'customsort' => array('usort', '', PARAM_RAW),
