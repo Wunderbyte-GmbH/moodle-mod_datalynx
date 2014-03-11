@@ -283,7 +283,7 @@ class datalynxview_base {
         $groups = !empty($urloptions['groups']) ? $urloptions['groups'] : null;
         $page = !empty($urloptions['page']) ? $urloptions['page'] : 0;
 
-        $perpage = !empty($urloptions['perpage']) ? $urloptions['perpage'] : 0;
+        $perpage = !empty($urloptions['perpage']) ? $urloptions['perpage'] : 50;
         $groupby = !empty($urloptions['groupby']) ? $urloptions['groupby'] : 0;
 
         $csort = !empty($urloptions['customsort']) ? $urloptions['customsort'] : null;

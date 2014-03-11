@@ -1218,7 +1218,7 @@ class datalynx_filter_manager {
     public static function get_filter_options_from_url($url = null) {
         $filteroptions = array(
             'filterid' => array('filter', 0, PARAM_INT),
-            'perpage' => array('uperpage', 0, PARAM_INT),
+            'perpage' => array('uperpage', 50, PARAM_INT),
             'selection' => array('uselection', 0, PARAM_INT),
             'groupby' => array('ugroupby', 0, PARAM_INT),
             'customsort' => array('usort', '', PARAM_RAW),
