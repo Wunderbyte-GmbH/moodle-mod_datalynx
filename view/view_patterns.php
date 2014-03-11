@@ -232,11 +232,10 @@ class datalynxview_patterns {
 
         switch ($tag) {
             case '##numentriestotal##':
-                $replacement = empty($options['entriescount']) ? 0 : $options['entriescount'];
-                break;
-
-            case '##numentriesdisplayed##':
                 $replacement = empty($options['entriesfiltercount']) ? 0 : $options['entriesfiltercount'];
+                break;
+            case '##numentriesdisplayed##':
+                $replacement = empty($options['entriescount']) ? 0 : $options['entriescount'];
                 break;
         }
         return $replacement;
