@@ -144,6 +144,12 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
 
         $data->dataid = $this->get_new_parentid('datalynx');
 
+        // restore view reference for datalynxview field type
+        if ($data->type == 'datalynxview') {
+            $data->param1 = $this->get_mappingid('datalynx', $data->param1);
+            $data->param2 = $this->get_mappingid('datalynx_views', $data->param2);
+        }
+
         // insert the datalynx_fields record
         $newitemid = $DB->insert_record('datalynx_fields', $data);
         $this->set_mapping('datalynx_field', $oldid, $newitemid, true); // files by this item id
