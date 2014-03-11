@@ -194,17 +194,14 @@ class datalynxview_pdf extends datalynxview_base {
             return;
         }
 
-        $content = array();
         if ($settings->pagebreak == 'entry') {
-            $entries = $this->_entries->entries();
-            foreach ($entries as $eid => $entry) {
-                $entriesset = new object;
-                $entriesset->max = 1;
-                $entriesset->found = 1;
-                $entriesset->entries = array($eid => $entry);
-                $this->_entries->set_content(array('entriesset' => $entriesset));
-                $pages = explode(self::PAGE_BREAK, $this->display(array('export' => true, 'tohtml' => true, 'controls' => false, 'entryactions' => false)));
-                $content = array_merge($content,$pages);
+            $entrybreak = '<div class="entrybreak"></div>';
+            $content = array();
+            $newcontent = explode($entrybreak, $this->display(array('export' => true, 'tohtml' => true, 'controls' => false, 'entryactions' => false)));
+            foreach ($newcontent as $page) {
+                if ($page) {
+                    $content[] = $page;
+                }
             }
         } else {
             $content = explode(self::PAGE_BREAK, $this->display(array('export' => true, 'tohtml' => true, 'controls' => false, 'entryactions' => false)));
