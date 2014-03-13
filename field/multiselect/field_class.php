@@ -244,4 +244,8 @@ class datalynxfield_multiselect extends datalynxfield_base {
         }
         return $defaults;
     }
+
+    public function supports_group_by() {
+        return false;
+    }
 }

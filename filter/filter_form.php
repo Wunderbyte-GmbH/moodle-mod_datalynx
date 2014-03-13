@@ -30,6 +30,9 @@ require_once ("$CFG->libdir/formslib.php");
  */
 abstract class mod_datalynx_filter_base_form extends moodleform {
     protected $_filter = null;
+    /**
+     * @var datalynx null
+     */
     protected $_df = null;
 
     /*
@@ -273,7 +276,13 @@ class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
         $mform->disabledIf('selection', 'perpage', 'eq', '0');
 
         // group by
-        $mform->addElement('select', 'groupby', get_string('filtergroupby', 'datalynx'), $fieldoptions);
+        $groupbyfieldoptions = array(0 => get_string('choose'));
+        foreach ($fields as $field) {
+            if ($field->supports_group_by()) {
+                $groupbyfieldoptions[$field->id()] = $field->name();
+            }
+        }
+        $mform->addElement('select', 'groupby', get_string('filtergroupby', 'datalynx'), $groupbyfieldoptions);
         $mform->setDefault('groupby', $filter->groupby);
 
         // search

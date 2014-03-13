@@ -780,7 +780,11 @@ class datalynx {
     }
 
     /**
-     *
+     * @param null   $exclude
+     * @param bool   $menu
+     * @param bool   $forceget
+     * @param string $sort
+     * @return datalynxfield_base[]
      */
     public function get_fields($exclude = null, $menu = false, $forceget = false, $sort = '') {
         global $DB;

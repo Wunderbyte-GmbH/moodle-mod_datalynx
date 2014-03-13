@@ -511,6 +511,14 @@ abstract class datalynxfield_base {
     }
 
     /**
+     * Checks whether the field supports 'group by' filtering option
+     * @return bool
+     */
+    public function supports_group_by() {
+        return true;
+    }
+
+    /**
      *
      */
     public function get_content_parts() {

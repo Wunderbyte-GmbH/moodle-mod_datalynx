@@ -253,4 +253,8 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         }
         return null;
     }
+
+    public function supports_group_by() {
+        return false;
+    }
 }
