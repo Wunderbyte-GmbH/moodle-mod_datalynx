@@ -130,7 +130,7 @@ class datalynxview_csv extends datalynxview_aligned {
         }
         
         // Convert encoding
-        $returnstr = mb_convert_encoding($returnstr, $this->_encoding);
+        $returnstr = mb_convert_encoding($returnstr, $this->_encoding, 'UTF-8');
 
         header("Content-Type: application/download\n");
         header("Content-Disposition: attachment; filename=\"$filename\"");
