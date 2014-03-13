@@ -41,6 +41,13 @@ class datalynxfield_url_form extends datalynxfield_form {
         // force link name
         $mform->addElement('text', 'param2', get_string('forcename', 'datalynxfield_url'), array('size'=>'32'));
         $mform->setType('param2', PARAM_TEXT);
+
+        $mform->addElement('text', 'param3', get_string('urlclass', 'datalynx'), array('size'=>'32'));
+        $mform->setType('param3', PARAM_TEXT);
+
+        $mform->addElement('text', 'param4', get_string('urltarget', 'datalynx'), array('size'=>'32'));
+        $mform->setType('param4', PARAM_TEXT);
+
     }
 
 }

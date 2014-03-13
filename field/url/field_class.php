@@ -24,7 +24,16 @@
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
 class datalynxfield_url extends datalynxfield_base {
+    public $class;
+    public $target;
+
     public $type = 'url';
+
+    public function __construct($df = 0, $field = 0) {
+        parent::__construct($df, $field);
+        $this->class = $field->param3;
+        $this->target = $field->param4;
+    }
 
     /**
      *

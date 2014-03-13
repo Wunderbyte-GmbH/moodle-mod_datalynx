@@ -672,3 +672,5 @@ $string['datalynx:notifymemberremoved'] = 'Nutzer benachrichtigen, wenn sie von 
 $string['datalynx:viewprivilegeadmin'] = 'Administratorzugriffsrecht auf Ansichten';
 $string['blankfilter'] = 'Leerer Filter';
 $string['defaultfilterlabel'] = 'Voreingestellter Filter ({$a})';
+$string['urlclass'] = 'CSS Klassen';
+$string['urltarget'] = '\'target\' Attribut';

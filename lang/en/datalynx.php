@@ -697,3 +697,5 @@ $string['datalynx_memberadded'] = 'Team member added';
 $string['datalynx_memberremoved'] = 'Team member removed';
 $string['blankfilter'] = 'Blank filter';
 $string['defaultfilterlabel'] = 'Default filter ({$a})';
+$string['urlclass'] = 'CSS classes';
+$string['urltarget'] = '\'target\' attribute';

@@ -106,6 +106,8 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
 
         $field = $this->_field;
         $fieldid = $field->id();
+        $attributes = array('class' => $field->class,
+                            'target' => $field->target);
 
         if (isset($entry->{"c{$fieldid}_content"})) {
             $url = $entry->{"c{$fieldid}_content"};
@@ -127,7 +129,7 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
 
             // linking
             if ($type == 'link') {
-                return html_writer::link($url, $alttext);
+                return html_writer::link($url, $alttext, $attributes);
             }
             
             // image
@@ -144,7 +146,7 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
             if ($type == 'media') {
                 require_once("$CFG->dirroot/filter/mediaplugin/filter.php");
                 $mpfilter = new filter_mediaplugin($field->df()->context, array());
-                return $mpfilter->filter(html_writer::link($url, ''));
+                return $mpfilter->filter(html_writer::link($url, '', $attributes));
             }
         }
         
