@@ -550,5 +550,17 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2014010701, 'datalynx');
     }
 
+    if ($oldversion < 2014031401) {
+        $query = "UPDATE {datalynx_contents} c
+                     SET c.content = CONCAT('#', c.content, '#')
+                   WHERE c.fieldid IN (SELECT id
+                                       FROM {datalynx_fields} f
+                                       WHERE f.type = 'checkbox' OR f.type = 'multiselect')";
+        $DB->execute($query);
+
+        // Datalynx savepoint reached.
+        upgrade_mod_savepoint(true, 2014031401, 'datalynx');
+    }
+
     return true;
 }

@@ -23,7 +23,7 @@
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
-class datalynxfield_select extends datalynxfield_base {
+class datalynxfield_select extends datalynxfield_option_single {
 
     public $type = 'select';
     
@@ -40,61 +40,6 @@ class datalynxfield_select extends datalynxfield_base {
 
         // Set the options
         $this->options_menu();
-    }
-
-    /**
-     * Update a field in the database
-     */
-    public function update_field($fromform = null) {
-        global $DB;
-        
-        // before we update get the current options
-        $oldoptions = $this->options_menu();
-        // update
-        parent::update_field($fromform);       
-
-        // adjust content if necessary
-        $adjustments = array();
-        // Get updated options
-        $newoptions = $this->options_menu(true);
-        foreach ($newoptions as $newkey => $value) {
-            if (!isset($oldoptions[$newkey]) or $value != $oldoptions[$newkey]) {
-                if ($key = array_search($value, $oldoptions) or $key !== false) {
-                    $adjustments[$key] = $newkey;
-                }
-            }
-        }
-
-        if (!empty($adjustments)) {
-            // fetch all contents of the field whose content in keys
-            list($incontent, $params) = $DB->get_in_or_equal(array_keys($adjustments));
-            array_unshift($params, $this->field->id);
-            $contents = $DB->get_records_select_menu('datalynx_contents',
-                                        " fieldid = ? AND content $incontent ",
-                                        $params,
-                                        '',
-                                        'id,content'); 
-            if ($contents) {
-                if (count($contents) == 1) {
-                    list($id, $content) = each($contents);
-                    $DB->set_field('datalynx_contents', 'content', $adjustments[$content], array('id' => $id));
-                } else { 
-                    $params = array();
-                    $sql = "UPDATE {datalynx_contents} SET content = CASE id ";
-                    foreach ($contents as $id => $content) {
-                        $newcontent = $adjustments[$content];
-                        $sql .= " WHEN ? THEN ? ";
-                        $params[] = $id;
-                        $params[] = $newcontent;
-                    }
-                    list($inids, $paramids) = $DB->get_in_or_equal(array_keys($contents));
-                    $sql .= " END WHERE id $inids ";
-                    $params = array_merge($params, $paramids);
-                    $DB->execute($sql, $params);
-                }
-            }
-        }
-        return true;
     }
 
     /**

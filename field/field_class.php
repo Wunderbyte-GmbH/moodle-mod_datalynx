@@ -618,7 +618,7 @@ abstract class datalynxfield_base {
             $params = array($name => "'$value'");
             $sql = " $varcharcontent $operator :$name ";
         }
-        // 
+
         if ($excludeentries) {
             // Get entry ids for entries that meet the criterion
             if ($eids = $this->get_entry_ids_for_content($sql, $params)) {
@@ -744,6 +744,9 @@ abstract class datalynxfield_base {
         );
     }
 
+    public function has_options() {
+        return false;
+    }
 }
 
 /**
@@ -790,5 +793,122 @@ abstract class datalynxfield_no_content extends datalynxfield_base {
      */
     protected function filearea($suffix = null) {
         return false;
+    }
+}
+
+class datalynxfield_option extends datalynxfield_base {
+    public function has_options() {
+        return true;
+    }
+}
+
+class datalynxfield_option_multiple extends datalynxfield_option {
+    public function set_field($forminput = null) {
+        global $DB;
+
+        $this->field = new stdClass();
+        $this->field->id = !empty($forminput->id) ? $forminput->id : 0;
+        $this->field->type   = $this->type;
+        $this->field->dataid = $this->df->id();
+        $this->field->name = !empty($forminput->name) ? trim($forminput->name) : '';
+        $this->field->description = !empty($forminput->description) ? trim($forminput->description) : '';
+        $this->field->visible = isset($forminput->visible) ? $forminput->visible : 2;
+        $this->field->edits = isset($forminput->edits) ? $forminput->edits : -1;
+        $this->field->label = !empty($forminput->label) ? $forminput->label : '';
+
+        $oldvalues = array_merge(array(0 => ''), $this->_options);
+        $newvalues = array_unique(array_merge(array(0 => ''), preg_split("/[\r\n]+/", $forminput->param1)));
+
+        $map = array(0 => 0);
+        for ($i = 1; $i < count($oldvalues); $i++) {
+            if (($j = array_search($oldvalues[$i], $newvalues)) !== false) {
+                $map[$i] = $j;
+            } else {
+                $map[$i] = 0;
+            }
+        }
+
+        $params = array();
+        $i = 0;
+        $where = 'FALSE ';
+        foreach ($map as $old => $new) {
+            $where .= 'OR ' . $DB->sql_like('c.content', ":old{$i}") . ' ';
+            $params["old{$i}"] = "%#{$old}#%";
+            $i++;
+        }
+        $selectsql = "SELECT c.id, c.content
+                        FROM {datalynx_contents} c
+                       WHERE {$where}
+                         AND c.fieldid = :fieldid";
+        $params['fieldid'] = $this->field->id;
+
+        $oldcontents = $DB->get_records_sql_menu($selectsql, $params);
+        foreach ($oldcontents as $id => $oldcontent) {
+            $newcontent = preg_replace('/#(\d)/', '#-$1', $oldcontent);
+            foreach ($map as $old => $new) {
+                $newcontent = preg_replace("/#-{$old}/", "#{$new}", $newcontent);
+            }
+            $DB->set_field('datalynx_contents', 'content', $newcontent, array('id' => $id));
+        }
+
+        array_shift($newvalues);
+        $this->field->param1 = implode("\n", $newvalues);
+        $this->field->param2 = $forminput->param2;
+    }
+
+    public function supports_group_by() {
+        return false;
+    }
+}
+
+class datalynxfield_option_single extends datalynxfield_option {
+    public function set_field($forminput = null) {
+        global $DB;
+
+        $this->field = new stdClass();
+        $this->field->id = !empty($forminput->id) ? $forminput->id : 0;
+        $this->field->type   = $this->type;
+        $this->field->dataid = $this->df->id();
+        $this->field->name = !empty($forminput->name) ? trim($forminput->name) : '';
+        $this->field->description = !empty($forminput->description) ? trim($forminput->description) : '';
+        $this->field->visible = isset($forminput->visible) ? $forminput->visible : 2;
+        $this->field->edits = isset($forminput->edits) ? $forminput->edits : -1;
+        $this->field->label = !empty($forminput->label) ? $forminput->label : '';
+
+        $oldvalues = array_merge(array(0 => ''), $this->_options);
+        $newvalues = array_unique(array_merge(array(0 => ''), preg_split("/[\r\n]+/", $forminput->param1)));
+
+        $map = array(0 => 0);
+        for ($i = 1; $i < count($oldvalues); $i++) {
+            if (($j = array_search($oldvalues[$i], $newvalues)) !== false) {
+                $map[$i] = $j;
+            } else {
+                $map[$i] = 0;
+            }
+        }
+
+        $params = array();
+        $i = 0;
+        $updatesql = "UPDATE {datalynx_contents} c
+                         SET c.content = (
+                        CASE";
+        foreach ($map as $old => $new) {
+            $updatesql .= " WHEN c.content = :old{$i} THEN :new{$i} ";
+            $params["old{$i}"] = $old;
+            $params["new{$i}"] = $new;
+            $i++;
+        }
+        $updatesql .= "ELSE 0 END) WHERE c.fieldid = :fieldid";
+        $params['fieldid'] = $this->field->id;
+
+        $DB->execute($updatesql, $params);
+
+        array_shift($newvalues);
+        $this->field->param1 = implode("\n", $newvalues);
+        $this->field->param2 = $forminput->param2;
+    }
+
+    public function supports_group_by() {
+        return true;
     }
 }

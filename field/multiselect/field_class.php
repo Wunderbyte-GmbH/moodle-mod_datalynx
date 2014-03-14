@@ -23,7 +23,7 @@
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
-class datalynxfield_multiselect extends datalynxfield_base {
+class datalynxfield_multiselect extends datalynxfield_option_multiple {
 
     public $type = 'multiselect';
     protected $_options = array();
@@ -95,24 +95,15 @@ class datalynxfield_multiselect extends datalynxfield_base {
         $allrequired = $value['allrequired'];
         $selected    = $value['selected'];
         $content = "c{$this->field->id}.content";
-        $varcharcontent = $DB->sql_compare_text($content, 255);
 
         if ($selected) {
             $conditions = array();
             foreach ($selected as $key => $sel) {
                 $xname = $name. $key;
                 $likesel = str_replace('%', '\%', $sel);
-                $likeselsel = str_replace('_', '\_', $likesel);
 
-                $conditions[] = "({$varcharcontent} = :{$xname}a".
-                                   ' OR '. $DB->sql_like($content, ":{$xname}b").
-                                   ' OR '. $DB->sql_like($content, ":{$xname}c").
-                                   ' OR '. $DB->sql_like($content, ":{$xname}d"). ")";
-                                   
-                $params[$xname.'a'] = $sel;
-                $params[$xname.'b'] = "$likesel#%";
-                $params[$xname.'c'] = "%#$likesel";
-                $params[$xname.'d'] = "%#$likesel#%";
+                $conditions[] = $DB->sql_like($content, ":{$xname}");
+                $params[$xname] = "%#$likesel#%";
             }
             if ($allrequired) {
                 return array(" $not (".implode(" AND ", $conditions).") ", $params, true);
@@ -146,7 +137,7 @@ class datalynxfield_multiselect extends datalynxfield_base {
 
         // parse values
         $selected = !empty($values['selected']) ? $values['selected'] : array();
-        $newvalues = !empty($values['newvalue']) ? explode('#', $values['newvalue']) : array();
+        $newvalues = !empty($values['newvalue']) ? explode('#', trim('#', $values['newvalue'])) : array();
 
         // update new values in field type
         if ($newvalues) {
@@ -166,7 +157,7 @@ class datalynxfield_multiselect extends datalynxfield_base {
 
         // new contents
         if (!empty($selected)) {
-            $contents[] = implode('#', $selected);
+            $contents[] = '#' . implode('#', $selected) . '#';
         }
         
         return array($contents, $oldcontents);
@@ -200,7 +191,7 @@ class datalynxfield_multiselect extends datalynxfield_base {
             $fieldname = $this->name();
             $csvname = $importsettings[$fieldname]['name'];
             $allownew = $importsettings[$fieldname]['allownew'];
-            $labels = !empty($csvrecord[$csvname]) ? explode('#', $csvrecord[$csvname]) : null;
+            $labels = !empty($csvrecord[$csvname]) ? explode('#', trim('#', $csvrecord[$csvname])) : null;
 
             if ($labels) {
                 $options = $this->options_menu();
@@ -220,7 +211,7 @@ class datalynxfield_multiselect extends datalynxfield_base {
                     $data->{"field_{$fieldid}_{$entryid}_selected"} = $selected;
                 }
                 if ($newvalues) {
-                    $data->{"field_{$fieldid}_{$entryid}_newvalue"} = implode('#', $newvalues);
+                    $data->{"field_{$fieldid}_{$entryid}_newvalue"} = '#' . implode('#', $newvalues) . '#';
                 }
             }
         }
@@ -243,9 +234,5 @@ class datalynxfield_multiselect extends datalynxfield_base {
             }
         }
         return $defaults;
-    }
-
-    public function supports_group_by() {
-        return false;
     }
 }
