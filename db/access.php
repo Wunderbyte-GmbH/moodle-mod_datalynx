@@ -63,12 +63,11 @@ $capabilities = array(
     // manage entries: view, write, delete, export etc.
     'mod/datalynx:manageentries' => array(
 
-        'riskbitmask' => RISK_SPAM,
+        'riskbitmask' => RISK_SPAM | RISK_DATALOSS,
 
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
-            'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW
         )
