@@ -137,7 +137,7 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
 
         // parse values
         $selected = !empty($values['selected']) ? $values['selected'] : array();
-        $newvalues = !empty($values['newvalue']) ? explode('#', trim('#', $values['newvalue'])) : array();
+        $newvalues = !empty($values['newvalue']) ? explode('#', trim($values['newvalue'], '#')) : array();
 
         // update new values in field type
         if ($newvalues) {

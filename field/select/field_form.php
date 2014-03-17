@@ -22,31 +22,21 @@
  */
 require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
-class datalynxfield_select_form extends datalynxfield_form {
+class datalynxfield_select_form extends datalynxfield_option_form {
 
-    /**
-     *
-     */
-    function field_definition() {
-
+    public function field_definition() {
         $mform =& $this->_form;
 
-    //-------------------------------------------------------------------------------
         $mform->addElement('header', 'fieldattributeshdr', get_string('fieldattributes', 'datalynx'));
 
-        // options
-        $mform->addElement('textarea', 'param1', get_string('fieldoptions', 'datalynx'), 'wrap="virtual" rows="5" cols="30"');
-
-        // default value
+        // Default value.
         $mform->addElement('text', 'param2', get_string('default'));
         $mform->setType('param2', PARAM_TEXT);
 
-        // reserve param3 for options separator (e.g. radiobutton, image button)
-
-        // allow add option
+        // Allow add option?
         $mform->addElement('selectyesno', 'param4', get_string('allowaddoption', 'datalynx'));
 
-        // allow choice limit
+        // Allow choice limit?
         $mform->addElement('checkbox', 'param5', get_string('limitchoice', 'datalynx'));
         $mform->addHelpButton('param5', 'limitchoice', 'datalynx');
     }

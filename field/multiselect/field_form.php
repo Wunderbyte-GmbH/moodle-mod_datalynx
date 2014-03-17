@@ -22,28 +22,21 @@
  */
 require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
-class datalynxfield_multiselect_form extends datalynxfield_form {
-
-    /**
-     *
-     */
-    function field_definition() {
-
+class datalynxfield_multiselect_form extends datalynxfield_option_form {
+    public function field_definition() {
         $mform =& $this->_form;
 
-    //-------------------------------------------------------------------------------
         $mform->addElement('header', 'fieldattributeshdr', get_string('fieldattributes', 'datalynx'));
-        
-        // options
-        $mform->addElement('textarea', 'param1', get_string('fieldoptions', 'datalynx'), 'wrap="virtual" rows="10" cols="50"');
 
-        // default options
-        $mform->addElement('textarea', 'param2', get_string('fieldoptionsdefault', 'datalynx'), 'wrap="virtual" rows="5" cols="50"');
+        // Default options.
+        $mform->addElement('textarea', 'param2', get_string('fieldoptionsdefault', 'datalynx'),
+                           'wrap="virtual" rows="5" cols="50"');
 
-        // options separator
-        $mform->addElement('select', 'param3', get_string('fieldoptionsseparator', 'datalynx'), array_map('current', $this->_field->separators));
+        // Options separator.
+        $mform->addElement('select', 'param3', get_string('fieldoptionsseparator', 'datalynx'),
+                           array_map('current', $this->_field->separators));
 
-        // allow add option
+        // Allow add option?
         $mform->addElement('selectyesno', 'param4', get_string('allowaddoption', 'datalynx'));
 
     }

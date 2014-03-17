@@ -512,7 +512,7 @@ abstract class datalynxfield_base {
 
     /**
      * Checks whether the field supports 'group by' filtering option
-     * @return bool
+     * @return bool true if 'group by' is supported, false otherwise
      */
     public function supports_group_by() {
         return true;
@@ -744,6 +744,10 @@ abstract class datalynxfield_base {
         );
     }
 
+    /**
+     * Checks whether this field provides a set of options.
+     * @return bool true if this is an option field, false otherwise
+     */
     public function has_options() {
         return false;
     }
@@ -796,16 +800,32 @@ abstract class datalynxfield_no_content extends datalynxfield_base {
     }
 }
 
-class datalynxfield_option extends datalynxfield_base {
+/**
+ * Base class for Datalynx field types that offer a set of options
+ */
+abstract class datalynxfield_option extends datalynxfield_base {
+
+    /**
+     * @return bool
+     */
     public function has_options() {
         return true;
     }
-}
 
-class datalynxfield_option_multiple extends datalynxfield_option {
+    /**
+     * @return mixed
+     */
+    public function get_options() {
+        return $this->_options;
+    }
+
+    /**
+     * @param array $map
+     * @return mixed
+     */
+    public abstract function update_options($map = array());
+
     public function set_field($forminput = null) {
-        global $DB;
-
         $this->field = new stdClass();
         $this->field->id = !empty($forminput->id) ? $forminput->id : 0;
         $this->field->type   = $this->type;
@@ -816,8 +836,27 @@ class datalynxfield_option_multiple extends datalynxfield_option {
         $this->field->edits = isset($forminput->edits) ? $forminput->edits : -1;
         $this->field->label = !empty($forminput->label) ? $forminput->label : '';
 
-        $oldvalues = array_merge(array(0 => ''), $this->_options);
-        $newvalues = array_unique(array_merge(array(0 => ''), preg_split("/[\r\n]+/", $forminput->param1)));
+        $oldvalues = $newvalues = $this->_options;
+        $renames = !empty($forminput->renameoption) ? $forminput->renameoption : array();
+        $deletes = !empty($forminput->deleteoption) ? $forminput->deleteoption : array();
+        $adds = preg_split("/[\r\n]+/", !empty($forminput->addoptions) ? $forminput->addoptions : '');
+
+        foreach (array_keys($deletes) as $id) {
+            if (($addedid = array_search($oldvalues[$id], $adds)) !== false) {
+                unset($adds[$addedid]);
+                unset($deletes[$id]);
+            } else {
+                unset($newvalues[$id]);
+            }
+        }
+
+        foreach ($renames as $id => $newname) {
+            if (!!(trim($newname))) {
+                $newvalues[$id] = $newname;
+            }
+        }
+
+        $newvalues = array_merge($newvalues, $adds);
 
         $map = array(0 => 0);
         for ($i = 1; $i < count($oldvalues); $i++) {
@@ -828,6 +867,19 @@ class datalynxfield_option_multiple extends datalynxfield_option {
             }
         }
 
+        $this->update_options($map);
+
+        $this->field->param1 = implode("\n", $newvalues);
+        $this->field->param2 = $forminput->param2;
+    }
+}
+
+/**
+ * Base class for Datalynx field types that offer a set of options with multiple choice
+ */
+class datalynxfield_option_multiple extends datalynxfield_option {
+    public function update_options($map = array()) {
+        global $DB;
         $params = array();
         $i = 0;
         $where = 'FALSE ';
@@ -850,10 +902,6 @@ class datalynxfield_option_multiple extends datalynxfield_option {
             }
             $DB->set_field('datalynx_contents', 'content', $newcontent, array('id' => $id));
         }
-
-        array_shift($newvalues);
-        $this->field->param1 = implode("\n", $newvalues);
-        $this->field->param2 = $forminput->param2;
     }
 
     public function supports_group_by() {
@@ -861,31 +909,12 @@ class datalynxfield_option_multiple extends datalynxfield_option {
     }
 }
 
+/**
+ * Base class for Datalynx field types that offer a set of options with single choice
+ */
 class datalynxfield_option_single extends datalynxfield_option {
-    public function set_field($forminput = null) {
+    public function update_options($map = array()) {
         global $DB;
-
-        $this->field = new stdClass();
-        $this->field->id = !empty($forminput->id) ? $forminput->id : 0;
-        $this->field->type   = $this->type;
-        $this->field->dataid = $this->df->id();
-        $this->field->name = !empty($forminput->name) ? trim($forminput->name) : '';
-        $this->field->description = !empty($forminput->description) ? trim($forminput->description) : '';
-        $this->field->visible = isset($forminput->visible) ? $forminput->visible : 2;
-        $this->field->edits = isset($forminput->edits) ? $forminput->edits : -1;
-        $this->field->label = !empty($forminput->label) ? $forminput->label : '';
-
-        $oldvalues = array_merge(array(0 => ''), $this->_options);
-        $newvalues = array_unique(array_merge(array(0 => ''), preg_split("/[\r\n]+/", $forminput->param1)));
-
-        $map = array(0 => 0);
-        for ($i = 1; $i < count($oldvalues); $i++) {
-            if (($j = array_search($oldvalues[$i], $newvalues)) !== false) {
-                $map[$i] = $j;
-            } else {
-                $map[$i] = 0;
-            }
-        }
 
         $params = array();
         $i = 0;
@@ -902,10 +931,6 @@ class datalynxfield_option_single extends datalynxfield_option {
         $params['fieldid'] = $this->field->id;
 
         $DB->execute($updatesql, $params);
-
-        array_shift($newvalues);
-        $this->field->param1 = implode("\n", $newvalues);
-        $this->field->param2 = $forminput->param2;
     }
 
     public function supports_group_by() {

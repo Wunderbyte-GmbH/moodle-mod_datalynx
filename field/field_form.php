@@ -34,7 +34,8 @@ class datalynxfield_form extends moodleform {
         parent::__construct($action, $customdata, $method, $target, $attributes, $editable);       
     }
     
-    function definition() {        
+    function definition() {
+        global $CFG;
         $mform = &$this->_form;
 
         // buttons
@@ -125,4 +126,38 @@ class datalynxfield_form extends moodleform {
         return $errors;
     }
 
+}
+
+class datalynxfield_option_form extends datalynxfield_form {
+
+    function definition_after_data() {
+        $this->add_option_dialog();
+    }
+
+    protected function add_option_dialog() {
+        $mform = &$this->_form;
+        $options = $this->_field->get_options();
+        if (!empty($options)) {
+            $header = &$mform->createElement('static', '', get_string('existingoptions', 'datalynx'),
+                '<table><thead><th>' . get_string('option', 'datalynx') . '</th><th>' .
+                get_string('deleteoption', 'datalynx') . '</th><th>' . get_string('renameoption', 'datalynx') .
+                '</th></thead><tbody>');
+            $mform->insertElementBefore($header, 'param2');
+            foreach ($options as $id => $option) {
+                $group = array();
+                $group[] = &$mform->createElement('static', '', '', "<tr><td>{$option}</td><td>");
+                $group[] = &$mform->createElement('checkbox', "deleteoption[{$id}]", '');
+                $group[] = &$mform->createElement('static', '', '', '</td><td>');
+                $group[] = &$mform->createElement('text', "renameoption[{$id}]", '');
+                $group[] = &$mform->createElement('static', '', '', '</td></tr>');
+                $tablerow = &$mform->createElement('group', 'existingoptions', '', $group, null, false);
+                $mform->insertElementBefore($tablerow, 'param2');
+                $mform->disabledIf("renameoption{$id}", "deleteoption{$id}", 'checked');
+            }
+            $footer = &$mform->createElement('static', '', '', '</tbody></table>');
+            $mform->insertElementBefore($footer, 'param2');
+        }
+        $addnew = &$mform->createElement('textarea', 'addoptions', get_string('addoptions', 'datalynx'), 'wrap="virtual" rows="5" cols="30"');
+        $mform->insertElementBefore($addnew, 'param2');
+    }
 }
