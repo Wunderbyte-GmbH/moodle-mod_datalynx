@@ -466,16 +466,6 @@ function mod_datalynx_pluginfile($course, $cm, $context, $filearea, $args, $forc
             return false;
         }
 
-        // nanogong ugly hack
-        if ($field->type != 'nanogong') {
-            if (empty($USER->id)) {
-                return false;
-            }
-        
-            require_course_login($course, true, $cm);
-        }
-        
-
         if (!$entry = $DB->get_record('datalynx_entries', array('id'=>$content->entryid))) {
             return false;
         }
