@@ -1003,11 +1003,46 @@ class datalynxview_base {
         foreach ($this->_vieweditors as $editor) {
             // Format to apply filters if html
             if ($this->view->{"e$editor".'format'} == FORMAT_HTML) {
-                $this->view->{"e$editor"} = format_text($this->view->{"e$editor"}, FORMAT_HTML, array('trusted' => 1));
+                $text = $this->view->{"e$editor"};
+                list($text, $map) = $this->mask_tags($text);
+                $text = format_text($text, FORMAT_HTML, array('trusted' => 1, 'filter' => true));
+                $this->view->{"e$editor"}  = $this->unmask_tags($text, $map);
             }
-            
+
             $this->view->{"e$editor"} = str_replace($tags, $replacements, $this->view->{"e$editor"});
         }
+    }
+
+    /**
+     * Masks view and field tags so that they do not get auto-linked
+     * @param string $text a string with masked tags
+     * @return array an array containing data for unmasking
+     */
+    public function mask_tags($text) {
+        $matches = array();
+        $find = array();
+        $replace = array();
+        preg_match_all('/(?:(\[\[[^\]]+\]\])|(##[^#]+##)|(%%[^%]+%%)|(#\{\{[^%]+\}\}#))/', $text, $matches, PREG_PATTERN_ORDER);
+        $map = $matches[0];
+        foreach ($map as $index => $match) {
+            $find[$index] = "/" . preg_quote($match) . "/";
+            $replace[$index] = "!!!!!{$index}!!!!!";
+        }
+        $text = preg_replace($find, $replace, $text);
+        return array($text, $map);
+    }
+
+    /**
+     * Reverses the tag masking
+     * @param string  $text a string with masked tags
+     * @param array   $map an array containing data for unmasking, obtained through mask_tags
+     * @return string input string with tags restored
+     */
+    public function unmask_tags($text, $map) {
+        foreach (array_keys($map) as $index) {
+            $find[$index] = "/!!!!!{$index}!!!!!/";
+        }
+        return preg_replace($find, $map, $text);
     }
 
     /**
