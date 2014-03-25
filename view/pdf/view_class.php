@@ -209,8 +209,10 @@ class datalynxview_pdf extends datalynxview_base {
 
 
         foreach ($content as $pagecontent) {
-        
+            $docroot = $_SERVER['DOCUMENT_ROOT'];
+            unset($_SERVER['DOCUMENT_ROOT']);
             $pdf->AddPage();
+            $_SERVER['DOCUMENT_ROOT'] = $docroot;
 
             // Set page bookmarks
             $pagecontent = $this->set_page_bookmarks($pdf, $pagecontent);
