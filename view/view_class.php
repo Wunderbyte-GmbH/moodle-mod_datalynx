@@ -261,7 +261,9 @@ class datalynxview_base {
     }
 
     /**
-     *
+     * Sets up filter options based on parameters from URL, filter assigned to this particular view, and default settings.
+     * @param bool $filteroptions
+     * @param bool $ignoreurl true, if URL filter options should be ignored
      */
     public function set_filter($filteroptions = true, $ignoreurl = false) {
         $fm = $this->_df->get_filter_manager($this);
@@ -289,6 +291,8 @@ class datalynxview_base {
         $csort = !empty($urloptions['customsort']) ? $urloptions['customsort'] : null;
         $csearch = !empty($urloptions['customsearch']) ? $urloptions['customsearch'] : null;
 
+        $usersearch = !empty($urloptions['usersearch']) ? $urloptions['usersearch'] : '';
+
         $filterid = $fid ? $fid : ($this->view->filter ? $this->view->filter : 0);
 
         $this->_filter = $fm->get_filter_from_id($filterid, array('view' => $this, 'advanced' => $afilter));
@@ -307,6 +311,8 @@ class datalynxview_base {
         $this->_filter->perpage = $perpage ? $perpage : ($this->_filter->perpage ? $this->_filter->perpage : 50);
 
         $this->_filter->groupby = $groupby ? $groupby : $this->_filter->groupby;
+
+        $this->_filter->search = $usersearch ? $usersearch : $this->_filter->search;
 
         // add page
         $this->_filter->page = $page ? $page : 0;

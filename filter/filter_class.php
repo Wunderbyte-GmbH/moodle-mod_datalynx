@@ -65,7 +65,7 @@ class datalynx_filter {
         $this->groupby = empty($filterdata->groupby) ? '' : $filterdata->groupby;
         $this->customsort = empty($filterdata->customsort) ? '' : $filterdata->customsort;
         $this->customsearch = empty($filterdata->customsearch) ? '' : $filterdata->customsearch;
-        $this->search = empty($filterdata->search) ? '' : $filterdata->search;
+        $this->search = empty($filterdata->search) ? (empty($filterdata->usersearch) ? '' : $filterdata->usersearch) : $filterdata->search;
         $this->contentfields = empty($filterdata->contentfields) ? null : $filterdata->contentfields;
 
         $this->eids = empty($filterdata->eids) ? null : $filterdata->eids;
@@ -222,18 +222,68 @@ class datalynx_filter {
 
         } else if ($simplesearch) {
             $searchtables .= " JOIN {datalynx_contents} cs ON cs.entryid = e.id ";
+            $searchtables .= " JOIN {datalynx_fields} f ON cs.fieldid = f.id ";
             $searchlike = array(
-                'search1' => $DB->sql_like('cs.content', ':search1', false),
-                'search2' => $DB->sql_like('u.firstname', ':search2', false),
-                'search3' => $DB->sql_like('u.lastname', ':search3', false),
-                'search4' => $DB->sql_like('u.username', ':search4', false)
+                'search1' => $DB->sql_like('cs.content', ':search1', false, false),
+                'search2' => $DB->sql_like('u.firstname', ':search2', false, false),
+                'search3' => $DB->sql_like('u.lastname', ':search3', false, false),
+                'search4' => $DB->sql_like('u.username', ':search4', false, false)
             );
-            $searchwhere[] = ' ('. implode(' OR ', $searchlike). ') ';
-            foreach ($searchlike as $namekey => $unused) {
-                $searchparams[$namekey] = "%$simplesearch%";
+            foreach (array_keys($searchlike) as $namekey) {
+                $searchparams[$namekey] = '%' . $DB->sql_like_escape($simplesearch) . '%';
             }
+
+            // Add search for option fields, which store option IDs.
+            $i = 0;
+            foreach ($fields as $field) {
+                if ($field instanceof datalynxfield_option_multiple) {
+                    foreach ($field->get_options() as $id => $option) {
+                        if (stripos($option, $simplesearch) !== false) {
+                            $paramlike = "fieldquicksearch$i";
+                            $paramid = "fieldid$i";
+                            $searchlike[$paramlike] = "(" . $DB->sql_like("cs.content", ":$paramlike", false, false) .
+                                                      " AND f.id = :$paramid)";
+                            $searchparams[$paramlike] = "%#{$id}#%";
+                            $searchparams[$paramid] = $field->id();
+                            $i++;
+                        }
+                    }
+                } else if ($field instanceof datalynxfield_option_single) {
+                    foreach ($field->get_options() as $id => $option) {
+                        if (stripos($option, $simplesearch) !== false) {
+                            $paramlike = "fieldquicksearch$i";
+                            $paramid = "fieldid$i";
+                            $searchlike[$paramlike] = "(cs.content = :$paramlike AND f.id = :$paramid)";
+                            $searchparams[$paramlike] = "$id";
+                            $searchparams[$paramid] = $field->id();
+                            $i++;
+                        }
+                    }
+                } else if ($field instanceof datalynxfield_teammemberselect) {
+                    foreach ($field->options_menu() as $id => $option) {
+                        if (stripos($option, $simplesearch) !== false) {
+                            $paramlike = "fieldquicksearch$i";
+                            $paramid = "fieldid$i";
+                            $searchlike[$paramlike] = "(" . $DB->sql_like("cs.content", ":$paramlike", false, false) .
+                                " AND f.id = :$paramid)";
+                            $searchparams[$paramlike] = "%\"$id\"%";
+                            $searchparams[$paramid] = $field->id();
+                            $i++;
+                        }
+                    }
+                } else if ($field instanceof datalynxfield_userinfo) {
+                    $paramlike = "fieldquicksearch$i";
+                    $paramid = "fieldid$i";
+                    $searchlike[$paramlike] = "(" . $DB->sql_like("c{$field->id()}.data", ":$paramlike", false, false) . ")";
+                    $searchparams[$paramlike] = '%' . $DB->sql_like_escape($simplesearch) . '%';
+                    $searchparams[$paramid] = $field->id();
+                    $i++;
+                }
+            }
+
+            $searchwhere[] = ' ('. implode(' OR ', $searchlike). ') ';
         }
-    
+
         $wheresearch = $searchwhere ? ' AND '. implode(' AND ', $searchwhere) : '';
 
         // register referred tables
@@ -1228,6 +1278,7 @@ class datalynx_filter_manager {
             'users' => array('users', '', PARAM_SEQUENCE),
             'groups' => array('groups', '', PARAM_SEQUENCE),
             'afilter' => array('afilter', 0, PARAM_INT),
+            'usersearch' => array('usersearch', 0, PARAM_RAW),
         );
 
         $options = array();

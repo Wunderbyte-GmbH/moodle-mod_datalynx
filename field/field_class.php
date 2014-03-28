@@ -870,7 +870,7 @@ abstract class datalynxfield_option extends datalynxfield_base {
         $this->update_options($map);
 
         $this->field->param1 = implode("\n", $newvalues);
-        $this->field->param2 = $forminput->param2;
+        $this->field->param2 = isset($forminput->param2) ? $forminput->param2 : '';
     }
 }
 
