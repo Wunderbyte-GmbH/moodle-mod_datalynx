@@ -36,6 +36,8 @@ M.datalynxfield_teammemberselect.sources = [];
  */
 M.datalynxfield_teammemberselect.init_entry_form = function (Y, userlistobject, fieldid, entryid, minteamsize) {
     var key = 0,
+        maxresults = 7,
+        overflow = false,
         formcancelled = false,
         dropdowns = Y.all('input[type="text"][name^="field_' + fieldid + '"][name*="_dropdown"]'),
         form = dropdowns.item(0).get('form'),
@@ -58,10 +60,31 @@ M.datalynxfield_teammemberselect.init_entry_form = function (Y, userlistobject, 
             tabSelect: true,
             activateFirstItem: true,
             circular: true,
-            maxResults: 5,
+            maxResults: 0,
             resultFilters: 'subWordMatch',
             queryDelay: 40,
-            width: "400px",
+            width: "400px"
+        });
+
+        autocomplete.on('results', function(e) {
+            var info = {}, numresults = e.results.length, nummore = 0;
+            if (numresults > maxresults) {
+                nummore = numresults - maxresults;
+                info.display = M.util.get_string('moreresults', 'datalynx', nummore);
+                info.raw = 'info';
+                info.text = info.display;
+                e.results = e.results.slice(0, maxresults - 1);
+                e.results.push(info);
+                overflow = true;
+            } else {
+                overflow = false;
+            }
+        });
+
+        autocomplete.on('select', function (e) {
+            if (overflow && e.result.raw === 'info') {
+                e.preventDefault();
+            }
         });
 
         // attaches event listeners after the selection has been made
@@ -171,11 +194,13 @@ M.datalynxfield_teammemberselect.init_entry_form = function (Y, userlistobject, 
 
 M.datalynxfield_teammemberselect.init_filter_search_form = function (Y, userlistobject, fieldid) {
     var key = 0,
-    dropdowns = Y.all('input[type="text"][name^="f_"][name*="' + fieldid + '_dropdown"]'),
-    stringtoid = [],
-    source = M.datalynxfield_teammemberselect.sources[fieldid] = [],
-    autocompletes = [],
-    lastvalues = {};
+        maxresults = 7,
+        overflow = false,
+        dropdowns = Y.all('input[type="text"][name^="f_"][name*="' + fieldid + '_dropdown"]'),
+        stringtoid = [],
+        source = M.datalynxfield_teammemberselect.sources[fieldid] = [],
+        autocompletes = [],
+        lastvalues = {};
 
     // move the object's contents into the appropriate array
     for (key in userlistobject) {
@@ -193,10 +218,31 @@ M.datalynxfield_teammemberselect.init_filter_search_form = function (Y, userlist
             tabSelect: true,
             activateFirstItem: true,
             circular: true,
-            maxResults: 5,
+            maxResults: 0,
             resultFilters: 'subWordMatch',
             queryDelay: 40,
-            width: "400px",
+            width: "400px"
+        });
+
+        autocomplete.on('results', function(e) {
+            var info = {}, numresults = e.results.length, nummore = 0;
+            if (numresults > maxresults) {
+                nummore = numresults - maxresults;
+                info.display = M.util.get_string('moreresults', 'datalynx', nummore);
+                info.raw = 'info';
+                info.text = info.display;
+                e.results = e.results.slice(0, maxresults - 1);
+                e.results.push(info);
+                overflow = true;
+            } else {
+                overflow = false;
+            }
+        });
+
+        autocomplete.on('select', function (e) {
+            if (overflow && e.result.raw === 'info') {
+                e.preventDefault();
+            }
         });
 
         // attaches event listeners after the selection has been made

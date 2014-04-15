@@ -681,3 +681,4 @@ $string['existingoptions'] = 'Vorhandene Optionen bearbeiten';
 $string['option'] = 'Option';
 $string['deleteoption'] = 'Entfernen?';
 $string['renameoption'] = 'Umbenennen in:';
+$string['moreresults'] = '(Noch {$a} Ergebnisse...)';

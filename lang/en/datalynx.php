@@ -706,3 +706,4 @@ $string['existingoptions'] = 'Edit existing options';
 $string['option'] = 'Option';
 $string['deleteoption'] = 'Delete?';
 $string['renameoption'] = 'Rename to:';
+$string['moreresults'] = '({$a} more results...)';

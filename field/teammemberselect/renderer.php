@@ -104,7 +104,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         if ($required) {
             $mform->addGroupRule("{$fieldname}_dropdown_grp", '', 'required', null, 0, 'client');
         }
-        $PAGE->requires->string_for_js('minteamsize_error_form', 'datalynx');
+        $PAGE->requires->strings_for_js(array('minteamsize_error_form', 'moreresults'), 'datalynx');
         $PAGE->requires->js_init_call(
                 'M.datalynxfield_teammemberselect.init_entry_form',
                 array($field->options_menu(false, false, $authorid), $fieldid, $entryid, $field->minteamsize),
@@ -157,6 +157,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         $mform->disabledIf($fieldnamedropdown, "searchoperator{$i}", 'eq', '');
         $mform->disabledIf($fieldnamedropdown, "searchoperator{$i}", 'eq', 'USER');
 
+        $PAGE->requires->strings_for_js(array('moreresults'), 'datalynx');
         $PAGE->requires->js_init_call(
                 'M.datalynxfield_teammemberselect.init_filter_search_form',
                 array($menu, $fieldid),
