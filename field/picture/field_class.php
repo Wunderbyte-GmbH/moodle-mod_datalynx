@@ -86,7 +86,9 @@ class datalynxfield_picture extends datalynxfield_file {
                     if ($maxwidth or $maxheight) {
                         // this may fail for various reasons
                         try {
-                            $fs->convert_image($file, $file, $maxwidth, $maxheight, true);
+                            global $DB;
+                            $record = $DB->get_record('files', array('id' => $file->get_id()));
+                            $fs->convert_image($record, $record->id, $maxwidth, $maxheight, true);
                         } catch (Exception $e) {
                             return false;
                         }
