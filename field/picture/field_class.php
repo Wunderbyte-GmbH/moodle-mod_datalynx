@@ -39,9 +39,9 @@ class datalynxfield_picture extends datalynxfield_file {
             return false;
         }
         // Have the dimensions changed?
-        if ($oldfield and
-                    ($updatefile = ($oldfield->param7 != $this->field->param7 or $oldfield->param8 != $this->field->param8)
-                    or $updatethumb = ($oldfield->param9 != $this->field->param9 or $oldfield->param10 != $this->field->param10))) {
+        $updatefile = $oldfield->param7 != $this->field->param7 or $oldfield->param8 != $this->field->param8;
+        $updatethumb = $oldfield->param9 != $this->field->param9 or $oldfield->param10 != $this->field->param10;
+        if ($oldfield && ($updatefile || $updatethumb)) {
             // Check through all existing records and update the thumbnail
             if ($contents = $DB->get_records('datalynx_contents', array('fieldid' => $this->field->id))) {
                 if (count($contents) > 20) {
