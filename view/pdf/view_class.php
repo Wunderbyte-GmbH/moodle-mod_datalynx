@@ -280,11 +280,19 @@ class datalynxview_pdf extends datalynxview_base {
         $certoptions = array('subdirs' => 0, 'maxbytes' => -1, 'maxfiles' => 1, 'accepted_types' => array('.crt'));
         
         // Pdf frame
-        file_save_draft_area_files($data->pdfframe, $contextid, 'mod_datalynx', 'view_pdfframe', $this->id(), $imageoptions);
+        if (isset($data->pdfframe)) {
+            file_save_draft_area_files($data->pdfframe, $contextid, 'mod_datalynx', 'view_pdfframe', $this->id(), $imageoptions);
+        }
+
         // Pdf watermark
-        file_save_draft_area_files($data->pdfwmark, $contextid, 'mod_datalynx', 'view_pdfwmark', $this->id(), $imageoptions);
+        if (isset($data->pdfwmark)) {
+            file_save_draft_area_files($data->pdfwmark, $contextid, 'mod_datalynx', 'view_pdfwmark', $this->id(), $imageoptions);
+        }
+
         // Pdf cert
-        file_save_draft_area_files($data->pdfcert, $contextid, 'mod_datalynx', 'view_pdfcert', $this->id(), $certoptions);
+        if (isset($data->pdfcert)) {
+            file_save_draft_area_files($data->pdfcert, $contextid, 'mod_datalynx', 'view_pdfcert', $this->id(), $certoptions);
+        }
 
         return $data;
     }
