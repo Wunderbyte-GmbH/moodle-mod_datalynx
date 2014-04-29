@@ -20,9 +20,9 @@
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once("$CFG->dirroot/mod/datalynx/view/aligned/view_class.php");
+require_once("$CFG->dirroot/mod/datalynx/view/view_class.php");
 
-class datalynxview_csv extends datalynxview_aligned {
+class datalynxview_csv extends datalynxview_base {
 
     const EXPORT_ALL = 'all';
     const EXPORT_PAGE = 'page';
@@ -33,6 +33,10 @@ class datalynxview_csv extends datalynxview_aligned {
     protected $_delimiter = 'comma';
     protected $_enclosure = '';
     protected $_encoding = 'UTF-8';
+
+    protected $_editors = array('section');
+
+    protected $_columns = null;
 
     protected $_showimportform = false;
 
@@ -47,6 +51,51 @@ class datalynxview_csv extends datalynxview_aligned {
         if (!empty($this->view->param1)) {
             list($this->_delimiter, $this->_enclosure, $this->_encoding) = explode(',', $this->view->param1);
         }
+    }
+
+    /**
+     *
+     */
+    protected function group_entries_definition($entriesset, $name = '') {
+        global $OUTPUT;
+
+        $elements = array();
+
+        // Generate the header row
+        $tableheader = '';
+        if ($this->has_headers()) {
+            $columns = $this->get_columns();
+            foreach ($columns as $column) {
+                list(,$header,$class) = $column;
+                $tableheader .= html_writer::tag('th', $header, array('class' => $class));
+            }
+            $tableheader = html_writer::tag('thead', html_writer::tag('tr', $tableheader));
+
+            // Set view tags in header row
+            $tags = $this->_tags['view'];
+            $replacements = $this->patterns()->get_replacements($tags);
+            $tableheader = str_replace($tags, $replacements, $tableheader);
+        }
+        // Open table and wrap header with thead
+        $elements[] = array('html', html_writer::start_tag('table', array('class' => 'generaltable')). $tableheader);
+
+        // flatten the set to a list of elements, wrap with tbody and close table
+        $elements[] = array('html', html_writer::start_tag('tbody'));
+        foreach ($entriesset as $entryid => $entry_definitions) {
+            $elements = array_merge($elements, $entry_definitions);
+        }
+        $elements[] = array('html', html_writer::end_tag('tbody'). html_writer::end_tag('table'));
+
+        // Add group heading
+        $name = ($name == 'newentry') ? get_string('entrynew', 'datalynx') : $name;
+        if ($name) {
+            array_unshift($elements, array('html', $OUTPUT->heading($name, 3, 'main')));
+        }
+        // Wrap with entriesview
+        array_unshift($elements, array('html', html_writer::start_tag('div', array('class' => 'entriesview'))));
+        array_push($elements, array('html', html_writer::end_tag('div')));
+
+        return $elements;
     }
 
     /**
@@ -65,6 +114,108 @@ class datalynxview_csv extends datalynxview_aligned {
             $this->process_import();
         }
         
+    }
+
+    /**
+     *
+     */
+    protected function entry_definition($fielddefinitions) {
+        $elements = array();
+        // Get the columns definition from the view template
+        $columns = $this->get_columns();
+
+        // Generate entry table row
+        $elements[] = array('html', html_writer::start_tag('tr'));
+        foreach ($columns as $column) {
+            list($tag,,$class) = array_map('trim', $column);
+            if (!empty($fielddefinitions[$tag])) {
+                $fielddefinition = $fielddefinitions[$tag];
+                if ($fielddefinition[0] == 'html') {
+                    $elements[] = array('html', html_writer::tag('td', $fielddefinition[1], array('class' => $class)));
+                } else {
+                    $elements[] = array('html', html_writer::start_tag('td', array('class' => $class)));
+                    $elements[] = $fielddefinition;
+                    $elements[] = array('html', html_writer::end_tag('td'));
+                }
+            } else {
+                $elements[] = array('html', html_writer::tag('td', '', array('class' => $class)));
+            }
+        }
+        $elements[] = array('html', html_writer::end_tag('tr'));
+
+        return $elements;
+    }
+
+    /**
+     *
+     */
+    protected function new_entry_definition($entryid = -1) {
+        $elements = array();
+
+        // Get the columns definition from the view template
+        $columns = $this->get_columns();
+
+
+        // Get field definitions for new entry
+        $fields = $this->_df->get_fields();
+        $entry = (object) array('id' => $entryid);
+        $fielddefinitions = array();
+        foreach ($this->_tags['field'] as $fieldid => $patterns) {
+            $field = $fields[$fieldid];
+            $options = array('edit' => true, 'manage' => true);
+            if ($definitions = $field->get_definitions($patterns, $entry, $options)) {
+                $fielddefinitions = array_merge($fielddefinitions, $definitions);
+            }
+        }
+
+        // Generate entry table row
+        $elements[] = array('html', html_writer::start_tag('tr'));
+        foreach ($columns as $column) {
+            list($tag,,$class) = array_map('trim', $column);
+            if (!empty($fielddefinitions[$tag])) {
+                $fielddefinition = $fielddefinitions[$tag];
+                if ($fielddefinition[0] == 'html') {
+                    $elements[] = array('html', html_writer::tag('td', $fielddefinition[1], array('class' => $class)));
+                } else {
+                    $elements[] = array('html', html_writer::start_tag('td', array('class' => $class)));
+                    $elements[] = $fielddefinition;
+                    $elements[] = array('html', html_writer::end_tag('td'));
+                }
+            } else {
+                $elements[] = array('html', html_writer::tag('td', '', array('class' => $class)));
+            }
+        }
+        $elements[] = array('html', html_writer::end_tag('tr'));
+
+        return $elements;
+    }
+
+    /**
+     *
+     */
+    protected function set__patterns($data = null) {
+        parent::set__patterns($data);
+
+        // get patterns from param2
+        if ($data) {
+            $text = !empty($data->param2) ? ' '. $data->param2 : '';
+            if (trim($text)) {
+                // This view patterns
+                if ($patterns = $this->patterns()->search($text)) {
+                    $this->_tags['view'] = array_merge($this->_tags['view'], $patterns);
+                }
+                // Field patterns
+                if ($fields = $this->_df->get_fields()) {
+                    foreach ($fields as $fieldid => $field) {
+                        if ($patterns = $field->renderer()->search($text)) {
+                            $this->_tags['field'][$fieldid] = $patterns;
+                        }
+                    }
+                }
+
+            }
+            $this->view->patterns = serialize($this->_tags);
+        }
     }
 
     /**
@@ -456,7 +607,19 @@ class datalynxview_csv extends datalynxview_aligned {
             }
         }
         return $this->_columns;
-    }    
+    }
+
+    /**
+     *
+     */
+    protected function has_headers() {
+        foreach ($this->get_columns() as $column) {
+            if (!empty($column[1])) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     // GETTERS
     /**
