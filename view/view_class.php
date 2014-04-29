@@ -1045,6 +1045,7 @@ class datalynxview_base {
      * @return string input string with tags restored
      */
     public function unmask_tags($text, $map) {
+        $find = array();
         foreach (array_keys($map) as $index) {
             $find[$index] = "/!!!!!{$index}!!!!!/";
         }
@@ -1742,4 +1743,5 @@ class datalynxview_base {
         //}
         return $editing;
     }
+
 }
