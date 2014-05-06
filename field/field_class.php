@@ -850,6 +850,15 @@ abstract class datalynxfield_option extends datalynxfield_base {
             }
         }
 
+        $map = array(0 => 0);
+        for ($i = 1; $i < count($oldvalues); $i++) {
+            if (($j = array_search($oldvalues[$i], $newvalues)) !== false) {
+                $map[$i] = $j;
+            } else {
+                $map[$i] = 0;
+            }
+        }
+
         foreach ($renames as $id => $newname) {
             if (!!(trim($newname))) {
                 $newvalues[$id] = $newname;
@@ -860,15 +869,6 @@ abstract class datalynxfield_option extends datalynxfield_base {
            $add = trim($add);
             if (!empty($add)) {
                 $newvalues[] = $add;
-            }
-        }
-
-        $map = array(0 => 0);
-        for ($i = 1; $i < count($oldvalues); $i++) {
-            if (($j = array_search($oldvalues[$i], $newvalues)) !== false) {
-                $map[$i] = $j;
-            } else {
-                $map[$i] = 0;
             }
         }
 
