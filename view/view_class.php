@@ -1031,7 +1031,7 @@ class datalynxview_base {
         preg_match_all('/(?:(\[\[[^\]]+\]\])|(##[^#]+##)|(%%[^%]+%%)|(#\{\{[^\}#]+\}\}#))/', $text, $matches, PREG_PATTERN_ORDER);
         $map = $matches[0];
         foreach ($map as $index => $match) {
-            $find[$index] = "/" . preg_quote($match) . "/";
+            $find[$index] = "/" . preg_quote($match, '/') . "/";
             $replace[$index] = "!!!!!{$index}!!!!!";
         }
         $text = preg_replace($find, $replace, $text);
