@@ -281,10 +281,12 @@ class datalynxview_patterns {
         
         if (!$view->is_forcing_filter() and (!$filter->id or !empty($options['entriescount']))) {
             switch ($tag) {
-                case '##quicksearch##': return $this->print_quick_search($filter, true);
                 case '##quickperpage##': return $this->print_quick_perpage($filter, true);
                 case '##advancedfilter##': return $this->print_advanced_filter($filter, true);
             }
+        }
+        if ($tag == '##quicksearch##') {
+             return $this->print_quick_search($filter, true);
         }
         return '';
     }
