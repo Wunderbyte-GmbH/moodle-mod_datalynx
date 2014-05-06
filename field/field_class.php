@@ -856,7 +856,12 @@ abstract class datalynxfield_option extends datalynxfield_base {
             }
         }
 
-        $newvalues = array_merge($newvalues, $adds);
+        foreach ($adds as $add) {
+           $add = trim($add);
+            if (!empty($add)) {
+                $newvalues[] = $add;
+            }
+        }
 
         $map = array(0 => 0);
         for ($i = 1; $i < count($oldvalues); $i++) {
