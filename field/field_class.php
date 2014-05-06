@@ -849,10 +849,16 @@ abstract class datalynxfield_option extends datalynxfield_base {
                 unset($newvalues[$id]);
             }
         }
+        $dummyentry = "0";
+        while(array_search($dummyentry, $newvalues) !== false) {
+            $dummyentry .= "0";
+        }
+        $newvalues = array_merge(array(0 => $dummyentry), $newvalues);
 
         $map = array(0 => 0);
-        for ($i = 1; $i < count($oldvalues); $i++) {
-            if (($j = array_search($oldvalues[$i], $newvalues)) !== false) {
+        for ($i = 1; $i <= count($oldvalues); $i++) {
+            $j = array_search($oldvalues[$i], $newvalues);
+            if ($j !== false) {
                 $map[$i] = $j;
             } else {
                 $map[$i] = 0;
@@ -874,6 +880,7 @@ abstract class datalynxfield_option extends datalynxfield_base {
 
         $this->update_options($map);
 
+        unset($newvalues[0]);
         $this->field->param1 = implode("\n", $newvalues);
         $this->field->param2 = isset($forminput->param2) ? $forminput->param2 : '';
     }
