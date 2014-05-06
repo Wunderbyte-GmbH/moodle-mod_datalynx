@@ -80,7 +80,7 @@ class datalynxfield__user_renderer extends datalynxfield_renderer {
             $entry->email = $USER->email;
             $entry->userid =  $USER->id;
         }
-        $field = $this->field;
+        $field = $this->_field;
         $fieldid = $field->id();
         $entryid = $entry->id;
         $fieldname = "field{$fieldid}_{$entryid}";
