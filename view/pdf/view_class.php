@@ -75,7 +75,7 @@ class datalynxview_pdf extends datalynxview_base {
                 'page' => !empty($settings->toc->page) ? $settings->toc->page : '',
                 'name' => !empty($settings->toc->name) ? $settings->toc->name : '',
                 'title' => !empty($settings->toc->title) ? $settings->toc->title : '',
-                'template' => !empty($settings->toc->template) ? $settings->toc->template : '',
+                'template' => !empty($settings->toc->template) ? preg_replace('/[\r\n]+/', '', $settings->toc->template) : '',
             ),
             'header' => (object) array(
                 'enabled' => !empty($settings->header->enabled) ? $settings->header->enabled : false,
