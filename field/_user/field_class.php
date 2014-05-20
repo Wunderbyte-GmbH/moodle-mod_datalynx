@@ -127,7 +127,7 @@ class datalynxfield__user extends datalynxfield_no_content {
                 return false;
             }
         } else {
-            return parent::parse_search($datalynx, $i);
+            return parent::parse_search($this->df(), $i);
         }
 
     }

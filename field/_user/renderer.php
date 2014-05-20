@@ -83,7 +83,7 @@ class datalynxfield__user_renderer extends datalynxfield_renderer {
         $field = $this->_field;
         $fieldid = $field->id();
         $entryid = $entry->id;
-        $fieldname = "field{$fieldid}_{$entryid}";
+        $fieldname = "field_{$fieldid}_{$entryid}";
         $selected = $entry->userid;
         static $usersmenu = null;
         if (is_null($usersmenu)) {
