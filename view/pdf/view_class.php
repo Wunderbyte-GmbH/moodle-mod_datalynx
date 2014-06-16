@@ -195,9 +195,10 @@ class datalynxview_pdf extends datalynxview_base {
         }
 
         if ($settings->pagebreak == 'entry') {
-            $entrybreak = '<div class="entrybreak"></div>';
             $content = array();
-            $newcontent = explode($entrybreak, $this->display(array('export' => true, 'tohtml' => true, 'controls' => false, 'entryactions' => false)));
+            $totalcontent = $this->display(array('export' => true, 'tohtml' => true, 'controls' => false, 'entryactions' => false));
+            $totalcontent = preg_replace('/\<\/div\>\<div class\=\"entry\"\>/', '<></div><div class="entry">', $totalcontent);
+            $newcontent = explode('<>', $totalcontent);
             foreach ($newcontent as $page) {
                 if ($page) {
                     $content[] = $page;
