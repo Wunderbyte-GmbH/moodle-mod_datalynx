@@ -72,7 +72,9 @@ class datalynx_entries {
         } else if (!empty($options['user'])) {
             $entriesset = $this->get_entries(array('search' => array('userid' => $options['user'])));
         } else {
-            $entriesset = $this->get_entries($options);
+            if (!optional_param('new', 0, PARAM_INT)) {
+                $entriesset = $this->get_entries($options);
+            }
         }            
 
         // Apply entry content rules
