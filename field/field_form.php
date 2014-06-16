@@ -75,11 +75,11 @@ class datalynxfield_form extends moodleform {
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('name', PARAM_TEXT);
             $mform->setType('description', PARAM_TEXT);
-            $mform->setType('label', PARAM_TEXT);
+            $mform->setType('label', PARAM_RAW);
         } else {
             $mform->setType('name', PARAM_CLEANHTML);
             $mform->setType('description', PARAM_CLEANHTML);
-            $mform->setType('label', PARAM_CLEANHTML);
+            $mform->setType('label', PARAM_RAW);
         }
 
         //-------------------------------------------------------------------------------
