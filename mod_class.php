@@ -1715,8 +1715,10 @@ class datalynx {
         $data->df = $this;
         $data->coursename = $this->course->shortname;
         $data->datalynxname = $this->name();
-        $data->datalynxbaselink = html_writer::link($data->view->get_df()->get_baseurl(), $data->datalynxname);
-        $data->datalynxlink = html_writer::link($data->view->get_baseurl(), $data->datalynxname);
+        if (isset($data->view)) {
+            $data->datalynxbaselink = html_writer::link($data->view->get_df()->get_baseurl(), $data->datalynxname);
+            $data->datalynxlink = html_writer::link($data->view->get_baseurl(), $data->datalynxname);
+        }
         $data->context = $this->context->id;
         $data->event = $event;
         $data->notification = 1;
