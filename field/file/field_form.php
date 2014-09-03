@@ -61,8 +61,8 @@ class datalynxfield_file_form extends datalynxfield_form {
         // accetped types (param3)
         $options = array();
         $options['*'] = get_string('filetypeany', 'datalynx');
-        $options['*.jpg,*.gif,*.png'] = get_string('filetypeimage', 'datalynx');
-        $options['*.html'] = get_string('filetypehtml', 'datalynx');
+        $options['image'] = get_string('filetypeimage', 'datalynx');
+        $options['.html'] = get_string('filetypehtml', 'datalynx');
 
         $mform->addElement('select', 'param3', get_string('filetypes', 'datalynx'), $options);
         $mform->setDefault('param3', '*');
