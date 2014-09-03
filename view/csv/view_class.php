@@ -572,7 +572,7 @@ class datalynxview_csv extends datalynxview_base {
         // construct the table
         $table->data = array($row1, $row2, $row2a, $row3);
         $sectiondefault = html_writer::table($table);
-        $this->view->esection = html_writer::tag('div', $sectiondefault, array('class' => 'mdl-align'));
+        $this->view->esection = html_writer::tag('div', $sectiondefault, array('class' => 'mdl-align')) . "<div>##entries##</div>";
 
 
         // set content
