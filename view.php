@@ -61,6 +61,8 @@ $headerparams = array(
         'tab' => 'browse',
         'groups' => true,
         'urlparams' => $urlparams);
+
+$PAGE->requires->css(new moodle_url($CFG->wwwroot . '/mod/datalynx/field/picture/shadowbox/shadowbox.css'));
 $df->print_header($headerparams);
 
 $df->display();

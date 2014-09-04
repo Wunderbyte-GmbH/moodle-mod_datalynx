@@ -56,23 +56,21 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
             } else {
                 $displaybrowse = '';
                 switch ($cleantag) {
-                    case "[[$fieldname:tn-url]]":
-                        $displaybrowse = $this->display_browse($entry, array('tn' => 1, 'url' => 1));
+                    case "[[$fieldname]]":
+                        $displaybrowse = $this->display_browse($entry, array());
                         break;
                     case "[[$fieldname:linked]]":
                         $displaybrowse = $this->display_browse($entry, array('linked' => 1));
                         break;
-                    case "[[$fieldname:base64]]":
-                        $displaybrowse = $this->display_browse($entry, array('base64' => 1));
-                        break;
+                    case "[[$fieldname:thumb]]":
                     case "[[$fieldname:tn]]":
-                        $displaybrowse = $this->display_browse($entry, array('tn' => 1));
+                        $displaybrowse = $this->display_browse($entry, array('thumb' => 1));
                         break;
                     case "[[$fieldname:tn-linked]]":
-                        $displaybrowse = $this->display_browse($entry, array('tn' => 1, 'linked' => 1));
+                    case "[[$fieldname:lightbox]]":
+                        $displaybrowse = $this->display_browse($entry, array('thumb' => 1, 'linked' => 1));
                         break;
-                    case "[[$fieldname:tn-base64]]":
-                        $displaybrowse = $this->display_browse($entry, array('tn' => 1, 'base64' => 1));
+                    default:
                         break;
                 }
                 
@@ -91,6 +89,90 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
         return $replacements;
     }
 
+    public function display_edit(&$mform, $entry, array $options = null) {
+        $field = $this->_field;
+        $fieldid = $field->id();
+
+        $entryid = $entry->id;
+        $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
+        $content = isset($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : null;
+        $content1 = isset($entry->{"c{$fieldid}_content1"}) ? $entry->{"c{$fieldid}_content1"} : null;
+
+        $fieldname = "field_{$fieldid}_{$entryid}";
+        $fmoptions = array('subdirs' => 0,
+            'maxbytes' => $field->get('param1'),
+            'maxfiles' => $field->get('param2'),
+            'accepted_types' => explode(',', $field->get('param3')));
+
+        $draftitemid = file_get_submitted_draft_itemid("{$fieldname}_filemanager");
+        file_prepare_draft_area($draftitemid, $field->df()->context->id, 'mod_datalynx', 'content', $contentid, $fmoptions);
+
+        // file manager
+        $mform->addElement('filemanager', "{$fieldname}_filemanager", null, null, $fmoptions);
+        $mform->setDefault("{$fieldname}_filemanager", $draftitemid);
+        $required = !empty($options['required']);
+        if ($required) {
+            $mform->addRule("{$fieldname}_filemanager", null, 'required', null, 'client');
+        }
+    }
+
+    public function display_browse($entry, $params = null, $hidden = false) {
+        global $CFG, $PAGE;
+
+        $module = array(
+            'name' => 'M.datalynxfield_picture',
+            'fullpath' => '/mod/datalynx/field/picture/picture.js',
+            'requires' => array('base','node')
+        );
+
+        $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/datalynx/field/picture/shadowbox/shadowbox.js'));
+        $PAGE->requires->js_init_call('M.datalynxfield_picture.init', array($params), false, $module);
+
+        $field = $this->_field;
+        $fieldid = $field->id();
+        $entryid = $entry->id;
+
+        $content = isset($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : null;
+        $content1 = isset($entry->{"c{$fieldid}_content1"}) ? $entry->{"c{$fieldid}_content1"} : null;
+        $content2 = isset($entry->{"c{$fieldid}_content2"}) ? $entry->{"c{$fieldid}_content2"} : null;
+        $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
+
+        if (empty($content)) {
+            return '';
+        }
+
+        if (!empty($params['downloadcount'])) {
+            return $content2;
+        }
+
+        $fs = get_file_storage();
+        $files = $fs->get_area_files($field->df()->context->id, 'mod_datalynx', 'content', $contentid);
+        if (!$files or !(count($files) > 1)) {
+            return '';
+        }
+
+        $altname = empty($content1) ? '' : s($content1);
+
+        if (!empty($params['alt'])) {
+            return $altname;
+        }
+
+        $strfiles = array();
+        foreach ($files as $file) {
+            if (!$file->is_directory()) {
+
+                $filename = $file->get_filename();
+                $filenameinfo = pathinfo($filename);
+                $path = "/{$field->df()->context->id}/mod_datalynx/content/$contentid";
+
+                if(strpos($filename, 'thumb_') === false) {
+                    $strfiles[] = $this->display_file($file, $path, $altname, $params);
+                }
+            }
+        }
+        return implode("<br />\n", $strfiles);
+    }
+
     /**
      * 
      */
@@ -98,32 +180,34 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
         $fieldname =  $this->_field->name();
         return array(
             "[[{$fieldname}]]",
+            "[[{$fieldname}:thumb]]",
             "[[{$fieldname}:linked]]",
-            "[[{$fieldname}:tn-linked]]",
+            "[[{$fieldname}:lightbox]]",
         );
     }
 
-    /**
-     *
-     */
     protected function display_file($file, $path, $altname, $params = null) {
         $field = $this->_field;
-        
+
         if ($file->is_valid_image()) {
             $filename = $file->get_filename();
             $imgattr = array('style' => array());
 
-            if (!empty($params['tn'])) {
-                // decline if the file is not really a thumbnail
-                if (strpos($filename, 'thumb_') === false) {
-                    return '';
+            $pluginfileurl = new moodle_url('/pluginfile.php');
+            $imgpath = moodle_url::make_file_url($pluginfileurl, "$path/$filename");
+
+            if (isset($params['thumb'])) {
+                $thumbpath = moodle_url::make_file_url($pluginfileurl, "$path/thumb_$filename");
+                $imgattr['style'] = implode(';', $imgattr['style']);
+                $imgattr['src'] = $thumbpath;
+                $thumb = html_writer::empty_tag('img', $imgattr);
+
+                if (isset($params['linked'])) {
+                    return html_writer::link($imgpath, $thumb, array('rel' => 'shadowbox'));
+                } else {
+                    return $thumb;
                 }
             } else {
-                // decline if the file is a thumbnail
-                if (strpos($filename, 'thumb_') !== false) {
-                    return '';
-                }
-
                 // the picture's display dimension may be set in the field
                 if ($field->get('param4')) {
                     $imgattr['style'][] = 'width:'. s($field->get('param4')). s($field->get('param6'));
@@ -131,34 +215,16 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
                 if ($field->get('param5')) {
                     $imgattr['style'][] = 'height:'. s($field->get('param5')). s($field->get('param6'));
                 }
-            }
 
-            // calculate src: either moodle url or base64
-            if (!empty($params['download'])) {
-                return $this->display_link($file, $path, $altname, $params);
-            } else if (!empty($params['base64'])) {
-                $src = 'data:'. $file->get_mimetype(). ';base64,'. base64_encode($file->get_content());
-            } else {
-                $pluginfileurl = new moodle_url('/pluginfile.php');
-                $src = moodle_url::make_file_url($pluginfileurl, "$path/$filename");
-                
-                // for url request return it here
-                if (!empty($params['url'])) {
-                    return $src;
+                $imgattr['src'] = $imgpath;
+                $imgattr['style'] = implode(';', $imgattr['style']);
+                $img = html_writer::empty_tag('img', $imgattr);
+                if (isset($params['linked'])) {
+                    return html_writer::link($imgpath, $img, array('target' => '_blank'));
+                } else {
+                    return $img;
                 }
             }
-
-            $imgattr['src'] = $src;
-            $imgattr['style'] = implode(';', $imgattr['style']);
-
-            $str = html_writer::empty_tag('img', $imgattr);
-
-            if (!empty($params['linked'])) {
-                return html_writer::link($src, $str);
-            } else {
-                return $str;
-            }
-        } else {
             return '';
         }
     }
@@ -170,12 +236,11 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
         $fieldname = $this->_field->name();
 
         $patterns = parent::patterns();
-        $patterns["[[{$fieldname}:linked]]"] = array(false);
-        $patterns["[[{$fieldname}:base64]]"] = array(false);
+        $patterns["[[{$fieldname}:linked]]"] = array(true);
         $patterns["[[{$fieldname}:tn]]"] = array(false);
-        $patterns["[[{$fieldname}:tn-url]]"] = array(false);
+        $patterns["[[{$fieldname}:thumb]]"] = array(true);
         $patterns["[[{$fieldname}:tn-linked]]"] = array(false);
-        $patterns["[[{$fieldname}:tn-base64]]"] = array(false);
+        $patterns["[[{$fieldname}:lightbox]]"] = array(true);
 
         return $patterns; 
     }
