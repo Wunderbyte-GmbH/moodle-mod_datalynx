@@ -74,7 +74,15 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
         $data->siteurl = $CFG->wwwroot;
         $data->coursename = !empty($data->coursename) ? $data->coursename : 'Unspecified course';
         $data->datalynxname = !empty($data->datalynxname) ? $data->datalynxname : 'Unspecified datalynx';
-        $data->entryid = implode(array_keys($data->items), ',');
+        if (is_array($data->items)) {
+            $data->entryid = implode(array_keys($data->items), ',');
+        } else if (is_object($data->items) && isset($data->items->itemid)) {
+            $data->entryid = $data->items->itemid;
+            $data->items = array($data->entryid => $DB->get_record('datalynx_entries', array('id' => $data->entryid)));
+        } else {
+            $data->entryid = array();
+        }
+
 
         if ($df->data->singleview) {
             $entryurl = new moodle_url($data->url, array('view' => $df->data->singleview, 'eids' => $data->entryid));
