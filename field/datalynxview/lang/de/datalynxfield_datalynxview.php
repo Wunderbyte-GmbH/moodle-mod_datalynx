@@ -22,7 +22,7 @@
  */
 $string['pluginname'] = 'Datalynx view';
 $string['embedded'] = 'Embedded';
-$string['missingview'] = 'Please select a view';
+$string['missingview'] = 'Bitte eine Ansicht auswählen';
 $string['nodatalynxs'] = 'No datalynxs are found in this course';
 $string['noviews'] = 'No views are found for the selected datalynx';
 $string['datalynx'] = 'Datalynx';

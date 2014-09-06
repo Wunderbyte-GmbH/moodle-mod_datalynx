@@ -193,7 +193,7 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
         $errors= array();
         
         if (!empty($data['param1']) and empty($data['param2'])) {
-            $errors['param2'] = get_string('missingview','block_datalynx_view');
+            $errors['param2'] = get_string('missingview','mod_datalynx_view');
         }
 
         return $errors;
