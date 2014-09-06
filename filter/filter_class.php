@@ -220,7 +220,9 @@ class datalynx_filter {
                 $searchwhere[] = '('. implode(' OR ', $whereor). ')';
             }
 
-        } else if ($simplesearch) {
+        }
+
+        if ($simplesearch) {
             $searchtables .= " JOIN {datalynx_contents} cs ON cs.entryid = e.id ";
             $searchtables .= " JOIN {datalynx_fields} f ON cs.fieldid = f.id ";
             $searchlike = array(

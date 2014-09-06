@@ -833,14 +833,15 @@ class datalynxview_patterns {
         $baseurlparams = array('d' => $df->id(),
                                 'sesskey' => sesskey(),
                                 'view' => $view->id(),
-                                'filter' => datalynx_filter_manager::USER_FILTER_SET);
-
+                                'filter' => $filter->id);// datalynx_filter_manager::USER_FILTER_SET);
+        /*
         if ($filter->id < 0 and $filter->search) {
             $searchvalue = $filter->search;
         } else {
             $searchvalue = '';
         }
-
+        */
+        $searchvalue = $filter->search;
         // Display the quick search form
         $label = html_writer::label(get_string('search'), "usersearch");
         $inputfield = html_writer::empty_tag('input', array('type' => 'text',
