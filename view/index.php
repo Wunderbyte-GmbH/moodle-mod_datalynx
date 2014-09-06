@@ -218,21 +218,21 @@ if ($views) {
 
         // default view
         if ($viewid == $df->data->defaultview) {
-            $defaultview = $OUTPUT->pix_icon('t/clear', '');
+            $defaultview = $OUTPUT->pix_icon('t/approve', '');
         } else {
             $defaultview = html_writer::link(new moodle_url($actionbaseurl, $linkparams + array('default' => $viewid)), $OUTPUT->pix_icon('t/switch_whole', $strchoose));
         }
         
         // single edit view
         if ($viewid == $df->data->singleedit) {
-            $singleedit = html_writer::link(new moodle_url($actionbaseurl, $linkparams + array('singleedit' => -1)), $OUTPUT->pix_icon('t/clear', ''));
+            $singleedit = html_writer::link(new moodle_url($actionbaseurl, $linkparams + array('singleedit' => -1)), $OUTPUT->pix_icon('t/approve', ''));
         } else {
             $singleedit = html_writer::link(new moodle_url($actionbaseurl, $linkparams + array('singleedit' => $viewid)), $OUTPUT->pix_icon('t/switch_whole', $strchoose));
         }
         
         // single more view
         if ($viewid == $df->data->singleview) {
-            $singlemore = html_writer::link(new moodle_url($actionbaseurl, $linkparams + array('singlemore' => -1)), $OUTPUT->pix_icon('t/clear', ''));
+            $singlemore = html_writer::link(new moodle_url($actionbaseurl, $linkparams + array('singlemore' => -1)), $OUTPUT->pix_icon('t/approve', ''));
         } else {
             $singlemore = html_writer::link(new moodle_url($actionbaseurl, $linkparams + array('singlemore' => $viewid)), $OUTPUT->pix_icon('t/switch_whole', $strchoose));
         }

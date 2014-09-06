@@ -407,7 +407,7 @@ class datalynxview_patterns {
                     } else {
                         $replacement =
                             html_writer::tag('button',
-                                        $OUTPUT->pix_icon('i/tick_green_big', get_string('multiapprove', 'datalynx')),
+                                        $OUTPUT->pix_icon('i/grade_correct', get_string('multiapprove', 'datalynx')),
                                         array('type' => 'button',
                                                 'name' => 'multiapprove',
                                                 'onclick' => 'bulk_action(\'entry\'&#44; \''. $baseurl->out(false). '\'&#44; \'approve\')'));

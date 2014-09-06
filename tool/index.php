@@ -95,7 +95,7 @@ if ($tools) {
     foreach ($tools as $dir => $tool) {
         
         $runlink = html_writer::link(new moodle_url($actionbaseurl, $linkparams + array('run' => $dir)),
-                        $OUTPUT->pix_icon('t/addgreen', $strrun));
+                        $OUTPUT->pix_icon('t/collapsed', $strrun));
 
         $table->data[] = array(
             $tool->name,
