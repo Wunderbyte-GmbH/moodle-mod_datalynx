@@ -79,6 +79,22 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
     /**
      *
      */
+    public function display_search(&$mform, $i = 0, $value = '') {
+        $fieldid = $this->_field->id();
+        $fieldname = "f_{$i}_$fieldid";
+
+        $arr = array();
+        $arr[] = &$mform->createElement('duration', $fieldname);
+        $mform->setType($fieldname, PARAM_NOTAGS);
+        $mform->setDefault($fieldname, $value);
+        $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
+
+        return array($arr, null);
+    }
+
+    /**
+     *
+     */
     public function display_edit(&$mform, $entry, array $options = null) {
         $field = $this->_field;
         $fieldid = $field->id();
