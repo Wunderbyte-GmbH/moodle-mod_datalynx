@@ -78,7 +78,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         global $DB, $COURSE;
 
         $context = context_course::instance($COURSE->id);
-        $query = "SELECT DISTINCT CONCAT(u.id, '-', ra.roleid) AS mainid, u.id, u.username, u.firstname, u.lastname, u.email, ra.roleid
+        $query = "SELECT DISTINCT CONCAT(u.id, '-', ra.roleid) AS mainid, u.*, ra.roleid
                     FROM {role_assignments} ra
               INNER JOIN {user} u ON u.id = ra.userid
                    WHERE ra.contextid = :contextid
