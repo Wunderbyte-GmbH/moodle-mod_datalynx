@@ -56,6 +56,8 @@ if ($urlparams->duplicate and confirm_sesskey()) {  // Duplicate any requested v
     $df->process_views('duplicate', $urlparams->duplicate, $urlparams->confirmed);
 
 } else if ($urlparams->reset and confirm_sesskey()) { // Reset to default any requested views
+    $patterncache = cache::make('mod_datalynx', 'patterns');
+    $patterncache->delete($urlparams->vedit, true);
     $df->process_views('reset', $urlparams->reset, true);
 
 } else if ($urlparams->delete and confirm_sesskey()) { // Delete any requested views

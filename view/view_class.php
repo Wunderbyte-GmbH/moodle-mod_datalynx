@@ -220,44 +220,33 @@ class datalynxview_base {
     /**
      *
      */
-    protected function set__patterns($data = null) {
-        // new view or from DB so set the _patterns property
-        if (is_null($data)) {
-            if (!empty($this->view->patterns)) {
-                $this->_tags = unserialize($this->view->patterns);
-            } else {
-                $this->_tags = array('view' => array(), 'field' => array());
-            }
+    protected function set__patterns() {
+        $patterncache = cache::make('mod_datalynx', 'patterns');
+        $cachedpatterns = $patterncache->get($this->view->id);
 
-        // view from form or editor areas updated
-        } else {
-            $this->_tags = array('view' => array(), 'field' => array());
+        if (!$cachedpatterns) {
+            $cachedpatterns = array('view' => array(), 'field' => array());
             $text = '';
             foreach ($this->_editors as $editor) {
-                $text .= isset($data->{"e{$editor}"}) ? $data->{"e{$editor}"} : '';
+                $text .= isset($this->view->$editor) ? $this->view->$editor : '';
             }
 
             if (trim($text)) {
-                // Datalynx View links/content
-
-                // TODO filter links ???
-                
                 // This view patterns
-                if ($patterns = $this->patterns()->search($text)) {
-                    $this->_tags['view'] = $patterns;
-                }
+                $cachedpatterns['view'] = $this->patterns()->search($text);
+
                 // Field patterns
                 if ($fields = $this->_df->get_fields()) {
                     foreach ($fields as $fieldid => $field) {
-                        if ($patterns = $field->renderer()->search($text)) {
-                            $this->_tags['field'][$fieldid] = $patterns;
-                        }
+                        $cachedpatterns['field'][$fieldid] = $field->renderer()->search($text);
                     }
                 }
 
+                $patterncache->set($this->view->id, $cachedpatterns);
             }
-            $this->view->patterns = serialize($this->_tags);
         }
+
+        $this->_tags = $cachedpatterns;
     }
 
     /**
@@ -314,6 +303,7 @@ class datalynxview_base {
 
         $this->_filter->search = $usersearch ? $usersearch : $this->_filter->search;
 
+
         // add page
         $this->_filter->page = $page ? $page : 0;
         // content fields
@@ -360,6 +350,8 @@ class datalynxview_base {
         global $DB, $OUTPUT;
 
         if ($data) {
+            $patterncache = cache::make('mod_datalynx', 'patterns');
+            $patterncache->delete($this->view->id, true);
             $data = $this->from_form($data);
             $this->set_view($data);
         }
