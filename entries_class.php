@@ -514,9 +514,9 @@ class datalynx_entries {
                                 datalynxfield__time::_TIMECREATED,
                                 datalynxfield__time::_TIMEMODIFIED,
                                 datalynxfield__approve::_APPROVED,
-                                datalynxfield__user::_USERID,
-                                datalynxfield__user::_USERNAME,
-                                datalynxfield__group::_GROUP,
+                                datalynxfield_entryauthor::_USERID,
+                                datalynxfield_entryauthor::_USERNAME,
+                                datalynxfield_entrygroup::_GROUP,
                                 datalynxfield__status::_STATUS
                             );
 
@@ -536,7 +536,7 @@ class datalynx_entries {
                                     // Entry info
                                     if (in_array($fieldid, $entryinfo)) {
                                         // TODO
-                                        if ($fieldid == datalynxfield__user::_USERID or $fieldid == datalynxfield__user::_USERNAME) {
+                                        if ($fieldid == datalynxfield_entryauthor::_USERID or $fieldid == datalynxfield_entryauthor::_USERNAME) {
                                             $entryvar = 'userid';
                                         } else {
                                             $entryvar = $field->get_internalname();

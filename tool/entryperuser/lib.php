@@ -24,7 +24,7 @@
 defined('MOODLE_INTERNAL') or die;
 
 require_once("$CFG->dirroot/mod/datalynx/entries_class.php");
-require_once("$CFG->dirroot/mod/datalynx/field/_user/field_class.php");
+require_once("$CFG->dirroot/mod/datalynx/field/entryauthor/field_class.php");
 
 class datalynxtool_entryperuser {
     /**
@@ -40,7 +40,7 @@ class datalynxtool_entryperuser {
         
         // Construct entries data
         $data = (object) array('eids' => array());
-        $fieldid = datalynxfield__user::_USERID;
+        $fieldid = datalynxfield_entryauthor::_USERID;
         $entryid = -1;
         foreach ($users as $userid => $unused) {
             $data->eids[$entryid] = $entryid;

@@ -16,7 +16,7 @@
  
 /**
  * @package datalynxfield
- * @subpackage _user
+ * @subpackage entryauthor
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,7 +27,7 @@ require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 /**
  *
  */
-class datalynxfield__user_renderer extends datalynxfield_renderer {
+class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
 
     /**
      * 

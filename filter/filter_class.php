@@ -363,7 +363,7 @@ class datalynx_filter {
             $contentfrom = array();
             $paramcount = 0;
             foreach ($contentfields as $fieldid) {
-                // Skip non-selectable fields (some of the internal fields e.g. _user which are included in the select clause by default)
+                // Skip non-selectable fields (some of the internal fields e.g. entryauthor which are included in the select clause by default)
                 if (!isset($fields[$fieldid]) or !$selectsql = $fields[$fieldid]->get_select_sql()) {
                     continue;
                 }

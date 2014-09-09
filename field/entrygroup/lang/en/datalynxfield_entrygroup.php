@@ -16,17 +16,13 @@
  
 /**
  * @package datalynxfield
- * @subpackage _user
- * @copyright 2011 Itamar Tzadok
+ * @subpackage entrygroup
+ * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['##group:description##'] = '##group:description##';
+$string['##group:id##'] = '##group:id##';
+$string['##group:name##'] = '##group:name##';
+$string['group'] = 'Group';
 $string['pluginname'] = 'Internal';
-$string['useremail'] = 'User email';
-$string['userfirstname'] = 'User first name';
-$string['userid'] = 'User id';
-$string['useridnumber'] = 'User id number';
-$string['userlastname'] = 'User last name';
-$string['username'] = 'User name';
-$string['userpicture'] = 'User picture';
-$string['userusername'] = 'User username';
