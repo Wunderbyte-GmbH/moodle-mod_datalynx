@@ -942,7 +942,7 @@ class datalynxview_base {
                             'collapsed' => true,
                             'rows' => 5,
                             'style' => 'width:100%',
-                            'maxfiles' => EDITOR_UNLIMITED_FILES,
+                            'maxfiles' => 0,
                             'maxbytes' => $this->_df->course->maxbytes,
                             'context'=> $this->_df->context);
 

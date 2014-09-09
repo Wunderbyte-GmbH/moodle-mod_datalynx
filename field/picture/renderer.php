@@ -198,6 +198,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
 
             if (isset($params['thumb'])) {
                 $thumbpath = moodle_url::make_file_url($pluginfileurl, "$path/thumb_$filename");
+                $thumbpath = str_replace('mod_datalynx/content/', 'mod_datalynx/thumb/', $thumbpath);
                 $imgattr['style'] = implode(';', $imgattr['style']);
                 $imgattr['src'] = $thumbpath;
                 $thumb = html_writer::empty_tag('img', $imgattr);

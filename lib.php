@@ -454,7 +454,7 @@ function mod_datalynx_pluginfile($course, $cm, $context, $filearea, $args, $forc
     global $CFG, $DB, $USER;
 
     // FIELD CONTENT files
-    if ($filearea === 'content' and $context->contextlevel == CONTEXT_MODULE) {
+    if (($filearea === 'content' or $filearea === 'thumb') and $context->contextlevel == CONTEXT_MODULE) {
 
         $contentid = (int)array_shift($args);
 
@@ -513,8 +513,8 @@ function mod_datalynx_pluginfile($course, $cm, $context, $filearea, $args, $forc
         //}
 
         $relativepath = implode('/', $args);
-        $fullpath = "/$context->id/mod_datalynx/content/$contentid/$relativepath";
-        $oldpath = "/$context->id/mod_dataform/content/$contentid/$relativepath";
+        $fullpath = "/$context->id/mod_datalynx/$filearea/$contentid/$relativepath";
+        $oldpath = "/$context->id/mod_dataform/$filearea/$contentid/$relativepath";
 
         $fs = get_file_storage();
         if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {

@@ -29,6 +29,17 @@ class datalynxfield_picture extends datalynxfield_file {
     /**
      *
      */
+    public function update_content($entry, array $values = null) {
+        global $DB;
+        parent::update_content($entry, $values);
+        $content = $DB->get_record('datalynx_contents', array('fieldid' => $this->field->id,
+                                                                 'entryid' => $entry->id));
+        $this->update_content_files($content->id, array('updatethumb' => true, 'updatefile' => false));
+    }
+
+    /**
+     *
+     */
     public function update_field($fromform = null) {
         global $DB, $OUTPUT;
 
@@ -61,6 +72,23 @@ class datalynxfield_picture extends datalynxfield_file {
     }
 
     /**
+     * Delete a field completely
+     */
+    public function delete_field() {
+        global $DB;
+
+        if (!empty($this->field->id)) {
+            foreach(array('content', 'thumb') as $filearea) {
+                $fs = get_file_storage();
+                $fs->delete_area_files($this->df->context->id, 'mod_datalynx', $filearea);
+            }
+            $this->delete_content();
+            $DB->delete_records('datalynx_fields', array('id' => $this->field->id));
+        }
+        return true;
+    }
+
+    /**
      * (Re)generate pic and thumbnail images according to the dimensions specified in the field settings.
      */
     protected function update_content_files($contentid, $params = null) {
@@ -76,11 +104,11 @@ class datalynxfield_picture extends datalynxfield_file {
         // update dimensions and regenerate thumbs
         foreach ($files as $file) {
             
-            if ($file->is_valid_image() and strpos($file->get_filename(), 'thumb_') === false) {
+            if ($file->is_valid_image()) {
                 // original first
                 if ($updatefile) {
-                    $maxwidth  = !empty($this->field->param7)?$this->field->param7:'';
-                    $maxheight = !empty($this->field->param8)?$this->field->param8:'';
+                    $maxwidth  = !empty($this->field->param7) ? $this->field->param7 : '';
+                    $maxheight = !empty($this->field->param8) ? $this->field->param8 : '';
 
                     // If either width or height try to (re)generate
                     if ($maxwidth or $maxheight) {
@@ -101,14 +129,14 @@ class datalynxfield_picture extends datalynxfield_file {
                     $thumbheight = !empty($this->field->param10)?$this->field->param10:'';
                     $thumbname = 'thumb_'.$file->get_filename();
 
-                    if ($thumbfile = $fs->get_file($this->df->context->id, 'mod_datalynx', 'content', $contentid, '/', $thumbname)) {
+                    if ($thumbfile = $fs->get_file($this->df->context->id, 'mod_datalynx', 'thumb', $contentid, '/', $thumbname)) {
                         $thumbfile->delete();
                     }
 
                     // If either width or height try to (re)generate, otherwise delete what exists
                     if ($thumbwidth or $thumbheight) {
 
-                        $file_record = array('contextid'=>$this->df->context->id, 'component'=>'mod_datalynx', 'filearea'=>'content',
+                        $file_record = array('contextid'=>$this->df->context->id, 'component'=>'mod_datalynx', 'filearea'=>'thumb',
                                              'itemid'=>$contentid, 'filepath'=> '/',
                                              'filename'=>$thumbname, 'userid'=>$file->get_userid());
 
