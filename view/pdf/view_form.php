@@ -194,7 +194,7 @@ class datalynxview_pdf_form extends datalynxview_base_form {
 
         // Mode
         $options = array(
-            '' => get_string('choosedots'),
+            '' => get_string('none'),
             0 => get_string('protmode0', 'datalynxview_pdf'),
             1 => get_string('protmode1', 'datalynxview_pdf'),
             2 => get_string('protmode2', 'datalynxview_pdf'),

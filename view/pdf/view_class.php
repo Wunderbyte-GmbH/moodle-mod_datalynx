@@ -94,10 +94,10 @@ class datalynxview_pdf extends datalynxview_base {
                 'keep' => !empty($settings->margins->keep) ? $settings->margins->keep : false,
             ),
             'protection' => (object) array(
-                'permissions' => !empty($settings->protection->permissions) ? $settings->protection->permissions : array('print', 'copy'),
+                'permissions' => !empty($settings->protection->permissions) ? $settings->protection->permissions : array(),
                 'user_pass' => !empty($settings->protection->user_pass) ? $settings->protection->user_pass : '',
                 'owner_pass' => !empty($settings->protection->owner_pass) ? $settings->protection->owner_pass : null,
-                'mode' => !empty($settings->protection->mode) ? $settings->protection->mode : 0,
+                'mode' => !empty($settings->protection->mode) ? $settings->protection->mode : null,
                 //'pubkeys' => null                    )
             ),
             'signature' => (object) array(
