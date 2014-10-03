@@ -31,10 +31,10 @@ defined('MOODLE_INTERNAL') or die;
  *
  * @package    mod_datalynx
  * @category   phpunit
- * @copyright  2012 Itamar Tzadok
+ * @copyright  2014 Ivan Šakić
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_datalynx_generator extends phpunit_module_generator {
+class mod_datalynx_generator extends testing_module_generator {
 
     /**
      * Create new datalynx module instance
@@ -43,39 +43,48 @@ class mod_datalynx_generator extends phpunit_module_generator {
      * @return stdClass activity record with extra cmid field
      */
     public function create_instance($record = null, array $options = null) {
-        global $CFG;
-        require_once("$CFG->dirroot/mod/datalynx/lib.php");
-        require_once("$CFG->dirroot/mod/datalynx/locallib.php");
+        $record = (object) (array) $record;
 
-        $this->instancecount++;
-        $i = $this->instancecount;
+        $defaults = array(
+            'intro' => NULL,
+            'introformat' => 0,
+            'timemodified' => 0,
+            'timeavailable' => 0,
+            'timedue' => 0,
+            'timeinterval' => 0,
+            'intervalcount' => 1,
+            'allowlate' => 0,
+            'grade' => 0,
+            'grademethod' => 0,
+            'anonymous' => 0,
+            'notification' => 0,
+            'notificationformat' => 1,
+            'entriesrequired' => 0,
+            'entriestoview' => 0,
+            'maxentries' => 0,
+            'timelimit' => -1,
+            'approval' => 0,
+            'grouped' => 0,
+            'rating' => 0,
+            'singleedit' => 0,
+            'singleview' => 0,
+            'rssarticles' => 0,
+            'rss' => 0,
+            'css' => null,
+            'cssincludes' => null,
+            'js' => null,
+            'jsincludes' => null,
+            'defaultview' => 0,
+            'defaultfilter' => 0,
+            'completionentries' => 0,
+        );
 
-        $record = (object)(array)$record;
-        $options = (array)$options;
-
-        if (empty($record->course)) {
-            throw new coding_exception('module generator requires $record->course');
-        }
-        if (!isset($record->name)) {
-            $record->name = get_string('pluginname', 'datalynx').' '.$i;
-        }
-        if (!isset($record->intro)) {
-            $record->intro = 'Test datalynx '.$i;
-        }
-        if (!isset($record->introformat)) {
-            $record->introformat = FORMAT_MOODLE;
-        }
-        if (!isset($record->grade)) {
-            $record->grade = 0;
-        }
-        if (isset($options['idnumber'])) {
-            $record->cmidnumber = $options['idnumber'];
-        } else {
-            $record->cmidnumber = '';
+        foreach ($defaults as $name => $value) {
+            if (!isset($record->{$name})) {
+                $record->{$name} = $value;
+            }
         }
 
-        $record->coursemodule = $this->precreate_course_module($record->course, $options);
-        $id = datalynx_add_instance($record, null);
-        return $this->post_add_instance($id, $record->coursemodule);
+        return parent::create_instance($record, (array)$options);
     }
 }
