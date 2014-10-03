@@ -38,31 +38,21 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
         $edit = !empty($options['edit']) ? $options['edit'] : false;
 
         $replacements = array();
-        // rules support
         $tags = $this->add_clean_pattern_keys($tags);
-
         foreach ($tags as $tag => $cleantag) {
-            $noedit = $this->is_noedit($tag);
-            if ($edit and !$noedit) {
+            $replacements[$tag] = '';
+            if ($edit and !$this->is_noedit($tag)) {
                 if ($cleantag == "[[$fieldname]]") {
                     $required = $this->is_required($tag);
                     $replacements[$tag] = array('', array(array($this,'display_edit'), array($entry, array('required' => $required))));
-                } else {
-                    $replacements[$tag] = '';
                 }
             } else {
                 switch ($cleantag) {
                     case "[[$fieldname]]":
                         $replacements[$tag] = array('html', $this->display_browse($entry));
                         break;
-                    case "[[$fieldname:quest:text]]":
-                        $replacements[$tag] = array('html', $this->display_quest_text($entry));
-                        break;
-                    case "[[$fieldname:quest:select]]":
-                        $replacements[$tag] = array('html', $this->display_quest_select($entry));
-                        break;
                     default:
-                        $replacements[$tag] = '';
+                        break;
                 }
             }
         }
@@ -74,6 +64,7 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
      *
      */
     public function display_edit(&$mform, $entry, array $options = null) {
+        $mform->addElement('html', '<div data-field-type="' . $this->_field->type . '" data-field-name="' . $this->_field->field->name . '">');
         $field = $this->_field;
         $fieldid = $field->id();
         $entryid = $entry->id;
@@ -123,7 +114,9 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
                 case 'rangelength': $val = array($min, $max); break;
             }                
             $mform->addRule($fieldname, null, $length, $val, 'client');
-        }        
+        }
+
+        $mform->addElement('html', '</div>');
     }
 
     /**
@@ -149,57 +142,6 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
             $str = format_text($content, $format, $options);
         } else {
             $str = '';
-        }
-
-        return $str;
-    }
-
-    /**
-     *
-     */
-    protected function display_quest_text($entry) {
-        $field = $this->_field;
-        $fieldid = $field->id();
-
-        $str = '';
-        if (isset($entry->{"c{$fieldid}_content"})) {
-            if ($content = $entry->{"c{$fieldid}_content"}) {
-                $str = html_writer::empty_tag(
-                    'input',
-                    array('type' => 'text',
-                        'onkeyup' => "this.style.backgroundColor=(this.value=='".$content."')?'#ccff99':'#ffcc99';")
-                );
-            }
-        }
-
-        return $str;
-    }
-
-    /**
-     *
-     */
-    protected function display_quest_select($entry) {
-        $field = $this->_field;
-        $fieldid = $field->id();
-
-        $str = '';
-        if (isset($entry->{"c{$fieldid}_content"})) {
-            if ($content = $entry->{"c{$fieldid}_content"}) {
-                $fieldcontents = $field->get_distinct_content();
-                shuffle($fieldcontents);
-                $options = array_slice($fieldcontents, 0, 5);
-                // not this content in options, add it in place of a random option
-                if (!in_array($content, $options)) {
-                    $options[rand(0, 4)] = $content;
-                }
-                $str = html_writer::select(
-                    array_combine($options, $options),
-                    null,
-                    '',
-                    array('' => 'choosedots'),
-                    array('onchange' => "this.style.backgroundColor=(this.options[this.selectedIndex].value=='".$content."')?'#ccff99':'#ffcc99';")
-                );
-            }
         }
 
         return $str;

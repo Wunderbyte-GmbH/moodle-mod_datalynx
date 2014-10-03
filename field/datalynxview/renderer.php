@@ -153,6 +153,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         // Set to return html
         $options['tohtml'] = true;
         $options['fieldview'] = true;
+        $options['entryactions'] = false;
         return $refview->display($options);
     }
     

@@ -40,11 +40,16 @@ M.datalynxfield_teammemberselect.init_entry_form = function (Y, userlistobject, 
         overflow = false,
         formcancelled = false,
         dropdowns = Y.all('input[type="text"][name^="field_' + fieldid + '"][name*="_dropdown"]'),
-        form = dropdowns.item(0).get('form'),
+        form,
         source = M.datalynxfield_teammemberselect.sources[fieldid] = [],
         autocompletes = [],
         lastvalues = {};
 
+    if (dropdowns.size() == 0) {
+        return;
+    } else {
+        form = dropdowns.item(0).get('form');
+    }
     // move the object's contents into the appropriate array
     for (key in userlistobject) {
         source.push(userlistobject[key]);

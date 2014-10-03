@@ -96,6 +96,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
      *
      */
     public function display_edit(&$mform, $entry, array $options = null) {
+        $mform->addElement('html', '<div data-field-type="' . $this->_field->type . '" data-field-name="' . $this->_field->field->name . '">');
         $field = $this->_field;
         $fieldid = $field->id();
 
@@ -130,6 +131,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
         //if ($field->get('param2') > 1) {
         //    $mform->addElement('checkbox', "{$fieldname}_delete", get_string('clearcontent','datalynxfield_file'));
         //}
+        $mform->addElement('html', '</div>');
     }
 
     /**

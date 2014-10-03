@@ -87,7 +87,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
         $selected = $entry->userid;
         static $usersmenu = null;
         if (is_null($usersmenu)) {
-            $users = get_users_by_capability($field->df->context, 'mod/datalynx:writeentry','u.id, u.firstname, u.lastname, u.email','u.lastname ASC');
+            $users = get_users_by_capability($field->df->context, 'mod/datalynx:writeentry','u.*','u.lastname ASC');
             // add a supervisor's id
             if (!in_array($entry->userid, array_keys($users))) {
                 $user = new object;
@@ -106,20 +106,20 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
         $mform->setDefault($fieldname, $selected);
     }
 
-   /**
+    /**
      * 
      */
     public function display_name($entry) {
-        global $USER;
+        global $USER, $DB;
         
         if ($entry->id < 0) { // new entry
             $entry->firstname =  $USER->firstname;
             $entry->lastname =  $USER->lastname;
             $entry->userid =  $USER->id;
         }
-
+        $user = $DB->get_record('user', array('id' => $entry->userid));
         $df = $this->_field->df();
-        return html_writer::link(new moodle_url('/user/view.php', array('id' => $entry->userid, 'course' => $df->course->id)), fullname($entry));
+        return html_writer::link(new moodle_url('/user/view.php', array('id' => $entry->userid, 'course' => $df->course->id)), fullname($user));
     }
 
     /**

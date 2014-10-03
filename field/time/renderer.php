@@ -80,6 +80,7 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
      * 
      */
     public function display_edit(&$mform, $entry, array $options = array()) {
+        $mform->addElement('html', '<div data-field-type="' . $this->_field->type . '" data-field-name="' . $this->_field->field->name . '">');
         $field = $this->_field;
         $fieldid = $field->id();
         $entryid = $entry->id;
@@ -97,6 +98,7 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         } else {
             $this->render_standard_selector($mform, $entry, $content, $includetime, $options);
         }
+        $mform->addElement('html', '</div>');
     }
     
     /**

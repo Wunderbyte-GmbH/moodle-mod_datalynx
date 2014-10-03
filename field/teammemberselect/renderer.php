@@ -67,6 +67,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
      * @return [type]          [description]
      */
     public function display_edit(MoodleQuickForm &$mform, $entry, array $options = null) {
+        $mform->addElement('html', '<div data-field-type="' . $this->_field->type . '" data-field-name="' . $this->_field->field->name . '">');
         global $PAGE, $USER;
 
         $field = $this->_field;
@@ -110,6 +111,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
                 array($field->options_menu(false, false, $authorid), $fieldid, $entryid, $field->minteamsize),
                 false,
                 $this->get_js_module());
+        $mform->addElement('html', '</div>');
     }
 
     public static function compare_different_ignore_zero_callback($data) {

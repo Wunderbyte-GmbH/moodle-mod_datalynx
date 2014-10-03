@@ -25,9 +25,9 @@ require_once($CFG->dirroot.'/mod/datalynx/field/field_class.php');
 
 class datalynxfield_entrygroup extends datalynxfield_no_content {
 
-    public $type = '_group';
+    public $type = 'entrygroup';
 
-    const _GROUP = 'group';
+    const _GROUP = 'entrygroup';
 
     /**
      *
@@ -42,7 +42,7 @@ class datalynxfield_entrygroup extends datalynxfield_no_content {
     public static function get_field_objects($dataid) {
         $fieldobjects = array();
         
-        $fieldobjects[self::_GROUP] = (object) array('id' => self::_GROUP, 'dataid' => $dataid, 'type' => '_group', 'name' => get_string('group', 'datalynxfield_entrygroup'), 'description' => '', 'visible' => 2, 'internalname' => 'groupid');
+        $fieldobjects[self::_GROUP] = (object) array('id' => self::_GROUP, 'dataid' => $dataid, 'type' => 'entrygroup', 'name' => get_string('group', 'datalynxfield_entrygroup'), 'description' => '', 'visible' => 2, 'internalname' => 'groupid');
 
         return $fieldobjects;
     }

@@ -90,6 +90,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
     }
 
     public function display_edit(&$mform, $entry, array $options = null) {
+        $mform->addElement('html', '<div data-field-type="' . $this->_field->type . '" data-field-name="' . $this->_field->field->name . '">');
         $field = $this->_field;
         $fieldid = $field->id();
 
@@ -114,6 +115,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
         if ($required) {
             $mform->addRule("{$fieldname}_filemanager", null, 'required', null, 'client');
         }
+        $mform->addElement('html', '</div>');
     }
 
     public function display_browse($entry, $params = null, $hidden = false) {

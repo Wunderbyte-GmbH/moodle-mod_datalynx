@@ -682,3 +682,12 @@ $string['option'] = 'Option';
 $string['deleteoption'] = 'Entfernen?';
 $string['renameoption'] = 'Umbenennen in:';
 $string['moreresults'] = '(Noch {$a} Ergebnisse...)';
+
+$string['setdefault'] = 'Ansicht als voreingestellte Ansicht bezeichnen';
+$string['setedit'] = 'Ansicht als Bearbeitungsansicht bezeichnen';
+$string['setmore'] = 'Ansicht als Detailansicht bezeichnen';
+
+$string['isdefault'] = 'Voreingestellte Ansicht';
+$string['isedit'] = 'Bearbeitungsansicht';
+$string['ismore'] = 'Detailansicht';
+$string['nooptions'] = 'Sie müssen mindestens eine Option angeben!';

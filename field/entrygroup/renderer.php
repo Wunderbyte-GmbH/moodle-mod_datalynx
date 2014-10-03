@@ -40,7 +40,7 @@ class datalynxfield_entrygroup_renderer extends datalynxfield_renderer {
         // set the group object
         $group = new object;
         if ($entry->id < 0) { // new record (0)
-            $entry->groupid = $this->df->currentgroup;
+            $entry->groupid = $field->df()->currentgroup;
             $group->id = $entry->groupid;
             $group->name = null;
             $group->hidepicture = null;

@@ -839,7 +839,7 @@ abstract class datalynxfield_option extends datalynxfield_base {
         $oldvalues = $newvalues = $this->_options;
         $renames = !empty($forminput->renameoption) ? $forminput->renameoption : array();
         $deletes = !empty($forminput->deleteoption) ? $forminput->deleteoption : array();
-        $adds = preg_split("/[\r\n]+/", !empty($forminput->addoptions) ? $forminput->addoptions : '');
+        $adds = preg_split("/[\|\r\n]+/", !empty($forminput->addoptions) ? $forminput->addoptions : '');
 
         foreach (array_keys($deletes) as $id) {
             if (($addedid = array_search($oldvalues[$id], $adds)) !== false) {

@@ -69,6 +69,7 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
      *
      */
     public function display_edit(&$mform, $entry, array $options = null) {
+        $mform->addElement('html', '<div data-field-type="' . $this->_field->type . '" data-field-name="' . $this->_field->field->name . '">');
         global $CFG, $PAGE;
 
         $field = $this->_field;
@@ -96,6 +97,7 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
             $mform->setType("{$fieldname}_alt", PARAM_TEXT);
             $mform->setDefault("{$fieldname}_alt", s($alt));
         }
+        $mform->addElement('html', '</div>');
     }
 
     /**

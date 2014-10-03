@@ -34,7 +34,9 @@ class datalynxfield_picture extends datalynxfield_file {
         parent::update_content($entry, $values);
         $content = $DB->get_record('datalynx_contents', array('fieldid' => $this->field->id,
                                                                  'entryid' => $entry->id));
-        $this->update_content_files($content->id, array('updatethumb' => true, 'updatefile' => false));
+        if ($content) {
+            $this->update_content_files($content->id, array('updatethumb' => true, 'updatefile' => false));
+        }
     }
 
     /**

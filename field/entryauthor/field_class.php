@@ -49,21 +49,21 @@ class datalynxfield_entryauthor extends datalynxfield_no_content {
     public static function get_field_objects($dataid) {
         $fieldobjects = array();
         
-        $fieldobjects[self::_USERID] = (object) array('id' => self::_USERID, 'dataid' => $dataid, 'type' => '_user', 'name' => get_string('userid', 'datalynxfield_entryauthor'), 'description' => '', 'visible' => 2, 'internalname' => 'id');
+        $fieldobjects[self::_USERID] = (object) array('id' => self::_USERID, 'dataid' => $dataid, 'type' => 'entryauthor', 'name' => get_string('userid', 'datalynxfield_entryauthor'), 'description' => '', 'visible' => 2, 'internalname' => 'id');
 
-        $fieldobjects[self::_USERNAME] = (object) array('id' => self::_USERNAME, 'dataid' => $dataid, 'type' => '_user', 'name' => get_string('username', 'datalynxfield_entryauthor'), 'description' => '', 'visible' => 2, 'internalname' => 'name');
+        $fieldobjects[self::_USERNAME] = (object) array('id' => self::_USERNAME, 'dataid' => $dataid, 'type' => 'entryauthor', 'name' => get_string('username', 'datalynxfield_entryauthor'), 'description' => '', 'visible' => 2, 'internalname' => 'name');
 
-        $fieldobjects[self::_USERFIRSTNAME] = (object) array('id' => self::_USERFIRSTNAME, 'dataid' => $dataid, 'type' => '_user', 'name' => get_string('userfirstname', 'datalynxfield_entryauthor'), 'description' => '', 'visible' => 2, 'internalname' => 'firstname');
+        $fieldobjects[self::_USERFIRSTNAME] = (object) array('id' => self::_USERFIRSTNAME, 'dataid' => $dataid, 'type' => 'entryauthor', 'name' => get_string('userfirstname', 'datalynxfield_entryauthor'), 'description' => '', 'visible' => 2, 'internalname' => 'firstname');
 
-        $fieldobjects[self::_USERLASTNAME] = (object) array('id' => self::_USERLASTNAME, 'dataid' => $dataid, 'type' => '_user', 'name' => get_string('userlastname', 'datalynxfield_entryauthor'), 'description' => '', 'visible' => 2, 'internalname' => 'lastname');
+        $fieldobjects[self::_USERLASTNAME] = (object) array('id' => self::_USERLASTNAME, 'dataid' => $dataid, 'type' => 'entryauthor', 'name' => get_string('userlastname', 'datalynxfield_entryauthor'), 'description' => '', 'visible' => 2, 'internalname' => 'lastname');
 
-        $fieldobjects[self::_USERUSERNAME] = (object) array('id' => self::_USERUSERNAME, 'dataid' => $dataid, 'type' => '_user', 'name' => get_string('userusername', 'datalynxfield_entryauthor'), 'description' => '', 'visible' => 2, 'internalname' => 'username');
+        $fieldobjects[self::_USERUSERNAME] = (object) array('id' => self::_USERUSERNAME, 'dataid' => $dataid, 'type' => 'entryauthor', 'name' => get_string('userusername', 'datalynxfield_entryauthor'), 'description' => '', 'visible' => 2, 'internalname' => 'username');
 
-        $fieldobjects[self::_USERIDNUMBER] = (object) array('id' => self::_USERIDNUMBER, 'dataid' => $dataid, 'type' => '_user', 'name' => get_string('useridnumber', 'datalynxfield_entryauthor'), 'description' => '', 'visible' => 2, 'internalname' => 'idnumber');
+        $fieldobjects[self::_USERIDNUMBER] = (object) array('id' => self::_USERIDNUMBER, 'dataid' => $dataid, 'type' => 'entryauthor', 'name' => get_string('useridnumber', 'datalynxfield_entryauthor'), 'description' => '', 'visible' => 2, 'internalname' => 'idnumber');
 
-        $fieldobjects[self::_USERPICTURE] = (object) array('id' => self::_USERPICTURE, 'dataid' => $dataid, 'type' => '_user', 'name' => get_string('userpicture', 'datalynxfield_entryauthor'), 'description' => '', 'visible' => 2, 'internalname' => 'picture');
+        $fieldobjects[self::_USERPICTURE] = (object) array('id' => self::_USERPICTURE, 'dataid' => $dataid, 'type' => 'entryauthor', 'name' => get_string('userpicture', 'datalynxfield_entryauthor'), 'description' => '', 'visible' => 2, 'internalname' => 'picture');
 
-        $fieldobjects[self::_USEREMAIL] = (object) array('id' => self::_USEREMAIL, 'dataid' => $dataid, 'type' => '_user', 'name' => get_string('useremail', 'datalynxfield_entryauthor'), 'description' => '', 'visible' => 2, 'internalname' => 'email');
+        $fieldobjects[self::_USEREMAIL] = (object) array('id' => self::_USEREMAIL, 'dataid' => $dataid, 'type' => 'entryauthor', 'name' => get_string('useremail', 'datalynxfield_entryauthor'), 'description' => '', 'visible' => 2, 'internalname' => 'email');
 
         return $fieldobjects;
     }

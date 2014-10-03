@@ -240,7 +240,7 @@ $string['filtercustomsearch'] = 'Search options';
 $string['filtercustomsort'] = 'Sort options';
 $string['filterdescription'] = 'Filter description';
 $string['filteredit'] = 'Editing \'{$a}\'';
-$string['filter'] = 'filter';
+$string['filter'] = 'Filter';
 $string['filtergroupby'] = 'Group by';
 $string['filterincomplete'] = 'Search condition must be completed.';
 $string['filtername'] = 'Datalynx auto-linking';
@@ -707,3 +707,12 @@ $string['option'] = 'Option';
 $string['deleteoption'] = 'Delete?';
 $string['renameoption'] = 'Rename to:';
 $string['moreresults'] = '({$a} more results...)';
+
+$string['setdefault'] = 'Set as default view';
+$string['setedit'] = 'Set as edit view';
+$string['setmore'] = 'Set as detailed view';
+
+$string['isdefault'] = 'Default view';
+$string['isedit'] = 'Edit view';
+$string['ismore'] = 'Detailed view';
+$string['nooptions'] = 'You must specify at least one option!';

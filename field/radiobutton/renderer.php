@@ -33,6 +33,7 @@ class datalynxfield_radiobutton_renderer extends datalynxfield_select_renderer {
      * 
      */
     protected function render(&$mform, $fieldname, $options, $selected, $required = false, $overridedisabled = false) {
+
         $field = $this->_field;
         $separator = $field->separators[(int) $field->get('param3')]['chr'];
         $elemgrp = array();

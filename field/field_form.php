@@ -152,7 +152,7 @@ class datalynxfield_option_form extends datalynxfield_form {
                 $group[] = &$mform->createElement('static', '', '', '</td></tr>');
                 $tablerow = &$mform->createElement('group', 'existingoptions', '', $group, null, false);
                 $mform->insertElementBefore($tablerow, 'param2');
-                $mform->disabledIf("renameoption{$id}", "deleteoption{$id}", 'checked');
+                $mform->disabledIf("renameoption[{$id}]", "deleteoption[{$id}]", 'checked');
             }
             $footer = &$mform->createElement('static', '', '', '</tbody></table>');
             $mform->insertElementBefore($footer, 'param2');
@@ -162,5 +162,21 @@ class datalynxfield_option_form extends datalynxfield_form {
         if (empty($options)) {
             $mform->addRule('addoptions', null, 'required', null, 'client');
         }
+    }
+
+    /**
+     *
+     */
+    function validation($data, $files) {
+        $errors = parent::validation($data, $files);
+
+        $oldoptions = $this->_field->get_options();
+        if (count($oldoptions) == 0 && empty($data['addoptions'])) {
+            $errors['addoptions'] = get_string('nooptions','datalynx');
+        } else if (isset($data['deleteoption']) && count($data['deleteoption']) == count($oldoptions) && empty($data['addoptions'])) {
+            $errors['addoptions'] = get_string('nooptions','datalynx');
+        }
+
+        return $errors;
     }
 }

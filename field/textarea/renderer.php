@@ -85,6 +85,7 @@ class datalynxfield_textarea_renderer extends datalynxfield_renderer {
      *
      */
     public function display_edit(&$mform, $entry, array $options = null) {
+        $mform->addElement('html', '<div data-field-type="' . $this->_field->type . '" data-field-name="' . $this->_field->field->name . '">');
         global $PAGE, $CFG;
 
         $field = $this->_field;
@@ -123,6 +124,7 @@ class datalynxfield_textarea_renderer extends datalynxfield_renderer {
                 $mform->addRule("{$fieldname}_editor", null, 'required', null, 'client');
             }
         }
+        $mform->addElement('html', '</div>');
     }
 
     /**
