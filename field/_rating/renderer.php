@@ -221,7 +221,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
      * 
      */
     protected function display_view_inline($entry) {
-        global $OUTPUT;
+        global $OUTPUT, $DB;
         
         if (isset($entry->rating)) {
             $rating = $entry->rating;
@@ -246,11 +246,11 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
                     //we could clone the rating object or preserve the rating id if we needed it again
                     //but we don't
                     $raterecord->id = $raterecord->userid;
-
                     $row = new html_table_row();
                     $row->attributes['class'] = 'ratingitemheader';
                     $row->cells[] = $OUTPUT->user_picture($raterecord, array('courseid' => $this->_field->df()->course->id));
-                    $row->cells[] = fullname($raterecord);
+                    $userrecord = $DB->get_record('user', array('id' => $raterecord->userid));
+                    $row->cells[] = fullname($userrecord);
                     if ($raterecord->rating > $maxrating) {
                         $raterecord->rating = $maxrating;
                     }

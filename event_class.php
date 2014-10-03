@@ -121,7 +121,7 @@ class datalynx_event_handler {
     }
 
     private static function notify_team_members(stdClass $data, $event) {
-        global $CFG, $SITE, $USER;
+        global $CFG, $SITE, $USER, $DB;
 
         $df = $data->df;
         $data->event = $event;
@@ -164,8 +164,9 @@ class datalynx_event_handler {
         $message->userfrom = $data->userfrom = $USER;
         $data->senderprofilelink = html_writer::link(new moodle_url('/user/profile.php', array('id' => $data->userfrom->id)), fullname($data->userfrom));
         foreach ($data->users as $user) {
-            $message->userto = $user;
-            $data->fullname = fullname($user);
+            $userto = $DB->get_record('user', array('id' => $user->id));
+            $message->userto = $userto;
+            $data->fullname = fullname($userto);
             $notedetails = get_string("message_$event", 'datalynx', $data);
             $contenthtml = text_to_html($notedetails, false, false, true);
             $content = html_to_text($notedetails);
