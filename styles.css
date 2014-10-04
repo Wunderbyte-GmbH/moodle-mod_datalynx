@@ -124,18 +124,18 @@
     display: none;
 }
 
-.datalynxfield_teammemberselect_select {
+select.datalynxfield_teammemberselect_select {
   display: inherit;
 }
 
-.jsenabled .datalynxfield_teammemberselect_select {
+body.jsenabled select.datalynxfield_teammemberselect_select {
   display: none;
 }
 
-.datalynxfield_teammemberselect_dropdown {
+input[type="text"].datalynxfield_teammemberselect_dropdown {
   display: none;
 }
 
-.jsenabled .datalynxfield_teammemberselect_dropdown {
+body.jsenabled input[type="text"].datalynxfield_teammemberselect_dropdown {
   display: inherit;
 }
