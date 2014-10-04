@@ -104,7 +104,7 @@ class datalynxfield_textarea_renderer extends datalynxfield_renderer {
         $data->$fieldname = isset($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : '';
         $required = !empty($options['required']);
 
-        if (!$field->is_editor() or !can_use_html_editor()) {
+        if (!$field->is_editor()) {
             $mform->addElement('textarea', $fieldname, null, $attr);
             $mform->setDefault($fieldname, $data->$fieldname);
             if ($required) {

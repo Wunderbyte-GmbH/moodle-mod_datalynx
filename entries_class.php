@@ -30,9 +30,15 @@ class datalynx_entries {
     const SELECT_LAST_PAGE = -1;
     const SELECT_NEXT_PAGE = -2;
     const SELECT_RANDOM_PAGE = -3;
-    
-    protected $_df = null;      // datalynx object
-    protected $_view = null;      // view object
+
+    /**
+     * @var datalynx
+     */
+    protected $datalynx = null;      // datalynx object
+    /**
+     * @var datalynx_filter|null
+     */
+    protected $filter = null;
 
     protected $_entries = null;
     protected $_entriestotalcount = 0;
@@ -42,29 +48,19 @@ class datalynx_entries {
      * Constructor
      * View or datalynx or both, each can be id or object
      */
-    public function __construct($df, $view = null) {
-
-        if (empty($df) and empty($view)) {
+    public function datalynx_entries(datalynx $datalynx, datalynx_filter $filter = null) {
+        if (empty($datalynx)) {
             throw new coding_exception('Datalynx id or object must be passed to entries constructor.');
         }
-        
-        if (is_object($df)) {
-            $this->_df = $df;
-        } else {
-            $this->_df = new datalynx($df);
-        }
 
-        if (is_object($view)) {
-            $this->_view = $view;
-        } else {
-            $this->_view = $this->_df->get_view_from_id($view);
-        }
+        $this->datalynx = $datalynx;
+        $this->filter = $filter;
     }
 
     /**
      *
      */
-    public function set_content(array $options = null) {
+    public function set_content(array $options = array()) {
         global $CFG;
         
         if (isset($options['entriesset'])) {
@@ -78,7 +74,7 @@ class datalynx_entries {
         }            
 
         // Apply entry content rules
-        $rm = $this->_df->get_rule_manager();
+        $rm = $this->datalynx->get_rule_manager();
         if (!empty($entriesset->entries) and $rules = $rm->get_rules_by_plugintype('entrycontent')) {
             foreach ($rules as $rule) {
                 if ($rule->is_enabled()) {
@@ -113,12 +109,12 @@ class datalynx_entries {
     public function get_entries($options = null) {
         global $CFG, $DB, $USER;
         
-        $df = &$this->_df;
-        $fields = $df->get_fields();
+        $datalynx = &$this->datalynx;
+        $fields = $datalynx->get_fields();
 
         // Get the filter
         if (empty($options['filter'])) {
-            $filter = $this->_view->get_filter();
+            $filter = $this->filter;
         } else {
             $filter = $options['filter'];
         }
@@ -136,7 +132,7 @@ class datalynx_entries {
 
         // USER filtering
         $whereuser = '';
-        if (!$df->user_can_view_all_entries()) {
+        if (!$datalynx->user_can_view_all_entries()) {
             // include only the  user's entries
             $whereuser = " AND e.userid = :{$this->sqlparams($params, 'userid', $USER->id)} ";
         } else {
@@ -148,27 +144,27 @@ class datalynx_entries {
             }
                 
             // exclude guest/anonymous
-            if (!has_capability('mod/datalynx:viewanonymousentry', $df->context)) {
+            if (!has_capability('mod/datalynx:viewanonymousentry', $datalynx->context)) {
                 $whereuser .= " AND e.userid <> :{$this->sqlparams($params, 'guestid', 1)} ";
             }
         }
 
         // GROUP filtering
         $wheregroup = '';
-        if ($df->currentgroup) {
-            $wheregroup = " AND e.groupid = :{$this->sqlparams($params, 'groupid', $df->currentgroup)} ";
+        if ($datalynx->currentgroup) {
+            $wheregroup = " AND e.groupid = :{$this->sqlparams($params, 'groupid', $datalynx->currentgroup)} ";
         } else {
             // specific groups requested
             if (!empty($filter->groups)) {
                 list($ingroups, $groupparams) = $DB->get_in_or_equal($filter->groups, SQL_PARAMS_NAMED, 'groups');
                 $whereuser .= " AND e.userid $ingroups ";
-                $params = array_merge($params, array('groups' => $userparams));
+                $params = array_merge($params, array('groups' => $groupparams));
             }
         }
         
         // APPROVE filtering
         $whereapprove = '';
-        if ($df->data->approval and !has_capability('mod/datalynx:manageentries', $df->context)) {
+        if ($datalynx->data->approval and !has_capability('mod/datalynx:manageentries', $datalynx->context)) {
             if (isloggedin()) {
                 $whereapprove = " AND (e.approved = :{$this->sqlparams($params, 'approved', 1)} 
                                         OR e.userid = :{$this->sqlparams($params, 'userid', $USER->id)}) ";
@@ -179,7 +175,7 @@ class datalynx_entries {
 
         // STATUS filtering (visibility)
         $wherestatus = '';
-        if (!has_capability('mod/datalynx:viewdrafts', $df->context)) {
+        if (!has_capability('mod/datalynx:viewdrafts', $datalynx->context)) {
             $wherestatus = " AND (e.status <> :{$this->sqlparams($params, 'status', datalynxfield__status::STATUS_DRAFT)}
                               OR  e.userid = :{$this->sqlparams($params, 'userid', $USER->id)}) ";
         }
@@ -198,7 +194,7 @@ class datalynx_entries {
         $tables = ' {datalynx_entries} e
                     JOIN {user} u ON u.id = e.userid 
                     LEFT JOIN {groups} g ON g.id = e.groupid ';
-        $wheredfid =  " e.dataid = :{$this->sqlparams($params, 'dataid', $df->id())} ";
+        $wheredfid =  " e.dataid = :{$this->sqlparams($params, 'dataid', $datalynx->id())} ";
         $whereoptions = '';
         if (!empty($options['search'])) {
             foreach ($options['search'] as $key => $val) {
@@ -378,7 +374,7 @@ class datalynx_entries {
                         // retrieve the files (no dirs) from file area 
                         // TODO for Picture fields this does not distinguish between the images and their thumbs
                         //      but the view may not necessarily display both 
-                        $files = array_merge($files, $fs->get_area_files($this->_df->context->id,
+                        $files = array_merge($files, $fs->get_area_files($this->datalynx->context->id,
                                                                         'mod_datalynx',
                                                                         'content',
                                                                         $contentid,
@@ -397,7 +393,7 @@ class datalynx_entries {
      */
     public function process_entries($action, $eids, $data = null, $confirmed = false) {
         global $CFG, $DB, $USER, $OUTPUT, $PAGE;
-        $df = $this->_df;
+        $df = $this->datalynx;
 
         $entries = array();
         // some entries may be specified for action
@@ -617,7 +613,7 @@ class datalynx_entries {
                                 }
                             }
                             if ($processed) {
-                                $eventdata = (object) array('view' => $this->_view, 'items' => $processed);
+                                $eventdata = (object) array('items' => $processed);
                                 $df->events_trigger("entry$addorupdate", $eventdata);
                             }
                         }
@@ -658,7 +654,7 @@ class datalynx_entries {
                         }
 
                         if ($processed) {
-                            $eventdata = (object) array('view' => $this->_view, 'items' => $processed);
+                            $eventdata = (object) array('items' => $processed);
                             $df->events_trigger("entryadded", $eventdata);
                         }
 
@@ -676,7 +672,7 @@ class datalynx_entries {
                         $processed += $this->create_approved_entries_for_team($entryids);
 
                         if ($processed) {
-                            $eventdata = (object) array('view' => $this->_view, 'items' => $processed);
+                            $eventdata = (object) array('items' => $processed);
                             $df->events_trigger("entryapproved", $eventdata);
                         }
 
@@ -691,7 +687,7 @@ class datalynx_entries {
                         $DB->set_field_select('datalynx_entries', 'approved', 0, " dataid = ? AND id IN ($ids) ", array($df->id()));        
                         $processed = $entries;
                         if ($processed) {
-                            $eventdata = (object) array('view' => $this->_view, 'items' => $processed);
+                            $eventdata = (object) array('items' => $processed);
                             $df->events_trigger("entrydisapproved", $eventdata);
                         }
 
@@ -711,7 +707,7 @@ class datalynx_entries {
                             $processed[$entry->id] = $entry;
                         }
                         if ($processed) {
-                            $eventdata = (object) array('view' => $this->_view, 'items' => $processed);
+                            $eventdata = (object) array('items' => $processed);
                             $df->events_trigger("entrydeleted", $eventdata);
                         }
 
@@ -782,7 +778,7 @@ class datalynx_entries {
     public function notify_team_members($entry, $field, $oldmembers, $newmembers) {
         global $DB;
 
-        $df = $this->_df;
+        $df = $this->datalynx;
         $oldmembers = !empty($oldmembers) ? array_filter($oldmembers) : array();
         $newmembers = array_filter($newmembers);
 
@@ -804,7 +800,6 @@ class datalynx_entries {
         }
 
         $eventdata = array('items' => array($entry->id => $entry),
-                           'view' => $this->_view,
                            'fieldname' => $field->name);
 
         $eventdata['users'] = $addedmembers;
@@ -823,7 +818,7 @@ class datalynx_entries {
     public function create_approved_entries_for_team(array $entryids) {
         global $DB;
 
-        $df = $this->_df;
+        $df = $this->datalynx;
 
         $fields = $df->get_fields();
         $teamfield = false;
@@ -940,7 +935,7 @@ class datalynx_entries {
     public function update_entry($entry, $data = null, $updatetime = true) {
         global $CFG, $DB, $USER;
 
-        $df = $this->_df;
+        $df = $this->datalynx;
         
         if ($data and has_capability('mod/datalynx:manageentries', $df->context)) {
             foreach ($data as $key => $value) {

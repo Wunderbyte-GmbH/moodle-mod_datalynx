@@ -299,7 +299,7 @@ class datalynxview_csv extends datalynxview_base {
     public function get_csv_content($range = self::EXPORT_PAGE) {
         // Set content
         if ($range == self::EXPORT_ALL) {
-            $entries = new datalynx_entries($this->_df, $this);
+            $entries = new datalynx_entries($this->_df, $this->_filter);
             $options = array();
             // Set a filter to take it all
             $filter = $this->get_filter();

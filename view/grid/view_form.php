@@ -54,7 +54,7 @@ class datalynxview_grid_form extends datalynxview_base_form {
         $mform->addElement('header', 'entrytemplatehdr', get_string('entrytemplate', 'datalynx'));
 
         $mform->addElement('editor', 'eparam2_editor', '', $editorattr, $editoroptions['param2']);
-        $mform->setDefault("eparam2_editor[format]", FORMAT_PLAIN);
+        $mform->setDefault("eparam2_editor[format]", FORMAT_HTML);
         $this->add_tags_selector('eparam2_editor', 'field');
         $this->add_tags_selector('eparam2_editor', 'character');        
     }

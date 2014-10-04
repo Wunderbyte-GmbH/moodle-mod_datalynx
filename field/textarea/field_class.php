@@ -87,7 +87,7 @@ class datalynxfield_textarea extends datalynxfield_base {
         }        
 
         // Editor content
-        if ($this->is_editor() and can_use_html_editor()) {
+        if ($this->is_editor()) {
             $data = (object) $values;
             $data->{'editor_editor'} = $data->editor;
 
@@ -143,7 +143,7 @@ class datalynxfield_textarea extends datalynxfield_base {
      *
      */
     protected function content_names() {
-        if ($this->is_editor() and can_use_html_editor()) {
+        if ($this->is_editor()) {
             return array('editor');
         } else {
             return array('');
@@ -161,7 +161,7 @@ class datalynxfield_textarea extends datalynxfield_base {
             "[[$fieldname:textlinks]]"
         );
 
-        if (!$this->is_editor() or !can_use_html_editor()) {
+        if (!$this->is_editor()) {
             $formfieldname = "field_{$fieldid}_{$entryid}";
             $cleanformat = PARAM_NOTAGS;
         } else {
@@ -175,7 +175,7 @@ class datalynxfield_textarea extends datalynxfield_base {
                 if (empty($formdata->$formfieldname)) {
                     return array($formfieldname => get_string('fieldrequired', 'datalynx'));
                 }
-                if (!$this->is_editor() or !can_use_html_editor()) {
+                if (!$this->is_editor()) {
                     if (!clean_param($formdata->$formfieldname, $cleanformat)) {
                         return array($formfieldname => get_string('fieldrequired', 'datalynx'));
                     }
