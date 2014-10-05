@@ -274,7 +274,7 @@ class datalynx_rule_manager {
                         break;
                 }
 
-                add_to_log($df->course->id, 'datalynx', 'rule '. $action, 'rule/index.php?id='. $df->cm->id, $df->id(), $df->cm->id);
+                //FIXME: add_to_log($df->course->id, 'datalynx', 'rule '. $action, 'rule/index.php?id='. $df->cm->id, $df->id(), $df->cm->id);
                 if ($strnotify) {
                     $rulesprocessed = $processedrids ? count($processedrids) : 'No';
                     $df->notifications['good'][] = get_string($strnotify, 'datalynx', $rulesprocessed);

@@ -56,13 +56,13 @@ if ($mform->is_cancelled()){
    // add new rule
     if (!$rule->get_id()) {
         $rule->insert_rule($data);
-        add_to_log($df->course->id, 'datalynx', 'rules add', 'rule_edit.php?d='. $df->id(), '', $df->cm->id);
+        //FIXME: add_to_log($df->course->id, 'datalynx', 'rules add', 'rule_edit.php?d='. $df->id(), '', $df->cm->id);
 
     // update rule
     } else {
         $data->id = $rule->get_id();
         $rule->update_rule($data);
-        add_to_log($df->course->id, 'datalynx', 'rules update', 'rule/index.php?d='. $df->id(). '&amp;id=', $urlparams->rid, $df->cm->id);
+        //FIXME: add_to_log($df->course->id, 'datalynx', 'rules update', 'rule/index.php?d='. $df->id(). '&amp;id=', $urlparams->rid, $df->cm->id);
     }
 
     if ($data->submitbutton != get_string('savecontinue', 'datalynx')) {

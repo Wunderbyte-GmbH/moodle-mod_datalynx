@@ -80,7 +80,7 @@ if ($mform->is_cancelled()){
     }
     
     $df->notifications['good'][] = $log;
-    add_to_log($df->course->id, 'datalynx', $log, 'view/index.php?d='. $df->id(). '&amp;vedit=', $view->id(), $df->cm->id);
+    //FIXME: add_to_log($df->course->id, 'datalynx', $log, 'view/index.php?d='. $df->id(). '&amp;vedit=', $view->id(), $df->cm->id);
 
     if (!isset($data->submitreturnbutton)) {
         // TODO: set default view       

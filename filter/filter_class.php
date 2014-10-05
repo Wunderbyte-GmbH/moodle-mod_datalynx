@@ -738,7 +738,7 @@ class datalynx_filter_manager {
                         break;
                 }
 
-                add_to_log($df->course->id, 'datalynx', 'filter '. $action, 'filter/index.php?id='. $df->cm->id, $df->id(), $df->cm->id);
+                //FIXME: add_to_log($df->course->id, 'datalynx', 'filter '. $action, 'filter/index.php?id='. $df->cm->id, $df->id(), $df->cm->id);
                 if (!empty($strnotify)) {
                     $filtersprocessed = $processedfids ? count($processedfids) : 'No';
                     $df->notifications['good'][] = get_string($strnotify, 'datalynx', $filtersprocessed);

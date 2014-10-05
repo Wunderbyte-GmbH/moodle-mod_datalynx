@@ -526,9 +526,7 @@ class datalynx {
 
         // set current view and view's page requirements
         $currentview = !empty($urlparams['view']) ? $urlparams['view'] : 0;
-        if ($this->_currentview = $this->get_current_view_from_id($currentview)) {
-            $this->_currentview->set_page($page);
-        }
+        $this->_currentview = $this->get_current_view_from_id($currentview);
         
         // if a new datalynx or incomplete design, direct manager to manage area
         if ($manager) {
@@ -631,6 +629,7 @@ class datalynx {
      * TODO: consider moving into the view
      */
     public function print_rsslink() {
+        global $USER, $CFG;
         // Link to the RSS feed
         if (!empty($CFG->enablerssfeeds) && !empty($CFG->datalynx_enablerssfeeds) && $this->data->rssarticles > 0) {
             echo '<div style="float:right;">';
@@ -669,7 +668,7 @@ class datalynx {
      */
     public function display() {
         if (!empty($this->_currentview)) {
-            add_to_log($this->course->id, 'datalynx', 'view', $this->pagefile. '.php?id='. $this->cm->id, $this->id(), $this->cm->id);
+            //FIXME: add_to_log($this->course->id, 'datalynx', 'view', $this->pagefile. '.php?id='. $this->cm->id, $this->id(), $this->cm->id);
             $this->_currentview->display();
         }
     }
@@ -935,7 +934,7 @@ class datalynx {
                         break;
                 }
 
-                add_to_log($this->course->id, 'datalynx', 'field '. $action, 'field/index.php?id='. $this->cm->id, $this->id(), $this->cm->id);
+                //FIXME: add_to_log($this->course->id, 'datalynx', 'field '. $action, 'field/index.php?id='. $this->cm->id, $this->id(), $this->cm->id);
                 if ($strnotify) {
                     $fieldsprocessed = $processedfids ? count($processedfids) : 'No';
                     $this->notifications['good'][] = get_string($strnotify, 'datalynx', $fieldsprocessed);
@@ -1355,7 +1354,7 @@ class datalynx {
                         break;
                 }
 
-                add_to_log($this->course->id, 'datalynx', 'view '. $action, 'view/index.php?id='. $this->cm->id, $this->id(), $this->cm->id);
+                //FIXME: add_to_log($this->course->id, 'datalynx', 'view '. $action, 'view/index.php?id='. $this->cm->id, $this->id(), $this->cm->id);
                 if ($strnotify) {
                     $viewsprocessed = $processedvids ? count($processedvids) : 'No';
                     $this->notifications['good'][] = get_string($strnotify, 'datalynx', $viewsprocessed);
@@ -1705,7 +1704,7 @@ class datalynx {
      * 
      */
     public function add_to_log($action) {
-        add_to_log($this->course->id, 'datalynx', 'entry '. $action, $this->pagefile. '.php?id='. $this->cm->id, $this->id(), $this->cm->id);
+        //FIXME: add_to_log($this->course->id, 'datalynx', 'entry '. $action, $this->pagefile. '.php?id='. $this->cm->id, $this->id(), $this->cm->id);
     }
     
     /**

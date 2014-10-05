@@ -46,7 +46,7 @@ if (!$course = $DB->get_record('course', array('id' => $id))) {
 $context = context_course::instance($course->id);
 require_course_login($course);
 
-add_to_log($course->id, "datalynx", "view all", "index.php?id=$course->id", "");
+//FIXME: add_to_log($course->id, "datalynx", "view all", "index.php?id=$course->id", "");
 
 $modulename = get_string('modulename','datalynx');
 $modulenameplural  = get_string('modulenameplural','datalynx');
