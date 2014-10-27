@@ -150,6 +150,7 @@ class datalynxfield_textarea extends datalynxfield_base {
         }
     }
 
+    // TODO: this needs fixing
     public function validate($entryid, $tags, $formdata) {
         $fieldid = $this->id();
         $fieldname = $this->name();

@@ -21,6 +21,7 @@
  */
 
 require_once(dirname(__FILE__). '/../mod_class.php');
+require_once(dirname(__FILE__). '/../behavior/behavior.php');
 
 /**
  * Base class for Datalynx Field Types
@@ -77,7 +78,7 @@ abstract class datalynxfield_base {
      * Sets up a field object
      */
     public function set_field($forminput = null) {
-        $this->field = new object;
+        $this->field = new stdClass();
         $this->field->id = !empty($forminput->id) ? $forminput->id : 0;
         $this->field->type   = $this->type;
         $this->field->dataid = $this->df->id();
@@ -86,7 +87,7 @@ abstract class datalynxfield_base {
         $this->field->visible = isset($forminput->visible) ? $forminput->visible : 2;
         $this->field->edits = isset($forminput->edits) ? $forminput->edits : -1;
         $this->field->label = !empty($forminput->label) ? $forminput->label : '';
-        for ($i=1; $i<=10; $i++) {
+        for ($i = 1; $i <= 10; $i++) {
             $this->field->{"param$i"} = !empty($forminput->{"param$i"}) ? trim($forminput->{"param$i"}) : null;
         }
     }
@@ -187,14 +188,7 @@ abstract class datalynxfield_base {
      */
     public function image() {
         global $OUTPUT;
-
-        $image = $OUTPUT->pix_icon(
-                            'icon',
-                            $this->type,
-                            "datalynxfield_{$this->type}");
-
-        return $image;
-
+        return $OUTPUT->pix_icon('icon', $this->type, "datalynxfield_{$this->type}");
     }
 
     /**
@@ -232,7 +226,7 @@ abstract class datalynxfield_base {
     }
 
     /**
-     *
+     * @return datalynxfield_renderer
      */
     public function renderer() {
         global $CFG;
@@ -245,77 +239,62 @@ abstract class datalynxfield_base {
         return $this->_renderer;
     }
 
-    /**
-     * Check if a field from an add form is empty
-     */
-    public function notemptyfield($value, $name) {
-        return !empty($value);
-    }
-
     // CONTENT MANAGEMENT
     /**
      *
      */
-    public function get_definitions($patterns, $entry, $options = array()) {
-        global $USER;
+    public function get_definitions($tags, $entry, array $options = array('edit' => false, 'manage' => false, 'visible' => false,  'editable' => false, 'required' => false)) {
+        $replacements = array();
+        foreach ($tags as $tag) {
+            list($field, $behavior, $renderer) = $this->process_tag($tag);
+            /* @var $behavior datalynx_field_behavior */
 
-        $userid = 0;
-        if (!empty($entry->userid)) {
-            $userid = $entry->userid;
-        } else if ($entry->id < 0) {
-            $userid = $USER->id;
+            $options['visible'] = $behavior->is_visible_to_user();
+            $options['editable'] = $behavior->is_editable_by_user() && (strpos($tag, '!') === false);
+            $options['required'] = $behavior->is_required() || (strpos($tag, '*') !== false);
+
+            $replacements = array_merge($replacements, $this->renderer()->get_replacements(array($tag), $entry, $options));
         }
-        
-        if (!$this->is_visible($userid)) {
-            return array_fill_keys($patterns, '');
+        return $replacements;
+    }
+
+    private function process_tag($tag) {
+        $pattern = '/\[\[([^\|\]]+)(?:\|([^\|\]]*))?(?:\|([^\|\]]*))?\]\]/';
+        $matches = array();
+
+        $field = $this;
+        $behavior = datalynx_field_behavior::get_default_behavior($this->df());
+        $renderer = null;
+
+        if (preg_match($pattern, $tag, $matches)) {
+            $fieldname = $matches[1];
+
+            $behaviorname = isset($matches[2]) ? $matches[2] : false;
+            if ($behaviorname) {
+                $behavior = datalynx_field_behavior::from_name($behaviorname);
+            }
+
+            $renderername = isset($matches[3]) ? $matches[3] : false;
+            if ($renderername) {
+                // $renderer = ...
+            }
         }
-        
-        if (!$this->is_editable()) {
-            $options['edit'] = false;
-        }
-        
-        return $this->renderer()->get_replacements($patterns, $entry, $options);
+
+        return array($field, $behavior, $renderer);
     }
        
     /**
      *
      */
     public static function is_internal() {
-        false;
-    }
-    
-    /**
-     *
-     */
-    protected function is_visible($entryowner) {
-        global $USER;
-
-        $visibility = $this->field->visible;
-        if ($visibility == self::VISIBLE_ALL) {
-            return true;
-        } 
-
-        if ($canmanageentries = has_capability('mod/datalynx:manageentries', $this->df()->context)) {
-            return true;
-        }
-        
-        $isowner = ($USER->id == $entryowner);
-        if ($visibility == self::VISIBLE_OWNER and $isowner) {
-            return true;
-        }
-        
         return false;
     }
 
     /**
      *
      */
-    protected function is_editable() {
-        if (empty($this->field->edits)
-                    and !has_capability('mod/datalynx:manageentries', $this->df()->context)) {
-            return false;
-        }
-        return true;
+    public function is_editable() {
+        return !(empty($this->field->edits) && !has_capability('mod/datalynx:manageentries', $this->df()->context));
     }
 
     /**
@@ -385,32 +364,6 @@ abstract class datalynxfield_base {
         $rs->close();
 
         return $DB->delete_records('datalynx_contents', $params);
-    }
-
-    /**
-     * transfer all content associated with the field
-     */
-    public function transfer_content($tofieldid) {
-        global $CFG, $DB;
-
-        if ($contents = $DB->get_records('datalynx_contents', array('fieldid' => $this->field->id))) {
-            if (!$tofieldid) {
-                return false;
-            } else {
-                foreach ($contents as $content) {
-                    $content->fieldid = $tofieldid;
-                    $DB->update_record('datalynx_contents', $content);
-                }
-
-                // rename content dir if exists
-                $path = $CFG->dataroot.'/'.$this->df->course->id.'/'.$CFG->moddata.'/datalynx/'.$this->df->id();
-                $olddir = "$path/". $this->field->id;
-                $newdir = "$path/$tofieldid";
-                file_exists($olddir) and rename($olddir, $newdir);
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
@@ -762,10 +715,6 @@ abstract class datalynxfield_no_content extends datalynxfield_base {
     }
 
     public function delete_content($entryid = 0) {
-        return true;
-    }
-
-    public function transfer_content($tofieldid) {
         return true;
     }
 

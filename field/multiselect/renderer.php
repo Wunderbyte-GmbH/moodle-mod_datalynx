@@ -43,7 +43,7 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
 
         foreach ($tags as $tag => $cleantag) {
             if ($edit) {
-                $params = array('required' => $this->is_required($tag));
+                $params = array('required' => $options['required']);
                 if ($cleantag == "[[$fieldname:addnew]]") {
                     $params['addnew'] = true;
                 }
@@ -146,23 +146,6 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
         }
         
         return $str;
-    }
-    
-    /**
-     *
-     */
-    public function display_import(&$mform, $tags) {
-        $fieldid = $this->_field->id();
-        $tagname = $this->_field->name();
-        $name = "f_{$fieldid}_$tagname";
-
-        $grp = array();
-        $grp[] = &$mform->createElement('text', "{$name}_name", null, array('size'=>'16'));                   
-        $grp[] = &$mform->createElement('selectyesno', "{$name}_allownew");
-        $mform->addGroup($grp, "grp$tagname", $tagname, ' '. get_string('newvalueallow', 'datalynx'). ': ', false);
-                            
-        $mform->setType("{$name}_name", PARAM_NOTAGS);
-        $mform->setDefault("{$name}_name", $tagname);
     }
 
     /**

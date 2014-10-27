@@ -44,7 +44,7 @@ class datalynxfield__approve extends datalynxfield_no_content {
      *
      */
     public static function is_internal() {
-        true;
+        return true;
     }
     
     /**

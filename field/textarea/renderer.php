@@ -45,7 +45,7 @@ class datalynxfield_textarea_renderer extends datalynxfield_renderer {
         if ($edit) {
             foreach ($tags as $tag => $cleantag) {
                 $params = null;
-                $required = $this->is_required($tag);
+                $required = $options['required'];
                 if ($cleantag == "[[{$fieldname}:wordcount]]") {
                     $replacements[$tag] = '';
                     continue;

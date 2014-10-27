@@ -422,7 +422,6 @@ $string['ratingsviewrate'] = 'Anzeigen und bewerten';
 $string['ratingsview'] = 'Bewertungen anzeigen';
 $string['ratingvalue'] = 'Bewertung';
 $string['reference'] = 'Verweis';
-$string['renew'] = 'Neu laden';
 $string['requireapproval'] = 'Freischaltung erforderlich?';
 $string['requiredall'] = 'alle notwendig';
 $string['requirednotall'] = 'nicht alle notwendig';
@@ -691,3 +690,22 @@ $string['isdefault'] = 'Voreingestellte Ansicht';
 $string['isedit'] = 'Bearbeitungsansicht';
 $string['ismore'] = 'Detailansicht';
 $string['nooptions'] = 'Sie müssen mindestens eine Option angeben!';
+
+$string['visibility'] = 'Sichtbarkeit';
+$string['editing'] = 'Bearbeitung';
+$string['editable'] = 'Bearbeitbar';
+$string['required'] = 'Erforderlich';
+$string['editableby'] = 'Bearbeitbar von';
+$string['entryauthor'] = 'Eintragsautor';
+
+$string['behaviors'] = 'Verhalten';
+$string['behavioradd'] = 'Verhalten anlegen';
+
+$string['renderers'] = 'Renderers';
+$string['copyof'] = 'Kopie von {$a}';
+$string['mentor'] = 'Mentor';
+$string['notrequired'] = 'Nicht erforderlich';
+$string['newbehavior'] = 'New field behavior';
+$string['editingbehavior'] = 'Editing field behavior "{$a}"';
+$string['deletingbehavior'] = 'Deleting field behavior "{$a}"';
+$string['duplicatingbehavior'] = 'Duplicating field behavior "{$a}"';

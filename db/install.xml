@@ -172,7 +172,7 @@
         <KEY NAME="dataid" TYPE="foreign" FIELDS="dataid" REFTABLE="datalynx" REFFIELDS="id" PREVIOUS="primary"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="datalynx_contents" COMMENT="the content of each entry" PREVIOUS="datalynx_entries">
+    <TABLE NAME="datalynx_contents" COMMENT="the content of each entry" PREVIOUS="datalynx_entries" NEXT="datalynx_renderers">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="fieldid"/>
         <FIELD NAME="fieldid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="entryid"/>
@@ -187,6 +187,35 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="entryid"/>
         <KEY NAME="entryid" TYPE="foreign" FIELDS="entryid" REFTABLE="datalynx_entries" REFFIELDS="id" PREVIOUS="primary" NEXT="fieldid"/>
         <KEY NAME="fieldid" TYPE="foreign" FIELDS="fieldid" REFTABLE="datalynx_fields" REFFIELDS="id" PREVIOUS="entryid"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="datalynx_behaviors" COMMENT="Governs behavior of fields" PREVIOUS="datalynx_contents" NEXT="datalynx_renderers">
+      <FIELDS>
+          <FIELD NAME="id"          TYPE="int"  LENGTH="10"    NOTNULL="true"  SEQUENCE="true"                         NEXT="dataid"/>
+          <FIELD NAME="dataid"      TYPE="int"  LENGTH="10"    NOTNULL="true"  SEQUENCE="false" PREVIOUS="id"          NEXT="type"/>
+          <FIELD NAME="name"        TYPE="char" LENGTH="255"   NOTNULL="true"  SEQUENCE="false" PREVIOUS="type"        NEXT="description"/>
+          <FIELD NAME="description" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="name"        NEXT="visibleto"/>
+          <FIELD NAME="visibleto"   TYPE="text" LENGTH="big"   NOTNULL="false" SEQUENCE="false" PREVIOUS="description" NEXT="editableby"/>
+          <FIELD NAME="editableby"  TYPE="text" LENGTH="big"   NOTNULL="false" SEQUENCE="false" PREVIOUS="visibleto"   NEXT="required"/>
+          <FIELD NAME="required"    TYPE="text" LENGTH="big"   NOTNULL="false" SEQUENCE="false" PREVIOUS="editableby"/>
+      </FIELDS>
+      <KEYS>
+          <KEY NAME="primary" TYPE="primary" FIELDS="id"     NEXT="dataid"/>
+          <KEY NAME="dataid"  TYPE="foreign" FIELDS="dataid" REFTABLE="datalynx" REFFIELDS="id" PREVIOUS="primary"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="datalynx_renderers" COMMENT="Governs visual representation of fields" PREVIOUS="datalynx_behaviors">
+      <FIELDS>
+          <FIELD NAME="id"          TYPE="int"  LENGTH="10"    NOTNULL="true"  SEQUENCE="true"                         NEXT="dataid"/>
+          <FIELD NAME="dataid"      TYPE="int"  LENGTH="10"    NOTNULL="true"  SEQUENCE="false" PREVIOUS="id"          NEXT="type"/>
+          <FIELD NAME="type"        TYPE="char" LENGTH="255"   NOTNULL="true"  SEQUENCE="false" PREVIOUS="dataid"      NEXT="name"/>
+          <FIELD NAME="name"        TYPE="char" LENGTH="255"   NOTNULL="true"  SEQUENCE="false" PREVIOUS="type"        NEXT="description"/>
+          <FIELD NAME="description" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="name"        NEXT="data"/>
+          <FIELD NAME="properties"  TYPE="text" LENGTH="big"   NOTNULL="false" SEQUENCE="false" PREVIOUS="description"/>
+      </FIELDS>
+      <KEYS>
+          <KEY NAME="primary" TYPE="primary" FIELDS="id"     NEXT="dataid"/>
+          <KEY NAME="dataid"  TYPE="foreign" FIELDS="dataid" REFTABLE="datalynx" REFFIELDS="id" PREVIOUS="primary"/>
       </KEYS>
     </TABLE>
   </TABLES>

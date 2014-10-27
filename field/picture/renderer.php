@@ -50,7 +50,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
             
             if ($edit) {
                 if ($cleantag != "[[$fieldname:tn-url]]" and in_array($cleantag, array_keys($this->patterns()))) {
-                    $required = $this->is_required($tag);
+                    $required = $options['required'];
                     $replacements[$tag] = array('', array(array($this,'display_edit'), array($entry, array('required' => $required))));
                 }
             } else {
@@ -75,7 +75,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
                 }
                 
                 if (!empty($displaybrowse)) {
-                    if ($this->is_hidden($tag)) {
+                    if (!$options['visible']) {
                         $displaybrowse = html_writer::tag('span', $displaybrowse, array('class' => 'hide'));
                     }
                     $replacements[$tag] = array('html', $displaybrowse);

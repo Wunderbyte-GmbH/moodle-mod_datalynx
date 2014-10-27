@@ -48,7 +48,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         $tags = $this->add_clean_pattern_keys($tags);
         foreach ($tags as $tag => $cleantag) {
             if ($edit) {
-                $params = array('required' => $this->is_required($tag));
+                $params = array('required' => $options['required']);
                 $replacements[$tag] = array('', array(array($this, 'display_edit'), array($entry, $params)));
                 break;
             } else {

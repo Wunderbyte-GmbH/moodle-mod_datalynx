@@ -33,6 +33,7 @@ class datalynx_filter {
     public $visible;
     
     public $perpage;
+    public $pagenum;
     public $selection;
     public $groupby;
     public $customsort;

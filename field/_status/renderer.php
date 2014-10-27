@@ -46,7 +46,7 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
         foreach ($tags as $tag => $cleantag) {
             if (!$entry or $edit) {
                 if ($cleantag == "##status##") {
-                    $required = $this->is_required($tag);
+                    $required = $options['required'];
                     $replacements[$tag] = array('', array(array($this, 'display_edit'), array($entry, array('required' => $required))));
                 }
             } else {

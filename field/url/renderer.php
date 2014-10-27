@@ -45,7 +45,7 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
         foreach ($tags as $tag => $cleantag) {
             if ($edit) {
                 if (!$editonce) {
-                    $required = $this->is_required($tag);
+                    $required = $options['required'];
                     $replacements[$tag] = array('', array(array($this,'display_edit'), array($entry, array('required' => $required))));
                     $editonce = true;
                 } else {

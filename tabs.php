@@ -25,11 +25,10 @@
  * certain copyrights on the Database module may obtain.
  */
 
-$is_templatemanager = has_capability('mod/datalynx:managetemplates', $this->context);
-$is_entriesmanager = has_capability('mod/datalynx:manageentries', $this->context);
+$istemplatemanager = has_capability('mod/datalynx:managetemplates', $this->context);
 
 // tabs are displayed only for template managers
-if (isloggedin() and $is_templatemanager) {
+if (isloggedin() and $istemplatemanager) {
     if (empty($currenttab) or empty($this->data) or empty($this->course)) {
         throw new moodle_exception('emptytab', 'datalynx');
     }
@@ -58,7 +57,7 @@ if (isloggedin() and $is_templatemanager) {
 
         $row  = array();
         // template manager can do everything
-        if ($is_templatemanager)  {
+        if ($istemplatemanager)  {
             $row[] = new tabobject('views', new moodle_url('/mod/datalynx/view/index.php', array('d' => $this->id())), get_string('views','datalynx'));
             $row[] = new tabobject('fields', new moodle_url('/mod/datalynx/field/index.php', array('d' => $this->id())), get_string('fields','datalynx'));
             $row[] = new tabobject('filters', new moodle_url('/mod/datalynx/filter/index.php', array('d' => $this->id())), get_string('filters','datalynx'));
@@ -69,11 +68,25 @@ if (isloggedin() and $is_templatemanager) {
             $row[] = new tabobject('presets', new moodle_url('/mod/datalynx/preset/index.php', array('d' => $this->id())), get_string('presets', 'datalynx'));
             $row[] = new tabobject('import', new moodle_url('/mod/datalynx/import.php', array('d' => $this->id())), get_string('import', 'datalynx'));
             $row[] = new tabobject('statistics', new moodle_url('/mod/datalynx/statistics/index.php', array('d' => $this->id())), get_string('statistics', 'datalynx'));
-            //$row[] = new tabobject('reports', new moodle_url('/mod/datalynx/reports.php', array('d' => $this->id())), get_string('reports','datalynx'));
+        }
+        $tabs[] = $row;
+    }
 
-        // entries manager can do import
-        //} else if ($is_entriesmanager)  {
-        //    $row[] = new tabobject('import', new moodle_url('/mod/datalynx/import.php', array('d' => $this->id())), get_string('import', 'datalynx'));
+    if ($currenttab == 'fields' || $currenttab == 'fields2' || $currenttab == 'behaviors' || $currenttab == 'renderers') {
+        $inactive[] = 'fields';
+        $activated[] = 'fields';
+        if ($currenttab == 'fields') {
+            $inactive[] = 'fields2';
+            $activated[] = 'fields2';
+            $currenttab = 'fields2';
+        }
+
+        $row  = array();
+        // template manager can do everything
+        if ($istemplatemanager)  {
+            $row[] = new tabobject('fields2', new moodle_url('/mod/datalynx/field/index.php', array('d' => $this->id())), get_string('fields','datalynx'));
+            $row[] = new tabobject('behaviors', new moodle_url('/mod/datalynx/behavior/index.php', array('d' => $this->id())), get_string('behaviors','datalynx'));
+            $row[] = new tabobject('renderers', new moodle_url('/mod/datalynx/renderers/index.php', array('d' => $this->id())), get_string('renderers','datalynx'));
         }
 
         $tabs[] = $row;

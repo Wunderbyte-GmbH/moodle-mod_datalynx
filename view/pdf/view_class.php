@@ -427,11 +427,10 @@ class datalynxview_pdf extends datalynxview_base {
     /**
      *
      */
-    protected function group_entries_definition($entriesset, $name = '') {
+    protected function apply_entry_group_layout($entriesset, $name = '') {
         global $OUTPUT;
-        
-        $elements = array();
 
+        $elements = array();
 
         // flatten the set to a list of elements
         foreach ($entriesset as $entry_definitions) {
@@ -443,34 +442,12 @@ class datalynxview_pdf extends datalynxview_base {
         if ($name) {
             array_unshift($elements, array('html', $OUTPUT->heading($name, 3, 'main')));
         }
+
         // Wrap with entriesview
         array_unshift($elements, array('html', html_writer::start_tag('div', array('class' => 'entriesview'))));
         array_push($elements, array('html', html_writer::end_tag('div')));
 
         return $elements;
-    }
-
-    /**
-     *
-     */
-    protected function entry_definition($fielddefinitions) {
-        $elements = array();
-        
-        // split the entry template to tags and html
-        $tags = array_keys($fielddefinitions);
-        $parts = $this->split_tags($tags, $this->view->eparam2);
-        
-        foreach ($parts as $part) {
-            if (in_array($part, $tags)) {
-                if ($def = $fielddefinitions[$part]) {
-                    $elements[] = $def;
-                }
-            } else {
-                $elements[] = array('html', $part);
-            }
-        }
-
-        return $elements;      
     }
 
     /**
@@ -495,7 +472,7 @@ class datalynxview_pdf extends datalynxview_base {
         }            
             
         // split the entry template to tags and html
-        $parts = $this->split_tags($tags, $this->view->eparam2);
+        $parts = $this->split_template_by_tags($tags, $this->view->eparam2);
 
         foreach ($parts as $part) {
             if (in_array($part, $tags)) {

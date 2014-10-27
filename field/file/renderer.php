@@ -45,7 +45,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
         foreach ($tags as $tag => $cleantag) {
             if ($edit) {
                 if ($cleantag == "[[$fieldname]]") {
-                    $required = $this->is_required($tag);
+                    $required = $options['required'];
                     $replacements[$tag] = array('', array(array($this,'display_edit'), array($entry, array('required' => $required))));
                 } else {
                     $replacements[$tag] = '';
@@ -79,7 +79,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
                 }
                 
                 if (!empty($displaybrowse)) {
-                    if ($this->is_hidden($tag)) {
+                    if (!$options['visible']) {
                         $displaybrowse = html_writer::tag('span', $displaybrowse, array('class' => 'hide'));
                     }
                     $replacements[$tag] = array('html', $displaybrowse);
@@ -300,44 +300,6 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
      */
     public function pluginfile_patterns() {
         return array("[[{$this->_field->name()}]]");
-    }
-
-    /**
-     *
-     */
-    public function display_import(&$mform, $tags) {
-        $field = $this->_field;
-        $fieldid = $field->id();
-        $fieldname = $this->_field->name();
-
-        foreach ($tags as $tag) {
-            $tagname = trim($tag, "[]#");
-            switch ($tagname) {
-                case $fieldname:
-                    $fmoptions = array('subdirs' => 0,
-                                        'maxbytes' => $field->df()->course->maxbytes,
-                                        'maxfiles' => 1,
-                                        'accepted_types' => array('*.zip'),
-                                );
-
-                    $grp = array();
-                    $grp[] = &$mform->createElement('text', "f_{$fieldid}_{$tagname}_name", null, array('size'=>'16'));                   
-                    $grp[] = &$mform->createElement('filepicker', "f_{$fieldid}_{$tagname}_filepicker", null, null, $fmoptions);
-                    $mform->addGroup($grp, "grp$tagname", $tagname, ' ', false);
-                                        
-                    $mform->setType("f_{$fieldid}_$tagname", PARAM_NOTAGS);
-                    $mform->setDefault("f_{$fieldid}_$tagname", $tagname);
-
-
-                    break;
-                    
-                case "$fieldname:alt":
-                    $mform->addElement('text', "f_{$fieldid}_{$tagname}_name", $tagname, array('size'=>'16'));
-                    $mform->setType("f_{$fieldid}_$tagname", PARAM_NOTAGS);
-                    $mform->setDefault("f_{$fieldid}_$tagname", $tagname);
-                    break;                
-            }
-        }
     }
 
     /**

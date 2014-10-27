@@ -95,18 +95,4 @@ class datalynxfield_url extends datalynxfield_base {
     public function get_content_parts() {
         return array('content', 'content1');
     }
-
-    /**
-     *
-     */
-    public function notemptyfield($value, $name) {
-        $names = explode('_',$name);
-        $value = clean_param($value, PARAM_URL);
-        //clean first
-        if ($names[3] == '0') {
-            return ($value!='http://' && !empty($value));
-        }
-        return false;
-    }
-
 }

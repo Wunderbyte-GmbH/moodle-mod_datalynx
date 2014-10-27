@@ -33,6 +33,9 @@ abstract class datalynxfield_renderer {
     const RULE_HIDDEN = '^';
     const RULE_NOEDIT = '!';
 
+    /**
+     * @var datalynxfield_base
+     */
     protected $_field = null;
 
     /**
@@ -53,6 +56,14 @@ abstract class datalynxfield_renderer {
         $fieldname = $this->_field->name();
 
         $found = array();
+
+
+        $matches = array();
+        if (preg_match_all("/\[\[$fieldname(?:\|(?:[^\]]+))?\]\]/", $text, $matches)) {
+            $found = array_merge($found, $matches[0]);
+        }
+
+        // Legacy code below
         
         // Capture label patterns
         if (strpos($text, "[[$fieldname@]]") !== false and !empty($this->_field->field->label)) {
@@ -109,30 +120,6 @@ abstract class datalynxfield_renderer {
     /**
      *
      */
-    public function is_required($pattern) {
-        // TODO must be after opening brackets and before field name
-        return strpos($pattern, self::RULE_REQUIRED) !== false;
-    }
-
-    /**
-     *
-     */
-    public function is_hidden($pattern) {
-        // TODO must be after opening brackets and before field name
-        return strpos($pattern, self::RULE_HIDDEN) !== false;
-    }
-
-    /**
-     *
-     */
-    public function is_noedit($pattern) {
-        // TODO must be after opening brackets and before field name
-        return strpos($pattern, self::RULE_NOEDIT) !== false;
-    }
-
-    /**
-     *
-     */
     public function pluginfile_patterns() {
         return array();
     }
@@ -141,6 +128,7 @@ abstract class datalynxfield_renderer {
      *
      */
     public function display_search(&$mform, $i = 0, $value = '') {
+        /* @var $mform MoodleQuickForm */
         $fieldid = $this->_field->id();
         $fieldname = "f_{$i}_$fieldid";
         
@@ -151,20 +139,6 @@ abstract class datalynxfield_renderer {
         $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
         
         return array($arr, null);
-    }
-
-    /**
-     *
-     */
-    public function display_import(&$mform, $tags) {
-        $fieldid = $this->_field->id();
-        foreach ($tags as $tag) {
-            $cleantag = trim($tag, "[]#");
-            $name = "f_{$fieldid}_{$cleantag}_name";
-            $mform->addElement('text', $name, $cleantag, array('size'=>'16'));
-            $mform->setType($name, PARAM_NOTAGS);
-            $mform->setDefault($name, $cleantag);
-        }
     }
 
     /**
@@ -195,83 +169,43 @@ abstract class datalynxfield_renderer {
     /**
      *
      */
-    public function get_replacements(array $tags = null, $entry = null, array $options = null) {
+    public function get_replacements(array $tags, stdClass $entry, array $options) {
         $replacements = $this->replacements($tags, $entry, $options);
-        $edit = !empty($options['edit']) ? $options['edit'] : false;
-
-        // Set the label replacement if applicable
-        $labelreplacement = array();
-        $field = $this->_field;
-        $fieldname = $field->name();
-        if (in_array("[[$fieldname@]]", $tags) and !empty($field->field->label)) {
-            if ($edit) {
-                $labelreplacement["[[$fieldname@]]"] = array('', array(array($this ,'parse_label'), array($replacements)));
-            } else {
-                $labelcontent = $field->field->label;
-                $hasvalue = true;
-                foreach ($replacements as $pattern => $replacement) {
-                    if (empty($replacement)) {
-                        continue;
-                    }
-                    if (is_array($replacement) && empty($replacement[1])) {
-                        $hasvalue = false;
-                    }
-                    list(,$content) = $replacement;                   
-                    $labelcontent = str_replace($pattern, $content, $labelcontent);
-                }
-                if ($hasvalue) {
-                    $labelreplacement["[[$fieldname@]]"] = array('html', $labelcontent);
-                }
-            }
-            $replacements = $labelreplacement + $replacements;
-        }
-
-        if (in_array("[[$fieldname:restricted]]", $tags)) {
-            if ($edit && has_capability('mod/datalynx:editrestrictedfields', $this->_field->df()->context)) {
-                $labelreplacement["[[$fieldname:restricted]]"] = array('', array(array($this , 'display_edit'), array($entry)));
-            } else {
-                $labelreplacement["[[$fieldname:restricted]]"] = array('html', $this->display_browse($entry));
-            }
-            $replacements = $labelreplacement + $replacements;
-        }
-
-        return $replacements;
+        return $this->apply_behavior_options($replacements, $options);
     }
 
     /**
-     * @param array $patterns array of arrays of pattern replacement pairs
+     * Handles visibility,
+     * @param array $replacements
+     * @param array $options
+     * @return array
      */
-    public function parse_label(&$mform, $definitions) {
-        $field = $this->_field;
-        $patterns = array_keys($definitions);
-        $delims = implode('|', $patterns);
-        // escape [ and ] and the pattern rule character *
-        // TODO organize this
-        $delims = str_replace(array('[', ']', '*', '^'), array('\[', '\]', '\*', '\^'), $delims);
-
-        $parts = preg_split("/($delims)/", $field->field->label, null, PREG_SPLIT_DELIM_CAPTURE);
-        foreach ($parts as $part) {
-            if (in_array($part, $patterns)) {
-                if ($def = $definitions[$part]) {
-                    list($type, $content) = $def;
-                    if ($type === 'html') {
-                        $mform->addElement('html', $content);
-                    } else {
-                        list($func, $params) = $content;
-                        call_user_func_array($func, array_merge(array($mform),$params));
-                    }
+    private function apply_behavior_options(array $replacements, array $options) {
+        $new = array();
+        foreach ($replacements as $tag => $replacement) {
+            if ($options['edit'] && !$options['editable']) {
+                if (!$this->_field->is_internal()) {
+                    $replacement = array('html', '<em>[[field not editable]]</em>');
+                } else {
+                    $replacement = array('html', '');
                 }
-            } else {
-                $mform->addElement('html', $part);
+
             }
+
+            if (!$options['visible'] && !$this->_field->is_internal()) {
+                $replacement = array('html', '<em>[[field not visible]]</em>');
+            }
+
+            $new[$tag] = $replacement;
         }
+        return $new;
     }
 
     /**
      *
      */
     public function validate_data($entryid, $tags, $data) {
-        return null;
+        return array();
     }
 
     /**
@@ -280,11 +214,9 @@ abstract class datalynxfield_renderer {
      * so that it is processed first in view templates 
      * so that in turn patterns it may contain could be processed.
      *
-     * @return array pattern => array(visible in menu, category) 
+     * @return array pattern => array(visible in menu, category) -> WRONG WRONG WRONG
      */
-    protected function replacements(array $tags = null, $entry = null, array $options = null) {
-        throw new coding_exception('replacements() method needs to be overridden in each subclass of datalynxfield_renderer');
-    }
+    abstract protected function replacements(array $tags = null, $entry = null, array $options = null);
 
     /**
      * Array of patterns this field supports
@@ -299,8 +231,6 @@ abstract class datalynxfield_renderer {
 
         $patterns = array();
         $patterns["[[$fieldname]]"] = array(true);
-        $patterns["[[$fieldname@]]"] = array(true);
-        $patterns["[[$fieldname:restricted]]"] = array(true);
 
         return $patterns;
     }

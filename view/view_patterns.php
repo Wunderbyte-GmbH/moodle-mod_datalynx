@@ -29,6 +29,9 @@ class datalynxview_patterns {
     const PATTERN_SHOW_IN_MENU = 0;
     const PATTERN_CATEGORY = 1;
 
+    /**
+     * @var datalynxview_base
+     */
     protected $_view = null;
 
     /**

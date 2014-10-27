@@ -41,19 +41,10 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
         $tags = $this->add_clean_pattern_keys($tags);
         foreach ($tags as $tag => $cleantag) {
             $replacements[$tag] = '';
-            if ($edit and !$this->is_noedit($tag)) {
-                if ($cleantag == "[[$fieldname]]") {
-                    $required = $this->is_required($tag);
-                    $replacements[$tag] = array('', array(array($this,'display_edit'), array($entry, array('required' => $required))));
-                }
+            if ($edit) {
+                $replacements[$tag] = array('', array(array($this,'display_edit'), array($entry, array('required' => $options['required']))));
             } else {
-                switch ($cleantag) {
-                    case "[[$fieldname]]":
-                        $replacements[$tag] = array('html', $this->display_browse($entry));
-                        break;
-                    default:
-                        break;
-                }
+                $replacements[$tag] = array('html', $this->display_browse($entry));
             }
         }
 
@@ -155,8 +146,6 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
 
         $patterns = parent::patterns();
         $patterns["[[$fieldname]]"] = array(true);
-        $patterns["[[$fieldname:quest:text]]"] = array(false);
-        $patterns["[[$fieldname:quest:select]]"] = array(false);
 
        return $patterns;
     }

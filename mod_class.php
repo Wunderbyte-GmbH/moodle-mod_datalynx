@@ -253,50 +253,6 @@ class datalynx {
     }
 
     /**
-     * TODO complete cleanup
-     */
-    protected function renew() {
-        global $DB;
-
-        // files
-        $fs = get_file_storage();
-        $fs->delete_area_files($this->context->id, 'mod_datalynx');
-
-        // delete fields and their content
-        if ($fields = $this->get_fields()) {
-            foreach ($fields as $field) {
-                $field->delete_field();
-            }
-            // reset this fields
-            $this->get_fields(null, false, true);
-        }
-            
-        // delete views
-        if ($views = $this->get_views()) {
-            foreach ($views as $view) {
-                $view->delete();
-            }
-            $this->get_views(null, true);
-        }
-
-        // delete filters
-        $DB->delete_records('datalynx_filters', array('dataid'=>$this->data->id));
-        
-        // delete entries
-        $DB->delete_records('datalynx_entries', array('dataid'=>$this->data->id));
-
-        // delete ratings
-        
-        // delete comments
-
-        // cleanup gradebook
-        datalynx_grade_item_delete($this->data);
-
-
-        return true;
-    }
-
-    /**
      * sets the datalynx page
      *
      * @param string $page current page
@@ -326,11 +282,6 @@ class datalynx {
         $urlparams['d'] = $thisid;
 
         $manager = has_capability('mod/datalynx:managetemplates', $this->context);
-
-        // renew if requested
-        if ($manager and !empty($urlparams['renew']) and confirm_sesskey()) {
-            $this->renew();
-        }
 
         // if datalynx activity closed don't let students in
         if (!$manager) {
@@ -389,7 +340,9 @@ class datalynx {
             if (!empty($params->pagelayout)) {
                 $PAGE->set_pagelayout($params->pagelayout);
             }
-            
+
+            $PAGE->requires->css(new moodle_url($CFG->wwwroot . '/mod/datalynx/field/picture/shadowbox/shadowbox.css'));
+
             // Mark as viewed
             if (!empty($params->completion)) {
                 require_once($CFG->libdir . '/completionlib.php');
@@ -423,11 +376,13 @@ class datalynx {
                 $what = strpos($page, 'preset') !== false ? get_string('presets','datalynx') : $what;
                 $what = strpos($page, 'import') !== false ? get_string('import','datalynx') : $what;
                 $what = strpos($page, 'statistics') !== false ? get_string('statistics','datalynx') : $what;
+                $what = strpos($page, 'behavior') !== false ? get_string('behaviors','datalynx') : $what;
+                $what = strpos($page, 'renderer') !== false ? get_string('renderers','datalynx') : $what;
                 $pagename = "{$modulename}: {$what} ({$manage})";
                 $PAGE->set_title($pagename);
             }
             $PAGE->set_heading($this->course->fullname);
-            
+
             // Include blocks dragdrop when editing
             if ($PAGE->user_is_editing()) {
                 $params = array(
@@ -443,7 +398,7 @@ class datalynx {
 
         ////////////////////////////////////
         // PAGE setup for datalynx content anywhere
-        
+
         // Use this to return css if this df page is set after header 
         $output = '';
 
@@ -518,7 +473,7 @@ class datalynx {
         if (!empty($params->modjs)) {
             $PAGE->requires->js('/mod/datalynx/datalynx.js');
         }
-        
+
         // TODO
         //if ($mode == 'asearch') {
         //    $PAGE->navbar->add(get_string('search'));
@@ -686,12 +641,11 @@ class datalynx {
         if (!$this->internalfields) {
             $fieldplugins = get_list_of_plugins('mod/datalynx/field/');
             foreach ($fieldplugins as $fieldname) {
-                // Internal should start with _
-                if (strpos($fieldname, '_') !== 0) {
-                    continue;
-                }
                 require_once("$CFG->dirroot/mod/datalynx/field/$fieldname/field_class.php");
                 $fieldclass = "datalynxfield_$fieldname";
+                if (!$fieldclass::is_internal()) {
+                    continue;
+                }
                 $internalfields = $fieldclass::get_field_objects($this->data->id);
                 foreach ($internalfields as $fid => $field) {
                     $this->internalfields[$fid] = $this->get_field($field);
@@ -1661,6 +1615,59 @@ class datalynx {
 /**********************************************************************************
  * UTILITY
  *********************************************************************************/
+
+    const PERMISSION_MANAGER = 1;
+    const PERMISSION_TEACHER = 2;
+    const PERMISSION_STUDENT = 4;
+    const PERMISSION_GUEST   = 8;
+    const PERMISSION_AUTHOR  = 16;
+    const PERMISSION_MENTOR  = 32;
+
+    public function get_datalynx_permission_names() {
+        return array(
+            self::PERMISSION_MANAGER => get_string('visible_1', 'datalynx'),
+            self::PERMISSION_TEACHER => get_string('visible_2', 'datalynx'),
+            self::PERMISSION_STUDENT => get_string('visible_4', 'datalynx'),
+            self::PERMISSION_GUEST => get_string('visible_8', 'datalynx'),
+            self::PERMISSION_AUTHOR => get_string('author', 'datalynx'),
+            self::PERMISSION_MENTOR => get_string('mentor', 'datalynx'));
+    }
+
+    public function get_datalynx_view_permissions_for_userid($user = null) {
+        $userpermissions = array();
+        if (has_capability('mod/datalynx:viewprivilegemanager', $this->context, $user, false)) {
+            $userpermissions[] = self::PERMISSION_MANAGER;
+        }
+        if (has_capability('mod/datalynx:viewprivilegeteacher', $this->context, $user, false)) {
+            $userpermissions[] = self::PERMISSION_TEACHER;
+        }
+        if (has_capability('mod/datalynx:viewprivilegestudent', $this->context, $user, false)) {
+            $userpermissions[] = self::PERMISSION_STUDENT;
+        }
+        if (has_capability('mod/datalynx:viewprivilegeguest', $this->context, $user, false)) {
+            $userpermissions[] = self::PERMISSION_GUEST;
+        }
+
+        return $userpermissions;
+    }
+
+    public function get_datalynx_edit_permissions_for_userid($user = null) {
+        $userpermissions = array();
+        if (has_capability('mod/datalynx:editprivilegemanager', $this->context, $user, false)) {
+            $userpermissions[] = self::PERMISSION_MANAGER;
+        }
+        if (has_capability('mod/datalynx:editprivilegeteacher', $this->context, $user, false)) {
+            $userpermissions[] = self::PERMISSION_TEACHER;
+        }
+        if (has_capability('mod/datalynx:editprivilegestudent', $this->context, $user, false)) {
+            $userpermissions[] = self::PERMISSION_STUDENT;
+        }
+        if (has_capability('mod/datalynx:editprivilegeguest', $this->context, $user, false)) {
+            $userpermissions[] = self::PERMISSION_GUEST;
+        }
+
+        return $userpermissions;
+    }
 
     /**
      *

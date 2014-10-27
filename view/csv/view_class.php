@@ -56,7 +56,7 @@ class datalynxview_csv extends datalynxview_base {
     /**
      *
      */
-    protected function group_entries_definition($entriesset, $name = '') {
+    protected function apply_entry_group_layout($entriesset, $name = '') {
         global $OUTPUT;
 
         $elements = array();
@@ -329,7 +329,7 @@ class datalynxview_csv extends datalynxview_base {
         $entryvalues = array();
         foreach ($exportentries as $entryid => $entry) {
             $patternvalues = array();
-            $definitions = $this->get_field_definitions($entry, array());
+            $definitions = $this->get_entry_tag_replacements($entry, array());
             foreach ($definitions as $pattern => $definition) {
                 if (is_array($definition)) {
                     list(, $value) = $definition;

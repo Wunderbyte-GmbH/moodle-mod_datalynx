@@ -29,7 +29,7 @@
 require_once('../../config.php');
 require_once("$CFG->dirroot/mod/datalynx/mod_class.php");
 
-$urlparams = new object();
+$urlparams = new stdClass();
 $urlparams->d = optional_param('d', 0, PARAM_INT);             // datalynx id
 $urlparams->id = optional_param('id', 0, PARAM_INT);           // course module id
 
@@ -37,10 +37,9 @@ $urlparams->view = optional_param('view', 0, PARAM_INT);       // current view i
 $urlparams->filter = optional_param('filter', 0, PARAM_INT);     // current filter (-1 for user filter)
 $urlparams->pagelayout = optional_param('pagelayout', '', PARAM_ALPHAEXT);
 $urlparams->refresh = optional_param('refresh', 0, PARAM_INT);
-$urlparams->renew = optional_param('renew', 0, PARAM_INT);
 
 // Set a datalynx object with guest autologin
-$df = new datalynx($urlparams->d, $urlparams->id);
+$datalynx = new datalynx($urlparams->d, $urlparams->id);
 
 $pageparams = array(
         'js' => true,
@@ -49,12 +48,12 @@ $pageparams = array(
         'modjs' => true,
         'completion' => true,
         'comments' => true,
-        'urlparams' => $urlparams);        
-$df->set_page('view', $pageparams);
+        'urlparams' => $urlparams);
 
-require_capability('mod/datalynx:viewentry', $df->context);
+$datalynx->set_page('view', $pageparams);
+$datalynx->set_content();
 
-$df->set_content();
+require_capability('mod/datalynx:viewentry', $datalynx->context);
 
 $headerparams = array(
         'heading' => 'true',
@@ -62,9 +61,8 @@ $headerparams = array(
         'groups' => true,
         'urlparams' => $urlparams);
 
-$PAGE->requires->css(new moodle_url($CFG->wwwroot . '/mod/datalynx/field/picture/shadowbox/shadowbox.css'));
-$df->print_header($headerparams);
+$datalynx->print_header($headerparams);
 
-$df->display();
+$datalynx->display();
 
-$df->print_footer();
+$datalynx->print_footer();

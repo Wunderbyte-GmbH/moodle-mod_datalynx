@@ -443,7 +443,6 @@ $string['ratingsviewrate'] = 'View and rate';
 $string['ratingsview'] = 'View ratings';
 $string['ratingvalue'] = 'Rating value';
 $string['reference'] = 'Reference';
-$string['renew'] = 'Renew';
 $string['requireapproval'] = 'Require approval?';
 $string['requiredall'] = 'all required';
 $string['requirednotall'] = 'not all required';
@@ -716,3 +715,24 @@ $string['isdefault'] = 'Default view';
 $string['isedit'] = 'Edit view';
 $string['ismore'] = 'Detailed view';
 $string['nooptions'] = 'You must specify at least one option!';
+
+$string['visibility'] = 'Visibility';
+$string['editing'] = 'Editing';
+$string['editable'] = 'Editable';
+$string['required'] = 'Required';
+$string['editableby'] = 'Editable by';
+$string['entryauthor'] = 'Entry author';
+
+$string['behaviors'] = 'Behaviors';
+$string['behavioradd'] = 'Add behavior';
+
+$string['renderers'] = 'Renderers';
+$string['copyof'] = 'Copy of {$a}';
+$string['mentor'] = 'Mentor';
+$string['notrequired'] = 'Not required';
+$string['newbehavior'] = 'New field behavior';
+$string['editingbehavior'] = 'Editing field behavior "{$a}"';
+$string['deletingbehavior'] = 'Deleting field behavior "{$a}"';
+$string['duplicatingbehavior'] = 'Duplicating field behavior "{$a}"';
+$string['confirmbehaviorduplicate'] = 'You are about to duplicate this field behavior!';
+$string['confirmbehaviordelete'] = 'You are about to delete this field behavior!';

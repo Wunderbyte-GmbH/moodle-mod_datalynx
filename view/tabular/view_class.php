@@ -155,7 +155,7 @@ class datalynxview_tabular extends datalynxview_base {
     /**
      *
      */
-    protected function group_entries_definition($entriesset, $name = '') {
+    protected function apply_entry_group_layout($entriesset, $name = '') {
         global $CFG, $OUTPUT, $GLOBALS;
 
         $tablehtml = trim($this->view->eparam2);
@@ -223,7 +223,7 @@ class datalynxview_tabular extends datalynxview_base {
 
             foreach ($entriesset as $fielddefinitions) {
                 $definitions = reset($fielddefinitions);
-                $parts = $this->split_tags($tags, $entrytemplate);
+                $parts = $this->split_template_by_tags($tags, $entrytemplate);
                 
                 foreach ($parts as $part) {
                     if (in_array($part, $tags)) {
@@ -249,7 +249,7 @@ class datalynxview_tabular extends datalynxview_base {
      */
     protected function entry_definition($fielddefinitions) {
         $elements = array();
-        // just store the fefinitions
+        // just store the definitions
         //   and group_entries_definition will process them
         $elements[] = $fielddefinitions; 
         return $elements;
@@ -278,3 +278,23 @@ class datalynxview_tabular extends datalynxview_base {
         return $elements;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

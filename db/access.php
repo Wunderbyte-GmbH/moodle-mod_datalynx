@@ -489,6 +489,48 @@ $capabilities = array(
         )
     ),
 
+    'mod/datalynx:editprivilegemanager' => array(
+
+        'riskbitmask' => RISK_PERSONAL, RISK_DATALOSS,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+        )
+    ),
+
+    'mod/datalynx:editprivilegeteacher' => array(
+
+        'riskbitmask' => RISK_PERSONAL, RISK_DATALOSS,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+        )
+    ),
+
+    'mod/datalynx:editprivilegestudent' => array(
+
+        'riskbitmask' => RISK_PERSONAL, RISK_DATALOSS,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'student' => CAP_ALLOW,
+        )
+    ),
+
+    'mod/datalynx:editprivilegeguest' => array(
+
+        'riskbitmask' => RISK_PERSONAL, RISK_DATALOSS,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'guest' => CAP_ALLOW,
+            'user' => CAP_ALLOW,
+        )
+    ),
+
     'mod/datalynx:viewstatistics' => array(
 
         'riskbitmask' => RISK_PERSONAL,

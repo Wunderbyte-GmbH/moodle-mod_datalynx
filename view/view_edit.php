@@ -32,7 +32,24 @@ $urlparams->returnurl  = optional_param('returnurl', '', PARAM_URL);
 // Set a datalynx object
 $df = new datalynx($urlparams->d);
 
+global $DB;
+$options = array();
+$options['behaviors'] = $DB->get_fieldset_select('datalynx_behaviors', 'name', '', array('dataid' => $urlparams->d));
+$fields = $DB->get_fieldset_select('datalynx_fields', 'name', 'dataid = :dataid', array('dataid' => $urlparams->d));
+$options['renderers'] = array();
+foreach ($fields as $field) {
+    $options['renderers'][$field] = array('Default' => 'Default');
+}
+
+$module = array(
+    'name'=>'mod_datalynx',
+    'fullpath'=>'/mod/datalynx/datalynx.js',
+    'requires' => array('moodle-core-notification-dialogue'));
+
+$PAGE->requires->js_init_call('M.mod_datalynx.tag_manager.init', $options, true, $module);
+
 $df->set_page('view/view_edit', array('modjs' => true, 'urlparams' => $urlparams));
+
 require_sesskey();
 require_capability('mod/datalynx:managetemplates', $df->context);
 

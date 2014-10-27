@@ -646,7 +646,6 @@ function datalynx_extend_settings_navigation(settings_navigation $settings, navi
 
     // delete
     if ($templatesmanager) {
-        $dfnode->add(get_string('renew', 'datalynx'), new moodle_url('/mod/datalynx/view.php', array('id' => $PAGE->cm->id, 'renew' => 1, 'sesskey' => sesskey())));    
         $dfnode->add(get_string('delete'), new moodle_url('/course/mod.php', array('delete' => $PAGE->cm->id, 'sesskey' => sesskey())));    
     }
 
@@ -663,13 +662,16 @@ function datalynx_extend_settings_navigation(settings_navigation $settings, navi
         $manage = $dfnode->add(get_string('manage', 'datalynx'));
         if ($templatesmanager) {
             $manage->add(get_string('views', 'datalynx'), new moodle_url('/mod/datalynx/view/index.php', array('id' => $PAGE->cm->id)));
-            $manage->add(get_string('fields', 'datalynx'), new moodle_url('/mod/datalynx/field/index.php', array('id' => $PAGE->cm->id)));
+            $fields = $manage->add(get_string('fields', 'datalynx'), new moodle_url('/mod/datalynx/field/index.php', array('id' => $PAGE->cm->id)));
             $manage->add(get_string('filters', 'datalynx'), new moodle_url('/mod/datalynx/filter/index.php', array('id' => $PAGE->cm->id)));
             $manage->add(get_string('rules', 'datalynx'), new moodle_url('/mod/datalynx/rule/index.php', array('id' => $PAGE->cm->id)));
             $manage->add(get_string('tools', 'datalynx'), new moodle_url('/mod/datalynx/tool/index.php', array('id' => $PAGE->cm->id)));
             $manage->add(get_string('jsinclude', 'datalynx'), new moodle_url('/mod/datalynx/js.php', array('id' => $PAGE->cm->id, 'jsedit' => 1)));
             $manage->add(get_string('cssinclude', 'datalynx'), new moodle_url('/mod/datalynx/css.php', array('id' => $PAGE->cm->id, 'cssedit' => 1)));
             $manage->add(get_string('presets', 'datalynx'), new moodle_url('/mod/datalynx/preset/index.php', array('id' => $PAGE->cm->id)));
+            $manage->add(get_string('statistics', 'datalynx'), new moodle_url('/mod/datalynx/statistics/index.php', array('id' => $PAGE->cm->id)));
+            $fields->add(get_string('behaviors', 'datalynx'), new moodle_url('/mod/datalynx/behavior/index.php', array('id' => $PAGE->cm->id)));
+            $fields->add(get_string('renderers', 'datalynx'), new moodle_url('/mod/datalynx/renderer/index.php', array('id' => $PAGE->cm->id)));
         }
         $manage->add(get_string('import', 'datalynx'), new moodle_url('/mod/datalynx/import.php', array('id' => $PAGE->cm->id)));
     }
@@ -1099,3 +1101,4 @@ function datalynx_get_completion_state($course, $cm, $userid, $type) {
 
     return $count >= $datalynx->completionentries;
 }
+

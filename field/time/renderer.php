@@ -44,7 +44,7 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         
         foreach ($tags as $tag => $cleantag) {
             if ($edit) {
-                $required = $this->is_required($tag);
+                $required = $options['required'];
                 // Determine whether date only selector
                 $date = (($cleantag == "[[$fieldname:date]]") or $field->date_only);
                 $options = array('required' => $required, 'date' => $date);

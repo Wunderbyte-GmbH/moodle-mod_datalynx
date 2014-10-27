@@ -42,10 +42,9 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
         $tags = $this->add_clean_pattern_keys($tags);
 
         foreach ($tags as $tag => $cleantag) {
-            $noedit = $this->is_noedit($tag);
-            if ($edit and !$noedit) {
+            if ($edit) {
                 if ($cleantag == "[[$fieldname]]") {
-                    $required = $this->is_required($tag);
+                    $required = $options['required'];
                     $replacements[$tag] = array('', array(array($this,'display_edit'), array($entry, array('required' => $required))));
                 } else {
                     $replacements[$tag] = '';

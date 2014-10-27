@@ -33,8 +33,8 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
      * 
      */
     protected function replacements(array $tags = null, $entry = null, array $options = null) {
-        $managable = !empty($options['managable']) ? $options['managable'] : false;
-        $managable = $managable && ($entry->status != datalynxfield__status::STATUS_FINAL_SUBMISSION ||
+        $manageable = !empty($options['manage']) ? $options['manage'] : false;
+        $manageable = $manageable && ($entry->status != datalynxfield__status::STATUS_FINAL_SUBMISSION ||
                        has_capability('mod/datalynx:manageentries', $this->_field->df->context));
         
         // no edit mode
@@ -55,10 +55,10 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
                     case '##anchor##': $str = html_writer::tag('a', '', array('name' => $entry->id)); break;    
                     // Actions
                     case '##select##': $str = html_writer::checkbox('entryselector', $entry->id, false); break;                        
-                    case '##edit##': $str = $managable ? $this->display_edit($entry) : ''; break;
-                    case '##delete##': $str = $managable ? $this->display_delete($entry): ''; break;
+                    case '##edit##': $str = $manageable ? $this->display_edit($entry) : ''; break;
+                    case '##delete##': $str = $manageable ? $this->display_delete($entry): ''; break;
                     case '##export##': $str = $this->display_export($entry); break;
-                    case '##duplicate##': $str = $managable ? $this->display_duplicate($entry) : ''; break;
+                    case '##duplicate##': $str = $manageable ? $this->display_duplicate($entry) : ''; break;
                     default: $str = '';
                 }
                 $replacements[$tag] = array('html', $str);

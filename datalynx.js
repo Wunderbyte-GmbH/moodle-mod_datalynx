@@ -24,6 +24,8 @@
  * certain copyrights on the Database module may obtain.
  */
 
+M.mod_datalynx = {};
+
 /**
  * insert the field tags into the textarea.
  * Used when editing a datalynx view
@@ -291,6 +293,176 @@ M.datalynx_imagepicker.init = function(Y, options) {
     item = document.getElementById('filepicker-wrapper-'+options.client_id);
     if (item) {
         item.style.display = '';
-		M.datalynx_imagepicker.callback(options);
+        M.datalynx_imagepicker.callback(options);
     }
 };
+
+/**
+ * Tag management in atto
+ */
+
+M.mod_datalynx.tag_manager = {};
+
+/**
+ *
+ * @param Y YUI
+ * @param options []
+ */
+M.mod_datalynx.tag_manager.init = function(Y, behaviors, renderers) {
+    // return;
+    var tagregex = /\[\[([^\|\]]+)(?:\|([^\|\]]*))?(?:\|([^\|\]]*))?\]\]/g;
+
+    var editors = Y.all("body.jsenabled div.editor_atto_content_wrap > div");
+    editors.each(function(editor) {
+        var oldcontent = editor.getHTML();
+        var newcontent = oldcontent;
+        while ((splittag = tagregex.exec(oldcontent)) !== null) {
+            var tag = splittag[0];
+            var field = splittag[1];
+            var behavior = typeof(splittag[2]) !== "undefined" ? splittag[2] : "";
+            var renderer = typeof(splittag[3]) !== "undefined" ? splittag[3] : "";
+            var replacement = "<span contenteditable=\"false\" class=\"datalynx-tag\" data-datalynx-field=\"" + field +
+                                             "\" data-datalynx-behavior=\"" + behavior +
+                                             "\" data-datalynx-renderer=\"" + renderer +
+                                             "\">" + field + "</span>";
+            newcontent = newcontent.replace(tag, replacement);
+        }
+        editor.setHTML(newcontent);
+        editor.ancestor().ancestor().siblings().item(0).setHTML(newcontent);
+    });
+
+    var behaviorselect = Y.Node.create('<select></select>');
+    behaviorselect.appendChild(Y.Node.create('<option value="">-</option>'));
+    for (var key in behaviors) {
+        if (behaviors.hasOwnProperty(key)) {
+            behaviorselect.appendChild(Y.Node.create('<option value="' + behaviors[key] + '">' + behaviors[key] + '</option>'));
+        }
+    }
+
+    var config = {
+        draggable : false,
+        modal : false,
+        closeButton : true,
+        width : '240px'
+    };
+
+    var dialog = M.mod_datalynx.tag_manager.dialog = new M.core.dialogue(config);
+    var hide = false;
+
+    Y.one("body").on("click", function (event) {
+        if (hide) {
+            dialog.hide();
+        }
+        hide = true;
+    });
+
+    dialog.on("click", function (event) {
+        hide = false;
+    });
+
+    behaviorselect.on("valuechange", function (event) {
+        var value = behaviorselect.get("value");
+        var targetid = dialog.get("target");
+        Y.one("#" + targetid).setAttribute("data-datalynx-behavior", value);
+    });
+
+    Y.all("span.datalynx-tag").each(function (span) {
+        span.on("click", function (event) {
+            dialog.set('headerContent', span.getAttribute("data-datalynx-field"));
+            dialog.set('bodyContent', behaviorselect);
+            behaviorselect.set("value", span.getAttribute("data-datalynx-behavior"));
+            dialog.set('target', span.get("id"));
+            dialog.show();
+            dialog.set('align', {node: span, points: [Y.WidgetPositionAlign.TL, Y.WidgetPositionAlign.BL]});
+            hide = false;
+        });
+    });
+    Y.all("#region-main textarea").on("valuechange", function (event) {
+        Y.log(event.target.get('innerHTML'));
+    });
+    Y.one("#region-main form").on("submit", M.mod_datalynx.tag_manager.remove_tag_spans, null, Y);
+}
+
+/**
+ *
+ * @param event DOMEventFacade
+ * @param Y YUI
+ */
+M.mod_datalynx.tag_manager.remove_tag_spans = function(event, Y) {
+    // return;
+    var editors = Y.all("body.jsenabled div.editor_atto_content_wrap > div");
+    editors.each(function(editor) {
+        var oldcontent = editor.getHTML();
+        var newcontent = oldcontent;
+        var spans = editor.all("span.datalynx-tag");
+        spans.each(function(span) {
+            var field = span.getAttribute("data-datalynx-field");
+            var behavior = span.getAttribute("data-datalynx-behavior");
+            var renderer = span.getAttribute("data-datalynx-renderer");
+            var replacement = "[[" + field;
+            if ((behavior !== "")) {
+                replacement += "|" + behavior;
+            }
+            if ((renderer !== "")) {
+                replacement += "|" + renderer;
+            }
+            replacement += "]]";
+            newcontent = newcontent.replace(span.get('outerHTML'), replacement);
+        });
+        editor.setHTML(newcontent);
+        var textarea = editor.ancestor().ancestor().siblings().item(0);
+        textarea.set('value', newcontent);
+        textarea.simulate('change');
+    });
+}
+
+
+
+
+
+
+M.mod_datalynx.behaviors_helper = {};
+
+M.mod_datalynx.behaviors_helper.toggle_image = function (img) {
+    var src = img.get("src");
+    if (src.search("-enabled") !== -1) {
+        src = src.replace("-enabled", "-n");
+    } else {
+        src = src.replace("-n", "-enabled");
+    }
+    img.set("src", src);
+}
+
+M.mod_datalynx.behaviors_helper.event_handler = function (event, Y) {
+    var img = event.target;
+    var behaviorid = img.getAttribute('data-behavior-id');
+    var permissionid = img.getAttribute('data-permission-id');
+    var forproperty = img.getAttribute('data-for');
+
+    var callback = {
+        timeout : 5000,
+        method : 'POST',
+        data :  build_querystring({
+            behaviorid : behaviorid,
+            permissionid : permissionid,
+            forproperty : forproperty
+        }),
+        on : {
+            success : function (id, result) {
+                Y.log("RAW JSON DATA: " + result.responseText);
+                M.mod_datalynx.behaviors_helper.toggle_image(img);
+            },
+
+            failure : function (id, result) {
+                Y.log("Async call failed!");
+            }
+
+        }
+    };
+
+    Y.io('behavior_edit_ajax.php', callback);
+}
+
+M.mod_datalynx.behaviors_helper.init = function(Y) {
+    Y.all('table.datalynx-behaviors img[data-for]').on("click", M.mod_datalynx.behaviors_helper.event_handler, null, Y);
+}

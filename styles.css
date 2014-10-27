@@ -139,3 +139,29 @@ input[type="text"].datalynxfield_teammemberselect_dropdown {
 body.jsenabled input[type="text"].datalynxfield_teammemberselect_dropdown {
   display: inherit;
 }
+
+body.jsenabled div.editor_atto_content_wrap span.datalynx-tag {
+    background-color: skyblue;
+    padding: 0.25em;
+    margin-left: 0.125em;
+    margin-right: 0.125em;
+    cursor: pointer;
+    border-radius: 0.25em;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+table.datalynx-behaviors img {
+    margin-left: 0.125em;
+    margin-right: 0.125em;
+
+}
+
+body.jsenabled table.datalynx-behaviors img {
+    cursor: pointer;
+}
+

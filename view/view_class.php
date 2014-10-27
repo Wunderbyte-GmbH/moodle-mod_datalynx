@@ -33,6 +33,9 @@ abstract class datalynxview_base {
     public $view = NULL;            // The view object itself, if we know it
 
     protected $_df = NULL;           // The datalynx object that this view belongs to
+    /**
+     * @var datalynx_filter
+     */
     protected $_filter = null;
     protected $_patterns = null;
 
@@ -115,10 +118,8 @@ abstract class datalynxview_base {
 
         $this->_baseurl = new moodle_url("/mod/datalynx/{$this->_df->pagefile()}.php", $baseurlparams);
 
-        // TODO: should this be here?
         $this->set_groupby_per_page();
 
-        // TODO
         require_once("$CFG->dirroot/mod/datalynx/entries_class.php");
         $this->_entries = new datalynx_entries($this->_df, $this->_filter);
     }
@@ -371,6 +372,7 @@ abstract class datalynxview_base {
         return $data;
     }
 
+
     /**
      * prepare view data for form
      */
@@ -496,10 +498,6 @@ abstract class datalynxview_base {
         }
     }
 
-    private function get_display_defaults() {
-
-    }
-
     /**
      *
      */
@@ -556,6 +554,8 @@ abstract class datalynxview_base {
         } else {
             echo $output;
         }
+
+        return '';
     }
 
     protected function print_notifications() {
@@ -738,7 +738,7 @@ abstract class datalynxview_base {
     }
 
     /**
-     *
+     * @return datalynxview_patterns
      */
     public function patterns() {
         global $CFG;
@@ -795,7 +795,7 @@ abstract class datalynxview_base {
         // view files
         if (empty($set) or $set == 'view') {
             foreach ($this->_editors as $key => $editorname) {
-                $editor = "e$editorname";
+                // $editor = "e$editorname";
                 $files = array_merge($files, $fs->get_area_files($this->_df->context->id,
                                                                 'mod_datalynx',
                                                                 'view',
@@ -829,7 +829,7 @@ abstract class datalynxview_base {
     /**
      *
      */
-    protected abstract function group_entries_definition($entriesset, $name = '');
+    protected abstract function apply_entry_group_layout($entriesset, $name = '');
 
     /**
      *
@@ -837,14 +837,33 @@ abstract class datalynxview_base {
     protected abstract function new_entry_definition($entryid = -1);
 
     /**
-     *
+     * @param $fielddefinitions
+     * @return array
      */
-    protected abstract function entry_definition($fielddefinitions);
+    protected function entry_definition($fielddefinitions) {
+        $elements = array();
+
+        // split the entry template to tags and html
+        $tags = array_keys($fielddefinitions);
+        $parts = $this->split_template_by_tags($tags, $this->view->eparam2);
+
+        foreach ($parts as $part) {
+            if (in_array($part, $tags)) {
+                if ($def = $fielddefinitions[$part]) {
+                    $elements[] = $def;
+                }
+            } else {
+                $elements[] = array('html', $part);
+            }
+        }
+
+        return $elements;
+    }
 
     /**
      * @param array $patterns array of arrays of pattern replacement pairs
      */
-    protected function split_tags($patterns, $subject) {
+    protected function split_template_by_tags($patterns, $subject) {
         foreach ($patterns as $id => $pattern) {
             $patterns[$id] = preg_quote($pattern, '/');
         }
@@ -866,7 +885,7 @@ abstract class datalynxview_base {
             // first pattern
             $pattern = reset($this->_tags['field'][$fieldid]);
             $field = $fields[$fieldid];
-            /// TODO
+
             if ($definition = $field->get_definitions(array($pattern), $entry)) {
                $groupbyvalue = $definition[$pattern][1];
             }
@@ -989,7 +1008,6 @@ abstract class datalynxview_base {
         global $USER;
 
         if (!$this->_df->data->grade) {
-            // TODO throw an exception
             return null;
         }
 
@@ -1013,15 +1031,9 @@ abstract class datalynxview_base {
     public function display_entries(array $options = null) {
         if (!$this->user_is_editing()) {
             $html = $this->definition_to_html();
-
-            // Replace pluginfile urls if needed (e.g. in export)
             if (isset($options['pluginfileurl'])) {
-                $pluginfilepath = moodle_url::make_file_url("/pluginfile.php", "/{$this->_df->context->id}/mod_datalynx/content");
-                $pattern = str_replace('/', '\/', $pluginfilepath);
-                $pattern = "/$pattern\/\d+\//";
-                $html = preg_replace($pattern, $options['pluginfileurl'], $html);
-            }                    
-
+                $html = $this->replace_pluginfile_urls($html, $options['pluginfileurl']);
+            }
         } else {
             // prepare options for form
             $entriesform = $this->get_entries_form();
@@ -1048,10 +1060,7 @@ abstract class datalynxview_base {
         return $html;
     }
 
-    /**
-     * TODO: change this so that the entries are passed to form, instead of the view
-     */
-    public function definition_to_form(&$mform) {
+    public function definition_to_form(HTML_QuickForm &$mform) {
         $elements = $this->get_entries_definition();
         foreach ($elements as $element) {
             if (!empty($element)) {
@@ -1067,7 +1076,7 @@ abstract class datalynxview_base {
     }
 
     /**
-     *
+     * @return datalynxview_entries_form
      */
     protected function get_entries_form() {
         static $entriesform = null;
@@ -1100,6 +1109,7 @@ abstract class datalynxview_base {
     /**
      * @param array $entriesset entryid => array(entry, edit, editable)
      */
+    // TODO THIS IS CRITICAL!!!
     public function get_entries_definition() {
 
         $display_definition = $this->_display_definition;
@@ -1113,12 +1123,12 @@ abstract class datalynxview_base {
             } else {
                 foreach ($entriesset as $entryid => $entryparams) {
                     list($entry, $editthisone, $managethisone) = $entryparams;
-                    $options = array('edit' => $editthisone, 'managable' => $managethisone);
-                    $fielddefinitions = $this->get_field_definitions($entry, $options);
+                    $options = array('edit' => $editthisone, 'manage' => $managethisone);
+                    $fielddefinitions = $this->get_entry_tag_replacements($entry, $options); // <======================= HERE
                     $definitions[$entryid] = $this->entry_definition($fielddefinitions);
                 }
             }
-            $groupedelements[$name] = $this->group_entries_definition($definitions, $name);
+            $groupedelements[$name] = $this->apply_entry_group_layout($definitions, $name);
         }
         // Flatten the elements
         $elements = array();
@@ -1132,148 +1142,30 @@ abstract class datalynxview_base {
     /**
      *
      */
-    protected function get_field_definitions($entry, $options) {
+    protected function get_entry_tag_replacements($entry, $options) {
         $fields = $this->_df->get_fields();
         $entry->baseurl = $this->_baseurl;
 
-        $htmloptions = $options;
-        unset($htmloptions['edit']);
         $definitions = array();
-        $htmldefinitions = array();
         foreach ($this->_tags['field'] as $fieldid => $patterns) {
             if (isset($fields[$fieldid])) {
                 $field = $fields[$fieldid];
-                if ($fielddefinitions = $field->get_definitions($patterns, $entry, $options)) {
+                if ($fielddefinitions = $field->get_definitions($patterns, $entry, $options)) { // <==================== HERE
                     $definitions = array_merge($definitions, $fielddefinitions);
-                }
-                if ($fielddefinitions = $field->get_definitions($patterns, $entry, $htmloptions)) {
-                    $htmldefinitions = array_merge($htmldefinitions, $fielddefinitions);
                 }
             }
         }
 
+        // enables view tag replacement within the entry template
         if ($patterns = $this->patterns()->get_replacements($this->_tags['view'], null, $options)) {
             $viewdefinitions = array();
             foreach ($patterns as $tag => $pattern) {
-                if ($this->patterns()->is_regexp_pattern($tag)) {
-                    foreach ($htmldefinitions as $fieldpattern => $replacement) {
-                        $fieldpattern = preg_quote($fieldpattern, '/');
-                        $replacement = (!empty($replacement) && is_array($replacement) && $replacement[0] == 'html')
-                            ? ($replacement[1] ? $replacement[1] : '')
-                            : '';
-                        $pattern = preg_replace("/{$fieldpattern}/", $replacement, $pattern);
-                    }
-                }
                 $viewdefinitions[$tag] = array('html', $pattern);
             }
             $definitions = array_merge($definitions, $viewdefinitions);
         }
+
         return $definitions;
-    }
-
-    /**
-     *
-     */
-    public function process_entries_data() {
-        global $CFG;
-
-        // Check first if returning from form
-        $update = optional_param('update', '', PARAM_TAGLIST);
-        if ($update and confirm_sesskey()) {
-
-            // get entries only if updating existing entries
-            if ($update != self::ADD_NEW_ENTRY) {
-                // fetch entries
-                $this->_entries->set_content();
-            }
-
-            // set the display definition for the form
-            $this->_editentries = $update;
-            $this->set__display_definition();
-
-            $entriesform = $this->get_entries_form();
-            
-            // Process the form if not cancelled
-            if (!$entriesform->is_cancelled()) {
-                if ($data = $entriesform->get_data()) {
-                    // validated successfully so process request
-                    $processed = $this->_entries->process_entries('update', $update, $data, true);
-                    if (!$processed) {
-                        $this->_returntoentriesform = true;
-                        return false;
-                    }
-
-                    if (!empty($data->submitreturnbutton)) {
-                        // If we have just added new entries refresh the content
-                        // This is far from ideal because this new entries may be
-                        // spread out in the form when we return to edit them
-                        if ($this->_editentries < 0) {
-                            $this->_entries->set_content();
-                        }                        
-
-                        // so that return after adding new entry will return the added entry 
-                        $this->_editentries = is_array($processed[1]) ? implode(',', $processed[1]) : $processed[1];
-                        $this->_returntoentriesform = true;
-                        return true;
-                    } else {
-                        // So that we can show the new entries if we so wish
-                        if ($this->_editentries < 0) {
-                            $this->_editentries = is_array($processed[1]) ? implode(',', $processed[1]) : $processed[1];
-                        } else {
-                            $this->_editentries = '';
-                        }
-                        $this->_returntoentriesform = false;
-                        return $processed;
-                    }
-                } else {
-                    // form validation failed so return to form
-                    $this->_returntoentriesform = true;
-                    return false;
-                }
-            } else {
-                $redirectid = $this->_redirect ? $this->_redirect : $this->id();
-                $url = new moodle_url($this->_baseurl, array('view' => $redirectid));
-                redirect($url);
-            }
-        }
-
-        // direct url params; not from form
-        $new = optional_param('new', 0, PARAM_INT);               // open new entry form
-        $editentries = optional_param('editentries', 0, PARAM_SEQUENCE);        // edit entries (all) or by record ids (comma delimited eids)
-        $duplicate = optional_param('duplicate', '', PARAM_SEQUENCE);    // duplicate entries (all) or by record ids (comma delimited eids)
-        $delete = optional_param('delete', '', PARAM_SEQUENCE);    // delete entries (all) or by record ids (comma delimited eids)
-        $approve = optional_param('approve', '', PARAM_SEQUENCE);  // approve entries (all) or by record ids (comma delimited eids)
-        $disapprove = optional_param('disapprove', '', PARAM_SEQUENCE);  // disapprove entries (all) or by record ids (comma delimited eids)
-        $append = optional_param('append', '', PARAM_SEQUENCE);  // append entries (all) or by record ids (comma delimited eids)
-        $status = optional_param('status', '', PARAM_SEQUENCE);  // append entries (all) or by record ids (comma delimited eids)
-
-        $confirmed = optional_param('confirmed', 0, PARAM_BOOL);
-
-        $this->_editentries = $editentries;
-
-        // Prepare open a new entry form
-        if ($new and confirm_sesskey()) {
-            $this->_editentries = -$new;
-        // Duplicate any requested entries
-        } else if ($duplicate and confirm_sesskey()) {
-            return $this->_entries->process_entries('duplicate', $duplicate, null, $confirmed);
-        // Delete any requested entries
-        } else if ($delete and confirm_sesskey()) {
-            return $this->_entries->process_entries('delete', $delete, null, $confirmed);
-        // Approve any requested entries
-        } else if ($approve and confirm_sesskey()) {
-            return $this->_entries->process_entries('approve', $approve, null, true);
-        // Disapprove any requested entries
-        } else if ($disapprove and confirm_sesskey()) {
-            return $this->_entries->process_entries('disapprove', $disapprove, null, true);
-        // Append any requested entries to the initiating entry
-        } else if ($append and confirm_sesskey()) {
-            return $this->_entries->process_entries('append', $append, null, true);
-        } else if ($status and confirm_sesskey()) {
-            return $this->_entries->process_entries('status', $status, null, true);
-        }
-
-        return true;
     }
 
     /**
@@ -1290,7 +1182,6 @@ abstract class datalynxview_base {
 
         // Display a new entry to add in its own group
         if ($this->_editentries < 0) {
-            // TODO check how many entries left to add
             if ($this->_df->user_can_manage_entry()) {
                 $this->_display_definition['newentry'] = array();
                 for ($i = -1; $i >= $this->_editentries; $i--) {
@@ -1314,14 +1205,14 @@ abstract class datalynxview_base {
                // Set a flag if we are editing any entries
                $requiresmanageentries = $editthisone ? true : $requiresmanageentries;
                // Calculate manageability for this entry only if action buttons can be displayed and we're not already editing it
-               $managable = false;
+               $manageable = false;
                if ($displayactions and !$editthisone) {
-                    $managable = $this->_df->user_can_manage_entry($entry);
+                   $manageable = $this->_df->user_can_manage_entry($entry);
                 }
 
                 // Are we grouping?
                 if ($this->_filter->groupby) {
-                    // TODO assuming here that the groupbyed field returns only one pattern
+                    // assuming here that the groupbyed field returns only one pattern
                     $groupbyvalue = $this->get_groupby_value($entry);
                     if ($groupbyvalue != $groupname) {
                         // Compile current group definitions
@@ -1336,7 +1227,7 @@ abstract class datalynxview_base {
                 }
 
                 // add to the current entries group
-                $groupdefinition[$entryid] = array($entry, $editthisone, $managable);
+                $groupdefinition[$entryid] = array($entry, $editthisone, $manageable);
 
             }
             // collect remaining definitions (all of it if no groupby)
@@ -1385,7 +1276,7 @@ abstract class datalynxview_base {
                 $result = $calc->evaluate();
                 // false as result indicates some problem
                 if ($result === false) {
-                    // TODO: add more error hints
+                    // add more error hints
                     $replacements[$pattern] = html_writer::tag('span', $formula, array('style' => 'color:red;')); //get_string('errorcalculationunknown', 'grades');
                 } else {
                     // Set decimals
@@ -1481,4 +1372,115 @@ abstract class datalynxview_base {
         return $this->_editentries;
     }
 
+    /**
+     *
+     */
+    public function process_entries_data() {
+        global $CFG;
+
+        // Check first if returning from form
+        $update = optional_param('update', '', PARAM_TAGLIST);
+        if ($update and confirm_sesskey()) {
+
+            // get entries only if updating existing entries
+            if ($update != self::ADD_NEW_ENTRY) {
+                // fetch entries
+                $this->_entries->set_content();
+            }
+
+            // set the display definition for the form
+            $this->_editentries = $update;
+            $this->set__display_definition();
+
+            $entriesform = $this->get_entries_form();
+
+            // Process the form if not cancelled
+            if (!$entriesform->is_cancelled()) {
+                if ($data = $entriesform->get_data()) {
+                    // validated successfully so process request
+                    $processed = $this->_entries->process_entries('update', $update, $data, true);
+                    if (!$processed) {
+                        $this->_returntoentriesform = true;
+                        return false;
+                    }
+
+                    if (!empty($data->submitreturnbutton)) {
+                        // If we have just added new entries refresh the content
+                        // This is far from ideal because this new entries may be
+                        // spread out in the form when we return to edit them
+                        if ($this->_editentries < 0) {
+                            $this->_entries->set_content();
+                        }
+
+                        // so that return after adding new entry will return the added entry
+                        $this->_editentries = is_array($processed[1]) ? implode(',', $processed[1]) : $processed[1];
+                        $this->_returntoentriesform = true;
+                        return true;
+                    } else {
+                        // So that we can show the new entries if we so wish
+                        if ($this->_editentries < 0) {
+                            $this->_editentries = is_array($processed[1]) ? implode(',', $processed[1]) : $processed[1];
+                        } else {
+                            $this->_editentries = '';
+                        }
+                        $this->_returntoentriesform = false;
+                        return $processed;
+                    }
+                } else {
+                    // form validation failed so return to form
+                    $this->_returntoentriesform = true;
+                    return false;
+                }
+            } else {
+                $redirectid = $this->_redirect ? $this->_redirect : $this->id();
+                $url = new moodle_url($this->_baseurl, array('view' => $redirectid));
+                redirect($url);
+            }
+        }
+
+        // direct url params; not from form
+        $new = optional_param('new', 0, PARAM_INT);               // open new entry form
+        $editentries = optional_param('editentries', 0, PARAM_SEQUENCE);        // edit entries (all) or by record ids (comma delimited eids)
+        $duplicate = optional_param('duplicate', '', PARAM_SEQUENCE);    // duplicate entries (all) or by record ids (comma delimited eids)
+        $delete = optional_param('delete', '', PARAM_SEQUENCE);    // delete entries (all) or by record ids (comma delimited eids)
+        $approve = optional_param('approve', '', PARAM_SEQUENCE);  // approve entries (all) or by record ids (comma delimited eids)
+        $disapprove = optional_param('disapprove', '', PARAM_SEQUENCE);  // disapprove entries (all) or by record ids (comma delimited eids)
+        $append = optional_param('append', '', PARAM_SEQUENCE);  // append entries (all) or by record ids (comma delimited eids)
+        $status = optional_param('status', '', PARAM_SEQUENCE);  // append entries (all) or by record ids (comma delimited eids)
+
+        $confirmed = optional_param('confirmed', 0, PARAM_BOOL);
+
+        $this->_editentries = $editentries;
+
+        // Prepare open a new entry form
+        if ($new and confirm_sesskey()) {
+            $this->_editentries = -$new;
+            // Duplicate any requested entries
+        } else if ($duplicate and confirm_sesskey()) {
+            return $this->_entries->process_entries('duplicate', $duplicate, null, $confirmed);
+            // Delete any requested entries
+        } else if ($delete and confirm_sesskey()) {
+            return $this->_entries->process_entries('delete', $delete, null, $confirmed);
+            // Approve any requested entries
+        } else if ($approve and confirm_sesskey()) {
+            return $this->_entries->process_entries('approve', $approve, null, true);
+            // Disapprove any requested entries
+        } else if ($disapprove and confirm_sesskey()) {
+            return $this->_entries->process_entries('disapprove', $disapprove, null, true);
+            // Append any requested entries to the initiating entry
+        } else if ($append and confirm_sesskey()) {
+            return $this->_entries->process_entries('append', $append, null, true);
+        } else if ($status and confirm_sesskey()) {
+            return $this->_entries->process_entries('status', $status, null, true);
+        }
+
+        return true;
+    }
+
+    private function replace_pluginfile_urls($html, $pluginfileurl) {
+        $pluginfilepath = moodle_url::make_file_url("/pluginfile.php", "/{$this->_df->context->id}/mod_datalynx/content");
+        $pattern = str_replace('/', '\/', $pluginfilepath);
+        $pattern = "/$pattern\/\d+\//";
+        return preg_replace($pattern, $pluginfileurl, $html);
+    }
 }

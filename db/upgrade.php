@@ -562,5 +562,16 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2014031401, 'datalynx');
     }
 
+    if ($oldversion < 2014102101) {
+        $table = new xmldb_table('datalynx_behaviors');
+        if (!$dbman->table_exists($table)) {
+            $filepath = "$CFG->dirroot/mod/datalynx/db/install.xml";
+            $dbman->install_one_table_from_xmldb_file($filepath, 'datalynx_behaviors');
+        }
+
+        // datalynx savepoint reached
+        upgrade_mod_savepoint(true, 2014102101, 'datalynx');
+    }
+
     return true;
 }

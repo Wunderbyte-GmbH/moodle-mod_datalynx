@@ -32,7 +32,7 @@ class datalynxfield__entry extends datalynxfield_no_content {
      *
      */
     public static function is_internal() {
-        true;
+        return true;
     }
     
     /**
