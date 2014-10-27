@@ -30,10 +30,14 @@ class HTML_QuickForm_checkboxgroup extends HTML_QuickForm_element {
         }
     }
 
-    function load(&$options, $param1=null, $param2=null, $param3=null, $param4=null) {
+    function load(&$options, $param1 = null, $param2 = null, $param3 = null, $param4 = null) {
         if (is_array($options)) {
             $this->loadArray($options, $param1);
         }
+    }
+
+    function getMultiple() {
+        return true;
     }
 
     function setName($name) {
@@ -108,6 +112,7 @@ class HTML_QuickForm_checkboxgroup extends HTML_QuickForm_element {
             }
 
             $strHtml .= $tabs;
+            $strHtml .= '<input type="hidden" name="' . $this->getName() . '" value="" />';
 
             $i = 0;
             foreach ($this->_options as $option) {
@@ -172,7 +177,9 @@ class HTML_QuickForm_checkboxgroup extends HTML_QuickForm_element {
         $value = $this->_findValue($submitValues);
         if (is_null($value)) {
             $value = $this->getValue();
-        } else if(!is_array($value)) {
+        } else if ($value == "") {
+            $value = array();
+        } else if (!is_array($value)) {
             $value = array($value);
         }
         if (is_array($value) && !empty($this->_options)) {
