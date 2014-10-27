@@ -81,8 +81,8 @@ class datalynxview_base_form extends moodleform {
         } else {
            $filtersmenu = array(0 => get_string('choose')) + $filtersmenu;
         }
-        $mform->addElement('select', 'filter', get_string('viewfilter', 'datalynx'), $filtersmenu);
-        $mform->setDefault('filter', 0);
+        $mform->addElement('select', '_filter', get_string('viewfilter', 'datalynx'), $filtersmenu);
+        $mform->setDefault('_filter', 0);
 
         global $DB;
         $mform->addElement('header', 'redirectsettings', get_string('redirectsettings', 'datalynx'));
@@ -125,7 +125,10 @@ class datalynxview_base_form extends moodleform {
         } else if (isset($data)) {
             $data->visible = 0;
         }
-
+        if (isset($data->_filter)) {
+            $data->filter = $data->_filter;
+            unset($data->_filter);
+        }
         return $data;
     }
 
@@ -139,6 +142,10 @@ class datalynxview_base_form extends moodleform {
                 8 => $visible & 8 ? 1 : null);
         } else {
             $data->visible = array();
+        }
+        if (isset($data->filter)) {
+            $data->_filter = $data->filter;
+            unset($data->filter);
         }
         parent::set_data($data);
     }
