@@ -13,6 +13,9 @@ require_once('../../../config.php');
 $behaviorid = required_param('behaviorid', PARAM_INT);
 $permissionid = optional_param('permissionid', 0, PARAM_INT);
 $forproperty = required_param('forproperty', PARAM_ALPHA);
+
+require_sesskey();
+
 $toggle = "ERROR";
 if ($for == "required") {
     $required = $DB->get_field('datalynx_behaviors', $forproperty, array('id' => $behaviorid));

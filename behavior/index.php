@@ -81,6 +81,7 @@ $table->sortable(false);
 
 // Column styles
 $table->set_attribute('class', 'generaltable generalbox boxaligncenter boxwidthwide datalynx-behaviors');
+$table->set_attribute('data-sesskey', sesskey());
 $table->column_style('visibleto', 'text-align', 'center');
 $table->column_style('editableby', 'text-align', 'center');
 $table->column_style('required', 'text-align', 'center');

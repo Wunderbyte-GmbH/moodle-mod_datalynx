@@ -438,6 +438,7 @@ M.mod_datalynx.behaviors_helper.event_handler = function (event, Y) {
     var behaviorid = img.getAttribute('data-behavior-id');
     var permissionid = img.getAttribute('data-permission-id');
     var forproperty = img.getAttribute('data-for');
+    var sesskey = Y.one('table.datalynx-behaviors').getAttribute('data-sesskey');
 
     var callback = {
         timeout : 5000,
@@ -445,7 +446,8 @@ M.mod_datalynx.behaviors_helper.event_handler = function (event, Y) {
         data :  build_querystring({
             behaviorid : behaviorid,
             permissionid : permissionid,
-            forproperty : forproperty
+            forproperty : forproperty,
+            sesskey : sesskey
         }),
         on : {
             success : function (id, result) {
