@@ -309,7 +309,6 @@ M.mod_datalynx.tag_manager = {};
  * @param options []
  */
 M.mod_datalynx.tag_manager.init = function(Y, behaviors, renderers) {
-    // return;
     var tagregex = /\[\[([^\|\]]+)(?:\|([^\|\]]*))?(?:\|([^\|\]]*))?\]\]/g;
 
     var editors = Y.all("body.jsenabled div.editor_atto_content_wrap > div");
@@ -377,19 +376,17 @@ M.mod_datalynx.tag_manager.init = function(Y, behaviors, renderers) {
             hide = false;
         });
     });
-    Y.all("#region-main textarea").on("valuechange", function (event) {
+    Y.all("#datalynx-view-edit-form textarea").on("valuechange", function (event) {
         Y.log(event.target.get('innerHTML'));
     });
-    Y.one("#region-main form").on("submit", M.mod_datalynx.tag_manager.remove_tag_spans, null, Y);
+    Y.one("#datalynx-view-edit-form").on("submit", M.mod_datalynx.tag_manager.remove_tag_spans, null, Y);
 }
 
 /**
- *
  * @param event DOMEventFacade
  * @param Y YUI
  */
 M.mod_datalynx.tag_manager.remove_tag_spans = function(event, Y) {
-    // return;
     var editors = Y.all("body.jsenabled div.editor_atto_content_wrap > div");
     editors.each(function(editor) {
         var oldcontent = editor.getHTML();
