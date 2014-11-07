@@ -723,8 +723,10 @@ $string['required'] = 'Required';
 $string['editableby'] = 'Editable by';
 $string['entryauthor'] = 'Entry author';
 
+$string['behavior'] = 'Behavior';
 $string['behaviors'] = 'Behaviors';
 $string['behavioradd'] = 'Add behavior';
+$string['defaultbehavior'] = 'Default behavior';
 
 $string['renderers'] = 'Renderers';
 $string['copyof'] = 'Copy of {$a}';

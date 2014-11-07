@@ -27,74 +27,6 @@
 M.mod_datalynx = {};
 
 /**
- * insert the field tags into the textarea.
- * Used when editing a datalynx view
- */
-function insert_field_tags(selectlist, editorname) {
-    var value = selectlist.options[selectlist.selectedIndex].value;
-    editorid = 'id_'+editorname;
-
-    // textarea displayed and tinyMCE hidden
-    if (document.getElementById(editorid).style.display != 'none') {
-        editor = document.getElementById(editorid);
-        switch (value){
-            case '9':
-                insertAtCursor(editor, "\t");
-                break;
-
-            case '10':               
-                insertAtCursor(editor, "\n");
-                break;
-
-            default:
-                insertAtCursor(editor, value);
-        }
-    } else {
-        if (typeof tinyMCE == 'undefined') { // Atto
-            document.getElementById(editorid).focus();
-            pasteHtmlAtCaret(value);
-        } else { // tinyMCE
-            tinyMCE.execInstanceCommand(editorid, 'mceInsertContent', false, value);
-        }
-    }
-}
-
-function pasteHtmlAtCaret(html) {
-    var sel, range;
-    if (window.getSelection) {
-        // IE9 and non-IE
-        sel = window.getSelection();
-        if (sel.getRangeAt && sel.rangeCount) {
-            range = sel.getRangeAt(0);
-            range.deleteContents();
-
-            // Range.createContextualFragment() would be useful here but is
-            // non-standard and not supported in all browsers (IE9, for one)
-            var el = document.createElement("div");
-            el.innerHTML = html;
-            var frag = document.createDocumentFragment(),
-                node, lastNode;
-            while ((node = el.firstChild)) {
-                lastNode = frag.appendChild(node);
-            }
-            range.insertNode(frag);
-
-            // Preserve the selection
-            if (lastNode) {
-                range = range.cloneRange();
-                range.setStartAfter(lastNode);
-                range.collapse(true);
-                sel.removeAllRanges();
-                sel.addRange(range);
-            }
-        }
-    } else if (document.selection && document.selection.type != "Control") {
-        // IE < 9
-        document.selection.createRange().pasteHTML(html);
-    }
-}
-
-/**
  * select antries for multiactions
  * Used when editing datalynx entries
  */
@@ -297,47 +229,76 @@ M.datalynx_imagepicker.init = function(Y, options) {
     }
 };
 
+
+
 /**
  * Tag management in atto
  */
 
 M.mod_datalynx.tag_manager = {};
 
+M.mod_datalynx.tag_manager.tags = [];
+M.mod_datalynx.tag_manager.dialog = null;
+M.mod_datalynx.tag_manager.hidedialog = false;
+M.mod_datalynx.tag_manager.behaviors = [];
+M.mod_datalynx.tag_manager.renderers = {};
+
 /**
- *
- * @param Y YUI
- * @param options []
+ * @param editor Node
  */
-M.mod_datalynx.tag_manager.init = function(Y, behaviors, renderers) {
+M.mod_datalynx.tag_manager.add_tag_spans = function(editordiv) {
+    var editor = editordiv.one(".editor_atto  .editor_atto_content");
+    var textarea = editordiv.one("textarea");
+
     var tagregex = /\[\[([^\|\]]+)(?:\|([^\|\]]*))?(?:\|([^\|\]]*))?\]\]/g;
-
-    var editors = Y.all("body.jsenabled div.editor_atto_content_wrap > div");
-    editors.each(function(editor) {
-        var oldcontent = editor.getHTML();
-        var newcontent = oldcontent;
-        while ((splittag = tagregex.exec(oldcontent)) !== null) {
-            var tag = splittag[0];
-            var field = splittag[1];
-            var behavior = typeof(splittag[2]) !== "undefined" ? splittag[2] : "";
-            var renderer = typeof(splittag[3]) !== "undefined" ? splittag[3] : "";
-            var replacement = "<span contenteditable=\"false\" class=\"datalynx-tag\" data-datalynx-field=\"" + field +
-                                             "\" data-datalynx-behavior=\"" + behavior +
-                                             "\" data-datalynx-renderer=\"" + renderer +
-                                             "\">" + field + "</span>";
-            newcontent = newcontent.replace(tag, replacement);
-        }
-        editor.setHTML(newcontent);
-        editor.ancestor().ancestor().siblings().item(0).setHTML(newcontent);
-    });
-
-    var behaviorselect = Y.Node.create('<select></select>');
-    behaviorselect.appendChild(Y.Node.create('<option value="">-</option>'));
-    for (var key in behaviors) {
-        if (behaviors.hasOwnProperty(key)) {
-            behaviorselect.appendChild(Y.Node.create('<option value="' + behaviors[key] + '">' + behaviors[key] + '</option>'));
-        }
+    var oldcontent = textarea.get('value');
+    var newcontent = oldcontent;
+    var splittag = [];
+    while ((splittag = tagregex.exec(oldcontent)) !== null) {
+        var tag = splittag[0];
+        var field = splittag[1];
+        var behavior = typeof(splittag[2]) !== "undefined" ? splittag[2] : "";
+        var renderer = typeof(splittag[3]) !== "undefined" ? splittag[3] : "";
+        var replacement = '<span contenteditable="false" class="datalynx-tag" data-datalynx-field="' + field +
+            '" data-datalynx-behavior="' + behavior + '" data-datalynx-renderer="' + renderer + '">' + field + '</span>';
+        newcontent = newcontent.replace(tag, replacement);
     }
 
+    editor.setHTML(newcontent);
+    textarea.set('value', newcontent);
+    textarea.simulate('change');
+}
+
+/**
+ * @param editor Node
+ */
+M.mod_datalynx.tag_manager.remove_tag_spans = function(editordiv) {
+    var editor = editordiv.one(".editor_atto .editor_atto_content");
+    var textarea = editordiv.one("textarea");
+
+    var newcontent = editor.getHTML();
+    var spans = editor.all("span.datalynx-tag");
+    spans.each(function(span) {
+        var field = span.getAttribute("data-datalynx-field");
+        var behavior = span.getAttribute("data-datalynx-behavior");
+        var renderer = span.getAttribute("data-datalynx-renderer");
+        var replacement = "[[" + field;
+        if ((behavior !== "")) {
+            replacement += "|" + behavior;
+        }
+        if ((renderer !== "")) {
+            replacement += "|" + renderer;
+        }
+        replacement += "]]";
+        newcontent = newcontent.replace(span.get('outerHTML'), replacement);
+    });
+
+    editor.setHTML(newcontent);
+    textarea.set('value', newcontent);
+    textarea.simulate('change');
+}
+
+M.mod_datalynx.tag_manager.init_span_dialog = function(behaviors, renderers) {
     var config = {
         draggable : false,
         modal : false,
@@ -346,17 +307,18 @@ M.mod_datalynx.tag_manager.init = function(Y, behaviors, renderers) {
     };
 
     var dialog = M.mod_datalynx.tag_manager.dialog = new M.core.dialogue(config);
-    var hide = false;
+    var behaviorselect = Y.Node.create('Behavior: <select id="datalynx-tag-behavior-menu"></select>');
+    dialog.set('bodyContent', behaviorselect);
 
     Y.one("body").on("click", function (event) {
-        if (hide) {
+        if (M.mod_datalynx.tag_manager.hidedialog) {
             dialog.hide();
         }
-        hide = true;
+        M.mod_datalynx.tag_manager.hidedialog = true;
     });
 
     dialog.on("click", function (event) {
-        hide = false;
+        M.mod_datalynx.tag_manager.hidedialog = false;
     });
 
     behaviorselect.on("valuechange", function (event) {
@@ -364,57 +326,137 @@ M.mod_datalynx.tag_manager.init = function(Y, behaviors, renderers) {
         var targetid = dialog.get("target");
         Y.one("#" + targetid).setAttribute("data-datalynx-behavior", value);
     });
-
-    Y.all("span.datalynx-tag").each(function (span) {
-        span.on("click", function (event) {
-            dialog.set('headerContent', span.getAttribute("data-datalynx-field"));
-            dialog.set('bodyContent', behaviorselect);
-            behaviorselect.set("value", span.getAttribute("data-datalynx-behavior"));
-            dialog.set('target', span.get("id"));
-            dialog.show();
-            dialog.set('align', {node: span, points: [Y.WidgetPositionAlign.TL, Y.WidgetPositionAlign.BL]});
-            hide = false;
-        });
-    });
-    Y.all("#datalynx-view-edit-form textarea").on("valuechange", function (event) {
-        Y.log(event.target.get('innerHTML'));
-    });
-    Y.one("#datalynx-view-edit-form").on("submit", M.mod_datalynx.tag_manager.remove_tag_spans, null, Y);
 }
 
-/**
- * @param event DOMEventFacade
- * @param Y YUI
- */
-M.mod_datalynx.tag_manager.remove_tag_spans = function(event, Y) {
-    var editors = Y.all("body.jsenabled div.editor_atto_content_wrap > div");
-    editors.each(function(editor) {
-        var oldcontent = editor.getHTML();
-        var newcontent = oldcontent;
-        var spans = editor.all("span.datalynx-tag");
-        spans.each(function(span) {
-            var field = span.getAttribute("data-datalynx-field");
-            var behavior = span.getAttribute("data-datalynx-behavior");
-            var renderer = span.getAttribute("data-datalynx-renderer");
-            var replacement = "[[" + field;
-            if ((behavior !== "")) {
-                replacement += "|" + behavior;
-            }
-            if ((renderer !== "")) {
-                replacement += "|" + renderer;
-            }
-            replacement += "]]";
-            newcontent = newcontent.replace(span.get('outerHTML'), replacement);
-        });
-        editor.setHTML(newcontent);
-        var textarea = editor.ancestor().ancestor().siblings().item(0);
-        textarea.set('value', newcontent);
-        textarea.simulate('change');
+M.mod_datalynx.tag_manager.show_tag_dialog = function (event, Y) {
+    var tag = event.target;
+    var dialog = M.mod_datalynx.tag_manager.dialog;
+    if (tag.hasClass("datalynx-tag")) {
+        dialog.set('headerContent', tag.getAttribute("data-datalynx-field"));
+        M.mod_datalynx.tag_manager.populate_select(dialog.bodyNode.one("#datalynx-tag-behavior-menu"),
+                                                   M.mod_datalynx.tag_manager.behaviors,
+                                                   tag.getAttribute("data-datalynx-behavior"));
+
+        dialog.set('target', tag.get("id"));
+        dialog.show();
+        dialog.set('align', {node: tag, points: [Y.WidgetPositionAlign.TL, Y.WidgetPositionAlign.BL]});
+
+        M.mod_datalynx.tag_manager.hidedialog = false;
+    } else {
+        M.mod_datalynx.tag_manager.hidedialog = true;
+    }
+}
+
+M.mod_datalynx.tag_manager.populate_select = function (select, data, selectedvalue) {
+    select.set('innerHTML', '');
+    select.appendChild(Y.Node.create('<option value=""><em>(Default behavior)</em></option>'));
+    for (var key in data) {
+        if (data.hasOwnProperty(key)) {
+            select.appendChild(Y.Node.create('<option value="' + key + '">' + data[key] + '</option>'));
+        }
+    }
+    if (selectedvalue != null) {
+        select.set("value", selectedvalue);
+    }
+}
+
+M.mod_datalynx.tag_manager.init = function(Y, behaviors, renderers) {
+    var attoeditors = Y.all("#datalynx-view-edit-form div.editor_atto");
+    attoeditors.each(function (attoeditor) {
+        var editordiv = attoeditor.ancestor();
+        M.mod_datalynx.tag_manager.add_tag_spans(editordiv);
+        attoeditor.one(".editor_atto_content").on('click', M.mod_datalynx.tag_manager.show_tag_dialog, null, Y);
+        attoeditor.one("button[title='HTML']").on('click', M.mod_datalynx.tag_manager.toggle_tags, null, Y, editordiv);
+        var id = attoeditor.siblings().item(0).get('id').replace('id_', '');
+        Y.all('select[name^="' + id + '"]').on('valuechange', M.mod_datalynx.tag_manager.insert_field_tag, null, Y, editordiv);
+    });
+
+    M.mod_datalynx.tag_manager.behaviors = behaviors;
+    M.mod_datalynx.tag_manager.renderers = renderers;
+
+    M.mod_datalynx.tag_manager.init_span_dialog(behaviors, renderers);
+
+    Y.one("#datalynx-view-edit-form").on("submit", M.mod_datalynx.tag_manager.prepare_submit, null, Y);
+}
+
+M.mod_datalynx.tag_manager.toggle_tags = function (event, Y, editordiv) {
+    if (editordiv.one("textarea").getAttribute('hidden') === 'hidden') {
+        M.mod_datalynx.tag_manager.remove_tag_spans(editordiv);
+    } else {
+        M.mod_datalynx.tag_manager.add_tag_spans(editordiv);
+    }
+}
+
+M.mod_datalynx.tag_manager.prepare_submit = function(event, Y) {
+    var attoeditors = Y.all("#datalynx-view-edit-form div.editor_atto");
+    attoeditors.each(function (attoeditor) {
+        var editordiv = attoeditor.ancestor();
+        M.mod_datalynx.tag_manager.remove_tag_spans(editordiv);
     });
 }
 
+M.mod_datalynx.tag_manager.insert_field_tag = function (event, Y, editordiv) {
+    var value = event.target.get('value');
+    var textarea = editordiv.one("textarea");
 
+    if (value === '') {
+        return;
+    }
 
+    textarea.focus();
+    if (textarea.getAttribute('hidden') !== 'hidden') {
+        var editor = document.getElementById(textarea.get('id'));
+        switch (value) {
+            case '9':
+                insertAtCursor(editor, "\t");
+                break;
+            case '10':
+                insertAtCursor(editor, "\n");
+                break;
+            default:
+                insertAtCursor(editor, value);
+                break;
+        }
+    } else {
+        var field = value.replace(/[\[\]]+/g, '');
+        var replacement = '<span contenteditable="false" class="datalynx-tag" data-datalynx-field="' + field + '">' + field + '</span>';
+        M.mod_datalynx.tag_manager.insert_at_caret(replacement);
+    }
+    textarea.simulate('change');
+}
+
+M.mod_datalynx.tag_manager.insert_at_caret = function (html) {
+    var sel, range;
+    if (window.getSelection) {
+        // IE9 and non-IE
+        sel = window.getSelection();
+        if (sel.getRangeAt && sel.rangeCount) {
+            range = sel.getRangeAt(0);
+            range.deleteContents();
+
+            var el = document.createElement("div");
+            el.innerHTML = html;
+            var frag = document.createDocumentFragment(),
+                node, lastNode;
+            while ((node = el.firstChild)) {
+                lastNode = frag.appendChild(node);
+            }
+            range.insertNode(frag);
+
+            // Preserve the selection
+            if (lastNode) {
+                range = range.cloneRange();
+                range.setStartAfter(lastNode);
+                range.collapse(true);
+                sel.removeAllRanges();
+                sel.addRange(range);
+            }
+        }
+    } else if (document.selection && document.selection.type != "Control") {
+        // IE < 9
+        document.selection.createRange().pasteHTML(html);
+    }
+}
 
 
 

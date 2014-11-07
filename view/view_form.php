@@ -238,10 +238,11 @@ class datalynxview_base_form extends moodleform {
         }
                 
         if (!empty($tags)) {
+            $name = "{$editorname}_{$tagstype}_tag_menu";
             $grp = array();
             $grp[] = &$mform->createElement('html', html_writer::start_tag('div', array('class' => 'fitem')));
             $grp[] = &$mform->createElement('html', '<div class="fitemtitle"><label>'. $label. '</label></div>');
-            $grp[] = &$mform->createElement('html', '<div class="felement fselect">'. html_writer::select($tags, "{$editorname}{$tagstype}tags", '', array('' => 'choosedots'), array('onchange' => "insert_field_tags(this, '{$editorname}');this.selectedIndex=0;")). '</div>');
+            $grp[] = &$mform->createElement('html', '<div class="felement fselect">'. html_writer::select($tags, $name, '', array('' => 'choosedots'), array('id' => $name)). '</div>');
             $grp[] = &$mform->createElement('html', html_writer::end_tag('div'));
             $mform->addGroup($grp, "{$editorname}{$tagstype}tagsgrp", '', array(' '), false);
         }

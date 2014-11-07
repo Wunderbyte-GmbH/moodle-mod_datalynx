@@ -698,8 +698,10 @@ $string['required'] = 'Erforderlich';
 $string['editableby'] = 'Bearbeitbar von';
 $string['entryauthor'] = 'Eintragsautor';
 
+$string['behavior'] = 'Verhalten';
 $string['behaviors'] = 'Verhalten';
 $string['behavioradd'] = 'Verhalten anlegen';
+$string['defaultbehavior'] = 'Voreingestelltes Verhalten';
 
 $string['renderers'] = 'Renderers';
 $string['copyof'] = 'Kopie von {$a}';

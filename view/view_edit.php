@@ -26,7 +26,7 @@ $urlparams = new object();
 $urlparams->d          = required_param('d', PARAM_INT);    // datalynx ID
 
 $urlparams->type       = optional_param('type', '', PARAM_ALPHA);   // type of a view to edit
-$urlparams->vedit        = optional_param('vedit', 0, PARAM_INT);       // view id to edit
+$urlparams->vedit      = optional_param('vedit', 0, PARAM_INT);       // view id to edit
 $urlparams->returnurl  = optional_param('returnurl', '', PARAM_URL);
 
 // Set a datalynx object
@@ -34,7 +34,7 @@ $df = new datalynx($urlparams->d);
 
 global $DB;
 $options = array();
-$options['behaviors'] = $DB->get_fieldset_select('datalynx_behaviors', 'name', 'dataid = :dataid', array('dataid' => $urlparams->d));
+$options['behaviors'] = $DB->get_records_select_menu('datalynx_behaviors', 'dataid = :dataid', array('dataid' => $urlparams->d), 'value ASC', 'name AS value, name AS label');
 $fields = $DB->get_fieldset_select('datalynx_fields', 'name', 'dataid = :dataid', array('dataid' => $urlparams->d));
 $options['renderers'] = array();
 foreach ($fields as $field) {
@@ -47,6 +47,9 @@ $module = array(
     'requires' => array('moodle-core-notification-dialogue'));
 
 $PAGE->requires->js_init_call('M.mod_datalynx.tag_manager.init', $options, true, $module);
+$PAGE->requires->string_for_js('behavior', 'datalynx');
+$PAGE->requires->string_for_js('defaultbehavior', 'datalynx');
+$PAGE->requires->string_for_js('defaultbehavior', 'datalynx');
 
 $df->set_page('view/view_edit', array('modjs' => true, 'urlparams' => $urlparams));
 
