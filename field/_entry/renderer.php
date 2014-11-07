@@ -34,7 +34,7 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
      */
     protected function replacements(array $tags = null, $entry = null, array $options = null) {
         $manageable = !empty($options['manage']) ? $options['manage'] : false;
-        $manageable = $manageable && ($entry->status != datalynxfield__status::STATUS_FINAL_SUBMISSION ||
+        $manageable = $manageable && ((isset($entry->status) && $entry->status != datalynxfield__status::STATUS_FINAL_SUBMISSION) ||
                        has_capability('mod/datalynx:manageentries', $this->_field->df->context));
         
         // no edit mode

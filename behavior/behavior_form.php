@@ -63,7 +63,6 @@ class datalynx_field_behavior_form extends moodleform {
         $mform->addElement('checkboxgroup', 'visibleto', get_string('roles'), $this->datalynx->get_datalynx_permission_names(), $this->get_permissions_menu_separators());
         $mform->setType('visibleto', PARAM_RAW);
         $mform->setDefault('visibleto', array(datalynx::PERMISSION_MANAGER, datalynx::PERMISSION_TEACHER, datalynx::PERMISSION_STUDENT));
-        //$mform->addRule('visibleto', null, 'required', null, 'client');
 
         //----- EDITING OPTIONS -----
 
@@ -107,9 +106,6 @@ class datalynx_field_behavior_form extends moodleform {
 
     function validation($data, $files) {
         $errors = array();
-        if (empty($data['visibleto'])) {
-            $errors['visibleto'] = "The field must be visible to at least one role.";
-        }
         if (!$data['name']) {
             $errors['name'] = "You must supply a value here.";
         }

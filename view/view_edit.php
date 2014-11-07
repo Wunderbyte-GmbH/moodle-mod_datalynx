@@ -34,7 +34,7 @@ $df = new datalynx($urlparams->d);
 
 global $DB;
 $options = array();
-$options['behaviors'] = $DB->get_fieldset_select('datalynx_behaviors', 'name', '', array('dataid' => $urlparams->d));
+$options['behaviors'] = $DB->get_fieldset_select('datalynx_behaviors', 'name', 'dataid = :dataid', array('dataid' => $urlparams->d));
 $fields = $DB->get_fieldset_select('datalynx_fields', 'name', 'dataid = :dataid', array('dataid' => $urlparams->d));
 $options['renderers'] = array();
 foreach ($fields as $field) {
