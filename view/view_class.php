@@ -720,15 +720,15 @@ abstract class datalynxview_base {
         $editors = array();
 
         $options = array('trusttext' => true,
-                            'noclean' => true,
-                            'subdirs' => false,
-                            'changeformat' => true,
-                            'collapsed' => true,
-                            'rows' => 5,
-                            'style' => 'width:100%',
-                            'maxfiles' => 0,
-                            'maxbytes' => $this->_df->course->maxbytes,
-                            'context'=> $this->_df->context);
+                         'noclean' => true,
+                         'subdirs' => false,
+                         'changeformat' => true,
+                         'collapsed' => true,
+                         'rows' => 20,
+                         'style' => 'width:100%',
+                         'maxfiles' => EDITOR_UNLIMITED_FILES,
+                         'maxbytes' => $this->_df->course->maxbytes,
+                         'context'=> $this->_df->context);
 
         foreach ($this->_editors as $editor) {
             $editors[$editor] = $options;
