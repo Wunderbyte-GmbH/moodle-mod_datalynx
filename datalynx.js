@@ -307,7 +307,7 @@ M.mod_datalynx.tag_manager.init_span_dialog = function(behaviors, renderers) {
     };
 
     var dialog = M.mod_datalynx.tag_manager.dialog = new M.core.dialogue(config);
-    var behaviorselect = Y.Node.create('Behavior: <select id="datalynx-tag-behavior-menu"></select>');
+    var behaviorselect = Y.Node.create('<select id="datalynx-tag-behavior-menu"></select>');
     dialog.set('bodyContent', behaviorselect);
 
     Y.one("body").on("click", function (event) {
@@ -321,7 +321,7 @@ M.mod_datalynx.tag_manager.init_span_dialog = function(behaviors, renderers) {
         M.mod_datalynx.tag_manager.hidedialog = false;
     });
 
-    behaviorselect.on("valuechange", function (event) {
+    behaviorselect.on("click", function (event) {
         var value = behaviorselect.get("value");
         var targetid = dialog.get("target");
         Y.one("#" + targetid).setAttribute("data-datalynx-behavior", value);
