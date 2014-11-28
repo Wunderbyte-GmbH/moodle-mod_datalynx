@@ -22,6 +22,7 @@
 
 require_once(dirname(__FILE__). '/../mod_class.php');
 require_once(dirname(__FILE__). '/../behavior/behavior.php');
+require_once(dirname(__FILE__). '/../renderer/renderer.php');
 
 /**
  * Base class for Datalynx Field Types
@@ -239,50 +240,23 @@ abstract class datalynxfield_base {
         return $this->_renderer;
     }
 
+    protected static $defaultoptions = array(
+        'manage' => false,
+        'visible' => false,
+        'edit' => false,
+        'editable' => false,
+        'disabled' => false,
+        'required' => false,
+        'internal' => false);
+
     // CONTENT MANAGEMENT
     /**
      *
      */
-    public function get_definitions($tags, $entry, array $options = array('edit' => false, 'manage' => false, 'visible' => false,  'editable' => false, 'required' => false)) {
-        $replacements = array();
-        foreach ($tags as $tag) {
-            list($field, $behavior, $renderer) = $this->process_tag($tag);
-            /* @var $behavior datalynx_field_behavior */
-
-            $options['visible'] = $behavior->is_visible_to_user();
-            $options['editable'] = $behavior->is_editable_by_user() && (strpos($tag, '!') === false);
-            $options['required'] = $behavior->is_required() || (strpos($tag, '*') !== false);
-
-            $replacements = array_merge($replacements, $this->renderer()->get_replacements(array($tag), $entry, $options));
-        }
-        return $replacements;
+    public function get_definitions($tags, $entry, array $options) {
+        return $this->renderer()->replacements($tags, $entry, array_merge(self::$defaultoptions, $options)); // TODO: YOU *MUST* REMOVE THIS MERGE!
     }
 
-    private function process_tag($tag) {
-        $pattern = '/\[\[([^\|\]]+)(?:\|([^\|\]]*))?(?:\|([^\|\]]*))?\]\]/';
-        $matches = array();
-
-        $field = $this;
-        $behavior = datalynx_field_behavior::get_default_behavior($this->df());
-        $renderer = null;
-
-        if (preg_match($pattern, $tag, $matches)) {
-            $fieldname = $matches[1];
-
-            $behaviorname = isset($matches[2]) ? $matches[2] : false;
-            if ($behaviorname) {
-                $behavior = datalynx_field_behavior::from_name($behaviorname);
-            }
-
-            $renderername = isset($matches[3]) ? $matches[3] : false;
-            if ($renderername) {
-                // $renderer = ...
-            }
-        }
-
-        return array($field, $behavior, $renderer);
-    }
-       
     /**
      *
      */

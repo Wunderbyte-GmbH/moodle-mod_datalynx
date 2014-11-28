@@ -238,10 +238,12 @@ M.datalynx_imagepicker.init = function(Y, options) {
 M.mod_datalynx.tag_manager = {};
 
 M.mod_datalynx.tag_manager.tags = [];
+M.mod_datalynx.tag_manager.currenttag = null;
 M.mod_datalynx.tag_manager.dialog = null;
 M.mod_datalynx.tag_manager.hidedialog = false;
 M.mod_datalynx.tag_manager.behaviors = [];
 M.mod_datalynx.tag_manager.renderers = {};
+M.mod_datalynx.tag_manager.types = [];
 
 /**
  * @param editor Node
@@ -250,17 +252,27 @@ M.mod_datalynx.tag_manager.add_tag_spans = function(editordiv) {
     var editor = editordiv.one(".editor_atto  .editor_atto_content");
     var textarea = editordiv.one("textarea");
 
+    // field tags
     var tagregex = /\[\[([^\|\]]+)(?:\|([^\|\]]*))?(?:\|([^\|\]]*))?\]\]/g;
     var oldcontent = textarea.get('value');
     var newcontent = oldcontent;
-    var splittag = [];
+    var splittag;
     while ((splittag = tagregex.exec(oldcontent)) !== null) {
         var tag = splittag[0];
         var field = splittag[1];
         var behavior = typeof(splittag[2]) !== "undefined" ? splittag[2] : "";
         var renderer = typeof(splittag[3]) !== "undefined" ? splittag[3] : "";
-        var replacement = '<span contenteditable="false" class="datalynx-tag" data-datalynx-field="' + field +
-            '" data-datalynx-behavior="' + behavior + '" data-datalynx-renderer="' + renderer + '">' + field + '</span>';
+        var replacement = M.mod_datalynx.tag_manager.create_advanced_tag('field', field, behavior, renderer);
+        newcontent = newcontent.replace(tag, replacement);
+    }
+
+    // action tags
+    tagregex = /##([^#]*)?##/g;
+    splittag = [];
+    while ((splittag = tagregex.exec(oldcontent)) !== null) {
+        tag = splittag[0];
+        var action = splittag[1];
+        replacement = M.mod_datalynx.tag_manager.create_advanced_tag('action', action, '', '');
         newcontent = newcontent.replace(tag, replacement);
     }
 
@@ -277,19 +289,19 @@ M.mod_datalynx.tag_manager.remove_tag_spans = function(editordiv) {
     var textarea = editordiv.one("textarea");
 
     var newcontent = editor.getHTML();
-    var spans = editor.all("span.datalynx-tag");
+    var spans = editor.all("button.datalynx-field-tag");
     spans.each(function(span) {
         var field = span.getAttribute("data-datalynx-field");
         var behavior = span.getAttribute("data-datalynx-behavior");
         var renderer = span.getAttribute("data-datalynx-renderer");
-        var replacement = "[[" + field;
-        if ((behavior !== "")) {
-            replacement += "|" + behavior;
-        }
-        if ((renderer !== "")) {
-            replacement += "|" + renderer;
-        }
-        replacement += "]]";
+        var replacement = M.mod_datalynx.tag_manager.create_raw_tag('field', field, behavior, renderer);
+        newcontent = newcontent.replace(span.get('outerHTML'), replacement);
+    });
+
+    spans = editor.all("button.datalynx-action-tag");
+    spans.each(function(span) {
+        var action = span.getHTML();
+        var replacement = M.mod_datalynx.tag_manager.create_raw_tag('action', action, '', '');
         newcontent = newcontent.replace(span.get('outerHTML'), replacement);
     });
 
@@ -298,21 +310,33 @@ M.mod_datalynx.tag_manager.remove_tag_spans = function(editordiv) {
     textarea.simulate('change');
 }
 
-M.mod_datalynx.tag_manager.init_span_dialog = function(behaviors, renderers) {
+M.mod_datalynx.tag_manager.init_span_dialog = function(Y) {
     var config = {
         draggable : false,
         modal : false,
         closeButton : true,
-        width : '240px'
+        width : '300px'
     };
 
     var dialog = M.mod_datalynx.tag_manager.dialog = new M.core.dialogue(config);
-    var behaviorselect = Y.Node.create('<select id="datalynx-tag-behavior-menu"></select>');
-    dialog.set('bodyContent', behaviorselect);
+    var dialogcontent = Y.Node.create(
+        '<div id="datalynx-tag-dialog-content">' +
+            '<div id="datalynx-field-tag-contols">' +
+            '<p><label for="datalynx-tag-fieldtype">' + M.util.get_string('fieldtype', 'datalynx', null) + ':</label><span id="datalynx-tag-fieldtype"></span></p>' +
+            '<p><label for="datalynx-tag-behavior-menu">' + M.util.get_string('behavior', 'datalynx', null) + ':</label><select id="datalynx-tag-behavior-menu"></select></p>' +
+            '<p><label for="datalynx-tag-renderer-menu">' + M.util.get_string('renderer', 'datalynx', null) + ':</label><select id="datalynx-tag-renderer-menu"></select></p>' +
+            '</div>' +
+            '<button type="button" id="datalynx-tag-button-delete">' + M.util.get_string('deletetag', 'datalynx', null) + '</button>' +
+        '</div>');
+    var behaviorselect = dialogcontent.one('#datalynx-tag-behavior-menu');
+    var rendererselect = dialogcontent.one('#datalynx-tag-renderer-menu');
+
+    dialog.set('bodyContent', dialogcontent);
 
     Y.one("body").on("click", function (event) {
         if (M.mod_datalynx.tag_manager.hidedialog) {
             dialog.hide();
+            M.mod_datalynx.tag_manager.currenttag = null;
         }
         M.mod_datalynx.tag_manager.hidedialog = true;
     });
@@ -321,26 +345,71 @@ M.mod_datalynx.tag_manager.init_span_dialog = function(behaviors, renderers) {
         M.mod_datalynx.tag_manager.hidedialog = false;
     });
 
+    Y.one("#datalynx-tag-button-delete").on('click', function (event) {
+        dialog.hide();
+        M.mod_datalynx.tag_manager.hidedialog = true;
+
+        M.mod_datalynx.tag_manager.currenttag.remove();
+        M.mod_datalynx.tag_manager.currenttag = null;
+
+        var attoeditors = Y.all("#datalynx-view-edit-form div.editor_atto");
+        attoeditors.each(function (attoeditor) {
+            var editordiv = attoeditor.ancestor();
+            var editor = editordiv.one(".editor_atto .editor_atto_content");
+            var textarea = editordiv.one("textarea");
+            textarea.set('value', editor.getHTML());
+            editor.simulate('change');
+            textarea.simulate('change');
+        });
+    });
+
     behaviorselect.on("click", function (event) {
         var value = behaviorselect.get("value");
         var targetid = dialog.get("target");
         Y.one("#" + targetid).setAttribute("data-datalynx-behavior", value);
     });
+
+    rendererselect.on("click", function (event) {
+        var value = rendererselect.get("value");
+        var targetid = dialog.get("target");
+        Y.one("#" + targetid).setAttribute("data-datalynx-renderer", value);
+    });
 }
 
 M.mod_datalynx.tag_manager.show_tag_dialog = function (event, Y) {
-    var tag = event.target;
+    var tag = M.mod_datalynx.tag_manager.currenttag = event.target;
     var dialog = M.mod_datalynx.tag_manager.dialog;
-    if (tag.hasClass("datalynx-tag")) {
-        dialog.set('headerContent', tag.getAttribute("data-datalynx-field"));
+    var fieldname, tagtype;
+    if (tag.hasClass("datalynx-field-tag")) {
+        Y.one('#datalynx-field-tag-contols').show();
+        fieldname = tag.getAttribute("data-datalynx-field");
+        tagtype =  M.util.get_string('field', 'datalynx', null);
+        dialog.set('headerContent', M.util.get_string('tagproperties', 'datalynx', {tagtype : tagtype, tagname : fieldname}));
+        if (fieldname.indexOf(':') !== -1) {
+            fieldname = fieldname.split(':')[0];
+        }
         M.mod_datalynx.tag_manager.populate_select(dialog.bodyNode.one("#datalynx-tag-behavior-menu"),
-                                                   M.mod_datalynx.tag_manager.behaviors,
-                                                   tag.getAttribute("data-datalynx-behavior"));
+                                                    M.mod_datalynx.tag_manager.behaviors,
+                                                    tag.getAttribute("data-datalynx-behavior"));
+        M.mod_datalynx.tag_manager.populate_select(dialog.bodyNode.one("#datalynx-tag-renderer-menu"),
+                                                    M.mod_datalynx.tag_manager.renderers[fieldname],
+                                                    tag.getAttribute("data-datalynx-renderer"));
+        Y.one('#datalynx-tag-fieldtype').set('innerHTML', M.mod_datalynx.tag_manager.types[fieldname]);
 
         dialog.set('target', tag.get("id"));
         dialog.show();
         dialog.set('align', {node: tag, points: [Y.WidgetPositionAlign.TL, Y.WidgetPositionAlign.BL]});
 
+        M.mod_datalynx.tag_manager.hidedialog = false;
+    } else if (tag.hasClass("datalynx-action-tag")) {
+        Y.one('#datalynx-field-tag-contols').hide();
+        fieldname = tag.getAttribute("data-datalynx-field");
+        tagtype =  M.util.get_string('action', 'datalynx', null);
+        dialog.set('headerContent', M.util.get_string('tagproperties', 'datalynx', {tagtype : tagtype, tagname : fieldname}));
+
+        dialog.set('target', tag.get("id"));
+        dialog.show();
+        dialog.set('align', {node: tag, points: [Y.WidgetPositionAlign.TL, Y.WidgetPositionAlign.BL]});
         M.mod_datalynx.tag_manager.hidedialog = false;
     } else {
         M.mod_datalynx.tag_manager.hidedialog = true;
@@ -349,7 +418,6 @@ M.mod_datalynx.tag_manager.show_tag_dialog = function (event, Y) {
 
 M.mod_datalynx.tag_manager.populate_select = function (select, data, selectedvalue) {
     select.set('innerHTML', '');
-    select.appendChild(Y.Node.create('<option value=""><em>(Default behavior)</em></option>'));
     for (var key in data) {
         if (data.hasOwnProperty(key)) {
             select.appendChild(Y.Node.create('<option value="' + key + '">' + data[key] + '</option>'));
@@ -360,7 +428,7 @@ M.mod_datalynx.tag_manager.populate_select = function (select, data, selectedval
     }
 }
 
-M.mod_datalynx.tag_manager.init = function(Y, behaviors, renderers) {
+M.mod_datalynx.tag_manager.init = function(Y, behaviors, renderers, types) {
     var attoeditors = Y.all("#datalynx-view-edit-form div.editor_atto");
     attoeditors.each(function (attoeditor) {
         var editordiv = attoeditor.ancestor();
@@ -373,8 +441,9 @@ M.mod_datalynx.tag_manager.init = function(Y, behaviors, renderers) {
 
     M.mod_datalynx.tag_manager.behaviors = behaviors;
     M.mod_datalynx.tag_manager.renderers = renderers;
+    M.mod_datalynx.tag_manager.types = types;
 
-    M.mod_datalynx.tag_manager.init_span_dialog(behaviors, renderers);
+    M.mod_datalynx.tag_manager.init_span_dialog(Y);
 
     Y.one("#datalynx-view-edit-form").on("submit", M.mod_datalynx.tag_manager.prepare_submit, null, Y);
 }
@@ -418,47 +487,112 @@ M.mod_datalynx.tag_manager.insert_field_tag = function (event, Y, editordiv) {
                 break;
         }
     } else {
-        var field = value.replace(/[\[\]]+/g, '');
-        var replacement = '<span contenteditable="false" class="datalynx-tag" data-datalynx-field="' + field + '">' + field + '</span>';
-        M.mod_datalynx.tag_manager.insert_at_caret(replacement);
+        var replacement = '';
+        var field = '';
+        if (/\[\[[^\]]+\]\]/.test(value)) {
+            field = value.replace(/[\[\]]+/g, '');
+            replacement = M.mod_datalynx.tag_manager.create_advanced_tag('field', field, '', '');
+        } else if (/##[^\]]+##/.test(value)) {
+            field = value.replace(/#+/g, '');
+            replacement = M.mod_datalynx.tag_manager.create_advanced_tag('action', field, '', '');
+        } else {
+            replacement = value;
+        }
+
+        M.mod_datalynx.tag_manager.insert_at_caret(Y, editordiv, replacement);
     }
+
+    event.target.set('value', '');
+    event.target.simulate('change');
     textarea.simulate('change');
 }
 
-M.mod_datalynx.tag_manager.insert_at_caret = function (html) {
-    var sel, range;
+M.mod_datalynx.tag_manager.create_advanced_tag = function (type, fieldname, behavior, renderer) {
+    var output = '';
+    switch (type) {
+        case 'field':
+            output = '<button type="button" contenteditable="false" ' +
+                'class="datalynx-tag datalynx-field-tag" data-datalynx-field="' + fieldname +
+                '" data-datalynx-behavior="' + behavior + '" data-datalynx-renderer="' + renderer + '">' + fieldname + '</button>';
+            break;
+        case 'action':
+            output = '<button type="button" contenteditable="false" ' +
+                'class="datalynx-tag datalynx-action-tag" data-datalynx-field="' + fieldname + '">' + fieldname + '</button>';
+            break;
+        default:
+            output = fieldname;
+            break;
+    }
+    return output;
+}
+
+M.mod_datalynx.tag_manager.create_raw_tag = function (type, fieldname, behavior, renderer) {
+    var output = '';
+    switch (type) {
+        case 'field':
+            output = "[[" + fieldname;
+            if ((behavior !== "")) {
+                output += "|" + behavior;
+                if ((renderer !== "")) {
+                    output += "|" + renderer;
+                }
+            } else {
+                if ((renderer !== "")) {
+                    output += "||" + renderer;
+                }
+            }
+            output += "]]";
+            break;
+        case 'action':
+            output =  "##" + fieldname + "##";
+            break;
+        default:
+            output = fieldname;
+            break;
+    }
+    return output;
+}
+
+M.mod_datalynx.tag_manager.insert_at_caret = function (Y, editordiv, html) {
+    var sel, range, firstTop;
+    var container = editordiv.one(".editor_atto_content_wrap");
     if (window.getSelection) {
         // IE9 and non-IE
         sel = window.getSelection();
         if (sel.getRangeAt && sel.rangeCount) {
             range = sel.getRangeAt(0);
-            range.deleteContents();
+            firstTop = Y.one(range.commonAncestorContainer.parentNode);
+            if (firstTop !== null && (container.compareTo(firstTop) || container.one("#" + firstTop.get("id")) !== null)) {
+                range.deleteContents();
 
-            var el = document.createElement("div");
-            el.innerHTML = html;
-            var frag = document.createDocumentFragment(),
-                node, lastNode;
-            while ((node = el.firstChild)) {
-                lastNode = frag.appendChild(node);
-            }
-            range.insertNode(frag);
+                var el = document.createElement("div");
+                el.innerHTML = html;
+                var frag = document.createDocumentFragment(),
+                    node, lastNode;
+                while ((node = el.firstChild)) {
+                    lastNode = frag.appendChild(node);
+                }
+                range.insertNode(frag);
 
-            // Preserve the selection
-            if (lastNode) {
-                range = range.cloneRange();
-                range.setStartAfter(lastNode);
-                range.collapse(true);
-                sel.removeAllRanges();
-                sel.addRange(range);
+                // Preserve the selection
+                if (lastNode) {
+                    range = range.cloneRange();
+                    range.setStartAfter(lastNode);
+                    range.collapse(true);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                }
             }
         }
     } else if (document.selection && document.selection.type != "Control") {
         // IE < 9
-        document.selection.createRange().pasteHTML(html);
+        range = document.selection.createRange();
+        firstTop = Y.one(range.parentElement());
+        if (firstTop !== null && (container.compareTo(firstTop) || container.one("#" + firstTop.get("id")) !== null)) {
+            document.selection.createRange().pasteHTML(html);
+        }
     }
 }
-
-
 
 M.mod_datalynx.behaviors_helper = {};
 

@@ -32,7 +32,7 @@ class datalynxfield__time_renderer extends datalynxfield_renderer {
     /**
      * 
      */
-    protected function replacements(array $tags = null, $entry = null, array $options = null) {
+    public function replacements(array $tags = null, $entry = null, array $options = null) {
         $field = $this->_field;
         $fieldname = $field->get('internalname');
 
@@ -106,8 +106,8 @@ class datalynxfield__time_renderer extends datalynxfield_renderer {
         $cat = get_string('entryinfo', 'datalynx');
 
         $patterns = array();
-        $patterns["##$fieldname##"] = array(true);
-        $patterns["##$fieldname:date##"] = array(true);
+        $patterns["##$fieldname##"] = array(true, $cat);
+        $patterns["##$fieldname:date##"] = array(true, $cat);
         // Minute (M)
         $patterns["##$fieldname:minute##"] = array(false);
         // Hour (H)

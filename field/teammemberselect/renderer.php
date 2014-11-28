@@ -31,43 +31,13 @@ require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
 
     /**
-     * Returns array of replacements for the field patterns
-     * The label pattern should always be first where applicable
-     * so that it is processed first in view templates
-     * so that i turn patterns it may contain could be processed.
-     *
-     * @return array pattern => array(visible in menu, category)
-     */
-    protected function replacements(array $tags = null, $entry = null, array $options = null) {
-        $field = $this->_field;
-        $fieldname = $field->name();
-        $edit = !empty($options['edit']) ? $options['edit'] : false;
-
-        $replacements = array_fill_keys($tags, '');
-        // rules support
-        $tags = $this->add_clean_pattern_keys($tags);
-        foreach ($tags as $tag => $cleantag) {
-            if ($edit) {
-                $params = array('required' => $options['required']);
-                $replacements[$tag] = array('', array(array($this, 'display_edit'), array($entry, $params)));
-                break;
-            } else {
-                $replacements[$tag] = array('html', $this->display_browse($entry));
-            }
-        }
-
-        return $replacements;
-    }
-
-    /**
      * [display_edit description]
      * @param  MoodleQuickForm $mform form to display element in
      * @param  [type] $entry   [description]
      * @param  [type] $options [description]
      * @return [type]          [description]
      */
-    public function display_edit(MoodleQuickForm &$mform, $entry, array $options = null) {
-        $mform->addElement('html', '<div data-field-type="' . $this->_field->type . '" data-field-name="' . $this->_field->field->name . '">');
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options = null) {
         global $PAGE, $USER;
 
         $field = $this->_field;
@@ -111,7 +81,6 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
                 array($field->options_menu(false, false, $authorid), $fieldid, $entryid, $field->minteamsize),
                 false,
                 $this->get_js_module());
-        $mform->addElement('html', '</div>');
     }
 
     public static function compare_different_ignore_zero_callback($data) {
@@ -169,10 +138,11 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         return array($elements, null);
     }
 
+
     /**
      *
      */
-    public function display_browse($entry, $params = null) {
+    public function render_display_mode(stdClass $entry, array $params) {
         $field = $this->_field;
         $fieldid = $field->id();
         $str = '';

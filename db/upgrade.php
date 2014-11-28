@@ -568,10 +568,145 @@ function xmldb_datalynx_upgrade($oldversion) {
             $filepath = "$CFG->dirroot/mod/datalynx/db/install.xml";
             $dbman->install_one_table_from_xmldb_file($filepath, 'datalynx_behaviors');
         }
-
+        mod_datalynx_replace_field_rules();
         // datalynx savepoint reached
         upgrade_mod_savepoint(true, 2014102101, 'datalynx');
     }
 
+    if ($oldversion < 2014111501) {
+        $table = new xmldb_table('datalynx_renderers');
+        if (!$dbman->table_exists($table)) {
+            $filepath = "$CFG->dirroot/mod/datalynx/db/install.xml";
+            $dbman->install_one_table_from_xmldb_file($filepath, 'datalynx_renderers');
+        }
+        mod_datalynx_replace_field_labels();
+        // datalynx savepoint reached
+        upgrade_mod_savepoint(true, 2014111501, 'datalynx');
+    }
+
     return true;
+}
+
+function mod_datalynx_replace_field_rules() {
+    require_once(dirname(__FILE__) . '/../behavior/behavior.php');
+    global $DB;
+
+    $defaultbehavior = (object) array(
+        'name' => '',
+        'description' => '',
+        'visibleto' => array(
+            datalynx::PERMISSION_MANAGER,
+            datalynx::PERMISSION_TEACHER,
+            datalynx::PERMISSION_STUDENT,
+            datalynx::PERMISSION_AUTHOR,),
+        'editableby' => array(
+            datalynx::PERMISSION_MANAGER,
+            datalynx::PERMISSION_TEACHER,
+            datalynx::PERMISSION_STUDENT,
+            datalynx::PERMISSION_AUTHOR,),
+        'required' => false,
+    );
+    $dataids = $DB->get_fieldset_select('datalynx', 'id', '1');
+    foreach ($dataids as $dataid) {
+        $views = $DB->get_records('datalynx_views', array('dataid' => $dataid), '', 'id, param2');
+        foreach ($views as $view) {
+            $changed = false;
+
+            $regex = '/\[\[\*([^\]]+)\]\]/';
+            $matches = array();
+            if (preg_match_all($regex, $view->param2, $matches, PREG_SET_ORDER)) {
+                $behavior = $defaultbehavior;
+                $behavior->name = get_string('required', 'datalynx');
+                $behavior->required = true;
+                $behavior->d = $dataid;
+                datalynx_field_behavior::insert_behavior($behavior);
+
+                foreach ($matches as $match) {
+                    $view->param2 = str_replace($match[0], "[[{$match[1]}|{$behavior->name}]]", $view->param2);
+                }
+
+                $changed = true;
+            }
+
+            $regex = '/\[\[\^([^\]]+)\]\]/';
+            $matches = array();
+            if (preg_match_all($regex, $view->param2, $matches, PREG_SET_ORDER)) {
+                $behavior = $defaultbehavior;
+                $behavior->name = get_string('hidden', 'datalynx');
+                $behavior->visibleto = array();
+                $behavior->d = $dataid;
+                datalynx_field_behavior::insert_behavior($behavior);
+
+                foreach ($matches as $match) {
+                    $view->param2 = str_replace($match[0], "[[{$match[1]}|{$behavior->name}]]", $view->param2);
+                }
+
+                $changed = true;
+            }
+
+            $regex = '/\[\[\!([^\]]+)\]\]/';
+            $matches = array();
+            if (preg_match_all($regex, $view->param2, $matches, PREG_SET_ORDER)) {
+                $behavior = $defaultbehavior;
+                $behavior->name = get_string('noedit', 'datalynx');
+                $behavior->editableby = array();
+                $behavior->d = $dataid;
+                datalynx_field_behavior::insert_behavior($behavior);
+
+                foreach ($matches as $match) {
+                    $view->param2 = str_replace($match[0], "[[{$match[1]}|{$behavior->name}]]", $view->param2);
+                }
+
+                $changed = true;
+            }
+
+            if ($changed) {
+                $DB->update_record('datalynx_views', $view);
+            }
+        }
+    }
+}
+
+function mod_datalynx_replace_field_labels() {
+    require_once(dirname(__FILE__) . '/../renderer/renderer.php');
+    global $DB;
+
+    $defaultrenderer = (object) array(
+        'id' => 0,
+        'name' => '',
+        'description' => '',
+        'notvisibletemplate' => datalynx_field_renderer::NOT_VISIBLE_SHOW_NOTHING,
+        'displaytemplate' => datalynx_field_renderer::DISPLAY_MODE_TEMPLATE_NONE,
+        'novaluetemplate' => datalynx_field_renderer::NO_VALUE_SHOW_NOTHING,
+        'edittemplate' => datalynx_field_renderer::EDIT_MODE_TEMPLATE_NONE,
+        'noteditabletemplate' => datalynx_field_renderer::NOT_EDITABLE_SHOW_NOTHING,
+    );
+
+    $dataids = $DB->get_fieldset_select('datalynx', 'id', '1');
+    foreach ($dataids as $dataid) {
+        $views = $DB->get_records('datalynx_views', array('dataid' => $dataid), '', 'id, param2');
+        foreach ($views as $view) {
+            $fieldtags = array();
+            $fieldlabels = $DB->get_records_menu('datalynx_fields', array('dataid' => $dataid), '', 'name, label');
+            $regex = '/\[\[([^\]]+)\@\]\]/';
+            $matches = array();
+            if (preg_match_all($regex, $view->param2, $matches, PREG_SET_ORDER)) {
+                foreach ($matches as $match) {
+                    $oldtag = $match[0];
+                    $fieldname = $match[1];
+                    if (!isset($fieldtags[$fieldname])) {
+                        $renderer = $defaultrenderer;
+                        $renderer->name = $fieldname . '_' . get_string('label', 'datalynx');
+                        $renderer->d = $dataid;
+                        $renderer->displaytemplate = str_replace('[[' . $fieldname . ']]', '#value', $fieldlabels[$fieldname]);
+                        $renderer->edittemplate = str_replace('[[' . $fieldname . ']]', '#input', $fieldlabels[$fieldname]);
+                        datalynx_field_renderer::insert_renderer($renderer);
+                        $fieldtags[$oldtag] = '[[' . $fieldname . '||' . $renderer->name . ']]';
+                    }
+                }
+            }
+            $view->param2 = str_replace(array_keys($fieldtags), array_values($fieldtags), $view->param2);
+            $DB->update_record('datalynx_views', $view);
+        }
+    }
 }

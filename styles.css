@@ -124,6 +124,8 @@
     display: none;
 }
 
+/* CSS fix for showing/hiding appropriate fields when javascript is on/off */
+
 select.datalynxfield_teammemberselect_select {
   display: inherit;
 }
@@ -140,28 +142,61 @@ body.jsenabled input[type="text"].datalynxfield_teammemberselect_dropdown {
   display: inherit;
 }
 
-body.jsenabled div.editor_atto_content_wrap span.datalynx-tag {
-    background-color: skyblue;
-    padding: 0.25em;
-    margin-left: 0.125em;
-    margin-right: 0.125em;
+/* CSS for advanced tags in entry templates */
+
+body.jsenabled div.editor_atto_content_wrap button.datalynx-tag {
+    padding: 0 0.25em;
+    margin: 0.125em;
     cursor: pointer;
-    border-radius: 0.25em;
+    border-radius: 0.5em;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    font-size: x-small;
+    background: none;
+}
+
+body.jsenabled div.editor_atto_content_wrap button.datalynx-tag::before {
+    padding-left: 1.5em;
+    content: no-close-quote;
+}
+
+body.jsenabled div.editor_atto_content_wrap button.datalynx-tag.datalynx-field-tag {
+    background-color: skyblue;
+}
+
+body.jsenabled div.editor_atto_content_wrap button.datalynx-tag.datalynx-field-tag::before {
+    background: url([[pix:i/edit]]) no-repeat;
+    background-size: contain;
+}
+
+body.jsenabled div.editor_atto_content_wrap button.datalynx-tag.datalynx-action-tag {
+    background-color: lightgreen;
+    font-style: italic;
+}
+
+body.jsenabled div.editor_atto_content_wrap button.datalynx-tag.datalynx-action-tag::before {
+    background: url([[pix:e/document_properties]]) no-repeat;
+    background-size: contain;
 }
 
 table.datalynx-behaviors img {
     margin-left: 0.125em;
     margin-right: 0.125em;
-
 }
 
 body.jsenabled table.datalynx-behaviors img {
     cursor: pointer;
 }
 
+form.mform div.entry div.fitem {
+    display: inline-block;
+    margin: inherit;
+}
+
+form.mform div.entry div.datalynx-field-wrapper {
+    display: inline-flex;
+}

@@ -86,7 +86,7 @@ if (isloggedin() and $istemplatemanager) {
         if ($istemplatemanager)  {
             $row[] = new tabobject('fields2', new moodle_url('/mod/datalynx/field/index.php', array('d' => $this->id())), get_string('fields','datalynx'));
             $row[] = new tabobject('behaviors', new moodle_url('/mod/datalynx/behavior/index.php', array('d' => $this->id())), get_string('behaviors','datalynx'));
-            $row[] = new tabobject('renderers', new moodle_url('/mod/datalynx/renderers/index.php', array('d' => $this->id())), get_string('renderers','datalynx'));
+            $row[] = new tabobject('renderers', new moodle_url('/mod/datalynx/renderer/index.php', array('d' => $this->id())), get_string('renderers','datalynx'));
         }
 
         $tabs[] = $row;

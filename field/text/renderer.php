@@ -32,30 +32,7 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
     /**
      *
      */
-    protected function replacements(array $tags = null, $entry = null, array $options = null) {
-        $field = $this->_field;
-        $fieldname = $field->name();
-        $edit = !empty($options['edit']) ? $options['edit'] : false;
-
-        $replacements = array();
-        $tags = $this->add_clean_pattern_keys($tags);
-        foreach ($tags as $tag => $cleantag) {
-            $replacements[$tag] = '';
-            if ($edit) {
-                $replacements[$tag] = array('', array(array($this,'display_edit'), array($entry, array('required' => $options['required']))));
-            } else {
-                $replacements[$tag] = array('html', $this->display_browse($entry));
-            }
-        }
-
-        return $replacements;
-    }
-
-    /**
-     *
-     */
-    public function display_edit(&$mform, $entry, array $options = null) {
-        $mform->addElement('html', '<div data-field-type="' . $this->_field->type . '" data-field-name="' . $this->_field->field->name . '">');
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $field = $this->_field;
         $fieldid = $field->id();
         $entryid = $entry->id;
@@ -91,29 +68,27 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
                 case 'alphanumeric': $mform->setType($fieldname, PARAM_ALPHANUM); break;
                 case 'lettersonly': $mform->setType($fieldname, PARAM_ALPHA); break;
                 case 'numeric': $mform->setType($fieldname, PARAM_INT); break;
-                case 'email': $mform->setType($fieldname, PARAM_EMAIL); break;            
+                case 'email': $mform->setType($fieldname, PARAM_EMAIL); break;
             }
         }
         // length rule
         if ($length = $field->get('param5')) {
             ($min = $field->get('param6')) or ($min = 0);
             ($max = $field->get('param7')) or ($max = 64);
-            
+
             switch ($length) {
                 case 'minlength': $val = $min; break;
                 case 'maxlength': $val = $max; break;
                 case 'rangelength': $val = array($min, $max); break;
-            }                
+            }
             $mform->addRule($fieldname, null, $length, $val, 'client');
         }
-
-        $mform->addElement('html', '</div>');
     }
 
     /**
      *
      */
-    protected function display_browse($entry, $params = null) {
+    public function render_display_mode(stdClass $entry, array $params) {
         $field = $this->_field;
         $fieldid = $field->id();
 

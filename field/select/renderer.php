@@ -32,45 +32,9 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
     protected $_cats = array();
 
     /**
-     * 
-     */
-    protected function replacements(array $tags = null, $entry = null, array $options = null) {
-        $field = $this->_field;
-        $fieldname = $field->name();
-        $edit = !empty($options['edit']) ? $options['edit'] : false;
-
-        $replacements = array_fill_keys($tags, '');
-        // rules support
-        $tags = $this->add_clean_pattern_keys($tags);        
-
-        foreach ($tags as $tag => $cleantag) {
-            if ($edit) {
-                $params = array('required' => $options['required']);
-                if ($cleantag == "[[$fieldname:addnew]]") {
-                    $params['addnew'] = true;
-                }
-                $replacements[$tag] = array('', array(array($this ,'display_edit'), array($entry, $params)));
-                break;
-            } else {
-                if ($cleantag == "[[$fieldname:options]]") {
-                    $replacements[$tag] = array('html', $this->display_browse($entry, array('options' => true)));
-                } else if ($cleantag == "[[$fieldname:key]]") {
-                    $replacements[$tag] = array('html', $this->display_category($entry, array('key' => true)));
-                } else if ($cleantag == "[[$fieldname:cat]]") {
-                    $replacements[$tag] = array('html', $this->display_category($entry));
-                } else {
-                    $replacements[$tag] = array('html', $this->display_browse($entry));
-                }
-            }
-        }
-        return $replacements;
-    }
-
-    /**
      *
      */
-    public function display_edit(&$mform, $entry, array $options = null) {
-        $mform->addElement('html', '<div data-field-type="' . $this->_field->type . '" data-field-name="' . $this->_field->field->name . '">');
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $field = $this->_field;
         $fieldid = $field->id();
         $entryid = $entry->id;
@@ -105,13 +69,12 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
             }
             return;
         }
-        $mform->addElement('html', '</div>');
     }
 
     /**
      *
      */
-    public function display_browse($entry, $params = null) {
+    public function render_display_mode(stdClass $entry, array $params) {
         $field = $this->_field;
         $fieldid = $field->id();
 

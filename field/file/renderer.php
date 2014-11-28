@@ -30,73 +30,9 @@ require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 class datalynxfield_file_renderer extends datalynxfield_renderer {
 
     /**
-     * 
-     */
-    protected function replacements(array $tags = null, $entry = null, array $options = null) {
-        $field = $this->_field;
-        $fieldname = $field->name();
-        $edit = !empty($options['edit']) ? $options['edit'] : false;
-
-        $replacements = array();
-
-        // rules support
-        $tags = $this->add_clean_pattern_keys($tags);
-
-        foreach ($tags as $tag => $cleantag) {
-            if ($edit) {
-                if ($cleantag == "[[$fieldname]]") {
-                    $required = $options['required'];
-                    $replacements[$tag] = array('', array(array($this,'display_edit'), array($entry, array('required' => $required))));
-                } else {
-                    $replacements[$tag] = '';
-                }
-            } else {
-                $displaybrowse = '';
-                if ($cleantag == "[[$fieldname]]") {
-                    $displaybrowse = $this->display_browse($entry);
-                // url    
-                } else if ($cleantag == "[[{$fieldname}:url]]") {
-                    $displaybrowse = $this->display_browse($entry, array('url' => 1));
-                // alt
-                } else if ($cleantag == "[[{$fieldname}:alt]]") {
-                    $displaybrowse = $this->display_browse($entry, array('alt' => 1));
-                // size
-                } else if ($cleantag == "[[{$fieldname}:size]]") {
-                    $displaybrowse = $this->display_browse($entry, array('size' => 1));
-                // content (for html files)
-                } else if ($cleantag == "[[{$fieldname}:content]]") {
-                    if ($edit) {
-                        $replacements[$tag] = array('', array(array($this,'display_edit_content'), array($entry)));
-                    } else {
-                        $displaybrowse = $this->display_browse($entry, array('content' => 1));
-                    }
-                // download
-                } else if ($cleantag == "[[{$fieldname}:download]]") {
-                    $displaybrowse = $this->display_browse($entry, array('download' => 1));
-                // download count
-                } else if ($cleantag == "[[{$fieldname}:downloadcount]]") {
-                    $displaybrowse = $this->display_browse($entry, array('downloadcount' => 1));
-                }
-                
-                if (!empty($displaybrowse)) {
-                    if (!$options['visible']) {
-                        $displaybrowse = html_writer::tag('span', $displaybrowse, array('class' => 'hide'));
-                    }
-                    $replacements[$tag] = array('html', $displaybrowse);
-                } else {
-                    $replacements[$tag] = '';
-                }
-            }           
-        }
-
-        return $replacements;
-    }
-
-    /**
      *
      */
-    public function display_edit(&$mform, $entry, array $options = null) {
-        $mform->addElement('html', '<div data-field-type="' . $this->_field->type . '" data-field-name="' . $this->_field->field->name . '">');
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options = null) {
         $field = $this->_field;
         $fieldid = $field->id();
 
@@ -121,17 +57,6 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
         if ($required) {
             $mform->addRule("{$fieldname}_filemanager", null, 'required', null, 'client');
         }
-
-        // alt text
-        //$altoptions = array();
-        //$mform->addElement('text', "{$fieldname}_alttext", get_string('alttext','datalynxfield_file'), $altoptions);
-        //$mform->setDefault("{$fieldname}_alttext", s($content1));
-
-        // delete (only for multiple files)
-        //if ($field->get('param2') > 1) {
-        //    $mform->addElement('checkbox', "{$fieldname}_delete", get_string('clearcontent','datalynxfield_file'));
-        //}
-        $mform->addElement('html', '</div>');
     }
 
     /**
@@ -196,7 +121,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
     /**
      *
      */
-    public function display_browse($entry, $params = null, $hidden = false) {
+    public function render_display_mode(stdClass $entry, array $params) {
 
         $field = $this->_field;
         $fieldid = $field->id();

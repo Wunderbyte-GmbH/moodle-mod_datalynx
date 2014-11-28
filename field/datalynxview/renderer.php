@@ -36,7 +36,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
     /**
      * 
      */
-    protected function replacements(array $tags = null, $entry = null, array $options = null) {
+    public function replacements(array $tags = null, $entry = null, array $options = null) {
         $field = $this->_field;
         $fieldname = $field->name();
 
@@ -312,7 +312,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
                 $value = $localpattern;
             } else if ($localfield = $field->df->get_field_from_id($localfieldid)) {
                 // Get the array of values for the patterns
-                if ($replacements = $localfield->renderer()->get_replacements(array($localpattern), $entry)) {
+                if ($replacements = $localfield->renderer()->replacements(array($localpattern), $entry)) {
                     // Take the first: array('html', value)
                     $first = reset($replacements);
                     // extract the value part

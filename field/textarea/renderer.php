@@ -32,62 +32,7 @@ class datalynxfield_textarea_renderer extends datalynxfield_renderer {
     /**
      *
      */
-    protected function replacements(array $tags = null, $entry = null, array $options = null) {
-        $field = $this->_field;
-        $fieldname = $field->name();
-        $edit = !empty($options['edit']) ? $options['edit'] : false;
-
-        $replacements = array();
-        // rules support
-        $tags = $this->add_clean_pattern_keys($tags);
-
-        $replacements = array_fill_keys($tags, '');
-        if ($edit) {
-            foreach ($tags as $tag => $cleantag) {
-                $params = null;
-                $required = $options['required'];
-                if ($cleantag == "[[{$fieldname}:wordcount]]") {
-                    $replacements[$tag] = '';
-                    continue;
-                }
-                $replacements[$tag] = array('', array(array($this,'display_edit'), array($entry, array('required' => $required))));
-                break;
-            }
-
-        } else {
-            foreach ($tags as $tag => $cleantag) {
-                switch ($cleantag) {
-                    case "[[$fieldname]]":
-                        $replacements[$tag] = array('html', $this->display_browse($entry));
-                        break;
-
-                    // plain text, no links
-                    case "[[$fieldname:text]]":
-                        $replacements[$tag] = array('html', html_to_text($this->display_browse($entry, array('text' => true))));
-                        break;
-
-                    // plain text, with links
-                    case "[[$fieldname:textlinks]]":
-                        $replacements[$tag] = array('html', $this->display_browse($entry, array('text' => true, 'links' => true)));
-                        break;
-
-                    case "[[{$fieldname}:wordcount]]":
-                        $replacements[$tag] = array('html', $this->word_count($entry));
-                        break;
-                }
-            }
-        }
-
-        return $replacements;
-    }
-
-    /**
-     *
-     */
-    public function display_edit(&$mform, $entry, array $options = null) {
-        $mform->addElement('html', '<div data-field-type="' . $this->_field->type . '" data-field-name="' . $this->_field->field->name . '">');
-        global $PAGE, $CFG;
-
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $field = $this->_field;
         $fieldid = $field->id();
         $entryid = $entry->id;
@@ -100,7 +45,7 @@ class datalynxfield_textarea_renderer extends datalynxfield_renderer {
         $attr['cols'] = !$field->get('param2') ? 40 : $field->get('param2');
         $attr['rows'] = !$field->get('param3') ? 20 : $field->get('param3');
 
-        $data = new object;
+        $data = new stdClass();
         $data->$fieldname = isset($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : '';
         $required = !empty($options['required']);
 
@@ -124,29 +69,12 @@ class datalynxfield_textarea_renderer extends datalynxfield_renderer {
                 $mform->addRule("{$fieldname}_editor", null, 'required', null, 'client');
             }
         }
-        $mform->addElement('html', '</div>');
-    }
-
-    /**
-     *
-     */
-    public function word_count($entry) {
-
-        $fieldid = $this->_field->id();
-
-        if (isset($entry->{"c{$fieldid}_content"})) {
-            $text = $entry->{"c{$fieldid}_content"};
-            return str_word_count($text);
-        } else {
-            return '';
-        }
     }
 
     /**
      * Print the content for browsing the entry
      */
-    protected function display_browse($entry, $params = null) {
-
+    public function render_display_mode(stdClass $entry, array $params) {
         $field = $this->_field;
         $fieldid = $field->id();
 
@@ -157,7 +85,7 @@ class datalynxfield_textarea_renderer extends datalynxfield_renderer {
 
             $text = file_rewrite_pluginfile_urls($text, 'pluginfile.php', $field->df()->context->id, 'mod_datalynx', 'content', $contentid);
 
-            $options = new object();
+            $options = new stdClass();
             $options->para = false;
             $str = format_text($text, $format, $options);
             return $str;
@@ -171,20 +99,6 @@ class datalynxfield_textarea_renderer extends datalynxfield_renderer {
      */
     public function pluginfile_patterns() {
         return array("[[{$this->_field->name()}]]");
-    }
-
-    /**
-     * Array of patterns this field supports
-     */
-    protected function patterns() {
-        $fieldname = $this->_field->name();
-
-        $patterns = parent::patterns();
-        $patterns["[[$fieldname]]"] = array(true);
-        $patterns["[[$fieldname:text]]"] = array(false);
-        $patterns["[[$fieldname:wordcount]]"] = array(false);
-
-        return $patterns;
     }
 
     /**

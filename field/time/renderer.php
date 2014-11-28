@@ -30,61 +30,12 @@ require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 class datalynxfield_time_renderer extends datalynxfield_renderer {
 
     /**
-     * 
+     *
      */
-    protected function replacements(array $tags = null, $entry = null, array $options = null) {
-        $field = $this->_field;
-        $fieldname = $field->name();
-        $edit = !empty($options['edit']) ? $options['edit'] : false;
-
-        // rules support
-        $tags = $this->add_clean_pattern_keys($tags);        
-
-        $replacements = array_fill_keys($tags, '');
-        
-        foreach ($tags as $tag => $cleantag) {
-            if ($edit) {
-                $required = $options['required'];
-                // Determine whether date only selector
-                $date = (($cleantag == "[[$fieldname:date]]") or $field->date_only);
-                $options = array('required' => $required, 'date' => $date);
-                $replacements[$tag] = array('', array(array($this,'display_edit'), array($entry, $options)));
-                break;
-            } else {
-                // Determine display format
-                $format = (strpos($tag, "$fieldname:") !== false ? str_replace("$fieldname:", '', trim($tag, '[]')) : $field->display_format);
-                // For specialized tags convert format to the userdate format string
-                switch ($format) {            
-                    case 'date': $format = get_string('strftimedate', 'langconfig'); break; 
-                    case 'minute': $format = '%M'; break; 
-                    case 'hour': $format = '%H'; break; 
-                    case 'day': $format = '%a'; break; 
-                    case 'week': $format = '%V'; break; 
-                    case 'month': $format = '%b'; break; 
-                    case 'm': $format = '%m'; break; 
-                    case 'year':
-                    case 'Y': $format = '%Y'; break;
-                    default:
-                        if (!$format and $field->date_only) {
-                            $format = get_string('strftimedate', 'langconfig');
-                        }
-                }
-                $replacements[$tag] = array('html', $this->display_browse($entry, array('format' => $format)));
-            }
-        }    
-
-        return $replacements;
-    }
-
-    /**
-     * 
-     */
-    public function display_edit(&$mform, $entry, array $options = array()) {
-        $mform->addElement('html', '<div data-field-type="' . $this->_field->type . '" data-field-name="' . $this->_field->field->name . '">');
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $field = $this->_field;
         $fieldid = $field->id();
         $entryid = $entry->id;
-        $fieldname = "field_{$fieldid}_{$entryid}";
 
         $content = 0;
         if ($entryid > 0 and !empty($entry->{"c{$fieldid}_content"})){
@@ -98,13 +49,12 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         } else {
             $this->render_standard_selector($mform, $entry, $content, $includetime, $options);
         }
-        $mform->addElement('html', '</div>');
     }
-    
+
     /**
      *
      */
-    public function display_browse($entry, $params = null) {
+    public function render_display_mode(stdClass $entry, array $params) {
         $field = $this->_field;
         $fieldid = $field->id();
 

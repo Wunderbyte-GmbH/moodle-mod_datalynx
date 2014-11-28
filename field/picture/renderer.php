@@ -29,68 +29,7 @@ require_once("$CFG->dirroot/mod/datalynx/field/file/renderer.php");
  */
 class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
 
-    /**
-     * 
-     */
-    protected function replacements(array $tags = null, $entry = null, array $options = null) {
-        $field = $this->_field;
-        $fieldname = $field->name();
-        $edit = !empty($options['edit']) ? $options['edit'] : false;
-
-        // there is only one possible tag here so no check
-        $replacements = parent::replacements($tags, $entry, $options);
-
-        // rules support
-        $tags = $this->add_clean_pattern_keys($tags);
-        foreach ($tags as $tag => $cleantag) {
-            
-            if (is_array($replacements[$tag])) {
-                continue;
-            }
-            
-            if ($edit) {
-                if ($cleantag != "[[$fieldname:tn-url]]" and in_array($cleantag, array_keys($this->patterns()))) {
-                    $required = $options['required'];
-                    $replacements[$tag] = array('', array(array($this,'display_edit'), array($entry, array('required' => $required))));
-                }
-            } else {
-                $displaybrowse = '';
-                switch ($cleantag) {
-                    case "[[$fieldname]]":
-                        $displaybrowse = $this->display_browse($entry, array());
-                        break;
-                    case "[[$fieldname:linked]]":
-                        $displaybrowse = $this->display_browse($entry, array('linked' => 1));
-                        break;
-                    case "[[$fieldname:thumb]]":
-                    case "[[$fieldname:tn]]":
-                        $displaybrowse = $this->display_browse($entry, array('thumb' => 1));
-                        break;
-                    case "[[$fieldname:tn-linked]]":
-                    case "[[$fieldname:lightbox]]":
-                        $displaybrowse = $this->display_browse($entry, array('thumb' => 1, 'linked' => 1));
-                        break;
-                    default:
-                        break;
-                }
-                
-                if (!empty($displaybrowse)) {
-                    if (!$options['visible']) {
-                        $displaybrowse = html_writer::tag('span', $displaybrowse, array('class' => 'hide'));
-                    }
-                    $replacements[$tag] = array('html', $displaybrowse);
-                } else {
-                    $replacements[$tag] = '';
-                }            
-            }
-
-        }
-
-        return $replacements;
-    }
-
-    public function display_edit(&$mform, $entry, array $options = null) {
-        $mform->addElement('html', '<div data-field-type="' . $this->_field->type . '" data-field-name="' . $this->_field->field->name . '">');
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options = null) {
         $field = $this->_field;
         $fieldid = $field->id();
 
@@ -115,10 +54,9 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
         if ($required) {
             $mform->addRule("{$fieldname}_filemanager", null, 'required', null, 'client');
         }
-        $mform->addElement('html', '</div>');
     }
 
-    public function display_browse($entry, $params = null, $hidden = false) {
+    public function render_display_mode(stdClass $entry, array $params) {
         global $CFG, $PAGE;
 
         $module = array(
@@ -190,6 +128,11 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
 
     protected function display_file($file, $path, $altname, $params = null) {
         $field = $this->_field;
+
+        if(isset($params['lightbox']) && $params['lightbox']) {
+            $params['thumb'] = true;
+            $params['linked'] = true;
+        }
 
         if ($file->is_valid_image()) {
             $filename = $file->get_filename();

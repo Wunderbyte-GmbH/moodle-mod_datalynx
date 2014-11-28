@@ -172,7 +172,7 @@ class datalynxfield_textarea extends datalynxfield_base {
 
         foreach ($editabletags as $cleantag) {
             $tag = array_search($cleantag, $tags);
-            if ($tag !== false and $this->renderer()->is_required($tag)) {
+            if ($tag !== false and false) {
                 if (empty($formdata->$formfieldname)) {
                     return array($formfieldname => get_string('fieldrequired', 'datalynx'));
                 }

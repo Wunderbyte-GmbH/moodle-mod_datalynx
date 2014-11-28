@@ -21,8 +21,8 @@
  */
 
 require_once('../../../config.php');
-require_once('behavior_form.php');
-require_once('behavior.php');
+require_once('renderer_form.php');
+require_once('renderer.php');
 require_once("$CFG->dirroot/mod/datalynx/mod_class.php");
 
 $urlparams = new stdClass();
@@ -33,36 +33,36 @@ $urlparams->confirmed = optional_param('confirmed', false, PARAM_BOOL);
 
 $datalynx = new datalynx($urlparams->d);
 
-$datalynx->set_page('behavior/behavior_edit', array('urlparams' => $urlparams));
+$datalynx->set_page('renderer/renderer_edit', array('urlparams' => $urlparams));
 
 require_sesskey();
 require_capability('mod/datalynx:managetemplates', $datalynx->context);
 
-$returnurl = new moodle_url('/mod/datalynx/behavior/index.php', array('d' => $datalynx->id()));
+$returnurl = new moodle_url('/mod/datalynx/renderer/index.php', array('d' => $datalynx->id()));
 
 switch ($urlparams->action) {
     case "edit":
-        $mform = new datalynx_field_behavior_form($datalynx);
+        $mform = new datalynx_field_renderer_form($datalynx);
 
         if ($mform->is_cancelled()) {
             redirect($returnurl);
         } else if ($data = $mform->get_data()) {
             if(!$data->id) {
-                $id = datalynx_field_behavior::insert_behavior($data);
+                $id = datalynx_field_renderer::insert_renderer($data);
             } else {
-                datalynx_field_behavior::update_behavior($data);
+                datalynx_field_renderer::update_renderer($data);
             }
             redirect($returnurl);
         }
 
-        $datalynx->print_header(array('tab' => 'behaviors', 'nonotifications' => true, 'urlparams' => $urlparams));
+        $datalynx->print_header(array('tab' => 'renderers', 'nonotifications' => true, 'urlparams' => $urlparams));
 
         if ($urlparams->id) {
-            $data = datalynx_field_behavior::get_behavior($urlparams->id);
+            $data = datalynx_field_renderer::get_record($urlparams->id);
             $mform->set_data($data);
-            echo html_writer::tag('h2', get_string('editingbehavior', 'datalynx', $data->name), array('class' => 'mdl-align'));
+            echo html_writer::tag('h2', get_string('editingrenderer', 'datalynx', $data->name), array('class' => 'mdl-align'));
         } else {
-            echo html_writer::tag('h2', get_string('newbehavior', 'datalynx'), array('class' => 'mdl-align'));
+            echo html_writer::tag('h2', get_string('newrenderer', 'datalynx'), array('class' => 'mdl-align'));
         }
 
         $mform->display();
@@ -72,28 +72,28 @@ switch ($urlparams->action) {
 
     case "duplicate":
         if ($urlparams->confirmed) {
-            datalynx_field_behavior::duplicate_behavior($urlparams->id);
+            datalynx_field_renderer::duplicate_renderer($urlparams->id);
             redirect($returnurl);
         } else {
-            $data = datalynx_field_behavior::get_behavior($urlparams->id);
+            $data = datalynx_field_renderer::get_renderer_by_id($urlparams->id);
             $urlparams->confirmed = true;
-            $datalynx->print_header(array('tab' => 'behaviors', 'nonotifications' => true, 'urlparams' => $urlparams));
-            echo html_writer::tag('h2', get_string('duplicatingbehavior', 'datalynx', $data->name), array('class' => 'mdl-align'));
-            echo $OUTPUT->confirm(get_string('confirmbehaviorduplicate', 'datalynx'), new moodle_url('behavior_edit.php', (array) $urlparams), $returnurl);
+            $datalynx->print_header(array('tab' => 'renderers', 'nonotifications' => true, 'urlparams' => $urlparams));
+            echo html_writer::tag('h2', get_string('duplicatingrenderer', 'datalynx', $data->get_name()), array('class' => 'mdl-align'));
+            echo $OUTPUT->confirm(get_string('confirmrendererduplicate', 'datalynx'), new moodle_url('renderer_edit.php', (array) $urlparams), $returnurl);
             $datalynx->print_footer();
         }
         break;
 
     case "delete":
         if ($urlparams->confirmed) {
-            datalynx_field_behavior::delete_behavior($urlparams->id);
+            datalynx_field_renderer::delete_renderer($urlparams->id);
             redirect($returnurl);
         } else {
-            $data = datalynx_field_behavior::get_behavior($urlparams->id);
+            $data = datalynx_field_renderer::get_renderer_by_id($urlparams->id);
             $urlparams->confirmed = true;
-            $datalynx->print_header(array('tab' => 'behaviors', 'nonotifications' => true, 'urlparams' => $urlparams));
-            echo html_writer::tag('h2', get_string('deletingbehavior', 'datalynx', $data->name), array('class' => 'mdl-align'));
-            echo $OUTPUT->confirm(get_string('confirmbehaviordelete', 'datalynx'), new moodle_url('behavior_edit.php', (array) $urlparams), $returnurl);
+            $datalynx->print_header(array('tab' => 'renderers', 'nonotifications' => true, 'urlparams' => $urlparams));
+            echo html_writer::tag('h2', get_string('deletingrenderer', 'datalynx', $data->get_name()), array('class' => 'mdl-align'));
+            echo $OUTPUT->confirm(get_string('confirmrendererdelete', 'datalynx'), new moodle_url('renderer_edit.php', (array) $urlparams), $returnurl);
             $datalynx->print_footer();
         }
         break;

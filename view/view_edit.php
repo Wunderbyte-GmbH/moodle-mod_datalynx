@@ -35,11 +35,15 @@ $df = new datalynx($urlparams->d);
 global $DB;
 $options = array();
 $options['behaviors'] = $DB->get_records_select_menu('datalynx_behaviors', 'dataid = :dataid', array('dataid' => $urlparams->d), 'value ASC', 'name AS value, name AS label');
+$options['behaviors'][''] = get_string('defaultbehavior', 'datalynx');
 $fields = $DB->get_fieldset_select('datalynx_fields', 'name', 'dataid = :dataid', array('dataid' => $urlparams->d));
 $options['renderers'] = array();
+$commonrenderers = $DB->get_records_select_menu('datalynx_renderers', 'dataid = :dataid', array('dataid' => $urlparams->d), 'value ASC', 'name AS value, name AS label');
 foreach ($fields as $field) {
-    $options['renderers'][$field] = array('Default' => 'Default');
+    $options['renderers'][$field] = $commonrenderers; // TODO: add field-specific renderers here
+    $options['renderers'][$field][''] = get_string('defaultrenderer', 'datalynx');
 }
+$options['types'] = $DB->get_records_select_menu('datalynx_fields', 'dataid = :dataid', array('dataid' => $urlparams->d), 'name ASC', 'name, type');
 
 $module = array(
     'name'=>'mod_datalynx',
@@ -48,8 +52,13 @@ $module = array(
 
 $PAGE->requires->js_init_call('M.mod_datalynx.tag_manager.init', $options, true, $module);
 $PAGE->requires->string_for_js('behavior', 'datalynx');
-$PAGE->requires->string_for_js('defaultbehavior', 'datalynx');
-$PAGE->requires->string_for_js('defaultbehavior', 'datalynx');
+$PAGE->requires->string_for_js('renderer', 'datalynx');
+$PAGE->requires->string_for_js('fieldname', 'datalynx');
+$PAGE->requires->string_for_js('fieldtype', 'datalynx');
+$PAGE->requires->string_for_js('tagproperties', 'datalynx');
+$PAGE->requires->string_for_js('deletetag', 'datalynx');
+$PAGE->requires->string_for_js('action', 'datalynx');
+$PAGE->requires->string_for_js('field', 'datalynx');
 
 $df->set_page('view/view_edit', array('modjs' => true, 'urlparams' => $urlparams));
 
@@ -68,7 +77,7 @@ if ($urlparams->vedit) {
 
 $mform = $view->get_form();
 
-// for cancelled
+// form cancelled
 if ($mform->is_cancelled()){
         if ($urlparams->returnurl) {
             redirect($urlparams->returnurl);
@@ -130,3 +139,4 @@ $mform->set_data($view->to_form());
 $mform->display();
 
 $df->print_footer();
+

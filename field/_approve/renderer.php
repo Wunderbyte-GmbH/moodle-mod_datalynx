@@ -32,7 +32,7 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
     /**
      * 
      */
-    protected function replacements(array $tags = null, $entry = null, array $options = null) {
+    public function replacements(array $tags = null, $entry = null, array $options = null) {
         $df = $this->_field->df();
 
         $canapprove = has_capability('mod/datalynx:approve', $df->context);
@@ -75,7 +75,6 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
      *
      */
     public function display_edit(&$mform, $entry, array $options = null) {
-        $mform->addElement('html', '<div data-field-type="' . $this->_field->type . '" data-field-name="' . $this->_field->field->name . '">');
         $field = $this->_field;
         $fieldid = $field->id();
         $entryid = $entry->id;
@@ -89,8 +88,6 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
         $fieldname = "field_{$fieldid}_{$entryid}";
         $mform->addElement('checkbox', $fieldname, null);
         $mform->setDefault($fieldname, $checked);
-
-        $mform->addElement('html', '</div>');
     }
 
     /**

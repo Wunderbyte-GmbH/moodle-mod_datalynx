@@ -21,6 +21,9 @@
  */
 defined('MOODLE_INTERNAL') or die;
 
+require_once(dirname(__FILE__). '/../behavior/behavior.php');
+require_once(dirname(__FILE__). '/../renderer/renderer.php');
+
 /**
  * Base class for field patterns
  */
@@ -32,6 +35,15 @@ abstract class datalynxfield_renderer {
     const RULE_REQUIRED = '*';
     const RULE_HIDDEN = '^';
     const RULE_NOEDIT = '!';
+
+    protected static $defaultoptions = array(
+        'manage' => false,
+        'visible' => false,
+        'edit' => false,
+        'editable' => false,
+        'disabled' => false,
+        'required' => false,
+        'internal' => false);
 
     /**
      * @var datalynxfield_base
@@ -48,51 +60,22 @@ abstract class datalynxfield_renderer {
     /**
      * Search and collate field patterns that occur in given text
      *
-     * @param string Text that may contain field patterns
+     * @param string $text text that may contain field patterns
      * @return array Field patterns found in the text
      */
     public function search($text) {
-        $fieldid = $this->_field->field->id;
-        $fieldname = $this->_field->name();
-
         $found = array();
 
-
         $matches = array();
+        $fieldname = $this->_field->name();
         if (preg_match_all("/\[\[$fieldname(?:\|(?:[^\]]+))?\]\]/", $text, $matches)) {
             $found = array_merge($found, $matches[0]);
         }
 
-        // Legacy code below
-        
-        // Capture label patterns
-        if (strpos($text, "[[$fieldname@]]") !== false and !empty($this->_field->field->label)) {
-            $found[] = "[[$fieldname]]";
-            $found[] = "[[$fieldname@]]";
-            
-            $text = str_replace("[[$fieldname@]]", $this->_field->field->label, $text);
-        }
-        
-        // Search and collate field patterns
         $patterns = array_keys($this->patterns());
-        $wrapopen = is_numeric($fieldid) && $fieldid > 0 ? '\[\[' : '##';
-        $wrapclose = is_numeric($fieldid) && $fieldid > 0 ? '\]\]' : '##';
-        $labelpattern = false;
-        if ($rules = implode('', $this->supports_rules())) {
-            // Patterns may have rule prefix
-            foreach ($patterns as $pattern) {
-                $pattern = trim($pattern, '[]#');
-                $pattern = $wrapopen. "[$rules]*$pattern". $wrapclose;
-                preg_match_all("/$pattern/", $text, $matches);
-                if (!empty($matches[0])) {
-                    $found = array_merge($found, $matches[0]);
-                }
-            }
-        } else {
-            foreach ($patterns as $pattern) {
-                if (strpos($text, $pattern) !== false) {
-                    $found[] = $pattern;
-                }
+        foreach ($patterns as $pattern) {
+            if (strpos($text, $pattern) !== false) {
+                $found[] = $pattern;
             }
         }
 
@@ -100,14 +83,214 @@ abstract class datalynxfield_renderer {
     }
 
     /**
-     * @return string characters of supported rulesCleans a pattern from auxiliary indicators (e.g. * for required)
+     * Returns array of replacements for the field patterns
+     * The label pattern should always be first where applicable
+     * so that it is processed first in view templates
+     * so that in turn patterns it may contain could be processed.
+     *
+     * @return array pattern => array(visible in menu, category) -> WRONG WRONG WRONG
      */
-    protected function supports_rules() {
-        return array();
+    public function replacements(array $tags = null, $entry = null, array $options = null) {
+        $replacements = array();
+        foreach ($tags as $tag) {
+            $currentoptions = array_merge(self::$defaultoptions, $options);
+            list($fieldname, $behavior, $renderer) = $this->process_tag($tag);
+            /* @var $field datalynxfield_base */
+            /* @var $behavior datalynx_field_behavior */
+            /* @var $renderer datalynx_field_renderer */
+
+            $splitfieldname = explode(':', $fieldname);
+            if (isset($splitfieldname[1])) {
+                $currentoptions[$splitfieldname[1]] = true;
+            }
+
+            $currentoptions['visible'] = $behavior->is_visible_to_user() && (strpos($tag, self::RULE_HIDDEN) === false);
+            $currentoptions['editable'] = $behavior->is_editable_by_user() && (strpos($tag, self::RULE_NOEDIT) === false);
+            $currentoptions['required'] = $behavior->is_required() || (strpos($tag, self::RULE_REQUIRED) !== false);
+            $currentoptions['internal'] = $this->_field->is_internal();
+
+            if (!$currentoptions['visible']) { // ====================================================== NOT VISIBLE ===
+                if ($renderer->get_not_visible_template() !== $renderer::NOT_VISIBLE_SHOW_NOTHING) {
+                    $replacements[$tag] = array('html', '');
+                } else {
+                    $replacements[$tag] = array('html', $renderer->get_not_visible_template());
+                }
+            } else { // ==================================================================================== VISIBLE ===
+                if ($currentoptions['edit']) { // ======================================================== EDIT MODE ===
+                    if (!$currentoptions['editable']) { // ==============================================NOT EDITABLE ===
+                        if ($renderer->get_not_editable_template() === $renderer::NOT_EDITABLE_SHOW_NOTHING) {
+                            $replacements[$tag] = array('html', '');
+                        } else if ($renderer->get_not_editable_template() === $renderer::NOT_EDITABLE_SHOW_AS_DISPLAY_MODE) {
+                            $currentoptions['template'] = $renderer->get_display_template();
+                            $replacements[$tag] = ['', [[$this ,'prerender_edit_mode'], [$entry, $currentoptions]]];
+                        } else if ($renderer->get_not_editable_template() === $renderer::NOT_EDITABLE_SHOW_DISABLED) {
+                            $currentoptions['disabled'] = $renderer->get_not_editable_template() == $renderer::NOT_EDITABLE_SHOW_DISABLED;
+                            $replacements[$tag] = ['', [[$this ,'prerender_edit_mode'], [$entry, $currentoptions]]];
+                        } else {
+                            $replacements[$tag] = array('html', $renderer->get_not_editable_template());
+                        }
+                    } else { // =========================================================================== EDITABLE ===
+                        if ($renderer->get_edit_template() === $renderer::EDIT_MODE_TEMPLATE_NONE) {
+                            $replacements[$tag] = ['', [[$this ,'prerender_edit_mode'], [$entry, $currentoptions]]];
+                        } else {
+                            $currentoptions['template'] = $renderer->get_edit_template();
+                            $replacements[$tag] = ['', [[$this ,'prerender_edit_mode'], [$entry, $currentoptions]]];
+                        }
+                    }
+                } else { // =========================================================================== DISPLAY MODE ===
+                    $replacement = $this->render_display_mode($entry, $currentoptions);
+                    if ($replacement === '') { // ========================================================= NO VALUE ===
+                        if ($renderer->get_no_value_template() === $renderer::NO_VALUE_SHOW_NOTHING) {
+                            $replacements[$tag] = array('html', '');
+                        } else if ($renderer->get_no_value_template() === $renderer::NO_VALUE_SHOW_DISPLAY_MODE_TEMPLATE) {
+                            $replacements[$tag] = array('html', $this->replace_renderer_template_tags($renderer->get_display_template(), ''));
+                        } else {
+                            $replacements[$tag] = array('html', $renderer->get_no_value_template());
+                        }
+                    } else { // ========================================================================== HAS VALUE ===
+                        if ($renderer->get_display_template() === $renderer::DISPLAY_MODE_TEMPLATE_NONE) {
+                            $replacements[$tag] = array('html', $replacement);
+                        } else {
+                            $replacements[$tag] = array('html', $this->replace_renderer_template_tags($renderer->get_display_template(), $replacement));
+                        }
+                    }
+
+                }
+            }
+        }
+
+        return $replacements;
+    }
+
+    /**
+     * TODO: add hash escaping option!
+     * @param $template
+     * @param $value
+     * @return mixed
+     */
+    private function replace_renderer_template_tags($template, $value) {
+        return preg_replace('/#value/', $value, $template);
+    }
+
+    /**
+     * Processes a tag string and returns all relevant info: the field name, and the referenced behavior and renderer
+     * @param string $tag
+     * @return array
+     */
+    private function process_tag($tag) {
+        $pattern = '/\[\[([^\|\]]+)(?:\|([^\|\]]*))?(?:\|([^\|\]]*))?\]\]/';
+        $matches = array();
+
+        $fieldname = $this->_field->name();
+        $behavior = datalynx_field_behavior::get_default_behavior($this->_field->df());
+        $renderer = datalynx_field_renderer::get_default_renderer($this->_field->df());
+
+        if (preg_match($pattern, $tag, $matches)) {
+            $fieldname = isset($matches[1]) ? $matches[1] : false;
+
+            $behaviorname = isset($matches[2]) ? $matches[2] : false;
+            if ($behaviorname) {
+                $behavior = datalynx_field_behavior::from_name($behaviorname);
+            }
+
+            $renderername = isset($matches[3]) ? $matches[3] : false;
+            if ($renderername) {
+                $renderer = datalynx_field_renderer::get_renderer_by_name($renderername);
+            }
+        }
+
+        return array($fieldname, $behavior, $renderer);
+    }
+
+    /**
+     * TODO: make abstract once all field types have been updated
+     */
+    public function render_display_mode(stdClass $entry, array $options) {
+        $fieldid = $this->_field->id();
+
+        if (isset($entry->{"c{$fieldid}_content"})) {
+            $content = $entry->{"c{$fieldid}_content"};
+            $str = format_text($content);
+        } else {
+            $str = '';
+        }
+
+        return $str;
+    }
+
+    public function prerender_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
+        if (isset($options['template']) && strpos($options['template'], '#input') !== false) {
+            $splittemplate = explode('#input', $options['template']);
+            $options['prefix'] = $splittemplate[0];
+            $options['suffix'] = $splittemplate[1];
+        }
+
+        $mform->addElement('html', '<div class="datalynx-field-wrapper" data-field-type="' . $this->_field->type . '" data-field-name="' . $this->_field->field->name . '">');
+        if (isset($options['prefix'])) {
+            $mform->addElement('html', $options['prefix']);
+        }
+        $this->render_edit_mode($mform, $entry, $options);
+        if (isset($options['suffix'])) {
+            $mform->addElement('html', $options['suffix']);
+        }
+        $mform->addElement('html', '</div>');
+    }
+
+    /**
+     * TODO: make abstract once all field types have been updated
+     */
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
+        $fieldid = $this->_field->id();
+
+        $fieldname = "f_{$entry->id}_$fieldid";
+
+        $content = '';
+        if ($entry->id > 0 and !empty($entry->{"c{$fieldid}_content"})){
+            $content = $entry->{"c{$fieldid}_content"};
+        }
+
+        $arr = array();
+        $arr[] = &$mform->createElement('text', $fieldname, null, array('size' => '32', 'disabled' => ($options['disabled'] ? 'disabled' : null)));
+        $mform->setType($fieldname, PARAM_NOTAGS);
+        $mform->setDefault($fieldname, $content);
+    }
+
+    /**
+     * TODO: make abstract once all field types have been updated
+     */
+    public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
+        $fieldid = $this->_field->id();
+        $fieldname = "f_{$i}_$fieldid";
+
+        $arr = array();
+        $arr[] = &$mform->createElement('text', $fieldname, null, array('size'=>'32'));
+        $mform->setType($fieldname, PARAM_NOTAGS);
+        $mform->setDefault($fieldname, $value);
+        $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
+
+        return array($arr, null);
+    }
+
+    /**
+     * TODO: rename all existing into one of the above
+     */
+    public function display_search(&$mform, $i = 0, $value = '') {
+        /* @var $mform MoodleQuickForm */
+        $fieldid = $this->_field->id();
+        $fieldname = "f_{$i}_$fieldid";
+
+        $arr = array();
+        $arr[] = &$mform->createElement('text', $fieldname, null, array('size'=>'32'));
+        $mform->setType($fieldname, PARAM_NOTAGS);
+        $mform->setDefault($fieldname, $value);
+        $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
+
+        return array($arr, null);
     }
 
     /**
      * Cleans a pattern from auxiliary indicators (e.g. * for required)
+     * TODO: deprecate once all uses have been replaced with the new behavior functionality
      */
     public function add_clean_pattern_keys(array $patterns) {
         $keypatterns = array();
@@ -115,30 +298,6 @@ abstract class datalynxfield_renderer {
             $keypatterns[$pattern] = str_replace($this->supports_rules(), '', $pattern);
         }
         return $keypatterns;
-    }
-
-    /**
-     *
-     */
-    public function pluginfile_patterns() {
-        return array();
-    }
-
-    /**
-     *
-     */
-    public function display_search(&$mform, $i = 0, $value = '') {
-        /* @var $mform MoodleQuickForm */
-        $fieldid = $this->_field->id();
-        $fieldname = "f_{$i}_$fieldid";
-        
-        $arr = array();
-        $arr[] = &$mform->createElement('text', $fieldname, null, array('size'=>'32'));
-        $mform->setType($fieldname, PARAM_NOTAGS);
-        $mform->setDefault($fieldname, $value);
-        $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
-        
-        return array($arr, null);
     }
 
     /**
@@ -169,54 +328,9 @@ abstract class datalynxfield_renderer {
     /**
      *
      */
-    public function get_replacements(array $tags, stdClass $entry, array $options) {
-        $replacements = $this->replacements($tags, $entry, $options);
-        return $this->apply_behavior_options($replacements, $options);
-    }
-
-    /**
-     * Handles visibility,
-     * @param array $replacements
-     * @param array $options
-     * @return array
-     */
-    private function apply_behavior_options(array $replacements, array $options) {
-        $new = array();
-        foreach ($replacements as $tag => $replacement) {
-            if ($options['edit'] && !$options['editable']) {
-                if (!$this->_field->is_internal()) {
-                    $replacement = array('html', '<em>[[field not editable]]</em>');
-                } else {
-                    $replacement = array('html', '');
-                }
-
-            }
-
-            if (!$options['visible'] && !$this->_field->is_internal()) {
-                $replacement = array('html', '<em>[[field not visible]]</em>');
-            }
-
-            $new[$tag] = $replacement;
-        }
-        return $new;
-    }
-
-    /**
-     *
-     */
     public function validate_data($entryid, $tags, $data) {
         return array();
     }
-
-    /**
-     * Returns array of replacements for the field patterns
-     * The label pattern should always be first where applicable
-     * so that it is processed first in view templates 
-     * so that in turn patterns it may contain could be processed.
-     *
-     * @return array pattern => array(visible in menu, category) -> WRONG WRONG WRONG
-     */
-    abstract protected function replacements(array $tags = null, $entry = null, array $options = null);
 
     /**
      * Array of patterns this field supports
@@ -233,5 +347,19 @@ abstract class datalynxfield_renderer {
         $patterns["[[$fieldname]]"] = array(true);
 
         return $patterns;
+    }
+
+    /**
+     * @return string characters of supported rulesCleans a pattern from auxiliary indicators (e.g. * for required)
+     */
+    protected function supports_rules() {
+        return array();
+    }
+
+    /**
+     *
+     */
+    public function pluginfile_patterns() {
+        return array();
     }
 }

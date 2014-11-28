@@ -32,8 +32,8 @@ class datalynxfield_number_renderer extends datalynxfield_text_renderer {
     /**
      *
      */
-    public function display_edit(&$mform, $entry, array $options = null) {
-        parent::display_edit($mform, $entry, $options);
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
+        parent::render_edit_mode($mform, $entry, $options);
         
         $fieldid = $this->_field->id();
         $entryid = $entry->id;
@@ -44,7 +44,7 @@ class datalynxfield_number_renderer extends datalynxfield_text_renderer {
     /**
      *
      */
-    protected function display_browse($entry, $params = null) {
+    public function render_display_mode(stdClass $entry, array $params) {
         $field = $this->_field;
         $fieldid = $field->id();
         if (isset($entry->{"c{$fieldid}_content"})) {

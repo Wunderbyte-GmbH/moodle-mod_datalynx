@@ -32,7 +32,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
     /**
      * 
      */
-    protected function replacements(array $tags = null, $entry = null, array $options = null) {
+    public function replacements(array $tags = null, $entry = null, array $options = null) {
         $field = $this->_field;
         $fieldname = $field->get('internalname');
         $edit = !empty($options['edit']) ? $options['edit'] : false;

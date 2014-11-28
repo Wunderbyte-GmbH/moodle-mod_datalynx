@@ -30,48 +30,9 @@ require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 class datalynxfield_url_renderer extends datalynxfield_renderer {
 
     /**
-     * 
-     */
-    protected function replacements(array $tags = null, $entry = null, array $options = null) {
-        $field = $this->_field;
-        $fieldname = $field->name();
-        $edit = !empty($options['edit']) ? $options['edit'] : false;
-
-        $replacements = array();
-        // rules support
-        $tags = $this->add_clean_pattern_keys($tags);        
-        
-        $editonce = false;
-        foreach ($tags as $tag => $cleantag) {
-            if ($edit) {
-                if (!$editonce) {
-                    $required = $options['required'];
-                    $replacements[$tag] = array('', array(array($this,'display_edit'), array($entry, array('required' => $required))));
-                    $editonce = true;
-                } else {
-                    $replacements[$tag] = '';
-                }
-            } else {
-                $parts = explode(':', trim($cleantag, '[]'));
-                if (!empty($parts[1])) {
-                    $type = $parts[1];
-                } else {
-                    $type = '';
-                }
-                $replacements[$tag] = array('html', $this->display_browse($entry, $type));
-            }
-        }
-
-        return $replacements;
-    }
-
-    /**
      *
      */
-    public function display_edit(&$mform, $entry, array $options = null) {
-        $mform->addElement('html', '<div data-field-type="' . $this->_field->type . '" data-field-name="' . $this->_field->field->name . '">');
-        global $CFG, $PAGE;
-
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $field = $this->_field;
         $fieldid = $field->id();
         $entryid = $entry->id;
@@ -97,17 +58,18 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
             $mform->setType("{$fieldname}_alt", PARAM_TEXT);
             $mform->setDefault("{$fieldname}_alt", s($alt));
         }
-        $mform->addElement('html', '</div>');
     }
 
     /**
      *
      */
-    protected function display_browse($entry, $type = '') {
+    public function render_display_mode(stdClass $entry, array $params) {
         global $CFG;
 
         $field = $this->_field;
         $fieldid = $field->id();
+        $types = array_intersect(['link', 'image', 'imageflex', 'media'], array_keys($params));
+        $type = isset($types[0]) ? $types[0] : '';
         $attributes = array('class' => $field->class,
                             'target' => $field->target);
 

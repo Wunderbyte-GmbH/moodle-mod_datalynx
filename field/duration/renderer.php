@@ -32,70 +32,7 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
     /**
      *
      */
-    protected function replacements(array $tags = null, $entry = null, array $options = null) {
-        $field = $this->_field;
-        $fieldname = $field->name();
-        $edit = !empty($options['edit']) ? $options['edit'] : false;
-
-        $replacements = array();
-        // rules support
-        $tags = $this->add_clean_pattern_keys($tags);
-
-        foreach ($tags as $tag => $cleantag) {
-            if ($edit) {
-                if ($cleantag == "[[$fieldname]]") {
-                    $required = $options['required'];
-                    $replacements[$tag] = array('', array(array($this,'display_edit'), array($entry, array('required' => $required))));
-                } else {
-                    $replacements[$tag] = '';
-                }
-            } else {
-                switch ($cleantag) {
-                    case "[[$fieldname]]":
-                        $replacements[$tag] = array('html', $this->display_browse($entry));
-                        break;
-                    case "[[$fieldname:unit]]":
-                        $replacements[$tag] = array('html', $this->display_browse($entry, array('format' => 'unit')));
-                        break;
-                    case "[[$fieldname:value]]":
-                        $replacements[$tag] = array('html', $this->display_browse($entry, array('format' => 'value')));
-                        break;
-                    case "[[$fieldname:seconds]]":
-                        $replacements[$tag] = array('html', $this->display_browse($entry, array('format' => 'seconds')));
-                        break;
-                    case "[[$fieldname:interval]]":
-                        $replacements[$tag] = array('html', $this->display_browse($entry, array('format' => 'interval')));
-                        break;
-                    default:
-                        $replacements[$tag] = '';
-                }
-            }
-        }
-
-        return $replacements;
-    }
-
-    /**
-     *
-     */
-    public function display_search(&$mform, $i = 0, $value = '') {
-        $fieldid = $this->_field->id();
-        $fieldname = "f_{$i}_$fieldid";
-
-        $arr = array();
-        $arr[] = &$mform->createElement('duration', $fieldname);
-        $mform->setType($fieldname, PARAM_NOTAGS);
-        $mform->setDefault($fieldname, $value);
-        $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
-
-        return array($arr, null);
-    }
-
-    /**
-     *
-     */
-    public function display_edit(&$mform, $entry, array $options = null) {
-        $mform->addElement('html', '<div data-field-type="' . $this->_field->type . '" data-field-name="' . $this->_field->field->name . '">');
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $field = $this->_field;
         $fieldid = $field->id();
         $entryid = $entry->id;
@@ -112,19 +49,18 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
             $fieldattr['style'] = 'width:'. s($field->get('param2')). s($field->get('param3')). ';';
         }
 
-        $elem = &$mform->addElement('duration', $fieldname, '', array('optional' => null), $fieldattr);
+        $mform->addElement('duration', $fieldname, '', array('optional' => null), $fieldattr);
         $mform->setDefault($fieldname, $number);
         $required = !empty($options['required']);
         if ($required) {
             $mform->addRule($fieldname, null, 'required', null, 'client');
         }
-        $mform->addElement('html', '</div>');
     }
 
     /**
      *
      */
-    protected function display_browse($entry, $params = null) {
+    public function render_display_mode(stdClass $entry, array $params) {
         $field = $this->_field;
         $fieldid = $field->id();
         if (isset($entry->{"c{$fieldid}_content"})) {
@@ -155,6 +91,22 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
             }
         }
         return '';
+    }
+
+    /**
+     *
+     */
+    public function display_search(&$mform, $i = 0, $value = '') {
+        $fieldid = $this->_field->id();
+        $fieldname = "f_{$i}_$fieldid";
+
+        $arr = array();
+        $arr[] = &$mform->createElement('duration', $fieldname);
+        $mform->setType($fieldname, PARAM_NOTAGS);
+        $mform->setDefault($fieldname, $value);
+        $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
+
+        return array($arr, null);
     }
 
     /**

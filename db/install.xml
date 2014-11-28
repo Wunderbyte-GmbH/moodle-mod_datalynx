@@ -206,12 +206,16 @@
     </TABLE>
     <TABLE NAME="datalynx_renderers" COMMENT="Governs visual representation of fields" PREVIOUS="datalynx_behaviors">
       <FIELDS>
-          <FIELD NAME="id"          TYPE="int"  LENGTH="10"    NOTNULL="true"  SEQUENCE="true"                         NEXT="dataid"/>
-          <FIELD NAME="dataid"      TYPE="int"  LENGTH="10"    NOTNULL="true"  SEQUENCE="false" PREVIOUS="id"          NEXT="type"/>
-          <FIELD NAME="type"        TYPE="char" LENGTH="255"   NOTNULL="true"  SEQUENCE="false" PREVIOUS="dataid"      NEXT="name"/>
-          <FIELD NAME="name"        TYPE="char" LENGTH="255"   NOTNULL="true"  SEQUENCE="false" PREVIOUS="type"        NEXT="description"/>
-          <FIELD NAME="description" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="name"        NEXT="data"/>
-          <FIELD NAME="properties"  TYPE="text" LENGTH="big"   NOTNULL="false" SEQUENCE="false" PREVIOUS="description"/>
+          <FIELD NAME="id"          TYPE="int"  LENGTH="10"    NOTNULL="true"  SEQUENCE="true"                    NEXT="dataid"/>
+          <FIELD NAME="dataid"      TYPE="int"  LENGTH="10"    NOTNULL="true"  SEQUENCE="false" PREVIOUS="id"     NEXT="type"/>
+          <FIELD NAME="type"        TYPE="char" LENGTH="255"   NOTNULL="true"  SEQUENCE="false" PREVIOUS="dataid" NEXT="name"/>
+          <FIELD NAME="name"        TYPE="char" LENGTH="255"   NOTNULL="true"  SEQUENCE="false" PREVIOUS="type"   NEXT="description"/>
+          <FIELD NAME="description" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="name"   NEXT="notvisibletemplate"/>
+          <FIELD NAME="notvisibletemplate"  TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" PREVIOUS="description"        NEXT="displaytemplate"/>
+          <FIELD NAME="displaytemplate"     TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" PREVIOUS="notvisibletemplate" NEXT="novaluetemplate"/>
+          <FIELD NAME="novaluetemplate"     TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" PREVIOUS="displaytemplate"    NEXT="edittemplate"/>
+          <FIELD NAME="edittemplate"        TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" PREVIOUS="novaluetemplate"    NEXT="noteditabletemplate"/>
+          <FIELD NAME="noteditabletemplate" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" PREVIOUS="edittemplate"/>
       </FIELDS>
       <KEYS>
           <KEY NAME="primary" TYPE="primary" FIELDS="id"     NEXT="dataid"/>

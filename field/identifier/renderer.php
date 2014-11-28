@@ -32,31 +32,7 @@ class datalynxfield_identifier_renderer extends datalynxfield_renderer {
     /**
      *
      */
-    protected function replacements(array $tags = null, $entry = null, array $options = null) {
-        $field = $this->_field;
-        $fieldname = $field->name();
-        $edit = !empty($options['edit']) ? $options['edit'] : false;
-
-        // No rules support
-        $replacements = array_fill_keys($tags, '');
-
-        // Only one tag
-        $tag = "[[$fieldname]]";
-        if (array_key_exists($tag, $replacements)) {
-            if ($edit) {
-                $replacements[$tag] = array('', array(array($this,'display_edit'), array($entry)));
-            } else {
-                $replacements[$tag] = array('html', $this->display_browse($entry));
-            }
-        }
-
-        return $replacements;
-    }
-
-    /**
-     *
-     */
-    public function display_edit(&$mform, $entry, array $options = null) {
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $field = $this->_field;
         $fieldid = $field->id();
         $entryid = $entry->id;
@@ -78,7 +54,7 @@ class datalynxfield_identifier_renderer extends datalynxfield_renderer {
     /**
      *
      */
-    protected function display_browse($entry, $params = null) {
+    public function render_display_mode(stdClass $entry, array $params) {
         $field = $this->_field;
         $fieldid = $field->id();
 
@@ -88,18 +64,6 @@ class datalynxfield_identifier_renderer extends datalynxfield_renderer {
         }
 
         return $content;
-    }
-
-    /**
-     * Array of patterns this field supports
-     */
-    protected function patterns() {
-        $fieldname = $this->_field->name();
-
-        $patterns = parent::patterns();
-        $patterns["[[$fieldname]]"] = array(true);
-
-        return $patterns;
     }
 
 }
