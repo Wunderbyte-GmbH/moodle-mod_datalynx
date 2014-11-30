@@ -16,115 +16,51 @@
 
 /**
  * @package datalynxview
- * @copyright 2011 Itamar Tzadok
+ * @copyright 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once $CFG->libdir.'/formslib.php';
 
-/**
- *
- */
 class datalynxview_entries_form extends moodleform {
 
-    function definition() {
-
+    protected function definition() {
         $view = $this->_customdata['view'];
         $mform =& $this->_form;
         $mform->addElement('hidden', 'new', optional_param('new', 0, PARAM_INT));
-        $mform->setType('new', PARAM_BOOL);
+        $mform->setType('new', PARAM_INT);
 
-        // buttons
-        //-------------------------------------------------------------------------------
         $this->add_action_buttons();
 
-        // entries
-        //-------------------------------------------------------------------------------
         $view->definition_to_form($mform);
 
-        // buttons again
-        //-------------------------------------------------------------------------------
         $this->add_action_buttons();
     }
 
-    /**
-     *
-     */
-    function add_action_buttons($cancel = true, $submit = null) {
-        $mform = &$this->_form;
-        
-        static $i = 0;
-        $i++;
-
-        $arr = array();
-        $submitlabel = $submit ? $submit : get_string('savechanges');
-        $arr[] = &$mform->createElement('submit', "submitbutton$i", $submitlabel);
-        if ($this->add_action_save_continue()) {
-            $arr[] = &$mform->createElement('submit', "submitreturnbutton$i", get_string('savecontinue', 'datalynx'));
-        }
-        if ($cancel) {
-            $arr[] = &$mform->createElement('cancel', "cancel$i");
-        }
-        $mform->addGroup($arr, 'buttonarr', null, ' ', false);
-    }
-
-    /**
-     *
-     */
-    protected function add_action_save_continue() {
-        return false;
-    }
-
-    /**
-     *
-     */
-    public function html() {
-        return $this->_form->toHtml();
-    }
-
-    /**
-     *
-     */
     function validation($data, $files) {
-        global $CFG;
+        $errors = parent::validation($data, $files);
 
-        if (!$errors = parent::validation($data, $files)) {
-
-            $errors = array();
-            
-            // field validations
+        if (empty($errors)) {
             $view = $this->_customdata['view'];
             $patterns = $view->get__patterns('field');
             $fields = $view->get_view_fields();
             $entryids = explode(',', $this->_customdata['update']);
 
-            foreach ($entryids as $eid) {
-                // validate all fields for this entry
+            foreach ($entryids as $entryid) {
                 foreach ($fields as $fid => $field) {
-                    // captcha check
-                    if ($field->type() == 'captcha') {
-                        if (!empty($CFG->recaptchapublickey) and !empty($CFG->recaptchaprivatekey)) {
-                            $mform = $this->_form;
-                            $values = $mform->_submitValues;
-                            if (!empty($values['recaptcha_challenge_field'])) {
-                                $formfield = "field_{$fid}_$eid";
-                                $captchaelement = $mform->getElement($formfield); 
-                                $challenge = $values['recaptcha_challenge_field'];
-                                $response = $values['recaptcha_response_field'];
-                                if (true !== ($result = $captchaelement->verify($challenge, $response))) {
-                                    $errors[$formfield] = $result;
-                                }
-                            } else {
-                                $errors[$formfield] = get_string('missingrecaptchachallengefield');
-                            }
-                        }                
-                           
-                    } else if ($err = $field->validate($eid, $patterns[$fid], (object) $data)) {
-                        $errors = array_merge($errors, $err);
-                    }
+                    $errors = array_merge($errors, $field->renderer()->validate($entryid, $patterns[$fid], (object) $data));
                 }
             }
         }
 
         return $errors;
     }
+
+    /**
+     * Returns an HTML version of the form
+     * @return string HTML version of the form
+     */
+    public function html() {
+        return $this->_form->toHtml();
+    }
+
 }

@@ -40,8 +40,6 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
         $edit = !empty($options['edit']) ? $options['edit'] : false;
 
         $replacements = array();
-        // rules support
-        $tags = $this->add_clean_pattern_keys($tags);
 
         foreach ($tags as $tag => $cleantag) {
             if (!$entry or $edit) {
@@ -129,12 +127,4 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
         return $patterns;
     }
 
-    /**
-     * Array of patterns this field supports
-     */
-    protected function supports_rules() {
-        return array(
-            self::RULE_REQUIRED
-        );
-    }
 }

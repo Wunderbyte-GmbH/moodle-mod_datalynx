@@ -15,11 +15,11 @@ M.datalynxfield_checkbox_required.init = function(Y, options) {
         var selected = options.selected;
         var err_message = options.message;
         
-        if (!Y.one('#fgroup_id_'+fieldname+'_grp')) {
+        if (!Y.one('#fgroup_id_'+fieldname)) {
             return;
         }
         
-        Y.one('#fgroup_id_'+fieldname+'_grp').on('click', function (e) {
+        Y.one('#fgroup_id_'+fieldname).on('click', function (e) {
             if (e.target.get('className') === 'checkboxgroup'+fieldname+'_selected') {
                 var empty = true;
                 Y.all('.checkboxgroup'+fieldname+'_selected').each(function(check) {

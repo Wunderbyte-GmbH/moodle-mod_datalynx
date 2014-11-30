@@ -47,17 +47,22 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
         $options = array(
             'title' => s($field->field->description),
             'size' => 64
-        );        
-        $mform->addElement('url', "{$fieldname}_url", null, $options, array('usefilepicker' => $usepicker));
+        );
+
+        $group = array();
+        $group[] = $mform->createElement('url', "{$fieldname}_url", null, $options, array('usefilepicker' => $usepicker));
         $mform->setType("{$fieldname}_url", PARAM_URL);
         $mform->setDefault("{$fieldname}_url", s($url));
 
         // add alt name if not forcing name
         if (empty($field->field->param2)) {
-            $mform->addElement('text', "{$fieldname}_alt", get_string('alttext','datalynxfield_url'));
+            $group[] = $mform->createElement('static', '', '', get_string('alttext','datalynxfield_url'));
+            $group[] = $mform->createElement('text', "{$fieldname}_alt", get_string('alttext','datalynxfield_url'));
             $mform->setType("{$fieldname}_alt", PARAM_TEXT);
             $mform->setDefault("{$fieldname}_alt", s($alt));
         }
+
+        $mform->addGroup($group, "{$fieldname}_grp", null, null, false);
     }
 
     /**
@@ -131,13 +136,5 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
         $patterns["[[$fieldname:media]]"] = array(false);
 
         return $patterns; 
-    }
-    /**
-     * Array of patterns this field supports 
-     */
-    protected function supports_rules() {
-        return array(
-            self::RULE_REQUIRED
-        );
     }
 }

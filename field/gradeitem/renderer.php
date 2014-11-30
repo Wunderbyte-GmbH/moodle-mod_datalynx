@@ -17,7 +17,7 @@
 /**
  * @package datalynxfield
  * @subpackage gradeitem
- * @copyright 2012 Itamar Tzadok
+ * @copyright 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die;
@@ -29,52 +29,15 @@ require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
  */
 class datalynxfield_gradeitem_renderer extends datalynxfield_renderer {
 
-    /**
-     *
-     */
-    public function replacements(array $tags = null, $entry = null, array $options = null) {
-        $field = $this->_field;
-        $fieldname = $field->name();
-
-        $replacements = array();
-
-        // there is only one possible tag here, no edit
-        $tag = "[[$fieldname]]";
-        $replacements[$tag] = array('html', $this->display_grade($entry));
-/*
-        switch ($field->infotype) {
-            case 'checkbox':
-                $replacements[$tag] = array('html', $this->display_checkbox($entry));
-                break;
-            case 'datetime':
-                $replacements[$tag] = array('html', $this->display_datetime($entry));
-                break;
-            case 'menu':
-            case 'text':
-                $replacements[$tag] = array('html', $this->display_text($entry));
-                break;
-            case 'textarea':
-                $replacements[$tag] = array('html', $this->display_richtext($entry));
-                break;
-            default:
-                $replacements[$tag] = '';
-        }
-*/
-        return $replacements;
-    }
-
-    /**
-     *
-     */
-    protected function display_grade($entry) {
+    public function render_display_mode(stdClass $entry, array $options) {
         $field = $this->_field;
         $fieldid = $field->id();
 
         if (!isset($entry->{"c{$fieldid}_content"})) {
             return '';
         }
-        
-        $number = (float) $entry->{"c{$fieldid}_content"};       
+
+        $number = (float) $entry->{"c{$fieldid}_content"};
         $decimals = 2;
         // only apply number formatting if param1 contains an integer number >= 0:
         if ($decimals) {
@@ -84,6 +47,10 @@ class datalynxfield_gradeitem_renderer extends datalynxfield_renderer {
             $str = (int) $number;
         }
         return $str;
+    }
+
+    function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
+        // not editable
     }
 
 }

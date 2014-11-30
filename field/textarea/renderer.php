@@ -17,29 +17,23 @@
 /**
  * @package datalynxfield
  * @subpackage textarea
- * @copyright 2011 Itamar Tzadok
+ * @copyright 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') or die;
 
-require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
+require_once(dirname(__FILE__) . "/../renderer.php");
 
 /**
- *
+ * Class datalynxfield_textarea_renderer Renderer for textarea field type
  */
 class datalynxfield_textarea_renderer extends datalynxfield_renderer {
 
-    /**
-     *
-     */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $field = $this->_field;
         $fieldid = $field->id();
         $entryid = $entry->id;
         $fieldname = "field_{$fieldid}_{$entryid}";
-
-        // editor
-        $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
 
         $attr = array();
         $attr['cols'] = !$field->get('param2') ? 40 : $field->get('param2');
@@ -49,26 +43,12 @@ class datalynxfield_textarea_renderer extends datalynxfield_renderer {
         $data->$fieldname = isset($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : '';
         $required = !empty($options['required']);
 
-        if (!$field->is_editor()) {
-            $mform->addElement('textarea', $fieldname, null, $attr);
-            $mform->setDefault($fieldname, $data->$fieldname);
-            if ($required) {
-                $mform->addRule($fieldname, null, 'required', null, 'client');
-            }
-        } else {
-            // format
-            $data->{"{$fieldname}format"} = isset($entry->{"c{$fieldid}_content1"}) ? $entry->{"c{$fieldid}_content1"} : FORMAT_HTML;
-
-            $data = file_prepare_standard_editor($data, $fieldname, $field->editor_options(), $field->df()->context, 'mod_datalynx', 'content', $contentid);
-
-            $mform->addElement('editor', "{$fieldname}_editor", null, $attr , $field->editor_options() + array('collapsed' => true));
-            $mform->setDefault("{$fieldname}_editor", $data->{"{$fieldname}_editor"});
-            $mform->setDefault("{$fieldname}[text]", $data->$fieldname);
-            $mform->setDefault("{$fieldname}[format]", $data->{"{$fieldname}format"});
-            if ($required) {
-                $mform->addRule("{$fieldname}_editor", null, 'required', null, 'client');
-            }
+        $mform->addElement('textarea', $fieldname, null, $attr);
+        $mform->setDefault($fieldname, $data->$fieldname);
+        if ($required) {
+            $mform->addRule($fieldname, null, 'required', null, 'client');
         }
+
     }
 
     /**
@@ -79,11 +59,8 @@ class datalynxfield_textarea_renderer extends datalynxfield_renderer {
         $fieldid = $field->id();
 
         if (isset($entry->{"c{$fieldid}_content"})) {
-            $contentid = $entry->{"c{$fieldid}_id"};
             $text = $entry->{"c{$fieldid}_content"};
             $format = isset($entry->{"c{$fieldid}_content1"}) ? $entry->{"c{$fieldid}_content1"} : FORMAT_PLAIN;
-
-            $text = file_rewrite_pluginfile_urls($text, 'pluginfile.php', $field->df()->context->id, 'mod_datalynx', 'content', $contentid);
 
             $options = new stdClass();
             $options->para = false;
@@ -94,19 +71,23 @@ class datalynxfield_textarea_renderer extends datalynxfield_renderer {
         }
     }
 
-    /**
-     *
-     */
-    public function pluginfile_patterns() {
-        return array("[[{$this->_field->name()}]]");
+    public function validate($entryid, $tags, $formdata) {
+        $fieldid = $this->_field->id();
+
+        $formfieldname = "field_{$fieldid}_{$entryid}";
+
+        $errors = array();
+        foreach ($tags as $tag) {
+            list(, $behavior,) = $this->process_tag($tag);
+            /* @var $behavior datalynx_field_behavior */
+            if ($behavior->is_required() and isset($formdata->$formfieldname)) {
+                if (!clean_param($formdata->$formfieldname, PARAM_NOTAGS)) {
+                    $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
+                }
+            }
+        }
+
+        return $errors;
     }
 
-    /**
-     * Array of patterns this field supports
-     */
-    protected function supports_rules() {
-        return array(
-            self::RULE_REQUIRED
-        );
-    }
 }

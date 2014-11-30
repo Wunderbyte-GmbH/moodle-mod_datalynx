@@ -176,7 +176,7 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
                 $arr[] = &$mform->createElement('select', 'searchoperator'. $count, '', $operatoroptions);
                 $mform->setDefault('searchoperator'. $count, $operator);
                 // field search elements
-                list($elems, $separators) = $fields[$fieldid]->renderer()->display_search($mform, $count, $value);
+                list($elems, $separators) = $fields[$fieldid]->renderer()->render_search_mode($mform, $count, $value);
                 
                 $arr = array_merge($arr, $elems);
                 if ($separators) {

@@ -23,23 +23,113 @@
 
 require_once("$CFG->dirroot/mod/datalynx/field/multiselect/field_class.php");
 
-class datalynxfield_checkbox extends datalynxfield_multiselect {
+class datalynxfield_checkbox extends datalynxfield_option_multiple {
 
     public $type = 'checkbox';
+
+    public $separators = array(
+        array('name' => 'New line', 'chr' => '<br />'),
+        array('name' => 'Space', 'chr' => '&#32;'),
+        array('name' => ',', 'chr' => '&#44;'),
+        array('name' => ', (with space)', 'chr' => '&#44;&#32;'),
+        array('name' => 'Unordered list', 'chr' => '</li><li>')
+    );
 
     /**
      *
      */
-    protected function content_names() {
-        $optioncount = count(explode("\n",$this->field->param1));
-        $contentnames = array('newvalue');
-        foreach (range(1, $optioncount) as $key) {
-            $contentnames[] = "selected_$key";
+    public function format_search_value($searchparams) {
+        list($not, $operator, $value) = $searchparams;
+        if (is_array($value)){
+            $selected = implode(', ', $value['selected']);
+            $allrequired = '('. ($value['allrequired'] ? get_string('requiredall') : get_string('requirednotall', 'datalynx')). ')';
+            return $not. ' '. $operator. ' '. $selected. ' '. $allrequired;
+        } else {
+            return false;
         }
-        // Add contentname selected for import
-        $contentnames[] = 'selected';
+    }
 
-        return $contentnames;
+    /**
+     *
+     */
+    public function get_search_sql($search) {
+        global $DB;
+
+        // TODO Handle search for empty field
+
+        list($not, , $value) = $search;
+
+        static $i=0;
+        $i++;
+        $name = "df_{$this->field->id}_{$i}_";
+        $params = array();
+
+        $allrequired = $value['allrequired'];
+        $selected    = $value['selected'];
+        $content = "c{$this->field->id}.content";
+
+        if ($selected) {
+            $conditions = array();
+            foreach ($selected as $key => $sel) {
+                $xname = $name. $key;
+                $likesel = str_replace('%', '\%', $sel);
+
+                $conditions[] = $DB->sql_like($content, ":{$xname}");
+                $params[$xname] = "%#$likesel#%";
+            }
+            if ($allrequired) {
+                return array(" $not (".implode(" AND ", $conditions).") ", $params, true);
+            } else {
+                return array(" $not (".implode(" OR ", $conditions).") ", $params, true);
+            }
+        } else {
+            return array(" ", $params);
+        }
+    }
+
+    /**
+     *
+     */
+    public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
+        // import only from csv
+        if ($csvrecord) {
+            $fieldid = $this->field->id;
+            $fieldname = $this->name();
+            $csvname = $importsettings[$fieldname]['name'];
+            $labels = !empty($csvrecord[$csvname]) ? explode('#', trim('#', $csvrecord[$csvname])) : null;
+
+            if ($labels) {
+                $options = $this->options_menu();
+                $selected = array();
+                foreach ($labels as $label) {
+                    if ($optionkey = array_search($label, $options)) {
+                        $selected[] = $optionkey;
+                    }
+                }
+                if ($selected) {
+                    $data->{"field_{$fieldid}_{$entryid}_selected"} = $selected;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     *
+     */
+    public function default_values() {
+        $rawdefaults = explode("\n",$this->field->param2);
+        $options = $this->options_menu();
+
+        $defaults = array();
+        foreach ($rawdefaults as $default) {
+            $default = trim($default);
+            if ($default and $key = array_search($default, $options)) {
+                $defaults[] = $key;
+            }
+        }
+        return $defaults;
     }
     
     /**
@@ -47,28 +137,23 @@ class datalynxfield_checkbox extends datalynxfield_multiselect {
      */
     protected function format_content($entry, array $values = null) {
         $fieldid = $this->field->id;
-        $entryid = $entry->id;
+        $contents = array();
+        $oldcontents = array();
 
-        // When called by import values are already collated in selected
-        if (!empty($values['selected'])) {
-            return parent::format_content($entry, $values);
+        // old contents
+        if (isset($entry->{"c{$fieldid}_content"})) {
+            $oldcontents[] = $entry->{"c{$fieldid}_content"};
         }
 
-        // When called by form submission collate the selected to one array
-        $selected = array();
-        if (!empty($values)) {
-            $optioncount = count(explode("\n",$this->field->param1));
-            foreach (range(1, $optioncount) as $key) {
-                if (!empty($values["selected_$key"])) {
-                    $selected[] = $key;
-                }
-            }
+        $value = reset($values);
+        // new contents
+        if (!empty($value)) {
+            $contents[] = '#' . implode('#', $value) . '#';
         }
-        $values['selected'] = $selected;
 
-        return parent::format_content($entry, $values);
+        return array($contents, $oldcontents);
     }
-    
+
     /**
      *
      */
@@ -93,26 +178,4 @@ class datalynxfield_checkbox extends datalynxfield_multiselect {
         }
     }
 
-    public function validate($entryid, $tags, $formdata) {
-        $fieldid = $this->id();
-        $fieldname = $this->name();
-
-        $formfieldname = "field_{$fieldid}_{$entryid}_selected";
-
-        // only [[$fieldname]] is editable so check it if exists
-        if (in_array("[[*$fieldname]]", $tags)) {
-            $emptyfield  = true;
-            foreach (array_keys($this->options_menu()) as $key) {
-                $formelementname = "{$formfieldname}_$key";
-                if (!empty($formdata->$formelementname)) {
-                    $emptyfield = false;
-                    break;
-                }
-            }
-            if ($emptyfield) {
-                return array("{$fieldname}_grp" => get_string('fieldrequired', 'datalynx'));
-            }
-        }
-        return null;
-    }
 }

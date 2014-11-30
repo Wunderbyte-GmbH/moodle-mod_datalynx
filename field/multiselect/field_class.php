@@ -26,7 +26,7 @@ require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 class datalynxfield_multiselect extends datalynxfield_option_multiple {
 
     public $type = 'multiselect';
-    protected $_options = array();
+
     public $separators = array(
             array('name' => 'New line', 'chr' => '<br />'),
             array('name' => 'Space', 'chr' => '&#32;'),
@@ -34,20 +34,6 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
             array('name' => ', (with space)', 'chr' => '&#44;&#32;'),
             array('name' => 'Unordered list', 'chr' => '</li><li>')
     );
-
-    
-    /**
-     * Class constructor
-     *
-     * @param var $df       datalynx id or class object
-     * @param var $field    field id or DB record
-     */
-    public function __construct($df = 0, $field = 0) {
-        parent::__construct($df, $field);
-        
-        // Set the options
-        $this->options_menu();
-    }
 
     /**
      *
@@ -118,67 +104,23 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
     /**
      *
      */
-    protected function content_names() {
-        return array('selected', 'newvalue');
-    }
-    
-    /**
-     *
-     */
     protected function format_content($entry, array $values = null) {
         $fieldid = $this->field->id;
-        $oldcontents = array();
         $contents = array();
+        $oldcontents = array();
 
         // old contents
         if (isset($entry->{"c{$fieldid}_content"})) {
             $oldcontents[] = $entry->{"c{$fieldid}_content"};
         }
 
-        // parse values
-        $selected = !empty($values['selected']) ? $values['selected'] : array();
-        $newvalues = !empty($values['newvalue']) ? explode('#', trim($values['newvalue'], '#')) : array();
-
-        // update new values in field type
-        if ($newvalues) {
-            $update = false;
-            foreach ($newvalues as $newvalue) {
-                if (!$optionkey = (int) array_search($newvalue, $this->_options)) {
-                    $update = true;
-                    $selected[] = count($this->_options);
-                    $this->_options[] = $newvalue;
-                }
-            }
-            if ($update) {
-                $this->field->param1 = implode("\n", $this->_options);
-                $this->update_field();
-            }
-        }
-
+        $value = reset($values);
         // new contents
-        if (!empty($selected)) {
-            $contents[] = '#' . implode('#', $selected) . '#';
+        if (!empty($value)) {
+            $contents[] = '#' . implode('#', $value) . '#';
         }
-        
-        return array($contents, $oldcontents);
-    }
 
-    /**
-     * 
-     */
-    public function options_menu($forceget = false) {
-        if (!$this->_options or $forceget) {
-            if (!empty($this->field->param1)) {
-                $rawoptions = explode("\n",$this->field->param1);
-                foreach ($rawoptions as $key => $option) {
-                    $option = trim($option);
-                    if ($option != '') {
-                        $this->_options[$key + 1] = $option;
-                    }
-                }
-            }
-        }
-        return $this->_options;
+        return array($contents, $oldcontents);
     }
 
     /**
@@ -190,28 +132,18 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
             $fieldid = $this->field->id;
             $fieldname = $this->name();
             $csvname = $importsettings[$fieldname]['name'];
-            $allownew = $importsettings[$fieldname]['allownew'];
             $labels = !empty($csvrecord[$csvname]) ? explode('#', trim('#', $csvrecord[$csvname])) : null;
 
             if ($labels) {
                 $options = $this->options_menu();
                 $selected = array();
-                $newvalues = array();
                 foreach ($labels as $label) {
-                    if (!$optionkey = array_search($label, $options)) {
-                        if ($allownew) {
-                            $newvalues[] = $label;
-                            $selected[] = count($options) + count($newvalues);
-                        }
-                    } else {
-                        $selected[] = $optionkey;                    
+                    if ($optionkey = array_search($label, $options)) {
+                        $selected[] = $optionkey;
                     }
                 }
                 if ($selected) {
                     $data->{"field_{$fieldid}_{$entryid}_selected"} = $selected;
-                }
-                if ($newvalues) {
-                    $data->{"field_{$fieldid}_{$entryid}_newvalue"} = '#' . implode('#', $newvalues) . '#';
                 }
             }
         }

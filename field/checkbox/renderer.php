@@ -17,67 +17,92 @@
 /**
  * @package datalynxfield
  * @subpackage checkbox
- * @copyright 2011 Itamar Tzadok
+ * @copyright 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die;
 
-require_once("$CFG->dirroot/mod/datalynx/field/multiselect/renderer.php");
+require_once(dirname(__FILE__) . "/../renderer.php");
 
 /**
- * 
+ * Class datalynxfield_checkbox_renderer Renderer for checkbox field type
  */
-class datalynxfield_checkbox_renderer extends datalynxfield_multiselect_renderer {
+class datalynxfield_checkbox_renderer extends datalynxfield_renderer {
 
-    /**
-     *
-     */
-    protected function render(&$mform, $fieldname, $options, $selected, $required = false) {
-        global $PAGE;
-        
+    /* @var datalynxfield_checkbox */
+    protected $_field = null;
+
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $field = $this->_field;
+        $fieldid = $field->id();
+        $entryid = $entry->id;
+        $fieldname = "field_{$fieldid}_$entryid";
+        $menuoptions = $field->options_menu();
+        $required = $options['required'];
+
+        $content = !empty($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : null;
+
         $separator = $field->separators[(int) $field->get('param2')]['chr'];
 
         $elemgrp = array();
-        foreach ($options as $i => $option) {
-            $cb = &$mform->createElement('advcheckbox', $fieldname. '_'. $i, null, $option, array('group' => $fieldname), array(0, $i));
-            $elemgrp[] = $cb;
-            if (in_array($i, $selected)) {
-                $cb->setChecked(true);
-            }
+        foreach ($menuoptions as $i => $option) {
+            $elemgrp[] = &$mform->createElement('advcheckbox',  $i, null, $option, null, array(null, $i));
         }
-        // add checkbox controller
-        
-        return array($elemgrp, array($separator));
-    }
-    
-    /**
-     *
-     */
-    protected function set_required(&$mform, $fieldname, $selected) {
-        global $PAGE;
-        
-        $mform->addRule("{$fieldname}_grp", null, 'required', null, 'client');
-        // JS Error message
-        $options = array(
-            'fieldname' => $fieldname,
-            'selected' => !empty($selected),
-            'message' => get_string('err_required', 'form'),
-        );
 
-        $module = array(
-            'name' => 'M.datalynxfield_checkbox_required',
-            'fullpath' => '/mod/datalynx/field/checkbox/checkbox.js',
-            'requires' => array('base','node')
-        );
+        $mform->addGroup($elemgrp, $fieldname, null, $separator, true);
 
-        $PAGE->requires->js_init_call('M.datalynxfield_checkbox_required.init', array($options), false, $module);            
+        $selected = array();
+        if ($entryid > 0 and $content) {
+            $selected = explode('#', $content);
+        }
+
+        // check for default values
+        if (!$selected and $field->get('param2')) {
+            $selected = $field->default_values();
+        }
+
+        $mform->getElement($fieldname)->setValue($selected);
+
+        if ($required) {
+            $mform->addGroupRule($fieldname, get_string('err_required', 'form'), 'required', null, 1);
+        }
     }
 
     /**
      *
      */
-    public function display_search(&$mform, $i = 0, $value = '') {
+    public function render_display_mode(stdClass $entry, array $params) {
+        $field = $this->_field;
+        $fieldid = $field->id();
+
+        if (isset($entry->{"c{$fieldid}_content"})) {
+            $content = $entry->{"c{$fieldid}_content"};
+
+            $options = $field->options_menu();
+
+            $contents = explode('#', $content);
+
+            $str = array();
+            foreach ($options as $key => $option) {
+                $selected = (int) in_array($key, $contents);
+                if ($selected) {
+                    $str[] = $option;
+                }
+            }
+            $separator = $field->separators[(int) $field->get('param3')]['chr'];
+            if ($separator == '</li><li>' && count($str) > 0) {
+                $str = '<ul><li>' . implode($separator, $str) . '</li></ul>';
+            } else {
+                $str = implode($separator, $str);
+            }
+        } else {
+            $str = '';
+        }
+
+        return $str;
+    }
+
+    public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
         $field = $this->_field;
         $fieldid = $field->id();
 
@@ -92,13 +117,44 @@ class datalynxfield_checkbox_renderer extends datalynxfield_multiselect_renderer
         $options = $field->options_menu();
 
         $fieldname = "f_{$i}_$fieldid";
-        list($elem, $separators) = $this->render($mform, $fieldname, $options, $selected);
+        $select = &$mform->createElement('select', $fieldname, null, $options);
+        $select->setMultiple(true);
+        $select->setSelected($selected);
+
         $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
 
         $allreq = &$mform->createElement('checkbox', "{$fieldname}_allreq", null, ucfirst(get_string('requiredall', 'datalynx')));
         $mform->setDefault("{$fieldname}_allreq", $allrequired);
         $mform->disabledIf("{$fieldname}_allreq", "searchoperator$i", 'eq', '');
 
-        return array($elem + array($allreq), $separators);
+        return array(array($select, $allreq), null);
     }
+
+    public function validate($entryid, $tags, $formdata) {
+        $fieldid = $this->_field->id();
+        $formfieldname = "field_{$fieldid}_{$entryid}";
+
+        $errors = array();
+        foreach ($tags as $tag) {
+            list(,$behavior,) = $this->process_tag($tag);
+            /* @var $behavior datalynx_field_behavior */
+
+            if ($behavior->is_required()) {
+                if (empty($formdata->$formfieldname)) {
+                    $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
+                } else {
+                    $empty = true;
+                    foreach ($formdata->$formfieldname as $value) {
+                        $empty = $empty && empty($value);
+                    }
+                    if ($empty) {
+                        $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
+                    }
+                }
+            }
+        }
+
+        return $errors;
+    }
+
 }

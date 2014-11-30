@@ -88,14 +88,13 @@ class datalynxfield_duration extends datalynxfield_base {
         $fieldname = $this->name();
 
         $formfieldname = "field_{$fieldid}_{$entryid}";
-        $tags = $this->renderer()->add_clean_pattern_keys($tags);
 
         if (array_key_exists("[[*$fieldname]]", $tags) and isset($formdata->$formfieldname)) {
             if (!clean_param($formdata->$formfieldname, PARAM_INT)) {
                 return array("{$formfieldname}[number]" => get_string('fieldrequired', 'datalynx'));
             }
         }
-        return null;
+        return array();
     }
 
 }

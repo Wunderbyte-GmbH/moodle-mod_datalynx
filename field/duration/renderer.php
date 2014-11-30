@@ -29,9 +29,6 @@ require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
  */
 class datalynxfield_duration_renderer extends datalynxfield_renderer {
 
-    /**
-     *
-     */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $field = $this->_field;
         $fieldid = $field->id();
@@ -57,9 +54,6 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
         }
     }
 
-    /**
-     *
-     */
     public function render_display_mode(stdClass $entry, array $params) {
         $field = $this->_field;
         $fieldid = $field->id();
@@ -93,10 +87,7 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
         return '';
     }
 
-    /**
-     *
-     */
-    public function display_search(&$mform, $i = 0, $value = '') {
+    public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
         $fieldid = $this->_field->id();
         $fieldname = "f_{$i}_$fieldid";
 
@@ -109,9 +100,6 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
         return array($arr, null);
     }
 
-    /**
-     * Array of patterns this field supports
-     */
     protected function patterns() {
         $fieldname = $this->_field->name();
 
@@ -125,14 +113,5 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
         return $patterns;
     }
 
-    /**
-     * Array of patterns this field supports
-     */
-    protected function supports_rules() {
-        return array(
-            self::RULE_REQUIRED,
-            self::RULE_NOEDIT,
-        );
-    }
 }
 

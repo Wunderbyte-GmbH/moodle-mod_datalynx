@@ -111,7 +111,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
     /**
      *
      */
-    public function display_search(&$mform, $i = 0, $value = '') {
+    public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
         global $PAGE;
 
         $field = $this->_field;
@@ -200,12 +200,4 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         return $patterns;
     }
 
-    /**
-     * Array of patterns this field supports
-     */
-    protected function supports_rules() {
-        return array(
-            self::RULE_REQUIRED
-        );
-    }
 }

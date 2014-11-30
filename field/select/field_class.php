@@ -26,28 +26,6 @@ require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 class datalynxfield_select extends datalynxfield_option_single {
 
     public $type = 'select';
-    
-    protected $_options = array();
-
-    /**
-     * Class constructor
-     *
-     * @param var $df       datalynx id or class object
-     * @param var $field    field id or DB record
-     */
-    public function __construct($df = 0, $field = 0) {
-        parent::__construct($df, $field);
-
-        // Set the options
-        $this->options_menu();
-    }
-
-    /**
-     *
-     */
-    protected function content_names() {
-        return array('selected', 'newvalue');
-    }
 
     /**
      * Computes which values of this field have already been chosen by the given user and
@@ -100,24 +78,13 @@ class datalynxfield_select extends datalynxfield_option_single {
         // new contents
         $contents = array();
 
-        $selected = $newvalue = null;
+        $selected = null;
         if (!empty($values)) {
-            foreach ($values as $name => $value) {
-                $value = (string) $value;
-                if (!empty($name) and !empty($value)) {
-                    ${$name} = $value;
-                }
-            }
-        }        
-        // update new value in the field type
-        if ($newvalue = s($newvalue)) {
-            $options = $this->options_menu();
-            if (!$selected = (int) array_search($newvalue, $options)) {
-                $selected = count($options) + 1;
-                $this->field->param1 = trim($this->field->param1). "\n$newvalue";
-                $this->update_field();
+            foreach ($values as $value) {
+                $selected = (string) $value;
             }
         }
+
         // add the content
         if (!is_null($selected)) {
             $contents[] = $selected;
@@ -149,41 +116,19 @@ class datalynxfield_select extends datalynxfield_option_single {
     /**
      * 
      */
-    public function options_menu($forceget = false) {
-        global $DB, $USER;
-        if (!$this->_options or $forceget) {
-            if (!empty($this->field->param1)) {
-                $rawoptions = explode("\n", $this->field->param1);
-                foreach ($rawoptions as $key => $option) {
-                    $option = trim($option);
-                    if ($option != '') {
-                        $this->_options[$key + 1] = $option;
-                    }
-                }
-            }
-        }
-        return $this->_options;
-    }
-
-    /**
-     * 
-     */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
         // import only from csv
         if ($csvrecord) {
             $fieldid = $this->field->id;
             $fieldname = $this->name();
             $csvname = $importsettings[$fieldname]['name'];
-            $allownew = !empty($importsettings[$fieldname]['allownew']) ? true : false;
             $label = !empty($csvrecord[$csvname]) ? $csvrecord[$csvname] : null;
             
             if ($label) {
                 $options = $this->options_menu();
                 if ($optionkey = array_search($label, $options)) {
                     $data->{"field_{$fieldid}_{$entryid}_selected"} = $optionkey;
-                } else if ($allownew) {
-                    $data->{"field_{$fieldid}_{$entryid}_newvalue"} = $label;
-                }                    
+                }
             }
         }
     
@@ -212,8 +157,15 @@ class datalynxfield_select extends datalynxfield_option_single {
                 return array($formfieldname => get_string('limitchoice_error', 'datalynx', $menu[$content]));
             }
         } else {
-            return null;
+            return array();
         }
+    }
+
+    public function get_supported_search_operators() {
+        return array(
+            '' => get_string('empty', 'datalynx'),
+            '=' => get_string('equal', 'datalynx'),
+        );
     }
 
 }

@@ -36,8 +36,5 @@ class datalynxfield_multiselect_form extends datalynxfield_option_form {
         $mform->addElement('select', 'param3', get_string('fieldoptionsseparator', 'datalynx'),
                            array_map('current', $this->_field->separators));
 
-        // Allow add option?
-        $mform->addElement('selectyesno', 'param4', get_string('allowaddoption', 'datalynx'));
-
     }
 }

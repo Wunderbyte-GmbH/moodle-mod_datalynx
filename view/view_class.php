@@ -874,7 +874,7 @@ abstract class datalynxview_base {
     }
 
     /**
-     *
+     * FIXME: there was an error here at get_definitions call!
      */
     protected function get_groupby_value($entry) {
         $fields = $this->_df->get_fields();
@@ -886,7 +886,7 @@ abstract class datalynxview_base {
             $pattern = reset($this->_tags['field'][$fieldid]);
             $field = $fields[$fieldid];
 
-            if ($definition = $field->get_definitions(array($pattern), $entry)) {
+            if ($definition = $field->get_definitions(array($pattern), $entry, array())) {
                $groupbyvalue = $definition[$pattern][1];
             }
         }

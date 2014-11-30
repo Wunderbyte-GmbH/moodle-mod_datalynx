@@ -244,13 +244,5 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
 
         return $patterns; 
     }
-    
-    /**
-     * Array of patterns this field supports
-     */
-    protected function supports_rules() {
-        return array(
-            self::RULE_REQUIRED
-        );
-    }
+
 }

@@ -23,9 +23,10 @@
 
 require_once("$CFG->dirroot/mod/datalynx/field/select/field_class.php");
 
-class datalynxfield_radiobutton extends datalynxfield_select {
+class datalynxfield_radiobutton extends datalynxfield_option_single {
 
     public $type = 'radiobutton';
+
     public $separators = array(
             array('name' => 'New line', 'chr' => '<br />'),
             array('name' => 'Space', 'chr' => '&#32;'),
@@ -33,4 +34,149 @@ class datalynxfield_radiobutton extends datalynxfield_select {
             array('name' => ', (with space)', 'chr' => '&#44;&#32;')
     );
 
+    /**
+     * Computes which values of this field have already been chosen by the given user and
+     * determines which ones have reached their limit
+     * @param  int      $userid  ID of the user modifying an entry; if not specified defaults to $USER->id
+     * @return array    an array of disabled values
+     */
+    public function get_disabled_values_for_user($userid = 0) {
+        global $DB, $USER;
+
+        if ($userid == 0) {
+            $userid = $USER->id;
+        }
+
+        $countsql = "SELECT COUNT(dc2.id)
+                       FROM {datalynx_contents} dc2
+                 INNER JOIN {datalynx_fields} df2 ON dc2.fieldid = df2.id
+                 INNER JOIN {datalynx_entries} de2 ON dc2.entryid = de2.id
+                      WHERE dc2.fieldid = :fieldid1
+                        AND dc2.content = dc.content";
+
+        $sql = "SELECT dc.content, ({$countsql}) AS count
+                  FROM {datalynx_contents} dc
+            INNER JOIN {datalynx_entries} de ON dc.entryid = de.id
+                 WHERE de.userid = :userid
+                   AND de.dataid = :dataid
+                   AND dc.fieldid = :fieldid2
+                HAVING count >= 1";
+
+        $params = array('userid'    => $userid,
+            'dataid'    => $this->df->id(),
+            'fieldid1'  => $this->field->id,
+            'fieldid2'  => $this->field->id);
+
+        $results = $DB->get_records_sql($sql, $params);
+
+        return array_keys($results);
+    }
+
+
+    /**
+     *
+     */
+    protected function get_sql_compare_text($column = 'content') {
+        global $DB;
+        return $DB->sql_compare_text("c{$this->field->id}.$column", 255);
+    }
+
+    /**
+     *
+     */
+    public function get_search_value($value) {
+        $options = $this->options_menu();
+        if ($key = array_search($value, $options)) {
+            return $key;
+        } else {
+            return '';
+        }
+    }
+
+    /**
+     *
+     */
+    public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
+        // import only from csv
+        if ($csvrecord) {
+            $fieldid = $this->field->id;
+            $fieldname = $this->name();
+            $csvname = $importsettings[$fieldname]['name'];
+            $allownew = !empty($importsettings[$fieldname]['allownew']) ? true : false;
+            $label = !empty($csvrecord[$csvname]) ? $csvrecord[$csvname] : null;
+
+            if ($label) {
+                $options = $this->options_menu();
+                if ($optionkey = array_search($label, $options)) {
+                    $data->{"field_{$fieldid}_{$entryid}_selected"} = $optionkey;
+                } else if ($allownew) {
+                    $data->{"field_{$fieldid}_{$entryid}_newvalue"} = $label;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public function validate($entryid, $tags, $formdata) {
+        $fieldid = $this->id();
+
+        global $DB;
+        $query = "SELECT dc.content
+                    FROM {datalynx_contents} dc
+                   WHERE dc.entryid = :entryid
+                     AND dc.fieldid = :fieldid";
+        $params = array('entryid' => $entryid, 'fieldid' => $fieldid);
+
+        $oldcontent = $DB->get_field_sql($query, $params);
+
+        $formfieldname = "field_{$fieldid}_{$entryid}_selected";
+
+        if (isset($this->field->param5)) {
+            $disabled = $this->get_disabled_values_for_user();
+            $content = clean_param($formdata->{$formfieldname}, PARAM_INT);
+            if ($content != $oldcontent && array_search($content, $disabled) !== false) {
+                $menu = $this->options_menu();
+                return array($formfieldname => get_string('limitchoice_error', 'datalynx', $menu[$content]));
+            }
+        } else {
+            return array();
+        }
+    }
+
+
+    /**
+     *
+     */
+    protected function format_content($entry, array $values = null) {
+        $fieldid = $this->field->id;
+        // old contents
+        $oldcontents = array();
+        if (isset($entry->{"c{$fieldid}_content"})) {
+            $oldcontents[] = $entry->{"c{$fieldid}_content"};
+        }
+        // new contents
+        $contents = array();
+
+        $selected = null;
+        if (!empty($values)) {
+            foreach ($values as $value) {
+                $selected = $value;
+            }
+        }
+
+        // add the content
+        if (!is_null($selected)) {
+            $contents[] = $selected;
+        }
+
+        return array($contents, $oldcontents);
+    }
+
+    public function get_supported_search_operators() {
+        return array(
+            '' => get_string('empty', 'datalynx'),
+            '=' => get_string('equal', 'datalynx'),
+        );
+    }
 }

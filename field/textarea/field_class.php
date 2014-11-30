@@ -139,55 +139,12 @@ class datalynxfield_textarea extends datalynxfield_base {
         return true;
     }
 
-    /**
-     *
-     */
-    protected function content_names() {
-        if ($this->is_editor()) {
-            return array('editor');
-        } else {
-            return array('');
-        }
-    }
-
-    // TODO: this needs fixing
-    public function validate($entryid, $tags, $formdata) {
-        $fieldid = $this->id();
-        $fieldname = $this->name();
-
-        $tags = $this->renderer()->add_clean_pattern_keys($tags);
-        $editabletags = array(
-            "[[$fieldname]]",
-            "[[$fieldname:text]]",
-            "[[$fieldname:textlinks]]"
+    public function get_supported_search_operators() {
+        return array(
+            '' => get_string('empty', 'datalynx'),
+            '=' => get_string('equal', 'datalynx'),
+            'LIKE' => get_string('contains', 'datalynx'),
         );
-
-        if (!$this->is_editor()) {
-            $formfieldname = "field_{$fieldid}_{$entryid}";
-            $cleanformat = PARAM_NOTAGS;
-        } else {
-            $formfieldname = "field_{$fieldid}_{$entryid}_editor";
-            $cleanformat = PARAM_CLEANHTML;
-        }
-
-        foreach ($editabletags as $cleantag) {
-            $tag = array_search($cleantag, $tags);
-            if ($tag !== false and false) {
-                if (empty($formdata->$formfieldname)) {
-                    return array($formfieldname => get_string('fieldrequired', 'datalynx'));
-                }
-                if (!$this->is_editor()) {
-                    if (!clean_param($formdata->$formfieldname, $cleanformat)) {
-                        return array($formfieldname => get_string('fieldrequired', 'datalynx'));
-                    }
-                } else {
-                    if (!clean_param($formdata->$formfieldname['text'], $cleanformat)) {
-                        return array($formfieldname => get_string('fieldrequired', 'datalynx'));
-                    }
-                }
-            }
-        }
-        return null;
     }
 
 }

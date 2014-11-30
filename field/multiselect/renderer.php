@@ -17,12 +17,12 @@
 /**
  * @package datalynxfield
  * @subpackage multiselect
- * @copyright 2011 Itamar Tzadok
+ * @copyright 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
+require_once(dirname(__FILE__) . "/../renderer.php");
 
 /**
  *
@@ -30,8 +30,10 @@ require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
 
     /**
-     *
+     * @var datalynxfield_multiselect
      */
+    protected $_field = null;
+
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $field = $this->_field;
         $fieldid = $field->id();
@@ -53,32 +55,16 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
             $selected = $field->default_values();
         }
 
-        list($elem, $separators) = $this->render($mform, "{$fieldname}_selected", $menuoptions, $selected, $required);
-        // Add group or element
-        if (is_array($elem)) {
-            $mform->addGroup($elem, "{$fieldname}_grp",null, $separators, false);
-        } else {
-            $mform->addElement($elem);
-        }
+        $select = &$mform->addElement('select', $fieldname, null, $menuoptions);
+        $select->setMultiple(true);
+        $select->setSelected($selected);
         
         if ($required) {
-            $this->set_required($mform, $fieldname, $selected);
+            $mform->addRule($fieldname, null, 'required', null, 'client');
         }
 
-        // Input field for adding a new option
-        if (!empty($options['addnew'])) {
-            if ($field->get('param4') or has_capability('mod/datalynx:managetemplates', $field->df()->context)) {
-                $mform->addElement('text', "{$fieldname}_newvalue", get_string('newvalue', 'datalynx'));
-                $mform->setType("{$fieldname}_newvalue", PARAM_TEXT);
-                $mform->disabledIf("{$fieldname}_newvalue", "{$fieldname}_selected", 'neq', 0);
-            }
-            return;
-        }
     }
 
-    /**
-     *
-     */
     public function render_display_mode(stdClass $entry, array $params) {
         $field = $this->_field;
         $fieldid = $field->id();
@@ -87,21 +73,17 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
             $content = $entry->{"c{$fieldid}_content"};
 
             $options = $field->options_menu();
-            $optionscount = count($options);
-            $showalloptions = !empty($params['options']);
 
             $contents = explode('#', $content);
 
             $str = array();
             foreach ($options as $key => $option) {
                 $selected = (int) in_array($key, $contents);
-                if ($showalloptions) {
-                    $str[] = "$selected $option";
-                } else if ($selected) {
+                if ($selected) {
                     $str[] = $option;
                 }
             }
-            $separator = $showalloptions ? ',' : $field->separators[(int) $field->get('param3')]['chr'];
+            $separator = $field->separators[(int) $field->get('param3')]['chr'];
             if ($separator == '</li><li>' && count($str) > 0) {
                 $str = '<ul><li>' . implode($separator, $str) . '</li></ul>';
             } else {
@@ -114,13 +96,10 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
         return $str;
     }
 
-    /**
-     *
-     */
-    public function display_search(&$mform, $i = 0, $value = '') {
+    public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
         $field = $this->_field;
         $fieldid = $field->id();
-        
+
         if (is_array($value)){
             $selected     = $value['selected'];
             $allrequired = $value['allrequired'] ? 'checked = "checked"' : '';
@@ -132,56 +111,37 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
         $options = $field->options_menu();
 
         $fieldname = "f_{$i}_$fieldid";
-        list($elem, $separators) = $this->render($mform, $fieldname, $options, $selected);
-        $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
-        
-        $allreq = &$mform->createElement('checkbox', "{$fieldname}_allreq", null, ucfirst(get_string('requiredall', 'datalynx')));
-        $mform->setDefault("{$fieldname}_allreq", $allrequired);
-        $mform->disabledIf("{$fieldname}_allreq", "searchoperator$i", 'eq', '');
-        
-        return array(array($elem, $allreq), $separators);
-    }
-
-    /**
-     *
-     */
-    protected function render(&$mform, $fieldname, $options, $selected, $required = false) {
         $select = &$mform->createElement('select', $fieldname, null, $options);
         $select->setMultiple(true);
         $select->setSelected($selected);
-        return array($select, null);
+
+        $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
+
+        $allreq = &$mform->createElement('checkbox', "{$fieldname}_allreq", null, ucfirst(get_string('requiredall', 'datalynx')));
+        $mform->setDefault("{$fieldname}_allreq", $allrequired);
+        $mform->disabledIf("{$fieldname}_allreq", "searchoperator$i", 'eq', '');
+
+        return array(array($select, $allreq), null);
     }
 
-    /**
-     *
-     */
-    protected function set_required(&$mform, $fieldname, $selected) {
-        $mform->addRule($fieldname, null, 'required', null, 'client');
+    public function validate($entryid, $tags, $formdata) {
+        $fieldid = $this->_field->id();
+
+        $formfieldname = "field_{$fieldid}_{$entryid}";
+
+        $errors = array();
+        foreach ($tags as $tag) {
+            list(, $behavior,) = $this->process_tag($tag);
+            /* @var $behavior datalynx_field_behavior */
+
+            if ($behavior->is_required()) {
+                if (empty($formdata->$formfieldname)) {
+                    $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
+                }
+            }
+        }
+
+        return $errors;
     }
 
-
-    /**
-     * Array of patterns this field supports 
-     */
-    protected function patterns() {
-        $fieldname = $this->_field->name();
-
-        $patterns = parent::patterns();
-        $patterns["[[$fieldname]]"] = array(true);
-        $patterns["[[$fieldname:addnew]]"] = array(false);
-        $patterns["[[$fieldname:options]]"] = array(false);
-
-        return $patterns; 
-    }
-    
-    /**
-     * Array of patterns this field supports 
-     */
-    protected function supports_rules() {
-        return array(
-            self::RULE_REQUIRED
-        );
-    }
-    
 }
-

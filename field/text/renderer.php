@@ -17,21 +17,18 @@
 /**
  * @package datalynxfield
  * @subpackage text
- * @copyright 2011 Itamar Tzadok
+ * @copyright 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die;
 
-require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
+require_once(dirname(__FILE__) . "/../renderer.php");
 
 /**
- *
+ * Class datalynxfield_text_renderer Renderer for text field type
  */
 class datalynxfield_text_renderer extends datalynxfield_renderer {
 
-    /**
-     *
-     */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $field = $this->_field;
         $fieldid = $field->id();
@@ -76,18 +73,18 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
             ($min = $field->get('param6')) or ($min = 0);
             ($max = $field->get('param7')) or ($max = 64);
 
+            $val = false;
             switch ($length) {
                 case 'minlength': $val = $min; break;
                 case 'maxlength': $val = $max; break;
                 case 'rangelength': $val = array($min, $max); break;
             }
-            $mform->addRule($fieldname, null, $length, $val, 'client');
+            if ($val !== false) {
+                $mform->addRule($fieldname, null, $length, $val, 'client');
+            }
         }
     }
 
-    /**
-     *
-     */
     public function render_display_mode(stdClass $entry, array $params) {
         $field = $this->_field;
         $fieldid = $field->id();
@@ -95,7 +92,7 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
         if (isset($entry->{"c{$fieldid}_content"})) {
             $content = $entry->{"c{$fieldid}_content"};
 
-            $options = new object();
+            $options = new stdClass();
             $options->para = false;
 
             $format = FORMAT_PLAIN;
@@ -113,25 +110,23 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
         return $str;
     }
 
-    /**
-     * Array of patterns this field supports
-     */
-    protected function patterns() {
-        $fieldname = $this->_field->name();
+    public function validate($entryid, $tags, $formdata) {
+        $fieldid = $this->_field->id();
 
-        $patterns = parent::patterns();
-        $patterns["[[$fieldname]]"] = array(true);
+        $formfieldname = "field_{$fieldid}_{$entryid}";
 
-       return $patterns;
+        $errors = array();
+        foreach ($tags as $tag) {
+            list(, $behavior,) = $this->process_tag($tag);
+            /* @var $behavior datalynx_field_behavior */
+            if ($behavior->is_required() and isset($formdata->$formfieldname)) {
+                if (!clean_param($formdata->$formfieldname, PARAM_NOTAGS)) {
+                    $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
+                }
+            }
+        }
+
+        return $errors;
     }
 
-    /**
-     * Array of patterns this field supports
-     */
-    protected function supports_rules() {
-        return array(
-            self::RULE_REQUIRED,
-            self::RULE_NOEDIT,
-        );
-    }
 }

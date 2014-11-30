@@ -32,10 +32,6 @@ abstract class datalynxfield_renderer {
     const PATTERN_SHOW_IN_MENU = 0;
     const PATTERN_CATEGORY = 1;
 
-    const RULE_REQUIRED = '*';
-    const RULE_HIDDEN = '^';
-    const RULE_NOEDIT = '!';
-
     protected static $defaultoptions = array(
         'manage' => false,
         'visible' => false,
@@ -45,15 +41,13 @@ abstract class datalynxfield_renderer {
         'required' => false,
         'internal' => false);
 
-    /**
-     * @var datalynxfield_base
-     */
+    /* @var datalynxfield_base */
     protected $_field = null;
 
     /**
      * Constructor
      */
-    public function __construct(&$field) {
+    public function datalynxfield_renderer(&$field) {
         $this->_field = $field;
     }
 
@@ -88,7 +82,10 @@ abstract class datalynxfield_renderer {
      * so that it is processed first in view templates
      * so that in turn patterns it may contain could be processed.
      *
-     * @return array pattern => array(visible in menu, category) -> WRONG WRONG WRONG
+     * @param array $tags
+     * @param null $entry
+     * @param array $options
+     * @return array
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
         $replacements = array();
@@ -104,9 +101,9 @@ abstract class datalynxfield_renderer {
                 $currentoptions[$splitfieldname[1]] = true;
             }
 
-            $currentoptions['visible'] = $behavior->is_visible_to_user() && (strpos($tag, self::RULE_HIDDEN) === false);
-            $currentoptions['editable'] = $behavior->is_editable_by_user() && (strpos($tag, self::RULE_NOEDIT) === false);
-            $currentoptions['required'] = $behavior->is_required() || (strpos($tag, self::RULE_REQUIRED) !== false);
+            $currentoptions['visible'] = $behavior->is_visible_to_user();
+            $currentoptions['editable'] = $behavior->is_editable_by_user();
+            $currentoptions['required'] = $behavior->is_required();
             $currentoptions['internal'] = $this->_field->is_internal();
 
             if (!$currentoptions['visible']) { // ====================================================== NOT VISIBLE ===
@@ -177,7 +174,7 @@ abstract class datalynxfield_renderer {
      * @param string $tag
      * @return array
      */
-    private function process_tag($tag) {
+    protected function process_tag($tag) {
         $pattern = '/\[\[([^\|\]]+)(?:\|([^\|\]]*))?(?:\|([^\|\]]*))?\]\]/';
         $matches = array();
 
@@ -204,13 +201,17 @@ abstract class datalynxfield_renderer {
 
     /**
      * TODO: make abstract once all field types have been updated
+     * Outputs the HTML representation of the field and its value
+     * @param stdClass $entry object containing the entry data being rendered
+     * @param array $options rendering options
+     * @return string HTML representation of the field
      */
     public function render_display_mode(stdClass $entry, array $options) {
         $fieldid = $this->_field->id();
 
         if (isset($entry->{"c{$fieldid}_content"})) {
             $content = $entry->{"c{$fieldid}_content"};
-            $str = format_text($content);
+            $str = format_text($content, FORMAT_PLAIN, $options);
         } else {
             $str = '';
         }
@@ -218,7 +219,15 @@ abstract class datalynxfield_renderer {
         return $str;
     }
 
-    public function prerender_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
+    /**
+     * Callback function. Adds preceeding and following HTML formatting for field elements and calls
+     * render_edit_mode. Cannot be overridden, but {@link render_edit_mode()} function can and should be.
+     * @param MoodleQuickForm $mform form object used to render field input elements
+     * @param stdClass $entry object containing the entry data being rendered
+     * @param array $options rendering options
+     * @see datalynxfield_renderer::render_edit_mode
+     */
+    public final function prerender_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         if (isset($options['template']) && strpos($options['template'], '#input') !== false) {
             $splittemplate = explode('#input', $options['template']);
             $options['prefix'] = $splittemplate[0];
@@ -238,8 +247,13 @@ abstract class datalynxfield_renderer {
 
     /**
      * TODO: make abstract once all field types have been updated
+     * Adds appropriate input elements to the entry form. Called by {@link prerender_edit_mode()}.
+     * @param MoodleQuickForm $mform form object used to render field input elements
+     * @param stdClass $entry object containing the entry data being rendered
+     * @param array $options rendering options
+     * @see datalynxfield_renderer::prerender_edit_mode
      */
-    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
+    function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $fieldid = $this->_field->id();
 
         $fieldname = "f_{$entry->id}_$fieldid";
@@ -257,6 +271,10 @@ abstract class datalynxfield_renderer {
 
     /**
      * TODO: make abstract once all field types have been updated
+     * @param MoodleQuickForm $mform
+     * @param int $i
+     * @param string $value
+     * @return array
      */
     public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
         $fieldid = $this->_field->id();
@@ -269,35 +287,6 @@ abstract class datalynxfield_renderer {
         $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
 
         return array($arr, null);
-    }
-
-    /**
-     * TODO: rename all existing into one of the above
-     */
-    public function display_search(&$mform, $i = 0, $value = '') {
-        /* @var $mform MoodleQuickForm */
-        $fieldid = $this->_field->id();
-        $fieldname = "f_{$i}_$fieldid";
-
-        $arr = array();
-        $arr[] = &$mform->createElement('text', $fieldname, null, array('size'=>'32'));
-        $mform->setType($fieldname, PARAM_NOTAGS);
-        $mform->setDefault($fieldname, $value);
-        $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
-
-        return array($arr, null);
-    }
-
-    /**
-     * Cleans a pattern from auxiliary indicators (e.g. * for required)
-     * TODO: deprecate once all uses have been replaced with the new behavior functionality
-     */
-    public function add_clean_pattern_keys(array $patterns) {
-        $keypatterns = array();
-        foreach ($patterns as $pattern) {
-            $keypatterns[$pattern] = str_replace($this->supports_rules(), '', $pattern);
-        }
-        return $keypatterns;
     }
 
     /**
@@ -326,9 +315,13 @@ abstract class datalynxfield_renderer {
     }
 
     /**
-     *
+     * Validate the form data for this field
+     * @param $entryid
+     * @param $tags
+     * @param $data
+     * @return array
      */
-    public function validate_data($entryid, $tags, $data) {
+    public function validate(/** @noinspection PhpUnusedParameterInspection */ $entryid, $tags, $data) {
         return array();
     }
 
@@ -347,13 +340,6 @@ abstract class datalynxfield_renderer {
         $patterns["[[$fieldname]]"] = array(true);
 
         return $patterns;
-    }
-
-    /**
-     * @return string characters of supported rulesCleans a pattern from auxiliary indicators (e.g. * for required)
-     */
-    protected function supports_rules() {
-        return array();
     }
 
     /**

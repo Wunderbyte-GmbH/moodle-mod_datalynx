@@ -254,7 +254,7 @@ abstract class datalynxfield_base {
      *
      */
     public function get_definitions($tags, $entry, array $options) {
-        return $this->renderer()->replacements($tags, $entry, array_merge(self::$defaultoptions, $options)); // TODO: YOU *MUST* REMOVE THIS MERGE!
+        return $this->renderer()->replacements($tags, $entry, array_merge(self::$defaultoptions, $options)); // FIXME: YOU *MUST* REMOVE THIS MERGE!
     }
 
     /**
@@ -267,25 +267,14 @@ abstract class datalynxfield_base {
     /**
      *
      */
-    public function is_editable() {
-        return !(empty($this->field->edits) && !has_capability('mod/datalynx:manageentries', $this->df()->context));
-    }
-
-    /**
-     *
-     */
     public function update_content($entry, array $values = null) {
         global $DB;
-
-        if (!$this->is_editable()) {
-            return false;
-        }
 
         $fieldid = $this->field->id;
         $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
         list($contents, $oldcontents) = $this->format_content($entry, $values);
 
-        $rec = new object();
+        $rec = new stdClass();
         $rec->fieldid = $this->field->id;
         $rec->entryid = $entry->id;
         foreach ($contents as $key => $content) {
@@ -341,7 +330,7 @@ abstract class datalynxfield_base {
     }
 
     /**
-     * returns an array of distinct content of the field
+     * returns an array of distinct content of the field (GROUP BY)
      */
     public function get_distinct_content($sortdir = 0) {
         global $DB;
@@ -413,28 +402,29 @@ abstract class datalynxfield_base {
     protected function content_names() {
         return array('');
     }
-    
+
     /**
-     *
+     * Formats content for database storage
+     * @param $entry stdClass object containing all the entry contents (from the database, NOT the form!)
+     * @param array $values values from the entry form elements
+     * @return array
      */
     protected function format_content($entry, array $values = null) {
         $fieldid = $this->field->id;
-        $oldcontents = array();
-        $contents = array();
-        // old content
+
+        $newcontent = null;
+        $oldcontent = null;
+
+        if (!empty($values)) {
+            $newcontent = reset($values);
+            $newcontent = (string) clean_param($newcontent, PARAM_NOTAGS);
+        }
+
         if (isset($entry->{"c{$fieldid}_content"})) {
             $oldcontent = $entry->{"c{$fieldid}_content"};
-        } else {
-            $oldcontent = null;
         }
-        // new content
-        if (!empty($values)) {
-            $content = reset($values);
-            $content = (string) clean_param($content, PARAM_NOTAGS);
-        } else {
-            $content = null;
-        }
-        return array(array($content), array($oldcontent));
+
+        return array(array($newcontent), array($oldcontent));
     }
 
     /**
@@ -627,17 +617,6 @@ abstract class datalynxfield_base {
     }
 
     /**
-     * Validate form data in entries form
-     * @param int $entryid
-     * @param string[] $tags
-     * @param stdClass $formdata
-     * @return string[]|null array of error messages
-     */
-    public function validate($entryid, $tags, $formdata) {
-        return null;
-    }
-
-    /**
      *
      */
     protected function filearea($suffix = null) {
@@ -658,26 +637,9 @@ abstract class datalynxfield_base {
      * @return array an array of operators
      */
     public function get_supported_search_operators() {
-        return array(
-            '' => get_string('empty', 'datalynx'),
-            '=' => get_string('equal', 'datalynx'),
-            '>' => get_string('greaterthan', 'datalynx'),
-            '<' => get_string('lessthan', 'datalynx'),
-            '>=' => get_string('greaterorequal', 'datalynx'),
-            '<=' => get_string('lessorequal', 'datalynx'),
-            'BETWEEN' => get_string('between', 'datalynx'),
-            'LIKE' => get_string('contains', 'datalynx'),
-            'IN' => get_string('in', 'datalynx'),
-        );
+        return array(); // if search is not supported, offer no operators
     }
 
-    /**
-     * Checks whether this field provides a set of options.
-     * @return bool true if this is an option field, false otherwise
-     */
-    public function has_options() {
-        return false;
-    }
 }
 
 /**
@@ -696,10 +658,6 @@ abstract class datalynxfield_no_content extends datalynxfield_base {
         return array();
     }
 
-//    public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
-//        return true;
-//    }
-
     public function get_select_sql() {
         return '';
     }
@@ -708,16 +666,10 @@ abstract class datalynxfield_no_content extends datalynxfield_base {
         return '';
     }
 
-    /**
-     *
-     */
     public function is_datalynx_content() {
         return false;
     }
 
-    /**
-     * TODO
-     */
     protected function filearea($suffix = null) {
         return false;
     }
@@ -728,12 +680,7 @@ abstract class datalynxfield_no_content extends datalynxfield_base {
  */
 abstract class datalynxfield_option extends datalynxfield_base {
 
-    /**
-     * @return bool
-     */
-    public function has_options() {
-        return true;
-    }
+    protected $_options = array();
 
     /**
      * @return mixed
@@ -741,6 +688,25 @@ abstract class datalynxfield_option extends datalynxfield_base {
     public function get_options() {
         return $this->_options;
     }
+
+    /**
+     *
+     */
+    public function options_menu($forceget = false) {
+        if (!$this->_options or $forceget) {
+            if (!empty($this->field->param1)) {
+                $rawoptions = explode("\n",$this->field->param1);
+                foreach ($rawoptions as $key => $option) {
+                    $option = trim($option);
+                    if ($option != '') {
+                        $this->_options[$key + 1] = $option;
+                    }
+                }
+            }
+        }
+        return $this->_options;
+    }
+
 
     /**
      * @param array $map
@@ -806,6 +772,7 @@ abstract class datalynxfield_option extends datalynxfield_base {
         unset($newvalues[0]);
         $this->field->param1 = implode("\n", $newvalues);
         $this->field->param2 = isset($forminput->param2) ? $forminput->param2 : '';
+        $this->field->param3 = isset($forminput->param3) ? $forminput->param3 : '';
     }
 }
 
@@ -813,6 +780,7 @@ abstract class datalynxfield_option extends datalynxfield_base {
  * Base class for Datalynx field types that offer a set of options with multiple choice
  */
 class datalynxfield_option_multiple extends datalynxfield_option {
+
     public function update_options($map = array()) {
         global $DB;
         $params = array();
@@ -848,6 +816,7 @@ class datalynxfield_option_multiple extends datalynxfield_option {
  * Base class for Datalynx field types that offer a set of options with single choice
  */
 class datalynxfield_option_single extends datalynxfield_option {
+
     public function update_options($map = array()) {
         global $DB;
 

@@ -29,9 +29,6 @@ require_once("$CFG->dirroot/mod/datalynx/field/text/renderer.php");
  */
 class datalynxfield_number_renderer extends datalynxfield_text_renderer {
 
-    /**
-     *
-     */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         parent::render_edit_mode($mform, $entry, $options);
         
@@ -41,9 +38,6 @@ class datalynxfield_number_renderer extends datalynxfield_text_renderer {
         $mform->addRule($fieldname, null, 'numeric', null, 'client');
     }
 
-    /**
-     *
-     */
     public function render_display_mode(stdClass $entry, array $params) {
         $field = $this->_field;
         $fieldid = $field->id();

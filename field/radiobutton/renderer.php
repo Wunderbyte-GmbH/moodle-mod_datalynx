@@ -17,57 +17,112 @@
 /**
  * @package datalynxfield
  * @subpackage radiobutton
- * @copyright 2011 Itamar Tzadok
+ * @copyright 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once("$CFG->dirroot/mod/datalynx/field/select/renderer.php");
+require_once(dirname(__FILE__) . "/../renderer.php");
 
 /**
- * 
+ * Class datalynxfield_radiobutton_renderer Renderer for radiobutton field type
  */
-class datalynxfield_radiobutton_renderer extends datalynxfield_select_renderer {
+class datalynxfield_radiobutton_renderer extends datalynxfield_renderer {
 
     /**
-     * 
+     * @var datalynxfield_radiobutton
      */
-    protected function render(&$mform, $fieldname, $options, $selected, $required = false, $overridedisabled = false) {
+    protected $_field = null;
 
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $field = $this->_field;
-        $separator = $field->separators[(int) $field->get('param3')]['chr'];
+        $fieldid = $field->id();
+        $entryid = $entry->id;
+        $menuoptions = $field->options_menu();
+        $fieldname = "field_{$fieldid}_$entryid";
+        $required = !empty($options['required']);
+        $selected = !empty($entry->{"c{$fieldid}_content"}) ? (int) $entry->{"c{$fieldid}_content"} : 0;
+
+        // check for default value
+        if (!$selected and $defaultval = $field->get('param2')) {
+            $selected = (int) array_search($defaultval, $menuoptions);
+        }
+
+        $separator = $field->separators[(int) $field->get('param2')]['chr'];
+
         $elemgrp = array();
-        $separators = array();
-        foreach ($options as $key => $option) {
-            $elemgrp[] = &$mform->createElement('radio', $fieldname, $separator, $option, $key);
+        foreach ($menuoptions as $id => $option) {
+            $radio = &$mform->createElement('radio', $fieldname, $separator, $option, $id);
+            if ($id == $selected) {
+                $radio->setChecked(true);
+            }
+            $elemgrp[] = $radio;
         }
-        if (!empty($selected)) {
-            $mform->setDefault($fieldname, (int) $selected);
+
+        $mform->addGroup($elemgrp, "{$fieldname}_group", null, $separator, false);
+
+        $mform->setDefaults(array($fieldname => (int) $selected));
+
+        if ($required) {
+            $mform->addRule("{$fieldname}_group", null, 'required', null, 'client');
         }
-        return array($elemgrp, array($separator));
+
     }
 
-    /**
-     *
-     */
-    protected function set_required(&$mform, $fieldname, $selected) {
-        global $PAGE;
-        list($label, $fieldid, $entryid,) = explode('_', $fieldname);
-        $mform->addRule("{$label}_{$fieldid}_{$entryid}_grp", null, 'required', null, 'client');
-        // JS Error message
-        $options = array(
-            'fieldname' => $fieldname,
-            'selected' => !empty($selected),
-            'message' => get_string('err_required', 'form'),
-        );
+    public function render_display_mode(stdClass $entry, array $params) {
+        $field = $this->_field;
+        $fieldid = $field->id();
 
-        $module = array(
-            'name' => 'M.datalynxfield_radiobutton_required',
-            'fullpath' => '/mod/datalynx/field/radiobutton/radiobutton.js',
-            'requires' => array('base','node')
-        );
+        if (isset($entry->{"c{$fieldid}_content"})) {
+            $selected = (int) $entry->{"c{$fieldid}_content"};
+            $options = $field->options_menu();
 
-        $PAGE->requires->js_init_call('M.datalynxfield_radiobutton_required.init', array($options), false, $module);            
+            if (!empty($params['options'])) {
+                $str = array();
+                foreach ($options as $key => $option) {
+                    $isselected = (int) ($key == $selected);
+                    $str[] = "$isselected $option";
+                }
+                $str = implode(',', $str);
+                return $str;
+            }
+
+            if (!empty($params['key'])) {
+                if ($selected) {
+                    return $selected;
+                } else {
+                    return '';
+                }
+            }
+
+            if ($selected and $selected <= count($options)) {
+                return $options[$selected];
+            }
+        }
+
+        return '';
+    }
+
+    public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
+        $field = $this->_field;
+        $fieldid = $field->id();
+
+        $options = $field->options_menu();
+        $selected = $value ? (int) $value : '';
+        $fieldname = "f_{$i}_$fieldid";
+
+        $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
+
+        $select = &$mform->createElement('select', $fieldname, null);
+
+        $options = array('' => get_string('choosedots')) + $options;
+        foreach ($options as $id => $name) {
+            $select->addOption($name, $id);
+        }
+
+        $select->setSelected($selected);
+
+        return array(array($select), null);
     }
 
 }
