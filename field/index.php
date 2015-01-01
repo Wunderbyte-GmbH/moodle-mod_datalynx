@@ -81,7 +81,7 @@ $directories = get_list_of_plugins('mod/datalynx/field/');
 $menufield = array();
 
 foreach ($directories as $directory){
-    if ($directory[0] != '_') {
+    if ($directory[0] != '_' && strpos($directory, 'entry') !== 0) {
         // Get name from language files
         $menufield[$directory] = get_string('pluginname',"datalynxfield_$directory");
     }
