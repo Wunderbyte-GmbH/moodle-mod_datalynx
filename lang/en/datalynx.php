@@ -305,54 +305,6 @@ $string['max'] = 'Maximum';
 $string['maxsize'] = 'Maximum size';
 $string['mediafile'] = 'Media file';
 $string['reference'] = 'Reference';
-/// Message strings
-$string['message_entryadded'] =
-'Hello {$a->fullname},
-
-the content in {$a->datalynxlink} has been modified by {$a->senderprofilelink}.
-
-The following entry has been created: {$a->viewlink}.';
-
-$string['message_entryupdated'] =
-'Hello {$a->fullname},
-
-the content in {$a->datalynxlink} has been modified by {$a->senderprofilelink}.
-
-The following entry has been updated: {$a->viewlink}.';
-
-$string['message_entrydeleted'] =
-'Hello {$a->fullname},
-
-the content in {$a->datalynxlink} has been modified by {$a->senderprofilelink}.
-
-The following entry has been deleted: {$a->entryid}.';
-
-$string['message_entryapproved'] = 'Hello {$a->fullname},
-
-the content in {$a->datalynxlink} has been approved by {$a->senderprofilelink}.
-
-The following entry has been approved: {$a->viewlink}.';
-
-$string['message_entrydisapproved'] = 'Hello {$a->fullname},
-
-the content in {$a->datalynxlink} has been modified by {$a->senderprofilelink}.
-
-The following entry has been disapproved: {$a->viewlink}.';
-
-$string['message_commentadded'] = 'Datalynx comment added';
-$string['message_ratingadded'] = 'Datalynx rating added';
-$string['message_ratingupdated'] = 'Datalynx rating updated';
-/// End Message strings
-/// Message provider strings
-$string['messageprovider:datalynx_entryadded'] = 'Datalynx entry added';
-$string['messageprovider:datalynx_entryupdated'] = 'Datalynx entry updated';
-$string['messageprovider:datalynx_entrydeleted'] = 'Datalynx entry deleted';
-$string['messageprovider:datalynx_entryapproved'] = 'Datalynx entry approved';
-$string['messageprovider:datalynx_entrydisapproved'] = 'Datalynx entry disapproved';
-$string['messageprovider:datalynx_commentadded'] = 'Datalynx comment added';
-$string['messageprovider:datalynx_ratingadded'] = 'Datalynx rating added';
-$string['messageprovider:datalynx_ratingupdated'] = 'Datalynx rating updated';
-/// End Message provider strings
 $string['min'] = 'Minimum';
 $string['modulename'] = 'Datalynx';
 $string['modulename_help'] = 'The datalynx module may be used for creating a wide range of activities/resources by allowing the instructor/manager to design and create a custom content form from various input elements (e.g.  texts, numbers, images, files, urls, etc.), and participants to submit content and view submitted content.';
@@ -667,14 +619,6 @@ $string['referencefield_help'] = 'Select a field to serve as a duplicate prevent
 $string['linktoentry'] = 'Link to entry';
 $string['notifyteammembers'] = 'Notify team members';
 $string['notifyteammembers_help'] = 'Select this option to inform team members of their membership status change.';
-$string['messageprovider:datalynx_memberadded'] = 'Team membership status change';
-$string['messageprovider:datalynx_memberremoved'] = 'Team membership status change';
-$string['message_memberadded'] = 'Dear {$a->fullname},
-
-you have been added to {$a->fieldname} by {$a->senderprofilelink}. Please go to {$a->viewlink} for more details.';
-$string['message_memberremoved'] = 'Dear {$a->fullname},
-
-you have been removed from {$a->fieldname} by {$a->senderprofilelink}. Please go to {$a->viewlink} for more details.';
 $string['noentries'] = 'There are no entries to display.';
 $string['nosuchentries'] = 'No entries available.';
 $string['nomatchingentries'] = 'No entries matching the selected filter exist.';
@@ -764,3 +708,74 @@ $string['deletetag'] = 'Delete tag';
 $string['action'] = 'Action';
 $string['field'] = 'Field';
 $string['tagproperties'] = '{$a->tagtype} tag properties: {$a->tagname}';
+
+$string['event_entry_created'] = 'Entry created';
+$string['event_entry_updated'] = 'Entry updated';
+$string['event_entry_deleted'] = 'Entry deleted';
+$string['event_entry_approved'] = 'Entry approved';
+$string['event_entry_disapproved'] = 'Entry disapproved';
+$string['event_comment_created'] = 'Comment created';
+$string['event_rating_added'] = 'Rating added';
+$string['event_rating_updated'] = 'Rating updated';
+$string['event_rating_deleted'] = 'Rating deleted';
+$string['event_teammember_added'] = 'Team member added';
+$string['event_teammember_removed'] = 'Team member removed';
+
+/// Message strings
+$string['message_entry_created'] =
+    'Hello {$a->fullname},
+
+the content in {$a->datalynxlink} has been modified by {$a->senderprofilelink}.
+
+The following entry has been created: {$a->viewlink}.';
+
+$string['message_entry_updated'] =
+    'Hello {$a->fullname},
+
+the content in {$a->datalynxlink} has been modified by {$a->senderprofilelink}.
+
+The following entry has been updated: {$a->viewlink}.';
+
+$string['message_entry_deleted'] =
+    'Hello {$a->fullname},
+
+the content in {$a->datalynxlink} has been modified by {$a->senderprofilelink}.
+
+The following entry has been deleted: {$a->entryid}.';
+
+$string['message_entry_approved'] = 'Hello {$a->fullname},
+
+the content in {$a->datalynxlink} has been approved by {$a->senderprofilelink}.
+
+The following entry has been approved: {$a->viewlink}.';
+
+$string['message_entry_disapproved'] = 'Hello {$a->fullname},
+
+the content in {$a->datalynxlink} has been modified by {$a->senderprofilelink}.
+
+The following entry has been disapproved: {$a->viewlink}.';
+
+$string['message_comment_added'] = 'Datalynx comment added';
+$string['message_rating_added'] = 'Datalynx rating added';
+$string['message_rating_updated'] = 'Datalynx rating updated';
+
+$string['message_memberadded'] = 'Dear {$a->fullname},
+
+you have been added to {$a->fieldname} by {$a->senderprofilelink}. Please go to {$a->viewlink} for more details.';
+$string['message_memberremoved'] = 'Dear {$a->fullname},
+
+you have been removed from {$a->fieldname} by {$a->senderprofilelink}. Please go to {$a->viewlink} for more details.';
+/// End Message strings
+
+/// Message provider strings
+$string['messageprovider:event_entry_created'] = 'Datalynx entry created';
+$string['messageprovider:event_entry_updated'] = 'Datalynx entry updated';
+$string['messageprovider:event_entry_deleted'] = 'Datalynx entry deleted';
+$string['messageprovider:event_entry_approved'] = 'Datalynx entry approved';
+$string['messageprovider:event_entry_disapproved'] = 'Datalynx entry disapproved';
+$string['messageprovider:event_comment_added'] = 'Datalynx comment added';
+$string['messageprovider:event_rating_added'] = 'Datalynx rating added';
+$string['messageprovider:event_rating_updated'] = 'Datalynx rating updated';
+$string['messageprovider:event_teammember_added'] = 'Team membership status change';
+$string['messageprovider:event_teammember_removed'] = 'Team membership status change';
+/// End Message provider strings

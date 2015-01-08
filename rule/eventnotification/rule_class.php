@@ -51,17 +51,13 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
         $this->recipient = unserialize($this->rule->param3);
     }
 
-    /**
-     *
-     */
-    public function trigger(stdClass $data) {
+    public function trigger(\core\event\base $event) {
         global $CFG, $SITE, $DB;
-        if (empty($data->event)) {
-            return true;
-        }
 
-        $df = $data->df;
-        $event = $data->event;
+        $data = new stdClass();
+
+        $df = new datalynx($event->other['dataid']);
+        $eventname = (new \ReflectionClass($event))->getShortName();
 
         $data->datalynxs = get_string('modulenameplural', 'datalynx');
         $data->datalynx = get_string('modulename', 'datalynx');
@@ -91,14 +87,14 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
         } else {
             $entryurl = new moodle_url($data->url);
         }
-        $notename = get_string("messageprovider:datalynx_$event", 'datalynx');
+        $notename = get_string("messageprovider:$eventname", 'datalynx');
         $subject = "$sitename -> $data->coursename -> $strdatalynx $data->datalynxname:  $notename";
 
         // prepare message object
         $message = new stdClass();
         $message->siteshortname   = format_string($SITE->shortname);
         $message->component       = 'mod_datalynx';
-        $message->name            = "datalynx_$event";
+        $message->name            = get_string("event_$eventname", 'datalynx');
         $message->context         = $data->context;
         $message->subject         = $subject;
         $message->fullmessageformat = $data->notificationformat;
@@ -113,7 +109,7 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
                 $user = $DB->get_record('user', array('id' => $userid));
                 $message->userto = $user;
                 $data->fullname = fullname($user);
-                $notedetails = get_string("message_$event", 'datalynx', $data);
+                $notedetails = get_string("message_$eventname", 'datalynx', $data);
                 $contenthtml = text_to_html($notedetails, false, false, true);
                 $content = html_to_text($notedetails);
                 $message->fullmessage = $content;
@@ -150,6 +146,7 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
     }
 
     public function is_triggered_by($eventname) {
+        $eventname = explode('\\', trim($eventname, '\\'))[2];
         return array_search($eventname, unserialize($this->rule->param1)) !== false;
     }
 

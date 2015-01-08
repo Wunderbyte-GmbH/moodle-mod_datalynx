@@ -22,7 +22,7 @@
 defined('MOODLE_INTERNAL') or die;
 
 require_once("$CFG->libdir/formslib.php");
-require_once('../event_class.php');
+require_once('rule_manager.php');
 
 class datalynx_rule_form extends moodleform {
     protected $_rule = null;
@@ -65,7 +65,7 @@ class datalynx_rule_form extends moodleform {
 
         // events
         $mform->addElement('header', 'eventsettings', get_string('eventsettings', 'datalynx'));
-        $eventmenu = datalynx_event_handler::get_event_data(true);
+        $eventmenu = datalynx_rule_manager::get_event_data();
         $eventgroup = array();
         foreach ($eventmenu as $eventname => $eventlabel) {
             $eventgroup[] =& $mform->createElement('checkbox', $eventname, null, $eventlabel);
@@ -92,7 +92,7 @@ class datalynx_rule_form extends moodleform {
 
     function get_data($slashed = true) {
         if ($data = parent::get_data($slashed)) {
-            $eventmenu = datalynx_event_handler::get_event_data(true);
+            $eventmenu = datalynx_rule_manager::get_event_data();
             $selectedevents = array();
             foreach (array_keys($eventmenu) as $eventname) {
                 if (isset($data->$eventname)) {

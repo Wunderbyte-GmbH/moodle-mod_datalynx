@@ -67,10 +67,11 @@ abstract class datalynx_rule_base {
     }
 
     /**
-     * Applies the rule according to the data provided
-     * @param stdClass $data
+     * @param \core\event\base $event
+     * @return bool
+     * @throws coding_exception
      */
-    public abstract function trigger(stdClass $data);
+    public abstract function trigger(\core\event\base $event);
 
     /**
      * Checks if the rule triggers on the given event

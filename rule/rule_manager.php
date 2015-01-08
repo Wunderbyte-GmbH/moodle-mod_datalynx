@@ -15,44 +15,76 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package datalynx_rule
- * @copyright 2013 Itamar Tzadok
+ * @package mod_datalynx
+ * @copyright 2015 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 /**
- * Rule manager class
+ * Class that manages and triggers rules
  */
 class datalynx_rule_manager {
 
     protected $_df;
     protected $_customrules;
 
+    private static $observers = null;
+
+    /**
+     * Loads data about available events from events.php and lang file
+     * @return array
+     */
+    public static function get_event_data() {
+        if (!self::$observers) {
+            require_once('../db/event.php');
+            self::$observers = $observers;
+        }
+
+        $eventmenu = array();
+        foreach(self::$observers as $observer) {
+            if ($observer['callback'] == 'datalynx_rule_manager::trigger_rules') {
+                // eventname is formed as follows: mod_datalynx\event\<name>, trimming backspace chars just in case
+                $eventname = explode('\\', trim('\\', $observer['eventname']))[2];
+                $eventmenu[$eventname] = get_string("event_$eventname", 'datalynx');
+            }
+        }
+
+        return $eventmenu;
+    }
+
     /**
      * constructor
+     * @param $datalynx datalynx
      */
-    public function __construct($df) {
-        $this->_df = $df;
+    public function datalynx_rule_manager(datalynx $datalynx) {
+        $this->_df = $datalynx;
         $this->_customrules = array();
     }
 
     /**
-     *
+     * Observer of events that can trigger datalynx rules. Triggers all rules associated with the event.
+     * @param \core\event\base $event event data
      */
-    public function get_custom_rules($forceget = false) {
-        $this->get_rules(null, false, $forceget);
-        return $this->_customrules;
+    public static function trigger_rules(\core\event\base $event) {
+        $rulemanager = new datalynx_rule_manager(new datalynx($event->other['dataid']));
+        $rules = $rulemanager->get_rules_for_event($event->eventname);
+        foreach ($rules as $rule) {
+            $rule->trigger($event);
+        }
     }
 
     /**
      * given a rule id return the rule object from get_rules
      * Initializes get_rules if necessary
+     * @param int $ruleid
+     * @param bool $forceget
+     * @return datalynx_rule_base|null
      */
     public function get_rule_from_id($ruleid, $forceget = false) {
         $rules = $this->get_rules(null, false, $forceget);
         
         if (empty($rules[$ruleid])) {;
-            return false;
+            return null;
         } else {
             return $rules[$ruleid];
         }
@@ -78,15 +110,14 @@ class datalynx_rule_manager {
     }
 
     /**
-     * @param string $plugintype
      * @param string $eventname
      * @param bool $enabledonly
      * @return datalynx_rule_base[]
      */
-    public function get_rules_for_event($plugintype, $eventname, $enabledonly = true) {
+    public function get_rules_for_event($eventname, $enabledonly = true) {
         $rules = array();
         foreach  ($this->get_rules() as $ruleid => $rule) {
-            if ($rule->get_type() === $plugintype && $rule->is_triggered_by($eventname) && (!$enabledonly || $rule->is_enabled())) {
+            if ($rule->is_triggered_by($eventname) && (!$enabledonly || $rule->is_enabled())) {
                 $rules[$ruleid] = $rule;
             }
         }
@@ -130,7 +161,10 @@ class datalynx_rule_manager {
     }
 
     /**
-     *
+     * @param null $exclude
+     * @param bool $menu
+     * @param bool $forceget
+     * @return array
      */
     public function get_rules($exclude = null, $menu = false, $forceget = false) {
         global $DB;
@@ -399,6 +433,63 @@ class datalynx_rule_manager {
         $br = html_writer::empty_tag('br');
         echo html_writer::tag('div', $br. $OUTPUT->render($ruleselect). $br, array('class'=>'ruleadd mdl-align'));
         //echo $OUTPUT->help_icon('ruleadd', 'datalynx');
+    }
+
+    private static function notify_team_members(stdClass $data, $event) {
+        global $CFG, $SITE, $USER, $DB;
+
+        /* @var $df datalynx */
+        $df = $data->df;
+        $data->event = $event;
+
+        $data->datalynxs = get_string('modulenameplural', 'datalynx');
+        $data->datalynx = get_string('modulename', 'datalynx');
+        $data->activity = format_string($df->name(), true);
+        $data->url = "$CFG->wwwroot/mod/datalynx/view.php?d=" . $df->id();
+
+        // Prepare message
+        $strdatalynx = get_string('pluginname', 'datalynx');
+        $sitename = format_string($SITE->fullname);
+        $data->siteurl = $CFG->wwwroot;
+        $data->coursename = !empty($data->coursename) ? $data->coursename : 'Unspecified course';
+        $data->datalynxname = !empty($data->datalynxname) ? $data->datalynxname : 'Unspecified datalynx';
+        $data->entryid = implode(array_keys($data->items), ',');
+
+        if ($df->data->singleview) {
+            $entryurl = new moodle_url($data->url, array('view' => $df->data->singleview, 'eids' => $data->entryid));
+        } else if ($df->data->defaultview) {
+            $entryurl = new moodle_url($data->url, array('view' => $df->data->defaultview, 'eids' => $data->entryid));
+        } else {
+            $entryurl = new moodle_url($data->url);
+        }
+        $data->viewlink = html_writer::link($entryurl, get_string('linktoentry', 'datalynx'));
+
+        $notename = get_string("messageprovider:datalynx_$event", 'datalynx');
+        $subject = "$sitename -> $data->coursename -> $strdatalynx $data->datalynxname:  $notename";
+
+        // prepare message object
+        $message = new stdClass();
+        $message->siteshortname   = format_string($SITE->shortname);
+        $message->component       = 'mod_datalynx';
+        $message->name            = "datalynx_$event";
+        $message->context         = $data->context;
+        $message->subject         = $subject;
+        $message->fullmessageformat = $data->notificationformat;
+        $message->smallmessage    = '';
+        $message->notification = 1;
+        $message->userfrom = $data->userfrom = $USER;
+        $data->senderprofilelink = html_writer::link(new moodle_url('/user/profile.php', array('id' => $data->userfrom->id)), fullname($data->userfrom));
+        foreach ($data->users as $user) {
+            $userto = $DB->get_record('user', array('id' => $user->id));
+            $message->userto = $userto;
+            $data->fullname = fullname($userto);
+            $notedetails = get_string("message_$event", 'datalynx', $data);
+            $contenthtml = text_to_html($notedetails, false, false, true);
+            $content = html_to_text($notedetails);
+            $message->fullmessage = $content;
+            $message->fullmessagehtml = $contenthtml;
+            message_send($message);
+        }
     }
 
 }

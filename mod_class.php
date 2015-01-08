@@ -1715,7 +1715,7 @@ class datalynx {
     }
     
     /**
-     * 
+     * TODO: #368 - refactor and comment
      */
     public function events_trigger($event, $data) {
         $data->df = $this;
@@ -1729,7 +1729,47 @@ class datalynx {
         $data->event = $event;
         $data->notification = 1;
         $data->notificationformat = 1;
-        events_trigger("datalynx_$event", $data);
+
+        $other = array('dataid' => $this->id());
+
+        foreach($data->items as $id => $item) {
+            switch ($event) {
+                case 'entryadded':
+                    $event = \mod_datalynx\event\entry_created::create(array('context' => $this->context, 'objectid' => $id, 'other' => $other));
+                    $event->trigger();
+                    break;
+                case 'entryupdated':
+                    $event = \mod_datalynx\event\entry_updated::create(array('context' => $this->context, 'objectid' => $id, 'other' => $other));
+                    $event->trigger();
+                    break;
+                case 'entrydeleted':
+                    $event = \mod_datalynx\event\entry_deleted::create(array('context' => $this->context, 'objectid' => $id, 'other' => $other));
+                    $event->trigger();
+                    break;
+                case 'entryapproved':
+                    $event = \mod_datalynx\event\entry_approved::create(array('context' => $this->context, 'objectid' => $id, 'other' => $other));
+                    $event->trigger();
+                    break;
+                case 'entrydisapproved':
+                    $event = \mod_datalynx\event\entry_disapproved::create(array('context' => $this->context, 'objectid' => $id, 'other' => $other));
+                    $event->trigger();
+                    break;
+                case 'memberadded':
+                    $event = \mod_datalynx\event\teammember_added::create(array('context' => $this->context, 'objectid' => $id, 'other' => $other));
+                    $event->trigger();
+                    break;
+                case 'memberremoved':
+                    $event = \mod_datalynx\event\teammember_removed::create(array('context' => $this->context, 'objectid' => $id, 'other' => $other));
+                    $event->trigger();
+                    break;
+                case 'commentadded':
+                    $event = \mod_datalynx\event\comment_created::create(array('context' => $this->context, 'objectid' => $id, 'other' => $other));
+                    $event->trigger();
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     public function get_baseurl() {

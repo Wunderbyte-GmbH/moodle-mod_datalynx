@@ -17,51 +17,50 @@
 /**
  * Defines message providers (types of messages being sent)
  *
- * @package mod
- * @package datalynx
- * @copyright  2012 Itamar Tzadok
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package mod_datalynx
+ * @copyright 2015 Ivan Šakić <ivan.sakic3@gmail.com>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 $messageproviders = array (
 
-    'datalynx_entryadded' => array (
+    'event_entry_created' => array (
         'capability' => 'mod/datalynx:notifyentryadded',
     ),
 
-    'datalynx_entryupdated' => array (
+    'event_entry_updated' => array (
         'capability' => 'mod/datalynx:notifyentryupdated',
     ),
 
-    'datalynx_entrydeleted' => array (
+    'event_entry_deleted' => array (
         'capability' => 'mod/datalynx:notifyentrydeleted',
     ),
 
-    'datalynx_entryapproved' => array (
+    'event_entry_approved' => array (
         'capability' => 'mod/datalynx:notifyentryapproved',
     ),
 
-    'datalynx_entrydisapproved' => array (
+    'event_entry_disapproved' => array (
         'capability' => 'mod/datalynx:notifyentrydisapproved',
     ),
 
-    'datalynx_commentadded' => array (
+    'event_comment_created' => array (
         'capability' => 'mod/datalynx:notifycommentadded',
     ),
 
-    'datalynx_ratingadded' => array (
+    'event_rating_added' => array (
         'capability' => 'mod/datalynx:notifyratingadded',
     ),
 
-    'datalynx_ratingupdated' => array (
+    'event_rating_updated' => array (
         'capability' => 'mod/datalynx:notifyratingadded',
     ),
 
-    'datalynx_memberadded' => array (
+    'event_teammember_added' => array (
         'capability' => 'mod/datalynx:notifymemberadded',
     ),
 
-    'datalynx_memberremoved' => array (
+    'event_teammember_removed' => array (
         'capability' => 'mod/datalynx:notifymemberremoved',
     ),
 
