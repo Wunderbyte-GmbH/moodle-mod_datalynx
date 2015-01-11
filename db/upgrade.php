@@ -584,6 +584,18 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2014111501, 'datalynx');
     }
 
+    if ($oldversion < 2015011101) {
+        $views = $DB->get_records('datalynx_views');
+        foreach ($views as $view) {
+            if (strpos($view->section, '##entries##') === false) {
+                $view->section .= '##entries##';
+                $DB->update_record('datalynx_views', $view);
+            }
+        }
+        // datalynx savepoint reached
+        upgrade_mod_savepoint(true, 2015011101, 'datalynx');
+    }
+
     return true;
 }
 
