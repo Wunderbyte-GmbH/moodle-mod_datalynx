@@ -1713,9 +1713,11 @@ class datalynx {
     public function add_to_log($action) {
         //FIXME: add_to_log($this->course->id, 'datalynx', 'entry '. $action, $this->pagefile. '.php?id='. $this->cm->id, $this->id(), $this->cm->id);
     }
-    
+
     /**
-     * TODO: #368 - refactor and comment
+     * Method triggering entry-based events
+     * @param $event
+     * @param $data
      */
     public function events_trigger($event, $data) {
         $data->df = $this;
@@ -1752,18 +1754,6 @@ class datalynx {
                     break;
                 case 'entrydisapproved':
                     $event = \mod_datalynx\event\entry_disapproved::create(array('context' => $this->context, 'objectid' => $id, 'other' => $other));
-                    $event->trigger();
-                    break;
-                case 'memberadded':
-                    $event = \mod_datalynx\event\teammember_added::create(array('context' => $this->context, 'objectid' => $id, 'other' => $other));
-                    $event->trigger();
-                    break;
-                case 'memberremoved':
-                    $event = \mod_datalynx\event\teammember_removed::create(array('context' => $this->context, 'objectid' => $id, 'other' => $other));
-                    $event->trigger();
-                    break;
-                case 'commentadded':
-                    $event = \mod_datalynx\event\comment_created::create(array('context' => $this->context, 'objectid' => $id, 'other' => $other));
                     $event->trigger();
                     break;
                 default:

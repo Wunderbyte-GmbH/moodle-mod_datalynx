@@ -873,7 +873,7 @@ function datalynx_comment_validate($comment_param) {
 function datalynx_comment_add($newcomment, $comment_param) {
     $df = new datalynx($comment_param->cm->instance);
     $eventdata = (object) array('items' => $newcomment);
-    $df->events_trigger("commentadded", $eventdata);
+    //$df->events_trigger("commentadded", $eventdata); FIXME: this should behave differently!
 }
 
 //------------------------------------------------------------

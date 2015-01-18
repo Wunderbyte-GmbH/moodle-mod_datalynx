@@ -17,11 +17,11 @@
 /**
  * @package datalynx_rule
  * @subpackage eventnotification
- * @copyright 2014 Ivan Šakić
+ * @copyright 2015 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once("$CFG->dirroot/mod/datalynx/rule/rule_class.php");
+require_once(dirname(__FILE__) . "/../rule_class.php");
 
 class datalynx_rule_eventnotification extends datalynx_rule_base {
     const FROM_AUTHOR = 0;
@@ -41,8 +41,8 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
     /**
      * Class constructor
      *
-     * @param var $df       datalynx id or class object
-     * @param var $rule    rule id or DB record
+     * @param datalynx|int $df   datalynx id or class object
+     * @param stdClass|int $rule rule id or DB record
      */
     public function __construct($df = 0, $rule = 0) {
         parent::__construct($df, $rule);
@@ -51,103 +51,106 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
         $this->recipient = unserialize($this->rule->param3);
     }
 
+    /**
+     * @param \core\event\base $event
+     * @return bool
+     */
+    private function checkteam(\core\event\base $event) {
+        $teamname = $event->get_data()['other']['fieldid'];
+        $triggers = unserialize($this->rule->param1);
+        foreach ($triggers as $trigger) {
+            if(strpos($trigger, $teamname) !== false) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function trigger(\core\event\base $event) {
-        global $CFG, $SITE, $DB;
+        global $CFG, $SITE, $DB, $USER;
 
-        $data = new stdClass();
-
-        $df = new datalynx($event->other['dataid']);
         $eventname = (new \ReflectionClass($event))->getShortName();
-
-        $data->datalynxs = get_string('modulenameplural', 'datalynx');
-        $data->datalynx = get_string('modulename', 'datalynx');
-        $data->activity = format_string($df->name(), true);
-        $data->url = "$CFG->wwwroot/mod/datalynx/view.php?d=" . $df->id();
-
-        // Prepare message
-        $strdatalynx = get_string('pluginname', 'datalynx');
-        $sitename = format_string($SITE->fullname);
-        $data->siteurl = $CFG->wwwroot;
-        $data->coursename = !empty($data->coursename) ? $data->coursename : 'Unspecified course';
-        $data->datalynxname = !empty($data->datalynxname) ? $data->datalynxname : 'Unspecified datalynx';
-        if (is_array($data->items)) {
-            $data->entryid = implode(array_keys($data->items), ',');
-        } else if (is_object($data->items) && isset($data->items->itemid)) {
-            $data->entryid = $data->items->itemid;
-            $data->items = array($data->entryid => $DB->get_record('datalynx_entries', array('id' => $data->entryid)));
-        } else {
-            $data->entryid = array();
+        if (strpos($eventname, 'team') !== false) {
+            if (!$this->checkteam($event)) {
+                return false;
+            } else {
+                // TODO: combine added and removed members if notification sent to changed team
+            }
         }
 
+        $df = $this->df;
+        $viewurl = "$CFG->wwwroot/mod/datalynx/view.php?d=" . $df->id();
+
+        $datalynxname = $df->name() ? format_string($df->name(), true) : 'Unspecified datalynx';
+        $coursename = $df->course->shortname ? format_string($df->course->shortname, true) : 'Unspecified datalynx';
+
+        $messagedata = new stdClass();
+
+        $messagedata->siteurl = $CFG->wwwroot;
+
+        $messagedata->objectid = $event->get_data()['objectid'];
 
         if ($df->data->singleview) {
-            $entryurl = new moodle_url($data->url, array('view' => $df->data->singleview, 'eids' => $data->entryid));
+            $entryurl = new moodle_url($viewurl, array('view' => $df->data->singleview, 'eids' => $messagedata->objectid));
         } else if ($df->data->defaultview) {
-            $entryurl = new moodle_url($data->url, array('view' => $df->data->defaultview, 'eids' => $data->entryid));
+            $entryurl = new moodle_url($viewurl, array('view' => $df->data->defaultview, 'eids' => $messagedata->objectid));
         } else {
-            $entryurl = new moodle_url($data->url);
+            $entryurl = new moodle_url($viewurl);
         }
-        $notename = get_string("messageprovider:$eventname", 'datalynx');
-        $subject = "$sitename -> $data->coursename -> $strdatalynx $data->datalynxname:  $notename";
+        $messagedata->viewlink = html_writer::link($entryurl, get_string('linktoentry', 'datalynx'));
+        $messagedata->datalynxlink = html_writer::link(new moodle_url($viewurl), $datalynxname);
+
+        $notename = get_string("messageprovider:event_$eventname", 'datalynx');
+
+        $pluginname = get_string('pluginname', 'datalynx');
+        $sitename = format_string($SITE->fullname);
+        $subject = "$sitename -> $coursename -> $pluginname $datalynxname:  $notename";
 
         // prepare message object
         $message = new stdClass();
-        $message->siteshortname   = format_string($SITE->shortname);
-        $message->component       = 'mod_datalynx';
-        $message->name            = get_string("event_$eventname", 'datalynx');
-        $message->context         = $data->context;
-        $message->subject         = $subject;
-        $message->fullmessageformat = $data->notificationformat;
-        $message->smallmessage    = '';
-        $message->notification = 1;
+        $message->siteshortname     = format_string($SITE->shortname);
+        $message->component         = 'mod_datalynx';
+        $message->name              = "event_$eventname";
+        $message->context           = $df->context;
+        $message->subject           = $subject;
+        $message->fullmessageformat = 1;
+        $message->smallmessage      = '';
+        $message->notification      = 1;
 
-        foreach ($data->items as $entry) {
-            $data->viewlink = html_writer::link($entryurl, get_string('linktoentry', 'datalynx'));
-            $message->userfrom = $data->userfrom = $this->get_sender_for_entry($entry);
-            $data->senderprofilelink = html_writer::link(new moodle_url('/user/profile.php', array('id' => $data->userfrom->id)), fullname($data->userfrom));
-            foreach ($this->get_recipients_for_entry($entry) as $userid) {
-                $user = $DB->get_record('user', array('id' => $userid));
-                $message->userto = $user;
-                $data->fullname = fullname($user);
-                $notedetails = get_string("message_$eventname", 'datalynx', $data);
-                $contenthtml = text_to_html($notedetails, false, false, true);
-                $content = html_to_text($notedetails);
-                $message->fullmessage = $content;
-                $message->fullmessagehtml = $contenthtml;
-                message_send($message);
-            }
+        // TODO: fix sender!
+        $message->userfrom = (strpos($eventname, 'event') !== false && $this->sender == self::FROM_AUTHOR) ? $USER : $USER;
+        $messagedata->senderprofilelink = html_writer::link(new moodle_url('/user/profile.php', array('id' => $message->userfrom->id)), fullname($message->userfrom));
+
+        foreach ($this->get_recipients() as $userid) {
+            $userto = $DB->get_record('user', array('id' => $userid));
+            $message->userto = $userto;
+            $messagedata->fullname = fullname($userto);
+
+            $messagetext = get_string("message_$eventname", 'datalynx', $messagedata);
+            $message->fullmessage = html_to_text($messagetext);
+            $message->fullmessagehtml = text_to_html($messagetext, false, false, true);
+            message_send($message);
         }
         return true;
     }
 
-    private function get_sender_for_entry($entry) {
-        global $DB, $USER;
-        if ($this->sender == self::FROM_AUTHOR) {
-            return $DB->get_record('user', array('id' => $entry->userid));
-        } else {
-            return $USER;
-        }
-    }
-
-    private function get_recipients_for_entry($entry) {
-        static $recipientsbyrole = null;
+    /**
+     * Get IDs of recepient users as defined by this rule
+     * @param int $authorid user ID of the entry author, if the rule is entry-related
+     * @return array array of user IDs
+     */
+    private function get_recipients($authorid = 0) {
         $recipientids = array();
-        if (isset($this->recipient['author'])) {
-            $recipientids[] = $entry->userid;
+        if (isset($this->recipient['author']) && $authorid) {
+            $recipientids[] = $authorid;
         }
         if (isset($this->recipient['roles'])) {
-            if (!isset($recipientsbyrole)) {
-                $recipientsbyrole = $this->get_roles_used_in_context($this->df->context, $this->recipient['roles']);
-            }
-            $recipientids += $recipientsbyrole;
+            $recipientids = array_merge($recipientids, $this->get_roles_used_in_context($this->df->context, $this->recipient['roles']));
         }
-        $recipientids = array_unique($recipientids);
-        return $recipientids;
-    }
-
-    public function is_triggered_by($eventname) {
-        $eventname = explode('\\', trim($eventname, '\\'))[2];
-        return array_search($eventname, unserialize($this->rule->param1)) !== false;
+        if (isset($this->recipient['teams'])) {
+            $recipientids = array_merge($recipientids, $this->get_team_recipients($this->recipient['teams']));
+        }
+        return array_diff(array_unique($recipientids), [0]);
     }
 
     /**
@@ -169,6 +172,30 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
                    AND ra.contextid $contextlist";
 
         return $DB->get_fieldset_sql($sql, $params1 + $params2);
+    }
+
+    /**
+     * Compiles an array of IDs of users that should receive this notification based on team fields
+     * @param $teams
+     * @return array
+     * @throws coding_exception
+     * @throws dml_exception
+     */
+    protected function get_team_recipients($teams) {
+        global $DB;
+        $ids = array();
+        List($insql, $params) = $DB->get_in_or_equal($teams, SQL_PARAMS_NAMED);
+        $sql = "SELECT dc.content
+                  FROM {datalynx_contents} dc
+            INNER JOIN {datalynx_fields} df ON dc.fieldid = df.id
+                 WHERE dataid = :dataid
+                   AND df.id $insql";
+        $params = array_merge($params, ['dataid' => $this->df->id()]);
+        $contents = $DB->get_fieldset_sql($sql, $params);
+        foreach ($contents as $content) {
+            $ids = array_merge($ids, json_decode($content, true));
+        }
+        return array_unique($ids);
     }
 
 }

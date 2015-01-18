@@ -32,9 +32,11 @@ class datalynx_rule_manager {
 
     /**
      * Loads data about available events from events.php and lang file
+     * @param int $dataid instance id, only necessary if per-team-field-change events are needed
      * @return array
+     * @throws coding_exception
      */
-    public static function get_event_data() {
+    public static function get_event_data($dataid = 0) {
         if (!self::$observers) {
             require_once('../db/event.php');
             self::$observers = $observers;
@@ -44,12 +46,24 @@ class datalynx_rule_manager {
         foreach(self::$observers as $observer) {
             if ($observer['callback'] == 'datalynx_rule_manager::trigger_rules') {
                 // eventname is formed as follows: mod_datalynx\event\<name>, trimming backspace chars just in case
-                $eventname = explode('\\', trim('\\', $observer['eventname']))[2];
-                $eventmenu[$eventname] = get_string("event_$eventname", 'datalynx');
+                $eventname = explode('\\', trim($observer['eventname'], '\\'))[2];
+                if ($eventname !== 'team_updated') {
+                    $eventmenu[$eventname] = get_string("event_$eventname", 'datalynx');
+                } else {
+                    foreach (self::get_team_fields_menu($dataid) as $id => $teamfieldname) {
+                        $eventmenu["$eventname:$id"] = get_string("event_$eventname", 'datalynx') . ": $teamfieldname";
+                    }
+                }
             }
         }
 
         return $eventmenu;
+    }
+
+    private static function get_team_fields_menu($dataid) {
+        global $DB;
+        $params = array('dataid' => $dataid, 'type' => 'teammemberselect');
+        return $DB->get_records_menu('datalynx_fields', $params, '', 'id, name');
     }
 
     /**
@@ -66,7 +80,10 @@ class datalynx_rule_manager {
      * @param \core\event\base $event event data
      */
     public static function trigger_rules(\core\event\base $event) {
-        $rulemanager = new datalynx_rule_manager(new datalynx($event->other['dataid']));
+        global $DB;
+        $cmid = $event->get_data()['contextinstanceid'];
+        $dataid = $DB->get_field('course_modules', 'instance', array('id' => $cmid));
+        $rulemanager = new datalynx_rule_manager(new datalynx($dataid));
         $rules = $rulemanager->get_rules_for_event($event->eventname);
         foreach ($rules as $rule) {
             $rule->trigger($event);
@@ -164,7 +181,7 @@ class datalynx_rule_manager {
      * @param null $exclude
      * @param bool $menu
      * @param bool $forceget
-     * @return array
+     * @return datalynx_rule_base[] array of all rules
      */
     public function get_rules($exclude = null, $menu = false, $forceget = false) {
         global $DB;

@@ -26,13 +26,14 @@ require_once('rule_manager.php');
 
 class datalynx_rule_form extends moodleform {
     protected $_rule = null;
+    /* @var datalynx $_df */
     protected $_df = null;
 
-    public function __construct($rule, $action = null, $customdata = null, $method = 'post', $target = '', $attributes = null, $editable = true) {
+    public function datalynx_rule_form($rule, $action = null, $customdata = null, $method = 'post', $target = '', $attributes = null, $editable = true) {
         $this->_rule = $rule;
         $this->_df = $this->_rule->df;
         
-        parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
+        parent::moodleform($action, $customdata, $method, $target, $attributes, $editable);
     }
 
     function definition() {
@@ -65,7 +66,7 @@ class datalynx_rule_form extends moodleform {
 
         // events
         $mform->addElement('header', 'eventsettings', get_string('eventsettings', 'datalynx'));
-        $eventmenu = datalynx_rule_manager::get_event_data();
+        $eventmenu = datalynx_rule_manager::get_event_data($this->_df->id());
         $eventgroup = array();
         foreach ($eventmenu as $eventname => $eventlabel) {
             $eventgroup[] =& $mform->createElement('checkbox', $eventname, null, $eventlabel);
@@ -92,7 +93,7 @@ class datalynx_rule_form extends moodleform {
 
     function get_data($slashed = true) {
         if ($data = parent::get_data($slashed)) {
-            $eventmenu = datalynx_rule_manager::get_event_data();
+            $eventmenu = datalynx_rule_manager::get_event_data($this->_df->id());
             $selectedevents = array();
             foreach (array_keys($eventmenu) as $eventname) {
                 if (isset($data->$eventname)) {

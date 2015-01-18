@@ -42,9 +42,22 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
         // recipient
         $grp = array();
         $grp[] = &$mform->createElement('checkbox', 'author', null, get_string('author', 'datalynx'), null);
-        $grp[] = &$mform->createElement('static', 'rolesheader', '', get_string('roles'));
+
         $grp[] = &$mform->createElement('checkboxgroup', 'roles', get_string('roles'), $this->menu_roles_used_in_context(), '<br/>');
+
+        $grp[] = &$mform->createElement('checkboxgroup', 'teams', get_string('teams', 'datalynx'), $this->get_datalynx_team_fields(), '<br/>');
+
         $mform->addGroup($grp, 'recipientgrp', get_string('to'), $br, false);
+    }
+
+    protected function get_datalynx_team_fields() {
+        global $DB;
+        $sql = "SELECT id, name
+                  FROM {datalynx_fields}
+                 WHERE dataid = :dataid
+                   AND " . $DB->sql_like('type', ':type');
+        $params = ['dataid' => $this->_df->id(), 'type' => 'teammemberselect'];
+        return $DB->get_records_sql_menu($sql, $params);
     }
 
     protected function menu_roles_used_in_context() {
@@ -63,6 +76,9 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
         if (isset($recipients['roles'])) {
             $data->roles = $recipients['roles'];
         }
+        if (isset($recipients['teams'])) {
+            $data->teams = $recipients['teams'];
+        }
         parent::set_data($data);
     }
 
@@ -76,6 +92,10 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
 
             if (isset($data->roles)) {
                 $recipients['roles'] = $data->roles;
+            }
+
+            if (isset($data->teams)) {
+                $recipients['teams'] = $data->teams;
             }
             $data->param3 = serialize($recipients);
         }

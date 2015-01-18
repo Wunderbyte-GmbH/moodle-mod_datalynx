@@ -73,16 +73,6 @@ class datalynx_entries {
             }
         }            
 
-        // Apply entry content rules
-        $rm = $this->datalynx->get_rule_manager();
-        if (!empty($entriesset->entries) and $rules = $rm->get_rules_by_plugintype('entrycontent')) {
-            foreach ($rules as $rule) {
-                if ($rule->is_enabled()) {
-                    $entriesset->entries = $rule->trigger($entriesset->entries);
-                }
-            }
-        }
-        
         $this->_entries = !empty($entriesset->entries) ? $entriesset->entries : array();
         $this->_entriestotalcount = !empty($entriesset->max) ? $entriesset->max : count($this->_entries);
         $this->_entriesfiltercount = !empty($entriesset->found) ? $entriesset->found : count($this->_entries);
@@ -584,23 +574,18 @@ class datalynx_entries {
                             $contents = $newcontents;
 
                             global $DB;
-                            // now update entry and contents
+                            // now update entry and contents TODO: TEAM_CHANGED - check this!
                             $addorupdate = '';
-                            $teamfieldid = $this->get_teammemberselect_fields_to_notify($df->id());
+
                             foreach ($entries as $eid => $entry) {
                                 if ($entry->id = $this->update_entry($entry, $contents[$eid]['info'])) {
                                     // $eid should be different from $entryid only in new entries
                                     foreach ($contents[$eid]['fields'] as $fieldid => $content) {
-                                        if (array_search($fieldid, $teamfieldid) !== false && array_search($eid, $skipnotification) === false) {
-                                                if (array_search($eid, $drafttofinal) !== false) {
-                                                $oldcontent = array();
-                                            } else {
-                                                $oldcontent = json_decode($DB->get_field('datalynx_contents', 'content',
-                                                                          array('fieldid' => $fieldid,
-                                                                                'entryid' => $entryid)), true);
-                                            }
+                                        $field = $DB->get_record('datalynx_fields', array('id' => $fieldid));
+                                        if ($field->type == 'teammemberselect') {
+                                            $oldcontent = json_decode($DB->get_field('datalynx_contents', 'content',
+                                                array('fieldid' => $fieldid, 'entryid' => $eid)), true);
                                             $newcontent = $content[''];
-                                            $field = $DB->get_record('datalynx_fields', array('id' => $fieldid));
                                             $this->notify_team_members($entry, $field, $oldcontent, $newcontent);
                                         }
                                         $fields[$fieldid]->update_content($entry, $content);
@@ -714,30 +699,6 @@ class datalynx_entries {
                         $strnotify = 'entriesdeleted';
                         break;
 
-                    case 'append':
-                        $completiontype = COMPLETION_UNKNOWN;
-                        $nodeid = required_param('node', PARAM_INT);
-                        $parentid = required_param('parent', PARAM_INT);
-                        $siblingid = optional_param('sibling', 0, PARAM_INT);
-
-                        //get the node content of the requested entries
-                        list($eids, $params) = $DB->get_in_or_equal(array_keys($entries), SQL_PARAMS_NAMED);
-                        $params['fieldid'] = $nodeid;
-                        $contents = $DB->get_records_select('datalynx_contents', "fieldid = :fieldid AND entryid {$eids}", $params);
-                        //update node content of the entries
-                        foreach ($contents as $content) {
-                            if ($content->entryid != $parentid and $content->entryid != $siblingid) {
-                                $content->content = $parentid;
-                                $content->content1 = $siblingid;
-                                $DB->update_record('datalynx_contents', $content);
-                                
-                                $processed[] = $content->entryid;
-                            }
-                        }
-
-                        $strnotify = 'entriesappended';
-                        break;
-
                     default:
                         break;
                 }
@@ -762,23 +723,9 @@ class datalynx_entries {
         }
     }
 
-    public function get_teammemberselect_fields_to_notify($dataid) {
-        global $CFG, $DB;
-        $query = "SELECT f.id
-                    FROM {datalynx_fields} f
-                   WHERE f.type = 'teammemberselect'
-                     AND f.dataid = :dataid
-                     AND f.param6 = 1";
-        $params = array('dataid' => $dataid);
-        $results = $DB->get_fieldset_sql($query, $params);
-        $results = $results ? $results : array();
-        return $results;
-    }
-
     public function notify_team_members($entry, $field, $oldmembers, $newmembers) {
         global $DB;
 
-        $df = $this->datalynx;
         $oldmembers = !empty($oldmembers) ? array_filter($oldmembers) : array();
         $newmembers = array_filter($newmembers);
 
@@ -799,14 +746,21 @@ class datalynx_entries {
             $removedmembers = array();
         }
 
-        $eventdata = array('items' => array($entry->id => $entry),
-                           'fieldname' => $field->name);
+        $other = ['dataid' => $this->datalynx->id(),
+                  'fieldid' => $field->id,
+                  'name' => $field->name,
+                  'addedmembers' => json_encode($addedmembers),
+                  'removedmembers' => json_encode($removedmembers)];
 
-        $eventdata['users'] = $addedmembers;
-        $df->events_trigger('memberadded', (object) $eventdata);
+        if (!empty($addedmembers)) {
+            $event = \mod_datalynx\event\team_updated::create(array('context' => $this->datalynx->context, 'objectid' => $entry->id, 'other' => $other));
+            $event->trigger();
+        }
 
-        $eventdata['users'] = $removedmembers;
-        $df->events_trigger('memberremoved', (object) $eventdata);
+        if (!empty($removedmembers)) {
+            $event = \mod_datalynx\event\team_updated::create(array('context' => $this->datalynx->context, 'objectid' => $entry->id, 'other' => $other));
+            $event->trigger();
+        }
     }
 
     /**

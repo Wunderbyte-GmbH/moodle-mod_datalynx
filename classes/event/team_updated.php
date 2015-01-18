@@ -27,7 +27,7 @@ namespace mod_datalynx\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The mod_datalynx teammember added event class.
+ * The mod_datalynx team updated event class.
  *
  * @property-read array $other {
  *      Extra information about event.
@@ -40,7 +40,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2015 Ivan Šakić <ivan.sakic3@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class teammember_added extends \core\event\base {
+class team_updated extends \core\event\base {
 
     /**
      * Init method.
@@ -59,7 +59,7 @@ class teammember_added extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('datalynx_teammemberadded', 'mod_datalynx');
+        return get_string('datalynx_team_updated', 'mod_datalynx');
     }
 
     /**
@@ -68,7 +68,7 @@ class teammember_added extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' added the datalynx teammember with id '$this->objectid' for the datalynx activity " .
+        return "The user with id '$this->userid' changed the team of the entry with id '$this->objectid' for the datalynx activity " .
             "with the course module id '$this->contextinstanceid'.";
     }
 
@@ -87,7 +87,7 @@ class teammember_added extends \core\event\base {
      * @return array
      */
     public function get_legacy_logdata() {
-        return array($this->courseid, 'datalynx', 'teammember_added', 'view.php?d=' . $this->other['dataid'] . '&amp;eid=' . $this->objectid,
+        return array($this->courseid, 'datalynx', 'team_updated', 'view.php?d=' . $this->other['dataid'] . '&amp;eid=' . $this->objectid,
             $this->other['dataid'], $this->contextinstanceid);
     }
 

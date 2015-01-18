@@ -708,6 +708,7 @@ $string['deletetag'] = 'Delete tag';
 $string['action'] = 'Action';
 $string['field'] = 'Field';
 $string['tagproperties'] = '{$a->tagtype} tag properties: {$a->tagname}';
+$string['teams'] = 'Teams';
 
 $string['event_entry_created'] = 'Entry created';
 $string['event_entry_updated'] = 'Entry updated';
@@ -718,8 +719,7 @@ $string['event_comment_created'] = 'Comment created';
 $string['event_rating_added'] = 'Rating added';
 $string['event_rating_updated'] = 'Rating updated';
 $string['event_rating_deleted'] = 'Rating deleted';
-$string['event_teammember_added'] = 'Team member added';
-$string['event_teammember_removed'] = 'Team member removed';
+$string['event_team_updated'] = 'Team updated';
 
 /// Message strings
 $string['message_entry_created'] =
@@ -755,16 +755,13 @@ the content in {$a->datalynxlink} has been modified by {$a->senderprofilelink}.
 
 The following entry has been disapproved: {$a->viewlink}.';
 
-$string['message_comment_added'] = 'Datalynx comment added';
+$string['message_comment_created'] = 'Datalynx comment added';
 $string['message_rating_added'] = 'Datalynx rating added';
 $string['message_rating_updated'] = 'Datalynx rating updated';
 
-$string['message_memberadded'] = 'Dear {$a->fullname},
+$string['message_team_updated'] = 'Dear {$a->fullname},
 
-you have been added to {$a->fieldname} by {$a->senderprofilelink}. Please go to {$a->viewlink} for more details.';
-$string['message_memberremoved'] = 'Dear {$a->fullname},
-
-you have been removed from {$a->fieldname} by {$a->senderprofilelink}. Please go to {$a->viewlink} for more details.';
+{$a->fieldname} membership has been changed by {$a->senderprofilelink}. Please go to {$a->viewlink} for more details.';
 /// End Message strings
 
 /// Message provider strings
@@ -773,9 +770,8 @@ $string['messageprovider:event_entry_updated'] = 'Datalynx entry updated';
 $string['messageprovider:event_entry_deleted'] = 'Datalynx entry deleted';
 $string['messageprovider:event_entry_approved'] = 'Datalynx entry approved';
 $string['messageprovider:event_entry_disapproved'] = 'Datalynx entry disapproved';
-$string['messageprovider:event_comment_added'] = 'Datalynx comment added';
+$string['messageprovider:event_comment_created'] = 'Datalynx comment created';
 $string['messageprovider:event_rating_added'] = 'Datalynx rating added';
 $string['messageprovider:event_rating_updated'] = 'Datalynx rating updated';
-$string['messageprovider:event_teammember_added'] = 'Team membership status change';
-$string['messageprovider:event_teammember_removed'] = 'Team membership status change';
-/// End Message provider strings
+$string['messageprovider:event_team_updated'] = 'Datalynx entry team updated';
+/// End Message provider strings event_team_updated

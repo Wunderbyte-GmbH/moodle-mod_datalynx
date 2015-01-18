@@ -93,7 +93,7 @@ class mod_datalynx_mod_form extends moodleform_mod {
         //-------------------------------------------------------------------------------
         if($CFG->enablerssfeeds && $CFG->datalynx_enablerssfeeds){
             $mform->addElement('header', 'rssshdr', get_string('rss'));
-
+            $countoptions = 0;
             $mform->addElement('select', 'rssarticles', get_string('numberrssarticles', 'datalynx') , $countoptions);
         }
 

@@ -35,6 +35,7 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class comment_created extends \core\event\comment_created {
+
     /**
      * Get URL related to the action.
      *
@@ -50,7 +51,7 @@ class comment_created extends \core\event\comment_created {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' added the comment with id '$this->objectid' to the datalynx activity with " .
+        return "The user with id '$this->userid' added the comment with to the datalynx activity with " .
             "the course module id '$this->contextinstanceid'.";
     }
 }

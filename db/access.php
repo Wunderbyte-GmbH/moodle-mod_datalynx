@@ -389,22 +389,8 @@ $capabilities = array(
         )
     ),
 
-    // Notified on updated rating
-    'mod/datalynx:notifymemberadded' => array(
-
-        'riskbitmask' => RISK_PERSONAL,
-        'captype' => 'read',
-        'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => array(
-            'manager' => CAP_ALLOW,
-            'teacher' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-            'student' => CAP_ALLOW,
-        )
-    ),
-
-    // Notified on updated rating
-    'mod/datalynx:notifymemberremoved' => array(
+    // Notified on updated team
+    'mod/datalynx:notifyteamupdated' => array(
 
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'read',

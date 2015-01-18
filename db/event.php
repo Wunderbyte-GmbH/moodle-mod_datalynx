@@ -43,10 +43,7 @@ $observers = array(
     array('eventname' => 'mod_datalynx\event\rating_updated',
         'callback' => 'datalynx_rule_manager::trigger_rules',
         'includefile' => 'mod/datalynx/rule/rule_manager.php'),
-    array('eventname' => 'mod_datalynx\event\teammember_added',
-        'callback' => 'datalynx_rule_manager::trigger_rules',
-        'includefile' => 'mod/datalynx/rule/rule_manager.php'),
-    array('eventname' => 'mod_datalynx\event\teammember_removed',
+    array('eventname' => 'mod_datalynx\event\team_updated',
         'callback' => 'datalynx_rule_manager::trigger_rules',
         'includefile' => 'mod/datalynx/rule/rule_manager.php'),
 );
