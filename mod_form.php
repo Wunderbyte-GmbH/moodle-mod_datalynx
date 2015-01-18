@@ -100,23 +100,6 @@ class mod_datalynx_mod_form extends moodleform_mod {
         // grading
         //-------------------------------------------------------------------------------
         $mform->addElement('header', 'gradinghdr', get_string('rating', 'rating'));
-
-        // entry rating
-        $mform->addElement('modgrade', 'grade', get_string('grade'));
-        $mform->setDefault('grade', 0);
-
-        // rating method
-        $grademethods = array(
-            0 => get_string('ratingmanual', 'datalynx'),
-            1 => get_string('ratingsavg', 'datalynx'),
-            2 => get_string('ratingscount', 'datalynx'),
-            3 => get_string('ratingsmax', 'datalynx'),
-            4 => get_string('ratingsmin', 'datalynx'),
-            5 => get_string('ratingssum', 'datalynx')
-        );
-        $mform->addElement('select', 'grademethod', get_string('gradingmethod', 'datalynx'), $grademethods);
-        $mform->setDefault('grademethod', 0);
-        $mform->disabledIf('grademethod', 'grade', 'eq', 0);
         
         // entry rating
         $mform->addElement('modgrade', 'rating', get_string('rating', 'datalynx'));

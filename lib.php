@@ -368,7 +368,7 @@ function datalynx_supports($feature) {
         case FEATURE_COMPLETION_HAS_RULES:    return true;
         //case FEATURE_GRADE_HAS_GRADE:         return true;
         //case FEATURE_ADVANCED_GRADING:        return true;
-        case FEATURE_GRADE_OUTCOMES:          return true;
+        //case FEATURE_GRADE_OUTCOMES:          return true;
         case FEATURE_BACKUP_MOODLE2:          return true;
 
         default: return null;

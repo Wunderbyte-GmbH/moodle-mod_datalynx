@@ -74,6 +74,7 @@ class datalynx_rating_manager extends rating_manager {
      *            assesstimestart  => int only allow rating of items created after this timestamp [optional]
      *            assesstimefinish => int only allow rating of items created before this timestamp [optional]
      * @return array the array of items with their ratings attached at $items[0]->rating
+     * @throws coding_exception
      */
     public function get_ratings($options) {
         global $DB, $USER;
