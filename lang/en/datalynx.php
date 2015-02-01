@@ -210,16 +210,6 @@ $string['filetypeimage'] = 'Image files';
 $string['filetypejpg'] = 'jpg files';
 $string['filetypepng'] = 'png files';
 $string['filetypes'] = 'Accepted file types';
-// FILTER
-$string['empty'] = 'Empty';
-$string['equal'] = 'Equal';
-$string['greaterthan'] = 'Greater than';
-$string['lessthan'] = 'Less than';
-$string['greaterorequal'] = 'Greater or equal';
-$string['lessorequal'] = 'Less or equal';
-$string['between'] = 'Between';
-$string['contains'] = 'Contains';
-$string['in'] = 'In';
 
 // FILTER FORM
 $string['andor'] = 'and/or ...';
@@ -230,7 +220,7 @@ $string['not'] = 'NOT';
 // FILTER
 $string['filtersortfieldlabel'] = 'Sort field ';
 $string['filtersearchfieldlabel'] = 'Search field ';
-$string['filteradvanced'] = 'Advanced filter';
+$string['filteradvanced'] = 'Custom filter';
 $string['filteradd'] = 'Add a filter';
 $string['filterbypage'] = 'By page';
 $string['filtercancel'] = 'Cancel filter';
@@ -775,3 +765,24 @@ $string['messageprovider:event_rating_added'] = 'Datalynx rating added';
 $string['messageprovider:event_rating_updated'] = 'Datalynx rating updated';
 $string['messageprovider:event_team_updated'] = 'Datalynx entry team updated';
 /// End Message provider strings event_team_updated
+
+$string['filterforms'] = 'Filter forms';
+$string['filterformadd'] = 'Add new filter form';
+$string['newfilterform'] = 'New filter form';
+
+// FILTER
+$string['empty'] = 'empty';
+$string['equal'] = 'equal';
+$string['between'] = 'between';
+$string['contains'] = 'contains';
+$string['in'] = 'in';
+$string['anyof'] = 'any of';
+$string['allof'] = 'all of';
+$string['exactly'] = 'exactly';
+$string['greater_than'] = 'greater than';
+$string['greater_equal'] = 'greater or equal';
+$string['less_than'] = 'less than';
+$string['less_equal'] = 'less or equal';
+$string['less_equal'] = 'equal';
+$string['before'] = 'before';
+$string['after'] = 'after';

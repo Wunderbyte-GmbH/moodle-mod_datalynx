@@ -58,8 +58,8 @@ if ($mform->is_cancelled()){
     if (!$field->id()) {
         $fieldid = $field->insert_field($data);
 
-        $other = array('dataid' => $this->id());
-        $event = \mod_datalynx\event\field_created::create(array('context' => $this->context, 'objectid' => $fieldid, 'other' => $other));
+        $other = array('dataid' => $df->id());
+        $event = \mod_datalynx\event\field_created::create(array('context' => $df->context, 'objectid' => $fieldid, 'other' => $other));
         $event->trigger();
 
     // update field
@@ -67,8 +67,8 @@ if ($mform->is_cancelled()){
         $data->id = $field->id();
         $field->update_field($data);
 
-        $other = array('dataid' => $this->id());
-        $event = \mod_datalynx\event\field_updated::create(array('context' => $this->context, 'objectid' => $field->id(), 'other' => $other));
+        $other = array('dataid' => $df->id());
+        $event = \mod_datalynx\event\field_updated::create(array('context' => $df->context, 'objectid' => $field->id(), 'other' => $other));
         $event->trigger();
     }
 

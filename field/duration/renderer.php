@@ -92,10 +92,22 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
         $fieldname = "f_{$i}_$fieldid";
 
         $arr = array();
-        $arr[] = &$mform->createElement('duration', $fieldname);
-        $mform->setType($fieldname, PARAM_NOTAGS);
-        $mform->setDefault($fieldname, $value);
-        $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
+
+        $arr[] = &$mform->createElement('duration', "{$fieldname}_from");
+        $mform->setType("{$fieldname}_from", PARAM_INT);
+        if (isset($value[0])) {
+            $mform->setDefault("{$fieldname}_from", $value[0]);
+        }
+        $mform->disabledIf("{$fieldname}_from[number]", "searchoperator$i", 'eq', '');
+        $mform->disabledIf("{$fieldname}_from[timeunit]", "searchoperator$i", 'eq', '');
+
+        $arr[] = &$mform->createElement('duration', "{$fieldname}_to");
+        $mform->setType("{$fieldname}_to", PARAM_INT);
+        if (isset($value[1])) {
+            $mform->setDefault("{$fieldname}_to", $value[1]);
+        }
+        $mform->disabledIf("{$fieldname}_to[number]", "searchoperator$i", 'neq', 'BETWEEN');
+        $mform->disabledIf("{$fieldname}_to[timeunit]", "searchoperator$i", 'neq', 'BETWEEN');
 
         return array($arr, null);
     }

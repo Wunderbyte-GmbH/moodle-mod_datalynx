@@ -137,5 +137,13 @@ class datalynxfield_identifier extends datalynxfield_base {
 
         return $DB->record_exists('datalynx_contents', array('fieldid' => $this->fieldid, 'content' => $key));
     }
+
+    public function get_supported_search_operators() {
+        return array(
+            '' => get_string('empty', 'datalynx'),
+            '=' => get_string('equal', 'datalynx'),
+            'LIKE' => get_string('contains', 'datalynx'),
+        );
+    }
 }
 

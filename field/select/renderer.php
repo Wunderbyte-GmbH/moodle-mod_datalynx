@@ -108,25 +108,22 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
     }
 
     public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
+        global $CFG;
+        HTML_QuickForm::registerElementType('checkboxgroup', "$CFG->dirroot/mod/datalynx/checkboxgroup/checkboxgroup.php", 'HTML_QuickForm_checkboxgroup');
+
         $field = $this->_field;
         $fieldid = $field->id();
 
+        $selected = $value;
+
         $options = $field->options_menu();
-        $selected = $value ? (int) $value : '';
+
         $fieldname = "f_{$i}_$fieldid";
+        $select = &$mform->createElement('checkboxgroup', $fieldname, null, $options, '');
+        $select->setValue($selected);
 
         $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
 
-        $select = &$mform->createElement('select', $fieldname, null);
-
-        $options = array('' => get_string('choosedots')) + $options;
-        foreach ($options as $id => $name) {
-            $select->addOption($name, $id);
-        }
-
-        $select->setSelected($selected);
-
         return array(array($select), null);
     }
-
 }

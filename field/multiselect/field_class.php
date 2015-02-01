@@ -52,58 +52,6 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
     /**
      *
      */
-    public function format_search_value($searchparams) {
-        list($not, $operator, $value) = $searchparams;
-        if (is_array($value)){
-            $selected = implode(', ', $value['selected']);
-            $allrequired = '('. ($value['allrequired'] ? get_string('requiredall') : get_string('requirednotall', 'datalynx')). ')';
-            return $not. ' '. $operator. ' '. $selected. ' '. $allrequired;
-        } else {
-            return false;
-        }
-    }  
-
-    /**
-     *
-     */
-    public function get_search_sql($search) {
-        global $DB;
-        
-        // TODO Handle search for empty field
-        
-        list($not, , $value) = $search;
-
-        static $i=0;
-        $i++;
-        $name = "df_{$this->field->id}_{$i}_";
-        $params = array();
-
-        $allrequired = $value['allrequired'];
-        $selected    = $value['selected'];
-        $content = "c{$this->field->id}.content";
-
-        if ($selected) {
-            $conditions = array();
-            foreach ($selected as $key => $sel) {
-                $xname = $name. $key;
-                $likesel = str_replace('%', '\%', $sel);
-
-                $conditions[] = $DB->sql_like($content, ":{$xname}");
-                $params[$xname] = "%#$likesel#%";
-            }
-            if ($allrequired) {
-                return array(" $not (".implode(" AND ", $conditions).") ", $params, true);
-            } else {
-                return array(" $not (".implode(" OR ", $conditions).") ", $params, true);
-            }
-        } else {
-           return array(" ", $params);
-        }
-    }
-
-    /**
-     *
-     */
     protected function format_content($entry, array $values = null) {
         $fieldid = $this->field->id;
         $contents = array();

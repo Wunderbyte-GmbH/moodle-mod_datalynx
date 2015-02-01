@@ -97,31 +97,23 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
     }
 
     public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
+        global $CFG;
+        HTML_QuickForm::registerElementType('checkboxgroup', "$CFG->dirroot/mod/datalynx/checkboxgroup/checkboxgroup.php", 'HTML_QuickForm_checkboxgroup');
+
         $field = $this->_field;
         $fieldid = $field->id();
 
-        if (is_array($value)){
-            $selected     = $value['selected'];
-            $allrequired = $value['allrequired'] ? 'checked = "checked"' : '';
-        } else {
-            $selected     = array();
-            $allrequired = '';
-        }
+        $selected = $value;
 
         $options = $field->options_menu();
 
         $fieldname = "f_{$i}_$fieldid";
-        $select = &$mform->createElement('select', $fieldname, null, $options);
-        $select->setMultiple(true);
-        $select->setSelected($selected);
+        $select = &$mform->createElement('checkboxgroup', $fieldname, null, $options, '');
+        $select->setValue($selected);
 
         $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
 
-        $allreq = &$mform->createElement('checkbox', "{$fieldname}_allreq", null, ucfirst(get_string('requiredall', 'datalynx')));
-        $mform->setDefault("{$fieldname}_allreq", $allrequired);
-        $mform->disabledIf("{$fieldname}_allreq", "searchoperator$i", 'eq', '');
-
-        return array(array($select, $allreq), null);
+        return array(array($select), null);
     }
 
     public function validate($entryid, $tags, $formdata) {

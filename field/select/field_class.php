@@ -102,18 +102,6 @@ class datalynxfield_select extends datalynxfield_option_single {
     }
 
     /**
-     *
-     */
-    public function get_search_value($value) {
-        $options = $this->options_menu();
-        if ($key = array_search($value, $options)) {
-            return $key;
-        } else {
-            return '';
-        }
-    }
-
-    /**
      * 
      */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
@@ -159,13 +147,6 @@ class datalynxfield_select extends datalynxfield_option_single {
         } else {
             return array();
         }
-    }
-
-    public function get_supported_search_operators() {
-        return array(
-            '' => get_string('empty', 'datalynx'),
-            '=' => get_string('equal', 'datalynx'),
-        );
     }
 
 }

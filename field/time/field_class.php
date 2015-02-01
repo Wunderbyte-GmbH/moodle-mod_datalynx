@@ -176,11 +176,36 @@ class datalynxfield_time extends datalynxfield_base {
     }
 
     /**
+     *
+     */
+    public function format_search_value($searchparams) {
+        list($not, $operator, $value) = $searchparams;
+        if (is_array($value)) {
+            if (count($value) > 1) {
+                $value = '(' . implode(',', $value) . ')';
+            } else {
+                $value = $value[0];
+            }
+        }
+        return $not. ' '. $operator. ' '. $value;
+    }
+
+    /**
      * 
      */
     public function get_sql_compare_text($column = 'content') {
         global $DB;
         return $DB->sql_cast_char2int("c{$this->field->id}.$column", true);
+    }
+
+    public function get_supported_search_operators() {
+        return array(
+            '' => get_string('empty', 'datalynx'),
+            '=' => get_string('equal', 'datalynx'),
+            '>' => get_string('after', 'datalynx'),
+            '<' => get_string('before', 'datalynx'),
+            'BETWEEN' => get_string('between', 'datalynx'),
+        );
     }
 
 }

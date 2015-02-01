@@ -173,10 +173,4 @@ class datalynxfield_radiobutton extends datalynxfield_option_single {
         return array($contents, $oldcontents);
     }
 
-    public function get_supported_search_operators() {
-        return array(
-            '' => get_string('empty', 'datalynx'),
-            '=' => get_string('equal', 'datalynx'),
-        );
-    }
 }

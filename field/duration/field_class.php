@@ -22,6 +22,7 @@
  */
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
+require_once("$CFG->dirroot/mod/datalynx/field/number/field_class.php");
 
 class datalynxfield_duration extends datalynxfield_base {
     public $type = 'duration';
@@ -97,4 +98,110 @@ class datalynxfield_duration extends datalynxfield_base {
         return array();
     }
 
+    /**
+     *
+     */
+    public function parse_search($formdata, $i) {
+        $values = array();
+
+        if (!empty($formdata->{'f_'. $i. '_'. $this->field->id. '_from'})) {
+            $values[0] = $formdata->{'f_'. $i. '_'. $this->field->id. '_from'};
+        }
+
+        if (!empty($formdata->{'f_'. $i. '_'. $this->field->id. '_to'})) {
+            $values[1] = $formdata->{'f_'. $i. '_'. $this->field->id. '_to'};
+        }
+
+        if (!empty($values)) {
+            return $values;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     *
+     */
+    public function get_search_sql($search) {
+        global $DB;
+
+        list($not, $operator, $value) = $search;
+
+        static $i=0;
+        $i++;
+        $fieldid = $this->field->id;
+        $name = "df_{$fieldid}_{$i}";
+
+        // For all NOT criteria except NOT Empty, exclude entries which don't meet the positive criterion
+        $excludeentries = (($not and $operator !== '') or (!$not and $operator === ''));
+
+        if ($excludeentries) {
+            $varcharcontent = $DB->sql_compare_text('content');
+        } else {
+            $varcharcontent = $this->get_sql_compare_text();
+        }
+
+        $params = [];
+        switch ($operator) {
+            case '=':
+            case '>':
+            case '>=':
+            case '<':
+            case '<=':
+                $paramname = "{$name}_$i";
+                $params[$paramname] = trim($value[0]);
+                $sql = "$not $varcharcontent $operator :$paramname ";
+                break;
+            case 'BETWEEN':
+                $paramname = "{$name}_$i";
+                $params["{$paramname}_l"] = floatval(trim($value[0]));
+                $params["{$paramname}_u"] = floatval(trim($value[1]));
+                $sql = "$not ($varcharcontent > :{$paramname}_l AND $varcharcontent < :{$paramname}_u) ";
+                break;
+            default:
+                $sql = " 1 ";
+                break;
+        }
+
+        if ($excludeentries) {
+            // Get entry ids for entries that meet the criterion
+            if ($eids = $this->get_entry_ids_for_content($sql, $params)) {
+                // Get NOT IN sql
+                list($notinids, $params) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED, "df_{$fieldid}_", false);
+                $sql = " e.id $notinids ";
+                return array($sql, $params, false);
+            } else {
+                return array('', '', '');
+            }
+        } else {
+            return array($sql, $params, true);
+        }
+    }
+
+    /**
+     *
+     */
+    public function format_search_value($searchparams) {
+        list($not, $operator, $value) = $searchparams;
+        if (is_array($value)) {
+            if (count($value) > 1) {
+                $value = '(' . implode(',', $value) . ')';
+            } else {
+                $value = $value[0];
+            }
+        }
+        return $not. ' '. $operator. ' '. $value;
+    }
+
+    public function get_supported_search_operators() {
+        return array(
+            '' => get_string('empty', 'datalynx'),
+            '=' => get_string('equal', 'datalynx'),
+            '>' => get_string('greater_than', 'datalynx'),
+            '>=' => get_string('greater_equal', 'datalynx'),
+            '<' => get_string('less_than', 'datalynx'),
+            '<=' => get_string('less_equal', 'datalynx'),
+            'BETWEEN' => get_string('between', 'datalynx'),
+        );
+    }
 }

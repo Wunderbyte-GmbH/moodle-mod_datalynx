@@ -110,6 +110,19 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
         return $str;
     }
 
+    public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
+        $fieldid = $this->_field->id();
+        $fieldname = "f_{$i}_$fieldid";
+
+        $arr = array();
+        $arr[] = &$mform->createElement('text', $fieldname, null, array('size'=>'32'));
+        $mform->setType($fieldname, PARAM_NOTAGS);
+        $mform->setDefault($fieldname, $value);
+        $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
+
+        return array($arr, null);
+    }
+
     public function validate($entryid, $tags, $formdata) {
         $fieldid = $this->_field->id();
 

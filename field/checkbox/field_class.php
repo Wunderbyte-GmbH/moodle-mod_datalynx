@@ -38,58 +38,6 @@ class datalynxfield_checkbox extends datalynxfield_option_multiple {
     /**
      *
      */
-    public function format_search_value($searchparams) {
-        list($not, $operator, $value) = $searchparams;
-        if (is_array($value)){
-            $selected = implode(', ', $value['selected']);
-            $allrequired = '('. ($value['allrequired'] ? get_string('requiredall') : get_string('requirednotall', 'datalynx')). ')';
-            return $not. ' '. $operator. ' '. $selected. ' '. $allrequired;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     *
-     */
-    public function get_search_sql($search) {
-        global $DB;
-
-        // TODO Handle search for empty field
-
-        list($not, , $value) = $search;
-
-        static $i=0;
-        $i++;
-        $name = "df_{$this->field->id}_{$i}_";
-        $params = array();
-
-        $allrequired = $value['allrequired'];
-        $selected    = $value['selected'];
-        $content = "c{$this->field->id}.content";
-
-        if ($selected) {
-            $conditions = array();
-            foreach ($selected as $key => $sel) {
-                $xname = $name. $key;
-                $likesel = str_replace('%', '\%', $sel);
-
-                $conditions[] = $DB->sql_like($content, ":{$xname}");
-                $params[$xname] = "%#$likesel#%";
-            }
-            if ($allrequired) {
-                return array(" $not (".implode(" AND ", $conditions).") ", $params, true);
-            } else {
-                return array(" $not (".implode(" OR ", $conditions).") ", $params, true);
-            }
-        } else {
-            return array(" ", $params);
-        }
-    }
-
-    /**
-     *
-     */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
         // import only from csv
         if ($csvrecord) {
@@ -152,30 +100,6 @@ class datalynxfield_checkbox extends datalynxfield_option_multiple {
         }
 
         return array($contents, $oldcontents);
-    }
-
-    /**
-     *
-     */
-    public function parse_search($formdata, $i) {
-        $selected = array();
-        
-        $fieldname = "f_{$i}_{$this->field->id}";
-        foreach (array_keys($this->options_menu()) as $cb) {
-            if (!empty($formdata->{"{$fieldname}_$cb"})) {
-                $selected[] = $cb;
-            }
-        }
-        if ($selected) {
-            if (!empty($formdata->{"{$fieldname}_allreq"})) {
-                $allrequired = $formdata->{"{$fieldname}_allreq"};
-            } else {
-                $allrequired = '';
-            }
-            return array('selected'=>$selected, 'allrequired'=>$allrequired);
-        } else {
-            return false;
-        }
     }
 
 }

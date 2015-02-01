@@ -492,7 +492,10 @@ abstract class datalynxfield_base {
     }
 
     /**
-     *
+     * @param $search
+     * @return array|null $fieldsql, $fieldparams, $fromcontent
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public function get_search_sql($search) {
         global $DB;
@@ -683,6 +686,7 @@ abstract class datalynxfield_option extends datalynxfield_base {
     protected $_options = array();
 
     /**
+     * TODO: see if this can be changed or merged with function below
      * @return mixed
      */
     public function get_options() {
@@ -774,6 +778,25 @@ abstract class datalynxfield_option extends datalynxfield_base {
         $this->field->param2 = isset($forminput->param2) ? $forminput->param2 : '';
         $this->field->param3 = isset($forminput->param3) ? $forminput->param3 : '';
     }
+
+    public function format_search_value($searchparams) {
+        list($not, $operator, $value) = $searchparams;
+        if (is_array($value)){
+            $selected = implode(', ', $value);
+            return $not. ' '. $operator. ' '. $selected;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     *
+     */
+    public function parse_search($formdata, $i) {
+        $fieldname = "f_{$i}_{$this->field->id}";
+        return optional_param_array($fieldname, false, PARAM_NOTAGS);
+    }
+
 }
 
 /**
@@ -810,6 +833,76 @@ class datalynxfield_option_multiple extends datalynxfield_option {
     public function supports_group_by() {
         return false;
     }
+
+
+    public function get_search_sql($search) {
+        global $DB;
+
+        list($not, $operator, $value) = $search;
+
+        static $i=0; //FIXME: might cause problems!
+        $i++;
+        $fieldid = $this->field->id;
+        $name = "df_{$fieldid}_{$i}";
+
+        $content = "c{$this->field->id}.content";
+        $params = [];
+        $conditions = [];
+
+        if ($operator === 'ANY_OF') {
+            foreach ($value as $key => $sel) {
+                $xname = $name. $key;
+                $likesel = str_replace('%', '\%', $sel);
+
+                $conditions[] = $DB->sql_like($content, ":{$xname}");
+                $params[$xname] = "%#$likesel#%";
+            }
+            return array(" $not (".implode(" OR ", $conditions).") ", $params, true);
+        } else if ($operator === 'ALL_OF') {
+            foreach ($value as $key => $sel) {
+                $xname = $name. $key;
+                $likesel = str_replace('%', '\%', $sel);
+
+                $conditions[] = $DB->sql_like($content, ":{$xname}");
+                $params[$xname] = "%#$likesel#%";
+            }
+            return array(" $not (".implode(" AND ", $conditions).") ", $params, true);
+        } else if ($operator === 'EXACTLY') {
+            $j = 0;
+            foreach (array_keys($this->options_menu()) as $key) {
+                if (in_array($key, $value)) {
+                    $xname = $name. $j++;
+                    $likesel = str_replace('%', '\%', $key);
+
+                    $conditions[] = $DB->sql_like($content, ":{$xname}");
+                    $params[$xname] = "%#$likesel#%";
+                }
+            }
+            $counterconditions = [];
+            $counternot = $not ? '' : 'NOT';
+            foreach (array_keys($this->options_menu()) as $key) {
+                if (!in_array($key, $value)) {
+                    $xname = $name. $j++;
+                    $likesel = str_replace('%', '\%', $key);
+
+                    $counterconditions[] = $DB->sql_like($content, ":{$xname}");
+                    $params[$xname] = "%#$likesel#%";
+                }
+            }
+            return array(" $not (".implode(" AND ", $conditions).") AND $counternot (". implode(" AND ", $counterconditions) . ")", $params, true);
+        } else {
+            return array('', '', '');
+        }
+
+    }
+
+    public function get_supported_search_operators() {
+        return array(
+            'ANY_OF' => get_string('anyof', 'datalynx'),
+            'ALL_OF' => get_string('allof', 'datalynx'),
+            'EXACTLY' => get_string('exactly', 'datalynx'),
+        );
+    }
 }
 
 /**
@@ -839,5 +932,29 @@ class datalynxfield_option_single extends datalynxfield_option {
 
     public function supports_group_by() {
         return true;
+    }
+
+    public function get_search_sql($search) {
+        global $DB;
+
+        list($not, $operator, $value) = $search;
+
+        static $i=0; //FIXME: might cause problems!
+        $i++;
+
+        $content = "c{$this->field->id}.content";
+
+        if ($operator === 'ANY_OF') {
+            list($insql, $params) = $DB->get_in_or_equal($value, SQL_PARAMS_NAMED, "param_{$i}_");
+            return array(" $not $content $insql ", $params, true);
+        } else {
+            return array('', '', '');
+        }
+    }
+
+    public function get_supported_search_operators() {
+        return array(
+            'ANY_OF' => get_string('anyof', 'datalynx'),
+        );
     }
 }

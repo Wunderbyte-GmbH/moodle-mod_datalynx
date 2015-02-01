@@ -122,6 +122,19 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
         return '';
     }
 
+    public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
+        $fieldid = $this->_field->id();
+        $fieldname = "f_{$i}_$fieldid";
+
+        $arr = array();
+        $arr[] = &$mform->createElement('text', $fieldname, null, array('size'=>'32'));
+        $mform->setType($fieldname, PARAM_NOTAGS);
+        $mform->setDefault($fieldname, $value);
+        $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
+
+        return array($arr, null);
+    }
+
     /**
      * Array of patterns this field supports 
      */

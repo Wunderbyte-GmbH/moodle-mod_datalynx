@@ -44,7 +44,7 @@ class datalynxfield_number_renderer extends datalynxfield_text_renderer {
         if (isset($entry->{"c{$fieldid}_content"})) {
             $number = (float) $entry->{"c{$fieldid}_content"};
         } else {
-            $number = 0;
+            return '';
         }
         
         $decimals = (int) trim($field->get('param1'));
@@ -58,4 +58,24 @@ class datalynxfield_number_renderer extends datalynxfield_text_renderer {
         
         return $str;
     }
+
+    public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
+        $fieldid = $this->_field->id();
+        $fieldname = "f_{$i}_$fieldid";
+
+        $arr = array();
+
+        $arr[] = &$mform->createElement('text', "{$fieldname}[0]", null, array('size'=>'6'));
+        $mform->setType("{$fieldname}[0]", PARAM_FLOAT);
+        $mform->setDefault("{$fieldname}[0]", $value[0]);
+        $mform->disabledIf("{$fieldname}[0]", "searchoperator$i", 'eq', '');
+
+        $arr[] = &$mform->createElement('text', "{$fieldname}[1]", null, array('size'=>'6'));
+        $mform->setType("{$fieldname}[1]", PARAM_FLOAT);
+        $mform->setDefault("{$fieldname}[1]", $value[1]);
+        $mform->disabledIf("{$fieldname}[1]", "searchoperator$i", 'neq', 'BETWEEN');
+
+        return array($arr, null);
+    }
+
 }

@@ -29,9 +29,6 @@ require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
  */
 class datalynxfield_time_renderer extends datalynxfield_renderer {
 
-    /**
-     *
-     */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $field = $this->_field;
         $fieldid = $field->id();
@@ -51,9 +48,6 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         }
     }
 
-    /**
-     *
-     */
     public function render_display_mode(stdClass $entry, array $params) {
         $field = $this->_field;
         $fieldid = $field->id();
@@ -69,36 +63,26 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         return $strtime;
     }
 
-    /**
-     * 
-     */
     public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
         $fieldid = $this->_field->id();
-
-        if (is_array($value)){
-            $from = $value[0];
-            $to = $value[1];
-        } else {
-            $from = 0;
-            $to = 0;
-        }
     
         $elements = array();
         $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_from", get_string('from'));
         $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_to", get_string('to'));
-        $mform->setDefault("f_{$i}_{$fieldid}_from", $from);
-        $mform->setDefault("f_{$i}_{$fieldid}_to", $to);
+        if (isset($value[0])) {
+            $mform->setDefault("f_{$i}_{$fieldid}_from", $value[0]);
+        }
+        if (isset($value[1])) {
+            $mform->setDefault("f_{$i}_{$fieldid}_to", $value[1]);
+        }
         foreach (array('year','month','day','hour','minute') as $fieldidentifier) {
             $mform->disabledIf("f_{$i}_{$fieldid}_to[$fieldidentifier]", "searchoperator$i", 'neq', 'BETWEEN');
         }
-        $mform->disabledIf("f_{$i}_{$fieldid}_from", "searchoperator$i", 'eq', '');
-        $mform->disabledIf("f_{$i}_{$fieldid}_from", "searchoperator$i", 'eq', 'IN');
-        $mform->disabledIf("f_{$i}_{$fieldid}_from", "searchoperator$i", 'eq', 'LIKE');
-        $mform->disabledIf("f_{$i}_{$fieldid}_to", "searchoperator$i", 'eq', '');
-        $mform->disabledIf("f_{$i}_{$fieldid}_to", "searchoperator$i", 'eq', 'IN');
-        $mform->disabledIf("f_{$i}_{$fieldid}_to", "searchoperator$i", 'eq', 'LIKE');
+        foreach (array('year','month','day','hour','minute') as $fieldidentifier) {
+            $mform->disabledIf("f_{$i}_{$fieldid}_from[$fieldidentifier]", "searchoperator$i", 'eq', '');
+        }
         
-        $separators = array('<br />'. get_string('from'), '<br />'. get_string('to'));
+        $separators = array('<br>', '<br>');
         return array($elements, $separators);
     }
     
@@ -133,9 +117,14 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
     }
 
     /**
-     *
+     * @param MoodleQuickForm $mform
+     * @param $entry
+     * @param $content
+     * @param bool $includetime
+     * @param array $options
+     * @throws coding_exception
      */
-    protected function render_masked_selector(&$mform, $entry, $content, $includetime = true, array $options = array()) {
+    protected function render_masked_selector(MoodleQuickForm &$mform, $entry, $content, $includetime = true, array $options = array()) {
         $field = $this->_field;
         $entryid = $entry->id;
         $fieldid = $field->id();

@@ -51,9 +51,6 @@ class datalynxfield_textarea_renderer extends datalynxfield_renderer {
 
     }
 
-    /**
-     * Print the content for browsing the entry
-     */
     public function render_display_mode(stdClass $entry, array $params) {
         $field = $this->_field;
         $fieldid = $field->id();
@@ -69,6 +66,19 @@ class datalynxfield_textarea_renderer extends datalynxfield_renderer {
         } else {
             return '';
         }
+    }
+
+    public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
+        $fieldid = $this->_field->id();
+        $fieldname = "f_{$i}_$fieldid";
+
+        $arr = array();
+        $arr[] = &$mform->createElement('text', $fieldname, null, array('size'=>'32'));
+        $mform->setType($fieldname, PARAM_NOTAGS);
+        $mform->setDefault($fieldname, $value);
+        $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
+
+        return array($arr, null);
     }
 
     public function validate($entryid, $tags, $formdata) {

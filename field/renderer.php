@@ -120,9 +120,6 @@ abstract class datalynxfield_renderer {
                         } else if ($renderer->get_not_editable_template() === $renderer::NOT_EDITABLE_SHOW_AS_DISPLAY_MODE) {
                             $currentoptions['template'] = $renderer->get_display_template();
                             $replacements[$tag] = ['', [[$this ,'prerender_edit_mode'], [$entry, $currentoptions]]];
-                        } else if ($renderer->get_not_editable_template() === $renderer::NOT_EDITABLE_SHOW_DISABLED) {
-                            $currentoptions['disabled'] = $renderer->get_not_editable_template() == $renderer::NOT_EDITABLE_SHOW_DISABLED;
-                            $replacements[$tag] = ['', [[$this ,'prerender_edit_mode'], [$entry, $currentoptions]]];
                         } else {
                             $replacements[$tag] = array('html', $renderer->get_not_editable_template());
                         }
