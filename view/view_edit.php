@@ -141,7 +141,11 @@ echo html_writer::tag('h2', format_string($formheading), array('class' => 'mdl-a
 
 // display form
 $mform->set_data($view->to_form());
+
+$texteditors = $CFG->texteditors;
+$CFG->texteditors = 'atto,textarea';
 $mform->display();
+$CFG->texteditors = $texteditors;
 
 $df->print_footer();
 
