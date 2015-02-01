@@ -100,16 +100,21 @@ if ($mform->is_cancelled()){
 } else if ($data = $mform->get_data()) {
     // add new view
     if (!$view->id()) {
-        $view->add($data);
-        $log = get_string('viewsadded','datalynx');
+        $vid = $view->add($data);
+
+        $other = array('dataid' => $df->id());
+        $event = \mod_datalynx\event\view_created::create(array('context' => $df->context, 'objectid' => $vid, 'other' => $other));
+        $event->trigger();
     // update view
     } else {
         $view->update($data);
-        $log = get_string('viewsupdated','datalynx');
+
+        $other = array('dataid' => $df->id());
+        $event = \mod_datalynx\event\view_updated::create(array('context' => $df->context, 'objectid' => $view->id(), 'other' => $other));
+        $event->trigger();
     }
     
-    $df->notifications['good'][] = $log;
-    //FIXME: add_to_log($df->course->id, 'datalynx', $log, 'view/index.php?d='. $df->id(). '&amp;vedit=', $view->id(), $df->cm->id);
+    //$df->notifications['good'][] = $log; //FIXME: what is this for
 
     if (!isset($data->submitreturnbutton)) {
         // TODO: set default view       

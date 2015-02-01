@@ -13,17 +13,16 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
- 
+
 /**
- * @package mod
- * @subpackage datalynx
- * @copyright 2014 Ivan Šakić
+ * @copyright 2015 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$module->component = 'mod_datalynx';
-$module->version   = 2015011802;
-$module->release   = '0.81';
-$module->requires  = 2014050800;
-$module->maturity  = MATURITY_BETA;
+namespace mod_datalynx\event;
 
+defined('MOODLE_INTERNAL') || die();
+
+class course_module_instance_list_viewed extends \core\event\course_module_instance_list_viewed {
+
+}

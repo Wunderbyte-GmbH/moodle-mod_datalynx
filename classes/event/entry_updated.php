@@ -48,7 +48,7 @@ class entry_updated extends \core\event\base {
      * @return void
      */
     protected function init() {
-        $this->data['objecttable'] = 'data_records';
+        $this->data['objecttable'] = 'datalynx_entries';
         $this->data['crud'] = 'u';
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
     }

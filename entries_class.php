@@ -703,8 +703,6 @@ class datalynx_entries {
                         break;
                 }
 
-                $df->add_to_log($action);
-
                 if ($processed) {
                     // Update completion state
                     $completion = new completion_info($df->course);

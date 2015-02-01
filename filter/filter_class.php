@@ -467,7 +467,8 @@ class datalynx_filter_manager {
     const BLANK_FILTER = -1;
     const USER_FILTER_SET = -2;
     const USER_FILTER_ID_START = -10;
-    
+
+    /* @var datalynx */
     protected $_df;
     protected $_filters;
 
@@ -679,10 +680,18 @@ class datalynx_filter_manager {
                                 $DB->update_record('datalynx_filters', $filter);
                                 $processedfids[] = $filter->id;
                                 $strnotify = 'filtersupdated';
+
+                                $other = array('dataid' => $this->_df->id());
+                                $event = \mod_datalynx\event\field_updated::create(array('context' => $this->_df->context, 'objectid' => $filter->id, 'other' => $other));
+                                $event->trigger();
                             } else {
                                 $filter->id = $DB->insert_record('datalynx_filters', $filter, true);
                                 $processedfids[] = $filter->id;
                                 $strnotify = 'filtersadded';
+
+                                $other = array('dataid' => $this->_df->id());
+                                $event = \mod_datalynx\event\field_created::create(array('context' => $this->_df->context, 'objectid' => $filter->id, 'other' => $other));
+                                $event->trigger();
                             }
                             // Update cached filters
                             $this->_filters[$filter->id] = $filter;                           
@@ -701,6 +710,10 @@ class datalynx_filter_manager {
                                 $filterid = $DB->insert_record('datalynx_filters', $filter);
 
                                 $processedfids[] = $filterid;
+
+                                $other = array('dataid' => $this->_df->id());
+                                $event = \mod_datalynx\event\field_created::create(array('context' => $this->_df->context, 'objectid' => $filterid, 'other' => $other));
+                                $event->trigger();
                             }
                         }
                         $strnotify = 'filtersadded';
@@ -716,6 +729,10 @@ class datalynx_filter_manager {
                             $filter->visible = $updatefilter->visible;
 
                             $processedfids[] = $filter->id;
+
+                            $other = array('dataid' => $this->_df->id());
+                            $event = \mod_datalynx\event\field_updated::create(array('context' => $this->_df->context, 'objectid' => $filter->id, 'other' => $other));
+                            $event->trigger();
                         }
 
                         $strnotify = '';
@@ -731,6 +748,10 @@ class datalynx_filter_manager {
                             }
 
                             $processedfids[] = $filter->id;
+
+                            $other = array('dataid' => $this->_df->id());
+                            $event = \mod_datalynx\event\field_deleted::create(array('context' => $this->_df->context, 'objectid' => $filter->id, 'other' => $other));
+                            $event->trigger();
                         }
                         $strnotify = 'filtersdeleted';
                         break;
@@ -739,7 +760,6 @@ class datalynx_filter_manager {
                         break;
                 }
 
-                //FIXME: add_to_log($df->course->id, 'datalynx', 'filter '. $action, 'filter/index.php?id='. $df->cm->id, $df->id(), $df->cm->id);
                 if (!empty($strnotify)) {
                     $filtersprocessed = $processedfids ? count($processedfids) : 'No';
                     $df->notifications['good'][] = get_string($strnotify, 'datalynx', $filtersprocessed);

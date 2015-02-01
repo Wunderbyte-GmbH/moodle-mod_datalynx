@@ -271,7 +271,11 @@ class datalynx_rule_manager {
 
                             // Create a rule object to collect and store the data safely
                             $rule = $this->get_rule($forminput->type);
-                            $rule->insert_rule($forminput);
+                            $ruleid = $rule->insert_rule($forminput);
+
+                            $other = array('dataid' => $this->_df->id());
+                            $event = \mod_datalynx\event\rule_created::create(array('context' => $this->_df->context, 'objectid' => $ruleid, 'other' => $other));
+                            $event->trigger();
                         }
                         $strnotify = 'rulesadded';
                         break;
@@ -285,6 +289,10 @@ class datalynx_rule_manager {
                             $rule = reset($rules);
                             $oldrulename = $rule->rule->name;
                             $rule->update_rule($forminput);
+
+                            $other = array('dataid' => $this->_df->id());
+                            $event = \mod_datalynx\event\rule_updated::create(array('context' => $this->_df->context, 'objectid' => $rule->rule->id, 'other' => $other));
+                            $event->trigger();
                         }
                         $strnotify = 'rulesupdated';
                         break;
@@ -296,6 +304,10 @@ class datalynx_rule_manager {
                             $DB->set_field('datalynx_rules', 'enabled', $enabled, array('id' => $rid));
 
                             $processedrids[] = $rid;
+
+                            $other = array('dataid' => $this->_df->id());
+                            $event = \mod_datalynx\event\rule_updated::create(array('context' => $this->_df->context, 'objectid' => $rid, 'other' => $other));
+                            $event->trigger();
                         }
 
                         $strnotify = '';
@@ -309,6 +321,10 @@ class datalynx_rule_manager {
                             }
                             $ruleid = $DB->insert_record('datalynx_rules', $rule->rule);
                             $processedrids[] = $ruleid;
+
+                            $other = array('dataid' => $this->_df->id());
+                            $event = \mod_datalynx\event\rule_created::create(array('context' => $this->_df->context, 'objectid' => $ruleid, 'other' => $other));
+                            $event->trigger();
                         }
                         $strnotify = 'rulesadded';
                         break;
@@ -317,6 +333,10 @@ class datalynx_rule_manager {
                         foreach ($rules as $rule) {
                             $rule->delete_rule();
                             $processedrids[] = $rule->rule->id;
+
+                            $other = array('dataid' => $this->_df->id());
+                            $event = \mod_datalynx\event\rule_deleted::create(array('context' => $this->_df->context, 'objectid' => $rule->rule->id, 'other' => $other));
+                            $event->trigger();
                         }
                         $strnotify = 'rulesdeleted';
                         break;
@@ -325,7 +345,6 @@ class datalynx_rule_manager {
                         break;
                 }
 
-                //FIXME: add_to_log($df->course->id, 'datalynx', 'rule '. $action, 'rule/index.php?id='. $df->cm->id, $df->id(), $df->cm->id);
                 if ($strnotify) {
                     $rulesprocessed = $processedrids ? count($processedrids) : 'No';
                     $df->notifications['good'][] = get_string($strnotify, 'datalynx', $rulesprocessed);

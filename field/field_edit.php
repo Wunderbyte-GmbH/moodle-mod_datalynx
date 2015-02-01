@@ -56,14 +56,20 @@ if ($mform->is_cancelled()){
 
    // add new field
     if (!$field->id()) {
-        $field->insert_field($data);
-        //FIXME: add_to_log($df->course->id, 'datalynx', 'fields add', 'field_edit.php?d='. $df->id(), '', $df->cm->id);
+        $fieldid = $field->insert_field($data);
+
+        $other = array('dataid' => $this->id());
+        $event = \mod_datalynx\event\field_created::create(array('context' => $this->context, 'objectid' => $fieldid, 'other' => $other));
+        $event->trigger();
 
     // update field
     } else {
         $data->id = $field->id();
         $field->update_field($data);
-        //FIXME: add_to_log($df->course->id, 'datalynx', 'fields update', 'field/index.php?d='. $df->id(). '&amp;id=', $urlparams->fid, $df->cm->id);
+
+        $other = array('dataid' => $this->id());
+        $event = \mod_datalynx\event\field_updated::create(array('context' => $this->context, 'objectid' => $field->id(), 'other' => $other));
+        $event->trigger();
     }
 
     if ($data->submitbutton != get_string('savecontinue', 'datalynx')) {

@@ -53,6 +53,7 @@ class datalynx {
     protected $_filtermanager = null;
     protected $_rulemanager = null;
     protected $_presetmanager = null;
+    /* @var datalynxview_base */
     protected $_currentview = null;
 
     // internal fields
@@ -622,8 +623,16 @@ class datalynx {
      * 
      */
     public function display() {
+        global $PAGE;
         if (!empty($this->_currentview)) {
-            //FIXME: add_to_log($this->course->id, 'datalynx', 'view', $this->pagefile. '.php?id='. $this->cm->id, $this->id(), $this->cm->id);
+
+            $event = \mod_datalynx\event\course_module_viewed::create(array(
+                'objectid' => $PAGE->cm->instance,
+                'context' => $PAGE->context,
+            ));
+            $event->add_record_snapshot('course', $PAGE->course);
+            $event->trigger();
+
             $this->_currentview->display();
         }
     }
@@ -828,6 +837,10 @@ class datalynx {
                             // Create a field object to collect and store the data safely
                             $field = $this->get_field($forminput->type);
                             $field->insert_field($forminput);
+
+                            $other = array('dataid' => $this->id());
+                            $event = \mod_datalynx\event\field_created::create(array('context' => $this->context, 'objectid' => $field->field->id, 'other' => $other));
+                            $event->trigger();
                         }
                         $strnotify = 'fieldsadded';
                         break;
@@ -841,6 +854,10 @@ class datalynx {
                             $field = reset($fields);
                             $oldfieldname = $field->field->name;
                             $field->update_field($forminput);
+
+                            $other = array('dataid' => $this->id());
+                            $event = \mod_datalynx\event\field_updated::create(array('context' => $this->context, 'objectid' => $field->field->id, 'other' => $other));
+                            $event->trigger();
 
                             // Update the views
                             if ($oldfieldname != $field->field->name) {
@@ -857,6 +874,10 @@ class datalynx {
                             $DB->set_field('datalynx_fields', 'edits', $editable, array('id' => $fid));
 
                             $processedfids[] = $fid;
+
+                            $other = array('dataid' => $this->id());
+                            $event = \mod_datalynx\event\field_updated::create(array('context' => $this->context, 'objectid' => $fid, 'other' => $other));
+                            $event->trigger();
                         }
 
                         $strnotify = '';
@@ -870,7 +891,12 @@ class datalynx {
                             }
                             $fieldid = $DB->insert_record('datalynx_fields', $field->field);
                             $processedfids[] = $fieldid;
+
+                            $other = array('dataid' => $this->id());
+                            $event = \mod_datalynx\event\field_created::create(array('context' => $this->context, 'objectid' => $fieldid, 'other' => $other));
+                            $event->trigger();
                         }
+
                         $strnotify = 'fieldsadded';
                         break;
 
@@ -880,6 +906,10 @@ class datalynx {
                             $processedfids[] = $field->field->id;
                             // Update views
                             $this->replace_field_in_views($field->field->name, '');
+
+                            $other = array('dataid' => $this->id());
+                            $event = \mod_datalynx\event\field_deleted::create(array('context' => $this->context, 'objectid' => $field->field->id, 'other' => $other));
+                            $event->trigger();
                         }
                         $strnotify = 'fieldsdeleted';
                         break;
@@ -888,7 +918,6 @@ class datalynx {
                         break;
                 }
 
-                //FIXME: add_to_log($this->course->id, 'datalynx', 'field '. $action, 'field/index.php?id='. $this->cm->id, $this->id(), $this->cm->id);
                 if ($strnotify) {
                     $fieldsprocessed = $processedfids ? count($processedfids) : 'No';
                     $this->notifications['good'][] = get_string($strnotify, 'datalynx', $fieldsprocessed);
@@ -1198,6 +1227,10 @@ class datalynx {
                                 $updateview->id = $vid;
                                 $DB->update_record('datalynx_views', $updateview);
 
+                                $other = array('dataid' => $this->id());
+                                $event = \mod_datalynx\event\view_updated::create(array('context' => $this->context, 'objectid' => $vid, 'other' => $other));
+                                $event->trigger();
+
                                 $processedvids[] = $vid;
                             }
                         }
@@ -1217,6 +1250,11 @@ class datalynx {
                                     $updateview->filter = $filterid;
                                 }
                                 $DB->update_record('datalynx_views', $updateview);
+
+                                $other = array('dataid' => $this->id());
+                                $event = \mod_datalynx\event\view_updated::create(array('context' => $this->context, 'objectid' => $vid, 'other' => $other));
+                                $event->trigger();
+
                                 $processedvids[] = $vid;
                             }
                         }
@@ -1231,6 +1269,10 @@ class datalynx {
 
                             // update view
                             $view->update($view->view);
+
+                            $other = array('dataid' => $this->id());
+                            $event = \mod_datalynx\event\view_updated::create(array('context' => $this->context, 'objectid' => $vid, 'other' => $other));
+                            $event->trigger();
                             
                             $processedvids[] = $vid;
                         }
@@ -1275,6 +1317,9 @@ class datalynx {
                                 }
                             }
 
+                            $other = array('dataid' => $this->id());
+                            $event = \mod_datalynx\event\view_created::create(array('context' => $this->context, 'objectid' => $newviewid, 'other' => $other));
+                            $event->trigger();
 
                             $processedvids[] = $viewid;
                         }
@@ -1291,7 +1336,12 @@ class datalynx {
                             if ($view->id() == $this->data->defaultview) {
                                 $this->set_default_view();
                             }
+
+                            $other = array('dataid' => $this->id());
+                            $event = \mod_datalynx\event\view_deleted::create(array('context' => $this->context, 'objectid' => $vid, 'other' => $other));
+                            $event->trigger();
                         }
+
                         $strnotify = 'viewsdeleted';
                         break;
 
@@ -1308,7 +1358,6 @@ class datalynx {
                         break;
                 }
 
-                //FIXME: add_to_log($this->course->id, 'datalynx', 'view '. $action, 'view/index.php?id='. $this->cm->id, $this->id(), $this->cm->id);
                 if ($strnotify) {
                     $viewsprocessed = $processedvids ? count($processedvids) : 'No';
                     $this->notifications['good'][] = get_string($strnotify, 'datalynx', $viewsprocessed);
@@ -1705,13 +1754,6 @@ class datalynx {
                 $fieldinput->$key = $str;
             }
         }
-    }
-    
-    /**
-     * 
-     */
-    public function add_to_log($action) {
-        //FIXME: add_to_log($this->course->id, 'datalynx', 'entry '. $action, $this->pagefile. '.php?id='. $this->cm->id, $this->id(), $this->cm->id);
     }
 
     /**

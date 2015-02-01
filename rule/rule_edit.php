@@ -55,14 +55,20 @@ if ($mform->is_cancelled()){
 
    // add new rule
     if (!$rule->get_id()) {
-        $rule->insert_rule($data);
-        //FIXME: add_to_log($df->course->id, 'datalynx', 'rules add', 'rule_edit.php?d='. $df->id(), '', $df->cm->id);
+        $ruleid = $rule->insert_rule($data);
+
+        $other = array('dataid' => $this->_df->id());
+        $event = \mod_datalynx\event\rule_created::create(array('context' => $this->_df->context, 'objectid' => $ruleid, 'other' => $other));
+        $event->trigger();
 
     // update rule
     } else {
         $data->id = $rule->get_id();
         $rule->update_rule($data);
-        //FIXME: add_to_log($df->course->id, 'datalynx', 'rules update', 'rule/index.php?d='. $df->id(). '&amp;id=', $urlparams->rid, $df->cm->id);
+
+        $other = array('dataid' => $this->_df->id());
+        $event = \mod_datalynx\event\rule_updated::create(array('context' => $this->_df->context, 'objectid' => $rule->get_id(), 'other' => $other));
+        $event->trigger();
     }
 
     if ($data->submitbutton != get_string('savecontinue', 'datalynx')) {

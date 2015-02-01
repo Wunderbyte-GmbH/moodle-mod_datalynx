@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_datalynx entry created event.
+ * The mod_datalynx entry updated event.
  *
  * @package    mod_datalynx
  * @copyright  2015 Ivan Šakić <ivan.sakic3@gmail.com>
@@ -27,20 +27,12 @@ namespace mod_datalynx\event;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The mod_datalynx entry deleted event class.
- *
- * @property-read array $other {
- *      Extra information about event.
- *
- *      - int dataid: the id of the datalynx activity.
- * }
- *
  * @package    mod_datalynx
  * @since      Moodle 2.7
  * @copyright  2015 Ivan Šakić <ivan.sakic3@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class entry_deleted extends \core\event\base {
+class view_updated extends \core\event\base {
 
     /**
      * Init method.
@@ -48,9 +40,9 @@ class entry_deleted extends \core\event\base {
      * @return void
      */
     protected function init() {
-        $this->data['objecttable'] = 'datalynx_entries';
+        $this->data['objecttable'] = 'datalynx_views';
         $this->data['crud'] = 'd';
-        $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
+        $this->data['edulevel'] = self::LEVEL_TEACHING;
     }
 
     /**
@@ -59,7 +51,7 @@ class entry_deleted extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('datalynx_entrydeleted', 'mod_datalynx');
+        return get_string('datalynx_entryupdated', 'mod_datalynx');
     }
 
     /**
@@ -68,8 +60,8 @@ class entry_deleted extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' deleted the datalynx entry with id '$this->objectid' in the datalynx activity " .
-            "with the course module id '$this->contextinstanceid'.";
+        return "The user with id '$this->userid' updated the datalynx entry with id '$this->objectid' in the datalynx activity " .
+        "with the course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -78,7 +70,7 @@ class entry_deleted extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/mod/datalynx/view.php', array('d' => $this->other['dataid']));
+        return new \moodle_url('/mod/datalynx/view.php', array('d' => $this->other['dataid'], 'vid' => $this->objectid));
     }
 
     /**
@@ -87,7 +79,7 @@ class entry_deleted extends \core\event\base {
      * @return array
      */
     public function get_legacy_logdata() {
-        return array($this->courseid, 'datalynx', 'entry_deleted', 'view.php?id=' . $this->contextinstanceid,
+        return array($this->courseid, 'datalynx', 'view_updated', 'view.php?d=' . $this->other['dataid'] . '&amp;vid=' . $this->objectid,
             $this->other['dataid'], $this->contextinstanceid);
     }
 

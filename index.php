@@ -46,7 +46,8 @@ if (!$course = $DB->get_record('course', array('id' => $id))) {
 $context = context_course::instance($course->id);
 require_course_login($course);
 
-//FIXME: add_to_log($course->id, "datalynx", "view all", "index.php?id=$course->id", "");
+$event = \mod_datalynx\event\course_module_instance_list_viewed::create(array('context' => $context));
+$event->trigger();
 
 $modulename = get_string('modulename','datalynx');
 $modulenameplural  = get_string('modulenameplural','datalynx');
