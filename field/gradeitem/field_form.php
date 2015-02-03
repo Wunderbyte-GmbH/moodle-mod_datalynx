@@ -36,9 +36,37 @@ class datalynxfield_gradeitem_form extends datalynxfield_form {
         $mform->addElement('header', 'fieldattributeshdr', get_string('fieldattributes', 'datalynx'));
         
         // Info field
-        $options = $DB->get_records_menu('grade_items', array(), 'itemname', 'id,itemname');
-        $options = array('' => get_string('choosedots')) + $options;
-        $mform->addElement('select', "param1", get_string('gradeitem', 'datalynxfield_gradeitem'), $options);
+        $sql = "SELECT gi.id, c.fullname,
+                       CASE
+                            WHEN itemname IS NULL THEN 'Course grade'
+                            ELSE itemname
+                       END AS label
+                  FROM {grade_items} gi
+            INNER JOIN {course} c ON gi.courseid = c.id
+              ORDER BY courseid";
+        $ungroupedoptions = $DB->get_records_sql($sql);
+        $options = [];
+        foreach($ungroupedoptions as $option) {
+            if (!isset($options[$option->fullname])) {
+                $options[$option->fullname] = [];
+            }
+            $options[$option->fullname][$option->id] = $option->label;
+        }
+        $actualoptions = [];
+        foreach($options as $key => $optionset) {
+            $actualoptions[] = [$key => $optionset];
+        }
+
+        $mform->addElement('hidden', 'param1');
+        $mform->setType('param1', PARAM_INT);
+        $mform->addElement('static', '', get_string('gradeitem', 'datalynx'), html_writer::select($actualoptions, "param1", '', array('' => 'choosedots')));
+
+        $module = array(
+            'name'=>'mod_datalynx',
+            'fullpath'=>'/mod/datalynx/datalynx.js');
+
+        global $PAGE;
+        $PAGE->requires->js_init_call('M.mod_datalynx.field_gradeitem_form_init', [], true, $module);
     }
 
 }

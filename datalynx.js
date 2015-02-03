@@ -229,6 +229,10 @@ M.datalynx_imagepicker.init = function(Y, options) {
     }
 };
 
+M.mod_datalynx.field_gradeitem_form_init = function () {
+    Y.one('#mform1').one('select[name="param1"]').set('value', Y.one('#mform1').one('input[type="hidden"][name="param1"]').get('value'));
+};
+
 
 
 /**

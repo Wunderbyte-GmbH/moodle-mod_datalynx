@@ -786,3 +786,5 @@ $string['less_equal'] = 'less or equal';
 $string['less_equal'] = 'equal';
 $string['before'] = 'before';
 $string['after'] = 'after';
+
+$string['gradeitem'] = 'Grade item';
