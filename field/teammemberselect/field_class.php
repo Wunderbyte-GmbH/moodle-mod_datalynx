@@ -39,6 +39,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
     public $teamfield;
     public $referencefieldid;
     public $notifyteammembers;
+    public $usercanaddself;
 
     public $separators;
     public $rules;
@@ -53,6 +54,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         $this->teamfield = $this->field->param5 != 0;
         $this->referencefieldid = $this->field->param5;
         $this->notifyteammembers = $this->field->param6 != 0;
+        $this->usercanaddself = $this->field->param7 != 0;
         $this->separators = array(
                 self::TEAMMEMBERSELECT_FORMAT_NEWLINE => get_string('listformat_newline', 'datalynx'),
                 self::TEAMMEMBERSELECT_FORMAT_SPACE => get_string('listformat_space', 'datalynx'),
@@ -147,7 +149,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
                     ($allowall ? self::$alluserslinks[$fieldid] : self::$alloweduserslinks[$fieldid]) :
                     ($allowall ? self::$allusers[$fieldid] : self::$allowedusers[$fieldid]);
 
-        if (isset($options[$excludeuser])) {
+        if ($excludeuser && isset($options[$excludeuser])) {
             unset($options[$excludeuser]);
         }
 

@@ -69,8 +69,11 @@ class datalynxfield_teammemberselect_form extends datalynxfield_form {
         $mform->setType('param4', PARAM_INT);
         $mform->setDefault('param4', datalynxfield_teammemberselect::TEAMMEMBERSELECT_FORMAT_UL);
 
+        $mform->addElement('checkbox', 'param7', get_string('user_can_add_self', 'datalynx'), null, 1);
+        $mform->addHelpButton('param7', 'notifyteammembers', 'datalynx');
+        $mform->setType('param7', PARAM_BOOL);
+
         $mform->addElement('checkbox', 'param6', get_string('notifyteammembers', 'datalynx'), null, 1);
-        $mform->addHelpButton('param6', 'notifyteammembers', 'datalynx');
         $mform->setType('param6', PARAM_BOOL);
 
         $attributes = array();
@@ -106,6 +109,7 @@ class datalynxfield_teammemberselect_form extends datalynxfield_form {
         }
         $data->param5 = isset($data->param5) ? $data->param5 : 0;
         $data->param6 = isset($data->param6) ? $data->param6 : 0;
+        $data->param7 = isset($data->param7) ? $data->param7 : 0;
         $data->teamfieldenable = $data->param5 != 0;
         parent::set_data($data);
     }
@@ -120,6 +124,7 @@ class datalynxfield_teammemberselect_form extends datalynxfield_form {
             $data->param2 = json_encode(array_keys($data->param2));
             $data->param5 = isset($data->param5) ? $data->param5 : 0;
             $data->param6 = isset($data->param6) ? $data->param6 : 0;
+            $data->param7 = isset($data->param7) ? $data->param7 : 0;
         }
         return $data;
     }

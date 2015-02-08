@@ -40,6 +40,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options = null) {
         global $PAGE, $USER;
 
+        /* @var $field datalynxfield_teammemberselect */
         $field = $this->_field;
         $fieldid = $field->id();
         $entryid = $entry->id;
@@ -50,7 +51,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
 
         $selected = !empty($entry->{"c{$fieldid}_content"}) ? json_decode($entry->{"c{$fieldid}_content"}, true) : array();
         $authorid = isset($entry->userid) ? $entry->userid : $USER->id;
-        $menu = $field->options_menu(true, false, $authorid);
+        $menu = $field->options_menu(false, false, $field->usercanaddself ? 0 : $authorid);
 
         $selectgroup = array();
         $dropdowngroup = array();
@@ -59,14 +60,16 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
                 $selected[$i] = 0;
             }
             $select = $mform->createElement('select', "{$fieldname}[{$i}]", null, $menu,
-                array('class' => "datalynxfield_teammemberselect_select $classname"));
+                array('class' => "datalynxfield_teammemberselect_select $classname", 'placeholder' => 'Select user...'));
             $mform->setType("{$fieldname}[{$i}]", PARAM_INT);
             $text = $mform->createElement('text', "{$fieldnamedropdown}[{$i}]", null,
-                array('class' => "datalynxfield_teammemberselect_dropdown $classname"));
+                array('class' => "datalynxfield_teammemberselect_dropdown $classname", 'placeholder' => 'Select user...'));
             $mform->setType("{$fieldnamedropdown}[{$i}]", PARAM_TEXT);
 
             $select->setSelected($selected[$i]);
-            $text->setValue($menu[$selected[$i]]);
+            if (isset($menu[$selected[$i]])) {
+                $text->setValue($menu[$selected[$i]]);
+            }
             $selectgroup[] = $select;
             $dropdowngroup[] = $text;
         }
@@ -78,7 +81,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         $PAGE->requires->strings_for_js(array('minteamsize_error_form', 'moreresults'), 'datalynx');
         $PAGE->requires->js_init_call(
                 'M.datalynxfield_teammemberselect.init_entry_form',
-                array($field->options_menu(false, false, $authorid), $fieldid, $entryid, $field->minteamsize),
+                array($field->options_menu(false, false, $field->usercanaddself ? 0 : $authorid), $fieldid, $entryid, $field->minteamsize),
                 false,
                 $this->get_js_module());
     }

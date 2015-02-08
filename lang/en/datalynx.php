@@ -788,3 +788,4 @@ $string['before'] = 'before';
 $string['after'] = 'after';
 
 $string['gradeitem'] = 'Grade item';
+$string['user_can_add_self'] = 'User can add self';
