@@ -37,6 +37,7 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
 
     protected $sender;
     protected $recipient;
+    protected $targetviews;
 
     /**
      * Class constructor
@@ -49,6 +50,7 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
 
         $this->sender = $this->rule->param2;
         $this->recipient = unserialize($this->rule->param3);
+        $this->targetviews = unserialize($this->rule->param4);
     }
 
     /**
@@ -90,16 +92,6 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
 
         $messagedata->objectid = $event->get_data()['objectid'];
 
-        if ($df->data->singleview) {
-            $entryurl = new moodle_url($viewurl, array('view' => $df->data->singleview, 'eids' => $messagedata->objectid));
-        } else if ($df->data->defaultview) {
-            $entryurl = new moodle_url($viewurl, array('view' => $df->data->defaultview, 'eids' => $messagedata->objectid));
-        } else {
-            $entryurl = new moodle_url($viewurl);
-        }
-        $messagedata->viewlink = html_writer::link($entryurl, get_string('linktoentry', 'datalynx'));
-        $messagedata->datalynxlink = html_writer::link(new moodle_url($viewurl), $datalynxname);
-
         $notename = get_string("messageprovider:event_$eventname", 'datalynx');
 
         $pluginname = get_string('pluginname', 'datalynx');
@@ -125,6 +117,20 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
             $userto = $DB->get_record('user', array('id' => $userid));
             $message->userto = $userto;
             $messagedata->fullname = fullname($userto);
+
+            $viewurlparams = ['eids' => $messagedata->objectid];
+            $roleid = $this->df()->get_user_datalynx_role($userid);
+            if (isset($this->targetviews[$roleid])) {
+                $viewurlparams['view'] = $this->targetviews[$roleid];
+            } else if ($df->data->singleview) {
+                $viewurlparams['view'] = $df->data->singleview;
+            } else if ($df->data->defaultview) {
+                $viewurlparams['view'] = $df->data->defaultview;
+            }
+
+            $entryurl = new moodle_url($viewurl, $viewurlparams);
+            $messagedata->viewlink = html_writer::link($entryurl, get_string('linktoentry', 'datalynx'));
+            $messagedata->datalynxlink = html_writer::link(new moodle_url($viewurl), $datalynxname);
 
             $messagetext = get_string("message_$eventname", 'datalynx', $messagedata);
             $message->fullmessage = html_to_text($messagetext);

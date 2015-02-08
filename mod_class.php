@@ -972,8 +972,86 @@ class datalynx {
         return $isadmin || ($view->visible & $mask);
     }
 
+    const ROLE_ADMIN = 0;
+    const ROLE_MANAGER = 1;
+    const ROLE_TEACHER = 2;
+    const ROLE_STUDENT = 4;
+    const ROLE_GUEST = 8;
+
     /**
-     * TODO there is no need to instantiate all viewds!!!
+     * @param int $userid
+     * @return int
+     * @throws coding_exception
+     */
+    public function get_user_datalynx_role($userid = 0) {
+        global $USER, $DB;
+
+        if (!$userid) {
+            $user = $USER;
+        } else {
+            $user = $DB->get_record('user', array('id' => $userid));
+        }
+
+        if (has_capability('mod/datalynx:viewprivilegeadmin', $this->context, $user, true)) {
+            return self::ROLE_ADMIN;
+        } else if (has_capability('mod/datalynx:viewprivilemanager', $this->context, $user, false)) {
+            return self::ROLE_MANAGER;
+        } else if (has_capability('mod/datalynx:viewprivilegeteacher', $this->context, $user, false)) {
+            return self::ROLE_TEACHER;
+        } else if (has_capability('mod/datalynx:viewprivilegestudent', $this->context, $user, false)) {
+            return self::ROLE_STUDENT;
+        } else if (has_capability('mod/datalynx:viewprivilegeguest', $this->context, $user, false)) {
+            return self::ROLE_GUEST;
+        } else {
+            return self::ROLE_GUEST;
+        }
+    }
+
+    /**
+     * Returns a list of names of available datalynx roles indexed by their id.
+     * @return array <roleid> => <rolename>
+     * @throws coding_exception
+     */
+    public function get_datalynx_roles() {
+        return [
+            self::ROLE_ADMIN => get_string('admin', 'datalynx'),
+            self::ROLE_MANAGER => get_string('manager', 'datalynx'),
+            self::ROLE_TEACHER => get_string('teacher', 'datalynx'),
+            self::ROLE_STUDENT => get_string('student', 'datalynx'),
+            self::ROLE_GUEST => get_string('guest', 'datalynx'),
+        ];
+    }
+
+    /**
+     * @param $roles array|int
+     * @return array
+     */
+    public function get_users_with_datalynx_roles($roles) {
+        if (is_int($roles)) {
+            $roles = [$roles];
+        }
+        $users = [];
+        if (in_array(self::ROLE_ADMIN, $roles)) {
+            $users += get_enrolled_users($this->context, 'mod/datalynx:viewprivilegeadmin');
+        }
+        if (in_array(self::ROLE_MANAGER, $roles)) {
+            $users += get_enrolled_users($this->context, 'mod/datalynx:viewprivilemanager');
+        }
+        if (in_array(self::ROLE_TEACHER, $roles)) {
+            $users += get_enrolled_users($this->context, 'mod/datalynx:viewprivilegeteacher');
+        }
+        if (in_array(self::ROLE_STUDENT, $roles)) {
+            $users += get_enrolled_users($this->context, 'mod/datalynx:viewprivilegestudent');
+        }
+        if (in_array(self::ROLE_GUEST, $roles)) {
+            $users += get_enrolled_users($this->context, 'mod/datalynx:viewprivilegeguest');
+        }
+
+        return array_unique($users);
+    }
+
+    /**
+     * TODO there is no need to instantiate all views!!!
      * this function creates an instance of the particular subtemplate class   *
      */
     public function get_current_view_from_id($viewid = 0) {
@@ -1156,6 +1234,10 @@ class datalynx {
             throw new moodle_exception('Failed to update the database');
         }
         $this->data->singleview = $viewid;
+    }
+
+    public function get_default_view_id() {
+        return $this->data->defaultview;
     }
 
     /**

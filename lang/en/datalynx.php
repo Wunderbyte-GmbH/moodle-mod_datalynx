@@ -789,3 +789,10 @@ $string['after'] = 'after';
 
 $string['gradeitem'] = 'Grade item';
 $string['user_can_add_self'] = 'User can add self';
+$string['linksettings'] = 'Message link settings';
+$string['admin'] = 'Administrator';
+$string['manager'] = 'Manager';
+$string['teacher'] = 'Teacher';
+$string['student'] = 'Student';
+$string['guest'] = 'Guest';
+$string['targetviewforroles'] = 'Link target views for roles';

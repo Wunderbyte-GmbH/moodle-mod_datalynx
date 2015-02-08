@@ -26,7 +26,6 @@ HTML_QuickForm::registerElementType('checkboxgroup', "$CFG->dirroot/mod/datalynx
 class datalynx_rule_eventnotification_form extends datalynx_rule_form {
     function rule_definition() {
         $br = html_writer::empty_tag('br');
-        $sp = '    ';
         $mform = &$this->_form;
 
         //-------------------------------------------------------------------------------
@@ -43,11 +42,34 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
         $grp = array();
         $grp[] = &$mform->createElement('checkbox', 'author', null, get_string('author', 'datalynx'), null);
 
-        $grp[] = &$mform->createElement('checkboxgroup', 'roles', get_string('roles'), $this->menu_roles_used_in_context(), '<br/>');
+        $grp[] = &$mform->createElement('checkboxgroup', 'roles', get_string('roles'), $this->menu_roles_used_in_context(), $br);
 
-        $grp[] = &$mform->createElement('checkboxgroup', 'teams', get_string('teams', 'datalynx'), $this->get_datalynx_team_fields(), '<br/>');
+        $grp[] = &$mform->createElement('checkboxgroup', 'teams', get_string('teams', 'datalynx'), $this->get_datalynx_team_fields(), $br);
 
         $mform->addGroup($grp, 'recipientgrp', get_string('to'), $br, false);
+
+        $mform->addElement('header', 'settingshdr', get_string('linksettings', 'datalynx'));
+        $mform->addElement('static', '', get_string('targetviewforroles', 'datalynx'));
+
+        foreach ($this->_df->get_datalynx_roles() as $roleid => $rolename) {
+            $views = $this->get_views_visible_to_datalynx_role($roleid);
+            $mform->addElement('select', "param4[$roleid]", $rolename, $views);
+            $defaultview = $this->_df->get_default_view_id();
+            if ($defaultview && in_array($defaultview, array_keys($views))) {
+                $mform->setDefault("param4[$roleid]", $defaultview);
+            }
+        }
+    }
+
+    private function get_views_visible_to_datalynx_role($roleid) {
+        global $DB;
+        if ($roleid == datalynx::ROLE_ADMIN) {
+            $sql = "SELECT id, name FROM {datalynx_views} WHERE dataid = :dataid";
+            return $DB->get_records_sql_menu($sql, ['dataid' => $this->_df->id()]);
+        } else {
+            $sql = "SELECT id, name FROM {datalynx_views} WHERE dataid = :dataid AND visible & :roleid <> 0";
+            return $DB->get_records_sql_menu($sql, ['dataid' => $this->_df->id(), 'roleid' => $roleid]);
+        }
     }
 
     protected function get_datalynx_team_fields() {
@@ -79,6 +101,7 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
         if (isset($recipients['teams'])) {
             $data->teams = $recipients['teams'];
         }
+        $data->param4 = unserialize($data->param4);
         parent::set_data($data);
     }
 
@@ -98,6 +121,7 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
                 $recipients['teams'] = $data->teams;
             }
             $data->param3 = serialize($recipients);
+            $data->param4 = serialize($data->param4);
         }
         return $data;
     }
