@@ -121,7 +121,8 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
                 $this->get_js_module());
 
             return html_writer::link(
-                new moodle_url($entry->baseurl, array($approval => $entry->id, 'sesskey' => sesskey())),
+                new moodle_url($entry->baseurl, array($approval => $entry->id, 'sesskey' => sesskey(),
+                    'sourceview' => $this->_field->df()->get_current_view()->id())),
                 $approvedimage, array('class' =>  'datalynxfield__approve')
             );
         } else {

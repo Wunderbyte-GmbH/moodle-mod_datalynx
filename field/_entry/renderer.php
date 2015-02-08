@@ -99,7 +99,8 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
         $field = $this->_field;
         $params = array(
             'editentries' => $entry->id,
-            'sesskey' => sesskey()
+            'sesskey' => sesskey(),
+            'sourceview' => $this->_field->df()->get_current_view()->id()
         );       
         $url = new moodle_url($entry->baseurl, $params);         
         if ($field->df()->data->singleedit) {
@@ -119,8 +120,9 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
         $field = $this->_field;
         $params = array(
             'duplicate' => $entry->id,
-            'sesskey' => sesskey()
-        );       
+            'sesskey' => sesskey(),
+            'sourceview' => $this->_field->df()->get_current_view()->id()
+        );
         $url = new moodle_url($entry->baseurl, $params);         
         if ($field->df()->data->singleedit) {
             $url->param('view', $field->df()->data->singleedit);
@@ -138,7 +140,8 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
         $field = $this->_field;
         $params = array(
             'delete' => $entry->id,
-            'sesskey' => sesskey()
+            'sesskey' => sesskey(),
+            'sourceview' => $this->_field->df()->get_current_view()->id()
         );       
         $url = new moodle_url($entry->baseurl, $params);         
         $str = get_string('delete');

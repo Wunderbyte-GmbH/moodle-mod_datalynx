@@ -1376,65 +1376,68 @@ abstract class datalynxview_base {
      *
      */
     public function process_entries_data() {
-        global $CFG;
+        $illegalaction = false;
 
         // Check first if returning from form
-        $update = optional_param('update', '', PARAM_TAGLIST);
-        if ($update and confirm_sesskey()) {
+        $update = optional_param('update', '', PARAM_SEQUENCE);
+        if ($update) {
+            if (confirm_sesskey() && !$this->confirm_view_action("edit")) {
+                // get entries only if updating existing entries
+                if ($update != self::ADD_NEW_ENTRY) {
+                    // fetch entries
+                    $this->_entries->set_content();
+                }
 
-            // get entries only if updating existing entries
-            if ($update != self::ADD_NEW_ENTRY) {
-                // fetch entries
-                $this->_entries->set_content();
-            }
+                // set the display definition for the form
+                $this->_editentries = $update;
+                $this->set__display_definition();
 
-            // set the display definition for the form
-            $this->_editentries = $update;
-            $this->set__display_definition();
+                $entriesform = $this->get_entries_form();
 
-            $entriesform = $this->get_entries_form();
+                // Process the form if not cancelled
+                if (!$entriesform->is_cancelled()) {
+                    if ($data = $entriesform->get_data()) {
+                        // validated successfully so process request
+                        $processed = $this->_entries->process_entries('update', $update, $data, true);
+                        if (!$processed) {
+                            $this->_returntoentriesform = true;
+                            return false;
+                        }
 
-            // Process the form if not cancelled
-            if (!$entriesform->is_cancelled()) {
-                if ($data = $entriesform->get_data()) {
-                    // validated successfully so process request
-                    $processed = $this->_entries->process_entries('update', $update, $data, true);
-                    if (!$processed) {
+                        if (!empty($data->submitreturnbutton)) {
+                            // If we have just added new entries refresh the content
+                            // This is far from ideal because this new entries may be
+                            // spread out in the form when we return to edit them
+                            if ($this->_editentries < 0) {
+                                $this->_entries->set_content();
+                            }
+
+                            // so that return after adding new entry will return the added entry
+                            $this->_editentries = is_array($processed[1]) ? implode(',', $processed[1]) : $processed[1];
+                            $this->_returntoentriesform = true;
+                            return true;
+                        } else {
+                            // So that we can show the new entries if we so wish
+                            if ($this->_editentries < 0) {
+                                $this->_editentries = is_array($processed[1]) ? implode(',', $processed[1]) : $processed[1];
+                            } else {
+                                $this->_editentries = '';
+                            }
+                            $this->_returntoentriesform = false;
+                            return $processed;
+                        }
+                    } else {
+                        // form validation failed so return to form
                         $this->_returntoentriesform = true;
                         return false;
                     }
-
-                    if (!empty($data->submitreturnbutton)) {
-                        // If we have just added new entries refresh the content
-                        // This is far from ideal because this new entries may be
-                        // spread out in the form when we return to edit them
-                        if ($this->_editentries < 0) {
-                            $this->_entries->set_content();
-                        }
-
-                        // so that return after adding new entry will return the added entry
-                        $this->_editentries = is_array($processed[1]) ? implode(',', $processed[1]) : $processed[1];
-                        $this->_returntoentriesform = true;
-                        return true;
-                    } else {
-                        // So that we can show the new entries if we so wish
-                        if ($this->_editentries < 0) {
-                            $this->_editentries = is_array($processed[1]) ? implode(',', $processed[1]) : $processed[1];
-                        } else {
-                            $this->_editentries = '';
-                        }
-                        $this->_returntoentriesform = false;
-                        return $processed;
-                    }
                 } else {
-                    // form validation failed so return to form
-                    $this->_returntoentriesform = true;
-                    return false;
+                    $redirectid = $this->_redirect ? $this->_redirect : $this->id();
+                    $url = new moodle_url($this->_baseurl, array('view' => $redirectid));
+                    redirect($url);
                 }
             } else {
-                $redirectid = $this->_redirect ? $this->_redirect : $this->id();
-                $url = new moodle_url($this->_baseurl, array('view' => $redirectid));
-                redirect($url);
+                $illegalaction = true;
             }
         }
 
@@ -1445,36 +1448,72 @@ abstract class datalynxview_base {
         $delete = optional_param('delete', '', PARAM_SEQUENCE);    // delete entries (all) or by record ids (comma delimited eids)
         $approve = optional_param('approve', '', PARAM_SEQUENCE);  // approve entries (all) or by record ids (comma delimited eids)
         $disapprove = optional_param('disapprove', '', PARAM_SEQUENCE);  // disapprove entries (all) or by record ids (comma delimited eids)
-        $append = optional_param('append', '', PARAM_SEQUENCE);  // append entries (all) or by record ids (comma delimited eids)
-        $status = optional_param('status', '', PARAM_SEQUENCE);  // append entries (all) or by record ids (comma delimited eids)
+        $status = optional_param('status', '', PARAM_SEQUENCE);  // set status of entries (all) or by record ids (comma delimited eids)
 
         $confirmed = optional_param('confirmed', 0, PARAM_BOOL);
 
         $this->_editentries = $editentries;
 
-        // Prepare open a new entry form
-        if ($new and confirm_sesskey()) {
-            $this->_editentries = -$new;
-            // Duplicate any requested entries
-        } else if ($duplicate and confirm_sesskey()) {
-            return $this->_entries->process_entries('duplicate', $duplicate, null, $confirmed);
-            // Delete any requested entries
-        } else if ($delete and confirm_sesskey()) {
-            return $this->_entries->process_entries('delete', $delete, null, $confirmed);
-            // Approve any requested entries
-        } else if ($approve and confirm_sesskey()) {
-            return $this->_entries->process_entries('approve', $approve, null, true);
-            // Disapprove any requested entries
-        } else if ($disapprove and confirm_sesskey()) {
-            return $this->_entries->process_entries('disapprove', $disapprove, null, true);
-            // Append any requested entries to the initiating entry
-        } else if ($append and confirm_sesskey()) {
-            return $this->_entries->process_entries('append', $append, null, true);
-        } else if ($status and confirm_sesskey()) {
-            return $this->_entries->process_entries('status', $status, null, true);
+        if ($new) {
+            if (confirm_sesskey() && ($this->confirm_view_action("addnewentry") || $this->confirm_view_action("addnewentries"))) {
+                return $this->_editentries = -$new;
+            } else {
+                $illegalaction = true;
+            }
+        } else if ($duplicate) {
+            if (confirm_sesskey() && $this->confirm_view_action("duplicate")) {
+                return $this->_entries->process_entries('duplicate', $duplicate, null, $confirmed);
+            } else {
+                $illegalaction = true;
+            }
+        } else if ($delete) {
+            if (confirm_sesskey() && $this->confirm_view_action("delete")) {
+                return $this->_entries->process_entries('delete', $delete, null, $confirmed);
+            } else {
+                $illegalaction = true;
+            }
+        } else if ($approve) {
+            if (confirm_sesskey() && $this->confirm_view_action("approve")) {
+                return $this->_entries->process_entries('approve', $approve, null, true);
+            } else {
+                $illegalaction = true;
+            }
+        } else if ($disapprove) {
+            if (confirm_sesskey() && $this->confirm_view_action("approve")) {
+                return $this->_entries->process_entries('disapprove', $disapprove, null, true);
+            } else {
+                $illegalaction = true;
+            }
+        } else if ($status) {
+            if (confirm_sesskey() && $this->confirm_view_action("status")) {
+                return $this->_entries->process_entries('status', $status, null, true);
+            } else {
+                $illegalaction = true;
+            }
         }
 
-        return true;
+        if ($illegalaction) {
+            $sourceview = optional_param('sourceview', $this->id(), PARAM_INT);
+            $url = new moodle_url('view.php', array('d' => $this->_df->id(), 'view' => $sourceview));
+            redirect($url);
+        }
+
+        return false;
+    }
+
+    /**
+     * Verifies if the given action is available to the user in the view. The view must be visible to the user and
+     * contain the necessary action tag in the entry template in order for the action to be allowed. This function
+     * prevents users to circumvent action restrictions via URL queries.
+     * @param $action String of the action
+     * @return bool true, if the action is allowed; false otherwise.
+     */
+    private function confirm_view_action($action) {
+        global $DB;
+        $sourceview = optional_param('sourceview', 0, PARAM_INT);
+        $view = $DB->get_record('datalynx_views', array('id' => $sourceview));
+        return $view && $this->_df->is_visible_to_user($this->view) &&
+                ((strpos($view->param2, "##$action##") !== false) || (strpos($view->section, "##$action##") !== false));
     }
 
     private function replace_pluginfile_urls($html, $pluginfileurl) {
