@@ -56,7 +56,7 @@ M.datalynxfield__approve.init = function (Y, approvedicon, disapprovedicon) {
                         }
                     },
                     failure: function (id) {
-                        alert("Failure! ID: " + id);
+                        console.log("Failure! ID: " + id);
                     }
                 }
             });

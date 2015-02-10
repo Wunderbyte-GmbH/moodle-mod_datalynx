@@ -796,3 +796,8 @@ $string['teacher'] = 'Teacher';
 $string['student'] = 'Student';
 $string['guest'] = 'Guest';
 $string['targetviewforroles'] = 'Link target views for roles';
+
+$string['subscribe'] = 'Subscribe';
+$string['unsubscribe'] = 'Unsubscribe';
+$string['allowsubscription'] = 'Allow manual subscription';
+$string['allowunsubscription'] = 'Allow manual unsubscription';

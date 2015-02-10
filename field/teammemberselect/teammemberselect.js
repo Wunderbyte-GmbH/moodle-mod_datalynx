@@ -197,6 +197,71 @@ M.datalynxfield_teammemberselect.init_entry_form = function (Y, userlistobject, 
     });
 };
 
+M.datalynxfield_teammemberselect.init_subscribe_links = function(Y, userurl, username) {
+    Y.all('a.datalynxfield_subscribe').each(function (link) {
+        var href = link.get('href');
+        var params = extract_params(href.split('?')[1]);
+        link.detach('click');
+        link.on('click', function (e) {
+            var ul = e.target.ancestor().one('ul');
+            if (!ul) {
+                ul = Y.Node.create('<ul></ul>');
+                e.target.ancestor().prepend(ul);
+            }
+            e.preventDefault();
+            e.stopPropagation();
+            var actionurl = 'field/teammemberselect/ajax.php';
+            Y.io(actionurl, {
+                method: 'POST',
+                data: params,
+                on: {
+                    success: function (id, o) {
+                        if (o.responseText === 'true' && e.target.hasClass('subscribed')) {
+                            e.target.toggleClass('subscribed');
+                            e.target.set('title', M.util.get_string('subscribe', 'datalynx', {}));
+                            e.target.set('innerHTML', M.util.get_string('subscribe', 'datalynx', {}));
+                            params.action = 'subscribe';
+                            remove_user(ul);
+                        } else if (o.responseText === 'true' && !e.target.hasClass('subscribed')) {
+                            e.target.toggleClass('subscribed');
+                            e.target.set('title', M.util.get_string('unsubscribe', 'datalynx', {}));
+                            e.target.set('innerHTML', M.util.get_string('unsubscribe', 'datalynx', {}));
+                            params.action = 'unsubscribe';
+                            add_user(ul);
+                        }
+                    },
+                    failure: function (id) {
+                        console.log("Failure! ID: " + id);
+                    }
+                }
+            });
+        });
+    });
+
+    function add_user(listelement) {
+        var item = Y.Node.create('<li><a href=' + userurl + '>' + username + '</a></li>');
+        listelement.append(item);
+    }
+
+    function remove_user(listelement) {
+        listelement.all('li').each(function (item) {
+            if (item.one('a').get('href') == userurl) {
+                item.remove();
+            }
+        });
+    }
+
+    function extract_params(paramstring) {
+        var params = paramstring.split('&');
+        var output = {};
+        for(var i = 0; i < params.length; i++) {
+            var param = params[i];
+            output[param.split('=')[0]] = param.split('=')[1];
+        }
+        return output;
+    }
+}
+
 M.datalynxfield_teammemberselect.init_filter_search_form = function (Y, userlistobject, fieldid) {
     var key = 0,
         maxresults = 7,
@@ -287,5 +352,3 @@ M.datalynxfield_teammemberselect.init_filter_search_form = function (Y, userlist
         }
     });
 };
-
-

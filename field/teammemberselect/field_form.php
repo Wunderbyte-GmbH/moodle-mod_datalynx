@@ -76,6 +76,12 @@ class datalynxfield_teammemberselect_form extends datalynxfield_form {
         $mform->addElement('checkbox', 'param6', get_string('notifyteammembers', 'datalynx'), null, 1);
         $mform->setType('param6', PARAM_BOOL);
 
+        $mform->addElement('checkbox', 'param8_sub', get_string('allowsubscription', 'datalynx'), null, 1);
+        $mform->addElement('checkbox', 'param8_unsub', get_string('allowunsubscription', 'datalynx'), null, 1);
+        $mform->disabledIf('param8_unsub', 'param8_sub', 'notchecked');
+        $mform->setType('param8_sub', PARAM_INT);
+        $mform->setType('param8_unsub', PARAM_INT);
+
         $attributes = array();
         $message = '';
         if ($teamfield = $this->_field->get_teamfield()) {
@@ -111,6 +117,17 @@ class datalynxfield_teammemberselect_form extends datalynxfield_form {
         $data->param6 = isset($data->param6) ? $data->param6 : 0;
         $data->param7 = isset($data->param7) ? $data->param7 : 0;
         $data->teamfieldenable = $data->param5 != 0;
+        if ($data->param8 == 2) {
+            $data->param8_sub = 1;
+            $data->param8_unsub = 1;
+        } else if ($data->param8 == 1) {
+            $data->param8_sub = 1;
+            $data->param8_unsub = 0;
+        } else {
+            $data->param8_sub = 0;
+            $data->param8_unsub = 0;
+        }
+        unset($data->param8);
         parent::set_data($data);
     }
 
@@ -125,6 +142,17 @@ class datalynxfield_teammemberselect_form extends datalynxfield_form {
             $data->param5 = isset($data->param5) ? $data->param5 : 0;
             $data->param6 = isset($data->param6) ? $data->param6 : 0;
             $data->param7 = isset($data->param7) ? $data->param7 : 0;
+            if (isset($data->param8_sub)) {
+                if (isset($data->param8_unsub)) {
+                    $data->param8 = 2;
+                } else {
+                    $data->param8 = 1;
+                }
+            } else {
+                $data->param8 = 0;
+            }
+            unset($data->param8_sub);
+            unset($data->param8_unsub);
         }
         return $data;
     }

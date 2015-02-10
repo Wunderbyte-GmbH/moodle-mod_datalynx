@@ -30,13 +30,77 @@ require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
  */
 class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
 
-    /**
-     * [display_edit description]
-     * @param  MoodleQuickForm $mform form to display element in
-     * @param  [type] $entry   [description]
-     * @param  [type] $options [description]
-     * @return [type]          [description]
-     */
+    public function render_display_mode(stdClass $entry, array $params) {
+        $field = $this->_field;
+        $fieldid = $field->id();
+        $str = '';
+
+        if (isset($entry->{"c{$fieldid}_content"})) {
+            $selected = json_decode($entry->{"c{$fieldid}_content"}, true);
+            $options = $field->options_menu(false, true, 0, true);
+
+            $str = array();
+            foreach ($selected as $id) {
+                if ($id > 0) {
+                    if (isset($options[$id])) {
+                        $str[] = $options[$id];
+                    }
+                }
+            }
+
+            switch ($field->listformat) {
+                case datalynxfield_teammemberselect::TEAMMEMBERSELECT_FORMAT_NEWLINE:
+                    $str = implode('<br />', $str);
+                    break;
+                case datalynxfield_teammemberselect::TEAMMEMBERSELECT_FORMAT_SPACE:
+                    $str = implode(' ', $str);
+                    break;
+                case datalynxfield_teammemberselect::TEAMMEMBERSELECT_FORMAT_COMMA:
+                    $str = implode(',', $str);
+                    break;
+                case datalynxfield_teammemberselect::TEAMMEMBERSELECT_FORMAT_COMMA_SPACE:
+                    $str = implode(', ', $str);
+                    break;
+                case datalynxfield_teammemberselect::TEAMMEMBERSELECT_FORMAT_UL:
+                default:
+                    if (count($str) > 0) {
+                        $str = '<ul><li>' . implode('</li><li>', $str) . '</li></ul>';
+                    } else {
+                        $str = '';
+                    }
+                    break;
+
+            }
+        }
+
+        if (isset($params['subscribe'])) {
+            global $PAGE, $USER;
+
+            if (isset($entry->{"c{$fieldid}_content"})) {
+                $selected = json_decode($entry->{"c{$fieldid}_content"}, true);
+                $userismember = in_array($USER->id, $selected);
+            } else {
+                $userismember = false;
+            }
+
+            $str .= html_writer::link(new moodle_url('/mod/datalynx/field/teammemberselect/ajax.php',
+                array('d' => $this->_field->df()->id(), 'fieldid' => $this->_field->id(), 'entryid' => $entry->id,
+                      'userid' => $USER->id, 'action' => $userismember ? 'unsubscribe' : 'subscribe',
+                      'sesskey' => sesskey())),
+                get_string($userismember ? 'unsubscribe' : 'subscribe', 'datalynx'),
+                array('class' => 'datalynxfield_subscribe' . ($userismember ? ' subscribed' : '')));
+            $userurl = new moodle_url('/user/view.php', array('course' => $this->_field->df()->course->id, 'id' => $USER->id));
+            $PAGE->requires->strings_for_js(array('subscribe', 'unsubscribe'), 'datalynx');
+            $PAGE->requires->js_init_call(
+                'M.datalynxfield_teammemberselect.init_subscribe_links',
+                array($userurl->out(false), fullname($USER)),
+                false,
+                $this->get_js_module());
+        }
+
+        return $str;
+    }
+
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options = null) {
         global $PAGE, $USER;
 
@@ -111,9 +175,6 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         return $jsmodule;
     }
 
-    /**
-     *
-     */
     public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
         global $PAGE;
 
@@ -141,64 +202,12 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         return array($elements, null);
     }
 
-
-    /**
-     *
-     */
-    public function render_display_mode(stdClass $entry, array $params) {
-        $field = $this->_field;
-        $fieldid = $field->id();
-        $str = '';
-
-        if (isset($entry->{"c{$fieldid}_content"})) {
-            $selected = json_decode($entry->{"c{$fieldid}_content"}, true);
-            $options = $field->options_menu(false, true, 0, true);
-
-            $str = array();
-            foreach ($selected as $id) {
-                if ($id > 0) {
-                    if (isset($options[$id])) {
-                        $str[] = $options[$id];
-                    }
-                }
-            }
-
-            switch ($field->listformat) {
-                case datalynxfield_teammemberselect::TEAMMEMBERSELECT_FORMAT_NEWLINE:
-                    $str = implode('<br />', $str);
-                    break;
-                case datalynxfield_teammemberselect::TEAMMEMBERSELECT_FORMAT_SPACE:
-                    $str = implode(' ', $str);
-                    break;
-                case datalynxfield_teammemberselect::TEAMMEMBERSELECT_FORMAT_COMMA:
-                    $str = implode(',', $str);
-                    break;
-                case datalynxfield_teammemberselect::TEAMMEMBERSELECT_FORMAT_COMMA_SPACE:
-                    $str = implode(', ', $str);
-                    break;
-                case datalynxfield_teammemberselect::TEAMMEMBERSELECT_FORMAT_UL:
-                default:
-                    if (count($str) > 0) {
-                        $str = '<ul><li>' . implode('</li><li>', $str) . '</li></ul>';
-                    } else {
-                        $str = '';
-                    }
-                    break;
-
-            }
-        }
-
-        return $str;
-    }
-
-    /**
-     * Array of patterns this field supports
-     */
     protected function patterns() {
         $fieldname = $this->_field->name();
 
         $patterns = parent::patterns();
         $patterns["[[$fieldname]]"] = array(true);
+        $patterns["[[$fieldname:subscribe]]"] = array(true);
 
         return $patterns;
     }

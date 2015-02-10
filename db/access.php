@@ -528,4 +528,17 @@ $capabilities = array(
             'editingteacher' => CAP_ALLOW,
         )
     ),
+
+    'mod/datalynx:teamsubscribe' => array(
+
+        'riskbitmask' => RISK_PERSONAL,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'student' => CAP_ALLOW
+        )
+    ),
 );
