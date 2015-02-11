@@ -801,3 +801,6 @@ $string['subscribe'] = 'Subscribe';
 $string['unsubscribe'] = 'Unsubscribe';
 $string['allowsubscription'] = 'Allow manual subscription';
 $string['allowunsubscription'] = 'Allow manual unsubscription';
+$string['selectuser'] = 'Select user...';
+$string['allowsubscription_help'] = 'Check this option to enable users to add themselves to teams created by other people. This is facilitated via :subscribe tag extension, e.g. [[&lt;fieldname&gt;:subscribe]], which modifies the field to display an additional link in browse mode. By clicking on this link user can add themselves to the particular team, if they are able and allowed to by the field setup.';
+$string['allowunsubscription_help'] = 'Check this option to enable users to unsubscribe themselves from teams of other users in a manner similar to the \'Allow manual subscription option\'. If disabled, users on a team can only be removed by the user who created that team.';

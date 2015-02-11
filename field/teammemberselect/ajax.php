@@ -21,10 +21,6 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-if (!defined('AJAX_SCRIPT')) {
-    define('AJAX_SCRIPT', true);
-}
-
 require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))).'/config.php');
 
 ob_start();
@@ -34,8 +30,12 @@ $entryid = required_param('entryid', PARAM_INT);
 $fieldid = required_param('fieldid', PARAM_INT);
 $userid = required_param('userid', PARAM_INT);
 $action = required_param('action', PARAM_ALPHA);
-$viewid = optional_param('viewid', 0, PARAM_INT);
-$isajax = optional_param('ajax', false, PARAM_BOOL);
+$viewid = optional_param('viewid', null, PARAM_INT);
+$ajax = optional_param('ajax', false, PARAM_BOOL);
+
+if (!defined('AJAX_SCRIPT') && $ajax) {
+    define('AJAX_SCRIPT', true);
+}
 
 $cm = get_coursemodule_from_instance('datalynx', $d, 0, false, MUST_EXIST);
 $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
@@ -62,14 +62,31 @@ if ($action == 'subscribe') {
         $DB->insert_record('datalynx_contents', (object) $content);
     }
 
+    $other = ['dataid' => $d,
+        'fieldid' => $fieldid,
+        'name' => $DB->get_field('datalynx_fields', 'name', array('id' => $fieldid)),
+        'addedmembers' => json_encode([$userid]),
+        'removedmembers' => json_encode([])];
+
+    $event = \mod_datalynx\event\team_updated::create(array('context' => $context, 'objectid' => $entryid, 'other' => $other));
+    $event->trigger();
+
     $return = true;
 } else if ($action == 'unsubscribe') {
-    $field = $DB->get_field('datalynx_contents', 'content', array('fieldid' => $fieldid, 'entryid' => $entryid));
     $users = json_decode($DB->get_field('datalynx_contents', 'content', array('fieldid' => $fieldid, 'entryid' => $entryid)));
     if ($users !== null) {
         $users = array_values(array_diff($users, array($userid)));
         $DB->set_field('datalynx_contents', 'content', json_encode($users), array('fieldid' => $fieldid, 'entryid' => $entryid));
         $return = true;
+
+        $other = ['dataid' => $d,
+            'fieldid' => $fieldid,
+            'name' => $DB->get_field('datalynx_fields', 'name', array('id' => $fieldid)),
+            'addedmembers' => json_encode([]),
+            'removedmembers' => json_encode([$userid])];
+
+        $event = \mod_datalynx\event\team_updated::create(array('context' => $context, 'objectid' => $entryid, 'other' => $other));
+        $event->trigger();
     } else {
         $return = false; //should not occur, as at least this user's id must be in the field
     }
@@ -77,7 +94,7 @@ if ($action == 'subscribe') {
     $return = false;
 }
 
-if (true) {
+if ($ajax) {
     if (ob_get_contents()) {
         ob_clean();
     }
@@ -85,11 +102,7 @@ if (true) {
 
     die;
 } else {
-    $sourceview = optional_param('sourceview', $this->id(), PARAM_INT);
-    $url = new moodle_url('view.php', array('d' => $this->_df->id(), 'view' => $sourceview));
+    $url = new moodle_url('../../view.php', array('d' => $d, 'view' => $viewid));
     redirect($url);
 }
-
-
-
 

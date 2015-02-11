@@ -31,6 +31,9 @@ require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
 
     public function render_display_mode(stdClass $entry, array $params) {
+        global $PAGE, $USER;
+
+        /* @var $field datalynxfield_teammemberselect */
         $field = $this->_field;
         $fieldid = $field->id();
         $str = '';
@@ -50,7 +53,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
 
             switch ($field->listformat) {
                 case datalynxfield_teammemberselect::TEAMMEMBERSELECT_FORMAT_NEWLINE:
-                    $str = implode('<br />', $str);
+                    $str = implode('<br>', $str);
                     break;
                 case datalynxfield_teammemberselect::TEAMMEMBERSELECT_FORMAT_SPACE:
                     $str = implode(' ', $str);
@@ -73,23 +76,22 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
             }
         }
 
-        if (isset($params['subscribe'])) {
-            global $PAGE, $USER;
+        $subscribeenabled = isset($params['subscribe']);
+        $selected = isset($entry->{"c{$fieldid}_content"}) ? json_decode($entry->{"c{$fieldid}_content"}, true) : [];
+        $teamfull = $field->teamsize < count($selected);
+        $userhasadmissiblerole = $field->admissibleroles & $field->df()->get_user_datalynx_role($USER->id);
+        $userismember = in_array($USER->id, $selected);
 
-            if (isset($entry->{"c{$fieldid}_content"})) {
-                $selected = json_decode($entry->{"c{$fieldid}_content"}, true);
-                $userismember = in_array($USER->id, $selected);
-            } else {
-                $userismember = false;
-            }
+        if ($subscribeenabled && $userhasadmissiblerole && ($userismember || !$teamfull)) {
 
             $str .= html_writer::link(new moodle_url('/mod/datalynx/field/teammemberselect/ajax.php',
-                array('d' => $this->_field->df()->id(), 'fieldid' => $this->_field->id(), 'entryid' => $entry->id,
-                      'userid' => $USER->id, 'action' => $userismember ? 'unsubscribe' : 'subscribe',
+                array('d' => $field->df()->id(), 'fieldid' => $fieldid, 'entryid' => $entry->id,
+                      'viewid' => optional_param('viewid', null, PARAM_INT),
+                      'userid' => $USER->id, 'action' =>  $userismember ? 'unsubscribe' : 'subscribe',
                       'sesskey' => sesskey())),
                 get_string($userismember ? 'unsubscribe' : 'subscribe', 'datalynx'),
                 array('class' => 'datalynxfield_subscribe' . ($userismember ? ' subscribed' : '')));
-            $userurl = new moodle_url('/user/view.php', array('course' => $this->_field->df()->course->id, 'id' => $USER->id));
+            $userurl = new moodle_url('/user/view.php', array('course' => $field->df()->course->id, 'id' => $USER->id));
             $PAGE->requires->strings_for_js(array('subscribe', 'unsubscribe'), 'datalynx');
             $PAGE->requires->js_init_call(
                 'M.datalynxfield_teammemberselect.init_subscribe_links',
@@ -124,10 +126,10 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
                 $selected[$i] = 0;
             }
             $select = $mform->createElement('select', "{$fieldname}[{$i}]", null, $menu,
-                array('class' => "datalynxfield_teammemberselect_select $classname", 'placeholder' => 'Select user...'));
+                array('class' => "datalynxfield_teammemberselect_select $classname", 'placeholder' => get_string('selectuser', 'datalynx')));
             $mform->setType("{$fieldname}[{$i}]", PARAM_INT);
             $text = $mform->createElement('text', "{$fieldnamedropdown}[{$i}]", null,
-                array('class' => "datalynxfield_teammemberselect_dropdown $classname", 'placeholder' => 'Select user...'));
+                array('class' => "datalynxfield_teammemberselect_dropdown $classname", 'placeholder' => get_string('selectuser', 'datalynx')));
             $mform->setType("{$fieldnamedropdown}[{$i}]", PARAM_TEXT);
 
             $select->setSelected($selected[$i]);

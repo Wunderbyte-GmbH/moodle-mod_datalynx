@@ -972,7 +972,7 @@ class datalynx {
         return $isadmin || ($view->visible & $mask);
     }
 
-    const ROLE_ADMIN = 0;
+    const ROLE_ADMIN = 15;
     const ROLE_MANAGER = 1;
     const ROLE_TEACHER = 2;
     const ROLE_STUDENT = 4;

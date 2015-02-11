@@ -77,7 +77,9 @@ class datalynxfield_teammemberselect_form extends datalynxfield_form {
         $mform->setType('param6', PARAM_BOOL);
 
         $mform->addElement('checkbox', 'param8_sub', get_string('allowsubscription', 'datalynx'), null, 1);
+        $mform->addHelpButton('param8_sub', 'allowsubscription', 'datalynx');
         $mform->addElement('checkbox', 'param8_unsub', get_string('allowunsubscription', 'datalynx'), null, 1);
+        $mform->addHelpButton('param8_unsub', 'allowunsubscription', 'datalynx');
         $mform->disabledIf('param8_unsub', 'param8_sub', 'notchecked');
         $mform->setType('param8_sub', PARAM_INT);
         $mform->setType('param8_unsub', PARAM_INT);

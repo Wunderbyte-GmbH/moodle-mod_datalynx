@@ -201,6 +201,7 @@ M.datalynxfield_teammemberselect.init_subscribe_links = function(Y, userurl, use
     Y.all('a.datalynxfield_subscribe').each(function (link) {
         var href = link.get('href');
         var params = extract_params(href.split('?')[1]);
+        params['ajax'] = true;
         link.detach('click');
         link.on('click', function (e) {
             var ul = e.target.ancestor().one('ul');
@@ -249,6 +250,9 @@ M.datalynxfield_teammemberselect.init_subscribe_links = function(Y, userurl, use
                 item.remove();
             }
         });
+        if (!listelement.hasChildNodes()) {
+            listelement.remove();
+        }
     }
 
     function extract_params(paramstring) {
