@@ -326,6 +326,7 @@ class datalynxview_patterns {
                         $baseurl->param('view', $df->data->singleedit);
                     }
                     $baseurl->param('new', 1);
+                    $baseurl->param('sourceview', $this->_view->id());
                     $label = html_writer::tag('span', get_string('entryaddnew', 'datalynx'));
                     $replacement = html_writer::link($baseurl, $label, array('class' => 'addnewentry'));
                 } else {
