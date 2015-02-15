@@ -180,7 +180,7 @@ class datalynxview_patterns {
                         $linktext = $OUTPUT->pix_icon($icon, $titletext);
                     }
                     $urlquery = str_replace('|', '&', $urlquery);
-                    $linkparams = array('sesskey' => sesskey());
+                    $linkparams = array('sesskey' => sesskey(), 'sourceview' => $this->_view->id());
                     $viewlink = new moodle_url($view->baseurl, $linkparams);
                     if (strpos($urlquery, 'new=1') === false || $this->user_can_add_new_entry()) {
                         return html_writer::link($viewlink->out(false). "&$urlquery", $linktext);
