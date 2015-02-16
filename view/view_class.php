@@ -1089,7 +1089,8 @@ abstract class datalynxview_base {
                 'view' => $this->id(),
                 'page' => $this->_filter->page,
                 'eids' => $this->_filter->eids,
-                'update' => $this->_editentries
+                'update' => $this->_editentries,
+                'sourceview' => optional_param('sourceview', null, PARAM_INT),
             );
             $actionurl = new moodle_url("/mod/datalynx/{$this->_df->pagefile()}.php", $actionparams);
             $custom_data = array(
@@ -1379,9 +1380,10 @@ abstract class datalynxview_base {
         $illegalaction = false;
 
         // Check first if returning from form
-        $update = optional_param('update', '', PARAM_SEQUENCE);
+        $update = optional_param('update', '', PARAM_RAW);
         if ($update) {
-            if (confirm_sesskey() && !$this->confirm_view_action("edit")) {
+            $action = ($update != self::ADD_NEW_ENTRY) ? "edit" : "addnewentry";
+            if (confirm_sesskey() && $this->confirm_view_action($action)) {
                 // get entries only if updating existing entries
                 if ($update != self::ADD_NEW_ENTRY) {
                     // fetch entries
