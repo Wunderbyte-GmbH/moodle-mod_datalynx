@@ -473,7 +473,8 @@ class datalynx_entries {
                 echo $OUTPUT->confirm(get_string("entriesconfirm$action", 'datalynx', count($entries)),
                                     new moodle_url($PAGE->url, array($action => implode(',', array_keys($entries)),
                                                                     'sesskey' => sesskey(),
-                                                                    'confirmed' => true)),
+                                                                    'confirmed' => true,
+                                                                    'sourceview' => optional_param('sourceview', null, PARAM_INT))),
                                     new moodle_url($PAGE->url));
 
                 echo $OUTPUT->footer();
