@@ -61,7 +61,7 @@ abstract class datalynxfield_renderer {
         $found = array();
 
         $matches = array();
-        $fieldname = $this->_field->name();
+        $fieldname = preg_quote($this->_field->name());
         if (preg_match_all("/\[\[$fieldname(?:\|(?:[^\]]+))?\]\]/", $text, $matches)) {
             $found = array_merge($found, $matches[0]);
         }
