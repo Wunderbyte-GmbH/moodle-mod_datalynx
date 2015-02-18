@@ -1161,6 +1161,9 @@ abstract class datalynxview_base {
         if ($patterns = $this->patterns()->get_replacements($this->_tags['view'], null, $options)) {
             $viewdefinitions = array();
             foreach ($patterns as $tag => $pattern) {
+                if (strpos($tag, 'viewlink') !== 0 || strpos($tag, 'viewsesslink') !== 0) {
+                    $pattern = str_replace('##entryid##', isset($definitions['##entryid##'][1]) ? $definitions['##entryid##'][1] : "0", $pattern);
+                }
                 $viewdefinitions[$tag] = array('html', $pattern);
             }
             $definitions = array_merge($definitions, $viewdefinitions);
