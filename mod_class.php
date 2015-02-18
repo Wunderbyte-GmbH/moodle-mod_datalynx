@@ -994,7 +994,7 @@ class datalynx {
 
         if (has_capability('mod/datalynx:viewprivilegeadmin', $this->context, $user, true)) {
             return self::ROLE_ADMIN;
-        } else if (has_capability('mod/datalynx:viewprivilemanager', $this->context, $user, false)) {
+        } else if (has_capability('mod/datalynx:viewprivilegemanager', $this->context, $user, false)) {
             return self::ROLE_MANAGER;
         } else if (has_capability('mod/datalynx:viewprivilegeteacher', $this->context, $user, false)) {
             return self::ROLE_TEACHER;
@@ -1035,7 +1035,7 @@ class datalynx {
             $users += get_enrolled_users($this->context, 'mod/datalynx:viewprivilegeadmin');
         }
         if (in_array(self::ROLE_MANAGER, $roles)) {
-            $users += get_enrolled_users($this->context, 'mod/datalynx:viewprivilemanager');
+            $users += get_enrolled_users($this->context, 'mod/datalynx:viewprivilegemanager');
         }
         if (in_array(self::ROLE_TEACHER, $roles)) {
             $users += get_enrolled_users($this->context, 'mod/datalynx:viewprivilegeteacher');
