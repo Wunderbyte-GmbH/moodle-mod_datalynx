@@ -690,6 +690,17 @@ abstract class datalynxfield_option extends datalynxfield_base {
      * @return mixed
      */
     public function get_options() {
+        if (!$this->_options) {
+            if (!empty($this->field->param1)) {
+                $rawoptions = explode("\n",$this->field->param1);
+                foreach ($rawoptions as $key => $option) {
+                    $option = trim($option);
+                    if ($option != '') {
+                        $this->_options[$key + 1] = $option;
+                    }
+                }
+            }
+        }
         return $this->_options;
     }
 
