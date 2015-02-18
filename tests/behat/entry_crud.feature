@@ -115,5 +115,5 @@ Feature: In a datalynx create, update, and delete entries
     When I select "first" entry
     And I press "multidelete"
     And I press "Continue"
-    Then I should see "Blah, blah, blah!"
-    But should not see "This is the other!"
+    Then I should not see "Blah, blah, blah!"
+    But I should see "This is the other!"

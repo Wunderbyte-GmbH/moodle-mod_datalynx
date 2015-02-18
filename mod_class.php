@@ -1266,7 +1266,7 @@ class datalynx {
         
         if ($vids) { // some views are specified for action
             $views = array();
-            $viewobjs = $this->get_views();
+            $viewobjs = $this->get_views(false, true);
             foreach (explode(',', $vids) as $vid) {
                 if (!empty($viewobjs[$vid])) {
                     $views[$vid] = $viewobjs[$vid];
@@ -1347,7 +1347,7 @@ class datalynx {
                     case 'reset':
                         foreach ($views as $vid => $view) {
                             // generate default view and update
-                            $view->generate_default_view();                            
+                            $view->generate_default_view();
 
                             // update view
                             $view->update($view->view);

@@ -96,23 +96,22 @@ class datalynxview_patterns {
     }
 
     /**
-     *
+     * @param null $tags
+     * @param null $entry
+     * @param array $options
+     * @return array
      */
     public function get_replacements($tags = null, $entry = null, array $options = array()) {
-        global $CFG, $OUTPUT;
         $view = $this->_view;
-        $viewname = $view->name();
         
         $info = array_keys($this->info_patterns());
         $ref = array_keys($this->ref_patterns());
         $userpref = array_keys($this->userpref_patterns());
         $actions = array_keys($this->action_patterns());
         $paging = array_keys($this->paging_patterns());
-        $paging = array_keys($this->paging_patterns());
         
         $options['filter'] = $view->get_filter();
         $options['baseurl'] = new moodle_url($view->get_baseurl(), array('sesskey' => sesskey()));
-        $edit = !empty($options['edit']) ? $options['edit'] : false;
 
         $replacements = array();
         foreach ($tags as $tag) {
@@ -307,6 +306,7 @@ class datalynxview_patterns {
         $filter = $view->get_filter();
         $baseurl = new moodle_url($view->get_baseurl());
         $baseurl->param('sesskey', sesskey());
+        $baseurl->param('sourceview', $this->_view->id());
 
         $showentryactions = (!empty($options['showentryactions'])
                                 or has_capability('mod/datalynx:manageentries', $df->context));
@@ -326,7 +326,6 @@ class datalynxview_patterns {
                         $baseurl->param('view', $df->data->singleedit);
                     }
                     $baseurl->param('new', 1);
-                    $baseurl->param('sourceview', $this->_view->id());
                     $label = html_writer::tag('span', get_string('entryaddnew', 'datalynx'));
                     $replacement = html_writer::link($baseurl, $label, array('class' => 'addnewentry'));
                 } else {

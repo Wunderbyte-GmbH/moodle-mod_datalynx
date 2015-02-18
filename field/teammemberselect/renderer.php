@@ -117,7 +117,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
 
         $selected = !empty($entry->{"c{$fieldid}_content"}) ? json_decode($entry->{"c{$fieldid}_content"}, true) : array();
         $authorid = isset($entry->userid) ? $entry->userid : $USER->id;
-        $menu = $field->options_menu(false, false, $field->usercanaddself ? 0 : $authorid);
+        $menu = $field->options_menu(true, false, $field->usercanaddself ? 0 : $authorid);
 
         $selectgroup = array();
         $dropdowngroup = array();
@@ -126,10 +126,10 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
                 $selected[$i] = 0;
             }
             $select = $mform->createElement('select', "{$fieldname}[{$i}]", null, $menu,
-                array('class' => "datalynxfield_teammemberselect_select $classname", 'placeholder' => get_string('selectuser', 'datalynx')));
+                array('class' => "datalynxfield_teammemberselect_select $classname"));
             $mform->setType("{$fieldname}[{$i}]", PARAM_INT);
             $text = $mform->createElement('text', "{$fieldnamedropdown}[{$i}]", null,
-                array('class' => "datalynxfield_teammemberselect_dropdown $classname", 'placeholder' => get_string('selectuser', 'datalynx')));
+                array('class' => "datalynxfield_teammemberselect_dropdown $classname"));
             $mform->setType("{$fieldnamedropdown}[{$i}]", PARAM_TEXT);
 
             $select->setSelected($selected[$i]);

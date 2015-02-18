@@ -23,9 +23,9 @@ Feature: In a datalynx create, update, and delete fields
       | textarea       | Textarea |                              |
       | time           | Time     |                              |
       | duration       | Duration |                              |
-      | radiobutton    | Radio    | Option A\|Option B\|Option C |
-      | checkbox       | Checkbox | Option 1\|Option 2\|Option 3 |
-      | select         | Select   | Option X\|Option Y\|Option Z |
+      | radiobutton    | Radio    | Option A, Option B, Option C |
+      | checkbox       | Checkbox | Option 1, Option 2, Option 3 |
+      | select         | Select   | Option X, Option Y, Option Z |
     And "Datalynx Test Instance" has following filters:
       | name       | perpage |
       | TestFilter | 3       |
@@ -55,23 +55,3 @@ Feature: In a datalynx create, update, and delete fields
     And I should see "Option 1"
     And I should see "Option 2"
     But I should not see "Option 3"
-
-  @javascript
-  Scenario: add entry
-    Given I log in as "teacher1"
-    And I follow "Course 1"
-    And I follow "Datalynx Test Instance"
-    And I create an entry in "Datalynx Test Instance" instance and fill the form with:
-      | Option A  | x       |
-      | Option 1  | x       |
-    And I create an entry in "Datalynx Test Instance" instance and fill the form with:
-      | Option B  | x       |
-      | Option 1  | x       |
-      | Option 2  | x       |
-    And I create an entry in "Datalynx Test Instance" instance and fill the form with:
-      | Option C  | x       |
-      | Option 3  | x       |
-      | Option 2  | x       |
-    When I select "first,third" entry
-    And I press "multiedit"
-    And I wait "10" seconds
