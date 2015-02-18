@@ -41,14 +41,14 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
 
         $replacements = array();
 
-        foreach ($tags as $tag => $cleantag) {
+        foreach ($tags as $tag) {
             if (!$entry or $edit) {
-                if ($cleantag == "##status##") {
+                if ($tag == "##status##") {
                     $required = $options['required'];
                     $replacements[$tag] = array('', array(array($this, 'display_edit'), array($entry, array('required' => $required))));
                 }
             } else {
-                if ($cleantag == "##status##") {
+                if ($tag == "##status##") {
                     $replacements[$tag] = array('html', $this->display_browse($entry));
                 }
             }
