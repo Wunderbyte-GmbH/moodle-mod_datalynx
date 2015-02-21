@@ -70,7 +70,7 @@ class datalynxfield_teammemberselect_form extends datalynxfield_form {
         $mform->setDefault('param4', datalynxfield_teammemberselect::TEAMMEMBERSELECT_FORMAT_UL);
 
         $mform->addElement('checkbox', 'param7', get_string('user_can_add_self', 'datalynx'), null, 1);
-        $mform->addHelpButton('param7', 'notifyteammembers', 'datalynx');
+        $mform->addHelpButton('param7', 'user_can_add_self', 'datalynx');
         $mform->setType('param7', PARAM_BOOL);
 
         $mform->addElement('checkbox', 'param6', get_string('notifyteammembers', 'datalynx'), null, 1);
