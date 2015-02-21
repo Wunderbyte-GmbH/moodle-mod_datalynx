@@ -83,7 +83,7 @@ class datalynxfield__status extends datalynxfield_no_content {
      */
     public function get_search_sql($search) {
         $value = $search[2];
-        return array(" e.status = $value ", array());
+        return array(" e.status = $value ", array(), false);
     }
 
     /**
@@ -96,5 +96,15 @@ class datalynxfield__status extends datalynxfield_no_content {
         } else {
             return false;
         }
+    }
+
+    /**
+     * @return array
+     * @throws coding_exception
+     */
+    public function get_supported_search_operators() {
+        return array(
+            '=' => get_string('equal', 'datalynx'),
+        );
     }
 }

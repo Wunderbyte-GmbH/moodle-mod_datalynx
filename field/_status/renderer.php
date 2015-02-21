@@ -115,6 +115,25 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * @param MoodleQuickForm $mform
+     * @param int $i
+     * @param string $value
+     * @return array
+     */
+    public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
+        $fieldid = $this->_field->id();
+        $fieldname = "f_{$i}_$fieldid";
+
+        $statusmenu = $this->menu_status(true);
+
+        $select = &$mform->createElement('select', $fieldname, null, $statusmenu, '');
+        $select->setValue($value);
+
+        $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
+        return [[$select], null];
+    }
+
+    /**
      * Returns information about supported field patterns
      * @return array (string) pattern => array((boolean) supported, (string) pattern category)
      */
