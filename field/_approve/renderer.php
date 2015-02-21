@@ -109,7 +109,7 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
         $strapproved = get_string($approved, 'datalynx');
         
         $approvedimage = html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url($approvedimagesrc),
-                                                            'class' => "iconsmall" . $entry->approved ? ' approved' : '',
+                                                            'class' => "iconsmall" . ($entry->approved ? ' approved' : ''),
                                                             'alt' => $strapproved,
                                                             'title' => $strapproved));
                                                             
