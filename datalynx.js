@@ -257,7 +257,7 @@ M.mod_datalynx.tag_manager.add_tag_spans = function(editordiv) {
     var textarea = editordiv.one("textarea");
 
     // field tags
-    var tagregex = /\[\[([^\|\]]+)(?:\|([^\|\]]*))?(?:\|([^\|\]]*))?\]\]/g;
+    var tagregex = /\[\[([^\|\]]+)(?:\|([^\|\]]*))?(?:\|([^\|\]]*))?]](@?)/g;
     var oldcontent = textarea.get('value');
     var newcontent = oldcontent;
     var splittag;
@@ -266,8 +266,10 @@ M.mod_datalynx.tag_manager.add_tag_spans = function(editordiv) {
         var field = splittag[1];
         var behavior = typeof(splittag[2]) !== "undefined" ? splittag[2] : "";
         var renderer = typeof(splittag[3]) !== "undefined" ? splittag[3] : "";
-        var replacement = M.mod_datalynx.tag_manager.create_advanced_tag('field', field, behavior, renderer);
-        newcontent = newcontent.replace(tag, replacement);
+        if (splittag[4] !== '@') {
+            var replacement = M.mod_datalynx.tag_manager.create_advanced_tag('field', field, behavior, renderer);
+            newcontent = newcontent.replace(new RegExp(preg_quote(tag) + "(?!@)"), replacement);
+        }
     }
 
     // action tags
@@ -283,7 +285,24 @@ M.mod_datalynx.tag_manager.add_tag_spans = function(editordiv) {
     editor.setHTML(newcontent);
     textarea.set('value', newcontent);
     textarea.simulate('change');
-}
+
+    function preg_quote(str, delimiter) {
+        //  discuss at: http://phpjs.org/functions/preg_quote/
+        // original by: booeyOH
+        // improved by: Ates Goral (http://magnetiq.com)
+        // improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+        // improved by: Brett Zamir (http://brett-zamir.me)
+        // bugfixed by: Onno Marsman
+        //   example 1: preg_quote("$40");
+        //   returns 1: '\\$40'
+        //   example 2: preg_quote("*RRRING* Hello?");
+        //   returns 2: '\\*RRRING\\* Hello\\?'
+        //   example 3: preg_quote("\\.+*?[^]$(){}=!<>|:");
+        //   returns 3: '\\\\\\.\\+\\*\\?\\[\\^\\]\\$\\(\\)\\{\\}\\=\\!\\<\\>\\|\\:'
+
+        return String(str).replace(new RegExp('[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\' + (delimiter || '') + '-]', 'g'), '\\$&');
+    }
+};
 
 /**
  * @param editor Node
