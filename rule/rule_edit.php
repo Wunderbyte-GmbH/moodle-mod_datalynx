@@ -57,8 +57,8 @@ if ($mform->is_cancelled()){
     if (!$rule->get_id()) {
         $ruleid = $rule->insert_rule($data);
 
-        $other = array('dataid' => $this->_df->id());
-        $event = \mod_datalynx\event\rule_created::create(array('context' => $this->_df->context, 'objectid' => $ruleid, 'other' => $other));
+        $other = array('dataid' => $df->id());
+        $event = \mod_datalynx\event\rule_created::create(array('context' => $df->context, 'objectid' => $ruleid, 'other' => $other));
         $event->trigger();
 
     // update rule
@@ -66,8 +66,8 @@ if ($mform->is_cancelled()){
         $data->id = $rule->get_id();
         $rule->update_rule($data);
 
-        $other = array('dataid' => $this->_df->id());
-        $event = \mod_datalynx\event\rule_updated::create(array('context' => $this->_df->context, 'objectid' => $rule->get_id(), 'other' => $other));
+        $other = array('dataid' => $df->id());
+        $event = \mod_datalynx\event\rule_updated::create(array('context' => $df->context, 'objectid' => $rule->get_id(), 'other' => $other));
         $event->trigger();
     }
 
