@@ -459,7 +459,12 @@ M.mod_datalynx.tag_manager.init = function(Y, behaviors, renderers, types) {
         attoeditor.one(".editor_atto_content").on('click', M.mod_datalynx.tag_manager.show_tag_dialog, null, Y);
         attoeditor.one("button[title='HTML']").on('click', M.mod_datalynx.tag_manager.toggle_tags, null, Y, editordiv);
         var id = attoeditor.siblings().item(0).get('id').replace('id_', '');
-        Y.all('select[name^="' + id + '"]').on('valuechange', M.mod_datalynx.tag_manager.insert_field_tag, null, Y, editordiv);
+        if (typeof InstallTrigger !== 'undefined') { // Firefox check
+            Y.all('select[name^="' + id + '"]').on('click', M.mod_datalynx.tag_manager.insert_field_tag, null, Y, editordiv);
+        } else {
+            Y.all('select[name^="' + id + '"]').on('valuechange', M.mod_datalynx.tag_manager.insert_field_tag, null, Y, editordiv);
+        }
+
     });
 
     M.mod_datalynx.tag_manager.behaviors = behaviors;
