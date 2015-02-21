@@ -407,7 +407,11 @@ class datalynxview_pdf extends datalynxview_base {
             if ($field->field->id > 0) {
                 $name = new html_table_cell($field->name(). ':');
                 $name->style = 'text-align:right;';
-                $content = new html_table_cell("[[{$field->name()}]]");
+                if ($field->type == "userinfo") {
+                    $content = new html_table_cell("##author:{$field->name()}##");
+                } else {
+                    $content = new html_table_cell("[[{$field->name()}]]");
+                }
                 $row = new html_table_row();
                 $row->cells = array($name, $content);
                 $table->data[] = $row;

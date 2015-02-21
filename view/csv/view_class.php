@@ -580,7 +580,12 @@ class datalynxview_csv extends datalynxview_base {
         foreach ($fields as $field) {
             if ($field->field->id > 0) {
                 $fieldname = $field->name();
-                $this->view->param2 .= "[[$fieldname]]\n";
+                if ($field->type == "userinfo") {
+                    $this->view->param2 .= "##author:{$fieldname}##\n";
+                } else {
+                    $this->view->param2 .= "[[$fieldname]]\n";
+                }
+
             }
         }
     }    
