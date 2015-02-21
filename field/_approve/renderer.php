@@ -86,7 +86,7 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
         }
 
         $fieldname = "field_{$fieldid}_{$entryid}";
-        $mform->addElement('checkbox', $fieldname, null);
+        $mform->addElement('advcheckbox', $fieldname, null, null, null, array(0, 1));
         $mform->setDefault($fieldname, $checked);
     }
 
