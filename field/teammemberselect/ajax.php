@@ -59,7 +59,12 @@ if ($action == 'subscribe') {
             'entryid' => $entryid,
             'content' => json_encode($users)
         ];
-        $DB->insert_record('datalynx_contents', (object) $content);
+        if ($content !== "null") {
+            $DB->insert_record('datalynx_contents', (object) $content);
+        } else {
+            $return = "Team subscribe error: Failed encoding subscription!";
+        }
+
     }
 
     $other = ['dataid' => $d,
@@ -88,10 +93,10 @@ if ($action == 'subscribe') {
         $event = \mod_datalynx\event\team_updated::create(array('context' => $context, 'objectid' => $entryid, 'other' => $other));
         $event->trigger();
     } else {
-        $return = false; //should not occur, as at least this user's id must be in the field
+        $return = "Team subscribe error: The team list is empty!"; //should not occur, as at least this user's id must be in the field
     }
 } else {
-    $return = false;
+    $return = "Team subscribe error: Wrong action!";
 }
 
 if ($ajax) {

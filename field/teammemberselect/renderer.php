@@ -40,6 +40,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
 
         if (isset($entry->{"c{$fieldid}_content"})) {
             $selected = json_decode($entry->{"c{$fieldid}_content"}, true);
+            $selected = $selected ? $selected : [];
             $options = $field->options_menu(false, true, 0, true);
 
             $str = array();
@@ -78,6 +79,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
 
         $subscribeenabled = isset($params['subscribe']);
         $selected = isset($entry->{"c{$fieldid}_content"}) ? json_decode($entry->{"c{$fieldid}_content"}, true) : [];
+        $selected = $selected ? $selected : [];
         $teamfull = $field->teamsize < count($selected);
         $userhasadmissiblerole = $field->admissibleroles & $field->df()->get_user_datalynx_role($USER->id);
         $userismember = in_array($USER->id, $selected);

@@ -222,12 +222,14 @@ M.datalynxfield_teammemberselect.init_subscribe_links = function(Y, userurl, use
                             e.target.set('title', M.util.get_string('subscribe', 'datalynx', {}));
                             e.target.set('innerHTML', M.util.get_string('subscribe', 'datalynx', {}));
                             params.action = 'subscribe';
+                            e.target.set('href', e.target.get('href').replace('unsubscribe', 'subscribe'));
                             remove_user(ul);
                         } else if (o.responseText === 'true' && !e.target.hasClass('subscribed')) {
                             e.target.toggleClass('subscribed');
                             e.target.set('title', M.util.get_string('unsubscribe', 'datalynx', {}));
                             e.target.set('innerHTML', M.util.get_string('unsubscribe', 'datalynx', {}));
                             params.action = 'unsubscribe';
+                            e.target.set('href', e.target.get('href').replace('subscribe', 'unsubscribe'));
                             add_user(ul);
                         }
                     },
@@ -246,7 +248,9 @@ M.datalynxfield_teammemberselect.init_subscribe_links = function(Y, userurl, use
 
     function remove_user(listelement) {
         listelement.all('li').each(function (item) {
-            if (item.one('a').get('href') == userurl) {
+            var userurlparams = extract_params(userurl.split('?')[1]);
+            var anchorparams = extract_params(item.one('a').get('href').split('?')[1]);
+            if (userurlparams.id == anchorparams.id) {
                 item.remove();
             }
         });
