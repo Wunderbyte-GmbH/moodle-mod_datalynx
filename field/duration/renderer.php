@@ -35,11 +35,6 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
         $entryid = $entry->id;
         $fieldname = "field_{$fieldid}_{$entryid}";
 
-        $number = '';
-        if ($entryid > 0 and !empty($entry->{"c{$fieldid}_content"})){
-            $number = $entry->{"c{$fieldid}_content"};
-        }
-        
         // Field width
         $fieldattr = array();
         if ($field->get('param2')) {
@@ -47,7 +42,12 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
         }
 
         $mform->addElement('duration', $fieldname, '', array('optional' => null), $fieldattr);
-        $mform->setDefault($fieldname, $number);
+
+        if ($entryid > 0 and !empty($entry->{"c{$fieldid}_content"})) {
+            $number = $entry->{"c{$fieldid}_content"};
+            $mform->setDefault($fieldname, $number);
+        }
+
         $required = !empty($options['required']);
         if ($required) {
             $mform->addRule($fieldname, null, 'required', null, 'client');
@@ -125,5 +125,25 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
         return $patterns;
     }
 
+    public function validate($entryid, $tags, $formdata) {
+        $fieldid = $this->_field->id();
+
+        $formfieldname = "field_{$fieldid}_{$entryid}";
+
+        $errors = array();
+        foreach ($tags as $tag) {
+            list(, $behavior,) = $this->process_tag($tag);
+            /* @var $behavior datalynx_field_behavior */
+            if ($behavior->is_required() and isset($formdata->$formfieldname)) {
+                $value = optional_param_array($formfieldname, [], PARAM_RAW)['number'];
+                $intvalue = intval($value);
+                if ($value !== "$intvalue") {
+                    $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
+                }
+            }
+        }
+
+        return $errors;
+    }
 }
 

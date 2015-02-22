@@ -150,4 +150,23 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
 
         return $patterns; 
     }
+
+
+    public function validate($entryid, $tags, $formdata) {
+        $fieldid = $this->_field->id();
+
+        $formfieldname = "field_{$fieldid}_{$entryid}_url";
+
+        $errors = array();
+        foreach ($tags as $tag) {
+            list(, $behavior,) = $this->process_tag($tag);
+            /* @var $behavior datalynx_field_behavior */
+            if ($behavior->is_required()
+                && (!isset($formdata->$formfieldname) || $formdata->$formfieldname === 'http://')) {
+                $errors["field_{$fieldid}_{$entryid}"] = get_string('fieldrequired', 'datalynx');
+            }
+        }
+
+        return $errors;
+    }
 }

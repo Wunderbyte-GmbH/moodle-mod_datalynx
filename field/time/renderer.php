@@ -236,4 +236,21 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         return $patterns; 
     }
 
+    public function validate($entryid, $tags, $formdata) {
+        $fieldid = $this->_field->id();
+
+        $formfieldname = "field_{$fieldid}_{$entryid}";
+
+        $errors = array();
+        foreach ($tags as $tag) {
+            list(, $behavior,) = $this->process_tag($tag);
+            /* @var $behavior datalynx_field_behavior */
+            if ($behavior->is_required() and !isset(optional_param_array($formfieldname, [], PARAM_RAW)['enabled'])) {
+                $errors[$formfieldname] = get_string('check_enable', 'datalynx');
+            }
+        }
+
+        return $errors;
+    }
+
 }
