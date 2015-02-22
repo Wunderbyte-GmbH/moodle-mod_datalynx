@@ -972,84 +972,6 @@ class datalynx {
         return $isadmin || ($view->visible & $mask);
     }
 
-    const ROLE_ADMIN = 15;
-    const ROLE_MANAGER = 1;
-    const ROLE_TEACHER = 2;
-    const ROLE_STUDENT = 4;
-    const ROLE_GUEST = 8;
-
-    /**
-     * @param int $userid
-     * @return int
-     * @throws coding_exception
-     */
-    public function get_user_datalynx_role($userid = 0) {
-        global $USER, $DB;
-
-        if (!$userid) {
-            $user = $USER;
-        } else {
-            $user = $DB->get_record('user', array('id' => $userid));
-        }
-
-        if (has_capability('mod/datalynx:viewprivilegeadmin', $this->context, $user, true)) {
-            return self::ROLE_ADMIN;
-        } else if (has_capability('mod/datalynx:viewprivilegemanager', $this->context, $user, false)) {
-            return self::ROLE_MANAGER;
-        } else if (has_capability('mod/datalynx:viewprivilegeteacher', $this->context, $user, false)) {
-            return self::ROLE_TEACHER;
-        } else if (has_capability('mod/datalynx:viewprivilegestudent', $this->context, $user, false)) {
-            return self::ROLE_STUDENT;
-        } else if (has_capability('mod/datalynx:viewprivilegeguest', $this->context, $user, false)) {
-            return self::ROLE_GUEST;
-        } else {
-            return self::ROLE_GUEST;
-        }
-    }
-
-    /**
-     * Returns a list of names of available datalynx roles indexed by their id.
-     * @return array <roleid> => <rolename>
-     * @throws coding_exception
-     */
-    public function get_datalynx_roles() {
-        return [
-            self::ROLE_ADMIN => get_string('admin', 'datalynx'),
-            self::ROLE_MANAGER => get_string('manager', 'datalynx'),
-            self::ROLE_TEACHER => get_string('teacher', 'datalynx'),
-            self::ROLE_STUDENT => get_string('student', 'datalynx'),
-            self::ROLE_GUEST => get_string('guest', 'datalynx'),
-        ];
-    }
-
-    /**
-     * @param $roles array|int
-     * @return array
-     */
-    public function get_users_with_datalynx_roles($roles) {
-        if (is_int($roles)) {
-            $roles = [$roles];
-        }
-        $users = [];
-        if (in_array(self::ROLE_ADMIN, $roles)) {
-            $users += get_enrolled_users($this->context, 'mod/datalynx:viewprivilegeadmin');
-        }
-        if (in_array(self::ROLE_MANAGER, $roles)) {
-            $users += get_enrolled_users($this->context, 'mod/datalynx:viewprivilegemanager');
-        }
-        if (in_array(self::ROLE_TEACHER, $roles)) {
-            $users += get_enrolled_users($this->context, 'mod/datalynx:viewprivilegeteacher');
-        }
-        if (in_array(self::ROLE_STUDENT, $roles)) {
-            $users += get_enrolled_users($this->context, 'mod/datalynx:viewprivilegestudent');
-        }
-        if (in_array(self::ROLE_GUEST, $roles)) {
-            $users += get_enrolled_users($this->context, 'mod/datalynx:viewprivilegeguest');
-        }
-
-        return array_unique($users);
-    }
-
     /**
      * TODO there is no need to instantiate all views!!!
      * this function creates an instance of the particular subtemplate class   *
@@ -1753,51 +1675,96 @@ class datalynx {
     const PERMISSION_GUEST   = 8;
     const PERMISSION_AUTHOR  = 16;
     const PERMISSION_MENTOR  = 32;
+    const PERMISSION_ADMIN   = 64;
 
-    public function get_datalynx_permission_names() {
-        return array(
-            self::PERMISSION_MANAGER => get_string('visible_1', 'datalynx'),
-            self::PERMISSION_TEACHER => get_string('visible_2', 'datalynx'),
-            self::PERMISSION_STUDENT => get_string('visible_4', 'datalynx'),
-            self::PERMISSION_GUEST => get_string('visible_8', 'datalynx'),
-            self::PERMISSION_AUTHOR => get_string('author', 'datalynx'),
-            self::PERMISSION_MENTOR => get_string('mentor', 'datalynx'));
+    public function get_datalynx_permission_names($absoluteonly = false, $includeadmin = false) {
+        $permissions = [];
+
+        if ($includeadmin) {
+            $permissions[self::PERMISSION_ADMIN] = get_string('admin', 'datalynx');
+        }
+
+        $permissions[self::PERMISSION_MANAGER] = get_string('visible_1', 'datalynx');
+        $permissions[self::PERMISSION_TEACHER] = get_string('visible_2', 'datalynx');
+        $permissions[self::PERMISSION_STUDENT] = get_string('visible_4', 'datalynx');
+        $permissions[self::PERMISSION_GUEST]   = get_string('visible_8', 'datalynx');
+
+        if (!$absoluteonly) {
+            $permissions[self::PERMISSION_AUTHOR] = get_string('author', 'datalynx');
+            $permissions[self::PERMISSION_MENTOR] = get_string('mentor', 'datalynx');
+        }
+
+        return $permissions;
     }
 
-    public function get_datalynx_view_permissions_for_userid($user = null) {
-        $userpermissions = array();
-        if (has_capability('mod/datalynx:viewprivilegemanager', $this->context, $user, false)) {
-            $userpermissions[] = self::PERMISSION_MANAGER;
-        }
-        if (has_capability('mod/datalynx:viewprivilegeteacher', $this->context, $user, false)) {
-            $userpermissions[] = self::PERMISSION_TEACHER;
-        }
-        if (has_capability('mod/datalynx:viewprivilegestudent', $this->context, $user, false)) {
-            $userpermissions[] = self::PERMISSION_STUDENT;
-        }
-        if (has_capability('mod/datalynx:viewprivilegeguest', $this->context, $user, false)) {
-            $userpermissions[] = self::PERMISSION_GUEST;
+    /**
+     * Note: this function doesn't return contextual permissions (entry author/mentor).
+     * @param int $userid ID of the user. If not given the current user is presumed.
+     * @param string $type 'any', 'both', 'view', or 'edit'. Defaults to 'any'.
+     * @return int[] Array of IDs of permissions the user has in this instance.
+     * @throws coding_exception
+     */
+    public function get_user_datalynx_permissions($userid = 0, $type = 'any') {
+        global $USER, $DB;
+
+        if (!$userid) {
+            $user = $USER;
+        } else {
+            $user = $DB->get_record('user', array('id' => $userid));
         }
 
-        return $userpermissions;
-    }
+        $edit = $type === 'edit' || $type === 'both';
+        $view = $type === 'view' || $type === 'both';
 
-    public function get_datalynx_edit_permissions_for_userid($user = null) {
-        $userpermissions = array();
-        if (has_capability('mod/datalynx:editprivilegemanager', $this->context, $user, false)) {
-            $userpermissions[] = self::PERMISSION_MANAGER;
-        }
-        if (has_capability('mod/datalynx:editprivilegeteacher', $this->context, $user, false)) {
-            $userpermissions[] = self::PERMISSION_TEACHER;
-        }
-        if (has_capability('mod/datalynx:editprivilegestudent', $this->context, $user, false)) {
-            $userpermissions[] = self::PERMISSION_STUDENT;
-        }
-        if (has_capability('mod/datalynx:editprivilegeguest', $this->context, $user, false)) {
-            $userpermissions[] = self::PERMISSION_GUEST;
+        $permissions = [];
+
+        if ($type === 'any') {
+            if (has_capability('mod/datalynx:viewprivilegeadmin', $this->context, $user, true) ||
+                has_capability('mod/datalynx:editprivilegeadmin', $this->context, $user, true)) {
+                $permissions[] = self::PERMISSION_ADMIN;
+            }
+            if (has_capability('mod/datalynx:viewprivilegemanager', $this->context, $user, false) ||
+                has_capability('mod/datalynx:editprivilegemanager', $this->context, $user, false)) {
+                $permissions[] = self::PERMISSION_MANAGER;
+            }
+            if (has_capability('mod/datalynx:viewprivilegeteacher', $this->context, $user, false) ||
+                has_capability('mod/datalynx:editprivilegeteacher', $this->context, $user, false)) {
+                $permissions[] = self::PERMISSION_TEACHER;
+            }
+            if (has_capability('mod/datalynx:viewprivilegestudent', $this->context, $user, false) ||
+                has_capability('mod/datalynx:editprivilegestudent', $this->context, $user, false)) {
+                $permissions[] = self::PERMISSION_STUDENT;
+            }
+            if (has_capability('mod/datalynx:viewprivilegeguest', $this->context, $user, false) ||
+                has_capability('mod/datalynx:editprivilegeguest', $this->context, $user, false)) {
+                $permissions[] = self::PERMISSION_GUEST;
+            }
+        } else if ($edit || $view) {
+            if ((!$view || has_capability('mod/datalynx:viewprivilegeadmin', $this->context, $user, true)) &&
+                (!$edit || has_capability('mod/datalynx:editprivilegeadmin', $this->context, $user, true))) {
+                $permissions[] = self::PERMISSION_ADMIN;
+            }
+            if ((!$view || has_capability('mod/datalynx:viewprivilegemanager', $this->context, $user, false)) &&
+                (!$edit || has_capability('mod/datalynx:editprivilegemanager', $this->context, $user, false))) {
+                $permissions[] = self::PERMISSION_MANAGER;
+            }
+            if ((!$view || has_capability('mod/datalynx:viewprivilegeteacher', $this->context, $user, false)) &&
+                (!$edit || has_capability('mod/datalynx:editprivilegeteacher', $this->context, $user, false))) {
+                $permissions[] = self::PERMISSION_TEACHER;
+            }
+            if ((!$view || has_capability('mod/datalynx:viewprivilegestudent', $this->context, $user, false)) &&
+                (!$edit || has_capability('mod/datalynx:editprivilegestudent', $this->context, $user, false))) {
+                $permissions[] = self::PERMISSION_STUDENT;
+            }
+            if ((!$view || has_capability('mod/datalynx:viewprivilegeguest', $this->context, $user, false)) &&
+                (!$edit || has_capability('mod/datalynx:editprivilegeguest', $this->context, $user, false))) {
+                $permissions[] = self::PERMISSION_GUEST;
+            }
+        } else {
+            debug("Invalid \$type parameter: $type");
         }
 
-        return $userpermissions;
+        return $permissions;
     }
 
     /**

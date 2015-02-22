@@ -99,7 +99,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
             $baseurl = new moodle_url('/user/view.php', array('id' => $result->id, 'course' => $COURSE->id));
             self::$alluserslinks[$fieldid][$result->id] = html_writer::link($baseurl, fullname($result));
 
-            if (array_search($result->roleid, $this->admissibleroles) !== false) {
+            if (!empty(array_intersect($this->df()->get_user_datalynx_permissions($result->id), $this->admissibleroles))) {
                 self::$allowedusers[$fieldid][$result->id] = self::$allusers[$fieldid][$result->id];
                 self::$alloweduserslinks[$fieldid][$result->id] = self::$alluserslinks[$fieldid][$result->id];
             }

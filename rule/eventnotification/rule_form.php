@@ -51,24 +51,24 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
         $mform->addElement('header', 'settingshdr', get_string('linksettings', 'datalynx'));
         $mform->addElement('static', '', get_string('targetviewforroles', 'datalynx'));
 
-        foreach ($this->_df->get_datalynx_roles() as $roleid => $rolename) {
-            $views = $this->get_views_visible_to_datalynx_role($roleid);
-            $mform->addElement('select', "param4[$roleid]", $rolename, $views);
+        foreach ($this->_df->get_datalynx_permission_names(true) as $permissionid => $permissionname) {
+            $views = $this->get_views_visible_to_datalynx_permission($permissionid);
+            $mform->addElement('select', "param4[$permissionid]", $permissionname, $views);
             $defaultview = $this->_df->get_default_view_id();
             if ($defaultview && in_array($defaultview, array_keys($views))) {
-                $mform->setDefault("param4[$roleid]", $defaultview);
+                $mform->setDefault("param4[$permissionid]", $defaultview);
             }
         }
     }
 
-    private function get_views_visible_to_datalynx_role($roleid) {
+    private function get_views_visible_to_datalynx_permission($permissionid) {
         global $DB;
-        if ($roleid == datalynx::ROLE_ADMIN) {
+        if ($permissionid == datalynx::PERMISSION_ADMIN) {
             $sql = "SELECT id, name FROM {datalynx_views} WHERE dataid = :dataid";
             return $DB->get_records_sql_menu($sql, ['dataid' => $this->_df->id()]);
         } else {
-            $sql = "SELECT id, name FROM {datalynx_views} WHERE dataid = :dataid AND visible & :roleid <> 0";
-            return $DB->get_records_sql_menu($sql, ['dataid' => $this->_df->id(), 'roleid' => $roleid]);
+            $sql = "SELECT id, name FROM {datalynx_views} WHERE dataid = :dataid AND visible & :permissionid <> 0";
+            return $DB->get_records_sql_menu($sql, ['dataid' => $this->_df->id(), 'permissionid' => $permissionid]);
         }
     }
 

@@ -115,8 +115,9 @@ class datalynx_field_behavior {
     public function is_visible_to_user($user = null, $isentryauthor = false, $ismentor = false) {
         global $USER;
         $user = $user ? $user : $USER;
-        $permissions = $this->datalynx->get_datalynx_view_permissions_for_userid($user);
-        return $this->user_is_admin($user) || !empty(array_intersect($permissions, $this->visibleto))
+        $permissions = $this->datalynx->get_user_datalynx_permissions($user->id, 'view');
+        return $this->user_is_admin($user)
+                || !empty(array_intersect($permissions, $this->visibleto))
                 || ($isentryauthor && in_array(datalynx::PERMISSION_AUTHOR, $this->visibleto))
                 || ($ismentor && in_array(datalynx::PERMISSION_MENTOR, $this->visibleto));
     }
@@ -124,8 +125,9 @@ class datalynx_field_behavior {
     public function is_editable_by_user($user = null, $isentryauthor = false, $ismentor = false) {
         global $USER;
         $user = $user ? $user : $USER;
-        $permissions = $this->datalynx->get_datalynx_edit_permissions_for_userid($user);
-        return $this->user_is_admin($user) || !empty(array_intersect($permissions, $this->editableby))
+        $permissions = $this->datalynx->get_user_datalynx_permissions($user->id, 'edit');
+        return $this->user_is_admin($user)
+                || !empty(array_intersect($permissions, $this->editableby))
                 || ($isentryauthor && in_array(datalynx::PERMISSION_AUTHOR, $this->editableby))
                 || ($ismentor && in_array(datalynx::PERMISSION_MENTOR, $this->editableby));
     }

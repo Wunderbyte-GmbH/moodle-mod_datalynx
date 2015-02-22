@@ -60,7 +60,7 @@ class datalynx_field_behavior_form extends moodleform {
         $mform->addElement('header', 'visibilityoptions', get_string('visibility', 'datalynx'));
         $mform->setExpanded('visibilityoptions');
 
-        $mform->addElement('checkboxgroup', 'visibleto', get_string('roles'), $this->datalynx->get_datalynx_permission_names(), $this->get_permissions_menu_separators());
+        $mform->addElement('checkboxgroup', 'visibleto', get_string('roles'), $this->datalynx->get_datalynx_permission_names(false, false), $this->get_permissions_menu_separators());
         $mform->setType('visibleto', PARAM_RAW);
         $mform->setDefault('visibleto', array(datalynx::PERMISSION_MANAGER, datalynx::PERMISSION_TEACHER, datalynx::PERMISSION_STUDENT));
 
@@ -72,7 +72,7 @@ class datalynx_field_behavior_form extends moodleform {
         $mform->addElement('advcheckbox', 'editable', get_string('editable', 'datalynx'));
         $mform->setDefault('editable', true);
 
-        $mform->addElement('checkboxgroup', 'editableby', get_string('editableby', 'datalynx'), $this->datalynx->get_datalynx_permission_names(), $this->get_permissions_menu_separators());
+        $mform->addElement('checkboxgroup', 'editableby', get_string('editableby', 'datalynx'), $this->datalynx->get_datalynx_permission_names(false, false), $this->get_permissions_menu_separators());
         $mform->setType('editableby', PARAM_RAW);
         $mform->setDefault('editableby', array(datalynx::PERMISSION_MANAGER, datalynx::PERMISSION_TEACHER, datalynx::PERMISSION_STUDENT));
         $mform->disabledIf('editableby', 'editable', 'notchecked');

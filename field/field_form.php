@@ -25,6 +25,7 @@ require_once("$CFG->libdir/formslib.php");
 
 class datalynxfield_form extends moodleform {
     protected $_field = null;
+    /* @var $_df datalynx */
     protected $_df = null;
 
     public function __construct($field, $action = null, $customdata = null, $method = 'post', $target = '', $attributes = null, $editable = true) {
