@@ -43,12 +43,12 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
 
         foreach ($tags as $tag) {
             if (!$entry or $edit) {
-                if ($tag == "##status##") {
+                if (trim($tag, '@') == "##status##") {
                     $required = $options['required'];
                     $replacements[$tag] = array('', array(array($this, 'display_edit'), array($entry, array('required' => $required))));
                 }
             } else {
-                if ($tag == "##status##") {
+                if (trim($tag, '@') == "##status##") {
                     $replacements[$tag] = array('html', $this->display_browse($entry));
                 }
             }

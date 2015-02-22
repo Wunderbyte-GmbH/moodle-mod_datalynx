@@ -45,7 +45,7 @@ class datalynxfield__time_renderer extends datalynxfield_renderer {
                 $replacements[$tag] = '';
 
             } else {
-                $format = (strpos($tag, "{$fieldname}:") !== false ? str_replace("{$fieldname}:", '', trim($tag, '#')) : '');
+                $format = (strpos($tag, "{$fieldname}:") !== false ? str_replace("{$fieldname}:", '', trim($tag, '#@')) : '');
                 switch ($format) {            
                     case 'date': $format = get_string('strftimedate'); break; 
                     case 'minute': $format = '%M'; break; 

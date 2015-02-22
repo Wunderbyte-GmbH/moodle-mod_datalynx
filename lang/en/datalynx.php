@@ -300,7 +300,6 @@ $string['modulename'] = 'Datalynx';
 $string['modulename_help'] = 'The datalynx module may be used for creating a wide range of activities/resources by allowing the instructor/manager to design and create a custom content form from various input elements (e.g.  texts, numbers, images, files, urls, etc.), and participants to submit content and view submitted content.';
 $string['modulenameplural'] = 'Datalynxs';
 $string['more'] = 'More';
-$string['moreurl'] = 'More URL';
 $string['movezipfailed'] = 'Can\'t move zip';
 $string['multiapprove'] = ' Approve ';
 $string['multidelete'] = ' Delete  ';

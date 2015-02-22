@@ -43,7 +43,7 @@ class datalynxfield__comment_renderer extends datalynxfield_renderer {
         // no edit mode for this field so just return html
         if ($entry->id > 0 and !empty($CFG->usecomments)) {            
             foreach ($tags as $tag) {
-                switch($tag) {
+                switch(trim($tag, '@')) {
                     case '##comments:count##':
                         $options = array(
                             'count' => true,

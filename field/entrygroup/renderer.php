@@ -57,7 +57,7 @@ class datalynxfield_entrygroup_renderer extends datalynxfield_renderer {
 
         foreach ($tags as $tag) {
             $replacements[$tag] = '';
-            switch ($tag) {
+            switch (trim($tag, '@')) {
                 case '##group:id##':
                     if (!empty($group->id)) {
                         $replacements[$tag] = array('html', $group->id);

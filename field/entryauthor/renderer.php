@@ -44,7 +44,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
         if ($fieldname == 'name') {
             // two tags are possible
             foreach ($tags as $tag) {
-                if ($tag == "##author:edit##" and $edit and has_capability('mod/datalynx:manageentries', $field->df()->context)) {
+                if (trim($tag, '@') == "##author:edit##" and $edit and has_capability('mod/datalynx:manageentries', $field->df()->context)) {
                     $replacements[$tag] = array('', array(array($this,'display_edit'), array($entry)));
                 } else {
                     $replacements[$tag] = array('html', $this->{"display_$fieldname"}($entry));
@@ -53,12 +53,13 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
 
         // if not picture there is only one possible tag so no check
         } else if ($fieldname != 'picture') {
+            $replacements["##author:{$fieldname}##@"] = array('html', $this->{"display_$fieldname"}($entry));
             $replacements["##author:{$fieldname}##"] = array('html', $this->{"display_$fieldname"}($entry));
 
         // for picture switch on $tags
         } else {
             foreach ($tags as $tag) {
-                if ($tag == "##author:picturelarge##") {
+                if (trim($tag, '@') == "##author:picturelarge##") {
                     $replacements[$tag] = array('html', $this->{"display_$fieldname"}($entry, true));
                 } else {
                     $replacements[$tag] = array('html', $this->{"display_$fieldname"}($entry));

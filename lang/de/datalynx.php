@@ -336,7 +336,6 @@ $string['modulename'] = 'Datalynx';
 $string['modulename_help'] = 'Das Datalynx Modul kann benutzt werden, um vielfältigste Aktivitäten/Ressourcen anzulegen. LehrerInnen/ManagerInnen können eine individuell angepasste Datenbank erzeugen, in der TeilnehmerInnen unterschiedliche Elemente (z.B. TextE, Zahlen, Bilder, Dateien, URLs, etc.) abgeben und anzeigen können.';
 $string['modulenameplural'] = 'Datalynxs';
 $string['more'] = 'Mehr';
-$string['moreurl'] = 'Mehr URL';
 $string['movezipfailed'] = 'ZIP kann nicht bewegt werden';
 $string['multiapprove'] = ' Freischalten ';
 $string['multidelete'] = ' Löschen  ';

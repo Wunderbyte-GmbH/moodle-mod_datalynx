@@ -1182,7 +1182,7 @@ abstract class datalynxview_base {
 
         $this->_display_definition = array();
         // Indicate if there are managable entries in the display for the current user
-        // in which case edit/delete action 
+        // in which case edit/delete action
         $requiresmanageentries = false;
 
         $editentries = null;
@@ -1198,7 +1198,7 @@ abstract class datalynxview_base {
         } else if ($this->_editentries) {
             $editentries = explode(',', $this->_editentries);
         }
-        
+
         // compile entries if any
         if ($entries = $this->_entries->entries()) {
             $groupname = '';

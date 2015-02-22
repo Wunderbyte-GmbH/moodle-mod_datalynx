@@ -273,13 +273,15 @@ M.mod_datalynx.tag_manager.add_tag_spans = function(editordiv) {
     }
 
     // action tags
-    tagregex = /##([^#]*)?##/g;
+    tagregex = /##([^#]*)?##(@?)/g;
     splittag = [];
     while ((splittag = tagregex.exec(oldcontent)) !== null) {
         tag = splittag[0];
         var action = splittag[1];
-        replacement = M.mod_datalynx.tag_manager.create_advanced_tag('action', action, '', '');
-        newcontent = newcontent.replace(tag, replacement);
+        if (splittag[2] !== '@') {
+            replacement = M.mod_datalynx.tag_manager.create_advanced_tag('action', action, '', '');
+            newcontent = newcontent.replace(new RegExp(preg_quote(tag) + "(?!@)"), replacement);
+        }
     }
 
     editor.setHTML(newcontent);

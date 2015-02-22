@@ -47,6 +47,7 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
 
             // existing entry to browse 
             } else {
+                $replacements['##approve##@'] = array('html', $this->display_browse($entry));
                 $replacements['##approve##'] = array('html', $this->display_browse($entry));
             }
         }

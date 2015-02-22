@@ -62,14 +62,25 @@ abstract class datalynxfield_renderer {
 
         $matches = array();
         $fieldname = preg_quote($this->_field->name());
-        if (preg_match_all("/\[\[$fieldname(?:\|(?:[^\]]+))?\]\]/", $text, $matches)) {
+        if (preg_match_all("/\[\[$fieldname(?:\|(?:[^\]]+))?\]\](?:@)?/", $text, $matches)) {
             $found = array_merge($found, $matches[0]);
         }
 
         $patterns = array_keys($this->patterns());
         foreach ($patterns as $pattern) {
-            if (strpos($text, $pattern) !== false) {
-                $found[] = $pattern;
+            if (strpos($pattern, '##') === 0) {
+                $strippedpattern = preg_quote(str_replace('##', '', $pattern));
+                if (preg_match_all("/##$strippedpattern##(?:@)?/", $text, $matches)) {
+                    $found = array_merge($found, $matches[0]);
+                }
+                if (strpos($text, $pattern) !== false) {
+                    $found[] = $pattern;
+                }
+            } else {
+                $strippedpattern = preg_quote(str_replace(['[[', ']]'], ['', ''], $pattern));
+                if (preg_match_all("/\[\[$strippedpattern(?:\|(?:[^\]]+))?\]\](?:@)?/", $text, $matches)) {
+                    $found = array_merge($found, $matches[0]);
+                }
             }
         }
 

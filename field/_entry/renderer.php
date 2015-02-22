@@ -47,11 +47,10 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
             
             // no edit mode for this field so just return html
             } else {
-                switch ($tag) {
+                switch (trim($tag, '@')) {
                     // reference
                     case '##entryid##': $str = $entry->id; break;
                     case '##more##': $str = $this->display_more($entry); break;
-                    case '##moreurl##': $str = $this->display_more($entry, true); break;
                     case '##anchor##': $str = html_writer::tag('a', '', array('name' => $entry->id)); break;    
                     // Actions
                     case '##select##': $str = html_writer::checkbox('entryselector', $entry->id, false); break;                        
@@ -188,7 +187,6 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
         $reference = get_string('reference', 'datalynx');
         $patterns["##anchor##"] = array(true, $reference);
         $patterns["##more##"] = array(true, $reference);
-        $patterns["##moreurl##"] = array(true, $reference);
 
         // entryinfo
         $entryinfo = get_string('entryinfo', 'datalynx');

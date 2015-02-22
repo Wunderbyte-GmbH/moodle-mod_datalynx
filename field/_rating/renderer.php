@@ -44,7 +44,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
             if ($tags) {
                 $replacements = array();
                 foreach ($tags as $tag) {
-                    switch($tag) {
+                    switch(trim($tag, '@')) {
                         case '##ratings:count##':
                         case '##ratings:avg##': 
                         case '##ratings:max##':
@@ -133,7 +133,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
         $replacements = array();
         foreach ($tags as $tag) {
             if ($entry->id > 0 and !empty($entry->rating)) {            
-                switch($tag) {
+                switch(trim($tag, '@')) {
                     case '##ratings:count##':
                         $str = !empty($entry->rating->count) ? $entry->rating->count : '-';
                         break;                            
