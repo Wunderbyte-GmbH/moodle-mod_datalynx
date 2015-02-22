@@ -1156,13 +1156,16 @@ abstract class datalynxview_base {
                 }
             }
         }
+        $fielddefinitions = $definitions;
 
         // enables view tag replacement within the entry template
         if ($patterns = $this->patterns()->get_replacements($this->_tags['view'], null, $options)) {
             $viewdefinitions = array();
             foreach ($patterns as $tag => $pattern) {
-                if (strpos($tag, 'viewlink') !== 0 || strpos($tag, 'viewsesslink') !== 0) {
-                    $pattern = str_replace('##entryid##', isset($definitions['##entryid##'][1]) ? $definitions['##entryid##'][1] : "0", $pattern);
+                if ((strpos($tag, 'viewlink') !== 0 || strpos($tag, 'viewsesslink') !== 0) && !$options['edit']) {
+                    foreach ($fielddefinitions as $fieldtag => $definition) {
+                        $pattern = str_replace($fieldtag, isset($definitions[$fieldtag][1]) ? $definitions[$fieldtag][1] : '', $pattern);
+                    }
                 }
                 $viewdefinitions[$tag] = array('html', $pattern);
             }
