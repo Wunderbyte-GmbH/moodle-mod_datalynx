@@ -74,13 +74,20 @@ class datalynx_field_behavior_form extends moodleform {
 
         $mform->addElement('checkboxgroup', 'editableby', get_string('editableby', 'datalynx'), $this->datalynx->get_datalynx_permission_names(false, false), $this->get_permissions_menu_separators());
         $mform->setType('editableby', PARAM_RAW);
-        $mform->setDefault('editableby', array(datalynx::PERMISSION_MANAGER, datalynx::PERMISSION_TEACHER, datalynx::PERMISSION_STUDENT));
         $mform->disabledIf('editableby', 'editable', 'notchecked');
 
         $mform->addElement('advcheckbox', 'required', get_string('required', 'datalynx'));
         $mform->disabledIf('required', 'editable', 'notchecked');
 
         $this->add_action_buttons();
+    }
+
+    public function definition_after_data() {
+        $mform = $this->_form;
+        $values = $this->_form->_defaultValues;
+        if (isset($values['editable']) && $values['editable']) {
+            $mform->setDefault('editableby', array(datalynx::PERMISSION_MANAGER, datalynx::PERMISSION_TEACHER, datalynx::PERMISSION_STUDENT));
+        }
     }
 
     public function get_data() {
