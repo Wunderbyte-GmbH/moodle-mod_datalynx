@@ -47,10 +47,12 @@ require_capability('mod/datalynx:teamsubscribe', $context);
 
 global $DB;
 if ($action == 'subscribe') {
-    $users = json_decode($DB->get_field('datalynx_contents', 'content', array('fieldid' => $fieldid, 'entryid' => $entryid)));
+    $users = json_decode($DB->get_field('datalynx_contents', 'content', array('fieldid' => $fieldid, 'entryid' => $entryid)), true);
     if ($users !== null) {
         $users[] = "$userid";
         $users = array_unique($users);
+        $users = array_diff($users, ["0"]);
+        $users = array_values($users);
         $DB->set_field('datalynx_contents', 'content', json_encode($users), array('fieldid' => $fieldid, 'entryid' => $entryid));
     } else {
         $users = ["$userid"];
@@ -78,9 +80,12 @@ if ($action == 'subscribe') {
 
     $return = true;
 } else if ($action == 'unsubscribe') {
-    $users = json_decode($DB->get_field('datalynx_contents', 'content', array('fieldid' => $fieldid, 'entryid' => $entryid)));
+    $users = json_decode($DB->get_field('datalynx_contents', 'content', array('fieldid' => $fieldid, 'entryid' => $entryid)), true);
     if ($users !== null) {
-        $users = array_values(array_diff($users, array($userid)));
+        $users = array_unique($users);
+        $users = array_values(array_diff($users, [$userid]));
+        $users = array_diff($users, ["0"]);
+        $users = array_values($users);
         $DB->set_field('datalynx_contents', 'content', json_encode($users), array('fieldid' => $fieldid, 'entryid' => $entryid));
         $return = true;
 

@@ -40,6 +40,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
     public $referencefieldid;
     public $notifyteammembers;
     public $usercanaddself;
+    public $allowunsubscription;
 
     public $separators;
     public $rules;
@@ -55,6 +56,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         $this->referencefieldid = $this->field->param5;
         $this->notifyteammembers = $this->field->param6 != 0;
         $this->usercanaddself = $this->field->param7 != 0;
+        $this->allowunsubscription = $this->field->param8 != 0;
         $this->separators = array(
                 self::TEAMMEMBERSELECT_FORMAT_NEWLINE => get_string('listformat_newline', 'datalynx'),
                 self::TEAMMEMBERSELECT_FORMAT_SPACE => get_string('listformat_space', 'datalynx'),

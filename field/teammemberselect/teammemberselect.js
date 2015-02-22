@@ -197,10 +197,13 @@ M.datalynxfield_teammemberselect.init_entry_form = function (Y, userlistobject, 
     });
 };
 
-M.datalynxfield_teammemberselect.init_subscribe_links = function(Y, userurl, username) {
+M.datalynxfield_teammemberselect.init_subscribe_links = function(Y, fieldid, userurl, canunsubscribe) {
     Y.all('a.datalynxfield_subscribe').each(function (link) {
         var href = link.get('href');
         var params = extract_params(href.split('?')[1]);
+        if (params.fieldid !== fieldid) {
+            return;
+        }
         params['ajax'] = true;
         link.detach('click');
         link.on('click', function (e) {
@@ -209,8 +212,7 @@ M.datalynxfield_teammemberselect.init_subscribe_links = function(Y, userurl, use
                 ul = Y.Node.create('<ul></ul>');
                 e.target.ancestor().prepend(ul);
             }
-            e.preventDefault();
-            e.stopPropagation();
+            // TODO: hide link after triggering
             var actionurl = 'field/teammemberselect/ajax.php';
             Y.io(actionurl, {
                 method: 'POST',
@@ -218,11 +220,13 @@ M.datalynxfield_teammemberselect.init_subscribe_links = function(Y, userurl, use
                 on: {
                     success: function (id, o) {
                         if (o.responseText === 'true' && e.target.hasClass('subscribed')) {
-                            e.target.toggleClass('subscribed');
-                            e.target.set('title', M.util.get_string('subscribe', 'datalynx', {}));
-                            e.target.set('innerHTML', M.util.get_string('subscribe', 'datalynx', {}));
-                            params.action = 'subscribe';
-                            e.target.set('href', e.target.get('href').replace('unsubscribe', 'subscribe'));
+                            if (canunsubscribe) {
+                                e.target.toggleClass('subscribed');
+                                e.target.set('title', M.util.get_string('subscribe', 'datalynx', {}));
+                                e.target.set('innerHTML', M.util.get_string('subscribe', 'datalynx', {}));
+                                params.action = 'subscribe';
+                                e.target.set('href', e.target.get('href').replace('unsubscribe', 'subscribe'));
+                            }
                             remove_user(ul);
                         } else if (o.responseText === 'true' && !e.target.hasClass('subscribed')) {
                             e.target.toggleClass('subscribed');

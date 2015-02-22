@@ -82,23 +82,30 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         $teamfull = $field->teamsize < count($selected);
         $userhasadmissiblerole = !empty(array_intersect($field->df()->get_user_datalynx_permissions($USER->id), $field->admissibleroles));
         $userismember = in_array($USER->id, $selected);
+        $canunsubscribe = $this->_field->allowunsubscription;
 
-        if ($subscribeenabled && $userhasadmissiblerole && ($userismember || !$teamfull)) {
+        if ($subscribeenabled
+            && $userhasadmissiblerole
+            && (!$teamfull || $userismember)
+            && (!$userismember || $canunsubscribe)) {
 
-            $str .= html_writer::link(new moodle_url('/mod/datalynx/field/teammemberselect/ajax.php',
-                array('d' => $field->df()->id(), 'fieldid' => $fieldid, 'entryid' => $entry->id,
-                      'viewid' => optional_param('viewid', null, PARAM_INT),
-                      'userid' => $USER->id, 'action' =>  $userismember ? 'unsubscribe' : 'subscribe',
-                      'sesskey' => sesskey())),
-                get_string($userismember ? 'unsubscribe' : 'subscribe', 'datalynx'),
-                array('class' => 'datalynxfield_subscribe' . ($userismember ? ' subscribed' : '')));
+            $str .= html_writer::link(
+                    new moodle_url('/mod/datalynx/field/teammemberselect/ajax.php',
+                    array('d' => $field->df()->id(), 'fieldid' => $fieldid, 'entryid' => $entry->id,
+                          'viewid' => optional_param('viewid', null, PARAM_INT),
+                          'userid' => $USER->id, 'action' =>  $userismember ? 'unsubscribe' : 'subscribe',
+                          'sesskey' => sesskey())),
+                    get_string($userismember ? 'unsubscribe' : 'subscribe', 'datalynx'),
+                    array('class' => 'datalynxfield_subscribe' . ($userismember ? ' subscribed' : '')));
+
             $userurl = new moodle_url('/user/view.php', array('course' => $field->df()->course->id, 'id' => $USER->id));
+
             $PAGE->requires->strings_for_js(array('subscribe', 'unsubscribe'), 'datalynx');
             $PAGE->requires->js_init_call(
-                'M.datalynxfield_teammemberselect.init_subscribe_links',
-                array($userurl->out(false), fullname($USER)),
-                false,
-                $this->get_js_module());
+                    'M.datalynxfield_teammemberselect.init_subscribe_links',
+                    array($fieldid, $userurl->out(false), fullname($USER), $canunsubscribe),
+                    false,
+                    $this->get_js_module());
         }
 
         return $str;
