@@ -197,7 +197,7 @@ M.datalynxfield_teammemberselect.init_entry_form = function (Y, userlistobject, 
     });
 };
 
-M.datalynxfield_teammemberselect.init_subscribe_links = function(Y, fieldid, userurl, canunsubscribe) {
+M.datalynxfield_teammemberselect.init_subscribe_links = function(Y, fieldid, userurl, username, canunsubscribe) {
     Y.all('a.datalynxfield_subscribe').each(function (link) {
         var href = link.get('href');
         var params = extract_params(href.split('?')[1]);
@@ -207,6 +207,7 @@ M.datalynxfield_teammemberselect.init_subscribe_links = function(Y, fieldid, use
         params['ajax'] = true;
         link.detach('click');
         link.on('click', function (e) {
+            e.preventDefault();
             var ul = e.target.ancestor().one('ul');
             if (!ul) {
                 ul = Y.Node.create('<ul></ul>');

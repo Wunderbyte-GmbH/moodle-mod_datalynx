@@ -158,33 +158,30 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         return $options;
     }
 
-    /**
-     *
-     */
     public function get_search_sql($search) {
-        global $DB, $USER;
+        global $DB;
         static $i = 0;
         list($not, $operator, $value) = $search;
         $i++;
         $fieldid = $this->field->id;
         $name = "df_{$fieldid}_{$i}";
+        $like = '';
         $params = array();
 
         $content = "c{$fieldid}.content";
-        $paramname = "{$name}_user";
-
         if ($operator == 'USER') {
             global $USER;
-            $like = $DB->sql_like($content, ":{$paramname}");
-            $params[$paramname] = "%\"{$USER->id}\"%";
-            return array(" $not $like", $params, true);
+            $like = $DB->sql_like($content, ":{$name}", true, true, !!$not);
+            $params[$name] = "%\"{$USER->id}\"%";
         } else if ($operator == 'OTHER_USER') {
-            $like = $DB->sql_like($content, ":{$paramname}");
-            $params[$paramname] = "%\"{$value}\"%";
-            return array(" $not $like", $params, true);
-        } else {
-           return array(" ", $params);
+            $like = $DB->sql_like($content, ":{$name}", true, true, !!$not);
+            $params[$name] = "%\"{$value}\"%";
+        } else if ($operator == '') {
+            $like = $DB->sql_like($content, ":{$name}", true, true, !!$not);
+            $params[$name] = "[]";
         }
+
+        return array(" $like ", $params, true);
     }
 
     /**
@@ -231,7 +228,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
 
     public function get_supported_search_operators() {
         return array(
-            ''     => '&lt;' . get_string('choose') . '&gt;',
+            ''     => get_string('empty', 'datalynx'),
             'USER' => get_string('iamteammember', 'datalynx'),
             'OTHER_USER' => get_string('useristeammember', 'datalynx')
         );
