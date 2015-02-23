@@ -30,7 +30,7 @@ $entryid = required_param('entryid', PARAM_INT);
 $fieldid = required_param('fieldid', PARAM_INT);
 $userid = required_param('userid', PARAM_INT);
 $action = required_param('action', PARAM_ALPHA);
-$viewid = optional_param('viewid', null, PARAM_INT);
+$view = optional_param('view', null, PARAM_INT);
 $ajax = optional_param('ajax', false, PARAM_BOOL);
 
 if (!defined('AJAX_SCRIPT') && $ajax) {
@@ -112,7 +112,7 @@ if ($ajax) {
 
     die;
 } else {
-    $url = new moodle_url('../../view.php', array('d' => $d, 'view' => $viewid));
+    $url = new moodle_url('../../view.php', array('d' => $d, 'view' => $view));
     redirect($url);
 }
 

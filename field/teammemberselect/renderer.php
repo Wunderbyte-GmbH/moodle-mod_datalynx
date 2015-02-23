@@ -92,7 +92,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
             $str .= html_writer::link(
                     new moodle_url('/mod/datalynx/field/teammemberselect/ajax.php',
                     array('d' => $field->df()->id(), 'fieldid' => $fieldid, 'entryid' => $entry->id,
-                          'viewid' => optional_param('viewid', null, PARAM_INT),
+                          'view' => optional_param('view', null, PARAM_INT),
                           'userid' => $USER->id, 'action' =>  $userismember ? 'unsubscribe' : 'subscribe',
                           'sesskey' => sesskey())),
                     get_string($userismember ? 'unsubscribe' : 'subscribe', 'datalynx'),
