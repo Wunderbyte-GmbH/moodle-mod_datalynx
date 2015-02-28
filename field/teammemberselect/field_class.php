@@ -165,23 +165,79 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         $i++;
         $fieldid = $this->field->id;
         $name = "df_{$fieldid}_{$i}";
-        $like = '';
+
+        $sql = "1";
         $params = array();
+        $usecontent = false;
 
         $content = "c{$fieldid}.content";
-        if ($operator == 'USER') {
+        if ($operator === 'USER') {
             global $USER;
-            $like = $DB->sql_like($content, ":{$name}", true, true, !!$not);
             $params[$name] = "%\"{$USER->id}\"%";
-        } else if ($operator == 'OTHER_USER') {
-            $like = $DB->sql_like($content, ":{$name}", true, true, !!$not);
+
+            if (!!$not) {
+                $like = $DB->sql_like("content", ":{$name}", true, true);
+
+                if ($eids = $this->get_entry_ids_for_content($like, $params)) {
+                    list($notinids, $paramsnot) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED, "df_{$fieldid}_x_", false);
+                    $params = array_merge($params, $paramsnot);
+                    $sql = "e.id $notinids";
+                } else {
+                    $sql = "0";
+                }
+
+                $usecontent = false;
+            } else {
+                $sql = $DB->sql_like("c{$fieldid}.content", ":{$name}", true, true);
+                $usecontent = true;
+            }
+        } else if ($operator === 'OTHER_USER') {
             $params[$name] = "%\"{$value}\"%";
-        } else if ($operator == '') {
-            $like = $DB->sql_like($content, ":{$name}", true, true, !!$not);
-            $params[$name] = "[]";
+
+            if (!!$not) {
+                $like = $DB->sql_like("content", ":{$name}", true, true);
+
+                if ($eids = $this->get_entry_ids_for_content($like, $params)) {
+                    list($notinids, $paramsnot) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED, "df_{$fieldid}_x_", false);
+                    $params = array_merge($params, $paramsnot);
+                    $sql = "e.id $notinids";
+                } else {
+                    $sql = "0";
+                }
+
+                $usecontent = false;
+            } else {
+                $sql = $DB->sql_like("c{$fieldid}.content", ":{$name}", true, true);
+                $usecontent = true;
+            }
+        } else if ($operator === '') {
+            if (!!$not) {
+                $like1 = $DB->sql_like($content, ":{$name}1", true, true, !!$not);
+                $params[$name . "1"] = "[]";
+                $like2 = $DB->sql_like($content, ":{$name}2", true, true, !!$not);
+                $params[$name . "2"] = "[" . implode(',', array_fill(0, $this->teamsize, '"0"')) . "]";
+
+                $sql = "$like1 AND $like2";
+                $usecontent = true;
+            } else {
+                $like1 = $DB->sql_like("content", ":{$name}1", true, true, true);
+                $params[$name . "1"] = "[]";
+                $like2 = $DB->sql_like("content", ":{$name}2", true, true, true);
+                $params[$name . "2"] = "[" . implode(',', array_fill(0, $this->teamsize, '"0"')) . "]";
+
+                if ($eids = $this->get_entry_ids_for_content("content LIKE '%' AND $like1 AND $like2", $params)) {
+                    list($notinids, $paramsnot) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED, "df_{$fieldid}_x_", false);
+                    $params = array_merge($params, $paramsnot);
+                    $sql = "e.id $notinids";
+                } else {
+                    $sql = "0";
+                }
+
+                $usecontent = false;
+            }
         }
 
-        return array(" $like ", $params, true);
+        return array(" ($sql) ", $params, $usecontent);
     }
 
     /**
