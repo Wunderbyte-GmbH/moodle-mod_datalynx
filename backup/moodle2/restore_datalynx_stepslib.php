@@ -146,6 +146,15 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         if ($data->type == 'datalynxview') {
             $data->param1 = $this->get_mappingid('datalynx', $data->param1);
             $data->param2 = $this->get_mappingid('datalynx_views', $data->param2);
+
+            $course = $data->targetcourse ? $data->targetcourse : 'NULL';
+            $instance = $data->targetinstance ? $data->targetinstance : 'NULL';
+            $view = $data->targetview ? $data->targetview : 'NULL';
+            $filter = $data->targetfilter ? $data->targetfilter : 'NULL';
+
+            $this->log("WARNING! 'datalynxview' field type cannot be restored if referencing instances are not included in the backup!", backup::LOG_WARNING);
+            $this->log("* Please verify the references of the field:", backup::LOG_WARNING);
+            $this->log("* Field '$data->name' originally referenced: course '$course', instance '$instance', view '$view', filter '$filter'", backup::LOG_WARNING);
         }
 
         // insert the datalynx_fields record

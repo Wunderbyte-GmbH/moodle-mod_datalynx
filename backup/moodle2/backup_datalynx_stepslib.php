@@ -51,7 +51,8 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
         $field = new backup_nested_element('field', array('id'), array(
             'type', 'name', 'description', 'visible', 'edits', 'label',
             'param1', 'param2', 'param3', 'param4', 'param5', 
-            'param6', 'param7', 'param8', 'param9', 'param10'));
+            'param6', 'param7', 'param8', 'param9', 'param10',
+            'targetcourse', 'targetinstance', 'targetview', 'targetfilter'));
 
         $filters = new backup_nested_element('filters');
         $filter = new backup_nested_element('filter', array('id'), array(
@@ -133,7 +134,18 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
         // Define sources
         $datalynx->set_source_table('datalynx', array('id' => backup::VAR_ACTIVITYID));
         $module->set_source_table('course_modules', array('id' => backup::VAR_MODID));
-        $field->set_source_table('datalynx_fields', array('dataid' => backup::VAR_PARENTID));
+
+        $field->set_source_sql(
+                "SELECT f.*, c.fullname AS targetcourse, d.name AS targetinstance, v.name AS targetview, fil.name AS targetfilter
+                   FROM {datalynx_fields} f
+              LEFT JOIN {datalynx} d ON f.param1 = d.id
+              LEFT JOIN {course_modules} cm ON cm.instance = d.id
+              LEFT JOIN {course} c ON cm.course = c.id
+              LEFT JOIN {datalynx_views} v ON f.param2 = v.id
+              LEFT JOIN {datalynx_filters} fil ON f.param3 = fil.id
+              WHERE f.dataid = :dataid", array('dataid' => backup::VAR_PARENTID));
+
+
         $filter->set_source_table('datalynx_filters', array('dataid' => backup::VAR_PARENTID));
         $view->set_source_table('datalynx_views', array('dataid' => backup::VAR_PARENTID));
         $rule->set_source_table('datalynx_rules', array('dataid' => backup::VAR_PARENTID));
