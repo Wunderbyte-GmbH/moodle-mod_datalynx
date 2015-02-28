@@ -46,16 +46,14 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         $paths[] = new restore_path_element('datalynx_filter', '/activity/datalynx/filters/filter');
         $paths[] = new restore_path_element('datalynx_view', '/activity/datalynx/views/view');
         $paths[] = new restore_path_element('datalynx_rule', '/activity/datalynx/rules/rule');
+        $paths[] = new restore_path_element('datalynx_behavior', '/activity/datalynx/behaviors/behavior');
+        $paths[] = new restore_path_element('datalynx_renderer', '/activity/datalynx/renderers/renderer');
 
         if ($userinfo) {
             $paths[] = new restore_path_element('datalynx_entry', '/activity/datalynx/entries/entry');
             $paths[] = new restore_path_element('datalynx_content', '/activity/datalynx/entries/entry/contents/content');
             $paths[] = new restore_path_element('datalynx_rating', '/activity/datalynx/entries/entry/ratings/rating');
             $paths[] = new restore_path_element('datalynx_grade', '/activity/datalynx/grades/grade');
-/*
-            $paths[] = new restore_path_element('datalynx_comment', '/activity/datalynx/entries/entry/comments/comment');
-            $paths[] = new restore_path_element('datalynx_gradecomment', '/activity/datalynx/gradecomments/gradecomment');
-*/
         }
 
         // Return the paths wrapped into standard activity structure
@@ -319,6 +317,38 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         $data = (object)$data;
         $data->itemid = $this->get_mappingid('user', $data->itemid);
         $this->process_this_rating($data);        
+    }
+
+    /**
+     *
+     */
+    protected function process_datalynx_behavior($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $oldid = $data->id;
+
+        $data->dataid = $this->get_new_parentid('datalynx');
+
+        // insert the datalynx_fields record
+        $newitemid = $DB->insert_record('datalynx_behaviors', $data);
+        $this->set_mapping('datalynx_behavior', $oldid, $newitemid, false); // no files
+    }
+
+    /**
+     *
+     */
+    protected function process_datalynx_renderer($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $oldid = $data->id;
+
+        $data->dataid = $this->get_new_parentid('datalynx');
+
+        // insert the datalynx_fields record
+        $newitemid = $DB->insert_record('datalynx_renderers', $data);
+        $this->set_mapping('datalynx_renderer', $oldid, $newitemid, false); // no files
     }
 
     /**

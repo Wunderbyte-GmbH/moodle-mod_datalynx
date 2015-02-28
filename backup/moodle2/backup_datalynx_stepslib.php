@@ -88,6 +88,15 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
         $grade = new backup_nested_element('grade', array('id'), array(
             'component', 'ratingarea', 'scaleid', 'value', 'userid', 'timecreated', 'timemodified'));
 
+        $behaviors = new backup_nested_element('behaviors');
+        $behavior = new backup_nested_element('behavior', array('id'), array(
+            'dataid', 'name', 'description', 'visibleto', 'editableby', 'required'));
+
+        $renderers = new backup_nested_element('renderers');
+        $renderer = new backup_nested_element('renderer', array('id'), array(
+            'dataid', 'type', 'name', 'description', 'notvisibletemplate', 'displaytemplate', 'novaluetemplate',
+            'edittemplate', 'noteditabletemplate'));
+
         // Build the tree
         $datalynx->add_child($module);
 
@@ -115,6 +124,12 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
         $datalynx->add_child($grades);
         $grades->add_child($grade);
 
+        $datalynx->add_child($behaviors);
+        $behaviors->add_child($behavior);
+
+        $datalynx->add_child($renderers);
+        $renderers->add_child($renderer);
+
         // Define sources
         $datalynx->set_source_table('datalynx', array('id' => backup::VAR_ACTIVITYID));
         $module->set_source_table('course_modules', array('id' => backup::VAR_MODID));
@@ -122,6 +137,8 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
         $filter->set_source_table('datalynx_filters', array('dataid' => backup::VAR_PARENTID));
         $view->set_source_table('datalynx_views', array('dataid' => backup::VAR_PARENTID));
         $rule->set_source_table('datalynx_rules', array('dataid' => backup::VAR_PARENTID));
+        $behavior->set_source_table('datalynx_behaviors', array('dataid' => backup::VAR_PARENTID));
+        $renderer->set_source_table('datalynx_renderers', array('dataid' => backup::VAR_PARENTID));
 
         // All the rest of elements only happen if we are including user info
         if ($userinfo) {
