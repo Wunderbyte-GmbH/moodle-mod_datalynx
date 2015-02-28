@@ -782,6 +782,25 @@ class datalynx {
         }
     }
 
+    private function find_filters_using_fields($fields) {
+        global $DB;
+        $filters = $DB->get_records('datalynx_filters', ['dataid' => $this->id()]);
+        $usedfilters = [];
+        $fieldids = array_keys($fields);
+        foreach ($filters as $filter) {
+            $custormsort = unserialize($filter->customsort);
+            $custormsort = $custormsort ? array_keys($custormsort) : [];
+
+            $customsearch = unserialize($filter->customsearch);
+            $customsearch = $customsearch ? array_keys($customsearch) : [];
+
+            if (array_intersect($fieldids, $customsearch) || array_intersect($fieldids, $custormsort)) {
+                $usedfilters[] = $filter;
+            }
+        }
+        return $usedfilters;
+    }
+
     /**
      *
      */
@@ -815,13 +834,34 @@ class datalynx {
                 // print header
                 $this->print_header('fields');
 
-                // Print a confirmation page
-                echo $OUTPUT->confirm(get_string("fieldsconfirm$action", 'datalynx', count($fields)),
-                        new moodle_url('/mod/datalynx/field/index.php', array('d' => $this->id(),
-                                                                        $action => implode(',', array_keys($fields)),
-                                                                        'sesskey' => sesskey(),
-                                                                        'confirmed' => 1)),
-                        new moodle_url('/mod/datalynx/field/index.php', array('d' => $this->id())));
+                $msg = get_string("fieldsconfirm$action", 'datalynx', count($fields));
+                if ($action === 'delete') {
+                    $fieldlist = array_reduce($fields, function ($list, $field) {
+                        return $list . "<li>{$field->field->name}</li>";
+                    }, '');
+                    $fieldlist = "<ul>$fieldlist</ul>";
+                    $filters = $this->find_filters_using_fields($fields);
+                    $filterlist = array_reduce($filters, function ($list, $filter) {
+                        return $list . "<li>{$filter->name}</li>";
+                    }, '');
+                    $filterlist = "<ul>$filterlist</ul>";
+                    if ($filters) {
+                        echo "<div class=\"alert alert-warning\">" .
+                                get_string('deletefieldfilterwarning', 'datalynx', ['fieldlist' => $fieldlist, 'filterlist' => $filterlist]) .
+                                "</div>";
+                        echo $OUTPUT->continue_button(new moodle_url('/mod/datalynx/field/index.php', array('d' => $this->id())));
+
+                        echo $OUTPUT->footer();
+                        exit;
+                    }
+                }
+
+                echo $OUTPUT->confirm($msg,
+                    new moodle_url('/mod/datalynx/field/index.php', array('d' => $this->id(),
+                        $action => implode(',', array_keys($fields)),
+                        'sesskey' => sesskey(),
+                        'confirmed' => 1)),
+                    new moodle_url('/mod/datalynx/field/index.php', array('d' => $this->id())));
 
                 echo $OUTPUT->footer();
                 exit;
@@ -1696,6 +1736,7 @@ class datalynx {
 
         return $permissions;
     }
+
 
     /**
      * Note: this function doesn't return contextual permissions (entry author/mentor).

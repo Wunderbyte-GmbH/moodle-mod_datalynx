@@ -805,3 +805,4 @@ $string['allowsubscription_help'] = 'Check this option to enable users to add th
 $string['allowunsubscription_help'] = 'Check this option to enable users to unsubscribe themselves from teams of other users in a manner similar to the \'Allow manual subscription option\'. If disabled, users on a team can only be removed by the user who created that team.';
 $string['user_can_add_self_help'] = 'Check this option to allow the user who owns the entry to add themselves to the team in this field.';
 $string['check_enable'] = 'You must mark \'enable\' checkbox to confirm the validity of the selected value.';
+$string['deletefieldfilterwarning'] = 'Warning! You are attempting to delete following fields:{$a->fieldlist}However, filters listed below are still using some of these fields:{$a->filterlist}You will have to delete these filters manually first before you may proceed.';
