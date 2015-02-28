@@ -119,13 +119,18 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
             $messagedata->fullname = fullname($userto);
 
             $viewurlparams = ['eids' => $messagedata->objectid];
-            $roleid = $this->df()->get_user_datalynx_role($userid);
-            if (isset($this->targetviews[$roleid])) {
-                $viewurlparams['view'] = $this->targetviews[$roleid];
-            } else if ($df->data->singleview) {
-                $viewurlparams['view'] = $df->data->singleview;
-            } else if ($df->data->defaultview) {
-                $viewurlparams['view'] = $df->data->defaultview;
+            $roleids = $this->df()->get_user_datalynx_permissions($userid);
+            foreach ($roleids as $roleid) {
+                if (isset($this->targetviews[$roleid])) {
+                    $viewurlparams['view'] = $this->targetviews[$roleid];
+                    break;
+                } else if ($df->data->singleview) {
+                    $viewurlparams['view'] = $df->data->singleview;
+                    break;
+                } else if ($df->data->defaultview) {
+                    $viewurlparams['view'] = $df->data->defaultview;
+                    break;
+                }
             }
 
             $entryurl = new moodle_url($viewurl, $viewurlparams);

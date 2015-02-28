@@ -229,7 +229,7 @@ abstract class datalynxfield_renderer {
     }
 
     /**
-     * Callback function. Adds preceeding and following HTML formatting for field elements and calls
+     * Callback function. Adds preceding and following HTML formatting for field elements and calls
      * render_edit_mode. Cannot be overridden, but {@link render_edit_mode()} function can and should be.
      * @param MoodleQuickForm $mform form object used to render field input elements
      * @param stdClass $entry object containing the entry data being rendered

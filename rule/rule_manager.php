@@ -40,7 +40,7 @@ class datalynx_rule_manager {
      */
     public static function get_event_data($dataid = 0) {
         if (!self::$observers) {
-            require_once('../db/event.php');
+            require_once('../db/events.php');
             self::$observers = $observers;
         }
 

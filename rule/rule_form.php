@@ -65,7 +65,6 @@ class datalynx_rule_form extends moodleform {
         $mform->addElement('advcheckbox', 'enabled', get_string('ruleenabled', 'datalynx'), '', null, array(0, 1));
 
         // events
-        $mform->addElement('header', 'eventsettings', get_string('eventsettings', 'datalynx'));
         $eventmenu = datalynx_rule_manager::get_event_data($this->_df->id());
         $eventgroup = array();
         foreach ($eventmenu as $eventname => $eventlabel) {

@@ -41,8 +41,10 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
         // recipient
         $grp = array();
         $grp[] = &$mform->createElement('checkbox', 'author', null, get_string('author', 'datalynx'), null);
+        $grp[] = &$mform->createElement('static', '', '', $br);
 
-        $grp[] = &$mform->createElement('checkboxgroup', 'roles', get_string('roles'), $this->menu_roles_used_in_context(), $br);
+        $grp[] = &$mform->createElement('checkboxgroup', 'roles', get_string('roles'), $this->_df->get_datalynx_permission_names(true), $br);
+        $grp[] = &$mform->createElement('static', '', '', $br);
 
         $grp[] = &$mform->createElement('checkboxgroup', 'teams', get_string('teams', 'datalynx'), $this->get_datalynx_team_fields(), $br);
 
