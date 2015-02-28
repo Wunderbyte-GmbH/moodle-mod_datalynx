@@ -60,9 +60,9 @@ class datalynx_field_behavior {
         $this->record = $record;
     }
 
-    public static function from_name($name) {
+    public static function from_name($name, $dataid) {
         global $DB;
-        $record = $DB->get_record('datalynx_behaviors', array('name' => $name));
+        $record = $DB->get_record('datalynx_behaviors', array('name' => $name, 'dataid' => $dataid));
         if ($record) {
             return new datalynx_field_behavior($record);
         } else {

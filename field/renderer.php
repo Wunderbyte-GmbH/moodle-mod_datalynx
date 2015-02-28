@@ -130,6 +130,7 @@ abstract class datalynxfield_renderer {
                             $replacements[$tag] = array('html', '');
                         } else if ($renderer->get_not_editable_template() === $renderer::NOT_EDITABLE_SHOW_AS_DISPLAY_MODE) {
                             $currentoptions['template'] = $renderer->get_display_template();
+                            $currentoptions['value'] = $this->render_display_mode($entry, $currentoptions);
                             $replacements[$tag] = ['', [[$this ,'prerender_edit_mode'], [$entry, $currentoptions]]];
                         } else {
                             $replacements[$tag] = array('html', $renderer->get_not_editable_template());
@@ -195,12 +196,12 @@ abstract class datalynxfield_renderer {
 
             $behaviorname = isset($matches[2]) ? $matches[2] : false;
             if ($behaviorname) {
-                $behavior = datalynx_field_behavior::from_name($behaviorname);
+                $behavior = datalynx_field_behavior::from_name($behaviorname, $this->_field->df()->id());
             }
 
             $renderername = isset($matches[3]) ? $matches[3] : false;
             if ($renderername) {
-                $renderer = datalynx_field_renderer::get_renderer_by_name($renderername);
+                $renderer = datalynx_field_renderer::get_renderer_by_name($renderername, $this->_field->df()->id());
             }
         }
 
@@ -236,21 +237,40 @@ abstract class datalynxfield_renderer {
      * @see datalynxfield_renderer::render_edit_mode
      */
     public final function prerender_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
-        if (isset($options['template']) && strpos($options['template'], '#input') !== false) {
-            $splittemplate = explode('#input', $options['template']);
-            $options['prefix'] = $splittemplate[0];
-            $options['suffix'] = $splittemplate[1];
+        if ($options['editable']) {
+            if (isset($options['template']) && strpos($options['template'], '#input') !== false) {
+                $splittemplate = explode('#input', $options['template']);
+                $options['prefix'] = $splittemplate[0];
+                $options['suffix'] = $splittemplate[1];
+            }
+
+            $mform->addElement('html', '<div class="datalynx-field-wrapper" data-field-type="' . $this->_field->type . '" data-field-name="' . $this->_field->field->name . '">');
+            if (isset($options['prefix'])) {
+                $mform->addElement('html', $options['prefix']);
+            }
+            $this->render_edit_mode($mform, $entry, $options);
+            if (isset($options['suffix'])) {
+                $mform->addElement('html', $options['suffix']);
+            }
+            $mform->addElement('html', '</div>');
+        } else {
+            if (isset($options['template']) && strpos($options['template'], '#value') !== false) {
+                $splittemplate = explode('#value', $options['template']);
+                $options['prefix'] = $splittemplate[0];
+                $options['suffix'] = $splittemplate[1];
+            }
+
+            $mform->addElement('html', '<div class="datalynx-field-wrapper" data-field-type="' . $this->_field->type . '" data-field-name="' . $this->_field->field->name . '">');
+            if (isset($options['prefix'])) {
+                $mform->addElement('html', $options['prefix']);
+            }
+            $mform->addElement('html', $options['value']);
+            if (isset($options['suffix'])) {
+                $mform->addElement('html', $options['suffix']);
+            }
+            $mform->addElement('html', '</div>');
         }
 
-        $mform->addElement('html', '<div class="datalynx-field-wrapper" data-field-type="' . $this->_field->type . '" data-field-name="' . $this->_field->field->name . '">');
-        if (isset($options['prefix'])) {
-            $mform->addElement('html', $options['prefix']);
-        }
-        $this->render_edit_mode($mform, $entry, $options);
-        if (isset($options['suffix'])) {
-            $mform->addElement('html', $options['suffix']);
-        }
-        $mform->addElement('html', '</div>');
     }
 
     /**

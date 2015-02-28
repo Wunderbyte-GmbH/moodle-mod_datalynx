@@ -87,9 +87,9 @@ class datalynx_field_renderer {
         $this->record = $record;
     }
 
-    public static function get_renderer_by_name($name) {
+    public static function get_renderer_by_name($name, $dataid) {
         global $DB;
-        $record = $DB->get_record('datalynx_renderers', array('name' => $name));
+        $record = $DB->get_record('datalynx_renderers', array('name' => $name, 'dataid' => $dataid));
         if ($record) {
             return new datalynx_field_renderer($record);
         } else {
