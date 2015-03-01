@@ -807,3 +807,12 @@ $string['user_can_add_self_help'] = 'Check this option to allow the user who own
 $string['check_enable'] = 'You must mark \'enable\' checkbox to confirm the validity of the selected value.';
 $string['deletefieldfilterwarning'] = 'Warning! You are attempting to delete following fields:{$a->fieldlist}However, filters listed below are still using some of these fields:{$a->filterlist}You will have to delete these filters manually first before you may proceed.';
 $string['noviewsavailable'] = 'No views available';
+
+$string['datalynx_team_updated'] = 'Team updated';
+$string['datalynx:editprivilegeadmin'] = 'Admin edit access privilege';
+$string['datalynx:editprivilegeguest'] = 'Guest edit access privilege';
+$string['datalynx:editprivilegemanager'] = 'Manager edit access privilege';
+$string['datalynx:editprivilegestudent'] = 'Student edit access privilege';
+$string['datalynx:editprivilegeteacher'] = 'Teacher edit access privilege';
+$string['datalynx:notifyteamupdated'] = 'Notified on team update';
+$string['datalynx:teamsubscribe'] = 'Subscribe to/join teams';
