@@ -25,9 +25,11 @@ require_once('../mod_class.php');
 require_once("$CFG->libdir/tablelib.php");
 
 $urlparams = new stdClass();
-$urlparams->d = optional_param('d', 0, PARAM_INT);
+$urlparams->d = optional_param('d', 0, PARAM_INT);             // datalynx id
+$urlparams->id = optional_param('id', 0, PARAM_INT);            // course module id
 
-$datalynx = new datalynx($urlparams->d);
+$datalynx = new datalynx($urlparams->d, $urlparams->id);
+$urlparams->d = $datalynx->id();
 $urlparams->id = $datalynx->cm->id;
 
 require_capability('mod/datalynx:managetemplates', $datalynx->context);
