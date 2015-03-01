@@ -61,7 +61,7 @@ abstract class datalynxfield_renderer {
         $found = array();
 
         $matches = array();
-        $fieldname = preg_quote($this->_field->name());
+        $fieldname = preg_quote($this->_field->name(), '/');
         if (preg_match_all("/\[\[$fieldname(?:\|(?:[^\]]+))?\]\](?:@)?/", $text, $matches)) {
             $found = array_merge($found, $matches[0]);
         }
@@ -69,7 +69,7 @@ abstract class datalynxfield_renderer {
         $patterns = array_keys($this->patterns());
         foreach ($patterns as $pattern) {
             if (strpos($pattern, '##') === 0) {
-                $strippedpattern = preg_quote(str_replace('##', '', $pattern));
+                $strippedpattern = preg_quote(str_replace('##', '', $pattern), '/');
                 if (preg_match_all("/##$strippedpattern##(?:@)?/", $text, $matches)) {
                     $found = array_merge($found, $matches[0]);
                 }
@@ -77,7 +77,7 @@ abstract class datalynxfield_renderer {
                     $found[] = $pattern;
                 }
             } else {
-                $strippedpattern = preg_quote(str_replace(['[[', ']]'], ['', ''], $pattern));
+                $strippedpattern = preg_quote(str_replace(['[[', ']]'], ['', ''], $pattern), '/');
                 if (preg_match_all("/\[\[$strippedpattern(?:\|(?:[^\]]+))?\]\](?:@)?/", $text, $matches)) {
                     $found = array_merge($found, $matches[0]);
                 }
