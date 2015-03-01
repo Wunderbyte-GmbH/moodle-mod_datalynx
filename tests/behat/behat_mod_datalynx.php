@@ -329,7 +329,8 @@ class behat_mod_datalynx extends behat_files {
             new Given('I follow "' . $this->escape($activityname) . '"'),
             new Given('I follow "Manage"'),
             new Given('I follow "Views"'),
-            new Given('I select "' . $this->escape($filtername) . '" filter for "' . $this->escape($viewname) . '" view'),
+            new Given('I set the field with xpath "//a[text()=\"' . $this->escape($viewname) . '\"]/ancestor::tr//select" to "' . $this->escape($filtername) . '"'),
+            //new Given('I select "' . $this->escape($filtername) . '" filter for "' . $this->escape($viewname) . '" view'),
         );
 
         if (!$this->running_javascript()) {
