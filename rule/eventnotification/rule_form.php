@@ -55,9 +55,22 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
 
         foreach ($this->_df->get_datalynx_permission_names(true) as $permissionid => $permissionname) {
             $views = $this->get_views_visible_to_datalynx_permission($permissionid);
-            $mform->addElement('select', "param4[$permissionid]", $permissionname, $views);
+            if (!empty($views)) {
+                $mform->addElement('select', "param4[$permissionid]", $permissionname, $views);
+            } else {
+                $mform->addElement('static', '', $permissionname, get_string('noviewsavailable', 'datalynx'));
+            }
+        }
+    }
+
+    function definition_after_data() {
+        $mform = &$this->_form;
+        $data = $this->get_submitted_data();
+
+        foreach ($this->_df->get_datalynx_permission_names(true) as $permissionid => $permissionname) {
+            $views = $this->get_views_visible_to_datalynx_permission($permissionid);
             $defaultview = $this->_df->get_default_view_id();
-            if ($defaultview && in_array($defaultview, array_keys($views))) {
+            if (isset($data) && isset($data->param4[$permissionid]) && $defaultview && in_array($defaultview, array_keys($views))) {
                 $mform->setDefault("param4[$permissionid]", $defaultview);
             }
         }

@@ -806,3 +806,4 @@ $string['allowunsubscription_help'] = 'Check this option to enable users to unsu
 $string['user_can_add_self_help'] = 'Check this option to allow the user who owns the entry to add themselves to the team in this field.';
 $string['check_enable'] = 'You must mark \'enable\' checkbox to confirm the validity of the selected value.';
 $string['deletefieldfilterwarning'] = 'Warning! You are attempting to delete following fields:{$a->fieldlist}However, filters listed below are still using some of these fields:{$a->filterlist}You will have to delete these filters manually first before you may proceed.';
+$string['noviewsavailable'] = 'No views available';
