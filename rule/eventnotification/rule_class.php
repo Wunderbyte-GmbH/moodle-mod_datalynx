@@ -109,16 +109,24 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
         $message->smallmessage      = '';
         $message->notification      = 1;
 
-        // TODO: fix sender!
-        $message->userfrom = (strpos($eventname, 'event') !== false && $this->sender == self::FROM_AUTHOR) ? $USER : $USER;
+        if ((strpos($eventname, 'comment') !== false)) {
+            $entryid = $event->get_data()['other']['itemid'];
+        } else {
+            $entryid = $event->get_data()['objectid'];
+        }
+        $authorid = $DB->get_field('datalynx_entries', 'userid', array('id' => $entryid));
+        $author = $DB->get_record('user', array('id' => $authorid));
+
+        $message->userfrom = (strpos($eventname, 'event') !== false && $this->sender == self::FROM_AUTHOR) ? $author : $USER;
         $messagedata->senderprofilelink = html_writer::link(new moodle_url('/user/profile.php', array('id' => $message->userfrom->id)), fullname($message->userfrom));
 
-        foreach ($this->get_recipients() as $userid) {
+        foreach ($this->get_recipients($author->id) as $userid) {
             $userto = $DB->get_record('user', array('id' => $userid));
             $message->userto = $userto;
             $messagedata->fullname = fullname($userto);
 
-            $viewurlparams = ['eids' => $messagedata->objectid];
+            $viewurlparams = ['eids' => $entryid];
+
             $roleids = $this->df()->get_user_datalynx_permissions($userid);
             foreach ($roleids as $roleid) {
                 if (isset($this->targetviews[$roleid])) {
@@ -140,6 +148,7 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
             $messagetext = get_string("message_$eventname", 'datalynx', $messagedata);
             $message->fullmessage = html_to_text($messagetext);
             $message->fullmessagehtml = text_to_html($messagetext, false, false, true);
+
             message_send($message);
         }
         return true;
@@ -195,7 +204,10 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
     protected function get_team_recipients($teams) {
         global $DB;
         $ids = array();
-        List($insql, $params) = $DB->get_in_or_equal($teams, SQL_PARAMS_NAMED);
+        if (empty($teams)) {
+            return [];
+        }
+        list($insql, $params) = $DB->get_in_or_equal($teams, SQL_PARAMS_NAMED);
         $sql = "SELECT dc.content
                   FROM {datalynx_contents} dc
             INNER JOIN {datalynx_fields} df ON dc.fieldid = df.id

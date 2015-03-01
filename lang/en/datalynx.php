@@ -744,7 +744,11 @@ the content in {$a->datalynxlink} has been modified by {$a->senderprofilelink}.
 
 The following entry has been disapproved: {$a->viewlink}.';
 
-$string['message_comment_created'] = 'Datalynx comment added';
+$string['message_comment_created'] = 'Hello {$a->fullname},
+
+one your entries was commented on by {$a->senderprofilelink}.
+
+The following entry has been commented on: {$a->viewlink}.';
 $string['message_rating_added'] = 'Datalynx rating added';
 $string['message_rating_updated'] = 'Datalynx rating updated';
 
