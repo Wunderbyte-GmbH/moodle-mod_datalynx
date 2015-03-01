@@ -143,7 +143,8 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
               LEFT JOIN {course} c ON cm.course = c.id
               LEFT JOIN {datalynx_views} v ON f.param2 = v.id
               LEFT JOIN {datalynx_filters} fil ON f.param3 = fil.id
-              WHERE f.dataid = :dataid", array('dataid' => backup::VAR_PARENTID));
+                  WHERE f.dataid = :dataid
+               GROUP BY f.id", array('dataid' => backup::VAR_PARENTID));
 
 
         $filter->set_source_table('datalynx_filters', array('dataid' => backup::VAR_PARENTID));
