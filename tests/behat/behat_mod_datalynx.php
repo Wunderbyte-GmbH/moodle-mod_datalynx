@@ -585,7 +585,14 @@ class behat_mod_datalynx extends behat_files {
 
         foreach ($entries as $entry) {
             $authorid = $DB->get_field('user', 'id', array('username' => trim($entry['author'])));
-
+            $approved = 0;
+            $status = 0;
+            if(!empty($entry['approved'])){
+                $approved = trim($entry['approved']);
+            }
+            if(!empty($entry['status'])){
+                $status = trim($entry['status']);
+            }
             $record = array (
                 'dataid' => $instance->id,
                 'userid' => $authorid,
@@ -594,8 +601,8 @@ class behat_mod_datalynx extends behat_files {
                 'visible' => 1,
                 'timecreated' => time(),
                 'timemodified' => time(),
-                'approved' => 0,
-                'status' => 0,
+                'approved' => $approved,
+                'status' => $status,
             );
 
             $entryid = $DB->insert_record('datalynx_entries', $record);
