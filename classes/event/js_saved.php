@@ -32,7 +32,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2015 Ivan Šakić <ivan.sakic3@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class rule_updated extends \core\event\base {
+class js_saved extends \core\event\base {
 
     /**
      * Init method.
@@ -40,7 +40,7 @@ class rule_updated extends \core\event\base {
      * @return void
      */
     protected function init() {
-        $this->data['objecttable'] = 'datalynx_rules';
+        $this->data['objecttable'] = 'datalynx';
         $this->data['crud'] = 'u';
         $this->data['edulevel'] = self::LEVEL_TEACHING;
     }
@@ -51,7 +51,7 @@ class rule_updated extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('datalynx_entryupdated', 'mod_datalynx');
+        return get_string('datalynx_jssaved', 'mod_datalynx');
     }
 
     /**
@@ -60,7 +60,7 @@ class rule_updated extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' updated the datalynx entry with id '$this->objectid' in the datalynx activity " .
+        return "The user with id '$this->userid' saved a custom JavaScript file in the datalynx activity " .
         "with the course module id '$this->contextinstanceid'.";
     }
 
@@ -70,7 +70,7 @@ class rule_updated extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/mod/datalynx/rule.php', array('d' => $this->other['dataid'], 'vid' => $this->objectid));
+        return new \moodle_url('/mod/datalynx/view.php', array('d' => $this->objectid, 'jsedit' => 1));
     }
 
     /**
@@ -79,21 +79,8 @@ class rule_updated extends \core\event\base {
      * @return array
      */
     public function get_legacy_logdata() {
-        return array($this->courseid, 'datalynx', 'rule_updated', 'view.php?d=' . $this->other['dataid'],
-            $this->other['dataid'], $this->contextinstanceid);
+        return array($this->courseid, 'datalynx', 'js_saved', 'view.php?d=' . $this->objectid . '&jsedit=1',
+            $this->objectid, $this->contextinstanceid);
     }
 
-    /**
-     * Custom validation.
-     *
-     * @throws \coding_exception when validation does not pass.
-     * @return void
-     */
-    protected function validate_data() {
-        parent::validate_data();
-
-        if (!isset($this->other['dataid'])) {
-            throw new \coding_exception('The \'dataid\' value must be set in other.');
-        }
-    }
 }

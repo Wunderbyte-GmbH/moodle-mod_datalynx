@@ -820,3 +820,6 @@ $string['datalynx:editprivilegestudent'] = 'Student edit access privilege';
 $string['datalynx:editprivilegeteacher'] = 'Teacher edit access privilege';
 $string['datalynx:notifyteamupdated'] = 'Notified on team update';
 $string['datalynx:teamsubscribe'] = 'Subscribe to/join teams';
+
+$string['datalynx_csssaved'] = 'Custom CSS saved';
+$string['datalynx_jssaved'] = 'Custom JavaScript saved';

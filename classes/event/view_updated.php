@@ -41,7 +41,7 @@ class view_updated extends \core\event\base {
      */
     protected function init() {
         $this->data['objecttable'] = 'datalynx_views';
-        $this->data['crud'] = 'd';
+        $this->data['crud'] = 'c';
         $this->data['edulevel'] = self::LEVEL_TEACHING;
     }
 

@@ -111,8 +111,9 @@ if ($urlparams->jsedit) {
             }
             $fs->delete_area_files($usercontext->id, 'user', 'draft', $data->jsupload);
         }
-        
-        //FIXME: add_to_log($df->course->id, 'datalynx', 'js saved', 'js.php?id='. $df->cm->id. '&amp;d='. $df->id(), $df->id(), $df->cm->id);
+
+        $event = \mod_datalynx\event\js_saved::create(array('context' => $df->context, 'objectid' => $df->id()));
+        $event->trigger();
     }
 
     $df->print_header(array('tab' => 'js', 'urlparams' => $urlparams));

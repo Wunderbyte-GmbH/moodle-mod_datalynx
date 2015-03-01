@@ -41,7 +41,7 @@ class field_updated extends \core\event\base {
      */
     protected function init() {
         $this->data['objecttable'] = 'datalynx_fields';
-        $this->data['crud'] = 'd';
+        $this->data['crud'] = 'u';
         $this->data['edulevel'] = self::LEVEL_TEACHING;
     }
 
