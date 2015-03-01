@@ -183,7 +183,7 @@ class datalynx_field_renderer_form extends moodleform
         if (isset($data['displaytemplate']) && strpos($data['displaytemplate'], '#value') === false) {
             $errors['displaytemplate'] = 'You must use tag #value somewhere in this template!';
         }
-        if (isset($data['edittemplate']) && strpos($data['edittemplate'], '#inputh') === false) {
+        if (isset($data['edittemplate']) && strpos($data['edittemplate'], '#input') === false) {
             $errors['edittemplate'] = 'You must use tag #input somewhere in this template!';
         }
         return $errors;
