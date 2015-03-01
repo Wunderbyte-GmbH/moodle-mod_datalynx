@@ -112,6 +112,10 @@ class datalynxfield_time extends datalynxfield_base {
         }
     }
 
+    public function supports_group_by() {
+        return true;
+    }
+
     /**
      * 
      */

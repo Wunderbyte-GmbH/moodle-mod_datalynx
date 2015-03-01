@@ -27,6 +27,10 @@ class datalynxfield_text extends datalynxfield_base {
 
     public $type = 'text';
 
+    public function supports_group_by() {
+        return true;
+    }
+
     public function get_supported_search_operators() {
         return array(
             '' => get_string('empty', 'datalynx'),

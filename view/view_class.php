@@ -884,10 +884,12 @@ abstract class datalynxview_base {
         if (array_key_exists($fieldid, $this->_tags['field'])) {
             // first pattern
             $pattern = reset($this->_tags['field'][$fieldid]);
-            $field = $fields[$fieldid];
+            if ($pattern !== false) {
+                $field = $fields[$fieldid];
 
-            if ($definition = $field->get_definitions(array($pattern), $entry, array())) {
-               $groupbyvalue = $definition[$pattern][1];
+                if ($definition = $field->get_definitions(array($pattern), $entry, array())) {
+                    $groupbyvalue = $definition[$pattern][1];
+                }
             }
         }
 
@@ -895,6 +897,7 @@ abstract class datalynxview_base {
     }
 
     /**
+     * TODO: this needs to be moved to the filter itself!!!
      * Set sort and search criteria for grouping by
      */
     protected function set_groupby_per_page() {
@@ -945,18 +948,12 @@ abstract class datalynxview_base {
         } else {
             $vals = $groupbyvalues;
         }
-        
-        // Set the filter search criteria
-        $search = array('', 'IN', $vals);
+
         $searchfields = array();
         if ($this->_filter->customsearch) {
             $searchfields = unserialize($this->_filter->customsearch);
         }
-        if (!isset($searchfields[$fieldid]['AND'])) {
-            $searchfields[$fieldid]['AND'] = array($search);
-        } else {
-            array_unshift($searchfields[$fieldid]['AND'], $search);
-        }
+
         $this->_filter->customsearch = serialize($searchfields);
     }
 

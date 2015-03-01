@@ -36,6 +36,10 @@ class datalynxfield_entryauthor extends datalynxfield_no_content {
     const _USERPICTURE = 'userpicture';
     const _USEREMAIL = 'useremail';
 
+    public function supports_group_by() {
+        return true;
+    }
+
     /**
      *
      */

@@ -347,7 +347,7 @@ abstract class datalynxfield_base {
 
             if ($options = $DB->get_records_sql($sql)) {
                 foreach ($options as $data) {
-                    $value = $data->content;
+                    $value = isset($data->content) ? $data->content : '';
                     if ($value === '') {
                         continue;
                     }
@@ -432,7 +432,7 @@ abstract class datalynxfield_base {
      * @return bool true if 'group by' is supported, false otherwise
      */
     public function supports_group_by() {
-        return true;
+        return false;
     }
 
     /**
@@ -986,7 +986,7 @@ class datalynxfield_option_single extends datalynxfield_option {
         $i++;
         $fieldid = $this->field->id;
 
-        $sql = '';
+        $sql = null;
         $params = [];
         $notinidsequal = false;
 

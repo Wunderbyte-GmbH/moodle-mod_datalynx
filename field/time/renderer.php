@@ -39,7 +39,7 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
             $content = $entry->{"c{$fieldid}_content"};
         }
 
-        $includetime = empty($options['date']) ? true : false;
+        $includetime = !empty($options['date']) || isset($field->param1);
 
         if ($field->masked) {
             $this->render_masked_selector($mform, $entry, $content, $includetime, $options);
