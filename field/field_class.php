@@ -895,7 +895,7 @@ class datalynxfield_option_multiple extends datalynxfield_option {
                     $xname = $name. $j++;
                     $likesel = str_replace('%', '\%', $key);
 
-                    $conditions[] = $DB->sql_like($content, ":{$xname}");
+                    $conditions[] = $DB->sql_like($content, ":{$xname}", true, true, false);
                     $params[$xname] = "%#$likesel#%";
                 }
             }
@@ -908,8 +908,7 @@ class datalynxfield_option_multiple extends datalynxfield_option {
                     $params[$xname] = "%#$likesel#%";
                 }
             }
-            $sql = " $not (" . implode(" AND ", $conditions) . ")";
-            $notinidsequal = true;
+            $sql = "$not (" . implode(" AND ", $conditions) . ")";
         } else if ($operator === '') {
             $empty = str_repeat('#', count($this->options_menu()) + 1);
             $sqlnot = $DB->sql_like("content", ":{$name}_empty");
@@ -926,7 +925,7 @@ class datalynxfield_option_multiple extends datalynxfield_option {
 
         if ($excludeentries && $operator !== '') {
             $sqlnot = str_replace($content, 'content', $sql);
-            $sqlnot = str_replace('NOT', '', $sqlnot);
+            $sqlnot = str_replace('NOT (', '(', $sqlnot);
             if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) {
                 // Get NOT IN sql
                 list($notinids, $paramsnot) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED, "df_{$fieldid}_x_", $notinidsequal);
@@ -1002,7 +1001,7 @@ class datalynxfield_option_single extends datalynxfield_option {
         $usecontent = true;
         if ($operator === 'ANY_OF') {
             list($insql, $params) = $DB->get_in_or_equal($value, SQL_PARAMS_NAMED, "param_{$i}_");
-            $sql = " $not $content $insql ";
+            $sql = " $not ($content $insql) ";
         } else if ($operator === '') {
             $sql = 'content LIKE "%"';
             if ($eids = $this->get_entry_ids_for_content($sql, $params)) {
@@ -1016,7 +1015,7 @@ class datalynxfield_option_single extends datalynxfield_option {
 
         if ($excludeentries && $operator !== '') {
             $sqlnot = str_replace($content, 'content', $sql);
-            $sqlnot = str_replace('NOT', '', $sqlnot);
+            $sqlnot = str_replace('NOT (', '(', $sqlnot);
             if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) {
                 // Get NOT IN sql
                 list($notinids, $paramsnot) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED, "df_{$fieldid}_x_", $notinidsequal);
