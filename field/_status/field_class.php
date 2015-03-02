@@ -78,12 +78,14 @@ class datalynxfield__status extends datalynxfield_no_content {
         return 'e.status';
     }
 
-    /**
-     *
-     */
     public function get_search_sql($search) {
+        static $i = 0;
+        $not = $search[0];
         $value = $search[2];
-        return array(" e.status = $value ", array(), false);
+        $name = "status_$i";
+        $i++;
+        $value = $value < 0 ? 0 : $value;
+        return array(" $not (e.status = :$name) ", array($name => $value), false);
     }
 
     /**

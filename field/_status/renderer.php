@@ -124,7 +124,9 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
         $fieldid = $this->_field->id();
         $fieldname = "f_{$i}_$fieldid";
 
-        $statusmenu = $this->menu_status(true);
+        $statusmenu = array(-1 => get_string('status_notcreated', 'datalynx'),
+                datalynxfield__status::STATUS_DRAFT => get_string('status_draft', 'datalynx'),
+                datalynxfield__status::STATUS_FINAL_SUBMISSION => get_string('status_finalsubmission', 'datalynx'));
 
         $select = &$mform->createElement('select', $fieldname, null, $statusmenu, '');
         $select->setValue($value);
