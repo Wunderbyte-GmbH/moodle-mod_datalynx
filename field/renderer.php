@@ -118,7 +118,7 @@ abstract class datalynxfield_renderer {
             $currentoptions['internal'] = $this->_field->is_internal();
 
             if (!$currentoptions['visible']) { // ====================================================== NOT VISIBLE ===
-                if ($renderer->get_not_visible_template() !== $renderer::NOT_VISIBLE_SHOW_NOTHING) {
+                if ($renderer->get_not_visible_template() === $renderer::NOT_VISIBLE_SHOW_NOTHING) {
                     $replacements[$tag] = array('html', '');
                 } else {
                     $replacements[$tag] = array('html', $renderer->get_not_visible_template());
