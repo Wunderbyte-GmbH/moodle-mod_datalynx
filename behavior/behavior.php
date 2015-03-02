@@ -151,8 +151,8 @@ class datalynx_field_behavior {
         $record->dataid = $formdata->d;
         $record->name = $formdata->name;
         $record->description = $formdata->description;
-        $record->visibleto = serialize($formdata->visibleto);
-        $record->editableby = serialize($formdata->editableby);
+        $record->visibleto = serialize(isset($formdata->visibleto) ? $formdata->visibleto : []);
+        $record->editableby = serialize(isset($formdata->editableby) ? $formdata->editableby : []);
         $record->required = $formdata->required;
 
         return $record;
