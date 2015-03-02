@@ -58,10 +58,10 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
      * @return bool
      */
     private function checkteam(\core\event\base $event) {
-        $teamname = $event->get_data()['other']['fieldid'];
+        $teamid = $event->get_data()['other']['fieldid'];
         $triggers = unserialize($this->rule->param1);
         foreach ($triggers as $trigger) {
-            if(strpos($trigger, $teamname) !== false) {
+            if(strpos($trigger, "$teamid") !== false) {
                 return true;
             }
         }
@@ -71,8 +71,10 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
     public function trigger(\core\event\base $event) {
         global $CFG, $SITE, $DB, $USER;
 
+        $messagedata = new stdClass();
         $eventname = (new \ReflectionClass($event))->getShortName();
         if (strpos($eventname, 'team') !== false) {
+            $messagedata->fieldname = $DB->get_field('datalynx_fields', 'name', array('id' => $event->get_data()['other']['fieldid']));
             if (!$this->checkteam($event)) {
                 return false;
             } else {
@@ -86,7 +88,6 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
         $datalynxname = $df->name() ? format_string($df->name(), true) : 'Unspecified datalynx';
         $coursename = $df->course->shortname ? format_string($df->course->shortname, true) : 'Unspecified datalynx';
 
-        $messagedata = new stdClass();
 
         $messagedata->siteurl = $CFG->wwwroot;
 
