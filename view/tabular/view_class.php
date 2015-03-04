@@ -109,7 +109,6 @@ class datalynxview_tabular extends datalynxview_base {
                 } else {
                     $entry[] = '[['. $field->field->name. ']]';
                 }
-                $entry[] = '[['. $field->field->name. ']]';
                 $align[] = 'left';
             }
         }
