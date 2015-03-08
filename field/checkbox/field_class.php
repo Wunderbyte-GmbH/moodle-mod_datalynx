@@ -96,7 +96,10 @@ class datalynxfield_checkbox extends datalynxfield_option_multiple {
         $value = reset($values);
         // new contents
         if (!empty($value)) {
-            $contents[] = '#' . implode('#', $value) . '#';
+            $content = '#' . implode('#', $value) . '#';
+            if (!preg_match('/^#+$/', $content)) {
+                $contents[] = $content;
+            }
         }
 
         return array($contents, $oldcontents);

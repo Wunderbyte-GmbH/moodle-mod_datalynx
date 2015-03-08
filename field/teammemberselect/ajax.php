@@ -86,7 +86,11 @@ if ($action == 'subscribe') {
         $users = array_values(array_diff($users, [$userid]));
         $users = array_diff($users, ["0"]);
         $users = array_values($users);
-        $DB->set_field('datalynx_contents', 'content', json_encode($users), array('fieldid' => $fieldid, 'entryid' => $entryid));
+        if (empty($users)) {
+            $DB->delete_records('datalynx_contents', array('fieldid' => $fieldid, 'entryid' => $entryid));
+        } else {
+            $DB->set_field('datalynx_contents', 'content', json_encode($users), array('fieldid' => $fieldid, 'entryid' => $entryid));
+        }
         $return = true;
 
         $other = ['dataid' => $d,

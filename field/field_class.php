@@ -868,8 +868,12 @@ class datalynxfield_option_multiple extends datalynxfield_option {
         // despite meeting the criterion
         $excludeentries = (($not and $operator !== '') or (!$not and $operator === ''));
 
-        $content = "c{$this->field->id}.content";
+        if ($operator === 'EXACTLY' && empty($value)) {
+            $operator = '';
+        }
 
+        $content = "c{$this->field->id}.content";
+        $usecontent = true;
         if ($operator === 'ANY_OF') {
             foreach ($value as $key => $sel) {
                 $xname = $name. $key;
@@ -889,6 +893,14 @@ class datalynxfield_option_multiple extends datalynxfield_option {
             }
             $sql = " $not (".implode(" AND ", $conditions).") ";
         } else if ($operator === 'EXACTLY') {
+            if ($not) {
+                $content = "content";
+                $usecontent = false;
+            } else {
+                $content = "c{$this->field->id}.content";
+                $usecontent = true;
+            }
+
             $j = 0;
             foreach (array_keys($this->options_menu()) as $key) {
                 if (in_array($key, $value)) {
@@ -908,22 +920,39 @@ class datalynxfield_option_multiple extends datalynxfield_option {
                     $params[$xname] = "%#$likesel#%";
                 }
             }
-            $sql = "$not (" . implode(" AND ", $conditions) . ")";
-        } else if ($operator === '') {
-            $empty = str_repeat('#', count($this->options_menu()) + 1);
-            $sqlnot = $DB->sql_like("content", ":{$name}_empty");
-            $params["{$name}_empty"] = "%$empty%";
-            if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) {
-                // Get NOT IN sql
-                list($notinids, $paramsnot) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED, "df_{$fieldid}_x_", !$not);
-                $params = array_merge($params, $paramsnot);
-                $sql = " (e.id $notinids) ";
+
+            if ($not) {
+                $sqlfind = " (" . implode(" AND ", $conditions) . ") ";
+
+                $sql = ' 1 ';
+                if ($eids = $this->get_entry_ids_for_content($sqlfind, $params)) { // there are non-empty contents
+                    list($contentids, $paramsnot) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED, "df_{$fieldid}_x_", false);
+                    $params = array_merge($params, $paramsnot);
+                    $sql = " (e.id $contentids) ";
+                }
             } else {
-                $sql = "1";
+                $sql = " (" . implode(" AND ", $conditions) . ") ";
+            }
+
+        } else if ($operator === '') { // EMPTY
+            $usecontent = false;
+            $sqlnot = $DB->sql_like("content", ":{$name}_hascontent");
+            $params["{$name}_hascontent"] = "%";
+
+            if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) { // there are non-empty contents
+                list($contentids, $paramsnot) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED, "df_{$fieldid}_x_", !!$not);
+                $params = array_merge($params, $paramsnot);
+                $sql = " (e.id $contentids) ";
+            } else { // there are no non-empty contents
+                if ($not) {
+                    $sql = " 0 ";
+                } else {
+                    $sql = " 1 ";
+                }
             }
         }
 
-        if ($excludeentries && $operator !== '') {
+        if ($excludeentries && $operator !== '' && $operator !== 'EXACTLY') {
             $sqlnot = str_replace($content, 'content', $sql);
             $sqlnot = str_replace('NOT (', '(', $sqlnot);
             if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) {
@@ -934,7 +963,7 @@ class datalynxfield_option_multiple extends datalynxfield_option {
             }
         }
 
-        return array($sql, $params, true);
+        return array($sql, $params, $usecontent);
     }
 
     public function get_supported_search_operators() {
@@ -987,6 +1016,7 @@ class datalynxfield_option_single extends datalynxfield_option {
 
         $sql = null;
         $params = [];
+        $name = "df_{$fieldid}_{$i}";
         $notinidsequal = false;
 
         // For all NOT criteria except NOT Empty, exclude entries
@@ -1003,13 +1033,20 @@ class datalynxfield_option_single extends datalynxfield_option {
             list($insql, $params) = $DB->get_in_or_equal($value, SQL_PARAMS_NAMED, "param_{$i}_");
             $sql = " $not ($content $insql) ";
         } else if ($operator === '') {
-            $sql = 'content LIKE "%"';
-            if ($eids = $this->get_entry_ids_for_content($sql, $params)) {
-                // Get NOT IN sql
-                list($notinids, $paramsnot) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED, "df_{$fieldid}_x_", !!$not);
+            $usecontent = false;
+            $sqlnot = $DB->sql_like("content", ":{$name}_hascontent");
+            $params["{$name}_hascontent"] = "%";
+
+            if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) { // there are non-empty contents
+                list($contentids, $paramsnot) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED, "df_{$fieldid}_x_", !!$not);
                 $params = array_merge($params, $paramsnot);
-                $sql = " (e.id $notinids) ";
-                $usecontent = false;
+                $sql = " (e.id $contentids) ";
+            } else { // there are no non-empty contents
+                if ($not) {
+                    $sql = " 0 ";
+                } else {
+                    $sql = " 1 ";
+                }
             }
         }
 

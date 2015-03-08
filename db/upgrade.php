@@ -596,6 +596,35 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2015011101, 'datalynx');
     }
 
+    if ($oldversion < 2015030801) {
+        $sql = "SELECT c.id, c.content
+                  FROM {datalynx_contents} c
+            INNER JOIN {datalynx_fields} f ON c.fieldid = f.id
+                 WHERE f.type = 'checkbox'";
+
+        $contents = $DB->get_records_sql_menu($sql);
+        foreach ($contents as $id => $content) {
+            if (preg_match('/^#+$/', $content)) {
+                $DB->delete_records('datalynx_contents', array('id' => $id));
+            }
+        }
+
+        $sql = "SELECT c.id, c.content
+                  FROM {datalynx_contents} c
+            INNER JOIN {datalynx_fields} f ON c.fieldid = f.id
+                 WHERE f.type = 'teammemberselect'";
+
+        $contents = $DB->get_records_sql_menu($sql);
+        foreach ($contents as $id => $content) {
+            if (preg_match('/^\[(?:\"0\",?)*\]$/', $content)) {
+                $DB->delete_records('datalynx_contents', array('id' => $id));
+            }
+        }
+
+        // datalynx savepoint reached
+        upgrade_mod_savepoint(true, 2015030801, 'datalynx');
+    }
+
     return true;
 }
 

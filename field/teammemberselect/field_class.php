@@ -181,9 +181,9 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
                 if ($eids = $this->get_entry_ids_for_content($like, $params)) {
                     list($notinids, $paramsnot) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED, "df_{$fieldid}_x_", false);
                     $params = array_merge($params, $paramsnot);
-                    $sql = "e.id $notinids";
+                    $sql = " (e.id $notinids)";
                 } else {
-                    $sql = "0";
+                    $sql = " 0 ";
                 }
 
                 $usecontent = false;
@@ -200,9 +200,9 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
                 if ($eids = $this->get_entry_ids_for_content($like, $params)) {
                     list($notinids, $paramsnot) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED, "df_{$fieldid}_x_", false);
                     $params = array_merge($params, $paramsnot);
-                    $sql = "e.id $notinids";
+                    $sql = " (e.id $notinids) ";
                 } else {
-                    $sql = "0";
+                    $sql = " 0 ";
                 }
 
                 $usecontent = false;
@@ -211,38 +211,26 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
                 $usecontent = true;
             }
         } else if ($operator === '') {
-            if (!!$not) {
-                $like1 = $DB->sql_like($content, ":{$name}1", true, true, !!$not);
-                $params[$name . "1"] = "[]";
-                $like2 = $DB->sql_like($content, ":{$name}2", true, true, !!$not);
-                $params[$name . "2"] = "[" . implode(',', array_fill(0, $this->teamsize, '"0"')) . "]";
+            $usecontent = false;
+            $sqlnot = $DB->sql_like("content", ":{$name}_hascontent");
+            $params["{$name}_hascontent"] = "%";
 
-                $sql = "$like1 AND $like2";
-                $usecontent = true;
-            } else {
-                $like1 = $DB->sql_like("content", ":{$name}1", true, true, true);
-                $params[$name . "1"] = "[]";
-                $like2 = $DB->sql_like("content", ":{$name}2", true, true, true);
-                $params[$name . "2"] = "[" . implode(',', array_fill(0, $this->teamsize, '"0"')) . "]";
-
-                if ($eids = $this->get_entry_ids_for_content("content LIKE '%' AND $like1 AND $like2", $params)) {
-                    list($notinids, $paramsnot) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED, "df_{$fieldid}_x_", false);
-                    $params = array_merge($params, $paramsnot);
-                    $sql = "e.id $notinids";
+            if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) { // there are non-empty contents
+                list($contentids, $paramsnot) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED, "df_{$fieldid}_x_", !!$not);
+                $params = array_merge($params, $paramsnot);
+                $sql = " (e.id $contentids) ";
+            } else { // there are no non-empty contents
+                if ($not) {
+                    $sql = " 0 ";
                 } else {
-                    $sql = "0";
+                    $sql = " 1 ";
                 }
-
-                $usecontent = false;
             }
         }
 
-        return array(" ($sql) ", $params, $usecontent);
+        return array($sql, $params, $usecontent);
     }
 
-    /**
-     *
-     */
     public function parse_search($formdata, $i) {
         global $USER;
         $fieldid = $this->field->id;
@@ -257,9 +245,6 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         }
     }
 
-    /**
-     *
-     */
     protected function format_content($entry, array $values = array()) {
         $fieldid = $this->field->id;
         $oldcontents = array();
@@ -274,9 +259,13 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         $first = reset($values);
         $selected = !empty($first) ? $first : array();
 
-        // new contents
         if (!empty($selected)) {
-            $contents[] = json_encode($selected);
+            foreach ($selected as $userid) {
+                if ($userid != "0") {
+                    $contents[] = json_encode($selected);
+                    break;
+                }
+            }
         }
 
         return array($contents, $oldcontents);
