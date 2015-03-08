@@ -50,28 +50,6 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
     }
 
     /**
-     *
-     */
-    protected function format_content($entry, array $values = null) {
-        $fieldid = $this->field->id;
-        $contents = array();
-        $oldcontents = array();
-
-        // old contents
-        if (isset($entry->{"c{$fieldid}_content"})) {
-            $oldcontents[] = $entry->{"c{$fieldid}_content"};
-        }
-
-        $value = reset($values);
-        // new contents
-        if (!empty($value)) {
-            $contents[] = '#' . implode('#', $value) . '#';
-        }
-
-        return array($contents, $oldcontents);
-    }
-
-    /**
      * 
      */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {

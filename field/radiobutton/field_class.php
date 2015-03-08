@@ -143,34 +143,4 @@ class datalynxfield_radiobutton extends datalynxfield_option_single {
             return array();
         }
     }
-
-
-    /**
-     *
-     */
-    protected function format_content($entry, array $values = null) {
-        $fieldid = $this->field->id;
-        // old contents
-        $oldcontents = array();
-        if (isset($entry->{"c{$fieldid}_content"})) {
-            $oldcontents[] = $entry->{"c{$fieldid}_content"};
-        }
-        // new contents
-        $contents = array();
-
-        $selected = null;
-        if (!empty($values)) {
-            foreach ($values as $value) {
-                $selected = $value;
-            }
-        }
-
-        // add the content
-        if (!is_null($selected)) {
-            $contents[] = $selected;
-        }
-
-        return array($contents, $oldcontents);
-    }
-
 }

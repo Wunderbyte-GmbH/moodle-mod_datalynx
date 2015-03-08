@@ -79,30 +79,4 @@ class datalynxfield_checkbox extends datalynxfield_option_multiple {
         }
         return $defaults;
     }
-    
-    /**
-     *
-     */
-    protected function format_content($entry, array $values = null) {
-        $fieldid = $this->field->id;
-        $contents = array();
-        $oldcontents = array();
-
-        // old contents
-        if (isset($entry->{"c{$fieldid}_content"})) {
-            $oldcontents[] = $entry->{"c{$fieldid}_content"};
-        }
-
-        $value = reset($values);
-        // new contents
-        if (!empty($value)) {
-            $content = '#' . implode('#', $value) . '#';
-            if (!preg_match('/^#+$/', $content)) {
-                $contents[] = $content;
-            }
-        }
-
-        return array($contents, $oldcontents);
-    }
-
 }

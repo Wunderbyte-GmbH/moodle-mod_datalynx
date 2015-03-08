@@ -845,6 +845,27 @@ class datalynxfield_option_multiple extends datalynxfield_option {
         return false;
     }
 
+    protected function format_content($entry, array $values = null) {
+        $fieldid = $this->field->id;
+        $contents = array();
+        $oldcontents = array();
+
+        // old contents
+        if (isset($entry->{"c{$fieldid}_content"})) {
+            $oldcontents[] = $entry->{"c{$fieldid}_content"};
+        }
+
+        $value = reset($values);
+        // new contents
+        if (!empty($value)) {
+            $content = '#' . implode('#', $value) . '#';
+            if (!preg_match('/^#+$/', $content)) {
+                $contents[] = $content;
+            }
+        }
+
+        return array($contents, $oldcontents);
+    }
 
     public function get_search_sql($search) {
         global $DB;
@@ -999,6 +1020,33 @@ class datalynxfield_option_single extends datalynxfield_option {
         $params['fieldid'] = $this->field->id;
 
         $DB->execute($updatesql, $params);
+    }
+
+    protected function format_content($entry, array $values = null) {
+        $fieldid = $this->field->id;
+        // old contents
+        $oldcontents = array();
+        if (isset($entry->{"c{$fieldid}_content"})) {
+            $oldcontents[] = $entry->{"c{$fieldid}_content"};
+        }
+        // new contents
+        $contents = array();
+
+        $selected = null;
+        if (!empty($values)) {
+            foreach ($values as $value) {
+                if ($value) {
+                    $selected = $value;
+                }
+            }
+        }
+
+        // add the content
+        if (!is_null($selected)) {
+            $contents[] = $selected;
+        }
+
+        return array($contents, $oldcontents);
     }
 
     public function supports_group_by() {
