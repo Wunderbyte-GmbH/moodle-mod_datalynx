@@ -40,25 +40,14 @@ class datalynxfield__rating extends datalynxfield_no_content {
     const _RATINGMIN = 'ratingmin';
     const _RATINGSUM = 'ratingsum';
 
-    /**
-     *
-     */
     public static function is_internal() {
         return true;
     }
-    
-    /**
-     * Overriding parent to indicate that this field provides join sql
-     *
-     * @return bool
-     */
+
     public function is_joined() {
         return true;
     }
-    
-    /**
-     *
-     */
+
     public static function get_field_objects($dataid) {
         $fieldobjects = array();
         
@@ -77,25 +66,16 @@ class datalynxfield__rating extends datalynxfield_no_content {
         return $fieldobjects;
     }
 
-    /**
-     *
-     */
     public function get_select_sql() {
         return ' er.itemid, er.component, er.ratingarea, er.contextid,
                 er.numratings, er.avgratings, er.sumratings, er.maxratings, er.minratings, 
                 er.ratingid, er.ratinguserid, er.scaleid, er.usersrating ';
     }
 
-    /**
-     *
-     */
     protected function get_sql_compare_text($column = 'content') {
         return $this->get_sort_sql();
     }
 
-    /**
-     *
-     */
     public function get_sort_sql() {
         $internalname = $this->field->internalname;
         if ($internalname == 'ratings') {
@@ -107,9 +87,6 @@ class datalynxfield__rating extends datalynxfield_no_content {
         }
     }
 
-    /**
-     *
-     */
     public function get_join_sql() {
         global $USER;
 
@@ -140,131 +117,4 @@ class datalynxfield__rating extends datalynxfield_no_content {
                     ORDER BY r.itemid) AS er ON er.itemid = e.id ";
         return array($sql, $params);
     }
-
-    /**
-     *
-    public function permissions($params) {
-    }
-     */
-
-    /**
-     * 
-     */
-    public function get_scaleid($area) {
-        if ($area == 'entry' and $this->df->data->rating) {
-            return $this->df->data->rating;
-        } else if ($area == 'activity' and $this->df->data->grade) {
-            return $this->df->data->grade;
-        }
-        return 0;
-    }
-
-    /**
-     *
-     */
-    public function validation($params) {
-        global $DB, $USER;
-        
-        // Check the component is mod_datalynx
-        if ($params['component'] != 'mod_datalynx') {
-            throw new rating_exception('invalidcomponent');
-        }
-
-        // you can't rate your own entries unless you can manage ratings
-        if (!has_capability('mod/datalynx:manageratings', $params['context']) and $params['rateduserid'] == $USER->id) {
-            throw new rating_exception('nopermissiontorate');
-        }
-
-        // if the supplied context doesnt match the item's context
-        if ($params['context']->id != $this->df->context->id) {
-            throw new rating_exception('invalidcontext');
-        }
-
-        // Check the ratingarea is entry or activity
-        if ($params['ratingarea'] != 'entry' and $params['ratingarea'] != 'activity') {
-            throw new rating_exception('invalidratingarea');
-        }
-
-        $data = $this->df->data;
-        
-        // vaildate activity scale and rating range
-        if ($params['ratingarea'] == 'activity') {
-            if ($params['scaleid'] != $data->grade) {
-                throw new rating_exception('invalidscaleid');
-            }
-            
-            // upper limit
-            if ($data->grade < 0) {
-                //its a custom scale
-                $scalerecord = $DB->get_record('scale', array('id' => -$data->grade));
-                if ($scalerecord) {
-                    $scalearray = explode(',', $scalerecord->scale);
-                    if ($params['rating'] > count($scalearray)) {
-                        throw new rating_exception('invalidnum');
-                    }
-                } else {
-                    throw new rating_exception('invalidscaleid');
-                }
-            } else if ($params['rating'] > $data->grade) {
-                //if its numeric and submitted rating is above maximum
-                throw new rating_exception('invalidnum');
-            }
-            
-        }
-
-        // vaildate entry scale and rating range
-        if ($params['ratingarea'] == 'entry') {
-            if ($params['scaleid'] != $data->rating) {
-                throw new rating_exception('invalidscaleid');
-            }
-            
-            // upper limit
-            if ($data->rating < 0) {
-                //its a custom scale
-                $scalerecord = $DB->get_record('scale', array('id' => -$data->rating));
-                if ($scalerecord) {
-                    $scalearray = explode(',', $scalerecord->scale);
-                    if ($params['rating'] > count($scalearray)) {
-                        throw new rating_exception('invalidnum');
-                    }
-                } else {
-                    throw new rating_exception('invalidscaleid');
-                }
-            } else if ($params['rating'] > $data->rating) {
-                //if its numeric and submitted rating is above maximum
-                throw new rating_exception('invalidnum');
-            }
-            
-        }
-
-        // lower limit
-        if ($params['rating'] < 0  and $params['rating'] != RATING_UNSET_RATING) {
-            throw new rating_exception('invalidnum');
-        }
-
-        // check the item we're rating was created in the assessable time window
-        //if (!empty($info->assesstimestart) && !empty($info->assesstimefinish)) {
-        //    if ($info->timecreated < $info->assesstimestart || $info->timecreated > $info->assesstimefinish) {
-        //        throw new rating_exception('notavailable');
-        //    }
-        //}
-
-        // Make sure groups allow this user to see the item they're rating
-        $groupid = $this->df->currentgroup;
-        if ($groupid > 0 and $groupmode = groups_get_activity_groupmode($this->df->cm, $this->df->course)) {  
-            // Groups are being used
-            if (!groups_group_exists($groupid)) {
-                // Can't find group
-                throw new rating_exception('cannotfindgroup');//something is wrong
-            }
-
-            if (!groups_is_member($groupid) and !has_capability('moodle/site:accessallgroups', $this->df->context)) {
-                // do not allow rating of posts from other groups when in SEPARATEGROUPS or VISIBLEGROUPS
-                throw new rating_exception('notmemberofgroup');
-            }
-        }
-
-        return true;
-    }
-
 }

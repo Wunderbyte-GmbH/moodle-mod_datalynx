@@ -97,14 +97,6 @@ class mod_datalynx_mod_form extends moodleform_mod {
             $mform->addElement('select', 'rssarticles', get_string('numberrssarticles', 'datalynx') , $countoptions);
         }
 
-        // grading
-        //-------------------------------------------------------------------------------
-        $mform->addElement('header', 'gradinghdr', get_string('rating', 'rating'));
-        
-        // entry rating
-        $mform->addElement('modgrade', 'rating', get_string('rating', 'datalynx'));
-        $mform->setDefault('rating', 0);
-        
         // entry settings
         //-------------------------------------------------------------------------------
         $mform->addElement('header', 'entrysettingshdr', get_string('entrysettings', 'datalynx'));
@@ -171,6 +163,7 @@ class mod_datalynx_mod_form extends moodleform_mod {
         
         // common course elements
         //-------------------------------------------------------------------------------
+        $this->standard_grading_coursemodule_elements();
         $this->standard_coursemodule_elements();
 
         // add separate participants group option

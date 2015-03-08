@@ -30,7 +30,7 @@ require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 class datalynxfield__rating_renderer extends datalynxfield_renderer {
 
     /**
-     * 
+     *
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
         global $CFG, $DB;
@@ -40,7 +40,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
         $edit = !empty($options['edit']) ? $options['edit'] : false;
 
         // no edit mode
-        if ($edit or !$this->_field->df()->data->rating) {
+        if ($edit or (!$this->_field->df()->data->rating)) {
             if ($tags) {
                 $replacements = array();
                 foreach ($tags as $tag) {

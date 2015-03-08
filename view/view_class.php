@@ -975,10 +975,19 @@ abstract class datalynxview_base {
         $ratingoptions->component = 'mod_datalynx';
         $ratingoptions->ratingarea = 'entry';
         $ratingoptions->aggregate = $ratingfield->renderer()->get_aggregations($this->_tags['field'][datalynxfield__rating::_RATING]);
-        $ratingoptions->scaleid = $ratingfield->get_scaleid('entry');
+        $ratingoptions->scaleid = $this->get_scaleid('entry');
         $ratingoptions->userid = $USER->id;
 
         return $ratingoptions;
+    }
+
+    public function get_scaleid($area) {
+        if ($area == 'entry' and $this->_df->data->rating) {
+            return $this->_df->data->rating;
+        } else if ($area == 'activity' and $this->_df->data->grade) {
+            return $this->_df->data->grade;
+        }
+        return 0;
     }
         
     /**

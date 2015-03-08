@@ -33,6 +33,29 @@
 defined('MOODLE_INTERNAL') or die;
 
 /**
+ * Indicates API features that the datalynx supports.
+ * @param string $feature
+ * @return mixed true if yes (some features may use other values)
+ */
+function datalynx_supports($feature) {
+    switch($feature) {
+        case FEATURE_GROUPS:                  return true;
+        case FEATURE_GROUPINGS:               return true;
+        case FEATURE_GROUPMEMBERSONLY:        return true;
+        case FEATURE_MOD_INTRO:               return true;
+        case FEATURE_COMPLETION_TRACKS_VIEWS: return true;
+        case FEATURE_COMPLETION_HAS_RULES:    return true;
+        case FEATURE_GRADE_HAS_GRADE:         return true;
+        case FEATURE_GRADE_OUTCOMES:          return true;
+        case FEATURE_RATE:                    return true;
+        case FEATURE_BACKUP_MOODLE2:          return true;
+        case FEATURE_SHOW_DESCRIPTION:        return true;
+
+        default: return null;
+    }
+}
+
+/**
  * Adds an instance of a datalynx
  *
  * @global object
@@ -47,6 +70,12 @@ function datalynx_add_instance($data) {
     if (empty($data->grade)) {
         $data->grade = 0;
         $data->grademethod = 0;
+    }
+
+    if (!empty($data->scale)) {
+        $data->rating = $data->scale;
+    } else {
+        $data->rating = 0;
     }
 
     if ($CFG->datalynx_maxentries) {
@@ -78,6 +107,18 @@ function datalynx_update_instance($data) {
     if (empty($data->grade)) {
         $data->grade = 0;
         $data->grademethod = 0;
+    }
+
+    if (!empty($data->assessed)) {
+        $data->grademethod = $data->assessed;
+    } else {
+        $data->rating = 0;
+    }
+
+    if (!empty($data->scale)) {
+        $data->rating = $data->scale;
+    } else {
+        $data->rating = 0;
     }
 
     if (!$DB->update_record('datalynx', $data)) {
@@ -351,28 +392,6 @@ function datalynx_get_extra_capabilities() {
                 'moodle/comment:view',
                 'moodle/comment:post',
                 'moodle/comment:delete');
-}
-
-/**
- * @param string $feature FEATURE_xx constant for requested feature
- * @return mixed True if module supports feature, null if doesn't know
- */
-function datalynx_supports($feature) {
-    switch($feature) {
-        case FEATURE_GROUPS:                  return true;
-        case FEATURE_GROUPINGS:               return true;
-        case FEATURE_GROUPMEMBERSONLY:        return true;
-        case FEATURE_MOD_INTRO:               return true;
-        case FEATURE_SHOW_DESCRIPTION:        return true;
-        case FEATURE_COMPLETION_TRACKS_VIEWS: return true;
-        case FEATURE_COMPLETION_HAS_RULES:    return true;
-        //case FEATURE_GRADE_HAS_GRADE:         return true;
-        //case FEATURE_ADVANCED_GRADING:        return true;
-        //case FEATURE_GRADE_OUTCOMES:          return true;
-        case FEATURE_BACKUP_MOODLE2:          return true;
-
-        default: return null;
-    }
 }
 
 /**
@@ -894,66 +913,148 @@ function datalynx_rating_permissions($contextid, $component, $ratingarea) {
     $context = context::instance_by_id($contextid, MUST_EXIST);
     if ($component == 'mod_datalynx' and ($ratingarea == 'entry' or $ratingarea == 'activity')) {
         return array(
-            'view'    => has_capability('mod/datalynx:ratingsview',$context),
-            'viewany' => has_capability('mod/datalynx:ratingsviewany',$context),
-            'viewall' => has_capability('mod/datalynx:ratingsviewall',$context),
-            'rate'    => has_capability('mod/datalynx:rate',$context)
+            'view'    => has_capability('mod/datalynx:ratingsview', $context),
+            'viewany' => has_capability('mod/datalynx:ratingsviewany', $context),
+            'viewall' => has_capability('mod/datalynx:ratingsviewall', $context),
+            'rate'    => has_capability('mod/datalynx:rate', $context)
         );
     }
     return null;
 }
 
 /**
- * Validates a submitted rating
- * @param array $params submitted data
- *            context => object the context in which the rated items exists [required]
- *            ratingarea => string 'entry' or 'activity' [required]
- *            itemid => int the ID of the object being rated
- *            scaleid => int the scale from which the user can select a rating. Used for bounds checking. [required]
- *            rating => int the submitted rating
- *            rateduserid => int the id of the user whose items have been rated. NOT the user who submitted the ratings. 0 to update all. [required]
- *            aggregation => int the aggregation method to apply when calculating grades ie RATING_AGGREGATE_AVERAGE [required]
- * @return boolean true if the rating is valid. Will throw rating_exception if not
+ * @param $params
+ * @return bool
+ * @throws coding_exception
+ * @throws rating_exception
  */
 function datalynx_rating_validate($params) {
-    require_once("mod_class.php");
-    require_once("field/_rating/field_class.php");
+    global $DB, $USER;
+
+    require_once(dirname(__FILE__) . "/mod_class.php");
+
     $df = new datalynx(null, $params['context']->instanceid);
-    $rating = $df->get_field_from_id(datalynxfield__rating::_RATING);
-    return $rating->validation($params);
+
+    // Check the component is mod_datalynx
+    if ($params['component'] != 'mod_datalynx') {
+        throw new rating_exception('invalidcomponent');
+    }
+
+    // you can't rate your own entries unless you can manage ratings
+    if (!has_capability('mod/datalynx:manageratings', $params['context']) and $params['rateduserid'] == $USER->id) {
+        throw new rating_exception('nopermissiontorate');
+    }
+
+    // if the supplied context doesnt match the item's context
+    if ($params['context']->id != $df->context->id) {
+        throw new rating_exception('invalidcontext');
+    }
+
+    // Check the ratingarea is entry or activity
+    if ($params['ratingarea'] != 'entry' and $params['ratingarea'] != 'activity') {
+        throw new rating_exception('invalidratingarea');
+    }
+
+    $data = $df->data;
+
+    // vaildate activity scale and rating range
+    if ($params['ratingarea'] == 'activity') {
+        if ($params['scaleid'] != $data->grade) {
+            throw new rating_exception('invalidscaleid');
+        }
+
+        // upper limit
+        if ($data->grade < 0) {
+            //its a custom scale
+            $scalerecord = $DB->get_record('scale', array('id' => -$data->grade));
+            if ($scalerecord) {
+                $scalearray = explode(',', $scalerecord->scale);
+                if ($params['rating'] > count($scalearray)) {
+                    throw new rating_exception('invalidnum');
+                }
+            } else {
+                throw new rating_exception('invalidscaleid');
+            }
+        } else if ($params['rating'] > $data->grade) {
+            //if its numeric and submitted rating is above maximum
+            throw new rating_exception('invalidnum');
+        }
+
+    }
+
+    // vaildate entry scale and rating range
+    if ($params['ratingarea'] == 'entry') {
+        if ($params['scaleid'] != $data->rating) {
+            throw new rating_exception('invalidscaleid');
+        }
+
+        // upper limit
+        if ($data->rating < 0) {
+            //its a custom scale
+            $scalerecord = $DB->get_record('scale', array('id' => -$data->rating));
+            if ($scalerecord) {
+                $scalearray = explode(',', $scalerecord->scale);
+                if ($params['rating'] > count($scalearray)) {
+                    throw new rating_exception('invalidnum');
+                }
+            } else {
+                throw new rating_exception('invalidscaleid');
+            }
+        } else if ($params['rating'] > $data->rating) {
+            //if its numeric and submitted rating is above maximum
+            throw new rating_exception('invalidnum');
+        }
+
+    }
+
+    // lower limit
+    if ($params['rating'] < 0  and $params['rating'] != RATING_UNSET_RATING) {
+        throw new rating_exception('invalidnum');
+    }
+
+    // Make sure groups allow this user to see the item they're rating
+    $groupid = $df->currentgroup;
+    if ($groupid > 0 and $groupmode = groups_get_activity_groupmode($df->cm, $df->course)) {
+        // Groups are being used
+        if (!groups_group_exists($groupid)) {
+            // Can't find group
+            throw new rating_exception('cannotfindgroup');//something is wrong
+        }
+
+        if (!groups_is_member($groupid) and !has_capability('moodle/site:accessallgroups', $df->context)) {
+            // do not allow rating of posts from other groups when in SEPARATEGROUPS or VISIBLEGROUPS
+            throw new rating_exception('notmemberofgroup');
+        }
+    }
+
+    return true;
 }
 
 /**
  * Return grade for given user or all users.
+ * @param $data
+ * @param int $userid
  * @return array array of grades, false if none
+ * @throws coding_exception
  */
 function datalynx_get_user_grades($data, $userid = 0) {
     global $CFG;
 
     require_once("$CFG->dirroot/rating/lib.php");
 
-    $options = new object();
+    $options = new stdClass();
     $options->component = 'mod_datalynx';
-    if ($data->grade and !$data->grademethod) {
-        $options->ratingarea = 'activity';
-        $options->aggregationmethod = RATING_AGGREGATE_MAXIMUM;
+    $options->ratingarea = 'entry';
 
-        $options->itemtable = 'user';
-        $options->itemtableusercolumn = 'id';
-
-    } else {
-        $options->ratingarea = 'entry';
-        $options->aggregationmethod = $data->grademethod;
-
-        $options->itemtable = 'datalynx_entries';
-        $options->itemtableusercolumn = 'userid';
-
-    }
+    //this is ripped off directly from the datalynx activity
     $options->modulename = 'datalynx';
     $options->moduleid   = $data->id;
     $options->userid = $userid;
-    $options->scaleid = $data->grade;
-    
+    $options->aggregationmethod = $data->grademethod;
+    $options->scaleid = $data->rating;
+    $options->itemtable = 'datalynx_entries';
+    $options->itemtableusercolumn = 'userid';
+
     $rm = new rating_manager();
     return $rm->get_user_grades($options);
 }
@@ -963,29 +1064,25 @@ function datalynx_get_user_grades($data, $userid = 0) {
  * @param object $data null means all databases
  * @param int $userid specific user only, 0 mean all
  * @param bool $nullifnone
- * @param array $grades
  */
-function datalynx_update_grades($data=null, $userid=0, $nullifnone=true, $grades=null) {
+function datalynx_update_grades($data = null, $userid = 0, $nullifnone = true) {
     global $CFG, $DB;
     require_once("$CFG->libdir/gradelib.php");
 
-    if ($data != null) {
-        if ($data->grade) {
-            if ($grades or $grades = datalynx_get_user_grades($data, $userid)) {
-                datalynx_grade_item_update($data, $grades);
+    if (!$data->rating) {
+        datalynx_grade_item_update($data);
 
-            } else if ($userid and $nullifnone) {
-                $grade = new object();
-                $grade->userid   = $userid;
-                $grade->rawgrade = NULL;
-                datalynx_grade_item_update($data, $grade);
+    } else if ($grades = datalynx_get_user_grades($data, $userid)) {
+        datalynx_grade_item_update($data, $grades);
 
-            } else {
-                datalynx_grade_item_update($data);
-            }
-        } else {
-            datalynx_grade_item_delete($data);
-        }
+    } else if ($userid and $nullifnone) {
+        $grade = new stdClass();
+        $grade->userid   = $userid;
+        $grade->rawgrade = NULL;
+        datalynx_grade_item_update($data, $grade);
+
+    } else {
+        datalynx_grade_item_update($data);
     }
 }
 
@@ -1007,7 +1104,6 @@ function datalynx_upgrade_grades() {
              WHERE m.name='datalynx' AND m.id=cm.module AND cm.instance=d.id";
     $rs = $DB->get_recordset_sql($sql);
     if ($rs->valid()) {
-        // too much debug output
         $pbar = new progress_bar('dataupgradegrades', 500, true);
         $i=0;
         foreach ($rs as $data) {
@@ -1026,31 +1122,30 @@ function datalynx_upgrade_grades() {
  * @param mixed optional array/object of grade(s); 'reset' means reset grades in gradebook
  * @return object grade_item
  */
-function datalynx_grade_item_update($data, $grades=NULL) {
+function datalynx_grade_item_update($data, $grades = null) {
     global $CFG;
-    require_once("$CFG->libdir/gradelib.php");
+    if (!function_exists('grade_update')) { //workaround for buggy PHP versions
+        require_once($CFG->libdir.'/gradelib.php');
+    }
 
-    $params = array(
-        'itemname'=>$data->name,
-        'idnumber'=>$data->cmidnumber
-    );
+    $params = array('itemname' => $data->name, 'idnumber' => $data->cmidnumber);
 
-    if (!$data->grade) {
+    if (!$data->rating) {
         $params['gradetype'] = GRADE_TYPE_NONE;
 
-    } else if ($data->grade > 0) {
+    } else if ($data->rating > 0) {
         $params['gradetype'] = GRADE_TYPE_VALUE;
-        $params['grademax']  = $data->grade;
+        $params['grademax']  = $data->rating;
         $params['grademin']  = 0;
 
-    } else if ($data->grade < 0) {
+    } else if ($data->rating < 0) {
         $params['gradetype'] = GRADE_TYPE_SCALE;
         $params['scaleid']   = -$data->grade;
     }
 
     if ($grades  === 'reset') {
         $params['reset'] = true;
-        $grades = NULL;
+        $grades = null;
     }
 
     return grade_update('mod/datalynx', $data->course, 'mod', 'datalynx', $data->id, 0, $grades, $params);
@@ -1069,16 +1164,14 @@ function datalynx_grade_item_delete($data) {
 }
 
 /**
- * Obtains the automatic completion state for this datalynx based on conditions datalynx settings.
- *
- * @global object
- * @global object
- * @param object $course Course
- * @param object $cm Course-module
- * @param int $userid User ID
- * @param bool $type Type of comparison (or/and; can be used as return value if no conditions)
- * @return bool True if completed, false if not. (If no conditions, then return
- *   value depends on comparison type)
+ * Obtains the automatic completion state for this forum based on any conditions
+ * in datalynx settings.
+ * @param $course
+ * @param $cm
+ * @param $userid
+ * @param $type
+ * @return bool
+ * @throws Exception
  */
 function datalynx_get_completion_state($course, $cm, $userid, $type) {
     global $CFG, $DB;
@@ -1102,3 +1195,37 @@ function datalynx_get_completion_state($course, $cm, $userid, $type) {
     return $count >= $datalynx->completionentries;
 }
 
+/**
+ * This function returns if a scale is being used by one datalyxx
+ *
+ * @global object
+ * @param int $dataid
+ * @param int $scaleid negative number
+ * @return bool
+ */
+function datalynx_scale_used($dataid, $scaleid) {
+    global $DB;
+    $return = false;
+
+    $rec = $DB->get_record('datalynx', array('id' => "$dataid", 'rating' => "-$scaleid"));
+
+    if (!empty($rec) && !empty($scaleid)) {
+        $return = true;
+    }
+
+    return $return;
+}
+
+/**
+ * Checks if scale is being used by any instance of datalyxx
+ *
+ * This is used to find out if scale used anywhere
+ *
+ * @global object
+ * @param $scaleid int
+ * @return boolean True if the scale is used by any datalynx
+ */
+function datalynx_scale_used_anywhere($scaleid) {
+    global $DB;
+    return ($scaleid and $DB->record_exists('datalynx', array('rating' => "-$scaleid")));
+}
