@@ -40,6 +40,8 @@ class datalynx_field_behavior_form extends moodleform {
     protected function definition() {
         $mform = &$this->_form;
 
+        $new = !required_param('id', PARAM_INT);
+
         $mform->addElement('hidden', 'id', 0);
         $mform->setType('id', PARAM_INT);
         $mform->addElement('hidden', 'd', $this->datalynx->id());
@@ -62,7 +64,9 @@ class datalynx_field_behavior_form extends moodleform {
 
         $mform->addElement('checkboxgroup', 'visibleto', get_string('roles'), $this->datalynx->get_datalynx_permission_names(false, false), $this->get_permissions_menu_separators());
         $mform->setType('visibleto', PARAM_RAW);
-        $mform->setDefault('visibleto', array(datalynx::PERMISSION_MANAGER, datalynx::PERMISSION_TEACHER, datalynx::PERMISSION_STUDENT));
+        if ($new) {
+            $mform->setDefault('visibleto', array(datalynx::PERMISSION_MANAGER, datalynx::PERMISSION_TEACHER, datalynx::PERMISSION_STUDENT));
+        }
 
         //----- EDITING OPTIONS -----
 
@@ -70,39 +74,57 @@ class datalynx_field_behavior_form extends moodleform {
         $mform->setExpanded('editing');
 
         $mform->addElement('advcheckbox', 'editable', get_string('editable', 'datalynx'));
-        $mform->setDefault('editable', true);
+        if ($new) {
+            $mform->setDefault('editable', true);
+        }
 
         $mform->addElement('checkboxgroup', 'editableby', get_string('editableby', 'datalynx'), $this->datalynx->get_datalynx_permission_names(false, false), $this->get_permissions_menu_separators());
         $mform->setType('editableby', PARAM_RAW);
+        if ($new) {
+            $mform->setDefault('editableby', array(datalynx::PERMISSION_MANAGER, datalynx::PERMISSION_TEACHER, datalynx::PERMISSION_STUDENT));
+        }
         $mform->disabledIf('editableby', 'editable', 'notchecked');
 
         $mform->addElement('advcheckbox', 'required', get_string('required', 'datalynx'));
+        if ($new) {
+            $mform->setDefault('required', false);
+        }
         $mform->disabledIf('required', 'editable', 'notchecked');
 
         $this->add_action_buttons();
     }
 
-    public function definition_after_data() {
-        $mform = $this->_form;
-        $values = $this->_form->_defaultValues;
-        if (isset($values['editable']) && $values['editable']) {
-            $mform->setDefault('editableby', array(datalynx::PERMISSION_MANAGER, datalynx::PERMISSION_TEACHER, datalynx::PERMISSION_STUDENT));
-        }
-    }
-
     public function get_data() {
         $data = parent::get_data();
-        if ($data && !isset($data->editableby)) {
-            $data->editableby = array();
+        if ($data) {
+            if (!isset($data->visibleto)) {
+                $data->visibleto = [];
+            }
+            if (!isset($data->editableby)) {
+                $data->editableby = [];
+                $data->editable = false;
+            }
+            if (!isset($data->required)) {
+                $data->required = false;
+            }
         }
         return $data;
     }
 
     public function set_data($data) {
-        if (!isset($data->editableby) || empty($data->editableby)) {
+        if (!isset($data->visibleto)) {
+            $data->visibleto = [];
+        }
+        if (!isset($data->editableby)) {
+            $data->editableby = [];
+        }
+        if (empty($data->editableby)) {
             $data->editable = false;
         } else {
             $data->editable = true;
+        }
+        if (!isset($data->required)) {
+            $data->required = false;
         }
         parent::set_data($data);
     }
