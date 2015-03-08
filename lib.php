@@ -72,6 +72,12 @@ function datalynx_add_instance($data) {
         $data->grademethod = 0;
     }
 
+    if (!empty($data->assessed)) {
+        $data->grademethod = $data->assessed;
+    } else {
+        $data->rating = 0;
+    }
+
     if (!empty($data->scale)) {
         $data->rating = $data->scale;
     } else {

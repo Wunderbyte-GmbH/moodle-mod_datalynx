@@ -87,7 +87,9 @@ class datalynxfield_time extends datalynxfield_base {
                 }
             }
         }
-        $contents[] = $timestamp;
+        if ($timestamp) {
+            $contents[] = $timestamp;
+        }
         return array($contents, $oldcontents);        
     }
 
