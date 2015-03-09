@@ -42,6 +42,7 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
         }
 
         $mform->addElement('duration', $fieldname, '', array('optional' => null), $fieldattr);
+        $mform->setType($fieldname, PARAM_ALPHANUMEXT);
 
         if ($entryid > 0 and !empty($entry->{"c{$fieldid}_content"})) {
             $number = $entry->{"c{$fieldid}_content"};
@@ -64,7 +65,7 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
         }
         
         $format = !empty($params['format']) ? $params['format'] : '';
-        if ($duration) {
+        if ($duration !== '') {
             list($value, $unit) = $field->seconds_to_unit($duration);
             $units = $field->get_units();
             switch ($format) {

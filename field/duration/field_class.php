@@ -68,8 +68,8 @@ class datalynxfield_duration extends datalynxfield_base {
      * @return array associative array ($number => $unit)
      */
     public function seconds_to_unit($seconds) {
-        if ($seconds == 0) {
-            return array(0, $this->_options['defaultunit']);
+        if ($seconds === 0) {
+            return array(0, 1);
         }
         foreach ($this->get_units() as $unit => $notused) {
             if (fmod($seconds, $unit) == 0) {
@@ -98,18 +98,45 @@ class datalynxfield_duration extends datalynxfield_base {
         return array();
     }
 
+    protected function format_content($entry, array $values = null) {
+        $fieldid = $this->field->id;
+        $contents = array();
+        $oldcontents = array();
+
+        // old contents
+        if (isset($entry->{"c{$fieldid}_content"})) {
+            $oldcontents[] = $entry->{"c{$fieldid}_content"};
+        }
+
+        $value = reset($values);
+        $rawvalue = optional_param_array("field_{$fieldid}_{$entry->id}", ['number' => ''], PARAM_RAW);
+        if ($rawvalue['number'] !== '') {
+            $contents[] = $value;
+        }
+
+        return array($contents, $oldcontents);
+    }
+
     /**
      *
      */
     public function parse_search($formdata, $i) {
         $values = array();
 
-        if (!empty($formdata->{'f_'. $i. '_'. $this->field->id. '_from'})) {
-            $values[0] = $formdata->{'f_'. $i. '_'. $this->field->id. '_from'};
+        $fromfield = optional_param_array('f_'. $i. '_'. $this->field->id. '_from', ['number' => ''], PARAM_RAW);
+        $tofield = optional_param_array('f_'. $i. '_'. $this->field->id. '_to', ['number' => ''], PARAM_RAW);
+
+        $fromfield = isset($formdata->{'f_'. $i. '_'. $this->field->id. '_from'}) ?
+                        $formdata->{'f_'. $i. '_'. $this->field->id. '_from'} : $fromfield['number'];
+        $tofield = isset($formdata->{'f_'. $i. '_'. $this->field->id. '_to'}) ?
+                        $formdata->{'f_'. $i. '_'. $this->field->id. '_to'} : $tofield['number'];
+
+        if (!empty($fromfield) || "$fromfield" === "0") {
+            $values[0] = $fromfield;
         }
 
-        if (!empty($formdata->{'f_'. $i. '_'. $this->field->id. '_to'})) {
-            $values[1] = $formdata->{'f_'. $i. '_'. $this->field->id. '_to'};
+        if (!empty($tofield) || "$tofield" === "0") {
+            $values[1] = $tofield;
         }
 
         if (!empty($values)) {

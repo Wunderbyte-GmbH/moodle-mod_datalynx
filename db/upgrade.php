@@ -654,6 +654,23 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2015030901, 'datalynx');
     }
 
+    if ($oldversion < 2015030902) {
+        $sql = "SELECT c.id, c.content
+                  FROM {datalynx_contents} c
+            INNER JOIN {datalynx_fields} f ON c.fieldid = f.id
+                 WHERE f.type = 'duration'";
+
+        $contents = $DB->get_records_sql_menu($sql);
+        foreach ($contents as $id => $content) {
+            if (!$content && "$content" !== "0") {
+                $DB->delete_records('datalynx_contents', array('id' => $id));
+            }
+        }
+
+        // datalynx savepoint reached
+        upgrade_mod_savepoint(true, 2015030902, 'datalynx');
+    }
+
     return true;
 }
 
