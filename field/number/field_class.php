@@ -57,13 +57,13 @@ class datalynxfield_number extends datalynxfield_text {
             case '<=':
                 $paramname = "{$name}_$i";
                 $params[$paramname] = trim($value[0]);
-                $sql = "$not $varcharcontent $operator :$paramname ";
+                $sql = " $varcharcontent $operator :$paramname ";
                 break;
             case 'BETWEEN':
                 $paramname = "{$name}_$i";
                 $params["{$paramname}_l"] = floatval(trim($value[0]));
                 $params["{$paramname}_u"] = floatval(trim($value[1]));
-                $sql = "$not ($varcharcontent > :{$paramname}_l AND $varcharcontent < :{$paramname}_u) ";
+                $sql = " ($varcharcontent > :{$paramname}_l AND $varcharcontent < :{$paramname}_u) ";
                 break;
             default:
                 $sql = " 1 ";
@@ -82,6 +82,52 @@ class datalynxfield_number extends datalynxfield_text {
             }
         } else {
             return array($sql, $params, true);
+        }
+    }
+
+    protected function format_content($entry, array $values = null) {
+        $fieldid = $this->field->id;
+        $contents = array();
+        $oldcontents = array();
+
+        // old contents
+        if (isset($entry->{"c{$fieldid}_content"})) {
+            $oldcontents[] = $entry->{"c{$fieldid}_content"};
+        }
+
+        $value = reset($values);
+        if (!empty($value) || "$value" === "0") {
+            $contents[] = $value;
+        }
+
+        return array($contents, $oldcontents);
+    }
+
+    public function parse_search($formdata, $i) {
+        $values = array();
+
+        $name = 'f_' . $i . '_'. $this->field->id;
+
+        $data = isset($formdata->$name) ? $formdata->$name : optional_param_array($name, [], PARAM_RAW);
+        if (empty($data)) {
+            return false;
+        }
+
+
+        $field0 = isset($data[0]) ? $data[0] : '';
+        if (!empty($field0) || "$field0" === "0") {
+            $values[0] = $field0;
+        }
+
+        $field1 = isset($data[1]) ? $data[1] : '';
+        if (!empty($field1) || "$field1" === "0") {
+            $values[1] = $field1;
+        }
+
+        if (!empty($values)) {
+            return $values;
+        } else {
+            return false;
         }
     }
 

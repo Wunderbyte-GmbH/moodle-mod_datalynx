@@ -786,7 +786,6 @@ $string['greater_than'] = 'greater than';
 $string['greater_equal'] = 'greater or equal';
 $string['less_than'] = 'less than';
 $string['less_equal'] = 'less or equal';
-$string['less_equal'] = 'equal';
 $string['before'] = 'before';
 $string['after'] = 'after';
 
