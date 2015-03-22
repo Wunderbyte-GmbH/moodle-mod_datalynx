@@ -671,6 +671,72 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2015030902, 'datalynx');
     }
 
+    if ($oldversion < 2015032204) {
+        $views = $DB->get_records('datalynx_views');
+        foreach ($views as $view) {
+            if (strpos($view->param2, ':addnew]]') !== false) {
+                $view->param2 = str_replace(':addnew]]', ']]', $view->param2);
+                $DB->update_record('datalynx_views', $view);
+            }
+        }
+
+        // datalynx savepoint reached
+        upgrade_mod_savepoint(true, 2015032204, 'datalynx');
+    }
+
+    if ($oldversion < 2015032205) {
+
+        $checkboxfields = $DB->get_fieldset_select('datalynx_fields', 'id', 'type = "checkbox"');
+        $radiofields = $DB->get_fieldset_select('datalynx_fields', 'id', 'type = "radiobutton"');
+
+        $filtersearchfields = $DB->get_records_sql_menu("SELECT id, customsearch FROM {datalynx_filters} WHERE 1");
+        foreach ($filtersearchfields as $filterid => $serializedcustomsearch) {
+            $customsearch = unserialize($serializedcustomsearch);
+            foreach ($customsearch as $fieldid => $queries) {
+                if (in_array($fieldid, $checkboxfields)) {
+                    foreach ($queries as $sub) {
+                        foreach ($sub as $query) {
+                            if ($query[1] !== '' && $query[1] !== 'ANY_OF' && $query[1] !== 'ALL_OF' && $query[1] !== 'EXACTLY') {
+                                $query[1] = 'EXACTLY';
+                            }
+                        }
+                    }
+                } else if (in_array($fieldid, $radiofields)) {
+                    foreach ($queries as $sub) {
+                        foreach ($sub as $query) {
+                            if ($query[1] !== '' && $query[1] !== 'ANY_OF') {
+                                $query[1] = 'ANY_OF';
+                            }
+                        }
+                    }
+                }
+            }
+            $serializedcustomsearch = serialize($customsearch);
+            $DB->set_field('datalynx_filters', 'customsearch', $serializedcustomsearch, array('id' => $filterid));
+        }
+
+        // datalynx savepoint reached
+        upgrade_mod_savepoint(true, 2015032205, 'datalynx');
+    }
+
+    if ($oldversion < 2015032206) {
+        $instances = $DB->get_records('datalynx');
+        foreach ($instances as $instance) {
+            $views = $DB->get_records('datalynx_views', array('dataid' => $instance->id));
+            $moreview = $DB->get_record('datalynx_views', array('id' => $instance->singleview));
+            if ($moreview) {
+                foreach ($views as $view) {
+                    $view->section = preg_replace('/\<a.*##moreurl##[^>]*\>(.+)\<\/a\>/', "#{{viewlink:{$moreview->name};$1;}}#", $view->section);
+                    $view->param2 = preg_replace('/\<a.*##moreurl##[^>]*\>(.+)\<\/a\>/', "#{{viewlink:{$moreview->name};$1;}}#", $view->param2);
+                    $DB->update_record('datalynx_views', $view);
+                }
+            }
+        }
+
+        // datalynx savepoint reached
+        upgrade_mod_savepoint(true, 2015032206, 'datalynx');
+    }
+
     return true;
 }
 

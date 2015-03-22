@@ -913,7 +913,7 @@ class datalynxfield_option_multiple extends datalynxfield_option {
                 $params[$xname] = "%#$likesel#%";
             }
             $sql = " $not (".implode(" AND ", $conditions).") ";
-        } else if ($operator === 'EXACTLY') {
+        } else if ($operator === 'EXACTLY' || $operator === '=') {
             if ($not) {
                 $content = "content";
                 $usecontent = false;
@@ -1077,7 +1077,7 @@ class datalynxfield_option_single extends datalynxfield_option {
         $content = "c{$this->field->id}.content";
 
         $usecontent = true;
-        if ($operator === 'ANY_OF') {
+        if ($operator === 'ANY_OF' || $operator === '=') {
             list($insql, $params) = $DB->get_in_or_equal($value, SQL_PARAMS_NAMED, "param_{$i}_");
             $sql = " $not ($content $insql) ";
         } else if ($operator === '') {

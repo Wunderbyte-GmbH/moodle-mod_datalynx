@@ -43,12 +43,12 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
 
         foreach ($tags as $tag) {
             if (!$entry or $edit) {
-                if (trim($tag, '@') == "##status##") {
-                    $required = $options['required'];
+                if (trim($tag, '@') == "##status##" || trim($tag, '@') == "##*status##") {
+                    $required = trim($tag, '@') === "##*status##";
                     $replacements[$tag] = array('', array(array($this, 'display_edit'), array($entry, array('required' => $required))));
                 }
             } else {
-                if (trim($tag, '@') == "##status##") {
+                if (trim($tag, '@') == "##status##" || trim($tag, '@') == "##*status##") {
                     $replacements[$tag] = array('html', $this->display_browse($entry));
                 }
             }
@@ -144,6 +144,7 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
 
         $patterns = array();
         $patterns["##status##"] = array(true, $cat);
+        $patterns["##*status##"] = array(true, $cat);
 
         return $patterns;
     }
