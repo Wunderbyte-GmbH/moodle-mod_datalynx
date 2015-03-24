@@ -1040,7 +1040,7 @@ class datalynx_filter_manager {
                 }
                 
             }
-            if (!empty($searchoptions)) {
+            if (!empty($searchoptions) && is_array($searchoptions)) {
                 $searchurlquery = '&usearch='. self::get_search_url_query($searchfields);
             }
            
