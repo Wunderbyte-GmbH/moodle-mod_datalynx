@@ -525,7 +525,7 @@ function xmldb_datalynx_upgrade($oldversion) {
                      SET dv.param10 = dv.param4
                    WHERE dv.param10 IS NULL
                      AND dv.param4 IS NOT NULL
-                     AND dv.param4 <> 0";
+                     AND CAST(dv.param4 AS INT) <> 0";
         $DB->execute($query);
 
         // Datalynx savepoint reached.
@@ -759,7 +759,7 @@ function mod_datalynx_replace_field_rules() {
             datalynx::PERMISSION_AUTHOR,),
         'required' => false,
     );
-    $dataids = $DB->get_fieldset_select('datalynx', 'id', '1');
+    $dataids = $DB->get_fieldset_select('datalynx', 'id', "id IS NOT NULL");
     foreach ($dataids as $dataid) {
         $views = $DB->get_records('datalynx_views', array('dataid' => $dataid), '', 'id, param2');
         foreach ($views as $view) {
@@ -835,7 +835,7 @@ function mod_datalynx_replace_field_labels() {
         'noteditabletemplate' => datalynx_field_renderer::NOT_EDITABLE_SHOW_NOTHING,
     );
 
-    $dataids = $DB->get_fieldset_select('datalynx', 'id', '1');
+    $dataids = $DB->get_fieldset_select('datalynx', 'id', "id IS NOT NULL");
     foreach ($dataids as $dataid) {
         $views = $DB->get_records('datalynx_views', array('dataid' => $dataid), '', 'id, param2');
         foreach ($views as $view) {
