@@ -693,7 +693,7 @@ function mod_datalynx_replace_field_rules() {
             datalynx::PERMISSION_AUTHOR,),
         'required' => false,
     );
-    $dataids = $DB->get_fieldset_select('datalynx', 'id', 1);
+    $dataids = $DB->get_fieldset_select('datalynx', 'id', "id IS NOT NULL");
     foreach ($dataids as $dataid) {
         $views = $DB->get_records('datalynx_views', array('dataid' => $dataid), '', 'id, param2');
         foreach ($views as $view) {
@@ -769,7 +769,7 @@ function mod_datalynx_replace_field_labels() {
         'noteditabletemplate' => datalynx_field_renderer::NOT_EDITABLE_SHOW_NOTHING,
     );
 
-    $dataids = $DB->get_fieldset_select('datalynx', 'id', 1);
+    $dataids = $DB->get_fieldset_select('datalynx', 'id', "id IS NOT NULL");
     foreach ($dataids as $dataid) {
         $views = $DB->get_records('datalynx_views', array('dataid' => $dataid), '', 'id, param2');
         foreach ($views as $view) {
