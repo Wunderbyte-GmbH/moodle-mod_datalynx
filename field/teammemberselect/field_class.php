@@ -116,7 +116,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
                    WHERE df.dataid = :dataid
                      AND df.type LIKE 'teammemberselect'
                      AND df.param5 IS NOT NULL
-                     AND df.param5 <> 0";
+                     AND CAST(df.param5 AS INT) <> 0";
 
         return $DB->get_record_sql($query, array('dataid' => $this->df->id()));
     }
