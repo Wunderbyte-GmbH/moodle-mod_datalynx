@@ -30,7 +30,8 @@
 class backup_datalynx_activity_structure_step extends backup_activity_structure_step {
 
     protected function define_structure() {
-
+		global $DB;
+		
         // To know if we are including userinfo
         $userinfo = $this->get_setting_value('userinfo');
 
@@ -138,14 +139,13 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
         $field->set_source_sql(
                 "SELECT f.*, c.fullname AS targetcourse, d.name AS targetinstance, v.name AS targetview, fil.name AS targetfilter
                    FROM {datalynx_fields} f
-              LEFT JOIN {datalynx} d ON f.param1 = CAST(d.id AS TEXT)
+              LEFT JOIN {datalynx} d ON " . $DB->sql_cast_char2int('f.param1') . " = d.id
               LEFT JOIN {course_modules} cm ON cm.instance = d.id
               LEFT JOIN {course} c ON cm.course = c.id
-              LEFT JOIN {datalynx_views} v ON f.param2 = CAST(v.id AS TEXT)
-              LEFT JOIN {datalynx_filters} fil ON f.param3 = CAST(fil.id AS TEXT)
+              LEFT JOIN {datalynx_views} v ON " . $DB->sql_cast_char2int('f.param2') . " = v.id
+              LEFT JOIN {datalynx_filters} fil ON " . $DB->sql_cast_char2int('f.param3') . " = fil.id
                   WHERE f.dataid = :dataid
                GROUP BY f.id, targetcourse, targetinstance, targetview, targetfilter", array('dataid' => backup::VAR_PARENTID));
-
 
         $filter->set_source_table('datalynx_filters', array('dataid' => backup::VAR_PARENTID));
         $view->set_source_table('datalynx_views', array('dataid' => backup::VAR_PARENTID));

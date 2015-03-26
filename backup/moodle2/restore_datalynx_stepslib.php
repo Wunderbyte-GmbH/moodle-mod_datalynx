@@ -465,7 +465,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
                   FROM {datalynx_fields} df
                  WHERE $sqllike
                    AND df.dataid = :dataid
-                   AND CAST(df.param5 AS INT) NOT IN (0, -1)";
+                   AND " . $DB->sql_cast_char2int('df.param5') . " NOT IN (0, -1)";
         $results = $DB->get_records_sql_menu($sql, array('type' => 'teammemberselect', 'dataid' => $datalynxnewid));
         foreach ($results as $id => $referencefieldid) {
             $newreferencefieldid = $this->get_mappingid('datalynx_field', $referencefieldid);

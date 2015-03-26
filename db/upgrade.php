@@ -525,7 +525,7 @@ function xmldb_datalynx_upgrade($oldversion) {
                      SET dv.param10 = dv.param4
                    WHERE dv.param10 IS NULL
                      AND dv.param4 IS NOT NULL
-                     AND CAST(dv.param4 AS INT) <> 0";
+                     AND dv.param4 <> '0'";
         $DB->execute($query);
 
         // Datalynx savepoint reached.
