@@ -80,7 +80,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         $selected = isset($entry->{"c{$fieldid}_content"}) ? json_decode($entry->{"c{$fieldid}_content"}, true) : [];
         $selected = $selected ? $selected : [];
         $teamfull = $field->teamsize < count($selected);
-        $userhasadmissiblerole = !empty(array_intersect($field->df()->get_user_datalynx_permissions($USER->id), $field->admissibleroles));
+        $userhasadmissiblerole = array_intersect($field->df()->get_user_datalynx_permissions($USER->id), $field->admissibleroles);
         $userismember = in_array($USER->id, $selected);
         $canunsubscribe = $this->_field->allowunsubscription;
 

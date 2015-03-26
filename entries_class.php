@@ -237,7 +237,7 @@ class datalynx_entries {
                 if ($entries->entries = $DB->get_records_sql($sqlselect, $allparams + $eidparams)) {
                     // if one entry was requested get its position
                     if (!is_array($filter->eids) or count($filter->eids) == 1) {
-                        $sqlselect = "$sqlcount AND e.id $ineids $sortorder";
+                        $sqlselect = "$sqlcount AND e.id $ineids";
                         $eidposition = $DB->get_records_sql($sqlselect, $allparams + $eidparams);
                         
                         $filter->page = key($eidposition) - 1;

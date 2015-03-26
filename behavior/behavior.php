@@ -117,7 +117,7 @@ class datalynx_field_behavior {
         $user = $user ? $user : $USER;
         $permissions = $this->datalynx->get_user_datalynx_permissions($user->id, 'view');
         return $this->user_is_admin($user)
-                || !empty(array_intersect($permissions, $this->visibleto))
+                || (array_intersect($permissions, $this->visibleto))
                 || ($isentryauthor && in_array(datalynx::PERMISSION_AUTHOR, $this->visibleto))
                 || ($ismentor && in_array(datalynx::PERMISSION_MENTOR, $this->visibleto));
     }
@@ -127,7 +127,7 @@ class datalynx_field_behavior {
         $user = $user ? $user : $USER;
         $permissions = $this->datalynx->get_user_datalynx_permissions($user->id, 'edit');
         return $this->user_is_admin($user)
-                || !empty(array_intersect($permissions, $this->editableby))
+                || (array_intersect($permissions, $this->editableby))
                 || ($isentryauthor && in_array(datalynx::PERMISSION_AUTHOR, $this->editableby))
                 || ($ismentor && in_array(datalynx::PERMISSION_MENTOR, $this->editableby));
     }

@@ -138,13 +138,13 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
         $field->set_source_sql(
                 "SELECT f.*, c.fullname AS targetcourse, d.name AS targetinstance, v.name AS targetview, fil.name AS targetfilter
                    FROM {datalynx_fields} f
-              LEFT JOIN {datalynx} d ON CAST(f.param1 AS INT) = d.id
+              LEFT JOIN {datalynx} d ON f.param1 = CAST(d.id AS TEXT)
               LEFT JOIN {course_modules} cm ON cm.instance = d.id
               LEFT JOIN {course} c ON cm.course = c.id
-              LEFT JOIN {datalynx_views} v ON CAST(f.param2 AS INT) = v.id
-              LEFT JOIN {datalynx_filters} fil ON CAST(f.param3 AS INT) = fil.id
+              LEFT JOIN {datalynx_views} v ON f.param2 = CAST(v.id AS TEXT)
+              LEFT JOIN {datalynx_filters} fil ON f.param3 = CAST(fil.id AS TEXT)
                   WHERE f.dataid = :dataid
-               GROUP BY f.id", array('dataid' => backup::VAR_PARENTID));
+               GROUP BY f.id, targetcourse, targetinstance, targetview, targetfilter", array('dataid' => backup::VAR_PARENTID));
 
 
         $filter->set_source_table('datalynx_filters', array('dataid' => backup::VAR_PARENTID));
