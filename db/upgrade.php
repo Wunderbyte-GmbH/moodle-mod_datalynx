@@ -726,8 +726,8 @@ function xmldb_datalynx_upgrade($oldversion) {
             $moreview = $DB->get_record('datalynx_views', array('id' => $instance->singleview));
             if ($moreview) {
                 foreach ($views as $view) {
-                    $view->section = preg_replace('/\<a.*##moreurl##[^>]*\>(.+)\<\/a\>/', "#{{viewlink:{$moreview->name};$1;}}#", $view->section);
-                    $view->param2 = preg_replace('/\<a.*##moreurl##[^>]*\>(.+)\<\/a\>/', "#{{viewlink:{$moreview->name};$1;}}#", $view->param2);
+                    $view->section = preg_replace('/\<a.*##moreurl##[^>]*\>(.+)\<\/a\>/', "#{{viewlink:{$moreview->name};$1;;}}#", $view->section);
+                    $view->param2 = preg_replace('/\<a.*##moreurl##[^>]*\>(.+)\<\/a\>/', "#{{viewlink:{$moreview->name};$1;;}}#", $view->param2);
                     $DB->update_record('datalynx_views', $view);
                 }
             }
