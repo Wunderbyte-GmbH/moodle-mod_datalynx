@@ -596,6 +596,38 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2015011101, 'datalynx');
     }
 
+    if ($oldversion < 2015011802) {
+        $teamfields = $DB->get_records_sql("SELECT f.* FROM {datalynx_fields} WHERE f.type = 'teammemberselect'");
+
+        $map = [
+            1 => 1,
+            2 => 1,
+            3 => 2,
+            4 => 2,
+            5 => 4,
+            6 => 8,
+            7 => 8,
+            8 => 8
+        ];
+
+        foreach ($teamfields as $teamfield) {
+            $perms = [];
+            $roles = json_decode($teamfield->param2, true);
+            foreach ($roles as $roleid) {
+                if (isset($map[$roleid])) {
+                    $perms[] = $map[$roleid];
+                } else {
+                    $perms[] = 8;
+                }
+            }
+            $teamfield->param2 = json_encode(array_unique($perms));
+            $DB->update_record('datalynx_fields', $teamfield);
+        }
+
+        // datalynx savepoint reached
+        upgrade_mod_savepoint(true, 2015011802, 'datalynx');
+    }
+
     if ($oldversion < 2015030801) {
         $sql = "SELECT c.id, c.content
                   FROM {datalynx_contents} c
