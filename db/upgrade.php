@@ -718,8 +718,11 @@ function xmldb_datalynx_upgrade($oldversion) {
 
     if ($oldversion < 2015032207) {
 
-        $checkboxfields = $DB->get_fieldset_select('datalynx_fields', 'id', 'type = "checkbox"');
-        $radiofields = $DB->get_fieldset_select('datalynx_fields', 'id', 'type = "radiobutton"');
+        $sqllike = $DB->sql_like('f.type', ':type');
+        $sql = "SELECT f.* FROM {datalynx_fields} WHERE $sqllike";
+
+        $checkboxfields = $DB->get_fieldset_sql($sql, ['type' => 'checkbox']);
+        $radiofields = $DB->get_fieldset_sql($sql, ['type' => 'radiobutton']);
 
         $filtersearchfields = $DB->get_records_sql_menu("SELECT id, customsearch FROM {datalynx_filters} WHERE 1");
         foreach ($filtersearchfields as $filterid => $serializedcustomsearch) {

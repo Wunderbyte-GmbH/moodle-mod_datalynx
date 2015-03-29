@@ -147,7 +147,6 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         $perms = [datalynx::PERMISSION_ADMIN => 'mod/datalynx:viewprivilegeadmin',
             datalynx::PERMISSION_MANAGER => 'mod/datalynx:viewprivilegemanager',
             datalynx::PERMISSION_TEACHER => 'mod/datalynx:viewprivilegeteacher',
-            5 => 'mod/datalynx:viewprivilegestudent',
             datalynx::PERMISSION_STUDENT => 'mod/datalynx:viewprivilegestudent',
             datalynx::PERMISSION_GUEST => 'mod/datalynx:viewprivilegeguest'];
 
