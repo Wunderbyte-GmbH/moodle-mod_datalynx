@@ -597,7 +597,7 @@ function xmldb_datalynx_upgrade($oldversion) {
     }
 
     if ($oldversion < 2015011802) {
-        $teamfields = $DB->get_records_sql("SELECT f.* FROM {datalynx_fields} WHERE f.type = 'teammemberselect'");
+        $teamfields = $DB->get_records_sql("SELECT f.* FROM {datalynx_fields} f WHERE f.type = 'teammemberselect'");
 
         $map = [
             1 => 1,
