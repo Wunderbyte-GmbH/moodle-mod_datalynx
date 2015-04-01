@@ -719,7 +719,7 @@ function xmldb_datalynx_upgrade($oldversion) {
     if ($oldversion < 2015032207) {
 
         $sqllike = $DB->sql_like('f.type', ':type');
-        $sql = "SELECT f.* FROM {datalynx_fields} WHERE $sqllike";
+        $sql = "SELECT f.* FROM {datalynx_fields} f WHERE $sqllike";
 
         $checkboxfields = $DB->get_fieldset_sql($sql, ['type' => 'checkbox']);
         $radiofields = $DB->get_fieldset_sql($sql, ['type' => 'radiobutton']);
