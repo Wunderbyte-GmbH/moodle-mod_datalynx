@@ -41,16 +41,8 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         if (isset($entry->{"c{$fieldid}_content"})) {
             $selected = json_decode($entry->{"c{$fieldid}_content"}, true);
             $selected = $selected ? $selected : [];
-            $options = $field->options_menu(false, true, 0, true);
 
-            $str = array();
-            foreach ($selected as $id) {
-                if ($id > 0) {
-                    if (isset($options[$id])) {
-                        $str[] = $options[$id];
-                    }
-                }
-            }
+            $str = $this->get_user_list($selected);
 
             switch ($field->listformat) {
                 case datalynxfield_teammemberselect::TEAMMEMBERSELECT_FORMAT_NEWLINE:
@@ -109,6 +101,40 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         }
 
         return $str;
+    }
+
+    private static $userlist = [];
+
+    private function get_user_list($userids) {
+        global $DB, $COURSE;
+
+        $list = [];
+        $notpresent = [];
+        foreach ($userids as $userid) {
+            if (!$userid) {
+                continue;
+            } else if (isset(self::$userlist[$userid])) {
+                $list[] = self::$userlist[$userid];
+            } else {
+                $notpresent[] = $userid;
+            }
+        }
+
+        if (!empty($notpresent)) {
+            $baseurl = new moodle_url('/user/view.php', array('course' => $COURSE->id));
+            list($insql, $params) = $DB->get_in_or_equal($notpresent);
+            $sql = "SELECT * FROM {user} WHERE id $insql";
+            $users = $DB->get_records_sql($sql, $params);
+            foreach ($users as $user) {
+                $baseurl->param('id', $userid);
+                $fullname = fullname($user);
+                $item = "<a href=\"$baseurl\">$fullname</a>";
+                self::$userlist[$userid] = $item;
+                $list[] = $item;
+            }
+        }
+
+        return $list;
     }
 
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options = null) {

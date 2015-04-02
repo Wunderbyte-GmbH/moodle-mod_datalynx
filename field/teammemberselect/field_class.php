@@ -78,16 +78,14 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
     protected static $alluserslinks = array();
     protected static $alloweduserslinks = array();
 
+    protected static $alluserids = array();
+    protected static $forbiddenuserids = array();
+    protected static $admissibility = ['needed' => [], 'forbidden' => []];
+
     protected function init_user_menu() {
         global $DB, $COURSE;
 
         $context = context_course::instance($COURSE->id);
-        $query = "SELECT DISTINCT CONCAT(u.id, '-', ra.roleid) AS mainid, u.*, ra.roleid
-                    FROM {role_assignments} ra
-              INNER JOIN {user} u ON u.id = ra.userid
-                   WHERE ra.contextid = :contextid
-                ORDER BY u.lastname ASC, u.firstname ASC, u.email ASC, u.username ASC";
-        $results = $DB->get_records_sql($query, array('contextid' => $context->id));
 
         $fieldid = $this->field->id;
         self::$allusers[$fieldid] = array();
@@ -95,17 +93,71 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         self::$allowedusers[$fieldid] = array();
         self::$alloweduserslinks[$fieldid] = array();
 
-        foreach ($results as $result) {
-            self::$allusers[$fieldid][$result->id] = fullname($result) . " ({$result->email})";
+        self::$alluserids[$fieldid] = array();
+        self::$forbiddenuserids[$fieldid] = array();
 
-            $baseurl = new moodle_url('/user/view.php', array('id' => $result->id, 'course' => $COURSE->id));
-            self::$alluserslinks[$fieldid][$result->id] = html_writer::link($baseurl, fullname($result));
-            
-            if (array_intersect($this->df()->get_user_datalynx_permissions($result->id), $this->admissibleroles)) {
+        self::$admissibility = $this->get_admissibility_for_roles($context);
+
+
+        $query = "SELECT DISTINCT CONCAT(u.id, '-', ra.roleid) AS mainid, u.*, ra.roleid
+                    FROM {role_assignments} ra
+              INNER JOIN {user} u ON u.id = ra.userid
+                   WHERE ra.contextid = :contextid
+                ORDER BY u.lastname ASC, u.firstname ASC, u.email ASC, u.username ASC";
+
+        $results = $DB->get_records_sql($query, array('contextid' => $context->id));
+
+        $baseurl = new moodle_url('/user/view.php', array('course' => $COURSE->id));
+
+        foreach ($results as $result) {
+            // if user was already checked and was marked as forbidden, skip checking any other roles they might have
+            if (in_array($result->id, self::$forbiddenuserids[$fieldid])) {
+                continue;
+            }
+
+            // if this is the first time user is checked, add them to the all user list
+            if (!in_array($result->id, self::$alluserids[$fieldid])) {
+                $fullname = fullname($result);
+                self::$allusers[$fieldid][$result->id] = "$fullname ({$result->email})";
+
+                $baseurl->param('id', $result->id);
+                self::$alluserslinks[$fieldid][$result->id] = "<a href=\"$baseurl\">$fullname</a>";
+
+                self::$alluserids[$fieldid][] = $result->id;
+            }
+
+            // if user has a forbidden role, remove them from admissible users (if present) and mark them as forbidden
+            if (in_array($result->roleid, self::$admissibility['forbidden'])) {
+                self::$forbiddenuserids[$fieldid][] = $result->id;
+                unset(self::$allowedusers[$fieldid][$result->id]);
+                unset(self::$alloweduserslinks[$fieldid][$result->id]);
+
+                // otherwise, if user has a needed role, add them to admissible users
+            } else if (in_array($result->roleid, self::$admissibility['needed'])) {
                 self::$allowedusers[$fieldid][$result->id] = self::$allusers[$fieldid][$result->id];
                 self::$alloweduserslinks[$fieldid][$result->id] = self::$alluserslinks[$fieldid][$result->id];
             }
         }
+    }
+
+    protected function get_admissibility_for_roles($context) {
+        $allneeded = [];
+        $allforbidden = [];
+
+        $perms = [datalynx::PERMISSION_ADMIN => 'mod/datalynx:viewprivilegeadmin',
+            datalynx::PERMISSION_MANAGER => 'mod/datalynx:viewprivilegemanager',
+            datalynx::PERMISSION_TEACHER => 'mod/datalynx:viewprivilegeteacher',
+            datalynx::PERMISSION_STUDENT => 'mod/datalynx:viewprivilegestudent',
+            datalynx::PERMISSION_GUEST => 'mod/datalynx:viewprivilegeguest'];
+
+        foreach ($perms as $permissionid => $capstring) {
+            if (in_array($permissionid, $this->admissibleroles)) {
+                list($needed, $forbidden) = get_roles_with_cap_in_context($context, $capstring);
+                $allneeded = array_merge($allneeded, $needed);
+                $allforbidden = array_merge($allforbidden, $forbidden);
+            }
+        }
+        return ['needed' => array_unique($allneeded), 'forbidden' => array_unique($allforbidden)];
     }
 
     public function get_teamfield() {
