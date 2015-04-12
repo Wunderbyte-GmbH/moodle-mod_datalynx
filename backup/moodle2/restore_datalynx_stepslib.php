@@ -147,10 +147,10 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             $data->param1 = $this->get_mappingid('datalynx', $data->param1);
             $data->param2 = $this->get_mappingid('datalynx_views', $data->param2);
 
-            $course = $data->targetcourse ? $data->targetcourse : 'NULL';
-            $instance = $data->targetinstance ? $data->targetinstance : 'NULL';
-            $view = $data->targetview ? $data->targetview : 'NULL';
-            $filter = $data->targetfilter ? $data->targetfilter : 'NULL';
+            $course = isset($data->targetcourse) ? $data->targetcourse : 'NULL';
+            $instance = isset($data->targetinstance) ? $data->targetinstance : 'NULL';
+            $view = isset($data->targetview) ? $data->targetview : 'NULL';
+            $filter = isset($data->targetfilter) ? $data->targetfilter : 'NULL';
 
             $this->log("WARNING! 'datalynxview' field type cannot be restored if referencing instances are not included in the backup!", backup::LOG_WARNING);
             $this->log("* Please verify the references of the field:", backup::LOG_WARNING);
