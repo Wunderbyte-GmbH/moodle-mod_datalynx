@@ -121,7 +121,7 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
         $message->userfrom = (strpos($eventname, 'event') !== false && $this->sender == self::FROM_AUTHOR) ? $author : $USER;
         $messagedata->senderprofilelink = html_writer::link(new moodle_url('/user/profile.php', array('id' => $message->userfrom->id)), fullname($message->userfrom));
 
-        foreach ($this->get_recipients($author->id) as $userid) {
+        foreach ($this->get_recipients($author->id, $entryid) as $userid) {
             $userto = $DB->get_record('user', array('id' => $userid));
             $message->userto = $userto;
             $messagedata->fullname = fullname($userto);
@@ -158,9 +158,10 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
     /**
      * Get IDs of recipient users as defined by this rule
      * @param int $authorid user ID of the entry author, if the rule is entry-related
+     * @param int $entryid ID of the entry (if applicable)
      * @return array array of user IDs
      */
-    private function get_recipients($authorid = 0) {
+    private function get_recipients($authorid = 0, $entryid = 0) {
         $recipientids = array();
         if (isset($this->recipient['author']) && $authorid) {
             $recipientids[] = $authorid;
@@ -169,7 +170,7 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
             $recipientids = array_merge($recipientids, $this->get_recipients_by_permission($this->df->context, $this->recipient['roles']));
         }
         if (isset($this->recipient['teams'])) {
-            $recipientids = array_merge($recipientids, $this->get_team_recipients($this->recipient['teams']));
+            $recipientids = array_merge($recipientids, $this->get_team_recipients($this->recipient['teams'], $entryid));
         }
         return array_diff(array_unique($recipientids), [0]);
     }
@@ -231,21 +232,29 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
     /**
      * Compiles an array of IDs of users that should receive this notification based on team fields
      * @param $teams
+     * @param $entryid
      * @return array
      * @throws coding_exception
      * @throws dml_exception
      */
-    protected function get_team_recipients($teams) {
+    protected function get_team_recipients($teams, $entryid = 0) {
         global $DB;
         $ids = array();
         if (empty($teams)) {
             return [];
         }
         list($insql, $params) = $DB->get_in_or_equal($teams, SQL_PARAMS_NAMED);
+        if ($entryid) {
+            $entryidsql = "dc.entryid = :entryid";
+            $params['entryid'] = $entryid;
+        } else {
+            $entryidsql = "1";
+        }
         $sql = "SELECT dc.content
                   FROM {datalynx_contents} dc
             INNER JOIN {datalynx_fields} df ON dc.fieldid = df.id
                  WHERE dataid = :dataid
+                   AND $entryidsql
                    AND df.id $insql";
         $params = array_merge($params, ['dataid' => $this->df->id()]);
         $contents = $DB->get_fieldset_sql($sql, $params);
