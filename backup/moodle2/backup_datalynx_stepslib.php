@@ -138,10 +138,10 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
 
         $field->set_source_sql(
                 "SELECT f.*,
-                        MAX(c.fullname) AS targetcourse,
-                        MAX(d.name) AS targetinstance,
-                        MAX(v.name) AS targetview,
-                        MAX(fil.name) AS targetfilter
+                        CASE f.type WHEN 'datalynxview' THEN MAX(c.fullname) ELSE NULL END AS targetcourse,
+                        CASE f.type WHEN 'datalynxview' THEN MAX(d.name) ELSE NULL END AS targetinstance,
+                        CASE f.type WHEN 'datalynxview' THEN MAX(v.name) ELSE NULL END AS targetview,
+                        CASE f.type WHEN 'datalynxview' THEN MAX(fil.name) ELSE NULL END AS targetfilter
                    FROM {datalynx_fields} f
               LEFT JOIN {datalynx} d ON " . $DB->sql_cast_char2int('f.param1') . " = d.id
               LEFT JOIN {course_modules} cm ON cm.instance = d.id
