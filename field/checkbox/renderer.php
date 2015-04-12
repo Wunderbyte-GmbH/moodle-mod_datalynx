@@ -46,14 +46,18 @@ class datalynxfield_checkbox_renderer extends datalynxfield_renderer {
 
         $elemgrp = array();
         foreach ($menuoptions as $i => $option) {
-            $elemgrp[] = &$mform->createElement('advcheckbox',  $i, null, $option, null, array(null, $i));
+            $elemgrp[] = &$mform->createElement('advcheckbox', $i, null, $option, null, array(null, $i));
         }
 
         $mform->addGroup($elemgrp, $fieldname, null, $separator, true);
 
         $selected = array();
         if ($entryid > 0 and $content) {
-            $selected = explode('#', $content);
+            $selectedraw = array_diff(array_unique(explode('#', $content)), ['']);
+
+            foreach ($selectedraw as $item) {
+                $selected[$item] = $item;
+            }
         }
 
         // check for default values

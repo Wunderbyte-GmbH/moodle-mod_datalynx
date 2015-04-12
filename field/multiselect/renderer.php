@@ -43,13 +43,16 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
         $required = !empty($options['required']);
 
         $content = !empty($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : null;
-        
-        if ($entryid > 0 and $content){
-            $selected = explode('#', $content);
-        } else {
-            $selected = array();
+
+        $selected = array();
+        if ($entryid > 0 and $content) {
+            $selectedraw = array_diff(array_unique(explode('#', $content)), ['']);
+
+            foreach ($selectedraw as $item) {
+                $selected[$item] = $item;
+            }
         }
-        
+
         // check for default values
         if (!$selected and $field->get('param2')) {
             $selected = $field->default_values();
