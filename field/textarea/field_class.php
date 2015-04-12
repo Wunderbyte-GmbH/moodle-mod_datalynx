@@ -87,7 +87,7 @@ class datalynxfield_textarea extends datalynxfield_base {
         }        
 
         // Editor content
-        if ($this->is_editor()) {
+        if (false) { // $this->is_editor()
             $data = (object) $values;
             $data->{'editor_editor'} = $data->editor;
 
