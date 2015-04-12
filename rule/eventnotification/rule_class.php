@@ -156,7 +156,7 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
     }
 
     /**
-     * Get IDs of recepient users as defined by this rule
+     * Get IDs of recipient users as defined by this rule
      * @param int $authorid user ID of the entry author, if the rule is entry-related
      * @return array array of user IDs
      */
@@ -166,7 +166,7 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
             $recipientids[] = $authorid;
         }
         if (isset($this->recipient['roles'])) {
-            $recipientids = array_merge($recipientids, $this->get_roles_used_in_context($this->df->context, $this->recipient['roles']));
+            $recipientids = array_merge($recipientids, $this->get_recipients_by_permission($this->df->context, $this->recipient['roles']));
         }
         if (isset($this->recipient['teams'])) {
             $recipientids = array_merge($recipientids, $this->get_team_recipients($this->recipient['teams']));
@@ -175,24 +175,57 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
     }
 
     /**
-     * Gets the list of roles assigned to this context and up (parents)
-     *
+     * Retrieves IDs of users that possess given permissions within the context.
      * @param context $context
-     * @param array $roleids
-     * @return array
+     * @param $permissions
+     * @return array IDs of recipient users
      */
-    private function get_roles_used_in_context(context $context, array $roleids) {
+    protected function get_recipients_by_permission(context $context, $permissions) {
         global $DB;
 
+        $allneeded = [];
+        $allforbidden = [];
+
+        $perms = [datalynx::PERMISSION_ADMIN => 'mod/datalynx:viewprivilegeadmin',
+            datalynx::PERMISSION_MANAGER => 'mod/datalynx:viewprivilegemanager',
+            datalynx::PERMISSION_TEACHER => 'mod/datalynx:viewprivilegeteacher',
+            datalynx::PERMISSION_STUDENT => 'mod/datalynx:viewprivilegestudent',
+            datalynx::PERMISSION_GUEST => 'mod/datalynx:viewprivilegeguest'];
+
+        foreach ($perms as $permissionid => $capstring) {
+            if (in_array($permissionid, $permissions)) {
+                list($needed, $forbidden) = get_roles_with_cap_in_context($context, $capstring);
+                $allneeded = array_merge($allneeded, $needed);
+                $allforbidden = array_merge($allforbidden, $forbidden);
+            }
+        }
+
         list($contextlist, $params1) = $DB->get_in_or_equal($context->get_parent_context_ids(true), SQL_PARAMS_NAMED);
-        list($rolelist, $params2) = $DB->get_in_or_equal($roleids, SQL_PARAMS_NAMED);
 
-        $sql = "SELECT DISTINCT ra.userid
-                  FROM {role_assignments} ra
-                 WHERE ra.roleid $rolelist
-                   AND ra.contextid $contextlist";
+        if ($allneeded) {
+            list($insqlneeded, $params2) = $DB->get_in_or_equal($allneeded, SQL_PARAMS_NAMED);
+            $sqlneeded = "SELECT DISTINCT ra.userid
+                                 FROM {role_assignments} ra
+                                WHERE ra.roleid $insqlneeded
+                                  AND ra.contextid $contextlist";
 
-        return $DB->get_fieldset_sql($sql, $params1 + $params2);
+            $users = $DB->get_fieldset_sql($sqlneeded, $params1 + $params2);
+        } else {
+            $users = [];
+        }
+
+        if ($allforbidden) {
+            list($insqlforbidden, $params3) = $DB->get_in_or_equal($allforbidden, SQL_PARAMS_NAMED);
+            $sqlforbidden = "SELECT DISTINCT ra.userid
+                                    FROM {role_assignments} ra
+                                   WHERE ra.roleid $insqlforbidden
+                                     AND ra.contextid $contextlist";
+            $forbiddenusers = $DB->get_fieldset_sql($sqlforbidden, $params1 + $params3);
+        } else {
+            $forbiddenusers = [];
+        }
+
+        return array_diff($users, $forbiddenusers);
     }
 
     /**
