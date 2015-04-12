@@ -137,7 +137,11 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
         $module->set_source_table('course_modules', array('id' => backup::VAR_MODID));
 
         $field->set_source_sql(
-                "SELECT f.*, c.fullname AS targetcourse, d.name AS targetinstance, v.name AS targetview, fil.name AS targetfilter
+                "SELECT f.*,
+                        MAX(c.fullname) AS targetcourse,
+                        MAX(d.name) AS targetinstance,
+                        MAX(v.name) AS targetview,
+                        MAX(fil.name) AS targetfilter
                    FROM {datalynx_fields} f
               LEFT JOIN {datalynx} d ON " . $DB->sql_cast_char2int('f.param1') . " = d.id
               LEFT JOIN {course_modules} cm ON cm.instance = d.id
