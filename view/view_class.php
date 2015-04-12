@@ -1516,16 +1516,16 @@ abstract class datalynxview_base {
     }
 
     /**
-     * Verifies if the given action is available to the user in the view. The view must be visible to the user and
-     * contain the necessary action tag in the entry template in order for the action to be allowed. This function
+     * Verifies if the given action is available to the user in the view. The TARGET view must be visible to the user
+     * AND contain the necessary action tag in the entry template in order for the action to be allowed. This function
      * prevents users to circumvent action restrictions via URL queries.
      * @param $action String of the action
      * @return bool true, if the action is allowed; false otherwise.
      */
     private function confirm_view_action($action) {
         global $DB;
-        $sourceview = optional_param('sourceview', 0, PARAM_INT);
-        $view = $DB->get_record('datalynx_views', array('id' => $sourceview));
+        $targetview = optional_param('view', 0, PARAM_INT);
+        $view = $DB->get_record('datalynx_views', array('id' => $targetview));
         return $view && $this->_df->is_visible_to_user($this->view) &&
                 ((strpos($view->param2, "##$action##") !== false) || (strpos($view->section, "##$action##") !== false));
     }
