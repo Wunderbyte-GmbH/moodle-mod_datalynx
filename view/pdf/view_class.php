@@ -239,6 +239,10 @@ class datalynxview_pdf extends datalynxview_base {
                 $pdf->addTOC($settings->toc->page, '', '.', $settings->toc->name);
             } else {
                 $templates = explode("\n", $settings->toc->template);
+                $total = count($templates);
+                for ($i = 0; $i < $total; $i++) {
+                    $templates["F$i"] = $templates[$i];
+                }
                 $pdf->addHTMLTOC($settings->toc->page, $settings->toc->name, $templates);
             }
             $pdf->endTOCPage();
@@ -250,6 +254,7 @@ class datalynxview_pdf extends datalynxview_base {
         // Send the pdf
         $documentname = optional_param('docname', $this->get_documentname($settings->docname), PARAM_TEXT);
         $destination = optional_param('dest', $settings->destination, PARAM_ALPHA);
+
         $pdf->Output("$documentname", $destination);
 
         // Clean up temp files
@@ -339,14 +344,14 @@ class datalynxview_pdf extends datalynxview_base {
         if (!empty($options['tohtml'])) {
             $displaycontent = parent::display($options);
             // Remove the bookmark patterns
-            $displaycontent = preg_replace("%#@PDF-[G]*BM:\d+:[^@]*@#%", '', $displaycontent);
+            $displaycontent = preg_replace("%#@PDF-G?BM:\d+:[^@#]*@?#%", '', $displaycontent);
         
             return $displaycontent;
         } else {
             $options['tohtml'] = true;
             $displaycontent = parent::display($options);
             // Remove the bookmark patterns
-            $displaycontent = preg_replace("%#@PDF-[G]*BM:\d+:[^@]*@#%", '', $displaycontent);
+            $displaycontent = preg_replace("%#@PDF-G?BM:\d+:[^@#]*@?#%", '', $displaycontent);
         
             echo $displaycontent;            
         }
@@ -499,7 +504,7 @@ class datalynxview_pdf extends datalynxview_base {
         static $bookmarkgroup = '';
         
         // Find all patterns ##PDFBM:d:any text##
-        if (preg_match_all("%#@PDF-[G]*BM:\d+:[^@]*@#%", $pagecontent, $matches)) {
+        if (preg_match_all("%#@PDF-[G]*BM:\d+:[^@#]*@?#%", $pagecontent, $matches)) {
             if (!empty($settings->toc->page)) {
                 // Get the array of templates
                 $templates = explode("\n", $settings->toc->template);
@@ -511,7 +516,7 @@ class datalynxview_pdf extends datalynxview_base {
                     
                     // Must have a template for the TOC level
                     if (empty($templates[$bmlevel])) {
-                        continue;;
+                        continue;
                     }
                     
                     // Add a group bookmark only if new
