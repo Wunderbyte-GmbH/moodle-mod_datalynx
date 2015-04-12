@@ -126,10 +126,10 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
             $sql = "SELECT * FROM {user} WHERE id $insql";
             $users = $DB->get_records_sql($sql, $params);
             foreach ($users as $user) {
-                $baseurl->param('id', $userid);
+                $baseurl->param('id', $user->id);
                 $fullname = fullname($user);
                 $item = "<a href=\"$baseurl\">$fullname</a>";
-                self::$userlist[$userid] = $item;
+                self::$userlist[$user->id] = $item;
                 $list[] = $item;
             }
         }
