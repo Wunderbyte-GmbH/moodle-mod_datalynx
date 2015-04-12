@@ -70,9 +70,11 @@ class datalynx_field_renderer_form extends moodleform
         $group[] = $mform->createElement('radio', 'displayoptions', '', get_string('none'), 0);
         $group[] = $mform->createElement('radio', 'displayoptions', '', get_string('custom', 'datalynx'), 1);
         $group[] = $mform->createElement('textarea', 'displaytemplate', '', '');
+        $mform->setDefault('displaytemplate', '#value');
         $mform->disabledIf('displaytemplate', 'displayoptions', 'eq', 0);
         $mform->addGroup($group, 'displaytemplategroup', get_string('displaytemplate', 'datalynx'), array('<br />'), false);
         $mform->setType('displaytemplate', PARAM_CLEANHTML);
+        $mform->addHelpButton('displaytemplategroup', 'displaytemplate', 'datalynx');
 
         $group = array();
         $group[] = $mform->createElement('radio', 'novalueoptions', '', get_string('shownothing', 'datalynx'), 0);
@@ -81,7 +83,7 @@ class datalynx_field_renderer_form extends moodleform
         $group[] = $mform->createElement('textarea', 'novaluetemplate', '', '');
         $mform->disabledIf('novaluetemplate', 'novalueoptions', 'eq', 0);
         $mform->disabledIf('novaluetemplate', 'novalueoptions', 'eq', 1);
-        $mform->addGroup($group, 'edittemplategroup', get_string('novalue', 'datalynx'), array('<br />'), false);
+        $mform->addGroup($group, 'novaluetemplategroup', get_string('novalue', 'datalynx'), array('<br />'), false);
         $mform->setType('novaluetemplate', PARAM_CLEANHTML);
 
         $group = array();
@@ -89,10 +91,12 @@ class datalynx_field_renderer_form extends moodleform
         $group[] = $mform->createElement('radio', 'editoptions', '', get_string('asdisplay', 'datalynx'), 1);
         $group[] = $mform->createElement('radio', 'editoptions', '', get_string('custom', 'datalynx'), 2);
         $group[] = $mform->createElement('textarea', 'edittemplate', '', '');
+        $mform->setDefault('edittemplate', '#input');
         $mform->disabledIf('edittemplate', 'editoptions', 'eq', 0);
         $mform->disabledIf('edittemplate', 'editoptions', 'eq', 1);
         $mform->addGroup($group, 'edittemplategroup', get_string('edittemplate', 'datalynx'), array('<br />'), false);
         $mform->setType('edittemplate', PARAM_CLEANHTML);
+        $mform->addHelpButton('edittemplategroup', 'edittemplate', 'datalynx');
 
         $group = array();
         $group[] = $mform->createElement('radio', 'noteditableoptions', '', get_string('shownothing', 'datalynx'), 0);
