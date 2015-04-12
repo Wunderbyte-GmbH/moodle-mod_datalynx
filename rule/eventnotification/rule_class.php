@@ -133,12 +133,13 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
                 if (isset($this->targetviews[$roleid])) {
                     $viewurlparams['view'] = $this->targetviews[$roleid];
                     break;
-                } else if ($df->data->singleview) {
+                }
+            }
+            if (!isset($viewurlparams['view'])) {
+                if ($df->data->singleview) {
                     $viewurlparams['view'] = $df->data->singleview;
-                    break;
                 } else if ($df->data->defaultview) {
                     $viewurlparams['view'] = $df->data->defaultview;
-                    break;
                 }
             }
 
