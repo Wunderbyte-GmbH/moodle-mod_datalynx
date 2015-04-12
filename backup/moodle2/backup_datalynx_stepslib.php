@@ -149,7 +149,7 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
               LEFT JOIN {datalynx_views} v ON " . $DB->sql_cast_char2int('f.param2') . " = v.id
               LEFT JOIN {datalynx_filters} fil ON " . $DB->sql_cast_char2int('f.param3') . " = fil.id
                   WHERE f.dataid = :dataid
-               GROUP BY f.id, targetcourse, targetinstance, targetview, targetfilter", array('dataid' => backup::VAR_PARENTID));
+               GROUP BY f.id", array('dataid' => backup::VAR_PARENTID));
 
         $filter->set_source_table('datalynx_filters', array('dataid' => backup::VAR_PARENTID));
         $view->set_source_table('datalynx_views', array('dataid' => backup::VAR_PARENTID));
