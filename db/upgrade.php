@@ -724,7 +724,7 @@ function xmldb_datalynx_upgrade($oldversion) {
         $checkboxfields = $DB->get_fieldset_sql($sql, ['type' => 'checkbox']);
         $radiofields = $DB->get_fieldset_sql($sql, ['type' => 'radiobutton']);
 
-        $filtersearchfields = $DB->get_records_sql_menu("SELECT id, customsearch FROM {datalynx_filters} WHERE 1");
+        $filtersearchfields = $DB->get_records_sql_menu("SELECT id, customsearch FROM {datalynx_filters}");
         foreach ($filtersearchfields as $filterid => $serializedcustomsearch) {
             $customsearch = unserialize($serializedcustomsearch);
             $newcustomsearch = (array)(object)$customsearch;
