@@ -22,7 +22,7 @@
  */
 
 $module->component = 'mod_datalynx';
-$module->version   = 2015041201;
+$module->version   = 2015041301;
 $module->release   = '0.8.3';
 $module->requires  = 2014050800;
 $module->maturity  = MATURITY_STABLE;
