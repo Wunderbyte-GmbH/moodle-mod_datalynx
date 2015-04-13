@@ -151,6 +151,14 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
                   WHERE f.dataid = :dataid
                GROUP BY f.id", array('dataid' => backup::VAR_PARENTID));
 
+        /* // for PostreSQL
+        $field->set_source_sql(
+            "SELECT f.*,
+               FROM {datalynx_fields} f
+              WHERE f.dataid = :dataid
+                AND f.type != 'datalynxview'", array('dataid' => backup::VAR_PARENTID));
+        */
+
         $filter->set_source_table('datalynx_filters', array('dataid' => backup::VAR_PARENTID));
         $view->set_source_table('datalynx_views', array('dataid' => backup::VAR_PARENTID));
         $rule->set_source_table('datalynx_rules', array('dataid' => backup::VAR_PARENTID));
