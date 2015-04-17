@@ -880,8 +880,14 @@ class behat_mod_datalynx extends behat_files {
                 $element->find('xpath', '//select[contains(@name, "day")]')->selectOption($day);
                 $element->find('xpath', '//select[contains(@name, "month")]')->selectOption($month);
                 $element->find('xpath', '//select[contains(@name, "year")]')->selectOption($year);
-                $element->find('xpath', '//select[contains(@name, "hour")]')->selectOption($hour);
-                $element->find('xpath', '//select[contains(@name, "minute")]')->selectOption($minute);
+
+                $buffElement = $element->find('xpath', '//select[contains(@name, "hour")]');
+                if(is_object($buffElement))
+                	$buffElement->selectOption($hour);
+                
+                $buffElement = $element->find('xpath', '//select[contains(@name, "minute")]');
+                if(is_object($buffElement))
+                	$buffElement->selectOption($minute);
                 break;
             case 'teammemberselect':
                 if ($this->running_javascript()) {
