@@ -16,13 +16,13 @@
  
 /**
  * @package mod
- * @subpackage datalynxvers
+ * @subpackage datalynx
  * @copyright 2015 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$module->component = 'mod_datalynx';
-$module->version   = 2015041301;
-$module->release   = '0.8.3';
-$module->requires  = 2014050800;
-$module->maturity  = MATURITY_STABLE;
+$plugin->component = 'mod_datalynx';
+$plugin->version   = 2015041301;
+$plugin->release   = '0.8.3';
+$plugin->requires  = 2014050800;
+$plugin->maturity  = MATURITY_STABLE;
