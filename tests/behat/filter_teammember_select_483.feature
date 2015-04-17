@@ -26,7 +26,7 @@ Feature:It happens that datalynx team member select does not display anything
       | teammemberselect | lehrer   |  2     | -1    | 3       | [1,2]  | 4         |
     And "Datalynx Test Instance" has following entries:
       | author   | lehrer             | approved |
-      | teacher1 | teacher1, teacher2 | 1        |
+      | teacher1 | teacher1 | 1        |
       | teacher2 | teacher1           | 1        |
       | teacher1 | teacher2           | 1        |
     And "Datalynx Test Instance" has following filters:
