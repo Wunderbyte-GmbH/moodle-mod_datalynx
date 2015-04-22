@@ -23,7 +23,6 @@ Feature:Team member should only see their entry
     And "Datalynx Test Instance" has following views:
       | type    | name                   | status       | redirect           | filter        | param2                                                                                                |
       | grid    | Default view           | default      | Default view       |               | <div ><table><tbody><tr><td>Hi.</td></tr><tr><td>##edit##  ##delete##</td></tr></tbody></table></div> |
-      | grid    | lehrer_teamselector    | default      | Default view       | 1             | <div ><table><tbody><tr><td>Text:</td><td>[[lehrer]]</td></tr><tr><td>##edit##  ##delete##</td></tr></tbody></table></div> |
     And "Datalynx Test Instance" has following fields:
       | type             | name     |visible | edits |  param1 | param2 | param3    |param4    |
       | teammemberselect | lehrer   |  2     | -1    | 3       | [2]  | 1           |4         |
