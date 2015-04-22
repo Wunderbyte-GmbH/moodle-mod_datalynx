@@ -21,9 +21,9 @@ Feature:Team member should only see their entry
       | activity | course | idnumber | name                   | approval |
       | datalynx | C1     | 12345    | Datalynx Test Instance | 1        |
     And "Datalynx Test Instance" has following views:
-      | type    | name             | status       | redirect           | filter       | param2                                                                                                |
-      | grid    | Default view     | default      | Default view       |              | <div ><table><tbody><tr><td>Hi.</td></tr><tr><td>##edit##  ##delete##</td></tr></tbody></table></div> |
-      | grid    | lehrer_teamselector     | default      | Default view       |              | <div ><table><tbody><tr><td>Hi.</td></tr><tr><td>##edit##  ##delete##</td></tr></tbody></table></div> |
+      | type    | name                   | status       | redirect           | filter        | param2                                                                                                |
+      | grid    | Default view           | default      | Default view       |               | <div ><table><tbody><tr><td>Hi.</td></tr><tr><td>##edit##  ##delete##</td></tr></tbody></table></div> |
+      | grid    | lehrer_teamselector    | default      | Default view       | 1             | <div ><table><tbody><tr><td>Text:</td><td>[[lehrer]]</td></tr><tr><td>##edit##  ##delete##</td></tr></tbody></table></div> |
     And "Datalynx Test Instance" has following fields:
       | type             | name     |visible | edits |  param1 | param2 | param3    |param4    |
       | teammemberselect | lehrer   |  2     | -1    | 3       | [2]  | 1           |4         |
@@ -42,19 +42,6 @@ Scenario: Login to Course and add Fields with data
     Given I log in as "teacher1"
     And I follow "Course 1"
     And I follow "Datalynx Test Instance"
-    And I follow "Manage"
-    And I follow "Fields"
-    Then I should see "lehrer"
-    And I follow "Filters"
-    Then I should see "lehrer_teamselect"
-    And I follow "Views"
-    And I set the field "type" to "Grid"
-    Then I should see "New Grid view"
-    And I set the field "name" to "lehrer_teamselector"
-    And I set the field "visible[4]" to "0"
-    And I set the field "_filter" to "lehrer_teamselect"
-    And I press "Save changes"
-    Then I should see "lehrer_teamselector"
     And I follow "Browse"
     And I set the field "view" to "lehrer_teamselector"
     Then I should see "Add a new entry"
@@ -74,16 +61,6 @@ Scenario: Login to Course and add Fields with data
     Given I log in as "teacher2"
     And I follow "Course 1"
     And I follow "Datalynx Test Instance"
-    And I follow "Manage"
-    And I follow "Views"
-    And I set the field "type" to "Grid"
-    Then I should see "New Grid view"
-    And I set the field "name" to "lehrer_teamselector"
-    And I set the field "visible[4]" to "0"
-    And I set the field "_filter" to "lehrer_teamselect"
-    And I press "Save changes"
-    Then I should see "lehrer_teamselector"
-    And I follow "Browse"
     And I set the field "view" to "lehrer_teamselector"
     Then I should see "Add a new entry"
     Then I should see "There are no entries to display"
@@ -102,16 +79,6 @@ Scenario: Login to Course and add Fields with data
     Given I log in as "teacher3"
     And I follow "Course 1"
     And I follow "Datalynx Test Instance"
-    And I follow "Manage"
-    And I follow "Views"
-    And I set the field "type" to "Grid"
-    Then I should see "New Grid view"
-    And I set the field "name" to "lehrer_teamselector"
-    And I set the field "visible[4]" to "0"
-    And I set the field "_filter" to "lehrer_teamselect"
-    And I press "Save changes"
-    Then I should see "lehrer_teamselector"
-    And I follow "Browse"
     And I set the field "view" to "lehrer_teamselector"
     Then I should see "Add a new entry"
     Then I should see "There are no entries to display"
