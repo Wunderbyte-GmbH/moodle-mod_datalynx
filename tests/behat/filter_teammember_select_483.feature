@@ -1,7 +1,8 @@
 @mod @mod_datalynx @dev @_file_upload @wip1 @mink:selenium2
 Feature:Team member should only see their entry
         Where they have been assigned to
-        And neither the others nor nothing if there would be anything
+        And not the other team entries
+        And should not see nothing if there is an entry
 
   Background:
     Given the following "courses" exist:
@@ -38,11 +39,10 @@ Feature:Team member should only see their entry
       | name              | visible  |   customsearch                                                                   |
       | lehrer_teamselect | 1        | a:1:{i:1;a:1:{s:3:"AND";a:1:{i:0;a:3:{i:0;s:0:"";i:1;s:4:"USER";i:2;s:1:"3";}}}} |
 
-Scenario: Login to Course and add Fields with data
+Scenario: Login to Course as Teacher 1 and see your three assignments
     Given I log in as "teacher1"
     And I follow "Course 1"
     And I follow "Datalynx Test Instance"
-    And I follow "Browse"
     And I set the field "view" to "lehrer_teamselector"
     Then I should see "Add a new entry"
     Then I should see "There are no entries to display"
@@ -57,7 +57,7 @@ Scenario: Login to Course and add Fields with data
     And I should not see "Teacher 3"
     And I should see "Teacher 1"
     
-Scenario: Login to Course and add Fields with data
+Scenario: Login to Course as Teacher 2 and see your your single assignment and your double assignment with Teacher 2
     Given I log in as "teacher2"
     And I follow "Course 1"
     And I follow "Datalynx Test Instance"
@@ -75,7 +75,7 @@ Scenario: Login to Course and add Fields with data
     And I should see "Teacher 3"
     And I should not see "Teacher 1"
     
-Scenario: Login to Course and add Fields with data
+Scenario: Login to Course as Teacher 3 and see your double assignment with Teacher 2
     Given I log in as "teacher3"
     And I follow "Course 1"
     And I follow "Datalynx Test Instance"
