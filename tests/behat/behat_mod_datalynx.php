@@ -657,6 +657,22 @@ class behat_mod_datalynx extends behat_files {
             $element->click();
         }
     }
+    
+     /**
+     * @Given /^I should see "([^"]*)" (\d+) times$/
+     */
+    public function iShouldSeeTimes($arg1, $arg2) {
+        
+        
+            $session = $this->getSession(); // get the mink session
+            $count = 0;
+            do{
+                $found = $session->getPage()->find($arg1);
+                $count++;
+            }while($found==true);
+        
+        return $count==$arg2;
+    }
 
     /**
      * @Given /^I fill entry form with:$/
