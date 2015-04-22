@@ -58,7 +58,7 @@ Scenario: Login as Teacher1 and see three entries of yourself
     And I set the field "view" to "lehrer_teamselector"
     And I should not see "Teacher 2"
     And I should not see "Teacher 3"
-    And I should see "Teacher 1" 5 times
+    And I should see "Teacher 1"
     
 Scenario: Login as Teacher2 and see one entrie of yourself and one entry with Teacher3
     Given I log in as "teacher2"
@@ -75,8 +75,8 @@ Scenario: Login as Teacher2 and see one entrie of yourself and one entry with Te
     Then I should see "lehrer_teamselector"
     And I follow "Browse"
     And I set the field "view" to "lehrer_teamselector"
-    And I should see "Teacher 2" 4 times
-    And I should see "Teacher 3" 1 times
+    And I should see "Teacher 2"
+    And I should see "Teacher 3"
     And I should not see "Teacher 1"
     
 Scenario: Login as Teacher3 and see one entrie with Teacher2
@@ -94,6 +94,6 @@ Scenario: Login as Teacher3 and see one entrie with Teacher2
     Then I should see "lehrer_teamselector"
     And I follow "Browse"
     And I set the field "view" to "lehrer_teamselector"
-    And I should see "Teacher 2" 1 times
-    And I should see "Teacher 3" 3 times
+    And I should see "Teacher 2"
+    And I should see "Teacher 3"
     And I should not see "Teacher 1"
