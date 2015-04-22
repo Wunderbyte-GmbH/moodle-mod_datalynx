@@ -15,6 +15,8 @@ Feature:Team member should only see their entry
     And the following "course enrolments" exist:
       | user      | course  | role            |
       | teacher1  | C1      | editingteacher  |
+      | teacher2  | C1      | editingteacher  |
+      | teacher3  | C1      | editingteacher  |
     And the following "activities" exist:
       | activity | course | idnumber | name                   | approval |
       | datalynx | C1     | 12345    | Datalynx Test Instance | 1        |
