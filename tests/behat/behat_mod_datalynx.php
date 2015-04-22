@@ -690,7 +690,7 @@ class behat_mod_datalynx extends behat_files {
                 }
                 $entries[$row['entry']][$row['field']] = $row['value'];
             }
-        } else {
+        } else { 
             $entry = $table->getRowsHash();
             unset($entry['field']);
             $entries[1] = $entry;
