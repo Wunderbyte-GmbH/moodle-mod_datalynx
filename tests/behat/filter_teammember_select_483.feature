@@ -37,7 +37,7 @@ Feature:Team member should only see their entry
       | name              | visible  |   customsearch                                                                   |
       | lehrer_teamselect | 1        | a:1:{i:1;a:1:{s:3:"AND";a:1:{i:0;a:3:{i:0;s:0:"";i:1;s:4:"USER";i:2;s:1:"3";}}}} |
 
-Scenario: Login to Course and add Fields with data
+Scenario: Login as Teacher1 and see three entries of yourself
     Given I log in as "teacher1"
     And I follow "Course 1"
     And I follow "Datalynx Test Instance"
@@ -58,9 +58,9 @@ Scenario: Login to Course and add Fields with data
     And I set the field "view" to "lehrer_teamselector"
     And I should not see "Teacher 2"
     And I should not see "Teacher 3"
-    And I should see "Teacher 1"
+    And I should see "Teacher 1" 3 times
     
-Scenario: Login to Course and add Fields with data
+Scenario: Login as Teacher2 and see one entrie of yourself and one entry with Teacher3
     Given I log in as "teacher2"
     And I follow "Course 1"
     And I follow "Datalynx Test Instance"
@@ -75,11 +75,11 @@ Scenario: Login to Course and add Fields with data
     Then I should see "lehrer_teamselector"
     And I follow "Browse"
     And I set the field "view" to "lehrer_teamselector"
-    And I should see "Teacher 2"
-    And I should see "Teacher 3"
+    And I should see "Teacher 2" 2 times
+    And I should see "Teacher 3" 1 times
     And I should not see "Teacher 1"
     
-Scenario: Login to Course and add Fields with data
+Scenario: Login as Teacher3 and see one entrie with Teacher2
     Given I log in as "teacher3"
     And I follow "Course 1"
     And I follow "Datalynx Test Instance"
@@ -94,6 +94,6 @@ Scenario: Login to Course and add Fields with data
     Then I should see "lehrer_teamselector"
     And I follow "Browse"
     And I set the field "view" to "lehrer_teamselector"
-    And I should see "Teacher 2"
-    And I should see "Teacher 3"
+    And I should see "Teacher 2" 1 times
+    And I should see "Teacher 3" 1 times
     And I should not see "Teacher 1"
