@@ -667,8 +667,7 @@ class behat_mod_datalynx extends behat_files {
             $session = $this->getSession(); // get the mink session
             $count = 0;
             do{
-                $obj = $session->getPage()->find('xpath','//div[@id="page-content"]');
-                $found= $obj->find($arg1);
+                $obj = $session->getPage()->find($arg1);
                 $count++;
             }while($found==true);
         
