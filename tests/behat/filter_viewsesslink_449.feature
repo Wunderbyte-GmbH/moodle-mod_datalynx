@@ -16,11 +16,11 @@ Feature:When creating a view and adding a tag to the template with the viewname
       | activity | course | idnumber | name                   | approval |
       | datalynx | C1     | 12345    | Datalynx Test Instance | 1        |
     And "Datalynx Test Instance" has following fields:
-      | type             | name      |visible | edits |  param1 | param2 | param3    |param4    |
-      | text             | testfield |  2     | -1    |         |        |           |          |
+      |type             |name      |visible | edits |  param1 | param2 | param3    |param4    |
+      |text             |testfield |  2     | -1    |         |        |           |          |
     And "Datalynx Test Instance" has following views:
-      | type    | name                   | status                   | redirect           | filter        | section                                                                   |
-      | grid    | testview               | default, edit, more      | testview           |               | ##entries##<br>#{{viewsesslink:testview;Neuen Eintrag anlegen;new=1;}}#   |
+      |type    |name                   |status                   |redirect           |filter        |section                                                                   |
+      |grid    |testview               |default, edit, more      |testview           |               |##entries##<br>#{{viewsesslink:testview;Neuen Eintrag anlegen;new=1;}}#   |
       
       
 Scenario: Login and look at a view with a tag
@@ -31,7 +31,7 @@ Scenario: Login and look at a view with a tag
     And I should see "testview"
     Then I click "Edit" button of "testview" item
     And I follow "View template"
-    And I follow "Save changes"
+    And I press "Save changes"
     Then I follow "Browse"
     And I should see "Neuen Eintrag anlegen"
     But I should not see "viewsesslink"
