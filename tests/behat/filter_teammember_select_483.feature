@@ -26,7 +26,7 @@ Feature:Team member should only see their entry
     And "Datalynx Test Instance" has following fields:
       | type             | name     |visible | edits |  param1 | param2 | param3    |param4    |
       | teammemberselect | lehrer   |  2     | -1    | 3       | [2]  | 1           |4         |
-      | text             | entry    |  2     | -1    |        | [2]  |            |         |
+      | text             | entry    |  2     | -1    |         | [2]  |             |          |
     And "Datalynx Test Instance" has following entries:
       | author   |entry | lehrer            | approved |
       | teacher1 |t1_1  | teacher1          | 1        |

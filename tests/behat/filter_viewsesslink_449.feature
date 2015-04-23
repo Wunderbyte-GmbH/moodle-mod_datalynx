@@ -15,6 +15,12 @@ Feature:When creating a view and a field and you add a viewsesslink tag
     And the following "activities" exist:
       | activity | course | idnumber | name                   | approval |
       | datalynx | C1     | 12345    | Datalynx Test Instance | 1        |
+  And "Datalynx Test Instance" has following views:
+      | type    | name                   | status       | redirect           | filter        | param2                                                                    |
+      | grid    | Default view           | default, edit, detail      | Default view       |               | <div ><table><tbody><tr><td>Hi.</td></tr><tr><td>##edit##  ##delete##</td></tr></tbody></table></div> |
+  And "Datalynx Test Instance" has following fields:
+      | type             | name     |visible | edits |  param1 | param2 | param3    |param4    |
+      | teammemberselect | lehrer   |  2     | -1    | 3       | [2]  | 1           |4         |
       
       
 Scenario: Login and create a View and a field with a sesslink as viewtemplate
