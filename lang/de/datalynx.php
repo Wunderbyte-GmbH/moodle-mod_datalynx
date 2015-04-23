@@ -280,47 +280,7 @@ $string['max'] = 'Maximum';
 $string['maxsize'] = 'Maximale Größe';
 $string['mediafile'] = 'Mediendatei';
 $string['menus'] = 'Menüs';
-/// Message strings
-$string['message_entryadded'] =
-'Guten Tag {$a->fullname},
 
-{$a->datalynxlink} wurde von {$a->senderprofilelink} bearbeitet.
-
-Unter folgendem Link können Sie den Eintrag einsehen: {$a->viewlink}.';
-
-$string['message_entryupdated'] =
-'Guten Tag {$a->fullname},
-
-{$a->datalynxlink} wurde von {$a->senderprofilelink} bearbeitet.
-
-Unter folgendem Link können Sie den Eintrag einsehen: {$a->viewlink}.';
-
-$string['message_entrydeleted'] =
-'Guten Tag {$a->fullname},
-
-{$a->datalynxlink} wurde von {$a->senderprofilelink} bearbeitet.
-
-Folgender Eintrag wurde gelöscht: {$a->entryid}.';
-
-$string['message_entryapproved'] =
-'Guten Tag {$a->fullname},
-
-{$a->datalynxlink} wurde von {$a->senderprofilelink} bearbeitet.
-
-Folgender Eintrag wurde zugelassen: {$a->viewlink}.';
-
-
-$string['message_entrydisapproved'] =
-'Guten Tag {$a->fullname},
-
-{$a->datalynxlink} wurde von {$a->senderprofilelink} bearbeitet.
-
-Folgender Eintrag wurde abgelehnt: {$a->viewlink}.';
-
-$string['message_commentadded'] = 'Datalynx Kommentar hinzugefügt';
-$string['message_ratingadded'] = 'Datalynx Bewertung hinzugefügt';
-$string['message_ratingupdated'] = 'Datalynx Bewertung aktualisiert';
-/// End Message strings
 /// Message provider strings
 $string['messageprovider:datalynx_entryadded'] = 'Datalynx Eintrag hinzugefügt';
 $string['messageprovider:datalynx_entryupdated'] = 'Datalynx Eintrag aktualisiert';
@@ -710,3 +670,107 @@ $string['newbehavior'] = 'New field behavior';
 $string['editingbehavior'] = 'Editing field behavior "{$a}"';
 $string['deletingbehavior'] = 'Deleting field behavior "{$a}"';
 $string['duplicatingbehavior'] = 'Duplicating field behavior "{$a}"';
+
+
+/// Message strings
+$string['message_entry_created'] =
+'Guten Tag {$a->fullname},
+
+der Inhalt von {$a->datalynxlink} wurde von {$a->senderprofilelink} bearbeitet.
+
+Der folgende Eintrag wurde hinzugefügt: {$a->viewlink}.';
+
+$string['message_entry_updated'] =
+'Guten Tag {$a->fullname},
+
+der Inhalt von {$a->datalynxlink} wurde von {$a->senderprofilelink} bearbeitet.
+
+Der folgende Eintrag wurde aktualisiert: {$a->viewlink}.';
+
+$string['message_entry_deleted'] =
+'Guten Tag {$a->fullname},
+
+der Inhalt von {$a->datalynxlink} wurde von {$a->senderprofilelink} bearbeitet.
+
+Der folgende Eintrag wurde gelöscht: {$a->entryid}.';
+
+$string['message_entry_approved'] = 'Guten Tag {$a->fullname},
+
+der Inhalt von {$a->datalynxlink} wurde von {$a->senderprofilelink} bearbeitet.
+
+Der folgende Eintrag wurde freigeschaltet: {$a->viewlink}.';
+
+$string['message_entry_disapproved'] = 'Guten Tag {$a->fullname},
+
+der Inhalt von {$a->datalynxlink} wurde von {$a->senderprofilelink} bearbeitet.
+
+Der folgende Eintrag wurde deaktiviert: {$a->viewlink}.';
+
+$string['message_comment_created'] = 'Guten Tag {$a->fullname},
+
+Der folgende Eintrag wurde von {$a->senderprofilelink}  kommentiert: {$a->viewlink}.';
+$string['message_rating_added'] = 'Eintrag bewertet';
+$string['message_rating_updated'] = 'Bewertung eines Eintrags aktualisiert';
+
+$string['message_team_updated'] = 'Guten Tag {$a->fullname},
+
+ {$a->fieldname} wurde von {$a->senderprofilelink} geändert. Rufen Sie folgenden Link für detaillierte Informationen auf: {$a->viewlink}.';
+/// End Message strings
+
+/// Message provider strings
+$string['messageprovider:event_entry_created'] = 'Eintrag erstellt';
+$string['messageprovider:event_entry_updated'] = 'Eintrag aktualisiert';
+$string['messageprovider:event_entry_deleted'] = 'Eintrag gelöscht';
+$string['messageprovider:event_entry_approved'] = 'Eintrag freigeschaltet';
+$string['messageprovider:event_entry_disapproved'] = 'Eintrag deaktiviert';
+$string['messageprovider:event_comment_created'] = 'Kommentar hinzugefügt';
+$string['messageprovider:event_rating_added'] = 'Bewertung hinzugefügt';
+$string['messageprovider:event_rating_updated'] = 'Bewertung aktualisiert';
+$string['messageprovider:event_team_updated'] = 'Teammitglieder aktualisiert';
+/// End Message provider strings event_team_updated
+
+$string['filterforms'] = 'Filter forms';
+$string['filterformadd'] = 'Add new filter form';
+$string['newfilterform'] = 'New filter form';
+
+// FILTER
+$string['anyof'] = 'ein beliebiges';
+$string['allof'] = 'alle';
+$string['exactly'] = 'exakt';
+$string['greater_than'] = 'größer als';
+$string['greater_equal'] = 'größer als oder gleich wie';
+$string['less_than'] = 'weniger als';
+$string['less_equal'] = 'weniger als oder gleich wie';
+$string['before'] = 'zuvor';
+$string['after'] = 'danach';
+
+$string['gradeitem'] = 'Bewertung';
+$string['user_can_add_self'] = 'Benutzer/in kann sich selbst hinzufügen';
+$string['linksettings'] = 'Link Einstellungen für Benachrichtigungen';
+$string['admin'] = 'Administrator';
+$string['manager'] = 'Manager';
+$string['teacher'] = 'Trainer/in';
+$string['student'] = 'Teilnehmer/in';
+$string['guest'] = 'Gast';
+$string['targetviewforroles'] = 'Für die Rolle zugeordnete Ansicht auf die der eingefügte Link verweist';
+
+$string['subscribe'] = 'Eintragen';
+$string['unsubscribe'] = 'Austragen';
+$string['allowsubscription'] = 'Selbstätiges Eintragen erlauben';
+$string['allowunsubscription'] = 'Selbstätiges Austragen erlauben';
+$string['selectuser'] = 'Benutzer/in auswählen...';
+$string['allowsubscription_help'] = 'Check this option to enable users to add themselves to teams created by other people. This is facilitated via :subscribe tag extension, e.g. [[&lt;fieldname&gt;:subscribe]], which modifies the field to display an additional link in browse mode. By clicking on this link user can add themselves to the particular team, if they are able and allowed to by the field setup.';
+$string['allowunsubscription_help'] = 'Check this option to enable users to unsubscribe themselves from teams of other users in a manner similar to the \'Allow manual subscription option\'. If disabled, users on a team can only be removed by the user who created that team.';
+$string['user_can_add_self_help'] = 'Check this option to allow the user who owns the entry to add themselves to the team in this field.';
+$string['check_enable'] = 'You must mark \'enable\' checkbox to confirm the validity of the selected value.';
+$string['deletefieldfilterwarning'] = 'Warning! You are attempting to delete following fields:{$a->fieldlist}However, filters listed below are still using some of these fields:{$a->filterlist}You will have to delete these filters manually first before you may proceed.';
+$string['noviewsavailable'] = 'Keine Ansicht verfügbar';
+
+$string['datalynx_team_updated'] = 'Team aktualisiert';
+$string['datalynx:editprivilegeadmin'] = 'Admin Editierrecht';
+$string['datalynx:editprivilegeguest'] = 'Gast Editierrecht';
+$string['datalynx:editprivilegemanager'] = 'Manager Editierrecht';
+$string['datalynx:editprivilegestudent'] = 'Teilnehmer/innen Editierrecht';
+$string['datalynx:editprivilegeteacher'] = 'Trainer/innen Editierrecht';
+$string['datalynx:notifyteamupdated'] = 'Bei Aktualisierung des Teams benachrichtigen';
+$string['datalynx:teamsubscribe'] = 'Einschreiben / einem Team beitreten';

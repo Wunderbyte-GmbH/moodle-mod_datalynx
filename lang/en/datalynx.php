@@ -742,11 +742,11 @@ $string['message_entry_disapproved'] = 'Hello {$a->fullname},
 
 the content in {$a->datalynxlink} has been modified by {$a->senderprofilelink}.
 
-The following entry has been disapproved: {$a->viewlink}.';
+The following entry has been deactivated: {$a->viewlink}.';
 
 $string['message_comment_created'] = 'Hello {$a->fullname},
 
-one your entries was commented on by {$a->senderprofilelink}.
+a comment to one of your entries was added by {$a->senderprofilelink}.
 
 The following entry has been commented on: {$a->viewlink}.';
 $string['message_rating_added'] = 'Datalynx rating added';
@@ -790,7 +790,7 @@ $string['before'] = 'before';
 $string['after'] = 'after';
 
 $string['gradeitem'] = 'Grade item';
-$string['user_can_add_self'] = 'User can add self';
+$string['user_can_add_self'] = 'User can add him/herself';
 $string['linksettings'] = 'Message link settings';
 $string['admin'] = 'Administrator';
 $string['manager'] = 'Manager';
