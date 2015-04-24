@@ -265,6 +265,55 @@ class behat_mod_datalynx extends behat_files {
 
         return $steps;
     }
+    
+   
+    
+    /**
+     * @Given /^I fill in "([^"]*)" for "([^"]*)"$/
+     */
+    public function iFillInFor($arg1, $arg2)
+    {
+    	$session = $this->getSession(); 
+        $element = $session->getPage()->findField($arg2);
+        $session->getPage()->fillField($arg2, $arg1);
+        
+        
+        //$element->click();
+        //foreach (str_split($arg1) as $cchar)
+        //{
+        //	$session->getDriver()->keyPress($element->getXpath(), $cchar);
+        //}
+    }
+    
+    /**
+     * @Given /^I append "([^"]*)" for "([^"]*)"$/
+     */
+    public function iAppendFor($arg1, $arg2)
+    {
+    	$session = $this->getSession();
+    	$element = $session->getPage()->findField($arg2);
+    	$oldvalue = $element->getValue();
+    	$session->getPage()->fillField($arg2, $oldvalue."".$arg1);
+    
+    
+    	//$element->click();
+    	//foreach (str_split($arg1) as $cchar)
+    	//{
+    		//	$session->getDriver()->keyPress($element->getXpath(), $cchar);
+    		//}
+    }
+    
+    /**
+     * @Given /^I click inside "([^"]*)"$/
+     */
+    public function iClickOn($arg1)
+    {
+    	$session = $this->getSession();
+    	$element = $session->getPage()->findById($arg1);
+    	$element->click();
+    }
+    
+    
 
     /**
      * Deletes a view in the list

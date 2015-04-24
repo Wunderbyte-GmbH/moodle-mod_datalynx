@@ -20,7 +20,8 @@ Feature:When creating a view and adding a tag to the template with the viewname
       |text             |testfield |  2     | -1    |         |        |           |          |
     And "Datalynx Test Instance" has following views:
       |type    |name                   |status                   |redirect           |filter        |section                                                                   |
-      |grid    |testview               |default, edit, more      |testview           |               |##entries##<br>#{{viewsesslink:testview;Neuen Eintrag anlegen;new=1;}}#   |
+      |grid    |testview               |default, edit, more      |testview           |              |<div><table><tbody><tr><td>Text:</td> <td>[[testfield]]</td></tr><tr><td>##edit##  ##delete##</td></tr></tbody></table></div>    |
+      
       
       
 Scenario: Login and look at a view with a tag
@@ -31,6 +32,10 @@ Scenario: Login and look at a view with a tag
     And I should see "testview"
     Then I click "Edit" button of "testview" item
     And I follow "View template"
+    And I press "Show more buttons"
+    And I press "HTML"
+    And I fill in "#{{viewsesslink:testview;Neuen Eintrag anlegen;new=1;}}#" for "id_esection_editor"
+    And I press "HTML"
     And I press "Save changes"
     Then I follow "Browse"
     And I should see "Neuen Eintrag anlegen"
