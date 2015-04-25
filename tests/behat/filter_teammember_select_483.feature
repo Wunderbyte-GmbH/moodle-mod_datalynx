@@ -1,4 +1,4 @@
-@mod @mod_datalynx @dev @_file_upload @wip1 @mink:selenium2
+@mod @mod_datalynx @mod_peter @wip1 @mink:selenium2
 Feature:Team member should only see their entry
         Where they have been assigned to
         And neither the others nor nothing if there would be anything
@@ -36,7 +36,7 @@ Feature:Team member should only see their entry
       | teacher1 |t1_1  | teacher1          | 1        |
       | teacher2 |t1_2  | teacher1          | 1        |
       | teacher3 |t1_3  | teacher1          | 1        |
-      | teacher1 |t2    | teacher2          | 1        |
+      | teacher1 |t2s    | teacher2          | 1        |
       | teacher3 |t2_t3 | teacher2,teacher3 | 1        |
     
 Scenario: Login as Teacher1 and see three entries of yourself
@@ -51,27 +51,27 @@ Scenario: Login as Teacher1 and see three entries of yourself
     And I follow "Views"
     Then I should see "lehrer_teamselector"
     And I follow "Browse"
-    And I should not see "t2"
+    And I should not see "t2s"
     And I should not see "t2_t3"
     And I should see "t1_1"
     And I should see "t1_2"
     And I should see "t1_3"
     
-Scenario: Login as Teacher2 and see one entrie of yourself and one entry with Teacher3
+Scenario: Login as Teacher2 and see one entry of yourself and one entry with Teacher3
     Given I log in as "teacher2"
     And I follow "Course 1"
     And I follow "Datalynx Test Instance"
-    And I should see "t2"
+    And I should see "t2s"
     And I should see "t2_t3"
     And I should not see "t1_1"
     And I should not see "t1_2"
     And I should not see "t1_3"
     
-Scenario: Login as Teacher3 and see one entrie with Teacher2
+Scenario: Login as Teacher3 and see one entry with Teacher2
     Given I log in as "teacher3"
     And I follow "Course 1"
     And I follow "Datalynx Test Instance"
-    And I should not see "t2"
+    And I should not see "t2s"
     And I should see "t2_t3"
     And I should not see "t1_1"
     And I should not see "t1_2"

@@ -1,4 +1,4 @@
-@mod @mod_datalynx @wip4
+@mod @mod_datalynx @wip4 @mod_peter @mink:selenium2
 Feature: If you have a radiobutton and/or checkbox field assigned to a view
          And the filter is "not any of a is check"
          It should show you all entries where A is not chosen

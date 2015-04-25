@@ -1,4 +1,4 @@
-@mod @mod_datalynx @dev @_file_upload @wip3 @mink:selenium2
+@mod @mod_datalynx @mod_peter @wip3 @mink:selenium2
 Feature:A Status Tag can be inserted into a view and should not throw any exceptions or failures during saving
 
   Background:

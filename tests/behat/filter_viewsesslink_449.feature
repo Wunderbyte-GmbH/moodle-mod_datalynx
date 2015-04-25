@@ -1,4 +1,4 @@
-@mod @mod_datalynx @dev @_file_upload @wip2 @mink:selenium2
+@mod @mod_datalynx @mod_peter @wip2 @mink:selenium2
 Feature:When creating a view and adding a tag to the template with the viewname
         The viewname was displayed and the tag was broken
 
