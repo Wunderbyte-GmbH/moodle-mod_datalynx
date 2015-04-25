@@ -853,6 +853,16 @@ class behat_mod_datalynx extends behat_files {
         $datalynx = new datalynx($record->dataid);
         $datalynx->process_views('reset', $id, true);
 
+        if($record->param2)
+        {
+        	$DB->set_field('datalynx_views', 'param2', $record->param2, array('id' => $record->dataid));
+        }
+        
+        if($record->section)
+        {
+        	$DB->set_field('datalynx_views', 'section', $record->section, array('id' => $record->dataid));
+        }
+        
         if (isset($options['default'])) {
             $DB->set_field('datalynx', 'defaultview', $id, array('id' => $record->dataid));
         }
@@ -1033,7 +1043,7 @@ class behat_mod_datalynx extends behat_files {
                 $options = preg_split('/[\n\r]+/m', $DB->get_field('datalynx_fields', 'param1', array('id' => $fieldid)));
                 $id = array_search(trim($value), $options);
                 if ($id !== false) {
-                    $content['content'] = $id;
+                    $content['content'] = $id+1;
                 } else {
                     $content['content'] = '';
                 }

@@ -16,7 +16,7 @@ Feature:A Status Tag can be inserted into a view and should not throw any except
       | datalynx | C1     | 12345    | Datalynx Test Instance | 1        |
   And "Datalynx Test Instance" has following views:
       | type    | name                   | status       | redirect           | filter        | param2                                                                                                |
-      | grid    | Default view           | default      | Default view       |               | <div ><table><tbody><tr><td>Hi.</td></tr><tr><td>##edit##  ##delete##</td></tr></tbody></table></div> |
+      | grid    | Default view           | default      | Default view       |               | <div ><table><tbody><tr><td>Hi.</td></tr><tr><td>##edit##  ##delete## ##status##</td></tr></tbody></table></div> |
   And "Datalynx Test Instance" has following entries:
       | author   | approved | status |
       | teacher1 | 1        | 1      |
@@ -30,8 +30,8 @@ Scenario: Login and insert a status tag into view edit template
     And I click "Edit" button of "Default view" item
     And I follow "Entry template"
     And I click inside "id_eparam2_editoreditable"
-    And I set the field "eparam2_editor_field_tag_menu" to "##status##"
+    And I set the field "eparam2_editor_field_tag_menu" to ""
     And I press "Save changes"
     Then I follow "Browse"
-    And I should see "DraftDraft"
+    And I should see "Draft"
     But I should not see "Undefined index"
