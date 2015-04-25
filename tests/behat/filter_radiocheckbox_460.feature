@@ -23,11 +23,13 @@ Feature: If you have a radiobutton and/or checkbox field assigned to a view
       | text        | RecordF |        |
     And "Datalynx Test Instance" has following filters:
       | name        | visible | customsearch                                                                     |
-      | RadioFilter | 1       | a:1:{i:1;a:1:{s:3:"AND";a:1:{i:0;a:3:{i:0;s:0:"";i:1;s:4:"USER";i:2;s:1:"3";}}}} |
-      | CheckFilter | 1       | a:1:{i:1;a:1:{s:3:"AND";a:1:{i:0;a:3:{i:0;s:0:"";i:1;s:4:"USER";i:2;s:1:"3";}}}} |
+      | RadioFilter | 1       | a:1:{i:1;a:1:{s:3:"AND";a:1:{i:0;a:3:{i:0;s:3:"NOT";i:1;s:6:"ANY_OF";i:2;a:1:{i:0;s:1:"1";}}}}} |
+      | CheckFilter | 1       | a:1:{i:2;a:1:{s:3:"AND";a:1:{i:0;a:3:{i:0;s:3:"NOT";i:1;s:6:"ANY_OF";i:2;a:1:{i:0;s:1:"1";}}}}} |
     And "Datalynx Test Instance" has following views:
-      | type    | name         | status  | redirect     | filter |    
-      | grid    | Default view | default | Default view |        |
+      | type    | name        | status  | redirect    | filter      |
+      | grid    | DefaultView | default | DefaultView | RadioFilter |    
+      | grid    | RadioView   |         | RadioView   | DefaultView |
+      | grid    | CheckView   |         | CheckView   | DefaultView |
    And "Datalynx Test Instance" has following entries:
       | author   |CheckF | RadioF | RecordF  | approved |
       | teacher1 | A     |        | checkA   | 1        |
@@ -42,7 +44,8 @@ Feature: If you have a radiobutton and/or checkbox field assigned to a view
 
   @javascript
   Scenario: Check if filter works for radiobuttons
-    
-    
-    
-  Scenario: Check if filter works for checkboxes
+    Given I log in as "teacher1"
+    And I follow "Course 1"
+    And I follow "Datalynx Test Instance"
+    And I set the field "view" to "RadioView"
+    And I should not see "checkA"
