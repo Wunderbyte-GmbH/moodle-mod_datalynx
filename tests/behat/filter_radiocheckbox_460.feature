@@ -22,7 +22,7 @@ Feature: If you have a radiobutton and/or checkbox field assigned to a view
       | checkbox    | CheckF  | A, B   |
       | text        | RecordF |        |
     And "Datalynx Test Instance" has following filters:
-      | name        | visible | customsearch                                                                     |
+      | name        | visible | customsearch                                                                                    |
       | RadioFilter | 1       | a:1:{i:1;a:1:{s:3:"AND";a:1:{i:0;a:3:{i:0;s:3:"NOT";i:1;s:6:"ANY_OF";i:2;a:1:{i:0;s:1:"1";}}}}} |
       | CheckFilter | 1       | a:1:{i:2;a:1:{s:3:"AND";a:1:{i:0;a:3:{i:0;s:3:"NOT";i:1;s:6:"ANY_OF";i:2;a:1:{i:0;s:1:"1";}}}}} |
     And "Datalynx Test Instance" has following views:
@@ -48,4 +48,27 @@ Feature: If you have a radiobutton and/or checkbox field assigned to a view
     And I follow "Course 1"
     And I follow "Datalynx Test Instance"
     And I set the field "view" to "RadioView"
-    And I should not see "checkA"
+    And I should see "checkA"
+    And I should see "checkB"
+    And I should see "nonono"
+    And I should see "radioB"
+    And I should see "bothB"
+    And I should see "bothAB"
+    But I should not see "radioA"
+    But I should not see "bothA"
+    But I should not see "bothBA"
+    
+Scenario: Check if filter works for checkbuttons
+    Given I log in as "teacher1"
+    And I follow "Course 1"
+    And I follow "Datalynx Test Instance"
+    And I set the field "view" to "CheckView"
+    And I should see "radioA"
+    And I should see "checkB"
+    And I should see "nonono"
+    And I should see "radioB"
+    And I should see "bothB"
+    And I should see "bothBA"
+    But I should not see "checkA"
+    But I should not see "bothA"
+    But I should not see "bothAB"
