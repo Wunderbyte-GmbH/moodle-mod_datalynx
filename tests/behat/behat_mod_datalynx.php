@@ -875,6 +875,94 @@ class behat_mod_datalynx extends behat_files {
 
         return $id;
     }
+    
+    /**
+     * @Given /^"([^"]*)" has following behaviors:$/
+     */
+    public function hasFollowingBehaviors($arg1, TableNode $table)
+    {
+    	$behaviors = $table->getHash();
+
+        $instance = $this->get_instance_by_name($arg1);
+        
+        foreach ($behaviors as $behavior) {
+            $behavior['dataid'] = $instance->id;
+			$behavior['id'] = $this->create_behavior($behavior);
+        }
+    }
+    
+    private function create_behavior($record = null) {
+    	global $DB;
+    
+    	$record = (object) (array) $record;
+    
+    	$defaults = array (
+    			'name' => 'Behavior',
+    			'description' => '',
+    			'visibleto' => '',
+    			'editableby' => '',
+    			'required' => 0,
+    	);
+    
+    	foreach ($defaults as $name => $value) {
+    		if (!isset($record->{$name})) {
+    			$record->{$name} = $value;
+    		}
+    	}
+    	
+    	$id = $DB->insert_record('datalynx_behaviors', $record);
+    	
+    	return $id;
+    }
+    
+    
+    /**
+     * @Given /^I refresh the Entry template of "([^"]*)"$/
+     */
+    public function iRefreshTheEntryTemplateOf($arg1)
+    {
+    	$steps = array( new Given('I click "Edit" button of "'.$arg1.'" item'),
+    					new Given('I follow "Entry template"'),
+    					new Given('I click inside "id_eparam2_editoreditable"'),
+    					new Given('I set the field "eparam2_editor_field_tag_menu" to ""'),
+    					new Given('I press "Save changes"'),
+    							);
+        return $steps;
+    }
+    
+    /**
+     * @Given /^I refresh the View template of "([^"]*)"$/
+     */
+    public function iRefreshTheViewTemplateOf($arg1)
+    {
+    	$steps = array( new Given('I click "Edit" button of "'.$arg1.'" item'),
+    					new Given('I follow "View template"'),
+    					new Given('I press "Show more buttons"'),
+    					new Given('I press "HTML"'),
+    					new Given('I press "HTML"'),
+    					new Given('I press "Save changes"'),
+    							);
+        return $steps;
+    }
+    
+    /**
+     * @Given /^I update the templates of "([^"]*)"$/
+     */
+    public function iUpdateTheTemplatesOf($arg1)
+    {
+    	$steps = array( new Given('I click "Edit" button of "'.$arg1.'" item'),
+    					new Given('I follow "View template"'),
+    					new Given('I press "Show more buttons"'),
+    					new Given('I press "HTML"'),
+    					new Given('I press "HTML"'),
+    					new Given('I follow "Entry template"'),
+    					new Given('I click inside "id_eparam2_editoreditable"'),
+    					new Given('I set the field "eparam2_editor_field_tag_menu" to ""'),
+    					new Given('I press "Save changes"'),
+    							);
+        return $steps;
+    }
+    
 
     private function create_filter($record = null, array $options = null) {
         global $DB;
