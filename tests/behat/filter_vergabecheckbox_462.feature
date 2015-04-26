@@ -8,6 +8,7 @@ Feature:
     And the following "users" exist:
       | username  | firstname   | lastname  | email                   |
       | teacher1  | Teacher     | 1         | teacher1@mailinator.com |
+      | manager1  | Checker     | , The     | manager1@mailinator.com |
     And the following "course enrolments" exist:
       | user      | course  | role            |
       | teacher1  | C1      | editingteacher  |
@@ -21,26 +22,52 @@ Feature:
       | textarea    | Themenbeschreibung |                       |
       | checkbox    | Vergabestatus      | Vergabe abgeschlossen |
     And "Datalynx Test Instance" has following filters:
-      | name                 | visible | customsearch                                                                                  |
-      | FilterCBNotAny       | 1       |                          cb is not any check                                                  |
-      | FilterCBNotExactly   | 1       |                          cb is not excatly check                                              |
-      | FilterCBNotAll       | 1       |                          cb is not allcheck                                                   |
+      | name                 | visible | customsearch                                                                                    |
+      | FilterCBNotAny       | 1       | a:1:{i:3;a:1:{s:3:"AND";a:1:{i:0;a:3:{i:0;s:3:"NOT";i:1;s:6:"ANY_OF";i:2;a:1:{i:0;s:1:"1";}}}}} |
+      | FilterCBNotExactly   | 1       | a:1:{i:3;a:1:{s:3:"AND";a:1:{i:0;a:3:{i:0;s:3:"NOT";i:1;s:7:"EXACTLY";i:2;a:1:{i:0;s:1:"1";}}}}}|
+      | FilterCBNotAll       | 1       | a:1:{i:3;a:1:{s:3:"AND";a:1:{i:0;a:3:{i:0;s:3:"NOT";i:1;s:6:"ALL_OF";i:2;a:1:{i:0;s:1:"1";}}}}} |
     And "Datalynx Test Instance" has following views:
-      | type    | name                    | status  | redirect                | filter | section | param2  | visible |
-      | grid    | Übersicht               | default | Übersicht               |        | no cb   |  no cb  | 7       |
-      | grid    | Eintrag anlegen         | edit    | Übersicht               |        |  no cb  |  no cb  | 7       | 
-      | tabular | Vergabestatus Übersicht |         | Vergabestatus Übersicht |        | all+tag | all+tag | 1       |
+      | type    | name                    | status  | redirect      | param2                                                                                                                                                                                                                                                                                                                                                                                                                                                            | visible |
+      | grid    | Übersicht               | default | Übersicht     |<div class="entry"><table class="generaltable" align="center"><tbody><tr class="r0"><td class="cell c0" style="text-align:right;">Thema:</td><td class="cell c1 lastcol">[[Thema]]</td></tr><tr class="r1"><td class="cell c0" style="text-align:right;">Themenbeschreibung:</td><td class="cell c1 lastcol">[[Themenbeschreibung]]</td></tr><tr class="r1 lastrow"><td class="cell c0 lastcol" colspan="2">##edit##  ##delete##</td></tr></tbody></table></div>   | 7       |
+      | grid    | Eintrag anlegen         | edit    | Übersicht     |<div class="entry"><table class="generaltable" align="center"><tbody><tr class="r0"><td class="cell c0" style="text-align:right;">Thema:</td><td class="cell c1 lastcol">[[Thema]]</td></tr><tr class="r1"><td class="cell c0" style="text-align:right;">Themenbeschreibung:</td><td class="cell c1 lastcol">[[Themenbeschreibung]]</td></tr><tr class="r1 lastrow"><td class="cell c0 lastcol" colspan="2">##edit##  ##delete##</td></tr></tbody></table></div>   | 7       | 
+      | tabular | Vergabestatus           |         | Vergabestatus |<div class="entry"><table class="generaltable" align="center"><tbody><tr class="r0"><td class="cell c0" style="text-align:right;">Thema:</td><td class="cell c1 lastcol">[[Thema]]</td></tr><tr class="r1"><td class="cell c0" style="text-align:right;">Themenbeschreibung:</td><td class="cell c1 lastcol">[[Themenbeschreibung]]</td></tr><tr class="r1"><td class="cell c0" style="text-align:right;">Status:</td><td class="cell c1 lastcol">[[Vergabestatus]]</td></tr><tr class="r1 lastrow"><td class="cell c0 lastcol" colspan="2">##edit##  ##delete## #{{viewsesslink:Vergabestatus;_pixicon:t/edit:Thema zuweisen;eids=##entryid##\|editentries=##entryid##;}}#</td></tr></tbody></table></div>                                   | 1       |
    And "Datalynx Test Instance" has following entries:
       | author   | approved | Thema   | Themenbeschreibung            |
       | teacher1 | 1        | Thema_1 | Die Beschreibung Nummer Eins. |
       | teacher1 | 1        | Thema_2 | Die Beschreibung Nummer Zwei. |
       | teacher1 | 1        | Thema_3 | Die Beschreibung Nummer Drei. |
+      | teacher1 | 1        | Thema_4 | Die Beschreibung Nummer Vier. |
       
       
-  Scenario:
-    Given I log in as "teacher1"
+
+    Given I log in as "manager1"
     And I follow "Course 1"
     And I follow "Datalynx Test Instance"
     And I follow "Manage"
     And I follow "Views"
+    And I refresh the Entry template of "Übersicht"
+    And I refresh the Entry template of "Eintrag anlegen"
+    And I refresh the Entry template of "Vergabestatus"
+    
+Scenario: Try it with filter "NotAny"
+    Then I click "Edit" button of "Vergabestatus" item
+    Then I set the field "_filter" to "FilterCBNotAny"
+    And I press "Save changes"
+    And I follow "Vergabestatus"
+    And I should not see "no entries to display"
+    
+Scenario: Try it with filter "NotExactly"
+    Then I click "Edit" button of "Vergabestatus" item
+    Then I set the field "_filter" to "FilterCBNotExactly"
+    And I press "Save changes"
+    And I follow "Vergabestatus"
+    And I should not see "no entries to display"
+    
+Scenario: Try it with filter "NotAll"
+    Then I click "Edit" button of "Vergabestatus" item
+    Then I set the field "_filter" to "FilterCBNotAll"
+    And I press "Save changes"
+    And I follow "Vergabestatus"
+    And I should not see "no entries to display"
+    
   

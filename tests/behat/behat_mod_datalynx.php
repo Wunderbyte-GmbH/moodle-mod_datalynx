@@ -855,12 +855,12 @@ class behat_mod_datalynx extends behat_files {
 
         if($record->param2)
         {
-        	$DB->set_field('datalynx_views', 'param2', $record->param2, array('id' => $record->dataid));
+        	$DB->set_field('datalynx_views', 'param2', $record->param2, array('id' => $id));
         }
         
         if($record->section)
         {
-        	$DB->set_field('datalynx_views', 'section', $record->section, array('id' => $record->dataid));
+        	$DB->set_field('datalynx_views', 'section', $record->section, array('id' => $id));
         }
         
         if (isset($options['default'])) {
@@ -946,7 +946,7 @@ class behat_mod_datalynx extends behat_files {
     }
     
     /**
-     * @Given /^I update the templates of "([^"]*)"$/
+     * @Given /^I refresh the templates of "([^"]*)"$/
      */
     public function iUpdateTheTemplatesOf($arg1)
     {
