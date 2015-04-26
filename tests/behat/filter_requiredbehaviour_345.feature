@@ -33,7 +33,7 @@ Scenario: Check if the required field works
     And I follow "Datalynx Test Instance"
     And I follow "Manage"
     And I follow "Views"
-    And I refresh the Entry template of "testview"
+    Then I refresh the Entry template of "testview"
     And I follow "Browse"
     And I follow "Add a new entry"
     Then I should see "New entry"

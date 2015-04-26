@@ -20,10 +20,10 @@ Feature: If you have a filter for status tags which are in Final Submission
       | type        | name    |
       | text        | RecordF |
     And "Datalynx Test Instance" has following filters:
-      | name                 | visible | customsearch |
-      | StatusNotFinalFilter | 1       |  |
-      | StatusIsFinalFilter  | 1       |  |
-      | StatusNotSetFilter   | 1       |              |
+      | name                 | visible | customsearch                                                                              |
+      | StatusNotFinalFilter | 1       | a:1:{s:6:"status";a:1:{s:3:"AND";a:1:{i:0;a:3:{i:0;s:3:"NOT";i:1;s:1:"=";i:2;s:1:"2";}}}} |
+      | StatusIsFinalFilter  | 1       | a:1:{s:6:"status";a:1:{s:3:"AND";a:1:{i:0;a:3:{i:0;s:0:"";i:1;s:1:"=";i:2;s:1:"2";}}}}    |
+      | StatusNotSetFilter   | 1       |                                                                                           |
     And "Datalynx Test Instance" has following views:
       | type    | name            | status  | redirect    | filter               |
       | grid    | DefaultView     | default | DefaultView |                      |
@@ -48,7 +48,7 @@ Scenario: Check if Final Submission Filter ist working
     And I should see "entry2"
     And I should not see "entry3"
     And I should not see "entry4"
-    And I should not see "entry5"
+    And I should see "entry5"
     Then I set the field "view" to "StatusIsView"
     And I should not see "entry1"
     And I should not see "entry2"
@@ -61,6 +61,7 @@ Scenario: Check if Is Not Set shows correct output and is saveable
     And I follow "Course 1"
     And I follow "Datalynx Test Instance"
     Then I follow "Manage"
+    And I follow "Filters"
     And I should see "StatusNotSetFilter"
     Then I follow "StatusNotSetFilter"
     And I set the field "searchandor0" to "AND"
@@ -74,6 +75,6 @@ Scenario: Check if Is Not Set shows correct output and is saveable
     And I should not see "entry2"
     And I should not see "entry3"
     And I should not see "entry4"
-    And I should not see "entry5"
+    But I should see "entry5"
     
     
