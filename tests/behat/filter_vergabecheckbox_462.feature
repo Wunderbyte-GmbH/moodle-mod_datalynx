@@ -11,30 +11,30 @@ Feature:
     And the following "course enrolments" exist:
       | user      | course  | role            |
       | teacher1  | C1      | editingteacher  |
+      | manager1  | C1      | manager         |
     And the following "activities" exist:
       | activity | course | idnumber | name                   |
       | datalynx | C1     | 12345    | Datalynx Test Instance |
     And "Datalynx Test Instance" has following fields:
-      | type        | name    |
-      | text        | RecordF |
+      | type        | name               | param1                |
+      | text        | Thema              |                       |
+      | textarea    | Themenbeschreibung |                       |
+      | checkbox    | Vergabestatus      | Vergabe abgeschlossen |
     And "Datalynx Test Instance" has following filters:
-      | name                 | visible | customsearch                                                                              |
-      | StatusNotFinalFilter | 1       | a:1:{s:6:"status";a:1:{s:3:"AND";a:1:{i:0;a:3:{i:0;s:3:"NOT";i:1;s:1:"=";i:2;s:1:"2";}}}} |
-      | StatusIsFinalFilter  | 1       | a:1:{s:6:"status";a:1:{s:3:"AND";a:1:{i:0;a:3:{i:0;s:0:"";i:1;s:1:"=";i:2;s:1:"2";}}}}    |
-      | StatusNotSetFilter   | 1       |                                                                                           |
+      | name                 | visible | customsearch                                                                                  |
+      | FilterCBNotAny       | 1       |                          cb is not any check                                                  |
+      | FilterCBNotExactly   | 1       |                          cb is not excatly check                                              |
+      | FilterCBNotAll       | 1       |                          cb is not allcheck                                                   |
     And "Datalynx Test Instance" has following views:
-      | type    | name            | status  | redirect    | filter               |
-      | grid    | DefaultView     | default | DefaultView |                      |
-      | grid    | StatusNotView   |         | DefaultView | StatusNotFinalFilter |
-      | grid    | StatusIsView    |         | DefaultView | StatusIsFinalFilter  |
-      | grid    | StatusSetView   |         | DefaultView | StatusNotSetFilter   |
+      | type    | name                    | status  | redirect                | filter | section | param2  | visible |
+      | grid    | Übersicht               | default | Übersicht               |        | no cb   |  no cb  | 7       |
+      | grid    | Eintrag anlegen         | edit    | Übersicht               |        |  no cb  |  no cb  | 7       | 
+      | tabular | Vergabestatus Übersicht |         | Vergabestatus Übersicht |        | all+tag | all+tag | 1       |
    And "Datalynx Test Instance" has following entries:
-      | author   | RecordF | status   | approved |
-      | teacher1 | entry1  | 1        | 1        |
-      | teacher1 | entry2  | 1        | 1        |
-      | teacher1 | entry3  | 2        | 1        |
-      | teacher1 | entry4  | 2        | 1        |
-      | teacher1 | entry5  | 0        | 1        |
+      | author   | approved | Thema   | Themenbeschreibung            |
+      | teacher1 | 1        | Thema_1 | Die Beschreibung Nummer Eins. |
+      | teacher1 | 1        | Thema_2 | Die Beschreibung Nummer Zwei. |
+      | teacher1 | 1        | Thema_3 | Die Beschreibung Nummer Drei. |
       
       
   Scenario:
