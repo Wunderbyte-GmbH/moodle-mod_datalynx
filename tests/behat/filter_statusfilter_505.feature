@@ -1,6 +1,7 @@
 @mod @mod_datalynx @wip6 @mod_peter @mink:selenium2
-Feature: If you have a filter for status tags 
-         The expected result is not the same as the actual result
+Feature: If you have a filter for status tags which are in Final Submission
+         It used to show false results
+         And The IS NOT SET Filter could not be saved
 
   Background:
     Given the following "courses" exist:
@@ -22,7 +23,7 @@ Feature: If you have a filter for status tags
       | name                 | visible | customsearch |
       | StatusNotFinalFilter | 1       |  |
       | StatusIsFinalFilter  | 1       |  |
-      | StatusNotSetFilter   | 1       |  |
+      | StatusNotSetFilter   | 1       |              |
     And "Datalynx Test Instance" has following views:
       | type    | name            | status  | redirect    | filter               |
       | grid    | DefaultView     | default | DefaultView |                      |
@@ -30,15 +31,15 @@ Feature: If you have a filter for status tags
       | grid    | StatusIsView    |         | DefaultView | StatusIsFinalFilter  |
       | grid    | StatusSetView   |         | DefaultView | StatusNotSetFilter   |
    And "Datalynx Test Instance" has following entries:
-      | author   |RecordF | status   | approved |
-      | teacher1 | entry1 | 1        | 1        |
-      | teacher1 | entry2 | 1        | 1        |
-      | teacher1 | entry3 | 2        | 1        |
-      | teacher1 | entry4 | 2        | 1        |
-      | teacher1 | entry5 | 0        | 1        |
+      | author   | RecordF | status   | approved |
+      | teacher1 | entry1  | 1        | 1        |
+      | teacher1 | entry2  | 1        | 1        |
+      | teacher1 | entry3  | 2        | 1        |
+      | teacher1 | entry4  | 2        | 1        |
+      | teacher1 | entry5  | 0        | 1        |
       
 @javascript
-Scenario: Check if Final Submission FIlter ist working
+Scenario: Check if Final Submission Filter ist working
     Given I log in as "teacher1"
     And I follow "Course 1"
     And I follow "Datalynx Test Instance"
