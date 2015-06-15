@@ -117,13 +117,17 @@ class datalynxview_csv extends datalynxview_base {
     }
 
     /**
-     *
+     *s
      */
     protected function entry_definition($fielddefinitions) {
         $elements = array();
         // Get the columns definition from the view template
         $columns = $this->get_columns();
 
+        // split the entry template to tags and html
+        $parts = $this->split_template_by_tags($tags, $this->view->param2);
+        
+        
         // Generate entry table row
         $elements[] = array('html', html_writer::start_tag('tr'));
         foreach ($columns as $column) {

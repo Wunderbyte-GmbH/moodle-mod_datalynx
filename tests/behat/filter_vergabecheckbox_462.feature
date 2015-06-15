@@ -49,6 +49,13 @@ Feature:
     And I refresh the Entry template of "Eintrag anlegen"
     And I refresh the Entry template of "Vergabestatus"
     
+Scenario: Try it with filter "NotExactly"
+    Then I click "Edit" button of "Vergabestatus" item
+    Then I set the field "_filter" to "FilterCBNotExactly"
+    And I press "Save changes"
+    And I follow "Vergabestatus"
+    And I should not see "no entries to display"
+    
 Scenario: Try it with filter "NotAny"
     Then I click "Edit" button of "Vergabestatus" item
     Then I set the field "_filter" to "FilterCBNotAny"
@@ -56,12 +63,6 @@ Scenario: Try it with filter "NotAny"
     And I follow "Vergabestatus"
     And I should not see "no entries to display"
     
-Scenario: Try it with filter "NotExactly"
-    Then I click "Edit" button of "Vergabestatus" item
-    Then I set the field "_filter" to "FilterCBNotExactly"
-    And I press "Save changes"
-    And I follow "Vergabestatus"
-    And I should not see "no entries to display"
     
 Scenario: Try it with filter "NotAll"
     Then I click "Edit" button of "Vergabestatus" item
