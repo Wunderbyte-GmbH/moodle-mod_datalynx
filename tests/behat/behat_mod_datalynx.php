@@ -265,55 +265,6 @@ class behat_mod_datalynx extends behat_files {
 
         return $steps;
     }
-    
-   
-    
-    /**
-     * @Given /^I fill in "([^"]*)" for "([^"]*)"$/
-     */
-    public function iFillInFor($arg1, $arg2)
-    {
-    	$session = $this->getSession(); 
-        $element = $session->getPage()->findField($arg2);
-        $session->getPage()->fillField($arg2, $arg1);
-        
-        
-        //$element->click();
-        //foreach (str_split($arg1) as $cchar)
-        //{
-        //	$session->getDriver()->keyPress($element->getXpath(), $cchar);
-        //}
-    }
-    
-    /**
-     * @Given /^I append "([^"]*)" for "([^"]*)"$/
-     */
-    public function iAppendFor($arg1, $arg2)
-    {
-    	$session = $this->getSession();
-    	$element = $session->getPage()->findField($arg2);
-    	$oldvalue = $element->getValue();
-    	$session->getPage()->fillField($arg2, $oldvalue."".$arg1);
-    
-    
-    	//$element->click();
-    	//foreach (str_split($arg1) as $cchar)
-    	//{
-    		//	$session->getDriver()->keyPress($element->getXpath(), $cchar);
-    		//}
-    }
-    
-    /**
-     * @Given /^I click inside "([^"]*)"$/
-     */
-    public function iClickOn($arg1)
-    {
-    	$session = $this->getSession();
-    	$element = $session->getPage()->findById($arg1);
-    	$element->click();
-    }
-    
-    
 
     /**
      * Deletes a view in the list
@@ -706,23 +657,6 @@ class behat_mod_datalynx extends behat_files {
             $element->click();
         }
     }
-    
-     /**
-     * @Given /^I should see "([^"]*)" (\d+) times$/
-     */
-    public function iShouldSeeTimes($arg1, $arg2) {
-        
-        
-            $session = $this->getSession(); // get the mink session
-            $count = 0;
-            $found = false;
-            do{
-                $found = $session->getPage()->find($arg1);
-                $count++;
-            }while($found==true);
-        
-        return $count>=$arg2;
-    }
 
     /**
      * @Given /^I fill entry form with:$/
@@ -740,7 +674,7 @@ class behat_mod_datalynx extends behat_files {
                 }
                 $entries[$row['entry']][$row['field']] = $row['value'];
             }
-        } else { 
+        } else {
             $entry = $table->getRowsHash();
             unset($entry['field']);
             $entries[1] = $entry;
@@ -853,16 +787,6 @@ class behat_mod_datalynx extends behat_files {
         $datalynx = new datalynx($record->dataid);
         $datalynx->process_views('reset', $id, true);
 
-        if($record->param2)
-        {
-        	$DB->set_field('datalynx_views', 'param2', $record->param2, array('id' => $id));
-        }
-        
-        if($record->section)
-        {
-        	$DB->set_field('datalynx_views', 'section', $record->section, array('id' => $id));
-        }
-        
         if (isset($options['default'])) {
             $DB->set_field('datalynx', 'defaultview', $id, array('id' => $record->dataid));
         }
@@ -875,94 +799,6 @@ class behat_mod_datalynx extends behat_files {
 
         return $id;
     }
-    
-    /**
-     * @Given /^"([^"]*)" has following behaviors:$/
-     */
-    public function hasFollowingBehaviors($arg1, TableNode $table)
-    {
-    	$behaviors = $table->getHash();
-
-        $instance = $this->get_instance_by_name($arg1);
-        
-        foreach ($behaviors as $behavior) {
-            $behavior['dataid'] = $instance->id;
-			$behavior['id'] = $this->create_behavior($behavior);
-        }
-    }
-    
-    private function create_behavior($record = null) {
-    	global $DB;
-    
-    	$record = (object) (array) $record;
-    
-    	$defaults = array (
-    			'name' => 'Behavior',
-    			'description' => '',
-    			'visibleto' => '',
-    			'editableby' => '',
-    			'required' => 0,
-    	);
-    
-    	foreach ($defaults as $name => $value) {
-    		if (!isset($record->{$name})) {
-    			$record->{$name} = $value;
-    		}
-    	}
-    	
-    	$id = $DB->insert_record('datalynx_behaviors', $record);
-    	
-    	return $id;
-    }
-    
-    
-    /**
-     * @Given /^I refresh the Entry template of "([^"]*)"$/
-     */
-    public function iRefreshTheEntryTemplateOf($arg1)
-    {
-    	$steps = array( new Given('I click "Edit" button of "'.$arg1.'" item'),
-    					new Given('I follow "Entry template"'),
-    					new Given('I click inside "id_eparam2_editoreditable"'),
-    					new Given('I set the field "eparam2_editor_field_tag_menu" to ""'),
-    					new Given('I press "Save changes"'),
-    							);
-        return $steps;
-    }
-    
-    /**
-     * @Given /^I refresh the View template of "([^"]*)"$/
-     */
-    public function iRefreshTheViewTemplateOf($arg1)
-    {
-    	$steps = array( new Given('I click "Edit" button of "'.$arg1.'" item'),
-    					new Given('I follow "View template"'),
-    					new Given('I press "Show more buttons"'),
-    					new Given('I press "HTML"'),
-    					new Given('I press "HTML"'),
-    					new Given('I press "Save changes"'),
-    							);
-        return $steps;
-    }
-    
-    /**
-     * @Given /^I refresh the templates of "([^"]*)"$/
-     */
-    public function iUpdateTheTemplatesOf($arg1)
-    {
-    	$steps = array( new Given('I click "Edit" button of "'.$arg1.'" item'),
-    					new Given('I follow "View template"'),
-    					new Given('I press "Show more buttons"'),
-    					new Given('I press "HTML"'),
-    					new Given('I press "HTML"'),
-    					new Given('I follow "Entry template"'),
-    					new Given('I click inside "id_eparam2_editoreditable"'),
-    					new Given('I set the field "eparam2_editor_field_tag_menu" to ""'),
-    					new Given('I press "Save changes"'),
-    							);
-        return $steps;
-    }
-    
 
     private function create_filter($record = null, array $options = null) {
         global $DB;
@@ -1131,7 +967,7 @@ class behat_mod_datalynx extends behat_files {
                 $options = preg_split('/[\n\r]+/m', $DB->get_field('datalynx_fields', 'param1', array('id' => $fieldid)));
                 $id = array_search(trim($value), $options);
                 if ($id !== false) {
-                    $content['content'] = $id+1;
+                    $content['content'] = $id;
                 } else {
                     $content['content'] = '';
                 }

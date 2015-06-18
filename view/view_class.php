@@ -131,7 +131,7 @@ abstract class datalynxview_base {
         $this->view->name = $data->name;
         $this->view->description = !empty($data->description) ? $data->description : '';
 
-        $this->view->visible = !is_null($data->visible) ? $data->visible : 7;
+        $this->view->visible = !empty($data->visible) ? $data->visible : 7;
         $this->view->perpage = !empty($data->perpage) ? $data->perpage : 0;
         $this->view->groupby = !empty($data->groupby) ? $data->groupby : '';
         $this->view->filter = !empty($data->filter) ? $data->filter : 0;

@@ -57,7 +57,7 @@ class datalynxfield_textarea_renderer extends datalynxfield_renderer {
 
         if (isset($entry->{"c{$fieldid}_content"})) {
             $text = $entry->{"c{$fieldid}_content"};
-            $format = isset($entry->{"c{$fieldid}_content1"}) ? $entry->{"c{$fieldid}_content1"} : FORMAT_HTML;
+            $format = isset($entry->{"c{$fieldid}_content1"}) ? $entry->{"c{$fieldid}_content1"} : FORMAT_PLAIN;
 
             $options = new stdClass();
             $options->para = false;

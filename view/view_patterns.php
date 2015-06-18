@@ -590,7 +590,6 @@ class datalynxview_patterns {
         $patterns = array(
             '##numentriestotal##' => array(true, $cat),
             '##numentriesdisplayed##' => array(true, $cat),
-        	'##entries##' => array(true, $cat),
         );
         return $patterns;
     }

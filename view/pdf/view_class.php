@@ -70,7 +70,7 @@ class datalynxview_pdf extends datalynxview_base {
             'format' => !empty($settings->format) ? $settings->format : 'LETTER',
             'destination' => !empty($settings->destination) ? $settings->destination : 'I',
             'transparency' => !empty($settings->transparency) ? $settings->transparency : 0.5,
-            'pagebreak' => !is_null($settings->pagebreak) ? $settings->pagebreak : 'auto',
+            'pagebreak' => !empty($settings->pagebreak) ? $settings->pagebreak : 'auto',
             'toc' => (object) array(
                 'page' => !empty($settings->toc->page) ? $settings->toc->page : '',
                 'name' => !empty($settings->toc->name) ? $settings->toc->name : '',
@@ -101,7 +101,7 @@ class datalynxview_pdf extends datalynxview_base {
                 //'pubkeys' => null                    )
             ),
             'signature' => (object) array(
-                'password' => !is_null($settings->signature->password) ? $settings->signature->password : null,
+                'password' => !empty($settings->signature->password) ? $settings->signature->password : '',
                 'type' => !empty($settings->signature->type) ? $settings->signature->type : 1,
                 'info' => array(
                     'Name' => !empty($settings->signature->info->Name) ? $settings->signature->info->Name : '',
@@ -617,8 +617,7 @@ class datalynxview_pdf extends datalynxview_base {
             $filepath = $tmpdir. "files/$filename";
             if ($cert->copy_content_to($filepath)) {
                 $signsettings = $this->_settings->signature;
-                if($signsettings->password != null)
-                	$pdf->setSignature("file://$filepath", "file://$filepath", $signsettings->password, '', $signsettings->type, $signsettings->info);
+                $pdf->setSignature("file://$filepath", "file://$filepath", $signsettings->password, '', $signsettings->type, $signsettings->info);
             }
             $this->_tmpfiles[] = $filepath;
         }
