@@ -61,7 +61,9 @@ class datalynxview_pdf extends datalynxview_base {
 
         if (!empty($this->view->param1)) {
             $settings = unserialize($this->view->param1);
-        }    
+        } else {
+        	$settings = new stdClass();
+        }
         
         $this->_settings = (object) array(
             'docname' => !empty($settings->docname) ? $settings->docname : '',
@@ -173,7 +175,7 @@ class datalynxview_pdf extends datalynxview_base {
         );
             
         // Paging
-        if (empty($settings->pagebreak)) {
+        if ($settings->pagebreak == 'none') {
             $pdf->SetAutoPageBreak(false, 0);
         }
 
@@ -617,7 +619,9 @@ class datalynxview_pdf extends datalynxview_base {
             $filepath = $tmpdir. "files/$filename";
             if ($cert->copy_content_to($filepath)) {
                 $signsettings = $this->_settings->signature;
-                $pdf->setSignature("file://$filepath", "file://$filepath", $signsettings->password, '', $signsettings->type, $signsettings->info);
+                if($signsettings->password != ''){
+                	$pdf->setSignature("file://$filepath", "file://$filepath", $signsettings->password, '', $signsettings->type, $signsettings->info);
+                }
             }
             $this->_tmpfiles[] = $filepath;
         }

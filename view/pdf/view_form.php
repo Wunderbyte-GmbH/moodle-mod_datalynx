@@ -170,7 +170,7 @@ class datalynxview_pdf_form extends datalynxview_base_form {
         $mform->addElement('selectyesno', 'marginkeep', get_string('marginkeep', 'datalynxview_pdf'));
 
         // Page break
-        $options = array('' => get_string('none'), 'auto' => get_string('auto', 'datalynxview_pdf'), 'entry' => get_string('entry', 'datalynx')); 
+        $options = array('none' => get_string('none'), 'auto' => get_string('auto', 'datalynxview_pdf'), 'entry' => get_string('entry', 'datalynx')); 
         $mform->addElement('select', 'pagebreak', get_string('pagebreak', 'datalynxview_pdf'), $options);
 
         // Protection
