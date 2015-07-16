@@ -729,6 +729,12 @@ abstract class datalynxfield_option extends datalynxfield_base {
      */
     public abstract function update_options($map = array());
 
+    /**
+     * TODO: add proper documentation
+     * todo: adjust check if there are old values. current check happens too late
+     * (non-PHPdoc)
+     * @see datalynxfield_base::set_field()
+     */
     public function set_field($forminput = null) {
         $this->field = new stdClass();
         $this->field->id = !empty($forminput->id) ? $forminput->id : 0;
@@ -781,8 +787,9 @@ abstract class datalynxfield_option extends datalynxfield_base {
                 $newvalues[] = $add;
             }
         }
-
-        $this->update_options($map);
+		if(!empty($this->_options)){
+			$this->update_options($map);
+		}
 
         unset($newvalues[0]);
         $this->field->param1 = implode("\n", $newvalues);
