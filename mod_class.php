@@ -114,6 +114,11 @@ class datalynx {
         //$this->_viewmanager = new datalynxview_manager($this);
 
     }
+    
+    public static function get_datalynx_by_instance($instanceid) {
+    	$cm = get_coursemodule_from_instance('datalynx', $instanceid);
+    	return new datalynx($instanceid,$cm->id);
+    }
 
     /**
      *
@@ -635,6 +640,46 @@ class datalynx {
 
             $this->_currentview->display();
         }
+    }
+    
+    /**
+     * Returns datalynx content for inline display.
+     * Used in mod_datalynxcoursepage only.
+     *
+     * @param int $datalynxid The id of the datalynx whose content should be displayed
+     * @param int $viewid The id of the datalynx's view whose content should be displayed
+     * @return string
+     */
+    public static function get_content_inline($datalynxid, $viewid = 0) {
+    	global $CFG;
+    	require_once $CFG->dirroot . '/mod/datalynx/view/view_class.php';
+		$urlparams = new stdClass();
+    	$datalynx = new datalynx($datalynxid, null, true);
+    	$urlparams->d = $datalynxid;
+    	$urlparams->view = $viewid;
+    	$urlparams->pagelayout = 'external';
+    	
+		$pageparams = array(
+		        'js' => true,
+		        'css' => true,
+		        'rss' => true,
+		        'modjs' => true,
+		        'completion' => true,
+		        'comments' => true,
+		        'urlparams' => $urlparams);
+    	$datalynx->set_page('external', $pageparams);
+    	$type = $datalynx->views[$viewid]->type;
+    	require_once $CFG->dirroot . "/mod/datalynx/view/$type/view_class.php";
+    	$viewclass = "datalynxview_$type";
+    	$datalynx->_currentview = $datalynx->get_current_view_from_id($viewid);
+    	 
+    	if ($view = new $viewclass($datalynxid,$viewid)) {
+    		$view->set_content();
+    		$view->get_df()->_currentview = $datalynx->_currentview;
+    		$viewcontent = $view->display();
+    		return "$viewcontent";
+    	}
+    	return null;
     }
 
 /**********************************************************************************

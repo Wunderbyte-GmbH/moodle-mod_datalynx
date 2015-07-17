@@ -17,12 +17,12 @@
 /**
  * @package mod
  * @subpackage datalynx
- * @copyright 2015 Ivan Šakić
+ * @copyright 2015 onwards David Bogner
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 $plugin->component = 'mod_datalynx';
-$plugin->version   = 2015061800;
-$plugin->release   = '0.8.3';
+$plugin->version   = 2015071800;
+$plugin->release   = 'Skyler White 1'; //famous movie, theater and tv series characters
 $plugin->requires  = 2014050800;
 $plugin->maturity  = MATURITY_STABLE;
