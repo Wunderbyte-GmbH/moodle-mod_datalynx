@@ -30,7 +30,7 @@
 class backup_datalynx_activity_structure_step extends backup_activity_structure_step {
 
     protected function define_structure() {
-		global $DB;
+		global $DB, $CFG;
 		
         // To know if we are including userinfo
         $userinfo = $this->get_setting_value('userinfo');
@@ -136,8 +136,13 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
         $datalynx->set_source_table('datalynx', array('id' => backup::VAR_ACTIVITYID));
         $module->set_source_table('course_modules', array('id' => backup::VAR_MODID));
 
-        $field->set_source_sql(
-                "SELECT f.*,
+        
+        // TODO: fix sql, this is just a temporary fix and does not provide same functionality for postgresql
+        // SQL for mysql provides id mapping of the field datalynx view, wheras
+        // there is no id mapping for postgresql
+        if ($CFG->dbtype == 'mysqli' || $CFG->dbtype == 'mysql')  {
+        	$field->set_source_sql(
+        			"SELECT f.*,
                         CASE f.type WHEN 'datalynxview' THEN MAX(c.fullname) ELSE NULL END AS targetcourse,
                         CASE f.type WHEN 'datalynxview' THEN MAX(d.name) ELSE NULL END AS targetinstance,
                         CASE f.type WHEN 'datalynxview' THEN MAX(v.name) ELSE NULL END AS targetview,
@@ -150,14 +155,13 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
               LEFT JOIN {datalynx_filters} fil ON " . $DB->sql_cast_char2int('f.param3') . " = fil.id
                   WHERE f.dataid = :dataid
                GROUP BY f.id", array('dataid' => backup::VAR_PARENTID));
-
-        /* // for PostreSQL
-        $field->set_source_sql(
-            "SELECT f.*,
+        } else {
+        	$field->set_source_sql(
+        			"SELECT f.*,
                FROM {datalynx_fields} f
               WHERE f.dataid = :dataid
                 AND f.type != 'datalynxview'", array('dataid' => backup::VAR_PARENTID));
-        */
+        }
 
         $filter->set_source_table('datalynx_filters', array('dataid' => backup::VAR_PARENTID));
         $view->set_source_table('datalynx_views', array('dataid' => backup::VAR_PARENTID));
