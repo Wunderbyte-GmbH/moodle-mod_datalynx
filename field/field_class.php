@@ -1014,16 +1014,16 @@ class datalynxfield_option_single extends datalynxfield_option {
 
         $params = array();
         $i = 0;
-        $updatesql = "UPDATE {datalynx_contents} c
-                         SET c.content = (
+        $updatesql = "UPDATE {datalynx_contents}
+                         SET content = (
                         CASE";
         foreach ($map as $old => $new) {
-            $updatesql .= " WHEN c.content = :old{$i} THEN :new{$i} ";
+            $updatesql .= " WHEN content = :old{$i} THEN :new{$i} ";
             $params["old{$i}"] = $old;
             $params["new{$i}"] = $new;
             $i++;
         }
-        $updatesql .= "ELSE 0 END) WHERE c.fieldid = :fieldid";
+        $updatesql .= "ELSE 0 END) WHERE fieldid = :fieldid";
         $params['fieldid'] = $this->field->id;
 
         $DB->execute($updatesql, $params);

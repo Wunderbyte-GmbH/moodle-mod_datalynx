@@ -521,11 +521,11 @@ function xmldb_datalynx_upgrade($oldversion) {
     }
 
     if ($oldversion < 2014010700) {
-        $query = "UPDATE {datalynx_views} dv
-                     SET dv.param10 = dv.param4
-                   WHERE dv.param10 IS NULL
-                     AND dv.param4 IS NOT NULL
-                     AND dv.param4 <> '0'";
+        $query = "UPDATE {datalynx_views}
+                     SET param10 = param4
+                   WHERE param10 IS NULL
+                     AND param4 IS NOT NULL
+                     AND param4 <> '0'";
         $DB->execute($query);
 
         // Datalynx savepoint reached.
@@ -533,17 +533,17 @@ function xmldb_datalynx_upgrade($oldversion) {
     }
 
     if ($oldversion < 2014010701) {
-        $query = "UPDATE {datalynx_views} dv
-                     SET dv.type = 'grid',
-                         dv.section = CASE
-                                          WHEN dv.param4 IS NULL AND dv.param5 IS NULL THEN CONCAT(dv.section, '##entries##')
-                                          WHEN dv.param4 IS NOT NULL AND dv.param5 IS NULL THEN CONCAT(dv.section, dv.param4, '##entries##')
-                                          WHEN dv.param4 IS NULL AND dv.param5 IS NOT NULL THEN CONCAT(dv.section, '##entries##', dv.param5)
-                                          ELSE CONCAT(dv.section, dv.param4, '##entries##', dv.param5)
+        $query = "UPDATE {datalynx_views}
+                     SET type = 'grid',
+                         section = CASE
+                                          WHEN param4 IS NULL AND param5 IS NULL THEN CONCAT(section, '##entries##')
+                                          WHEN param4 IS NOT NULL AND param5 IS NULL THEN CONCAT(section, param4, '##entries##')
+                                          WHEN param4 IS NULL AND param5 IS NOT NULL THEN CONCAT(section, '##entries##', param5)
+                                          ELSE CONCAT(section, param4, '##entries##', param5)
                                       END,
-                         dv.param4 = NULL,
-                         dv.param5 = NULL
-                   WHERE dv.type = 'gridext'";
+                         param4 = NULL,
+                         param5 = NULL
+                   WHERE type = 'gridext'";
         $DB->execute($query);
 
         // Datalynx savepoint reached.
@@ -551,9 +551,9 @@ function xmldb_datalynx_upgrade($oldversion) {
     }
 
     if ($oldversion < 2014031401) {
-        $query = "UPDATE {datalynx_contents} c
-                     SET c.content = CONCAT('#', c.content, '#')
-                   WHERE c.fieldid IN (SELECT id
+        $query = "UPDATE {datalynx_contents}
+                     SET content = CONCAT('#', content, '#')
+                   WHERE fieldid IN (SELECT id
                                        FROM {datalynx_fields} f
                                        WHERE f.type = 'checkbox' OR f.type = 'multiselect')";
         $DB->execute($query);
