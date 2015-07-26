@@ -676,7 +676,7 @@ class datalynx {
     	if ($view = new $viewclass($datalynxid,$viewid)) {
     		$view->set_content();
     		$view->get_df()->_currentview = $datalynx->_currentview;
-    		$viewcontent = $view->display();
+    		$viewcontent = $view->display(array ('tohtml' => true));
     		return "$viewcontent";
     	}
     	return null;

@@ -498,9 +498,13 @@ abstract class datalynxview_base {
         }
     }
 
-    /**
-     *
-     */
+	/**
+	 *  Displays or echoes the content of a datalynx view
+	 *  
+	 *  
+	 * @param array $options (tohtml = true means output is returned instead of echoed)
+	 * @return string (empty string of tohtml = false, html when tohtml is true)
+	 */
     public function display(array $options = array()) {
         global $OUTPUT;
 
