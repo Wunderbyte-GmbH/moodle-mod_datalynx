@@ -151,7 +151,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             $instance = isset($data->targetinstance) ? $data->targetinstance : 'NULL';
             $view = isset($data->targetview) ? $data->targetview : 'NULL';
             $filter = isset($data->targetfilter) ? $data->targetfilter : 'NULL';
-
+            
             $this->log("WARNING! 'datalynxview' field type cannot be restored if referencing instances are not included in the backup!", backup::LOG_WARNING);
             $this->log("* Please verify the references of the field:", backup::LOG_WARNING);
             $this->log("* Field '$data->name' originally referenced: course '$course', instance '$instance', view '$view', filter '$filter'", backup::LOG_WARNING);
@@ -380,7 +380,10 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
     }
 
     /**
-     *
+     * Once the database tables have been fully restored, restore the files
+     * reconfigure referenced fields like teammemberselect user ids
+     * 
+     * @return void
      */
     protected function after_execute() {
         global $DB;
