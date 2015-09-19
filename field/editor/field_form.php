@@ -15,14 +15,21 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package mod
- * @subpackage datalynx
- * @copyright 2015 onwards David Bogner
+ * @package datalynxfield
+ * @subpackage editor
+ * @copyright 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
-$plugin->component = 'mod_datalynx';
-$plugin->version   = 2015091700;
-$plugin->release   = 'Skyler White 1.1'; //famous movie, theater and tv series characters
-$plugin->requires  = 2014050800;
-$plugin->maturity  = MATURITY_STABLE;
+class datalynxfield_editor_form extends datalynxfield_form {
+
+    function field_definition() {
+
+        $mform =& $this->_form;
+
+        $mform->addElement('header', 'fieldattributeshdr', get_string('fieldattributes', 'datalynx'));
+
+    }
+
+}
