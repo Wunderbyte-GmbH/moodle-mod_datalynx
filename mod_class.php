@@ -847,7 +847,10 @@ class datalynx {
     }
 
     /**
-     *
+     * Process the action triggered by user for a specific field
+     * @param string $action
+     * @param string $fids (comma separated numbers of field ids)
+     * @param boolean $confirmed
      */
     public function process_fields($action, $fids, $confirmed = false) {
         global $OUTPUT, $DB;
@@ -998,7 +1001,20 @@ class datalynx {
                         }
                         $strnotify = 'fieldsdeleted';
                         break;
-
+                        
+                        case 'convert':
+                        	foreach ($fields as $fid => $field) {
+                        		$processedfids[] = $field->field->id;
+                        		// Update views
+                        		$DB->set_field('datalynx_fields','type','editor', array('id' => $fid));
+                        
+                        		$other = array('dataid' => $this->id());
+                           		$event = \mod_datalynx\event\field_updated::create(array('context' => $this->context, 'objectid' => $fid, 'other' => $other));
+                        		$event->trigger();
+                        	}
+                        	$strnotify = 'fieldsupdated';
+                        	break;
+                        	
                     default:
                         break;
                 }

@@ -29,6 +29,11 @@ require_once(dirname(__FILE__) . "/../renderer.php");
  */
 class datalynxfield_editor_renderer extends datalynxfield_renderer {
 
+	/**
+	 * render the editor form for adding content to the editor field
+	 * TODO: improve editor rendering for including images from repositories
+	 * @see datalynxfield_renderer::render_edit_mode()
+	 */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $field = $this->_field;
         $fieldid = $field->id();
@@ -40,19 +45,16 @@ class datalynxfield_editor_renderer extends datalynxfield_renderer {
 
         $data = new object;
         $data->$fieldname = isset($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : '';
+        $data->{"{$fieldname}trust"} = true;
         $required = !empty($options['required']);
-            // format
-            $data->{"{$fieldname}format"} = isset($entry->{"c{$fieldid}_content1"}) ? $entry->{"c{$fieldid}_content1"} : FORMAT_HTML;
-
-            $data = file_prepare_standard_editor($data, $fieldname, $field->editor_options(), $field->df()->context, 'mod_datalynx', 'content', $contentid);
-
-            $mform->addElement('editor', "{$fieldname}_editor", null , $field->editor_options() + array('collapsed' => true));
-            $mform->setDefault("{$fieldname}_editor", $data->{"{$fieldname}_editor"});
-            $mform->setDefault("{$fieldname}[text]", $data->$fieldname);
-            $mform->setDefault("{$fieldname}[format]", $data->{"{$fieldname}format"});
-            if ($required) {
-                $mform->addRule("{$fieldname}_editor", null, 'required', null, 'client');
-            }
+		// format
+		$data->{"{$fieldname}format"} = isset ( $entry->{"c{$fieldid}_content1"} ) ? $entry->{"c{$fieldid}_content1"} : FORMAT_HTML;
+		$mform->addElement ( 'editor', "{$fieldname}", null);
+		$data = file_prepare_standard_editor ( $data, $fieldname, $field->editor_options(), $field->df()->context, 'mod_datalynx', 'content', $contentid );
+		$mform->setDefault ( "{$fieldname}", $data->{"{$fieldname}_editor"} );
+		if ($required) {
+			$mform->addRule ( "{$fieldname}", null, 'required', null, 'client' );
+		}
     }
 
     public function render_display_mode(stdClass $entry, array $params) {

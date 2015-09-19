@@ -41,6 +41,7 @@ $urlparams->delete     = optional_param('delete', 0, PARAM_SEQUENCE);   // ids (
 $urlparams->duplicate  = optional_param('duplicate', 0, PARAM_SEQUENCE);   // ids (comma delimited) of fields to duplicate
 $urlparams->visible    = optional_param('visible', 0, PARAM_INT);     // id of field to hide/(show to owner)/show to all
 $urlparams->editable    = optional_param('editable', 0, PARAM_INT);     // id of field to set editing
+$urlparams->convert    = optional_param('convert', 0, PARAM_INT);     // id of field to be converted
 
 $urlparams->confirmed    = optional_param('confirmed', 0, PARAM_INT);
 
@@ -66,6 +67,8 @@ if ($urlparams->duplicate and confirm_sesskey()) {
 // Set field editability
 } else if ($urlparams->editable and confirm_sesskey()) {
     $df->process_fields('editable', $urlparams->editable, true);    // confirmed by default
+} else if ($urlparams->convert and confirm_sesskey()) {
+    $df->process_fields('convert', $urlparams->convert, true);    // confirmed by default
 }
 
 // any notifications
@@ -110,6 +113,7 @@ if ($fields) {
     $strshow = get_string('show');
     $strlock = get_string('lock', 'datalynx');
     $strunlock = get_string('unlock', 'datalynx');
+    $strconvert = get_string('convert', 'datalynx');
 
     // The default value of the type attr of a button is submit, so set it to button so that
     // it doesn't submit the form
@@ -134,6 +138,7 @@ if ($fields) {
         'visible' => get_string('visible'),
         'edits' => get_string('fieldeditable', 'datalynx'),
         'edit' => $stredit,
+    	'convert' => get_string('convert', 'datalynx'),
         'duplicate' => $multiduplicate,
         'delete' => $multidelete,
         'selectallnone' => $selectallnone,
@@ -193,6 +198,13 @@ if ($fields) {
            $editableicon = $OUTPUT->pix_icon('t/unlock', $strunlock);
         }
         $fieldeditable = html_writer::link(new moodle_url($actionbaseurl, $linkparams + array('editable' => $fieldid)), $editableicon);
+        // Convert textarea to editor field
+        if ($field->type == "textarea") {
+        	$converticon = $OUTPUT->pix_icon('t/right', $strconvert);
+        	$convert = html_writer::link(new moodle_url($actionbaseurl, $linkparams + array('convert' => $fieldid)), $converticon);
+        } else {
+        	$convert = '';
+        }
 
         $table->add_data(array(
             $fieldname,
@@ -201,6 +213,7 @@ if ($fields) {
             $fieldvisible,
             $fieldeditable,
             $fieldedit,
+            $convert,
             $fieldduplicate,
             $fielddelete,
             $fieldselector

@@ -393,11 +393,6 @@ abstract class datalynxfield_base {
         $content = array();
         foreach ($this->content_names() as $name) {
             $delim = $name ? '_' : '';
-            //TODO: ugly hack, do not check type of field here, but rename the fieldname of the editor field
-            if($this->type == 'editor'){
-            	$delim = '_';
-            	$name = 'editor';
-            }
             $contentname = "field_{$fieldid}_$entryid". $delim. $name;
             if (isset($data->$contentname)) {
                 $content[$name] = $data->$contentname;

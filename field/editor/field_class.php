@@ -32,21 +32,26 @@ class datalynxfield_editor extends datalynxfield_base {
     protected $editoroptions;
 
     public function __construct($df = 0, $field = 0) {
+    	global $COURSE, $PAGE, $CFG;
         parent::__construct($df, $field);
 
-        $trust = !empty($this->field->param4) ? $this->field->param4 : 0;
-        $maxbytes = !empty($this->field->param5) ? $this->field->param5 : 0;
-        $maxfiles = !empty($this->field->param6) ? $this->field->param6 : -1;
+        $maxbytes = get_user_max_upload_file_size($PAGE->context, $CFG->maxbytes, $COURSE->maxbytes);
+
+        //TODO: provide options for the editor field to configure in the field settings
+        //$trust = !empty($this->field->param4) ? $this->field->param4 : 0;
+        //$maxbytes = !empty($this->field->param5) ? $this->field->param5 : 0;
+        //$maxfiles = !empty($this->field->param6) ? $this->field->param6 : -1;
         
         $this->editoroptions = array();
         $this->editoroptions['context'] = $this->df->context;
-        $this->editoroptions['trusttext'] = $trust;
+        $this->editoroptions['trusttext'] = true;
         $this->editoroptions['maxbytes'] = $maxbytes;
-        $this->editoroptions['maxfiles'] = $maxfiles;
+        //$this->editoroptions['maxfiles'] = EDITOR_UNLIMITED_FILES;
         $this->editoroptions['subdirs'] = false;
         $this->editoroptions['changeformat'] = 0;
         $this->editoroptions['forcehttps'] = false;
         $this->editoroptions['noclean'] = false;
+        $this->editoroptions['return_types'] = FILE_INTERNAL | FILE_EXTERNAL;
     }
 
     /**
@@ -63,12 +68,13 @@ class datalynxfield_editor extends datalynxfield_base {
         return $this->editoroptions;
     }
 
-    /**
-     *
-     */
+	/**
+	 * write the content of the editor field to the database
+	 * 
+	 * @see datalynxfield_base::update_content()
+	 */
     public function update_content($entry, array $values = null) {
         global $DB;
-        print_object($values);
         $entryid = $entry->id;
         $fieldid = $this->field->id;
 
@@ -85,26 +91,15 @@ class datalynxfield_editor extends datalynxfield_base {
         if (!$rec->id = $contentid) {
             $rec->id = $DB->insert_record('datalynx_contents', $rec);
         }        
-
-        // Editor content
-        if ($this->is_editor() and can_use_html_editor()) {
-            $data = (object) $values;
-            $data->{'editor_editor'} = $data->editor;
-
-            $data = file_postupdate_standard_editor($data, 'editor', $this->editoroptions, $this->df->context, 'mod_datalynx', 'content', $rec->id);
-
-            $rec->content = $data->editor;
-            $rec->content1 = $data->{'editorformat'};
-
-        // Text area content
-        } else {
-            $value = reset($values);           
-            if (is_array($value)) {
-                // Import: One value as array of text,format,trust, so take the text
-                $value = reset($value);
-            }                
-            $rec->content = clean_param($value, PARAM_NOTAGS);
-        }            
+        // the editor's content is an array, so reset is used in order to access the data in the array
+        $value = reset($values);
+        $data = new stdClass();
+        $data->text = $value['text'];
+        $data->format = $value['format'];
+        $data->content_editor = $value;
+        $data = file_postupdate_standard_editor($data, 'content', $this->editoroptions, $this->df->context, 'mod_datalynx', 'content', $rec->id);
+        $rec->content = $data->content;
+        $rec->content1 = $data->contentformat;  
         
         return $DB->update_record('datalynx_contents', $rec);
     }

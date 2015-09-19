@@ -54,6 +54,7 @@ $string['configmaxentries'] = 'Dieser Wert bestimmt die Höchstanzahl an Einträ
 $string['configmaxfields'] = 'Dieser Wert bestimmt die Höchstanzahl an Feldern, die zu einer Datalynx Aktivität hinzugefügt werden können.';
 $string['configmaxfilters'] = 'Dieser Wert bestimmt die Höchstanzahl an Filtern, die zu einer Datalynx Aktivität hinzugefügt werden können.';
 $string['configmaxviews'] = 'Dieser Wert bestimmt die Höchstanzahl an Ansichten, die zu einer Datalynx Aktivität hinzugefügt werden können.';
+$string['convert'] = 'Konvertieren';
 $string['correct'] = 'Richtig';
 $string['csscode'] = 'CSS Code';
 $string['cssinclude'] = 'CSS';
