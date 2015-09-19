@@ -380,14 +380,24 @@ abstract class datalynxfield_base {
         return true;
     }
 
-    /**
-     *
-     */
+	/**
+	 * Retrieve the submitted form data for a specific field
+	 * and return as array indexed by contentname
+	 * 
+	 * @param number $entryid
+	 * @param stdClass $data submitted form data
+	 * @return array with 
+	 */
     public function get_content_from_data($entryid, $data) {
         $fieldid = $this->field->id;
         $content = array();
         foreach ($this->content_names() as $name) {
             $delim = $name ? '_' : '';
+            //TODO: ugly hack, do not check type of field here, but rename the fieldname of the editor field
+            if($this->type == 'editor'){
+            	$delim = '_';
+            	$name = 'editor';
+            }
             $contentname = "field_{$fieldid}_$entryid". $delim. $name;
             if (isset($data->$contentname)) {
                 $content[$name] = $data->$contentname;
