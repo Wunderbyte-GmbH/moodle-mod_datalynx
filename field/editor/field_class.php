@@ -17,7 +17,7 @@
 /**
  * @package datalynxfield
  * @subpackage editor
- * @copyright 2011 Itamar Tzadok
+ * @copyright 2015 David Bogner
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -53,6 +53,14 @@ class datalynxfield_editor extends datalynxfield_base {
         $this->editoroptions['noclean'] = false;
         $this->editoroptions['return_types'] = FILE_INTERNAL | FILE_EXTERNAL;
     }
+    
+	/**
+	 * (non-PHPdoc)
+	 * @see datalynxfield_base::content_names()
+	 */
+    protected function content_names() {
+    	return array('editor');
+    }
 
     /**
      *
@@ -69,7 +77,7 @@ class datalynxfield_editor extends datalynxfield_base {
     }
 
 	/**
-	 * write the content of the editor field to the database
+	 * write the content of the editor field and editor format to the database
 	 * 
 	 * @see datalynxfield_base::update_content()
 	 */
@@ -105,7 +113,9 @@ class datalynxfield_editor extends datalynxfield_base {
     }
 
     /**
-     *
+     * Returns 'content': the html content of the editor and 'content1': the format of the content
+     * 
+     * @see datalynxfield_base::get_content_parts()
      */
     public function get_content_parts() {
         return array('content', 'content1');

@@ -57,6 +57,7 @@ $string['configmaxfields'] = 'This value determines the maximum number of fields
 $string['configmaxfilters'] = 'This value determines the maximum number of filters that may be added to a datalynx activity.';
 $string['configmaxviews'] = 'This value determines the maximum number of views that may be added to a datalynx activity.';
 $string['convert'] = 'Convert';
+$string['converttoeditor'] = 'Convert to editor field';
 $string['correct'] = 'Correct';
 $string['csscode'] = 'CSS code';
 $string['cssinclude'] = 'CSS';

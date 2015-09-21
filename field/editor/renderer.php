@@ -48,13 +48,13 @@ class datalynxfield_editor_renderer extends datalynxfield_renderer {
         $data->{"{$fieldname}trust"} = true;
         $required = !empty($options['required']);
 		// format
-		$data->{"{$fieldname}format"} = isset ( $entry->{"c{$fieldid}_content1"} ) ? $entry->{"c{$fieldid}_content1"} : FORMAT_HTML;
-		$mform->addElement ( 'editor', "{$fieldname}", null);
-		$data = file_prepare_standard_editor ( $data, $fieldname, $field->editor_options(), $field->df()->context, 'mod_datalynx', 'content', $contentid );
-		$mform->setDefault ( "{$fieldname}", $data->{"{$fieldname}_editor"} );
-		if ($required) {
-			$mform->addRule ( "{$fieldname}", null, 'required', null, 'client' );
-		}
+            $data->{"{$fieldname}format"} = isset($entry->{"c{$fieldid}_content1"}) ? $entry->{"c{$fieldid}_content1"} : FORMAT_HTML;
+            $data = file_prepare_standard_editor($data, $fieldname, $field->editor_options(), $field->df()->context, 'mod_datalynx', 'content', $contentid);
+            $mform->addElement('editor', "{$fieldname}_editor", null, null , $field->editor_options());
+            $mform->setDefault("{$fieldname}_editor", $data->{"{$fieldname}_editor"});
+            if ($required) {
+                $mform->addRule("{$fieldname}_editor", null, 'required', null, 'client');
+            }
     }
 
     public function render_display_mode(stdClass $entry, array $params) {

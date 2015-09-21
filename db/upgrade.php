@@ -777,13 +777,6 @@ function xmldb_datalynx_upgrade($oldversion) {
         // datalynx savepoint reached
         upgrade_mod_savepoint(true, 2015032208, 'datalynx');
     }
-    
-    if ($oldversion < 2015091700) {
-    	$sql = 'UPDATE {datalynx_fields} SET type="editor" WHERE type="textarea"';
-    	$DB->execute($sql);
-    	// datalynx savepoint reached
-    	upgrade_mod_savepoint(true, 2015091700, 'datalynx');
-    }
 
     return true;
 }

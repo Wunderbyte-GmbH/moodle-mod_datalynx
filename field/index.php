@@ -200,7 +200,7 @@ if ($fields) {
         $fieldeditable = html_writer::link(new moodle_url($actionbaseurl, $linkparams + array('editable' => $fieldid)), $editableicon);
         // Convert textarea to editor field
         if ($field->type == "textarea") {
-        	$converticon = $OUTPUT->pix_icon('t/right', $strconvert);
+        	$converticon = $OUTPUT->pix_icon('t/right', get_string('converttoeditor', 'datalynx'));
         	$convert = html_writer::link(new moodle_url($actionbaseurl, $linkparams + array('convert' => $fieldid)), $converticon);
         } else {
         	$convert = '';

@@ -401,9 +401,15 @@ abstract class datalynxfield_base {
         return $content;
     }
 
-    /**
-     *
-     */
+	/**
+	 *  This function should be overriden in each field class which extends this base class.
+	 *  If a field has more than one form element where user content is expected to be submitted
+	 *  all of these elements have to be specified here
+	 *  Example: Field of type file has these form elements: 'filemanager', 'alttext', 'delete', 'editor'
+	 *  So these values have to be returned like that: return array('filemanager', 'alttext', 'delete', 'editor');
+	 *  
+	 * @return array of strings
+	 */
     protected function content_names() {
         return array('');
     }
@@ -441,7 +447,11 @@ abstract class datalynxfield_base {
     }
 
     /**
-     *
+     * To be overriden by classes, that extend the field base class
+     * This returns all the column names of the columns used to save content of one specific field
+     * in the table "datalynx_contents". Values can be 'content', 'content1', 'content2', until 'content4'
+     * 
+     * @return array of strings
      */
     public function get_content_parts() {
         return array('content');
