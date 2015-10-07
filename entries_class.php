@@ -77,8 +77,7 @@ class datalynx_entries {
         $this->_entriestotalcount = !empty($entriesset->max) ? $entriesset->max : count($this->_entries);
         $this->_entriesfiltercount = !empty($entriesset->found) ? $entriesset->found : count($this->_entries);
 
-        require_once($CFG->libdir . '/pluginlib.php');
-        $pluginmananger = plugin_manager::instance();
+        $pluginmananger = core_plugin_manager::instance();
         $plugininfo = $pluginmananger->get_plugin_info('local_userinfosync');
         if ($plugininfo && $plugininfo->rootdir) {
             require_once($plugininfo->rootdir . '/lib.php');
