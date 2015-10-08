@@ -16,7 +16,7 @@
 
 /**
  * @package datalynxfield
- * @subpackage textarea
+ * @subpackage editor
  * @copyright 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -25,30 +25,36 @@ defined('MOODLE_INTERNAL') or die;
 require_once(dirname(__FILE__) . "/../renderer.php");
 
 /**
- * Class datalynxfield_textarea_renderer Renderer for textarea field type
+ * Class datalynxfield_editor_renderer Renderer for editor field type
  */
-class datalynxfield_textarea_renderer extends datalynxfield_renderer {
+class datalynxfield_editor_renderer extends datalynxfield_renderer {
 
+	/**
+	 * render the editor form for adding content to the editor field
+	 * TODO: improve editor rendering for including images from repositories
+	 * @see datalynxfield_renderer::render_edit_mode()
+	 */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $field = $this->_field;
         $fieldid = $field->id();
         $entryid = $entry->id;
         $fieldname = "field_{$fieldid}_{$entryid}";
 
-        $attr = array();
-        $attr['cols'] = !$field->get('param2') ? 40 : $field->get('param2');
-        $attr['rows'] = !$field->get('param3') ? 20 : $field->get('param3');
+        // editor
+        $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
 
-        $data = new stdClass();
+        $data = new object;
         $data->$fieldname = isset($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : '';
+        $data->{"{$fieldname}trust"} = true;
         $required = !empty($options['required']);
-
-        $mform->addElement('textarea', $fieldname, null, $attr);
-        $mform->setDefault($fieldname, $data->$fieldname);
-        if ($required) {
-            $mform->addRule($fieldname, null, 'required', null, 'client');
-        }
-
+		// format
+            $data->{"{$fieldname}format"} = isset($entry->{"c{$fieldid}_content1"}) ? $entry->{"c{$fieldid}_content1"} : FORMAT_HTML;
+            $data = file_prepare_standard_editor($data, $fieldname, $field->editor_options(), $field->df()->context, 'mod_datalynx', 'content', $contentid);
+            $mform->addElement('editor', "{$fieldname}_editor", null, null , $field->editor_options());
+            $mform->setDefault("{$fieldname}_editor", $data->{"{$fieldname}_editor"});
+            if ($required) {
+                $mform->addRule("{$fieldname}_editor", null, 'required', null, 'client');
+            }
     }
 
     public function render_display_mode(stdClass $entry, array $params) {
@@ -57,7 +63,7 @@ class datalynxfield_textarea_renderer extends datalynxfield_renderer {
 
         if (isset($entry->{"c{$fieldid}_content"})) {
             $text = $entry->{"c{$fieldid}_content"};
-            $format = isset($entry->{"c{$fieldid}_content1"}) ? $entry->{"c{$fieldid}_content1"} : FORMAT_PLAIN;
+            $format = isset($entry->{"c{$fieldid}_content1"}) ? $entry->{"c{$fieldid}_content1"} : FORMAT_HTML;
 
             $options = new stdClass();
             $options->para = false;

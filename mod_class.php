@@ -845,9 +845,21 @@ class datalynx {
         }
         return $usedfilters;
     }
-
+	
     /**
-     *
+     * Checks if string contains html tags
+     * @param string $string
+     * @return boolean
+     */
+    private function is_html($string) {
+	    return preg_match("/<[^<]+>/",$string,$m) != 0;
+	}
+		
+    /**
+     * Process the action triggered by user for a specific field
+     * @param string $action
+     * @param string $fids (comma separated numbers of field ids)
+     * @param boolean $confirmed
      */
     public function process_fields($action, $fids, $confirmed = false) {
         global $OUTPUT, $DB;
@@ -998,7 +1010,35 @@ class datalynx {
                         }
                         $strnotify = 'fieldsdeleted';
                         break;
-
+                        
+                        case 'convert':
+                        	foreach ($fields as $fid => $field) {
+                        		$processedfids[] = $field->field->id;
+                        		
+								
+                        		// Convert field content to HTML
+                        		$contents = $DB->get_records('datalynx_contents', array('fieldid' => $fid),null,'id,content');
+                        		$htmlcontent = new stdClass();
+                        		if($contents){
+	                         		foreach ($contents as $contentid => $content){
+	                        			if(!$this->is_html($content->content)){
+	                        				$htmlcontent->id = $contentid;
+	                        				$htmlcontent->content = format_text($content->content, FORMAT_PLAIN);
+	                        				$htmlcontent->content1 = FORMAT_HTML;
+	                        				$DB->update_record('datalynx_contents', $htmlcontent);
+	                        			}
+	                        		}
+                        		}
+                        		// Convert field type to editor
+                        		$DB->set_field('datalynx_fields','type','editor', array('id' => $fid));
+                        		
+                        		$other = array('dataid' => $this->id());
+                           		$event = \mod_datalynx\event\field_updated::create(array('context' => $this->context, 'objectid' => $fid, 'other' => $other));
+                        		$event->trigger();
+                        	}
+                        	$strnotify = 'fieldsupdated';
+                        	break;
+                        	
                     default:
                         break;
                 }

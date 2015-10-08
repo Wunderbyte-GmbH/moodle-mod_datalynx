@@ -15,14 +15,18 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
  
 /**
- * @package mod
- * @subpackage datalynx
- * @copyright 2015 onwards David Bogner
+ * @package datalynxfield
+ * @subpackage editor
+ * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$plugin->component = 'mod_datalynx';
-$plugin->version   = 2015092200;
-$plugin->release   = 'Skyler White 1.1'; //famous movie, theater and tv series characters
-$plugin->requires  = 2014050800;
-$plugin->maturity  = MATURITY_STABLE;
+$string['pluginname'] = 'Text area with editor';
+$string['rows'] = 'Rows';
+$string['cols'] = 'Columns';
+$string['wordcountmax'] = 'Maximum words';
+$string['wordcountmin'] = 'Minimum words';
+$string['wordcountshow'] = 'Show wordcount bar';
+
+
+

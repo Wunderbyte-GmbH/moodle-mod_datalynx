@@ -60,7 +60,7 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
                 } else {
                     $format = get_string("strftimedatetime");
                 }
-                //$format = !empty($params['format']) ? $params['format'] : '';
+                $format = !empty($params['format']) ? $params['format'] : $format;
                 $strtime = userdate($content, $format);
             }
         }

@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,17 +12,13 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
- 
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 /**
- * @package mod
- * @subpackage datalynx
- * @copyright 2015 onwards David Bogner
+ * @package datalynxview
+ * @subpackage pdf
+ * @copyright 2015 David Bogner {@link http://www.edulabs.org}
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-$plugin->component = 'mod_datalynx';
-$plugin->version   = 2015092200;
-$plugin->release   = 'Skyler White 1.1'; //famous movie, theater and tv series characters
-$plugin->requires  = 2014050800;
-$plugin->maturity  = MATURITY_STABLE;
+$plugin->component = 'datalynxview_pdf';
+$plugin->version = 2015092200;
+$plugin->requires = 2014051200;
