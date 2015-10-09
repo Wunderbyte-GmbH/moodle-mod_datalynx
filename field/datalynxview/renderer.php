@@ -8,40 +8,39 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ *
  * @package datalynxfield
  * @subpackage datadformview
  * @copyright 2013 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 defined('MOODLE_INTERNAL') or die();
 
-require_once("$CFG->dirroot/mod/datalynx/filter/filter_class.php");
-require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
-require_once("$CFG->dirroot/mod/datalynx/field/entryauthor/field_class.php");
-require_once("$CFG->dirroot/mod/datalynx/field/entrygroup/field_class.php");
+require_once ("$CFG->dirroot/mod/datalynx/filter/filter_class.php");
+require_once ("$CFG->dirroot/mod/datalynx/field/renderer.php");
+require_once ("$CFG->dirroot/mod/datalynx/field/entryauthor/field_class.php");
+require_once ("$CFG->dirroot/mod/datalynx/field/entrygroup/field_class.php");
+
 
 /**
- *
  */
 class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
 
     /**
-     * 
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
         $field = $this->_field;
         $fieldname = $field->name();
-
+        
         $replacements = array();
-
+        
         foreach ($tags as $tag) {
             // No edit mode
             $parts = explode(':', trim($tag, '[]'));
@@ -50,39 +49,48 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
             } else {
                 $type = '';
             }
-            $replacements[$tag] = array('html', $this->display_browse($entry, $type));
+            $replacements[$tag] = array('html', $this->display_browse($entry, $type)
+            );
         }
         return $replacements;
     }
 
     /**
-     *
      */
     protected function display_browse($entry, $type = null) {
         global $PAGE;
         
         $field = $this->_field;
-
+        
         if (empty($field->refdatalynx) or empty($field->refview)) {
             return '';
         }
-
+        
         // Inline
         if (empty($type)) {
             // TODO Including controls seems to mess up the hosting view controls
-            $voptions = array('controls' => false);
+            $voptions = array('controls' => false
+            );
             return $this->get_view_display_content($entry, $voptions);
         }
-
+        
         // Overlay
         if ($type == 'overlay') {
             $this->add_overlay_support();
             
-            $voptions = array('controls' => false);
-            $widgetbody = html_writer::tag('div', $this->get_view_display_content($entry, $voptions), array('class' => "yui3-widget-bd"));
-            $panel = html_writer::tag('div', $widgetbody, array('class' => 'panelContent hide'));
-            $button = html_writer::tag('button', get_string('viewbutton', 'datalynxfield_datalynxview')); 
-            $wrapper = html_writer::tag('div', $button. $panel, array('class' => 'datalynxfield-datalynxview overlay'));
+            $voptions = array('controls' => false
+            );
+            $widgetbody = html_writer::tag('div', 
+                    $this->get_view_display_content($entry, $voptions), 
+                    array('class' => "yui3-widget-bd"
+                    ));
+            $panel = html_writer::tag('div', $widgetbody, array('class' => 'panelContent hide'
+            ));
+            $button = html_writer::tag('button', 
+                    get_string('viewbutton', 'datalynxfield_datalynxview'));
+            $wrapper = html_writer::tag('div', $button . $panel, 
+                    array('class' => 'datalynxfield-datalynxview overlay'
+                    ));
             return $wrapper;
         }
         
@@ -90,15 +98,21 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         if ($type == 'embedded') {
             return $this->get_view_display_embedded($entry);
         }
-
+        
         // Embedded Overlay
         if ($type == 'embeddedoverlay') {
             $this->add_overlay_support();
-
-            $widgetbody = html_writer::tag('div', $this->get_view_display_embedded($entry), array('class' => "yui3-widget-bd"));
-            $panel = html_writer::tag('div', $widgetbody, array('class' => 'panelContent hide'));
-            $button = html_writer::tag('button', get_string('viewbutton', 'datalynxfield_datalynxview')); 
-            $wrapper = html_writer::tag('div', $button. $panel, array('class' => 'datalynxfield-datalynxview embedded overlay'));
+            
+            $widgetbody = html_writer::tag('div', $this->get_view_display_embedded($entry), 
+                    array('class' => "yui3-widget-bd"
+                    ));
+            $panel = html_writer::tag('div', $widgetbody, array('class' => 'panelContent hide'
+            ));
+            $button = html_writer::tag('button', 
+                    get_string('viewbutton', 'datalynxfield_datalynxview'));
+            $wrapper = html_writer::tag('div', $button . $panel, 
+                    array('class' => 'datalynxfield-datalynxview embedded overlay'
+                    ));
             return $wrapper;
         }
         
@@ -106,15 +120,14 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
     }
 
     /**
-     *
      */
     protected function get_view_display_content($entry, array $options = array()) {
         $field = $this->_field;
-
+        
         $refdatalynx = $field->refdatalynx;
         $refview = $field->refview;
         $localview = $field->localview;
-
+        
         // Options for setting the filter
         $foptions = array();
         // Filter id
@@ -133,20 +146,16 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         if ($soptions = $this->get_search_options($entry)) {
             $foptions['csearch'] = $soptions;
         }
-
+        
         $refview->set_filter($foptions, true);
-
+        
         // Set the ref datalynx
-        $params = array(
-                'js' => true,
-                'css' => true,
-                'modjs' => true,
-                'completion' => true,
-                'comments' => true,
+        $params = array('js' => true, 'css' => true, 'modjs' => true, 'completion' => true, 
+            'comments' => true
         );
         
         // Ref datalynx page type defaults to external
-        $refpagetype = !empty($options['pagetype']) ? $options['pagetype'] : 'external';        
+        $refpagetype = !empty($options['pagetype']) ? $options['pagetype'] : 'external';
         $pageoutput = $refdatalynx->set_page('external', $params, true);
         
         $refview->set_content();
@@ -156,25 +165,22 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         $options['entryactions'] = false;
         return $refview->display($options);
     }
-    
+
     /**
-     *
      */
     protected function get_view_display_embedded($entry) {
         $field = $this->_field;
         $fieldname = str_replace(' ', '_', $field->name());
         
         // Construct the src url
-        $params = array(
-            'd' => $field->refdatalynx->id(),
-            'view' => $field->refview->id()
+        $params = array('d' => $field->refdatalynx->id(), 'view' => $field->refview->id()
         );
         if ($field->reffilterid) {
             $params['filter'] = $field->reffilterid;
         }
         // Search filter by entry author or group
         $params = $this->get_filter_by_options($params, $entry, true);
-    
+        
         // Custom sort
         if ($soptions = $this->get_sort_options()) {
             $fm = $this->_df->get_filter_manager();
@@ -187,22 +193,20 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
             $usearch = $fm::get_search_url_query($soptions);
             $params['usearch'] = $usearch;
         }
-
+        
         $srcurl = new moodle_url('/mod/datalynx/embed.php', $params);
         
         // Frame
-        $froptions = array(
-            'src' => $srcurl,
-            'width' => '100%',
-            'height' => '100%',
-            'style' => 'border:0;',
+        $froptions = array('src' => $srcurl, 'width' => '100%', 'height' => '100%', 
+            'style' => 'border:0;'
         );
         $iframe = html_writer::tag('iframe', null, $froptions);
-        return html_writer::tag('div', $iframe, array('class' => "datalynxfield-datalynxview-$fieldname embedded"));
+        return html_writer::tag('div', $iframe, 
+                array('class' => "datalynxfield-datalynxview-$fieldname embedded"
+                ));
     }
 
     /**
-     *
      */
     protected function add_overlay_support() {
         global $PAGE;
@@ -210,39 +214,42 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         static $added = false;
         
         if (!$added) {
-            $module = array(
-                'name' => 'M.datalynxfield_datalynxview_overlay',
-                'fullpath' => '/mod/datalynx/field/datalynxview/datalynxview.js',
-                'requires' => array('base','node')
+            $module = array('name' => 'M.datalynxfield_datalynxview_overlay', 
+                'fullpath' => '/mod/datalynx/field/datalynxview/datalynxview.js', 
+                'requires' => array('base', 'node'
+                )
             );
             
-            $PAGE->requires->js_init_call('M.datalynxfield_datalynxview_overlay.init', null, false, $module);
+            $PAGE->requires->js_init_call('M.datalynxfield_datalynxview_overlay.init', null, false, 
+                    $module);
         }
     }
 
     /**
-     *
      */
     protected function get_filter_by_options(array $options, $entry, $urlquery = false) {
         $field = $this->_field;
-
+        
         if (!empty($field->field->param6)) {
             list($filterauthor, $filtergroup) = explode(',', $field->field->param6);
             // Entry author
             if ($filterauthor) {
                 if ($entry->id != -1) {
-                    $users = $urlquery ? $entry->userid : array($entry->userid);
+                    $users = $urlquery ? $entry->userid : array($entry->userid
+                    );
                     $options['users'] = $users;
                 } else {
                     global $USER;
-                    $users = $urlquery ? $USER->id : array($USER->id);
+                    $users = $urlquery ? $USER->id : array($USER->id
+                    );
                     $options['users'] = $users;
                 }
             }
             // Entry group
             if ($filtergroup) {
                 if ($entry->id != -1) {
-                    $groups = $urlquery ? $entry->groupid : array($entry->groupid);
+                    $groups = $urlquery ? $entry->groupid : array($entry->groupid
+                    );
                     $options['groups'] = $groups;
                 } else {
                     $allgroups = groups_get_user_groups($this->_df->course);
@@ -253,16 +260,15 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         }
         return $options;
     }
-        
+
     /**
-     *
      */
     protected function get_sort_options() {
         $field = $this->_field;
-
+        
         $refdatalynx = $field->refdatalynx;
         $refview = $field->refview;
-
+        
         $soptions = array();
         // Custom sort (ref-field-patten,ASC/DESC)
         if (!empty($field->field->param4)) {
@@ -281,25 +287,26 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
     }
 
     /**
-     *
      */
     protected function get_search_options($entry) {
         $field = $this->_field;
         $soptions = array();
-
+        
         // Custom search (AND/OR,ref-field-patten,[NOT],OPT,local-field-pattern/value
         if (empty($field->field->param5)) {
             return $soptions;
         }
-
-        if (!$refdatalynx = $field->refdatalynx or !$refview = $field->refview or !$localview = $field->localview) {
+        
+        if (!$refdatalynx = $field->refdatalynx or !$refview = $field->refview or
+                 !$localview = $field->localview) {
             return $soptions;
         }
-
+        
         foreach (explode("\n", $field->field->param5) as $key => $searchy) {
             list($andor, $refpattern, $not, $operator, $localpattern) = explode(',', $searchy);
             // And/or
-            if (empty($andor) or !in_array($andor, array('AND', 'OR'))) {
+            if (empty($andor) or !in_array($andor, array('AND', 'OR'
+            ))) {
                 continue;
             }
             // Get the ref field id from pattern
@@ -312,7 +319,8 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
                 $value = $localpattern;
             } else if ($localfield = $field->df->get_field_from_id($localfieldid)) {
                 // Get the array of values for the patterns
-                if ($replacements = $localfield->renderer()->replacements(array($localpattern), $entry)) {
+                if ($replacements = $localfield->renderer()->replacements(array($localpattern
+                ), $entry)) {
                     // Take the first: array('html', value)
                     $first = reset($replacements);
                     // extract the value part
@@ -325,26 +333,32 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
             
             // Add to the search options
             if (empty($soptions[$rfieldid])) {
-                $soptions[$rfieldid] = array('AND' => array(), 'OR' => array());
+                $soptions[$rfieldid] = array('AND' => array(), 'OR' => array()
+                );
             }
-            $soptions[$rfieldid][$andor][] = array($not, $operator, $value);
+            $soptions[$rfieldid][$andor][] = array($not, $operator, $value
+            );
         }
-
+        
         return $soptions;
     }
-    
+
     /**
-     * Array of patterns this field supports 
+     * Array of patterns this field supports
      */
     protected function patterns() {
         $fieldname = $this->_field->name();
-
+        
         $patterns = parent::patterns();
-        $patterns["[[$fieldname]]"] = array(true);
-        $patterns["[[$fieldname:overlay]]"] = array(true);
-        $patterns["[[$fieldname:embedded]]"] = array(false);
-        $patterns["[[$fieldname:embeddedoverlay]]"] = array(false);
-
-        return $patterns; 
+        $patterns["[[$fieldname]]"] = array(true
+        );
+        $patterns["[[$fieldname:overlay]]"] = array(true
+        );
+        $patterns["[[$fieldname:embedded]]"] = array(false
+        );
+        $patterns["[[$fieldname:embeddedoverlay]]"] = array(false
+        );
+        
+        return $patterns;
     }
 }

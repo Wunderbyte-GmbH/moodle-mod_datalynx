@@ -8,52 +8,54 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
- 
+
 /**
+ *
  * @package datalynxfield
  * @subpackage radiobutton
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+require_once ("$CFG->dirroot/mod/datalynx/field/select/field_class.php");
 
-require_once("$CFG->dirroot/mod/datalynx/field/select/field_class.php");
 
 class datalynxfield_radiobutton extends datalynxfield_option_single {
 
     public $type = 'radiobutton';
 
-    public $separators = array(
-            array('name' => 'New line', 'chr' => '<br />'),
-            array('name' => 'Space', 'chr' => '&#32;'),
-            array('name' => ',', 'chr' => '&#44;'),
-            array('name' => ', (with space)', 'chr' => '&#44;&#32;')
+    public $separators = array(array('name' => 'New line', 'chr' => '<br />'
+    ), array('name' => 'Space', 'chr' => '&#32;'
+    ), array('name' => ',', 'chr' => '&#44;'
+    ), array('name' => ', (with space)', 'chr' => '&#44;&#32;'
+    )
     );
 
     /**
      * Computes which values of this field have already been chosen by the given user and
      * determines which ones have reached their limit
-     * @param  int      $userid  ID of the user modifying an entry; if not specified defaults to $USER->id
-     * @return array    an array of disabled values
+     * 
+     * @param int $userid ID of the user modifying an entry; if not specified defaults to $USER->id
+     * @return array an array of disabled values
      */
     public function get_disabled_values_for_user($userid = 0) {
         global $DB, $USER;
-
+        
         if ($userid == 0) {
             $userid = $USER->id;
         }
-
+        
         $countsql = "SELECT COUNT(dc2.id)
                        FROM {datalynx_contents} dc2
                  INNER JOIN {datalynx_fields} df2 ON dc2.fieldid = df2.id
                  INNER JOIN {datalynx_entries} de2 ON dc2.entryid = de2.id
                       WHERE dc2.fieldid = :fieldid1
                         AND dc2.content = dc.content";
-
+        
         $sql = "SELECT dc.content, ({$countsql}) AS count
                   FROM {datalynx_contents} dc
             INNER JOIN {datalynx_entries} de ON dc.entryid = de.id
@@ -61,20 +63,17 @@ class datalynxfield_radiobutton extends datalynxfield_option_single {
                    AND de.dataid = :dataid
                    AND dc.fieldid = :fieldid2
                 HAVING count >= 1";
-
-        $params = array('userid'    => $userid,
-            'dataid'    => $this->df->id(),
-            'fieldid1'  => $this->field->id,
-            'fieldid2'  => $this->field->id);
-
+        
+        $params = array('userid' => $userid, 'dataid' => $this->df->id(), 
+            'fieldid1' => $this->field->id, 'fieldid2' => $this->field->id
+        );
+        
         $results = $DB->get_records_sql($sql, $params);
-
+        
         return array_keys($results);
     }
 
-
     /**
-     *
      */
     protected function get_sql_compare_text($column = 'content') {
         global $DB;
@@ -82,7 +81,6 @@ class datalynxfield_radiobutton extends datalynxfield_option_single {
     }
 
     /**
-     *
      */
     public function get_search_value($value) {
         $options = $this->options_menu();
@@ -94,7 +92,6 @@ class datalynxfield_radiobutton extends datalynxfield_option_single {
     }
 
     /**
-     *
      */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
         // import only from csv
@@ -104,7 +101,7 @@ class datalynxfield_radiobutton extends datalynxfield_option_single {
             $csvname = $importsettings[$fieldname]['name'];
             $allownew = !empty($importsettings[$fieldname]['allownew']) ? true : false;
             $label = !empty($csvrecord[$csvname]) ? $csvrecord[$csvname] : null;
-
+            
             if ($label) {
                 $options = $this->options_menu();
                 if ($optionkey = array_search($label, $options)) {
@@ -114,30 +111,33 @@ class datalynxfield_radiobutton extends datalynxfield_option_single {
                 }
             }
         }
-
+        
         return true;
     }
 
     public function validate($entryid, $tags, $formdata) {
         $fieldid = $this->id();
-
+        
         global $DB;
         $query = "SELECT dc.content
                     FROM {datalynx_contents} dc
                    WHERE dc.entryid = :entryid
                      AND dc.fieldid = :fieldid";
-        $params = array('entryid' => $entryid, 'fieldid' => $fieldid);
-
+        $params = array('entryid' => $entryid, 'fieldid' => $fieldid
+        );
+        
         $oldcontent = $DB->get_field_sql($query, $params);
-
+        
         $formfieldname = "field_{$fieldid}_{$entryid}_selected";
-
+        
         if (isset($this->field->param5)) {
             $disabled = $this->get_disabled_values_for_user();
             $content = clean_param($formdata->{$formfieldname}, PARAM_INT);
             if ($content != $oldcontent && array_search($content, $disabled) !== false) {
                 $menu = $this->options_menu();
-                return array($formfieldname => get_string('limitchoice_error', 'datalynx', $menu[$content]));
+                return array(
+                    $formfieldname => get_string('limitchoice_error', 'datalynx', $menu[$content])
+                );
             }
         } else {
             return array();

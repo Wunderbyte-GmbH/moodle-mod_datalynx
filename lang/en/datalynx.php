@@ -8,24 +8,24 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ *
  * @package mod
- * $subpackage datalynx
+ *          $subpackage datalynx
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * The Datalynx has been developed as an enhanced counterpart
- * of Moodle's Database activity module (1.9.11+ (20110323)).
- * To the extent that Datalynx code corresponds to Database code,
- * certain copyrights on the Database module may obtain.
+ *         
+ *          The Datalynx has been developed as an enhanced counterpart
+ *          of Moodle's Database activity module (1.9.11+ (20110323)).
+ *          To the extent that Datalynx code corresponds to Database code,
+ *          certain copyrights on the Database module may obtain.
  */
-
 $string['fieldlabel'] = 'Field label';
 $string['fieldlabel_help'] = 'The field label allows for specifying a designated field label that can be added to the view by means of the [[fieldname@]] field pattern. This field pattern observes the field visibility and is hidden if the field is set to be hidden. The field label can also serve as a field display template and it interprets patterns of that field if included in the label. For example, with a number field called Number and the field label defined as \'You have earned [[Number]] credits.\' and an entry where the number value is 47 the pattern [[Number@]] would be displayed as \'You have earned 47 credits.\'';
 $string['actions'] = 'Entry actions';
@@ -70,7 +70,7 @@ $string['csvfailed'] = 'Unable to read the raw data from the CSV file';
 $string['csvoutput'] = 'CSV output';
 $string['csvsettings'] = 'CSV settings';
 $string['csvwithselecteddelimiter'] = '<acronym title=\"Comma Separated Values\">CSV</acronym> text with selected delimiter:';
-/// Capability strings
+// / Capability strings
 $string['datalynx:addinstance'] = 'Add a new datalynx';
 $string['datalynx:approve'] = 'Approve unapproved entries';
 $string['datalynx:comment'] = 'Write comments';
@@ -99,7 +99,7 @@ $string['datalynx:viewanonymousentry'] = 'View anonymous entries';
 $string['datalynx:viewentry'] = 'View entries';
 $string['datalynx:viewindex'] = 'View index';
 $string['datalynx:writeentry'] = 'Write entries';
-/// End Capability strings
+// / End Capability strings
 $string['defaultview'] = 'D';
 $string['deletenotenrolled'] = 'Delete entries by users not enrolled';
 $string['descending'] = 'Descending';
@@ -256,7 +256,6 @@ $string['filterupdate'] = 'Update an existing filter';
 $string['filterurlquery'] = 'Url query';
 $string['filtermy'] = 'My filter';
 $string['filteruserreset'] = '** Reset my filter';
-
 
 $string['firstdayofweek'] = 'Monday';
 $string['first'] = 'First';
@@ -427,9 +426,6 @@ $string['ruleenabled'] = 'Enabled';
 $string['author'] = 'Author';
 $string['email'] = 'Email';
 
-
-
-
 $string['savecontinue'] = 'Save and continue';
 $string['search'] = 'Search';
 $string['sendinratings'] = 'Send in my latest ratings';
@@ -521,7 +517,8 @@ $string['view'] = 'view';
 $string['viewvisibility'] = 'Visibility';
 $string['wrongdataid'] = 'Wrong datalynx id provided';
 
-// === teammemberselect strings ====================================================================================================
+// === teammemberselect strings
+// ====================================================================================================
 
 $string['teamsize'] = 'Maximum team size';
 $string['teamsize_help'] = 'Specify the maximum size of the team. It must be a positive integer.';
@@ -712,23 +709,20 @@ $string['event_rating_updated'] = 'Rating updated';
 $string['event_rating_deleted'] = 'Rating deleted';
 $string['event_team_updated'] = 'Team updated';
 
-/// Message strings
-$string['message_entry_created'] =
-    'Hello {$a->fullname},
+// / Message strings
+$string['message_entry_created'] = 'Hello {$a->fullname},
 
 the content in {$a->datalynxlink} has been modified by {$a->senderprofilelink}.
 
 The following entry has been created: {$a->viewlink}.';
 
-$string['message_entry_updated'] =
-    'Hello {$a->fullname},
+$string['message_entry_updated'] = 'Hello {$a->fullname},
 
 the content in {$a->datalynxlink} has been modified by {$a->senderprofilelink}.
 
 The following entry has been updated: {$a->viewlink}.';
 
-$string['message_entry_deleted'] =
-    'Hello {$a->fullname},
+$string['message_entry_deleted'] = 'Hello {$a->fullname},
 
 the content in {$a->datalynxlink} has been modified by {$a->senderprofilelink}.
 
@@ -757,9 +751,9 @@ $string['message_rating_updated'] = 'Datalynx rating updated';
 $string['message_team_updated'] = 'Dear {$a->fullname},
 
 {$a->fieldname} membership has been changed by {$a->senderprofilelink}. Please go to {$a->viewlink} for more details.';
-/// End Message strings
+// / End Message strings
 
-/// Message provider strings
+// / Message provider strings
 $string['messageprovider:event_entry_created'] = 'Datalynx entry created';
 $string['messageprovider:event_entry_updated'] = 'Datalynx entry updated';
 $string['messageprovider:event_entry_deleted'] = 'Datalynx entry deleted';
@@ -769,7 +763,7 @@ $string['messageprovider:event_comment_created'] = 'Datalynx comment created';
 $string['messageprovider:event_rating_added'] = 'Datalynx rating added';
 $string['messageprovider:event_rating_updated'] = 'Datalynx rating updated';
 $string['messageprovider:event_team_updated'] = 'Datalynx entry team updated';
-/// End Message provider strings event_team_updated
+// / End Message provider strings event_team_updated
 
 $string['filterforms'] = 'Filter forms';
 $string['filterformadd'] = 'Add new filter form';

@@ -8,20 +8,21 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
- 
+
 /**
+ *
  * @package datalynxfield
  * @subpackage identifier
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+require_once ("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
-require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
 class datalynxfield_identifier extends datalynxfield_base {
 
@@ -30,9 +31,7 @@ class datalynxfield_identifier extends datalynxfield_base {
     public static function get_salt_options() {
         global $CFG;
         
-        $options = array(
-            '' => get_string('none'),
-            'random' => get_string('random', 'datalynx'),
+        $options = array('' => get_string('none'), 'random' => get_string('random', 'datalynx')
         );
         if (!empty($CFG->passwordsaltmain)) {
             $options[] = get_string('system', 'datalynxfield_identifier');
@@ -41,13 +40,13 @@ class datalynxfield_identifier extends datalynxfield_base {
     }
 
     /**
-     *
      */
     protected function format_content($entry, array $values = null) {
         $fieldid = $this->field->id;
         $oldcontents = array();
         $contents = array();
-        // old content (should not exist if we get here, as update should be triggered only when no content)
+        // old content (should not exist if we get here, as update should be triggered only when no
+        // content)
         if (isset($entry->{"c{$fieldid}_content"})) {
             $oldcontent = $entry->{"c{$fieldid}_content"};
         } else {
@@ -59,17 +58,19 @@ class datalynxfield_identifier extends datalynxfield_base {
         } else {
             $content = null;
         }
-        return array(array($content), array($oldcontent));
+        return array(array($content
+        ), array($oldcontent
+        )
+        );
     }
 
     /**
-     *
      */
     protected function generate_identifier_key($entry) {
         global $CFG, $USER;
         
         $identifierkey = $this->get_hash_string($entry);
-        $uniqueness = !empty($this->field->param4) ? $this->field->param4 : false;       
+        $uniqueness = !empty($this->field->param4) ? $this->field->param4 : false;
         if ($uniqueness) {
             // We check against stored idenitifiers in this field
             // To prevent this from going forever under certain configurations
@@ -81,12 +82,11 @@ class datalynxfield_identifier extends datalynxfield_base {
                 $identifierkey = $this->get_hash_string($entry, $forcerandomsalt);
             }
         }
-
+        
         return $identifierkey;
     }
 
     /**
-     *
      */
     protected function get_hash_string($entry, $forcerandomsalt = false) {
         global $CFG, $USER;
@@ -101,11 +101,11 @@ class datalynxfield_identifier extends datalynxfield_base {
         $entryid = $entry->id;
         $timeadded = (!empty($entry->timecreated) ? $entry->timecreated : time());
         $userid = (!empty($entry->userid) ? $entry->userid : $USER->id);
-
+        
         // Collate elements for hashing
         $elements = array();
         $elements[] = $entryid;
-
+        
         // Salt
         switch ($salt) {
             case '':
@@ -124,25 +124,24 @@ class datalynxfield_identifier extends datalynxfield_base {
                 $elements[] = complex_random_string($fieldsaltsize);
                 break;
         }
-
+        
         // Generate and return the hash
         return md5(implode('_', $elements));
     }
 
     /**
-     *
      */
     protected function is_unique_key($key) {
         global $DB;
-
-        return $DB->record_exists('datalynx_contents', array('fieldid' => $this->fieldid, 'content' => $key));
+        
+        return $DB->record_exists('datalynx_contents', 
+                array('fieldid' => $this->fieldid, 'content' => $key
+                ));
     }
 
     public function get_supported_search_operators() {
-        return array(
-            '' => get_string('empty', 'datalynx'),
-            '=' => get_string('equal', 'datalynx'),
-            'LIKE' => get_string('contains', 'datalynx'),
+        return array('' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'), 
+            'LIKE' => get_string('contains', 'datalynx')
         );
     }
 }

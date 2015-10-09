@@ -8,93 +8,110 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
- 
+
 /**
+ *
  * @package datalynxview
  * @subpackage csv
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once("$CFG->dirroot/mod/datalynx/view/view_class.php");
+require_once ("$CFG->dirroot/mod/datalynx/view/view_class.php");
+
 
 class datalynxview_csv extends datalynxview_base {
 
     const EXPORT_ALL = 'all';
+
     const EXPORT_PAGE = 'page';
 
     protected $type = 'csv';
-    
+
     protected $_output = 'csv';
+
     protected $_delimiter = 'comma';
+
     protected $_enclosure = '';
+
     protected $_encoding = 'UTF-8';
 
-    protected $_editors = array('section');
+    protected $_editors = array('section'
+    );
 
     protected $_columns = null;
 
     protected $_showimportform = false;
 
     /**
-     *
      */
-    public function __construct($df = 0, $view = 0) {       
+    public function __construct($df = 0, $view = 0) {
         parent::__construct($df, $view);
         if (!empty($this->view->param3)) {
             $this->_output = $this->view->param3;
         }
         if (!empty($this->view->param1)) {
-            list($this->_delimiter, $this->_enclosure, $this->_encoding) = explode(',', $this->view->param1);
+            list($this->_delimiter, $this->_enclosure, $this->_encoding) = explode(',', 
+                    $this->view->param1);
         }
     }
 
     /**
-     *
      */
     protected function apply_entry_group_layout($entriesset, $name = '') {
         global $OUTPUT;
-
+        
         $elements = array();
-
+        
         // Generate the header row
         $tableheader = '';
         if ($this->has_headers()) {
             $columns = $this->get_columns();
             foreach ($columns as $column) {
-                list(,$header,$class) = $column;
-                $tableheader .= html_writer::tag('th', $header, array('class' => $class));
+                list(, $header, $class) = $column;
+                $tableheader .= html_writer::tag('th', $header, array('class' => $class
+                ));
             }
             $tableheader = html_writer::tag('thead', html_writer::tag('tr', $tableheader));
-
+            
             // Set view tags in header row
             $tags = $this->_tags['view'];
             $replacements = $this->patterns()->get_replacements($tags);
             $tableheader = str_replace($tags, $replacements, $tableheader);
         }
         // Open table and wrap header with thead
-        $elements[] = array('html', html_writer::start_tag('table', array('class' => 'generaltable')). $tableheader);
-
+        $elements[] = array('html', 
+            html_writer::start_tag('table', array('class' => 'generaltable'
+            )) . $tableheader
+        );
+        
         // flatten the set to a list of elements, wrap with tbody and close table
-        $elements[] = array('html', html_writer::start_tag('tbody'));
+        $elements[] = array('html', html_writer::start_tag('tbody')
+        );
         foreach ($entriesset as $entryid => $entry_definitions) {
             $elements = array_merge($elements, $entry_definitions);
         }
-        $elements[] = array('html', html_writer::end_tag('tbody'). html_writer::end_tag('table'));
-
+        $elements[] = array('html', html_writer::end_tag('tbody') . html_writer::end_tag('table')
+        );
+        
         // Add group heading
         $name = ($name == 'newentry') ? get_string('entrynew', 'datalynx') : $name;
         if ($name) {
-            array_unshift($elements, array('html', $OUTPUT->heading($name, 3, 'main')));
+            array_unshift($elements, array('html', $OUTPUT->heading($name, 3, 'main')
+            ));
         }
         // Wrap with entriesview
-        array_unshift($elements, array('html', html_writer::start_tag('div', array('class' => 'entriesview'))));
-        array_push($elements, array('html', html_writer::end_tag('div')));
-
+        array_unshift($elements, 
+                array('html', html_writer::start_tag('div', array('class' => 'entriesview'
+                ))
+                ));
+        array_push($elements, array('html', html_writer::end_tag('div')
+        ));
+        
         return $elements;
     }
 
@@ -103,102 +120,121 @@ class datalynxview_csv extends datalynxview_base {
      */
     public function process_data() {
         global $CFG;
-
+        
         // proces csv export request
-        if ($exportcsv = optional_param('exportcsv','', PARAM_ALPHA)) {
+        if ($exportcsv = optional_param('exportcsv', '', PARAM_ALPHA)) {
             $this->process_export($exportcsv);
         }
         
         // proces csv import request
-        if ($importcsv = optional_param('importcsv',0, PARAM_INT)) {
+        if ($importcsv = optional_param('importcsv', 0, PARAM_INT)) {
             $this->process_import();
         }
-        
     }
 
     /**
-     *
      */
     protected function entry_definition($fielddefinitions) {
         $elements = array();
         // Get the columns definition from the view template
         $columns = $this->get_columns();
-
+        
         // Generate entry table row
-        $elements[] = array('html', html_writer::start_tag('tr'));
+        $elements[] = array('html', html_writer::start_tag('tr')
+        );
         foreach ($columns as $column) {
-            list($tag,,$class) = array_map('trim', $column);
+            list($tag, , $class) = array_map('trim', $column);
             if (!empty($fielddefinitions[$tag])) {
                 $fielddefinition = $fielddefinitions[$tag];
                 if ($fielddefinition[0] == 'html') {
-                    $elements[] = array('html', html_writer::tag('td', $fielddefinition[1], array('class' => $class)));
+                    $elements[] = array('html', 
+                        html_writer::tag('td', $fielddefinition[1], array('class' => $class
+                        ))
+                    );
                 } else {
-                    $elements[] = array('html', html_writer::start_tag('td', array('class' => $class)));
+                    $elements[] = array('html', 
+                        html_writer::start_tag('td', array('class' => $class
+                        ))
+                    );
                     $elements[] = $fielddefinition;
-                    $elements[] = array('html', html_writer::end_tag('td'));
+                    $elements[] = array('html', html_writer::end_tag('td')
+                    );
                 }
             } else {
-                $elements[] = array('html', html_writer::tag('td', '', array('class' => $class)));
+                $elements[] = array('html', html_writer::tag('td', '', array('class' => $class
+                ))
+                );
             }
         }
-        $elements[] = array('html', html_writer::end_tag('tr'));
-
+        $elements[] = array('html', html_writer::end_tag('tr')
+        );
+        
         return $elements;
     }
 
     /**
-     *
      */
     protected function new_entry_definition($entryid = -1) {
         $elements = array();
-
+        
         // Get the columns definition from the view template
         $columns = $this->get_columns();
-
-
+        
         // Get field definitions for new entry
         $fields = $this->_df->get_fields();
-        $entry = (object) array('id' => $entryid);
+        $entry = (object) array('id' => $entryid
+        );
         $fielddefinitions = array();
         foreach ($this->_tags['field'] as $fieldid => $patterns) {
             $field = $fields[$fieldid];
-            $options = array('edit' => true, 'manage' => true);
+            $options = array('edit' => true, 'manage' => true
+            );
             if ($definitions = $field->get_definitions($patterns, $entry, $options)) {
                 $fielddefinitions = array_merge($fielddefinitions, $definitions);
             }
         }
-
+        
         // Generate entry table row
-        $elements[] = array('html', html_writer::start_tag('tr'));
+        $elements[] = array('html', html_writer::start_tag('tr')
+        );
         foreach ($columns as $column) {
-            list($tag,,$class) = array_map('trim', $column);
+            list($tag, , $class) = array_map('trim', $column);
             if (!empty($fielddefinitions[$tag])) {
                 $fielddefinition = $fielddefinitions[$tag];
                 if ($fielddefinition[0] == 'html') {
-                    $elements[] = array('html', html_writer::tag('td', $fielddefinition[1], array('class' => $class)));
+                    $elements[] = array('html', 
+                        html_writer::tag('td', $fielddefinition[1], array('class' => $class
+                        ))
+                    );
                 } else {
-                    $elements[] = array('html', html_writer::start_tag('td', array('class' => $class)));
+                    $elements[] = array('html', 
+                        html_writer::start_tag('td', array('class' => $class
+                        ))
+                    );
                     $elements[] = $fielddefinition;
-                    $elements[] = array('html', html_writer::end_tag('td'));
+                    $elements[] = array('html', html_writer::end_tag('td')
+                    );
                 }
             } else {
-                $elements[] = array('html', html_writer::tag('td', '', array('class' => $class)));
+                $elements[] = array('html', html_writer::tag('td', '', array('class' => $class
+                ))
+                );
             }
         }
-        $elements[] = array('html', html_writer::end_tag('tr'));
-
+        $elements[] = array('html', html_writer::end_tag('tr')
+        );
+        
         return $elements;
     }
 
     /**
-     *
      */
     protected function set__patterns($data = null) {
         parent::set__patterns($data);
-
+        
         // get patterns from param2
         if ($data) {
-            $text = !empty($data->param2) ? ' '. $data->param2 : '';
+            $text = !empty($data->param2) ? ' ' . $data->param2 : '';
             if (trim($text)) {
                 // This view patterns
                 if ($patterns = $this->patterns()->search($text)) {
@@ -212,7 +248,6 @@ class datalynxview_csv extends datalynxview_base {
                         }
                     }
                 }
-
             }
             $this->view->patterns = serialize($this->_tags);
         }
@@ -223,35 +258,35 @@ class datalynxview_csv extends datalynxview_base {
      */
     public function display(array $params = array()) {
         global $OUTPUT;
-
+        
         if ($this->_showimportform) {
             
             $mform = $this->get_import_form();
-        
+            
             $tohtml = isset($params['tohtml']) ? $params['tohtml'] : false;
             // print view
-            $viewname = 'datalynxview-'. str_replace(' ', '_', $this->name());
+            $viewname = 'datalynxview-' . str_replace(' ', '_', $this->name());
             if ($tohtml) {
-                return html_writer::tag('div', $mform->html(), array('class' => $viewname));
+                return html_writer::tag('div', $mform->html(), array('class' => $viewname
+                ));
             } else {
-                echo html_writer::start_tag('div', array('class' => $viewname));
+                echo html_writer::start_tag('div', array('class' => $viewname
+                ));
                 $mform->display();
                 echo html_writer::end_tag('div');
             }
-        
         } else {
             return parent::display($params);
-        }    
+        }
     }
 
     /**
-     *
      */
     public function process_export($range = self::EXPORT_PAGE) {
         global $CFG;
-
-        require_once($CFG->libdir . '/csvlib.class.php');
-
+        
+        require_once ($CFG->libdir . '/csvlib.class.php');
+        
         if (!$csvcontent = $this->get_csv_content($range)) {
             return;
         }
@@ -260,10 +295,12 @@ class datalynxview_csv extends datalynxview_base {
         $filename = clean_filename("{$datalynxname}-export");
         $filename .= clean_filename('-' . gmdate("Ymd_Hi"));
         $filename .= clean_filename("-{$this->_delimiter}_separated");
-        $filename .= '.'. $this->_output;
-
-        $patterns = array("\n");
-        $adjustments = array('');
+        $filename .= '.' . $this->_output;
+        
+        $patterns = array("\n"
+        );
+        $adjustments = array(''
+        );
         if ($this->_enclosure) {
             $patterns[] = $this->_enclosure;
             $adjustments[] = '&#' . ord($this->_enclosure) . ';';
@@ -272,29 +309,28 @@ class datalynxview_csv extends datalynxview_base {
             $adjustments[] = '&#' . ord($delimiter) . ';';
         }
         $returnstr = '';
-        foreach($csvcontent as $row) {
-            foreach($row as $key => $column) {
+        foreach ($csvcontent as $row) {
+            foreach ($row as $key => $column) {
                 $value = str_replace($patterns, $adjustments, $column);
-                $row[$key] = $this->_enclosure. $value. $this->_enclosure;
+                $row[$key] = $this->_enclosure . $value . $this->_enclosure;
             }
             $returnstr .= implode($delimiter, $row) . "\n";
         }
         
         // Convert encoding
         $returnstr = mb_convert_encoding($returnstr, $this->_encoding, 'UTF-8');
-
+        
         header("Content-Type: application/download\n");
         header("Content-Disposition: attachment; filename=\"$filename\"");
         header('Expires: 0');
         header('Cache-Control: must-revalidate,post-check=0,pre-check=0');
         header('Pragma: public');
-
+        
         echo $returnstr;
-        exit;
+        exit();
     }
 
     /**
-     *
      */
     public function get_csv_content($range = self::EXPORT_PAGE) {
         // Set content
@@ -318,12 +354,12 @@ class datalynxview_csv extends datalynxview_base {
             $this->set_content();
             $exportentries = $this->_entries->entries();
         }
-
+        
         // Compile entries if any
         if (!$exportentries) {
             return null;
         }
-
+        
         // Get the field definitions
         // array(array(pattern => value,...)...)
         $entryvalues = array();
@@ -338,17 +374,17 @@ class datalynxview_csv extends datalynxview_base {
             }
             $entryvalues[$entryid] = $patternvalues;
         }
-
+        
         // Get csv headers from view columns
         $columnpatterns = array();
         $csvheader = array();
         $columns = $this->get_columns();
         foreach ($columns as $column) {
-            list($pattern, $header,) = $column;
+            list($pattern, $header, ) = $column;
             $columnpatterns[] = $pattern;
-            $csvheader[] = $header ? $header : trim($pattern,'[#]');
+            $csvheader[] = $header ? $header : trim($pattern, '[#]');
         }
-
+        
         $csvcontent = array();
         $csvcontent[] = $csvheader;
         
@@ -356,7 +392,7 @@ class datalynxview_csv extends datalynxview_base {
         // array(array(pattern => value,...)...)
         foreach ($entryvalues as $entryid => $patternvalues) {
             $row = array();
-            foreach ($columnpatterns as  $pattern) {
+            foreach ($columnpatterns as $pattern) {
                 if (isset($patternvalues[$pattern])) {
                     $row[] = $patternvalues[$pattern];
                 } else {
@@ -365,31 +401,29 @@ class datalynxview_csv extends datalynxview_base {
             }
             $csvcontent[] = $row;
         }
-
+        
         return $csvcontent;
     }
 
     /**
-     *
      */
     public function process_import() {
         global $CFG;
-
+        
         $mform = $this->get_import_form();
         
         if ($mform->is_cancelled()) {
             return null;
-        
-        } else if ($formdata = $mform->get_data()) {            
-
-            $data = new object;
+        } else if ($formdata = $mform->get_data()) {
+            
+            $data = new object();
             $data->eids = array();
             
             $fieldsettings = array();
-
+            
             // collect field import settings from formdata by field, tag and element
-            foreach ($formdata as $name => $value){
-                if (strpos($name, 'f_') !== false) {   // assuming only field settings start with f_
+            foreach ($formdata as $name => $value) {
+                if (strpos($name, 'f_') !== false) { // assuming only field settings start with f_
                     list(, $fieldid, $tag, $elem) = explode('_', $name);
                     if (!array_key_exists($fieldid, $fieldsettings)) {
                         $fieldsettings[$fieldid] = array();
@@ -408,30 +442,28 @@ class datalynxview_csv extends datalynxview_base {
                 } else { // upload from file
                     $csvcontent = $mform->get_file_content('importfile');
                 }
-
-                $options = array(
-                    'delimiter' => $formdata->delimiter,
-                    'enclosure' => ($formdata->enclosure ? $formdata->enclosure : ''),
-                    'encoding' => $formdata->encoding,
-                    'updateexisting' => $formdata->updateexisting,
+                
+                $options = array('delimiter' => $formdata->delimiter, 
+                    'enclosure' => ($formdata->enclosure ? $formdata->enclosure : ''), 
+                    'encoding' => $formdata->encoding, 'updateexisting' => $formdata->updateexisting, 
                     'settings' => $fieldsettings
                 );
-            
+                
                 if (!empty($csvcontent)) {
                     $data = $this->process_csv($data, $csvcontent, $options);
                     if (!empty($data->error)) {
-                        //print_object($data->error);
+                        // print_object($data->error);
                         $this->_showimportform = true;
                     }
                 }
             }
-
+            
             // process fields' non-csv import
             foreach ($fieldsettings as $fieldid => $importsettings) {
                 $field = $this->_df->get_field_from_id($fieldid);
                 $field->prepare_import_content($data, $importsettings);
             }
-
+            
             return $this->execute_import($data);
         } else {
             // Set import flag to display the form
@@ -440,11 +472,10 @@ class datalynxview_csv extends datalynxview_base {
     }
 
     /**
-     *
      */
     public function execute_import($data) {
         if ($data->eids) {
-            $this->_entries->process_entries('update', $data->eids, $data, true);               
+            $this->_entries->process_entries('update', $data->eids, $data, true);
             return true;
         } else {
             return null;
@@ -452,38 +483,39 @@ class datalynxview_csv extends datalynxview_base {
     }
 
     /**
-     * @param array  $options associative delimiter,enclosure,encoding,updateexisting,settings
+     *
+     * @param array $options associative delimiter,enclosure,encoding,updateexisting,settings
      */
     public function process_csv(&$data, $csvcontent, $options = null) {
         global $CFG;
-    
-        require_once("$CFG->libdir/csvlib.class.php");
+        
+        require_once ("$CFG->libdir/csvlib.class.php");
         
         @set_time_limit(0);
         raise_memory_limit(MEMORY_EXTRA);
-    
+        
         $iid = csv_import_reader::get_new_iid('moddatalynx');
         $cir = new csv_import_reader($iid, 'moddatalynx');
-    
+        
         $delimiter = !empty($options['delimiter']) ? $options['delimiter'] : $this->_delimiter;
         $enclosure = !empty($options['enclosure']) ? $options['enclosure'] : $this->_enclosure;
         $encoding = !empty($options['encoding']) ? $options['encoding'] : $this->_encoding;
         $updateexisting = !empty($options['updateexisting']) ? $options['updateexisting'] : false;
         $fieldsettings = !empty($options['settings']) ? $options['settings'] : array();
-
+        
         $readcount = $cir->load_csv_content($csvcontent, $encoding, $delimiter);
-
-        if (empty($readcount)) { 
+        
+        if (empty($readcount)) {
             $data->error = $cir->get_error();
             return $data;
         }
-
+        
         // csv column headers
         if (!$fieldnames = $cir->get_columns()) {
             $data->error = $cir->get_error();
             return $data;
         }
-
+        
         // process each csv record
         $updateexisting = $updateexisting and !empty($csvfieldnames['Entry']);
         $i = 0;
@@ -498,7 +530,7 @@ class datalynxview_csv extends datalynxview_base {
                 $data->eids[$i] = $entryid = $i;
             }
             // iterate the fields and add their content
-
+            
             foreach ($fieldsettings as $fieldid => $importsettings) {
                 $field = $this->_df->get_field_from_id($fieldid);
                 $field->prepare_import_content($data, $importsettings, $csvrecord, $entryid);
@@ -506,18 +538,18 @@ class datalynxview_csv extends datalynxview_base {
         }
         $cir->cleanup(true);
         $cir->close();
-
+        
         return $data;
     }
 
     /**
-     *
      */
     public function get_import_form() {
         global $CFG;
-        require_once("$CFG->dirroot/mod/datalynx/view/csv/import_form.php");
-
-        $actionurl = new moodle_url($this->_baseurl, array('importcsv' => 1)); 
+        require_once ("$CFG->dirroot/mod/datalynx/view/csv/import_form.php");
+        
+        $actionurl = new moodle_url($this->_baseurl, array('importcsv' => 1
+        ));
         return new datalynxview_csv_import_form($this, $actionurl);
     }
 
@@ -529,7 +561,7 @@ class datalynxview_csv extends datalynxview_base {
         if (!$fields = $this->_df->get_fields()) {
             return; // you shouldn't get that far if there are no user fields
         }
-
+        
         // set views and filters menus and quick search
         $table = new html_table();
         $table->attributes['align'] = 'center';
@@ -541,40 +573,46 @@ class datalynxview_csv extends datalynxview_base {
         $filtersmenu = new html_table_cell('##filtersmenu##');
         $quicksearch = new html_table_cell('##quicksearch##');
         $quickperpage = new html_table_cell('##quickperpage##');
-        $row1->cells = array($viewsmenu, $seperator, $filtersmenu, $quicksearch, $quickperpage);
+        $row1->cells = array($viewsmenu, $seperator, $filtersmenu, $quicksearch, $quickperpage
+        );
         foreach ($row1->cells as $cell) {
             $cell->style = 'border:0 none;';
         }
-        // second row: export 
+        // second row: export
         $row2 = new html_table_row();
         $addentries = new html_table_cell('##addnewentries##');
         $addentries->colspan = 5;
-        $row2->cells = array($addentries);
+        $row2->cells = array($addentries
+        );
         foreach ($row2->cells as $cell) {
             $cell->style = 'border:0 none;';
-        }        
+        }
         // next row: export import
         $row2a = new html_table_row();
         $addentries = new html_table_cell('##export:all## | ##export:page## | ##import##');
         $addentries->colspan = 5;
-        $row2a->cells = array($addentries);
+        $row2a->cells = array($addentries
+        );
         foreach ($row2a->cells as $cell) {
             $cell->style = 'border:0 none;';
-        }        
+        }
         // third row: paging bar
         $row3 = new html_table_row();
         $pagingbar = new html_table_cell('##pagingbar##');
         $pagingbar->colspan = 5;
-        $row3->cells = array($pagingbar);
+        $row3->cells = array($pagingbar
+        );
         foreach ($row3->cells as $cell) {
             $cell->style = 'border:0 none;';
         }
         // construct the table
-        $table->data = array($row1, $row2, $row2a, $row3);
+        $table->data = array($row1, $row2, $row2a, $row3
+        );
         $sectiondefault = html_writer::table($table);
-        $this->view->esection = html_writer::tag('div', $sectiondefault, array('class' => 'mdl-align')) . "<div>##entries##</div>";
-
-
+        $this->view->esection = html_writer::tag('div', $sectiondefault, 
+                array('class' => 'mdl-align'
+                )) . "<div>##entries##</div>";
+        
         // set content
         $this->view->param2 = '';
         foreach ($fields as $field) {
@@ -585,10 +623,9 @@ class datalynxview_csv extends datalynxview_base {
                 } else {
                     $this->view->param2 .= "[[$fieldname]]\n";
                 }
-
             }
         }
-    }    
+    }
 
     /**
      * Overridden to add default headers from patterns
@@ -606,16 +643,16 @@ class datalynxview_csv extends datalynxview_base {
                 $tag = $arr[0]; // Must exist
                 $header = !empty($arr[1]) ? $arr[1] : trim($tag, '[]#');
                 $class = !empty($arr[2]) ? $arr[2] : '';
-
-                $definition = array($tag, $header, $class);                
-                $this->_columns[] = $definition;            
+                
+                $definition = array($tag, $header, $class
+                );
+                $this->_columns[] = $definition;
             }
         }
         return $this->_columns;
     }
 
     /**
-     *
      */
     protected function has_headers() {
         foreach ($this->get_columns() as $column) {
@@ -625,34 +662,29 @@ class datalynxview_csv extends datalynxview_base {
         }
         return false;
     }
-
+    
     // GETTERS
     /**
-     *
      */
     public function get_output_type() {
         return $this->_output;
     }
 
     /**
-     *
      */
     public function get_delimiter() {
         return $this->_delimiter;
     }
 
     /**
-     *
      */
     public function get_enclosure() {
         return $this->_enclosure;
     }
 
     /**
-     *
      */
     public function get_encoding() {
         return $this->_encoding;
     }
-
 }

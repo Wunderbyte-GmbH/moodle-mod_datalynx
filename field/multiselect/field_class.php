@@ -8,49 +8,49 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
- 
+
 /**
+ *
  * @package datalynxfield
  * @subpackage multiselect
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+require_once ("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
-require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
 class datalynxfield_multiselect extends datalynxfield_option_multiple {
 
     public $type = 'multiselect';
 
-    public $separators = array(
-            array('name' => 'New line', 'chr' => '<br />'),
-            array('name' => 'Space', 'chr' => '&#32;'),
-            array('name' => ',', 'chr' => '&#44;'),
-            array('name' => ', (with space)', 'chr' => '&#44;&#32;'),
-            array('name' => 'Unordered list', 'chr' => '</li><li>')
+    public $separators = array(array('name' => 'New line', 'chr' => '<br />'
+    ), array('name' => 'Space', 'chr' => '&#32;'
+    ), array('name' => ',', 'chr' => '&#44;'
+    ), array('name' => ', (with space)', 'chr' => '&#44;&#32;'
+    ), array('name' => 'Unordered list', 'chr' => '</li><li>'
+    )
     );
 
     /**
-     *
      */
     public function parse_search($formdata, $i) {
         $fieldname = "f_{$i}_{$this->field->id}";
         $selected = optional_param($fieldname, array(), PARAM_NOTAGS);
         if ($selected) {
             $allrequired = optional_param("{$fieldname}_allreq", 0, PARAM_BOOL);
-            return array('selected'=>$selected, 'allrequired'=>$allrequired);
+            return array('selected' => $selected, 'allrequired' => $allrequired
+            );
         } else {
             return false;
         }
     }
 
     /**
-     * 
      */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
         // import only from csv
@@ -59,7 +59,7 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
             $fieldname = $this->name();
             $csvname = $importsettings[$fieldname]['name'];
             $labels = !empty($csvrecord[$csvname]) ? explode('#', trim('#', $csvrecord[$csvname])) : null;
-
+            
             if ($labels) {
                 $options = $this->options_menu();
                 $selected = array();
@@ -73,17 +73,16 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
                 }
             }
         }
-    
+        
         return true;
     }
 
     /**
-     * 
      */
     public function default_values() {
-        $rawdefaults = explode("\n",$this->field->param2);
+        $rawdefaults = explode("\n", $this->field->param2);
         $options = $this->options_menu();
-
+        
         $defaults = array();
         foreach ($rawdefaults as $default) {
             $default = trim($default);

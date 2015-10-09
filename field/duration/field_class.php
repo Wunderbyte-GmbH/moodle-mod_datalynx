@@ -8,40 +8,42 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
- 
+
 /**
+ *
  * @package datalynxfield
  * @subpackage duration
  * @copyright 2013 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+require_once ("$CFG->dirroot/mod/datalynx/field/field_class.php");
+require_once ("$CFG->dirroot/mod/datalynx/field/number/field_class.php");
 
-require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
-require_once("$CFG->dirroot/mod/datalynx/field/number/field_class.php");
 
 class datalynxfield_duration extends datalynxfield_base {
+
     public $type = 'duration';
 
     public $width;
+
     public $widthunit;
-    
+
     protected $_units = null;
-    
+
     /**
-     * 
      */
-    public function __construct($df = 0, $field = 0) {       
+    public function __construct($df = 0, $field = 0) {
         parent::__construct($df, $field);
         
         $this->width = $this->field->param2;
         $this->widthunit = $this->field->param3;
     }
-    
+
     /**
      * Returns time associative array of unit length.
      *
@@ -49,19 +51,16 @@ class datalynxfield_duration extends datalynxfield_base {
      */
     public function get_units() {
         if (is_null($this->_units)) {
-            $this->_units = array(
-                604800 => get_string('weeks'),
-                86400 => get_string('days'),
-                3600 => get_string('hours'),
-                60 => get_string('minutes'),
-                1 => get_string('seconds'),
+            $this->_units = array(604800 => get_string('weeks'), 86400 => get_string('days'), 
+                3600 => get_string('hours'), 60 => get_string('minutes'), 1 => get_string('seconds')
             );
         }
         return $this->_units;
     }
 
     /**
-     * Converts seconds to the best possible time unit. for example
+     * Converts seconds to the best possible time unit.
+     * for example
      * 1800 -> array(30, 60) = 30 minutes.
      *
      * @param int $seconds an amout of time in seconds.
@@ -69,14 +68,17 @@ class datalynxfield_duration extends datalynxfield_base {
      */
     public function seconds_to_unit($seconds) {
         if ($seconds === 0) {
-            return array(0, 1);
+            return array(0, 1
+            );
         }
         foreach ($this->get_units() as $unit => $notused) {
             if (fmod($seconds, $unit) == 0) {
-                return array($seconds / $unit, $unit);
+                return array($seconds / $unit, $unit
+                );
             }
         }
-        return array($seconds, 1);
+        return array($seconds, 1
+        );
     }
 
     protected function get_sql_compare_text($column = 'content') {
@@ -87,12 +89,13 @@ class datalynxfield_duration extends datalynxfield_base {
     public function validate($entryid, $tags, $formdata) {
         $fieldid = $this->id();
         $fieldname = $this->name();
-
+        
         $formfieldname = "field_{$fieldid}_{$entryid}";
-
+        
         if (array_key_exists("[[*$fieldname]]", $tags) and isset($formdata->$formfieldname)) {
             if (!clean_param($formdata->$formfieldname, PARAM_INT)) {
-                return array("{$formfieldname}[number]" => get_string('fieldrequired', 'datalynx'));
+                return array("{$formfieldname}[number]" => get_string('fieldrequired', 'datalynx')
+                );
             }
         }
         return array();
@@ -102,43 +105,48 @@ class datalynxfield_duration extends datalynxfield_base {
         $fieldid = $this->field->id;
         $contents = array();
         $oldcontents = array();
-
+        
         // old contents
         if (isset($entry->{"c{$fieldid}_content"})) {
             $oldcontents[] = $entry->{"c{$fieldid}_content"};
         }
-
+        
         $value = reset($values);
-        $rawvalue = optional_param_array("field_{$fieldid}_{$entry->id}", ['number' => ''], PARAM_RAW);
+        $rawvalue = optional_param_array("field_{$fieldid}_{$entry->id}", ['number' => ''
+        ], PARAM_RAW);
         if ($rawvalue['number'] !== '') {
             $contents[] = $value;
         }
-
-        return array($contents, $oldcontents);
+        
+        return array($contents, $oldcontents
+        );
     }
 
     /**
-     *
      */
     public function parse_search($formdata, $i) {
         $values = array();
-
-        $fromfield = optional_param_array('f_'. $i. '_'. $this->field->id. '_from', ['number' => ''], PARAM_RAW);
-        $tofield = optional_param_array('f_'. $i. '_'. $this->field->id. '_to', ['number' => ''], PARAM_RAW);
-
-        $fromfield = isset($formdata->{'f_'. $i. '_'. $this->field->id. '_from'}) ?
-                        $formdata->{'f_'. $i. '_'. $this->field->id. '_from'} : $fromfield['number'];
-        $tofield = isset($formdata->{'f_'. $i. '_'. $this->field->id. '_to'}) ?
-                        $formdata->{'f_'. $i. '_'. $this->field->id. '_to'} : $tofield['number'];
-
+        
+        $fromfield = optional_param_array('f_' . $i . '_' . $this->field->id . '_from', 
+                ['number' => ''
+                ], PARAM_RAW);
+        $tofield = optional_param_array('f_' . $i . '_' . $this->field->id . '_to', 
+                ['number' => ''
+                ], PARAM_RAW);
+        
+        $fromfield = isset($formdata->{'f_' . $i . '_' . $this->field->id . '_from'}) ? $formdata->{'f_' .
+                 $i . '_' . $this->field->id . '_from'} : $fromfield['number'];
+        $tofield = isset($formdata->{'f_' . $i . '_' . $this->field->id . '_to'}) ? $formdata->{'f_' .
+                 $i . '_' . $this->field->id . '_to'} : $tofield['number'];
+        
         if (!empty($fromfield) || "$fromfield" === "0") {
             $values[0] = $fromfield;
         }
-
+        
         if (!empty($tofield) || "$tofield" === "0") {
             $values[1] = $tofield;
         }
-
+        
         if (!empty($values)) {
             return $values;
         } else {
@@ -147,27 +155,27 @@ class datalynxfield_duration extends datalynxfield_base {
     }
 
     /**
-     *
      */
     public function get_search_sql($search) {
         global $DB;
-
+        
         list($not, $operator, $value) = $search;
-
-        static $i=0;
+        
+        static $i = 0;
         $i++;
         $fieldid = $this->field->id;
         $name = "df_{$fieldid}_{$i}";
-
-        // For all NOT criteria except NOT Empty, exclude entries which don't meet the positive criterion
+        
+        // For all NOT criteria except NOT Empty, exclude entries which don't meet the positive
+        // criterion
         $excludeentries = (($not and $operator !== '') or (!$not and $operator === ''));
-
+        
         if ($excludeentries) {
             $varcharcontent = $DB->sql_compare_text('content');
         } else {
             $varcharcontent = $this->get_sql_compare_text();
         }
-
+        
         $params = [];
         switch ($operator) {
             case '=':
@@ -189,24 +197,27 @@ class datalynxfield_duration extends datalynxfield_base {
                 $sql = " 1 ";
                 break;
         }
-
+        
         if ($excludeentries) {
             // Get entry ids for entries that meet the criterion
             if ($eids = $this->get_entry_ids_for_content($sql, $params)) {
                 // Get NOT IN sql
-                list($notinids, $params) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED, "df_{$fieldid}_", false);
+                list($notinids, $params) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED, 
+                        "df_{$fieldid}_", false);
                 $sql = " e.id $notinids ";
-                return array($sql, $params, false);
+                return array($sql, $params, false
+                );
             } else {
-                return array('', '', '');
+                return array('', '', ''
+                );
             }
         } else {
-            return array($sql, $params, true);
+            return array($sql, $params, true
+            );
         }
     }
 
     /**
-     *
      */
     public function format_search_value($searchparams) {
         list($not, $operator, $value) = $searchparams;
@@ -217,18 +228,15 @@ class datalynxfield_duration extends datalynxfield_base {
                 $value = $value[0];
             }
         }
-        return $not. ' '. $operator. ' '. $value;
+        return $not . ' ' . $operator . ' ' . $value;
     }
 
     public function get_supported_search_operators() {
-        return array(
-            '' => get_string('empty', 'datalynx'),
-            '=' => get_string('equal', 'datalynx'),
-            '>' => get_string('greater_than', 'datalynx'),
-            '>=' => get_string('greater_equal', 'datalynx'),
-            '<' => get_string('less_than', 'datalynx'),
-            '<=' => get_string('less_equal', 'datalynx'),
-            'BETWEEN' => get_string('between', 'datalynx'),
+        return array('' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'), 
+            '>' => get_string('greater_than', 'datalynx'), 
+            '>=' => get_string('greater_equal', 'datalynx'), 
+            '<' => get_string('less_than', 'datalynx'), '<=' => get_string('less_equal', 'datalynx'), 
+            'BETWEEN' => get_string('between', 'datalynx')
         );
     }
 }

@@ -8,30 +8,31 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ *
  * @package datalynx_rule
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-require_once('../../../config.php');
-require_once("$CFG->dirroot/mod/datalynx/mod_class.php");
+require_once ('../../../config.php');
+require_once ("$CFG->dirroot/mod/datalynx/mod_class.php");
 
 $urlparams = new stdClass();
-$urlparams->d          = required_param('d', PARAM_INT);    // datalynx ID
+$urlparams->d = required_param('d', PARAM_INT); // datalynx ID
 
-$urlparams->type       = optional_param('type','' ,PARAM_ALPHA);   // type of a rule to edit
-$urlparams->rid        = optional_param('rid',0 ,PARAM_INT);       // rule id to edit
-
+$urlparams->type = optional_param('type', '', PARAM_ALPHA); // type of a rule to edit
+$urlparams->rid = optional_param('rid', 0, PARAM_INT); // rule id to edit
+                                                             
 // Set a datalynx object
 $df = new datalynx($urlparams->d);
-$df->set_page('rule/rule_edit', array('urlparams' => $urlparams));
+$df->set_page('rule/rule_edit', array('urlparams' => $urlparams
+));
 require_capability('mod/datalynx:managetemplates', $df->context);
 
 $rm = $df->get_rule_manager();
@@ -44,35 +45,43 @@ if ($urlparams->rid) {
 
 $mform = $rule->get_form();
 
-if ($mform->is_cancelled()){
-    redirect(new moodle_url('/mod/datalynx/rule/index.php', array('d' => $df->id())));
-
-// no submit buttons    
+if ($mform->is_cancelled()) {
+    redirect(new moodle_url('/mod/datalynx/rule/index.php', array('d' => $df->id()
+    )));
+    
+    // no submit buttons
 } else if ($mform->no_submit_button_pressed()) {
-
-// process validated    
-} else if ($data = $mform->get_data()) { 
-
-   // add new rule
+    
+    // process validated
+} else if ($data = $mform->get_data()) {
+    
+    // add new rule
     if (!$rule->get_id()) {
         $ruleid = $rule->insert_rule($data);
-
-        $other = array('dataid' => $df->id());
-        $event = \mod_datalynx\event\rule_created::create(array('context' => $df->context, 'objectid' => $ruleid, 'other' => $other));
+        
+        $other = array('dataid' => $df->id()
+        );
+        $event = \mod_datalynx\event\rule_created::create(
+                array('context' => $df->context, 'objectid' => $ruleid, 'other' => $other
+                ));
         $event->trigger();
-
-    // update rule
+        
+        // update rule
     } else {
         $data->id = $rule->get_id();
         $rule->update_rule($data);
-
-        $other = array('dataid' => $df->id());
-        $event = \mod_datalynx\event\rule_updated::create(array('context' => $df->context, 'objectid' => $rule->get_id(), 'other' => $other));
+        
+        $other = array('dataid' => $df->id()
+        );
+        $event = \mod_datalynx\event\rule_updated::create(
+                array('context' => $df->context, 'objectid' => $rule->get_id(), 'other' => $other
+                ));
         $event->trigger();
     }
-
+    
     if ($data->submitbutton != get_string('savecontinue', 'datalynx')) {
-        redirect(new moodle_url('/mod/datalynx/rule/index.php', array('d' => $df->id())));
+        redirect(new moodle_url('/mod/datalynx/rule/index.php', array('d' => $df->id()
+        )));
     }
     
     // continue to edit so refresh the form
@@ -80,13 +89,18 @@ if ($mform->is_cancelled()){
 }
 
 // activate navigation node
-navigation_node::override_active_url(new moodle_url('/mod/datalynx/rule/index.php', array('id' => $df->cm->id)));
+navigation_node::override_active_url(
+        new moodle_url('/mod/datalynx/rule/index.php', array('id' => $df->cm->id
+        )));
 
 // print header
-$df->print_header(array('tab' => 'rules', 'nonotifications' => true, 'urlparams' => $urlparams));
+$df->print_header(array('tab' => 'rules', 'nonotifications' => true, 'urlparams' => $urlparams
+));
 
-$formheading = $rule->get_id() ? get_string('ruleedit', 'datalynx', $rule->get_name()) : get_string('rulenew', 'datalynx', $rule->typename());
-echo html_writer::tag('h2', format_string($formheading), array('class' => 'mdl-align'));
+$formheading = $rule->get_id() ? get_string('ruleedit', 'datalynx', $rule->get_name()) : get_string(
+        'rulenew', 'datalynx', $rule->typename());
+echo html_writer::tag('h2', format_string($formheading), array('class' => 'mdl-align'
+));
 
 // display form
 $mform->set_data($rule->to_form());

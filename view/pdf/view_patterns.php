@@ -8,33 +8,34 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ *
  * @package datalynxview
  * @subpackage pdf
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die;
+defined('MOODLE_INTERNAL') or die();
 
-require_once("$CFG->dirroot/mod/datalynx/view/view_patterns.php");
+require_once ("$CFG->dirroot/mod/datalynx/view/view_patterns.php");
+
 
 /**
  * Base class for view patterns
  */
-class datalynxview_pdf_patterns extends datalynxview_patterns{
+class datalynxview_pdf_patterns extends datalynxview_patterns {
 
     /**
-     *
      */
     public function get_replacements($tags = null, $entry = null, array $options = array()) {
         global $CFG, $OUTPUT;
-
+        
         $replacements = parent::get_replacements($tags, $entry, $options);
         
         $view = $this->_view;
@@ -42,43 +43,51 @@ class datalynxview_pdf_patterns extends datalynxview_patterns{
         $filter = $view->get_filter();
         $baseurl = new moodle_url($view->get_baseurl());
         $baseurl->param('sesskey', sesskey());
-
+        
         foreach ($tags as $tag) {
             switch ($tag) {
                 case '##export:all##':
-                    $actionurl = new moodle_url($baseurl, array('pdfexportall' => true));
-                    //$label = $OUTPUT->pix_icon('f/pdf', get_string('multiexport', 'datalynx'));
+                    $actionurl = new moodle_url($baseurl, array('pdfexportall' => true
+                    ));
+                    // $label = $OUTPUT->pix_icon('f/pdf', get_string('multiexport', 'datalynx'));
                     $label = html_writer::tag('span', get_string('exportall', 'datalynx'));
-                    $replacements[$tag] = html_writer::link($actionurl, $label, array('class' => 'actionlink exportall'));
-
+                    $replacements[$tag] = html_writer::link($actionurl, $label, 
+                            array('class' => 'actionlink exportall'
+                            ));
+                    
                     break;
                 case '##export:page##':
-                    $actionurl = new moodle_url($baseurl, array('pdfexportpage' => true));
-                    //$label = $OUTPUT->pix_icon('f/pdf', get_string('multiexport', 'datalynx'));
+                    $actionurl = new moodle_url($baseurl, array('pdfexportpage' => true
+                    ));
+                    // $label = $OUTPUT->pix_icon('f/pdf', get_string('multiexport', 'datalynx'));
                     $label = html_writer::tag('span', get_string('exportpage', 'datalynx'));
-                    $replacements[$tag] = html_writer::link($actionurl, $label, array('class' => 'actionlink exportpage'));
-
+                    $replacements[$tag] = html_writer::link($actionurl, $label, 
+                            array('class' => 'actionlink exportpage'
+                            ));
+                    
                     break;
                 case '##pagebreak##':
                     $replacements[$tag] = $view::PAGE_BREAK;
-
+                    
                     break;
             }
         }
-
+        
         return $replacements;
     }
 
     /**
-     *
      */
     protected function patterns() {
         $patterns = parent::patterns();
         $cat = get_string('pluginname', 'datalynxview_pdf');
-        $patterns['##export:all##'] = array(true, $cat);
-        $patterns['##export:page##'] =  array(true, $cat);
-        $patterns['##pagebreak##'] =  array(true, $cat);
-
+        $patterns['##export:all##'] = array(true, $cat
+        );
+        $patterns['##export:page##'] = array(true, $cat
+        );
+        $patterns['##pagebreak##'] = array(true, $cat
+        );
+        
         return $patterns;
     }
 }

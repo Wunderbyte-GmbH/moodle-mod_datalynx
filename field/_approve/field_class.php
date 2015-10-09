@@ -8,20 +8,21 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
- 
+
 /**
+ *
  * @package datalynxfield
  * @subpackage _approve
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+require_once ("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
-require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
 class datalynxfield__approve extends datalynxfield_no_content {
 
@@ -30,47 +31,45 @@ class datalynxfield__approve extends datalynxfield_no_content {
     const _APPROVED = 'approve';
 
     /**
-     * 
      */
     public static function get_field_objects($dataid) {
         $fieldobjects = array();
-
-        $fieldobjects[self::_APPROVED] = (object) array('id' => self::_APPROVED, 'dataid' => $dataid, 'type' => '_approve', 'name' => get_string('approved', 'datalynx'), 'description' => '', 'visible' => 2, 'internalname' => 'approved');
-
+        
+        $fieldobjects[self::_APPROVED] = (object) array('id' => self::_APPROVED, 
+            'dataid' => $dataid, 'type' => '_approve', 'name' => get_string('approved', 'datalynx'), 
+            'description' => '', 'visible' => 2, 'internalname' => 'approved'
+        );
+        
         return $fieldobjects;
     }
 
     /**
-     *
      */
     public static function is_internal() {
         return true;
     }
-    
+
     /**
-     * 
      */
     public function get_internalname() {
         return $this->field->internalname;
     }
 
     /**
-     * 
      */
     public function get_sort_sql() {
         return 'e.approved';
     }
 
     /**
-     * 
      */
     public function get_search_sql($search) {
         $value = $search[2];
-        return array(" e.approved = $value ", array(), false); 
+        return array(" e.approved = $value ", array(), false
+        );
     }
 
     /**
-     *
      */
     public function parse_search($formdata, $i) {
         $fieldid = $this->field->id;
@@ -85,7 +84,7 @@ class datalynxfield__approve extends datalynxfield_no_content {
      * returns an array of distinct content of the field
      */
     public function get_distinct_content($sortdir = 0) {
-        return array('approved', 'Not approved');
+        return array('approved', 'Not approved'
+        );
     }
-
 }

@@ -8,22 +8,22 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
- 
+
 /**
+ *
  * @package datalynxfield
  * @subpackage coursegroup
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 define('AJAX_SCRIPT', true);
 
-require_once('../../../../config.php');
+require_once ('../../../../config.php');
 
 $courseid = required_param('courseid', PARAM_INT);
 
@@ -31,11 +31,12 @@ $courseid = required_param('courseid', PARAM_INT);
 require_login();
 
 if ($courseid) {
-    $groups = $DB->get_records_menu('groups', array('courseid' => $courseid), 'name', 'id,name');
+    $groups = $DB->get_records_menu('groups', array('courseid' => $courseid
+    ), 'name', 'id,name');
     $groupsmenu = array();
     foreach ($groups as $groupid => $name) {
         $groupsmenu[] = "$groupid $name";
     }
-
+    
     echo implode(',', $groupsmenu);
 }    

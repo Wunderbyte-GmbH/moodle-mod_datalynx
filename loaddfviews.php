@@ -8,22 +8,22 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
- 
+
 /**
+ *
  * @package mod
  * @subpackage datalynx
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 define('AJAX_SCRIPT', true);
 
-require_once(dirname(__FILE__). '/../../config.php');
+require_once (dirname(__FILE__) . '/../../config.php');
 
 $d = required_param('dfid', PARAM_INT);
 
@@ -33,17 +33,19 @@ require_login();
 $retviews = '';
 $retfilters = '';
 if ($d) {
-    if ($views = $DB->get_records_menu('datalynx_views', array('dataid' => $d), 'name', 'id,name')) {
+    if ($views = $DB->get_records_menu('datalynx_views', array('dataid' => $d
+    ), 'name', 'id,name')) {
         $viewmenu = array();
-        foreach($views as $key => $value) {
-            $viewmenu[] = "$key ". strip_tags($value);
+        foreach ($views as $key => $value) {
+            $viewmenu[] = "$key " . strip_tags($value);
         }
         $retviews = implode(',', $viewmenu);
     }
-    if ($filters = $DB->get_records_menu('datalynx_filters', array('dataid' => $d), 'name', 'id,name')) {
+    if ($filters = $DB->get_records_menu('datalynx_filters', array('dataid' => $d
+    ), 'name', 'id,name')) {
         $filtermenu = array();
-        foreach($filters as $key => $value) {
-            $filtermenu[] = "$key ". strip_tags($value);
+        foreach ($filters as $key => $value) {
+            $filtermenu[] = "$key " . strip_tags($value);
         }
         $retfilters = implode(',', $filtermenu);
     }

@@ -8,24 +8,23 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Datalynx tool subplugin info class.
  *
- * @package   mod_datalynx
+ * @package mod_datalynx
  * @copyright 2014 Ivan Šakić
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 namespace mod_datalynx\plugininfo;
 
 defined('MOODLE_INTERNAL') || die();
 
-class datalynxtool extends \core\plugininfo\base {
 
+class datalynxtool extends \core\plugininfo\base {
 } 

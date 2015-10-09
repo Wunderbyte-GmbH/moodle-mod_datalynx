@@ -1,19 +1,24 @@
 <?php
 
+
 /**
  * HTML class for a checkbox group type field
  *
- * @author       Ivan Šakić <ivan.sakic3@gmail.com>
- * @version      0.9b
- * @since        PHP4.04pl1
- * @access       public
+ * @author Ivan Šakić <ivan.sakic3@gmail.com>
+ * @version 0.9b
+ * @since PHP4.04pl1
+ * @access public
  */
 class HTML_QuickForm_checkboxgroup extends HTML_QuickForm_element {
+
     var $_options = array();
+
     var $_separator = array();
+
     var $_values = array();
 
-    function HTML_QuickForm_checkboxgroup($elementName = null, $elementLabel = null, $options = null, $separator = null, $attributes = null) {
+    function HTML_QuickForm_checkboxgroup($elementName = null, $elementLabel = null, $options = null, 
+            $separator = null, $attributes = null) {
         HTML_QuickForm_element::HTML_QuickForm_element($elementName, $elementLabel, $attributes);
         $this->_persistantFreeze = true;
         if (count($options) > 1) {
@@ -23,7 +28,7 @@ class HTML_QuickForm_checkboxgroup extends HTML_QuickForm_element {
                 $this->_separator = array_fill(0, count($options) - 1, $separator);
             }
         }
-
+        
         $this->_type = 'checkboxgroup';
         if (isset($options)) {
             $this->load($options);
@@ -41,7 +46,8 @@ class HTML_QuickForm_checkboxgroup extends HTML_QuickForm_element {
     }
 
     function setName($name) {
-        $this->updateAttributes(array('name' => $name));
+        $this->updateAttributes(array('name' => $name
+        ));
     }
 
     function getName() {
@@ -59,7 +65,8 @@ class HTML_QuickForm_checkboxgroup extends HTML_QuickForm_element {
         if (is_array($value)) {
             $this->_values = array_values($value);
         } else {
-            $this->_values = array($value);
+            $this->_values = array($value
+            );
         }
     }
 
@@ -69,20 +76,24 @@ class HTML_QuickForm_checkboxgroup extends HTML_QuickForm_element {
 
     function addOption($text, $value, $attributes = null) {
         if (null === $attributes) {
-            $attributes = array('value' => $value);
+            $attributes = array('value' => $value
+            );
         } else {
             $attributes = $this->_parseAttributes($attributes);
             if (isset($attributes['checked'])) {
                 $this->_removeAttr('checked', $attributes);
                 if (is_null($this->_values)) {
-                    $this->_values = array($value);
+                    $this->_values = array($value
+                    );
                 } else if (!in_array($value, $this->_values)) {
                     $this->_values[] = $value;
                 }
             }
-            $this->_updateAttrArray($attributes, array('value' => $value));
+            $this->_updateAttrArray($attributes, array('value' => $value
+            ));
         }
-        $this->_options[] = array('text' => $text, 'attr' => $attributes);
+        $this->_options[] = array('text' => $text, 'attr' => $attributes
+        );
     }
 
     function loadArray($arr, $values = null) {
@@ -97,23 +108,22 @@ class HTML_QuickForm_checkboxgroup extends HTML_QuickForm_element {
             $this->addOption($val, $key);
         }
         return true;
-
     }
 
     function toHtml() {
         if ($this->_flagFrozen) {
             return $this->getFrozenHtml();
         } else {
-            $tabs    = $this->_getTabs();
+            $tabs = $this->_getTabs();
             $strHtml = '';
-
+            
             if ($this->getComment() != '') {
                 $strHtml .= $tabs . '<!-- ' . $this->getComment() . " //-->\n";
             }
-
+            
             $strHtml .= $tabs;
             $strHtml .= '<input type="hidden" name="' . $this->getName() . '" value="" />';
-
+            
             $i = 0;
             foreach ($this->_options as $option) {
                 if (isset($this->_separator[$i])) {
@@ -122,15 +132,20 @@ class HTML_QuickForm_checkboxgroup extends HTML_QuickForm_element {
                 } else {
                     $separator = '';
                 }
-                $this->_updateAttrArray($option['attr'], array('name' => $this->getPrivateName()));
-                if (is_array($this->_values) && in_array((string)$option['attr']['value'], $this->_values)) {
-                    $this->_updateAttrArray($option['attr'], array('checked' => 'checked'));
+                $this->_updateAttrArray($option['attr'], array('name' => $this->getPrivateName()
+                ));
+                if (is_array($this->_values) &&
+                         in_array((string) $option['attr']['value'], $this->_values)) {
+                    $this->_updateAttrArray($option['attr'], array('checked' => 'checked'
+                    ));
                 } else {
                     unset($option['attr']['checked']);
                 }
-                $strHtml .= $tabs . "\t<input type=\"checkbox\"" . $this->_getAttrString($option['attr']) . '/> ' . $option['text'] . "{$separator}\n";
+                $strHtml .= $tabs . "\t<input type=\"checkbox\"" .
+                         $this->_getAttrString($option['attr']) . '/> ' . $option['text'] .
+                         "{$separator}\n";
             }
-
+            
             return $strHtml . $tabs;
         }
     }
@@ -152,21 +167,20 @@ class HTML_QuickForm_checkboxgroup extends HTML_QuickForm_element {
             }
             $html .= $box . $option['text'] . $separator;
         }
-
+        
         if ($this->_persistantFreeze) {
             $name = $this->getPrivateName();
             // Only use id attribute if doing single hidden input
             if (1 == count($this->_values)) {
-                $id     = $this->getAttribute('id');
-                $idAttr = isset($id)? array('id' => $id): array();
+                $id = $this->getAttribute('id');
+                $idAttr = isset($id) ? array('id' => $id
+                ) : array();
             } else {
                 $idAttr = array();
             }
             foreach ($this->_values as $value) {
-                $html .= '<input' . $this->_getAttrString(array(
-                            'type'  => 'hidden',
-                            'name'  => $name,
-                            'value' => $value
+                $html .= '<input' . $this->_getAttrString(
+                        array('type' => 'hidden', 'name' => $name, 'value' => $value
                         ) + $idAttr) . ' />';
             }
         }
@@ -180,7 +194,8 @@ class HTML_QuickForm_checkboxgroup extends HTML_QuickForm_element {
         } else if ($value == "") {
             $value = array();
         } else if (!is_array($value)) {
-            $value = array($value);
+            $value = array($value
+            );
         }
         if (is_array($value) && !empty($this->_options)) {
             $cleanValue = null;

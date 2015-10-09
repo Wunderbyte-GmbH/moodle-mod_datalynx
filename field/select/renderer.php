@@ -8,21 +8,23 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
- 
+
 /**
+ *
  * @package datalynxfield
  * @subpackage select
  * @copyright 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die;
+defined('MOODLE_INTERNAL') or die();
 
-require_once(dirname(__FILE__) . "/../renderer.php");
+require_once (dirname(__FILE__) . "/../renderer.php");
+
 
 /**
  * Class datalynxfield_select_renderer Renderer for select field type
@@ -30,6 +32,7 @@ require_once(dirname(__FILE__) . "/../renderer.php");
 class datalynxfield_select_renderer extends datalynxfield_renderer {
 
     /**
+     *
      * @var datalynxfield_select
      */
     protected $_field = null;
@@ -47,42 +50,43 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
         if (!$selected and $defaultval = $field->get('param2')) {
             $selected = (int) array_search($defaultval, $menuoptions);
         }
-
+        
         $select = &$mform->addElement('select', $fieldname, null);
-
+        
         if (isset($this->_field->field->param5)) {
             $disabled = $this->_field->get_disabled_values_for_user();
         } else {
             $disabled = array();
         }
-
-        $menuoptions = array('' => get_string('choosedots')) + $menuoptions;
+        
+        $menuoptions = array('' => get_string('choosedots')
+        ) + $menuoptions;
         foreach ($menuoptions as $id => $name) {
             if (array_search($id, $disabled) === false || $id == $selected) {
                 $select->addOption($name, $id);
             } else {
-                $select->addOption($name, $id, array('disabled' => 'disabled'));
+                $select->addOption($name, $id, array('disabled' => 'disabled'
+                ));
             }
         }
-
+        
         $select->setSelected($selected);
-
+        
         if ($required) {
             $mform->addRule($fieldname, null, 'required', null, 'client');
         }
-
     }
 
     public function render_display_mode(stdClass $entry, array $params) {
         $field = $this->_field;
         $fieldid = $field->id();
-
+        
         if (isset($entry->{"c{$fieldid}_content"})) {
             $selected = (int) $entry->{"c{$fieldid}_content"};
             $options = $field->options_menu();
-
+            
             if (!empty($params['options'])) {
-                $str = array();           
+                $str = array();
                 foreach ($options as $key => $option) {
                     $isselected = (int) ($key == $selected);
                     $str[] = "$isselected $option";
@@ -90,7 +94,7 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
                 $str = implode(',', $str);
                 return $str;
             }
-
+            
             if (!empty($params['key'])) {
                 if ($selected) {
                     return $selected;
@@ -98,7 +102,7 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
                     return '';
                 }
             }
-
+            
             if ($selected and $selected <= count($options)) {
                 return $options[$selected];
             }
@@ -109,21 +113,25 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
 
     public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
         global $CFG;
-        HTML_QuickForm::registerElementType('checkboxgroup', "$CFG->dirroot/mod/datalynx/checkboxgroup/checkboxgroup.php", 'HTML_QuickForm_checkboxgroup');
-
+        HTML_QuickForm::registerElementType('checkboxgroup', 
+                "$CFG->dirroot/mod/datalynx/checkboxgroup/checkboxgroup.php", 
+                'HTML_QuickForm_checkboxgroup');
+        
         $field = $this->_field;
         $fieldid = $field->id();
-
+        
         $selected = $value;
-
+        
         $options = $field->options_menu();
-
+        
         $fieldname = "f_{$i}_$fieldid";
         $select = &$mform->createElement('checkboxgroup', $fieldname, null, $options, '');
         $select->setValue($selected);
-
+        
         $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
-
-        return array(array($select), null);
+        
+        return array(array($select
+        ), null
+        );
     }
 }

@@ -8,46 +8,48 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
- 
+
 /**
+ *
  * @package datalynxfield
  * @subpackage number
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+require_once ("$CFG->dirroot/mod/datalynx/field/text/field_class.php");
 
-require_once("$CFG->dirroot/mod/datalynx/field/text/field_class.php");
 
 class datalynxfield_number extends datalynxfield_text {
+
     public $type = 'number';
 
     /**
-     *
      */
     public function get_search_sql($search) {
         global $DB;
-
+        
         list($not, $operator, $value) = $search;
-
-        static $i=0;
+        
+        static $i = 0;
         $i++;
         $fieldid = $this->field->id;
         $name = "df_{$fieldid}_{$i}";
-
-        // For all NOT criteria except NOT Empty, exclude entries which don't meet the positive criterion
+        
+        // For all NOT criteria except NOT Empty, exclude entries which don't meet the positive
+        // criterion
         $excludeentries = (($not and $operator !== '') or (!$not and $operator === ''));
-
+        
         if ($excludeentries) {
             $varcharcontent = $DB->sql_compare_text('content');
         } else {
             $varcharcontent = $this->get_sql_compare_text();
         }
-
+        
         $params = [];
         switch ($operator) {
             case '=':
@@ -69,19 +71,23 @@ class datalynxfield_number extends datalynxfield_text {
                 $sql = " 1 ";
                 break;
         }
-
+        
         if ($excludeentries) {
             // Get entry ids for entries that meet the criterion
             if ($eids = $this->get_entry_ids_for_content($sql, $params)) {
                 // Get NOT IN sql
-                list($notinids, $params) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED, "df_{$fieldid}_", false);
+                list($notinids, $params) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED, 
+                        "df_{$fieldid}_", false);
                 $sql = " e.id $notinids ";
-                return array($sql, $params, false);
+                return array($sql, $params, false
+                );
             } else {
-                return array('', '', '');
+                return array('', '', ''
+                );
             }
         } else {
-            return array($sql, $params, true);
+            return array($sql, $params, true
+            );
         }
     }
 
@@ -89,41 +95,42 @@ class datalynxfield_number extends datalynxfield_text {
         $fieldid = $this->field->id;
         $contents = array();
         $oldcontents = array();
-
+        
         // old contents
         if (isset($entry->{"c{$fieldid}_content"})) {
             $oldcontents[] = $entry->{"c{$fieldid}_content"};
         }
-
+        
         $value = reset($values);
         if (!empty($value) || "$value" === "0") {
             $contents[] = $value;
         }
-
-        return array($contents, $oldcontents);
+        
+        return array($contents, $oldcontents
+        );
     }
 
     public function parse_search($formdata, $i) {
         $values = array();
-
-        $name = 'f_' . $i . '_'. $this->field->id;
-
-        $data = isset($formdata->$name) ? $formdata->$name : optional_param_array($name, [], PARAM_RAW);
+        
+        $name = 'f_' . $i . '_' . $this->field->id;
+        
+        $data = isset($formdata->$name) ? $formdata->$name : optional_param_array($name, [], 
+                PARAM_RAW);
         if (empty($data)) {
             return false;
         }
-
-
+        
         $field0 = isset($data[0]) ? $data[0] : '';
         if (!empty($field0) || "$field0" === "0") {
             $values[0] = $field0;
         }
-
+        
         $field1 = isset($data[1]) ? $data[1] : '';
         if (!empty($field1) || "$field1" === "0") {
             $values[1] = $field1;
         }
-
+        
         if (!empty($values)) {
             return $values;
         } else {
@@ -132,7 +139,6 @@ class datalynxfield_number extends datalynxfield_text {
     }
 
     /**
-     *
      */
     public function format_search_value($searchparams) {
         list($not, $operator, $value) = $searchparams;
@@ -143,19 +149,15 @@ class datalynxfield_number extends datalynxfield_text {
                 $value = $value[0];
             }
         }
-        return $not. ' '. $operator. ' '. $value;
+        return $not . ' ' . $operator . ' ' . $value;
     }
 
     public function get_supported_search_operators() {
-        return array(
-            '' => get_string('empty', 'datalynx'),
-            '=' => get_string('equal', 'datalynx'),
-            '>' => get_string('greater_than', 'datalynx'),
-            '>=' => get_string('greater_equal', 'datalynx'),
-            '<' => get_string('less_than', 'datalynx'),
-            '<=' => get_string('less_equal', 'datalynx'),
-            'BETWEEN' => get_string('between', 'datalynx'),
+        return array('' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'), 
+            '>' => get_string('greater_than', 'datalynx'), 
+            '>=' => get_string('greater_equal', 'datalynx'), 
+            '<' => get_string('less_than', 'datalynx'), '<=' => get_string('less_equal', 'datalynx'), 
+            'BETWEEN' => get_string('between', 'datalynx')
         );
     }
-
 }

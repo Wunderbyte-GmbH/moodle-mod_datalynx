@@ -8,52 +8,45 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
- 
+
 /**
+ *
  * @package mod
  * @subpackage datalynx
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-require_once('../../config.php');
-require_once("$CFG->dirroot/mod/datalynx/mod_class.php");
+require_once ('../../config.php');
+require_once ("$CFG->dirroot/mod/datalynx/mod_class.php");
 
 $urlparams = new object();
-$urlparams->d = optional_param('d', 0, PARAM_INT);             // datalynx id
-$urlparams->id = optional_param('id', 0, PARAM_INT);           // course module id
+$urlparams->d = optional_param('d', 0, PARAM_INT); // datalynx id
+$urlparams->id = optional_param('id', 0, PARAM_INT); // course module id
 
-$urlparams->view = optional_param('view', 0, PARAM_INT);       // current view id
-$urlparams->filter = optional_param('filter', 0, PARAM_INT);     // current filter (-1 for user filter)
+$urlparams->view = optional_param('view', 0, PARAM_INT); // current view id
+$urlparams->filter = optional_param('filter', 0, PARAM_INT); // current filter (-1 for user filter)
 $urlparams->pagelayout = optional_param('pagelayout', '', PARAM_ALPHAEXT);
 $urlparams->refresh = optional_param('refresh', 0, PARAM_INT);
 
 // Set a datalynx object with guest autologin
 $df = new datalynx($urlparams->d, $urlparams->id);
 
-$pageparams = array(
-        'js' => true,
-        'css' => true,
-        'rss' => true,
-        'modjs' => true,
-        'completion' => true,
-        'comments' => true,
-        'pagelayout' => 'embedded',
-        'urlparams' => $urlparams);        
+$pageparams = array('js' => true, 'css' => true, 'rss' => true, 'modjs' => true, 
+    'completion' => true, 'comments' => true, 'pagelayout' => 'embedded', 'urlparams' => $urlparams
+);
 $df->set_page('embed', $pageparams);
 
 require_capability('mod/datalynx:viewentry', $df->context);
 
 $df->set_content();
 
-$headerparams = array(
-        'groups' => true,
-        'urlparams' => $urlparams);
+$headerparams = array('groups' => true, 'urlparams' => $urlparams
+);
 $df->print_header($headerparams);
 
 $df->display();

@@ -8,47 +8,46 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
- 
+
 /**
- * This file is part of the Datalynx module for Moodle - http://moodle.org/. 
+ * This file is part of the Datalynx module for Moodle - http://moodle.org/.
+ *
  *
  * @package datalynxview
  * @subpackage tabular
- * @copyright 2012 Itamar Tzadok 
+ * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+require_once ("$CFG->dirroot/mod/datalynx/view/view_form.php");
 
-require_once("$CFG->dirroot/mod/datalynx/view/view_form.php");
 
 class datalynxview_tabular_form extends datalynxview_base_form {
 
     /**
-     *
      */
     function view_definition_after_gps() {
-
         $view = $this->_view;
         $editoroptions = $view->editors();
-        $editorattr = array('cols' => 40, 'rows' => 12);
-
+        $editorattr = array('cols' => 40, 'rows' => 12
+        );
+        
         $mform = &$this->_form;
-
+        
         // content
-        //-------------------------------------------------------------------------------
+        // -------------------------------------------------------------------------------
         $mform->addElement('header', 'entrytemplatehdr', get_string('entrytemplate', 'datalynx'));
-
+        
         $mform->addElement('selectyesno', 'param3', get_string('headerrow', 'datalynxview_tabular'));
         $mform->setDefault('param3', 1);
         
-        $mform->addElement('editor', 'eparam2_editor', get_string('table', 'datalynxview_tabular'), $editorattr, $editoroptions['param2']);
+        $mform->addElement('editor', 'eparam2_editor', get_string('table', 'datalynxview_tabular'), 
+                $editorattr, $editoroptions['param2']);
         $this->add_tags_selector('eparam2_editor', 'general');
-        $this->add_tags_selector('eparam2_editor', 'field');        
-
+        $this->add_tags_selector('eparam2_editor', 'field');
     }
-
 }

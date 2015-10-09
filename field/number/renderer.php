@@ -8,13 +8,14 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
- 
+
 /**
+ *
  * @package datalynxfield
  * @subpackage number
  * @copyright 2011 Itamar Tzadok
@@ -22,10 +23,10 @@
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once("$CFG->dirroot/mod/datalynx/field/text/renderer.php");
+require_once ("$CFG->dirroot/mod/datalynx/field/text/renderer.php");
+
 
 /**
- *
  */
 class datalynxfield_number_renderer extends datalynxfield_text_renderer {
 
@@ -62,20 +63,22 @@ class datalynxfield_number_renderer extends datalynxfield_text_renderer {
     public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
         $fieldid = $this->_field->id();
         $fieldname = "f_{$i}_$fieldid";
-
+        
         $arr = array();
-
-        $arr[] = &$mform->createElement('text', "{$fieldname}[0]", null, array('size'=>'6'));
+        
+        $arr[] = &$mform->createElement('text', "{$fieldname}[0]", null, array('size' => '6'
+        ));
         $mform->setType("{$fieldname}[0]", PARAM_FLOAT);
         $mform->setDefault("{$fieldname}[0]", isset($value[0]) ? $value[0] : '');
         $mform->disabledIf("{$fieldname}[0]", "searchoperator$i", 'eq', '');
-
-        $arr[] = &$mform->createElement('text', "{$fieldname}[1]", null, array('size'=>'6'));
+        
+        $arr[] = &$mform->createElement('text', "{$fieldname}[1]", null, array('size' => '6'
+        ));
         $mform->setType("{$fieldname}[1]", PARAM_FLOAT);
         $mform->setDefault("{$fieldname}[1]", isset($value[1]) ? $value[1] : '');
         $mform->disabledIf("{$fieldname}[1]", "searchoperator$i", 'neq', 'BETWEEN');
-
-        return array($arr, null);
+        
+        return array($arr, null
+        );
     }
-
 }

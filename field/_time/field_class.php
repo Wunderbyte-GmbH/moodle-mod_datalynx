@@ -8,82 +8,86 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
- 
+
 /**
+ *
  * @package datalynxfield
  * @subpackage _time
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+require_once ("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
-require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
 class datalynxfield__time extends datalynxfield_no_content {
+
     public $type = '_time';
 
     const _TIMECREATED = 'timecreated';
+
     const _TIMEMODIFIED = 'timemodified';
 
     /**
-     *
      */
     public static function is_internal() {
         return true;
     }
-    
+
     /**
-     *
      */
     public static function get_field_objects($dataid) {
         $fieldobjects = array();
         
-        $fieldobjects[self::_TIMECREATED] = (object) array('id' => self::_TIMECREATED, 'dataid' => $dataid, 'type' => '_time', 'name' => get_string('timecreated', 'datalynx'), 'description' => '', 'visible' => 2, 'internalname' => 'timecreated');
-
-        $fieldobjects[self::_TIMEMODIFIED] = (object) array('id' => self::_TIMEMODIFIED, 'dataid' => $dataid, 'type' => '_time', 'name' => get_string('timemodified', 'datalynx'), 'description' => '', 'visible' => 2, 'internalname' => 'timemodified');
-
+        $fieldobjects[self::_TIMECREATED] = (object) array('id' => self::_TIMECREATED, 
+            'dataid' => $dataid, 'type' => '_time', 'name' => get_string('timecreated', 'datalynx'), 
+            'description' => '', 'visible' => 2, 'internalname' => 'timecreated'
+        );
+        
+        $fieldobjects[self::_TIMEMODIFIED] = (object) array('id' => self::_TIMEMODIFIED, 
+            'dataid' => $dataid, 'type' => '_time', 'name' => get_string('timemodified', 'datalynx'), 
+            'description' => '', 'visible' => 2, 'internalname' => 'timemodified'
+        );
+        
         return $fieldobjects;
     }
 
     /**
-     * 
      */
     public function get_internalname() {
         return $this->field->internalname;
     }
 
     /**
-     * 
      */
     public function parse_search($formdata, $i) {
         $time = array();
-
-        if (!empty($formdata->{'f_'. $i. '_'. $this->field->id. '_from'})) {
-            $time[0] = $formdata->{'f_'. $i. '_'. $this->field->id. '_from'};
+        
+        if (!empty($formdata->{'f_' . $i . '_' . $this->field->id . '_from'})) {
+            $time[0] = $formdata->{'f_' . $i . '_' . $this->field->id . '_from'};
         }
-            
-        if (!empty($formdata->{'f_'. $i. '_'. $this->field->id. '_to'})) {
-            $time[1] = $formdata->{'f_'. $i. '_'. $this->field->id. '_to'};
+        
+        if (!empty($formdata->{'f_' . $i . '_' . $this->field->id . '_to'})) {
+            $time[1] = $formdata->{'f_' . $i . '_' . $this->field->id . '_to'};
         }
-
+        
         if (!empty($time)) {
-            return $time;   
+            return $time;
         } else {
             return false;
         }
     }
 
     /**
-     * 
      */
     public function get_search_sql($search) {
         list($not, $operator, $value) = $search;
-
-        if (is_array($value)){
+        
+        if (is_array($value)) {
             $from = $value[0];
             $to = $value[1];
         } else {
@@ -91,7 +95,7 @@ class datalynxfield__time extends datalynxfield_no_content {
             $to = 0;
         }
         
-        static $i=0;
+        static $i = 0;
         $i++;
         $namefrom = "df__time_{$i}_from";
         $nameto = "df__time_{$i}_to";
@@ -103,28 +107,29 @@ class datalynxfield__time extends datalynxfield_no_content {
                 $operator = '=';
             }
             $params[$namefrom] = $from;
-            return array(" $not $varcharcontent $operator :$namefrom ", $params, false);
+            return array(" $not $varcharcontent $operator :$namefrom ", $params, false
+            );
         } else {
             $params[$namefrom] = $from;
             $params[$nameto] = $to;
-            return array(" ($not $varcharcontent >= :$namefrom AND $varcharcontent <= :$nameto) ", $params, false);
+            return array(" ($not $varcharcontent >= :$namefrom AND $varcharcontent <= :$nameto) ", 
+                $params, false
+            );
         }
     }
 
     /**
-     *
      */
     protected function get_sql_compare_text($column = 'content') {
         global $DB;
         
-        return $DB->sql_compare_text("e.{$this->field->internalname}");    
+        return $DB->sql_compare_text("e.{$this->field->internalname}");
     }
 
     /**
-     * 
      */
     public function get_sort_sql() {
-        return 'e.'. $this->field->internalname;
+        return 'e.' . $this->field->internalname;
     }
 
     /**
@@ -140,7 +145,7 @@ class datalynxfield__time extends datalynxfield_no_content {
                     FROM {datalynx_entries} e
                     WHERE $contentfull IS NOT NULL'.
                     ORDER BY $contentfull $sortdir";
-
+        
         $distinctvalues = array();
         if ($options = $DB->get_records_sql($sql)) {
             foreach ($options as $data) {
@@ -155,11 +160,10 @@ class datalynxfield__time extends datalynxfield_no_content {
     }
 
     /**
-     *
      */
     public function format_search_value($searchparams) {
         list($not, $operator, $value) = $searchparams;
-        if (is_array($value)){
+        if (is_array($value)) {
             $from = userdate($value[0]);
             $to = userdate($value[1]);
         } else {
@@ -167,10 +171,9 @@ class datalynxfield__time extends datalynxfield_no_content {
             $to = userdate(time());
         }
         if ($operator != 'BETWEEN') {
-            return $not. ' '. $operator. ' '. $from;
+            return $not . ' ' . $operator . ' ' . $from;
         } else {
-            return $not. ' '. $operator. ' '. $from. ' and '. $to;
+            return $not . ' ' . $operator . ' ' . $from . ' and ' . $to;
         }
-    }  
-
+    }
 }

@@ -8,21 +8,19 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
- 
+
 /**
+ *
  * @package mod
  * @subpackage datalynx
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */ 
-$subplugins = array(
-    'datalynxfield'  => 'mod/datalynx/field',
-    'datalynxview' => 'mod/datalynx/view',
-    'datalynxrule' => 'mod/datalynx/rule',
-    'datalynxtool' => 'mod/datalynx/tool',
+ */
+$subplugins = array('datalynxfield' => 'mod/datalynx/field', 'datalynxview' => 'mod/datalynx/view', 
+    'datalynxrule' => 'mod/datalynx/rule', 'datalynxtool' => 'mod/datalynx/tool'
 );

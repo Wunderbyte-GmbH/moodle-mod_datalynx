@@ -8,29 +8,30 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * The mod_datalynx entry created event.
  *
- * @package    mod_datalynx
- * @copyright  2015 Ivan Šakić <ivan.sakic3@gmail.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package mod_datalynx
+ * @copyright 2015 Ivan Šakić <ivan.sakic3@gmail.com>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 namespace mod_datalynx\event;
 
 defined('MOODLE_INTERNAL') || die();
 
+
 /**
- * @package    mod_datalynx
- * @since      Moodle 2.7
- * @copyright  2015 Ivan Šakić <ivan.sakic3@gmail.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ *
+ * @package mod_datalynx
+ * @since Moodle 2.7
+ * @copyright 2015 Ivan Šakić <ivan.sakic3@gmail.com>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class field_created extends \core\event\base {
 
@@ -61,7 +62,7 @@ class field_created extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '$this->userid' created the datalynx field with id '$this->objectid' for the datalynx activity " .
-        "with the course module id '$this->contextinstanceid'.";
+                 "with the course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -70,7 +71,8 @@ class field_created extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/mod/datalynx/view.php', array('d' => $this->other['dataid']));
+        return new \moodle_url('/mod/datalynx/view.php', array('d' => $this->other['dataid']
+        ));
     }
 
     /**
@@ -79,8 +81,9 @@ class field_created extends \core\event\base {
      * @return array
      */
     public function get_legacy_logdata() {
-        return array($this->courseid, 'datalynx', 'field_created', 'view.php?d=' . $this->other['dataid'],
-            $this->other['dataid'], $this->contextinstanceid);
+        return array($this->courseid, 'datalynx', 'field_created', 
+            'view.php?d=' . $this->other['dataid'], $this->other['dataid'], $this->contextinstanceid
+        );
     }
 
     /**
@@ -91,7 +94,7 @@ class field_created extends \core\event\base {
      */
     protected function validate_data() {
         parent::validate_data();
-
+        
         if (!isset($this->other['dataid'])) {
             throw new \coding_exception('The \'dataid\' value must be set in other.');
         }

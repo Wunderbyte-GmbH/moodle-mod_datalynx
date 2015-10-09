@@ -8,33 +8,46 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
- 
+
 /**
+ *
  * @package mod-datalynx
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-/** 
+/**
  * Definition of log events
  */
+defined('MOODLE_INTERNAL') or die();
 
-defined('MOODLE_INTERNAL') or die;
-
-$logs = array(
-    array('module'=>'datalynx', 'action'=>'view', 'mtable'=>'datalynx', 'field'=>'name'),
-    array('module'=>'datalynx', 'action'=>'add', 'mtable'=>'datalynx', 'field'=>'name'),
-    array('module'=>'datalynx', 'action'=>'update', 'mtable'=>'datalynx', 'field'=>'name'),
-    array('module'=>'datalynx', 'action'=>'record delete', 'mtable'=>'datalynx', 'field'=>'name'),
-    array('module'=>'datalynx', 'action'=>'fields add', 'mtable'=>'datalynx_fields', 'field'=>'name'),
-    array('module'=>'datalynx', 'action'=>'fields update', 'mtable'=>'datalynx_fields', 'field'=>'name'),
-    array('module'=>'datalynx', 'action'=>'views add', 'mtable'=>'datalynx_views', 'field'=>'name'),
-    array('module'=>'datalynx', 'action'=>'views update', 'mtable'=>'datalynx_views', 'field'=>'name'),
-    array('module'=>'datalynx', 'action'=>'filters add', 'mtable'=>'datalynx_filters', 'field'=>'name'),
-    array('module'=>'datalynx', 'action'=>'filters update', 'mtable'=>'datalynx_filters', 'field'=>'name')
+$logs = array(array('module' => 'datalynx', 'action' => 'view', 'mtable' => 'datalynx', 
+    'field' => 'name'
+), array('module' => 'datalynx', 'action' => 'add', 'mtable' => 'datalynx', 'field' => 'name'
+), array('module' => 'datalynx', 'action' => 'update', 'mtable' => 'datalynx', 'field' => 'name'
+), array('module' => 'datalynx', 'action' => 'record delete', 'mtable' => 'datalynx', 
+    'field' => 'name'
+), array('module' => 'datalynx', 'action' => 'fields add', 'mtable' => 'datalynx_fields', 
+    'field' => 'name'
+), 
+    array('module' => 'datalynx', 'action' => 'fields update', 'mtable' => 'datalynx_fields', 
+        'field' => 'name'
+    ), 
+    array('module' => 'datalynx', 'action' => 'views add', 'mtable' => 'datalynx_views', 
+        'field' => 'name'
+    ), 
+    array('module' => 'datalynx', 'action' => 'views update', 'mtable' => 'datalynx_views', 
+        'field' => 'name'
+    ), 
+    array('module' => 'datalynx', 'action' => 'filters add', 'mtable' => 'datalynx_filters', 
+        'field' => 'name'
+    ), 
+    array('module' => 'datalynx', 'action' => 'filters update', 'mtable' => 'datalynx_filters', 
+        'field' => 'name'
+    )
 );

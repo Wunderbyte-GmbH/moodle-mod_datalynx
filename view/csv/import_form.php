@@ -8,141 +8,148 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
- 
+
 /**
- * This file is part of the Datalynx module for Moodle - http://moodle.org/. 
+ * This file is part of the Datalynx module for Moodle - http://moodle.org/.
+ *
  *
  * @package datalynxview
  * @subpackage csv
- * @copyright 2012 Itamar Tzadok 
+ * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') or die();
 
-defined('MOODLE_INTERNAL') or die;
+require_once ("$CFG->libdir/formslib.php");
+require_once ("$CFG->libdir/csvlib.class.php");
 
-require_once("$CFG->libdir/formslib.php");
-require_once("$CFG->libdir/csvlib.class.php");
 
 /**
- *
  */
 class datalynxview_csv_import_form extends moodleform {
+
     protected $_view;
 
-    public function __construct($view, $action = null, $customdata = null, $method = 'post', $target = '', $attributes = null, $editable = true) {
+    public function __construct($view, $action = null, $customdata = null, $method = 'post', $target = '', 
+            $attributes = null, $editable = true) {
         $this->_view = $view;
         
-        parent::__construct($action, $customdata, $method, $target, $attributes, $editable);       
+        parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
     }
-    
+
     /**
-     *
      */
     public function html() {
         return $this->_form->toHtml();
     }
 
-
     function definition() {
-
         $view = $this->_view;
         $fieldsettings = empty($this->_customdata['hidefieldsettings']) ? true : false;
-
+        
         $mform = &$this->_form;
-
+        
         // action buttons
-        //-------------------------------------------------------------------------------
+        // -------------------------------------------------------------------------------
         $this->add_action_buttons(true, get_string('import', 'datalynx'));
         
         // field settings
-        //-------------------------------------------------------------------------------
+        // -------------------------------------------------------------------------------
         $this->field_settings();
         
         // csv settings
-        //-------------------------------------------------------------------------------
+        // -------------------------------------------------------------------------------
         $this->csv_settings();
         
         // action buttons
-        //-------------------------------------------------------------------------------
+        // -------------------------------------------------------------------------------
         $this->add_action_buttons(true, get_string('import', 'datalynx'));
     }
 
     /**
-     *
      */
     protected function field_settings() {
         $view = $this->_view;
         $df = $view->get_df();
         $mform = &$this->_form;
-
-        $mform->addElement('header', 'fieldsettingshdr', get_string('fieldsimportsettings', 'datalynxview_import'));
+        
+        $mform->addElement('header', 'fieldsettingshdr', 
+                get_string('fieldsimportsettings', 'datalynxview_import'));
         $columns = $view->get_columns();
         foreach ($columns as $column) {
-            list($pattern, $header,) = $column;
-            $patternname = trim($pattern,'[#]');
+            list($pattern, $header, ) = $column;
+            $patternname = trim($pattern, '[#]');
             $header = $header ? $header : $patternname;
-
+            
             if (!$fieldid = $view->get_pattern_fieldid($pattern)) {
                 continue;
             }
-
+            
             if (!$field = $df->get_field_from_id($fieldid)) {
                 continue;
             }
-
+            
             $name = "f_{$fieldid}_$patternname";
-
+            
             $grp = array();
-            $grp[] = &$mform->createElement('text', "{$name}_name", null, array('size'=>'16'));
-            list($elements, $labels) = $field->renderer()->get_pattern_import_settings($mform, $pattern);
+            $grp[] = &$mform->createElement('text', "{$name}_name", null, array('size' => '16'
+            ));
+            list($elements, $labels) = $field->renderer()->get_pattern_import_settings($mform, 
+                    $pattern);
             $grp = $grp + $elements;
             $mform->addGroup($grp, "grp$patternname", $patternname, $labels, false);
-
+            
             $mform->setType("{$name}_name", PARAM_NOTAGS);
             $mform->setDefault("{$name}_name", $header);
         }
-    }    
+    }
 
     /**
-     *
      */
     protected function csv_settings() {
         $view = $this->_view;
         $mform = &$this->_form;
-
+        
         $mform->addElement('header', 'csvsettingshdr', get_string('csvsettings', 'datalynx'));
-
+        
         // delimiter
         $delimiters = csv_import_reader::get_delimiter_list();
-        $mform->addElement('select', 'delimiter', get_string('csvdelimiter', 'datalynx'), $delimiters);
+        $mform->addElement('select', 'delimiter', get_string('csvdelimiter', 'datalynx'), 
+                $delimiters);
         $mform->setDefault('delimiter', $view->get_delimiter());
-
+        
         // enclosure
-        $mform->addElement('text', 'enclosure', get_string('csvenclosure', 'datalynx'), array('size'=>'10'));
+        $mform->addElement('text', 'enclosure', get_string('csvenclosure', 'datalynx'), 
+                array('size' => '10'
+                ));
         $mform->setType('enclosure', PARAM_NOTAGS);
         $mform->setDefault('enclosure', $view->get_enclosure());
-
+        
         // encoding
         $choices = textlib::get_encodings();
         $mform->addElement('select', 'encoding', get_string('encoding', 'grades'), $choices);
         $mform->setDefault('encoding', $view->get_encoding());
-
+        
         // upload file
-        $mform->addElement('filepicker', 'importfile', get_string('uploadfile', 'datalynxview_import'));
+        $mform->addElement('filepicker', 'importfile', 
+                get_string('uploadfile', 'datalynxview_import'));
         
         // upload text
-        $mform->addElement('textarea', 'csvtext', get_string('uploadtext', 'datalynxview_import'), array('wrap' => 'virtual', 'rows' => '5', 'style' => 'width:100%;'));
+        $mform->addElement('textarea', 'csvtext', get_string('uploadtext', 'datalynxview_import'), 
+                array('wrap' => 'virtual', 'rows' => '5', 'style' => 'width:100%;'
+                ));
         
         // update existing entries
-        $mform->addElement('selectyesno', 'updateexisting', get_string('updateexisting', 'datalynxview_import'));
+        $mform->addElement('selectyesno', 'updateexisting', 
+                get_string('updateexisting', 'datalynxview_import'));
         
         // edit after import
-        //$mform->addElement('selectyesno', 'editafter', get_string('importeditimported', 'datalynxview_import'));
+        // $mform->addElement('selectyesno', 'editafter', get_string('importeditimported',
+    // 'datalynxview_import'));
     }
-
 }

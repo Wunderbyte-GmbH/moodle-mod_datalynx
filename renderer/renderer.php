@@ -8,60 +8,82 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ *
  * @package datalynx_field_renderer
  * @copyright 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die;
-require_once(dirname(__FILE__). '/../mod_class.php');
+defined('MOODLE_INTERNAL') or die();
+require_once (dirname(__FILE__) . '/../mod_class.php');
+
 
 class datalynx_field_renderer {
 
     const NOT_VISIBLE_SHOW_NOTHING = 0;
-    const NOT_VISIBLE_SHOW_CUSTOM  = 1;
 
-    const DISPLAY_MODE_TEMPLATE_NONE   = 0;
+    const NOT_VISIBLE_SHOW_CUSTOM = 1;
+
+    const DISPLAY_MODE_TEMPLATE_NONE = 0;
+
     const DISPLAY_MODE_TEMPLATE_CUSTOM = 1;
 
-    const NO_VALUE_SHOW_NOTHING               = 0;
+    const NO_VALUE_SHOW_NOTHING = 0;
+
     const NO_VALUE_SHOW_DISPLAY_MODE_TEMPLATE = 1;
-    const NO_VALUE_SHOW_CUSTOM                = 2;
 
-    const EDIT_MODE_TEMPLATE_NONE            = 0;
+    const NO_VALUE_SHOW_CUSTOM = 2;
+
+    const EDIT_MODE_TEMPLATE_NONE = 0;
+
     const EDIT_MODE_TEMPLATE_AS_DISPLAY_MODE = 1;
-    const EDIT_MODE_TEMPLATE_CUSTOM          = 2;
 
-    const NOT_EDITABLE_SHOW_NOTHING         = 0;
+    const EDIT_MODE_TEMPLATE_CUSTOM = 2;
+
+    const NOT_EDITABLE_SHOW_NOTHING = 0;
+
     const NOT_EDITABLE_SHOW_AS_DISPLAY_MODE = 1;
-    const NOT_EDITABLE_SHOW_DISABLED        = 2;
-    const NOT_EDITABLE_SHOW_CUSTOM          = 3;
+
+    const NOT_EDITABLE_SHOW_DISABLED = 2;
+
+    const NOT_EDITABLE_SHOW_CUSTOM = 3;
 
     const TAG_FIELD_VALUE = "#value";
+
     const TAG_FIELD_NAME = "#name";
 
     private $id;
+
     private $name;
+
     private $description;
+
     private $dataid;
+
     private $notvisibletemplate;
+
     private $displaytemplate;
+
     private $novaluetemplate;
+
     private $edittemplate;
+
     private $noteditabletemplate;
 
     /**
+     *
      * @var datalynx related datalynx instance object
      */
     private $datalynx;
 
     /**
+     *
      * @var stdClass related datalynx renderer DB record
      */
     private $record;
@@ -71,36 +93,37 @@ class datalynx_field_renderer {
         $this->name = $record->name;
         $this->description = $record->description;
         $this->dataid = $record->dataid;
-
+        
         if (isset($record->datalynx)) {
             $this->datalynx = $record->datalynx;
         } else {
             $this->datalynx = new datalynx($record->dataid);
         }
-
+        
         $this->notvisibletemplate = $record->notvisibletemplate;
         $this->displaytemplate = $record->displaytemplate;
         $this->novaluetemplate = $record->novaluetemplate;
         $this->edittemplate = $record->edittemplate;
         $this->noteditabletemplate = $record->noteditabletemplate;
-
+        
         $this->record = $record;
     }
 
     public static function get_renderer_by_name($name, $dataid) {
         global $DB;
-        $record = $DB->get_record('datalynx_renderers', array('name' => $name, 'dataid' => $dataid), '*', IGNORE_MULTIPLE);
+        $record = $DB->get_record('datalynx_renderers', array('name' => $name, 'dataid' => $dataid
+        ), '*', IGNORE_MULTIPLE);
         if ($record) {
             return new datalynx_field_renderer($record);
         } else {
             return false; // TODO: or throw exception?
         }
-
     }
 
     public static function get_renderer_by_id($id) {
         global $DB;
-        $record = $DB->get_record('datalynx_renderers', array('id' => $id));
+        $record = $DB->get_record('datalynx_renderers', array('id' => $id
+        ));
         if ($record) {
             return new datalynx_field_renderer($record);
         } else {
@@ -108,15 +131,12 @@ class datalynx_field_renderer {
         }
     }
 
-    private static $default = array(
-        'id' => 0,
-        'name' => '',
-        'description' => '',
-        'notvisibletemplate' => self::NOT_VISIBLE_SHOW_NOTHING,
-        'displaytemplate' => self::DISPLAY_MODE_TEMPLATE_NONE,
-        'novaluetemplate' => self::NO_VALUE_SHOW_NOTHING,
-        'edittemplate' => self::EDIT_MODE_TEMPLATE_NONE,
-        'noteditabletemplate' => self::NOT_EDITABLE_SHOW_NOTHING,
+    private static $default = array('id' => 0, 'name' => '', 'description' => '', 
+        'notvisibletemplate' => self::NOT_VISIBLE_SHOW_NOTHING, 
+        'displaytemplate' => self::DISPLAY_MODE_TEMPLATE_NONE, 
+        'novaluetemplate' => self::NO_VALUE_SHOW_NOTHING, 
+        'edittemplate' => self::EDIT_MODE_TEMPLATE_NONE, 
+        'noteditabletemplate' => self::NOT_EDITABLE_SHOW_NOTHING
     );
 
     public static function get_default_renderer(datalynx $datalynx) {
@@ -134,7 +154,8 @@ class datalynx_field_renderer {
 
     public static function get_record($rendererid) {
         global $DB;
-        return $DB->get_record('datalynx_renderers', array('id' => $rendererid));
+        return $DB->get_record('datalynx_renderers', array('id' => $rendererid
+        ));
     }
 
     public static function duplicate_renderer($rendererid) {
@@ -144,7 +165,8 @@ class datalynx_field_renderer {
         do {
             $i++;
             $newname = get_string('copyof', 'datalynx', $object->name) . ' ' . $i;
-        } while ($DB->record_exists('datalynx_renderers', array('name' => $newname)));
+        } while ($DB->record_exists('datalynx_renderers', array('name' => $newname
+        )));
         $object->name = $newname;
         return self::insert_renderer($object);
     }
@@ -158,14 +180,15 @@ class datalynx_field_renderer {
 
     public static function delete_renderer($rendererid) {
         global $DB;
-        return $DB->delete_records('datalynx_renderers', array('id' => $rendererid));
+        return $DB->delete_records('datalynx_renderers', array('id' => $rendererid
+        ));
     }
 
     public function process_renderer_pattern() {
-
     }
 
     /**
+     *
      * @return int
      */
     public function get_id() {
@@ -173,6 +196,7 @@ class datalynx_field_renderer {
     }
 
     /**
+     *
      * @return string
      */
     public function get_name() {
@@ -180,6 +204,7 @@ class datalynx_field_renderer {
     }
 
     /**
+     *
      * @return string
      */
     public function get_description() {
@@ -187,6 +212,7 @@ class datalynx_field_renderer {
     }
 
     /**
+     *
      * @return mixed
      */
     public function get_no_value_template() {
@@ -198,6 +224,7 @@ class datalynx_field_renderer {
     }
 
     /**
+     *
      * @return mixed
      */
     public function get_not_visible_template() {
@@ -209,6 +236,7 @@ class datalynx_field_renderer {
     }
 
     /**
+     *
      * @return mixed
      */
     public function get_not_editable_template() {
@@ -220,6 +248,7 @@ class datalynx_field_renderer {
     }
 
     /**
+     *
      * @return mixed
      */
     public function get_display_template() {
@@ -231,6 +260,7 @@ class datalynx_field_renderer {
     }
 
     /**
+     *
      * @return mixed
      */
     public function get_edit_template() {

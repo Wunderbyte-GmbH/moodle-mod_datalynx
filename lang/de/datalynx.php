@@ -8,24 +8,24 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ *
  * @package mod
- * $subpackage datalynx
+ *          $subpackage datalynx
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * The Datalynx has been developed as an enhanced counterpart
- * of Moodle's Database activity module (1.9.11+ (20110323)).
- * To the extent that Datalynx code corresponds to Database code,
- * certain copyrights on the Database module may obtain.
+ *         
+ *          The Datalynx has been developed as an enhanced counterpart
+ *          of Moodle's Database activity module (1.9.11+ (20110323)).
+ *          To the extent that Datalynx code corresponds to Database code,
+ *          certain copyrights on the Database module may obtain.
  */
-
 $string['actions'] = 'Aktionen nach Hinzufügen eines Eintrags';
 $string['alignment'] = 'Ausrichtung';
 $string['allowaddoption'] = 'Bearbeitungseinstellungen zulassen';
@@ -68,7 +68,7 @@ $string['csvfailed'] = 'Originaldaten der CSV Datei können nicht gelesen werden
 $string['csvoutput'] = 'CSV Ausgabe';
 $string['csvsettings'] = 'CSV Einstellungen';
 $string['csvwithselecteddelimiter'] = '<acronym title=\"Comma Separated Values\">CSV</acronym> Text mit ausgewähltem Trennzeichen:';
-/// Capability strings
+// / Capability strings
 $string['datalynx:addinstance'] = 'Neue Datalynx Aktivität anlegen';
 $string['datalynx:approve'] = 'Einträge freischalten';
 $string['datalynx:comment'] = 'Kommentare schreiben';
@@ -97,7 +97,7 @@ $string['datalynx:viewanonymousentry'] = 'Anonyme Einträge anzeigen';
 $string['datalynx:viewentry'] = 'Einträge anzeigen';
 $string['datalynx:viewindex'] = 'Index anzeigen';
 $string['datalynx:writeentry'] = 'Einträge schreiben';
-/// End Capability strings
+// / End Capability strings
 $string['defaultview'] = 'D';
 $string['deletenotenrolled'] = 'Einträge von nicht eingeschriebenen UserInnen löschen.';
 $string['descending'] = 'Absteigend';
@@ -283,7 +283,7 @@ $string['maxsize'] = 'Maximale Größe';
 $string['mediafile'] = 'Mediendatei';
 $string['menus'] = 'Menüs';
 
-/// Message provider strings
+// / Message provider strings
 $string['messageprovider:datalynx_entryadded'] = 'Datalynx Eintrag hinzugefügt';
 $string['messageprovider:datalynx_entryupdated'] = 'Datalynx Eintrag aktualisiert';
 $string['messageprovider:datalynx_entrydeleted'] = 'Datalynx Eintrag gelöscht';
@@ -292,7 +292,7 @@ $string['messageprovider:datalynx_entrydisapproved'] = 'Datalynx Eintrag abgeleh
 $string['messageprovider:datalynx_commentadded'] = 'Datalynx Kommentar hinzugefügt';
 $string['messageprovider:datalynx_ratingadded'] = 'Datalynx Bewertung hinzugefügt';
 $string['messageprovider:datalynx_ratingupdated'] = 'Datalynx Bewertung aktualisiert';
-/// End Message provider strings
+// / End Message provider strings
 $string['min'] = 'Minimum';
 $string['modulename'] = 'Datalynx';
 $string['modulename_help'] = 'Das Datalynx Modul kann benutzt werden, um vielfältigste Aktivitäten/Ressourcen anzulegen. LehrerInnen/ManagerInnen können eine individuell angepasste Datenbank erzeugen, in der TeilnehmerInnen unterschiedliche Elemente (z.B. TextE, Zahlen, Bilder, Dateien, URLs, etc.) abgeben und anzeigen können.';
@@ -423,9 +423,6 @@ $string['ruleenabled'] = 'Aktiviert';
 
 $string['author'] = 'Autor';
 $string['email'] = 'E-Mail';
-
-
-
 
 $string['savecontinue'] = 'Speichern und Fortsetzen';
 $string['search'] = 'Suche';
@@ -673,24 +670,20 @@ $string['editingbehavior'] = 'Editing field behavior "{$a}"';
 $string['deletingbehavior'] = 'Deleting field behavior "{$a}"';
 $string['duplicatingbehavior'] = 'Duplicating field behavior "{$a}"';
 
-
-/// Message strings
-$string['message_entry_created'] =
-'Guten Tag {$a->fullname},
+// / Message strings
+$string['message_entry_created'] = 'Guten Tag {$a->fullname},
 
 der Inhalt von {$a->datalynxlink} wurde von {$a->senderprofilelink} bearbeitet.
 
 Der folgende Eintrag wurde hinzugefügt: {$a->viewlink}.';
 
-$string['message_entry_updated'] =
-'Guten Tag {$a->fullname},
+$string['message_entry_updated'] = 'Guten Tag {$a->fullname},
 
 der Inhalt von {$a->datalynxlink} wurde von {$a->senderprofilelink} bearbeitet.
 
 Der folgende Eintrag wurde aktualisiert: {$a->viewlink}.';
 
-$string['message_entry_deleted'] =
-'Guten Tag {$a->fullname},
+$string['message_entry_deleted'] = 'Guten Tag {$a->fullname},
 
 der Inhalt von {$a->datalynxlink} wurde von {$a->senderprofilelink} bearbeitet.
 
@@ -717,9 +710,9 @@ $string['message_rating_updated'] = 'Bewertung eines Eintrags aktualisiert';
 $string['message_team_updated'] = 'Guten Tag {$a->fullname},
 
  {$a->fieldname} wurde von {$a->senderprofilelink} geändert. Rufen Sie folgenden Link für detaillierte Informationen auf: {$a->viewlink}.';
-/// End Message strings
+// / End Message strings
 
-/// Message provider strings
+// / Message provider strings
 $string['messageprovider:event_entry_created'] = 'Eintrag erstellt';
 $string['messageprovider:event_entry_updated'] = 'Eintrag aktualisiert';
 $string['messageprovider:event_entry_deleted'] = 'Eintrag gelöscht';
@@ -729,7 +722,7 @@ $string['messageprovider:event_comment_created'] = 'Kommentar hinzugefügt';
 $string['messageprovider:event_rating_added'] = 'Bewertung hinzugefügt';
 $string['messageprovider:event_rating_updated'] = 'Bewertung aktualisiert';
 $string['messageprovider:event_team_updated'] = 'Teammitglieder aktualisiert';
-/// End Message provider strings event_team_updated
+// / End Message provider strings event_team_updated
 
 $string['filterforms'] = 'Filter forms';
 $string['filterformadd'] = 'Add new filter form';

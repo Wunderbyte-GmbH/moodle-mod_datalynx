@@ -8,23 +8,24 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
- 
+
 /**
- * This file is part of the Datalynx module for Moodle - http://moodle.org/. 
+ * This file is part of the Datalynx module for Moodle - http://moodle.org/.
+ *
  *
  * @package datalynxview
  * @subpackage tabular
- * @copyright 2012 Itamar Tzadok 
+ * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+require_once ("$CFG->dirroot/mod/datalynx/view/view_class.php");
 
-require_once("$CFG->dirroot/mod/datalynx/view/view_class.php"); 
- 
+
 /**
  * A template for displaying datalynx entries in a tabular list
  * Parameters used:
@@ -32,15 +33,17 @@ require_once("$CFG->dirroot/mod/datalynx/view/view_class.php");
  * param2 - repeated entry section
  * param3 - table header
  */
-
 class datalynxview_tabular extends datalynxview_base {
 
-    protected $type = 'tabular';    
-    protected $_editors = array('section', 'param2');
-    protected $_vieweditors = array('section', 'param2');
-    
+    protected $type = 'tabular';
+
+    protected $_editors = array('section', 'param2'
+    );
+
+    protected $_vieweditors = array('section', 'param2'
+    );
+
     /**
-     * 
      */
     public function generate_default_view() {
         // get all the fields
@@ -59,43 +62,48 @@ class datalynxview_tabular extends datalynxview_base {
         $filtersmenu = new html_table_cell('##filtersmenu##');
         $quicksearch = new html_table_cell('##quicksearch##');
         $quickperpage = new html_table_cell('##quickperpage##');
-        $row1->cells = array($viewsmenu, $seperator, $filtersmenu, $quicksearch, $quickperpage);
+        $row1->cells = array($viewsmenu, $seperator, $filtersmenu, $quicksearch, $quickperpage
+        );
         foreach ($row1->cells as $cell) {
             $cell->style = 'border:0 none;';
         }
-        // second row: add entries 
+        // second row: add entries
         $row2 = new html_table_row();
         $addentries = new html_table_cell('##addnewentry##');
         $addentries->colspan = 5;
-        $row2->cells = array($addentries);
+        $row2->cells = array($addentries
+        );
         foreach ($row2->cells as $cell) {
             $cell->style = 'border:0 none;';
-        }        
+        }
         // third row: paging bar
         $row3 = new html_table_row();
         $pagingbar = new html_table_cell('##pagingbar##');
         $pagingbar->colspan = 5;
-        $row3->cells = array($pagingbar);
+        $row3->cells = array($pagingbar
+        );
         foreach ($row3->cells as $cell) {
             $cell->style = 'border:0 none;';
         }
         // construct the table
-        $table->data = array($row1, $row2, $row3);
+        $table->data = array($row1, $row2, $row3
+        );
         $sectiondefault = html_writer::table($table);
-        $this->view->esection = html_writer::tag('div', $sectiondefault, array('class' => 'mdl-align')) . "<div>##entries##</div>";
-
-
+        $this->view->esection = html_writer::tag('div', $sectiondefault, 
+                array('class' => 'mdl-align'
+                )) . "<div>##entries##</div>";
+        
         // set content table
         $table = new html_table();
         $table->attributes['align'] = 'center';
         $table->attributes['cellpadding'] = '2';
         $header = array();
         $entry = array();
-        $align = array();        
+        $align = array();
         // author picture
         $header[] = '';
         $entry[] = '##author:picture##';
-        $align[] = 'center';        
+        $align[] = 'center';
         // author name
         $header[] = '';
         $entry[] = '##author:name##';
@@ -107,7 +115,7 @@ class datalynxview_tabular extends datalynxview_base {
                 if ($field->type == "userinfo") {
                     $entry[] = "##author:{$field->field->name}##";
                 } else {
-                    $entry[] = '[['. $field->field->name. ']]';
+                    $entry[] = '[[' . $field->field->name . ']]';
                 }
                 $align[] = 'left';
             }
@@ -134,60 +142,56 @@ class datalynxview_tabular extends datalynxview_base {
         $table->align = $align;
         $table->data[] = $entry;
         $this->view->eparam2 = html_writer::table($table);
-
     }
 
     public function display(array $options = array()) {
         parent::display($options);
         global $PAGE;
-        $PAGE->requires->js_init_call(
-                'M.datalynxview_tabular.init',
-                array(),
-                false,
+        $PAGE->requires->js_init_call('M.datalynxview_tabular.init', array(), false, 
                 $this->get_js_module());
     }
 
     private function get_js_module() {
-        $jsmodule = array(
-            'name' => 'datalynxview_tabular',
-            'fullpath' => '/mod/datalynx/view/tabular/tabular.js',
-            'requires' => array('node', 'event', 'node-event-delegate'),
-            );
+        $jsmodule = array('name' => 'datalynxview_tabular', 
+            'fullpath' => '/mod/datalynx/view/tabular/tabular.js', 
+            'requires' => array('node', 'event', 'node-event-delegate'
+            )
+        );
         return $jsmodule;
     }
 
     /**
-     *
      */
     protected function apply_entry_group_layout($entriesset, $name = '') {
         global $CFG, $OUTPUT, $GLOBALS;
-
+        
         $tablehtml = trim($this->view->eparam2);
-        $opengroupdiv = html_writer::start_tag('div', array('class' => 'entriesview'));
+        $opengroupdiv = html_writer::start_tag('div', array('class' => 'entriesview'
+        ));
         $closegroupdiv = html_writer::end_tag('div');
         if ($name) {
-            $name = ($name == 'newentry' ? get_string('entrynew', 'datalynx') : $name); 
+            $name = ($name == 'newentry' ? get_string('entrynew', 'datalynx') : $name);
         }
         $groupheading = $OUTPUT->heading($name, 3, 'main');
-
+        
         $elements = array();
-
+        
         // if there are no field definition just return everything as html
         if (empty($entriesset)) {
-            $elements[] = array('html', $opengroupdiv. $groupheading. $tablehtml. $closegroupdiv);
-        
+            $elements[] = array('html', $opengroupdiv . $groupheading . $tablehtml . $closegroupdiv
+            );
         } else {
-
+            
             // clean any prefix and get the open table tag
-            //$tablehtml = preg_replace('/^[\s\S]*<table/i', '<table', $tablehtml);        
+            // $tablehtml = preg_replace('/^[\s\S]*<table/i', '<table', $tablehtml);
             $tablepattern = '/^<table[^>]*>/i';
             preg_match($tablepattern, $tablehtml, $match); // must be there
             $tablehtml = trim(preg_replace($tablepattern, '', $tablehtml));
             $opentable = reset($match);
             // clean any suffix and get the close table tag
             $tablehtml = trim(preg_replace('/<\/table>$/i', '', $tablehtml));
-            $closetable = '</table>'; 
-
+            $closetable = '</table>';
+            
             // get the header row if required
             $headerrow = '';
             if ($require_headerrow = $this->view->param3) {
@@ -196,10 +200,10 @@ class datalynxview_tabular extends datalynxview_base {
                     $theadpattern = '/^<thead>[\s\S]*<\/thead>/i';
                     preg_match($theadpattern, $tablehtml, $match);
                     $tablehtml = trim(preg_replace($theadpattern, '', $tablehtml));
-                    $headerrow = reset($match);             
+                    $headerrow = reset($match);
                 }
             }
-            // we may still need to get the header row 
+            // we may still need to get the header row
             // but first remove tbody tags
             if (strpos($tablehtml, '<tbody>') === 0) {
                 $tablehtml = trim(preg_replace('/^<tbody>|<\/tbody>$/i', '', $tablehtml));
@@ -211,20 +215,22 @@ class datalynxview_tabular extends datalynxview_base {
                 $trpattern = '/^<tr>[\s\S]*<\/tr>/i';
                 preg_match($trpattern, $tablehtml, $match);
                 $tablehtml = trim(preg_replace($trpattern, '', $tablehtml));
-                $headerrow = '<thead>'. reset($match). '</thead>';
+                $headerrow = '<thead>' . reset($match) . '</thead>';
             }
             // the reset of $tablehtml should be the entry template
             $entrytemplate = $tablehtml;
             // construct elements
             // first everything before the entrytemplate as html
-            $elements[] = array('html', $opengroupdiv. $groupheading. $opentable. $headerrow. '<tbody>');
+            $elements[] = array('html', 
+                $opengroupdiv . $groupheading . $opentable . $headerrow . '<tbody>'
+            );
             
             // do the entries
             // get tags from the first item in the entry set
             $tagsitem = reset($entriesset);
             $tagsitem = reset($tagsitem);
-            $tags = array_keys($tagsitem); 
-
+            $tags = array_keys($tagsitem);
+            
             foreach ($entriesset as $fielddefinitions) {
                 $definitions = reset($fielddefinitions);
                 $parts = $this->split_template_by_tags($tags, $entrytemplate);
@@ -235,32 +241,31 @@ class datalynxview_tabular extends datalynxview_base {
                             $elements[] = $def;
                         }
                     } else {
-                        $elements[] = array('html', $part);
+                        $elements[] = array('html', $part
+                        );
                     }
                 }
             }
             
             // finish the table
-            $elements[] = array('html', '</tbody>'. $closetable. $closegroupdiv);
-            
+            $elements[] = array('html', '</tbody>' . $closetable . $closegroupdiv
+            );
         }
-
+        
         return $elements;
     }
 
     /**
-     * 
      */
     protected function entry_definition($fielddefinitions) {
         $elements = array();
         // just store the definitions
-        //   and group_entries_definition will process them
-        $elements[] = $fielddefinitions; 
+        // and group_entries_definition will process them
+        $elements[] = $fielddefinitions;
         return $elements;
     }
-    
+
     /**
-     * 
      */
     protected function new_entry_definition($entryid = -1) {
         $elements = array();
@@ -268,17 +273,18 @@ class datalynxview_tabular extends datalynxview_base {
         // get patterns definitions
         $fields = $this->_df->get_fields();
         $fielddefinitions = array();
-        $entry = new object;
+        $entry = new object();
         foreach ($this->_tags['field'] as $fieldid => $patterns) {
             $field = $fields[$fieldid];
             $entry->id = $entryid;
-            $options = array('edit' => true, 'manage' => true);
+            $options = array('edit' => true, 'manage' => true
+            );
             if ($definitions = $field->get_definitions($patterns, $entry, $options)) {
                 $fielddefinitions = array_merge($fielddefinitions, $definitions);
             }
-        }            
-            
-        $elements[] = $fielddefinitions; 
+        }
+        
+        $elements[] = $fielddefinitions;
         return $elements;
     }
 }

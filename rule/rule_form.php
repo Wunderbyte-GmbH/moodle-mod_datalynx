@@ -8,28 +8,33 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
- 
+
 /**
+ *
  * @package datalynx_rule
  * @copyright 2013 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die;
+defined('MOODLE_INTERNAL') or die();
 
-require_once("$CFG->libdir/formslib.php");
-require_once('rule_manager.php');
+require_once ("$CFG->libdir/formslib.php");
+require_once ('rule_manager.php');
+
 
 class datalynx_rule_form extends moodleform {
+
     protected $_rule = null;
+
     /* @var datalynx $_df */
     protected $_df = null;
 
-    public function datalynx_rule_form($rule, $action = null, $customdata = null, $method = 'post', $target = '', $attributes = null, $editable = true) {
+    public function datalynx_rule_form($rule, $action = null, $customdata = null, $method = 'post', $target = '', 
+            $attributes = null, $editable = true) {
         $this->_rule = $rule;
         $this->_df = $this->_rule->df;
         
@@ -39,20 +44,22 @@ class datalynx_rule_form extends moodleform {
     function definition() {
         global $CFG;
         $mform = &$this->_form;
-
+        
         // buttons
-        //-------------------------------------------------------------------------------
+        // -------------------------------------------------------------------------------
         $this->add_action_buttons();
-
-        //-------------------------------------------------------------------------------
+        
+        // -------------------------------------------------------------------------------
         $mform->addElement('header', 'general', get_string('general', 'form'));
-
+        
         // name
-        $mform->addElement('text', 'name', get_string('name'), array('size'=>'32'));
+        $mform->addElement('text', 'name', get_string('name'), array('size' => '32'
+        ));
         $mform->addRule('name', null, 'required', null, 'client');
         
         // description
-        $mform->addElement('text', 'description', get_string('description'), array('size'=>'64'));
+        $mform->addElement('text', 'description', get_string('description'), array('size' => '64'
+        ));
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('name', PARAM_TEXT);
             $mform->setType('description', PARAM_TEXT);
@@ -60,23 +67,26 @@ class datalynx_rule_form extends moodleform {
             $mform->setType('name', PARAM_RAW);
             $mform->setType('description', PARAM_RAW);
         }
-
+        
         // enabled
-        $mform->addElement('advcheckbox', 'enabled', get_string('ruleenabled', 'datalynx'), '', null, array(0, 1));
-
+        $mform->addElement('advcheckbox', 'enabled', get_string('ruleenabled', 'datalynx'), '', 
+                null, array(0, 1
+                ));
+        
         // events
         $eventmenu = datalynx_rule_manager::get_event_data($this->_df->id());
         $eventgroup = array();
         foreach ($eventmenu as $eventname => $eventlabel) {
-            $eventgroup[] =& $mform->createElement('checkbox', $eventname, null, $eventlabel);
+            $eventgroup[] = & $mform->createElement('checkbox', $eventname, null, $eventlabel);
         }
-        $mform->addGroup($eventgroup, 'eventsgroup', get_string('triggeringevent', 'datalynx'), '<br />', false);
-
-        //-------------------------------------------------------------------------------
+        $mform->addGroup($eventgroup, 'eventsgroup', get_string('triggeringevent', 'datalynx'), 
+                '<br />', false);
+        
+        // -------------------------------------------------------------------------------
         $this->rule_definition();
-
+        
         // buttons
-        //-------------------------------------------------------------------------------
+        // -------------------------------------------------------------------------------
         $this->add_action_buttons();
     }
 
@@ -104,27 +114,29 @@ class datalynx_rule_form extends moodleform {
         return $data;
     }
 
-    public function add_action_buttons($cancel = true, $submit = null){
+    public function add_action_buttons($cancel = true, $submit = null) {
         $mform = &$this->_form;
-
-        $buttonarray=array();
+        
+        $buttonarray = array();
         // save and display
         $buttonarray[] = &$mform->createElement('submit', 'submitbutton', get_string('savechanges'));
         // save and continue
-        $buttonarray[] = &$mform->createElement('submit', 'submitbutton', get_string('savecontinue', 'datalynx'));
+        $buttonarray[] = &$mform->createElement('submit', 'submitbutton', 
+                get_string('savecontinue', 'datalynx'));
         // cancel
         $buttonarray[] = &$mform->createElement('cancel');
-        $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
+        $mform->addGroup($buttonarray, 'buttonar', '', array(' '
+        ), false);
         $mform->closeHeaderBefore('buttonar');
     }
 
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
-
+        
         if ($this->_df->name_exists('rules', $data['name'], $this->_rule->get_id())) {
-            $errors['name'] = get_string('invalidname','datalynx', get_string('rule', 'datalynx'));
+            $errors['name'] = get_string('invalidname', 'datalynx', get_string('rule', 'datalynx'));
         }
-
+        
         return $errors;
     }
 }

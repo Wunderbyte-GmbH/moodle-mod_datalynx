@@ -8,76 +8,78 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
- 
+
 /**
+ *
  * @package datalynxfield
  * @subpackage url
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die;
+defined('MOODLE_INTERNAL') or die();
 
-require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
+require_once ("$CFG->dirroot/mod/datalynx/field/renderer.php");
+
 
 /**
- *
  */
 class datalynxfield_url_renderer extends datalynxfield_renderer {
 
     /**
-     *
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $field = $this->_field;
         $fieldid = $field->id();
         $entryid = $entry->id;
         $fieldname = "field_{$fieldid}_{$entryid}";
-
+        
         $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
         $url = isset($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : null;
         $alt = isset($entry->{"c{$fieldid}_content1"}) ? $entry->{"c{$fieldid}_content1"} : null;
         
         $url = empty($url) ? 'http://' : $url;
         $usepicker = empty($field->field->param1) ? false : true;
-        $options = array(
-            'title' => s($field->field->description),
-            'size' => 64
+        $options = array('title' => s($field->field->description), 'size' => 64
         );
-
+        
         $group = array();
-        $group[] = $mform->createElement('url', "{$fieldname}_url", null, $options, array('usefilepicker' => $usepicker));
+        $group[] = $mform->createElement('url', "{$fieldname}_url", null, $options, 
+                array('usefilepicker' => $usepicker
+                ));
         $mform->setType("{$fieldname}_url", PARAM_URL);
         $mform->setDefault("{$fieldname}_url", s($url));
-
+        
         // add alt name if not forcing name
         if (empty($field->field->param2)) {
-            $group[] = $mform->createElement('static', '', '', get_string('alttext','datalynxfield_url'));
-            $group[] = $mform->createElement('text', "{$fieldname}_alt", get_string('alttext','datalynxfield_url'));
+            $group[] = $mform->createElement('static', '', '', 
+                    get_string('alttext', 'datalynxfield_url'));
+            $group[] = $mform->createElement('text', "{$fieldname}_alt", 
+                    get_string('alttext', 'datalynxfield_url'));
             $mform->setType("{$fieldname}_alt", PARAM_TEXT);
             $mform->setDefault("{$fieldname}_alt", s($alt));
         }
-
+        
         $mform->addGroup($group, "{$fieldname}_grp", null, null, false);
     }
 
     /**
-     *
      */
     public function render_display_mode(stdClass $entry, array $params) {
         global $CFG;
-
+        
         $field = $this->_field;
         $fieldid = $field->id();
-        $types = array_intersect(['link', 'image', 'imageflex', 'media'], array_keys($params));
+        $types = array_intersect(['link', 'image', 'imageflex', 'media'
+        ], array_keys($params));
         $type = isset($types[0]) ? $types[0] : '';
-        $attributes = array('class' => $field->class,
-                            'target' => $field->target);
-
+        $attributes = array('class' => $field->class, 'target' => $field->target
+        );
+        
         if (isset($entry->{"c{$fieldid}_content"})) {
             $url = $entry->{"c{$fieldid}_content"};
             if (empty($url) or ($url == 'http://')) {
@@ -95,7 +97,7 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
             } else {
                 $alttext = empty($entry->{"c{$fieldid}_content1"}) ? $url : $entry->{"c{$fieldid}_content1"};
             }
-
+            
             // linking
             if ($type == 'link') {
                 return html_writer::link($url, $alttext, $attributes);
@@ -103,17 +105,19 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
             
             // image
             if ($type == 'image') {
-                return html_writer::empty_tag('img', array('src' => $url));
+                return html_writer::empty_tag('img', array('src' => $url
+                ));
             }
-
+            
             // image flexible
             if ($type == 'imageflex') {
-                return html_writer::empty_tag('img', array('src' => $url, 'style' => 'width:100%'));
+                return html_writer::empty_tag('img', array('src' => $url, 'style' => 'width:100%'
+                ));
             }
-
+            
             // media
             if ($type == 'media') {
-                require_once("$CFG->dirroot/filter/mediaplugin/filter.php");
+                require_once ("$CFG->dirroot/filter/mediaplugin/filter.php");
                 $mpfilter = new filter_mediaplugin($field->df()->context, array());
                 return $mpfilter->filter(html_writer::link($url, '', $attributes));
             }
@@ -125,48 +129,54 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
     public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
         $fieldid = $this->_field->id();
         $fieldname = "f_{$i}_$fieldid";
-
+        
         $arr = array();
-        $arr[] = &$mform->createElement('text', $fieldname, null, array('size'=>'32'));
+        $arr[] = &$mform->createElement('text', $fieldname, null, array('size' => '32'
+        ));
         $mform->setType($fieldname, PARAM_NOTAGS);
         $mform->setDefault($fieldname, $value);
         $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
-
-        return array($arr, null);
+        
+        return array($arr, null
+        );
     }
 
     /**
-     * Array of patterns this field supports 
+     * Array of patterns this field supports
      */
     protected function patterns() {
         $fieldname = $this->_field->name();
-
+        
         $patterns = parent::patterns();
-        $patterns["[[$fieldname]]"] = array(true);
-        $patterns["[[$fieldname:link]]"] = array(false);
-        $patterns["[[$fieldname:image]]"] = array(false);
-        $patterns["[[$fieldname:imageflex]]"] = array(false);
-        $patterns["[[$fieldname:media]]"] = array(false);
-
-        return $patterns; 
+        $patterns["[[$fieldname]]"] = array(true
+        );
+        $patterns["[[$fieldname:link]]"] = array(false
+        );
+        $patterns["[[$fieldname:image]]"] = array(false
+        );
+        $patterns["[[$fieldname:imageflex]]"] = array(false
+        );
+        $patterns["[[$fieldname:media]]"] = array(false
+        );
+        
+        return $patterns;
     }
-
 
     public function validate($entryid, $tags, $formdata) {
         $fieldid = $this->_field->id();
-
+        
         $formfieldname = "field_{$fieldid}_{$entryid}_url";
-
+        
         $errors = array();
         foreach ($tags as $tag) {
-            list(, $behavior,) = $this->process_tag($tag);
+            list(, $behavior, ) = $this->process_tag($tag);
             /* @var $behavior datalynx_field_behavior */
-            if ($behavior->is_required()
-                && (!isset($formdata->$formfieldname) || $formdata->$formfieldname === 'http://')) {
+            if ($behavior->is_required() &&
+                     (!isset($formdata->$formfieldname) || $formdata->$formfieldname === 'http://')) {
                 $errors["field_{$fieldid}_{$entryid}"] = get_string('fieldrequired', 'datalynx');
             }
         }
-
+        
         return $errors;
     }
 }

@@ -8,34 +8,37 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ *
  * @package datalynxfield
  * @subpackage select
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
+require_once ("$CFG->dirroot/mod/datalynx/field/field_form.php");
+
 
 class datalynxfield_select_form extends datalynxfield_option_form {
 
     public function field_definition() {
-        $mform =& $this->_form;
-
-        $mform->addElement('header', 'fieldattributeshdr', get_string('fieldattributes', 'datalynx'));
-
+        $mform = & $this->_form;
+        
+        $mform->addElement('header', 'fieldattributeshdr', 
+                get_string('fieldattributes', 'datalynx'));
+        
         // Default value.
         $mform->addElement('text', 'param2', get_string('default'));
         $mform->setType('param2', PARAM_TEXT);
-
+        
         // Allow add option?
         $mform->addElement('selectyesno', 'param4', get_string('allowaddoption', 'datalynx'));
-
+        
         // Allow choice limit?
         $mform->addElement('checkbox', 'param5', get_string('limitchoice', 'datalynx'));
         $mform->addHelpButton('param5', 'limitchoice', 'datalynx');
