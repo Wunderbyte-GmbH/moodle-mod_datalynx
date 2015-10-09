@@ -25,6 +25,9 @@ defined('MOODLE_INTERNAL') or die;
 require_once("$CFG->libdir/formslib.php");
 
 /**
+ * This class provides the form for editing the general settings of a view, that are common for all view types.
+ * It should be extended by the specific view type in order to reflect the specific view type settings
+ * 
  *
  */
 class datalynxview_base_form extends moodleform {
@@ -42,7 +45,7 @@ class datalynxview_base_form extends moodleform {
      *
      */
     function definition() {
-        global $CFG;
+        global $CFG, $DB;
         $view = $this->_view;
         $df = $this->_df;
         $editoroptions = $view->editors();
@@ -84,7 +87,6 @@ class datalynxview_base_form extends moodleform {
         $mform->addElement('select', '_filter', get_string('viewfilter', 'datalynx'), $filtersmenu);
         $mform->setDefault('_filter', 0);
 
-        global $DB;
         $mform->addElement('header', 'redirectsettings', get_string('redirectsettings', 'datalynx'));
         $mform->addHelpButton('redirectsettings', 'redirectsettings', 'datalynx');
         $mform->addElement('select', 'param10', get_string('redirectto', 'datalynx'), $this->get_view_menu());
@@ -95,17 +97,10 @@ class datalynxview_base_form extends moodleform {
         //-------------------------------------------------------------------------------
         $this->view_definition_before_gps();
 
-        // View template
+        // View template: header and editor for view template
         //-------------------------------------------------------------------------------
         $mform->addElement('header', 'viewtemplatehdr', get_string('viewtemplate', 'datalynx'));
         $mform->addHelpButton('viewtemplatehdr', 'viewtemplate', 'datalynx');
-
-        // section position
-        //$sectionposoptions = array(0 => 'top', 1 => 'left', 2 => 'right', 3 => 'bottom');
-        //$mform->addElement('select', 'sectionpos', get_string('viewsectionpos', 'datalynx'), $sectionposoptions);
-        //$mform->setDefault('sectionpos', 0);
-        
-        // section
         $mform->addElement('editor', 'esection_editor', '', null, $editoroptions['section']);
         $this->add_tags_selector('esection_editor', 'general');
 
@@ -179,19 +174,22 @@ class datalynxview_base_form extends moodleform {
     }
 
     /**
-     *
+     * To be used by a specific view
+     * Settings that apply before the "view template"
      */
     function view_definition_before_gps() {
     }
 
     /**
-     *
+     * To be used by a specific view
+     * Settings that apply after the "view template"
      */
     function view_definition_after_gps() {
     }
 
     /**
-     *
+     * override standard moodle action buttons
+     * @see moodleform::add_action_buttons()
      */
     function add_action_buttons($cancel = true, $submit = null){
         $mform = &$this->_form;
@@ -212,7 +210,11 @@ class datalynxview_base_form extends moodleform {
     }
 
     /**
-     *
+     * Prepares dropdown menu for inserting tags in the editorfield, that is usually placed above the dropdown menu
+     * Selecting a dropdown option places a tag into the editor field
+     * 
+     * @param string $editorname
+     * @param string $tagstype
      */
     function add_tags_selector($editorname, $tagstype){
         $view = $this->_view;

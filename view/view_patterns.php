@@ -70,8 +70,12 @@ class datalynxview_patterns {
         return $found;
     }
 
+
     /**
-     *
+     * Returns tags menu to be rendered as dropdown
+     * 
+     * @param string $showall
+     * @return array 
      */
     public final function get_menu($showall = false) {
         // the default menu category for views
@@ -510,9 +514,13 @@ class datalynxview_patterns {
         return $replacement;
     }
 
-    /**
-     *
-     */
+	/**
+	 * If viewname is not specified, return the URL of the current view
+	 * else return the URL of the $viewname
+	 * 
+	 * @param string $viewname
+	 * @return string base URL of the view, empty string if view does not exist
+	 */
     protected function get_viewurl_replacement($viewname = null) {
         $view = $this->_view;
         
@@ -539,8 +547,12 @@ class datalynxview_patterns {
     }
     
     /**
-     *
-     */
+	* return HTML of the content of a given view $viewname
+	* 
+	* 
+	* @param string $viewname
+	* @return string
+	*/
     protected function get_viewcontent_replacement($viewname = null) {
         $df = $this->_view->get_df();        
         static $views = null;
