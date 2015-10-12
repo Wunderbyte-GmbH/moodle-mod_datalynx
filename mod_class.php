@@ -1285,6 +1285,11 @@ class datalynx {
     }
 
     /**
+     * Get all views of a datalynx instance as an array indexed by viewid
+     * @param string $exclude
+     * @param string $forceget
+     * @param string $sort
+     * @return string[viewid]
      */
     public function get_views_menu($exclude = null, $forceget = false, $sort = '') {
         $views = array();

@@ -196,6 +196,8 @@ abstract class datalynxview_base {
     }
 
     /**
+     * Checks if patterns are cached. If yes patterns are retrieved from cache set in $this->_tags
+     * If no cached patterns are found, they are retrieved from the HTML provided in the view settings (definition)
      */
     protected function set__patterns() {
         $patterncache = cache::make('mod_datalynx', 'patterns');
@@ -477,6 +479,8 @@ abstract class datalynxview_base {
 
     /**
      * process any view specific actions
+     * 
+     * @return Ambigous <boolean, number, unknown, multitype:>
      */
     public function process_data() {
         
@@ -518,8 +522,7 @@ abstract class datalynxview_base {
     }
 
     /**
-     * Displays or echoes the content of a datalynx view
-     *
+     * Display or echo the content of a datalynx view
      *
      * @param array $options (tohtml = true means output is returned instead of echoed)
      * @return string (empty string of tohtml = false, html when tohtml is true)
@@ -582,6 +585,11 @@ abstract class datalynxview_base {
         return '';
     }
 
+    /**
+     * Get notifications
+     * 
+     * @return string notifications
+     */
     protected function print_notifications() {
         global $OUTPUT;
         $notifications = '';
@@ -594,6 +602,11 @@ abstract class datalynxview_base {
         return $notifications;
     }
 
+    /**
+     * Get message why no entries are shown in this view
+     * 
+     * @return Ambigous <mixed, string>
+     */
     protected function display_no_entries() {
         global $OUTPUT, $DB;
         
@@ -621,6 +634,9 @@ abstract class datalynxview_base {
     }
 
     /**
+     * Replace the tags in the view template section of a view with the appropriate values
+     * 
+     * @param array $options
      */
     public function set_view_tags($options) {
         // rewrite plugin urls
@@ -643,10 +659,9 @@ abstract class datalynxview_base {
         $replacements = $this->patterns()->get_replacements($tags, null, $options);
         foreach ($this->_vieweditors as $editor) {
             $text = $this->view->{"e$editor"};
-            list($text, $map) = $this->mask_tags($text);
-            $text = format_text($text, FORMAT_HTML, array('trusted' => 1, 'filter' => true
+            $text = $this->mask_tags($text);
+            $this->view->{"e$editor"} = format_text($text, FORMAT_HTML, array('trusted' => 1, 'filter' => true
             ));
-            $this->view->{"e$editor"} = $this->unmask_tags($text, $map);
             $this->view->{"e$editor"} = str_replace($tags, $replacements, $this->view->{"e$editor"});
         }
     }
@@ -655,7 +670,7 @@ abstract class datalynxview_base {
      * Masks view and field tags so that they do not get auto-linked
      * 
      * @param string $text a string with masked tags
-     * @return array an array containing data for unmasking
+     * @return $text HTML with masked tags
      */
     public function mask_tags($text) {
         $matches = array();
@@ -666,26 +681,10 @@ abstract class datalynxview_base {
         $map = $matches[0];
         foreach ($map as $index => $match) {
             $find[$index] = "/" . preg_quote($match, '/') . "/";
-            $replace[$index] = "!!!!!{$index}!!!!!";
+            $replace[$index] = '<span class="nolink">' . $match . '</span>';
         }
         $text = preg_replace($find, $replace, $text);
-        return array($text, $map
-        );
-    }
-
-    /**
-     * Reverses the tag masking
-     * 
-     * @param string $text a string with masked tags
-     * @param array $map an array containing data for unmasking, obtained through mask_tags
-     * @return string input string with tags restored
-     */
-    public function unmask_tags($text, $map) {
-        $find = array();
-        foreach (array_keys($map) as $index) {
-            $find[$index] = "/!!!!!{$index}!!!!!/";
-        }
-        return preg_replace($find, $map, $text);
+        return $text;
     }
     
     // //////////////////////////////////
@@ -756,7 +755,7 @@ abstract class datalynxview_base {
     }
 
     /**
-     *
+     * Get the class for view patterns (tag processing)
      * @return datalynxview_patterns
      */
     public function patterns() {
@@ -1068,6 +1067,8 @@ abstract class datalynxview_base {
     }
 
     /**
+     * Assemble the the replaced tags and field values to valid html
+     * @return string html
      */
     public function definition_to_html() {
         $html = '';
@@ -1398,6 +1399,9 @@ abstract class datalynxview_base {
     }
 
     /**
+     * Process the submitted data of entries
+     * 
+     * @return boolean|multitype:|number
      */
     public function process_entries_data() {
         $illegalaction = false;

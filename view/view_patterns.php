@@ -46,8 +46,10 @@ class datalynxview_patterns {
     }
 
     /**
+     * Find pattern/tags and return them in an array
      * 
      * @param string $text
+     * @return multitype:unknown
      */
     public function search($text) {
         $viewid = $this->_view->view->id;
