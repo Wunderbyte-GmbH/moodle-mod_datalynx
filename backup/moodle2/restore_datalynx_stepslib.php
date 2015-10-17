@@ -269,6 +269,29 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         $oldid = $data->id;
         
         $data->dataid = $this->get_new_parentid('datalynx');
+            
+        // Update teammemberselect ids in datalynx_rules event notifications
+        if ($data->param3 && $data->type == 'eventnotification') {
+            $unserialized = unserialize($data->param3);
+            if (!empty($unserialized['teams'])) {
+                foreach ($unserialized['teams'] as $key => $teamid) {
+                    $newreferencefieldid = $this->get_mappingid('datalynx_field', $teamid);
+                    $unserialized['teams'][$key] = $newreferencefieldid;
+                }
+                $data->param3 = serialize($unserialized);
+            }            
+        }
+        
+        // update the link to the views sent in the event notification
+        if ($data->param4 && $data->type == 'eventnotification') {
+            $views = unserialize($data->param4);
+            if (!empty($views)) {
+                foreach ($views as $key => $viewid) {
+                    $views[$key] = $this->get_mappingid('datalynx_view', $viewid);
+                }
+            }
+            $data->param4 = serialize($views);
+        }
         
         // insert the datalynx_fields record
         $newitemid = $DB->insert_record('datalynx_rules', $data);
@@ -413,8 +436,9 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         $datalynxnewid = $this->get_new_parentid('datalynx');
         
         // default view
-        if ($defaultview = $DB->get_field('datalynx', 'defaultview', array('id' => $datalynxnewid
-        ))) {
+        if ($defaultview = $DB->get_field('datalynx', 'defaultview', 
+                array('id' => $datalynxnewid
+                ))) {
             if ($defaultview = $this->get_mappingid('datalynx_view', $defaultview)) {
                 $DB->set_field('datalynx', 'defaultview', $defaultview, 
                         array('id' => $datalynxnewid
@@ -434,20 +458,24 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         }
         
         // single edit view
-        if ($singleedit = $DB->get_field('datalynx', 'singleedit', array('id' => $datalynxnewid
-        ))) {
+        if ($singleedit = $DB->get_field('datalynx', 'singleedit', 
+                array('id' => $datalynxnewid
+                ))) {
             if ($singleedit = $this->get_mappingid('datalynx_view', $singleedit)) {
-                $DB->set_field('datalynx', 'singleedit', $singleedit, array('id' => $datalynxnewid
-                ));
+                $DB->set_field('datalynx', 'singleedit', $singleedit, 
+                        array('id' => $datalynxnewid
+                        ));
             }
         }
         
         // single view
-        if ($singleview = $DB->get_field('datalynx', 'singleview', array('id' => $datalynxnewid
-        ))) {
+        if ($singleview = $DB->get_field('datalynx', 'singleview', 
+                array('id' => $datalynxnewid
+                ))) {
             if ($singleview = $this->get_mappingid('datalynx_view', $singleview)) {
-                $DB->set_field('datalynx', 'singleview', $singleview, array('id' => $datalynxnewid
-                ));
+                $DB->set_field('datalynx', 'singleview', $singleview, 
+                        array('id' => $datalynxnewid
+                        ));
             }
         }
         
@@ -474,13 +502,14 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
                             $newusers[] = $newuser;
                         } else {
                             $newusers[] = $user; // WARNING: hack for restoring into same instance
-                                                 // w/o course data
+                                                     // w/o course data
                         }
                     }
                 }
                 $newcontent = json_encode($newusers);
-                $DB->set_field('datalynx_contents', 'content', $newcontent, array('id' => $id
-                ));
+                $DB->set_field('datalynx_contents', 'content', $newcontent, 
+                        array('id' => $id
+                        ));
             }
         }
         
@@ -495,6 +524,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         $results = $DB->get_records_sql_menu($sql, 
                 array('type' => 'teammemberselect', 'dataid' => $datalynxnewid
                 ));
+        
         foreach ($results as $id => $referencefieldid) {
             $newreferencefieldid = $this->get_mappingid('datalynx_field', $referencefieldid);
             if ($newreferencefieldid) {
@@ -504,6 +534,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             }
         }
         
+
         // Update redirect on submit ids
         $sql = "SELECT dv.id, dv.param10
                   FROM {datalynx_views} dv
@@ -513,8 +544,9 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         foreach ($results as $id => $redirectid) {
             $newredirectid = $this->get_mappingid('datalynx_view', $redirectid);
             if ($newredirectid) {
-                $DB->set_field('datalynx_views', 'param10', $newredirectid, array('id' => $id
-                ));
+                $DB->set_field('datalynx_views', 'param10', $newredirectid, 
+                        array('id' => $id
+                        ));
             }
         }
         
@@ -528,8 +560,9 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
                         array('shortname' => $uifield->param2
                         ));
                 if ($infoid != (int) $uifield->param1) {
-                    $DB->set_field('datalynx_fields', 'param1', $infoid, array('id' => $fieldid
-                    ));
+                    $DB->set_field('datalynx_fields', 'param1', $infoid, 
+                            array('id' => $fieldid
+                            ));
                 }
             }
         }
