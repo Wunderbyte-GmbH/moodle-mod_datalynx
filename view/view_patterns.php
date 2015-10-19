@@ -656,7 +656,6 @@ class datalynxview_patterns {
         $cat = get_string('entries', 'datalynx');
         $patterns = array('##numentriestotal##' => array(true, $cat
         ), '##numentriesdisplayed##' => array(true, $cat
-        ), '##entries##' => array(true, $cat
         )
         );
         return $patterns;

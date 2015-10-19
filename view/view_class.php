@@ -146,7 +146,7 @@ abstract class datalynxview_base {
     protected function set_view($data) {
         $this->view->name = $data->name;
         $this->view->description = !empty($data->description) ? $data->description : '';
-        
+        $this->view->patterns = !empty($data->patterns) ? unserialize($data->patterns) : null;
         $this->view->visible = !empty($data->visible) ? $data->visible : 7;
         $this->view->perpage = !empty($data->perpage) ? $data->perpage : 0;
         $this->view->groupby = !empty($data->groupby) ? $data->groupby : '';
@@ -197,14 +197,18 @@ abstract class datalynxview_base {
 
     /**
      * Checks if patterns are cached. If yes patterns are retrieved from cache set in $this->_tags
-     * If no cached patterns are found, they are retrieved from the HTML provided in the view settings section field (definition)
+     * If no cached patterns are found, they are retrieved from the HTML provided in the 
+     * view settings section field (definition)
      */
     protected function set__patterns() {
-        $patterncache = cache::make('mod_datalynx', 'patterns');
-        $cachedpatterns = $patterncache->get($this->view->id);
+        global $DB;
+        $patterns = $this->view->patterns;
+        if(!is_null($this->view->patterns)){
+            $patterns = unserialize($this->view->patterns);
+        }
         
-        if (!$cachedpatterns) {
-            $cachedpatterns = array('view' => array(), 'field' => array()
+        if (!$patterns) {
+            $patterns = array('view' => array(), 'field' => array()
             );
             $text = '';
             foreach ($this->_editors as $editor) {
@@ -213,20 +217,19 @@ abstract class datalynxview_base {
             
             if (trim($text)) {
                 // This view patterns
-                $cachedpatterns['view'] = $this->patterns()->search($text);
+                $patterns['view'] = $this->patterns()->search($text);
                 
                 // Field patterns
                 if ($fields = $this->_df->get_fields()) {
                     foreach ($fields as $fieldid => $field) {
-                        $cachedpatterns['field'][$fieldid] = $field->renderer()->search($text);
+                        $patterns['field'][$fieldid] = $field->renderer()->search($text);
                     }
                 }
-                
-                $patterncache->set($this->view->id, $cachedpatterns);
+                $serializedpatterns = serialize($patterns);
+                $DB->set_field('datalynx_views', 'patterns', $serializedpatterns, array( 'id' => $this->view->id));
             }
         }
-        
-        $this->_tags = $cachedpatterns;
+        $this->_tags = $patterns;
     }
 
     /**
@@ -329,10 +332,9 @@ abstract class datalynxview_base {
      */
     public function update($data = null) {
         global $DB, $OUTPUT;
-        
+        // invalidate patterns in the view
+        $DB->set_field('datalynx_views', 'patterns', null, array('id' => $this->view->id));
         if ($data) {
-            $patterncache = cache::make('mod_datalynx', 'patterns');
-            $patterncache->delete($this->view->id, true);
             $data = $this->from_form($data);
             $this->set_view($data);
         }
@@ -779,6 +781,10 @@ abstract class datalynxview_base {
     }
 
     /**
+     * Get either all tags ($set = null) or field tags ($set = field) as an array
+     * 
+     * @param string $set current: field or view 
+     * @return Ambigous <multitype:, multitype:multitype: multitype:unknown  >|multitype:|boolean
      */
     public function get__patterns($set = null) {
         if (is_null($set)) {
