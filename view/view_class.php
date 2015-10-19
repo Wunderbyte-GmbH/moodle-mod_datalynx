@@ -197,7 +197,7 @@ abstract class datalynxview_base {
 
     /**
      * Checks if patterns are cached. If yes patterns are retrieved from cache set in $this->_tags
-     * If no cached patterns are found, they are retrieved from the HTML provided in the view settings (definition)
+     * If no cached patterns are found, they are retrieved from the HTML provided in the view settings section field (definition)
      */
     protected function set__patterns() {
         $patterncache = cache::make('mod_datalynx', 'patterns');

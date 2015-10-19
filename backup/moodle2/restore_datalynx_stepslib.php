@@ -240,7 +240,23 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             $data->filter = $this->get_mappingid('datalynx_filter', $data->filter);
         }
         
-        // adjust pattern field ids
+        // adjust filter id in patterns used in the view template general section
+        if($data->section){
+        	$searchpattern = "/;filter=([0-9]+?);/";
+        	$haystack = $data->section;
+        	$search = preg_match_all($searchpattern, $haystack, $matches);
+        	if($search > 0 && !empty($matches[1])){
+        		foreach ($matches[1] as $key => $filterid){
+        		    $newfilterid = $this->get_mappingid('datalynx_filter', $filterid);
+        			$toreplace[] = ";filter=" . $filterid . ";";
+        			$replacements[] = ";filter=" . $newfilterid . ";";
+        		}
+        		$data->section = str_replace($toreplace, $replacements, $data->section);
+        	}        	
+        }
+
+        
+        // adjust pattern field ids and filter ids
         if ($data->patterns) {
             $patterns = unserialize($data->patterns);
             $newpatterns = array('view' => $patterns['view'], 'field' => array()
@@ -250,6 +266,13 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
                     $newpatterns['field'][$this->get_mappingid('datalynx_field', $fieldid)] = $tags;
                 } else {
                     $newpatterns['field'][$fieldid] = $tags;
+                }
+            }
+            foreach ($newpatterns['view'] as $tagkey => $tag ) {
+                if(is_nan($tagkey && !empty($toreplace))){
+                    str_replace($toreplace, $replacements, $tag);
+                    $newpatterns['view'][$tag] = $tag;
+                    unset ($newpatterns['view'][$tagkey]); 
                 }
             }
             $data->patterns = serialize($newpatterns);
