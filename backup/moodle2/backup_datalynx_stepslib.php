@@ -71,7 +71,7 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
         $view = new backup_nested_element('view', array('id'
         ), 
                 array('type', 'name', 'description', 'visible', 'perpage', 'groupby', 'filter', 
-                    'section', 'sectionpos', 'patterns', 'param1', 'param2', 'param3', 'param4', 
+                    'patterns', 'section', 'sectionpos', 'param1', 'param2', 'param3', 'param4', 
                     'param5', 'param6', 'param7', 'param8', 'param9', 'param10'
                 ));
         
