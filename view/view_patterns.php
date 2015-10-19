@@ -130,7 +130,9 @@ class datalynxview_patterns {
         
         $replacements = array();
         foreach ($tags as $tag) {
-            if (in_array($tag, $info)) {
+            if($tag == '##entries##') {
+                $replacements[$tag] = '##entries##';
+            } else if (in_array($tag, $info)) {
                 $replacements[$tag] = $this->get_info_replacements($tag, $entry, $options);
             } else if (in_array($tag, $ref)) {
                 $replacements[$tag] = $this->get_ref_replacements($tag, $entry, $options);

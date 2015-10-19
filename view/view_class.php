@@ -680,8 +680,10 @@ abstract class datalynxview_base {
                 $matches, PREG_PATTERN_ORDER);
         $map = $matches[0];
         foreach ($map as $index => $match) {
-            $find[$index] = "/" . preg_quote($match, '/') . "/";
-            $replace[$index] = '<span class="nolink">' . $match . '</span>';
+            if ($match != '##entries##'){
+                $find[$index] = "/" . preg_quote($match, '/') . "/";
+                $replace[$index] = '<span class="nolink">' . $match . '</span>';
+            }
         }
         $text = preg_replace($find, $replace, $text);
         return $text;
