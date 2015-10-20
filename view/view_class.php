@@ -205,9 +205,8 @@ abstract class datalynxview_base {
         $patterns = $this->view->patterns;
         if(!is_null($this->view->patterns)){
             $patterns = unserialize($this->view->patterns);
-        }
-        
-        if (!$patterns) {
+            $this->_tags = $patterns;
+        } else {
             $patterns = array('view' => array(), 'field' => array()
             );
             $text = '';
@@ -217,7 +216,7 @@ abstract class datalynxview_base {
             
             if (trim($text)) {
                 // This view patterns
-                $patterns['view'] = $this->patterns()->search($text);
+                $patterns['view'] = $this->patterns()->search($text, false);
                 
                 // Field patterns
                 if ($fields = $this->_df->get_fields()) {
@@ -227,9 +226,9 @@ abstract class datalynxview_base {
                 }
                 $serializedpatterns = serialize($patterns);
                 $DB->set_field('datalynx_views', 'patterns', $serializedpatterns, array( 'id' => $this->view->id));
+                $this->__construct($this->_df, $this->view->id);
             }
         }
-        $this->_tags = $patterns;
     }
 
     /**

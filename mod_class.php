@@ -59,6 +59,9 @@ class datalynx {
 
     protected $fields = array();
 
+    /**
+     * @var array of view objects visible to the user indexed by viewid
+     */
     protected $views = array();
 
     protected $_filtermanager = null;
@@ -1136,8 +1139,10 @@ class datalynx {
      */
     
     /**
-     * Retrieves the view entries associated with the current
-     * datalynx instance visible to the current user.
+     * Retrieves the views associated with the current
+     * datalynx instance
+     * Sets $this->views to the views visible to the user
+     * Returns either views visible to the user or all views, but never saves all views to $this->views
      * 
      * @param boolean $forceget if true, the entries will be reread form the database
      * @param string $sort SQL ORDER BY clause
@@ -1156,9 +1161,12 @@ class datalynx {
             }
             $this->views = array();
             foreach ($views as $viewid => $view) {
-                if (!$checkvisibility || $this->is_visible_to_user($view)) {
+                if ($this->is_visible_to_user($view)) {
                     $this->views[$viewid] = $view;
-                }
+                } 
+            }
+            if(!$checkvisibility){
+                return $views;
             }
         }
         return $this->views;
