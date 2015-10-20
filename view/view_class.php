@@ -717,7 +717,7 @@ abstract class datalynxview_base {
      */
     public function unmask_tags($text) {
         $find = '/<span class="nolink" title="donotreplaceme">(.+?)<\/span>/is';
-        $replace = '$2';
+        $replace = '$1';
         $text = preg_replace($find, $replace, $text);
         return $text;
     }
