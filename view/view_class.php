@@ -28,13 +28,25 @@
 abstract class datalynxview_base {
 
     const ADD_NEW_ENTRY = -1;
-
+    
+    /**
+     * Subclasses must override the type with their name
+     * @var string view type
+     */
     protected $type = 'unknown';
- // Subclasses must override the type with their name
+    
+    /**
+     * 
+     * @var stdClass get_records object of datalynx_views
+     */
     public $view = NULL;
- // The view object itself, if we know it
+    
+    /**
+     *  
+     * @var datalynx object that this view belongs to
+     */
     protected $_df = NULL;
- // The datalynx object that this view belongs to
+    
     /**
      *
      * @var datalynx_filter
