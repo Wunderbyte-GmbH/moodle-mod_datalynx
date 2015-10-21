@@ -239,7 +239,7 @@ class datalynxview_base_form extends moodleform {
         $mform = &$this->_form;
         switch ($tagstype) {
             case 'general':
-                $tags = $view->patterns()->get_menu();
+                $tags = $view->patternclass()->get_menu();
                 $label = get_string('viewgeneraltags', 'datalynx');
                 break;
             

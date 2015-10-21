@@ -663,8 +663,9 @@ class datalynxview_patterns {
 
     /**
      * Get view references with localised string
+     * Only views visible to current user are used
      * 
-     * @return array multidimensional
+     * @return array associative array sith pattern string as value and key
      */
     protected function ref_patterns() {
         $cat = get_string('reference', 'datalynx');
@@ -689,7 +690,6 @@ class datalynxview_patterns {
                 );
             }
         }
-        
         return $patterns;
     }
 

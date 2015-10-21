@@ -30,14 +30,14 @@ abstract class datalynxview_base {
     const ADD_NEW_ENTRY = -1;
     
     /**
-     * Subclasses must override the type with their name
-     * @var string view type
+     * 
+     * @var string view type Subclasses must override the type with their name
      */
     protected $type = 'unknown';
     
     /**
      * 
-     * @var stdClass get_records object of datalynx_views
+     * @var stdClass get_record object of datalynx_views
      */
     public $view = NULL;
     
@@ -53,7 +53,10 @@ abstract class datalynxview_base {
      */
     protected $_filter = null;
 
-    protected $_patterns = null;
+    /**
+     * @var datalynxview_patterns
+     */
+    protected $patternclass = null;
 
     protected $_editors = array('section'
     );
@@ -218,7 +221,7 @@ abstract class datalynxview_base {
         global $DB;
         $patterns = $this->view->patterns;
         if(!is_null($this->view->patterns)){
-            $patterns = unserialize($this->view->patterns);
+            $patternarray = unserialize($this->view->patterns);
         }
         
         if (!$patterns) {
@@ -231,7 +234,7 @@ abstract class datalynxview_base {
             
             if (trim($text)) {
                 // This view patterns
-                $patterns['view'] = $this->patterns()->search($text);
+                $patterns['view'] = $this->patternclass()->search($text);
                 
                 // Field patterns
                 if ($fields = $this->_df->get_fields()) {
@@ -243,7 +246,7 @@ abstract class datalynxview_base {
                 $DB->set_field('datalynx_views', 'patterns', $serializedpatterns, array( 'id' => $this->view->id));
             }
         }
-        $this->_tags = $patterns;
+        $this->_tags = $patternarray;
     }
 
     /**
@@ -672,7 +675,7 @@ abstract class datalynxview_base {
         }
         
         $tags = $this->_tags['view'];
-        $replacements = $this->patterns()->get_replacements($tags, null, $options);
+        $replacements = $this->patternclass()->get_replacements($tags, null, $options);
         foreach ($this->_vieweditors as $editor) {
             $text = $this->view->{"e$editor"};
             $text = $this->mask_tags($text);
@@ -776,10 +779,10 @@ abstract class datalynxview_base {
      * Get the class for view patterns (tag processing)
      * @return datalynxview_patterns
      */
-    public function patterns() {
+    public function patternclass() {
         global $CFG;
         
-        if (!$this->_patterns) {
+        if (!$this->patternclass) {
             $viewtype = $this->type;
             
             if (file_exists("$CFG->dirroot/mod/datalynx/view/$viewtype/view_patterns.php")) {
@@ -789,9 +792,9 @@ abstract class datalynxview_base {
                 require_once ("$CFG->dirroot/mod/datalynx/view/view_patterns.php");
                 $patternsclass = "datalynxview_patterns";
             }
-            $this->_patterns = new $patternsclass($this);
+            $this->patternclass = new $patternsclass($this);
         }
-        return $this->_patterns;
+        return $this->patternclass;
     }
 
     /**
@@ -1200,7 +1203,7 @@ abstract class datalynxview_base {
         $fielddefinitions = $definitions;
         
         // enables view tag replacement within the entry template
-        if ($patterns = $this->patterns()->get_replacements($this->_tags['view'], null, $options)) {
+        if ($patterns = $this->patternclass()->get_replacements($this->_tags['view'], null, $options)) {
             $viewdefinitions = array();
             foreach ($patterns as $tag => $pattern) {
                 if ((strpos($tag, 'viewlink') !== 0 || strpos($tag, 'viewsesslink') !== 0) &&
