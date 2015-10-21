@@ -152,13 +152,15 @@ abstract class datalynxview_base {
         $this->_entries = new datalynx_entries($this->_df, $this->_filter);
     }
 
+
     /**
-     * Set view
+     * Updates the view with data submitted from from after editing the view settings
+     * @param stdClass $data form data
      */
     protected function set_view($data) {
         $this->view->name = $data->name;
         $this->view->description = !empty($data->description) ? $data->description : '';
-        $this->view->patterns = !empty($data->patterns) ? unserialize($data->patterns) : null;
+        $this->view->patterns = !empty($data->patterns) ? $data->patterns : null;
         $this->view->visible = !empty($data->visible) ? $data->visible : 7;
         $this->view->perpage = !empty($data->perpage) ? $data->perpage : 0;
         $this->view->groupby = !empty($data->groupby) ? $data->groupby : '';

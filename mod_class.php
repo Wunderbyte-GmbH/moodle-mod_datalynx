@@ -40,18 +40,26 @@ class datalynx {
 
     const COUNT_LEFT = 3;
 
+    /**
+     * 
+     * @var stdClass course module
+     */
     public $cm = NULL;
- // The course module
+    
+    /**
+     * 
+     * @var fieldset object of the course
+     */
     public $course = NULL;
- // The course record
+    
+    /**
+     * 
+     * @var fieldset record of datalynx instance
+     */
     public $data = NULL;
- // The datalynx record
     public $context = NULL;
- //
     public $groupmode = 0;
-
     public $currentgroup = 0;
- // current group id
     public $notifications = array('bad' => array(), 'good' => array()
     );
 
@@ -1136,16 +1144,15 @@ class datalynx {
      */
     
     /**
-     * Retrieves the view entries associated with the current
-     * datalynx instance visible to the current user.
+     * Retrieves the views associated with the current
+     * datalynx instance visible to the current user
+     * Updates $this->views
      * 
      * @param boolean $forceget if true, the entries will be reread form the database
      * @param string $sort SQL ORDER BY clause
-     * @param boolean $checkvisibility if true, only the entries of views visible to the current
-     *        user will be retrieved
      * @return array an array of datalynx_views entry objects
      */
-    public function get_view_records($forceget = false, $sort = '', $checkvisibility = true) {
+    public function get_view_records($forceget = false, $sort = '') {
         global $DB;
         
         if (empty($this->views) or $forceget) {
@@ -1156,7 +1163,7 @@ class datalynx {
             }
             $this->views = array();
             foreach ($views as $viewid => $view) {
-                if (!$checkvisibility || $this->is_visible_to_user($view)) {
+                if ($this->is_visible_to_user($view)) {
                     $this->views[$viewid] = $view;
                 }
             }
