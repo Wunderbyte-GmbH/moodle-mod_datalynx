@@ -1170,6 +1170,21 @@ class datalynx {
         }
         return $this->views;
     }
+    
+
+    /**
+     * Get all views of a datalynx instance
+     * @return array of view objects indexed by view id, empty array if no views are found
+     */
+    public function get_all_views(){
+        global $DB;
+        $views = array();
+        if (!$views = $DB->get_records('datalynx_views', array('dataid' => $this->id()))) {
+            return array();
+        } else {
+            return $views;
+        }
+    }
 
     /**
      * Verifies whether the current user has the needed

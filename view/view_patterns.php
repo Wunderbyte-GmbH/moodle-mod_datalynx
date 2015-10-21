@@ -167,7 +167,7 @@ class datalynxview_patterns {
         
         static $views = null;
         if ($views === null) {
-            $views = $df->get_view_records();
+            $views = $df->get_all_views();
             foreach ($views as $view) {
                 $viewname = $view->name;
                 
