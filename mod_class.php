@@ -1286,6 +1286,12 @@ class datalynx {
     }
 
     /**
+     * Get the view objects visible to the user as an array indexed by the view id
+     * 
+     * @param array $exclude array of viewids to exclude
+     * @param boolean $forceget true to get from db directly
+     * @param string $sort
+     * @return array of view objects indexed by view id or false if no views are found
      */
     public function get_views($exclude = null, $forceget = false, $sort = '') {
         if (!$this->get_view_records($forceget, $sort)) {
@@ -1293,7 +1299,6 @@ class datalynx {
         }
         
         static $views = null;
-        
         if ($views === null or $forceget) {
             $views = array();
             foreach ($this->views as $viewid => $view) {
