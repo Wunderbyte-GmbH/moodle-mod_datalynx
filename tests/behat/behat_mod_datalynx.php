@@ -221,8 +221,7 @@ class behat_mod_datalynx extends behat_files {
     /**
      * Deletes a view in the list
      *
-     * @Given /^I set "(?P<viewname_string>(?:[^"]|\\")*)" view in
-     * "(?P<activityname_string>(?:[^"]|\\")*)" instance as default view$/
+     * @Given /^I set "(?P<viewname_string>(?:[^"]|\\")*)" view in "(?P<activityname_string>(?:[^"]|\\")*)" instance as default view$/
      *
      * @param string $viewname,
      * @param string $activityname
@@ -241,8 +240,7 @@ class behat_mod_datalynx extends behat_files {
     /**
      * Deletes a view in the list
      *
-     * @Given /^I set "(?P<viewname_string>(?:[^"]|\\")*)" view in
-     * "(?P<activityname_string>(?:[^"]|\\")*)" instance as edit view$/
+     * @Given /^I set "(?P<viewname_string>(?:[^"]|\\")*)" view in "(?P<activityname_string>(?:[^"]|\\")*)" instance as edit view$/
      *
      * @param string $viewname,
      * @param string $activityname
