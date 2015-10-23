@@ -234,15 +234,15 @@ abstract class datalynxview_base {
             
             if (trim($text)) {
                 // This view patterns
-                $patterns['view'] = $this->patternclass()->search($text);
+                $patternarray['view'] = $this->patternclass()->search($text, false);
                 
                 // Field patterns
                 if ($fields = $this->_df->get_fields()) {
                     foreach ($fields as $fieldid => $field) {
-                        $patterns['field'][$fieldid] = $field->renderer()->search($text);
+                        $patternarray['field'][$fieldid] = $field->renderer()->search($text);
                     }
                 }
-                $serializedpatterns = serialize($patterns);
+                $serializedpatterns = serialize($patternarray);
                 $DB->set_field('datalynx_views', 'patterns', $serializedpatterns, array( 'id' => $this->view->id));
             }
         }

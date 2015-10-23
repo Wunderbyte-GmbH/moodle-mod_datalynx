@@ -49,14 +49,15 @@ class datalynxview_patterns {
      * Find pattern/tags and return them in an array
      * 
      * @param string $text
+     * @param boolean $checkvisibility if true only views visible to user are considered
      * @return multitype:unknown
      */
-    public function search($text) {
+    public function search($text, $checkvisibility = true) {
         $viewid = $this->_view->view->id;
         
         $found = array();
         // Fixed patterns
-        $patterns = array_keys($this->patterns());
+        $patterns = array_keys($this->patterns($checkvisibility));
         foreach ($patterns as $pattern) {
             if (strpos($text, $pattern) !== false) {
                 $found[] = $pattern;
@@ -64,7 +65,7 @@ class datalynxview_patterns {
         }
         
         // Regexp patterns
-        if ($patterns = array_keys($this->regexp_patterns())) {
+        if ($patterns = array_keys($this->regexp_patterns($checkvisibility))) {
             foreach ($patterns as $pattern) {
                 if (preg_match_all("/$pattern/", $text, $matches)) {
                     foreach ($matches[0] as $match) {
@@ -636,11 +637,11 @@ class datalynxview_patterns {
 
     /**
      * Get all tags in a single array
-     * 
-     * @return array of tags
+     * @param boolean $checkvisibility if true only views visible to user are considered
+     * @return array of tags/patterns
      */
-    protected function patterns() {
-        $patterns = array_merge($this->info_patterns(), $this->ref_patterns(), 
+    protected function patterns($checkvisibility = true) {
+        $patterns = array_merge($this->info_patterns(), $this->ref_patterns($checkvisibility), 
                 $this->userpref_patterns(), $this->action_patterns(), $this->paging_patterns(), 
                 $this->bulkedit_patterns());
         return $patterns;
@@ -667,7 +668,7 @@ class datalynxview_patterns {
      * 
      * @return array associative array sith pattern string as value and key
      */
-    protected function ref_patterns() {
+    protected function ref_patterns($checkvisibility = true) {
         $cat = get_string('reference', 'datalynx');
         $patterns = array('##viewurl##' => array(true, $cat
         ), '##viewsmenu##' => array(true, $cat
@@ -678,8 +679,15 @@ class datalynxview_patterns {
         $df = $this->_view->get_df();
         
         static $views = null;
-        if ($views === null) {
+        if ($views === null && $checkvisibility) {
             $views = $df->get_views_menu();
+        } else if ($checkvisibility == false) {
+        	$viewojects = $df->get_all_views();
+        	if(!empty($viewojects)){
+        		foreach ($viewojects as $viewid => $view){
+        			$views[$viewid] = $view->name;
+        		}        		
+        	}
         }
         
         if ($views) {
@@ -754,12 +762,22 @@ class datalynxview_patterns {
      * 
      * @return multitype:multitype:boolean unknown  multitype:boolean string
      */
-    protected function regexp_patterns() {
+    protected function regexp_patterns($checkvisibility = true) {
         $df = $this->_view->get_df();
         
         $patterns = array();
+        if($checkvisibility){
+        	$views = $df->get_views_menu();
+        } else {
+        	$viewojects = $df->get_all_views();
+        	if(!empty($viewojects)){
+        		foreach ($viewojects as $viewid => $view){
+        			$views[$viewid] = $view->name;
+        		}
+        	}
+        }
         // Get list of views
-        if ($views = $df->get_views_menu()) {
+        if ($views) {
             // View link
             $cat = get_string('reference', 'datalynx');
             foreach ($views as $viewname) {
