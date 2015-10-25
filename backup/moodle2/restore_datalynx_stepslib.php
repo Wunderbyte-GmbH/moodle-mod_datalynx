@@ -256,26 +256,9 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         }
 
         
-        // adjust pattern field ids and filter ids
+        // set patterns to null (they are only used as cache anyway)
         if ($data->patterns) {
-            $patterns = unserialize($data->patterns);
-            $newpatterns = array('view' => $patterns['view'], 'field' => array()
-            );
-            foreach ($patterns['field'] as $fieldid => $tags) {
-                if ($fieldid > 0) {
-                    $newpatterns['field'][$this->get_mappingid('datalynx_field', $fieldid)] = $tags;
-                } else {
-                    $newpatterns['field'][$fieldid] = $tags;
-                }
-            }
-            foreach ($newpatterns['view'] as $tagkey => $tag ) {
-                if(is_nan($tagkey && !empty($toreplace))){
-                    str_replace($toreplace, $replacements, $tag);
-                    $newpatterns['view'][$tag] = $tag;
-                    unset ($newpatterns['view'][$tagkey]); 
-                }
-            }
-            $data->patterns = serialize($newpatterns);
+            $data->patterns = NULL;
         }
         
         // insert the datalynx_views record
