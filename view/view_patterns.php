@@ -666,6 +666,7 @@ class datalynxview_patterns {
      * Get view references with localised string
      * Only views visible to current user are used
      * 
+     * @param boolean $checkvisibility true if only views visible to the user should be considered 
      * @return array associative array sith pattern string as value and key
      */
     protected function ref_patterns($checkvisibility = true) {
@@ -760,6 +761,7 @@ class datalynxview_patterns {
      * viewlink and viewsesslink tags with localised string
      * TODO Currently not included in the menu
      * 
+     * @param boolean $checkvisibility true if only views visible to the user should be considered
      * @return multitype:multitype:boolean unknown  multitype:boolean string
      */
     protected function regexp_patterns($checkvisibility = true) {
