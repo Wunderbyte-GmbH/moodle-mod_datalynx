@@ -81,8 +81,8 @@ class datalynxview_csv_patterns extends datalynxview_patterns {
 
     /**
      */
-    protected function patterns() {
-        $patterns = parent::patterns();
+    protected function patterns($checkvisibility = true) {
+        $patterns = parent::patterns($checkvisibility);
         $cat = get_string('pluginname', 'datalynxview_csv');
         $patterns['##export:all##'] = array(true, $cat
         );
