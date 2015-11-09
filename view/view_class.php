@@ -681,6 +681,7 @@ abstract class datalynxview_base {
             $text = $this->mask_tags($text);
             $this->view->{"e$editor"} = format_text($text, FORMAT_HTML, array('trusted' => 1, 'filter' => true
             ));
+            $this->view->{"e$editor"} = $this->unmask_tags($text);
             $this->view->{"e$editor"} = str_replace($tags, $replacements, $this->view->{"e$editor"});
         }
     }
@@ -688,7 +689,7 @@ abstract class datalynxview_base {
     /**
      * Masks view and field tags so that they do not get auto-linked
      * 
-     * @param string $text a string with masked tags
+     * @param string $text a string with tags to mask
      * @return $text HTML with masked tags
      */
     public function mask_tags($text) {
@@ -701,9 +702,22 @@ abstract class datalynxview_base {
         foreach ($map as $index => $match) {
             if ($match != '##entries##'){
                 $find[$index] = "/" . preg_quote($match, '/') . "/";
-                $replace[$index] = '<span class="nolink">' . $match . '</span>';
+                $replace[$index] = '<span class="nolink" title="donotreplaceme">' . $match . '</span>';
             }
         }
+        $text = preg_replace($find, $replace, $text);
+        return $text;
+    }
+    
+    /**
+     * Unmasks view and field tags
+     *
+     * @param string $text a string with masked tags
+     * @return $text HTML with unmasked tags
+     */
+    public function unmask_tags($text) {
+        $find = '/<span class="nolink" title="donotreplaceme">(.+?)<\/span>/is';
+        $replace = '$2';
         $text = preg_replace($find, $replace, $text);
         return $text;
     }
