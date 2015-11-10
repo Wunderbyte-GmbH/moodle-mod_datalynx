@@ -790,10 +790,10 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2015032208, 'datalynx');
     }
     
-    if ($oldversion < 2015102000) {
+    if ($oldversion < 2015111100) {
   		$views = $DB->set_field_select('datalynx_views','patterns',null, 'id >= 0');
     	// datalynx savepoint reached
-    	upgrade_mod_savepoint(true, 2015102000, 'datalynx');
+    	upgrade_mod_savepoint(true, 2015111100, 'datalynx');
     }
     
     return true;
