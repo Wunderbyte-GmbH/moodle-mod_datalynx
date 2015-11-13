@@ -778,8 +778,8 @@ $centery) // $y = '',
                 }
             }
         }
-        $foundtags += $this->patterns()->search($namepattern);
-        $replacements += $this->patterns()->get_replacements($foundtags);
+        $foundtags += $this->patternclass()->search($namepattern);
+        $replacements += $this->patternclass()->get_replacements($foundtags);
         foreach ($foundtags as $foundtag) {
             $namepattern = str_replace($foundtag, $replacements[$foundtag][1], $namepattern);
         }

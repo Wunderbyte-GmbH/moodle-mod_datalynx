@@ -80,7 +80,7 @@ class datalynxview_csv extends datalynxview_base {
             
             // Set view tags in header row
             $tags = $this->_tags['view'];
-            $replacements = $this->patterns()->get_replacements($tags);
+            $replacements = $this->patternclass()->get_replacements($tags);
             $tableheader = str_replace($tags, $replacements, $tableheader);
         }
         // Open table and wrap header with thead
@@ -237,7 +237,7 @@ class datalynxview_csv extends datalynxview_base {
             $text = !empty($data->param2) ? ' ' . $data->param2 : '';
             if (trim($text)) {
                 // This view patterns
-                if ($patterns = $this->patterns()->search($text)) {
+                if ($patterns = $this->patternclass()->search($text)) {
                     $this->_tags['view'] = array_merge($this->_tags['view'], $patterns);
                 }
                 // Field patterns
