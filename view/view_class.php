@@ -698,7 +698,7 @@ abstract class datalynxview_base {
         $replace = array();
         preg_match_all('/(?:(\[\[[^\]]+\]\])|(##[^#]+##)|(%%[^%]+%%)|(#\{\{[^\}#]+\}\}#))/', $text, 
                 $matches, PREG_PATTERN_ORDER);
-        $map = $matches[0];
+        $map = array_unique($matches[0]);
         foreach ($map as $index => $match) {
             if ($match != '##entries##'){
                 $find[$index] = "/" . preg_quote($match, '/') . "/";
@@ -718,13 +718,19 @@ abstract class datalynxview_base {
     public function unmask_tags($text) {
         $find = '/<span class="nolink" title="donotreplaceme">(.+?)<\/span>/is';
         $replace = '$1';
+        print_object($text);
         $text = preg_replace($find, $replace, $text);
+        print_object($text);
         return $text;
     }
     
     // //////////////////////////////////
     // HELPERS
     // //////////////////////////////////
+    /**
+     * Get fields of a view as an array
+     * @return array of field ids
+     */
     public function get_view_fields() {
         $viewfields = array();
         
@@ -736,11 +742,12 @@ abstract class datalynxview_base {
                 }
             }
         }
-        
         return $viewfields;
     }
 
     /**
+     * Renders fields as patterns
+     * @return array of strings (field pattern used in the view)
      */
     public function field_tags() {
         $patterns = array();
@@ -751,7 +758,6 @@ abstract class datalynxview_base {
                 }
             }
         }
-        
         return $patterns;
     }
 

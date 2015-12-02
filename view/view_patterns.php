@@ -156,7 +156,7 @@ class datalynxview_patterns {
     /**
      * Get the values for tags that contain a viewname or a fieldname
      * 
-     * @param unknown $tag
+     * @param string $tag
      * @param string $entry
      * @param array $options
      * @return string
@@ -318,7 +318,7 @@ class datalynxview_patterns {
 
     /**
      * Get the HTML code that replacee the user preferences tags like
-     * ##quickper##page
+     * ##quickperpage##
      * 
      * @param string $tag
      * @param string $entry
