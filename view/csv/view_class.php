@@ -452,7 +452,6 @@ class datalynxview_csv extends datalynxview_base {
                 if (!empty($csvcontent)) {
                     $data = $this->process_csv($data, $csvcontent, $options);
                     if (!empty($data->error)) {
-                        // print_object($data->error);
                         $this->_showimportform = true;
                     }
                 }
