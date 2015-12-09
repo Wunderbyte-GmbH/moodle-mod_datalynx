@@ -112,6 +112,7 @@ abstract class datalynxview_base {
         } else {
             $this->view = new stdClass();
             $this->view->id = 0;
+            $this->view->patterns = null;
             $this->view->type = $this->type;
             $this->view->dataid = $this->_df->id();
             $this->view->name = get_string('pluginname', "datalynxview_{$this->type}");
@@ -219,6 +220,7 @@ abstract class datalynxview_base {
      */
     protected function set__patterns() {
         global $DB;
+        $patternarray = array();
         $patterns = $this->view->patterns;
         if(!is_null($this->view->patterns)){
             $patternarray = unserialize($this->view->patterns);
@@ -364,8 +366,10 @@ abstract class datalynxview_base {
         return true;
     }
 
+
     /**
      * Delete a view from the database
+     * @return true
      */
     public function delete() {
         global $DB;
@@ -383,6 +387,8 @@ abstract class datalynxview_base {
     }
 
     /**
+     * Get the form object of the specific view type (grid, etc)
+     * @return formobject for view type
      */
     public function get_form() {
         global $CFG;
@@ -819,15 +825,17 @@ abstract class datalynxview_base {
      * Get either all tags ($set = null) or field tags ($set = field) as an array
      * 
      * @param string $set current: field or view 
-     * @return Ambigous <multitype:, multitype:multitype: multitype:unknown  >|multitype:|boolean
+     * @return array of either field or view tags, empty array if none of these tags is present
      */
     public function get__patterns($set = null) {
         if (is_null($set)) {
             return $this->_tags;
+        } else if (empty($this->_tags)){
+            return array();
         } else if ($set == 'view' or $set == 'field') {
             return $this->_tags[$set];
         } else {
-            return false;
+            return array();
         }
     }
 
