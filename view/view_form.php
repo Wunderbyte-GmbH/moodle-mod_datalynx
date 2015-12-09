@@ -42,7 +42,7 @@ class datalynxview_base_form extends moodleform {
         $this->_view = $view;
         $this->_df = $view->get_df();
         $attributes['id'] = 'datalynx-view-edit-form';
-        parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
+        parent::moodleform($action, $customdata, $method, $target, $attributes, $editable);
     }
 
     /**
@@ -53,6 +53,8 @@ class datalynxview_base_form extends moodleform {
         $df = $this->_df;
         $editoroptions = $view->editors();
         $mform = &$this->_form;
+        // remove input password field from core HACK
+        //$mform->removeElement('');
         
         // buttons
         // -------------------------------------------------------------------------------
