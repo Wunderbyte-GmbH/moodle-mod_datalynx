@@ -859,20 +859,28 @@ abstract class datalynxfield_option extends datalynxfield_base {
  */
 class datalynxfield_option_multiple extends datalynxfield_option {
 
+    /**
+     * Update the selected options in the entries. The field value of an entry saves the selected
+     * line numbers in a multiselect field. When an option is deleted, a line is deleted. Example:
+     * line 2 is deleted, therefore line 3 becomes line 2, line 4 becomes line 3 and so on.
+     * Therefore the values of the field in the entries have to be remapped to the new line numbers of the options
+     * @see datalynxfield_option::update_options()
+     */
     public function update_options($map = array()) {
         global $DB;
         $params = array();
         $i = 0;
-        $where = 'FALSE ';
+        $where = 'c.fieldid = :fieldid AND (';
         foreach ($map as $old => $new) {
-            $where .= 'OR ' . $DB->sql_like('c.content', ":old{$i}") . ' ';
+            $where .= $DB->sql_like('c.content', ":old{$i}") . ' OR ';
             $params["old{$i}"] = "%#{$old}#%";
             $i++;
         }
+        $where = rtrim($where,"OR ") . ")";
         $selectsql = "SELECT c.id, c.content
                         FROM {datalynx_contents} c
                        WHERE {$where}
-                         AND c.fieldid = :fieldid";
+                         ";
         $params['fieldid'] = $this->field->id;
         
         $oldcontents = $DB->get_records_sql_menu($selectsql, $params);
