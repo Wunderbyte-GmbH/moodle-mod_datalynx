@@ -729,6 +729,7 @@ $string['filterformadd'] = 'Add new filter form';
 $string['newfilterform'] = 'New filter form';
 
 // FILTER
+$string['avoidaddanddeletesimultaneously'] = 'Gleichzeitiges Entfernen und Umbenennen von Auswahlmöglichkeiten ist nicht erlaubt. Zuerst Entfernen und Speichern, dann Umbenennen und Speichern ist dier richtige Vorgehensweise';
 $string['anyof'] = 'ein beliebiges';
 $string['allof'] = 'alle';
 $string['exactly'] = 'exakt';

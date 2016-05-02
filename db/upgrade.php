@@ -796,6 +796,81 @@ function xmldb_datalynx_upgrade($oldversion) {
     	upgrade_mod_savepoint(true, 2015111100, 'datalynx');
     }
     
+    if ($oldversion < 2016050100) {
+            $sql = 'SELECT dc.*
+              	        FROM {datalynx_contents} dc
+              	        JOIN {datalynx_fields} df
+              	        ON dc.fieldid = df.id
+              	        WHERE df.type = "checkbox" OR df.type = "multiselect"';
+        $checkboxes = $DB->get_records_sql($sql);
+        foreach ($checkboxes AS $checkbox) {
+            $old = explode('#', $checkbox->content);
+            foreach ($old AS $key => $value){
+                $value = (int)$value;
+                if ($value === 0){
+                   unset($old[$key]);
+                }
+            }
+            $new = array_values(array_filter($old));
+            if(!empty($new)){
+                $new = serialize($new);
+            } else {
+                $new = NULL;
+            }
+            $checkbox->content = $new;
+            $DB->update_record('datalynx_contents', $checkbox, true);
+        }
+      	// datalynx savepoint reached
+      	upgrade_mod_savepoint(true, 2016050100, 'datalynx');
+    }
+    
+    if ($oldversion < 2016050101) {
+        $sql = 'SELECT dc.*
+              	        FROM {datalynx_contents} dc
+              	        JOIN {datalynx_fields} df
+              	        ON dc.fieldid = df.id
+              	        WHERE df.type = "checkbox" OR df.type = "multiselect"';
+        $checkboxes = $DB->get_records_sql($sql);
+        foreach ($checkboxes AS $checkbox) {
+            if($checkbox->content) {
+                $rawdata = unserialize($checkbox->content);
+                $new = implode(',',$rawdata);
+                $checkbox->content = $new;
+                $DB->update_record('datalynx_contents', $checkbox, true);
+            }
+
+        }
+        // datalynx savepoint reached
+        upgrade_mod_savepoint(true, 2016050101, 'datalynx');
+    }
+    
+    if ($oldversion < 2016050200) {
+            $sql = 'SELECT dc.*
+                  	        FROM {datalynx_contents} dc
+                  	        JOIN {datalynx_fields} df
+                  	        ON dc.fieldid = df.id
+                  	        WHERE df.type = "checkbox" OR df.type = "multiselect"';
+        $checkboxes = $DB->get_records_sql($sql);
+        foreach ($checkboxes AS $checkbox) {
+            if($checkbox->content) {
+                $old = explode(",", $checkbox->content);
+                foreach ($old AS $key => $value){
+                    $value = (int)$value;
+                    $old[$key] = $value;
+                    if ($value === 0){
+                        unset($old[$key]);
+                    }
+                }
+                $checkbox->content = implode (",", $old);
+                $new = "#".str_replace(",", "#,#", $checkbox->content)."#";
+                $checkbox->content = $new;
+                $DB->update_record('datalynx_contents', $checkbox, true);
+            }
+        }
+        // datalynx savepoint reached
+        upgrade_mod_savepoint(true, 2016050200, 'datalynx');
+    }
+    
     return true;
 }
 

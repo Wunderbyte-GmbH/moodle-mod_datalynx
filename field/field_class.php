@@ -712,7 +712,8 @@ abstract class datalynxfield_no_content extends datalynxfield_base {
 
 
 /**
- * Base class for Datalynx field types that offer a set of options
+ * Base class for Datalynx field types that offer single choice or multiplce choices
+ * from a set of options
  */
 abstract class datalynxfield_option extends datalynxfield_base {
 
@@ -739,6 +740,9 @@ abstract class datalynxfield_option extends datalynxfield_base {
     }
 
     /**
+     * 
+     * @param boolean $forceget
+     * @return Ambigous <multitype:, string>
      */
     public function options_menu($forceget = false) {
         if (!$this->_options or $forceget) {
@@ -763,9 +767,9 @@ abstract class datalynxfield_option extends datalynxfield_base {
     public abstract function update_options($map = array());
 
     /**
-     * TODO: add proper documentation
-     * todo: adjust check if there are old values.
-     * current check happens too late
+     * When an option from a single/multi choice is deleted / renamed or added
+     * the old content will be updated to the new values of the options. If an option
+     * is deleted all the selections for that specific option made in an entry will be deleted
      * (non-PHPdoc)
      * 
      * @see datalynxfield_base::set_field()
@@ -786,6 +790,11 @@ abstract class datalynxfield_option extends datalynxfield_base {
         $deletes = !empty($forminput->deleteoption) ? $forminput->deleteoption : array();
         $adds = preg_split("/[\|\r\n]+/", 
                 !empty($forminput->addoptions) ? $forminput->addoptions : '');
+        
+        // make sure there are no renames when options are deleted. That will not work
+        if(!empty(array_values($deletes))){
+            $renames = array();
+        }
         
         foreach (array_keys($deletes) as $id) {
             if (($addedid = array_search($oldvalues[$id], $adds)) !== false) {
@@ -825,6 +834,7 @@ abstract class datalynxfield_option extends datalynxfield_base {
                 $newvalues[] = $add;
             }
         }
+        
         if (!empty($this->_options)) {
             $this->update_options($map);
         }
@@ -835,6 +845,10 @@ abstract class datalynxfield_option extends datalynxfield_base {
         $this->field->param3 = isset($forminput->param3) ? $forminput->param3 : '';
     }
 
+    /**
+     * (non-PHPdoc)
+     * @see datalynxfield_base::format_search_value()
+     */
     public function format_search_value($searchparams) {
         list($not, $operator, $value) = $searchparams;
         if (is_array($value)) {
@@ -846,6 +860,8 @@ abstract class datalynxfield_option extends datalynxfield_base {
     }
 
     /**
+     * (non-PHPdoc)
+     * @see datalynxfield_base::parse_search()
      */
     public function parse_search($formdata, $i) {
         $fieldname = "f_{$i}_{$this->field->id}";
@@ -885,19 +901,36 @@ class datalynxfield_option_multiple extends datalynxfield_option {
         
         $oldcontents = $DB->get_records_sql_menu($selectsql, $params);
         foreach ($oldcontents as $id => $oldcontent) {
-            $newcontent = preg_replace('/#(\d)/', '#-$1', $oldcontent);
-            foreach ($map as $old => $new) {
-                $newcontent = preg_replace("/#-{$old}/", "#{$new}", $newcontent);
+            $prepareoldcontent = str_replace('#', '', $oldcontent);
+            $prepared = explode(",", $prepareoldcontent);
+            $replaced = array();
+            foreach ($prepared as $value){
+                if($map[$value] !== 0){
+                    $replaced[$map[$value]] = $map[$value];
+                }
             }
+            $implodedcontent = implode(",", $replaced);
+            $newcontent = "#".str_replace(",", "#,#", $implodedcontent)."#";
+
             $DB->set_field('datalynx_contents', 'content', $newcontent, array('id' => $id
             ));
         }
     }
 
+    /**
+     * does not support group by filter settings
+     * @see datalynxfield_base::supports_group_by()
+     */
     public function supports_group_by() {
         return false;
     }
 
+    /**
+     * Prepare the content of the field for database storage when an entry
+     * is modified or created
+     * (non-PHPdoc)
+     * @see datalynxfield_base::format_content()
+     */
     protected function format_content($entry, array $values = null) {
         $fieldid = $this->field->id;
         $contents = array();
@@ -908,13 +941,16 @@ class datalynxfield_option_multiple extends datalynxfield_option {
             $oldcontents[] = $entry->{"c{$fieldid}_content"};
         }
         
-        $value = reset($values);
-        // new contents
-        if (!empty($value)) {
-            $content = '#' . implode('#', $value) . '#';
-            if (!preg_match('/^#+$/', $content)) {
-                $contents[] = $content;
+        $newvalues = reset($values);
+        foreach ($newvalues as $key => $value){
+            if(empty($value)){
+                unset($newvalues[$key]);
             }
+        }
+        // new contents
+        if (!empty($newvalues)) {
+            $content = '#' . implode('#,#', $newvalues) . '#';
+            $contents[] = $content;
         }
         
         return array($contents, $oldcontents

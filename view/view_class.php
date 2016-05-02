@@ -536,6 +536,7 @@ abstract class datalynxview_base {
     }
 
     /**
+     * Retrieve the content for the fields which is savedn in the table datalynx_contents
      */
     public function set_content() {
         if ($this->_returntoentriesform) {

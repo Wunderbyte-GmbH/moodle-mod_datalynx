@@ -56,8 +56,8 @@ class datalynxfield_checkbox_renderer extends datalynxfield_renderer {
         
         $selected = array();
         if ($entryid > 0 and $content) {
-            $selectedraw = array_diff(array_unique(explode('#', $content)), [''
-            ]);
+            $contentprepare = str_replace("#", "", $content);
+            $selectedraw = explode(',',$contentprepare);
             
             foreach ($selectedraw as $item) {
                 $selected[$item] = $item;
@@ -78,6 +78,10 @@ class datalynxfield_checkbox_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * transform the raw database value into HTML suitable for displaying on the entry page
+     * (non-PHPdoc)
+     * @see datalynxfield_renderer::render_display_mode()
+     * @return string HTML
      */
     public function render_display_mode(stdClass $entry, array $params) {
         $field = $this->_field;
@@ -85,10 +89,11 @@ class datalynxfield_checkbox_renderer extends datalynxfield_renderer {
         
         if (isset($entry->{"c{$fieldid}_content"})) {
             $content = $entry->{"c{$fieldid}_content"};
-            
+            $contentprepare = str_replace("#", "", $content);
+
             $options = $field->options_menu();
             
-            $contents = explode('#', $content);
+            $contents = explode(',',$contentprepare);
             
             $str = array();
             foreach ($options as $key => $option) {

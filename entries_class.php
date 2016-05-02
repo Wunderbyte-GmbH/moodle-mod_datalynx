@@ -65,8 +65,12 @@ class datalynx_entries {
         $this->datalynx = $datalynx;
         $this->filter = $filter;
     }
-
     /**
+     * Populate the entries with content of the content table datalynx_contents. Gets the raw content
+     * for each field for the entry and sets the content in $this->_entries
+     * Performs entries count in order to display number of entries. Updates user profiels if
+     * plugin local_userinfosync is installed
+     * @param array $options
      */
     public function set_content(array $options = array()) {
         global $CFG;
@@ -105,6 +109,10 @@ class datalynx_entries {
     }
 
     /**
+     * retrieve all entries depending on the options passed and
+     * the permissions of the user viewing the view and other conditions
+     * @param array $options array of strings
+     * @return object retrieved entries
      */
     public function get_entries($options = null) {
         global $CFG, $DB, $USER;
@@ -332,6 +340,9 @@ class datalynx_entries {
     }
 
     /**
+     * get all entries created by the user with $userid
+     * @param integer $userid the user id of the user who created the entry (or was assigned as author of the entry)
+     * @return object
      */
     public function get_user_entries($userid = null) {
         global $USER;
@@ -345,6 +356,9 @@ class datalynx_entries {
     }
 
     /**
+     * count number of entries 
+     * @param boolean $filtered true for filtered only, false for total number of entries
+     * @return number
      */
     public function get_count($filtered = false) {
         if ($filtered) {
@@ -355,6 +369,8 @@ class datalynx_entries {
     }
 
     /**
+     * return entries
+     * @return multitype:
      */
     public function entries() {
         return $this->_entries;
@@ -772,6 +788,14 @@ class datalynx_entries {
         }
     }
 
+    /**
+     * Trigger events to notify the team members when new members were
+     * added to the field "teammemeberselect" in a specific entry
+     * @param object $entry
+     * @param object $field
+     * @param array $oldmembers
+     * @param array $newmembers
+     */
     public function notify_team_members($entry, $field, $oldmembers, $newmembers) {
         global $DB;
         
@@ -949,6 +973,11 @@ class datalynx_entries {
     }
 
     /**
+     * Update an entry
+     * @param object $entry
+     * @param array $data
+     * @param boolean $updatetime
+     * @return boolean|Ambigous <boolean, number>
      */
     public function update_entry($entry, $data = null, $updatetime = true) {
         global $CFG, $DB, $USER;
@@ -1023,6 +1052,11 @@ class datalynx_entries {
     }
 
     /**
+     * get sql params
+     * @param unknown $params
+     * @param array $param
+     * @param string $value
+     * @return string
      */
     private function sqlparams(&$params, $param, $value) {
         if (!array_key_exists($param, $params)) {

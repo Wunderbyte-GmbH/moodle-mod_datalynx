@@ -99,7 +99,11 @@ class datalynxfield_form extends moodleform {
     }
 }
 
-
+/**
+ * base form for fields that use multi and single choice options
+ * @author david
+ *
+ */
 class datalynxfield_option_form extends datalynxfield_form {
 
     /**
@@ -111,6 +115,9 @@ class datalynxfield_option_form extends datalynxfield_form {
         $this->add_option_dialog();
     }
 
+    /**
+     * Prepare the form to edit the options for a single or multi choice field
+     */
     protected function add_option_dialog() {
         $mform = &$this->_form;
         $options = $this->_field->get_options();
@@ -126,7 +133,9 @@ class datalynxfield_option_form extends datalynxfield_form {
                 $group[] = &$mform->createElement('text', "renameoption[{$id}]", '');
                 $group[] = &$mform->createElement('static', null, null, '</td><td>');
                 $group[] = &$mform->createElement('checkbox', "deleteoption[{$id}]", '');
-                $mform->disabledIf("renameoption[{$id}]", "deleteoption[{$id}]", 'checked');
+                foreach ($options as $newid => $newoption){
+                    $mform->disabledIf("renameoption[{$id}]", "deleteoption[{$newid}]", 'checked');
+                }
                 $group[] = &$mform->createElement('static', null, null, '</td></tr>');
             }
             $group[] = &$mform->createElement('static', null, null, '</tbody></table>');
@@ -149,10 +158,12 @@ class datalynxfield_option_form extends datalynxfield_form {
         
         $oldoptions = $this->_field->get_options();
         if (count($oldoptions) == 0 && empty($data['addoptions'])) {
-            $errors['addoptions'] = get_string('nooptions', 'datalynx');
+            $errors['existingoptions'] = get_string('nooptions', 'datalynx');
         } else if (isset($data['deleteoption']) && count($data['deleteoption']) == count(
                 $oldoptions) && empty($data['addoptions'])) {
-            $errors['addoptions'] = get_string('nooptions', 'datalynx');
+            $errors['existingoptions'] = get_string('nooptions', 'datalynx');
+        } else if(isset($data['deleteoption']) && isset($data['renameoption'])){
+            $errors['existingoptions'] = get_string('avoidaddanddeletesimultaneously'. 'datalynx');
         }
         
         return $errors;

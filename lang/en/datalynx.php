@@ -770,6 +770,7 @@ $string['filterformadd'] = 'Add new filter form';
 $string['newfilterform'] = 'New filter form';
 
 // FILTER
+$string['avoidaddanddeletesimultaneously'] = 'You must not add and delete options in one step. First delete the options and save, then rename the options and save again.';
 $string['empty'] = 'empty';
 $string['equal'] = 'equal';
 $string['between'] = 'between';
