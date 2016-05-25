@@ -793,7 +793,7 @@ abstract class datalynxfield_option extends datalynxfield_base {
         
         // make sure there are no renames when options are deleted. That will not work
         $delvalues = array_values($deletes);
-        if(!empty($tmp)){
+        if(!empty($delvalues)){
             $renames = array();
         }
         
