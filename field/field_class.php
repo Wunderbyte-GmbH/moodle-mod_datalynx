@@ -792,12 +792,15 @@ abstract class datalynxfield_option extends datalynxfield_base {
                 !empty($forminput->addoptions) ? $forminput->addoptions : '');
         
         // make sure there are no renames when options are deleted. That will not work
-        if(!empty(array_values($deletes))){
+        $delvalues = array_values($deletes);
+        if(!empty($tmp)){
             $renames = array();
         }
         
-        foreach (array_keys($deletes) as $id) {
-            if (($addedid = array_search($oldvalues[$id], $adds)) !== false) {
+        $delkeys = array_keys($deletes);
+        foreach ($delkeys as $id) {
+            $addedid = array_search($oldvalues[$id], $adds);
+            if ($addedid !== false) {
                 unset($adds[$addedid]);
                 unset($deletes[$id]);
             } else {
