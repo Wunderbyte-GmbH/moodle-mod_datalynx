@@ -239,7 +239,7 @@ class datalynx_entries {
         }
         
         // initialize returned object
-        $entries = new object();
+        $entries = new stdClass();
         $entries->max = $maxcount;
         $entries->found = $searchcount;
         $entries->entries = null;
@@ -445,7 +445,7 @@ class datalynx_entries {
                 
                 // Prepare the entries to process
                 foreach ($eids as $eid) {
-                    $entry = new object();
+                    $entry = new stdClass();
                     
                     // existing entry from view
                     if ($eid > 0 and isset($this->_entries[$eid])) {

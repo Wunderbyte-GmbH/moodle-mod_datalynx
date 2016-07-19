@@ -69,7 +69,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
         $rm = new datalynx_rating_manager();
         // Get entry rating objects
         if ($entry->id > 0) {
-            $options = new object();
+            $options = new stdClass();
             $options->context = $field->df()->context;
             $options->component = 'mod_datalynx';
             $options->ratingarea = 'entry';
@@ -78,7 +78,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
             // TODO check when scaleid is empty
             $options->scaleid = !empty($entry->scaleid) ? $entry->scaleid : $field->df()->data->rating;
             
-            $rec = new object();
+            $rec = new stdClass();
             $rec->itemid = $entry->id;
             $rec->context = $field->df()->context;
             $rec->component = 'mod_datalynx';

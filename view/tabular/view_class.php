@@ -273,7 +273,7 @@ class datalynxview_tabular extends datalynxview_base {
         // get patterns definitions
         $fields = $this->_df->get_fields();
         $fielddefinitions = array();
-        $entry = new object();
+        $entry = new stdClass();
         foreach ($this->_tags['field'] as $fieldid => $patterns) {
             $field = $fields[$fieldid];
             $entry->id = $entryid;

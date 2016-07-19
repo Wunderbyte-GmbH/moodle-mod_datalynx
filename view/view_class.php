@@ -1083,7 +1083,7 @@ abstract class datalynxview_base {
             return null;
         }
         
-        $gradingoptions = new object();
+        $gradingoptions = new stdClass();
         $gradingoptions->context = $this->_df->context;
         $gradingoptions->component = 'mod_datalynx';
         $gradingoptions->ratingarea = 'activity';

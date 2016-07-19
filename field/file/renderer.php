@@ -88,7 +88,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
             }
         }
         
-        $data = new object();
+        $data = new stdClass();
         $data->{$fieldname} = $strcontent;
         $data->{"{$fieldname}format"} = FORMAT_HTML;
         

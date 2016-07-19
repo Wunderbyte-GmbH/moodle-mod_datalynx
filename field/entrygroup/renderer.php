@@ -38,7 +38,7 @@ class datalynxfield_entrygroup_renderer extends datalynxfield_renderer {
         $edit = !empty($options['edit']) ? $options['edit'] : false;
         
         // set the group object
-        $group = new object();
+        $group = new stdClass();
         if ($entry->id < 0) { // new record (0)
             $entry->groupid = $field->df()->currentgroup;
             $group->id = $entry->groupid;

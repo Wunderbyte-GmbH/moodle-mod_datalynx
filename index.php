@@ -124,7 +124,7 @@ if ($showeditbuttons = $PAGE->user_allowed_editing()) {
     ));
 }
 
-$options = new object();
+$options = new stdClass();
 $options->noclean = true;
 $currentsection = null;
 $stredit = get_string('edit');

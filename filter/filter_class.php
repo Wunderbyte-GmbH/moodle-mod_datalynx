@@ -96,7 +96,7 @@ class datalynx_filter {
     /**
      */
     public function get_filter_obj() {
-        $filter = new object();
+        $filter = new stdClass();
         $filter->id = $this->id;
         $filter->dataid = $this->dataid;
         $filter->name = $this->name;
@@ -512,7 +512,7 @@ class datalynx_filter_manager {
         
         // Blank filter
         if ($filterid == self::BLANK_FILTER) {
-            $filter = new object();
+            $filter = new stdClass();
             $filter->dataid = $df->id();
             $filter->name = get_string('filternew', 'datalynx');
             $filter->perpage = 0;
@@ -549,7 +549,7 @@ class datalynx_filter_manager {
         if ($filterid == 0) {
             // If no default return empty
             if (!$df->data->defaultfilter) {
-                $filter = new object();
+                $filter = new stdClass();
                 $filter->dataid = $df->id();
                 
                 return new datalynx_filter($filter);
@@ -564,7 +564,7 @@ class datalynx_filter_manager {
         if ($this->get_filters() and isset($this->_filters[$filterid])) {
             return clone ($this->_filters[$filterid]);
         } else {
-            $filter = new object();
+            $filter = new stdClass();
             $filter->dataid = $df->id();
             
             return new datalynx_filter($filter);
@@ -754,7 +754,7 @@ class datalynx_filter_manager {
                         break;
                     
                     case 'visible':
-                        $updatefilter = new object();
+                        $updatefilter = new stdClass();
                         foreach ($filters as $filter) {
                             $updatefilter->id = $filter->id;
                             $updatefilter->visible = (int) !$filter->visible;

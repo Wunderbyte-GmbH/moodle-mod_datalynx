@@ -526,7 +526,7 @@ class datalynx {
             $viewrecords = $this->get_view_records();
             if (empty($viewrecords)) {
                 if ($page == 'view' or $page == 'embed') {
-                    $getstarted = new object();
+                    $getstarted = new stdClass();
                     $getstarted->presets = html_writer::link(
                             new moodle_url('/mod/datalynx/preset/index.php', array('d' => $thisid
                             )), get_string('presets', 'datalynx'));
@@ -1337,7 +1337,7 @@ class datalynx {
     public function set_default_view($viewid = 0) {
         global $DB;
         
-        $rec = new object();
+        $rec = new stdClass();
         $rec->id = $this->id();
         $rec->defaultview = $viewid;
         if (!$DB->update_record('datalynx', $rec)) {
@@ -1351,7 +1351,7 @@ class datalynx {
     public function set_default_filter($filterid = 0) {
         global $DB;
         
-        $rec = new object();
+        $rec = new stdClass();
         $rec->id = $this->id();
         $rec->defaultfilter = $filterid;
         if (!$DB->update_record('datalynx', $rec)) {
@@ -1365,7 +1365,7 @@ class datalynx {
     public function set_single_edit_view($viewid = 0) {
         global $DB;
         
-        $rec = new object();
+        $rec = new stdClass();
         $rec->id = $this->id();
         $rec->singleedit = $viewid;
         if (!$DB->update_record('datalynx', $rec)) {
@@ -1379,7 +1379,7 @@ class datalynx {
     public function set_single_more_view($viewid = 0) {
         global $DB;
         
-        $rec = new object();
+        $rec = new stdClass();
         $rec->id = $this->id();
         $rec->singleview = $viewid;
         if (!$DB->update_record('datalynx', $rec)) {
@@ -1453,7 +1453,7 @@ class datalynx {
                 // go ahead and perform the requested action
                 switch ($action) {
                     case 'visible':
-                        $updateview = new object();
+                        $updateview = new stdClass();
                         foreach ($views as $vid => $view) {
                             if ($vid == $this->data->defaultview) {
                                 // TODO: notify something
@@ -1478,7 +1478,7 @@ class datalynx {
                         break;
                     
                     case 'filter':
-                        $updateview = new object();
+                        $updateview = new stdClass();
                         $filterid = optional_param('fid', 0, PARAM_INT);
                         foreach ($views as $vid => $view) {
                             if ($filterid != $view->view->filter) {

@@ -23,7 +23,7 @@
 require_once ('../../../config.php');
 require_once ('../mod_class.php');
 
-$urlparams = new object();
+$urlparams = new stdClass();
 
 $urlparams->d = optional_param('d', 0, PARAM_INT); // datalynx id
 $urlparams->id = optional_param('id', 0, PARAM_INT); // course module id

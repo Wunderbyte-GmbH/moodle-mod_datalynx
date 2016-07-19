@@ -878,7 +878,7 @@ function datalynx_user_outline($course, $user, $mod, $data) {
     $sqlparams = array('dataid' => $data->id, 'userid' => $user->id
     );
     if ($countrecords = $DB->count_records('datalynx_entries', $sqlparams)) {
-        $result = new object();
+        $result = new stdClass();
         $result->info = get_string('entriescount', 'datalynx', $countrecords);
         $lastrecordset = $DB->get_records('datalynx_entries', $sqlparams, 'timemodified DESC', 
                 'id,timemodified', 0, 1);
@@ -889,7 +889,7 @@ function datalynx_user_outline($course, $user, $mod, $data) {
         }
         return $result;
     } else if ($grade) {
-        $result = new object();
+        $result = new stdClass();
         $result->info = get_string('grade') . ': ' . $grade->str_long_grade;
         $result->time = $grade->dategraded;
         return $result;

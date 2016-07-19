@@ -77,7 +77,7 @@ class datalynxfield_file extends datalynxfield_base {
         $files = $fs->get_area_files($usercontext->id, 'user', 'draft', $draftarea);
         if (count($files) > 1) {
             // there are files to upload so add/update content record
-            $rec = new object();
+            $rec = new stdClass();
             $rec->fieldid = $fieldid;
             $rec->entryid = $entryid;
             $rec->content = 1;
@@ -143,7 +143,7 @@ class datalynxfield_file extends datalynxfield_base {
             // move each file to its own area and add info to data
             if ($files = $fs->get_area_files($usercontext->id, 'user', 'draft', $draftid, 
                     'sortorder', false)) {
-                $rec = new object();
+                $rec = new stdClass();
                 $rec->contextid = $usercontext->id;
                 $rec->component = 'user';
                 $rec->filearea = 'draft';
@@ -207,7 +207,7 @@ class datalynxfield_file extends datalynxfield_base {
         $filecontent = substr_replace($filecontent, $data->$fieldname, $openbodypos, $sublength);
         
         // prepare new file record
-        $rec = new object();
+        $rec = new stdClass();
         $rec->contextid = $this->df->context->id;
         $rec->component = 'mod_datalynx';
         $rec->filearea = 'content';

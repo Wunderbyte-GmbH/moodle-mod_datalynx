@@ -28,7 +28,7 @@
  */
 require_once ('../../config.php');
 
-$urlparams = new object();
+$urlparams = new stdClass();
 $urlparams->d = optional_param('d', 0, PARAM_INT); // datalynx id
 $urlparams->id = optional_param('id', 0, PARAM_INT); // course module id
 $urlparams->cssedit = optional_param('cssedit', 0, PARAM_BOOL); // edit mode
@@ -97,7 +97,7 @@ if ($urlparams->cssedit) {
     if ($mform->is_cancelled()) {
     } else if ($data = $mform->get_data()) {
         // update the datalynx
-        $rec = new object();
+        $rec = new stdClass();
         $rec->css = $data->css;
         $rec->cssincludes = $data->cssincludes;
         $df->update($rec, get_string('csssaved', 'datalynx'));
@@ -107,7 +107,7 @@ if ($urlparams->cssedit) {
         $fs = get_file_storage();
         if ($files = $fs->get_area_files($usercontext->id, 'user', 'draft', $data->cssupload, 
                 'sortorder', false)) {
-            $filerec = new object();
+            $filerec = new stdClass();
             $filerec->contextid = $df->context->id;
             $filerec->component = 'mod_datalynx';
             $filerec->filearea = 'css';

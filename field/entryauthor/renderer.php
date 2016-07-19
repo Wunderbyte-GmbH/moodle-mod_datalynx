@@ -104,7 +104,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
                     'u.lastname ASC');
             // add a supervisor's id
             if (!in_array($entry->userid, array_keys($users))) {
-                $user = new object();
+                $user = new stdClass();
                 $user->id = $entry->userid;
                 $user->firstname = $entry->firstname;
                 $user->lastname = $entry->lastname;
@@ -207,7 +207,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
         if ($entry->id < 0) { // new entry
             $user = $USER;
         } else {
-            $user = new object();
+            $user = new stdClass();
             foreach (explode(',', user_picture::fields()) as $userfield) {
                 if ($userfield == 'id') {
                     $user->id = $entry->uid;

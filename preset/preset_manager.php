@@ -65,7 +65,7 @@ class datalynx_preset_manager {
                 if ($file->is_directory() || ($file->get_userid() != $USER->id and !$canviewall)) {
                     continue;
                 }
-                $preset = new object();
+                $preset = new stdClass();
                 $preset->contextid = $file->get_contextid();
                 $preset->path = $file->get_filepath();
                 $preset->name = $file->get_filename();
@@ -343,7 +343,7 @@ class datalynx_preset_manager {
                 if ($file->get_contextid() != $contextid) {
                     continue;
                 }
-                $preset = new object();
+                $preset = new stdClass();
                 $preset->contextid = $course_context->id;
                 $preset->component = 'mod_datalynx';
                 $preset->filearea = self::PRESET_COURSEAREA;
@@ -373,7 +373,7 @@ class datalynx_preset_manager {
                 false)) {
             $file = reset($files);
             $course_context = context_course::instance($this->_df->course->id);
-            $preset = new object();
+            $preset = new stdClass();
             $preset->contextid = $course_context->id;
             $preset->component = 'mod_datalynx';
             $preset->filearea = self::PRESET_COURSEAREA;
@@ -551,7 +551,7 @@ class datalynx_preset_manager {
         }
         
         $fs = get_file_storage();
-        $filerecord = new object();
+        $filerecord = new stdClass();
         $filerecord->contextid = self::PRESET_SITECONTEXT;
         $filerecord->component = 'mod_datalynx';
         $filerecord->filearea = self::PRESET_SITEAREA;

@@ -416,7 +416,7 @@ class datalynxview_csv extends datalynxview_base {
             return null;
         } else if ($formdata = $mform->get_data()) {
             
-            $data = new object();
+            $data = new stdClass();
             $data->eids = array();
             
             $fieldsettings = array();

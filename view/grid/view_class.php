@@ -196,7 +196,7 @@ class datalynxview_grid extends datalynxview_base {
         $fields = $this->_df->get_fields();
         $tags = array();
         $patterndefinitions = array();
-        $entry = new object();
+        $entry = new stdClass();
         foreach ($this->_tags['field'] as $fieldid => $patterns) {
             if (isset($fields[$fieldid])) {
                 $field = $fields[$fieldid];

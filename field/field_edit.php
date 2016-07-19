@@ -23,7 +23,7 @@
 require_once ('../../../config.php');
 require_once ("$CFG->dirroot/mod/datalynx/mod_class.php");
 
-$urlparams = new object();
+$urlparams = new stdClass();
 $urlparams->d = required_param('d', PARAM_INT); // datalynx ID
 
 $urlparams->type = optional_param('type', '', PARAM_ALPHA); // type of a field to edit

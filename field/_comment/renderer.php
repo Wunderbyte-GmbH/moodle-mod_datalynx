@@ -78,7 +78,7 @@ class datalynxfield__comment_renderer extends datalynxfield_renderer {
         $str = '';
         
         require_once ("$CFG->dirroot/comment/lib.php");
-        $cmt = new object();
+        $cmt = new stdClass();
         $cmt->context = $df->context;
         $cmt->courseid = $df->course->id;
         $cmt->cm = $df->cm;

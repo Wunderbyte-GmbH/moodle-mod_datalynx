@@ -76,7 +76,7 @@ class datalynxfield_textarea extends datalynxfield_base {
             return true;
         }
         
-        $rec = new object();
+        $rec = new stdClass();
         $rec->fieldid = $fieldid;
         $rec->entryid = $entryid;
         

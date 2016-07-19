@@ -46,7 +46,7 @@ class datalynxfield_editor_renderer extends datalynxfield_renderer {
         // editor
         $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
         
-        $data = new object();
+        $data = new stdClass();
         $data->$fieldname = isset($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : '';
         $data->{"{$fieldname}trust"} = true;
         $required = !empty($options['required']);

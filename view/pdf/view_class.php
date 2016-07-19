@@ -514,7 +514,7 @@ class datalynxview_pdf extends datalynxview_base {
         $fields = $this->_df->get_fields();
         $tags = array();
         $patterndefinitions = array();
-        $entry = new object();
+        $entry = new stdClass();
         foreach ($this->_tags['field'] as $fieldid => $patterns) {
             $field = $fields[$fieldid];
             $entry->id = $entryid;

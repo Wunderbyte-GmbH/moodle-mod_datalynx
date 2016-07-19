@@ -28,7 +28,7 @@
  */
 require_once ('../../config.php');
 
-$urlparams = new object();
+$urlparams = new stdClass();
 $urlparams->d = optional_param('d', 0, PARAM_INT); // datalynx id
 $urlparams->id = optional_param('id', 0, PARAM_INT); // course module id
 $urlparams->jsedit = optional_param('jsedit', 0, PARAM_BOOL); // edit mode
@@ -96,7 +96,7 @@ if ($urlparams->jsedit) {
     
     if ($mform->is_cancelled()) {
     } else if ($data = $mform->get_data()) {
-        $rec = new object();
+        $rec = new stdClass();
         $rec->js = $data->js;
         $rec->jsincludes = $data->jsincludes;
         $df->update($rec, get_string('jssaved', 'datalynx'));
@@ -106,7 +106,7 @@ if ($urlparams->jsedit) {
         $fs = get_file_storage();
         if ($files = $fs->get_area_files($usercontext->id, 'user', 'draft', $data->jsupload, 
                 'sortorder', false)) {
-            $filerec = new object();
+            $filerec = new stdClass();
             $filerec->contextid = $df->context->id;
             $filerec->component = 'mod_datalynx';
             $filerec->filearea = 'js';
