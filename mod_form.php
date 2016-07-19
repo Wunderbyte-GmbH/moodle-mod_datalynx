@@ -65,8 +65,14 @@ class mod_datalynx_mod_form extends moodleform_mod {
         $mform->setDefault('name', get_string('modulename', 'datalynx'));
         
         // intro
-        $this->add_intro_editor(false, get_string('intro', 'datalynx'));
-        
+		if ( $CFG->branch < 29 ) {
+            //This is valid before v2.9
+            $this->add_intro_editor(false, get_string('intro', 'datalynx'));
+        } else {
+            //This is valid after v2.9
+            $this->standard_intro_elements();
+        }
+		        
         // timing
         // -------------------------------------------------------------------------------
         $mform->addElement('header', 'timinghdr', get_string('timing', 'form'));
