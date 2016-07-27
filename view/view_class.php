@@ -146,6 +146,10 @@ abstract class datalynxview_base {
         if ($this->_df->currentgroup) {
             $baseurlparams['currentgroup'] = $this->_df->currentgroup;
         }
+		$usersearch = optional_param('usersearch', '', PARAM_TEXT);
+		if(!empty($usersearch)) {
+			$baseurlparams['usersearch'] = $usersearch;
+		}
         
         $this->_baseurl = new moodle_url("/mod/datalynx/{$this->_df->pagefile()}.php", 
                 $baseurlparams);
