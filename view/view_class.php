@@ -1238,7 +1238,7 @@ abstract class datalynxview_base {
             $viewdefinitions = array();
             foreach ($patterns as $tag => $pattern) {
                 if ((strpos($tag, 'viewlink') !== 0 || strpos($tag, 'viewsesslink') !== 0) &&
-                         !$options['edit']) {
+                    (!array_key_exists('edit', $options) || !$options['edit'])) {
                     foreach ($fielddefinitions as $fieldtag => $definition) {
                         $pattern = str_replace($fieldtag, 
                                 isset($definitions[$fieldtag][1]) ? $definitions[$fieldtag][1] : '', 

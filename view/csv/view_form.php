@@ -56,7 +56,7 @@ class datalynxview_csv_form extends datalynxview_base_form {
         $mform->setDefault('enclosure', '');
         
         // encoding
-        $choices = textlib::get_encodings();
+        $choices = core_text::get_encodings();
         $mform->addElement('select', 'encoding', get_string('encoding', 'grades'), $choices);
         $mform->setDefault('encoding', 'UTF-8');
         
