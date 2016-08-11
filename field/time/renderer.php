@@ -56,13 +56,22 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         $strtime = '';
         if (isset($entry->{"c{$fieldid}_content"})) {
             if ($content = $entry->{"c{$fieldid}_content"}) {
-                if (isset($params['date'])) {
+                $replacezerotime = false;
+                if(!empty($params['format'])) {
+                    $format = $params['format'];
+                } elseif(!empty($field->display_format)){
+                    $format = $field->display_format;
+                } elseif (isset($params['date'])) {
                     $format = get_string("strftimedate");
                 } else {
                     $format = get_string("strftimedatetime");
+                    $replacezerotime = true;
                 }
-                $format = !empty($params['format']) ? $params['format'] : $format;
                 $strtime = userdate($content, $format);
+                if($replacezerotime) {
+                    $strtime = str_replace(", 00:00", "", $strtime);
+                    $strtime = str_replace(" 00:00", "", $strtime);
+                }
             }
         }
         
