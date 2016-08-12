@@ -698,7 +698,7 @@ class datalynx {
         global $CFG;
         require_once $CFG->dirroot . '/mod/datalynx/view/view_class.php';
         $urlparams = new stdClass();
-        $datalynx = new datalynx($datalynxid, null, true);
+        $datalynx = new datalynx($datalynxid, null);
         $urlparams->d = $datalynxid;
         $urlparams->view = $viewid;
         $urlparams->pagelayout = 'external';
