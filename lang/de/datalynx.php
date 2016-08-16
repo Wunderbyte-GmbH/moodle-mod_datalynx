@@ -687,7 +687,7 @@ $string['message_entry_deleted'] = 'Guten Tag {$a->fullname},
 
 der Inhalt von {$a->datalynxlink} wurde von {$a->senderprofilelink} bearbeitet.
 
-Der folgende Eintrag wurde gelöscht: {$a->entryid}.';
+Ein Eintrag wurde gelöscht.';
 
 $string['message_entry_approved'] = 'Guten Tag {$a->fullname},
 

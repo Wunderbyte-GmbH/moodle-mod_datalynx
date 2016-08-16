@@ -726,7 +726,7 @@ $string['message_entry_deleted'] = 'Hello {$a->fullname},
 
 the content in {$a->datalynxlink} has been modified by {$a->senderprofilelink}.
 
-The following entry has been deleted: {$a->entryid}.';
+An entry has been deleted.';
 
 $string['message_entry_approved'] = 'Hello {$a->fullname},
 
