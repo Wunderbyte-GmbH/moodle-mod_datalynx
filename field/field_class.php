@@ -467,8 +467,7 @@ abstract class datalynxfield_base {
      * @return array of strings
      */
     public function get_content_parts() {
-        return array('content'
-        );
+        return array('content');
     }
 
     /**

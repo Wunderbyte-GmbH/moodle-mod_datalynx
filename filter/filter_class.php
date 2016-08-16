@@ -400,7 +400,7 @@ class datalynx_filter {
                     $whatcontent[] = $selectsql;
                     
                     // If not in sort or search separate datalynx_contents content b/c of limit on
-                // joins
+                    // joins
                     // This content would be fetched after the entries and added to the entries
                 } else {
                     if ($field->is_datalynx_content()) {

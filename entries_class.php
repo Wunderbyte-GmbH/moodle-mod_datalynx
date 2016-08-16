@@ -78,9 +78,7 @@ class datalynx_entries {
         if (isset($options['entriesset'])) {
             $entriesset = $options['entriesset'];
         } else if (!empty($options['user'])) {
-            $entriesset = $this->get_entries(array('search' => array('userid' => $options['user']
-            )
-            ));
+            $entriesset = $this->get_entries(array('search' => array('userid' => $options['user'])));
         } else {
             if (!optional_param('new', 0, PARAM_INT)) {
                 $entriesset = $this->get_entries($options);
@@ -128,8 +126,8 @@ class datalynx_entries {
         }
         
         // Filter sql
-        list($filtertables, $wheresearch, $sortorder, $whatcontent, $filterparams, $datalynxcontent) = $filter->get_sql(
-                $fields);
+        list($filtertables, $wheresearch, $sortorder, $whatcontent, $filterparams, $datalynxcontent) =
+                $filter->get_sql($fields);
         
         // named params array for the sql
         $params = array();
@@ -145,8 +143,7 @@ class datalynx_entries {
                 list($inusers, $userparams) = $DB->get_in_or_equal($filter->users, SQL_PARAMS_NAMED, 
                         'users');
                 $whereuser .= " AND e.userid $inusers ";
-                $params = array_merge($params, array('users' => $userparams
-                ));
+                $params = array_merge($params, array('users' => $userparams));
             }
             
             // exclude guest/anonymous
@@ -350,9 +347,7 @@ class datalynx_entries {
         if (empty($userid)) {
             $userid = $USER->id;
         }
-        return $this->get_entries(array('search' => array('userid' => $userid
-        )
-        ));
+        return $this->get_entries(array('search' => array('userid' => $userid)));
     }
 
     /**

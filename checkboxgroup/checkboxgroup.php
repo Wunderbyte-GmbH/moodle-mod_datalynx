@@ -17,9 +17,9 @@ class HTML_QuickForm_checkboxgroup extends HTML_QuickForm_element {
 
     var $_values = array();
 
-    function HTML_QuickForm_checkboxgroup($elementName = null, $elementLabel = null, $options = null, 
+    function __construct($elementName = null, $elementLabel = null, $options = null,
             $separator = null, $attributes = null) {
-        HTML_QuickForm_element::HTML_QuickForm_element($elementName, $elementLabel, $attributes);
+        HTML_QuickForm_element::__construct($elementName, $elementLabel, $attributes);
         $this->_persistantFreeze = true;
         if (count($options) > 1) {
             if (is_array($separator)) {

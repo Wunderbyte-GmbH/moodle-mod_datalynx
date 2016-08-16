@@ -44,7 +44,7 @@ abstract class datalynxfield_renderer {
     /**
      * Constructor
      */
-    public function datalynxfield_renderer(&$field) {
+    public function __construct(&$field) {
         $this->_field = $field;
     }
 

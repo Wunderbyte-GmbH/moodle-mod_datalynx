@@ -1145,9 +1145,10 @@ abstract class datalynxview_base {
                 if ($type === 'html') {
                     $mform->addElement('html', $content);
                 } else {
-                    list($func, $params) = $content;
-                    call_user_func_array($func, array_merge(array($mform
-                    ), $params));
+                    $func = $content[0];
+                    $entry = $content[1][0];
+                    $params = $content[1][1];
+                    call_user_func_array($func, array($mform, $entry, $params));
                 }
             }
         }
