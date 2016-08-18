@@ -670,6 +670,8 @@ $string['deletingbehavior'] = 'Deleting field behavior "{$a}"';
 $string['duplicatingbehavior'] = 'Duplicating field behavior "{$a}"';
 $string['confirmbehaviorduplicate'] = 'You are about to duplicate this field behavior!';
 $string['confirmbehaviordelete'] = 'You are about to delete this field behavior!';
+$string['deletingrenderer'] = 'Deleting field renderer "{$a}"';
+$string['confirmrendererdelete'] = 'You are about to delete this field renderer!';
 
 $string['notvisible'] = 'When not visible';
 $string['novalue'] = 'When empty';

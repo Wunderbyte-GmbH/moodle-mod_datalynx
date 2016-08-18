@@ -35,9 +35,9 @@ class datalynx_field_renderer_form extends moodleform {
      */
     private $datalynx;
 
-    public function datalynx_field_renderer_form(datalynx $datalynx) {
+    public function __construct(datalynx $datalynx) {
         $this->datalynx = $datalynx;
-        parent::moodleform();
+        parent::__construct();
     }
 
     protected function definition() {
@@ -139,6 +139,8 @@ class datalynx_field_renderer_form extends moodleform {
     }
 
     public function get_data() {
+        global $DB;
+
         $data = parent::get_data();
         if (!$data) {
             return null;
@@ -171,6 +173,13 @@ class datalynx_field_renderer_form extends moodleform {
         } else if ($data->noteditabletemplate == '0' || $data->noteditabletemplate == '1' ||
                  $data->noteditabletemplate == '2' || $data->noteditabletemplate == '3') {
             $data->noteditabletemplate = '<span>' . $data->noteditabletemplate . '</span>';
+        }
+        if($data->id == 0) {
+            // To prevent duplicate renderer names the string " 2" is added to the new name if it already exists
+            while($DB->record_exists('datalynx_renderers', array('name' => $data->name, 'dataid' => $data->d)))
+            {
+                $data->name = $data->name . " 2";
+            }
         }
         
         return $data;
