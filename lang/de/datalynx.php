@@ -661,14 +661,16 @@ $string['behaviors'] = 'Verhalten';
 $string['behavioradd'] = 'Verhalten anlegen';
 $string['defaultbehavior'] = 'Voreingestelltes Verhalten';
 
-$string['renderers'] = 'Renderers';
+$string['renderers'] = 'Renderer';
 $string['copyof'] = 'Kopie von {$a}';
 $string['mentor'] = 'Mentor';
 $string['notrequired'] = 'Nicht erforderlich';
-$string['newbehavior'] = 'New field behavior';
-$string['editingbehavior'] = 'Editing field behavior "{$a}"';
-$string['deletingbehavior'] = 'Deleting field behavior "{$a}"';
-$string['duplicatingbehavior'] = 'Duplicating field behavior "{$a}"';
+$string['newbehavior'] = 'Neues Feldverhalten';
+$string['editingbehavior'] = 'Bearbeiten Feldverhalten "{$a}"';
+$string['deletingbehavior'] = 'Löschen Feldverhalten "{$a}"';
+$string['duplicatingbehavior'] = 'Duplizieren Feldverhalten "{$a}"';
+$string['deletingrenderer'] = 'Löschen Feldrenderer "{$a}"';
+$string['confirmrendererdelete'] = 'Sie sind im Begriff, einen Feldrenderer zu löschen. Wollen Sie fortsetzen?';
 
 // / Message strings
 $string['message_entry_created'] = 'Guten Tag {$a->fullname},
