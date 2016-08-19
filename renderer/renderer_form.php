@@ -222,8 +222,17 @@ class datalynx_field_renderer_form extends moodleform {
             $errors['edittemplate'] = 'You must use tag #input somewhere in this template!';
         }
         if($data['id'] == 0) {
-            // To prevent duplicate renderer names
+            // To prevent duplicate renderer names when creating a new renderer
             if($DB->record_exists('datalynx_renderers', array('name' => $data['name'], 'dataid' => $data['d']))) {
+                $errors['name'] = get_string('duplicatename', 'datalynx');
+            }
+        } else {
+            // To prevent duplicate renderer names when updating existing renderers
+            $sql = "SELECT 'x'
+                    FROM {datalynx_renderers} r
+                    WHERE r.name = ? AND r.dataid = ? AND r.id <> ?";
+            $params = array($data['name'], $data['d'], $data['id']);
+            if ($DB->record_exists_sql($sql, $params)) {
                 $errors['name'] = get_string('duplicatename', 'datalynx');
             }
         }
