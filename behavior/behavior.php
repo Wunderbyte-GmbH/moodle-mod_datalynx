@@ -167,8 +167,7 @@ class datalynx_field_behavior {
 
     public static function get_behavior($behaviorid) {
         global $DB;
-        $record = $DB->get_record('datalynx_behaviors', array('id' => $behaviorid
-        ));
+        $record = $DB->get_record('datalynx_behaviors', array('id' => $behaviorid));
         return self::db_to_form($record);
     }
 

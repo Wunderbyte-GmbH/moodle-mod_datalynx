@@ -672,6 +672,9 @@ $string['confirmbehaviorduplicate'] = 'You are about to duplicate this field beh
 $string['confirmbehaviordelete'] = 'You are about to delete this field behavior!';
 $string['deletingrenderer'] = 'Deleting field renderer "{$a}"';
 $string['confirmrendererdelete'] = 'You are about to delete this field renderer!';
+$string['duplicatename'] = 'This name already exists. Please choose another one.';
+$string['duplicatingrenderer'] = 'Duplicating field renderer "{$a}"';
+$string['confirmrendererduplicate'] = 'You are about to duplicate this field renderer!';
 
 $string['notvisible'] = 'When not visible';
 $string['novalue'] = 'When empty';

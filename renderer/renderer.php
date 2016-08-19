@@ -136,8 +136,7 @@ class datalynx_field_renderer {
      */
     public static function get_renderer_by_id($id) {
         global $DB;
-        $record = $DB->get_record('datalynx_renderers', array('id' => $id
-        ), '*', MUST_EXIST);
+        $record = $DB->get_record('datalynx_renderers', array('id' => $id), '*', MUST_EXIST);
         return new datalynx_field_renderer($record);
     }
 
@@ -161,14 +160,51 @@ class datalynx_field_renderer {
         return new datalynx_field_renderer($record);
     }
 
+    public static function get_renderer($rendererid) {
+        global $DB;
+        $record = $DB->get_record('datalynx_renderers', array('id' => $rendererid));
+        return self::db_to_form($record);
+
+    }
+
+    public static function db_to_form($record) {
+        $formdata = new stdClass();
+        $formdata->id = isset($record->id) ? $record->id : 0;
+        $formdata->d = $record->dataid;
+        $formdata->name = $record->name;
+        $formdata->description = $record->description;
+        $formdata->notvisibletemplate = $record->notvisibletemplate;
+        $formdata->displaytemplate = $record->displaytemplate;
+        $formdata->novaluetemplate = $record->novaluetemplate;
+        $formdata->edittemplate = $record->edittemplate;
+        $formdata->noteditabletemplate = $record->noteditabletemplate;
+
+        return $formdata;
+    }
+
+    public static function form_to_db($formdata) {
+        $record = new stdClass();
+        $record->id = isset($formdata->id) ? $formdata->id : 0;
+        $record->dataid = $formdata->d;
+        $record->name = $formdata->name;
+        $record->description = $formdata->description;
+        $record->notvisibletemplate = $formdata->notvisibletemplate;
+        $record->displaytemplate = $formdata->displaytemplate;
+        $record->novaluetemplate = $formdata->novaluetemplate;
+        $record->edittemplate = $formdata->edittemplate;
+        $record->noteditabletemplate = $formdata->noteditabletemplate;
+
+        return $record;
+    }
+
     /**
      * Save renderer to db
      * @param datalynx_field_renderer $record
      * @return bool|int true or new id  
      */
-    public static function insert_renderer($record) {
+    public static function insert_renderer($formdata) {
         global $DB;
-        $record->dataid = $record->d;
+        $record = self::form_to_db($formdata);
         return $DB->insert_record('datalynx_renderers', $record);
     }
 
@@ -179,8 +215,7 @@ class datalynx_field_renderer {
      */
     public static function get_record($rendererid) {
         global $DB;
-        return $DB->get_record('datalynx_renderers', array('id' => $rendererid
-        ));
+        return $DB->get_record('datalynx_renderers', array('id' => $rendererid));
     }
 
     /**
@@ -189,13 +224,12 @@ class datalynx_field_renderer {
      */
     public static function duplicate_renderer($rendererid) {
         global $DB;
-        $object = self::get_renderer_by_id($rendererid);
+        $object = self::get_renderer($rendererid);
         $i = 0;
         do {
             $i++;
             $newname = get_string('copyof', 'datalynx', $object->name) . ' ' . $i;
-        } while ($DB->record_exists('datalynx_renderers', array('name' => $newname
-        )));
+        } while ($DB->record_exists('datalynx_renderers', array('name' => $newname)));
         $object->name = $newname;
         return self::insert_renderer($object);
     }

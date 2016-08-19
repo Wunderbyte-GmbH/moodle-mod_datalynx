@@ -139,9 +139,8 @@ class datalynx_field_renderer_form extends moodleform {
     }
 
     public function get_data() {
-        global $DB;
-
         $data = parent::get_data();
+
         if (!$data) {
             return null;
         }
@@ -174,14 +173,7 @@ class datalynx_field_renderer_form extends moodleform {
                  $data->noteditabletemplate == '2' || $data->noteditabletemplate == '3') {
             $data->noteditabletemplate = '<span>' . $data->noteditabletemplate . '</span>';
         }
-        if($data->id == 0) {
-            // To prevent duplicate renderer names the string " 2" is added to the new name if it already exists
-            while($DB->record_exists('datalynx_renderers', array('name' => $data->name, 'dataid' => $data->d)))
-            {
-                $data->name = $data->name . " 2";
-            }
-        }
-        
+
         return $data;
     }
 
@@ -220,6 +212,8 @@ class datalynx_field_renderer_form extends moodleform {
     }
 
     function validation($data, $files) {
+        global $DB;
+
         $errors = array();
         if (isset($data['displaytemplate']) && strpos($data['displaytemplate'], '#value') === false) {
             $errors['displaytemplate'] = 'You must use tag #value somewhere in this template!';
@@ -227,6 +221,13 @@ class datalynx_field_renderer_form extends moodleform {
         if (isset($data['edittemplate']) && strpos($data['edittemplate'], '#input') === false) {
             $errors['edittemplate'] = 'You must use tag #input somewhere in this template!';
         }
+        if($data['id'] == 0) {
+            // To prevent duplicate renderer names
+            if($DB->record_exists('datalynx_renderers', array('name' => $data['name'], 'dataid' => $data['d']))) {
+                $errors['name'] = get_string('duplicatename', 'datalynx');
+            }
+        }
+
         return $errors;
     }
 }

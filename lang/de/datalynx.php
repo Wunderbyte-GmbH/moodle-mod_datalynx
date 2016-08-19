@@ -671,6 +671,8 @@ $string['deletingbehavior'] = 'Löschen Feldverhalten "{$a}"';
 $string['duplicatingbehavior'] = 'Duplizieren Feldverhalten "{$a}"';
 $string['deletingrenderer'] = 'Löschen Feldrenderer "{$a}"';
 $string['confirmrendererdelete'] = 'Sie sind im Begriff, einen Feldrenderer zu löschen. Wollen Sie fortsetzen?';
+$string['duplicatename'] = 'Dieser Name existiert bereits. Wählen Sie bitte einen anderen!';
+$string['newrenderer'] = 'Neuer Feldrenderer';
 
 // / Message strings
 $string['message_entry_created'] = 'Guten Tag {$a->fullname},
@@ -772,3 +774,21 @@ $string['datalynx:editprivilegestudent'] = 'Teilnehmer/innen Editierrecht';
 $string['datalynx:editprivilegeteacher'] = 'Trainer/innen Editierrecht';
 $string['datalynx:notifyteamupdated'] = 'Bei Aktualisierung des Teams benachrichtigen';
 $string['datalynx:teamsubscribe'] = 'Einschreiben / einem Team beitreten';
+
+$string['notvisible'] = 'Wenn unsichtbar';
+$string['novalue'] = 'Wenn leer';
+$string['noteditable'] = 'Wenn nicht editierbar';
+$string['displaytemplate'] = 'Anzeige-Vorlage';
+$string['edittemplate'] = 'Bearbeiten-Vorlage';
+$string['shownothing'] = 'Nichts anzeigen';
+$string['custom'] = 'Angepasste Vorlage';
+$string['asdisplay'] = 'Verwende Anzeige-Vorlage';
+$string['disabled'] = 'Zeige deaktivierte Elemente';
+
+$string['duplicatingrenderer'] = 'Feldrenderer "{$a}" duplizieren';
+$string['confirmrendererduplicate'] = 'Sie sind im Begriff diesen Renderer zu duplizieren!';
+$string['confirmbehaviorduplicate'] = 'Sie sind im Begriff dieses Feldverhalten zu duplizieren';
+
+
+
+
