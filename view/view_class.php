@@ -1162,7 +1162,7 @@ abstract class datalynxview_base {
         static $entriesform = null;
         
         if ($entriesform == null) {
-            global $CFG, $DB;
+            global $CFG;
             // prepare params for for content management
             $actionparams = array('d' => $this->_df->id(), 'view' => $this->id(), 
                 'page' => $this->_filter->page, 'eids' => $this->_filter->eids, 
@@ -1170,8 +1170,7 @@ abstract class datalynxview_base {
                 'sourceview' => optional_param('sourceview', null, PARAM_INT)
             );
             $actionurl = new moodle_url("/mod/datalynx/{$this->_df->pagefile()}.php", $actionparams);
-            $custom_data = array('view' => $this, 'update' => $this->_editentries
-            );
+            $custom_data = array('view' => $this, 'update' => $this->_editentries);
             
             $formclass = 'datalynxview_entries_form';
             require_once ("$CFG->dirroot/mod/datalynx/view/view_entries_form.php");

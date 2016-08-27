@@ -27,7 +27,7 @@ class datalynxview_entries_form extends moodleform {
 
     protected function definition() {
         $view = $this->_customdata['view'];
-        $mform = & $this->_form;
+        $mform = &$this->_form;
         $mform->addElement('hidden', 'new', optional_param('new', 0, PARAM_INT));
         $mform->setType('new', PARAM_INT);
         
