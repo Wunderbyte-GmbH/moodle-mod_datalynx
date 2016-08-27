@@ -545,9 +545,11 @@ class datalynxview_patterns {
             }
             // Remove eids so that we return to list
             $url->remove_params('eids');
+            /* commented out by TN, see ticket: http://development.edulabs.org/redmine/issues/878
             // Make the link
-            $pagingbar = html_writer::link($url->out(false), 
+            $pagingbar = html_writer::link($url->out(false),
                     get_string('viewreturntolist', 'datalynx'));
+            */
             
             // typical groupby, one group per page case. show paging bar as per number of groups
         } else if (isset($filter->pagenum)) {
