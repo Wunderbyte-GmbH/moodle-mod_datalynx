@@ -28,12 +28,11 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
 
     public $type = 'multiselect';
 
-    public $separators = array(array('name' => 'New line', 'chr' => '<br />'
-    ), array('name' => 'Space', 'chr' => '&#32;'
-    ), array('name' => ',', 'chr' => '&#44;'
-    ), array('name' => ', (with space)', 'chr' => '&#44;&#32;'
-    ), array('name' => 'Unordered list', 'chr' => '</li><li>'
-    )
+    public $separators = array(array('name' => 'New line', 'chr' => '<br />'),
+        array('name' => 'Space', 'chr' => '&#32;'),
+        array('name' => ',', 'chr' => '&#44;'),
+        array('name' => ', (with space)', 'chr' => '&#44;&#32;'),
+        array('name' => 'Unordered list', 'chr' => '</li><li>')
     );
 
     /**
@@ -43,8 +42,7 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
         $selected = optional_param($fieldname, array(), PARAM_NOTAGS);
         if ($selected) {
             $allrequired = optional_param("{$fieldname}_allreq", 0, PARAM_BOOL);
-            return array('selected' => $selected, 'allrequired' => $allrequired
-            );
+            return array('selected' => $selected, 'allrequired' => $allrequired);
         } else {
             return false;
         }

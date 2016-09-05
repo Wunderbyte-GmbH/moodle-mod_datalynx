@@ -35,47 +35,37 @@ $urlparams->id = $datalynx->cm->id;
 require_capability('mod/datalynx:managetemplates', $datalynx->context);
 
 $module = array('name' => 'mod_datalynx', 'fullpath' => '/mod/datalynx/datalynx.js', 
-    'requires' => array('io'
-    )
-);
+    'requires' => array('io'));
 
 $PAGE->requires->js_init_call('M.mod_datalynx.behaviors_helper.init', array(), true, $module);
 
-$datalynx->set_page('behavior/index', array('urlparams' => $urlparams
-));
+$datalynx->set_page('behavior/index', array('urlparams' => $urlparams));
 
 // activate navigation node
 navigation_node::override_active_url(
-        new moodle_url('/mod/datalynx/behavior/index.php', array('id' => $datalynx->cm->id
-        )));
+    new moodle_url('/mod/datalynx/behavior/index.php', array('id' => $datalynx->cm->id)));
 
 // TODO: print notifications
 
 // print header
-$datalynx->print_header(array('tab' => 'behaviors', 'urlparams' => $urlparams
-));
+$datalynx->print_header(array('tab' => 'behaviors', 'urlparams' => $urlparams));
 
 echo html_writer::empty_tag('br');
-echo html_writer::start_tag('div', array('class' => 'fieldadd mdl-align'
-));
-echo html_writer::link(
-        new moodle_url('/mod/datalynx/behavior/behavior_edit.php', 
-                array('d' => $datalynx->id(), 'sesskey' => sesskey(), 'id' => 0
-                )), get_string('behavioradd', 'datalynx'));
+echo html_writer::start_tag('div', array('class' => 'fieldadd mdl-align'));
+echo html_writer::link(new moodle_url('/mod/datalynx/behavior/behavior_edit.php',
+            array('d' => $datalynx->id(), 'sesskey' => sesskey(), 'id' => 0)), get_string('behavioradd', 'datalynx'));
 echo html_writer::end_tag('div');
 echo html_writer::empty_tag('br');
 
 $editbaseurl = '/mod/datalynx/behavior/behavior_edit.php';
-$linkparams = array('d' => $datalynx->id(), 'sesskey' => sesskey()
-);
+$linkparams = array('d' => $datalynx->id(), 'sesskey' => sesskey());
 
 // table headers
 $headers = array('name' => get_string('name'), 'description' => get_string('description'), 
     'visibleto' => get_string('visibleto', 'datalynx'), 
     'editableby' => get_string('editableby', 'datalynx'), 'required' => get_string('required'), 
     'edit' => get_string('edit'), 'duplicate' => get_string('duplicate'), 
-    'delete' => get_string('delete')
-);
+    'delete' => get_string('delete'));
 
 $table = new flexible_table('datalynxbehaviorsindex' . $datalynx->id());
 $table->define_baseurl(
@@ -88,8 +78,7 @@ $table->define_headers(array_values($headers));
 $table->sortable(false);
 
 // Column styles
-$table->set_attribute('class', 
-        'generaltable generalbox boxaligncenter boxwidthwide datalynx-behaviors');
+$table->set_attribute('class', 'generaltable generalbox boxaligncenter boxwidthwide datalynx-behaviors');
 $table->set_attribute('data-sesskey', sesskey());
 $table->column_style('visibleto', 'text-align', 'center');
 $table->column_style('editableby', 'text-align', 'center');
@@ -100,36 +89,29 @@ $table->column_style('delete', 'text-align', 'center');
 
 $table->setup();
 
-$behaviors = $DB->get_records('datalynx_behaviors', array('dataid' => $datalynx->id()
-));
+$behaviors = $DB->get_records('datalynx_behaviors', array('dataid' => $datalynx->id()));
 
+// create table entries from behaviors
 foreach ($behaviors as $behaviorid => $behavior) {
     
     $fieldname = html_writer::link(
-            new moodle_url($editbaseurl, $linkparams + array('id' => $behaviorid
-            )), $behavior->name);
+            new moodle_url($editbaseurl, $linkparams + array('id' => $behaviorid)), $behavior->name);
     $fielddescription = shorten_text($behavior->description, 30);
-    $fieldedit = html_writer::link(
-            new moodle_url($editbaseurl, $linkparams + array('id' => $behaviorid
-            )), $OUTPUT->pix_icon('t/edit', get_string('edit')));
-    $fieldduplicate = html_writer::link(
-            new moodle_url($editbaseurl, 
-                    $linkparams + array('action' => 'duplicate', 'id' => $behaviorid
-                    )), $OUTPUT->pix_icon('t/copy', get_string('duplicate')));
-    $fielddelete = html_writer::link(
-            new moodle_url($editbaseurl, 
-                    $linkparams + array('action' => 'delete', 'id' => $behaviorid
-                    )), $OUTPUT->pix_icon('t/delete', get_string('delete')));
+    $fieldedit = html_writer::link(new moodle_url($editbaseurl, $linkparams + array('id' => $behaviorid)),
+        $OUTPUT->pix_icon('t/edit', get_string('edit')));
+    $fieldduplicate = html_writer::link(new moodle_url($editbaseurl,
+                    $linkparams + array('action' => 'duplicate', 'id' => $behaviorid)),
+        $OUTPUT->pix_icon('t/copy', get_string('duplicate')));
+    $fielddelete = html_writer::link(new moodle_url($editbaseurl,
+                    $linkparams + array('action' => 'delete', 'id' => $behaviorid)),
+                    $OUTPUT->pix_icon('t/delete', get_string('delete')));
     
     if ($behavior->required) {
         $fieldrequired = $OUTPUT->pix_icon('i/completion-manual-enabled', get_string('required'), 
-                'moodle', array('data-behavior-id' => $behaviorid, 'data-for' => 'required'
-                ));
+                'moodle', array('data-behavior-id' => $behaviorid, 'data-for' => 'required'));
     } else {
-        $fieldrequired = $OUTPUT->pix_icon('i/completion-manual-n', 
-                get_string('notrequired', 'datalynx'), 'moodle', 
-                array('data-behavior-id' => $behaviorid, 'data-for' => 'required'
-                ));
+        $fieldrequired = $OUTPUT->pix_icon('i/completion-manual-n', get_string('notrequired', 'datalynx'),
+            'moodle', array('data-behavior-id' => $behaviorid, 'data-for' => 'required'));
     }
     
     $permissionnames = $datalynx->get_datalynx_permission_names();
@@ -137,16 +119,13 @@ foreach ($behaviors as $behaviorid => $behavior) {
     $fieldvisible = '';
     foreach ($permissionnames as $permissionid => $permissionname) {
         if (in_array($permissionid, $visibleto)) {
-            $fieldvisible .= $OUTPUT->pix_icon('i/completion-manual-enabled', $permissionname, 
-                    'moodle', 
+            $fieldvisible .= $OUTPUT->pix_icon('i/completion-manual-enabled', $permissionname, 'moodle',
                     array('data-behavior-id' => $behaviorid, 'data-permission-id' => $permissionid, 
-                        'data-for' => 'visibleto'
-                    ));
+                        'data-for' => 'visibleto'));
         } else {
             $fieldvisible .= $OUTPUT->pix_icon('i/completion-manual-n', $permissionname, 'moodle', 
                     array('data-behavior-id' => $behaviorid, 'data-permission-id' => $permissionid, 
-                        'data-for' => 'visibleto'
-                    ));
+                        'data-for' => 'visibleto'));
         }
     }
     
@@ -154,25 +133,21 @@ foreach ($behaviors as $behaviorid => $behavior) {
     $fieldeditable = '';
     foreach ($permissionnames as $permissionid => $permissionname) {
         if (in_array($permissionid, $editableby)) {
-            $fieldeditable .= $OUTPUT->pix_icon('i/completion-manual-enabled', $permissionname, 
-                    'moodle', 
-                    array('data-behavior-id' => $behaviorid, 'data-permission-id' => $permissionid, 
-                        'data-for' => 'editableby'
-                    ));
+            $fieldeditable .= $OUTPUT->pix_icon('i/completion-manual-enabled', $permissionname,'moodle',
+                array('data-behavior-id' => $behaviorid, 'data-permission-id' => $permissionid,
+                    'data-for' => 'editableby'));
         } else {
             $fieldeditable .= $OUTPUT->pix_icon('i/completion-manual-n', $permissionname, 'moodle', 
                     array('data-behavior-id' => $behaviorid, 'data-permission-id' => $permissionid, 
-                        'data-for' => 'editableby'
-                    ));
+                        'data-for' => 'editableby'));
         }
     }
     
-    $table->add_data(
-            array($fieldname, $fielddescription, $fieldvisible, $fieldeditable, $fieldrequired, 
-                $fieldedit, $fieldduplicate, $fielddelete
-            ));
+    $table->add_data(array($fieldname, $fielddescription, $fieldvisible, $fieldeditable, $fieldrequired,
+                $fieldedit, $fieldduplicate, $fielddelete));
 }
 
+// print table
 $table->finish_output();
 
 $datalynx->print_footer();

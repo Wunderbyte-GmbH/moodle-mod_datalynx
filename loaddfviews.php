@@ -33,16 +33,14 @@ require_login();
 $retviews = '';
 $retfilters = '';
 if ($d) {
-    if ($views = $DB->get_records_menu('datalynx_views', array('dataid' => $d
-    ), 'name', 'id,name')) {
+    if ($views = $DB->get_records_menu('datalynx_views', array('dataid' => $d), 'name', 'id,name')) {
         $viewmenu = array();
         foreach ($views as $key => $value) {
             $viewmenu[] = "$key " . strip_tags($value);
         }
         $retviews = implode(',', $viewmenu);
     }
-    if ($filters = $DB->get_records_menu('datalynx_filters', array('dataid' => $d
-    ), 'name', 'id,name')) {
+    if ($filters = $DB->get_records_menu('datalynx_filters', array('dataid' => $d), 'name', 'id,name')) {
         $filtermenu = array();
         foreach ($filters as $key => $value) {
             $filtermenu[] = "$key " . strip_tags($value);

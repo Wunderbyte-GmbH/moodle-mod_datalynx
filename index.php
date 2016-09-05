@@ -43,27 +43,22 @@ $id = required_param('id', PARAM_INT); // course
                                                    // $delete = optional_param('delete', 0,
                                                    // PARAM_INT);
 
-if (!$course = $DB->get_record('course', array('id' => $id
-))) {
+if (!$course = $DB->get_record('course', array('id' => $id))) {
     throw new moodle_exception('invalidcourseid');
 }
 
 $context = context_course::instance($course->id);
 require_course_login($course);
 
-$event = \mod_datalynx\event\course_module_instance_list_viewed::create(
-        array('context' => $context
-        ));
+$event = \mod_datalynx\event\course_module_instance_list_viewed::create(array('context' => $context));
 $event->trigger();
 
 $modulename = get_string('modulename', 'datalynx');
 $modulenameplural = get_string('modulenameplural', 'datalynx');
 
-$PAGE->set_url('/mod/datalynx/index.php', array('id' => $id
-));
+$PAGE->set_url('/mod/datalynx/index.php', array('id' => $id));
 $PAGE->set_pagelayout('incourse');
-$PAGE->navbar->add($modulename, new moodle_url('/mod/datalynx/index.php', array('id' => $course->id
-)));
+$PAGE->navbar->add($modulename, new moodle_url('/mod/datalynx/index.php', array('id' => $course->id)));
 $PAGE->set_title($modulename);
 $PAGE->set_heading($course->fullname);
 
@@ -71,8 +66,7 @@ echo $OUTPUT->header();
 
 if (!$datalynxs = get_all_instances_in_course("datalynx", $course)) {
     notice(get_string('thereareno', 'moodle', $modulenameplural), 
-            new moodle_url('/course/view.php', array('id', $course->id
-            )));
+            new moodle_url('/course/view.php', array('id', $course->id)));
 }
 
 $usesections = course_format_uses_sections($course->format);
@@ -120,8 +114,7 @@ if ($rss) {
 if ($showeditbuttons = $PAGE->user_allowed_editing()) {
     $table->head[] = '';
     $table->align[] = 'center';
-    $editingurl = new moodle_url('/course/mod.php', array('sesskey' => sesskey()
-    ));
+    $editingurl = new moodle_url('/course/mod.php', array('sesskey' => sesskey()));
 }
 
 $options = new stdClass();
@@ -153,11 +146,10 @@ foreach ($datalynxs as $datalynx) {
     }
     
     // name (linked; dim if not visible)
-    $linkparams = !$datalynx->visible ? array('class' => 'dimmed'
-    ) : null;
+    $linkparams = !$datalynx->visible ? array('class' => 'dimmed') : null;
     $linkedname = html_writer::link(
-            new moodle_url('/mod/datalynx/view.php', array('id' => $datalynx->coursemodule
-            )), format_string($datalynx->name, true), $linkparams);
+            new moodle_url('/mod/datalynx/view.php', array('id' => $datalynx->coursemodule)),
+                    format_string($datalynx->name, true), $linkparams);
     $tablerow[] = $linkedname;
     
     // description
@@ -196,6 +188,5 @@ foreach ($datalynxs as $datalynx) {
 }
 
 echo html_writer::empty_tag('br');
-echo html_writer::tag('div', html_writer::table($table), array('class' => 'no-overflow'
-));
+echo html_writer::tag('div', html_writer::table($table), array('class' => 'no-overflow'));
 echo $OUTPUT->footer();

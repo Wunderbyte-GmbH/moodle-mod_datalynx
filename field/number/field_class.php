@@ -79,15 +79,12 @@ class datalynxfield_number extends datalynxfield_text {
                 list($notinids, $params) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED, 
                         "df_{$fieldid}_", false);
                 $sql = " e.id $notinids ";
-                return array($sql, $params, false
-                );
+                return array($sql, $params, false);
             } else {
-                return array('', '', ''
-                );
+                return array('', '', '');
             }
         } else {
-            return array($sql, $params, true
-            );
+            return array($sql, $params, true);
         }
     }
 
@@ -106,8 +103,7 @@ class datalynxfield_number extends datalynxfield_text {
             $contents[] = $value;
         }
         
-        return array($contents, $oldcontents
-        );
+        return array($contents, $oldcontents);
     }
 
     public function parse_search($formdata, $i) {
@@ -115,8 +111,7 @@ class datalynxfield_number extends datalynxfield_text {
         
         $name = 'f_' . $i . '_' . $this->field->id;
         
-        $data = isset($formdata->$name) ? $formdata->$name : optional_param_array($name, [], 
-                PARAM_RAW);
+        $data = isset($formdata->$name) ? $formdata->$name : optional_param_array($name, [], PARAM_RAW);
         if (empty($data)) {
             return false;
         }

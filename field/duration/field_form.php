@@ -37,20 +37,14 @@ class datalynxfield_duration_form extends datalynxfield_form {
         
         // field width
         $fieldwidthgrp = array();
-        $fieldwidthgrp[] = &$mform->createElement('text', 'param2', null, array('size' => '8'
-        ));
+        $fieldwidthgrp[] = &$mform->createElement('text', 'param2', null, array('size' => '8'));
         $fieldwidthgrp[] = &$mform->createElement('select', 'param3', null, 
-                array('px' => 'px', 'em' => 'em', '%' => '%'
-                ));
+                array('px' => 'px', 'em' => 'em', '%' => '%'));
         $mform->addGroup($fieldwidthgrp, 'fieldwidthgrp', get_string('fieldwidth', 'datalynx'), 
-                array(' '
-                ), false);
+                array(' '), false);
         $mform->setType('param2', PARAM_INT);
         $mform->addGroupRule('fieldwidthgrp', 
-                array('param2' => array(array(null, 'numeric', null, 'client'
-                )
-                )
-                ));
+                array('param2' => array(array(null, 'numeric', null, 'client'))));
         $mform->disabledIf('param3', 'param2', 'eq', '');
         $mform->setDefault('param2', '');
         $mform->setDefault('param3', 'px');

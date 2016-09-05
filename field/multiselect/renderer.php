@@ -121,9 +121,7 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
         
         $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
         
-        return array(array($select
-        ), null
-        );
+        return array(array($select), null);
     }
 
     public function validate($entryid, $tags, $formdata) {

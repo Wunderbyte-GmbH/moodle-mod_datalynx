@@ -35,9 +35,9 @@ class datalynx_field_filterform_form extends moodleform {
      */
     private $datalynx;
 
-    public function datalynx_field_filterform_form(datalynx $datalynx) {
+    public function __construct(datalynx $datalynx) {
         $this->datalynx = $datalynx;
-        parent::moodleform();
+        parent::__construct();
     }
 
     protected function definition() {
@@ -50,15 +50,13 @@ class datalynx_field_filterform_form extends moodleform {
         
         $mform->addElement('header', 'general', get_string('general', 'form'));
         
-        $mform->addElement('text', 'name', get_string('name'), array('size' => '32'
-        ));
+        $mform->addElement('text', 'name', get_string('name'), array('size' => '32'));
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', "Filter form name may not contain the pipe symbol \" | \"!", 
                 'regex', '/^[^\|]+$/', 'client');
         
-        $mform->addElement('text', 'description', get_string('description'), array('size' => '64'
-        ));
+        $mform->addElement('text', 'description', get_string('description'), array('size' => '64'));
         $mform->setType('description', PARAM_TEXT);
         
         $mform->addElement('checkboxgroup', 'fields', get_string('fields', 'datalynx'), 

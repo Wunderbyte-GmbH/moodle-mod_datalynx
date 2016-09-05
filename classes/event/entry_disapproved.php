@@ -68,7 +68,8 @@ class entry_disapproved extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' disapproved the datalynx entry with id '$this->objectid' for the datalynx activity " .
+        return "The user with id '$this->userid' disapproved the datalynx entry with " .
+            "id '$this->objectid' for the datalynx activity " .
                  "with the course module id '$this->contextinstanceid'.";
     }
 
@@ -79,8 +80,7 @@ class entry_disapproved extends \core\event\base {
      */
     public function get_url() {
         return new \moodle_url('/mod/datalynx/view.php', 
-                array('d' => $this->other['dataid'], 'rid' => $this->objectid
-                ));
+                array('d' => $this->other['dataid'], 'rid' => $this->objectid));
     }
 
     /**
@@ -91,8 +91,7 @@ class entry_disapproved extends \core\event\base {
     public function get_legacy_logdata() {
         return array($this->courseid, 'datalynx', 'entry_disapproved', 
             'view.php?d=' . $this->other['dataid'] . '&amp;eid=' . $this->objectid, 
-            $this->other['dataid'], $this->contextinstanceid
-        );
+            $this->other['dataid'], $this->contextinstanceid);
     }
 
     /**

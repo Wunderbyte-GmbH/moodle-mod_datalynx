@@ -58,8 +58,7 @@ class datalynxfield_userinfo extends datalynxfield_base {
         
         if ($this->field->param1 and ($this->field->param1 != $infoid or !$this->field->param2)) {
             $infoitems = 'shortname,datatype,defaultdata,defaultdataformat,param1,param2,param3,param4,param5';
-            if ($info = $DB->get_record('user_info_field', array('id' => $this->field->param1
-            ), $infoitems)) {
+            if ($info = $DB->get_record('user_info_field', array('id' => $this->field->param1), $infoitems)) {
                 $this->field->param2 = $info->shortname;
                 $this->field->param3 = $info->datatype;
                 $this->field->param4 = $info->defaultdata;
@@ -98,8 +97,7 @@ class datalynxfield_userinfo extends datalynxfield_base {
         if ($fieldid > 0) {
             $sql = " LEFT JOIN {user_info_data} c$fieldid ON 
                 (c$fieldid.userid = e.userid AND c$fieldid.fieldid = :$paramname$paramcount) ";
-            return array($sql, $this->infoid
-            );
+            return array($sql, $this->infoid);
         } else {
             return null;
         }

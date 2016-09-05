@@ -50,9 +50,7 @@ $datalynx->set_content();
 
 require_capability('mod/datalynx:viewentry', $datalynx->context);
 
-$headerparams = array('heading' => 'true', 'tab' => 'browse', 'groups' => true, 
-    'urlparams' => $urlparams
-);
+$headerparams = array('heading' => 'true', 'tab' => 'browse', 'groups' => true, 'urlparams' => $urlparams);
 
 $datalynx->print_header($headerparams);
 

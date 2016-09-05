@@ -45,8 +45,7 @@ require_capability('mod/datalynx:viewentry', $df->context);
 
 $df->set_content();
 
-$headerparams = array('groups' => true, 'urlparams' => $urlparams
-);
+$headerparams = array('groups' => true, 'urlparams' => $urlparams);
 $df->print_header($headerparams);
 
 $df->display();

@@ -37,8 +37,7 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
         $userinfo = $this->get_setting_value('userinfo');
         
         // Define each element separated
-        $datalynx = new backup_nested_element('datalynx', array('id'
-        ), 
+        $datalynx = new backup_nested_element('datalynx', array('id'),
                 array('name', 'intro', 'introformat', 'timemodified', 'timeavailable', 'timedue', 
                     'timeinterval', 'intervalcount', 'allowlate', 'grade', 'grademethod', 
                     'anonymous', 'notification', 'notificationformat', 'entriesrequired', 
@@ -48,74 +47,63 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
                     'completionentries'
                 ));
         
-        $module = new backup_nested_element('module', array('id'
-        ), array('groupmode'
-        ));
+        $module = new backup_nested_element('module', array('id'), array('groupmode'));
         
         $fields = new backup_nested_element('fields');
-        $field = new backup_nested_element('field', array('id'
-        ), 
+        $field = new backup_nested_element('field', array('id'),
                 array('type', 'name', 'description', 'visible', 'edits', 'label', 'param1', 
                     'param2', 'param3', 'param4', 'param5', 'param6', 'param7', 'param8', 'param9', 
                     'param10', 'targetcourse', 'targetinstance', 'targetview', 'targetfilter'
                 ));
         
         $filters = new backup_nested_element('filters');
-        $filter = new backup_nested_element('filter', array('id'
-        ), 
+        $filter = new backup_nested_element('filter', array('id'),
                 array('name', 'description', 'visible', 'perpage', 'selection', 'groupby', 'search', 
                     'customsort', 'customsearch'
                 ));
         
         $views = new backup_nested_element('views');
-        $view = new backup_nested_element('view', array('id'
-        ), 
+        $view = new backup_nested_element('view', array('id'),
                 array('type', 'name', 'description', 'visible', 'perpage', 'groupby', 'filter', 
                     'patterns', 'section', 'sectionpos', 'param1', 'param2', 'param3', 'param4', 
                     'param5', 'param6', 'param7', 'param8', 'param9', 'param10'
                 ));
         
         $rules = new backup_nested_element('rules');
-        $rule = new backup_nested_element('rule', array('id'
-        ), 
+        $rule = new backup_nested_element('rule', array('id'),
                 array('type', 'name', 'description', 'enabled', 'param1', 'param2', 'param3', 
                     'param4', 'param5', 'param6', 'param7', 'param8', 'param9', 'param10'
                 ));
         
         $entries = new backup_nested_element('entries');
-        $entry = new backup_nested_element('entry', array('id'
-        ), 
+        $entry = new backup_nested_element('entry', array('id'),
                 array('userid', 'groupid', 'timecreated', 'timemodified', 'approved', 'status'
                 ));
         
         $contents = new backup_nested_element('contents');
-        $content = new backup_nested_element('content', array('id'
-        ), array('fieldid', 'content', 'content1', 'content2', 'content3', 'content4'
+        $content = new backup_nested_element('content', array('id'),
+                array('fieldid', 'content', 'content1', 'content2', 'content3', 'content4'
         ));
         
         $ratings = new backup_nested_element('ratings');
-        $rating = new backup_nested_element('rating', array('id'
-        ), 
+        $rating = new backup_nested_element('rating', array('id'),
                 array('component', 'ratingarea', 'scaleid', 'value', 'userid', 'timecreated', 
                     'timemodified'
                 ));
         
         $grades = new backup_nested_element('grades');
-        $grade = new backup_nested_element('grade', array('id'
-        ), 
+        $grade = new backup_nested_element('grade', array('id'),
                 array('component', 'ratingarea', 'scaleid', 'value', 'userid', 'timecreated', 
                     'timemodified'
                 ));
         
         $behaviors = new backup_nested_element('behaviors');
-        $behavior = new backup_nested_element('behavior', array('id'
-        ), 
+        $behavior = new backup_nested_element('behavior', array('id'),
                 array('dataid', 'name', 'description', 'visibleto', 'editableby', 'required'
                 ));
         
         $renderers = new backup_nested_element('renderers');
-        $renderer = new backup_nested_element('renderer', array('id'
-        ), 
+        $renderer = new backup_nested_element('renderer', array('id'),
                 array('dataid', 'type', 'name', 'description', 'notvisibletemplate', 
                     'displaytemplate', 'novaluetemplate', 'edittemplate', 'noteditabletemplate'
                 ));
@@ -154,10 +142,8 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
         $renderers->add_child($renderer);
         
         // Define sources
-        $datalynx->set_source_table('datalynx', array('id' => backup::VAR_ACTIVITYID
-        ));
-        $module->set_source_table('course_modules', array('id' => backup::VAR_MODID
-        ));
+        $datalynx->set_source_table('datalynx', array('id' => backup::VAR_ACTIVITYID));
+        $module->set_source_table('course_modules', array('id' => backup::VAR_MODID));
         
         // TODO: fix sql, this is just a temporary fix and does not provide same functionality for
         // postgresql
@@ -182,36 +168,27 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
                              $DB->sql_cast_char2int('f.param3') . " = fil.id
                   WHERE f.dataid = :dataid
                GROUP BY f.id", 
-                            array('dataid' => backup::VAR_PARENTID
-                            ));
+                            array('dataid' => backup::VAR_PARENTID));
         } else {
             $field->set_source_sql(
                     "SELECT f.*
                FROM {datalynx_fields} f
               WHERE f.dataid = :dataid
                 AND f.type != 'datalynxview'", 
-                    array('dataid' => backup::VAR_PARENTID
-                    ));
+                    array('dataid' => backup::VAR_PARENTID));
         }
         
-        $filter->set_source_table('datalynx_filters', array('dataid' => backup::VAR_PARENTID
-        ));
-        $view->set_source_table('datalynx_views', array('dataid' => backup::VAR_PARENTID
-        ));
-        $rule->set_source_table('datalynx_rules', array('dataid' => backup::VAR_PARENTID
-        ));
-        $behavior->set_source_table('datalynx_behaviors', array('dataid' => backup::VAR_PARENTID
-        ));
-        $renderer->set_source_table('datalynx_renderers', array('dataid' => backup::VAR_PARENTID
-        ));
+        $filter->set_source_table('datalynx_filters', array('dataid' => backup::VAR_PARENTID));
+        $view->set_source_table('datalynx_views', array('dataid' => backup::VAR_PARENTID));
+        $rule->set_source_table('datalynx_rules', array('dataid' => backup::VAR_PARENTID));
+        $behavior->set_source_table('datalynx_behaviors', array('dataid' => backup::VAR_PARENTID));
+        $renderer->set_source_table('datalynx_renderers', array('dataid' => backup::VAR_PARENTID));
         
         // All the rest of elements only happen if we are including user info
         if ($userinfo) {
-            $entry->set_source_table('datalynx_entries', array('dataid' => backup::VAR_PARENTID
-            ));
+            $entry->set_source_table('datalynx_entries', array('dataid' => backup::VAR_PARENTID));
             $content->set_source_table('datalynx_contents', 
-                    array('entryid' => backup::VAR_PARENTID
-                    ));
+                    array('entryid' => backup::VAR_PARENTID));
             
             // Entry ratings
             $rating->set_source_table('rating', 

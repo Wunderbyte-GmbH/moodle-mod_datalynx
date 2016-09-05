@@ -29,10 +29,8 @@ $file = required_param('file', PARAM_FILE);
 // Check user is logged in
 require_login();
 
-$count = $DB->get_field('datalynx_contents', 'content2', array('id' => $cid
-));
+$count = $DB->get_field('datalynx_contents', 'content2', array('id' => $cid));
 $count++;
-$DB->set_field('datalynx_contents', 'content2', $count, array('id' => $cid
-));
+$DB->set_field('datalynx_contents', 'content2', $count, array('id' => $cid));
 redirect(new moodle_url("/pluginfile.php/$context/mod_datalynx/content/$cid/$file"));
 

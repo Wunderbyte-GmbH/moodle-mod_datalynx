@@ -37,8 +37,7 @@ class datalynxfield__approve extends datalynxfield_no_content {
         
         $fieldobjects[self::_APPROVED] = (object) array('id' => self::_APPROVED, 
             'dataid' => $dataid, 'type' => '_approve', 'name' => get_string('approved', 'datalynx'), 
-            'description' => '', 'visible' => 2, 'internalname' => 'approved'
-        );
+            'description' => '', 'visible' => 2, 'internalname' => 'approved');
         
         return $fieldobjects;
     }
@@ -65,8 +64,7 @@ class datalynxfield__approve extends datalynxfield_no_content {
      */
     public function get_search_sql($search) {
         $value = $search[2];
-        return array(" e.approved = $value ", array(), false
-        );
+        return array(" e.approved = $value ", array(), false);
     }
 
     /**
@@ -84,7 +82,6 @@ class datalynxfield__approve extends datalynxfield_no_content {
      * returns an array of distinct content of the field
      */
     public function get_distinct_content($sortdir = 0) {
-        return array('approved', 'Not approved'
-        );
+        return array('approved', 'Not approved');
     }
 }

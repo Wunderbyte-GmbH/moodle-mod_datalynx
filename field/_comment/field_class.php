@@ -54,8 +54,7 @@ class datalynxfield__comment extends datalynxfield_no_content {
      */
     public function get_sort_sql() {
         return '';
-        // return "(Select count(entryid) From mdl_datalynx_comments as cm Where cm.entryid =
-    // e.id)";
+        // return "(Select count(entryid) From mdl_datalynx_comments as cm Where cm.entryid = e.id)";
     }
 
     /**
@@ -66,11 +65,9 @@ class datalynxfield__comment extends datalynxfield_no_content {
         if (has_capability('mod/datalynx:managecomments', $this->df->context) or
                  ($params->commentarea == 'activity' and $params->itemid == $USER->id) or
                  ($params->commentarea == 'entry')) {
-            return array('post' => true, 'view' => true
-            );
+            return array('post' => true, 'view' => true);
         }
-        return array('post' => false, 'view' => false
-        );
+        return array('post' => false, 'view' => false);
     }
 
     /**
@@ -120,8 +117,7 @@ class datalynxfield__comment extends datalynxfield_no_content {
                 // }
                 
                 // validate entry
-                if (!$entry = $DB->get_record('datalynx_entries', array('id' => $params->itemid
-                ))) {
+                if (!$entry = $DB->get_record('datalynx_entries', array('id' => $params->itemid))) {
                     throw new comment_exception('invalidcommentitemid');
                 }
                 

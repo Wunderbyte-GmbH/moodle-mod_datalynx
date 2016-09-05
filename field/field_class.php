@@ -144,8 +144,7 @@ abstract class datalynxfield_base {
                 $fs->delete_area_files($this->df->context->id, 'mod_datalynx', $filearea);
             }
             $this->delete_content();
-            $DB->delete_records('datalynx_fields', array('id' => $this->field->id
-            ));
+            $DB->delete_records('datalynx_fields', array('id' => $this->field->id));
         }
         return true;
     }
@@ -217,8 +216,7 @@ abstract class datalynxfield_base {
             $formclass = 'datalynxfield_form';
         }
         $actionurl = new moodle_url('/mod/datalynx/field/field_edit.php', 
-                array('d' => $this->df->id(), 'fid' => $this->id(), 'type' => $this->type
-                ));
+                array('d' => $this->df->id(), 'fid' => $this->id(), 'type' => $this->type));
         return new $formclass($this, $actionurl);
     }
 
@@ -313,11 +311,9 @@ abstract class datalynxfield_base {
         global $DB;
         
         if ($entryid) {
-            $params = array('fieldid' => $this->field->id, 'entryid' => $entryid
-            );
+            $params = array('fieldid' => $this->field->id, 'entryid' => $entryid);
         } else {
-            $params = array('fieldid' => $this->field->id
-            );
+            $params = array('fieldid' => $this->field->id);
         }
         
         $rs = $DB->get_recordset('datalynx_contents', $params);
@@ -416,8 +412,7 @@ abstract class datalynxfield_base {
      * @return array of strings
      */
     protected function content_names() {
-        return array(''
-        );
+        return array('');
     }
 
     /**
@@ -443,10 +438,7 @@ abstract class datalynxfield_base {
             $oldcontent = $entry->{"c{$fieldid}_content"};
         }
         
-        return array(array($newcontent
-        ), array($oldcontent
-        )
-        );
+        return array(array($newcontent), array($oldcontent));
     }
 
     /**
@@ -492,8 +484,7 @@ abstract class datalynxfield_base {
         $fieldid = $this->field->id;
         if ($fieldid > 0) {
             $sql = " LEFT JOIN {datalynx_contents} c$fieldid ON (c$fieldid.entryid = e.id AND c$fieldid.fieldid = :$paramname$paramcount) ";
-            return array($sql, $fieldid
-            );
+            return array($sql, $fieldid);
         } else {
             return null;
         }
@@ -562,12 +553,10 @@ abstract class datalynxfield_base {
             $sql = " $varcharcontent $sql ";
         } else if (in_array($operator, array('LIKE', 'BETWEEN', ''
         ))) {
-            $params = array($name => "%$value%"
-            );
+            $params = array($name => "%$value%");
             $sql = $DB->sql_like($varcharcontent, ":$name", false);
         } else {
-            $params = array($name => "'$value'"
-            );
+            $params = array($name => "'$value'");
             $sql = " $varcharcontent $operator :$name ";
         }
         
@@ -578,14 +567,12 @@ abstract class datalynxfield_base {
                 list($notinids, $params) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED, 
                         "df_{$fieldid}_", false);
                 $sql = " e.id $notinids ";
-                return array($sql, $params, false
-                );
+                return array($sql, $params, false);
             } else {
                 return null;
             }
         } else {
-            return array($sql, $params, true
-            );
+            return array($sql, $params, true);
         }
     }
 
@@ -810,8 +797,7 @@ abstract class datalynxfield_option extends datalynxfield_base {
         while (array_search($dummyentry, $newvalues) !== false) {
             $dummyentry .= "0";
         }
-        $newvalues = array_merge(array(0 => $dummyentry
-        ), $newvalues);
+        $newvalues = array_merge(array(0 => $dummyentry), $newvalues);
         
         $map = array(0 => 0
         );
@@ -914,8 +900,7 @@ class datalynxfield_option_multiple extends datalynxfield_option {
             $implodedcontent = implode(",", $replaced);
             $newcontent = "#".str_replace(",", "#,#", $implodedcontent)."#";
 
-            $DB->set_field('datalynx_contents', 'content', $newcontent, array('id' => $id
-            ));
+            $DB->set_field('datalynx_contents', 'content', $newcontent, array('id' => $id));
         }
     }
 
@@ -955,8 +940,7 @@ class datalynxfield_option_multiple extends datalynxfield_option {
             $contents[] = $content;
         }
         
-        return array($contents, $oldcontents
-        );
+        return array($contents, $oldcontents);
     }
 
     public function get_search_sql($search) {
@@ -1143,8 +1127,7 @@ class datalynxfield_option_single extends datalynxfield_option {
             $contents[] = $selected;
         }
         
-        return array($contents, $oldcontents
-        );
+        return array($contents, $oldcontents);
     }
 
     public function supports_group_by() {
@@ -1210,13 +1193,11 @@ class datalynxfield_option_single extends datalynxfield_option {
             }
         }
         
-        return array($sql, $params, $usecontent
-        );
+        return array($sql, $params, $usecontent);
     }
 
     public function get_supported_search_operators() {
         return array('ANY_OF' => get_string('anyof', 'datalynx'), 
-            '' => get_string('empty', 'datalynx')
-        );
+            '' => get_string('empty', 'datalynx'));
     }
 }

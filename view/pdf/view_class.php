@@ -206,9 +206,7 @@ class datalynxview_pdf extends datalynxview_base {
         if ($settings->pagebreak == 'entry') {
             $content = array();
             $totalcontent = $this->display(
-                    array('export' => true, 'tohtml' => true, 'controls' => true, 
-                        'entryactions' => false
-                    ));
+                    array('export' => true, 'tohtml' => true, 'controls' => true, 'entryactions' => false));
             $totalcontent = preg_replace('/\<\/div\>\<div class\=\"entry\"\>/', 
                     '<></div><div class="entry">', $totalcontent);
             $newcontent = explode('<>', $totalcontent);
@@ -220,9 +218,7 @@ class datalynxview_pdf extends datalynxview_base {
         } else {
             $content = explode(self::PAGE_BREAK, 
                     $this->display(
-                            array('export' => true, 'tohtml' => true, 'controls' => true, 
-                                'entryactions' => false
-                            )));
+                            array('export' => true, 'tohtml' => true, 'controls' => true, 'entryactions' => false)));
         }
         
         foreach ($content as $pagecontent) {
@@ -299,12 +295,10 @@ class datalynxview_pdf extends datalynxview_base {
         // Save pdf specific template files
         $contextid = $this->_df->context->id;
         $imageoptions = array('subdirs' => 0, 'maxbytes' => -1, 'maxfiles' => 1, 
-            'accepted_types' => array('image'
-            )
+            'accepted_types' => array('image')
         );
         $certoptions = array('subdirs' => 0, 'maxbytes' => -1, 'maxfiles' => 1, 
-            'accepted_types' => array('.crt'
-            )
+            'accepted_types' => array('.crt')
         );
         
         // Pdf frame
@@ -337,12 +331,10 @@ class datalynxview_pdf extends datalynxview_base {
         // Save pdf specific template files
         $contextid = $this->_df->context->id;
         $imageoptions = array('subdirs' => 0, 'maxbytes' => -1, 'maxfiles' => 1, 
-            'accepted_types' => array('image'
-            )
+            'accepted_types' => array('image')
         );
         $certoptions = array('subdirs' => 0, 'maxbytes' => -1, 'maxfiles' => 1, 
-            'accepted_types' => array('.crt'
-            )
+            'accepted_types' => array('.crt')
         );
         
         // Pdf frame
@@ -411,8 +403,7 @@ class datalynxview_pdf extends datalynxview_base {
         $filtersmenu = new html_table_cell('##filtersmenu##');
         $quicksearch = new html_table_cell('##quicksearch##');
         $quickperpage = new html_table_cell('##quickperpage##');
-        $row1->cells = array($viewsmenu, $seperator, $filtersmenu, $quicksearch, $quickperpage
-        );
+        $row1->cells = array($viewsmenu, $seperator, $filtersmenu, $quicksearch, $quickperpage);
         foreach ($row1->cells as $cell) {
             $cell->style = 'border:0 none;';
         }
@@ -420,8 +411,7 @@ class datalynxview_pdf extends datalynxview_base {
         $row2 = new html_table_row();
         $addentries = new html_table_cell('##addnewentry##     ##export:all##');
         $addentries->colspan = 5;
-        $row2->cells = array($addentries
-        );
+        $row2->cells = array($addentries);
         foreach ($row2->cells as $cell) {
             $cell->style = 'border:0 none;';
         }
@@ -429,18 +419,15 @@ class datalynxview_pdf extends datalynxview_base {
         $row3 = new html_table_row();
         $pagingbar = new html_table_cell('##pagingbar##');
         $pagingbar->colspan = 5;
-        $row3->cells = array($pagingbar
-        );
+        $row3->cells = array($pagingbar);
         foreach ($row3->cells as $cell) {
             $cell->style = 'border:0 none;';
         }
         // construct the table
-        $table->data = array($row1, $row2, $row3
-        );
+        $table->data = array($row1, $row2, $row3);
         $sectiondefault = html_writer::table($table);
         $this->view->esection = html_writer::tag('div', $sectiondefault, 
-                array('class' => 'mdl-align'
-                )) . "<div>##entries##</div>";
+                array('class' => 'mdl-align')) . "<div>##entries##</div>";
         
         // set content
         $table = new html_table();
@@ -457,8 +444,7 @@ class datalynxview_pdf extends datalynxview_base {
                     $content = new html_table_cell("[[{$field->name()}]]");
                 }
                 $row = new html_table_row();
-                $row->cells = array($name, $content
-                );
+                $row->cells = array($name, $content);
                 $table->data[] = $row;
             }
         }
@@ -466,13 +452,11 @@ class datalynxview_pdf extends datalynxview_base {
         $row = new html_table_row();
         $actions = new html_table_cell('##edit##  ##delete##');
         $actions->colspan = 2;
-        $row->cells = array($actions
-        );
+        $row->cells = array($actions);
         $table->data[] = $row;
         // construct the table
         $entrydefault = html_writer::table($table);
-        $this->view->eparam2 = html_writer::tag('div', $entrydefault, array('class' => 'entry'
-        ));
+        $this->view->eparam2 = html_writer::tag('div', $entrydefault, array('class' => 'entry'));
     }
 
     /**
@@ -490,17 +474,12 @@ class datalynxview_pdf extends datalynxview_base {
         // Add group heading
         $name = ($name == 'newentry') ? get_string('entrynew', 'datalynx') : $name;
         if ($name) {
-            array_unshift($elements, array('html', $OUTPUT->heading($name, 3, 'main')
-            ));
+            array_unshift($elements, array('html', $OUTPUT->heading($name, 3, 'main')));
         }
         
         // Wrap with entriesview
-        array_unshift($elements, 
-                array('html', html_writer::start_tag('div', array('class' => 'entriesview'
-                ))
-                ));
-        array_push($elements, array('html', html_writer::end_tag('div')
-        ));
+        array_unshift($elements, array('html', html_writer::start_tag('div', array('class' => 'entriesview'))));
+        array_push($elements, array('html', html_writer::end_tag('div')));
         
         return $elements;
     }
@@ -518,8 +497,7 @@ class datalynxview_pdf extends datalynxview_base {
         foreach ($this->_tags['field'] as $fieldid => $patterns) {
             $field = $fields[$fieldid];
             $entry->id = $entryid;
-            $options = array('edit' => true, 'manage' => true
-            );
+            $options = array('edit' => true, 'manage' => true);
             if ($fielddefinitions = $field->get_definitions($patterns, $entry, $options)) {
                 $patterndefinitions = array_merge($patterndefinitions, $fielddefinitions);
             }
@@ -535,8 +513,7 @@ class datalynxview_pdf extends datalynxview_base {
                     $elements[] = $def;
                 }
             } else {
-                $elements[] = array('html', $part
-                );
+                $elements[] = array('html', $part);
             }
         }
         
@@ -685,8 +662,7 @@ $centery) // $y = '',
         $content = $this->process_content_images($content);
         // Add the Datalynx css to content
         if ($this->_df->data->css) {
-            $style = html_writer::tag('style', $this->_df->data->css, array('type' => 'text/css'
-            ));
+            $style = html_writer::tag('style', $this->_df->data->css, array('type' => 'text/css'));
             $content = $style . $content;
         }
         
@@ -720,8 +696,7 @@ $centery) // $y = '',
         
         // Process pluginfile images
         $imagetypes = get_string('imagetypes', 'datalynxview_pdf');
-        if (preg_match_all("%$CFG->wwwroot/pluginfile.php(/[^.]+.($imagetypes))%", $content, 
-                $matches)) {
+        if (preg_match_all("%$CFG->wwwroot/pluginfile.php(/[^.]+.($imagetypes))%", $content, $matches)) {
             $replacements = array();
             
             $fs = get_file_storage();
@@ -750,8 +725,7 @@ $centery) // $y = '',
         
         // Add the Datalynx css to content
         if ($this->_df->data->css) {
-            $style = html_writer::tag('style', $this->_df->data->css, array('type' => 'text/css'
-            ));
+            $style = html_writer::tag('style', $this->_df->data->css, array('type' => 'text/css'));
             $content = $style . $content;
         }
         $root = $_SERVER['DOCUMENT_ROOT'];

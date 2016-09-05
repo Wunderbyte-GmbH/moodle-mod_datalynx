@@ -28,11 +28,10 @@ class datalynxfield_radiobutton extends datalynxfield_option_single {
 
     public $type = 'radiobutton';
 
-    public $separators = array(array('name' => 'New line', 'chr' => '<br />'
-    ), array('name' => 'Space', 'chr' => '&#32;'
-    ), array('name' => ',', 'chr' => '&#44;'
-    ), array('name' => ', (with space)', 'chr' => '&#44;&#32;'
-    )
+    public $separators = array(array('name' => 'New line', 'chr' => '<br />'),
+        array('name' => 'Space', 'chr' => '&#32;'),
+        array('name' => ',', 'chr' => '&#44;'),
+        array('name' => ', (with space)', 'chr' => '&#44;&#32;')
     );
 
     /**
@@ -123,8 +122,7 @@ class datalynxfield_radiobutton extends datalynxfield_option_single {
                     FROM {datalynx_contents} dc
                    WHERE dc.entryid = :entryid
                      AND dc.fieldid = :fieldid";
-        $params = array('entryid' => $entryid, 'fieldid' => $fieldid
-        );
+        $params = array('entryid' => $entryid, 'fieldid' => $fieldid);
         
         $oldcontent = $DB->get_field_sql($query, $params);
         
@@ -135,9 +133,7 @@ class datalynxfield_radiobutton extends datalynxfield_option_single {
             $content = clean_param($formdata->{$formfieldname}, PARAM_INT);
             if ($content != $oldcontent && array_search($content, $disabled) !== false) {
                 $menu = $this->options_menu();
-                return array(
-                    $formfieldname => get_string('limitchoice_error', 'datalynx', $menu[$content])
-                );
+                return array($formfieldname => get_string('limitchoice_error', 'datalynx', $menu[$content]));
             }
         } else {
             return array();

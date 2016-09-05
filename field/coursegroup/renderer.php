@@ -41,11 +41,7 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
         
         foreach ($tags as $tag) {
             if ($edit) {
-                $replacements[$tag] = array('', array(array($this, 'display_edit'
-                ), array($entry
-                )
-                )
-                );
+                $replacements[$tag] = array('', array(array($this, 'display_edit'), array($entry)));
                 break;
             } else {
                 $parts = explode(':', trim($tag, '[]'));
@@ -54,8 +50,7 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
                 } else {
                     $type = '';
                 }
-                $replacements[$tag] = array('html', $this->display_browse($entry, $type)
-                );
+                $replacements[$tag] = array('html', $this->display_browse($entry, $type));
             }
         }
         
@@ -86,8 +81,7 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
         $fieldname = "field_{$fieldid}_{$entryid}";
         // group course
         $courses = get_courses("all", "c.sortorder ASC", "c.id,c.fullname");
-        $coursemenu = array(0 => get_string('choosedots')
-        );
+        $coursemenu = array(0 => get_string('choosedots'));
         foreach ($courses as $cid => $course) {
             $coursemenu[$cid] = $course->fullname;
         }
@@ -109,30 +103,25 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
             
             $module = array('name' => 'M.datalynxfield_coursegroup_load_course_groups', 
                 'fullpath' => '/mod/datalynx/field/coursegroup/coursegroup.js', 
-                'requires' => array('base', 'io', 'node'
-                )
+                'requires' => array('base', 'io', 'node')
             );
             
             $PAGE->requires->js_init_call('M.datalynxfield_coursegroup_load_course_groups.init', 
-                    array($options
-                    ), false, $module);
+                    array($options), false, $module);
         }
         
         // group id
         if ($field->group) {
-            if ($group = $DB->get_record('groups', array('id' => $groupid
-            ), 'name')) {
+            if ($group = $DB->get_record('groups', array('id' => $groupid), 'name')) {
                 $groupname = $group->name;
             } else {
                 $groupname = get_string('groupnotfound', 'datalynxfield_coursegroup', $groupid);
             }
             $mform->addElement('html', html_writer::tag('h3', $groupname));
         } else {
-            $groupmenu = array('' => get_string('choosedots')
-            );
+            $groupmenu = array('' => get_string('choosedots'));
             if ($courseid) {
-                $groups = $DB->get_records_menu('groups', array('courseid' => $courseid
-                ), 'name', 'id,name');
+                $groups = $DB->get_records_menu('groups', array('courseid' => $courseid), 'name', 'id,name');
                 foreach ($groups as $gid => $groupname) {
                     $groupmenu[$gid] = $groupname;
                 }
@@ -141,8 +130,7 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
             $mform->setDefault("{$fieldname}_group", $groupid);
             $mform->disabledIf("{$fieldname}_group", "{$fieldname}_course", 'eq', '');
             
-            $mform->addElement('text', "{$fieldname}_groupid", null, array('class' => 'hide'
-            ));
+            $mform->addElement('text', "{$fieldname}_groupid", null, array('class' => 'hide'));
             $mform->setDefault("{$fieldname}_groupid", $groupid);
         }
     }
@@ -174,16 +162,14 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
         switch ($type) {
             case 'course':
                 // Return the course name
-                if ($coursename = $DB->get_field('course', 'fullname', array('id' => $courseid
-                ))) {
+                if ($coursename = $DB->get_field('course', 'fullname', array('id' => $courseid))) {
                     return $coursename;
                 }
                 break;
             case 'group':
                 // Return the group name
                 if ($groupid and
-                         $groupname = $DB->get_field('groups', 'name', array('id' => $groupid
-                        ))) {
+                         $groupname = $DB->get_field('groups', 'name', array('id' => $groupid))) {
                     return $groupname;
                 }
                 break;
@@ -241,16 +227,11 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
         $fieldname = $this->_field->name();
         
         $patterns = parent::patterns();
-        $patterns["[[$fieldname]]"] = array(true
-        );
-        $patterns["[[$fieldname:course]]"] = array(true
-        );
-        $patterns["[[$fieldname:group]]"] = array(true
-        );
-        $patterns["[[$fieldname:courseid]]"] = array(false
-        );
-        $patterns["[[$fieldname:groupid]]"] = array(false
-        );
+        $patterns["[[$fieldname]]"] = array(true);
+        $patterns["[[$fieldname:course]]"] = array(true);
+        $patterns["[[$fieldname:group]]"] = array(true);
+        $patterns["[[$fieldname:courseid]]"] = array(false);
+        $patterns["[[$fieldname:groupid]]"] = array(false);
         
         return $patterns;
     }

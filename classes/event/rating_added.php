@@ -68,7 +68,8 @@ class rating_added extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' added the datalynx rating with id '$this->objectid' for the datalynx activity " .
+        return "The user with id '$this->userid' added the datalynx rating with " .
+            "id '$this->objectid' for the datalynx activity " .
                  "with the course module id '$this->contextinstanceid'.";
     }
 
@@ -79,8 +80,7 @@ class rating_added extends \core\event\base {
      */
     public function get_url() {
         return new \moodle_url('/mod/datalynx/view.php', 
-                array('d' => $this->other['dataid'], 'eids' => $this->objectid
-                ));
+                array('d' => $this->other['dataid'], 'eids' => $this->objectid));
     }
 
     /**
@@ -91,8 +91,7 @@ class rating_added extends \core\event\base {
     public function get_legacy_logdata() {
         return array($this->courseid, 'datalynx', 'rating_added', 
             'view.php?d=' . $this->other['dataid'] . '&amp;eid=' . $this->objectid, 
-            $this->other['dataid'], $this->contextinstanceid
-        );
+            $this->other['dataid'], $this->contextinstanceid);
     }
 
     /**

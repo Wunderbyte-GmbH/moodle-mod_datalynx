@@ -49,8 +49,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
             } else {
                 $type = '';
             }
-            $replacements[$tag] = array('html', $this->display_browse($entry, $type)
-            );
+            $replacements[$tag] = array('html', $this->display_browse($entry, $type));
         }
         return $replacements;
     }
@@ -69,8 +68,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         // Inline
         if (empty($type)) {
             // TODO Including controls seems to mess up the hosting view controls
-            $voptions = array('controls' => false
-            );
+            $voptions = array('controls' => false);
             return $this->get_view_display_content($entry, $voptions);
         }
         
@@ -78,19 +76,15 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         if ($type == 'overlay') {
             $this->add_overlay_support();
             
-            $voptions = array('controls' => false
-            );
+            $voptions = array('controls' => false);
             $widgetbody = html_writer::tag('div', 
                     $this->get_view_display_content($entry, $voptions), 
-                    array('class' => "yui3-widget-bd"
-                    ));
-            $panel = html_writer::tag('div', $widgetbody, array('class' => 'panelContent hide'
-            ));
+                    array('class' => "yui3-widget-bd"));
+            $panel = html_writer::tag('div', $widgetbody, array('class' => 'panelContent hide'));
             $button = html_writer::tag('button', 
                     get_string('viewbutton', 'datalynxfield_datalynxview'));
             $wrapper = html_writer::tag('div', $button . $panel, 
-                    array('class' => 'datalynxfield-datalynxview overlay'
-                    ));
+                    array('class' => 'datalynxfield-datalynxview overlay'));
             return $wrapper;
         }
         
@@ -104,15 +98,12 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
             $this->add_overlay_support();
             
             $widgetbody = html_writer::tag('div', $this->get_view_display_embedded($entry), 
-                    array('class' => "yui3-widget-bd"
-                    ));
-            $panel = html_writer::tag('div', $widgetbody, array('class' => 'panelContent hide'
-            ));
+                    array('class' => "yui3-widget-bd"));
+            $panel = html_writer::tag('div', $widgetbody, array('class' => 'panelContent hide'));
             $button = html_writer::tag('button', 
                     get_string('viewbutton', 'datalynxfield_datalynxview'));
             $wrapper = html_writer::tag('div', $button . $panel, 
-                    array('class' => 'datalynxfield-datalynxview embedded overlay'
-                    ));
+                    array('class' => 'datalynxfield-datalynxview embedded overlay'));
             return $wrapper;
         }
         
@@ -173,8 +164,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         $fieldname = str_replace(' ', '_', $field->name());
         
         // Construct the src url
-        $params = array('d' => $field->refdatalynx->id(), 'view' => $field->refview->id()
-        );
+        $params = array('d' => $field->refdatalynx->id(), 'view' => $field->refview->id());
         if ($field->reffilterid) {
             $params['filter'] = $field->reffilterid;
         }
@@ -202,8 +192,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         );
         $iframe = html_writer::tag('iframe', null, $froptions);
         return html_writer::tag('div', $iframe, 
-                array('class' => "datalynxfield-datalynxview-$fieldname embedded"
-                ));
+                array('class' => "datalynxfield-datalynxview-$fieldname embedded"));
     }
 
     /**
@@ -216,8 +205,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         if (!$added) {
             $module = array('name' => 'M.datalynxfield_datalynxview_overlay', 
                 'fullpath' => '/mod/datalynx/field/datalynxview/datalynxview.js', 
-                'requires' => array('base', 'node'
-                )
+                'requires' => array('base', 'node')
             );
             
             $PAGE->requires->js_init_call('M.datalynxfield_datalynxview_overlay.init', null, false, 
@@ -235,21 +223,18 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
             // Entry author
             if ($filterauthor) {
                 if ($entry->id != -1) {
-                    $users = $urlquery ? $entry->userid : array($entry->userid
-                    );
+                    $users = $urlquery ? $entry->userid : array($entry->userid);
                     $options['users'] = $users;
                 } else {
                     global $USER;
-                    $users = $urlquery ? $USER->id : array($USER->id
-                    );
+                    $users = $urlquery ? $USER->id : array($USER->id);
                     $options['users'] = $users;
                 }
             }
             // Entry group
             if ($filtergroup) {
                 if ($entry->id != -1) {
-                    $groups = $urlquery ? $entry->groupid : array($entry->groupid
-                    );
+                    $groups = $urlquery ? $entry->groupid : array($entry->groupid);
                     $options['groups'] = $groups;
                 } else {
                     $allgroups = groups_get_user_groups($this->_df->course);
@@ -305,8 +290,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         foreach (explode("\n", $field->field->param5) as $key => $searchy) {
             list($andor, $refpattern, $not, $operator, $localpattern) = explode(',', $searchy);
             // And/or
-            if (empty($andor) or !in_array($andor, array('AND', 'OR'
-            ))) {
+            if (empty($andor) or !in_array($andor, array('AND', 'OR'))) {
                 continue;
             }
             // Get the ref field id from pattern
@@ -319,8 +303,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
                 $value = $localpattern;
             } else if ($localfield = $field->df->get_field_from_id($localfieldid)) {
                 // Get the array of values for the patterns
-                if ($replacements = $localfield->renderer()->replacements(array($localpattern
-                ), $entry)) {
+                if ($replacements = $localfield->renderer()->replacements(array($localpattern), $entry)) {
                     // Take the first: array('html', value)
                     $first = reset($replacements);
                     // extract the value part
@@ -333,11 +316,9 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
             
             // Add to the search options
             if (empty($soptions[$rfieldid])) {
-                $soptions[$rfieldid] = array('AND' => array(), 'OR' => array()
-                );
+                $soptions[$rfieldid] = array('AND' => array(), 'OR' => array());
             }
-            $soptions[$rfieldid][$andor][] = array($not, $operator, $value
-            );
+            $soptions[$rfieldid][$andor][] = array($not, $operator, $value);
         }
         
         return $soptions;
@@ -350,14 +331,10 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         $fieldname = $this->_field->name();
         
         $patterns = parent::patterns();
-        $patterns["[[$fieldname]]"] = array(true
-        );
-        $patterns["[[$fieldname:overlay]]"] = array(true
-        );
-        $patterns["[[$fieldname:embedded]]"] = array(false
-        );
-        $patterns["[[$fieldname:embeddedoverlay]]"] = array(false
-        );
+        $patterns["[[$fieldname]]"] = array(true);
+        $patterns["[[$fieldname:overlay]]"] = array(true);
+        $patterns["[[$fieldname:embedded]]"] = array(false);
+        $patterns["[[$fieldname:embeddedoverlay]]"] = array(false);
         
         return $patterns;
     }

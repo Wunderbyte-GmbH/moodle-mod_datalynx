@@ -39,9 +39,7 @@ class datalynxfield_userinfo_form extends datalynxfield_form {
         
         // Info field
         $options = $DB->get_records_menu('user_info_field', array(), 'shortname', 'id,shortname');
-        $options = array('' => get_string('choosedots')
-        ) + $options;
-        $mform->addElement('select', "param1", get_string('infofield', 'datalynxfield_userinfo'), 
-                $options);
+        $options = array('' => get_string('choosedots')) + $options;
+        $mform->addElement('select', "param1", get_string('infofield', 'datalynxfield_userinfo'), $options);
     }
 }

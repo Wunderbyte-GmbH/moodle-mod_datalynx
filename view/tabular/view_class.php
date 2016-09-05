@@ -37,11 +37,9 @@ class datalynxview_tabular extends datalynxview_base {
 
     protected $type = 'tabular';
 
-    protected $_editors = array('section', 'param2'
-    );
+    protected $_editors = array('section', 'param2');
 
-    protected $_vieweditors = array('section', 'param2'
-    );
+    protected $_vieweditors = array('section', 'param2');
 
     /**
      */
@@ -62,8 +60,7 @@ class datalynxview_tabular extends datalynxview_base {
         $filtersmenu = new html_table_cell('##filtersmenu##');
         $quicksearch = new html_table_cell('##quicksearch##');
         $quickperpage = new html_table_cell('##quickperpage##');
-        $row1->cells = array($viewsmenu, $seperator, $filtersmenu, $quicksearch, $quickperpage
-        );
+        $row1->cells = array($viewsmenu, $seperator, $filtersmenu, $quicksearch, $quickperpage);
         foreach ($row1->cells as $cell) {
             $cell->style = 'border:0 none;';
         }
@@ -71,8 +68,7 @@ class datalynxview_tabular extends datalynxview_base {
         $row2 = new html_table_row();
         $addentries = new html_table_cell('##addnewentry##');
         $addentries->colspan = 5;
-        $row2->cells = array($addentries
-        );
+        $row2->cells = array($addentries);
         foreach ($row2->cells as $cell) {
             $cell->style = 'border:0 none;';
         }
@@ -80,8 +76,7 @@ class datalynxview_tabular extends datalynxview_base {
         $row3 = new html_table_row();
         $pagingbar = new html_table_cell('##pagingbar##');
         $pagingbar->colspan = 5;
-        $row3->cells = array($pagingbar
-        );
+        $row3->cells = array($pagingbar);
         foreach ($row3->cells as $cell) {
             $cell->style = 'border:0 none;';
         }
@@ -90,8 +85,7 @@ class datalynxview_tabular extends datalynxview_base {
         );
         $sectiondefault = html_writer::table($table);
         $this->view->esection = html_writer::tag('div', $sectiondefault, 
-                array('class' => 'mdl-align'
-                )) . "<div>##entries##</div>";
+                array('class' => 'mdl-align')) . "<div>##entries##</div>";
         
         // set content table
         $table = new html_table();
@@ -241,15 +235,13 @@ class datalynxview_tabular extends datalynxview_base {
                             $elements[] = $def;
                         }
                     } else {
-                        $elements[] = array('html', $part
-                        );
+                        $elements[] = array('html', $part);
                     }
                 }
             }
             
             // finish the table
-            $elements[] = array('html', '</tbody>' . $closetable . $closegroupdiv
-            );
+            $elements[] = array('html', '</tbody>' . $closetable . $closegroupdiv);
         }
         
         return $elements;
@@ -277,8 +269,7 @@ class datalynxview_tabular extends datalynxview_base {
         foreach ($this->_tags['field'] as $fieldid => $patterns) {
             $field = $fields[$fieldid];
             $entry->id = $entryid;
-            $options = array('edit' => true, 'manage' => true
-            );
+            $options = array('edit' => true, 'manage' => true);
             if ($definitions = $field->get_definitions($patterns, $entry, $options)) {
                 $fielddefinitions = array_merge($fielddefinitions, $definitions);
             }

@@ -33,8 +33,7 @@ class datalynxview_tabular_form extends datalynxview_base_form {
     function view_definition_after_gps() {
         $view = $this->_view;
         $editoroptions = $view->editors();
-        $editorattr = array('cols' => 40, 'rows' => 12
-        );
+        $editorattr = array('cols' => 40, 'rows' => 12);
         
         $mform = &$this->_form;
         

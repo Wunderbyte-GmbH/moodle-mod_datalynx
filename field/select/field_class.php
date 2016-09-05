@@ -102,8 +102,7 @@ class datalynxfield_select extends datalynxfield_option_single {
                     FROM {datalynx_contents} dc
                    WHERE dc.entryid = :entryid
                      AND dc.fieldid = :fieldid";
-        $params = array('entryid' => $entryid, 'fieldid' => $fieldid
-        );
+        $params = array('entryid' => $entryid, 'fieldid' => $fieldid);
         
         $oldcontent = $DB->get_field_sql($query, $params);
         

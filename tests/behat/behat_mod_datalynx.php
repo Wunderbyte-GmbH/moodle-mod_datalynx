@@ -230,8 +230,7 @@ class behat_mod_datalynx extends behat_files {
     public function i_set_view_as_default_view_in_instance($viewname, $activityname) {
         $steps = array(new Given('I follow "' . $this->escape($activityname) . '"'), 
             new Given('I follow "Manage"'), new Given('I follow "Views"'), 
-            new Given(
-                    'I click "Set as default view" button of "' . $this->escape($viewname) . '" item')
+            new Given('I click "Set as default view" button of "' . $this->escape($viewname) . '" item')
         );
         
         return $steps;
@@ -539,8 +538,7 @@ class behat_mod_datalynx extends behat_files {
 
     private function get_instance_by_name($name) {
         global $DB;
-        return $DB->get_record('datalynx', array('name' => $name
-        ));
+        return $DB->get_record('datalynx', array('name' => $name));
     }
 
     /**
@@ -628,8 +626,7 @@ class behat_mod_datalynx extends behat_files {
         $instance = $this->get_instance_by_name($activityname);
         
         foreach ($entries as $entry) {
-            $authorid = $DB->get_field('user', 'id', array('username' => trim($entry['author'])
-            ));
+            $authorid = $DB->get_field('user', 'id', array('username' => trim($entry['author'])));
             $approved = 0;
             $status = 0;
             if (!empty($entry['approved'])) {
@@ -646,8 +643,7 @@ class behat_mod_datalynx extends behat_files {
             $entryid = $DB->insert_record('datalynx_entries', $record);
             
             foreach ($entry as $fieldname => $value) {
-                $field = $DB->get_record('datalynx_fields', array('name' => $fieldname
-                ));
+                $field = $DB->get_record('datalynx_fields', array('name' => $fieldname));
                 if ($field) {
                     $this->create_content($instance->id, $entryid, $field->id, $field->type, $value);
                 }
@@ -752,8 +748,7 @@ class behat_mod_datalynx extends behat_files {
         global $DB;
         foreach ($views as $view) {
             $DB->set_field('datalynx_views', 'param10', $names[$view['redirect']], 
-                    array('id' => $view['id']
-                    ));
+                    array('id' => $view['id']));
         }
     }
 
@@ -780,8 +775,7 @@ class behat_mod_datalynx extends behat_files {
         if (isset($record->param1) &&
                  ($record->type == "radiobutton" || $record->type == "select" ||
                  $record->type == "checkbox")) {
-            $record->param1 = preg_replace('/,[ ]?/', "
-", $record->param1);
+            $record->param1 = preg_replace('/,[ ]?/', "", $record->param1);
         }
         
         if (!isset($record->param2) && ($record->type == "file" || $record->type == "picture")) {
@@ -816,8 +810,7 @@ class behat_mod_datalynx extends behat_files {
         
         if ($record->filter) {
             $record->filter = $DB->get_field('datalynx_filters', 'id', 
-                    array('name' => $record->filter
-                    ));
+                    array('name' => $record->filter));
         }
         
         $id = $DB->insert_record('datalynx_views', $record);
@@ -826,26 +819,21 @@ class behat_mod_datalynx extends behat_files {
         $datalynx->process_views('reset', $id, true);
         
         if ($record->param2) {
-            $DB->set_field('datalynx_views', 'param2', $record->param2, array('id' => $id
-            ));
+            $DB->set_field('datalynx_views', 'param2', $record->param2, array('id' => $id));
         }
         
         if ($record->section) {
-            $DB->set_field('datalynx_views', 'section', $record->section, array('id' => $id
-            ));
+            $DB->set_field('datalynx_views', 'section', $record->section, array('id' => $id));
         }
         
         if (isset($options['default'])) {
-            $DB->set_field('datalynx', 'defaultview', $id, array('id' => $record->dataid
-            ));
+            $DB->set_field('datalynx', 'defaultview', $id, array('id' => $record->dataid));
         }
         if (isset($options['edit'])) {
-            $DB->set_field('datalynx', 'singleedit', $id, array('id' => $record->dataid
-            ));
+            $DB->set_field('datalynx', 'singleedit', $id, array('id' => $record->dataid));
         }
         if (isset($options['more'])) {
-            $DB->set_field('datalynx', 'singleview', $id, array('id' => $record->dataid
-            ));
+            $DB->set_field('datalynx', 'singleview', $id, array('id' => $record->dataid));
         }
         
         return $id;
@@ -1117,8 +1105,7 @@ class behat_mod_datalynx extends behat_files {
                 $usernames = preg_split('/,[ ]?/', $value);
                 $ids = array();
                 foreach ($usernames as $username) {
-                    $ids[] = '"' . $DB->get_field('user', 'id', array('username' => $username
-                    )) . '"';
+                    $ids[] = '"' . $DB->get_field('user', 'id', array('username' => $username)) . '"';
                 }
                 $content['content'] = '[' . implode(',', $ids) . ']';
                 break;

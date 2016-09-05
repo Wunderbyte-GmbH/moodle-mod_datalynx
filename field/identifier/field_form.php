@@ -38,22 +38,19 @@ class datalynxfield_identifier_form extends datalynxfield_form {
         
         // Salt (param1)
         $options = $field::get_salt_options();
-        $mform->addElement('select', 'param1', get_string('saltsource', 'datalynxfield_identifier'), 
-                $options);
+        $mform->addElement('select', 'param1', get_string('saltsource', 'datalynxfield_identifier'), $options);
         $mform->setDefault('param1', 'random');
         
         // Field Salt length (param2)
         $mform->addElement('text', 'param2', get_string('saltsize', 'datalynxfield_identifier'), 
-                array('size' => '8'
-                ));
+                array('size' => '8'));
         $mform->setType('param2', PARAM_INT);
         $mform->addRule('param2', null, 'numeric', null, 'client');
         $mform->setDefault('param2', 10);
         $mform->disabledIf('param2', 'param1', 'neq', 'random');
         
         // Uniqueness (param3)
-        $mform->addElement('selectyesno', 'param3', 
-                get_string('uniqueness', 'datalynxfield_identifier'));
+        $mform->addElement('selectyesno', 'param3', get_string('uniqueness', 'datalynxfield_identifier'));
         $mform->setDefault('param3', 1);
     }
 }

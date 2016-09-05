@@ -17,8 +17,7 @@ require_sesskey();
 
 $toggle = "ERROR";
 if ($for == "required") {
-    $required = $DB->get_field('datalynx_behaviors', $forproperty, array('id' => $behaviorid
-    ));
+    $required = $DB->get_field('datalynx_behaviors', $forproperty, array('id' => $behaviorid));
     if ($required) {
         $required = 0;
         $toggle = "OFF";
@@ -27,12 +26,10 @@ if ($for == "required") {
         $toggle = "ON";
     }
     
-    $DB->set_field('datalynx_behaviors', $forproperty, $required, array('id' => $behaviorid
-    ));
+    $DB->set_field('datalynx_behaviors', $forproperty, $required, array('id' => $behaviorid));
 } else {
     $permissions = unserialize(
-            $DB->get_field('datalynx_behaviors', $forproperty, array('id' => $behaviorid
-            )));
+            $DB->get_field('datalynx_behaviors', $forproperty, array('id' => $behaviorid)));
     if (!in_array($permissionid, $permissions)) {
         $permissions[] = $permissionid;
         $toggle = "ON";
@@ -43,8 +40,7 @@ if ($for == "required") {
         $toggle = "OFF";
     }
     $DB->set_field('datalynx_behaviors', $forproperty, serialize($permissions), 
-            array('id' => $behaviorid
-            ));
+            array('id' => $behaviorid));
 }
 
 echo json_encode($toggle);

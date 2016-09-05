@@ -39,20 +39,17 @@ class datalynxfield_coursegroup_form extends datalynxfield_form {
         
         // course
         $courses = get_courses("all", "c.sortorder ASC", "c.id,c.fullname");
-        $options = array(0 => get_string('choosedots')
-        );
+        $options = array(0 => get_string('choosedots'));
         foreach ($courses as $courseid => $course) {
             $options[$courseid] = $course->fullname;
         }
         $mform->addElement('select', 'param1', get_string('course'), $options);
         
         // group id
-        $options = array(0 => get_string('choosedots')
-        );
+        $options = array(0 => get_string('choosedots'));
         if (!empty($this->_field->field->param1)) {
             $course = $this->_field->field->param1;
-            $groups = $DB->get_records_menu('groups', array('courseid' => $course
-            ), 'name', 'id,name');
+            $groups = $DB->get_records_menu('groups', array('courseid' => $course), 'name', 'id,name');
         } else {
             // an arbitrary limit of 100 registered options
             $options = $options + range(1, 100);
@@ -67,12 +64,10 @@ class datalynxfield_coursegroup_form extends datalynxfield_form {
         
         $module = array('name' => 'M.datalynxfield_coursegroup_load_course_groups', 
             'fullpath' => '/mod/datalynx/field/coursegroup/coursegroup.js', 
-            'requires' => array('base', 'io', 'node'
-            )
+            'requires' => array('base', 'io', 'node')
         );
         
         $PAGE->requires->js_init_call('M.datalynxfield_coursegroup_load_course_groups.init', 
-                array($options
-                ), false, $module);
+                array($options), false, $module);
     }
 }

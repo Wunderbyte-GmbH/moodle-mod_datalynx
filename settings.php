@@ -26,13 +26,11 @@ defined('MOODLE_INTERNAL') or die();
 if ($ADMIN->fulltree) {
     // enable rss feeds
     if (empty($CFG->enablerssfeeds)) {
-        $options = array(0 => get_string('rssglobaldisabled', 'admin')
-        );
+        $options = array(0 => get_string('rssglobaldisabled', 'admin'));
         $str = get_string('configenablerssfeeds', 'datalynx') . '<br />' .
                  get_string('configenablerssfeedsdisabled2', 'admin');
     } else {
-        $options = array(0 => get_string('no'), 1 => get_string('yes')
-        );
+        $options = array(0 => get_string('no'), 1 => get_string('yes'));
         $str = get_string('configenablerssfeeds', 'datalynx');
     }
     $settings->add(
@@ -74,8 +72,7 @@ if ($ADMIN->fulltree) {
                     -1, $options));
     
     // allow anonymous entries
-    $options = array(0 => get_string('no'), 1 => get_string('yes')
-    );
+    $options = array(0 => get_string('no'), 1 => get_string('yes'));
     $settings->add(
             new admin_setting_configselect('datalynx_anonymous', 
                     get_string('entriesanonymous', 'datalynx'), 

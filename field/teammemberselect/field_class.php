@@ -86,10 +86,8 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
                    WHERE r.dataid = :dataid
                      AND r.type LIKE :type";
         $this->rules = $DB->get_records_sql_menu($query, 
-                array('dataid' => $df->id(), 'type' => 'eventnotification'
-                ));
-        $this->rules = array_merge(array(0 => '...'
-        ), $this->rules);
+                array('dataid' => $df->id(), 'type' => 'eventnotification'));
+        $this->rules = array_merge(array(0 => '...'), $this->rules);
     }
 
     protected static $allusers = array();
@@ -129,11 +127,9 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
                    WHERE ra.contextid = :contextid
                 ORDER BY u.lastname ASC, u.firstname ASC, u.email ASC, u.username ASC";
         
-        $results = $DB->get_records_sql($query, array('contextid' => $context->id
-        ));
+        $results = $DB->get_records_sql($query, array('contextid' => $context->id));
         
-        $baseurl = new moodle_url('/user/view.php', array('course' => $COURSE->id
-        ));
+        $baseurl = new moodle_url('/user/view.php', array('course' => $COURSE->id));
         
         foreach ($results as $result) {
             // if user was already checked and was marked as forbidden, skip checking any other
@@ -201,8 +197,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
                      AND df.param5 IS NOT NULL
                      AND df.param5 <> '0'";
         
-        return $DB->get_record_sql($query, array('dataid' => $this->df->id()
-        ));
+        return $DB->get_record_sql($query, array('dataid' => $this->df->id()));
     }
 
     /**
@@ -276,6 +271,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
                 $usecontent = true;
             }
         } else if ($operator === 'OTHER_USER') {
+
             $params[$name] = "%\"{$value}\"%";
             
             if (!!$not) {
@@ -315,8 +311,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
             }
         }
         
-        return array($sql, $params, $usecontent
-        );
+        return array($sql, $params, $usecontent);
     }
 
     public function parse_search($formdata, $i) {
@@ -356,8 +351,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
             }
         }
         
-        return array($contents, $oldcontents
-        );
+        return array($contents, $oldcontents);
     }
 
     public function get_supported_search_operators() {

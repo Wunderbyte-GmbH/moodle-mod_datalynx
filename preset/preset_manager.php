@@ -88,8 +88,7 @@ class datalynx_preset_manager {
         $targetpage = '/mod/datalynx/preset/index.php';
         if ($localpresets or $sharedpresets) {
             
-            $linkparams = array('d' => $this->_df->id(), 'sesskey' => sesskey()
-            );
+            $linkparams = array('d' => $this->_df->id(), 'sesskey' => sesskey());
             $actionurl = htmlspecialchars_decode(new moodle_url($targetpage, $linkparams));
             
             // prepare to make file links
@@ -106,8 +105,7 @@ class datalynx_preset_manager {
             $strshare = get_string('presetshare', 'datalynx');
             
             $selectallnone = html_writer::checkbox(null, null, false, null, 
-                    array('onclick' => 'select_allnone(\'preset\'&#44;this.checked)'
-                    ));
+                    array('onclick' => 'select_allnone(\'preset\'&#44;this.checked)'));
             
             $multidownload = html_writer::tag('button', 
                     $OUTPUT->pix_icon('t/download', get_string('multidownload', 'datalynx')), 
@@ -132,13 +130,9 @@ class datalynx_preset_manager {
             
             $table = new html_table();
             $table->head = array($strname, $strdescription, $strscreenshot, $strapply, 
-                $multidownload, $multishare, $multidelete, $selectallnone
-            );
-            $table->align = array('left', 'left', 'center', 'center', 'center', 'center', 'center', 
-                'center'
-            );
-            $table->wrap = array(false, false, false, false, false, false, false, false
-            );
+                $multidownload, $multishare, $multidelete, $selectallnone);
+            $table->align = array('left', 'left', 'center', 'center', 'center', 'center', 'center', 'center');
+            $table->wrap = array(false, false, false, false, false, false, false, false);
             $table->attributes['align'] = 'center';
             
             // print local presets
@@ -164,8 +158,8 @@ class datalynx_preset_manager {
                     // $preset->screenshot. '" alt="'. get_string('screenshot'). '" />';
                     // }
                     $presetapply = html_writer::link(
-                            new moodle_url($targetpage, $linkparams + array('apply' => $preset->id
-                            )), $OUTPUT->pix_icon('t/switch_whole', $strapply));
+                            new moodle_url($targetpage, $linkparams + array('apply' => $preset->id)),
+                                        $OUTPUT->pix_icon('t/switch_whole', $strapply));
                     // $presetapplymap = html_writer::link(new moodle_url($targetpage, $linkparams +
                     // array('applymap' => $preset->id)),
                     // $OUTPUT->pix_icon('t/switch_plus', $strapply));
@@ -177,17 +171,16 @@ class datalynx_preset_manager {
                     if (has_capability('mod/datalynx:presetsviewall', $this->_df->context)) {
                         $presetshare = html_writer::link(
                                 new moodle_url($targetpage, 
-                                        $linkparams + array('share' => $preset->id
-                                        )), $OUTPUT->pix_icon('i/group', $strshare));
+                                        $linkparams + array('share' => $preset->id)),
+                                            $OUTPUT->pix_icon('i/group', $strshare));
                     }
                     $presetdelete = html_writer::link(
-                            new moodle_url($targetpage, $linkparams + array('delete' => $preset->id
-                            )), $OUTPUT->pix_icon('t/delete', $strdelete));
+                            new moodle_url($targetpage, $linkparams + array('delete' => $preset->id)),
+                                            $OUTPUT->pix_icon('t/delete', $strdelete));
                     $presetselector = html_writer::checkbox("presetselector", $preset->id, false);
                     
                     $table->data[] = array($presetname, $presetdescription, $presetscreenshot, 
-                        $presetapply, $presetdownload, $presetshare, $presetdelete, $presetselector
-                    );
+                        $presetapply, $presetdownload, $presetshare, $presetdelete, $presetselector);
                 }
             }
             
@@ -212,8 +205,8 @@ class datalynx_preset_manager {
                     $presetdescription = '';
                     $presetscreenshot = '';
                     $presetapply = html_writer::link(
-                            new moodle_url($targetpage, $linkparams + array('apply' => $preset->id
-                            )), $OUTPUT->pix_icon('t/switch_whole', $strapply));
+                            new moodle_url($targetpage, $linkparams + array('apply' => $preset->id)),
+                                        $OUTPUT->pix_icon('t/switch_whole', $strapply));
                     // $presetapplymap = html_writer::link(new moodle_url($targetpage, $linkparams +
                     // array('applymap' => $preset->id)), $OUTPUT->pix_icon('t/switch_plus',
                     // $strapply));
@@ -226,8 +219,8 @@ class datalynx_preset_manager {
                     if (has_capability('mod/datalynx:managepresets', $this->_df->context)) {
                         $presetdelete = html_writer::link(
                                 new moodle_url($targetpage, 
-                                        $linkparams + array('delete' => $preset->id
-                                        )), $OUTPUT->pix_icon('t/delete', $strdelete));
+                                        $linkparams + array('delete' => $preset->id)),
+                                            $OUTPUT->pix_icon('t/delete', $strdelete));
                     }
                     $presetselector = html_writer::checkbox("presetselector", $preset->id, false);
                     
@@ -249,8 +242,7 @@ class datalynx_preset_manager {
         ));
         $mform = new mod_datalynx_preset_form(
                 new moodle_url('/mod/datalynx/preset/index.php', 
-                        array('d' => $this->_df->id(), 'sesskey' => sesskey(), 'add' => 1
-                        )));
+                        array('d' => $this->_df->id(), 'sesskey' => sesskey(), 'add' => 1)));
         $mform->set_data(null);
         $mform->display();
         echo html_writer::end_tag('div');
@@ -263,8 +255,7 @@ class datalynx_preset_manager {
         
         $mform = new mod_datalynx_preset_form(
                 new moodle_url('mod/datalynx/preset/index.php', 
-                        array('d' => $this->_df->id(), 'sesskey' => sesskey(), 'add' => 1
-                        )));
+                        array('d' => $this->_df->id(), 'sesskey' => sesskey(), 'add' => 1)));
         // add presets
         if ($data = $mform->get_data()) {
             // preset this datalynx
@@ -423,8 +414,7 @@ class datalynx_preset_manager {
         
         // anonymous users cleanup
         $DB->delete_records_select('user', $DB->sql_like('firstname', '?'), 
-                array('%anonfirstname%'
-                ));
+                array('%anonfirstname%'));
         
         $transaction = $DB->start_delegated_transaction();
         $rc = new restore_controller($folder, $this->_df->course->id, backup::INTERACTIVE_NO, 
@@ -458,11 +448,9 @@ class datalynx_preset_manager {
             $rc->destroy();
             // anonymous users cleanup
             $DB->delete_records_select('user', $DB->sql_like('firstname', '?'), 
-                    array('%anonfirstname%'
-                    ));
+                    array('%anonfirstname%'));
             
-            redirect(new moodle_url('/mod/datalynx/view.php', array('d' => $this->_df->id()
-            )));
+            redirect(new moodle_url('/mod/datalynx/view.php', array('d' => $this->_df->id())));
         } else {
             $rc->destroy();
         }

@@ -44,8 +44,7 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
         
         // recipient
         $grp = array();
-        $grp[] = &$mform->createElement('checkbox', 'author', null, 
-                get_string('author', 'datalynx'), null);
+        $grp[] = &$mform->createElement('checkbox', 'author', null, get_string('author', 'datalynx'), null);
         $grp[] = &$mform->createElement('static', '', '', $br);
         
         $grp[] = &$mform->createElement('checkboxgroup', 'roles', get_string('roles'), 
@@ -89,13 +88,10 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
         global $DB;
         if ($permissionid == datalynx::PERMISSION_ADMIN) {
             $sql = "SELECT id, name FROM {datalynx_views} WHERE dataid = :dataid";
-            return $DB->get_records_sql_menu($sql, ['dataid' => $this->_df->id()
-            ]);
+            return $DB->get_records_sql_menu($sql, ['dataid' => $this->_df->id()]);
         } else {
             $sql = "SELECT id, name FROM {datalynx_views} WHERE dataid = :dataid AND visible & :permissionid <> 0";
-            return $DB->get_records_sql_menu($sql, 
-                    ['dataid' => $this->_df->id(), 'permissionid' => $permissionid
-                    ]);
+            return $DB->get_records_sql_menu($sql, ['dataid' => $this->_df->id(), 'permissionid' => $permissionid]);
         }
     }
 
@@ -105,8 +101,7 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
                   FROM {datalynx_fields}
                  WHERE dataid = :dataid
                    AND " . $DB->sql_like('type', ':type');
-        $params = ['dataid' => $this->_df->id(), 'type' => 'teammemberselect'
-        ];
+        $params = ['dataid' => $this->_df->id(), 'type' => 'teammemberselect'];
         return $DB->get_records_sql_menu($sql, $params);
     }
 

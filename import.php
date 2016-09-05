@@ -52,13 +52,11 @@ if (!has_capability('mod/datalynx:manageentries', $df->context) or
             'nopermissions', '');
 }
 
-$df->set_page('import', array('modjs' => true, 'urlparams' => $urlparams
-));
+$df->set_page('import', array('modjs' => true, 'urlparams' => $urlparams));
 
 // activate navigation node
 navigation_node::override_active_url(
-        new moodle_url('/mod/datalynx/import.php', array('id' => $df->cm->id
-        )));
+        new moodle_url('/mod/datalynx/import.php', array('id' => $df->cm->id)));
 
 // DATA PROCESSING
 // import
@@ -68,8 +66,7 @@ if ($urlparams->vid and confirm_sesskey()) {
     // process import
     if ($urlparams->import and confirm_sesskey()) {
         if ($view->process_data()) {
-            redirect(new moodle_url('/mod/datalynx/view.php', array('d' => $urlparams->d
-            )));
+            redirect(new moodle_url('/mod/datalynx/view.php', array('d' => $urlparams->d)));
         } else {
             // proceed to display list of import views
         }
@@ -105,8 +102,7 @@ if (!$views = $df->get_views_by_type('import', true)) {
 }
 
 // print header
-$df->print_header(array('tab' => 'import', 'urlparams' => $urlparams
-));
+$df->print_header(array('tab' => 'import', 'urlparams' => $urlparams));
 
 // print add import link
 $addimporturl = new moodle_url('/mod/datalynx/view/view_edit.php', 
@@ -114,8 +110,7 @@ $addimporturl = new moodle_url('/mod/datalynx/view/view_edit.php',
         ));
 $addimportlink = html_writer::link($addimporturl, get_string('importadd', 'datalynx'));
 $br = html_writer::empty_tag('br');
-echo html_writer::tag('div', $addimportlink . $br . $br, array('class' => 'mdl-align'
-));
+echo html_writer::tag('div', $addimportlink . $br . $br, array('class' => 'mdl-align'));
 
 // if there are import views print admin style list of them
 if ($views) {
@@ -123,8 +118,7 @@ if ($views) {
     $viewbaseurl = '/mod/datalynx/import.php';
     $editbaseurl = '/mod/datalynx/view/view_edit.php';
     $actionbaseurl = '/mod/datalynx/import.php';
-    $linkparams = array('d' => $df->id(), 'sesskey' => sesskey()
-    );
+    $linkparams = array('d' => $df->id(), 'sesskey' => sesskey());
     
     // table headings
     $strviews = get_string('views', 'datalynx');
@@ -135,8 +129,7 @@ if ($views) {
     $strduplicate = get_string('duplicate');
     
     $selectallnone = html_writer::checkbox(null, null, false, null, 
-            array('onclick' => 'select_allnone(\'view\'&#44;this.checked)'
-            ));
+            array('onclick' => 'select_allnone(\'view\'&#44;this.checked)'));
     $multidelete = html_writer::tag('button', 
             $OUTPUT->pix_icon('t/delete', get_string('multidelete', 'datalynx')), 
             array('name' => 'multidelete', 
@@ -149,35 +142,31 @@ if ($views) {
     $table->head = array($strviews, $strdescription, $stredit, $strduplicate, $strreset, 
         $multidelete, $selectallnone
     );
-    $table->align = array('left', 'left', 'center', 'center', 'center', 'center', 'center'
-    );
-    $table->wrap = array(false, false, false, false, false, false, false
-    );
+    $table->align = array('left', 'left', 'center', 'center', 'center', 'center', 'center');
+    $table->wrap = array(false, false, false, false, false, false, false);
     $table->attributes['align'] = 'center';
     
     foreach ($views as $viewid => $view) {
         
         $viewname = html_writer::link(
-                new moodle_url($viewbaseurl, $linkparams + array('vid' => $viewid
-                )), $view->name());
+                new moodle_url($viewbaseurl, $linkparams + array('vid' => $viewid)), $view->name());
         $viewdescription = shorten_text($view->view->description, 30);
         $viewedit = html_writer::link(
-                new moodle_url($editbaseurl, $linkparams + array('vedit' => $viewid
-                )), $OUTPUT->pix_icon('t/edit', $stredit));
+                new moodle_url($editbaseurl, $linkparams + array('vedit' => $viewid)),
+                    $OUTPUT->pix_icon('t/edit', $stredit));
         $viewduplicate = html_writer::link(
-                new moodle_url($actionbaseurl, $linkparams + array('duplicate' => $viewid
-                )), $OUTPUT->pix_icon('t/copy', $strduplicate));
+                new moodle_url($actionbaseurl, $linkparams + array('duplicate' => $viewid)),
+                    $OUTPUT->pix_icon('t/copy', $strduplicate));
         $viewreset = html_writer::link(
-                new moodle_url($actionbaseurl, $linkparams + array('reset' => $viewid
-                )), $OUTPUT->pix_icon('t/reload', $strreset));
+                new moodle_url($actionbaseurl, $linkparams + array('reset' => $viewid)),
+                    $OUTPUT->pix_icon('t/reload', $strreset));
         $viewdelete = html_writer::link(
-                new moodle_url($actionbaseurl, $linkparams + array('delete' => $viewid
-                )), $OUTPUT->pix_icon('t/delete', $strdelete));
+                new moodle_url($actionbaseurl, $linkparams + array('delete' => $viewid)),
+                    $OUTPUT->pix_icon('t/delete', $strdelete));
         $viewselector = html_writer::checkbox('viewselector', $viewid, false);
         
         $table->data[] = array($viewname, $viewdescription, $viewedit, $viewduplicate, $viewreset, 
-            $viewdelete, $viewselector
-        );
+            $viewdelete, $viewselector);
     }
     echo html_writer::table($table);
 }

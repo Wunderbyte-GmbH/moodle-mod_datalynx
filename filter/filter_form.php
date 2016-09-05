@@ -55,7 +55,7 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
      */
     public function custom_sort_definition($customsort, $fields, $fieldoptions, $showlabel = false) {
         $mform = &$this->_form;
-        $df = $this->_df;
+        // $df = $this->_df;
         
         $diroptions = array(0 => get_string('ascending', 'datalynx'), 
             1 => get_string('descending', 'datalynx')
@@ -110,8 +110,7 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
     /*
      *
      */
-    public function custom_search_definition($customsearch, $fields, $fieldoptions, 
-            $showlabel = false) {
+    public function custom_search_definition($customsearch, $fields, $fieldoptions, $showlabel = false) {
         $mform = &$this->_form;
         $df = $this->_df;
         
@@ -144,11 +143,9 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
                             if ($searchoption) {
                                 list($not, $operator, $value) = $searchoption;
                             } else {
-                                list($not, $operator, $value) = array('', '', ''
-                                );
+                                list($not, $operator, $value) = array('', '', '');
                             }
-                            $searcharr[] = array($fieldid, $andor, $not, $operator, $value
-                            );
+                            $searcharr[] = array($fieldid, $andor, $not, $operator, $value);
                         }
                     }
                 }
@@ -241,9 +238,7 @@ class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
         $description = empty($filter->description) ? '' : $filter->description;
         $visible = !isset($filter->visible) ? 1 : $filter->visible;
         $fields = $df->get_fields();
-        $fieldoptions = array(0 => get_string('choose')
-        ) + $df->get_fields(array('entry'
-        ), true);
+        $fieldoptions = array(0 => get_string('choose')) + $df->get_fields(array('entry'), true);
         
         $mform = &$this->_form;
         
@@ -258,16 +253,14 @@ class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
         
         // name and description
         $mform->addElement('text', 'name', get_string('name'));
-        $mform->addElement('text', 'description', get_string('description'), array('size' => '64'
-        ));
+        $mform->addElement('text', 'description', get_string('description'), array('size' => '64'));
         $mform->setType('name', PARAM_TEXT);
         $mform->setType('description', PARAM_TEXT);
         $mform->setDefault('name', $name);
         $mform->setDefault('description', $description);
         
         // visibility
-        $visibilityoptions = array(0 => 'hidden', 1 => 'visible'
-        );
+        $visibilityoptions = array(0 => 'hidden', 1 => 'visible');
         $mform->addElement('select', 'visible', get_string('visible'), $visibilityoptions);
         $mform->setDefault('visible', $visible);
         
@@ -284,17 +277,13 @@ class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
         $mform->setDefault('perpage', $filter->perpage);
         
         // selection method
-        $options = array(0 => get_string('filterbypage', 'datalynx'), 
-            1 => get_string('random', 'datalynx')
-        );
-        $mform->addElement('select', 'selection', get_string('filterselection', 'datalynx'), 
-                $options);
+        $options = array(0 => get_string('filterbypage', 'datalynx'), 1 => get_string('random', 'datalynx'));
+        $mform->addElement('select', 'selection', get_string('filterselection', 'datalynx'), $options);
         $mform->setDefault('selection', $filter->selection);
         $mform->disabledIf('selection', 'perpage', 'eq', '0');
         
         // group by
-        $groupbyfieldoptions = array(0 => get_string('choose')
-        );
+        $groupbyfieldoptions = array(0 => get_string('choose'));
         foreach ($fields as $field) {
             if ($field->supports_group_by()) {
                 $groupbyfieldoptions[$field->id()] = $field->name();
@@ -358,15 +347,14 @@ class mod_datalynx_advanced_filter_form extends mod_datalynx_filter_base_form {
      *
      */
     function definition() {
-        $df = $this->_df;
+        // $df = $this->_df;
         $filter = $this->_filter;
         $view = $this->_customdata['view'];
         
         $name = empty($filter->name) ? get_string('filternew', 'datalynx') : $filter->name;
         
         $fields = $view->get_view_fields();
-        $fieldoptions = array(0 => get_string('choose')
-        );
+        $fieldoptions = array(0 => get_string('choose'));
         foreach ($fields as $fieldid => $field) {
             $fieldoptions[$fieldid] = $field->name();
         }

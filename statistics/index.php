@@ -33,17 +33,14 @@ $urlparams->id = optional_param('id', 0, PARAM_INT); // course module id
 $df = new datalynx($urlparams->d, $urlparams->id);
 require_capability('mod/datalynx:viewstatistics', $df->context);
 
-$df->set_page('statistics/index', array('modjs' => true, 'urlparams' => $urlparams
-));
+$df->set_page('statistics/index', array('modjs' => true, 'urlparams' => $urlparams));
 
 // activate navigation node
 navigation_node::override_active_url(
-        new moodle_url('/mod/datalynx/statistics/index.php', array('id' => $df->cm->id
-        )));
+        new moodle_url('/mod/datalynx/statistics/index.php', array('id' => $df->cm->id)));
 
 // Print header
-$df->print_header(array('tab' => 'statistics', 'urlparams' => $urlparams
-));
+$df->print_header(array('tab' => 'statistics', 'urlparams' => $urlparams));
 
 $stats = new datalynx_statistics_class($df);
 
@@ -61,8 +58,7 @@ if ($data = $mform->get_data()) {
     $data->from = 0;
     $data->to = time();
     $data->mode = datalynx_statistics_class::MODE_ALL_TIME;
-    $data->show = array(1 => 1, 2 => 1, 4 => 1, 8 => 1
-    );
+    $data->show = array(1 => 1, 2 => 1, 4 => 1, 8 => 1);
     $mform->set_data($data);
 }
 

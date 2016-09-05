@@ -46,14 +46,12 @@ class mod_datalynx_preset_form extends moodleform {
         $grp[] = &$mform->createElement('select', 'preset_data', null, $packdata);
         $grp[] = &$mform->createElement('radio', 'preset_source', null, 
                 get_string('presetfromfile', 'datalynx'), 'file');
-        $mform->addGroup($grp, 'psourcegrp', null, array('  ', '<br />'
-        ), false);
+        $mform->addGroup($grp, 'psourcegrp', null, array('  ', '<br />'), false);
         $mform->setDefault('preset_source', 'current');
         
         // upload file
         $options = array('subdirs' => 0, 'maxbytes' => $COURSE->maxbytes, 'maxfiles' => 1, 
-            'accepted_types' => array('*.zip', '*.mbz'
-            )
+            'accepted_types' => array('*.zip', '*.mbz')
         );
         $mform->addElement('filepicker', 'uploadfile', null, null, $options);
         $mform->disabledIf('uploadfile', 'preset_source', 'neq', 'file');

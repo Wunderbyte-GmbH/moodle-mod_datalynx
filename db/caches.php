@@ -20,6 +20,4 @@
  * @copyright 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-$definitions = array('patterns' => array('mode' => cache_store::MODE_APPLICATION
-)
-);
+$definitions = array('patterns' => array('mode' => cache_store::MODE_APPLICATION));

@@ -50,15 +50,13 @@ class datalynx_field_renderer_form extends moodleform {
         
         $mform->addElement('header', 'general', get_string('general', 'form'));
         
-        $mform->addElement('text', 'name', get_string('name'), array('size' => '32'
-        ));
+        $mform->addElement('text', 'name', get_string('name'), array('size' => '32'));
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', "Renderer name may not contain the pipe symbol \" | \"!", 'regex', 
                 '/^[^\|]+$/', 'client');
         
-        $mform->addElement('text', 'description', get_string('description'), array('size' => '64'
-        ));
+        $mform->addElement('text', 'description', get_string('description'), array('size' => '64'));
         $mform->setType('description', PARAM_TEXT);
         
         $group = array();
@@ -96,9 +94,7 @@ class datalynx_field_renderer_form extends moodleform {
         $group[] = $mform->createElement('textarea', 'novaluetemplate', '', '');
         $mform->disabledIf('novaluetemplate', 'novalueoptions', 'eq', 0);
         $mform->disabledIf('novaluetemplate', 'novalueoptions', 'eq', 1);
-        $mform->addGroup($group, 'novaluetemplategroup', get_string('novalue', 'datalynx'), 
-                array('<br />'
-                ), false);
+        $mform->addGroup($group, 'novaluetemplategroup', get_string('novalue', 'datalynx'), array('<br />'), false);
         $mform->setType('novaluetemplate', PARAM_CLEANHTML);
         
         $group = array();
@@ -111,9 +107,7 @@ class datalynx_field_renderer_form extends moodleform {
         $mform->setDefault('edittemplate', '#input');
         $mform->disabledIf('edittemplate', 'editoptions', 'eq', 0);
         $mform->disabledIf('edittemplate', 'editoptions', 'eq', 1);
-        $mform->addGroup($group, 'edittemplategroup', get_string('edittemplate', 'datalynx'), 
-                array('<br />'
-                ), false);
+        $mform->addGroup($group, 'edittemplategroup', get_string('edittemplate', 'datalynx'), array('<br />'), false);
         $mform->setType('edittemplate', PARAM_CLEANHTML);
         $mform->addHelpButton('edittemplategroup', 'edittemplate', 'datalynx');
         
@@ -130,9 +124,7 @@ class datalynx_field_renderer_form extends moodleform {
         $mform->disabledIf('noteditabletemplate', 'noteditableoptions', 'eq', 0);
         $mform->disabledIf('noteditabletemplate', 'noteditableoptions', 'eq', 1);
         $mform->disabledIf('noteditabletemplate', 'noteditableoptions', 'eq', 2);
-        $mform->addGroup($group, 'noteditablegroup', get_string('noteditable', 'datalynx'), 
-                array('<br />'
-                ), false);
+        $mform->addGroup($group, 'noteditablegroup', get_string('noteditable', 'datalynx'), array('<br />'), false);
         $mform->setType('noteditabletemplate', PARAM_CLEANHTML);
         
         $this->add_action_buttons();

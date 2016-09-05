@@ -68,7 +68,8 @@ class entry_deleted extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' deleted the datalynx entry with id '$this->objectid' in the datalynx activity " .
+        return "The user with id '$this->userid' deleted the datalynx entry with " .
+            "id '$this->objectid' in the datalynx activity " .
                  "with the course module id '$this->contextinstanceid'.";
     }
 
@@ -78,8 +79,7 @@ class entry_deleted extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/mod/datalynx/view.php', array('d' => $this->other['dataid']
-        ));
+        return new \moodle_url('/mod/datalynx/view.php', array('d' => $this->other['dataid']));
     }
 
     /**
@@ -90,8 +90,7 @@ class entry_deleted extends \core\event\base {
     public function get_legacy_logdata() {
         return array($this->courseid, 'datalynx', 'entry_deleted', 
             'view.php?id=' . $this->contextinstanceid, $this->other['dataid'], 
-            $this->contextinstanceid
-        );
+            $this->contextinstanceid);
     }
 
     /**

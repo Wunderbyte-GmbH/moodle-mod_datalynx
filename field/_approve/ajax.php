@@ -38,10 +38,8 @@ $entryid = required_param('entryid', PARAM_INT);
 $sesskey = required_param('sesskey', PARAM_TEXT);
 
 $cm = get_coursemodule_from_instance('datalynx', $d, 0, false, MUST_EXIST);
-$course = $DB->get_record('course', array('id' => $cm->course
-), '*', MUST_EXIST);
-$data = $DB->get_record('datalynx', array('id' => $d
-), '*', MUST_EXIST);
+$course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
+$data = $DB->get_record('datalynx', array('id' => $d), '*', MUST_EXIST);
 
 require_sesskey();
 
@@ -53,30 +51,21 @@ global $DB;
 $completiontype = COMPLETION_UNKNOWN;
 $df = new datalynx($d);
 if ($action == 'approve') {
-    $DB->set_field('datalynx_entries', 'approved', 1, array('id' => $entryid
-    ));
+    $DB->set_field('datalynx_entries', 'approved', 1, array('id' => $entryid));
     $entriesclass = new datalynx_entries($df);
-    $processed = $entriesclass->create_approved_entries_for_team(array($entryid
-    ));
+    $processed = $entriesclass->create_approved_entries_for_team(array($entryid));
     if ($processed) {
-        $eventdata = (object) array('view' => $df->get_view_from_id($viewid), 'items' => $processed
-        );
+        $eventdata = (object) array('view' => $df->get_view_from_id($viewid), 'items' => $processed);
         $df->events_trigger("entryapproved", $eventdata);
     }
-    $return = $DB->get_field('datalynx_entries', 'approved', array('id' => $entryid
-    )) == 1;
+    $return = $DB->get_field('datalynx_entries', 'approved', array('id' => $entryid)) == 1;
     $completiontype = COMPLETION_COMPLETE;
 } else if ($action == 'disapprove') {
-    $DB->set_field('datalynx_entries', 'approved', 0, array('id' => $entryid
-    ));
-    $return = $DB->get_field('datalynx_entries', 'approved', array('id' => $entryid
-    )) == 0;
-    $processed = array($entryid => $DB->get_record('datalynx_entries', array('id' => $entryid
-    ))
-    );
+    $DB->set_field('datalynx_entries', 'approved', 0, array('id' => $entryid));
+    $return = $DB->get_field('datalynx_entries', 'approved', array('id' => $entryid)) == 0;
+    $processed = array($entryid => $DB->get_record('datalynx_entries', array('id' => $entryid)));
     if ($processed) {
-        $eventdata = (object) array('view' => $df->get_view_from_id($viewid), 'items' => $processed
-        );
+        $eventdata = (object) array('view' => $df->get_view_from_id($viewid), 'items' => $processed);
         $df->events_trigger("entrydisapproved", $eventdata);
     }
     $completiontype = COMPLETION_INCOMPLETE;
@@ -87,8 +76,7 @@ if ($action == 'approve') {
 $completion = new completion_info($course);
 if ($completion->is_enabled($cm) && $cm->completion == COMPLETION_TRACKING_AUTOMATIC &&
          $data->completionentries) {
-    $userid = $DB->get_field('datalynx_entries', 'userid', array('id' => $entryid
-    ));
+    $userid = $DB->get_field('datalynx_entries', 'userid', array('id' => $entryid));
     $completion->update_state($cm, $completiontype, $userid);
 }
 

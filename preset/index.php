@@ -45,13 +45,11 @@ $urlparams->confirmed = optional_param('confirmed', 0, PARAM_INT);
 // Set a datalynx object
 $df = new datalynx($urlparams->d, $urlparams->id);
 require_capability('mod/datalynx:managetemplates', $df->context);
-$df->set_page('preset/index', array('modjs' => true, 'urlparams' => $urlparams
-));
+$df->set_page('preset/index', array('modjs' => true, 'urlparams' => $urlparams));
 
 // activate navigation node
 navigation_node::override_active_url(
-        new moodle_url('/mod/datalynx/preset/index.php', array('id' => $df->cm->id
-        )));
+        new moodle_url('/mod/datalynx/preset/index.php', array('id' => $df->cm->id)));
 
 $pm = $df->get_preset_manager();
 
@@ -68,8 +66,7 @@ if (!$localpresets and !$sharedpresets) {
 }
 
 // print header
-$df->print_header(array('tab' => 'presets', 'urlparams' => $urlparams
-));
+$df->print_header(array('tab' => 'presets', 'urlparams' => $urlparams));
 
 // print the preset form
 $pm->print_preset_form();

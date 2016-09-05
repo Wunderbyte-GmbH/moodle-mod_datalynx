@@ -58,8 +58,7 @@ class datalynxfield_gradeitem extends datalynxfield_base {
         
         if ($this->field->param1 and ($this->field->param1 != $itemid or !$this->field->param2)) {
             $gradeiteminfo = 'id,itemname,itemtype,itemmodule,iteminstance';
-            if ($item = $DB->get_record('grade_items', array('id' => $this->field->param1
-            ), $gradeiteminfo)) {
+            if ($item = $DB->get_record('grade_items', array('id' => $this->field->param1), $gradeiteminfo)) {
                 $this->field->param2 = $item->itemname;
                 $this->field->param3 = $item->itemtype;
                 $this->field->param4 = $item->itemmodule;
@@ -89,9 +88,9 @@ class datalynxfield_gradeitem extends datalynxfield_base {
     public function get_sort_from_sql($paramname = 'sortie', $paramcount = '') {
         $fieldid = $this->field->id;
         if ($fieldid > 0) {
-            $sql = " LEFT JOIN {grade_grades} c$fieldid ON (c$fieldid.userid = e.userid AND c$fieldid.itemid = :$paramname$paramcount) ";
-            return array($sql, $this->itemid
-            );
+            $sql = " LEFT JOIN {grade_grades} c$fieldid ON (c$fieldid.userid = e.userid AND 
+                    c$fieldid.itemid = :$paramname$paramcount) ";
+            return array($sql, $this->itemid);
         } else {
             return null;
         }

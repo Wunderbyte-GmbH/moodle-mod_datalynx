@@ -45,8 +45,7 @@ class datalynxfield_datalynxview extends datalynxfield_no_content {
         
         // Get the datalynx
         if (empty($this->field->param1) or
-                 !$data = $DB->get_record('datalynx', array('id' => $this->field->param1
-                ))) {
+                 !$data = $DB->get_record('datalynx', array('id' => $this->field->param1))) {
             return;
         }
         
@@ -54,8 +53,7 @@ class datalynxfield_datalynxview extends datalynxfield_no_content {
         // TODO Add capability check on view entries
         
         // Get the view
-        if (empty($this->field->param2) or !$view = $datalynx->get_view_from_id(
-                $this->field->param2)) {
+        if (empty($this->field->param2) or !$view = $datalynx->get_view_from_id($this->field->param2)) {
             return;
         }
         $this->refdatalynx = $datalynx;

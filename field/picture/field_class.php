@@ -34,12 +34,10 @@ class datalynxfield_picture extends datalynxfield_file {
         global $DB;
         parent::update_content($entry, $values);
         $content = $DB->get_record('datalynx_contents', 
-                array('fieldid' => $this->field->id, 'entryid' => $entry->id
-                ));
+                array('fieldid' => $this->field->id, 'entryid' => $entry->id));
         if ($content) {
             $this->update_content_files($content->id, 
-                    array('updatethumb' => true, 'updatefile' => false
-                    ));
+                    array('updatethumb' => true, 'updatefile' => false));
         }
     }
 
@@ -62,8 +60,7 @@ class datalynxfield_picture extends datalynxfield_file {
         if ($oldfield && ($updatefile || $updatethumb)) {
             // Check through all existing records and update the thumbnail
             if ($contents = $DB->get_records('datalynx_contents', 
-                    array('fieldid' => $this->field->id
-                    ))) {
+                    array('fieldid' => $this->field->id))) {
                 if (count($contents) > 20) {
                     echo $OUTPUT->notification(
                             get_string('resizingimages', 'datalynxfield_picture'), 'notifysuccess');
@@ -75,8 +72,7 @@ class datalynxfield_picture extends datalynxfield_file {
                     @set_time_limit(300);
                     // Might be slow!
                     $this->update_content_files($content->id, 
-                            array('updatefile' => $updatefile, 'updatethumb' => $updatethumb
-                            ));
+                            array('updatefile' => $updatefile, 'updatethumb' => $updatethumb));
                 }
             }
         }
@@ -96,8 +92,7 @@ class datalynxfield_picture extends datalynxfield_file {
                 $fs->delete_area_files($this->df->context->id, 'mod_datalynx', $filearea);
             }
             $this->delete_content();
-            $DB->delete_records('datalynx_fields', array('id' => $this->field->id
-            ));
+            $DB->delete_records('datalynx_fields', array('id' => $this->field->id));
         }
         return true;
     }
@@ -130,8 +125,7 @@ class datalynxfield_picture extends datalynxfield_file {
                         // this may fail for various reasons
                         try {
                             global $DB;
-                            $record = $DB->get_record('files', array('id' => $file->get_id()
-                            ));
+                            $record = $DB->get_record('files', array('id' => $file->get_id()));
                             $fs->convert_image($record, $record->id, $maxwidth, $maxheight, true);
                         } catch (Exception $e) {
                             return false;

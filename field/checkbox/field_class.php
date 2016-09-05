@@ -32,8 +32,7 @@ class datalynxfield_checkbox extends datalynxfield_option_multiple {
     ), array('name' => 'Space', 'chr' => '&#32;'
     ), array('name' => ',', 'chr' => '&#44;'
     ), array('name' => ', (with space)', 'chr' => '&#44;&#32;'
-    ), array('name' => 'Unordered list', 'chr' => '</li><li>'
-    )
+    ), array('name' => 'Unordered list', 'chr' => '</li><li>')
     );
 
     /**

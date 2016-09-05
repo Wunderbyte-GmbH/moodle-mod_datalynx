@@ -33,12 +33,12 @@ class datalynx_rule_form extends moodleform {
     /* @var datalynx $_df */
     protected $_df = null;
 
-    public function datalynx_rule_form($rule, $action = null, $customdata = null, $method = 'post', $target = '', 
+    public function __construct($rule, $action = null, $customdata = null, $method = 'post', $target = '',
             $attributes = null, $editable = true) {
         $this->_rule = $rule;
         $this->_df = $this->_rule->df;
         
-        parent::moodleform($action, $customdata, $method, $target, $attributes, $editable);
+        parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
     }
 
     function definition() {
@@ -53,13 +53,11 @@ class datalynx_rule_form extends moodleform {
         $mform->addElement('header', 'general', get_string('general', 'form'));
         
         // name
-        $mform->addElement('text', 'name', get_string('name'), array('size' => '32'
-        ));
+        $mform->addElement('text', 'name', get_string('name'), array('size' => '32'));
         $mform->addRule('name', null, 'required', null, 'client');
         
         // description
-        $mform->addElement('text', 'description', get_string('description'), array('size' => '64'
-        ));
+        $mform->addElement('text', 'description', get_string('description'), array('size' => '64'));
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('name', PARAM_TEXT);
             $mform->setType('description', PARAM_TEXT);
@@ -70,8 +68,7 @@ class datalynx_rule_form extends moodleform {
         
         // enabled
         $mform->addElement('advcheckbox', 'enabled', get_string('ruleenabled', 'datalynx'), '', 
-                null, array(0, 1
-                ));
+                null, array(0, 1));
         
         // events
         $eventmenu = datalynx_rule_manager::get_event_data($this->_df->id());
@@ -125,8 +122,7 @@ class datalynx_rule_form extends moodleform {
                 get_string('savecontinue', 'datalynx'));
         // cancel
         $buttonarray[] = &$mform->createElement('cancel');
-        $mform->addGroup($buttonarray, 'buttonar', '', array(' '
-        ), false);
+        $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
         $mform->closeHeaderBefore('buttonar');
     }
 

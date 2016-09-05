@@ -144,11 +144,9 @@ class datalynx_statistics_class {
     }
 
     public function get_form() {
-        global $CFG;
-        
+
         $formclass = 'datalynx_statistics_form';
-        $formparams = array('d' => $this->_df->id()
-        );
+        $formparams = array('d' => $this->_df->id());
         $actionurl = new moodle_url('/mod/datalynx/statistics/index.php', $formparams);
         require_once ('statistics_form.php');
         return new $formclass($this, $actionurl);
@@ -158,8 +156,7 @@ class datalynx_statistics_class {
         global $DB;
         
         $params = array('dataid' => $this->_df->id(), 'fromdate' => $from, 
-            'todate' => $to + strtotime('+1 day', 0)
-        );
+            'todate' => $to + strtotime('+1 day', 0));
         
         $querytotal = "SELECT COUNT(de.id)
                     FROM {datalynx_entries} de

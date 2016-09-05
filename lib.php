@@ -159,8 +159,7 @@ function datalynx_update_instance($data) {
 function datalynx_delete_instance($id) {
     global $DB;
     
-    if (!$data = $DB->get_record('datalynx', array('id' => $id
-    ))) {
+    if (!$data = $DB->get_record('datalynx', array('id' => $id))) {
         return false;
     }
     
@@ -173,22 +172,16 @@ function datalynx_delete_instance($id) {
     
     // get all the content in this datalynx
     $sql = "SELECT e.id FROM {datalynx_entries} e WHERE e.dataid = ?";
-    $DB->delete_records_select('datalynx_contents', "entryid IN ($sql)", array($id
-    ));
+    $DB->delete_records_select('datalynx_contents', "entryid IN ($sql)", array($id));
     
     // delete fields views filters entries
-    $DB->delete_records('datalynx_fields', array('dataid' => $id
-    ));
-    $DB->delete_records('datalynx_views', array('dataid' => $id
-    ));
-    $DB->delete_records('datalynx_filters', array('dataid' => $id
-    ));
-    $DB->delete_records('datalynx_entries', array('dataid' => $id
-    ));
+    $DB->delete_records('datalynx_fields', array('dataid' => $id));
+    $DB->delete_records('datalynx_views', array('dataid' => $id));
+    $DB->delete_records('datalynx_filters', array('dataid' => $id));
+    $DB->delete_records('datalynx_entries', array('dataid' => $id));
     
     // Delete the instance itself
-    $result = $DB->delete_records('datalynx', array('id' => $id
-    ));
+    $result = $DB->delete_records('datalynx', array('id' => $id));
     
     // cleanup gradebook
     datalynx_grade_item_delete($data);
@@ -204,8 +197,7 @@ function datalynx_delete_instance($id) {
  * @param stdClass $currentcontext Current context of block
  */
 function datalynx_page_type_list($pagetype, $parentcontext, $currentcontext) {
-    $module_pagetype = array('mod-datalynx-*' => get_string('page-mod-datalynx-x', 'datalynx')
-    );
+    $module_pagetype = array('mod-datalynx-*' => get_string('page-mod-datalynx-x', 'datalynx'));
     return $module_pagetype;
 }
 
@@ -261,8 +253,7 @@ function datalynx_reset_gradebook($courseid, $type = '') {
               FROM {datalynx} d, {course_modules} cm, {modules} m
              WHERE m.name='datalynx' AND m.id=cm.module AND cm.instance=d.id AND d.course=?";
     
-    if ($datalynxs = $DB->get_records_sql($sql, array($courseid
-    ))) {
+    if ($datalynxs = $DB->get_records_sql($sql, array($courseid))) {
         foreach ($datalynxs as $datalynx) {
             datalynx_grade_item_update($datalynx, 'reset');
         }
@@ -304,14 +295,11 @@ function datalynx_reset_userdata($data) {
     // delete entries if requested
     if (!empty($data->reset_datalynx_data)) {
         $DB->delete_records_select('comments', "itemid IN ($allrecordssql) AND commentarea='entry'", 
-                array($data->courseid
-                ));
+                array($data->courseid));
         $DB->delete_records_select('datalynx_contents', "entryid IN ($allrecordssql)", 
-                array($data->courseid
-                ));
+                array($data->courseid));
         $DB->delete_records_select('datalynx_entries', "dataid IN ($alldatassql)", 
-                array($data->courseid
-                ));
+                array($data->courseid));
         
         if ($datas = $DB->get_records_sql($alldatassql, array($data->courseid
         ))) {
@@ -348,8 +336,7 @@ function datalynx_reset_userdata($data) {
         $course_context = context_course::instance($data->courseid);
         $notenrolled = array();
         $fields = array();
-        $rs = $DB->get_recordset_sql($recordssql, array($data->courseid
-        ));
+        $rs = $DB->get_recordset_sql($recordssql, array($data->courseid));
         foreach ($rs as $record) {
             if (array_key_exists($record->userid, $notenrolled) or !$record->userexists or
                      $record->userdeleted or !is_enrolled($course_context, $record->userid)) {
@@ -362,17 +349,12 @@ function datalynx_reset_userdata($data) {
                 $ratingdeloptions->itemid = $record->id;
                 $rm->delete_ratings($ratingdeloptions);
                 
-                $DB->delete_records('comments', 
-                        array('itemid' => $record->id, 'commentarea' => 'entry'
-                        ));
-                $DB->delete_records('datalynx_contents', array('entryid' => $record->id
-                ));
-                $DB->delete_records('datalynx_entries', array('id' => $record->id
-                ));
+                $DB->delete_records('comments', array('itemid' => $record->id, 'commentarea' => 'entry'));
+                $DB->delete_records('datalynx_contents', array('entryid' => $record->id));
+                $DB->delete_records('datalynx_entries', array('id' => $record->id));
                 // HACK: this is ugly - the entryid should be before the fieldid!
                 if (!array_key_exists($record->dataid, $fields)) {
-                    if ($fs = $DB->get_records('datalynx_fields', array('dataid' => $record->dataid
-                    ))) {
+                    if ($fs = $DB->get_records('datalynx_fields', array('dataid' => $record->dataid))) {
                         $fields[$record->dataid] = array_keys($fs);
                     } else {
                         $fields[$record->dataid] = array();
@@ -386,8 +368,7 @@ function datalynx_reset_userdata($data) {
             }
             rs_close($rs);
             $status[] = array('component' => $componentstr, 
-                'item' => get_string('deletenotenrolled', 'datalynx'), 'error' => false
-            );
+                'item' => get_string('deletenotenrolled', 'datalynx'), 'error' => false);
         }
     }
     
@@ -412,27 +393,22 @@ function datalynx_reset_userdata($data) {
         }
         
         $status[] = array('component' => $componentstr, 'item' => get_string('deleteallratings'), 
-            'error' => false
-        );
+            'error' => false);
     }
     
     // remove all comments
     if (!empty($data->reset_datalynx_comments)) {
         $DB->delete_records_select('comments', "itemid IN ($allrecordssql) AND commentarea='entry'", 
-                array($data->courseid
-                ));
+                array($data->courseid));
         $status[] = array('component' => $componentstr, 'item' => get_string('deleteallcomments'), 
-            'error' => false
-        );
+            'error' => false);
     }
     
     // updating dates - shift may be negative too
     if ($data->timeshift) {
-        shift_course_mod_dates('datalynx', array('timeavailable', 'timedue'
-        ), $data->timeshift, $data->courseid);
+        shift_course_mod_dates('datalynx', array('timeavailable', 'timedue'), $data->timeshift, $data->courseid);
         $status[] = array('component' => $componentstr, 'item' => get_string('datechanged'), 
-            'error' => false
-        );
+            'error' => false);
     }
     
     return $status;
@@ -497,8 +473,7 @@ function datalynx_get_file_info($browser, $areas, $course, $cm, $context, $filea
         return new datalynx_file_info_container($browser, $course, $cm, $context, $areas, $filearea);
     }
     
-    if (!$view = $DB->get_record('datalynx_views', array('id' => $itemid
-    ))) {
+    if (!$view = $DB->get_record('datalynx_views', array('id' => $itemid))) {
         return null;
     }
     
@@ -537,23 +512,19 @@ function mod_datalynx_pluginfile($course, $cm, $context, $filearea, $args, $forc
         
         $contentid = (int) array_shift($args);
         
-        if (!$content = $DB->get_record('datalynx_contents', array('id' => $contentid
-        ))) {
+        if (!$content = $DB->get_record('datalynx_contents', array('id' => $contentid))) {
             return false;
         }
         
-        if (!$field = $DB->get_record('datalynx_fields', array('id' => $content->fieldid
-        ))) {
+        if (!$field = $DB->get_record('datalynx_fields', array('id' => $content->fieldid))) {
             return false;
         }
         
-        if (!$entry = $DB->get_record('datalynx_entries', array('id' => $content->entryid
-        ))) {
+        if (!$entry = $DB->get_record('datalynx_entries', array('id' => $content->entryid))) {
             return false;
         }
         
-        if (!$datalynx = $DB->get_record('datalynx', array('id' => $field->dataid
-        ))) {
+        if (!$datalynx = $DB->get_record('datalynx', array('id' => $field->dataid))) {
             return false;
         }
         
@@ -633,8 +604,7 @@ function mod_datalynx_pluginfile($course, $cm, $context, $filearea, $args, $forc
     }
     
     // PDF VIEW files
-    $viewpdfareas = array('view_pdfframe', 'view_pdfwmark', 'view_pdfcert'
-    );
+    $viewpdfareas = array('view_pdfframe', 'view_pdfwmark', 'view_pdfcert');
     if (in_array($filearea, $viewpdfareas) and $context->contextlevel == CONTEXT_MODULE) {
         require_course_login($course, true, $cm);
         
@@ -740,16 +710,14 @@ function datalynx_extend_settings_navigation(settings_navigation $settings, navi
     
     // index
     $dfnode->add(get_string('index', 'datalynx'), 
-            new moodle_url('/mod/datalynx/index.php', array('id' => $PAGE->course->id
-            )));
+            new moodle_url('/mod/datalynx/index.php', array('id' => $PAGE->course->id)));
     
     // notifications
     if (isloggedin() and !isguestuser()) {
         $dfnode->add(get_string('messaging', 'message'), 
                 new moodle_url('/message/edit.php', 
                         array('id' => $USER->id, 'course' => $PAGE->course->id, 
-                            'context' => $PAGE->context->id
-                        )));
+                            'context' => $PAGE->context->id)));
     }
     
     // manage
@@ -757,45 +725,33 @@ function datalynx_extend_settings_navigation(settings_navigation $settings, navi
         $manage = $dfnode->add(get_string('manage', 'datalynx'));
         if ($templatesmanager) {
             $manage->add(get_string('views', 'datalynx'), 
-                    new moodle_url('/mod/datalynx/view/index.php', array('id' => $PAGE->cm->id
-                    )));
+                    new moodle_url('/mod/datalynx/view/index.php', array('id' => $PAGE->cm->id)));
             $fields = $manage->add(get_string('fields', 'datalynx'), 
-                    new moodle_url('/mod/datalynx/field/index.php', array('id' => $PAGE->cm->id
-                    )));
+                    new moodle_url('/mod/datalynx/field/index.php', array('id' => $PAGE->cm->id)));
             $manage->add(get_string('filters', 'datalynx'), 
-                    new moodle_url('/mod/datalynx/filter/index.php', array('id' => $PAGE->cm->id
-                    )));
+                    new moodle_url('/mod/datalynx/filter/index.php', array('id' => $PAGE->cm->id)));
             $manage->add(get_string('rules', 'datalynx'), 
-                    new moodle_url('/mod/datalynx/rule/index.php', array('id' => $PAGE->cm->id
-                    )));
+                    new moodle_url('/mod/datalynx/rule/index.php', array('id' => $PAGE->cm->id)));
             $manage->add(get_string('tools', 'datalynx'), 
-                    new moodle_url('/mod/datalynx/tool/index.php', array('id' => $PAGE->cm->id
-                    )));
+                    new moodle_url('/mod/datalynx/tool/index.php', array('id' => $PAGE->cm->id)));
             $manage->add(get_string('jsinclude', 'datalynx'), 
                     new moodle_url('/mod/datalynx/js.php', 
-                            array('id' => $PAGE->cm->id, 'jsedit' => 1
-                            )));
+                            array('id' => $PAGE->cm->id, 'jsedit' => 1)));
             $manage->add(get_string('cssinclude', 'datalynx'), 
                     new moodle_url('/mod/datalynx/css.php', 
-                            array('id' => $PAGE->cm->id, 'cssedit' => 1
-                            )));
+                            array('id' => $PAGE->cm->id, 'cssedit' => 1)));
             $manage->add(get_string('presets', 'datalynx'), 
-                    new moodle_url('/mod/datalynx/preset/index.php', array('id' => $PAGE->cm->id
-                    )));
+                    new moodle_url('/mod/datalynx/preset/index.php', array('id' => $PAGE->cm->id)));
             $manage->add(get_string('statistics', 'datalynx'), 
                     new moodle_url('/mod/datalynx/statistics/index.php', 
-                            array('id' => $PAGE->cm->id
-                            )));
+                            array('id' => $PAGE->cm->id)));
             $fields->add(get_string('behaviors', 'datalynx'), 
-                    new moodle_url('/mod/datalynx/behavior/index.php', array('id' => $PAGE->cm->id
-                    )));
+                    new moodle_url('/mod/datalynx/behavior/index.php', array('id' => $PAGE->cm->id)));
             $fields->add(get_string('renderers', 'datalynx'), 
-                    new moodle_url('/mod/datalynx/renderer/index.php', array('id' => $PAGE->cm->id
-                    )));
+                    new moodle_url('/mod/datalynx/renderer/index.php', array('id' => $PAGE->cm->id)));
         }
         $manage->add(get_string('import', 'datalynx'), 
-                new moodle_url('/mod/datalynx/import.php', array('id' => $PAGE->cm->id
-                )));
+                new moodle_url('/mod/datalynx/import.php', array('id' => $PAGE->cm->id)));
     }
 }
 
@@ -809,8 +765,7 @@ function datalynx_extend_settings_navigation(settings_navigation $settings, navi
 function datalynx_get_participants($dataid) {
     global $DB;
     
-    $params = array('dataid' => $dataid
-    );
+    $params = array('dataid' => $dataid);
     
     $sql = "SELECT DISTINCT u.id 
               FROM {user} u,
@@ -912,8 +867,7 @@ function datalynx_user_complete($course, $user, $mod, $data) {
             echo '<p>' . get_string('feedback') . ': ' . $grade->str_feedback . '</p>';
         }
     }
-    $sqlparams = array('dataid' => $data->id, 'userid' => $user->id
-    );
+    $sqlparams = array('dataid' => $data->id, 'userid' => $user->id);
     if ($countrecords = $DB->count_records('datalynx_entries', $sqlparams)) {
         // TODO get the default view add a filter for user only and display
     }
@@ -926,15 +880,13 @@ function datalynx_user_complete($course, $user, $mod, $data) {
 /**
  */
 function datalynx_get_view_actions() {
-    return array('view'
-    );
+    return array('view');
 }
 
 /**
  */
 function datalynx_get_post_actions() {
-    return array('add', 'update', 'record delete'
-    );
+    return array('add', 'update', 'record delete');
 }
 
 // ------------------------------------------------------------
@@ -964,8 +916,7 @@ function datalynx_comment_permissions($comment_param) {
     // require_once("$CFG->field/_comment/field_class.php");
     // $comment = new datalynxfield__comment($comment_param->cm->instance);
     // return $comment->permissions($comment_param);
-    return array('post' => true, 'view' => true
-    );
+    return array('post' => true, 'view' => true);
 }
 
 /**
@@ -992,8 +943,7 @@ function datalynx_comment_validate($comment_param) {
  */
 function datalynx_comment_add($newcomment, $comment_param) {
     $df = new datalynx($comment_param->cm->instance);
-    $eventdata = (object) array('items' => $newcomment
-    );
+    $eventdata = (object) array('items' => $newcomment);
     // $df->events_trigger("commentadded", $eventdata); FIXME: this should behave differently!
 }
 
@@ -1095,8 +1045,7 @@ function datalynx_rating_validate($params) {
         // upper limit
         if ($data->rating < 0) {
             // its a custom scale
-            $scalerecord = $DB->get_record('scale', array('id' => -$data->rating
-            ));
+            $scalerecord = $DB->get_record('scale', array('id' => -$data->rating));
             if ($scalerecord) {
                 $scalearray = explode(',', $scalerecord->scale);
                 if ($params['rating'] > count($scalearray)) {
@@ -1234,8 +1183,7 @@ function datalynx_grade_item_update($data, $grades = null) {
         require_once ($CFG->libdir . '/gradelib.php');
     }
     
-    $params = array('itemname' => $data->name, 'idnumber' => $data->cmidnumber
-    );
+    $params = array('itemname' => $data->name, 'idnumber' => $data->cmidnumber);
     
     if (!$data->rating) {
         $params['gradetype'] = GRADE_TYPE_NONE;
@@ -1268,8 +1216,7 @@ function datalynx_grade_item_delete($data) {
     require_once ("$CFG->libdir/gradelib.php");
     
     return grade_update('mod/datalynx', $data->course, 'mod', 'datalynx', $data->id, 0, NULL, 
-            array('deleted' => 1
-            ));
+            array('deleted' => 1));
 }
 
 /**
@@ -1286,8 +1233,7 @@ function datalynx_grade_item_delete($data) {
 function datalynx_get_completion_state($course, $cm, $userid, $type) {
     global $CFG, $DB;
     
-    if (!($datalynx = $DB->get_record('datalynx', array('id' => $cm->instance
-    )))) {
+    if (!($datalynx = $DB->get_record('datalynx', array('id' => $cm->instance)))) {
         throw new Exception("Can't find datalynx {$cm->instance}");
     }
     
@@ -1296,8 +1242,7 @@ function datalynx_get_completion_state($course, $cm, $userid, $type) {
                 "'completionentries' field does not exist in 'datalynx' table! Upgrade your database!");
     }
     
-    $params = array('userid' => $userid, 'dataid' => $datalynx->id
-    );
+    $params = array('userid' => $userid, 'dataid' => $datalynx->id);
     $sql = "SELECT COUNT(1)
               FROM {datalynx_entries} de
              WHERE de.userid = :userid
@@ -1320,8 +1265,7 @@ function datalynx_scale_used($dataid, $scaleid) {
     global $DB;
     $return = false;
     
-    $rec = $DB->get_record('datalynx', array('id' => "$dataid", 'rating' => "-$scaleid"
-    ));
+    $rec = $DB->get_record('datalynx', array('id' => "$dataid", 'rating' => "-$scaleid"));
     
     if (!empty($rec) && !empty($scaleid)) {
         $return = true;
@@ -1341,6 +1285,5 @@ function datalynx_scale_used($dataid, $scaleid) {
  */
 function datalynx_scale_used_anywhere($scaleid) {
     global $DB;
-    return ($scaleid and $DB->record_exists('datalynx', array('rating' => "-$scaleid"
-    )));
+    return ($scaleid and $DB->record_exists('datalynx', array('rating' => "-$scaleid")));
 }

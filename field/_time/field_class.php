@@ -143,7 +143,7 @@ class datalynxfield__time extends datalynxfield_no_content {
         
         $sql = "SELECT DISTINCT $contentfull
                     FROM {datalynx_entries} e
-                    WHERE $contentfull IS NOT NULL'.
+                    WHERE $contentfull IS NOT NULL 
                     ORDER BY $contentfull $sortdir";
         
         $distinctvalues = array();

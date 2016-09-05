@@ -54,20 +54,16 @@ if ($urlparams->cssedit) {
             $mform->addElement('header', 'generalhdr', get_string('headercss', 'datalynx'));
             
             // includes
-            $attributes = array('wrap' => 'virtual', 'rows' => 5, 'cols' => 60
-            );
-            $mform->addElement('textarea', 'cssincludes', get_string('cssincludes', 'datalynx'), 
-                    $attributes);
+            $attributes = array('wrap' => 'virtual', 'rows' => 5, 'cols' => 60);
+            $mform->addElement('textarea', 'cssincludes', get_string('cssincludes', 'datalynx'), $attributes);
             
             // code
-            $attributes = array('wrap' => 'virtual', 'rows' => 15, 'cols' => 60
-            );
+            $attributes = array('wrap' => 'virtual', 'rows' => 15, 'cols' => 60);
             $mform->addElement('textarea', 'css', get_string('csscode', 'datalynx'), $attributes);
             
             // uploads
             $options = array('subdirs' => 0, 'maxbytes' => $COURSE->maxbytes, 'maxfiles' => 10, 
-                'accepted_types' => array('*.css'
-                )
+                'accepted_types' => array('*.css')
             );
             $mform->addElement('filemanager', 'cssupload', get_string('cssupload', 'datalynx'), 
                     null, $options);
@@ -82,17 +78,14 @@ if ($urlparams->cssedit) {
     $df = new datalynx($urlparams->d, $urlparams->id);
     require_capability('mod/datalynx:managetemplates', $df->context);
     
-    $df->set_page('css', array('urlparams' => $urlparams
-    ));
+    $df->set_page('css', array('urlparams' => $urlparams));
     
     // activate navigation node
     navigation_node::override_active_url(
-            new moodle_url('/mod/datalynx/css.php', array('id' => $df->cm->id, 'cssedit' => 1
-            )));
+            new moodle_url('/mod/datalynx/css.php', array('id' => $df->cm->id, 'cssedit' => 1)));
     
     $mform = new mod_datalynx_css_form(
-            new moodle_url('/mod/datalynx/css.php', array('d' => $df->id(), 'cssedit' => 1
-            )));
+            new moodle_url('/mod/datalynx/css.php', array('d' => $df->id(), 'cssedit' => 1)));
     
     if ($mform->is_cancelled()) {
     } else if ($data = $mform->get_data()) {
@@ -121,16 +114,13 @@ if ($urlparams->cssedit) {
         }
         
         $event = \mod_datalynx\event\css_saved::create(
-                array('context' => $df->context, 'objectid' => $df->id()
-                ));
+                array('context' => $df->context, 'objectid' => $df->id()));
         $event->trigger();
     }
     
-    $df->print_header(array('tab' => 'css', 'urlparams' => $urlparams
-    ));
+    $df->print_header(array('tab' => 'css', 'urlparams' => $urlparams));
     
-    $options = array('subdirs' => 0, 'maxbytes' => $COURSE->maxbytes, 'maxfiles' => 10
-    );
+    $options = array('subdirs' => 0, 'maxbytes' => $COURSE->maxbytes, 'maxfiles' => 10);
     $draftitemid = file_get_submitted_draft_itemid('cssupload');
     file_prepare_draft_area($draftitemid, $df->context->id, 'mod_datalynx', 'css', 0, $options);
     $df->data->cssupload = $draftitemid;
@@ -144,8 +134,7 @@ if ($urlparams->cssedit) {
     
     $lifetime = 600; // Seconds to cache this stylesheet
     
-    $PAGE->set_url('/mod/datalynx/css.php', array('d' => $urlparams->d
-    ));
+    $PAGE->set_url('/mod/datalynx/css.php', array('d' => $urlparams->d));
     
     if ($cssdata = $DB->get_field('datalynx', 'css', array('id' => $urlparams->d
     ))) {

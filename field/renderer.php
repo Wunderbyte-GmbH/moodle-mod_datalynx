@@ -74,9 +74,7 @@ abstract class datalynxfield_renderer {
                     $found[] = $pattern;
                 }
             } else {
-                $strippedpattern = preg_quote(str_replace(['[[', ']]'
-                ], ['', ''
-                ], $pattern), '/');
+                $strippedpattern = preg_quote(str_replace(['[[', ']]'], ['', ''], $pattern), '/');
                 if (preg_match_all("/\[\[$strippedpattern(?:\|(?:[^\]]+))?\]\](?:@)?/", $text, 
                         $matches)) {
                     $found = array_merge($found, $matches[0]);
@@ -120,11 +118,9 @@ abstract class datalynxfield_renderer {
             if (!$currentoptions['visible']) { // ======================================================
                                                // NOT VISIBLE ===
                 if ($renderer->get_not_visible_template() === $renderer::NOT_VISIBLE_SHOW_NOTHING) {
-                    $replacements[$tag] = array('html', ''
-                    );
+                    $replacements[$tag] = array('html', '');
                 } else {
-                    $replacements[$tag] = array('html', $renderer->get_not_visible_template()
-                    );
+                    $replacements[$tag] = array('html', $renderer->get_not_visible_template());
                 }
             } else { // ====================================================================================
                      // VISIBLE ===
@@ -141,34 +137,17 @@ abstract class datalynxfield_renderer {
                             $currentoptions['template'] = $renderer->get_display_template();
                             $currentoptions['value'] = $this->render_display_mode($entry, 
                                     $currentoptions);
-                            $replacements[$tag] = ['', 
-                                [[$this, 'prerender_edit_mode'
-                                ], [$entry, $currentoptions
-                                ]
-                                ]
-                            ];
+                            $replacements[$tag] = ['', [[$this, 'prerender_edit_mode'], [$entry, $currentoptions]]];
                         } else {
-                            $replacements[$tag] = array('html', 
-                                $renderer->get_not_editable_template()
-                            );
+                            $replacements[$tag] = array('html', $renderer->get_not_editable_template());
                         }
                     } else { // ===========================================================================
                              // EDITABLE ===
                         if ($renderer->get_edit_template() === $renderer::EDIT_MODE_TEMPLATE_NONE) {
-                            $replacements[$tag] = ['', 
-                                [[$this, 'prerender_edit_mode'
-                                ], [$entry, $currentoptions
-                                ]
-                                ]
-                            ];
+                            $replacements[$tag] = ['', [[$this, 'prerender_edit_mode'], [$entry, $currentoptions]]];
                         } else {
                             $currentoptions['template'] = $renderer->get_edit_template();
-                            $replacements[$tag] = ['', 
-                                [[$this, 'prerender_edit_mode'
-                                ], [$entry, $currentoptions
-                                ]
-                                ]
-                            ];
+                            $replacements[$tag] = ['', [[$this, 'prerender_edit_mode'], [$entry, $currentoptions]]];
                         }
                     }
                 } else { // ===========================================================================
@@ -177,24 +156,19 @@ abstract class datalynxfield_renderer {
                     if ($replacement === '') { // =========================================================
                                                // NO VALUE ===
                         if ($renderer->get_no_value_template() === $renderer::NO_VALUE_SHOW_NOTHING) {
-                            $replacements[$tag] = array('html', ''
-                            );
+                            $replacements[$tag] = array('html', '');
                         } else if ($renderer->get_no_value_template() ===
-                                 $renderer::NO_VALUE_SHOW_DISPLAY_MODE_TEMPLATE) {
-                            $replacements[$tag] = array('html', 
-                                $this->replace_renderer_template_tags(
-                                        $renderer->get_display_template(), '')
-                            );
+                            $renderer::NO_VALUE_SHOW_DISPLAY_MODE_TEMPLATE) {
+                                    $replacements[$tag] = array('html',
+                                        $this->replace_renderer_template_tags($renderer->get_display_template(), ''));
                         } else {
-                            $replacements[$tag] = array('html', $renderer->get_no_value_template()
-                            );
+                            $replacements[$tag] = array('html', $renderer->get_no_value_template());
                         }
                     } else { // ==========================================================================
                              // HAS VALUE ===
                         if ($renderer->get_display_template() ===
                                  $renderer::DISPLAY_MODE_TEMPLATE_NONE) {
-                            $replacements[$tag] = array('html', $replacement
-                            );
+                            $replacements[$tag] = array('html', $replacement);
                         } else {
                             $replacements[$tag] = array('html', 
                                 $this->replace_renderer_template_tags(
@@ -240,19 +214,16 @@ abstract class datalynxfield_renderer {
             
             $behaviorname = isset($matches[2]) ? $matches[2] : false;
             if ($behaviorname) {
-                $behavior = datalynx_field_behavior::from_name($behaviorname, 
-                        $this->_field->df()->id());
+                $behavior = datalynx_field_behavior::from_name($behaviorname, $this->_field->df()->id());
             }
             
             $renderername = isset($matches[3]) ? $matches[3] : false;
             if ($renderername) {
-                $renderer = datalynx_field_renderer::get_renderer_by_name($renderername, 
-                        $this->_field->df()->id());
+                $renderer = datalynx_field_renderer::get_renderer_by_name($renderername, $this->_field->df()->id());
             }
         }
         
-        return array($fieldname, $behavior, $renderer
-        );
+        return array($fieldname, $behavior, $renderer);
     }
 
     /**
@@ -369,14 +340,12 @@ abstract class datalynxfield_renderer {
         $fieldname = "f_{$i}_$fieldid";
         
         $arr = array();
-        $arr[] = &$mform->createElement('text', $fieldname, null, array('size' => '32'
-        ));
+        $arr[] = &$mform->createElement('text', $fieldname, null, array('size' => '32'));
         $mform->setType($fieldname, PARAM_NOTAGS);
         $mform->setDefault($fieldname, $value);
         $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
         
-        return array($arr, null
-        );
+        return array($arr, null);
     }
 
     /**
@@ -394,8 +363,7 @@ abstract class datalynxfield_renderer {
                 }
                 // prepare array
                 if (!isset($patternsmenu[$cat])) {
-                    $patternsmenu[$cat] = array($cat => array()
-                    );
+                    $patternsmenu[$cat] = array($cat => array());
                 }
                 // add tag
                 $patternsmenu[$cat][$cat][$tag] = $tag;
@@ -431,8 +399,7 @@ abstract class datalynxfield_renderer {
         $fieldname = $this->_field->name();
         
         $patterns = array();
-        $patterns["[[$fieldname]]"] = array(true
-        );
+        $patterns["[[$fieldname]]"] = array(true);
         
         return $patterns;
     }

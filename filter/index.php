@@ -51,13 +51,11 @@ $urlparams->cancel = optional_param('cancel', 0, PARAM_BOOL);
 $df = new datalynx($urlparams->d, $urlparams->id);
 require_capability('mod/datalynx:managetemplates', $df->context);
 
-$df->set_page('filter/index', array('modjs' => true, 'urlparams' => $urlparams
-));
+$df->set_page('filter/index', array('modjs' => true, 'urlparams' => $urlparams));
 
 // activate navigation node
 navigation_node::override_active_url(
-        new moodle_url('/mod/datalynx/filter/index.php', array('id' => $df->cm->id
-        )));
+        new moodle_url('/mod/datalynx/filter/index.php', array('id' => $df->cm->id)));
 
 $fm = $df->get_filter_manager();
 
@@ -99,8 +97,7 @@ if ($urlparams->new and confirm_sesskey()) {
     }
     
     // Print header
-    $df->print_header(array('tab' => 'filters', 'urlparams' => $urlparams
-    ));
+    $df->print_header(array('tab' => 'filters', 'urlparams' => $urlparams));
     
     // Print the filter add link
     $fm->print_add_filter();

@@ -97,10 +97,8 @@ class datalynxview_csv_import_form extends moodleform {
             $name = "f_{$fieldid}_$patternname";
             
             $grp = array();
-            $grp[] = &$mform->createElement('text', "{$name}_name", null, array('size' => '16'
-            ));
-            list($elements, $labels) = $field->renderer()->get_pattern_import_settings($mform, 
-                    $pattern);
+            $grp[] = &$mform->createElement('text', "{$name}_name", null, array('size' => '16'));
+            list($elements, $labels) = $field->renderer()->get_pattern_import_settings($mform, $pattern);
             $grp = $grp + $elements;
             $mform->addGroup($grp, "grp$patternname", $patternname, $labels, false);
             
@@ -119,34 +117,28 @@ class datalynxview_csv_import_form extends moodleform {
         
         // delimiter
         $delimiters = csv_import_reader::get_delimiter_list();
-        $mform->addElement('select', 'delimiter', get_string('csvdelimiter', 'datalynx'), 
-                $delimiters);
+        $mform->addElement('select', 'delimiter', get_string('csvdelimiter', 'datalynx'), $delimiters);
         $mform->setDefault('delimiter', $view->get_delimiter());
         
         // enclosure
-        $mform->addElement('text', 'enclosure', get_string('csvenclosure', 'datalynx'), 
-                array('size' => '10'
-                ));
+        $mform->addElement('text', 'enclosure', get_string('csvenclosure', 'datalynx'), array('size' => '10'));
         $mform->setType('enclosure', PARAM_NOTAGS);
         $mform->setDefault('enclosure', $view->get_enclosure());
         
         // encoding
-        $choices = textlib::get_encodings();
+        $choices = core_text::get_encodings();
         $mform->addElement('select', 'encoding', get_string('encoding', 'grades'), $choices);
         $mform->setDefault('encoding', $view->get_encoding());
         
         // upload file
-        $mform->addElement('filepicker', 'importfile', 
-                get_string('uploadfile', 'datalynxview_import'));
+        $mform->addElement('filepicker', 'importfile', get_string('uploadfile', 'datalynxview_import'));
         
         // upload text
         $mform->addElement('textarea', 'csvtext', get_string('uploadtext', 'datalynxview_import'), 
-                array('wrap' => 'virtual', 'rows' => '5', 'style' => 'width:100%;'
-                ));
+                array('wrap' => 'virtual', 'rows' => '5', 'style' => 'width:100%;'));
         
         // update existing entries
-        $mform->addElement('selectyesno', 'updateexisting', 
-                get_string('updateexisting', 'datalynxview_import'));
+        $mform->addElement('selectyesno', 'updateexisting', get_string('updateexisting', 'datalynxview_import'));
         
         // edit after import
         // $mform->addElement('selectyesno', 'editafter', get_string('importeditimported',

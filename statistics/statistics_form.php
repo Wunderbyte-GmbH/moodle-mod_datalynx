@@ -58,8 +58,7 @@ class datalynx_statistics_form extends moodleform {
         $radioarray[] = &$mform->createElement('radio', 'mode', '', 
                 get_string('alltime', 'datalynx'), datalynx_statistics_class::MODE_ALL_TIME);
         $mform->addGroup($radioarray, 'modearray', get_string('modearray', 'datalynx'), 
-                array(' ', ' ', '<br />', ' ', ' '
-                ), false);
+                array(' ', ' ', '<br />', ' ', ' '), false);
         $mform->addHelpButton('modearray', 'modearray', 'datalynx');
         $mform->disabledIf('from', 'mode', 'eq', datalynx_statistics_class::MODE_UNTIL_DATE);
         $mform->disabledIf('from', 'mode', 'eq', datalynx_statistics_class::MODE_ALL_TIME);
@@ -68,10 +67,8 @@ class datalynx_statistics_form extends moodleform {
         $mform->disabledIf('to', 'mode', 'eq', datalynx_statistics_class::MODE_ALL_TIME);
         $mform->addElement('html', '</div><div style="width: 33%; float: left;">');
         $mform->addElement('checkbox', 'show[0]', '', get_string('numtotalentries', 'datalynx'), 1);
-        $mform->addElement('checkbox', 'show[1]', '', get_string('numapprovedentries', 'datalynx'), 
-                1);
-        $mform->addElement('checkbox', 'show[2]', '', get_string('numdeletedentries', 'datalynx'), 
-                1);
+        $mform->addElement('checkbox', 'show[1]', '', get_string('numapprovedentries', 'datalynx'), 1);
+        $mform->addElement('checkbox', 'show[2]', '', get_string('numdeletedentries', 'datalynx'), 1);
         $mform->addElement('checkbox', 'show[3]', '', get_string('numvisits', 'datalynx'), 1);
         $mform->addElement('html', '</div><div style="clear:both;"></div><div>');
         $mform->addElement('submit', 'refresh', get_string('refresh'));

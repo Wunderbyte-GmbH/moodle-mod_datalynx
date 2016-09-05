@@ -59,14 +59,12 @@ class datalynxfield_entrygroup_renderer extends datalynxfield_renderer {
             switch (trim($tag, '@')) {
                 case '##group:id##':
                     if (!empty($group->id)) {
-                        $replacements[$tag] = array('html', $group->id
-                        );
+                        $replacements[$tag] = array('html', $group->id);
                     }
                     break;
                 
                 case '##group:name##':
-                    $replacements[$tag] = array('html', $group->name
-                    );
+                    $replacements[$tag] = array('html', $group->name);
                     break;
                 
                 // case '##group:description##':
@@ -89,14 +87,10 @@ class datalynxfield_entrygroup_renderer extends datalynxfield_renderer {
                     if ($edit and has_capability('mod/datalynx:manageentries', 
                             $field->df()->context)) {
                         $replacements[$tag] = array('', 
-                            array(array($this, 'display_edit'
-                            ), array($entry
-                            )
-                            )
+                            array(array($this, 'display_edit'), array($entry))
                         );
                     } else {
-                        $replacements[$tag] = array('html', $group->name
-                        );
+                        $replacements[$tag] = array('html', $group->name);
                     }
                     break;
             }
@@ -116,8 +110,7 @@ class datalynxfield_entrygroup_renderer extends datalynxfield_renderer {
         $selected = $entry->groupid;
         static $groupsmenu = null;
         if (is_null($groupsmenu)) {
-            $groupsmenu = array(0 => get_string('choosedots')
-            );
+            $groupsmenu = array(0 => get_string('choosedots'));
             if ($groups = groups_get_activity_allowed_groups($field->df()->cm)) {
                 foreach ($groups as $groupid => $group) {
                     $groupsmenu[$groupid] = $group->name;
@@ -136,17 +129,12 @@ class datalynxfield_entrygroup_renderer extends datalynxfield_renderer {
         $cat = get_string('groupinfo', 'datalynx');
         
         $patterns = array();
-        $patterns['##group:id##'] = array(true, $cat
-        );
-        $patterns['##group:name##'] = array(true, $cat
-        );
+        $patterns['##group:id##'] = array(true, $cat);
+        $patterns['##group:name##'] = array(true, $cat);
         // $patterns['##group:description##'] = array(true, $cat);
-        $patterns['##group:picture##'] = array(true, $cat
-        );
-        $patterns['##group:picturelarge##'] = array(false, $cat
-        );
-        $patterns['##group:edit##'] = array(true, $cat
-        );
+        $patterns['##group:picture##'] = array(true, $cat);
+        $patterns['##group:picturelarge##'] = array(false, $cat);
+        $patterns['##group:edit##'] = array(true, $cat);
         
         return $patterns;
     }

@@ -33,14 +33,12 @@ $urlparams->confirmed = optional_param('confirmed', false, PARAM_BOOL);
 
 $datalynx = new datalynx($urlparams->d);
 
-$datalynx->set_page('filterform/filterform_edit', array('urlparams' => $urlparams
-));
+$datalynx->set_page('filterform/filterform_edit', array('urlparams' => $urlparams));
 
 require_sesskey();
 require_capability('mod/datalynx:managetemplates', $datalynx->context);
 
-$returnurl = new moodle_url('/mod/datalynx/filterform/index.php', array('d' => $datalynx->id()
-));
+$returnurl = new moodle_url('/mod/datalynx/filterform/index.php', array('d' => $datalynx->id()));
 
 switch ($urlparams->action) {
     case "edit":
@@ -58,19 +56,16 @@ switch ($urlparams->action) {
         }
         
         $datalynx->print_header(
-                array('tab' => 'filterforms', 'nonotifications' => true, 'urlparams' => $urlparams
-                ));
+                array('tab' => 'filterforms', 'nonotifications' => true, 'urlparams' => $urlparams));
         
         if ($urlparams->id) {
             $data = mod_datalynx_advanced_filter_form::get_filterform($urlparams->id);
             $mform->set_data($data);
             echo html_writer::tag('h2', get_string('editingfilterform', 'datalynx', $data->name), 
-                    array('class' => 'mdl-align'
-                    ));
+                    array('class' => 'mdl-align'));
         } else {
             echo html_writer::tag('h2', get_string('newfilterform', 'datalynx'), 
-                    array('class' => 'mdl-align'
-                    ));
+                    array('class' => 'mdl-align'));
         }
         
         $mform->display();
@@ -87,12 +82,10 @@ switch ($urlparams->action) {
             $urlparams->confirmed = true;
             $datalynx->print_header(
                     array('tab' => 'filterforms', 'nonotifications' => true, 
-                        'urlparams' => $urlparams
-                    ));
+                        'urlparams' => $urlparams));
             echo html_writer::tag('h2', 
                     get_string('duplicatingfilterform', 'datalynx', $data->name), 
-                    array('class' => 'mdl-align'
-                    ));
+                    array('class' => 'mdl-align'));
             echo $OUTPUT->confirm(get_string('confirmfilterformduplicate', 'datalynx'), 
                     new moodle_url('filterform_edit.php', (array) $urlparams), $returnurl);
             $datalynx->print_footer();
@@ -108,11 +101,9 @@ switch ($urlparams->action) {
             $urlparams->confirmed = true;
             $datalynx->print_header(
                     array('tab' => 'filterforms', 'nonotifications' => true, 
-                        'urlparams' => $urlparams
-                    ));
+                        'urlparams' => $urlparams));
             echo html_writer::tag('h2', get_string('deletingfilterform', 'datalynx', $data->name), 
-                    array('class' => 'mdl-align'
-                    ));
+                    array('class' => 'mdl-align'));
             echo $OUTPUT->confirm(get_string('confirmfilterformdelete', 'datalynx'), 
                     new moodle_url('filterform_edit.php', (array) $urlparams), $returnurl);
             $datalynx->print_footer();

@@ -28,8 +28,7 @@ class datalynxview_grid extends datalynxview_base {
 
     protected $type = 'grid';
 
-    protected $_editors = array('section', 'param2'
-    );
+    protected $_editors = array('section', 'param2');
 
     /**
      * Returns a fieldset of view options
@@ -51,8 +50,7 @@ class datalynxview_grid extends datalynxview_base {
         $filtersmenu = new html_table_cell('##filtersmenu##');
         $quicksearch = new html_table_cell('##quicksearch##');
         $quickperpage = new html_table_cell('##quickperpage##');
-        $row1->cells = array($viewsmenu, $seperator, $filtersmenu, $quicksearch, $quickperpage
-        );
+        $row1->cells = array($viewsmenu, $seperator, $filtersmenu, $quicksearch, $quickperpage);
         foreach ($row1->cells as $cell) {
             $cell->style = 'border:0 none;';
         }
@@ -60,8 +58,7 @@ class datalynxview_grid extends datalynxview_base {
         $row2 = new html_table_row();
         $addentries = new html_table_cell('##addnewentry##');
         $addentries->colspan = 5;
-        $row2->cells = array($addentries
-        );
+        $row2->cells = array($addentries);
         foreach ($row2->cells as $cell) {
             $cell->style = 'border:0 none;';
         }
@@ -69,18 +66,15 @@ class datalynxview_grid extends datalynxview_base {
         $row3 = new html_table_row();
         $pagingbar = new html_table_cell('##pagingbar##');
         $pagingbar->colspan = 5;
-        $row3->cells = array($pagingbar
-        );
+        $row3->cells = array($pagingbar);
         foreach ($row3->cells as $cell) {
             $cell->style = 'border:0 none;';
         }
         // construct the table
-        $table->data = array($row1, $row2, $row3
-        );
+        $table->data = array($row1, $row2, $row3);
         $sectiondefault = html_writer::table($table);
         $this->view->esection = html_writer::tag('div', $sectiondefault, 
-                array('class' => 'mdl-align'
-                )) . "<div>##entries##</div>";
+                array('class' => 'mdl-align')) . "<div>##entries##</div>";
         
         // set content
         $table = new html_table();
@@ -97,8 +91,7 @@ class datalynxview_grid extends datalynxview_base {
                     $content = new html_table_cell("[[{$field->name()}]]");
                 }
                 $row = new html_table_row();
-                $row->cells = array($name, $content
-                );
+                $row->cells = array($name, $content);
                 $table->data[] = $row;
             }
         }
@@ -106,13 +99,11 @@ class datalynxview_grid extends datalynxview_base {
         $row = new html_table_row();
         $actions = new html_table_cell('##edit##  ##delete##');
         $actions->colspan = 2;
-        $row->cells = array($actions
-        );
+        $row->cells = array($actions);
         $table->data[] = $row;
         // construct the table
         $entrydefault = html_writer::table($table);
-        $this->view->eparam2 = html_writer::tag('div', $entrydefault, array('class' => 'entry'
-        ));
+        $this->view->eparam2 = html_writer::tag('div', $entrydefault, array('class' => 'entry'));
     }
 
     /**
@@ -143,8 +134,7 @@ class datalynxview_grid extends datalynxview_base {
             // now split $tablehtml to cells by ##begintablecell##
             $cells = explode('##begintablecell##', $grouphtml);
             // the first part is everything before first cell
-            $elements[] = array('html', array_shift($cells)
-            );
+            $elements[] = array('html', array_shift($cells));
         }
         
         // flatten the set to a list of elements
@@ -154,8 +144,7 @@ class datalynxview_grid extends datalynxview_base {
             if (!empty($cells)) {
                 if (empty($percol) or $count >= $percol - 1) {
                     $count = 0;
-                    $elements[] = array('html', array_shift($cells)
-                    );
+                    $elements[] = array('html', array_shift($cells));
                 } else {
                     $count++;
                 }
@@ -165,24 +154,19 @@ class datalynxview_grid extends datalynxview_base {
         // Add remaining cells
         if (!empty($cells)) {
             foreach ($cells as $cell) {
-                $elements[] = array('html', $cell
-                );
+                $elements[] = array('html', $cell);
             }
         }
         
         // Add group heading
         $name = ($name == 'newentry') ? get_string('entrynew', 'datalynx') : $name;
         if ($name) {
-            array_unshift($elements, array('html', $OUTPUT->heading($name, 3, 'main')
-            ));
+            array_unshift($elements, array('html', $OUTPUT->heading($name, 3, 'main')));
         }
         // Wrap with entriesview
         array_unshift($elements, 
-                array('html', html_writer::start_tag('div', array('class' => 'entriesview'
-                ))
-                ));
-        array_push($elements, array('html', html_writer::end_tag('div')
-        ));
+                array('html', html_writer::start_tag('div', array('class' => 'entriesview'))));
+        array_push($elements, array('html', html_writer::end_tag('div')));
         
         return $elements;
     }
@@ -201,8 +185,7 @@ class datalynxview_grid extends datalynxview_base {
             if (isset($fields[$fieldid])) {
                 $field = $fields[$fieldid];
                 $entry->id = $entryid;
-                $options = array('edit' => true, 'manage' => true
-                );
+                $options = array('edit' => true, 'manage' => true);
                 if ($fielddefinitions = $field->get_definitions($patterns, $entry, $options)) {
                     $patterndefinitions = array_merge($patterndefinitions, $fielddefinitions);
                 }
@@ -219,8 +202,7 @@ class datalynxview_grid extends datalynxview_base {
                     $elements[] = $def;
                 }
             } else {
-                $elements[] = array('html', $part
-                );
+                $elements[] = array('html', $part);
             }
         }
         

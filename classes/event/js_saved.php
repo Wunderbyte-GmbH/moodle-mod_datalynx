@@ -72,8 +72,7 @@ class js_saved extends \core\event\base {
      */
     public function get_url() {
         return new \moodle_url('/mod/datalynx/view.php', 
-                array('d' => $this->objectid, 'jsedit' => 1
-                ));
+                array('d' => $this->objectid, 'jsedit' => 1));
     }
 
     /**
@@ -83,7 +82,6 @@ class js_saved extends \core\event\base {
      */
     public function get_legacy_logdata() {
         return array($this->courseid, 'datalynx', 'js_saved', 
-            'view.php?d=' . $this->objectid . '&jsedit=1', $this->objectid, $this->contextinstanceid
-        );
+            'view.php?d=' . $this->objectid . '&jsedit=1', $this->objectid, $this->contextinstanceid);
     }
 }

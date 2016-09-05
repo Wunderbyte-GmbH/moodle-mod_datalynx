@@ -63,14 +63,12 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
         
         $module = array('name' => 'M.datalynxfield_picture', 
             'fullpath' => '/mod/datalynx/field/picture/picture.js', 
-            'requires' => array('base', 'node'
-            )
+            'requires' => array('base', 'node')
         );
         
         $PAGE->requires->js(
                 new moodle_url($CFG->wwwroot . '/mod/datalynx/field/picture/shadowbox/shadowbox.js'));
-        $PAGE->requires->js_init_call('M.datalynxfield_picture.init', array($params
-        ), false, $module);
+        $PAGE->requires->js_init_call('M.datalynxfield_picture.init', array($params), false, $module);
         
         $field = $this->_field;
         $fieldid = $field->id();
@@ -123,8 +121,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
     public function pluginfile_patterns() {
         $fieldname = $this->_field->name();
         return array("[[{$fieldname}]]", "[[{$fieldname}:thumb]]", "[[{$fieldname}:linked]]", 
-            "[[{$fieldname}:lightbox]]"
-        );
+            "[[{$fieldname}:lightbox]]");
     }
 
     protected function display_file($file, $path, $altname, $params = null) {
@@ -137,8 +134,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
         
         if ($file->is_valid_image()) {
             $filename = $file->get_filename();
-            $imgattr = array('style' => array()
-            );
+            $imgattr = array('style' => array());
             
             $pluginfileurl = new moodle_url('/pluginfile.php');
             $imgpath = moodle_url::make_file_url($pluginfileurl, "$path/$filename");
@@ -151,28 +147,24 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
                 $thumb = html_writer::empty_tag('img', $imgattr);
                 
                 if (isset($params['linked'])) {
-                    return html_writer::link($imgpath, $thumb, array('rel' => 'shadowbox'
-                    ));
+                    return html_writer::link($imgpath, $thumb, array('rel' => 'shadowbox'));
                 } else {
                     return $thumb;
                 }
             } else {
                 // the picture's display dimension may be set in the field
                 if ($field->get('param4')) {
-                    $imgattr['style'][] = 'width:' . s($field->get('param4')) .
-                             s($field->get('param6'));
+                    $imgattr['style'][] = 'width:' . s($field->get('param4')) . s($field->get('param6'));
                 }
                 if ($field->get('param5')) {
-                    $imgattr['style'][] = 'height:' . s($field->get('param5')) .
-                             s($field->get('param6'));
+                    $imgattr['style'][] = 'height:' . s($field->get('param5')) . s($field->get('param6'));
                 }
                 
                 $imgattr['src'] = $imgpath;
                 $imgattr['style'] = implode(';', $imgattr['style']);
                 $img = html_writer::empty_tag('img', $imgattr);
                 if (isset($params['linked'])) {
-                    return html_writer::link($imgpath, $img, array('target' => '_blank'
-                    ));
+                    return html_writer::link($imgpath, $img, array('target' => '_blank'));
                 } else {
                     return $img;
                 }
@@ -188,16 +180,11 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
         $fieldname = $this->_field->name();
         
         $patterns = parent::patterns();
-        $patterns["[[{$fieldname}:linked]]"] = array(true
-        );
-        $patterns["[[{$fieldname}:tn]]"] = array(false
-        );
-        $patterns["[[{$fieldname}:thumb]]"] = array(true
-        );
-        $patterns["[[{$fieldname}:tn-linked]]"] = array(false
-        );
-        $patterns["[[{$fieldname}:lightbox]]"] = array(true
-        );
+        $patterns["[[{$fieldname}:linked]]"] = array(true);
+        $patterns["[[{$fieldname}:tn]]"] = array(false);
+        $patterns["[[{$fieldname}:thumb]]"] = array(true);
+        $patterns["[[{$fieldname}:tn-linked]]"] = array(false);
+        $patterns["[[{$fieldname}:lightbox]]"] = array(true);
         
         return $patterns;
     }

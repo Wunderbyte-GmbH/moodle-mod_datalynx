@@ -52,7 +52,7 @@ class datalynx_field_behavior {
      */
     private $record;
 
-    private function datalynx_field_behavior($record) {
+    private function __construct($record) {
         $this->id = $record->id;
         $this->name = $record->name;
         $this->description = $record->description;
@@ -72,8 +72,7 @@ class datalynx_field_behavior {
 
     public static function from_name($name, $dataid) {
         global $DB;
-        $record = $DB->get_record('datalynx_behaviors', array('name' => $name, 'dataid' => $dataid
-        ));
+        $record = $DB->get_record('datalynx_behaviors', array('name' => $name, 'dataid' => $dataid));
         if ($record) {
             return new datalynx_field_behavior($record);
         } else {
@@ -83,8 +82,7 @@ class datalynx_field_behavior {
 
     public static function from_id($id) {
         global $DB;
-        $record = $DB->get_record('datalynx_behaviors', array('id' => $id
-        ));
+        $record = $DB->get_record('datalynx_behaviors', array('id' => $id));
         if ($record) {
             return new datalynx_field_behavior($record);
         } else {
@@ -94,12 +92,9 @@ class datalynx_field_behavior {
 
     private static $default = array('id' => 0, 'name' => '', 'description' => '', 
         'visibleto' => array(datalynx::PERMISSION_MANAGER, datalynx::PERMISSION_TEACHER, 
-            datalynx::PERMISSION_STUDENT, datalynx::PERMISSION_AUTHOR
-        ), 
+            datalynx::PERMISSION_STUDENT, datalynx::PERMISSION_AUTHOR),
         'editableby' => array(datalynx::PERMISSION_MANAGER, datalynx::PERMISSION_TEACHER, 
-            datalynx::PERMISSION_STUDENT, datalynx::PERMISSION_AUTHOR
-        ), 'required' => false
-    );
+            datalynx::PERMISSION_STUDENT, datalynx::PERMISSION_AUTHOR), 'required' => false);
 
     public static function get_default_behavior(datalynx $datalynx) {
         $record = (object) self::$default;
@@ -178,8 +173,7 @@ class datalynx_field_behavior {
         do {
             $i++;
             $newname = get_string('copyof', 'datalynx', $object->name) . ' ' . $i;
-        } while ($DB->record_exists('datalynx_behaviors', array('name' => $newname
-        )));
+        } while ($DB->record_exists('datalynx_behaviors', array('name' => $newname)));
         $object->name = $newname;
         return self::insert_behavior($object);
     }
@@ -193,8 +187,7 @@ class datalynx_field_behavior {
 
     public static function delete_behavior($behaviorid) {
         global $DB;
-        return $DB->delete_records('datalynx_behaviors', array('id' => $behaviorid
-        ));
+        return $DB->delete_records('datalynx_behaviors', array('id' => $behaviorid));
     }
 
     /**

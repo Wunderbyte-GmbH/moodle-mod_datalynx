@@ -40,20 +40,14 @@ class datalynxfield_text_form extends datalynxfield_form {
         
         // field width
         $fieldwidthgrp = array();
-        $fieldwidthgrp[] = &$mform->createElement('text', 'param2', null, array('size' => '8'
-        ));
+        $fieldwidthgrp[] = &$mform->createElement('text', 'param2', null, array('size' => '8'));
         $fieldwidthgrp[] = &$mform->createElement('select', 'param3', null, 
-                array('px' => 'px', 'em' => 'em', '%' => '%'
-                ));
+                array('px' => 'px', 'em' => 'em', '%' => '%'));
         $mform->addGroup($fieldwidthgrp, 'fieldwidthgrp', get_string('fieldwidth', 'datalynx'), 
-                array(' '
-                ), false);
+                array(' '), false);
         $mform->setType('param2', PARAM_INT);
         $mform->addGroupRule('fieldwidthgrp', 
-                array('param2' => array(array(null, 'numeric', null, 'client'
-                )
-                )
-                ));
+                array('param2' => array(array(null, 'numeric', null, 'client'))));
         $mform->disabledIf('param3', 'param2', 'eq', '');
         // //$mform->addHelpButton('fieldwidthgrp', array("fieldwidth", get_string('fieldwidth',
         // 'datalynx'), 'datalynx'));
@@ -82,22 +76,13 @@ class datalynxfield_text_form extends datalynxfield_form {
         );
         $grp = array();
         $grp[] = &$mform->createElement('select', 'param5', null, $options);
-        $grp[] = &$mform->createElement('text', 'param6', null, array('size' => 8
-        ));
-        $grp[] = &$mform->createElement('text', 'param7', null, array('size' => 8
-        ));
-        $mform->addGroup($grp, 'lengthgrp', get_string('numcharsallowed', 'datalynx'), '    ', 
-                false);
+        $grp[] = &$mform->createElement('text', 'param6', null, array('size' => 8));
+        $grp[] = &$mform->createElement('text', 'param7', null, array('size' => 8));
+        $mform->addGroup($grp, 'lengthgrp', get_string('numcharsallowed', 'datalynx'), '    ', false);
         $mform->addGroupRule('lengthgrp', 
-                array('param6' => array(array(null, 'numeric', null, 'client'
-                )
-                )
-                ));
+                array('param6' => array(array(null, 'numeric', null, 'client'))));
         $mform->addGroupRule('lengthgrp', 
-                array('param7' => array(array(null, 'numeric', null, 'client'
-                )
-                )
-                ));
+                array('param7' => array(array(null, 'numeric', null, 'client'))));
         $mform->disabledIf('param6', 'param5', 'eq', '');
         $mform->disabledIf('param6', 'param5', 'eq', 'maxlength');
         $mform->disabledIf('param7', 'param5', 'eq', '');

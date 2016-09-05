@@ -37,8 +37,7 @@ class datalynxfield_file extends datalynxfield_base {
     /**
      */
     protected function content_names() {
-        return array('filemanager', 'alttext', 'delete', 'editor'
-        );
+        return array('filemanager', 'alttext', 'delete', 'editor');
     }
 
     /**
@@ -110,8 +109,7 @@ class datalynxfield_file extends datalynxfield_base {
     /**
      */
     protected function format_content($entry, array $values = null) {
-        return array(null, null, null
-        );
+        return array(null, null, null);
     }
 
     /**
@@ -185,8 +183,7 @@ class datalynxfield_file extends datalynxfield_base {
         
         $contentid = isset($entry->{"c{$this->field->id}_id"}) ? $entry->{"c{$this->field->id}_id"} : null;
         
-        $options = array('context' => $this->df->context
-        );
+        $options = array('context' => $this->df->context);
         $data = (object) $values;
         $data = file_postupdate_standard_editor((object) $values, $fieldname, $options, 
                 $this->df->context, 'mod_datalynx', 'content', $contentid);

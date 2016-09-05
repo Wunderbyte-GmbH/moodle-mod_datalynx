@@ -146,19 +146,15 @@ class restore_datalynx_activity_task extends restore_activity_task {
     static public function define_decode_contents() {
         $contents = array();
         
-        $contents[] = new restore_decode_content('datalynx', array('intro'
-        ), 'datalynx');
+        $contents[] = new restore_decode_content('datalynx', array('intro'), 'datalynx');
         $contents[] = new restore_decode_content('datalynx_fields', 
                 array('description', 'param1', 'param2', 'param3', 'param4', 'param5', 'param6', 
-                    'param7', 'param8', 'param9', 'param10'
-                ), 'datalynx_field');
+                    'param7', 'param8', 'param9', 'param10'), 'datalynx_field');
         $contents[] = new restore_decode_content('datalynx_views', 
                 array('description', 'section', 'param1', 'param2', 'param3', 'param4', 'param5', 
-                    'param6', 'param7', 'param8', 'param9', 'param10'
-                ), 'datalynx_view');
+                    'param6', 'param7', 'param8', 'param9', 'param10'), 'datalynx_view');
         $contents[] = new restore_decode_content('datalynx_contents', 
-                array('content', 'content1', 'content2', 'content3', 'content4'
-                ), 'datalynx_content');
+                array('content', 'content1', 'content2', 'content3', 'content4'), 'datalynx_content');
         
         return $contents;
     }
@@ -181,27 +177,21 @@ class restore_datalynx_activity_task extends restore_activity_task {
         $rules[] = new restore_decode_rule('DFEMBEDBYD', '/mod/datalynx/embed.php?d=$1', 'datalynx');
         
         $rules[] = new restore_decode_rule('DFVIEWVIEW', '/mod/datalynx/view.php?d=$1&amp;view=$2', 
-                array('datalynx', 'datalynx_view'
-                ));
+                array('datalynx', 'datalynx_view'));
         $rules[] = new restore_decode_rule('DFEMBEDVIEW', '/mod/datalynx/embed.php?d=$1&amp;view=$2', 
-                array('datalynx', 'datalynx_view'
-                ));
+                array('datalynx', 'datalynx_view'));
         
         $rules[] = new restore_decode_rule('DFVIEWVIEWFILTER', 
                 '/mod/datalynx/view.php?d=$1&amp;view=$2&amp;filter=$3', 
-                array('datalynx', 'datalynx_view', 'datalynx_filter'
-                ));
+                array('datalynx', 'datalynx_view', 'datalynx_filter'));
         $rules[] = new restore_decode_rule('DFEMBEDVIEWFILTER', 
                 '/mod/datalynx/embed.php?d=$1&amp;view=$2&amp;filter=$3', 
-                array('datalynx', 'datalynx_view', 'datalynx_filter'
-                ));
+                array('datalynx', 'datalynx_view', 'datalynx_filter'));
         
         $rules[] = new restore_decode_rule('DFVIEWENTRY', '/mod/datalynx/view.php?d=$1&amp;eid=$2', 
-                array('datalynx', 'datalynx_entry'
-                ));
+                array('datalynx', 'datalynx_entry'));
         $rules[] = new restore_decode_rule('DFEMBEDENTRY', '/mod/datalynx/embed.php?d=$1&amp;eid=$2', 
-                array('datalynx', 'datalynx_entry'
-                ));
+                array('datalynx', 'datalynx_entry'));
         
         return $rules;
     }

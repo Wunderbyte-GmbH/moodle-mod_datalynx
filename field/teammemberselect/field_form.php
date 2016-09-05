@@ -42,23 +42,18 @@ class datalynxfield_teammemberselect_form extends datalynxfield_form {
         $mform->setType('zero', PARAM_INT);
         
         // Maximum team size
-        $mform->addElement('text', 'param1', get_string('teamsize', 'datalynx'), array('size' => 3
-        ));
+        $mform->addElement('text', 'param1', get_string('teamsize', 'datalynx'), array('size' => 3));
         $mform->addHelpButton('param1', 'teamsize', 'datalynx');
         $mform->setType('param1', PARAM_INT);
         $mform->addRule('param1', get_string('teamsize_error_required', 'datalynx'), 'required', 
                 null, 'client');
-        $mform->addRule(array('param1', 'zero'
-        ), get_string('teamsize_error_value', 'datalynx'), 'compare', 'gt');
+        $mform->addRule(array('param1', 'zero'), get_string('teamsize_error_value', 'datalynx'), 'compare', 'gt');
         
         // Minimum required team size
-        $mform->addElement('text', 'param3', get_string('minteamsize', 'datalynx'), 
-                array('size' => 3
-                ));
+        $mform->addElement('text', 'param3', get_string('minteamsize', 'datalynx'), array('size' => 3));
         $mform->addHelpButton('param3', 'minteamsize', 'datalynx');
         $mform->setType('param3', PARAM_INT);
-        $mform->addRule(array('param3', 'param1'
-        ), get_string('minteamsize_error_value', 'datalynx'), 'compare', 'lte');
+        $mform->addRule(array('param3', 'param1'), get_string('minteamsize_error_value', 'datalynx'), 'compare', 'lte');
         $mform->setDefault('param3', 0);
         
         // Admissible roles
@@ -66,8 +61,7 @@ class datalynxfield_teammemberselect_form extends datalynxfield_form {
         $permissions = $this->_df->get_datalynx_permission_names(true);
         
         foreach ($permissions as $key => $label) {
-            $checkbox = &$mform->createElement('checkbox', $key, null, $label, array('group' => 1
-            ));
+            $checkbox = &$mform->createElement('checkbox', $key, null, $label, array('group' => 1));
             $group[] = $checkbox;
         }
         $mform->addGroup($group, 'param2', get_string('admissibleroles', 'datalynx'), '<br />');
@@ -75,22 +69,18 @@ class datalynxfield_teammemberselect_form extends datalynxfield_form {
         $mform->addGroupRule('param2', get_string('admissibleroles_error', 'datalynx'), 'required', 
                 null, 1, 'client');
         
-        $mform->addElement('select', 'param4', get_string('listformat', 'datalynx'), 
-                $this->_field->separators);
+        $mform->addElement('select', 'param4', get_string('listformat', 'datalynx'), $this->_field->separators);
         $mform->setType('param4', PARAM_INT);
         $mform->setDefault('param4', datalynxfield_teammemberselect::TEAMMEMBERSELECT_FORMAT_UL);
         
-        $mform->addElement('checkbox', 'param7', get_string('user_can_add_self', 'datalynx'), null, 
-                1);
+        $mform->addElement('checkbox', 'param7', get_string('user_can_add_self', 'datalynx'), null, 1);
         $mform->addHelpButton('param7', 'user_can_add_self', 'datalynx');
         $mform->setType('param7', PARAM_BOOL);
         
-        $mform->addElement('checkbox', 'param6', get_string('notifyteammembers', 'datalynx'), null, 
-                1);
+        $mform->addElement('checkbox', 'param6', get_string('notifyteammembers', 'datalynx'), null, 1);
         $mform->setType('param6', PARAM_BOOL);
         
-        $mform->addElement('checkbox', 'param8', get_string('allowunsubscription', 'datalynx'), 
-                null, 1);
+        $mform->addElement('checkbox', 'param8', get_string('allowunsubscription', 'datalynx'), null, 1);
         $mform->addHelpButton('param8', 'allowunsubscription', 'datalynx');
         $mform->setType('param8', PARAM_INT);
         
@@ -99,8 +89,7 @@ class datalynxfield_teammemberselect_form extends datalynxfield_form {
         if ($teamfield = $this->_field->get_teamfield()) {
             if ($this->_field->field->id != $teamfield->id) {
                 $message = $teamfield->name . ' is already designated as a team field!';
-                $attributes = array('disabled' => 'disabled'
-                );
+                $attributes = array('disabled' => 'disabled');
             }
         }
         
@@ -109,8 +98,7 @@ class datalynxfield_teammemberselect_form extends datalynxfield_form {
         $mform->addHelpButton('teamfieldenable', 'teamfield', 'datalynx');
         
         $fieldmenu = $this->_df->get_fields(array_keys($this->_df->get_internal_fields()), true);
-        $fieldmenu = array('-1' => 'No field'
-        ) + $fieldmenu;
+        $fieldmenu = array('-1' => 'No field') + $fieldmenu;
         $mform->addElement('select', 'param5', get_string('referencefield', 'datalynx'), $fieldmenu);
         $mform->addHelpButton('param5', 'referencefield', 'datalynx');
         $mform->setType('param5', PARAM_INT);

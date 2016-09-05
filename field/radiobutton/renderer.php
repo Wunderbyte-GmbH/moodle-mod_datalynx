@@ -64,8 +64,7 @@ class datalynxfield_radiobutton_renderer extends datalynxfield_renderer {
         
         $mform->addGroup($elemgrp, "{$fieldname}_group", null, $separator, false);
         
-        $mform->setDefaults(array($fieldname => (int) $selected
-        ));
+        $mform->setDefaults(array($fieldname => (int) $selected));
         
         if ($required) {
             $mform->addRule("{$fieldname}_group", null, 'required', null, 'client');
@@ -125,8 +124,6 @@ class datalynxfield_radiobutton_renderer extends datalynxfield_renderer {
         
         $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
         
-        return array(array($select
-        ), null
-        );
+        return array(array($select), null);
     }
 }

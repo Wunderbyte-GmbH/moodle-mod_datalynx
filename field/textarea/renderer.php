@@ -74,14 +74,12 @@ class datalynxfield_textarea_renderer extends datalynxfield_renderer {
         $fieldname = "f_{$i}_$fieldid";
         
         $arr = array();
-        $arr[] = &$mform->createElement('text', $fieldname, null, array('size' => '32'
-        ));
+        $arr[] = &$mform->createElement('text', $fieldname, null, array('size' => '32'));
         $mform->setType($fieldname, PARAM_NOTAGS);
         $mform->setDefault($fieldname, $value);
         $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
         
-        return array($arr, null
-        );
+        return array($arr, null);
     }
 
     public function validate($entryid, $tags, $formdata) {

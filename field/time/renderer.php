@@ -82,10 +82,8 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         $fieldid = $this->_field->id();
         
         $elements = array();
-        $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_from", 
-                get_string('from'));
-        $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_to", 
-                get_string('to'));
+        $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_from", get_string('from'));
+        $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_to", get_string('to'));
         if (isset($value[0])) {
             $mform->setDefault("f_{$i}_{$fieldid}_from", $value[0]);
         }
@@ -99,14 +97,11 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         }
         foreach (array('year', 'month', 'day', 'hour', 'minute'
         ) as $fieldidentifier) {
-            $mform->disabledIf("f_{$i}_{$fieldid}_from[$fieldidentifier]", "searchoperator$i", 'eq', 
-                    '');
+            $mform->disabledIf("f_{$i}_{$fieldid}_from[$fieldidentifier]", "searchoperator$i", 'eq', '');
         }
         
-        $separators = array('<br>', '<br>'
-        );
-        return array($elements, $separators
-        );
+        $separators = array('<br>', '<br>');
+        return array($elements, $separators);
     }
 
     /**
@@ -178,14 +173,11 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         
         $grp = array();
         $grp[] = &$mform->createElement('select', "{$fieldname}[day]", null, 
-                array(0 => $maskday
-                ) + $days);
+                array(0 => $maskday) + $days);
         $grp[] = &$mform->createElement('select', "{$fieldname}[month]", null, 
-                array(0 => $maskmonth
-                ) + $months);
+                array(0 => $maskmonth) + $months);
         $grp[] = &$mform->createElement('select', "{$fieldname}[year]", null, 
-                array(0 => $maskyear
-                ) + $years);
+                array(0 => $maskyear) + $years);
         
         // If time add hours and minutes
         if ($includetime) {
@@ -202,11 +194,9 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
             }
             
             $grp[] = &$mform->createElement('select', "{$fieldname}[hour]", null, 
-                    array(0 => $maskhour
-                    ) + $hours);
+                    array(0 => $maskhour) + $hours);
             $grp[] = &$mform->createElement('select', "{$fieldname}[minute]", null, 
-                    array(0 => $maskminute
-                    ) + $minutes);
+                    array(0 => $maskminute) + $minutes);
         }
         
         $mform->addGroup($grp, "grp$fieldname", null, '', false);
@@ -260,7 +250,8 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
                                             get_string('minute')), 'nonzero', null, 'client'
                                 )
                             )
-                        ));
+                        )
+                );
             } else {
                 $mform->addGroupRule("grp$fieldname", 
                         array(
@@ -282,7 +273,8 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
                                             get_string('year')), 'nonzero', null, 'client'
                                 )
                             )
-                        ));
+                        )
+                );
             }
         }
     }
@@ -294,34 +286,23 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         $fieldname = $this->_field->name();
         
         $patterns = parent::patterns();
-        $patterns["[[$fieldname]]"] = array(true
-        );
-        $patterns["[[$fieldname:date]]"] = array(true
-        );
+        $patterns["[[$fieldname]]"] = array(true);
+        $patterns["[[$fieldname:date]]"] = array(true);
         // Minute (M)
-        $patterns["[[$fieldname:minute]]"] = array(false
-        );
+        $patterns["[[$fieldname:minute]]"] = array(false);
         // Hour (H)
-        $patterns["[[$fieldname:hour]]"] = array(false
-        );
+        $patterns["[[$fieldname:hour]]"] = array(false);
         // Day (a)
-        $patterns["[[$fieldname:day]]"] = array(false
-        );
-        $patterns["[[$fieldname:d]]"] = array(false
-        );
+        $patterns["[[$fieldname:day]]"] = array(false);
+        $patterns["[[$fieldname:d]]"] = array(false);
         // Week (V)
-        $patterns["[[$fieldname:week]]"] = array(false
-        );
+        $patterns["[[$fieldname:week]]"] = array(false);
         // Month (b)
-        $patterns["[[$fieldname:month]]"] = array(false
-        );
-        $patterns["[[$fieldname:m]]"] = array(false
-        );
+        $patterns["[[$fieldname:month]]"] = array(false);
+        $patterns["[[$fieldname:m]]"] = array(false);
         // Year (G)
-        $patterns["[[$fieldname:year]]"] = array(false
-        );
-        $patterns["[[$fieldname:Y]]"] = array(false
-        );
+        $patterns["[[$fieldname:year]]"] = array(false);
+        $patterns["[[$fieldname:Y]]"] = array(false);
         
         return $patterns;
     }

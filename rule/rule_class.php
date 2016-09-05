@@ -164,8 +164,7 @@ abstract class datalynx_rule_base {
         global $DB;
         
         if (!empty($this->rule->id)) {
-            $DB->delete_records('datalynx_rules', array('id' => $this->rule->id
-            ));
+            $DB->delete_records('datalynx_rules', array('id' => $this->rule->id));
         }
         return true;
     }
@@ -223,8 +222,7 @@ abstract class datalynx_rule_base {
             $formclass = 'datalynx_rule_form';
         }
         $actionurl = new moodle_url('/mod/datalynx/rule/rule_edit.php', 
-                array('d' => $this->df->id(), 'rid' => $this->get_id(), 'type' => $this->type
-                ));
+                array('d' => $this->df->id(), 'rid' => $this->get_id(), 'type' => $this->type));
         return new $formclass($this, $actionurl);
     }
 
@@ -252,8 +250,7 @@ abstract class datalynx_rule_base {
         $ruleid = $this->rule->id;
         if ($ruleid > 0) {
             $sql = " LEFT JOIN {datalynx_contents} c$ruleid ON (c$ruleid.entryid = e.id AND c$ruleid.ruleid = :$paramname$paramcount) ";
-            return array($sql, $ruleid
-            );
+            return array($sql, $ruleid);
         } else {
             return null;
         }

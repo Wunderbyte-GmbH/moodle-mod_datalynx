@@ -43,8 +43,7 @@ class datalynxfield__entry extends datalynxfield_no_content {
         
         $fieldobjects[self::_ENTRY] = (object) array('id' => self::_ENTRY, 'dataid' => $dataid, 
             'type' => '_entry', 'name' => get_string('entry', 'datalynx'), 'description' => '', 
-            'visible' => 2, 'internalname' => ''
-        );
+            'visible' => 2, 'internalname' => '');
         
         return $fieldobjects;
     }

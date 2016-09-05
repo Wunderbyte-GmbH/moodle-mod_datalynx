@@ -31,8 +31,7 @@ $courseid = required_param('courseid', PARAM_INT);
 require_login();
 
 if ($courseid) {
-    $groups = $DB->get_records_menu('groups', array('courseid' => $courseid
-    ), 'name', 'id,name');
+    $groups = $DB->get_records_menu('groups', array('courseid' => $courseid), 'name', 'id,name');
     $groupsmenu = array();
     foreach ($groups as $groupid => $name) {
         $groupsmenu[] = "$groupid $name";

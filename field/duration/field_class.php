@@ -68,17 +68,14 @@ class datalynxfield_duration extends datalynxfield_base {
      */
     public function seconds_to_unit($seconds) {
         if ($seconds === 0) {
-            return array(0, 1
-            );
+            return array(0, 1);
         }
         foreach ($this->get_units() as $unit => $notused) {
             if (fmod($seconds, $unit) == 0) {
-                return array($seconds / $unit, $unit
-                );
+                return array($seconds / $unit, $unit);
             }
         }
-        return array($seconds, 1
-        );
+        return array($seconds, 1);
     }
 
     protected function get_sql_compare_text($column = 'content') {
@@ -94,8 +91,7 @@ class datalynxfield_duration extends datalynxfield_base {
         
         if (array_key_exists("[[*$fieldname]]", $tags) and isset($formdata->$formfieldname)) {
             if (!clean_param($formdata->$formfieldname, PARAM_INT)) {
-                return array("{$formfieldname}[number]" => get_string('fieldrequired', 'datalynx')
-                );
+                return array("{$formfieldname}[number]" => get_string('fieldrequired', 'datalynx'));
             }
         }
         return array();
@@ -112,14 +108,12 @@ class datalynxfield_duration extends datalynxfield_base {
         }
         
         $value = reset($values);
-        $rawvalue = optional_param_array("field_{$fieldid}_{$entry->id}", ['number' => ''
-        ], PARAM_RAW);
+        $rawvalue = optional_param_array("field_{$fieldid}_{$entry->id}", ['number' => ''], PARAM_RAW);
         if ($rawvalue['number'] !== '') {
             $contents[] = $value;
         }
         
-        return array($contents, $oldcontents
-        );
+        return array($contents, $oldcontents);
     }
 
     /**
@@ -128,11 +122,9 @@ class datalynxfield_duration extends datalynxfield_base {
         $values = array();
         
         $fromfield = optional_param_array('f_' . $i . '_' . $this->field->id . '_from', 
-                ['number' => ''
-                ], PARAM_RAW);
+                ['number' => ''], PARAM_RAW);
         $tofield = optional_param_array('f_' . $i . '_' . $this->field->id . '_to', 
-                ['number' => ''
-                ], PARAM_RAW);
+                ['number' => ''], PARAM_RAW);
         
         $fromfield = isset($formdata->{'f_' . $i . '_' . $this->field->id . '_from'}) ? $formdata->{'f_' .
                  $i . '_' . $this->field->id . '_from'} : $fromfield['number'];
@@ -205,15 +197,12 @@ class datalynxfield_duration extends datalynxfield_base {
                 list($notinids, $params) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED, 
                         "df_{$fieldid}_", false);
                 $sql = " e.id $notinids ";
-                return array($sql, $params, false
-                );
+                return array($sql, $params, false);
             } else {
-                return array('', '', ''
-                );
+                return array('', '', '');
             }
         } else {
-            return array($sql, $params, true
-            );
+            return array($sql, $params, true);
         }
     }
 

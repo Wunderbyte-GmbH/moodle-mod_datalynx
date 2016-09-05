@@ -93,7 +93,7 @@ class datalynx_field_renderer {
      * Constructor: Create the datalynx_field_renderer object given the db record
      * @param fieldset record $record
      */
-    private function datalynx_field_renderer($record) {
+    private function __construct($record) {
         $this->id = $record->id;
         $this->name = $record->name;
         $this->description = $record->description;
@@ -123,8 +123,8 @@ class datalynx_field_renderer {
      */
     public static function get_renderer_by_name($name, $dataid) {
         global $DB;
-        $record = $DB->get_record('datalynx_renderers', array('name' => $name, 'dataid' => $dataid
-        ), '*', MUST_EXIST);
+        $record = $DB->get_record('datalynx_renderers', array('name' => $name, 'dataid' => $dataid),
+            '*', MUST_EXIST);
         return new datalynx_field_renderer($record);
     }
 
@@ -251,8 +251,7 @@ class datalynx_field_renderer {
      */
     public static function delete_renderer($rendererid) {
         global $DB;
-        return $DB->delete_records('datalynx_renderers', array('id' => $rendererid
-        ));
+        return $DB->delete_records('datalynx_renderers', array('id' => $rendererid));
     }
 
     public function process_renderer_pattern() {

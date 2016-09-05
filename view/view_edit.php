@@ -36,27 +36,22 @@ $df = new datalynx($urlparams->d);
 global $DB;
 $options = array();
 $options['behaviors'] = $DB->get_records_select_menu('datalynx_behaviors', 'dataid = :dataid', 
-        array('dataid' => $urlparams->d
-        ), 'value ASC', 'name AS value, name AS label');
+        array('dataid' => $urlparams->d), 'value ASC', 'name AS value, name AS label');
 $options['behaviors'][''] = get_string('defaultbehavior', 'datalynx');
 $fields = $DB->get_fieldset_select('datalynx_fields', 'name', 'dataid = :dataid', 
-        array('dataid' => $urlparams->d
-        ));
+        array('dataid' => $urlparams->d));
 $options['renderers'] = array();
 $commonrenderers = $DB->get_records_select_menu('datalynx_renderers', 'dataid = :dataid', 
-        array('dataid' => $urlparams->d
-        ), 'value ASC', 'name AS value, name AS label');
+        array('dataid' => $urlparams->d), 'value ASC', 'name AS value, name AS label');
 foreach ($fields as $field) {
     $options['renderers'][$field] = $commonrenderers; // TODO: add field-specific renderers here
     $options['renderers'][$field][''] = get_string('defaultrenderer', 'datalynx');
 }
 $options['types'] = $DB->get_records_select_menu('datalynx_fields', 'dataid = :dataid', 
-        array('dataid' => $urlparams->d
-        ), 'name ASC', 'name, type');
+        array('dataid' => $urlparams->d), 'name ASC', 'name, type');
 
 $module = array('name' => 'mod_datalynx', 'fullpath' => '/mod/datalynx/datalynx.js', 
-    'requires' => array('moodle-core-notification-dialogue'
-    )
+    'requires' => array('moodle-core-notification-dialogue')
 );
 
 $PAGE->requires->js_init_call('M.mod_datalynx.tag_manager.init', $options, true, $module);
@@ -69,8 +64,7 @@ $PAGE->requires->string_for_js('deletetag', 'datalynx');
 $PAGE->requires->string_for_js('action', 'datalynx');
 $PAGE->requires->string_for_js('field', 'datalynx');
 
-$df->set_page('view/view_edit', array('modjs' => true, 'urlparams' => $urlparams
-));
+$df->set_page('view/view_edit', array('modjs' => true, 'urlparams' => $urlparams));
 
 require_sesskey();
 require_capability('mod/datalynx:managetemplates', $df->context);
@@ -92,8 +86,7 @@ if ($mform->is_cancelled()) {
     if ($urlparams->returnurl) {
         redirect($urlparams->returnurl);
     } else {
-        redirect(new moodle_url('/mod/datalynx/view/index.php', array('d' => $urlparams->d
-        )));
+        redirect(new moodle_url('/mod/datalynx/view/index.php', array('d' => $urlparams->d)));
     }
     
     // no submit buttons: reset to default
@@ -105,8 +98,7 @@ if ($mform->is_cancelled()) {
         $urlparams->resetdefault = 1;
         redirect(
                 new moodle_url('/mod/datalynx/view/view_edit.php', 
-                        ((array) $urlparams) + array('sesskey' => sesskey()
-                        )));
+                        ((array) $urlparams) + array('sesskey' => sesskey())));
     }
     
     // process validated
@@ -115,21 +107,17 @@ if ($mform->is_cancelled()) {
     if (!$view->id()) {
         $vid = $view->add($data);
         
-        $other = array('dataid' => $df->id()
-        );
+        $other = array('dataid' => $df->id());
         $event = \mod_datalynx\event\view_created::create(
-                array('context' => $df->context, 'objectid' => $vid, 'other' => $other
-                ));
+                array('context' => $df->context, 'objectid' => $vid, 'other' => $other));
         $event->trigger();
         // update view
     } else {
         $view->update($data);
         
-        $other = array('dataid' => $df->id()
-        );
+        $other = array('dataid' => $df->id());
         $event = \mod_datalynx\event\view_updated::create(
-                array('context' => $df->context, 'objectid' => $view->id(), 'other' => $other
-                ));
+                array('context' => $df->context, 'objectid' => $view->id(), 'other' => $other));
         $event->trigger();
     }
     
@@ -141,8 +129,7 @@ if ($mform->is_cancelled()) {
         if ($urlparams->returnurl) {
             redirect($urlparams->returnurl);
         } else {
-            redirect(new moodle_url('/mod/datalynx/view/index.php', array('d' => $urlparams->d
-            )));
+            redirect(new moodle_url('/mod/datalynx/view/index.php', array('d' => $urlparams->d)));
         }
     }
     
@@ -152,17 +139,14 @@ if ($mform->is_cancelled()) {
 
 // activate navigation node
 navigation_node::override_active_url(
-        new moodle_url('/mod/datalynx/view/index.php', array('id' => $df->cm->id
-        )));
+        new moodle_url('/mod/datalynx/view/index.php', array('id' => $df->cm->id)));
 
 // print header
-$df->print_header(array('tab' => 'views', 'nonotifications' => true, 'urlparams' => $urlparams
-));
+$df->print_header(array('tab' => 'views', 'nonotifications' => true, 'urlparams' => $urlparams));
 
 $formheading = $view->id() ? get_string('viewedit', 'datalynx', $view->name()) : get_string(
         'viewnew', 'datalynx', $view->typename());
-echo html_writer::tag('h2', format_string($formheading), array('class' => 'mdl-align'
-));
+echo html_writer::tag('h2', format_string($formheading), array('class' => 'mdl-align'));
 
 // display form
 $mform->set_data($view->to_form());

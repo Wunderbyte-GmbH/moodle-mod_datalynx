@@ -85,8 +85,7 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
         $eventname = (new \ReflectionClass($event))->getShortName();
         if (strpos($eventname, 'team') !== false) {
             $messagedata->fieldname = $DB->get_field('datalynx_fields', 'name', 
-                    array('id' => $event->get_data()['other']['fieldid']
-                    ));
+                    array('id' => $event->get_data()['other']['fieldid']));
             if (!$this->checkteam($event)) {
                 return false;
             } else {
@@ -126,25 +125,21 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
         } else {
             $entryid = $event->get_data()['objectid'];
         }
-        $authorid = $DB->get_field('datalynx_entries', 'userid', array('id' => $entryid
-        ));
-        $author = $DB->get_record('user', array('id' => $authorid
-        ));
+        $authorid = $DB->get_field('datalynx_entries', 'userid', array('id' => $entryid));
+        $author = $DB->get_record('user', array('id' => $authorid));
         
         $message->userfrom = (strpos($eventname, 'event') !== false &&
                  $this->sender == self::FROM_AUTHOR) ? $author : $USER;
         $messagedata->senderprofilelink = html_writer::link(
-                new moodle_url('/user/profile.php', array('id' => $message->userfrom->id
-                )), fullname($message->userfrom));
+                new moodle_url('/user/profile.php', array('id' => $message->userfrom->id)),
+                        fullname($message->userfrom));
         
         foreach ($this->get_recipients($author->id, $entryid) as $userid) {
-            $userto = $DB->get_record('user', array('id' => $userid
-            ));
+            $userto = $DB->get_record('user', array('id' => $userid));
             $message->userto = $userto;
             $messagedata->fullname = fullname($userto);
             
-            $viewurlparams = ['eids' => $entryid
-            ];
+            $viewurlparams = ['eids' => $entryid];
             
             $roleids = $this->df()->get_user_datalynx_permissions($userid);
             foreach ($roleids as $roleid) {
@@ -196,8 +191,7 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
             $recipientids = array_merge($recipientids, 
                     $this->get_team_recipients($this->recipient['teams'], $entryid));
         }
-        return array_diff(array_unique($recipientids), [0
-        ]);
+        return array_diff(array_unique($recipientids), [0]);
     }
 
     /**
@@ -285,8 +279,7 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
                  WHERE dataid = :dataid
                    AND $entryidsql
                    AND df.id $insql";
-        $params = array_merge($params, ['dataid' => $this->df->id()
-        ]);
+        $params = array_merge($params, ['dataid' => $this->df->id()]);
         $contents = $DB->get_fieldset_sql($sql, $params);
         foreach ($contents as $content) {
             $ids = array_merge($ids, json_decode($content, true));

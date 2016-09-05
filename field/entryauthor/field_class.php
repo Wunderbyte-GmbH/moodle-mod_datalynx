@@ -184,8 +184,7 @@ class datalynxfield_entryauthor extends datalynxfield_no_content {
                  ORDER BY $contentfull $sortdir";
         
         $distinctvalues = array();
-        if ($options = $DB->get_records_sql($sql, array($this->df->id()
-        ))) {
+        if ($options = $DB->get_records_sql($sql, array($this->df->id()))) {
             if ($this->field->internalname == 'name') {
                 $internalname = 'id';
             } else {

@@ -32,33 +32,28 @@ $urlparams->id = $datalynx->cm->id;
 
 require_capability('mod/datalynx:managetemplates', $datalynx->context);
 
-$datalynx->set_page('filterform/index', array('urlparams' => $urlparams
-));
+$datalynx->set_page('filterform/index', array('urlparams' => $urlparams));
 
 // activate navigation node
 navigation_node::override_active_url(
-        new moodle_url('/mod/datalynx/filterform/index.php', array('id' => $datalynx->cm->id
-        )));
+        new moodle_url('/mod/datalynx/filterform/index.php', array('id' => $datalynx->cm->id)));
 
 // TODO: print notifications
 
 // print header
-$datalynx->print_header(array('tab' => 'filterforms', 'urlparams' => $urlparams
-));
+$datalynx->print_header(array('tab' => 'filterforms', 'urlparams' => $urlparams));
 
 echo html_writer::empty_tag('br');
-echo html_writer::start_tag('div', array('class' => 'fieldadd mdl-align'
-));
+echo html_writer::start_tag('div', array('class' => 'fieldadd mdl-align'));
 echo html_writer::link(
         new moodle_url('/mod/datalynx/filterform/filterform_edit.php', 
-                array('d' => $datalynx->id(), 'sesskey' => sesskey(), 'id' => 0
-                )), get_string('filterformadd', 'datalynx'));
+                array('d' => $datalynx->id(), 'sesskey' => sesskey(), 'id' => 0)),
+                    get_string('filterformadd', 'datalynx'));
 echo html_writer::end_tag('div');
 echo html_writer::empty_tag('br');
 
 $editbaseurl = '/mod/datalynx/filterform/filterform_edit.php';
-$linkparams = array('d' => $datalynx->id(), 'sesskey' => sesskey()
-);
+$linkparams = array('d' => $datalynx->id(), 'sesskey' => sesskey());
 
 // table headers
 $headers = array('name' => get_string('name'), 'description' => get_string('description'), 
@@ -68,8 +63,7 @@ $headers = array('name' => get_string('name'), 'description' => get_string('desc
 
 $table = new flexible_table('datalynxfilterformindex' . $datalynx->id());
 $table->define_baseurl(
-        new moodle_url('/mod/datalynx/filterform/index.php', array('d' => $datalynx->id()
-        )));
+        new moodle_url('/mod/datalynx/filterform/index.php', array('d' => $datalynx->id())));
 $table->define_columns(array_keys($headers));
 $table->define_headers(array_values($headers));
 
@@ -86,32 +80,29 @@ $table->column_style('delete', 'text-align', 'center');
 
 $table->setup();
 
-$filterforms = $DB->get_records('datalynx_filter_forms', array('dataid' => $datalynx->id()
-));
+$filterforms = $DB->get_records('datalynx_filter_forms', array('dataid' => $datalynx->id()));
 
 foreach ($filterforms as $filterformid => $filterform) {
     
     $filterformname = html_writer::link(
-            new moodle_url($editbaseurl, $linkparams + array('id' => $filterformid
-            )), $filterform->name);
+            new moodle_url($editbaseurl, $linkparams + array('id' => $filterformid)), $filterform->name);
     $filterformdescription = shorten_text($filterform->description, 30);
     $filterformfields = "[[FIELD LIST GOES HERE]]";
     $filterformedit = html_writer::link(
-            new moodle_url($editbaseurl, $linkparams + array('id' => $filterformid
-            )), $OUTPUT->pix_icon('t/edit', get_string('edit')));
+            new moodle_url($editbaseurl, $linkparams + array('id' => $filterformid)),
+                        $OUTPUT->pix_icon('t/edit', get_string('edit')));
     $filterformduplicate = html_writer::link(
             new moodle_url($editbaseurl, 
-                    $linkparams + array('action' => 'duplicate', 'id' => $filterformid
-                    )), $OUTPUT->pix_icon('t/copy', get_string('duplicate')));
+                    $linkparams + array('action' => 'duplicate', 'id' => $filterformid)),
+                        $OUTPUT->pix_icon('t/copy', get_string('duplicate')));
     $filterformdelete = html_writer::link(
             new moodle_url($editbaseurl, 
-                    $linkparams + array('action' => 'delete', 'id' => $filterformid
-                    )), $OUTPUT->pix_icon('t/delete', get_string('delete')));
+                    $linkparams + array('action' => 'delete', 'id' => $filterformid)),
+                        $OUTPUT->pix_icon('t/delete', get_string('delete')));
     
     $table->add_data(
             array($filterformname, $filterformdescription, $filterformfields, $filterformedit, 
-                $filterformduplicate, $filterformdelete
-            ));
+                $filterformduplicate, $filterformdelete));
 }
 
 $table->finish_output();

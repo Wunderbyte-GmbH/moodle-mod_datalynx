@@ -44,13 +44,11 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
         
         $url = empty($url) ? 'http://' : $url;
         $usepicker = empty($field->field->param1) ? false : true;
-        $options = array('title' => s($field->field->description), 'size' => 64
-        );
+        $options = array('title' => s($field->field->description), 'size' => 64);
         
         $group = array();
         $group[] = $mform->createElement('url', "{$fieldname}_url", null, $options, 
-                array('usefilepicker' => $usepicker
-                ));
+                array('usefilepicker' => $usepicker));
         $mform->setType("{$fieldname}_url", PARAM_URL);
         $mform->setDefault("{$fieldname}_url", s($url));
         
@@ -77,8 +75,7 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
         $types = array_intersect(['link', 'image', 'imageflex', 'media'
         ], array_keys($params));
         $type = isset($types[0]) ? $types[0] : '';
-        $attributes = array('class' => $field->class, 'target' => $field->target
-        );
+        $attributes = array('class' => $field->class, 'target' => $field->target);
         
         if (isset($entry->{"c{$fieldid}_content"})) {
             $url = $entry->{"c{$fieldid}_content"};
@@ -105,14 +102,12 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
             
             // image
             if ($type == 'image') {
-                return html_writer::empty_tag('img', array('src' => $url
-                ));
+                return html_writer::empty_tag('img', array('src' => $url));
             }
             
             // image flexible
             if ($type == 'imageflex') {
-                return html_writer::empty_tag('img', array('src' => $url, 'style' => 'width:100%'
-                ));
+                return html_writer::empty_tag('img', array('src' => $url, 'style' => 'width:100%'));
             }
             
             // media
@@ -131,14 +126,12 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
         $fieldname = "f_{$i}_$fieldid";
         
         $arr = array();
-        $arr[] = &$mform->createElement('text', $fieldname, null, array('size' => '32'
-        ));
+        $arr[] = &$mform->createElement('text', $fieldname, null, array('size' => '32'));
         $mform->setType($fieldname, PARAM_NOTAGS);
         $mform->setDefault($fieldname, $value);
         $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
         
-        return array($arr, null
-        );
+        return array($arr, null);
     }
 
     /**
@@ -148,16 +141,11 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
         $fieldname = $this->_field->name();
         
         $patterns = parent::patterns();
-        $patterns["[[$fieldname]]"] = array(true
-        );
-        $patterns["[[$fieldname:link]]"] = array(false
-        );
-        $patterns["[[$fieldname:image]]"] = array(false
-        );
-        $patterns["[[$fieldname:imageflex]]"] = array(false
-        );
-        $patterns["[[$fieldname:media]]"] = array(false
-        );
+        $patterns["[[$fieldname]]"] = array(true);
+        $patterns["[[$fieldname:link]]"] = array(false);
+        $patterns["[[$fieldname:image]]"] = array(false);
+        $patterns["[[$fieldname:imageflex]]"] = array(false);
+        $patterns["[[$fieldname:media]]"] = array(false);
         
         return $patterns;
     }

@@ -50,8 +50,7 @@ class datalynxfield_time extends datalynxfield_base {
     /**
      */
     protected function content_names() {
-        return array('', 'year', 'month', 'day', 'hour', 'minute', 'enabled'
-        );
+        return array('', 'year', 'month', 'day', 'hour', 'minute', 'enabled');
     }
 
     /**
@@ -93,8 +92,7 @@ class datalynxfield_time extends datalynxfield_base {
         if ($timestamp) {
             $contents[] = $timestamp;
         }
-        return array($contents, $oldcontents
-        );
+        return array($contents, $oldcontents);
     }
 
     /**
@@ -146,14 +144,12 @@ class datalynxfield_time extends datalynxfield_base {
                 $operator = '=';
             }
             $params[$namefrom] = $from;
-            return array(" $not $varcharcontent $operator :$namefrom ", $params, true
-            );
+            return array(" $not $varcharcontent $operator :$namefrom ", $params, true);
         } else {
             $params[$namefrom] = $from;
             $params[$nameto] = $to;
             return array(" ($not $varcharcontent >= :$namefrom AND $varcharcontent < :$nameto) ", 
-                $params, true
-            );
+                $params, true);
         }
     }
 

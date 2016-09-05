@@ -33,8 +33,7 @@ class datalynxview_pdf_form extends datalynxview_base_form {
         
         $view = $this->_view;
         $editoroptions = $view->editors();
-        $editorattr = array('cols' => 40, 'rows' => 12
-        );
+        $editorattr = array('cols' => 40, 'rows' => 12);
         
         $mform = &$this->_form;
         
@@ -53,8 +52,7 @@ class datalynxview_pdf_form extends datalynxview_base_form {
                 get_string('pdfsettings', 'datalynxview_pdf'));
         // Document name
         $mform->addElement('text', 'docname', get_string('docname', 'datalynxview_pdf'), 
-                array('size' => 64
-                ));
+                array('size' => 64));
         $mform->setType('docname', PARAM_TEXT);
         $mform->addHelpButton('docname', 'docname', 'datalynxview_pdf');
         // Orientation: Portrait, Landscape
@@ -100,21 +98,18 @@ class datalynxview_pdf_form extends datalynxview_base_form {
         $mform->addHelpButton('tocname', 'tocname', 'datalynxview_pdf');
         // Title
         $mform->addElement('textarea', 'toctitle', get_string('toctitle', 'datalynxview_pdf'), 
-                array('rows' => 3, 'style' => 'width:100%'
-                ));
+                array('rows' => 3, 'style' => 'width:100%'));
         $mform->addHelpButton('toctitle', 'toctitle', 'datalynxview_pdf');
         // Template
         $mform->addElement('textarea', 'toctmpl', get_string('toctmpl', 'datalynxview_pdf'), 
-                array('rows' => 10, 'style' => 'width:100%'
-                ));
+                array('rows' => 10, 'style' => 'width:100%'));
         $mform->addHelpButton('toctmpl', 'toctmpl', 'datalynxview_pdf');
         
         // PDF Frame
         // -------------------------------------------------------------------------------
         $mform->addElement('header', 'pdfframehdr', get_string('pdfframe', 'datalynxview_pdf'));
         $fileoptions = array('subdirs' => 0, 'maxbytes' => -1, 'maxfiles' => 1, 
-            'accepted_types' => array('image'
-            )
+            'accepted_types' => array('image')
         );
         $mform->addElement('filemanager', 'pdfframe', get_string('image', 'datalynxview_pdf'), null, 
                 $fileoptions);
@@ -124,8 +119,7 @@ class datalynxview_pdf_form extends datalynxview_base_form {
         // -------------------------------------------------------------------------------
         $mform->addElement('header', 'pdfwatermarkhdr', get_string('pdfwmark', 'datalynxview_pdf'));
         $fileoptions = array('subdirs' => 0, 'maxbytes' => -1, 'maxfiles' => 1, 
-            'accepted_types' => array('image'
-            )
+            'accepted_types' => array('image')
         );
         // Watermark image
         $mform->addElement('filemanager', 'pdfwmark', get_string('image', 'datalynxview_pdf'), null, 
@@ -212,8 +206,7 @@ class datalynxview_pdf_form extends datalynxview_base_form {
         $perms = $view::get_permission_options();
         foreach ($perms as $perm => $label) {
             $elemgrp[] = &$mform->createElement('advcheckbox', "perm_$perm", null, $label, null, 
-                    array('', $perm
-                    ));
+                    array('', $perm));
         }
         $mform->addGroup($elemgrp, "perms_grp", get_string('protperms', 'datalynxview_pdf'), 
                 '<br />', false);
@@ -245,8 +238,7 @@ class datalynxview_pdf_form extends datalynxview_base_form {
         
         // Certification
         $fileoptions = array('subdirs' => 0, 'maxbytes' => -1, 'maxfiles' => 1, 
-            'accepted_types' => array('.crt'
-            )
+            'accepted_types' => array('.crt')
         );
         $mform->addElement('filemanager', 'pdfcert', 
                 get_string('certification', 'datalynxview_pdf'), null, $fileoptions);

@@ -91,19 +91,17 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
                                 'action' => $userismember ? 'unsubscribe' : 'subscribe', 
                                 'sesskey' => sesskey()
                             )), get_string($userismember ? 'unsubscribe' : 'subscribe', 'datalynx'), 
-                    array(
-                        'class' => 'datalynxfield_subscribe' . ($userismember ? ' subscribed' : '')
+                    array('class' => 'datalynxfield_subscribe' . ($userismember ? ' subscribed' : '')
                     ));
             
             $userurl = new moodle_url('/user/view.php', 
-                    array('course' => $field->df()->course->id, 'id' => $USER->id
-                    ));
+                    array('course' => $field->df()->course->id, 'id' => $USER->id));
             
             $PAGE->requires->strings_for_js(array('subscribe', 'unsubscribe'
             ), 'datalynx');
             $PAGE->requires->js_init_call('M.datalynxfield_teammemberselect.init_subscribe_links', 
-                    array($fieldid, $userurl->out(false), fullname($USER), $canunsubscribe
-                    ), false, $this->get_js_module());
+                    array($fieldid, $userurl->out(false), fullname($USER), $canunsubscribe),
+                        false, $this->get_js_module());
         }
         
         return $str;
@@ -127,8 +125,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         }
         
         if (!empty($notpresent)) {
-            $baseurl = new moodle_url('/user/view.php', array('course' => $COURSE->id
-            ));
+            $baseurl = new moodle_url('/user/view.php', array('course' => $COURSE->id));
             list($insql, $params) = $DB->get_in_or_equal($notpresent);
             $sql = "SELECT * FROM {user} WHERE id $insql";
             $users = $DB->get_records_sql($sql, $params);
@@ -168,12 +165,10 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
                 $selected[$i] = 0;
             }
             $select = $mform->createElement('select', "{$fieldname}[{$i}]", null, $menu, 
-                    array('class' => "datalynxfield_teammemberselect_select $classname"
-                    ));
+                    array('class' => "datalynxfield_teammemberselect_select $classname"));
             $mform->setType("{$fieldname}[{$i}]", PARAM_INT);
             $text = $mform->createElement('text', "{$fieldnamedropdown}[{$i}]", null, 
-                    array('class' => "datalynxfield_teammemberselect_dropdown $classname"
-                    ));
+                    array('class' => "datalynxfield_teammemberselect_dropdown $classname"));
             $mform->setType("{$fieldnamedropdown}[{$i}]", PARAM_TEXT);
             
             $select->setSelected($selected[$i]);
@@ -188,12 +183,10 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         if ($required) {
             $mform->addGroupRule("{$fieldname}_dropdown_grp", '', 'required', null, 0, 'client');
         }
-        $PAGE->requires->strings_for_js(array('minteamsize_error_form', 'moreresults'
-        ), 'datalynx');
+        $PAGE->requires->strings_for_js(array('minteamsize_error_form', 'moreresults'), 'datalynx');
         $PAGE->requires->js_init_call('M.datalynxfield_teammemberselect.init_entry_form', 
                 array($field->options_menu(false, false, $field->usercanaddself ? 0 : $authorid), 
-                    $fieldid, $entryid, $field->minteamsize
-                ), false, $this->get_js_module());
+                    $fieldid, $entryid, $field->minteamsize), false, $this->get_js_module());
     }
 
     public static function compare_different_ignore_zero_callback($data) {
@@ -242,21 +235,17 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         $PAGE->requires->strings_for_js(array('moreresults'
         ), 'datalynx');
         $PAGE->requires->js_init_call('M.datalynxfield_teammemberselect.init_filter_search_form', 
-                array($menu, $fieldid
-                ), false, $this->get_js_module());
+                array($menu, $fieldid), false, $this->get_js_module());
         
-        return array($elements, null
-        );
+        return array($elements, null);
     }
 
     protected function patterns() {
         $fieldname = $this->_field->name();
         
         $patterns = parent::patterns();
-        $patterns["[[$fieldname]]"] = array(true
-        );
-        $patterns["[[$fieldname:subscribe]]"] = array(true
-        );
+        $patterns["[[$fieldname]]"] = array(true);
+        $patterns["[[$fieldname:subscribe]]"] = array(true);
         
         return $patterns;
     }

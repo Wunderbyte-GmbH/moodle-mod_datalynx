@@ -48,13 +48,11 @@ class datalynxfield_form extends moodleform {
         // -------------------------------------------------------------------------------
         $mform->addElement('header', 'general', get_string('general', 'form'));
         
-        $mform->addElement('text', 'name', get_string('name'), array('size' => '32'
-        ));
+        $mform->addElement('text', 'name', get_string('name'), array('size' => '32'));
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
         
-        $mform->addElement('text', 'description', get_string('description'), array('size' => '64'
-        ));
+        $mform->addElement('text', 'description', get_string('description'), array('size' => '64'));
         $mform->setType('description', PARAM_TEXT);
         
         // -------------------------------------------------------------------------------
@@ -81,8 +79,7 @@ class datalynxfield_form extends moodleform {
                 get_string('savecontinue', 'datalynx'));
         // cancel
         $buttonarray[] = &$mform->createElement('cancel');
-        $mform->addGroup($buttonarray, 'buttonar', '', array(' '
-        ), false);
+        $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
         $mform->closeHeaderBefore('buttonar');
     }
 

@@ -35,72 +35,46 @@ class datalynxfield_picture_form extends datalynxfield_file_form {
         
         // pic display dimensions
         $dispdimgrp = array();
-        $dispdimgrp[] = &$mform->createElement('text', 'param4', null, array('size' => '8'
-        ));
-        $dispdimgrp[] = &$mform->createElement('text', 'param5', null, array('size' => '8'
-        ));
+        $dispdimgrp[] = &$mform->createElement('text', 'param4', null, array('size' => '8'));
+        $dispdimgrp[] = &$mform->createElement('text', 'param5', null, array('size' => '8'));
         $dispdimgrp[] = &$mform->createElement('select', 'param6', null, 
-                array('px' => 'px', 'em' => 'em', '%' => '%'
-                ));
+                array('px' => 'px', 'em' => 'em', '%' => '%'));
         $mform->addGroup($dispdimgrp, 'dispdim', 
-                get_string('displaydimensions', 'datalynxfield_picture'), array('x', ''
-                ), false);
+                get_string('displaydimensions', 'datalynxfield_picture'), array('x', ''), false);
         $mform->setType('param4', PARAM_INT);
         $mform->setType('param5', PARAM_INT);
         $mform->addGroupRule('dispdim', 
-                array('param4' => array(array(null, 'numeric', null, 'client'
-                )
-                )
-                ));
+                array('param4' => array(array(null, 'numeric', null, 'client'))));
         $mform->addGroupRule('dispdim', 
-                array('param5' => array(array(null, 'numeric', null, 'client'
-                )
-                )
-                ));
+                array('param5' => array(array(null, 'numeric', null, 'client'))));
         
         // max pic dimensions (crop if needed)
         $maxpicdimgrp = array();
-        $maxpicdimgrp[] = &$mform->createElement('text', 'param7', null, array('size' => '8'
-        ));
-        $maxpicdimgrp[] = &$mform->createElement('text', 'param8', null, array('size' => '8'
-        ));
+        $maxpicdimgrp[] = &$mform->createElement('text', 'param7', null, array('size' => '8'));
+        $maxpicdimgrp[] = &$mform->createElement('text', 'param8', null, array('size' => '8'));
         $mform->addGroup($maxpicdimgrp, 'maxpicdim', 
                 get_string('maxdimensions', 'datalynxfield_picture'), 'x', false);
         $mform->setType('param7', PARAM_INT);
         $mform->setType('param8', PARAM_INT);
         $mform->addGroupRule('maxpicdim', 
-                array('param7' => array(array(null, 'numeric', null, 'client'
-                )
-                )
-                ));
+                array('param7' => array(array(null, 'numeric', null, 'client'))));
         $mform->addGroupRule('maxpicdim', 
-                array('param8' => array(array(null, 'numeric', null, 'client'
-                )
-                )
-                ));
+                array('param8' => array(array(null, 'numeric', null, 'client'))));
         $mform->setDefault('param7', '');
         $mform->setDefault('param8', '');
         
         // thumbnail dimensions (crop if needed)
         $thumbnailgrp = array();
-        $thumbnailgrp[] = &$mform->createElement('text', 'param9', null, array('size' => '8'
-        ));
-        $thumbnailgrp[] = &$mform->createElement('text', 'param10', null, array('size' => '8'
-        ));
+        $thumbnailgrp[] = &$mform->createElement('text', 'param9', null, array('size' => '8'));
+        $thumbnailgrp[] = &$mform->createElement('text', 'param10', null, array('size' => '8'));
         $mform->addGroup($thumbnailgrp, 'thumbnaildim', 
                 get_string('thumbdimensions', 'datalynxfield_picture'), 'x', false);
         $mform->setType('param9', PARAM_INT);
         $mform->setType('param10', PARAM_INT);
         $mform->addGroupRule('thumbnaildim', 
-                array('param9' => array(array(null, 'numeric', null, 'client'
-                )
-                )
-                ));
+                array('param9' => array(array(null, 'numeric', null, 'client'))));
         $mform->addGroupRule('thumbnaildim', 
-                array('param10' => array(array(null, 'numeric', null, 'client'
-                )
-                )
-                ));
+                array('param10' => array(array(null, 'numeric', null, 'client'))));
         $mform->setDefault('param9', '');
         $mform->setDefault('param10', '');
         

@@ -21,7 +21,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once $CFG->libdir . '/formslib.php';
-HTML_QuickForm::registerElementType('checkboxgroup', 
+HTML_QuickForm::registerElementType('checkboxgroup',
         "$CFG->dirroot/mod/datalynx/checkboxgroup/checkboxgroup.php", 'HTML_QuickForm_checkboxgroup');
 
 
@@ -35,9 +35,9 @@ class datalynx_field_behavior_form extends moodleform {
      */
     private $datalynx;
 
-    public function datalynx_field_behavior_form(datalynx $datalynx) {
+    public function __construct(datalynx $datalynx) {
         $this->datalynx = $datalynx;
-        parent::moodleform();
+        parent::__construct();
     }
 
     protected function definition() {
@@ -52,15 +52,13 @@ class datalynx_field_behavior_form extends moodleform {
         
         $mform->addElement('header', 'general', get_string('general', 'form'));
         
-        $mform->addElement('text', 'name', get_string('name'), array('size' => '32'
-        ));
+        $mform->addElement('text', 'name', get_string('name'), array('size' => '32'));
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', "Behavior name may not contain the pipe symbol \" | \"!", 'regex', 
                 '/^[^\|]+$/', 'client');
         
-        $mform->addElement('text', 'description', get_string('description'), array('size' => '64'
-        ));
+        $mform->addElement('text', 'description', get_string('description'), array('size' => '64'));
         $mform->setType('description', PARAM_TEXT);
         
         // ----- VISIBILITY OPTIONS -----
@@ -75,8 +73,7 @@ class datalynx_field_behavior_form extends moodleform {
         if ($new) {
             $mform->setDefault('visibleto', 
                     array(datalynx::PERMISSION_MANAGER, datalynx::PERMISSION_TEACHER, 
-                        datalynx::PERMISSION_STUDENT
-                    ));
+                        datalynx::PERMISSION_STUDENT));
         }
         
         // ----- EDITING OPTIONS -----
@@ -96,8 +93,7 @@ class datalynx_field_behavior_form extends moodleform {
         if ($new) {
             $mform->setDefault('editableby', 
                     array(datalynx::PERMISSION_MANAGER, datalynx::PERMISSION_TEACHER, 
-                        datalynx::PERMISSION_STUDENT
-                    ));
+                        datalynx::PERMISSION_STUDENT));
         }
         $mform->disabledIf('editableby', 'editable', 'notchecked');
         
@@ -146,8 +142,7 @@ class datalynx_field_behavior_form extends moodleform {
     }
 
     private function get_permissions_menu_separators() {
-        return array('<br />', '<br />', '<br />', '<br /><br />', '<br />'
-        );
+        return array('<br />', '<br />', '<br />', '<br /><br />', '<br />');
     }
 
     function validation($data, $files) {

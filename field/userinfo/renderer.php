@@ -42,21 +42,17 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
         $tag = "##author:$fieldname##";
         switch ($field->infotype) {
             case 'checkbox':
-                $replacements[$tag] = array('html', $this->display_checkbox($entry)
-                );
+                $replacements[$tag] = array('html', $this->display_checkbox($entry));
                 break;
             case 'datetime':
-                $replacements[$tag] = array('html', $this->display_datetime($entry)
-                );
+                $replacements[$tag] = array('html', $this->display_datetime($entry));
                 break;
             case 'menu':
             case 'text':
-                $replacements[$tag] = array('html', $this->display_text($entry)
-                );
+                $replacements[$tag] = array('html', $this->display_text($entry));
                 break;
             case 'textarea':
-                $replacements[$tag] = array('html', $this->display_richtext($entry)
-                );
+                $replacements[$tag] = array('html', $this->display_richtext($entry));
                 break;
             default:
                 $replacements[$tag] = '';
@@ -77,12 +73,10 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
         } else {
             global $USER, $DB;
             $content = $DB->get_field('user_info_data', 'data', 
-                    array('userid' => $USER->id, 'fieldid' => $field->infoid
-                    ));
+                    array('userid' => $USER->id, 'fieldid' => $field->infoid));
         }
         
-        $params = array('disabled' => "disabled", 'type' => "checkbox", 'name' => $fieldname
-        );
+        $params = array('disabled' => "disabled", 'type' => "checkbox", 'name' => $fieldname);
         if (intval($content) === 1) {
             $params['checked'] = 'checked';
         }
@@ -100,8 +94,7 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
         } else {
             global $USER, $DB;
             $content = $DB->get_field('user_info_data', 'data', 
-                    array('userid' => $USER->id, 'fieldid' => $field->infoid
-                    ));
+                    array('userid' => $USER->id, 'fieldid' => $field->infoid));
         }
         
         // Check if time was specified
@@ -130,8 +123,7 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
         } else {
             global $USER, $DB;
             $content = $DB->get_field('user_info_data', 'data', 
-                    array('userid' => $USER->id, 'fieldid' => $field->infoid
-                    ));
+                    array('userid' => $USER->id, 'fieldid' => $field->infoid));
         }
         
         if (!$content) {
@@ -149,8 +141,7 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
         if (!empty($this->field->param9)) {
             // Define the target
             if (!empty($this->field->param10)) {
-                $attributes = array('target' => $this->field->param10
-                );
+                $attributes = array('target' => $this->field->param10);
             } else {
                 $attributes = array();
             }
@@ -172,17 +163,14 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
         if (isset($entry->{"c{$fieldid}_content"})) {
             if ($content = $entry->{"c{$fieldid}_content"}) {
                 $format = isset($entry->{"c{$fieldid}_content1"}) ? $entry->{"c{$fieldid}_content1"} : FORMAT_PLAIN;
-                return format_text($content, $format, array('overflowdiv' => true
-                ));
+                return format_text($content, $format, array('overflowdiv' => true));
             }
         } else {
             global $USER, $DB;
             $content = $DB->get_field('user_info_data', 'data', 
-                    array('userid' => $USER->id, 'fieldid' => $field->infoid
-                    ));
+                    array('userid' => $USER->id, 'fieldid' => $field->infoid));
             $format = FORMAT_PLAIN;
-            return format_text($content, $format, array('overflowdiv' => true
-            ));
+            return format_text($content, $format, array('overflowdiv' => true));
         }
         
         return '';
@@ -196,8 +184,7 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
         $cat = get_string('authorinfo', 'datalynx');
         
         $patterns = array();
-        $patterns["##author:$fieldname##"] = array(true, $cat
-        );
+        $patterns["##author:$fieldname##"] = array(true, $cat);
         
         return $patterns;
     }

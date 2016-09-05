@@ -59,14 +59,12 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
             $disabled = array();
         }
         
-        $menuoptions = array('' => get_string('choosedots')
-        ) + $menuoptions;
+        $menuoptions = array('' => get_string('choosedots')) + $menuoptions;
         foreach ($menuoptions as $id => $name) {
             if (array_search($id, $disabled) === false || $id == $selected) {
                 $select->addOption($name, $id);
             } else {
-                $select->addOption($name, $id, array('disabled' => 'disabled'
-                ));
+                $select->addOption($name, $id, array('disabled' => 'disabled'));
             }
         }
         
@@ -130,8 +128,6 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
         
         $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
         
-        return array(array($select
-        ), null
-        );
+        return array(array($select), null);
     }
 }

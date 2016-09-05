@@ -114,8 +114,7 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
      * @return string
      */
     public function get_sha1() {
-        return sha1(serialize(array($this->id, $this->vid, $this->fid, $this->eids
-        )));
+        return sha1(serialize(array($this->id, $this->vid, $this->fid, $this->eids)));
     }
 
     /**
@@ -127,14 +126,12 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
         // set the exported view content
         $df = new datalynx(null, $this->id);
         $view = $df->get_view_from_id($this->vid);
-        $view->set_filter(array('filterid' => $this->fid, 'eids' => $this->eids
-        ));
+        $view->set_filter(array('filterid' => $this->fid, 'eids' => $this->eids));
         $view->set_content();
         
         // export to spreadsheet
         if ($this->exporter->get('formatclass') == PORTFOLIO_FORMAT_SPREADSHEET) {
-            $content = $view->display(array('controls' => false, 'tohtml' => true
-            ));
+            $content = $view->display(array('controls' => false, 'tohtml' => true));
             $filename = clean_filename(
                     $view->name() . '-full.' . $this->get_export_config('spreadsheettype'));
             $this->exporter->write_new_file($content, $filename);
@@ -198,8 +195,7 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
         }
         
         // spreadsheet selection
-        $types = array('csv', 'ods', 'xls'
-        );
+        $types = array('csv', 'ods', 'xls');
         $options = array_combine($types, $types);
         $mform->addElement('select', 'caller_spreadsheettype', 
                 get_string('spreadsheettype', 'datalynx'), $options);
@@ -234,8 +230,7 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
     /**
      */
     public function get_allowed_export_config() {
-        return array('spreadsheettype', 'documenttype', 'contentformat', 'separateentries'
-        );
+        return array('spreadsheettype', 'documenttype', 'contentformat', 'separateentries');
     }
 
     /**
@@ -244,9 +239,7 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
         global $CFG;
         
         $returnurl = new moodle_url('/mod/datalynx/view.php', 
-                array('id' => $this->id, 'view' => $this->vid, 'filter' => $this->fid
-                ));
-        ;
+                array('id' => $this->id, 'view' => $this->vid, 'filter' => $this->fid));
         return $returnurl->out(false);
     }
 }

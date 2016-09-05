@@ -44,8 +44,7 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
         $fieldattr = array();
         
         if ($field->get('param2')) {
-            $fieldattr['style'] = 'width:' . s($field->get('param2')) . s($field->get('param3')) .
-                     ';';
+            $fieldattr['style'] = 'width:' . s($field->get('param2')) . s($field->get('param3')) . ';';
         }
         
         if ($field->get('param4')) {
@@ -93,8 +92,7 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
                     $val = $max;
                     break;
                 case 'rangelength':
-                    $val = array($min, $max
-                    );
+                    $val = array($min, $max);
                     break;
             }
             if ($val !== false) {
@@ -134,14 +132,12 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
         $fieldname = "f_{$i}_$fieldid";
         
         $arr = array();
-        $arr[] = &$mform->createElement('text', $fieldname, null, array('size' => '32'
-        ));
+        $arr[] = &$mform->createElement('text', $fieldname, null, array('size' => '32'));
         $mform->setType($fieldname, PARAM_NOTAGS);
         $mform->setDefault($fieldname, $value);
         $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
         
-        return array($arr, null
-        );
+        return array($arr, null);
     }
 
     public function validate($entryid, $tags, $formdata) {

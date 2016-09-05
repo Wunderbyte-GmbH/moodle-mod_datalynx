@@ -46,8 +46,7 @@ class HTML_QuickForm_checkboxgroup extends HTML_QuickForm_element {
     }
 
     function setName($name) {
-        $this->updateAttributes(array('name' => $name
-        ));
+        $this->updateAttributes(array('name' => $name));
     }
 
     function getName() {
@@ -65,8 +64,7 @@ class HTML_QuickForm_checkboxgroup extends HTML_QuickForm_element {
         if (is_array($value)) {
             $this->_values = array_values($value);
         } else {
-            $this->_values = array($value
-            );
+            $this->_values = array($value);
         }
     }
 
@@ -76,24 +74,20 @@ class HTML_QuickForm_checkboxgroup extends HTML_QuickForm_element {
 
     function addOption($text, $value, $attributes = null) {
         if (null === $attributes) {
-            $attributes = array('value' => $value
-            );
+            $attributes = array('value' => $value);
         } else {
             $attributes = $this->_parseAttributes($attributes);
             if (isset($attributes['checked'])) {
                 $this->_removeAttr('checked', $attributes);
                 if (is_null($this->_values)) {
-                    $this->_values = array($value
-                    );
+                    $this->_values = array($value);
                 } else if (!in_array($value, $this->_values)) {
                     $this->_values[] = $value;
                 }
             }
-            $this->_updateAttrArray($attributes, array('value' => $value
-            ));
+            $this->_updateAttrArray($attributes, array('value' => $value));
         }
-        $this->_options[] = array('text' => $text, 'attr' => $attributes
-        );
+        $this->_options[] = array('text' => $text, 'attr' => $attributes);
     }
 
     function loadArray($arr, $values = null) {
@@ -136,8 +130,7 @@ class HTML_QuickForm_checkboxgroup extends HTML_QuickForm_element {
                 ));
                 if (is_array($this->_values) &&
                          in_array((string) $option['attr']['value'], $this->_values)) {
-                    $this->_updateAttrArray($option['attr'], array('checked' => 'checked'
-                    ));
+                    $this->_updateAttrArray($option['attr'], array('checked' => 'checked'));
                 } else {
                     unset($option['attr']['checked']);
                 }
@@ -173,15 +166,13 @@ class HTML_QuickForm_checkboxgroup extends HTML_QuickForm_element {
             // Only use id attribute if doing single hidden input
             if (1 == count($this->_values)) {
                 $id = $this->getAttribute('id');
-                $idAttr = isset($id) ? array('id' => $id
-                ) : array();
+                $idAttr = isset($id) ? array('id' => $id) : array();
             } else {
                 $idAttr = array();
             }
             foreach ($this->_values as $value) {
                 $html .= '<input' . $this->_getAttrString(
-                        array('type' => 'hidden', 'name' => $name, 'value' => $value
-                        ) + $idAttr) . ' />';
+                        array('type' => 'hidden', 'name' => $name, 'value' => $value) + $idAttr) . ' />';
             }
         }
         return $html;
@@ -194,8 +185,7 @@ class HTML_QuickForm_checkboxgroup extends HTML_QuickForm_element {
         } else if ($value == "") {
             $value = array();
         } else if (!is_array($value)) {
-            $value = array($value
-            );
+            $value = array($value);
         }
         if (is_array($value) && !empty($this->_options)) {
             $cleanValue = null;

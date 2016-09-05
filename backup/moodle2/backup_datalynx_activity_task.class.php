@@ -96,8 +96,7 @@ class backup_datalynx_activity_task extends backup_activity_task {
                     "/(" . $base .
                      "\/mod\/datalynx\/embed.php\?d\=)([0-9]+)\&(amp;)view\=([0-9]+)\&(amp;)filter\=([0-9]+)/"
         );
-        $replacement = array('$@DFVIEWVIEWFILTER*$2*$4*$6@$', '$@DFEMBEDVIEWFILTER*$2*$4*$6@$'
-        );
+        $replacement = array('$@DFVIEWVIEWFILTER*$2*$4*$6@$', '$@DFEMBEDVIEWFILTER*$2*$4*$6@$');
         $content = preg_replace($search, $replacement, $content);
         
         // View/embed: d, view
@@ -105,8 +104,7 @@ class backup_datalynx_activity_task extends backup_activity_task {
                  "\/mod\/datalynx\/view.php\?d\=)([0-9]+)\&(amp;)view\=([0-9]+)/", 
                     "/(" . $base . "\/mod\/datalynx\/embed.php\?d\=)([0-9]+)\&(amp;)view\=([0-9]+)/"
         );
-        $replacement = array('$@DFVIEWVIEW*$2*$4@$', '$@DFEMBEDVIEW*$2*$4@$'
-        );
+        $replacement = array('$@DFVIEWVIEW*$2*$4@$', '$@DFEMBEDVIEW*$2*$4@$');
         $content = preg_replace($search, $replacement, $content);
         
         // View/embed: d, eid
@@ -114,24 +112,21 @@ class backup_datalynx_activity_task extends backup_activity_task {
                  "\/mod\/datalynx\/view.php\?d\=)([0-9]+)\&(amp;)eid\=([0-9]+)/", 
                     "/(" . $base . "\/mod\/datalynx\/embed.php\?d\=)([0-9]+)\&(amp;)eid\=([0-9]+)/"
         );
-        $replacement = array('$@DFVIEWENTRY*$2*$4@$', '$@DFEMBEDENTRY*$2*$4@$'
-        );
+        $replacement = array('$@DFVIEWENTRY*$2*$4@$', '$@DFEMBEDENTRY*$2*$4@$');
         $content = preg_replace($search, $replacement, $content);
         
         // View/embed: id
         $search = array("/(" . $base . "\/mod\/datalynx\/view.php\?id\=)([0-9]+)/", 
             "/(" . $base . "\/mod\/datalynx\/embed.php\?id\=)([0-9]+)/"
         );
-        $replacement = array('$@DFVIEWBYID*$2@$', '$@DFEMBEDBYID*$2@$'
-        );
+        $replacement = array('$@DFVIEWBYID*$2@$', '$@DFEMBEDBYID*$2@$');
         $content = preg_replace($search, $replacement, $content);
         
         // View/embed: d
         $search = array("/(" . $base . "\/mod\/datalynx\/view.php\?d\=)([0-9]+)/", 
             "/(" . $base . "\/mod\/datalynx\/embed.php\?d\=)([0-9]+)/"
         );
-        $replacement = array('$@DFVIEWBYD*$2@$', '$@DFEMBEDBYD*$2@$'
-        );
+        $replacement = array('$@DFVIEWBYD*$2@$', '$@DFEMBEDBYD*$2@$');
         $content = preg_replace($search, $replacement, $content);
         
         return $content;
