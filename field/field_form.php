@@ -37,7 +37,7 @@ class datalynxfield_form extends moodleform {
         $this->_field = $field;
         $this->_df = $field->df();
         
-        parent::moodleform($action, $customdata, $method, $target, $attributes, $editable);
+        parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
     }
 
     function definition() {
