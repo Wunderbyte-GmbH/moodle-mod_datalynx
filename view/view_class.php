@@ -1126,7 +1126,7 @@ abstract class datalynxview_base {
                     $func = $content[0];
                     $entry = $content[1][0];
                     $params = $content[1][1];
-                    call_user_func_array($func, array($mform, $entry, $params));
+                    call_user_func_array($func, array(&$mform, $entry, $params));
                 }
             }
         }

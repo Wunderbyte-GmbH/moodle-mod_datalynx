@@ -518,6 +518,7 @@ class datalynxview_patterns {
         global $OUTPUT;
         
         $replacement = '';
+        $pagingbar = null;
         
         $view = $this->_view;
         $df = $view->get_df();
