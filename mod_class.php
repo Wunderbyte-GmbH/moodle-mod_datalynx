@@ -281,7 +281,7 @@ class datalynx {
      * @param array $params
      */
     public function set_page($page = 'view', $params = null, $skiplogincheck = false) {
-        global $CFG, $PAGE, $USER, $OUTPUT;
+        global $CFG, $PAGE, $USER;
         
         $this->pagefile = $page;
         $thisid = $this->id();
@@ -380,8 +380,7 @@ class datalynx {
                     $this->data->defaultview) ? $this->data->defaultview : 0));
             if ($page == 'view' && $viewid) {
                 global $DB;
-                $viewname = $DB->get_field('datalynx_views', 'name', array('id' => $viewid
-                ));
+                $viewname = $DB->get_field('datalynx_views', 'name', array('id' => $viewid));
                 $pagestring = get_string('page');
                 $fm = $this->get_filter_manager();
                 $filteroptions = $fm::get_filter_options_from_url();
@@ -517,25 +516,23 @@ class datalynx {
                 if ($page == 'view' or $page == 'embed') {
                     $getstarted = new stdClass();
                     $getstarted->presets = html_writer::link(
-                            new moodle_url('/mod/datalynx/preset/index.php', array('d' => $thisid
-                            )), get_string('presets', 'datalynx'));
+                            new moodle_url('/mod/datalynx/preset/index.php', array('d' => $thisid)),
+                                get_string('presets', 'datalynx'));
                     $getstarted->fields = html_writer::link(
-                            new moodle_url('/mod/datalynx/field/index.php', array('d' => $thisid
-                            )), get_string('fields', 'datalynx'));
+                            new moodle_url('/mod/datalynx/field/index.php', array('d' => $thisid)),
+                                get_string('fields', 'datalynx'));
                     $getstarted->views = html_writer::link(
-                            new moodle_url('/mod/datalynx/view/index.php', array('d' => $thisid
-                            )), get_string('views', 'datalynx'));
+                            new moodle_url('/mod/datalynx/view/index.php', array('d' => $thisid)),
+                                get_string('views', 'datalynx'));
                     
                     $this->notifications['bad']['getstarted'] = html_writer::tag('div', 
-                            get_string('getstarted', 'datalynx', $getstarted), 
-                            array('class' => 'mdl-left'));
+                            get_string('getstarted', 'datalynx', $getstarted), array('class' => 'mdl-left'));
                 }
             } else if (!$this->data->defaultview) {
                 $linktoviews = html_writer::link(
-                        new moodle_url('/mod/datalynx/view/index.php', array('d' => $thisid
-                        )), get_string('views', 'datalynx'));
-                $this->notifications['bad']['defaultview'] = get_string('viewnodefault', 'datalynx', 
-                        $linktoviews);
+                        new moodle_url('/mod/datalynx/view/index.php', array('d' => $thisid)),
+                            get_string('views', 'datalynx'));
+                $this->notifications['bad']['defaultview'] = get_string('viewnodefault', 'datalynx', $linktoviews);
             }
         }
         
@@ -625,8 +622,7 @@ class datalynx {
         if (!empty($CFG->enablerssfeeds) && !empty($CFG->datalynx_enablerssfeeds) &&
                  $this->data->rssarticles > 0) {
             echo '<div style="float:right;">';
-            rss_print_link($this->course->id, $USER->id, 'datalynx', $this->id(), 
-                    get_string('rsstype'));
+            rss_print_link($this->course->id, $USER->id, 'datalynx', $this->id(), get_string('rsstype'));
             echo '</div>';
             echo '<div style="clear:both;"></div>';
         }
@@ -643,8 +639,7 @@ class datalynx {
         if ($this->data->intro) {
             $options = new stdClass();
             $options->noclean = true;
-            echo $OUTPUT->box(format_module_intro('datalynx', $this->data, $this->cm->id), 
-                    'generalbox', 'intro');
+            echo $OUTPUT->box(format_module_intro('datalynx', $this->data, $this->cm->id), 'generalbox', 'intro');
         }
     }
 
@@ -866,8 +861,7 @@ class datalynx {
             $customsearch = unserialize($filter->customsearch);
             $customsearch = $customsearch ? array_keys($customsearch) : [];
             
-            if (array_intersect($fieldids, $customsearch) || array_intersect($fieldids, 
-                    $custormsort)) {
+            if (array_intersect($fieldids, $customsearch) || array_intersect($fieldids, $custormsort)) {
                 $usedfilters[] = $filter;
             }
         }
@@ -941,8 +935,9 @@ class datalynx {
                                         ]) . "</div>";
                         echo $OUTPUT->continue_button(
                                 new moodle_url('/mod/datalynx/field/index.php', 
-                                        array('d' => $this->id()
-                                        )));
+                                        array('d' => $this->id())
+                                )
+                        );
                         
                         echo $OUTPUT->footer();
                         exit();
@@ -953,8 +948,8 @@ class datalynx {
                         new moodle_url('/mod/datalynx/field/index.php', 
                                 array('d' => $this->id(), 
                                     $action => implode(',', array_keys($fields)), 
-                                    'sesskey' => sesskey(), 'confirmed' => 1
-                                )), 
+                                    'sesskey' => sesskey(), 'confirmed' => 1)
+                        ),
                         new moodle_url('/mod/datalynx/field/index.php', array('d' => $this->id())));
                 
                 echo $OUTPUT->footer();
@@ -975,7 +970,8 @@ class datalynx {
                             $event = \mod_datalynx\event\field_created::create(
                                     array('context' => $this->context, 
                                         'objectid' => $field->field->id, 'other' => $other
-                                    ));
+                                    )
+                            );
                             $event->trigger();
                         }
                         $strnotify = 'fieldsadded';
@@ -991,12 +987,12 @@ class datalynx {
                             $oldfieldname = $field->field->name;
                             $field->update_field($forminput);
                             
-                            $other = array('dataid' => $this->id()
-                            );
+                            $other = array('dataid' => $this->id());
                             $event = \mod_datalynx\event\field_updated::create(
                                     array('context' => $this->context, 
                                         'objectid' => $field->field->id, 'other' => $other
-                                    ));
+                                    )
+                            );
                             $event->trigger();
                             
                             // Update the views
@@ -1018,7 +1014,8 @@ class datalynx {
                             $event = \mod_datalynx\event\field_updated::create(
                                     array('context' => $this->context, 'objectid' => $fid, 
                                         'other' => $other
-                                    ));
+                                    )
+                            );
                             $event->trigger();
                         }
                         
@@ -1038,7 +1035,8 @@ class datalynx {
                             $event = \mod_datalynx\event\field_created::create(
                                     array('context' => $this->context, 'objectid' => $fieldid, 
                                         'other' => $other
-                                    ));
+                                    )
+                            );
                             $event->trigger();
                         }
                         
@@ -1056,7 +1054,8 @@ class datalynx {
                             $event = \mod_datalynx\event\field_deleted::create(
                                     array('context' => $this->context, 
                                         'objectid' => $field->field->id, 'other' => $other
-                                    ));
+                                    )
+                            );
                             $event->trigger();
                         }
                         $strnotify = 'fieldsdeleted';
@@ -1097,8 +1096,7 @@ class datalynx {
                 
                 if ($strnotify) {
                     $fieldsprocessed = $processedfids ? count($processedfids) : 'No';
-                    $this->notifications['good'][] = get_string($strnotify, 'datalynx', 
-                            $fieldsprocessed);
+                    $this->notifications['good'][] = get_string($strnotify, 'datalynx', $fieldsprocessed);
                 }
                 return $processedfids;
             }
@@ -1409,8 +1407,7 @@ class datalynx {
                         new moodle_url('/mod/datalynx/view/index.php', 
                                 array('d' => $this->id(), 
                                     $action => implode(',', array_keys($views)), 
-                                    'sesskey' => sesskey(), 'confirmed' => 1
-                                )), 
+                                    'sesskey' => sesskey(), 'confirmed' => 1)),
                         new moodle_url('/mod/datalynx/view/index.php', array('d' => $this->id())));
                 
                 echo $OUTPUT->footer();
@@ -1525,8 +1522,7 @@ class datalynx {
                                 }
                             }
                             
-                            $other = array('dataid' => $this->id()
-                            );
+                            $other = array('dataid' => $this->id());
                             $event = \mod_datalynx\event\view_created::create(
                                     array('context' => $this->context, 'objectid' => $newviewid, 
                                         'other' => $other));

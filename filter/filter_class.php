@@ -501,8 +501,7 @@ class datalynx_filter_manager {
     /**
      */
     public function get_filter_from_id($filterid = 0, array $options = null) {
-        global $DB;
-        
+
         $df = $this->_df;
         $dfid = $df->id();
         
@@ -629,7 +628,7 @@ class datalynx_filter_manager {
     /**
      */
     public function process_filters($action, $fids, $confirmed = false) {
-        global $CFG, $DB, $OUTPUT;
+        global $DB, $OUTPUT;
         
         $df = $this->_df;
         
@@ -1123,10 +1122,8 @@ class datalynx_filter_manager {
         global $CFG;
         
         require_once ("$CFG->dirroot/mod/datalynx/filter/filter_form.php");
-        $formurl = new moodle_url($view->get_baseurl(), 
-                array('filter' => self::USER_FILTER_SET, 'afilter' => 1));
-        $mform = new mod_datalynx_advanced_filter_form($this->_df, $filter, $formurl, 
-                array('view' => $view));
+        $formurl = new moodle_url($view->get_baseurl(), array('filter' => self::USER_FILTER_SET, 'afilter' => 1));
+        $mform = new mod_datalynx_advanced_filter_form($this->_df, $filter, $formurl, array('view' => $view));
         return $mform;
     }
 
@@ -1256,18 +1253,7 @@ class datalynx_filter_manager {
     /**
      */
     public static function get_sort_options_from_query($query) {
-        $usort = array();
-        if ($query) {
-            $tempusort = urldecode($query);
-            $tempusort = array_map(function ($a) {
-                return explode(' ', $a);
-            }, explode(',', $usort));
-        }
-        foreach ($tempusort as $data) {
-            $usort[$data[0]] = $data[1];
-        }
-        
-        return $usort;
+        return unserialize(urldecode($query));
     }
 
     /**
@@ -1324,19 +1310,19 @@ class datalynx_filter_manager {
     /**
      */
     public static function get_filter_options_from_url($url = null) {
-        $filteroptions = array('filterid' => array('filter', 0, PARAM_INT
-        ), 'perpage' => array('uperpage', 0, PARAM_INT
-        ), 'selection' => array('uselection', 0, PARAM_INT
-        ), 'groupby' => array('ugroupby', 0, PARAM_INT
-        ), 'customsort' => array('usort', '', PARAM_RAW
-        ), 'customsearch' => array('usearch', '', PARAM_RAW
-        ), 'page' => array('page', 0, PARAM_INT
-        ), 'eids' => array('eids', 0, PARAM_INT
-        ), 'users' => array('users', '', PARAM_SEQUENCE
-        ), 'groups' => array('groups', '', PARAM_SEQUENCE
-        ), 'afilter' => array('afilter', 0, PARAM_INT
-        ), 'usersearch' => array('usersearch', 0, PARAM_RAW
-        )
+        $filteroptions = array(
+            'filterid' => array('filter', 0, PARAM_INT),
+            'perpage' => array('uperpage', 0, PARAM_INT),
+            'selection' => array('uselection', 0, PARAM_INT),
+            'groupby' => array('ugroupby', 0, PARAM_INT),
+            'customsort' => array('usort', '', PARAM_RAW),
+            'customsearch' => array('usearch', '', PARAM_RAW),
+            'page' => array('page', 0, PARAM_INT),
+            'eids' => array('eids', 0, PARAM_INT),
+            'users' => array('users', '', PARAM_SEQUENCE),
+            'groups' => array('groups', '', PARAM_SEQUENCE),
+            'afilter' => array('afilter', 0, PARAM_INT),
+            'usersearch' => array('usersearch', 0, PARAM_RAW)
         );
         
         $options = array();

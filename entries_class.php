@@ -113,7 +113,7 @@ class datalynx_entries {
      * @return object retrieved entries
      */
     public function get_entries($options = null) {
-        global $CFG, $DB, $USER;
+        global $DB, $USER;
         
         $datalynx = &$this->datalynx;
         $fields = $datalynx->get_fields();
@@ -162,8 +162,7 @@ class datalynx_entries {
                 list($ingroups, $groupparams) = $DB->get_in_or_equal($filter->groups, 
                         SQL_PARAMS_NAMED, 'groups');
                 $whereuser .= " AND e.userid $ingroups ";
-                $params = array_merge($params, array('groups' => $groupparams
-                ));
+                $params = array_merge($params, array('groups' => $groupparams));
             }
         }
         
@@ -302,8 +301,7 @@ class datalynx_entries {
                             $page = $numpages > 1 ? rand(0, ($numpages - 1)) : 0;
                         }
                     }
-                    $entries->entries = $DB->get_records_sql($sqlselect, $allparams, 
-                            $page * $perpage, $perpage);
+                    $entries->entries = $DB->get_records_sql($sqlselect, $allparams, $page * $perpage, $perpage);
                 }
                 // get everything
             } else {

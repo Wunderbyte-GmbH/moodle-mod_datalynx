@@ -139,7 +139,7 @@ class datalynxview_patterns {
             } else if (in_array($tag, $actions)) {
                 $replacements[$tag] = $this->get_action_replacements($tag, $entry, $options);
             } else if (in_array($tag, $paging)) {
-                $replacements[$tag] = $this->get_paging_replacements($tag, $entry, $options);
+                $replacements[$tag] = $this->get_paging_replacements($options);
             } else if ($this->is_regexp_pattern($tag)) {
                 $replacements[$tag] = $this->get_regexp_replacements($tag, $entry, $options);
             } else {
@@ -514,36 +514,19 @@ class datalynxview_patterns {
      * @param array $options
      * @return Ambigous <string, paging_bar>
      */
-    protected function get_paging_replacements($tag, $entry = null, array $options = null) {
+    protected function get_paging_replacements(array $options = null) {
         global $OUTPUT;
-        
-        $replacement = '';
-        
+
         $view = $this->_view;
-        $df = $view->get_df();
         $filter = $view->get_filter();
         $baseurl = $view->get_baseurl();
         
-        // typical entry 'more' request. If not single view (1 per page) show return to list instead
+        // typical entry 'more' request. If not single view (1 per page) show nothing instead
         // of paging bar
         if (!empty($filter->eids)) {
-            $url = new moodle_url($baseurl);
-            // Add page
-            if ($filter->page) {
-                $url->param('page', $filter->page);
-            }
-            // Change view to caller
-            if ($ret = optional_param('ret', 0, PARAM_INT)) {
-                $url->param('view', $ret);
-            }
-            // Remove eids so that we return to list
-            $url->remove_params('eids');
-            /* commented out by TN, see ticket: http://development.edulabs.org/redmine/issues/878
-            // Make the link
-            $pagingbar = html_writer::link($url->out(false),
-                    get_string('viewreturntolist', 'datalynx'));
-            */
-            
+
+            $pagingbar = '';
+
             // typical groupby, one group per page case. show paging bar as per number of groups
         } else if (isset($filter->pagenum)) {
             $pagingbar = new paging_bar($filter->pagenum, $filter->page, 1, $baseurl . '&amp;', 
@@ -553,8 +536,8 @@ class datalynxview_patterns {
                  !empty($options['entriesfiltercount']) and
                  $options['entriescount'] != $options['entriesfiltercount']) {
 
+            $url = new moodle_url($baseurl);
             if($filter->id<0) {
-                $url = new moodle_url($baseurl);
                 // Add dataid
                 if ($filter->dataid) {
                     $url->param('dataid', $filter->dataid);
@@ -573,7 +556,7 @@ class datalynxview_patterns {
                 }
                 // Add perpage
                 if ($filter->perpage) {
-                    $url->param('perpage', $filter->perpage);
+                    $url->param('uperpage', $filter->perpage);
                 }
                 // Add pagenum
                 if ($filter->pagenum) {
@@ -581,27 +564,23 @@ class datalynxview_patterns {
                 }
                 // Add selection
                 if ($filter->selection) {
-                    $url->param('selection', $filter->selection);
+                    $url->param('uselection', $filter->selection);
                 }
                 // Add groupby
                 if ($filter->groupby) {
-                    $url->param('groupby', $filter->groupby);
+                    $url->param('ugroupby', $filter->groupby);
                 }
                 // Add customsort
                 if ($filter->customsort) {
-                    $url->param('customsort', $filter->customsort);
+                    $url->param('usort', $filter->customsort);
                 }
                 // Add customsearch
                 if ($filter->customsearch) {
-                    $url->param('customsearch', $filter->customsearch);
+                    $url->param('usearch', $filter->customsearch);
                 }
                 // Add search
                 if ($filter->search) {
-                    $url->param('search', $filter->search);
-                }
-                // Add contentfields
-                if (1==2 && $filter->contentfields) {
-                    $url->param('contentfields', serialize($filter->contentfields));
+                    $url->param('usersearch', $filter->search);
                 }
                 // Add eids
                 if ($filter->eids) {
@@ -611,22 +590,36 @@ class datalynxview_patterns {
                 if ($filter->users) {
                     $url->param('users', $filter->users);
                 }
-            }
+            } // end if filter is userfilter
             $pagingbar = new paging_bar($options['entriesfiltercount'], $filter->page,
-                    $filter->perpage, $baseurl . '&amp;', 'page', '', true);
-//            $pagingbar = new paging_bar($options['entriesfiltercount'], $filter->page,
-//                $filter->perpage, $url . '&amp;', 'page', '', true);
-        } else {
+                $filter->perpage, $url , 'page');
+        } else { // no paging bar case at all:
             $pagingbar = '';
         }
         
-        if ($pagingbar instanceof paging_bar) {
+        if ($pagingbar) {
             $replacement = $OUTPUT->render($pagingbar);
         } else {
-            $replacement = $pagingbar;
+            $replacement = "";
         }
         return $replacement;
     }
+
+
+    /**
+     * @param array $fieldinput
+     */
+    protected function contentfield_convert_array_to_string($contentfields) {
+
+        $contentfield_str = "";
+        foreach ($contentfields as $key => $val) {
+            if (!is_array($val)) {
+                $contentfield_str .= "&contentfields[" . $key . "]=" . $val;
+            }
+        }
+        return $contentfield_str;
+    }
+
 
     /**
      * If viewname is not specified, return the URL of the current view
