@@ -58,7 +58,7 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
         // $df = $this->_df;
         
         $diroptions = array(0 => get_string('ascending', 'datalynx'), 
-            1 => get_string('descending', 'datalynx')
+                            1 => get_string('descending', 'datalynx')
         );
         
         $fieldlabel = get_string('filtersortfieldlabel', 'datalynx');
@@ -289,8 +289,7 @@ class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
                 $groupbyfieldoptions[$field->id()] = $field->name();
             }
         }
-        $mform->addElement('select', 'groupby', get_string('filtergroupby', 'datalynx'), 
-                $groupbyfieldoptions);
+        $mform->addElement('select', 'groupby', get_string('filtergroupby', 'datalynx'), $groupbyfieldoptions);
         $mform->setDefault('groupby', $filter->groupby);
         
         // search
@@ -307,8 +306,7 @@ class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
         
         // custom search
         // -------------------------------------------------------------------------------
-        $mform->addElement('header', 'customsearchhdr', 
-                get_string('filtercustomsearch', 'datalynx'));
+        $mform->addElement('header', 'customsearchhdr', get_string('filtercustomsearch', 'datalynx'));
         $mform->setExpanded('customsearchhdr');
         
         $this->custom_search_definition($filter->customsearch, $fields, $fieldoptions, true);

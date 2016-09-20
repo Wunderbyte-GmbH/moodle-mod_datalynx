@@ -1065,8 +1065,7 @@ class datalynxfield_option_multiple extends datalynxfield_option {
             }
         }
         
-        return array($sql, $params, $usecontent
-        );
+        return array($sql, $params, $usecontent);
     }
 
     public function get_supported_search_operators() {
@@ -1197,7 +1196,6 @@ class datalynxfield_option_single extends datalynxfield_option {
     }
 
     public function get_supported_search_operators() {
-        return array('ANY_OF' => get_string('anyof', 'datalynx'), 
-            '' => get_string('empty', 'datalynx'));
+        return array('ANY_OF' => get_string('anyof', 'datalynx'), '' => get_string('empty', 'datalynx'));
     }
 }

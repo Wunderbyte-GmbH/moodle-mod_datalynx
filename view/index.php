@@ -259,8 +259,7 @@ if ($views) {
                                 $linkparams + array('setfilter' => $viewid, 'fid' => -1)),
                                     $OUTPUT->pix_icon('i/risk_xss', $strreset));
             } else {
-                $blankfilteroption = array(-1 => get_string('blankfilter', 'datalynx')
-                );
+                $blankfilteroption = array(-1 => get_string('blankfilter', 'datalynx'));
                 if ($df->data->defaultfilter) {
                     $defaultfilter = $df->get_filter_manager()->get_filter_from_id($df->data->defaultfilter);
                     $defaultfiltername = $defaultfilter->name;
@@ -269,8 +268,7 @@ if ($views) {
                     );
                 } else {
                     $defaultfilteroption = array(
-                        0 => get_string('defaultfilterlabel', 'datalynx', 
-                                get_string('blankfilter', 'datalynx'))
+                        0 => get_string('defaultfilterlabel', 'datalynx', get_string('blankfilter', 'datalynx'))
                     );
                 }
                 
