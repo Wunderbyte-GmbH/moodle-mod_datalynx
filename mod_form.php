@@ -215,7 +215,7 @@ class mod_datalynx_mod_form extends moodleform_mod {
     }
 
     public function add_completion_rules() {
-        $mform = & $this->_form;
+        $mform = &$this->_form;
         
         $group = array();
         $group[] = &$mform->createElement('checkbox', 'completionentriesenabled', '', 

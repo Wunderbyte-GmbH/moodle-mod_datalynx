@@ -31,7 +31,7 @@ class datalynxfield_picture_form extends datalynxfield_file_form {
     function field_definition() {
         global $CFG;
         
-        $mform = & $this->_form;
+        $mform = &$this->_form;
         
         // pic display dimensions
         $dispdimgrp = array();
@@ -84,7 +84,7 @@ class datalynxfield_picture_form extends datalynxfield_file_form {
     /**
      */
     function filetypes_definition() {
-        $mform = & $this->_form;
+        $mform = &$this->_form;
         
         // accetped types
         $options = array();

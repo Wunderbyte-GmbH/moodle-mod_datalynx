@@ -30,7 +30,7 @@ class datalynxview_csv_form extends datalynxview_base_form {
     /**
      */
     function view_definition_after_gps() {
-        $mform = & $this->_form;
+        $mform = &$this->_form;
         
         $mform->addElement('header', 'settingshdr', get_string('settings'));
         

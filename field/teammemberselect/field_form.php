@@ -32,7 +32,7 @@ class datalynxfield_teammemberselect_form extends datalynxfield_form {
     public function field_definition() {
         parent::field_definition();
         
-        $mform = & $this->_form;
+        $mform = &$this->_form;
         
         $mform->addElement('header', 'fieldattributesheader', 
                 get_string('fieldattributes', 'datalynx'));

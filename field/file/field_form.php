@@ -31,7 +31,7 @@ class datalynxfield_file_form extends datalynxfield_form {
     function field_definition() {
         global $CFG;
         
-        $mform = & $this->_form;
+        $mform = &$this->_form;
         
         // -------------------------------------------------------------------------------
         $mform->addElement('header', 'fieldattributeshdr', 
@@ -55,7 +55,7 @@ class datalynxfield_file_form extends datalynxfield_form {
     /**
      */
     function filetypes_definition() {
-        $mform = & $this->_form;
+        $mform = &$this->_form;
         
         // accetped types (param3)
         $options = array();

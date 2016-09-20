@@ -29,7 +29,7 @@ class datalynxfield_number_form extends datalynxfield_form {
     /**
      */
     function field_definition() {
-        $mform = & $this->_form;
+        $mform = &$this->_form;
         
         // -------------------------------------------------------------------------------
         $mform->addElement('header', 'fieldattributeshdr', 

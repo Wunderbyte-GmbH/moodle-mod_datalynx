@@ -27,7 +27,7 @@ require_once ("$CFG->dirroot/mod/datalynx/field/field_form.php");
 class datalynxfield_textarea_form extends datalynxfield_form {
 
     function field_definition() {
-        $mform = & $this->_form;
+        $mform = &$this->_form;
         
         $mform->addElement('header', 'fieldattributeshdr', get_string('fieldattributes', 'datalynx'));
         

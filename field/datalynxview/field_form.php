@@ -31,7 +31,7 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
     function field_definition() {
         global $CFG, $PAGE, $DB;
         
-        $mform = & $this->_form;
+        $mform = &$this->_form;
         
         // -------------------------------------------------------------------------------
         $mform->addElement('header', 'fieldattributeshdr', 
