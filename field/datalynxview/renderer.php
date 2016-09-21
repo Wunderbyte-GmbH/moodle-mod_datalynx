@@ -161,7 +161,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
      */
     protected function get_view_display_embedded($entry) {
         $field = $this->_field;
-        $fieldname = str_replace(' ', '_', $field->name());
+        $fieldname = preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $field->name()));
         
         // Construct the src url
         $params = array('d' => $field->refdatalynx->id(), 'view' => $field->refview->id());

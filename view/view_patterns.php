@@ -520,9 +520,8 @@ class datalynxview_patterns {
         $view = $this->_view;
         $filter = $view->get_filter();
         $baseurl = $view->get_baseurl();
-        $pagingbar = null; 
         
-	// typical entry 'more' request. If not single view (1 per page) show nothing instead
+        // typical entry 'more' request. If not single view (1 per page) show nothing instead
         // of paging bar
         if (!empty($filter->eids)) {
 

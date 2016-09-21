@@ -588,7 +588,7 @@ abstract class datalynxview_base {
             $output = $notifications . $OUTPUT->continue_button($url);
         }
         
-        $viewname = 'datalynxview-' . str_replace(' ', '_', $this->name());
+        $viewname = 'datalynxview-' . preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $this->name()));
         $output = html_writer::tag('div', $output, array('class' => $viewname));
         
         if ($tohtml) {

@@ -160,8 +160,7 @@ class datalynxview_tabular extends datalynxview_base {
         global $CFG, $OUTPUT, $GLOBALS;
         
         $tablehtml = trim($this->view->eparam2);
-        $opengroupdiv = html_writer::start_tag('div', array('class' => 'entriesview'
-        ));
+        $opengroupdiv = html_writer::start_tag('div', array('class' => 'entriesview'));
         $closegroupdiv = html_writer::end_tag('div');
         if ($name) {
             $name = ($name == 'newentry' ? get_string('entrynew', 'datalynx') : $name);
@@ -172,8 +171,7 @@ class datalynxview_tabular extends datalynxview_base {
         
         // if there are no field definition just return everything as html
         if (empty($entriesset)) {
-            $elements[] = array('html', $opengroupdiv . $groupheading . $tablehtml . $closegroupdiv
-            );
+            $elements[] = array('html', $opengroupdiv . $groupheading . $tablehtml . $closegroupdiv);
         } else {
             
             // clean any prefix and get the open table tag

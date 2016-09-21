@@ -231,15 +231,14 @@ class datalynxview_csv extends datalynxview_base {
      * Overridden to show import form without entries
      */
     public function display(array $params = array()) {
-        global $OUTPUT;
-        
+
         if ($this->_showimportform) {
             
             $mform = $this->get_import_form();
             
             $tohtml = isset($params['tohtml']) ? $params['tohtml'] : false;
             // print view
-            $viewname = 'datalynxview-' . str_replace(' ', '_', $this->name());
+            $viewname = 'datalynxview-' . preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $this->name()));
             if ($tohtml) {
                 return html_writer::tag('div', $mform->html(), array('class' => $viewname));
             } else {
