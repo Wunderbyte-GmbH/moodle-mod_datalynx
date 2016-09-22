@@ -72,7 +72,7 @@ class datalynxfield_checkbox extends datalynxfield_option_multiple {
         foreach ($rawdefaults as $default) {
             $default = trim($default);
             if ($default and $key = array_search($default, $options)) {
-                $defaults[] = $key;
+                    $defaults[$key] = $key;
             }
         }
         return $defaults;

@@ -48,8 +48,7 @@ class datalynxfield_checkbox_renderer extends datalynxfield_renderer {
         $elemgrp = array();
         foreach ($menuoptions as $i => $option) {
             $elemgrp[] = &$mform->createElement('advcheckbox', $i, null, $option, null, 
-                    array(null, $i
-                    ));
+                    array(null, $i));
         }
         
         $mform->addGroup($elemgrp, $fieldname, null, $separator, true);
@@ -72,8 +71,7 @@ class datalynxfield_checkbox_renderer extends datalynxfield_renderer {
         $mform->getElement($fieldname)->setValue($selected);
         
         if ($required) {
-            $mform->addGroupRule($fieldname, get_string('err_required', 'form'), 'required', null, 
-                    1);
+            $mform->addGroupRule($fieldname, get_string('err_required', 'form'), 'required', null, 1);
         }
     }
 
