@@ -144,7 +144,7 @@ class datalynx_statistics_class {
     }
 
     public function get_form() {
-
+        global $CFG;
         $formclass = 'datalynx_statistics_form';
         $formparams = array('d' => $this->_df->id());
         $actionurl = new moodle_url('/mod/datalynx/statistics/index.php', $formparams);
