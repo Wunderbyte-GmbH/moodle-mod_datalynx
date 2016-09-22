@@ -45,13 +45,11 @@ class datalynxfield__time extends datalynxfield_no_content {
         
         $fieldobjects[self::_TIMECREATED] = (object) array('id' => self::_TIMECREATED, 
             'dataid' => $dataid, 'type' => '_time', 'name' => get_string('timecreated', 'datalynx'), 
-            'description' => '', 'visible' => 2, 'internalname' => 'timecreated'
-        );
+            'description' => '', 'visible' => 2, 'internalname' => 'timecreated');
         
         $fieldobjects[self::_TIMEMODIFIED] = (object) array('id' => self::_TIMEMODIFIED, 
             'dataid' => $dataid, 'type' => '_time', 'name' => get_string('timemodified', 'datalynx'), 
-            'description' => '', 'visible' => 2, 'internalname' => 'timemodified'
-        );
+            'description' => '', 'visible' => 2, 'internalname' => 'timemodified');
         
         return $fieldobjects;
     }

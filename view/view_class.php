@@ -472,8 +472,7 @@ abstract class datalynxview_base {
      * Subclass may need to override
      */
     public function replace_field_in_view($searchfieldname, $newfieldname) {
-        $patterns = array('[[' . $searchfieldname . ']]', '[[' . $searchfieldname . '#id]]'
-        );
+        $patterns = array('[[' . $searchfieldname . ']]', '[[' . $searchfieldname . '#id]]');
         if (!$newfieldname) {
             $replacements = '';
         } else {
@@ -563,8 +562,7 @@ abstract class datalynxview_base {
             'entriescount' => $this->_entries->get_count(), 
             'entriesfiltercount' => $this->_entries->get_count(true), 
             'hidenewentry' => $this->user_is_editing() ? 1 : 0, 
-            'showentryactions' => $requiresmanageentries && $showentryactions
-        );
+            'showentryactions' => $requiresmanageentries && $showentryactions);
         
         $this->set_view_tags($viewoptions);
         
@@ -775,8 +773,7 @@ abstract class datalynxview_base {
         $options = array('trusttext' => true, 'noclean' => true, 'subdirs' => false, 
             'changeformat' => true, 'collapsed' => true, 'rows' => 20, 'style' => 'width:100%', 
             'maxfiles' => EDITOR_UNLIMITED_FILES, 'maxbytes' => $this->_df->course->maxbytes, 
-            'context' => $this->_df->context
-        );
+            'context' => $this->_df->context);
         
         foreach ($this->_editors as $editor) {
             $editors[$editor] = $options;

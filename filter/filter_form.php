@@ -58,8 +58,7 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
         // $df = $this->_df;
         
         $diroptions = array(0 => get_string('ascending', 'datalynx'), 
-                            1 => get_string('descending', 'datalynx')
-        );
+                            1 => get_string('descending', 'datalynx'));
         
         $fieldlabel = get_string('filtersortfieldlabel', 'datalynx');
         $count = 0;
@@ -115,11 +114,9 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
         $df = $this->_df;
         
         $andoroptions = array(0 => get_string('andor', 'datalynx'), 
-            'AND' => get_string('and', 'datalynx'), 'OR' => get_string('or', 'datalynx')
-        );
+            'AND' => get_string('and', 'datalynx'), 'OR' => get_string('or', 'datalynx'));
         $isnotoptions = array('' => get_string('is', 'datalynx'), 
-            'NOT' => get_string('not', 'datalynx')
-        );
+            'NOT' => get_string('not', 'datalynx'));
         
         $fieldlabel = get_string('filtersearchfieldlabel', 'datalynx');
         $count = 0;
@@ -271,8 +268,7 @@ class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
         // entries per page
         $options = array(0 => get_string('choose'), 1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5, 6 => 6, 
             7 => 7, 8 => 8, 9 => 9, 10 => 10, 15 => 15, 20 => 20, 30 => 30, 40 => 40, 50 => 50, 
-            100 => 100, 200 => 200, 300 => 300, 400 => 400, 500 => 500, 1000 => 1000
-        );
+            100 => 100, 200 => 200, 300 => 300, 400 => 400, 500 => 500, 1000 => 1000);
         $mform->addElement('select', 'perpage', get_string('viewperpage', 'datalynx'), $options);
         $mform->setDefault('perpage', $filter->perpage);
         
@@ -371,8 +367,7 @@ class mod_datalynx_advanced_filter_form extends mod_datalynx_filter_base_form {
         // entries per page
         $options = array(0 => get_string('choose'), 1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5, 6 => 6, 
             7 => 7, 8 => 8, 9 => 9, 10 => 10, 15 => 15, 20 => 20, 30 => 30, 40 => 40, 50 => 50, 
-            100 => 100, 200 => 200, 300 => 300, 400 => 400, 500 => 500, 1000 => 1000
-        );
+            100 => 100, 200 => 200, 300 => 300, 400 => 400, 500 => 500, 1000 => 1000);
         $mform->addElement('select', 'uperpage', get_string('viewperpage', 'datalynx'), $options);
         $mform->setDefault('uperpage', $filter->perpage);
         

@@ -37,8 +37,7 @@ class datalynxview_csv_form extends datalynxview_base_form {
         // Export type
         $options = array('csv' => get_string('csv', 'datalynxview_csv'), 
             'ods' => get_string('ods', 'datalynxview_csv'), 
-            'xls' => get_string('xls', 'datalynxview_csv')
-        );
+            'xls' => get_string('xls', 'datalynxview_csv'));
         $mform->addElement('select', 'param3', get_string('outputtype', 'datalynxview_csv'), $options);
         
         // delimiter

@@ -63,34 +63,28 @@ class datalynxfield__rating extends datalynxfield_no_content {
         
         $fieldobjects[self::_RATING] = (object) array('id' => self::_RATING, 'dataid' => $dataid, 
             'type' => '_rating', 'name' => get_string('ratings', 'datalynx'), 'description' => '', 
-            'visible' => 2, 'internalname' => 'ratings'
-        );
+            'visible' => 2, 'internalname' => 'ratings');
         
         $fieldobjects[self::_RATINGAVG] = (object) array('id' => self::_RATINGAVG, 
             'dataid' => $dataid, 'type' => '_rating', 'name' => get_string('ratingsavg', 'datalynx'), 
-            'description' => '', 'visible' => 2, 'internalname' => 'avgratings'
-        );
+            'description' => '', 'visible' => 2, 'internalname' => 'avgratings');
         
         $fieldobjects[self::_RATINGCOUNT] = (object) array('id' => self::_RATINGCOUNT, 
             'dataid' => $dataid, 'type' => '_rating', 
             'name' => get_string('ratingscount', 'datalynx'), 'description' => '', 'visible' => 2, 
-            'internalname' => 'countratings'
-        );
+            'internalname' => 'countratings');
         
         $fieldobjects[self::_RATINGMAX] = (object) array('id' => self::_RATINGMAX, 
             'dataid' => $dataid, 'type' => '_rating', 'name' => get_string('ratingsmax', 'datalynx'), 
-            'description' => '', 'visible' => 2, 'internalname' => 'maxratings'
-        );
+            'description' => '', 'visible' => 2, 'internalname' => 'maxratings');
         
         $fieldobjects[self::_RATINGMIN] = (object) array('id' => self::_RATINGMIN, 
             'dataid' => $dataid, 'type' => '_rating', 'name' => get_string('ratingsmin', 'datalynx'), 
-            'description' => '', 'visible' => 2, 'internalname' => 'minratings'
-        );
+            'description' => '', 'visible' => 2, 'internalname' => 'minratings');
         
         $fieldobjects[self::_RATINGSUM] = (object) array('id' => self::_RATINGSUM, 
             'dataid' => $dataid, 'type' => '_rating', 'name' => get_string('ratingssum', 'datalynx'), 
-            'description' => '', 'visible' => 2, 'internalname' => 'sumratings'
-        );
+            'description' => '', 'visible' => 2, 'internalname' => 'sumratings');
         
         return $fieldobjects;
     }
@@ -144,7 +138,6 @@ class datalynxfield__rating extends datalynxfield_no_content {
                             AND r.ratingarea = :ratingarea
                     GROUP BY r.itemid, r.component, r.ratingarea, r.contextid, ratingid, ur.userid, ur.scaleid
                     ORDER BY r.itemid) AS er ON er.itemid = e.id ";
-        return array($sql, $params
-        );
+        return array($sql, $params);
     }
 }

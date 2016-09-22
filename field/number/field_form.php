@@ -41,8 +41,7 @@ class datalynxfield_number_form extends datalynxfield_form {
         
         // field width
         $fieldwidthgrp = array();
-        $fieldwidthgrp[] = &$mform->createElement('text', 'param2', null, array('size' => '8'
-        ));
+        $fieldwidthgrp[] = &$mform->createElement('text', 'param2', null, array('size' => '8'));
         $fieldwidthgrp[] = &$mform->createElement('select', 'param3', null, 
                 array('px' => 'px', 'em' => 'em', '%' => '%'));
         $mform->addGroup($fieldwidthgrp, 'fieldwidthgrp', get_string('fieldwidth', 'datalynx'), 

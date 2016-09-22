@@ -685,8 +685,7 @@ class datalynx {
         $urlparams->pagelayout = 'external';
         
         $pageparams = array('js' => true, 'css' => true, 'rss' => true, 'modjs' => true, 
-            'completion' => true, 'comments' => true, 'urlparams' => $urlparams
-        );
+            'completion' => true, 'comments' => true, 'urlparams' => $urlparams);
         $datalynx->set_page('external', $pageparams);
         $type = $datalynx->views[$viewid]->type;
         require_once $CFG->dirroot . "/mod/datalynx/view/$type/view_class.php";

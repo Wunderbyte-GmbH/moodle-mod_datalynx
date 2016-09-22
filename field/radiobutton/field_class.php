@@ -64,8 +64,7 @@ class datalynxfield_radiobutton extends datalynxfield_option_single {
                 HAVING count >= 1";
         
         $params = array('userid' => $userid, 'dataid' => $this->df->id(), 
-            'fieldid1' => $this->field->id, 'fieldid2' => $this->field->id
-        );
+            'fieldid1' => $this->field->id, 'fieldid2' => $this->field->id);
         
         $results = $DB->get_records_sql($sql, $params);
         

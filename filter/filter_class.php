@@ -950,14 +950,11 @@ class datalynx_filter_manager {
         $table = new html_table();
         $table->head = array($strfilters, $strdescription, $strperpage, $strcustomsort, 
             $strcustomsearch, $strurlquery, $strvisible, $strdefault, $stredit, $strduplicate, 
-            $multidelete, $selectallnone
-        );
+            $multidelete, $selectallnone);
         $table->align = array('left', 'left', 'center', 'left', 'left', 'left', 'center', 'center', 
-            'center', 'center', 'center'
-        );
+            'center', 'center', 'center');
         $table->wrap = array(false, false, false, false, false, false, false, false, false, false, 
-            false
-        );
+            false);
         $table->attributes['align'] = 'center';
         
         foreach ($this->_filters as $filterid => $filter) {
@@ -1103,8 +1100,7 @@ class datalynx_filter_manager {
      */
     public function print_add_filter() {
         echo html_writer::empty_tag('br');
-        echo html_writer::start_tag('div', array('class' => 'fieldadd mdl-align'
-        ));
+        echo html_writer::start_tag('div', array('class' => 'fieldadd mdl-align'));
         echo html_writer::link(
                 new moodle_url('/mod/datalynx/filter/index.php', 
                         array('d' => $this->_df->id(), 'sesskey' => sesskey(), 'new' => 1)),
@@ -1322,8 +1318,7 @@ class datalynx_filter_manager {
             'users' => array('users', '', PARAM_SEQUENCE),
             'groups' => array('groups', '', PARAM_SEQUENCE),
             'afilter' => array('afilter', 0, PARAM_INT),
-            'usersearch' => array('usersearch', 0, PARAM_RAW)
-        );
+            'usersearch' => array('usersearch', 0, PARAM_RAW));
         
         $options = array();
         

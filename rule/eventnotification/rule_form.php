@@ -38,8 +38,7 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
         // sender
         $options = array(
             datalynx_rule_eventnotification::FROM_AUTHOR => get_string('author', 'datalynx'), 
-            datalynx_rule_eventnotification::FROM_CURRENT_USER => get_string('user')
-        );
+            datalynx_rule_eventnotification::FROM_CURRENT_USER => get_string('user'));
         $mform->addElement('select', 'param2', get_string('from'), $options);
         
         // recipient

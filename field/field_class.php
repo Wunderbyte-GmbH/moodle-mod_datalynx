@@ -551,8 +551,7 @@ abstract class datalynxfield_base {
             list($sql, $params) = $DB->get_in_or_equal($searchvalue, SQL_PARAMS_NAMED, 
                     "df_{$fieldid}_");
             $sql = " $varcharcontent $sql ";
-        } else if (in_array($operator, array('LIKE', 'BETWEEN', ''
-        ))) {
+        } else if (in_array($operator, array('LIKE', 'BETWEEN', ''))) {
             $params = array($name => "%$value%");
             $sql = $DB->sql_like($varcharcontent, ":$name", false);
         } else {
@@ -799,8 +798,7 @@ abstract class datalynxfield_option extends datalynxfield_base {
         }
         $newvalues = array_merge(array(0 => $dummyentry), $newvalues);
         
-        $map = array(0 => 0
-        );
+        $map = array(0 => 0);
         for ($i = 1; $i <= count($oldvalues); $i++) {
             $j = array_search($oldvalues[$i], $newvalues);
             if ($j !== false) {
@@ -1071,8 +1069,7 @@ class datalynxfield_option_multiple extends datalynxfield_option {
     public function get_supported_search_operators() {
         return array('ANY_OF' => get_string('anyof', 'datalynx'), 
             'ALL_OF' => get_string('allof', 'datalynx'), 
-            'EXACTLY' => get_string('exactly', 'datalynx'), '' => get_string('empty', 'datalynx')
-        );
+            'EXACTLY' => get_string('exactly', 'datalynx'), '' => get_string('empty', 'datalynx'));
     }
 }
 

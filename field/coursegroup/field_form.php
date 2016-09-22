@@ -59,13 +59,11 @@ class datalynxfield_coursegroup_form extends datalynxfield_form {
         
         // ajax
         $options = array('coursefield' => 'param1', 'groupfield' => 'param2', 
-            'acturl' => "$CFG->wwwroot/mod/datalynx/field/coursegroup/loadgroups.php"
-        );
+            'acturl' => "$CFG->wwwroot/mod/datalynx/field/coursegroup/loadgroups.php");
         
         $module = array('name' => 'M.datalynxfield_coursegroup_load_course_groups', 
             'fullpath' => '/mod/datalynx/field/coursegroup/coursegroup.js', 
-            'requires' => array('base', 'io', 'node')
-        );
+            'requires' => array('base', 'io', 'node'));
         
         $PAGE->requires->js_init_call('M.datalynxfield_coursegroup_load_course_groups.init', 
                 array($options), false, $module);

@@ -189,7 +189,6 @@ class datalynx_statistics_class {
         
         return array($DB->get_field_sql($querytotal, $params), 
             $DB->get_field_sql($queryapproved, $params), $DB->get_field_sql($querydeleted, $params), 
-            $DB->get_field_sql($queryvisits, $params)
-        );
+            $DB->get_field_sql($queryvisits, $params));
     }
 }

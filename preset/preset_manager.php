@@ -238,8 +238,7 @@ class datalynx_preset_manager {
     /**
      */
     public function print_preset_form() {
-        echo html_writer::start_tag('div', array('style' => 'width:80%;margin:auto;'
-        ));
+        echo html_writer::start_tag('div', array('style' => 'width:80%;margin:auto;'));
         $mform = new mod_datalynx_preset_form(
                 new moodle_url('/mod/datalynx/preset/index.php', 
                         array('d' => $this->_df->id(), 'sesskey' => sesskey(), 'add' => 1)));

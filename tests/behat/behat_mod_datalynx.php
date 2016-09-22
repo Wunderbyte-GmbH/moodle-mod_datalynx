@@ -56,8 +56,7 @@ class behat_mod_datalynx extends behat_files {
             TableNode $fielddata) {
         $steps = array(new Given('I follow "' . $this->escape($activityname) . '"'), 
             new Given('I follow "Manage"'), new Given('I follow "Fields"'), 
-            new Given('I set the field "Add a field" to "' . $this->escape($fieldtype) . '"')
-        );
+            new Given('I set the field "Add a field" to "' . $this->escape($fieldtype) . '"'));
         
         if (!$this->running_javascript()) {
             $steps[] = new Given('I click on "Go" "button" in the ".fieldadd" "css_element"');
@@ -84,8 +83,7 @@ class behat_mod_datalynx extends behat_files {
             TableNode $fielddata) {
         $steps = array(new Given('I follow "' . $this->escape($activityname) . '"'), 
             new Given('I follow "Manage"'), new Given('I follow "Fields"'), 
-            new Given('I follow "' . $this->escape($fieldname) . '"')
-        );
+            new Given('I follow "' . $this->escape($fieldname) . '"'));
         
         array_push($steps, new Given('I set the following fields to these values:', $fielddata), 
                 new Given('I press "Save changes"'));
@@ -107,8 +105,7 @@ class behat_mod_datalynx extends behat_files {
         $steps = array(new Given('I follow "' . $this->escape($activityname) . '"'), 
             new Given('I follow "Manage"'), new Given('I follow "Fields"'), 
             new Given('I click "Delete" button of "' . $this->escape($fieldname) . '" item'), 
-            new Given('I press "Continue"')
-        );
+            new Given('I press "Continue"'));
         
         return $steps;
     }
@@ -144,8 +141,7 @@ class behat_mod_datalynx extends behat_files {
     public function i_create_a_view_in_instance($viewtype, $activityname, TableNode $fielddata) {
         $steps = array(new Given('I follow "' . $this->escape($activityname) . '"'), 
             new Given('I follow "Manage"'), new Given('I follow "Views"'), 
-            new Given('I set the field "Add a view" to "' . $this->escape($viewtype) . '"')
-        );
+            new Given('I set the field "Add a view" to "' . $this->escape($viewtype) . '"'));
         
         if (!$this->running_javascript()) {
             $steps[] = new Given('I click on "Go" "button" in the ".fieldadd" "css_element"');
@@ -170,8 +166,7 @@ class behat_mod_datalynx extends behat_files {
     public function i_view_view_in_instance($viewname, $activityname) {
         $steps = array(new Given('I follow "' . $this->escape($activityname) . '"'), 
             new Given('I follow "Manage"'), new Given('I follow "Views"'), 
-            new Given('I follow "' . $this->escape($viewname) . '"')
-        );
+            new Given('I follow "' . $this->escape($viewname) . '"'));
         
         return $steps;
     }
@@ -192,8 +187,7 @@ class behat_mod_datalynx extends behat_files {
             new Given('I follow "Manage"'), new Given('I follow "Fields"'), 
             new Given('I click "Edit" button of "' . $this->escape($viewname) . '" item'), 
             new Given('I set the following fields to these values:', $fielddata), 
-            new Given('I press "Save changes"')
-        );
+            new Given('I press "Save changes"'));
         
         return $steps;
     }
@@ -212,8 +206,7 @@ class behat_mod_datalynx extends behat_files {
         $steps = array(new Given('I follow "' . $this->escape($activityname) . '"'), 
             new Given('I follow "Manage"'), new Given('I follow "Views"'), 
             new Given('I click "Delete" button of "' . $this->escape($viewname) . '" item'), 
-            new Given('I press "Continue"')
-        );
+            new Given('I press "Continue"'));
         
         return $steps;
     }
@@ -230,8 +223,7 @@ class behat_mod_datalynx extends behat_files {
     public function i_set_view_as_default_view_in_instance($viewname, $activityname) {
         $steps = array(new Given('I follow "' . $this->escape($activityname) . '"'), 
             new Given('I follow "Manage"'), new Given('I follow "Views"'), 
-            new Given('I click "Set as default view" button of "' . $this->escape($viewname) . '" item')
-        );
+            new Given('I click "Set as default view" button of "' . $this->escape($viewname) . '" item'));
         
         return $steps;
     }
@@ -248,8 +240,7 @@ class behat_mod_datalynx extends behat_files {
     public function i_set_view_as_edit_view_in_instance($viewname, $activityname) {
         $steps = array(new Given('I follow "' . $this->escape($activityname) . '"'), 
             new Given('I follow "Manage"'), new Given('I follow "Views"'), 
-            new Given('I click "Set as edit view" button of "' . $this->escape($viewname) . '" item')
-        );
+            new Given('I click "Set as edit view" button of "' . $this->escape($viewname) . '" item'));
         
         return $steps;
     }
@@ -309,8 +300,7 @@ class behat_mod_datalynx extends behat_files {
             new Given('I follow "Manage"'), new Given('I follow "Views"'), 
             new Given(
                     'I click "Set as detailed view" button of "' . $this->escape($viewname) .
-                             '" item')
-        );
+                             '" item'));
         
         return $steps;
     }
@@ -363,8 +353,7 @@ class behat_mod_datalynx extends behat_files {
             new Given('I follow "Manage"'), new Given('I follow "Views"'), 
             new Given(
                     'I set the field with xpath "//a[text()=\"' . $this->escape($viewname) .
-                             '\"]/ancestor::tr//select" to "' . $this->escape($filtername) . '"')
-        )
+                             '\"]/ancestor::tr//select" to "' . $this->escape($filtername) . '"'))
         // new Given('I select "' . $this->escape($filtername) . '" filter for "' .
         // $this->escape($viewname) . '" view'),
         ;
@@ -407,8 +396,7 @@ class behat_mod_datalynx extends behat_files {
             new Given('I follow "Manage"'), new Given('I follow "Filters"'), 
             new Given('I follow "Add a filter"'), 
             new Given('I set the following fields to these values:', $fielddata), 
-            new Given('I press "Save changes"')
-        );
+            new Given('I press "Save changes"'));
         
         return $steps;
     }
@@ -427,8 +415,7 @@ class behat_mod_datalynx extends behat_files {
         $steps = array(new Given('I follow "' . $this->escape($activityname) . '"'), 
             new Given('I follow "Add a new entry"'), 
             new Given('I set the following fields to these values:', $fielddata), 
-            new Given('I press "Save changes"'), new Given('I press "Continue"')
-        );
+            new Given('I press "Save changes"'), new Given('I press "Continue"'));
         
         return $steps;
     }
@@ -530,8 +517,7 @@ class behat_mod_datalynx extends behat_files {
             new Given('I set the field "Current view" to "' . $this->escape($viewtype) . '"'), 
             new Given('I follow "Add a new entry"'), 
             new Given('I set the following fields to these values:', $fielddata), 
-            new Given('I press "Save changes"'), new Given('I press "Continue"')
-        );
+            new Given('I press "Save changes"'), new Given('I press "Continue"'));
         
         return $steps;
     }
@@ -763,8 +749,7 @@ class behat_mod_datalynx extends behat_files {
             'param2' => ($record->type == "teammemberselect") ? "[1,2,3,4,5,6,7,8]" : null, 
             'param3' => null, 'param4' => ($record->type == "teammemberselect") ? "4" : null, 
             'param5' => null, 'param6' => null, 'param7' => null, 'param8' => null, 'param9' => null, 
-            'param10' => null
-        );
+            'param10' => null);
         
         foreach ($defaults as $name => $value) {
             if (!isset($record->{$name})) {
@@ -799,8 +784,7 @@ class behat_mod_datalynx extends behat_files {
             'filter' => 0, 'patterns' => null, 'section' => null, 'sectionpos' => 0, 
             'param1' => null, 'param2' => null, 'param3' => ($record->type == "tabular") ? 1 : null, 
             'param4' => null, 'param5' => null, 'param6' => null, 'param7' => null, 'param8' => null, 
-            'param9' => null, 'param10' => null
-        );
+            'param9' => null, 'param10' => null);
         
         foreach ($defaults as $name => $value) {
             if (!isset($record->{$name})) {
@@ -859,8 +843,7 @@ class behat_mod_datalynx extends behat_files {
         $record = (object) (array) $record;
         
         $defaults = array('name' => 'Behavior', 'description' => '', 'visibleto' => '', 
-            'editableby' => '', 'required' => 0
-        );
+            'editableby' => '', 'required' => 0);
         
         foreach ($defaults as $name => $value) {
             if (!isset($record->{$name})) {
@@ -881,8 +864,7 @@ class behat_mod_datalynx extends behat_files {
             new Given('I follow "Entry template"'), 
             new Given('I click inside "id_eparam2_editoreditable"'), 
             new Given('I set the field "eparam2_editor_field_tag_menu" to ""'), 
-            new Given('I press "Save changes"')
-        );
+            new Given('I press "Save changes"'));
         return $steps;
     }
 
@@ -893,8 +875,7 @@ class behat_mod_datalynx extends behat_files {
         $steps = array(new Given('I click "Edit" button of "' . $arg1 . '" item'), 
             new Given('I follow "View template"'), new Given('I press "Show more buttons"'), 
             new Given('I press "HTML"'), new Given('I press "HTML"'), 
-            new Given('I press "Save changes"')
-        );
+            new Given('I press "Save changes"'));
         return $steps;
     }
 
@@ -908,8 +889,7 @@ class behat_mod_datalynx extends behat_files {
             new Given('I follow "Entry template"'), 
             new Given('I click inside "id_eparam2_editoreditable"'), 
             new Given('I set the field "eparam2_editor_field_tag_menu" to ""'), 
-            new Given('I press "Save changes"')
-        );
+            new Given('I press "Save changes"'));
         return $steps;
     }
 
@@ -920,8 +900,7 @@ class behat_mod_datalynx extends behat_files {
         $options = (array) $options;
         
         $defaults = array('description' => '', 'visible' => 1, 'perpage' => 0, 'selection' => 0, 
-            'groupby' => null, 'search' => null, 'customsort' => null, 'customsearch' => null
-        );
+            'groupby' => null, 'search' => null, 'customsort' => null, 'customsearch' => null);
         
         foreach ($defaults as $name => $value) {
             if (!isset($record->{$name})) {
@@ -1052,8 +1031,7 @@ class behat_mod_datalynx extends behat_files {
         global $DB, $CFG;
         
         $content = array('fieldid' => $fieldid, 'entryid' => $entryid, 'content' => null, 
-            'content1' => null, 'content2' => null, 'content3' => null, 'content4' => null
-        );
+            'content1' => null, 'content2' => null, 'content3' => null, 'content4' => null);
         
         switch ($type) {
             case 'text':

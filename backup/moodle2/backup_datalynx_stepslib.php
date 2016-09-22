@@ -82,8 +82,7 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
         
         $contents = new backup_nested_element('contents');
         $content = new backup_nested_element('content', array('id'),
-                array('fieldid', 'content', 'content1', 'content2', 'content3', 'content4'
-        ));
+                array('fieldid', 'content', 'content1', 'content2', 'content3', 'content4'));
         
         $ratings = new backup_nested_element('ratings');
         $rating = new backup_nested_element('rating', array('id'),

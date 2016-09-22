@@ -46,8 +46,7 @@ if (isloggedin() and $istemplatemanager) {
     // Add view edit tab
     if ($currenttab == 'browse' and !empty($this->_currentview)) {
         $params = array('d' => $this->id(), 'sesskey' => sesskey(), 
-            'vedit' => $this->_currentview->id()
-        );
+            'vedit' => $this->_currentview->id());
         $editviewurl = new moodle_url('/mod/datalynx/view/view_edit.php', $params);
         $row[] = new tabobject('editview', $editviewurl, 
                 $OUTPUT->pix_icon('t/edit', get_string('vieweditthis', 'datalynx')));

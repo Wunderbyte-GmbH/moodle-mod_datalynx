@@ -102,8 +102,7 @@ class datalynxfield__time_renderer extends datalynxfield_renderer {
         
         $mform->setDefault("f_{$i}_{$fieldid}_from", $from);
         $mform->setDefault("f_{$i}_{$fieldid}_to", $to);
-        foreach (array('year', 'month', 'day', 'hour', 'minute'
-        ) as $fieldidentifier) {
+        foreach (array('year', 'month', 'day', 'hour', 'minute') as $fieldidentifier) {
             $mform->disabledIf("f_{$i}_{$fieldid}_to[$fieldidentifier]", "searchoperator$i", 'neq', 
                     'BETWEEN');
         }
@@ -114,10 +113,8 @@ class datalynxfield__time_renderer extends datalynxfield_renderer {
         $mform->disabledIf("f_{$i}_{$fieldid}_to", "searchoperator$i", 'eq', 'IN');
         $mform->disabledIf("f_{$i}_{$fieldid}_to", "searchoperator$i", 'eq', 'LIKE');
         
-        $separators = array('<br />' . get_string('from'), '<br />' . get_string('to')
-        );
-        return array($elements, $separators
-        );
+        $separators = array('<br />' . get_string('from'), '<br />' . get_string('to'));
+        return array($elements, $separators);
     }
 
     /**
@@ -128,34 +125,23 @@ class datalynxfield__time_renderer extends datalynxfield_renderer {
         $cat = get_string('entryinfo', 'datalynx');
         
         $patterns = array();
-        $patterns["##$fieldname##"] = array(true, $cat
-        );
-        $patterns["##$fieldname:date##"] = array(true, $cat
-        );
+        $patterns["##$fieldname##"] = array(true, $cat);
+        $patterns["##$fieldname:date##"] = array(true, $cat);
         // Minute (M)
-        $patterns["##$fieldname:minute##"] = array(false
-        );
+        $patterns["##$fieldname:minute##"] = array(false);
         // Hour (H)
-        $patterns["##$fieldname:hour##"] = array(false
-        );
+        $patterns["##$fieldname:hour##"] = array(false);
         // Day (a)
-        $patterns["##$fieldname:day##"] = array(false
-        );
-        $patterns["##$fieldname:d##"] = array(false
-        );
+        $patterns["##$fieldname:day##"] = array(false);
+        $patterns["##$fieldname:d##"] = array(false);
         // Week (V)
-        $patterns["##$fieldname:week##"] = array(false
-        );
+        $patterns["##$fieldname:week##"] = array(false);
         // Month (b)
-        $patterns["##$fieldname:month##"] = array(false
-        );
-        $patterns["##$fieldname:m##"] = array(false
-        );
+        $patterns["##$fieldname:month##"] = array(false);
+        $patterns["##$fieldname:m##"] = array(false);
         // Year (G)
-        $patterns["##$fieldname:year##"] = array(false
-        );
-        $patterns["##$fieldname:Y##"] = array(false
-        );
+        $patterns["##$fieldname:year##"] = array(false);
+        $patterns["##$fieldname:Y##"] = array(false);
         
         return $patterns;
     }

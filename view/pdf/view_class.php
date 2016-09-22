@@ -56,8 +56,7 @@ class datalynxview_pdf extends datalynxview_base {
             'fill-forms' => get_string('perm_fill-forms', 'datalynxview_pdf'), 
             'extract' => get_string('perm_extract', 'datalynxview_pdf'), 
             'assemble' => get_string('perm_assemble', 'datalynxview_pdf'), 
-            'print-high' => get_string('perm_print-high', 'datalynxview_pdf')
-        )
+            'print-high' => get_string('perm_print-high', 'datalynxview_pdf'))
         // 'owner' => get_string('perm_owner', 'datalynxview_pdf'),
         ;
     }
@@ -121,8 +120,7 @@ class datalynxview_pdf extends datalynxview_base {
                     'Reason' => !empty($settings->signature->info->Reason) ? $settings->signature->info->Reason : '', 
                     'ContactInfo' => !empty($settings->signature->info->ContactInfo) ? $settings->signature->info->ContactInfo : ''
                 )
-            )
-        );
+            ));
     }
 
     /**
@@ -295,11 +293,9 @@ class datalynxview_pdf extends datalynxview_base {
         // Save pdf specific template files
         $contextid = $this->_df->context->id;
         $imageoptions = array('subdirs' => 0, 'maxbytes' => -1, 'maxfiles' => 1, 
-            'accepted_types' => array('image')
-        );
+            'accepted_types' => array('image'));
         $certoptions = array('subdirs' => 0, 'maxbytes' => -1, 'maxfiles' => 1, 
-            'accepted_types' => array('.crt')
-        );
+            'accepted_types' => array('.crt'));
         
         // Pdf frame
         if (isset($data->pdfframe)) {
@@ -331,11 +327,9 @@ class datalynxview_pdf extends datalynxview_base {
         // Save pdf specific template files
         $contextid = $this->_df->context->id;
         $imageoptions = array('subdirs' => 0, 'maxbytes' => -1, 'maxfiles' => 1, 
-            'accepted_types' => array('image')
-        );
+            'accepted_types' => array('image'));
         $certoptions = array('subdirs' => 0, 'maxbytes' => -1, 'maxfiles' => 1, 
-            'accepted_types' => array('.crt')
-        );
+            'accepted_types' => array('.crt'));
         
         // Pdf frame
         $draftitemid = file_get_submitted_draft_itemid('pdfframe');
@@ -795,8 +789,7 @@ class dfpdf extends pdf {
 
     protected function set_page_numbers($text) {
         $replacements = array('##pagenumber##' => $this->getAliasNumPage(), 
-            '##totalpages##' => $this->getAliasNbPages()
-        );
+            '##totalpages##' => $this->getAliasNbPages());
         $text = str_replace(array_keys($replacements), $replacements, $text);
         return $text;
     }

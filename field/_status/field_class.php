@@ -46,8 +46,7 @@ class datalynxfield__status extends datalynxfield_no_content {
         
         $fieldobjects[self::_STATUS] = (object) array('id' => self::_STATUS, 'dataid' => $dataid, 
             'type' => '_status', 'name' => get_string('status', 'datalynx'), 'description' => '', 
-            'visible' => 2, 'internalname' => 'status'
-        );
+            'visible' => 2, 'internalname' => 'status');
         
         return $fieldobjects;
     }
@@ -84,9 +83,7 @@ class datalynxfield__status extends datalynxfield_no_content {
         $name = "status_$i";
         $i++;
         $value = $value < 0 ? 0 : $value;
-        return array(" $not (e.status = :$name) ", array($name => $value
-        ), false
-        );
+        return array(" $not (e.status = :$name) ", array($name => $value), false);
     }
 
     /**
@@ -106,7 +103,6 @@ class datalynxfield__status extends datalynxfield_no_content {
      * @throws coding_exception
      */
     public function get_supported_search_operators() {
-        return array('=' => get_string('equal', 'datalynx')
-        );
+        return array('=' => get_string('equal', 'datalynx'));
     }
 }

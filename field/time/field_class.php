@@ -204,8 +204,7 @@ class datalynxfield_time extends datalynxfield_base {
     public function get_supported_search_operators() {
         return array('' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'), 
             '>' => get_string('after', 'datalynx'), '<' => get_string('before', 'datalynx'), 
-            'BETWEEN' => get_string('between', 'datalynx')
-        );
+            'BETWEEN' => get_string('between', 'datalynx'));
     }
 }
 

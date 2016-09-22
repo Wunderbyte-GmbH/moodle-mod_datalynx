@@ -83,8 +83,7 @@ class datalynxview_csv extends datalynxview_base {
         }
         // Open table and wrap header with thead
         $elements[] = array('html', 
-            html_writer::start_tag('table', array('class' => 'generaltable')) . $tableheader
-        );
+            html_writer::start_tag('table', array('class' => 'generaltable')) . $tableheader);
         
         // flatten the set to a list of elements, wrap with tbody and close table
         $elements[] = array('html', html_writer::start_tag('tbody'));

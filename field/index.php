@@ -99,8 +99,7 @@ foreach ($directories as $directory) {
 asort($menufield);
 
 $popupurl = new moodle_url('/mod/datalynx/field/field_edit.php', 
-        array('d' => $df->id(), 'sesskey' => sesskey()
-        ));
+        array('d' => $df->id(), 'sesskey' => sesskey()));
 $fieldselect = new single_select($popupurl, 'type', $menufield, null, array('' => 'choosedots'), 'fieldform');
 $fieldselect->set_label(get_string('fieldadd', 'datalynx') . '&nbsp;');
 $br = html_writer::empty_tag('br');

@@ -216,8 +216,7 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
         return array($elements, 
             array(get_string('member', 'datalynxfield_coursegroup'), 
                 '<br />' . get_string('course') . ' ', '<br />' . get_string('group') . ' '
-            )
-        );
+            ));
     }
 
     /**

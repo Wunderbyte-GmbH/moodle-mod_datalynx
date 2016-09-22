@@ -182,8 +182,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
         $aggr = array(datalynxfield__rating::AGGREGATE_AVG => '##ratings:avg##', 
             datalynxfield__rating::AGGREGATE_MAX => '##ratings:max##', 
             datalynxfield__rating::AGGREGATE_MIN => '##ratings:min##', 
-            datalynxfield__rating::AGGREGATE_SUM => '##ratings:sum##'
-        );
+            datalynxfield__rating::AGGREGATE_SUM => '##ratings:sum##');
         if ($aggregations = array_intersect($aggr, $patterns)) {
             return array_keys($aggregations);
         } else {

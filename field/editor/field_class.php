@@ -61,8 +61,7 @@ class datalynxfield_editor extends datalynxfield_base {
      * @see datalynxfield_base::content_names()
      */
     protected function content_names() {
-        return array('editor'
-        );
+        return array('editor');
     }
 
     /**

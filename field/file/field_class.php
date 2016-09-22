@@ -115,8 +115,7 @@ class datalynxfield_file extends datalynxfield_base {
     /**
      */
     public function get_content_parts() {
-        return array('content', 'content1', 'content2'
-        );
+        return array('content', 'content1', 'content2');
     }
 
     /**

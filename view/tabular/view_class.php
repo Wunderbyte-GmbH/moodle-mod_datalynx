@@ -81,8 +81,7 @@ class datalynxview_tabular extends datalynxview_base {
             $cell->style = 'border:0 none;';
         }
         // construct the table
-        $table->data = array($row1, $row2, $row3
-        );
+        $table->data = array($row1, $row2, $row3);
         $sectiondefault = html_writer::table($table);
         $this->view->esection = html_writer::tag('div', $sectiondefault, 
                 array('class' => 'mdl-align')) . "<div>##entries##</div>";
@@ -149,8 +148,7 @@ class datalynxview_tabular extends datalynxview_base {
         $jsmodule = array('name' => 'datalynxview_tabular', 
             'fullpath' => '/mod/datalynx/view/tabular/tabular.js', 
             'requires' => array('node', 'event', 'node-event-delegate'
-            )
-        );
+            ));
         return $jsmodule;
     }
 

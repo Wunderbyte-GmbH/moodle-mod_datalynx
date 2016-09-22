@@ -352,8 +352,7 @@ function xmldb_datalynx_upgrade($oldversion) {
             -4 => 'approve', -5 => 'group', -6 => 'userid', -7 => 'username', -8 => 'userfirstname', 
             -9 => 'userlastname', -10 => 'userusername', -11 => 'useridnumber', -12 => 'userpicture', 
             -13 => 'comment', -14 => 'rating', -141 => 'ratingavg', -142 => 'ratingcount', 
-            -143 => 'ratingmax', -144 => 'ratingmin', -145 => 'ratingsum'
-        );
+            -143 => 'ratingmax', -144 => 'ratingmin', -145 => 'ratingsum');
         
         // View patterns
         if ($views = $DB->get_records('datalynx_views')) {
@@ -867,8 +866,7 @@ function mod_datalynx_replace_field_rules() {
     );
     $dataids = $DB->get_fieldset_select('datalynx', 'id', "id IS NOT NULL");
     foreach ($dataids as $dataid) {
-        $views = $DB->get_records('datalynx_views', array('dataid' => $dataid
-        ), '', 'id, param2');
+        $views = $DB->get_records('datalynx_views', array('dataid' => $dataid), '', 'id, param2');
         foreach ($views as $view) {
             $changed = false;
             

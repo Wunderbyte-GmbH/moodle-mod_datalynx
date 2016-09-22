@@ -84,7 +84,6 @@ class css_saved extends \core\event\base {
     public function get_legacy_logdata() {
         return array($this->courseid, 'datalynx', 'css_saved', 
             'view.php?d=' . $this->objectid . '&cssedit=1', $this->objectid, 
-            $this->contextinstanceid
-        );
+            $this->contextinstanceid);
     }
 }

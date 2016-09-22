@@ -704,8 +704,7 @@ class datalynxview_patterns {
     protected function info_patterns() {
         $cat = get_string('entries', 'datalynx');
         $patterns = array('##numentriestotal##' => array(true, $cat),
-            '##numentriesdisplayed##' => array(true, $cat)
-        );
+            '##numentriesdisplayed##' => array(true, $cat));
         return $patterns;
     }
 
@@ -765,23 +764,7 @@ class datalynxview_patterns {
      */
     protected function action_patterns() {
         $cat = get_string('generalactions', 'datalynx');
-        $patterns = array('##addnewentry##' => array(true, $cat
-        ), '##addnewentries##' => array(true, $cat
-        ), '##selectallnone##' => array(true, $cat
-        ), '##multiduplicate##' => array(true, $cat
-        ), '##multiduplicate:icon##' => array(true, $cat
-        ), '##multiedit##' => array(true, $cat
-        ), '##multiedit:icon##' => array(true, $cat
-        ), '##multidelete##' => array(true, $cat
-        ), '##multidelete:icon##' => array(true, $cat
-        ), '##multiapprove##' => array(true, $cat
-        ), '##multiapprove:icon##' => array(true, $cat
-        ), '##multiexport##' => array(true, $cat
-        ), '##multiexport:icon##' => array(true, $cat
-        ), '##multiimport##' => array(true, $cat
-        ), '##multiimporty:icon##' => array(true, $cat
-        )
-        );
+        $patterns = array('##addnewentry##' => array(true, $cat), '##addnewentries##' => array(true, $cat), '##selectallnone##' => array(true, $cat), '##multiduplicate##' => array(true, $cat), '##multiduplicate:icon##' => array(true, $cat), '##multiedit##' => array(true, $cat), '##multiedit:icon##' => array(true, $cat), '##multidelete##' => array(true, $cat), '##multidelete:icon##' => array(true, $cat), '##multiapprove##' => array(true, $cat), '##multiapprove:icon##' => array(true, $cat), '##multiexport##' => array(true, $cat), '##multiexport:icon##' => array(true, $cat), '##multiimport##' => array(true, $cat), '##multiimporty:icon##' => array(true, $cat));
         return $patterns;
     }
 
@@ -985,8 +968,7 @@ class datalynxview_patterns {
         
         $baseurl = $baseurl->out_omit_querystring();
         $baseurlparams = array('d' => $df->id(), 'sesskey' => sesskey(), 'view' => $view->id(), 
-            'filter' => $filter->id
-        ); // datalynx_filter_manager::USER_FILTER_SET);
+            'filter' => $filter->id); // datalynx_filter_manager::USER_FILTER_SET);
         /*
          * if ($filter->id < 0 and $filter->search) {
          * $searchvalue = $filter->search;
@@ -1042,8 +1024,7 @@ class datalynxview_patterns {
 
         $baseurl = $baseurl->out_omit_querystring();
         $baseurlparams = array('d' => $df->id(), 'sesskey' => sesskey(), 'view' => $view->id(), 
-            'filter' => datalynx_filter_manager::USER_FILTER_SET
-        );
+            'filter' => datalynx_filter_manager::USER_FILTER_SET);
         
         if ($filter->id < 0 and $filter->perpage) {
             $perpagevalue = $filter->perpage;
@@ -1053,8 +1034,7 @@ class datalynxview_patterns {
         
         $perpage = array(1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5, 6 => 6, 7 => 7, 8 => 8, 9 => 9, 
             10 => 10, 15 => 15, 20 => 20, 30 => 30, 40 => 40, 50 => 50, 100 => 100, 200 => 200, 
-            300 => 300, 400 => 400, 500 => 500, 1000 => 1000
-        );
+            300 => 300, 400 => 400, 500 => 500, 1000 => 1000);
         
         // Display the view form jump list
         $select = new single_select(new moodle_url($baseurl, $baseurlparams), 'uperpage', $perpage, 

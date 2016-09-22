@@ -197,8 +197,7 @@ class datalynx_rating_manager extends rating_manager {
                 GROUP BY r.itemid, r.component, r.ratingarea, r.contextid, ur.id, ur.userid, ur.scaleid
                 ORDER BY r.itemid";
         
-        return array($sql, $params
-        );
+        return array($sql, $params);
     }
 
     /**
@@ -243,8 +242,7 @@ class datalynx_rating_manager extends rating_manager {
                         $andwhereitems
                 ORDER BY r.itemid";
         
-        return array($sql, $params
-        );
+        return array($sql, $params);
     }
 
     /**

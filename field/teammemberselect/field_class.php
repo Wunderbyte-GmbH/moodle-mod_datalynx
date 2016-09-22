@@ -78,8 +78,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
             self::TEAMMEMBERSELECT_FORMAT_COMMA => get_string('listformat_comma', 'datalynx'), 
             self::TEAMMEMBERSELECT_FORMAT_COMMA_SPACE => get_string('listformat_commaspace', 
                     'datalynx'), 
-            self::TEAMMEMBERSELECT_FORMAT_UL => get_string('listformat_ul', 'datalynx')
-        );
+            self::TEAMMEMBERSELECT_FORMAT_UL => get_string('listformat_ul', 'datalynx'));
         
         $query = "SELECT r.id, r.name
                     FROM {datalynx_rules} r
@@ -357,8 +356,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
     public function get_supported_search_operators() {
         return array('' => get_string('empty', 'datalynx'), 
             'USER' => get_string('iamteammember', 'datalynx'), 
-            'OTHER_USER' => get_string('useristeammember', 'datalynx')
-        );
+            'OTHER_USER' => get_string('useristeammember', 'datalynx'));
     }
 
     public function validate($entryid, $tags, $formdata) {

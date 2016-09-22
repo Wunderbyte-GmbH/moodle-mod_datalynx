@@ -146,8 +146,7 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
         $statusmenu = array(-1 => get_string('status_notcreated', 'datalynx'), 
             datalynxfield__status::STATUS_DRAFT => get_string('status_draft', 'datalynx'), 
             datalynxfield__status::STATUS_FINAL_SUBMISSION => get_string('status_finalsubmission', 
-                    'datalynx')
-        );
+                    'datalynx'));
         
         $select = &$mform->createElement('select', $fieldname, null, $statusmenu, '');
         $select->setValue($value);
@@ -167,10 +166,8 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
         $cat = get_string('actions', 'datalynx');
         
         $patterns = array();
-        $patterns["##status##"] = array(true, $cat
-        );
-        $patterns["##*status##"] = array(true, $cat
-        );
+        $patterns["##status##"] = array(true, $cat);
+        $patterns["##*status##"] = array(true, $cat);
         
         return $patterns;
     }

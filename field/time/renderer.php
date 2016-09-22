@@ -90,13 +90,11 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         if (isset($value[1])) {
             $mform->setDefault("f_{$i}_{$fieldid}_to", $value[1]);
         }
-        foreach (array('year', 'month', 'day', 'hour', 'minute'
-        ) as $fieldidentifier) {
+        foreach (array('year', 'month', 'day', 'hour', 'minute') as $fieldidentifier) {
             $mform->disabledIf("f_{$i}_{$fieldid}_to[$fieldidentifier]", "searchoperator$i", 'neq', 
                     'BETWEEN');
         }
-        foreach (array('year', 'month', 'day', 'hour', 'minute'
-        ) as $fieldidentifier) {
+        foreach (array('year', 'month', 'day', 'hour', 'minute') as $fieldidentifier) {
             $mform->disabledIf("f_{$i}_{$fieldid}_from[$fieldidentifier]", "searchoperator$i", 'eq', '');
         }
         

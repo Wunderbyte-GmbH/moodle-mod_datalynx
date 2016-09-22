@@ -113,13 +113,11 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
         
         // ajax view loading
         $options = array('dffield' => 'param1', 'viewfield' => 'param2', 'filterfield' => 'param3', 
-            'acturl' => "$CFG->wwwroot/mod/datalynx/loaddfviews.php"
-        );
+            'acturl' => "$CFG->wwwroot/mod/datalynx/loaddfviews.php");
         
         $module = array('name' => 'M.mod_datalynx_load_views', 
             'fullpath' => '/mod/datalynx/datalynxloadviews.js', 
-            'requires' => array('base', 'io', 'node')
-        );
+            'requires' => array('base', 'io', 'node'));
         
         $PAGE->requires->js_init_call('M.mod_datalynx_load_views.init', array($options), false, $module);
     }

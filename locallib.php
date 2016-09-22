@@ -48,8 +48,7 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
      * @return array
      */
     public static function expected_callbackargs() {
-        return array('id' => true, 'vid' => true, 'fid' => true, 'eids' => false, 'ecount' => false
-        ) // number of entries for full exports
+        return array('id' => true, 'vid' => true, 'fid' => true, 'eids' => false, 'ecount' => false) // number of entries for full exports
 ;
     }
 
@@ -205,8 +204,7 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
         // export content
         $options = array(self::CONTENT_NOFILES => 'Exclude embedded files', 
             self::CONTENT_WITHFILES => 'Include embedded files', 
-            self::CONTENT_FILESONLY => 'embedded files only'
-        );
+            self::CONTENT_FILESONLY => 'embedded files only');
         $mform->addElement('select', 'caller_contentformat', 
                 get_string('exportcontent', 'datalynx'), $options);
         $mform->setDefault('caller_contentformat', self::CONTENT_NOFILES);
@@ -316,8 +314,7 @@ class datalynx_file_info_container extends file_info {
      */
     public function get_params() {
         return array('contextid' => $this->context->id, 'component' => $this->component, 
-            'filearea' => $this->filearea, 'itemid' => null, 'filepath' => null, 'filename' => null
-        );
+            'filearea' => $this->filearea, 'itemid' => null, 'filepath' => null, 'filename' => null);
     }
 
     /**

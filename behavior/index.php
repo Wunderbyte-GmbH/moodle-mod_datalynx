@@ -69,8 +69,7 @@ $headers = array('name' => get_string('name'), 'description' => get_string('desc
 
 $table = new flexible_table('datalynxbehaviorsindex' . $datalynx->id());
 $table->define_baseurl(
-        new moodle_url('/mod/datalynx/behavior/index.php', array('d' => $datalynx->id()
-        )));
+        new moodle_url('/mod/datalynx/behavior/index.php', array('d' => $datalynx->id())));
 $table->define_columns(array_keys($headers));
 $table->define_headers(array_values($headers));
 

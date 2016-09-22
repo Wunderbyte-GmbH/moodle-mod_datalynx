@@ -301,8 +301,7 @@ function datalynx_reset_userdata($data) {
         $DB->delete_records_select('datalynx_entries', "dataid IN ($alldatassql)", 
                 array($data->courseid));
         
-        if ($datas = $DB->get_records_sql($alldatassql, array($data->courseid
-        ))) {
+        if ($datas = $DB->get_records_sql($alldatassql, array($data->courseid))) {
             foreach ($datas as $dataid => $unused) {
                 fulldelete("$CFG->dataroot/$data->courseid/moddata/datalynx/$dataid");
                 
@@ -321,8 +320,7 @@ function datalynx_reset_userdata($data) {
             datalynx_reset_gradebook($data->courseid);
         }
         $status[] = array('component' => $componentstr, 
-            'item' => get_string('entriesdeleteall', 'datalynx'), 'error' => false
-        );
+            'item' => get_string('entriesdeleteall', 'datalynx'), 'error' => false);
     }
     
     // remove entries by users not enrolled into course
@@ -374,8 +372,7 @@ function datalynx_reset_userdata($data) {
     
     // remove all ratings
     if (!empty($data->reset_datalynx_ratings)) {
-        if ($datas = $DB->get_records_sql($alldatassql, array($data->courseid
-        ))) {
+        if ($datas = $DB->get_records_sql($alldatassql, array($data->courseid))) {
             foreach ($datas as $dataid => $unused) {
                 if (!$cm = get_coursemodule_from_instance('datalynx', $dataid)) {
                     continue;
@@ -968,8 +965,7 @@ function datalynx_rating_permissions($contextid, $component, $ratingarea) {
         return array('view' => has_capability('mod/datalynx:ratingsview', $context), 
             'viewany' => has_capability('mod/datalynx:ratingsviewany', $context), 
             'viewall' => has_capability('mod/datalynx:ratingsviewall', $context), 
-            'rate' => has_capability('mod/datalynx:rate', $context)
-        );
+            'rate' => has_capability('mod/datalynx:rate', $context));
     }
     return null;
 }

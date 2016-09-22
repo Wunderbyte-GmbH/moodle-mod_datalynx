@@ -74,8 +74,7 @@ if ($urlparams->vid and confirm_sesskey()) {
         // or display form
     } else {
         // print header
-        $df->print_header(array('tab' => 'import', 'urlparams' => $urlparams
-        ));
+        $df->print_header(array('tab' => 'import', 'urlparams' => $urlparams));
         $mform = $view->get_import_form();
         $mform->set_data(null);
         $mform->display();
@@ -106,8 +105,7 @@ $df->print_header(array('tab' => 'import', 'urlparams' => $urlparams));
 
 // print add import link
 $addimporturl = new moodle_url('/mod/datalynx/view/view_edit.php', 
-        array('d' => $df->id(), 'type' => 'import', 'sesskey' => sesskey()
-        ));
+        array('d' => $df->id(), 'type' => 'import', 'sesskey' => sesskey()));
 $addimportlink = html_writer::link($addimporturl, get_string('importadd', 'datalynx'));
 $br = html_writer::empty_tag('br');
 echo html_writer::tag('div', $addimportlink . $br . $br, array('class' => 'mdl-align'));

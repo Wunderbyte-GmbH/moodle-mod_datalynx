@@ -58,26 +58,22 @@ class datalynxview_pdf_form extends datalynxview_base_form {
         // Orientation: Portrait, Landscape
         $options = array('' => get_string('auto', 'datalynxview_pdf'), 
             'P' => get_string('portrait', 'datalynxview_pdf'), 
-            'L' => get_string('landscape', 'datalynxview_pdf')
-        );
+            'L' => get_string('landscape', 'datalynxview_pdf'));
         $mform->addElement('select', 'orientation', get_string('orientation', 'datalynxview_pdf'), 
                 $options);
         // Unit
         $options = array('mm' => get_string('unit_mm', 'datalynxview_pdf'), 
             'pt' => get_string('unit_pt', 'datalynxview_pdf'), 
             'cm' => get_string('unit_cm', 'datalynxview_pdf'), 
-            'in' => get_string('unit_in', 'datalynxview_pdf')
-        );
+            'in' => get_string('unit_in', 'datalynxview_pdf'));
         $mform->addElement('select', 'unit', get_string('unit', 'datalynxview_pdf'), $options);
         // Format
         $options = array('A4' => get_string('A4', 'datalynxview_pdf'), 
-            'LETTER' => get_string('LETTER', 'datalynxview_pdf')
-        );
+            'LETTER' => get_string('LETTER', 'datalynxview_pdf'));
         $mform->addElement('select', 'format', get_string('format', 'datalynxview_pdf'), $options);
         // Destination
         $options = array('D' => get_string('dest_D', 'datalynxview_pdf'), 
-            'I' => get_string('dest_I', 'datalynxview_pdf')
-        )
+            'I' => get_string('dest_I', 'datalynxview_pdf'))
         // 'F' => get_string('dest_F', 'datalynxview_pdf'),
         // 'FI' => get_string('dest_FI', 'datalynxview_pdf'),
         // 'FD' => get_string('dest_FD', 'datalynxview_pdf'),
@@ -109,8 +105,7 @@ class datalynxview_pdf_form extends datalynxview_base_form {
         // -------------------------------------------------------------------------------
         $mform->addElement('header', 'pdfframehdr', get_string('pdfframe', 'datalynxview_pdf'));
         $fileoptions = array('subdirs' => 0, 'maxbytes' => -1, 'maxfiles' => 1, 
-            'accepted_types' => array('image')
-        );
+            'accepted_types' => array('image'));
         $mform->addElement('filemanager', 'pdfframe', get_string('image', 'datalynxview_pdf'), null, 
                 $fileoptions);
         $mform->addHelpButton('pdfframe', 'pdfframe', 'datalynxview_pdf');
@@ -119,8 +114,7 @@ class datalynxview_pdf_form extends datalynxview_base_form {
         // -------------------------------------------------------------------------------
         $mform->addElement('header', 'pdfwatermarkhdr', get_string('pdfwmark', 'datalynxview_pdf'));
         $fileoptions = array('subdirs' => 0, 'maxbytes' => -1, 'maxfiles' => 1, 
-            'accepted_types' => array('image')
-        );
+            'accepted_types' => array('image'));
         // Watermark image
         $mform->addElement('filemanager', 'pdfwmark', get_string('image', 'datalynxview_pdf'), null, 
                 $fileoptions);
@@ -192,8 +186,7 @@ class datalynxview_pdf_form extends datalynxview_base_form {
         // Page break
         $options = array('none' => get_string('none'), 
             'auto' => get_string('auto', 'datalynxview_pdf'), 
-            'entry' => get_string('entry', 'datalynx')
-        );
+            'entry' => get_string('entry', 'datalynx'));
         $mform->addElement('select', 'pagebreak', get_string('pagebreak', 'datalynxview_pdf'), 
                 $options);
         
@@ -223,8 +216,7 @@ class datalynxview_pdf_form extends datalynxview_base_form {
         $options = array('' => get_string('none'), 0 => get_string('protmode0', 'datalynxview_pdf'), 
             1 => get_string('protmode1', 'datalynxview_pdf'), 
             2 => get_string('protmode2', 'datalynxview_pdf'), 
-            3 => get_string('protmode3', 'datalynxview_pdf')
-        );
+            3 => get_string('protmode3', 'datalynxview_pdf'));
         $mform->addElement('select', 'protmode', get_string('protmode', 'datalynxview_pdf'), 
                 $options);
         
@@ -238,8 +230,7 @@ class datalynxview_pdf_form extends datalynxview_base_form {
         
         // Certification
         $fileoptions = array('subdirs' => 0, 'maxbytes' => -1, 'maxfiles' => 1, 
-            'accepted_types' => array('.crt')
-        );
+            'accepted_types' => array('.crt'));
         $mform->addElement('filemanager', 'pdfcert', 
                 get_string('certification', 'datalynxview_pdf'), null, $fileoptions);
         
@@ -249,8 +240,7 @@ class datalynxview_pdf_form extends datalynxview_base_form {
         
         // Type
         $options = array(1 => get_string('none'), 2 => get_string('certperm2', 'datalynxview_pdf'), 
-            3 => get_string('certperm3', 'datalynxview_pdf')
-        );
+            3 => get_string('certperm3', 'datalynxview_pdf'));
         $mform->addElement('select', 'certtype', get_string('certtype', 'datalynxview_pdf'), 
                 $options);
         

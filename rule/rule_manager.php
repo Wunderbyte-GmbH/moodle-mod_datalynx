@@ -390,8 +390,7 @@ class datalynx_rule_manager {
         
         $editbaseurl = '/mod/datalynx/rule/rule_edit.php';
         $actionbaseurl = '/mod/datalynx/rule/index.php';
-        $linkparams = array('d' => $df->id(), 'sesskey' => sesskey()
-        );
+        $linkparams = array('d' => $df->id(), 'sesskey' => sesskey());
         
         // table headings
         $strname = get_string('name');
@@ -424,8 +423,7 @@ class datalynx_rule_manager {
         
         $table = new html_table();
         $table->head = array($strname, $strtype, $strdescription, $strenabled, $stredit, 
-            $multiduplicate, $multidelete, $selectallnone
-        );
+            $multiduplicate, $multidelete, $selectallnone);
         $table->align = array('left', 'left', 'left', 'center', 'center', 'center', 'center', 'center');
         $table->wrap = array(false, false, false, false, false, false, false, false);
         $table->attributes['align'] = 'center';

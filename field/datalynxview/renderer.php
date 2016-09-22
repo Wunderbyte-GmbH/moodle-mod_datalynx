@@ -142,8 +142,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         
         // Set the ref datalynx
         $params = array('js' => true, 'css' => true, 'modjs' => true, 'completion' => true, 
-            'comments' => true
-        );
+            'comments' => true);
         
         // Ref datalynx page type defaults to external
         $refpagetype = !empty($options['pagetype']) ? $options['pagetype'] : 'external';
@@ -188,8 +187,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         
         // Frame
         $froptions = array('src' => $srcurl, 'width' => '100%', 'height' => '100%', 
-            'style' => 'border:0;'
-        );
+            'style' => 'border:0;');
         $iframe = html_writer::tag('iframe', null, $froptions);
         return html_writer::tag('div', $iframe, 
                 array('class' => "datalynxfield-datalynxview-$fieldname embedded"));

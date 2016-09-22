@@ -64,16 +64,14 @@ class datalynxfield_text_form extends datalynxfield_form {
             'lettersonly' => get_string('err_lettersonly', 'form'), 
             'numeric' => get_string('err_numeric', 'form'), 
             'email' => get_string('err_email', 'form'), 
-            'nopunctuation' => get_string('err_nopunctuation', 'form')
-        );
+            'nopunctuation' => get_string('err_nopunctuation', 'form'));
         $mform->addElement('select', 'param4', get_string('format'), $options);
         
         // length (param5, 6, 7): min, max, range
         $options = array('' => get_string('choosedots'), 
             'minlength' => get_string('min', 'datalynx'), 
             'maxlength' => get_string('max', 'datalynx'), 
-            'rangelength' => get_string('range', 'datalynx')
-        );
+            'rangelength' => get_string('range', 'datalynx'));
         $grp = array();
         $grp[] = &$mform->createElement('select', 'param5', null, $options);
         $grp[] = &$mform->createElement('text', 'param6', null, array('size' => 8));

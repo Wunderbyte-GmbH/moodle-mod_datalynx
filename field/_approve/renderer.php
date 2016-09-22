@@ -62,8 +62,7 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
         $fieldid = $field->id();
         
         $options = array(0 => ucfirst(get_string('approvednot', 'datalynx')), 
-            1 => ucfirst(get_string('approved', 'datalynx'))
-        );
+            1 => ucfirst(get_string('approved', 'datalynx')));
         $select = &$mform->createElement('select', "f_{$i}_$fieldid", null, $options);
         $select->setSelected($value);
         // disable the 'not' and 'operator' fields
@@ -133,8 +132,7 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
     private function get_js_module() {
         $jsmodule = array('name' => 'datalynxfield__approve', 
             'fullpath' => '/mod/datalynx/field/_approve/_approve.js', 
-            'requires' => array('node', 'event', 'node-event-delegate', 'io')
-        );
+            'requires' => array('node', 'event', 'node-event-delegate', 'io'));
         return $jsmodule;
     }
 

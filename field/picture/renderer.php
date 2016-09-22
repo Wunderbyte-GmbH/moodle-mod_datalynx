@@ -42,8 +42,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
         $fieldname = "field_{$fieldid}_{$entryid}";
         $fmoptions = array('subdirs' => 0, 'maxbytes' => $field->get('param1'), 
             'maxfiles' => $field->get('param2'), 
-            'accepted_types' => explode(',', $field->get('param3'))
-        );
+            'accepted_types' => explode(',', $field->get('param3')));
         
         $draftitemid = file_get_submitted_draft_itemid("{$fieldname}_filemanager");
         file_prepare_draft_area($draftitemid, $field->df()->context->id, 'mod_datalynx', 'content', 
@@ -63,8 +62,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
         
         $module = array('name' => 'M.datalynxfield_picture', 
             'fullpath' => '/mod/datalynx/field/picture/picture.js', 
-            'requires' => array('base', 'node')
-        );
+            'requires' => array('base', 'node'));
         
         $PAGE->requires->js(
                 new moodle_url($CFG->wwwroot . '/mod/datalynx/field/picture/shadowbox/shadowbox.js'));

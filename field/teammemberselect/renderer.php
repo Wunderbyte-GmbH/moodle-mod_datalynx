@@ -210,8 +210,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
             'fullpath' => '/mod/datalynx/field/teammemberselect/teammemberselect.js', 
             'requires' => array('node', 'event', 'node-event-delegate', 'autocomplete', 
                 'autocomplete-filters', 'autocomplete-highlighters', 'event-outside'
-            )
-        );
+            ));
         return $jsmodule;
     }
 
@@ -232,8 +231,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         $mform->disabledIf($fieldnamedropdown, "searchoperator{$i}", 'eq', '');
         $mform->disabledIf($fieldnamedropdown, "searchoperator{$i}", 'eq', 'USER');
         
-        $PAGE->requires->strings_for_js(array('moreresults'
-        ), 'datalynx');
+        $PAGE->requires->strings_for_js(array('moreresults'), 'datalynx');
         $PAGE->requires->js_init_call('M.datalynxfield_teammemberselect.init_filter_search_form', 
                 array($menu, $fieldid), false, $this->get_js_module());
         

@@ -293,8 +293,7 @@ if ($views) {
         $table->add_data(
                 array($viewname, $viewtype, $viewdescription, $viewvisible, $defaultview, 
                     $singleedit, $singlemore, $viewfilter, $viewedit, $viewreset, $viewduplicate, 
-                    $viewdelete, $viewselector)
-        );
+                    $viewdelete, $viewselector));
     }
     
     $table->finish_output();
