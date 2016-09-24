@@ -50,6 +50,9 @@ class datalynxfield__time_renderer extends datalynxfield_renderer {
                     case 'date':
                         $format = get_string('strftimedate');
                         break;
+                    case 'timestamp':
+                        $format = '';
+                        break;
                     case 'minute':
                         $format = '%M';
                         break;
@@ -73,8 +76,7 @@ class datalynxfield__time_renderer extends datalynxfield_renderer {
                         $format = '%Y';
                         break;
                 }
-                $replacements[$tag] = array('html', userdate($entry->{$fieldname}, $format)
-                );
+                $replacements[$tag] = array('html', userdate($entry->{$fieldname}, $format));
             }
         }
         
@@ -126,7 +128,10 @@ class datalynxfield__time_renderer extends datalynxfield_renderer {
         
         $patterns = array();
         $patterns["##$fieldname##"] = array(true, $cat);
+        // date without time
         $patterns["##$fieldname:date##"] = array(true, $cat);
+        // date with time
+        $patterns["##$fieldname:timestamp##"] = array(true, $cat);
         // Minute (M)
         $patterns["##$fieldname:minute##"] = array(false);
         // Hour (H)

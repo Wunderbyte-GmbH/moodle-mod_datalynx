@@ -130,13 +130,11 @@ abstract class datalynxfield_renderer {
                                                         // EDITABLE ===
                         if ($renderer->get_not_editable_template() ===
                                  $renderer::NOT_EDITABLE_SHOW_NOTHING) {
-                            $replacements[$tag] = array('html', ''
-                            );
+                            $replacements[$tag] = array('html', '');
                         } else if ($renderer->get_not_editable_template() ===
                                  $renderer::NOT_EDITABLE_SHOW_AS_DISPLAY_MODE) {
                             $currentoptions['template'] = $renderer->get_display_template();
-                            $currentoptions['value'] = $this->render_display_mode($entry, 
-                                    $currentoptions);
+                            $currentoptions['value'] = $this->render_display_mode($entry, $currentoptions);
                             $replacements[$tag] = ['', [[$this, 'prerender_edit_mode'], [$entry, $currentoptions]]];
                         } else {
                             $replacements[$tag] = array('html', $renderer->get_not_editable_template());

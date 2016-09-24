@@ -56,25 +56,24 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         $strtime = '';
         if (isset($entry->{"c{$fieldid}_content"})) {
             if ($content = $entry->{"c{$fieldid}_content"}) {
-                $replacezerotime = false;
                 if(!empty($params['format'])) {
-                    $format = $params['format'];
-                } elseif(!empty($field->display_format)){
-                    $format = $field->display_format;
+                    $strtime = userdate($content, $params['format']);
                 } elseif (isset($params['date'])) {
-                    $format = get_string("strftimedate");
+                    $strtime = userdate($content, get_string("strftimedate"));
+                } elseif (isset($params['timestamp'])) {
+                    $strtime = $content;
+                } elseif(!empty($field->display_format)){
+                    $strtime = userdate($content, $field->display_format);
                 } else {
-                    $format = get_string("strftimedatetime");
-                    $replacezerotime = true;
-                }
-                $strtime = userdate($content, $format);
-                if($replacezerotime) {
-                    $strtime = str_replace(", 00:00", "", $strtime);
-                    $strtime = str_replace(" 00:00", "", $strtime);
+                    $date = getdate($content);
+                    if($date['seconds'] || $date['minutes'] || $date['hours']) {
+                        $strtime = userdate($content,  get_string("strftimedatetime"));
+                    } else {
+                        $strtime = userdate($content,  get_string("strftimedate"));
+                    }
                 }
             }
         }
-        
         return $strtime;
     }
 
@@ -285,7 +284,10 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         
         $patterns = parent::patterns();
         $patterns["[[$fieldname]]"] = array(true);
+        // date without time
         $patterns["[[$fieldname:date]]"] = array(true);
+        // date with time
+        $patterns["[[$fieldname:timestamp]]"] = array(true);
         // Minute (M)
         $patterns["[[$fieldname:minute]]"] = array(false);
         // Hour (H)
