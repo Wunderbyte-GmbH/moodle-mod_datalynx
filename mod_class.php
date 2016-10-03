@@ -382,9 +382,8 @@ class datalynx {
                 global $DB;
                 $viewname = $DB->get_field('datalynx_views', 'name', array('id' => $viewid));
                 $pagestring = get_string('page');
-                $fm = $this->get_filter_manager();
-                $filteroptions = $fm::get_filter_options_from_url();
-                $pagenum = !empty($filteroptions['page']) ? $filteroptions['page'] + 1 : 1;
+                $pageparam = optional_param('page', 0, PARAM_INT);
+                $pagenum = !empty($pageparam) ? $pageparam + 1 : 1;
                 $editmode = optional_param('editentries', 0, PARAM_SEQUENCE);
                 $editstring = get_string('editmode', 'datalynx');
                 $edit = $editmode ? " ({$editstring})" : "";

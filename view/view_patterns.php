@@ -536,63 +536,8 @@ class datalynxview_patterns {
                  !empty($options['entriesfiltercount']) and
                  $options['entriescount'] != $options['entriesfiltercount']) {
 
-            $url = new moodle_url($baseurl);
-            if($filter->id<0) {
-                // Add dataid
-                if ($filter->dataid) {
-                    $url->param('dataid', $filter->dataid);
-                }
-                // Add name
-                if ($filter->name) {
-                    $url->param('name', $filter->name);
-                }
-                // Add description
-                if ($filter->description) {
-                    $url->param('description', $filter->description);
-                }
-                // Add visible
-                if ($filter->visible) {
-                    $url->param('visible', $filter->visible);
-                }
-                // Add perpage
-                if ($filter->perpage) {
-                    $url->param('uperpage', $filter->perpage);
-                }
-                // Add pagenum
-                if ($filter->pagenum) {
-                    $url->param('pagenum', $filter->pagenum);
-                }
-                // Add selection
-                if ($filter->selection) {
-                    $url->param('uselection', $filter->selection);
-                }
-                // Add groupby
-                if ($filter->groupby) {
-                    $url->param('ugroupby', $filter->groupby);
-                }
-                // Add customsort
-                if ($filter->customsort) {
-                    $url->param('usort', $filter->customsort);
-                }
-                // Add customsearch
-                if ($filter->customsearch) {
-                    $url->param('usearch', $filter->customsearch);
-                }
-                // Add search
-                if ($filter->search) {
-                    $url->param('usersearch', $filter->search);
-                }
-                // Add eids
-                if ($filter->eids) {
-                    $url->param('eids', $filter->eids);
-                }
-                // Add users
-                if ($filter->users) {
-                    $url->param('users', $filter->users);
-                }
-            } // end if filter is userfilter
             $pagingbar = new paging_bar($options['entriesfiltercount'], $filter->page,
-                $filter->perpage, $url , 'page');
+                $filter->perpage, $baseurl , 'page');
         } else { // no paging bar case at all:
             $pagingbar = '';
         }
@@ -788,7 +733,8 @@ class datalynxview_patterns {
      */
     protected function regexp_patterns($checkvisibility = true) {
         $df = $this->_view->get_df();
-        
+
+        $views = array();
         $patterns = array();
         if($checkvisibility){
         	$views = $df->get_views_menu();

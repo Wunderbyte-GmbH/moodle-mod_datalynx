@@ -284,8 +284,7 @@ abstract class datalynxview_base {
         
         $filterid = $fid ? $fid : ($this->view->filter ? $this->view->filter : 0);
         
-        $this->_filter = $fm->get_filter_from_id($filterid, 
-                array('view' => $this, 'advanced' => $afilter));
+        $this->_filter = $fm->get_filter_from_id($filterid, array('view' => $this, 'advanced' => $afilter));
         
         // set specific entry id
         $this->_filter->eids = $eids;

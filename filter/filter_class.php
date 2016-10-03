@@ -569,8 +569,7 @@ class datalynx_filter_manager {
     /**
      */
     public function get_filter_from_url($url, $raw = false) {
-        global $DB;
-        
+
         $df = $this->_df;
         $dfid = $df->id();
         
@@ -831,7 +830,7 @@ class datalynx_filter_manager {
     public function get_filter_from_form($filter, $formdata, $finalize = false) {
         $filter->name = $formdata->name;
         $filter->description = !empty($formdata->description) ? $formdata->description : '';
-        $filter->perpage = !empty($formdata->perpage) ? $formdata->perpage : 0;
+        $filter->perpage = !empty($formdata->uperpage) ? $formdata->uperpage : 0;
         $filter->selection = !empty($formdata->selection) ? $formdata->selection : 0;
         $filter->groupby = !empty($formdata->groupby) ? $formdata->groupby : 0;
         $filter->search = isset($formdata->search) ? $formdata->search : '';
@@ -1171,7 +1170,12 @@ class datalynx_filter_manager {
         
         // Quick filters
         if (!$advanced) {
-            if (!$filter = $this->get_filter_from_url(null, true)) {
+            if($filterid >= $this->USER_FILTER_ID_START ) {
+                $filter = $this->get_filter_from_userpreferences($filterid);
+            } else {
+                $filter = $this->get_filter_from_url(null, true);
+            }
+            if(!$filter) {
                 return null;
             }
         }
@@ -1306,7 +1310,7 @@ class datalynx_filter_manager {
     /**
      */
     public static function get_filter_options_from_url($url = null) {
-        $filteroptions = array(
+        $filteroptions = array(      // left: filteroption-names, right: urlparameter-names
             'filterid' => array('filter', 0, PARAM_INT),
             'perpage' => array('uperpage', 0, PARAM_INT),
             'selection' => array('uselection', 0, PARAM_INT),
@@ -1321,7 +1325,7 @@ class datalynx_filter_manager {
             'usersearch' => array('usersearch', 0, PARAM_RAW));
         
         $options = array();
-        
+
         // Url provided
         if ($url) {
             if ($url instanceof moodle_url) {
@@ -1341,11 +1345,12 @@ class datalynx_filter_manager {
                             $options[$option] = $val;
                         }
                     }
+
                 }
             }
             return $options;
         }
-        
+
         // Optional params
         foreach ($filteroptions as $option => $args) {
             list($name, $default, $type) = $args;
@@ -1367,4 +1372,62 @@ class datalynx_filter_manager {
         
         return $options;
     }
+
+    public static function get_filter_options_from_userpreferences()
+    {
+        $filteroptions = array(   // left: urlparam-names, right: userpreferences-names
+            'perpage' =>        'uperpage',
+            'selection' =>      'uselection',
+            'groupby' =>        'ugroupby',
+            'customsort' =>     'usort',
+            'customsearch' =>   'usearch',
+            'page' =>           'page',
+            'eids' =>           'eids',
+            'users' =>          'users',
+            'groups' =>         'groups',
+            'afilter' =>        'afilter',
+            'usersearch' =>     'usersearch'
+        );
+
+        $options = array();
+
+        $userfilter = false;
+        $filterid = optional_param('filter', 0, PARAM_INT);
+        if ($filterid < 0) {
+            $viewid = optional_param('view', 0, PARAM_INT);
+            $dfid = optional_param('d', 0, PARAM_INT);
+            if ($viewid) {
+                $userfilter = get_user_preferences("datalynxfilter-$dfid-$viewid-$filterid", null);
+                $userfilter = unserialize($userfilter);
+            }
+        }
+
+        if ($userfilter) {
+            // Optional params
+            foreach ($filteroptions as $option => $name) {
+                if ($val = $userfilter->$name) {
+                    if ($option == 'customsort') {
+                        $options[$option] = self::get_sort_options_from_query($val);
+                    } else if ($option == 'customsearch') {
+                        $searchoptions = self::get_search_options_from_query($val);
+                        if (is_array($searchoptions)) {
+                            $options['customsearch'] = $searchoptions;
+                        } else {
+                            $options['search'] = $searchoptions;
+                        }
+                    } else if ($option == 'usersearch') {
+                        $options['search'] = $val;
+                    } else {
+                        $options[$option] = $val;
+                    }
+                }
+            }
+        }
+
+        return $options;
+
+    } // end function
+
 }
+
+
