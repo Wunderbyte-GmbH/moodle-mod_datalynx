@@ -16,13 +16,26 @@
 
 /**
  *
- * @package mod
- * @subpackage datalynx
- * @copyright 2015 onwards David Bogner
+ * @package datalynxfield
+ * @subpackage tag
+ * @copyright 2016 David Bogner
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-$plugin->component = 'mod_datalynx';
-$plugin->version = 2016111600;
-$plugin->release = 'Skyler White 1.4.1'; // famous movie, theater and tv series characters
-$plugin->requires = 2014050800;
-$plugin->maturity = MATURITY_STABLE;
+require_once ("$CFG->dirroot/mod/datalynx/field/field_form.php");
+
+
+class datalynxfield_tag_form extends datalynxfield_form {
+
+    /**
+     * The only option for this field is whether to make tags standard tags or not
+     * {@inheritDoc}
+     * @see datalynxfield_form::field_definition()
+     */
+    function field_definition() {
+        $mform = &$this->_form;
+        $mform->addElement('header', 'fieldattributeshdr',
+                get_string('fieldattributes', 'datalynx'));
+        // Make standard tags?
+        $mform->addElement('selectyesno', 'param1', get_string('saveasstandardtags', 'datalynx'));
+    }
+}

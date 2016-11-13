@@ -674,7 +674,7 @@ class datalynx {
      * @param int $viewid The id of the datalynx's view whose content should be displayed
      * @return string
      */
-    public static function get_content_inline($datalynxid, $viewid = 0) {
+    public static function get_content_inline($datalynxid, $viewid = 0, $eids = null) {
         global $CFG;
         require_once $CFG->dirroot . '/mod/datalynx/view/view_class.php';
         $urlparams = new stdClass();
@@ -682,6 +682,9 @@ class datalynx {
         $urlparams->d = $datalynxid;
         $urlparams->view = $viewid;
         $urlparams->pagelayout = 'external';
+        if($eids) {
+            $urlparams->eids = $eids;
+        }
         
         $pageparams = array('js' => true, 'css' => true, 'rss' => true, 'modjs' => true, 
             'completion' => true, 'comments' => true, 'urlparams' => $urlparams);

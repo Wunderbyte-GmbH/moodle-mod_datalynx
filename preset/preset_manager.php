@@ -54,9 +54,9 @@ class datalynx_preset_manager {
         $course_context = context_course::instance($this->_df->course->id);
         
         $fs = get_file_storage();
-        if ($presetarea == 'course_presets') {
+        if ($presetarea == self::PRESET_COURSEAREA) {
             $files = $fs->get_area_files($course_context->id, 'mod_datalynx', $presetarea);
-        } else if ($presetarea == 'site_presets') {
+        } else if ($presetarea == self::PRESET_SITEAREA) {
             $files = $fs->get_area_files(self::PRESET_SITECONTEXT, 'mod_datalynx', $presetarea);
         }
         $canviewall = has_capability('mod/datalynx:presetsviewall', $this->_df->context);
@@ -73,6 +73,7 @@ class datalynx_preset_manager {
                 $preset->userid = $file->get_userid();
                 $preset->itemid = $file->get_itemid();
                 $preset->id = $file->get_id();
+                $preset->area = $presetarea;
                 $presets[] = $preset;
             }
         }

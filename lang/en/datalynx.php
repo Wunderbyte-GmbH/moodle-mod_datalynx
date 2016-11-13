@@ -427,6 +427,7 @@ $string['author'] = 'Author';
 $string['email'] = 'Email';
 
 $string['savecontinue'] = 'Save and continue';
+$string['saveasstandardtags'] = 'Save tags as standard-tags in order to suggest them when adding or updating an entry?';
 $string['search'] = 'Search';
 $string['sendinratings'] = 'Send in my latest ratings';
 $string['separateentries'] = 'Each entry in a separate file';
@@ -447,6 +448,8 @@ $string['subplugintype_datalynxtool'] = 'Datalynx tool type';
 $string['subplugintype_datalynxtool_plural'] = 'Datalynx tool types';
 $string['subplugintype_datalynxview'] = 'Datalynx view type';
 $string['subplugintype_datalynxview_plural'] = 'Datalynx view types';
+$string['tagarea_datalynx_contents'] = 'Datalynx entries';
+$string['tagcollection_datalynx'] = 'Datalynx tags';
 $string['teachersandstudents'] = '{$a->teachers} and {$a->students}';
 $string['textbox'] = 'Text box';
 $string['timecreated'] = 'Time created';

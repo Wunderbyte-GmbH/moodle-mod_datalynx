@@ -84,6 +84,10 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
         $content = new backup_nested_element('content', array('id'),
                 array('fieldid', 'content', 'content1', 'content2', 'content3', 'content4'));
         
+
+        $tags = new backup_nested_element('tags');
+        $tag = new backup_nested_element('tag', array('id'), array('rawname'));
+        
         $ratings = new backup_nested_element('ratings');
         $rating = new backup_nested_element('rating', array('id'),
                 array('component', 'ratingarea', 'scaleid', 'value', 'userid', 'timecreated', 
@@ -128,6 +132,9 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
         $entry->add_child($contents);
         $contents->add_child($content);
         
+        $content->add_child($tags);
+        $tags->add_child($tag);
+        
         $entry->add_child($ratings);
         $ratings->add_child($rating);
         
@@ -143,6 +150,17 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
         // Define sources
         $datalynx->set_source_table('datalynx', array('id' => backup::VAR_ACTIVITYID));
         $module->set_source_table('course_modules', array('id' => backup::VAR_MODID));
+        
+        //tags
+        $tag->set_source_sql('SELECT t.id, t.rawname
+                        FROM {tag} t
+                        JOIN {tag_instance} ti ON ti.tagid = t.id
+                       WHERE ti.itemtype = ?
+                         AND ti.component = ?
+                         AND ti.itemid = ?', array(
+                                 		backup_helper::is_sqlparam('datalynx_contents'),
+                                 		backup_helper::is_sqlparam('mod_datalynx'),
+                                 		backup::VAR_PARENTID));
         
         // TODO: fix sql, this is just a temporary fix and does not provide same functionality for
         // postgresql

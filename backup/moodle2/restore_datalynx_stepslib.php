@@ -45,17 +45,14 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         $paths[] = new restore_path_element('datalynx_filter', '/activity/datalynx/filters/filter');
         $paths[] = new restore_path_element('datalynx_view', '/activity/datalynx/views/view');
         $paths[] = new restore_path_element('datalynx_rule', '/activity/datalynx/rules/rule');
-        $paths[] = new restore_path_element('datalynx_behavior', 
-                '/activity/datalynx/behaviors/behavior');
-        $paths[] = new restore_path_element('datalynx_renderer', 
-                '/activity/datalynx/renderers/renderer');
+        $paths[] = new restore_path_element('datalynx_behavior', '/activity/datalynx/behaviors/behavior');
+        $paths[] = new restore_path_element('datalynx_renderer', '/activity/datalynx/renderers/renderer');
         
         if ($userinfo) {
             $paths[] = new restore_path_element('datalynx_entry', '/activity/datalynx/entries/entry');
-            $paths[] = new restore_path_element('datalynx_content', 
-                    '/activity/datalynx/entries/entry/contents/content');
-            $paths[] = new restore_path_element('datalynx_rating', 
-                    '/activity/datalynx/entries/entry/ratings/rating');
+            $paths[] = new restore_path_element('datalynx_content', '/activity/datalynx/entries/entry/contents/content');
+            $paths[] = new restore_path_element('datalynx_tag', '/activity/datalynx/entries/entry/contents/content/tags/tag');
+            $paths[] = new restore_path_element('datalynx_rating', '/activity/datalynx/entries/entry/ratings/rating');
             $paths[] = new restore_path_element('datalynx_grade', '/activity/datalynx/grades/grade');
         }
         
@@ -405,6 +402,21 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         $data->timemodified = $this->apply_date_offset($data->timemodified);
         
         $newitemid = $DB->insert_record('rating', $data);
+    }
+    
+    /**
+     * 
+     * @param unknown $data
+     */
+    protected function process_datalynx_tag($data) {
+    	$data = (object)$data;
+    	if (!core_tag_tag::is_enabled('mod_datalynx', 'datalynx_contents')) { // Tags disabled in server, nothing to process.
+    		return;
+    	}
+    	$tag = $data->rawname;
+    	$itemid = $this->get_new_parentid('datalynx_content');
+    	$context = context_module::instance($this->task->get_moduleid());
+    	core_tag_tag::add_item_tag('mod_datalynx', 'datalynx_contents', $itemid, $context, $tag);
     }
 
     /**
