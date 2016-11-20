@@ -21,5 +21,5 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $plugin->component = 'datalynxfield_select';
-$plugin->version = 2015092200;
+$plugin->version =  2016111900;
 $plugin->requires = 2014051200;

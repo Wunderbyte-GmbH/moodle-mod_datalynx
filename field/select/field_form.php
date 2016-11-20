@@ -36,11 +36,11 @@ class datalynxfield_select_form extends datalynxfield_option_form {
         $mform->addElement('text', 'param2', get_string('default'));
         $mform->setType('param2', PARAM_TEXT);
         
-        // Allow add option?
-        $mform->addElement('selectyesno', 'param4', get_string('allowaddoption', 'datalynx'));
+        // Order alphabetically in edit mode?
+        $mform->addElement('selectyesno', 'param4', get_string('alphabeticalorder', 'datalynx'));
         
         // Allow choice limit?
-        $mform->addElement('checkbox', 'param5', get_string('limitchoice', 'datalynx'));
+        $mform->addElement('selectyesno', 'param5', get_string('limitchoice', 'datalynx'));
         $mform->addHelpButton('param5', 'limitchoice', 'datalynx');
     }
 }

@@ -29,6 +29,7 @@
 $string['actions'] = 'Aktionen nach Hinzufügen eines Eintrags';
 $string['alignment'] = 'Ausrichtung';
 $string['allowaddoption'] = 'Bearbeitungseinstellungen zulassen';
+$string['alphabeticalorder'] = 'In der Eintragsbearbeitung die Optionen alphabetisch sortieren?';
 $string['approved'] = 'freigeschaltet';
 $string['approvednot'] = 'nicht freigeschaltet';
 $string['ascending'] = 'Aufsteigend';
@@ -175,6 +176,8 @@ $string['fieldedit'] = 'Bearbeite \'{$a}\'';
 $string['fieldedits'] = 'Anzahl an Bearbeitungen';
 $string['field'] = 'Feld';
 $string['fieldids'] = 'Feld IDs';
+$string['fieldlabel'] = 'Feldbezeichnung';
+$string['fieldlabel_help'] = 'The field label allows to specify a designated field label that can be added to the view by means of the [[fieldname@]] field pattern. This field pattern observes the field visibility and is hidden if the field is set to be hidden. The field label can also serve as a field display template and it interprets patterns of that field if included in the label. For example, with a number field called Number and the field label defined as \'You have earned [[Number]] credits.\' and an entry where the number value is 47 the pattern [[Number@]] would be displayed as \'You have earned 47 credits.\'';
 $string['fieldmappings'] = 'Feldzuordnungen';
 $string['fieldname'] = 'Feldname';
 $string['fieldnew'] = 'Neues {$a} Feld';

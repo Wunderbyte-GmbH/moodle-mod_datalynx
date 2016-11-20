@@ -59,12 +59,29 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
             $disabled = array();
         }
         
-        $menuoptions = array('' => get_string('choosedots')) + $menuoptions;
-        foreach ($menuoptions as $id => $name) {
-            if (array_search($id, $disabled) === false || $id == $selected) {
-                $select->addOption($name, $id);
+        foreach ($menuoptions as $id=> $name){
+        	$option = new stdClass();
+        	$option->id = $id;
+        	$option->name = $name;
+        	$menuoptions[$id] = $option;
+        }
+        // Sort the options alphabetically
+        $sortalphbetically = $field->field->param4;
+        if($sortalphbetically){
+        	usort($menuoptions, function($a, $b)
+        	{
+        		return strcmp($a->name, $b->name);
+        	});
+        }
+        $choosedots = new stdClass();
+        $choosedots->id = '';
+        $choosedots->name = get_string('choosedots');
+        $menuoptions = array('' => $choosedots) + $menuoptions;
+        foreach ($menuoptions as $option) {
+            if (array_search($option->id, $disabled) === false || $option->id == $selected) {
+                $select->addOption($option->name, $option->id);
             } else {
-                $select->addOption($name, $id, array('disabled' => 'disabled'));
+                $select->addOption($option->name, $option->id, array('disabled' => 'disabled'));
             }
         }
         

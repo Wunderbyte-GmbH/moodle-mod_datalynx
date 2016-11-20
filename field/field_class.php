@@ -827,8 +827,12 @@ abstract class datalynxfield_option extends datalynxfield_base {
         
         unset($newvalues[0]);
         $this->field->param1 = implode("\n", $newvalues);
-        $this->field->param2 = isset($forminput->param2) ? $forminput->param2 : '';
-        $this->field->param3 = isset($forminput->param3) ? $forminput->param3 : '';
+        for ($i=2; $i<=10; $i++){
+        	$param = "param$i";
+        	if (isset($forminput->$param)){
+        		$this->field->$param = $forminput->$param;
+        	}
+        }
     }
 
     /**

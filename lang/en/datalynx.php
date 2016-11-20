@@ -26,11 +26,10 @@
  *          To the extent that Datalynx code corresponds to Database code,
  *          certain copyrights on the Database module may obtain.
  */
-$string['fieldlabel'] = 'Field label';
-$string['fieldlabel_help'] = 'The field label allows for specifying a designated field label that can be added to the view by means of the [[fieldname@]] field pattern. This field pattern observes the field visibility and is hidden if the field is set to be hidden. The field label can also serve as a field display template and it interprets patterns of that field if included in the label. For example, with a number field called Number and the field label defined as \'You have earned [[Number]] credits.\' and an entry where the number value is 47 the pattern [[Number@]] would be displayed as \'You have earned 47 credits.\'';
 $string['actions'] = 'Entry actions';
 $string['alignment'] = 'Alignment';
 $string['allowaddoption'] = 'Allow adding options';
+$string['alphabeticalorder'] = 'Sort the options in alphabetical order when editing an entry?';
 $string['approved'] = 'approved';
 $string['approvednot'] = 'not approved';
 $string['ascending'] = 'Ascending';
@@ -177,6 +176,8 @@ $string['fieldedit'] = 'Editing \'{$a}\'';
 $string['fieldedits'] = 'Number of edits';
 $string['field'] = 'field';
 $string['fieldids'] = 'Field ids';
+$string['fieldlabel'] = 'Field label';
+$string['fieldlabel_help'] = 'The field label allows to specify a designated field label that can be added to the view by means of the [[fieldname@]] field pattern. This field pattern observes the field visibility and is hidden if the field is set to be hidden. The field label can also serve as a field display template and it interprets patterns of that field if included in the label. For example, with a number field called Number and the field label defined as \'You have earned [[Number]] credits.\' and an entry where the number value is 47 the pattern [[Number@]] would be displayed as \'You have earned 47 credits.\'';
 $string['fieldmappings'] = 'Field Mappings';
 $string['fieldname'] = 'Field name';
 $string['fieldnew'] = 'New {$a} field';
