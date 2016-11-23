@@ -972,7 +972,8 @@ class datalynx_entries {
         if ($entry->id > 0) {
             if ($df->user_can_manage_entry($entry)) { // just in case the user opens two forms at
                                                       // the same time
-                if (!has_capability('mod/datalynx:approve', $df->context)) {
+                if (!has_capability('mod/datalynx:approve', $df->context)
+                        && ($df->data->approval == datalynx::APPROVAL_ON_UPDATE)) {
                     $entry->approved = 0;
                 }
                 

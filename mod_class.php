@@ -40,6 +40,13 @@ class datalynx {
 
     const COUNT_LEFT = 3;
 
+    /** no approval required **/
+    const APPROVAL_NONE = 0;
+    /** approval for new entries and updates required **/
+    const APPROVAL_ON_UPDATE = 1;
+    /** approval only for new entries required **/
+    const APPROVAL_ON_NEW = 2;
+
     /**
      * 
      * @var stdClass course module
