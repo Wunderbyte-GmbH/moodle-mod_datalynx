@@ -29,6 +29,8 @@ class datalynxfield_text_form extends datalynxfield_form {
     /**
      */
     function field_definition() {
+        global $OUTPUT;
+
         $mform = &$this->_form;
         
         // -------------------------------------------------------------------------------
@@ -54,6 +56,24 @@ class datalynxfield_text_form extends datalynxfield_form {
         $mform->setDefault('param2', '');
         $mform->setDefault('param3', 'px');
         
+        $duplicates = $this->amount_most_used_content();
+
+        if ($duplicates > 1) {
+            $mform->addElement('static', 'duplicatestext', '',
+                               $OUTPUT->notification(get_string('has_duplicate_entries', 'datalynx'), 'notifymessage'));
+        }
+
+        $mform->addElement('selectyesno', 'param8', get_string('unique', 'datalynx'));
+        $mform->setType('param8', PARAM_BOOL);
+
+        if ($duplicates > 1) {
+            // We set it constantly to 'no' if there are duplicates!
+            $mform->setConstant('param8', 0);
+            $mform->freeze('param8');
+        } else {
+            $mform->setDefault('param8', 0);
+        }
+
         // rules
         // -------------------------------------------------------------------------------
         $mform->addElement('header', 'fieldruleshdr', get_string('fieldrules', 'datalynx'));
@@ -87,5 +107,50 @@ class datalynxfield_text_form extends datalynxfield_form {
         $mform->disabledIf('param7', 'param5', 'eq', 'minlength');
         $mform->setType('param6', PARAM_INT);
         $mform->setType('param7', PARAM_INT);
+
+    }
+
+    /**
+     * Ensures there are no duplicate entries right now if unique is set to 'yes'!
+     *
+     * @param array $data
+     * @param array $files
+     * @return string[] Associative array with errors
+     */
+    function validation($data, $files) {
+        $errors = array();
+
+        $errors = parent::validation($data, $files);
+
+        $fieldid = $this->_field->id();
+        if (!empty($data['param8']) && !empty($fieldid)) {
+            // Unique is activated, we check if there are doubles!
+            // Should never happen, because we freeze it to 'no' if there are duplicates!
+            $max = $this->amount_most_used_content();
+            if ($max > 1) {
+                $errors['param8'] = get_string('has_duplicate_entries', 'datalynx');
+            }
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Returns how often the most used content for this field is used!
+     */
+    function amount_most_used_content() {
+        global $DB;
+
+        $fieldid = $this->_field->id();
+        if (empty($fieldid)) {
+            echo "NO FIELDID!";
+            return 0;
+        }
+
+        return $DB->get_field_sql("SELECT COUNT(1) AS amount
+                                     FROM {datalynx_contents} c
+                                    WHERE c.fieldid = :fieldid AND c.content IS NOT NULL
+                                 GROUP BY c.content
+                                 ORDER BY amount DESC", array('fieldid' => $fieldid));
     }
 }
