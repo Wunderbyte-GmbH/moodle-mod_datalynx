@@ -266,6 +266,7 @@ $string['groupinfo'] = 'Gruppeninformation';
 $string['headercss'] = 'Eigene CSS Einstellungen für alle Ansichten';
 $string['headerjs'] = 'Eigenes javascript für alle Ansichten';
 $string['horizontal'] = 'Horizontal';
+$string['id'] = 'ID';
 $string['importadd'] = 'Neue Importansicht hinzufügen';
 $string['import'] = 'Import';
 $string['importnoneindatalynx'] = 'Für diese Datalynx sind keine Importe definiert.';

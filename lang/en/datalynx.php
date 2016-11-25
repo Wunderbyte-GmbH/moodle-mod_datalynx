@@ -278,6 +278,7 @@ $string['groupinfo'] = 'Group info';
 $string['headercss'] = 'Custom CSS styles for all views';
 $string['headerjs'] = 'Custom javascript for all views';
 $string['horizontal'] = 'Horizontal';
+$string['id'] = 'ID';
 $string['importadd'] = 'Add a new Import view';
 $string['import'] = 'Import';
 $string['importnoneindatalynx'] = 'There are no imports defined for this datalynx.';
