@@ -60,7 +60,7 @@ class datalynxfield_text_form extends datalynxfield_form {
 
         if ($duplicates > 1) {
             $mform->addElement('static', 'duplicatestext', '',
-                               $OUTPUT->notification(get_string('has_duplicate_entries', 'datalynx'), 'notifymessage'));
+                               $OUTPUT->notification(get_string('field_has_duplicate_entries', 'datalynx'), 'notifymessage'));
         }
 
         $mform->addElement('selectyesno', 'param8', get_string('unique', 'datalynx'));
@@ -128,7 +128,7 @@ class datalynxfield_text_form extends datalynxfield_form {
             // Should never happen, because we freeze it to 'no' if there are duplicates!
             $max = $this->amount_most_used_content();
             if ($max > 1) {
-                $errors['param8'] = get_string('has_duplicate_entries', 'datalynx');
+                $errors['param8'] = get_string('field_has_duplicate_entries', 'datalynx');
             }
         }
 
@@ -147,10 +147,10 @@ class datalynxfield_text_form extends datalynxfield_form {
             return 0;
         }
 
-        return $DB->get_field_sql("SELECT COUNT(1) AS amount
+        return $DB->get_field_sql("SELECT COUNT(*) AS amount
                                      FROM {datalynx_contents} c
                                     WHERE c.fieldid = :fieldid AND c.content IS NOT NULL
                                  GROUP BY c.content
-                                 ORDER BY amount DESC", array('fieldid' => $fieldid));
+                                 ORDER BY amount DESC LIMIT 1", array('fieldid' => $fieldid));
     }
 }
