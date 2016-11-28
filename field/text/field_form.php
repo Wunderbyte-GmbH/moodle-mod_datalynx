@@ -55,15 +55,9 @@ class datalynxfield_text_form extends datalynxfield_form {
         // 'datalynx'), 'datalynx'));
         $mform->setDefault('param2', '');
         $mform->setDefault('param3', 'px');
-        
-        $duplicates = $this->get_list_of_duplicates();
 
-        if ($duplicates) {
-            $listtext = $this->print_list_of_duplicates($duplicates);
-            $mform->addElement('static', 'duplicatestext', '',
-                $OUTPUT->notification(get_string('field_has_duplicate_entries', 'datalynx') .
-                    $listtext, 'notifymessage'));
-        }
+        // check for duplicate entries
+        $duplicates = $this->get_list_of_duplicates();
 
         $mform->addElement('selectyesno', 'param8', get_string('unique', 'datalynx'));
         $mform->setType('param8', PARAM_BOOL);
@@ -72,7 +66,13 @@ class datalynxfield_text_form extends datalynxfield_form {
             // We set it constantly to 'no' if there are duplicates!
             $mform->setConstant('param8', 0);
             $mform->freeze('param8');
+            // Display the duplicate-entries-message and the list of duplicate entries
+            $listtext = $this->print_list_of_duplicates($duplicates);
+            $mform->addElement('static', 'duplicatestext', '',
+                $OUTPUT->notification(get_string('field_has_duplicate_entries', 'datalynx') .
+                    $listtext, 'notifymessage'));
         } else {
+            // if there are no duplicates the default option for unique is "No" as well, but the user can change it
             $mform->setDefault('param8', 0);
         }
 
