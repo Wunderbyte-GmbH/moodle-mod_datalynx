@@ -147,4 +147,37 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
         
         return array(array($select), null);
     }
+    
+    /**
+     *
+     * @param unknown $entryid
+     * @param unknown $tags
+     * @param unknown $formdata
+     * @return string[]
+     */
+    public function validate($entryid, $tags, $formdata) {
+    	global $DB;
+    	$fieldid = $this->_field->id();
+    	$errors = array();
+    	$query = "SELECT dc.content
+                    FROM {datalynx_contents} dc
+                   WHERE dc.entryid = :entryid
+                     AND dc.fieldid = :fieldid";
+    	$params = array('entryid' => $entryid, 'fieldid' => $fieldid);
+    
+    	$oldcontent = $DB->get_field_sql($query, $params);
+    
+    	$formfieldname = "field_{$fieldid}_{$entryid}";
+    
+    	if (isset($this->_field->field->param5) && $this->_field->field->param5 > 0) {
+    		$disabled = $this->_field->get_disabled_values_for_user();
+    		$content = clean_param($formdata->{$formfieldname}, PARAM_INT);
+    		if ($content != $oldcontent && array_search($content, $disabled) !== false) {
+    			$menu = $this->_field->options_menu();
+    			$errors[$formfieldname] = get_string('limitchoice_error', 'datalynx', $menu[$content]);
+    		}
+    	} 
+    	
+    	return $errors;
+    }
 }

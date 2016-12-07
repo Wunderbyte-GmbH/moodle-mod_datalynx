@@ -40,7 +40,11 @@ class datalynxfield_select_form extends datalynxfield_option_form {
         $mform->addElement('selectyesno', 'param4', get_string('alphabeticalorder', 'datalynx'));
         
         // Allow choice limit?
-        $mform->addElement('selectyesno', 'param5', get_string('limitchoice', 'datalynx'));
+        $options = array (0 => get_string('choose'));
+        for ($i=1; $i<=100; $i++){
+        	$options[$i] = $i;
+        }
+        $mform->addElement('select', 'param5', get_string('limitchoice', 'datalynx'), $options);
         $mform->addHelpButton('param5', 'limitchoice', 'datalynx');
     }
 }

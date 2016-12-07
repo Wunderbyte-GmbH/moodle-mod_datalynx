@@ -76,30 +76,5 @@ class datalynxfield_radiobutton extends datalynxfield_option_single {
         
         return true;
     }
-
-    public function validate($entryid, $tags, $formdata) {
-        $fieldid = $this->id();
-        
-        global $DB;
-        $query = "SELECT dc.content
-                    FROM {datalynx_contents} dc
-                   WHERE dc.entryid = :entryid
-                     AND dc.fieldid = :fieldid";
-        $params = array('entryid' => $entryid, 'fieldid' => $fieldid);
-        
-        $oldcontent = $DB->get_field_sql($query, $params);
-        
-        $formfieldname = "field_{$fieldid}_{$entryid}_selected";
-        
-        if (isset($this->field->param5)) {
-            $disabled = $this->get_disabled_values_for_user();
-            $content = clean_param($formdata->{$formfieldname}, PARAM_INT);
-            if ($content != $oldcontent && array_search($content, $disabled) !== false) {
-                $menu = $this->options_menu();
-                return array($formfieldname => get_string('limitchoice_error', 'datalynx', $menu[$content]));
-            }
-        } else {
-            return array();
-        }
-    }
+    
 }
