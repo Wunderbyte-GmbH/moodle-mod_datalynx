@@ -617,6 +617,7 @@ class datalynx_entries {
                                     foreach ($contents[$eid]['fields'] as $fieldid => $content) {
                                         $field = $DB->get_record('datalynx_fields', 
                                                 array('id' => $fieldid));
+                                        //TODO: Move this. That should not be here. A single exception for a field is not cool. 
                                         if ($field->type == 'teammemberselect') {
                                             $oldcontent = json_decode(
                                                     $DB->get_field('datalynx_contents', 'content', 
@@ -624,6 +625,7 @@ class datalynx_entries {
                                                                 'entryid' => $eid
                                                             )), true);
                                             $newcontent = $content[''];
+                                            //TODO: Not the best place for notifying teammembers. Better to create an event?
                                             $this->notify_team_members($entry, $field, $oldcontent, 
                                                     $newcontent);
                                         }

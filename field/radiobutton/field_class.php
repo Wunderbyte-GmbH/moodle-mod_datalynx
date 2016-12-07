@@ -34,42 +34,6 @@ class datalynxfield_radiobutton extends datalynxfield_option_single {
         array('name' => ', (with space)', 'chr' => '&#44;&#32;')
     );
 
-    /**
-     * Computes which values of this field have already been chosen by the given user and
-     * determines which ones have reached their limit
-     * 
-     * @param int $userid ID of the user modifying an entry; if not specified defaults to $USER->id
-     * @return array an array of disabled values
-     */
-    public function get_disabled_values_for_user($userid = 0) {
-        global $DB, $USER;
-        
-        if ($userid == 0) {
-            $userid = $USER->id;
-        }
-        
-        $countsql = "SELECT COUNT(dc2.id)
-                       FROM {datalynx_contents} dc2
-                 INNER JOIN {datalynx_fields} df2 ON dc2.fieldid = df2.id
-                 INNER JOIN {datalynx_entries} de2 ON dc2.entryid = de2.id
-                      WHERE dc2.fieldid = :fieldid1
-                        AND dc2.content = dc.content";
-        
-        $sql = "SELECT dc.content, ({$countsql}) AS count
-                  FROM {datalynx_contents} dc
-            INNER JOIN {datalynx_entries} de ON dc.entryid = de.id
-                 WHERE de.userid = :userid
-                   AND de.dataid = :dataid
-                   AND dc.fieldid = :fieldid2
-                HAVING count >= 1";
-        
-        $params = array('userid' => $userid, 'dataid' => $this->df->id(), 
-            'fieldid1' => $this->field->id, 'fieldid2' => $this->field->id);
-        
-        $results = $DB->get_records_sql($sql, $params);
-        
-        return array_keys($results);
-    }
 
     /**
      */
