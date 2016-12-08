@@ -19,6 +19,7 @@
  * @package datalynxfield
  * @subpackage select
  * @copyright 2014 Ivan Šakić
+ * @copyright 2016 David Bogner
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die();
@@ -37,6 +38,11 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
      */
     protected $_field = null;
 
+    /**
+     * 
+     * {@inheritDoc}
+     * @see datalynxfield_renderer::render_edit_mode()
+     */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $field = $this->_field;
         $fieldid = $field->id();
@@ -92,6 +98,11 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
         }
     }
 
+    /**
+     * 
+     * {@inheritDoc}
+     * @see datalynxfield_renderer::render_display_mode()
+     */
     public function render_display_mode(stdClass $entry, array $params) {
         $field = $this->_field;
         $fieldid = $field->id();
@@ -126,6 +137,11 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
         return '';
     }
 
+    /**
+     * 
+     * {@inheritDoc}
+     * @see datalynxfield_renderer::render_search_mode()
+     */
     public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
         global $CFG;
         HTML_QuickForm::registerElementType('checkboxgroup', 
@@ -150,9 +166,9 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
     
     /**
      *
-     * @param unknown $entryid
+     * @param integer $entryid
      * @param unknown $tags
-     * @param unknown $formdata
+     * @param object $formdata
      * @return string[]
      */
     public function validate($entryid, $tags, $formdata) {
