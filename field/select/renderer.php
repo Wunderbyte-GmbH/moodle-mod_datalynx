@@ -59,7 +59,7 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
         
         $select = &$mform->addElement('select', $fieldname, null);
         
-        if (isset($this->_field->field->param5)) {
+        if (isset($this->_field->field->param5) && $this->_field->field->param5 > 0) {
             $disabled = $this->_field->get_disabled_values_for_user();
         } else {
             $disabled = array();
