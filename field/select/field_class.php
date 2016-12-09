@@ -37,6 +37,20 @@ class datalynxfield_select extends datalynxfield_option_single {
         global $DB;
         return $DB->sql_compare_text("c{$this->field->id}.$column", 255);
     }
+    
+    /**
+     * 
+     * {@inheritDoc}
+     * @see datalynxfield_base::get_search_value()
+     */
+    public function get_search_value($value) {
+    	$options = $this->options_menu();
+    	if ($key = array_search($value, $options)) {
+    		return $key;
+    	} else {
+    		return '';
+    	}
+    }
 
     /**
      * 
@@ -49,16 +63,18 @@ class datalynxfield_select extends datalynxfield_option_single {
             $fieldid = $this->field->id;
             $fieldname = $this->name();
             $csvname = $importsettings[$fieldname]['name'];
+            $allownew = !empty($importsettings[$fieldname]['allownew']) ? true : false;
             $label = !empty($csvrecord[$csvname]) ? $csvrecord[$csvname] : null;
             
             if ($label) {
                 $options = $this->options_menu();
                 if ($optionkey = array_search($label, $options)) {
                     $data->{"field_{$fieldid}_{$entryid}_selected"} = $optionkey;
+                } else if ($allownew) {
+                    $data->{"field_{$fieldid}_{$entryid}_newvalue"} = $label;
                 }
             }
         }
-        
         return true;
     }
 

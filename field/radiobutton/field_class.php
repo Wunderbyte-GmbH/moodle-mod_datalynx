@@ -24,7 +24,7 @@
 require_once ("$CFG->dirroot/mod/datalynx/field/select/field_class.php");
 
 
-class datalynxfield_radiobutton extends datalynxfield_option_single {
+class datalynxfield_radiobutton extends datalynxfield_select {
 
     public $type = 'radiobutton';
 
@@ -33,48 +33,5 @@ class datalynxfield_radiobutton extends datalynxfield_option_single {
         array('name' => ',', 'chr' => '&#44;'),
         array('name' => ', (with space)', 'chr' => '&#44;&#32;')
     );
-
-
-    /**
-     */
-    protected function get_sql_compare_text($column = 'content') {
-        global $DB;
-        return $DB->sql_compare_text("c{$this->field->id}.$column", 255);
-    }
-
-    /**
-     */
-    public function get_search_value($value) {
-        $options = $this->options_menu();
-        if ($key = array_search($value, $options)) {
-            return $key;
-        } else {
-            return '';
-        }
-    }
-
-    /**
-     */
-    public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
-        // import only from csv
-        if ($csvrecord) {
-            $fieldid = $this->field->id;
-            $fieldname = $this->name();
-            $csvname = $importsettings[$fieldname]['name'];
-            $allownew = !empty($importsettings[$fieldname]['allownew']) ? true : false;
-            $label = !empty($csvrecord[$csvname]) ? $csvrecord[$csvname] : null;
-            
-            if ($label) {
-                $options = $this->options_menu();
-                if ($optionkey = array_search($label, $options)) {
-                    $data->{"field_{$fieldid}_{$entryid}_selected"} = $optionkey;
-                } else if ($allownew) {
-                    $data->{"field_{$fieldid}_{$entryid}_newvalue"} = $label;
-                }
-            }
-        }
-        
-        return true;
-    }
     
 }
