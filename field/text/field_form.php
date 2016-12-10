@@ -151,8 +151,7 @@ class datalynxfield_text_form extends datalynxfield_form {
 
         $fieldid = $this->_field->id();
         if (empty($fieldid)) {
-            echo "NO FIELDID!";
-            return 0;
+            return false;
         }
 
         $records = $DB->get_records_sql("SELECT COUNT(*) AS amount, c.content
