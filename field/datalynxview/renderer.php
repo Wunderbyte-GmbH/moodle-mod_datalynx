@@ -51,7 +51,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         }
 		return $this->display_browse($entry, $type);
 	}
-	
+
     /**
      * Check, which type of display, and call the right display-function
      * stdClass @entry  the entry object which holds this field
@@ -243,9 +243,9 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
                 array('entryid' => $entry->id, 'fieldid' => $field->field->id))) {
                 list($insql, $params) = $DB->get_in_or_equal($content, SQL_PARAMS_NAMED);
                 $params['fieldid'] = $fieldid;
-                $sql = 'SELECT  c.entryid 
+                $sql = 'SELECT  c.entryid
                         FROM    {datalynx_contents} c
-                        WHERE   c.fieldid = :fieldid 
+                        WHERE   c.fieldid = :fieldid
                         AND     c.content ' . $insql ;
                 if($eids = $DB->get_fieldset_sql($sql,$params)) {
                     $options['eids'] = implode(",", $eids);
@@ -361,7 +361,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         $classname = "datalynxview_{$fieldid}_{$entryid}";
         $required = !empty($options['required']);
 
-        $selected = !empty($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : 0;
+        $selected = !empty($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : '';
 
         $authorid = isset($entry->userid) ? $entry->userid : $USER->id;
 
