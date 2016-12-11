@@ -607,6 +607,7 @@ $string['statusrequired'] = 'Status must be set!';
 $string['fromaftertoday_error'] = '\'From\' date cannot be set after today\'s date!';
 $string['editmode'] = 'Edit mode';
 $string['managemode'] = 'Manage mode';
+$string['maxteamsize_error_form'] = 'You can select only a maximum of {$a} team members!';
 $string['minteamsize'] = 'Minimum team size';
 $string['minteamsize_help'] = 'Enter the miminum allowed number of team members here.';
 $string['minteamsize_error_value'] = 'Minimum team size cannot be greater than the maximum team size!';
