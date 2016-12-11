@@ -32,27 +32,25 @@ class datalynxfield_text_form extends datalynxfield_form {
         global $OUTPUT;
 
         $mform = &$this->_form;
-        
+
         // -------------------------------------------------------------------------------
-        $mform->addElement('header', 'fieldattributeshdr', 
+        $mform->addElement('header', 'fieldattributeshdr',
                 get_string('fieldattributes', 'datalynx'));
-        
+
         // auto link
         $mform->addElement('checkbox', 'param1', get_string('fieldallowautolink', 'datalynx'));
-        
+
         // field width
         $fieldwidthgrp = array();
         $fieldwidthgrp[] = &$mform->createElement('text', 'param2', null, array('size' => '8'));
-        $fieldwidthgrp[] = &$mform->createElement('select', 'param3', null, 
+        $fieldwidthgrp[] = &$mform->createElement('select', 'param3', null,
                 array('px' => 'px', 'em' => 'em', '%' => '%'));
-        $mform->addGroup($fieldwidthgrp, 'fieldwidthgrp', get_string('fieldwidth', 'datalynx'), 
+        $mform->addGroup($fieldwidthgrp, 'fieldwidthgrp', get_string('fieldwidth', 'datalynx'),
                 array(' '), false);
         $mform->setType('param2', PARAM_INT);
-        $mform->addGroupRule('fieldwidthgrp', 
+        $mform->addGroupRule('fieldwidthgrp',
                 array('param2' => array(array(null, 'numeric', null, 'client'))));
         $mform->disabledIf('param3', 'param2', 'eq', '');
-        // //$mform->addHelpButton('fieldwidthgrp', array("fieldwidth", get_string('fieldwidth',
-        // 'datalynx'), 'datalynx'));
         $mform->setDefault('param2', '');
         $mform->setDefault('param3', 'px');
 
@@ -79,29 +77,29 @@ class datalynxfield_text_form extends datalynxfield_form {
         // rules
         // -------------------------------------------------------------------------------
         $mform->addElement('header', 'fieldruleshdr', get_string('fieldrules', 'datalynx'));
-        
+
         // format rules
-        $options = array('' => get_string('choosedots'), 
-            'alphanumeric' => get_string('err_alphanumeric', 'form'), 
-            'lettersonly' => get_string('err_lettersonly', 'form'), 
-            'numeric' => get_string('err_numeric', 'form'), 
-            'email' => get_string('err_email', 'form'), 
+        $options = array('' => get_string('choosedots'),
+            'alphanumeric' => get_string('err_alphanumeric', 'form'),
+            'lettersonly' => get_string('err_lettersonly', 'form'),
+            'numeric' => get_string('err_numeric', 'form'),
+            'email' => get_string('err_email', 'form'),
             'nopunctuation' => get_string('err_nopunctuation', 'form'));
         $mform->addElement('select', 'param4', get_string('format'), $options);
-        
+
         // length (param5, 6, 7): min, max, range
-        $options = array('' => get_string('choosedots'), 
-            'minlength' => get_string('min', 'datalynx'), 
-            'maxlength' => get_string('max', 'datalynx'), 
+        $options = array('' => get_string('choosedots'),
+            'minlength' => get_string('min', 'datalynx'),
+            'maxlength' => get_string('max', 'datalynx'),
             'rangelength' => get_string('range', 'datalynx'));
         $grp = array();
         $grp[] = &$mform->createElement('select', 'param5', null, $options);
         $grp[] = &$mform->createElement('text', 'param6', null, array('size' => 8));
         $grp[] = &$mform->createElement('text', 'param7', null, array('size' => 8));
         $mform->addGroup($grp, 'lengthgrp', get_string('numcharsallowed', 'datalynx'), '    ', false);
-        $mform->addGroupRule('lengthgrp', 
+        $mform->addGroupRule('lengthgrp',
                 array('param6' => array(array(null, 'numeric', null, 'client'))));
-        $mform->addGroupRule('lengthgrp', 
+        $mform->addGroupRule('lengthgrp',
                 array('param7' => array(array(null, 'numeric', null, 'client'))));
         $mform->disabledIf('param6', 'param5', 'eq', '');
         $mform->disabledIf('param6', 'param5', 'eq', 'maxlength');
@@ -120,7 +118,6 @@ class datalynxfield_text_form extends datalynxfield_form {
      * @return string[] Associative array with errors
      */
     function validation($data, $files) {
-        $errors = array();
 
         $errors = parent::validation($data, $files);
 
@@ -143,13 +140,14 @@ class datalynxfield_text_form extends datalynxfield_form {
     }
 
     /**
-     * Returns a list of entries with duplicate content in the given text field, if there are any
+     * Returns a list of entries with duplicate content in the given text field
      * @return $array entries with duplicate content (entryid, content)
      */
     function get_list_of_duplicates() {
         global $DB;
 
         $fieldid = $this->_field->id();
+
         if (empty($fieldid)) {
             return false;
         }
@@ -158,7 +156,7 @@ class datalynxfield_text_form extends datalynxfield_form {
                                      FROM {datalynx_contents} c
                                     WHERE c.fieldid = :fieldid AND c.content IS NOT NULL
                                  GROUP BY c.content
-                                 HAVING amount > 1", array('fieldid' => $fieldid));
+                                   HAVING amount > 1", array('fieldid' => $fieldid));
         $list_of_duplicates = array();
         foreach($records as $record) {
             $ids = $DB->get_fieldset_sql("SELECT c.entryid
