@@ -24,7 +24,7 @@
 require_once ("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
 
-class datalynxfield_datalynxview extends datalynxfield_no_content {
+class datalynxfield_datalynxview extends datalynxfield_base {
 
     public $type = 'datalynxview';
 
@@ -40,18 +40,18 @@ class datalynxfield_datalynxview extends datalynxfield_no_content {
 
     public function __construct($df = 0, $field = 0) {
         global $DB;
-        
+
         parent::__construct($df, $field);
-        
+
         // Get the datalynx
         if (empty($this->field->param1) or
                  !$data = $DB->get_record('datalynx', array('id' => $this->field->param1))) {
             return;
         }
-        
+
         $datalynx = new datalynx($data, null);
         // TODO Add capability check on view entries
-        
+
         // Get the view
         if (empty($this->field->param2) or !$view = $datalynx->get_view_from_id($this->field->param2)) {
             return;
@@ -60,6 +60,10 @@ class datalynxfield_datalynxview extends datalynxfield_no_content {
         $this->refview = $view;
         $this->localview = $this->df->get_current_view();
         $this->reffilterid = $this->field->param3 ? $this->field->param3 : 0;
+    }
+
+    public function is_editable() {
+        return true;
     }
 }
 

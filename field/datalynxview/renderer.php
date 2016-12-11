@@ -35,7 +35,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
 
     /**
      */
-    public function replacements(array $tags = null, $entry = null, array $options = null) {
+    /*public function replacements(array $tags = null, $entry = null, array $options = null) {
 
         $replacements = array();
 
@@ -51,19 +51,23 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
             );
         }
         return $replacements;
-    }
+    }*/
 
+	public function render_display_mode(stdClass $entry, array $params) {
+		return $this->display_browse($entry, 'embedded');
+	}
+	
     /**
      *
      */
     protected function display_browse($entry, $type = null) {
-
+        echo "DISPLAY BROWSE!";
         $field = $this->_field;
 
         if (empty($field->refdatalynx) or empty($field->refview)) {
             return '';
         }
-        
+
         // Inline
         if (empty($type)) {
             // TODO Including controls seems to mess up the hosting view controls
@@ -75,32 +79,32 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         if ($type == 'overlay') {
             $this->add_overlay_support();
             $voptions = array('controls' => false);
-            $widgetbody = html_writer::tag('div', 
-                    $this->get_view_display_content($entry, $voptions), 
+            $widgetbody = html_writer::tag('div',
+                    $this->get_view_display_content($entry, $voptions),
                     array('class' => "yui3-widget-bd"));
             $panel = html_writer::tag('div', $widgetbody, array('class' => 'panelContent hide'));
-            $button = html_writer::tag('button', 
+            $button = html_writer::tag('button',
                     get_string('viewbutton', 'datalynxfield_datalynxview'));
-            $wrapper = html_writer::tag('div', $button . $panel, 
+            $wrapper = html_writer::tag('div', $button . $panel,
                     array('class' => 'datalynxfield-datalynxview overlay'));
             return $wrapper;
         }
-        
+
         // Embedded
         if ($type == 'embedded') {
             return $this->get_view_display_embedded($entry);
         }
-        
+
         // Embedded Overlay
         if ($type == 'embeddedoverlay') {
             $this->add_overlay_support();
-            
-            $widgetbody = html_writer::tag('div', $this->get_view_display_embedded($entry), 
+
+            $widgetbody = html_writer::tag('div', $this->get_view_display_embedded($entry),
                     array('class' => "yui3-widget-bd"));
             $panel = html_writer::tag('div', $widgetbody, array('class' => 'panelContent hide'));
-            $button = html_writer::tag('button', 
+            $button = html_writer::tag('button',
                     get_string('viewbutton', 'datalynxfield_datalynxview'));
-            $wrapper = html_writer::tag('div', $button . $panel, 
+            $wrapper = html_writer::tag('div', $button . $panel,
                     array('class' => 'datalynxfield-datalynxview embedded overlay'));
             return $wrapper;
         }
@@ -111,8 +115,9 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
     /**
      */
     protected function get_view_display_content($entry, array $options = array()) {
+        echo "VIEW DISPLAY CONTENT!";
         $field = $this->_field;
-        
+
         $refdatalynx = $field->refdatalynx;
         $refview = $field->refview;
 
@@ -123,15 +128,15 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         $foptions = $this->get_filter_by_options($foptions, $entry);
 
         $refview->set_filter($foptions, true);
-        
+
         // Set the ref datalynx
-        $params = array('js' => true, 'css' => true, 'modjs' => true, 'completion' => true, 
+        $params = array('js' => true, 'css' => true, 'modjs' => true, 'completion' => true,
             'comments' => true);
-        
+
         // Ref datalynx page type defaults to external
         $refpagetype = !empty($options['pagetype']) ? $options['pagetype'] : 'external';
         $pageoutput = $refdatalynx->set_page('external', $params, true);
-        
+
         $refview->set_content();
         // Set to return html
         $options['tohtml'] = true;
@@ -143,9 +148,10 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
     /**
      */
     protected function get_view_display_embedded($entry) {
+        echo "VIEW DISPLAY EMBED!";
         $field = $this->_field;
         $fieldname = preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $field->name()));
-        
+
         // Construct the src url
         $params = array('d' => $field->refdatalynx->id(), 'view' => $field->refview->id());
         if ($field->reffilterid) {
@@ -168,29 +174,30 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         }
 
         $srcurl = new moodle_url('/mod/datalynx/embed.php', $params);
-        
+
         // Frame
-        $froptions = array('src' => $srcurl, 'width' => '100%', 'height' => '100%', 
+        $froptions = array('src' => $srcurl, 'width' => '100%', 'height' => '100%',
             'style' => 'border:0;');
         $iframe = html_writer::tag('iframe', null, $froptions);
-        return html_writer::tag('div', $iframe, 
+        return html_writer::tag('div', $iframe,
                 array('class' => "datalynxfield-datalynxview-$fieldname embedded"));
     }
 
     /**
      */
     protected function add_overlay_support() {
+        echo "ADD OVERLAY SUPPORT!";
         global $PAGE;
-        
+
         static $added = false;
-        
+
         if (!$added) {
-            $module = array('name' => 'M.datalynxfield_datalynxview_overlay', 
-                'fullpath' => '/mod/datalynx/field/datalynxview/datalynxview.js', 
+            $module = array('name' => 'M.datalynxfield_datalynxview_overlay',
+                'fullpath' => '/mod/datalynx/field/datalynxview/datalynxview.js',
                 'requires' => array('base', 'node')
             );
-            
-            $PAGE->requires->js_init_call('M.datalynxfield_datalynxview_overlay.init', null, false, 
+
+            $PAGE->requires->js_init_call('M.datalynxfield_datalynxview_overlay.init', null, false,
                     $module);
         }
     }
@@ -198,8 +205,9 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
     /**
      */
     protected function get_filter_by_options(array $options, $entry, $urlquery = false) {
+        echo "GET FILTER BY OPTIONS!";
         $field = $this->_field;
-        
+
         if (!empty($field->field->param6)) {
             list($filterauthor, $filtergroup) = explode(',', $field->field->param6);
             // Entry author
@@ -232,10 +240,10 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
      */
     protected function get_sort_options() {
         $field = $this->_field;
-        
+
         $refdatalynx = $field->refdatalynx;
         $refview = $field->refview;
-        
+
         $soptions = array();
         // Custom sort (ref-field-patten,ASC/DESC)
         if (!empty($field->field->param4)) {
@@ -258,17 +266,17 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
     protected function get_search_options($entry) {
         $field = $this->_field;
         $soptions = array();
-        
+
         // Custom search (AND/OR,ref-field-patten,[NOT],OPT,local-field-pattern/value
         if (empty($field->field->param5)) {
             return $soptions;
         }
-        
+
         if (!$refdatalynx = $field->refdatalynx or !$refview = $field->refview or
                  !$localview = $field->localview) {
             return $soptions;
         }
-        
+
         foreach (explode("\n", $field->field->param5) as $key => $searchy) {
             list($andor, $refpattern, $not, $operator, $localpattern) = explode(',', $searchy);
             // And/or
@@ -295,14 +303,14 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
                     $value = $localfield->get_search_value($value);
                 }
             }
-            
+
             // Add to the search options
             if (empty($soptions[$rfieldid])) {
                 $soptions[$rfieldid] = array('AND' => array(), 'OR' => array());
             }
             $soptions[$rfieldid][$andor][] = array($not, $operator, $value);
         }
-        
+
         return $soptions;
     }
 
@@ -319,5 +327,33 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         $patterns["[[$fieldname:embeddedoverlay]]"] = array(false);
 
         return $patterns;
+    }
+
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options = null) {
+        global $PAGE, $USER;
+
+        /* @var $field datalynxfield_datalynxview */
+        $field = $this->_field;
+        $fieldid = $field->id();
+        $entryid = $entry->id;
+        $fieldname = "field_{$fieldid}_$entryid";
+        $classname = "datalynxview_{$fieldid}_{$entryid}";
+        $required = !empty($options['required']);
+
+        $selected = !empty($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : 0;
+
+        $authorid = isset($entry->userid) ? $entry->userid : $USER->id;
+
+        // TODO replace with textfield-values
+        if ($field->refdatalynx !== null && !empty($field->field->param7)) {
+            $menu = array('' => get_string('choose')) + $field->refdatalynx->get_distinct_textfieldvalues_by_id($field->field->param7);
+        }
+
+        $mform->addElement('autocomplete', $fieldname, null, $menu, array('class'    => "datalynxfield_datalynxview $classname"));
+        $mform->setType($fieldname, PARAM_NOTAGS);
+        $mform->setDefault($fieldname, $selected);
+        if ($required) {
+            $mform->addRule("{$fieldname}", '', 'required', null, 0, 'client');
+        }
     }
 }
