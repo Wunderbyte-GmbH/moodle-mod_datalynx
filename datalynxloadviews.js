@@ -31,6 +31,7 @@ M.mod_datalynx_load_views.init = function(Y, options) {
         var dffield = options.dffield;
         var viewfield = options.viewfield;
         var filterfield = options.filterfield;
+        var textfieldfield = options.textfieldfield;
         var actionurl = options.acturl;
 
         Y.on('change', function(e) {
@@ -41,18 +42,24 @@ M.mod_datalynx_load_views.init = function(Y, options) {
             // get filter select
             var filter = Y.Node.one('#id_' + filterfield);
 
+            // get textfield select
+            var textfield = Y.Node.one('#id_' + textfieldfield);
+
             // get the datalynx id
             var dfid = this.get('options').item(this.get('selectedIndex')).get('value');
 
-            // remove view and filter options (but the first choose) from view select
+            // remove view, filter, textfield options (but the first choose) from view select
             var viewchoose = view.get('options').item(0);
             view.setContent(viewchoose);
             view.set('selectedIndex', 0);           
             var filterchoose = filter.get('options').item(0);
             filter.setContent(filterchoose);
-            filter.set('selectedIndex', 0);           
+            filter.set('selectedIndex', 0);
+            var textfieldchoose = textfield.get('options').item(0);
+            textfield.setContent(textfieldchoose);
+            textfield.set('selectedIndex', 0);
 
-            // load views and filters from datalynx
+            // load views, filters, textfields from datalynx
             if (dfid != 0) {
 
                 Y.io(actionurl, {
@@ -61,11 +68,12 @@ M.mod_datalynx_load_views.init = function(Y, options) {
                     on: {
                         success: function (id, o) {
                             if (o.responseText != '') {
+                                console.log(o.responseText);
                                 var respoptions = o.responseText.split('#');
+
                                 // add view options
                                 var viewoptions = respoptions[0].split(',');
-                                //var questoptions = view.get('options');
-		                        for (var i=0;i<viewoptions.length;++i) {
+ 		                        for (var i=0;i<viewoptions.length;++i) {
 		                            var arr = viewoptions[i].trim().split(' ');
                                     var qid = arr.shift();
                                     var qname = arr.join(' ');
@@ -74,17 +82,25 @@ M.mod_datalynx_load_views.init = function(Y, options) {
                                 
                                 // add filter options
                                 var filteroptions = respoptions[1].split(',');
-                                //var questoptions = view.get('options');
-		                        for (var i=0;i<filteroptions.length;++i) {
+ 		                        for (var i=0;i<filteroptions.length;++i) {
 		                            var arr = filteroptions[i].trim().split(' ');
                                     var qid = arr.shift();
                                     var qname = arr.join(' ');
 		                            filter.append(Y.Node.create('<option value="'+qid+'">'+qname+'</option>'));
 	                            }
+
+                                // add textfield options
+                                var textfieldoptions = respoptions[2].split(',');
+                                for (var i=0;i<textfieldoptions.length;++i) {
+                                    var arr = textfieldoptions[i].trim().split(' ');
+                                    var qid = arr.shift();
+                                    var qname = arr.join(' ');
+                                    textfield.append(Y.Node.create('<option value="'+qid+'">'+qname+'</option>'));
+                                }
                             }
                         },
                         failure: function (id, o) {
-		                    // do something
+		                    console.log("Error while loading views, filters and textfields.")
                         }
                     }
                 });

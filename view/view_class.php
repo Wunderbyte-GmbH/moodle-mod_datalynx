@@ -739,10 +739,27 @@ abstract class datalynxview_base {
      * @return array of strings (field pattern used in the view)
      */
     public function field_tags() {
+        global $DB;
+
         $patterns = array();
         if ($fields = $this->_df->get_fields()) {
             foreach ($fields as $field) {
-                if ($fieldpatterns = $field->renderer()->get_menu()) {
+                if ($field->type == "datalynxview") {
+                    $textfieldids = array();
+                    if($field->field->param7) {
+                        $textfieldids = explode(",", $field->field->param7);
+                    }
+                   foreach($textfieldids as $fieldid)  {
+                       if($fieldname = $DB->get_field('datalynx_fields', 'name', array('id' => $fieldid))) {
+                           if ($fieldpatterns = $field->renderer()->get_menu()) {
+                               $fieldpatterns->Fields->Fields = str_replace($field->field->name,
+                                   $field->field->name . ':' . $fieldname, $fieldpatterns->Fields->Fields);
+                               $patterns = array_merge_recursive($patterns, $fieldpatterns);
+                           }
+                       }
+                   }
+                }
+                 else if ($fieldpatterns = $field->renderer()->get_menu()) {
                     $patterns = array_merge_recursive($patterns, $fieldpatterns);
                 }
             }

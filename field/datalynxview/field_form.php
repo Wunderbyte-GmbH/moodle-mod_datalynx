@@ -27,6 +27,7 @@ require_once ("$CFG->dirroot/mod/datalynx/field/field_form.php");
 class datalynxfield_datalynxview_form extends datalynxfield_form {
 
     /**
+     * Overrides the field_definition of field/field_form.php for the datalynx_view field-type
      */
     function field_definition() {
         global $CFG, $PAGE, $DB;
@@ -51,7 +52,7 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
             }
         }
         
-        // Datalynxs menu
+        // select Datalynx instance (to be stored in param1)
         if ($datalynxs) {
             $dfmenu = array('' => array(0 => get_string('choosedots')));
             foreach ($datalynxs as $dfid => $df) {
@@ -68,14 +69,14 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
                 get_string('datalynx', 'datalynxfield_datalynxview'), $dfmenu);
         $mform->addHelpButton('param1', 'datalynx', 'datalynxfield_datalynxview');
         
-        // Views menu
+        // Select view of given instance (stored in param2)
         $options = array(0 => get_string('choosedots'));
         $mform->addElement('select', 'param2', get_string('view', 'datalynxfield_datalynxview'), 
                 $options);
         $mform->disabledIf('param2', 'param1', 'eq', 0);
         $mform->addHelpButton('param2', 'view', 'datalynxfield_datalynxview');
         
-        // Filters menu
+        // Select filter of given instance (stored in param3)
         $options = array(0 => get_string('choosedots'));
         $mform->addElement('select', 'param3', get_string('filter', 'datalynxfield_datalynxview'), 
                 $options);
@@ -83,7 +84,7 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
         $mform->disabledIf('param3', 'param2', 'eq', 0);
         $mform->addHelpButton('param3', 'filter', 'datalynxfield_datalynxview');
         
-        // Filter by entry attributes (param6)
+        // Special filter by entry attributes "author" AND/OR "group" (to be stored in param6)
         $grp = array();
         $grp[] = &$mform->createElement('advcheckbox', 'entryauthor', null, 
                 get_string('entryauthor', 'datalynxfield_datalynxview'), null, array(0, 1));
@@ -92,32 +93,28 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
         $mform->addGroup($grp, 'filterbyarr', get_string('filterby', 'datalynxfield_datalynxview'), 
                 '<br />', false);
         $mform->addHelpButton('filterbyarr', 'filterby', 'datalynxfield_datalynxview');
-        
-        // Custom sort options
-        $mform->addElement('textarea', 'param4', 
-                get_string('customsort', 'datalynxfield_datalynxview'), 
-                array('rows' => '5', 'cols' => '60'));
-        $mform->setType('param4', PARAM_NOTAGS);
-        $mform->disabledIf('param4', 'param1', 'eq', 0);
-        $mform->disabledIf('param4', 'param2', 'eq', 0);
-        $mform->addHelpButton('param4', 'customsort', 'datalynxfield_datalynxview');
-        
-        // Custom search options
-        $mform->addElement('textarea', 'param5', 
-                get_string('customsearch', 'datalynxfield_datalynxview'), 
-                array('rows' => '5', 'cols' => '60'));
-        $mform->setType('param5', PARAM_NOTAGS);
-        $mform->disabledIf('param5', 'param1', 'eq', 0);
-        $mform->disabledIf('param5', 'param2', 'eq', 0);
-        $mform->addHelpButton('param5', 'customsearch', 'datalynxfield_datalynxview');
-        
+
+        // Select textfields of given instance (stored in param7)
+        $options = array(0 => get_string('choosedots'));
+        $mform->addElement('select', 'param7', get_string('textfield', 'datalynxfield_datalynxview'),
+            $options);
+        $mform->disabledIf('param7', 'param1', 'eq', 0);
+        $mform->addHelpButton('param7', 'textfield', 'datalynxfield_datalynxview');
+
         // ajax view loading
-        $options = array('dffield' => 'param1', 'viewfield' => 'param2', 'filterfield' => 'param3', 
-            'acturl' => "$CFG->wwwroot/mod/datalynx/loaddfviews.php");
+        $options = array(
+            'dffield' => 'param1',
+            'viewfield' => 'param2',
+            'filterfield' => 'param3',
+            'textfieldfield' => 'param7',
+            'acturl' => "$CFG->wwwroot/mod/datalynx/loaddfviews.php"
+        );
         
-        $module = array('name' => 'M.mod_datalynx_load_views', 
+        $module = array(
+            'name' => 'M.mod_datalynx_load_views',
             'fullpath' => '/mod/datalynx/datalynxloadviews.js', 
-            'requires' => array('base', 'io', 'node'));
+            'requires' => array('base', 'io', 'node')
+        );
         
         $PAGE->requires->js_init_call('M.mod_datalynx_load_views.init', array($options), false, $module);
     }
@@ -138,7 +135,7 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
         } else {
             $viewid = 0;
         }
-        
+
         if ($datalynxid) {
             if ($views = $DB->get_records_menu('datalynx_views', array('dataid' => $datalynxid), 'name', 'id,name')) {
                 $configview = &$this->_form->getElement('param2');
@@ -149,12 +146,18 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
             
             if ($viewid) {
                 if ($filters = $DB->get_records_menu('datalynx_filters', 
-                        array('dataid' => $datalynxid
-                        ), 'name', 'id,name')) {
+                        array('dataid' => $datalynxid), 'name', 'id,name')) {
                     $configfilter = &$this->_form->getElement('param3');
                     foreach ($filters as $key => $value) {
                         $configfilter->addOption(strip_tags(format_string($value, true)), $key);
                     }
+                }
+            }
+            if ($textfields = $DB->get_records_menu('datalynx_fields',
+                                array('dataid' => $datalynxid, 'type' => 'text'), 'name', 'id,name')) {
+                $configtextfields = &$this->_form->getElement('param7');
+                foreach ($textfields as $key => $value) {
+                    $configtextfields->addOption(strip_tags(format_string($value, true)), $key);
                 }
             }
         }
@@ -197,7 +200,7 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
         $errors = array();
         
         if (!empty($data['param1']) and empty($data['param2'])) {
-            $errors['param2'] = get_string('missingview', 'mod_datalynx_view');
+            $errors['param2'] = get_string('missingview', 'datalynxfield_datalynxview');
         }
         
         return $errors;
