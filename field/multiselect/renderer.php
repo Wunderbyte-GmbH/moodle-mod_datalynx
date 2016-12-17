@@ -36,6 +36,11 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
      */
     protected $_field = null;
 
+    /**
+     * 
+     * {@inheritDoc}
+     * @see datalynxfield_renderer::render_edit_mode()
+     */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $field = $this->_field;
         $fieldid = $field->id();
@@ -70,6 +75,12 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
         }
     }
 
+    /**
+     * transform the raw database value into HTML suitable for displaying on the entry page
+     * (non-PHPdoc)
+     * @see datalynxfield_renderer::render_display_mode()
+     * @return string HTML
+     */
     public function render_display_mode(stdClass $entry, array $params) {
         $field = $this->_field;
         $fieldid = $field->id();
@@ -102,6 +113,11 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
         return $str;
     }
 
+    /**
+     * 
+     * {@inheritDoc}
+     * @see datalynxfield_renderer::render_search_mode()
+     */
     public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
         global $CFG;
         HTML_QuickForm::registerElementType('checkboxgroup', 
@@ -124,23 +140,35 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
         return array(array($select), null);
     }
 
+    /**
+     * 
+     * {@inheritDoc}
+     * @see datalynxfield_renderer::validate()
+     */
     public function validate($entryid, $tags, $formdata) {
-        $fieldid = $this->_field->id();
-        
-        $formfieldname = "field_{$fieldid}_{$entryid}";
-        
-        $errors = array();
-        foreach ($tags as $tag) {
-            list(, $behavior, ) = $this->process_tag($tag);
-            /* @var $behavior datalynx_field_behavior */
-            
-            if ($behavior->is_required()) {
-                if (empty($formdata->$formfieldname)) {
-                    $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
-                }
-            }
-        }
-        
-        return $errors;
+    	$fieldid = $this->_field->id();
+    	$formfieldname = "field_{$fieldid}_{$entryid}";
+    
+    	$errors = array();
+    	foreach ($tags as $tag) {
+    		list(, $behavior, ) = $this->process_tag($tag);
+    		/* @var $behavior datalynx_field_behavior */
+    
+    		if ($behavior->is_required()) {
+    			if (empty($formdata->$formfieldname)) {
+    				$errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
+    			} else {
+    				$empty = true;
+    				foreach ($formdata->$formfieldname as $value) {
+    					$empty = $empty && empty($value);
+    				}
+    				if ($empty) {
+    					$errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
+    				}
+    			}
+    		}
+    	}
+    
+    	return $errors;
     }
 }

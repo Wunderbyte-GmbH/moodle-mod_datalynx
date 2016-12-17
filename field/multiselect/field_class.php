@@ -37,19 +37,6 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
 
     /**
      */
-    public function parse_search($formdata, $i) {
-        $fieldname = "f_{$i}_{$this->field->id}";
-        $selected = optional_param($fieldname, array(), PARAM_NOTAGS);
-        if ($selected) {
-            $allrequired = optional_param("{$fieldname}_allreq", 0, PARAM_BOOL);
-            return array('selected' => $selected, 'allrequired' => $allrequired);
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
         // import only from csv
         if ($csvrecord) {

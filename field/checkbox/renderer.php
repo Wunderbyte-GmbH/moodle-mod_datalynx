@@ -23,16 +23,19 @@
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once (dirname(__FILE__) . "/../renderer.php");
+require_once (dirname(__FILE__) . "/../multiselect/renderer.php");
 
 
 /**
  * Class datalynxfield_checkbox_renderer Renderer for checkbox field type
  */
-class datalynxfield_checkbox_renderer extends datalynxfield_renderer {
+class datalynxfield_checkbox_renderer extends datalynxfield_multiselect_renderer {
 
-    protected $_field = null;
-
+	/**
+	 * 
+	 * {@inheritDoc}
+	 * @see datalynxfield_renderer::render_edit_mode()
+	 */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $field = $this->_field;
         $fieldid = $field->id();
@@ -75,90 +78,4 @@ class datalynxfield_checkbox_renderer extends datalynxfield_renderer {
         }
     }
 
-    /**
-     * transform the raw database value into HTML suitable for displaying on the entry page
-     * (non-PHPdoc)
-     * @see datalynxfield_renderer::render_display_mode()
-     * @return string HTML
-     */
-    public function render_display_mode(stdClass $entry, array $params) {
-        $field = $this->_field;
-        $fieldid = $field->id();
-        
-        if (isset($entry->{"c{$fieldid}_content"})) {
-            $content = $entry->{"c{$fieldid}_content"};
-            $contentprepare = str_replace("#", "", $content);
-
-            $options = $field->options_menu();
-            
-            $contents = explode(',',$contentprepare);
-            
-            $str = array();
-            foreach ($options as $key => $option) {
-                $selected = (int) in_array($key, $contents);
-                if ($selected) {
-                    $str[] = $option;
-                }
-            }
-            $separator = $field->separators[(int) $field->get('param3')]['chr'];
-            if ($separator == '</li><li>' && count($str) > 0) {
-                $str = '<ul><li>' . implode($separator, $str) . '</li></ul>';
-            } else {
-                $str = implode($separator, $str);
-            }
-        } else {
-            $str = '';
-        }
-        
-        return $str;
-    }
-
-    public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
-        global $CFG;
-        HTML_QuickForm::registerElementType('checkboxgroup', 
-                "$CFG->dirroot/mod/datalynx/checkboxgroup/checkboxgroup.php", 
-                'HTML_QuickForm_checkboxgroup');
-        
-        $field = $this->_field;
-        $fieldid = $field->id();
-        
-        $selected = $value;
-        
-        $options = $field->options_menu();
-        
-        $fieldname = "f_{$i}_$fieldid";
-        $select = &$mform->createElement('checkboxgroup', $fieldname, null, $options, '');
-        $select->setValue($selected);
-        
-        $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
-        
-        return array(array($select), null);
-    }
-
-    public function validate($entryid, $tags, $formdata) {
-        $fieldid = $this->_field->id();
-        $formfieldname = "field_{$fieldid}_{$entryid}";
-        
-        $errors = array();
-        foreach ($tags as $tag) {
-            list(, $behavior, ) = $this->process_tag($tag);
-            /* @var $behavior datalynx_field_behavior */
-            
-            if ($behavior->is_required()) {
-                if (empty($formdata->$formfieldname)) {
-                    $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
-                } else {
-                    $empty = true;
-                    foreach ($formdata->$formfieldname as $value) {
-                        $empty = $empty && empty($value);
-                    }
-                    if ($empty) {
-                        $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
-                    }
-                }
-            }
-        }
-        
-        return $errors;
-    }
 }
