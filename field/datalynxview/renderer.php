@@ -175,14 +175,21 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
 
         $textfieldid = $this->_field->field->param7;
         if($textfieldcontent && $textfieldid) {
-            $sql = "SELECT entryid FROM {datalynx_contents} 
-                     WHERE fieldid = :fieldid AND content = :content
-                  ORDER BY content ";
+            $sql = "SELECT c.entryid FROM {datalynx_contents} as c INNER JOIN {datalynx_entries} as e
+                        ON e.id = c.entryid
+                     WHERE c.fieldid = :fieldid AND c.content = :content ";
+            if(isset($foptions['users'])){
+                $users = implode(",", $foptions['users']);
+                $sql .= " AND e.userid IN (" . $users . ")";
+            }
             $sqlparams['fieldid'] = $textfieldid;
             $sqlparams['content'] = $textfieldcontent;
             $eids = $DB->get_fieldset_sql($sql, $sqlparams);
             if($eids) {
                 $foptions['eids'] = implode(",", $eids);
+            } else {
+                //display nothing if no entries were found
+                return '';
             }
         } else {
             //better display nothing than too much
@@ -257,30 +264,36 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         if ($field->reffilterid) {
             $params['filter'] = $field->reffilterid;
         }
+        // Search filter by entry author or group
+        $params = $this->get_filter_by_options($params, $entry, true);
+
         $textfieldid = $field->field->param7;
         if($textfieldcontent && $textfieldid) {
-            $sql = "SELECT entryid FROM {datalynx_contents} 
-                     WHERE fieldid = :fieldid AND content = :content
-                  ORDER BY content ";
+            $sql = "SELECT c.entryid FROM {datalynx_contents} as c INNER JOIN {datalynx_entries} as e
+                        ON e.id = c.entryid
+                     WHERE c.fieldid = :fieldid AND c.content = :content ";
+            if(isset($params['users'])){
+                $sql .= " AND e.userid IN (" . $params['users'] . ")";
+            }
             $sqlparams['fieldid'] = $textfieldid;
             $sqlparams['content'] = $textfieldcontent;
             $eids = $DB->get_fieldset_sql($sql, $sqlparams);
             if($eids) {
                 $params['eids'] = implode(",", $eids);
+            } else {
+                // display nothing if no entries were found
+                return '';
             }
         } else {
             //better display nothing than too much
             return '';
         }
 
-        // Search filter by entry author or group
-        $params = $this->get_filter_by_options($params, $entry, true);
-
         $srcurl = new moodle_url('/mod/datalynx/embed.php', $params);
 
         // Frame
-        $froptions = array('src' => $srcurl, 'width' => '100%', 'height' => '100%',
-            'style' => 'border:0;');
+        $froptions = array('src' => $srcurl, 'width' => '100%', 'height' => '100%', 'scrolling' => 'no',
+            'style' => 'border:0;overflow-y:hidden;');
         $iframe = html_writer::tag('iframe', null, $froptions);
         return html_writer::tag('div', $iframe,
             array('class' => "datalynxfield-datalynxview-$fieldname embedded"));
@@ -431,7 +444,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
             $textfieldnames = $this->get_textfields($textfieldids);
             foreach($textfieldnames as $textfield) {
                 $patterns["[[$fieldname:$textfield|textfieldcontent]]"] = array(true);
-                $patterns["[[$fieldname:$textfield|textfieldembedded]]"] = array(false);
+                $patterns["[[$fieldname:$textfield|textfieldembedded]]"] = array(true);
             }
         }
 
