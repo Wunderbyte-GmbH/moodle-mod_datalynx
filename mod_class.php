@@ -2080,4 +2080,21 @@ class datalynx {
         $baseurlparams['d'] = $this->id();
         return new moodle_url("/mod/datalynx/{$this->pagefile()}.php", $baseurlparams);
     }
+
+    public function get_textfieldvalues_by_fieldname($fieldname) {
+        global $DB;
+
+        $textfieldvalues = '';
+
+        $dataid = $this->id();
+        if($fieldid = $DB->get_field('datalynx_fields', 'param7', array('dataid' => $dataid, 'name' => $fieldname))) {
+            $sql = "SELECT c.content FROM {datalynx_contents} as c WHERE c.fieldid = :fieldid ";
+            $sqlparams['fieldid'] = $fieldid;
+            if($contentvalues = $DB->get_fieldset_sql($sql, $sqlparams)) {
+                $textfieldvalues = implode(",", $contentvalues);
+            }
+        }
+        return $textfieldvalues;
+    }
 }
+

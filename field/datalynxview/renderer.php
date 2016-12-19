@@ -38,22 +38,17 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
     public function replacements(array $tags = null, $entry = null, array $options = null) {
 
         $replacements = array();
-        
+
         foreach ($tags as $tag) {
             // No edit mode
             $parts = explode(':', trim($tag, '[]'));
-            $textfieldcontent = '';
-            $type = '';
             if (!empty($parts[1])) {
-                $parts2 = explode('|', $parts[1]);
-                if (!empty($parts2[1])) {
-                    $type = $parts2[1];
-                    if (!empty($parts2[2])) {
-                        $textfieldcontent = $parts2[2];
-                    }
-                }
+                $type = $parts[1];
+            } else {
+                $type = '';
             }
-            $replacements[$tag] = array('html', $this->display_browse($entry, $type, $textfieldcontent));
+            $replacements[$tag] = array('html', $this->display_browse($entry, $type)
+            );
         }
         return $replacements;
     }
@@ -61,7 +56,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
     /**
      *
      */
-    protected function display_browse($entry, $type = null, $textfieldcontent = null) {
+    protected function display_browse($entry, $type = null) {
 
         $field = $this->_field;
 
@@ -69,7 +64,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
             return '';
         }
         
-        // Inline default (without textfield)
+        // Inline
         if (empty($type)) {
             // TODO Including controls seems to mess up the hosting view controls
             $voptions = array('controls' => false);
@@ -110,18 +105,6 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
             return $wrapper;
         }
 
-        // inline with textfield
-        if ($type == 'textfieldcontent') {
-            // TODO Including controls seems to mess up the hosting view controls
-            $voptions = array('controls' => false);
-            return $this->get_view_display_content_textfield($entry, $voptions, $textfieldcontent);
-        }
-
-        // embedded with textfield
-        if ($type == 'textfieldembedded') {
-            return $this->get_view_display_embedded_textfield($entry, $textfieldcontent);
-        }
-
         return '';
     }
 
@@ -149,63 +132,6 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         $refpagetype = !empty($options['pagetype']) ? $options['pagetype'] : 'external';
         $pageoutput = $refdatalynx->set_page('external', $params, true);
         
-        $refview->set_content();
-        // Set to return html
-        $options['tohtml'] = true;
-        $options['fieldview'] = true;
-        $options['entryactions'] = false;
-        return $refview->display($options);
-    }
-
-    /**
-     */
-    protected function get_view_display_content_textfield($entry, array $options = array(), $textfieldcontent = null) {
-        global $DB;
-
-        $field = $this->_field;
-
-        // Options for setting the filter
-        $foptions = array();
-
-        $refdatalynx = $field->refdatalynx;
-        $refview = $field->refview;
-
-        // Search filter by entry author or group
-        $foptions = $this->get_filter_by_options($foptions, $entry);
-
-        $textfieldid = $this->_field->field->param7;
-        if($textfieldcontent && $textfieldid) {
-            $sql = "SELECT c.entryid FROM {datalynx_contents} as c INNER JOIN {datalynx_entries} as e
-                        ON e.id = c.entryid
-                     WHERE c.fieldid = :fieldid AND c.content = :content ";
-            if(isset($foptions['users'])){
-                $users = implode(",", $foptions['users']);
-                $sql .= " AND e.userid IN (" . $users . ")";
-            }
-            $sqlparams['fieldid'] = $textfieldid;
-            $sqlparams['content'] = $textfieldcontent;
-            $eids = $DB->get_fieldset_sql($sql, $sqlparams);
-            if($eids) {
-                $foptions['eids'] = implode(",", $eids);
-            } else {
-                //display nothing if no entries were found
-                return '';
-            }
-        } else {
-            //better display nothing than too much
-            return '';
-        }
-
-        $refview->set_filter($foptions, true);
-
-        // Set the ref datalynx
-        $params = array('js' => true, 'css' => true, 'modjs' => true, 'completion' => true,
-            'comments' => true);
-
-        // Ref datalynx page type defaults to external
-        $refpagetype = !empty($options['pagetype']) ? $options['pagetype'] : 'external';
-        $pageoutput = $refdatalynx->set_page('external', $params, true);
-
         $refview->set_content();
         // Set to return html
         $options['tohtml'] = true;
@@ -250,55 +176,6 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         return html_writer::tag('div', $iframe, 
                 array('class' => "datalynxfield-datalynxview-$fieldname embedded"));
     }
-
-    /**
-     */
-    protected function get_view_display_embedded_textfield($entry, $textfieldcontent) {
-        global $DB;
-
-        $field = $this->_field;
-        $fieldname = preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $field->name()));
-
-        // Construct the src url
-        $params = array('d' => $field->refdatalynx->id(), 'view' => $field->refview->id());
-        if ($field->reffilterid) {
-            $params['filter'] = $field->reffilterid;
-        }
-        // Search filter by entry author or group
-        $params = $this->get_filter_by_options($params, $entry, true);
-
-        $textfieldid = $field->field->param7;
-        if($textfieldcontent && $textfieldid) {
-            $sql = "SELECT c.entryid FROM {datalynx_contents} as c INNER JOIN {datalynx_entries} as e
-                        ON e.id = c.entryid
-                     WHERE c.fieldid = :fieldid AND c.content = :content ";
-            if(isset($params['users'])){
-                $sql .= " AND e.userid IN (" . $params['users'] . ")";
-            }
-            $sqlparams['fieldid'] = $textfieldid;
-            $sqlparams['content'] = $textfieldcontent;
-            $eids = $DB->get_fieldset_sql($sql, $sqlparams);
-            if($eids) {
-                $params['eids'] = implode(",", $eids);
-            } else {
-                // display nothing if no entries were found
-                return '';
-            }
-        } else {
-            //better display nothing than too much
-            return '';
-        }
-
-        $srcurl = new moodle_url('/mod/datalynx/embed.php', $params);
-
-        // Frame
-        $froptions = array('src' => $srcurl, 'width' => '100%', 'height' => '100%', 'scrolling' => 'no',
-            'style' => 'border:0;overflow-y:hidden;');
-        $iframe = html_writer::tag('iframe', null, $froptions);
-        return html_writer::tag('div', $iframe,
-            array('class' => "datalynxfield-datalynxview-$fieldname embedded"));
-    }
-
 
     /**
      */
@@ -440,35 +317,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         $patterns["[[$fieldname:overlay]]"] = array(true);
         $patterns["[[$fieldname:embedded]]"] = array(false);
         $patterns["[[$fieldname:embeddedoverlay]]"] = array(false);
-        if($textfieldids = $this->_field->field->param7) {
-            $textfieldnames = $this->get_textfields($textfieldids);
-            foreach($textfieldnames as $textfield) {
-                $patterns["[[$fieldname:$textfield|textfieldcontent]]"] = array(true);
-                $patterns["[[$fieldname:$textfield|textfieldembedded]]"] = array(true);
-            }
-        }
 
         return $patterns;
-    }
-
-    /**
-     * Get textfields of this datalynxview field if any
-     * array int textfieldids the IDs of the selected textfields in this datalynxview-field
-     * @return array string $textfieldnames
-     */
-    protected function get_textfields($textfieldids=null)
-    {
-        global $DB;
-
-        $textfieldnames = array();
-        $fieldids = explode(",", $textfieldids);
-        if($fieldids) {
-            foreach($fieldids as $fieldid) {
-                if($textfieldname = $DB->get_field('datalynx_fields', 'name', array('id' => $fieldid))) {
-                    $textfieldnames[] = $textfieldname;
-                }
-            }
-        }
-        return $textfieldnames;
     }
 }

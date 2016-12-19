@@ -458,6 +458,7 @@ $string['tagarea_datalynx_contents'] = 'Datalynx entries';
 $string['tagcollection_datalynx'] = 'Datalynx tags';
 $string['teachersandstudents'] = '{$a->teachers} and {$a->students}';
 $string['textbox'] = 'Text box';
+$string['textfieldvalues'] = 'Textfield values';
 $string['timecreated'] = 'Time created';
 $string['timemodified'] = 'Time modified';
 $string['todatalynx'] = 'to this datalynx.';
