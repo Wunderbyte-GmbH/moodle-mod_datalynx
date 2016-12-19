@@ -178,11 +178,10 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
             $sql = "SELECT entryid FROM {datalynx_contents} 
                      WHERE fieldid = :fieldid AND content = :content
                   ORDER BY content ";
-            $params['fieldid'] = $textfieldid;
-            $params['content'] = $textfieldcontent;
-            $eids = $DB->get_fieldset_sql($sql, $params);
+            $sqlparams['fieldid'] = $textfieldid;
+            $sqlparams['content'] = $textfieldcontent;
+            $eids = $DB->get_fieldset_sql($sql, $sqlparams);
             if($eids) {
-                $options['eids'] = implode(",", $eids);
                 $foptions['eids'] = implode(",", $eids);
             }
         } else {
@@ -431,7 +430,8 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         if($textfieldids = $this->_field->field->param7) {
             $textfieldnames = $this->get_textfields($textfieldids);
             foreach($textfieldnames as $textfield) {
-                $patterns["[[$fieldname:$textfield]]"] = array(true);
+                $patterns["[[$fieldname:$textfield|textfieldcontent]]"] = array(true);
+                $patterns["[[$fieldname:$textfield|textfieldembedded]]"] = array(false);
             }
         }
 
