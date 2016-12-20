@@ -1102,7 +1102,7 @@ function datalynx_get_user_grades($data, $userid = 0) {
     $options->modulename = 'datalynx';
     $options->moduleid = $data->id;
     $options->userid = $userid;
-    $options->aggregationmethod = $data->grademethod;
+    $options->aggregationmethod = $data->assessed;
     $options->scaleid = $data->rating;
     $options->itemtable = 'datalynx_entries';
     $options->itemtableusercolumn = 'userid';
@@ -1122,7 +1122,7 @@ function datalynx_update_grades($data = null, $userid = 0, $nullifnone = true) {
     global $CFG, $DB;
     require_once ("$CFG->libdir/gradelib.php");
     
-    if (!$data->rating) {
+    if (!$data->assessed) {
         datalynx_grade_item_update($data);
     } else if ($grades = datalynx_get_user_grades($data, $userid)) {
         datalynx_grade_item_update($data, $grades);
