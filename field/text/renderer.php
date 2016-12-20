@@ -163,8 +163,11 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
                 // Check uniquenes!
                 if ($DB->record_exists_sql("SELECT id
                                               FROM {datalynx_contents} c
-                                             WHERE c.fieldid = :fieldid AND c.content LIKE :content",
+                                             WHERE c.fieldid = :fieldid 
+                                               AND c.entryid <> :entryid 
+                                               AND c.content LIKE :content",
                                            array('fieldid' => $fieldid,
+                                                 'entryid' => $entryid,
                                                  'content' => $formdata->$formfieldname))) {
                     // It's not the first of it's kind!
                     $errors[$formfieldname] = get_string('unique_required', 'datalynx');
