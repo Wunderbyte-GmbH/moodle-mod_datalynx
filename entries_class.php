@@ -122,7 +122,11 @@ class datalynx_entries {
         if (empty($options['filter'])) {
             $filter = $this->filter;
         } else {
-            $filter = $options['filter'];
+            if($filter = $options['filter']) {
+                $optionsfilterusers = $filter->users[0]; // when view is called by a datalynxview_field
+                $optionsfiltergroups = $filter->groups[0]; // when view is called by a datalynxview_field
+                $optionseids = $filter->eids; // when view is called by a datalynxview_field
+            }
         }
         
         // Filter sql
@@ -134,7 +138,9 @@ class datalynx_entries {
         
         // USER filtering
         $whereuser = '';
-        if (!$datalynx->user_can_view_all_entries()) {
+        if(isset($optionsfilterusers)) { // datalynxview_field goes first
+            $whereuser = " AND e.userid = :{$this->sqlparams($params, 'userid', $optionsfilterusers)} ";
+        } else if (!$datalynx->user_can_view_all_entries()) {
             // include only the user's entries
             $whereuser = " AND e.userid = :{$this->sqlparams($params, 'userid', $USER->id)} ";
         } else {
@@ -154,12 +160,15 @@ class datalynx_entries {
         
         // GROUP filtering
         $wheregroup = '';
-        if ($datalynx->currentgroup) {
+
+        if(isset($optionsfiltergroups)) { // datalynxview_field goes first
+            $wheregroup = " AND e.groupid = :{$this->sqlparams($params, 'groupid', $optionsfiltergroups)} ";
+        } else if ($datalynx->currentgroup) {
             $wheregroup = " AND e.groupid = :{$this->sqlparams($params, 'groupid', $datalynx->currentgroup)} ";
         } else {
             // specific groups requested
             if (!empty($filter->groups)) {
-                list($ingroups, $groupparams) = $DB->get_in_or_equal($filter->groups, 
+                list($ingroups, $groupparams) = $DB->get_in_or_equal($filter->groups,
                         SQL_PARAMS_NAMED, 'groups');
                 $whereuser .= " AND e.userid $ingroups ";
                 $params = array_merge($params, array('groups' => $groupparams));
@@ -207,7 +216,16 @@ class datalynx_entries {
                 $whereoptions .= " e.$key = :{$this->sqlparams($params, $key, $val)} ";
             }
         }
-        
+
+        if (isset($optionseids)) { // datalynxview_field's entry-ids as an additional filter
+                                   // (= all entries which match the searched value)
+            $eids = explode(",", $optionseids);
+            list($ineids, $eidparams) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED, 'eid');
+            $whereoptions = " AND e.id $ineids " ;
+            $params = array_merge($params, array( 'eid' => $eidparams));
+        }
+
+
         $fromsql = " $tables $filtertables ";
         $wheresql = " $wheredfid $whereoptions $whereuser $wheregroup $whereapprove $wherestatus $wheresearch";
         $sqlselect = "SELECT $what FROM $fromsql WHERE $wheresql $sortorder";
@@ -242,9 +260,8 @@ class datalynx_entries {
         
         if ($searchcount) {
             // if specific entries requested (eids)
-            if (!empty($filter->eids)) {
-                list($ineids, $eidparams) = $DB->get_in_or_equal($filter->eids, SQL_PARAMS_NAMED, 
-                        'eid');
+            if (!empty($filter->eids && !isset($optionseids))) {
+                list($ineids, $eidparams) = $DB->get_in_or_equal($filter->eids, SQL_PARAMS_NAMED, 'eid');
                 $andwhereeid = " AND e.id $ineids ";
                 
                 $sqlselect = "SELECT $what $whatcontent                                  

@@ -525,14 +525,15 @@ abstract class datalynxview_base {
     }
 
     /**
-     * Retrieve the content for the fields which is savedn in the table datalynx_contents
+     * Retrieve the content for the fields which is saved in the table datalynx_contents
      */
-    public function set_content() {
+    public function set_content(array $options = array()) { //options: added for datalynxview_field calling external view
+                                                            // possible options values: filter, users, groups, eids
         if ($this->_returntoentriesform) {
             return;
         }
         if ($this->_editentries >= 0 or $this->view->perpage != 1) {
-            $this->_entries->set_content();
+            $this->_entries->set_content($options);
         }
     }
 

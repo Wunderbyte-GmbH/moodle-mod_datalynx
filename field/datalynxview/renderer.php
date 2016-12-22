@@ -33,35 +33,31 @@ require_once ("$CFG->dirroot/mod/datalynx/field/entrygroup/field_class.php");
  */
 class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
 
-    /**
+
+    /*
+     * Rendering this field in display mode
+     * called from the replacement-function of datalynxfield_renderer
+     * stdClass @entry   represents the entry which includes this instance of the field
+     * array @params     the type of the display, "embedded" or "overlay" or "" for default
+     * @returns          the function for displaying this field-instance
      */
-    /*public function replacements(array $tags = null, $entry = null, array $options = null) {
-
-        $replacements = array();
-
-        foreach ($tags as $tag) {
-            // No edit mode
-            $parts = explode(':', trim($tag, '[]'));
-            if (!empty($parts[1])) {
-                $type = $parts[1];
-            } else {
-                $type = '';
-            }
-            $replacements[$tag] = array('html', $this->display_browse($entry, $type)
-            );
-        }
-        return $replacements;
-    }*/
-
 	public function render_display_mode(stdClass $entry, array $params) {
-		return $this->display_browse($entry, 'embedded');
+	    if(isset($params['embedded'])) {
+	        $type = "embedded";
+        } else if(isset($params['overlay'])) {
+            $type = "overlay";
+        } else {
+            $type = "";
+        }
+		return $this->display_browse($entry, $type);
 	}
 	
     /**
-     *
+     * Check, which type of display, and call the right display-function
+     * stdClass @entry  the entry object which holds this field
+     * string @type     the type of display
      */
     protected function display_browse($entry, $type = null) {
-        echo "DISPLAY BROWSE!";
         $field = $this->_field;
 
         if (empty($field->refdatalynx) or empty($field->refview)) {
@@ -113,9 +109,12 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * The default display-method, just inline html
+     * stdClass @entry          the entry object this field belongs to
+     * array string @options    array of options for the display-method of the view
+     * @returns                 the display-method of the view
      */
     protected function get_view_display_content($entry, array $options = array()) {
-        echo "VIEW DISPLAY CONTENT!";
         $field = $this->_field;
 
         $refdatalynx = $field->refdatalynx;
@@ -127,6 +126,10 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         // Search filter by entry author or group
         $foptions = $this->get_filter_by_options($foptions, $entry);
 
+        if(!isset($foptions['eids'])) {
+            return "";
+        }
+
         $refview->set_filter($foptions, true);
 
         // Set the ref datalynx
@@ -137,7 +140,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         $refpagetype = !empty($options['pagetype']) ? $options['pagetype'] : 'external';
         $pageoutput = $refdatalynx->set_page('external', $params, true);
 
-        $refview->set_content();
+        $refview->set_content(array( 'filter' =>  $refview->get_filter()));
         // Set to return html
         $options['tohtml'] = true;
         $options['fieldview'] = true;
@@ -146,31 +149,22 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * This display-method builds an iframe which holds a page with the view
+     * stdClass @entry          the entry object this field belongs to
+     * @returns                 the moodle display-method for an iframe
      */
     protected function get_view_display_embedded($entry) {
-        echo "VIEW DISPLAY EMBED!";
         $field = $this->_field;
         $fieldname = preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $field->name()));
 
         // Construct the src url
         $params = array('d' => $field->refdatalynx->id(), 'view' => $field->refview->id());
-        if ($field->reffilterid) {
-            $params['filter'] = $field->reffilterid;
-        }
-        // Search filter by entry author or group
+
+        // Search filter by entry author or group or value
         $params = $this->get_filter_by_options($params, $entry, true);
 
-        // Custom sort
-        if ($soptions = $this->get_sort_options()) {
-            $fm = $this->_df->get_filter_manager();
-            $usort = $fm::get_sort_url_query($soptions);
-            $params['usort'] = $usort;
-        }
-        // Custom search
-        if ($soptions = $this->get_search_options($entry)) {
-            $fm = $this->_df->get_filter_manager();
-            $usearch = $fm::get_search_url_query($soptions);
-            $params['usearch'] = $usearch;
+        if(!isset($params['eids'])) {
+            return "";
         }
 
         $srcurl = new moodle_url('/mod/datalynx/embed.php', $params);
@@ -186,7 +180,6 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
     /**
      */
     protected function add_overlay_support() {
-        echo "ADD OVERLAY SUPPORT!";
         global $PAGE;
 
         static $added = false;
@@ -203,12 +196,19 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Get the filter options for this field instance
+     * and add it to the options array
+     * Should the entries be filtered:
+     * - by the author of this entry object
+     * - by the group to which this entry object belongs to
+     * - by a value, which is stored in datalynx_contents for this field(fieldid) and this entry(entryid)
      */
     protected function get_filter_by_options(array $options, $entry, $urlquery = false) {
-        echo "GET FILTER BY OPTIONS!";
+        global $DB;
+
         $field = $this->_field;
 
-        if (!empty($field->field->param6)) {
+        if (!empty($field->field->param6)) { // param6: author,group
             list($filterauthor, $filtergroup) = explode(',', $field->field->param6);
             // Entry author
             if ($filterauthor) {
@@ -233,6 +233,27 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
                 }
             }
         }
+
+        // With the ID this datalynxview_field and the ID of the parent-entry we retrieve
+        // the content to search for.
+        // Then we get the entry-IDs of the entries which match this content-value
+        // end add them to the options array
+        if($fieldid = $field->field->param7) {  // field-ID of the external field
+            if($content = $DB->get_field('datalynx_contents','content',
+                array('entryid' => $entry->id, 'fieldid' => $field->field->id))) {
+                list($insql, $params) = $DB->get_in_or_equal($content, SQL_PARAMS_NAMED);
+                $params['fieldid'] = $fieldid;
+                $sql = 'SELECT  c.entryid 
+                        FROM    {datalynx_contents} c
+                        WHERE   c.fieldid = :fieldid 
+                        AND     c.content ' . $insql ;
+                if($eids = $DB->get_fieldset_sql($sql,$params)) {
+                    $options['eids'] = implode(",", $eids);
+                }
+
+            }
+        }
+
         return $options;
     }
 
@@ -346,10 +367,11 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
 
         // TODO replace with textfield-values
         if ($field->refdatalynx !== null && !empty($field->field->param7)) {
-            $menu = array('' => get_string('choose')) + $field->refdatalynx->get_distinct_textfieldvalues_by_id($field->field->param7);
+            $menu = array('' => get_string('choose')) +
+                $field->refdatalynx->get_distinct_textfieldvalues_by_id($field->field->param7);
         }
 
-        $mform->addElement('autocomplete', $fieldname, null, $menu, array('class'    => "datalynxfield_datalynxview $classname"));
+        $mform->addElement('autocomplete', $fieldname, null, $menu, array('class' => "datalynxfield_datalynxview $classname"));
         $mform->setType($fieldname, PARAM_NOTAGS);
         $mform->setDefault($fieldname, $selected);
         if ($required) {
