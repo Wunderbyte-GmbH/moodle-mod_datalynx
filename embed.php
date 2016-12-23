@@ -32,6 +32,7 @@ $urlparams->view = optional_param('view', 0, PARAM_INT); // current view id
 $urlparams->filter = optional_param('filter', 0, PARAM_INT); // current filter (-1 for user filter)
 $urlparams->pagelayout = optional_param('pagelayout', '', PARAM_ALPHAEXT);
 $urlparams->refresh = optional_param('refresh', 0, PARAM_INT);
+$urlparams->eids = optional_param('eids', 0, PARAM_SEQUENCE);
 
 // Set a datalynx object with guest autologin
 $df = new datalynx($urlparams->d, $urlparams->id);

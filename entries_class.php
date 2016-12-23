@@ -261,7 +261,8 @@ class datalynx_entries {
         if ($searchcount) {
             // if specific entries requested (eids)
             if (!empty($filter->eids && !isset($optionseids))) {
-                list($ineids, $eidparams) = $DB->get_in_or_equal($filter->eids, SQL_PARAMS_NAMED, 'eid');
+                $eids = explode(",", $filter->eids);
+                list($ineids, $eidparams) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED, 'eid');
                 $andwhereeid = " AND e.id $ineids ";
                 
                 $sqlselect = "SELECT $what $whatcontent                                  

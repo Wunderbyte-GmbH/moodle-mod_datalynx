@@ -1318,7 +1318,7 @@ class datalynx_filter_manager {
             'customsort' => array('usort', '', PARAM_RAW),
             'customsearch' => array('usearch', '', PARAM_RAW),
             'page' => array('page', 0, PARAM_INT),
-            'eids' => array('eids', 0, PARAM_INT),
+            'eids' => array('eids', 0, PARAM_SEQUENCE),
             'users' => array('users', '', PARAM_SEQUENCE),
             'groups' => array('groups', '', PARAM_SEQUENCE),
             'afilter' => array('afilter', 0, PARAM_INT),

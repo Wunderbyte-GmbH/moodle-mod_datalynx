@@ -36,10 +36,10 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
 
     /*
      * Rendering this field in display mode
-     * called from the replacement-function of datalynxfield_renderer
+     * called by the replacement-function of datalynxfield_renderer
      * stdClass @entry   represents the entry which includes this instance of the field
      * array @params     the type of the display, "embedded" or "overlay" or "" for default
-     * @returns          the function for displaying this field-instance
+     * @returns          the function which displays this field-instance
      */
 	public function render_display_mode(stdClass $entry, array $params) {
 	    if(isset($params['embedded'])) {
@@ -234,9 +234,9 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
             }
         }
 
-        // With the ID this datalynxview_field and the ID of the parent-entry we retrieve
+        // With the ID of this datalynxview_field and the ID of the parent-entry we retrieve
         // the content to search for.
-        // Then we get the entry-IDs of the entries which match this content-value
+        // Then we get the entry-IDs of the entries (eids) which match this content-value
         // end add them to the options array
         if($fieldid = $field->field->param7) {  // field-ID of the external field
             if($content = $DB->get_field('datalynx_contents','content',
