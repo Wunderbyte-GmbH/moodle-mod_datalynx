@@ -2108,7 +2108,7 @@ class datalynx {
 
         $textfieldvalues = array();
 
-        if (!$DB->record_exists_select('datalynx_fields', 'id = :id AND dataid = :dataid AND type LIKE "text"',
+        if (!$DB->record_exists_select("datalynx_fields", "id = :id AND dataid = :dataid AND type LIKE 'text'",
                                        array('id' => $id, 'dataid' => $this->id()))) {
             throw new coding_exception("There is no text-field with this ID for this datalynx instance!");
         }
