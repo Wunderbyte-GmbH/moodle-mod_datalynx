@@ -431,6 +431,9 @@ abstract class datalynxfield_base {
 
 		if (!empty($values)) {
 			$newcontent = reset($values);
+            if(is_array($newcontent)){
+                $newcontent =  implode(",", $newcontent);
+            }
 			$newcontent = (string) clean_param($newcontent, PARAM_NOTAGS);
 		}
 

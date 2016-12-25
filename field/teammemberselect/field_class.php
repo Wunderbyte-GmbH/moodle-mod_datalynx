@@ -226,7 +226,8 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
             $options[0] = '...';
         }
         
-        $options += $makelinks ? ($allowall ? self::$alluserslinks[$fieldid] : self::$alloweduserslinks[$fieldid]) : ($allowall ? self::$allusers[$fieldid] : self::$allowedusers[$fieldid]);
+        $options += $makelinks ? ($allowall ? self::$alluserslinks[$fieldid] : self::$alloweduserslinks[$fieldid]) :
+            ($allowall ? self::$allusers[$fieldid] : self::$allowedusers[$fieldid]);
         
         if ($excludeuser && isset($options[$excludeuser])) {
             unset($options[$excludeuser]);

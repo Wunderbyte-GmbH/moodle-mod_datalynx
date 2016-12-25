@@ -239,9 +239,11 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         // Then we get the entry-IDs of the entries (eids) which match this content-value
         // end add them to the options array
         if($fieldid = $field->field->param7) {  // field-ID of the external field
-            if($content = $DB->get_field('datalynx_contents','content',
-                array('entryid' => $entry->id, 'fieldid' => $field->field->id))) {
-                list($insql, $params) = $DB->get_in_or_equal($content, SQL_PARAMS_NAMED);
+            if($contents = $DB->get_fieldset_select('datalynx_contents','content',
+                'entryid = :entryid and fieldid = :fieldid',
+                    array('entryid' => $entry->id, 'fieldid' => $field->field->id))) {
+                $contentsarr = explode(",", $contents[0]);
+                list($insql, $params) = $DB->get_in_or_equal($contentsarr, SQL_PARAMS_NAMED);
                 $params['fieldid'] = $fieldid;
                 $sql = 'SELECT  c.entryid
                         FROM    {datalynx_contents} c
@@ -371,7 +373,8 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
                 $field->refdatalynx->get_distinct_textfieldvalues_by_id($field->field->param7);
         }
 
-        $mform->addElement('autocomplete', $fieldname, null, $menu, array('class' => "datalynxfield_datalynxview $classname"));
+        $mform->addElement('autocomplete', $fieldname, null, $menu,
+            array("class" => "datalynxfield_datalynxview $classname", "multiple" => "true"));
         $mform->setType($fieldname, PARAM_NOTAGS);
         $mform->setDefault($fieldname, $selected);
         if ($required) {
