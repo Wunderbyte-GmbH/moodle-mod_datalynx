@@ -75,15 +75,7 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
                 $options);
         $mform->disabledIf('param2', 'param1', 'eq', 0);
         $mform->addHelpButton('param2', 'view', 'datalynxfield_datalynxview');
-        
-        // Select filter of given instance (stored in param3)
-        $options = array(0 => get_string('choosedots'));
-        $mform->addElement('select', 'param3', get_string('filter', 'datalynxfield_datalynxview'), 
-                $options);
-        $mform->disabledIf('param3', 'param1', 'eq', 0);
-        $mform->disabledIf('param3', 'param2', 'eq', 0);
-        $mform->addHelpButton('param3', 'filter', 'datalynxfield_datalynxview');
-        
+
         // Special filter by entry attributes "author" AND/OR "group" (to be stored in param6)
         $grp = array();
         $grp[] = &$mform->createElement('advcheckbox', 'entryauthor', null, 
@@ -105,7 +97,6 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
         $options = array(
             'dffield' => 'param1',
             'viewfield' => 'param2',
-            'filterfield' => 'param3',
             'textfieldfield' => 'param7',
             'acturl' => "$CFG->wwwroot/mod/datalynx/loaddfviews.php"
         );
@@ -129,12 +120,6 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
         } else {
             $datalynxid = 0;
         }
-        
-        if ($selectedarr = $this->_form->getElement('param2')->getSelected()) {
-            $viewid = reset($selectedarr);
-        } else {
-            $viewid = 0;
-        }
 
         if ($datalynxid) {
             if ($views = $DB->get_records_menu('datalynx_views', array('dataid' => $datalynxid), 'name', 'id,name')) {
@@ -144,15 +129,6 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
                 }
             }
             
-            if ($viewid) {
-                if ($filters = $DB->get_records_menu('datalynx_filters', 
-                        array('dataid' => $datalynxid), 'name', 'id,name')) {
-                    $configfilter = &$this->_form->getElement('param3');
-                    foreach ($filters as $key => $value) {
-                        $configfilter->addOption(strip_tags(format_string($value, true)), $key);
-                    }
-                }
-            }
             if ($textfields = $DB->get_records_menu('datalynx_fields',
                                 array('dataid' => $datalynxid, 'type' => 'text'), 'name', 'id,name')) {
                 $configtextfields = &$this->_form->getElement('param7');

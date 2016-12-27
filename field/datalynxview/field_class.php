@@ -59,7 +59,6 @@ class datalynxfield_datalynxview extends datalynxfield_base {
         $this->refdatalynx = $datalynx;
         $this->refview = $view;
         $this->localview = $this->df->get_current_view();
-        $this->reffilterid = $this->field->param3 ? $this->field->param3 : 0;
     }
 
     public function is_editable() {
