@@ -35,7 +35,11 @@ class datalynxfield_select_form extends datalynxfield_option_form {
         // Default value.
         $mform->addElement('text', 'param2', get_string('default'));
         $mform->setType('param2', PARAM_TEXT);
-        
+
+        // Enable autocompletion for edit mode
+        $mform->addElement('selectyesno', 'param6', get_string('autocompletion', 'datalynx'));
+        $mform->addHelpButton('param6', 'autocompletion', 'datalynx');
+
         // Order alphabetically in edit mode?
         $mform->addElement('selectyesno', 'param4', get_string('alphabeticalorder', 'datalynx'));
         

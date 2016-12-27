@@ -29,7 +29,7 @@ class datalynxfield_text_form extends datalynxfield_form {
     /**
      */
     function field_definition() {
-        global $OUTPUT;
+        global $OUTPUT, $DB, $PAGE, $CFG;
 
         $mform = &$this->_form;
 
@@ -74,6 +74,60 @@ class datalynxfield_text_form extends datalynxfield_form {
             $mform->setDefault('param8', 0);
         }
 
+        // Get all Datalynxs where user has managetemplate capability
+        // TODO there may be too many
+        if ($datalynxs = $DB->get_records('datalynx')) {
+            foreach ($datalynxs as $dfid => $datalynx) {
+                $df = new datalynx($datalynx);
+                // Remove if user cannot manage
+                if (!has_capability('mod/datalynx:managetemplates', $df->context)) {
+                    unset($datalynxs[$dfid]);
+                    continue;
+                }
+                $datalynxs[$dfid] = $df;
+            }
+        }
+
+        // Autocompletion with content of other textfield from the same or other datalynx instance
+        //
+        // select Datalynx instance (to be stored in param9)
+        if ($datalynxs) {
+            $dfmenu = array('' => array(0 => get_string('noautocompletion', 'datalynx')));
+            foreach ($datalynxs as $dfid => $df) {
+                if (!isset($dfmenu[$df->course->shortname])) {
+                    $dfmenu[$df->course->shortname] = array();
+                }
+                $dfmenu[$df->course->shortname][$dfid] = strip_tags(
+                    format_string($df->name(), true));
+            }
+        } else {
+            $dfmenu = array('' => array(0 => get_string('nodatalynxs', 'datalynx')));
+        }
+        $mform->addElement('selectgroups', 'param9', get_string('autocompletion', 'datalynx'), $dfmenu);
+        $mform->addHelpButton('param9', 'autocompletion_textfield', 'datalynx');
+
+        // Select textfields of given instance (stored in param10)
+        $options = array(0 => get_string('choosedots'));
+        $mform->addElement('select', 'param10', get_string('textfield', 'datalynx'), $options);
+        $mform->disabledIf('param10', 'param9', 'eq', 0);
+        $mform->addHelpButton('param10', 'textfield', 'datalynx');
+        $mform->setType('param10', PARAM_INT);
+
+        // ajax view loading
+        $options = array(
+            'dffield' => 'param9',
+            'textfieldfield' => 'param10',
+            'acturl' => "$CFG->wwwroot/mod/datalynx/loaddfviews.php"
+        );
+
+        $module = array(
+            'name' => 'M.mod_datalynx_load_views',
+            'fullpath' => '/mod/datalynx/datalynxloadviews.js',
+            'requires' => array('base', 'io', 'node')
+        );
+
+        $PAGE->requires->js_init_call('M.mod_datalynx_load_views.init', array($options), false, $module);
+
         // rules
         // -------------------------------------------------------------------------------
         $mform->addElement('header', 'fieldruleshdr', get_string('fieldrules', 'datalynx'));
@@ -111,13 +165,42 @@ class datalynxfield_text_form extends datalynxfield_form {
     }
 
     /**
+     */
+    function definition_after_data() {
+        global $DB;
+
+        if ($selectedarr = $this->_form->getElement('param9')->getSelected()) {
+            $refdatalynxid = reset($selectedarr);
+        } else {
+            $refdatalynxid = 0;
+        }
+        if ($selectedarr = $this->_form->getElement('param10')->getSelected()) {
+            $textfieldid = reset($selectedarr);
+        } else {
+            $textfieldid = 0;
+        }
+
+        if ($refdatalynxid) {
+            if ($textfields = $DB->get_records_menu('datalynx_fields',
+                array('dataid' => $refdatalynxid, 'type' => 'text'), 'name', 'id,name')) {
+                $formfield = &$this->_form->getElement('param10');
+                foreach ($textfields as $key => $value) {
+                    $formfield->addOption(strip_tags(format_string($value, true)), $key);
+                }
+                $this->_form->setDefault('param10', $textfieldid);
+            }
+        }
+    }
+
+
+    /**
      * Ensures there are no duplicate entries right now if unique is set to 'yes'!
      *
      * @param array $data
      * @param array $files
      * @return string[] Associative array with errors
      */
-    function validation($data, $files) {
+    function validation($data, $files, $mform) {
 
         $errors = parent::validation($data, $files);
 

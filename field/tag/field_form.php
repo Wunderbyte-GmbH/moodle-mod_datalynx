@@ -27,7 +27,7 @@ require_once ("$CFG->dirroot/mod/datalynx/field/field_form.php");
 class datalynxfield_tag_form extends datalynxfield_form {
 
     /**
-     * The only option for this field is whether to make tags standard tags or not
+     * The first option for this field is whether to make tags standard tags or not
      * {@inheritDoc}
      * @see datalynxfield_form::field_definition()
      */

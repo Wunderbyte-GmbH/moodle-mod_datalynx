@@ -35,7 +35,10 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
         $field = $this->_field;
         $fieldid = $field->id();
         $entryid = $entry->id;
-        
+        $fieldname = "field_{$fieldid}_{$entryid}";
+        $required = !empty($options['required']);
+        $autocomplete = $field->get('param9');
+
         $content = '';
         if ($entryid > 0 and !empty($entry->{"c{$fieldid}_content"})) {
             $content = $entry->{"c{$fieldid}_content"};
@@ -50,12 +53,23 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
         if ($field->get('param4')) {
             $fieldattr['class'] = s($field->get('param4'));
         }
-        
-        $fieldname = "field_{$fieldid}_{$entryid}";
-        $mform->addElement('text', $fieldname, null, $fieldattr);
-        $mform->setType($fieldname, PARAM_TEXT);
+        if($autocomplete) {
+            $fieldattr['class'] = "datalynxfield_datalynxview datalynxview_{$fieldid}_{$entryid}";
+            //$fieldattr['multiple'] = "true";
+            // if param10 is empty take the values of this field itself for autocomplete options
+            $reffieldid = $field->field->param10 ? $field->field->param10 : $field->field->id;
+            $menu = array('' => get_string('choose')) +
+                    $field->df->get_distinct_textfieldvalues_by_id($reffieldid);
+        }
+
+        if($autocomplete) {  // render as autocomplete field if param9 is not empty
+            $mform->addElement('autocomplete', $fieldname, null, $menu, $fieldattr);
+            $mform->setType($fieldname, PARAM_NOTAGS);
+        } else {
+            $mform->addElement('text', $fieldname, null, $fieldattr);
+            $mform->setType($fieldname, PARAM_TEXT);
+        }
         $mform->setDefault($fieldname, $content);
-        $required = !empty($options['required']);
         if ($required) {
             $mform->addRule($fieldname, null, 'required', null, 'client');
         }

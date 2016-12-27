@@ -49,17 +49,23 @@ M.mod_datalynx_load_views.init = function(Y, options) {
             var dfid = this.get('options').item(this.get('selectedIndex')).get('value');
 
             // remove view, filter, textfield options (but the first choose) from view select
-            var viewchoose = view.get('options').item(0);
-            view.setContent(viewchoose);
-            view.set('selectedIndex', 0);           
-            var filterchoose = filter.get('options').item(0);
-            filter.setContent(filterchoose);
-            filter.set('selectedIndex', 0);
-            var textfieldchoose = textfield.get('options').item(0);
-            textfield.setContent(textfieldchoose);
-            textfield.set('selectedIndex', 0);
+            if(view) {
+                var viewchoose = view.get('options').item(0);
+                view.setContent(viewchoose);
+                view.set('selectedIndex', 0);
+            }
+            if(filter) {
+                var filterchoose = filter.get('options').item(0);
+                filter.setContent(filterchoose);
+                filter.set('selectedIndex', 0);
+            }
+            if(textfield) {
+                var textfieldchoose = textfield.get('options').item(0);
+                textfield.setContent(textfieldchoose);
+                textfield.set('selectedIndex', 0);
+            }
 
-            // load views, filters, textfields from datalynx
+            // load views and/or filters and/or textfields from datalynx
             if (dfid != 0) {
 
                 Y.io(actionurl, {
@@ -72,30 +78,36 @@ M.mod_datalynx_load_views.init = function(Y, options) {
                                 var respoptions = o.responseText.split('#');
 
                                 // add view options
-                                var viewoptions = respoptions[0].split(',');
- 		                        for (var i=0;i<viewoptions.length;++i) {
-		                            var arr = viewoptions[i].trim().split(' ');
-                                    var qid = arr.shift();
-                                    var qname = arr.join(' ');
-		                            view.append(Y.Node.create('<option value="'+qid+'">'+qname+'</option>'));
+                                if(view) {
+                                    var viewoptions = respoptions[0].split(',');
+                                    for (var i=0;i<viewoptions.length;++i) {
+                                        var arr = viewoptions[i].trim().split(' ');
+                                        var qid = arr.shift();
+                                        var qname = arr.join(' ');
+                                        view.append(Y.Node.create('<option value="'+qid+'">'+qname+'</option>'));
+                                    }
                                 }
-                                
+
                                 // add filter options
-                                var filteroptions = respoptions[1].split(',');
- 		                        for (var i=0;i<filteroptions.length;++i) {
-		                            var arr = filteroptions[i].trim().split(' ');
-                                    var qid = arr.shift();
-                                    var qname = arr.join(' ');
-		                            filter.append(Y.Node.create('<option value="'+qid+'">'+qname+'</option>'));
-	                            }
+                                if(filter) {
+                                    var filteroptions = respoptions[1].split(',');
+                                    for (var i=0;i<filteroptions.length;++i) {
+                                        var arr = filteroptions[i].trim().split(' ');
+                                        var qid = arr.shift();
+                                        var qname = arr.join(' ');
+                                        filter.append(Y.Node.create('<option value="'+qid+'">'+qname+'</option>'));
+                                    }
+                                }
 
                                 // add textfield options
-                                var textfieldoptions = respoptions[2].split(',');
-                                for (var i=0;i<textfieldoptions.length;++i) {
-                                    var arr = textfieldoptions[i].trim().split(' ');
-                                    var qid = arr.shift();
-                                    var qname = arr.join(' ');
-                                    textfield.append(Y.Node.create('<option value="'+qid+'">'+qname+'</option>'));
+                                if(textfield) {
+                                    var textfieldoptions = respoptions[2].split(',');
+                                    for (var i=0;i<textfieldoptions.length;++i) {
+                                        var arr = textfieldoptions[i].trim().split(' ');
+                                        var qid = arr.shift();
+                                        var qname = arr.join(' ');
+                                        textfield.append(Y.Node.create('<option value="'+qid+'">'+qname+'</option>'));
+                                    }
                                 }
                             }
                         },

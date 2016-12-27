@@ -39,5 +39,9 @@ class datalynxfield_multiselect_form extends datalynxfield_option_form {
         // Options separator.
         $mform->addElement('select', 'param3', get_string('fieldoptionsseparator', 'datalynx'), 
                 array_map('current', $this->_field->separators));
+
+        // Enable autocompletion for edit mode
+        $mform->addElement('selectyesno', 'param6', get_string('autocompletion', 'datalynx'));
+        $mform->addHelpButton('param6', 'autocompletion', 'datalynx');
     }
 }

@@ -365,9 +365,6 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
 
         $selected = !empty($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : '';
 
-        $authorid = isset($entry->userid) ? $entry->userid : $USER->id;
-
-        // TODO replace with textfield-values
         if ($field->refdatalynx !== null && !empty($field->field->param7)) {
             $menu = array('' => get_string('choose')) +
                 $field->refdatalynx->get_distinct_textfieldvalues_by_id($field->field->param7);

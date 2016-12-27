@@ -51,13 +51,19 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
         $fieldname = "field_{$fieldid}_$entryid";
         $required = !empty($options['required']);
         $selected = !empty($entry->{"c{$fieldid}_content"}) ? (int) $entry->{"c{$fieldid}_content"} : 0;
-        
+        $autocomplete = $field->get('param6');
+
         // check for default value
         if (!$selected and $defaultval = $field->get('param2')) {
             $selected = (int) array_search($defaultval, $menuoptions);
         }
-        
-        $select = &$mform->addElement('select', $fieldname, null);
+
+        // render as autocomplete field (param6 not empty) or select field
+        if($autocomplete) {
+            $select = &$mform->addElement('autocomplete', $fieldname, null);
+        } else {
+            $select = &$mform->addElement('select', $fieldname, null);
+        }
         
         if (isset($this->_field->field->param5) && $this->_field->field->param5 > 0) {
             $disabled = $this->_field->get_disabled_values_for_user();
@@ -184,16 +190,17 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
     	$oldcontent = $DB->get_field_sql($query, $params);
     
     	$formfieldname = "field_{$fieldid}_{$entryid}";
-    
-    	if (isset($this->_field->field->param5) && $this->_field->field->param5 > 0) {
-    		$disabled = $this->_field->get_disabled_values_for_user();
-    		$content = clean_param($formdata->{$formfieldname}, PARAM_INT);
-    		if ($content != $oldcontent && array_search($content, $disabled) !== false) {
-    			$menu = $this->_field->options_menu();
-    			$errors[$formfieldname] = get_string('limitchoice_error', 'datalynx', $menu[$content]);
-    		}
-    	} 
-    	
+
+        if(isset($formdata->{$formfieldname})) { // Not every field of this dataynx-instance has to be in the form!
+            if (isset($this->_field->field->param5) && $this->_field->field->param5 > 0) {
+                $disabled = $this->_field->get_disabled_values_for_user();
+                $content = clean_param($formdata->{$formfieldname}, PARAM_INT);
+                if ($content != $oldcontent && array_search($content, $disabled) !== false) {
+                    $menu = $this->_field->options_menu();
+                    $errors[$formfieldname] = get_string('limitchoice_error', 'datalynx', $menu[$content]);
+                }
+            }
+        }
     	return $errors;
     }
 }

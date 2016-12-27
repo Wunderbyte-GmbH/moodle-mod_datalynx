@@ -2081,22 +2081,6 @@ class datalynx {
         return new moodle_url("/mod/datalynx/{$this->pagefile()}.php", $baseurlparams);
     }
 
-    public function get_textfieldvalues_by_fieldname($fieldname) {
-        global $DB;
-
-        $textfieldvalues = '';
-
-        $dataid = $this->id();
-        if($fieldid = $DB->get_field('datalynx_fields', 'param7', array('dataid' => $dataid, 'name' => $fieldname))) {
-            $sql = "SELECT c.content FROM {datalynx_contents} as c WHERE c.fieldid = :fieldid ";
-            $sqlparams['fieldid'] = $fieldid;
-            if($contentvalues = $DB->get_fieldset_sql($sql, $sqlparams)) {
-                $textfieldvalues = implode(",", $contentvalues);
-            }
-        }
-        return $textfieldvalues;
-    }
-
     /**
      * Given the ID of a textfield for this instance, it returns all used values as array
      *
@@ -2106,14 +2090,7 @@ class datalynx {
     public function get_distinct_textfieldvalues_by_id($id) {
         global $DB;
 
-        $textfieldvalues = array();
-
-        if (!$DB->record_exists_select("datalynx_fields", "id = :id AND dataid = :dataid AND type LIKE 'text'",
-                                       array('id' => $id, 'dataid' => $this->id()))) {
-            throw new coding_exception("There is no text-field with this ID for this datalynx instance!");
-        }
-
-        $sql = "SELECT DISTINCT c.content FROM {datalynx_contents} as c WHERE c.fieldid = :fieldid ";
+        $sql = "SELECT DISTINCT c.content FROM {datalynx_contents} as c WHERE c.fieldid = :fieldid ORDER BY c.content";
         $sqlparams['fieldid'] = $id;
 
         $textfieldvalues = $DB->get_fieldset_sql($sql, $sqlparams);
