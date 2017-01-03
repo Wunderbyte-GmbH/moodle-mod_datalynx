@@ -200,7 +200,8 @@ class datalynxfield_text_form extends datalynxfield_form {
      * @param array $files
      * @return string[] Associative array with errors
      */
-    function validation($data, $files, $mform) {
+    function validation($data, $files) {
+        $mform = &$this->_form;
 
         $errors = parent::validation($data, $files);
 

@@ -39,6 +39,7 @@ $string['ascending'] = 'Aufsteigend';
 $string['authorinfo'] = 'AutorInneninformationen';
 $string['autocompletion'] = 'Autocompletion';
 $string['autocompletion_help'] = 'Aktiviere Autocompletion für den Editier-Modus.';
+$string['autocompletion_textfield'] = 'Textfeld';
 $string['autocompletion_textfield_help'] = 'Wähle das datalynx-Modul und das Textfeld von dem die Autocompletion-Daten genommen werden sollen.';
 $string['browse'] = 'Durchblättern';
 $string['columns'] = 'Spalten';

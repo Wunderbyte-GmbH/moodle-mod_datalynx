@@ -39,6 +39,7 @@ $string['ascending'] = 'Ascending';
 $string['authorinfo'] = 'Author info';
 $string['autocompletion'] = 'Autocompletion';
 $string['autocompletion_help'] = 'Choose whether autocompletion shall be active in edit mode.';
+$string['autocompletion_textfield'] = 'Textfield';
 $string['autocompletion_textfield_help'] = 'Choose datalynx module and textfield to retrieve the autocompletion data of.';
 $string['browse'] = 'Browse';
 $string['columns'] = 'columns';
