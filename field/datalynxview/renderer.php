@@ -353,7 +353,6 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
     }
 
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options = null) {
-        global $PAGE, $USER;
 
         /* @var $field datalynxfield_datalynxview */
         $field = $this->_field;
@@ -363,13 +362,12 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         $classname = "datalynxview_{$fieldid}_{$entryid}";
         $required = !empty($options['required']);
 
-        $selected = !empty($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : '';
-
+        $selected = !empty($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : "...";
+        $menu = array( "..." => "...");
         if ($field->refdatalynx !== null && !empty($field->field->param7)) {
-            $menu = array('' => get_string('choose')) +
-                $field->refdatalynx->get_distinct_textfieldvalues_by_id($field->field->param7);
+            $menu = array_merge($menu,$field->refdatalynx->get_distinct_textfieldvalues_by_id($field->field->param7));
         }
-
+        
         $mform->addElement('autocomplete', $fieldname, null, $menu,
             array("class" => "datalynxfield_datalynxview $classname", "multiple" => "true"));
         $mform->setType($fieldname, PARAM_NOTAGS);
@@ -377,5 +375,28 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         if ($required) {
             $mform->addRule("{$fieldname}", '', 'required', null, 0, 'client');
         }
+    }
+    
+    /**
+     *
+     * {@inheritDoc}
+     * @see datalynxfield_renderer::validate()
+     */
+    public function validate($entryid, $tags, $formdata) {
+        $fieldid = $this->_field->id();
+    
+        $formfieldname = "field_{$fieldid}_{$entryid}";
+        $required = true;
+    
+        $errors = array();
+        foreach ($tags as $tag) {
+            list(, $behavior, ) = $this->process_tag($tag);
+            /* @var $behavior datalynx_field_behavior */
+            if ($behavior->is_required() AND (!isset($formdata->$formfieldname))) {
+                    $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
+            }
+        }
+    
+        return $errors;
     }
 }

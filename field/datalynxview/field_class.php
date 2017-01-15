@@ -64,5 +64,6 @@ class datalynxfield_datalynxview extends datalynxfield_base {
     public function is_editable() {
         return true;
     }
+    
 }
 

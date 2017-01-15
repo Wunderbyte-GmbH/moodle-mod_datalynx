@@ -215,8 +215,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         return true;
     }
 
-    public function options_menu($addnoselection = false, $makelinks = false, $excludeuser = 0, 
-            $allowall = false) {
+    public function options_menu($addnoselection = false, $makelinks = false, $excludeuser = 0, $allowall = false) {
         $fieldid = $this->field->id;
         if (!isset(self::$allusers[$fieldid])) {
             $this->init_user_menu();
@@ -358,28 +357,6 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         return array('' => get_string('empty', 'datalynx'), 
             'USER' => get_string('iamteammember', 'datalynx'), 
             'OTHER_USER' => get_string('useristeammember', 'datalynx'));
-    }
-
-    public function validate($entryid, $tags, $formdata) {
-        $fieldid = $this->id();
-        $fieldname = $this->name();
-        
-        $formfieldname = "field_{$fieldid}_{$entryid}";
-        if (array_key_exists("[[*$fieldname]]", $tags) and isset($formdata->$formfieldname)) {
-            $numvalues = 0;
-            foreach ($formdata->$formfieldname as $value) {
-                if ($value != 0) {
-                    $numvalues++;
-                }
-            }
-            if ($numvalues < $this->minteamsize) {
-                return array(
-                    "{$formfieldname}_dropdown_grp" => get_string('minteamsize_error_form', 
-                            'datalynx', $this->minteamsize)
-                );
-            }
-        }
-        return array();
     }
 
     public function supports_group_by() {

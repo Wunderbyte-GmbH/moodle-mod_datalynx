@@ -83,20 +83,6 @@ class datalynxfield_duration extends datalynxfield_base {
         return $DB->sql_cast_char2int("c{$this->field->id}.$column", true);
     }
 
-    public function validate($entryid, $tags, $formdata) {
-        $fieldid = $this->id();
-        $fieldname = $this->name();
-        
-        $formfieldname = "field_{$fieldid}_{$entryid}";
-        
-        if (array_key_exists("[[*$fieldname]]", $tags) and isset($formdata->$formfieldname)) {
-            if (!clean_param($formdata->$formfieldname, PARAM_INT)) {
-                return array("{$formfieldname}[number]" => get_string('fieldrequired', 'datalynx'));
-            }
-        }
-        return array();
-    }
-
     protected function format_content($entry, array $values = null) {
         $fieldid = $this->field->id;
         $contents = array();
