@@ -162,6 +162,7 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
         $fieldid = $this->_field->id();
         
         $formfieldname = "field_{$fieldid}_{$entryid}";
+        $param8 = $this->_field->get('param8');
         
         $errors = array();
         foreach ($tags as $tag) {
@@ -173,7 +174,7 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
                 }
             }
 
-            if (!empty($this->_field->get('param8')) && isset($formdata->$formfieldname)) {
+            if (!empty($param8) && isset($formdata->$formfieldname)) {
                 // Check uniquenes!
                 if ($DB->record_exists_sql("SELECT id
                                               FROM {datalynx_contents} c
