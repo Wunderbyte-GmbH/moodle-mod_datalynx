@@ -240,7 +240,7 @@ class datalynxfield_text_form extends datalynxfield_form {
                                      FROM {datalynx_contents} c
                                     WHERE c.fieldid = :fieldid AND c.content IS NOT NULL
                                  GROUP BY c.content
-                                   HAVING amount > 1", array('fieldid' => $fieldid));
+                                   HAVING COUNT(*) > 1", array('fieldid' => $fieldid));
         $list_of_duplicates = array();
         foreach($records as $record) {
             $ids = $DB->get_fieldset_sql("SELECT c.entryid
