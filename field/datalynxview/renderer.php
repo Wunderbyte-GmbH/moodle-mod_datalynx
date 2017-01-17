@@ -285,6 +285,9 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * 
+     * @param unknown $entry
+     * @return unknown[]
      */
     protected function get_search_options($entry) {
         $field = $this->_field;
@@ -338,7 +341,9 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
     }
 
     /**
-     * Array of patterns this field supports
+     * 
+     * {@inheritDoc}
+     * @see datalynxfield_renderer::patterns()
      */
     protected function patterns() {
         $fieldname = $this->_field->name();
@@ -352,6 +357,11 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         return $patterns;
     }
 
+    /**
+     * 
+     * {@inheritDoc}
+     * @see datalynxfield_renderer::render_edit_mode()
+     */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options = null) {
 
         /* @var $field datalynxfield_datalynxview */
@@ -362,8 +372,10 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         $classname = "datalynxview_{$fieldid}_{$entryid}";
         $required = !empty($options['required']);
 
-        $selected = !empty($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : "...";
-        $menu = array( "..." => "...");
+        $selected = !empty($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : array();
+        // A hidden field is added to autocomplete fields by parent Quickform element. 
+        // The value of the hidden field must be added as option in order to process an empty autocomplete field
+        $menu = array( "_qf__force_multiselect_submission" => "...");
         if ($field->refdatalynx !== null && !empty($field->field->param7)) {
             $menu = array_merge($menu,$field->refdatalynx->get_distinct_textfieldvalues_by_id($field->field->param7));
         }
@@ -373,7 +385,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         $mform->setType($fieldname, PARAM_NOTAGS);
         $mform->setDefault($fieldname, $selected);
         if ($required) {
-            $mform->addRule("{$fieldname}", '', 'required', null, 0, 'client');
+            $mform->addRule($fieldname, null, 'required');
         }
     }
     
