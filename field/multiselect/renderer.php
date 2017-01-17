@@ -46,7 +46,6 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
         $fieldid = $field->id();
         $entryid = $entry->id;
         $fieldname = "field_{$fieldid}_$entryid";
-        $menuoptions = $field->options_menu();
         $required = !empty($options['required']);
         $autocomplete = $field->get('param6');
 
@@ -69,12 +68,15 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
 
         // render as autocomplete field (param6 not empty) or select field
         if($autocomplete) {
+            $menuoptions = $field->options_menu(false, true);
             $select = &$mform->addElement('autocomplete', $fieldname, null, $menuoptions);
         } else {
+            $menuoptions = $field->options_menu();
             $select = &$mform->addElement('select', $fieldname, null, $menuoptions);
         }
         $select->setMultiple(true);
         $select->setSelected($selected);
+        $mform->setType($fieldname, PARAM_INT);
         
         if ($required) {
             $mform->addRule($fieldname, null, 'required', null, 'client');

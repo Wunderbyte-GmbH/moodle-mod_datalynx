@@ -424,24 +424,29 @@ abstract class datalynxfield_base {
 	 * @return array
 	 */
 	protected function format_content($entry, array $values = null) {
-		$fieldid = $this->field->id;
-
-		$newcontent = null;
-		$oldcontent = null;
-
-		if (!empty($values)) {
-			$newcontent = reset($values);
-            if(is_array($newcontent)){
-                $newcontent =  implode(",", $newcontent);
-            }
-			$newcontent = (string) clean_param($newcontent, PARAM_NOTAGS);
-		}
-
-		if (isset($entry->{"c{$fieldid}_content"})) {
-			$oldcontent = $entry->{"c{$fieldid}_content"};
-		}
-
-		return array(array($newcontent), array($oldcontent));
+	    $fieldid = $this->field->id;
+	    
+	    $newcontent = null;
+	    $oldcontent = null;
+	    
+	    if (!empty($values)) {
+	        $resetted = reset($values);
+	        $newcontent = !empty($resetted) ? $resetted : array();
+	        if(!empty($newcontent) && is_array($newcontent)){
+	            // When no value ist selected, then a default value is saved by Quickform. Value is removed here:
+	            if(($key = array_search('_qf__force_multiselect_submission', $newcontent)) !== false) {
+	                unset($newcontent[$key]);
+	            }
+	            $newcontent =  implode(",", $newcontent);
+	        }
+	        $newcontent = (string) clean_param($newcontent, PARAM_NOTAGS);
+	    }
+	    
+	    if (isset($entry->{"c{$fieldid}_content"})) {
+	        $oldcontent = $entry->{"c{$fieldid}_content"};
+	    }
+	    
+	    return array(array($newcontent), array($oldcontent));
 	}
 
 	/**
@@ -732,9 +737,12 @@ abstract class datalynxfield_option extends datalynxfield_base {
 	 * @param boolean $forceget
 	 * @return Ambigous <multitype:, string>
 	 */
-	public function options_menu($forceget = false) {
+	public function options_menu($forceget = false, $addnoselection = false) {
 		if (!$this->_options or $forceget) {
 			if (!empty($this->field->param1)) {
+			    if ($addnoselection) {
+			        $this->_options[0] = '...';
+			    }
 				$rawoptions = explode("\n", $this->field->param1);
 				foreach ($rawoptions as $key => $option) {
 					$option = trim($option);

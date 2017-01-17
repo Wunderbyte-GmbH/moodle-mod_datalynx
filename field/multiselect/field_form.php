@@ -42,6 +42,7 @@ class datalynxfield_multiselect_form extends datalynxfield_option_form {
 
         // Enable autocompletion for edit mode
         $mform->addElement('selectyesno', 'param6', get_string('autocompletion', 'datalynx'));
+        $mform->setDefault('param6', 1);
         $mform->addHelpButton('param6', 'autocompletion', 'datalynx');
     }
 }

@@ -64,36 +64,5 @@ class datalynxfield_datalynxview extends datalynxfield_base {
     public function is_editable() {
         return true;
     }
-    
-    /**
-     * 
-     * {@inheritDoc}
-     * @see datalynxfield_base::format_content()
-     */
-    protected function format_content($entry, array $values = null) {
-        $fieldid = $this->field->id;
-    
-        $newcontent = null;
-        $oldcontent = null;
-    
-        if (!empty($values)) {
-            $resetted = reset($values);
-            // When no value ist selected, then a default value is saved by Quickform. Value is removed here:
-            if(($key = array_search('_qf__force_multiselect_submission', $resetted)) !== false) {
-                unset($resetted[$key]);
-            }
-            $newcontent = !empty($resetted) ? $resetted : array();
-            if(!empty($newcontent)){
-                $newcontent =  implode(",", $newcontent);
-            }
-            $newcontent = (string) clean_param($newcontent, PARAM_NOTAGS);
-        }
-    
-        if (isset($entry->{"c{$fieldid}_content"})) {
-            $oldcontent = $entry->{"c{$fieldid}_content"};
-        }
-    
-        return array(array($newcontent), array($oldcontent));
-    }
 }
 

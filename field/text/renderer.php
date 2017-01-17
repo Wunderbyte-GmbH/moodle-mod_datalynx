@@ -55,10 +55,10 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
         }
         if($autocomplete) {
             $fieldattr['class'] = "datalynxfield_datalynxview datalynxview_{$fieldid}_{$entryid}";
-            //$fieldattr['multiple'] = "true";
-            // if param10 is empty take the values of this field itself for autocomplete options
+            // $fieldattr['multiple'] = "true";
+            // If param10 is empty take the values of this field itself for autocomplete options
             $reffieldid = $field->field->param10 ? $field->field->param10 : $field->field->id;
-            $menu = array('' => get_string('choose')) +
+            $menu = array('_qf__force_multiselect_submission' => get_string('choose')) +
                     $field->df->get_distinct_textfieldvalues_by_id($reffieldid);
         }
 
