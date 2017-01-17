@@ -63,6 +63,7 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
         }
 
         if($autocomplete) {  // render as autocomplete field if param9 is not empty
+        	$fieldattr['tags'] = true;
             $mform->addElement('autocomplete', $fieldname, null, $menu, $fieldattr);
             $mform->setType($fieldname, PARAM_NOTAGS);
         } else {
