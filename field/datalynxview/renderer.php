@@ -356,36 +356,41 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
 
         return $patterns;
     }
-
+    
     /**
-     * 
-     * {@inheritDoc}
+     *
+     * {@inheritdoc}
+     *
      * @see datalynxfield_renderer::render_edit_mode()
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options = null) {
-
+        
         /* @var $field datalynxfield_datalynxview */
         $field = $this->_field;
-        $fieldid = $field->id();
-        $entryid = $entry->id;
-        $fieldname = "field_{$fieldid}_$entryid";
-        $classname = "datalynxview_{$fieldid}_{$entryid}";
-        $required = !empty($options['required']);
-
-        $selected = !empty($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : array();
-        // A hidden field is added to autocomplete fields by parent Quickform element. 
-        // The value of the hidden field must be added as option in order to process an empty autocomplete field
-        $menu = array( "_qf__force_multiselect_submission" => "...");
-        if ($field->refdatalynx !== null && !empty($field->field->param7)) {
-            $menu = array_merge($menu,$field->refdatalynx->get_distinct_textfieldvalues_by_id($field->field->param7));
-        }
-        
-        $mform->addElement('autocomplete', $fieldname, null, $menu,
-            array("class" => "datalynxfield_datalynxview $classname", "multiple" => "true"));
-        $mform->setType($fieldname, PARAM_NOTAGS);
-        $mform->setDefault($fieldname, $selected);
-        if ($required) {
-            $mform->addRule($fieldname, null, 'required');
+        // Do not show in edit mode, when nothing can be selected
+        if ($field->refdatalynx !== null && ! empty($field->field->param7)) {
+            
+            $fieldid = $field->id();
+            $entryid = $entry->id;
+            $fieldname = "field_{$fieldid}_$entryid";
+            $classname = "datalynxview_{$fieldid}_{$entryid}";
+            $required = !empty($options ['required']);
+            
+            $selected = !empty($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : array();
+            // A hidden field is added to autocomplete fields by parent Quickform element.
+            // The value of the hidden field must be added as option in order to process an empty autocomplete field
+            $menu = array("_qf__force_multiselect_submission" => "...");
+            $menu = array_merge($menu, $field->refdatalynx->get_distinct_textfieldvalues_by_id($field->field->param7));
+            
+            $mform->addElement ('autocomplete', $fieldname, null, $menu, array(
+                    "class" => "datalynxfield_datalynxview $classname",
+                    "multiple" => "true" 
+            ));
+            $mform->setType($fieldname, PARAM_NOTAGS);
+            $mform->setDefault($fieldname, $selected);
+            if ($required) {
+                $mform->addRule($fieldname, null, 'required');
+            }
         }
     }
     
