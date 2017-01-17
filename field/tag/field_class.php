@@ -43,8 +43,12 @@ class datalynxfield_tag extends datalynxfield_option_multiple {
             return true;
         }
         
-        // $content is an array of tagnames
-        $content = reset($values);
+        // $content is an array of tagnames or empty
+        if(empty($content)){
+        	$content = array();
+        } else {
+        	$content = reset($values);
+        }
         $rec = new stdClass();
         $rec->fieldid = $fieldid;
         $rec->entryid = $entryid;
