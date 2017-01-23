@@ -38,28 +38,34 @@ class datalynxfield_tag extends datalynxfield_option_multiple {
         $entryid = $entry->id;
         $fieldid = $this->field->id;
         $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
-    
-        if (empty($values)) {
-            return true;
+        $tags = array();
+        $content = "";
+        
+        // Variable $tags is an array of tagnames or empty
+        if(!empty($values)){
+            $tags = reset($values);
         }
         
-        // $content is an array of tagnames or empty
-        if(empty($content)){
-        	$content = array();
-        } else {
-        	$content = reset($values);
-        }
         $rec = new stdClass();
         $rec->fieldid = $fieldid;
         $rec->entryid = $entryid;
-    
+        
+        // Remove content from entry and remove tags from item when tags were removed in entry
+        if (empty($tags) && $rec->id = $contentid) {
+            $rec->content = "";
+            $DB->update_record('datalynx_contents', $rec);
+            core_tag_tag::remove_all_item_tags('mod_datalynx', 'datalynx_contents', $contentid);
+            return true;
+        }
+        
+        // Create empty datalynx_contents entry in order to get id for processing tags
         if (!$rec->id = $contentid) {
             $rec->id = $DB->insert_record('datalynx_contents', $rec);
         }
-        core_tag_tag::set_item_tags('mod_datalynx', 'datalynx_contents', $rec->id, $this->df->context, $content);
+        core_tag_tag::set_item_tags('mod_datalynx', 'datalynx_contents', $rec->id, $this->df->context, $tags);
         $collid = core_tag_area::get_collection('mod_datalynx', 'datalynx_contents');
         if ($this->field->param1) {
-        	$tagobjects = core_tag_tag::create_if_missing($collid, $content, true);
+        	$tagobjects = core_tag_tag::create_if_missing($collid, $tags, true);
 			// make standard tags
 	        foreach ($tagobjects as $tagobject) {
 	            if (!$tagobject->isstandard) {
@@ -68,8 +74,8 @@ class datalynxfield_tag extends datalynxfield_option_multiple {
 	        }
         }
 
-        if(!empty($content)){
-            $content = implode(',',$content);
+        if(!empty($tags)){
+            $content = implode(',',$tags);
         }
         $rec->content = $content;
     
