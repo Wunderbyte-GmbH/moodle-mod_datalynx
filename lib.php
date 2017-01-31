@@ -711,7 +711,7 @@ function datalynx_extend_settings_navigation(settings_navigation $settings, navi
     
     // notifications
     if (isloggedin() and !isguestuser()) {
-        $dfnode->add(get_string('messaging', 'message'), 
+        $dfnode->add(get_string('messages', 'message'),
                 new moodle_url('/message/edit.php', 
                         array('id' => $USER->id, 'course' => $PAGE->course->id, 
                             'context' => $PAGE->context->id)));
