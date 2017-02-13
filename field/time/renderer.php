@@ -78,7 +78,8 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
     }
 
     public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
-        $fieldid = $this->_field->id();
+        $field = $this->_field;
+        $fieldid = $field->id();
         
         $elements = array();
         $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_from", get_string('from'));
@@ -90,13 +91,18 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
             $mform->setDefault("f_{$i}_{$fieldid}_to", $value[1]);
         }
         foreach (array('year', 'month', 'day', 'hour', 'minute') as $fieldidentifier) {
-            $mform->disabledIf("f_{$i}_{$fieldid}_to[$fieldidentifier]", "searchoperator$i", 'neq', 
-                    'BETWEEN');
+            $mform->disabledIf("f_{$i}_{$fieldid}_to[$fieldidentifier]", "searchoperator$i", 'neq', 'BETWEEN');
         }
         foreach (array('year', 'month', 'day', 'hour', 'minute') as $fieldidentifier) {
             $mform->disabledIf("f_{$i}_{$fieldid}_from[$fieldidentifier]", "searchoperator$i", 'eq', '');
         }
-        
+        if($field->date_only) {
+            // Deactivate form elements for min and seconds when field is date only and operator is "="
+            foreach (array('hour', 'minute') as $fieldidentifier) {
+                $mform->disabledIf("f_{$i}_{$fieldid}_from[$fieldidentifier]", "searchoperator$i", 'eq', '=');
+            }
+        }
+
         $separators = array('<br>', '<br>');
         return array($elements, $separators);
     }

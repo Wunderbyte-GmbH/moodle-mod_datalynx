@@ -32,8 +32,7 @@ class datalynxfield_time_form extends datalynxfield_form {
         $mform = &$this->_form;
         
         // -------------------------------------------------------------------------------
-        $mform->addElement('header', 'fieldattributeshdr', 
-                get_string('fieldattributes', 'datalynx'));
+        $mform->addElement('header', 'fieldattributeshdr', get_string('fieldattributes', 'datalynx'));
         
         // Date
         $mform->addElement('checkbox', 'param1', get_string('dateonly', 'datalynxfield_time'));

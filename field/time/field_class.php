@@ -120,6 +120,8 @@ class datalynxfield_time extends datalynxfield_base {
     }
 
     /**
+     * Returns the sql for selecting entries which match the given criterion for this field
+     * Possible criterions: BETWEEN, equal(=), after(>), before(<), IS EMPTY, IS NOT EMPTY
      */
     public function get_search_sql($search) {
         list($not, $operator, $value) = $search;
@@ -138,19 +140,58 @@ class datalynxfield_time extends datalynxfield_base {
         $nameto = "df_{$this->field->id}_{$i}_to";
         $varcharcontent = $this->get_sql_compare_text();
         $params = array();
-        
-        if ($operator != 'BETWEEN') {
-            if (!$operator) {
-                $operator = '=';
-            }
-            $params[$namefrom] = $from;
-            return array(" $not $varcharcontent $operator :$namefrom ", $params, true);
-        } else {
-            $params[$namefrom] = $from;
-            $params[$nameto] = $to;
-            return array(" ($not $varcharcontent >= :$namefrom AND $varcharcontent < :$nameto) ", 
-                $params, true);
-        }
+
+        switch($operator) {
+            case 'BETWEEN':
+                $params[$namefrom] = $from;
+                $params[$nameto] = $to;
+                $return = array(" ($not $varcharcontent >= :$namefrom AND $varcharcontent < :$nameto) ",
+                    $params, true);
+                break;
+            case '=':
+                if($this->date_only) {
+                    $fromdate = date("Y-m-d", $from);
+                    $from = strtotime($fromdate);
+                }
+            case '<':
+            case '>':
+                $params[$namefrom] = $from;
+                $return = array(" $not $varcharcontent $operator :$namefrom ", $params, true);
+                break;
+            default:
+                if($not) {  // content value is not empty
+                    $return = array(" $not $varcharcontent = '' ", $params, true);
+                } else { // content value is empty or there is no content dataset at all
+                    global $DB;
+                    $eids = $this->get_entry_ids_for_empty_content();
+                    // Get NOT IN sql
+                    list($inids, $params) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED,
+                        "df_{$this->field->id}_", true);
+                    $sql = " e.id $inids ";
+                    return array($sql, $params, false);
+                }
+        } // end switch
+
+        return $return;
+    }
+
+    /**
+     * Returns the entry-IDs of all the entries where the content field is empty or there is no content dataset at all
+     */
+    protected function get_entry_ids_for_empty_content() {
+        global $DB;
+
+        $params = array();
+        $sql = "SELECT id FROM {datalynx_entries} e 
+                WHERE e.dataid = :dataid AND NOT EXISTS 
+                  (SELECT id FROM {datalynx_contents} c WHERE fieldid = :fieldid AND c.entryid =  e.id) ";
+        $params['dataid'] = $this->field->dataid;
+        $params['fieldid'] = $this->id();
+        $eids = $DB->get_fieldset_sql($sql, $params);
+        $sql = "SELECT entryid FROM {datalynx_contents} 
+                WHERE fieldid = :fieldid AND content =  '' ";
+        $eids = array_merge($eids, $DB->get_fieldset_sql($sql, $params));
+        return $eids;
     }
 
     /**

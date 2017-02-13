@@ -183,13 +183,15 @@ class datalynx_filter {
                     foreach ($searchfield['AND'] as $option) {
                         if ($fieldsqloptions = $field->get_search_sql($option)) {
                             list($fieldsql, $fieldparams, $fromcontent) = $fieldsqloptions;
-                            $whereand[] = $fieldsql;
-                            $searchparams = array_merge($searchparams, $fieldparams);
-                            
-                            // Add searchfrom (JOIN) only for search in datalynx content or external
-                            // tables.
-                            if (!$internalfield and $fromcontent) {
-                                $searchfrom[$fieldid] = $fieldid;
+                            if($fieldsql) {
+                                $whereand[] = $fieldsql;
+                                $searchparams = array_merge($searchparams, $fieldparams);
+
+                                // Add searchfrom (JOIN) only for search in datalynx content or external
+                                // tables.
+                                if (!$internalfield and $fromcontent) {
+                                    $searchfrom[$fieldid] = $fieldid;
+                                }
                             }
                         }
                     }
