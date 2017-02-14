@@ -534,7 +534,6 @@ class datalynx_rule_manager {
         $message = new \core\message\message();
         $message->component = 'mod_datalynx';
         $message->name = "datalynx_$event";
-        $message->courseid = $df->course->id;
         $message->subject = $subject;
         $message->fullmessageformat = $data->notificationformat;
         $message->smallmessage = '';

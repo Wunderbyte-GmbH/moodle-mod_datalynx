@@ -113,7 +113,6 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
         $message = new \core\message\message();
         $message->component = 'mod_datalynx';
         $message->name = "event_$eventname";
-        $message->courseid = $df->course->id;
         $message->subject = $subject;
         $message->fullmessageformat = 1;
         $message->smallmessage = '';
