@@ -633,20 +633,6 @@ class datalynx_entries {
                                         $contents[$eid]['info'])) {
                                     // $eid should be different from $entryid only in new entries
                                     foreach ($contents[$eid]['fields'] as $fieldid => $content) {
-                                        $field = $DB->get_record('datalynx_fields', 
-                                                array('id' => $fieldid));
-                                        //TODO: Move this. That should not be here. A single exception for a field is not cool. 
-                                        if ($field->type == 'teammemberselect') {
-                                            $oldcontent = json_decode(
-                                                    $DB->get_field('datalynx_contents', 'content', 
-                                                            array('fieldid' => $fieldid, 
-                                                                'entryid' => $eid
-                                                            )), true);
-                                            $newcontent = $content[''];
-                                            //TODO: Not the best place for notifying teammembers. Better to create an event?
-                                            $this->notify_team_members($entry, $field, $oldcontent, 
-                                                    $newcontent);
-                                        }
                                         $fields[$fieldid]->update_content($entry, $content);
                                     }
                                     $processed[$entry->id] = $entry;
@@ -783,57 +769,6 @@ class datalynx_entries {
                 
                 return array($strnotify, array_keys($processed));
             }
-        }
-    }
-
-    /**
-     * Trigger events to notify the team members when new members were
-     * added to the field "teammemeberselect" in a specific entry
-     * @param object $entry
-     * @param object $field
-     * @param array $oldmembers
-     * @param array $newmembers
-     */
-    public function notify_team_members($entry, $field, $oldmembers, $newmembers) {
-        global $DB;
-        
-        $oldmembers = !empty($oldmembers) ? array_filter($oldmembers) : array();
-        $newmembers = array_filter($newmembers);
-        
-        $addedmemberids = array_diff($newmembers, $oldmembers);
-        $removedmemberids = array_diff($oldmembers, $newmembers);
-        
-        if (!empty($addedmemberids)) {
-            list($insql, $params) = $DB->get_in_or_equal($addedmemberids);
-            $addedmembers = $DB->get_records_sql("SELECT * FROM {user} WHERE id $insql", $params);
-        } else {
-            $addedmembers = array();
-        }
-        
-        if (!empty($removedmemberids)) {
-            list($insql, $params) = $DB->get_in_or_equal($removedmemberids);
-            $removedmembers = $DB->get_records_sql("SELECT * FROM {user} WHERE id $insql", $params);
-        } else {
-            $removedmembers = array();
-        }
-        
-        $other = ['dataid' => $this->datalynx->id(), 'fieldid' => $field->id, 
-            'name' => $field->name, 'addedmembers' => json_encode($addedmembers), 
-            'removedmembers' => json_encode($removedmembers)
-        ];
-        
-        if (!empty($addedmembers)) {
-            $event = \mod_datalynx\event\team_updated::create(
-                    array('context' => $this->datalynx->context, 'objectid' => $entry->id, 
-                        'other' => $other));
-            $event->trigger();
-        }
-        
-        if (!empty($removedmembers)) {
-            $event = \mod_datalynx\event\team_updated::create(
-                    array('context' => $this->datalynx->context, 'objectid' => $entry->id, 
-                        'other' => $other));
-            $event->trigger();
         }
     }
 

@@ -110,16 +110,15 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
         $subject = "$sitename -> $coursename -> $pluginname $datalynxname:  $notename";
         
         // prepare message object
-        $message = new stdClass();
-        $message->siteshortname = format_string($SITE->shortname);
+        $message = new \core\message\message();
         $message->component = 'mod_datalynx';
         $message->name = "event_$eventname";
-        $message->context = $df->context;
+        $message->courseid = $df->course->id;
         $message->subject = $subject;
         $message->fullmessageformat = 1;
         $message->smallmessage = '';
         $message->notification = 1;
-        
+
         if ((strpos($eventname, 'comment') !== false)) {
             $entryid = $event->get_data()['other']['itemid'];
         } else {

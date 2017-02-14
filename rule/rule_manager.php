@@ -531,11 +531,10 @@ class datalynx_rule_manager {
         $subject = "$sitename -> $data->coursename -> $strdatalynx $data->datalynxname:  $notename";
         
         // prepare message object
-        $message = new stdClass();
-        $message->siteshortname = format_string($SITE->shortname);
+        $message = new \core\message\message();
         $message->component = 'mod_datalynx';
         $message->name = "datalynx_$event";
-        $message->context = $data->context;
+        $message->courseid = $df->course->id;
         $message->subject = $subject;
         $message->fullmessageformat = $data->notificationformat;
         $message->smallmessage = '';
