@@ -42,7 +42,8 @@ class sendmessage_task extends \core\task\adhoc_task {
      * Send out messages.
      */
     public function execute() {
-        foreach ($this->get_custom_data() as $message) {
+        $data = unserialize($this->get_custom_data_as_string());
+        foreach ($data as $message) {
             mtrace("Sending message to the user with id " . $message->userto->id);
             message_send($message);
             mtrace("Sent.");
