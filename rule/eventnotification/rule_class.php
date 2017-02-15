@@ -131,7 +131,7 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
         $messagedata->senderprofilelink = html_writer::link(
                 new moodle_url('/user/profile.php', array('id' => $message->userfrom->id)),
                         fullname($message->userfrom));
-        
+        $messagestosend = array();
         foreach ($this->get_recipients($author->id, $entryid) as $userid) {
             $userto = $DB->get_record('user', array('id' => $userid));
             $message->userto = $userto;
@@ -162,8 +162,13 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
             $messagetext = get_string("message_$eventname", 'datalynx', $messagedata);
             $message->fullmessage = html_to_text($messagetext);
             $message->fullmessagehtml = text_to_html($messagetext, false, false, true);
-            
-            message_send($message);
+            $messagestosend[] = $message;
+        }
+        if($messagestosend) {
+            $adhocktask = new sendmessage_task();
+            $adhocktask->set_custom_data($messagestosend);
+            $adhocktask->set_component('mod_datalynx');
+            \core\task\manager::queue_adhoc_task($adhocktask);
         }
         return true;
     }

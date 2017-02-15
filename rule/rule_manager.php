@@ -541,6 +541,7 @@ class datalynx_rule_manager {
         $message->userfrom = $data->userfrom = $USER;
         $data->senderprofilelink = html_writer::link(
                 new moodle_url('/user/profile.php', array('id' => $data->userfrom->id)), fullname($data->userfrom));
+        $messagestosend = array();
         foreach ($data->users as $user) {
             $userto = $DB->get_record('user', array('id' => $user->id));
             $message->userto = $userto;
@@ -550,7 +551,13 @@ class datalynx_rule_manager {
             $content = html_to_text($notedetails);
             $message->fullmessage = $content;
             $message->fullmessagehtml = $contenthtml;
-            message_send($message);
+            $messagestosend[] = $message;
+        }
+        if($messagestosend) {
+            $adhocktask = new sendmessage_task();
+            $adhocktask->set_custom_data($messagestosend);
+            $adhocktask->set_component('mod_datalynx');
+            \core\task\manager::queue_adhoc_task($adhocktask);
         }
     }
 }
