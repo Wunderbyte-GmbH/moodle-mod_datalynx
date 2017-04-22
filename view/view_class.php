@@ -217,32 +217,25 @@ abstract class datalynxview_base {
      */
     protected function set__patterns() {
         global $DB;
+
         $patternarray = array();
-        $patterns = $this->view->patterns;
-        if(!is_null($this->view->patterns)){
-            $patternarray = unserialize($this->view->patterns);
+        $text = '';
+        foreach ($this->_editors as $editor) {
+            $text .= isset($this->view->$editor) ? $this->view->$editor : '';
         }
-        
-        if (!$patterns) {
-            $patterns = array('view' => array(), 'field' => array());
-            $text = '';
-            foreach ($this->_editors as $editor) {
-                $text .= isset($this->view->$editor) ? $this->view->$editor : '';
-            }
-            
-            if (trim($text)) {
-                // This view patterns
-                $patternarray['view'] = $this->patternclass()->search($text, false);
-                
-                // Field patterns
-                if ($fields = $this->_df->get_fields()) {
-                    foreach ($fields as $fieldid => $field) {
-                        $patternarray['field'][$fieldid] = $field->renderer()->search($text);
-                    }
+
+        if (trim($text)) {
+            // This view patterns
+            $patternarray['view'] = $this->patternclass()->search($text, false);
+
+            // Field patterns
+            if ($fields = $this->_df->get_fields(null, false, true)) {
+                foreach ($fields as $fieldid => $field) {
+                    $patternarray['field'][$fieldid] = $field->renderer()->search($text);
                 }
-                $serializedpatterns = serialize($patternarray);
-                $DB->set_field('datalynx_views', 'patterns', $serializedpatterns, array( 'id' => $this->view->id));
             }
+            $serializedpatterns = serialize($patternarray);
+            $DB->set_field('datalynx_views', 'patterns', $serializedpatterns, array( 'id' => $this->view->id));
         }
         $this->_tags = $patternarray;
     }

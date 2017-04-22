@@ -77,8 +77,7 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
                 $label = $showlabel ? "$fieldlabel$i" : '';
                 
                 $optionsarr = array();
-                $optionsarr[] = &$mform->createElement('select', 'sortfield' . $count, '', 
-                        $fieldoptions);
+                $optionsarr[] = &$mform->createElement('select', 'sortfield' . $count, '', $fieldoptions);
                 $optionsarr[] = &$mform->createElement('select', 'sortdir' . $count, '', 
                         $diroptions);
                 $mform->addGroup($optionsarr, 'sortoptionarr' . $count, $label, ' ', false);
@@ -95,8 +94,7 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
             $label = $showlabel ? "$fieldlabel$i" : '';
             
             $optionsarr = array();
-            $optionsarr[] = &$mform->createElement('select', 'sortfield' . $count, '', 
-                    $fieldoptions);
+            $optionsarr[] = &$mform->createElement('select', 'sortfield' . $count, '', $fieldoptions);
             $optionsarr[] = &$mform->createElement('select', 'sortdir' . $count, '', $diroptions);
             $mform->addGroup($optionsarr, 'sortoptionarr' . $count, $label, ' ', false);
             $mform->disabledIf('sortdir' . $count, 'sortfield' . $count, 'eq', 0);
@@ -338,16 +336,16 @@ class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
 class mod_datalynx_advanced_filter_form extends mod_datalynx_filter_base_form {
 
     /*
-     *
+     * Definition of the advanced filter form which is part of a view
      */
     function definition() {
-        // $df = $this->_df;
         $filter = $this->_filter;
         $view = $this->_customdata['view'];
         
         $name = empty($filter->name) ? get_string('filternew', 'datalynx') : $filter->name;
         
-        $fields = $view->get_view_fields();
+        // get the fields of this view
+        $fields = $view->get_view_fields(true);
         $fieldoptions = array(0 => get_string('choose'));
         foreach ($fields as $fieldid => $field) {
             $fieldoptions[$fieldid] = $field->name();
