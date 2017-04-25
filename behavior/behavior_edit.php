@@ -80,9 +80,7 @@ switch ($urlparams->action) {
         } else {
             $data = datalynx_field_behavior::get_behavior($urlparams->id);
             $urlparams->confirmed = true;
-            $datalynx->print_header(
-                    array('tab' => 'behaviors', 'nonotifications' => true, 
-                        'urlparams' => $urlparams));
+            $datalynx->print_header(array('tab' => 'behaviors', 'nonotifications' => true, 'urlparams' => $urlparams));
             echo html_writer::tag('h2', get_string('duplicatingbehavior', 'datalynx', $data->name), 
                     array('class' => 'mdl-align'));
             echo $OUTPUT->confirm(get_string('confirmbehaviorduplicate', 'datalynx'), 

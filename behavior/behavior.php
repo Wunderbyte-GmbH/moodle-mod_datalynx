@@ -123,7 +123,7 @@ class datalynx_field_behavior {
         global $USER;
         $user = $user ? $user : $USER;
         $permissions = $this->datalynx->get_user_datalynx_permissions($user->id, 'edit');
-        return $this->user_is_admin($user) || (array_intersect($permissions, $this->editableby)) ||
+        return (array_intersect($permissions, $this->editableby)) ||
                  ($isentryauthor && in_array(datalynx::PERMISSION_AUTHOR, $this->editableby)) ||
                  ($ismentor && in_array(datalynx::PERMISSION_MENTOR, $this->editableby));
     }
