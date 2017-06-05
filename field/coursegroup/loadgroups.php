@@ -23,7 +23,7 @@
  */
 define('AJAX_SCRIPT', true);
 
-require_once ('../../../../config.php');
+require_once('../../../../config.php');
 
 $courseid = required_param('courseid', PARAM_INT);
 
@@ -36,6 +36,6 @@ if ($courseid) {
     foreach ($groups as $groupid => $name) {
         $groupsmenu[] = "$groupid $name";
     }
-    
+
     echo implode(',', $groupsmenu);
 }    

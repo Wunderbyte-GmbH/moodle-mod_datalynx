@@ -6,34 +6,34 @@ Feature: In a datalynx create, update, and delete fields
 
   Background:
     Given the following "courses" exist:
-      | fullname  | shortname   | category  | groupmode   |
-      | Course 1  | C1          | 0         | 1           |
+      | fullname | shortname | category | groupmode |
+      | Course 1 | C1        | 0        | 1         |
     And the following "users" exist:
-      | username  | firstname   | lastname  | email                   |
-      | teacher1  | Teacher     | 1         | teacher1@asd.com        |
+      | username | firstname | lastname | email            |
+      | teacher1 | Teacher   | 1        | teacher1@asd.com |
     And the following "course enrolments" exist:
-      | user      | course  | role            |
-      | teacher1  | C1      | editingteacher  |
+      | user     | course | role           |
+      | teacher1 | C1     | editingteacher |
     And the following "activities" exist:
       | activity | course | idnumber | name                   |
       | datalynx | C1     | 12345    | Datalynx Test Instance |
     And "Datalynx Test Instance" has following fields:
-      | type           | name     | param1                       |
-      | text           | Text     |                              |
-      | textarea       | Textarea |                              |
-      | time           | Time     |                              |
-      | duration       | Duration |                              |
-      | radiobutton    | Radio    | Option A, Option B, Option C |
-      | checkbox       | Checkbox | Option 1, Option 2, Option 3 |
-      | select         | Select   | Option X, Option Y, Option Z |
+      | type        | name     | param1                       |
+      | text        | Text     |                              |
+      | textarea    | Textarea |                              |
+      | time        | Time     |                              |
+      | duration    | Duration |                              |
+      | radiobutton | Radio    | Option A, Option B, Option C |
+      | checkbox    | Checkbox | Option 1, Option 2, Option 3 |
+      | select      | Select   | Option X, Option Y, Option Z |
     And "Datalynx Test Instance" has following filters:
       | name       | perpage |
       | TestFilter | 3       |
     And "Datalynx Test Instance" has following views:
-      | type    | name    | status       | redirect    | filter     |
-      | grid    | Grid    | default      | Grid        | TestFilter |
-      | tabular | Tabular | edit         | Grid        |            |
-      | pdf     | PDF     | more         | Grid        |            |
+      | type    | name    | status  | redirect | filter     |
+      | grid    | Grid    | default | Grid     | TestFilter |
+      | tabular | Tabular | edit    | Grid     |            |
+      | pdf     | PDF     | more    | Grid     |            |
 
   @javascript
   Scenario: add entry
@@ -41,14 +41,14 @@ Feature: In a datalynx create, update, and delete fields
     And I follow "Course 1"
     And I follow "Datalynx Test Instance"
     When I create an entry in "Datalynx Test Instance" instance and fill the form with:
-      | Option A  | x       |
-      | Option 1  | x       |
-      | Option 3  | x       |
+      | Option A | x |
+      | Option 1 | x |
+      | Option 3 | x |
     And I edit "first" entry
     And I set the following fields to these values:
-      | Option B  | x       |
-      | Option 3  |         |
-      | Option 2  | x       |
+      | Option B | x |
+      | Option 3 |   |
+      | Option 2 | x |
     And I press "Save changes"
     And I press "Continue"
     Then I should see "Option B"

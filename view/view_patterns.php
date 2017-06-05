@@ -22,7 +22,6 @@
  */
 defined('MOODLE_INTERNAL') or die();
 
-
 /**
  * Base class for view patterns
  */
@@ -47,14 +46,14 @@ class datalynxview_patterns {
 
     /**
      * Find pattern/tags and return them in an array
-     * 
+     *
      * @param string $text
      * @param boolean $checkvisibility if true only views visible to user are considered
      * @return multitype:unknown
      */
     public function search($text, $checkvisibility = true) {
         $viewid = $this->_view->view->id;
-        
+
         $found = array();
         // Fixed patterns
         $patterns = array_keys($this->patterns($checkvisibility));
@@ -63,7 +62,7 @@ class datalynxview_patterns {
                 $found[] = $pattern;
             }
         }
-        
+
         // Regexp patterns
         if ($patterns = array_keys($this->regexp_patterns($checkvisibility))) {
             foreach ($patterns as $pattern) {
@@ -106,53 +105,65 @@ class datalynxview_patterns {
     }
 
     /**
-     * Get an array with the tags and the values to replace. 
-     * 
-     * @param array $tags array of tags with tagname as value and tagname or number as key 
+     * Get an array with the tags and the values to replace.
+     *
+     * @param array $tags array of tags with tagname as value and tagname or number as key
      * @param null $entry
      * @param array $options options like pluginfileurl, entriescount, entriesfiltercount, hidenewentry, baseurl
      * @return array of strings key: tagname, value:the string that replaces the tag
      */
     public function get_replacements($tags = null, $entry = null, array $options = array()) {
         $view = $this->_view;
-        
+
         // existing tag types
         $info = array_keys($this->info_patterns()); // number of entries
         $ref = array_keys($this->ref_patterns()); // viewrelated tags like ##viewurl## and ##filtersmenu##
         $userpref = array_keys($this->userpref_patterns()); // custom filter tags
         $actions = array_keys($this->action_patterns()); // action tags like ##addnewentry## and ##multiedit##
         $paging = array_keys($this->paging_patterns()); // paging tags
-        
+
         $options['filter'] = $view->get_filter();
         $options['baseurl'] = new moodle_url($view->get_baseurl(), array('sesskey' => sesskey()));
-        
+
         $replacements = array();
         foreach ($tags as $tag) {
-            if($tag == '##entries##') {
+            if ($tag == '##entries##') {
                 $replacements[$tag] = '##entries##';
-            } else if (in_array($tag, $info)) {
-                $replacements[$tag] = $this->get_info_replacements($tag, $entry, $options);
-            } else if (in_array($tag, $ref)) {
-                $replacements[$tag] = $this->get_ref_replacements($tag, $entry, $options);
-            } else if (in_array($tag, $userpref)) {
-                $replacements[$tag] = $this->get_userpref_replacements($tag, $options);
-            } else if (in_array($tag, $actions)) {
-                $replacements[$tag] = $this->get_action_replacements($tag, $entry, $options);
-            } else if (in_array($tag, $paging)) {
-                $replacements[$tag] = $this->get_paging_replacements($options);
-            } else if ($this->is_regexp_pattern($tag)) {
-                $replacements[$tag] = $this->get_regexp_replacements($tag, $entry, $options);
             } else {
-                $replacements[$tag] = '';
+                if (in_array($tag, $info)) {
+                    $replacements[$tag] = $this->get_info_replacements($tag, $entry, $options);
+                } else {
+                    if (in_array($tag, $ref)) {
+                        $replacements[$tag] = $this->get_ref_replacements($tag, $entry, $options);
+                    } else {
+                        if (in_array($tag, $userpref)) {
+                            $replacements[$tag] = $this->get_userpref_replacements($tag, $options);
+                        } else {
+                            if (in_array($tag, $actions)) {
+                                $replacements[$tag] = $this->get_action_replacements($tag, $entry, $options);
+                            } else {
+                                if (in_array($tag, $paging)) {
+                                    $replacements[$tag] = $this->get_paging_replacements($options);
+                                } else {
+                                    if ($this->is_regexp_pattern($tag)) {
+                                        $replacements[$tag] = $this->get_regexp_replacements($tag, $entry, $options);
+                                    } else {
+                                        $replacements[$tag] = '';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
-        
+
         return $replacements;
     }
 
     /**
      * Get the values for tags that contain a viewname or a fieldname
-     * 
+     *
      * @param string $tag
      * @param string $entry
      * @param array $options
@@ -160,29 +171,29 @@ class datalynxview_patterns {
      */
     protected function get_regexp_replacements($tag, $entry = null, array $options = null) {
         global $OUTPUT;
-        
+
         $df = $this->_view->get_df();
-        
+
         static $views = null;
         if ($views === null) {
             $views = $df->get_all_views();
             foreach ($views as $view) {
                 $viewname = $view->name;
-                
+
                 $baseurlparams = array();
                 $baseurlparams['d'] = $view->dataid;
                 $baseurlparams['view'] = $view->id;
-                
+
                 $view->baseurl = new moodle_url(
                         "/mod/datalynx/{$this->_view->get_df()->pagefile()}.php", $baseurlparams);
             }
         }
-        
+
         if ($views) {
             foreach ($views as $view) {
                 $viewname = $view->name;
                 if (strpos($tag, "#{{viewlink:$viewname;") === 0) {
-                    list(, $linktext, $urlquery, ) = explode(';', $tag);
+                    list(, $linktext, $urlquery,) = explode(';', $tag);
                     // Pix icon for text
                     if (strpos($linktext, '_pixicon:') === 0) {
                         list(, $icon, $titletext) = explode(':', $linktext);
@@ -193,7 +204,7 @@ class datalynxview_patterns {
                     return html_writer::link($view->baseurl->out(false) . "&$urlquery", $linktext);
                 }
                 if (strpos($tag, "#{{viewsesslink:$viewname;") === 0) {
-                    list(, $linktext, $urlquery, ) = explode(';', $tag);
+                    list(, $linktext, $urlquery,) = explode(';', $tag);
                     // Pix icon for text
                     if (strpos($linktext, '_pixicon:') === 0) {
                         list(, $icon, $titletext) = explode(':', $linktext);
@@ -210,12 +221,12 @@ class datalynxview_patterns {
                 }
             }
         }
-        
+
         static $fields = null;
         if ($fields === null) {
             $fields = $df->get_fields(null, true);
         }
-        
+
         foreach ($fields as $id => $fieldname) {
             if (strpos($tag, "%%{$fieldname}:bulkedit%%") === 0) {
                 if (true) { // if (isset($options['edit'])) {
@@ -225,13 +236,13 @@ class datalynxview_patterns {
                 }
             }
         }
-        
+
         return '';
     }
 
     /**
      * Find out if user can add a new entry
-     * 
+     *
      * @param number $userid
      * @return boolean true if user is allowed to add a new entry
      */
@@ -249,13 +260,13 @@ class datalynxview_patterns {
                  WHERE de.userid = :userid
                    AND de.dataid = :dataid";
         $count = $DB->get_field_sql($sql, $params);
-        
+
         return $count < $maxentries;
     }
 
     /**
      * Returns the values for number of total entries and number of entries displayed
-     * 
+     *
      * @param string $tag
      * @param string $entry
      * @param array $options
@@ -263,7 +274,7 @@ class datalynxview_patterns {
      */
     protected function get_info_replacements($tag, $entry = null, array $options = null) {
         $replacement = '';
-        
+
         switch ($tag) {
             case '##numentriestotal##':
                 $replacement = empty($options['entriesfiltercount']) ? 0 : $options['entriesfiltercount'];
@@ -276,8 +287,8 @@ class datalynxview_patterns {
     }
 
     /**
-     * Return the value of a tag that references a view (viewurl, etc.) 
-     * 
+     * Return the value of a tag that references a view (viewurl, etc.)
+     *
      * @param string $tag
      * @param string $entry
      * @param array $options
@@ -287,34 +298,34 @@ class datalynxview_patterns {
         if ($tag == '##viewsmenu##') {
             return $this->print_views_menu($options, true);
         }
-        
+
         if ($tag == '##filtersmenu##') {
             return $this->print_filters_menu($options, true);
         }
-        
+
         // View url
         if ($tag == '##viewurl##') {
             return $this->get_viewurl_replacement();
         }
-        
+
         if (strpos($tag, '##viewurl:') === 0) {
             list(, $viewname) = explode(':', trim($tag, '#'));
             return $this->get_viewurl_replacement($viewname);
         }
-        
+
         // View content
         if (strpos($tag, '##viewcontent:') === 0) {
             list(, $viewname) = explode(':', trim($tag, '#'));
             return $this->get_viewcontent_replacement($viewname);
         }
-        
+
         return '';
     }
 
     /**
      * Get the HTML code that replacee the user preferences tags like
      * ##quickperpage##
-     * 
+     *
      * @param string $tag
      * @param string $entry
      * @param array $options
@@ -323,7 +334,7 @@ class datalynxview_patterns {
     protected function get_userpref_replacements($tag, array $options = null) {
         $view = $this->_view;
         $filter = $view->get_filter();
-        
+
         if (!$view->is_forcing_filter() and (!$filter->id or !empty($options['entriescount']))) {
             switch ($tag) {
                 case '##quickperpage##':
@@ -340,7 +351,7 @@ class datalynxview_patterns {
 
     /**
      * Get the HTML code that replaces action tags like ##edit##
-     * 
+     *
      * @param string $tag
      * @param string $entry
      * @param array $options
@@ -348,167 +359,167 @@ class datalynxview_patterns {
      */
     protected function get_action_replacements($tag, $entry = null, array $options = null) {
         global $CFG, $OUTPUT;
-        
+
         $replacement = '';
-        
+
         $view = $this->_view;
         $df = $view->get_df();
         $filter = $view->get_filter();
         $baseurl = new moodle_url($view->get_baseurl());
         $baseurl->param('sesskey', sesskey());
         $baseurl->param('sourceview', $this->_view->id());
-        
+
         $showentryactions = (!empty($options['showentryactions']) or
-                 has_capability('mod/datalynx:manageentries', $df->context));
+                has_capability('mod/datalynx:manageentries', $df->context));
         // TODO: move to a view attribute so as to call only once
         // Can this user registered or anonymous add entries
         $usercanaddentries = $view->get_df()->user_can_manage_entry();
-        
+
         switch ($tag) {
             case '##addnewentry##':
             case '##addnewentries##':
                 if (!empty($options['hidenewentry']) or !$usercanaddentries) {
                     break;
                 }
-                
+
                 if ($tag == '##addnewentry##') {
                     if (!empty($df->data->singleedit)) {
                         $baseurl->param('view', $df->data->singleedit);
                     }
                     $baseurl->param('new', 1);
                     $label = html_writer::tag('span', get_string('entryaddnew', 'datalynx'));
-                    $replacement = html_writer::link($baseurl, $label, 
+                    $replacement = html_writer::link($baseurl, $label,
                             array('class' => 'addnewentry'));
                 } else {
                     $range = range(1, 20);
                     $options = array_combine($range, $range);
-                    $select = new single_select(new moodle_url($baseurl), 'new', $options, null, 
+                    $select = new single_select(new moodle_url($baseurl), 'new', $options, null,
                             array(0 => get_string('dots', 'datalynx')), 'newentries_jump');
                     $select->set_label(get_string('entryaddmultinew', 'datalynx') . '&nbsp;');
                     $replacement = $OUTPUT->render($select);
                 }
-                
+
                 break;
-            
+
             case '##multiduplicate##':
-                $replacement = html_writer::empty_tag('input', 
-                        array('type' => 'button', 'name' => 'multiduplicate', 
-                            'value' => get_string('multiduplicate', 'datalynx'), 
-                            'onclick' => 'bulk_action(\'entry\'&#44; \'' . $baseurl->out(false) .
-                                     '\'&#44; \'duplicate\')'
+                $replacement = html_writer::empty_tag('input',
+                        array('type' => 'button', 'name' => 'multiduplicate',
+                                'value' => get_string('multiduplicate', 'datalynx'),
+                                'onclick' => 'bulk_action(\'entry\'&#44; \'' . $baseurl->out(false) .
+                                        '\'&#44; \'duplicate\')'
                         ));
                 break;
-            
+
             case '##multiduplicate:icon##':
                 if ($showentryactions) {
-                    $replacement = html_writer::tag('button', 
-                            $OUTPUT->pix_icon('t/copy', get_string('multiduplicate', 'datalynx')), 
-                            array('type' => 'button', 'name' => 'multiduplicate', 
-                                'onclick' => 'bulk_action(\'entry\'&#44; \'' . $baseurl->out(false) .
-                                         '\'&#44; \'duplicate\')'
+                    $replacement = html_writer::tag('button',
+                            $OUTPUT->pix_icon('t/copy', get_string('multiduplicate', 'datalynx')),
+                            array('type' => 'button', 'name' => 'multiduplicate',
+                                    'onclick' => 'bulk_action(\'entry\'&#44; \'' . $baseurl->out(false) .
+                                            '\'&#44; \'duplicate\')'
                             ));
                 }
                 break;
-            
+
             case '##multiedit##':
                 if ($showentryactions) {
-                    $replacement = html_writer::empty_tag('input', 
-                            array('type' => 'button', 'name' => 'multiedit', 
-                                'value' => get_string('multiedit', 'datalynx'), 
-                                'onclick' => 'bulk_action(\'entry\'&#44; \'' . $baseurl->out(false) .
-                                         '\'&#44; \'editentries\')'
+                    $replacement = html_writer::empty_tag('input',
+                            array('type' => 'button', 'name' => 'multiedit',
+                                    'value' => get_string('multiedit', 'datalynx'),
+                                    'onclick' => 'bulk_action(\'entry\'&#44; \'' . $baseurl->out(false) .
+                                            '\'&#44; \'editentries\')'
                             ));
                 }
                 break;
-            
+
             case '##multiedit:icon##':
                 if ($showentryactions) {
-                    $replacement = html_writer::tag('button', 
-                            $OUTPUT->pix_icon('t/edit', get_string('multiedit', 'datalynx')), 
-                            array('type' => 'button', 'name' => 'multiedit', 
-                                'onclick' => 'bulk_action(\'entry\'&#44; \'' . $baseurl->out(false) .
-                                         '\'&#44; \'editentries\')'
+                    $replacement = html_writer::tag('button',
+                            $OUTPUT->pix_icon('t/edit', get_string('multiedit', 'datalynx')),
+                            array('type' => 'button', 'name' => 'multiedit',
+                                    'onclick' => 'bulk_action(\'entry\'&#44; \'' . $baseurl->out(false) .
+                                            '\'&#44; \'editentries\')'
                             ));
                 }
                 break;
-            
+
             case '##multidelete##':
                 if ($showentryactions) {
-                    $replacement = html_writer::empty_tag('input', 
-                            array('type' => 'button', 'name' => 'multidelete', 
-                                'value' => get_string('multidelete', 'datalynx'), 
-                                'onclick' => 'bulk_action(\'entry\'&#44; \'' . $baseurl->out(false) .
-                                         '\'&#44; \'delete\')'
+                    $replacement = html_writer::empty_tag('input',
+                            array('type' => 'button', 'name' => 'multidelete',
+                                    'value' => get_string('multidelete', 'datalynx'),
+                                    'onclick' => 'bulk_action(\'entry\'&#44; \'' . $baseurl->out(false) .
+                                            '\'&#44; \'delete\')'
                             ));
                 }
                 break;
-            
+
             case '##multidelete:icon##':
                 if ($showentryactions) {
-                    $replacement = html_writer::tag('button', 
-                            $OUTPUT->pix_icon('t/delete', get_string('multidelete', 'datalynx')), 
-                            array('type' => 'button', 'name' => 'multidelete', 
-                                'onclick' => 'bulk_action(\'entry\'&#44; \'' . $baseurl->out(false) .
-                                         '\'&#44; \'delete\')'
+                    $replacement = html_writer::tag('button',
+                            $OUTPUT->pix_icon('t/delete', get_string('multidelete', 'datalynx')),
+                            array('type' => 'button', 'name' => 'multidelete',
+                                    'onclick' => 'bulk_action(\'entry\'&#44; \'' . $baseurl->out(false) .
+                                            '\'&#44; \'delete\')'
                             ));
                 }
                 break;
-            
+
             case '##multiapprove##':
             case '##multiapprove:icon##':
                 if ($df->data->approval and has_capability('mod/datalynx:approve', $df->context)) {
                     if ($tag == '##multiapprove##') {
-                        $replacement = html_writer::empty_tag('input', 
-                                array('type' => 'button', 'name' => 'multiapprove', 
-                                    'value' => get_string('multiapprove', 'datalynx'), 
-                                    'onclick' => 'bulk_action(\'entry\'&#44; \'' .
-                                             $baseurl->out(false) . '\'&#44; \'approve\')'
+                        $replacement = html_writer::empty_tag('input',
+                                array('type' => 'button', 'name' => 'multiapprove',
+                                        'value' => get_string('multiapprove', 'datalynx'),
+                                        'onclick' => 'bulk_action(\'entry\'&#44; \'' .
+                                                $baseurl->out(false) . '\'&#44; \'approve\')'
                                 ));
                     } else {
-                        $replacement = html_writer::tag('button', 
-                                $OUTPUT->pix_icon('i/grade_correct', 
-                                        get_string('multiapprove', 'datalynx')), 
-                                array('type' => 'button', 'name' => 'multiapprove', 
-                                    'onclick' => 'bulk_action(\'entry\'&#44; \'' .
-                                             $baseurl->out(false) . '\'&#44; \'approve\')'
+                        $replacement = html_writer::tag('button',
+                                $OUTPUT->pix_icon('i/grade_correct',
+                                        get_string('multiapprove', 'datalynx')),
+                                array('type' => 'button', 'name' => 'multiapprove',
+                                        'onclick' => 'bulk_action(\'entry\'&#44; \'' .
+                                                $baseurl->out(false) . '\'&#44; \'approve\')'
                                 ));
                     }
                 }
                 break;
-            
+
             case '##multiexport##':
                 $buttonval = get_string('multiexport', 'datalynx');
             case '##multiexport:icon##':
-                $buttonval = !isset($buttonval) ? $OUTPUT->pix_icon('t/portfolioadd', 
+                $buttonval = !isset($buttonval) ? $OUTPUT->pix_icon('t/portfolioadd',
                         get_string('multiexport', 'datalynx')) : $buttonval;
-                
+
                 if (!empty($CFG->enableportfolios)) {
                     if (!empty($format)) {
                         $baseurl->param('format', $format);
                     }
                     // list(,$ext,) = explode(':', $tag);
-                    $replacement = html_writer::tag('button', $buttonval, 
-                            array('type' => 'button', 'name' => 'multiexport', 
-                                'onclick' => 'bulk_action(\'entry\'&#44; \'' . $baseurl->out(false) .
-                                         '\'&#44; \'export\'&#44;-1)'
+                    $replacement = html_writer::tag('button', $buttonval,
+                            array('type' => 'button', 'name' => 'multiexport',
+                                    'onclick' => 'bulk_action(\'entry\'&#44; \'' . $baseurl->out(false) .
+                                            '\'&#44; \'export\'&#44;-1)'
                             ));
                 }
                 break;
-            
+
             case '##selectallnone##':
-                $replacement = html_writer::checkbox(null, null, false, null, 
+                $replacement = html_writer::checkbox(null, null, false, null,
                         array('onclick' => 'select_allnone(\'entry\'&#44;this.checked)'
                         ));
-                
+
                 break;
         }
-        
+
         return $replacement;
     }
 
     /**
      * Get HTML that replaces the tag ##pagingbar##
-     * 
+     *
      * @param string $tag
      * @param string $entry
      * @param array $options
@@ -520,7 +531,7 @@ class datalynxview_patterns {
         $view = $this->_view;
         $filter = $view->get_filter();
         $baseurl = $view->get_baseurl();
-        
+
         // typical entry 'more' request. If not single view (1 per page) show nothing instead
         // of paging bar
         if (!empty($filter->eids)) {
@@ -528,20 +539,25 @@ class datalynxview_patterns {
             $pagingbar = '';
 
             // typical groupby, one group per page case. show paging bar as per number of groups
-        } else if (isset($filter->pagenum)) {
-            $pagingbar = new paging_bar($filter->pagenum, $filter->page, 1, $baseurl . '&amp;', 
-                    'page', '', true);
-            // standard paging bar case
-        } else if (!empty($filter->perpage) and !empty($options['entriescount']) and
-                 !empty($options['entriesfiltercount']) and
-                 $options['entriescount'] != $options['entriesfiltercount']) {
+        } else {
+            if (isset($filter->pagenum)) {
+                $pagingbar = new paging_bar($filter->pagenum, $filter->page, 1, $baseurl . '&amp;',
+                        'page', '', true);
+                // standard paging bar case
+            } else {
+                if (!empty($filter->perpage) and !empty($options['entriescount']) and
+                        !empty($options['entriesfiltercount']) and
+                        $options['entriescount'] != $options['entriesfiltercount']
+                ) {
 
-            $pagingbar = new paging_bar($options['entriesfiltercount'], $filter->page,
-                $filter->perpage, $baseurl , 'page');
-        } else { // no paging bar case at all:
-            $pagingbar = '';
+                    $pagingbar = new paging_bar($options['entriesfiltercount'], $filter->page,
+                            $filter->perpage, $baseurl, 'page');
+                } else { // no paging bar case at all:
+                    $pagingbar = '';
+                }
+            }
         }
-        
+
         if ($pagingbar) {
             $replacement = $OUTPUT->render($pagingbar);
         } else {
@@ -549,7 +565,6 @@ class datalynxview_patterns {
         }
         return $replacement;
     }
-
 
     /**
      * @param array $fieldinput
@@ -565,7 +580,6 @@ class datalynxview_patterns {
         return $contentfield_str;
     }
 
-
     /**
      * If viewname is not specified, return the URL of the current view
      * else return the URL of the $viewname
@@ -575,12 +589,12 @@ class datalynxview_patterns {
      */
     protected function get_viewurl_replacement($viewname = null) {
         $view = $this->_view;
-        
+
         // Return this view's url
         if ($viewname === null) {
             return $view->get_baseurl()->out(false);
         }
-        
+
         $df = $this->_view->get_df();
         static $views = null;
         if ($views === null) {
@@ -591,7 +605,7 @@ class datalynxview_patterns {
                 }
             }
         }
-        
+
         if (!empty($views[$viewname])) {
             return $views[$viewname]->get_baseurl()->out(false);
         }
@@ -615,13 +629,13 @@ class datalynxview_patterns {
                 }
             }
         }
-        
+
         if (!empty($views[$viewname])) {
             // Cannot display current view or else infinite loop
             if ($views[$viewname]->id() == $this->_view->id()) {
                 return '';
             }
-            
+
             $views[$viewname]->set_content();
             return $views[$viewname]->display(array('tohtml' => true));
         }
@@ -630,12 +644,13 @@ class datalynxview_patterns {
 
     /**
      * Get all tags in a single array
+     *
      * @param boolean $checkvisibility if true only views visible to user are considered
      * @return array of tags/patterns
      */
     protected function patterns($checkvisibility = true) {
-        $patterns = array_merge($this->info_patterns(), $this->ref_patterns($checkvisibility), 
-                $this->userpref_patterns(), $this->action_patterns(), $this->paging_patterns(), 
+        $patterns = array_merge($this->info_patterns(), $this->ref_patterns($checkvisibility),
+                $this->userpref_patterns(), $this->action_patterns(), $this->paging_patterns(),
                 $this->bulkedit_patterns());
         return $patterns;
     }
@@ -643,43 +658,45 @@ class datalynxview_patterns {
     /**
      * Get tags for total number of entries and entries per page
      * and the localised "entries" string
-     * 
-     * @return array of arrays 
+     *
+     * @return array of arrays
      */
     protected function info_patterns() {
         $cat = get_string('entries', 'datalynx');
         $patterns = array('##numentriestotal##' => array(true, $cat),
-            '##numentriesdisplayed##' => array(true, $cat));
+                '##numentriesdisplayed##' => array(true, $cat));
         return $patterns;
     }
 
     /**
      * Get view references with localised string
      * Only views visible to current user are used
-     * 
-     * @param boolean $checkvisibility true if only views visible to the user should be considered 
+     *
+     * @param boolean $checkvisibility true if only views visible to the user should be considered
      * @return array associative array sith pattern string as value and key
      */
     protected function ref_patterns($checkvisibility = true) {
         $cat = get_string('reference', 'datalynx');
-        $patterns = array(  '##viewurl##' => array(true, $cat),
-                            '##viewsmenu##' => array(true, $cat),
-                            '##filtersmenu##' => array(true, $cat));
-        
+        $patterns = array('##viewurl##' => array(true, $cat),
+                '##viewsmenu##' => array(true, $cat),
+                '##filtersmenu##' => array(true, $cat));
+
         $df = $this->_view->get_df();
-        
+
         static $views = null;
         if ($views === null && $checkvisibility) {
             $views = $df->get_views_menu();
-        } else if ($checkvisibility == false) {
-        	$viewojects = $df->get_all_views();
-        	if(!empty($viewojects)){
-        		foreach ($viewojects as $viewid => $view){
-        			$views[$viewid] = $view->name;
-        		}        		
-        	}
+        } else {
+            if ($checkvisibility == false) {
+                $viewojects = $df->get_all_views();
+                if (!empty($viewojects)) {
+                    foreach ($viewojects as $viewid => $view) {
+                        $views[$viewid] = $view->name;
+                    }
+                }
+            }
         }
-        
+
         if ($views) {
             foreach ($views as $viewname) {
                 $patterns["##viewurl:$viewname##"] = array(false);
@@ -691,31 +708,38 @@ class datalynxview_patterns {
 
     /**
      * Get filter and search tags with localised string
-     * 
+     *
      * @return array multidimensional
      */
     protected function userpref_patterns() {
         $cat = get_string('userpref', 'datalynx');
-        $patterns = array(  '##quicksearch##' => array(true, $cat),
-                            '##quickperpage##' => array(true, $cat),
-                            '##advancedfilter##' => array(true, $cat));
+        $patterns = array('##quicksearch##' => array(true, $cat),
+                '##quickperpage##' => array(true, $cat),
+                '##advancedfilter##' => array(true, $cat));
         return $patterns;
     }
 
     /**
      * Get actions tags with localised string
-     * 
+     *
      * @return array multidimensional
      */
     protected function action_patterns() {
         $cat = get_string('generalactions', 'datalynx');
-        $patterns = array('##addnewentry##' => array(true, $cat), '##addnewentries##' => array(true, $cat), '##selectallnone##' => array(true, $cat), '##multiduplicate##' => array(true, $cat), '##multiduplicate:icon##' => array(true, $cat), '##multiedit##' => array(true, $cat), '##multiedit:icon##' => array(true, $cat), '##multidelete##' => array(true, $cat), '##multidelete:icon##' => array(true, $cat), '##multiapprove##' => array(true, $cat), '##multiapprove:icon##' => array(true, $cat), '##multiexport##' => array(true, $cat), '##multiexport:icon##' => array(true, $cat), '##multiimport##' => array(true, $cat), '##multiimporty:icon##' => array(true, $cat));
+        $patterns = array('##addnewentry##' => array(true, $cat), '##addnewentries##' => array(true, $cat),
+                '##selectallnone##' => array(true, $cat), '##multiduplicate##' => array(true, $cat),
+                '##multiduplicate:icon##' => array(true, $cat), '##multiedit##' => array(true, $cat),
+                '##multiedit:icon##' => array(true, $cat), '##multidelete##' => array(true, $cat),
+                '##multidelete:icon##' => array(true, $cat), '##multiapprove##' => array(true, $cat),
+                '##multiapprove:icon##' => array(true, $cat), '##multiexport##' => array(true, $cat),
+                '##multiexport:icon##' => array(true, $cat), '##multiimport##' => array(true, $cat),
+                '##multiimporty:icon##' => array(true, $cat));
         return $patterns;
     }
 
     /**
      * Get pagingbar tag
-     * 
+     *
      * @return array multidimensional
      */
     protected function paging_patterns() {
@@ -727,7 +751,7 @@ class datalynxview_patterns {
     /**
      * viewlink and viewsesslink tags with localised string
      * TODO Currently not included in the menu
-     * 
+     *
      * @param boolean $checkvisibility true if only views visible to the user should be considered
      * @return multitype:multitype:boolean unknown  multitype:boolean string
      */
@@ -736,15 +760,15 @@ class datalynxview_patterns {
 
         $views = array();
         $patterns = array();
-        if($checkvisibility){
-        	$views = $df->get_views_menu();
+        if ($checkvisibility) {
+            $views = $df->get_views_menu();
         } else {
-        	$viewojects = $df->get_all_views();
-        	if(!empty($viewojects)){
-        		foreach ($viewojects as $viewid => $view){
-        			$views[$viewid] = $view->name;
-        		}
-        	}
+            $viewojects = $df->get_all_views();
+            if (!empty($viewojects)) {
+                foreach ($viewojects as $viewid => $view) {
+                    $views[$viewid] = $view->name;
+                }
+            }
         }
         // Get list of views
         if ($views) {
@@ -756,20 +780,20 @@ class datalynxview_patterns {
                 $patterns["#{{viewsesslink:$viewname;[^;]*;[^;]*;}}#"] = array(true, $cat);
             }
         }
-        
+
         return $patterns;
     }
 
     /**
      * Get bulkedit fieldname specific bulkedit tags with localised string
-     * 
+     *
      * @return array multitype:multitype:boolean string
      */
     protected function bulkedit_patterns() {
         $df = $this->_view->get_df();
-        
+
         $patterns = array();
-        
+
         $fields = $df->get_fields(null, true);
         $cat = get_string('reference', 'datalynx');
         foreach ($fields as $fieldname) {
@@ -781,18 +805,18 @@ class datalynxview_patterns {
 
     /**
      * Find out if pattern contains a viewname or fieldname
-     * 
+     *
      * @param string $pattern
      * @return boolean true if $pattern is a viewname or fieldame
      */
     public function is_regexp_pattern($pattern) {
         $df = $this->_view->get_df();
-        
+
         static $views = null;
         if ($views === null) {
             $views = $df->get_views_menu();
         }
-        
+
         if ($views) {
             foreach ($views as $viewname) {
                 if (strpos($pattern, "#{{viewlink:$viewname;") === 0) {
@@ -803,12 +827,12 @@ class datalynxview_patterns {
                 }
             }
         }
-        
+
         static $fields = null;
         if ($fields === null) {
             $fields = $df->get_fields(null, true);
         }
-        
+
         foreach ($fields as $fieldname) {
             if (strpos($pattern, "%%{$fieldname}:bulkedit%%") === 0) {
                 return true;
@@ -819,32 +843,32 @@ class datalynxview_patterns {
 
     /**
      * Echo or return views menu HTML (Dropdown of available views for the user)
-     * 
+     *
      * @param array $options
      * @param string $return
      * @return string
      */
     protected function print_views_menu($options, $return = false) {
         global $OUTPUT;
-        
+
         $view = $this->_view;
         $df = $view->get_df();
         $filter = $view->get_filter();
         $baseurl = $view->get_baseurl();
-        
+
         $viewjump = '';
-        
+
         if ($menuviews = $df->get_views_menu() and count($menuviews) > 1) {
-            
+
             // Display the view form jump list
             $baseurl = $baseurl->out_omit_querystring();
             $baseurlparams = array('d' => $df->id(), 'sesskey' => sesskey());
-            $viewselect = new single_select(new moodle_url($baseurl, $baseurlparams), 'view', 
+            $viewselect = new single_select(new moodle_url($baseurl, $baseurlparams), 'view',
                     $menuviews, $view->id(), array('' => 'choosedots'), 'viewbrowse_jump');
             $viewselect->set_label(get_string('viewcurrent', 'datalynx') . '&nbsp;');
             $viewjump = $OUTPUT->render($viewselect);
         }
-        
+
         if ($return) {
             return $viewjump;
         } else {
@@ -854,20 +878,21 @@ class datalynxview_patterns {
 
     /**
      * Echo or return filter menu HTML (Dropdown of available filters for the user)
+     *
      * @param array $options
      * @param string $return
      * @return string
      */
     protected function print_filters_menu($options, $return = false) {
         global $OUTPUT;
-        
+
         $view = $this->_view;
         $df = $view->get_df();
         $filter = $view->get_filter();
         $baseurl = $view->get_baseurl();
-        
+
         $filterjump = '';
-        
+
         if (!$view->is_forcing_filter() and ($filter->id or !empty($options['entriescount']))) {
             $fm = $df->get_filter_manager();
             if (!$menufilters = $fm->get_filters(null, true)) {
@@ -876,20 +901,20 @@ class datalynxview_patterns {
             if ($userfilters = $fm->get_user_filters_menu($view->id())) {
                 $menufilters[] = array(get_string('filtermy', 'datalynx') => $userfilters);
             }
-            
+
             $baseurl = $baseurl->out_omit_querystring();
             $baseurlparams = array('d' => $df->id(), 'sesskey' => sesskey(), 'view' => $view->id());
             // if ($filter->id) {
             // $menufilters[0] = get_string('filtercancel', 'datalynx');
             // }
-            
+
             // Display the filter form jump list
-            $filterselect = new single_select(new moodle_url($baseurl, $baseurlparams), 'filter', 
+            $filterselect = new single_select(new moodle_url($baseurl, $baseurlparams), 'filter',
                     $menufilters, $filter->id, array('' => 'choosedots'), 'filterbrowse_jump');
             $filterselect->set_label(get_string('filtercurrent', 'datalynx') . '&nbsp;');
             $filterjump = $OUTPUT->render($filterselect);
         }
-        
+
         if ($return) {
             return $filterjump;
         } else {
@@ -899,7 +924,7 @@ class datalynxview_patterns {
 
     /**
      * Echo or return quicksearch HTML (input field for text to search for)
-     * 
+     *
      * @param array $options
      * @param string $return
      * @return string
@@ -909,12 +934,12 @@ class datalynxview_patterns {
         $df = $view->get_df();
         $filter = $view->get_filter();
         $baseurl = $view->get_baseurl();
-        
+
         $quicksearchjump = '';
-        
+
         $baseurl = $baseurl->out_omit_querystring();
-        $baseurlparams = array('d' => $df->id(), 'sesskey' => sesskey(), 'view' => $view->id(), 
-            'filter' => $filter->id); // datalynx_filter_manager::USER_FILTER_SET);
+        $baseurlparams = array('d' => $df->id(), 'sesskey' => sesskey(), 'view' => $view->id(),
+                'filter' => $filter->id); // datalynx_filter_manager::USER_FILTER_SET);
         /*
          * if ($filter->id < 0 and $filter->search) {
          * $searchvalue = $filter->search;
@@ -925,26 +950,26 @@ class datalynxview_patterns {
         $searchvalue = $filter->search;
         // Display the quick search form
         $label = html_writer::label(get_string('search'), "usersearch");
-        $inputfield = html_writer::empty_tag('input', 
+        $inputfield = html_writer::empty_tag('input',
                 array('type' => 'text', 'name' => 'usersearch', 'value' => $searchvalue, 'size' => 20));
-        
+
         $button = '';
         // html_writer::empty_tag('input', array('type' => 'submit', 'value' =>
         // get_string('submit')));
-        
+
         $formparams = '';
         foreach ($baseurlparams as $var => $val) {
-            $formparams .= html_writer::empty_tag('input', 
+            $formparams .= html_writer::empty_tag('input',
                     array('type' => 'hidden', 'name' => $var, 'value' => $val));
         }
-        
+
         $attributes = array('method' => 'post', 'action' => new moodle_url($baseurl));
-        
+
         $qsform = html_writer::tag('form', "$formparams&nbsp;$label&nbsp;$inputfield&nbsp;$button", $attributes);
-        
+
         // and finally one more wrapper with class
         $quicksearchjump = html_writer::tag('div', $qsform, array('class' => 'singleselect'));
-        
+
         if ($return) {
             return $quicksearchjump;
         } else {
@@ -954,40 +979,40 @@ class datalynxview_patterns {
 
     /**
      * Echo or return the HTML for entries per page dropdown menu
-     * 
+     *
      * @param string $return
      * @return string
      */
     protected function print_quick_perpage($return = false) {
         global $OUTPUT;
-        
+
         $view = $this->_view;
         $df = $view->get_df();
         $filter = $view->get_filter();
         $baseurl = $view->get_baseurl();
-        
+
         $perpagejump = '';
 
         $baseurl = $baseurl->out_omit_querystring();
-        $baseurlparams = array('d' => $df->id(), 'sesskey' => sesskey(), 'view' => $view->id(), 
-            'filter' => datalynx_filter_manager::USER_FILTER_SET);
-        
+        $baseurlparams = array('d' => $df->id(), 'sesskey' => sesskey(), 'view' => $view->id(),
+                'filter' => datalynx_filter_manager::USER_FILTER_SET);
+
         if ($filter->id < 0 and $filter->perpage) {
             $perpagevalue = $filter->perpage;
         } else {
             $perpagevalue = 0;
         }
-        
-        $perpage = array(1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5, 6 => 6, 7 => 7, 8 => 8, 9 => 9, 
-            10 => 10, 15 => 15, 20 => 20, 30 => 30, 40 => 40, 50 => 50, 100 => 100, 200 => 200, 
-            300 => 300, 400 => 400, 500 => 500, 1000 => 1000);
-        
+
+        $perpage = array(1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5, 6 => 6, 7 => 7, 8 => 8, 9 => 9,
+                10 => 10, 15 => 15, 20 => 20, 30 => 30, 40 => 40, 50 => 50, 100 => 100, 200 => 200,
+                300 => 300, 400 => 400, 500 => 500, 1000 => 1000);
+
         // Display the view form jump list
-        $select = new single_select(new moodle_url($baseurl, $baseurlparams), 'uperpage', $perpage, 
-                        $perpagevalue, array('' => 'choosedots'), 'perpage_jump');
+        $select = new single_select(new moodle_url($baseurl, $baseurlparams), 'uperpage', $perpage,
+                $perpagevalue, array('' => 'choosedots'), 'perpage_jump');
         $select->set_label(get_string('filterperpage', 'datalynx') . '&nbsp;');
         $perpagejump = $OUTPUT->render($select);
-        
+
         if ($return) {
             return $perpagejump;
         } else {
@@ -997,7 +1022,7 @@ class datalynxview_patterns {
 
     /**
      * Echo or return advanced filter form HTML
-     * 
+     *
      * @param string $return
      * @return string
      */
@@ -1009,9 +1034,9 @@ class datalynxview_patterns {
 
         $fm = $df->get_filter_manager();
         $filterform = $fm->get_advanced_filter_form($filter, $view);
-        
+
         if ($return) {
-            return html_writer::tag('div', $filterform->html(), 
+            return html_writer::tag('div', $filterform->html(),
                     array('class' => 'mdl-left'));
         } else {
             html_writer::start_tag('div', array('class' => 'mdl-left'));

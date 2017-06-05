@@ -21,15 +21,14 @@
  * @copyright 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ("$CFG->dirroot/mod/datalynx/field/field_form.php");
-
+require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
 class datalynxfield_editor_form extends datalynxfield_form {
 
     function field_definition() {
         $mform = &$this->_form;
-        
-        $mform->addElement('header', 'fieldattributeshdr', 
+
+        $mform->addElement('header', 'fieldattributeshdr',
                 get_string('fieldattributes', 'datalynx'));
     }
 }

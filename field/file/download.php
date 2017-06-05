@@ -21,7 +21,7 @@
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ('../../../../config.php');
+require_once('../../../../config.php');
 
 $cid = required_param('cid', PARAM_INT);
 $context = required_param('context', PARAM_INT);

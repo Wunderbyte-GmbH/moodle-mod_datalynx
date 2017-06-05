@@ -26,8 +26,7 @@
  * A class representing a single datalynx rating
  * Extends the core rating class
  */
-require_once ("$CFG->dirroot/rating/lib.php");
-
+require_once("$CFG->dirroot/rating/lib.php");
 
 class datalynx_rating extends rating {
 
@@ -38,7 +37,7 @@ class datalynx_rating extends rating {
      */
     public function get_aggregate_value($aggregation) {
         $aggregate = isset($this->aggregate[$aggregation]) ? $this->aggregate[$aggregation] : '';
-        
+
         if ($aggregate and $aggregation != RATING_AGGREGATE_COUNT) {
             if ($aggregation != RATING_AGGREGATE_SUM and !$this->settings->scale->isnumeric) {
                 // round aggregate as we're using it as an index
@@ -48,11 +47,10 @@ class datalynx_rating extends rating {
                 $aggregate = round($aggregate, 1);
             }
         }
-        
+
         return $aggregate;
     }
 }
-
 
 /**
  * The datalynx_rating_manager class extends the rating_manager class
@@ -63,7 +61,7 @@ class datalynx_rating_manager extends rating_manager {
     /**
      * Adds rating objects to an array of entries
      * Rating objects are available at $item->rating
-     * 
+     *
      * @param stdClass $options {
      *        context => context the context in which the ratings exists [required]
      *        component => the component name ie mod_forum [required]
@@ -85,33 +83,35 @@ class datalynx_rating_manager extends rating_manager {
      */
     public function get_ratings($options) {
         global $DB, $USER;
-        
+
         if (!isset($options->context)) {
             throw new coding_exception(
                     'The context option is a required option when getting ratings.');
         }
-        
+
         if (!isset($options->component)) {
             throw new coding_exception(
                     'The component option is a required option when getting ratings.');
         }
-        
+
         if (!isset($options->ratingarea)) {
             throw new coding_exception(
                     'The ratingarea option is a required option when getting ratings.');
         }
-        
+
         if (!isset($options->scaleid)) {
             throw new coding_exception(
                     'The scaleid option is a required option when getting ratings.');
         }
-        
+
         if (!isset($options->items)) {
             throw new coding_exception('The items option is a required option when getting ratings.');
-        } else if (empty($options->items)) {
-            return array();
+        } else {
+            if (empty($options->items)) {
+                return array();
+            }
         }
-        
+
         list($sql, $params) = $this->get_sql_aggregate($options);
         if ($ratingrecords = $DB->get_records_sql($sql, $params)) {
             foreach ($options->items as &$item) {
@@ -136,21 +136,21 @@ class datalynx_rating_manager extends rating_manager {
      */
     public function get_sql_aggregate($options) {
         global $DB, $USER;
-        
+
         // User id; default to current user
         if (empty($options->userid)) {
             $userid = $USER->id;
         } else {
             $userid = $options->userid;
         }
-        
+
         // Params
         $params = array();
         $params['contextid'] = $options->context->id;
         $params['userid'] = $userid;
         $params['component'] = $options->component;
         $params['ratingarea'] = $options->ratingarea;
-        
+
         // Aggregation sql
         $optionsaggregate = null;
         if (empty($options->aggregate)) {
@@ -171,7 +171,7 @@ class datalynx_rating_manager extends rating_manager {
             $options->aggregate = RATING_AGGREGATE_COUNT;
         }
         $aggregationsql = !empty($aggregatessql) ? implode(', ', $aggregatessql) . ', ' : '';
-        
+
         // sql for entry ids
         $andwhereitems = '';
         if (!empty($options->items)) {
@@ -180,7 +180,7 @@ class datalynx_rating_manager extends rating_manager {
             $andwhereitems = " AND r.itemid $itemidtest ";
             $params = array_merge($params, $paramitems);
         }
-        
+
         $sql = "SELECT r.itemid, r.component, r.ratingarea, r.contextid,
                        COUNT(r.rating) AS numratings, $aggregationsql 
                        ur.id, ur.userid, ur.scaleid, ur.rating AS usersrating
@@ -196,7 +196,7 @@ class datalynx_rating_manager extends rating_manager {
                         $andwhereitems
                 GROUP BY r.itemid, r.component, r.ratingarea, r.contextid, ur.id, ur.userid, ur.scaleid
                 ORDER BY r.itemid";
-        
+
         return array($sql, $params);
     }
 
@@ -206,21 +206,21 @@ class datalynx_rating_manager extends rating_manager {
      */
     public function get_sql_all($options) {
         global $DB, $USER;
-        
+
         // User id; default to current user
         if (empty($options->userid)) {
             $userid = $USER->id;
         } else {
             $userid = $options->userid;
         }
-        
+
         // Params
         $params = array();
         $params['contextid'] = $options->context->id;
         $params['userid'] = $userid;
         $params['component'] = $options->component;
         $params['ratingarea'] = $options->ratingarea;
-        
+
         // sql for entry ids
         $andwhereitems = '';
         if (!empty($options->items)) {
@@ -229,10 +229,10 @@ class datalynx_rating_manager extends rating_manager {
             $andwhereitems = " AND r.itemid $itemidtest ";
             $params = array_merge($params, $paramitems);
         }
-        
+
         $sql = "SELECT r.id, r.itemid, r.component, r.ratingarea, r.contextid, r.scaleid,
                        r.rating, r.userid, r.timecreated, r.timemodified, " .
-                 user_picture::fields('u', array('idnumber', 'username'
+                user_picture::fields('u', array('idnumber', 'username'
                 ), 'uid ') . " FROM {rating} r 
                     JOIN {user} u ON u.id = r.userid 
                     
@@ -241,7 +241,7 @@ class datalynx_rating_manager extends rating_manager {
                         AND r.ratingarea = :ratingarea
                         $andwhereitems
                 ORDER BY r.itemid";
-        
+
         return array($sql, $params);
     }
 
@@ -259,7 +259,7 @@ class datalynx_rating_manager extends rating_manager {
      */
     public function get_rating_object($item, $ratingrecord) {
         $rec = $ratingrecord;
-        
+
         $options = new stdClass();
         $options->context = $rec->context;
         $options->component = 'mod_datalynx';
@@ -269,7 +269,7 @@ class datalynx_rating_manager extends rating_manager {
         // Note: rec->scaleid = the id of scale at the time the rating was submitted
         // may be different from the current scale id
         $options->scaleid = $rec->scaleid;
-        
+
         $options->userid = !empty($rec->userid) ? $rec->userid : 0;
         $options->id = !empty($rec->id) ? $rec->id : 0;
         if (!empty($rec->usersrating)) {
@@ -279,7 +279,7 @@ class datalynx_rating_manager extends rating_manager {
         }
         $options->count = $rec->numratings;
         $rec->countratings = $rec->numratings;
-        
+
         if (!empty($rec->aggregate)) {
             if (!is_array($rec->aggregate)) {
                 $rec->aggregate = array($rec->aggregate
@@ -291,17 +291,17 @@ class datalynx_rating_manager extends rating_manager {
                 }
                 $aggrmethod = $this->get_aggregation_method($aggregation);
                 $aggrmethodpref = strtolower($aggrmethod);
-                $options->aggregate[$aggregation] = min($rec->{"{$aggrmethodpref}ratings"}, 
+                $options->aggregate[$aggregation] = min($rec->{"{$aggrmethodpref}ratings"},
                         $rec->settings->scale->max);
             }
         }
-        
+
         $rating = new datalynx_rating($options);
         $rating->itemtimecreated = $this->get_item_time_created($item);
         if (!empty($item->userid)) {
             $rating->itemuserid = $item->userid;
         }
-        
+
         return $rating;
     }
 }

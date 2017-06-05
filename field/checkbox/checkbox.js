@@ -9,34 +9,34 @@
  */
 M.datalynxfield_checkbox_required = {};
 
-M.datalynxfield_checkbox_required.init = function(Y, options) {
+M.datalynxfield_checkbox_required.init = function (Y, options) {
     YUI().use('node', function (Y) {
         var fieldname = options.fieldname;
         var selected = options.selected;
         var err_message = options.message;
-        
-        if (!Y.one('#fgroup_id_'+fieldname)) {
+
+        if (!Y.one('#fgroup_id_' + fieldname)) {
             return;
         }
-        
-        Y.one('#fgroup_id_'+fieldname).on('click', function (e) {
-            if (e.target.get('className') === 'checkboxgroup'+fieldname+'_selected') {
+
+        Y.one('#fgroup_id_' + fieldname).on('click', function (e) {
+            if (e.target.get('className') === 'checkboxgroup' + fieldname + '_selected') {
                 var empty = true;
-                Y.all('.checkboxgroup'+fieldname+'_selected').each(function(check) {
+                Y.all('.checkboxgroup' + fieldname + '_selected').each(function (check) {
                     if (check.get('checked')) {
                         empty = false;
                     }
                 });
-                Y.all('#fgroup_id_'+fieldname+'_grp .fgrouplabel label span').remove();
+                Y.all('#fgroup_id_' + fieldname + '_grp .fgrouplabel label span').remove();
                 if (empty) {
-                    Y.one('#fgroup_id_'+fieldname+'_grp .fgrouplabel label').append('<span class="error">'+err_message+'</span>');
+                    Y.one('#fgroup_id_' + fieldname + '_grp .fgrouplabel label').append('<span class="error">' + err_message + '</span>');
                 }
             }
         });
-        
-        Y.all('#fgroup_id_'+fieldname+'_grp .fgrouplabel label span').remove();
+
+        Y.all('#fgroup_id_' + fieldname + '_grp .fgrouplabel label span').remove();
         if (!selected) {
-            Y.one('#fgroup_id_'+fieldname+'_grp .fgrouplabel label').append('<span class="error">'+err_message+'</span>');
+            Y.one('#fgroup_id_' + fieldname + '_grp .fgrouplabel label').append('<span class="error">' + err_message + '</span>');
         }
     });
 };

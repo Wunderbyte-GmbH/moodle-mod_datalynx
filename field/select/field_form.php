@@ -21,17 +21,16 @@
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ("$CFG->dirroot/mod/datalynx/field/field_form.php");
-
+require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
 class datalynxfield_select_form extends datalynxfield_option_form {
 
     public function field_definition() {
         $mform = &$this->_form;
-        
-        $mform->addElement('header', 'fieldattributeshdr', 
+
+        $mform->addElement('header', 'fieldattributeshdr',
                 get_string('fieldattributes', 'datalynx'));
-        
+
         // Default value.
         $mform->addElement('text', 'param2', get_string('default'));
         $mform->setType('param2', PARAM_TEXT);
@@ -42,11 +41,11 @@ class datalynxfield_select_form extends datalynxfield_option_form {
 
         // Order alphabetically in edit mode?
         $mform->addElement('selectyesno', 'param4', get_string('alphabeticalorder', 'datalynx'));
-        
+
         // Allow choice limit?
-        $options = array (0 => get_string('choose'));
-        for ($i=1; $i<=100; $i++){
-        	$options[$i] = $i;
+        $options = array(0 => get_string('choose'));
+        for ($i = 1; $i <= 100; $i++) {
+            $options[$i] = $i;
         }
         $mform->addElement('select', 'param5', get_string('limitchoice', 'datalynx'), $options);
         $mform->addHelpButton('param5', 'limitchoice', 'datalynx');

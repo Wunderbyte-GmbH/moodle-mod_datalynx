@@ -21,9 +21,8 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once $CFG->libdir . '/formslib.php';
-HTML_QuickForm::registerElementType('checkboxgroup', 
+HTML_QuickForm::registerElementType('checkboxgroup',
         "$CFG->dirroot/mod/datalynx/checkboxgroup/checkboxgroup.php", 'HTML_QuickForm_checkboxgroup');
-
 
 /**
  */
@@ -42,29 +41,29 @@ class datalynx_field_filterform_form extends moodleform {
 
     protected function definition() {
         $mform = &$this->_form;
-        
+
         $mform->addElement('hidden', 'id', 0);
         $mform->setType('id', PARAM_INT);
         $mform->addElement('hidden', 'd', $this->datalynx->id());
         $mform->setType('d', PARAM_INT);
-        
+
         $mform->addElement('header', 'general', get_string('general', 'form'));
-        
+
         $mform->addElement('text', 'name', get_string('name'), array('size' => '32'));
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
-        $mform->addRule('name', "Filter form name may not contain the pipe symbol \" | \"!", 
+        $mform->addRule('name', "Filter form name may not contain the pipe symbol \" | \"!",
                 'regex', '/^[^\|]+$/', 'client');
-        
+
         $mform->addElement('text', 'description', get_string('description'), array('size' => '64'));
         $mform->setType('description', PARAM_TEXT);
-        
-        $mform->addElement('checkboxgroup', 'fields', get_string('fields', 'datalynx'), 
-                array_map(function ($field) {
+
+        $mform->addElement('checkboxgroup', 'fields', get_string('fields', 'datalynx'),
+                array_map(function($field) {
                     return $field->field->name;
                 }, $this->datalynx->get_fields()), '<br>');
         $mform->setType('fields', PARAM_RAW);
-        
+
         $this->add_action_buttons();
     }
 

@@ -43,7 +43,7 @@ function select_allnone(elem, checked) {
  */
 function bulk_action(elem, url, action, defaultval) {
     var selected = [];
-    var selectors = document.getElementsByName(elem +'selector');
+    var selectors = document.getElementsByName(elem + 'selector');
     for (var i = 0; i < selectors.length; i++) {
         if (selectors[i].checked == true) {
             selected.push(selectors[i].value);
@@ -54,7 +54,7 @@ function bulk_action(elem, url, action, defaultval) {
     if (selected.length) {
         location.href = url + '&' + action + '=' + selected.join(',');
 
-    // if no entries selected but there is default, send it
+        // if no entries selected but there is default, send it
     } else if (defaultval) {
         location.href = url + '&' + action + '=' + defaultval;
     }
@@ -65,9 +65,9 @@ function bulk_action(elem, url, action, defaultval) {
  */
 function showHideAdvSearch(checked) {
     var divs = document.getElementsByTagName('div');
-    for(i=0;i<divs.length;i++) {
-        if(divs[i].id.match('datalynx_adv_form')) {
-            if(checked) {
+    for (i = 0; i < divs.length; i++) {
+        if (divs[i].id.match('datalynx_adv_form')) {
+            if (checked) {
                 divs[i].style.display = 'inline';
             }
             else {
@@ -91,33 +91,33 @@ function showHideAdvSearch(checked) {
 
 M.datalynx_wordcount_bar = {pb: null};
 
-M.datalynx_wordcount_bar.callback = function(obj) {
+M.datalynx_wordcount_bar.callback = function (obj) {
     if (typeof tinyMCE == 'undefined') {
         // For normal textareas
-		editor = document.getElementById('id_'+obj.pbid+'_editor');
+        editor = document.getElementById('id_' + obj.pbid + '_editor');
         //insertAtCursor(editor, value);
     } else {
-        editor = tinyMCE.get('id_'+obj.pbid+'_editor');
+        editor = tinyMCE.get('id_' + obj.pbid + '_editor');
 
-        var text = editor.getContent().replace(/<[^>]+>/gi,'');
-        text = text.replace(/\s+/gi,' ');
+        var text = editor.getContent().replace(/<[^>]+>/gi, '');
+        text = text.replace(/\s+/gi, ' ');
         var words = text.split(' ').length;
-        document.getElementById('id_'+obj.pbid+'_wordcount_value').innerHTML = words;
+        document.getElementById('id_' + obj.pbid + '_wordcount_value').innerHTML = words;
         obj.pb.set('value', words);
 
-        editor.onKeyUp.add(function(editor, e) {
-                                    var text = editor.getContent().replace(/<[^>]+>/gi,'');
-                                    text = text.replace(/\s+/gi,' ');
-                                    var words = text.split(' ').length;
-                                    document.getElementById('id_'+obj.pbid+'_wordcount_value').innerHTML = words;
-                                    obj.pb.set('value', words);
-                        });
+        editor.onKeyUp.add(function (editor, e) {
+            var text = editor.getContent().replace(/<[^>]+>/gi, '');
+            text = text.replace(/\s+/gi, ' ');
+            var words = text.split(' ').length;
+            document.getElementById('id_' + obj.pbid + '_wordcount_value').innerHTML = words;
+            obj.pb.set('value', words);
+        });
     }
 };
 
-M.datalynx_wordcount_bar.init = function(Y, options) {
-    var Dom = YAHOO.util.Dom; 
-    
+M.datalynx_wordcount_bar.init = function (Y, options) {
+    var Dom = YAHOO.util.Dom;
+
     this.pbid = options['identifier'];
     this.pb = new YAHOO.widget.ProgressBar();
     this.pb.set('width', '300px');
@@ -125,22 +125,22 @@ M.datalynx_wordcount_bar.init = function(Y, options) {
     this.pb.set('minValue', Number(options['minValue']));
     this.pb.set('maxValue', Number(options['maxValue']));
     this.pb.set('value', Number(options['value']));
-    
-    this.pb.render('id_'+this.pbid+'_wordcount_pb');
-    Dom.get('id_'+this.pbid+'_wordcount_value').innerHTML = options['value'];
-    
+
+    this.pb.render('id_' + this.pbid + '_wordcount_pb');
+    Dom.get('id_' + this.pbid + '_wordcount_value').innerHTML = options['value'];
+
     //var anim = this.pb.get('anim');
     //anim.duration = 1;
     //anim.method = YAHOO.util.Easing.easeNone;
-    
+
     //this.pb.on('progress', function(value){
     //    Dom.get('id_'+this.pbid+'_wordcount_value').innerHTML = value;
     //});
-    
-    this.pb.on('valueChange', function(oArgs){
-        Dom.get('id_'+this.pbid+'_wordcount_value').innerHTML = oArgs.newValue;
+
+    this.pb.on('valueChange', function (oArgs) {
+        Dom.get('id_' + this.pbid + '_wordcount_value').innerHTML = oArgs.newValue;
     });
-    
+
     Y.later(1000, M.datalynx_wordcount_bar, M.datalynx_wordcount_bar.callback, this);
 }
 
@@ -148,29 +148,29 @@ M.datalynx_wordcount_bar.init = function(Y, options) {
 M.datalynx_filepicker = {};
 
 
-M.datalynx_filepicker.callback = function(params) {
-    var html = '<a href="'+params['url']+'">'+params['file']+'</a>';
-    document.getElementById('file_info_'+params['client_id']).innerHTML = html;
+M.datalynx_filepicker.callback = function (params) {
+    var html = '<a href="' + params['url'] + '">' + params['file'] + '</a>';
+    document.getElementById('file_info_' + params['client_id']).innerHTML = html;
 };
 
 /**
  * This fucntion is called for each file picker on page.
  */
-M.datalynx_filepicker.init = function(Y, options) {
+M.datalynx_filepicker.init = function (Y, options) {
     options.formcallback = M.datalynx_filepicker.callback;
     if (!M.core_filepicker.instances[options.client_id]) {
         M.core_filepicker.init(Y, options);
     }
-    Y.on('click', function(e, client_id) {
+    Y.on('click', function (e, client_id) {
         e.preventDefault();
         M.core_filepicker.instances[client_id].show();
-    }, '#filepicker-button-'+options.client_id, null, options.client_id);
+    }, '#filepicker-button-' + options.client_id, null, options.client_id);
 
-    var item = document.getElementById('nonjs-filepicker-'+options.client_id);
+    var item = document.getElementById('nonjs-filepicker-' + options.client_id);
     if (item) {
         item.parentNode.removeChild(item);
     }
-    item = document.getElementById('filepicker-wrapper-'+options.client_id);
+    item = document.getElementById('filepicker-wrapper-' + options.client_id);
     if (item) {
         item.style.display = '';
     }
@@ -178,51 +178,51 @@ M.datalynx_filepicker.init = function(Y, options) {
 
 M.datalynx_urlpicker = {};
 
-M.datalynx_urlpicker.init = function(Y, options) {
+M.datalynx_urlpicker.init = function (Y, options) {
     options.formcallback = M.datalynx_urlpicker.callback;
     if (!M.core_filepicker.instances[options.client_id]) {
         M.core_filepicker.init(Y, options);
     }
-    Y.on('click', function(e, client_id) {
+    Y.on('click', function (e, client_id) {
         e.preventDefault();
         M.core_filepicker.instances[client_id].show();
-    }, '#id_filepicker-button-'+options.client_id, null, options.client_id);
+    }, '#id_filepicker-button-' + options.client_id, null, options.client_id);
 
 };
 
 M.datalynx_urlpicker.callback = function (params) {
-    document.getElementById('id_field_url_'+params.client_id).value = params.url;
+    document.getElementById('id_field_url_' + params.client_id).value = params.url;
 };
 
 M.datalynx_imagepicker = {};
 
-M.datalynx_imagepicker.callback = function(params) {
-	if (params['url'] == '') {
-		var html = params['file'];
-	} else {
-		var html = '<a href="'+params['url']+'"><img src="'+params['url']+'" style="max-width:50px !important;" /> '+params['file']+'</a>';
-	}
-    document.getElementById('file_info_'+params['client_id']).innerHTML = html;
+M.datalynx_imagepicker.callback = function (params) {
+    if (params['url'] == '') {
+        var html = params['file'];
+    } else {
+        var html = '<a href="' + params['url'] + '"><img src="' + params['url'] + '" style="max-width:50px !important;" /> ' + params['file'] + '</a>';
+    }
+    document.getElementById('file_info_' + params['client_id']).innerHTML = html;
 };
 
 /**
  * This fucntion is called for each file picker on page.
  */
-M.datalynx_imagepicker.init = function(Y, options) {
+M.datalynx_imagepicker.init = function (Y, options) {
     options.formcallback = M.datalynx_imagepicker.callback;
     if (!M.core_filepicker.instances[options.client_id]) {
         M.core_filepicker.init(Y, options);
     }
-    Y.on('click', function(e, client_id) {
+    Y.on('click', function (e, client_id) {
         e.preventDefault();
         M.core_filepicker.instances[client_id].show();
-    }, '#filepicker-button-'+options.client_id, null, options.client_id);
+    }, '#filepicker-button-' + options.client_id, null, options.client_id);
 
-    var item = document.getElementById('nonjs-filepicker-'+options.client_id);
+    var item = document.getElementById('nonjs-filepicker-' + options.client_id);
     if (item) {
         item.parentNode.removeChild(item);
     }
-    item = document.getElementById('filepicker-wrapper-'+options.client_id);
+    item = document.getElementById('filepicker-wrapper-' + options.client_id);
     if (item) {
         item.style.display = '';
         M.datalynx_imagepicker.callback(options);
@@ -232,7 +232,6 @@ M.datalynx_imagepicker.init = function(Y, options) {
 M.mod_datalynx.field_gradeitem_form_init = function () {
     Y.one('#mform1').one('select[name="param1"]').set('value', Y.one('#mform1').one('input[type="hidden"][name="param1"]').get('value'));
 };
-
 
 
 /**
@@ -252,7 +251,7 @@ M.mod_datalynx.tag_manager.types = [];
 /**
  * @param editor Node
  */
-M.mod_datalynx.tag_manager.add_tag_spans = function(editordiv) {
+M.mod_datalynx.tag_manager.add_tag_spans = function (editordiv) {
     var editor = editordiv.one(".editor_atto  .editor_atto_content");
     var textarea = editordiv.one("textarea");
 
@@ -309,13 +308,13 @@ M.mod_datalynx.tag_manager.add_tag_spans = function(editordiv) {
 /**
  * @param editor Node
  */
-M.mod_datalynx.tag_manager.remove_tag_spans = function(editordiv) {
+M.mod_datalynx.tag_manager.remove_tag_spans = function (editordiv) {
     var editor = editordiv.one(".editor_atto .editor_atto_content");
     var textarea = editordiv.one("textarea");
 
     var newcontent = editor.getHTML();
     var spans = editor.all("button.datalynx-field-tag");
-    spans.each(function(span) {
+    spans.each(function (span) {
         var field = span.getAttribute("data-datalynx-field");
         var behavior = span.getAttribute("data-datalynx-behavior");
         var renderer = span.getAttribute("data-datalynx-renderer");
@@ -324,7 +323,7 @@ M.mod_datalynx.tag_manager.remove_tag_spans = function(editordiv) {
     });
 
     spans = editor.all("button.datalynx-action-tag");
-    spans.each(function(span) {
+    spans.each(function (span) {
         var action = span.getHTML();
         var replacement = M.mod_datalynx.tag_manager.create_raw_tag('action', action, '', '');
         newcontent = newcontent.replace(span.get('outerHTML'), replacement);
@@ -335,23 +334,23 @@ M.mod_datalynx.tag_manager.remove_tag_spans = function(editordiv) {
     textarea.simulate('change');
 }
 
-M.mod_datalynx.tag_manager.init_span_dialog = function(Y) {
+M.mod_datalynx.tag_manager.init_span_dialog = function (Y) {
     var config = {
-        draggable : false,
-        modal : false,
-        closeButton : true,
-        width : '300px'
+        draggable: false,
+        modal: false,
+        closeButton: true,
+        width: '300px'
     };
 
     var dialog = M.mod_datalynx.tag_manager.dialog = new M.core.dialogue(config);
     var dialogcontent = Y.Node.create(
         '<div id="datalynx-tag-dialog-content">' +
-            '<div id="datalynx-field-tag-contols">' +
-            '<p><label for="datalynx-tag-fieldtype">' + M.util.get_string('fieldtype', 'datalynx', null) + ':</label><span id="datalynx-tag-fieldtype"></span></p>' +
-            '<p><label for="datalynx-tag-behavior-menu">' + M.util.get_string('behavior', 'datalynx', null) + ':</label><select id="datalynx-tag-behavior-menu"></select></p>' +
-            '<p><label for="datalynx-tag-renderer-menu">' + M.util.get_string('renderer', 'datalynx', null) + ':</label><select id="datalynx-tag-renderer-menu"></select></p>' +
-            '</div>' +
-            '<button type="button" id="datalynx-tag-button-delete">' + M.util.get_string('deletetag', 'datalynx', null) + '</button>' +
+        '<div id="datalynx-field-tag-contols">' +
+        '<p><label for="datalynx-tag-fieldtype">' + M.util.get_string('fieldtype', 'datalynx', null) + ':</label><span id="datalynx-tag-fieldtype"></span></p>' +
+        '<p><label for="datalynx-tag-behavior-menu">' + M.util.get_string('behavior', 'datalynx', null) + ':</label><select id="datalynx-tag-behavior-menu"></select></p>' +
+        '<p><label for="datalynx-tag-renderer-menu">' + M.util.get_string('renderer', 'datalynx', null) + ':</label><select id="datalynx-tag-renderer-menu"></select></p>' +
+        '</div>' +
+        '<button type="button" id="datalynx-tag-button-delete">' + M.util.get_string('deletetag', 'datalynx', null) + '</button>' +
         '</div>');
     var behaviorselect = dialogcontent.one('#datalynx-tag-behavior-menu');
     var rendererselect = dialogcontent.one('#datalynx-tag-renderer-menu');
@@ -408,17 +407,17 @@ M.mod_datalynx.tag_manager.show_tag_dialog = function (event, Y) {
     if (tag.hasClass("datalynx-field-tag")) {
         Y.one('#datalynx-field-tag-contols').show();
         fieldname = tag.getAttribute("data-datalynx-field");
-        tagtype =  M.util.get_string('field', 'datalynx', null);
-        dialog.set('headerContent', M.util.get_string('tagproperties', 'datalynx', {tagtype : tagtype, tagname : fieldname}));
+        tagtype = M.util.get_string('field', 'datalynx', null);
+        dialog.set('headerContent', M.util.get_string('tagproperties', 'datalynx', {tagtype: tagtype, tagname: fieldname}));
         if (fieldname.indexOf(':') !== -1) {
             fieldname = fieldname.split(':')[0];
         }
         M.mod_datalynx.tag_manager.populate_select(dialog.bodyNode.one("#datalynx-tag-behavior-menu"),
-                                                    M.mod_datalynx.tag_manager.behaviors,
-                                                    tag.getAttribute("data-datalynx-behavior"));
+            M.mod_datalynx.tag_manager.behaviors,
+            tag.getAttribute("data-datalynx-behavior"));
         M.mod_datalynx.tag_manager.populate_select(dialog.bodyNode.one("#datalynx-tag-renderer-menu"),
-                                                    M.mod_datalynx.tag_manager.renderers[fieldname],
-                                                    tag.getAttribute("data-datalynx-renderer"));
+            M.mod_datalynx.tag_manager.renderers[fieldname],
+            tag.getAttribute("data-datalynx-renderer"));
         Y.one('#datalynx-tag-fieldtype').set('innerHTML', M.mod_datalynx.tag_manager.types[fieldname]);
 
         dialog.set('target', tag.get("id"));
@@ -429,8 +428,8 @@ M.mod_datalynx.tag_manager.show_tag_dialog = function (event, Y) {
     } else if (tag.hasClass("datalynx-action-tag")) {
         Y.one('#datalynx-field-tag-contols').hide();
         fieldname = tag.getAttribute("data-datalynx-field");
-        tagtype =  M.util.get_string('action', 'datalynx', null);
-        dialog.set('headerContent', M.util.get_string('tagproperties', 'datalynx', {tagtype : tagtype, tagname : fieldname}));
+        tagtype = M.util.get_string('action', 'datalynx', null);
+        dialog.set('headerContent', M.util.get_string('tagproperties', 'datalynx', {tagtype: tagtype, tagname: fieldname}));
 
         dialog.set('target', tag.get("id"));
         dialog.show();
@@ -453,7 +452,7 @@ M.mod_datalynx.tag_manager.populate_select = function (select, data, selectedval
     }
 }
 
-M.mod_datalynx.tag_manager.init = function(Y, behaviors, renderers, types) {
+M.mod_datalynx.tag_manager.init = function (Y, behaviors, renderers, types) {
     var attoeditors = Y.all("#datalynx-view-edit-form div.editor_atto");
     attoeditors.each(function (attoeditor) {
         var editordiv = attoeditor.ancestor();
@@ -461,8 +460,8 @@ M.mod_datalynx.tag_manager.init = function(Y, behaviors, renderers, types) {
         attoeditor.one(".editor_atto_content").on('click', M.mod_datalynx.tag_manager.show_tag_dialog, null, Y);
         attoeditor.one("button[title='HTML']").on('click', M.mod_datalynx.tag_manager.toggle_tags, null, Y, editordiv);
         var id = attoeditor.siblings().item(0).get('id').replace('id_', '');
-        Y.all('select[name^="' + id + '"]').each( function (Yselect) {
-        	Yselect.on('change', M.mod_datalynx.tag_manager.insert_field_tag, null, Y, editordiv);        	        	
+        Y.all('select[name^="' + id + '"]').each(function (Yselect) {
+            Yselect.on('change', M.mod_datalynx.tag_manager.insert_field_tag, null, Y, editordiv);
         });
     });
 
@@ -483,7 +482,7 @@ M.mod_datalynx.tag_manager.toggle_tags = function (event, Y, editordiv) {
     }
 }
 
-M.mod_datalynx.tag_manager.prepare_submit = function(event, Y) {
+M.mod_datalynx.tag_manager.prepare_submit = function (event, Y) {
     var attoeditors = Y.all("#datalynx-view-edit-form div.editor_atto");
     attoeditors.each(function (attoeditor) {
         var editordiv = attoeditor.ancestor();
@@ -571,7 +570,7 @@ M.mod_datalynx.tag_manager.create_raw_tag = function (type, fieldname, behavior,
             output += "]]";
             break;
         case 'action':
-            output =  "##" + fieldname + "##";
+            output = "##" + fieldname + "##";
             break;
         default:
             output = fieldname;
@@ -641,21 +640,21 @@ M.mod_datalynx.behaviors_helper.event_handler = function (event, Y) {
     var sesskey = Y.one('table.datalynx-behaviors').getAttribute('data-sesskey');
 
     var callback = {
-        timeout : 5000,
-        method : 'POST',
-        data :  build_querystring({
-            behaviorid : behaviorid,
-            permissionid : permissionid,
-            forproperty : forproperty,
-            sesskey : sesskey
+        timeout: 5000,
+        method: 'POST',
+        data: build_querystring({
+            behaviorid: behaviorid,
+            permissionid: permissionid,
+            forproperty: forproperty,
+            sesskey: sesskey
         }),
-        on : {
-            success : function (id, result) {
+        on: {
+            success: function (id, result) {
                 Y.log("RAW JSON DATA: " + result.responseText);
                 M.mod_datalynx.behaviors_helper.toggle_image(img);
             },
 
-            failure : function (id, result) {
+            failure: function (id, result) {
                 Y.log("Async call failed!");
             }
 
@@ -665,6 +664,6 @@ M.mod_datalynx.behaviors_helper.event_handler = function (event, Y) {
     Y.io('behavior_edit_ajax.php', callback);
 }
 
-M.mod_datalynx.behaviors_helper.init = function(Y) {
+M.mod_datalynx.behaviors_helper.init = function (Y) {
     Y.all('table.datalynx-behaviors img[data-for]').on("click", M.mod_datalynx.behaviors_helper.event_handler, null, Y);
 }

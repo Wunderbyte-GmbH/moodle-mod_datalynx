@@ -21,8 +21,7 @@
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ("$CFG->dirroot/mod/datalynx/view/view_class.php");
-
+require_once("$CFG->dirroot/mod/datalynx/view/view_class.php");
 
 class datalynxview_grid extends datalynxview_base {
 
@@ -38,7 +37,7 @@ class datalynxview_grid extends datalynxview_base {
         if (!$fields = $this->_df->get_fields()) {
             return; // you shouldn't get that far if there are no user fields
         }
-        
+
         // set views and filters menus and quick search
         $table = new html_table();
         $table->attributes['align'] = 'center';
@@ -73,9 +72,9 @@ class datalynxview_grid extends datalynxview_base {
         // construct the table
         $table->data = array($row1, $row2, $row3);
         $sectiondefault = html_writer::table($table);
-        $this->view->esection = html_writer::tag('div', $sectiondefault, 
-                array('class' => 'mdl-align')) . "<div>##entries##</div>";
-        
+        $this->view->esection = html_writer::tag('div', $sectiondefault,
+                        array('class' => 'mdl-align')) . "<div>##entries##</div>";
+
         // set content
         $table = new html_table();
         $table->attributes['align'] = 'center';
@@ -110,9 +109,9 @@ class datalynxview_grid extends datalynxview_base {
      */
     protected function apply_entry_group_layout($entriesset, $name = '') {
         global $OUTPUT;
-        
+
         $elements = array();
-        
+
         // Prepare grid table if needed
         if ($name != 'newentry' and !empty($this->view->param3)) {
             $entriescount = count($entriesset);
@@ -128,7 +127,7 @@ class datalynxview_grid extends datalynxview_base {
                     $percol = ceil($entriescount / $cols) > 1 ? ceil($entriescount / $cols) : null;
                 }
             }
-            
+
             $table = $this->make_table($cols, $rows);
             $grouphtml = html_writer::table($table);
             // now split $tablehtml to cells by ##begintablecell##
@@ -136,7 +135,7 @@ class datalynxview_grid extends datalynxview_base {
             // the first part is everything before first cell
             $elements[] = array('html', array_shift($cells));
         }
-        
+
         // flatten the set to a list of elements
         $count = 0;
         foreach ($entriesset as $entry_definitions) {
@@ -150,24 +149,24 @@ class datalynxview_grid extends datalynxview_base {
                 }
             }
         }
-        
+
         // Add remaining cells
         if (!empty($cells)) {
             foreach ($cells as $cell) {
                 $elements[] = array('html', $cell);
             }
         }
-        
+
         // Add group heading
         $name = ($name == 'newentry') ? get_string('entrynew', 'datalynx') : $name;
         if ($name) {
             array_unshift($elements, array('html', $OUTPUT->heading($name, 3, 'main')));
         }
         // Wrap with entriesview
-        array_unshift($elements, 
+        array_unshift($elements,
                 array('html', html_writer::start_tag('div', array('class' => 'entriesview'))));
         array_push($elements, array('html', html_writer::end_tag('div')));
-        
+
         return $elements;
     }
 
@@ -175,7 +174,7 @@ class datalynxview_grid extends datalynxview_base {
      */
     protected function new_entry_definition($entryid = -1) {
         $elements = array();
-        
+
         // get patterns definitions
         $fields = $this->_df->get_fields();
         $tags = array();
@@ -192,10 +191,10 @@ class datalynxview_grid extends datalynxview_base {
                 $tags = array_merge($tags, $patterns);
             }
         }
-        
+
         // split the entry template to tags and html
         $parts = $this->split_template_by_tags($tags, $this->view->eparam2);
-        
+
         foreach ($parts as $part) {
             if (in_array($part, $tags)) {
                 if ($def = $patterndefinitions[$part]) {
@@ -205,7 +204,7 @@ class datalynxview_grid extends datalynxview_base {
                 $elements[] = array('html', $part);
             }
         }
-        
+
         return $elements;
     }
 
@@ -225,7 +224,7 @@ class datalynxview_grid extends datalynxview_base {
             }
             $table->data[] = $row;
         }
-        
+
         return $table;
     }
 }

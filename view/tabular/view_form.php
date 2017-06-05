@@ -23,8 +23,7 @@
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ("$CFG->dirroot/mod/datalynx/view/view_form.php");
-
+require_once("$CFG->dirroot/mod/datalynx/view/view_form.php");
 
 class datalynxview_tabular_form extends datalynxview_base_form {
 
@@ -34,17 +33,17 @@ class datalynxview_tabular_form extends datalynxview_base_form {
         $view = $this->_view;
         $editoroptions = $view->editors();
         $editorattr = array('cols' => 40, 'rows' => 12);
-        
+
         $mform = &$this->_form;
-        
+
         // content
         // -------------------------------------------------------------------------------
         $mform->addElement('header', 'entrytemplatehdr', get_string('entrytemplate', 'datalynx'));
-        
+
         $mform->addElement('selectyesno', 'param3', get_string('headerrow', 'datalynxview_tabular'));
         $mform->setDefault('param3', 1);
-        
-        $mform->addElement('editor', 'eparam2_editor', get_string('table', 'datalynxview_tabular'), 
+
+        $mform->addElement('editor', 'eparam2_editor', get_string('table', 'datalynxview_tabular'),
                 $editorattr, $editoroptions['param2']);
         $this->add_tags_selector('eparam2_editor', 'general');
         $this->add_tags_selector('eparam2_editor', 'field');

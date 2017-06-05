@@ -20,8 +20,7 @@
  * @copyright 2013 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once (dirname(__FILE__) . "/../mod_class.php");
-
+require_once(dirname(__FILE__) . "/../mod_class.php");
 
 /**
  * Base class for Datalynx Rule Types
@@ -29,12 +28,12 @@ require_once (dirname(__FILE__) . "/../mod_class.php");
 abstract class datalynx_rule_base {
 
     public $type = 'unknown';
- // Subclasses must override the type with their name
+    // Subclasses must override the type with their name
     public $df = null;
- // The datalynx object that this rule belongs to
+    // The datalynx object that this rule belongs to
     public $rule = null;
- // The rule object itself, if we know it
-    
+    // The rule object itself, if we know it
+
     /**
      * Class constructor
      *
@@ -44,25 +43,29 @@ abstract class datalynx_rule_base {
     public function __construct($df = 0, $rule = 0) {
         if (empty($df)) {
             throw new coding_exception('Datalynx id or object must be passed to view constructor.');
-        } else if ($df instanceof datalynx) {
-            $this->df = $df;
-        } else { // datalynx id/object
-            $this->df = new datalynx($df);
+        } else {
+            if ($df instanceof datalynx) {
+                $this->df = $df;
+            } else { // datalynx id/object
+                $this->df = new datalynx($df);
+            }
         }
-        
+
         if (!empty($rule)) {
             // $rule is the rule record
             if (is_object($rule)) {
                 $this->rule = $rule; // Programmer knows what they are doing, we hope
-                                         
+
                 // $rule is a rule id
-            } else if ($ruleobj = $this->df->get_rule_from_id($rule)) {
-                $this->rule = $ruleobj->rule;
             } else {
-                throw new moodle_exception('invalidrule', 'datalynx', null, null, $rule);
+                if ($ruleobj = $this->df->get_rule_from_id($rule)) {
+                    $this->rule = $ruleobj->rule;
+                } else {
+                    throw new moodle_exception('invalidrule', 'datalynx', null, null, $rule);
+                }
             }
         }
-        
+
         if (empty($this->rule)) { // We need to define some default values
             $this->set_rule();
         }
@@ -78,14 +81,14 @@ abstract class datalynx_rule_base {
 
     /**
      * Checks if the rule triggers on the given event
-     * 
+     *
      * @param string $eventname full name of the event (with namespaces)
      * @return bool
      */
     public function is_triggered_by($eventname) {
         $eventname = explode('\\', trim($eventname, '\\'))[2];
         $triggers = array_map(
-                function ($element) {
+                function($element) {
                     return explode(':', $element)[0];
                 }, unserialize($this->rule->param1));
         return array_search($eventname, $triggers) !== false;
@@ -93,14 +96,14 @@ abstract class datalynx_rule_base {
 
     /**
      * Returns the list of the triggers
-     * 
+     *
      * @return array
      */
     public function get_triggers() {
         static $triggers = array();
         if (empty($triggers)) {
             $triggers = array_map(
-                    function ($element) {
+                    function($element) {
                         return explode(':', $element)[0];
                     }, unserialize($this->rule->param1));
         }
@@ -128,11 +131,11 @@ abstract class datalynx_rule_base {
      */
     public function insert_rule($fromform = null) {
         global $DB, $OUTPUT;
-        
+
         if (!empty($fromform)) {
             $this->set_rule($fromform);
         }
-        
+
         if (!$this->rule->id = $DB->insert_record('datalynx_rules', $this->rule)) {
             echo $OUTPUT->notification('Insertion of new rule failed!');
             return false;
@@ -149,7 +152,7 @@ abstract class datalynx_rule_base {
         if (!empty($fromform)) {
             $this->set_rule($fromform);
         }
-        
+
         if (!$DB->update_record('datalynx_rules', $this->rule)) {
             echo $OUTPUT->notification('updating of rule failed!');
             return false;
@@ -162,7 +165,7 @@ abstract class datalynx_rule_base {
      */
     public function delete_rule() {
         global $DB;
-        
+
         if (!empty($this->rule->id)) {
             $DB->delete_records('datalynx_rules', array('id' => $this->rule->id));
         }
@@ -213,15 +216,15 @@ abstract class datalynx_rule_base {
      */
     public function get_form() {
         global $CFG;
-        
+
         if (file_exists($CFG->dirroot . '/mod/datalynx/rule/' . $this->type . '/rule_form.php')) {
-            require_once ($CFG->dirroot . '/mod/datalynx/rule/' . $this->type . '/rule_form.php');
+            require_once($CFG->dirroot . '/mod/datalynx/rule/' . $this->type . '/rule_form.php');
             $formclass = 'datalynx_rule_' . $this->type . '_form';
         } else {
-            require_once ($CFG->dirroot . '/mod/datalynx/rule/rule_form.php');
+            require_once($CFG->dirroot . '/mod/datalynx/rule/rule_form.php');
             $formclass = 'datalynx_rule_form';
         }
-        $actionurl = new moodle_url('/mod/datalynx/rule/rule_edit.php', 
+        $actionurl = new moodle_url('/mod/datalynx/rule/rule_edit.php',
                 array('d' => $this->df->id(), 'rid' => $this->get_id(), 'type' => $this->type));
         return new $formclass($this, $actionurl);
     }
@@ -249,7 +252,8 @@ abstract class datalynx_rule_base {
     public function get_sort_from_sql($paramname = 'sortie', $paramcount = '') {
         $ruleid = $this->rule->id;
         if ($ruleid > 0) {
-            $sql = " LEFT JOIN {datalynx_contents} c$ruleid ON (c$ruleid.entryid = e.id AND c$ruleid.ruleid = :$paramname$paramcount) ";
+            $sql =
+                    " LEFT JOIN {datalynx_contents} c$ruleid ON (c$ruleid.entryid = e.id AND c$ruleid.ruleid = :$paramname$paramcount) ";
             return array($sql, $ruleid);
         } else {
             return null;

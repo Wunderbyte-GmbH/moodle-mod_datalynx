@@ -21,8 +21,7 @@
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ("$CFG->dirroot/mod/datalynx/field/field_form.php");
-
+require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
 class datalynxfield_number_form extends datalynxfield_form {
 
@@ -30,24 +29,24 @@ class datalynxfield_number_form extends datalynxfield_form {
      */
     function field_definition() {
         $mform = &$this->_form;
-        
+
         // -------------------------------------------------------------------------------
-        $mform->addElement('header', 'fieldattributeshdr', 
+        $mform->addElement('header', 'fieldattributeshdr',
                 get_string('fieldattributes', 'datalynx'));
-        
+
         // decimals
         $options = array('' => 0) + array_combine(range(1, 10), range(1, 10));
         $mform->addElement('select', 'param1', get_string('decimals', 'datalynxfield_number'), $options);
-        
+
         // field width
         $fieldwidthgrp = array();
         $fieldwidthgrp[] = &$mform->createElement('text', 'param2', null, array('size' => '8'));
-        $fieldwidthgrp[] = &$mform->createElement('select', 'param3', null, 
+        $fieldwidthgrp[] = &$mform->createElement('select', 'param3', null,
                 array('px' => 'px', 'em' => 'em', '%' => '%'));
-        $mform->addGroup($fieldwidthgrp, 'fieldwidthgrp', get_string('fieldwidth', 'datalynx'), 
+        $mform->addGroup($fieldwidthgrp, 'fieldwidthgrp', get_string('fieldwidth', 'datalynx'),
                 array(' '), false);
         $mform->setType('param2', PARAM_INT);
-        $mform->addGroupRule('fieldwidthgrp', 
+        $mform->addGroupRule('fieldwidthgrp',
                 array('param2' => array(array(null, 'numeric', null, 'client'))));
         $mform->disabledIf('param3', 'param2', 'eq', '');
         $mform->setDefault('param2', '');

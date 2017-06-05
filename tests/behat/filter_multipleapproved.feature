@@ -6,42 +6,42 @@ Feature: In datalynx filter approved and not approved entries from multiple stud
 
   Background:
     Given the following "courses" exist:
-      | fullname  | shortname   | category  | groupmode   |
-      | Course 1  | C1          | 0         | 1           |
+      | fullname | shortname | category | groupmode |
+      | Course 1 | C1        | 0        | 1         |
     And the following "users" exist:
-      | username  | firstname   | lastname  | email                   |
-      | teacher1  | Teacher     | 1         | teacher1@mailinator.com |
-      | student1  | Student     | 1         | student1@mailinator.com |
-      | student2  | Student     | 2         | student2@mailinator.com |
-      | student3  | Student     | 3         | student3@mailinator.com |
-      | student4  | Student     | 4         | student4@mailinator.com |
+      | username | firstname | lastname | email                   |
+      | teacher1 | Teacher   | 1        | teacher1@mailinator.com |
+      | student1 | Student   | 1        | student1@mailinator.com |
+      | student2 | Student   | 2        | student2@mailinator.com |
+      | student3 | Student   | 3        | student3@mailinator.com |
+      | student4 | Student   | 4        | student4@mailinator.com |
     And the following "course enrolments" exist:
-      | user      | course  | role            |
-      | teacher1  | C1      | editingteacher  |
-      | student1  | C1      | student         |
-      | student2  | C1      | student         |
-      | student3  | C1      | student         |
-      | student4  | C1      | student         |
+      | user     | course | role           |
+      | teacher1 | C1     | editingteacher |
+      | student1 | C1     | student        |
+      | student2 | C1     | student        |
+      | student3 | C1     | student        |
+      | student4 | C1     | student        |
     And the following "activities" exist:
       | activity | course | idnumber | name                   | approval |
       | datalynx | C1     | 12345    | Datalynx Test Instance | 1        |
     And "Datalynx Test Instance" has following fields:
-      | type             | name     | param1                       |
-      | text             | Text     |                              |
+      | type | name | param1 |
+      | text | Text |        |
     And "Datalynx Test Instance" has following views:
-      | type    | name            	| status       | redirect            | filter     	| param2                                                                                                                                     |
-      | grid    | Approved view   	| default      | Approved view       | 				| <div ><table><tbody><tr><td>Text:</td> <td>[[Text]]</td></tr><tr><td>##edit##  ##delete##</td></tr></tbody></table></div>                  |
-      | grid    | Notapproved view  | 			   | Approved view       | 				| <div ><table><tbody><tr><td>Text:</td> <td>[[Text]]</td></tr><tr><td>##edit##  ##delete##</td></tr></tbody></table></div>                  |
-      | grid    | Edit view       	| edit         | Approved view       |            	| <div><table> <tbody><tr> <td>Text:</td><td>[[Text]]</td> </tr> <tr> <td>##edit##  ##delete## ##approve## </td></tr></tbody></table> </div> |
+      | type | name             | status  | redirect      | filter | param2                                                                                                                                     |
+      | grid | Approved view    | default | Approved view |        | <div ><table><tbody><tr><td>Text:</td> <td>[[Text]]</td></tr><tr><td>##edit##  ##delete##</td></tr></tbody></table></div>                  |
+      | grid | Notapproved view |         | Approved view |        | <div ><table><tbody><tr><td>Text:</td> <td>[[Text]]</td></tr><tr><td>##edit##  ##delete##</td></tr></tbody></table></div>                  |
+      | grid | Edit view        | edit    | Approved view |        | <div><table> <tbody><tr> <td>Text:</td><td>[[Text]]</td> </tr> <tr> <td>##edit##  ##delete## ##approve## </td></tr></tbody></table> </div> |
     And "Datalynx Test Instance" has following entries:
-      | author   | Text         | approved |
-      | student1 | yes1    | 1        |
-      | student1 | yes2    | 1        |
-      | student1 | yes3    | 1        |
-      | student1 | not1    | 0        |
-      | student3 | not2    | 0        |
-      | student2 | yes4    | 1        |
-      | student2 | not3    | 0        |
+      | author   | Text | approved |
+      | student1 | yes1 | 1        |
+      | student1 | yes2 | 1        |
+      | student1 | yes3 | 1        |
+      | student1 | not1 | 0        |
+      | student3 | not2 | 0        |
+      | student2 | yes4 | 1        |
+      | student2 | not3 | 0        |
 
 
   @javascript

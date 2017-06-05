@@ -20,15 +20,15 @@
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ('../../../config.php');
-require_once ("$CFG->dirroot/mod/datalynx/mod_class.php");
+require_once('../../../config.php');
+require_once("$CFG->dirroot/mod/datalynx/mod_class.php");
 
 $urlparams = new stdClass();
 $urlparams->d = required_param('d', PARAM_INT); // datalynx ID
 
 $urlparams->type = optional_param('type', '', PARAM_ALPHA); // type of a field to edit
 $urlparams->fid = optional_param('fid', 0, PARAM_INT); // field id to edit
-                                                             
+
 // Set a datalynx object
 $df = new datalynx($urlparams->d);
 
@@ -39,48 +39,54 @@ require_capability('mod/datalynx:managetemplates', $df->context);
 
 if ($urlparams->fid) {
     $field = $df->get_field_from_id($urlparams->fid, true); // force get
-} else if ($urlparams->type) {
-    $field = $df->get_field($urlparams->type);
+} else {
+    if ($urlparams->type) {
+        $field = $df->get_field($urlparams->type);
+    }
 }
 
 $mform = $field->get_form();
 
 if ($mform->is_cancelled()) {
     redirect(new moodle_url('/mod/datalynx/field/index.php', array('d' => $df->id())));
-    
+
     // no submit buttons
-} else if ($mform->no_submit_button_pressed()) {
-    
-    // process validated
-} else if ($data = $mform->get_data()) {
-    
-    // add new field
-    if (!$field->id()) {
-        $fieldid = $field->insert_field($data);
-        
-        $other = array('dataid' => $df->id());
-        $event = \mod_datalynx\event\field_created::create(
-                array('context' => $df->context, 'objectid' => $fieldid, 'other' => $other));
-        $event->trigger();
-        
-        // update field
+} else {
+    if ($mform->no_submit_button_pressed()) {
+
+        // process validated
     } else {
-        $data->id = $field->id();
-        $field->update_field($data);
-        
-        $other = array('dataid' => $df->id());
-        $event = \mod_datalynx\event\field_updated::create(
-                array('context' => $df->context, 'objectid' => $field->id(), 'other' => $other
-                ));
-        $event->trigger();
+        if ($data = $mform->get_data()) {
+
+            // add new field
+            if (!$field->id()) {
+                $fieldid = $field->insert_field($data);
+
+                $other = array('dataid' => $df->id());
+                $event = \mod_datalynx\event\field_created::create(
+                        array('context' => $df->context, 'objectid' => $fieldid, 'other' => $other));
+                $event->trigger();
+
+                // update field
+            } else {
+                $data->id = $field->id();
+                $field->update_field($data);
+
+                $other = array('dataid' => $df->id());
+                $event = \mod_datalynx\event\field_updated::create(
+                        array('context' => $df->context, 'objectid' => $field->id(), 'other' => $other
+                        ));
+                $event->trigger();
+            }
+
+            if ($data->submitbutton != get_string('savecontinue', 'datalynx')) {
+                redirect(new moodle_url('/mod/datalynx/field/index.php', array('d' => $df->id())));
+            }
+
+            // continue to edit so refresh the form
+            $mform = $field->get_form();
+        }
     }
-    
-    if ($data->submitbutton != get_string('savecontinue', 'datalynx')) {
-        redirect(new moodle_url('/mod/datalynx/field/index.php', array('d' => $df->id())));
-    }
-    
-    // continue to edit so refresh the form
-    $mform = $field->get_form();
 }
 
 // activate navigation node

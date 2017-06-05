@@ -21,14 +21,14 @@
  * @copyright 2013 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ('../../../config.php');
-require_once ('../mod_class.php');
-require_once ('statistics_class.php');
+require_once('../../../config.php');
+require_once('../mod_class.php');
+require_once('statistics_class.php');
 
 $urlparams = new stdClass();
 $urlparams->d = optional_param('d', 0, PARAM_INT); // datalynx id
 $urlparams->id = optional_param('id', 0, PARAM_INT); // course module id
-                                                      
+
 // Set a datalynx object
 $df = new datalynx($urlparams->d, $urlparams->id);
 require_capability('mod/datalynx:viewstatistics', $df->context);
@@ -51,15 +51,17 @@ if ($data = $mform->get_data()) {
     $data->mode_old = $data->mode;
     $data->show_old = isset($data->show) ? $data->show : array();
     $mform->set_data($data);
-} else if ($mform->is_submitted()) {
-    $data = null;
 } else {
-    $data = new stdClass();
-    $data->from = 0;
-    $data->to = time();
-    $data->mode = datalynx_statistics_class::MODE_ALL_TIME;
-    $data->show = array(1 => 1, 2 => 1, 4 => 1, 8 => 1);
-    $mform->set_data($data);
+    if ($mform->is_submitted()) {
+        $data = null;
+    } else {
+        $data = new stdClass();
+        $data->from = 0;
+        $data->to = time();
+        $data->mode = datalynx_statistics_class::MODE_ALL_TIME;
+        $data->show = array(1 => 1, 2 => 1, 4 => 1, 8 => 1);
+        $mform->set_data($data);
+    }
 }
 
 $mform->display();

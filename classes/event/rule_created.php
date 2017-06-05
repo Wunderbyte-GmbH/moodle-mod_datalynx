@@ -25,7 +25,6 @@ namespace mod_datalynx\event;
 
 defined('MOODLE_INTERNAL') || die();
 
-
 /**
  *
  * @package mod_datalynx
@@ -62,8 +61,8 @@ class rule_created extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '$this->userid' created the datalynx rule with " .
-            "id '$this->objectid' for the datalynx activity " .
-                 "with the course module id '$this->contextinstanceid'.";
+        "id '$this->objectid' for the datalynx activity " .
+        "with the course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -81,8 +80,8 @@ class rule_created extends \core\event\base {
      * @return array
      */
     public function get_legacy_logdata() {
-        return array($this->courseid, 'datalynx', 'rule_created', 
-            'view.php?d=' . $this->other['dataid'], $this->other['dataid'], $this->contextinstanceid);
+        return array($this->courseid, 'datalynx', 'rule_created',
+                'view.php?d=' . $this->other['dataid'], $this->other['dataid'], $this->contextinstanceid);
     }
 
     /**
@@ -93,7 +92,7 @@ class rule_created extends \core\event\base {
      */
     protected function validate_data() {
         parent::validate_data();
-        
+
         if (!isset($this->other['dataid'])) {
             throw new \coding_exception('The \'dataid\' value must be set in other.');
         }

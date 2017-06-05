@@ -23,9 +23,8 @@
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once ("$CFG->dirroot/mod/datalynx/entries_class.php");
-require_once ("$CFG->dirroot/mod/datalynx/field/entryauthor/field_class.php");
-
+require_once("$CFG->dirroot/mod/datalynx/entries_class.php");
+require_once("$CFG->dirroot/mod/datalynx/field/entryauthor/field_class.php");
 
 class datalynxtool_entryperuser {
 
@@ -33,12 +32,12 @@ class datalynxtool_entryperuser {
      */
     public static function run($df) {
         global $DB;
-        
+
         // Get gradebook users
         if (!$users = $df->get_gradebook_users()) {
             return;
         }
-        
+
         // Construct entries data
         $data = (object) array('eids' => array());
         $fieldid = datalynxfield_entryauthor::_USERID;
@@ -51,7 +50,7 @@ class datalynxtool_entryperuser {
         // Add entries
         $em = new datalynx_entries($df);
         $processed = $em->process_entries('update', $data->eids, $data, true);
-        
+
         if (is_array($processed)) {
             list($strnotify, $processedeids) = $processed;
             if ($entriesprocessed = ($processedeids ? count($processedeids) : 0)) {

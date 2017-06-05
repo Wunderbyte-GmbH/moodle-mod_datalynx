@@ -25,12 +25,12 @@
 defined('MOODLE_INTERNAL') || die();
 
 $tagareas = array(
-    array(
-        'itemtype' => 'datalynx_contents',
-        'component' => 'mod_datalynx',
-        'callback' => 'mod_datalynx_get_tagged_entries',
-        'callbackfile' => '/mod/datalynx/lib.php',
-        'collection' => 'datalynx',
-        'showstandard' => core_tag_tag::BOTH_STANDARD_AND_NOT,
-    ),
+        array(
+                'itemtype' => 'datalynx_contents',
+                'component' => 'mod_datalynx',
+                'callback' => 'mod_datalynx_get_tagged_entries',
+                'callbackfile' => '/mod/datalynx/lib.php',
+                'collection' => 'datalynx',
+                'showstandard' => core_tag_tag::BOTH_STANDARD_AND_NOT,
+        ),
 );

@@ -21,6 +21,6 @@
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-$subplugins = array('datalynxfield' => 'mod/datalynx/field', 'datalynxview' => 'mod/datalynx/view', 
-    'datalynxrule' => 'mod/datalynx/rule', 'datalynxtool' => 'mod/datalynx/tool'
+$subplugins = array('datalynxfield' => 'mod/datalynx/field', 'datalynxview' => 'mod/datalynx/view',
+        'datalynxrule' => 'mod/datalynx/rule', 'datalynxtool' => 'mod/datalynx/tool'
 );

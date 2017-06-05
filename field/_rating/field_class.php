@@ -21,8 +21,7 @@
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once (dirname(__FILE__) . '/../field_class.php');
-
+require_once(dirname(__FILE__) . '/../field_class.php');
 
 class datalynxfield__rating extends datalynxfield_no_content {
 
@@ -60,32 +59,32 @@ class datalynxfield__rating extends datalynxfield_no_content {
 
     public static function get_field_objects($dataid) {
         $fieldobjects = array();
-        
-        $fieldobjects[self::_RATING] = (object) array('id' => self::_RATING, 'dataid' => $dataid, 
-            'type' => '_rating', 'name' => get_string('ratings', 'datalynx'), 'description' => '', 
-            'visible' => 2, 'internalname' => 'ratings');
-        
-        $fieldobjects[self::_RATINGAVG] = (object) array('id' => self::_RATINGAVG, 
-            'dataid' => $dataid, 'type' => '_rating', 'name' => get_string('ratingsavg', 'datalynx'), 
-            'description' => '', 'visible' => 2, 'internalname' => 'avgratings');
-        
-        $fieldobjects[self::_RATINGCOUNT] = (object) array('id' => self::_RATINGCOUNT, 
-            'dataid' => $dataid, 'type' => '_rating', 
-            'name' => get_string('ratingscount', 'datalynx'), 'description' => '', 'visible' => 2, 
-            'internalname' => 'countratings');
-        
-        $fieldobjects[self::_RATINGMAX] = (object) array('id' => self::_RATINGMAX, 
-            'dataid' => $dataid, 'type' => '_rating', 'name' => get_string('ratingsmax', 'datalynx'), 
-            'description' => '', 'visible' => 2, 'internalname' => 'maxratings');
-        
-        $fieldobjects[self::_RATINGMIN] = (object) array('id' => self::_RATINGMIN, 
-            'dataid' => $dataid, 'type' => '_rating', 'name' => get_string('ratingsmin', 'datalynx'), 
-            'description' => '', 'visible' => 2, 'internalname' => 'minratings');
-        
-        $fieldobjects[self::_RATINGSUM] = (object) array('id' => self::_RATINGSUM, 
-            'dataid' => $dataid, 'type' => '_rating', 'name' => get_string('ratingssum', 'datalynx'), 
-            'description' => '', 'visible' => 2, 'internalname' => 'sumratings');
-        
+
+        $fieldobjects[self::_RATING] = (object) array('id' => self::_RATING, 'dataid' => $dataid,
+                'type' => '_rating', 'name' => get_string('ratings', 'datalynx'), 'description' => '',
+                'visible' => 2, 'internalname' => 'ratings');
+
+        $fieldobjects[self::_RATINGAVG] = (object) array('id' => self::_RATINGAVG,
+                'dataid' => $dataid, 'type' => '_rating', 'name' => get_string('ratingsavg', 'datalynx'),
+                'description' => '', 'visible' => 2, 'internalname' => 'avgratings');
+
+        $fieldobjects[self::_RATINGCOUNT] = (object) array('id' => self::_RATINGCOUNT,
+                'dataid' => $dataid, 'type' => '_rating',
+                'name' => get_string('ratingscount', 'datalynx'), 'description' => '', 'visible' => 2,
+                'internalname' => 'countratings');
+
+        $fieldobjects[self::_RATINGMAX] = (object) array('id' => self::_RATINGMAX,
+                'dataid' => $dataid, 'type' => '_rating', 'name' => get_string('ratingsmax', 'datalynx'),
+                'description' => '', 'visible' => 2, 'internalname' => 'maxratings');
+
+        $fieldobjects[self::_RATINGMIN] = (object) array('id' => self::_RATINGMIN,
+                'dataid' => $dataid, 'type' => '_rating', 'name' => get_string('ratingsmin', 'datalynx'),
+                'description' => '', 'visible' => 2, 'internalname' => 'minratings');
+
+        $fieldobjects[self::_RATINGSUM] = (object) array('id' => self::_RATINGSUM,
+                'dataid' => $dataid, 'type' => '_rating', 'name' => get_string('ratingssum', 'datalynx'),
+                'description' => '', 'visible' => 2, 'internalname' => 'sumratings');
+
         return $fieldobjects;
     }
 
@@ -103,22 +102,24 @@ class datalynxfield__rating extends datalynxfield_no_content {
         $internalname = $this->field->internalname;
         if ($internalname == 'ratings') {
             return "er.usersrating";
-        } else if ($internalname == 'countratings') {
-            return "er.numratings";
         } else {
-            return "er.$internalname";
+            if ($internalname == 'countratings') {
+                return "er.numratings";
+            } else {
+                return "er.$internalname";
+            }
         }
     }
 
     public function get_join_sql() {
         global $USER;
-        
+
         $params = array();
         $params['rcontextid'] = $this->df()->context->id;
         $params['ruserid'] = $USER->id;
         $params['rcomponent'] = 'mod_datalynx';
         $params['ratingarea'] = 'entry';
-        
+
         $sql = "LEFT JOIN 
                 (SELECT r.itemid, r.component, r.ratingarea, r.contextid,
                            COUNT(r.rating) AS numratings,

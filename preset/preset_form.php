@@ -21,8 +21,7 @@
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ("$CFG->libdir/formslib.php");
-
+require_once("$CFG->libdir/formslib.php");
 
 /**
  */
@@ -30,30 +29,30 @@ class mod_datalynx_preset_form extends moodleform {
 
     function definition() {
         global $COURSE;
-        
+
         $mform = &$this->_form;
-        
+
         $mform->addElement('header', 'presetshdr', get_string('presetadd', 'datalynx'));
         // preset source
         $grp = array();
-        $grp[] = &$mform->createElement('radio', 'preset_source', null, 
+        $grp[] = &$mform->createElement('radio', 'preset_source', null,
                 get_string('presetfromdatalynx', 'datalynx'), 'current');
-        
-        $packdata = array('nodata' => get_string('presetnodata', 'datalynx'), 
-            'data' => get_string('presetdata', 'datalynx'), 
-            'dataanon' => get_string('presetdataanon', 'datalynx'));
+
+        $packdata = array('nodata' => get_string('presetnodata', 'datalynx'),
+                'data' => get_string('presetdata', 'datalynx'),
+                'dataanon' => get_string('presetdataanon', 'datalynx'));
         $grp[] = &$mform->createElement('select', 'preset_data', null, $packdata);
-        $grp[] = &$mform->createElement('radio', 'preset_source', null, 
+        $grp[] = &$mform->createElement('radio', 'preset_source', null,
                 get_string('presetfromfile', 'datalynx'), 'file');
         $mform->addGroup($grp, 'psourcegrp', null, array('  ', '<br />'), false);
         $mform->setDefault('preset_source', 'current');
-        
+
         // upload file
-        $options = array('subdirs' => 0, 'maxbytes' => $COURSE->maxbytes, 'maxfiles' => 1, 
-            'accepted_types' => array('*.zip', '*.mbz'));
+        $options = array('subdirs' => 0, 'maxbytes' => $COURSE->maxbytes, 'maxfiles' => 1,
+                'accepted_types' => array('*.zip', '*.mbz'));
         $mform->addElement('filepicker', 'uploadfile', null, null, $options);
         $mform->disabledIf('uploadfile', 'preset_source', 'neq', 'file');
-        
+
         $mform->addElement('html', '<br /><div class="mdl-align">');
         $mform->addElement('submit', 'add', '    ' . get_string('add') . '    ');
         $mform->addElement('html', '</div>');

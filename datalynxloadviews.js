@@ -12,7 +12,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
- 
+
 /**
  * @package mod
  * @subpackage datalynx
@@ -25,15 +25,15 @@
  */
 M.mod_datalynx_load_views = {};
 
-M.mod_datalynx_load_views.init = function(Y, options) {
-    YUI().use('node-base', 'event-base', 'io-base', function(Y) {
+M.mod_datalynx_load_views.init = function (Y, options) {
+    YUI().use('node-base', 'event-base', 'io-base', function (Y) {
         // get field name from options
         var dffield = options.dffield;
         var viewfield = options.viewfield;
         var textfieldfield = options.textfieldfield;
         var actionurl = options.acturl;
 
-        Y.on('change', function(e) {
+        Y.on('change', function (e) {
 
             // get view select
             var view = Y.Node.one('#id_' + viewfield);
@@ -45,12 +45,12 @@ M.mod_datalynx_load_views.init = function(Y, options) {
             var dfid = this.get('options').item(this.get('selectedIndex')).get('value');
 
             // remove view, textfield options (but the first choose) from view select
-            if(view) {
+            if (view) {
                 var viewchoose = view.get('options').item(0);
                 view.setContent(viewchoose);
                 view.set('selectedIndex', 0);
             }
-            if(textfield) {
+            if (textfield) {
                 var textfieldchoose = textfield.get('options').item(0);
                 textfield.setContent(textfieldchoose);
                 textfield.set('selectedIndex', 0);
@@ -61,7 +61,7 @@ M.mod_datalynx_load_views.init = function(Y, options) {
 
                 Y.io(actionurl, {
                     method: 'POST',
-                    data: 'dfid='+dfid,
+                    data: 'dfid=' + dfid,
                     on: {
                         success: function (id, o) {
                             if (o.responseText != '') {
@@ -69,35 +69,35 @@ M.mod_datalynx_load_views.init = function(Y, options) {
                                 var respoptions = o.responseText.split('#');
 
                                 // add view options
-                                if(view) {
+                                if (view) {
                                     var viewoptions = respoptions[0].split(',');
-                                    for (var i=0;i<viewoptions.length;++i) {
+                                    for (var i = 0; i < viewoptions.length; ++i) {
                                         var arr = viewoptions[i].trim().split(' ');
                                         var qid = arr.shift();
                                         var qname = arr.join(' ');
-                                        view.append(Y.Node.create('<option value="'+qid+'">'+qname+'</option>'));
+                                        view.append(Y.Node.create('<option value="' + qid + '">' + qname + '</option>'));
                                     }
                                 }
 
                                 // add textfield options
-                                if(textfield) {
+                                if (textfield) {
                                     var textfieldoptions = respoptions[1].split(',');
-                                    for (var i=0;i<textfieldoptions.length;++i) {
+                                    for (var i = 0; i < textfieldoptions.length; ++i) {
                                         var arr = textfieldoptions[i].trim().split(' ');
                                         var qid = arr.shift();
                                         var qname = arr.join(' ');
-                                        textfield.append(Y.Node.create('<option value="'+qid+'">'+qname+'</option>'));
+                                        textfield.append(Y.Node.create('<option value="' + qid + '">' + qname + '</option>'));
                                     }
                                 }
                             }
                         },
                         failure: function (id, o) {
-		                    console.log("Error while loading views and textfields.")
+                            console.log("Error while loading views and textfields.")
                         }
                     }
                 });
 
             }
-        }, '#id_'+ dffield);
-    });        
+        }, '#id_' + dffield);
+    });
 };

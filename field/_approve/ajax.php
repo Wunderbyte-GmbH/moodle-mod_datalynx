@@ -25,9 +25,9 @@ if (!defined('AJAX_SCRIPT')) {
     define('AJAX_SCRIPT', true);
 }
 
-require_once (dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/config.php');
-require_once ("$CFG->dirroot/mod/datalynx/mod_class.php");
-require_once ("$CFG->dirroot/mod/datalynx/entries_class.php");
+require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/config.php');
+require_once("$CFG->dirroot/mod/datalynx/mod_class.php");
+require_once("$CFG->dirroot/mod/datalynx/entries_class.php");
 
 ob_start();
 
@@ -60,22 +60,25 @@ if ($action == 'approve') {
     }
     $return = $DB->get_field('datalynx_entries', 'approved', array('id' => $entryid)) == 1;
     $completiontype = COMPLETION_COMPLETE;
-} else if ($action == 'disapprove') {
-    $DB->set_field('datalynx_entries', 'approved', 0, array('id' => $entryid));
-    $return = $DB->get_field('datalynx_entries', 'approved', array('id' => $entryid)) == 0;
-    $processed = array($entryid => $DB->get_record('datalynx_entries', array('id' => $entryid)));
-    if ($processed) {
-        $eventdata = (object) array('view' => $df->get_view_from_id($viewid), 'items' => $processed);
-        $df->events_trigger("entrydisapproved", $eventdata);
-    }
-    $completiontype = COMPLETION_INCOMPLETE;
 } else {
-    $return = false;
+    if ($action == 'disapprove') {
+        $DB->set_field('datalynx_entries', 'approved', 0, array('id' => $entryid));
+        $return = $DB->get_field('datalynx_entries', 'approved', array('id' => $entryid)) == 0;
+        $processed = array($entryid => $DB->get_record('datalynx_entries', array('id' => $entryid)));
+        if ($processed) {
+            $eventdata = (object) array('view' => $df->get_view_from_id($viewid), 'items' => $processed);
+            $df->events_trigger("entrydisapproved", $eventdata);
+        }
+        $completiontype = COMPLETION_INCOMPLETE;
+    } else {
+        $return = false;
+    }
 }
 // Update completion state
 $completion = new completion_info($course);
 if ($completion->is_enabled($cm) && $cm->completion == COMPLETION_TRACKING_AUTOMATIC &&
-         $data->completionentries) {
+        $data->completionentries
+) {
     $userid = $DB->get_field('datalynx_entries', 'userid', array('id' => $entryid));
     $completion->update_state($cm, $completiontype, $userid);
 }

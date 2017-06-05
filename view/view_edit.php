@@ -20,8 +20,8 @@
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ('../../../config.php');
-require_once ("$CFG->dirroot/mod/datalynx/mod_class.php");
+require_once('../../../config.php');
+require_once("$CFG->dirroot/mod/datalynx/mod_class.php");
 
 $urlparams = new stdClass();
 $urlparams->d = required_param('d', PARAM_INT); // datalynx ID
@@ -35,23 +35,23 @@ $df = new datalynx($urlparams->d);
 
 global $DB;
 $options = array();
-$options['behaviors'] = $DB->get_records_select_menu('datalynx_behaviors', 'dataid = :dataid', 
+$options['behaviors'] = $DB->get_records_select_menu('datalynx_behaviors', 'dataid = :dataid',
         array('dataid' => $urlparams->d), 'value ASC', 'name AS value, name AS label');
 $options['behaviors'][''] = get_string('defaultbehavior', 'datalynx');
-$fields = $DB->get_fieldset_select('datalynx_fields', 'name', 'dataid = :dataid', 
+$fields = $DB->get_fieldset_select('datalynx_fields', 'name', 'dataid = :dataid',
         array('dataid' => $urlparams->d));
 $options['renderers'] = array();
-$commonrenderers = $DB->get_records_select_menu('datalynx_renderers', 'dataid = :dataid', 
+$commonrenderers = $DB->get_records_select_menu('datalynx_renderers', 'dataid = :dataid',
         array('dataid' => $urlparams->d), 'value ASC', 'name AS value, name AS label');
 foreach ($fields as $field) {
     $options['renderers'][$field] = $commonrenderers; // TODO: add field-specific renderers here
     $options['renderers'][$field][''] = get_string('defaultrenderer', 'datalynx');
 }
-$options['types'] = $DB->get_records_select_menu('datalynx_fields', 'dataid = :dataid', 
+$options['types'] = $DB->get_records_select_menu('datalynx_fields', 'dataid = :dataid',
         array('dataid' => $urlparams->d), 'name ASC', 'name, type');
 
-$module = array('name' => 'mod_datalynx', 'fullpath' => '/mod/datalynx/datalynx.js', 
-    'requires' => array('moodle-core-notification-dialogue')
+$module = array('name' => 'mod_datalynx', 'fullpath' => '/mod/datalynx/datalynx.js',
+        'requires' => array('moodle-core-notification-dialogue')
 );
 
 $PAGE->requires->js_init_call('M.mod_datalynx.tag_manager.init', $options, true, $module);
@@ -74,9 +74,11 @@ if ($urlparams->vedit) {
     if ($default = optional_param('resetdefault', 0, PARAM_INT)) {
         $view->generate_default_view();
     }
-} else if ($urlparams->type) {
-    $view = $df->get_view($urlparams->type);
-    $view->generate_default_view();
+} else {
+    if ($urlparams->type) {
+        $view = $df->get_view($urlparams->type);
+        $view->generate_default_view();
+    }
 }
 
 $mform = $view->get_form();
@@ -88,53 +90,57 @@ if ($mform->is_cancelled()) {
     } else {
         redirect(new moodle_url('/mod/datalynx/view/index.php', array('d' => $urlparams->d)));
     }
-    
+
     // no submit buttons: reset to default
-} else if ($mform->no_submit_button_pressed()) {
-    // reset view to default
-    // TODO is this the best way?
-    $resettodefault = optional_param('resetdefaultbutton', '', PARAM_ALPHA);
-    if ($resettodefault) {
-        $urlparams->resetdefault = 1;
-        redirect(
-                new moodle_url('/mod/datalynx/view/view_edit.php', 
-                        ((array) $urlparams) + array('sesskey' => sesskey())));
-    }
-    
-    // process validated
-} else if ($data = $mform->get_data()) {
-    // add new view
-    if (!$view->id()) {
-        $vid = $view->add($data);
-        
-        $other = array('dataid' => $df->id());
-        $event = \mod_datalynx\event\view_created::create(
-                array('context' => $df->context, 'objectid' => $vid, 'other' => $other));
-        $event->trigger();
-        // update view
+} else {
+    if ($mform->no_submit_button_pressed()) {
+        // reset view to default
+        // TODO is this the best way?
+        $resettodefault = optional_param('resetdefaultbutton', '', PARAM_ALPHA);
+        if ($resettodefault) {
+            $urlparams->resetdefault = 1;
+            redirect(
+                    new moodle_url('/mod/datalynx/view/view_edit.php',
+                            ((array) $urlparams) + array('sesskey' => sesskey())));
+        }
+
+        // process validated
     } else {
-        $view->update($data);
-        
-        $other = array('dataid' => $df->id());
-        $event = \mod_datalynx\event\view_updated::create(
-                array('context' => $df->context, 'objectid' => $view->id(), 'other' => $other));
-        $event->trigger();
-    }
-    
-    // $df->notifications['good'][] = $log; //FIXME: what is this for
-    
-    if (!isset($data->submitreturnbutton)) {
-        // TODO: set default view
-        
-        if ($urlparams->returnurl) {
-            redirect($urlparams->returnurl);
-        } else {
-            redirect(new moodle_url('/mod/datalynx/view/index.php', array('d' => $urlparams->d)));
+        if ($data = $mform->get_data()) {
+            // add new view
+            if (!$view->id()) {
+                $vid = $view->add($data);
+
+                $other = array('dataid' => $df->id());
+                $event = \mod_datalynx\event\view_created::create(
+                        array('context' => $df->context, 'objectid' => $vid, 'other' => $other));
+                $event->trigger();
+                // update view
+            } else {
+                $view->update($data);
+
+                $other = array('dataid' => $df->id());
+                $event = \mod_datalynx\event\view_updated::create(
+                        array('context' => $df->context, 'objectid' => $view->id(), 'other' => $other));
+                $event->trigger();
+            }
+
+            // $df->notifications['good'][] = $log; //FIXME: what is this for
+
+            if (!isset($data->submitreturnbutton)) {
+                // TODO: set default view
+
+                if ($urlparams->returnurl) {
+                    redirect($urlparams->returnurl);
+                } else {
+                    redirect(new moodle_url('/mod/datalynx/view/index.php', array('d' => $urlparams->d)));
+                }
+            }
+
+            // Save and continue so refresh the form
+            $mform = $view->get_form();
         }
     }
-    
-    // Save and continue so refresh the form
-    $mform = $view->get_form();
 }
 
 // activate navigation node

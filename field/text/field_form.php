@@ -21,8 +21,7 @@
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ("$CFG->dirroot/mod/datalynx/field/field_form.php");
-
+require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
 class datalynxfield_text_form extends datalynxfield_form {
 
@@ -67,8 +66,8 @@ class datalynxfield_text_form extends datalynxfield_form {
             // Display the duplicate-entries-message and the list of duplicate entries
             $listtext = $this->print_list_of_duplicates($duplicates);
             $mform->addElement('static', 'duplicatestext', '',
-                $OUTPUT->notification(get_string('field_has_duplicate_entries', 'datalynx') .
-                    $listtext, 'notifymessage'));
+                    $OUTPUT->notification(get_string('field_has_duplicate_entries', 'datalynx') .
+                            $listtext, 'notifymessage'));
         } else {
             // if there are no duplicates the default option for unique is "No" as well, but the user can change it
             $mform->setDefault('param8', 0);
@@ -98,7 +97,7 @@ class datalynxfield_text_form extends datalynxfield_form {
                     $dfmenu[$df->course->shortname] = array();
                 }
                 $dfmenu[$df->course->shortname][$dfid] = strip_tags(
-                    format_string($df->name(), true));
+                        format_string($df->name(), true));
             }
         } else {
             $dfmenu = array('' => array(0 => get_string('nodatalynxs', 'datalynx')));
@@ -115,15 +114,15 @@ class datalynxfield_text_form extends datalynxfield_form {
 
         // ajax view loading
         $options = array(
-            'dffield' => 'param9',
-            'textfieldfield' => 'param10',
-            'acturl' => "$CFG->wwwroot/mod/datalynx/loaddfviews.php"
+                'dffield' => 'param9',
+                'textfieldfield' => 'param10',
+                'acturl' => "$CFG->wwwroot/mod/datalynx/loaddfviews.php"
         );
 
         $module = array(
-            'name' => 'M.mod_datalynx_load_views',
-            'fullpath' => '/mod/datalynx/datalynxloadviews.js',
-            'requires' => array('base', 'io', 'node')
+                'name' => 'M.mod_datalynx_load_views',
+                'fullpath' => '/mod/datalynx/datalynxloadviews.js',
+                'requires' => array('base', 'io', 'node')
         );
 
         $PAGE->requires->js_init_call('M.mod_datalynx_load_views.init', array($options), false, $module);
@@ -134,18 +133,18 @@ class datalynxfield_text_form extends datalynxfield_form {
 
         // format rules
         $options = array('' => get_string('choosedots'),
-            'alphanumeric' => get_string('err_alphanumeric', 'form'),
-            'lettersonly' => get_string('err_lettersonly', 'form'),
-            'numeric' => get_string('err_numeric', 'form'),
-            'email' => get_string('err_email', 'form'),
-            'nopunctuation' => get_string('err_nopunctuation', 'form'));
+                'alphanumeric' => get_string('err_alphanumeric', 'form'),
+                'lettersonly' => get_string('err_lettersonly', 'form'),
+                'numeric' => get_string('err_numeric', 'form'),
+                'email' => get_string('err_email', 'form'),
+                'nopunctuation' => get_string('err_nopunctuation', 'form'));
         $mform->addElement('select', 'param4', get_string('format'), $options);
 
         // length (param5, 6, 7): min, max, range
         $options = array('' => get_string('choosedots'),
-            'minlength' => get_string('min', 'datalynx'),
-            'maxlength' => get_string('max', 'datalynx'),
-            'rangelength' => get_string('range', 'datalynx'));
+                'minlength' => get_string('min', 'datalynx'),
+                'maxlength' => get_string('max', 'datalynx'),
+                'rangelength' => get_string('range', 'datalynx'));
         $grp = array();
         $grp[] = &$mform->createElement('select', 'param5', null, $options);
         $grp[] = &$mform->createElement('text', 'param6', null, array('size' => 8));
@@ -182,7 +181,8 @@ class datalynxfield_text_form extends datalynxfield_form {
 
         if ($refdatalynxid) {
             if ($textfields = $DB->get_records_menu('datalynx_fields',
-                array('dataid' => $refdatalynxid, 'type' => 'text'), 'name', 'id,name')) {
+                    array('dataid' => $refdatalynxid, 'type' => 'text'), 'name', 'id,name')
+            ) {
                 $formfield = &$this->_form->getElement('param10');
                 foreach ($textfields as $key => $value) {
                     $formfield->addOption(strip_tags(format_string($value, true)), $key);
@@ -191,7 +191,6 @@ class datalynxfield_text_form extends datalynxfield_form {
             }
         }
     }
-
 
     /**
      * Ensures there are no duplicate entries right now if unique is set to 'yes'!
@@ -215,8 +214,8 @@ class datalynxfield_text_form extends datalynxfield_form {
             if ($duplicates) {
                 $listtext = $this->print_list_of_duplicates($duplicates);
                 $mform->addElement('static', 'duplicatestext', '',
-                    $OUTPUT->notification(get_string('field_has_duplicate_entries', 'datalynx')
-                        . $listtext, 'notifymessage'));
+                        $OUTPUT->notification(get_string('field_has_duplicate_entries', 'datalynx')
+                                . $listtext, 'notifymessage'));
             }
         }
 
@@ -225,6 +224,7 @@ class datalynxfield_text_form extends datalynxfield_form {
 
     /**
      * Returns a list of entries with duplicate content in the given text field
+     *
      * @return $array entries with duplicate content (entryid, content)
      */
     function get_list_of_duplicates() {
@@ -242,12 +242,12 @@ class datalynxfield_text_form extends datalynxfield_form {
                                  GROUP BY c.content
                                    HAVING COUNT(*) > 1", array('fieldid' => $fieldid));
         $list_of_duplicates = array();
-        foreach($records as $record) {
+        foreach ($records as $record) {
             $ids = $DB->get_fieldset_sql("SELECT c.entryid
                                      FROM {datalynx_contents} c
                                     WHERE c.fieldid = :fieldid AND c.content = :content",
-                array('fieldid' => $fieldid, 'content' => $record->content));
-            foreach($ids as $id) {
+                    array('fieldid' => $fieldid, 'content' => $record->content));
+            foreach ($ids as $id) {
                 $list_of_duplicates[] = array('id' => $id, 'content' => $record->content);
             }
         }
@@ -258,11 +258,11 @@ class datalynxfield_text_form extends datalynxfield_form {
     function print_list_of_duplicates($duplicates) {
         $entryurl = $baseurl = $this->get_editviewlink();
         $listtext = "";
-        foreach($duplicates as $entry) {
+        foreach ($duplicates as $entry) {
             $entryurl->param('editentries', $entry['id']);
             $entryurl->param('eids', $entry['id']);
             $label = html_writer::tag('span', get_string('entry', 'datalynx') . ' ' .
-                get_string('id', 'datalynx') . ' ' . $entry['id'] . ' ' . $entry['content']);
+                    get_string('id', 'datalynx') . ' ' . $entry['id'] . ' ' . $entry['content']);
             $link = html_writer::link($entryurl, $label);
             $listtext .= "<br \>" . $link;
         }

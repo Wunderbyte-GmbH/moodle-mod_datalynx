@@ -24,7 +24,7 @@
 
 M.datalynxview_tabular = {};
 
-M.datalynxview_tabular.init = function(Y) {
+M.datalynxview_tabular.init = function (Y) {
     var firstentryfield = Y.one('div.felement [name^="field_"]');
     if (!firstentryfield) {
         Y.all('input[type="checkbox"][name$="bulkedit"]').hide();
@@ -37,7 +37,7 @@ M.datalynxview_tabular.init = function(Y) {
         var fieldid = checkbox.get('name').split('_')[1];
 
         Y.all('[name^="field_' + fieldid + '"]:not([name^="field_' + fieldid + '_' + firstentryid + '"])' +
-                ':not([name^="field_' + fieldid + '_bulkedit"])').each(function () {
+            ':not([name^="field_' + fieldid + '_bulkedit"])').each(function () {
             this.set('disabled', (checkbox.get('checked') ? 'disabled' : null ));
         });
     });

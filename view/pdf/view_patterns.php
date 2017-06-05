@@ -23,8 +23,7 @@
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once ("$CFG->dirroot/mod/datalynx/view/view_patterns.php");
-
+require_once("$CFG->dirroot/mod/datalynx/view/view_patterns.php");
 
 /**
  * Base class for view patterns
@@ -37,38 +36,38 @@ class datalynxview_pdf_patterns extends datalynxview_patterns {
         global $CFG, $OUTPUT;
 
         $replacements = parent::get_replacements($tags, $entry, $options);
-        
+
         $view = $this->_view;
         $df = $view->get_df();
         $filter = $view->get_filter();
         $baseurl = new moodle_url($view->get_baseurl());
         $baseurl->param('sesskey', sesskey());
-        
+
         foreach ($tags as $tag) {
             switch ($tag) {
                 case '##export:all##':
                     $actionurl = new moodle_url($baseurl, array('pdfexportall' => true));
                     // $label = $OUTPUT->pix_icon('f/pdf', get_string('multiexport', 'datalynx'));
                     $label = html_writer::tag('span', get_string('exportall', 'datalynx'));
-                    $replacements[$tag] = html_writer::link($actionurl, $label, 
+                    $replacements[$tag] = html_writer::link($actionurl, $label,
                             array('class' => 'actionlink exportall'));
-                    
+
                     break;
                 case '##export:page##':
                     $actionurl = new moodle_url($baseurl, array('pdfexportpage' => true));
                     // $label = $OUTPUT->pix_icon('f/pdf', get_string('multiexport', 'datalynx'));
                     $label = html_writer::tag('span', get_string('exportpage', 'datalynx'));
-                    $replacements[$tag] = html_writer::link($actionurl, $label, 
+                    $replacements[$tag] = html_writer::link($actionurl, $label,
                             array('class' => 'actionlink exportpage'));
-                    
+
                     break;
                 case '##pagebreak##':
                     $replacements[$tag] = $view::PAGE_BREAK;
-                    
+
                     break;
             }
         }
-        
+
         return $replacements;
     }
 
@@ -80,7 +79,7 @@ class datalynxview_pdf_patterns extends datalynxview_patterns {
         $patterns['##export:all##'] = array(true, $cat);
         $patterns['##export:page##'] = array(true, $cat);
         $patterns['##pagebreak##'] = array(true, $cat);
-        
+
         return $patterns;
     }
 }

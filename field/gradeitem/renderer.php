@@ -23,8 +23,7 @@
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once ("$CFG->dirroot/mod/datalynx/field/renderer.php");
-
+require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
  */
@@ -33,11 +32,11 @@ class datalynxfield_gradeitem_renderer extends datalynxfield_renderer {
     public function render_display_mode(stdClass $entry, array $options) {
         $field = $this->_field;
         $fieldid = $field->id();
-        
+
         if (!isset($entry->{"c{$fieldid}_content"})) {
             return '';
         }
-        
+
         $number = (float) $entry->{"c{$fieldid}_content"};
         $decimals = 2;
         // only apply number formatting if param1 contains an integer number >= 0:

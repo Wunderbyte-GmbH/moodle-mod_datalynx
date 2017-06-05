@@ -25,7 +25,6 @@ namespace mod_datalynx\event;
 
 defined('MOODLE_INTERNAL') || die();
 
-
 /**
  *
  * @package mod_datalynx
@@ -62,7 +61,7 @@ class css_saved extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '$this->userid' saved a custom CSS file in the datalynx activity " .
-                 "with the course module id '$this->contextinstanceid'.";
+        "with the course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -71,7 +70,7 @@ class css_saved extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/mod/datalynx/view.php', 
+        return new \moodle_url('/mod/datalynx/view.php',
                 array('d' => $this->objectid, 'cssedit' => 1
                 ));
     }
@@ -82,8 +81,8 @@ class css_saved extends \core\event\base {
      * @return array
      */
     public function get_legacy_logdata() {
-        return array($this->courseid, 'datalynx', 'css_saved', 
-            'view.php?d=' . $this->objectid . '&cssedit=1', $this->objectid, 
-            $this->contextinstanceid);
+        return array($this->courseid, 'datalynx', 'css_saved',
+                'view.php?d=' . $this->objectid . '&cssedit=1', $this->objectid,
+                $this->contextinstanceid);
     }
 }

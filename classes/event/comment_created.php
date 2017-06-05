@@ -25,7 +25,6 @@ namespace mod_datalynx\event;
 
 defined('MOODLE_INTERNAL') || die();
 
-
 /**
  * The mod_datalynx comment created event class.
  *
@@ -52,6 +51,6 @@ class comment_created extends \core\event\comment_created {
      */
     public function get_description() {
         return "The user with id '$this->userid' added the comment with to the datalynx activity with " .
-                 "the course module id '$this->contextinstanceid'.";
+        "the course module id '$this->contextinstanceid'.";
     }
 }

@@ -23,19 +23,18 @@
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once (dirname(__FILE__) . "/../multiselect/renderer.php");
-
+require_once(dirname(__FILE__) . "/../multiselect/renderer.php");
 
 /**
  * Class datalynxfield_checkbox_renderer Renderer for checkbox field type
  */
 class datalynxfield_checkbox_renderer extends datalynxfield_multiselect_renderer {
 
-	/**
-	 * 
-	 * {@inheritDoc}
-	 * @see datalynxfield_renderer::render_edit_mode()
-	 */
+    /**
+     *
+     * {@inheritDoc}
+     * @see datalynxfield_renderer::render_edit_mode()
+     */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $field = $this->_field;
         $fieldid = $field->id();
@@ -43,36 +42,36 @@ class datalynxfield_checkbox_renderer extends datalynxfield_multiselect_renderer
         $fieldname = "field_{$fieldid}_$entryid";
         $menuoptions = $field->options_menu();
         $required = $options['required'];
-        
+
         $content = !empty($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : null;
-        
+
         $separator = $field->separators[(int) $field->get('param2')]['chr'];
-        
+
         $elemgrp = array();
         foreach ($menuoptions as $i => $option) {
-            $elemgrp[] = &$mform->createElement('advcheckbox', $i, null, $option, null, 
+            $elemgrp[] = &$mform->createElement('advcheckbox', $i, null, $option, null,
                     array(null, $i));
         }
-        
+
         $mform->addGroup($elemgrp, $fieldname, null, $separator, true);
-        
+
         $selected = array();
         if ($entryid > 0 and $content) {
             $contentprepare = str_replace("#", "", $content);
-            $selectedraw = explode(',',$contentprepare);
-            
+            $selectedraw = explode(',', $contentprepare);
+
             foreach ($selectedraw as $item) {
                 $selected[$item] = $item;
             }
         }
-        
+
         // check for default values
         if (!$selected and $field->get('param2')) {
             $selected = $field->default_values();
         }
-        
+
         $mform->getElement($fieldname)->setValue($selected);
-        
+
         if ($required) {
             $mform->addGroupRule($fieldname, get_string('err_required', 'form'), 'required', null, 1);
         }

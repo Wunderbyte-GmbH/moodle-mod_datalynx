@@ -20,14 +20,14 @@
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ('../../../config.php');
-require_once ('../mod_class.php');
+require_once('../../../config.php');
+require_once('../mod_class.php');
 
 $urlparams = new stdClass();
 
 $urlparams->d = optional_param('d', 0, PARAM_INT); // datalynx id
 $urlparams->id = optional_param('id', 0, PARAM_INT); // course module id
-                                                     
+
 // views list actions
 $urlparams->run = optional_param('run', '', PARAM_PLUGIN); // tool plugin to run
 
@@ -48,7 +48,7 @@ if ($urlparams->run and confirm_sesskey()) { // Run selected tool
     $tooldir = "$CFG->dirroot/mod/datalynx/tool/$urlparams->run";
     $toolclass = "datalynxtool_$urlparams->run";
     if (file_exists($tooldir)) {
-        require_once ("$tooldir/lib.php");
+        require_once("$tooldir/lib.php");
         if ($result = $toolclass::run($df)) {
             list($goodbad, $message) = $result;
         } else {
@@ -64,16 +64,16 @@ $directories = get_list_of_plugins('mod/datalynx/tool/');
 $tools = array();
 foreach ($directories as $directory) {
     $tools[$directory] = (object) array(
-        'name' => get_string('pluginname', "datalynxtool_$directory"), 
-        'description' => get_string('pluginname_help', "datalynxtool_$directory")
+            'name' => get_string('pluginname', "datalynxtool_$directory"),
+            'description' => get_string('pluginname_help', "datalynxtool_$directory")
     );
 }
 ksort($tools); // sort in alphabetical order
-               
+
 // any notifications?
 if (!$tools) {
     $df->notifications['bad'][] = get_string('toolnoneindatalynx', 'datalynx'); // nothing in
-                                                                               // database
+    // database
 }
 
 // print header
@@ -83,7 +83,7 @@ $df->print_header(array('tab' => 'tools', 'urlparams' => $urlparams));
 if ($tools) {
     $actionbaseurl = '/mod/datalynx/tool/index.php';
     $linkparams = array('d' => $df->id(), 'sesskey' => sesskey());
-    
+
     // / table headings
     $strname = get_string('name');
     $strdesc = get_string('description');
@@ -94,13 +94,13 @@ if ($tools) {
     $table->align = array('left', 'left', 'center');
     $table->wrap = array(false, false, false);
     $table->attributes['align'] = 'center';
-    
+
     foreach ($tools as $dir => $tool) {
-        
+
         $runlink = html_writer::link(
                 new moodle_url($actionbaseurl, $linkparams + array('run' => $dir)),
-                            $OUTPUT->pix_icon('t/collapsed', $strrun));
-        
+                $OUTPUT->pix_icon('t/collapsed', $strrun));
+
         $table->data[] = array($tool->name, $tool->description, $runlink);
     }
     echo html_writer::table($table);

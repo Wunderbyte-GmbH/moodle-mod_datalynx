@@ -25,6 +25,5 @@ namespace mod_datalynx\plugininfo;
 
 defined('MOODLE_INTERNAL') || die();
 
-
 class datalynxfield extends \core\plugininfo\base {
 } 

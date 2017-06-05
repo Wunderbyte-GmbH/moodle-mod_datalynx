@@ -7,7 +7,7 @@
  */
 define('AJAX_SCRIPT', true);
 
-require_once ('../../../config.php');
+require_once('../../../config.php');
 
 $behaviorid = required_param('behaviorid', PARAM_INT);
 $permissionid = optional_param('permissionid', 0, PARAM_INT);
@@ -25,7 +25,7 @@ if ($for == "required") {
         $required = 1;
         $toggle = "ON";
     }
-    
+
     $DB->set_field('datalynx_behaviors', $forproperty, $required, array('id' => $behaviorid));
 } else {
     $permissions = unserialize(
@@ -39,7 +39,7 @@ if ($for == "required") {
         }
         $toggle = "OFF";
     }
-    $DB->set_field('datalynx_behaviors', $forproperty, serialize($permissions), 
+    $DB->set_field('datalynx_behaviors', $forproperty, serialize($permissions),
             array('id' => $behaviorid));
 }
 

@@ -21,7 +21,7 @@
  * @copyright 2015 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once (dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/config.php');
+require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/config.php');
 
 ob_start();
 
@@ -48,69 +48,71 @@ require_capability('mod/datalynx:teamsubscribe', $context);
 global $DB;
 if ($action == 'subscribe') {
     $users = json_decode(
-            $DB->get_field('datalynx_contents', 'content', 
+            $DB->get_field('datalynx_contents', 'content',
                     array('fieldid' => $fieldid, 'entryid' => $entryid)), true);
     if ($users !== null) {
         $users[] = "$userid";
         $users = array_unique($users);
         $users = array_diff($users, ["0"]);
         $users = array_values($users);
-        $DB->set_field('datalynx_contents', 'content', json_encode($users), 
+        $DB->set_field('datalynx_contents', 'content', json_encode($users),
                 array('fieldid' => $fieldid, 'entryid' => $entryid));
     } else {
         $users = ["$userid"];
-        $content = ['fieldid' => $fieldid, 'entryid' => $entryid, 
-            'content' => json_encode($users)];
+        $content = ['fieldid' => $fieldid, 'entryid' => $entryid,
+                'content' => json_encode($users)];
         if ($content !== "null") {
             $DB->insert_record('datalynx_contents', (object) $content);
         } else {
             $return = "Team subscribe error: Failed encoding subscription!";
         }
     }
-    
-    $other = ['dataid' => $d, 'fieldid' => $fieldid, 
-        'name' => $DB->get_field('datalynx_fields', 'name', array('id' => $fieldid)),
-        'addedmembers' => json_encode([$userid]), 'removedmembers' => json_encode([])
+
+    $other = ['dataid' => $d, 'fieldid' => $fieldid,
+            'name' => $DB->get_field('datalynx_fields', 'name', array('id' => $fieldid)),
+            'addedmembers' => json_encode([$userid]), 'removedmembers' => json_encode([])
     ];
-    
+
     $event = \mod_datalynx\event\team_updated::create(
             array('context' => $context, 'objectid' => $entryid, 'other' => $other));
     $event->trigger();
-    
+
     $return = true;
-} else if ($action == 'unsubscribe') {
-    $users = json_decode(
-            $DB->get_field('datalynx_contents', 'content', 
-                    array('fieldid' => $fieldid, 'entryid' => $entryid)), true);
-    if ($users !== null) {
-        $users = array_unique($users);
-        $users = array_values(array_diff($users, [$userid]));
-        $users = array_diff($users, ["0"]);
-        $users = array_values($users);
-        if (empty($users)) {
-            $DB->delete_records('datalynx_contents', 
-                    array('fieldid' => $fieldid, 'entryid' => $entryid));
-        } else {
-            $DB->set_field('datalynx_contents', 'content', json_encode($users), 
-                    array('fieldid' => $fieldid, 'entryid' => $entryid));
-        }
-        $return = true;
-        
-        $other = ['dataid' => $d, 'fieldid' => $fieldid, 
-            'name' => $DB->get_field('datalynx_fields', 'name', array('id' => $fieldid)),
-            'addedmembers' => json_encode([]), 'removedmembers' => json_encode([$userid])
-        ];
-        
-        $event = \mod_datalynx\event\team_updated::create(
-                array('context' => $context, 'objectid' => $entryid, 'other' => $other));
-        $event->trigger();
-    } else {
-        $return = "Team subscribe error: The team list is empty!"; // should not occur, as at least
-                                                                   // this user's id must be in the
-                                                                   // field
-    }
 } else {
-    $return = "Team subscribe error: Wrong action!";
+    if ($action == 'unsubscribe') {
+        $users = json_decode(
+                $DB->get_field('datalynx_contents', 'content',
+                        array('fieldid' => $fieldid, 'entryid' => $entryid)), true);
+        if ($users !== null) {
+            $users = array_unique($users);
+            $users = array_values(array_diff($users, [$userid]));
+            $users = array_diff($users, ["0"]);
+            $users = array_values($users);
+            if (empty($users)) {
+                $DB->delete_records('datalynx_contents',
+                        array('fieldid' => $fieldid, 'entryid' => $entryid));
+            } else {
+                $DB->set_field('datalynx_contents', 'content', json_encode($users),
+                        array('fieldid' => $fieldid, 'entryid' => $entryid));
+            }
+            $return = true;
+
+            $other = ['dataid' => $d, 'fieldid' => $fieldid,
+                    'name' => $DB->get_field('datalynx_fields', 'name', array('id' => $fieldid)),
+                    'addedmembers' => json_encode([]), 'removedmembers' => json_encode([$userid])
+            ];
+
+            $event = \mod_datalynx\event\team_updated::create(
+                    array('context' => $context, 'objectid' => $entryid, 'other' => $other));
+            $event->trigger();
+        } else {
+            $return = "Team subscribe error: The team list is empty!"; // should not occur, as at least
+            // this user's id must be in the
+            // field
+        }
+    } else {
+        $return = "Team subscribe error: Wrong action!";
+    }
 }
 
 if ($ajax) {
@@ -118,7 +120,7 @@ if ($ajax) {
         ob_clean();
     }
     echo json_encode($return);
-    
+
     die();
 } else {
     $url = new moodle_url('../../view.php', array('d' => $d, 'view' => $view));

@@ -23,8 +23,7 @@
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once (dirname(__FILE__) . "/../renderer.php");
-
+require_once(dirname(__FILE__) . "/../renderer.php");
 
 /**
  */
@@ -37,7 +36,7 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
     protected $_field = null;
 
     /**
-     * 
+     *
      * {@inheritDoc}
      * @see datalynxfield_renderer::render_edit_mode()
      */
@@ -50,24 +49,24 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
         $autocomplete = $field->get('param6');
 
         $content = !empty($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : null;
-        
+
         $selected = array();
         if ($entryid > 0 and $content) {
             $contentprepare = str_replace("#", "", $content);
-            $selectedraw = explode(',',$contentprepare);
-            
+            $selectedraw = explode(',', $contentprepare);
+
             foreach ($selectedraw as $item) {
                 $selected[$item] = $item;
             }
         }
-        
+
         // check for default values
         if (!$selected and $field->get('param2')) {
             $selected = $field->default_values();
         }
 
         // render as autocomplete field (param6 not empty) or select field
-        if($autocomplete) {
+        if ($autocomplete) {
             $menuoptions = $field->options_menu(false, true);
             $select = &$mform->addElement('autocomplete', $fieldname, null, $menuoptions);
         } else {
@@ -77,7 +76,7 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
         $select->setMultiple(true);
         $select->setSelected($selected);
         $mform->setType($fieldname, PARAM_INT);
-        
+
         if ($required) {
             $mform->addRule($fieldname, null, 'required', null, 'client');
         }
@@ -86,21 +85,22 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
     /**
      * transform the raw database value into HTML suitable for displaying on the entry page
      * (non-PHPdoc)
+     *
      * @see datalynxfield_renderer::render_display_mode()
      * @return string HTML
      */
     public function render_display_mode(stdClass $entry, array $params) {
         $field = $this->_field;
         $fieldid = $field->id();
-        
+
         if (isset($entry->{"c{$fieldid}_content"})) {
             $content = $entry->{"c{$fieldid}_content"};
             $contentprepare = str_replace("#", "", $content);
-            
+
             $options = $field->options_menu();
-            
-            $contents = explode(',',$contentprepare);
-            
+
+            $contents = explode(',', $contentprepare);
+
             $str = array();
             foreach ($options as $key => $option) {
                 $selected = (int) in_array($key, $contents);
@@ -117,66 +117,66 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
         } else {
             $str = '';
         }
-        
+
         return $str;
     }
 
     /**
-     * 
+     *
      * {@inheritDoc}
      * @see datalynxfield_renderer::render_search_mode()
      */
     public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
         global $CFG;
-        HTML_QuickForm::registerElementType('checkboxgroup', 
-                "$CFG->dirroot/mod/datalynx/checkboxgroup/checkboxgroup.php", 
+        HTML_QuickForm::registerElementType('checkboxgroup',
+                "$CFG->dirroot/mod/datalynx/checkboxgroup/checkboxgroup.php",
                 'HTML_QuickForm_checkboxgroup');
-        
+
         $field = $this->_field;
         $fieldid = $field->id();
-        
+
         $selected = $value;
-        
+
         $options = $field->options_menu();
-        
+
         $fieldname = "f_{$i}_$fieldid";
         $select = &$mform->createElement('checkboxgroup', $fieldname, null, $options, '');
         $select->setValue($selected);
-        
+
         $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
-        
+
         return array(array($select), null);
     }
 
     /**
-     * 
+     *
      * {@inheritDoc}
      * @see datalynxfield_renderer::validate()
      */
     public function validate($entryid, $tags, $formdata) {
-    	$fieldid = $this->_field->id();
-    	$formfieldname = "field_{$fieldid}_{$entryid}";
-    
-    	$errors = array();
-    	foreach ($tags as $tag) {
-    		list(, $behavior, ) = $this->process_tag($tag);
-    		/* @var $behavior datalynx_field_behavior */
-    
-    		if ($behavior->is_required()) {
-    			if (empty($formdata->$formfieldname)) {
-    				$errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
-    			} else {
-    				$empty = true;
-    				foreach ($formdata->$formfieldname as $value) {
-    					$empty = $empty && empty($value);
-    				}
-    				if ($empty) {
-    					$errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
-    				}
-    			}
-    		}
-    	}
-    
-    	return $errors;
+        $fieldid = $this->_field->id();
+        $formfieldname = "field_{$fieldid}_{$entryid}";
+
+        $errors = array();
+        foreach ($tags as $tag) {
+            list(, $behavior,) = $this->process_tag($tag);
+            /* @var $behavior datalynx_field_behavior */
+
+            if ($behavior->is_required()) {
+                if (empty($formdata->$formfieldname)) {
+                    $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
+                } else {
+                    $empty = true;
+                    foreach ($formdata->$formfieldname as $value) {
+                        $empty = $empty && empty($value);
+                    }
+                    if ($empty) {
+                        $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
+                    }
+                }
+            }
+        }
+
+        return $errors;
     }
 }

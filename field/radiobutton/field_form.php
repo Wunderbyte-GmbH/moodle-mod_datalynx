@@ -21,8 +21,7 @@
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ("$CFG->dirroot/mod/datalynx/field/select/field_form.php");
-
+require_once("$CFG->dirroot/mod/datalynx/field/select/field_form.php");
 
 class datalynxfield_radiobutton_form extends datalynxfield_select_form {
 
@@ -30,11 +29,11 @@ class datalynxfield_radiobutton_form extends datalynxfield_select_form {
      */
     function field_definition() {
         parent::field_definition();
-        
+
         $mform = &$this->_form;
-        
+
         // options separator
-        $mform->addElement('select', 'param3', get_string('fieldoptionsseparator', 'datalynx'), 
+        $mform->addElement('select', 'param3', get_string('fieldoptionsseparator', 'datalynx'),
                 array_map('current', $this->_field->separators));
     }
 }

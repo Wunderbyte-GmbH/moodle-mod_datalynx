@@ -23,8 +23,7 @@
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ("$CFG->dirroot/mod/datalynx/view/view_class.php");
-
+require_once("$CFG->dirroot/mod/datalynx/view/view_class.php");
 
 /**
  * A template for displaying datalynx entries in a tabular list
@@ -48,7 +47,7 @@ class datalynxview_tabular extends datalynxview_base {
         if (!$fields = $this->_df->get_fields()) {
             return; // you shouldn't get that far if there are no user fields
         }
-        
+
         // set views and filters menus and quick search
         $table = new html_table();
         $table->attributes['align'] = 'center';
@@ -83,9 +82,9 @@ class datalynxview_tabular extends datalynxview_base {
         // construct the table
         $table->data = array($row1, $row2, $row3);
         $sectiondefault = html_writer::table($table);
-        $this->view->esection = html_writer::tag('div', $sectiondefault, 
-                array('class' => 'mdl-align')) . "<div>##entries##</div>";
-        
+        $this->view->esection = html_writer::tag('div', $sectiondefault,
+                        array('class' => 'mdl-align')) . "<div>##entries##</div>";
+
         // set content table
         $table = new html_table();
         $table->attributes['align'] = 'center';
@@ -129,7 +128,7 @@ class datalynxview_tabular extends datalynxview_base {
         $header[] = '##selectallnone##';
         $entry[] = '##select##';
         $align[] = 'center';
-        
+
         // construct the table
         $table->head = $header;
         $table->align = $align;
@@ -140,15 +139,15 @@ class datalynxview_tabular extends datalynxview_base {
     public function display(array $options = array()) {
         parent::display($options);
         global $PAGE;
-        $PAGE->requires->js_init_call('M.datalynxview_tabular.init', array(), false, 
+        $PAGE->requires->js_init_call('M.datalynxview_tabular.init', array(), false,
                 $this->get_js_module());
     }
 
     private function get_js_module() {
-        $jsmodule = array('name' => 'datalynxview_tabular', 
-            'fullpath' => '/mod/datalynx/view/tabular/tabular.js', 
-            'requires' => array('node', 'event', 'node-event-delegate'
-            ));
+        $jsmodule = array('name' => 'datalynxview_tabular',
+                'fullpath' => '/mod/datalynx/view/tabular/tabular.js',
+                'requires' => array('node', 'event', 'node-event-delegate'
+                ));
         return $jsmodule;
     }
 
@@ -156,7 +155,7 @@ class datalynxview_tabular extends datalynxview_base {
      */
     protected function apply_entry_group_layout($entriesset, $name = '') {
         global $CFG, $OUTPUT, $GLOBALS;
-        
+
         $tablehtml = trim($this->view->eparam2);
         $opengroupdiv = html_writer::start_tag('div', array('class' => 'entriesview'));
         $closegroupdiv = html_writer::end_tag('div');
@@ -164,14 +163,14 @@ class datalynxview_tabular extends datalynxview_base {
             $name = ($name == 'newentry' ? get_string('entrynew', 'datalynx') : $name);
         }
         $groupheading = $OUTPUT->heading($name, 3, 'main');
-        
+
         $elements = array();
-        
+
         // if there are no field definition just return everything as html
         if (empty($entriesset)) {
             $elements[] = array('html', $opengroupdiv . $groupheading . $tablehtml . $closegroupdiv);
         } else {
-            
+
             // clean any prefix and get the open table tag
             // $tablehtml = preg_replace('/^[\s\S]*<table/i', '<table', $tablehtml);
             $tablepattern = '/^<table[^>]*>/i';
@@ -181,7 +180,7 @@ class datalynxview_tabular extends datalynxview_base {
             // clean any suffix and get the close table tag
             $tablehtml = trim(preg_replace('/<\/table>$/i', '', $tablehtml));
             $closetable = '</table>';
-            
+
             // get the header row if required
             $headerrow = '';
             if ($require_headerrow = $this->view->param3) {
@@ -211,20 +210,20 @@ class datalynxview_tabular extends datalynxview_base {
             $entrytemplate = $tablehtml;
             // construct elements
             // first everything before the entrytemplate as html
-            $elements[] = array('html', 
-                $opengroupdiv . $groupheading . $opentable . $headerrow . '<tbody>'
+            $elements[] = array('html',
+                    $opengroupdiv . $groupheading . $opentable . $headerrow . '<tbody>'
             );
-            
+
             // do the entries
             // get tags from the first item in the entry set
             $tagsitem = reset($entriesset);
             $tagsitem = reset($tagsitem);
             $tags = array_keys($tagsitem);
-            
+
             foreach ($entriesset as $fielddefinitions) {
                 $definitions = reset($fielddefinitions);
                 $parts = $this->split_template_by_tags($tags, $entrytemplate);
-                
+
                 foreach ($parts as $part) {
                     if (in_array($part, $tags)) {
                         if ($def = $definitions[$part]) {
@@ -235,11 +234,11 @@ class datalynxview_tabular extends datalynxview_base {
                     }
                 }
             }
-            
+
             // finish the table
             $elements[] = array('html', '</tbody>' . $closetable . $closegroupdiv);
         }
-        
+
         return $elements;
     }
 
@@ -257,7 +256,7 @@ class datalynxview_tabular extends datalynxview_base {
      */
     protected function new_entry_definition($entryid = -1) {
         $elements = array();
-        
+
         // get patterns definitions
         $fields = $this->_df->get_fields();
         $fielddefinitions = array();
@@ -270,7 +269,7 @@ class datalynxview_tabular extends datalynxview_base {
                 $fielddefinitions = array_merge($fielddefinitions, $definitions);
             }
         }
-        
+
         $elements[] = $fielddefinitions;
         return $elements;
     }

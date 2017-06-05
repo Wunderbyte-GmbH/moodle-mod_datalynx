@@ -21,8 +21,7 @@
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ("$CFG->dirroot/mod/datalynx/field/field_class.php");
-
+require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
 class datalynxfield_userinfo extends datalynxfield_base {
 
@@ -52,10 +51,10 @@ class datalynxfield_userinfo extends datalynxfield_base {
      */
     public function set_field($forminput = null) {
         global $DB;
-        
+
         $infoid = !empty($this->field->param1) ? $this->field->param1 : null;
         parent::set_field($forminput);
-        
+
         if ($this->field->param1 and ($this->field->param1 != $infoid or !$this->field->param2)) {
             $infoitems = 'shortname,datatype,defaultdata,defaultdataformat,param1,param2,param3,param4,param5';
             if ($info = $DB->get_record('user_info_field', array('id' => $this->field->param1), $infoitems)) {
@@ -63,7 +62,7 @@ class datalynxfield_userinfo extends datalynxfield_base {
                 $this->field->param3 = $info->datatype;
                 $this->field->param4 = $info->defaultdata;
                 $this->field->param5 = $info->defaultdataformat;
-                
+
                 $this->field->param6 = $info->param1;
                 $this->field->param7 = $info->param2;
                 $this->field->param8 = $info->param3;
@@ -86,7 +85,7 @@ class datalynxfield_userinfo extends datalynxfield_base {
      */
     protected function get_sql_compare_text($column = 'content') {
         global $DB;
-        
+
         return $DB->sql_compare_text("c{$this->field->id}.$column");
     }
 

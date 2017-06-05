@@ -21,8 +21,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die();
-require_once (dirname(__FILE__) . '/../mod_class.php');
-
+require_once(dirname(__FILE__) . '/../mod_class.php');
 
 class datalynx_field_renderer {
 
@@ -88,9 +87,9 @@ class datalynx_field_renderer {
      */
     private $record;
 
-
     /**
      * Constructor: Create the datalynx_field_renderer object given the db record
+     *
      * @param fieldset record $record
      */
     private function __construct($record) {
@@ -98,25 +97,26 @@ class datalynx_field_renderer {
         $this->name = $record->name;
         $this->description = $record->description;
         $this->dataid = $record->dataid;
-        
+
         if (isset($record->datalynx)) {
             $this->datalynx = $record->datalynx;
         } else {
             $this->datalynx = new datalynx($record->dataid);
         }
-        
+
         $this->notvisibletemplate = $record->notvisibletemplate;
         $this->displaytemplate = $record->displaytemplate;
         $this->novaluetemplate = $record->novaluetemplate;
         $this->edittemplate = $record->edittemplate;
         $this->noteditabletemplate = $record->noteditabletemplate;
-        
+
         $this->record = $record;
     }
 
     /**
-     * Static constructor method for datalynx_field_renderer: 
+     * Static constructor method for datalynx_field_renderer:
      * Return the renderer object using the name of the renderer and the dataid (datalynx id)
+     *
      * @param string $name
      * @param int $dataid
      * @return datalynx_field_renderer
@@ -124,13 +124,14 @@ class datalynx_field_renderer {
     public static function get_renderer_by_name($name, $dataid) {
         global $DB;
         $record = $DB->get_record('datalynx_renderers', array('name' => $name, 'dataid' => $dataid),
-            '*', MUST_EXIST);
+                '*', MUST_EXIST);
         return new datalynx_field_renderer($record);
     }
 
     /**
-     * Static constructor method for datalynx_field_renderer: 
+     * Static constructor method for datalynx_field_renderer:
      * Return the renderer object from db providing the renderer id
+     *
      * @param int $id
      * @return datalynx_field_renderer
      */
@@ -140,16 +141,17 @@ class datalynx_field_renderer {
         return new datalynx_field_renderer($record);
     }
 
-    private static $default = array('id' => 0, 'name' => '', 'description' => '', 
-        'notvisibletemplate' => self::NOT_VISIBLE_SHOW_NOTHING, 
-        'displaytemplate' => self::DISPLAY_MODE_TEMPLATE_NONE, 
-        'novaluetemplate' => self::NO_VALUE_SHOW_NOTHING, 
-        'edittemplate' => self::EDIT_MODE_TEMPLATE_NONE, 
-        'noteditabletemplate' => self::NOT_EDITABLE_SHOW_NOTHING
+    private static $default = array('id' => 0, 'name' => '', 'description' => '',
+            'notvisibletemplate' => self::NOT_VISIBLE_SHOW_NOTHING,
+            'displaytemplate' => self::DISPLAY_MODE_TEMPLATE_NONE,
+            'novaluetemplate' => self::NO_VALUE_SHOW_NOTHING,
+            'edittemplate' => self::EDIT_MODE_TEMPLATE_NONE,
+            'noteditabletemplate' => self::NOT_EDITABLE_SHOW_NOTHING
     );
 
     /**
      * Static constructor method for default datalynx_field_renderer
+     *
      * @param datalynx $datalynx
      * @return datalynx_field_renderer
      */
@@ -199,8 +201,9 @@ class datalynx_field_renderer {
 
     /**
      * Save renderer to db
+     *
      * @param datalynx_field_renderer $record
-     * @return bool|int true or new id  
+     * @return bool|int true or new id
      */
     public static function insert_renderer($formdata) {
         global $DB;
@@ -210,6 +213,7 @@ class datalynx_field_renderer {
 
     /**
      * Get DB record of a field renderer
+     *
      * @param integer $rendererid
      * @return Ambigous <mixed, stdClass, false>
      */
@@ -220,6 +224,7 @@ class datalynx_field_renderer {
 
     /**
      * Create a copy of a renderer
+     *
      * @param integer $rendererid
      */
     public static function duplicate_renderer($rendererid) {
@@ -236,6 +241,7 @@ class datalynx_field_renderer {
 
     /**
      * Update renderer with submitted form data
+     *
      * @param object $formdata
      */
     public static function update_renderer($formdata) {
@@ -247,6 +253,7 @@ class datalynx_field_renderer {
 
     /**
      * delete a renderer
+     *
      * @param integer $rendererid
      */
     public static function delete_renderer($rendererid) {

@@ -21,8 +21,7 @@
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ("$CFG->dirroot/mod/datalynx/field/multiselect/field_class.php");
-
+require_once("$CFG->dirroot/mod/datalynx/field/multiselect/field_class.php");
 
 class datalynxfield_checkbox extends datalynxfield_multiselect {
 

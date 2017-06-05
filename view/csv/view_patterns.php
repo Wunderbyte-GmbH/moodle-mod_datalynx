@@ -23,8 +23,7 @@
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once ("$CFG->dirroot/mod/datalynx/view/view_patterns.php");
-
+require_once("$CFG->dirroot/mod/datalynx/view/view_patterns.php");
 
 /**
  * Base class for view patterns
@@ -35,41 +34,41 @@ class datalynxview_csv_patterns extends datalynxview_patterns {
      */
     public function get_replacements($tags = null, $entry = null, array $options = array()) {
         global $CFG, $OUTPUT;
-        
+
         $replacements = parent::get_replacements($tags, $entry, $options);
-        
+
         $view = $this->_view;
         $df = $view->get_df();
         $filter = $view->get_filter();
         $baseurl = new moodle_url($view->get_baseurl());
         $baseurl->param('sesskey', sesskey());
-        
+
         foreach ($tags as $tag) {
             switch ($tag) {
                 case '##export:all##':
                     $actionurl = new moodle_url($baseurl, array('exportcsv' => $view::EXPORT_ALL));
                     $label = html_writer::tag('span', get_string('exportall', 'datalynx'));
-                    $replacements[$tag] = html_writer::link($actionurl, $label, 
+                    $replacements[$tag] = html_writer::link($actionurl, $label,
                             array('class' => 'actionlink exportall'));
-                    
+
                     break;
                 case '##export:page##':
                     $actionurl = new moodle_url($baseurl, array('exportcsv' => $view::EXPORT_PAGE));
                     $label = html_writer::tag('span', get_string('exportpage', 'datalynx'));
-                    $replacements[$tag] = html_writer::link($actionurl, $label, 
+                    $replacements[$tag] = html_writer::link($actionurl, $label,
                             array('class' => 'actionlink exportpage'));
-                    
+
                     break;
                 case '##import##':
                     $actionurl = new moodle_url($baseurl, array('importcsv' => 1));
                     $label = html_writer::tag('span', get_string('import', 'datalynx'));
-                    $replacements[$tag] = html_writer::link($actionurl, $label, 
+                    $replacements[$tag] = html_writer::link($actionurl, $label,
                             array('class' => 'actionlink exportall'));
-                    
+
                     break;
             }
         }
-        
+
         return $replacements;
     }
 
@@ -81,7 +80,7 @@ class datalynxview_csv_patterns extends datalynxview_patterns {
         $patterns['##export:all##'] = array(true, $cat);
         $patterns['##export:page##'] = array(true, $cat);
         $patterns['##import##'] = array(true, $cat);
-        
+
         return $patterns;
     }
 }

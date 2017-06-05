@@ -21,19 +21,18 @@
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ("$CFG->dirroot/mod/datalynx/field/field_class.php");
-
+require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
 /**
  */
 class datalynxfield_file extends datalynxfield_base {
 
     public $type = 'file';
-    
+
     // content - file manager
     // content1 - alt name
     // content2 - download counter
-    
+
     /**
      */
     protected function content_names() {
@@ -44,10 +43,10 @@ class datalynxfield_file extends datalynxfield_base {
      */
     public function update_content($entry, array $values = null) {
         global $DB, $USER;
-        
+
         $entryid = $entry->id;
         $fieldid = $this->field->id;
-        
+
         $filemanager = $alttext = $delete = $editor = null;
         if (!empty($values)) {
             foreach ($values as $name => $value) {
@@ -56,22 +55,22 @@ class datalynxfield_file extends datalynxfield_base {
                 }
             }
         }
-        
+
         // update file content
         if ($editor) {
             return $this->save_changes_to_file($entry, $values);
         }
-        
+
         // delete files
         // if ($delete) {
         // return $this->delete_content($entryid);
         // }
-        
+
         // store uploaded files
         $contentid = isset($entry->{"c{$this->field->id}_id"}) ? $entry->{"c{$this->field->id}_id"} : null;
         $draftarea = $filemanager;
         $usercontext = context_user::instance($USER->id);
-        
+
         $fs = get_file_storage();
         $files = $fs->get_area_files($usercontext->id, 'user', 'draft', $draftarea);
         if (count($files) > 1) {
@@ -81,27 +80,29 @@ class datalynxfield_file extends datalynxfield_base {
             $rec->entryid = $entryid;
             $rec->content = 1;
             $rec->content1 = $alttext;
-            
+
             if (!empty($contentid)) {
                 $rec->id = $contentid;
                 $DB->update_record('datalynx_contents', $rec);
             } else {
                 $contentid = $DB->insert_record('datalynx_contents', $rec);
             }
-            
+
             // now save files
-            $options = array('subdirs' => 0, 'maxbytes' => $this->field->param1, 
-                'maxfiles' => $this->field->param2, 'accepted_types' => $this->field->param3
+            $options = array('subdirs' => 0, 'maxbytes' => $this->field->param1,
+                    'maxfiles' => $this->field->param2, 'accepted_types' => $this->field->param3
             );
             $contextid = $this->df->context->id;
-            file_save_draft_area_files($filemanager, $contextid, 'mod_datalynx', 'content', 
+            file_save_draft_area_files($filemanager, $contextid, 'mod_datalynx', 'content',
                     $contentid, $options);
-            
+
             $this->update_content_files($contentid);
-            
+
             // user cleared files from the field
-        } else if (!empty($contentid)) {
-            $this->delete_content($entryid);
+        } else {
+            if (!empty($contentid)) {
+                $this->delete_content($entryid);
+            }
         }
         return true;
     }
@@ -122,29 +123,31 @@ class datalynxfield_file extends datalynxfield_base {
      */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
         global $USER;
-        
+
         $fieldid = $this->field->id;
         $fieldname = $this->field->name;
-        
+
         $draftid = $importsettings[$fieldname]['filepicker'];
         $usercontext = context_user::instance($USER->id);
         $fs = get_file_storage();
-        if ($files = $fs->get_area_files($usercontext->id, 'user', 'draft', $draftid, 'sortorder', 
-                false)) {
+        if ($files = $fs->get_area_files($usercontext->id, 'user', 'draft', $draftid, 'sortorder',
+                false)
+        ) {
             $zipfile = reset($files);
             // extract files to the draft area
             $zipper = get_file_packer('application/zip');
             $zipfile->extract_to_storage($zipper, $usercontext->id, 'user', 'draft', $draftid, '/');
             $zipfile->delete();
-            
+
             // move each file to its own area and add info to data
-            if ($files = $fs->get_area_files($usercontext->id, 'user', 'draft', $draftid, 
-                    'sortorder', false)) {
+            if ($files = $fs->get_area_files($usercontext->id, 'user', 'draft', $draftid,
+                    'sortorder', false)
+            ) {
                 $rec = new stdClass();
                 $rec->contextid = $usercontext->id;
                 $rec->component = 'user';
                 $rec->filearea = 'draft';
-                
+
                 $i = 0;
                 foreach ($files as $file) {
                     // if ($file->is_valid_image()) {
@@ -179,29 +182,29 @@ class datalynxfield_file extends datalynxfield_base {
         $fieldid = $this->field->id;
         $entryid = $entry->id;
         $fieldname = "field_{$fieldid}_{$entry->id}";
-        
+
         $contentid = isset($entry->{"c{$this->field->id}_id"}) ? $entry->{"c{$this->field->id}_id"} : null;
-        
+
         $options = array('context' => $this->df->context);
         $data = (object) $values;
-        $data = file_postupdate_standard_editor((object) $values, $fieldname, $options, 
+        $data = file_postupdate_standard_editor((object) $values, $fieldname, $options,
                 $this->df->context, 'mod_datalynx', 'content', $contentid);
-        
+
         // get the file content
         $fs = get_file_storage();
         $file = reset(
-                $fs->get_area_files($this->df->context->id, 'mod_datalynx', 'content', $contentid, 
+                $fs->get_area_files($this->df->context->id, 'mod_datalynx', 'content', $contentid,
                         'sortorder', false));
         $filecontent = $file->get_content();
-        
+
         // find content position (between body tags)
         $tmpbodypos = stripos($filecontent, '<body');
         $openbodypos = strpos($filecontent, '>', $tmpbodypos) + 1;
         $sublength = strripos($filecontent, '</body>') - $openbodypos;
-        
+
         // replace body content with new content
         $filecontent = substr_replace($filecontent, $data->$fieldname, $openbodypos, $sublength);
-        
+
         // prepare new file record
         $rec = new stdClass();
         $rec->contextid = $this->df->context->id;
@@ -215,10 +218,10 @@ class datalynxfield_file extends datalynxfield_base {
         $rec->source = $file->get_source();
         $rec->author = $file->get_author();
         $rec->license = $file->get_license();
-        
+
         // delete old file
         $fs->delete_area_files($this->df->context->id, 'mod_datalynx', 'content', $contentid);
-        
+
         // create a new file from string
         $fs->create_file_from_string($rec, $filecontent);
         return true;

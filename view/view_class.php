@@ -28,25 +28,25 @@
 abstract class datalynxview_base {
 
     const ADD_NEW_ENTRY = -1;
-    
+
     /**
-     * 
+     *
      * @var string view type Subclasses must override the type with their name
      */
     protected $type = 'unknown';
-    
+
     /**
-     * 
+     *
      * @var stdClass get_record object of datalynx_views
      */
-    public $view = NULL;
-    
+    public $view = null;
+
     /**
-     *  
+     *
      * @var datalynx object that this view belongs to
      */
-    protected $_df = NULL;
-    
+    protected $_df = null;
+
     /**
      *
      * @var datalynx_filter
@@ -86,23 +86,27 @@ abstract class datalynxview_base {
      */
     public function __construct($df = 0, $view = 0, $filteroptions = true) {
         global $DB, $CFG;
-        
+
         if (empty($df)) {
             throw new coding_exception('Datalynx id or object must be passed to field constructor.');
             // datalynx object
-        } else if ($df instanceof datalynx) {
-            $this->_df = $df;
-            // datalynx id
         } else {
-            $this->_df = new datalynx($df);
+            if ($df instanceof datalynx) {
+                $this->_df = $df;
+                // datalynx id
+            } else {
+                $this->_df = new datalynx($df);
+            }
         }
-        
+
         // set existing view
         if (!empty($view)) {
             if (is_object($view)) {
                 $this->view = $view; // Programmer knows what they are doing, we hope
-            } else if (!$this->view = $DB->get_record('datalynx_views', array('id' => $view))) {
-                throw new moodle_exception('invalidview', 'datalynx', null, null, $view);
+            } else {
+                if (!$this->view = $DB->get_record('datalynx_views', array('id' => $view))) {
+                    throw new moodle_exception('invalidview', 'datalynx', null, null, $view);
+                }
             }
             // set defaults for new view
         } else {
@@ -119,15 +123,15 @@ abstract class datalynxview_base {
             $this->view->groupby = '';
             $this->view->param10 = 0;
         }
-        
+
         $this->_redirect = $this->view->param10;
-        
+
         // set editors and patterns
         $this->set__editors();
         $this->set__patterns();
-        
+
         $this->set_filter($filteroptions);
-        
+
         // base url params
         $baseurlparams = array();
         $baseurlparams['d'] = $this->_df->id();
@@ -142,22 +146,22 @@ abstract class datalynxview_base {
         if ($this->_df->currentgroup) {
             $baseurlparams['currentgroup'] = $this->_df->currentgroup;
         }
-		$usersearch = optional_param('usersearch', '', PARAM_TEXT);
-		if(!empty($usersearch)) {
-			$baseurlparams['usersearch'] = $usersearch;
-		}
-        
+        $usersearch = optional_param('usersearch', '', PARAM_TEXT);
+        if (!empty($usersearch)) {
+            $baseurlparams['usersearch'] = $usersearch;
+        }
+
         $this->_baseurl = new moodle_url("/mod/datalynx/{$this->_df->pagefile()}.php", $baseurlparams);
-        
+
         $this->set_groupby_per_page();
-        
-        require_once ("$CFG->dirroot/mod/datalynx/entries_class.php");
+
+        require_once("$CFG->dirroot/mod/datalynx/entries_class.php");
         $this->_entries = new datalynx_entries($this->_df, $this->_filter);
     }
 
-
     /**
      * Updates the view with data submitted from from after editing the view settings
+     *
      * @param stdClass $data form data
      */
     protected function set_view($data) {
@@ -168,13 +172,13 @@ abstract class datalynxview_base {
         $this->view->perpage = !empty($data->perpage) ? $data->perpage : 0;
         $this->view->groupby = !empty($data->groupby) ? $data->groupby : '';
         $this->view->filter = !empty($data->filter) ? $data->filter : 0;
-        
+
         for ($i = 1; $i <= 10; $i++) {
             if (isset($data->{"param$i"})) {
                 $this->view->{"param$i"} = $data->{"param$i"};
             }
         }
-        
+
         $this->set__editors($data);
         $this->set__patterns($data);
     }
@@ -202,8 +206,10 @@ abstract class datalynxview_base {
                 $this->view->$editor = null;
                 if (isset($data->{"e{$editor}"})) {
                     $text = isset($data->{"e{$editor}"}) ? $data->{"e{$editor}"} : '';
-                } else if ($currenteditor = $data->{"e{$editor}_editor"}) {
-                    $text = !empty($currenteditor['text']) ? $currenteditor['text'] : '';
+                } else {
+                    if ($currenteditor = $data->{"e{$editor}_editor"}) {
+                        $text = !empty($currenteditor['text']) ? $currenteditor['text'] : '';
+                    }
                 }
                 $this->view->$editor = $text;
             }
@@ -212,7 +218,7 @@ abstract class datalynxview_base {
 
     /**
      * Checks if patterns are cached. If yes patterns are retrieved from cache set in $this->_tags
-     * If no cached patterns are found, they are retrieved from the HTML provided in the 
+     * If no cached patterns are found, they are retrieved from the HTML provided in the
      * view settings section field (definition)
      */
     protected function set__patterns() {
@@ -235,7 +241,7 @@ abstract class datalynxview_base {
                 }
             }
             $serializedpatterns = serialize($patternarray);
-            $DB->set_field('datalynx_views', 'patterns', $serializedpatterns, array( 'id' => $this->view->id));
+            $DB->set_field('datalynx_views', 'patterns', $serializedpatterns, array('id' => $this->view->id));
         }
         $this->_tags = $patternarray;
     }
@@ -243,42 +249,42 @@ abstract class datalynxview_base {
     /**
      * Sets up filter options based on parameters from URL, filter assigned to this particular view,
      * and default settings.
-     * 
+     *
      * @param bool $filteroptions
      * @param bool $ignoreurl true, if URL filter options should be ignored
      */
     public function set_filter($filteroptions = true, $ignoreurl = false) {
         $fm = $this->_df->get_filter_manager($this);
-        
+
         if (!$ignoreurl) {
             $urloptions = $filteroptions ? $fm::get_filter_options_from_url() : array();
         } else {
             $urloptions = array();
         }
-        
+
         if (is_array($filteroptions)) {
             $urloptions = array_merge($urloptions, $filteroptions);
         }
-        
+
         $fid = !empty($urloptions['filterid']) ? $urloptions['filterid'] : 0;
         $afilter = !empty($urloptions['afilter']) ? $urloptions['afilter'] : 0;
         $eids = !empty($urloptions['eids']) ? $urloptions['eids'] : null;
         $users = !empty($urloptions['users']) ? $urloptions['users'] : null;
         $groups = !empty($urloptions['groups']) ? $urloptions['groups'] : null;
         $page = !empty($urloptions['page']) ? $urloptions['page'] : 0;
-        
+
         $perpage = !empty($urloptions['perpage']) ? $urloptions['perpage'] : 0;
         $groupby = !empty($urloptions['groupby']) ? $urloptions['groupby'] : 0;
-        
+
         $csort = !empty($urloptions['customsort']) ? $urloptions['customsort'] : null;
         $csearch = !empty($urloptions['customsearch']) ? $urloptions['customsearch'] : null;
-        
+
         $usersearch = !empty($urloptions['usersearch']) ? $urloptions['usersearch'] : '';
-        
+
         $filterid = $fid ? $fid : ($this->view->filter ? $this->view->filter : 0);
-        
+
         $this->_filter = $fm->get_filter_from_id($filterid, array('view' => $this, 'advanced' => $afilter));
-        
+
         // set specific entry id
         $this->_filter->eids = $eids;
         // set specific user id
@@ -289,18 +295,18 @@ abstract class datalynxview_base {
         if ($groups) {
             $this->_filter->groups = is_array($groups) ? $groups : explode(',', $groups);
         }
-        
+
         $this->_filter->perpage = $perpage ? $perpage : ($this->_filter->perpage ? $this->_filter->perpage : 50);
-        
+
         $this->_filter->groupby = $groupby ? $groupby : $this->_filter->groupby;
-        
+
         $this->_filter->search = $usersearch ? $usersearch : $this->_filter->search;
-        
+
         // add page
         $this->_filter->page = $page ? $page : 0;
         // content fields
         $this->_filter->contentfields = array_keys($this->get__patterns('field'));
-        
+
         // Append custom sort options
         if ($csort) {
             $this->_filter->append_sort_options($csort);
@@ -310,25 +316,25 @@ abstract class datalynxview_base {
             $this->_filter->append_search_options($csearch);
         }
     }
-    
+
     // //////////////////////////////////
     // VIEW TYPE
     // //////////////////////////////////
-    
+
     /**
      * Insert a new view into the database
      * $this->view is assumed set
      */
     public function add($data) {
         global $DB, $OUTPUT;
-        
+
         $this->set_view($data);
-        
+
         if (!$this->view->id = $DB->insert_record('datalynx_views', $this->view)) {
             echo $OUTPUT->notification('Insertion of new view failed!');
             return false;
         }
-        
+
         return $this->view->id;
     }
 
@@ -344,27 +350,27 @@ abstract class datalynxview_base {
             $data = $this->from_form($data);
             $this->set_view($data);
         }
-        
+
         if (!$DB->update_record('datalynx_views', $this->view)) {
             echo $OUTPUT->notification('updating view failed!');
             return false;
         }
-        
+
         return true;
     }
 
-
     /**
      * Delete a view from the database
+     *
      * @return true
      */
     public function delete() {
         global $DB;
-        
+
         if (!empty($this->view->id)) {
             $fs = get_file_storage();
             foreach ($this->_editors as $key => $editorname) {
-                $fs->delete_area_files($this->_df->context->id, 'mod_datalynx', "view$editorname", 
+                $fs->delete_area_files($this->_df->context->id, 'mod_datalynx', "view$editorname",
                         $this->id() . $key);
             }
             return $DB->delete_records('datalynx_views', array('id' => $this->view->id));
@@ -374,16 +380,17 @@ abstract class datalynxview_base {
 
     /**
      * Get the form object of the specific view type (grid, etc)
+     *
      * @return formobject for view type
      */
     public function get_form() {
         global $CFG;
-        
+
         $formclass = 'datalynxview_' . $this->type . '_form';
         $formparams = array('d' => $this->_df->id(), 'vedit' => $this->id(), 'type' => $this->type);
         $actionurl = new moodle_url('/mod/datalynx/view/view_edit.php', $formparams);
-        
-        require_once ($CFG->dirroot . '/mod/datalynx/view/' . $this->type . '/view_form.php');
+
+        require_once($CFG->dirroot . '/mod/datalynx/view/' . $this->type . '/view_form.php');
         return new $formclass($this, $actionurl);
     }
 
@@ -409,7 +416,7 @@ abstract class datalynxview_base {
      */
     public function prepare_view_editors($data) {
         $editors = $this->editors();
-        
+
         foreach ($data as $key => $value) {
             if (is_string($value)) {
                 $data->{$key} = str_replace('##moreurl##', '$$moreurl$$', $value);
@@ -418,17 +425,19 @@ abstract class datalynxview_base {
         foreach ($editors as $editorname => $options) {
             $data->{"e{$editorname}format"} = FORMAT_HTML;
             $data->{"e{$editorname}trust"} = 1;
-            $data = file_prepare_standard_editor($data, "e$editorname", $options, 
+            $data = file_prepare_standard_editor($data, "e$editorname", $options,
                     $this->_df->context, 'mod_datalynx', "view$editorname", $this->view->id);
         }
-        
+
         foreach ($data as $key => $value) {
             if (is_string($value)) {
                 $data->{$key} = str_replace('$$moreurl$$', '##moreurl##', $value);
-            } else if (is_array($value)) {
-                foreach ($value as $subkey => $subvalue) {
-                    if (is_string($subvalue)) {
-                        $data->{$key}[$subkey] = str_replace('$$moreurl$$', '##moreurl##', $subvalue);
+            } else {
+                if (is_array($value)) {
+                    foreach ($value as $subkey => $subvalue) {
+                        if (is_string($subvalue)) {
+                            $data->{$key}[$subkey] = str_replace('$$moreurl$$', '##moreurl##', $subvalue);
+                        }
                     }
                 }
             }
@@ -446,14 +455,15 @@ abstract class datalynxview_base {
         if ($editors && $this->view->id) {
             foreach ($editors as $editorname => $options) {
                 if (!(isset($data->{"e{$editorname}_editor"}) &&
-                         is_array($data->{"e{$editorname}_editor"}))) {
+                        is_array($data->{"e{$editorname}_editor"}))
+                ) {
                     $text = isset($data->{"e{$editorname}"}) ? $data->{"e{$editorname}"} : '';
-                    $data->{"e{$editorname}_editor"} = array('format' => $format, 'trust' => $trust, 
-                        'text' => $text
+                    $data->{"e{$editorname}_editor"} = array('format' => $format, 'trust' => $trust,
+                            'text' => $text
                     );
                 }
-                
-                $data = file_postupdate_standard_editor($data, "e$editorname", $options, 
+
+                $data = file_postupdate_standard_editor($data, "e$editorname", $options,
                         $this->_df->context, 'mod_datalynx', "view$editorname", $this->view->id);
             }
         }
@@ -470,9 +480,9 @@ abstract class datalynxview_base {
         } else {
             $replacements = array('[[' . $newfieldname . ']]', '[[' . $newfieldname . '#id]]');
         }
-        
+
         foreach ($this->_editors as $editor) {
-            $this->view->{"e$editor"} = str_ireplace($patterns, $replacements, 
+            $this->view->{"e$editor"} = str_ireplace($patterns, $replacements,
                     $this->view->{"e$editor"});
         }
         $this->update($this->view);
@@ -487,11 +497,11 @@ abstract class datalynxview_base {
 
     /**
      * process any view specific actions
-     * 
+     *
      * @return Ambigous <boolean, number, unknown, multitype:>
      */
     public function process_data() {
-        
+
         // Process entries data
         $processed = $this->process_entries_data();
         if (is_array($processed)) {
@@ -499,13 +509,15 @@ abstract class datalynxview_base {
         } else {
             list($strnotify, $processedeids) = array('', '');
         }
-        
+
         if ($processedeids) {
             $this->_notifications['good']['entries'] = $strnotify;
-        } else if ($strnotify) {
-            $this->_notifications['bad']['entries'] = $strnotify;
+        } else {
+            if ($strnotify) {
+                $this->_notifications['bad']['entries'] = $strnotify;
+            }
         }
-        
+
         // With one entry per page show the saved entry
         if ($processedeids and $this->_editentries and !$this->_returntoentriesform) {
             if ($this->_filter->perpage == 1) {
@@ -513,7 +525,7 @@ abstract class datalynxview_base {
             }
             $this->_editentries = '';
         }
-        
+
         return $processed;
     }
 
@@ -521,7 +533,7 @@ abstract class datalynxview_base {
      * Retrieve the content for the fields which is saved in the table datalynx_contents
      */
     public function set_content(array $options = array()) { //options: added for datalynxview_field calling external view
-                                                            // possible options values: filter, users, groups, eids
+        // possible options values: filter, users, groups, eids
         if ($this->_returntoentriesform) {
             return;
         }
@@ -538,7 +550,7 @@ abstract class datalynxview_base {
      */
     public function display(array $options = array()) {
         global $OUTPUT;
-        
+
         // set display options
         $new = optional_param('new', 0, PARAM_INT);
         $displaycontrols = isset($options['controls']) ? $options['controls'] : true;
@@ -546,21 +558,21 @@ abstract class datalynxview_base {
         $notify = isset($options['notify']) ? $options['notify'] : true;
         $tohtml = isset($options['tohtml']) ? $options['tohtml'] : false;
         $pluginfileurl = isset($options['pluginfileurl']) ? $options['pluginfileurl'] : null;
-        
+
         // build entries display definition
         $requiresmanageentries = $this->set__display_definition($options);
-        
+
         // set view specific tags
-        $viewoptions = array('pluginfileurl' => $pluginfileurl, 
-            'entriescount' => $this->_entries->get_count(), 
-            'entriesfiltercount' => $this->_entries->get_count(true), 
-            'hidenewentry' => $this->user_is_editing() ? 1 : 0, 
-            'showentryactions' => $requiresmanageentries && $showentryactions);
-        
+        $viewoptions = array('pluginfileurl' => $pluginfileurl,
+                'entriescount' => $this->_entries->get_count(),
+                'entriesfiltercount' => $this->_entries->get_count(true),
+                'hidenewentry' => $this->user_is_editing() ? 1 : 0,
+                'showentryactions' => $requiresmanageentries && $showentryactions);
+
         $this->set_view_tags($viewoptions);
-        
+
         $notifications = $notify ? $this->print_notifications() : '';
-        
+
         if ($this->_returntoentriesform !== false) {
             if ($displaycontrols) {
                 $output = $notifications . $this->process_calculations($this->view->esection);
@@ -578,22 +590,22 @@ abstract class datalynxview_base {
             $url = new moodle_url($this->_baseurl, array('view' => $redirectid));
             $output = $notifications . $OUTPUT->continue_button($url);
         }
-        
+
         $viewname = 'datalynxview-' . preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $this->name()));
         $output = html_writer::tag('div', $output, array('class' => $viewname));
-        
+
         if ($tohtml) {
             return $output;
         } else {
             echo $output;
         }
-        
+
         return '';
     }
 
     /**
      * Get notifications
-     * 
+     *
      * @return string notifications
      */
     protected function print_notifications() {
@@ -610,37 +622,41 @@ abstract class datalynxview_base {
 
     /**
      * Get message why no entries are shown in this view
-     * 
+     *
      * @return Ambigous <mixed, string>
      */
     protected function display_no_entries() {
         global $OUTPUT, $DB;
-        
+
         if ($this->view->filter > 0) { // this view has a forced filter set
             $output = $OUTPUT->notification(get_string('noentries', 'datalynx'));
-        } else if ($this->_filter->id) { // this view has a user filter set
-            $output = $OUTPUT->notification(get_string('nomatchingentries', 'datalynx'));
-            $url = new moodle_url($this->_baseurl, array('filter' => 0));
-            $output .= str_replace(get_string('continue'), get_string('resetsettings', 'datalynx'), 
-                    $OUTPUT->continue_button($url));
-        } else if ($this->_filter->eids) { // this view displays only entries with chosen ids
-            list($insql, $params) = $DB->get_in_or_equal($this->_filter->eids, SQL_PARAMS_NAMED);
-            if (!$DB->record_exists_select('datalynx_entries', "id $insql", $params)) {
-                $output = $OUTPUT->notification(get_string('nosuchentries', 'datalynx')) .
-                         $OUTPUT->continue_button($this->_df->get_baseurl());
+        } else {
+            if ($this->_filter->id) { // this view has a user filter set
+                $output = $OUTPUT->notification(get_string('nomatchingentries', 'datalynx'));
+                $url = new moodle_url($this->_baseurl, array('filter' => 0));
+                $output .= str_replace(get_string('continue'), get_string('resetsettings', 'datalynx'),
+                        $OUTPUT->continue_button($url));
             } else {
-                $output = $OUTPUT->notification(get_string('nopermission', 'datalynx')) .
-                         $OUTPUT->continue_button($this->_df->get_baseurl());
+                if ($this->_filter->eids) { // this view displays only entries with chosen ids
+                    list($insql, $params) = $DB->get_in_or_equal($this->_filter->eids, SQL_PARAMS_NAMED);
+                    if (!$DB->record_exists_select('datalynx_entries', "id $insql", $params)) {
+                        $output = $OUTPUT->notification(get_string('nosuchentries', 'datalynx')) .
+                                $OUTPUT->continue_button($this->_df->get_baseurl());
+                    } else {
+                        $output = $OUTPUT->notification(get_string('nopermission', 'datalynx')) .
+                                $OUTPUT->continue_button($this->_df->get_baseurl());
+                    }
+                } else { // there are no entries in this datalynx
+                    $output = $OUTPUT->notification(get_string('noentries', 'datalynx'));
+                }
             }
-        } else { // there are no entries in this datalynx
-            $output = $OUTPUT->notification(get_string('noentries', 'datalynx'));
         }
         return $output;
     }
 
     /**
      * Replace the tags in the view template section of a view with the appropriate values
-     * 
+     *
      * @param array $options
      */
     public function set_view_tags($options) {
@@ -648,18 +664,18 @@ abstract class datalynxview_base {
         $pluginfileurl = !empty($options['pluginfileurl']) ? $options['pluginfileurl'] : null;
         foreach ($this->_editors as $editorname) {
             $editor = "e$editorname";
-            
+
             // export with files should provide the file path
             if ($pluginfileurl) {
-                $this->view->$editor = str_replace('@@PLUGINFILE@@/', $pluginfileurl, 
+                $this->view->$editor = str_replace('@@PLUGINFILE@@/', $pluginfileurl,
                         $this->view->$editor);
             } else {
-                $this->view->$editor = file_rewrite_pluginfile_urls($this->view->$editor, 
-                        'pluginfile.php', $this->_df->context->id, 'mod_datalynx', "view$editorname", 
+                $this->view->$editor = file_rewrite_pluginfile_urls($this->view->$editor,
+                        'pluginfile.php', $this->_df->context->id, 'mod_datalynx', "view$editorname",
                         $this->id());
             }
         }
-        
+
         $tags = $this->_tags['view'];
         $replacements = $this->patternclass()->get_replacements($tags, null, $options);
         foreach ($this->_vieweditors as $editor) {
@@ -673,7 +689,7 @@ abstract class datalynxview_base {
 
     /**
      * Masks view and field tags so that they do not get auto-linked
-     * 
+     *
      * @param string $text a string with tags to mask
      * @return $text HTML with masked tags
      */
@@ -681,11 +697,11 @@ abstract class datalynxview_base {
         $matches = array();
         $find = array();
         $replace = array();
-        preg_match_all('/(?:(\[\[[^\]]+\]\])|(##[^#]+##)|(%%[^%]+%%)|(#\{\{[^\}#]+\}\}#))/', $text, 
+        preg_match_all('/(?:(\[\[[^\]]+\]\])|(##[^#]+##)|(%%[^%]+%%)|(#\{\{[^\}#]+\}\}#))/', $text,
                 $matches, PREG_PATTERN_ORDER);
         $map = array_unique($matches[0]);
         foreach ($map as $index => $match) {
-            if ($match != '##entries##'){
+            if ($match != '##entries##') {
                 $find[$index] = "/" . preg_quote($match, '/') . "/";
                 $replace[$index] = '<span class="nolink" title="donotreplaceme">' . $match . '</span>';
             }
@@ -693,7 +709,7 @@ abstract class datalynxview_base {
         $text = preg_replace($find, $replace, $text);
         return $text;
     }
-    
+
     /**
      * Unmasks view and field tags
      *
@@ -706,17 +722,18 @@ abstract class datalynxview_base {
         $text = preg_replace($find, $replace, $text);
         return $text;
     }
-    
+
     // //////////////////////////////////
     // HELPERS
     // //////////////////////////////////
     /**
      * Get fields of a view as an array
+     *
      * @return array of field ids
      */
     public function get_view_fields() {
         $viewfields = array();
-        
+
         if (!empty($this->_tags['field'])) {
             $fields = $this->_df->get_fields();
             foreach (array_keys($this->_tags['field']) as $fieldid) {
@@ -730,6 +747,7 @@ abstract class datalynxview_base {
 
     /**
      * Renders fields as patterns
+     *
      * @return array of strings (field pattern used in the view)
      */
     public function field_tags() {
@@ -752,7 +770,7 @@ abstract class datalynxview_base {
         $patterns = array('---' => array('---' => array()));
         $patterns['9'] = 'tab';
         $patterns['10'] = 'new line';
-        
+
         return $patterns;
     }
 
@@ -764,34 +782,35 @@ abstract class datalynxview_base {
      */
     public function editors() {
         $editors = array();
-        
-        $options = array('trusttext' => true, 'noclean' => true, 'subdirs' => false, 
-            'changeformat' => true, 'collapsed' => true, 'rows' => 20, 'style' => 'width:100%', 
-            'maxfiles' => EDITOR_UNLIMITED_FILES, 'maxbytes' => $this->_df->course->maxbytes, 
-            'context' => $this->_df->context);
-        
+
+        $options = array('trusttext' => true, 'noclean' => true, 'subdirs' => false,
+                'changeformat' => true, 'collapsed' => true, 'rows' => 20, 'style' => 'width:100%',
+                'maxfiles' => EDITOR_UNLIMITED_FILES, 'maxbytes' => $this->_df->course->maxbytes,
+                'context' => $this->_df->context);
+
         foreach ($this->_editors as $editor) {
             $editors[$editor] = $options;
         }
-        
+
         return $editors;
     }
 
     /**
      * Get the class for view patterns (tag processing)
+     *
      * @return datalynxview_patterns
      */
     public function patternclass() {
         global $CFG;
-        
+
         if (!$this->patternclass) {
             $viewtype = $this->type;
-            
+
             if (file_exists("$CFG->dirroot/mod/datalynx/view/$viewtype/view_patterns.php")) {
-                require_once ("$CFG->dirroot/mod/datalynx/view/$viewtype/view_patterns.php");
+                require_once("$CFG->dirroot/mod/datalynx/view/$viewtype/view_patterns.php");
                 $patternsclass = "datalynxview_{$viewtype}_patterns";
             } else {
-                require_once ("$CFG->dirroot/mod/datalynx/view/view_patterns.php");
+                require_once("$CFG->dirroot/mod/datalynx/view/view_patterns.php");
                 $patternsclass = "datalynxview_patterns";
             }
             $this->patternclass = new $patternsclass($this);
@@ -801,19 +820,23 @@ abstract class datalynxview_base {
 
     /**
      * Get either all tags ($set = null) or field tags ($set = field) as an array
-     * 
-     * @param string $set current: field or view 
+     *
+     * @param string $set current: field or view
      * @return array of either field or view tags, empty array if none of these tags is present
      */
     public function get__patterns($set = null) {
         if (is_null($set)) {
             return $this->_tags;
-        } else if (empty($this->_tags)){
-            return array();
-        } else if ($set == 'view' or $set == 'field') {
-            return $this->_tags[$set];
         } else {
-            return array();
+            if (empty($this->_tags)) {
+                return array();
+            } else {
+                if ($set == 'view' or $set == 'field') {
+                    return $this->_tags[$set];
+                } else {
+                    return array();
+                }
+            }
         }
     }
 
@@ -835,17 +858,17 @@ abstract class datalynxview_base {
     public function get_embedded_files($set = null) {
         $files = array();
         $fs = get_file_storage();
-        
+
         // view files
         if (empty($set) or $set == 'view') {
             foreach ($this->_editors as $key => $editorname) {
                 // $editor = "e$editorname";
-                $files = array_merge($files, 
-                        $fs->get_area_files($this->_df->context->id, 'mod_datalynx', 'view', 
+                $files = array_merge($files,
+                        $fs->get_area_files($this->_df->context->id, 'mod_datalynx', 'view',
                                 $this->id() . $key, 'sortorder, itemid, filepath, filename', false));
             }
         }
-        
+
         // field files
         if (empty($set) or $set == 'field') {
             // find which fields actually display files/images in the view
@@ -863,7 +886,7 @@ abstract class datalynxview_base {
                 $files = array_merge($files, $this->_entries->get_embedded_files($fids));
             }
         }
-        
+
         return $files;
     }
 
@@ -882,11 +905,11 @@ abstract class datalynxview_base {
      */
     protected function entry_definition($fielddefinitions) {
         $elements = array();
-        
+
         // split the entry template to tags and html
         $tags = array_keys($fielddefinitions);
         $parts = $this->split_template_by_tags($tags, $this->view->eparam2);
-        
+
         foreach ($parts as $part) {
             if (in_array($part, $tags)) {
                 if ($def = $fielddefinitions[$part]) {
@@ -896,7 +919,7 @@ abstract class datalynxview_base {
                 $elements[] = array('html', $part);
             }
         }
-        
+
         return $elements;
     }
 
@@ -910,7 +933,7 @@ abstract class datalynxview_base {
         }
         $delims = implode('|', $patterns);
         $elements = preg_split("/($delims)/", $subject, null, PREG_SPLIT_DELIM_CAPTURE);
-        
+
         return $elements;
     }
 
@@ -921,20 +944,21 @@ abstract class datalynxview_base {
         $fields = $this->_df->get_fields();
         $fieldid = $this->_filter->groupby;
         $groupbyvalue = '';
-        
+
         if (array_key_exists($fieldid, $this->_tags['field'])) {
             // first pattern
             $pattern = reset($this->_tags['field'][$fieldid]);
             if ($pattern !== false) {
                 $field = $fields[$fieldid];
-                
+
                 if ($definition = $field->get_definitions(array($pattern
-                ), $entry, array())) {
+                ), $entry, array())
+                ) {
                     $groupbyvalue = $definition[$pattern][1];
                 }
             }
         }
-        
+
         return $groupbyvalue;
     }
 
@@ -944,12 +968,12 @@ abstract class datalynxview_base {
      */
     protected function set_groupby_per_page() {
         global $CFG;
-        
+
         // Get the group by fieldid
         if (empty($this->_filter->groupby)) {
             return;
         }
-        
+
         $fieldid = $this->_filter->groupby;
         // set sorting to begin with this field
         $insort = false;
@@ -965,13 +989,13 @@ abstract class datalynxview_base {
         }
         $sortfields = array($fieldid => $sortdir) + $sortfields;
         $this->_filter->customsort = serialize($sortfields);
-        
+
         // Get the distinct content for the group by field
         $field = $this->_df->get_field_from_id($fieldid);
         if (!$groupbyvalues = $field->get_distinct_content($sortdir)) {
             return;
         }
-        
+
         // Get the displayed subset according to page
         $numvals = count($groupbyvalues);
         // Calc number of pages
@@ -983,19 +1007,19 @@ abstract class datalynxview_base {
             $this->_filter->pagenum = 0;
             $this->_filter->page = 0;
         }
-        
+
         if ($this->_filter->perpage) {
             $offset = $this->_filter->page * $this->_filter->perpage;
             $vals = array_slice($groupbyvalues, $offset, $this->_filter->perpage);
         } else {
             $vals = $groupbyvalues;
         }
-        
+
         $searchfields = array();
         if ($this->_filter->customsearch) {
             $searchfields = unserialize($this->_filter->customsearch);
         }
-        
+
         $this->_filter->customsearch = serialize($searchfields);
     }
 
@@ -1003,14 +1027,15 @@ abstract class datalynxview_base {
      */
     protected function is_rating() {
         global $USER, $CFG;
-        
-        require_once ("$CFG->dirroot/mod/datalynx/field/_rating/field_class.php");
-        
+
+        require_once("$CFG->dirroot/mod/datalynx/field/_rating/field_class.php");
+
         if (!$this->_df->data->rating or empty(
-                $this->_tags['field'][datalynxfield__rating::_RATING])) {
+                $this->_tags['field'][datalynxfield__rating::_RATING])
+        ) {
             return null;
         }
-        
+
         $ratingfield = $this->_df->get_field_from_id(datalynxfield__rating::_RATING);
         $ratingoptions = new stdClass();
         $ratingoptions->context = $this->_df->context;
@@ -1020,15 +1045,17 @@ abstract class datalynxview_base {
                 $this->_tags['field'][datalynxfield__rating::_RATING]);
         $ratingoptions->scaleid = $this->get_scaleid('entry');
         $ratingoptions->userid = $USER->id;
-        
+
         return $ratingoptions;
     }
 
     public function get_scaleid($area) {
         if ($area == 'entry' and $this->_df->data->rating) {
             return $this->_df->data->rating;
-        } else if ($area == 'activity' and $this->_df->data->grade) {
-            return $this->_df->data->grade;
+        } else {
+            if ($area == 'activity' and $this->_df->data->grade) {
+                return $this->_df->data->grade;
+            }
         }
         return 0;
     }
@@ -1040,12 +1067,12 @@ abstract class datalynxview_base {
             // grading is disabled in this datalynx
             return false;
         }
-        
+
         if (empty($this->view->param1)) {
             // grading is not activated in this view
             return false;
         }
-        
+
         return true;
     }
 
@@ -1053,11 +1080,11 @@ abstract class datalynxview_base {
      */
     protected function get_grading_options() {
         global $USER;
-        
+
         if (!$this->_df->data->grade) {
             return null;
         }
-        
+
         $gradingoptions = new stdClass();
         $gradingoptions->context = $this->_df->context;
         $gradingoptions->component = 'mod_datalynx';
@@ -1065,10 +1092,10 @@ abstract class datalynxview_base {
         $gradingoptions->aggregate = array(RATING_AGGREGATE_MAXIMUM);
         $gradingoptions->scaleid = $this->_df->data->grade;
         $gradingoptions->userid = $USER->id;
-        
+
         return $gradingoptions;
     }
-    
+
     // //////////////////////////////////
     // VIEW ENTRIES
     // //////////////////////////////////
@@ -1085,15 +1112,16 @@ abstract class datalynxview_base {
             $entriesform = $this->get_entries_form();
             $html = $entriesform->html();
         }
-        
+
         // Process calculations if any
         $html = $this->process_calculations($html);
-        
+
         return $html;
     }
 
     /**
      * Assemble the the replaced tags and field values to valid html
+     *
      * @return string html
      */
     public function definition_to_html() {
@@ -1103,7 +1131,7 @@ abstract class datalynxview_base {
             list(, $content) = $element;
             $html .= $content;
         }
-        
+
         return $html;
     }
 
@@ -1118,7 +1146,7 @@ abstract class datalynxview_base {
                     $params = array();
                     $func = $content[0];
                     $entry = $content[1][0];
-                    if(isset($content[1][1])) {
+                    if (isset($content[1][1])) {
                         $params = $content[1][1];
                     }
                     call_user_func_array($func, array(&$mform, $entry, $params));
@@ -1133,23 +1161,23 @@ abstract class datalynxview_base {
      */
     protected function get_entries_form() {
         static $entriesform = null;
-        
+
         if ($entriesform == null) {
             global $CFG;
             // prepare params for for content management
-            $actionparams = array('d' => $this->_df->id(), 'view' => $this->id(), 
-                'page' => $this->_filter->page, 'eids' => $this->_filter->eids, 
-                'update' => $this->_editentries, 
-                'sourceview' => optional_param('sourceview', null, PARAM_INT)
+            $actionparams = array('d' => $this->_df->id(), 'view' => $this->id(),
+                    'page' => $this->_filter->page, 'eids' => $this->_filter->eids,
+                    'update' => $this->_editentries,
+                    'sourceview' => optional_param('sourceview', null, PARAM_INT)
             );
             $actionurl = new moodle_url("/mod/datalynx/{$this->_df->pagefile()}.php", $actionparams);
             $custom_data = array('view' => $this, 'update' => $this->_editentries);
-            
+
             $formclass = 'datalynxview_entries_form';
-            require_once ("$CFG->dirroot/mod/datalynx/view/view_entries_form.php");
+            require_once("$CFG->dirroot/mod/datalynx/view/view_entries_form.php");
             $entriesform = new $formclass($actionurl, $custom_data);
         }
-        
+
         return $entriesform;
     }
 
@@ -1172,7 +1200,7 @@ abstract class datalynxview_base {
                     list($entry, $editthisone, $managethisone) = $entryparams;
                     $options = array('edit' => $editthisone, 'manage' => $managethisone);
                     $fielddefinitions = $this->get_entry_tag_replacements($entry, $options); // <=======================
-                                                                                             // HERE
+                    // HERE
                     $definitions[$entryid] = $this->entry_definition($fielddefinitions);
                 }
             }
@@ -1183,7 +1211,7 @@ abstract class datalynxview_base {
         foreach ($groupedelements as $group) {
             $elements = array_merge($elements, $group);
         }
-        
+
         return $elements;
     }
 
@@ -1192,28 +1220,29 @@ abstract class datalynxview_base {
     protected function get_entry_tag_replacements($entry, $options) {
         $fields = $this->_df->get_fields();
         $entry->baseurl = $this->_baseurl;
-        
+
         $definitions = array();
         foreach ($this->_tags['field'] as $fieldid => $patterns) {
             if (isset($fields[$fieldid])) {
                 $field = $fields[$fieldid];
                 if ($fielddefinitions = $field->get_definitions($patterns, $entry, $options)) { // <====================
-                                                                                                // HERE
+                    // HERE
                     $definitions = array_merge($definitions, $fielddefinitions);
                 }
             }
         }
         $fielddefinitions = $definitions;
-        
+
         // enables view tag replacement within the entry template
         if ($patterns = $this->patternclass()->get_replacements($this->_tags['view'], null, $options)) {
             $viewdefinitions = array();
             foreach ($patterns as $tag => $pattern) {
                 if ((strpos($tag, 'viewlink') !== 0 || strpos($tag, 'viewsesslink') !== 0) &&
-                    (!array_key_exists('edit', $options) || !$options['edit'])) {
+                        (!array_key_exists('edit', $options) || !$options['edit'])
+                ) {
                     foreach ($fielddefinitions as $fieldtag => $definition) {
-                        $pattern = str_replace($fieldtag, 
-                                isset($definitions[$fieldtag][1]) ? $definitions[$fieldtag][1] : '', 
+                        $pattern = str_replace($fieldtag,
+                                isset($definitions[$fieldtag][1]) ? $definitions[$fieldtag][1] : '',
                                 $pattern);
                     }
                 }
@@ -1221,7 +1250,7 @@ abstract class datalynxview_base {
             }
             $definitions = array_merge($definitions, $viewdefinitions);
         }
-        
+
         return $definitions;
     }
 
@@ -1232,9 +1261,9 @@ abstract class datalynxview_base {
         // Indicate if there are managable entries in the display for the current user
         // in which case edit/delete action
         $requiresmanageentries = false;
-        
+
         $editentries = null;
-        
+
         // Display a new entry to add in its own group
         if ($this->_editentries < 0) {
             if ($this->_df->user_can_manage_entry()) {
@@ -1243,15 +1272,17 @@ abstract class datalynxview_base {
                     $this->_display_definition['newentry'][$i] = null;
                 }
             }
-        } else if ($this->_editentries) {
-            $editentries = explode(',', $this->_editentries);
+        } else {
+            if ($this->_editentries) {
+                $editentries = explode(',', $this->_editentries);
+            }
         }
-        
+
         // compile entries if any
         if ($entries = $this->_entries->entries()) {
             $groupname = '';
             $groupdefinition = array();
-            
+
             // If action buttons should be hidden entries should unmanageable
             $displayactions = isset($options['entryactions']) ? $options['entryactions'] : true;
             foreach ($entries as $entryid => $entry) {
@@ -1265,7 +1296,7 @@ abstract class datalynxview_base {
                 if ($displayactions and !$editthisone) {
                     $manageable = $this->_df->user_can_manage_entry($entry);
                 }
-                
+
                 // Are we grouping?
                 if ($this->_filter->groupby) {
                     // assuming here that the groupbyed field returns only one pattern
@@ -1281,7 +1312,7 @@ abstract class datalynxview_base {
                         $groupname = $groupbyvalue;
                     }
                 }
-                
+
                 // add to the current entries group
                 $groupdefinition[$entryid] = array($entry, $editthisone, $manageable);
             }
@@ -1295,9 +1326,9 @@ abstract class datalynxview_base {
      */
     protected function process_calculations($text) {
         global $CFG;
-        
+
         if (preg_match_all("/%%F\d*:=[^%]+%%/", $text, $matches)) {
-            require_once ("$CFG->libdir/mathslib.php");
+            require_once("$CFG->libdir/mathslib.php");
             sort($matches[0]);
             $replacements = array();
             $formulas = array();
@@ -1309,7 +1340,7 @@ abstract class datalynxview_base {
                     foreach ($frefs[0] as $fref) {
                         $fref = trim($fref, '_');
                         if (isset($formulas[$fref])) {
-                            $formula = str_replace("_{$fref}_", implode(',', $formulas[$fref]), 
+                            $formula = str_replace("_{$fref}_", implode(',', $formulas[$fref]),
                                     $formula);
                         }
                     }
@@ -1319,23 +1350,23 @@ abstract class datalynxview_base {
                 $formulas[$fid][] = "($formula)";
                 $replacements[$pattern] = $formula;
             }
-            
+
             foreach ($replacements as $pattern => $formula) {
                 // Number of decimals can be set as ;n at the end of the formula
                 $decimals = null;
                 if (strpos($formula, ';')) {
                     list($formula, $decimals) = explode(';', $formula);
                 }
-                
+
                 $calc = new calc_formula("=$formula");
                 $result = $calc->evaluate();
                 // false as result indicates some problem
                 if ($result === false) {
                     // add more error hints
-                    $replacements[$pattern] = html_writer::tag('span', $formula, 
+                    $replacements[$pattern] = html_writer::tag('span', $formula,
                             array('style' => 'color:red;'
                             )); // get_string('errorcalculationunknown',
-                                                                                                                          // 'grades');
+                    // 'grades');
                 } else {
                     // Set decimals
                     if (is_numeric($decimals)) {
@@ -1348,11 +1379,11 @@ abstract class datalynxview_base {
         }
         return $text;
     }
-    
+
     // //////////////////////////////////
     // GETTERS
     // //////////////////////////////////
-    
+
     /**
      * Returns the type of the view
      */
@@ -1426,12 +1457,12 @@ abstract class datalynxview_base {
 
     /**
      * Process the submitted data of entries
-     * 
+     *
      * @return boolean|multitype:|number
      */
     public function process_entries_data() {
         $illegalaction = false;
-        
+
         // Check first if returning from form
         $update = optional_param('update', '', PARAM_RAW);
         if ($update) {
@@ -1442,24 +1473,24 @@ abstract class datalynxview_base {
                     // fetch entries
                     $this->_entries->set_content();
                 }
-                
+
                 // set the display definition for the form
                 $this->_editentries = $update;
                 $this->set__display_definition();
-                
+
                 $entriesform = $this->get_entries_form();
-                
+
                 // Process the form if not cancelled
                 if (!$entriesform->is_cancelled()) {
                     if ($data = $entriesform->get_data()) {
                         // validated successfully so process request
-                        $processed = $this->_entries->process_entries('update', $update, $data, 
+                        $processed = $this->_entries->process_entries('update', $update, $data,
                                 true);
                         if (!$processed) {
                             $this->_returntoentriesform = true;
                             return false;
                         }
-                        
+
                         if (!empty($data->submitreturnbutton)) {
                             // If we have just added new entries refresh the content
                             // This is far from ideal because this new entries may be
@@ -1467,16 +1498,16 @@ abstract class datalynxview_base {
                             if ($this->_editentries < 0) {
                                 $this->_entries->set_content();
                             }
-                            
+
                             // so that return after adding new entry will return the added entry
-                            $this->_editentries = is_array($processed[1]) ? implode(',', 
+                            $this->_editentries = is_array($processed[1]) ? implode(',',
                                     $processed[1]) : $processed[1];
                             $this->_returntoentriesform = true;
                             return true;
                         } else {
                             // So that we can show the new entries if we so wish
                             if ($this->_editentries < 0) {
-                                $this->_editentries = is_array($processed[1]) ? implode(',', 
+                                $this->_editentries = is_array($processed[1]) ? implode(',',
                                         $processed[1]) : $processed[1];
                             } else {
                                 $this->_editentries = '';
@@ -1499,76 +1530,87 @@ abstract class datalynxview_base {
                 $illegalaction = true;
             }
         }
-        
+
         // direct url params; not from form
         $new = optional_param('new', 0, PARAM_INT); // open new entry form
         $editentries = optional_param('editentries', 0, PARAM_SEQUENCE); // edit entries (all) or by
-                                                                         // record ids (comma
-                                                                         // delimited eids)
+        // record ids (comma
+        // delimited eids)
         $duplicate = optional_param('duplicate', '', PARAM_SEQUENCE); // duplicate entries (all) or
-                                                                      // by record ids (comma
-                                                                      // delimited eids)
+        // by record ids (comma
+        // delimited eids)
         $delete = optional_param('delete', '', PARAM_SEQUENCE); // delete entries (all) or by record
-                                                                // ids (comma delimited eids)
+        // ids (comma delimited eids)
         $approve = optional_param('approve', '', PARAM_SEQUENCE); // approve entries (all) or by
-                                                                  // record ids (comma delimited
-                                                                  // eids)
+        // record ids (comma delimited
+        // eids)
         $disapprove = optional_param('disapprove', '', PARAM_SEQUENCE); // disapprove entries (all)
-                                                                        // or by record ids (comma
-                                                                        // delimited eids)
+        // or by record ids (comma
+        // delimited eids)
         $status = optional_param('status', '', PARAM_SEQUENCE); // set status of entries (all) or by
-                                                                // record ids (comma delimited eids)
-        
+        // record ids (comma delimited eids)
+
         $confirmed = optional_param('confirmed', 0, PARAM_BOOL);
-        
+
         $this->_editentries = $editentries;
-        
+
         if ($new) {
             if (confirm_sesskey() &&
-                     ($this->confirm_view_action("addnewentry") ||
-                     $this->confirm_view_action("addnewentries"))) {
+                    ($this->confirm_view_action("addnewentry") ||
+                            $this->confirm_view_action("addnewentries"))
+            ) {
                 return $this->_editentries = -$new;
             } else {
                 $illegalaction = true;
             }
-        } else if ($duplicate) {
-            if (confirm_sesskey() && $this->confirm_view_action("duplicate")) {
-                return $this->_entries->process_entries('duplicate', $duplicate, null, $confirmed);
+        } else {
+            if ($duplicate) {
+                if (confirm_sesskey() && $this->confirm_view_action("duplicate")) {
+                    return $this->_entries->process_entries('duplicate', $duplicate, null, $confirmed);
+                } else {
+                    $illegalaction = true;
+                }
             } else {
-                $illegalaction = true;
-            }
-        } else if ($delete) {
-            if (confirm_sesskey() && $this->confirm_view_action("delete")) {
-                return $this->_entries->process_entries('delete', $delete, null, $confirmed);
-            } else {
-                $illegalaction = true;
-            }
-        } else if ($approve) {
-            if (confirm_sesskey() && $this->confirm_view_action("approve")) {
-                return $this->_entries->process_entries('approve', $approve, null, true);
-            } else {
-                $illegalaction = true;
-            }
-        } else if ($disapprove) {
-            if (confirm_sesskey() && $this->confirm_view_action("approve")) {
-                return $this->_entries->process_entries('disapprove', $disapprove, null, true);
-            } else {
-                $illegalaction = true;
-            }
-        } else if ($status) {
-            if (confirm_sesskey() && $this->confirm_view_action("status")) {
-                return $this->_entries->process_entries('status', $status, null, true);
-            } else {
-                $illegalaction = true;
+                if ($delete) {
+                    if (confirm_sesskey() && $this->confirm_view_action("delete")) {
+                        return $this->_entries->process_entries('delete', $delete, null, $confirmed);
+                    } else {
+                        $illegalaction = true;
+                    }
+                } else {
+                    if ($approve) {
+                        if (confirm_sesskey() && $this->confirm_view_action("approve")) {
+                            return $this->_entries->process_entries('approve', $approve, null, true);
+                        } else {
+                            $illegalaction = true;
+                        }
+                    } else {
+                        if ($disapprove) {
+                            if (confirm_sesskey() && $this->confirm_view_action("approve")) {
+                                return $this->_entries->process_entries('disapprove', $disapprove, null, true);
+                            } else {
+                                $illegalaction = true;
+                            }
+                        } else {
+                            if ($status) {
+                                if (confirm_sesskey() && $this->confirm_view_action("status")) {
+                                    return $this->_entries->process_entries('status', $status, null, true);
+                                } else {
+                                    $illegalaction = true;
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
-        
+
         if ($illegalaction) {
             $sourceview = optional_param('sourceview', $this->id(), PARAM_INT);
             $url = new moodle_url('view.php', array('d' => $this->_df->id(), 'view' => $sourceview));
             redirect($url);
         }
-        
+
         return false;
     }
 
@@ -1578,7 +1620,7 @@ abstract class datalynxview_base {
      * AND contain the necessary action tag in the entry template in order for the action to be
      * allowed. This function
      * prevents users to circumvent action restrictions via URL queries.
-     * 
+     *
      * @param $action String of the action
      * @return bool true, if the action is allowed; false otherwise.
      */
@@ -1587,12 +1629,12 @@ abstract class datalynxview_base {
         $targetview = optional_param('view', 0, PARAM_INT);
         $view = $DB->get_record('datalynx_views', array('id' => $targetview));
         return $view && $this->_df->is_visible_to_user($this->view) &&
-                 ((strpos($view->param2, "##$action##") !== false) ||
-                 (strpos($view->section, "##$action##") !== false));
+        ((strpos($view->param2, "##$action##") !== false) ||
+                (strpos($view->section, "##$action##") !== false));
     }
 
     private function replace_pluginfile_urls($html, $pluginfileurl) {
-        $pluginfilepath = moodle_url::make_file_url("/pluginfile.php", 
+        $pluginfilepath = moodle_url::make_file_url("/pluginfile.php",
                 "/{$this->_df->context->id}/mod_datalynx/content");
         $pattern = str_replace('/', '\/', $pluginfilepath);
         $pattern = "/$pattern\/\d+\//";

@@ -34,8 +34,6 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright 2017 Thomas Niedermaier <thomas.niedermaier@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-
 class sendmessage_task extends \core\task\adhoc_task {
 
     /**

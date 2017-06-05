@@ -21,8 +21,7 @@
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ("$CFG->dirroot/mod/datalynx/field/field_form.php");
-
+require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
 class datalynxfield_coursegroup_form extends datalynxfield_form {
 
@@ -30,13 +29,13 @@ class datalynxfield_coursegroup_form extends datalynxfield_form {
      */
     function field_definition() {
         global $CFG, $PAGE, $DB, $SITE;
-        
+
         $mform = &$this->_form;
-        
+
         // -------------------------------------------------------------------------------
-        $mform->addElement('header', 'fieldattributeshdr', 
+        $mform->addElement('header', 'fieldattributeshdr',
                 get_string('fieldattributes', 'datalynx'));
-        
+
         // course
         $courses = get_courses("all", "c.sortorder ASC", "c.id,c.fullname");
         $options = array(0 => get_string('choosedots'));
@@ -44,7 +43,7 @@ class datalynxfield_coursegroup_form extends datalynxfield_form {
             $options[$courseid] = $course->fullname;
         }
         $mform->addElement('select', 'param1', get_string('course'), $options);
-        
+
         // group id
         $options = array(0 => get_string('choosedots'));
         if (!empty($this->_field->field->param1)) {
@@ -56,16 +55,16 @@ class datalynxfield_coursegroup_form extends datalynxfield_form {
         }
         $mform->addElement('select', "param2", get_string('group'), $options);
         $mform->disabledIf("param2", "param1", 'eq', '');
-        
+
         // ajax
-        $options = array('coursefield' => 'param1', 'groupfield' => 'param2', 
-            'acturl' => "$CFG->wwwroot/mod/datalynx/field/coursegroup/loadgroups.php");
-        
-        $module = array('name' => 'M.datalynxfield_coursegroup_load_course_groups', 
-            'fullpath' => '/mod/datalynx/field/coursegroup/coursegroup.js', 
-            'requires' => array('base', 'io', 'node'));
-        
-        $PAGE->requires->js_init_call('M.datalynxfield_coursegroup_load_course_groups.init', 
+        $options = array('coursefield' => 'param1', 'groupfield' => 'param2',
+                'acturl' => "$CFG->wwwroot/mod/datalynx/field/coursegroup/loadgroups.php");
+
+        $module = array('name' => 'M.datalynxfield_coursegroup_load_course_groups',
+                'fullpath' => '/mod/datalynx/field/coursegroup/coursegroup.js',
+                'requires' => array('base', 'io', 'node'));
+
+        $PAGE->requires->js_init_call('M.datalynxfield_coursegroup_load_course_groups.init',
                 array($options), false, $module);
     }
 }

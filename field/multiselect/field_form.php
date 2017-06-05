@@ -21,23 +21,22 @@
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ("$CFG->dirroot/mod/datalynx/field/field_form.php");
-
+require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
 class datalynxfield_multiselect_form extends datalynxfield_option_form {
 
     public function field_definition() {
         $mform = &$this->_form;
-        
-        $mform->addElement('header', 'fieldattributeshdr', 
+
+        $mform->addElement('header', 'fieldattributeshdr',
                 get_string('fieldattributes', 'datalynx'));
-        
+
         // Default options.
-        $mform->addElement('textarea', 'param2', get_string('fieldoptionsdefault', 'datalynx'), 
+        $mform->addElement('textarea', 'param2', get_string('fieldoptionsdefault', 'datalynx'),
                 'wrap="virtual" rows="5" cols="50"');
-        
+
         // Options separator.
-        $mform->addElement('select', 'param3', get_string('fieldoptionsseparator', 'datalynx'), 
+        $mform->addElement('select', 'param3', get_string('fieldoptionsseparator', 'datalynx'),
                 array_map('current', $this->_field->separators));
 
         // Enable autocompletion for edit mode

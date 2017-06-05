@@ -23,8 +23,7 @@
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once ("$CFG->dirroot/mod/datalynx/field/renderer.php");
-
+require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
  */
@@ -35,9 +34,9 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
     public function replacements(array $tags = null, $entry = null, array $options = null) {
         $field = $this->_field;
         $fieldname = $field->name();
-        
+
         $replacements = array();
-        
+
         // there is only one possible tag here, no edit
         $tag = "##author:$fieldname##";
         switch ($field->infotype) {
@@ -57,7 +56,7 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
             default:
                 $replacements[$tag] = '';
         }
-        
+
         return $replacements;
     }
 
@@ -67,15 +66,15 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
         $field = $this->_field;
         $fieldid = $field->id();
         $fieldname = $field->name();
-        
+
         if (isset($entry->{"c{$fieldid}_content"})) {
             $content = $entry->{"c{$fieldid}_content"};
         } else {
             global $USER, $DB;
-            $content = $DB->get_field('user_info_data', 'data', 
+            $content = $DB->get_field('user_info_data', 'data',
                     array('userid' => $USER->id, 'fieldid' => $field->infoid));
         }
-        
+
         $params = array('disabled' => "disabled", 'type' => "checkbox", 'name' => $fieldname);
         if (intval($content) === 1) {
             $params['checked'] = 'checked';
@@ -88,27 +87,27 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
     protected function display_datetime($entry) {
         $field = $this->_field;
         $fieldid = $field->id();
-        
+
         if (isset($entry->{"c{$fieldid}_content"})) {
             $content = $entry->{"c{$fieldid}_content"};
         } else {
             global $USER, $DB;
-            $content = $DB->get_field('user_info_data', 'data', 
+            $content = $DB->get_field('user_info_data', 'data',
                     array('userid' => $USER->id, 'fieldid' => $field->infoid));
         }
-        
+
         // Check if time was specified
         if (!empty($field->field->param8)) {
             $format = get_string('strftimedaydatetime', 'langconfig');
         } else {
             $format = get_string('strftimedate', 'langconfig');
         }
-        
+
         // Check if a date has been specified
         if (!empty($content)) {
             return userdate($content, $format);
         }
-        
+
         return '';
     }
 
@@ -117,26 +116,26 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
     protected function display_text($entry) {
         $field = $this->_field;
         $fieldid = $field->id();
-        
+
         if (isset($entry->{"c{$fieldid}_content"})) {
             $content = $entry->{"c{$fieldid}_content"};
         } else {
             global $USER, $DB;
-            $content = $DB->get_field('user_info_data', 'data', 
+            $content = $DB->get_field('user_info_data', 'data',
                     array('userid' => $USER->id, 'fieldid' => $field->infoid));
         }
-        
+
         if (!$content) {
             return '';
         }
-        
+
         $options = new stdClass();
         $options->para = false;
         $format = FORMAT_MOODLE;
         if (!$str = format_text($content, $format, $options)) {
             return '';
         }
-        
+
         // Are we creating a link?
         if (!empty($this->field->param9)) {
             // Define the target
@@ -145,12 +144,12 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
             } else {
                 $attributes = array();
             }
-            
+
             // / Create the link
-            $str = html_writer::link(str_replace('$$', urlencode($str), $this->field->param9), 
+            $str = html_writer::link(str_replace('$$', urlencode($str), $this->field->param9),
                     htmlspecialchars($this->field->content), $attributes);
         }
-        
+
         return $str;
     }
 
@@ -159,7 +158,7 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
     protected function display_richtext($entry) {
         $field = $this->_field;
         $fieldid = $field->id();
-        
+
         if (isset($entry->{"c{$fieldid}_content"})) {
             if ($content = $entry->{"c{$fieldid}_content"}) {
                 $format = isset($entry->{"c{$fieldid}_content1"}) ? $entry->{"c{$fieldid}_content1"} : FORMAT_PLAIN;
@@ -167,12 +166,12 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
             }
         } else {
             global $USER, $DB;
-            $content = $DB->get_field('user_info_data', 'data', 
+            $content = $DB->get_field('user_info_data', 'data',
                     array('userid' => $USER->id, 'fieldid' => $field->infoid));
             $format = FORMAT_PLAIN;
             return format_text($content, $format, array('overflowdiv' => true));
         }
-        
+
         return '';
     }
 
@@ -182,10 +181,10 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
     protected function patterns() {
         $fieldname = $this->_field->name();
         $cat = get_string('authorinfo', 'datalynx');
-        
+
         $patterns = array();
         $patterns["##author:$fieldname##"] = array(true, $cat);
-        
+
         return $patterns;
     }
 }

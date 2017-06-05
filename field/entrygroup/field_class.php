@@ -21,8 +21,7 @@
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ($CFG->dirroot . '/mod/datalynx/field/field_class.php');
-
+require_once($CFG->dirroot . '/mod/datalynx/field/field_class.php');
 
 class datalynxfield_entrygroup extends datalynxfield_no_content {
 
@@ -40,11 +39,11 @@ class datalynxfield_entrygroup extends datalynxfield_no_content {
      */
     public static function get_field_objects($dataid) {
         $fieldobjects = array();
-        
-        $fieldobjects[self::_GROUP] = (object) array('id' => self::_GROUP, 'dataid' => $dataid, 
-            'type' => 'entrygroup', 'name' => get_string('group', 'datalynxfield_entrygroup'), 
-            'description' => '', 'visible' => 2, 'internalname' => 'groupid');
-        
+
+        $fieldobjects[self::_GROUP] = (object) array('id' => self::_GROUP, 'dataid' => $dataid,
+                'type' => 'entrygroup', 'name' => get_string('group', 'datalynxfield_entrygroup'),
+                'description' => '', 'visible' => 2, 'internalname' => 'groupid');
+
         return $fieldobjects;
     }
 

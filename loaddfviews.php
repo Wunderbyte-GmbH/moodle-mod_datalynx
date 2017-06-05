@@ -23,7 +23,7 @@
  */
 define('AJAX_SCRIPT', true);
 
-require_once (dirname(__FILE__) . '/../../config.php');
+require_once(dirname(__FILE__) . '/../../config.php');
 
 $d = required_param('dfid', PARAM_INT);
 
@@ -41,7 +41,8 @@ if ($d) {
         $retviews = implode(',', $viewmenu);
     }
     if ($textfields =
-        $DB->get_records_menu('datalynx_fields', array('dataid' => $d, 'type' => 'text'), 'name', 'id,name')) {
+            $DB->get_records_menu('datalynx_fields', array('dataid' => $d, 'type' => 'text'), 'name', 'id,name')
+    ) {
         $textfieldmenu = array();
         foreach ($textfields as $key => $value) {
             $textfieldmenu[] = "$key " . strip_tags($value);

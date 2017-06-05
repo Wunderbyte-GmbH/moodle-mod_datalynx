@@ -66,7 +66,7 @@ M.datalynxfield__approve.init = function (Y, approvedicon, disapprovedicon) {
     function extract_params(paramstring) {
         var params = paramstring.split('&');
         var output = {};
-        for(var i = 0; i < params.length; i++) {
+        for (var i = 0; i < params.length; i++) {
             var param = params[i];
             var paramname = param.split('=')[0];
             var paramvalue = param.split('=')[1];

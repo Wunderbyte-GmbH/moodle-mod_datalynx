@@ -29,11 +29,11 @@ M.datalynxfield_teammemberselect = {};
 
 M.datalynxfield_teammemberselect.sources = [];
 
-M.datalynxfield_teammemberselect.init_subscribe_links = function(Y, fieldid, userurl, username, canunsubscribe) {
+M.datalynxfield_teammemberselect.init_subscribe_links = function (Y, fieldid, userurl, username, canunsubscribe) {
     function extract_params(paramstring) {
         var params = paramstring.split('&');
         var output = {};
-        for(var i = 0; i < params.length; i++) {
+        for (var i = 0; i < params.length; i++) {
             var param = params[i];
             output[param.split('=')[0]] = param.split('=')[1];
         }

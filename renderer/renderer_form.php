@@ -21,9 +21,8 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once $CFG->libdir . '/formslib.php';
-HTML_QuickForm::registerElementType('checkboxgroup', 
+HTML_QuickForm::registerElementType('checkboxgroup',
         "$CFG->dirroot/mod/datalynx/checkboxgroup/checkboxgroup.php", 'HTML_QuickForm_checkboxgroup');
-
 
 /**
  */
@@ -42,66 +41,66 @@ class datalynx_field_renderer_form extends moodleform {
 
     protected function definition() {
         $mform = &$this->_form;
-        
+
         $mform->addElement('hidden', 'id', 0);
         $mform->setType('id', PARAM_INT);
         $mform->addElement('hidden', 'd', $this->datalynx->id());
         $mform->setType('d', PARAM_INT);
-        
+
         $mform->addElement('header', 'general', get_string('general', 'form'));
-        
+
         $mform->addElement('text', 'name', get_string('name'), array('size' => '32'));
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
-        $mform->addRule('name', "Renderer name may not contain the pipe symbol \" | \"!", 'regex', 
+        $mform->addRule('name', "Renderer name may not contain the pipe symbol \" | \"!", 'regex',
                 '/^[^\|]+$/', 'client');
-        
+
         $mform->addElement('text', 'description', get_string('description'), array('size' => '64'));
         $mform->setType('description', PARAM_TEXT);
-        
+
         $group = array();
-        $group[] = $mform->createElement('radio', 'notvisibleoptions', '', 
+        $group[] = $mform->createElement('radio', 'notvisibleoptions', '',
                 get_string('shownothing', 'datalynx'), 0);
-        $group[] = $mform->createElement('radio', 'notvisibleoptions', '', 
+        $group[] = $mform->createElement('radio', 'notvisibleoptions', '',
                 get_string('custom', 'datalynx'), 1);
         $group[] = $mform->createElement('textarea', 'notvisibletemplate', '', '');
         $mform->disabledIf('notvisibletemplate', 'notvisibleoptions', 'eq', 0);
-        $mform->addGroup($group, 'notvisiblegroup', get_string('notvisible', 'datalynx'), 
+        $mform->addGroup($group, 'notvisiblegroup', get_string('notvisible', 'datalynx'),
                 array('<br />'
                 ), false);
         $mform->setType('notvisibletemplate', PARAM_CLEANHTML);
-        
+
         $group = array();
         $group[] = $mform->createElement('radio', 'displayoptions', '', get_string('none'), 0);
-        $group[] = $mform->createElement('radio', 'displayoptions', '', 
+        $group[] = $mform->createElement('radio', 'displayoptions', '',
                 get_string('custom', 'datalynx'), 1);
         $group[] = $mform->createElement('textarea', 'displaytemplate', '', '');
         $mform->setDefault('displaytemplate', '#value');
         $mform->disabledIf('displaytemplate', 'displayoptions', 'eq', 0);
-        $mform->addGroup($group, 'displaytemplategroup', get_string('displaytemplate', 'datalynx'), 
+        $mform->addGroup($group, 'displaytemplategroup', get_string('displaytemplate', 'datalynx'),
                 array('<br />'
                 ), false);
         $mform->setType('displaytemplate', PARAM_CLEANHTML);
         $mform->addHelpButton('displaytemplategroup', 'displaytemplate', 'datalynx');
-        
+
         $group = array();
-        $group[] = $mform->createElement('radio', 'novalueoptions', '', 
+        $group[] = $mform->createElement('radio', 'novalueoptions', '',
                 get_string('shownothing', 'datalynx'), 0);
-        $group[] = $mform->createElement('radio', 'novalueoptions', '', 
+        $group[] = $mform->createElement('radio', 'novalueoptions', '',
                 get_string('asdisplay', 'datalynx'), 1);
-        $group[] = $mform->createElement('radio', 'novalueoptions', '', 
+        $group[] = $mform->createElement('radio', 'novalueoptions', '',
                 get_string('custom', 'datalynx'), 2);
         $group[] = $mform->createElement('textarea', 'novaluetemplate', '', '');
         $mform->disabledIf('novaluetemplate', 'novalueoptions', 'eq', 0);
         $mform->disabledIf('novaluetemplate', 'novalueoptions', 'eq', 1);
         $mform->addGroup($group, 'novaluetemplategroup', get_string('novalue', 'datalynx'), array('<br />'), false);
         $mform->setType('novaluetemplate', PARAM_CLEANHTML);
-        
+
         $group = array();
         $group[] = $mform->createElement('radio', 'editoptions', '', get_string('none'), 0);
-        $group[] = $mform->createElement('radio', 'editoptions', '', 
+        $group[] = $mform->createElement('radio', 'editoptions', '',
                 get_string('asdisplay', 'datalynx'), 1);
-        $group[] = $mform->createElement('radio', 'editoptions', '', 
+        $group[] = $mform->createElement('radio', 'editoptions', '',
                 get_string('custom', 'datalynx'), 2);
         $group[] = $mform->createElement('textarea', 'edittemplate', '', '');
         $mform->setDefault('edittemplate', '#input');
@@ -110,15 +109,15 @@ class datalynx_field_renderer_form extends moodleform {
         $mform->addGroup($group, 'edittemplategroup', get_string('edittemplate', 'datalynx'), array('<br />'), false);
         $mform->setType('edittemplate', PARAM_CLEANHTML);
         $mform->addHelpButton('edittemplategroup', 'edittemplate', 'datalynx');
-        
+
         $group = array();
-        $group[] = $mform->createElement('radio', 'noteditableoptions', '', 
+        $group[] = $mform->createElement('radio', 'noteditableoptions', '',
                 get_string('shownothing', 'datalynx'), 0);
-        $group[] = $mform->createElement('radio', 'noteditableoptions', '', 
+        $group[] = $mform->createElement('radio', 'noteditableoptions', '',
                 get_string('asdisplay', 'datalynx'), 1);
-        $group[] = $mform->createElement('radio', 'noteditableoptions', '', 
+        $group[] = $mform->createElement('radio', 'noteditableoptions', '',
                 get_string('disabled', 'datalynx'), 2);
-        $group[] = $mform->createElement('radio', 'noteditableoptions', '', 
+        $group[] = $mform->createElement('radio', 'noteditableoptions', '',
                 get_string('custom', 'datalynx'), 3);
         $group[] = $mform->createElement('textarea', 'noteditabletemplate', '', '');
         $mform->disabledIf('noteditabletemplate', 'noteditableoptions', 'eq', 0);
@@ -126,7 +125,7 @@ class datalynx_field_renderer_form extends moodleform {
         $mform->disabledIf('noteditabletemplate', 'noteditableoptions', 'eq', 2);
         $mform->addGroup($group, 'noteditablegroup', get_string('noteditable', 'datalynx'), array('<br />'), false);
         $mform->setType('noteditabletemplate', PARAM_CLEANHTML);
-        
+
         $this->add_action_buttons();
     }
 
@@ -136,34 +135,47 @@ class datalynx_field_renderer_form extends moodleform {
         if (!$data) {
             return null;
         }
-        
+
         if (!isset($data->notvisibletemplate)) {
             $data->notvisibletemplate = $data->notvisibleoptions;
-        } else if ($data->notvisibletemplate == '0' || $data->notvisibletemplate == '1') {
-            $data->notvisibletemplate = '<span>' . $data->notvisibletemplate . '</span>';
+        } else {
+            if ($data->notvisibletemplate == '0' || $data->notvisibletemplate == '1') {
+                $data->notvisibletemplate = '<span>' . $data->notvisibletemplate . '</span>';
+            }
         }
         if (!isset($data->displaytemplate)) {
             $data->displaytemplate = $data->displayoptions;
-        } else if ($data->displaytemplate == '0' || $data->displaytemplate == '1') {
-            $data->displaytemplate = '<span>' . $data->displaytemplate . '</span>';
+        } else {
+            if ($data->displaytemplate == '0' || $data->displaytemplate == '1') {
+                $data->displaytemplate = '<span>' . $data->displaytemplate . '</span>';
+            }
         }
         if (!isset($data->novaluetemplate)) {
             $data->novaluetemplate = $data->novalueoptions;
-        } else if ($data->novaluetemplate == '0' || $data->novaluetemplate == '1' ||
-                 $data->novaluetemplate == '2') {
-            $data->novaluetemplate = '<span>' . $data->novaluetemplate . '</span>';
+        } else {
+            if ($data->novaluetemplate == '0' || $data->novaluetemplate == '1' ||
+                    $data->novaluetemplate == '2'
+            ) {
+                $data->novaluetemplate = '<span>' . $data->novaluetemplate . '</span>';
+            }
         }
         if (!isset($data->edittemplate)) {
             $data->edittemplate = $data->editoptions;
-        } else if ($data->edittemplate == '0' || $data->edittemplate == '1' ||
-                 $data->edittemplate == '2') {
-            $data->edittemplate = '<span>' . $data->edittemplate . '</span>';
+        } else {
+            if ($data->edittemplate == '0' || $data->edittemplate == '1' ||
+                    $data->edittemplate == '2'
+            ) {
+                $data->edittemplate = '<span>' . $data->edittemplate . '</span>';
+            }
         }
         if (!isset($data->noteditabletemplate)) {
             $data->noteditabletemplate = $data->noteditableoptions;
-        } else if ($data->noteditabletemplate == '0' || $data->noteditabletemplate == '1' ||
-                 $data->noteditabletemplate == '2' || $data->noteditabletemplate == '3') {
-            $data->noteditabletemplate = '<span>' . $data->noteditabletemplate . '</span>';
+        } else {
+            if ($data->noteditabletemplate == '0' || $data->noteditabletemplate == '1' ||
+                    $data->noteditabletemplate == '2' || $data->noteditabletemplate == '3'
+            ) {
+                $data->noteditabletemplate = '<span>' . $data->noteditabletemplate . '</span>';
+            }
         }
 
         return $data;
@@ -213,9 +225,9 @@ class datalynx_field_renderer_form extends moodleform {
         if (isset($data['edittemplate']) && strpos($data['edittemplate'], '#input') === false) {
             $errors['edittemplate'] = 'You must use tag #input somewhere in this template!';
         }
-        if($data['id'] == 0) {
+        if ($data['id'] == 0) {
             // To prevent duplicate renderer names when creating a new renderer
-            if($DB->record_exists('datalynx_renderers', array('name' => $data['name'], 'dataid' => $data['d']))) {
+            if ($DB->record_exists('datalynx_renderers', array('name' => $data['name'], 'dataid' => $data['d']))) {
                 $errors['name'] = get_string('duplicatename', 'datalynx');
             }
         } else {

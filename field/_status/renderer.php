@@ -23,8 +23,7 @@
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once ("$CFG->dirroot/mod/datalynx/field/renderer.php");
-
+require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
  * Implementation of internal field for setting entry submission statuses.
@@ -33,7 +32,7 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
 
     /**
      * Performs replacements of supported patterns depending on the given parameters
-     * 
+     *
      * @param array $tags unused
      * @param datalynx_entry $entry an entry object
      * @param array $options array of viewing options. Supported: 'edit'
@@ -42,19 +41,19 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
      */
     public function replacements(array $tags = array(), $entry = null, array $options = array()) {
         $edit = !empty($options['edit']) ? $options['edit'] : false;
-        
+
         $replacements = array();
-        
+
         foreach ($tags as $tag) {
             if (!$entry or $edit) {
                 if (trim($tag, '@') == "##status##" || trim($tag, '@') == "##*status##") {
                     $required = trim($tag, '@') === "##*status##";
-                    $replacements[$tag] = array('', 
-                        array(array($this, 'display_edit'
-                        ), array($entry, array('required' => $required
-                        )
-                        )
-                        )
+                    $replacements[$tag] = array('',
+                            array(array($this, 'display_edit'
+                            ), array($entry, array('required' => $required
+                            )
+                            )
+                            )
                     );
                 }
             } else {
@@ -69,7 +68,7 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
 
     /**
      * Adds the element for the status field to the entry form
-     * 
+     *
      * @param moodleform $mform entry form
      * @param datalynx_entry $entry an entry
      * @param array $options unused
@@ -80,20 +79,20 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
         $entryid = $entry->id;
         $status = isset($entry->status) ? $entry->status : datalynxfield__status::STATUS_NOT_SET;
         $required = !empty($options['required']);
-        
+
         $fieldname = "field_{$fieldid}_{$entryid}";
         $menu = $this->menu_status();
         $select = &$mform->addElement('select', $fieldname, '', $menu);
         $mform->setDefault($fieldname, $status);
         if ($required) {
-            $mform->addRule($fieldname, get_string('statusrequired', 'datalynx'), 'nonzero', null, 
+            $mform->addRule($fieldname, get_string('statusrequired', 'datalynx'), 'nonzero', null,
                     'client');
         }
     }
 
     /**
      * Creates menu items for submission status
-     * 
+     *
      * @param boolean $includenotcreated if STATUS_NOT_SET should be included in the menu (default
      *        false)
      * @return array (int) statusid => (string) label
@@ -101,23 +100,23 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
     private function menu_status($shownotset = false) {
         if ($shownotset) {
             return array(
-                datalynxfield__status::STATUS_NOT_SET => get_string('status_notcreated', 'datalynx'), 
-                datalynxfield__status::STATUS_DRAFT => get_string('status_draft', 'datalynx'), 
-                datalynxfield__status::STATUS_FINAL_SUBMISSION => get_string(
-                        'status_finalsubmission', 'datalynx')
+                    datalynxfield__status::STATUS_NOT_SET => get_string('status_notcreated', 'datalynx'),
+                    datalynxfield__status::STATUS_DRAFT => get_string('status_draft', 'datalynx'),
+                    datalynxfield__status::STATUS_FINAL_SUBMISSION => get_string(
+                            'status_finalsubmission', 'datalynx')
             );
         } else {
-            return array(datalynxfield__status::STATUS_NOT_SET => get_string('choosedots'), 
-                datalynxfield__status::STATUS_DRAFT => get_string('status_draft', 'datalynx'), 
-                datalynxfield__status::STATUS_FINAL_SUBMISSION => get_string(
-                        'status_finalsubmission', 'datalynx')
+            return array(datalynxfield__status::STATUS_NOT_SET => get_string('choosedots'),
+                    datalynxfield__status::STATUS_DRAFT => get_string('status_draft', 'datalynx'),
+                    datalynxfield__status::STATUS_FINAL_SUBMISSION => get_string(
+                            'status_finalsubmission', 'datalynx')
             );
         }
     }
 
     /**
      * Returns an HTML representation of the value of the internal status field of an entry
-     * 
+     *
      * @param datalynx_entry $entry an entry
      * @param array $params unused
      * @return string HTML representation
@@ -142,15 +141,15 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
     public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
         $fieldid = $this->_field->id();
         $fieldname = "f_{$i}_$fieldid";
-        
-        $statusmenu = array(-1 => get_string('status_notcreated', 'datalynx'), 
-            datalynxfield__status::STATUS_DRAFT => get_string('status_draft', 'datalynx'), 
-            datalynxfield__status::STATUS_FINAL_SUBMISSION => get_string('status_finalsubmission', 
-                    'datalynx'));
-        
+
+        $statusmenu = array(-1 => get_string('status_notcreated', 'datalynx'),
+                datalynxfield__status::STATUS_DRAFT => get_string('status_draft', 'datalynx'),
+                datalynxfield__status::STATUS_FINAL_SUBMISSION => get_string('status_finalsubmission',
+                        'datalynx'));
+
         $select = &$mform->createElement('select', $fieldname, null, $statusmenu, '');
         $select->setValue($value);
-        
+
         $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
         return [[$select
         ], null
@@ -159,16 +158,16 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
 
     /**
      * Returns information about supported field patterns
-     * 
+     *
      * @return array (string) pattern => array((boolean) supported, (string) pattern category)
      */
     protected function patterns() {
         $cat = get_string('actions', 'datalynx');
-        
+
         $patterns = array();
         $patterns["##status##"] = array(true, $cat);
         $patterns["##*status##"] = array(true, $cat);
-        
+
         return $patterns;
     }
 }

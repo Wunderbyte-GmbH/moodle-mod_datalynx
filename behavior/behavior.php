@@ -21,8 +21,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die();
-require_once (dirname(__FILE__) . '/../mod_class.php');
-
+require_once(dirname(__FILE__) . '/../mod_class.php');
 
 class datalynx_field_behavior {
 
@@ -60,13 +59,13 @@ class datalynx_field_behavior {
         $this->visibleto = isset($record->visibleto) ? unserialize($record->visibleto) : array();
         $this->editableby = isset($record->editableby) ? unserialize($record->editableby) : array();
         $this->required = isset($record->required) ? $record->required : false;
-        
+
         if (isset($record->datalynx)) {
             $this->datalynx = $record->datalynx;
         } else {
             $this->datalynx = new datalynx($record->dataid);
         }
-        
+
         $this->record = $record;
     }
 
@@ -90,11 +89,11 @@ class datalynx_field_behavior {
         }
     }
 
-    private static $default = array('id' => 0, 'name' => '', 'description' => '', 
-        'visibleto' => array(datalynx::PERMISSION_MANAGER, datalynx::PERMISSION_TEACHER, 
-            datalynx::PERMISSION_STUDENT, datalynx::PERMISSION_AUTHOR),
-        'editableby' => array(datalynx::PERMISSION_MANAGER, datalynx::PERMISSION_TEACHER, 
-            datalynx::PERMISSION_STUDENT, datalynx::PERMISSION_AUTHOR), 'required' => false);
+    private static $default = array('id' => 0, 'name' => '', 'description' => '',
+            'visibleto' => array(datalynx::PERMISSION_MANAGER, datalynx::PERMISSION_TEACHER,
+                    datalynx::PERMISSION_STUDENT, datalynx::PERMISSION_AUTHOR),
+            'editableby' => array(datalynx::PERMISSION_MANAGER, datalynx::PERMISSION_TEACHER,
+                    datalynx::PERMISSION_STUDENT, datalynx::PERMISSION_AUTHOR), 'required' => false);
 
     public static function get_default_behavior(datalynx $datalynx) {
         $record = (object) self::$default;
@@ -115,8 +114,8 @@ class datalynx_field_behavior {
         $user = $user ? $user : $USER;
         $permissions = $this->datalynx->get_user_datalynx_permissions($user->id, 'view');
         return $this->user_is_admin($user) || (array_intersect($permissions, $this->visibleto)) ||
-                 ($isentryauthor && in_array(datalynx::PERMISSION_AUTHOR, $this->visibleto)) ||
-                 ($ismentor && in_array(datalynx::PERMISSION_MENTOR, $this->visibleto));
+        ($isentryauthor && in_array(datalynx::PERMISSION_AUTHOR, $this->visibleto)) ||
+        ($ismentor && in_array(datalynx::PERMISSION_MENTOR, $this->visibleto));
     }
 
     public function is_editable_by_user($user = null, $isentryauthor = false, $ismentor = false) {
@@ -124,8 +123,8 @@ class datalynx_field_behavior {
         $user = $user ? $user : $USER;
         $permissions = $this->datalynx->get_user_datalynx_permissions($user->id, 'edit');
         return (array_intersect($permissions, $this->editableby)) ||
-                 ($isentryauthor && in_array(datalynx::PERMISSION_AUTHOR, $this->editableby)) ||
-                 ($ismentor && in_array(datalynx::PERMISSION_MENTOR, $this->editableby));
+        ($isentryauthor && in_array(datalynx::PERMISSION_AUTHOR, $this->editableby)) ||
+        ($ismentor && in_array(datalynx::PERMISSION_MENTOR, $this->editableby));
     }
 
     public static function db_to_form($record) {
@@ -137,7 +136,7 @@ class datalynx_field_behavior {
         $formdata->visibleto = unserialize($record->visibleto);
         $formdata->editableby = unserialize($record->editableby);
         $formdata->required = $record->required;
-        
+
         return $formdata;
     }
 
@@ -150,7 +149,7 @@ class datalynx_field_behavior {
         $record->visibleto = serialize(isset($formdata->visibleto) ? $formdata->visibleto : []);
         $record->editableby = serialize(isset($formdata->editableby) ? $formdata->editableby : []);
         $record->required = $formdata->required;
-        
+
         return $record;
     }
 

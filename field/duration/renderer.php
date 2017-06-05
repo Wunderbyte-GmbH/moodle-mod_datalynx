@@ -23,8 +23,7 @@
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once ("$CFG->dirroot/mod/datalynx/field/renderer.php");
-
+require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
  */
@@ -35,21 +34,21 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
         $fieldid = $field->id();
         $entryid = $entry->id;
         $fieldname = "field_{$fieldid}_{$entryid}";
-        
+
         // Field width
         $fieldattr = array();
         if ($field->get('param2')) {
             $fieldattr['style'] = 'width:' . s($field->get('param2')) . s($field->get('param3')) . ';';
         }
-        
+
         $mform->addElement('duration', $fieldname, '', array('optional' => null), $fieldattr);
         $mform->setType($fieldname, PARAM_ALPHANUMEXT);
-        
+
         if ($entryid > 0 and !empty($entry->{"c{$fieldid}_content"})) {
             $number = $entry->{"c{$fieldid}_content"};
             $mform->setDefault($fieldname, $number);
         }
-        
+
         $required = !empty($options['required']);
         if ($required) {
             $mform->addRule($fieldname, null, 'required', null, 'client');
@@ -64,7 +63,7 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
         } else {
             $duration = '';
         }
-        
+
         $format = !empty($params['format']) ? $params['format'] : '';
         if ($duration !== '') {
             list($value, $unit) = $field->seconds_to_unit($duration);
@@ -73,19 +72,19 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
                 case 'unit':
                     return $units[$unit];
                     break;
-                
+
                 case 'value':
                     return $value;
                     break;
-                
+
                 case 'seconds':
                     return $duration;
                     break;
-                
+
                 case 'interval':
                     return format_time($duration);
                     break;
-                
+
                 default:
                     return $value . ' ' . $units[$unit];
                     break;
@@ -97,9 +96,9 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
     public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
         $fieldid = $this->_field->id();
         $fieldname = "f_{$i}_$fieldid";
-        
+
         $arr = array();
-        
+
         $arr[] = &$mform->createElement('duration', "{$fieldname}_from");
         $mform->setType("{$fieldname}_from", PARAM_INT);
         if (isset($value[0])) {
@@ -107,7 +106,7 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
         }
         $mform->disabledIf("{$fieldname}_from[number]", "searchoperator$i", 'eq', '');
         $mform->disabledIf("{$fieldname}_from[timeunit]", "searchoperator$i", 'eq', '');
-        
+
         $arr[] = &$mform->createElement('duration', "{$fieldname}_to");
         $mform->setType("{$fieldname}_to", PARAM_INT);
         if (isset($value[1])) {
@@ -115,31 +114,31 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
         }
         $mform->disabledIf("{$fieldname}_to[number]", "searchoperator$i", 'neq', 'BETWEEN');
         $mform->disabledIf("{$fieldname}_to[timeunit]", "searchoperator$i", 'neq', 'BETWEEN');
-        
+
         return array($arr, null);
     }
 
     protected function patterns() {
         $fieldname = $this->_field->name();
-        
+
         $patterns = parent::patterns();
         $patterns["[[$fieldname]]"] = array(true);
         $patterns["[[$fieldname:unit]]"] = array(false);
         $patterns["[[$fieldname:value]]"] = array(false);
         $patterns["[[$fieldname:seconds]]"] = array(false);
         $patterns["[[$fieldname:interval]]"] = array(false);
-        
+
         return $patterns;
     }
 
     public function validate($entryid, $tags, $formdata) {
         $fieldid = $this->_field->id();
-        
+
         $formfieldname = "field_{$fieldid}_{$entryid}";
-        
+
         $errors = array();
         foreach ($tags as $tag) {
-            list(, $behavior, ) = $this->process_tag($tag);
+            list(, $behavior,) = $this->process_tag($tag);
             /* @var $behavior datalynx_field_behavior */
             if ($behavior->is_required() and isset($formdata->$formfieldname)) {
                 $value = optional_param_array($formfieldname, [], PARAM_RAW)['number'];
@@ -149,7 +148,7 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
                 }
             }
         }
-        
+
         return $errors;
     }
 }

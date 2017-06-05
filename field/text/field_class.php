@@ -21,8 +21,7 @@
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ("$CFG->dirroot/mod/datalynx/field/field_class.php");
-
+require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
 class datalynxfield_text extends datalynxfield_base {
 
@@ -33,7 +32,7 @@ class datalynxfield_text extends datalynxfield_base {
     }
 
     public function get_supported_search_operators() {
-        return array('' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'), 
-            'LIKE' => get_string('contains', 'datalynx'));
+        return array('' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
+                'LIKE' => get_string('contains', 'datalynx'));
     }
 }

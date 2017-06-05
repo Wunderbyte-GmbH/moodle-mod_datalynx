@@ -23,8 +23,7 @@
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once ("$CFG->dirroot/mod/datalynx/field/renderer.php");
-
+require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
  */
@@ -35,16 +34,16 @@ class datalynxfield__time_renderer extends datalynxfield_renderer {
     public function replacements(array $tags = null, $entry = null, array $options = null) {
         $field = $this->_field;
         $fieldname = $field->get('internalname');
-        
+
         // no edit mode
         $replacements = array();
-        
+
         foreach ($tags as $tag) {
             // display nothing on new entries
             if ($entry->id < 0) {
                 $replacements[$tag] = '';
             } else {
-                $format = (strpos($tag, "{$fieldname}:") !== false ? str_replace("{$fieldname}:", 
+                $format = (strpos($tag, "{$fieldname}:") !== false ? str_replace("{$fieldname}:",
                         '', trim($tag, '#@')) : '');
                 switch ($format) {
                     case 'date':
@@ -79,7 +78,7 @@ class datalynxfield__time_renderer extends datalynxfield_renderer {
                 $replacements[$tag] = array('html', userdate($entry->{$fieldname}, $format));
             }
         }
-        
+
         return $replacements;
     }
 
@@ -87,7 +86,7 @@ class datalynxfield__time_renderer extends datalynxfield_renderer {
      */
     public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
         $fieldid = $this->_field->id();
-        
+
         if (is_array($value)) {
             $from = $value[0];
             $to = $value[1];
@@ -95,17 +94,17 @@ class datalynxfield__time_renderer extends datalynxfield_renderer {
             $from = 0;
             $to = 0;
         }
-        
+
         $elements = array();
-        $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_from", 
+        $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_from",
                 get_string('from'));
-        $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_to", 
+        $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_to",
                 get_string('to'));
-        
+
         $mform->setDefault("f_{$i}_{$fieldid}_from", $from);
         $mform->setDefault("f_{$i}_{$fieldid}_to", $to);
         foreach (array('year', 'month', 'day', 'hour', 'minute') as $fieldidentifier) {
-            $mform->disabledIf("f_{$i}_{$fieldid}_to[$fieldidentifier]", "searchoperator$i", 'neq', 
+            $mform->disabledIf("f_{$i}_{$fieldid}_to[$fieldidentifier]", "searchoperator$i", 'neq',
                     'BETWEEN');
         }
         $mform->disabledIf("f_{$i}_{$fieldid}_from", "searchoperator$i", 'eq', '');
@@ -114,7 +113,7 @@ class datalynxfield__time_renderer extends datalynxfield_renderer {
         $mform->disabledIf("f_{$i}_{$fieldid}_to", "searchoperator$i", 'eq', '');
         $mform->disabledIf("f_{$i}_{$fieldid}_to", "searchoperator$i", 'eq', 'IN');
         $mform->disabledIf("f_{$i}_{$fieldid}_to", "searchoperator$i", 'eq', 'LIKE');
-        
+
         $separators = array('<br />' . get_string('from'), '<br />' . get_string('to'));
         return array($elements, $separators);
     }
@@ -125,7 +124,7 @@ class datalynxfield__time_renderer extends datalynxfield_renderer {
     protected function patterns() {
         $fieldname = $this->_field->get('internalname');
         $cat = get_string('entryinfo', 'datalynx');
-        
+
         $patterns = array();
         $patterns["##$fieldname##"] = array(true, $cat);
         // date without time
@@ -147,7 +146,7 @@ class datalynxfield__time_renderer extends datalynxfield_renderer {
         // Year (G)
         $patterns["##$fieldname:year##"] = array(false);
         $patterns["##$fieldname:Y##"] = array(false);
-        
+
         return $patterns;
     }
 }

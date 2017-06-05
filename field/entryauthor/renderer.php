@@ -23,8 +23,7 @@
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once ("$CFG->dirroot/mod/datalynx/field/renderer.php");
-
+require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
  */
@@ -36,39 +35,42 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
         $field = $this->_field;
         $fieldname = $field->get('internalname');
         $edit = !empty($options['edit']) ? $options['edit'] : false;
-        
+
         // no edit mode
         $replacements = array();
-        
+
         // edit author name
         if ($fieldname == 'name') {
             // two tags are possible
             foreach ($tags as $tag) {
                 if (trim($tag, '@') == "##author:edit##" and $edit and
-                         has_capability('mod/datalynx:manageentries', $field->df()->context)) {
-                    $replacements[$tag] = array('', 
-                        array(array($this, 'display_edit'), array($entry)));
+                        has_capability('mod/datalynx:manageentries', $field->df()->context)
+                ) {
+                    $replacements[$tag] = array('',
+                            array(array($this, 'display_edit'), array($entry)));
                 } else {
                     $replacements[$tag] = array('html', $this->{"display_$fieldname"}($entry));
                 }
             }
-            
+
             // if not picture there is only one possible tag so no check
-        } else if ($fieldname != 'picture') {
-            $replacements["##author:{$fieldname}##@"] = array('html', $this->{"display_$fieldname"}($entry));
-            $replacements["##author:{$fieldname}##"] = array('html', $this->{"display_$fieldname"}($entry));
-            
-            // for picture switch on $tags
         } else {
-            foreach ($tags as $tag) {
-                if (trim($tag, '@') == "##author:picturelarge##") {
-                    $replacements[$tag] = array('html', $this->{"display_$fieldname"}($entry, true));
-                } else {
-                    $replacements[$tag] = array('html', $this->{"display_$fieldname"}($entry));
+            if ($fieldname != 'picture') {
+                $replacements["##author:{$fieldname}##@"] = array('html', $this->{"display_$fieldname"}($entry));
+                $replacements["##author:{$fieldname}##"] = array('html', $this->{"display_$fieldname"}($entry));
+
+                // for picture switch on $tags
+            } else {
+                foreach ($tags as $tag) {
+                    if (trim($tag, '@') == "##author:picturelarge##") {
+                        $replacements[$tag] = array('html', $this->{"display_$fieldname"}($entry, true));
+                    } else {
+                        $replacements[$tag] = array('html', $this->{"display_$fieldname"}($entry));
+                    }
                 }
             }
         }
-        
+
         return $replacements;
     }
 
@@ -89,7 +91,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
         $selected = $entry->userid;
         static $usersmenu = null;
         if (is_null($usersmenu)) {
-            $users = get_users_by_capability($field->df->context, 'mod/datalynx:writeentry', 'u.*', 
+            $users = get_users_by_capability($field->df->context, 'mod/datalynx:writeentry', 'u.*',
                     'u.lastname ASC');
             // add a supervisor's id
             if (!in_array($entry->userid, array_keys($users))) {
@@ -113,7 +115,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
      */
     public function display_name($entry) {
         global $USER, $DB;
-        
+
         if ($entry->id < 0) { // new entry
             $entry->firstname = $USER->firstname;
             $entry->lastname = $USER->lastname;
@@ -122,7 +124,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
         $user = $DB->get_record('user', array('id' => $entry->userid));
         $df = $this->_field->df();
         return html_writer::link(
-                new moodle_url('/user/view.php', 
+                new moodle_url('/user/view.php',
                         array('id' => $entry->userid, 'course' => $df->course->id)), fullname($user));
     }
 
@@ -130,7 +132,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
      */
     public function display_firstname($entry) {
         global $USER;
-        
+
         if ($entry->id < 0) { // new entry
             return $USER->firstname;
         } else {
@@ -142,7 +144,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
      */
     public function display_lastname($entry) {
         global $USER;
-        
+
         if ($entry->id < 0) { // new entry
             return $USER->lastname;
         } else {
@@ -154,7 +156,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
      */
     public function display_username($entry) {
         global $USER;
-        
+
         if ($entry->id < 0) { // new entry
             return $USER->username;
         } else {
@@ -166,7 +168,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
      */
     public function display_id($entry) {
         global $USER;
-        
+
         if ($entry->id < 0) { // new entry
             return $USER->id;
         } else {
@@ -178,7 +180,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
      */
     public function display_idnumber($entry) {
         global $USER;
-        
+
         if ($entry->id < 0) { // new entry
             return $USER->idnumber;
         } else {
@@ -190,7 +192,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
      */
     public function display_picture($entry, $large = false) {
         global $USER, $OUTPUT;
-        
+
         if ($entry->id < 0) { // new entry
             $user = $USER;
         } else {
@@ -203,7 +205,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
                 }
             }
         }
-        
+
         $pictureparams = array('courseid' => $this->_field->df()->course->id);
         if ($large) {
             $pictureparams['size'] = 100;
@@ -215,7 +217,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
      */
     public function display_email($entry) {
         global $USER;
-        
+
         if ($entry->id < 0) { // new entry
             return $USER->email;
         } else {
@@ -229,7 +231,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
     protected function patterns() {
         $fieldinternalname = $this->_field->get('internalname');
         $cat = get_string('authorinfo', 'datalynx');
-        
+
         $patterns = array();
         $patterns["##author:{$fieldinternalname}##"] = array(true, $cat);
         // for user name add edit tag
@@ -240,7 +242,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
         if ($fieldinternalname == 'picture') {
             $patterns["##author:picturelarge##"] = array(true, $cat);
         }
-        
+
         return $patterns;
     }
 }

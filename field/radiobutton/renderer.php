@@ -18,14 +18,13 @@
  *
  * @package datalynxfield
  * @subpackage radiobutton
- * @copyright 2014 Ivan Šakić 
+ * @copyright 2014 Ivan Šakić
  * @copyright 2016 David Bogner
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once (dirname(__FILE__) . "/../select/renderer.php");
-
+require_once(dirname(__FILE__) . "/../select/renderer.php");
 
 /**
  * Class datalynxfield_radiobutton_renderer Renderer for radiobutton field type
@@ -46,14 +45,14 @@ class datalynxfield_radiobutton_renderer extends datalynxfield_select_renderer {
         $fieldname = "field_{$fieldid}_$entryid";
         $required = !empty($options['required']);
         $selected = !empty($entry->{"c{$fieldid}_content"}) ? (int) $entry->{"c{$fieldid}_content"} : 0;
-        
+
         // check for default value
         if (!$selected and $defaultval = $field->get('param2')) {
             $selected = (int) array_search($defaultval, $menuoptions);
         }
-        
+
         $separator = $field->separators[(int) $field->get('param2')]['chr'];
-        
+
         $elemgrp = array();
         foreach ($menuoptions as $id => $option) {
             $radio = &$mform->createElement('radio', $fieldname, $separator, $option, $id);
@@ -62,11 +61,11 @@ class datalynxfield_radiobutton_renderer extends datalynxfield_select_renderer {
             }
             $elemgrp[] = $radio;
         }
-        
+
         $mform->addGroup($elemgrp, "{$fieldname}_group", null, $separator, false);
-        
+
         $mform->setDefaults(array($fieldname => (int) $selected));
-        
+
         if ($required) {
             $mform->addRule("{$fieldname}_group", null, 'required', null, 'client');
         }

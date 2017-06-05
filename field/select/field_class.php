@@ -21,15 +21,14 @@
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ($CFG->dirroot . "/mod/datalynx/field/field_class.php");
-
+require_once($CFG->dirroot . "/mod/datalynx/field/field_class.php");
 
 class datalynxfield_select extends datalynxfield_option_single {
 
     public $type = 'select';
 
     /**
-     * 
+     *
      * {@inheritDoc}
      * @see datalynxfield_base::get_sql_compare_text()
      */
@@ -37,23 +36,23 @@ class datalynxfield_select extends datalynxfield_option_single {
         global $DB;
         return $DB->sql_compare_text("c{$this->field->id}.$column", 255);
     }
-    
+
     /**
-     * 
+     *
      * {@inheritDoc}
      * @see datalynxfield_base::get_search_value()
      */
     public function get_search_value($value) {
-    	$options = $this->options_menu();
-    	if ($key = array_search($value, $options)) {
-    		return $key;
-    	} else {
-    		return '';
-    	}
+        $options = $this->options_menu();
+        if ($key = array_search($value, $options)) {
+            return $key;
+        } else {
+            return '';
+        }
     }
 
     /**
-     * 
+     *
      * {@inheritDoc}
      * @see datalynxfield_base::prepare_import_content()
      */
@@ -65,13 +64,15 @@ class datalynxfield_select extends datalynxfield_option_single {
             $csvname = $importsettings[$fieldname]['name'];
             $allownew = !empty($importsettings[$fieldname]['allownew']) ? true : false;
             $label = !empty($csvrecord[$csvname]) ? $csvrecord[$csvname] : null;
-            
+
             if ($label) {
                 $options = $this->options_menu();
                 if ($optionkey = array_search($label, $options)) {
                     $data->{"field_{$fieldid}_{$entryid}_selected"} = $optionkey;
-                } else if ($allownew) {
-                    $data->{"field_{$fieldid}_{$entryid}_newvalue"} = $label;
+                } else {
+                    if ($allownew) {
+                        $data->{"field_{$fieldid}_{$entryid}_newvalue"} = $label;
+                    }
                 }
             }
         }

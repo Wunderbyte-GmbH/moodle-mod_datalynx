@@ -21,8 +21,7 @@
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ("$CFG->dirroot/mod/datalynx/field/field_class.php");
-
+require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
 class datalynxfield_url extends datalynxfield_base {
 
@@ -51,9 +50,9 @@ class datalynxfield_url extends datalynxfield_base {
         // old contents
         if (isset($entry->{"c{$fieldid}_content"})) {
             $oldcontents[] = isset($entry->{"c$fieldid" . '_content'}) ? $entry->{"c$fieldid" .
-                     '_content'} : null;
+            '_content'} : null;
             $oldcontents[] = isset($entry->{"c$fieldid" . '_content1'}) ? $entry->{"c$fieldid" .
-                     '_content1'} : null;
+            '_content1'} : null;
         }
         // new contents
         $url = $alttext = null;
@@ -97,7 +96,7 @@ class datalynxfield_url extends datalynxfield_base {
     }
 
     public function get_supported_search_operators() {
-        return array('' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'), 
-            'LIKE' => get_string('contains', 'datalynx'));
+        return array('' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
+                'LIKE' => get_string('contains', 'datalynx'));
     }
 }

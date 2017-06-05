@@ -3,25 +3,25 @@ Feature: Check if visible will be saved
 
   Background:
     Given the following "courses" exist:
-      | fullname  | shortname   | category  | groupmode   |
-      | Course 1  | C1          | 0         | 1           |
+      | fullname | shortname | category | groupmode |
+      | Course 1 | C1        | 0        | 1         |
     And the following "users" exist:
-      | username  | firstname   | lastname  | email                   |
-      | teacher1  | Teacher     | 1         | teacher1@mailinator.com |
+      | username | firstname | lastname | email                   |
+      | teacher1 | Teacher   | 1        | teacher1@mailinator.com |
     And the following "course enrolments" exist:
-      | user      | course  | role            |
-      | teacher1  | C1      | editingteacher  |
+      | user     | course | role           |
+      | teacher1 | C1     | editingteacher |
     And the following "activities" exist:
       | activity | course | idnumber | name                   |
       | datalynx | C1     | 12345    | Datalynx Test Instance |
     And "Datalynx Test Instance" has following fields:
-      | type        | name    | param1 |
-      | text        | Text    |        |
+      | type | name | param1 |
+      | text | Text |        |
     And "Datalynx Test Instance" has following views:
-      | type    | name        | status  | redirect    | filter      |
-      | grid    | DefaultView | default | DefaultView |             |
-      
-      
+      | type | name        | status  | redirect    | filter |
+      | grid | DefaultView | default | DefaultView |        |
+
+
   Scenario: Remove Visibility
     Given I log in as "teacher1"
     And I follow "Course 1"

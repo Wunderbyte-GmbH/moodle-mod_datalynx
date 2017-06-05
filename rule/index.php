@@ -20,25 +20,25 @@
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ('../../../config.php');
-require_once ('../mod_class.php');
+require_once('../../../config.php');
+require_once('../mod_class.php');
 
 $urlparams = new stdClass();
 
 $urlparams->d = optional_param('d', 0, PARAM_INT); // datalynx id
 $urlparams->id = optional_param('id', 0, PARAM_INT); // course module id
 $urlparams->rid = optional_param('rid', -1, PARAM_INT); // update rule id
-                                                                
+
 // rules list actions
 $urlparams->new = optional_param('new', 0, PARAM_INT); // new rule
 
 $urlparams->enabled = optional_param('enabled', 0, PARAM_INT); // rule enabled/disabled flag
 $urlparams->redit = optional_param('redit', 0, PARAM_SEQUENCE); // ids (comma delimited) of
-                                                                    // rules to delete
+// rules to delete
 $urlparams->delete = optional_param('delete', 0, PARAM_SEQUENCE); // ids (comma delimited) of
-                                                                      // rules to delete
+// rules to delete
 $urlparams->duplicate = optional_param('duplicate', 0, PARAM_SEQUENCE); // ids (comma delimited) of
-                                                                         // rules to duplicate
+// rules to duplicate
 
 $urlparams->confirmed = optional_param('confirmed', 0, PARAM_INT);
 
@@ -61,18 +61,24 @@ $rm = $df->get_rule_manager();
 // DATA PROCESSING
 if ($urlparams->duplicate and confirm_sesskey()) { // Duplicate any requested rules
     $rm->process_rules('duplicate', $urlparams->duplicate, $urlparams->confirmed);
-} else if ($urlparams->delete and confirm_sesskey()) { // Delete any requested rules
-    $rm->process_rules('delete', $urlparams->delete, $urlparams->confirmed);
-} else if ($urlparams->enabled and confirm_sesskey()) { // set rule to enabled/disabled
-    $rm->process_rules('enabled', $urlparams->enabled, true); // confirmed by default
-} else if ($urlparams->update and confirm_sesskey()) { // Add/update a new rule
-    $rm->process_rules('update', $urlparams->rid, true);
+} else {
+    if ($urlparams->delete and confirm_sesskey()) { // Delete any requested rules
+        $rm->process_rules('delete', $urlparams->delete, $urlparams->confirmed);
+    } else {
+        if ($urlparams->enabled and confirm_sesskey()) { // set rule to enabled/disabled
+            $rm->process_rules('enabled', $urlparams->enabled, true); // confirmed by default
+        } else {
+            if ($urlparams->update and confirm_sesskey()) { // Add/update a new rule
+                $rm->process_rules('update', $urlparams->rid, true);
+            }
+        }
+    }
 }
 
 // any notifications?
 if (!$rules = $rm->get_rules()) {
     $df->notifications['bad'][] = get_string('rulesnoneindatalynx', 'datalynx'); // nothing in
-                                                                                // datalynx
+    // datalynx
 }
 
 // print header

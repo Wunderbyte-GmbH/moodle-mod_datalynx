@@ -24,7 +24,6 @@ require_once $CFG->libdir . '/formslib.php';
 HTML_QuickForm::registerElementType('checkboxgroup',
         "$CFG->dirroot/mod/datalynx/checkboxgroup/checkboxgroup.php", 'HTML_QuickForm_checkboxgroup');
 
-
 /**
  */
 class datalynx_field_behavior_form extends moodleform {
@@ -42,67 +41,67 @@ class datalynx_field_behavior_form extends moodleform {
 
     protected function definition() {
         $mform = &$this->_form;
-        
+
         $new = !required_param('id', PARAM_INT);
-        
+
         $mform->addElement('hidden', 'id', 0);
         $mform->setType('id', PARAM_INT);
         $mform->addElement('hidden', 'd', $this->datalynx->id());
         $mform->setType('d', PARAM_INT);
-        
+
         $mform->addElement('header', 'general', get_string('general', 'form'));
-        
+
         $mform->addElement('text', 'name', get_string('name'), array('size' => '32'));
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
-        $mform->addRule('name', "Behavior name may not contain the pipe symbol \" | \"!", 'regex', 
+        $mform->addRule('name', "Behavior name may not contain the pipe symbol \" | \"!", 'regex',
                 '/^[^\|]+$/', 'client');
-        
+
         $mform->addElement('text', 'description', get_string('description'), array('size' => '64'));
         $mform->setType('description', PARAM_TEXT);
-        
+
         // ----- VISIBILITY OPTIONS -----
-        
+
         $mform->addElement('header', 'visibilityoptions', get_string('visibility', 'datalynx'));
         $mform->setExpanded('visibilityoptions');
-        
-        $mform->addElement('checkboxgroup', 'visibleto', get_string('roles'), 
-                $this->datalynx->get_datalynx_permission_names(false, false), 
+
+        $mform->addElement('checkboxgroup', 'visibleto', get_string('roles'),
+                $this->datalynx->get_datalynx_permission_names(false, false),
                 $this->get_permissions_menu_separators());
         $mform->setType('visibleto', PARAM_RAW);
         if ($new) {
-            $mform->setDefault('visibleto', 
-                    array(datalynx::PERMISSION_MANAGER, datalynx::PERMISSION_TEACHER, 
-                        datalynx::PERMISSION_STUDENT));
+            $mform->setDefault('visibleto',
+                    array(datalynx::PERMISSION_MANAGER, datalynx::PERMISSION_TEACHER,
+                            datalynx::PERMISSION_STUDENT));
         }
-        
+
         // ----- EDITING OPTIONS -----
-        
+
         $mform->addElement('header', 'editing', get_string('editing', 'datalynx'));
         $mform->setExpanded('editing');
-        
+
         $mform->addElement('advcheckbox', 'editable', get_string('editable', 'datalynx'));
         if ($new) {
             $mform->setDefault('editable', true);
         }
-        
-        $mform->addElement('checkboxgroup', 'editableby', get_string('editableby', 'datalynx'), 
-                $this->datalynx->get_datalynx_permission_names(false, false), 
+
+        $mform->addElement('checkboxgroup', 'editableby', get_string('editableby', 'datalynx'),
+                $this->datalynx->get_datalynx_permission_names(false, false),
                 $this->get_permissions_menu_separators());
         $mform->setType('editableby', PARAM_RAW);
         if ($new) {
-            $mform->setDefault('editableby', 
-                    array(datalynx::PERMISSION_MANAGER, datalynx::PERMISSION_TEACHER, 
-                        datalynx::PERMISSION_STUDENT));
+            $mform->setDefault('editableby',
+                    array(datalynx::PERMISSION_MANAGER, datalynx::PERMISSION_TEACHER,
+                            datalynx::PERMISSION_STUDENT));
         }
         $mform->disabledIf('editableby', 'editable', 'notchecked');
-        
+
         $mform->addElement('advcheckbox', 'required', get_string('required', 'datalynx'));
         if ($new) {
             $mform->setDefault('required', false);
         }
         $mform->disabledIf('required', 'editable', 'notchecked');
-        
+
         $this->add_action_buttons();
     }
 

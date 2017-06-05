@@ -25,16 +25,15 @@ namespace mod_datalynx\event;
 
 defined('MOODLE_INTERNAL') || die();
 
-
 /**
  * The mod_datalynx entry disapproved event class.
  *
  * @property-read array $other {
  *                Extra information about event.
- *               
+ *
  *                - int dataid: the id of the datalynx activity.
  *                }
- *               
+ *
  * @package mod_datalynx
  * @since Moodle 2.7
  * @copyright 2015 Ivan Šakić <ivan.sakic3@gmail.com>
@@ -69,8 +68,8 @@ class entry_disapproved extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '$this->userid' disapproved the datalynx entry with " .
-            "id '$this->objectid' for the datalynx activity " .
-                 "with the course module id '$this->contextinstanceid'.";
+        "id '$this->objectid' for the datalynx activity " .
+        "with the course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -79,7 +78,7 @@ class entry_disapproved extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/mod/datalynx/view.php', 
+        return new \moodle_url('/mod/datalynx/view.php',
                 array('d' => $this->other['dataid'], 'rid' => $this->objectid));
     }
 
@@ -89,9 +88,9 @@ class entry_disapproved extends \core\event\base {
      * @return array
      */
     public function get_legacy_logdata() {
-        return array($this->courseid, 'datalynx', 'entry_disapproved', 
-            'view.php?d=' . $this->other['dataid'] . '&amp;eid=' . $this->objectid, 
-            $this->other['dataid'], $this->contextinstanceid);
+        return array($this->courseid, 'datalynx', 'entry_disapproved',
+                'view.php?d=' . $this->other['dataid'] . '&amp;eid=' . $this->objectid,
+                $this->other['dataid'], $this->contextinstanceid);
     }
 
     /**
@@ -102,7 +101,7 @@ class entry_disapproved extends \core\event\base {
      */
     protected function validate_data() {
         parent::validate_data();
-        
+
         if (!isset($this->other['dataid'])) {
             throw new \coding_exception('The \'dataid\' value must be set in other.');
         }

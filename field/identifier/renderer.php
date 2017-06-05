@@ -23,8 +23,7 @@
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once ("$CFG->dirroot/mod/datalynx/field/renderer.php");
-
+require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
  */
@@ -34,12 +33,12 @@ class datalynxfield_identifier_renderer extends datalynxfield_renderer {
         $field = $this->_field;
         $fieldid = $field->id();
         $entryid = $entry->id;
-        
+
         $content = '';
         if ($entryid > 0 and !empty($entry->{"c{$fieldid}_content"})) {
             $content = $entry->{"c{$fieldid}_content"};
         }
-        
+
         // Include reference to field in entry form only when there is no content
         // so as to generate once
         if (empty($content)) {
@@ -52,25 +51,25 @@ class datalynxfield_identifier_renderer extends datalynxfield_renderer {
     public function render_display_mode(stdClass $entry, array $params) {
         $field = $this->_field;
         $fieldid = $field->id();
-        
+
         $content = '';
         if (isset($entry->{"c{$fieldid}_content"})) {
             $content = strtoupper($entry->{"c{$fieldid}_content"});
         }
-        
+
         return $content;
     }
 
     public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
         $fieldid = $this->_field->id();
         $fieldname = "f_{$i}_$fieldid";
-        
+
         $arr = array();
         $arr[] = &$mform->createElement('text', $fieldname, null, array('size' => '32'));
         $mform->setType($fieldname, PARAM_NOTAGS);
         $mform->setDefault($fieldname, $value);
         $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
-        
+
         return array($arr, null);
     }
 }

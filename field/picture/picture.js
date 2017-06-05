@@ -24,7 +24,7 @@
 
 M.datalynxfield_picture = {};
 
-M.datalynxfield_picture.init = function(Y) {
+M.datalynxfield_picture.init = function (Y) {
     Shadowbox.init({});
 }
 

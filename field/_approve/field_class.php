@@ -21,8 +21,7 @@
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ("$CFG->dirroot/mod/datalynx/field/field_class.php");
-
+require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
 class datalynxfield__approve extends datalynxfield_no_content {
 
@@ -34,11 +33,11 @@ class datalynxfield__approve extends datalynxfield_no_content {
      */
     public static function get_field_objects($dataid) {
         $fieldobjects = array();
-        
-        $fieldobjects[self::_APPROVED] = (object) array('id' => self::_APPROVED, 
-            'dataid' => $dataid, 'type' => '_approve', 'name' => get_string('approved', 'datalynx'), 
-            'description' => '', 'visible' => 2, 'internalname' => 'approved');
-        
+
+        $fieldobjects[self::_APPROVED] = (object) array('id' => self::_APPROVED,
+                'dataid' => $dataid, 'type' => '_approve', 'name' => get_string('approved', 'datalynx'),
+                'description' => '', 'visible' => 2, 'internalname' => 'approved');
+
         return $fieldobjects;
     }
 

@@ -21,8 +21,7 @@
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ("$CFG->dirroot/mod/datalynx/field/field_class.php");
-
+require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
 class datalynxfield_gradeitem extends datalynxfield_base {
 
@@ -52,10 +51,10 @@ class datalynxfield_gradeitem extends datalynxfield_base {
      */
     public function set_field($forminput = null) {
         global $DB;
-        
+
         $itemid = !empty($this->field->param1) ? $this->field->param1 : null;
         parent::set_field($forminput);
-        
+
         if ($this->field->param1 and ($this->field->param1 != $itemid or !$this->field->param2)) {
             $gradeiteminfo = 'id,itemname,itemtype,itemmodule,iteminstance';
             if ($item = $DB->get_record('grade_items', array('id' => $this->field->param1), $gradeiteminfo)) {
@@ -79,7 +78,7 @@ class datalynxfield_gradeitem extends datalynxfield_base {
      */
     protected function get_sql_compare_text($column = 'content') {
         global $DB;
-        
+
         return $DB->sql_compare_text("c{$this->field->id}.finalgrade");
     }
 

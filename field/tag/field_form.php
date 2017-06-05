@@ -21,14 +21,14 @@
  * @copyright 2016 David Bogner
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ("$CFG->dirroot/mod/datalynx/field/field_form.php");
-
+require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
 class datalynxfield_tag_form extends datalynxfield_form {
 
     /**
      * The first option for this field is whether to make tags standard tags or not
      * {@inheritDoc}
+     *
      * @see datalynxfield_form::field_definition()
      */
     function field_definition() {

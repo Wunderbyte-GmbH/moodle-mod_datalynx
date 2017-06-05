@@ -25,15 +25,15 @@
  */
 M.datalynxfield_coursegroup_load_course_groups = {};
 
-M.datalynxfield_coursegroup_load_course_groups.init = function(Y, options) {
-    YUI().use('node-base', 'event-base', 'io-base', function(Y) {
+M.datalynxfield_coursegroup_load_course_groups.init = function (Y, options) {
+    YUI().use('node-base', 'event-base', 'io-base', function (Y) {
         // get field name from options
         var coursefield = options.coursefield;
         var groupfield = options.groupfield;
-        var groupidfield = options.groupfield+'id';
+        var groupidfield = options.groupfield + 'id';
         var actionurl = options.acturl;
 
-        Y.on('change', function(e) {
+        Y.on('change', function (e) {
 
             // get group select
             var group = Y.Node.one('#id_' + groupfield);
@@ -44,39 +44,39 @@ M.datalynxfield_coursegroup_load_course_groups.init = function(Y, options) {
             // remove options (but first choose) from group select
             var optionchoose = group.get('options').item(0);
             group.setContent(optionchoose);
-            group.set('selectedIndex', 0);           
+            group.set('selectedIndex', 0);
 
             // load groups from course
             if (courseid != 0) {
 
                 Y.io(actionurl, {
                     method: 'POST',
-                    data: 'courseid='+courseid,
+                    data: 'courseid=' + courseid,
                     on: {
                         success: function (id, o) {
                             if (o.responseText != '') {
                                 // add options
                                 var groupoptions = group.get('options');
                                 var respoptions = o.responseText.split(',');
-		                        for (var i=0;i<respoptions.length;++i) {
-		                            var arr = respoptions[i].trim().split(' ');
+                                for (var i = 0; i < respoptions.length; ++i) {
+                                    var arr = respoptions[i].trim().split(' ');
                                     var qid = arr.shift();
                                     var qname = arr.join(' ');
-		                            group.append(Y.Node.create('<option value="'+qid+'">'+qname+'</option>'));
-	                            }
+                                    group.append(Y.Node.create('<option value="' + qid + '">' + qname + '</option>'));
+                                }
                             }
                         },
                         failure: function (id, o) {
-		                    // do something
+                            // do something
                         }
                     }
                 });
 
             }
-        }, '#id_'+ coursefield);
+        }, '#id_' + coursefield);
 
 
-        Y.on('change', function(e) {
+        Y.on('change', function (e) {
 
             // get groupid field
             var group = Y.Node.one('#id_' + groupidfield);
@@ -86,6 +86,6 @@ M.datalynxfield_coursegroup_load_course_groups.init = function(Y, options) {
 
             // assign to groupid
             group.set('value', gid);
-        }, '#id_'+ groupfield);
-    });        
+        }, '#id_' + groupfield);
+    });
 };

@@ -23,8 +23,7 @@
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once ("$CFG->dirroot/mod/datalynx/field/renderer.php");
-
+require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
  */
@@ -36,7 +35,7 @@ class datalynxfield_entrygroup_renderer extends datalynxfield_renderer {
         $field = $this->_field;
         $fieldname = $field->get('internalname');
         $edit = !empty($options['edit']) ? $options['edit'] : false;
-        
+
         // set the group object
         $group = new stdClass();
         if ($entry->id < 0) { // new record (0)
@@ -51,9 +50,9 @@ class datalynxfield_entrygroup_renderer extends datalynxfield_renderer {
             $group->hidepicture = $entry->grouphidepic;
             $group->picture = $entry->grouppic;
         }
-        
+
         $replacements = array();
-        
+
         foreach ($tags as $tag) {
             $replacements[$tag] = '';
             switch (trim($tag, '@')) {
@@ -62,32 +61,33 @@ class datalynxfield_entrygroup_renderer extends datalynxfield_renderer {
                         $replacements[$tag] = array('html', $group->id);
                     }
                     break;
-                
+
                 case '##group:name##':
                     $replacements[$tag] = array('html', $group->name);
                     break;
-                
+
                 // case '##group:description##':
                 // $replacements[$tag] = array('html', $group->description);
                 // break;
-                
+
                 case '##group:picture##':
-                    $replacements[$tag] = array('html', 
-                        print_group_picture($group, $field->df()->course->id, false, true)
+                    $replacements[$tag] = array('html',
+                            print_group_picture($group, $field->df()->course->id, false, true)
                     );
                     break;
-                
+
                 case '##group:picturelarge##':
-                    $replacements[$tag] = array('html', 
-                        print_group_picture($group, $field->df()->course->id, true, true)
+                    $replacements[$tag] = array('html',
+                            print_group_picture($group, $field->df()->course->id, true, true)
                     );
                     break;
-                
+
                 case '##group:edit##':
-                    if ($edit and has_capability('mod/datalynx:manageentries', 
-                            $field->df()->context)) {
-                        $replacements[$tag] = array('', 
-                            array(array($this, 'display_edit'), array($entry))
+                    if ($edit and has_capability('mod/datalynx:manageentries',
+                                    $field->df()->context)
+                    ) {
+                        $replacements[$tag] = array('',
+                                array(array($this, 'display_edit'), array($entry))
                         );
                     } else {
                         $replacements[$tag] = array('html', $group->name);
@@ -95,7 +95,7 @@ class datalynxfield_entrygroup_renderer extends datalynxfield_renderer {
                     break;
             }
         }
-        
+
         return $replacements;
     }
 
@@ -106,7 +106,7 @@ class datalynxfield_entrygroup_renderer extends datalynxfield_renderer {
         $fieldid = $field->id();
         $entryid = $entry->id;
         $fieldname = "field_{$fieldid}_{$entryid}";
-        
+
         $selected = $entry->groupid;
         static $groupsmenu = null;
         if (is_null($groupsmenu)) {
@@ -117,7 +117,7 @@ class datalynxfield_entrygroup_renderer extends datalynxfield_renderer {
                 }
             }
         }
-        
+
         $mform->addElement('select', $fieldname, null, $groupsmenu);
         $mform->setDefault($fieldname, $selected);
     }
@@ -127,7 +127,7 @@ class datalynxfield_entrygroup_renderer extends datalynxfield_renderer {
      */
     protected function patterns() {
         $cat = get_string('groupinfo', 'datalynx');
-        
+
         $patterns = array();
         $patterns['##group:id##'] = array(true, $cat);
         $patterns['##group:name##'] = array(true, $cat);
@@ -135,7 +135,7 @@ class datalynxfield_entrygroup_renderer extends datalynxfield_renderer {
         $patterns['##group:picture##'] = array(true, $cat);
         $patterns['##group:picturelarge##'] = array(false, $cat);
         $patterns['##group:edit##'] = array(true, $cat);
-        
+
         return $patterns;
     }
 }

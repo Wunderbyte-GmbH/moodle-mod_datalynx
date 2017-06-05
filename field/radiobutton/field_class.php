@@ -21,17 +21,16 @@
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ("$CFG->dirroot/mod/datalynx/field/select/field_class.php");
-
+require_once("$CFG->dirroot/mod/datalynx/field/select/field_class.php");
 
 class datalynxfield_radiobutton extends datalynxfield_select {
 
     public $type = 'radiobutton';
 
     public $separators = array(array('name' => 'New line', 'chr' => '<br />'),
-        array('name' => 'Space', 'chr' => '&#32;'),
-        array('name' => ',', 'chr' => '&#44;'),
-        array('name' => ', (with space)', 'chr' => '&#44;&#32;')
+            array('name' => 'Space', 'chr' => '&#32;'),
+            array('name' => ',', 'chr' => '&#44;'),
+            array('name' => ', (with space)', 'chr' => '&#44;&#32;')
     );
-    
+
 }

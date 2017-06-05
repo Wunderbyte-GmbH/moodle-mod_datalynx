@@ -23,16 +23,14 @@
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once ("$CFG->dirroot/mod/datalynx/filter/filter_class.php");
-require_once ("$CFG->dirroot/mod/datalynx/field/renderer.php");
-require_once ("$CFG->dirroot/mod/datalynx/field/entryauthor/field_class.php");
-require_once ("$CFG->dirroot/mod/datalynx/field/entrygroup/field_class.php");
-
+require_once("$CFG->dirroot/mod/datalynx/filter/filter_class.php");
+require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
+require_once("$CFG->dirroot/mod/datalynx/field/entryauthor/field_class.php");
+require_once("$CFG->dirroot/mod/datalynx/field/entrygroup/field_class.php");
 
 /**
  */
 class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
-
 
     /*
      * Rendering this field in display mode
@@ -41,16 +39,18 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
      * array @params     the type of the display, "embedded" or "overlay" or "" for default
      * @returns          the function which displays this field-instance
      */
-	public function render_display_mode(stdClass $entry, array $params) {
-	    if(isset($params['embedded'])) {
-	        $type = "embedded";
-        } else if(isset($params['overlay'])) {
-            $type = "overlay";
+    public function render_display_mode(stdClass $entry, array $params) {
+        if (isset($params['embedded'])) {
+            $type = "embedded";
         } else {
-            $type = "";
+            if (isset($params['overlay'])) {
+                $type = "overlay";
+            } else {
+                $type = "";
+            }
         }
-		return $this->display_browse($entry, $type);
-	}
+        return $this->display_browse($entry, $type);
+    }
 
     /**
      * Check, which type of display, and call the right display-function
@@ -112,6 +112,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
      * The default display-method, just inline html
      * stdClass @entry          the entry object this field belongs to
      * array string @options    array of options for the display-method of the view
+     *
      * @returns                 the display-method of the view
      */
     protected function get_view_display_content($entry, array $options = array()) {
@@ -126,7 +127,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         // Search filter by entry author or group
         $foptions = $this->get_filter_by_options($foptions, $entry);
 
-        if(!isset($foptions['eids'])) {
+        if (!isset($foptions['eids'])) {
             return "";
         }
 
@@ -134,13 +135,13 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
 
         // Set the ref datalynx
         $params = array('js' => true, 'css' => true, 'modjs' => true, 'completion' => true,
-            'comments' => true);
+                'comments' => true);
 
         // Ref datalynx page type defaults to external
         $refpagetype = !empty($options['pagetype']) ? $options['pagetype'] : 'external';
         $pageoutput = $refdatalynx->set_page('external', $params, true);
 
-        $refview->set_content(array( 'filter' =>  $refview->get_filter()));
+        $refview->set_content(array('filter' => $refview->get_filter()));
         // Set to return html
         $options['tohtml'] = true;
         $options['fieldview'] = true;
@@ -151,6 +152,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
     /**
      * This display-method builds an iframe which holds a page with the view
      * stdClass @entry          the entry object this field belongs to
+     *
      * @returns                 the moodle display-method for an iframe
      */
     protected function get_view_display_embedded($entry) {
@@ -163,7 +165,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         // Search filter by entry author or group or value
         $params = $this->get_filter_by_options($params, $entry, true);
 
-        if(!isset($params['eids'])) {
+        if (!isset($params['eids'])) {
             return "";
         }
 
@@ -171,7 +173,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
 
         // Frame
         $froptions = array('src' => $srcurl, 'width' => '100%', 'height' => '100%',
-            'style' => 'border:0;');
+                'style' => 'border:0;');
         $iframe = html_writer::tag('iframe', null, $froptions);
         return html_writer::tag('div', $iframe,
                 array('class' => "datalynxfield-datalynxview-$fieldname embedded"));
@@ -186,8 +188,8 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
 
         if (!$added) {
             $module = array('name' => 'M.datalynxfield_datalynxview_overlay',
-                'fullpath' => '/mod/datalynx/field/datalynxview/datalynxview.js',
-                'requires' => array('base', 'node')
+                    'fullpath' => '/mod/datalynx/field/datalynxview/datalynxview.js',
+                    'requires' => array('base', 'node')
             );
 
             $PAGE->requires->js_init_call('M.datalynxfield_datalynxview_overlay.init', null, false,
@@ -238,18 +240,19 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         // the content to search for.
         // Then we get the entry-IDs of the entries (eids) which match this content-value
         // end add them to the options array
-        if($fieldid = $field->field->param7) {  // field-ID of the external field
-            if($contents = $DB->get_fieldset_select('datalynx_contents','content',
-                'entryid = :entryid and fieldid = :fieldid',
-                    array('entryid' => $entry->id, 'fieldid' => $field->field->id))) {
+        if ($fieldid = $field->field->param7) {  // field-ID of the external field
+            if ($contents = $DB->get_fieldset_select('datalynx_contents', 'content',
+                    'entryid = :entryid and fieldid = :fieldid',
+                    array('entryid' => $entry->id, 'fieldid' => $field->field->id))
+            ) {
                 $contentsarr = explode(",", $contents[0]);
                 list($insql, $params) = $DB->get_in_or_equal($contentsarr, SQL_PARAMS_NAMED);
                 $params['fieldid'] = $fieldid;
                 $sql = 'SELECT  c.entryid
                         FROM    {datalynx_contents} c
                         WHERE   c.fieldid = :fieldid
-                        AND     c.content ' . $insql ;
-                if($eids = $DB->get_fieldset_sql($sql,$params)) {
+                        AND     c.content ' . $insql;
+                if ($eids = $DB->get_fieldset_sql($sql, $params)) {
                     $options['eids'] = implode(",", $eids);
                 }
 
@@ -285,7 +288,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
     }
 
     /**
-     * 
+     *
      * @param unknown $entry
      * @return unknown[]
      */
@@ -299,7 +302,8 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         }
 
         if (!$refdatalynx = $field->refdatalynx or !$refview = $field->refview or
-                 !$localview = $field->localview) {
+                !$localview = $field->localview
+        ) {
             return $soptions;
         }
 
@@ -317,16 +321,18 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
             $value = '';
             if (!$localfieldid = $localview->get_pattern_fieldid($localpattern)) {
                 $value = $localpattern;
-            } else if ($localfield = $field->df->get_field_from_id($localfieldid)) {
-                // Get the array of values for the patterns
-                if ($replacements = $localfield->renderer()->replacements(array($localpattern), $entry)) {
-                    // Take the first: array('html', value)
-                    $first = reset($replacements);
-                    // extract the value part
-                    $value = $first[1];
-                    // Make sure this is the search value
-                    // (select fields search by key)
-                    $value = $localfield->get_search_value($value);
+            } else {
+                if ($localfield = $field->df->get_field_from_id($localfieldid)) {
+                    // Get the array of values for the patterns
+                    if ($replacements = $localfield->renderer()->replacements(array($localpattern), $entry)) {
+                        // Take the first: array('html', value)
+                        $first = reset($replacements);
+                        // extract the value part
+                        $value = $first[1];
+                        // Make sure this is the search value
+                        // (select fields search by key)
+                        $value = $localfield->get_search_value($value);
+                    }
                 }
             }
 
@@ -341,7 +347,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
     }
 
     /**
-     * 
+     *
      * {@inheritDoc}
      * @see datalynxfield_renderer::patterns()
      */
@@ -356,7 +362,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
 
         return $patterns;
     }
-    
+
     /**
      *
      * {@inheritdoc}
@@ -364,27 +370,27 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
      * @see datalynxfield_renderer::render_edit_mode()
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options = null) {
-        
+
         /* @var $field datalynxfield_datalynxview */
         $field = $this->_field;
         // Do not show in edit mode, when nothing can be selected
-        if ($field->refdatalynx !== null && ! empty($field->field->param7)) {
-            
+        if ($field->refdatalynx !== null && !empty($field->field->param7)) {
+
             $fieldid = $field->id();
             $entryid = $entry->id;
             $fieldname = "field_{$fieldid}_$entryid";
             $classname = "datalynxview_{$fieldid}_{$entryid}";
             $required = !empty($options ['required']);
-            
+
             $selected = !empty($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : array();
             // A hidden field is added to autocomplete fields by parent Quickform element.
             // The value of the hidden field must be added as option in order to process an empty autocomplete field
             $menu = array("_qf__force_multiselect_submission" => "...");
             $menu = array_merge($menu, $field->refdatalynx->get_distinct_textfieldvalues_by_id($field->field->param7));
-            
-            $mform->addElement ('autocomplete', $fieldname, null, $menu, array(
+
+            $mform->addElement('autocomplete', $fieldname, null, $menu, array(
                     "class" => "datalynxfield_datalynxview $classname",
-                    "multiple" => "true" 
+                    "multiple" => "true"
             ));
             $mform->setType($fieldname, PARAM_NOTAGS);
             $mform->setDefault($fieldname, $selected);
@@ -393,7 +399,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
             }
         }
     }
-    
+
     /**
      *
      * {@inheritDoc}
@@ -401,19 +407,19 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
      */
     public function validate($entryid, $tags, $formdata) {
         $fieldid = $this->_field->id();
-    
+
         $formfieldname = "field_{$fieldid}_{$entryid}";
         $required = true;
-    
+
         $errors = array();
         foreach ($tags as $tag) {
-            list(, $behavior, ) = $this->process_tag($tag);
+            list(, $behavior,) = $this->process_tag($tag);
             /* @var $behavior datalynx_field_behavior */
             if ($behavior->is_required() AND (!isset($formdata->$formfieldname))) {
-                    $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
+                $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
             }
         }
-    
+
         return $errors;
     }
 }

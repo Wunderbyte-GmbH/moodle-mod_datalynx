@@ -21,10 +21,9 @@
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ($CFG->dirroot . '/mod/datalynx/field/field_class.php');
-require_once ($CFG->dirroot . '/lib/filelib.php');
-require_once ($CFG->dirroot . '/repository/lib.php');
-
+require_once($CFG->dirroot . '/mod/datalynx/field/field_class.php');
+require_once($CFG->dirroot . '/lib/filelib.php');
+require_once($CFG->dirroot . '/repository/lib.php');
 
 class datalynxfield_textarea extends datalynxfield_base {
 
@@ -34,11 +33,11 @@ class datalynxfield_textarea extends datalynxfield_base {
 
     public function __construct($df = 0, $field = 0) {
         parent::__construct($df, $field);
-        
+
         $trust = !empty($this->field->param4) ? $this->field->param4 : 0;
         $maxbytes = !empty($this->field->param5) ? $this->field->param5 : 0;
         $maxfiles = !empty($this->field->param6) ? $this->field->param6 : -1;
-        
+
         $this->editoroptions = array();
         $this->editoroptions['context'] = $this->df->context;
         $this->editoroptions['trusttext'] = $trust;
@@ -66,35 +65,35 @@ class datalynxfield_textarea extends datalynxfield_base {
      */
     public function update_content($entry, array $values = null) {
         global $DB;
-        
+
         $entryid = $entry->id;
         $fieldid = $this->field->id;
-        
+
         $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
-        
+
         if (empty($values)) {
             return true;
         }
-        
+
         $rec = new stdClass();
         $rec->fieldid = $fieldid;
         $rec->entryid = $entryid;
-        
+
         if (!$rec->id = $contentid) {
             $rec->id = $DB->insert_record('datalynx_contents', $rec);
         }
-        
+
         // Editor content
         if (false) { // $this->is_editor()
             $data = (object) $values;
             $data->{'editor_editor'} = $data->editor;
-            
-            $data = file_postupdate_standard_editor($data, 'editor', $this->editoroptions, 
+
+            $data = file_postupdate_standard_editor($data, 'editor', $this->editoroptions,
                     $this->df->context, 'mod_datalynx', 'content', $rec->id);
-            
+
             $rec->content = $data->editor;
             $rec->content1 = $data->{'editorformat'};
-            
+
             // Text area content
         } else {
             $value = reset($values);
@@ -104,7 +103,7 @@ class datalynxfield_textarea extends datalynxfield_base {
             }
             $rec->content = clean_param($value, PARAM_RAW);
         }
-        
+
         return $DB->update_record('datalynx_contents', $rec);
     }
 
@@ -118,9 +117,9 @@ class datalynxfield_textarea extends datalynxfield_base {
      */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
         $fieldid = $this->field->id;
-        
+
         parent::prepare_import_content($data, $importsettings, $csvrecord, $entryid);
-        
+
         // For editors reformat in editor structure
         if ($this->is_editor()) {
             if (isset($data->{"field_{$fieldid}_{$entryid}"})) {
@@ -137,7 +136,7 @@ class datalynxfield_textarea extends datalynxfield_base {
     }
 
     public function get_supported_search_operators() {
-        return array('' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'), 
-            'LIKE' => get_string('contains', 'datalynx'));
+        return array('' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
+                'LIKE' => get_string('contains', 'datalynx'));
     }
 }

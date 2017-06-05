@@ -21,24 +21,24 @@
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ('../../../config.php');
-require_once ('../mod_class.php');
-require_once ('preset_form.php');
+require_once('../../../config.php');
+require_once('../mod_class.php');
+require_once('preset_form.php');
 
 $urlparams = new stdClass();
 
 $urlparams->d = optional_param('d', 0, PARAM_INT); // datalynx id
 $urlparams->id = optional_param('id', 0, PARAM_INT); // course module id
-                                                     
+
 // presets list actions
 $urlparams->apply = optional_param('apply', 0, PARAM_INT); // path of preset to apply
 $urlparams->torestorer = optional_param('torestorer', 1, PARAM_INT); // apply user data to
-                                                                         // restorer
+// restorer
 $urlparams->map = optional_param('map', 0, PARAM_BOOL); // map new preset fields to old fields
 $urlparams->delete = optional_param('delete', '', PARAM_SEQUENCE); // ids of presets to delete
 $urlparams->share = optional_param('share', '', PARAM_SEQUENCE); // ids of presets to share
 $urlparams->download = optional_param('download', '', PARAM_SEQUENCE); // ids of presets to
-                                                                           // download in one zip
+// download in one zip
 
 $urlparams->confirmed = optional_param('confirmed', 0, PARAM_INT);
 
@@ -62,7 +62,7 @@ $sharedpresets = $pm->get_user_presets($pm::PRESET_SITEAREA);
 // any notifications
 if (!$localpresets and !$sharedpresets) {
     $df->notifications['bad'][] = get_string('presetnoneavailable', 'datalynx'); // No presets in
-                                                                                // datalynx
+    // datalynx
 }
 
 // print header

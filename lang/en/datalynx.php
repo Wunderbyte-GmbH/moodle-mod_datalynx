@@ -20,7 +20,7 @@
  *          $subpackage datalynx
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *         
+ *
  *          The Datalynx has been developed as an enhanced counterpart
  *          of Moodle's Database activity module (1.9.11+ (20110323)).
  *          To the extent that Datalynx code corresponds to Database code,
@@ -56,8 +56,10 @@ $string['commentsaved'] = 'Comment saved';
 $string['comments'] = 'Comments';
 $string['commentsn'] = '{$a} comments';
 $string['commentsnone'] = 'No comments';
-$string['configanonymousentries'] = 'This switch will enable the possibility of guest/anonymous entries for all datalynxs. You will still need to turn anonymous on manually in the settings for each datalynx.';
-$string['configenablerssfeeds'] = 'This switch will enable the possibility of RSS feeds for all datalynxs. You will still need to turn feeds on manually in the settings for each datalynx.';
+$string['configanonymousentries'] =
+        'This switch will enable the possibility of guest/anonymous entries for all datalynxs. You will still need to turn anonymous on manually in the settings for each datalynx.';
+$string['configenablerssfeeds'] =
+        'This switch will enable the possibility of RSS feeds for all datalynxs. You will still need to turn feeds on manually in the settings for each datalynx.';
 $string['configmaxentries'] = 'This value determines the maximum number of entries that may be added to a datalynx activity.';
 $string['configmaxfields'] = 'This value determines the maximum number of fields that may be added to a datalynx activity.';
 $string['configmaxfilters'] = 'This value determines the maximum number of filters that may be added to a datalynx activity.';
@@ -184,7 +186,8 @@ $string['fieldedits'] = 'Number of edits';
 $string['field'] = 'field';
 $string['fieldids'] = 'Field ids';
 $string['fieldlabel'] = 'Field label';
-$string['fieldlabel_help'] = 'The field label allows to specify a designated field label that can be added to the view by means of the [[fieldname@]] field pattern. This field pattern observes the field visibility and is hidden if the field is set to be hidden. The field label can also serve as a field display template and it interprets patterns of that field if included in the label. For example, with a number field called Number and the field label defined as \'You have earned [[Number]] credits.\' and an entry where the number value is 47 the pattern [[Number@]] would be displayed as \'You have earned 47 credits.\'';
+$string['fieldlabel_help'] =
+        'The field label allows to specify a designated field label that can be added to the view by means of the [[fieldname@]] field pattern. This field pattern observes the field visibility and is hidden if the field is set to be hidden. The field label can also serve as a field display template and it interprets patterns of that field if included in the label. For example, with a number field called Number and the field label defined as \'You have earned [[Number]] credits.\' and an entry where the number value is 47 the pattern [[Number@]] would be displayed as \'You have earned 47 credits.\'';
 $string['fieldmappings'] = 'Field Mappings';
 $string['fieldname'] = 'Field name';
 $string['fieldnew'] = 'New {$a} field';
@@ -210,7 +213,8 @@ $string['fieldvisibleall'] = 'Everyone';
 $string['fieldvisiblenone'] = 'Managers only';
 $string['fieldvisibleowner'] = 'Owner and managers';
 $string['fieldwidth'] = 'Width';
-$string['field_has_duplicate_entries'] = 'There are duplicate entries, therefore it\'s not possible to set this field to Unique:"Yes" at the moment!';
+$string['field_has_duplicate_entries'] =
+        'There are duplicate entries, therefore it\'s not possible to set this field to Unique:"Yes" at the moment!';
 $string['filemaxsize'] = 'Total size of uploded files';
 $string['filesmax'] = 'Max number of uploaded files';
 $string['filetypeany'] = 'Any file type';
@@ -271,7 +275,8 @@ $string['first'] = 'First';
 $string['formemptyadd'] = 'You did not fill out any fields!';
 $string['fromfile'] = 'Import from zip file';
 $string['generalactions'] = 'General actions';
-$string['getstarted'] = 'This datalynx appears to be new or with incomplete setup. To get the datalynx started <ul><li>apply a preset in the {$a->presets} section</li></ul> or <ul><li>add fields in the {$a->fields} section</li><li>add views in the {$a->views} section</li></ul>';
+$string['getstarted'] =
+        'This datalynx appears to be new or with incomplete setup. To get the datalynx started <ul><li>apply a preset in the {$a->presets} section</li></ul> or <ul><li>add fields in the {$a->fields} section</li><li>add views in the {$a->views} section</li></ul>';
 $string['grade'] = 'Grade';
 $string['gradeinputtype'] = 'Grade input type';
 $string['grading'] = 'Grading';
@@ -308,7 +313,8 @@ $string['mediafile'] = 'Media file';
 $string['reference'] = 'Reference';
 $string['min'] = 'Minimum';
 $string['modulename'] = 'Datalynx';
-$string['modulename_help'] = 'The datalynx module may be used for creating a wide range of activities/resources by allowing the instructor/manager to design and create a custom content form from various input elements (e.g.  texts, numbers, images, files, urls, etc.), and participants to submit content and view submitted content.';
+$string['modulename_help'] =
+        'The datalynx module may be used for creating a wide range of activities/resources by allowing the instructor/manager to design and create a custom content form from various input elements (e.g.  texts, numbers, images, files, urls, etc.), and participants to submit content and view submitted content.';
 $string['modulenameplural'] = 'Datalynxs';
 $string['more'] = 'More';
 $string['movezipfailed'] = 'Can\'t move zip';
@@ -545,7 +551,8 @@ $string['teamsize_help'] = 'Specify the maximum size of the team. It must be a p
 $string['teamsize_error_required'] = 'This field is required!';
 $string['teamsize_error_value'] = 'The value must be a positive integer!';
 $string['admissibleroles'] = 'Admissible roles';
-$string['admissibleroles_help'] = 'Users possessing any of the selected roles will be admissible to the team. At least one role must be selected.';
+$string['admissibleroles_help'] =
+        'Users possessing any of the selected roles will be admissible to the team. At least one role must be selected.';
 $string['admissibleroles_error'] = 'Please select at least one role!';
 $string['notifyteam'] = 'Notification rule';
 $string['notifyteam_help'] = 'Select notification rule to be applied to all team members selected in this field.';
@@ -566,10 +573,12 @@ $string['completionentries'] = 'Number of approved entries';
 $string['completionentriesgroup'] = 'Require approved entries';
 $string['completionentriesgroup_help'] = 'Make sure you enable approval for entries above!';
 $string['limitchoice'] = 'Limit choices for users';
-$string['limitchoice_help'] = 'Enable this to prevent a user from choosing the same option more than the chosen number in separate entries.';
+$string['limitchoice_help'] =
+        'Enable this to prevent a user from choosing the same option more than the chosen number in separate entries.';
 $string['limitchoice_error'] = 'You have already selected option \'{$a}\' the maximum allowed number of times!';
 $string['redirectsettings'] = 'Redirect on submit options';
-$string['redirectsettings_help'] = 'Use this fields to specify which view should the browser redirect to upon leaving the edit view.';
+$string['redirectsettings_help'] =
+        'Use this fields to specify which view should the browser redirect to upon leaving the edit view.';
 $string['redirectto'] = 'Target view';
 $string['targetview_this_new'] = 'This view (New)';
 $string['targetview_this'] = '(This view)';
@@ -622,9 +631,11 @@ $string['minteamsize_help'] = 'Enter the miminum allowed number of team members 
 $string['minteamsize_error_value'] = 'Minimum team size cannot be greater than the maximum team size!';
 $string['minteamsize_error_form'] = 'You must select at least {$a} team members!';
 $string['teamfield'] = 'Team field';
-$string['teamfield_help'] = 'Check this box to designate this field as a team field. When approving an entry with a specified team that entry will be copied and assigned to every team member. Only one field per Datalynx instance may be designated as a team field.';
+$string['teamfield_help'] =
+        'Check this box to designate this field as a team field. When approving an entry with a specified team that entry will be copied and assigned to every team member. Only one field per Datalynx instance may be designated as a team field.';
 $string['referencefield'] = 'Reference field';
-$string['referencefield_help'] = 'Select a field to serve as a duplicate prevention field. This will skip creating entries for users who already have an approved entry with the same field value as the one being approved.';
+$string['referencefield_help'] =
+        'Select a field to serve as a duplicate prevention field. This will skip creating entries for users who already have an approved entry with the same field value as the one being approved.';
 $string['linktoentry'] = 'Link to entry';
 $string['notifyteammembers'] = 'Notify team members';
 $string['notifyteammembers_help'] = 'Select this option to inform team members of their membership status change.';
@@ -796,7 +807,8 @@ $string['filterformadd'] = 'Add new filter form';
 $string['newfilterform'] = 'New filter form';
 
 // FILTER
-$string['avoidaddanddeletesimultaneously'] = 'You must not add and delete options in one step. First delete the options and save, then rename the options and save again.';
+$string['avoidaddanddeletesimultaneously'] =
+        'You must not add and delete options in one step. First delete the options and save, then rename the options and save again.';
 $string['empty'] = 'empty';
 $string['equal'] = 'equal';
 $string['between'] = 'between';
@@ -827,11 +839,15 @@ $string['unsubscribe'] = 'Unsubscribe';
 $string['allowsubscription'] = 'Allow manual subscription';
 $string['allowunsubscription'] = 'Allow manual unsubscription';
 $string['selectuser'] = 'Select user...';
-$string['allowsubscription_help'] = 'Check this option to enable users to add themselves to teams created by other people. This is facilitated via :subscribe tag extension, e.g. [[&lt;fieldname&gt;:subscribe]], which modifies the field to display an additional link in browse mode. By clicking on this link user can add themselves to the particular team, if they are able and allowed to by the field setup.';
-$string['allowunsubscription_help'] = 'Check this option to enable users to unsubscribe themselves from teams of other users in a manner similar to the \'Allow manual subscription option\'. If disabled, users on a team can only be removed by the user who created that team.';
-$string['user_can_add_self_help'] = 'Check this option to allow the user who owns the entry to add themselves to the team in this field.';
+$string['allowsubscription_help'] =
+        'Check this option to enable users to add themselves to teams created by other people. This is facilitated via :subscribe tag extension, e.g. [[&lt;fieldname&gt;:subscribe]], which modifies the field to display an additional link in browse mode. By clicking on this link user can add themselves to the particular team, if they are able and allowed to by the field setup.';
+$string['allowunsubscription_help'] =
+        'Check this option to enable users to unsubscribe themselves from teams of other users in a manner similar to the \'Allow manual subscription option\'. If disabled, users on a team can only be removed by the user who created that team.';
+$string['user_can_add_self_help'] =
+        'Check this option to allow the user who owns the entry to add themselves to the team in this field.';
 $string['check_enable'] = 'You must mark \'enable\' checkbox to confirm the validity of the selected value.';
-$string['deletefieldfilterwarning'] = 'Warning! You are attempting to delete following fields:{$a->fieldlist}However, filters listed below are still using some of these fields:{$a->filterlist}You will have to delete these filters manually first before you may proceed.';
+$string['deletefieldfilterwarning'] =
+        'Warning! You are attempting to delete following fields:{$a->fieldlist}However, filters listed below are still using some of these fields:{$a->filterlist}You will have to delete these filters manually first before you may proceed.';
 $string['noviewsavailable'] = 'No views available';
 
 $string['datalynx_team_updated'] = 'Team updated';
@@ -846,5 +862,7 @@ $string['datalynx:teamsubscribe'] = 'Subscribe to/join teams';
 $string['datalynx_csssaved'] = 'Custom CSS saved';
 $string['datalynx_jssaved'] = 'Custom JavaScript saved';
 
-$string['displaytemplate_help'] = 'Specify HTML template to replace the field tag in browse mode. To specify the position of the actual value, use #value tag within the template.';
-$string['edittemplate_help'] = 'Specify HTML template to replace the field tag in edit mode. To specify the position of the actual input element, use #input tag within the template.';
+$string['displaytemplate_help'] =
+        'Specify HTML template to replace the field tag in browse mode. To specify the position of the actual value, use #value tag within the template.';
+$string['edittemplate_help'] =
+        'Specify HTML template to replace the field tag in edit mode. To specify the position of the actual input element, use #input tag within the template.';

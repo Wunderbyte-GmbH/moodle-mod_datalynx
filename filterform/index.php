@@ -20,9 +20,9 @@
  * @copyright 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ('../../../config.php');
-require_once ('../mod_class.php');
-require_once ("$CFG->libdir/tablelib.php");
+require_once('../../../config.php');
+require_once('../mod_class.php');
+require_once("$CFG->libdir/tablelib.php");
 
 $urlparams = new stdClass();
 $urlparams->d = optional_param('d', 0, PARAM_INT);
@@ -46,9 +46,9 @@ $datalynx->print_header(array('tab' => 'filterforms', 'urlparams' => $urlparams)
 echo html_writer::empty_tag('br');
 echo html_writer::start_tag('div', array('class' => 'fieldadd mdl-align'));
 echo html_writer::link(
-        new moodle_url('/mod/datalynx/filterform/filterform_edit.php', 
+        new moodle_url('/mod/datalynx/filterform/filterform_edit.php',
                 array('d' => $datalynx->id(), 'sesskey' => sesskey(), 'id' => 0)),
-                    get_string('filterformadd', 'datalynx'));
+        get_string('filterformadd', 'datalynx'));
 echo html_writer::end_tag('div');
 echo html_writer::empty_tag('br');
 
@@ -56,9 +56,9 @@ $editbaseurl = '/mod/datalynx/filterform/filterform_edit.php';
 $linkparams = array('d' => $datalynx->id(), 'sesskey' => sesskey());
 
 // table headers
-$headers = array('name' => get_string('name'), 'description' => get_string('description'), 
-    'fields' => get_string('fields', 'datalynx'), 'edit' => get_string('edit'), 
-    'duplicate' => get_string('duplicate'), 'delete' => get_string('delete')
+$headers = array('name' => get_string('name'), 'description' => get_string('description'),
+        'fields' => get_string('fields', 'datalynx'), 'edit' => get_string('edit'),
+        'duplicate' => get_string('duplicate'), 'delete' => get_string('delete')
 );
 
 $table = new flexible_table('datalynxfilterformindex' . $datalynx->id());
@@ -71,7 +71,7 @@ $table->define_headers(array_values($headers));
 $table->sortable(false);
 
 // Column styles
-$table->set_attribute('class', 
+$table->set_attribute('class',
         'generaltable generalbox boxaligncenter boxwidthwide datalynx-filterforms');
 $table->set_attribute('data-sesskey', sesskey());
 $table->column_style('edit', 'text-align', 'center');
@@ -83,26 +83,26 @@ $table->setup();
 $filterforms = $DB->get_records('datalynx_filter_forms', array('dataid' => $datalynx->id()));
 
 foreach ($filterforms as $filterformid => $filterform) {
-    
+
     $filterformname = html_writer::link(
             new moodle_url($editbaseurl, $linkparams + array('id' => $filterformid)), $filterform->name);
     $filterformdescription = shorten_text($filterform->description, 30);
     $filterformfields = "[[FIELD LIST GOES HERE]]";
     $filterformedit = html_writer::link(
             new moodle_url($editbaseurl, $linkparams + array('id' => $filterformid)),
-                        $OUTPUT->pix_icon('t/edit', get_string('edit')));
+            $OUTPUT->pix_icon('t/edit', get_string('edit')));
     $filterformduplicate = html_writer::link(
-            new moodle_url($editbaseurl, 
+            new moodle_url($editbaseurl,
                     $linkparams + array('action' => 'duplicate', 'id' => $filterformid)),
-                        $OUTPUT->pix_icon('t/copy', get_string('duplicate')));
+            $OUTPUT->pix_icon('t/copy', get_string('duplicate')));
     $filterformdelete = html_writer::link(
-            new moodle_url($editbaseurl, 
+            new moodle_url($editbaseurl,
                     $linkparams + array('action' => 'delete', 'id' => $filterformid)),
-                        $OUTPUT->pix_icon('t/delete', get_string('delete')));
-    
+            $OUTPUT->pix_icon('t/delete', get_string('delete')));
+
     $table->add_data(
-            array($filterformname, $filterformdescription, $filterformfields, $filterformedit, 
-                $filterformduplicate, $filterformdelete));
+            array($filterformname, $filterformdescription, $filterformfields, $filterformedit,
+                    $filterformduplicate, $filterformdelete));
 }
 
 $table->finish_output();

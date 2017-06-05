@@ -24,7 +24,6 @@
  */
 defined('MOODLE_INTERNAL') or die();
 
-
 /**
  * Page module PHPUnit data generator class
  *
@@ -37,29 +36,29 @@ class mod_datalynx_generator extends testing_module_generator {
 
     /**
      * Create new datalynx module instance
-     * 
+     *
      * @param array|stdClass $record
      * @param array $options (mostly course_module properties)
      * @return stdClass activity record with extra cmid field
      */
     public function create_instance($record = null, array $options = null) {
         $record = (object) (array) $record;
-        
-        $defaults = array('intro' => NULL, 'introformat' => 0, 'timemodified' => 0, 
-            'timeavailable' => 0, 'timedue' => 0, 'timeinterval' => 0, 'intervalcount' => 1, 
-            'allowlate' => 0, 'grade' => 0, 'grademethod' => 0, 'anonymous' => 0, 
-            'notification' => 0, 'notificationformat' => 1, 'entriesrequired' => 0, 
-            'entriestoview' => 0, 'maxentries' => 0, 'timelimit' => -1, 'approval' => 0, 
-            'grouped' => 0, 'rating' => 0, 'singleedit' => 0, 'singleview' => 0, 'rssarticles' => 0, 
-            'rss' => 0, 'css' => null, 'cssincludes' => null, 'js' => null, 'jsincludes' => null, 
-            'defaultview' => 0, 'defaultfilter' => 0, 'completionentries' => 0);
-        
+
+        $defaults = array('intro' => null, 'introformat' => 0, 'timemodified' => 0,
+                'timeavailable' => 0, 'timedue' => 0, 'timeinterval' => 0, 'intervalcount' => 1,
+                'allowlate' => 0, 'grade' => 0, 'grademethod' => 0, 'anonymous' => 0,
+                'notification' => 0, 'notificationformat' => 1, 'entriesrequired' => 0,
+                'entriestoview' => 0, 'maxentries' => 0, 'timelimit' => -1, 'approval' => 0,
+                'grouped' => 0, 'rating' => 0, 'singleedit' => 0, 'singleview' => 0, 'rssarticles' => 0,
+                'rss' => 0, 'css' => null, 'cssincludes' => null, 'js' => null, 'jsincludes' => null,
+                'defaultview' => 0, 'defaultfilter' => 0, 'completionentries' => 0);
+
         foreach ($defaults as $name => $value) {
             if (!isset($record->{$name})) {
                 $record->{$name} = $value;
             }
         }
-        
+
         return parent::create_instance($record, (array) $options);
     }
 }

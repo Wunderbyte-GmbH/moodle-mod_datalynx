@@ -26,177 +26,169 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 #page-mod-datalynx-view #sortsearch .c0 {
-	text-align: right;
+    text-align: right;
 }
 
 #page-mod-datalynx-view .approve img.icon {
-	width: 34px;
-	height: 34px;
+    width: 34px;
+    height: 34px;
 }
 
 #page-mod-datalynx-view .approve img.icon {
-	width: 34px;
-	height: 34px;
+    width: 34px;
+    height: 34px;
 }
 
 #page-mod-datalynx-view .tabtree {
-	margin-bottom: 1em;
+    margin-bottom: 1em;
 }
 
 #page-mod-datalynx-view .singleselect {
-	margin: 0.5em 0;
+    margin: 0.5em 0;
 }
 
-#page-mod-datalynx-embed .entriesview, #page-mod-datalynx-view .entriesview
-	{
-	overflow: auto;
+#page-mod-datalynx-embed .entriesview, #page-mod-datalynx-view .entriesview {
+    overflow: auto;
 }
 
 #page-mod-datalynx-embed.gecko .mform fieldset.hidden,
-	#page-mod-datalynx-view.gecko .mform fieldset.hidden {
-	display: table-column;
+#page-mod-datalynx-view.gecko .mform fieldset.hidden {
+    display: table-column;
 }
 
 #page-mod-datalynx-embed .mform .entriesview fieldset.hidden,
-	#page-mod-datalynx-embed .mform .entriesview fieldset.hidden div,
-	#page-mod-datalynx-view .mform .entriesview fieldset.hidden,
-	#page-mod-datalynx-view .mform .entriesview fieldset.hidden div {
-	margin: 0;
-	padding: 0;
+#page-mod-datalynx-embed .mform .entriesview fieldset.hidden div,
+#page-mod-datalynx-view .mform .entriesview fieldset.hidden,
+#page-mod-datalynx-view .mform .entriesview fieldset.hidden div {
+    margin: 0;
+    padding: 0;
 }
 
 #page-mod-datalynx-embed .mform .fitem .fitemtitle,
-	#page-mod-datalynx-embed .mform .entriesview .fitem .fitemtitle,
-	/*#page-mod-datalynx-view .mform .fitem .fitemtitle,*/
-	#page-mod-datalynx-view .mform .entriesview .fitem .fitemtitle {
-	float: left;
-	text-align: left;
-	width: auto;
+#page-mod-datalynx-embed .mform .entriesview .fitem .fitemtitle,
+    /*#page-mod-datalynx-view .mform .fitem .fitemtitle,*/
+#page-mod-datalynx-view .mform .entriesview .fitem .fitemtitle {
+    float: left;
+    text-align: left;
+    width: auto;
 }
 
 #page-mod-datalynx-embed .mform .fitem .felement,
-	#page-mod-datalynx-embed .mform .entriesview .fitem .felement,
-	#page-mod-datalynx-embed .mform .entriesview .fitem .feditor,
-	/*#page-mod-datalynx-view .mform .fitem .felement,*/
-	#page-mod-datalynx-view .mform .entriesview .fitem .felement,
-	#page-mod-datalynx-view .mform .entriesview .fitem .feditor {
-	margin-left: 0;
-	width: 100%;
+#page-mod-datalynx-embed .mform .entriesview .fitem .felement,
+#page-mod-datalynx-embed .mform .entriesview .fitem .feditor,
+    /*#page-mod-datalynx-view .mform .fitem .felement,*/
+#page-mod-datalynx-view .mform .entriesview .fitem .felement,
+#page-mod-datalynx-view .mform .entriesview .fitem .feditor {
+    margin-left: 0;
+    width: 100%;
 }
 
 .mod-datalynx-field .c0 {
-	text-align: right;
+    text-align: right;
 }
 
 .mod-datalynx-field .fieldadd, .mod-datalynx-field .sortdefault {
-	margin-bottom: 1em;
-	margin-top: 1em;
+    margin-bottom: 1em;
+    margin-top: 1em;
 }
 
-.mod-datalynx-field .fieldadd select, .mod-datalynx-field .sortdefault select
-	{
-	margin-left: 1em;
+.mod-datalynx-field .fieldadd select, .mod-datalynx-field .sortdefault select {
+    margin-left: 1em;
 }
 
 .generaltable td.z_borderless, .generaltable th.z_borderless {
-	border: 0 none !important;
+    border: 0 none !important;
 }
 
 #page-mod-datalynx-embed {
-	margin: 0;
-	width: 100%;
+    margin: 0;
+    width: 100%;
 }
 
 #page-mod-datalynx-embed.pagelayout-embedded #content {
-	padding: 0;
+    padding: 0;
 }
 
 /* Captcha image overlap fix for Safari */
 #recaptcha_image {
-	margin-bottom: 25px;
+    margin-bottom: 25px;
 }
 
 .mform div.fdescription.required {
-	display: none;
+    display: none;
 }
 
 /* CSS fix for showing/hiding appropriate fields when javascript is on/off */
 select.datalynxfield_teammemberselect_select {
-	display: inherit;
+    display: inherit;
 }
 
 body.jsenabled select.datalynxfield_teammemberselect_select {
-	display: none;
+    display: none;
 }
 
 input[type="text"].datalynxfield_teammemberselect_dropdown {
-	display: none;
+    display: none;
 }
 
-body.jsenabled input[type="text"].datalynxfield_teammemberselect_dropdown
-	{
-	display: inherit;
+body.jsenabled input[type="text"].datalynxfield_teammemberselect_dropdown {
+    display: inherit;
 }
 
 /* CSS for advanced tags in entry templates */
 body.jsenabled div.editor_atto_content_wrap button.datalynx-tag {
-	padding: 0 0.25em;
-	margin: 0.125em;
-	cursor: pointer;
-	border-radius: 0.5em;
-	-webkit-touch-callout: none;
-	-webkit-user-select: none;
-	-khtml-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-	font-size: x-small;
-	background: none;
+    padding: 0 0.25em;
+    margin: 0.125em;
+    cursor: pointer;
+    border-radius: 0.5em;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    font-size: x-small;
+    background: none;
 }
 
-body.jsenabled div.editor_atto_content_wrap button.datalynx-tag::before
-	{
-	padding-left: 1.5em;
-	content: no-close-quote;
+body.jsenabled div.editor_atto_content_wrap button.datalynx-tag::before {
+    padding-left: 1.5em;
+    content: no-close-quote;
 }
 
-body.jsenabled div.editor_atto_content_wrap button.datalynx-tag.datalynx-field-tag
-	{
-	background-color: skyblue;
+body.jsenabled div.editor_atto_content_wrap button.datalynx-tag.datalynx-field-tag {
+    background-color: skyblue;
 }
 
-body.jsenabled div.editor_atto_content_wrap button.datalynx-tag.datalynx-field-tag::before
-	{
-	background: url([[pix:i/edit]]) no-repeat;
-	background-size: contain;
+body.jsenabled div.editor_atto_content_wrap button.datalynx-tag.datalynx-field-tag::before {
+    background: url([[pix:i/edit]]) no-repeat;
+    background-size: contain;
 }
 
-body.jsenabled div.editor_atto_content_wrap button.datalynx-tag.datalynx-action-tag
-	{
-	background-color: lightgreen;
-	font-style: italic;
+body.jsenabled div.editor_atto_content_wrap button.datalynx-tag.datalynx-action-tag {
+    background-color: lightgreen;
+    font-style: italic;
 }
 
-body.jsenabled div.editor_atto_content_wrap button.datalynx-tag.datalynx-action-tag::before
-	{
-	background: url([[pix:e/document_properties]]) no-repeat;
-	background-size: contain;
+body.jsenabled div.editor_atto_content_wrap button.datalynx-tag.datalynx-action-tag::before {
+    background: url([[pix:e/document_properties]]) no-repeat;
+    background-size: contain;
 }
 
 table.datalynx-behaviors img {
-	margin-left: 0.125em;
-	margin-right: 0.125em;
+    margin-left: 0.125em;
+    margin-right: 0.125em;
 }
 
 body.jsenabled table.datalynx-behaviors img {
-	cursor: pointer;
+    cursor: pointer;
 }
 
 form.mform div.entry div.fitem {
-	display: inline-block;
-	margin: inherit;
+    display: inline-block;
+    margin: inherit;
 }
 
 form.mform div.entry div.datalynx-field-wrapper {
-	display: inline-flex;
+    display: inline-flex;
 }

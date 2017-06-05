@@ -21,8 +21,7 @@
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ("$CFG->dirroot/mod/datalynx/field/field_class.php");
-
+require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
 class datalynxfield_time extends datalynxfield_base {
 
@@ -63,14 +62,14 @@ class datalynxfield_time extends datalynxfield_base {
         if (isset($entry->{"c{$fieldid}_content"})) {
             $oldcontents[] = $entry->{"c{$fieldid}_content"};
         }
-        
+
         // new contents
         $timestamp = null;
         if (!empty($values)) {
             if (count($values) === 1) {
                 $values = reset($values);
             }
-            
+
             if (!is_array($values)) {
                 // assuming timestamp is passed (e.g. in import)
                 $timestamp = $values;
@@ -99,15 +98,15 @@ class datalynxfield_time extends datalynxfield_base {
      */
     public function parse_search($formdata, $i) {
         $time = array();
-        
+
         if (!empty($formdata->{'f_' . $i . '_' . $this->field->id . '_from'})) {
             $time[0] = $formdata->{'f_' . $i . '_' . $this->field->id . '_from'};
         }
-        
+
         if (!empty($formdata->{'f_' . $i . '_' . $this->field->id . '_to'})) {
             $time[1] = $formdata->{'f_' . $i . '_' . $this->field->id . '_to'};
         }
-        
+
         if (!empty($time)) {
             return $time;
         } else {
@@ -125,7 +124,7 @@ class datalynxfield_time extends datalynxfield_base {
      */
     public function get_search_sql($search) {
         list($not, $operator, $value) = $search;
-        
+
         if (is_array($value)) {
             $from = $value[0];
             $to = $value[1];
@@ -133,7 +132,7 @@ class datalynxfield_time extends datalynxfield_base {
             $from = 0;
             $to = 0;
         }
-        
+
         static $i = 0;
         $i++;
         $namefrom = "df_{$this->field->id}_{$i}_from";
@@ -141,15 +140,15 @@ class datalynxfield_time extends datalynxfield_base {
         $varcharcontent = $this->get_sql_compare_text();
         $params = array();
 
-        switch($operator) {
+        switch ($operator) {
             case 'BETWEEN':
                 $params[$namefrom] = $from;
                 $params[$nameto] = $to;
                 $return = array(" ($not $varcharcontent >= :$namefrom AND $varcharcontent < :$nameto) ",
-                    $params, true);
+                        $params, true);
                 break;
             case '=':
-                if($this->date_only) {
+                if ($this->date_only) {
                     $fromdate = date("Y-m-d", $from);
                     $from = strtotime($fromdate);
                 }
@@ -159,14 +158,14 @@ class datalynxfield_time extends datalynxfield_base {
                 $return = array(" $not $varcharcontent $operator :$namefrom ", $params, true);
                 break;
             default:
-                if($not) {  // content value is not empty
+                if ($not) {  // content value is not empty
                     $return = array(" $not $varcharcontent = '' ", $params, true);
                 } else { // content value is empty or there is no content dataset at all
                     global $DB;
                     $eids = $this->get_entry_ids_for_empty_content();
                     // Get NOT IN sql
                     list($inids, $params) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED,
-                        "df_{$this->field->id}_", true);
+                            "df_{$this->field->id}_", true);
                     $sql = " e.id $inids ";
                     return array($sql, $params, false);
                 }
@@ -203,21 +202,24 @@ class datalynxfield_time extends datalynxfield_base {
             $fieldname = $this->name();
             $csvname = $importsettings[$fieldname]['name'];
             $timestr = !empty($csvrecord[$csvname]) ? $csvrecord[$csvname] : null;
-            
+
             if ($timestr) {
                 // It's a timestamp
                 if (((string) (int) $timestr === $timestr) && ($timestr <= PHP_INT_MAX) &&
-                         ($timestr >= ~PHP_INT_MAX)) {
-                    
+                        ($timestr >= ~PHP_INT_MAX)
+                ) {
+
                     $data->{"field_{$fieldid}_{$entryid}"} = $timestr;
-                    
+
                     // It's a valid time string
-                } else if ($timestr = strtotime($timestr)) {
-                    $data->{"field_{$fieldid}_{$entryid}"} = $timestr;
+                } else {
+                    if ($timestr = strtotime($timestr)) {
+                        $data->{"field_{$fieldid}_{$entryid}"} = $timestr;
+                    }
                 }
             }
         }
-        
+
         return true;
     }
 
@@ -243,9 +245,9 @@ class datalynxfield_time extends datalynxfield_base {
     }
 
     public function get_supported_search_operators() {
-        return array('' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'), 
-            '>' => get_string('after', 'datalynx'), '<' => get_string('before', 'datalynx'), 
-            'BETWEEN' => get_string('between', 'datalynx'));
+        return array('' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
+                '>' => get_string('after', 'datalynx'), '<' => get_string('before', 'datalynx'),
+                'BETWEEN' => get_string('between', 'datalynx'));
     }
 }
 

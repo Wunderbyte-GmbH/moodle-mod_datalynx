@@ -59,10 +59,12 @@ class datalynx_statistics_class {
     public function __construct($df = 0) {
         if (empty($df)) {
             throw new coding_exception('Datalynx id or object must be passed to field constructor.');
-        } else if ($df instanceof datalynx) {
-            $this->_df = $df;
         } else {
-            $this->_df = new datalynx($df);
+            if ($df instanceof datalynx) {
+                $this->_df = $df;
+            } else {
+                $this->_df = new datalynx($df);
+            }
         }
     }
 
@@ -97,9 +99,9 @@ class datalynx_statistics_class {
             list($total, $approved, $deleted, $visits) = $this->get_count($params->mode, $from, $to);
             $dateformat = get_string('strftimedate', 'langconfig');
             $title = get_string('statisticsfor', 'datalynx', $this->_df->name());
-            $timestring = get_string("timestring{$params->mode}", 'datalynx', 
-                    array('from' => userdate($from, $dateformat), 
-                        'to' => userdate($to, $dateformat), 'now' => userdate(time(), $dateformat)
+            $timestring = get_string("timestring{$params->mode}", 'datalynx',
+                    array('from' => userdate($from, $dateformat),
+                            'to' => userdate($to, $dateformat), 'now' => userdate(time(), $dateformat)
                     ));
             echo "<hr />$title $timestring";
             $first = true;
@@ -148,29 +150,29 @@ class datalynx_statistics_class {
         $formclass = 'datalynx_statistics_form';
         $formparams = array('d' => $this->_df->id());
         $actionurl = new moodle_url('/mod/datalynx/statistics/index.php', $formparams);
-        require_once ('statistics_form.php');
+        require_once('statistics_form.php');
         return new $formclass($this, $actionurl);
     }
 
     private function get_count($mode, $from = 0, $to = PHP_INT_MAX) {
         global $DB;
-        
-        $params = array('dataid' => $this->_df->id(), 'fromdate' => $from, 
-            'todate' => $to + strtotime('+1 day', 0));
-        
+
+        $params = array('dataid' => $this->_df->id(), 'fromdate' => $from,
+                'todate' => $to + strtotime('+1 day', 0));
+
         $querytotal = "SELECT COUNT(de.id)
                     FROM {datalynx_entries} de
                    WHERE de.dataid = :dataid
                      AND de.timecreated > :fromdate
                      AND de.timecreated < :todate";
-        
+
         $queryapproved = "SELECT COUNT(de.id)
                             FROM {datalynx_entries} de
                            WHERE de.dataid = :dataid
                              AND de.timecreated > :fromdate
                              AND de.timecreated < :todate
                              AND de.approved = 1";
-        
+
         $querydeleted = "SELECT COUNT(l.id)
                            FROM {log} l
                           WHERE l.module LIKE 'datalynx'
@@ -178,7 +180,7 @@ class datalynx_statistics_class {
                             AND l.info = :dataid
                             AND l.time > :fromdate
                             AND l.time < :todate";
-        
+
         $queryvisits = "SELECT COUNT(l.id)
                           FROM {log} l
                          WHERE l.module LIKE 'datalynx'
@@ -186,9 +188,9 @@ class datalynx_statistics_class {
                            AND l.info = :dataid
                            AND l.time > :fromdate
                            AND l.time < :todate";
-        
-        return array($DB->get_field_sql($querytotal, $params), 
-            $DB->get_field_sql($queryapproved, $params), $DB->get_field_sql($querydeleted, $params), 
-            $DB->get_field_sql($queryvisits, $params));
+
+        return array($DB->get_field_sql($querytotal, $params),
+                $DB->get_field_sql($queryapproved, $params), $DB->get_field_sql($querydeleted, $params),
+                $DB->get_field_sql($queryvisits, $params));
     }
 }

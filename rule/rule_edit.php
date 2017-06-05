@@ -20,15 +20,15 @@
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ('../../../config.php');
-require_once ("$CFG->dirroot/mod/datalynx/mod_class.php");
+require_once('../../../config.php');
+require_once("$CFG->dirroot/mod/datalynx/mod_class.php");
 
 $urlparams = new stdClass();
 $urlparams->d = required_param('d', PARAM_INT); // datalynx ID
 
 $urlparams->type = optional_param('type', '', PARAM_ALPHA); // type of a rule to edit
 $urlparams->rid = optional_param('rid', 0, PARAM_INT); // rule id to edit
-                                                             
+
 // Set a datalynx object
 $df = new datalynx($urlparams->d);
 $df->set_page('rule/rule_edit', array('urlparams' => $urlparams));
@@ -38,47 +38,53 @@ $rm = $df->get_rule_manager();
 
 if ($urlparams->rid) {
     $rule = $rm->get_rule_from_id($urlparams->rid, true); // force get
-} else if ($urlparams->type) {
-    $rule = $rm->get_rule($urlparams->type);
+} else {
+    if ($urlparams->type) {
+        $rule = $rm->get_rule($urlparams->type);
+    }
 }
 
 $mform = $rule->get_form();
 
 if ($mform->is_cancelled()) {
     redirect(new moodle_url('/mod/datalynx/rule/index.php', array('d' => $df->id())));
-    
+
     // no submit buttons
-} else if ($mform->no_submit_button_pressed()) {
-    
-    // process validated
-} else if ($data = $mform->get_data()) {
-    
-    // add new rule
-    if (!$rule->get_id()) {
-        $ruleid = $rule->insert_rule($data);
-        
-        $other = array('dataid' => $df->id());
-        $event = \mod_datalynx\event\rule_created::create(
-                array('context' => $df->context, 'objectid' => $ruleid, 'other' => $other));
-        $event->trigger();
-        
-        // update rule
+} else {
+    if ($mform->no_submit_button_pressed()) {
+
+        // process validated
     } else {
-        $data->id = $rule->get_id();
-        $rule->update_rule($data);
-        
-        $other = array('dataid' => $df->id());
-        $event = \mod_datalynx\event\rule_updated::create(
-                array('context' => $df->context, 'objectid' => $rule->get_id(), 'other' => $other));
-        $event->trigger();
+        if ($data = $mform->get_data()) {
+
+            // add new rule
+            if (!$rule->get_id()) {
+                $ruleid = $rule->insert_rule($data);
+
+                $other = array('dataid' => $df->id());
+                $event = \mod_datalynx\event\rule_created::create(
+                        array('context' => $df->context, 'objectid' => $ruleid, 'other' => $other));
+                $event->trigger();
+
+                // update rule
+            } else {
+                $data->id = $rule->get_id();
+                $rule->update_rule($data);
+
+                $other = array('dataid' => $df->id());
+                $event = \mod_datalynx\event\rule_updated::create(
+                        array('context' => $df->context, 'objectid' => $rule->get_id(), 'other' => $other));
+                $event->trigger();
+            }
+
+            if ($data->submitbutton != get_string('savecontinue', 'datalynx')) {
+                redirect(new moodle_url('/mod/datalynx/rule/index.php', array('d' => $df->id())));
+            }
+
+            // continue to edit so refresh the form
+            $mform = $rule->get_form();
+        }
     }
-    
-    if ($data->submitbutton != get_string('savecontinue', 'datalynx')) {
-        redirect(new moodle_url('/mod/datalynx/rule/index.php', array('d' => $df->id())));
-    }
-    
-    // continue to edit so refresh the form
-    $mform = $rule->get_form();
 }
 
 // activate navigation node

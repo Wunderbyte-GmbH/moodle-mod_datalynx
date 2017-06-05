@@ -21,8 +21,7 @@
  * @copyright 2013 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ("$CFG->dirroot/mod/datalynx/field/field_class.php");
-
+require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
 class datalynxfield__status extends datalynxfield_no_content {
 
@@ -31,29 +30,29 @@ class datalynxfield__status extends datalynxfield_no_content {
     const _STATUS = 'status';
 
     const STATUS_NOT_SET = 0;
- // 00
+    // 00
     const STATUS_DRAFT = 1;
- // 01
+    // 01
     const STATUS_FINAL_SUBMISSION = 2;
- // 10
+    // 10
     const STATUS_SUBMISSION = 3;
- // 11
-    
+    // 11
+
     /**
      */
     public static function get_field_objects($dataid) {
         $fieldobjects = array();
-        
-        $fieldobjects[self::_STATUS] = (object) array('id' => self::_STATUS, 'dataid' => $dataid, 
-            'type' => '_status', 'name' => get_string('status', 'datalynx'), 'description' => '', 
-            'visible' => 2, 'internalname' => 'status');
-        
+
+        $fieldobjects[self::_STATUS] = (object) array('id' => self::_STATUS, 'dataid' => $dataid,
+                'type' => '_status', 'name' => get_string('status', 'datalynx'), 'description' => '',
+                'visible' => 2, 'internalname' => 'status');
+
         return $fieldobjects;
     }
 
     /**
      * informs about the internal status of the field.
-     * 
+     *
      * @return boolean always true
      */
     public static function is_internal() {

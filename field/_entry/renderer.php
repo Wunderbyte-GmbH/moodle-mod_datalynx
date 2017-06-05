@@ -23,8 +23,7 @@
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once ("$CFG->dirroot/mod/datalynx/field/renderer.php");
-
+require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
  */
@@ -35,17 +34,17 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
     public function replacements(array $tags = null, $entry = null, array $options = null) {
         $manageable = !empty($options['manage']) ? $options['manage'] : false;
         $manageable = $manageable && ((isset($entry->status) &&
-                 $entry->status != datalynxfield__status::STATUS_FINAL_SUBMISSION) ||
-                 has_capability('mod/datalynx:manageentries', $this->_field->df->context));
-        
+                                $entry->status != datalynxfield__status::STATUS_FINAL_SUBMISSION) ||
+                        has_capability('mod/datalynx:manageentries', $this->_field->df->context));
+
         // no edit mode
         $replacements = array();
         foreach ($tags as $tag) {
-            
+
             // new entry displays nothing
             if ($entry->id < 0) {
                 $replacements[$tag] = '';
-                
+
                 // no edit mode for this field so just return html
             } else {
                 switch (trim($tag, '@')) {
@@ -88,7 +87,7 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
      */
     protected function display_more($entry, $href = false) {
         global $OUTPUT;
-        
+
         $field = $this->_field;
         $params = array('eids' => $entry->id);
         $url = new moodle_url($entry->baseurl, $params);
@@ -108,10 +107,10 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
      */
     protected function display_edit($entry) {
         global $OUTPUT;
-        
+
         $field = $this->_field;
-        $params = array('editentries' => $entry->id, 'sesskey' => sesskey(), 
-            'sourceview' => $this->_field->df()->get_current_view()->id());
+        $params = array('editentries' => $entry->id, 'sesskey' => sesskey(),
+                'sourceview' => $this->_field->df()->get_current_view()->id());
         $url = new moodle_url($entry->baseurl, $params);
         if ($field->df()->data->singleedit) {
             $url->param('view', $field->df()->data->singleedit);
@@ -125,10 +124,10 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
      */
     protected function display_duplicate($entry) {
         global $OUTPUT;
-        
+
         $field = $this->_field;
-        $params = array('duplicate' => $entry->id, 'sesskey' => sesskey(), 
-            'sourceview' => $this->_field->df()->get_current_view()->id());
+        $params = array('duplicate' => $entry->id, 'sesskey' => sesskey(),
+                'sourceview' => $this->_field->df()->get_current_view()->id());
         $url = new moodle_url($entry->baseurl, $params);
         if ($field->df()->data->singleedit) {
             $url->param('view', $field->df()->data->singleedit);
@@ -141,10 +140,10 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
      */
     protected function display_delete($entry) {
         global $OUTPUT;
-        
+
         $field = $this->_field;
-        $params = array('delete' => $entry->id, 'sesskey' => sesskey(), 
-            'sourceview' => $this->_field->df()->get_current_view()->id());
+        $params = array('delete' => $entry->id, 'sesskey' => sesskey(),
+                'sourceview' => $this->_field->df()->get_current_view()->id());
         $url = new moodle_url($entry->baseurl, $params);
         $str = get_string('delete');
         return html_writer::link($url->out(false), $OUTPUT->pix_icon('t/delete', $str));
@@ -154,11 +153,11 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
      */
     protected function display_export($entry) {
         global $CFG, $OUTPUT;
-        
+
         if (!$CFG->enableportfolios) {
             return '';
         }
-        
+
         $str = '';
         $canexportentry = $this->_field->df()->user_can_export_entry($entry);
         if ($canexportentry) {
@@ -175,7 +174,7 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
      */
     protected function patterns() {
         $patterns = array();
-        
+
         // actions
         $actions = get_string('actions', 'datalynx');
         $patterns["##edit##"] = array(true, $actions);
@@ -183,16 +182,16 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
         $patterns["##select##"] = array(true, $actions);
         $patterns["##export##"] = array(true, $actions);
         $patterns["##duplicate##"] = array(true, $actions);
-        
+
         // reference
         $reference = get_string('reference', 'datalynx');
         $patterns["##anchor##"] = array(true, $reference);
         $patterns["##more##"] = array(true, $reference);
-        
+
         // entryinfo
         $entryinfo = get_string('entryinfo', 'datalynx');
         $patterns["##entryid##"] = array(true, $entryinfo);
-        
+
         return $patterns;
     }
 }

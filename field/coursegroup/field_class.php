@@ -21,8 +21,7 @@
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ("$CFG->dirroot/mod/datalynx/field/field_class.php");
-
+require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
 class datalynxfield_coursegroup extends datalynxfield_base {
 
@@ -36,7 +35,7 @@ class datalynxfield_coursegroup extends datalynxfield_base {
 
     public function __construct($df = 0, $field = 0) {
         parent::__construct($df, $field);
-        
+
         $this->course = $this->field->param1;
         $this->group = $this->field->param2;
         $this->_comparetext = 'content1';
@@ -54,7 +53,7 @@ class datalynxfield_coursegroup extends datalynxfield_base {
         $fieldid = $this->field->id;
         $oldcontents = array();
         $contents = array();
-        
+
         // new contents
         $course = 0;
         $group = 0;
@@ -79,26 +78,28 @@ class datalynxfield_coursegroup extends datalynxfield_base {
             }
         }
         $group = $groupid;
-        
+
         // old contents
-        
+
         if (!$this->course) {
             if (!empty($course) or !empty($entry->{"c$fieldid" . '_content'})) {
                 $contents[] = $course;
                 $contents[] = $group;
                 $oldcontents[] = isset($entry->{"c$fieldid" . '_content'}) ? $entry->{"c$fieldid" .
-                         '_content'} : null;
+                '_content'} : null;
                 $oldcontents[] = isset($entry->{"c$fieldid" . '_content1'}) ? $entry->{"c$fieldid" .
-                         '_content1'} : null;
+                '_content1'} : null;
             }
-        } else if (!$this->group and (!empty($group) or !empty($entry->{"c$fieldid" . '_content1'}))) {
-            $contents[] = null;
-            $contents[] = $group;
-            $oldcontents[] = null;
-            $oldcontents[] = isset($entry->{"c$fieldid" . '_content1'}) ? $entry->{"c$fieldid" .
-                     '_content1'} : null;
+        } else {
+            if (!$this->group and (!empty($group) or !empty($entry->{"c$fieldid" . '_content1'}))) {
+                $contents[] = null;
+                $contents[] = $group;
+                $oldcontents[] = null;
+                $oldcontents[] = isset($entry->{"c$fieldid" . '_content1'}) ? $entry->{"c$fieldid" .
+                '_content1'} : null;
+            }
         }
-        
+
         return array($contents, $oldcontents);
     }
 
@@ -107,17 +108,21 @@ class datalynxfield_coursegroup extends datalynxfield_base {
     public function parse_search($formdata, $i) {
         $coursegroup = array(0, 0, 0);
         $search = 'f_' . $i . '_' . $this->field->id;
-        
+
         if (!empty($formdata->{$search . '_member'})) {
             $coursegroup[0] = $formdata->{$search . '_member'};
-        } else if (!empty($formdata->{$search . '_course'})) {
-            $coursegroup[1] = $formdata->{$search . '_course'};
-        } else if (!empty($formdata->{$search . '_group'})) {
-            $coursegroup[2] = $formdata->{$search . '_group'};
         } else {
-            return false;
+            if (!empty($formdata->{$search . '_course'})) {
+                $coursegroup[1] = $formdata->{$search . '_course'};
+            } else {
+                if (!empty($formdata->{$search . '_group'})) {
+                    $coursegroup[2] = $formdata->{$search . '_group'};
+                } else {
+                    return false;
+                }
+            }
         }
-        
+
         return $coursegroup;
     }
 
@@ -138,48 +143,51 @@ class datalynxfield_coursegroup extends datalynxfield_base {
      */
     public function get_search_sql($search) {
         global $DB, $CFG, $USER, $PAGE;
-        
+
         list($not, $operator, $value) = $search;
-        
+
         if (is_array($value)) {
             list($member, $course, $group) = $value;
         } else {
             $member = $course = $group = 0;
         }
-        
+
         // For course and group use the parent get_search_sql
         if ($course) {
             $this->_comparetext = 'content';
             return parent::get_search_sql(array($not, $operator, $course));
-        } else if ($group) {
-            $this->_comparetext = 'content1';
-            return parent::get_search_sql(array($not, $operator, $group));
+        } else {
+            if ($group) {
+                $this->_comparetext = 'content1';
+                return parent::get_search_sql(array($not, $operator, $group));
+            }
         }
-        
+
         // So we need to filter by membership
-        require_once ("$CFG->dirroot/user/lib.php");
-        require_once ("$CFG->libdir/enrollib.php");
-        
+        require_once("$CFG->dirroot/user/lib.php");
+        require_once("$CFG->libdir/enrollib.php");
+
         static $i = 0;
         $i++;
         $fieldid = $this->field->id;
-        
+
         $varcharcontent = "c{$fieldid}.content1";
-        
+
         // Set user id to filter on, from url if user profile page
         $path = $PAGE->url->get_path();
         $isprofilepage = (strpos($path, '/user/view.php') !== false or
-                 strpos($path, '/user/profile.php') !== false);
+                strpos($path, '/user/profile.php') !== false);
         if (!$isprofilepage or !$userid = optional_param('id', 0, PARAM_INT)) {
             $userid = $USER->id;
         }
         // Get user's groups
         if (!$usergroups = $DB->get_records_menu('groups_members', array('userid' => $userid),
-            'groupid', 'id,groupid')) {
+                'groupid', 'id,groupid')
+        ) {
             // Not a member in any group so search for "groupid" -1 to retrieve no entries
             $usergroups = array(-1);
         }
-        list($ingroups, $groupids) = $DB->get_in_or_equal($usergroups, SQL_PARAMS_NAMED, 
+        list($ingroups, $groupids) = $DB->get_in_or_equal($usergroups, SQL_PARAMS_NAMED,
                 "df_{$fieldid}_");
         return array(" $varcharcontent $ingroups ", $groupids, true);
     }
@@ -188,7 +196,7 @@ class datalynxfield_coursegroup extends datalynxfield_base {
      */
     protected function get_sql_compare_text($column = 'content') {
         global $DB;
-        
+
         $comparetext = $this->_comparetext;
         return $DB->sql_compare_text("c{$this->field->id}.$comparetext");
     }
@@ -217,15 +225,15 @@ class datalynxfield_coursegroup extends datalynxfield_base {
             $fieldid = $this->field->id;
             $fieldname = $this->name();
             $csvname = $importsettings[$fieldname]['name'];
-            list($course, $group) = !empty($csvrecord[$csvname]) ? explode(' ', 
+            list($course, $group) = !empty($csvrecord[$csvname]) ? explode(' ',
                     $csvrecord[$csvname]) : array(0, 0);
-            
+
             if ($course and $group) {
                 $data->{"field_{$fieldid}_{$entryid}_course"} = $course;
                 $data->{"field_{$fieldid}_{$entryid}_groupid"} = $group;
             }
         }
-        
+
         return true;
     }
 }

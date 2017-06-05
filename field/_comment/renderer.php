@@ -23,8 +23,7 @@
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once ("$CFG->dirroot/mod/datalynx/field/renderer.php");
-
+require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
  */
@@ -34,12 +33,12 @@ class datalynxfield__comment_renderer extends datalynxfield_renderer {
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
         global $CFG;
-        
+
         $field = $this->_field;
-        
+
         // no edit mode
         $replacements = array_fill_keys($tags, '');
-        
+
         // no edit mode for this field so just return html
         if ($entry->id > 0 and !empty($CFG->usecomments)) {
             foreach ($tags as $tag) {
@@ -62,7 +61,7 @@ class datalynxfield__comment_renderer extends datalynxfield_renderer {
                 $replacements[$tag] = array('html', $str);
             }
         }
-        
+
         return $replacements;
     }
 
@@ -70,11 +69,11 @@ class datalynxfield__comment_renderer extends datalynxfield_renderer {
      */
     public function display_browse($entry, $options = array()) {
         global $CFG;
-        
+
         $df = $this->_field->df();
         $str = '';
-        
-        require_once ("$CFG->dirroot/comment/lib.php");
+
+        require_once("$CFG->dirroot/comment/lib.php");
         $cmt = new stdClass();
         $cmt->context = $df->context;
         $cmt->courseid = $df->course->id;
@@ -83,7 +82,7 @@ class datalynxfield__comment_renderer extends datalynxfield_renderer {
         $cmt->component = 'mod_datalynx';
         $cmt->area = !empty($options['area']) ? $options['area'] : 'entry';
         $cmt->showcount = isset($options['showcount']) ? $options['showcount'] : true;
-        
+
         if (!empty($options['count'])) {
             $comment = new comment($cmt);
             $str = $comment->count();
@@ -94,7 +93,7 @@ class datalynxfield__comment_renderer extends datalynxfield_renderer {
             $comment = new comment($cmt);
             $str = $comment->output(true);
         }
-        
+
         return $str;
     }
 
@@ -103,13 +102,13 @@ class datalynxfield__comment_renderer extends datalynxfield_renderer {
      */
     protected function patterns() {
         $cat = get_string('comments', 'datalynx');
-        
+
         $patterns = array();
         $patterns['##comments##'] = array(true, $cat);
         $patterns['##comments:count##'] = array(true, $cat);
         $patterns['##comments:inline##'] = array(true, $cat);
         $patterns['##comments:add##'] = array(false);
-        
+
         return $patterns;
     }
 }

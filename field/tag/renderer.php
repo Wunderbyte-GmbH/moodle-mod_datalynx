@@ -23,8 +23,7 @@
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once (dirname(__FILE__) . "/../renderer.php");
-
+require_once(dirname(__FILE__) . "/../renderer.php");
 
 /**
  * Class datalynxfield_tag_renderer Renderer for tag field type
@@ -32,7 +31,7 @@ require_once (dirname(__FILE__) . "/../renderer.php");
 class datalynxfield_tag_renderer extends datalynxfield_renderer {
 
     /**
-     * 
+     *
      * {@inheritDoc}
      * @see datalynxfield_renderer::render_edit_mode()
      */
@@ -40,22 +39,24 @@ class datalynxfield_tag_renderer extends datalynxfield_renderer {
         $field = $this->_field;
         $fieldid = $field->id();
         $entryid = $entry->id;
-        
+
         $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
-        $content = core_tag_tag::get_item_tags_array('mod_datalynx', 'datalynx_contents', $contentid, core_tag_tag::BOTH_STANDARD_AND_NOT);
-        
+        $content = core_tag_tag::get_item_tags_array('mod_datalynx', 'datalynx_contents', $contentid,
+                core_tag_tag::BOTH_STANDARD_AND_NOT);
+
         $fieldname = "field_{$fieldid}_{$entryid}";
-        $mform->addElement('tags', $fieldname, get_string('tags'), array('itemtype' => 'datalynx_contents', 'component' => 'mod_datalynx'));
+        $mform->addElement('tags', $fieldname, get_string('tags'),
+                array('itemtype' => 'datalynx_contents', 'component' => 'mod_datalynx'));
         $mform->setDefault($fieldname, $content);
         $required = !empty($options['required']);
         if ($required) {
             $mform->addRule($fieldname, null, 'required', null, 'client');
         }
-        
+
     }
 
     /**
-     * 
+     *
      * {@inheritDoc}
      * @see datalynxfield_renderer::render_display_mode()
      */
@@ -66,14 +67,14 @@ class datalynxfield_tag_renderer extends datalynxfield_renderer {
         $fieldid = $field->id();
         $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
         $items = core_tag_tag::get_item_tags('mod_datalynx', 'datalynx_contents', $contentid);
-        $str = $OUTPUT->tag_list($items , null, 'datalynx-tags');
+        $str = $OUTPUT->tag_list($items, null, 'datalynx-tags');
         if (isset($params['nolink'])) {
             $str = preg_replace("/<b>.+<\/b>/i", '', $str);
-            $str = preg_replace("/<a[^>]*(href=\"[^\"]+?\")([^>]*?)(\/?)>([^<]+)(<\/a>)/i",'<span$2>$4</span>', $str);
+            $str = preg_replace("/<a[^>]*(href=\"[^\"]+?\")([^>]*?)(\/?)>([^<]+)(<\/a>)/i", '<span$2>$4</span>', $str);
         }
         return $str;
     }
-    
+
     /**
      * Array of patterns this field supports
      */
@@ -85,50 +86,51 @@ class datalynxfield_tag_renderer extends datalynxfield_renderer {
         $patterns["[[$fieldname:nolink]]"] = array(true);
         return $patterns;
     }
-    
+
     /**
-     * 
+     *
      * {@inheritDoc}
      * @see datalynxfield_renderer::render_search_mode()
      */
     public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
         global $CFG;
-    
+
         $field = $this->_field;
         $fieldid = $field->id();
-    
+
         $selected = $value;
-    
+
         $options = $field->options_menu();
-    
+
         $fieldname = "f_{$i}_$fieldid";
-        $select = &$mform->createElement('tags', $fieldname, get_string('tags'), array('itemtype' => 'datalynx_contents', 'component' => 'mod_datalynx'));
+        $select = &$mform->createElement('tags', $fieldname, get_string('tags'),
+                array('itemtype' => 'datalynx_contents', 'component' => 'mod_datalynx'));
         $select->setValue($selected);
-    
+
         $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
-    
+
         return array(array($select), null);
     }
 
     /**
-     * 
+     *
      * {@inheritDoc}
      * @see datalynxfield_renderer::validate()
      */
     public function validate($entryid, $tags, $formdata) {
         $fieldid = $this->_field->id();
-        
+
         $formfieldname = "field_{$fieldid}_{$entryid}";
-        
+
         $errors = array();
         foreach ($tags as $tag) {
-            list(, $behavior, ) = $this->process_tag($tag);
+            list(, $behavior,) = $this->process_tag($tag);
             /* @var $behavior datalynx_field_behavior */
             if ($behavior->is_required() and !is_array($formdata->$formfieldname)) {
-                    $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
+                $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
             }
         }
-        
+
         return $errors;
     }
 }

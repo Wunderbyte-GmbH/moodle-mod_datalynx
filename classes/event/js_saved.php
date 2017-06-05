@@ -25,7 +25,6 @@ namespace mod_datalynx\event;
 
 defined('MOODLE_INTERNAL') || die();
 
-
 /**
  *
  * @package mod_datalynx
@@ -62,7 +61,7 @@ class js_saved extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '$this->userid' saved a custom JavaScript file in the datalynx activity " .
-                 "with the course module id '$this->contextinstanceid'.";
+        "with the course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -71,7 +70,7 @@ class js_saved extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/mod/datalynx/view.php', 
+        return new \moodle_url('/mod/datalynx/view.php',
                 array('d' => $this->objectid, 'jsedit' => 1));
     }
 
@@ -81,7 +80,7 @@ class js_saved extends \core\event\base {
      * @return array
      */
     public function get_legacy_logdata() {
-        return array($this->courseid, 'datalynx', 'js_saved', 
-            'view.php?d=' . $this->objectid . '&jsedit=1', $this->objectid, $this->contextinstanceid);
+        return array($this->courseid, 'datalynx', 'js_saved',
+                'view.php?d=' . $this->objectid . '&jsedit=1', $this->objectid, $this->contextinstanceid);
     }
 }

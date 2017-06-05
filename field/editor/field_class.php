@@ -21,10 +21,9 @@
  * @copyright 2015 David Bogner
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ($CFG->dirroot . '/mod/datalynx/field/field_class.php');
-require_once ($CFG->dirroot . '/lib/filelib.php');
-require_once ($CFG->dirroot . '/repository/lib.php');
-
+require_once($CFG->dirroot . '/mod/datalynx/field/field_class.php');
+require_once($CFG->dirroot . '/lib/filelib.php');
+require_once($CFG->dirroot . '/repository/lib.php');
 
 class datalynxfield_editor extends datalynxfield_base {
 
@@ -35,14 +34,14 @@ class datalynxfield_editor extends datalynxfield_base {
     public function __construct($df = 0, $field = 0) {
         global $COURSE, $PAGE, $CFG;
         parent::__construct($df, $field);
-        
+
         $maxbytes = get_user_max_upload_file_size($PAGE->context, $CFG->maxbytes, $COURSE->maxbytes);
-        
+
         // TODO: provide options for the editor field to configure in the field settings
         // $trust = !empty($this->field->param4) ? $this->field->param4 : 0;
         // $maxbytes = !empty($this->field->param5) ? $this->field->param5 : 0;
         // $maxfiles = !empty($this->field->param6) ? $this->field->param6 : -1;
-        
+
         $this->editoroptions = array();
         $this->editoroptions['context'] = $this->df->context;
         $this->editoroptions['trusttext'] = true;
@@ -57,7 +56,7 @@ class datalynxfield_editor extends datalynxfield_base {
 
     /**
      * (non-PHPdoc)
-     * 
+     *
      * @see datalynxfield_base::content_names()
      */
     protected function content_names() {
@@ -85,17 +84,17 @@ class datalynxfield_editor extends datalynxfield_base {
         global $DB;
         $entryid = $entry->id;
         $fieldid = $this->field->id;
-        
+
         $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
-        
+
         if (empty($values)) {
             return true;
         }
-        
+
         $rec = new stdClass();
         $rec->fieldid = $fieldid;
         $rec->entryid = $entryid;
-        
+
         if (!$rec->id = $contentid) {
             $rec->id = $DB->insert_record('datalynx_contents', $rec);
         }
@@ -106,11 +105,11 @@ class datalynxfield_editor extends datalynxfield_base {
         $data->text = $value['text'];
         $data->format = $value['format'];
         $data->content_editor = $value;
-        $data = file_postupdate_standard_editor($data, 'content', $this->editoroptions, 
+        $data = file_postupdate_standard_editor($data, 'content', $this->editoroptions,
                 $this->df->context, 'mod_datalynx', 'content', $rec->id);
         $rec->content = $data->content;
         $rec->content1 = $data->contentformat;
-        
+
         return $DB->update_record('datalynx_contents', $rec);
     }
 
@@ -127,9 +126,9 @@ class datalynxfield_editor extends datalynxfield_base {
      */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
         $fieldid = $this->field->id;
-        
+
         parent::prepare_import_content($data, $importsettings, $csvrecord, $entryid);
-        
+
         // For editors reformat in editor structure
         if ($this->is_editor()) {
             if (isset($data->{"field_{$fieldid}_{$entryid}"})) {
@@ -146,7 +145,7 @@ class datalynxfield_editor extends datalynxfield_base {
     }
 
     public function get_supported_search_operators() {
-        return array('' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'), 
-            'LIKE' => get_string('contains', 'datalynx'));
+        return array('' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
+                'LIKE' => get_string('contains', 'datalynx'));
     }
 }

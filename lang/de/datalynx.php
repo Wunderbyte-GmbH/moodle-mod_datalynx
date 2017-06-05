@@ -20,7 +20,7 @@
  *          $subpackage datalynx
  * @copyright 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *         
+ *
  *          The Datalynx has been developed as an enhanced counterpart
  *          of Moodle's Database activity module (1.9.11+ (20110323)).
  *          To the extent that Datalynx code corresponds to Database code,
@@ -40,7 +40,8 @@ $string['authorinfo'] = 'AutorInneninformationen';
 $string['autocompletion'] = 'Autocompletion';
 $string['autocompletion_help'] = 'Aktiviere Autocompletion für den Editier-Modus.';
 $string['autocompletion_textfield'] = 'Textfeld';
-$string['autocompletion_textfield_help'] = 'Wähle das datalynx-Modul und das Textfeld von dem die Autocompletion-Daten genommen werden sollen.';
+$string['autocompletion_textfield_help'] =
+        'Wähle das datalynx-Modul und das Textfeld von dem die Autocompletion-Daten genommen werden sollen.';
 $string['browse'] = 'Durchblättern';
 $string['columns'] = 'Spalten';
 $string['commentadd'] = 'Kommentar hinzufügen';
@@ -56,12 +57,17 @@ $string['commentsaved'] = 'Kommentar gespeichert';
 $string['comments'] = 'Kommentare';
 $string['commentsn'] = '{$a} Kommentare';
 $string['commentsnone'] = 'Keine Kommentare';
-$string['configanonymousentries'] = 'Diese Einstellung ermöglicht es mit einem Gastzugang (anonym, ohne Login) Einträge für alle Datalynx Instanzen zu verfassen. Diese Einstellung muss für jede Instanz noch extra aktiviert werden. Diese Einstellung muss für jede Instanz noch extra aktiviert werden.';
+$string['configanonymousentries'] =
+        'Diese Einstellung ermöglicht es mit einem Gastzugang (anonym, ohne Login) Einträge für alle Datalynx Instanzen zu verfassen. Diese Einstellung muss für jede Instanz noch extra aktiviert werden. Diese Einstellung muss für jede Instanz noch extra aktiviert werden.';
 $string['configenablerssfeeds'] = 'Diese Einstellung ermöglicht RSS feeds für alle Datalynx Instanzen zu generieren.';
-$string['configmaxentries'] = 'Dieser Wert bestimmt die Höchstanzahl an Einträgen, die zu einer Datalynx Aktivität hinzugefügt werden können.';
-$string['configmaxfields'] = 'Dieser Wert bestimmt die Höchstanzahl an Feldern, die zu einer Datalynx Aktivität hinzugefügt werden können.';
-$string['configmaxfilters'] = 'Dieser Wert bestimmt die Höchstanzahl an Filtern, die zu einer Datalynx Aktivität hinzugefügt werden können.';
-$string['configmaxviews'] = 'Dieser Wert bestimmt die Höchstanzahl an Ansichten, die zu einer Datalynx Aktivität hinzugefügt werden können.';
+$string['configmaxentries'] =
+        'Dieser Wert bestimmt die Höchstanzahl an Einträgen, die zu einer Datalynx Aktivität hinzugefügt werden können.';
+$string['configmaxfields'] =
+        'Dieser Wert bestimmt die Höchstanzahl an Feldern, die zu einer Datalynx Aktivität hinzugefügt werden können.';
+$string['configmaxfilters'] =
+        'Dieser Wert bestimmt die Höchstanzahl an Filtern, die zu einer Datalynx Aktivität hinzugefügt werden können.';
+$string['configmaxviews'] =
+        'Dieser Wert bestimmt die Höchstanzahl an Ansichten, die zu einer Datalynx Aktivität hinzugefügt werden können.';
 $string['convert'] = 'Konvertieren';
 $string['converttoeditor'] = 'Zu Editorfeld konvertieren';
 $string['correct'] = 'Richtig';
@@ -142,7 +148,8 @@ $string['entriesduplicated'] = '{$a} Eintrag/Einträge dupliziert';
 $string['entries'] = 'Einträge';
 $string['entriesfound'] = '{$a} Eintrag/Einträge gefunden';
 $string['entriesimport'] = 'Einträge importieren';
-$string['entrieslefttoaddtoview'] = 'Sie müssen {$a} weitere/n Eintrag/Einträge hinzufügen, bevor Sie die Einträge anderer TeilnehmerInnen sehen können.';
+$string['entrieslefttoaddtoview'] =
+        'Sie müssen {$a} weitere/n Eintrag/Einträge hinzufügen, bevor Sie die Einträge anderer TeilnehmerInnen sehen können.';
 $string['entrieslefttoadd'] = 'Sie müssen {$a} weitere/n Eintrag/Einträge hinzufügen, um diese Aktivität abzuschließen.';
 $string['entriesmax'] = 'Höchstzahl an Einträgen';
 $string['entriesnotsaved'] = 'Kein Eintrag wurde gespeichert. Bitte überprüfen Sie das Format der hochgeladenen Datei.';
@@ -184,7 +191,8 @@ $string['fieldedits'] = 'Anzahl an Bearbeitungen';
 $string['field'] = 'Feld';
 $string['fieldids'] = 'Feld IDs';
 $string['fieldlabel'] = 'Feldbezeichnung';
-$string['fieldlabel_help'] = 'The field label allows to specify a designated field label that can be added to the view by means of the [[fieldname@]] field pattern. This field pattern observes the field visibility and is hidden if the field is set to be hidden. The field label can also serve as a field display template and it interprets patterns of that field if included in the label. For example, with a number field called Number and the field label defined as \'You have earned [[Number]] credits.\' and an entry where the number value is 47 the pattern [[Number@]] would be displayed as \'You have earned 47 credits.\'';
+$string['fieldlabel_help'] =
+        'The field label allows to specify a designated field label that can be added to the view by means of the [[fieldname@]] field pattern. This field pattern observes the field visibility and is hidden if the field is set to be hidden. The field label can also serve as a field display template and it interprets patterns of that field if included in the label. For example, with a number field called Number and the field label defined as \'You have earned [[Number]] credits.\' and an entry where the number value is 47 the pattern [[Number@]] would be displayed as \'You have earned 47 credits.\'';
 $string['fieldmappings'] = 'Feldzuordnungen';
 $string['fieldname'] = 'Feldname';
 $string['fieldnew'] = 'Neues {$a} Feld';
@@ -200,7 +208,8 @@ $string['fieldrules'] = 'Feldbearbeitungsregeln';
 $string['fieldsadded'] = 'Felder hinzugefügt';
 $string['fieldsconfirmdelete'] = 'Sie sind im Begriff, {$a} Feld/Felder zu löschen. Wollen Sie fortsetzen?';
 $string['fieldsconfirmduplicate'] = 'Sie sind im Begriff, {$a} Feld/Felder zu duplizieren. Wollen Sie fortsetzen?';
-$string['fieldsdeleted'] = 'Felder gelöscht. Es könnte notwendig sein, die voreingestellten Sortierungseinstellungen zu aktualisieren.';
+$string['fieldsdeleted'] =
+        'Felder gelöscht. Es könnte notwendig sein, die voreingestellten Sortierungseinstellungen zu aktualisieren.';
 $string['fields'] = 'Felder';
 $string['fieldsmax'] = 'Maximalanzahl an Feldern';
 $string['fieldsnonedefined'] = 'Keine Felder angelegt';
@@ -210,7 +219,8 @@ $string['fieldvisibleall'] = 'Jede/n';
 $string['fieldvisiblenone'] = 'Nur ManagerInnen';
 $string['fieldvisibleowner'] = 'EigentümerInnen und ManagerInnen';
 $string['fieldwidth'] = 'Breite';
-$string['field_has_duplicate_entries'] = 'Es gibt Mehrfach-Einträge. Die Option Unique:"Ja" kann deshalb derzeit nicht aktiviert werden!';
+$string['field_has_duplicate_entries'] =
+        'Es gibt Mehrfach-Einträge. Die Option Unique:"Ja" kann deshalb derzeit nicht aktiviert werden!';
 $string['filemaxsize'] = 'Gesamtgröße der hochgeladenen Dateien';
 $string['filesmax'] = 'Maximale Anzahl an hochgeladenen Dateien';
 $string['filetypeany'] = 'Jeglicher Dateityp';
@@ -259,7 +269,8 @@ $string['first'] = 'Erste';
 $string['formemptyadd'] = 'Sie haben keine Felder ausgefüllt!';
 $string['fromfile'] = 'Aus ZIP Datei importieren';
 $string['generalactions'] = 'Allgemeine Aktionen';
-$string['getstarted'] = 'Diese Datalynx scheint neu oder noch nicht vollständig eingerichtet zu sein. Um zu beginnen, <ul><li>rufen Sie {$a->presets} auf</li></ul> oder <ul><li>fügen Sie {$a->fields} hinzu</li><li>fügen Sie {$a->views} hinzu</li></ul>';
+$string['getstarted'] =
+        'Diese Datalynx scheint neu oder noch nicht vollständig eingerichtet zu sein. Um zu beginnen, <ul><li>rufen Sie {$a->presets} auf</li></ul> oder <ul><li>fügen Sie {$a->fields} hinzu</li><li>fügen Sie {$a->views} hinzu</li></ul>';
 $string['grade'] = 'Bewertung';
 $string['gradeinputtype'] = 'Eingabemethode für die Bewertung';
 $string['grading'] = 'Bewerten';
@@ -289,7 +300,8 @@ $string['jssaved'] = 'Javascript gespeichert';
 $string['jsupload'] = 'Javascript Dateien hochladen';
 $string['lock'] = 'Sperren';
 $string['manage'] = 'Verwalten';
-$string['mappingwarning'] = 'All alten Felder, die nicht einem neuen Feld zugeordnet sind, werden entfernt und deren Inhalte werden gelöscht.';
+$string['mappingwarning'] =
+        'All alten Felder, die nicht einem neuen Feld zugeordnet sind, werden entfernt und deren Inhalte werden gelöscht.';
 $string['max'] = 'Maximum';
 $string['maxsize'] = 'Maximale Größe';
 $string['mediafile'] = 'Mediendatei';
@@ -307,7 +319,8 @@ $string['messageprovider:datalynx_ratingupdated'] = 'Datalynx Bewertung aktualis
 // / End Message provider strings
 $string['min'] = 'Minimum';
 $string['modulename'] = 'Datalynx';
-$string['modulename_help'] = 'Das Datalynx Modul kann benutzt werden, um vielfältigste Aktivitäten/Ressourcen anzulegen. LehrerInnen/ManagerInnen können eine individuell angepasste Datenbank erzeugen, in der TeilnehmerInnen unterschiedliche Elemente (z.B. TextE, Zahlen, Bilder, Dateien, URLs, etc.) abgeben und anzeigen können.';
+$string['modulename_help'] =
+        'Das Datalynx Modul kann benutzt werden, um vielfältigste Aktivitäten/Ressourcen anzulegen. LehrerInnen/ManagerInnen können eine individuell angepasste Datenbank erzeugen, in der TeilnehmerInnen unterschiedliche Elemente (z.B. TextE, Zahlen, Bilder, Dateien, URLs, etc.) abgeben und anzeigen können.';
 $string['modulenameplural'] = 'Datalynxs';
 $string['more'] = 'Mehr';
 $string['movezipfailed'] = 'ZIP kann nicht bewegt werden';
@@ -348,7 +361,8 @@ $string['presetfaileddelete'] = 'Fehler beim Löschen von Vorlagen!';
 $string['presetfromdatalynx'] = 'Aus dieser Datalynx Vorlagen erzeugen';
 $string['presetfromfile'] = 'Vorlagen aus Datei hochladen';
 $string['presetimportsuccess'] = 'Vorlagen erfolgreich angewendet.';
-$string['presetinfo'] = 'Beim Speichern als Vorlage, wird diese Ansicht veröffentlicht. Andere UserInnen könnten sie in ihren Datalynxs verwenden.';
+$string['presetinfo'] =
+        'Beim Speichern als Vorlage, wird diese Ansicht veröffentlicht. Andere UserInnen könnten sie in ihren Datalynxs verwenden.';
 $string['presetmap'] = 'Felder zuordnen';
 $string['presetnodata'] = 'ohne UserInnendaten';
 $string['presetnodefinedfields'] = 'Keine Felder in dieser Vorlage festgelegt!';
@@ -400,7 +414,8 @@ $string['requiredall'] = 'alle notwendig';
 $string['requirednotall'] = 'nicht alle notwendig';
 $string['resetsettings'] = 'Filter zurücksetzen';
 $string['returntoimport'] = 'Zurück zum Import';
-$string['rssglobaldisabled'] = 'Für die Website nicht aktiviert. Ändern Sie die globale Website-Konfiguration, um RSS zu aktivieren.';
+$string['rssglobaldisabled'] =
+        'Für die Website nicht aktiviert. Ändern Sie die globale Website-Konfiguration, um RSS zu aktivieren.';
 $string['rsshowmany'] = '(Anzahl an letzten Eintrgen, die angezeigt werden, 0 um RSS zu deaktivieren';
 $string['rsstemplate'] = 'RSS Vorlage';
 $string['rsstitletemplate'] = 'RSS Titelvorlage';
@@ -437,7 +452,8 @@ $string['author'] = 'Autor';
 $string['email'] = 'E-Mail';
 
 $string['savecontinue'] = 'Speichern und Fortsetzen';
-$string['saveasstandardtags'] = 'Alle hinzugefügten Tags als Standard-Tags speichern, sodass sie bei neuen Einträgen vorgeschlagen werden.';
+$string['saveasstandardtags'] =
+        'Alle hinzugefügten Tags als Standard-Tags speichern, sodass sie bei neuen Einträgen vorgeschlagen werden.';
 $string['search'] = 'Suche';
 $string['sendinratings'] = 'Die neuesten Bewertungen zuschicken';
 $string['separateentries'] = 'Jeden Eintrag in einer eigenen Datei';
@@ -535,13 +551,16 @@ $string['teamsize_help'] = 'Geben Sie hier die Höchstzahl der Teammitglieder. D
 $string['teamsize_error_required'] = 'Dieses Feld ist erforderlich!';
 $string['teamsize_error_value'] = 'Der Wert dieses Feldes muss eine natürliche Zahl sein!';
 $string['admissibleroles'] = 'Zugelassene Rollen';
-$string['admissibleroles_help'] = 'Zulässige Teammitglieder sind jene BenutzerInnen, die mindestens eine von den ausgewählten Rollen haben.';
+$string['admissibleroles_help'] =
+        'Zulässige Teammitglieder sind jene BenutzerInnen, die mindestens eine von den ausgewählten Rollen haben.';
 $string['admissibleroles_error'] = 'Wählen Sie bitte mindestens eine Rolle aus!';
 $string['noautocompletion'] = 'Keine Autocompletion';
 $string['nodatalynxs'] = 'Keine Datalynx-Module gefunden.';
 $string['notifyteam'] = 'Benachrichtigungsregeln';
-$string['notifyteam_help'] = 'Wählen Sie eine Benachrichtigungsregel aus, die Select notification rule to be applied to all team members selected in this field.';
-$string['teammemberselectmultiple'] = 'Eine gewissene Person kann nur einmal als Mitglied eines gewissenen Teams ausgewählt werden!';
+$string['notifyteam_help'] =
+        'Wählen Sie eine Benachrichtigungsregel aus, die Select notification rule to be applied to all team members selected in this field.';
+$string['teammemberselectmultiple'] =
+        'Eine gewissene Person kann nur einmal als Mitglied eines gewissenen Teams ausgewählt werden!';
 $string['listformat'] = 'Listeformat';
 $string['listformat_newline'] = 'mit Zeilenvorschubzeichen getrennt';
 $string['listformat_space'] = 'mit Leerzeichen getrennt';
@@ -558,8 +577,10 @@ $string['completionentries'] = 'Anzahl der zugelassenen Abgaben';
 $string['completionentriesgroup'] = 'Zulassung der Abgaben fordern';
 $string['completionentriesgroup_help'] = 'Schalten Sie unbedingt die Zulassung der Abgaben oben im Formular frei!';
 $string['limitchoice'] = 'Auswahlbeschränkung';
-$string['limitchoice_help'] = 'Schalten Sie dies frei, um die Auswahlmöglichkeit der BenutzerInnen auf die angegebene Anzahl zu beschränken.';
-$string['limitchoice_error'] = 'Sie können die \'{$a}\' Option nicht nochmal auswählen, weil Sie die Höchstzahl der Auswahl dieser Option bereits erreicht haben.';
+$string['limitchoice_help'] =
+        'Schalten Sie dies frei, um die Auswahlmöglichkeit der BenutzerInnen auf die angegebene Anzahl zu beschränken.';
+$string['limitchoice_error'] =
+        'Sie können die \'{$a}\' Option nicht nochmal auswählen, weil Sie die Höchstzahl der Auswahl dieser Option bereits erreicht haben.';
 $string['redirectsettings'] = 'Umleitung nach Abgabe';
 $string['redirectsettings_help'] = 'Benuzten Sie diese Felder, um die Zielansicht nach Bearbeitung der Einträge anzugeben.';
 $string['redirectto'] = 'Zielansicht';
@@ -611,10 +632,12 @@ $string['managemode'] = 'Verwaltungsmodus';
 $string['maxteamsize_error_form'] = 'Sie können nur maximal {$a} Teammitglieder auswählen!';
 $string['minteamsize'] = 'Mindestzahl an Teammitgliedern';
 $string['minteamsize_help'] = 'Geben Sie hier die Mindestzahl an Teammitgliedern ein.';
-$string['minteamsize_error_value'] = 'Die Mindestzahl an Teammitgliedern darf nicht höher als die Höchstzahl an Teammitgliedern sein!';
+$string['minteamsize_error_value'] =
+        'Die Mindestzahl an Teammitgliedern darf nicht höher als die Höchstzahl an Teammitgliedern sein!';
 $string['minteamsize_error_form'] = 'Sie müssen mindestens {$a} Teammitglieder auswählen!';
 $string['teamfield'] = 'Teamfeld';
-$string['teamfield_help'] = 'Haken sie diese Checkbox an, um dieses Feld als Teamfeld zu bezeichnen. Bei Freigabe eines Eintrags wird dieser jeder Person in diesem Feld zugewiesen. Nur ein Feld darf pro eine Datalynx-Instanz als Teamfeld bezeichnet werden.';
+$string['teamfield_help'] =
+        'Haken sie diese Checkbox an, um dieses Feld als Teamfeld zu bezeichnen. Bei Freigabe eines Eintrags wird dieser jeder Person in diesem Feld zugewiesen. Nur ein Feld darf pro eine Datalynx-Instanz als Teamfeld bezeichnet werden.';
 $string['referencefield'] = 'Referenzfeld';
 $string['referencefield_help'] = 'Wählen Sie hier ein Referenzfeld aus.';
 $string['linktoentry'] = 'Link zum Eintrag';
@@ -756,7 +779,8 @@ $string['filterformadd'] = 'Add new filter form';
 $string['newfilterform'] = 'New filter form';
 
 // FILTER
-$string['avoidaddanddeletesimultaneously'] = 'Gleichzeitiges Entfernen und Umbenennen von Auswahlmöglichkeiten ist nicht erlaubt. Zuerst Entfernen und Speichern, dann Umbenennen und Speichern ist dier richtige Vorgehensweise';
+$string['avoidaddanddeletesimultaneously'] =
+        'Gleichzeitiges Entfernen und Umbenennen von Auswahlmöglichkeiten ist nicht erlaubt. Zuerst Entfernen und Speichern, dann Umbenennen und Speichern ist dier richtige Vorgehensweise';
 $string['anyof'] = 'ein beliebiges';
 $string['allof'] = 'alle';
 $string['exactly'] = 'exakt';
@@ -782,11 +806,15 @@ $string['unsubscribe'] = 'Austragen';
 $string['allowsubscription'] = 'Selbstätiges Eintragen erlauben';
 $string['allowunsubscription'] = 'Selbstätiges Austragen erlauben';
 $string['selectuser'] = 'Benutzer/in auswählen...';
-$string['allowsubscription_help'] = 'Check this option to enable users to add themselves to teams created by other people. This is facilitated via :subscribe tag extension, e.g. [[&lt;fieldname&gt;:subscribe]], which modifies the field to display an additional link in browse mode. By clicking on this link user can add themselves to the particular team, if they are able and allowed to by the field setup.';
-$string['allowunsubscription_help'] = 'Check this option to enable users to unsubscribe themselves from teams of other users in a manner similar to the \'Allow manual subscription option\'. If disabled, users on a team can only be removed by the user who created that team.';
-$string['user_can_add_self_help'] = 'Check this option to allow the user who owns the entry to add themselves to the team in this field.';
+$string['allowsubscription_help'] =
+        'Check this option to enable users to add themselves to teams created by other people. This is facilitated via :subscribe tag extension, e.g. [[&lt;fieldname&gt;:subscribe]], which modifies the field to display an additional link in browse mode. By clicking on this link user can add themselves to the particular team, if they are able and allowed to by the field setup.';
+$string['allowunsubscription_help'] =
+        'Check this option to enable users to unsubscribe themselves from teams of other users in a manner similar to the \'Allow manual subscription option\'. If disabled, users on a team can only be removed by the user who created that team.';
+$string['user_can_add_self_help'] =
+        'Check this option to allow the user who owns the entry to add themselves to the team in this field.';
 $string['check_enable'] = 'You must mark \'enable\' checkbox to confirm the validity of the selected value.';
-$string['deletefieldfilterwarning'] = 'Warning! You are attempting to delete following fields:{$a->fieldlist}However, filters listed below are still using some of these fields:{$a->filterlist}You will have to delete these filters manually first before you may proceed.';
+$string['deletefieldfilterwarning'] =
+        'Warning! You are attempting to delete following fields:{$a->fieldlist}However, filters listed below are still using some of these fields:{$a->filterlist}You will have to delete these filters manually first before you may proceed.';
 $string['noviewsavailable'] = 'Keine Ansicht verfügbar';
 
 $string['datalynx_team_updated'] = 'Team aktualisiert';

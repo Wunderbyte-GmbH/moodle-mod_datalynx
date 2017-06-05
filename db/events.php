@@ -24,32 +24,32 @@
 defined('MOODLE_INTERNAL') or die();
 
 $observers = array(
-    array('eventname' => 'mod_datalynx\event\comment_created', 
-        'callback' => 'datalynx_rule_manager::trigger_rules', 
-        'includefile' => 'mod/datalynx/rule/rule_manager.php'
-    ), 
-    array('eventname' => 'mod_datalynx\event\entry_created', 
-        'callback' => 'datalynx_rule_manager::trigger_rules', 
-        'includefile' => 'mod/datalynx/rule/rule_manager.php'
-    ), 
-    array('eventname' => 'mod_datalynx\event\entry_updated', 
-        'callback' => 'datalynx_rule_manager::trigger_rules', 
-        'includefile' => 'mod/datalynx/rule/rule_manager.php'
-    ), 
-    array('eventname' => 'mod_datalynx\event\entry_deleted', 
-        'callback' => 'datalynx_rule_manager::trigger_rules', 
-        'includefile' => 'mod/datalynx/rule/rule_manager.php'
-    ), 
-    array('eventname' => 'mod_datalynx\event\rating_added', 
-        'callback' => 'datalynx_rule_manager::trigger_rules', 
-        'includefile' => 'mod/datalynx/rule/rule_manager.php'
-    ), 
-    array('eventname' => 'mod_datalynx\event\rating_updated', 
-        'callback' => 'datalynx_rule_manager::trigger_rules', 
-        'includefile' => 'mod/datalynx/rule/rule_manager.php'
-    ), 
-    array('eventname' => 'mod_datalynx\event\team_updated', 
-        'callback' => 'datalynx_rule_manager::trigger_rules', 
-        'includefile' => 'mod/datalynx/rule/rule_manager.php'
-    )
+        array('eventname' => 'mod_datalynx\event\comment_created',
+                'callback' => 'datalynx_rule_manager::trigger_rules',
+                'includefile' => 'mod/datalynx/rule/rule_manager.php'
+        ),
+        array('eventname' => 'mod_datalynx\event\entry_created',
+                'callback' => 'datalynx_rule_manager::trigger_rules',
+                'includefile' => 'mod/datalynx/rule/rule_manager.php'
+        ),
+        array('eventname' => 'mod_datalynx\event\entry_updated',
+                'callback' => 'datalynx_rule_manager::trigger_rules',
+                'includefile' => 'mod/datalynx/rule/rule_manager.php'
+        ),
+        array('eventname' => 'mod_datalynx\event\entry_deleted',
+                'callback' => 'datalynx_rule_manager::trigger_rules',
+                'includefile' => 'mod/datalynx/rule/rule_manager.php'
+        ),
+        array('eventname' => 'mod_datalynx\event\rating_added',
+                'callback' => 'datalynx_rule_manager::trigger_rules',
+                'includefile' => 'mod/datalynx/rule/rule_manager.php'
+        ),
+        array('eventname' => 'mod_datalynx\event\rating_updated',
+                'callback' => 'datalynx_rule_manager::trigger_rules',
+                'includefile' => 'mod/datalynx/rule/rule_manager.php'
+        ),
+        array('eventname' => 'mod_datalynx\event\team_updated',
+                'callback' => 'datalynx_rule_manager::trigger_rules',
+                'includefile' => 'mod/datalynx/rule/rule_manager.php'
+        )
 );

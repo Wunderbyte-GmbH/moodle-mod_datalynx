@@ -21,9 +21,8 @@
  * @copyright 2013 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once ("$CFG->dirroot/mod/datalynx/field/field_class.php");
-require_once ("$CFG->dirroot/mod/datalynx/field/number/field_class.php");
-
+require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
+require_once("$CFG->dirroot/mod/datalynx/field/number/field_class.php");
 
 class datalynxfield_duration extends datalynxfield_base {
 
@@ -39,7 +38,7 @@ class datalynxfield_duration extends datalynxfield_base {
      */
     public function __construct($df = 0, $field = 0) {
         parent::__construct($df, $field);
-        
+
         $this->width = $this->field->param2;
         $this->widthunit = $this->field->param3;
     }
@@ -51,8 +50,8 @@ class datalynxfield_duration extends datalynxfield_base {
      */
     public function get_units() {
         if (is_null($this->_units)) {
-            $this->_units = array(604800 => get_string('weeks'), 86400 => get_string('days'), 
-                3600 => get_string('hours'), 60 => get_string('minutes'), 1 => get_string('seconds')
+            $this->_units = array(604800 => get_string('weeks'), 86400 => get_string('days'),
+                    3600 => get_string('hours'), 60 => get_string('minutes'), 1 => get_string('seconds')
             );
         }
         return $this->_units;
@@ -87,18 +86,18 @@ class datalynxfield_duration extends datalynxfield_base {
         $fieldid = $this->field->id;
         $contents = array();
         $oldcontents = array();
-        
+
         // old contents
         if (isset($entry->{"c{$fieldid}_content"})) {
             $oldcontents[] = $entry->{"c{$fieldid}_content"};
         }
-        
+
         $value = reset($values);
         $rawvalue = optional_param_array("field_{$fieldid}_{$entry->id}", ['number' => ''], PARAM_RAW);
         if ($rawvalue['number'] !== '') {
             $contents[] = $value;
         }
-        
+
         return array($contents, $oldcontents);
     }
 
@@ -106,25 +105,25 @@ class datalynxfield_duration extends datalynxfield_base {
      */
     public function parse_search($formdata, $i) {
         $values = array();
-        
-        $fromfield = optional_param_array('f_' . $i . '_' . $this->field->id . '_from', 
+
+        $fromfield = optional_param_array('f_' . $i . '_' . $this->field->id . '_from',
                 ['number' => ''], PARAM_RAW);
-        $tofield = optional_param_array('f_' . $i . '_' . $this->field->id . '_to', 
+        $tofield = optional_param_array('f_' . $i . '_' . $this->field->id . '_to',
                 ['number' => ''], PARAM_RAW);
-        
+
         $fromfield = isset($formdata->{'f_' . $i . '_' . $this->field->id . '_from'}) ? $formdata->{'f_' .
-                 $i . '_' . $this->field->id . '_from'} : $fromfield['number'];
+        $i . '_' . $this->field->id . '_from'} : $fromfield['number'];
         $tofield = isset($formdata->{'f_' . $i . '_' . $this->field->id . '_to'}) ? $formdata->{'f_' .
-                 $i . '_' . $this->field->id . '_to'} : $tofield['number'];
-        
+        $i . '_' . $this->field->id . '_to'} : $tofield['number'];
+
         if (!empty($fromfield) || "$fromfield" === "0") {
             $values[0] = $fromfield;
         }
-        
+
         if (!empty($tofield) || "$tofield" === "0") {
             $values[1] = $tofield;
         }
-        
+
         if (!empty($values)) {
             return $values;
         } else {
@@ -136,24 +135,24 @@ class datalynxfield_duration extends datalynxfield_base {
      */
     public function get_search_sql($search) {
         global $DB;
-        
+
         list($not, $operator, $value) = $search;
-        
+
         static $i = 0;
         $i++;
         $fieldid = $this->field->id;
         $name = "df_{$fieldid}_{$i}";
-        
+
         // For all NOT criteria except NOT Empty, exclude entries which don't meet the positive
         // criterion
         $excludeentries = (($not and $operator !== '') or (!$not and $operator === ''));
-        
+
         if ($excludeentries) {
             $varcharcontent = $DB->sql_compare_text('content');
         } else {
             $varcharcontent = $this->get_sql_compare_text();
         }
-        
+
         $params = [];
         switch ($operator) {
             case '=':
@@ -175,12 +174,12 @@ class datalynxfield_duration extends datalynxfield_base {
                 $sql = " 1 ";
                 break;
         }
-        
+
         if ($excludeentries) {
             // Get entry ids for entries that meet the criterion
             if ($eids = $this->get_entry_ids_for_content($sql, $params)) {
                 // Get NOT IN sql
-                list($notinids, $params) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED, 
+                list($notinids, $params) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED,
                         "df_{$fieldid}_", false);
                 $sql = " e.id $notinids ";
                 return array($sql, $params, false);
@@ -207,10 +206,10 @@ class datalynxfield_duration extends datalynxfield_base {
     }
 
     public function get_supported_search_operators() {
-        return array('' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'), 
-            '>' => get_string('greater_than', 'datalynx'), 
-            '>=' => get_string('greater_equal', 'datalynx'), 
-            '<' => get_string('less_than', 'datalynx'), '<=' => get_string('less_equal', 'datalynx'), 
-            'BETWEEN' => get_string('between', 'datalynx'));
+        return array('' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
+                '>' => get_string('greater_than', 'datalynx'),
+                '>=' => get_string('greater_equal', 'datalynx'),
+                '<' => get_string('less_than', 'datalynx'), '<=' => get_string('less_equal', 'datalynx'),
+                'BETWEEN' => get_string('between', 'datalynx'));
     }
 }

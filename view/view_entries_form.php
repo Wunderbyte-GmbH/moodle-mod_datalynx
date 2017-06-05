@@ -22,7 +22,6 @@
  */
 require_once $CFG->libdir . '/formslib.php';
 
-
 class datalynxview_entries_form extends moodleform {
 
     protected function definition() {
@@ -30,37 +29,37 @@ class datalynxview_entries_form extends moodleform {
         $mform = &$this->_form;
         $mform->addElement('hidden', 'new', optional_param('new', 0, PARAM_INT));
         $mform->setType('new', PARAM_INT);
-        
+
         $this->add_action_buttons();
-        
+
         $view->definition_to_form($mform);
-        
+
         $this->add_action_buttons();
     }
 
     function validation($data, $files) {
         $errors = parent::validation($data, $files);
-        
+
         if (empty($errors)) {
             $view = $this->_customdata['view'];
             $patterns = $view->get__patterns('field');
             $fields = $view->get_view_fields();
             $entryids = explode(',', $this->_customdata['update']);
-            
+
             foreach ($entryids as $entryid) {
                 foreach ($fields as $fid => $field) {
-                    $errors = array_merge($errors, 
+                    $errors = array_merge($errors,
                             $field->renderer()->validate($entryid, $patterns[$fid], (object) $data));
                 }
             }
         }
-        
+
         return $errors;
     }
 
     /**
      * Returns an HTML version of the form
-     * 
+     *
      * @return string HTML version of the form
      */
     public function html() {

@@ -27,11 +27,13 @@ $string['missingview'] = 'Please select a view';
 $string['nodatalynxs'] = 'No datalynxs are found in this course';
 $string['noviews'] = 'No views are found for the selected datalynx';
 $string['datalynx'] = 'Datalynx';
-$string['datalynx_help'] = 'Choose the Datalynx whose view you want to display. You can select any Datalynx in this site for which you have \'managetemplates\' capability.';
+$string['datalynx_help'] =
+        'Choose the Datalynx whose view you want to display. You can select any Datalynx in this site for which you have \'managetemplates\' capability.';
 $string['view'] = 'View';
 $string['view_help'] = 'Choose the view you want to display from the selectd Datalynx.';
 $string['filter'] = 'Filter';
-$string['filter_help'] = 'Choose a filter of the selected Datalynx. This filter will be applied to the selected view before displaying the view.';
+$string['filter_help'] =
+        'Choose a filter of the selected Datalynx. This filter will be applied to the selected view before displaying the view.';
 $string['css'] = 'Custom css';
 $string['css_help'] = 'Custom css';
 $string['customsort'] = 'Custom sort';
@@ -48,4 +50,5 @@ $string['entryauthor'] = 'Entry author';
 $string['entrygroup'] = 'Entry group';
 $string['viewbutton'] = 'View';
 $string['textfield'] = 'Textfield';
-$string['textfield_help'] = 'Choose a textfield of the selected Datalynx instance to be able to fetch the value of this textfield in every entry with specific criteria.';
+$string['textfield_help'] =
+        'Choose a textfield of the selected Datalynx instance to be able to fetch the value of this textfield in every entry with specific criteria.';

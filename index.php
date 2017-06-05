@@ -20,28 +20,28 @@
  * @subpackage datalynx
  * @copyright 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *         
+ *
  *          The Datalynx has been developed as an enhanced counterpart
  *          of Moodle's Database activity module (1.9.11+ (20110323)).
  *          To the extent that Datalynx code corresponds to Database code,
  *          certain copyrights on the Database module may obtain
  */
-require_once ("../../config.php");
-require_once ("$CFG->dirroot/mod/datalynx/mod_class.php");
-require_once ("$CFG->dirroot/mod/datalynx/lib.php");
+require_once("../../config.php");
+require_once("$CFG->dirroot/mod/datalynx/mod_class.php");
+require_once("$CFG->dirroot/mod/datalynx/lib.php");
 
 $id = required_param('id', PARAM_INT); // course
-                                                   // $add = optional_param('add', '', PARAM_ALPHA);
-                                                   // $update = optional_param('update', 0,
-                                                   // PARAM_INT);
-                                                   // $duplicate = optional_param('duplicate', 0,
-                                                   // PARAM_INT);
-                                                   // $hide = optional_param('hide', 0, PARAM_INT);
-                                                   // $show = optional_param('show', 0, PARAM_INT);
-                                                   // $movetosection =
-                                                   // optional_param('movetosection', 0, PARAM_INT);
-                                                   // $delete = optional_param('delete', 0,
-                                                   // PARAM_INT);
+// $add = optional_param('add', '', PARAM_ALPHA);
+// $update = optional_param('update', 0,
+// PARAM_INT);
+// $duplicate = optional_param('duplicate', 0,
+// PARAM_INT);
+// $hide = optional_param('hide', 0, PARAM_INT);
+// $show = optional_param('show', 0, PARAM_INT);
+// $movetosection =
+// optional_param('movetosection', 0, PARAM_INT);
+// $delete = optional_param('delete', 0,
+// PARAM_INT);
 
 if (!$course = $DB->get_record('course', array('id' => $id))) {
     throw new moodle_exception('invalidcourseid');
@@ -65,7 +65,7 @@ $PAGE->set_heading($course->fullname);
 echo $OUTPUT->header();
 
 if (!$datalynxs = get_all_instances_in_course("datalynx", $course)) {
-    notice(get_string('thereareno', 'moodle', $modulenameplural), 
+    notice(get_string('thereareno', 'moodle', $modulenameplural),
             new moodle_url('/course/view.php', array('id', $course->id)));
 }
 
@@ -105,7 +105,7 @@ $table->align[] = 'center';
 // rss
 $rss = (!empty($CFG->enablerssfeeds) and !empty($CFG->datalynx_enablerssfeeds));
 if ($rss) {
-    require_once ($CFG->libdir . "/rsslib.php");
+    require_once($CFG->libdir . "/rsslib.php");
     $table->head[] = 'RSS';
     $table->align[] = 'center';
 }
@@ -125,13 +125,13 @@ $strdelete = get_string('delete');
 
 foreach ($datalynxs as $datalynx) {
     $tablerow = array();
-    
+
     $df = new datalynx($datalynx);
-    
+
     if (!has_capability('mod/datalynx:viewindex', $df->context)) {
         continue;
     }
-    
+
     // section
     if ($usesections) {
         if ($datalynx->section !== $currentsection) {
@@ -144,23 +144,23 @@ foreach ($datalynxs as $datalynx) {
             $tablerow[] = '';
         }
     }
-    
+
     // name (linked; dim if not visible)
     $linkparams = !$datalynx->visible ? array('class' => 'dimmed') : null;
     $linkedname = html_writer::link(
             new moodle_url('/mod/datalynx/view.php', array('id' => $datalynx->coursemodule)),
-                    format_string($datalynx->name, true), $linkparams);
+            format_string($datalynx->name, true), $linkparams);
     $tablerow[] = $linkedname;
-    
+
     // description
     $tablerow[] = format_text($datalynx->intro, $datalynx->introformat, $options);
-    
+
     // number of entries
     $tablerow[] = $df->get_entriescount(datalynx::COUNT_ALL);
-    
+
     // number of pending entries
     $tablerow[] = $df->get_entriescount(datalynx::COUNT_LEFT);
-    
+
     // rss
     if ($rss) {
         if ($datalynx->rssarticles > 0) {
@@ -169,21 +169,21 @@ foreach ($datalynxs as $datalynx) {
             $tablerow[] = '';
         }
     }
-    
+
     if ($showeditbuttons) {
         $buttons = array();
         $editingurl->param('update', $datalynx->coursemodule);
         $buttons['edit'] = html_writer::link($editingurl, $OUTPUT->pix_icon('t/edit', $stredit));
         $editingurl->remove_params('update');
-        
+
         $editingurl->param('delete', $datalynx->coursemodule);
-        $buttons['delete'] = html_writer::link($editingurl, 
+        $buttons['delete'] = html_writer::link($editingurl,
                 $OUTPUT->pix_icon('t/delete', $strdelete));
         $editingurl->remove_params('delete');
-        
+
         $tablerow[] = implode('&nbsp;&nbsp;&nbsp;', $buttons);
     }
-    
+
     $table->data[] = $tablerow;
 }
 
