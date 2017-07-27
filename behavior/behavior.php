@@ -91,7 +91,7 @@ class datalynx_field_behavior {
 
     private static $default = array('id' => 0, 'name' => '', 'description' => '',
             'visibleto' => array(datalynx::PERMISSION_MANAGER, datalynx::PERMISSION_TEACHER,
-                    datalynx::PERMISSION_STUDENT, datalynx::PERMISSION_AUTHOR),
+                    datalynx::PERMISSION_STUDENT, datalynx::PERMISSION_AUTHOR, datalynx::PERMISSION_GUEST),
             'editableby' => array(datalynx::PERMISSION_MANAGER, datalynx::PERMISSION_TEACHER,
                     datalynx::PERMISSION_STUDENT, datalynx::PERMISSION_AUTHOR), 'required' => false);
 
