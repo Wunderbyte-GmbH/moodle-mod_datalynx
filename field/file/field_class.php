@@ -1,26 +1,28 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package datalynxfield
  * @subpackage file
  * @copyright 2012 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
+defined('MOODLE_INTERNAL') or die();
+
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
 /**
@@ -29,9 +31,9 @@ class datalynxfield_file extends datalynxfield_base {
 
     public $type = 'file';
 
-    // content - file manager
-    // content1 - alt name
-    // content2 - download counter
+    // Content - file manager.
+    // Content1 - alt name.
+    // Content2 - download counter.
 
     /**
      */
@@ -56,17 +58,12 @@ class datalynxfield_file extends datalynxfield_base {
             }
         }
 
-        // update file content
+        // Update file content.
         if ($editor) {
             return $this->save_changes_to_file($entry, $values);
         }
 
-        // delete files
-        // if ($delete) {
-        // return $this->delete_content($entryid);
-        // }
-
-        // store uploaded files
+        // Store uploaded files.
         $contentid = isset($entry->{"c{$this->field->id}_id"}) ? $entry->{"c{$this->field->id}_id"} : null;
         $draftarea = $filemanager;
         $usercontext = context_user::instance($USER->id);
@@ -74,7 +71,7 @@ class datalynxfield_file extends datalynxfield_base {
         $fs = get_file_storage();
         $files = $fs->get_area_files($usercontext->id, 'user', 'draft', $draftarea);
         if (count($files) > 1) {
-            // there are files to upload so add/update content record
+            // There are files to upload so add/update content record.
             $rec = new stdClass();
             $rec->fieldid = $fieldid;
             $rec->entryid = $entryid;
@@ -88,7 +85,7 @@ class datalynxfield_file extends datalynxfield_base {
                 $contentid = $DB->insert_record('datalynx_contents', $rec);
             }
 
-            // now save files
+            // Now save files.
             $options = array('subdirs' => 0, 'maxbytes' => $this->field->param1,
                     'maxfiles' => $this->field->param2, 'accepted_types' => $this->field->param3
             );
@@ -98,7 +95,7 @@ class datalynxfield_file extends datalynxfield_base {
 
             $this->update_content_files($contentid);
 
-            // user cleared files from the field
+            // User cleared files from the field.
         } else {
             if (!empty($contentid)) {
                 $this->delete_content($entryid);
@@ -134,12 +131,12 @@ class datalynxfield_file extends datalynxfield_base {
                 false)
         ) {
             $zipfile = reset($files);
-            // extract files to the draft area
+            // Extract files to the draft area.
             $zipper = get_file_packer('application/zip');
             $zipfile->extract_to_storage($zipper, $usercontext->id, 'user', 'draft', $draftid, '/');
             $zipfile->delete();
 
-            // move each file to its own area and add info to data
+            // Move each file to its own area and add info to data.
             if ($files = $fs->get_area_files($usercontext->id, 'user', 'draft', $draftid,
                     'sortorder', false)
             ) {
@@ -150,19 +147,16 @@ class datalynxfield_file extends datalynxfield_base {
 
                 $i = 0;
                 foreach ($files as $file) {
-                    // if ($file->is_valid_image()) {
-                    // $get unused draft area
                     $itemid = file_get_unused_draft_itemid();
-                    // move image to the new draft area
+                    // Move image to the new draft area.
                     $rec->itemid = $itemid;
                     $fs->create_file_from_storedfile($rec, $file);
-                    // add info to data
+                    // Add info to data.
                     $i--;
                     $fieldname = "field_{$fieldid}_$i";
                     $data->{"{$fieldname}_filemanager"} = $itemid;
                     $data->{"{$fieldname}_alttext"} = $file->get_filename();
                     $data->eids[$i] = $i;
-                    // }
                 }
                 $fs->delete_area_files($usercontext->id, 'user', 'draft', $draftid);
             }
@@ -190,22 +184,22 @@ class datalynxfield_file extends datalynxfield_base {
         $data = file_postupdate_standard_editor((object) $values, $fieldname, $options,
                 $this->df->context, 'mod_datalynx', 'content', $contentid);
 
-        // get the file content
+        // Get the file content.
         $fs = get_file_storage();
         $file = reset(
                 $fs->get_area_files($this->df->context->id, 'mod_datalynx', 'content', $contentid,
                         'sortorder', false));
         $filecontent = $file->get_content();
 
-        // find content position (between body tags)
+        // Find content position (between body tags).
         $tmpbodypos = stripos($filecontent, '<body');
         $openbodypos = strpos($filecontent, '>', $tmpbodypos) + 1;
         $sublength = strripos($filecontent, '</body>') - $openbodypos;
 
-        // replace body content with new content
+        // Replace body content with new content.
         $filecontent = substr_replace($filecontent, $data->$fieldname, $openbodypos, $sublength);
 
-        // prepare new file record
+        // Prepare new file record.
         $rec = new stdClass();
         $rec->contextid = $this->df->context->id;
         $rec->component = 'mod_datalynx';
@@ -219,10 +213,10 @@ class datalynxfield_file extends datalynxfield_base {
         $rec->author = $file->get_author();
         $rec->license = $file->get_license();
 
-        // delete old file
+        // Delete old file.
         $fs->delete_area_files($this->df->context->id, 'mod_datalynx', 'content', $contentid);
 
-        // create a new file from string
+        // Create a new file from string.
         $fs->create_file_from_string($rec, $filecontent);
         return true;
     }

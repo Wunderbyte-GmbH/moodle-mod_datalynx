@@ -1,31 +1,33 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package mod
  * @subpackage datalynx
  * @copyright 2012 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  *
  *          The Datalynx has been developed as an enhanced counterpart
  *          of Moodle's Database activity module (1.9.11+ (20110323)).
  *          To the extent that Datalynx code corresponds to Database code,
  *          certain copyrights on the Database module may obtain.
  */
+defined('MOODLE_INTERNAL') or die();
+
 require_once("$CFG->libdir/portfolio/caller.php");
 require_once("$CFG->dirroot/mod/datalynx/mod_class.php");
 require_once($CFG->libdir . '/filelib.php');
@@ -48,8 +50,7 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
      */
     public static function expected_callbackargs() {
         return array('id' => true, 'vid' => true, 'fid' => true, 'eids' => false,
-                'ecount' => false) // number of entries for full exports
-                ;
+                'ecount' => false);
     }
 
     /**
@@ -64,18 +65,13 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
      * base supported formats before we know anything about the export
      */
     public static function base_supported_formats() {
-        return array()
-                // PORTFOLIO_FORMAT_SPREADSHEET,
-                // PORTFOLIO_FORMAT_RICHHTML,
-                // PORTFOLIO_FORMAT_DOCUMENT,
-                // PORTFOLIO_FORMAT_LEAP2A
-                ;
+        return array();
     }
 
     /**
-     * get files to export if any
+     * get module
      *
-     * @global object $DB
+     * @throws portfolio_caller_exception
      */
     public function load_data() {
         if (!$this->cm = get_coursemodule_from_id('datalynx', $this->id)) {
@@ -86,10 +82,10 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
     /**
      * How long we think the export will take
      *
-     * @return one of PORTFOLIO_TIME_XX constants
+     * @return string
      */
     public function expected_time() {
-        // by number of exported entries
+        // By number of exported entries.
         if (!empty($this->eids)) {
             $dbtime = portfolio_expected_time_db(count(explode(',', $this->eids)));
         } else {
@@ -100,9 +96,8 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
             }
         }
 
-        // TODO by file sizes
-        // (only if export includes embedded files but this is in config and not
-        // yet accessible here ...)
+        // TODO by file sizes.
+        // (only if export includes embedded files but this is in config and not yet accessible here ...).
         $filetime = PORTFOLIO_TIME_HIGH;
 
         return ($filetime > $dbtime) ? $filetime : $dbtime;
@@ -121,16 +116,16 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
     /**
      * Prepare the package for export
      *
-     * @return stored_file object
+     * @return nothing
      */
     public function prepare_package() {
-        // set the exported view content
+        // Set the exported view content.
         $df = new datalynx(null, $this->id);
         $view = $df->get_view_from_id($this->vid);
         $view->set_filter(array('filterid' => $this->fid, 'eids' => $this->eids));
         $view->set_content();
 
-        // export to spreadsheet
+        // Export to spreadsheet.
         if ($this->exporter->get('formatclass') == PORTFOLIO_FORMAT_SPREADSHEET) {
             $content = $view->display(array('controls' => false, 'tohtml' => true));
             $filename = clean_filename(
@@ -139,11 +134,11 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
             return;
         }
 
-        // export to html
+        // Export to html.
         if ($this->exporter->get('formatclass') == PORTFOLIO_FORMAT_RICHHTML) {
             $exportfiles = $this->get_export_config('contentformat');
 
-            // collate embedded files (view and field)
+            // Collate embedded files (view and field).
             if ($exportfiles) {
                 if ($files = $view->get_embedded_files()) {
                     foreach ($files as $file) {
@@ -152,9 +147,9 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
                 }
             }
 
-            // export content
+            // Export content.
             if ($exportfiles != self::CONTENT_FILESONLY) {
-                // TODO the user may choose to export without files
+                // TODO the user may choose to export without files.
                 $content = $view->display(
                         array('controls' => false, 'tohtml' => true,
                                 'pluginfileurl' => $this->exporter->get('format')->get_file_directory()
@@ -165,9 +160,6 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
             return;
         }
 
-        // export to leap2a
-        // if ($this->exporter->get('formatclass') == PORTFOLIO_FORMAT_LEAP2A) {
-        // }
     }
 
     /**
@@ -176,7 +168,7 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
      * @return bool
      */
     public function check_permissions() {
-        // verification is done in the view so just return true
+        // Verification is done in the view so just return true.
         return true;
     }
 
@@ -195,7 +187,7 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
             return;
         }
 
-        // spreadsheet selection
+        // Spreadsheet selection.
         $types = array('csv', 'ods', 'xls');
         $options = array_combine($types, $types);
         $mform->addElement('select', 'caller_spreadsheettype',
@@ -203,7 +195,7 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
         $mform->setDefault('caller_spreadsheettype', 'csv');
         $mform->disabledIf('caller_spreadsheettype', 'format', 'neq', PORTFOLIO_FORMAT_SPREADSHEET);
 
-        // export content
+        // Export content.
         $options = array(self::CONTENT_NOFILES => 'Exclude embedded files',
                 self::CONTENT_WITHFILES => 'Include embedded files',
                 self::CONTENT_FILESONLY => 'embedded files only');
@@ -211,18 +203,8 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
                 get_string('exportcontent', 'datalynx'), $options);
         $mform->setDefault('caller_contentformat', self::CONTENT_NOFILES);
         $mform->disabledIf('caller_contentformat', 'format', 'neq', PORTFOLIO_FORMAT_RICHHTML);
-        /*
-         * // document selection
-         * $types = array('htm', 'txt');
-         * $options = array_combine($types, $types);
-         * $mform->addElement('select', 'caller_documenttype', get_string('documenttype',
-         * 'datalynx'), $options);
-         * $mform->setDefault('caller_documenttype', 'htm');
-         * $mform->disabledIf('caller_documenttype', 'format', 'neq', PORTFOLIO_FORMAT_DOCUMENT);
-         * $mform->disabledIf('caller_documenttype', 'caller_content', 'eq',
-         * self::CONTENT_FILESONLY);
-         */
-        // each entry in a separate file
+
+        // Each entry in a separate file.
         $mform->addElement('selectyesno', 'caller_separateentries',
                 get_string('separateentries', 'datalynx'));
     }
@@ -249,7 +231,7 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
  *
  * @category files
  * @copyright 2012 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 class datalynx_file_info_container extends file_info {
 

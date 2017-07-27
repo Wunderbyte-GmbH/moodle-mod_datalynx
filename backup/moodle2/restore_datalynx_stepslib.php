@@ -1,25 +1,26 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package mod-datalynx
  * @copyright 2011 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
+defined('MOODLE_INTERNAL') or die();
 
 /**
  * Define all the restore steps that will be used by the restore_datalynx_activity_task
@@ -36,8 +37,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
      */
     protected function define_structure() {
         $paths = array();
-        $userinfo = $this->get_setting_value('userinfo'); // restore content and user info (requires
-        // the backup users)
+        $userinfo = $this->get_setting_value('userinfo'); // Restore content and user info (requires the backup users).
 
         $paths[] = new restore_path_element('datalynx', '/activity/datalynx');
         $paths[] = new restore_path_element('datalynx_module', '/activity/datalynx/module');
@@ -56,7 +56,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             $paths[] = new restore_path_element('datalynx_grade', '/activity/datalynx/grades/grade');
         }
 
-        // Return the paths wrapped into standard activity structure
+        // Return the paths wrapped into standard activity structure.
         return $this->prepare_activity_structure($paths);
     }
 
@@ -66,18 +66,17 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         global $DB;
 
         $data = (object) $data;
-        $oldid = $data->id;
         $data->course = $this->get_courseid();
 
         $data->timemodified = $this->apply_date_offset($data->timemodified);
         $data->timeavailable = $this->apply_date_offset($data->timeavailable);
         $data->timedue = $this->apply_date_offset($data->timedue);
 
-        if ($data->grade < 0) { // scale found, get mapping
+        if ($data->grade < 0) { // Scale found, get mapping.
             $data->grade = -($this->get_mappingid('scale', abs($data->grade)));
         }
 
-        if ($data->rating < 0) { // scale found, get mapping
+        if ($data->rating < 0) { // Scale found, get mapping.
             $data->rating = -($this->get_mappingid('scale', abs($data->rating)));
         }
 
@@ -87,7 +86,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             $data->id = $newitemid;
             $DB->update_record('datalynx', $data);
         } else {
-            // insert the datalynx record
+            // Insert the datalynx record.
             $newitemid = $DB->insert_record('datalynx', $data);
         }
         $this->apply_activity_instance($newitemid);
@@ -102,20 +101,20 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         global $DB;
 
         if ($newitemid == $this->task->get_activityid()) {
-            // remap task module id
+            // Remap task module id.
             $this->set_mapping('course_module', $this->task->get_old_moduleid(),
                     $this->task->get_moduleid());
-            // remap task context id
+            // Remap task context id.
             $this->set_mapping('context', $this->task->get_old_contextid(),
                     $this->task->get_contextid());
         } else {
-            // Save activity id in task
+            // Save activity id in task.
             $this->task->set_activityid($newitemid);
-            // Apply the id to course_modules->instance
+            // Apply the id to course_modules->instance.
             $DB->set_field('course_modules', 'instance', $newitemid,
                     array('id' => $this->task->get_moduleid()));
         }
-        // Do the mapping for modulename, preparing it for files by oldcontext
+        // Do the mapping for modulename, preparing it for files by oldcontext.
         $oldid = $this->task->get_old_activityid();
         $this->set_mapping('datalynx', $oldid, $newitemid, true);
     }
@@ -126,7 +125,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         global $DB;
 
         $data = (object) $data;
-        // Adjust groupmode in course_modules->groupmode
+        // Adjust groupmode in course_modules->groupmode.
         if (isset($data->groupmode)) {
             $DB->set_field('course_modules', 'groupmode', $data->groupmode,
                     array('id' => $this->task->get_moduleid()));
@@ -143,7 +142,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
 
         $data->dataid = $this->get_new_parentid('datalynx');
 
-        // restore view reference for datalynxview field type
+        // Restore view reference for datalynxview field type.
         if ($data->type == 'datalynxview') {
             $data->param1 = $this->get_mappingid('datalynx', $data->param1);
             $data->param2 = $this->get_mappingid('datalynx_views', $data->param2);
@@ -154,17 +153,17 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             $filter = isset($data->targetfilter) ? $data->targetfilter : 'NULL';
 
             $this->log(
-                    "WARNING! 'datalynxview' field type cannot be restored if referencing instances are not included in the backup!",
+            "WARNING! 'datalynxview' field type cannot be restored if referencing instances are not included in the backup!",
                     backup::LOG_WARNING);
             $this->log("* Please verify the references of the field:", backup::LOG_WARNING);
             $this->log(
-                    "* Field '$data->name' originally referenced: course '$course', instance '$instance', view '$view', filter '$filter'",
+            "* Field '$data->name' originally referenced: course '$course', instance '$instance', view '$view', filter '$filter'",
                     backup::LOG_WARNING);
         }
 
-        // insert the datalynx_fields record
+        // Insert the datalynx_fields record.
         $newitemid = $DB->insert_record('datalynx_fields', $data);
-        $this->set_mapping('datalynx_field', $oldid, $newitemid, true); // files by this item id
+        $this->set_mapping('datalynx_field', $oldid, $newitemid, true); // Files by this item id.
     }
 
     /**
@@ -177,12 +176,12 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
 
         $data->dataid = $this->get_new_parentid('datalynx');
 
-        // adjust groupby field id
+        // Adjust groupby field id.
         if ($data->groupby > 0) {
             $data->groupby = $this->get_mappingid('datalynx_field', $data->groupby);
         }
 
-        // adjust customsort field ids
+        // Adjust customsort field ids.
         if ($data->customsort) {
             $customsort = unserialize($data->customsort);
             $sortfields = array();
@@ -196,7 +195,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             $data->customsort = serialize($sortfields);
         }
 
-        // adjust customsearch field ids
+        // Adjust customsearch field ids.
         if ($data->customsearch) {
             $customsearch = unserialize($data->customsearch);
             $searchfields = array();
@@ -210,9 +209,9 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             $data->customsearch = serialize($searchfields);
         }
 
-        // insert the datalynx_filters record
+        // Insert the datalynx_filters record.
         $newitemid = $DB->insert_record('datalynx_filters', $data);
-        $this->set_mapping('datalynx_filter', $oldid, $newitemid, false); // no files associated
+        $this->set_mapping('datalynx_filter', $oldid, $newitemid, false); // No files associated.
     }
 
     /**
@@ -225,17 +224,17 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
 
         $data->dataid = $this->get_new_parentid('datalynx');
 
-        // adjust groupby field id
+        // Adjust groupby field id.
         if ($data->groupby > 0) {
             $data->groupby = $this->get_mappingid('datalynx_field', $data->groupby);
         }
 
-        // adjust view filter id
+        // Adjust view filter id.
         if ($data->filter) {
             $data->filter = $this->get_mappingid('datalynx_filter', $data->filter);
         }
 
-        // adjust filter id in patterns used in the view template general section
+        // Adjust filter id in patterns used in the view template general section.
         if ($data->section) {
             $searchpattern = "/;filter=([0-9]+?);/";
             $haystack = $data->section;
@@ -250,14 +249,14 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             }
         }
 
-        // set patterns to null (they are only used as cache anyway)
+        // Set patterns to null (they are only used as cache anyway).
         if ($data->patterns) {
             $data->patterns = null;
         }
 
-        // insert the datalynx_views record
+        // Insert the datalynx_views record.
         $newitemid = $DB->insert_record('datalynx_views', $data);
-        $this->set_mapping('datalynx_view', $oldid, $newitemid, true); // files by this item id
+        $this->set_mapping('datalynx_view', $oldid, $newitemid, true); // Files by this item id.
     }
 
     /**
@@ -270,7 +269,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
 
         $data->dataid = $this->get_new_parentid('datalynx');
 
-        // Update teammemberselect ids in datalynx_rules event notifications
+        // Update teammemberselect ids in datalynx_rules event notifications.
         if ($data->param3 && $data->type == 'eventnotification') {
             $unserialized = unserialize($data->param3);
             if (!empty($unserialized['teams'])) {
@@ -282,7 +281,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             }
         }
 
-        // update the link to the views sent in the event notification
+        // Update the link to the views sent in the event notification.
         if ($data->param4 && $data->type == 'eventnotification') {
             $views = unserialize($data->param4);
             if (!empty($views)) {
@@ -293,9 +292,9 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             $data->param4 = serialize($views);
         }
 
-        // insert the datalynx_fields record
+        // Insert the datalynx_fields record.
         $newitemid = $DB->insert_record('datalynx_rules', $data);
-        $this->set_mapping('datalynx_rule', $oldid, $newitemid, false); // no files
+        $this->set_mapping('datalynx_rule', $oldid, $newitemid, false); // No files.
     }
 
     /**
@@ -318,9 +317,9 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         }
         $data->groupid = $this->get_mappingid('group', $data->groupid);
 
-        // insert the datalynx_entries record
+        // Insert the datalynx_entries record.
         $newitemid = $DB->insert_record('datalynx_entries', $data);
-        $this->set_mapping('datalynx_entry', $oldid, $newitemid, false); // no files associated
+        $this->set_mapping('datalynx_entry', $oldid, $newitemid, false); // No files associated.
     }
 
     /**
@@ -334,9 +333,9 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         $data->fieldid = $this->get_mappingid('datalynx_field', $data->fieldid);
         $data->entryid = $this->get_new_parentid('datalynx_entry');
 
-        // insert the data_content record
+        // Insert the data_content record.
         $newitemid = $DB->insert_record('datalynx_contents', $data);
-        $this->set_mapping('datalynx_content', $oldid, $newitemid, true); // files by this item id
+        $this->set_mapping('datalynx_content', $oldid, $newitemid, true); // Files by this item id.
     }
 
     /**
@@ -365,9 +364,9 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
 
         $data->dataid = $this->get_new_parentid('datalynx');
 
-        // insert the datalynx_fields record
+        // Insert the datalynx_fields record.
         $newitemid = $DB->insert_record('datalynx_behaviors', $data);
-        $this->set_mapping('datalynx_behavior', $oldid, $newitemid, false); // no files
+        $this->set_mapping('datalynx_behavior', $oldid, $newitemid, false); // No files.
     }
 
     /**
@@ -380,9 +379,9 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
 
         $data->dataid = $this->get_new_parentid('datalynx');
 
-        // insert the datalynx_fields record
+        // Insert the datalynx_fields record.
         $newitemid = $DB->insert_record('datalynx_renderers', $data);
-        $this->set_mapping('datalynx_renderer', $oldid, $newitemid, false); // no files
+        $this->set_mapping('datalynx_renderer', $oldid, $newitemid, false); // No files.
     }
 
     /**
@@ -392,7 +391,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         $data = (object) $data;
 
         $data->contextid = $this->task->get_contextid();
-        if ($data->scaleid < 0) { // scale found, get mapping
+        if ($data->scaleid < 0) { // Scale found, get mapping.
             $data->scaleid = -($this->get_mappingid('scale', abs($data->scaleid)));
         }
         $data->rating = $data->value;
@@ -427,30 +426,29 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
     protected function after_execute() {
         global $DB;
 
-        // Add data related files, no need to match by itemname (just internally handled context)
+        // Add data related files, no need to match by itemname (just internally handled context).
         $this->add_related_files('mod_datalynx', 'intro', null);
 
-        // Add content related files, matching by item id (datalynx_content)
+        // Add content related files, matching by item id (datalynx_content).
         $this->add_related_files('mod_datalynx', 'content', 'datalynx_content');
 
-        // Add content related files, matching by item id (datalynx_view)
-        // TODO it's not quite item id; need to add folders there
+        // Add content related files, matching by item id (datalynx_view).
+        // TODO it's not quite item id; need to add folders there.
         $this->add_related_files('mod_datalynx', 'view', 'datalynx_view');
 
-        // TODO Add preset related files, matching by itemname (data_content)
-        // $this->add_related_files('mod_datalynx', 'course_presets', 'datalynx');
+        // TODO Add preset related files, matching by itemname (data_content).
 
-        // Add view template related files, matching by item id (datalynx_view)
+        // Add view template related files, matching by item id (datalynx_view).
         $this->add_related_files('mod_datalynx', 'viewsection', 'datalynx_view');
 
-        // Add entry template related files, matching by item id (datalynx_view)
+        // Add entry template related files, matching by item id (datalynx_view).
         for ($i = 2; $i <= 9; $i++) {
             $this->add_related_files('mod_datalynx', "viewparam{$i}", 'datalynx_view');
         }
 
         $datalynxnewid = $this->get_new_parentid('datalynx');
 
-        // default view
+        // Default view.
         if ($defaultview = $DB->get_field('datalynx', 'defaultview',
                 array('id' => $datalynxnewid))
         ) {
@@ -460,7 +458,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             }
         }
 
-        // default filter
+        // Default filter.
         if ($defaultfilter = $DB->get_field('datalynx', 'defaultfilter',
                 array('id' => $datalynxnewid))
         ) {
@@ -470,7 +468,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             }
         }
 
-        // single edit view
+        // Single edit view.
         if ($singleedit = $DB->get_field('datalynx', 'singleedit',
                 array('id' => $datalynxnewid))
         ) {
@@ -480,7 +478,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             }
         }
 
-        // single view
+        // Single view.
         if ($singleview = $DB->get_field('datalynx', 'singleview',
                 array('id' => $datalynxnewid))
         ) {
@@ -490,9 +488,9 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             }
         }
 
-        // Update group mode if the original was set to internal mode
+        // Update group mode if the original was set to internal mode.
 
-        // Update teammmemberselect user ids
+        // Update teammmemberselect user ids.
         $sqllike = $DB->sql_like('df.type', ':type', false);
         $sql = "SELECT dc.id, dc.content
                   FROM {datalynx_contents} dc
@@ -511,8 +509,8 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
                         if ($newuser) {
                             $newusers[] = $newuser;
                         } else {
-                            $newusers[] = $user; // WARNING: hack for restoring into same instance
-                            // w/o course data
+                            $newusers[] = $user; // WARNING: hack for restoring into same instance.
+                            // W/o course data.
                         }
                     }
                 }
@@ -522,7 +520,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             }
         }
 
-        // Update teammmemberselect reference field ids
+        // Update teammmemberselect reference field ids.
         $sqllike = $DB->sql_like('df.type', ':type', false);
         $sql = "SELECT df.id, df.param5
                   FROM {datalynx_fields} df
@@ -541,7 +539,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             }
         }
 
-        // Update redirect on submit ids
+        // Update redirect on submit ids.
         $sql = "SELECT dv.id, dv.param10
                   FROM {datalynx_views} dv
                  WHERE dv.dataid = :dataid";
@@ -554,7 +552,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             }
         }
 
-        // Update id of userinfo fields if needed
+        // Update id of userinfo fields if needed.
         // TODO can we condition this on restore to new site?
         if ($userinfofields = $DB->get_records('datalynx_fields',
                 array('dataid' => $datalynxnewid, 'type' => 'userinfo'), '', 'id,param1,param2')

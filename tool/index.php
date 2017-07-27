@@ -1,50 +1,54 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package datalynxtool
  * @copyright 2011 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
+
 require_once('../../../config.php');
 require_once('../mod_class.php');
 
 $urlparams = new stdClass();
 
-$urlparams->d = optional_param('d', 0, PARAM_INT); // datalynx id
-$urlparams->id = optional_param('id', 0, PARAM_INT); // course module id
+$urlparams->d = optional_param('d', 0, PARAM_INT); // Datalynx id.
+$urlparams->id = optional_param('id', 0, PARAM_INT); // Course module id.
 
-// views list actions
-$urlparams->run = optional_param('run', '', PARAM_PLUGIN); // tool plugin to run
+// Views list actions.
+$urlparams->run = optional_param('run', '', PARAM_PLUGIN); // Tool plugin to run.
 
 $urlparams->confirmed = optional_param('confirmed', 0, PARAM_INT);
 
-// Set a datalynx object
+// Set a datalynx object.
 $df = new datalynx($urlparams->d, $urlparams->id);
+
+require_login($df->data->course, false, $df->cm);
+
 require_capability('mod/datalynx:managetemplates', $df->context);
 
 $df->set_page('tool/index', array('modjs' => true, 'urlparams' => $urlparams));
 
-// activate navigation node
+// Activate navigation node.
 navigation_node::override_active_url(
         new moodle_url('/mod/datalynx/tool/index.php', array('id' => $df->cm->id)));
 
-// DATA PROCESSING
-if ($urlparams->run and confirm_sesskey()) { // Run selected tool
+// DATA PROCESSING.
+if ($urlparams->run and confirm_sesskey()) { // Run selected tool.
     $tooldir = "$CFG->dirroot/mod/datalynx/tool/$urlparams->run";
     $toolclass = "datalynxtool_$urlparams->run";
     if (file_exists($tooldir)) {
@@ -59,7 +63,7 @@ if ($urlparams->run and confirm_sesskey()) { // Run selected tool
     }
 }
 
-// Get the list of tools
+// Get the list of tools.
 $directories = get_list_of_plugins('mod/datalynx/tool/');
 $tools = array();
 foreach ($directories as $directory) {
@@ -68,23 +72,23 @@ foreach ($directories as $directory) {
             'description' => get_string('pluginname_help', "datalynxtool_$directory")
     );
 }
-ksort($tools); // sort in alphabetical order
+ksort($tools); // Sort in alphabetical order.
 
-// any notifications?
+// Any notifications?
 if (!$tools) {
-    $df->notifications['bad'][] = get_string('toolnoneindatalynx', 'datalynx'); // nothing in
-    // database
+    $df->notifications['bad'][] = get_string('toolnoneindatalynx', 'datalynx'); // Nothing in.
+    // Database.
 }
 
-// print header
+// Print header.
 $df->print_header(array('tab' => 'tools', 'urlparams' => $urlparams));
 
-// if there are tools print admin style list of them
+// If there are tools print admin style list of them.
 if ($tools) {
     $actionbaseurl = '/mod/datalynx/tool/index.php';
     $linkparams = array('d' => $df->id(), 'sesskey' => sesskey());
 
-    // / table headings
+    // Table headings.
     $strname = get_string('name');
     $strdesc = get_string('description');
     $strrun = get_string('toolrun', 'datalynx');

@@ -1,25 +1,25 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package datalynxfield
  * @subpackage _approve
  * @copyright 2011 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 defined('MOODLE_INTERNAL') or die();
 
@@ -37,14 +37,14 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
         $canapprove = has_capability('mod/datalynx:approve', $df->context);
         $edit = !empty($options['edit']) ? $options['edit'] and $canapprove : false;
         $replacements = array();
-        // just one tag, empty until we check df settings
+        // Just one tag, empty until we check df settings.
         $replacements['##approve##'] = '';
 
         if ($df->data->approval) {
             if (!$entry or $edit) {
                 $replacements['##approve##'] = array('', array(array($this, 'display_edit'), array($entry)));
 
-                // existing entry to browse
+                // Existing entry to browse.
             } else {
                 $replacements['##approve##@'] = array('html', $this->display_browse($entry));
                 $replacements['##approve##'] = array('html', $this->display_browse($entry));
@@ -64,7 +64,7 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
                 1 => ucfirst(get_string('approved', 'datalynx')));
         $select = &$mform->createElement('select', "f_{$i}_$fieldid", null, $options);
         $select->setSelected($value);
-        // disable the 'not' and 'operator' fields
+        // Disable the 'not' and 'operator' fields.
         $mform->disabledIf("searchnot$i", "f_{$i}_$fieldid", 'neq', 2);
         $mform->disabledIf("searchoperator$i", "f_{$i}_$fieldid", 'neq', 2);
 

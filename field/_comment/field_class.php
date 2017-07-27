@@ -1,26 +1,28 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package datalynxfield
  * @subpackage _comment
  * @copyright 2012 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
+defined('MOODLE_INTERNAL') or die();
+
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
 class datalynxfield__comment extends datalynxfield_no_content {
@@ -52,7 +54,6 @@ class datalynxfield__comment extends datalynxfield_no_content {
      */
     public function get_sort_sql() {
         return '';
-        // return "(Select count(entryid) From mdl_datalynx_comments as cm Where cm.entryid = e.id)";
     }
 
     /**
@@ -74,34 +75,33 @@ class datalynxfield__comment extends datalynxfield_no_content {
     public function validation($params) {
         global $DB, $USER;
 
-        // Validate context
+        // Validate context.
         if (empty($params->context) or $params->context->id != $this->df->context->id) {
             throw new comment_exception('invalidcontextid', 'datalynx');
         }
 
-        // Validate course
+        // Validate course.
         if ($params->courseid != $this->df->course->id) {
             throw new comment_exception('invalidcourseid', 'datalynx');
         }
 
-        // Validate cm
+        // Validate cm.
         if ($params->cm->id != $this->df->cm->id) {
             throw new comment_exception('invalidcmid', 'datalynx');
         }
 
-        // validate comment area
+        // Validate comment area.
         if ($params->commentarea != 'entry' and $params->commentarea != 'activity') {
             throw new comment_exception('invalidcommentarea');
         }
 
-        // validation for non-comment-managers
+        // Validation for non-comment-managers.
         if (!has_capability('mod/datalynx:managecomments', $this->df->context)) {
 
-            // non-comment-managers can add/view comments on their own entries
-            // but require df->data->comments for add/view on other entries (excluding grading
-            // entries)
+            // Non-comment-managers can add/view comments on their own entries.
+            // But require df->data->comments for add/view on other entries (excluding grading entries).
 
-            // comments in the activity level are associated (itemid) with participants
+            // Comments in the activity level are associated (itemid) with participants.
             if ($params->commentarea == 'activity') {
                 if ($params->itemid != $USER->id) {
                     throw new comment_exception('invalidcommentitemid');
@@ -110,25 +110,12 @@ class datalynxfield__comment extends datalynxfield_no_content {
 
             if ($params->commentarea == 'entry') {
 
-                // check if comments enabled
-                // if (!$this->df->data->comments) {
-                // throw new comment_exception('commentsoff', 'datalynx');
-                // }
-
-                // validate entry
+                // Validate entry.
                 if (!$entry = $DB->get_record('datalynx_entries', array('id' => $params->itemid))) {
                     throw new comment_exception('invalidcommentitemid');
                 }
 
-                // check if approved
-                // if ($this->df->data->approval
-                // and !$entry->approved
-                // and !($entry->userid === $USER->id)
-                // and !has_capability('mod/datalynx:approve', $context)) {
-                // throw new comment_exception('notapproved', 'datalynx');
-                // }
-
-                // group access
+                // Group access.
                 if ($entry->groupid) {
                     $groupmode = groups_get_activity_groupmode($this->df->cm, $this->df->course);
                     if ($groupmode == SEPARATEGROUPS and
@@ -142,7 +129,7 @@ class datalynxfield__comment extends datalynxfield_no_content {
             }
         }
 
-        // validation for comment deletion
+        // Validation for comment deletion.
         if (!empty($params->commentid)) {
             if ($comment = $DB->get_record('comments', array('id' => $params->commentid
             ))

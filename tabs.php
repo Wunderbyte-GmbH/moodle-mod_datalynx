@@ -1,33 +1,35 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * @preset mod-datalynx
  *
  * @copyright 2012 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  *
  *          The Datalynx has been developed as an enhanced counterpart
  *          of Moodle's Database activity module (1.9.11+ (20110323)).
  *          To the extent that Datalynx code corresponds to Database code,
  *          certain copyrights on the Database module may obtain.
  */
+defined('MOODLE_INTERNAL') or die();
+
 $istemplatemanager = has_capability('mod/datalynx:managetemplates', $this->context);
 
-// tabs are displayed only for template managers
+// Tabs are displayed only for template managers.
 if (isloggedin() and $istemplatemanager) {
     if (empty($currenttab) or empty($this->data) or empty($this->course)) {
         throw new moodle_exception('emptytab', 'datalynx');
@@ -37,13 +39,13 @@ if (isloggedin() and $istemplatemanager) {
     $activated = array();
     $tabs = array();
 
-    // Browse/Management
+    // Browse/Management.
     $row = array();
     $row[] = new tabobject('browse',
             new moodle_url('/mod/datalynx/view.php', array('d' => $this->id())), get_string('browse', 'datalynx'));
     $row[] = new tabobject('manage',
             new moodle_url('/mod/datalynx/view/index.php', array('d' => $this->id())), get_string('manage', 'datalynx'));
-    // Add view edit tab
+    // Add view edit tab.
     if ($currenttab == 'browse' and !empty($this->_currentview)) {
         $params = array('d' => $this->id(), 'sesskey' => sesskey(),
                 'vedit' => $this->_currentview->id());
@@ -59,7 +61,7 @@ if (isloggedin() and $istemplatemanager) {
         $activated[] = 'manage';
 
         $row = array();
-        // template manager can do everything
+        // Template manager can do everything.
         if ($istemplatemanager) {
             $row[] = new tabobject('views',
                     new moodle_url('/mod/datalynx/view/index.php', array('d' => $this->id())),
@@ -107,7 +109,7 @@ if (isloggedin() and $istemplatemanager) {
         }
 
         $row = array();
-        // template manager can do everything
+        // Template manager can do everything.
         if ($istemplatemanager) {
             $row[] = new tabobject('fields2',
                     new moodle_url('/mod/datalynx/field/index.php', array('d' => $this->id())),

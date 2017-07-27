@@ -1,45 +1,46 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package datalynxfield
  * @subpackage text
  * @copyright 2011 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
+defined('MOODLE_INTERNAL') or die();
+
 require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
 class datalynxfield_text_form extends datalynxfield_form {
 
     /**
      */
-    function field_definition() {
+    public function field_definition() {
         global $OUTPUT, $DB, $PAGE, $CFG;
 
         $mform = &$this->_form;
 
-        // -------------------------------------------------------------------------------
         $mform->addElement('header', 'fieldattributeshdr',
                 get_string('fieldattributes', 'datalynx'));
 
-        // auto link
+        // Auto link.
         $mform->addElement('checkbox', 'param1', get_string('fieldallowautolink', 'datalynx'));
 
-        // field width
+        // Field width.
         $fieldwidthgrp = array();
         $fieldwidthgrp[] = &$mform->createElement('text', 'param2', null, array('size' => '8'));
         $fieldwidthgrp[] = &$mform->createElement('select', 'param3', null,
@@ -53,7 +54,7 @@ class datalynxfield_text_form extends datalynxfield_form {
         $mform->setDefault('param2', '');
         $mform->setDefault('param3', 'px');
 
-        // check for duplicate entries
+        // Check for duplicate entries.
         $duplicates = $this->get_list_of_duplicates();
 
         $mform->addElement('selectyesno', 'param8', get_string('unique', 'datalynx'));
@@ -63,22 +64,22 @@ class datalynxfield_text_form extends datalynxfield_form {
             // We set it constantly to 'no' if there are duplicates!
             $mform->setConstant('param8', 0);
             $mform->freeze('param8');
-            // Display the duplicate-entries-message and the list of duplicate entries
+            // Display the duplicate-entries-message and the list of duplicate entries.
             $listtext = $this->print_list_of_duplicates($duplicates);
             $mform->addElement('static', 'duplicatestext', '',
                     $OUTPUT->notification(get_string('field_has_duplicate_entries', 'datalynx') .
                             $listtext, 'notifymessage'));
         } else {
-            // if there are no duplicates the default option for unique is "No" as well, but the user can change it
+            // If there are no duplicates the default option for unique is "No" as well, but the user can change it.
             $mform->setDefault('param8', 0);
         }
 
-        // Get all Datalynxs where user has managetemplate capability
-        // TODO there may be too many
+        // Get all Datalynxs where user has managetemplate capability.
+        // TODO there may be too many.
         if ($datalynxs = $DB->get_records('datalynx')) {
             foreach ($datalynxs as $dfid => $datalynx) {
                 $df = new datalynx($datalynx);
-                // Remove if user cannot manage
+                // Remove if user cannot manage.
                 if (!has_capability('mod/datalynx:managetemplates', $df->context)) {
                     unset($datalynxs[$dfid]);
                     continue;
@@ -87,9 +88,9 @@ class datalynxfield_text_form extends datalynxfield_form {
             }
         }
 
-        // Autocompletion with content of other textfield from the same or other datalynx instance
+        // Autocompletion with content of other textfield from the same or other datalynx instance.
         //
-        // select Datalynx instance (to be stored in param9)
+        // Select Datalynx instance (to be stored in param9).
         if ($datalynxs) {
             $dfmenu = array('' => array(0 => get_string('noautocompletion', 'datalynx')));
             foreach ($datalynxs as $dfid => $df) {
@@ -105,14 +106,14 @@ class datalynxfield_text_form extends datalynxfield_form {
         $mform->addElement('selectgroups', 'param9', get_string('autocompletion', 'datalynx'), $dfmenu);
         $mform->addHelpButton('param9', 'autocompletion_textfield', 'datalynx');
 
-        // Select textfields of given instance (stored in param10)
+        // Select textfields of given instance (stored in param10).
         $options = array(0 => get_string('choosedots'));
         $mform->addElement('select', 'param10', get_string('textfield', 'datalynx'), $options);
         $mform->disabledIf('param10', 'param9', 'eq', 0);
         $mform->addHelpButton('param10', 'textfield', 'datalynx');
         $mform->setType('param10', PARAM_INT);
 
-        // ajax view loading
+        // Ajax view loading.
         $options = array(
                 'dffield' => 'param9',
                 'textfieldfield' => 'param10',
@@ -127,11 +128,10 @@ class datalynxfield_text_form extends datalynxfield_form {
 
         $PAGE->requires->js_init_call('M.mod_datalynx_load_views.init', array($options), false, $module);
 
-        // rules
-        // -------------------------------------------------------------------------------
+        // Rules.
         $mform->addElement('header', 'fieldruleshdr', get_string('fieldrules', 'datalynx'));
 
-        // format rules
+        // Format rules.
         $options = array('' => get_string('choosedots'),
                 'alphanumeric' => get_string('err_alphanumeric', 'form'),
                 'lettersonly' => get_string('err_lettersonly', 'form'),
@@ -140,7 +140,7 @@ class datalynxfield_text_form extends datalynxfield_form {
                 'nopunctuation' => get_string('err_nopunctuation', 'form'));
         $mform->addElement('select', 'param4', get_string('format'), $options);
 
-        // length (param5, 6, 7): min, max, range
+        // Length (param5, 6, 7) minimum, maximum, range.
         $options = array('' => get_string('choosedots'),
                 'minlength' => get_string('min', 'datalynx'),
                 'maxlength' => get_string('max', 'datalynx'),
@@ -165,7 +165,7 @@ class datalynxfield_text_form extends datalynxfield_form {
 
     /**
      */
-    function definition_after_data() {
+    public function definition_after_data() {
         global $DB;
 
         if ($selectedarr = $this->_form->getElement('param9')->getSelected()) {
@@ -199,7 +199,7 @@ class datalynxfield_text_form extends datalynxfield_form {
      * @param array $files
      * @return string[] Associative array with errors
      */
-    function validation($data, $files) {
+    public function validation($data, $files) {
         $mform = &$this->_form;
 
         $errors = parent::validation($data, $files);
@@ -227,7 +227,7 @@ class datalynxfield_text_form extends datalynxfield_form {
      *
      * @return $array entries with duplicate content (entryid, content)
      */
-    function get_list_of_duplicates() {
+    public function get_list_of_duplicates() {
         global $DB;
 
         $fieldid = $this->_field->id();
@@ -241,21 +241,21 @@ class datalynxfield_text_form extends datalynxfield_form {
                                     WHERE c.fieldid = :fieldid AND c.content IS NOT NULL
                                  GROUP BY c.content
                                    HAVING COUNT(*) > 1", array('fieldid' => $fieldid));
-        $list_of_duplicates = array();
+        $listofduplicates = array();
         foreach ($records as $record) {
             $ids = $DB->get_fieldset_sql("SELECT c.entryid
                                      FROM {datalynx_contents} c
                                     WHERE c.fieldid = :fieldid AND c.content = :content",
                     array('fieldid' => $fieldid, 'content' => $record->content));
             foreach ($ids as $id) {
-                $list_of_duplicates[] = array('id' => $id, 'content' => $record->content);
+                $listofduplicates[] = array('id' => $id, 'content' => $record->content);
             }
         }
-        return $list_of_duplicates;
+        return $listofduplicates;
 
     }
 
-    function print_list_of_duplicates($duplicates) {
+    public function print_list_of_duplicates($duplicates) {
         $entryurl = $baseurl = $this->get_editviewlink();
         $listtext = "";
         foreach ($duplicates as $entry) {
@@ -269,7 +269,7 @@ class datalynxfield_text_form extends datalynxfield_form {
         return $listtext;
     }
 
-    function get_editviewlink() {
+    public function get_editviewlink() {
 
         $df = $this->_df;
         $view = $df->get_current_view();

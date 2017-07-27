@@ -1,26 +1,28 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package datalynxfield
  * @subpackage teammemberselect
  * @copyright 2013 Ivan Šakić
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
+defined('MOODLE_INTERNAL') or die();
+
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
 class datalynxfield_teammemberselect extends datalynxfield_base {
@@ -130,13 +132,12 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         $baseurl = new moodle_url('/user/view.php', array('course' => $COURSE->id));
 
         foreach ($results as $result) {
-            // if user was already checked and was marked as forbidden, skip checking any other
-            // roles they might have
+            // If user was already checked and was marked as forbidden, skip checking any other roles they might have.
             if (in_array($result->id, self::$forbiddenuserids[$fieldid])) {
                 continue;
             }
 
-            // if this is the first time user is checked, add them to the all user list
+            // If this is the first time user is checked, add them to the all user list.
             if (!in_array($result->id, self::$alluserids[$fieldid])) {
                 $fullname = fullname($result);
                 self::$allusers[$fieldid][$result->id] = "$fullname ({$result->email})";
@@ -147,14 +148,13 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
                 self::$alluserids[$fieldid][] = $result->id;
             }
 
-            // if user has a forbidden role, remove them from admissible users (if present) and mark
-            // them as forbidden
+            // If user has a forbidden role, remove them from admissible users (if present) and mark them as forbidden.
             if (in_array($result->roleid, self::$admissibility['forbidden'])) {
                 self::$forbiddenuserids[$fieldid][] = $result->id;
                 unset(self::$allowedusers[$fieldid][$result->id]);
                 unset(self::$alloweduserslinks[$fieldid][$result->id]);
 
-                // otherwise, if user has a needed role, add them to admissible users
+                // Otherwise, if user has a needed role, add them to admissible users.
             } else {
                 if (in_array($result->roleid, self::$admissibility['needed'])) {
                     self::$allowedusers[$fieldid][$result->id] = self::$allusers[$fieldid][$result->id];
@@ -242,8 +242,19 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
             $options[0] = '...';
         }
 
-        $options += $makelinks ? ($allowall ? self::$alluserslinks[$fieldid] : self::$alloweduserslinks[$fieldid]) :
-                ($allowall ? self::$allusers[$fieldid] : self::$allowedusers[$fieldid]);
+        if ($makelinks) {
+            if ($allowall) {
+                $options += self::$alluserslinks[$fieldid];
+            } else {
+                $options += self::$alloweduserslinks[$fieldid];
+            }
+        } else {
+            if ($allowall) {
+                $options += self::$allusers[$fieldid];
+            } else {
+                $options += self::$allowedusers[$fieldid];
+            }
+        }
 
         if ($excludeuser && isset($options[$excludeuser])) {
             unset($options[$excludeuser]);
@@ -314,13 +325,13 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
                     $sqlnot = $DB->sql_like("content", ":{$name}_hascontent");
                     $params["{$name}_hascontent"] = "%";
 
-                    if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) { // there are non-empty
-                        // contents
+                    if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) { // There are non-empty.
+                        // Contents.
                         list($contentids, $paramsnot) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED,
                                 "df_{$fieldid}_x_", !!$not);
                         $params = array_merge($params, $paramsnot);
                         $sql = " (e.id $contentids) ";
-                    } else { // there are no non-empty contents
+                    } else { // There are no non-empty contents.
                         if ($not) {
                             $sql = " 0 ";
                         } else {
@@ -355,12 +366,12 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         $oldcontents = array();
         $contents = array();
 
-        // old contents
+        // Old contents.
         if (isset($entry->{"c{$fieldid}_content"})) {
             $oldcontents[] = $entry->{"c{$fieldid}_content"};
         }
 
-        // parse values
+        // Parse values.
         $first = reset($values);
         $selected = !empty($first) ? $first : array();
 

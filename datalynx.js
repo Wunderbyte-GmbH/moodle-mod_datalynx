@@ -1,22 +1,22 @@
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of Moodle - http:// Moodle.org/.
 //
 // Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
+// It under the terms of the GNU General Public License as published by
+// The Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
 // Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// But WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// Along with Moodle. If not, see <http:// Www.gnu.org/licenses/>.
 
 /**
  * @package mod-datalynx
  * @copyright 2011 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  *
  * The Datalynx has been developed as an enhanced counterpart
  * of Moodle's Database activity module (1.9.11+ (20110323)).
@@ -50,11 +50,11 @@ function bulk_action(elem, url, action, defaultval) {
         }
     }
 
-    // send selected entries to processing
+    // Send selected entries to processing.
     if (selected.length) {
         location.href = url + '&' + action + '=' + selected.join(',');
 
-        // if no entries selected but there is default, send it
+        // If no entries selected but there is default, send it.
     } else if (defaultval) {
         location.href = url + '&' + action + '=' + defaultval;
     }
@@ -93,9 +93,9 @@ M.datalynx_wordcount_bar = {pb: null};
 
 M.datalynx_wordcount_bar.callback = function (obj) {
     if (typeof tinyMCE == 'undefined') {
-        // For normal textareas
+        // For normal textareas.
         editor = document.getElementById('id_' + obj.pbid + '_editor');
-        //insertAtCursor(editor, value);
+        // InsertAtCursor(editor, value);.
     } else {
         editor = tinyMCE.get('id_' + obj.pbid + '_editor');
 
@@ -129,13 +129,13 @@ M.datalynx_wordcount_bar.init = function (Y, options) {
     this.pb.render('id_' + this.pbid + '_wordcount_pb');
     Dom.get('id_' + this.pbid + '_wordcount_value').innerHTML = options['value'];
 
-    //var anim = this.pb.get('anim');
-    //anim.duration = 1;
-    //anim.method = YAHOO.util.Easing.easeNone;
+    // Var anim = this.pb.get('anim');.
+    // Anim.duration = 1;.
+    // Anim.method = YAHOO.util.Easing.easeNone;.
 
-    //this.pb.on('progress', function(value){
-    //    Dom.get('id_'+this.pbid+'_wordcount_value').innerHTML = value;
-    //});
+    // This.pb.on('progress', function(value){.
+    // Dom.get('id_'+this.pbid+'_wordcount_value').innerHTML = value;.
+    // });.
 
     this.pb.on('valueChange', function (oArgs) {
         Dom.get('id_' + this.pbid + '_wordcount_value').innerHTML = oArgs.newValue;
@@ -255,7 +255,7 @@ M.mod_datalynx.tag_manager.add_tag_spans = function (editordiv) {
     var editor = editordiv.one(".editor_atto  .editor_atto_content");
     var textarea = editordiv.one("textarea");
 
-    // field tags
+    // Field tags.
     var tagregex = /\[\[([^\|\]]+)(?:\|([^\|\]]*))?(?:\|([^\|\]]*))?]](@?)/g;
     var oldcontent = textarea.get('value');
     var newcontent = oldcontent;
@@ -271,7 +271,7 @@ M.mod_datalynx.tag_manager.add_tag_spans = function (editordiv) {
         }
     }
 
-    // action tags
+    // Action tags.
     tagregex = /##([^#]*)?##(@?)/g;
     splittag = [];
     while ((splittag = tagregex.exec(oldcontent)) !== null) {
@@ -288,18 +288,18 @@ M.mod_datalynx.tag_manager.add_tag_spans = function (editordiv) {
     textarea.simulate('change');
 
     function preg_quote(str, delimiter) {
-        //  discuss at: http://phpjs.org/functions/preg_quote/
-        // original by: booeyOH
-        // improved by: Ates Goral (http://magnetiq.com)
-        // improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-        // improved by: Brett Zamir (http://brett-zamir.me)
-        // bugfixed by: Onno Marsman
-        //   example 1: preg_quote("$40");
-        //   returns 1: '\\$40'
-        //   example 2: preg_quote("*RRRING* Hello?");
-        //   returns 2: '\\*RRRING\\* Hello\\?'
-        //   example 3: preg_quote("\\.+*?[^]$(){}=!<>|:");
-        //   returns 3: '\\\\\\.\\+\\*\\?\\[\\^\\]\\$\\(\\)\\{\\}\\=\\!\\<\\>\\|\\:'
+        // Discuss at: http:// Phpjs.org/functions/preg_quote/.
+        // Original by: booeyOH.
+        // Improved by: Ates Goral (http:// Magnetiq.com).
+        // Improved by: Kevin van Zonneveld (http:// Kevin.vanzonneveld.net).
+        // Improved by: Brett Zamir (http:// Brett-zamir.me).
+        // Bugfixed by: Onno Marsman.
+        // Example 1: preg_quote("$40");.
+        // Returns 1: '\\$40'.
+        // Example 2: preg_quote("*RRRING* Hello?");.
+        // Returns 2: '\\*RRRING\\* Hello\\?'.
+        // Example 3: preg_quote("\\.+*?[^]$(){}=!<>|:");.
+        // Returns 3: '\\\\\\.\\+\\*\\?\\[\\^\\]\\$\\(\\)\\{\\}\\=\\!\\<\\>\\|\\:'.
 
         return String(str).replace(new RegExp('[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\' + (delimiter || '') + '-]', 'g'), '\\$&');
     }
@@ -344,14 +344,7 @@ M.mod_datalynx.tag_manager.init_span_dialog = function (Y) {
 
     var dialog = M.mod_datalynx.tag_manager.dialog = new M.core.dialogue(config);
     var dialogcontent = Y.Node.create(
-        '<div id="datalynx-tag-dialog-content">' +
-        '<div id="datalynx-field-tag-contols">' +
-        '<p><label for="datalynx-tag-fieldtype">' + M.util.get_string('fieldtype', 'datalynx', null) + ':</label><span id="datalynx-tag-fieldtype"></span></p>' +
-        '<p><label for="datalynx-tag-behavior-menu">' + M.util.get_string('behavior', 'datalynx', null) + ':</label><select id="datalynx-tag-behavior-menu"></select></p>' +
-        '<p><label for="datalynx-tag-renderer-menu">' + M.util.get_string('renderer', 'datalynx', null) + ':</label><select id="datalynx-tag-renderer-menu"></select></p>' +
-        '</div>' +
-        '<button type="button" id="datalynx-tag-button-delete">' + M.util.get_string('deletetag', 'datalynx', null) + '</button>' +
-        '</div>');
+        '<div id="datalynx-tag-dialog-content">' + '<div id="datalynx-field-tag-contols">' + '<p><label for="datalynx-tag-fieldtype">' + M.util.get_string('fieldtype', 'datalynx', null) + ':</label><span id="datalynx-tag-fieldtype"></span></p>' + '<p><label for="datalynx-tag-behavior-menu">' + M.util.get_string('behavior', 'datalynx', null) + ':</label><select id="datalynx-tag-behavior-menu"></select></p>' + '<p><label for="datalynx-tag-renderer-menu">' + M.util.get_string('renderer', 'datalynx', null) + ':</label><select id="datalynx-tag-renderer-menu"></select></p>' + '</div>' + '<button type="button" id="datalynx-tag-button-delete">' + M.util.get_string('deletetag', 'datalynx', null) + '</button>' + '</div>');
     var behaviorselect = dialogcontent.one('#datalynx-tag-behavior-menu');
     var rendererselect = dialogcontent.one('#datalynx-tag-renderer-menu');
 
@@ -537,13 +530,10 @@ M.mod_datalynx.tag_manager.create_advanced_tag = function (type, fieldname, beha
     var output = '';
     switch (type) {
         case 'field':
-            output = '<button type="button" contenteditable="false" ' +
-                'class="datalynx-tag datalynx-field-tag" data-datalynx-field="' + fieldname +
-                '" data-datalynx-behavior="' + behavior + '" data-datalynx-renderer="' + renderer + '">' + fieldname + '</button>';
+            output = '<button type="button" contenteditable="false" ' + 'class="datalynx-tag datalynx-field-tag" data-datalynx-field="' + fieldname + '" data-datalynx-behavior="' + behavior + '" data-datalynx-renderer="' + renderer + '">' + fieldname + '</button>';
             break;
         case 'action':
-            output = '<button type="button" contenteditable="false" ' +
-                'class="datalynx-tag datalynx-action-tag" data-datalynx-field="' + fieldname + '">' + fieldname + '</button>';
+            output = '<button type="button" contenteditable="false" ' + 'class="datalynx-tag datalynx-action-tag" data-datalynx-field="' + fieldname + '">' + fieldname + '</button>';
             break;
         default:
             output = fieldname;
@@ -583,7 +573,7 @@ M.mod_datalynx.tag_manager.insert_at_caret = function (Y, editordiv, html) {
     var sel, range, firstTop;
     var container = editordiv.one(".editor_atto_content_wrap");
     if (window.getSelection) {
-        // IE9 and non-IE
+        // IE9 and non-IE.
         sel = window.getSelection();
         if (sel.getRangeAt && sel.rangeCount) {
             range = sel.getRangeAt(0);
@@ -600,7 +590,7 @@ M.mod_datalynx.tag_manager.insert_at_caret = function (Y, editordiv, html) {
                 }
                 range.insertNode(frag);
 
-                // Preserve the selection
+                // Preserve the selection.
                 if (lastNode) {
                     range = range.cloneRange();
                     range.setStartAfter(lastNode);
@@ -611,7 +601,7 @@ M.mod_datalynx.tag_manager.insert_at_caret = function (Y, editordiv, html) {
             }
         }
     } else if (document.selection && document.selection.type != "Control") {
-        // IE < 9
+        // IE < 9.
         range = document.selection.createRange();
         firstTop = Y.one(range.parentElement());
         if (firstTop !== null && (container.compareTo(firstTop) || container.one("#" + firstTop.get("id")) !== null)) {

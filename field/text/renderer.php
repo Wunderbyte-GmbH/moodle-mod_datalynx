@@ -1,25 +1,25 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package datalynxfield
  * @subpackage text
  * @copyright 2014 Ivan Šakić
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 defined('MOODLE_INTERNAL') or die();
 
@@ -54,14 +54,14 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
         }
         if ($autocomplete) {
             $fieldattr['class'] = "datalynxfield_datalynxview datalynxview_{$fieldid}_{$entryid}";
-            // $fieldattr['multiple'] = "true";
-            // If param10 is empty take the values of this field itself for autocomplete options
+            // If param10 is empty take the values of this field itself for autocomplete options.
             $reffieldid = $field->field->param10 ? $field->field->param10 : $field->field->id;
-            $menu = array('_qf__force_multiselect_submission' => get_string('choose')) +
-                    $field->df->get_distinct_textfieldvalues_by_id($reffieldid);
+            $menu = array(
+                    '_qf__force_multiselect_submission'
+                    => get_string('choose')) + $field->df->get_distinct_textfieldvalues_by_id($reffieldid);
         }
 
-        if ($autocomplete) {  // render as autocomplete field if param9 is not empty
+        if ($autocomplete) {  // Render as autocomplete field if param9 is not empty.
             $fieldattr['tags'] = true;
             $mform->addElement('autocomplete', $fieldname, null, $menu, $fieldattr);
             $mform->setType($fieldname, PARAM_NOTAGS);
@@ -73,10 +73,10 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
         if ($required) {
             $mform->addRule($fieldname, null, 'required', null, 'client');
         }
-        // format rule
+        // Format rule.
         if ($format = $field->get('param4')) {
             $mform->addRule($fieldname, null, $format, null, 'client');
-            // Adjust type
+            // Adjust type.
             switch ($format) {
                 case 'alphanumeric':
                     $mform->setType($fieldname, PARAM_ALPHANUM);
@@ -92,7 +92,7 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
                     break;
             }
         }
-        // length rule
+        // Length rule.
         if ($length = $field->get('param5')) {
             ($min = $field->get('param6')) or ($min = 0);
             ($max = $field->get('param7')) or ($max = 64);
@@ -128,8 +128,8 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
             $options->para = false;
 
             $format = FORMAT_PLAIN;
-            if ($field->get('param1') == '1') { // We are autolinking this field, so disable linking
-                // within us
+            if ($field->get('param1') == '1') { // We are autolinking this field, so disable linking.
+                // Within us.
                 $nolinkstart = '<span class="nolink">';
                 $nolinkend = '</span>';
                 $options->filter = false;
@@ -166,8 +166,8 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
 
         $errors = array();
         foreach ($tags as $tag) {
-            list(, $behavior,) = $this->process_tag($tag);
-            /* @var $behavior datalynx_field_behavior */
+            list(, $behavior, ) = $this->process_tag($tag);
+            // Variable $behavior datalynx_field_behavior.
             if ($behavior->is_required() and isset($formdata->$formfieldname)) {
                 if (!clean_param($formdata->$formfieldname, PARAM_NOTAGS)) {
                     $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
@@ -178,8 +178,8 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
                 // Check uniquenes!
                 if ($DB->record_exists_sql("SELECT id
                                               FROM {datalynx_contents} c
-                                             WHERE c.fieldid = :fieldid 
-                                               AND c.entryid <> :entryid 
+                                             WHERE c.fieldid = :fieldid
+                                               AND c.entryid <> :entryid
                                                AND c.content LIKE :content",
                         array('fieldid' => $fieldid,
                                 'entryid' => $entryid,

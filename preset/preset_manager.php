@@ -1,26 +1,27 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package mod
  * @package preset
  * @copyright 2012 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
+defined('MOODLE_INTERNAL') or die();
 
 /**
  * Preset manager class
@@ -46,16 +47,17 @@ class datalynx_preset_manager {
      * Returns an array of the shared presets (in moodledata) the user is allowed to access
      *
      * @param in $presetarea PRESET_COURSEAREA/PRESET_SITEAREA
+     * @return array
      */
     public function get_user_presets($presetarea) {
         global $USER;
 
         $presets = array();
-        $course_context = context_course::instance($this->_df->course->id);
+        $coursecontext = context_course::instance($this->_df->course->id);
 
         $fs = get_file_storage();
         if ($presetarea == self::PRESET_COURSEAREA) {
-            $files = $fs->get_area_files($course_context->id, 'mod_datalynx', $presetarea);
+            $files = $fs->get_area_files($coursecontext->id, 'mod_datalynx', $presetarea);
         } else {
             if ($presetarea == self::PRESET_SITEAREA) {
                 $files = $fs->get_area_files(self::PRESET_SITECONTEXT, 'mod_datalynx', $presetarea);
@@ -94,10 +96,10 @@ class datalynx_preset_manager {
             $linkparams = array('d' => $this->_df->id(), 'sesskey' => sesskey());
             $actionurl = htmlspecialchars_decode(new moodle_url($targetpage, $linkparams));
 
-            // prepare to make file links
+            // Prepare to make file links.
             require_once("$CFG->libdir/filelib.php");
 
-            // / table headings
+            // Table headings.
             $strname = get_string('name');
             $strdescription = get_string('description');
             $strscreenshot = get_string('screenshot');
@@ -138,9 +140,9 @@ class datalynx_preset_manager {
             $table->wrap = array(false, false, false, false, false, false, false, false);
             $table->attributes['align'] = 'center';
 
-            // print local presets
+            // Print local presets.
             if ($localpresets) {
-                // headingg
+                // Headingg.
                 $lpheadingcell = new html_table_cell();
                 $lpheadingcell->text = html_writer::tag('h4',
                         get_string('presetavailableincourse', 'datalynx'));
@@ -156,16 +158,9 @@ class datalynx_preset_manager {
                     $presetname = $preset->shortname;
                     $presetdescription = '';
                     $presetscreenshot = '';
-                    // if ($preset->screenshot) {
-                    // $presetscreenshot = '<img width="150" class="presetscreenshot" src="'.
-                    // $preset->screenshot. '" alt="'. get_string('screenshot'). '" />';
-                    // }
                     $presetapply = html_writer::link(
                             new moodle_url($targetpage, $linkparams + array('apply' => $preset->id)),
                             $OUTPUT->pix_icon('t/switch_whole', $strapply));
-                    // $presetapplymap = html_writer::link(new moodle_url($targetpage, $linkparams +
-                    // array('applymap' => $preset->id)),
-                    // $OUTPUT->pix_icon('t/switch_plus', $strapply));
                     $presetdownload = html_writer::link(
                             moodle_url::make_file_url("/pluginfile.php",
                                     "/$preset->contextid/mod_datalynx/course_presets/$preset->itemid/$preset->name"),
@@ -187,9 +182,9 @@ class datalynx_preset_manager {
                 }
             }
 
-            // print shared presets
+            // Print shared presets.
             if ($sharedpresets) {
-                // heading
+                // Heading.
                 $lpheadingcell = new html_table_cell();
                 $lpheadingcell->text = html_writer::tag('h4',
                         get_string('presetavailableinsite', 'datalynx'));
@@ -210,9 +205,6 @@ class datalynx_preset_manager {
                     $presetapply = html_writer::link(
                             new moodle_url($targetpage, $linkparams + array('apply' => $preset->id)),
                             $OUTPUT->pix_icon('t/switch_whole', $strapply));
-                    // $presetapplymap = html_writer::link(new moodle_url($targetpage, $linkparams +
-                    // array('applymap' => $preset->id)), $OUTPUT->pix_icon('t/switch_plus',
-                    // $strapply));
                     $presetdownload = html_writer::link(
                             moodle_url::make_file_url("/pluginfile.php",
                                     "/$preset->contextid/mod_datalynx/site_presets/$preset->itemid/$preset->name"),
@@ -253,41 +245,40 @@ class datalynx_preset_manager {
     /**
      */
     public function process_presets($params) {
-        global $CFG;
 
         $mform = new mod_datalynx_preset_form(
                 new moodle_url('mod/datalynx/preset/index.php',
                         array('d' => $this->_df->id(), 'sesskey' => sesskey(), 'add' => 1)));
-        // add presets
+        // Add presets.
         if ($data = $mform->get_data()) {
-            // preset this datalynx
+            // Preset this datalynx.
             if ($data->preset_source == 'current') {
                 $this->create_preset_from_backup($data->preset_data);
 
-                // upload presets
+                // Upload presets.
             } else {
                 if ($data->preset_source == 'file') {
                     $this->create_preset_from_upload($data->uploadfile);
                 }
             }
-            // apply a preset
+            // Apply a preset.
         } else {
             if ($params->apply and confirm_sesskey()) {
                 $this->apply_preset($params->apply, $params->torestorer);
-                // rebuild course cache to show new datalynx name on the course page
+                // Rebuild course cache to show new datalynx name on the course page.
                 rebuild_course_cache($this->_df->course->id);
 
-                // download (bulk in zip)
+                // Download (bulk in zip).
             } else {
                 if ($params->download and confirm_sesskey()) {
                     $this->download_presets($params->download);
 
-                    // share presets
+                    // Share presets.
                 } else {
                     if ($params->share and confirm_sesskey()) {
                         $this->share_presets($params->share);
 
-                        // delete presets
+                        // Delete presets.
                     } else {
                         if ($params->delete and confirm_sesskey()) {
                             $this->delete_presets($params->delete);
@@ -314,16 +305,16 @@ class datalynx_preset_manager {
                 $users = 1;
         }
 
-        // store preset settings in $SESSION
+        // Store preset settings in $SESSION.
         $SESSION->{"datalynx_{$this->_df->cm->id}_preset"} = "$users $anon";
 
         $bc = new backup_controller(backup::TYPE_1ACTIVITY, $this->_df->cm->id,
                 backup::FORMAT_MOODLE, backup::INTERACTIVE_NO, backup::MODE_GENERAL, $USER->id);
 
-        // clear preset settings from $SESSION
+        // Clear preset settings from $SESSION.
         unset($SESSION->{"datalynx_{$this->_df->cm->id}_preset"});
 
-        // set users and anon in plan
+        // Set users and anon in plan.
         $bc->get_plan()->get_setting('users')->set_value($users);
         $bc->get_plan()->get_setting('anonymize')->set_value($anon);
         $bc->set_status(backup::STATUS_AWAITING);
@@ -341,13 +332,13 @@ class datalynx_preset_manager {
             $files = $fs->get_area_files($contextid, 'user', 'backup', 0, 'timemodified', false);
         }
         if (!empty($files)) {
-            $course_context = context_course::instance($this->_df->course->id);
+            $coursecontext = context_course::instance($this->_df->course->id);
             foreach ($files as $file) {
                 if ($file->get_contextid() != $contextid) {
                     continue;
                 }
                 $preset = new stdClass();
-                $preset->contextid = $course_context->id;
+                $preset->contextid = $coursecontext->id;
                 $preset->component = 'mod_datalynx';
                 $preset->filearea = self::PRESET_COURSEAREA;
                 $preset->filepath = '/';
@@ -376,9 +367,9 @@ class datalynx_preset_manager {
                 false)
         ) {
             $file = reset($files);
-            $course_context = context_course::instance($this->_df->course->id);
+            $coursecontext = context_course::instance($this->_df->course->id);
             $preset = new stdClass();
-            $preset->contextid = $course_context->id;
+            $preset->contextid = $coursecontext->id;
             $preset->component = 'mod_datalynx';
             $preset->filearea = self::PRESET_COURSEAREA;
             $preset->filepath = '/';
@@ -389,7 +380,7 @@ class datalynx_preset_manager {
                 $fs->create_file_from_storedfile($preset, $file);
             } else {
                 if ($ext == 'zip') {
-                    // extract files to the draft area
+                    // Extract files to the draft area.
                     $zipper = get_file_packer('application/zip');
                     $file->extract_to_storage($zipper, $usercontext->id, 'user', 'draft', $draftid, '/');
                     $file->delete();
@@ -418,7 +409,7 @@ class datalynx_preset_manager {
     public function apply_preset($userpreset, $torestorer = true) {
         global $DB, $CFG, $USER;
 
-        // extract the backup file to the temp folder
+        // Extract the backup file to the temp folder.
         $folder = 'tmp-' . $this->_df->context->id . '-' . time();
         $backuptempdir = make_temp_directory("backup/$folder");
         $zipper = get_file_packer('application/zip');
@@ -428,7 +419,7 @@ class datalynx_preset_manager {
 
         require_once("$CFG->dirroot/backup/util/includes/restore_includes.php");
 
-        // anonymous users cleanup
+        // Anonymous users cleanup.
         $DB->delete_records_select('user', $DB->sql_like('firstname', '?'),
                 array('%anonfirstname%'));
 
@@ -438,7 +429,7 @@ class datalynx_preset_manager {
 
         $rc->execute_precheck();
 
-        // get the datalynx restore activity task
+        // Get the datalynx restore activity task.
         $tasks = $rc->get_plan()->get_tasks();
         $datalynxtask = null;
         foreach ($tasks as &$task) {
@@ -460,9 +451,9 @@ class datalynx_preset_manager {
             $rc->execute_plan();
 
             $transaction->allow_commit();
-            // rc cleanup
+            // Rc cleanup.
             $rc->destroy();
-            // anonymous users cleanup
+            // Anonymous users cleanup.
             $DB->delete_records_select('user', $DB->sql_like('firstname', '?'),
                     array('%anonfirstname%'));
 
@@ -475,7 +466,6 @@ class datalynx_preset_manager {
     /**
      */
     public function download_presets($presetids) {
-        global $CFG;
 
         if (headers_sent()) {
             throw new moodle_exception('headerssent');
@@ -488,9 +478,9 @@ class datalynx_preset_manager {
         $presets = array();
         $fs = get_file_storage();
 
-        // try first course area
-        $course_context = context_course::instance($this->_df->course->id);
-        $contextid = $course_context->id;
+        // Try first course area.
+        $coursecontext = context_course::instance($this->_df->course->id);
+        $contextid = $coursecontext->id;
 
         if ($files = $fs->get_area_files($contextid, 'mod_datalynx', self::PRESET_COURSEAREA)) {
             foreach ($files as $file) {
@@ -508,7 +498,7 @@ class datalynx_preset_manager {
             }
         }
 
-        // try site area
+        // Try site area.
         if (!empty($pids)) {
             if ($files = $fs->get_area_files(self::PRESET_SITECONTEXT, 'mod_datalynx',
                     self::PRESET_SITEAREA)
@@ -551,7 +541,6 @@ class datalynx_preset_manager {
     /**
      */
     public function share_presets($presetids) {
-        global $CFG, $USER;
 
         if (!has_capability('mod/datalynx:presetsviewall', $this->_df->context)) {
             return false;
@@ -583,9 +572,9 @@ class datalynx_preset_manager {
 
         $fs = get_file_storage();
 
-        // try first course area
-        $course_context = context_course::instance($this->_df->course->id);
-        $contextid = $course_context->id;
+        // Try first course area.
+        $coursecontext = context_course::instance($this->_df->course->id);
+        $contextid = $coursecontext->id;
 
         if ($files = $fs->get_area_files($contextid, 'mod_datalynx', self::PRESET_COURSEAREA)) {
             foreach ($files as $file) {
@@ -603,7 +592,7 @@ class datalynx_preset_manager {
             }
         }
 
-        // try site area
+        // Try site area.
         if (!empty($pids)) {
             if ($files = $fs->get_area_files(self::PRESET_SITECONTEXT, 'mod_datalynx',
                     self::PRESET_SITEAREA)

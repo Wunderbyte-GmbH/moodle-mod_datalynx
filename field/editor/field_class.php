@@ -1,26 +1,28 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package datalynxfield
  * @subpackage editor
  * @copyright 2015 David Bogner
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
+defined('MOODLE_INTERNAL') or die();
+
 require_once($CFG->dirroot . '/mod/datalynx/field/field_class.php');
 require_once($CFG->dirroot . '/lib/filelib.php');
 require_once($CFG->dirroot . '/repository/lib.php');
@@ -37,16 +39,12 @@ class datalynxfield_editor extends datalynxfield_base {
 
         $maxbytes = get_user_max_upload_file_size($PAGE->context, $CFG->maxbytes, $COURSE->maxbytes);
 
-        // TODO: provide options for the editor field to configure in the field settings
-        // $trust = !empty($this->field->param4) ? $this->field->param4 : 0;
-        // $maxbytes = !empty($this->field->param5) ? $this->field->param5 : 0;
-        // $maxfiles = !empty($this->field->param6) ? $this->field->param6 : -1;
+        // TODO: provide options for the editor field to configure in the field settings.
 
         $this->editoroptions = array();
         $this->editoroptions['context'] = $this->df->context;
         $this->editoroptions['trusttext'] = true;
         $this->editoroptions['maxbytes'] = $maxbytes;
-        // $this->editoroptions['maxfiles'] = EDITOR_UNLIMITED_FILES;
         $this->editoroptions['subdirs'] = false;
         $this->editoroptions['changeformat'] = 0;
         $this->editoroptions['forcehttps'] = false;
@@ -98,8 +96,8 @@ class datalynxfield_editor extends datalynxfield_base {
         if (!$rec->id = $contentid) {
             $rec->id = $DB->insert_record('datalynx_contents', $rec);
         }
-        // the editor's content is an array, so reset is used in order to access the data in the
-        // array
+        // The editor's content is an array, so reset is used in order to access the data in the.
+        // Array.
         $value = reset($values);
         $data = new stdClass();
         $data->text = $value['text'];
@@ -129,7 +127,7 @@ class datalynxfield_editor extends datalynxfield_base {
 
         parent::prepare_import_content($data, $importsettings, $csvrecord, $entryid);
 
-        // For editors reformat in editor structure
+        // For editors reformat in editor structure.
         if ($this->is_editor()) {
             if (isset($data->{"field_{$fieldid}_{$entryid}"})) {
                 $valuearr = explode('##', $data->{"field_{$fieldid}_{$entryid}"});

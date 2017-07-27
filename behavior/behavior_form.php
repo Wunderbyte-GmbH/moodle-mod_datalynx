@@ -1,26 +1,29 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package mod_datalynx
  * @copyright 2014 Ivan Šakić
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
-require_once $CFG->libdir . '/formslib.php';
+defined('MOODLE_INTERNAL') or die();
+
+require_once($CFG->libdir . '/formslib.php');
+
 HTML_QuickForm::registerElementType('checkboxgroup',
         "$CFG->dirroot/mod/datalynx/checkboxgroup/checkboxgroup.php", 'HTML_QuickForm_checkboxgroup');
 
@@ -60,7 +63,7 @@ class datalynx_field_behavior_form extends moodleform {
         $mform->addElement('text', 'description', get_string('description'), array('size' => '64'));
         $mform->setType('description', PARAM_TEXT);
 
-        // ----- VISIBILITY OPTIONS -----
+        // VISIBILITY OPTIONS.
 
         $mform->addElement('header', 'visibilityoptions', get_string('visibility', 'datalynx'));
         $mform->setExpanded('visibilityoptions');
@@ -75,7 +78,7 @@ class datalynx_field_behavior_form extends moodleform {
                             datalynx::PERMISSION_STUDENT));
         }
 
-        // ----- EDITING OPTIONS -----
+        // EDITING OPTIONS.
 
         $mform->addElement('header', 'editing', get_string('editing', 'datalynx'));
         $mform->setExpanded('editing');
@@ -144,7 +147,7 @@ class datalynx_field_behavior_form extends moodleform {
         return array('<br />', '<br />', '<br />', '<br /><br />', '<br />');
     }
 
-    function validation($data, $files) {
+    public function validation($data, $files) {
         $errors = array();
         if (!$data['name']) {
             $errors['name'] = "You must supply a value here.";

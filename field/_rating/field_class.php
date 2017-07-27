@@ -1,26 +1,28 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package datalynxfield
  * @subpackage _rating
  * @copyright 2012 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
+defined('MOODLE_INTERNAL') or die();
+
 require_once(dirname(__FILE__) . '/../field_class.php');
 
 class datalynxfield__rating extends datalynxfield_no_content {
@@ -90,7 +92,7 @@ class datalynxfield__rating extends datalynxfield_no_content {
 
     public function get_select_sql() {
         return ' er.itemid, er.component, er.ratingarea, er.contextid,
-                er.numratings, er.avgratings, er.sumratings, er.maxratings, er.minratings, 
+                er.numratings, er.avgratings, er.sumratings, er.maxratings, er.minratings,
                 er.ratingid, er.ratinguserid, er.scaleid, er.usersrating ';
     }
 
@@ -120,7 +122,7 @@ class datalynxfield__rating extends datalynxfield_no_content {
         $params['rcomponent'] = 'mod_datalynx';
         $params['ratingarea'] = 'entry';
 
-        $sql = "LEFT JOIN 
+        $sql = "LEFT JOIN
                 (SELECT r.itemid, r.component, r.ratingarea, r.contextid,
                            COUNT(r.rating) AS numratings,
                            AVG(r.rating) AS avgratings,
@@ -134,7 +136,7 @@ class datalynxfield__rating extends datalynxfield_no_content {
                                                     AND ur.component = r.component
                                                     AND ur.ratingarea = r.ratingarea
                                                     AND ur.userid = :ruserid
-                    WHERE r.contextid = :rcontextid 
+                    WHERE r.contextid = :rcontextid
                             AND r.component = :rcomponent
                             AND r.ratingarea = :ratingarea
                     GROUP BY r.itemid, r.component, r.ratingarea, r.contextid, ratingid, ur.userid, ur.scaleid

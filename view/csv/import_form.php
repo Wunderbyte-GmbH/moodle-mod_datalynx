@@ -1,27 +1,27 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file is part of the Datalynx module for Moodle - http://moodle.org/.
+ * This file is part of the Datalynx module for Moodle - http:// Moodle.org/.
  *
  *
  * @package datalynxview
  * @subpackage csv
  * @copyright 2012 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 defined('MOODLE_INTERNAL') or die();
 
@@ -47,26 +47,22 @@ class datalynxview_csv_import_form extends moodleform {
         return $this->_form->toHtml();
     }
 
-    function definition() {
+    public function definition() {
         $view = $this->_view;
         $fieldsettings = empty($this->_customdata['hidefieldsettings']) ? true : false;
 
         $mform = &$this->_form;
 
-        // action buttons
-        // -------------------------------------------------------------------------------
+        // Action buttons.
         $this->add_action_buttons(true, get_string('import', 'datalynx'));
 
-        // field settings
-        // -------------------------------------------------------------------------------
+        // Field settings.
         $this->field_settings();
 
-        // csv settings
-        // -------------------------------------------------------------------------------
+        // Csv settings.
         $this->csv_settings();
 
-        // action buttons
-        // -------------------------------------------------------------------------------
+        // Action buttons.
         $this->add_action_buttons(true, get_string('import', 'datalynx'));
     }
 
@@ -81,7 +77,7 @@ class datalynxview_csv_import_form extends moodleform {
                 get_string('fieldsimportsettings', 'datalynxview_import'));
         $columns = $view->get_columns();
         foreach ($columns as $column) {
-            list($pattern, $header,) = $column;
+            list($pattern, $header, ) = $column;
             $patternname = trim($pattern, '[#]');
             $header = $header ? $header : $patternname;
 
@@ -114,33 +110,30 @@ class datalynxview_csv_import_form extends moodleform {
 
         $mform->addElement('header', 'csvsettingshdr', get_string('csvsettings', 'datalynx'));
 
-        // delimiter
+        // Delimiter.
         $delimiters = csv_import_reader::get_delimiter_list();
         $mform->addElement('select', 'delimiter', get_string('csvdelimiter', 'datalynx'), $delimiters);
         $mform->setDefault('delimiter', $view->get_delimiter());
 
-        // enclosure
+        // Enclosure.
         $mform->addElement('text', 'enclosure', get_string('csvenclosure', 'datalynx'), array('size' => '10'));
         $mform->setType('enclosure', PARAM_NOTAGS);
         $mform->setDefault('enclosure', $view->get_enclosure());
 
-        // encoding
+        // Encoding.
         $choices = core_text::get_encodings();
         $mform->addElement('select', 'encoding', get_string('encoding', 'grades'), $choices);
         $mform->setDefault('encoding', $view->get_encoding());
 
-        // upload file
+        // Upload file.
         $mform->addElement('filepicker', 'importfile', get_string('uploadfile', 'datalynxview_import'));
 
-        // upload text
+        // Upload text.
         $mform->addElement('textarea', 'csvtext', get_string('uploadtext', 'datalynxview_import'),
                 array('wrap' => 'virtual', 'rows' => '5', 'style' => 'width:100%;'));
 
-        // update existing entries
+        // Update existing entries.
         $mform->addElement('selectyesno', 'updateexisting', get_string('updateexisting', 'datalynxview_import'));
 
-        // edit after import
-        // $mform->addElement('selectyesno', 'editafter', get_string('importeditimported',
-        // 'datalynxview_import'));
     }
 }

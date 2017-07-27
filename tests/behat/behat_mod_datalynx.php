@@ -1,18 +1,18 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Steps definitions related with the database activity.
@@ -119,7 +119,7 @@ class behat_mod_datalynx extends behat_files {
      * @param string $fieldname
      */
     public function i_click_button_of_item($button, $fieldname) {
-        $session = $this->getSession(); // get the mink session
+        $session = $this->getSession(); // Get the mink session.
         $element = $session->getPage()->find('xpath',
                 '//a[text()="' . $this->escape($fieldname) . '"]/ancestor::tr//a/img[@title="' .
                 $this->escape($button) . '"]/ancestor::a');
@@ -253,11 +253,6 @@ class behat_mod_datalynx extends behat_files {
         $element = $session->getPage()->findField($arg2);
         $session->getPage()->fillField($arg2, $arg1);
 
-        // $element->click();
-        // foreach (str_split($arg1) as $cchar)
-        // {
-        // $session->getDriver()->keyPress($element->getXpath(), $cchar);
-        // }
     }
 
     /**
@@ -269,11 +264,6 @@ class behat_mod_datalynx extends behat_files {
         $oldvalue = $element->getValue();
         $session->getPage()->fillField($arg2, $oldvalue . "" . $arg1);
 
-        // $element->click();
-        // foreach (str_split($arg1) as $cchar)
-        // {
-        // $session->getDriver()->keyPress($element->getXpath(), $cchar);
-        // }
     }
 
     /**
@@ -313,7 +303,7 @@ class behat_mod_datalynx extends behat_files {
      * @param string $itemname
      */
     public function i_select_item($itemname) {
-        $session = $this->getSession(); // get the mink session
+        $session = $this->getSession(); // Get the mink session.
         $element = $session->getPage()->find('xpath',
                 '//a[text()="' . $this->escape($itemname) .
                 '"]/ancestor::tr//input[@type="checkbox"]');
@@ -329,7 +319,7 @@ class behat_mod_datalynx extends behat_files {
      * @param string $actionname
      */
     public function i_click_action_button($actionname) {
-        $session = $this->getSession(); // get the mink session
+        $session = $this->getSession(); // Get the mink session.
         $element = $session->getPage()->find('xpath',
                 '//button[@name="' . $this->escape($actionname) . '"]');
 
@@ -353,10 +343,7 @@ class behat_mod_datalynx extends behat_files {
                 new Given('I follow "Manage"'), new Given('I follow "Views"'),
                 new Given(
                         'I set the field with xpath "//a[text()=\"' . $this->escape($viewname) .
-                        '\"]/ancestor::tr//select" to "' . $this->escape($filtername) . '"'))
-            // new Given('I select "' . $this->escape($filtername) . '" filter for "' .
-            // $this->escape($viewname) . '" view'),
-        ;
+                        '\"]/ancestor::tr//select" to "' . $this->escape($filtername) . '"'));
 
         if (!$this->running_javascript()) {
             $steps[] = new Given('I click on "Go" "button"');
@@ -375,7 +362,7 @@ class behat_mod_datalynx extends behat_files {
      * @param string $viewname
      */
     public function i_select_filter_for_view($filtername, $viewname) {
-        $session = $this->getSession(); // get the mink session
+        $session = $this->getSession(); // Get the mink session.
         $element = $session->getPage()->find('xpath',
                 '//a[text()="' . $this->escape($viewname) . '"]/ancestor::tr//select');
         $element->selectOption($this->escape($filtername));
@@ -454,7 +441,7 @@ class behat_mod_datalynx extends behat_files {
                 break;
         }
 
-        $session = $this->getSession(); // get the mink session
+        $session = $this->getSession(); // Get the mink session.
         $element = $session->getPage()->find('xpath',
                 '//div[@class="entry"][' . $number . ']//img[@alt="Edit"]//ancestor::a');
         $element->click();
@@ -494,7 +481,7 @@ class behat_mod_datalynx extends behat_files {
                 break;
         }
 
-        $session = $this->getSession(); // get the mink session
+        $session = $this->getSession(); // Get the mink session.
         $element = $session->getPage()->find('xpath',
                 '//div[@class="entry"][' . $number . ']//img[@alt="Delete"]//ancestor::a');
         $element->click();
@@ -670,7 +657,7 @@ class behat_mod_datalynx extends behat_files {
                     $number = $this->escape($entrynumber);
                     break;
             }
-            $session = $this->getSession(); // get the mink session
+            $session = $this->getSession(); // Get the mink session.
             $element = $session->getPage()->find('xpath',
                     '//div[@class="entriesview"]/table/tbody/tr[' . $number .
                     ']//input[@type="checkbox"]');
@@ -683,7 +670,7 @@ class behat_mod_datalynx extends behat_files {
      * @Given /^I should see "([^"]*)" (\d+) times$/
      */
     public function iShouldSeeTimes($arg1, $arg2) {
-        $session = $this->getSession(); // get the mink session
+        $session = $this->getSession(); // Get the mink session.
         $count = 0;
         $found = false;
         do {
@@ -925,7 +912,7 @@ class behat_mod_datalynx extends behat_files {
                 $urlfield->setValue($url);
                 $altfield->setValue($alt);
                 break;
-            case 'textarea': // TODO: account for the editor capability
+            case 'textarea': // TODO: account for the editor capability.
                 $element->find('xpath', '//textarea')->setValue($value);
                 break;
             case 'select':
@@ -961,20 +948,20 @@ class behat_mod_datalynx extends behat_files {
             case 'time':
                 $element->find('xpath', '//input[@type="checkbox"]')->check();
                 list($day, $month, $year, $hour, $minute) = preg_split('/[ \.\/:-]+/', $value);
-                $dateObj = DateTime::createFromFormat('!m', $month);
-                $month = $dateObj->format('F');
+                $dateobj = DateTime::createFromFormat('!m', $month);
+                $month = $dateobj->format('F');
                 $element->find('xpath', '//select[contains(@name, "day")]')->selectOption($day);
                 $element->find('xpath', '//select[contains(@name, "month")]')->selectOption($month);
                 $element->find('xpath', '//select[contains(@name, "year")]')->selectOption($year);
 
-                $buffElement = $element->find('xpath', '//select[contains(@name, "hour")]');
-                if (is_object($buffElement)) {
-                    $buffElement->selectOption($hour);
+                $buffelement = $element->find('xpath', '//select[contains(@name, "hour")]');
+                if (is_object($buffelement)) {
+                    $buffelement->selectOption($hour);
                 }
 
-                $buffElement = $element->find('xpath', '//select[contains(@name, "minute")]');
-                if (is_object($buffElement)) {
-                    $buffElement->selectOption($minute);
+                $buffelement = $element->find('xpath', '//select[contains(@name, "minute")]');
+                if (is_object($buffelement)) {
+                    $buffelement->selectOption($minute);
                 }
                 break;
             case 'teammemberselect':
@@ -989,9 +976,7 @@ class behat_mod_datalynx extends behat_files {
                         $lists[$index - 1]->find('xpath', '//li[1]')->click();
                         $index++;
                     }
-                } else {
-                    // TODO: add code for non-js
-                }
+                } // TODO: add code for non-js in an else-branch.
                 break;
             case 'file':
             case 'picture':

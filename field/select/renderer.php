@@ -1,18 +1,18 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
@@ -20,7 +20,7 @@
  * @subpackage select
  * @copyright 2014 Ivan Šakić
  * @copyright 2016 David Bogner
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 defined('MOODLE_INTERNAL') or die();
 
@@ -52,12 +52,12 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
         $selected = !empty($entry->{"c{$fieldid}_content"}) ? (int) $entry->{"c{$fieldid}_content"} : 0;
         $autocomplete = $field->get('param6');
 
-        // check for default value
+        // Check for default value.
         if (!$selected and $defaultval = $field->get('param2')) {
             $selected = (int) array_search($defaultval, $menuoptions);
         }
 
-        // render as autocomplete field (param6 not empty) or select field
+        // Render as autocomplete field (param6 not empty) or select field.
         if ($autocomplete) {
             $select = &$mform->addElement('autocomplete', $fieldname, null);
         } else {
@@ -76,7 +76,7 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
             $option->name = $name;
             $menuoptions[$id] = $option;
         }
-        // Sort the options alphabetically
+        // Sort the options alphabetically.
         $sortalphbetically = $field->field->param4;
         if ($sortalphbetically) {
             usort($menuoptions, function($a, $b) {

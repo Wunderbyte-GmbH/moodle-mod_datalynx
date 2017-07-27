@@ -1,25 +1,25 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package datalynxfield
  * @subpackage entryauthor
  * @copyright 2011 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 defined('MOODLE_INTERNAL') or die();
 
@@ -36,12 +36,12 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
         $fieldname = $field->get('internalname');
         $edit = !empty($options['edit']) ? $options['edit'] : false;
 
-        // no edit mode
+        // No edit mode.
         $replacements = array();
 
-        // edit author name
+        // Edit author name.
         if ($fieldname == 'name') {
-            // two tags are possible
+            // Two tags are possible.
             foreach ($tags as $tag) {
                 if (trim($tag, '@') == "##author:edit##" and $edit and
                         has_capability('mod/datalynx:manageentries', $field->df()->context)
@@ -53,13 +53,13 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
                 }
             }
 
-            // if not picture there is only one possible tag so no check
+            // If not picture there is only one possible tag so no check.
         } else {
             if ($fieldname != 'picture') {
                 $replacements["##author:{$fieldname}##@"] = array('html', $this->{"display_$fieldname"}($entry));
                 $replacements["##author:{$fieldname}##"] = array('html', $this->{"display_$fieldname"}($entry));
 
-                // for picture switch on $tags
+                // For picture switch on $tags.
             } else {
                 foreach ($tags as $tag) {
                     if (trim($tag, '@') == "##author:picturelarge##") {
@@ -78,7 +78,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
      */
     public function display_edit(&$mform, $entry, array $options = null) {
         global $USER;
-        if ($entry->id < 0) { // new entry
+        if ($entry->id < 0) { // New entry.
             $entry->firstname = $USER->firstname;
             $entry->lastname = $USER->lastname;
             $entry->email = $USER->email;
@@ -93,7 +93,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
         if (is_null($usersmenu)) {
             $users = get_users_by_capability($field->df->context, 'mod/datalynx:writeentry', 'u.*',
                     'u.lastname ASC');
-            // add a supervisor's id
+            // Add a supervisor's id.
             if (!in_array($entry->userid, array_keys($users))) {
                 $user = new stdClass();
                 $user->id = $entry->userid;
@@ -116,7 +116,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
     public function display_name($entry) {
         global $USER, $DB;
 
-        if ($entry->id < 0) { // new entry
+        if ($entry->id < 0) { // New entry.
             $entry->firstname = $USER->firstname;
             $entry->lastname = $USER->lastname;
             $entry->userid = $USER->id;
@@ -133,7 +133,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
     public function display_firstname($entry) {
         global $USER;
 
-        if ($entry->id < 0) { // new entry
+        if ($entry->id < 0) { // New entry.
             return $USER->firstname;
         } else {
             return $entry->firstname;
@@ -145,7 +145,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
     public function display_lastname($entry) {
         global $USER;
 
-        if ($entry->id < 0) { // new entry
+        if ($entry->id < 0) { // New entry.
             return $USER->lastname;
         } else {
             return $entry->lastname;
@@ -157,7 +157,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
     public function display_username($entry) {
         global $USER;
 
-        if ($entry->id < 0) { // new entry
+        if ($entry->id < 0) { // New entry.
             return $USER->username;
         } else {
             return $entry->username;
@@ -169,7 +169,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
     public function display_id($entry) {
         global $USER;
 
-        if ($entry->id < 0) { // new entry
+        if ($entry->id < 0) { // New entry.
             return $USER->id;
         } else {
             return $entry->userid;
@@ -181,7 +181,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
     public function display_idnumber($entry) {
         global $USER;
 
-        if ($entry->id < 0) { // new entry
+        if ($entry->id < 0) { // New entry.
             return $USER->idnumber;
         } else {
             return $entry->idnumber;
@@ -193,7 +193,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
     public function display_picture($entry, $large = false) {
         global $USER, $OUTPUT;
 
-        if ($entry->id < 0) { // new entry
+        if ($entry->id < 0) { // New entry.
             $user = $USER;
         } else {
             $user = new stdClass();
@@ -218,7 +218,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
     public function display_email($entry) {
         global $USER;
 
-        if ($entry->id < 0) { // new entry
+        if ($entry->id < 0) { // New entry.
             return $USER->email;
         } else {
             return $entry->email;
@@ -234,11 +234,11 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
 
         $patterns = array();
         $patterns["##author:{$fieldinternalname}##"] = array(true, $cat);
-        // for user name add edit tag
+        // For user name add edit tag.
         if ($fieldinternalname == 'name') {
             $patterns["##author:edit##"] = array(true, $cat);
         }
-        // for user picture add the large picture
+        // For user picture add the large picture.
         if ($fieldinternalname == 'picture') {
             $patterns["##author:picturelarge##"] = array(true, $cat);
         }

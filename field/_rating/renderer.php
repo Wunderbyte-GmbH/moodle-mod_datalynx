@@ -1,25 +1,25 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package datalynxfield
  * @subpackage _rating
  * @copyright 2011 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 defined('MOODLE_INTERNAL') or die();
 
@@ -38,7 +38,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
         $fieldname = $field->get('internalname');
         $edit = !empty($options['edit']) ? $options['edit'] : false;
 
-        // no edit mode
+        // No edit mode.
         if ($edit or (!$this->_field->df()->data->rating)) {
             if ($tags) {
                 $replacements = array();
@@ -54,8 +54,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
                         default:
                             $str = '';
                     }
-                    $replacements[$tag] = $str ? array('html', $str
-                    ) : '';
+                    $replacements[$tag] = $str ? array('html', $str) : '';
                 }
 
                 return $replacements;
@@ -66,15 +65,15 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
 
         require_once("$CFG->dirroot/mod/datalynx/field/_rating/lib.php");
         $rm = new datalynx_rating_manager();
-        // Get entry rating objects
+        // Get entry rating objects.
         if ($entry->id > 0) {
             $options = new stdClass();
             $options->context = $field->df()->context;
             $options->component = 'mod_datalynx';
             $options->ratingarea = 'entry';
-            // ugly hack to work around the exception in generate_settings
+            // Ugly hack to work around the exception in generate_settings.
             $options->aggregate = RATING_AGGREGATE_COUNT;
-            // TODO check when scaleid is empty
+            // TODO check when scaleid is empty.
             $options->scaleid = !empty($entry->scaleid) ? $entry->scaleid : $field->df()->data->rating;
 
             $rec = new stdClass();
@@ -101,7 +100,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
             $aggrmin = round($entry->rating->aggregate[datalynxfield__rating::AGGREGATE_MIN], 2);
             $aggrsum = round($entry->rating->aggregate[datalynxfield__rating::AGGREGATE_SUM], 2);
 
-            // Get all ratings for inline view
+            // Get all ratings for inline view.
             if (in_array('##ratings:viewinline##', $tags)) {
                 static $allratings = false;
                 static $ratingrecords = null;
@@ -115,11 +114,11 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
                         if ($raterecord->itemid < $entry->id) {
                             continue;
                         }
-                        // Break if we already found the respective records
+                        // Break if we already found the respective records.
                         if ($raterecord->itemid > $entry->id) {
                             continue;
                         }
-                        // Attach the rating record to the entry
+                        // Attach the rating record to the entry.
                         if (!isset($entry->rating->records)) {
                             $entry->rating->records = array();
                         }
@@ -129,7 +128,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
             }
         }
 
-        // no edit mode for this field so just return html
+        // No edit mode for this field so just return html.
         $replacements = array();
         foreach ($tags as $tag) {
             if ($entry->id > 0 and !empty($entry->rating)) {
@@ -168,8 +167,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
                     default:
                         $str = '';
                 }
-                $replacements[$tag] = array('html', $str
-                );
+                $replacements[$tag] = array('html', $str);
             }
         }
         return $replacements;
@@ -236,16 +234,14 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
                 );
                 $table->data = array();
 
-                // If the scale was changed after ratings were submitted some ratings may have a
-                // value above the current maximum
-                // We can't just do count($scalemenu) - 1 as custom scales start at index 1, not 0
+                // If the scale was changed after ratings were submitted some ratings may have av alue above the current maximum.
+                // We can't just do count($scalemenu) - 1 as custom scales start at index 1, not 0.
                 $maxrating = $rating->settings->scale->max;
 
                 foreach ($rating->records as $raterecord) {
-                    // Undo the aliasing of the user id column from user_picture::fields()
-                    // we could clone the rating object or preserve the rating id if we needed it
-                    // again
-                    // but we don't
+                    // Undo the aliasing of the user id column from user_picture::fields().
+                    // We could clone the rating object or preserve the rating id if we needed it again.
+                    // But we don't.
                     $raterecord->id = $raterecord->userid;
                     $row = new html_table_row();
                     $row->attributes['class'] = 'ratingitemheader';
@@ -327,19 +323,14 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
         if (isset($entry->rating)) {
             $rating = $entry->rating;
 
-            /*
-             * if ($rating->settings->aggregationmethod == RATING_AGGREGATE_NONE) {
-             * return null;//ratings are turned off
-             * }
-             */
             $rm = new datalynx_rating_manager();
             // Initialise the JavaScript so ratings can be done by AJAX.
             $rm->initialise_rating_javascript($PAGE);
 
             $strrate = get_string("rate", "rating");
-            $ratinghtml = ''; // the string we'll return
+            $ratinghtml = ''; // The string we'll return.
 
-            // hack to work around the js updating imposed text
+            // Hack to work around the js updating imposed text.
             $ratinghtml .= html_writer::tag('span', '',
                     array('id' => "ratingaggregate{$rating->itemid}", 'style' => 'display:none;'
                     ));
@@ -348,8 +339,8 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
                     ));
 
             $formstart = null;
-            // if the item doesn't belong to the current user, the user has permission to rate
-            // and we're within the assessable period
+            // If the item doesn't belong to the current user, the user has permission to rate.
+            // And we're within the assessable period.
             if ($rating->user_can_rate() or
                     has_capability('mod/datalynx:manageratings', $this->_field->df()->context)
             ) {
@@ -357,7 +348,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
                 $rateurl = $rating->get_rate_url();
                 $inputs = $rateurl->params();
 
-                // start the rating form
+                // Start the rating form.
                 $formattrs = array('id' => "postrating{$rating->itemid}",
                         'class' => 'postratingform', 'method' => 'post',
                         'action' => $rateurl->out_omit_querystring()
@@ -366,7 +357,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
                 $formstart .= html_writer::start_tag('div', array('class' => 'ratingform'
                 ));
 
-                // add the hidden inputs
+                // Add the hidden inputs.
                 foreach ($inputs as $name => $value) {
                     $attributes = array('type' => 'hidden', 'class' => 'ratinginput',
                             'name' => $name, 'value' => $value
@@ -384,7 +375,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
                 $ratinghtml .= html_writer::select($scalearray, 'rating', $rating->rating, false,
                         $scaleattrs);
 
-                // output submit button
+                // Output submit button.
                 $ratinghtml .= html_writer::start_tag('span', array('class' => "ratingsubmit"
                 ));
 

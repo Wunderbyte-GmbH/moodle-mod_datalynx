@@ -1,25 +1,25 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package datalynxfield
  * @subpackage file
  * @copyright 2011 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 defined('MOODLE_INTERNAL') or die();
 
@@ -49,7 +49,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
         file_prepare_draft_area($draftitemid, $field->df()->context->id, 'mod_datalynx', 'content',
                 $contentid, $fmoptions);
 
-        // file manager
+        // File manager.
         $mform->addElement('filemanager', "{$fieldname}_filemanager", null, null, $fmoptions);
         $mform->setDefault("{$fieldname}_filemanager", $draftitemid);
         $required = !empty($options['required']);
@@ -70,7 +70,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
         $content = isset($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : null;
         $content1 = isset($entry->{"c{$fieldid}_content1"}) ? $entry->{"c{$fieldid}_content1"} : null;
 
-        // get the file content
+        // Get the file content.
         $fs = get_file_storage();
         $files = $fs->get_area_files($field->df()->context->id, 'mod_datalynx', 'content',
                 $contentid);
@@ -90,27 +90,14 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
         $data->{$fieldname} = $strcontent;
         $data->{"{$fieldname}format"} = FORMAT_HTML;
 
-        // if (!$field->is_editor() or !can_use_html_editor()) {
-        // $data->{"{$fieldname}format"} = FORMAT_PLAIN;
-        // }
-
         $options = array();
         $options['context'] = $field->df()->context;
         $options['collapsed'] = true;
-        // $options['trusttext'] = true;
-        // $options['maxbytes'] = $field->df()->course->maxbytes;
-        // $options['maxfiles'] = EDITOR_UNLIMITED_FILES;
-        // $options['subdirs'] = false;
-        // $options['changeformat'] = 0;
-        // $options['forcehttps'] = false;
-        // $options['noclean'] = true;
 
         $data = file_prepare_standard_editor($data, $fieldname, $options, $field->df()->context,
                 'mod_datalynx', 'content', $contentid);
 
         $attr = array();
-        // $attr['cols'] = !$field->get('param2') ? 40 : $field->get('param2');
-        // $attr['rows'] = !$field->get('param3') ? 20 : $field->get('param3');
 
         $mform->addElement('editor', "{$fieldname}_editor", null, null, $options);
         $mform->setDefault("{$fieldname}_editor", $data->{"{$fieldname}_editor"});

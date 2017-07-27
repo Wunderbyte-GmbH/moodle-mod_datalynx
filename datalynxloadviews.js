@@ -1,23 +1,23 @@
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of Moodle - http:// Moodle.org/.
 //
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
+// Moodle is free software: you can redistribute it and/or modify.
+// It under the terms of the GNU General Public License as published by.
+// The Free Software Foundation, either version 3 of the License, or.
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// Moodle is distributed in the hope that it will be useful,.
+// But WITHOUT ANY WARRANTY; without even the implied warranty of.
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the.
 // GNU General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License.
+// Along with Moodle. If not, see <http:// Www.gnu.org/licenses/>.
 
 /**
  * @package mod
  * @subpackage datalynx
  * @copyright 2012 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
 /**
@@ -27,7 +27,7 @@ M.mod_datalynx_load_views = {};
 
 M.mod_datalynx_load_views.init = function (Y, options) {
     YUI().use('node-base', 'event-base', 'io-base', function (Y) {
-        // get field name from options
+        // Get field name from options.
         var dffield = options.dffield;
         var viewfield = options.viewfield;
         var textfieldfield = options.textfieldfield;
@@ -35,16 +35,16 @@ M.mod_datalynx_load_views.init = function (Y, options) {
 
         Y.on('change', function (e) {
 
-            // get view select
+            // Get view select.
             var view = Y.Node.one('#id_' + viewfield);
 
-            // get textfield select
+            // Get textfield select.
             var textfield = Y.Node.one('#id_' + textfieldfield);
 
-            // get the datalynx id
+            // Get the datalynx id.
             var dfid = this.get('options').item(this.get('selectedIndex')).get('value');
 
-            // remove view, textfield options (but the first choose) from view select
+            // Remove view, textfield options (but the first choose) from view select.
             if (view) {
                 var viewchoose = view.get('options').item(0);
                 view.setContent(viewchoose);
@@ -56,7 +56,7 @@ M.mod_datalynx_load_views.init = function (Y, options) {
                 textfield.set('selectedIndex', 0);
             }
 
-            // load views and/or textfields from datalynx
+            // Load views and/or textfields from datalynx.
             if (dfid != 0) {
 
                 Y.io(actionurl, {
@@ -68,7 +68,7 @@ M.mod_datalynx_load_views.init = function (Y, options) {
                                 console.log(o.responseText);
                                 var respoptions = o.responseText.split('#');
 
-                                // add view options
+                                // Add view options.
                                 if (view) {
                                     var viewoptions = respoptions[0].split(',');
                                     for (var i = 0; i < viewoptions.length; ++i) {
@@ -79,7 +79,7 @@ M.mod_datalynx_load_views.init = function (Y, options) {
                                     }
                                 }
 
-                                // add textfield options
+                                // Add textfield options.
                                 if (textfield) {
                                     var textfieldoptions = respoptions[1].split(',');
                                     for (var i = 0; i < textfieldoptions.length; ++i) {

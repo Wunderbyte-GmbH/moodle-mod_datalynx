@@ -1,26 +1,28 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package datalynxfield
  * @subpackage teammemberselect
  * @copyright 2013 Ivan Šakić
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
+defined('MOODLE_INTERNAL') or die();
+
 require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
 class datalynxfield_teammemberselect_form extends datalynxfield_form {
@@ -33,14 +35,13 @@ class datalynxfield_teammemberselect_form extends datalynxfield_form {
 
         $mform = &$this->_form;
 
-        $mform->addElement('header', 'fieldattributesheader',
-                get_string('fieldattributes', 'datalynx'));
+        $mform->addElement('header', 'fieldattributesheader', get_string('fieldattributes', 'datalynx'));
 
-        // Hidden element for positive number comparison
+        // Hidden element for positive number comparison.
         $mform->addElement('hidden', 'zero', 0);
         $mform->setType('zero', PARAM_INT);
 
-        // Maximum team size
+        // Maximum team size.
         $mform->addElement('text', 'param1', get_string('teamsize', 'datalynx'), array('size' => 3));
         $mform->addHelpButton('param1', 'teamsize', 'datalynx');
         $mform->setType('param1', PARAM_INT);
@@ -48,14 +49,14 @@ class datalynxfield_teammemberselect_form extends datalynxfield_form {
                 null, 'client');
         $mform->addRule(array('param1', 'zero'), get_string('teamsize_error_value', 'datalynx'), 'compare', 'gt');
 
-        // Minimum required team size
+        // Minimum required team size.
         $mform->addElement('text', 'param3', get_string('minteamsize', 'datalynx'), array('size' => 3));
         $mform->addHelpButton('param3', 'minteamsize', 'datalynx');
         $mform->setType('param3', PARAM_INT);
         $mform->addRule(array('param3', 'param1'), get_string('minteamsize_error_value', 'datalynx'), 'compare', 'lte');
         $mform->setDefault('param3', 0);
 
-        // Admissible roles
+        // Admissible roles.
         $group = array();
         $permissions = $this->_df->get_datalynx_permission_names(true);
 
@@ -65,8 +66,7 @@ class datalynxfield_teammemberselect_form extends datalynxfield_form {
         }
         $mform->addGroup($group, 'param2', get_string('admissibleroles', 'datalynx'), '<br />');
         $mform->addHelpButton('param2', 'admissibleroles', 'datalynx');
-        $mform->addGroupRule('param2', get_string('admissibleroles_error', 'datalynx'), 'required',
-                null, 1, 'client');
+        $mform->addGroupRule('param2', get_string('admissibleroles_error', 'datalynx'), 'required', null, 1, 'client');
 
         $mform->addElement('select', 'param4', get_string('listformat', 'datalynx'), $this->_field->separators);
         $mform->setType('param4', PARAM_INT);

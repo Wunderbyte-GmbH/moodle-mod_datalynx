@@ -1,25 +1,27 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package mod_datalynx
  * @copyright 2015 Ivan Šakić
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
+defined('MOODLE_INTERNAL') or die();
+
 require_once(dirname(dirname(__FILE__)) . '/mod_class.php');
 
 /**
@@ -49,8 +51,8 @@ class datalynx_rule_manager {
         $eventmenu = array();
         foreach (self::$observers as $observer) {
             if ($observer['callback'] == 'datalynx_rule_manager::trigger_rules') {
-                // eventname is formed as follows: mod_datalynx\event\<name>, trimming backspace
-                // chars just in case
+                // Eventname is formed as follows: mod_datalynx\event\<name>, trimming backspace.
+                // Chars just in case.
                 $eventname = explode('\\', trim($observer['eventname'], '\\'))[2];
                 if ($eventname !== 'team_updated') {
                     $eventmenu[$eventname] = get_string("event_$eventname", 'datalynx');
@@ -201,7 +203,7 @@ class datalynx_rule_manager {
 
         if (!$this->_customrules or $forceget) {
             $this->_customrules = array();
-            // collate user rules
+            // Collate user rules.
             if ($rules = $DB->get_records('datalynx_rules', array('dataid' => $this->_df->id()))) {
                 foreach ($rules as $ruleid => $rule) {
                     $this->_customrules[$ruleid] = $this->get_rule($rule);
@@ -236,13 +238,13 @@ class datalynx_rule_manager {
         $df = $this->_df;
 
         if (!has_capability('mod/datalynx:managetemplates', $df->context)) {
-            // TODO throw exception
+            // TODO throw exception.
             return false;
         }
 
         $dfrules = $this->get_rules();
         $rules = array();
-        // collate the rules for processing
+        // Collate the rules for processing.
         if ($ruleids = explode(',', $rids)) {
             foreach ($ruleids as $ruleid) {
                 if ($ruleid > 0 and isset($dfrules[$ruleid])) {
@@ -259,10 +261,10 @@ class datalynx_rule_manager {
             return false;
         } else {
             if (!$confirmed) {
-                // print header
+                // Print header.
                 $df->print_header('rules');
 
-                // Print a confirmation page
+                // Print a confirmation page.
                 echo $OUTPUT->confirm(get_string("rulesconfirm$action", 'datalynx', count($rules)),
                         new moodle_url('/mod/datalynx/rule/index.php',
                                 array('d' => $df->id(), $action => implode(',', array_keys($rules)),
@@ -272,14 +274,14 @@ class datalynx_rule_manager {
                 $df->print_footer();
                 exit();
             } else {
-                // go ahead and perform the requested action
+                // Go ahead and perform the requested action.
                 switch ($action) {
-                    case 'add': // TODO add new
+                    case 'add': // TODO add new.
                         if ($forminput = data_submitted()) {
-                            // Check for arrays and convert to a comma-delimited string
+                            // Check for arrays and convert to a comma-delimited string.
                             $df->convert_arrays_to_strings($forminput);
 
-                            // Create a rule object to collect and store the data safely
+                            // Create a rule object to collect and store the data safely.
                             $rule = $this->get_rule($forminput->type);
                             $ruleid = $rule->insert_rule($forminput);
 
@@ -292,12 +294,12 @@ class datalynx_rule_manager {
                         $strnotify = 'rulesadded';
                         break;
 
-                    case 'update': // update existing
+                    case 'update': // Update existing.
                         if ($forminput = data_submitted()) {
-                            // Check for arrays and convert to a comma-delimited string
+                            // Check for arrays and convert to a comma-delimited string.
                             $df->convert_arrays_to_strings($forminput);
 
-                            // Create a rule object to collect and store the data safely
+                            // Create a rule object to collect and store the data safely.
                             $rule = reset($rules);
                             $oldrulename = $rule->rule->name;
                             $rule->update_rule($forminput);
@@ -313,7 +315,7 @@ class datalynx_rule_manager {
 
                     case 'enabled':
                         foreach ($rules as $rid => $rule) {
-                            // disable = 0; enable = 1
+                            // Disable = 0; enable = 1.
                             $enabled = ($rule->rule->enabled ? 0 : 1);
                             $DB->set_field('datalynx_rules', 'enabled', $enabled,
                                     array('id' => $rid));
@@ -332,7 +334,7 @@ class datalynx_rule_manager {
 
                     case 'duplicate':
                         foreach ($rules as $rule) {
-                            // set new name
+                            // Set new name.
                             while ($df->name_exists('rules', $rule->name())) {
                                 $rule->rule->name .= '_1';
                             }
@@ -391,7 +393,7 @@ class datalynx_rule_manager {
         $actionbaseurl = '/mod/datalynx/rule/index.php';
         $linkparams = array('d' => $df->id(), 'sesskey' => sesskey());
 
-        // table headings
+        // Table headings.
         $strname = get_string('name');
         $strtype = get_string('type', 'datalynx');
         $strdescription = get_string('description');
@@ -402,8 +404,7 @@ class datalynx_rule_manager {
         $strhide = get_string('hide');
         $strshow = get_string('show');
 
-        // The default value of the type attr of a button is submit, so set it to button so that
-        // it doesn't submit the form
+        // The default value of the type attr of a button is submit, so set it to button so that it doesn't submit the form.
         $selectallnone = html_writer::checkbox(null, null, false, null,
                 array('onclick' => 'select_allnone(\'rule\'&#44;this.checked)'));
         $multiactionurl = new moodle_url($actionbaseurl, $linkparams);
@@ -429,7 +430,7 @@ class datalynx_rule_manager {
 
         $rules = $this->get_rules();
         foreach ($rules as $ruleid => $rule) {
-            // Skip predefined rules
+            // Skip predefined rules.
             if ($ruleid < 0) {
                 continue;
             }
@@ -450,7 +451,7 @@ class datalynx_rule_manager {
             $ruletype = $rule->typename();
             $ruledescription = shorten_text($rule->rule->description, 30);
 
-            // enabled
+            // Enabled.
             if ($enabled = $rule->rule->enabled) {
                 $enabledicon = $OUTPUT->pix_icon('t/hide', $strhide);
             } else {
@@ -472,17 +473,17 @@ class datalynx_rule_manager {
     public function print_add_rule() {
         global $OUTPUT;
 
-        // Display the rule form jump list
+        // Display the rule form jump list.
         $directories = get_list_of_plugins('mod/datalynx/rule/');
         $rulemenu = array();
 
         foreach ($directories as $directory) {
             if ($directory[0] != '_') {
-                // Get name from language files
+                // Get name from language files.
                 $rulemenu[$directory] = get_string('pluginname', "datalynxrule_$directory");
             }
         }
-        // sort in alphabetical order
+        // Sort in alphabetical order.
         asort($rulemenu);
 
         $popupurl = new moodle_url('/mod/datalynx/rule/rule_edit.php',
@@ -492,13 +493,11 @@ class datalynx_rule_manager {
         $br = html_writer::empty_tag('br');
         echo html_writer::tag('div', $br . $OUTPUT->render($ruleselect) . $br,
                 array('class' => 'ruleadd mdl-align'));
-        // echo $OUTPUT->help_icon('ruleadd', 'datalynx');
     }
 
     private static function notify_team_members(stdClass $data, $event) {
         global $CFG, $SITE, $USER, $DB;
 
-        /* @var $df datalynx */
         $df = $data->df;
         $data->event = $event;
 
@@ -507,7 +506,7 @@ class datalynx_rule_manager {
         $data->activity = format_string($df->name(), true);
         $data->url = "$CFG->wwwroot/mod/datalynx/view.php?d=" . $df->id();
 
-        // Prepare message
+        // Prepare message.
         $strdatalynx = get_string('pluginname', 'datalynx');
         $sitename = format_string($SITE->fullname);
         $data->siteurl = $CFG->wwwroot;
@@ -531,7 +530,7 @@ class datalynx_rule_manager {
         $notename = get_string("messageprovider:datalynx_$event", 'datalynx');
         $subject = "$sitename -> $data->coursename -> $strdatalynx $data->datalynxname:  $notename";
 
-        // prepare message object
+        // Prepare message object.
         $message = new \core\message\message();
         $message->component = 'mod_datalynx';
         $message->name = "datalynx_$event";

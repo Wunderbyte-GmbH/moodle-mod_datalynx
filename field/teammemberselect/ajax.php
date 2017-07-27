@@ -1,26 +1,27 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package datalynxfield
  * @subpackage teammemberselect
  * @copyright 2015 Ivan Šakić
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
+
 require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/config.php');
 
 ob_start();
@@ -106,9 +107,8 @@ if ($action == 'subscribe') {
                     array('context' => $context, 'objectid' => $entryid, 'other' => $other));
             $event->trigger();
         } else {
-            $return = "Team subscribe error: The team list is empty!"; // should not occur, as at least
-            // this user's id must be in the
-            // field
+            $return = "Team subscribe error: The team list is empty!"; // Should not occur, as at least.
+            // This user's id must be in the field.
         }
     } else {
         $return = "Team subscribe error: Wrong action!";

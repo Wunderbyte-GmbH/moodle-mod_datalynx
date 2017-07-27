@@ -1,25 +1,25 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package datalynxfield
  * @subpackage entrygroup
  * @copyright 2011 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 defined('MOODLE_INTERNAL') or die();
 
@@ -36,9 +36,9 @@ class datalynxfield_entrygroup_renderer extends datalynxfield_renderer {
         $fieldname = $field->get('internalname');
         $edit = !empty($options['edit']) ? $options['edit'] : false;
 
-        // set the group object
+        // Set the group object.
         $group = new stdClass();
-        if ($entry->id < 0) { // new record (0)
+        if ($entry->id < 0) { // New record.
             $entry->groupid = $field->df()->currentgroup;
             $group->id = $entry->groupid;
             $group->name = null;
@@ -65,10 +65,6 @@ class datalynxfield_entrygroup_renderer extends datalynxfield_renderer {
                 case '##group:name##':
                     $replacements[$tag] = array('html', $group->name);
                     break;
-
-                // case '##group:description##':
-                // $replacements[$tag] = array('html', $group->description);
-                // break;
 
                 case '##group:picture##':
                     $replacements[$tag] = array('html',
@@ -131,7 +127,6 @@ class datalynxfield_entrygroup_renderer extends datalynxfield_renderer {
         $patterns = array();
         $patterns['##group:id##'] = array(true, $cat);
         $patterns['##group:name##'] = array(true, $cat);
-        // $patterns['##group:description##'] = array(true, $cat);
         $patterns['##group:picture##'] = array(true, $cat);
         $patterns['##group:picturelarge##'] = array(false, $cat);
         $patterns['##group:edit##'] = array(true, $cat);

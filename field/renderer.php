@@ -1,24 +1,24 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package datalynxfield
  * @copyright 2011 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 defined('MOODLE_INTERNAL') or die();
 
@@ -100,9 +100,9 @@ abstract class datalynxfield_renderer {
         foreach ($tags as $tag) {
             $currentoptions = array_merge(self::$defaultoptions, $options);
             list($fieldname, $behavior, $renderer) = $this->process_tag($tag);
-            /* @var $field datalynxfield_base */
-            /* @var $behavior datalynx_field_behavior */
-            /* @var $renderer datalynx_field_renderer */
+            // Variable $field datalynxfield_base
+            // Variable $behavior datalynx_field_behavior
+            // Variable $renderer datalynx_field_renderer.
 
             $splitfieldname = explode(':', $fieldname);
             if (isset($splitfieldname[1])) {
@@ -114,26 +114,24 @@ abstract class datalynxfield_renderer {
             $currentoptions['required'] = $behavior->is_required();
             $currentoptions['internal'] = $this->_field->is_internal();
 
-            if (!$currentoptions['visible']) { // ======================================================
-                // NOT VISIBLE ===
+            if (!$currentoptions['visible']) {
+                // NOT VISIBLE ===.
                 if ($renderer->get_not_visible_template() === $renderer::NOT_VISIBLE_SHOW_NOTHING) {
                     $replacements[$tag] = array('html', '');
                 } else {
                     $replacements[$tag] = array('html', $renderer->get_not_visible_template());
                 }
-            } else { // ====================================================================================
-                // VISIBLE ===
-                if ($currentoptions['edit']) { // ========================================================
-                    // EDIT MODE ===
-                    if (!$currentoptions['editable']) { // ==============================================NOT
-                        // EDITABLE ===
-                        if ($renderer->get_not_editable_template() ===
-                                $renderer::NOT_EDITABLE_SHOW_NOTHING
+            } else {
+                // VISIBLE ===.
+                if ($currentoptions['edit']) {
+                    // EDIT MODE ===.
+                    if (!$currentoptions['editable']) {
+                        // NOT EDITABLE ===.
+                        if ($renderer->get_not_editable_template() === $renderer::NOT_EDITABLE_SHOW_NOTHING
                         ) {
                             $replacements[$tag] = array('html', '');
                         } else {
-                            if ($renderer->get_not_editable_template() ===
-                                    $renderer::NOT_EDITABLE_SHOW_AS_DISPLAY_MODE
+                            if ($renderer->get_not_editable_template() === $renderer::NOT_EDITABLE_SHOW_AS_DISPLAY_MODE
                             ) {
                                 $currentoptions['template'] = $renderer->get_display_template();
                                 $currentoptions['value'] = $this->render_display_mode($entry, $currentoptions);
@@ -142,8 +140,8 @@ abstract class datalynxfield_renderer {
                                 $replacements[$tag] = array('html', $renderer->get_not_editable_template());
                             }
                         }
-                    } else { // ===========================================================================
-                        // EDITABLE ===
+                    } else {
+                        // EDITABLE ===.
                         if ($renderer->get_edit_template() === $renderer::EDIT_MODE_TEMPLATE_NONE) {
                             $replacements[$tag] = ['', [[$this, 'prerender_edit_mode'], [$entry, $currentoptions]]];
                         } else {
@@ -151,16 +149,15 @@ abstract class datalynxfield_renderer {
                             $replacements[$tag] = ['', [[$this, 'prerender_edit_mode'], [$entry, $currentoptions]]];
                         }
                     }
-                } else { // ===========================================================================
-                    // DISPLAY MODE ===
+                } else {
+                    // DISPLAY MODE ===.
                     $replacement = $this->render_display_mode($entry, $currentoptions);
-                    if ($replacement === '') { // =========================================================
-                        // NO VALUE ===
+                    if ($replacement === '') {
+                        // NO VALUE ===.
                         if ($renderer->get_no_value_template() === $renderer::NO_VALUE_SHOW_NOTHING) {
                             $replacements[$tag] = array('html', '');
                         } else {
-                            if ($renderer->get_no_value_template() ===
-                                    $renderer::NO_VALUE_SHOW_DISPLAY_MODE_TEMPLATE
+                            if ($renderer->get_no_value_template() === $renderer::NO_VALUE_SHOW_DISPLAY_MODE_TEMPLATE
                             ) {
                                 $replacements[$tag] = array('html',
                                         $this->replace_renderer_template_tags($renderer->get_display_template(), ''));
@@ -168,10 +165,9 @@ abstract class datalynxfield_renderer {
                                 $replacements[$tag] = array('html', $renderer->get_no_value_template());
                             }
                         }
-                    } else { // ==========================================================================
-                        // HAS VALUE ===
-                        if ($renderer->get_display_template() ===
-                                $renderer::DISPLAY_MODE_TEMPLATE_NONE
+                    } else {
+                        // HAS VALUE ===.
+                        if ($renderer->get_display_template() === $renderer::DISPLAY_MODE_TEMPLATE_NONE
                         ) {
                             $replacements[$tag] = array('html', $replacement);
                         } else {
@@ -314,7 +310,7 @@ abstract class datalynxfield_renderer {
      * @param array $options rendering options
      * @see datalynxfield_renderer::prerender_edit_mode
      */
-    function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $fieldid = $this->_field->id();
 
         $fieldname = "f_{$entry->id}_$fieldid";
@@ -356,21 +352,21 @@ abstract class datalynxfield_renderer {
     /**
      */
     public final function get_menu($showall = false) {
-        // the default menu category for fields
+        // The default menu category for fields.
         $patternsmenu = array();
         foreach ($this->patterns() as $tag => $pattern) {
             if ($showall or $pattern[self::PATTERN_SHOW_IN_MENU]) {
-                // which category
+                // Which category.
                 if (!empty($pattern[self::PATTERN_CATEGORY])) {
                     $cat = $pattern[self::PATTERN_CATEGORY];
                 } else {
                     $cat = get_string('fields', 'datalynx');
                 }
-                // prepare array
+                // Prepare array.
                 if (!isset($patternsmenu[$cat])) {
                     $patternsmenu[$cat] = array($cat => array());
                 }
-                // add tag
+                // Add tag.
                 $patternsmenu[$cat][$cat][$tag] = $tag;
             }
         }
@@ -385,10 +381,7 @@ abstract class datalynxfield_renderer {
      * @param $data
      * @return array
      */
-    public function validate(/**
-     * @noinspection PhpUnusedParameterInspection
-     */
-            $entryid, $tags, $data) {
+    public function validate($entryid, $tags, $data) {
         return array();
     }
 

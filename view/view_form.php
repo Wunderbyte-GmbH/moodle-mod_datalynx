@@ -1,24 +1,24 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package datalynxview
  * @copyright 2011 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 defined('MOODLE_INTERNAL') or die();
 
@@ -46,25 +46,21 @@ class datalynxview_base_form extends moodleform {
 
     /**
      */
-    function definition() {
+    public function definition() {
         global $CFG, $DB;
         $view = $this->_view;
         $df = $this->_df;
         $editoroptions = $view->editors();
         $mform = &$this->_form;
-        // remove input password field from core HACK
-        //$mform->removeElement('');
 
-        // buttons
-        // -------------------------------------------------------------------------------
+        // Buttons.
         $this->add_action_buttons();
 
-        // general
-        // -------------------------------------------------------------------------------
+        // General.
         $mform->addElement('header', 'general', get_string('viewgeneral', 'datalynx'));
         $mform->addHelpButton('general', 'viewgeneral', 'datalynx');
 
-        // name and description
+        // Name and description.
         $mform->addElement('text', 'name', get_string('name'));
         $mform->addRule('name', null, 'required', null, 'client');
 
@@ -83,7 +79,7 @@ class datalynxview_base_form extends moodleform {
         $mform->addElement('checkbox', 'visible[4]', '', get_string('visible_4', 'datalynx'), 1);
         $mform->addElement('checkbox', 'visible[8]', '', get_string('visible_8', 'datalynx'), 1);
 
-        // filter
+        // Filter.
         if (!$filtersmenu = $df->get_filter_manager()->get_filters(null, true)) {
             $filtersmenu = array(0 => get_string('filtersnonedefined', 'datalynx'));
         } else {
@@ -100,27 +96,23 @@ class datalynxview_base_form extends moodleform {
                 $DB->get_field('datalynx', 'defaultview', array('id' => $this->_df->id())));
         $mform->setType('param10', PARAM_INT);
 
-        // view specific definition
-        // -------------------------------------------------------------------------------
+        // View specific definition.
         $this->view_definition_before_gps();
 
-        // View template: header and editor for view template
-        // -------------------------------------------------------------------------------
+        // View template: header and editor for view template.
         $mform->addElement('header', 'viewtemplatehdr', get_string('viewtemplate', 'datalynx'));
         $mform->addHelpButton('viewtemplatehdr', 'viewtemplate', 'datalynx');
         $mform->addElement('editor', 'esection_editor', '', null, $editoroptions['section']);
         $this->add_tags_selector('esection_editor', 'general');
 
-        // view specific definition
-        // -------------------------------------------------------------------------------
+        // View specific definition.
         $this->view_definition_after_gps();
 
-        // buttons
-        // -------------------------------------------------------------------------------
+        // Buttons.
         $this->add_action_buttons();
     }
 
-    function get_data() {
+    public function get_data() {
         $data = parent::get_data();
         if (isset($data) && isset($data->visible) && !empty($data->visible)) {
             $data->visible = array_sum(array_keys($data->visible));
@@ -136,7 +128,7 @@ class datalynxview_base_form extends moodleform {
         return $data;
     }
 
-    function set_data($data) {
+    public function set_data($data) {
         if ($data->visible) {
             $visible = $data->visible;
             $data->visible = array(1 => $visible & 1 ? 1 : null, 2 => $visible & 2 ? 1 : null,
@@ -152,7 +144,7 @@ class datalynxview_base_form extends moodleform {
         parent::set_data($data);
     }
 
-    function get_view_menu() {
+    public function get_view_menu() {
         global $DB;
         $viewid = $this->_view->view->id;
         $dataid = $this->_df->id();
@@ -184,14 +176,14 @@ class datalynxview_base_form extends moodleform {
      * To be used by a specific view
      * Settings that apply before the "view template"
      */
-    function view_definition_before_gps() {
+    public function view_definition_before_gps() {
     }
 
     /**
      * To be used by a specific view
      * Settings that apply after the "view template"
      */
-    function view_definition_after_gps() {
+    public function view_definition_after_gps() {
     }
 
     /**
@@ -199,21 +191,21 @@ class datalynxview_base_form extends moodleform {
      *
      * @see moodleform::add_action_buttons()
      */
-    function add_action_buttons($cancel = true, $submit = null) {
+    public function add_action_buttons($cancel = true, $submit = null) {
         $mform = &$this->_form;
 
         $buttonarray = array();
-        // save and display
+        // Save and display.
         $buttonarray[] = &$mform->createElement('submit', 'submitbutton', get_string('savechanges'));
-        // save and continue
+        // Save and continue.
         $buttonarray[] = &$mform->createElement('submit', 'submitreturnbutton',
                 get_string('savecontinue', 'datalynx'));
-        // reset to default
+        // Reset to default.
         $buttonarray[] = &$mform->createElement('submit', 'resetdefaultbutton',
                 get_string('viewresettodefault', 'datalynx'));
         $mform->registerNoSubmitButton('resetdefaultbutton');
-        // switch editor
-        // cancel
+        // Switch editor.
+        // Cancel.
         $buttonarray[] = &$mform->createElement('cancel');
         $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
         $mform->closeHeaderBefore('buttonar');
@@ -227,7 +219,7 @@ class datalynxview_base_form extends moodleform {
      * @param string $editorname
      * @param string $tagstype
      */
-    function add_tags_selector($editorname, $tagstype) {
+    public function add_tags_selector($editorname, $tagstype) {
         $view = $this->_view;
         $mform = &$this->_form;
         switch ($tagstype) {
@@ -268,12 +260,12 @@ class datalynxview_base_form extends moodleform {
 
     /**
      */
-    function data_preprocessing(&$data) {
+    public function data_preprocessing(&$data) {
     }
 
     /**
      */
-    function validation($data, $files) {
+    public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
         $view = $this->_view;

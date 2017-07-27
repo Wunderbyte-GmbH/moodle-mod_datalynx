@@ -1,26 +1,28 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package datalynxfield
  * @subpackage duration
  * @copyright 2013 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
+defined('MOODLE_INTERNAL') or die();
+
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 require_once("$CFG->dirroot/mod/datalynx/field/number/field_class.php");
 
@@ -87,7 +89,7 @@ class datalynxfield_duration extends datalynxfield_base {
         $contents = array();
         $oldcontents = array();
 
-        // old contents
+        // Old contents.
         if (isset($entry->{"c{$fieldid}_content"})) {
             $oldcontents[] = $entry->{"c{$fieldid}_content"};
         }
@@ -143,8 +145,8 @@ class datalynxfield_duration extends datalynxfield_base {
         $fieldid = $this->field->id;
         $name = "df_{$fieldid}_{$i}";
 
-        // For all NOT criteria except NOT Empty, exclude entries which don't meet the positive
-        // criterion
+        // For all NOT criteria except NOT Empty, exclude entries which don't meet the positive.
+        // Criterion.
         $excludeentries = (($not and $operator !== '') or (!$not and $operator === ''));
 
         if ($excludeentries) {
@@ -176,9 +178,9 @@ class datalynxfield_duration extends datalynxfield_base {
         }
 
         if ($excludeentries) {
-            // Get entry ids for entries that meet the criterion
+            // Get entry ids for entries that meet the criterion.
             if ($eids = $this->get_entry_ids_for_content($sql, $params)) {
-                // Get NOT IN sql
+                // Get NOT IN sql.
                 list($notinids, $params) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED,
                         "df_{$fieldid}_", false);
                 $sql = " e.id $notinids ";

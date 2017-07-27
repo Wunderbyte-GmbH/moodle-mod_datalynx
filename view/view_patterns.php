@@ -1,24 +1,24 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package datalynxview
  * @copyright 2012 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 defined('MOODLE_INTERNAL') or die();
 
@@ -55,7 +55,7 @@ class datalynxview_patterns {
         $viewid = $this->_view->view->id;
 
         $found = array();
-        // Fixed patterns
+        // Fixed patterns.
         $patterns = array_keys($this->patterns($checkvisibility));
         foreach ($patterns as $pattern) {
             if (strpos($text, $pattern) !== false) {
@@ -63,7 +63,7 @@ class datalynxview_patterns {
             }
         }
 
-        // Regexp patterns
+        // Regexp patterns.
         if ($patterns = array_keys($this->regexp_patterns($checkvisibility))) {
             foreach ($patterns as $pattern) {
                 if (preg_match_all("/$pattern/", $text, $matches)) {
@@ -83,21 +83,21 @@ class datalynxview_patterns {
      * @return array
      */
     public final function get_menu($showall = false) {
-        // the default menu category for views
+        // The default menu category for views.
         $patternsmenu = array();
         foreach ($this->patterns() as $tag => $pattern) {
             if ($showall or $pattern[self::PATTERN_SHOW_IN_MENU]) {
-                // which category
+                // Which category.
                 if (!empty($pattern[self::PATTERN_CATEGORY])) {
                     $cat = $pattern[self::PATTERN_CATEGORY];
                 } else {
                     $cat = get_string('views', 'datalynx');
                 }
-                // prepare array
+                // Prepare array.
                 if (!isset($patternsmenu[$cat])) {
                     $patternsmenu[$cat] = array($cat => array());
                 }
-                // add tag
+                // Add tag.
                 $patternsmenu[$cat][$cat][$tag] = $tag;
             }
         }
@@ -115,12 +115,12 @@ class datalynxview_patterns {
     public function get_replacements($tags = null, $entry = null, array $options = array()) {
         $view = $this->_view;
 
-        // existing tag types
-        $info = array_keys($this->info_patterns()); // number of entries
-        $ref = array_keys($this->ref_patterns()); // viewrelated tags like ##viewurl## and ##filtersmenu##
-        $userpref = array_keys($this->userpref_patterns()); // custom filter tags
-        $actions = array_keys($this->action_patterns()); // action tags like ##addnewentry## and ##multiedit##
-        $paging = array_keys($this->paging_patterns()); // paging tags
+        // Existing tag types.
+        $info = array_keys($this->info_patterns()); // Number of entries.
+        $ref = array_keys($this->ref_patterns()); // Viewrelated tags like ##viewurl## and ##filtersmenu##.
+        $userpref = array_keys($this->userpref_patterns()); // Custom filter tags.
+        $actions = array_keys($this->action_patterns()); // Action tags like ##addnewentry## and ##multiedit##.
+        $paging = array_keys($this->paging_patterns()); // Paging tags.
 
         $options['filter'] = $view->get_filter();
         $options['baseurl'] = new moodle_url($view->get_baseurl(), array('sesskey' => sesskey()));
@@ -193,19 +193,19 @@ class datalynxview_patterns {
             foreach ($views as $view) {
                 $viewname = $view->name;
                 if (strpos($tag, "#{{viewlink:$viewname;") === 0) {
-                    list(, $linktext, $urlquery,) = explode(';', $tag);
-                    // Pix icon for text
+                    list(, $linktext, $urlquery, ) = explode(';', $tag);
+                    // Pix icon for text.
                     if (strpos($linktext, '_pixicon:') === 0) {
                         list(, $icon, $titletext) = explode(':', $linktext);
                         $linktext = $OUTPUT->pix_icon($icon, $titletext);
                     }
-                    // Replace pipes in urlquery with &
+                    // Replace pipes in urlquery with &.
                     $urlquery = str_replace('|', '&', $urlquery);
                     return html_writer::link($view->baseurl->out(false) . "&$urlquery", $linktext);
                 }
                 if (strpos($tag, "#{{viewsesslink:$viewname;") === 0) {
-                    list(, $linktext, $urlquery,) = explode(';', $tag);
-                    // Pix icon for text
+                    list(, $linktext, $urlquery, ) = explode(';', $tag);
+                    // Pix icon for text.
                     if (strpos($linktext, '_pixicon:') === 0) {
                         list(, $icon, $titletext) = explode(':', $linktext);
                         $linktext = $OUTPUT->pix_icon($icon, $titletext);
@@ -229,11 +229,7 @@ class datalynxview_patterns {
 
         foreach ($fields as $id => $fieldname) {
             if (strpos($tag, "%%{$fieldname}:bulkedit%%") === 0) {
-                if (true) { // if (isset($options['edit'])) {
-                    return html_writer::checkbox("field_{$id}_bulkedit", 1, false, '');
-                } else {
-                    return '';
-                }
+                return html_writer::checkbox("field_{$id}_bulkedit", 1, false, '');
             }
         }
 
@@ -303,7 +299,7 @@ class datalynxview_patterns {
             return $this->print_filters_menu($options, true);
         }
 
-        // View url
+        // View url.
         if ($tag == '##viewurl##') {
             return $this->get_viewurl_replacement();
         }
@@ -313,7 +309,7 @@ class datalynxview_patterns {
             return $this->get_viewurl_replacement($viewname);
         }
 
-        // View content
+        // View content.
         if (strpos($tag, '##viewcontent:') === 0) {
             list(, $viewname) = explode(':', trim($tag, '#'));
             return $this->get_viewcontent_replacement($viewname);
@@ -371,8 +367,8 @@ class datalynxview_patterns {
 
         $showentryactions = (!empty($options['showentryactions']) or
                 has_capability('mod/datalynx:manageentries', $df->context));
-        // TODO: move to a view attribute so as to call only once
-        // Can this user registered or anonymous add entries
+        // TODO: move to a view attribute so as to call only once.
+        // Can this user registered or anonymous add entries.
         $usercanaddentries = $view->get_df()->user_can_manage_entry();
 
         switch ($tag) {
@@ -497,7 +493,6 @@ class datalynxview_patterns {
                     if (!empty($format)) {
                         $baseurl->param('format', $format);
                     }
-                    // list(,$ext,) = explode(':', $tag);
                     $replacement = html_writer::tag('button', $buttonval,
                             array('type' => 'button', 'name' => 'multiexport',
                                     'onclick' => 'bulk_action(\'entry\'&#44; \'' . $baseurl->out(false) .
@@ -520,8 +515,6 @@ class datalynxview_patterns {
     /**
      * Get HTML that replaces the tag ##pagingbar##
      *
-     * @param string $tag
-     * @param string $entry
      * @param array $options
      * @return Ambigous <string, paging_bar>
      */
@@ -532,18 +525,17 @@ class datalynxview_patterns {
         $filter = $view->get_filter();
         $baseurl = $view->get_baseurl();
 
-        // typical entry 'more' request. If not single view (1 per page) show nothing instead
-        // of paging bar
+        // Typical entry 'more' request. If not single view (1 per page) show nothing instead of paging bar.
         if (!empty($filter->eids)) {
 
             $pagingbar = '';
 
-            // typical groupby, one group per page case. show paging bar as per number of groups
+            // Typical groupby, one group per page case. show paging bar as per number of groups.
         } else {
             if (isset($filter->pagenum)) {
                 $pagingbar = new paging_bar($filter->pagenum, $filter->page, 1, $baseurl . '&amp;',
                         'page', '', true);
-                // standard paging bar case
+                // Standard paging bar case.
             } else {
                 if (!empty($filter->perpage) and !empty($options['entriescount']) and
                         !empty($options['entriesfiltercount']) and
@@ -552,7 +544,7 @@ class datalynxview_patterns {
 
                     $pagingbar = new paging_bar($options['entriesfiltercount'], $filter->page,
                             $filter->perpage, $baseurl, 'page');
-                } else { // no paging bar case at all:
+                } else { // No paging bar case at all:.
                     $pagingbar = '';
                 }
             }
@@ -568,16 +560,17 @@ class datalynxview_patterns {
 
     /**
      * @param array $fieldinput
+     * @return string
      */
     protected function contentfield_convert_array_to_string($contentfields) {
 
-        $contentfield_str = "";
+        $contentfieldstr = "";
         foreach ($contentfields as $key => $val) {
             if (!is_array($val)) {
-                $contentfield_str .= "&contentfields[" . $key . "]=" . $val;
+                $contentfieldstr .= "&contentfields[" . $key . "]=" . $val;
             }
         }
-        return $contentfield_str;
+        return $contentfieldstr;
     }
 
     /**
@@ -590,7 +583,7 @@ class datalynxview_patterns {
     protected function get_viewurl_replacement($viewname = null) {
         $view = $this->_view;
 
-        // Return this view's url
+        // Return this view's url.
         if ($viewname === null) {
             return $view->get_baseurl()->out(false);
         }
@@ -631,7 +624,7 @@ class datalynxview_patterns {
         }
 
         if (!empty($views[$viewname])) {
-            // Cannot display current view or else infinite loop
+            // Cannot display current view or else infinite loop.
             if ($views[$viewname]->id() == $this->_view->id()) {
                 return '';
             }
@@ -770,9 +763,9 @@ class datalynxview_patterns {
                 }
             }
         }
-        // Get list of views
+        // Get list of views.
         if ($views) {
-            // View link
+            // View link.
             $cat = get_string('reference', 'datalynx');
             foreach ($views as $viewname) {
                 $viewname = preg_quote($viewname, '/');
@@ -860,7 +853,7 @@ class datalynxview_patterns {
 
         if ($menuviews = $df->get_views_menu() and count($menuviews) > 1) {
 
-            // Display the view form jump list
+            // Display the view form jump list.
             $baseurl = $baseurl->out_omit_querystring();
             $baseurlparams = array('d' => $df->id(), 'sesskey' => sesskey());
             $viewselect = new single_select(new moodle_url($baseurl, $baseurlparams), 'view',
@@ -904,11 +897,8 @@ class datalynxview_patterns {
 
             $baseurl = $baseurl->out_omit_querystring();
             $baseurlparams = array('d' => $df->id(), 'sesskey' => sesskey(), 'view' => $view->id());
-            // if ($filter->id) {
-            // $menufilters[0] = get_string('filtercancel', 'datalynx');
-            // }
 
-            // Display the filter form jump list
+            // Display the filter form jump list.
             $filterselect = new single_select(new moodle_url($baseurl, $baseurlparams), 'filter',
                     $menufilters, $filter->id, array('' => 'choosedots'), 'filterbrowse_jump');
             $filterselect->set_label(get_string('filtercurrent', 'datalynx') . '&nbsp;');
@@ -935,27 +925,16 @@ class datalynxview_patterns {
         $filter = $view->get_filter();
         $baseurl = $view->get_baseurl();
 
-        $quicksearchjump = '';
-
         $baseurl = $baseurl->out_omit_querystring();
         $baseurlparams = array('d' => $df->id(), 'sesskey' => sesskey(), 'view' => $view->id(),
-                'filter' => $filter->id); // datalynx_filter_manager::USER_FILTER_SET);
-        /*
-         * if ($filter->id < 0 and $filter->search) {
-         * $searchvalue = $filter->search;
-         * } else {
-         * $searchvalue = '';
-         * }
-         */
+                'filter' => $filter->id);
         $searchvalue = $filter->search;
-        // Display the quick search form
+        // Display the quick search form.
         $label = html_writer::label(get_string('search'), "usersearch");
         $inputfield = html_writer::empty_tag('input',
                 array('type' => 'text', 'name' => 'usersearch', 'value' => $searchvalue, 'size' => 20));
 
         $button = '';
-        // html_writer::empty_tag('input', array('type' => 'submit', 'value' =>
-        // get_string('submit')));
 
         $formparams = '';
         foreach ($baseurlparams as $var => $val) {
@@ -967,7 +946,7 @@ class datalynxview_patterns {
 
         $qsform = html_writer::tag('form', "$formparams&nbsp;$label&nbsp;$inputfield&nbsp;$button", $attributes);
 
-        // and finally one more wrapper with class
+        // And finally one more wrapper with class.
         $quicksearchjump = html_writer::tag('div', $qsform, array('class' => 'singleselect'));
 
         if ($return) {
@@ -991,8 +970,6 @@ class datalynxview_patterns {
         $filter = $view->get_filter();
         $baseurl = $view->get_baseurl();
 
-        $perpagejump = '';
-
         $baseurl = $baseurl->out_omit_querystring();
         $baseurlparams = array('d' => $df->id(), 'sesskey' => sesskey(), 'view' => $view->id(),
                 'filter' => datalynx_filter_manager::USER_FILTER_SET);
@@ -1007,7 +984,7 @@ class datalynxview_patterns {
                 10 => 10, 15 => 15, 20 => 20, 30 => 30, 40 => 40, 50 => 50, 100 => 100, 200 => 200,
                 300 => 300, 400 => 400, 500 => 500, 1000 => 1000);
 
-        // Display the view form jump list
+        // Display the view form jump list.
         $select = new single_select(new moodle_url($baseurl, $baseurlparams), 'uperpage', $perpage,
                 $perpagevalue, array('' => 'choosedots'), 'perpage_jump');
         $select->set_label(get_string('filterperpage', 'datalynx') . '&nbsp;');

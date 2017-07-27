@@ -1,25 +1,26 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package datalynx_filterform
  * @copyright 2014 Ivan Šakić
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
+defined('MOODLE_INTERNAL') or die();
 require_once('../../../config.php');
 require_once('../mod_class.php');
 require_once("$CFG->libdir/tablelib.php");
@@ -30,17 +31,19 @@ $urlparams->d = optional_param('d', 0, PARAM_INT);
 $datalynx = new datalynx($urlparams->d);
 $urlparams->id = $datalynx->cm->id;
 
+require_login($datalynx->data->course, false, $datalynx->cm);
+
 require_capability('mod/datalynx:managetemplates', $datalynx->context);
 
 $datalynx->set_page('filterform/index', array('urlparams' => $urlparams));
 
-// activate navigation node
+// Activate navigation node.
 navigation_node::override_active_url(
         new moodle_url('/mod/datalynx/filterform/index.php', array('id' => $datalynx->cm->id)));
 
-// TODO: print notifications
+// TODO: print notifications.
 
-// print header
+// Print header.
 $datalynx->print_header(array('tab' => 'filterforms', 'urlparams' => $urlparams));
 
 echo html_writer::empty_tag('br');
@@ -55,7 +58,7 @@ echo html_writer::empty_tag('br');
 $editbaseurl = '/mod/datalynx/filterform/filterform_edit.php';
 $linkparams = array('d' => $datalynx->id(), 'sesskey' => sesskey());
 
-// table headers
+// Table headers.
 $headers = array('name' => get_string('name'), 'description' => get_string('description'),
         'fields' => get_string('fields', 'datalynx'), 'edit' => get_string('edit'),
         'duplicate' => get_string('duplicate'), 'delete' => get_string('delete')
@@ -67,10 +70,10 @@ $table->define_baseurl(
 $table->define_columns(array_keys($headers));
 $table->define_headers(array_values($headers));
 
-// Column sorting
+// Column sorting.
 $table->sortable(false);
 
-// Column styles
+// Column styles.
 $table->set_attribute('class',
         'generaltable generalbox boxaligncenter boxwidthwide datalynx-filterforms');
 $table->set_attribute('data-sesskey', sesskey());

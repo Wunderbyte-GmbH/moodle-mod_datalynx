@@ -1,49 +1,51 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package datalynxfield
  * @subpackage time
  * @copyright 2011 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
+defined('MOODLE_INTERNAL') or die();
+
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
 class datalynxfield_time extends datalynxfield_base {
 
     public $type = 'time';
 
-    public $date_only;
+    public $dateonly;
 
     public $masked;
 
-    public $start_year;
+    public $startyear;
 
-    public $stop_year;
+    public $stopyear;
 
-    public $display_format;
+    public $displayformat;
 
     public function __construct($df = 0, $field = 0) {
         parent::__construct($df, $field);
-        $this->date_only = $this->field->param1;
+        $this->dateonly = $this->field->param1;
         $this->masked = $this->field->param5;
-        $this->start_year = $this->field->param2;
-        $this->stop_year = $this->field->param3;
-        $this->display_format = $this->field->param4;
+        $this->startyear = $this->field->param2;
+        $this->stopyear = $this->field->param3;
+        $this->displayformat = $this->field->param4;
     }
 
     /**
@@ -58,12 +60,12 @@ class datalynxfield_time extends datalynxfield_base {
         $fieldid = $this->field->id;
         $oldcontents = array();
         $contents = array();
-        // old contents
+        // Old contents.
         if (isset($entry->{"c{$fieldid}_content"})) {
             $oldcontents[] = $entry->{"c{$fieldid}_content"};
         }
 
-        // new contents
+        // New contents.
         $timestamp = null;
         if (!empty($values)) {
             if (count($values) === 1) {
@@ -71,13 +73,13 @@ class datalynxfield_time extends datalynxfield_base {
             }
 
             if (!is_array($values)) {
-                // assuming timestamp is passed (e.g. in import)
+                // Assuming timestamp is passed (e.g. in import).
                 $timestamp = $values;
             } else {
-                // assuming any of year, month, day, hour, minute is passed
+                // Assuming any of year, month, day, hour, minute is passed.
                 $enabled = $year = $month = $day = $hour = $minute = 0;
                 foreach ($values as $name => $val) {
-                    if (!empty($name)) { // the time unit
+                    if (!empty($name)) { // The time unit.
                         ${$name} = $val;
                     }
                 }
@@ -148,7 +150,7 @@ class datalynxfield_time extends datalynxfield_base {
                         $params, true);
                 break;
             case '=':
-                if ($this->date_only) {
+                if ($this->dateonly) {
                     $fromdate = date("Y-m-d", $from);
                     $from = strtotime($fromdate);
                 }
@@ -158,18 +160,18 @@ class datalynxfield_time extends datalynxfield_base {
                 $return = array(" $not $varcharcontent $operator :$namefrom ", $params, true);
                 break;
             default:
-                if ($not) {  // content value is not empty
+                if ($not) {  // Content value is not empty.
                     $return = array(" $not $varcharcontent = '' ", $params, true);
-                } else { // content value is empty or there is no content dataset at all
+                } else { // Content value is empty or there is no content dataset at all.
                     global $DB;
                     $eids = $this->get_entry_ids_for_empty_content();
-                    // Get NOT IN sql
+                    // Get NOT IN sql.
                     list($inids, $params) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED,
                             "df_{$this->field->id}_", true);
                     $sql = " e.id $inids ";
                     return array($sql, $params, false);
                 }
-        } // end switch
+        } // End switch.
 
         return $return;
     }
@@ -181,13 +183,13 @@ class datalynxfield_time extends datalynxfield_base {
         global $DB;
 
         $params = array();
-        $sql = "SELECT id FROM {datalynx_entries} e 
-                WHERE e.dataid = :dataid AND NOT EXISTS 
+        $sql = "SELECT id FROM {datalynx_entries} e
+                WHERE e.dataid = :dataid AND NOT EXISTS
                   (SELECT id FROM {datalynx_contents} c WHERE fieldid = :fieldid AND c.entryid =  e.id) ";
         $params['dataid'] = $this->field->dataid;
         $params['fieldid'] = $this->id();
         $eids = $DB->get_fieldset_sql($sql, $params);
-        $sql = "SELECT entryid FROM {datalynx_contents} 
+        $sql = "SELECT entryid FROM {datalynx_contents}
                 WHERE fieldid = :fieldid AND content =  '' ";
         $eids = array_merge($eids, $DB->get_fieldset_sql($sql, $params));
         return $eids;
@@ -196,7 +198,7 @@ class datalynxfield_time extends datalynxfield_base {
     /**
      */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
-        // import only from csv
+        // Import only from csv.
         if ($csvrecord) {
             $fieldid = $this->field->id;
             $fieldname = $this->name();
@@ -204,14 +206,14 @@ class datalynxfield_time extends datalynxfield_base {
             $timestr = !empty($csvrecord[$csvname]) ? $csvrecord[$csvname] : null;
 
             if ($timestr) {
-                // It's a timestamp
+                // It's a timestamp.
                 if (((string) (int) $timestr === $timestr) && ($timestr <= PHP_INT_MAX) &&
                         ($timestr >= ~PHP_INT_MAX)
                 ) {
 
                     $data->{"field_{$fieldid}_{$entryid}"} = $timestr;
 
-                    // It's a valid time string
+                    // It's a valid time string.
                 } else {
                     if ($timestr = strtotime($timestr)) {
                         $data->{"field_{$fieldid}_{$entryid}"} = $timestr;

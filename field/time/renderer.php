@@ -1,25 +1,25 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package datalynxfield
  * @subpackage time
  * @copyright 2011 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 defined('MOODLE_INTERNAL') or die();
 
@@ -57,12 +57,12 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
             if ($content = $entry->{"c{$fieldid}_content"}) {
                 if (!empty($params['format'])) {
                     $strtime = userdate($content, $params['format']);
-                } elseif (isset($params['date'])) {
+                } else if (isset($params['date'])) {
                     $strtime = userdate($content, get_string("strftimedate"));
-                } elseif (isset($params['timestamp'])) {
+                } else if (isset($params['timestamp'])) {
                     $strtime = $content;
-                } elseif (!empty($field->display_format)) {
-                    $strtime = userdate($content, $field->display_format);
+                } else if (!empty($field->displayformat)) {
+                    $strtime = userdate($content, $field->displayformat);
                 } else {
                     $date = getdate($content);
                     if ($date['seconds'] || $date['minutes'] || $date['hours']) {
@@ -96,7 +96,7 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
             $mform->disabledIf("f_{$i}_{$fieldid}_from[$fieldidentifier]", "searchoperator$i", 'eq', '');
         }
         if ($field->date_only) {
-            // Deactivate form elements for min and seconds when field is date only and operator is "="
+            // Deactivate form elements for min and seconds when field is date only and operator is "=".
             foreach (array('hour', 'minute') as $fieldidentifier) {
                 $mform->disabledIf("f_{$i}_{$fieldid}_from[$fieldidentifier]", "searchoperator$i", 'eq', '=');
             }
@@ -115,18 +115,18 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         $entryid = $entry->id;
         $fieldname = "field_{$fieldid}_{$entryid}";
 
-        // If date only don't add time to selector
+        // If date only don't add time to selector.
         $time = $includetime ? 'time_' : '';
         $elementoptions = array();
-        // Optional
-        $elementoptions['optional'] = true; // (!empty($options['required']) ? null : true);
-        // Start year
-        if ($field->start_year) {
-            $elementoptions['startyear'] = $field->start_year;
+        // Optional.
+        $elementoptions['optional'] = true;
+        // Start year.
+        if ($field->startyear) {
+            $elementoptions['startyear'] = $field->startyear;
         }
-        // End year
-        if ($field->stop_year) {
-            $elementoptions['stopyear'] = $field->stop_year;
+        // End year.
+        if ($field->stopyear) {
+            $elementoptions['stopyear'] = $field->stopyear;
         }
         $mform->addElement("date_{$time}selector", $fieldname, null, $elementoptions);
         $mform->setDefault($fieldname, $content);
@@ -152,10 +152,10 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         $fieldid = $field->id();
         $fieldname = "field_{$fieldid}_{$entryid}";
 
-        // TODO some defaults that need to be set in the field settings
+        // TODO some defaults that need to be set in the field settings.
         $step = 5;
-        $startyear = $field->start_year ? $field->start_year : 1970;
-        $stopyear = $field->stop_year ? $field->stop_year : 2020;
+        $startyear = $field->startyear ? $field->startyear : 1970;
+        $stopyear = $field->stopyear ? $field->stopyear : 2020;
         $maskday = get_string('day');
         $maskmonth = get_string('month');
         $maskyear = get_string('year');
@@ -181,7 +181,7 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         $grp[] = &$mform->createElement('select', "{$fieldname}[year]", null,
                 array(0 => $maskyear) + $years);
 
-        // If time add hours and minutes
+        // If time add hours and minutes.
         if ($includetime) {
             $maskhour = get_string('hour', 'datalynxfield_time');
             $maskminute = get_string('minute', 'datalynxfield_time');
@@ -202,19 +202,19 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         }
 
         $mform->addGroup($grp, "grp$fieldname", null, '', false);
-        // Set field values
+        // Set field values.
         if ($content) {
             list($day, $month, $year, $hour, $minute) = explode(':', date('d:n:Y:G:i', $content));
             $mform->setDefault("{$fieldname}[day]", (int) $day);
             $mform->setDefault("{$fieldname}[month]", (int) $month);
             $mform->setDefault("{$fieldname}[year]", (int) $year);
-            // Defaults for time
+            // Defaults for time.
             if ($includetime) {
                 $mform->setDefault("{$fieldname}[hour]", (int) $hour);
                 $mform->setDefault("{$fieldname}[minute]", (int) $minute);
             }
         }
-        // Add enabled fake field
+        // Add enabled fake field.
         $mform->addElement('hidden', "{$fieldname}[enabled]", 1);
         $mform->setType("{$fieldname}[enabled]", PARAM_INT);
         $required = !empty($options['required']);
@@ -289,23 +289,23 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
 
         $patterns = parent::patterns();
         $patterns["[[$fieldname]]"] = array(true);
-        // date without time
+        // Date without time.
         $patterns["[[$fieldname:date]]"] = array(true);
-        // date with time
+        // Date with time.
         $patterns["[[$fieldname:timestamp]]"] = array(true);
-        // Minute (M)
+        // Minute (M).
         $patterns["[[$fieldname:minute]]"] = array(false);
-        // Hour (H)
+        // Hour (H).
         $patterns["[[$fieldname:hour]]"] = array(false);
-        // Day (a)
+        // Day (a).
         $patterns["[[$fieldname:day]]"] = array(false);
         $patterns["[[$fieldname:d]]"] = array(false);
-        // Week (V)
+        // Week (V).
         $patterns["[[$fieldname:week]]"] = array(false);
-        // Month (b)
+        // Month (b).
         $patterns["[[$fieldname:month]]"] = array(false);
         $patterns["[[$fieldname:m]]"] = array(false);
-        // Year (G)
+        // Year (G).
         $patterns["[[$fieldname:year]]"] = array(false);
         $patterns["[[$fieldname:Y]]"] = array(false);
 
@@ -319,8 +319,8 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
 
         $errors = array();
         foreach ($tags as $tag) {
-            list(, $behavior,) = $this->process_tag($tag);
-            /* @var $behavior datalynx_field_behavior */
+            list(, $behavior, ) = $this->process_tag($tag);
+            // Variable $behavior datalynx_field_behavior.
             if ($behavior->is_required() and
                     !isset(optional_param_array($formfieldname, [], PARAM_RAW)['enabled'])
             ) {

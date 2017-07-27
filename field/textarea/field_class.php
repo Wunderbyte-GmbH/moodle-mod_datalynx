@@ -1,26 +1,28 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package datalynxfield
  * @subpackage textarea
  * @copyright 2011 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
+defined('MOODLE_INTERNAL') or die();
+
 require_once($CFG->dirroot . '/mod/datalynx/field/field_class.php');
 require_once($CFG->dirroot . '/lib/filelib.php');
 require_once($CFG->dirroot . '/repository/lib.php');
@@ -83,8 +85,8 @@ class datalynxfield_textarea extends datalynxfield_base {
             $rec->id = $DB->insert_record('datalynx_contents', $rec);
         }
 
-        // Editor content
-        if (false) { // $this->is_editor()
+        // Editor content.
+        if (false) {
             $data = (object) $values;
             $data->{'editor_editor'} = $data->editor;
 
@@ -94,11 +96,11 @@ class datalynxfield_textarea extends datalynxfield_base {
             $rec->content = $data->editor;
             $rec->content1 = $data->{'editorformat'};
 
-            // Text area content
+            // Text area content.
         } else {
             $value = reset($values);
             if (is_array($value)) {
-                // Import: One value as array of text,format,trust, so take the text
+                // Import: One value as array of text,format,trust, so take the text.
                 $value = reset($value);
             }
             $rec->content = clean_param($value, PARAM_RAW);
@@ -120,7 +122,7 @@ class datalynxfield_textarea extends datalynxfield_base {
 
         parent::prepare_import_content($data, $importsettings, $csvrecord, $entryid);
 
-        // For editors reformat in editor structure
+        // For editors reformat in editor structure.
         if ($this->is_editor()) {
             if (isset($data->{"field_{$fieldid}_{$entryid}"})) {
                 $valuearr = explode('##', $data->{"field_{$fieldid}_{$entryid}"});

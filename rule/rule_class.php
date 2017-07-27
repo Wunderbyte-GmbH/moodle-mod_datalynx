@@ -1,25 +1,27 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package datalynx_rule
  * @copyright 2013 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
+defined('MOODLE_INTERNAL') or die();
+
 require_once(dirname(__FILE__) . "/../mod_class.php");
 
 /**
@@ -28,17 +30,18 @@ require_once(dirname(__FILE__) . "/../mod_class.php");
 abstract class datalynx_rule_base {
 
     public $type = 'unknown';
-    // Subclasses must override the type with their name
+    // Subclasses must override the type with their name.
     public $df = null;
-    // The datalynx object that this rule belongs to
+    // The datalynx object that this rule belongs to.
     public $rule = null;
-    // The rule object itself, if we know it
+    // The rule object itself, if we know it.
 
     /**
      * Class constructor
      *
-     * @param var $df datalynx id or class object
-     * @param var $rule rule id or DB record
+     * @param integer $df datalynx id or class object
+     * @param integer $rule rule id or DB record
+     * @throws coding_exception
      */
     public function __construct($df = 0, $rule = 0) {
         if (empty($df)) {
@@ -46,17 +49,17 @@ abstract class datalynx_rule_base {
         } else {
             if ($df instanceof datalynx) {
                 $this->df = $df;
-            } else { // datalynx id/object
+            } else { // Datalynx id/object.
                 $this->df = new datalynx($df);
             }
         }
 
         if (!empty($rule)) {
-            // $rule is the rule record
+            // Variable $rule is the rule record.
             if (is_object($rule)) {
-                $this->rule = $rule; // Programmer knows what they are doing, we hope
+                $this->rule = $rule; // Programmer knows what they are doing, we hope.
 
-                // $rule is a rule id
+                // Variable $rule is a rule id.
             } else {
                 if ($ruleobj = $this->df->get_rule_from_id($rule)) {
                     $this->rule = $ruleobj->rule;
@@ -66,7 +69,7 @@ abstract class datalynx_rule_base {
             }
         }
 
-        if (empty($this->rule)) { // We need to define some default values
+        if (empty($this->rule)) { // We need to define some default values.
             $this->set_rule();
         }
     }
@@ -252,8 +255,8 @@ abstract class datalynx_rule_base {
     public function get_sort_from_sql($paramname = 'sortie', $paramcount = '') {
         $ruleid = $this->rule->id;
         if ($ruleid > 0) {
-            $sql =
-                    " LEFT JOIN {datalynx_contents} c$ruleid ON (c$ruleid.entryid = e.id AND c$ruleid.ruleid = :$paramname$paramcount) ";
+            $sql = " LEFT JOIN {datalynx_contents} c$ruleid
+            ON (c$ruleid.entryid = e.id AND c$ruleid.ruleid = :$paramname$paramcount) ";
             return array($sql, $ruleid);
         } else {
             return null;

@@ -1,26 +1,28 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package mod_datalynx
  * @copyright 2014 Ivan Šakić
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
-require_once $CFG->libdir . '/formslib.php';
+defined('MOODLE_INTERNAL') or die();
+
+require_once($CFG->libdir . '/formslib.php');
 HTML_QuickForm::registerElementType('checkboxgroup',
         "$CFG->dirroot/mod/datalynx/checkboxgroup/checkboxgroup.php", 'HTML_QuickForm_checkboxgroup');
 
@@ -215,7 +217,7 @@ class datalynx_field_renderer_form extends moodleform {
         parent::set_data($data);
     }
 
-    function validation($data, $files) {
+    public function validation($data, $files) {
         global $DB;
 
         $errors = array();
@@ -226,12 +228,12 @@ class datalynx_field_renderer_form extends moodleform {
             $errors['edittemplate'] = 'You must use tag #input somewhere in this template!';
         }
         if ($data['id'] == 0) {
-            // To prevent duplicate renderer names when creating a new renderer
+            // To prevent duplicate renderer names when creating a new renderer.
             if ($DB->record_exists('datalynx_renderers', array('name' => $data['name'], 'dataid' => $data['d']))) {
                 $errors['name'] = get_string('duplicatename', 'datalynx');
             }
         } else {
-            // To prevent duplicate renderer names when updating existing renderers
+            // To prevent duplicate renderer names when updating existing renderers.
             $sql = "SELECT 'x'
                     FROM {datalynx_renderers} r
                     WHERE r.name = ? AND r.dataid = ? AND r.id <> ?";

@@ -1,26 +1,28 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package datalynxview
  * @subpackage csv
  * @copyright 2012 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
+defined('MOODLE_INTERNAL') or die();
+
 require_once("$CFG->dirroot/mod/datalynx/view/view_class.php");
 
 class datalynxview_csv extends datalynxview_base {
@@ -65,7 +67,7 @@ class datalynxview_csv extends datalynxview_base {
 
         $elements = array();
 
-        // Generate the header row
+        // Generate the header row.
         $tableheader = '';
         if ($this->has_headers()) {
             $columns = $this->get_columns();
@@ -75,28 +77,28 @@ class datalynxview_csv extends datalynxview_base {
             }
             $tableheader = html_writer::tag('thead', html_writer::tag('tr', $tableheader));
 
-            // Set view tags in header row
+            // Set view tags in header row.
             $tags = $this->_tags['view'];
             $replacements = $this->patternclass()->get_replacements($tags);
             $tableheader = str_replace($tags, $replacements, $tableheader);
         }
-        // Open table and wrap header with thead
+        // Open table and wrap header with thead.
         $elements[] = array('html',
                 html_writer::start_tag('table', array('class' => 'generaltable')) . $tableheader);
 
-        // flatten the set to a list of elements, wrap with tbody and close table
+        // Flatten the set to a list of elements, wrap with tbody and close table.
         $elements[] = array('html', html_writer::start_tag('tbody'));
-        foreach ($entriesset as $entryid => $entry_definitions) {
-            $elements = array_merge($elements, $entry_definitions);
+        foreach ($entriesset as $entryid => $entrydefinitions) {
+            $elements = array_merge($elements, $entrydefinitions);
         }
         $elements[] = array('html', html_writer::end_tag('tbody') . html_writer::end_tag('table'));
 
-        // Add group heading
+        // Add group heading.
         $name = ($name == 'newentry') ? get_string('entrynew', 'datalynx') : $name;
         if ($name) {
             array_unshift($elements, array('html', $OUTPUT->heading($name, 3, 'main')));
         }
-        // Wrap with entriesview
+        // Wrap with entriesview.
         array_unshift($elements, array('html', html_writer::start_tag('div', array('class' => 'entriesview'))));
         array_push($elements, array('html', html_writer::end_tag('div')));
 
@@ -109,12 +111,12 @@ class datalynxview_csv extends datalynxview_base {
     public function process_data() {
         global $CFG;
 
-        // proces csv export request
+        // Proces csv export request.
         if ($exportcsv = optional_param('exportcsv', '', PARAM_ALPHA)) {
             $this->process_export($exportcsv);
         }
 
-        // proces csv import request
+        // Proces csv import request.
         if ($importcsv = optional_param('importcsv', 0, PARAM_INT)) {
             $this->process_import();
         }
@@ -124,10 +126,10 @@ class datalynxview_csv extends datalynxview_base {
      */
     protected function entry_definition($fielddefinitions) {
         $elements = array();
-        // Get the columns definition from the view template
+        // Get the columns definition from the view template.
         $columns = $this->get_columns();
 
-        // Generate entry table row
+        // Generate entry table row.
         $elements[] = array('html', html_writer::start_tag('tr'));
         foreach ($columns as $column) {
             list($tag, , $class) = array_map('trim', $column);
@@ -158,10 +160,10 @@ class datalynxview_csv extends datalynxview_base {
     protected function new_entry_definition($entryid = -1) {
         $elements = array();
 
-        // Get the columns definition from the view template
+        // Get the columns definition from the view template.
         $columns = $this->get_columns();
 
-        // Get field definitions for new entry
+        // Get field definitions for new entry.
         $fields = $this->_df->get_fields();
         $entry = (object) array('id' => $entryid);
         $fielddefinitions = array();
@@ -173,7 +175,7 @@ class datalynxview_csv extends datalynxview_base {
             }
         }
 
-        // Generate entry table row
+        // Generate entry table row.
         $elements[] = array('html', html_writer::start_tag('tr'));
         foreach ($columns as $column) {
             list($tag, , $class) = array_map('trim', $column);
@@ -204,15 +206,15 @@ class datalynxview_csv extends datalynxview_base {
     protected function set__patterns($data = null) {
         parent::set__patterns($data);
 
-        // get patterns from param2
+        // Get patterns from param2.
         if ($data) {
             $text = !empty($data->param2) ? ' ' . $data->param2 : '';
             if (trim($text)) {
-                // This view patterns
+                // This view patterns.
                 if ($patterns = $this->patternclass()->search($text)) {
                     $this->_tags['view'] = array_merge($this->_tags['view'], $patterns);
                 }
-                // Field patterns
+                // Field patterns.
                 if ($fields = $this->_df->get_fields()) {
                     foreach ($fields as $fieldid => $field) {
                         if ($patterns = $field->renderer()->search($text)) {
@@ -235,7 +237,7 @@ class datalynxview_csv extends datalynxview_base {
             $mform = $this->get_import_form();
 
             $tohtml = isset($params['tohtml']) ? $params['tohtml'] : false;
-            // print view
+            // Print view.
             $viewname = 'datalynxview-' . preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $this->name()));
             if ($tohtml) {
                 return html_writer::tag('div', $mform->html(), array('class' => $viewname));
@@ -284,7 +286,7 @@ class datalynxview_csv extends datalynxview_base {
             $returnstr .= implode($delimiter, $row) . "\n";
         }
 
-        // Convert encoding
+        // Convert encoding.
         $returnstr = mb_convert_encoding($returnstr, $this->_encoding, 'UTF-8');
 
         header("Content-Type: application/download\n");
@@ -300,21 +302,21 @@ class datalynxview_csv extends datalynxview_base {
     /**
      */
     public function get_csv_content($range = self::EXPORT_PAGE) {
-        // Set content
+        // Set content.
         if ($range == self::EXPORT_ALL) {
             $entries = new datalynx_entries($this->_df, $this->_filter);
             $options = array();
-            // Set a filter to take it all
+            // Set a filter to take it all.
             $filter = $this->get_filter();
             $filter->perpage = 0;
             $options['filter'] = $filter;
-            // do we need ratings?
+            // Do we need ratings?
             if ($ratingoptions = $this->is_rating()) {
                 $options['ratings'] = $ratingoptions;
             }
-            // do we need comments?
+            // Do we need comments?
 
-            // Get the entries
+            // Get the entries.
             $entries->set_content($options);
             $exportentries = $entries->entries();
         } else {
@@ -322,13 +324,12 @@ class datalynxview_csv extends datalynxview_base {
             $exportentries = $this->_entries->entries();
         }
 
-        // Compile entries if any
+        // Compile entries if any.
         if (!$exportentries) {
             return null;
         }
 
-        // Get the field definitions
-        // array(array(pattern => value,...)...)
+        // Get the field definitions.
         $entryvalues = array();
         foreach ($exportentries as $entryid => $entry) {
             $patternvalues = array();
@@ -342,12 +343,12 @@ class datalynxview_csv extends datalynxview_base {
             $entryvalues[$entryid] = $patternvalues;
         }
 
-        // Get csv headers from view columns
+        // Get csv headers from view columns.
         $columnpatterns = array();
         $csvheader = array();
         $columns = $this->get_columns();
         foreach ($columns as $column) {
-            list($pattern, $header,) = $column;
+            list($pattern, $header, ) = $column;
             $columnpatterns[] = $pattern;
             $csvheader[] = $header ? $header : trim($pattern, '[#]');
         }
@@ -355,8 +356,7 @@ class datalynxview_csv extends datalynxview_base {
         $csvcontent = array();
         $csvcontent[] = $csvheader;
 
-        // Get the field definitions
-        // array(array(pattern => value,...)...)
+        // Get the field definitions.
         foreach ($entryvalues as $entryid => $patternvalues) {
             $row = array();
             foreach ($columnpatterns as $pattern) {
@@ -389,9 +389,9 @@ class datalynxview_csv extends datalynxview_base {
 
                 $fieldsettings = array();
 
-                // collect field import settings from formdata by field, tag and element
+                // Collect field import settings from formdata by field, tag and element.
                 foreach ($formdata as $name => $value) {
-                    if (strpos($name, 'f_') !== false) { // assuming only field settings start with f_
+                    if (strpos($name, 'f_') !== false) { // Assuming only field settings start with f_.
                         list(, $fieldid, $tag, $elem) = explode('_', $name);
                         if (!array_key_exists($fieldid, $fieldsettings)) {
                             $fieldsettings[$fieldid] = array();
@@ -404,12 +404,12 @@ class datalynxview_csv extends datalynxview_base {
                     }
                 }
 
-                // process csv if any
+                // Process csv if any.
                 if ($this->view->param2) {
 
-                    if (!empty($formdata->csvtext)) { // upload from text
+                    if (!empty($formdata->csvtext)) { // Upload from text.
                         $csvcontent = $formdata->csvtext;
-                    } else { // upload from file
+                    } else { // Upload from file.
                         $csvcontent = $mform->get_file_content('importfile');
                     }
 
@@ -427,7 +427,7 @@ class datalynxview_csv extends datalynxview_base {
                     }
                 }
 
-                // process fields' non-csv import
+                // Process fields' non-csv import.
                 foreach ($fieldsettings as $fieldid => $importsettings) {
                     $field = $this->_df->get_field_from_id($fieldid);
                     $field->prepare_import_content($data, $importsettings);
@@ -435,7 +435,7 @@ class datalynxview_csv extends datalynxview_base {
 
                 return $this->execute_import($data);
             } else {
-                // Set import flag to display the form
+                // Set import flag to display the form.
                 $this->_showimportform = true;
             }
         }
@@ -480,26 +480,26 @@ class datalynxview_csv extends datalynxview_base {
             return $data;
         }
 
-        // csv column headers
+        // Csv column headers.
         if (!$fieldnames = $cir->get_columns()) {
             $data->error = $cir->get_error();
             return $data;
         }
 
-        // process each csv record
+        // Process each csv record.
         $updateexisting = $updateexisting and !empty($csvfieldnames['Entry']);
         $i = 0;
         $cir->init();
         while ($csvrecord = $cir->next()) {
             $csvrecord = array_combine($fieldnames, $csvrecord);
-            // set the entry id
+            // Set the entry id.
             if ($updateexisting and $csvrecord['Entry'] > 0) {
                 $data->eids[$csvrecord['Entry']] = $entryid = $csvrecord['Entry'];
             } else {
                 $i--;
                 $data->eids[$i] = $entryid = $i;
             }
-            // iterate the fields and add their content
+            // Iterate the fields and add their content.
 
             foreach ($fieldsettings as $fieldid => $importsettings) {
                 $field = $this->_df->get_field_from_id($fieldid);
@@ -526,16 +526,16 @@ class datalynxview_csv extends datalynxview_base {
      * Returns a fieldset of view options
      */
     public function generate_default_view() {
-        // get all the fields
+        // Get all the fields.
         if (!$fields = $this->_df->get_fields()) {
-            return; // you shouldn't get that far if there are no user fields
+            return; // You shouldn't get that far if there are no user fields.
         }
 
-        // set views and filters menus and quick search
+        // Set views and filters menus and quick search.
         $table = new html_table();
         $table->attributes['align'] = 'center';
         $table->attributes['cellpadding'] = '2';
-        // first row: menus
+        // First row: menus.
         $row1 = new html_table_row();
         $viewsmenu = new html_table_cell('##viewsmenu##');
         $seperator = new html_table_cell('     ');
@@ -546,7 +546,7 @@ class datalynxview_csv extends datalynxview_base {
         foreach ($row1->cells as $cell) {
             $cell->style = 'border:0 none;';
         }
-        // second row: export
+        // Second row: export.
         $row2 = new html_table_row();
         $addentries = new html_table_cell('##addnewentries##');
         $addentries->colspan = 5;
@@ -554,7 +554,7 @@ class datalynxview_csv extends datalynxview_base {
         foreach ($row2->cells as $cell) {
             $cell->style = 'border:0 none;';
         }
-        // next row: export import
+        // Next row: export import.
         $row2a = new html_table_row();
         $addentries = new html_table_cell('##export:all## | ##export:page## | ##import##');
         $addentries->colspan = 5;
@@ -562,7 +562,7 @@ class datalynxview_csv extends datalynxview_base {
         foreach ($row2a->cells as $cell) {
             $cell->style = 'border:0 none;';
         }
-        // third row: paging bar
+        // Third row: paging bar.
         $row3 = new html_table_row();
         $pagingbar = new html_table_cell('##pagingbar##');
         $pagingbar->colspan = 5;
@@ -570,13 +570,13 @@ class datalynxview_csv extends datalynxview_base {
         foreach ($row3->cells as $cell) {
             $cell->style = 'border:0 none;';
         }
-        // construct the table
+        // Construct the table.
         $table->data = array($row1, $row2, $row2a, $row3);
         $sectiondefault = html_writer::table($table);
         $this->view->esection = html_writer::tag('div', $sectiondefault,
                         array('class' => 'mdl-align')) . "<div>##entries##</div>";
 
-        // set content
+        // Set content.
         $this->view->param2 = '';
         foreach ($fields as $field) {
             if ($field->field->id > 0) {
@@ -603,7 +603,7 @@ class datalynxview_csv extends datalynxview_base {
                     continue;
                 }
                 $arr = explode("|", $column);
-                $tag = $arr[0]; // Must exist
+                $tag = $arr[0]; // Must exist.
                 $header = !empty($arr[1]) ? $arr[1] : trim($tag, '[]#');
                 $class = !empty($arr[2]) ? $arr[2] : '';
 
@@ -625,7 +625,7 @@ class datalynxview_csv extends datalynxview_base {
         return false;
     }
 
-    // GETTERS
+    // GETTERS.
     /**
      */
     public function get_output_type() {

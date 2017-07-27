@@ -1,4 +1,18 @@
 <?php
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
+//
+// It is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// It is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * HTML class for a checkbox group type field
@@ -8,6 +22,8 @@
  * @since PHP4.04pl1
  * @access public
  */
+defined('MOODLE_INTERNAL') || die();
+
 class HTML_QuickForm_checkboxgroup extends HTML_QuickForm_element {
 
     var $_options = array();
@@ -99,7 +115,7 @@ class HTML_QuickForm_checkboxgroup extends HTML_QuickForm_element {
             $this->setSelected($values);
         }
         foreach ($arr as $key => $val) {
-            // Warning: new API since release 2.3
+            // Warning: new API since release 2.3.
             $this->addOption($val, $key);
         }
         return true;
@@ -165,7 +181,7 @@ class HTML_QuickForm_checkboxgroup extends HTML_QuickForm_element {
 
         if ($this->_persistantFreeze) {
             $name = $this->getPrivateName();
-            // Only use id attribute if doing single hidden input
+            // Only use id attribute if doing single hidden input.
             if (1 == count($this->_values)) {
                 $id = $this->getAttribute('id');
                 $idAttr = isset($id) ? array('id' => $id) : array();
@@ -214,7 +230,7 @@ class HTML_QuickForm_checkboxgroup extends HTML_QuickForm_element {
             $value = $this->_findValue($caller->_constantValues);
             if (null === $value) {
                 $value = $this->_findValue($caller->_submitValues);
-                // Fix for bug #4465 & #5269
+                // Fix for bug #4465 & #5269.
                 // XXX: should we push this to element::onQuickFormEvent()?
                 if (null === $value && (!$caller->isSubmitted())) {
                     $value = $this->_findValue($caller->_defaultValues);

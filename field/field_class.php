@@ -1,25 +1,27 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package datalynxfield
  * @copyright 2012 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
+defined('MOODLE_INTERNAL') or die();
+
 require_once(dirname(__FILE__) . '/../mod_class.php');
 require_once(dirname(__FILE__) . '/../behavior/behavior.php');
 require_once(dirname(__FILE__) . '/../renderer/renderer.php');
@@ -36,11 +38,11 @@ abstract class datalynxfield_base {
     const VISIBLE_ALL = 2;
 
     public $type = 'unknown';
-    // Subclasses must override the type with their name
+    // Subclasses must override the type with their name.
     public $df = null;
-    // The datalynx object that this field belongs to
+    // The datalynx object that this field belongs to.
     public $field = null;
-    // The field object itself, if we know it
+    // The field object itself, if we know it.
     protected $_renderer = null;
 
     protected $_distinctvalues = null;
@@ -57,17 +59,17 @@ abstract class datalynxfield_base {
         } else {
             if ($df instanceof datalynx) {
                 $this->df = $df;
-            } else { // datalynx id/object
+            } else { // Datalynx id/object.
                 $this->df = new datalynx($df);
             }
         }
 
         if (!empty($field)) {
-            // $field is the field record
+            // Variable field is the field record.
             if (is_object($field)) {
-                $this->field = $field; // Programmer knows what they are doing, we hope
+                $this->field = $field; // Programmer knows what they are doing, we hope.
 
-                // $field is a field id
+                // Variable $field is a field id.
             } else {
                 if ($fieldobj = $this->df->get_field_from_id($field)) {
                     $this->field = $fieldobj->field;
@@ -77,7 +79,7 @@ abstract class datalynxfield_base {
             }
         }
 
-        if (empty($this->field)) { // We need to define some default values
+        if (empty($this->field)) { // We need to define some default values.
             $this->set_field();
         }
     }
@@ -159,7 +161,7 @@ abstract class datalynxfield_base {
         if (isset($this->field->$var)) {
             return $this->field->$var;
         } else {
-            // TODO throw an exception if $var is not a property of field
+            // TODO throw an exception if $var is not a property of field.
             return false;
         }
     }
@@ -248,12 +250,12 @@ abstract class datalynxfield_base {
             'editable' => false, 'disabled' => false, 'required' => false, 'internal' => false
     );
 
-    // CONTENT MANAGEMENT
+    // CONTENT MANAGEMENT.
     /**
      */
     public function get_definitions($tags, $entry, array $options) {
         return $this->renderer()->replacements($tags, $entry,
-                array_merge(self::$defaultoptions, $options)); // FIXME:
+                array_merge(self::$defaultoptions, $options)); // FIXME:.
         // YOU
         // *MUST*
         // REMOVE
@@ -284,21 +286,21 @@ abstract class datalynxfield_base {
             $rec->{"content$c"} = $content;
         }
 
-        // insert only if no old contents and there is new contents
+        // Insert only if no old contents and there is new contents.
         if (is_null($contentid) and !empty($contents)) {
             return $DB->insert_record('datalynx_contents', $rec);
         }
 
-        // delete if old content but not new
+        // Delete if old content but not new.
         if (!is_null($contentid) and empty($contents)) {
             return $this->delete_content($entry->id);
         }
 
-        // update if new is different from old
+        // Update if new is different from old.
         if (!is_null($contentid)) {
             foreach ($contents as $key => $content) {
                 if (!isset($oldcontents[$key]) or $content !== $oldcontents[$key]) {
-                    $rec->id = $contentid; // MUST_EXIST
+                    $rec->id = $contentid; // MUST_EXIST.
                     return $DB->update_record('datalynx_contents', $rec);
                 }
             }
@@ -366,8 +368,8 @@ abstract class datalynxfield_base {
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
         $fieldid = $this->field->id;
         $fieldname = $this->name();
-        // TODO
-        // Ugly hack for internal fields
+        // TODO.
+        // Ugly hack for internal fields.
         if ($this->is_internal()) {
             $setting = reset($importsettings);
             $csvname = $setting['name'];
@@ -436,7 +438,7 @@ abstract class datalynxfield_base {
             $resetted = reset($values);
             $newcontent = !empty($resetted) ? $resetted : "";
             if (!empty($newcontent) && is_array($newcontent)) {
-                // When no value ist selected, then a default value is saved by Quickform. Value is removed here:
+                // When no value ist selected, then a default value is saved by Quickform. Value is removed here:.
                 if (($key = array_search('_qf__force_multiselect_submission', $newcontent)) !== false) {
                     unset($newcontent[$key]);
                 }
@@ -494,8 +496,8 @@ abstract class datalynxfield_base {
     public function get_sort_from_sql($paramname = 'sortie', $paramcount = '') {
         $fieldid = $this->field->id;
         if ($fieldid > 0) {
-            $sql =
-                    " LEFT JOIN {datalynx_contents} c$fieldid ON (c$fieldid.entryid = e.id AND c$fieldid.fieldid = :$paramname$paramcount) ";
+            $sql = " LEFT JOIN {datalynx_contents} c$fieldid
+            ON (c$fieldid.entryid = e.id AND c$fieldid.fieldid = :$paramname$paramcount)";
             return array($sql, $fieldid);
         } else {
             return null;
@@ -536,11 +538,11 @@ abstract class datalynxfield_base {
         $fieldid = $this->field->id;
         $name = "df_{$fieldid}_{$i}";
 
-        // For all NOT criteria except NOT Empty, exclude entries
-        // which don't meet the positive criterion
-        // because some fields may not have content records
-        // and the respective entries may be filter out
-        // despite meeting the criterion
+        // For all NOT criteria except NOT Empty, exclude entries.
+        // Which don't meet the positive criterion.
+        // Because some fields may not have content records.
+        // And the respective entries may be filter out.
+        // Despite meeting the criterion.
         $excludeentries = (($not and $operator !== '') or (!$not and $operator === ''));
 
         if ($excludeentries) {
@@ -578,9 +580,9 @@ abstract class datalynxfield_base {
         }
 
         if ($excludeentries) {
-            // Get entry ids for entries that meet the criterion
+            // Get entry ids for entries that meet the criterion.
             if ($eids = $this->get_entry_ids_for_content($sql, $params)) {
-                // Get NOT IN sql
+                // Get NOT IN sql.
                 list($notinids, $params) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED,
                         "df_{$fieldid}_", false);
                 $sql = " e.id $notinids ";
@@ -676,7 +678,7 @@ abstract class datalynxfield_base {
      * @return array an array of operators
      */
     public function get_supported_search_operators() {
-        return array(); // if search is not supported, offer no operators
+        return array(); // If search is not supported, offer no operators.
     }
 }
 
@@ -797,7 +799,7 @@ abstract class datalynxfield_option extends datalynxfield_base {
         $adds = preg_split("/[\|\r\n]+/",
                 !empty($forminput->addoptions) ? $forminput->addoptions : '');
 
-        // make sure there are no renames when options are deleted. That will not work
+        // Make sure there are no renames when options are deleted. That will not work.
         $delvalues = array_values($deletes);
         if (!empty($delvalues)) {
             $renames = array();
@@ -950,7 +952,7 @@ class datalynxfield_option_multiple extends datalynxfield_option {
         $contents = array();
         $oldcontents = array();
 
-        // old contents
+        // Old contents.
         if (isset($entry->{"c{$fieldid}_content"})) {
             $oldcontents[] = $entry->{"c{$fieldid}_content"};
         }
@@ -961,7 +963,7 @@ class datalynxfield_option_multiple extends datalynxfield_option {
                 unset($newvalues[$key]);
             }
         }
-        // new contents
+        // New contents.
         if (!empty($newvalues)) {
             $content = '#' . implode('#,#', $newvalues) . '#';
             $contents[] = $content;
@@ -985,11 +987,11 @@ class datalynxfield_option_multiple extends datalynxfield_option {
         $conditions = [];
         $notinidsequal = false;
 
-        // For all NOT criteria except NOT Empty, exclude entries
-        // which don't meet the positive criterion
-        // because some fields may not have content records
-        // and the respective entries may be filter out
-        // despite meeting the criterion
+        // For all NOT criteria except NOT Empty, exclude entries.
+        // Which don't meet the positive criterion.
+        // Because some fields may not have content records.
+        // And the respective entries may be filter out.
+        // Despite meeting the criterion.
         $excludeentries = (($not and $operator !== '') or (!$not and $operator === ''));
 
         if ($operator === 'EXACTLY' && empty($value)) {
@@ -1051,9 +1053,9 @@ class datalynxfield_option_multiple extends datalynxfield_option {
                         $sqlfind = " (" . implode(" AND ", $conditions) . ") ";
 
                         $sql = ' 1 ';
-                        if ($eids = $this->get_entry_ids_for_content($sqlfind, $params)) { // there are
-                            // non-empty
-                            // contents
+                        if ($eids = $this->get_entry_ids_for_content($sqlfind, $params)) { // There are.
+                            // Non-empty.
+                            // Contents.
                             list($contentids, $paramsnot) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED,
                                     "df_{$fieldid}_x_", false);
                             $params = array_merge($params, $paramsnot);
@@ -1063,18 +1065,18 @@ class datalynxfield_option_multiple extends datalynxfield_option {
                         $sql = " (" . implode(" AND ", $conditions) . ") ";
                     }
                 } else {
-                    if ($operator === '') { // EMPTY
+                    if ($operator === '') { // EMPTY.
                         $usecontent = false;
                         $sqlnot = $DB->sql_like("content", ":{$name}_hascontent");
                         $params["{$name}_hascontent"] = "%";
 
-                        if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) { // there are non-empty
-                            // contents
+                        if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) { // There are non-empty.
+                            // Contents.
                             list($contentids, $paramsnot) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED,
                                     "df_{$fieldid}_x_", !!$not);
                             $params = array_merge($params, $paramsnot);
                             $sql = " (e.id $contentids) ";
-                        } else { // there are no non-empty contents
+                        } else { // There are no non-empty contents.
                             if ($not) {
                                 $sql = " 0 ";
                             } else {
@@ -1090,7 +1092,7 @@ class datalynxfield_option_multiple extends datalynxfield_option {
             $sqlnot = str_replace($content, 'content', $sql);
             $sqlnot = str_replace('NOT (', '(', $sqlnot);
             if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) {
-                // Get NOT IN sql
+                // Get NOT IN sql.
                 list($notinids, $paramsnot) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED,
                         "df_{$fieldid}_x_", $notinidsequal);
                 $params = array_merge($params, $paramsnot);
@@ -1145,12 +1147,12 @@ class datalynxfield_option_single extends datalynxfield_option {
      */
     protected function format_content($entry, array $values = null) {
         $fieldid = $this->field->id;
-        // old contents
+        // Old contents.
         $oldcontents = array();
         if (isset($entry->{"c{$fieldid}_content"})) {
             $oldcontents[] = $entry->{"c{$fieldid}_content"};
         }
-        // new contents
+        // New contents.
         $contents = array();
 
         $selected = null;
@@ -1162,7 +1164,7 @@ class datalynxfield_option_single extends datalynxfield_option {
             }
         }
 
-        // add the content
+        // Add the content.
         if (!is_null($selected)) {
             $contents[] = $selected;
         }
@@ -1224,11 +1226,11 @@ class datalynxfield_option_single extends datalynxfield_option {
         $name = "df_{$fieldid}_{$i}";
         $notinidsequal = false;
 
-        // For all NOT criteria except NOT Empty, exclude entries
-        // which don't meet the positive criterion
-        // because some fields may not have content records
-        // and the respective entries may be filter out
-        // despite meeting the criterion
+        // For all NOT criteria except NOT Empty, exclude entries.
+        // Which don't meet the positive criterion.
+        // Because some fields may not have content records.
+        // And the respective entries may be filter out.
+        // Despite meeting the criterion.
         $excludeentries = (($not and $operator !== '') or (!$not and $operator === ''));
 
         $content = "c{$this->field->id}.content";
@@ -1243,13 +1245,13 @@ class datalynxfield_option_single extends datalynxfield_option {
                 $sqlnot = $DB->sql_like("content", ":{$name}_hascontent");
                 $params["{$name}_hascontent"] = "%";
 
-                if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) { // there are non-empty
-                    // contents
+                if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) { // There are non-empty.
+                    // Contents.
                     list($contentids, $paramsnot) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED,
                             "df_{$fieldid}_x_", !!$not);
                     $params = array_merge($params, $paramsnot);
                     $sql = " (e.id $contentids) ";
-                } else { // there are no non-empty contents
+                } else { // There are no non-empty contents.
                     if ($not) {
                         $sql = " 0 ";
                     } else {
@@ -1263,7 +1265,7 @@ class datalynxfield_option_single extends datalynxfield_option {
             $sqlnot = str_replace($content, 'content', $sql);
             $sqlnot = str_replace('NOT (', '(', $sqlnot);
             if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) {
-                // Get NOT IN sql
+                // Get NOT IN sql.
                 list($notinids, $paramsnot) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED,
                         "df_{$fieldid}_x_", $notinidsequal);
                 $params = array_merge($params, $paramsnot);

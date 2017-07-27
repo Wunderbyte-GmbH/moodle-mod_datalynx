@@ -1,25 +1,25 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package datalynxfield
  * @subpackage url
  * @copyright 2012 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 defined('MOODLE_INTERNAL') or die();
 
@@ -51,7 +51,7 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
         $mform->setType("{$fieldname}_url", PARAM_URL);
         $mform->setDefault("{$fieldname}_url", s($url));
 
-        // add alt name if not forcing name
+        // Add alt name if not forcing name.
         if (empty($field->field->param2)) {
             $group[] = $mform->createElement('static', '', '',
                     get_string('alttext', 'datalynxfield_url'));
@@ -82,34 +82,34 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
                 return '';
             }
 
-            // simple url text
+            // Simple url text.
             if (empty($type)) {
                 return $url;
             }
 
-            // param2 forces the text to something
+            // Param2 forces the text to something.
             if ($field->field->param2) {
                 $alttext = s($field->field->param2);
             } else {
                 $alttext = empty($entry->{"c{$fieldid}_content1"}) ? $url : $entry->{"c{$fieldid}_content1"};
             }
 
-            // linking
+            // Linking.
             if ($type == 'link') {
                 return html_writer::link($url, $alttext, $attributes);
             }
 
-            // image
+            // Image.
             if ($type == 'image') {
                 return html_writer::empty_tag('img', array('src' => $url));
             }
 
-            // image flexible
+            // Image flexible.
             if ($type == 'imageflex') {
                 return html_writer::empty_tag('img', array('src' => $url, 'style' => 'width:100%'));
             }
 
-            // media
+            // Media.
             if ($type == 'media') {
                 require_once("$CFG->dirroot/filter/mediaplugin/filter.php");
                 $mpfilter = new filter_mediaplugin($field->df()->context, array());
@@ -156,8 +156,8 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
 
         $errors = array();
         foreach ($tags as $tag) {
-            list(, $behavior,) = $this->process_tag($tag);
-            /* @var $behavior datalynx_field_behavior */
+            list(, $behavior, ) = $this->process_tag($tag);
+            // Variable $behavior datalynx_field_behavior.
             if ($behavior->is_required() &&
                     (!isset($formdata->$formfieldname) || $formdata->$formfieldname === 'http://')
             ) {

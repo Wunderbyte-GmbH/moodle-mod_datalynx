@@ -1,38 +1,40 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package datalynxfield
  * @subpackage picture
  * @copyright 2011 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
+defined('MOODLE_INTERNAL') or die();
+
 require_once("$CFG->dirroot/mod/datalynx/field/file/field_form.php");
 
 class datalynxfield_picture_form extends datalynxfield_file_form {
 
     /**
      */
-    function field_definition() {
+    public function field_definition() {
         global $CFG;
 
         $mform = &$this->_form;
 
-        // pic display dimensions
+        // Pic display dimensions.
         $dispdimgrp = array();
         $dispdimgrp[] = &$mform->createElement('text', 'param4', null, array('size' => '8'));
         $dispdimgrp[] = &$mform->createElement('text', 'param5', null, array('size' => '8'));
@@ -47,7 +49,7 @@ class datalynxfield_picture_form extends datalynxfield_file_form {
         $mform->addGroupRule('dispdim',
                 array('param5' => array(array(null, 'numeric', null, 'client'))));
 
-        // max pic dimensions (crop if needed)
+        // Max pic dimensions (crop if needed).
         $maxpicdimgrp = array();
         $maxpicdimgrp[] = &$mform->createElement('text', 'param7', null, array('size' => '8'));
         $maxpicdimgrp[] = &$mform->createElement('text', 'param8', null, array('size' => '8'));
@@ -62,7 +64,7 @@ class datalynxfield_picture_form extends datalynxfield_file_form {
         $mform->setDefault('param7', '');
         $mform->setDefault('param8', '');
 
-        // thumbnail dimensions (crop if needed)
+        // Thumbnail dimensions (crop if needed).
         $thumbnailgrp = array();
         $thumbnailgrp[] = &$mform->createElement('text', 'param9', null, array('size' => '8'));
         $thumbnailgrp[] = &$mform->createElement('text', 'param10', null, array('size' => '8'));
@@ -82,10 +84,10 @@ class datalynxfield_picture_form extends datalynxfield_file_form {
 
     /**
      */
-    function filetypes_definition() {
+    public function filetypes_definition() {
         $mform = &$this->_form;
 
-        // accetped types
+        // Accetped types.
         $options = array();
         $options['image'] = get_string('filetypeimage', 'datalynx');
         $options['.jpg'] = get_string('filetypejpg', 'datalynx');

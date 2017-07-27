@@ -1,37 +1,39 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package datalynxview
  * @copyright 2011 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 require_once('../../../config.php');
 require_once("$CFG->dirroot/mod/datalynx/mod_class.php");
 
 $urlparams = new stdClass();
-$urlparams->d = required_param('d', PARAM_INT); // datalynx ID
+$urlparams->d = required_param('d', PARAM_INT); // Datalynx ID.
 
-$urlparams->type = optional_param('type', '', PARAM_ALPHA); // type of a view to edit
-$urlparams->vedit = optional_param('vedit', 0, PARAM_INT); // view id to edit
+$urlparams->type = optional_param('type', '', PARAM_ALPHA); // Type of a view to edit.
+$urlparams->vedit = optional_param('vedit', 0, PARAM_INT); // View id to edit.
 $urlparams->returnurl = optional_param('returnurl', '', PARAM_URL);
 
-// Set a datalynx object
+// Set a datalynx object.
 $df = new datalynx($urlparams->d);
+
+require_login($df->data->course, false, $df->cm);
 
 global $DB;
 $options = array();
@@ -44,7 +46,7 @@ $options['renderers'] = array();
 $commonrenderers = $DB->get_records_select_menu('datalynx_renderers', 'dataid = :dataid',
         array('dataid' => $urlparams->d), 'value ASC', 'name AS value, name AS label');
 foreach ($fields as $field) {
-    $options['renderers'][$field] = $commonrenderers; // TODO: add field-specific renderers here
+    $options['renderers'][$field] = $commonrenderers; // TODO: add field-specific renderers here.
     $options['renderers'][$field][''] = get_string('defaultrenderer', 'datalynx');
 }
 $options['types'] = $DB->get_records_select_menu('datalynx_fields', 'dataid = :dataid',
@@ -83,7 +85,7 @@ if ($urlparams->vedit) {
 
 $mform = $view->get_form();
 
-// form cancelled
+// Form cancelled.
 if ($mform->is_cancelled()) {
     if ($urlparams->returnurl) {
         redirect($urlparams->returnurl);
@@ -91,10 +93,10 @@ if ($mform->is_cancelled()) {
         redirect(new moodle_url('/mod/datalynx/view/index.php', array('d' => $urlparams->d)));
     }
 
-    // no submit buttons: reset to default
+    // No submit buttons: reset to default.
 } else {
     if ($mform->no_submit_button_pressed()) {
-        // reset view to default
+        // Reset view to default.
         // TODO is this the best way?
         $resettodefault = optional_param('resetdefaultbutton', '', PARAM_ALPHA);
         if ($resettodefault) {
@@ -104,10 +106,10 @@ if ($mform->is_cancelled()) {
                             ((array) $urlparams) + array('sesskey' => sesskey())));
         }
 
-        // process validated
+        // Process validated.
     } else {
         if ($data = $mform->get_data()) {
-            // add new view
+            // Add new view.
             if (!$view->id()) {
                 $vid = $view->add($data);
 
@@ -115,7 +117,7 @@ if ($mform->is_cancelled()) {
                 $event = \mod_datalynx\event\view_created::create(
                         array('context' => $df->context, 'objectid' => $vid, 'other' => $other));
                 $event->trigger();
-                // update view
+                // Update view.
             } else {
                 $view->update($data);
 
@@ -125,10 +127,8 @@ if ($mform->is_cancelled()) {
                 $event->trigger();
             }
 
-            // $df->notifications['good'][] = $log; //FIXME: what is this for
-
             if (!isset($data->submitreturnbutton)) {
-                // TODO: set default view
+                // TODO: set default view.
 
                 if ($urlparams->returnurl) {
                     redirect($urlparams->returnurl);
@@ -137,24 +137,24 @@ if ($mform->is_cancelled()) {
                 }
             }
 
-            // Save and continue so refresh the form
+            // Save and continue so refresh the form.
             $mform = $view->get_form();
         }
     }
 }
 
-// activate navigation node
+// Activate navigation node.
 navigation_node::override_active_url(
         new moodle_url('/mod/datalynx/view/index.php', array('id' => $df->cm->id)));
 
-// print header
+// Print header.
 $df->print_header(array('tab' => 'views', 'nonotifications' => true, 'urlparams' => $urlparams));
 
 $formheading = $view->id() ? get_string('viewedit', 'datalynx', $view->name()) : get_string(
         'viewnew', 'datalynx', $view->typename());
 echo html_writer::tag('h2', format_string($formheading), array('class' => 'mdl-align'));
 
-// display form
+// Display form.
 $mform->set_data($view->to_form());
 
 $texteditors = $CFG->texteditors;

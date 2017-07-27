@@ -1,25 +1,25 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package datalynxfield
  * @subpackage _entry
  * @copyright 2011 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 defined('MOODLE_INTERNAL') or die();
 
@@ -37,18 +37,18 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
                                 $entry->status != datalynxfield__status::STATUS_FINAL_SUBMISSION) ||
                         has_capability('mod/datalynx:manageentries', $this->_field->df->context));
 
-        // no edit mode
+        // No edit mode.
         $replacements = array();
         foreach ($tags as $tag) {
 
-            // new entry displays nothing
+            // New entry displays nothing.
             if ($entry->id < 0) {
                 $replacements[$tag] = '';
 
-                // no edit mode for this field so just return html
+                // No edit mode for this field so just return html.
             } else {
                 switch (trim($tag, '@')) {
-                    // reference
+                    // Reference.
                     case '##entryid##':
                         $str = $entry->id;
                         break;
@@ -58,7 +58,7 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
                     case '##anchor##':
                         $str = html_writer::tag('a', '', array('name' => $entry->id));
                         break;
-                    // Actions
+                    // Actions.
                     case '##select##':
                         $str = html_writer::checkbox('entryselector', $entry->id, false);
                         break;
@@ -175,7 +175,7 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
     protected function patterns() {
         $patterns = array();
 
-        // actions
+        // Actions.
         $actions = get_string('actions', 'datalynx');
         $patterns["##edit##"] = array(true, $actions);
         $patterns["##delete##"] = array(true, $actions);
@@ -183,12 +183,12 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
         $patterns["##export##"] = array(true, $actions);
         $patterns["##duplicate##"] = array(true, $actions);
 
-        // reference
+        // Reference.
         $reference = get_string('reference', 'datalynx');
         $patterns["##anchor##"] = array(true, $reference);
         $patterns["##more##"] = array(true, $reference);
 
-        // entryinfo
+        // Entryinfo.
         $entryinfo = get_string('entryinfo', 'datalynx');
         $patterns["##entryid##"] = array(true, $entryinfo);
 

@@ -1,25 +1,25 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package mod
  * @subpackage datalynx
  * @copyright 2012 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  *
  *          The Datalynx has been developed as an enhanced counterpart
  *          of Moodle's Database activity module (1.9.11+ (20110323)).
@@ -30,18 +30,7 @@ require_once("../../config.php");
 require_once("$CFG->dirroot/mod/datalynx/mod_class.php");
 require_once("$CFG->dirroot/mod/datalynx/lib.php");
 
-$id = required_param('id', PARAM_INT); // course
-// $add = optional_param('add', '', PARAM_ALPHA);
-// $update = optional_param('update', 0,
-// PARAM_INT);
-// $duplicate = optional_param('duplicate', 0,
-// PARAM_INT);
-// $hide = optional_param('hide', 0, PARAM_INT);
-// $show = optional_param('show', 0, PARAM_INT);
-// $movetosection =
-// optional_param('movetosection', 0, PARAM_INT);
-// $delete = optional_param('delete', 0,
-// PARAM_INT);
+$id = required_param('id', PARAM_INT); // Course id.
 
 if (!$course = $DB->get_record('course', array('id' => $id))) {
     throw new moodle_exception('invalidcourseid');
@@ -80,29 +69,29 @@ $table->attributes['cellpadding'] = '2';
 $table->head = array();
 $table->align = array();
 
-// section
+// Section.
 if ($usesections) {
     $table->head[] = get_string('sectionname', 'format_' . $course->format);
     $table->align[] = 'center';
 }
 
-// name
+// Name.
 $table->head[] = get_string('name');
 $table->align[] = 'left';
 
-// description
+// Description.
 $table->head[] = get_string('description');
 $table->align[] = 'left';
 
-// number of entries
+// Number of entries.
 $table->head[] = get_string('entries', 'datalynx');
 $table->align[] = 'center';
 
-// number of pending entries
+// Number of pending entries.
 $table->head[] = get_string('entriespending', 'datalynx');
 $table->align[] = 'center';
 
-// rss
+// Rss.
 $rss = (!empty($CFG->enablerssfeeds) and !empty($CFG->datalynx_enablerssfeeds));
 if ($rss) {
     require_once($CFG->libdir . "/rsslib.php");
@@ -110,7 +99,7 @@ if ($rss) {
     $table->align[] = 'center';
 }
 
-// actions
+// Actions.
 if ($showeditbuttons = $PAGE->user_allowed_editing()) {
     $table->head[] = '';
     $table->align[] = 'center';
@@ -132,7 +121,7 @@ foreach ($datalynxs as $datalynx) {
         continue;
     }
 
-    // section
+    // Section.
     if ($usesections) {
         if ($datalynx->section !== $currentsection) {
             if ($currentsection !== null) {
@@ -145,23 +134,23 @@ foreach ($datalynxs as $datalynx) {
         }
     }
 
-    // name (linked; dim if not visible)
+    // Name (linked; dim if not visible).
     $linkparams = !$datalynx->visible ? array('class' => 'dimmed') : null;
     $linkedname = html_writer::link(
             new moodle_url('/mod/datalynx/view.php', array('id' => $datalynx->coursemodule)),
             format_string($datalynx->name, true), $linkparams);
     $tablerow[] = $linkedname;
 
-    // description
+    // Description.
     $tablerow[] = format_text($datalynx->intro, $datalynx->introformat, $options);
 
-    // number of entries
+    // Number of entries.
     $tablerow[] = $df->get_entriescount(datalynx::COUNT_ALL);
 
-    // number of pending entries
+    // Number of pending entries.
     $tablerow[] = $df->get_entriescount(datalynx::COUNT_LEFT);
 
-    // rss
+    // Rss.
     if ($rss) {
         if ($datalynx->rssarticles > 0) {
             $tablerow[] = rss_get_link($course->id, $USER->id, 'datalynx', $datalynx->id, 'RSS');

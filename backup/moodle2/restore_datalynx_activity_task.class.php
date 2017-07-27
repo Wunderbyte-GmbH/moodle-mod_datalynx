@@ -1,33 +1,28 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package mod-datalynx
  * @copyright 2011 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 defined('MOODLE_INTERNAL') or die();
 
 require_once("$CFG->dirroot/mod/datalynx/backup/moodle2/restore_datalynx_stepslib.php");
-
-// Because
-// it
-// exists
-// (must)
 
 /**
  * datalynx restore task that provides all the settings and steps to perform one
@@ -36,7 +31,7 @@ require_once("$CFG->dirroot/mod/datalynx/backup/moodle2/restore_datalynx_stepsli
 class restore_datalynx_activity_task extends restore_activity_task {
 
     protected $ownerid = 0;
-    // user id of designated owner of content
+    // User id of designated owner of content.
 
     /**
      */
@@ -74,52 +69,51 @@ class restore_datalynx_activity_task extends restore_activity_task {
     public function build() {
 
         // If restoring into a given activity remove the module_info step b/c there
-        // is no need to create a module instance
+        // is no need to create a module instance.
         if ($this->get_activityid()) {
 
-            // Here we add all the common steps for any activity and, in the point of interest
-            // we call to define_my_steps() is order to get the particular ones inserted in place.
+            // Here we add all the common steps for any activity and, in the point of interest.
+            // We call to define_my_steps() in order to get the particular ones inserted in place.
             $this->define_my_steps();
 
-            // Roles (optionally role assignments and always role overrides)
+            // Roles (optionally role assignments and always role overrides).
             $this->add_step(
                     new restore_ras_and_caps_structure_step('course_ras_and_caps', 'roles.xml'));
 
-            // Filters (conditionally)
+            // Filters (conditionally).
             if ($this->get_setting_value('filters')) {
                 $this->add_step(
                         new restore_filters_structure_step('activity_filters', 'filters.xml'));
             }
 
-            // Comments (conditionally)
+            // Comments (conditionally).
             if ($this->get_setting_value('comments')) {
                 $this->add_step(
                         new restore_comments_structure_step('activity_comments', 'comments.xml'));
             }
 
-            // Grades (module-related, rest of gradebook is restored later if possible: cats,
-            // calculations...)
+            // Grades (module-related, rest of gradebook is restored later if possible: cats, Calculations...).
             $this->add_step(
                     new restore_activity_grades_structure_step('activity_grades', 'grades.xml'));
 
-            // Advanced grading methods attached to the module
+            // Advanced grading methods attached to the module.
             $this->add_step(
                     new restore_activity_grading_structure_step('activity_grading', 'grading.xml'));
 
-            // Userscompletion (conditionally)
+            // Userscompletion (conditionally).
             if ($this->get_setting_value('userscompletion')) {
                 $this->add_step(
                         new restore_userscompletion_structure_step('activity_userscompletion',
                                 'completion.xml'));
             }
 
-            // Logs (conditionally)
+            // Logs (conditionally).
             if ($this->get_setting_value('logs')) {
                 $this->add_step(
                         new restore_activity_logs_structure_step('activity_logs', 'logs.xml'));
             }
 
-            // At the end, mark it as built
+            // At the end, mark it as built.
             $this->built = true;
         } else {
             parent::build();
@@ -136,7 +130,7 @@ class restore_datalynx_activity_task extends restore_activity_task {
      * Define (add) particular steps this activity can have
      */
     protected function define_my_steps() {
-        // Datalynx only has one structure step
+        // Datalynx only has one structure step.
         $this->add_step(
                 new restore_datalynx_activity_structure_step('datalynx_structure', 'datalynx.xml'));
     }

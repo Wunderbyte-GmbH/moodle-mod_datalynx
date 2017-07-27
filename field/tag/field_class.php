@@ -1,26 +1,28 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package datalynxfield
  * @subpackage tag
  * @copyright 2016 David Bogner
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
+defined('MOODLE_INTERNAL') or die();
+
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
 class datalynxfield_tag extends datalynxfield_option_multiple {
@@ -40,7 +42,7 @@ class datalynxfield_tag extends datalynxfield_option_multiple {
         $tags = array();
         $content = "";
 
-        // Variable $tags is an array of tagnames or empty
+        // Variable $tags is an array of tagnames or empty.
         if (!empty($values)) {
             $tags = reset($values);
         }
@@ -49,7 +51,7 @@ class datalynxfield_tag extends datalynxfield_option_multiple {
         $rec->fieldid = $fieldid;
         $rec->entryid = $entryid;
 
-        // Remove content from entry and remove tags from item when tags were removed in entry
+        // Remove content from entry and remove tags from item when tags were removed in entry.
         if (empty($tags) && $rec->id = $contentid) {
             $rec->content = "";
             $DB->update_record('datalynx_contents', $rec);
@@ -57,7 +59,7 @@ class datalynxfield_tag extends datalynxfield_option_multiple {
             return true;
         }
 
-        // Create empty datalynx_contents entry in order to get id for processing tags
+        // Create empty datalynx_contents entry in order to get id for processing tags.
         if (!$rec->id = $contentid) {
             $rec->id = $DB->insert_record('datalynx_contents', $rec);
         }
@@ -65,7 +67,7 @@ class datalynxfield_tag extends datalynxfield_option_multiple {
         $collid = core_tag_area::get_collection('mod_datalynx', 'datalynx_contents');
         if ($this->field->param1) {
             $tagobjects = core_tag_tag::create_if_missing($collid, $tags, true);
-            // make standard tags
+            // Make standard tags.
             foreach ($tagobjects as $tagobject) {
                 if (!$tagobject->isstandard) {
                     $tagobject->update(array('isstandard' => 1));
@@ -111,7 +113,7 @@ class datalynxfield_tag extends datalynxfield_option_multiple {
     public function get_search_sql($search) {
         global $DB;
 
-        // $not is either empty or "NOT"
+        // Variable $not is either empty or "NOT".
         list($not, $operator, $value) = $search;
 
         static $i = 0; // FIXME: might cause problems!
@@ -153,9 +155,9 @@ class datalynxfield_tag extends datalynxfield_option_multiple {
                 }
             }
         } else {
-            if ($operator === '') { // EMPTY
-                // get all entry ids where tags are present and then add a NOT IN (these entry ids)
-                // invert the $not operator in order to get correct results
+            if ($operator === '') { // EMPTY.
+                // Get all entry ids where tags are present and then add a NOT IN (these entry ids).
+                // Invert the $not operator in order to get correct results.
                 if ($not) {
                     $not = null;
                 } else {

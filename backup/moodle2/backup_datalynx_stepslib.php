@@ -1,25 +1,26 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package mod-datalynx
  * @copyright 2011 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
+defined('MOODLE_INTERNAL') or die();
 
 /**
  * Define all the backup steps that will be used by the backup_datalynx_activity_task
@@ -33,10 +34,10 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
     protected function define_structure() {
         global $DB, $CFG;
 
-        // To know if we are including userinfo
+        // To know if we are including userinfo.
         $userinfo = $this->get_setting_value('userinfo');
 
-        // Define each element separated
+        // Define each element separated.
         $datalynx = new backup_nested_element('datalynx', array('id'),
                 array('name', 'intro', 'introformat', 'timemodified', 'timeavailable', 'timedue',
                         'timeinterval', 'intervalcount', 'allowlate', 'grade', 'grademethod',
@@ -110,7 +111,7 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
                         'displaytemplate', 'novaluetemplate', 'edittemplate', 'noteditabletemplate'
                 ));
 
-        // Build the tree
+        // Build the tree.
         $datalynx->add_child($module);
 
         $datalynx->add_child($fields);
@@ -146,11 +147,11 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
         $datalynx->add_child($renderers);
         $renderers->add_child($renderer);
 
-        // Define sources
+        // Define sources.
         $datalynx->set_source_table('datalynx', array('id' => backup::VAR_ACTIVITYID));
         $module->set_source_table('course_modules', array('id' => backup::VAR_MODID));
 
-        //tags
+        // Tags.
         $tag->set_source_sql('SELECT t.id, t.rawname
                         FROM {tag} t
                         JOIN {tag_instance} ti ON ti.tagid = t.id
@@ -161,13 +162,11 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
                 backup_helper::is_sqlparam('mod_datalynx'),
                 backup::VAR_PARENTID));
 
-        // TODO: fix sql, this is just a temporary fix and does not provide same functionality for
-        // postgresql
-        // SQL for mysql provides id mapping of the field datalynx view, wheras
-        // there is no id mapping for postgresql
+        // TODO: fix sql, this is just a temporary fix and does not provide same functionality for postgresql.
+        // SQL for mysql provides id mapping of the field datalynx view, whereas there is no id mapping for postgresql.
         if ($CFG->dbtype == 'mysqli' || $CFG->dbtype == 'mysql') {
             $field->set_source_sql(
-                    "SELECT f.*, 
+                    "SELECT f.*,
                         CASE f.type WHEN 'datalynxview' THEN MAX(c.fullname) ELSE NULL END AS targetcourse,
                         CASE f.type WHEN 'datalynxview' THEN MAX(d.name) ELSE NULL END AS targetinstance,
                         CASE f.type WHEN 'datalynxview' THEN MAX(v.name) ELSE NULL END AS targetview,
@@ -200,13 +199,13 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
         $behavior->set_source_table('datalynx_behaviors', array('dataid' => backup::VAR_PARENTID));
         $renderer->set_source_table('datalynx_renderers', array('dataid' => backup::VAR_PARENTID));
 
-        // All the rest of elements only happen if we are including user info
+        // All the rest of elements only happen if we are including user info.
         if ($userinfo) {
             $entry->set_source_table('datalynx_entries', array('dataid' => backup::VAR_PARENTID));
             $content->set_source_table('datalynx_contents',
                     array('entryid' => backup::VAR_PARENTID));
 
-            // Entry ratings
+            // Entry ratings.
             $rating->set_source_table('rating',
                     array('contextid' => backup::VAR_CONTEXTID,
                             'itemid' => backup::VAR_PARENTID,
@@ -215,7 +214,7 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
                     ));
             $rating->set_source_alias('rating', 'value');
 
-            // Activity grade
+            // Activity grade.
             $grade->set_source_table('rating',
                     array('contextid' => backup::VAR_CONTEXTID,
                             'component' => backup_helper::is_sqlparam('mod_datalynx'),
@@ -224,7 +223,7 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
             $grade->set_source_alias('rating', 'value');
         }
 
-        // Define id annotations
+        // Define id annotations.
         $datalynx->annotate_ids('scale', 'grade');
         $datalynx->annotate_ids('scale', 'rating');
 
@@ -234,15 +233,15 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
         $rating->annotate_ids('scale', 'scaleid');
         $rating->annotate_ids('user', 'userid');
 
-        // Define file annotations
-        $datalynx->annotate_files('mod_datalynx', 'intro', null); // This file area hasn't itemid
-        $view->annotate_files('mod_datalynx', 'viewsection', 'id'); // By view->id
+        // Define file annotations.
+        $datalynx->annotate_files('mod_datalynx', 'intro', null); // This file area hasn't itemid.
+        $view->annotate_files('mod_datalynx', 'viewsection', 'id'); // By view->id.
         for ($i = 2; $i <= 9; $i++) {
-            $view->annotate_files('mod_datalynx', "viewparam{$i}", 'id'); // By view->id
+            $view->annotate_files('mod_datalynx', "viewparam{$i}", 'id'); // By view->id.
         }
-        $content->annotate_files('mod_datalynx', 'content', 'id'); // By content->id
+        $content->annotate_files('mod_datalynx', 'content', 'id'); // By content->id.
 
-        // Return the root element (data), wrapped into standard activity structure
+        // Return the root element (data), wrapped into standard activity structure.
         return $this->prepare_activity_structure($datalynx);
     }
 }

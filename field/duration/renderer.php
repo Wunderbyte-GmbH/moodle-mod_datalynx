@@ -1,25 +1,25 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package datalynxfield
  * @subpackage duration
  * @copyright 2013 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 defined('MOODLE_INTERNAL') or die();
 
@@ -35,7 +35,7 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
         $entryid = $entry->id;
         $fieldname = "field_{$fieldid}_{$entryid}";
 
-        // Field width
+        // Field width.
         $fieldattr = array();
         if ($field->get('param2')) {
             $fieldattr['style'] = 'width:' . s($field->get('param2')) . s($field->get('param3')) . ';';
@@ -138,8 +138,8 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
 
         $errors = array();
         foreach ($tags as $tag) {
-            list(, $behavior,) = $this->process_tag($tag);
-            /* @var $behavior datalynx_field_behavior */
+            list(, $behavior, ) = $this->process_tag($tag);
+            // Variable $behavior datalynx_field_behavior.
             if ($behavior->is_required() and isset($formdata->$formfieldname)) {
                 $value = optional_param_array($formfieldname, [], PARAM_RAW)['number'];
                 $intvalue = intval($value);

@@ -1,10 +1,10 @@
 /**
- * This file is part of the Datalynx module for Moodle - http://moodle.org/.
+ * This file is part of the Datalynx module for Moodle - http:// Moodle.org/.
  *
  * @package mod-datalynx
  * @subpackage datalynxfield-nanogong
  * @copyright 2011 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  *
  * The Datalynx has been developed as an enhanced counterpart
  * of Moodle's Database activity module (1.9.11+ (20110323)).
@@ -22,7 +22,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Moodle.  If not, see <http:// Www.gnu.org/licenses/>.
  */
 
 M.datalynxfield__approve = {};

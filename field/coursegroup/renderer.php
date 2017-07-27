@@ -1,25 +1,25 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package datalynxfield
  * @subpackage coursegroup
  * @copyright 2012 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 defined('MOODLE_INTERNAL') or die();
 
@@ -78,7 +78,7 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
         }
 
         $fieldname = "field_{$fieldid}_{$entryid}";
-        // group course
+        // Group course.
         $courses = get_courses("all", "c.sortorder ASC", "c.id,c.fullname");
         $coursemenu = array(0 => get_string('choosedots'));
         foreach ($courses as $cid => $course) {
@@ -94,7 +94,7 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
             $mform->addElement('select', "{$fieldname}_course", null, $coursemenu);
             $mform->setDefault("{$fieldname}_course", $courseid);
 
-            // ajax
+            // Ajax.
             $options = array('coursefield' => "${fieldname}_course",
                     'groupfield' => "{$fieldname}_group",
                     'acturl' => "$CFG->wwwroot/mod/datalynx/field/coursegroup/loadgroups.php"
@@ -109,7 +109,7 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
                     array($options), false, $module);
         }
 
-        // group id
+        // Group id.
         if ($field->group) {
             if ($group = $DB->get_record('groups', array('id' => $groupid), 'name')) {
                 $groupname = $group->name;
@@ -164,13 +164,13 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
 
         switch ($type) {
             case 'course':
-                // Return the course name
+                // Return the course name.
                 if ($coursename = $DB->get_field('course', 'fullname', array('id' => $courseid))) {
                     return $coursename;
                 }
                 break;
             case 'group':
-                // Return the group name
+                // Return the group name.
                 if ($groupid and
                         $groupname = $DB->get_field('groups', 'name', array('id' => $groupid))
                 ) {
@@ -206,11 +206,11 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
         }
 
         $elements = array();
-        // Select yes/no for member
+        // Select yes/no for member.
         $elements[] = &$mform->createElement('selectyesno', "f_{$i}_{$fieldid}_member");
-        // Number field for course id
+        // Number field for course id.
         $elements[] = &$mform->createElement('text', "f_{$i}_{$fieldid}_course");
-        // Number field for group id
+        // Number field for group id.
         $elements[] = &$mform->createElement('text', "f_{$i}_{$fieldid}_group");
         $mform->setDefault("f_{$i}_{$fieldid}_member", $member);
         $mform->setDefault("f_{$i}_{$fieldid}_course", $course);

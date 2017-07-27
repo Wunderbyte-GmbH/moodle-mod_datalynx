@@ -1,25 +1,25 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package datalynxfield
  * @subpackage userinfo
  * @copyright 2012 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 defined('MOODLE_INTERNAL') or die();
 
@@ -37,7 +37,7 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
 
         $replacements = array();
 
-        // there is only one possible tag here, no edit
+        // There is only one possible tag here, no edit.
         $tag = "##author:$fieldname##";
         switch ($field->infotype) {
             case 'checkbox':
@@ -96,14 +96,14 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
                     array('userid' => $USER->id, 'fieldid' => $field->infoid));
         }
 
-        // Check if time was specified
+        // Check if time was specified.
         if (!empty($field->field->param8)) {
             $format = get_string('strftimedaydatetime', 'langconfig');
         } else {
             $format = get_string('strftimedate', 'langconfig');
         }
 
-        // Check if a date has been specified
+        // Check if a date has been specified.
         if (!empty($content)) {
             return userdate($content, $format);
         }
@@ -138,14 +138,14 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
 
         // Are we creating a link?
         if (!empty($this->field->param9)) {
-            // Define the target
+            // Define the target.
             if (!empty($this->field->param10)) {
                 $attributes = array('target' => $this->field->param10);
             } else {
                 $attributes = array();
             }
 
-            // / Create the link
+            // Create the link.
             $str = html_writer::link(str_replace('$$', urlencode($str), $this->field->param9),
                     htmlspecialchars($this->field->content), $attributes);
         }

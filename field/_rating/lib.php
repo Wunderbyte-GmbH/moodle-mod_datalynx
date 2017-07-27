@@ -1,31 +1,33 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify
+// It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
  * @package datalynxfield
  * @subpackage _rating
  * @copyright 2011 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
 /**
  * A class representing a single datalynx rating
  * Extends the core rating class
  */
+defined('MOODLE_INTERNAL') or die();
+
 require_once("$CFG->dirroot/rating/lib.php");
 
 class datalynx_rating extends rating {
@@ -40,10 +42,10 @@ class datalynx_rating extends rating {
 
         if ($aggregate and $aggregation != RATING_AGGREGATE_COUNT) {
             if ($aggregation != RATING_AGGREGATE_SUM and !$this->settings->scale->isnumeric) {
-                // round aggregate as we're using it as an index
+                // Round aggregate as we're using it as an index.
                 $aggregate = $this->settings->scale->scaleitems[round($aggregate)];
             } else {
-                // aggregation is SUM or the scale is numeric
+                // Aggregation is SUM or the scale is numeric.
                 $aggregate = round($aggregate, 1);
             }
         }
@@ -137,27 +139,25 @@ class datalynx_rating_manager extends rating_manager {
     public function get_sql_aggregate($options) {
         global $DB, $USER;
 
-        // User id; default to current user
+        // User id; default to current user.
         if (empty($options->userid)) {
             $userid = $USER->id;
         } else {
             $userid = $options->userid;
         }
 
-        // Params
+        // Params.
         $params = array();
         $params['contextid'] = $options->context->id;
         $params['userid'] = $userid;
         $params['component'] = $options->component;
         $params['ratingarea'] = $options->ratingarea;
 
-        // Aggregation sql
-        $optionsaggregate = null;
+        // Aggregation sql.
         if (empty($options->aggregate)) {
-            // ugly hack to work around the exception in generate_settings
+            // Ugly hack to work around the exception in generate_settings.
             $options->aggregate = RATING_AGGREGATE_COUNT;
         } else {
-            $optionsaggregate = $options->aggregate;
             $aggregatessql = array();
             foreach ($options->aggregate as $aggregation) {
                 if (empty($aggregation)) {
@@ -167,12 +167,12 @@ class datalynx_rating_manager extends rating_manager {
                 $aggrmethodpref = strtolower($aggrmethod);
                 $aggregatessql[$aggrmethodpref] = "$aggrmethod(r.rating) AS {$aggrmethodpref}ratings";
             }
-            // ugly hack to work around the exception in generate_settings
+            // Ugly hack to work around the exception in generate_settings.
             $options->aggregate = RATING_AGGREGATE_COUNT;
         }
         $aggregationsql = !empty($aggregatessql) ? implode(', ', $aggregatessql) . ', ' : '';
 
-        // sql for entry ids
+        // Sql for entry ids.
         $andwhereitems = '';
         if (!empty($options->items)) {
             $itemids = array_keys($options->items);
@@ -182,7 +182,7 @@ class datalynx_rating_manager extends rating_manager {
         }
 
         $sql = "SELECT r.itemid, r.component, r.ratingarea, r.contextid,
-                       COUNT(r.rating) AS numratings, $aggregationsql 
+                       COUNT(r.rating) AS numratings, $aggregationsql
                        ur.id, ur.userid, ur.scaleid, ur.rating AS usersrating
                 FROM {rating} r
                         LEFT JOIN {rating} ur ON ur.contextid = r.contextid
@@ -190,7 +190,7 @@ class datalynx_rating_manager extends rating_manager {
                                                 AND ur.component = r.component
                                                 AND ur.ratingarea = r.ratingarea
                                                 AND ur.userid = :userid
-                WHERE r.contextid = :contextid 
+                WHERE r.contextid = :contextid
                         AND r.component = :component
                         AND r.ratingarea = :ratingarea
                         $andwhereitems
@@ -207,21 +207,21 @@ class datalynx_rating_manager extends rating_manager {
     public function get_sql_all($options) {
         global $DB, $USER;
 
-        // User id; default to current user
+        // User id; default to current user.
         if (empty($options->userid)) {
             $userid = $USER->id;
         } else {
             $userid = $options->userid;
         }
 
-        // Params
+        // Params.
         $params = array();
         $params['contextid'] = $options->context->id;
         $params['userid'] = $userid;
         $params['component'] = $options->component;
         $params['ratingarea'] = $options->ratingarea;
 
-        // sql for entry ids
+        // Sql for entry ids.
         $andwhereitems = '';
         if (!empty($options->items)) {
             $itemids = array_keys($options->items);
@@ -233,10 +233,9 @@ class datalynx_rating_manager extends rating_manager {
         $sql = "SELECT r.id, r.itemid, r.component, r.ratingarea, r.contextid, r.scaleid,
                        r.rating, r.userid, r.timecreated, r.timemodified, " .
                 user_picture::fields('u', array('idnumber', 'username'
-                ), 'uid ') . " FROM {rating} r 
-                    JOIN {user} u ON u.id = r.userid 
-                    
-                WHERE r.contextid = :contextid 
+                ), 'uid ') . " FROM {rating} r
+                    JOIN {user} u ON u.id = r.userid
+                WHERE r.contextid = :contextid
                         AND r.component = :component
                         AND r.ratingarea = :ratingarea
                         $andwhereitems
@@ -255,7 +254,7 @@ class datalynx_rating_manager extends rating_manager {
 
     /**
      *
-     * @return array the array of items with their ratings attached at $items[0]->rating
+     * @return datalynx_rating the array of items with their ratings attached at $items[0]->rating
      */
     public function get_rating_object($item, $ratingrecord) {
         $rec = $ratingrecord;
@@ -266,8 +265,8 @@ class datalynx_rating_manager extends rating_manager {
         $options->ratingarea = $rec->ratingarea;
         $options->itemid = $item->id;
         $options->settings = $rec->settings;
-        // Note: rec->scaleid = the id of scale at the time the rating was submitted
-        // may be different from the current scale id
+        // Note: rec->scaleid = the id of scale at the time the rating was submitted.
+        // May be different from the current scale id.
         $options->scaleid = $rec->scaleid;
 
         $options->userid = !empty($rec->userid) ? $rec->userid : 0;
