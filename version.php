@@ -22,7 +22,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $plugin->component = 'mod_datalynx';
-$plugin->version = 2017072700;
+$plugin->version = 2017080300;
 $plugin->release = 'Skyler White 1.4.5'; // famous movie, theater and tv series characters
 $plugin->requires = 2016052300;
 $plugin->maturity = MATURITY_STABLE;
