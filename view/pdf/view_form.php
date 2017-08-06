@@ -395,7 +395,7 @@ class datalynxview_pdf_form extends datalynxview_base_form {
                 }
             }
 
-            $data->param1 = serialize($settings);
+            $data->param1 = base64_encode(serialize($settings));
         }
 
         return $data;

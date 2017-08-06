@@ -58,7 +58,7 @@ function xmldb_datalynx_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
-        // datalynx savepoint reached
+        // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2012032100, 'datalynx');
     }
 
@@ -71,7 +71,7 @@ function xmldb_datalynx_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
-        // datalynx savepoint reached
+        // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2012040600, 'datalynx');
     }
 
@@ -93,7 +93,7 @@ function xmldb_datalynx_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
-        // datalynx savepoint reached
+        // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2012050500, 'datalynx');
     }
 
@@ -105,7 +105,7 @@ function xmldb_datalynx_upgrade($oldversion) {
             $dbman->drop_field($table, $field);
         }
 
-        // datalynx savepoint reached
+        // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2012051600, 'datalynx');
     }
 
@@ -124,7 +124,7 @@ function xmldb_datalynx_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
-        // datalynx savepoint reached
+        // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2012053100, 'datalynx');
     }
 
@@ -165,7 +165,7 @@ function xmldb_datalynx_upgrade($oldversion) {
             }
         }
 
-        // datalynx savepoint reached
+        // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2012060101, 'datalynx');
     }
 
@@ -211,7 +211,7 @@ function xmldb_datalynx_upgrade($oldversion) {
             }
         }
 
-        // datalynx savepoint reached
+        // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2012061700, 'datalynx');
     }
 
@@ -250,7 +250,7 @@ function xmldb_datalynx_upgrade($oldversion) {
             $dbman->drop_field($table, $field);
         }
 
-        // datalynx savepoint reached
+        // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2012070601, 'datalynx');
     }
 
@@ -263,7 +263,7 @@ function xmldb_datalynx_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
-        // datalynx savepoint reached
+        // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2012081801, 'datalynx');
     }
 
@@ -277,7 +277,7 @@ function xmldb_datalynx_upgrade($oldversion) {
             $dbman->change_field_default($table, $field);
         }
 
-        // datalynx savepoint reached
+        // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2012082600, 'datalynx');
     }
 
@@ -321,7 +321,7 @@ function xmldb_datalynx_upgrade($oldversion) {
         }
         $fs->delete_area_files(SYSCONTEXTID, 'mod_datalynx', 'site_packages');
 
-        // datalynx savepoint reached
+        // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2012082900, 'datalynx');
     }
 
@@ -333,7 +333,7 @@ function xmldb_datalynx_upgrade($oldversion) {
             $dbman->install_one_table_from_xmldb_file($filepath, 'datalynx_rules');
         }
 
-        // datalynx savepoint reached
+        // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2012092002, 'datalynx');
     }
 
@@ -342,7 +342,7 @@ function xmldb_datalynx_upgrade($oldversion) {
         $DB->set_field('datalynx_views', 'type', 'grid', array('type' => 'matrix'));
         $DB->set_field('datalynx_views', 'type', 'gridext', array('type' => 'matrixext'));
 
-        // datalynx savepoint reached
+        // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2012092207, 'datalynx');
     }
 
@@ -416,7 +416,7 @@ function xmldb_datalynx_upgrade($oldversion) {
             }
         }
 
-        // datalynx savepoint reached
+        // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2012121600, 'datalynx');
     }
 
@@ -436,7 +436,7 @@ function xmldb_datalynx_upgrade($oldversion) {
         $DB->set_field('datalynx_views', 'groupby', null, array('groupby' => 0));
         $DB->set_field('datalynx_filters', 'groupby', null, array('groupby' => 0));
 
-        // datalynx savepoint reached
+        // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2012121900, 'datalynx');
     }
 
@@ -456,7 +456,7 @@ function xmldb_datalynx_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
-        // datalynx savepoint reached
+        // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2013051101, 'datalynx');
     }
 
@@ -471,7 +471,7 @@ function xmldb_datalynx_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
-        // datalynx savepoint reached
+        // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2013051102, 'datalynx');
     }
 
@@ -486,7 +486,7 @@ function xmldb_datalynx_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
-        // datalynx savepoint reached
+        // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2013051103, 'datalynx');
     }
 
@@ -503,7 +503,7 @@ function xmldb_datalynx_upgrade($oldversion) {
         $DB->set_field('datalynx_views', 'visible', '15', array('visible' => '2'));
         $DB->set_field('datalynx_views', 'visible', '1', array('visible' => '1'));
 
-        // Datalynx savepoint reached.
+        // Datalynx savepoint reached..
         upgrade_mod_savepoint(true, 2013082800, 'datalynx');
     }
 
@@ -515,7 +515,7 @@ function xmldb_datalynx_upgrade($oldversion) {
                      AND param4 <> '0'";
         $DB->execute($query);
 
-        // Datalynx savepoint reached.
+        // Datalynx savepoint reached..
         upgrade_mod_savepoint(true, 2014010700, 'datalynx');
     }
 
@@ -533,7 +533,7 @@ function xmldb_datalynx_upgrade($oldversion) {
                    WHERE type = 'gridext'";
         $DB->execute($query);
 
-        // Datalynx savepoint reached.
+        // Datalynx savepoint reached..
         upgrade_mod_savepoint(true, 2014010701, 'datalynx');
     }
 
@@ -545,7 +545,7 @@ function xmldb_datalynx_upgrade($oldversion) {
                                        WHERE f.type = 'checkbox' OR f.type = 'multiselect')";
         $DB->execute($query);
 
-        // Datalynx savepoint reached.
+        // Datalynx savepoint reached..
         upgrade_mod_savepoint(true, 2014031401, 'datalynx');
     }
 
@@ -556,7 +556,7 @@ function xmldb_datalynx_upgrade($oldversion) {
             $dbman->install_one_table_from_xmldb_file($filepath, 'datalynx_behaviors');
         }
         mod_datalynx_replace_field_rules();
-        // datalynx savepoint reached
+        // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2014102101, 'datalynx');
     }
 
@@ -567,7 +567,7 @@ function xmldb_datalynx_upgrade($oldversion) {
             $dbman->install_one_table_from_xmldb_file($filepath, 'datalynx_renderers');
         }
         mod_datalynx_replace_field_labels();
-        // datalynx savepoint reached
+        // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2014111501, 'datalynx');
     }
 
@@ -579,7 +579,7 @@ function xmldb_datalynx_upgrade($oldversion) {
                 $DB->update_record('datalynx_views', $view);
             }
         }
-        // datalynx savepoint reached
+        // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2015011101, 'datalynx');
     }
 
@@ -603,7 +603,7 @@ function xmldb_datalynx_upgrade($oldversion) {
             $DB->update_record('datalynx_fields', $teamfield);
         }
 
-        // datalynx savepoint reached
+        // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2015011802, 'datalynx');
     }
 
@@ -632,7 +632,7 @@ function xmldb_datalynx_upgrade($oldversion) {
             }
         }
 
-        // datalynx savepoint reached
+        // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2015030801, 'datalynx');
     }
 
@@ -661,7 +661,7 @@ function xmldb_datalynx_upgrade($oldversion) {
             }
         }
 
-        // datalynx savepoint reached
+        // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2015030901, 'datalynx');
     }
 
@@ -678,7 +678,7 @@ function xmldb_datalynx_upgrade($oldversion) {
             }
         }
 
-        // datalynx savepoint reached
+        // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2015030902, 'datalynx');
     }
 
@@ -692,7 +692,7 @@ function xmldb_datalynx_upgrade($oldversion) {
                 }
             }
         }
-        // datalynx savepoint reached
+        // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2015032204, 'datalynx');
     }
 
@@ -743,7 +743,7 @@ function xmldb_datalynx_upgrade($oldversion) {
                         array('id' => $filterid));
             }
         }
-        // datalynx savepoint reached
+        // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2015032207, 'datalynx');
     }
 
@@ -764,13 +764,13 @@ function xmldb_datalynx_upgrade($oldversion) {
                 }
             }
         }
-        // datalynx savepoint reached
+        // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2015032208, 'datalynx');
     }
 
     if ($oldversion < 2015111100) {
         $views = $DB->set_field_select('datalynx_views', 'patterns', null, 'id >= 0');
-        // datalynx savepoint reached
+        // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2015111100, 'datalynx');
     }
 
@@ -801,7 +801,7 @@ function xmldb_datalynx_upgrade($oldversion) {
             }
         }
 
-        // datalynx savepoint reached
+        // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2016050100, 'datalynx');
     }
 
@@ -823,7 +823,7 @@ function xmldb_datalynx_upgrade($oldversion) {
             }
         }
 
-        // datalynx savepoint reached
+        // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2016050101, 'datalynx');
     }
 
@@ -850,10 +850,23 @@ function xmldb_datalynx_upgrade($oldversion) {
                 $DB->update_record('datalynx_contents', $checkbox, true);
             }
         }
-        // datalynx savepoint reached
+        // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2016050200, 'datalynx');
     }
-
+    if ($oldversion < 2017080600) {
+        $paramones = $DB->get_records_menu('datalynx_views', null, '', 'id,param1');
+        $record = new stdClass();
+        if (!empty($paramones)) {
+            foreach ($paramones as $key => $paramone) {
+                $paramones[$key] = base64_encode($paramone);
+                $record->id = $key;
+                $record->param1 = $paramone;
+                $DB->update_record('datalynx_views', $record, true);
+            }
+        }
+        // Datalynx savepoint reached..
+        upgrade_mod_savepoint(true, 2017080600, 'datalynx');
+    }
     return true;
 }
 
