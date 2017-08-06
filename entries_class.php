@@ -190,7 +190,7 @@ class datalynx_entries {
                 !has_capability('mod/datalynx:manageentries', $datalynx->context)
         ) {
             if (isloggedin()) {
-                $whereapprove = " AND (e.approved = :{$this->sqlparams($params, 'approved', 1)} 
+                $whereapprove = " AND (e.approved = :{$this->sqlparams($params, 'approved', 1)}
                                         OR e.userid = :{$this->sqlparams($params, 'userid', $USER->id)}) ";
             } else {
                 $whereapprove = " AND e.approved = :{$this->sqlparams($params, 'approved', 1)} ";
@@ -217,7 +217,7 @@ class datalynx_entries {
                 $whatcontent;
         $count = ' COUNT(e.id) ';
         $tables = ' {datalynx_entries} e
-                    JOIN {user} u ON u.id = e.userid 
+                    JOIN {user} u ON u.id = e.userid
                     LEFT JOIN {groups} g ON g.id = e.groupid ';
         $wheredfid = " e.dataid = :{$this->sqlparams($params, 'dataid', $datalynx->id())} ";
         $whereoptions = '';
@@ -274,8 +274,8 @@ class datalynx_entries {
                 list($ineids, $eidparams) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED, 'eid');
                 $andwhereeid = " AND e.id $ineids ";
 
-                $sqlselect = "SELECT $what $whatcontent                                  
-                              FROM $fromsql 
+                $sqlselect = "SELECT $what $whatcontent
+                              FROM $fromsql
                               WHERE $wheresql $andwhereeid $sortorder";
 
                 if ($entries->entries = $DB->get_records_sql($sqlselect, $allparams + $eidparams)) {
@@ -407,10 +407,12 @@ class datalynx_entries {
         return $this->_entries;
     }
 
+
     /**
      * Retrieves stored files which are embedded in the current content
      * set_content must have been called
      *
+     * @param array $fids
      * @return array of stored files
      */
     public function get_embedded_files(array $fids) {
@@ -441,6 +443,37 @@ class datalynx_entries {
     }
 
     /**
+     * Returns an array of objects indexed by contentid.
+     * entryid, fieldid, userid, firstname, lastname.
+     *
+     *
+     * @param array $fids
+     * @return array int[]
+     */
+    public function get_contentinfo(array $fids) {
+        $contentinfo = array();
+
+        if (!empty($fids) and !empty($this->_entries)) {
+            foreach ($this->_entries as $entry) {
+                foreach ($fids as $fieldid) {
+                    $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
+                    if ($contentid) {
+                        $contentobject = new stdClass();
+                        $contentobject->entryid = $entry->id;
+                        $contentobject->fid = $fieldid;
+                        $contentobject->userid = $entry->uid;
+                        $contentobject->lastname = $entry->lastname;
+                        $contentobject->firstname = $entry->firstname;
+                        $contentinfo[$contentid] = $contentobject;
+                    }
+                }
+            }
+        }
+        return $contentinfo;
+    }
+
+    /**
+     * Process entries when after editing content for saving into db
      *
      * @return array notification string, list of processed ids
      */

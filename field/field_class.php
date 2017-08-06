@@ -144,7 +144,7 @@ abstract class datalynxfield_base {
         if (!empty($this->field->id)) {
             if ($filearea = $this->filearea()) {
                 $fs = get_file_storage();
-                $fs->delete_area_files($this->df->context->id, 'mod_datalynx', $filearea);
+                $success = $fs->delete_area_files($this->df->context->id, 'mod_datalynx', $filearea);
             }
             $this->delete_content();
             $DB->delete_records('datalynx_fields', array('id' => $this->field->id));
@@ -654,6 +654,10 @@ abstract class datalynxfield_base {
     }
 
     /**
+     * Return file area of field
+     *
+     * @param string $suffix
+     * @return string|boolean
      */
     protected function filearea($suffix = null) {
         if (!empty($suffix)) {
