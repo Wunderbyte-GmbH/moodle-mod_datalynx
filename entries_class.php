@@ -407,10 +407,12 @@ class datalynx_entries {
         return $this->_entries;
     }
 
+
     /**
      * Retrieves stored files which are embedded in the current content
      * set_content must have been called
      *
+     * @param array $fids
      * @return array of stored files
      */
     public function get_embedded_files(array $fids) {
@@ -440,6 +442,37 @@ class datalynx_entries {
     }
 
     /**
+     * Returns an array of objects indexed by contentid.
+     * entryid, fieldid, userid, firstname, lastname.
+     *
+     *
+     * @param array $fids
+     * @return array int[]
+     */
+    public function get_contentinfo(array $fids) {
+        $contentinfo = array();
+
+        if (!empty($fids) and !empty($this->_entries)) {
+            foreach ($this->_entries as $entry) {
+                foreach ($fids as $fieldid) {
+                    $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
+                    if ($contentid) {
+                        $contentobject = new stdClass();
+                        $contentobject->entryid = $entry->id;
+                        $contentobject->fid = $fieldid;
+                        $contentobject->userid = $entry->uid;
+                        $contentobject->lastname = $entry->lastname;
+                        $contentobject->firstname = $entry->firstname;
+                        $contentinfo[$contentid] = $contentobject;
+                    }
+                }
+            }
+        }
+        return $contentinfo;
+    }
+
+    /**
+     * Process entries when after editing content for saving into db
      *
      * @return array notificationstrings, list of processed ids
      */

@@ -763,8 +763,12 @@ class datalynx {
     }
 
     /**
-     * given a field type returns the field object from get_fields
+     * Given a field type returns the field object from get_fields
      * Initializes get_fields if necessary
+     *
+     * @param string $type
+     * @param string $menu
+     * @return NULL[]|datalynxfield_base[]
      */
     public function get_fields_by_type($type, $menu = false) {
         $typefields = array();
