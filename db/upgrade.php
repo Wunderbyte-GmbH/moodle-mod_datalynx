@@ -505,7 +505,7 @@ function xmldb_datalynx_upgrade($oldversion) {
         $DB->set_field('datalynx_views', 'visible', '15', array('visible' => '2'));
         $DB->set_field('datalynx_views', 'visible', '1', array('visible' => '1'));
 
-        // Datalynx savepoint reached.
+        // Datalynx savepoint reached..
         upgrade_mod_savepoint(true, 2013082800, 'datalynx');
     }
 
@@ -517,7 +517,7 @@ function xmldb_datalynx_upgrade($oldversion) {
                      AND param4 <> '0'";
         $DB->execute($query);
 
-        // Datalynx savepoint reached.
+        // Datalynx savepoint reached..
         upgrade_mod_savepoint(true, 2014010700, 'datalynx');
     }
 
@@ -535,7 +535,7 @@ function xmldb_datalynx_upgrade($oldversion) {
                    WHERE type = 'gridext'";
         $DB->execute($query);
 
-        // Datalynx savepoint reached.
+        // Datalynx savepoint reached..
         upgrade_mod_savepoint(true, 2014010701, 'datalynx');
     }
 
@@ -547,7 +547,7 @@ function xmldb_datalynx_upgrade($oldversion) {
                                        WHERE f.type = 'checkbox' OR f.type = 'multiselect')";
         $DB->execute($query);
 
-        // Datalynx savepoint reached.
+        // Datalynx savepoint reached..
         upgrade_mod_savepoint(true, 2014031401, 'datalynx');
     }
 
@@ -855,7 +855,20 @@ function xmldb_datalynx_upgrade($oldversion) {
         // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2016050200, 'datalynx');
     }
-
+    if ($oldversion < 2017080600) {
+        $paramones = $DB->get_records_menu('datalynx_views', null, '', 'id,param1');
+        $record = new stdClass();
+        if (!empty($paramones)) {
+            foreach ($paramones as $key => $paramone) {
+                $paramones[$key] = base64_encode($paramone);
+                $record->id = $key;
+                $record->param1 = $paramone;
+                $DB->update_record('datalynx_views', $record, true);
+            }
+        }
+        // Datalynx savepoint reached..
+        upgrade_mod_savepoint(true, 2017080600, 'datalynx');
+    }
     return true;
 }
 
