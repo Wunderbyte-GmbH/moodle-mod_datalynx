@@ -19,7 +19,7 @@
  * @package datalynxview
  * @subpackage pdf
  * @copyright 2012 Itamar Tzadok
- * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die();
 
@@ -30,6 +30,7 @@ class datalynxview_pdf_form extends datalynxview_base_form {
     /**
      */
     public function view_definition_after_gps() {
+        global $COURSE;
 
         $view = $this->_view;
         $editoroptions = $view->editors();

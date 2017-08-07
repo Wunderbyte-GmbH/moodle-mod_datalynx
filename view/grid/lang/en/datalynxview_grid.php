@@ -19,7 +19,7 @@
  * @package datalynxview
  * @subpackage grid
  * @copyright Itamar Tzadok
- * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['pluginname'] = 'Grid';
 $string['gridsettings'] = 'Grid settings';

@@ -19,7 +19,7 @@
  * @package datalynxfield
  * @subpackage gradeitem
  * @copyright 2012 Itamar Tzadok
- * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['pluginname'] = 'Course grade item';
 $string['gradeitem'] = 'Grade item';

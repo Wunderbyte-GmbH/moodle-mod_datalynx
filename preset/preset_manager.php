@@ -19,7 +19,7 @@
  * @package mod
  * @package preset
  * @copyright 2012 Itamar Tzadok
- * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die();
 
@@ -245,6 +245,7 @@ class datalynx_preset_manager {
     /**
      */
     public function process_presets($params) {
+        global $CFG;
 
         $mform = new mod_datalynx_preset_form(
                 new moodle_url('mod/datalynx/preset/index.php',
@@ -466,6 +467,7 @@ class datalynx_preset_manager {
     /**
      */
     public function download_presets($presetids) {
+        global $CFG;
 
         if (headers_sent()) {
             throw new moodle_exception('headerssent');
@@ -541,6 +543,7 @@ class datalynx_preset_manager {
     /**
      */
     public function share_presets($presetids) {
+        global $CFG, $USER;
 
         if (!has_capability('mod/datalynx:presetsviewall', $this->_df->context)) {
             return false;

@@ -19,7 +19,7 @@
  * @package datalynxview
  * @subpackage pdf
  * @copyright 2012 Itamar Tzadok
- * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die();
 
@@ -33,6 +33,7 @@ class datalynxview_pdf_patterns extends datalynxview_patterns {
     /**
      */
     public function get_replacements($tags = null, $entry = null, array $options = array()) {
+        global $CFG, $OUTPUT;
 
         $replacements = parent::get_replacements($tags, $entry, $options);
 

@@ -19,7 +19,7 @@
  * @package datalynx
  * @subpackage statistics
  * @copyright 2013 Ivan Šakić
- * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require_once('../../../config.php');

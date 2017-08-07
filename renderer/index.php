@@ -18,7 +18,7 @@
  *
  * @package datalynx_renderer
  * @copyright 2014 Ivan Šakić
- * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once('../../../config.php');
 require_once('../mod_class.php');

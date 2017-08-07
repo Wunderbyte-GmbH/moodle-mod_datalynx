@@ -19,7 +19,7 @@
  * @package datalynxfield
  * @subpackage time
  * @copyright 2012 Itamar Tzadok
- * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['dateonly'] = 'Date only';
 $string['dateonly_help'] = 'Select this option to display only the date portion of the field value and a date only selector when the field is edited.';

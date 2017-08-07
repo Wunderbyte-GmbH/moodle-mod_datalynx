@@ -19,7 +19,7 @@
  * @package datalynxrule
  * @subpackage eventnotification
  * @copyright 2012 Itamar Tzadok
- * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['event'] = 'Datalynx event';
 $string['pluginname'] = 'Event notification';

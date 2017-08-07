@@ -20,7 +20,7 @@
  * @subpackage select
  * @copyright 2014 Ivan Šakić
  * @copyright 2016 David Bogner
- * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die();
 

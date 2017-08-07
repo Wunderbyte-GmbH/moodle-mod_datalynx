@@ -19,7 +19,7 @@
  * @package mod
  * @subpackage datalynx
  * @copyright 2012 Itamar Tzadok
- * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
  *          The Datalynx has been developed as an enhanced counterpart
  *          of Moodle's Database activity module (1.9.11+ (20110323)).
@@ -798,6 +798,7 @@ class datalynx {
      * input: $param $field record from db, or field type
      */
     public function get_field($key) {
+        global $CFG;
 
         if ($key) {
             if (is_object($key)) {
@@ -1820,7 +1821,7 @@ class datalynx {
      * @return integer
      */
     public function user_num_entries($perinterval = false) {
-        global $USER, $DB;
+        global $USER, $CFG, $DB;
 
         static $numentries = null;
         static $numentriesintervaled = null;

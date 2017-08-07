@@ -17,7 +17,7 @@
 /**
  *
  * @copyright 2015 Ivan Šakić
- * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_datalynx\event;
 

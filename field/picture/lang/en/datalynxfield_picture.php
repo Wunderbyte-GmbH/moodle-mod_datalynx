@@ -19,7 +19,7 @@
  * @package datalynxfield
  * @subpackage picture
  * @copyright 2011 Itamar Tzadok
- * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['displaydimensions'] = 'Display dimensions (width x height)';
 $string['maxdimensions'] = 'Max dimensions (width x height)px';

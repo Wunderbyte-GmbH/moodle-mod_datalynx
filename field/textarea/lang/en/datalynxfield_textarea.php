@@ -19,7 +19,7 @@
  * @package datalynxfield
  * @subpackage textarea
  * @copyright 2011 Itamar Tzadok
- * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['pluginname'] = 'Text area';
 $string['rows'] = 'Rows';

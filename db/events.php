@@ -19,7 +19,7 @@
  *
  * @package mod_datalynx
  * @copyright 2015 Ivan Šakić <ivan.sakic3@gmail.com>
- * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die();
 

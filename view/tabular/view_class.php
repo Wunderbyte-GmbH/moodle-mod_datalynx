@@ -21,7 +21,7 @@
  * @package datalynxview
  * @subpackage tabular
  * @copyright 2012 Itamar Tzadok
- * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die();
 
@@ -156,7 +156,7 @@ class datalynxview_tabular extends datalynxview_base {
     /**
      */
     protected function apply_entry_group_layout($entriesset, $name = '') {
-        global $OUTPUT, $CFG;
+        global $OUTPUT, $CFG, $GLOBALS;
 
         $tablehtml = trim($this->view->eparam2);
         $opengroupdiv = html_writer::start_tag('div', array('class' => 'entriesview'));

@@ -19,7 +19,7 @@
  * @package datalynxfield
  * @subpackage tag
  * @copyright 2016 David Bogner
- * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['pluginname'] = 'Tag';
 

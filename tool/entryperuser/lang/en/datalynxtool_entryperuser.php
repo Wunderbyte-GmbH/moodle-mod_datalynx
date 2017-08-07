@@ -19,7 +19,7 @@
  * @package datalynxtool
  * @subpackage entryperuser
  * @copyright 2012 Itamar Tzadok
- * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['pluginname'] = 'Entry per user';
 $string['pluginname_help'] = 'Adds one blank entry for each gradable user in the course';

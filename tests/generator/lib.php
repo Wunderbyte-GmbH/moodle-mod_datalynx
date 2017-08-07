@@ -20,7 +20,7 @@
  * @package mod_datalynx
  * @category phpunit
  * @copyright 2012 Itamar Tzadok
- * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die();
 
@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') or die();
  * @package mod_datalynx
  * @category phpunit
  * @copyright 2014 Ivan Šakić
- * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_datalynx_generator extends testing_module_generator {
 

@@ -19,7 +19,7 @@
  * @package datalynxfield
  * @subpackage teammemberselect
  * @copyright 2013 Ivan Šakić
- * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die();
 

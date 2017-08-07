@@ -18,7 +18,7 @@
  *
  * @package datalynx_field_behavior
  * @copyright 2014 Ivan Šakić
- * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die();
 require_once(dirname(__FILE__) . '/../mod_class.php');
