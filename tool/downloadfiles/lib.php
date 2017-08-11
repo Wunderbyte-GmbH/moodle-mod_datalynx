@@ -34,7 +34,6 @@ class datalynxtool_downloadfiles {
      * Retrieves all files of all entries adds them to zip and sends them to download
      *
      * @param datalynx $dl
-     * @return string[]|array[]|string[]
      */
     public static function run(datalynx $dl) {
         global $DB, $CFG;
@@ -78,7 +77,7 @@ class datalynxtool_downloadfiles {
      * @param array $filesforzipping - array of files to pass into archive_to_pathname.
      *                                 This array is indexed by the final file name and each
      *                                 element in the array is an instance of a stored_file object.
-     * @return path of temp file - note this returned file does
+     * @return string path of temp file - note this returned file does
      *         not have a .zip extension - it is a temp file.
      */
     protected static function pack_files($filesforzipping) {
