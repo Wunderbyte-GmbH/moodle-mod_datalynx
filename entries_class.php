@@ -497,7 +497,7 @@ class datalynx_entries {
                     }
                 }
 
-                // TODO Prepare counters for adding new entries
+                // TODO Prepare counters for adding new entries.
                 $addcount = 0;
                 $addmax = $df->data->maxentries;
                 $perinterval = ($df->data->intervalcount > 1);
