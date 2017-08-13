@@ -27,6 +27,7 @@
  *          certain copyrights on the Database module may obtain.
  */
 require_once('../../config.php');
+require_once('mod_class.php');
 
 $urlparams = new stdClass();
 $urlparams->d = optional_param('d', 0, PARAM_INT); // Datalynx id.
@@ -38,7 +39,6 @@ $df = new datalynx($urlparams->d, $urlparams->id);
 require_login($df->data->course, false, $df->cm);
 
 if ($urlparams->jsedit) {
-    require_once('mod_class.php');
     require_once($CFG->libdir . '/formslib.php');
 
     class mod_datalynx_js_form extends moodleform {
@@ -78,8 +78,6 @@ if ($urlparams->jsedit) {
         }
     }
 
-    // Set a datalynx object.
-    $df = new datalynx($urlparams->d, $urlparams->id);
     require_capability('mod/datalynx:managetemplates', $df->context);
 
     $df->set_page('js', array('urlparams' => $urlparams

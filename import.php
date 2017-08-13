@@ -32,7 +32,7 @@ $urlparams->vid = optional_param('vid', 0, PARAM_INT); // View id.
 $urlparams->vedit = optional_param('vedit', 0, PARAM_INT); // View id to edit.
 $urlparams->import = optional_param('import', 0, PARAM_INT); // Import.
 
-$cm         = get_coursemodule_from_id('datalynx', $urlparams->d, 0, false, MUST_EXIST);
+$cm         = get_coursemodule_from_instance('datalynx', $urlparams->d, 0, false, MUST_EXIST);
 $course     = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
 require_login($course, true, $cm);
 
