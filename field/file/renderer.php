@@ -184,14 +184,20 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
     /**
      */
     protected function display_link($file, $path, $altname, $params = null) {
-        global $OUTPUT;
+        global $OUTPUT, $CFG;
 
         $filename = $file->get_filename();
         $displayname = $altname ? $altname : $filename;
-
-        $fileicon = html_writer::empty_tag('img',
-                array('src' => $OUTPUT->image_url(file_mimetype_icon($file->get_mimetype())),
+        if ($CFG->branch >= 33) {
+            $fileicon = html_writer::empty_tag('img',
+                    array('src' => $OUTPUT->image_url(file_mimetype_icon($file->get_mimetype())),
                         'alt' => $file->get_mimetype(), 'height' => 16, 'width' => 16));
+        } else {
+            $fileicon = html_writer::empty_tag('img',
+                    array('src' => $OUTPUT->pix_url(file_mimetype_icon($file->get_mimetype())),
+                        'alt' => $file->get_mimetype(), 'height' => 16, 'width' => 16));
+        }
+
         if (!empty($params['download'])) {
             list(, $context, , , $contentid) = explode('/', $path);
             $url = new moodle_url("/mod/datalynx/field/file/download.php",

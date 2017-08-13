@@ -92,7 +92,7 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
     /**
      */
     protected function display_browse($entry, $params = null) {
-        global $PAGE, $OUTPUT;
+        global $PAGE, $OUTPUT, $CFG;
 
         $field = $this->_field;
         if ($entry && isset($entry->approved) && $entry->approved) {
@@ -105,17 +105,30 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
             $approvedimagesrc = 'i/completion-auto-n';
         }
         $strapproved = get_string($approved, 'datalynx');
-
-        $approvedimage = html_writer::empty_tag('img',
-                array('src' => $OUTPUT->image_url($approvedimagesrc),
+        if ($CFG->branch >= 33) {
+            $approvedimage = html_writer::empty_tag('img',
+                    array('src' => $OUTPUT->image_url($approvedimagesrc),
                         'class' => "iconsmall" . (isset($entry->approved) && $entry->approved ? ' approved' : ''),
-                        'alt' => $strapproved, 'title' => $strapproved
-                ));
+                        'alt' => $strapproved, 'title' => $strapproved));
+        } else {
+            $approvedimage = html_writer::empty_tag('img',
+                    array('src' => $OUTPUT->pix_url($approvedimagesrc),
+                        'class' => "iconsmall" . (isset($entry->approved) && $entry->approved ? ' approved' : ''),
+                        'alt' => $strapproved, 'title' => $strapproved));
+        }
 
         if (has_capability('mod/datalynx:approve', $field->df()->context)) {
-            $PAGE->requires->js_init_call('M.datalynxfield__approve.init',
-                    array($OUTPUT->image_url('i/completion-auto-pass')->__toString(),
-                            $OUTPUT->image_url('i/completion-auto-n')->__toString()), false, $this->get_js_module());
+            if ($CFG->branch >= 33) {
+                $PAGE->requires->js_init_call('M.datalynxfield__approve.init',
+                        array($OUTPUT->image_url('i/completion-auto-pass')->__toString(),
+                            $OUTPUT->image_url('i/completion-auto-n')->__toString()), false,
+                        $this->get_js_module());
+            } else {
+                $PAGE->requires->js_init_call('M.datalynxfield__approve.init',
+                        array($OUTPUT->pix_url('i/completion-auto-pass')->__toString(),
+                            $OUTPUT->pix_url('i/completion-auto-n')->__toString()), false,
+                        $this->get_js_module());
+            }
 
             return html_writer::link(
                     new moodle_url($entry->baseurl,
