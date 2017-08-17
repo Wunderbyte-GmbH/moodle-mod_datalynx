@@ -25,13 +25,13 @@ defined('MOODLE_INTERNAL') or die();
 
 require_once("$CFG->libdir/formslib.php");
 
-/*
+/**
  *
  */
-
 abstract class mod_datalynx_filter_base_form extends moodleform {
 
     protected $_filter = null;
+    protected $_customfilter = null;
 
     /**
      *
@@ -43,8 +43,9 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
      *
      */
     public function __construct($df, $filter, $action = null, $customdata = null, $method = 'post', $target = '',
-            $attributes = null, $editable = true) {
+            $attributes = null, $editable = true, $customfilter = false) {
         $this->_filter = $filter;
+        $this->_customfilter = $customfilter;
         $this->_df = $df;
 
         parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
@@ -53,7 +54,7 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
     /*
      *
      */
-    public function custom_sort_definition($customsort, $fields, $fieldoptions, $showlabel = false) {
+    public function custom_sort_definition($customsort, $fields, $fieldoptions, $showlabel = false, $customfilter = false) {
         $mform = &$this->_form;
 
         $diroptions = array(0 => get_string('ascending', 'datalynx'),
@@ -90,15 +91,17 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
         for ($prevcount = $count; $count < ($prevcount + 3); $count++) {
 
             $i = $count + 1;
-            $label = $showlabel ? "$fieldlabel$i" : '';
+            if ($customfilter and $customfilter->{"sort$i"}) {
+                $label = $showlabel ? "$fieldlabel$i" : '';
 
-            $optionsarr = array();
-            $optionsarr[] = &$mform->createElement('select', 'sortfield' . $count, '', $fieldoptions);
-            $optionsarr[] = &$mform->createElement('select', 'sortdir' . $count, '', $diroptions);
-            $mform->addGroup($optionsarr, 'sortoptionarr' . $count, $label, ' ', false);
-            $mform->disabledIf('sortdir' . $count, 'sortfield' . $count, 'eq', 0);
-            if ($count > $prevcount) {
-                $mform->disabledIf('sortoptionarr' . $count, 'sortfield' . ($count - 1), 'eq', 0);
+                $optionsarr = array();
+                $optionsarr[] = &$mform->createElement('select', 'sortfield' . $count, '', $fieldoptions);
+                $optionsarr[] = &$mform->createElement('select', 'sortdir' . $count, '', $diroptions);
+                $mform->addGroup($optionsarr, 'sortoptionarr' . $count, $label, ' ', false);
+                $mform->disabledIf('sortdir' . $count, 'sortfield' . $count, 'eq', 0);
+                if ($count > $prevcount) {
+                    $mform->disabledIf('sortoptionarr' . $count, 'sortfield' . ($count - 1), 'eq', 0);
+                }
             }
         }
     }
@@ -207,6 +210,34 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
 
         $mform->registerNoSubmitButton('addsearchsettings');
         $mform->addElement('submit', 'addsearchsettings', get_string('reload'));
+    }
+
+    /*
+     *
+     */
+    public function customfilter_search_definition($fields, $fieldoptions) {
+        $mform = &$this->_form;
+
+        // List user fields.
+        $count = 1;
+        foreach ($fieldoptions as $fieldid => $field) {
+
+            $label = is_object($field) ? $field->field->name : $field;
+
+            $value = null;
+
+            // Render search elements.
+            list($elems, $separators) = $fields[$fieldid]->renderer()->render_search_mode($mform, $count, $value);
+
+            if ($separators) {
+                $sep = array_merge(array(' ', ' ', ' '), $separators);
+            } else {
+                $sep = ' ';
+            }
+            $mform->addGroup($elems, "customsearcharr$count", $label, $sep, false);
+
+            $count++;
+        }
     }
 
     /**
@@ -377,3 +408,73 @@ class mod_datalynx_advanced_filter_form extends mod_datalynx_filter_base_form {
         $mform->addGroup($grp, "afiltersubmit_grp", null, ' ', false);
     }
 }
+
+/**
+ *
+ */
+class mod_datalynx_customized_filter_form extends mod_datalynx_filter_base_form {
+
+    /*
+     * This by the admin predefined customfilter form is presented to the user
+     */
+    public function definition() {
+        $view = $this->_customdata['view'];
+
+        if (!$customfilter = $this->_customfilter) {
+            throw new moodle_exception('nocustomfilter', 'datalynx');
+        }
+
+        $customfilterfields = explode(",", $customfilter->fieldlist);
+        $fields = $view->get_view_fields();
+        $fieldoptions = array();
+        foreach ($fields as $fieldid => $field) {
+            $select = false;
+            if (in_array($field->field->name, $customfilterfields)) {
+                $select = true;
+            } else {
+                switch ($field->field->name) {
+                    case (get_string("approved", "datalynx")):
+                        if ($customfilter->approve) {
+                            $select = true;
+                        }
+                        break;
+                    case (get_string("timecreated", "datalynx")):
+                        if ($customfilter->timecreated) {
+                            $select = true;
+                        }
+                        break;
+                    case (get_string("timemodified", "datalynx")):
+                        if ($customfilter->timemodified) {
+                            $select = true;
+                        }
+                        break;
+                    case (get_string("status", "datalynx")):
+                        if ($customfilter->status) {
+                            $select = true;
+                        }
+                        break;
+                }
+            }
+            if ($select) {
+                $fieldoptions[$fieldid] = $field->field->name;
+            }
+        }
+
+        $mform = &$this->_form;
+
+        if ($customfilter->fulltextsearch) {
+            $mform->addElement('text', 'search', get_string('search'));
+            $mform->setType('search', PARAM_TEXT);
+        }
+
+        // TODO: File.
+
+        // Custom search.
+        if ($customfilter->fieldlist) {
+            $this->customfilter_search_definition($fields, $fieldoptions);
+        }
+
+        $this->add_action_buttons(false, get_string('search'));
+    }
+}
+

@@ -76,6 +76,11 @@ $string['csvfailed'] = 'Unable to read the raw data from the CSV file';
 $string['csvoutput'] = 'CSV output';
 $string['csvsettings'] = 'CSV settings';
 $string['csvwithselecteddelimiter'] = '<acronym title=\"Comma Separated Values\">CSV</acronym> text with selected delimiter:';
+$string['customfilter'] = 'Custom user filter';
+$string['customfilteradd'] = 'Add a custom filter';
+$string['customfilternew'] = 'New custom user filter';
+$string['customfilters'] = 'Custom Filters';
+$string['customfiltersnoneindatalynx'] = 'There are no custom filters defined for this datalynx.';
 // Capability strings.
 $string['datalynx:addinstance'] = 'Add a new datalynx';
 $string['datalynx:approve'] = 'Approve unapproved entries';
@@ -221,7 +226,6 @@ $string['filetypeimage'] = 'Image files';
 $string['filetypejpg'] = 'jpg files';
 $string['filetypepng'] = 'png files';
 $string['filetypes'] = 'Accepted file types';
-
 // FILTER FORM.
 $string['andor'] = 'and/or ...';
 $string['and'] = 'AND';
@@ -265,7 +269,6 @@ $string['filterupdate'] = 'Update an existing filter';
 $string['filterurlquery'] = 'Url query';
 $string['filtermy'] = 'My filter';
 $string['filteruserreset'] = '** Reset my filter';
-
 $string['firstdayofweek'] = 'Monday';
 $string['first'] = 'First';
 $string['formemptyadd'] = 'You did not fill out any fields!';
@@ -325,6 +328,7 @@ $string['newvalueallow'] = 'Allow new values';
 $string['newvalue'] = 'New value';
 $string['noaccess'] = 'You do not have access to this page';
 $string['noautocompletion'] = 'No autocompletion';
+$string['nocustomfilter'] = 'Programming error [nocustomfilter]. Please contact your support.';
 $string['nodatalynxs'] = 'No Datalynx modules found';
 $string['nomatch'] = 'No matching entries found!';
 $string['nomaximum'] = 'No maximum';
@@ -847,3 +851,7 @@ $string['datalynx_jssaved'] = 'Custom JavaScript saved';
 
 $string['displaytemplate_help'] = 'Specify HTML template to replace the field tag in browse mode. To specify the position of the actual value, use #value tag within the template.';
 $string['edittemplate_help'] = 'Specify HTML template to replace the field tag in edit mode. To specify the position of the actual input element, use #input tag within the template.';
+
+$string['fulltextsearch'] = 'Fulltextsearch';
+$string['fieldlist'] = 'Searchable Fields';
+$string['userfields'] = 'User defined fields';

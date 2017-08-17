@@ -76,6 +76,11 @@ $string['csvfailed'] = 'Originaldaten der CSV Datei können nicht gelesen werden
 $string['csvoutput'] = 'CSV Ausgabe';
 $string['csvsettings'] = 'CSV Einstellungen';
 $string['csvwithselecteddelimiter'] = '<acronym title=\"Comma Separated Values\">CSV</acronym> Text mit ausgewähltem Trennzeichen:';
+$string['customfilter'] = 'Individueller Userfilter';
+$string['customfilteradd'] = 'Einen Custom Filter hinzufügen';
+$string['customfilternew'] = 'Neuer User-Filter';
+$string['customfilters'] = 'Userfilter';
+$string['customfiltersnoneindatalynx'] = 'Für diese Datalynx sind keine Custom Filter angelegt.';
 // Capability strings.
 $string['datalynx:addinstance'] = 'Neue Datalynx Aktivität anlegen';
 $string['datalynx:approve'] = 'Einträge freischalten';
@@ -324,6 +329,7 @@ $string['multishare'] = 'Teilen';
 $string['newvalueallow'] = 'Neue Werte erlauben';
 $string['newvalue'] = 'Neuer Wert';
 $string['noaccess'] = 'Sie haben zu dieser Seite keinen Zutritt.';
+$string['nocustomfilter'] = 'Fehler in der Programmierung [nocustomfilter]. Kontaktieren Sie bitte den Support.';
 $string['nomatch'] = 'Keine übereinstimmenden Einträge gefunden!';
 $string['nomaximum'] = 'Kein Maximum';
 $string['notapproved'] = 'Eintrag wurde noch nicht freigeschaltet.';
@@ -812,6 +818,6 @@ $string['duplicatingrenderer'] = 'Feldrenderer "{$a}" duplizieren';
 $string['confirmrendererduplicate'] = 'Sie sind im Begriff diesen Renderer zu duplizieren!';
 $string['confirmbehaviorduplicate'] = 'Sie sind im Begriff dieses Feldverhalten zu duplizieren';
 
-
-
-
+$string['fulltextsearch'] = 'Volltextsuche';
+$string['fieldlist'] = 'Durchsuchbare Felder';
+$string['userfields'] = 'Benutzer-definierte Felder';

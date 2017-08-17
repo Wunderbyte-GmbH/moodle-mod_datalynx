@@ -79,6 +79,8 @@ class datalynx {
 
     protected $_filtermanager = null;
 
+    protected $_customfiltermanager = null;
+
     protected $_rulemanager = null;
 
     protected $_presetmanager = null;
@@ -87,6 +89,8 @@ class datalynx {
 
     // Internal fields.
     protected $internalfields = array();
+
+    protected $customfilterfields = array();
 
     // Internal group modes.
     protected $internalgroupmodes = array('separateparticipants' => -1);
@@ -192,6 +196,15 @@ class datalynx {
             $this->_filtermanager = new datalynx_filter_manager($this);
         }
         return $this->_filtermanager;
+    }
+
+    /**
+     */
+    public function get_customfilter_manager() {
+        if (!$this->_customfiltermanager) {
+            $this->_customfiltermanager = new mod_datalynx_customfilter_manager($this);
+        }
+        return $this->_customfiltermanager;
     }
 
     /**
@@ -405,6 +418,7 @@ class datalynx {
                 $what = strpos($page, 'view') !== false ? get_string('views', 'datalynx') : '???';
                 $what = strpos($page, 'field') !== false ? get_string('fields', 'datalynx') : $what;
                 $what = strpos($page, 'filter') !== false ? get_string('filters', 'datalynx') : $what;
+                $what = strpos($page, 'customfilter') !== false ? get_string('customfilters', 'datalynx') : $what;
                 $what = strpos($page, 'rule') !== false ? get_string('rules', 'datalynx') : $what;
                 $what = strpos($page, 'tool') !== false ? get_string('tools', 'datalynx') : $what;
                 $what = strpos($page, 'js') !== false ? get_string('jsinclude', 'datalynx') : $what;
@@ -739,6 +753,32 @@ class datalynx {
         }
 
         return $this->internalfields;
+    }
+
+    /**
+     * Returns an array of fields, suitable for use in customfilter form.
+     * @return array of strings
+     */
+    public function get_customfilterfields() {
+        global $CFG;
+
+        if (!$this->customfilterfields) {
+            $this->customfilterfields = array();
+            // Collate customfilter fields.
+            $fieldplugins = get_list_of_plugins('mod/datalynx/field/');
+            foreach ($fieldplugins as $fieldname) {
+                require_once("$CFG->dirroot/mod/datalynx/field/$fieldname/field_class.php");
+                $fieldclass = "datalynxfield_$fieldname";
+                if ($fieldclass::is_internal()) {
+                    continue;
+                }
+                if ($fieldclass::is_customfilterfield()) {
+                    $this->customfilterfields[] = $fieldname;
+                }
+            }
+        }
+
+        return $this->customfilterfields;
     }
 
     /**

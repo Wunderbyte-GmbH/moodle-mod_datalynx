@@ -684,6 +684,14 @@ abstract class datalynxfield_base {
     public function get_supported_search_operators() {
         return array(); // If search is not supported, offer no operators.
     }
+
+    /**
+     * Are fields of this field type suitable for use in customfilters?
+     * @return bool
+     */
+    public static function is_customfilterfield() {
+        return false;
+    }
 }
 
 /**
@@ -885,6 +893,14 @@ abstract class datalynxfield_option extends datalynxfield_base {
     public function parse_search($formdata, $i) {
         $fieldname = "f_{$i}_{$this->field->id}";
         return optional_param_array($fieldname, false, PARAM_NOTAGS);
+    }
+
+    /**
+     * Are fields of this field type suitable for use in customfilters?
+     * @return bool
+     */
+    public static function is_customfilterfield() {
+        return true;
     }
 }
 

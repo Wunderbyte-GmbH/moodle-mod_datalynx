@@ -869,6 +869,17 @@ function xmldb_datalynx_upgrade($oldversion) {
         // Datalynx savepoint reached..
         upgrade_mod_savepoint(true, 2017080600, 'datalynx');
     }
+    if ($oldversion < 2017081500) {
+        // Add customfilter table for predefined custom filter forms.
+        $table = new xmldb_table('datalynx_customfilters');
+        if (!$dbman->table_exists($table)) {
+            $filepath = "$CFG->dirroot/mod/datalynx/db/install.xml";
+            $dbman->install_one_table_from_xmldb_file($filepath, 'datalynx_customfilters');
+        }
+
+        // Datalynx savepoint reached.
+        upgrade_mod_savepoint(true, 2017081500, 'datalynx');
+    }
     return true;
 }
 

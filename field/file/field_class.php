@@ -220,4 +220,12 @@ class datalynxfield_file extends datalynxfield_base {
         $fs->create_file_from_string($rec, $filecontent);
         return true;
     }
+
+    /**
+     * Are fields of this field type suitable for use in customfilters?
+     * @return bool
+     */
+    public static function is_customfilterfield() {
+        return true;
+    }
 }

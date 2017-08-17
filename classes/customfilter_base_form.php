@@ -16,14 +16,44 @@
 
 /**
  *
+ * Contains class mod_customfilter_base_form
+ *
  * @package mod
  * @subpackage datalynx
- * @copyright 2015 onwards David Bogner
+ * @copyright 2016 Thomas Niedermaier
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 defined('MOODLE_INTERNAL') or die();
-$plugin->component = 'mod_datalynx';
-$plugin->version = 2017081500;
-$plugin->release = 'Skyler White 1.4.5'; // Famous movie, theater and tv series characters.
-$plugin->requires = 2016052300;
-$plugin->maturity = MATURITY_STABLE;
+
+global $CFG;
+
+require_once ("$CFG->libdir/formslib.php");
+
+
+/**
+ *
+ */
+abstract class mod_datalynx_customfilter_base_form extends moodleform
+{
+
+    protected $_customfilter = null;
+
+    /**
+     *
+     * @var datalynx null
+     */
+    protected $_df = null;
+
+    /*
+     *
+     */
+    public function __construct($df, $customfilter, $action = null, $customdata = null, $method = 'post',
+                                $target = '', $attributes = null, $editable = true) {
+        $this->_customfilter = $customfilter;
+        $this->_df = $df;
+
+        parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
+    }
+
+}
