@@ -191,8 +191,7 @@ class mod_datalynx_mod_form extends moodleform_mod {
      */
     public function data_preprocessing(&$data) {
         parent::data_preprocessing($data);
-        $data['completionentriesenabled'] = !empty($data['approval']) &&
-        !empty($data['completionentries']) ? 1 : 0;
+        $data['completionentriesenabled'] = !empty($data['completionentries']) ? 1 : 0;
         if (empty($data['completionentries'])) {
             $data['completionentries'] = 1;
         }
@@ -220,8 +219,6 @@ class mod_datalynx_mod_form extends moodleform_mod {
         $mform->addGroup($group, 'completionentriesgroup',
                 get_string('completionentriesgroup', 'datalynx'), array(' '), false);
         $mform->disabledIf('completionentries', 'completionentriesenabled', 'notchecked');
-        $mform->disabledIf('completionentries', 'approval', 'eq', '0');
-        $mform->disabledIf('completionentriesenabled', 'approval', 'eq', '0');
         $mform->addHelpButton('completionentriesgroup', 'completionentriesgroup', 'datalynx');
 
         return array('completionentriesgroup');
@@ -230,15 +227,13 @@ class mod_datalynx_mod_form extends moodleform_mod {
     public function definition_after_data() {
         parent::definition_after_data();
         parent::data_preprocessing($data);
-        $data['completionentriesenabled'] = !empty($data['approval']) &&
-        !empty($data['completionentries']) ? 1 : 0;
+        $data['completionentriesenabled'] = !empty($data['completionentries']) ? 1 : 0;
         if (empty($data['completionentries'])) {
             $data['completionentries'] = 0;
         }
     }
 
     public function completion_rule_enabled($data) {
-        return (!empty($data['approval']) && $data['approval'] == 1 &&
-                !empty($data['completionentriesenabled']) && $data['completionentries'] > 0);
+        return (!empty($data['completionentriesenabled']) && $data['completionentries'] > 0);
     }
 }
