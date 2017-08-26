@@ -1242,11 +1242,18 @@ function datalynx_get_completion_state($course, $cm, $userid, $type) {
     }
 
     $params = array('userid' => $userid, 'dataid' => $datalynx->id);
-    $sql = "SELECT COUNT(1)
+    if ($datalynx->approval) {
+        $sql = "SELECT COUNT(1)
               FROM {datalynx_entries} de
              WHERE de.userid = :userid
                AND de.dataid = :dataid
                AND de.approved = 1";
+    } else {
+        $sql = "SELECT COUNT(1)
+              FROM {datalynx_entries} de
+             WHERE de.userid = :userid
+               AND de.dataid = :dataid";
+    }
     $count = $DB->get_field_sql($sql, $params);
 
     return $count >= $datalynx->completionentries;

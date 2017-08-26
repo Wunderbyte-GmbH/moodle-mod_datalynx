@@ -554,10 +554,10 @@ $string['status_notcreated'] = 'Nicht gesetzt';
 $string['status_draft'] = 'Entwurf';
 $string['status_submission'] = 'Abgabe';
 $string['status_finalsubmission'] = 'Endgültige Abgabe';
-$string['completionentries'] = 'Anzahl der zugelassenen Abgaben';
+$string['completionentries'] = 'Anzahl der (zugelassenen) Abgaben';
 $string['completionentriesgroup'] = 'Zulassung der Abgaben fordern';
-$string['completionentriesgroup_help'] = 'Schalten Sie unbedingt die Zulassung der Abgaben oben im Formular frei!<br />
-Anzahl der zugelassenen Abgaben: Anzahl der Abgaben, die ein Benutzer machen muss, vorausgesetzt \'Freischaltung erforderlich\' ist eingestellt. Nur bestätigte Abgaben werden berücksichtigt.';
+$string['completionentriesgroup_help'] = 'Schalten Sie eine obligate Zulassung der Abgaben oben im Formular frei!<br />
+Anzahl der (zugelassenen) Abgaben: Anzahl der Abgaben, die ein Benutzer tätigen muss. Wenn \'Freischaltung erforderlich\' eingestellt ist werden nur zugelassene Abgaben berücksichtigt.';
 $string['limitchoice'] = 'Auswahlbeschränkung';
 $string['limitchoice_help'] = 'Schalten Sie dies frei, um die Auswahlmöglichkeit der BenutzerInnen auf die angegebene Anzahl zu beschränken.';
 $string['limitchoice_error'] = 'Sie können die \'{$a}\' Option nicht nochmal auswählen, weil Sie die Höchstzahl der Auswahl dieser Option bereits erreicht haben.';

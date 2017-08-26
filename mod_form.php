@@ -193,7 +193,11 @@ class mod_datalynx_mod_form extends moodleform_mod {
         parent::data_preprocessing($data);
         $data['completionentriesenabled'] = !empty($data['completionentries']) ? 1 : 0;
         if (empty($data['completionentries'])) {
-            $data['completionentries'] = 1;
+            if (!$data['completionentriesenabled']) {
+                $data['completionentries'] = 0;
+            } else {
+                $data['completionentries'] = 1;
+            }
         }
     }
 
@@ -229,7 +233,11 @@ class mod_datalynx_mod_form extends moodleform_mod {
         parent::data_preprocessing($data);
         $data['completionentriesenabled'] = !empty($data['completionentries']) ? 1 : 0;
         if (empty($data['completionentries'])) {
-            $data['completionentries'] = 0;
+            if (!$data['completionentriesenabled']) {
+                $data['completionentries'] = 0;
+            } else {
+                $data['completionentries'] = 1;
+            }
         }
     }
 

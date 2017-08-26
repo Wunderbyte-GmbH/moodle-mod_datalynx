@@ -561,10 +561,10 @@ $string['status_notcreated'] = 'Not set';
 $string['status_draft'] = 'Draft';
 $string['status_submission'] = 'Submission';
 $string['status_finalsubmission'] = 'Final submission';
-$string['completionentries'] = 'Number of approved entries';
-$string['completionentriesgroup'] = 'Require approved entries';
+$string['completionentries'] = 'Number of (approved) entries';
+$string['completionentriesgroup'] = 'Require (approved) entries';
 $string['completionentriesgroup_help'] = 'Make sure you enable approval for entries above!<br />
-Number of approved entries: Entries a user has to make, if \'Require approval\' is set. Number of entries equals number of approved entries only.';
+Number of (approved) entries: Entries a user has to make. If \'Require approval\' is set: Number of entries equals number of approved entries only.';
 $string['limitchoice'] = 'Limit choices for users';
 $string['limitchoice_help'] = 'Enable this to prevent a user from choosing the same option more than the chosen number in separate entries.';
 $string['limitchoice_error'] = 'You have already selected option \'{$a}\' the maximum allowed number of times!';
