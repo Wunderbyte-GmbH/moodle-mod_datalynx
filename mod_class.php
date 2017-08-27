@@ -349,7 +349,7 @@ class datalynx {
             $urlparams['edit'] = optional_param('edit', 0, PARAM_BOOL);
             $PAGE->set_url("/mod/datalynx/$page.php", $urlparams);
 
-            // Editing button (omit in embedded datalynxs).
+            // Blocks editing button (omit in embedded datalynxs).
             if ($page != 'embed' and $PAGE->user_allowed_editing()) {
                 // Teacher editing mode.
                 if ($urlparams['edit'] != -1) {
@@ -379,7 +379,7 @@ class datalynx {
                     new moodle_url(
                             $CFG->wwwroot . '/mod/datalynx/field/picture/shadowbox/shadowbox.css'));
 
-            // Mark as viewed.
+            // If completion is on: Mark activity as viewed.
             if (!empty($params->completion)) {
                 require_once($CFG->libdir . '/completionlib.php');
                 $completion = new completion_info($this->course);
@@ -419,7 +419,7 @@ class datalynx {
             }
             $PAGE->set_heading($this->course->fullname);
 
-            // Include blocks dragdrop when editing.
+            // Include blocks dragdrop when blocks/moodle editing.
             if ($PAGE->user_is_editing()) {
                 $params = array('courseid' => $this->course->id, 'cmid' => $this->cm->id,
                         'pagetype' => $PAGE->pagetype, 'pagelayout' => $PAGE->pagelayout,
@@ -1642,9 +1642,8 @@ class datalynx {
     }
 
     /**
-     * has a user reached the max number of entries?
-     * if interval is set then required entries, max entrie etc.
-     * are relative to the current interval
+     * Has a user reached the max number of entries?
+     * If interval is set then required entries, max entries etc. are relative to the current interval
      *
      * @return boolean
      */
@@ -1730,6 +1729,11 @@ class datalynx {
     }
 
     /**
+     * Has the actual user the right to edit any entries or the optional single entry parameter?
+     *
+     * @param $entry
+     * @param global $USER, $CFG
+     * @return boolean
      */
     public function user_can_manage_entry($entry = null) {
         global $USER, $CFG;
@@ -1753,14 +1757,14 @@ class datalynx {
             $allowlate = $this->data->allowlate;
             $now = time();
 
-            // Activity time frame.
+            // If there is an activity timeframe, we must be inside the timeframe right now.
             if ($timeavailable and !($now >= $timeavailable) or
                     ($timedue and !($now < $timedue) and !$allowlate)
             ) {
                 return false;
             }
 
-            // Group access.
+            // If group mode is enabled user has to be in the right group.
             if ($this->groupmode and !in_array($this->groupmode, $this->internalgroupmodes) and
                     !has_capability('moodle/site:accessallgroups', $this->context) and (($this->currentgroup and
                                     !groups_is_member($this->currentgroup)) or
@@ -1779,6 +1783,7 @@ class datalynx {
                     return false; // Who are you anyway???
                 }
 
+                // If nor status 'draft' neither status 'not set' user is not allowed to manage this entry.
                 require_once('field/_status/field_class.php');
                 if (!($entry->status == datalynxfield__status::STATUS_DRAFT ||
                         $entry->status == datalynxfield__status::STATUS_NOT_SET)

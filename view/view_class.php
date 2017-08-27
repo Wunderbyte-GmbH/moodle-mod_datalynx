@@ -1116,7 +1116,7 @@ abstract class datalynxview_base {
     }
 
     /**
-     * Assemble the the replaced tags and field values to valid html
+     * Assemble the replaced tags and field values to valid html
      *
      * @return string html
      */
@@ -1277,7 +1277,7 @@ abstract class datalynxview_base {
             $groupname = '';
             $groupdefinition = array();
 
-            // If action buttons should be hidden entries should unmanageable.
+            // If action buttons should be hidden entries should be unmanageable.
             $displayactions = isset($options['entryactions']) ? $options['entryactions'] : true;
             foreach ($entries as $entryid => $entry) {
                 // Is this entry edited.

@@ -813,6 +813,9 @@ $string['duplicatingrenderer'] = 'Feldrenderer "{$a}" duplizieren';
 $string['confirmrendererduplicate'] = 'Sie sind im Begriff diesen Renderer zu duplizieren!';
 $string['confirmbehaviorduplicate'] = 'Sie sind im Begriff dieses Feldverhalten zu duplizieren';
 
+$string['notallowedtoeditentry'] = 'Es ist nicht erlaubt, diesen Eintrag zu ändern.';
+
+
 
 
 

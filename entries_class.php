@@ -691,11 +691,17 @@ class datalynx_entries {
                             global $DB;
                             // Now update entry and contents TODO: TEAM_CHANGED - check this!
                             $addorupdate = '';
+                            $admins = get_admins();
+                            $isadmin = in_array($USER->id, array_keys($admins));
 
                             foreach ($entries as $eid => $entry) {
-                                if ($entry->id = $this->update_entry($entry,
-                                        $contents[$eid]['info'])
+                                require_once('field/_status/field_class.php');
+                                if (!$isadmin && (!($entry->status == datalynxfield__status::STATUS_DRAFT ||
+                                        $entry->status == datalynxfield__status::STATUS_NOT_SET))
                                 ) {
+                                    continue;
+                                }
+                                if ($entry->id = $this->update_entry($entry, $contents[$eid]['info'])) {
                                     // Variable $eid should be different from $entryid only in new entries.
                                     foreach ($contents[$eid]['fields'] as $fieldid => $content) {
                                         $fields[$fieldid]->update_content($entry, $content);
@@ -993,8 +999,7 @@ class datalynx_entries {
 
         // Update existing entry (only authenticated users).
         if ($entry->id > 0) {
-            if ($df->user_can_manage_entry($entry)) { // Just in case the user opens two forms at.
-                // The same time.
+            if ($df->user_can_manage_entry($entry)) { // Just in case the user opens two forms at the same time.
                 if (!has_capability('mod/datalynx:approve', $df->context)
                         && ($df->data->approval == datalynx::APPROVAL_ON_UPDATE)
                 ) {

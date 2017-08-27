@@ -848,3 +848,5 @@ $string['datalynx_jssaved'] = 'Custom JavaScript saved';
 
 $string['displaytemplate_help'] = 'Specify HTML template to replace the field tag in browse mode. To specify the position of the actual value, use #value tag within the template.';
 $string['edittemplate_help'] = 'Specify HTML template to replace the field tag in edit mode. To specify the position of the actual input element, use #input tag within the template.';
+
+$string['notallowedtoeditentry'] = 'It\'s not allowed to edit this entry.';

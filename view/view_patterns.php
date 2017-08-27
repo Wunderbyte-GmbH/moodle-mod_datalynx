@@ -368,7 +368,7 @@ class datalynxview_patterns {
         $showentryactions = (!empty($options['showentryactions']) or
                 has_capability('mod/datalynx:manageentries', $df->context));
         // TODO: move to a view attribute so as to call only once.
-        // Can this user registered or anonymous add entries.
+        // Can this user add entries?
         $usercanaddentries = $view->get_df()->user_can_manage_entry();
 
         switch ($tag) {
