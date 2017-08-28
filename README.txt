@@ -36,4 +36,3 @@ Change log:
 Notes
 -----
 This version does not upgrade versions 1.0.4 and 1.0.4i
-

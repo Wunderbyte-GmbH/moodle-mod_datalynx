@@ -156,7 +156,7 @@ class datalynxview_tabular extends datalynxview_base {
     /**
      */
     protected function apply_entry_group_layout($entriesset, $name = '') {
-        global $OUTPUT, $CFG, $GLOBALS;
+        global $OUTPUT;
 
         $tablehtml = trim($this->view->eparam2);
         $opengroupdiv = html_writer::start_tag('div', array('class' => 'entriesview'));

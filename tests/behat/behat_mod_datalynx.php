@@ -248,7 +248,7 @@ class behat_mod_datalynx extends behat_files {
     /**
      * @Given /^I fill in "([^"]*)" for "([^"]*)"$/
      */
-    public function iFillInFor($arg1, $arg2) {
+    public function ifillinfor($arg1, $arg2) {
         $session = $this->getSession();
         $element = $session->getPage()->findField($arg2);
         $session->getPage()->fillField($arg2, $arg1);
@@ -258,7 +258,7 @@ class behat_mod_datalynx extends behat_files {
     /**
      * @Given /^I append "([^"]*)" for "([^"]*)"$/
      */
-    public function iAppendFor($arg1, $arg2) {
+    public function iappendfor($arg1, $arg2) {
         $session = $this->getSession();
         $element = $session->getPage()->findField($arg2);
         $oldvalue = $element->getValue();
@@ -269,7 +269,7 @@ class behat_mod_datalynx extends behat_files {
     /**
      * @Given /^I click inside "([^"]*)"$/
      */
-    public function iClickOn($arg1) {
+    public function iclickon($arg1) {
         $session = $this->getSession();
         $element = $session->getPage()->findById($arg1);
         $element->click();
@@ -669,7 +669,7 @@ class behat_mod_datalynx extends behat_files {
     /**
      * @Given /^I should see "([^"]*)" (\d+) times$/
      */
-    public function iShouldSeeTimes($arg1, $arg2) {
+    public function ishouldseetimes($arg1, $arg2) {
         $session = $this->getSession(); // Get the mink session.
         $count = 0;
         $found = false;
@@ -814,7 +814,7 @@ class behat_mod_datalynx extends behat_files {
     /**
      * @Given /^"([^"]*)" has following behaviors:$/
      */
-    public function hasFollowingBehaviors($arg1, TableNode $table) {
+    public function hasfollowingbehaviors($arg1, TableNode $table) {
         $behaviors = $table->getHash();
 
         $instance = $this->get_instance_by_name($arg1);
@@ -847,7 +847,7 @@ class behat_mod_datalynx extends behat_files {
     /**
      * @Given /^I refresh the Entry template of "([^"]*)"$/
      */
-    public function iRefreshTheEntryTemplateOf($arg1) {
+    public function irefreshtheentrytemplateof($arg1) {
         $steps = array(new Given('I click "Edit" button of "' . $arg1 . '" item'),
                 new Given('I follow "Entry template"'),
                 new Given('I click inside "id_eparam2_editoreditable"'),
@@ -859,7 +859,7 @@ class behat_mod_datalynx extends behat_files {
     /**
      * @Given /^I refresh the View template of "([^"]*)"$/
      */
-    public function iRefreshTheViewTemplateOf($arg1) {
+    public function irefreshtheviewtemplateof($arg1) {
         $steps = array(new Given('I click "Edit" button of "' . $arg1 . '" item'),
                 new Given('I follow "View template"'), new Given('I press "Show more buttons"'),
                 new Given('I press "HTML"'), new Given('I press "HTML"'),
@@ -870,7 +870,7 @@ class behat_mod_datalynx extends behat_files {
     /**
      * @Given /^I refresh the templates of "([^"]*)"$/
      */
-    public function iUpdateTheTemplatesOf($arg1) {
+    public function iupdatethetemplatesof($arg1) {
         $steps = array(new Given('I click "Edit" button of "' . $arg1 . '" item'),
                 new Given('I follow "View template"'), new Given('I press "Show more buttons"'),
                 new Given('I press "HTML"'), new Given('I press "HTML"'),

@@ -26,15 +26,15 @@ defined('MOODLE_INTERNAL') || die();
 
 class HTML_QuickForm_checkboxgroup extends HTML_QuickForm_element {
 
-    var $_options = array();
+    public $_options = array();
 
-    var $_separator = array();
+    public $_separator = array();
 
-    var $_values = array();
+    public $_values = array();
 
-    function __construct($elementName = null, $elementLabel = null, $options = null,
+    public function __construct($elementname = null, $elementlabel = null, $options = null,
             $separator = null, $attributes = null) {
-        HTML_QuickForm_element::__construct($elementName, $elementLabel, $attributes);
+        HTML_QuickForm_element::__construct($elementname, $elementlabel, $attributes);
         $this->_persistantFreeze = true;
         if (count($options) > 1) {
             if (is_array($separator)) {
@@ -50,29 +50,29 @@ class HTML_QuickForm_checkboxgroup extends HTML_QuickForm_element {
         }
     }
 
-    function load(&$options, $param1 = null, $param2 = null, $param3 = null, $param4 = null) {
+    public function load(&$options, $param1 = null, $param2 = null, $param3 = null, $param4 = null) {
         if (is_array($options)) {
             $this->loadArray($options, $param1);
         }
     }
 
-    function getMultiple() {
+    public function getMultiple() {
         return true;
     }
 
-    function setName($name) {
+    public function setName($name) {
         $this->updateAttributes(array('name' => $name));
     }
 
-    function getName() {
+    public function getName() {
         return $this->getAttribute('name');
     }
 
-    function getPrivateName() {
+    public function getPrivateName() {
         return $this->getName() . '[]';
     }
 
-    function setValue($value) {
+    public function setValue($value) {
         if (is_string($value)) {
             $value = preg_split("/[ ]?,[ ]?/", $value);
         }
@@ -83,11 +83,11 @@ class HTML_QuickForm_checkboxgroup extends HTML_QuickForm_element {
         }
     }
 
-    function getValue() {
+    public function getValue() {
         return $this->_values;
     }
 
-    function addOption($text, $value, $attributes = null) {
+    public function addOption($text, $value, $attributes = null) {
         if (null === $attributes) {
             $attributes = array('value' => $value);
         } else {
@@ -107,7 +107,7 @@ class HTML_QuickForm_checkboxgroup extends HTML_QuickForm_element {
         $this->_options[] = array('text' => $text, 'attr' => $attributes);
     }
 
-    function loadArray($arr, $values = null) {
+    public function loadArray($arr, $values = null) {
         if (!is_array($arr)) {
             return self::raiseError('Argument 1 of HTML_Select::loadArray is not a valid array');
         }
@@ -121,19 +121,19 @@ class HTML_QuickForm_checkboxgroup extends HTML_QuickForm_element {
         return true;
     }
 
-    function toHtml() {
+    public function toHtml() {
         if ($this->_flagFrozen) {
             return $this->getFrozenHtml();
         } else {
             $tabs = $this->_getTabs();
-            $strHtml = '';
+            $strhtml = '';
 
             if ($this->getComment() != '') {
-                $strHtml .= $tabs . '<!-- ' . $this->getComment() . " //-->\n";
+                $strhtml .= $tabs . '<!-- ' . $this->getComment() . " //-->\n";
             }
 
-            $strHtml .= $tabs;
-            $strHtml .= '<input type="hidden" name="' . $this->getName() . '" value="" />';
+            $strhtml .= $tabs;
+            $strhtml .= '<input type="hidden" name="' . $this->getName() . '" value="" />';
 
             $i = 0;
             foreach ($this->_options as $option) {
@@ -152,16 +152,16 @@ class HTML_QuickForm_checkboxgroup extends HTML_QuickForm_element {
                 } else {
                     unset($option['attr']['checked']);
                 }
-                $strHtml .= $tabs . "\t<input type=\"checkbox\"" .
+                $strhtml .= $tabs . "\t<input type=\"checkbox\"" .
                         $this->_getAttrString($option['attr']) . '/> ' . $option['text'] .
                         "{$separator}\n";
             }
 
-            return $strHtml . $tabs;
+            return $strhtml . $tabs;
         }
     }
 
-    function getFrozenHtml() {
+    public function getFrozenHtml() {
         $html = '';
         $i = 0;
         foreach ($this->_options as $option) {
@@ -184,20 +184,20 @@ class HTML_QuickForm_checkboxgroup extends HTML_QuickForm_element {
             // Only use id attribute if doing single hidden input.
             if (1 == count($this->_values)) {
                 $id = $this->getAttribute('id');
-                $idAttr = isset($id) ? array('id' => $id) : array();
+                $idattr = isset($id) ? array('id' => $id) : array();
             } else {
-                $idAttr = array();
+                $idattr = array();
             }
             foreach ($this->_values as $value) {
                 $html .= '<input' . $this->_getAttrString(
-                                array('type' => 'hidden', 'name' => $name, 'value' => $value) + $idAttr) . ' />';
+                                array('type' => 'hidden', 'name' => $name, 'value' => $value) + $idattr) . ' />';
             }
         }
         return $html;
     }
 
-    function exportValue(&$submitValues, $assoc = false) {
-        $value = $this->_findValue($submitValues);
+    public function exportValue(&$submitvalues, $assoc = false) {
+        $value = $this->_findValue($submitvalues);
         if (is_null($value)) {
             $value = $this->getValue();
         } else {
@@ -210,22 +210,22 @@ class HTML_QuickForm_checkboxgroup extends HTML_QuickForm_element {
             }
         }
         if (is_array($value) && !empty($this->_options)) {
-            $cleanValue = null;
+            $cleanvalue = null;
             foreach ($value as $v) {
-                for ($i = 0, $optCount = count($this->_options); $i < $optCount; $i++) {
+                for ($i = 0, $optcount = count($this->_options); $i < $optcount; $i++) {
                     if ($v == $this->_options[$i]['attr']['value']) {
-                        $cleanValue[] = $v;
+                        $cleanvalue[] = $v;
                         break;
                     }
                 }
             }
         } else {
-            $cleanValue = $value;
+            $cleanvalue = $value;
         }
-        return $this->_prepareValue($cleanValue, $assoc);
+        return $this->_prepareValue($cleanvalue, $assoc);
     }
 
-    function onQuickFormEvent($event, $arg, &$caller) {
+    public function onQuickFormEvent($event, $arg, &$caller) {
         if ('updateValue' == $event) {
             $value = $this->_findValue($caller->_constantValues);
             if (null === $value) {
