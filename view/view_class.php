@@ -1098,19 +1098,41 @@ abstract class datalynxview_base {
     /**
      */
     public function display_entries(array $options = null) {
+        global $DB, $OUTPUT;
+
         if (!$this->user_is_editing()) {
             $html = $this->definition_to_html();
             if (isset($options['pluginfileurl'])) {
                 $html = $this->replace_pluginfile_urls($html, $options['pluginfileurl']);
             }
         } else {
-            // Prepare options for form.
-            $entriesform = $this->get_entries_form();
-            $html = $entriesform->html();
+            $editallowed = false;
+            if ($editallowed = $this->get_df()->user_can_manage_entry()) {
+                if (count(explode(",", $this->_editentries)) == 1) {
+                    $entrystatus = $DB->get_field('datalynx_entries', 'status', array('id' => $this->_editentries));
+                    $admins = get_admins();
+                    $isadmin = in_array($USER->id, array_keys($admins));
+                    require_once('field/_status/field_class.php');
+                    if (!$isadmin && (!($entrystatus == datalynxfield__status::STATUS_DRAFT ||
+                                    $entrystatus == datalynxfield__status::STATUS_NOT_SET))
+                    ) {
+                        $editallowed = false;
+                    }
+                }
+            }
+            if ($editallowed) {
+                // Prepare options for form.
+                $entriesform = $this->get_entries_form();
+                $html = $entriesform->html();
+                // Process calculations if any.
+                $html = $this->process_calculations($html);
+            } else {
+                // Show message that editing is not allowed
+                $redirectid = $this->_redirect ? $this->_redirect : $this->id();
+                $url = new moodle_url($this->_baseurl, array('view' => $redirectid));
+                $html = $OUTPUT->notification(get_string('notallowedtoeditentry', 'datalynx')) . $OUTPUT->continue_button($url);
+            }
         }
-
-        // Process calculations if any.
-        $html = $this->process_calculations($html);
 
         return $html;
     }

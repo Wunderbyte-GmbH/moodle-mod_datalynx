@@ -27,41 +27,17 @@ require_once($CFG->libdir . '/formslib.php');
 class datalynxview_entries_form extends moodleform {
 
     protected function definition() {
-        global $USER;
+        global $USER, $OUTPUT;
         $view = $this->_customdata['view'];
         $mform = &$this->_form;
         $mform->addElement('hidden', 'new', optional_param('new', 0, PARAM_INT));
         $mform->setType('new', PARAM_INT);
 
-        if ($usercanaddentries = $view->get_df()->user_can_manage_entry()) {
-            if (count(explode(",", $this->_customdata['update'])) == 1) {
-                global $DB;
-                $entrystatus = $DB->get_field('datalynx_entries', 'status', array('id' => $this->_customdata['update']));
-                $admins = get_admins();
-                $isadmin = in_array($USER->id, array_keys($admins));
-                require_once('field/_status/field_class.php');
-                if (!$isadmin && (!($entrystatus == datalynxfield__status::STATUS_DRAFT ||
-                        $entrystatus == datalynxfield__status::STATUS_NOT_SET))
-                ) {
-                    $usercanaddentries = false;
-                }
-
-            }
-        }
-
-        if ($usercanaddentries) {
-            $this->add_action_buttons();
-        } else {
-            $this->add_action_buttons(false);
-            $this->_form->disabledIf('submitbutton', 'd');
-            $this->_form->getElement('submitbutton')->setValue(get_string('notallowedtoeditentry', 'datalynx'));
-        }
+        $this->add_action_buttons();
 
         $view->definition_to_form($mform);
 
-        if ($usercanaddentries) {
-            $this->add_action_buttons();
-        }
+        $this->add_action_buttons();
     }
 
     public function validation($data, $files) {

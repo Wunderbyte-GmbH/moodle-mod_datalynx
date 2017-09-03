@@ -695,11 +695,14 @@ class datalynx_entries {
                             $isadmin = in_array($USER->id, array_keys($admins));
 
                             foreach ($entries as $eid => $entry) {
-                                require_once('field/_status/field_class.php');
-                                if (!$isadmin && (!($entry->status == datalynxfield__status::STATUS_DRAFT ||
-                                        $entry->status == datalynxfield__status::STATUS_NOT_SET))
-                                ) {
-                                    continue;
+                                if ($eid > 0) {
+                                    require_once('field/_status/field_class.php');
+                                    $entrystatus = $contents[$eid]['info']['status'];
+                                    if (!$isadmin && !($entrystatus == datalynxfield__status::STATUS_DRAFT ||
+                                                    $entrystatus == datalynxfield__status::STATUS_NOT_SET)
+                                    ) {
+                                        continue;
+                                    }
                                 }
                                 if ($entry->id = $this->update_entry($entry, $contents[$eid]['info'])) {
                                     // Variable $eid should be different from $entryid only in new entries.
