@@ -76,15 +76,24 @@ class datalynxfield_text_form extends datalynxfield_form {
 
         // Get all Datalynxs where user has managetemplate capability.
         // TODO there may be too many.
-        if ($datalynxs = $DB->get_records('datalynx')) {
+        $sql = "SELECT DISTINCT d.*
+                FROM mdl_datalynx d
+                INNER JOIN mdl_course_modules cm ON d.id = cm.instance
+                INNER JOIN mdl_modules m ON m.id = cm.module
+                WHERE m.name = 'datalynx' AND cm.deletioninprogress = 0";
+        if ($datalynxs = $DB->get_records_sql($sql)) {
             foreach ($datalynxs as $dfid => $datalynx) {
-                $df = new datalynx($datalynx);
-                // Remove if user cannot manage.
-                if (!has_capability('mod/datalynx:managetemplates', $df->context)) {
+                if ($dfid != $this->_df->id()) {
+                    $df = new datalynx($datalynx);
+                    // Remove if user cannot manage.
+                    if (!has_capability('mod/datalynx:managetemplates', $df->context)) {
+                        unset($datalynxs[$dfid]);
+                        continue;
+                    }
+                    $datalynxs[$dfid] = $df;
+                } else {
                     unset($datalynxs[$dfid]);
-                    continue;
                 }
-                $datalynxs[$dfid] = $df;
             }
         }
 
@@ -93,6 +102,8 @@ class datalynxfield_text_form extends datalynxfield_form {
         // Select Datalynx instance (to be stored in param9).
         if ($datalynxs) {
             $dfmenu = array('' => array(0 => get_string('noautocompletion', 'datalynx')));
+            $dfmenu[''][$this->_df->id()] = get_string('thisdatalynx', 'datalynx') .
+                    " (" . strip_tags(format_string($this->_df->name(), true)) . ")";
             foreach ($datalynxs as $dfid => $df) {
                 if (!isset($dfmenu[$df->course->shortname])) {
                     $dfmenu[$df->course->shortname] = array();
@@ -117,7 +128,10 @@ class datalynxfield_text_form extends datalynxfield_form {
         $options = array(
                 'dffield' => 'param9',
                 'textfieldfield' => 'param10',
-                'acturl' => "$CFG->wwwroot/mod/datalynx/loaddfviews.php"
+                'acturl' => "$CFG->wwwroot/mod/datalynx/loaddfviews.php",
+                'presentdlid' => $this->_df->id(),
+                'thisfieldstring' => get_string('thisfield', 'datalynx'),
+                'update' => $this->_field->id() ? $this->_field->id() : 0
         );
 
         $module = array(
@@ -184,6 +198,10 @@ class datalynxfield_text_form extends datalynxfield_form {
                     array('dataid' => $refdatalynxid, 'type' => 'text'), 'name', 'id,name')
             ) {
                 $formfield = &$this->_form->getElement('param10');
+                // Add the option to choose this new field itself as autocompletion reference field.
+                if ($this->_df->id() == $refdatalynxid && $textfieldid == 0) {
+                    $formfield->addOption(get_string('thisfield', 'datalynx'), -1);
+                }
                 foreach ($textfields as $key => $value) {
                     $formfield->addOption(strip_tags(format_string($value, true)), $key);
                 }
@@ -200,6 +218,8 @@ class datalynxfield_text_form extends datalynxfield_form {
      * @return string[] Associative array with errors
      */
     public function validation($data, $files) {
+        global $OUTPUT;
+
         $mform = &$this->_form;
 
         $errors = parent::validation($data, $files);

@@ -32,6 +32,9 @@ M.mod_datalynx_load_views.init = function (Y, options) {
         var viewfield = options.viewfield;
         var textfieldfield = options.textfieldfield;
         var actionurl = options.acturl;
+        var presentdlid = options.presentdlid;
+        var thisfieldstring = options.thisfieldstring;
+        var update = options.update;
 
         Y.on('change', function (e) {
 
@@ -65,7 +68,6 @@ M.mod_datalynx_load_views.init = function (Y, options) {
                     on: {
                         success: function (id, o) {
                             if (o.responseText != '') {
-                                console.log(o.responseText);
                                 var respoptions = o.responseText.split('#');
 
                                 // Add view options.
@@ -82,6 +84,10 @@ M.mod_datalynx_load_views.init = function (Y, options) {
                                 // Add textfield options.
                                 if (textfield) {
                                     var textfieldoptions = respoptions[1].split(',');
+                                    // If this datalynx instance itself is chosen provide this new field itself as first option.
+                                    if (dfid == presentdlid && update == 0) {
+                                        textfield.append(Y.Node.create('<option value="-1">' + thisfieldstring + '</option>'));
+                                    }
                                     for (var i = 0; i < textfieldoptions.length; ++i) {
                                         var arr = textfieldoptions[i].trim().split(' ');
                                         var qid = arr.shift();

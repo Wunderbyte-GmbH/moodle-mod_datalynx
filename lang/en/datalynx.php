@@ -850,3 +850,5 @@ $string['displaytemplate_help'] = 'Specify HTML template to replace the field ta
 $string['edittemplate_help'] = 'Specify HTML template to replace the field tag in edit mode. To specify the position of the actual input element, use #input tag within the template.';
 
 $string['notallowedtoeditentry'] = 'It\'s not allowed to edit this entry.';
+$string['thisdatalynx'] = 'This datalynx instance';
+$string['thisfield'] = 'This field';

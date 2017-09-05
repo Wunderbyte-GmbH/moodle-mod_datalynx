@@ -35,8 +35,7 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
 
         $mform = &$this->_form;
 
-        $mform->addElement('header', 'fieldattributeshdr',
-                get_string('fieldattributes', 'datalynx'));
+        $mform->addElement('header', 'fieldattributeshdr', get_string('fieldattributes', 'datalynx'));
 
         // Get all Datalynxs where user has managetemplate capability.
         // TODO there may be too many.
@@ -59,20 +58,17 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
                 if (!isset($dfmenu[$df->course->shortname])) {
                     $dfmenu[$df->course->shortname] = array();
                 }
-                $dfmenu[$df->course->shortname][$dfid] = strip_tags(
-                        format_string($df->name(), true));
+                $dfmenu[$df->course->shortname][$dfid] = strip_tags(format_string($df->name(), true));
             }
         } else {
             $dfmenu = array('' => array(0 => get_string('nodatalynxs', 'datalynxfield_datalynxview')));
         }
-        $mform->addElement('selectgroups', 'param1',
-                get_string('datalynx', 'datalynxfield_datalynxview'), $dfmenu);
+        $mform->addElement('selectgroups', 'param1', get_string('datalynx', 'datalynxfield_datalynxview'), $dfmenu);
         $mform->addHelpButton('param1', 'datalynx', 'datalynxfield_datalynxview');
 
         // Select view of given instance (stored in param2).
         $options = array(0 => get_string('choosedots'));
-        $mform->addElement('select', 'param2', get_string('view', 'datalynxfield_datalynxview'),
-                $options);
+        $mform->addElement('select', 'param2', get_string('view', 'datalynxfield_datalynxview'), $options);
         $mform->disabledIf('param2', 'param1', 'eq', 0);
         $mform->addHelpButton('param2', 'view', 'datalynxfield_datalynxview');
 
@@ -88,8 +84,7 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
 
         // Select textfields of given instance (stored in param7).
         $options = array(0 => get_string('choosedots'));
-        $mform->addElement('select', 'param7', get_string('textfield', 'datalynxfield_datalynxview'),
-                $options);
+        $mform->addElement('select', 'param7', get_string('textfield', 'datalynxfield_datalynxview'), $options);
         $mform->disabledIf('param7', 'param1', 'eq', 0);
         $mform->addHelpButton('param7', 'textfield', 'datalynxfield_datalynxview');
 
@@ -98,7 +93,9 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
                 'dffield' => 'param1',
                 'viewfield' => 'param2',
                 'textfieldfield' => 'param7',
-                'acturl' => "$CFG->wwwroot/mod/datalynx/loaddfviews.php"
+                'acturl' => "$CFG->wwwroot/mod/datalynx/loaddfviews.php",
+                'presentdlid' => $this->_df->id(),
+                'thisfieldstring' => get_string('thisfield', 'datalynx')
         );
 
         $module = array(
