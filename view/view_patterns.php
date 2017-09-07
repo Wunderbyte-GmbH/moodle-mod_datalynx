@@ -787,9 +787,9 @@ class datalynxview_patterns {
 
         $patterns = array();
 
-        $fields = $df->get_fields(null, true);
+        $fieldnames = $df->get_fieldnames();
         $cat = get_string('reference', 'datalynx');
-        foreach ($fields as $fieldname) {
+        foreach ($fieldnames as $fieldname) {
             $fieldname = preg_quote($fieldname, '/');
             $patterns["%%{$fieldname}:bulkedit%%"] = array(true, $cat);
         }

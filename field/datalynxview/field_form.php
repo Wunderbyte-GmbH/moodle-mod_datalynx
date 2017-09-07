@@ -39,21 +39,32 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
 
         // Get all Datalynxs where user has managetemplate capability.
         // TODO there may be too many.
-        if ($datalynxs = $DB->get_records('datalynx')) {
+        $sql = "SELECT DISTINCT d.*
+                FROM mdl_datalynx d
+                INNER JOIN mdl_course_modules cm ON d.id = cm.instance
+                INNER JOIN mdl_modules m ON m.id = cm.module
+                WHERE m.name = 'datalynx' AND cm.deletioninprogress = 0";
+        if ($datalynxs = $DB->get_records_sql($sql)) {
             foreach ($datalynxs as $dfid => $datalynx) {
-                $df = new datalynx($datalynx);
-                // Remove if user cannot manage.
-                if (!has_capability('mod/datalynx:managetemplates', $df->context)) {
+                if ($dfid != $this->_df->id()) {
+                    $df = new datalynx($datalynx);
+                    // Remove if user cannot manage.
+                    if (!has_capability('mod/datalynx:managetemplates', $df->context)) {
+                        unset($datalynxs[$dfid]);
+                        continue;
+                    }
+                    $datalynxs[$dfid] = $df;
+                } else {
                     unset($datalynxs[$dfid]);
-                    continue;
                 }
-                $datalynxs[$dfid] = $df;
             }
         }
 
         // Select Datalynx instance (to be stored in param1).
         if ($datalynxs) {
             $dfmenu = array('' => array(0 => get_string('choosedots')));
+            $dfmenu[''][$this->_df->id()] = get_string('thisdatalynx', 'datalynx') .
+                    " (" . strip_tags(format_string($this->_df->name(), true)) . ")";
             foreach ($datalynxs as $dfid => $df) {
                 if (!isset($dfmenu[$df->course->shortname])) {
                     $dfmenu[$df->course->shortname] = array();
@@ -95,7 +106,9 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
                 'textfieldfield' => 'param7',
                 'acturl' => "$CFG->wwwroot/mod/datalynx/loaddfviews.php",
                 'presentdlid' => $this->_df->id(),
-                'thisfieldstring' => get_string('thisfield', 'datalynx')
+                'thisfieldstring' => get_string('thisfield', 'datalynx'),
+                'update' => $this->_field->id() ? $this->_field->id() : 0,
+                'fieldtype' => 'datalynxview'
         );
 
         $module = array(

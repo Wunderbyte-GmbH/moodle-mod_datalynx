@@ -119,7 +119,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         $field = $this->_field;
 
         $refdatalynx = $field->refdatalynx;
-        $refview = $field->refview;
+        $refview = $field->df->get_view_from_id($field->refview);
 
         // Options for setting the filter.
         $foptions = array();
@@ -160,7 +160,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         $fieldname = preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $field->name()));
 
         // Construct the src url.
-        $params = array('d' => $field->refdatalynx->id(), 'view' => $field->refview->id());
+        $params = array('d' => $field->refdatalynx->id(), 'view' => $field->refview);
 
         // Search filter by entry author or group or value.
         $params = $this->get_filter_by_options($params, $entry, true);
@@ -268,7 +268,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         $field = $this->_field;
 
         $refdatalynx = $field->refdatalynx;
-        $refview = $field->refview;
+        $refview = $field->df->get_view_from_id($field->refview);
 
         $soptions = array();
         // Custom sort (ref-field-patten,ASC/DESC).
@@ -301,8 +301,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
             return $soptions;
         }
 
-        if (!$refdatalynx = $field->refdatalynx or !$refview = $field->refview or
-                !$localview = $field->localview
+        if (!$refdatalynx = $field->refdatalynx or !$refview = $field->refview or !$localview = $field->localview
         ) {
             return $soptions;
         }
@@ -314,12 +313,14 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
                 continue;
             }
             // Get the ref field id from pattern.
-            if (!$rfieldid = $refview->get_pattern_fieldid($refpattern)) {
+            $refviewview = $field->df->get_view_from_id($refview);
+            if (!$rfieldid = $refviewview->get_pattern_fieldid($refpattern)) {
                 continue;
             }
             // Get value for local pattern or use as value.
             $value = '';
-            if (!$localfieldid = $localview->get_pattern_fieldid($localpattern)) {
+            $localviewview = $field->df->get_view_from_id($localview);
+            if (!$localfieldid = $localviewview->get_pattern_fieldid($localpattern)) {
                 $value = $localpattern;
             } else {
                 if ($localfield = $field->df->get_field_from_id($localfieldid)) {

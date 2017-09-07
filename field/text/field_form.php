@@ -131,7 +131,8 @@ class datalynxfield_text_form extends datalynxfield_form {
                 'acturl' => "$CFG->wwwroot/mod/datalynx/loaddfviews.php",
                 'presentdlid' => $this->_df->id(),
                 'thisfieldstring' => get_string('thisfield', 'datalynx'),
-                'update' => $this->_field->id() ? $this->_field->id() : 0
+                'update' => $this->_field->id() ? $this->_field->id() : 0,
+                'fieldtype' => 'text'
         );
 
         $module = array(

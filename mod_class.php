@@ -742,6 +742,29 @@ class datalynx {
     }
 
     /**
+     * Return the names of the internal fields
+     */
+    public function get_internal_fields_names() {
+        global $CFG;
+
+        $fieldplugins = get_list_of_plugins('mod/datalynx/field/');
+        $internalfieldsnames = array();
+        foreach ($fieldplugins as $fieldname) {
+            require_once("$CFG->dirroot/mod/datalynx/field/$fieldname/field_class.php");
+            $fieldclass = "datalynxfield_$fieldname";
+            if (!$fieldclass::is_internal()) {
+                continue;
+            }
+            $internalfields = $fieldclass::get_field_objects($this->data->id);
+            foreach ($internalfields as $fid => $field) {
+                $internalfieldsnames[$fid] = $field->name;
+            }
+        }
+
+        return $internalfieldsnames;
+    }
+
+    /**
      */
     public function get_user_defined_fields($forceget = false, $sort = '') {
         $this->get_fields(null, false, $forceget, $sort);
@@ -821,6 +844,30 @@ class datalynx {
     }
 
     /**
+     * returns a subclass field object given a record of the field
+     * used to invoke plugin methods
+     * input: $param $field record from db, or field type
+     */
+    public function get_fieldname($key) {
+        global $CFG;
+
+        if ($key) {
+            if (is_object($key)) {
+                $type = $key->type;
+            } else {
+                $type = $key;
+                $key = 0;
+            }
+            require_once('field/' . $type . '/field_class.php');
+            $fieldclass = 'datalynxfield_' . $type;
+            $field = new $fieldclass($this, $key);
+            return $field;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      *
      * @param null $exclude
      * @param bool $menu
@@ -860,6 +907,23 @@ class datalynx {
             }
             return $retfields;
         }
+    }
+
+    public function get_fieldnames($sort = '') {
+        global $DB;
+
+        $fieldnames = array();
+        // Collate user fields.
+        if ($fields = $DB->get_records('datalynx_fields', array('dataid' => $this->id()), $sort)) {
+            foreach ($fields as $fieldid => $field) {
+                $fieldnames[$fieldid] = $field->name;
+            }
+        }
+
+        // Collate all fields.
+        $retfieldnames = $fieldnames + $this->get_internal_fields_names();
+
+        return $retfieldnames;
     }
 
     private function find_filters_using_fields($fields) {
@@ -1132,11 +1196,10 @@ class datalynx {
      * @param string $sort SQL ORDER BY clause
      * @return array an array of datalynx_views entry objects
      */
-    public function get_view_records($forceget = false, $sort = '') {
+    public function get_view_records($forceget = false, $sort = '', $viewid = 0) {
         global $DB;
 
         if (empty($this->views) or $forceget) {
-            $views = array();
             if (!$views = $DB->get_records('datalynx_views', array('dataid' => $this->id()), $sort)) {
                 return false;
             }
@@ -1147,7 +1210,11 @@ class datalynx {
                 }
             }
         }
-        return $this->views;
+        if ($viewid) {
+            return $this->views[$viewid];
+        } else {
+            return $this->views;
+        }
     }
 
     /**
@@ -1182,23 +1249,15 @@ class datalynx {
     }
 
     /**
-     * TODO there is no need to instantiate all views!!!
-     * this function creates an instance of the particular subtemplate class *
+     * This function creates an instance of the particular subtemplate class
      */
     public function get_current_view_from_id($viewid = 0) {
-        if ($views = $this->get_view_records()) {
-            if ($viewid and isset($views[$viewid])) {
-                $view = $views[$viewid];
-
-                // If can't find the requested, try the default.
-            } else {
-                if ($viewid = $this->data->defaultview and isset($views[$viewid])) {
-                    $view = $views[$viewid];
-                } else {
-                    return false;
-                }
+        if (!$viewid) {
+            if (!$viewid = $this->data->defaultview and isset($views[$viewid])) {
+                return false;
             }
-
+        }
+        if ($view = $this->get_view_records(false, '', $viewid)) {
             return $this->get_view($view, true);
         }
 
@@ -1206,23 +1265,15 @@ class datalynx {
     }
 
     /**
-     * TODO there is no need to instantiate all viewds!!!
-     * this function creates an instance of the particular subtemplate class *
+     * This function creates an instance of the particular subtemplate class
      */
     public function get_view_from_id($viewid = 0) {
-        if ($views = $this->get_view_records()) {
-            if ($viewid and isset($views[$viewid])) {
-                $view = $views[$viewid];
-
-                // If can't find the requested, try the default.
-            } else {
-                if ($viewid = $this->data->defaultview and isset($views[$viewid])) {
-                    $view = $views[$viewid];
-                } else {
-                    return false;
-                }
+        if (!$viewid) {
+            if (!$viewid = $this->data->defaultview and isset($views[$viewid])) {
+                return false;
             }
-
+        }
+        if ($view = $this->get_view_records(false, '', $viewid)) {
             return $this->get_view($view);
         }
 

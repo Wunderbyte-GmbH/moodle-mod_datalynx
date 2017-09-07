@@ -35,6 +35,7 @@ M.mod_datalynx_load_views.init = function (Y, options) {
         var presentdlid = options.presentdlid;
         var thisfieldstring = options.thisfieldstring;
         var update = options.update;
+        var fieldtype = options.fieldtype;
 
         Y.on('change', function (e) {
 
@@ -85,7 +86,7 @@ M.mod_datalynx_load_views.init = function (Y, options) {
                                 if (textfield) {
                                     var textfieldoptions = respoptions[1].split(',');
                                     // If this datalynx instance itself is chosen provide this new field itself as first option.
-                                    if (dfid == presentdlid && update == 0) {
+                                    if (dfid == presentdlid && update == 0 && fieldtype == 'text') {
                                         textfield.append(Y.Node.create('<option value="-1">' + thisfieldstring + '</option>'));
                                     }
                                     for (var i = 0; i < textfieldoptions.length; ++i) {
