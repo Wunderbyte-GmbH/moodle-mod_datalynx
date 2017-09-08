@@ -16,6 +16,14 @@
                        SEQUENCE="false" PREVIOUS="name" NEXT="introformat"/>
                 <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="true"
                        DEFAULT="0" SEQUENCE="false" PREVIOUS="intro" NEXT="timemodified"/>
+                <FIELD NAME="assessed" TYPE="int" LENGTH="10" NOTNULL="true"
+                       DEFAULT="0" SEQUENCE="false" PREVIOUS="introformat" NEXT="assesstimestart"/>
+                <FIELD NAME="assesstimestart" TYPE="int" LENGTH="10" NOTNULL="true"
+                       DEFAULT="0" SEQUENCE="false" PREVIOUS="assessed" NEXT="assesstimefinish"/>
+                <FIELD NAME="assesstimefinish" TYPE="int" LENGTH="10" NOTNULL="true"
+                       DEFAULT="0" SEQUENCE="false" PREVIOUS="assesstimestart" NEXT="scale"/>
+                <FIELD NAME="scale" TYPE="int" LENGTH="10" NOTNULL="true"
+                       DEFAULT="0" SEQUENCE="false" PREVIOUS="assesstimefinish" NEXT="timemodified"/>
                 <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true"
                        DEFAULT="0" SEQUENCE="false" PREVIOUS="introformat" NEXT="timeavailable"/>
                 <FIELD NAME="timeavailable" TYPE="int" LENGTH="10" NOTNULL="true"
@@ -286,9 +294,11 @@
                 <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true"
                        DEFAULT="0" SEQUENCE="false" PREVIOUS="timecreated" NEXT="approved"/>
                 <FIELD NAME="approved" TYPE="int" LENGTH="1" NOTNULL="true"
-                       DEFAULT="0" SEQUENCE="false" PREVIOUS="timemodified"/>
+                       DEFAULT="0" SEQUENCE="false" PREVIOUS="timemodified" NEXT="status"/>
                 <FIELD NAME="status" TYPE="int" LENGTH="4" NOTNULL="true"
-                       DEFAULT="0" SEQUENCE="false" PREVIOUS="approved"/>
+                       DEFAULT="0" SEQUENCE="false" PREVIOUS="approved" NEXT="assessed"/>
+                <FIELD NAME="assessed" TYPE="int" LENGTH="1" NOTNULL="true"
+                       DEFAULT="1" SEQUENCE="false" PREVIOUS="status"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="dataid"/>

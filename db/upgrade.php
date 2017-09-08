@@ -869,6 +869,34 @@ function xmldb_datalynx_upgrade($oldversion) {
         // Datalynx savepoint reached..
         upgrade_mod_savepoint(true, 2017080600, 'datalynx');
     }
+    if ($oldversion < 2017090800) {
+        // Add rating fields to datalynx.
+        $table = new xmldb_table('datalynx');
+        $field = new xmldb_field('assessed', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'introformat');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('assesstimestart', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'assessed');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('assesstimefinish', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'assesstimestart');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('scale', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'assesstimefinish');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        // Add rating field to datalynx_entries.
+        $table = new xmldb_table('datalynx_entries');
+        $field = new xmldb_field('assessed', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1', 'status');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        // Datalynx savepoint reached.
+        upgrade_mod_savepoint(true, 2017090800, 'datalynx');
+    }
     return true;
 }
 

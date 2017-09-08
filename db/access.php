@@ -131,7 +131,7 @@ $capabilities = array(
         ),
 
     // RATINGS.
-    // Mangae ratings.
+    // Manage ratings.
         'mod/datalynx:manageratings' => array(
                 'riskbitmask' => RISK_SPAM,
                 'captype' => 'write',
@@ -153,7 +153,7 @@ $capabilities = array(
                 'archetypes' => array('teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW, 'manager' => CAP_ALLOW)
         ),
 
-    // What is this?
+    // Moodle.org: Allows the user to view aggregated ratings made on other people's items (but not their own).
         'mod/datalynx:ratingsviewany' => array(
                 'riskbitmask' => RISK_PERSONAL,
                 'captype' => 'read',
@@ -162,7 +162,7 @@ $capabilities = array(
                 'clonepermissionsfrom' => 'mod/datalynx:ratingsview'
         ),
 
-    // What is this?
+    // Moodle.org: Allows the user to see individual ratings.
         'mod/datalynx:ratingsviewall' => array(
                 'riskbitmask' => RISK_PERSONAL,
                 'captype' => 'read',

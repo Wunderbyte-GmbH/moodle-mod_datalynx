@@ -91,6 +91,11 @@ function datalynx_add_instance($data) {
         $data->rating = 0;
     }
 
+    if (empty($data->ratingtime) or empty($data->assessed)) {
+        $data->assesstimestart  = 0;
+        $data->assesstimefinish = 0;
+    }
+
     if (!empty($data->scale)) {
         $data->rating = $data->scale;
     } else {
@@ -132,6 +137,11 @@ function datalynx_update_instance($data) {
         $data->grademethod = $data->assessed;
     } else {
         $data->rating = 0;
+    }
+
+    if (empty($data->ratingtime) or empty($data->assessed)) {
+        $data->assesstimestart  = 0;
+        $data->assesstimefinish = 0;
     }
 
     if (!empty($data->scale)) {
@@ -1053,6 +1063,15 @@ function datalynx_rating_validate($params) {
     // Lower limit.
     if ($params['rating'] < 0 and $params['rating'] != RATING_UNSET_RATING) {
         throw new rating_exception('invalidnum');
+    }
+
+    $entry = $DB->get_record('datalynx_entries', array('id' => $params['itemid']), '*', MUST_EXIST);
+
+    // Check the item we are rating was created in the assessable time window.
+    if (!empty($data->assesstimestart && !empty($data->assesstimefinish))) {
+        if ($entry->timecreated < $data->assesstimestart || $entry->timecreated > $data->assesstimefinish) {
+            throw new rating_exception('notavailable');
+        }
     }
 
     // Make sure groups allow this user to see the item they're rating.

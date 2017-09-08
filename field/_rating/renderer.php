@@ -38,7 +38,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
         $fieldname = $field->get('internalname');
         $edit = !empty($options['edit']) ? $options['edit'] : false;
 
-        // No edit mode.
+        // If edit mode or rating not active return.
         if ($edit or (!$this->_field->df()->data->rating)) {
             if ($tags) {
                 $replacements = array();
