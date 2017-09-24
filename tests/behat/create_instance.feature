@@ -1,8 +1,8 @@
-@mod @mod_datalynx @_file_upload
-Feature: In a datalynx create, update, and delete fields
-  In order to create chapters and subchapters
+@mod @mod_datalynx
+Feature: In a datalynx instance create a new entry
+  In order to create a new entry
   As a teacher
-  I need to add chapters and subchapters to a book.
+  I need to add a new entry to the datalynx instance.
 
   Background:
     Given the following "courses" exist:
@@ -18,14 +18,14 @@ Feature: In a datalynx create, update, and delete fields
       | activity | course | idnumber | name                   |
       | datalynx | C1     | 12345    | Datalynx Test Instance |
     And "Datalynx Test Instance" has following fields:
-      | type        | name     | param1                       |
-      | text        | Text     |                              |
-      | textarea    | Textarea |                              |
-      | time        | Time     |                              |
-      | duration    | Duration |                              |
-      | radiobutton | Radio    | Option A, Option B, Option C |
-      | checkbox    | Checkbox | Option 1, Option 2, Option 3 |
-      | select      | Select   | Option X, Option Y, Option Z |
+      | type        | name     | param1                       | param3 |
+      | text        | Text     |                              |        |
+      | textarea    | Textarea |                              |        |
+      | time        | Time     |                              |        |
+      | duration    | Duration |                              |        |
+      | radiobutton | Radio    | Option A, Option B, Option C | 3      |
+      | checkbox    | Checkbox | Option 1, Option 2, Option 3 | 3      |
+      | select      | Select   | Option X, Option Y, Option Z | 3      |
     And "Datalynx Test Instance" has following filters:
       | name       | perpage |
       | TestFilter | 3       |
@@ -36,22 +36,23 @@ Feature: In a datalynx create, update, and delete fields
       | pdf     | PDF     | more    | Grid     |            |
 
   @javascript
-  Scenario: add entry
-    Given I log in as "teacher1"
-    And I follow "Course 1"
+  Scenario: add a new entry to dataylnx instance
+    When I log in as "teacher1"
+    And I am on "Course 1" course homepage
     And I follow "Datalynx Test Instance"
-    When I create an entry in "Datalynx Test Instance" instance and fill the form with:
-      | Option A | x |
-      | Option 1 | x |
-      | Option 3 | x |
+    And I follow "Add a new entry"
+    And I click option "Option A" from a radio
+    And I click option "Option 2" from a checkbox
+    And I select option "Option Z" from the "Select" select
+    And I press "Save changes"
+    And I press "Continue"
     And I edit "first" entry
-    And I set the following fields to these values:
-      | Option B | x |
-      | Option 3 |   |
-      | Option 2 | x |
+    And I click option "Option B" from a radio
+    And I click option "Option 1" from a checkbox
+    And I select option "Option Y" from the "Select" select
     And I press "Save changes"
     And I press "Continue"
     Then I should see "Option B"
     And I should see "Option 1"
-    And I should see "Option 2"
+    And I should see "Option Y"
     But I should not see "Option 3"

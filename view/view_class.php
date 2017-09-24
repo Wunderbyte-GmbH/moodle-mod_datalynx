@@ -1098,7 +1098,7 @@ abstract class datalynxview_base {
     /**
      */
     public function display_entries(array $options = null) {
-        global $DB, $OUTPUT;
+        global $DB, $OUTPUT, $USER;
 
         if (!$this->user_is_editing()) {
             $html = $this->definition_to_html();

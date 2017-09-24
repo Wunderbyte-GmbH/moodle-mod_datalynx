@@ -696,12 +696,14 @@ class datalynx_entries {
 
                             foreach ($entries as $eid => $entry) {
                                 if ($eid > 0) {
-                                    require_once('field/_status/field_class.php');
-                                    $entrystatus = $contents[$eid]['info']['status'];
-                                    if (!$isadmin && !($entrystatus == datalynxfield__status::STATUS_DRAFT ||
-                                                    $entrystatus == datalynxfield__status::STATUS_NOT_SET)
-                                    ) {
-                                        continue;
+                                    if (isset($contents[$eid]['info']['status'])) {
+                                        $entrystatus = $contents[$eid]['info']['status'];
+                                        require_once('field/_status/field_class.php');
+                                        if (!$isadmin && !($entrystatus == datalynxfield__status::STATUS_DRAFT ||
+                                                        $entrystatus == datalynxfield__status::STATUS_NOT_SET)
+                                        ) {
+                                            continue;
+                                        }
                                     }
                                 }
                                 if ($entry->id = $this->update_entry($entry, $contents[$eid]['info'])) {

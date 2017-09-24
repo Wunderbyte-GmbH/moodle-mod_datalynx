@@ -27,7 +27,6 @@
  *          certain copyrights on the Database module may obtain.
  */
 
-defined('MOODLE_INTERNAL') or die();
 
 /**
  * Datalynx class
