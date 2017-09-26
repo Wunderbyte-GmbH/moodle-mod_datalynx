@@ -261,7 +261,7 @@ class behat_mod_datalynx extends behat_files {
     }
 
     /**
-     * Select an option from a select.
+     * Select a select option.
      *
      * @Given /^I select option "(?P<option_string>(?:[^"]|\\")*)" from the "(?P<select_string>(?:[^"]|\\")*)" select$/
 
@@ -276,7 +276,7 @@ class behat_mod_datalynx extends behat_files {
     }
 
     /**
-     * Select an radio button option.
+     * Select a radio button option.
      *
      * @Given /^I click option "(?P<option_string>(?:[^"]|\\")*)" from a radio$/
 
@@ -291,7 +291,7 @@ class behat_mod_datalynx extends behat_files {
     }
 
     /**
-     * Select an radio button option.
+     * Select a checkbox option.
      *
      * @Given /^I click option "(?P<option_string>(?:[^"]|\\")*)" from a checkbox$/
 
@@ -303,5 +303,188 @@ class behat_mod_datalynx extends behat_files {
         $element = $session->getPage()->find('xpath',
                 '//input[@type="checkbox"]/following::*[contains(text()[normalize-space()], "' . $option . '")]');
         $element->click();
+    }
+
+    /**
+     * @Given /^I fill entry form with:$/
+     *
+     * @param TableNode $table
+     */
+    public function i_fill_entry_form_with(TableNode $table) {
+        $session = $this->getSession();
+        $entries = array();
+        if (in_array('entry', $table->getRow(0))) {
+            $data = $table->getHash();
+            foreach ($data as $row) {
+                if (!isset($entries[$row['entry']])) {
+                    $entries[$row['entry']] = array();
+                }
+                $entries[$row['entry']][$row['field']] = $row['value'];
+            }
+        } else {
+            $entry = $table->getRowsHash();
+            unset($entry['field']);
+            $entries[1] = $entry;
+        }
+
+        foreach ($entries as $number => $entry) {
+            $entryelement = $session->getPage()->find('xpath',
+                    '//div[@class="entriesview"]/table/tbody/tr[' . $number . ']');
+
+            foreach ($entry as $name => $value) {
+                $fieldelement = $entryelement->find('xpath', '//div[@data-field-name="' . $name . '"]');
+                $type = $fieldelement->getAttribute('data-field-type');
+                $this->fill_data($fieldelement, $type, $value);
+            }
+        }
+    }
+
+    /**
+     * @Given /^I select "(?P<entrynumbers_string>(?:[^"]|\\")*)" entry$/
+     *
+     * @param string $entrynumbers
+     */
+    public function i_select_entry($entrynumbers) {
+        $entrynumbers = explode(',', $entrynumbers);
+        foreach ($entrynumbers as $entrynumber) {
+            switch ($this->escape($entrynumber)) {
+                case "first":
+                case "1st":
+                    $number = 1;
+                    break;
+                case "second":
+                case "2nd":
+                    $number = 2;
+                    break;
+                case "third":
+                case "3rd":
+                    $number = 3;
+                    break;
+                case "fourth":
+                case "4th":
+                    $number = 4;
+                    break;
+                case "fifth":
+                case "5th":
+                    $number = 5;
+                    break;
+                default:
+                    $number = $this->escape($entrynumber);
+                    break;
+            }
+            $session = $this->getSession(); // Get the mink session.
+            $element = $session->getPage()->find('xpath',
+                    '//div[@class="entriesview"]/table/tbody/tr[' . $number . ']//input[@type="checkbox"]');
+            $element->click();
+        }
+    }
+
+    private function fill_data(Behat\Mink\Element\NodeElement $element, $type, $value) {
+        switch ($type) {
+            case 'text':
+            case 'number':
+                $element->find('xpath', '//input[@type="text"]')->setValue($value);
+                break;
+            case 'url':
+                list($url, $alt) = explode(' ', $value, 2);
+                list($urlfield, $altfield) = $element->findAll('xpath', '//input[@type="text"]');
+                $urlfield->setValue($url);
+                $altfield->setValue($alt);
+                break;
+            case 'textarea': // TODO: account for the editor capability.
+                $element->find('xpath', '//textarea')->setValue($value);
+                break;
+            case 'select':
+                $element->find('xpath', '//select')->selectOption($value);
+                break;
+            case '_approve':
+                $checkbox = $element->find('xpath', '//input[@type="checkbox"]');
+                if (strtolower($value) == "yes") {
+                    $checkbox->check();
+                } else {
+                    $checkbox->uncheck();
+                }
+                break;
+            case 'checkbox':
+                $checkboxes = $element->findAll('xpath', '//input[@type="checkbox"]');
+                foreach ($checkboxes as $checkbox) {
+                    $checkbox->uncheck();
+                }
+                foreach (explode(',', $value) as $option) {
+                    if ($checkbox = $element->find('xpath',
+                    '//input[@type="checkbox"][../following::*[position()=1][contains(., "' . trim($option) . '")]]')) {
+                        $checkbox->check();
+                    }
+                }
+                break;
+            case 'radiobutton':
+                $element->find('xpath',
+                        '//input[@type="radio"][../following-sibling::*[position()=1][contains(., "' . $value . '")]]'
+                        )->click();
+                break;
+            case 'duration':
+                list($amount, $unit) = explode(' ', $value);
+                $element->find('xpath', '//input[@type="text"]')->setValue($amount);
+                $element->find('xpath', '//select')->selectOption($unit);
+                break;
+            case 'time':
+                $element->find('xpath', '//input[@type="checkbox"]')->check();
+                list($day, $month, $year, $hour, $minute) = preg_split('/[ \.\/:-]+/', $value);
+                $dateobj = DateTime::createFromFormat('!m', $month);
+                $month = $dateobj->format('F');
+                $element->find('xpath', '//select[contains(@name, "day")]')->selectOption($day);
+                $element->find('xpath', '//select[contains(@name, "month")]')->selectOption($month);
+                $element->find('xpath', '//select[contains(@name, "year")]')->selectOption($year);
+
+                $buffelement = $element->find('xpath', '//select[contains(@name, "hour")]');
+                if (is_object($buffelement)) {
+                    $buffelement->selectOption($hour);
+                }
+
+                $buffelement = $element->find('xpath', '//select[contains(@name, "minute")]');
+                if (is_object($buffelement)) {
+                    $buffelement->selectOption($minute);
+                }
+                break;
+            case 'teammemberselect':
+                $input = $element->find('xpath', '//input[contains(@id,"form_autocomplete_input")]');
+                $inputid = $input->getAttribute('id');
+                $this->execute("behat_forms::i_set_the_field_to", array($inputid, $value));
+                break;
+            case 'file':
+            case 'picture':
+                global $CFG;
+                $filemanagernode = $element->find('xpath', '//div[contains(@class, "filemanager")]');
+                $this->open_add_file_window($filemanagernode,
+                        get_string('pluginname', 'repository_upload'));
+                // Ensure all the form is ready.
+                // Opening the select repository window and selecting the upload repository.
+                $this->open_add_file_window($filemanagernode,
+                        get_string('pluginname', 'repository_upload'));
+                $this->getSession()->wait(self::TIMEOUT, self::PAGE_READY_JS);
+
+                // Form elements to interact with.
+                $file = $this->find_file('repo_upload_file');
+
+                // Attaching specified file to the node.
+                // Replace 'admin/' if it is in start of path with $CFG->admin .
+                $pos = strpos($value, 'admin/');
+                if ($pos === 0) {
+                    $value = $CFG->admin . DIRECTORY_SEPARATOR . substr($value, 6);
+                }
+                $filepath = str_replace('/', DIRECTORY_SEPARATOR, $value);
+                $fileabsolutepath = $CFG->dirroot . DIRECTORY_SEPARATOR . $filepath;
+                $file->attachFile($fileabsolutepath);
+
+                // Submit the file.
+                $submit = $this->find_button(get_string('upload', 'repository'));
+                $submit->press();
+
+                // We wait for all the JS to finish as it is performing an action.
+                $this->getSession()->wait(self::TIMEOUT, self::PAGE_READY_JS);
+                break;
+            default:
+                break;
+        }
     }
 }
