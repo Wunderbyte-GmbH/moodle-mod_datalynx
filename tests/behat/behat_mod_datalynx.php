@@ -412,7 +412,7 @@ class behat_mod_datalynx extends behat_files {
                 }
                 foreach (explode(',', $value) as $option) {
                     if ($checkbox = $element->find('xpath',
-                    '//input[@type="checkbox"][../following::*[position()=1][contains(., "' . trim($option) . '")]]')) {
+                        '//input[@type="checkbox"]/following::*[contains(text()[normalize-space()], "' . $option . '")]')) {
                         $checkbox->check();
                     }
                 }
@@ -455,12 +455,10 @@ class behat_mod_datalynx extends behat_files {
             case 'picture':
                 global $CFG;
                 $filemanagernode = $element->find('xpath', '//div[contains(@class, "filemanager")]');
-                $this->open_add_file_window($filemanagernode,
-                        get_string('pluginname', 'repository_upload'));
+                $this->open_add_file_window($filemanagernode, get_string('pluginname', 'repository_upload'));
                 // Ensure all the form is ready.
                 // Opening the select repository window and selecting the upload repository.
-                $this->open_add_file_window($filemanagernode,
-                        get_string('pluginname', 'repository_upload'));
+                $this->open_add_file_window($filemanagernode, get_string('pluginname', 'repository_upload'));
                 $this->getSession()->wait(self::TIMEOUT, self::PAGE_READY_JS);
 
                 // Form elements to interact with.
@@ -485,6 +483,140 @@ class behat_mod_datalynx extends behat_files {
                 break;
             default:
                 break;
+        }
+    }
+
+    /**
+     * Sets up entries for the given datalynx instance.
+     * Optional, but must be called after field setup.
+     *
+     * @Given /^"(?P<activityname_string>(?:[^"]|\\")*)" has following entries:$/
+     *
+     * @param string $activityname
+     * @param TableNode $table
+     */
+    public function has_following_entries($activityname, TableNode $table) {
+        global $DB;
+        $entries = $table->getHash();
+
+        $instance = $this->get_instance_by_name($activityname);
+
+        foreach ($entries as $entry) {
+            $authorid = $DB->get_field('user', 'id', array('username' => trim($entry['author'])));
+            $approved = 0;
+            $status = 0;
+            if (!empty($entry['approved'])) {
+                $approved = trim($entry['approved']);
+            }
+            if (!empty($entry['status'])) {
+                $status = trim($entry['status']);
+            }
+            $record = array('dataid' => $instance->id, 'userid' => $authorid, 'groupid' => 0,
+                'description' => '', 'visible' => 1, 'timecreated' => time(),
+                'timemodified' => time(), 'approved' => $approved, 'status' => $status
+            );
+
+            $entryid = $DB->insert_record('datalynx_entries', $record);
+
+            foreach ($entry as $fieldname => $value) {
+                $field = $DB->get_record('datalynx_fields', array('name' => $fieldname));
+                if ($field) {
+                    $this->create_content($instance->id, $entryid, $field->id, $field->type, $value);
+                }
+            }
+        }
+    }
+
+    private function create_content($dataid, $entryid, $fieldid, $type, $value) {
+        global $DB, $CFG;
+
+        $content = array('fieldid' => $fieldid, 'entryid' => $entryid, 'content' => null,
+            'content1' => null, 'content2' => null, 'content3' => null, 'content4' => null);
+
+        switch ($type) {
+            case 'text':
+            case 'number':
+            case 'textarea':
+                $content['content'] = $value;
+                break;
+            case 'url':
+                list($content['content'], $content['content1']) = explode(' ', $value, 2);
+                break;
+            case 'select':
+            case 'radiobutton':
+            $result = $DB->get_record('datalynx_fields', array('id' => $fieldid), 'param1, param3');
+            if ($result->param3 == 3) {
+                $pattern = '/, /';
+            } else {
+                $pattern = '/[\n\r]+/m';
+            }
+            $options = preg_split($pattern, $result->param1);
+                $id = array_search(trim($value), $options);
+                if ($id !== false) {
+                    $content['content'] = $id + 1;
+                } else {
+                    $content['content'] = '';
+                }
+                break;
+            case 'checkbox':
+                $result = $DB->get_record('datalynx_fields', array('id' => $fieldid), 'param1, param3');
+                if ($result->param3 == 3) {
+                    $pattern = '/, /';
+                } else {
+                    $pattern = '/[\n\r]+/m';
+                }
+                $options = preg_split($pattern, $result->param1);
+                $selectedoptions = preg_split($pattern, $value);
+                $ids = array();
+                foreach ($selectedoptions as $selectedoption) {
+                    $id = array_search($selectedoption, $options);
+                    if ($id !== false) {
+                        $ids[] = $id + 1;
+                    }
+                }
+                if (!empty($ids)) {
+                    $content['content'] = '#' . implode('#', $ids) . '#';
+                } else {
+                    $content['content'] = '';
+                }
+                break;
+            case 'duration':
+                $content['content'] = strtotime($value, 0);
+                break;
+            case 'time':
+                list($day, $month, $year, $hour, $minute) = preg_split('/[ \.\/:-]+/', $value);
+                $content['content'] = mktime($hour, $minute, 0, $month, $day, $year);
+                break;
+            case 'teammemberselect':
+                $usernames = preg_split('/,[ ]?/', $value);
+                $ids = array();
+                foreach ($usernames as $username) {
+                    $ids[] = '"' . $DB->get_field('user', 'id', array('username' => $username)) . '"';
+                }
+                $content['content'] = '[' . implode(',', $ids) . ']';
+                break;
+            case 'file':
+            case 'picture':
+                $content['content'] = 1;
+                $itemid = $DB->insert_record('datalynx_contents', $content);
+
+                $datalynx = new datalynx($dataid);
+                $path = explode(DIRECTORY_SEPARATOR, $value);
+                $filename = end($path);
+                $fileinfo = array('component' => 'mod_datalynx', 'filearea' => 'content',
+                    'itemid' => $itemid, 'contextid' => $datalynx->context->id, 'filepath' => '/',
+                    'filename' => $filename
+                );
+                $fs = get_file_storage();
+                $fs->create_file_from_pathname($fileinfo, $CFG->libdir . '/../' . $value);
+                $content['content'] = 0;
+                break;
+            default:
+                break;
+        }
+
+        if ($content['content']) {
+            $DB->insert_record('datalynx_contents', $content);
         }
     }
 }
