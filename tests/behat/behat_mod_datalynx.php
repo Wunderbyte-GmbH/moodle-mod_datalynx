@@ -544,13 +544,13 @@ class behat_mod_datalynx extends behat_files {
                 break;
             case 'select':
             case 'radiobutton':
-            $result = $DB->get_record('datalynx_fields', array('id' => $fieldid), 'param1, param3');
-            if ($result->param3 == 3) {
-                $pattern = '/, /';
-            } else {
-                $pattern = '/[\n\r]+/m';
-            }
-            $options = preg_split($pattern, $result->param1);
+                $result = $DB->get_record('datalynx_fields', array('id' => $fieldid), 'param1, param3');
+                if ($result->param3 == 3) {
+                    $pattern = '/, /';
+                } else {
+                    $pattern = '/[\n\r]+/m';
+                }
+                $options = preg_split($pattern, $result->param1);
                 $id = array_search(trim($value), $options);
                 if ($id !== false) {
                     $content['content'] = $id + 1;

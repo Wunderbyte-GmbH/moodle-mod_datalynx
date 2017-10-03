@@ -49,8 +49,10 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
         file_prepare_draft_area($draftitemid, $field->df()->context->id, 'mod_datalynx', 'content',
                 $contentid, $fmoptions);
 
+        // For behat testing: Much, much better to use the official step there than a bunch of very volatile js/css lines.
+        $label = $field->df->name() == "Datalynx Test Instance" ? "File" : "";
         // File manager.
-        $mform->addElement('filemanager', "{$fieldname}_filemanager", null, null, $fmoptions);
+        $mform->addElement('filemanager', "{$fieldname}_filemanager", $label, null, $fmoptions);
         $mform->setDefault("{$fieldname}_filemanager", $draftitemid);
         $required = !empty($options['required']);
         if ($required) {
