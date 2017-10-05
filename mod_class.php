@@ -1203,9 +1203,9 @@ class datalynx {
                 return false;
             }
             $this->views = array();
-            foreach ($views as $viewid => $view) {
+            foreach ($views as $id => $view) {
                 if ($this->is_visible_to_user($view)) {
-                    $this->views[$viewid] = $view;
+                    $this->views[$id] = $view;
                 }
             }
         }
