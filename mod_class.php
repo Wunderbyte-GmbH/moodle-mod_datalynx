@@ -376,7 +376,7 @@ class datalynx {
 
             $PAGE->requires->css(
                     new moodle_url(
-                            $CFG->wwwroot . '/mod/datalynx/field/picture/shadowbox/shadowbox.css'));
+                            $CFG->wwwroot . '/mod/datalynx/field/picture/zoomable/zoomable.css'));
 
             // If completion is on: Mark activity as viewed.
             if (!empty($params->completion)) {

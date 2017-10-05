@@ -47,8 +47,10 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
         file_prepare_draft_area($draftitemid, $field->df()->context->id, 'mod_datalynx', 'content',
                 $contentid, $fmoptions);
 
+        // For behat testing: Much, much better to use the official step there than a bunch of very volatile js/css lines.
+        $label = $field->df->name() == "Datalynx Test Instance" ? "Picture" : "";
         // File manager.
-        $mform->addElement('filemanager', "{$fieldname}_filemanager", null, null, $fmoptions);
+        $mform->addElement('filemanager', "{$fieldname}_filemanager", $label, null, $fmoptions);
         $mform->setDefault("{$fieldname}_filemanager", $draftitemid);
         $required = !empty($options['required']);
         if ($required) {
@@ -59,13 +61,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
     public function render_display_mode(stdClass $entry, array $params) {
         global $CFG, $PAGE;
 
-        $module = array('name' => 'M.datalynxfield_picture',
-                'fullpath' => '/mod/datalynx/field/picture/picture.js',
-                'requires' => array('base', 'node'));
-
-        $PAGE->requires->js(
-                new moodle_url($CFG->wwwroot . '/mod/datalynx/field/picture/shadowbox/shadowbox.js'));
-        $PAGE->requires->js_init_call('M.datalynxfield_picture.init', array($params), false, $module);
+        $PAGE->requires->js_call_amd('mod_datalynx/zoomable', 'init');
 
         $field = $this->_field;
         $fieldid = $field->id();
@@ -85,8 +81,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
         }
 
         $fs = get_file_storage();
-        $files = $fs->get_area_files($field->df()->context->id, 'mod_datalynx', 'content',
-                $contentid);
+        $files = $fs->get_area_files($field->df()->context->id, 'mod_datalynx', 'content', $contentid);
         if (!$files or !(count($files) > 1)) {
             return '';
         }
@@ -124,15 +119,13 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
     protected function display_file($file, $path, $altname, $params = null) {
         $field = $this->_field;
 
+        $imgattr = array('style' => array());
         if (isset($params['lightbox']) && $params['lightbox']) {
-            $params['thumb'] = true;
-            $params['linked'] = true;
+            $imgattr['class'] = 'zoomable';
         }
 
         if ($file->is_valid_image()) {
             $filename = $file->get_filename();
-            $imgattr = array('style' => array());
-
             $pluginfileurl = new moodle_url('/pluginfile.php');
             $imgpath = moodle_url::make_file_url($pluginfileurl, "$path/$filename");
 
@@ -144,7 +137,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
                 $thumb = html_writer::empty_tag('img', $imgattr);
 
                 if (isset($params['linked'])) {
-                    return html_writer::link($imgpath, $thumb, array('rel' => 'shadowbox'));
+                    return html_writer::link($imgpath, $thumb);
                 } else {
                     return $thumb;
                 }
