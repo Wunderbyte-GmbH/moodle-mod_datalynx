@@ -1097,11 +1097,11 @@ class datalynx_filter_manager {
                     $searchoptions = $filter->search ? $filter->search : '---';
                 }
             }
-            if (!empty($searchoptions) && is_array($searchoptions)) {
+            if (!empty($searchoptions)) {
                 $searchurlquery = '&usearch=' . self::get_search_url_query($searchfields);
             }
 
-            // P0)er page.
+            // Per page.
             $perpage = empty($filter->perpage) ? '---' : $filter->perpage;
 
             $table->data[] = array($filtername, $filterdescription, $perpage, $sortoptions,
