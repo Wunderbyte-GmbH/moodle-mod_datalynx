@@ -69,21 +69,15 @@ Feature: In datalynx filter approved and not approved entries from multiple stud
     And I press "Save changes"
     Then I should see "approvedfilter"
     And I follow "Views"
-    And I pause scenario execution
     And I follow "Notapproved view"
-    And I pause scenario execution
     And I follow "Edit this view"
-    And I pause scenario execution
     And I set the field "_filter" to "notapprovedfilter"
     And I press "Save changes"
-    And I pause scenario execution
     And I follow "Approved view"
     And I follow "Edit this view"
     And I set the field "_filter" to "approvedfilter"
-    And I pause scenario execution
     And I press "Save changes"
     Then I should see "Add a view"
-    And I pause scenario execution
     When I follow "Notapproved view"
     Then I should see "not1"
     And I should see "not2"
