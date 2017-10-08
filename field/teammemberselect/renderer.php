@@ -153,8 +153,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         $classname = "teammemberselect_{$fieldid}_{$entryid}";
         $required = !empty($options['required']);
 
-        $selected = !empty($entry->{"c{$fieldid}_content"}) ? json_decode(
-                $entry->{"c{$fieldid}_content"}, true) : array();
+        $selected = !empty($entry->{"c{$fieldid}_content"}) ? json_decode($entry->{"c{$fieldid}_content"}, true) : array();
         $authorid = isset($entry->userid) ? $entry->userid : $USER->id;
         $menu = $field->options_menu(true, false, $field->usercanaddself ? 0 : $authorid);
 
@@ -201,6 +200,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         $elements = array();
         $elements[] = $mform->createElement('autocomplete', $fieldname, null, $menu);
         $mform->setType($fieldname, PARAM_INT);
+        $mform->setDefault($fieldname, $value);
         $mform->disabledIf($fieldname, "searchoperator{$i}", 'eq', '');
         $mform->disabledIf($fieldname, "searchoperator{$i}", 'eq', 'USER');
 

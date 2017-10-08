@@ -45,7 +45,6 @@ Feature: In a datalynx instance create, update, and delete entries
     And I am on "Course 1" course homepage
     And I follow "Datalynx Test Instance"
     And I follow "Add a new entry"
-    And I pause scenario execution
     And I fill entry form with:
       | field    | value                |
       | Text     | Blah, blah, blah!    |
@@ -69,7 +68,6 @@ Feature: In a datalynx instance create, update, and delete entries
       | Select   | Option Y                        |
       | Checkbox | Option 3                        |
       | TMS      | Student 2                       |
-    And I pause scenario execution
     And I press "Save changes"
     And I press "Continue"
     When I select "first,second" entry

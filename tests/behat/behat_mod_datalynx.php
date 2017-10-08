@@ -619,4 +619,73 @@ class behat_mod_datalynx extends behat_files {
             $DB->insert_record('datalynx_contents', $content);
         }
     }
+
+    /**
+     * @Given /^I refresh the Entry template of "([^"]*)"$/
+     */
+    public function irefreshtheentrytemplateof($arg1) {
+        $steps = array(new Given('I click "Edit" button of "' . $arg1 . '" item'),
+                new Given('I follow "Entry template"'),
+                new Given('I click inside "id_eparam2_editoreditable"'),
+                new Given('I set the field "eparam2_editor_field_tag_menu" to ""'),
+                new Given('I press "Save changes"'));
+        return $steps;
+    }
+
+    /**
+     * Clicks a control button of a field in the list
+     *
+     * @Given /^I click "(?P<button_string>(?:[^"]|\\")*)" button of "(?P<fieldname_string>(?:[^"]|\\")*)" item$/
+     *
+     * @param string $button
+     * @param string $fieldname
+     */
+    public function i_click_button_of_item($button, $fieldname) {
+        $session = $this->getSession(); // Get the mink session.
+        $element = $session->getPage()->find('xpath',
+                '//a[text()="' . $this->escape($fieldname) . '"]/ancestor::tr//a/i[@title="' .
+                $this->escape($button) . '"]/ancestor::a');
+        $element->click();
+    }
+
+    /**
+     * @Given /^I click inside "([^"]*)"$/
+     */
+    public function iclickon($arg1) {
+        $session = $this->getSession();
+        $element = $session->getPage()->findById($arg1);
+        $element->click();
+    }
+    /**
+     * @Given /^"([^"]*)" has following behaviors:$/
+     */
+    public function hasfollowingbehaviors($arg1, TableNode $table) {
+        $behaviors = $table->getHash();
+
+        $instance = $this->get_instance_by_name($arg1);
+
+        foreach ($behaviors as $behavior) {
+            $behavior['dataid'] = $instance->id;
+            $behavior['id'] = $this->create_behavior($behavior);
+        }
+    }
+
+    private function create_behavior($record = null) {
+        global $DB;
+
+        $record = (object) (array) $record;
+
+        $defaults = array('name' => 'Behavior', 'description' => '', 'visibleto' => '',
+                'editableby' => '', 'required' => 0);
+
+        foreach ($defaults as $name => $value) {
+            if (!isset($record->{$name})) {
+                $record->{$name} = $value;
+            }
+        }
+
+        $id = $DB->insert_record('datalynx_behaviors', $record);
+
+        return $id;
+    }
 }

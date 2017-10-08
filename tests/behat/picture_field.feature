@@ -33,5 +33,4 @@ Feature: In a datalynx instance create and update entries with fieldtype picture
     And I upload "mod/datalynx/tests/fixtures/picture.jpg" file to "Picture" filemanager
     And I press "Save changes"
     And I press "Continue"
-    And I pause scenario execution
     Then I should see "Add a new entry"

@@ -55,10 +55,8 @@ Feature: In a datalynx multiedit entries
       | entry | field | value               |
       | 1     | Text  | This is the first!  |
       | 2     | Text  | This is the second! |
-    And I pause scenario execution
     And I press "Save changes"
     And I press "Continue"
-    And I pause scenario execution
     Then I should see "This is the first!"
     And I should see "This is the second!"
     And I should see "Option 2"
