@@ -1209,7 +1209,7 @@ class datalynx {
                 }
             }
         }
-        if ($viewid) {
+        if ($viewid && isset($this->views[$viewid])) { // Only if the required view is visible to the user.
             return $this->views[$viewid];
         } else {
             return $this->views;
