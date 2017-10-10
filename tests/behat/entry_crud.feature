@@ -53,7 +53,7 @@ Feature: In a datalynx instance create, update, and delete entries
       | Time     | 11.10.1986 17:45     |
       | Radio    | Option A             |
       | Select   | Option X             |
-      | Checkbox | Option 2             |
+      | Checkbox | Option 1             |
       | TMS      | Student 4            |
     And I press "Save changes"
     And I press "Continue"
@@ -95,7 +95,7 @@ Feature: In a datalynx instance create, update, and delete entries
       | Time     | 11.10.1986 17:45     |
       | Radio    | Option A             |
       | Select   | Option X             |
-      | Checkbox | Option 2             |
+      | Checkbox | Option 1             |
       | TMS      | Student 4            |
     And I press "Save changes"
     And I press "Continue"

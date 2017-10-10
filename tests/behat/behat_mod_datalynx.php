@@ -328,9 +328,7 @@ class behat_mod_datalynx extends behat_files {
         }
 
         foreach ($entries as $number => $entry) {
-            $entryelement = $session->getPage()->find('xpath',
-                    '//div[@class="entriesview"]/table/tbody/tr[' . $number . ']');
-
+            $entryelement = $session->getPage()->find('xpath', '//div[@class="entriesview"]/table/tbody/tr[' . $number . ']');
             foreach ($entry as $name => $value) {
                 $fieldelement = $entryelement->find('xpath', '//div[@data-field-name="' . $name . '"]');
                 $type = $fieldelement->getAttribute('data-field-type');
@@ -413,7 +411,7 @@ class behat_mod_datalynx extends behat_files {
                 foreach (explode(',', $value) as $option) {
                     if ($checkbox = $element->find('xpath',
                         '//input[@type="checkbox"]/following::*[contains(text()[normalize-space()], "' . $option . '")]')) {
-                        $checkbox->check();
+                        $checkbox->click();
                     }
                 }
                 break;
