@@ -43,7 +43,10 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
                 FROM mdl_datalynx d
                 INNER JOIN mdl_course_modules cm ON d.id = cm.instance
                 INNER JOIN mdl_modules m ON m.id = cm.module
-                WHERE m.name = 'datalynx' AND cm.deletioninprogress = 0";
+                WHERE m.name = 'datalynx'";
+        if ($CFG->branch >= 32) {
+            $sql .= " AND cm.deletioninprogress = 0";
+        };
         if ($datalynxs = $DB->get_records_sql($sql)) {
             foreach ($datalynxs as $dfid => $datalynx) {
                 if ($dfid != $this->_df->id()) {
