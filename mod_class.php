@@ -1255,11 +1255,11 @@ class datalynx {
             if (!$viewid = $this->data->defaultview and isset($views[$viewid])) {
                 return false;
             }
+        } else {
+            if ($view = $this->get_view_records(false, '', $viewid)) {
+                return $this->get_view($view, true);
+            }
         }
-        if ($view = $this->get_view_records(false, '', $viewid)) {
-            return $this->get_view($view, true);
-        }
-
         return false;
     }
 
@@ -1271,11 +1271,11 @@ class datalynx {
             if (!$viewid = $this->data->defaultview and isset($views[$viewid])) {
                 return false;
             }
+        } else {
+            if ($view = $this->get_view_records(false, '', $viewid)) {
+                return $this->get_view($view);
+            }
         }
-        if ($view = $this->get_view_records(false, '', $viewid)) {
-            return $this->get_view($view);
-        }
-
         return false;
     }
 
