@@ -40,9 +40,9 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
         // Get all Datalynxs where user has managetemplate capability.
         // TODO there may be too many.
         $sql = "SELECT DISTINCT d.*
-                FROM mdl_datalynx d
-                INNER JOIN mdl_course_modules cm ON d.id = cm.instance
-                INNER JOIN mdl_modules m ON m.id = cm.module
+                FROM {datalynx} d
+                INNER JOIN {course_modules} cm ON d.id = cm.instance
+                INNER JOIN {modules} m ON m.id = cm.module
                 WHERE m.name = 'datalynx'";
         if ($CFG->branch >= 32) {
             $sql .= " AND cm.deletioninprogress = 0";
