@@ -1195,25 +1195,21 @@ class datalynx {
      * @param string $sort SQL ORDER BY clause
      * @return array an array of datalynx_views entry objects
      */
-    public function get_view_records($forceget = false, $sort = '', $viewid = 0) {
+    public function get_view_records($forceget = false, $sort = '') {
         global $DB;
-
         if (empty($this->views) or $forceget) {
+            $views = array();
             if (!$views = $DB->get_records('datalynx_views', array('dataid' => $this->id()), $sort)) {
                 return false;
             }
             $this->views = array();
-            foreach ($views as $id => $view) {
+            foreach ($views as $viewid => $view) {
                 if ($this->is_visible_to_user($view)) {
-                    $this->views[$id] = $view;
+                    $this->views[$viewid] = $view;
                 }
             }
         }
-        if ($viewid && isset($this->views[$viewid])) { // Only if the required view is visible to the user.
-            return $this->views[$viewid];
-        } else {
-            return $this->views;
-        }
+        return $this->views;
     }
 
     /**
@@ -1248,33 +1244,42 @@ class datalynx {
     }
 
     /**
-     * This function creates an instance of the particular subtemplate class
+     * TODO there is no need to instantiate all views!!!
+     * this function creates an instance of the particular subtemplate class *
      */
     public function get_current_view_from_id($viewid = 0) {
-        if (!$viewid) {
-            if (!$viewid = $this->data->defaultview and isset($views[$viewid])) {
-                return false;
+        if ($views = $this->get_view_records()) {
+            if ($viewid and isset($views[$viewid])) {
+                $view = $views[$viewid];
+                // If can't find the requested, try the default.
+            } else {
+                if ($viewid = $this->data->defaultview and isset($views[$viewid])) {
+                    $view = $views[$viewid];
+                } else {
+                    return false;
+                }
             }
-        } else {
-            if ($view = $this->get_view_records(false, '', $viewid)) {
-                return $this->get_view($view, true);
-            }
+            return $this->get_view($view, true);
         }
         return false;
     }
-
     /**
-     * This function creates an instance of the particular subtemplate class
+     * TODO there is no need to instantiate all viewds!!!
+     * this function creates an instance of the particular subtemplate class *
      */
     public function get_view_from_id($viewid = 0) {
-        if (!$viewid) {
-            if (!$viewid = $this->data->defaultview and isset($views[$viewid])) {
-                return false;
+        if ($views = $this->get_view_records()) {
+            if ($viewid and isset($views[$viewid])) {
+                $view = $views[$viewid];
+                // If can't find the requested, try the default.
+            } else {
+                if ($viewid = $this->data->defaultview and isset($views[$viewid])) {
+                    $view = $views[$viewid];
+                } else {
+                    return false;
+                }
             }
-        } else {
-            if ($view = $this->get_view_records(false, '', $viewid)) {
-                return $this->get_view($view);
-            }
+            return $this->get_view($view);
         }
         return false;
     }
