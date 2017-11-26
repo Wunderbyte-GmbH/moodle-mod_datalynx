@@ -1068,8 +1068,9 @@ function datalynx_rating_validate($params) {
     $entry = $DB->get_record('datalynx_entries', array('id' => $params['itemid']), '*', MUST_EXIST);
 
     // Check the item we are rating was created in the assessable time window.
-    if (!empty($data->assesstimestart && !empty($data->assesstimefinish))) {
-        if ($entry->timecreated < $data->assesstimestart || $entry->timecreated > $data->assesstimefinish) {
+    if (!empty($data->assesstimestart) && !empty($data->assesstimefinish)) {
+        if ($entry->timecreated < $data->assesstimestart ||
+                 $entry->timecreated > $data->assesstimefinish) {
             throw new rating_exception('notavailable');
         }
     }
