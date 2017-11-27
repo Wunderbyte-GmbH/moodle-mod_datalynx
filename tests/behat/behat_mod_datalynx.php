@@ -62,7 +62,7 @@ class behat_mod_datalynx extends behat_files {
 
     /**
      * Sets up filters for the given datalynx instance.
-     * Optional, but must be used after field setup.
+     * Optional, but must be used after fields setup.
      *
      * @Given /^"(?P<activityname_string>(?:[^"]|\\")*)" has following filters:$/
      *
@@ -80,8 +80,8 @@ class behat_mod_datalynx extends behat_files {
     }
 
     /**
-     * Sets up filters for the given datalynx instance.
-     * Optional, but must be called after field and filter setup.
+     * Sets up views for the given datalynx instance.
+     * Optional, but must be called after fields and fitlers setup.
      *
      * @Given /^"(?P<activityname_string>(?:[^"]|\\")*)" has following views:$/
      *
@@ -211,6 +211,36 @@ class behat_mod_datalynx extends behat_files {
         }
 
         $DB->insert_record('datalynx_filters', $record);
+    }
+
+    /**
+     * Creates a filter for a specified field with specified values.
+     *
+     * @Given /^"(?P<activityname_string>(?:[^"]|\\")*)" has a filter with following values:$/
+     *
+     * @param string $activityname
+     * @param TableNode $table
+     */
+    public function has_a_filter_with_values($activityname, TableNode $table) {
+        global $DB;
+
+        $entries = $table->getHash();
+        foreach ($entries as $entry) {
+            $filtername = $entry['filtername'];
+            $fieldname = $entry['fieldname'];
+            $customsearch = $entry['customsearch'];
+        }
+        $fieldid = $DB->get_field('datalynx_fields', 'id', array('name' => $fieldname));
+        $activityid = $DB->get_field('datalynx', 'id', array('name' => $activityname));
+
+        $customsearch = str_replace("xxxxxx", $fieldid, $customsearch);
+        $record = array('dataid' => $activityid, 'name' => $filtername,
+                'description' => 'desc', 'visible' => 1, 'perpage' => '10',
+                'selection' => '0', 'customsearch' => $customsearch
+        );
+
+        $filterid = $DB->insert_record('datalynx_filters', $record);
+
     }
 
     private function map_view_names_for_redirect($views, $names) {
