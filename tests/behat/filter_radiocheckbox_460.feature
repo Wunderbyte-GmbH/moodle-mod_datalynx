@@ -21,10 +21,12 @@ It should show you all entries where A is not chosen
       | radiobutton | RadioF  | A, B   | 3      |
       | checkbox    | CheckF  | A, B   | 3      |
       | text        | RecordF |        |        |
-    And "Datalynx Test Instance" has following filters:
-      | name        | visible | customsearch                                                                                         |
-      | RadioFilter | 1       | a:1:{i:195000;a:1:{s:3:"AND";a:1:{i:0;a:3:{i:0;s:3:"NOT";i:1;s:6:"ANY_OF";i:2;a:1:{i:0;s:1:"1";}}}}} |
-      | CheckFilter | 1       | a:1:{i:195001;a:1:{s:3:"AND";a:1:{i:0;a:3:{i:0;s:3:"NOT";i:1;s:6:"ANY_OF";i:2;a:1:{i:0;s:1:"1";}}}}} |
+    And "Datalynx Test Instance" has a filter with following values:
+      | filtername        | fieldname | customsearch                                                                                         |
+      | RadioFilter       | RadioF    | a:1:{i:xxxxxx;a:1:{s:3:"AND";a:1:{i:0;a:3:{i:0;s:3:"NOT";i:1;s:6:"ANY_OF";i:2;a:1:{i:0;s:1:"1";}}}}} |
+    And "Datalynx Test Instance" has a filter with following values:
+      | filtername        | fieldname | customsearch                                                                                         |
+      | CheckFilter       | CheckF    | a:1:{i:xxxxxx;a:1:{s:3:"AND";a:1:{i:0;a:3:{i:0;s:3:"NOT";i:1;s:6:"ANY_OF";i:2;a:1:{i:0;s:1:"1";}}}}} |
     And "Datalynx Test Instance" has following views:
       | type | name        | status  | redirect    | filter      |
       | grid | DefaultView | default | DefaultView |             |

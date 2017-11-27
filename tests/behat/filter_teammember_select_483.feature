@@ -24,9 +24,9 @@ Feature:Team member should only see their entry
       | type             | name   | visible | edits | param1 | param2 | param3 | param4 |
       | teammemberselect | lehrer | 2       | -1    | 3      | [2]    | 1      | 4      |
       | text             | entry  | 2       | -1    |        | [2]    |        |        |
-    And "Datalynx Test Instance" has following filters:
-      | name              | visible | customsearch                                                                          |
-      | lehrer_teamselect | 1       | a:1:{i:195000;a:1:{s:3:"AND";a:1:{i:0;a:3:{i:0;s:0:"";i:1;s:4:"USER";i:2;s:1:"2";}}}} |
+    And "Datalynx Test Instance" has a filter with following values:
+      | filtername        | fieldname | customsearch                                                                          |
+      | lehrer_teamselect | lehrer    | a:1:{i:xxxxxx;a:1:{s:3:"AND";a:1:{i:0;a:3:{i:0;s:0:"";i:1;s:4:"USER";i:2;s:1:"2";}}}} |
     And "Datalynx Test Instance" has following views:
       | type | name                | status  | redirect     | filter            | param2                                                                                                |
       | grid | Default view        | default | Default view |                   | <div ><table><tbody><tr><td>Hi.</td></tr><tr><td>##edit##  ##delete##</td></tr></tbody></table></div> |
