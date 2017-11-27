@@ -39,7 +39,7 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
      * @return array an array of replacements (either HTML for browse mode or callback info for the
      *         edit mode)
      */
-    public function replacements(array $tags = array(), $entry = null, array $options = array()) {
+    public function replacements(array $tags = null, $entry = null, array $options = null) {
         $edit = !empty($options['edit']) ? $options['edit'] : false;
 
         $replacements = array();

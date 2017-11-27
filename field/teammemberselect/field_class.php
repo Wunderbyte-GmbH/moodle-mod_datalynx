@@ -361,7 +361,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         }
     }
 
-    protected function format_content($entry, array $values = array()) {
+    protected function format_content($entry, array $values = null) {
         $fieldid = $this->field->id;
         $oldcontents = array();
         $contents = array();
