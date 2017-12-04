@@ -869,7 +869,7 @@ function xmldb_datalynx_upgrade($oldversion) {
         // Datalynx savepoint reached..
         upgrade_mod_savepoint(true, 2017080600, 'datalynx');
     }
-    if ($oldversion < 2017081500) {
+    if ($oldversion < 2017090803) {
         // Add customfilter table for predefined custom filter forms.
         $table = new xmldb_table('datalynx_customfilters');
         if (!$dbman->table_exists($table)) {
@@ -878,7 +878,7 @@ function xmldb_datalynx_upgrade($oldversion) {
         }
 
         // Datalynx savepoint reached.
-        upgrade_mod_savepoint(true, 2017081500, 'datalynx');
+        upgrade_mod_savepoint(true, 2017090803, 'datalynx');
     }
     return true;
 }

@@ -424,14 +424,21 @@ class mod_datalynx_customized_filter_form extends mod_datalynx_filter_base_form 
             throw new moodle_exception('nocustomfilter', 'datalynx');
         }
 
-        $customfilterfields = explode(",", $customfilter->fieldlist);
+        $customfilterfields = array();
+        if ($customfilter->fieldlist) {
+            $customfilterfields = json_decode($customfilter->fieldlist);
+        }
         $fields = $view->get_view_fields();
         $fieldoptions = array();
         foreach ($fields as $fieldid => $field) {
             $select = false;
-            if (in_array($field->field->name, $customfilterfields)) {
-                $select = true;
-            } else {
+            foreach ($customfilterfields as $fname => $fid) {
+                if ($field->field->id == $fid) {
+                    $select = true;
+                    break;
+                }
+            }
+            if ($select == false) {
                 switch ($field->field->name) {
                     case (get_string("approved", "datalynx")):
                         if ($customfilter->approve) {

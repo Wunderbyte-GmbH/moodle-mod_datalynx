@@ -382,7 +382,6 @@ class mod_datalynx_customfilter_manager {
         $stredit = get_string('edit');
         $strdelete = get_string('delete');
         $strduplicate = get_string('duplicate');
-        $strchoose = get_string('choose');
 
         $table = new html_table();
         $table->head = array($strfilters, $strdescription, $strfulltextsearch, $strfieldlist,
@@ -399,7 +398,18 @@ class mod_datalynx_customfilter_manager {
                     $linkparams + array('fedit' => $filterid, 'fid' => $filterid)), $filter->name);
             $filterdescription = shorten_text($filter->description, 30);
             $fulltextsearch = $filter->fulltextsearch ? $yesstr : $nostr;
-            $fieldlist = $filter->fieldlist ? $filter->fieldlist : "";
+            if ($filter->fieldlist) {
+                $fieldlist = "";
+                $connector = "";
+                $fieldlistdecode = json_decode($filter->fieldlist);
+                foreach($fieldlistdecode as $fname => $fid) {
+                    $fieldlist .= $connector . $fname;
+                    $connector = ", ";
+                }
+            } else {
+                $fieldlist = $nostr;
+            }
+
             if ($filter->visible) {
                 $visibleicon = $OUTPUT->pix_icon('t/hide', $strhide);
             } else {
@@ -418,7 +428,7 @@ class mod_datalynx_customfilter_manager {
                 new moodle_url($filterbaseurl, $linkparams + array('delete' => $filterid)),
                 $OUTPUT->pix_icon('t/delete', $strdelete));
             $table->data[] = array($filtername, $filterdescription, $fulltextsearch, $fieldlist,
-                $visibleurl, /*$defaultfilter,*/ $filteredit, $filterduplicate, $filterdelete
+                $visibleurl, $filteredit, $filterduplicate, $filterdelete
             );
         }
 

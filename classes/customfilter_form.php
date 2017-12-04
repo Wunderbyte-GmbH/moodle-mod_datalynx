@@ -50,12 +50,6 @@ class mod_datalynx_customfilter_form extends mod_datalynx_customfilter_base_form
 
         $name = empty($customfilter->name) ? get_string('filternew', 'datalynx') : $customfilter->name;
 
-        $fields = $this->_getfields($this->_df);
-        $fieldoptions = array(0 => get_string('choose'));
-        foreach ($fields as $fieldid => $field) {
-            $fieldoptions[$field->name()] = $field->name();
-        }
-
         $mform = &$this->_form;
 
         $mform->addElement('text', 'name', get_string('name'));
@@ -94,14 +88,18 @@ class mod_datalynx_customfilter_form extends mod_datalynx_customfilter_base_form
 
         $fieldlist = array();
         if ($customfilter->fieldlist) {
-            $fieldlist = explode(",", $customfilter->fieldlist);
+            $fieldlist = json_decode($customfilter->fieldlist);
         }
+        $fields = $this->_getfields($this->_df);
         foreach ($fields as $fieldid => $field) {
             $mform->addElement('advcheckbox', 'fieldlist[' . $field->field->name . ']',
-                $field->field->name . ' (' .  $field->type . ')', '', '', $field->field->name);
+                $field->field->name . ' (' . $field->type . ')', '', '', $field->field->id);
             $mform->setType('fieldlist[' . $field->field->name . ']', PARAM_TEXT);
-            if (in_array($field->field->name, $fieldlist)) {
-                $mform->setDefault('fieldlist[' . $field->field->name . ']', $field->field->name);
+            foreach ($fieldlist as $fname => $fid) {
+                if ($field->field->id == $fid) {
+                    $mform->setDefault('fieldlist[' . $field->field->name . ']', $field->field->id);
+                    break;
+                }
             }
         }
 
@@ -135,18 +133,7 @@ class mod_datalynx_customfilter_form extends mod_datalynx_customfilter_base_form
 
         if ($data = parent::get_data()) {
             if (!empty($data->fieldlist)) {
-                $fieldlist = "";
-                $sep = "";
-                foreach ($data->fieldlist as $field) {
-                    if ($field) {
-                        $fieldlist .= $sep . $field;
-                        $sep = ",";
-                    }
-                }
-                $data->fieldlist = $fieldlist;
-                if (empty($data->fieldlist)) {
-                    $data->fieldlist = null;
-                }
+                $data->fieldlist = json_encode($data->fieldlist);
             } else {
                 $data->fieldlist = null;
             }
