@@ -67,7 +67,11 @@ class datalynxview_pdf extends datalynxview_base {
         parent::__construct($df, $view);
 
         if (!empty($this->view->param1)) {
-            $settings = unserialize(base64_decode($this->view->param1));
+            if ($decoded = base64_decode($this->view->param1, true)) {
+                $settings = unserialize(base64_decode($this->view->param1));
+            } else {
+                $settings = unserialize($this->view->param1);
+            }
         } else {
             $settings = new stdClass();
         }
