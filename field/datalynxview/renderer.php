@@ -119,7 +119,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         $field = $this->_field;
 
         $refdatalynx = $field->refdatalynx;
-        $refview = $field->df->get_view_from_id($field->refview);
+        $refview = $refdatalynx->get_view_from_id($field->refview);
 
         // Options for setting the filter.
         $foptions = array();
@@ -127,7 +127,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         // Search filter by entry author or group.
         $foptions = $this->get_filter_by_options($foptions, $entry);
 
-        if (!isset($foptions['eids'])) {
+        if (!isset($foptions['eids']) AND !isset($foptions['users'])) {
             return "";
         }
 
