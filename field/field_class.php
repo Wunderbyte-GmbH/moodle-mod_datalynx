@@ -759,11 +759,7 @@ abstract class datalynxfield_option extends datalynxfield_base {
                 if ($addnoselection) {
                     $this->_options[0] = '...';
                 }
-                if (isset($this->separators) && is_numeric($this->field->param3) && $this->field->param3 >= 0 && $this->field->param3 <= 3) {
-                    $rawoptions = explode(html_entity_decode($this->separators[$this->field->param3]["chr"]), $this->field->param1);
-                } else {
-                    $rawoptions = explode("\n", $this->field->param1);
-                }
+                $rawoptions = explode("\n", $this->field->param1);
                 foreach ($rawoptions as $key => $option) {
                     $option = trim($option);
                     if ($option != '') {
