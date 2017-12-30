@@ -1246,40 +1246,15 @@ class datalynx_filter_manager {
 
     /**
      */
-    public function get_customfilter_form($filter, $view, $customfilter = false) {
+    public function get_customfilter_frontend_form($filter, $view, $customfilter = false) {
         global $CFG;
 
         require_once ("$CFG->dirroot/mod/datalynx/filter/filter_form.php");
         $cfilter = isset($customfilter->id) ? $customfilter->id : "1";
         $formurl = new moodle_url($view->get_baseurl(), array('filter' => self::USER_FILTER_SET, 'cfilter' => $cfilter));
-        $mform = new mod_datalynx_customized_filter_form($this->_df, $filter, $formurl,
+        $mform = new mod_datalynx_customfilter_frontend_form($this->_df, $filter, $formurl,
                 array('view' => $view),'post','', null, true, $customfilter);
         return $mform;
-    }
-
-
-    // CUSTOM FILTER FORM DATA
-
-    /**
-     */
-    public function get_customfilter_data() {
-        global $DB;
-
-        // TODO:
-        // Get fields of this customfilter.
-        // Get the values of these fields in $POST.
-        // Return the values.
-
-        if (isset($_POST["_qf__mod_datalynx_customized_filter_form"])) {
-            $cfid = $_POST["_qf__mod_datalynx_customized_filter_form"];
-            if (!$customfilter_fields = $DB->get_record('datalynx_customfilters', array('id' => $cfid))) {
-                throw new moodle_exception('invaliddatalynx_customfilter', 'datalynx', null, null,
-                        "Datalynxcustomfilter id: $cfid");
-            } else {
-                // Process field by field and create new form or just a filter...?
-                return $customfilter_form;
-            }
-        }
     }
 
     /**
@@ -1335,7 +1310,7 @@ class datalynx_filter_manager {
             global $DB;
             $filter = new datalynx_filter((object) array('id' => $filterid, 'dataid' => $dfid));
             $customfilter = $DB->get_record('datalynx_customfilters', array('id' => $customfilter));
-            $filterform = $this->get_customfilter_form($filter, $view, $customfilter);
+            $filterform = $this->get_customfilter_frontend_form($filter, $view, $customfilter);
             // return to form (on reload button press)
             if ($filterform->no_submit_button_pressed()) {
                 return $filter;

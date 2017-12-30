@@ -67,10 +67,9 @@ class mod_datalynx_customfilter_manager {
         if ($filterid < 0) {
             $view = !empty($options['view']) ? $options['view'] : null;
             $viewid = $view ? $view->id() : 0;
-            $advanced = !empty($options['advanced']);
 
-            if (($filterid == self::USER_FILTER_SET or $advanced) and $view and $view->is_active()) {
-                $filter = $this->set_user_filter($filterid, $view, $advanced);
+            if ($filterid == self::USER_FILTER_SET and $view and $view->is_active()) {
+                $filter = $this->set_user_filter($filterid, $view);
                 return new mod_datalynx_customfilter($filter);
             }
 
@@ -204,7 +203,7 @@ class mod_datalynx_customfilter_manager {
                 switch ($action) {
                     case 'update':
                         $filter = reset($filters);
-                        $mform = $this->get_customfilter_form($filter);
+                        $mform = $this->get_customfilter_backend_form($filter);
 
                         if ($mform->is_cancelled()) {
                             break;
@@ -212,7 +211,7 @@ class mod_datalynx_customfilter_manager {
 
                         $formdata = $mform->get_submitted_data();
                         $filter = $this->get_filter_from_form($filter, $formdata);
-                        $filterform = $this->get_customfilter_form($filter);
+                        $filterform = $this->get_customfilter_backend_form($filter);
 
                         if ($filterform->no_submit_button_pressed()) {
                             $this->display_filter_form($filterform, $filter);
@@ -322,11 +321,11 @@ class mod_datalynx_customfilter_manager {
 
     /**
      */
-    public function get_customfilter_form($filter) {
+    public function get_customfilter_backend_form($filter) {
 
         $formurl = new moodle_url('/mod/datalynx/customfilter/index.php',
             array('d' => $this->_df->id(), 'fid' => $filter->id, 'update' => 1));
-        $mform = new mod_datalynx_customfilter_form($this->_df, $filter, $formurl);
+        $mform = new mod_datalynx_customfilter_backend_form($this->_df, $filter, $formurl);
         return $mform;
     }
 
@@ -467,42 +466,22 @@ class mod_datalynx_customfilter_manager {
 
     /**
      */
-    public function set_user_filter($filterid, $view, $advanced = false) {
+    public function set_user_filter($filterid, $view) {
         $df = $this->_df;
         $dfid = $df->id();
         $viewid = $view->id();
 
-        if ($advanced) {
-            $filter = new mod_datalynx_customfilter((object) array('id' => $filterid, 'dataid' => $dfid));
-            $mform = $this->get_customfilter_form($filter, $view);
-
-            $formdata = $mform->get_submitted_data();
-            $filter = $this->get_filter_from_form($filter, $formdata);
-            $filter->id = $filterid;
-            $filterform = $this->get_customfilter_form($filter, $view);
-
-            if ($filterform->no_submit_button_pressed()) {
-                return $filter;
-
-            } else if ($formdata = $filterform->get_data()) {
-                $filter = $this->get_filter_from_form($filter, $formdata, true);
-                $modifycurrent = !empty($formdata->savebutton);
-            }
+        if($filterid >= $this->USER_FILTER_ID_START ) {
+            $filter = $this->get_filter_from_userpreferences($filterid);
+        } else {
+            $filter = $this->get_filter_from_url(null, true);
         }
-
-        if (!$advanced) {
-            if($filterid >= $this->USER_FILTER_ID_START ) {
-                $filter = $this->get_filter_from_userpreferences($filterid);
-            } else {
-                $filter = $this->get_filter_from_url(null, true);
-            }
-            if(!$filter) {
-                return null;
-            }
+        if(!$filter) {
+            return null;
         }
 
         if ($userfilters = $this->get_user_filters_menu($viewid)) {
-            if (empty($modifycurrent) or empty($userfilters[$filterid])) {
+            if (empty($userfilters[$filterid])) {
                 $filterid = key($userfilters) - 1;
             }
         } else {

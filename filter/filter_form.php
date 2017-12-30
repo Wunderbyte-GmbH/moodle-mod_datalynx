@@ -220,9 +220,9 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
 
         // List user fields.
         $count = 1;
-        foreach ($fieldoptions as $fieldid => $field) {
+        foreach ($fieldoptions as $fieldid => $fieldname) {
 
-            $label = is_object($field) ? $field->field->name : $field;
+            $label = $fieldname;
 
             $value = null;
 
@@ -410,9 +410,10 @@ class mod_datalynx_advanced_filter_form extends mod_datalynx_filter_base_form {
 }
 
 /**
+ * Contains class customized_filter_form used to display the customfilter options in FRONTEND ("Browse")
  *
  */
-class mod_datalynx_customized_filter_form extends mod_datalynx_filter_base_form {
+class mod_datalynx_customfilter_frontend_form extends mod_datalynx_filter_base_form {
 
     /*
      * This by the admin predefined customfilter form is presented to the user

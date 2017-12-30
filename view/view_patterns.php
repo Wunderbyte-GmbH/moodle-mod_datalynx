@@ -1037,7 +1037,7 @@ class datalynxview_patterns {
         $where = array('name' => $customfiltername);
         $customfilter = $DB->get_record('datalynx_customfilters', $where);
         $fm = $df->get_filter_manager();
-        $filterform = $fm->get_customfilter_form($filter, $view, $customfilter);
+        $filterform = $fm->get_customfilter_frontend_form($filter, $view, $customfilter);
 
         if ($return) {
             return html_writer::tag('div', $filterform->html(), array('class' => 'mdl-left'));

@@ -17,7 +17,7 @@
 
 /**
  *
- * Contains class mod_customfilter_form
+ * Contains class mod_customfilter_form used at the BACKEND ("Manage") to create or edit a customfilter
  *
  * @package mod
  * @subpackage datalynx
@@ -26,7 +26,7 @@
  */
 
 
-class mod_datalynx_customfilter_form extends mod_datalynx_customfilter_base_form {
+class mod_datalynx_customfilter_backend_form extends mod_datalynx_customfilter_base_form {
 
     /**
      *
@@ -83,8 +83,7 @@ class mod_datalynx_customfilter_form extends mod_datalynx_customfilter_base_form
         $mform->setType('status', PARAM_INT);
         $mform->setDefault('status', $customfilter->status);
 
-        $mform->addElement('header', 'fieldlistheader',
-            get_string('userfields', 'datalynx'));
+        $mform->addElement('header', 'fieldlistheader', get_string('userfields', 'datalynx'));
 
         $fieldlist = array();
         if ($customfilter->fieldlist) {

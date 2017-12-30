@@ -303,6 +303,7 @@ class datalynx {
      * @param string $page current page
      * @param array $params
      * @throws moodle_exception
+     * @return string output
      */
     public function set_page($page = 'view', $params = null, $skiplogincheck = false) {
         global $CFG, $PAGE, $USER;

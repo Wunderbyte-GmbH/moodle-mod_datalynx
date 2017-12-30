@@ -65,11 +65,11 @@ if ($urlparams->update and confirm_sesskey()) {
 // Edit a new filter.
 if ($urlparams->new and confirm_sesskey()) {
     $filter = $fm->get_filter_from_id($fm::BLANK_FILTER);
-    $filterform = $fm->get_customfilter_form($filter);
+    $filterform = $fm->get_customfilter_backend_form($filter);
     $fm->display_filter_form($filterform, $filter, $urlparams);
 } else if ($urlparams->fedit and confirm_sesskey()) { // Or edit existing filter.
     $filter = $fm->get_filter_from_id($urlparams->fid);
-    $filterform = $fm->get_customfilter_form($filter);
+    $filterform = $fm->get_customfilter_backend_form($filter);
     $fm->display_filter_form($filterform, $filter, $urlparams);
 } else { // Or display the filters list.
     if (!$filters = $fm->get_filters(null, false, true)) { // Any notifications?
