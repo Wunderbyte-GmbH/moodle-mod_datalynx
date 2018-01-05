@@ -530,19 +530,20 @@ class datalynx_rule_manager {
         $notename = get_string("messageprovider:datalynx_$event", 'datalynx');
         $subject = "$sitename -> $data->coursename -> $strdatalynx $data->datalynxname:  $notename";
 
-        // Prepare message object.
-        $message = new \core\message\message();
-        $message->component = 'mod_datalynx';
-        $message->name = "datalynx_$event";
-        $message->subject = $subject;
-        $message->fullmessageformat = $data->notificationformat;
-        $message->smallmessage = '';
-        $message->notification = 1;
-        $message->userfrom = $data->userfrom = $USER;
         $data->senderprofilelink = html_writer::link(
                 new moodle_url('/user/profile.php', array('id' => $data->userfrom->id)), fullname($data->userfrom));
         $messagestosend = array();
         foreach ($data->users as $user) {
+            // Prepare message object.
+            $message = new \core\message\message();
+            $message->component = 'mod_datalynx';
+            $message->name = "datalynx_$event";
+            $message->subject = $subject;
+            $message->fullmessageformat = $data->notificationformat;
+            $message->smallmessage = '';
+            $message->notification = 1;
+            $message->userfrom = $data->userfrom = $USER;
+            $message->courseid = $df->course->id;
             $userto = $DB->get_record('user', array('id' => $user->id));
             $message->userto = $userto;
             $data->fullname = fullname($userto);

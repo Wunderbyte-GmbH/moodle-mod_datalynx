@@ -109,15 +109,6 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
         $sitename = format_string($SITE->fullname);
         $subject = "$sitename -> $coursename -> $pluginname $datalynxname:  $notename";
 
-        // Prepare message object.
-        $message = new \core\message\message();
-        $message->component = 'mod_datalynx';
-        $message->name = "event_$eventname";
-        $message->subject = $subject;
-        $message->fullmessageformat = 1;
-        $message->smallmessage = '';
-        $message->notification = 1;
-
         if ((strpos($eventname, 'comment') !== false)) {
             $entryid = $event->get_data()['other']['itemid'];
         } else {
@@ -126,13 +117,23 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
         $authorid = $DB->get_field('datalynx_entries', 'userid', array('id' => $entryid));
         $author = $DB->get_record('user', array('id' => $authorid));
 
-        $message->userfrom = (strpos($eventname, 'event') !== false &&
+        $userfrom = (strpos($eventname, 'event') !== false &&
                 $this->sender == self::FROM_AUTHOR) ? $author : $USER;
         $messagedata->senderprofilelink = html_writer::link(
-                new moodle_url('/user/profile.php', array('id' => $message->userfrom->id)),
-                fullname($message->userfrom));
+                new moodle_url('/user/profile.php', array('id' => $userfrom->id)),
+                fullname($userfrom));
         $messagestosend = array();
         foreach ($this->get_recipients($author->id, $entryid) as $userid) {
+            // Prepare message object.
+            $message = new \core\message\message();
+            $message->component = 'mod_datalynx';
+            $message->name = "event_$eventname";
+            $message->subject = $subject;
+            $message->fullmessageformat = 1;
+            $message->smallmessage = '';
+            $message->notification = 1;
+            $message->courseid = $df->course->id;
+            $message->userfrom = $userfrom;
             $userto = $DB->get_record('user', array('id' => $userid));
             $message->userto = $userto;
             $messagedata->fullname = fullname($userto);
