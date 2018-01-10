@@ -543,7 +543,9 @@ class datalynx_rule_manager {
             $message->smallmessage = '';
             $message->notification = 1;
             $message->userfrom = $data->userfrom = $USER;
-            $message->courseid = $df->course->id;
+            if ($CFG->branch > 31) {
+                $message->courseid = $df->course->id;
+            }
             $userto = $DB->get_record('user', array('id' => $user->id));
             $message->userto = $userto;
             $data->fullname = fullname($userto);

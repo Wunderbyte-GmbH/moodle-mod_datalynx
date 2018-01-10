@@ -132,7 +132,9 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
             $message->fullmessageformat = 1;
             $message->smallmessage = '';
             $message->notification = 1;
-            $message->courseid = $df->course->id;
+            if ($CFG->branch > 31) {
+                $message->courseid = $df->course->id;
+            }
             $message->userfrom = $userfrom;
             $userto = $DB->get_record('user', array('id' => $userid));
             $message->userto = $userto;
