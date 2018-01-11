@@ -171,7 +171,7 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
         }
         if ($messagestosend) {
             $adhocktask = new \mod_datalynx\task\sendmessage_task();
-            $adhocktask->set_custom_data_as_string(serialize($messagestosend));
+            $adhocktask->set_custom_data_as_string(base64_encode(serialize($messagestosend)));
             $adhocktask->set_component('mod_datalynx');
             \core\task\manager::queue_adhoc_task($adhocktask);
         }

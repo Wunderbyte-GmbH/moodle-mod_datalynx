@@ -558,7 +558,7 @@ class datalynx_rule_manager {
         }
         if ($messagestosend) {
             $adhocktask = new \mod_datalynx\task\sendmessage_task();
-            $adhocktask->set_custom_data_as_string(serialize($messagestosend));
+            $adhocktask->set_custom_data_as_string(serialize(base64_encode($messagestosend)));
             $adhocktask->set_component('mod_datalynx');
             \core\task\manager::queue_adhoc_task($adhocktask);
         }
