@@ -60,8 +60,13 @@ if ($mform->is_cancelled()) {
         // Add new field.
         if (!$field->id()) {
             $fieldid = $field->insert_field($data);
+            if (!isset($data->param10)){
+                $param10 = 0;
+            } else {
+                $param10 = $data->param10;
+            }
             // For text fields: Store the field itself as autocompletion reference field if no other field is chosen.
-            if ($field->type == 'text' and $data->param10 <= 0 and $data->param9 == $df->id()) {
+            if ($field->type == 'text' and $param10 <= 0 and $data->param9 == $df->id()) {
                 $DB->set_field('datalynx_fields', 'param10', $fieldid, array('id' => $fieldid));
             }
             $other = array('dataid' => $df->id());
