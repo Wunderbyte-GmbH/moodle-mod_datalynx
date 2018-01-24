@@ -8,7 +8,8 @@ addons:
     packages:
       - oracle-java8-installer
       - oracle-java8-set-default
-      - chromium-chromedriver
+      - chromium-chromedriver # used to start behat with chrome
+      
 cache:
   directories:
     - $HOME/.composer/cache
@@ -22,9 +23,9 @@ env:
  global:
   - MOODLE_START_BEHAT_SERVERS=NO
   - MOODLE_CI_VER=1
-  - MOODLE_START_BEHAT_SERVERS=NO
   - MOODLE_DIR=/home/travis/build/moodle
   - MOODLE_SELENIUM_JAR=/home/travis/build/moodle/selenium.jar
+  - IGNORE_PATHS=checkboxgroup/checkboxgroup.php # we know this dir is problematic
  matrix:
   - DB=pgsql MOODLE_BRANCH=MOODLE_33_STABLE MOODLE_CI_VER=2
   - DB=mysqli MOODLE_BRANCH=MOODLE_33_STABLE MOODLE_CI_VER=2
@@ -54,4 +55,4 @@ script:
   - moodle-plugin-ci mustache
   - moodle-plugin-ci grunt
   - moodle-plugin-ci phpunit
-  - moodle-plugin-ci behat
+  - moodle-plugin-ci behat --profile chrome --dump # --dump is used for troubleshooting this config.
