@@ -1,6 +1,6 @@
 language: php
 
-sudo: false
+sudo: true # checking if sudo makes behat error go away.
 
 addons:
   postgresql: "9.3"
