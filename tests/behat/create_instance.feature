@@ -41,6 +41,7 @@ Feature: In a datalynx instance create a new entry
     And I am on "Course 1" course homepage
     And I follow "Datalynx Test Instance"
     And I follow "Add a new entry"
+    Then I should see "Option 1" # Troubleshooting why Option 1 is not found.
     And I click option "Option A" from a radio
     And I click option "Option 2" from a checkbox
     And I select option "Option Z" from the "Select" select
