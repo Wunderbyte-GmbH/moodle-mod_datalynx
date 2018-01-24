@@ -19,7 +19,7 @@ Moodle 2.0 or higher.
 Documentation:
 -------------
 Please feel free to contribute documentation in the relevant area of
-the MoodleDocs wiki.
+the MoodleDocs wiki...
 
 Support:
 --------
