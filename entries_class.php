@@ -702,7 +702,7 @@ class datalynx_entries {
                                         if (!$isadmin && !($entrystatus == datalynxfield__status::STATUS_DRAFT ||
                                                         $entrystatus == datalynxfield__status::STATUS_NOT_SET)
                                         ) {
-                                            continue;
+                                            // continue;
                                         }
                                     }
                                 }
