@@ -1110,14 +1110,11 @@ abstract class datalynxview_base {
             if ($editallowed = $this->get_df()->user_can_manage_entry()) {
                 if (count(explode(",", $this->_editentries)) == 1) {
                     $entrystatus = $DB->get_field('datalynx_entries', 'status', array('id' => $this->_editentries));
-                    $admins = get_admins();
-                    $isadmin = in_array($USER->id, array_keys($admins));
                     require_once('field/_status/field_class.php');
-                    if (!$isadmin && (!($entrystatus == datalynxfield__status::STATUS_DRAFT ||
-                                    $entrystatus == datalynxfield__status::STATUS_NOT_SET))
-                    ) {
-                        $editallowed = false;
-                    }
+                    if (!has_capability('mod/datalynx:manageentries', context_course::instance($COURSE->id)) && $entrystatus == datalynxfield__status::STATUS_FINAL_SUBMISSION
+                            ) {
+                                $editallowed = false;
+                            }
                 }
             }
             if ($editallowed) {
