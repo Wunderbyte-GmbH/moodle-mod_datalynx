@@ -354,7 +354,7 @@ class datalynxview_patterns {
      * @return string
      */
     protected function get_action_replacements($tag, $entry = null, array $options = null) {
-        global $CFG, $OUTPUT;
+        global $CFG, $OUTPUT, $USER;
 
         $replacement = '';
 
@@ -369,12 +369,10 @@ class datalynxview_patterns {
                 has_capability('mod/datalynx:manageentries', $df->context));
         // TODO: move to a view attribute so as to call only once.
         // Can this user add entries?
-        $usercanaddentries = $view->get_df()->user_can_manage_entry();
-
         switch ($tag) {
             case '##addnewentry##':
             case '##addnewentries##':
-                if (!empty($options['hidenewentry']) or !$usercanaddentries) {
+                if (!empty($options['hidenewentry']) || !($this->user_can_add_new_entry())) {
                     break;
                 }
 

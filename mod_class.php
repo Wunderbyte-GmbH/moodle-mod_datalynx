@@ -1709,7 +1709,7 @@ class datalynx {
             return false;
         } else {
             if ($this->data->maxentries == 0) {
-                return true;
+                return true; 
             } else {
                 return ($this->user_num_entries($perinterval) >= $this->data->maxentries);
             }
@@ -1827,7 +1827,7 @@ class datalynx {
             ) {
                 return false; // For members only.
             }
-
+                      
             // Managing a certain entry.
             if (!empty($entry->id)) {
                 // Entry owner.
@@ -1862,15 +1862,7 @@ class datalynx {
                         return false; // Nop ...
                     }
                 }
-
-                // Trying to add an entry.
-            } else {
-                if ($this->user_at_max_entries(true)) {
-                    return false; // No more entries for you (come back next interval or so).
-                }
-            }
-
-            // If you got this far you probably deserve to do something ... go ahead.
+            }// If you got this far you probably deserve to do something ... go ahead.
             return true;
         }
 
