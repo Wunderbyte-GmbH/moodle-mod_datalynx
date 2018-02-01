@@ -696,9 +696,8 @@ class datalynx_entries {
                                     if (isset($contents[$eid]['info']['status'])) {
                                         $entrystatus = $DB->get_records_menu('datalynx_entries', array('id'=>$eid),'','userid, status') ; // find current state of entry in db.
                                         require_once('field/_status/field_class.php');
-                                        // check if user is creator and status is final.
                                         if (isset($entrystatus[$USER->id]) && $entrystatus[$USER->id] == datalynxfield__status::STATUS_FINAL_SUBMISSION) {
-                                            continue;
+                                            continue; // check if user is creator and status is final. if true stop update.
                                         }
                                     }
                                 }
