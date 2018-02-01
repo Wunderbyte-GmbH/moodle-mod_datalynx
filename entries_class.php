@@ -687,17 +687,17 @@ class datalynx_entries {
                                 }
                             }
                             $contents = $newcontents;
-
+                            
                             global $DB;
                             // Now update entry and contents TODO: TEAM_CHANGED - check this!
                             $addorupdate = '';
                             foreach ($entries as $eid => $entry) {
                                 if ($eid > 0) {
                                     if (isset($contents[$eid]['info']['status'])) {
-                                        $entrystatus = $DB->get_records_menu('datalynx_entries', array('id'=>$eid),'','userid, status') ; // find current state of entry in db.
+                                        $entrystatus = $DB->get_record('datalynx_entries', array('id'=>$eid), 'status', 'MUST_EXIST') ; // find current state of entry in db.
                                         require_once('field/_status/field_class.php');
-                                        if (isset($entrystatus[$USER->id]) && $entrystatus[$USER->id] == datalynxfield__status::STATUS_FINAL_SUBMISSION) {
-                                            continue; // check if user is creator and status is final. if true stop update.
+                                        if ($entrystatus->status == datalynxfield__status::STATUS_FINAL_SUBMISSION && !has_capability('mod/datalynx:manageentries', $this->datalynx->context)) {
+                                            continue; // check if user is student and status is final. if true stop update.
                                         }
                                     }
                                 }
