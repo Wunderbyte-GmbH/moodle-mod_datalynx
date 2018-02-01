@@ -694,9 +694,9 @@ class datalynx_entries {
                             foreach ($entries as $eid => $entry) {
                                 if ($eid > 0) {
                                     if (isset($contents[$eid]['info']['status'])) {
-                                        $entrystatus = $DB->get_record('datalynx_entries', array('id'=>$eid), 'status', 'MUST_EXIST') ; // Find current state of entry in db.
+                                        $entrystatus = $DB->get_field('datalynx_entries', 'status', array('id'=>$eid), 'MUST_EXIST') ; // Find current state of entry in db.
                                         require_once('field/_status/field_class.php');
-                                        if ($entrystatus->status == datalynxfield__status::STATUS_FINAL_SUBMISSION && !has_capability('mod/datalynx:manageentries', $this->datalynx->context)) {
+                                        if ($entrystatus == datalynxfield__status::STATUS_FINAL_SUBMISSION && !has_capability('mod/datalynx:manageentries', $this->datalynx->context)) {
                                             continue; // Check if user has capacity manageentries and status is final. If true stop update.
                                         }
                                     }
