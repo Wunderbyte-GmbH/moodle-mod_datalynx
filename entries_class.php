@@ -691,21 +691,18 @@ class datalynx_entries {
                             global $DB;
                             // Now update entry and contents TODO: TEAM_CHANGED - check this!
                             $addorupdate = '';
-                            $admins = get_admins();
-                            $isadmin = in_array($USER->id, array_keys($admins));
-
                             foreach ($entries as $eid => $entry) {
                                 if ($eid > 0) {
                                     if (isset($contents[$eid]['info']['status'])) {
-                                        $entrystatus = $contents[$eid]['info']['status'];
+                                        $entrystatus = $DB->get_records_menu('datalynx_entries', array('id'=>$eid),'','userid, status') ; // find current state of entry in db.
                                         require_once('field/_status/field_class.php');
-                                        if (!$isadmin && !($entrystatus == datalynxfield__status::STATUS_DRAFT ||
-                                                        $entrystatus == datalynxfield__status::STATUS_NOT_SET)
-                                        ) {
-                                            // continue;
+                                        // check if user is creator and status is final.
+                                        if (isset($entrystatus[$USER->id]) && $entrystatus[$USER->id] == datalynxfield__status::STATUS_FINAL_SUBMISSION) {
+                                            continue;
                                         }
                                     }
                                 }
+                                
                                 if ($entry->id = $this->update_entry($entry, $contents[$eid]['info'])) {
                                     // Variable $eid should be different from $entryid only in new entries.
                                     foreach ($contents[$eid]['fields'] as $fieldid => $content) {
