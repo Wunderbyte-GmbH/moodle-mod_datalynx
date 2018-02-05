@@ -132,8 +132,7 @@ class datalynx_filter {
         // SORT sql.
         list($sorttables, $sortorder, $sortparams) = $this->get_sort_sql($fields);
         // CONTENT sql ($datalynxcontent is an array of fieldid whose content needs to be fetched).
-        list($datalynxcontent, $whatcontent, $contenttables, $contentparams) = $this->get_content_sql(
-                $fields);
+        list($datalynxcontent, $whatcontent, $contenttables, $contentparams) = $this->get_content_sql($fields);
 
         return array(" $searchtables $sorttables $contenttables ", $wheresearch, $sortorder,
                 $whatcontent, array_merge($searchparams, $sortparams, $contentparams), $datalynxcontent);
@@ -1322,7 +1321,7 @@ class datalynx_filter_manager {
 
         // Quick filters.
         if (!$advanced and !$customfilter) {
-            if ($filterid >= $this->USER_FILTER_ID_START) {
+            if ($filterid >= self::USER_FILTER_ID_START) {
                 $filter = $this->get_filter_options_from_userpreferences($filterid);
             } else {
                 $filter = $this->get_filter_from_url(null, true);
