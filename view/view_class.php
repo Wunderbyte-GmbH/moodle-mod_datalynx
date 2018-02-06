@@ -1109,12 +1109,13 @@ abstract class datalynxview_base {
             $editallowed = false;
             if ($editallowed = $this->get_df()->user_can_manage_entry()) {
                 if (count(explode(",", $this->_editentries)) == 1) {
-                    $entrystatus = $DB->get_field('datalynx_entries', 'status', array('id' => $this->_editentries));
-                    require_once('field/_status/field_class.php');
-                    if (!has_capability('mod/datalynx:manageentries', $this->_df->context) && $entrystatus == datalynxfield__status::STATUS_FINAL_SUBMISSION
-                            ) {
-                                $editallowed = false;
-                            }
+                    $entrystatus = $DB->get_field('datalynx_entries', 'status',
+                            array('id' => $this->_editentries));
+                    require_once ('field/_status/field_class.php');
+                    if (!has_capability('mod/datalynx:manageentries', $this->_df->context) &&
+                             $entrystatus == datalynxfield__status::STATUS_FINAL_SUBMISSION) {
+                        $editallowed = false;
+                    }
                 }
             }
             if ($editallowed) {
@@ -1124,10 +1125,11 @@ abstract class datalynxview_base {
                 // Process calculations if any.
                 $html = $this->process_calculations($html);
             } else {
-                // Show message that editing is not allowed
+                // Show message that editing is not allowed.
                 $redirectid = $this->_redirect ? $this->_redirect : $this->id();
                 $url = new moodle_url($this->_baseurl, array('view' => $redirectid));
-                $html = $OUTPUT->notification(get_string('notallowedtoeditentry', 'datalynx')) . $OUTPUT->continue_button($url);
+                $html = $OUTPUT->notification(get_string('notallowedtoeditentry', 'datalynx')) .
+                         $OUTPUT->continue_button($url);
             }
         }
 

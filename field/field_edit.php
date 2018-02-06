@@ -60,7 +60,7 @@ if ($mform->is_cancelled()) {
         // Add new field.
         if (!$field->id()) {
             $fieldid = $field->insert_field($data);
-            if (!isset($data->param10)){
+            if (!isset($data->param10)) {
                 $param10 = 0;
             } else {
                 $param10 = $data->param10;

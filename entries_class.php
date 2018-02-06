@@ -687,21 +687,22 @@ class datalynx_entries {
                                 }
                             }
                             $contents = $newcontents;
-                            
+
                             global $DB;
                             // Now update entry and contents TODO: TEAM_CHANGED - check this!
                             $addorupdate = '';
                             foreach ($entries as $eid => $entry) {
                                 if ($eid > 0) {
                                     if (isset($contents[$eid]['info']['status'])) {
-                                        $entrystatus = $DB->get_field('datalynx_entries', 'status', array('id'=>$eid), 'MUST_EXIST') ; // Find current state of entry in db.
+                                        $entrystatus = $DB->get_field('datalynx_entries', 'status', array('id' => $eid), 'MUST_EXIST'); // Find current state of entry in db.
                                         require_once('field/_status/field_class.php');
-                                        if ($entrystatus == datalynxfield__status::STATUS_FINAL_SUBMISSION && !has_capability('mod/datalynx:manageentries', $this->datalynx->context)) {
-                                            continue; // Check if user has capacity manageentries and status is final. If true stop update.
+                                        if ($entrystatus == datalynxfield__status::STATUS_FINAL_SUBMISSION 
+                                                && !has_capability('mod/datalynx:manageentries', $this->datalynx->context)) {
+                                            continue; // Check user has capacity & status is final. If stop update.
                                         }
                                     }
                                 }
-                                
+
                                 if ($entry->id = $this->update_entry($entry, $contents[$eid]['info'])) {
                                     // Variable $eid should be different from $entryid only in new entries.
                                     foreach ($contents[$eid]['fields'] as $fieldid => $content) {
