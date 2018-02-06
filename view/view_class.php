@@ -1111,7 +1111,7 @@ abstract class datalynxview_base {
                 if (count(explode(",", $this->_editentries)) == 1) {
                     $entrystatus = $DB->get_field('datalynx_entries', 'status',
                             array('id' => $this->_editentries));
-                    require_once ('field/_status/field_class.php');
+                    require_once('field/_status/field_class.php');
                     if (!has_capability('mod/datalynx:manageentries', $this->_df->context) &&
                              $entrystatus == datalynxfield__status::STATUS_FINAL_SUBMISSION) {
                         $editallowed = false;
