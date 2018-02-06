@@ -1189,8 +1189,8 @@ class datalynx_filter_manager {
 
         // Quick filters.
         if (!$advanced) {
-            if ($filterid >= $this->USER_FILTER_ID_START) {
-                $filter = $this->get_filter_from_userpreferences($filterid);
+            if ($filterid >= self::USER_FILTER_ID_START) {
+                $filter = $this->get_filter_from_id($filterid);
             } else {
                 $filter = $this->get_filter_from_url(null, true);
             }
