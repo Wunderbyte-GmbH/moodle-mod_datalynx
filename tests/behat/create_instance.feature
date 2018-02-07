@@ -49,7 +49,7 @@ Feature: In a datalynx instance create a new entry
     And I press "Continue"
     And I edit "first" entry
     And I click option "Option B" from a radio
-    And I check "Option 1"
+    And I click option "Option 1" from a checkbox
     And I select option "Option Y" from the "Select" select
     And I press "Save changes"
     And I press "Continue"
