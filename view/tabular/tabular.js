@@ -21,7 +21,6 @@
  * @copyright 2013 Ivan Šakić
  * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
-
 M.datalynxview_tabular = {};
 
 M.datalynxview_tabular.init = function (Y) {
@@ -40,4 +39,38 @@ M.datalynxview_tabular.init = function (Y) {
                 this.set('disabled', (checkbox.get('checked') ? 'disabled' : null ));
         });
     });
+}
+
+/**
+ * select antries for multiactions
+ * Used when editing datalynx entries
+ */
+function select_allnone(elem, checked) {
+	var selectors = document.getElementsByName(elem + 'selector');
+	for (var i = 0; i < selectors.length; i++) {
+		selectors[i].checked = checked;
+	}
+}
+
+/**
+ * construct url for multiactions
+ * Used when editing datalynx entries
+ */
+function bulk_action(elem, url, action, defaultval) {
+	var selected = [];
+	var selectors = document.getElementsByName(elem + 'selector');
+	for (var i = 0; i < selectors.length; i++) {
+		if (selectors[i].checked == true) {
+			selected.push(selectors[i].value);
+		}
+	}
+
+	// Send selected entries to processing.
+	if (selected.length) {
+		location.href = url + '&' + action + '=' + selected.join(',');
+
+		// If no entries selected but there is default, send it.
+	} else if (defaultval) {
+		location.href = url + '&' + action + '=' + defaultval;
+	}
 }
