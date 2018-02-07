@@ -331,7 +331,7 @@ class behat_mod_datalynx extends behat_files {
 
         $session = $this->getSession(); // Get the mink session.
         $element = $session->getPage()->find('xpath',
-                '//input[@type="checkbox"]/following::*[contains(text()[normalize-space()], "' . $option . '")]');
+                '//input[@type="checkbox"]/following::*[contains(., "' . $option . '")]');
         $element->click();
     }
 

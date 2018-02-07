@@ -21,6 +21,7 @@
  * @copyright 2013 Ivan Šakić
  * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
+
 M.datalynxview_tabular = {};
 
 M.datalynxview_tabular.init = function (Y) {
