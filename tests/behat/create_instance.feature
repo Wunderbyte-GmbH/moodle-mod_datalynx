@@ -41,7 +41,7 @@ Feature: In a datalynx instance create a new entry
     And I am on "Course 1" course homepage
     And I follow "Datalynx Test Instance"
     And I follow "Add a new entry"
-    Then I should see "Option A"
+    Then I should see "Option 1"
     And I click option "Option A" from a radio
     And I click option "Option 2" from a checkbox
     And I select option "Option Z" from the "Select" select
@@ -49,12 +49,11 @@ Feature: In a datalynx instance create a new entry
     And I press "Continue"
     And I edit "first" entry
     And I click option "Option B" from a radio
-    Then I should see "Option 1"
-    And I click option "Option 1" from a checkbox
+    And I check "Option 1"
     And I select option "Option Y" from the "Select" select
     And I press "Save changes"
     And I press "Continue"
-    Then I should see "Option 1"
-    And I should see "Option B"
+    Then I should see "Option B"
+    And I should see "Option 1"
     And I should see "Option Y"
     But I should not see "Option 3"
