@@ -18,14 +18,14 @@ Feature: In a datalynx instance create a new entry
       | activity | course | idnumber | name                   |
       | datalynx | C1     | 12345    | Datalynx Test Instance |
     And "Datalynx Test Instance" has following fields:
-      | type        | name     | param1                       | param3 |
-      | text        | Text     |                              |        |
-      | textarea    | Textarea |                              |        |
-      | time        | Time     |                              |        |
-      | duration    | Duration |                              |        |
-      | radiobutton | Radio    | Option A, Option B, Option C | 3      |
-      | checkbox    | Checkbox | Option 1, Option 2, Option 3 | 3      |
-      | select      | Select   | Option X, Option Y, Option Z | 3      |
+      | type        | name     | param1                       | param3 | param6 |
+      | text        | Text     |                              |        |        |
+      | textarea    | Textarea |                              |        |        |
+      | time        | Time     |                              |        |        |
+      | duration    | Duration |                              |        |        |
+      | radiobutton | Radio    | Option A, Option B, Option C | 3      |        |
+      | checkbox    | Checkbox | Option 1, Option 2, Option 3 | 3      | 0      |
+      | select      | Select   | Option X, Option Y, Option Z | 3      |        |
     And "Datalynx Test Instance" has following filters:
       | name       | perpage |
       | TestFilter | 3       |
@@ -41,7 +41,7 @@ Feature: In a datalynx instance create a new entry
     And I am on "Course 1" course homepage
     And I follow "Datalynx Test Instance"
     And I follow "Add a new entry"
-    Then I should see "Option 1"
+    Then I should see "Option A"
     And I click option "Option A" from a radio
     And I click option "Option 2" from a checkbox
     And I select option "Option Z" from the "Select" select
@@ -49,8 +49,7 @@ Feature: In a datalynx instance create a new entry
     And I press "Continue"
     And I edit "first" entry
     And I click option "Option B" from a radio
-    And I fill entry form with:
-      | Checkbox | Option 1             |
+    And I click option "Option 1" from a checkbox
     And I select option "Option Y" from the "Select" select
     And I press "Save changes"
     And I press "Continue"

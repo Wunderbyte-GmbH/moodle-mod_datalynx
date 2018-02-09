@@ -678,6 +678,8 @@ class datalynx_entries {
                                         if (array_search($fieldid, $bulkeditfields) !== false) {
                                             $newfields[$fieldid] = $contents[$firstentryid]['fields'][$fieldid];
                                         } else {
+                                            print_r($fieldid);
+                                            print_r($oldcontent['fields'][$fieldid]);
                                             $newfields[$fieldid] = $oldcontent['fields'][$fieldid];
                                         }
                                     }
