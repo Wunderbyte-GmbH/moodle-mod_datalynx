@@ -33,7 +33,7 @@ Feature: In a datalynx multiedit entries
       | time             | Time     |                              |        |        |
       | duration         | Duration |                              |        |        |
       | radiobutton      | Radio    | Option A, Option B, Option C | 3      |        |
-      | checkbox         | Checkbox | Option 1, Option 2, Option 3 | 3      | NULL   |
+      | checkbox         | Checkbox | Option 1, Option 2, Option 3 | 3      | 0      |
       | select           | Select   | Option X, Option Y, Option Z | 3      |        |
       | teammemberselect | TMS      | 3                            |        |        |
     And "Datalynx Test Instance" has following entries:
@@ -49,17 +49,20 @@ Feature: In a datalynx multiedit entries
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Datalynx Test Instance"
+    Then I should see "Option 1"
     When I select "first,second" entry
     And I press "multiedit"
     And I fill entry form with:
       | entry | field | value               |
       | 1     | Text  | This is the first!  |
       | 2     | Text  | This is the second! |
+      | 1     | Checkbox  | Option 1, Option 3, Option 2 |
+      | 2     | Checkbox  | Option 1, Option 3, Option 2 |
     And I press "Save changes"
     And I press "Continue"
     Then I should see "This is the first!"
     And I should see "This is the second!"
-    And I should see "Option 2"
+    And I should see "Option 1"
     And I should see "Lorem ipsum"
     And I should see "Teacher 1"
     And I should see "Student 2"
