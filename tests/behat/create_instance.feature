@@ -55,6 +55,5 @@ Feature: In a datalynx instance create a new entry
     And I press "Save changes"
     And I press "Continue"
     Then I should see "Option B"
-    And I should see "Option 1"
     And I should see "Option Y"
     But I should not see "Option 3"
