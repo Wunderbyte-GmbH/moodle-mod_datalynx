@@ -24,7 +24,7 @@ Feature: In a datalynx instance create a new entry
       | time        | Time     |                              |        |        |
       | duration    | Duration |                              |        |        |
       | radiobutton | Radio    | Option A, Option B, Option C | 3      |        |
-      | checkbox    | Checkbox | Option 1, Option 2, Option 3 | 3      | 0      |
+      | checkbox    | Checkbox | Option 1, Option 2, Option 3 | 3      | NULL   |
       | select      | Select   | Option X, Option Y, Option Z | 3      |        |
     And "Datalynx Test Instance" has following filters:
       | name       | perpage |

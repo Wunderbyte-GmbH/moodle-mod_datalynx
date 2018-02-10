@@ -26,16 +26,16 @@ Feature: In a datalynx multiedit entries
       | activity | course | idnumber | name                   |
       | datalynx | C1     | 12345    | Datalynx Test Instance |
     And "Datalynx Test Instance" has following fields:
-      | type             | name     | param1                       | param3 |
-      | file             | File     |                              |        |
-      | text             | Text     |                              |        |
-      | textarea         | Textarea |                              |        |
-      | time             | Time     |                              |        |
-      | duration         | Duration |                              |        |
-      | radiobutton      | Radio    | Option A, Option B, Option C | 3      |
-      | checkbox         | Checkbox | Option 1, Option 2, Option 3 | 3      |
-      | select           | Select   | Option X, Option Y, Option Z | 3      |
-      | teammemberselect | TMS      | 3                            |        |
+      | type             | name     | param1                       | param3 | param6 |
+      | file             | File     |                              |        |        |
+      | text             | Text     |                              |        |        |
+      | textarea         | Textarea |                              |        |        |
+      | time             | Time     |                              |        |        |
+      | duration         | Duration |                              |        |        |
+      | radiobutton      | Radio    | Option A, Option B, Option C | 3      |        |
+      | checkbox         | Checkbox | Option 1, Option 2, Option 3 | 3      | NULL   |
+      | select           | Select   | Option X, Option Y, Option Z | 3      |        |
+      | teammemberselect | TMS      | 3                            |        |        |
     And "Datalynx Test Instance" has following entries:
       | author   | Text         | Textarea    | Time             | Duration | Radio    | Checkbox           | Select   | TMS      | File                                    |
       | student1 | Yo! Whassup? | Whatever    | 16.9.2014 11:00  | 2 days   | Option A | Option 2           | Option Z | teacher1 | mod/datalynx/tests/fixtures/picture.jpg |
