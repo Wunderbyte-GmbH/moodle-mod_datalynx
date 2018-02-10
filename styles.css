@@ -48,7 +48,7 @@
 }
 
 #page-mod-datalynx-embed .entriesview, #page-mod-datalynx-view .entriesview {
-    overflow: visible;
+    overflow-y: visible;
 }
 
 #page-mod-datalynx-embed.gecko .mform fieldset.hidden,
