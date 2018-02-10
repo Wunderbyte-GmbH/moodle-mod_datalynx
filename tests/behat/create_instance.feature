@@ -43,7 +43,8 @@ Feature: In a datalynx instance create a new entry
     And I follow "Add a new entry"
     Then I should see "Option A"
     And I click option "Option A" from a radio
-    And I click option "Option 2" from a checkbox
+    Then I should see "Option 1"
+    And I click option "Option 1" from a checkbox
     And I select option "Option Z" from the "Select" select
     And I press "Save changes"
     And I press "Continue"
