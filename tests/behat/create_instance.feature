@@ -28,7 +28,7 @@ Feature: In a datalynx instance create a new entry
       | select      | Select   | Option X, Option Y, Option Z | 3      |        |
     And "Datalynx Test Instance" has following filters:
       | name       | perpage |
-      | TestFilter | 3       |
+      | TestFilter | 15       |
     And "Datalynx Test Instance" has following views:
       | type    | name    | status  | redirect | filter     |
       | grid    | Grid    | default | Grid     | TestFilter |
@@ -47,7 +47,7 @@ Feature: In a datalynx instance create a new entry
     And I click option "Option 1" from a checkbox
     And I select option "Option Z" from the "Select" select
     And I press "Save changes"
-    Then I should see "Option 1"
+    Then I should see "updated"
     And I press "Continue"
     And I edit "first" entry
     Then I should see "Option 1"

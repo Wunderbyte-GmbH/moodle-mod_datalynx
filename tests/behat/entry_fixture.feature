@@ -58,6 +58,7 @@ Feature: In a datalynx multiedit entries
       | 2     | Text  | This is the second! |
       | 1     | Checkbox  | Option 1, Option 3, Option 2 |
       | 2     | Checkbox  | Option 1, Option 3, Option 2 |
+    Then I should see "Option 1"
     And I press "Save changes"
     And I press "Continue"
     Then I should see "This is the first!"
