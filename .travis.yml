@@ -16,7 +16,7 @@ cache:
     - $HOME/.npm
 
 php:
-# - 7.0
+ - 7.0
  - 7.1
 
 env:
@@ -27,7 +27,7 @@ env:
   - MOODLE_SELENIUM_JAR=/home/travis/build/moodle/selenium.jar
   - IGNORE_PATHS=checkboxgroup/checkboxgroup.php # we know this dir is problematic
  matrix:
-#  - DB=pgsql MOODLE_BRANCH=MOODLE_33_STABLE MOODLE_CI_VER=2
+  - DB=pgsql MOODLE_BRANCH=MOODLE_33_STABLE MOODLE_CI_VER=2
   - DB=mysqli MOODLE_BRANCH=MOODLE_33_STABLE MOODLE_CI_VER=2
 
 before_install:
@@ -46,13 +46,13 @@ install:
   - php -t ${MOODLE_DIR} -S localhost:8000 > /tmp/php-access.log 2> /tmp/php-error.log &
   - sleep 5s
 script:
-#  - moodle-plugin-ci phplint
-#  - moodle-plugin-ci phpcpd
-#  - moodle-plugin-ci phpmd
-#  - moodle-plugin-ci codechecker
-#  - moodle-plugin-ci validate
-#  - moodle-plugin-ci savepoints
-#  - moodle-plugin-ci mustache
-#  - moodle-plugin-ci grunt
-#  - moodle-plugin-ci phpunit
+  - moodle-plugin-ci phplint
+  - moodle-plugin-ci phpcpd
+  - moodle-plugin-ci phpmd
+  - moodle-plugin-ci codechecker
+  - moodle-plugin-ci validate
+  - moodle-plugin-ci savepoints
+  - moodle-plugin-ci mustache
+  - moodle-plugin-ci grunt
+  - moodle-plugin-ci phpunit
   - moodle-plugin-ci behat --profile chrome --dump -vvv

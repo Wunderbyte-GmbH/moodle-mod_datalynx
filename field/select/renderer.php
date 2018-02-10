@@ -59,8 +59,7 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
 
         // Render as autocomplete field (param6 not empty) or select field.
         if ($autocomplete) {
-            $select = &$mform->addElement('select', $fieldname, null);
-            // $select = &$mform->addElement('autocomplete', $fieldname, null);
+            $select = &$mform->addElement('autocomplete', $fieldname, null);
         } else {
             $select = &$mform->addElement('select', $fieldname, null);
         }
