@@ -24,7 +24,7 @@ Feature: In a datalynx instance create a new entry
       | time        | Time     |                              |        |        |
       | duration    | Duration |                              |        |        |
       | radiobutton | Radio    | Option A, Option B, Option C | 3      |        |
-      | checkbox    | Checkbox | Option 1, Option 2, Option 3 | 3      | 0      |
+      | checkbox    | Checkbox | Option 1, Option 2, Option 3 | 3      | 1      |
       | select      | Select   | Option X, Option Y, Option Z | 3      |        |
     And "Datalynx Test Instance" has following filters:
       | name       | perpage |
@@ -47,13 +47,13 @@ Feature: In a datalynx instance create a new entry
     And I click option "Option 1" from a checkbox
     And I select option "Option Z" from the "Select" select
     And I press "Save changes"
+    Then I should see "Option 1"
     And I press "Continue"
     And I edit "first" entry
     Then I should see "Option 1"
-    And I click option "Option B" from a radio
     And I click option "Option 2" from a checkbox
-    And I select option "Option Y" from the "Select" select
-    And I press "Save changes"
+    And I press "Save changes" 
+    Then I should see "updated"
     And I press "Continue"
     Then I should see "Option 2"
     And I should see "Option B"
