@@ -2031,6 +2031,7 @@ class datalynx {
                                 has_capability('mod/datalynx:editprivilegeadmin', $this->context, $user, true))
                 ) {
                     $permissions[] = self::PERMISSION_ADMIN;
+                    $permissions[] = self::PERMISSION_MANAGER; // Bug#876 Admin has manager permission by default.
                 }
                 if ((!$view ||
                                 has_capability('mod/datalynx:viewprivilegemanager', $this->context, $user,
