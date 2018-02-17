@@ -136,6 +136,15 @@ class behat_mod_datalynx extends behat_files {
         if (isset($record->param1) && $record->type == "select") {
             $record->param1 = preg_replace('/,[ ]?/', "\n", $record->param1);
         }
+        
+        // Checkboxes need to be defined with linebreaks, not comma seperated.
+        if (isset($record->param1) && $record->type == "checkbox") {
+            $record->param1 = preg_replace('/,[ ]?/', "\n", $record->param1);
+        }
+        // Radiobuttons need to be defined with linebreaks, not comma seperated.
+        if (isset($record->param1) && $record->type == "radiobutton") {
+            $record->param1 = preg_replace('/,[ ]?/', "\n", $record->param1);
+        }
 
         if (!isset($record->param2) && ($record->type == "file" || $record->type == "picture")) {
             $record->param2 = -1;
@@ -328,10 +337,9 @@ class behat_mod_datalynx extends behat_files {
      * @param string $option
      */
     public function i_click_option_from_a_checkbox($option) {
-
-        $session = $this->getSession(); // Get the mink session.
+        $session = $this->getSession();
         $element = $session->getPage()->find('xpath',
-                '//input[@type="checkbox"]/following::*[contains(., "' . $option . '")]');
+                '//input[@type="checkbox"]/following::*[contains(text()[normalize-space()], "' . $option . '")]');
         $element->click();
     }
 

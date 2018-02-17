@@ -1,4 +1,4 @@
-@mod @mod_datalynx @dev @_file_upload
+@mod @mod_datalynx @dev @_file_upload @debugonlythis
 Feature: In a datalynx multiedit entries
   In order to update more than one entry at once
   As a teacher
@@ -32,14 +32,14 @@ Feature: In a datalynx multiedit entries
       | textarea         | Textarea |                              |        |        |
       | time             | Time     |                              |        |        |
       | duration         | Duration |                              |        |        |
-      | radiobutton      | Radio    | Option A, Option B, Option C | 3      |        |
-      | checkbox         | Checkbox | Option 1, Option 2, Option 3 | 3      | 0      |
-      | select           | Select   | Option X, Option Y, Option Z | 3      |        |
+      | radiobutton      | Radio    | Option A, Option B, Option C |        |        |
+      | checkbox         | Checkbox | Option 1, Option 2, Option 3 |        |        |
+      | select           | Select   | Option X, Option Y, Option Z |        |        |
       | teammemberselect | TMS      | 3                            |        |        |
     And "Datalynx Test Instance" has following entries:
       | author   | Text         | Textarea    | Time             | Duration | Radio    | Checkbox           | Select   | TMS      | File                                    |
       | student1 | Yo! Whassup? | Whatever    | 16.9.2014 11:00  | 2 days   | Option A | Option 2           | Option Z | teacher1 | mod/datalynx/tests/fixtures/picture.jpg |
-      | student3 | Hi there!    | Lorem ipsum | 23.11.1994 21:00 | 11 days  | Option C | Option 1, Option 3 | Option Z | student2 | mod/datalynx/tests/fixtures/picture.jpg |
+      | student3 | Hi there!    | Lorem ipsum | 23.11.1994 21:00 | 11 days  | Option C | Option 1           | Option Z | student2 | mod/datalynx/tests/fixtures/picture.jpg |
     And "Datalynx Test Instance" has following views:
       | type    | name    | status        | redirect |
       | tabular | Tabular | default, edit | Tabular  |
@@ -56,8 +56,6 @@ Feature: In a datalynx multiedit entries
       | entry | field | value               |
       | 1     | Text  | This is the first!  |
       | 2     | Text  | This is the second! |
-      | 1     | Checkbox  | Option 1, Option 3, Option 2 |
-      | 2     | Checkbox  | Option 1, Option 3, Option 2 |
     Then I should see "Option 1"
     And I press "Save changes"
     And I press "Continue"

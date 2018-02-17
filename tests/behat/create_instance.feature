@@ -23,9 +23,9 @@ Feature: In a datalynx instance create a new entry
       | textarea    | Textarea |                              |        |        |
       | time        | Time     |                              |        |        |
       | duration    | Duration |                              |        |        |
-      | radiobutton | Radio    | Option A, Option B, Option C | 3      |        |
-      | checkbox    | Checkbox | Option 1, Option 2, Option 3 | 3      | 1      |
-      | select      | Select   | Option X, Option Y, Option Z | 3      |        |
+      | radiobutton | Radio    | Option A, Option B, Option C |        |        |
+      | checkbox    | Checkbox | Option 1, Option 2, Option 3 |        |        |
+      | select      | Select   | Option X, Option Y, Option Z |        |        |
     And "Datalynx Test Instance" has following filters:
       | name       | perpage |
       | TestFilter | 15       |
@@ -49,13 +49,14 @@ Feature: In a datalynx instance create a new entry
     And I press "Save changes"
     Then I should see "updated"
     And I press "Continue"
+    Then I should see "Option 1"
     And I edit "first" entry
     Then I should see "Option 1"
     And I click option "Option 2" from a checkbox
     And I press "Save changes" 
     Then I should see "updated"
     And I press "Continue"
-    Then I should see "Option 2"
-    And I should see "Option B"
-    And I should see "Option Y"
+    Then I should see "Option 1"
+    And I should see "Option A"
+    And I should see "Option Z"
     But I should not see "Option 3"

@@ -55,4 +55,5 @@ script:
   - moodle-plugin-ci mustache
   - moodle-plugin-ci grunt
   - moodle-plugin-ci phpunit
-  - moodle-plugin-ci behat --profile chrome --dump -vvv
+  - moodle-plugin-ci behat --init
+  - moodle-plugin-ci behat --profile chrome
