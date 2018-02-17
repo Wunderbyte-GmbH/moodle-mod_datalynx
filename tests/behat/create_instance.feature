@@ -1,4 +1,4 @@
-@mod @mod_datalynx
+@mod @mod_datalynx @debugonlythis
 Feature: In a datalynx instance create a new entry
   In order to create a new entry
   As a teacher
