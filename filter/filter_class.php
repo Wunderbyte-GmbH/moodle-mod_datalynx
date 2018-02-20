@@ -335,8 +335,9 @@ class datalynx_filter {
         $orderby = array("e.timecreated ASC");
         $params = array();
 
-        $sortfields = $this->_sortfields;
+        $sortfields = $this->_sortfields; // Stores fieldids like in the db.
 
+        // We run through all sortfields and make sql statement.
         if ($sortfields) {
 
             $orderby = array();
@@ -352,8 +353,15 @@ class datalynx_filter {
                 if (!$field::is_internal()) {
                     $sorties[$fieldid] = $sortname;
                 }
-                $orderby[] = "$sortname " . ($sortdir ? 'DESC' : 'ASC');
-
+                
+                // Here we can check if fields are special.
+                if ($field instanceof datalynxfield_option_multiple) {
+                    $orderby[] = "SPLIT_STR(f.param1,CHAR(10), REPLACE ($sortname, '#', '')) " . ($sortdir ? 'DESC' : 'ASC');
+                }
+                else {
+                    $orderby[] = "$sortname " . ($sortdir ? 'DESC' : 'ASC');
+                }
+                
                 // Register join field if applicable.
                 $this->register_join_field($field);
             }
@@ -375,6 +383,10 @@ class datalynx_filter {
                     $paramcount++;
                 }
             }
+        }
+        
+        if ($field instanceof datalynxfield_option_multiple) {
+            $sorttables .= " JOIN {datalynx_fields} f ON c$fieldid.fieldid = f.id ";
         }
         return array($sorttables, $sortorder, $params);
     }
