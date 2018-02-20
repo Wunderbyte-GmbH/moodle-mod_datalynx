@@ -334,10 +334,11 @@ class datalynx_filter {
         $sorties = array();
         $orderby = array("e.timecreated ASC");
         $params = array();
+        $sorttables = '';
+        $stringindexed = false;
 
         $sortfields = $this->_sortfields; // Stores fieldids like in the db.
 
-        // We run through all sortfields and make sql statement.
         if ($sortfields) {
 
             $orderby = array();
@@ -347,6 +348,7 @@ class datalynx_filter {
                 }
 
                 $field = $fields[$fieldid];
+                
 
                 $sortname = $field->get_sort_sql();
                 // Add non-internal fields to sorties.
@@ -355,8 +357,11 @@ class datalynx_filter {
                 }
                 
                 // Here we can check if fields are special.
-                if ($field instanceof datalynxfield_option_multiple) {
-                    $orderby[] = "SPLIT_STR(f.param1,CHAR(10), REPLACE ($sortname, '#', '')) " . ($sortdir ? 'DESC' : 'ASC');
+                if ($field instanceof datalynxfield_option_multiple || 
+                        $field instanceof datalynxfield_option_single) {
+                    // Note: CHAR(10) is lf for linebreak, it may be a problem if DB is changed.
+                    $orderby[] = "SUBSTRING_INDEX(SUBSTRING_INDEX(param1, CHAR(10), REPLACE ($sortname, '#', '')), CHAR(10), -1)" . ($sortdir ? 'DESC' : 'ASC');
+                    $stringindexed = true;
                 }
                 else {
                     $orderby[] = "$sortname " . ($sortdir ? 'DESC' : 'ASC');
@@ -368,7 +373,6 @@ class datalynx_filter {
         }
 
         // Compile sql for sort settings.
-        $sorttables = '';
         $sortorder = ' ORDER BY ' . implode(', ', $orderby) . ' ';
         if ($sorties) {
             $sortfrom = array_keys($sorties);
@@ -385,9 +389,11 @@ class datalynx_filter {
             }
         }
         
-        if ($field instanceof datalynxfield_option_multiple) {
+        // If one of the sort vars needs the indexed values join fields.
+        if ($stringindexed) {
             $sorttables .= " JOIN {datalynx_fields} f ON c$fieldid.fieldid = f.id ";
         }
+        
         return array($sorttables, $sortorder, $params);
     }
 
