@@ -581,11 +581,14 @@ class behat_mod_datalynx extends behat_files {
             case 'select':
             case 'radiobutton':
                 $result = $DB->get_record('datalynx_fields', array('id' => $fieldid), 'param1, param3');
+                /*
                 if ($result->param3 == 3) {
                     $pattern = '/, /';
                 } else {
                     $pattern = '/[\n\r]+/m';
                 }
+                */
+                $pattern = '/[\n\r]+/m'; // Values are only stored in \n separated.
                 $options = preg_split($pattern, $result->param1);
                 $id = array_search(trim($value), $options);
                 if ($id !== false) {
@@ -593,14 +596,18 @@ class behat_mod_datalynx extends behat_files {
                 } else {
                     $content['content'] = '';
                 }
+                //$content['content'] = $result->param1;
                 break;
             case 'checkbox':
-                $result = $DB->get_record('datalynx_fields', array('id' => $fieldid), 'param1, param3');
+                $result = $DB->get_record('datalynx_fields', array('id' => $fieldid), 'param1, param3'); // A\nB 
+                /*
                 if ($result->param3 == 3) {
-                    $pattern = '/, /';
+                    $pattern = '/ /';
                 } else {
                     $pattern = '/[\n\r]+/m';
                 }
+                */
+                $pattern = '/[\n\r]+/m'; // Values are only stored in \n separated.
                 $options = preg_split($pattern, $result->param1);
                 $selectedoptions = preg_split($pattern, $value);
                 $ids = array();
@@ -615,6 +622,7 @@ class behat_mod_datalynx extends behat_files {
                 } else {
                     $content['content'] = '';
                 }
+                //$content['content'] = '#1#';
                 break;
             case 'duration':
                 $content['content'] = strtotime($value, 0);
