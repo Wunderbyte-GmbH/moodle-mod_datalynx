@@ -29,4 +29,28 @@ class datalynxfield_checkbox extends datalynxfield_multiselect {
 
     public $type = 'checkbox';
 
+    /**
+     * Create an array that converts default values from the database to values the checkbox understands. 
+     * Assume three checkboxes a, b, c. Default should be b, c. In the database we store \n separated values.
+     * $rawdefaults = 1b, 2c / $options = 1a, 2b, 3c / $defaults 2b, 3c
+     * Checkbox reads defaults from array that is based on position and has value. Starts at one.
+     * {@inheritDoc}
+     * @see datalynxfield_multiselect::default_values()
+     */
+    public function default_values() {
+        $rawdefaults = explode("\n", $this->field->param2); // Create array of default values.
+        $rawdefaults = array_map('trim', $rawdefaults); // Trim random spaces (1b, 2c).
+        $options = array_map('trim', $this->options_menu()); // Read available checkboxes (1a, 2b, 3c).
+        $defaults = array(); // Should become 2b, 3c.
+
+        foreach ($options as $key => $value) {
+            if (in_array($value, $rawdefaults)) {
+                $defaults[$key] = $value; // Create default checkbox values.
+            }
+        }
+        
+        return $defaults;
+    }
+    
+    
 }
