@@ -21,7 +21,6 @@ Feature: Check if visible will be saved
       | type | name        | status  | redirect    | filter |
       | grid | DefaultView | default | DefaultView |        |
 
-
   Scenario: Remove Visibility
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage

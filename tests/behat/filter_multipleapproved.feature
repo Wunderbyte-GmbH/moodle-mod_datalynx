@@ -43,7 +43,6 @@ Feature: In datalynx filter approved and not approved entries from multiple stud
       | student2 | yes4 | 1        |
       | student2 | not3 | 0        |
 
-
   @javascript
   Scenario: Login as teacher to see approved and not approved entries
     Given I log in as "teacher1"
@@ -86,4 +85,4 @@ Feature: In datalynx filter approved and not approved entries from multiple stud
     When I follow "Approved view"
     Then I should see "yes1"
     And I should see "yes2"
-    But I should not see "not1" 
+    But I should not see "not1"

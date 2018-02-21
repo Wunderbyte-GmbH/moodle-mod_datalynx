@@ -21,7 +21,6 @@ Feature: Check if the ##entries## tag is there.
       | type | name        | status  | redirect    | filter |
       | grid | DefaultView | default | DefaultView |        |
 
-
   Scenario: Check for Tag
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage

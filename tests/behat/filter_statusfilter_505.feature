@@ -76,5 +76,3 @@ Feature: If you have a filter for status tags which are in Final Submission
     And I should not see "entry3"
     And I should not see "entry4"
     But I should see "entry5"
-    
-    

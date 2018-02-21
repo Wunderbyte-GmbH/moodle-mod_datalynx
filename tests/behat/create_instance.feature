@@ -1,4 +1,4 @@
-@mod @mod_datalynx @debugonlythis
+@mod @mod_datalynx 
 Feature: In a datalynx instance create a new entry
   In order to create a new entry
   As a teacher
@@ -53,7 +53,7 @@ Feature: In a datalynx instance create a new entry
     And I edit "first" entry
     Then I should see "Option 1"
     And I click option "Option 2" from a checkbox
-    And I press "Save changes" 
+    And I press "Save changes"
     Then I should see "updated"
     And I press "Continue"
     Then I should see "Option 1"

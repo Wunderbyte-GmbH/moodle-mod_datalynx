@@ -45,5 +45,3 @@ Feature:When a field is set to required
     Then I press "Save changes"
     But I should not see "ntry(s) updated"
     And I should see "must supply a value here"
-    
-    

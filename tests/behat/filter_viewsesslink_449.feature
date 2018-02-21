@@ -22,7 +22,6 @@ Feature:When creating a view and adding a tag to the template with the viewname
       | type | name     | status              | redirect | filter | section                                                  |
       | grid | testview | default, edit, more | testview |        | #{{viewsesslink:testview;Neuen Eintrag anlegen;new=1;}}# |
 
-
   Scenario: Login and look at a view with a tag
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
@@ -38,5 +37,3 @@ Feature:When creating a view and adding a tag to the template with the viewname
     Then I follow "Browse"
     And I should see "Neuen Eintrag anlegen"
     But I should not see "viewsesslink"
-    
-    

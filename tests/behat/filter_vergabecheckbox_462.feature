@@ -1,5 +1,5 @@
 @mod @mod_datalynx @wip7 @mod_peter @mink:selenium2
-Feature:
+Feature: Vergabecheckbox
 
   Background:
     Given the following "courses" exist:
@@ -38,8 +38,6 @@ Feature:
       | teacher1 | 1        | Thema_3 | Die Beschreibung Nummer Drei. |
       | teacher1 | 1        | Thema_4 | Die Beschreibung Nummer Vier. |
 
-
-
     Given I log in as "manager1"
     And I am on "Course 1" course homepage
     And I follow "Datalynx Test Instance"
@@ -75,12 +73,9 @@ Feature:
     And I follow "Vergabestatus"
     And I should not see "no entries to display"
 
-
   Scenario: Try it with filter "NotAll"
     Then I click "Edit" button of "Vergabestatus" item
     Then I set the field "_filter" to "FilterCBNotAll"
     And I press "Save changes"
     And I follow "Vergabestatus"
     And I should not see "no entries to display"
-    
-  
