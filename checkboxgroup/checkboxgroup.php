@@ -32,7 +32,7 @@ class HTML_QuickForm_checkboxgroup extends HTML_QuickForm_element {
 
     public $_values = array();
 
-    public function __construct($elementname = null, $elementlabel = null, $options = null,
+    public function __construct($elementname = null, $elementlabel = null, $options = array(),
             $separator = null, $attributes = null) {
         HTML_QuickForm_element::__construct($elementname, $elementlabel, $attributes);
         $this->_persistantFreeze = true;
