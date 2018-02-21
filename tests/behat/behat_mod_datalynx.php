@@ -136,7 +136,7 @@ class behat_mod_datalynx extends behat_files {
         if (isset($record->param1) && $record->type == "select") {
             $record->param1 = preg_replace('/,[ ]?/', "\n", $record->param1);
         }
-        
+
         // Checkboxes need to be defined with linebreaks, not comma seperated.
         if (isset($record->param1) && $record->type == "checkbox") {
             $record->param1 = preg_replace('/,[ ]?/', "\n", $record->param1);
@@ -581,13 +581,7 @@ class behat_mod_datalynx extends behat_files {
             case 'select':
             case 'radiobutton':
                 $result = $DB->get_record('datalynx_fields', array('id' => $fieldid), 'param1, param3');
-                /*
-                if ($result->param3 == 3) {
-                    $pattern = '/, /';
-                } else {
-                    $pattern = '/[\n\r]+/m';
-                }
-                */
+
                 $pattern = '/[\n\r]+/m'; // Values are only stored in \n separated.
                 $options = preg_split($pattern, $result->param1);
                 $id = array_search(trim($value), $options);
@@ -596,17 +590,10 @@ class behat_mod_datalynx extends behat_files {
                 } else {
                     $content['content'] = '';
                 }
-                //$content['content'] = $result->param1;
                 break;
             case 'checkbox':
-                $result = $DB->get_record('datalynx_fields', array('id' => $fieldid), 'param1, param3'); // A\nB 
-                /*
-                if ($result->param3 == 3) {
-                    $pattern = '/ /';
-                } else {
-                    $pattern = '/[\n\r]+/m';
-                }
-                */
+                $result = $DB->get_record('datalynx_fields', array('id' => $fieldid), 'param1, param3');
+
                 $pattern = '/[\n\r]+/m'; // Values are only stored in \n separated.
                 $options = preg_split($pattern, $result->param1);
                 $selectedoptions = preg_split($pattern, $value);
@@ -622,7 +609,6 @@ class behat_mod_datalynx extends behat_files {
                 } else {
                     $content['content'] = '';
                 }
-                //$content['content'] = '#1#';
                 break;
             case 'duration':
                 $content['content'] = strtotime($value, 0);

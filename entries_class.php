@@ -679,7 +679,8 @@ class datalynx_entries {
                                             $newfields[$fieldid] = $contents[$firstentryid]['fields'][$fieldid];
                                         } else {
                                             if (array_key_exists($fieldid, $oldcontent['fields'])) {
-                                                $newfields[$fieldid] = $oldcontent['fields'][$fieldid]; // If no values are updated just copy old values.
+                                                // If no values are updated just copy old values.
+                                                $newfields[$fieldid] = $oldcontent['fields'][$fieldid];
                                             }
                                         }
                                     }

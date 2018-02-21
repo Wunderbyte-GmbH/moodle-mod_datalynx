@@ -348,25 +348,24 @@ class datalynx_filter {
                 }
 
                 $field = $fields[$fieldid];
-                
 
                 $sortname = $field->get_sort_sql();
                 // Add non-internal fields to sorties.
                 if (!$field::is_internal()) {
                     $sorties[$fieldid] = $sortname;
                 }
-                
+
                 // Here we can check if fields are special.
-                if ($field instanceof datalynxfield_option_multiple || 
+                // Note: CHAR(10) is lf for linebreak, it may be a problem if DB is changed.
+                if ($field instanceof datalynxfield_option_multiple ||
                         $field instanceof datalynxfield_option_single) {
-                    // Note: CHAR(10) is lf for linebreak, it may be a problem if DB is changed.
-                    $orderby[] = "SUBSTRING_INDEX(SUBSTRING_INDEX(param1, CHAR(10), REPLACE ($sortname, '#', '')), CHAR(10), -1)" . ($sortdir ? 'DESC' : 'ASC');
+                    $orderby[] = "SUBSTRING_INDEX(SUBSTRING_INDEX(param1, CHAR(10), REPLACE ($sortname, '#', '')), CHAR(10), -1)"
+                            . ($sortdir ? 'DESC' : 'ASC');
                     $stringindexed = true;
-                }
-                else {
+                } else {
                     $orderby[] = "$sortname " . ($sortdir ? 'DESC' : 'ASC');
                 }
-                
+
                 // Register join field if applicable.
                 $this->register_join_field($field);
             }
@@ -388,12 +387,12 @@ class datalynx_filter {
                 }
             }
         }
-        
+
         // If one of the sort vars needs the indexed values join fields.
         if ($stringindexed) {
             $sorttables .= " JOIN {datalynx_fields} f ON c$fieldid.fieldid = f.id ";
         }
-        
+
         return array($sorttables, $sortorder, $params);
     }
 
