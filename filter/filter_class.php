@@ -390,7 +390,7 @@ class datalynx_filter {
 
         // If one of the sort vars needs the indexed values join fields.
         if ($stringindexed) {
-            $sorttables .= " JOIN {datalynx_fields} f ON c$fieldid.fieldid = f.id ";
+            $sorttables .= " LEFT JOIN {datalynx_fields} f ON c$fieldid.fieldid = f.id ";
         }
 
         return array($sorttables, $sortorder, $params);
