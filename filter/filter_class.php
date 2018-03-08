@@ -361,7 +361,7 @@ class datalynx_filter {
                             // Read values of field from database.
                             $fieldvalues = $DB->get_field('datalynx_fields', 'param1', array ('id'=>$fieldid), $strictness=MUST_EXIST);
                             $fieldvalues = explode("\n", $fieldvalues);
-                            
+
                             $replacestring = $sortname; // Works only for single values yet.
                             foreach ($fieldvalues as $key => $value) {
                                 $replacestring = "REPLACE(".$replacestring.",'#". ($key+1) ."#', '".$value."')";
