@@ -356,11 +356,17 @@ class datalynx_filter {
                 }
 
                 // Here we can check if fields are special.
-                // Note: CHAR(10) is lf for linebreak, it may be a problem if DB is changed.
                 if ($field instanceof datalynxfield_option_multiple ||
                         $field instanceof datalynxfield_option_single) {
-                    $orderby[] = "SUBSTRING_INDEX(SUBSTRING_INDEX(param1, CHAR(10), REPLACE ($sortname, '#', '')), CHAR(10), -1)"
-                            . ($sortdir ? 'DESC' : 'ASC');
+                            // Read values of field from database.
+                            $fieldvalues = $DB->get_field('datalynx_fields', 'param1', array ('id'=>$fieldid), $strictness=MUST_EXIST);
+                            $fieldvalues = explode("\n", $fieldvalues);
+                            
+                            $replacestring = $sortname; // Works only for single values yet.
+                            foreach ($fieldvalues as $key => $value) {
+                                $replacestring = "REPLACE(".$replacestring.",'#". ($key+1) ."#', '".$value."')";
+                            }
+                            $orderby[] = $replacestring . ($sortdir ? 'DESC' : 'ASC');
                     $stringindexed = true;
                 } else {
                     $orderby[] = "$sortname " . ($sortdir ? 'DESC' : 'ASC');
