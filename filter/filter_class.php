@@ -331,6 +331,8 @@ class datalynx_filter {
     /**
      */
     public function get_sort_sql($fields) {
+        global $DB;
+        
         $sorties = array();
         $orderby = array("e.timecreated ASC");
         $params = array();
