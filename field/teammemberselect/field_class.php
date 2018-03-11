@@ -87,7 +87,6 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
                      AND r.type LIKE :type";
         $this->rules = $DB->get_records_sql_menu($query,
                 array('dataid' => $df->id(), 'type' => 'eventnotification'));
-        $this->rules = array_merge(array(0 => '...'), $this->rules);
     }
 
     protected static $allusers = array();
@@ -238,10 +237,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
             $this->init_user_menu();
         }
         $options = array();
-        if ($addnoselection) {
-            $options[0] = '...';
-        }
-
+        
         if ($makelinks) {
             if ($allowall) {
                 $options += self::$alluserslinks[$fieldid];
@@ -376,14 +372,12 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         $selected = !empty($first) ? $first : array();
 
         if (!empty($selected)) {
-            foreach ($selected as $userid) {
-                if ($userid != "0") {
-                    $contents[] = json_encode($selected);
-                    break;
-                }
+            // Remove non-user if teammembers are selected.
+            if ($selected[0] == 0) {
+                array_shift($selected);
             }
+            $contents[] = json_encode($selected);
         }
-
         return array($contents, $oldcontents);
     }
 

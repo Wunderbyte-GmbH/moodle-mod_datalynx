@@ -151,35 +151,28 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         $fieldname = "field_{$fieldid}_$entryid";
         $fieldnamedropdown = "field_{$fieldid}_{$entryid}_dropdown";
         $classname = "teammemberselect_{$fieldid}_{$entryid}";
-        $required = !empty($options['required']);
+        $required = true; // Make teammemberselect always required to hide autocomplete bug.
 
         $selected = !empty($entry->{"c{$fieldid}_content"}) ? json_decode($entry->{"c{$fieldid}_content"}, true) : array();
         $authorid = isset($entry->userid) ? $entry->userid : $USER->id;
         $menu = $field->options_menu(true, false, $field->usercanaddself ? 0 : $authorid);
+        // If we can make a one person team add "no teammember" key.
+        if ($this->_field->minteamsize < 1) {
+            $menu = array_merge(array(0 => 'Kein Teammitglied'), $menu); // TODO: Multilang.
+		}
 
         $mform->addElement('autocomplete', $fieldname, null, $menu, array('class' => "datalynxfield_teammemberselect $classname",
                 'multiple' => true));
         $mform->setType($fieldname, PARAM_INT);
-        $mform->setDefault($fieldname, $selected);
+        
+        if (empty($selected) && $this->_field->minteamsize < 1) {
+            $mform->setDefault($fieldname, 0);
+        }
+        else $mform->setDefault($fieldname, $selected);
+        
         if ($required) {
-            $mform->addRule("{$fieldname}", '', 'required', null, 0, 'client');
+            $mform->addRule("{$fieldname}", 'Hier ist leider ein Fehler aufgetreten, bitte wählen Sie.', 'required', null, 0, 'client'); // TODO: Multilang.
         }
-    }
-
-    public static function compare_different_ignore_zero_callback($data) {
-        $count = array_fill(0, max($data) + 1, 0);
-
-        foreach ($data as $id) {
-            $count[$id]++;
-        }
-
-        for ($id = 1; $id < count($count); $id++) {
-            if ($count[$id] > 1) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     private function get_js_module() {
@@ -238,15 +231,15 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
                     $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
                 }
             }
-
-            // Limit chosen users to max teamsize and ensure min teamsize users are chosen!
-            if (count($formdata->$formfieldname) > $this->_field->teamsize) {
-                $errors[$formfieldname] = get_string('maxteamsize_error_form', 'datalynx', $this->_field->teamsize);
+            if (isset($formdata->$formfieldname)) {
+                // Limit chosen users to max teamsize and ensure min teamsize users are chosen!
+                if (count($formdata->$formfieldname) > $this->_field->teamsize) {
+                    $errors[$formfieldname] = get_string('maxteamsize_error_form', 'datalynx', $this->_field->teamsize);
+                }
+                if (count($formdata->$formfieldname) < $this->_field->minteamsize) {
+                    $errors[$formfieldname] = get_string('minteamsize_error_form', 'datalynx', $this->_field->minteamsize);
+                }
             }
-            if (count($formdata->$formfieldname) < $this->_field->minteamsize) {
-                $errors[$formfieldname] = get_string('minteamsize_error_form', 'datalynx', $this->_field->minteamsize);
-            }
-
         }
 
         return $errors;
