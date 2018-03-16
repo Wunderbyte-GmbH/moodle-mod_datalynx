@@ -149,27 +149,26 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         $fieldid = $field->id();
         $entryid = $entry->id;
         $fieldname = "field_{$fieldid}_$entryid";
-        $fieldnamedropdown = "field_{$fieldid}_{$entryid}_dropdown";
+        $fieldnamedropdown = "field_{$fieldid}_{$entryid}_dropdown"; // We don't use this.
         $classname = "teammemberselect_{$fieldid}_{$entryid}";
-        $required = true; // Make teammemberselect always required to hide autocomplete bug.
+        $required = !empty($options['required']);
+
+        // We create a hidden field to force sending. Needs to be done via directly inserting html.
+        $mform->addElement('html', '<input type="hidden" name="'.$fieldname.'[-1]" value="-1">');
 
         $selected = !empty($entry->{"c{$fieldid}_content"}) ? json_decode($entry->{"c{$fieldid}_content"}, true) : array();
         $authorid = isset($entry->userid) ? $entry->userid : $USER->id;
         $menu = $field->options_menu(true, false, $field->usercanaddself ? 0 : $authorid);
-        // If we can make a one person team add "no teammember" key.
-        if ($this->_field->minteamsize < 1) {
-            $menu = array_merge(array(0 => 'Kein Teammitglied'), $menu); // TODO: Multilang.
-		}
-
+        
         $mform->addElement('autocomplete', $fieldname, null, $menu, array('class' => "datalynxfield_teammemberselect $classname",
-                'multiple' => true));
+            'multiple' => true, 'noselectionstring' => "Gerade keine Auswahl."));
         $mform->setType($fieldname, PARAM_INT);
-        
-        if (empty($selected) && $this->_field->minteamsize < 1) {
-            $mform->setDefault($fieldname, 0);
-        }
-        else $mform->setDefault($fieldname, $selected);
-        
+
+        // Don't show the hidden element.
+        if (isset($selected[0]) && $selected[0] == -1) array_shift($selected);
+
+        $mform->setDefault($fieldname, $selected);
+
         if ($required) {
             $mform->addRule("{$fieldname}", 'Hier ist leider ein Fehler aufgetreten, bitte wählen Sie.', 'required', null, 0, 'client'); // TODO: Multilang.
         }

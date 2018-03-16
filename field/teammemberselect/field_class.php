@@ -153,7 +153,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
                 unset(self::$allowedusers[$fieldid][$result->id]);
                 unset(self::$alloweduserslinks[$fieldid][$result->id]);
 
-                // Otherwise, if user has a needed role, add them to admissible users.
+            // Otherwise, if user has a needed role, add them to admissible users.
             } else {
                 if (in_array($result->roleid, self::$admissibility['needed'])) {
                     self::$allowedusers[$fieldid][$result->id] = self::$allusers[$fieldid][$result->id];
@@ -204,7 +204,8 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
      */
     public function update_content($entry, array $values = null) {
         global $DB;
-
+///
+        
         $field = $DB->get_record('datalynx_fields', array('id' => $this->field->id));
         $oldcontent = json_decode($DB->get_field('datalynx_contents', 'content',
                 array('fieldid' => $this->field->id, 'entryid' => $entry->id)), true);
@@ -236,8 +237,9 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         if (!isset(self::$allusers[$fieldid])) {
             $this->init_user_menu();
         }
-        $options = array();
-        
+        // Add hidden option for Validation. Needs to be int.
+        $options = array(-1 => NULL );
+
         if ($makelinks) {
             if ($allowall) {
                 $options += self::$alluserslinks[$fieldid];
@@ -255,7 +257,6 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         if ($excludeuser && isset($options[$excludeuser])) {
             unset($options[$excludeuser]);
         }
-
         return $options;
     }
 
@@ -357,7 +358,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         }
     }
 
-    protected function format_content($entry, array $values = null) {
+    protected function format_content($entry, array $values = null) {        
         $fieldid = $this->field->id;
         $oldcontents = array();
         $contents = array();
@@ -372,10 +373,10 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         $selected = !empty($first) ? $first : array();
 
         if (!empty($selected)) {
-            // Remove non-user if teammembers are selected.
-            if ($selected[0] == 0) {
+            if (isset($selected[0]) && $selected[0]==-1) {
                 array_shift($selected);
             }
+
             $contents[] = json_encode($selected);
         }
         return array($contents, $oldcontents);
