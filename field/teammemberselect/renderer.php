@@ -154,7 +154,9 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         $required = !empty($options['required']);
 
         // We create a hidden field to force sending. Needs to be done via directly inserting html.
-        $mform->addElement('html', '<input type="hidden" name="'.$fieldname.'[-1]" value="-1">');
+        if (!$required) {
+            $mform->addElement('html', '<input type="hidden" name="'.$fieldname.'[-1]" value="-1">');
+        }
 
         $selected = !empty($entry->{"c{$fieldid}_content"}) ? json_decode($entry->{"c{$fieldid}_content"}, true) : array();
         $authorid = isset($entry->userid) ? $entry->userid : $USER->id;
@@ -220,10 +222,12 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
             // Variable $behavior datalynx_field_behavior.
             if ($behavior->is_required()) {
                 $userfound = false;
-                foreach ($formdata->$formfieldname as $userid) {
-                    if ($userid != 0) {
-                        $userfound = true;
-                        break;
+                if (isset($formdata->$formfieldname)) {
+                    foreach ($formdata->$formfieldname as $userid) {
+                        if ($userid != 0) {
+                            $userfound = true;
+                            break;
+                        }
                     }
                 }
                 if (!$userfound) {
@@ -232,10 +236,12 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
             }
             if (isset($formdata->$formfieldname)) {
                 // Limit chosen users to max teamsize and ensure min teamsize users are chosen!
-                if (count($formdata->$formfieldname) > $this->_field->teamsize) {
+                // If the field is not required we have added a dummy value -1. Accounting for that.
+                $teamsize = $behavior->is_required() ? count($formdata->$formfieldname) : count($formdata->$formfieldname)-1;
+                if ($teamsize > $this->_field->teamsize) {
                     $errors[$formfieldname] = get_string('maxteamsize_error_form', 'datalynx', $this->_field->teamsize);
                 }
-                if (count($formdata->$formfieldname) < $this->_field->minteamsize) {
+                if ($teamsize < $this->_field->minteamsize) {
                     $errors[$formfieldname] = get_string('minteamsize_error_form', 'datalynx', $this->_field->minteamsize);
                 }
             }

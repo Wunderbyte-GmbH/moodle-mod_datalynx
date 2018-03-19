@@ -204,8 +204,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
      */
     public function update_content($entry, array $values = null) {
         global $DB;
-///
-        
+
         $field = $DB->get_record('datalynx_fields', array('id' => $this->field->id));
         $oldcontent = json_decode($DB->get_field('datalynx_contents', 'content',
                 array('fieldid' => $this->field->id, 'entryid' => $entry->id)), true);
@@ -358,7 +357,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         }
     }
 
-    protected function format_content($entry, array $values = null) {        
+    protected function format_content($entry, array $values = null) {
         $fieldid = $this->field->id;
         $oldcontents = array();
         $contents = array();
