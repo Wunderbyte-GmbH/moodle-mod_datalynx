@@ -94,13 +94,17 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
 
             $userurl = new moodle_url('/user/view.php',
                     array('course' => $field->df()->course->id, 'id' => $USER->id));
+                    
+            // Load jquery and parse parameters.
+            $PAGE->requires->js_call_amd('mod_datalynx/teammemberselect', 'init', array($fieldid, $userurl->out(false), fullname($USER), $canunsubscribe));
 
+/*
             $PAGE->requires->strings_for_js(array('subscribe', 'unsubscribe'
             ), 'datalynx');
             $PAGE->requires->js_init_call('M.datalynxfield_teammemberselect.init_subscribe_links',
                     array($fieldid, $userurl->out(false), fullname($USER), $canunsubscribe),
                     false, $this->get_js_module());
-        }
+*/        }
 
         return $str;
     }
@@ -178,7 +182,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
 
     private function get_js_module() {
         $jsmodule = array('name' => 'datalynxfield_teammemberselect',
-                'fullpath' => '/mod/datalynx/field/teammemberselect/teammemberselect.js',
+                'fullpath' => '/mod/datalynx/amd/teammemberselect.js',
                 'requires' => array('node', 'event', 'node-event-delegate', 'event-outside', 'console'));
         return $jsmodule;
     }
