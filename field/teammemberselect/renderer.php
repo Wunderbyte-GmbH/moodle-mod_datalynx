@@ -71,7 +71,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         $subscribeenabled = isset($params['subscribe']);
         $selected = isset($entry->{"c{$fieldid}_content"}) ? json_decode(
                 $entry->{"c{$fieldid}_content"}, true) : [];
-        $selected = $selected ? $selected : [];
+        $selected = $selected ? $selected : []; // TODO: Seems obsolete.
         $teamfull = $field->teamsize < count($selected);
         $userhasadmissiblerole = array_intersect(
                 $field->df()->get_user_datalynx_permissions($USER->id), $field->admissibleroles);
@@ -98,13 +98,9 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
             // Load jquery and parse parameters.
             $PAGE->requires->js_call_amd('mod_datalynx/teammemberselect', 'init', array($fieldid, $userurl->out(false), fullname($USER), $canunsubscribe));
 
-/*
             $PAGE->requires->strings_for_js(array('subscribe', 'unsubscribe'
             ), 'datalynx');
-            $PAGE->requires->js_init_call('M.datalynxfield_teammemberselect.init_subscribe_links',
-                    array($fieldid, $userurl->out(false), fullname($USER), $canunsubscribe),
-                    false, $this->get_js_module());
-*/        }
+        }
 
         return $str;
     }
@@ -153,43 +149,36 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         $fieldid = $field->id();
         $entryid = $entry->id;
         $fieldname = "field_{$fieldid}_$entryid";
-        $fieldnamedropdown = "field_{$fieldid}_{$entryid}_dropdown"; // We don't use this.
+        $fieldnamedropdown = "field_{$fieldid}_{$entryid}_dropdown"; // TODO: We don't use this.
         $classname = "teammemberselect_{$fieldid}_{$entryid}";
         $required = !empty($options['required']);
 
         // We create a hidden field to force sending. Needs to be done via directly inserting html.
-        if (!$required) {
-            $mform->addElement('html', '<input type="hidden" name="'.$fieldname.'[-1]" value="-1">');
-        }
+        if (!$required) $mform->addElement('html', '<input type="hidden" name="'.$fieldname.'[-1]" value="-999">');
 
         $selected = !empty($entry->{"c{$fieldid}_content"}) ? json_decode($entry->{"c{$fieldid}_content"}, true) : array();
         $authorid = isset($entry->userid) ? $entry->userid : $USER->id;
-        $menu = $field->options_menu(true, false, $field->usercanaddself ? 0 : $authorid);
-        
+        $menu = $field->options_menu(true, false, -999);
+
         $mform->addElement('autocomplete', $fieldname, null, $menu, array('class' => "datalynxfield_teammemberselect $classname",
             'multiple' => true, 'noselectionstring' => "Gerade keine Auswahl."));
         $mform->setType($fieldname, PARAM_INT);
+        $mform->setDefault("{$fieldname}", $selected); // Not value after validation fails
 
-        // Don't show the hidden element.
-        if (isset($selected[0]) && $selected[0] == -1) array_shift($selected);
-
-        $mform->setDefault($fieldname, $selected);
-
+        // If we edit an existing entry that is not required we need a workaround.
+        $newentry = optional_param('new',null,PARAM_INT) === null ? 1 : 0;
+        if (!$newentry && !$required) {
+			$PAGE->requires->jquery();
+			$mform->addElement('static', null, '', "<script>$('option[value=\"-999\"]').removeAttr('selected');</script>");
+        }
+        
         if ($required) {
             $mform->addRule("{$fieldname}", 'Hier ist leider ein Fehler aufgetreten, bitte wählen Sie.', 'required', null, 0, 'client'); // TODO: Multilang.
         }
     }
 
-    private function get_js_module() {
-        $jsmodule = array('name' => 'datalynxfield_teammemberselect',
-                'fullpath' => '/mod/datalynx/amd/teammemberselect.js',
-                'requires' => array('node', 'event', 'node-event-delegate', 'event-outside', 'console'));
-        return $jsmodule;
-    }
-
     public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
         global $PAGE;
-
         $field = $this->_field;
         $fieldid = $field->id();
         $fieldname = "f_{$i}_{$fieldid}";
@@ -219,10 +208,9 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         $fieldid = $this->_field->id();
 
         $formfieldname = "field_{$fieldid}_{$entryid}";
-
         $errors = array();
         foreach ($tags as $tag) {
-            list(, $behavior, ) = $this->process_tag($tag);
+			list(, $behavior, ) = $this->process_tag($tag);
             // Variable $behavior datalynx_field_behavior.
             if ($behavior->is_required()) {
                 $userfound = false;
@@ -239,9 +227,10 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
                 }
             }
             if (isset($formdata->$formfieldname)) {
+				// Get rid of Dummy value -999 to correct calculations.
+				if ($formdata->$formfieldname[0] == -999) array_shift($formdata->$formfieldname);
                 // Limit chosen users to max teamsize and ensure min teamsize users are chosen!
-                // If the field is not required we have added a dummy value -1. Accounting for that.
-                $teamsize = $behavior->is_required() ? count($formdata->$formfieldname) : count($formdata->$formfieldname)-1;
+                $teamsize = count($formdata->$formfieldname);
                 if ($teamsize > $this->_field->teamsize) {
                     $errors[$formfieldname] = get_string('maxteamsize_error_form', 'datalynx', $this->_field->teamsize);
                 }
