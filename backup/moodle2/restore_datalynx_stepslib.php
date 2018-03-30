@@ -142,23 +142,24 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
 
         $data->dataid = $this->get_new_parentid('datalynx');
 
-        // Restore view reference for datalynxview field type.
-        if ($data->type == 'datalynxview') {
-            $data->param1 = $this->get_mappingid('datalynx', $data->param1);
-            $data->param2 = $this->get_mappingid('datalynx_views', $data->param2);
-
-            $course = isset($data->targetcourse) ? $data->targetcourse : 'NULL';
-            $instance = isset($data->targetinstance) ? $data->targetinstance : 'NULL';
-            $view = isset($data->targetview) ? $data->targetview : 'NULL';
-            $filter = isset($data->targetfilter) ? $data->targetfilter : 'NULL';
-
-            $this->log(
-            "WARNING! 'datalynxview' field type cannot be restored if referencing instances are not included in the backup!",
-                    backup::LOG_WARNING);
-            $this->log("* Please verify the references of the field:", backup::LOG_WARNING);
-            $this->log(
-            "* Field '$data->name' originally referenced: course '$course', instance '$instance', view '$view', filter '$filter'",
-                    backup::LOG_WARNING);
+        // When datalynxview restored on the same site, keep the reference to the datalynx instance unchanged.
+        if ($data->type == 'datalynxview' && !$this->get_task()->is_samesite()) {
+                // Otherwhise set references to 0. TODO: Add error messages.
+                $data->param1 = $this->get_mappingid('datalynx', $data->param1);
+                $data->param2 = $this->get_mappingid('datalynx_views', $data->param2);
+    
+                $course = isset($data->targetcourse) ? $data->targetcourse : 'NULL';
+                $instance = isset($data->targetinstance) ? $data->targetinstance : 'NULL';
+                $view = isset($data->targetview) ? $data->targetview : 'NULL';
+                $filter = isset($data->targetfilter) ? $data->targetfilter : 'NULL';
+    
+                $this->log(
+                "WARNING! 'datalynxview' field type cannot be restored if referencing instances are not included in the backup!",
+                        backup::LOG_WARNING);
+                $this->log("* Please verify the references of the field:", backup::LOG_WARNING);
+                $this->log(
+                "* Field '$data->name' originally referenced: course '$course', instance '$instance', view '$view', filter '$filter'",
+                        backup::LOG_WARNING);
         }
 
         // Insert the datalynx_fields record.

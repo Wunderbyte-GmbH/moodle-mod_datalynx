@@ -164,7 +164,7 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
 
         // TODO: fix sql, this is just a temporary fix and does not provide same functionality for postgresql.
         // SQL for mysql provides id mapping of the field datalynx view, whereas there is no id mapping for postgresql.
-        if ($CFG->dbtype == 'mysqli' || $CFG->dbtype == 'mysql') {
+        // if ($CFG->dbtype == 'mysqli' || $CFG->dbtype == 'mysql') {
             $field->set_source_sql(
                     "SELECT f.*,
                         CASE f.type WHEN 'datalynxview' THEN MAX(c.fullname) ELSE NULL END AS targetcourse,
@@ -184,6 +184,7 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
                   WHERE f.dataid = :dataid
                GROUP BY f.id",
                     array('dataid' => backup::VAR_PARENTID));
+        /*
         } else {
             $field->set_source_sql(
                     "SELECT f.*
@@ -192,6 +193,7 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
                 AND f.type != 'datalynxview'",
                     array('dataid' => backup::VAR_PARENTID));
         }
+        */
 
         $filter->set_source_table('datalynx_filters', array('dataid' => backup::VAR_PARENTID));
         $view->set_source_table('datalynx_views', array('dataid' => backup::VAR_PARENTID));
