@@ -227,7 +227,11 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
             $value = null;
 
             // Render search elements.
-            list($elems, $separators) = $fields[$fieldid]->renderer()->render_search_mode($mform, $count, $value);
+            if ($fieldid == 'timecreated' || $fieldid == 'timemodified') {
+                list($elems, $separators) = $fields[$fieldid]->renderer()->render_search_mode($mform, $count, $value, true);
+            } else {
+                list($elems, $separators) = $fields[$fieldid]->renderer()->render_search_mode($mform, $count, $value);
+            }
 
             if ($separators) {
                 $sep = array_merge(array(' ', ' ', ' '), $separators);
@@ -410,13 +414,13 @@ class mod_datalynx_advanced_filter_form extends mod_datalynx_filter_base_form {
 }
 
 /**
- * Contains class customized_filter_form used to display the customfilter options in FRONTEND ("Browse")
+ * Class customfilter_frontend_form to display the customfilter options in browse mode
  *
  */
 class mod_datalynx_customfilter_frontend_form extends mod_datalynx_filter_base_form {
 
     /*
-     * This by the admin predefined customfilter form is presented to the user
+     * This customfilter form  predefined by the admin is displayed
      */
     public function definition() {
         $view = $this->_customdata['view'];

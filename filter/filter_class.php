@@ -147,12 +147,10 @@ class datalynx_filter {
         $this->_joins = array();
 
         if ($this->customsearch) {
-            $this->_searchfields = is_array($this->customsearch) ? $this->customsearch : unserialize(
-                    $this->customsearch);
+            $this->_searchfields = is_array($this->customsearch) ? $this->customsearch : unserialize($this->customsearch);
         }
         if ($this->customsort) {
-            $this->_sortfields = is_array($this->customsort) ? $this->customsort : unserialize(
-                    $this->customsort);
+            $this->_sortfields = is_array($this->customsort) ? $this->customsort : unserialize($this->customsort);
         }
     }
 
@@ -868,37 +866,56 @@ class datalynx_filter_manager {
     public function get_filter_from_customfilterform($filter, $formdata, $customfilter) {
         global $DB;
 
-        $customfilterfields = explode(",", $customfilter->fieldlist);
-        list($insql, $params) = $DB->get_in_or_equal($customfilterfields, SQL_PARAMS_NAMED);
-        $sql = 'SELECT  f.id
-                        FROM    {datalynx_fields} f
-                        WHERE   f.name ' . $insql ;
-        $customfilterfieldids = $DB->get_fieldset_sql($sql,$params);
+        $customfilterfields = json_decode($customfilter->fieldlist);
+        $customfilterfieldids = array();
+        foreach($customfilterfields as $key => $value) {
+            $customfilterfieldids[] = $value;
+        }
 
         $searchfields = array();
         foreach ($formdata as $key => $value) {
             $formfieldarray = explode("_", $key);
             if (count($formfieldarray) >= 3) {
+                $fieldid = $formfieldarray[1];
                 $fieldname = $formfieldarray[2];
                 switch ($fieldname) {
                     case ("approve"):
-                        $filter->approve = $value;
+                        $searchfields['approve']['AND'] = array('', '', $value);
                         break;
                     case ("timecreated"):
-                        $filter->timecreated = $value;
+                        if (count($formfieldarray) > 4 && $formfieldarray[3] == 'from' && $formfieldarray[4] == 'active') {
+                            if ($formdata[$key]) {
+                                $valuearr = array();
+                                $fromkey = str_replace('_active', '', $key);
+                                $valuearray[] = $formdata[$fromkey];
+                                $tokeyactive = str_replace('_from', '_to', $key);
+                                if ($formdata[$tokeyactive]) {
+                                    $valuearray[] = $formdata[$fromkey];
+                                    $tokey = str_replace('_active', '', $tokeyactive);
+                                    $tokeyactive = str_replace('_from', '_to', $key);
+                                }
+                                $searchfields['timecreated']['AND'] = array('', '>=', array($valuefrom));
+                            }
+                        }
                         break;
                     case ("timemodified"):
-                        $filter->timemodified = $value;
+                        if (count($formfieldarray) > 4 && $formfieldarray[3] == 'from' && $formfieldarray[4] == 'active') {
+                            $searchfields['timemodified']['AND'] = array('', '=', array($value));
+                        }
+                        if (count($formfieldarray) > 4 && $formfieldarray[3] == 'to' && $formfieldarray[4] == 'active') {
+                            $valuearr = array($searchfields['timemodified']['AND'][2], $value);
+                            $searchfields['timecreated']['AND'] = array('', 'BETWEEN', $valuearr);
+                        }
                         break;
                     case ("status"):
-                        $filter->status = $value;
+                        $searchfields['status']['AND'] = array('', '', $value);
                         break;
                     // TODO: Datei
                     default:
                         if(in_array($fieldname, $customfilterfieldids)) {
                             if($value) {
                                 // Analog to advanced filter form: searchfieldid - searchandor - not - operator - value.
-                                $searchfields[] = array($key, 'AND', '', '=', $value);
+                                $searchfields[$fieldid]['AND'] = array('', '=', $value);
                             }
                         }
                 }
@@ -1473,6 +1490,7 @@ class datalynx_filter_manager {
                 'users' => array('users', '', PARAM_SEQUENCE),
                 'groups' => array('groups', '', PARAM_SEQUENCE),
                 'afilter' => array('afilter', 0, PARAM_INT),
+                'cfilter' => array('cfilter', 0, PARAM_INT),
                 'usersearch' => array('usersearch', 0, PARAM_RAW));
 
         $options = array();
