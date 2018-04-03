@@ -880,42 +880,40 @@ class datalynx_filter_manager {
                 $fieldname = $formfieldarray[2];
                 switch ($fieldname) {
                     case ("approve"):
-                        $searchfields['approve']['AND'] = array('', '', $value);
+                        if ((int)$value > 0) {
+                            $searchfields['approve']['AND'][] = array('', '=', $value);
+                        }
                         break;
                     case ("timecreated"):
-                        if (count($formfieldarray) > 4 && $formfieldarray[3] == 'from' && $formfieldarray[4] == 'active') {
-                            if ($formdata[$key]) {
+                    case ("timemodified"):
+                        if (count($formfieldarray) > 4 && $formfieldarray[3] == 'from' &&
+                            $formfieldarray[4] == 'active') {
+                            if ($formdata->{$key}) {
                                 $valuearr = array();
                                 $fromkey = str_replace('_active', '', $key);
-                                $valuearray[] = $formdata[$fromkey];
+                                $valuearr[] = $formdata->{$fromkey};
                                 $tokeyactive = str_replace('_from', '_to', $key);
-                                if ($formdata[$tokeyactive]) {
-                                    $valuearray[] = $formdata[$fromkey];
+                                if ($formdata->{$tokeyactive}) {
                                     $tokey = str_replace('_active', '', $tokeyactive);
-                                    $tokeyactive = str_replace('_from', '_to', $key);
+                                    $valuearr[] = $formdata->{$tokey};
+                                    $searchfields[$fieldname]['AND'][] = array('', 'BETWEEN', $valuearr);
+                                } else {
+                                    $searchfields[$fieldname]['AND'][] = array('', '>=', $valuearr[0]);
                                 }
-                                $searchfields['timecreated']['AND'] = array('', '>=', array($valuefrom));
                             }
                         }
                         break;
-                    case ("timemodified"):
-                        if (count($formfieldarray) > 4 && $formfieldarray[3] == 'from' && $formfieldarray[4] == 'active') {
-                            $searchfields['timemodified']['AND'] = array('', '=', array($value));
-                        }
-                        if (count($formfieldarray) > 4 && $formfieldarray[3] == 'to' && $formfieldarray[4] == 'active') {
-                            $valuearr = array($searchfields['timemodified']['AND'][2], $value);
-                            $searchfields['timecreated']['AND'] = array('', 'BETWEEN', $valuearr);
-                        }
-                        break;
                     case ("status"):
-                        $searchfields['status']['AND'] = array('', '', $value);
+                        if ((int)$value > 0) {
+                            $searchfields['status']['AND'][] = array('', '=', $value);
+                        }
                         break;
                     // TODO: Datei
                     default:
                         if(in_array($fieldname, $customfilterfieldids)) {
                             if($value) {
                                 // Analog to advanced filter form: searchfieldid - searchandor - not - operator - value.
-                                $searchfields[$fieldid]['AND'] = array('', '=', $value);
+                                $searchfields[$fieldname]['AND'][] = array('', 'ANY_OF', $value);
                             }
                         }
                 }
