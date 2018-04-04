@@ -872,11 +872,11 @@ class datalynx_filter_manager {
             $customfilterfieldids[] = $value;
         }
 
+        $fields = $this->_df->get_fields();
         $searchfields = array();
         foreach ($formdata as $key => $value) {
             $formfieldarray = explode("_", $key);
             if (count($formfieldarray) >= 3) {
-                $fieldid = $formfieldarray[1];
                 $fieldname = $formfieldarray[2];
                 switch ($fieldname) {
                     case ("approve"):
@@ -893,7 +893,7 @@ class datalynx_filter_manager {
                                 $fromkey = str_replace('_active', '', $key);
                                 $valuearr[] = $formdata->{$fromkey};
                                 $tokeyactive = str_replace('_from', '_to', $key);
-                                if ($formdata->{$tokeyactive}) {
+                                if (isset($formdata->{$tokeyactive})) {
                                     $tokey = str_replace('_active', '', $tokeyactive);
                                     $valuearr[] = $formdata->{$tokey};
                                     $searchfields[$fieldname]['AND'][] = array('', 'BETWEEN', $valuearr);
@@ -912,8 +912,13 @@ class datalynx_filter_manager {
                     default:
                         if(in_array($fieldname, $customfilterfieldids)) {
                             if($value) {
-                                // Analog to advanced filter form: searchfieldid - searchandor - not - operator - value.
-                                $searchfields[$fieldname]['AND'][] = array('', 'ANY_OF', $value);
+                                $type = $fields[$fieldname]->type;
+                                if ($type == "text" || $type == "file") {
+                                    $searchfields[$fieldname]['AND'][] = array('', 'LIKE', $value);
+                                } else {
+                                    // Analog to advanced filter form: searchfieldid - searchandor - not - operator - value.
+                                    $searchfields[$fieldname]['AND'][] = array('', 'ANY_OF', $value);
+                                }
                             }
                         }
                 }
@@ -1346,39 +1351,41 @@ class datalynx_filter_manager {
             }
         }
 
-        // Set user filter.
-        if ($userfilters = $this->get_user_filters_menu($viewid)) {
-            if (empty($modifycurrent) or empty($userfilters[$filterid])) {
-                $filterid = key($userfilters) - 1;
+        if (!$customfilter) {
+            // Set user filter.
+            if ($userfilters = $this->get_user_filters_menu($viewid)) {
+                if (empty($modifycurrent) or empty($userfilters[$filterid])) {
+                    $filterid = key($userfilters) - 1;
+                }
+            } else {
+                $filterid = self::USER_FILTER_ID_START;
             }
-        } else {
-            $filterid = self::USER_FILTER_ID_START;
-        }
 
-        // If max number of user filters pop the last.
-        if (count($userfilters) >= self::USER_FILTER_MAX_NUM) {
-            $fids = array_keys($userfilters);
-            while (count($fids) >= self::USER_FILTER_MAX_NUM) {
-                $fid = array_pop($fids);
-                unset($userfilters[$fid]);
-                unset_user_preference("datalynxfilter-$dfid-$viewid-$fid");
+            // If max number of user filters pop the last.
+            if (count($userfilters) >= self::USER_FILTER_MAX_NUM) {
+                $fids = array_keys($userfilters);
+                while (count($fids) >= self::USER_FILTER_MAX_NUM) {
+                    $fid = array_pop($fids);
+                    unset($userfilters[$fid]);
+                    unset_user_preference("datalynxfilter-$dfid-$viewid-$fid");
+                }
             }
-        }
 
-        // Save the new filter.
-        $filter->id = $filterid;
-        $filter->dataid = $dfid;
-        if (empty($filter->name)) {
-            $filter->name = get_string('filtermy', 'datalynx') . ' ' . abs($filterid);
-        }
-        set_user_preference("datalynxfilter-$dfid-$viewid-$filterid", serialize($filter));
+            // Save the new filter.
+            $filter->id = $filterid;
+            $filter->dataid = $dfid;
+            if (empty($filter->name)) {
+                $filter->name = get_string('filtermy', 'datalynx') . ' ' . abs($filterid);
+            }
+            set_user_preference("datalynxfilter-$dfid-$viewid-$filterid", serialize($filter));
 
-        // Add the new filter to the beginning of the userfilters.
-        $userfilters = array($filterid => $filter->name) + $userfilters;
-        foreach ($userfilters as $filterid => $name) {
-            $userfilters[$filterid] = "$filterid $name";
+            // Add the new filter to the beginning of the userfilters.
+            $userfilters = array($filterid => $filter->name) + $userfilters;
+            foreach ($userfilters as $filterid => $name) {
+                $userfilters[$filterid] = "$filterid $name";
+            }
+            set_user_preference("datalynxfilter-$dfid-$viewid-userfilters", implode(';', $userfilters));
         }
-        set_user_preference("datalynxfilter-$dfid-$viewid-userfilters", implode(';', $userfilters));
 
         return $filter;
     }
