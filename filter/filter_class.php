@@ -48,6 +48,8 @@ class datalynx_filter {
 
     public $customsort;
 
+    public $customfiltersort;
+
     public $customsearch;
 
     public $search;
@@ -95,6 +97,7 @@ class datalynx_filter {
             $this->search = $filterdata->search;
         }
         $this->contentfields = empty($filterdata->contentfields) ? null : $filterdata->contentfields;
+        $this->customfiltersort = empty($filterdata->customfiltersortfields) ? null : $filterdata->customfiltersortfields;
 
         $this->eids = empty($filterdata->eids) ? null : $filterdata->eids;
         $this->users = empty($filterdata->users) ? null : $filterdata->users;
@@ -118,6 +121,7 @@ class datalynx_filter {
         $filter->customsort = $this->customsort;
         $filter->customsearch = $this->customsearch;
         $filter->search = $this->search;
+        $filter->customfiltersort = $this->customfiltersort;
 
         return $filter;
     }
@@ -151,6 +155,13 @@ class datalynx_filter {
         }
         if ($this->customsort) {
             $this->_sortfields = is_array($this->customsort) ? $this->customsort : unserialize($this->customsort);
+        }
+        if ($this->customfiltersort) {
+            if ($this->customsort) {
+             $this->_sortfields = array_merge( $this->_sortfields, $this->customfiltersort);
+            } else {
+                $this->_sortfields = $this->customfiltersort;
+            }
         }
     }
 
@@ -868,8 +879,8 @@ class datalynx_filter_manager {
 
         $customfilterfields = json_decode($customfilter->fieldlist);
         $customfilterfieldids = array();
-        foreach($customfilterfields as $key => $value) {
-            $customfilterfieldids[] = $value;
+        foreach ($customfilterfields as $fid => $field) {
+            $customfilterfieldids[] = $fid;
         }
 
         $fields = $this->_df->get_fields();

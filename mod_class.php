@@ -760,7 +760,7 @@ class datalynx {
      * Returns an array of fields, suitable for use in customfilter form.
      * @return array of strings
      */
-    public function get_customfilterfields() {
+    public function get_customfilterfieldtypes() {
         global $CFG;
 
         if (!$this->customfilterfields) {

@@ -42,7 +42,9 @@ class mod_datalynx_customfilter_backend_form extends mod_datalynx_customfilter_b
             $customfilter->fulltextsearch = false;
             $customfilter->visible = false;
             $customfilter->timecreated = false;
+            $customfilter->timecreated_sortable = false;
             $customfilter->timemodified = false;
+            $customfilter->timemodified_sortable = false;
             $customfilter->approve = false;
             $customfilter->status = false;
             $customfilter->fieldlist = "";
@@ -67,13 +69,25 @@ class mod_datalynx_customfilter_backend_form extends mod_datalynx_customfilter_b
         $mform->setType('fulltextsearch', PARAM_INT);
         $mform->setDefault('fulltextsearch', $customfilter->fulltextsearch);
 
-        $mform->addElement('advcheckbox', 'timecreated', get_string('timecreated', 'datalynx'));
+        $grp = array();
+        $grp[] = $mform->createElement('advcheckbox', 'timecreated', get_string('timecreated', 'datalynx'));
+        $grp[] = $mform->createElement('advcheckbox', 'timecreated_sortable', '', get_string('sortable', 'datalynx'),
+                '', array(0, 1));
+        $mform->addGroup($grp, '', null, ' ', false);
         $mform->setType('timecreated', PARAM_INT);
         $mform->setDefault('timecreated', $customfilter->timecreated);
+        $mform->setType('timecreated_sortable', PARAM_INT);
+        $mform->setDefault('timecreated_sortable', $customfilter->timecreated_sortable);
 
-        $mform->addElement('advcheckbox', 'timemodified', get_string('timemodified', 'datalynx'));
+        $grp = array();
+        $grp[] = $mform->createElement('advcheckbox', 'timemodified', get_string('timemodified', 'datalynx'));
+        $grp[] = $mform->createElement('advcheckbox', 'timemodified_sortable', '', get_string('sortable', 'datalynx'),
+                '', array(0, 1));
+        $mform->addGroup($grp, '', null, ' ', false);
         $mform->setType('timemodified', PARAM_INT);
         $mform->setDefault('timemodified', $customfilter->timemodified);
+        $mform->setType('timemodified_sortable', PARAM_INT);
+        $mform->setDefault('timemodified_sortable', $customfilter->timemodified_sortable);
 
         $mform->addElement('advcheckbox', 'approve', get_string('approved', 'datalynx'));
         $mform->setType('approve', PARAM_INT);
@@ -89,14 +103,24 @@ class mod_datalynx_customfilter_backend_form extends mod_datalynx_customfilter_b
         if ($customfilter->fieldlist) {
             $fieldlist = json_decode($customfilter->fieldlist);
         }
-        $fields = $this->_getfields($this->_df);
+        $fields = $this->_getpossiblecustomfilterfields($this->_df);
         foreach ($fields as $fieldid => $field) {
-            $mform->addElement('advcheckbox', 'fieldlist[' . $field->field->name . ']',
-                $field->field->name . ' (' . $field->type . ')', '', '', $field->field->id);
-            $mform->setType('fieldlist[' . $field->field->name . ']', PARAM_TEXT);
-            foreach ($fieldlist as $fname => $fid) {
+            $formfieldname = 'fieldlist[' . $field->field->id . '][name]';
+            $formfieldsortablename = 'fieldlist[' . $field->field->id . '][sortable]';
+            $grp = array();
+            $grp[] = $mform->createElement('advcheckbox', $formfieldname,
+                    $field->field->name . ' (' . $field->type . ')', '', '', $field->field->name);
+            $grp[] = $mform->createElement('advcheckbox', $formfieldsortablename, '', get_string('sortable', 'datalynx'),
+                    '', array(0, 1));
+            $mform->addGroup($grp, '', null, ' ', false);
+            $mform->setType($formfieldname, PARAM_TEXT);
+            $mform->setType($formfieldsortablename, PARAM_INT);
+            foreach ($fieldlist as $fid => $listfield) {
                 if ($field->field->id == $fid) {
-                    $mform->setDefault('fieldlist[' . $field->field->name . ']', $field->field->id);
+                    $mform->setDefault($formfieldname, $field->field->name);
+                    if ($listfield->sortable) {
+                        $mform->setDefault($formfieldsortablename, 1);
+                    }
                     break;
                 }
             }
@@ -105,11 +129,11 @@ class mod_datalynx_customfilter_backend_form extends mod_datalynx_customfilter_b
         $this->add_action_buttons(true, get_string('savechanges'));
     }
 
-    protected function _getfields($df) {
+    protected function _getpossiblecustomfilterfields($df) {
         global $DB;
 
         $fields = array();
-        $customfilterfieldtypes = $df->get_customfilterfields();
+        $customfilterfieldtypes = $df->get_customfilterfieldtypes();
         $fieldsdb = $DB->get_records('datalynx_fields', array('dataid' => $df->id()), 'name asc');
         foreach ($fieldsdb as $fieldid => $field) {
             if (in_array($field->type, $customfilterfieldtypes)) {
@@ -132,7 +156,14 @@ class mod_datalynx_customfilter_backend_form extends mod_datalynx_customfilter_b
 
         if ($data = parent::get_data()) {
             if (!empty($data->fieldlist)) {
-                $data->fieldlist = json_encode($data->fieldlist);
+                $fieldlistarray = array();
+                foreach($data->fieldlist as $fieldid => $field) {
+                    if ($field['name']) {
+                        $fieldlistarray[$fieldid]['name'] = $field['name'];
+                        $fieldlistarray[$fieldid]['sortable'] = $field['sortable'];
+                    }
+                }
+                $data->fieldlist = json_encode($fieldlistarray);
             } else {
                 $data->fieldlist = null;
             }

@@ -353,7 +353,9 @@ class mod_datalynx_customfilter_manager {
         $filter->visible = !isset($formdata->visible) ? 0 : $formdata->visible;
         $filter->fulltextsearch = !isset($formdata->fulltextsearch) ? 0 : $formdata->fulltextsearch;
         $filter->timecreated = empty($formdata->timecreated) ? 0 : $formdata->timecreated;
+        $filter->timecreated_sortable = empty($formdata->timecreated_sortable) ? 0 : $formdata->timecreated_sortable;
         $filter->timemodified = empty($formdata->timemodified) ? 0 : $formdata->timemodified;
+        $filter->timemodified_sortable = empty($formdata->timemodified_sortable) ? 0 : $formdata->timemodified_sortable;
         $filter->approve = empty($formdata->approve) ? 0 : $formdata->approve;
         $filter->status = empty($formdata->status) ? 0 : $formdata->status;
         $filter->fieldlist = empty($formdata->fieldlist) ? 0 : $formdata->fieldlist;
@@ -401,8 +403,8 @@ class mod_datalynx_customfilter_manager {
                 $fieldlist = "";
                 $connector = "";
                 $fieldlistdecode = json_decode($filter->fieldlist);
-                foreach($fieldlistdecode as $fname => $fid) {
-                    $fieldlist .= $connector . $fname;
+                foreach($fieldlistdecode as $fid => $listfield) {
+                    $fieldlist .= $connector . $listfield->name;
                     $connector = ", ";
                 }
             } else {

@@ -395,9 +395,13 @@
                 <FIELD NAME="fulltextsearch" TYPE="int" LENGTH="4" NOTNULL="true"
                        DEFAULT="0" SEQUENCE="false" PREVIOUS="visible" NEXT="timecreated"/>
                 <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true"
-                       DEFAULT="0" SEQUENCE="false" PREVIOUS="fulltextsearch" NEXT="timemodified"/>
+                       DEFAULT="0" SEQUENCE="false" PREVIOUS="fulltextsearch" NEXT="timecreated_sortable"/>
+                <FIELD NAME="timecreated_sortable" TYPE="int" LENGTH="10" NOTNULL="true"
+                       DEFAULT="0" SEQUENCE="false" PREVIOUS="timecreated" NEXT="timemodified"/>
                 <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true"
-                       DEFAULT="0" SEQUENCE="false" PREVIOUS="timecreated" NEXT="approve"/>
+                       DEFAULT="0" SEQUENCE="false" PREVIOUS="timecreated_sortable" NEXT="timemodified_sortable"/>
+                <FIELD NAME="timemodified_sortable" TYPE="int" LENGTH="4" NOTNULL="true"
+                       DEFAULT="0" SEQUENCE="false" PREVIOUS="timemodified" NEXT="approve"/>
                 <FIELD NAME="approve" TYPE="int" LENGTH="4" NOTNULL="true"
                        DEFAULT="0" SEQUENCE="false" PREVIOUS="timemodified" NEXT="status"/>
                 <FIELD NAME="status" TYPE="int" LENGTH="4" NOTNULL="true"

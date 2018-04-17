@@ -855,3 +855,5 @@ $string['edittemplate_help'] = 'Specify HTML template to replace the field tag i
 $string['fulltextsearch'] = 'Fulltextsearch';
 $string['fieldlist'] = 'Searchable Fields';
 $string['userfields'] = 'User defined fields';
+$string['sortable'] = 'sortable';
+$string['activate'] = 'activate';

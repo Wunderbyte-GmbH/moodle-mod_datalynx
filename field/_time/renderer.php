@@ -98,14 +98,14 @@ class datalynxfield__time_renderer extends datalynxfield_renderer {
         $elements = array();
         $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_from", get_string('from'));
         if ($activecheckbox) {
-            $elements[] = &$mform->createElement('checkbox', "f_{$i}_{$fieldid}_from_active", get_string('active'));
+            $elements[] = &$mform->createElement('checkbox', "f_{$i}_{$fieldid}_from_active", get_string('activate', 'datalynx'));
             foreach (array('year', 'month', 'day', 'hour', 'minute') as $fieldidentifier) {
                 $mform->disabledIf("f_{$i}_{$fieldid}_from[$fieldidentifier]", "f_{$i}_{$fieldid}_from_active", "notchecked");
             }
         }
         $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_to", get_string('to'));
         if ($activecheckbox) {
-            $elements[] = &$mform->createElement('checkbox', "f_{$i}_{$fieldid}_to_active", get_string('active'));
+            $elements[] = &$mform->createElement('checkbox', "f_{$i}_{$fieldid}_to_active", get_string('activate', 'datalynx'));
             foreach (array('year', 'month', 'day', 'hour', 'minute') as $fieldidentifier) {
                 $mform->disabledIf("f_{$i}_{$fieldid}_to[$fieldidentifier]", "f_{$i}_{$fieldid}_to_active", "notchecked");
             }

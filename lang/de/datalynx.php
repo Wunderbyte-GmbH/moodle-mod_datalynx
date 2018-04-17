@@ -821,3 +821,5 @@ $string['confirmbehaviorduplicate'] = 'Sie sind im Begriff dieses Feldverhalten 
 $string['fulltextsearch'] = 'Volltextsuche';
 $string['fieldlist'] = 'Durchsuchbare Felder';
 $string['userfields'] = 'Benutzer-definierte Felder';
+$string['sortable'] = 'sortierbar';
+$string['activate'] = 'Aktivieren';
