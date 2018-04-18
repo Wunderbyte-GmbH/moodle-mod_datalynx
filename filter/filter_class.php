@@ -48,8 +48,6 @@ class datalynx_filter {
 
     public $customsort;
 
-    public $customfiltersort;
-
     public $customsearch;
 
     public $search;
@@ -97,7 +95,6 @@ class datalynx_filter {
             $this->search = $filterdata->search;
         }
         $this->contentfields = empty($filterdata->contentfields) ? null : $filterdata->contentfields;
-        $this->customfiltersort = empty($filterdata->customfiltersortfields) ? null : $filterdata->customfiltersortfields;
 
         $this->eids = empty($filterdata->eids) ? null : $filterdata->eids;
         $this->users = empty($filterdata->users) ? null : $filterdata->users;
@@ -121,7 +118,6 @@ class datalynx_filter {
         $filter->customsort = $this->customsort;
         $filter->customsearch = $this->customsearch;
         $filter->search = $this->search;
-        $filter->customfiltersort = $this->customfiltersort;
 
         return $filter;
     }
@@ -156,11 +152,14 @@ class datalynx_filter {
         if ($this->customsort) {
             $this->_sortfields = is_array($this->customsort) ? $this->customsort : unserialize($this->customsort);
         }
-        if ($this->customfiltersort) {
+        $customfiltersortfield = optional_param('customfiltersortfield', null, PARAM_INT);
+        if ($customfiltersortfield) {
+            $customfiltersortdirection = optional_param('customfiltersortdirection', '0', PARAM_INT);
+            $customfiltersort = array($customfiltersortfield => $customfiltersortdirection);
             if ($this->customsort) {
-             $this->_sortfields = array_merge( $this->_sortfields, $this->customfiltersort);
+             $this->_sortfields = array_merge( $this->_sortfields, $customfiltersort);
             } else {
-                $this->_sortfields = $this->customfiltersort;
+                $this->_sortfields = $customfiltersort;
             }
         }
     }

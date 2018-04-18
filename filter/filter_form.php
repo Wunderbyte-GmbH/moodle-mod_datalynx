@@ -494,7 +494,11 @@ class mod_datalynx_customfilter_frontend_form extends mod_datalynx_filter_base_f
 
         if (!empty($sortfields)) {
             array_unshift($sortfields, get_string('choosedots'));
-            $mform->addElement('select', 'customfiltersortfields', get_string('sortby'), $sortfields);
+            $grp = array();
+            $grp[] = $mform->createElement('select', 'customfiltersortfield', '', $sortfields);
+            $directions = array( "0" => get_string('asc'), "1" => get_string('desc'));
+            $grp[] = $mform->createElement('select', 'customfiltersortdirection', '', $directions);
+            $mform->addGroup($grp, "customfiltersort_grp", get_string('sortby'), ' ', false);
         }
         $this->add_action_buttons(false, get_string('search'));
     }
