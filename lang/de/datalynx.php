@@ -823,3 +823,5 @@ $string['fieldlist'] = 'Durchsuchbare Felder';
 $string['userfields'] = 'Benutzer-definierte Felder';
 $string['sortable'] = 'sortierbar';
 $string['activate'] = 'Aktivieren';
+$string['fileexist'] = 'vorhanden';
+$string['filemissing'] = 'fehlt';

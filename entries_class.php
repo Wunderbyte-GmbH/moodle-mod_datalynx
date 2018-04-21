@@ -538,9 +538,7 @@ class datalynx_entries {
 
                 // All other types of processing must refer to specific entry ids.
             } else {
-                $entries = $DB->get_records_select('datalynx_entries',
-                        "dataid = ? AND id IN ($eids)", array($df->id()
-                        ));
+                $entries = $DB->get_records_select('datalynx_entries', "dataid = ? AND id IN ($eids)", array($df->id()));
             }
 
             if (!empty($importentryids)) {

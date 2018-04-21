@@ -857,3 +857,5 @@ $string['fieldlist'] = 'Searchable Fields';
 $string['userfields'] = 'User defined fields';
 $string['sortable'] = 'sortable';
 $string['activate'] = 'activate';
+$string['fileexist'] = 'exists';
+$string['filemissing'] = 'missing';

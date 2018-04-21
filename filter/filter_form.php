@@ -169,17 +169,14 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
                 if ($fieldid) {
                     $operatoroptions = $df->get_field_from_id($fieldid)->get_supported_search_operators();
                 }
-                $arr[] = &$mform->createElement('select', 'searchoperator' . $count, '',
-                        $operatoroptions);
+                $arr[] = &$mform->createElement('select', 'searchoperator' . $count, '', $operatoroptions);
                 $mform->setDefault('searchoperator' . $count, $operator);
                 // Field search elements.
-                list($elems, $separators) = $fields[$fieldid]->renderer()->render_search_mode(
-                        $mform, $count, $value);
+                list($elems, $separators) = $fields[$fieldid]->renderer()->render_search_mode($mform, $count, $value);
 
                 $arr = array_merge($arr, $elems);
                 if ($separators) {
-                    $sep = array_merge(array(' ', ' ', ' '
-                    ), $separators);
+                    $sep = array_merge(array(' ', ' ', ' '), $separators);
                 } else {
                     $sep = ' ';
                 }
@@ -484,8 +481,6 @@ class mod_datalynx_customfilter_frontend_form extends mod_datalynx_filter_base_f
             $mform->addElement('text', 'search', get_string('search'));
             $mform->setType('search', PARAM_TEXT);
         }
-
-        // TODO: File.
 
         // Custom search.
         if ($customfilter->fieldlist) {

@@ -918,17 +918,22 @@ class datalynx_filter_manager {
                             $searchfields['status']['AND'][] = array('', '=', $value);
                         }
                         break;
-                    // TODO: Datei
                     default:
                         if(in_array($fieldname, $customfilterfieldids)) {
-                            if($value) {
-                                $type = $fields[$fieldname]->type;
-                                if ($type == "text" || $type == "file") {
+                            $type = $fields[$fieldname]->type;
+                            if ($type == "text") {
+                                if($value) {
                                     $searchfields[$fieldname]['AND'][] = array('', 'LIKE', $value);
-                                } else {
-                                    // Analog to advanced filter form: searchfieldid - searchandor - not - operator - value.
-                                    $searchfields[$fieldname]['AND'][] = array('', 'ANY_OF', $value);
                                 }
+                            } else if ($type == "file") {
+                                if ($value == '0') {
+                                    $searchfields[$fieldname]['AND'][] = array('', '', false);
+                                } else if ($value == '1') {
+                                    $searchfields[$fieldname]['AND'][] = array('NOT', '', false);
+                                }
+                            } else {
+                                // Analog to advanced filter form: searchfieldid - searchandor - not - operator - value.
+                                $searchfields[$fieldname]['AND'][] = array('', 'ANY_OF', $value);
                             }
                         }
                 }
