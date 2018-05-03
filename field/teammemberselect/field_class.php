@@ -441,4 +441,11 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         }
     }
 
+    /**
+     * Are fields of this field type suitable for use in customfilters?
+     * @return bool
+     */
+    public static function is_customfilterfield() {
+        return true;
+    }
 }

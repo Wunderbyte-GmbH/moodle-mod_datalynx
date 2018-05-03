@@ -152,8 +152,17 @@ class datalynx_filter {
                     $this->customsearch);
         }
         if ($this->customsort) {
-            $this->_sortfields = is_array($this->customsort) ? $this->customsort : unserialize(
-                    $this->customsort);
+            $this->_sortfields = is_array($this->customsort) ? $this->customsort : unserialize($this->customsort);
+        }
+        $customfiltersortfield = optional_param('customfiltersortfield', null, PARAM_INT);
+        if ($customfiltersortfield) {
+            $customfiltersortdirection = optional_param('customfiltersortdirection', '0', PARAM_INT);
+            $customfiltersort = array($customfiltersortfield => $customfiltersortdirection);
+            if ($this->customsort) {
+             $this->_sortfields = array_merge( $this->_sortfields, $customfiltersort);
+            } else {
+                $this->_sortfields = $customfiltersort;
+            }
         }
     }
 
@@ -558,10 +567,11 @@ class datalynx_filter_manager {
             $view = !empty($options['view']) ? $options['view'] : null;
             $viewid = $view ? $view->id() : 0;
             $advanced = !empty($options['advanced']);
+            $customfilter = $options['customfilter'];
 
             // User preferences.
-            if (($filterid == self::USER_FILTER_SET or $advanced) and $view and $view->is_active()) {
-                $filter = $this->set_user_filter($filterid, $view, $advanced);
+            if (($filterid == self::USER_FILTER_SET or $advanced or $customfilter) and $view and $view->is_active()) {
+                $filter = $this->set_user_filter($filterid, $view, $advanced, $customfilter);
                 return new datalynx_filter($filter);
             }
 
@@ -888,6 +898,86 @@ class datalynx_filter_manager {
     }
 
     /**
+     * Get filter form data from customfilter form
+     */
+    public function get_filter_from_customfilterform($filter, $formdata, $customfilter) {
+        global $DB;
+
+        $customfilterfields = json_decode($customfilter->fieldlist);
+        $customfilterfieldids = array();
+        foreach ($customfilterfields as $fid => $field) {
+            $customfilterfieldids[] = $fid;
+        }
+
+        $fields = $this->_df->get_fields();
+        $searchfields = array();
+        foreach ($formdata as $key => $value) {
+            $formfieldarray = explode("_", $key);
+            if (count($formfieldarray) >= 3) {
+                $fieldname = $formfieldarray[2];
+                switch ($fieldname) {
+                    case ("approve"):
+                        if ((int)$value > 0) {
+                            $searchfields['approve']['AND'][] = array('', '=', $value);
+                        }
+                        break;
+                    case ("timecreated"):
+                    case ("timemodified"):
+                        if (count($formfieldarray) > 4 && $formfieldarray[3] == 'from' &&
+                            $formfieldarray[4] == 'active') {
+                            if ($formdata->{$key}) {
+                                $valuearr = array();
+                                $fromkey = str_replace('_active', '', $key);
+                                $valuearr[] = $formdata->{$fromkey};
+                                $tokeyactive = str_replace('_from', '_to', $key);
+                                if (isset($formdata->{$tokeyactive})) {
+                                    $tokey = str_replace('_active', '', $tokeyactive);
+                                    $valuearr[] = $formdata->{$tokey};
+                                    $searchfields[$fieldname]['AND'][] = array('', 'BETWEEN', $valuearr);
+                                } else {
+                                    $searchfields[$fieldname]['AND'][] = array('', '>=', $valuearr[0]);
+                                }
+                            }
+                        }
+                        break;
+                    case ("status"):
+                        if ((int)$value > 0) {
+                            $searchfields['status']['AND'][] = array('', '=', $value);
+                        }
+                        break;
+                    default:
+                        if(in_array($fieldname, $customfilterfieldids)) {
+                            $type = $fields[$fieldname]->type;
+                            if ($type == "text") {
+                                if($value) {
+                                    $searchfields[$fieldname]['AND'][] = array('', 'LIKE', $value);
+                                }
+                            } else if ($type == "file") {
+                                if ($value == '0') {
+                                    $searchfields[$fieldname]['AND'][] = array('', '', false);
+                                } else if ($value == '1') {
+                                    $searchfields[$fieldname]['AND'][] = array('NOT', '', false);
+                                }
+                            } else {
+                                // Analog to advanced filter form: searchfieldid - searchandor - not - operator - value.
+                                $searchfields[$fieldname]['AND'][] = array('', 'ANY_OF', $value);
+                            }
+                        }
+                }
+            } else {
+                if($key == "search" && $value) {
+                    $filter->search = $value;
+                }
+            }
+        }
+        if($searchfields) {
+            $filter->customsearch = serialize($searchfields);
+        }
+
+        return $filter;
+    }
+
+    /**
      */
     protected function get_sort_options_from_form($formdata) {
         $sortfields = array();
@@ -931,6 +1021,55 @@ class datalynx_filter_manager {
 
                         // If finalizing, aggregate by fieldid and searchandor,.
                         // Otherwise just make a flat array (of arrays).
+                        if ($finalize) {
+                            if (!isset($searchfields[$searchfieldid])) {
+                                $searchfields[$searchfieldid] = array();
+                            }
+                            if (!isset($searchfields[$searchfieldid][$searchandor])) {
+                                $searchfields[$searchfieldid][$searchandor] = array();
+                            }
+                            $searchfields[$searchfieldid][$searchandor][] = array($not, $operator, $parsedvalue);
+                        } else {
+                            $searchfields[] = array($searchfieldid, $searchandor, $not, $operator, $parsedvalue);
+                        }
+                    }
+                }
+            }
+        }
+
+        if ($searchfields) {
+            return serialize($searchfields);
+        } else {
+            return '';
+        }
+    }
+
+    /**
+     * TODO: Returns the search options transmitted by a customfilter form
+     */
+    protected function get_customfilter_search_options_from_form($formdata, $finalize = false) {
+        if ($fields = $this->_df->get_fields()) {
+            $searchfields = array();
+            foreach ($formdata as $var => $unused) {
+                if (strpos($var, 'searchandor') !== 0) {
+                    continue;
+                }
+
+                $i = (int) str_replace('searchandor', '', $var);
+                // Check if trying to define a search criterion.
+                if ($searchandor = $formdata->{"searchandor$i"}) {
+                    if ($searchfieldid = $formdata->{"searchfield$i"}) {
+                        $not = !empty($formdata->{"searchnot$i"}) ? $formdata->{"searchnot$i"} : '';
+                        $operator = isset($formdata->{"searchoperator$i"}) ? $formdata->{"searchoperator$i"} : '';
+                        $parsedvalue = $fields[$searchfieldid]->parse_search($formdata, $i);
+                        // Don't add empty criteria on cleanup (unless operator is Empty and thus
+                        // doesn't need search value).
+                        if ($finalize and $operator and !$parsedvalue) {
+                            continue;
+                        }
+
+                        // If finalizing, aggregate by fieldid and searchandor,
+                        // otherwise just make a flat array (of arrays).
                         if ($finalize) {
                             if (!isset($searchfields[$searchfieldid])) {
                                 $searchfields[$searchfieldid] = array();
@@ -1164,6 +1303,21 @@ class datalynx_filter_manager {
         return $mform;
     }
 
+    // CUSTOM FILTER.
+
+    /**
+     */
+    public function get_customfilter_frontend_form($filter, $view, $customfilter = false) {
+        global $CFG;
+
+        require_once ("$CFG->dirroot/mod/datalynx/filter/filter_form.php");
+        $cfilter = isset($customfilter->id) ? $customfilter->id : "1";
+        $formurl = new moodle_url($view->get_baseurl(), array('filter' => self::USER_FILTER_SET, 'cfilter' => $cfilter));
+        $mform = new mod_datalynx_customfilter_frontend_form($this->_df, $filter, $formurl,
+                array('view' => $view),'post','', null, true, $customfilter);
+        return $mform;
+    }
+
     /**
      */
     public function get_user_filters_menu($viewid) {
@@ -1182,7 +1336,7 @@ class datalynx_filter_manager {
 
     /**
      */
-    public function set_user_filter($filterid, $view, $advanced = false) {
+    public function set_user_filter($filterid, $view, $advanced = false, $customfilter = false) {
         $df = $this->_df;
         $dfid = $df->id();
         $viewid = $view->id();
@@ -1212,8 +1366,23 @@ class datalynx_filter_manager {
             }
         }
 
+        // Custom filter form
+        if ($customfilter) {
+            global $DB;
+            $filter = new datalynx_filter((object) array('id' => $filterid, 'dataid' => $dfid));
+            $customfilter = $DB->get_record('datalynx_customfilters', array('id' => $customfilter));
+            $filterform = $this->get_customfilter_frontend_form($filter, $view, $customfilter);
+            // return to form (on reload button press)
+            if ($filterform->no_submit_button_pressed()) {
+                return $filter;
+            } else if ($formdata = $filterform->get_data()) { // Process validated.
+                $filter = $this->get_filter_from_customfilterform($filter, $formdata, $customfilter);
+                $modifycurrent = !empty($formdata->savebutton);
+            }
+        }
+
         // Quick filters.
-        if (!$advanced) {
+        if (!$advanced and !$customfilter) {
             if ($filterid >= self::USER_FILTER_ID_START) {
                 $filter = $this->get_filter_from_id($filterid);
             } else {
@@ -1224,39 +1393,41 @@ class datalynx_filter_manager {
             }
         }
 
-        // Set user filter.
-        if ($userfilters = $this->get_user_filters_menu($viewid)) {
-            if (empty($modifycurrent) or empty($userfilters[$filterid])) {
-                $filterid = key($userfilters) - 1;
+        if (!$customfilter) {
+            // Set user filter.
+            if ($userfilters = $this->get_user_filters_menu($viewid)) {
+                if (empty($modifycurrent) or empty($userfilters[$filterid])) {
+                    $filterid = key($userfilters) - 1;
+                }
+            } else {
+                $filterid = self::USER_FILTER_ID_START;
             }
-        } else {
-            $filterid = self::USER_FILTER_ID_START;
-        }
 
-        // If max number of user filters pop the last.
-        if (count($userfilters) >= self::USER_FILTER_MAX_NUM) {
-            $fids = array_keys($userfilters);
-            while (count($fids) >= self::USER_FILTER_MAX_NUM) {
-                $fid = array_pop($fids);
-                unset($userfilters[$fid]);
-                unset_user_preference("datalynxfilter-$dfid-$viewid-$fid");
+            // If max number of user filters pop the last.
+            if (count($userfilters) >= self::USER_FILTER_MAX_NUM) {
+                $fids = array_keys($userfilters);
+                while (count($fids) >= self::USER_FILTER_MAX_NUM) {
+                    $fid = array_pop($fids);
+                    unset($userfilters[$fid]);
+                    unset_user_preference("datalynxfilter-$dfid-$viewid-$fid");
+                }
             }
-        }
 
-        // Save the new filter.
-        $filter->id = $filterid;
-        $filter->dataid = $dfid;
-        if (empty($filter->name)) {
-            $filter->name = get_string('filtermy', 'datalynx') . ' ' . abs($filterid);
-        }
-        set_user_preference("datalynxfilter-$dfid-$viewid-$filterid", serialize($filter));
+            // Save the new filter.
+            $filter->id = $filterid;
+            $filter->dataid = $dfid;
+            if (empty($filter->name)) {
+                $filter->name = get_string('filtermy', 'datalynx') . ' ' . abs($filterid);
+            }
+            set_user_preference("datalynxfilter-$dfid-$viewid-$filterid", serialize($filter));
 
-        // Add the new filter to the beginning of the userfilters.
-        $userfilters = array($filterid => $filter->name) + $userfilters;
-        foreach ($userfilters as $filterid => $name) {
-            $userfilters[$filterid] = "$filterid $name";
+            // Add the new filter to the beginning of the userfilters.
+            $userfilters = array($filterid => $filter->name) + $userfilters;
+            foreach ($userfilters as $filterid => $name) {
+                $userfilters[$filterid] = "$filterid $name";
+            }
+            set_user_preference("datalynxfilter-$dfid-$viewid-userfilters", implode(';', $userfilters));
         }
-        set_user_preference("datalynxfilter-$dfid-$viewid-userfilters", implode(';', $userfilters));
 
         return $filter;
     }
@@ -1366,6 +1537,7 @@ class datalynx_filter_manager {
                 'users' => array('users', '', PARAM_SEQUENCE),
                 'groups' => array('groups', '', PARAM_SEQUENCE),
                 'afilter' => array('afilter', 0, PARAM_INT),
+                'cfilter' => array('cfilter', 0, PARAM_INT),
                 'usersearch' => array('usersearch', 0, PARAM_RAW));
 
         $options = array();

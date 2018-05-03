@@ -24,6 +24,8 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+require_once(dirname(__FILE__) . '/../../../lib/pear/HTML/QuickForm/element.php');
+
 class HTML_QuickForm_checkboxgroup extends HTML_QuickForm_element {
 
     public $_options = array();

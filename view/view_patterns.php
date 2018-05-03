@@ -338,6 +338,9 @@ class datalynxview_patterns {
                 case '##advancedfilter##':
                     return $this->print_advanced_filter($filter, true);
             }
+            if (strpos($tag, '##customfilter') !== false) {
+                return $this->print_custom_filter($tag, true);
+            }
         }
         if ($tag == '##quicksearch##') {
             return $this->print_quick_search($filter, true);
@@ -703,10 +706,18 @@ class datalynxview_patterns {
      * @return array multidimensional
      */
     protected function userpref_patterns() {
+        global $DB;
+
         $cat = get_string('userpref', 'datalynx');
         $patterns = array('##quicksearch##' => array(true, $cat),
                 '##quickperpage##' => array(true, $cat),
                 '##advancedfilter##' => array(true, $cat));
+        $dataid = $this->_view->view->dataid;
+        $where = array('dataid' => $dataid, 'visible' => '1');
+        $rs = $DB->get_records('datalynx_customfilters', $where, 'name', 'id,name');
+        foreach ($rs as $customfilter) {
+            $patterns['##customfilter:' . $customfilter->name . '##'] = array(true, $cat);
+        }
         return $patterns;
     }
 
@@ -995,12 +1006,6 @@ class datalynxview_patterns {
         }
     }
 
-    /**
-     * Echo or return advanced filter form HTML
-     *
-     * @param string $return
-     * @return string
-     */
     protected function print_advanced_filter($return = false) {
 
         $view = $this->_view;
@@ -1018,5 +1023,30 @@ class datalynxview_patterns {
             $filterform->display();
             html_writer::end_tag('div');
         }
+    }
+
+    protected function print_custom_filter($tag, $return = false) {
+        global $DB;
+
+        $view = $this->_view;
+        $filter = $view->get_filter();
+        $df = $view->get_df();
+        $customfiltername = str_replace('##', '', str_replace('##customfilter:', '', $tag));
+        $where = array('name' => $customfiltername);
+        $customfilter = $DB->get_record('datalynx_customfilters', $where);
+        $fm = $df->get_filter_manager();
+        $filterform = $fm->get_customfilter_frontend_form($filter, $view, $customfilter);
+
+        if ($return) {
+            return html_writer::tag('div', $filterform->html(), array('class' => 'mdl-left'));
+        } else {
+            html_writer::start_tag('div', array('class' => 'mdl-left'));
+            $filterform->display();
+            html_writer::end_tag('div');
+        }
+    }
+
+    protected function _customize_advanced_filter($filter, $customfilter) {
+
     }
 }
