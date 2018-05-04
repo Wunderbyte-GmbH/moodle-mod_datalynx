@@ -28,14 +28,12 @@ defined('MOODLE_INTERNAL') or die();
 
 global $CFG;
 
-require_once ("$CFG->libdir/formslib.php");
+require_once("$CFG->libdir/formslib.php");
 
 
 /**
- *
  */
-abstract class mod_datalynx_customfilter_base_form extends moodleform
-{
+abstract class mod_datalynx_customfilter_base_form extends moodleform {
 
     protected $_customfilter = null;
 
@@ -49,11 +47,10 @@ abstract class mod_datalynx_customfilter_base_form extends moodleform
      *
      */
     public function __construct($df, $customfilter, $action = null, $customdata = null, $method = 'post',
-                                $target = '', $attributes = null, $editable = true) {
+            $target = '', $attributes = null, $editable = true) {
         $this->_customfilter = $customfilter;
         $this->_df = $df;
 
         parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
     }
-
 }

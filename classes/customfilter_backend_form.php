@@ -1,4 +1,6 @@
 <?php
+
+
 // This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
 // It is free software: you can redistribute it and/or modify
@@ -8,31 +10,27 @@
 //
 // It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
+// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
- * Contains class mod_customfilter_form used at the BACKEND ("Manage") to create or edit a customfilter
+ * Contains class mod_customfilter_form used at the BACKEND ("Manage") to create or edit a
+ * customfilter
  *
  * @package mod
  * @subpackage datalynx
  * @copyright 2016 Thomas Niedermaier
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-
 class mod_datalynx_customfilter_backend_form extends mod_datalynx_customfilter_base_form {
 
     /**
-     *
      */
     public function definition() {
-
         if ($id = $this->_customfilter->id) {
             $customfilter = $this->_getcustomfilter($id);
         } else {
@@ -70,9 +68,10 @@ class mod_datalynx_customfilter_backend_form extends mod_datalynx_customfilter_b
         $mform->setDefault('fulltextsearch', $customfilter->fulltextsearch);
 
         $grp = array();
-        $grp[] = $mform->createElement('advcheckbox', 'timecreated', get_string('timecreated', 'datalynx'));
-        $grp[] = $mform->createElement('advcheckbox', 'timecreated_sortable', '', get_string('sortable', 'datalynx'),
-                '', array(0, 1));
+        $grp[] = $mform->createElement('advcheckbox', 'timecreated',
+                get_string('timecreated', 'datalynx'));
+        $grp[] = $mform->createElement('advcheckbox', 'timecreated_sortable', '',
+                get_string('sortable', 'datalynx'), '', array(0, 1));
         $mform->addGroup($grp, '', null, ' ', false);
         $mform->setType('timecreated', PARAM_INT);
         $mform->setDefault('timecreated', $customfilter->timecreated);
@@ -80,9 +79,10 @@ class mod_datalynx_customfilter_backend_form extends mod_datalynx_customfilter_b
         $mform->setDefault('timecreated_sortable', $customfilter->timecreated_sortable);
 
         $grp = array();
-        $grp[] = $mform->createElement('advcheckbox', 'timemodified', get_string('timemodified', 'datalynx'));
-        $grp[] = $mform->createElement('advcheckbox', 'timemodified_sortable', '', get_string('sortable', 'datalynx'),
-                '', array(0, 1));
+        $grp[] = $mform->createElement('advcheckbox', 'timemodified',
+                get_string('timemodified', 'datalynx'));
+        $grp[] = $mform->createElement('advcheckbox', 'timemodified_sortable', '',
+                get_string('sortable', 'datalynx'), '', array(0, 1));
         $mform->addGroup($grp, '', null, ' ', false);
         $mform->setType('timemodified', PARAM_INT);
         $mform->setDefault('timemodified', $customfilter->timemodified);
@@ -110,8 +110,8 @@ class mod_datalynx_customfilter_backend_form extends mod_datalynx_customfilter_b
             $grp = array();
             $grp[] = $mform->createElement('advcheckbox', $formfieldname,
                     $field->field->name . ' (' . $field->type . ')', '', '', $field->field->name);
-            $grp[] = $mform->createElement('advcheckbox', $formfieldsortablename, '', get_string('sortable', 'datalynx'),
-                    '', array(0, 1));
+            $grp[] = $mform->createElement('advcheckbox', $formfieldsortablename, '',
+                    get_string('sortable', 'datalynx'), '', array(0, 1));
             $mform->addGroup($grp, '', null, ' ', false);
             $mform->setType($formfieldname, PARAM_TEXT);
             $mform->setType($formfieldsortablename, PARAM_INT);
@@ -153,11 +153,10 @@ class mod_datalynx_customfilter_backend_form extends mod_datalynx_customfilter_b
     }
 
     public function get_data() {
-
         if ($data = parent::get_data()) {
             if (!empty($data->fieldlist)) {
                 $fieldlistarray = array();
-                foreach($data->fieldlist as $fieldid => $field) {
+                foreach ($data->fieldlist as $fieldid => $field) {
                     if ($field['name']) {
                         $fieldlistarray[$fieldid]['name'] = $field['name'];
                         $fieldlistarray[$fieldid]['sortable'] = $field['sortable'];
@@ -176,5 +175,4 @@ class mod_datalynx_customfilter_backend_form extends mod_datalynx_customfilter_b
     public function html() {
         return $this->_form->toHtml();
     }
-
 }

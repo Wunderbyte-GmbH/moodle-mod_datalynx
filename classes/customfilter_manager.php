@@ -1,4 +1,6 @@
 <?php
+
+
 // This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
 // It is free software: you can redistribute it and/or modify
@@ -8,11 +10,11 @@
 //
 // It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
  *
@@ -52,7 +54,6 @@ class mod_datalynx_customfilter_manager {
     /**
      */
     public function get_filter_from_id($filterid = 0, array $options = null) {
-
         $df = $this->_df;
         $dfid = $df->id();
 
@@ -74,7 +75,8 @@ class mod_datalynx_customfilter_manager {
             }
 
             if ($filterid != self::USER_FILTER_SET and
-                $filter = get_user_preferences("datalynxcustomfilter-$dfid-$viewid-$filterid", null)) {
+                    $filter = get_user_preferences("datalynxcustomfilter-$dfid-$viewid-$filterid",
+                            null)) {
                 $filter = unserialize($filter);
                 $filter->dataid = $dfid;
                 return new mod_datalynx_customfilter($filter);
@@ -89,7 +91,6 @@ class mod_datalynx_customfilter_manager {
                 $filter->dataid = $df->id();
 
                 return new mod_datalynx_customfilter($filter);
-
             } else {
                 $filterid = $df->data->defaultfilter;
             }

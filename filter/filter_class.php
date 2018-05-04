@@ -140,6 +140,7 @@ class datalynx_filter {
     }
 
     /**
+     * TODO: Write comment
      */
     public function init_filter_sql() {
         $this->_filteredtables = null;
@@ -152,14 +153,15 @@ class datalynx_filter {
                     $this->customsearch);
         }
         if ($this->customsort) {
-            $this->_sortfields = is_array($this->customsort) ? $this->customsort : unserialize($this->customsort);
+            $this->_sortfields = is_array($this->customsort) ? $this->customsort : unserialize(
+                    $this->customsort);
         }
         $customfiltersortfield = optional_param('customfiltersortfield', null, PARAM_INT);
         if ($customfiltersortfield) {
             $customfiltersortdirection = optional_param('customfiltersortdirection', '0', PARAM_INT);
             $customfiltersort = array($customfiltersortfield => $customfiltersortdirection);
             if ($this->customsort) {
-             $this->_sortfields = array_merge( $this->_sortfields, $customfiltersort);
+                $this->_sortfields = array_merge($this->_sortfields, $customfiltersort);
             } else {
                 $this->_sortfields = $customfiltersort;
             }
@@ -256,15 +258,13 @@ class datalynx_filter {
                 $searchwhere[] = '(' . implode(' OR ', $whereor) . ')';
             }
         }
-
         if ($simplesearch) {
             $searchtables .= " JOIN {datalynx_contents} cs ON cs.entryid = e.id ";
             $searchtables .= " JOIN {datalynx_fields} f ON cs.fieldid = f.id ";
             $searchlike = array('search1' => $DB->sql_like('cs.content', ':search1', false, false),
-                    'search2' => $DB->sql_like('u.firstname', ':search2', false, false),
-                    'search3' => $DB->sql_like('u.lastname', ':search3', false, false),
-                    'search4' => $DB->sql_like('u.username', ':search4', false, false)
-            );
+                'search2' => $DB->sql_like('u.firstname', ':search2', false, false),
+                'search3' => $DB->sql_like('u.lastname', ':search3', false, false),
+                'search4' => $DB->sql_like('u.username', ':search4', false, false));
             foreach (array_keys($searchlike) as $namekey) {
                 $searchparams[$namekey] = '%' . $DB->sql_like_escape($simplesearch) . '%';
             }
@@ -316,8 +316,10 @@ class datalynx_filter {
                                 $paramlike = "fieldquicksearch$i";
                                 $paramid = "fieldid$i";
                                 $searchlike[$paramlike] = "(" .
-                                        $DB->sql_like("c{$field->id()}.data", ":$paramlike", false, false) . ")";
-                                $searchparams[$paramlike] = '%' . $DB->sql_like_escape($simplesearch) . '%';
+                                        $DB->sql_like("c{$field->id()}.data", ":$paramlike", false,
+                                                false) . ")";
+                                $searchparams[$paramlike] = '%' . $DB->sql_like_escape(
+                                        $simplesearch) . '%';
                                 $searchparams[$paramid] = $field->id();
                                 $i++;
                             }
@@ -341,7 +343,7 @@ class datalynx_filter {
      */
     public function get_sort_sql($fields) {
         global $DB;
-        
+
         $sorties = array();
         $orderby = array("e.timecreated ASC");
         $params = array();
@@ -369,15 +371,17 @@ class datalynx_filter {
                 // Here we can check if fields are special.
                 if ($field instanceof datalynxfield_option_multiple ||
                         $field instanceof datalynxfield_option_single) {
-                            // Read values of field from database.
-                            $fieldvalues = $DB->get_field('datalynx_fields', 'param1', array ('id'=>$fieldid), $strictness=MUST_EXIST);
-                            $fieldvalues = explode("\n", $fieldvalues);
+                    // Read values of field from database.
+                    $fieldvalues = $DB->get_field('datalynx_fields', 'param1',
+                            array('id' => $fieldid), $strictness = MUST_EXIST);
+                    $fieldvalues = explode("\n", $fieldvalues);
 
-                            $replacestring = $sortname; // Works only for single values yet.
-                            foreach ($fieldvalues as $key => $value) {
-                                $replacestring = "REPLACE(".$replacestring.",'#". ($key+1) ."#', '".$value."')";
-                            }
-                            $orderby[] = $replacestring . ($sortdir ? 'DESC' : 'ASC');
+                    $replacestring = $sortname; // Works only for single values yet.
+                    foreach ($fieldvalues as $key => $value) {
+                        $replacestring = "REPLACE(" . $replacestring . ",'#" . ($key + 1) . "#', '" .
+                                $value . "')";
+                    }
+                    $orderby[] = $replacestring . ($sortdir ? 'DESC' : 'ASC');
                     $stringindexed = true;
                 } else {
                     $orderby[] = "$sortname " . ($sortdir ? 'DESC' : 'ASC');
@@ -917,14 +921,14 @@ class datalynx_filter_manager {
                 $fieldname = $formfieldarray[2];
                 switch ($fieldname) {
                     case ("approve"):
-                        if ((int)$value > 0) {
+                        if ((int) $value > 0) {
                             $searchfields['approve']['AND'][] = array('', '=', $value);
                         }
                         break;
                     case ("timecreated"):
                     case ("timemodified"):
                         if (count($formfieldarray) > 4 && $formfieldarray[3] == 'from' &&
-                            $formfieldarray[4] == 'active') {
+                                $formfieldarray[4] == 'active') {
                             if ($formdata->{$key}) {
                                 $valuearr = array();
                                 $fromkey = str_replace('_active', '', $key);
@@ -933,23 +937,25 @@ class datalynx_filter_manager {
                                 if (isset($formdata->{$tokeyactive})) {
                                     $tokey = str_replace('_active', '', $tokeyactive);
                                     $valuearr[] = $formdata->{$tokey};
-                                    $searchfields[$fieldname]['AND'][] = array('', 'BETWEEN', $valuearr);
+                                    $searchfields[$fieldname]['AND'][] = array('', 'BETWEEN',
+                                        $valuearr);
                                 } else {
-                                    $searchfields[$fieldname]['AND'][] = array('', '>=', $valuearr[0]);
+                                    $searchfields[$fieldname]['AND'][] = array('', '>=',
+                                        $valuearr[0]);
                                 }
                             }
                         }
                         break;
                     case ("status"):
-                        if ((int)$value > 0) {
+                        if ((int) $value > 0) {
                             $searchfields['status']['AND'][] = array('', '=', $value);
                         }
                         break;
                     default:
-                        if(in_array($fieldname, $customfilterfieldids)) {
+                        if (in_array($fieldname, $customfilterfieldids)) {
                             $type = $fields[$fieldname]->type;
                             if ($type == "text") {
-                                if($value) {
+                                if ($value) {
                                     $searchfields[$fieldname]['AND'][] = array('', 'LIKE', $value);
                                 }
                             } else if ($type == "file") {
@@ -959,18 +965,19 @@ class datalynx_filter_manager {
                                     $searchfields[$fieldname]['AND'][] = array('NOT', '', false);
                                 }
                             } else {
-                                // Analog to advanced filter form: searchfieldid - searchandor - not - operator - value.
+                                // Analog to advanced filter form: searchfieldid - searchandor - not
+                                // - operator - value.
                                 $searchfields[$fieldname]['AND'][] = array('', 'ANY_OF', $value);
                             }
                         }
                 }
             } else {
-                if($key == "search" && $value) {
+                if ($key == "search" && $value) {
                     $filter->search = $value;
                 }
             }
         }
-        if($searchfields) {
+        if ($searchfields) {
             $filter->customsearch = serialize($searchfields);
         }
 
@@ -1124,24 +1131,25 @@ class datalynx_filter_manager {
         $multidelete = html_writer::tag('button',
                 $OUTPUT->pix_icon('t/delete', get_string('multidelete', 'datalynx')),
                 array('name' => 'multidelete',
-                        'onclick' => 'bulk_action(\'filter\'&#44; \'' .
-                                htmlspecialchars_decode(new moodle_url($filterbaseurl, $linkparams)) .
-                                '\'&#44; \'delete\')'));
+                    'onclick' => 'bulk_action(\'filter\'&#44; \'' .
+                    htmlspecialchars_decode(new moodle_url($filterbaseurl, $linkparams)) .
+                    '\'&#44; \'delete\')'));
 
         $table = new html_table();
         $table->head = array($strfilters, $strdescription, $strperpage, $strcustomsort,
-                $strcustomsearch, $strurlquery, $strvisible, $strdefault, $stredit, $strduplicate,
-                $multidelete, $selectallnone);
+            $strcustomsearch, $strurlquery, $strvisible, $strdefault, $stredit, $strduplicate,
+            $multidelete, $selectallnone);
         $table->align = array('left', 'left', 'center', 'left', 'left', 'left', 'center', 'center',
-                'center', 'center', 'center');
+            'center', 'center', 'center');
         $table->wrap = array(false, false, false, false, false, false, false, false, false, false,
-                false);
+            false);
         $table->attributes['align'] = 'center';
 
         foreach ($this->_filters as $filterid => $filter) {
             $filtername = html_writer::link(
                     new moodle_url($filterbaseurl,
-                            $linkparams + array('fedit' => $filterid, 'fid' => $filterid)), $filter->name);
+                            $linkparams + array('fedit' => $filterid, 'fid' => $filterid)),
+                    $filter->name);
             $filterdescription = shorten_text($filter->description, 30);
             $filteredit = html_writer::link(
                     new moodle_url($filterbaseurl,
@@ -1162,7 +1170,8 @@ class datalynx_filter_manager {
                 $visibleicon = $OUTPUT->pix_icon('t/show', $strshow);
             }
             $visible = html_writer::link(
-                    new moodle_url($filterbaseurl, $linkparams + array('visible' => $filterid)), $visibleicon);
+                    new moodle_url($filterbaseurl, $linkparams + array('visible' => $filterid)),
+                    $visibleicon);
 
             // Default filter.
             if ($filterid == $df->data->defaultfilter) {
@@ -1206,7 +1215,7 @@ class datalynx_filter_manager {
                         // Check if field participates in default sort.
                         $strsortdir = $sortdir ? 'Descending' : 'Ascending';
                         $sortarr[] = $OUTPUT->pix_icon('t/' . ($sortdir ? 'down' : 'up'),
-                                        $strsortdir) . ' ' . $fields[$fieldid]->field->name;
+                                $strsortdir) . ' ' . $fields[$fieldid]->field->name;
                     }
                     if ($sortfields) {
                         $sortoptions = implode('<br />', $sortarr);
@@ -1269,9 +1278,8 @@ class datalynx_filter_manager {
             $perpage = empty($filter->perpage) ? '---' : $filter->perpage;
 
             $table->data[] = array($filtername, $filterdescription, $perpage, $sortoptions,
-                    $searchoptions, $sorturlquery . $searchurlquery, $visible, $defaultfilter,
-                    $filteredit, $filterduplicate, $filterdelete, $filterselector
-            );
+                $searchoptions, $sorturlquery . $searchurlquery, $visible, $defaultfilter,
+                $filteredit, $filterduplicate, $filterdelete, $filterselector);
         }
 
         echo html_writer::table($table);
