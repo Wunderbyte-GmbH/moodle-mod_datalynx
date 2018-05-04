@@ -155,11 +155,12 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         $classname = "teammemberselect_{$fieldid}_{$entryid}";
         $required = !empty($options['required']);
 
-        // We create a hidden field to force sending. Needs to be done via directly inserting html.
-        if (!$required)
+        // We create a hidden field to force sending. Needs to be done via directly inserting
+        // html.
+        if (!$required) {
             $mform->addElement('html',
                     '<input type="hidden" name="' . $fieldname . '[-1]" value="-999">');
-
+        }
         $selected = !empty($entry->{"c{$fieldid}_content"}) ? json_decode(
                 $entry->{"c{$fieldid}_content"}, true) : array();
         $authorid = isset($entry->userid) ? $entry->userid : $USER->id;
@@ -169,7 +170,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
                 array('class' => "datalynxfield_teammemberselect $classname", 'multiple' => true,
                     'noselectionstring' => "Gerade keine Auswahl."));
         $mform->setType($fieldname, PARAM_INT);
-        $mform->setDefault("{$fieldname}", $selected); // Not value after validation fails
+        $mform->setDefault("{$fieldname}", $selected); // Not value after validation fails.
 
         // If we edit an existing entry that is not required we need a workaround.
         $newentry = optional_param('new', null, PARAM_INT) === null ? 1 : 0;
@@ -237,8 +238,9 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
             }
             if (isset($formdata->$formfieldname)) {
                 // Get rid of Dummy value -999 to correct calculations.
-                if ($formdata->$formfieldname[0] == -999)
+                if ($formdata->$formfieldname[0] == -999) {
                     array_shift($formdata->$formfieldname);
+                }
                 // Limit chosen users to max teamsize and ensure min teamsize users are chosen!
                 $teamsize = count($formdata->$formfieldname);
                 if ($teamsize > $this->_field->teamsize) {
@@ -251,7 +253,6 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
                 }
             }
         }
-
         return $errors;
     }
 }
