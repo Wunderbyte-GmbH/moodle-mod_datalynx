@@ -220,7 +220,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         $formfieldname = "field_{$fieldid}_{$entryid}";
         $errors = array();
         foreach ($tags as $tag) {
-            list(, $behavior,) = $this->process_tag($tag);
+            list(, $behavior, ) = $this->process_tag($tag);
             // Variable $behavior datalynx_field_behavior.
             if ($behavior->is_required()) {
                 $userfound = false;
@@ -238,8 +238,8 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
             }
             if (isset($formdata->$formfieldname)) {
                 // Get rid of Dummy value -999 to correct calculations.
-                if ($formdata->$formfieldname[0] == -999) {
-                    array_shift($formdata->$formfieldname);
+                if ($formdata->{$formfieldname[0]} == -999) {
+                    array_shift($formdata->{$formfieldname});
                 }
                 // Limit chosen users to max teamsize and ensure min teamsize users are chosen!
                 $teamsize = count($formdata->$formfieldname);

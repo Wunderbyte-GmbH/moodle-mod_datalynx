@@ -23,7 +23,7 @@
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once ("$CFG->dirroot/mod/datalynx/field/field_class.php");
+require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
 
 class datalynxfield_teammemberselect extends datalynxfield_base {
@@ -238,7 +238,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
             $this->init_user_menu();
         }
         // Add hidden option for Validation. Needs to be int.
-        $options = array(-1 => NULL);
+        $options = array(-1 => null);
 
         if ($makelinks) {
             if ($allowall) {

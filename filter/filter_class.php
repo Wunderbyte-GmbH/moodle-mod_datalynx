@@ -1318,11 +1318,11 @@ class datalynx_filter_manager {
     public function get_customfilter_frontend_form($filter, $view, $customfilter = false) {
         global $CFG;
 
-        require_once ("$CFG->dirroot/mod/datalynx/filter/filter_form.php");
+        require_once("$CFG->dirroot/mod/datalynx/filter/filter_form.php");
         $cfilter = isset($customfilter->id) ? $customfilter->id : "1";
         $formurl = new moodle_url($view->get_baseurl(), array('filter' => self::USER_FILTER_SET, 'cfilter' => $cfilter));
         $mform = new mod_datalynx_customfilter_frontend_form($this->_df, $filter, $formurl,
-                array('view' => $view),'post','', null, true, $customfilter);
+                array('view' => $view), 'post', '', null, true, $customfilter);
         return $mform;
     }
 
