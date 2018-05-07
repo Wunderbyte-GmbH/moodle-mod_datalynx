@@ -209,7 +209,7 @@ class datalynx_entries {
                 // Entry.
                 ' e.id, e.approved, e.timecreated, e.timemodified, e.userid, e.groupid, e.status, ' .
                 // User.
-                user_picture::fields('u', array('idnumber', 'username'
+                user_picture::fields('u', array('idnumber', 'username', 'institution'
                 ), 'uid ') . ', ' .
                 // Group (TODO g.description AS groupdesc need to be varchar for MSSQL).
                 'g.name AS groupname, g.hidepicture AS grouphidepic, g.picture AS grouppic ' .
