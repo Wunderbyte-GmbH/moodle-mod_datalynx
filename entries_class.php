@@ -209,7 +209,7 @@ class datalynx_entries {
                 // Entry.
                 ' e.id, e.approved, e.timecreated, e.timemodified, e.userid, e.groupid, e.status, ' .
                 // User.
-                user_picture::fields('u', array('idnumber', 'username'
+                user_picture::fields('u', array('idnumber', 'username', 'institution'
                 ), 'uid ') . ', ' .
                 // Group (TODO g.description AS groupdesc need to be varchar for MSSQL).
                 'g.name AS groupname, g.hidepicture AS grouphidepic, g.picture AS grouppic ' .
@@ -538,9 +538,7 @@ class datalynx_entries {
 
                 // All other types of processing must refer to specific entry ids.
             } else {
-                $entries = $DB->get_records_select('datalynx_entries',
-                        "dataid = ? AND id IN ($eids)", array($df->id()
-                        ));
+                $entries = $DB->get_records_select('datalynx_entries', "dataid = ? AND id IN ($eids)", array($df->id()));
             }
 
             if (!empty($importentryids)) {

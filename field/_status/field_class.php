@@ -105,4 +105,12 @@ class datalynxfield__status extends datalynxfield_no_content {
     public function get_supported_search_operators() {
         return array('=' => get_string('equal', 'datalynx'));
     }
+
+    /**
+     * Are fields of this field type suitable for use in customfilters?
+     * @return bool
+     */
+    public static function is_customfilterfield() {
+        return true;
+    }
 }

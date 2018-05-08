@@ -45,6 +45,8 @@ class datalynxfield_entryauthor extends datalynxfield_no_content {
 
     const _USEREMAIL = 'useremail';
 
+    const _USERINSTITUTION = 'userinstitution';
+
     public function supports_group_by() {
         return true;
     }
@@ -97,7 +99,12 @@ class datalynxfield_entryauthor extends datalynxfield_no_content {
         $fieldobjects[self::_USEREMAIL] = (object) array('id' => self::_USEREMAIL,
                 'dataid' => $dataid, 'type' => 'entryauthor',
                 'name' => get_string('useremail', 'datalynxfield_entryauthor'), 'description' => '',
-                'visible' => 2, 'internalname' => 'email');
+                        'visible' => 2, 'internalname' => 'email');
+
+        $fieldobjects[self::_USERINSTITUTION] = (object) array('id' => self::_USERINSTITUTION,
+                        'dataid' => $dataid, 'type' => 'entryauthor',
+                        'name' => get_string('institution'), 'description' => '',
+                        'visible' => 2, 'internalname' => 'institution');
 
         return $fieldobjects;
     }

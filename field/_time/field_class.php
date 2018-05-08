@@ -182,4 +182,11 @@ class datalynxfield__time extends datalynxfield_no_content {
                 'BETWEEN' => get_string('between', 'datalynx'));
     }
 
+    /**
+     * Are fields of this field type suitable for use in customfilters?
+     * @return bool
+     */
+    public static function is_customfilterfield() {
+        return true;
+    }
 }

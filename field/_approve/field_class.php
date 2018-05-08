@@ -85,4 +85,12 @@ class datalynxfield__approve extends datalynxfield_no_content {
     public function get_distinct_content($sortdir = 0) {
         return array('approved', 'Not approved');
     }
+
+    /**
+     * Are fields of this field type suitable for use in customfilters?
+     * @return bool
+     */
+    public static function is_customfilterfield() {
+        return true;
+    }
 }

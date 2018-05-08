@@ -84,7 +84,7 @@ class datalynxfield__time_renderer extends datalynxfield_renderer {
 
     /**
      */
-    public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
+    public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '', $activecheckbox = false) {
         $fieldid = $this->_field->id();
 
         if (is_array($value)) {
@@ -96,23 +96,34 @@ class datalynxfield__time_renderer extends datalynxfield_renderer {
         }
 
         $elements = array();
-        $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_from",
-                get_string('from'));
-        $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_to",
-                get_string('to'));
-
-        $mform->setDefault("f_{$i}_{$fieldid}_from", $from);
-        $mform->setDefault("f_{$i}_{$fieldid}_to", $to);
-        foreach (array('year', 'month', 'day', 'hour', 'minute') as $fieldidentifier) {
-            $mform->disabledIf("f_{$i}_{$fieldid}_to[$fieldidentifier]", "searchoperator$i", 'neq',
-                    'BETWEEN');
+        $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_from", get_string('from'));
+        if ($activecheckbox) {
+            $elements[] = &$mform->createElement('checkbox', "f_{$i}_{$fieldid}_from_active", get_string('activate', 'datalynx'));
+            foreach (array('year', 'month', 'day', 'hour', 'minute') as $fieldidentifier) {
+                $mform->disabledIf("f_{$i}_{$fieldid}_from[$fieldidentifier]", "f_{$i}_{$fieldid}_from_active", "notchecked");
+            }
         }
-        $mform->disabledIf("f_{$i}_{$fieldid}_from", "searchoperator$i", 'eq', '');
-        $mform->disabledIf("f_{$i}_{$fieldid}_from", "searchoperator$i", 'eq', 'IN');
-        $mform->disabledIf("f_{$i}_{$fieldid}_from", "searchoperator$i", 'eq', 'LIKE');
-        $mform->disabledIf("f_{$i}_{$fieldid}_to", "searchoperator$i", 'eq', '');
-        $mform->disabledIf("f_{$i}_{$fieldid}_to", "searchoperator$i", 'eq', 'IN');
-        $mform->disabledIf("f_{$i}_{$fieldid}_to", "searchoperator$i", 'eq', 'LIKE');
+        $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_to", get_string('to'));
+        if ($activecheckbox) {
+            $elements[] = &$mform->createElement('checkbox', "f_{$i}_{$fieldid}_to_active", get_string('activate', 'datalynx'));
+            foreach (array('year', 'month', 'day', 'hour', 'minute') as $fieldidentifier) {
+                $mform->disabledIf("f_{$i}_{$fieldid}_to[$fieldidentifier]", "f_{$i}_{$fieldid}_to_active", "notchecked");
+            }
+        }
+
+        if (!$activecheckbox) {
+            $mform->setDefault("f_{$i}_{$fieldid}_from", $from);
+            $mform->setDefault("f_{$i}_{$fieldid}_to", $to);
+            foreach (array('year', 'month', 'day', 'hour', 'minute') as $fieldidentifier) {
+                $mform->disabledIf("f_{$i}_{$fieldid}_to[$fieldidentifier]", "searchoperator$i", 'neq', 'BETWEEN');
+            }
+            $mform->disabledIf("f_{$i}_{$fieldid}_from", "searchoperator$i", 'eq', '');
+            $mform->disabledIf("f_{$i}_{$fieldid}_from", "searchoperator$i", 'eq', 'IN');
+            $mform->disabledIf("f_{$i}_{$fieldid}_from", "searchoperator$i", 'eq', 'LIKE');
+            $mform->disabledIf("f_{$i}_{$fieldid}_to", "searchoperator$i", 'eq', '');
+            $mform->disabledIf("f_{$i}_{$fieldid}_to", "searchoperator$i", 'eq', 'IN');
+            $mform->disabledIf("f_{$i}_{$fieldid}_to", "searchoperator$i", 'eq', 'LIKE');
+        }
 
         $separators = array('<br />' . get_string('from'), '<br />' . get_string('to'));
         return array($elements, $separators);

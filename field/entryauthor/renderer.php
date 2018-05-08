@@ -83,6 +83,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
             $entry->lastname = $USER->lastname;
             $entry->email = $USER->email;
             $entry->userid = $USER->id;
+            $entry->institution = $USER->institution;
         }
         $field = $this->_field;
         $fieldid = $field->id();
@@ -100,6 +101,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
                 $user->firstname = $entry->firstname;
                 $user->lastname = $entry->lastname;
                 $user->email = $entry->email;
+                $user->institution = $entry->institution;
                 $users[$entry->userid] = $user;
             }
         }
@@ -222,6 +224,18 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
             return $USER->email;
         } else {
             return $entry->email;
+        }
+    }
+
+    /**
+     */
+    public function display_institution($entry) {
+        global $USER;
+
+        if ($entry->id < 0) { // New entry.
+            return $USER->institution;
+        } else {
+            return $entry->institution;
         }
     }
 

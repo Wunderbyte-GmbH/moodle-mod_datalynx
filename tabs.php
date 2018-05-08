@@ -72,6 +72,9 @@ if (isloggedin() and $istemplatemanager) {
             $row[] = new tabobject('filters',
                     new moodle_url('/mod/datalynx/filter/index.php', array('d' => $this->id())),
                     get_string('filters', 'datalynx'));
+            $row[] = new tabobject('customfilters',
+                    new moodle_url('/mod/datalynx/customfilter/index.php', array('d' => $this->id())),
+                    get_string('customfilters', 'datalynx'));
             $row[] = new tabobject('rules',
                     new moodle_url('/mod/datalynx/rule/index.php', array('d' => $this->id())),
                     get_string('rules', 'datalynx'));
