@@ -269,6 +269,7 @@ abstract class datalynxview_base {
 
         $fid = !empty($urloptions['filterid']) ? $urloptions['filterid'] : 0;
         $afilter = !empty($urloptions['afilter']) ? $urloptions['afilter'] : 0;
+        $cfilter = !empty($urloptions['cfilter']) ? $urloptions['cfilter'] : 0;
         $eids = !empty($urloptions['eids']) ? $urloptions['eids'] : null;
         $users = !empty($urloptions['users']) ? $urloptions['users'] : null;
         $groups = !empty($urloptions['groups']) ? $urloptions['groups'] : null;
@@ -284,7 +285,8 @@ abstract class datalynxview_base {
 
         $filterid = $fid ? $fid : ($this->view->filter ? $this->view->filter : 0);
 
-        $this->_filter = $fm->get_filter_from_id($filterid, array('view' => $this, 'advanced' => $afilter));
+        $this->_filter = $fm->get_filter_from_id($filterid, array('view' => $this, 'advanced' => $afilter,
+                'customfilter' => $cfilter));
 
         // Set specific entry id.
         $this->_filter->eids = $eids;

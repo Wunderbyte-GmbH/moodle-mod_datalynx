@@ -735,6 +735,8 @@ function datalynx_extend_settings_navigation(settings_navigation $settings, navi
                     new moodle_url('/mod/datalynx/field/index.php', array('id' => $PAGE->cm->id)));
             $manage->add(get_string('filters', 'datalynx'),
                     new moodle_url('/mod/datalynx/filter/index.php', array('id' => $PAGE->cm->id)));
+            $manage->add(get_string('customfilters', 'datalynx'),
+                    new moodle_url('/mod/datalynx/customfilter/index.php', array('id' => $PAGE->cm->id)));
             $manage->add(get_string('rules', 'datalynx'),
                     new moodle_url('/mod/datalynx/rule/index.php', array('id' => $PAGE->cm->id)));
             $manage->add(get_string('tools', 'datalynx'),

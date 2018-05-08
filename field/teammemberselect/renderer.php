@@ -25,6 +25,7 @@ defined('MOODLE_INTERNAL') or die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
+
 /**
  * Renderer class for teammemberselect datalynx field
  */
@@ -78,28 +79,29 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         $userismember = in_array($USER->id, $selected);
         $canunsubscribe = $this->_field->allowunsubscription;
 
-        if ($subscribeenabled && $userhasadmissiblerole && (!$teamfull || $userismember) && (!$userismember || $canunsubscribe)) {
+        if ($subscribeenabled && $userhasadmissiblerole && (!$teamfull || $userismember) &&
+                (!$userismember || $canunsubscribe)) {
 
             $str .= html_writer::link(
                     new moodle_url('/mod/datalynx/field/teammemberselect/ajax.php',
                             array('d' => $field->df()->id(), 'fieldid' => $fieldid,
-                                    'entryid' => $entry->id,
-                                    'view' => optional_param('view', null, PARAM_INT),
-                                    'userid' => $USER->id,
-                                    'action' => $userismember ? 'unsubscribe' : 'subscribe',
-                                    'sesskey' => sesskey()
-                            )), get_string($userismember ? 'unsubscribe' : 'subscribe', 'datalynx'),
-                    array('class' => 'datalynxfield_subscribe' . ($userismember ? ' subscribed' : '')
-                    ));
+                                'entryid' => $entry->id,
+                                'view' => optional_param('view', null, PARAM_INT),
+                                'userid' => $USER->id,
+                                'action' => $userismember ? 'unsubscribe' : 'subscribe',
+                                'sesskey' => sesskey())),
+                    get_string($userismember ? 'unsubscribe' : 'subscribe', 'datalynx'),
+                    array(
+                        'class' => 'datalynxfield_subscribe' . ($userismember ? ' subscribed' : '')));
 
             $userurl = new moodle_url('/user/view.php',
                     array('course' => $field->df()->course->id, 'id' => $USER->id));
 
             // Load jquery and parse parameters.
-            $PAGE->requires->js_call_amd('mod_datalynx/teammemberselect', 'init', array($fieldid, $userurl->out(false), fullname($USER), $canunsubscribe));
+            $PAGE->requires->js_call_amd('mod_datalynx/teammemberselect', 'init',
+                    array($fieldid, $userurl->out(false), fullname($USER), $canunsubscribe));
 
-            $PAGE->requires->strings_for_js(array('subscribe', 'unsubscribe'
-            ), 'datalynx');
+            $PAGE->requires->strings_for_js(array('subscribe', 'unsubscribe'), 'datalynx');
         }
 
         return $str;
@@ -153,27 +155,35 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         $classname = "teammemberselect_{$fieldid}_{$entryid}";
         $required = !empty($options['required']);
 
-        // We create a hidden field to force sending. Needs to be done via directly inserting html.
-        if (!$required) $mform->addElement('html', '<input type="hidden" name="'.$fieldname.'[-1]" value="-999">');
-
-        $selected = !empty($entry->{"c{$fieldid}_content"}) ? json_decode($entry->{"c{$fieldid}_content"}, true) : array();
+        // We create a hidden field to force sending. Needs to be done via directly inserting
+        // html.
+        if (!$required) {
+            $mform->addElement('html',
+                    '<input type="hidden" name="' . $fieldname . '[-1]" value="-999">');
+        }
+        $selected = !empty($entry->{"c{$fieldid}_content"}) ? json_decode(
+                $entry->{"c{$fieldid}_content"}, true) : array();
         $authorid = isset($entry->userid) ? $entry->userid : $USER->id;
         $menu = $field->options_menu(true, false, $field->usercanaddself ? 0 : $authorid);
 
-        $mform->addElement('autocomplete', $fieldname, null, $menu, array('class' => "datalynxfield_teammemberselect $classname",
-            'multiple' => true, 'noselectionstring' => "Gerade keine Auswahl."));
+        $mform->addElement('autocomplete', $fieldname, null, $menu,
+                array('class' => "datalynxfield_teammemberselect $classname", 'multiple' => true,
+                    'noselectionstring' => "Gerade keine Auswahl."));
         $mform->setType($fieldname, PARAM_INT);
-        $mform->setDefault("{$fieldname}", $selected); // Not value after validation fails
+        $mform->setDefault("{$fieldname}", $selected); // Not value after validation fails.
 
         // If we edit an existing entry that is not required we need a workaround.
-        $newentry = optional_param('new',null,PARAM_INT) === null ? 1 : 0;
+        $newentry = optional_param('new', null, PARAM_INT) === null ? 1 : 0;
         if (!$newentry && !$required) {
             $PAGE->requires->jquery();
-            $mform->addElement('static', null, '', "<script>$('option[value=\"-999\"]').removeAttr('selected');</script>");
+            $mform->addElement('static', null, '',
+                    "<script>$('option[value=\"-999\"]').removeAttr('selected');</script>");
         }
-        
+
         if ($required) {
-            $mform->addRule("{$fieldname}", 'Hier ist leider ein Fehler aufgetreten, bitte wählen Sie.', 'required', null, 0, 'client'); // TODO: Multilang.
+            $mform->addRule("{$fieldname}",
+                    'Hier ist leider ein Fehler aufgetreten, bitte wählen Sie.', 'required', null, 0,
+                    'client'); // TODO: Multilang.
         }
     }
 
@@ -228,18 +238,21 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
             }
             if (isset($formdata->$formfieldname)) {
                 // Get rid of Dummy value -999 to correct calculations.
-                if ($formdata->$formfieldname[0] == -999) array_shift($formdata->$formfieldname);
+                if ($formdata->{$formfieldname[0]} == -999) {
+                    array_shift($formdata->{$formfieldname});
+                }
                 // Limit chosen users to max teamsize and ensure min teamsize users are chosen!
                 $teamsize = count($formdata->$formfieldname);
                 if ($teamsize > $this->_field->teamsize) {
-                    $errors[$formfieldname] = get_string('maxteamsize_error_form', 'datalynx', $this->_field->teamsize);
+                    $errors[$formfieldname] = get_string('maxteamsize_error_form', 'datalynx',
+                            $this->_field->teamsize);
                 }
                 if ($teamsize < $this->_field->minteamsize) {
-                    $errors[$formfieldname] = get_string('minteamsize_error_form', 'datalynx', $this->_field->minteamsize);
+                    $errors[$formfieldname] = get_string('minteamsize_error_form', 'datalynx',
+                            $this->_field->minteamsize);
                 }
             }
         }
-
         return $errors;
     }
 }

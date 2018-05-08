@@ -47,7 +47,8 @@
     margin: 0.5em 0;
 }
 
-#page-mod-datalynx-embed .entriesview, #page-mod-datalynx-view .entriesview {
+#page-mod-datalynx-embed .entriesview,
+#page-mod-datalynx-view .entriesview {
     overflow-y: visible;
 }
 
@@ -87,16 +88,19 @@
     text-align: right;
 }
 
-.mod-datalynx-field .fieldadd, .mod-datalynx-field .sortdefault {
+.mod-datalynx-field .fieldadd,
+.mod-datalynx-field .sortdefault {
     margin-bottom: 1em;
     margin-top: 1em;
 }
 
-.mod-datalynx-field .fieldadd select, .mod-datalynx-field .sortdefault select {
+.mod-datalynx-field .fieldadd select,
+.mod-datalynx-field .sortdefault select {
     margin-left: 1em;
 }
 
-.generaltable td.z_borderless, .generaltable th.z_borderless {
+.generaltable td.z_borderless,
+.generaltable th.z_borderless {
     border: 0 none !important;
 }
 

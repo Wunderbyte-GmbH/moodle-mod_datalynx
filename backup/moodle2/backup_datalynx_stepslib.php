@@ -32,7 +32,7 @@ defined('MOODLE_INTERNAL') or die();
 class backup_datalynx_activity_structure_step extends backup_activity_structure_step {
 
     protected function define_structure() {
-        global $DB, $CFG;
+        global $DB;
 
         // To know if we are including userinfo.
         $userinfo = $this->get_setting_value('userinfo');

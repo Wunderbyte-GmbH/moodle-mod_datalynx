@@ -359,7 +359,7 @@
             </KEYS>
         </TABLE>
         <TABLE NAME="datalynx_renderers" COMMENT="Governs visual representation of fields"
-               PREVIOUS="datalynx_behaviors">
+               PREVIOUS="datalynx_behaviors" next="datalynx_customfilters">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true"
                        SEQUENCE="true" NEXT="dataid"/>
@@ -382,6 +382,42 @@
                        SEQUENCE="false" PREVIOUS="novaluetemplate" NEXT="noteditabletemplate"/>
                 <FIELD NAME="noteditabletemplate" TYPE="text" LENGTH="big"
                        NOTNULL="false" SEQUENCE="false" PREVIOUS="edittemplate"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="dataid"/>
+                <KEY NAME="dataid" TYPE="foreign" FIELDS="dataid" REFTABLE="datalynx"
+                     REFFIELDS="id" PREVIOUS="primary"/>
+            </KEYS>
+        </TABLE>
+        <TABLE NAME="datalynx_customfilters" COMMENT="Predefined customfilter forms"
+               PREVIOUS="datalynx_renderers">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true"
+                       SEQUENCE="true" NEXT="dataid"/>
+                <FIELD NAME="dataid" TYPE="int" LENGTH="10" NOTNULL="true"
+                       SEQUENCE="false" PREVIOUS="id" NEXT="name"/>
+                <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true"
+                       SEQUENCE="false" PREVIOUS="dataid" NEXT="description"/>
+                <FIELD NAME="description" TYPE="text" LENGTH="small" NOTNULL="false"
+                       SEQUENCE="false" PREVIOUS="name" NEXT="visible"/>
+                <FIELD NAME="visible" TYPE="int" LENGTH="4" NOTNULL="true"
+                       DEFAULT="1" SEQUENCE="false" PREVIOUS="description" NEXT="fulltextsearch"/>
+                <FIELD NAME="fulltextsearch" TYPE="int" LENGTH="4" NOTNULL="true"
+                       DEFAULT="0" SEQUENCE="false" PREVIOUS="visible" NEXT="timecreated"/>
+                <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true"
+                       DEFAULT="0" SEQUENCE="false" PREVIOUS="fulltextsearch" NEXT="timecreated_sortable"/>
+                <FIELD NAME="timecreated_sortable" TYPE="int" LENGTH="10" NOTNULL="true"
+                       DEFAULT="0" SEQUENCE="false" PREVIOUS="timecreated" NEXT="timemodified"/>
+                <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true"
+                       DEFAULT="0" SEQUENCE="false" PREVIOUS="timecreated_sortable" NEXT="timemodified_sortable"/>
+                <FIELD NAME="timemodified_sortable" TYPE="int" LENGTH="4" NOTNULL="true"
+                       DEFAULT="0" SEQUENCE="false" PREVIOUS="timemodified" NEXT="approve"/>
+                <FIELD NAME="approve" TYPE="int" LENGTH="4" NOTNULL="true"
+                       DEFAULT="0" SEQUENCE="false" PREVIOUS="timemodified" NEXT="status"/>
+                <FIELD NAME="status" TYPE="int" LENGTH="4" NOTNULL="true"
+                       DEFAULT="0" SEQUENCE="false" PREVIOUS="approve" NEXT="fieldlist"/>
+                <FIELD NAME="fieldlist" TYPE="text" LENGTH="big"
+                       NOTNULL="false" SEQUENCE="false" PREVIOUS="status"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="dataid"/>
