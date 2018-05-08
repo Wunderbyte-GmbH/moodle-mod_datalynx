@@ -100,6 +100,9 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
                     'acturl' => "$CFG->wwwroot/mod/datalynx/field/coursegroup/loadgroups.php"
             );
 
+            // Add JQuery
+            $PAGE->requires->js_call_amd('mod_datalynx/coursegroup', 'init', array($options));
+/*
             $module = array('name' => 'M.datalynxfield_coursegroup_load_course_groups',
                     'fullpath' => '/mod/datalynx/field/coursegroup/coursegroup.js',
                     'requires' => array('base', 'io', 'node')
@@ -107,6 +110,7 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
 
             $PAGE->requires->js_init_call('M.datalynxfield_coursegroup_load_course_groups.init',
                     array($options), false, $module);
+*/
         }
 
         // Group id.

@@ -187,13 +187,9 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         static $added = false;
 
         if (!$added) {
-            $module = array('name' => 'M.datalynxfield_datalynxview_overlay',
-                    'fullpath' => '/mod/datalynx/field/datalynxview/datalynxview.js',
-                    'requires' => array('base', 'node')
-            );
-
-            $PAGE->requires->js_init_call('M.datalynxfield_datalynxview_overlay.init', null, false,
-                    $module);
+            // Changed to jquery.
+            $PAGE->requires->js_call_amd('mod_datalynx/datalynxview', 'init');
+            $added = true; // We want this to load only once.
         }
     }
 

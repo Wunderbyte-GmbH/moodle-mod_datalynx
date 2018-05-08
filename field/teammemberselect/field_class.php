@@ -208,6 +208,9 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         $field = $DB->get_record('datalynx_fields', array('id' => $this->field->id));
         $oldcontent = json_decode($DB->get_field('datalynx_contents', 'content',
                 array('fieldid' => $this->field->id, 'entryid' => $entry->id)), true);
+
+        // Remove Dummy -999 from values before updating.
+        if ($values[''][0] == -999) array_shift($values['']);
         $newcontent = $values[''];
         parent::update_content($entry, $values);
         $this->notify_team_members($entry, $field, $oldcontent, $newcontent);
@@ -236,8 +239,8 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         if (!isset(self::$allusers[$fieldid])) {
             $this->init_user_menu();
         }
-        // Add hidden option for Validation. Needs to be int.
-        $options = array(-1 => NULL );
+        $options = array();
+        $options += array(-999 => NULL); // NULL to "not" show in lists.
 
         if ($makelinks) {
             if ($allowall) {
@@ -372,7 +375,8 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         $selected = !empty($first) ? $first : array();
 
         if (!empty($selected)) {
-            if (isset($selected[0]) && $selected[0]==-1) {
+            // Remove Dummy value.
+            if (isset($selected[0]) && $selected[0]==-999) {
                 array_shift($selected);
             }
 

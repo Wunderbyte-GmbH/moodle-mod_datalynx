@@ -94,7 +94,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
 
             $userurl = new moodle_url('/user/view.php',
                     array('course' => $field->df()->course->id, 'id' => $USER->id));
-                    
+
             // Load jquery and parse parameters.
             $PAGE->requires->js_call_amd('mod_datalynx/teammemberselect', 'init', array($fieldid, $userurl->out(false), fullname($USER), $canunsubscribe));
 
@@ -158,7 +158,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
 
         $selected = !empty($entry->{"c{$fieldid}_content"}) ? json_decode($entry->{"c{$fieldid}_content"}, true) : array();
         $authorid = isset($entry->userid) ? $entry->userid : $USER->id;
-        $menu = $field->options_menu(true, false, -999);
+        $menu = $field->options_menu(true, false, $field->usercanaddself ? 0 : $authorid);
 
         $mform->addElement('autocomplete', $fieldname, null, $menu, array('class' => "datalynxfield_teammemberselect $classname",
             'multiple' => true, 'noselectionstring' => "Gerade keine Auswahl."));
@@ -168,8 +168,8 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         // If we edit an existing entry that is not required we need a workaround.
         $newentry = optional_param('new',null,PARAM_INT) === null ? 1 : 0;
         if (!$newentry && !$required) {
-			$PAGE->requires->jquery();
-			$mform->addElement('static', null, '', "<script>$('option[value=\"-999\"]').removeAttr('selected');</script>");
+            $PAGE->requires->jquery();
+            $mform->addElement('static', null, '', "<script>$('option[value=\"-999\"]').removeAttr('selected');</script>");
         }
         
         if ($required) {
@@ -210,7 +210,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         $formfieldname = "field_{$fieldid}_{$entryid}";
         $errors = array();
         foreach ($tags as $tag) {
-			list(, $behavior, ) = $this->process_tag($tag);
+            list(, $behavior, ) = $this->process_tag($tag);
             // Variable $behavior datalynx_field_behavior.
             if ($behavior->is_required()) {
                 $userfound = false;
@@ -227,8 +227,8 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
                 }
             }
             if (isset($formdata->$formfieldname)) {
-				// Get rid of Dummy value -999 to correct calculations.
-				if ($formdata->$formfieldname[0] == -999) array_shift($formdata->$formfieldname);
+                // Get rid of Dummy value -999 to correct calculations.
+                if ($formdata->$formfieldname[0] == -999) array_shift($formdata->$formfieldname);
                 // Limit chosen users to max teamsize and ensure min teamsize users are chosen!
                 $teamsize = count($formdata->$formfieldname);
                 if ($teamsize > $this->_field->teamsize) {
