@@ -155,6 +155,15 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         $classname = "teammemberselect_{$fieldid}_{$entryid}";
         $required = !empty($options['required']);
 
+        // If we edit an existing entry that is not required we need a workaround.
+        $newentry = optional_param('new', null, PARAM_INT) === null ? 1 : 0;
+        if (!$newentry && !$required) {
+            $PAGE->requires->js_amd_inline("
+            require(['jquery'], function($) {
+                $('option[value=\"-999\"]').removeAttr('selected');
+            });");
+        }
+
         // We create a hidden field to force sending. Needs to be done via directly inserting
         // html.
         if (!$required) {
@@ -171,14 +180,6 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
                     'noselectionstring' => "Gerade keine Auswahl."));
         $mform->setType($fieldname, PARAM_INT);
         $mform->setDefault("{$fieldname}", $selected); // Not value after validation fails.
-
-        // If we edit an existing entry that is not required we need a workaround.
-        $newentry = optional_param('new', null, PARAM_INT) === null ? 1 : 0;
-        if (!$newentry && !$required) {
-            $PAGE->requires->jquery();
-            $mform->addElement('static', null, '',
-                    "<script>$('option[value=\"-999\"]').removeAttr('selected');</script>");
-        }
 
         if ($required) {
             $mform->addRule("{$fieldname}",
