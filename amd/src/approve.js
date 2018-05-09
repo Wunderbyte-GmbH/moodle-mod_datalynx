@@ -1,5 +1,5 @@
 define(['jquery'], function($) {
- 
+
     return {
         init: function(approvedicon, disapprovedicon) {
             // After initialisation we loop through all links for subscribe / unsubscribe.
