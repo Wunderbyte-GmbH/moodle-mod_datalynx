@@ -47,6 +47,7 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
         */
         $url = empty($url) ? 'http://' : $url;
         $usepicker = empty($field->field->param1) ? false : true;
+        $displaylinktextfield = empty($field->field->param5) ? false : true;
         $options = array('title' => s($field->field->description), 'size' => 64);
 
         $group = array();
@@ -56,11 +57,11 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
         $mform->setDefault("{$fieldname}_url", s($url));
 
         // Add alt name if not forcing name.
-        if (empty($field->field->param2)) {
+        if (empty($field->field->param2) && $displaylinktextfield) {
             $group[] = $mform->createElement('static', '', '',
-                    get_string('alttext', 'datalynxfield_url'));
+                    get_string('linktext', 'datalynxfield_url'));
             $group[] = $mform->createElement('text', "{$fieldname}_alt",
-                    get_string('alttext', 'datalynxfield_url'));
+                    get_string('linktext', 'datalynxfield_url'));
             $mform->setType("{$fieldname}_alt", PARAM_TEXT);
             $mform->setDefault("{$fieldname}_alt", s($alt));
         }
@@ -93,14 +94,14 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
 
             // Param2 forces the text to something.
             if ($field->field->param2) {
-                $alttext = s($field->field->param2);
+                $linktext = s($field->field->param2);
             } else {
-                $alttext = empty($entry->{"c{$fieldid}_content1"}) ? $url : $entry->{"c{$fieldid}_content1"};
+                $linktext = empty($entry->{"c{$fieldid}_content1"}) ? $url : $entry->{"c{$fieldid}_content1"};
             }
 
             // Linking.
             if ($type == 'link') {
-                return html_writer::link($url, $alttext, $attributes);
+                return html_writer::link($url, $linktext, $attributes);
             }
 
             // Image.

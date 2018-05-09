@@ -57,7 +57,7 @@ class datalynxfield_url extends datalynxfield_base {
             '_content1'} : null;
         }
         // New contents.
-        $url = $alttext = null;
+        $url = $linktext = null;
         if (!empty($values)) {
             foreach ($values as $name => $value) {
                 if ($name) { // Update from form.
@@ -68,14 +68,14 @@ class datalynxfield_url extends datalynxfield_base {
                             }
                             break;
                         case 'alt':
-                            $alttext = clean_param($value, PARAM_NOTAGS);
+                            $linktext = clean_param($value, PARAM_NOTAGS);
                             break;
                     }
                 } else { // Update from import.
                     if (strpos($value, '##') !== false) {
                         $value = explode('##', $value);
                         $url = clean_param($value[0], PARAM_URL);
-                        $alttext = clean_param($value[1], PARAM_NOTAGS);
+                        $linktext = clean_param($value[1], PARAM_NOTAGS);
                     } else {
                         $url = clean_param($value, PARAM_URL);
                     }
@@ -86,7 +86,7 @@ class datalynxfield_url extends datalynxfield_base {
         }
         if (!is_null($url)) {
             $contents[] = $url;
-            $contents[] = $alttext;
+            $contents[] = $linktext;
         }
         return array($contents, $oldcontents);
     }

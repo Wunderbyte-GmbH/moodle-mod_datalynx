@@ -22,11 +22,12 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['applymediafilter'] = 'Apply media filter';
-$string['alttext'] = 'Alt text';
+$string['linktext'] = 'Link text';
 $string['forcename'] = 'Force name for the link';
 $string['makelink'] = 'Make the url a link';
 $string['makeimage'] = 'Make the url an image';
 $string['pluginname'] = 'Url';
 $string['usepicker'] = 'Use url picker when editing';
+$string['displaylinktext'] = 'Display input field for specifying a link text in edit mode.';
 
 
