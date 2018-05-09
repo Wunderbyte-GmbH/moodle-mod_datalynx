@@ -119,15 +119,13 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
 
         if (has_capability('mod/datalynx:approve', $field->df()->context)) {
             if ($CFG->branch >= 33) {
-                $PAGE->requires->js_init_call('M.datalynxfield__approve.init',
+                $PAGE->requires->js_call_amd('mod_datalynx/approve', 'init',
                         array($OUTPUT->image_url('i/completion-auto-pass')->__toString(),
-                            $OUTPUT->image_url('i/completion-auto-n')->__toString()), false,
-                        $this->get_js_module());
+                            $OUTPUT->image_url('i/completion-auto-n')->__toString()));
             } else {
-                $PAGE->requires->js_init_call('M.datalynxfield__approve.init',
+                $PAGE->requires->js_call_amd('mod_datalynx/approve', 'init',
                         array($OUTPUT->pix_url('i/completion-auto-pass')->__toString(),
-                            $OUTPUT->pix_url('i/completion-auto-n')->__toString()), false,
-                        $this->get_js_module());
+                            $OUTPUT->pix_url('i/completion-auto-n')->__toString()));
             }
 
             return html_writer::link(
@@ -138,13 +136,6 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
         } else {
             return $approvedimage;
         }
-    }
-
-    private function get_js_module() {
-        $jsmodule = array('name' => 'datalynxfield__approve',
-                'fullpath' => '/mod/datalynx/field/_approve/_approve.js',
-                'requires' => array('node', 'event', 'node-event-delegate', 'io'));
-        return $jsmodule;
     }
 
     /**
