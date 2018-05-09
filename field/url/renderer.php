@@ -40,7 +40,11 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
         $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
         $url = isset($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : null;
         $alt = isset($entry->{"c{$fieldid}_content1"}) ? $entry->{"c{$fieldid}_content1"} : null;
-
+        /*
+        // TODO: Replace filepicker with normal text input fields.
+        $mform->addElement('text', 'name', "test", "");
+        $mform->setType('name', PARAM_URL);
+        */
         $url = empty($url) ? 'http://' : $url;
         $usepicker = empty($field->field->param1) ? false : true;
         $options = array('title' => s($field->field->description), 'size' => 64);
@@ -153,7 +157,6 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
         $fieldid = $this->_field->id();
 
         $formfieldname = "field_{$fieldid}_{$entryid}_url";
-
         $errors = array();
         foreach ($tags as $tag) {
             list(, $behavior, ) = $this->process_tag($tag);
@@ -161,7 +164,14 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
             if ($behavior->is_required() &&
                     (!isset($formdata->$formfieldname) || $formdata->$formfieldname === 'http://')
             ) {
-                $errors["field_{$fieldid}_{$entryid}"] = get_string('fieldrequired', 'datalynx');
+                $errors["field_{$fieldid}_{$entryid}_grp"] = get_string('fieldrequired', 'datalynx');
+            }
+            // Validate that the input is a URL with regex.
+            // $urlregex = "/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i";
+            // if (!preg_match($urlregex, $formdata->$formfieldname)) {
+            $isurl = filter_var($formdata->$formfieldname, FILTER_VALIDATE_URL);
+            if ($isurl == false) {
+                $errors["field_{$fieldid}_{$entryid}_grp"] = "Please enter a valid URL."; // TODO: Multilang.
             }
         }
 
