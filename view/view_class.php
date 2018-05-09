@@ -1124,8 +1124,6 @@ abstract class datalynxview_base {
                 // Prepare options for form.
                 $entriesform = $this->get_entries_form();
                 $html = $entriesform->html();
-                // Process calculations if any.
-                $html = $this->process_calculations($html);
             } else {
                 // Show message that editing is not allowed.
                 $redirectid = $this->_redirect ? $this->_redirect : $this->id();
@@ -1134,7 +1132,8 @@ abstract class datalynxview_base {
                          $OUTPUT->continue_button($url);
             }
         }
-
+        // Process calculations if any.
+        $html = $this->process_calculations($html);
         return $html;
     }
 
