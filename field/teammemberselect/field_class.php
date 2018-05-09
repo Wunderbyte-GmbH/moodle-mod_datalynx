@@ -210,7 +210,9 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
                 array('fieldid' => $this->field->id, 'entryid' => $entry->id)), true);
 
         // Remove Dummy -999 from values before updating.
-        if ($values[''][0] == -999) array_shift($values['']);
+        if ($values[''][0] == -999) {
+            array_shift($values['']);
+        }
 
         $newcontent = $values[''];
         parent::update_content($entry, $values);
@@ -243,7 +245,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         }
 
         $options = array();
-        $options += array(-999 => NULL); // NULL to "not" show in lists.
+        $options += array(-999 => null); // NULL to "not" show in lists.
 
         if ($makelinks) {
             if ($allowall) {
@@ -381,7 +383,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         if (!empty($selected)) {
 
             // Remove Dummy value.
-            if (isset($selected[0]) && $selected[0]==-999) {
+            if (isset($selected[0]) && $selected[0] == -999) {
                 array_shift($selected);
             }
 
