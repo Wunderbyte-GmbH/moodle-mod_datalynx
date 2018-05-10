@@ -173,6 +173,7 @@ class datalynxview_patterns {
         global $OUTPUT;
 
         $df = $this->_view->get_df();
+        $currentview = $df->get_current_view();
 
         static $views = null;
         if ($views === null) {
@@ -204,6 +205,9 @@ class datalynxview_patterns {
                     return html_writer::link($view->baseurl->out(false) . "&$urlquery", $linktext);
                 }
                 if (strpos($tag, "#{{viewsesslink:$viewname;") === 0) {
+                    if ($currentview->user_is_editing()){
+                        return '';
+                    }
                     list(, $linktext, $urlquery, ) = explode(';', $tag);
                     // Pix icon for text.
                     if (strpos($linktext, '_pixicon:') === 0) {
