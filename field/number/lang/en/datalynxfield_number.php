@@ -23,4 +23,3 @@
  */
 $string['decimals'] = 'Decimals';
 $string['pluginname'] = 'Number';
-

@@ -42,12 +42,7 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
         if ($entryid > 0 and !empty($entry->{"c{$fieldid}_content"})) {
             $content = $entry->{"c{$fieldid}_content"};
         }
-
         $fieldattr = array();
-
-        if ($field->get('param2')) {
-            $fieldattr['style'] = 'width:' . s($field->get('param2')) . s($field->get('param3')) . ';';
-        }
 
         if ($field->get('param4')) {
             $fieldattr['class'] = s($field->get('param4'));
@@ -74,7 +69,11 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
             $mform->addRule($fieldname, null, 'required', null, 'client');
         }
         // Format rule.
-        if ($format = $field->get('param4')) {
+        $format = $field->get('param4');
+        if (!$format && $field->type == 'number'){
+            $format = 'numeric';
+        }
+        if ($format) {
             $mform->addRule($fieldname, null, $format, null, 'client');
             // Adjust type.
             switch ($format) {
