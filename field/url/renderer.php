@@ -171,7 +171,11 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
             // $urlregex = "/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i";
             // if (!preg_match($urlregex, $formdata->$formfieldname)) {
             $isurl = filter_var($formdata->$formfieldname, FILTER_VALIDATE_URL);
-            if ($isurl == false) {
+            $isdefault = $formdata->$formfieldname === 'http://';
+            $isempty =  $formdata->$formfieldname === '';
+            if ($isurl or $isdefault or $isempty) {
+                continue;
+            } else {
                 $errors["field_{$fieldid}_{$entryid}_grp"] = "Please enter a valid URL."; // TODO: Multilang.
             }
         }
