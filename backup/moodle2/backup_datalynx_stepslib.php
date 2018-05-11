@@ -162,11 +162,12 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
                 backup_helper::is_sqlparam('mod_datalynx'),
                 backup::VAR_PARENTID));
 
-        // TODO: fix sql, this is just a temporary fix and does not provide same functionality for postgresql.
-        // SQL for mysql provides id mapping of the field datalynx view, whereas there is no id mapping for postgresql.
-        // Possible DBs: 'pgsql', 'mariadb', 'mysqli', 'mssql', 'sqlsrv' or 'oci'
-        // The cases are weird, they are formated differently in mssql, postgresql, mysql, ... fix that.
-        /* SELECT *, case  when rev=1 then 'blabla' end FROM docs works on mysql, mssql, postgresql */
+            // TODO: fix sql, this is just a temporary fix and does not provide same functionality for postgresql.
+            // SQL for mysql provides id mapping of the field datalynx view, whereas there is no id mapping for postgresql.
+            // Possible DBs: 'pgsql', 'mariadb', 'mysqli', 'mssql', 'sqlsrv' or 'oci'
+            // The cases are weird, they are formated differently in mssql, postgresql, mysql, ... fix that.
+            // else if ($CFG->dbtype == 'pgsql') {}
+            /* SELECT *, case when rev=1 then 'blabla' end FROM docs works on mysql, mssql, postgresql */
         if ($CFG->dbtype == 'mysqli' || $CFG->dbtype == 'mysql' || $CFG->dbtype == 'mariadb') {
             $field->set_source_sql(
                     "SELECT f.*,
@@ -175,27 +176,19 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
                         CASE f.type WHEN 'datalynxview' THEN MAX(v.name) ELSE NULL END AS targetview,
                         CASE f.type WHEN 'datalynxview' THEN MAX(fil.name) ELSE NULL END AS targetfilter
                    FROM {datalynx_fields} f
-              LEFT JOIN {datalynx} d ON " .
-                    $DB->sql_cast_char2int('f.param1') . " = d.id
+              LEFT JOIN {datalynx} d ON " . $DB->sql_cast_char2int('f.param1') . " = d.id
               LEFT JOIN {course_modules} cm ON cm.instance = d.id
               LEFT JOIN {course} c ON cm.course = c.id
-              LEFT JOIN {datalynx_views} v ON " .
-                    $DB->sql_cast_char2int('f.param2') .
-                    " = v.id
-              LEFT JOIN {datalynx_filters} fil ON " .
-                    $DB->sql_cast_char2int('f.param3') . " = fil.id
+              LEFT JOIN {datalynx_views} v ON " . $DB->sql_cast_char2int('f.param2') . " = v.id
+              LEFT JOIN {datalynx_filters} fil ON " . $DB->sql_cast_char2int('f.param3') . " = fil.id
                   WHERE f.dataid = :dataid
-               GROUP BY f.id",
-                    array('dataid' => backup::VAR_PARENTID));
-        } else if ($CFG->dbtype == 'pgsql') {
-        }
-        else {
+               GROUP BY f.id", array('dataid' => backup::VAR_PARENTID));
+        } else {
             $field->set_source_sql(
                     "SELECT f.*
                FROM {datalynx_fields} f
               WHERE f.dataid = :dataid
-                AND f.type != 'datalynxview'",
-                    array('dataid' => backup::VAR_PARENTID));
+                AND f.type != 'datalynxview'", array('dataid' => backup::VAR_PARENTID));
         }
 
         $filter->set_source_table('datalynx_filters', array('dataid' => backup::VAR_PARENTID));

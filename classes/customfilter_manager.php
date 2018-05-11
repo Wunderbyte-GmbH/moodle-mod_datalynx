@@ -189,14 +189,13 @@ class mod_datalynx_customfilter_manager {
         } else {
             if (!$confirmed) {
                 $df->print_header('customfilters');
-                echo $OUTPUT->confirm(
-                        get_string("filtersconfirm$action", 'datalynx', count($filters)),
-                        new moodle_url('/mod/datalynx/customfilter/index.php',
-                                array('d' => $df->id(),
-                                    $action => implode(',', array_keys($filters)),
-                                    'sesskey' => sesskey(), 'confirmed' => 1)),
-                        new moodle_url('/mod/datalynx/customfilter/index.php',
-                                array('d' => $df->id())));
+                $message = get_string("filtersconfirm$action", 'datalynx', count($filters));
+                $url1 = new moodle_url('/mod/datalynx/customfilter/index.php',
+                        array('d' => $df->id(), $action => implode(',', array_keys($filters)),
+                            'sesskey' => sesskey(), 'confirmed' => 1));
+                $url2 = new moodle_url('/mod/datalynx/customfilter/index.php',
+                        array('d' => $df->id()));
+                echo $OUTPUT->confirm($message, $url1, $url2);
                 echo $OUTPUT->footer();
                 exit();
             } else {
@@ -204,7 +203,6 @@ class mod_datalynx_customfilter_manager {
                     case 'update':
                         $filter = reset($filters);
                         $mform = $this->get_customfilter_backend_form($filter);
-
                         if ($mform->is_cancelled()) {
                             break;
                         }

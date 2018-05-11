@@ -776,7 +776,7 @@ class dfpdf extends pdf {
     }
 
     // Page header.
-    public function Header() {
+    public function Header() { // phpcs:ignore  @codingStandardsIgnoreLine
         // Adjust X to override left margin.
         $x = $this->GetX();
         $this->SetX($this->_dfsettings->header->marginleft);
@@ -789,13 +789,14 @@ class dfpdf extends pdf {
     }
 
     // Page footer.
-    public function Footer() {
+    public function Footer() { // phpcs:ignore  @codingStandardsIgnoreLine
         if (!empty($this->_dfsettings->footer->text)) {
             $text = $this->set_page_numbers($this->_dfsettings->footer->text);
             $this->writeHtml($text);
         }
     }
 
+    // phpcs:enable
     protected function set_page_numbers($text) {
         $replacements = array('##pagenumber##' => $this->getAliasNumPage(),
                 '##totalpages##' => $this->getAliasNbPages());

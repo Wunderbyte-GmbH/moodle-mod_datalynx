@@ -70,7 +70,7 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
         }
         // Format rule.
         $format = $field->get('param4');
-        if (!$format && $field->type == 'number'){
+        if (!$format && $field->type == 'number') {
             $format = 'numeric';
         }
         if ($format) {

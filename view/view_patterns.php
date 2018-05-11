@@ -189,7 +189,6 @@ class datalynxview_patterns {
                         "/mod/datalynx/{$this->_view->get_df()->pagefile()}.php", $baseurlparams);
             }
         }
-
         if ($views) {
             foreach ($views as $view) {
                 $viewname = $view->name;
@@ -205,7 +204,7 @@ class datalynxview_patterns {
                     return html_writer::link($view->baseurl->out(false) . "&$urlquery", $linktext);
                 }
                 if (strpos($tag, "#{{viewsesslink:$viewname;") === 0) {
-                    if ($currentview->user_is_editing()){
+                    if ($currentview->user_is_editing()) {
                         return '';
                     }
                     list(, $linktext, $urlquery, ) = explode(';', $tag);
