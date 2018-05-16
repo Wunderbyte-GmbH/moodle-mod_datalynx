@@ -202,36 +202,34 @@ class datalynxview_csv extends datalynxview_base {
     }
 
     /**
+     * Add the patterns we store in param2 to all the other used patterns.
      */
-    protected function set__patterns($data = null) {
-        parent::set__patterns($data);
+    protected function set__patterns() {
+        parent::set__patterns();
 
         // Get patterns from param2.
-        if ($data) {
-            $text = !empty($data->param2) ? ' ' . $data->param2 : '';
-            if (trim($text)) {
-                // This view patterns.
-                if ($patterns = $this->patternclass()->search($text)) {
-                    $this->_tags['view'] = array_merge($this->_tags['view'], $patterns);
-                }
-                // Field patterns.
-                if ($fields = $this->_df->get_fields()) {
-                    foreach ($fields as $fieldid => $field) {
-                        if ($patterns = $field->renderer()->search($text)) {
-                            $this->_tags['field'][$fieldid] = $patterns;
-                        }
+        $text = !empty($this->view->param2) ? $this->view->param2 : '';
+        if (trim($text)) {
+            // This view patterns.
+            if ($patterns = $this->patternclass()->search($text)) {
+                $this->_tags['view'] = array_merge($this->_tags['view'], $patterns);
+            }
+            // Field patterns.
+            if ($fields = $this->_df->get_fields()) {
+                foreach ($fields as $fieldid => $field) {
+                    if ($patterns = $field->renderer()->search($text)) {
+                        $this->_tags['field'][$fieldid] = $patterns;
                     }
                 }
             }
-            $this->view->patterns = serialize($this->_tags);
         }
+        $this->view->patterns = serialize($this->_tags);
     }
 
     /**
      * Overridden to show import form without entries
      */
     public function display(array $params = array()) {
-
         if ($this->_showimportform) {
 
             $mform = $this->get_import_form();
