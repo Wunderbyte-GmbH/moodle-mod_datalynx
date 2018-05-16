@@ -73,9 +73,11 @@ class datalynxview_csv_import_form extends moodleform {
         $df = $view->get_df();
         $mform = &$this->_form;
 
+        // TODO: This is not in the lang files.
         $mform->addElement('header', 'fieldsettingshdr',
                 get_string('fieldsimportsettings', 'datalynxview_import'));
         $columns = $view->get_columns();
+        // Generate the headings and settings for values to import.
         foreach ($columns as $column) {
             list($pattern, $header, ) = $column;
             $patternname = trim($pattern, '[#]');
@@ -93,9 +95,8 @@ class datalynxview_csv_import_form extends moodleform {
 
             $grp = array();
             $grp[] = &$mform->createElement('text', "{$name}_name", null, array('size' => '16'));
-            list($elements, $labels) = $field->renderer()->get_pattern_import_settings($mform, $pattern);
-            $grp = $grp + $elements;
-            $mform->addGroup($grp, "grp$patternname", $patternname, $labels, false);
+
+            $mform->addGroup($grp, "grp$patternname", $patternname, array(), false);
 
             $mform->setType("{$name}_name", PARAM_NOTAGS);
             $mform->setDefault("{$name}_name", $header);
