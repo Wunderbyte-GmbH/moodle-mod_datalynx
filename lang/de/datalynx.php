@@ -829,3 +829,8 @@ $string['sortable'] = 'sortierbar';
 $string['activate'] = 'Aktivieren';
 $string['fileexist'] = 'vorhanden';
 $string['filemissing'] = 'fehlt';
+
+$string['fieldsimportsettings'] = 'Importeinstellungen';
+$string['uploadfile'] = 'Importdatei';
+$string['uploadtext'] = 'Importtext';
+$string['updateexisting'] = 'Vorhandene überschreiben';

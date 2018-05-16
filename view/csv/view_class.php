@@ -546,9 +546,9 @@ class datalynxview_csv extends datalynxview_base {
         foreach ($row1->cells as $cell) {
             $cell->style = 'border:0 none;';
         }
-        // Second row: export.
+        // Don't show addnewentries, it has no functionality..
         $row2 = new html_table_row();
-        $addentries = new html_table_cell('##addnewentries##');
+        $addentries = new html_table_cell('');
         $addentries->colspan = 5;
         $row2->cells = array($addentries);
         foreach ($row2->cells as $cell) {

@@ -864,3 +864,8 @@ $string['sortable'] = 'sortable';
 $string['activate'] = 'activate';
 $string['fileexist'] = 'exists';
 $string['filemissing'] = 'missing';
+
+$string['fieldsimportsettings'] = 'Importsettings';
+$string['uploadfile'] = 'File to import';
+$string['uploadtext'] = 'Text to import';
+$string['updateexisting'] = 'Overwrite existing';

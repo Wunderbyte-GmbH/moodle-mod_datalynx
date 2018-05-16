@@ -73,7 +73,6 @@ class datalynxview_csv_import_form extends moodleform {
         $df = $view->get_df();
         $mform = &$this->_form;
 
-        // TODO: This is not in the lang files.
         $mform->addElement('header', 'fieldsettingshdr',
                 get_string('fieldsimportsettings', 'datalynxview_import'));
         $columns = $view->get_columns();
