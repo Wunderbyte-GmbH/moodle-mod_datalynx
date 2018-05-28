@@ -60,11 +60,20 @@ class datalynx_field_renderer_form extends moodleform {
         $mform->addElement('text', 'description', get_string('description'), array('size' => '64'));
         $mform->setType('description', PARAM_TEXT);
 
+        /*
+         * Make this more readable:
+         * shownothing = 0
+         * asdisplay = 1
+         * custom = 2
+         * disabled = 3
+         * none = 4
+         * If *template is an integer we assume it is an option.
+         */
+
+        // When not visible.
         $group = array();
-        $group[] = $mform->createElement('radio', 'notvisibleoptions', '',
-                get_string('shownothing', 'datalynx'), 0);
-        $group[] = $mform->createElement('radio', 'notvisibleoptions', '',
-                get_string('custom', 'datalynx'), 1);
+        $group[] = $mform->createElement('radio', 'notvisibleoptions', '', get_string('shownothing', 'datalynx'), 0);
+        $group[] = $mform->createElement('radio', 'notvisibleoptions', '', get_string('custom', 'datalynx'), 2);
         $group[] = $mform->createElement('textarea', 'notvisibletemplate', '', '');
         $mform->disabledIf('notvisibletemplate', 'notvisibleoptions', 'eq', 0);
         $mform->addGroup($group, 'notvisiblegroup', get_string('notvisible', 'datalynx'),
@@ -72,19 +81,20 @@ class datalynx_field_renderer_form extends moodleform {
                 ), false);
         $mform->setType('notvisibletemplate', PARAM_CLEANHTML);
 
+        // Display template.
         $group = array();
-        $group[] = $mform->createElement('radio', 'displayoptions', '', get_string('none'), 0);
-        $group[] = $mform->createElement('radio', 'displayoptions', '',
-                get_string('custom', 'datalynx'), 1);
+        $group[] = $mform->createElement('radio', 'displayoptions', '', get_string('none'), 4);
+        $group[] = $mform->createElement('radio', 'displayoptions', '', get_string('custom', 'datalynx'), 2);
         $group[] = $mform->createElement('textarea', 'displaytemplate', '', '');
         $mform->setDefault('displaytemplate', '#value');
-        $mform->disabledIf('displaytemplate', 'displayoptions', 'eq', 0);
+        $mform->disabledIf('displaytemplate', 'displayoptions', 'eq', 4);
         $mform->addGroup($group, 'displaytemplategroup', get_string('displaytemplate', 'datalynx'),
                 array('<br />'
                 ), false);
         $mform->setType('displaytemplate', PARAM_CLEANHTML);
         $mform->addHelpButton('displaytemplategroup', 'displaytemplate', 'datalynx');
 
+        // When empty.
         $group = array();
         $group[] = $mform->createElement('radio', 'novalueoptions', '',
                 get_string('shownothing', 'datalynx'), 0);
@@ -98,39 +108,36 @@ class datalynx_field_renderer_form extends moodleform {
         $mform->addGroup($group, 'novaluetemplategroup', get_string('novalue', 'datalynx'), array('<br />'), false);
         $mform->setType('novaluetemplate', PARAM_CLEANHTML);
 
+        // Edit template.
         $group = array();
-        $group[] = $mform->createElement('radio', 'editoptions', '', get_string('none'), 0);
-        $group[] = $mform->createElement('radio', 'editoptions', '',
-                get_string('asdisplay', 'datalynx'), 1);
-        $group[] = $mform->createElement('radio', 'editoptions', '',
-                get_string('custom', 'datalynx'), 2);
+        $group[] = $mform->createElement('radio', 'editoptions', '', get_string('none'), 4);
+        $group[] = $mform->createElement('radio', 'editoptions', '', get_string('asdisplay', 'datalynx'), 1);
+        $group[] = $mform->createElement('radio', 'editoptions', '', get_string('custom', 'datalynx'), 2);
         $group[] = $mform->createElement('textarea', 'edittemplate', '', '');
         $mform->setDefault('edittemplate', '#input');
-        $mform->disabledIf('edittemplate', 'editoptions', 'eq', 0);
+        $mform->disabledIf('edittemplate', 'editoptions', 'eq', 4);
         $mform->disabledIf('edittemplate', 'editoptions', 'eq', 1);
         $mform->addGroup($group, 'edittemplategroup', get_string('edittemplate', 'datalynx'), array('<br />'), false);
         $mform->setType('edittemplate', PARAM_CLEANHTML);
         $mform->addHelpButton('edittemplategroup', 'edittemplate', 'datalynx');
 
+        // When not editable.
         $group = array();
-        $group[] = $mform->createElement('radio', 'noteditableoptions', '',
-                get_string('shownothing', 'datalynx'), 0);
-        $group[] = $mform->createElement('radio', 'noteditableoptions', '',
-                get_string('asdisplay', 'datalynx'), 1);
-        $group[] = $mform->createElement('radio', 'noteditableoptions', '',
-                get_string('disabled', 'datalynx'), 2);
-        $group[] = $mform->createElement('radio', 'noteditableoptions', '',
-                get_string('custom', 'datalynx'), 3);
+        $group[] = $mform->createElement('radio', 'noteditableoptions', '', get_string('shownothing', 'datalynx'), 0);
+        $group[] = $mform->createElement('radio', 'noteditableoptions', '', get_string('asdisplay', 'datalynx'), 1);
+        $group[] = $mform->createElement('radio', 'noteditableoptions', '', get_string('disabled', 'datalynx'), 3);
+        $group[] = $mform->createElement('radio', 'noteditableoptions', '', get_string('custom', 'datalynx'), 2);
         $group[] = $mform->createElement('textarea', 'noteditabletemplate', '', '');
         $mform->disabledIf('noteditabletemplate', 'noteditableoptions', 'eq', 0);
         $mform->disabledIf('noteditabletemplate', 'noteditableoptions', 'eq', 1);
-        $mform->disabledIf('noteditabletemplate', 'noteditableoptions', 'eq', 2);
+        $mform->disabledIf('noteditabletemplate', 'noteditableoptions', 'eq', 3);
         $mform->addGroup($group, 'noteditablegroup', get_string('noteditable', 'datalynx'), array('<br />'), false);
         $mform->setType('noteditabletemplate', PARAM_CLEANHTML);
 
         $this->add_action_buttons();
     }
 
+    // Process validated data from form.
     public function get_data() {
         $data = parent::get_data();
 
@@ -138,83 +145,38 @@ class datalynx_field_renderer_form extends moodleform {
             return null;
         }
 
-        if (!isset($data->notvisibletemplate)) {
-            $data->notvisibletemplate = $data->notvisibleoptions;
-        } else {
-            if ($data->notvisibletemplate == '0' || $data->notvisibletemplate == '1') {
-                $data->notvisibletemplate = '<span>' . $data->notvisibletemplate . '</span>';
-            }
-        }
-        if (!isset($data->displaytemplate)) {
-            $data->displaytemplate = $data->displayoptions;
-        } else {
-            if ($data->displaytemplate == '0' || $data->displaytemplate == '1') {
-                $data->displaytemplate = '<span>' . $data->displaytemplate . '</span>';
-            }
-        }
-        if (!isset($data->novaluetemplate)) {
-            $data->novaluetemplate = $data->novalueoptions;
-        } else {
-            if ($data->novaluetemplate == '0' || $data->novaluetemplate == '1' ||
-                    $data->novaluetemplate == '2'
-            ) {
-                $data->novaluetemplate = '<span>' . $data->novaluetemplate . '</span>';
-            }
-        }
-        if (!isset($data->edittemplate)) {
-            $data->edittemplate = $data->editoptions;
-        } else {
-            if ($data->edittemplate == '0' || $data->edittemplate == '1' ||
-                    $data->edittemplate == '2'
-            ) {
-                $data->edittemplate = '<span>' . $data->edittemplate . '</span>';
-            }
-        }
-        if (!isset($data->noteditabletemplate)) {
-            $data->noteditabletemplate = $data->noteditableoptions;
-        } else {
-            if ($data->noteditabletemplate == '0' || $data->noteditabletemplate == '1' ||
-                    $data->noteditabletemplate == '2' || $data->noteditabletemplate == '3'
-            ) {
-                $data->noteditabletemplate = '<span>' . $data->noteditabletemplate . '</span>';
+        $formfields = array('notvisible', 'display', 'novalue', 'edit', 'noteditable');
+
+        foreach ($formfields as $formfield) {
+            $template = $formfield . 'template';
+            if (!isset($data->$template)) {
+                $option = $formfield . 'options';
+                $data->$template = $data->$option;
             }
         }
 
         return $data;
     }
 
+    // Add data to formfields.
     public function set_data($data) {
-        if (is_numeric($data->notvisibletemplate)) {
-            $data->notvisibleoptions = $data->notvisibletemplate;
-            unset($data->notvisibletemplate);
-        } else {
-            $data->notvisibleoptions = 1;
-        }
-        if (is_numeric($data->displaytemplate)) {
-            $data->displayoptions = $data->displaytemplate;
-            unset($data->displaytemplate);
-        } else {
-            $data->displayoptions = 1;
-        }
-        if (is_numeric($data->novaluetemplate)) {
-            $data->novalueoptions = $data->novaluetemplate;
-            unset($data->novaluetemplate);
-        } else {
-            $data->novalueoptions = 2;
-        }
-        if (is_numeric($data->edittemplate)) {
-            $data->editoptions = $data->edittemplate;
-            unset($data->edittemplate);
-        } else {
-            $data->editoptions = 2;
-        }
-        if (is_numeric($data->noteditabletemplate)) {
-            $data->noteditableoptions = $data->noteditabletemplate;
-            unset($data->noteditabletemplate);
-        } else {
-            $data->noteditableoptions = 3;
-        }
-        parent::set_data($data);
+
+         $formfields = array('notvisible', 'display', 'novalue', 'edit', 'noteditable');
+
+         foreach ($formfields as $formfield) {
+             $template = $formfield . 'template';
+             $option = $formfield . 'options';
+
+             if (is_numeric($data->$template)) {
+                // If we see an integer value we set options and delete template.
+                $data->$option = $data->$template;
+                unset($data->$template);
+             } else {
+                 // Else we set options to custom which now is always 2.
+                 $data->$option = 2;
+             }
+         }
+         parent::set_data($data);
     }
 
     public function validation($data, $files) {

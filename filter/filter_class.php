@@ -245,12 +245,16 @@ class datalynx_filter {
                 }
             }
 
-            if ($searchfrom && is_numeric($fieldid)) {
+            // TESTING: bug#1056 teammemberselect does not store empty values so we need to work with dataid.
+            if ($fields[$fieldid]->type == 'teammemberselect' && $searchfrom && is_numeric($fieldid)) {
+                $searchwhere[] = " e.dataid = " . $fields[$fieldid]->field->dataid . " ";
+            } else if ($searchfrom && is_numeric($fieldid)) {
                 $searchwhere[] = implode(' AND ',
                         array_map(function($fieldid) {
                             return " c$fieldid.fieldid = $fieldid ";
                         }, $searchfrom));
             }
+
             if ($whereand) {
                 $searchwhere[] = implode(' AND ', $whereand);
             }

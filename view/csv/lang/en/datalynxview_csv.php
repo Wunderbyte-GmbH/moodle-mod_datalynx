@@ -27,3 +27,7 @@ $string['pluginname'] = 'Csv';
 $string['csv'] = 'CSV';
 $string['ods'] = 'Calc (Open Office)';
 $string['xls'] = 'Excel';
+$string['fieldsimportsettings'] = 'Import settings';
+$string['uploadfile'] = 'File to import';
+$string['uploadtext'] = 'Text to import';
+$string['updateexisting'] = 'Update existing';
