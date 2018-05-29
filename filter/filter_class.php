@@ -196,14 +196,19 @@ class datalynx_filter {
 
                 // Register join field if applicable.
                 $this->register_join_field($field);
-
                 // Add AND search clauses.
                 if (!empty($searchfield['AND'])) {
                     foreach ($searchfield['AND'] as $option) {
                         if ($fieldsqloptions = $field->get_search_sql($option)) {
                             list($fieldsql, $fieldparams, $fromcontent) = $fieldsqloptions;
                             if ($fieldsql) {
-                                $whereand[] = $fieldsql;
+
+                                // If we use values from content we make it an implied AND statement.
+                                if (is_numeric($fieldid)) {
+                                    $whereor[] = " ( " . $fieldsql . " AND c$fieldid.fieldid = $fieldid )";
+                                } else {
+                                    $whereor[] = $fieldsql;
+                                }
                                 $searchparams = array_merge($searchparams, $fieldparams);
 
                                 // Add searchfrom (JOIN) only for search in datalynx content or external.
@@ -221,7 +226,14 @@ class datalynx_filter {
                     foreach ($searchfield['OR'] as $option) {
                         if ($fieldsqloptions = $field->get_search_sql($option)) {
                             list($fieldsql, $fieldparams, $fromcontent) = $fieldsqloptions;
-                            $whereor[] = $fieldsql;
+
+                            // If we use values from content we make it an implied AND statement.
+                            if (is_numeric($fieldid)) {
+                                 $whereor[] = " ( " . $fieldsql . " AND c$fieldid.fieldid = $fieldid )";
+                            } else {
+                                $whereor[] = $fieldsql;
+                            }
+
                             $searchparams = array_merge($searchparams, $fieldparams);
 
                             // Add searchfrom (JOIN) only for search in datalynx content or external.
@@ -243,16 +255,6 @@ class datalynx_filter {
                         $searchtables .= $fields[$fieldid]->get_search_from_sql();
                     }
                 }
-            }
-
-            // TESTING: bug#1056 teammemberselect does not store empty values so we need to work with dataid.
-            if ($fields[$fieldid]->type == 'teammemberselect' && $searchfrom && is_numeric($fieldid)) {
-                $searchwhere[] = " e.dataid = " . $fields[$fieldid]->field->dataid . " ";
-            } else if ($searchfrom && is_numeric($fieldid)) {
-                $searchwhere[] = implode(' AND ',
-                        array_map(function($fieldid) {
-                            return " c$fieldid.fieldid = $fieldid ";
-                        }, $searchfrom));
             }
 
             if ($whereand) {
