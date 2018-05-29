@@ -36,19 +36,11 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
      * Rendering this field in display mode
      * called by the replacement-function of datalynxfield_renderer
      * stdClass @entry   represents the entry which includes this instance of the field
-     * array @params     the type of the display, "embedded" or "overlay" or "" for default
+     * array @params     the type of the display, "" for default
      * @returns          the function which displays this field-instance
      */
     public function render_display_mode(stdClass $entry, array $params) {
-        if (isset($params['embedded'])) {
-            $type = "embedded";
-        } else {
-            if (isset($params['overlay'])) {
-                $type = "overlay";
-            } else {
-                $type = "";
-            }
-        }
+        $type = "";
         return $this->display_browse($entry, $type);
     }
 
@@ -69,40 +61,6 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
             // TODO Including controls seems to mess up the hosting view controls.
             $voptions = array('controls' => false);
             return $this->get_view_display_content($entry, $voptions);
-        }
-
-        // Overlay.
-        if ($type == 'overlay') {
-            $this->add_overlay_support();
-            $voptions = array('controls' => false);
-            $widgetbody = html_writer::tag('div',
-                    $this->get_view_display_content($entry, $voptions),
-                    array('class' => "yui3-widget-bd"));
-            $panel = html_writer::tag('div', $widgetbody, array('class' => 'panelContent hide'));
-            $button = html_writer::tag('button',
-                    get_string('viewbutton', 'datalynxfield_datalynxview'));
-            $wrapper = html_writer::tag('div', $button . $panel,
-                    array('class' => 'datalynxfield-datalynxview overlay'));
-            return $wrapper;
-        }
-
-        // Embedded.
-        if ($type == 'embedded') {
-            return $this->get_view_display_embedded($entry);
-        }
-
-        // Embedded Overlay.
-        if ($type == 'embeddedoverlay') {
-            $this->add_overlay_support();
-
-            $widgetbody = html_writer::tag('div', $this->get_view_display_embedded($entry),
-                    array('class' => "yui3-widget-bd"));
-            $panel = html_writer::tag('div', $widgetbody, array('class' => 'panelContent hide'));
-            $button = html_writer::tag('button',
-                    get_string('viewbutton', 'datalynxfield_datalynxview'));
-            $wrapper = html_writer::tag('div', $button . $panel,
-                    array('class' => 'datalynxfield-datalynxview embedded overlay'));
-            return $wrapper;
         }
 
         return '';
@@ -147,50 +105,6 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         $options['fieldview'] = true;
         $options['entryactions'] = false;
         return $refview->display($options);
-    }
-
-    /**
-     * This display-method builds an iframe which holds a page with the view
-     * stdClass @entry          the entry object this field belongs to
-     *
-     * @returns                 the moodle display-method for an iframe
-     */
-    protected function get_view_display_embedded($entry) {
-        $field = $this->_field;
-        $fieldname = preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $field->name()));
-
-        // Construct the src url.
-        $params = array('d' => $field->refdatalynx->id(), 'view' => $field->refview);
-
-        // Search filter by entry author or group or value.
-        $params = $this->get_filter_by_options($params, $entry, true);
-
-        if (!isset($params['eids'])) {
-            return "";
-        }
-
-        $srcurl = new moodle_url('/mod/datalynx/embed.php', $params);
-
-        // Frame.
-        $froptions = array('src' => $srcurl, 'width' => '100%', 'height' => '100%',
-                'style' => 'border:0;');
-        $iframe = html_writer::tag('iframe', null, $froptions);
-        return html_writer::tag('div', $iframe,
-                array('class' => "datalynxfield-datalynxview-$fieldname embedded"));
-    }
-
-    /**
-     */
-    protected function add_overlay_support() {
-        global $PAGE;
-
-        static $added = false;
-
-        if (!$added) {
-            // Changed to jquery.
-            $PAGE->requires->js_call_amd('mod_datalynx/datalynxview', 'init');
-            $added = true; // We want this to load only once.
-        }
     }
 
     /**
@@ -353,9 +267,6 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
 
         $patterns = parent::patterns();
         $patterns["[[$fieldname]]"] = array(true);
-        $patterns["[[$fieldname:overlay]]"] = array(true);
-        $patterns["[[$fieldname:embedded]]"] = array(false);
-        $patterns["[[$fieldname:embeddedoverlay]]"] = array(false);
 
         return $patterns;
     }

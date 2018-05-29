@@ -22,7 +22,6 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['pluginname'] = 'Datalynx view';
-$string['embedded'] = 'Embedded';
 $string['missingview'] = 'Please select a view';
 $string['nodatalynxs'] = 'No datalynxs are found in this course';
 $string['noviews'] = 'No views are found for the selected datalynx';
