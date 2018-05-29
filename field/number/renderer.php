@@ -30,32 +30,41 @@ require_once("$CFG->dirroot/mod/datalynx/field/text/renderer.php");
 class datalynxfield_number_renderer extends datalynxfield_text_renderer {
 
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
-        parent::render_edit_mode($mform, $entry, $options);
-
-        $fieldid = $this->_field->id();
+        $field = $this->_field;
+        $fieldid = $field->id();
         $entryid = $entry->id;
-        $fieldname = "field_{$fieldid}_$entryid";
+        $fieldname = "field_{$fieldid}_{$entryid}";
+        $required = !empty($options['required']);
+        $content = '';
+        if (isset($entry->{"c{$fieldid}_content"}) and $entry->{"c{$fieldid}_content"} === "0" or !empty($entry->{"c{$fieldid}_content"})) {
+            $content = $entry->{"c{$fieldid}_content"};
+        }
+        $fieldattr = array();
+        $mform->addElement('text', $fieldname, null, $fieldattr);
+        $mform->setType($fieldname, PARAM_FLOAT);
         $mform->addRule($fieldname, null, 'numeric', null, 'client');
+        $mform->setDefault($fieldname, $content);
+        if ($required) {
+            $mform->addRule($fieldname, null, 'required', null, 'client');
+        }
     }
 
     public function render_display_mode(stdClass $entry, array $params) {
         $field = $this->_field;
         $fieldid = $field->id();
-        if (isset($entry->{"c{$fieldid}_content"})) {
-            $number = (float) $entry->{"c{$fieldid}_content"};
-        } else {
-            return '';
+        $entryid = $entry->id;
+        if (!isset($entry->{"c{$fieldid}_content"})) {
+            return 0;
         }
-
-        $decimals = (int) trim($field->get('param1'));
+        $number = (float) $entry->{"c{$fieldid}_content"};
+        $decimals = (float) trim($field->get('param1'));
         // Only apply number formatting if param1 contains an integer number >= 0:.
         if ($decimals) {
             // Removes leading zeros (eg. '007' -> '7'; '00' -> '0').
             $str = sprintf("%4.{$decimals}f", $number);
         } else {
-            $str = (int) $number;
+            $str = (float) $number;
         }
-
         return $str;
     }
 

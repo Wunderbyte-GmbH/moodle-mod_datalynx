@@ -40,19 +40,8 @@ class datalynxfield_text_form extends datalynxfield_form {
         // Auto link.
         $mform->addElement('checkbox', 'param1', get_string('fieldallowautolink', 'datalynx'));
 
-        // Field width.
-        $fieldwidthgrp = array();
-        $fieldwidthgrp[] = &$mform->createElement('text', 'param2', null, array('size' => '8'));
-        $fieldwidthgrp[] = &$mform->createElement('select', 'param3', null,
-                array('px' => 'px', 'em' => 'em', '%' => '%'));
-        $mform->addGroup($fieldwidthgrp, 'fieldwidthgrp', get_string('fieldwidth', 'datalynx'),
-                array(' '), false);
-        $mform->setType('param2', PARAM_INT);
-        $mform->addGroupRule('fieldwidthgrp',
-                array('param2' => array(array(null, 'numeric', null, 'client'))));
-        $mform->disabledIf('param3', 'param2', 'eq', '');
-        $mform->setDefault('param2', '');
-        $mform->setDefault('param3', 'px');
+        // Param2 (integer) and param3 (px,em/%) were used for width. They are not used anymore. Number field now
+        // uses param2 for displaying default value when field is left empty.
 
         // Check for duplicate entries.
         $duplicates = $this->get_list_of_duplicates();

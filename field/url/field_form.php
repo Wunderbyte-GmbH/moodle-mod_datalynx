@@ -46,5 +46,7 @@ class datalynxfield_url_form extends datalynxfield_form {
 
         $mform->addElement('text', 'param4', get_string('urltarget', 'datalynx'), array('size' => '32'));
         $mform->setType('param4', PARAM_TEXT);
+
+        $mform->addElement('selectyesno', 'param5', get_string('displaylinktext', 'datalynxfield_url'));
     }
 }
