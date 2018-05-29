@@ -205,10 +205,9 @@ class datalynx_filter {
 
                                 // If we use values from content we make it an implied AND statement.
                                 if (is_numeric($fieldid)) {
-                                    $whereand[] = " ( " . $fieldsql . " AND c$fieldid.fieldid = $fieldid )";
-                                } else {
-                                    $whereand[] = $fieldsql;
-                                }
+                                    $whereand[] = " ( $fieldsql AND c$fieldid.fieldid = $fieldid )";
+                                } else $whereand[] = $fieldsql;
+
                                 $searchparams = array_merge($searchparams, $fieldparams);
 
                                 // Add searchfrom (JOIN) only for search in datalynx content or external.
@@ -229,10 +228,8 @@ class datalynx_filter {
 
                             // If we use values from content we make it an implied AND statement.
                             if (is_numeric($fieldid)) {
-                                 $whereor[] = " ( " . $fieldsql . " AND c$fieldid.fieldid = $fieldid )";
-                            } else {
-                                $whereor[] = $fieldsql;
-                            }
+                                 $whereor[] = " ( $fieldsql AND c$fieldid.fieldid = $fieldid )";
+                            } else $whereor[] = $fieldsql;
 
                             $searchparams = array_merge($searchparams, $fieldparams);
 
