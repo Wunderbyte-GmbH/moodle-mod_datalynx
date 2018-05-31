@@ -232,18 +232,18 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
             $fieldid = $this->field->id;
             $fieldname = $this->name();
             $csvname = $importsettings[$fieldname]['name'];
-            $allownew = !empty($importsettings[$fieldname]['allownew']) ? true : false;
-            $htmlscontainsuserids = !empty($csvrecord[$csvname]) ? $csvrecord[$csvname] : null;
-            if ($htmlscontainsuserids) {
+            // Teammembers are stored in the csv as <li><a href elements.
+            $htmlcontainsuserids = !empty($csvrecord[$csvname]) ? $csvrecord[$csvname] : null;
+            if ($htmlcontainsuserids) {
                 $doc = new DOMDocument();
-                $doc->loadHTML("<html><body>" . $htmlscontainsuserids . "</body></html>");
+                $doc->loadHTML("<html><body>" . $htmlcontainsuserids . "</body></html>");
                 $userids = array();
+                // Loop through all <a href elements and add userids.
                 foreach ($doc->getElementsByTagName('a') as $element) {
                     $href = $element->getAttribute('href');
                     if (($pos = strpos($href, "id=")) !== FALSE) {
-                        $userid = substr($href, $pos + 3);
+                        $userids[] = trim(substr($href, $pos + 3));
                     }
-                    $userids[] = trim($userid);
                 }
                 $data->{"field_{$fieldid}_{$entryid}"} = $userids;
             }
