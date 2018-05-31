@@ -172,7 +172,7 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
             // if (!preg_match($urlregex, $formdata->$formfieldname)) {
             $isurl = filter_var($formdata->$formfieldname, FILTER_VALIDATE_URL);
             $isdefault = $formdata->$formfieldname === 'http://';
-            $isempty =  $formdata->$formfieldname === '';
+            $isempty = $formdata->$formfieldname === '';
             if ($isurl or $isdefault or $isempty) {
                 continue;
             } else {

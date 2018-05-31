@@ -202,7 +202,6 @@ class datalynx_filter {
                         if ($fieldsqloptions = $field->get_search_sql($option)) {
                             list($fieldsql, $fieldparams, $fromcontent) = $fieldsqloptions;
                             if ($fieldsql) {
-
                                 // If we use values from content we make it an implied AND statement.
                                 if (is_numeric($fieldid)) {
                                     $whereand[] = " ( $fieldsql AND c$fieldid.fieldid = $fieldid )";
@@ -231,7 +230,9 @@ class datalynx_filter {
                             // If we use values from content we make it an implied AND statement.
                             if (is_numeric($fieldid)) {
                                  $whereor[] = " ( $fieldsql AND c$fieldid.fieldid = $fieldid )";
-                            } else $whereor[] = $fieldsql;
+                            } else {
+                                $whereor[] = $fieldsql;
+                            }
 
                             $searchparams = array_merge($searchparams, $fieldparams);
 
