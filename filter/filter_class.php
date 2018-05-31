@@ -206,7 +206,9 @@ class datalynx_filter {
                                 // If we use values from content we make it an implied AND statement.
                                 if (is_numeric($fieldid)) {
                                     $whereand[] = " ( $fieldsql AND c$fieldid.fieldid = $fieldid )";
-                                } else $whereand[] = $fieldsql;
+                                } else {
+                                    $whereand[] = $fieldsql;
+                                }
 
                                 $searchparams = array_merge($searchparams, $fieldparams);
 

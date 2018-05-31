@@ -206,7 +206,7 @@ class datalynxview_patterns {
                 if (strpos($tag, "#{{viewsesslink:$viewname;") === 0) {
                     // Already editing the entry so do not show link for editing entry.
                     if ($currentview->user_is_editing() && is_numeric(strpos($tag, 'editentries'))) {
-                      return '';
+                        return '';
                     }
                     list(, $linktext, $urlquery, ) = explode(';', $tag);
                     // Pix icon for text.
