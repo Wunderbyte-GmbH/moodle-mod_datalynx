@@ -133,7 +133,7 @@ class datalynxfield_editor extends datalynxfield_base {
                 $valuearr = explode('##', $data->{"field_{$fieldid}_{$entryid}"});
                 $content = array();
                 $content['text'] = !empty($valuearr[0]) ? $valuearr[0] : null;
-                $content['format'] = !empty($valuearr[1]) ? $valuearr[1] : FORMAT_MOODLE;
+                $content['format'] = !empty($valuearr[1]) ? $valuearr[1] : FORMAT_HTML;
                 $content['trust'] = !empty($valuearr[2]) ? $valuearr[2] : $this->editoroptions['trusttext'];
                 $data->{"field_{$fieldid}_{$entryid}_editor"} = $content;
                 unset($data->{"field_{$fieldid}_{$entryid}"});

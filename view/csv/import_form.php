@@ -74,7 +74,7 @@ class datalynxview_csv_import_form extends moodleform {
         $mform = &$this->_form;
 
         $mform->addElement('header', 'fieldsettingshdr',
-                get_string('fieldsimportsettings', 'datalynxview_import'));
+                get_string('fieldsimportsettings', 'mod_datalynx'));
         $columns = $view->get_columns();
         // Generate the headings and settings for values to import.
         foreach ($columns as $column) {
@@ -126,14 +126,14 @@ class datalynxview_csv_import_form extends moodleform {
         $mform->setDefault('encoding', $view->get_encoding());
 
         // Upload file.
-        $mform->addElement('filepicker', 'importfile', get_string('uploadfile', 'datalynxview_import'));
+        $mform->addElement('filepicker', 'importfile', get_string('uploadfile', 'mod_datalynx'));
 
         // Upload text.
-        $mform->addElement('textarea', 'csvtext', get_string('uploadtext', 'datalynxview_import'),
+        $mform->addElement('textarea', 'csvtext', get_string('uploadtext', 'mod_datalynx'),
                 array('wrap' => 'virtual', 'rows' => '5', 'style' => 'width:100%;'));
 
         // Update existing entries.
-        $mform->addElement('selectyesno', 'updateexisting', get_string('updateexisting', 'datalynxview_import'));
+        $mform->addElement('selectyesno', 'updateexisting', get_string('updateexisting', 'mod_datalynx'));
 
     }
 }

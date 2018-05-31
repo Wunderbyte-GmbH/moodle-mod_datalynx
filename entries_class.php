@@ -672,7 +672,7 @@ class datalynx_entries {
                                 if ($entryid != $firstentryid) {
                                     $newcontents[$entryid]['info'] = $oldcontent['info'];
                                     $newfields = array();
-                                    foreach ($contents[$firstentryid]['fields'] as $fieldid => $value) {
+                                    foreach ($contents[$entryid]['fields'] as $fieldid => $value) {
                                         if (array_search($fieldid, $bulkeditfields) !== false) {
                                             $newfields[$fieldid] = $contents[$firstentryid]['fields'][$fieldid];
                                         } else {
