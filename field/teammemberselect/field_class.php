@@ -222,6 +222,36 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
     }
 
     /**
+     *
+     * {@inheritdoc}
+     * @see datalynxfield_base::prepare_import_content()
+     */
+    public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
+        // Import only from csv.
+        if ($csvrecord) {
+            $fieldid = $this->field->id;
+            $fieldname = $this->name();
+            $csvname = $importsettings[$fieldname]['name'];
+            $allownew = !empty($importsettings[$fieldname]['allownew']) ? true : false;
+            $htmlscontainsuserids = !empty($csvrecord[$csvname]) ? $csvrecord[$csvname] : null;
+            if ($htmlscontainsuserids) {
+                $doc = new DOMDocument();
+                $doc->loadHTML("<html><body>" . $htmlscontainsuserids . "</body></html>");
+                $userids = array();
+                foreach ($doc->getElementsByTagName('a') as $element) {
+                    $href = $element->getAttribute('href');
+                    if (($pos = strpos($href, "id=")) !== FALSE) {
+                        $userid = substr($href, $pos + 3);
+                    }
+                    $userids[] = trim($userid);
+                }
+                $data->{"field_{$fieldid}_{$entryid}"} = $userids;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Update a field in the database
      */
     public function update_field($fromform = null) {
