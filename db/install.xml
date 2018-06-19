@@ -359,7 +359,7 @@
             </KEYS>
         </TABLE>
         <TABLE NAME="datalynx_renderers" COMMENT="Governs visual representation of fields"
-               PREVIOUS="datalynx_behaviors" next="datalynx_customfilters">
+               PREVIOUS="datalynx_behaviors" NEXT="datalynx_customfilters">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true"
                        SEQUENCE="true" NEXT="dataid"/>
