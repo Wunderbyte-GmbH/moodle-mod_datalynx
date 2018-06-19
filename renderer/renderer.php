@@ -259,6 +259,22 @@ class datalynx_field_renderer {
      */
     public static function delete_renderer($rendererid) {
         global $DB;
+        // Read dataid from DB and find patterns and param2 from all connected views.
+        $rendererinfo = $DB->get_record('datalynx_renderers', array('id' => $rendererid),
+            $fields='dataid, name', $strictness=IGNORE_MISSING);
+        $connected = $DB->get_records('datalynx_views',array('dataid'=>$rendererinfo->dataid),
+            null,'id, patterns, param2');
+        // Update every instance that still has the string ||renderername in it.
+        foreach ($connected as $view) {
+            // TODO: Is one check enough or are these separate?
+            if (strpos($view->patterns, '||'.$rendererinfo->name) !== false ||
+                strpos($view->param2, '||'.$rendererinfo->name) !== false) {
+                $view->patterns = str_replace('||'.$rendererinfo->name, '', $view->patterns);
+                $view->param2 = str_replace('||'.$rendererinfo->name, '', $view->param2);
+                $DB->update_record('datalynx_views', $view, $bulk=true);
+            }
+        }
+        // Remove renderers finally.
         return $DB->delete_records('datalynx_renderers', array('id' => $rendererid));
     }
 
