@@ -413,7 +413,7 @@ class datalynx_preset_manager {
         // Extract the backup file to the temp folder.
         $folder = 'tmp-' . $this->_df->context->id . '-' . time();
         $backuptempdir = make_temp_directory("backup/$folder");
-        $zipper = get_file_packer('application/zip');
+        $zipper = get_file_packer('application/x-gzip');
         $fs = get_file_storage();
         $file = $fs->get_file_by_id($userpreset);
         $file->extract_to_pathname($zipper, $backuptempdir);
@@ -525,7 +525,7 @@ class datalynx_preset_manager {
         $filename = 'presets.zip';
         $downloadfile = "$downloaddir/$filename";
 
-        $zipper = get_file_packer('application/zip');
+        $zipper = get_file_packer('application/x-gzip');
         $zipper->archive_to_pathname($presets, $downloadfile);
 
         header("Content-Type: application/download\n");
