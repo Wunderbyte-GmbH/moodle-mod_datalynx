@@ -5,7 +5,7 @@ img.zoomable:hover {
     cursor: pointer;
 }
 .m3e-overlay {
-    display:none;
+    display: none;
     z-index: 9999;/*
     top: 50%;
     left: 50%;*/
@@ -14,7 +14,7 @@ img.zoomable:hover {
 .m3e-overlay img:hover,
 .m3e-overlay img {
     box-shadow: 2px 2px 11px #666;
-    cursor:pointer;
+    cursor: pointer;
     -moz-box-shadow: 2px 2px 11px #666;
     -webkit-box-shadow: 2px 2px 11px #666;
     opacity: 1;
@@ -23,12 +23,12 @@ img.zoomable:hover {
     max-height: 100%;*/
 }
 .m3e-overlay div.close {
-    background-image:url([[pix:theme|jtools_close]]);
-    position:absolute;
-    right:-15px;
-    top:-15px;
-    cursor:pointer;
-    height:35px;
-    width:35px;
+    background-image: url([[pix:theme|jtools_close]]);
+    position: absolute;
+    right: -15px;
+    top: -15px;
+    cursor: pointer;
+    height: 35px;
+    width: 35px;
     opacity: 1;
 }
