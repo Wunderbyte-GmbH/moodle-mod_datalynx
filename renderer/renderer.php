@@ -244,6 +244,7 @@ class datalynx_field_renderer {
      * Update renderer with submitted form data
      *
      * @param object $formdata
+     * @return integer id
      */
     public static function update_renderer($formdata) {
         global $DB;
@@ -256,6 +257,7 @@ class datalynx_field_renderer {
      * delete a renderer
      *
      * @param integer $rendererid
+     * @return bool success status of deletion
      */
     public static function delete_renderer($rendererid) {
         global $DB;
@@ -267,10 +269,10 @@ class datalynx_field_renderer {
         // Update every instance that still has the string ||renderername in it.
         foreach ($connected as $view) {
             // TODO: Is one check enough or are these separate?
-            if (strpos($view->patterns, '||'.$rendererinfo->name) !== false ||
-                strpos($view->param2, '||'.$rendererinfo->name) !== false) {
-                $view->patterns = str_replace('||'.$rendererinfo->name, '', $view->patterns);
-                $view->param2 = str_replace('||'.$rendererinfo->name, '', $view->param2);
+            if (strpos($view->patterns, '|'.$rendererinfo->name) !== false ||
+                strpos($view->param2, '|'.$rendererinfo->name) !== false) {
+                $view->patterns = str_replace('|'.$rendererinfo->name, '', $view->patterns);
+                $view->param2 = str_replace('|'.$rendererinfo->name, '', $view->param2);
                 $DB->update_record('datalynx_views', $view, $bulk=true);
             }
         }

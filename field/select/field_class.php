@@ -52,33 +52,4 @@ class datalynxfield_select extends datalynxfield_option_single {
             return '';
         }
     }
-
-    /**
-     *
-     * {@inheritDoc}
-     * @see datalynxfield_base::prepare_import_content()
-     */
-    public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
-        // Import only from csv.
-        if ($csvrecord) {
-            $fieldid = $this->field->id;
-            $fieldname = $this->name();
-            $csvname = $importsettings[$fieldname]['name'];
-            $allownew = !empty($importsettings[$fieldname]['allownew']) ? true : false;
-            $label = !empty($csvrecord[$csvname]) ? $csvrecord[$csvname] : null;
-
-            if ($label) {
-                $options = $this->options_menu();
-                if ($optionkey = array_search($label, $options)) {
-                    $data->{"field_{$fieldid}_{$entryid}_selected"} = $optionkey;
-                } else {
-                    if ($allownew) {
-                        $data->{"field_{$fieldid}_{$entryid}_newvalue"} = $label;
-                    }
-                }
-            }
-        }
-        return true;
-    }
-
 }

@@ -196,6 +196,9 @@ class datalynxfield_time extends datalynxfield_base {
     }
 
     /**
+     *
+     * {@inheritDoc}
+     * @see datalynxfield_base::prepare_import_content()
      */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
         // Import only from csv.
@@ -206,22 +209,20 @@ class datalynxfield_time extends datalynxfield_base {
             $timestr = !empty($csvrecord[$csvname]) ? $csvrecord[$csvname] : null;
 
             if ($timestr) {
+                $timestr = html_entity_decode($timestr);
                 // It's a timestamp.
                 if (((string) (int) $timestr === $timestr) && ($timestr <= PHP_INT_MAX) &&
                         ($timestr >= ~PHP_INT_MAX)
                 ) {
-
                     $data->{"field_{$fieldid}_{$entryid}"} = $timestr;
-
                     // It's a valid time string.
                 } else {
-                    if ($timestr = strtotime($timestr)) {
-                        $data->{"field_{$fieldid}_{$entryid}"} = $timestr;
+                    if ($unixtimestamp = strtotime($timestr)) {
+                        $data->{"field_{$fieldid}_{$entryid}"} = $unixtimestamp;
                     }
                 }
             }
         }
-
         return true;
     }
 
@@ -240,12 +241,20 @@ class datalynxfield_time extends datalynxfield_base {
     }
 
     /**
+     *
+     * {@inheritDoc}
+     * @see datalynxfield_base::get_sql_compare_text()
      */
     public function get_sql_compare_text($column = 'content') {
         global $DB;
         return $DB->sql_cast_char2int("c{$this->field->id}.$column", true);
     }
 
+    /**
+     *
+     * {@inheritDoc}
+     * @see datalynxfield_base::get_supported_search_operators()
+     */
     public function get_supported_search_operators() {
         return array('' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
                 '>' => get_string('after', 'datalynx'), '<' => get_string('before', 'datalynx'),

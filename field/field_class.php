@@ -1223,6 +1223,11 @@ class datalynxfield_option_single extends datalynxfield_option {
         return array_keys($results);
     }
 
+    /**
+     *
+     * {@inheritDoc}
+     * @see datalynxfield_base::supports_group_by()
+     */
     public function supports_group_by() {
         return true;
     }
@@ -1296,6 +1301,34 @@ class datalynxfield_option_single extends datalynxfield_option {
         return array($sql, $params, $usecontent);
     }
 
+    /**
+     *
+     * {@inheritDoc}
+     * @see datalynxfield_base::prepare_import_content()
+     */
+    public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
+        // Import only from csv.
+        if ($csvrecord) {
+            $fieldid = $this->field->id;
+            $fieldname = $this->name();
+            $csvname = $importsettings[$fieldname]['name'];
+            $label = !empty($csvrecord[$csvname]) ? $csvrecord[$csvname] : null;
+
+            if ($label) {
+                $options = $this->options_menu();
+                if ($optionkey = array_search($label, $options)) {
+                    $data->{"field_{$fieldid}_{$entryid}"} = $optionkey;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     *
+     * {@inheritDoc}
+     * @see datalynxfield_base::get_supported_search_operators()
+     */
     public function get_supported_search_operators() {
         return array('ANY_OF' => get_string('anyof', 'datalynx'), '' => get_string('empty', 'datalynx'));
     }

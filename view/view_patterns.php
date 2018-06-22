@@ -204,7 +204,8 @@ class datalynxview_patterns {
                     return html_writer::link($view->baseurl->out(false) . "&$urlquery", $linktext);
                 }
                 if (strpos($tag, "#{{viewsesslink:$viewname;") === 0) {
-                    if ($currentview->user_is_editing()) {
+                    // Already editing the entry so do not show link for editing entry.
+                    if ($currentview->user_is_editing() && is_numeric(strpos($tag, 'editentries'))) {
                         return '';
                     }
                     list(, $linktext, $urlquery, ) = explode(';', $tag);

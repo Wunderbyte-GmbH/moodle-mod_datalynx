@@ -158,27 +158,34 @@ class datalynx_field_renderer_form extends moodleform {
         return $data;
     }
 
-    // Add data to formfields.
+    /**
+     *  Add data to formfields.
+     * {@inheritDoc}
+     * @see moodleform::set_data()
+     */
     public function set_data($data) {
+        $formfields = array('notvisible', 'display', 'novalue', 'edit', 'noteditable');
 
-         $formfields = array('notvisible', 'display', 'novalue', 'edit', 'noteditable');
-
-         foreach ($formfields as $formfield) {
-             $template = $formfield . 'template';
-             $option = $formfield . 'options';
-
-             if (is_numeric($data->$template)) {
+        foreach ($formfields as $formfield) {
+            $template = $formfield . 'template';
+            $option = $formfield . 'options';
+            if (is_numeric($data->$template)) {
                 // If we see an integer value we set options and delete template.
                 $data->$option = $data->$template;
                 unset($data->$template);
-             } else {
-                 // Else we set options to custom which now is always 2.
-                 $data->$option = 2;
-             }
-         }
-         parent::set_data($data);
+            } else {
+                // Else we set options to custom which now is always 2.
+                $data->$option = 2;
+            }
+        }
+        parent::set_data($data);
     }
 
+    /**
+     *
+     * {@inheritDoc}
+     * @see moodleform::validation()
+     */
     public function validation($data, $files) {
         global $DB;
 

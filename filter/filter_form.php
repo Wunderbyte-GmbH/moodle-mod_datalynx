@@ -102,17 +102,22 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
         }
     }
 
-    /*
+    /**
      *
+     * @param unknown $customsearch
+     * @param unknown $fields
+     * @param unknown $fieldoptions
+     * @param boolean $showlabel
      */
-    public function custom_search_definition($customsearch, $fields, $fieldoptions, $showlabel = false) {
+    public function custom_search_definition($customsearch, $fields, $fieldoptions,
+            $showlabel = false) {
         $mform = &$this->_form;
         $df = $this->_df;
 
         $andoroptions = array(0 => get_string('andor', 'datalynx'),
-                'AND' => get_string('and', 'datalynx'), 'OR' => get_string('or', 'datalynx'));
+            'AND' => get_string('and', 'datalynx'), 'OR' => get_string('or', 'datalynx'));
         $isnotoptions = array('' => get_string('is', 'datalynx'),
-                'NOT' => get_string('not', 'datalynx'));
+            'NOT' => get_string('not', 'datalynx'));
 
         $fieldlabel = get_string('filtersearchfieldlabel', 'datalynx');
         $count = 0;
@@ -169,10 +174,12 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
                 if ($fieldid) {
                     $operatoroptions = $df->get_field_from_id($fieldid)->get_supported_search_operators();
                 }
-                $arr[] = &$mform->createElement('select', 'searchoperator' . $count, '', $operatoroptions);
+                $arr[] = &$mform->createElement('select', 'searchoperator' . $count, '',
+                        $operatoroptions);
                 $mform->setDefault('searchoperator' . $count, $operator);
                 // Field search elements.
-                list($elems, $separators) = $fields[$fieldid]->renderer()->render_search_mode($mform, $count, $value);
+                list($elems, $separators) = $fields[$fieldid]->renderer()->render_search_mode(
+                        $mform, $count, $value);
 
                 $arr = array_merge($arr, $elems);
                 if ($separators) {

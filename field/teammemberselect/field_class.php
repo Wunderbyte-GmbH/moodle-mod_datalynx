@@ -241,7 +241,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
                 // Loop through all <a href elements and add userids.
                 foreach ($doc->getElementsByTagName('a') as $element) {
                     $href = $element->getAttribute('href');
-                    if (($pos = strpos($href, "id=")) !== FALSE) {
+                    if (($pos = strpos($href, "id=")) !== false) {
                         $userids[] = trim(substr($href, $pos + 3));
                     }
                 }
