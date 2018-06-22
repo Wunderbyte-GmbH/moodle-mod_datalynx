@@ -101,7 +101,7 @@
 
 .generaltable td.z_borderless,
 .generaltable th.z_borderless {
-    border: 0 none !important;
+    border: 0 none; /* !important is not that important, class is never used. */
 }
 
 #page-mod-datalynx-embed {
