@@ -26,33 +26,45 @@ require_once(dirname(__FILE__) . '/../mod_class.php');
 
 class datalynx_field_renderer {
 
-    const NOT_VISIBLE_SHOW_NOTHING = 0;
 
-    const NOT_VISIBLE_SHOW_CUSTOM = 1;
+    /*
+     * Make this more readable:
+     * shownothing = '___0___'
+     * asdisplay = '___1___'
+     * custom = '___2___'
+     * disabled = '___3___'
+     * none = '___4___'
+     * If *template is a signifier we assume it is an option.
+     */
 
-    const DISPLAY_MODE_TEMPLATE_NONE = 0;
+    // TODO: Name consts sth. sane and integrate these in renderer form.
+    const NOT_VISIBLE_SHOW_NOTHING = '___0___';
 
-    const DISPLAY_MODE_TEMPLATE_CUSTOM = 1;
+    const NOT_VISIBLE_SHOW_CUSTOM = '___2___';
 
-    const NO_VALUE_SHOW_NOTHING = 0;
+    const DISPLAY_MODE_TEMPLATE_NONE = '___0___';
 
-    const NO_VALUE_SHOW_DISPLAY_MODE_TEMPLATE = 1;
+    const DISPLAY_MODE_TEMPLATE_CUSTOM = '___2___';
 
-    const NO_VALUE_SHOW_CUSTOM = 2;
+    const NO_VALUE_SHOW_NOTHING = '___0___';
 
-    const EDIT_MODE_TEMPLATE_NONE = 0;
+    const NO_VALUE_SHOW_DISPLAY_MODE_TEMPLATE = '___1___';
 
-    const EDIT_MODE_TEMPLATE_AS_DISPLAY_MODE = 1;
+    const NO_VALUE_SHOW_CUSTOM = '___2___';
 
-    const EDIT_MODE_TEMPLATE_CUSTOM = 2;
+    const EDIT_MODE_TEMPLATE_NONE = '___0___';
 
-    const NOT_EDITABLE_SHOW_NOTHING = 0;
+    const EDIT_MODE_TEMPLATE_AS_DISPLAY_MODE = '___1___';
 
-    const NOT_EDITABLE_SHOW_AS_DISPLAY_MODE = 1;
+    const EDIT_MODE_TEMPLATE_CUSTOM = '___2___';
 
-    const NOT_EDITABLE_SHOW_DISABLED = 2;
+    const NOT_EDITABLE_SHOW_NOTHING = '___0___';
 
-    const NOT_EDITABLE_SHOW_CUSTOM = 3;
+    const NOT_EDITABLE_SHOW_AS_DISPLAY_MODE = '___1___';
+
+    const NOT_EDITABLE_SHOW_DISABLED = '___3___';
+
+    const NOT_EDITABLE_SHOW_CUSTOM = '___2___';
 
     const TAG_FIELD_VALUE = "#value";
 
