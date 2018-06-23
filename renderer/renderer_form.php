@@ -36,11 +36,20 @@ class datalynx_field_renderer_form extends moodleform {
      */
     private $datalynx;
 
+    /**
+     *
+     * @param datalynx $datalynx
+     */
     public function __construct(datalynx $datalynx) {
         $this->datalynx = $datalynx;
         parent::__construct();
     }
 
+    /**
+     *
+     * {@inheritDoc}
+     * @see moodleform::definition()
+     */
     protected function definition() {
         $mform = &$this->_form;
 
@@ -80,6 +89,7 @@ class datalynx_field_renderer_form extends moodleform {
                 array('<br />'
                 ), false);
         $mform->setType('notvisibletemplate', PARAM_CLEANHTML);
+        $mform->setDefault('notvisibleoptions', '___0___');
 
         // Display template.
         $group = array();
@@ -93,6 +103,7 @@ class datalynx_field_renderer_form extends moodleform {
                 ), false);
         $mform->setType('displaytemplate', PARAM_CLEANHTML);
         $mform->addHelpButton('displaytemplategroup', 'displaytemplate', 'datalynx');
+        $mform->setDefault('displayoptions', '___4___');
 
         // When empty.
         $group = array();
@@ -107,6 +118,7 @@ class datalynx_field_renderer_form extends moodleform {
         $mform->disabledIf('novaluetemplate', 'novalueoptions', 'eq', '___1___');
         $mform->addGroup($group, 'novaluetemplategroup', get_string('novalue', 'datalynx'), array('<br />'), false);
         $mform->setType('novaluetemplate', PARAM_CLEANHTML);
+        $mform->setDefault('novalueoptions', '___1___');
 
         // Edit template.
         $group = array();
@@ -120,6 +132,7 @@ class datalynx_field_renderer_form extends moodleform {
         $mform->addGroup($group, 'edittemplategroup', get_string('edittemplate', 'datalynx'), array('<br />'), false);
         $mform->setType('edittemplate', PARAM_CLEANHTML);
         $mform->addHelpButton('edittemplategroup', 'edittemplate', 'datalynx');
+        $mform->setDefault('editoptions', '___1___');
 
         // When not editable.
         $group = array();
@@ -133,11 +146,17 @@ class datalynx_field_renderer_form extends moodleform {
         $mform->disabledIf('noteditabletemplate', 'noteditableoptions', 'eq', '___3___');
         $mform->addGroup($group, 'noteditablegroup', get_string('noteditable', 'datalynx'), array('<br />'), false);
         $mform->setType('noteditabletemplate', PARAM_CLEANHTML);
+        $mform->setDefault('noteditableoptions', '___1___');
 
         $this->add_action_buttons();
     }
 
-    // Process validated data from form.
+    /**
+     * Process validated data from form.
+     *
+     * {@inheritDoc}
+     * @see moodleform::get_data()
+     */
     public function get_data() {
         $data = parent::get_data();
 
@@ -189,13 +208,12 @@ class datalynx_field_renderer_form extends moodleform {
      */
     public function validation($data, $files) {
         global $DB;
-
-        $errors = array();
+        $errors = parent::validation($data, $files);
         if (isset($data['displaytemplate']) && strpos($data['displaytemplate'], '#value') === false) {
-            $errors['displaytemplate'] = 'You must use tag #value somewhere in this template!';
+            $errors['displaytemplategroup'] = 'You must use #value somewhere in this template!';
         }
         if (isset($data['edittemplate']) && strpos($data['edittemplate'], '#input') === false) {
-            $errors['edittemplate'] = 'You must use tag #input somewhere in this template!';
+            $errors['edittemplategroup'] = 'You must use #input somewhere in this template!';
         }
         if ($data['id'] == 0) {
             // To prevent duplicate renderer names when creating a new renderer.

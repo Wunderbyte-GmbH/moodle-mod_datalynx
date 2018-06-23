@@ -908,6 +908,23 @@ function xmldb_datalynx_upgrade($oldversion) {
         // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2018011302, 'datalynx');
     }
+    if ($oldversion < 2018062211) {
+        for ($i = 0; $i < 5; $i++) {
+            $sql01 = "UPDATE {datalynx_renderers} SET novaluetemplate = '___{$i}___' WHERE novaluetemplate = '$i'";
+            $sql02 = "UPDATE {datalynx_renderers} SET notvisibletemplate = '___{$i}___'  WHERE notvisibletemplate = '$i'";
+            $sql03 = "UPDATE {datalynx_renderers} SET displaytemplate = '___{$i}___' WHERE displaytemplate = '$i'";
+            $sql04 = "UPDATE {datalynx_renderers} SET edittemplate = '___{$i}___' WHERE edittemplate = '$i'";
+            $sql05 = "UPDATE {datalynx_renderers} SET noteditabletemplate = '___{$i}___' WHERE noteditabletemplate = '$i'";
+            $DB->execute($sql01);
+            $DB->execute($sql02);
+            $DB->execute($sql03);
+            $DB->execute($sql04);
+            $DB->execute($sql05);
+        }
+
+        // Datalynx savepoint reached.
+        upgrade_mod_savepoint(true, 2018062211, 'datalynx');
+    }
     return true;
 }
 
