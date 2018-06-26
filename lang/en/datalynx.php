@@ -172,6 +172,7 @@ $string['entrysaved'] = 'Your entry has been saved';
 $string['entrysettings'] = 'Entry settings';
 $string['entrysettingsupdated'] = 'Entry settings updated';
 $string['entrytimelimit'] = 'Editing time limit (minutes)';
+$string['err_numeric'] = 'You must enter a number here. Example: 0.00 or 0.3 or 387';
 $string['exportcontent'] = 'Export content';
 $string['exportadd'] = 'Add a new Export view';
 $string['export'] = 'Export';

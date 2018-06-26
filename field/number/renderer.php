@@ -29,6 +29,11 @@ require_once("$CFG->dirroot/mod/datalynx/field/text/renderer.php");
  */
 class datalynxfield_number_renderer extends datalynxfield_text_renderer {
 
+    /**
+     *
+     * {@inheritDoc}
+     * @see datalynxfield_text_renderer::render_edit_mode()
+     */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $field = $this->_field;
         $fieldid = $field->id();
@@ -36,19 +41,25 @@ class datalynxfield_number_renderer extends datalynxfield_text_renderer {
         $fieldname = "field_{$fieldid}_{$entryid}";
         $required = !empty($options['required']);
         $content = '';
-        if (isset($entry->{"c{$fieldid}_content"}) and $entry->{"c{$fieldid}_content"} === "0" or !empty($entry->{"c{$fieldid}_content"})) {
+        if (isset($entry->{"c{$fieldid}_content"}) and $entry->{"c{$fieldid}_content"} === "0" or !empty(
+                $entry->{"c{$fieldid}_content"})) {
             $content = $entry->{"c{$fieldid}_content"};
         }
         $fieldattr = array();
         $mform->addElement('text', $fieldname, null, $fieldattr);
-        $mform->setType($fieldname, PARAM_FLOAT);
-        $mform->addRule($fieldname, null, 'numeric', null, 'client');
+        $mform->setType($fieldname, PARAM_RAW);
+        $mform->addRule($fieldname, get_string('err_numeric', 'datalynx'), 'numeric', null, 'client');
         $mform->setDefault($fieldname, $content);
         if ($required) {
             $mform->addRule($fieldname, null, 'required', null, 'client');
         }
     }
 
+    /**
+     *
+     * {@inheritDoc}
+     * @see datalynxfield_text_renderer::render_display_mode()
+     */
     public function render_display_mode(stdClass $entry, array $params) {
         $field = $this->_field;
         $fieldid = $field->id();
@@ -68,6 +79,11 @@ class datalynxfield_number_renderer extends datalynxfield_text_renderer {
         return $str;
     }
 
+    /**
+     *
+     * {@inheritDoc}
+     * @see datalynxfield_text_renderer::render_search_mode()
+     */
     public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
         $fieldid = $this->_field->id();
         $fieldname = "f_{$i}_$fieldid";
@@ -85,5 +101,30 @@ class datalynxfield_number_renderer extends datalynxfield_text_renderer {
         $mform->disabledIf("{$fieldname}[1]", "searchoperator$i", 'neq', 'BETWEEN');
 
         return array($arr, null);
+    }
+
+    /**
+     *
+     * {@inheritDoc}
+     * @see datalynxfield_text_renderer::validate()
+     */
+    public function validate($entryid, $tags, $formdata) {
+        $fieldid = $this->_field->id();
+
+        $formfieldname = "field_{$fieldid}_{$entryid}";
+
+        $errors = array();
+        foreach ($tags as $tag) {
+            list(, $behavior, ) = $this->process_tag($tag);
+            // Variable $behavior datalynx_field_behavior.
+            if ($behavior->is_required() and isset($formdata->$formfieldname)) {
+                $value = optional_param($formfieldname, '', PARAM_RAW);
+                if (!is_numeric($value)) {
+                    $errors[$formfieldname] = get_string('err_numeric', 'datalynx');
+                }
+            }
+        }
+
+        return $errors;
     }
 }

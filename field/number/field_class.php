@@ -30,6 +30,9 @@ class datalynxfield_number extends datalynxfield_text {
     public $type = 'number';
 
     /**
+     *
+     * {@inheritDoc}
+     * @see datalynxfield_base::get_search_sql()
      */
     public function get_search_sql($search) {
         global $DB;
@@ -106,6 +109,11 @@ class datalynxfield_number extends datalynxfield_text {
         return array($contents, $oldcontents);
     }
 
+    /**
+     *
+     * {@inheritDoc}
+     * @see datalynxfield_base::parse_search()
+     */
     public function parse_search($formdata, $i) {
         $values = array();
 
@@ -134,6 +142,9 @@ class datalynxfield_number extends datalynxfield_text {
     }
 
     /**
+     *
+     * {@inheritDoc}
+     * @see datalynxfield_base::format_search_value()
      */
     public function format_search_value($searchparams) {
         list($not, $operator, $value) = $searchparams;
@@ -147,6 +158,11 @@ class datalynxfield_number extends datalynxfield_text {
         return $not . ' ' . $operator . ' ' . $value;
     }
 
+    /**
+     *
+     * {@inheritDoc}
+     * @see datalynxfield_text::get_supported_search_operators()
+     */
     public function get_supported_search_operators() {
         return array('' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
                 '>' => get_string('greater_than', 'datalynx'),
