@@ -133,6 +133,26 @@ class datalynxfield_duration extends datalynxfield_base {
         }
     }
 
+
+    /**
+     */
+    public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
+        // Import only from csv.
+        if ($csvrecord) {
+            $fieldid = $this->field->id;
+            $fieldname = $this->name();
+            // Data is stored in the csv as "xx Tage".
+            // To make this a bit more universal we use the language of the user and standard english for import.
+            $search  = array(get_string('seconds'), get_string('minutes'), get_string('hours'),
+                get_string('days'), get_string('weeks'));
+            $replace = array('seconds', 'minutes', 'hours', 'days', 'weeks');
+            $duration = str_replace($search, $replace, $csvrecord[$fieldname]);
+
+            $data->{"field_{$fieldid}_{$entryid}"} = strtotime($duration, 0); // Generates seconds from duration.
+        }
+        return true;
+    }
+
     /**
      */
     public function get_search_sql($search) {
