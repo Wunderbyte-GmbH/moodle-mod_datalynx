@@ -23,8 +23,6 @@
 defined('MOODLE_INTERNAL') or die();
 
 require_once($CFG->libdir . '/formslib.php');
-HTML_QuickForm::registerElementType('checkboxgroup',
-        "$CFG->dirroot/mod/datalynx/checkboxgroup/checkboxgroup.php", 'HTML_QuickForm_checkboxgroup');
 
 /**
  */
