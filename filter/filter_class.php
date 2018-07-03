@@ -203,7 +203,12 @@ class datalynx_filter {
                         if ($fieldsqloptions = $field->get_search_sql($option)) {
                             list($fieldsql, $fieldparams, $fromcontent) = $fieldsqloptions;
                             if ($fieldsql) {
-                                $whereand[] = $fieldsql;
+                                // If we use values from content we make it an implied AND statement.
+                                if (is_numeric($fieldid)) {
+                                    $whereand[] = " ( " . $fieldsql . " AND c$fieldid.fieldid = $fieldid )";
+                                } else {
+                                    $whereand[] = $fieldsql;
+                                }
                                 $searchparams = array_merge($searchparams, $fieldparams);
 
                                 // Add searchfrom (JOIN) only for search in datalynx content or external.
@@ -221,7 +226,12 @@ class datalynx_filter {
                     foreach ($searchfield['OR'] as $option) {
                         if ($fieldsqloptions = $field->get_search_sql($option)) {
                             list($fieldsql, $fieldparams, $fromcontent) = $fieldsqloptions;
-                            $whereor[] = $fieldsql;
+                            // If we use values from content we make it an implied AND statement.
+                            if (is_numeric($fieldid)) {
+                                 $whereor[] = " ( " . $fieldsql . " AND c$fieldid.fieldid = $fieldid )";
+                            } else {
+                                $whereor[] = $fieldsql;
+                            }
                             $searchparams = array_merge($searchparams, $fieldparams);
 
                             // Add searchfrom (JOIN) only for search in datalynx content or external.
@@ -245,12 +255,6 @@ class datalynx_filter {
                 }
             }
 
-            if ($searchfrom && is_numeric($fieldid)) {
-                $searchwhere[] = implode(' AND ',
-                        array_map(function($fieldid) {
-                            return " c$fieldid.fieldid = $fieldid ";
-                        }, $searchfrom));
-            }
             if ($whereand) {
                 $searchwhere[] = implode(' AND ', $whereand);
             }
@@ -331,7 +335,8 @@ class datalynx_filter {
             $searchwhere[] = ' (' . implode(' OR ', $searchlike) . ') ';
         }
 
-        $wheresearch = $searchwhere ? ' AND ' . implode(' AND ', $searchwhere) : '';
+        $wheresearch = $searchwhere ? ' AND (' . implode(' AND ', $searchwhere) .')' : '';
+        //$wheresearch .= ' GROUP BY e.id';
 
         // Register referred tables.
         $this->_filteredtables = $searchfrom;
