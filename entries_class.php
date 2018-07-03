@@ -975,7 +975,7 @@ class datalynx_entries {
     }
 
     /**
-     * Update an entry
+     * Update an entry.
      *
      * @param object $entry
      * @param array $data
@@ -1058,10 +1058,10 @@ class datalynx_entries {
     }
 
     /**
-     * get sql params
+     * Get sql params.
      *
-     * @param unknown $params
-     * @param array $param
+     * @param array $params
+     * @param string $param
      * @param string $value
      * @return string
      */

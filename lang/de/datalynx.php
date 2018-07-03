@@ -172,6 +172,7 @@ $string['entrysaved'] = 'Ihr Eintrag wurde gespeichert.';
 $string['entrysettings'] = 'Eintragseinstellungen';
 $string['entrysettingsupdated'] = 'Eintragseinstellungen aktualisiert';
 $string['entrytimelimit'] = 'Zeitlimit zum Bearbeiten (Minuten)';
+$string['err_numeric'] = 'Zahleneingabe im Englischen Format (. statt ,). Beispiele: 0.8 oder 837.89 oder 87';
 $string['exportcontent'] = 'Inhalt exportieren';
 $string['exportadd'] = 'Neue Exportansicht hinzufügen';
 $string['export'] = 'Exportieren';
