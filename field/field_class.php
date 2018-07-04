@@ -346,9 +346,9 @@ abstract class datalynxfield_base {
             $sortdir = $sortdir ? 'DESC' : 'ASC';
             $contentname = $this->get_sort_sql();
             $sql = "SELECT DISTINCT $contentname
-			FROM {datalynx_contents} c$fieldid
-			WHERE c$fieldid.fieldid = $fieldid AND $contentname IS NOT NULL
-			ORDER BY $contentname $sortdir";
+            FROM {datalynx_contents} c$fieldid
+            WHERE c$fieldid.fieldid = $fieldid AND $contentname IS NOT NULL
+            ORDER BY $contentname $sortdir";
 
             if ($options = $DB->get_records_sql($sql)) {
                 foreach ($options as $data) {
@@ -515,7 +515,7 @@ abstract class datalynxfield_base {
     public function get_search_from_sql() {
         $fieldid = $this->field->id;
         if ($fieldid > 0) {
-            return " JOIN {datalynx_contents} c$fieldid ON c$fieldid.entryid = e.id ";
+            return " LEFT JOIN {datalynx_contents} c$fieldid ON c$fieldid.entryid = e.id AND c$fieldid.fieldid = $fieldid ";
         } else {
             return '';
         }
@@ -929,9 +929,9 @@ class datalynxfield_option_multiple extends datalynxfield_option {
         }
         $where = rtrim($where, "OR ") . ")";
         $selectsql = "SELECT c.id, c.content
-		FROM {datalynx_contents} c
-		WHERE {$where}
-		";
+        FROM {datalynx_contents} c
+        WHERE {$where}
+        ";
         $params['fieldid'] = $this->field->id;
 
         $oldcontents = $DB->get_records_sql_menu($selectsql, $params);
@@ -1207,13 +1207,13 @@ class datalynxfield_option_single extends datalynxfield_option {
         }
 
         $sql = "SELECT dc.content, COUNT(dc.id)
-    	FROM {datalynx_contents} dc
-    	INNER JOIN {datalynx_entries} de ON dc.entryid = de.id
-    	WHERE de.userid = :userid
-    	AND de.dataid = :dataid
-    	AND dc.fieldid = :fieldid
-    	GROUP BY dc.content
-    	HAVING COUNT(dc.id) >= :selectlimit";
+        FROM {datalynx_contents} dc
+        INNER JOIN {datalynx_entries} de ON dc.entryid = de.id
+        WHERE de.userid = :userid
+        AND de.dataid = :dataid
+        AND dc.fieldid = :fieldid
+        GROUP BY dc.content
+        HAVING COUNT(dc.id) >= :selectlimit";
 
         $params = array('userid' => $userid, 'dataid' => $this->df->id(),
                 'fieldid' => $this->field->id, 'selectlimit' => $this->field->param5);

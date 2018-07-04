@@ -250,6 +250,7 @@ class datalynx_filter {
                     // Add only tables which are not already added.
                     if (empty($this->_filteredtables) or !in_array($fieldid, $this->_filteredtables)) {
                         $this->_filteredtables[] = $fieldid;
+                        // Here the LEFT JOIN query is built within field class.
                         $searchtables .= $fields[$fieldid]->get_search_from_sql();
                     }
                 }
