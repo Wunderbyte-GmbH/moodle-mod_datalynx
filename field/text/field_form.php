@@ -92,7 +92,7 @@ class datalynxfield_text_form extends datalynxfield_form {
         // Autocompletion with content of other textfield from the same or other datalynx instance.
         //
         // Select Datalynx instance (to be stored in param9).
-        if ($datalynxs) {
+        if ($datalynxs OR $this->_df->id() > 0) {
             $dfmenu = array('' => array(0 => get_string('noautocompletion', 'datalynx')));
             $dfmenu[''][$this->_df->id()] = get_string('thisdatalynx', 'datalynx') .
                     " (" . strip_tags(format_string($this->_df->name(), true)) . ")";
