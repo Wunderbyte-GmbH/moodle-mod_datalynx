@@ -340,7 +340,6 @@ class datalynx_filter {
         }
 
         $wheresearch = $searchwhere ? ' AND (' . implode(' AND ', $searchwhere) .')' : '';
-        //$wheresearch .= ' GROUP BY e.id';
 
         // Register referred tables.
         $this->_filteredtables = $searchfrom;
@@ -1383,13 +1382,13 @@ class datalynx_filter_manager {
             }
         }
 
-        // Custom filter form
+        // Custom filter form.
         if ($customfilter) {
             global $DB;
             $filter = new datalynx_filter((object) array('id' => $filterid, 'dataid' => $dfid));
             $customfilter = $DB->get_record('datalynx_customfilters', array('id' => $customfilter));
             $filterform = $this->get_customfilter_frontend_form($filter, $view, $customfilter);
-            // return to form (on reload button press)
+            // Return to form (on reload button press).
             if ($filterform->no_submit_button_pressed()) {
                 return $filter;
             } else if ($formdata = $filterform->get_data()) { // Process validated.
