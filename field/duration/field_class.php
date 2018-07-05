@@ -95,10 +95,14 @@ class datalynxfield_duration extends datalynxfield_base {
         }
 
         $value = reset($values);
+        // I don't understand what we are trying to do here.
+        /*
         $rawvalue = optional_param_array("field_{$fieldid}_{$entry->id}", ['number' => ''], PARAM_RAW);
         if ($rawvalue['number'] !== '') {
             $contents[] = $value;
         }
+        */
+        $contents[] = $value;
 
         return array($contents, $oldcontents);
     }
@@ -141,14 +145,7 @@ class datalynxfield_duration extends datalynxfield_base {
         if ($csvrecord) {
             $fieldid = $this->field->id;
             $fieldname = $this->name();
-            // Data is stored in the csv as "xx Tage".
-            // To make this a bit more universal we use the language of the user and standard english for import.
-            $search  = array(get_string('seconds'), get_string('minutes'), get_string('hours'),
-                get_string('days'), get_string('weeks'));
-            $replace = array('seconds', 'minutes', 'hours', 'days', 'weeks');
-            $duration = str_replace($search, $replace, $csvrecord[$fieldname]);
-
-            $data->{"field_{$fieldid}_{$entryid}"} = strtotime($duration, 0); // Generates seconds from duration.
+            $data->{"field_{$fieldid}_{$entryid}"} = $csvrecord[$fieldname];
         }
         return true;
     }
