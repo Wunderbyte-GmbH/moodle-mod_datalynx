@@ -101,4 +101,17 @@ class datalynxfield_url extends datalynxfield_base {
         return array('' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
                 'LIKE' => get_string('contains', 'datalynx'));
     }
+
+    /**
+     */
+    public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
+        // Import only from csv.
+        if ($csvrecord) {
+            $fieldid = $this->field->id;
+            $fieldname = $this->name();
+            // This _url is needed so we can import from simple csv files.
+            $data->{"field_{$fieldid}_{$entryid}_url"} = $csvrecord[$fieldname];
+        }
+        return true;
+    }
 }
