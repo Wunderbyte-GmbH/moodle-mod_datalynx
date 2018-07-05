@@ -119,49 +119,8 @@ class datalynxfield_file extends datalynxfield_base {
     /**
      */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
-        global $USER;
-
-        $fieldid = $this->field->id;
-        $fieldname = $this->field->name;
-
-        $draftid = $importsettings[$fieldname]['filepicker'];
-        $usercontext = context_user::instance($USER->id);
-        $fs = get_file_storage();
-        if ($files = $fs->get_area_files($usercontext->id, 'user', 'draft', $draftid, 'sortorder',
-                false)
-        ) {
-            $zipfile = reset($files);
-            // Extract files to the draft area.
-            $zipper = get_file_packer('application/zip');
-            $zipfile->extract_to_storage($zipper, $usercontext->id, 'user', 'draft', $draftid, '/');
-            $zipfile->delete();
-
-            // Move each file to its own area and add info to data.
-            if ($files = $fs->get_area_files($usercontext->id, 'user', 'draft', $draftid,
-                    'sortorder', false)
-            ) {
-                $rec = new stdClass();
-                $rec->contextid = $usercontext->id;
-                $rec->component = 'user';
-                $rec->filearea = 'draft';
-
-                $i = 0;
-                foreach ($files as $file) {
-                    $itemid = file_get_unused_draft_itemid();
-                    // Move image to the new draft area.
-                    $rec->itemid = $itemid;
-                    $fs->create_file_from_storedfile($rec, $file);
-                    // Add info to data.
-                    $i--;
-                    $fieldname = "field_{$fieldid}_$i";
-                    $data->{"{$fieldname}_filemanager"} = $itemid;
-                    $data->{"{$fieldname}_alttext"} = $file->get_filename();
-                    $data->eids[$i] = $i;
-                }
-                $fs->delete_area_files($usercontext->id, 'user', 'draft', $draftid);
-            }
-        }
-        return $data;
+        // Files can not be importet.
+        return false;
     }
 
     /**
