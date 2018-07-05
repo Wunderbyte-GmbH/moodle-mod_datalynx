@@ -68,7 +68,6 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
             return $duration;
         }
 
-
         $format = !empty($params['format']) ? $params['format'] : '';
         if ($duration !== '') {
             list($value, $unit) = $field->seconds_to_unit($duration);
