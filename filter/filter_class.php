@@ -193,6 +193,7 @@ class datalynx_filter {
 
                 $field = $fields[$fieldid];
                 $internalfield = $field::is_internal();
+                $isdatalynxcontent = $field->is_datalynx_content();
 
                 // Register join field if applicable.
                 $this->register_join_field($field);
@@ -204,7 +205,8 @@ class datalynx_filter {
                             list($fieldsql, $fieldparams, $fromcontent) = $fieldsqloptions;
                             if ($fieldsql) {
                                 // If we use values from content we make it an implied AND statement.
-                                if (is_numeric($fieldid)) {
+                                // TODO: Make sure isdatalynxcontent does the same thing is_numeric promises to do.
+                                if (is_numeric($fieldid) && $isdatalynxcontent) {
                                     $whereand[] = " ( " . $fieldsql . " AND c$fieldid.fieldid = $fieldid )";
                                 } else {
                                     $whereand[] = $fieldsql;
@@ -227,7 +229,8 @@ class datalynx_filter {
                         if ($fieldsqloptions = $field->get_search_sql($option)) {
                             list($fieldsql, $fieldparams, $fromcontent) = $fieldsqloptions;
                             // If we use values from content we make it an implied AND statement.
-                            if (is_numeric($fieldid)) {
+                            // TODO: Make sure isdatalynxcontent does the same thing is_numeric promises to do.
+                            if (is_numeric($fieldid) && $isdatalynxcontent) {
                                  $whereor[] = " ( " . $fieldsql . " AND c$fieldid.fieldid = $fieldid )";
                             } else {
                                 $whereor[] = $fieldsql;

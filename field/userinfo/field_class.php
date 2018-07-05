@@ -85,7 +85,7 @@ class datalynxfield_userinfo extends datalynxfield_base {
 
     /**
      */
-    protected function get_sql_compare_text($column = 'content') {
+    protected function get_sql_compare_text($column = 'data') {
         global $DB;
 
         return $DB->sql_compare_text("c{$this->field->id}.$column");
