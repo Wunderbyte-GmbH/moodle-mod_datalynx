@@ -182,7 +182,6 @@ class datalynx_filter {
         $searchtables = '';
 
         if ($searchfields) {
-
             $whereand = array();
             $whereor = array();
             foreach ($searchfields as $fieldid => $searchfield) {
@@ -339,7 +338,7 @@ class datalynx_filter {
             $searchwhere[] = ' (' . implode(' OR ', $searchlike) . ') ';
         }
 
-        $wheresearch = $searchwhere ? ' AND (' . implode(' AND ', $searchwhere) .')' : '';
+        $wheresearch = $searchwhere ? ' AND (' . implode(' OR ', $searchwhere) .')' : '';
 
         // Register referred tables.
         $this->_filteredtables = $searchfrom;
