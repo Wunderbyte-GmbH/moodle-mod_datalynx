@@ -182,7 +182,6 @@ class datalynx_filter {
         $searchtables = '';
 
         if ($searchfields) {
-
             $whereand = array();
             $whereor = array();
             foreach ($searchfields as $fieldid => $searchfield) {
@@ -193,6 +192,7 @@ class datalynx_filter {
 
                 $field = $fields[$fieldid];
                 $internalfield = $field::is_internal();
+                $isdatalynxcontent = $field->is_datalynx_content();
 
                 // Register join field if applicable.
                 $this->register_join_field($field);
@@ -204,7 +204,8 @@ class datalynx_filter {
                             list($fieldsql, $fieldparams, $fromcontent) = $fieldsqloptions;
                             if ($fieldsql) {
                                 // If we use values from content we make it an implied AND statement.
-                                if (is_numeric($fieldid)) {
+                                // TODO: Make sure isdatalynxcontent does the same thing is_numeric promises to do.
+                                if (is_numeric($fieldid) && $isdatalynxcontent) {
                                     $whereand[] = " ( " . $fieldsql . " AND c$fieldid.fieldid = $fieldid )";
                                 } else {
                                     $whereand[] = $fieldsql;
@@ -227,7 +228,8 @@ class datalynx_filter {
                         if ($fieldsqloptions = $field->get_search_sql($option)) {
                             list($fieldsql, $fieldparams, $fromcontent) = $fieldsqloptions;
                             // If we use values from content we make it an implied AND statement.
-                            if (is_numeric($fieldid)) {
+                            // TODO: Make sure isdatalynxcontent does the same thing is_numeric promises to do.
+                            if (is_numeric($fieldid) && $isdatalynxcontent) {
                                  $whereor[] = " ( " . $fieldsql . " AND c$fieldid.fieldid = $fieldid )";
                             } else {
                                 $whereor[] = $fieldsql;
@@ -336,8 +338,7 @@ class datalynx_filter {
             $searchwhere[] = ' (' . implode(' OR ', $searchlike) . ') ';
         }
 
-        $wheresearch = $searchwhere ? ' AND (' . implode(' AND ', $searchwhere) .')' : '';
-        //$wheresearch .= ' GROUP BY e.id';
+        $wheresearch = $searchwhere ? ' AND (' . implode(' OR ', $searchwhere) .')' : '';
 
         // Register referred tables.
         $this->_filteredtables = $searchfrom;
@@ -1380,13 +1381,13 @@ class datalynx_filter_manager {
             }
         }
 
-        // Custom filter form
+        // Custom filter form.
         if ($customfilter) {
             global $DB;
             $filter = new datalynx_filter((object) array('id' => $filterid, 'dataid' => $dfid));
             $customfilter = $DB->get_record('datalynx_customfilters', array('id' => $customfilter));
             $filterform = $this->get_customfilter_frontend_form($filter, $view, $customfilter);
-            // return to form (on reload button press)
+            // Return to form (on reload button press).
             if ($filterform->no_submit_button_pressed()) {
                 return $filter;
             } else if ($formdata = $filterform->get_data()) { // Process validated.
