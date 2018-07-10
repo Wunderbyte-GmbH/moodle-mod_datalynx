@@ -119,16 +119,16 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
         $fieldid = $field->id();
         $nolinkend = "";
         $nolinkstart = "";
-
-        if (isset($entry->{"c{$fieldid}_content"}) AND !empty($entry->{"c{$fieldid}_content"})) {
+        if (isset($entry->{"c{$fieldid}_content"}) and !empty($entry->{"c{$fieldid}_content"})) {
             $content = $entry->{"c{$fieldid}_content"};
 
             $options = new stdClass();
             $options->para = false;
 
             $format = FORMAT_PLAIN;
-            if ($field->get('param1') == '1') { // We are autolinking this field, so disable linking.
-                // Within us.
+            if ($field->get('param1') == '1') { // We are autolinking this field, so disable
+                                                // linking.
+                                                // Within us.
                 $nolinkstart = '<span class="nolink">';
                 $nolinkend = '</span>';
                 $options->filter = false;
