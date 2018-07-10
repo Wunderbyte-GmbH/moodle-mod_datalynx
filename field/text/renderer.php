@@ -120,7 +120,7 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
         $nolinkend = "";
         $nolinkstart = "";
 
-        if (isset($entry->{"c{$fieldid}_content"})) {
+        if (isset($entry->{"c{$fieldid}_content"}) AND !empty($entry->{"c{$fieldid}_content"})) {
             $content = $entry->{"c{$fieldid}_content"};
 
             $options = new stdClass();
@@ -138,7 +138,6 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
         } else {
             $str = '';
         }
-
         return $str;
     }
 
