@@ -67,6 +67,15 @@ class datalynxfield_tag_renderer extends datalynxfield_renderer {
         $fieldid = $field->id();
         $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
         $items = core_tag_tag::get_item_tags('mod_datalynx', 'datalynx_contents', $contentid);
+
+        // For csv export we only show rawnames of tags.
+        if ($exportcsv = optional_param('exportcsv', '', PARAM_ALPHA)) {
+            $exportstring = array();
+            foreach ($items as $item) {
+                $exportstring[] = $item->rawname;
+            }
+            return implode("#", $exportstring);
+        }
         $str = $OUTPUT->tag_list($items, null, 'datalynx-tags');
         if (isset($params['nolink'])) {
             $str = preg_replace("/<b>.+<\/b>/i", '', $str);

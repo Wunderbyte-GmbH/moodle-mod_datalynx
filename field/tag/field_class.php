@@ -127,13 +127,13 @@ class datalynxfield_tag extends datalynxfield_option_multiple {
         $notinidsequal = false;
 
         $sql = 'SELECT DISTINCT dc.entryid
-    	        FROM {datalynx_contents} dc
-    	        JOIN {tag_instance} ti ON ti.itemid = dc.id
-            	JOIN {tag} t ON ti.tagid = t.id
-    	        JOIN {datalynx_entries} de ON de.id = dc.entryid
-    	        JOIN {datalynx_fields} df ON df.id = dc.fieldid
-    	        WHERE ti.itemtype = :itemtype
-    	        AND ti.component = :component';
+                FROM {datalynx_contents} dc
+                JOIN {tag_instance} ti ON ti.itemid = dc.id
+                JOIN {tag} t ON ti.tagid = t.id
+                JOIN {datalynx_entries} de ON de.id = dc.entryid
+                JOIN {datalynx_fields} df ON df.id = dc.fieldid
+                WHERE ti.itemtype = :itemtype
+                AND ti.component = :component';
         $params = array('itemtype' => 'datalynx_contents', 'component' => 'mod_datalynx');
 
         if ($operator === 'EXACTLY' && empty($value)) {
@@ -178,4 +178,21 @@ class datalynxfield_tag extends datalynxfield_option_multiple {
                 '' => get_string('empty', 'datalynx'));
     }
 
+    /**
+     *
+     * {@inheritDoc}
+     * @see datalynxfield_base::prepare_import_content()
+     */
+    public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
+        // Import only from csv.
+        if ($csvrecord) {
+            $fieldid = $this->field->id;
+            $fieldname = $this->name();
+            $csvname = $importsettings[$fieldname]['name'];
+            // Labels are exported as # separated values. Make an array.
+            $labels = !empty($csvrecord[$csvname]) ? explode('#', trim($csvrecord[$csvname])) : null;
+            $data->{"field_{$fieldid}_{$entryid}"} = $labels;
+        }
+        return true;
+    }
 }
