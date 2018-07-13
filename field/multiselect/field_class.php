@@ -44,7 +44,7 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
             $fieldid = $this->field->id;
             $fieldname = $this->name();
             $csvname = $importsettings[$fieldname]['name'];
-            $labels = !empty($csvrecord[$csvname]) ? explode('#', trim('#', $csvrecord[$csvname])) : null;
+            $labels = !empty($csvrecord[$csvname]) ? explode('<br />', trim($csvrecord[$csvname])) : null;
 
             if ($labels) {
                 $options = $this->options_menu();
@@ -55,7 +55,7 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
                     }
                 }
                 if ($selected) {
-                    $data->{"field_{$fieldid}_{$entryid}_selected"} = $selected;
+                    $data->{"field_{$fieldid}_{$entryid}"} = $selected;
                 }
             }
         }
