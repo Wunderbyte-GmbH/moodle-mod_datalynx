@@ -167,9 +167,7 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
             ) {
                 $errors["field_{$fieldid}_{$entryid}_grp"] = get_string('fieldrequired', 'datalynx');
             }
-            // Validate that the input is a URL with regex.
-            // $urlregex = "/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i";
-            // if (!preg_match($urlregex, $formdata->$formfieldname)) {
+            // Validate that the input is a URL.
             $isurl = filter_var($formdata->$formfieldname, FILTER_VALIDATE_URL);
             $isdefault = $formdata->$formfieldname === 'http://';
             $isempty = $formdata->$formfieldname === '';

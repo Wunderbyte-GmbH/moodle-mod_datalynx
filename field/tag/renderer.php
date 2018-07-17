@@ -69,7 +69,7 @@ class datalynxfield_tag_renderer extends datalynxfield_renderer {
         $items = core_tag_tag::get_item_tags('mod_datalynx', 'datalynx_contents', $contentid);
 
         // For csv export we only show rawnames of tags.
-        if ($exportcsv = optional_param('exportcsv', '', PARAM_ALPHA)) {
+        if (optional_param('exportcsv', '', PARAM_ALPHA)) {
             $exportstring = array();
             foreach ($items as $item) {
                 $exportstring[] = $item->rawname;
