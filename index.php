@@ -19,12 +19,8 @@
  * @package mod
  * @subpackage datalynx
  * @copyright 2012 Itamar Tzadok
+ * @copyright 2016 onwards edulabs.org
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- *          The Datalynx has been developed as an enhanced counterpart
- *          of Moodle's Database activity module (1.9.11+ (20110323)).
- *          To the extent that Datalynx code corresponds to Database code,
- *          certain copyrights on the Database module may obtain
  */
 require_once("../../config.php");
 require_once("$CFG->dirroot/mod/datalynx/mod_class.php");
@@ -58,10 +54,8 @@ if (!$datalynxs = get_all_instances_in_course("datalynx", $course)) {
             new moodle_url('/course/view.php', array('id', $course->id)));
 }
 
-$usesections = course_format_uses_sections($course->format);
-if ($usesections) {
-    $sections = get_all_sections($course->id);
-}
+$modinfo = get_fast_modinfo($id);
+$sections = $modinfo->get_section_info_all();
 
 $table = new html_table();
 $table->attributes['align'] = 'center';
@@ -70,10 +64,8 @@ $table->head = array();
 $table->align = array();
 
 // Section.
-if ($usesections) {
-    $table->head[] = get_string('sectionname', 'format_' . $course->format);
-    $table->align[] = 'center';
-}
+$table->head[] = get_string('sectionname', 'format_' . $course->format);
+$table->align[] = 'center';
 
 // Name.
 $table->head[] = get_string('name');
@@ -122,16 +114,14 @@ foreach ($datalynxs as $datalynx) {
     }
 
     // Section.
-    if ($usesections) {
-        if ($datalynx->section !== $currentsection) {
-            if ($currentsection !== null) {
-                $table->data[] = 'hr';
-            }
-            $currentsection = $datalynx->section;
-            $tablerow[] = get_section_name($course, $sections[$datalynx->section]);
-        } else {
-            $tablerow[] = '';
+    if ($datalynx->section !== $currentsection) {
+        if ($currentsection !== null) {
+            $table->data[] = 'hr';
         }
+        $currentsection = $datalynx->section;
+        $tablerow[] = get_section_name($course, $sections[$datalynx->section]);
+    } else {
+        $tablerow[] = '';
     }
 
     // Name (linked; dim if not visible).
