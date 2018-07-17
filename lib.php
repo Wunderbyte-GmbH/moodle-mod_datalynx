@@ -714,8 +714,10 @@ function datalynx_extend_settings_navigation(settings_navigation $settings, navi
     }
 
     // Index.
-    $dfnode->add(get_string('index', 'datalynx'),
-            new moodle_url('/mod/datalynx/index.php', array('id' => $PAGE->course->id)));
+    if (has_capability('mod/datalynx:viewindex', $PAGE->cm->context)) {
+        $dfnode->add(get_string('index', 'datalynx'),
+                new moodle_url('/mod/datalynx/index.php', array('id' => $PAGE->course->id)));
+    }
 
     // Notifications.
     if (isloggedin() and !isguestuser()) {

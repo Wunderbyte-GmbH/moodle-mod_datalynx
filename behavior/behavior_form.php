@@ -148,12 +148,29 @@ class datalynx_field_behavior_form extends moodleform {
     }
 
     public function validation($data, $files) {
+        global $DB;
         $errors = array();
         if (!$data['name']) {
             $errors['name'] = "You must supply a value here.";
         }
         if (strpos($data['name'], '|') !== false) {
             $errors['name'] = "Behavior name may not contain the pipe symbol \" | \".";
+        }
+        if ($data['id'] == 0) {
+            // To prevent duplicate renderer names when creating a new renderer.
+            if ($DB->record_exists('datalynx_behaviors',
+                    array('name' => $data['name'], 'dataid' => $data['d']))) {
+                $errors['name'] = get_string('duplicatename', 'datalynx');
+            }
+        } else {
+            // To prevent duplicate renderer names when updating existing renderers.
+            $sql = "SELECT 'x'
+                    FROM {datalynx_behaviors} r
+                    WHERE r.name = ? AND r.dataid = ? AND r.id <> ?";
+            $params = array($data['name'], $data['d'], $data['id']);
+            if ($DB->record_exists_sql($sql, $params)) {
+                $errors['name'] = get_string('duplicatename', 'datalynx');
+            }
         }
         return $errors;
     }
