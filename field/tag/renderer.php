@@ -102,14 +102,11 @@ class datalynxfield_tag_renderer extends datalynxfield_renderer {
      * @see datalynxfield_renderer::render_search_mode()
      */
     public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
-        global $CFG;
 
         $field = $this->_field;
         $fieldid = $field->id();
 
         $selected = $value;
-
-        $options = $field->options_menu();
 
         $fieldname = "f_{$i}_$fieldid";
         $select = &$mform->createElement('tags', $fieldname, get_string('tags'),
