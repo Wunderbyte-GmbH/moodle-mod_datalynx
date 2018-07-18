@@ -85,26 +85,14 @@ class datalynxfield_textarea extends datalynxfield_base {
             $rec->id = $DB->insert_record('datalynx_contents', $rec);
         }
 
-        // Editor content.
-        if (false) {
-            $data = (object) $values;
-            $data->{'editor_editor'} = $data->editor;
-
-            $data = file_postupdate_standard_editor($data, 'editor', $this->editoroptions,
-                    $this->df->context, 'mod_datalynx', 'content', $rec->id);
-
-            $rec->content = $data->editor;
-            $rec->content1 = $data->{'editorformat'};
-
-            // Text area content.
-        } else {
-            $value = reset($values);
-            if (is_array($value)) {
-                // Import: One value as array of text,format,trust, so take the text.
-                $value = reset($value);
-            }
-            $rec->content = clean_param($value, PARAM_RAW);
+        $value = reset($values);
+        if (is_array($value)) {
+            // Import: One value as array of text,format,trust, so take the text.
+            $value = reset($value);
         }
+
+        $value = str_replace("<br />", "\n", $value); // Reset carriage returns, bug#887.
+        $rec->content = clean_param($value, PARAM_NOTAGS); // Replaced PARAM_RAW.
 
         return $DB->update_record('datalynx_contents', $rec);
     }

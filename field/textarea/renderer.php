@@ -57,6 +57,7 @@ class datalynxfield_textarea_renderer extends datalynxfield_renderer {
 
         if (isset($entry->{"c{$fieldid}_content"})) {
             $text = $entry->{"c{$fieldid}_content"};
+            $text = str_replace("\r", "", $text); // Remove carriage returns, bug#887.
             $format = isset($entry->{"c{$fieldid}_content1"}) ? $entry->{"c{$fieldid}_content1"} : FORMAT_PLAIN;
 
             $options = new stdClass();
