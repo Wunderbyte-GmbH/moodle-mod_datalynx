@@ -213,7 +213,7 @@ class datalynxview_pdf extends datalynxview_base {
         if ($settings->pagebreak == 'entry') {
             $content = array();
             $totalcontent = $this->display(
-                    array('export' => true, 'tohtml' => true, 'controls' => true, 'entryactions' => false));
+                    array('export' => true, 'tohtml' => true, 'controls' => false, 'entryactions' => false));
             $totalcontent = preg_replace('/\<\/div\>\<div class\=\"entry\"\>/',
                     '<></div><div class="entry">', $totalcontent);
             $newcontent = explode('<>', $totalcontent);
@@ -225,7 +225,7 @@ class datalynxview_pdf extends datalynxview_base {
         } else {
             $content = explode(self::PAGE_BREAK,
                     $this->display(
-                            array('export' => true, 'tohtml' => true, 'controls' => true, 'entryactions' => false)));
+                            array('export' => true, 'tohtml' => true, 'controls' => false, 'entryactions' => false)));
         }
 
         foreach ($content as $pagecontent) {
