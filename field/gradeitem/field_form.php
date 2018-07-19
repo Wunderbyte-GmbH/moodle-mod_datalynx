@@ -67,6 +67,12 @@ class datalynxfield_gradeitem_form extends datalynxfield_form {
         $module = array('name' => 'mod_datalynx', 'fullpath' => '/mod/datalynx/datalynx.js');
 
         global $PAGE;
-        $PAGE->requires->js_init_call('M.mod_datalynx.field_gradeitem_form_init', [], true, $module);
+
+        $PAGE->requires->js_amd_inline("
+        require(['jquery'], function($) {
+            $('select[name=param1]').val($('input[type=\"hidden\"][name=\"param1\"]').val());
+        });");
+
+
     }
 }
