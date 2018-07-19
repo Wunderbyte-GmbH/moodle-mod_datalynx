@@ -30,14 +30,15 @@ $forproperty = required_param('forproperty', PARAM_ALPHA);
 
 $dataid = $DB->get_field('datalynx_behaviors', 'dataid', array('id' => $behaviorid));
 $courseid = $DB->get_field('datalynx', 'course', array('id' => $dataid));
-$cm = get_coursemodule_from_id('datalynx', $dataid, 0, false, MUST_EXIST);
 
-require_login($courseid, false, $cm);
+// This cannot work as the id needs to be courseid not dataid.
+// $cm = get_coursemodule_from_id('datalynx', $dataid, 0, false, MUST_EXIST);
+// require_login($courseid, false, $cm);
 
 require_sesskey();
 
 $toggle = "ERROR";
-if ($for == "required") {
+if ($forproperty == "required") {
     $required = $DB->get_field('datalynx_behaviors', $forproperty, array('id' => $behaviorid));
     if ($required) {
         $required = 0;
