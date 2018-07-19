@@ -114,13 +114,9 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
                 'fieldtype' => 'datalynxview'
         );
 
-        $module = array(
-                'name' => 'M.mod_datalynx_load_views',
-                'fullpath' => '/mod/datalynx/datalynxloadviews.js',
-                'requires' => array('base', 'io', 'node')
-        );
+        // Add JQuery
+        $PAGE->requires->js_call_amd('mod_datalynx/datalynxloadviews', 'init', array($options));
 
-        $PAGE->requires->js_init_call('M.mod_datalynx_load_views.init', array($options), false, $module);
     }
 
     /**

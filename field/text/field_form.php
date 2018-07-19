@@ -127,13 +127,8 @@ class datalynxfield_text_form extends datalynxfield_form {
                 'fieldtype' => 'text'
         );
 
-        $module = array(
-                'name' => 'M.mod_datalynx_load_views',
-                'fullpath' => '/mod/datalynx/datalynxloadviews.js',
-                'requires' => array('base', 'io', 'node')
-        );
-
-        $PAGE->requires->js_init_call('M.mod_datalynx_load_views.init', array($options), false, $module);
+        // Add JQuery
+        $PAGE->requires->js_call_amd('mod_datalynx/datalynxloadviews', 'init', array($options));
 
         // Rules.
         $mform->addElement('header', 'fieldruleshdr', get_string('fieldrules', 'datalynx'));
