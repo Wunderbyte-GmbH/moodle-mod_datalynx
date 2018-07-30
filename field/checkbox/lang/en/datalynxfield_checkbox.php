@@ -22,4 +22,4 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['pluginname'] = 'Checkbox';
-$string['privacy:checkbox'] = 'Checkboxes do not store personal data.';
+$string['privacy:metadata'] = 'Checkboxes do not store personal data.';
