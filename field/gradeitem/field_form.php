@@ -72,7 +72,5 @@ class datalynxfield_gradeitem_form extends datalynxfield_form {
         require(['jquery'], function($) {
             $('select[name=param1]').val($('input[type=\"hidden\"][name=\"param1\"]').val());
         });");
-
-
     }
 }
