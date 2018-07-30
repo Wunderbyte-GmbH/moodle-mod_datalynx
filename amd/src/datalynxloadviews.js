@@ -70,7 +70,7 @@ define(['jquery'], function($) {
                                 }
                             },
                             error: function() {
-                                console.log("Error while loading views and textfields.");
+                                alert("Error while loading views and textfields.");
                             }
                         });
                 }
