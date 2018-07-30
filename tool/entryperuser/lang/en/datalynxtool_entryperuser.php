@@ -23,4 +23,4 @@
  */
 $string['pluginname'] = 'Entry per user';
 $string['pluginname_help'] = 'Adds one blank entry for each gradable user in the course';
-
+$string['privacy:metadata'] = 'This entryperuser tool does not store personal data.';
