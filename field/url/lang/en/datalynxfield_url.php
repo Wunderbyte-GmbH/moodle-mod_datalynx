@@ -29,5 +29,4 @@ $string['makeimage'] = 'Make the url an image';
 $string['pluginname'] = 'Url';
 $string['usepicker'] = 'Use url picker when editing';
 $string['displaylinktext'] = 'Display input field for specifying a link text in edit mode.';
-
-
+$string['privacy:metadata'] = 'URLs do not store personal data.';

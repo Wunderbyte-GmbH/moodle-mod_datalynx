@@ -23,3 +23,4 @@
  */
 $string['pluginname'] = 'Duration';
 $string['fixedunit'] = 'Fixed unit';
+$string['privacy:metadata'] = 'Duration does not store personal data.';

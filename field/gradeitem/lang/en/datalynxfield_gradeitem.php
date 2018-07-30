@@ -23,4 +23,4 @@
  */
 $string['pluginname'] = 'Course grade item';
 $string['gradeitem'] = 'Grade item';
-
+$string['privacy:metadata'] = 'Gradeitems do not store personal data.';

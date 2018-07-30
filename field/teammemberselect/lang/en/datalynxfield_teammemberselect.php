@@ -22,3 +22,4 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['pluginname'] = 'Team member select';
+$string['privacy:metadata'] = 'Team member select does not store personal data.';

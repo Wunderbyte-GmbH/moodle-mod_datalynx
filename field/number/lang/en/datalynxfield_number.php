@@ -23,3 +23,4 @@
  */
 $string['decimals'] = 'Decimals';
 $string['pluginname'] = 'Number';
+$string['privacy:metadata'] = 'Numbers do not store personal data.';

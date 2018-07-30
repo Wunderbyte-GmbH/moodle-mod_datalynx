@@ -23,4 +23,4 @@
  */
 $string['pluginname'] = 'User custom info';
 $string['infofield'] = 'Info field';
-
+$string['privacy:metadata'] = 'The field user custom info does not store personal data.';

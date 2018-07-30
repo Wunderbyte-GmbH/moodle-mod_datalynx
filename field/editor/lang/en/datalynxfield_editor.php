@@ -27,6 +27,4 @@ $string['cols'] = 'Columns';
 $string['wordcountmax'] = 'Maximum words';
 $string['wordcountmin'] = 'Minimum words';
 $string['wordcountshow'] = 'Show wordcount bar';
-
-
-
+$string['privacy:metadata'] = 'Editor does not store personal data.';

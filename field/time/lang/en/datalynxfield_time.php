@@ -38,3 +38,4 @@ $string['hour'] = 'Hour';
 $string['minute'] = 'Minute';
 $string['masked'] = 'Masked';
 $string['masked_help'] = 'Select this option to render Time/Date selector dropdowns with labels (e.g. Year, Month, Day) for empty values. The labels are defined in the language pack.';
+$string['privacy:metadata'] = 'Timestamps do not store personal data.';
