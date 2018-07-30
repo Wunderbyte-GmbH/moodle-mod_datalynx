@@ -24,3 +24,4 @@
 $string['pluginname'] = 'Tabular';
 $string['headerrow'] = 'Table with header row';
 $string['table'] = 'Table design';
+$string['privacy:metadata'] = 'The tabular view does not store personal data.';

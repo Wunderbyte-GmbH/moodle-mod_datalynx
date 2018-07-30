@@ -128,3 +128,4 @@ $string['marginright'] = 'Right';
 $string['marginkeep'] = 'Keep';
 $string['pagebreak'] = 'Page break';
 $string['imagetypes'] = 'jpg|jpeg|gif|png|tif';
+$string['privacy:metadata'] = 'The PDF View does not store personal data.';
