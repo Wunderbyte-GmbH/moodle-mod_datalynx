@@ -835,3 +835,21 @@ $string['fieldsimportsettings'] = 'Importeinstellungen';
 $string['uploadfile'] = 'Importdatei';
 $string['uploadtext'] = 'Importtext';
 $string['updateexisting'] = 'Vorhandene überschreiben';
+
+// Privacy API
+$string['privacy:metadata:datalynx_entries'] = 'Einträge in einer datalynx Instanz.';
+$string['privacy:metadata:datalynx_entries:userid'] = 'Nutzer der den Eintrag angelegt hat';
+$string['privacy:metadata:datalynx_entries:groupid'] = 'Gruppe';
+$string['privacy:metadata:datalynx_entries:timecreated'] = 'Erstellungszeitpunkt';
+$string['privacy:metadata:datalynx_entries:timemodified'] = 'Veränderungszeitpunkt';
+$string['privacy:metadata:datalynx_entries:approved'] = 'Approval Status';
+$string['privacy:metadata:datalynx_entries:status'] = 'Status des Eintrags';
+$string['privacy:metadata:datalynx_entries:assessed'] = 'Anzeigen ob der Eintrag bewertet wurde';
+$string['privacy:metadata:datalynx_contents'] = 'Inhalte die in ein Feld in einer datalynx Instanz abgelegt wurden.';
+$string['privacy:metadata:datalynx_contents:fieldid'] = 'Feld ID';
+$string['privacy:metadata:datalynx_contents:content'] = 'Content';
+$string['privacy:metadata:datalynx_contents:content1'] = 'Zusätzlicher content 1';
+$string['privacy:metadata:datalynx_contents:content2'] = 'Zusätzlicher content 2';
+$string['privacy:metadata:datalynx_contents:content3'] = 'Zusätzlicher content 3';
+$string['privacy:metadata:datalynx_contents:content4'] = 'Zusätzlicher content 4';
+$string['privacy:metadata:filepurpose'] = 'Datei oder Bild zur datalynx Instanz.';

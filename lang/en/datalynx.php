@@ -870,3 +870,21 @@ $string['fieldsimportsettings'] = 'Importsettings';
 $string['uploadfile'] = 'File to import';
 $string['uploadtext'] = 'Text to import';
 $string['updateexisting'] = 'Overwrite existing';
+
+// Privacy API
+$string['privacy:metadata:datalynx_entries'] = 'Represent entries in a datalynx instance.';
+$string['privacy:metadata:datalynx_entries:userid'] = 'User who created the record';
+$string['privacy:metadata:datalynx_entries:groupid'] = 'Group';
+$string['privacy:metadata:datalynx_entries:timecreated'] = 'Time when record was created';
+$string['privacy:metadata:datalynx_entries:timemodified'] = 'Time when record was last modified';
+$string['privacy:metadata:datalynx_entries:approved'] = 'Approval status';
+$string['privacy:metadata:datalynx_entries:status'] = 'Status of this entry';
+$string['privacy:metadata:datalynx_entries:assessed'] = 'Show if entry was assessed';
+$string['privacy:metadata:datalynx_contents'] = 'Represents content of one field that was written in a datalynx instance.';
+$string['privacy:metadata:datalynx_contents:fieldid'] = 'Field definition ID';
+$string['privacy:metadata:datalynx_contents:content'] = 'Content';
+$string['privacy:metadata:datalynx_contents:content1'] = 'Additional content 1';
+$string['privacy:metadata:datalynx_contents:content2'] = 'Additional content 2';
+$string['privacy:metadata:datalynx_contents:content3'] = 'Additional content 3';
+$string['privacy:metadata:datalynx_contents:content4'] = 'Additional content 4';
+$string['privacy:metadata:filepurpose'] = 'File or picture attached to a datalynx instance.';
