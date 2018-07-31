@@ -20,6 +20,7 @@
  * @package datalynx
  * @copyright 2018 Michael Pollak <moodle@michaelpollak.org>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * This is heavily based on mod_data from Marina Glancy, thank you.
  */
 
 namespace mod_datalynx\privacy;
@@ -84,7 +85,6 @@ class provider implements
         return $collection;
     }
 
-
     /**
      * Get the list of contexts that contain user information for the specified user.
      *
@@ -92,10 +92,6 @@ class provider implements
      * @return contextlist the list of contexts containing user info for the user.
      */
     public static function get_contexts_for_userid(int $userid) : contextlist {
-        /*
-        $contextlist = new \core_privacy\local\request\contextlist();
-        return $contextlist;
-        */
 
         // Fetch all entries in datalynx created by the user.
         $sql = "SELECT c.id
@@ -116,7 +112,6 @@ class provider implements
 
         return $contextlist;
     }
-
 
     /**
      * Export personal data for the given approved_contextlist. User and context information is contained within the contextlist.
@@ -175,9 +170,6 @@ class provider implements
         self::export_datalynx($context, $user);
     }
 
-
-
-
     /**
      * Delete all data for all users in the specified context.
      *
@@ -209,10 +201,6 @@ class provider implements
 
         self::delete_datalynx_entries($context, $recordstobedeleted);
     }
-
-
-
-
 
     /**
      * Delete all user data for the specified user, in the specified contexts.
@@ -251,8 +239,6 @@ class provider implements
         }
     }
 
-
-
     /**
      * Export one entry in the datalynx_entries table)
      *
@@ -280,7 +266,6 @@ class provider implements
             'mod_datalynx', 'datalynx_entries', $recordobj->id);
     }
 
-
     /**
      * Creates an object from all fields in the $entry where key starts with $prefix
      *
@@ -304,7 +289,6 @@ class provider implements
         return $object;
     }
 
-
     /**
      * Export basic info about datalynx activity module
      *
@@ -320,12 +304,8 @@ class provider implements
         writer::with_context($context)->export_data([], $contextdata); // TODO: Check if this is export_data or not.
     }
 
-
-
     /**
      * Marks datalynx_entry and datalynx_contents for deletion
-     *
-     * Also invokes callback from datalynxfield plugin in case it stores additional data that needs to be deleted
      *
      * @param \context $context
      * @param \stdClass $row result of SQL query - tables data_content, data_record, data_fields join together
@@ -348,8 +328,6 @@ class provider implements
         }
     }
 
-
-
     /**
      * Deletes records marked for deletion and all associated data
      *
@@ -369,10 +347,8 @@ class provider implements
         list($sql, $params) = $DB->get_in_or_equal($recordstobedeleted, SQL_PARAMS_NAMED);
 
         // Delete files.
-        /* TODO
         get_file_storage()->delete_area_files_select($context->id, 'mod_datalynx', 'datalynx_entries',
             "IN (SELECT dc.id FROM {datalynx_contents} dc WHERE dc.entryid $sql)", $params);
-        */
 
         // Delete from datalynx_contents.
         $DB->delete_records_select('datalynx_contents', 'entryid ' . $sql, $params);
@@ -380,8 +356,6 @@ class provider implements
         $DB->delete_records_select('datalynx_entries', 'id ' . $sql, $params);
         // NOTE: Keep the space after entryid and id.
     }
-
-
 
     /**
      * Export one field answer in a record in database activity module
@@ -413,7 +387,6 @@ class provider implements
         writer::with_context($context)->export_area_files([$recordobj->id, $contentobj->id], 'mod_datalynx',
             'content', $contentobj->id);
     }
-
 
     /**
      * SQL query that returns all fields from {datalynx_contents}, {datalynx_fields} and {datalynx_entries} tables
