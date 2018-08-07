@@ -3,7 +3,6 @@ define(['jquery'], function($) {
     return {
         init: function() {
             $('img[data-for]').on( "click", function ( event ) {
-                alert("dings");
 
                 var img = event.target;
                 var behaviorid = img.getAttribute('data-behavior-id');
