@@ -2,13 +2,14 @@ define(['jquery'], function($) {
 
     return {
         init: function() {
-            $('table.datalynx-behaviors img[data-for]').on( "click", function ( event ) {
+            $('img[data-for]').on( "click", function ( event ) {
+                alert("dings");
 
                 var img = event.target;
                 var behaviorid = img.getAttribute('data-behavior-id');
                 var permissionid = img.getAttribute('data-permission-id');
                 var forproperty = img.getAttribute('data-for');
-                var sesskey = $('table.datalynx-behaviors').attr('data-sesskey');
+                var sesskey = $('table.datalynx-behaviors').attr('data-sesskey'); // Maybe M.cfg.sesskey
                 var actionurl = "behavior_edit_ajax.php";
 
 
