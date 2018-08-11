@@ -1,7 +1,7 @@
 define(['jquery'], function($) {
 
     return {
-        init: function(approvedicon, disapprovedicon) {
+        init: function() {
             $('table.datalynx-behaviors img[data-for]').on( "click", function ( event ) {
 
                 var img = event.target;
@@ -10,7 +10,7 @@ define(['jquery'], function($) {
                 var forproperty = img.getAttribute('data-for');
                 var sesskey = $('table.datalynx-behaviors').attr('data-sesskey');
                 var actionurl = "behavior_edit_ajax.php";
-
+                var build_querystring;
 
                 // Ajax request to get current options.
                 $.ajax(
@@ -49,18 +49,3 @@ define(['jquery'], function($) {
         }
     }
 });
-
-
-
-/*
-M.mod_datalynx.behaviors_helper.toggle_image = function (img) {
-    alert("image");
-    var src = img.get("src");
-    if (src.search("-enabled") !== -1) {
-        src = src.replace("-enabled", "-n");
-    } else {
-        src = src.replace("-n", "-enabled");
-    }
-    img.set("src", src);
-}
-*/

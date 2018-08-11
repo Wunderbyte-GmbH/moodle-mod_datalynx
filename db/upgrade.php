@@ -925,6 +925,18 @@ function xmldb_datalynx_upgrade($oldversion) {
         // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2018062211, 'datalynx');
     }
+    if ($oldversion < 2018081000) {
+        $ids = $DB->get_records_menu('datalynx_views', array('type' => 'csv'), '', 'id, param1');
+        foreach ($ids as $id => $param1) {
+            $singleparams = explode(',', $param1);
+            $singleparams[1] = '"';
+            $param1 = implode(',', $singleparams);
+            $sql = "UPDATE {datalynx_views} SET param1 = '{$param1}' WHERE id = '$id'";
+            $DB->execute($sql);
+        }
+        // Datalynx savepoint reached.
+        upgrade_mod_savepoint(true, 2018081000, 'datalynx');
+    }
     return true;
 }
 
