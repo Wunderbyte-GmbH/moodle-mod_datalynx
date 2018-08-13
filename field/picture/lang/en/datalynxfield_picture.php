@@ -26,5 +26,4 @@ $string['maxdimensions'] = 'Max dimensions (width x height)px';
 $string['pluginname'] = 'Picture';
 $string['resizingimages'] = 'Resizing image thumbnails...';
 $string['thumbdimensions'] = 'Thumb dimensions (width x height)px';
-
-
+$string['privacy:metadata'] = 'Pictures do not store personal data.';

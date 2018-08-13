@@ -48,3 +48,4 @@ $string['entrygroup'] = 'Entry group';
 $string['viewbutton'] = 'View';
 $string['textfield'] = 'Textfield';
 $string['textfield_help'] = 'Choose a textfield of the selected Datalynx instance to be able to fetch the value of this textfield in every entry with specific criteria.';
+$string['privacy:metadata'] = 'Datalynx Views do not store personal data.';

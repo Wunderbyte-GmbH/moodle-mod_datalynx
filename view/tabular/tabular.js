@@ -25,7 +25,6 @@
 M.datalynxview_tabular = {};
 
 M.datalynxview_tabular.init = function (Y) {
-    alert("we init tabular.");
     var firstentryfield = Y.one('div.felement [name^="field_"]');
     if (!firstentryfield) {
         Y.all('input[type="checkbox"][name$="bulkedit"]').hide();

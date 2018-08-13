@@ -25,4 +25,4 @@ $string['pluginname'] = 'Grid';
 $string['gridsettings'] = 'Grid settings';
 $string['cols'] = 'Number of columns';
 $string['rows'] = 'Aligned rows';
-
+$string['privacy:metadata'] = 'The grid view does not store personal data.';

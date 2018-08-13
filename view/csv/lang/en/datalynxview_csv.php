@@ -31,3 +31,4 @@ $string['fieldsimportsettings'] = 'Import settings';
 $string['uploadfile'] = 'File to import';
 $string['uploadtext'] = 'Text to import';
 $string['updateexisting'] = 'Update existing';
+$string['privacy:metadata'] = 'The CSV View does not store personal data.';

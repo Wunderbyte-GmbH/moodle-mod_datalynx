@@ -22,4 +22,4 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['pluginname'] = 'Tag';
-
+$string['privacy:metadata'] = 'Tags do not store personal data.';

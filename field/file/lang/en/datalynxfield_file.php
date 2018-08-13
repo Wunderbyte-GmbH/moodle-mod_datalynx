@@ -24,4 +24,4 @@
 $string['alttext'] = 'Alt text';
 $string['clearcontent'] = 'Clear content';
 $string['pluginname'] = 'File';
-
+$string['privacy:metadata'] = 'Files do not store personal data.';

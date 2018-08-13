@@ -52,7 +52,7 @@ foreach ($fields as $field) {
 $options['types'] = $DB->get_records_select_menu('datalynx_fields', 'dataid = :dataid',
         array('dataid' => $urlparams->d), 'name ASC', 'name, type');
 
-$module = array('name' => 'mod_datalynx', 'fullpath' => '/mod/datalynx/datalynx.js',
+$module = array('name' => 'mod_datalynx', 'fullpath' => '/mod/datalynx/tagmanager.js',
         'requires' => array('moodle-core-notification-dialogue')
 );
 

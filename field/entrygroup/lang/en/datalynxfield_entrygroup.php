@@ -25,4 +25,5 @@ $string['##group:description##'] = '##group:description##';
 $string['##group:id##'] = '##group:id##';
 $string['##group:name##'] = '##group:name##';
 $string['group'] = 'Group';
-$string['pluginname'] = 'Internal';
+$string['pluginname'] = 'Entrygroup';
+$string['privacy:metadata'] = 'The field entrygroup does not store personal data.';

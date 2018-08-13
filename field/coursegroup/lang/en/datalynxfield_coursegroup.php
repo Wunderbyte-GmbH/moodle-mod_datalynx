@@ -25,3 +25,4 @@ $string['pluginname'] = 'Course group';
 $string['member'] = 'Membership';
 $string['coursenotfound'] = 'Course id {a} not found';
 $string['groupnotfound'] = 'Group id {a} not found';
+$string['privacy:metadata'] = 'Coursegroups do not store personal data.';

@@ -27,3 +27,4 @@ $string['saltsource'] = 'Salt source';
 $string['saltsize'] = 'Salt size';
 $string['system'] = 'System';
 $string['uniqueness'] = 'Uniqueness';
+$string['privacy:metadata'] = 'Identifiers do not store personal data.';
