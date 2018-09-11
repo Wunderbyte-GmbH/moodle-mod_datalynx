@@ -49,7 +49,7 @@ class datalynxview_csv_form extends datalynxview_base_form {
         // Enclosure.
         $mform->addElement('text', 'enclosure', get_string('csvenclosure', 'datalynx'), array('size' => '10'));
         $mform->setType('enclosure', PARAM_NOTAGS);
-        $mform->setDefault('enclosure', '');
+        $mform->setDefault('enclosure', '"');
 
         // Encoding.
         $choices = core_text::get_encodings();

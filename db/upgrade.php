@@ -925,6 +925,35 @@ function xmldb_datalynx_upgrade($oldversion) {
         // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2018062211, 'datalynx');
     }
+    if ($oldversion < 2018081000) {
+        $ids = $DB->get_records_menu('datalynx_views', array('type' => 'csv'), '', 'id, param1');
+        foreach ($ids as $id => $param1) {
+            $singleparams = explode(',', $param1);
+            $singleparams[1] = '"';
+            $param1 = implode(',', $singleparams);
+            $sql = "UPDATE {datalynx_views} SET param1 = '{$param1}' WHERE id = '$id'";
+            $DB->execute($sql);
+        }
+        // Datalynx savepoint reached.
+        upgrade_mod_savepoint(true, 2018081000, 'datalynx');
+    }
+    if ($oldversion < 2018081700) {
+        // Get all fieldids of type teammemberselect.
+        $sql = "SELECT dc.id, dc.content
+                    FROM {datalynx_contents} dc
+                    JOIN {datalynx_fields} df
+                    ON df.id = dc.fieldid
+                    WHERE df.type LIKE 'teammemberselect'";
+        $teammembercontent = $DB->get_records_sql_menu($sql);
+        // Get all
+        foreach ($teammembercontent as $id => $content) {
+            $newcontent = str_replace('\""', '"', $content);
+            $sql = "UPDATE {datalynx_contents} SET content = '{$newcontent}' WHERE id = '$id'";
+            $DB->execute($sql);
+        }
+        // Datalynx savepoint reached.
+        upgrade_mod_savepoint(true, 2018081700, 'datalynx');
+    }
     return true;
 }
 

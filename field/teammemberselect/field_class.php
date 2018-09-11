@@ -242,7 +242,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
                 foreach ($doc->getElementsByTagName('a') as $element) {
                     $href = $element->getAttribute('href');
                     if (($pos = strpos($href, "id=")) !== false) {
-                        $userids[] = trim(substr($href, $pos + 3));
+                        $userids[] = trim(substr($href, $pos + 3), " \t\n\r\0\x0B\"");
                     }
                 }
                 $data->{"field_{$fieldid}_{$entryid}"} = $userids;
