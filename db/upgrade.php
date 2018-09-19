@@ -937,7 +937,7 @@ function xmldb_datalynx_upgrade($oldversion) {
         // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2018081000, 'datalynx');
     }
-    if ($oldversion < 2018081700) {
+    if ($oldversion < 2018081701) {
         // Get all fieldids of type teammemberselect.
         $sql = "SELECT dc.id, dc.content
                     FROM {datalynx_contents} dc
@@ -945,14 +945,16 @@ function xmldb_datalynx_upgrade($oldversion) {
                     ON df.id = dc.fieldid
                     WHERE df.type LIKE 'teammemberselect'";
         $teammembercontent = $DB->get_records_sql_menu($sql);
-        // Get all
+        // Get all.
         foreach ($teammembercontent as $id => $content) {
             $newcontent = str_replace('\""', '"', $content);
-            $sql = "UPDATE {datalynx_contents} SET content = '{$newcontent}' WHERE id = '$id'";
-            $DB->execute($sql);
+            if ($newcontent !== $content) {
+                $sql = "UPDATE {datalynx_contents} SET content = '{$newcontent}' WHERE id = '$id'";
+                $DB->execute($sql);
+            }
         }
         // Datalynx savepoint reached.
-        upgrade_mod_savepoint(true, 2018081700, 'datalynx');
+        upgrade_mod_savepoint(true, 2018081701, 'datalynx');
     }
     return true;
 }

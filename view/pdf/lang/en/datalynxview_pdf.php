@@ -50,6 +50,7 @@ $string['unit_in'] = 'Inch';
 // PDF Frame.
 $string['pdfframe'] = 'PDF Frame';
 $string['pdfframe_help'] = 'PDF Frame';
+$string['pdfframefirstpageonly'] = 'Use frame on first page only';
 // PDF Watermark.
 $string['pdfwmark'] = 'PDF Watermark';
 $string['pdfwmark_help'] = 'PDF Watermark';

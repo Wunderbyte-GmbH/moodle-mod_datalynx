@@ -24,3 +24,4 @@
 $string['decimals'] = 'Decimals';
 $string['pluginname'] = 'Number';
 $string['privacy:metadata'] = 'Numbers do not store personal data.';
+$string['outputemptystring'] = 'When the field ist left empty: Output empty string instead of 0.';

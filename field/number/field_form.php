@@ -38,6 +38,7 @@ class datalynxfield_number_form extends datalynxfield_form {
         // Decimals.
         $options = array('' => 0) + array_combine(range(1, 10), range(1, 10));
         $mform->addElement('select', 'param1', get_string('decimals', 'datalynxfield_number'), $options);
+        $mform->addElement('selectyesno', 'param4', get_string('outputemptystring', 'datalynxfield_number'), $options);
         // Param3 not used anymore former: px, em or %. Param2 was width in integer.
     }
 }

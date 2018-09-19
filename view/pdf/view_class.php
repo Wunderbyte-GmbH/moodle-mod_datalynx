@@ -82,6 +82,7 @@ class datalynxview_pdf extends datalynxview_base {
                 'unit' => !empty($settings->unit) ? $settings->unit : 'mm',
                 'format' => !empty($settings->format) ? $settings->format : 'LETTER',
                 'destination' => !empty($settings->destination) ? $settings->destination : 'I',
+                'pdfframefirstpageonly' => !empty($settings->pdfframefirstpageonly) ? $settings->pdfframefirstpageonly : 0,
                 'transparency' => !empty($settings->transparency) ? $settings->transparency : 0.5,
                 'pagebreak' => !empty($settings->pagebreak) ? $settings->pagebreak : 'auto',
                 'toc' => (object) array(
@@ -228,6 +229,7 @@ class datalynxview_pdf extends datalynxview_base {
                             array('export' => true, 'tohtml' => true, 'controls' => false, 'entryactions' => false)));
         }
 
+        $pagecount = 0;
         foreach ($content as $pagecontent) {
             $docroot = $_SERVER['DOCUMENT_ROOT'];
             unset($_SERVER['DOCUMENT_ROOT']);
@@ -238,13 +240,16 @@ class datalynxview_pdf extends datalynxview_base {
             $pagecontent = $this->set_page_bookmarks($pdf, $pagecontent);
 
             // Set frame.
-            $this->set_frame($pdf);
+            if ($pagecount < 1 AND $this->_settings->pdfframefirstpageonly) {
+                $this->set_frame($pdf);
+            }
 
             // Set watermark.
             $this->set_watermark($pdf);
 
             $pagecontent = $this->process_content_images($pagecontent);
             $this->write_html($pdf, $pagecontent);
+            $pagecount++;
         }
 
         // Set TOC.

@@ -57,15 +57,18 @@ class datalynxfield_number_renderer extends datalynxfield_text_renderer {
 
     /**
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      * @see datalynxfield_text_renderer::render_display_mode()
      */
     public function render_display_mode(stdClass $entry, array $params) {
         $field = $this->_field;
         $fieldid = $field->id();
         $entryid = $entry->id;
-        if (!isset($entry->{"c{$fieldid}_content"})) {
+        $outputemptystring = !empty($field->get('param4')) ? $field->get('param4') : 0;
+        if (!isset($entry->{"c{$fieldid}_content"}) and !$outputemptystring) {
             return 0;
+        } else if (!isset($entry->{"c{$fieldid}_content"})) {
+            return '';
         }
         $number = (float) $entry->{"c{$fieldid}_content"};
         $decimals = (float) trim($field->get('param1'));
