@@ -704,8 +704,8 @@ class datalynxview_pdf extends datalynxview_base {
 
             $fs = get_file_storage();
             foreach ($matches[1] as $imagepath) {
-                // Moodle does not replace spaces prior to creating a hash for the file.
-                if (!$file = $fs->get_file_by_hash(sha1(str_replace("%20", " ", $imagepath))) or $file->is_directory()) {
+                // Moodle does not replace spaces prior to creating a hashvalue for the file.
+                if (!$file = $fs->get_file_by_hash(sha1(urldecode($imagepath))) or $file->is_directory()) {
                     continue;
                 }
                 $filename = $file->get_filename();
