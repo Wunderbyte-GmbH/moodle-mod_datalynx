@@ -355,6 +355,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
                 }
             } else {
                 if ($operator === '') {
+                    // This is the "empty" operator.
                     $usecontent = false;
                     $sqlnot = $DB->sql_like("content", ":{$name}_hascontent");
                     $params["{$name}_hascontent"] = "%";
