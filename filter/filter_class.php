@@ -201,13 +201,14 @@ class datalynx_filter {
                 if (!empty($searchfield['AND'])) {
                     foreach ($searchfield['AND'] as $option) {
 
-                        // The operator "" means we look for empty fields, don't add fieldids.
-                        if($option[1] == "") $addthefield = false;
-                        else $addthefield = true;
-
                         if ($fieldsqloptions = $field->get_search_sql($option)) {
                             list($fieldsql, $fieldparams, $fromcontent) = $fieldsqloptions;
                             if ($fieldsql) {
+
+                                // The operator "" means we look for empty fields, don't add fieldids.
+                                if($option[1] == "") $addthefield = false;
+                                else $addthefield = true;
+
                                 // If we use values from content we make it an implied AND statement.
                                 // TODO: Make sure isdatalynxcontent does the same thing is_numeric promises to do.
                                 if (is_numeric($fieldid) && $isdatalynxcontent && $addthefield) {
