@@ -332,6 +332,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
                 $usecontent = true;
             }
         } else {
+            // Customfilter adds ANY_OF instead of OTHER_USER.
             if ($operator === 'OTHER_USER' || $operator === 'ANY_OF') {
 
                 $params[$name] = "%\"{$value}\"%";
