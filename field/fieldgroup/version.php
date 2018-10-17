@@ -15,15 +15,13 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- *
- * @package mod
- * @subpackage datalynx
- * @copyright 2015 onwards David Bogner
+ * @package datalynxfield
+ * @subpackage fieldgroup
+ * @copyright 2018 michael pollak <moodle@michaelpollak.org>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die();
-$plugin->component = 'mod_datalynx';
-$plugin->version = 2018101700;
-$plugin->release = '1.5.9 Skyler White'; // Famous movie, theater and tv series characters.
-$plugin->requires = 2016052300;
-$plugin->maturity = MATURITY_STABLE;
+
+$plugin->component = 'datalynxfield_fieldgroup';
+$plugin->version = 2015092200;
+$plugin->requires = 2014051200;

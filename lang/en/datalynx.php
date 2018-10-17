@@ -888,3 +888,14 @@ $string['privacy:metadata:datalynx_contents:content2'] = 'Additional content 2';
 $string['privacy:metadata:datalynx_contents:content3'] = 'Additional content 3';
 $string['privacy:metadata:datalynx_contents:content4'] = 'Additional content 4';
 $string['privacy:metadata:filepurpose'] = 'File or picture attached to a datalynx instance.';
+
+// Fieldgroups
+$string['fieldgroups'] = 'Fieldgroups';
+$string['fieldgroupfields'] = 'Fieldgroupfields'; // TODO: This name needs work.
+$string['fieldgroupsadd'] = 'Add fieldgroups';
+$string['newfieldgroup'] = 'New fieldgroup';
+$string['editingfieldgroup'] = 'Editing fieldgroup "{$a}"';
+$string['deletingfieldgroup'] = 'Deleting fieldgroup "{$a}"';
+$string['duplicatingfieldgroup'] = 'Duplicating fieldgroup "{$a}"';
+$string['confirmfieldgroupduplicate'] = 'You are about to duplicate this fieldgroup!';
+$string['confirmfieldgroupdelete'] = 'You are about to delete this fieldgroup!';

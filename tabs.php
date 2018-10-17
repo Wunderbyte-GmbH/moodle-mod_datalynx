@@ -101,7 +101,7 @@ if (isloggedin() and $istemplatemanager) {
     }
 
     if ($currenttab == 'fields' || $currenttab == 'fields2' || $currenttab == 'behaviors' ||
-            $currenttab == 'renderers'
+            $currenttab == 'renderers' || $currenttab == 'fieldgroups'
     ) {
         $inactive[] = 'fields';
         $activated[] = 'fields';
@@ -123,6 +123,9 @@ if (isloggedin() and $istemplatemanager) {
             $row[] = new tabobject('renderers',
                     new moodle_url('/mod/datalynx/renderer/index.php', array('d' => $this->id())),
                     get_string('renderers', 'datalynx'));
+            $row[] = new tabobject('fieldgroups',
+                    new moodle_url('/mod/datalynx/field/fieldgroup/index.php', array('d' => $this->id())),
+                    get_string('fieldgroups', 'datalynx'));
         }
 
         $tabs[] = $row;
