@@ -31,24 +31,30 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
 
     public function render_display_mode(stdClass $entry, array $params) {
         global $CFG;
-        // We want to display fields text1 and text2... Get this from field definition first.
-        $fieldgroupfields = 'text1,text2';
+        // We want to display these fields.
+        $fieldgroupfields = $this->_field->field->param1;
 
         // Create display for every field.
         $displ = '';
         $array = explode(',', $fieldgroupfields);
-        foreach($array as $field){
-            $this->_field->field = $this->get_fieldgroup_from_name($field); // Attach subfield.
-            $field = $this->_field;
 
-            // TODO: Test with all field classes..
-            $rendererclass = "datalynxfield_{$this->_field->field->type}_renderer";
-            require_once("$CFG->dirroot/mod/datalynx/field/{$this->_field->field->type}/renderer.php");
-            $fieldclass = new $rendererclass($field);
+        // Loop
+        for ($x = 0; $x < 3; $x++) {
+            $displ .= "</td></tr><tr><td>";
 
-            $displ .= "<br>".$this->_field->field->name.": ";
-            $displ .= $fieldclass->render_display_mode($entry, $params);
-            $displ .= "<br>";
+            foreach($array as $field){
+                $this->_field->field = $this->get_fieldgroup_from_name($field); // Attach subfield.
+                $field = $this->_field;
+
+                // TODO: Test with all field classes..
+                $rendererclass = "datalynxfield_{$this->_field->field->type}_renderer";
+                require_once("$CFG->dirroot/mod/datalynx/field/{$this->_field->field->type}/renderer.php");
+                $fieldclass = new $rendererclass($field);
+
+                $displ .= "".$this->_field->field->name.": ";
+                $displ .= $fieldclass->render_display_mode($entry, $params);
+                $displ .= "     ";
+            }
         }
 
         return $displ;
@@ -58,21 +64,33 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         global $CFG;
 
-        $fieldgroupfields = 'text1,text2';
+        $fieldgroupfields = $this->_field->field->param1;
         $array = explode(',', $fieldgroupfields);
-        foreach($array as $field)
-        {
-            $this->_field->field = $this->get_fieldgroup_from_name($field); // Attach subfield.
-            $field = $this->_field;
 
-            // TODO: Test with all field classes..
-            $rendererclass = "datalynxfield_{$this->_field->field->type}_renderer";
-            require_once("$CFG->dirroot/mod/datalynx/field/{$this->_field->field->type}/renderer.php");
-            $fieldclass = new $rendererclass($field);
+        // Loop through showdefault.
+        $showdefault = $this->_field->field->param3;
+        for ($x = 0; $x < $showdefault; $x++) {
 
-            // Add a static label.
-            $mform->addElement('static', '', $this->_field->field->name . ": ");
-            $fieldclass->render_edit_mode($mform, $entry, $options);
+            // Fix this table thing. TODO: Get rid of this table and use css.
+            $mform->addElement('html', '</td></tr><tr><td>');
+            foreach($array as $field){
+
+                $this->_field->field = $this->get_fieldgroup_from_name($field); // Attach subfield.
+                // $this->_field->field->fieldgroupid = 123; // Add fieldgroupid here maybe?
+                $field = $this->_field;
+
+                // TODO: Test with all field classes..
+                $rendererclass = "datalynxfield_{$this->_field->field->type}_renderer";
+                require_once("$CFG->dirroot/mod/datalynx/field/{$this->_field->field->type}/renderer.php");
+                $fieldclass = new $rendererclass($field);
+
+                // Add a static label.
+                $mform->addElement('static', '', $this->_field->field->name . ": ");
+                $fieldclass->render_edit_mode($mform, $entry, $options);
+
+                // TODO: Add here a hidden field that stores fieldgroupid somehow.
+
+            }
 
         }
     }
