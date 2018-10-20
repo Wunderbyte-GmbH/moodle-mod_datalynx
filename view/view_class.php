@@ -688,7 +688,7 @@ abstract class datalynxview_base {
             $this->view->{"e$editor"} = str_replace($tags, $replacements, $this->view->{"e$editor"});
         }
         // Remove customfilter tags after we have displayed them.
-        foreach ($tags as $key=>$value) {
+        foreach ($tags as $key => $value) {
             if (strpos($value, '##customfilter') !== false) {
                 unset($this->_tags['view'][$key]);
             }

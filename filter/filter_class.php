@@ -206,8 +206,11 @@ class datalynx_filter {
                             if ($fieldsql) {
 
                                 // The operator "" means we look for empty fields, don't add fieldids.
-                                if($option[1] == "") $addthefield = false;
-                                else $addthefield = true;
+                                if ($option[1] == "") {
+                                    $addthefield = false;
+                                } else {
+                                    $addthefield = true;
+                                }
 
                                 // If we use values from content we make it an implied AND statement.
                                 // TODO: Make sure isdatalynxcontent does the same thing is_numeric promises to do.
