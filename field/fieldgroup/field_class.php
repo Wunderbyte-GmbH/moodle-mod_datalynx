@@ -28,6 +28,10 @@ class datalynxfield_fieldgroup extends datalynxfield_base {
 
     public $type = 'fieldgroup';
 
+    protected function content_names() {
+        return array(''); // TODO: Maybe we can add fieldgroupid here?
+    }
+
     public function supports_group_by() {
         return false;
     }
