@@ -23,7 +23,7 @@
  */
 defined('MOODLE_INTERNAL') or die();
 $plugin->component = 'mod_datalynx';
-$plugin->version = 2018081700;
+$plugin->version = 2018092000;
 $plugin->release = '1.5.9 Skyler White'; // Famous movie, theater and tv series characters.
 $plugin->requires = 2016052300;
 $plugin->maturity = MATURITY_STABLE;
