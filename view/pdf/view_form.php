@@ -102,6 +102,7 @@ class datalynxview_pdf_form extends datalynxview_base_form {
         $mform->addElement('filemanager', 'pdfframe', get_string('image', 'datalynxview_pdf'), null,
                 $fileoptions);
         $mform->addHelpButton('pdfframe', 'pdfframe', 'datalynxview_pdf');
+        $mform->addElement('selectyesno', 'pdfframefirstpageonly', get_string('pdfframefirstpageonly', 'datalynxview_pdf'));
 
         // PDF Watermark.
         $mform->addElement('header', 'pdfwatermarkhdr', get_string('pdfwmark', 'datalynxview_pdf'));
@@ -295,6 +296,10 @@ class datalynxview_pdf_form extends datalynxview_base_form {
     }
 
     /**
+     * Prepare protection settings for being serialized
+     *
+     * @param stdClass $data
+     * @param stdClass $protection
      */
     protected function data_preprocess_protection(&$data, $protection) {
         $view = $this->_view;
@@ -329,6 +334,10 @@ class datalynxview_pdf_form extends datalynxview_base_form {
     }
 
     /**
+     * Prepare data for saving. All settings are saved in param1 as serialized values
+     *
+     * {@inheritDoc}
+     * @see datalynxview_base_form::get_data()
      */
     public function get_data($slashed = true) {
         if (!$data = parent::get_data($slashed)) {
