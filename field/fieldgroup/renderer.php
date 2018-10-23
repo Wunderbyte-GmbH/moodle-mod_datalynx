@@ -42,7 +42,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         for ($x = 0; $x < 3; $x++) {
             $displ .= "</td></tr><tr><td>";
 
-            foreach($array as $field){
+            foreach ($array as $field) {
                 $this->_field->field = $this->get_fieldgroup_from_name($field); // Attach subfield.
                 $field = $this->_field;
 
@@ -73,7 +73,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
 
             // Fix this table thing. TODO: Get rid of this table and use css.
             $mform->addElement('html', '</td></tr><tr><td>');
-            foreach($array as $field){
+            foreach ($array as $field) {
 
                 $this->_field->field = $this->get_fieldgroup_from_name($field); // Attach subfield.
                 // $this->_field->field->fieldgroupid = 123; // Add fieldgroupid here maybe?
