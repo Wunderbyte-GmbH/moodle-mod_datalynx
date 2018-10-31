@@ -981,9 +981,12 @@ class datalynx_filter_manager {
                                     $searchfields[$fieldname]['AND'][] = array('NOT', '', false);
                                 }
                             } else {
-                                // Analog to advanced filter form: searchfieldid - searchandor - not
-                                // - operator - value.
-                                $searchfields[$fieldname]['AND'][] = array('', 'ANY_OF', $value);
+                                // Analog to advanced filter form:
+                                // searchfieldid - searchandor - not - operator - value.
+                                // Only add to query when something is chosen, ignore empty values.
+                                if ($value) {
+                                    $searchfields[$fieldname]['AND'][] = array('', 'ANY_OF', $value);
+                                }
                             }
                         }
                 }
