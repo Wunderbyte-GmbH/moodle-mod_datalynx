@@ -51,9 +51,22 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 require_once("$CFG->dirroot/mod/datalynx/field/{$this->_field->field->type}/renderer.php");
                 $fieldclass = new $rendererclass($field);
 
+                // Retrieve only relevant part of content and hand it over.
+                $contentarray = $entry->{"c{$this->_field->field->id}_content"};
+                if (isset($contentarray) && is_array($contentarray)) {
+                    if (isset($contentarray[$x])) {
+                        $entry->{"c{$this->_field->field->id}_content"} = $contentarray[$x];
+                    } else {
+                        $entry->{"c{$this->_field->field->id}_content"} = "";
+                    }
+                }
+
                 $displ .= "".$this->_field->field->name.": ";
                 $displ .= $fieldclass->render_display_mode($entry, $params);
                 $displ .= "     ";
+
+                // Restore array to prior state.
+                $entry->{"c{$this->_field->field->id}_content"} = $contentarray;
             }
         }
 
@@ -64,20 +77,29 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         global $CFG;
 
-        $fieldgroupfields = $this->_field->field->param1;
-        $array = explode(',', $fieldgroupfields);
+        $fieldgroupfields = explode(',', $this->_field->field->param1);
 
         // Loop through showdefault.
         $showdefault = $this->_field->field->param3;
         for ($x = 0; $x < $showdefault; $x++) {
 
-            // Fix this table thing. TODO: Get rid of this table and use css.
-            $mform->addElement('html', '</td></tr><tr><td>');
-            foreach ($array as $field) {
+            $mform->addElement('html', '</td></tr><tr><td>'); // Fix this table thing. TODO: Get rid of this table and use css.
+            foreach ($fieldgroupfields as $field) {
 
                 $this->_field->field = $this->get_fieldgroup_from_name($field); // Attach subfield.
-                // $this->_field->field->fieldgroupid = 123; // Add fieldgroupid here maybe?
                 $field = $this->_field;
+
+                // We can inject content by editing the entry: $content = $entry->{"c{$fieldid}_content"};
+                // Retrieve only relevant part of content and hand it over.
+                $contentarray = $entry->{"c{$this->_field->field->id}_content"};
+                if (isset($contentarray) && is_array($contentarray)) {
+
+                    if (isset($contentarray[$x])) {
+                        $entry->{"c{$this->_field->field->id}_content"} = $contentarray[$x];
+                    } else {
+                        $entry->{"c{$this->_field->field->id}_content"} = "";
+                    }
+                }
 
                 // TODO: Test with all field classes..
                 $rendererclass = "datalynxfield_{$this->_field->field->type}_renderer";
@@ -88,10 +110,12 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 $mform->addElement('static', '', $this->_field->field->name . ": ");
                 $fieldclass->render_edit_mode($mform, $entry, $options);
 
-                // TODO: Add here a hidden field that stores fieldgroupid somehow.
+                // Restore array to prior state.
+                $entry->{"c{$this->_field->field->id}_content"} = $contentarray;
+
+                // TODO: Add here a hidden field that stores fieldgroupid somehow?
 
             }
-
         }
     }
 

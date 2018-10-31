@@ -352,15 +352,40 @@ class datalynx_entries {
                 $contents = $DB->get_records_select('datalynx_contents',
                         "entryid {$eids} AND fieldid {$fids}", $params);
 
+                // TODO: This needs streamlining. Maybe always use an array?
                 foreach ($contents as $contentid => $content) {
                     $entry = $entries->entries[$content->entryid];
+
+
+                    // Create the contentid part.
                     $fieldid = $content->fieldid;
                     $varcontentid = "c{$fieldid}_id";
-                    $entry->$varcontentid = $contentid;
+
+                    // If this has multiples we see a fieldgroup. Set as array and append.
+                    if (isset($entry->$varcontentid)) {
+                        if (!is_array($entry->$varcontentid)) {
+                            $entry->$varcontentid = array($entry->$varcontentid);
+                        }
+                        $entry->$varcontentid[] = $contentid;
+                    } else {
+                        $entry->$varcontentid = $contentid; // Normal case, only one content item.
+                    }
+
+                    // Create the content part(s) as one field can have multiple content values.
                     foreach ($fields[$fieldid]->get_content_parts() as $part) {
                         $varpart = "c{$fieldid}_$part";
-                        $entry->$varpart = $content->$part;
+
+                        // If this already exists we see a fieldgroup. Set as array and append.
+                        if (isset($entry->$varpart)) {
+                            if (!is_array($entry->$varpart)) {
+                                $entry->$varpart = array($entry->$varpart);
+                            }
+                            $entry->$varpart[] = $content->$part;
+                        } else {
+                            $entry->$varpart = $content->$part; // Normal case, only one content item.
+                        }
                     }
+
                     $entries->entries[$content->entryid] = $entry;
                 }
             }
