@@ -76,9 +76,9 @@ $string['csvfailed'] = 'Unable to read the raw data from the CSV file';
 $string['csvoutput'] = 'CSV output';
 $string['csvsettings'] = 'CSV settings';
 $string['csvwithselecteddelimiter'] = '<acronym title=\"Comma Separated Values\">CSV</acronym> text with selected delimiter:';
-$string['customfilter'] = 'Custom user filter';
+$string['customfilter'] = 'Custom filter';
 $string['customfilteradd'] = 'Add a custom filter';
-$string['customfilternew'] = 'New custom user filter';
+$string['customfilternew'] = 'New custom filter';
 $string['customfilters'] = 'Custom Filters';
 $string['customfiltersnoneindatalynx'] = 'There are no custom filters defined for this datalynx.';
 // Capability strings.
