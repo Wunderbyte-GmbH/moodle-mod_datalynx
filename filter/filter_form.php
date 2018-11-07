@@ -496,7 +496,7 @@ class mod_datalynx_customfilter_frontend_form extends mod_datalynx_filter_base_f
 
         if (!empty($sortfields)) {
             // Important, keep fieldids intact.
-            $sortfields=array(0=>get_string('choosedots'))+$sortfields;
+            $sortfields=array(0 => get_string('choosedots')) + $sortfields;
 
             $grp = array();
             $grp[] = $mform->createElement('select', 'customfiltersortfield', '', $sortfields);
