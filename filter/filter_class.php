@@ -156,6 +156,7 @@ class datalynx_filter {
             $this->_sortfields = is_array($this->customsort) ? $this->customsort : unserialize(
                     $this->customsort);
         }
+        // Defines what field should be sorted by.
         $customfiltersortfield = optional_param('customfiltersortfield', null, PARAM_INT);
         if ($customfiltersortfield) {
             $customfiltersortdirection = optional_param('customfiltersortdirection', '0', PARAM_INT);
