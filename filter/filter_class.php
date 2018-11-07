@@ -156,6 +156,7 @@ class datalynx_filter {
             $this->_sortfields = is_array($this->customsort) ? $this->customsort : unserialize(
                     $this->customsort);
         }
+        // Defines what field should be sorted by.
         $customfiltersortfield = optional_param('customfiltersortfield', null, PARAM_INT);
         if ($customfiltersortfield) {
             $customfiltersortdirection = optional_param('customfiltersortdirection', '0', PARAM_INT);
@@ -981,9 +982,12 @@ class datalynx_filter_manager {
                                     $searchfields[$fieldname]['AND'][] = array('NOT', '', false);
                                 }
                             } else {
-                                // Analog to advanced filter form: searchfieldid - searchandor - not
-                                // - operator - value.
-                                $searchfields[$fieldname]['AND'][] = array('', 'ANY_OF', $value);
+                                // Analog to advanced filter form:
+                                // searchfieldid - searchandor - not - operator - value.
+                                // Only add to query when something is chosen, ignore empty values.
+                                if ($value) {
+                                    $searchfields[$fieldname]['AND'][] = array('', 'ANY_OF', $value);
+                                }
                             }
                         }
                 }
