@@ -86,7 +86,6 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
 
             $mform->addElement('html', '</td></tr><tr><td>'); // Fix this table thing. TODO: Get rid of this table and use css.
 
-
             foreach ($fieldgroupfields as $field) {
 
                 $this->_field->field = $this->get_fieldgroup_from_name($field); // Attach subfield.
