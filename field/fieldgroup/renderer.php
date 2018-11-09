@@ -57,11 +57,12 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                     if (isset($contentarray[$x])) {
                         $entry->{"c{$this->_field->field->id}_content"} = $contentarray[$x];
                     } else {
+                        // This should not happen when we store empty values in the db.
                         $entry->{"c{$this->_field->field->id}_content"} = "";
                     }
                 }
 
-                $displ .= "".$this->_field->field->name.": ";
+                $displ .= "".$this->_field->field->name.": "; // Needs to be automated here, no html.
                 $displ .= $fieldclass->render_display_mode($entry, $params);
                 $displ .= "     ";
 
@@ -84,20 +85,23 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         for ($x = 0; $x < $showdefault; $x++) {
 
             $mform->addElement('html', '</td></tr><tr><td>'); // Fix this table thing. TODO: Get rid of this table and use css.
+
+
             foreach ($fieldgroupfields as $field) {
 
                 $this->_field->field = $this->get_fieldgroup_from_name($field); // Attach subfield.
                 $field = $this->_field;
 
-                // We can inject content by editing the entry: $content = $entry->{"c{$fieldid}_content"};
                 // Retrieve only relevant part of content and hand it over.
-                $contentarray = $entry->{"c{$this->_field->field->id}_content"};
-                if (isset($contentarray) && is_array($contentarray)) {
+                $tempcontent = $entry->{"c{$this->_field->field->id}_content"};
+                $tempentryid = $entry->id;
 
-                    if (isset($contentarray[$x])) {
-                        $entry->{"c{$this->_field->field->id}_content"} = $contentarray[$x];
+                // Don't touch content if it is not a fieldgroup.
+                if (isset($tempcontent) && is_array($tempcontent)) {
+                    if (isset($tempcontent[$x])) {
+                        $entry->{"c{$this->_field->field->id}_content"} = $tempcontent[$x];
                     } else {
-                        $entry->{"c{$this->_field->field->id}_content"} = "";
+                        $entry->{"c{$this->_field->field->id}_content"} = ""; // TODO: Let's keep this empty I guess.
                     }
                 }
 
@@ -108,10 +112,12 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
 
                 // Add a static label.
                 $mform->addElement('static', '', $this->_field->field->name . ": ");
+                $entry->id = $entry->id . "_" . $x; // Add iterator to fieldname.
                 $fieldclass->render_edit_mode($mform, $entry, $options);
 
                 // Restore array to prior state.
-                $entry->{"c{$this->_field->field->id}_content"} = $contentarray;
+                $entry->{"c{$this->_field->field->id}_content"} = $tempcontent;
+                $entry->id = $tempentryid;
 
                 // TODO: Add here a hidden field that stores fieldgroupid somehow?
 
@@ -123,7 +129,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         return false; // TODO: Remove from search.
     }
 
-    // TODO: What to validate?
+    // We call validation of subfields.
     public function validate($entryid, $tags, $formdata) {
         return array();
     }

@@ -631,7 +631,8 @@ class datalynx_entries {
                                     datalynxfield__approve::_APPROVED,
                                     datalynxfield_entryauthor::_USERID,
                                     datalynxfield_entryauthor::_USERNAME,
-                                    datalynxfield_entrygroup::_GROUP, datalynxfield__status::_STATUS
+                                    datalynxfield_entrygroup::_GROUP,
+                                    datalynxfield__status::_STATUS
                             );
 
                             $skipnotification = array();
@@ -641,7 +642,7 @@ class datalynx_entries {
                             foreach ($data as $name => $value) {
                                 // Assuming only field names contain field_.
                                 if (strpos($name, 'field_') !== false) {
-                                    list(, $fieldid, $entryid) = explode('_', $name);
+                                    list(, $fieldid, $entryid, $iterator) = explode('_', $name); // TODO: Added iterator.
                                     if (array_key_exists($fieldid, $fields)) {
                                         $field = $fields[$fieldid];
                                     } else {
@@ -678,7 +679,7 @@ class datalynx_entries {
                                                 $contents[$entryid]['fields'])
                                         ) {
                                             $contents[$entryid]['fields'][$fieldid] = $field->get_content_from_data(
-                                                    $entryid, $data);
+                                                    $entryid, $data); // TODO: If iterator exists, just add array here?
                                         }
                                     }
                                 }
