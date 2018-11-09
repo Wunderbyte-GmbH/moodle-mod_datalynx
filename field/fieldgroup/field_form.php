@@ -67,7 +67,7 @@ class datalynxfield_fieldgroup_form extends datalynxfield_form {
         $fieldgroupfields = explode(',', $data['param1']);
 
         foreach ($fieldgroupfields as $field) {
-            $record = $DB->get_record('datalynx_fields', array('name' => $field), $fields='type', $strictness=IGNORE_MULTIPLE);
+            $record = $DB->get_record('datalynx_fields', array('name' => $field), 'type', 'IGNORE_MULTIPLE');
             if (!$record) {
                 $errors['param1'] = "Sorry, a field with the name " . $field . " was not found."; // TODO: Multilang.
             } elseif (!in_array($record->type, $workingfields)) {
