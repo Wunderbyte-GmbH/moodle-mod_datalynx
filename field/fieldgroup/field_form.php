@@ -70,7 +70,7 @@ class datalynxfield_fieldgroup_form extends datalynxfield_form {
             $record = $DB->get_record('datalynx_fields', array('name' => $field), 'type', 'IGNORE_MULTIPLE');
             if (!$record) {
                 $errors['param1'] = "Sorry, a field with the name " . $field . " was not found."; // TODO: Multilang.
-            } elseif (!in_array($record->type, $workingfields)) {
+            } else if (!in_array($record->type, $workingfields)) {
                 $errors['param1'] = "Sorry, fields of type " . $record->type . " are not yet supported in fieldgroups."; // TODO: Multilang.
             }
         }
