@@ -275,35 +275,48 @@ abstract class datalynxfield_base {
         global $DB;
 
         $fieldid = $this->field->id;
-        $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
-        list($contents, $oldcontents) = $this->format_content($entry, $values);
 
-        $rec = new stdClass();
-        $rec->fieldid = $this->field->id;
-        $rec->entryid = $entry->id;
-        foreach ($contents as $key => $content) {
-            $c = $key ? $key : '';
-            $rec->{"content$c"} = $content;
-        }
+        $contentids = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
 
-        // Insert only if no old contents and there is new contents.
-        if (is_null($contentid) and !empty($contents)) {
-            return $DB->insert_record('datalynx_contents', $rec);
-        }
+        // In case this is an array we see a fieldgroup, else make array.
+        if (!is_array($contentids)) $contentids = array($contentids);
 
-        // Delete if old content but not new.
-        if (!is_null($contentid) and empty($contents)) {
-            return $this->delete_content($entry->id);
-        }
+        // Run through every iteration of this field.
+        foreach ($contentids as $contentid) {
 
-        // Update if new is different from old.
-        if (!is_null($contentid)) {
+            list($contents, $oldcontents) = $this->format_content($entry, $values);
+
+            $rec = new stdClass();
+            $rec->fieldid = $this->field->id;
+            $rec->entryid = $entry->id;
             foreach ($contents as $key => $content) {
-                if (!isset($oldcontents[$key]) or $content !== $oldcontents[$key]) {
-                    $rec->id = $contentid; // MUST_EXIST.
-                    return $DB->update_record('datalynx_contents', $rec);
+                $c = $key ? $key : '';
+                $rec->{"content$c"} = $content;
+            }
+
+            // Insert only if no old contents and there is new contents.
+            if (is_null($contentid) and !empty($contents)) {
+                return $DB->insert_record('datalynx_contents', $rec);
+            }
+
+            // Delete if old content but not new.
+            if (!is_null($contentid) and empty($contents)) {
+                return $this->delete_content($entry->id);
+            }
+
+            // Update if new is different from old.
+            if (!is_null($contentid)) {
+                foreach ($contents as $key => $content) {
+                    if (!isset($oldcontents[$key]) or $content !== $oldcontents[$key]) {
+                        $rec->id = $contentid; // MUST_EXIST.
+                        return $DB->update_record('datalynx_contents', $rec);
+                    }
                 }
             }
+
+            // Remove first value from contents array.
+            // TODO: Check if this is correct in every instance.
+            array_shift($values); // Already updated.
         }
 
         return true;
@@ -402,6 +415,19 @@ abstract class datalynxfield_base {
                 $content[$name] = $data->$contentname;
             }
         }
+
+        // In case the entryid is followed by _0 we see a fieldgroup.
+        // TODO: Extend to all content_names.
+        $delim = $name = ''; // Just read content0 for now.
+        $i = 0;
+        $contentname = "field_{$fieldid}_$entryid" . "_0" . $delim . $name;
+
+        while (isset($data->$contentname)) {
+            $content[$contentname] = $data->$contentname;
+            $i++;
+            $contentname = "field_{$fieldid}_$entryid" . "_" . $i . $delim . $name;
+        }
+
         return $content;
     }
 

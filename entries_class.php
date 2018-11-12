@@ -356,19 +356,18 @@ class datalynx_entries {
                 foreach ($contents as $contentid => $content) {
                     $entry = $entries->entries[$content->entryid];
 
-
                     // Create the contentid part.
                     $fieldid = $content->fieldid;
                     $varcontentid = "c{$fieldid}_id";
 
                     // If this has multiples we see a fieldgroup. Set as array and append.
-                    if (isset($entry->$varcontentid)) {
-                        if (!is_array($entry->$varcontentid)) {
-                            $entry->$varcontentid = array($entry->$varcontentid);
+                    if (isset($entry->{$varcontentid})) {
+                        if (!is_array($entry->{$varcontentid})) {
+                            $entry->{$varcontentid} = array($entry->{$varcontentid});
                         }
                         $entry->$varcontentid[] = $contentid;
                     } else {
-                        $entry->$varcontentid = $contentid; // Normal case, only one content item.
+                        $entry->{$varcontentid} = $contentid; // Normal case, only one content item.
                     }
 
                     // Create the content part(s) as one field can have multiple content values.
@@ -376,13 +375,13 @@ class datalynx_entries {
                         $varpart = "c{$fieldid}_$part";
 
                         // If this already exists we see a fieldgroup. Set as array and append.
-                        if (isset($entry->$varpart)) {
+                        if (isset($entry->{$varpart})) {
                             if (!is_array($entry->$varpart)) {
-                                $entry->$varpart = array($entry->$varpart);
+                                $entry->{$varpart} = array($entry->{$varpart});
                             }
-                            $entry->$varpart[] = $content->$part;
+                            $entry->$varpart[] = $content->{$part};
                         } else {
-                            $entry->$varpart = $content->$part; // Normal case, only one content item.
+                            $entry->{$varpart} = $content->{$part}; // Normal case, only one content item.
                         }
                     }
 
@@ -637,7 +636,6 @@ class datalynx_entries {
 
                             $skipnotification = array();
                             $drafttofinal = array();
-
                             // Iterate the data and extract entry and fields content.
                             foreach ($data as $name => $value) {
                                 // Assuming only field names contain field_.
@@ -679,7 +677,7 @@ class datalynx_entries {
                                                 $contents[$entryid]['fields'])
                                         ) {
                                             $contents[$entryid]['fields'][$fieldid] = $field->get_content_from_data(
-                                                    $entryid, $data); // TODO: If iterator exists, just add array here?
+                                                    $entryid, $data);
                                         }
                                     }
                                 }
@@ -693,6 +691,7 @@ class datalynx_entries {
                                 }
                             }
                             $newcontents = array();
+
                             foreach ($contents as $entryid => $oldcontent) {
                                 $newcontents[$entryid] = array();
                                 if ($entryid != $firstentryid) {
@@ -731,6 +730,7 @@ class datalynx_entries {
                                 }
 
                                 if ($entry->id = $this->update_entry($entry, $contents[$eid]['info'])) {
+
                                     // Variable $eid should be different from $entryid only in new entries.
                                     foreach ($contents[$eid]['fields'] as $fieldid => $content) {
                                         $fields[$fieldid]->update_content($entry, $content);
