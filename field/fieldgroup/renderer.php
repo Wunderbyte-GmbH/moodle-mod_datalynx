@@ -42,32 +42,33 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         for ($x = 0; $x < 3; $x++) {
             $displ .= "</td></tr><tr><td>";
 
-            foreach ($array as $field) {
-                $this->_field->field = $this->get_fieldgroup_from_name($field); // Attach subfield.
-                $field = $this->_field;
+            foreach ($array as $fieldname) {
+                $subfield = clone $this->_field; // Clone fields so we don't mess with references.
+                $subfield->field = $this->get_fieldgroup_from_name($fieldname); // Attach subfield.
+
 
                 // TODO: Test with all field classes..
-                $rendererclass = "datalynxfield_{$this->_field->field->type}_renderer";
-                require_once("$CFG->dirroot/mod/datalynx/field/{$this->_field->field->type}/renderer.php");
-                $fieldclass = new $rendererclass($field);
+                $rendererclass = "datalynxfield_{$subfield->field->type}_renderer";
+                require_once("$CFG->dirroot/mod/datalynx/field/{$subfield->field->type}/renderer.php");
+                $fieldclass = new $rendererclass($subfield);
 
                 // Retrieve only relevant part of content and hand it over.
-                $contentarray = $entry->{"c{$this->_field->field->id}_content"};
+                $contentarray = $entry->{"c{$subfield->field->id}_content"};
                 if (isset($contentarray) && is_array($contentarray)) {
                     if (isset($contentarray[$x])) {
-                        $entry->{"c{$this->_field->field->id}_content"} = $contentarray[$x];
+                        $entry->{"c{$subfield->field->id}_content"} = $contentarray[$x];
                     } else {
                         // This should not happen when we store empty values in the db.
-                        $entry->{"c{$this->_field->field->id}_content"} = "";
+                        $entry->{"c{$subfield->field->id}_content"} = "";
                     }
                 }
-
-                $displ .= "".$this->_field->field->name.": "; // Needs to be automated here, no html.
+                $displ .= "" . $subfield->field->name . ": "; // Needs to be automated here, no html.
                 $displ .= $fieldclass->render_display_mode($entry, $params);
                 $displ .= "     ";
 
                 // Restore array to prior state.
-                $entry->{"c{$this->_field->field->id}_content"} = $contentarray;
+                $entry->{"c{$subfield->field->id}_content"} = $contentarray;
+
             }
         }
 
