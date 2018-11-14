@@ -276,15 +276,22 @@ abstract class datalynxfield_base {
 
         $fieldid = $this->field->id;
 
-        $contentids = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
+        // TODO: Create function that only kicks in when we see a fieldgroup. As soon as we se arrays here it is.
+        // $entry->{"c{$fieldid}_id"}  Array ( [0] => 60 [1] => 835 ) // DELETETHIS
 
-        // In case this is an array we see a fieldgroup, else make array.
-        if (!is_array($contentids)) $contentids = array($contentids);
+        // Run trough all values, check if they do have an associated contentid, else make it null.
+        for ($i = 0; $i <= count($values); $i++) {
+            $contentids[$i] = isset($entry->{"c{$fieldid}_id"}[$i]) ? $entry->{"c{$fieldid}_id"}[$i] : null;
+        }
 
         // Run through every iteration of this field.
         foreach ($contentids as $contentid) {
 
             list($contents, $oldcontents) = $this->format_content($entry, $values);
+
+            // Remove first value from contents array.
+            // TODO: Check if this is correct in every instance.
+            array_shift($values); // Already updated.
 
             $rec = new stdClass();
             $rec->fieldid = $this->field->id;
@@ -296,12 +303,15 @@ abstract class datalynxfield_base {
 
             // Insert only if no old contents and there is new contents.
             if (is_null($contentid) and !empty($contents)) {
-                return $DB->insert_record('datalynx_contents', $rec);
+                $DB->insert_record('datalynx_contents', $rec);
+                continue;
             }
 
             // Delete if old content but not new.
             if (!is_null($contentid) and empty($contents)) {
-                return $this->delete_content($entry->id);
+                // TODO: Test some more, why are empty values updated?
+                $this->delete_content($entry->id);
+                continue;
             }
 
             // Update if new is different from old.
@@ -309,16 +319,12 @@ abstract class datalynxfield_base {
                 foreach ($contents as $key => $content) {
                     if (!isset($oldcontents[$key]) or $content !== $oldcontents[$key]) {
                         $rec->id = $contentid; // MUST_EXIST.
-                        return $DB->update_record('datalynx_contents', $rec);
+                        $DB->update_record('datalynx_contents', $rec);
+                        continue;
                     }
                 }
             }
-
-            // Remove first value from contents array.
-            // TODO: Check if this is correct in every instance.
-            array_shift($values); // Already updated.
         }
-
         return true;
     }
 

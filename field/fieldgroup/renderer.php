@@ -92,7 +92,9 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 $field = $this->_field;
 
                 // Retrieve only relevant part of content and hand it over.
-                $tempcontent = $entry->{"c{$this->_field->field->id}_content"};
+                if ( isset ( $entry->{"c{$this->_field->field->id}_content"}) ) {
+                    $tempcontent = $entry->{"c{$this->_field->field->id}_content"};
+                } else { $tempcontent = ''; }
                 $tempentryid = $entry->id;
 
                 // Don't touch content if it is not a fieldgroup.
