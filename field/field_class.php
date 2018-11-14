@@ -424,7 +424,7 @@ abstract class datalynxfield_base {
 
         // In case the entryid is followed by _0 we see a fieldgroup.
         // TODO: Extend to all content_names.
-        $delim = $name = ''; // Just read content0 for now.
+        $delim = $name = ''; // Just read content for now.
         $i = 0;
         $contentname = "field_{$fieldid}_$entryid" . "_0" . $delim . $name;
 

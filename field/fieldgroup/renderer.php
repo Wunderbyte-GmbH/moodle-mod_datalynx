@@ -32,20 +32,19 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
     public function render_display_mode(stdClass $entry, array $params) {
         global $CFG;
         // We want to display these fields.
-        $fieldgroupfields = $this->_field->field->param1;
+        $fieldgroupfields = explode(',', $this->_field->field->param1);
 
         // Create display for every field.
         $displ = '';
-        $array = explode(',', $fieldgroupfields);
 
-        // Loop
-        for ($x = 0; $x < 3; $x++) {
+        // Loop through showdefault.
+        $showdefault = $this->_field->field->param3;
+        for ($x = 0; $x < $showdefault; $x++) {
             $displ .= "</td></tr><tr><td>";
 
-            foreach ($array as $fieldname) {
+            foreach ($fieldgroupfields as $fieldname) {
                 $subfield = clone $this->_field; // Clone fields so we don't mess with references.
                 $subfield->field = $this->get_fieldgroup_from_name($fieldname); // Attach subfield.
-
 
                 // TODO: Test with all field classes..
                 $rendererclass = "datalynxfield_{$subfield->field->type}_renderer";
@@ -68,17 +67,14 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
 
                 // Restore array to prior state.
                 $entry->{"c{$subfield->field->id}_content"} = $contentarray;
-
             }
         }
-
         return $displ;
-
     }
 
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         global $CFG;
-
+        // We want to display these fields.
         $fieldgroupfields = explode(',', $this->_field->field->param1);
 
         // Loop through showdefault.
@@ -87,42 +83,40 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
 
             $mform->addElement('html', '</td></tr><tr><td>'); // Fix this table thing. TODO: Get rid of this table and use css.
 
-            foreach ($fieldgroupfields as $field) {
+            foreach ($fieldgroupfields as $fieldname) {
+                $subfield = clone $this->_field; // Clone fields so we don't mess with references.
+                $subfield->field = $this->get_fieldgroup_from_name($fieldname); // Attach subfield.
 
-                $this->_field->field = $this->get_fieldgroup_from_name($field); // Attach subfield.
-                $field = $this->_field;
+                // TODO: Test with all field classes..
+                $rendererclass = "datalynxfield_{$subfield->field->type}_renderer";
+                require_once("$CFG->dirroot/mod/datalynx/field/{$subfield->field->type}/renderer.php");
+                $fieldclass = new $rendererclass($subfield);
 
                 // Retrieve only relevant part of content and hand it over.
-                if ( isset ( $entry->{"c{$this->_field->field->id}_content"}) ) {
-                    $tempcontent = $entry->{"c{$this->_field->field->id}_content"};
-                } else { $tempcontent = ''; }
+                if ( isset ( $entry->{"c{$subfield->field->id}_content"}) ) {
+                    $tempcontent = $entry->{"c{$subfield->field->id}_content"};
+                } else {
+                    $tempcontent = '';
+                }
                 $tempentryid = $entry->id;
 
                 // Don't touch content if it is not a fieldgroup.
                 if (isset($tempcontent) && is_array($tempcontent)) {
                     if (isset($tempcontent[$x])) {
-                        $entry->{"c{$this->_field->field->id}_content"} = $tempcontent[$x];
+                        $entry->{"c{$subfield->field->id}_content"} = $tempcontent[$x];
                     } else {
-                        $entry->{"c{$this->_field->field->id}_content"} = ""; // TODO: Let's keep this empty I guess.
+                        $entry->{"c{$subfield->field->id}_content"} = ""; // TODO: Let's keep this empty I guess.
                     }
                 }
 
-                // TODO: Test with all field classes..
-                $rendererclass = "datalynxfield_{$this->_field->field->type}_renderer";
-                require_once("$CFG->dirroot/mod/datalynx/field/{$this->_field->field->type}/renderer.php");
-                $fieldclass = new $rendererclass($field);
-
                 // Add a static label.
-                $mform->addElement('static', '', $this->_field->field->name . ": ");
+                $mform->addElement('static', '', $subfield->field->name . ": ");
                 $entry->id = $entry->id . "_" . $x; // Add iterator to fieldname.
                 $fieldclass->render_edit_mode($mform, $entry, $options);
 
                 // Restore array to prior state.
-                $entry->{"c{$this->_field->field->id}_content"} = $tempcontent;
+                $entry->{"c{$subfield->field->id}_content"} = $tempcontent;
                 $entry->id = $tempentryid;
-
-                // TODO: Add here a hidden field that stores fieldgroupid somehow?
-
             }
         }
     }
