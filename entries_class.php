@@ -342,6 +342,7 @@ class datalynx_entries {
                     $entries->entries = $DB->get_records_sql($sqlselect, $allparams);
                 }
             }
+
             // Now get the contents if required and add it to the entry objects.
             if ($datalynxcontent && $entries->entries) {
                 // Get the node content of the requested entries.
@@ -352,9 +353,7 @@ class datalynx_entries {
                 $contents = $DB->get_records_select('datalynx_contents',
                         "entryid {$eids} AND fieldid {$fids}", $params);
 
-                // TODO: Do the standard thing with a single field content. Reuse default codebase.
-
-                // If we see multiple, build array with different name, write a simple function.
+                // If we see multiple contents to one entry and field, build array with postfix _fieldgroup.
                 foreach ($contents as $contentid => $content) {
                     $entry = $entries->entries[$content->entryid];
 
@@ -364,24 +363,26 @@ class datalynx_entries {
 
                     // If this has multiples we see a fieldgroup. Set as array and append.
                     if (isset($entry->{$varcontentid})) {
-                        if (!is_array($entry->{$varcontentid})) {
-                            $entry->{$varcontentid} = array($entry->{$varcontentid});
+                        $varcontentids = "c{$fieldid}_id_fieldgroup";
+                        if (!isset($entry->{$varcontentids})) {
+                            $entry->{$varcontentids} = array($entry->{$varcontentid});
                         }
-                        $entry->{$varcontentid}[] = $contentid;
+                        $entry->{$varcontentids}[] = $contentid;
                     } else {
                         $entry->{$varcontentid} = $contentid; // Normal case, only one content item.
                     }
 
                     // Create the content part(s) as one field can have multiple content values.
                     foreach ($fields[$fieldid]->get_content_parts() as $part) {
-                        $varpart = "c{$fieldid}_$part" . "_fieldgroup"; // Look for _fieldgroup within the field_class.
+                        $varpart = "c{$fieldid}_$part";
 
                         // If this already exists we see a fieldgroup. Set as array and append.
                         if (isset($entry->{$varpart})) {
-                            if (!is_array($entry->$varpart)) {
-                                $entry->{$varpart} = array($entry->{$varpart});
+                            $varparts = "c{$fieldid}_$part" . "_fieldgroup";
+                            if (!isset($entry->{$varparts})) {
+                                $entry->{$varparts} = array($entry->{$varpart});
                             }
-                            $entry->{$varpart}[] = $content->{$part};
+                            $entry->{$varparts}[] = $content->{$part};
                         } else {
                             $entry->{$varpart} = $content->{$part}; // Normal case, only one content item.
                         }
@@ -642,7 +643,7 @@ class datalynx_entries {
                             foreach ($data as $name => $value) {
                                 // Assuming only field names contain field_.
                                 if (strpos($name, 'field_') !== false) {
-                                    list(, $fieldid, $entryid, $iterator) = explode('_', $name); // TODO: Added iterator.
+                                    list(, $fieldid, $entryid) = explode('_', $name);
                                     if (array_key_exists($fieldid, $fields)) {
                                         $field = $fields[$fieldid];
                                     } else {

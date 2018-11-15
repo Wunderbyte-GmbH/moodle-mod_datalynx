@@ -62,12 +62,10 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                         $entry->{"c{$subfield->field->id}_content"} = "";
                     }
                 }
+
                 $displ .= "" . $subfield->field->name . ": "; // Needs to be automated here, no html.
                 $displ .= $fieldclass->render_display_mode($entry, $params);
                 $displ .= "     ";
-
-                // Restore array to prior state.
-                $entry->{"c{$subfield->field->id}_content_fieldgroup"} = $contentarray;
             }
         }
         return $displ;
@@ -115,8 +113,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 $entry->id = $entry->id . "_" . $x; // Add iterator to fieldname.
                 $fieldclass->render_edit_mode($mform, $entry, $options);
 
-                // Restore array to prior state.
-                $entry->{"c{$subfield->field->id}_content_fieldgroup"} = $tempcontent;
+                // Restore entryid to prior state.
                 $entry->id = $tempentryid;
             }
         }

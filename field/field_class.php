@@ -281,7 +281,7 @@ abstract class datalynxfield_base {
 
         // Run trough all values, check if they do have an associated contentid, else make it null.
         for ($i = 0; $i <= count($values); $i++) {
-            $contentids[$i] = isset($entry->{"c{$fieldid}_id"}[$i]) ? $entry->{"c{$fieldid}_id"}[$i] : null;
+            $contentids[$i] = isset($entry->{"c{$fieldid}_id_fieldgroup"}[$i]) ? $entry->{"c{$fieldid}_id_fieldgroup"}[$i] : null;
         }
 
         // Run through every iteration of this field.
