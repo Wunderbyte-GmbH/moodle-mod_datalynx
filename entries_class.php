@@ -352,7 +352,9 @@ class datalynx_entries {
                 $contents = $DB->get_records_select('datalynx_contents',
                         "entryid {$eids} AND fieldid {$fids}", $params);
 
-                // TODO: This needs streamlining. Maybe always use an array?
+                // TODO: Do the standard thing with a single field content. Reuse default codebase.
+
+                // If we see multiple, build array with different name, write a simple function.
                 foreach ($contents as $contentid => $content) {
                     $entry = $entries->entries[$content->entryid];
 
@@ -365,21 +367,21 @@ class datalynx_entries {
                         if (!is_array($entry->{$varcontentid})) {
                             $entry->{$varcontentid} = array($entry->{$varcontentid});
                         }
-                        $entry->$varcontentid[] = $contentid;
+                        $entry->{$varcontentid}[] = $contentid;
                     } else {
                         $entry->{$varcontentid} = $contentid; // Normal case, only one content item.
                     }
 
                     // Create the content part(s) as one field can have multiple content values.
                     foreach ($fields[$fieldid]->get_content_parts() as $part) {
-                        $varpart = "c{$fieldid}_$part";
+                        $varpart = "c{$fieldid}_$part" . "_fieldgroup"; // Look for _fieldgroup within the field_class.
 
                         // If this already exists we see a fieldgroup. Set as array and append.
                         if (isset($entry->{$varpart})) {
                             if (!is_array($entry->$varpart)) {
                                 $entry->{$varpart} = array($entry->{$varpart});
                             }
-                            $entry->$varpart[] = $content->{$part};
+                            $entry->{$varpart}[] = $content->{$part};
                         } else {
                             $entry->{$varpart} = $content->{$part}; // Normal case, only one content item.
                         }
