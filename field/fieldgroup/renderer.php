@@ -52,7 +52,8 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 $fieldclass = new $rendererclass($subfield);
 
                 // Retrieve only relevant part of content and hand it over.
-                $contentarray = $entry->{"c{$subfield->field->id}_content"};
+                $contentarray = $entry->{"c{$subfield->field->id}_content_fieldgroup"};
+
                 if (isset($contentarray) && is_array($contentarray)) {
                     if (isset($contentarray[$x])) {
                         $entry->{"c{$subfield->field->id}_content"} = $contentarray[$x];
@@ -66,7 +67,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 $displ .= "     ";
 
                 // Restore array to prior state.
-                $entry->{"c{$subfield->field->id}_content"} = $contentarray;
+                $entry->{"c{$subfield->field->id}_content_fieldgroup"} = $contentarray;
             }
         }
         return $displ;
@@ -93,8 +94,8 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 $fieldclass = new $rendererclass($subfield);
 
                 // Retrieve only relevant part of content and hand it over.
-                if ( isset ( $entry->{"c{$subfield->field->id}_content"}) ) {
-                    $tempcontent = $entry->{"c{$subfield->field->id}_content"};
+                if ( isset ( $entry->{"c{$subfield->field->id}_content_fieldgroup"}) ) {
+                    $tempcontent = $entry->{"c{$subfield->field->id}_content_fieldgroup"};
                 } else {
                     $tempcontent = '';
                 }
@@ -115,7 +116,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 $fieldclass->render_edit_mode($mform, $entry, $options);
 
                 // Restore array to prior state.
-                $entry->{"c{$subfield->field->id}_content"} = $tempcontent;
+                $entry->{"c{$subfield->field->id}_content_fieldgroup"} = $tempcontent;
                 $entry->id = $tempentryid;
             }
         }
