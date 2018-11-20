@@ -283,7 +283,6 @@ abstract class datalynxfield_base {
         for ($i = 0; $i <= count($values); $i++) {
             $contentids[$i] = isset($entry->{"c{$fieldid}_id_fieldgroup"}[$i]) ? $entry->{"c{$fieldid}_id_fieldgroup"}[$i] : null;
         }
-
         // Run through every iteration of this field.
         foreach ($contentids as $contentid) {
 
@@ -292,6 +291,7 @@ abstract class datalynxfield_base {
             // Remove first value from contents array.
             // TODO: Check if this is correct in every instance.
             array_shift($values); // Already updated.
+            array_shift($entry->{"c{$fieldid}_content_fieldgroup"}); // Keep oldcontents correct.
 
             $rec = new stdClass();
             $rec->fieldid = $this->field->id;
@@ -319,11 +319,13 @@ abstract class datalynxfield_base {
                 foreach ($contents as $key => $content) {
                     if (!isset($oldcontents[$key]) or $content !== $oldcontents[$key]) {
                         $rec->id = $contentid; // MUST_EXIST.
+                        // print_r("<br><br><br>update:"); print_r($rec); // DEBUG: Check what we update.
                         $DB->update_record('datalynx_contents', $rec);
                         continue;
                     }
                 }
             }
+
         }
         return true;
     }
@@ -434,6 +436,12 @@ abstract class datalynxfield_base {
             $contentname = "field_{$fieldid}_$entryid" . "_" . $i . $delim . $name;
         }
 
+        /*
+        // Testing with _url
+        $contentname = "field_{$fieldid}_$entryid" . "_1_url";
+        if (isset($data->$contentname)) $content[$contentname] = $data->$contentname;
+        */
+
         return $content;
     }
 
@@ -481,6 +489,10 @@ abstract class datalynxfield_base {
 
         if (isset($entry->{"c{$fieldid}_content"})) {
             $oldcontent = $entry->{"c{$fieldid}_content"};
+        }
+        // Fieldgroup overwrites normal oldcontent. TODO: Test.
+        if (isset($entry->{"c{$fieldid}_content_fieldgroup"})) {
+            $oldcontent = $entry->{"c{$fieldid}_content_fieldgroup"};
         }
 
         return array(array($newcontent), array($oldcontent));

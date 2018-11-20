@@ -61,6 +61,9 @@ class datalynxfield_url extends datalynxfield_base {
         if (!empty($values)) {
             foreach ($values as $name => $value) {
                 if ($name) { // Update from form.
+
+                    $name=substr($name, -3); // Just remove the field_ for fieldgroup.
+
                     switch ($name) {
                         case 'url':
                             if ($value and $value != 'http://') {
