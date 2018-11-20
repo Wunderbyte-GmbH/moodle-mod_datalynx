@@ -46,21 +46,32 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 $subfield = clone $this->_field; // Clone fields so we don't mess with references.
                 $subfield->field = $this->get_fieldgroup_from_name($fieldname); // Attach subfield.
 
+                // E.g. for urls we need specific properties, how to fix this for all types?
+                $params = $this->fieldspecific($subfield, $params);
+
                 // TODO: Test with all field classes..
                 $rendererclass = "datalynxfield_{$subfield->field->type}_renderer";
                 require_once("$CFG->dirroot/mod/datalynx/field/{$subfield->field->type}/renderer.php");
                 $fieldclass = new $rendererclass($subfield);
 
-                // Retrieve only relevant part of content and hand it over.
-                $contentarray = $entry->{"c{$subfield->field->id}_content_fieldgroup"};
 
-                if (isset($contentarray) && is_array($contentarray)) {
-                    if (isset($contentarray[$x])) {
-                        $entry->{"c{$subfield->field->id}_content"} = $contentarray[$x];
+                // Retrieve only relevant part of content and hand it over.
+                // TODO: This throws errors when _fieldgroup is not set.
+                if (isset($entry->{"c{$subfield->field->id}_content_fieldgroup"})) {
+                    $contentarray = $entry->{"c{$subfield->field->id}_content_fieldgroup"};
+                } else {
+                    // If we have exactly one content, show this and leave the rest blank.
+                    if (isset( $entry->{"c{$subfield->field->id}_content"} )) {
+                        $contentarray = array( $entry->{"c{$subfield->field->id}_content"} );
                     } else {
-                        // This should not happen when we store empty values in the db.
-                        $entry->{"c{$subfield->field->id}_content"} = "";
+                        $contentarray = array();
                     }
+                }
+
+                if (isset($contentarray[$x])) {
+                    $entry->{"c{$subfield->field->id}_content"} = $contentarray[$x];
+                } else {
+                    $entry->{"c{$subfield->field->id}_content"} = "";
                 }
 
                 $displ .= "" . $subfield->field->name . ": "; // Needs to be automated here, no html.
@@ -95,18 +106,24 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 if ( isset ( $entry->{"c{$subfield->field->id}_content_fieldgroup"}) ) {
                     $tempcontent = $entry->{"c{$subfield->field->id}_content_fieldgroup"};
                 } else {
-                    $tempcontent = '';
+                    // If we have exactly one content, show this and leave the rest blank.
+                    if (isset( $entry->{"c{$subfield->field->id}_content"} )) {
+                        $tempcontent = array( $entry->{"c{$subfield->field->id}_content"} );
+                    } else {
+                        $tempcontent = array();
+                    }
                 }
                 $tempentryid = $entry->id;
 
                 // Don't touch content if it is not a fieldgroup.
-                if (isset($tempcontent) && is_array($tempcontent)) {
-                    if (isset($tempcontent[$x])) {
-                        $entry->{"c{$subfield->field->id}_content"} = $tempcontent[$x];
-                    } else {
-                        $entry->{"c{$subfield->field->id}_content"} = ""; // TODO: Let's keep this empty I guess.
-                    }
+                if (isset($tempcontent[$x])) {
+                    $entry->{"c{$subfield->field->id}_content"} = $tempcontent[$x];
+                } else {
+                    $entry->{"c{$subfield->field->id}_content"} = "";
                 }
+
+
+
 
                 // Add a static label.
                 $mform->addElement('static', '', $subfield->field->name . ": ");
@@ -145,5 +162,19 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         global $DB;
         $record = $DB->get_record('datalynx_fields', array('name' => $name));
         return $record;
+    }
+
+    public static function fieldspecific($subfield, $params) {
+        switch ($subfield->field->type) {
+            case 'url':
+                // Urls call property class and target.
+                $subfield->class = $subfield->field->param3;
+                $subfield->target = $subfield->field->param4;
+                // Urls do use a parameter here.
+                $params['link'] = true;
+                break;
+        }
+        // Return the possible unchanged params.
+        return $params;
     }
 }

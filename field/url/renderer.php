@@ -79,6 +79,8 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
         $types = array_intersect(['link', 'image', 'imageflex', 'media'
         ], array_keys($params));
         $type = isset($types[0]) ? $types[0] : '';
+
+        // TODO: In fieldgroups this fails, why aren't these read from field->param3?
         $attributes = array('class' => $field->class, 'target' => $field->target);
 
         if (isset($entry->{"c{$fieldid}_content"})) {
