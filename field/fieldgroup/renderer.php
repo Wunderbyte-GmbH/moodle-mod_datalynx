@@ -54,7 +54,6 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 require_once("$CFG->dirroot/mod/datalynx/field/{$subfield->field->type}/renderer.php");
                 $fieldclass = new $rendererclass($subfield);
 
-
                 // Retrieve only relevant part of content and hand it over.
                 // TODO: This throws errors when _fieldgroup is not set.
                 if (isset($entry->{"c{$subfield->field->id}_content_fieldgroup"})) {
@@ -121,9 +120,6 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 } else {
                     $entry->{"c{$subfield->field->id}_content"} = "";
                 }
-
-
-
 
                 // Add a static label.
                 $mform->addElement('static', '', $subfield->field->name . ": ");
