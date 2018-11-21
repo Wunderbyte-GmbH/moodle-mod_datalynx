@@ -273,25 +273,29 @@ abstract class datalynxfield_base {
      */
     public function update_content($entry, array $values = null) {
         global $DB;
-
         $fieldid = $this->field->id;
+        $fieldgroup = false;
 
-        // TODO: Create function that only kicks in when we see a fieldgroup. As soon as we se arrays here it is.
-        // $entry->{"c{$fieldid}_id"}  Array ( [0] => 60 [1] => 835 ) // DELETETHIS
-
-        // Run trough all values, check if they do have an associated contentid, else make it null.
-        for ($i = 0; $i <= count($values); $i++) {
+        // Keep this backwards compatible, only if multiple values assume we see a fieldgroup.
+        // Important, use null to allow insert
+        $contentids[0] = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
+        for ($i = 1; $i < count($values); $i++) {
+            $fieldgroup = true;
             $contentids[$i] = isset($entry->{"c{$fieldid}_id_fieldgroup"}[$i]) ? $entry->{"c{$fieldid}_id_fieldgroup"}[$i] : null;
         }
+
         // Run through every iteration of this field.
         foreach ($contentids as $contentid) {
 
+            // TODO: How can we handle fields with multiple valuesets (url, alt, ...)?
             list($contents, $oldcontents) = $this->format_content($entry, $values);
 
-            // Remove first value from contents array.
-            // TODO: Check if this is correct in every instance.
-            array_shift($values); // Already updated.
-            array_shift($entry->{"c{$fieldid}_content_fieldgroup"}); // Keep oldcontents correct.
+            if ($fieldgroup) {
+                // Remove first value from contents array.
+                // TODO: Check if this is correct in every instance.
+                array_shift($values); // Already updated.
+                array_shift($entry->{"c{$fieldid}_content_fieldgroup"}); // Keep oldcontents correct.
+            }
 
             $rec = new stdClass();
             $rec->fieldid = $this->field->id;
@@ -303,6 +307,7 @@ abstract class datalynxfield_base {
 
             // Insert only if no old contents and there is new contents.
             if (is_null($contentid) and !empty($contents)) {
+                print_r("<br><br><br>insert: "); print_r($rec); // DEBUG
                 $DB->insert_record('datalynx_contents', $rec);
                 continue;
             }
@@ -310,12 +315,14 @@ abstract class datalynxfield_base {
             // Delete if old content but not new.
             if (!is_null($contentid) and empty($contents)) {
                 // TODO: Test some more, why are empty values updated?
+                print_r("<br><br><br>delete: "); print_r($rec); // DEBUG
                 $this->delete_content($entry->id);
                 continue;
             }
 
             // Update if new is different from old.
             if (!is_null($contentid)) {
+                print_r("<br><br><br>update: "); print_r($contentid); print_r($rec); //DELETETHIS
                 foreach ($contents as $key => $content) {
                     if (!isset($oldcontents[$key]) or $content !== $oldcontents[$key]) {
                         $rec->id = $contentid; // MUST_EXIST.
@@ -331,7 +338,7 @@ abstract class datalynxfield_base {
     }
 
     /**
-     * delete all content associated with the field
+     * Delete all content associated with the field.
      */
     public function delete_content($entryid = 0) {
         global $DB;
@@ -416,6 +423,8 @@ abstract class datalynxfield_base {
     public function get_content_from_data($entryid, $data) {
         $fieldid = $this->field->id;
         $content = array();
+
+        // Keeping this for backwards compatibility.
         foreach ($this->content_names() as $name) {
             $delim = $name ? '_' : '';
             $contentname = "field_{$fieldid}_$entryid" . $delim . $name;
@@ -425,22 +434,19 @@ abstract class datalynxfield_base {
         }
 
         // In case the entryid is followed by _0 we see a fieldgroup.
-        // TODO: Extend to all content_names.
-        $delim = $name = ''; // Just read content for now.
-        $i = 0;
-        $contentname = "field_{$fieldid}_$entryid" . "_0" . $delim . $name;
+        foreach ($this->content_names() as $name) {
+            $delim = $name ? '_' : '';
 
-        while (isset($data->$contentname)) {
-            $content[$contentname] = $data->$contentname;
-            $i++;
-            $contentname = "field_{$fieldid}_$entryid" . "_" . $i . $delim . $name;
+            $contentname = "field_{$fieldid}_$entryid" . "_0" . $delim . $name;
+
+            $i = 0;
+            while (isset($data->$contentname)) {
+                $content[$contentname] = $data->$contentname;
+
+                $i++;
+                $contentname = "field_{$fieldid}_$entryid" . "_" . $i . $delim . $name;
+            }
         }
-
-        /*
-        // Testing with _url
-        $contentname = "field_{$fieldid}_$entryid" . "_1_url";
-        if (isset($data->$contentname)) $content[$contentname] = $data->$contentname;
-        */
 
         return $content;
     }

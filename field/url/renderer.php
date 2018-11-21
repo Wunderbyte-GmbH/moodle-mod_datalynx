@@ -157,6 +157,7 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
     }
 
     public function validate($entryid, $tags, $formdata) {
+
         $fieldid = $this->_field->id();
 
         $formfieldname = "field_{$fieldid}_{$entryid}_url";
