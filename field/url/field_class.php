@@ -66,12 +66,8 @@ class datalynxfield_url extends datalynxfield_base {
 
                     switch ($name) {
                         case 'url':
-                            // TODO: Validate for empty fields?
-                            // if ($value) {
-                                // TODO: Is this really the place to validate?
-                                //if ($value and $value != 'http://') {
-                                $url = clean_param($value, PARAM_URL);
-                            // }
+                            // TODO: Is this really the place to validate for empty fields?
+                            $url = clean_param($value, PARAM_URL);
                             break;
                         case 'alt':
                             $linktext = clean_param($value, PARAM_NOTAGS);
@@ -79,7 +75,9 @@ class datalynxfield_url extends datalynxfield_base {
                     }
 
                     // Stop this thing from overwriteing itself time and time again.
-                    if (isset($url)) break;
+                    if (isset($url)) {
+                        break;
+                    }
 
                 } else { // Update from import.
                     if (strpos($value, '##') !== false) {

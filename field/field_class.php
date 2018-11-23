@@ -288,6 +288,7 @@ abstract class datalynxfield_base {
         foreach ($contentids as $contentid) {
 
             // TODO: How can we handle fields with multiple valuesets (url, alt, ...)?
+            // We need to split the values and pass it one at a time for every entry-field.
             list($contents, $oldcontents) = $this->format_content($entry, $values);
 
             if ($fieldgroup) {
@@ -307,7 +308,7 @@ abstract class datalynxfield_base {
 
             // Insert only if no old contents and there is new contents.
             if (is_null($contentid) and !empty($contents)) {
-                print_r("<br><br><br>insert: "); print_r($rec); // DEBUG
+                print_object("insert: "); print_object($rec); // DEBUG
                 $DB->insert_record('datalynx_contents', $rec);
                 continue;
             }
@@ -315,18 +316,17 @@ abstract class datalynxfield_base {
             // Delete if old content but not new.
             if (!is_null($contentid) and empty($contents)) {
                 // TODO: Test some more, why are empty values updated?
-                print_r("<br><br><br>delete: "); print_r($rec); // DEBUG
+                print_object("delete: "); print_object($rec); // DEBUG
                 $this->delete_content($entry->id);
                 continue;
             }
 
             // Update if new is different from old.
             if (!is_null($contentid)) {
-                print_r("<br><br><br>update: "); print_r($contentid); print_r($rec); //DELETETHIS
+                print_object("update: "); print_object($rec); // DEBUG
                 foreach ($contents as $key => $content) {
                     if (!isset($oldcontents[$key]) or $content !== $oldcontents[$key]) {
                         $rec->id = $contentid; // MUST_EXIST.
-                        // print_r("<br><br><br>update:"); print_r($rec); // DEBUG: Check what we update.
                         $DB->update_record('datalynx_contents', $rec);
                         continue;
                     }
