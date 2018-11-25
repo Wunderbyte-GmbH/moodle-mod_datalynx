@@ -29,10 +29,20 @@ require_once(dirname(__FILE__) . "/../renderer.php");
  */
 class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
 
+    /**
+     * Fields that are included in the fieldgroup. Fieldid as key.
+     * @var array
+     */
+    protected $subfields = array();
+
+    /**
+     *
+     * {@inheritDoc}
+     * @see datalynxfield_renderer::render_display_mode()
+     */
     public function render_display_mode(stdClass $entry, array $params) {
-        global $CFG;
         // We want to display these fields.
-        $fieldgroupfields = explode(',', $this->_field->field->param1);
+        $fieldgroupfields = $this->get_subfields();
 
         // Create display for every field.
         $displ = '';
@@ -42,25 +52,24 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         for ($x = 0; $x < $showdefault; $x++) {
             $displ .= "</td></tr><tr><td>"; // TODO: How to get this in a template? Close current template and start new.
 
-            foreach ($fieldgroupfields as $fieldname) {
-                $subfieldid = $this->get_fieldid_from_name($fieldname);
-                $subfield = $this->_field->df->get_field_from_id($subfieldid);
-
-                $this->splitcontent($entry, $subfieldid, $x);
-
+            foreach ($fieldgroupfields as $fieldid => $subfield) {
+                $this->splitcontent($entry, $fieldid, $x);
                 $displ .= "" . $subfield->field->name . ": "; // Needs to be automated here, no html.
                 $displ .= $subfield->renderer()->render_display_mode($entry, $params);
                 $displ .= "     ";
-
             }
         }
         return $displ;
     }
 
+    /**
+     *
+     * {@inheritDoc}
+     * @see datalynxfield_renderer::render_edit_mode()
+     */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
-        global $CFG;
         // We want to display these fields.
-        $fieldgroupfields = explode(',', $this->_field->field->param1);
+        $fieldgroupfields = $this->get_subfields();
 
         // Loop through showdefault.
         $showdefault = $this->_field->field->param3;
@@ -68,36 +77,62 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
 
             $mform->addElement('html', '</td></tr><tr><td>'); // Fix this table thing. TODO: Get rid of this table and use css.
 
-            foreach ($fieldgroupfields as $fieldname) {
-                $subfieldid = $this->get_fieldid_from_name($fieldname);
-                $subfield = $this->_field->df->get_field_from_id($subfieldid);
-
-                $this->splitcontent($entry, $subfieldid, $x);
-
+            foreach ($fieldgroupfields as $fieldid => $subfield) {
+                $this->splitcontent($entry, $fieldid, $x);
                 // Add a static label.
                 $mform->addElement('static', '', $subfield->field->name . ": ");
                 $tempentryid = $entry->id;
                 $entry->id = $entry->id . "_" . $x; // Add iterator to fieldname.
                 $subfield->renderer()->render_edit_mode($mform, $entry, $options);
-
-
                 // Restore entryid to prior state.
                 $entry->id = $tempentryid;
             }
         }
     }
 
+    /**
+     * Get fields of the fielgroup as an array of fieldobjects where key = fieldid.
+     *
+     * @return array
+     */
+    public function get_subfields() {
+        if (empty($this->subfields)) {
+            // We want to display these fields.
+            $fieldids = $this->_field->fieldids;
+            foreach ($fieldids as $fieldid) {
+                $field = $this->_field->df->get_field_from_id($fieldid);
+                if ($field->for_use_in_fieldgroup()) {
+                    $this->subfields[$fieldid] = $field;
+                }
+            }
+        }
+        return $this->subfields;
+    }
+
+    /**
+     *
+     * {@inheritDoc}
+     * @see datalynxfield_renderer::render_search_mode()
+     */
     public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
         return false; // TODO: Remove from search.
     }
 
-    // We call validation of subfields.
+    /**
+     *  We call validation of subfields
+     *
+     * {@inheritDoc}
+     * @see datalynxfield_renderer::validate()
+     */
     public function validate($entryid, $tags, $formdata) {
         return array();
     }
 
     /**
      * Fieldgroups should be shown in own group.
+     *
+     * {@inheritDoc}
+     * @see datalynxfield_renderer::patterns()
      */
     protected function patterns() {
         $cat = 'Fieldgroups'; // TODO: Multilang.
@@ -109,12 +144,13 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         return $patterns;
     }
 
-    public static function get_fieldid_from_name($name) {
-        global $DB;
-        $record = $DB->get_record('datalynx_fields', array('name' => $name));
-        return $record->id;
-    }
-
+    /**
+     * TODO: What does this do???
+     *
+     * @param object $entry
+     * @param number $subfieldid
+     * @param number $iterator
+     */
     public static function splitcontent($entry, $subfieldid, $iterator) {
         // Retrieve only relevant part of content and hand it over.
         if ( isset ( $entry->{"c{$subfieldid}_content_fieldgroup"}) ) {

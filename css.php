@@ -45,7 +45,7 @@ if ($urlparams->cssedit) {
     class mod_datalynx_css_form extends moodleform {
 
         public function definition() {
-            global $CFG, $COURSE;
+            global $COURSE;
 
             $mform = &$this->_form;
 

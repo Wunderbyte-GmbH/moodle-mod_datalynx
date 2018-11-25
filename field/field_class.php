@@ -37,21 +37,49 @@ abstract class datalynxfield_base {
 
     const VISIBLE_ALL = 2;
 
+    /**
+     * Subclasses must override the type with their name.
+     * @var string Fieldtype usually datalynxfield_fieldtype.
+     */
     public $type = 'unknown';
-    // Subclasses must override the type with their name.
+
+    /**
+     * The datalynx object that this field belongs to.
+     * @var datalynx
+     */
     public $df = null;
-    // The datalynx object that this field belongs to.
+
+    /**
+     * The field object itself, if we know it
+     * @var object
+     */
     public $field = null;
-    // The field object itself, if we know it.
+
+    /**
+     * @var datalynxfield_renderer
+     */
     protected $_renderer = null;
 
+    /**
+     * @var array
+     */
     protected $_distinctvalues = null;
+
+    /**
+     * Can this field be used in fieldgroups?
+     * Only fields where user can enter data via a form can be used in a fieldgroup.
+     * Override if yes.
+     * @var boolean
+     */
+    protected $forfieldgroup = false;
 
     /**
      * Class constructor
      *
-     * @param var $df datalynx id or class object
-     * @param var $field field id or DB record
+     * @param number $df datalynx id or class object
+     * @param number $field fieldid or fieldobject
+     * @throws coding_exception
+     * @throws moodle_exception
      */
     public function __construct($df = 0, $field = 0) {
         if (empty($df)) {
@@ -68,7 +96,6 @@ abstract class datalynxfield_base {
             // Variable field is the field record.
             if (is_object($field)) {
                 $this->field = $field; // Programmer knows what they are doing, we hope.
-
                 // Variable $field is a field id.
             } else {
                 if ($fieldobj = $this->df->get_field_from_id($field)) {
@@ -86,6 +113,8 @@ abstract class datalynxfield_base {
 
     /**
      * Sets up a field object
+     *
+     * @param stdClass $forminput
      */
     public function set_field($forminput = null) {
         $this->field = new stdClass();
@@ -226,6 +255,14 @@ abstract class datalynxfield_base {
     }
 
     /**
+     * Is this field available for fieldgroups?
+     * @return boolean
+     */
+    public function for_use_in_fieldgroup() {
+        return $this->forfieldgroup;
+    }
+
+    /**
      */
     public function to_form() {
         return $this->field;
@@ -308,7 +345,6 @@ abstract class datalynxfield_base {
 
             // Insert only if no old contents and there is new contents.
             if (is_null($contentid) and !empty($contents)) {
-                print_object("insert: "); print_object($rec); // DEBUG
                 $DB->insert_record('datalynx_contents', $rec);
                 continue;
             }
@@ -316,14 +352,12 @@ abstract class datalynxfield_base {
             // Delete if old content but not new.
             if (!is_null($contentid) and empty($contents)) {
                 // TODO: Test some more, why are empty values updated?
-                print_object("delete: "); print_object($rec); // DEBUG
                 $this->delete_content($entry->id);
                 continue;
             }
 
             // Update if new is different from old.
             if (!is_null($contentid)) {
-                print_object("update: "); print_object($rec); // DEBUG
                 foreach ($contents as $key => $content) {
                     if (!isset($oldcontents[$key]) or $content !== $oldcontents[$key]) {
                         $rec->id = $contentid; // MUST_EXIST.

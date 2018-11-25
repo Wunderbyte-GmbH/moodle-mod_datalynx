@@ -3,11 +3,12 @@ language: php
 sudo: required # checking if sudo makes behat error go away.
 
 addons:
-  postgresql: "9.3"
+  postgresql: "9.6"
   apt:
     packages:
-      - oracle-java8-installer
-      - oracle-java8-set-default
+      - google-chrome-stable
+      - oracle-java9-installer
+      - oracle-java9-set-default
       - chromium-chromedriver # used to start behat with chrome
 
 cache:
@@ -16,8 +17,8 @@ cache:
     - $HOME/.npm
 
 php:
- - 7.0
  - 7.1
+ - 7.2
 
 env:
  global:
@@ -27,8 +28,10 @@ env:
   - MOODLE_SELENIUM_JAR=/home/travis/build/moodle/selenium.jar
   - IGNORE_PATHS=checkboxgroup/checkboxgroup.php # we know this dir is problematic
  matrix:
-  - DB=pgsql MOODLE_BRANCH=MOODLE_33_STABLE MOODLE_CI_VER=2
-  - DB=mysqli MOODLE_BRANCH=MOODLE_33_STABLE MOODLE_CI_VER=2
+  - DB=pgsql MOODLE_BRANCH=MOODLE_34_STABLE MOODLE_CI_VER=2
+  - DB=mysqli MOODLE_BRANCH=MOODLE_34_STABLE MOODLE_CI_VER=2
+  - DB=pgsql MOODLE_BRANCH=MOODLE_35_STABLE MOODLE_CI_VER=2
+  - DB=mysqli MOODLE_BRANCH=MOODLE_35_STABLE MOODLE_CI_VER=2
 
 before_install:
   - phpenv config-rm xdebug.ini

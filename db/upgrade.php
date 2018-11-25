@@ -44,7 +44,7 @@
 defined('MOODLE_INTERNAL') or die();
 
 function xmldb_datalynx_upgrade($oldversion) {
-    global $CFG, $DB, $OUTPUT;
+    global $CFG, $DB;
 
     $dbman = $DB->get_manager();
 

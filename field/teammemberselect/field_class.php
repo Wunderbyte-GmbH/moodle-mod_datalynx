@@ -62,6 +62,26 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
 
     public $rules;
 
+    protected static $allusers = array();
+
+    protected static $allowedusers = array();
+
+    protected static $alluserslinks = array();
+
+    protected static $alloweduserslinks = array();
+
+    protected static $alluserids = array();
+
+    protected static $forbiddenuserids = array();
+
+    protected static $admissibility = ['needed' => [], 'forbidden' => []];
+
+    /**
+     * Can this field be used in fieldgroups?
+     * @var boolean
+     */
+    protected $forfieldgroup = true;
+
     public function __construct($df = 0, $field = 0) {
         parent::__construct($df, $field);
         global $DB;
@@ -89,20 +109,6 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         $this->rules = $DB->get_records_sql_menu($query,
                 array('dataid' => $df->id(), 'type' => 'eventnotification'));
     }
-
-    protected static $allusers = array();
-
-    protected static $allowedusers = array();
-
-    protected static $alluserslinks = array();
-
-    protected static $alloweduserslinks = array();
-
-    protected static $alluserids = array();
-
-    protected static $forbiddenuserids = array();
-
-    protected static $admissibility = ['needed' => [], 'forbidden' => []];
 
     protected function init_user_menu() {
         global $DB, $COURSE;

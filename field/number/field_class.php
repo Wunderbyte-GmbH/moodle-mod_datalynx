@@ -30,6 +30,12 @@ class datalynxfield_number extends datalynxfield_text {
     public $type = 'number';
 
     /**
+     * Can this field be used in fieldgroups? Override if yes.
+     * @var boolean
+     */
+    protected $forfieldgroup = true;
+
+    /**
      *
      * {@inheritDoc}
      * @see datalynxfield_base::get_search_sql()

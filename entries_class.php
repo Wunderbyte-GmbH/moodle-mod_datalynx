@@ -56,6 +56,10 @@ class datalynx_entries {
     /**
      * Constructor
      * View or datalynx or both, each can be id or object
+     *
+     * @param datalynx $datalynx
+     * @param datalynx_filter|null $filter
+     * @throws coding_exception
      */
     public function __construct(datalynx $datalynx, datalynx_filter $filter = null) {
         if (empty($datalynx)) {
@@ -74,10 +78,10 @@ class datalynx_entries {
      * plugin local_userinfosync is installed
      *
      * @param array $options
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public function set_content(array $options = array()) {
-        global $CFG;
-
         if (isset($options['entriesset'])) {
             $entriesset = $options['entriesset'];
         } else {
@@ -117,6 +121,8 @@ class datalynx_entries {
      *
      * @param array $options array of strings
      * @return object retrieved entries
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public function get_entries($options = null) {
         global $DB, $USER;
@@ -401,6 +407,8 @@ class datalynx_entries {
      *
      * @param integer $userid the user id of the user who created the entry (or was assigned as author of the entry)
      * @return object
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public function get_user_entries($userid = null) {
         global $USER;
@@ -428,12 +436,11 @@ class datalynx_entries {
     /**
      * return entries
      *
-     * @return multitype:
+     * @return array:
      */
     public function entries() {
         return $this->_entries;
     }
-
 
     /**
      * Retrieves stored files which are embedded in the current content
@@ -441,6 +448,7 @@ class datalynx_entries {
      *
      * @param array $fids
      * @return array of stored files
+     * @throws coding_exception
      */
     public function get_embedded_files(array $fids) {
         $files = array();
@@ -501,10 +509,17 @@ class datalynx_entries {
     /**
      * Process entries when after editing content for saving into db
      *
+     * @param $action
+     * @param $eids
+     * @param null $data
+     * @param bool $confirmed
      * @return array notificationstrings, list of processed ids
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
     public function process_entries($action, $eids, $data = null, $confirmed = false) {
-        global $CFG, $DB, $USER, $OUTPUT, $PAGE;
+        global $DB, $USER, $OUTPUT, $PAGE;
         $df = $this->datalynx;
 
         $entries = array();
@@ -626,7 +641,6 @@ class datalynx_entries {
                             $contents = array_fill_keys(array_keys($entries),
                                     array('info' => array(), 'fields' => array()
                                     ));
-                            $calculations = array();
                             $entryinfo = array(datalynxfield__entry::_ENTRY,
                                     datalynxfield__time::_TIMECREATED,
                                     datalynxfield__time::_TIMEMODIFIED,
@@ -1009,7 +1023,7 @@ class datalynx_entries {
      * @param object $entry
      * @param array $data
      * @param boolean $updatetime
-     * @return boolean|Ambigous <boolean, number>
+     * @return boolean|integer <boolean, number>
      */
     public function update_entry($entry, $data = null, $updatetime = true) {
         global $CFG, $DB, $USER;

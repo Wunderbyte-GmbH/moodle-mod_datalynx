@@ -33,6 +33,12 @@ class datalynxfield_url extends datalynxfield_base {
 
     public $type = 'url';
 
+    /**
+     * Can this field be used in fieldgroups?
+     * @var boolean
+     */
+    protected $forfieldgroup = true;
+
     public function __construct($df = 0, $field = 0) {
         parent::__construct($df, $field);
         $this->class = isset($field->param3) ? $field->param3 : '';
