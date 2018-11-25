@@ -46,7 +46,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 $subfieldid = $this->get_fieldid_from_name($fieldname);
                 $subfield = $this->_field->df->get_field_from_id($subfieldid);
 
-                $this->splitcontent($entry, $subfieldid, $x);
+                $this->renderer_split_content($entry, $subfieldid, $x);
 
                 $displ .= "" . $subfield->field->name . ": "; // Needs to be automated here, no html.
                 $displ .= $subfield->renderer()->render_display_mode($entry, $params);
@@ -72,14 +72,13 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 $subfieldid = $this->get_fieldid_from_name($fieldname);
                 $subfield = $this->_field->df->get_field_from_id($subfieldid);
 
-                $this->splitcontent($entry, $subfieldid, $x);
+                $this->renderer_split_content($entry, $subfieldid, $x);
 
                 // Add a static label.
                 $mform->addElement('static', '', $subfield->field->name . ": ");
                 $tempentryid = $entry->id;
                 $entry->id = $entry->id . "_" . $x; // Add iterator to fieldname.
                 $subfield->renderer()->render_edit_mode($mform, $entry, $options);
-
 
                 // Restore entryid to prior state.
                 $entry->id = $tempentryid;
@@ -115,7 +114,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         return $record->id;
     }
 
-    public static function splitcontent($entry, $subfieldid, $iterator) {
+    public static function renderer_split_content($entry, $subfieldid, $iterator) {
         // Retrieve only relevant part of content and hand it over.
         if ( isset ( $entry->{"c{$subfieldid}_content_fieldgroup"}) ) {
             $tempcontent = $entry->{"c{$subfieldid}_content_fieldgroup"};

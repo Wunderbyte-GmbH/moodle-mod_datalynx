@@ -639,11 +639,22 @@ class datalynx_entries {
 
                             $skipnotification = array();
                             $drafttofinal = array();
+
                             // Iterate the data and extract entry and fields content.
                             foreach ($data as $name => $value) {
                                 // Assuming only field names contain field_.
                                 if (strpos($name, 'field_') !== false) {
-                                    list(, $fieldid, $entryid) = explode('_', $name);
+                                    // If we don't see the iterator we are backwards compatible and fill with null.
+                                    list(, $fieldid, $entryid, $iterator, $other) = array_pad(explode('_', $name, 5), 5, null);
+
+                                    // Important, url appends _url, so only iterator if number.
+                                    // TODO: This should be fixed in url, use an array to store _url and _alt, normalise that.
+                                    if (!is_numeric($iterator)) {
+                                        $iterator = null;
+                                    } else {
+                                        $iterator = intval($iterator);
+                                    }
+
                                     if (array_key_exists($fieldid, $fields)) {
                                         $field = $fields[$fieldid];
                                     } else {
@@ -736,7 +747,56 @@ class datalynx_entries {
 
                                     // Variable $eid should be different from $entryid only in new entries.
                                     foreach ($contents[$eid]['fields'] as $fieldid => $content) {
-                                        $fields[$fieldid]->update_content($entry, $content);
+
+                                        // TODO: Evaluate adding this loop here, split fieldgroups content here and call update
+                                        // for every single content entry. This keeps all field definitions and renderer intact.
+
+                                        // If we see a fieldgroup we split and reset the content.
+                                        if (isset($content['fieldgroup'])) {
+
+                                            // Find highest iterator in keys.
+                                            end($content);
+                                            $lastiterator = explode("_", key($content))[3];
+                                            reset($content);
+
+                                            // Loop through all iterators in $content
+                                            for ($i = 0; $i <= $lastiterator; $i++) {
+
+                                                /*
+                                                    [field_314_12_0_url] => http://assdfasf
+                                                    [field_314_12_1_url] => http://
+                                                    [field_314_12_0_alt] => adf
+                                                    [field_314_12_1_alt] =>
+                                                */
+                                                // Split $content and generate temporary content.
+                                                // TODO: This needs to loop all contentthings like _url or _alt.
+                                                $tempcontent["field_{$fieldid}_{$eid}_url"] = $content["field_{$fieldid}_{$eid}_" . $i . "_url"];
+
+                                                /*
+                                                    [c314_id] => 877
+                                                    [c314_content] => http://
+                                                    [c314_content1] =>
+                                                    [c314_id_fieldgroup] => Array
+                                                            [0] => 877
+                                                            [1] => 878
+                                                    [c314_content_fieldgroup] => Array
+                                                            [0] => http://assdf
+                                                            [1] => http://
+                                                */
+                                                // Split $entry and overwrite entry content.
+                                                // TODO: Loop all fields like _content1 and _content2.
+                                                $entry->{"c{$fieldid}_content"} = $entry->{"c{$fieldid}_content_fieldgroup"}[$i];
+                                                $entry->{"c{$fieldid}_id"} = $entry->{"c{$fieldid}_id_fieldgroup"}[$i];
+
+                                                // Pass tempstuff to updatecontent
+                                                $fields[$fieldid]->update_content($entry, $tempcontent);
+
+                                            }
+                                        } else {
+                                            // Keep behaviour if no fieldgroup is detected.
+                                            $fields[$fieldid]->update_content($entry, $content);
+                                        }
+
                                     }
                                     $processed[$entry->id] = $entry;
 

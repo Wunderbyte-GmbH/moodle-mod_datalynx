@@ -441,6 +441,7 @@ abstract class datalynxfield_base {
 
             $i = 0;
             while (isset($data->$contentname)) {
+                $content["fieldgroup"] = true;
                 $content[$contentname] = $data->$contentname;
 
                 $i++;
