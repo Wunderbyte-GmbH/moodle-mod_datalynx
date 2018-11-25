@@ -87,7 +87,7 @@ if ($urlparams->duplicate and confirm_sesskey()) {
 }
 
 // Any notifications.
-if (!$fields = $df->get_user_defined_fields(true,
+if (!$fields = $df->get_fields(null, false, true,
         flexible_table::get_sort_for_table('datalynxfieldsindex' . $df->id()))
 ) {
     $df->notifications['bad'][] = get_string('fieldnoneindatalynx', 'datalynx'); // Nothing in.

@@ -39,6 +39,12 @@ class datalynxfield_time extends datalynxfield_base {
 
     public $displayformat;
 
+    /**
+     * Can this field be used in fieldgroups?
+     * @var boolean
+     */
+    protected $forfieldgroup = true;
+
     public function __construct($df = 0, $field = 0) {
         parent::__construct($df, $field);
         $this->dateonly = $this->field->param1;

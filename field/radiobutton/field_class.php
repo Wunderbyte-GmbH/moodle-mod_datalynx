@@ -29,6 +29,12 @@ class datalynxfield_radiobutton extends datalynxfield_select {
 
     public $type = 'radiobutton';
 
+    /**
+     * Can this field be used in fieldgroups?
+     * @var boolean
+     */
+    protected $forfieldgroup = true;
+
     public $separators = array(array('name' => 'New line', 'chr' => '<br />'),
             array('name' => 'Space', 'chr' => '&#32;'),
             array('name' => ',', 'chr' => '&#44;'),
