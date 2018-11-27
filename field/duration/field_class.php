@@ -28,6 +28,9 @@ require_once("$CFG->dirroot/mod/datalynx/field/number/field_class.php");
 
 class datalynxfield_duration extends datalynxfield_base {
 
+    /**
+     * @var string
+     */
     public $type = 'duration';
 
     public $width;
@@ -35,6 +38,12 @@ class datalynxfield_duration extends datalynxfield_base {
     public $widthunit;
 
     protected $_units = null;
+
+    /**
+     * Can this field be used in fieldgroups? Override if yes.
+     * @var boolean
+     */
+    protected $forfieldgroup = true;
 
     /**
      */

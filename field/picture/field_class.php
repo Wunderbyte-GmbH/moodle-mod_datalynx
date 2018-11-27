@@ -30,6 +30,12 @@ class datalynxfield_picture extends datalynxfield_file {
     public $type = 'picture';
 
     /**
+     * Can this field be used in fieldgroups? Override if yes.
+     * @var boolean
+     */
+    protected $forfieldgroup = true;
+
+    /**
      */
     public function update_content($entry, array $values = null) {
         global $DB;

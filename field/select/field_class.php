@@ -30,6 +30,12 @@ class datalynxfield_select extends datalynxfield_option_single {
     public $type = 'select';
 
     /**
+     * Can this field be used in fieldgroups?
+     * @var boolean
+     */
+    protected $forfieldgroup = true;
+
+    /**
      *
      * {@inheritDoc}
      * @see datalynxfield_base::get_sql_compare_text()

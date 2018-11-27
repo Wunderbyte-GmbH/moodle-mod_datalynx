@@ -27,7 +27,16 @@ require_once("$CFG->dirroot/mod/datalynx/field/multiselect/field_class.php");
 
 class datalynxfield_checkbox extends datalynxfield_multiselect {
 
+    /**
+     * @var string
+     */
     public $type = 'checkbox';
+
+    /**
+     * Can this field be used in fieldgroups?
+     * @var boolean
+     */
+    protected $forfieldgroup = true;
 
     /**
      * Create an array that converts default values from the database to values the checkbox understands.

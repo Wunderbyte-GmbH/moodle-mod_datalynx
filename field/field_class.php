@@ -37,21 +37,49 @@ abstract class datalynxfield_base {
 
     const VISIBLE_ALL = 2;
 
+    /**
+     * Subclasses must override the type with their name.
+     * @var string Fieldtype usually datalynxfield_fieldtype.
+     */
     public $type = 'unknown';
-    // Subclasses must override the type with their name.
+
+    /**
+     * The datalynx object that this field belongs to.
+     * @var datalynx
+     */
     public $df = null;
-    // The datalynx object that this field belongs to.
+
+    /**
+     * The field object itself, if we know it
+     * @var object
+     */
     public $field = null;
-    // The field object itself, if we know it.
+
+    /**
+     * @var datalynxfield_renderer
+     */
     protected $_renderer = null;
 
+    /**
+     * @var array
+     */
     protected $_distinctvalues = null;
+
+    /**
+     * Can this field be used in fieldgroups?
+     * Only fields where user can enter data via a form can be used in a fieldgroup.
+     * Override if yes.
+     * @var boolean
+     */
+    protected $forfieldgroup = false;
 
     /**
      * Class constructor
      *
-     * @param var $df datalynx id or class object
-     * @param var $field field id or DB record
+     * @param number $df datalynx id or class object
+     * @param number $field fieldid or fieldobject
+     * @throws coding_exception
+     * @throws moodle_exception
      */
     public function __construct($df = 0, $field = 0) {
         if (empty($df)) {
@@ -68,7 +96,6 @@ abstract class datalynxfield_base {
             // Variable field is the field record.
             if (is_object($field)) {
                 $this->field = $field; // Programmer knows what they are doing, we hope.
-
                 // Variable $field is a field id.
             } else {
                 if ($fieldobj = $this->df->get_field_from_id($field)) {
@@ -86,6 +113,8 @@ abstract class datalynxfield_base {
 
     /**
      * Sets up a field object
+     *
+     * @param stdClass $forminput
      */
     public function set_field($forminput = null) {
         $this->field = new stdClass();
@@ -223,6 +252,14 @@ abstract class datalynxfield_base {
         $actionurl = new moodle_url('/mod/datalynx/field/field_edit.php',
                 array('d' => $this->df->id(), 'fid' => $this->id(), 'type' => $this->type));
         return new $formclass($this, $actionurl);
+    }
+
+    /**
+     * Is this field available for fieldgroups?
+     * @return boolean
+     */
+    public function for_use_in_fieldgroup(){
+        return $this->forfieldgroup;
     }
 
     /**
