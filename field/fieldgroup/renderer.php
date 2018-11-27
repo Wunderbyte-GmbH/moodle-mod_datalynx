@@ -49,11 +49,11 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
 
         // Loop through showdefault.
         $showdefault = $this->_field->field->param3;
-        for ($x = 0; $x < $showdefault; $x++) {
+        for ($line = 0; $line < $showdefault; $line++) {
             $displ .= "</td></tr><tr><td>"; // TODO: How to get this in a template? Close current template and start new.
 
             foreach ($fieldgroupfields as $fieldid => $subfield) {
-                $this->renderer_split_content($entry, $fieldid, $x);
+                $this->renderer_split_content($entry, $fieldid, $line);
                 $displ .= "" . $subfield->field->name . ": "; // Needs to be automated here, no html.
                 $displ .= $subfield->renderer()->render_display_mode($entry, $params);
                 $displ .= "     ";
@@ -73,17 +73,17 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
 
         // Loop through showdefault.
         $showdefault = $this->_field->field->param3;
-        for ($x = 0; $x < $showdefault; $x++) {
+        for ($line = 0; $line < $showdefault; $line++) {
 
             $mform->addElement('html', '</td></tr><tr><td>'); // Fix this table thing. TODO: Get rid of this table and use css.
 
             foreach ($fieldgroupfields as $fieldid => $subfield) {
-                $this->renderer_split_content($entry, $fieldid, $x);
+                $this->renderer_split_content($entry, $fieldid, $line);
 
                 // Add a static label.
                 $mform->addElement('static', '', $subfield->field->name . ": ");
                 $tempentryid = $entry->id;
-                $entry->id = $entry->id . "_" . $x; // Add iterator to fieldname.
+                $entry->id = $entry->id . "_" . $line; // Add iterator to fieldname.
                 $subfield->renderer()->render_edit_mode($mform, $entry, $options);
 
                 // Restore entryid to prior state.
@@ -147,30 +147,40 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
     }
 
     /**
-     * TODO: What does this do???
+     * We split the multiple contents for every line and pass only one content at a time to the subfields renderer.
      *
      * @param object $entry
      * @param number $subfieldid
-     * @param number $iterator
+     * @param number $line defines what line we want to pass here.
      */
-    public static function renderer_split_content($entry, $subfieldid, $iterator) {
+    public static function renderer_split_content($entry, $subfieldid, $line) {
         // Retrieve only relevant part of content and hand it over.
-        if ( isset ( $entry->{"c{$subfieldid}_content_fieldgroup"}) ) {
-            $tempcontent = $entry->{"c{$subfieldid}_content_fieldgroup"};
-        } else {
-            // If we have exactly one content, show this and leave the rest blank.
-            if (isset( $entry->{"c{$subfieldid}_content"} )) {
-                $tempcontent = array( $entry->{"c{$subfieldid}_content"} );
-            } else {
-                $tempcontent = array();
-            }
-        }
 
-        // Don't touch content if it is not a fieldgroup.
-        if (isset($tempcontent[$iterator])) {
-            $entry->{"c{$subfieldid}_content"} = $tempcontent[$iterator];
-        } else {
-            $entry->{"c{$subfieldid}_content"} = "";
+        // Loop through all possible contents. content, content1, ... 4
+        for ($i = 0; $i <= 4; $i++) {
+            if ($i == 0) {
+                $contentid = ''; // Content1 is actually content.
+            } else {
+                $contentid = $i;
+            }
+
+            if ( isset ( $entry->{"c{$subfieldid}_content{$contentid}_fieldgroup"}) ) {
+                $tempcontent = $entry->{"c{$subfieldid}_content{$contentid}_fieldgroup"};
+            } else {
+                // If we have exactly one content, show this and leave the rest blank.
+                if (isset( $entry->{"c{$subfieldid}_content{$contentid}"} )) {
+                    $tempcontent = array( $entry->{"c{$subfieldid}_content{$contentid}"} );
+                } else {
+                    $tempcontent = array();
+                }
+            }
+
+            // Don't touch content if it is not a fieldgroup.
+            if (isset($tempcontent[$line])) {
+                $entry->{"c{$subfieldid}_content{$contentid}"} = $tempcontent[$line];
+            } else {
+                $entry->{"c{$subfieldid}_content{$contentid}"} = "";
+            }
         }
     }
 
