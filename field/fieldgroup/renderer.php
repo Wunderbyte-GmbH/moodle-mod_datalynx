@@ -53,7 +53,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
             $displ .= "</td></tr><tr><td>"; // TODO: How to get this in a template? Close current template and start new.
 
             foreach ($fieldgroupfields as $fieldid => $subfield) {
-                $this->splitcontent($entry, $fieldid, $x);
+                $this->renderer_split_content($entry, $fieldid, $x);
                 $displ .= "" . $subfield->field->name . ": "; // Needs to be automated here, no html.
                 $displ .= $subfield->renderer()->render_display_mode($entry, $params);
                 $displ .= "     ";
@@ -78,12 +78,14 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
             $mform->addElement('html', '</td></tr><tr><td>'); // Fix this table thing. TODO: Get rid of this table and use css.
 
             foreach ($fieldgroupfields as $fieldid => $subfield) {
-                $this->splitcontent($entry, $fieldid, $x);
+                $this->renderer_split_content($entry, $fieldid, $x);
+
                 // Add a static label.
                 $mform->addElement('static', '', $subfield->field->name . ": ");
                 $tempentryid = $entry->id;
                 $entry->id = $entry->id . "_" . $x; // Add iterator to fieldname.
                 $subfield->renderer()->render_edit_mode($mform, $entry, $options);
+
                 // Restore entryid to prior state.
                 $entry->id = $tempentryid;
             }
@@ -151,7 +153,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
      * @param number $subfieldid
      * @param number $iterator
      */
-    public static function splitcontent($entry, $subfieldid, $iterator) {
+    public static function renderer_split_content($entry, $subfieldid, $iterator) {
         // Retrieve only relevant part of content and hand it over.
         if ( isset ( $entry->{"c{$subfieldid}_content_fieldgroup"}) ) {
             $tempcontent = $entry->{"c{$subfieldid}_content_fieldgroup"};
