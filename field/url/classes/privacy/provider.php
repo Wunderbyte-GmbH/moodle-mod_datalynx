@@ -22,6 +22,7 @@
  * @copyright 2018 Michael Pollak <moodle@michaelpollak.org>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+ defined('MOODLE_INTERNAL') or die();
 
 namespace datalynxfield_url\privacy;
 
