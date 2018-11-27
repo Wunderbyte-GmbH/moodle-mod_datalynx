@@ -748,16 +748,15 @@ class datalynx_entries {
                                     // Variable $eid should be different from $entryid only in new entries.
                                     foreach ($contents[$eid]['fields'] as $fieldid => $content) {
 
-                                        // TODO: Evaluate adding this loop here, split fieldgroups content here and call update
-                                        // for every single content entry. This keeps all field definitions and renderer intact.
-
                                         // If we see a fieldgroup we split and reset the content.
                                         if (isset($content['fieldgroup'])) {
 
-                                            // Find highest iterator in keys.
+                                            // Find highest iterator in content keys.
                                             end($content);
                                             $lastiterator = explode("_", key($content))[3];
                                             reset($content);
+
+                                            $fieldname = "field_{$fieldid}_{$eid}";
 
                                             // Loop through all iterators in $content
                                             for ($i = 0; $i <= $lastiterator; $i++) {
@@ -769,9 +768,21 @@ class datalynx_entries {
                                                     [field_314_12_1_alt] =>
                                                 */
                                                 // Split $content and generate temporary content.
-                                                // TODO: This needs to loop all contentthings like _url or _alt.
-                                                $tempcontent["field_{$fieldid}_{$eid}_url"] = $content["field_{$fieldid}_{$eid}_" . $i . "_url"];
-
+                                                // Look for all content_names like _url or _alt.
+                                                $tempcontent = array();
+                                                foreach ($content as $key => $value) {
+                                                    // Only add keys that start with our expected fieldname to tempcontent.
+                                                    if ( 0 === strpos($key, "{$fieldname}_{$i}")) {
+                                                        // If we found sth. relevant, split it up and rebuild key.
+                                                        // Either it has content_name after the iterator or not.
+                                                        $contentname = explode("_", $key);
+                                                        if (isset($contentname[4])) {
+                                                            $tempcontent[$fieldname . "_" . $contentname[4]] = $value;
+                                                        } else {
+                                                            $tempcontent[$fieldname] = $value;
+                                                        }
+                                                    }
+                                                }
                                                 /*
                                                     [c314_id] => 877
                                                     [c314_content] => http://
@@ -784,11 +795,23 @@ class datalynx_entries {
                                                             [1] => http://
                                                 */
                                                 // Split $entry and overwrite entry content.
-                                                // TODO: Loop all fields like _content1 and _content2.
-                                                $entry->{"c{$fieldid}_content"} = $entry->{"c{$fieldid}_content_fieldgroup"}[$i];
-                                                $entry->{"c{$fieldid}_id"} = $entry->{"c{$fieldid}_id_fieldgroup"}[$i];
+                                                $entry->{"c{$fieldid}_id"} = $entry->{"c{$fieldid}_content"} = null;
+                                                if (isset($entry->{"c{$fieldid}_id_fieldgroup"}[$i])) {
+                                                    $entry->{"c{$fieldid}_id"} = $entry->{"c{$fieldid}_id_fieldgroup"}[$i];
+                                                }
+                                                if (isset($entry->{"c{$fieldid}_id_content"}[$i])) {
+                                                    $entry->{"c{$fieldid}_content"} = $entry->{"c{$fieldid}_content_fieldgroup"}[$i];
+                                                }
 
-                                                // Pass tempstuff to updatecontent
+                                                // Loop all fields like _content1 and _content2.
+                                                // TODO: Test this.
+                                                for ($j = 1; $j <= 4; $j++) {
+                                                    if (isset($entry->{"c{$fieldid}_content{$j}_fieldgroup"}[$i])) {
+                                                            $entry->{"c{$fieldid}_content{$j}"} = $entry->{"c{$fieldid}_content{$j}_fieldgroup"}[$i];
+                                                    }
+                                                }
+
+                                                // Pass tempstuff to updatecontent.
                                                 $fields[$fieldid]->update_content($entry, $tempcontent);
 
                                             }

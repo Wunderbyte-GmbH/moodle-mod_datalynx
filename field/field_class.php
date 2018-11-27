@@ -273,67 +273,39 @@ abstract class datalynxfield_base {
      */
     public function update_content($entry, array $values = null) {
         global $DB;
-        $fieldid = $this->field->id;
-        $fieldgroup = false;
 
-        // Keep this backwards compatible, only if multiple values assume we see a fieldgroup.
-        // Important, use null to allow insert
-        $contentids[0] = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
-        for ($i = 1; $i < count($values); $i++) {
-            $fieldgroup = true;
-            $contentids[$i] = isset($entry->{"c{$fieldid}_id_fieldgroup"}[$i]) ? $entry->{"c{$fieldid}_id_fieldgroup"}[$i] : null;
+        $fieldid = $this->field->id;
+        $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
+        list($contents, $oldcontents) = $this->format_content($entry, $values);
+
+        $rec = new stdClass();
+        $rec->fieldid = $this->field->id;
+        $rec->entryid = $entry->id;
+        foreach ($contents as $key => $content) {
+            $c = $key ? $key : '';
+            $rec->{"content$c"} = $content;
         }
 
-        // Run through every iteration of this field.
-        foreach ($contentids as $contentid) {
+        // Insert only if no old contents and there is new contents.
+        if (is_null($contentid) and !empty($contents)) {
+            return $DB->insert_record('datalynx_contents', $rec);
+        }
 
-            // TODO: How can we handle fields with multiple valuesets (url, alt, ...)?
-            // We need to split the values and pass it one at a time for every entry-field.
-            list($contents, $oldcontents) = $this->format_content($entry, $values);
+        // Delete if old content but not new.
+        if (!is_null($contentid) and empty($contents)) {
+            return $this->delete_content($entry->id);
+        }
 
-            if ($fieldgroup) {
-                // Remove first value from contents array.
-                // TODO: Check if this is correct in every instance.
-                array_shift($values); // Already updated.
-                array_shift($entry->{"c{$fieldid}_content_fieldgroup"}); // Keep oldcontents correct.
-            }
-
-            $rec = new stdClass();
-            $rec->fieldid = $this->field->id;
-            $rec->entryid = $entry->id;
+        // Update if new is different from old.
+        if (!is_null($contentid)) {
             foreach ($contents as $key => $content) {
-                $c = $key ? $key : '';
-                $rec->{"content$c"} = $content;
-            }
-
-            // Insert only if no old contents and there is new contents.
-            if (is_null($contentid) and !empty($contents)) {
-                print_object("insert: "); print_object($rec); // DEBUG
-                $DB->insert_record('datalynx_contents', $rec);
-                continue;
-            }
-
-            // Delete if old content but not new.
-            if (!is_null($contentid) and empty($contents)) {
-                // TODO: Test some more, why are empty values updated?
-                print_object("delete: "); print_object($rec); // DEBUG
-                $this->delete_content($entry->id);
-                continue;
-            }
-
-            // Update if new is different from old.
-            if (!is_null($contentid)) {
-                print_object("update: "); print_object($rec); // DEBUG
-                foreach ($contents as $key => $content) {
-                    if (!isset($oldcontents[$key]) or $content !== $oldcontents[$key]) {
-                        $rec->id = $contentid; // MUST_EXIST.
-                        $DB->update_record('datalynx_contents', $rec);
-                        continue;
-                    }
+                if (!isset($oldcontents[$key]) or $content !== $oldcontents[$key]) {
+                    $rec->id = $contentid; // MUST_EXIST.
+                    return $DB->update_record('datalynx_contents', $rec);
                 }
             }
-
         }
+
         return true;
     }
 
@@ -496,10 +468,6 @@ abstract class datalynxfield_base {
 
         if (isset($entry->{"c{$fieldid}_content"})) {
             $oldcontent = $entry->{"c{$fieldid}_content"};
-        }
-        // Fieldgroup overwrites normal oldcontent. TODO: Test.
-        if (isset($entry->{"c{$fieldid}_content_fieldgroup"})) {
-            $oldcontent = $entry->{"c{$fieldid}_content_fieldgroup"};
         }
 
         return array(array($newcontent), array($oldcontent));

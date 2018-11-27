@@ -74,10 +74,6 @@ class datalynxfield_url extends datalynxfield_base {
                             break;
                     }
 
-                    // Stop this thing from overwriteing itself time and time again.
-                    if (isset($url)) {
-                        break;
-                    }
 
                 } else { // Update from import.
                     if (strpos($value, '##') !== false) {
