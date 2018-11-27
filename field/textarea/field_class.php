@@ -33,6 +33,12 @@ class datalynxfield_textarea extends datalynxfield_base {
 
     protected $editoroptions;
 
+    /**
+     * Can this field be used in fieldgroups?
+     * @var boolean
+     */
+    protected $forfieldgroup = true;
+
     public function __construct($df = 0, $field = 0) {
         parent::__construct($df, $field);
 

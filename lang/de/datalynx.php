@@ -853,3 +853,14 @@ $string['privacy:metadata:datalynx_contents:content2'] = 'Zusätzlicher content 
 $string['privacy:metadata:datalynx_contents:content3'] = 'Zusätzlicher content 3';
 $string['privacy:metadata:datalynx_contents:content4'] = 'Zusätzlicher content 4';
 $string['privacy:metadata:filepurpose'] = 'Datei oder Bild zur datalynx Instanz.';
+
+// Fieldgroups
+$string['fieldgroups'] = 'Feldergruppierung';
+$string['fieldgroupfields'] = 'Felder die als Gruppierung wiederholt ausgefüllt/angezeigt werden sollen. Die Felder werden alphabetisch gereiht. Um die Reihenfolge den eigenen Vorstellungen anzupassen, müssen die Felder entsprechend benamst werden';
+$string['fieldgroupsadd'] = 'Feldergruppierung hinzufügen';
+$string['newfieldgroup'] = 'Neue Feldergruppierung';
+$string['editingfieldgroup'] = 'Feldergruppierung "{$a}" bearbeiten';
+$string['deletingfieldgroup'] = 'Feldergruppierung löschen: "{$a}"';
+$string['duplicatingfieldgroup'] = 'Feldergruppierung duplizieren: "{$a}"';
+$string['confirmfieldgroupduplicate'] = 'Diese Feldergruppierung wirklich duplizieren?';
+$string['confirmfieldgroupdelete'] = 'Diese Feldergruppierung wirklich löschen?';

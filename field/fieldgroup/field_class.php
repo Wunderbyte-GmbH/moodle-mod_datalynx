@@ -28,6 +28,18 @@ class datalynxfield_fieldgroup extends datalynxfield_base {
 
     public $type = 'fieldgroup';
 
+    /**
+     * Fieldids of the fields belonging to the fieldgroup#
+     * @var integer[]
+     */
+    public $fieldids = array();
+
+    public function __construct($df = 0, $field = 0) {
+        parent::__construct($df, $field);
+
+        $this->fieldids = json_decode($this->field->param1, true);
+    }
+
     protected function content_names() {
         return array(''); // TODO: Maybe we can add fieldgroupid here?
     }

@@ -29,6 +29,15 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
 
     public $type = 'multiselect';
 
+    /**
+     * Can this field be used in fieldgroups? Override if yes.
+     * @var boolean
+     */
+    protected $forfieldgroup = true;
+
+    /**
+     * @var array
+     */
     public $separators = array(array('name' => 'New line', 'chr' => '<br />'),
             array('name' => 'Space', 'chr' => '&#32;'),
             array('name' => ',', 'chr' => '&#44;'),

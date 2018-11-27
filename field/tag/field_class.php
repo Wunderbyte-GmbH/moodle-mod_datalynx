@@ -30,6 +30,12 @@ class datalynxfield_tag extends datalynxfield_option_multiple {
     public $type = 'tag';
 
     /**
+     * Can this field be used in fieldgroups?
+     * @var boolean
+     */
+    protected $forfieldgroup = true;
+
+    /**
      * Write tags and and associate them with the id of the contents recordd
      *
      * @see datalynxfield_base::update_content()

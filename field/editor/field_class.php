@@ -33,6 +33,17 @@ class datalynxfield_editor extends datalynxfield_base {
 
     protected $editoroptions;
 
+    /**
+     * Can this field be used in fieldgroups? Override if yes.
+     * @var boolean
+     */
+    protected $forfieldgroup = true;
+
+    /**
+     *
+     * @param number $df
+     * @param number $field
+     */
     public function __construct($df = 0, $field = 0) {
         global $COURSE, $PAGE, $CFG;
         parent::__construct($df, $field);

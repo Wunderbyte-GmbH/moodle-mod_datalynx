@@ -29,6 +29,12 @@ class datalynxfield_text extends datalynxfield_base {
 
     public $type = 'text';
 
+    /**
+     * Can this field be used in fieldgroups?
+     * @var boolean
+     */
+    protected $forfieldgroup = true;
+
     public function supports_group_by() {
         return true;
     }

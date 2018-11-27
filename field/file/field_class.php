@@ -31,6 +31,12 @@ class datalynxfield_file extends datalynxfield_base {
 
     public $type = 'file';
 
+    /**
+     * Can this field be used in fieldgroups? Override if yes.
+     * @var boolean
+     */
+    protected $forfieldgroup = true;
+
     // Content - file manager.
     // Content1 - alt name.
     // Content2 - download counter.

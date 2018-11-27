@@ -806,15 +806,12 @@ class datalynx {
     }
 
     /**
-     */
-    public function get_user_defined_fields($forceget = false, $sort = '') {
-        $this->get_fields(null, false, $forceget, $sort);
-        return $this->fields;
-    }
-
-    /**
-     * given a field id return the field object from get_fields
+     * Given a field id return the field object from get_fields
      * Initializes get_fields if necessary
+     *
+     * @param number $fieldid
+     * @param boolean $forceget
+     * @return boolean|datalynxfield_base
      */
     public function get_field_from_id($fieldid, $forceget = false) {
         $fields = $this->get_fields(null, false, $forceget);
@@ -849,7 +846,10 @@ class datalynx {
     }
 
     /**
-     * given a field name returns the field object from get_fields
+     * Given a field name returns the field object from get_fields
+     *
+     * @param string $name
+     * @return datalynxfield_base|boolean
      */
     public function get_field_by_name($name) {
         foreach ($this->get_fields() as $field) {
@@ -887,11 +887,10 @@ class datalynx {
     /**
      * returns a subclass field object given a record of the field
      * used to invoke plugin methods
-     * input: $param $field record from db, or field type
+     * @param string $key
+     * @return stdClass|boolean
      */
     public function get_fieldname($key) {
-        global $CFG;
-
         if ($key) {
             if (is_object($key)) {
                 $type = $key->type;
@@ -909,6 +908,7 @@ class datalynx {
     }
 
     /**
+     * Get fields of datalynx instance
      *
      * @param null $exclude
      * @param bool $menu

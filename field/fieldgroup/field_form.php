@@ -27,15 +27,26 @@ require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 class datalynxfield_fieldgroup_form extends datalynxfield_form {
 
     /**
+     *
+     * {@inheritdoc}
+     * @see datalynxfield_form::field_definition()
      */
     public function field_definition() {
-        global $OUTPUT, $DB, $PAGE, $CFG;
-
         $mform = &$this->_form;
 
-        // Fieldgroupfields is stored in param1
-        $mform->addElement('text', 'param1', get_string('fieldgroupfields', 'datalynx'), array('size' => '64'));
-        $mform->setType('param1', PARAM_TEXT);
+        // Fieldgroupfieldids are stored in param1.
+        $fields = array();
+        $fields = $this->_df->get_fields(null, false, true);
+        $fieldnames = array();
+        foreach ($fields as $fieldid => $field) {
+            if ($field->for_use_in_fieldgroup()) {
+                $fieldnames[$fieldid] = $field->name();
+            }
+        }
+        asort($fieldnames);
+        $options = array('multiple' => true);
+        $mform->addElement('autocomplete', 'param1', get_string('fieldgroupfields', 'datalynx'),
+                $fieldnames, $options);
 
         // Number of times the field group can be filled out.
         $mform->addElement('text', 'param2', 'beschreibung nummax'); // TODO: Multilang.
@@ -58,23 +69,51 @@ class datalynxfield_fieldgroup_form extends datalynxfield_form {
         // TODO: Select displaymode.
     }
 
+    /**
+     *
+     * {@inheritDoc}
+     * @see datalynxfield_form::validation()
+     */
     public function validation($data, $files) {
-        global $DB;
         $errors = parent::validation($data, $files);
 
         // Check if all fieldnames are actually found and only fieldtypes are entered that have been tested.
-        $workingfields = array('text');
-        $fieldgroupfields = explode(',', $data['param1']);
-
-        foreach ($fieldgroupfields as $field) {
-            $record = $DB->get_record('datalynx_fields', array('name' => $field), 'type', 'IGNORE_MULTIPLE');
-            if (!$record) {
-                $errors['param1'] = "Sorry, a field with the name " . $field . " was not found."; // TODO: Multilang.
-            } else if (!in_array($record->type, $workingfields)) {
-                $errors['param1'] = "Sorry, fields of type " . $record->type . " are not yet supported in fieldgroups."; // TODO: Multilang.
+        // $workingfields = array('text');
+        $fields = $this->_df->get_fields(null, false, true);
+        foreach ($data['param1'] as $fieldid) {
+            if (!(array_key_exists($fieldid, $fields) and $fields[$fieldid]->for_use_in_fieldgroup())) {
+                $errors['param1'] = "Sorry, fields of type " . $fields[$fieldid]->type .
+                        " are not yet supported in fieldgroups."; // TODO: Multilang.
             }
         }
-
         return $errors;
+    }
+
+    /**
+     * This function is overriden to decode param1 field from JSON notation into an array
+     *
+     * @param array $data new contents of the form
+     */
+    public function set_data($data) {
+        $elements = json_decode($data->param1, true);
+        $elements = $elements == null ? array() : $elements;
+        $data->param1 = array();
+        foreach ($elements as $element) {
+            $data->param1[] = $element;
+        }
+        parent::set_data($data);
+    }
+
+    /**
+     * This function is overriden to encode param1 field into JSON notation
+     *
+     * @param boolean $slashed TODO: add description!
+     * @return array submitted, validated and processed form contents
+     */
+    public function get_data($slashed = true) {
+        if ($data = parent::get_data($slashed)) {
+            $data->param1 = json_encode($data->param1);
+        }
+        return $data;
     }
 }
