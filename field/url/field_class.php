@@ -74,7 +74,6 @@ class datalynxfield_url extends datalynxfield_base {
                             break;
                     }
 
-
                 } else { // Update from import.
                     if (strpos($value, '##') !== false) {
                         $value = explode('##', $value);
