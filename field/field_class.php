@@ -258,7 +258,7 @@ abstract class datalynxfield_base {
      * Is this field available for fieldgroups?
      * @return boolean
      */
-    public function for_use_in_fieldgroup (){
+    public function for_use_in_fieldgroup() {
         return $this->forfieldgroup;
     }
 
