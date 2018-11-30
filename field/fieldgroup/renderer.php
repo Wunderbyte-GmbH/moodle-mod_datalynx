@@ -41,23 +41,28 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
      * @see datalynxfield_renderer::render_display_mode()
      */
     public function render_display_mode(stdClass $entry, array $params) {
+
         // We want to display these fields.
         $fieldgroupfields = $this->get_subfields();
 
-        // Create display for every field.
+        // Append display for every field.
         $displ = '';
 
         // Loop through showdefault.
         $showdefault = $this->_field->field->param3;
+
         for ($line = 0; $line < $showdefault; $line++) {
-            $displ .= "</td></tr><tr><td>"; // TODO: How to get this in a template? Close current template and start new.
+
+            $displ .= '<tr><td colspan="2">'; // TODO:
 
             foreach ($fieldgroupfields as $fieldid => $subfield) {
                 $this->renderer_split_content($entry, $fieldid, $line);
-                $displ .= "" . $subfield->field->name . ": "; // Needs to be automated here, no html.
+                $displ .= "" . $subfield->field->name . ": "; // Needs to be automated here, no html from view definition.
                 $displ .= $subfield->renderer()->render_display_mode($entry, $params);
                 $displ .= "     ";
             }
+
+            $displ .= '</td></tr>'; // TODO:
         }
         return $displ;
     }
@@ -84,7 +89,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         // Loop through all lines.
         for ($line = 0; $line < $showdefault; $line++) {
 
-            $mform->addElement('html', '</td></tr><tr><td>'); // Fix this table thing. TODO: Get rid of this table and use css.
+            $mform->addElement('html', '<tr><td colspan="2">'); // TODO: Get rid of this table and use css.
 
             foreach ($fieldgroupfields as $fieldid => $subfield) {
                 $this->renderer_split_content($entry, $fieldid, $line);
@@ -98,6 +103,8 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 // Restore entryid to prior state.
                 $entry->id = $tempentryid;
             }
+
+            $mform->addElement('html', '</td></tr>'); // TODO: Get rid of this table and use css.
         }
     }
 
