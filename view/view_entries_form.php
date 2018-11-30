@@ -50,9 +50,24 @@ class datalynxview_entries_form extends moodleform {
             $entryids = explode(',', $this->_customdata['update']);
 
             foreach ($entryids as $entryid) {
-                foreach ($fields as $fid => $field) {
-                    $errors = array_merge($errors,
-                            $field->renderer()->validate($entryid, $patterns[$fid], (object) $data));
+
+                // If we see a fieldgroup loop through all lines.
+                if (isset($data['fieldgroup'])) {
+
+                    // Append the correct patterns to match.
+                    $patterns = $fields[$data['fieldgroup']]->renderer()->get_fieldgroup_patterns($patterns);
+
+                    for ($i = 0; $i < $data['iterations']; $i++) {
+                        foreach ($fields as $fid => $field) {
+                            $newerrors = $field->renderer()->validate($entryid . "_" . $i, $patterns[$fid], (object) $data);
+                            $errors = array_merge($errors, $newerrors);
+                        }
+                    }
+                } else {
+                    foreach ($fields as $fid => $field) {
+                        $errors = array_merge($errors,
+                                $field->renderer()->validate($entryid, $patterns[$fid], (object) $data));
+                    }
                 }
             }
         }

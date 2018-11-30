@@ -71,8 +71,17 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         // We want to display these fields.
         $fieldgroupfields = $this->get_subfields();
 
-        // Loop through showdefault.
+        // Number of lines to show by default.
         $showdefault = $this->_field->field->param3;
+
+        // Add a fieldgroup marker to the entry data.
+        $mform->addElement('hidden', 'fieldgroup', $this->_field->field->id);
+        $mform->setType('fieldgroup', PARAM_INT);
+
+        $mform->addElement('hidden', 'iterations', $showdefault);
+        $mform->setType('iterations', PARAM_INT);
+
+        // Loop through all lines.
         for ($line = 0; $line < $showdefault; $line++) {
 
             $mform->addElement('html', '</td></tr><tr><td>'); // Fix this table thing. TODO: Get rid of this table and use css.
@@ -156,7 +165,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
     public static function renderer_split_content($entry, $subfieldid, $line) {
         // Retrieve only relevant part of content and hand it over.
 
-        // Loop through all possible contents. content, content1, ... 4
+        // Loop through all possible contents. content, content1, ...
         for ($i = 0; $i <= 4; $i++) {
             if ($i == 0) {
                 $contentid = ''; // Content1 is actually content.
@@ -164,6 +173,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 $contentid = $i;
             }
 
+            // If we render a fieldgroup we assume there is fieldgroup content in the $entry.
             if ( isset ( $entry->{"c{$subfieldid}_content{$contentid}_fieldgroup"}) ) {
                 $tempcontent = $entry->{"c{$subfieldid}_content{$contentid}_fieldgroup"};
             } else {
@@ -179,9 +189,22 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
             if (isset($tempcontent[$line])) {
                 $entry->{"c{$subfieldid}_content{$contentid}"} = $tempcontent[$line];
             } else {
-                $entry->{"c{$subfieldid}_content{$contentid}"} = "";
+                $entry->{"c{$subfieldid}_content{$contentid}"} = null;
             }
         }
     }
 
+    /**
+     * Add all subfields to tag patterns, even if not in view.
+     *
+     * @param array $patterns Current set of patterns as collected from the view.
+     * @return array Appended field patterns with all fieldgroup patterns.
+    */
+    public function get_fieldgroup_patterns($patterns) {
+        foreach ($this->get_subfields() as $fieldid => $subfield) {
+            $fieldname = $subfield->field->name;
+            $patterns[$fieldid][0] = "[[$fieldname]]";
+        }
+        return ($patterns);
+    }
 }
