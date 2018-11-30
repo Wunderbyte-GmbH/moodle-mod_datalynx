@@ -41,6 +41,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
      * @see datalynxfield_renderer::render_display_mode()
      */
     public function render_display_mode(stdClass $entry, array $params) {
+        global $OUTPUT; // Needed for mustache implementation.
 
         // We want to display these fields.
         $fieldgroupfields = $this->get_subfields();
@@ -52,17 +53,16 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         $showdefault = $this->_field->field->param3;
 
         for ($line = 0; $line < $showdefault; $line++) {
-
-            $displ .= '<tr><td colspan="2">'; // TODO:
+            $linedispl = array(); // Reset.
 
             foreach ($fieldgroupfields as $fieldid => $subfield) {
                 $this->renderer_split_content($entry, $fieldid, $line);
-                $displ .= "" . $subfield->field->name . ": "; // Needs to be automated here, no html from view definition.
-                $displ .= $subfield->renderer()->render_display_mode($entry, $params);
-                $displ .= "     ";
+                $subfielddefinition['name'] = $subfield->field->name;
+                $subfielddefinition['content'] = $subfield->renderer()->render_display_mode($entry, $params);
+                $linedispl['subfield'][] = $subfielddefinition; // Build this multidimensional array for mustache context.
             }
 
-            $displ .= '</td></tr>'; // TODO:
+            $displ .= $OUTPUT->render_from_template('mod_datalynx/fieldgroup', $linedispl);
         }
         return $displ;
     }
@@ -206,7 +206,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
      *
      * @param array $patterns Current set of patterns as collected from the view.
      * @return array Appended field patterns with all fieldgroup patterns.
-    */
+     */
     public function get_fieldgroup_patterns($patterns) {
         foreach ($this->get_subfields() as $fieldid => $subfield) {
             $fieldname = $subfield->field->name;

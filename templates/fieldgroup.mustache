@@ -17,7 +17,7 @@
 {{!
     @template mod_datalynx/fieldgroup
 
-    Displays feedback summary
+    Displays fieldgroups within datalynx.
 
     Classes required for JS:
     * none
@@ -30,38 +30,15 @@
 
     Example context (json):
     {
-        "completedcount" : 15,
-        "itemscount" : 5,
-        "timeopen" : "May 15, 2016"
+        "name" : "textfield",
+        "content" : "testtext"
     }
 
 }}
-
-<div class="feedback_info">
-    <span
-        class="feedback_info">{{#str}}completed_feedbacks, mod_feedback{{/str}}: </span><span
-        class="feedback_info_value">{{completedcount}}</span>
+<tr><td colspan="2">
+<div class="row">
+    {{#subfield}}
+        <span style="margin-left: 20px">{{name}}: {{content}}</span>
+    {{/subfield}}
 </div>
-
-<div class="feedback_info">
-    <span
-        class="feedback_info">{{#str}}questions, mod_feedback{{/str}}: </span><span
-        class="feedback_info_value">{{itemscount}}</span>
-</div>
-
-{{#timeopen}}
-    <div class="feedback_info">
-        <span
-            class="feedback_info">{{#str}}feedbackopen, mod_feedback{{/str}}: </span><span
-            class="feedback_info_value">{{timeopen}}</span>
-    </div>
-{{/timeopen}}
-
-{{#timeclose}}
-    <div class="feedback_info">
-        <span
-            class="feedback_info">{{#str}}feedbackclose, mod_feedback{{/str}}: </span><span
-            class="feedback_info_value">{{timeclose}}</span>
-    </div>
-{{/timeclose}}
-
+</td></tr>
