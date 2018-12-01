@@ -61,9 +61,11 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 $subfielddefinition['content'] = $subfield->renderer()->render_display_mode($entry, $params);
                 $linedispl['subfield'][] = $subfielddefinition; // Build this multidimensional array for mustache context.
             }
+            $completedispl['line'][] = $linedispl;
 
-            $displ .= $OUTPUT->render_from_template('mod_datalynx/fieldgroup', $linedispl);
         }
+        $displ .= $OUTPUT->render_from_template('mod_datalynx/fieldgroup', $completedispl);
+
         return $displ;
     }
 
