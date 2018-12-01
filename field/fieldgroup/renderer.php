@@ -46,15 +46,10 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         // We want to display these fields.
         $fieldgroupfields = $this->get_subfields();
 
-        // Append display for every field.
-        $displ = '';
-
         // Loop through showdefault.
         $showdefault = $this->_field->field->param3;
 
         for ($line = 0; $line < $showdefault; $line++) {
-            $linedispl = array(); // Reset.
-
             foreach ($fieldgroupfields as $fieldid => $subfield) {
                 $this->renderer_split_content($entry, $fieldid, $line);
                 $subfielddefinition['name'] = $subfield->field->name;
@@ -62,11 +57,10 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 $linedispl['subfield'][] = $subfielddefinition; // Build this multidimensional array for mustache context.
             }
             $completedispl['line'][] = $linedispl;
+            $linedispl = array(); // Reset.
 
         }
-        $displ .= $OUTPUT->render_from_template('mod_datalynx/fieldgroup', $completedispl);
-
-        return $displ;
+        return $OUTPUT->render_from_template('mod_datalynx/fieldgroup', $completedispl);
     }
 
     /**
