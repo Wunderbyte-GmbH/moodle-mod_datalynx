@@ -85,13 +85,17 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         // Loop through all lines.
         for ($line = 0; $line < $showdefault; $line++) {
 
-            $mform->addElement('html', '<tr><td colspan="2">'); // TODO: Get rid of this table and use css.
+            // Allow every fieldgroup to be collapsed if not in use.
+            $mform->addElement('header', $line + 1, 'Zeile ' . s($line+1)); // TODO: Multilang.
+            if ($line + 1 <= 2) {
+                $mform->setExpanded($line + 1, true);
+            }
 
             foreach ($fieldgroupfields as $fieldid => $subfield) {
                 $this->renderer_split_content($entry, $fieldid, $line);
 
                 // Add a static label.
-                $mform->addElement('static', '', $subfield->field->name . ": ");
+                $mform->addElement('static', '', $subfield->field->name . ': ');
                 $tempentryid = $entry->id;
                 $entry->id = $entry->id . "_" . $line; // Add iterator to fieldname.
                 $subfield->renderer()->render_edit_mode($mform, $entry, $options);
@@ -99,8 +103,6 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 // Restore entryid to prior state.
                 $entry->id = $tempentryid;
             }
-
-            $mform->addElement('html', '</td></tr>'); // TODO: Get rid of this table and use css.
         }
     }
 
