@@ -86,7 +86,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         for ($line = 0; $line < $showdefault; $line++) {
 
             // Allow every fieldgroup to be collapsed if not in use.
-            $mform->addElement('header', $line + 1, 'Zeile ' . s($line+1)); // TODO: Multilang.
+            $mform->addElement('header', $line + 1, 'Zeile ' . s($line + 1)); // TODO: Multilang.
             if ($line + 1 <= 2) {
                 $mform->setExpanded($line + 1, true);
             }
