@@ -47,6 +47,7 @@ class datalynxfield_fieldgroup_form extends datalynxfield_form {
         $options = array('multiple' => true);
         $mform->addElement('autocomplete', 'param1', get_string('fieldgroupfields', 'datalynx'),
                 $fieldnames, $options);
+        $mform->addHelpButton('param1', 'fieldgroupfields', 'datalynx');
 
         // Number of times the field group can be filled out.
         $mform->addElement('text', 'param2', 'beschreibung nummax'); // TODO: Multilang.

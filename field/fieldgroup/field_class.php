@@ -41,7 +41,7 @@ class datalynxfield_fieldgroup extends datalynxfield_base {
     }
 
     protected function content_names() {
-        return array(''); // TODO: Maybe we can add fieldgroupid here?
+        return array('');
     }
 
     public function supports_group_by() {
@@ -49,7 +49,7 @@ class datalynxfield_fieldgroup extends datalynxfield_base {
     }
 
     public function get_supported_search_operators() {
-        return false; // TODO: Check.
+        return false;
     }
 
     public static function is_customfilterfield() {

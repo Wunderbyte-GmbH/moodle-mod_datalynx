@@ -353,7 +353,6 @@ class datalynx_entries {
                 $contents = $DB->get_records_select('datalynx_contents',
                         "entryid {$eids} AND fieldid {$fids}", $params);
 
-                // If we see multiple contents to one entry and field, build array with postfix _fieldgroup.
                 foreach ($contents as $contentid => $content) {
                     $entry = $entries->entries[$content->entryid];
 
@@ -378,7 +377,7 @@ class datalynx_entries {
 
                         // If this already exists we see a fieldgroup. Set as array and append.
                         if (isset($entry->{$varpart})) {
-                            $varparts = "c{$fieldid}_$part" . "_fieldgroup";
+                            $varparts = "c{$fieldid}_{$part}_fieldgroup";
                             if (!isset($entry->{$varparts})) {
                                 $entry->{$varparts} = array($entry->{$varpart});
                             }

@@ -129,7 +129,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
      * @see datalynxfield_renderer::render_search_mode()
      */
     public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
-        return false; // TODO: Remove from search.
+        return false; // Remove from search.
     }
 
     /**
@@ -149,7 +149,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
      * @see datalynxfield_renderer::patterns()
      */
     protected function patterns() {
-        $cat = 'Fieldgroups'; // TODO: Multilang.
+        $cat = get_string('fieldgroups', 'datalynx');
         $fieldname = $this->_field->name();
 
         $patterns = array();
@@ -167,7 +167,6 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
      */
     public static function renderer_split_content($entry, $subfieldid, $line) {
         // Retrieve only relevant part of content and hand it over.
-
         // Loop through all possible contents. content, content1, ...
         for ($i = 0; $i <= 4; $i++) {
             if ($i == 0) {
