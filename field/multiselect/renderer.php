@@ -108,7 +108,12 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
                     $str[] = $option;
                 }
             }
+
             $separator = $field->separators[(int) $field->get('param3')]['chr'];
+
+            // If we see a fieldgroup we simply display comma separations for now.
+            if (isset($params['fieldgroup'])) $separator = ", ";
+
             if ($separator == '</li><li>' && count($str) > 0) {
                 $str = '<ul><li>' . implode($separator, $str) . '</li></ul>';
             } else {

@@ -49,6 +49,9 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         // Loop through showdefault.
         $showdefault = $this->_field->field->param3;
 
+        // Add key so the other renderers know they deal with fieldgroup.
+        $params['fieldgroup'] = true;
+
         for ($line = 0; $line < $showdefault; $line++) {
             foreach ($fieldgroupfields as $fieldid => $subfield) {
                 $this->renderer_split_content($entry, $fieldid, $line);
