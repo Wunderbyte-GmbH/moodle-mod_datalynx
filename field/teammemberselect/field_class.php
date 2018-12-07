@@ -208,20 +208,28 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
      * Update a teammemberselectfield when editing an entry and notify teammembers of changes
      */
     public function update_content($entry, array $values = null) {
+        parent::update_content($entry, $values);
+
+        // TODO: All this is only to notify team members. Check if we really need this here.
         global $DB;
+        $fieldid = $this->field->id;
 
-        $field = $DB->get_record('datalynx_fields', array('id' => $this->field->id));
-
-        $oldcontent = json_decode($DB->get_field('datalynx_contents', 'content',
-                array('fieldid' => $this->field->id, 'entryid' => $entry->id)), true);
-
-        // Remove Dummy -999 from values before updating.
-        if ($values[''][0] == -999) {
-            array_shift($values['']);
+        // Read oldcontent from passed entry, not from DB query.
+        $oldcontent = array();
+        if (isset($entry->{"c{$fieldid}_content"})) {
+            $oldcontent = json_decode($entry->{"c{$fieldid}_content"}, true);
         }
 
-        $newcontent = $values[''];
-        parent::update_content($entry, $values);
+        $first = reset($values);
+        $newcontent = !empty($first) ? $first : array();
+
+        if (!empty($newcontent)) {
+            if (isset($newcontent[0]) && $newcontent[0] == -999) {
+                array_shift($newcontent); // Remove Dummy value.
+            }
+        }
+
+        $field = $DB->get_record('datalynx_fields', array('id' => $this->field->id));
         $this->notify_team_members($entry, $field, $oldcontent, $newcontent);
 
         return true;
