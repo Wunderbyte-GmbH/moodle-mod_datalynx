@@ -776,7 +776,8 @@ class datalynx_entries {
                                                         // Either it has content_name after the iterator or not.
                                                         $contentname = explode("_", $key);
                                                         if (isset($contentname[4])) {
-                                                            $tempcontent[$fieldname . "_" . $contentname[4]] = $value;
+                                                            $tempcontent[$contentname[4]] = $value; // No need for fieldname.
+                                                            // $tempcontent[$fieldname . "_" . $contentname[4]] = $value;
                                                         } else {
                                                             $tempcontent[$fieldname] = $value;
                                                         }

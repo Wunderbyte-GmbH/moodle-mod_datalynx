@@ -323,11 +323,15 @@ abstract class datalynxfield_base {
             $rec->{"content$c"} = $content;
         }
 
+        // TODO: Bug found,
+        // When we add a list of values but the first is empty, this insert is not triggered and the order is inserted wrong.
+
         // Insert only if no old contents and there is new contents.
         if (is_null($contentid) and !empty($contents)) {
             return $DB->insert_record('datalynx_contents', $rec);
         }
 
+        // TODO: This needs upgrading, we don't delete the whole entry id but only the one value if other lines exist.
         // Delete if old content but not new.
         if (!is_null($contentid) and empty($contents)) {
             return $this->delete_content($entry->id);

@@ -63,7 +63,9 @@ class datalynxview_entries_form extends moodleform {
                             $errors = array_merge($errors, $newerrors);
                         }
                     }
+
                 } else {
+                    // If no fieldgroup use standard behaviour.
                     foreach ($fields as $fid => $field) {
                         $errors = array_merge($errors,
                                 $field->renderer()->validate($entryid, $patterns[$fid], (object) $data));

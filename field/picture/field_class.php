@@ -33,7 +33,7 @@ class datalynxfield_picture extends datalynxfield_file {
      * Can this field be used in fieldgroups? Override if yes.
      * @var boolean
      */
-    protected $forfieldgroup = true;
+    protected $forfieldgroup = false;
 
     /**
      */
