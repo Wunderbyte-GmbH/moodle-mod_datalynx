@@ -1241,7 +1241,7 @@ class datalynxfield_option_single extends datalynxfield_option {
             $selected = $value;
         }
 
-        // Add the content, even if none is picked.
+        // Add the content.
         $contents[] = $selected;
 
         return array($contents, $oldcontents);
