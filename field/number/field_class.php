@@ -108,9 +108,9 @@ class datalynxfield_number extends datalynxfield_text {
         }
 
         $value = reset($values);
-        if (!empty($value) || "$value" === "0") {
-            $contents[] = $value;
-        }
+
+        // We want to store empty numbers as well.
+        $contents[] = $value;
 
         return array($contents, $oldcontents);
     }
