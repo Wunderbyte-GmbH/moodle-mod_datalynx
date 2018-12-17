@@ -346,7 +346,6 @@ abstract class datalynxfield_base {
                 }
             }
         }
-
         return true;
     }
 
@@ -1236,18 +1235,14 @@ class datalynxfield_option_single extends datalynxfield_option {
         $contents = array();
 
         $selected = null;
-        if (!empty($values)) {
-            foreach ($values as $value) {
-                if ($value) {
-                    $selected = $value;
-                }
-            }
+
+        // We want to store empty values as well.
+        foreach ($values as $value) {
+            $selected = $value;
         }
 
-        // Add the content.
-        if (!is_null($selected)) {
-            $contents[] = $selected;
-        }
+        // Add the content, even if none is picked.
+        $contents[] = $selected;
 
         return array($contents, $oldcontents);
     }
