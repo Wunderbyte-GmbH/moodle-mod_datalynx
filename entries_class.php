@@ -783,6 +783,7 @@ class datalynx_entries {
                                                         }
                                                     }
                                                 }
+
                                                 /*
                                                     [c314_id] => 877
                                                     [c314_content] => http://
@@ -799,7 +800,7 @@ class datalynx_entries {
                                                 if (isset($entry->{"c{$fieldid}_id_fieldgroup"}[$i])) {
                                                     $entry->{"c{$fieldid}_id"} = $entry->{"c{$fieldid}_id_fieldgroup"}[$i];
                                                 }
-                                                if (isset($entry->{"c{$fieldid}_id_content"}[$i])) {
+                                                if (isset($entry->{"c{$fieldid}_content_fieldgroup"}[$i])) {
                                                     $entry->{"c{$fieldid}_content"} = $entry->{"c{$fieldid}_content_fieldgroup"}[$i];
                                                 }
 

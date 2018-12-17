@@ -96,9 +96,10 @@ class datalynxfield_time extends datalynxfield_base {
                 }
             }
         }
-        if ($timestamp) {
-            $contents[] = $timestamp;
-        }
+
+        // We consider 0 a valid input to be stored.
+        $contents[] = $timestamp;
+
         return array($contents, $oldcontents);
     }
 
