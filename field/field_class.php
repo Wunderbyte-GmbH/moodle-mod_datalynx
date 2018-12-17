@@ -1046,6 +1046,8 @@ class datalynxfield_option_multiple extends datalynxfield_option {
         if (!empty($newvalues)) {
             $content = '#' . implode('#,#', $newvalues) . '#';
             $contents[] = $content;
+        } else {
+            $contents[] = ''; // Keep empties in database.
         }
 
         return array($contents, $oldcontents);
