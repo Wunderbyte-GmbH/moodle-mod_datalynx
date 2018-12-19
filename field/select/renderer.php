@@ -185,19 +185,10 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
         // Not every field of this dataynx-instance has to be in the form!
         if (isset($formdata->{$formfieldname})) {
 
-            $query = "SELECT dc.id, dc.content
-            FROM {datalynx_contents} dc
-            WHERE dc.entryid = :entryid
-            AND dc.fieldid = :fieldid";
-            $params = array('entryid' => $entryid, 'fieldid' => $fieldid);
-
-            // TODO: Throws errors bc. multiples are found when fieldgroups.
-            $oldcontent = $DB->get_field_sql($query, $params);
-
             if (isset($this->_field->field->param5) && $this->_field->field->param5 > 0) {
                 $disabled = $this->_field->get_disabled_values_for_user();
                 $content = clean_param($formdata->{$formfieldname}, PARAM_INT);
-                if ($content != $oldcontent && array_search($content, $disabled) !== false) {
+                if (array_search($content, $disabled) !== false) {
                     $menu = $this->_field->options_menu();
                     $errors[$formfieldname] = get_string('limitchoice_error', 'datalynx', $menu[$content]);
                 }
