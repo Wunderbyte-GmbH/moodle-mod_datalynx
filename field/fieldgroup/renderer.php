@@ -52,6 +52,9 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         // Add key so the other renderers know they deal with fieldgroup.
         $params['fieldgroup'] = true;
 
+        // In case we don't have anything to show there should be an error.
+        $linedispl = array();
+
         for ($line = 0; $line < $showdefault; $line++) {
             foreach ($fieldgroupfields as $fieldid => $subfield) {
                 $this->renderer_split_content($entry, $fieldid, $line);
