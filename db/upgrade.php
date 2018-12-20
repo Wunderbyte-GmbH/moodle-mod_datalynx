@@ -778,10 +778,10 @@ function xmldb_datalynx_upgrade($oldversion) {
 
     if ($oldversion < 2016050100) {
         $sql = "SELECT dc.*
-              	        FROM {datalynx_contents} dc
-              	        JOIN {datalynx_fields} df
-              	        ON dc.fieldid = df.id
-              	        WHERE df.type = 'checkbox' OR df.type = 'multiselect'";
+                        FROM {datalynx_contents} dc
+                        JOIN {datalynx_fields} df
+                        ON dc.fieldid = df.id
+                        WHERE df.type = 'checkbox' OR df.type = 'multiselect'";
         $checkboxes = $DB->get_records_sql($sql);
         if (!empty($checkboxes)) {
             foreach ($checkboxes as $checkbox) {
@@ -809,10 +809,10 @@ function xmldb_datalynx_upgrade($oldversion) {
 
     if ($oldversion < 2016050101) {
         $sql = "SELECT dc.*
-              	        FROM {datalynx_contents} dc
-              	        JOIN {datalynx_fields} df
-              	        ON dc.fieldid = df.id
-              	        WHERE df.type = 'checkbox' OR df.type = 'multiselect'";
+                        FROM {datalynx_contents} dc
+                        JOIN {datalynx_fields} df
+                        ON dc.fieldid = df.id
+                        WHERE df.type = 'checkbox' OR df.type = 'multiselect'";
         $checkboxes = $DB->get_records_sql($sql);
         if (!empty($checkboxes)) {
             foreach ($checkboxes as $checkbox) {
@@ -831,10 +831,10 @@ function xmldb_datalynx_upgrade($oldversion) {
 
     if ($oldversion < 2016050200) {
         $sql = "SELECT dc.*
-                  	        FROM {datalynx_contents} dc
-                  	        JOIN {datalynx_fields} df
-                  	        ON dc.fieldid = df.id
-                  	        WHERE df.type = 'checkbox' OR df.type = 'multiselect'";
+                            FROM {datalynx_contents} dc
+                            JOIN {datalynx_fields} df
+                            ON dc.fieldid = df.id
+                            WHERE df.type = 'checkbox' OR df.type = 'multiselect'";
         $checkboxes = $DB->get_records_sql($sql);
         foreach ($checkboxes as $checkbox) {
             if ($checkbox->content) {
@@ -955,6 +955,16 @@ function xmldb_datalynx_upgrade($oldversion) {
         }
         // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2018081701, 'datalynx');
+    }
+    if ($oldversion < 2018101700) {
+        // Add field to every line of content.
+        $table = new xmldb_table('datalynx_contents');
+        $field = new xmldb_field('fieldgroupid', XMLDB_TYPE_INTEGER, '20', null, XMLDB_NOTNULL, null, '0', 'content4');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2018101700, 'datalynx');
     }
     return true;
 }
