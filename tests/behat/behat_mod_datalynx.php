@@ -243,13 +243,15 @@ class behat_mod_datalynx extends behat_files {
         $activityid = $DB->get_field('datalynx', 'id', array('name' => $activityname));
 
         $customsearch = str_replace("xxxxxx", $fieldid, $customsearch);
-        $record = array('dataid' => $activityid, 'name' => $filtername,
-                'description' => 'desc', 'visible' => 1, 'perpage' => '10',
-                'selection' => '0', 'customsearch' => $customsearch
-        );
-
+        $record = new \stdClass();
+        $record->dataid = $activityid;
+        $record->name = $filtername;
+        $record->description = 'desc';
+        $record->visible = 1;
+        $record->perpage = 18;
+        $record->selection = 0;
+        $record->customsearch = $customsearch;
         $filterid = $DB->insert_record('datalynx_filters', $record);
-
     }
 
     private function map_view_names_for_redirect($views, $names) {
@@ -347,6 +349,10 @@ class behat_mod_datalynx extends behat_files {
      * @Given /^I fill entry form with:$/
      *
      * @param TableNode $table
+     * @throws \Behat\Mink\Exception\ElementException
+     * @throws \Behat\Mink\Exception\ElementNotFoundException
+     * @throws \Behat\Mink\Exception\ExpectationException
+     * @throws coding_exception
      */
     public function i_fill_entry_form_with(TableNode $table) {
         $session = $this->getSession();
@@ -379,6 +385,7 @@ class behat_mod_datalynx extends behat_files {
      * @Given /^I select "(?P<entrynumbers_string>(?:[^"]|\\")*)" entry$/
      *
      * @param string $entrynumbers
+     * @throws \Behat\Mink\Exception\ElementException
      */
     public function i_select_entry($entrynumbers) {
         $entrynumbers = explode(',', $entrynumbers);
@@ -415,6 +422,15 @@ class behat_mod_datalynx extends behat_files {
         }
     }
 
+    /**
+     * @param \Behat\Mink\Element\NodeElement $element
+     * @param $type
+     * @param $value
+     * @throws \Behat\Mink\Exception\ElementException
+     * @throws \Behat\Mink\Exception\ElementNotFoundException
+     * @throws \Behat\Mink\Exception\ExpectationException
+     * @throws coding_exception
+     */
     private function fill_data(Behat\Mink\Element\NodeElement $element, $type, $value) {
         switch ($type) {
             case 'text':

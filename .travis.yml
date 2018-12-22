@@ -1,13 +1,17 @@
 language: php
 
-sudo: false # checking if sudo makes behat error go away.
+sudo: required # checking if sudo makes behat error go away.
 
 addons:
-  postgresql: "9.6"
+  postgresql: "9.4"
+  firefox: "47.0.1"
+  chrome: stable
   apt:
     packages:
-      - oracle-java9-installer
-      - oracle-java9-set-default
+      - oracle-java8-installer
+      - oracle-java8-set-default
+      - chromium-chromedriver
+
 
 cache:
   directories:
@@ -21,22 +25,30 @@ php:
 env:
  global:
   - IGNORE_PATHS=checkboxgroup/checkboxgroup.php # we know this dir is problematic
+  - MOODLE_DIR=/home/travis/build/moodle
+  - MOODLE_SELENIUM_JAR=/home/travis/build/moodle/selenium.jar
  matrix:
-  - DB=pgsql MOODLE_BRANCH=MOODLE_34_STABLE MOODLE_CI_VER=2
-  - DB=mysqli MOODLE_BRANCH=MOODLE_34_STABLE MOODLE_CI_VER=2
-  - DB=pgsql MOODLE_BRANCH=MOODLE_35_STABLE MOODLE_CI_VER=2
-  - DB=mysqli MOODLE_BRANCH=MOODLE_35_STABLE MOODLE_CI_VER=2
+  - DB=pgsql MOODLE_BRANCH=MOODLE_34_STABLE
+  - DB=mysqli MOODLE_BRANCH=MOODLE_35_STABLE
 
 before_install:
   - phpenv config-rm xdebug.ini
-  - nvm install v8.9.4
+  - echo "upload_max_filesize=20M" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
+  - echo "post_max_size=20M" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
+  - nvm install 8.9; nvm use 8.9;
   - cd ../..
   - composer selfupdate
-  - composer create-project -n --no-dev --prefer-dist moodlerooms/moodle-plugin-ci ci ^2
+  - composer create-project -n --no-dev --prefer-dist blackboard-open-source/moodle-plugin-ci ci ^2
   - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
+  - chromedriverversion=$(curl https://chromedriver.storage.googleapis.com/LATEST_RELEASE);
+  - curl https://chromedriver.storage.googleapis.com/$chromedriverversion/chromedriver_linux64.zip | gunzip - > ci/bin/chromedriver
+  - chmod +x ci/bin/chromedriver
 
 install:
   - moodle-plugin-ci install
+  - xvfb-run -a --server-args="-screen 0 1024x768x24" java -Dwebdriver.firefox.bin=/usr/bin/firefox -jar ${MOODLE_SELENIUM_JAR} -log /tmp/selenium.log &
+  - php -t ${MOODLE_DIR} -S localhost:8000 > /tmp/php-access.log 2> /tmp/php-error.log &
+  - sleep 3
 script:
   - moodle-plugin-ci phplint
   #- moodle-plugin-ci phpcpd # bug#1065 as discussed.
@@ -47,4 +59,4 @@ script:
   - moodle-plugin-ci mustache
   - moodle-plugin-ci grunt
   - moodle-plugin-ci phpunit
-  - moodle-plugin-ci behat
+  - moodle-plugin-ci behat --profile chrome --dump
