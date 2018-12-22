@@ -1,15 +1,13 @@
 language: php
 
-sudo: required # checking if sudo makes behat error go away.
+sudo: false # checking if sudo makes behat error go away.
 
 addons:
   postgresql: "9.6"
   apt:
     packages:
-      - google-chrome-stable
       - oracle-java9-installer
       - oracle-java9-set-default
-      - chromium-chromedriver # used to start behat with chrome
 
 cache:
   directories:
@@ -22,10 +20,6 @@ php:
 
 env:
  global:
-  - MOODLE_START_BEHAT_SERVERS=NO
-  - MOODLE_CI_VER=1
-  - MOODLE_DIR=/home/travis/build/moodle
-  - MOODLE_SELENIUM_JAR=/home/travis/build/moodle/selenium.jar
   - IGNORE_PATHS=checkboxgroup/checkboxgroup.php # we know this dir is problematic
  matrix:
   - DB=pgsql MOODLE_BRANCH=MOODLE_34_STABLE MOODLE_CI_VER=2
@@ -35,19 +29,14 @@ env:
 
 before_install:
   - phpenv config-rm xdebug.ini
-  - nvm install 8.9
-  - nvm use 8.9
+  - nvm install v8.9.4
   - cd ../..
   - composer selfupdate
-  - composer create-project -n --no-dev --prefer-dist moodlerooms/moodle-plugin-ci ci ^${MOODLE_CI_VER}
+  - composer create-project -n --no-dev --prefer-dist moodlerooms/moodle-plugin-ci ci ^2
   - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
-  - sleep 10
 
 install:
   - moodle-plugin-ci install
-  - xvfb-run -a --server-args="-screen 0 1024x768x24" java -Dwebdriver.chrome.driver=/usr/lib/chromium-browser/chromedriver -jar ${MOODLE_SELENIUM_JAR} -log /tmp/selenium.log &
-  - php -t ${MOODLE_DIR} -S localhost:8000 > /tmp/php-access.log 2> /tmp/php-error.log &
-  - sleep 5s
 script:
   - moodle-plugin-ci phplint
   #- moodle-plugin-ci phpcpd # bug#1065 as discussed.
@@ -58,4 +47,4 @@ script:
   - moodle-plugin-ci mustache
   - moodle-plugin-ci grunt
   - moodle-plugin-ci phpunit
-  - moodle-plugin-ci behat --profile chrome
+  - moodle-plugin-ci behat
