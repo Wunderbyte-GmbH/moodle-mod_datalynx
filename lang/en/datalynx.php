@@ -891,7 +891,8 @@ $string['privacy:metadata:filepurpose'] = 'File or picture attached to a datalyn
 
 // Fieldgroups
 $string['fieldgroups'] = 'Fieldgroups';
-$string['fieldgroupfields'] = 'Fields that are repeated as a group. The order of the fields is alphabetically so in order to have the fields ordered according to your preferences name them appropriatly';
+$string['fieldgroupfields'] = 'Fieldgroupfields';
+$string['fieldgroupfields_help'] = 'Fields that are repeated as a group. The order of the fields is alphabetically so in order to have the fields ordered according to your preferences name them appropriatly';
 $string['fieldgroupsadd'] = 'Add fieldgroups';
 $string['newfieldgroup'] = 'New fieldgroup';
 $string['editingfieldgroup'] = 'Editing fieldgroup "{$a}"';

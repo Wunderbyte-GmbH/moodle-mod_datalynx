@@ -41,25 +41,32 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
      * @see datalynxfield_renderer::render_display_mode()
      */
     public function render_display_mode(stdClass $entry, array $params) {
+        global $OUTPUT; // Needed for mustache implementation.
+
         // We want to display these fields.
         $fieldgroupfields = $this->get_subfields();
 
-        // Create display for every field.
-        $displ = '';
-
         // Loop through showdefault.
         $showdefault = $this->_field->field->param3;
-        for ($x = 0; $x < $showdefault; $x++) {
-            $displ .= "</td></tr><tr><td>"; // TODO: How to get this in a template? Close current template and start new.
 
+        // Add key so the other renderers know they deal with fieldgroup.
+        $params['fieldgroup'] = true;
+
+        // In case we don't have anything to show there should be an error.
+        $linedispl = array();
+
+        for ($line = 0; $line < $showdefault; $line++) {
             foreach ($fieldgroupfields as $fieldid => $subfield) {
-                $this->splitcontent($entry, $fieldid, $x);
-                $displ .= "" . $subfield->field->name . ": "; // Needs to be automated here, no html.
-                $displ .= $subfield->renderer()->render_display_mode($entry, $params);
-                $displ .= "     ";
+                $this->renderer_split_content($entry, $fieldid, $line);
+                $subfielddefinition['name'] = $subfield->field->name;
+                $subfielddefinition['content'] = $subfield->renderer()->render_display_mode($entry, $params);
+                $linedispl['subfield'][] = $subfielddefinition; // Build this multidimensional array for mustache context.
             }
+            $completedispl['line'][] = $linedispl;
+            $linedispl = array(); // Reset.
+
         }
-        return $displ;
+        return $OUTPUT->render_from_template('mod_datalynx/fieldgroup', $completedispl);
     }
 
     /**
@@ -71,19 +78,34 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         // We want to display these fields.
         $fieldgroupfields = $this->get_subfields();
 
-        // Loop through showdefault.
+        // Number of lines to show by default.
         $showdefault = $this->_field->field->param3;
-        for ($x = 0; $x < $showdefault; $x++) {
 
-            $mform->addElement('html', '</td></tr><tr><td>'); // Fix this table thing. TODO: Get rid of this table and use css.
+        // Add a fieldgroup marker to the entry data.
+        $mform->addElement('hidden', 'fieldgroup', $this->_field->field->id);
+        $mform->setType('fieldgroup', PARAM_INT);
+
+        $mform->addElement('hidden', 'iterations', $showdefault);
+        $mform->setType('iterations', PARAM_INT);
+
+        // Loop through all lines.
+        for ($line = 0; $line < $showdefault; $line++) {
+
+            // Allow every fieldgroup to be collapsed if not in use.
+            $mform->addElement('header', $line + 1, 'Zeile ' . s($line + 1)); // TODO: Multilang.
+            if ($line + 1 <= 2) {
+                $mform->setExpanded($line + 1, true);
+            }
 
             foreach ($fieldgroupfields as $fieldid => $subfield) {
-                $this->splitcontent($entry, $fieldid, $x);
+                $this->renderer_split_content($entry, $fieldid, $line);
+
                 // Add a static label.
-                $mform->addElement('static', '', $subfield->field->name . ": ");
+                $mform->addElement('static', '', $subfield->field->name . ': ');
                 $tempentryid = $entry->id;
-                $entry->id = $entry->id . "_" . $x; // Add iterator to fieldname.
+                $entry->id = $entry->id . "_" . $line; // Add iterator to fieldname.
                 $subfield->renderer()->render_edit_mode($mform, $entry, $options);
+
                 // Restore entryid to prior state.
                 $entry->id = $tempentryid;
             }
@@ -115,7 +137,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
      * @see datalynxfield_renderer::render_search_mode()
      */
     public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
-        return false; // TODO: Remove from search.
+        return false; // Remove from search.
     }
 
     /**
@@ -135,7 +157,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
      * @see datalynxfield_renderer::patterns()
      */
     protected function patterns() {
-        $cat = 'Fieldgroups'; // TODO: Multilang.
+        $cat = get_string('fieldgroups', 'datalynx');
         $fieldname = $this->_field->name();
 
         $patterns = array();
@@ -145,31 +167,54 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
     }
 
     /**
-     * TODO: What does this do???
+     * We split the multiple contents for every line and pass only one content at a time to the subfields renderer.
      *
      * @param object $entry
      * @param number $subfieldid
-     * @param number $iterator
+     * @param number $line defines what line we want to pass here.
      */
-    public static function splitcontent($entry, $subfieldid, $iterator) {
+    public static function renderer_split_content($entry, $subfieldid, $line) {
         // Retrieve only relevant part of content and hand it over.
-        if ( isset ( $entry->{"c{$subfieldid}_content_fieldgroup"}) ) {
-            $tempcontent = $entry->{"c{$subfieldid}_content_fieldgroup"};
-        } else {
-            // If we have exactly one content, show this and leave the rest blank.
-            if (isset( $entry->{"c{$subfieldid}_content"} )) {
-                $tempcontent = array( $entry->{"c{$subfieldid}_content"} );
+        // Loop through all possible contents. content, content1, ...
+        for ($i = 0; $i <= 4; $i++) {
+            if ($i == 0) {
+                $contentid = ''; // Content1 is actually content.
             } else {
-                $tempcontent = array();
+                $contentid = $i;
             }
-        }
 
-        // Don't touch content if it is not a fieldgroup.
-        if (isset($tempcontent[$iterator])) {
-            $entry->{"c{$subfieldid}_content"} = $tempcontent[$iterator];
-        } else {
-            $entry->{"c{$subfieldid}_content"} = "";
+            // If we render a fieldgroup we assume there is fieldgroup content in the $entry.
+            if ( isset ( $entry->{"c{$subfieldid}_content{$contentid}_fieldgroup"}) ) {
+                $tempcontent = $entry->{"c{$subfieldid}_content{$contentid}_fieldgroup"};
+            } else {
+                // If we have exactly one content, show this and leave the rest blank.
+                if (isset( $entry->{"c{$subfieldid}_content{$contentid}"} )) {
+                    $tempcontent = array( $entry->{"c{$subfieldid}_content{$contentid}"} );
+                } else {
+                    $tempcontent = array();
+                }
+            }
+
+            // Don't touch content if it is not a fieldgroup.
+            if (isset($tempcontent[$line])) {
+                $entry->{"c{$subfieldid}_content{$contentid}"} = $tempcontent[$line];
+            } else {
+                $entry->{"c{$subfieldid}_content{$contentid}"} = null;
+            }
         }
     }
 
+    /**
+     * Add all subfields to tag patterns, even if not in view.
+     *
+     * @param array $patterns Current set of patterns as collected from the view.
+     * @return array Appended field patterns with all fieldgroup patterns.
+     */
+    public function get_fieldgroup_patterns($patterns) {
+        foreach ($this->get_subfields() as $fieldid => $subfield) {
+            $fieldname = $subfield->field->name;
+            $patterns[$fieldid][0] = "[[$fieldname]]";
+        }
+        return ($patterns);
+    }
 }

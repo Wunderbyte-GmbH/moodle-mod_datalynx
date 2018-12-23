@@ -244,7 +244,8 @@ class datalynxfield_text_form extends datalynxfield_form {
             return false;
         }
 
-        $records = $DB->get_records_sql("SELECT COUNT(*) AS amount, c.content
+        // Added id to records to make the first column something unique.
+        $records = $DB->get_records_sql("SELECT id, COUNT(*) AS amount, c.content
                                      FROM {datalynx_contents} c
                                     WHERE c.fieldid = :fieldid AND c.content IS NOT NULL
                                  GROUP BY c.content

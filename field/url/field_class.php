@@ -68,8 +68,6 @@ class datalynxfield_url extends datalynxfield_base {
             foreach ($values as $name => $value) {
                 if ($name) { // Update from form.
 
-                    $name = substr($name, -3); // Just remove the field_ for fieldgroup.
-
                     switch ($name) {
                         case 'url':
                             // TODO: Is this really the place to validate for empty fields?
@@ -78,11 +76,6 @@ class datalynxfield_url extends datalynxfield_base {
                         case 'alt':
                             $linktext = clean_param($value, PARAM_NOTAGS);
                             break;
-                    }
-
-                    // Stop this thing from overwriteing itself time and time again.
-                    if (isset($url)) {
-                        break;
                     }
 
                 } else { // Update from import.

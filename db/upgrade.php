@@ -957,7 +957,7 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2018081701, 'datalynx');
     }
     if ($oldversion < 2018101700) {
-        // Add field to every line of content.
+        // Add fieldgroupid to every line of content.
         $table = new xmldb_table('datalynx_contents');
         $field = new xmldb_field('fieldgroupid', XMLDB_TYPE_INTEGER, '20', null, XMLDB_NOTNULL, null, '0', 'content4');
         if (!$dbman->field_exists($table, $field)) {

@@ -189,10 +189,12 @@ body.jsenabled table.datalynx-behaviors img {
 }
 
 form.mform div.entry div.fitem {
-    display: inline-block;
+    /* Don't force inline. */
+    display: block;
     margin: inherit;
 }
 
 form.mform div.entry div.datalynx-field-wrapper {
-    display: inline-flex;
+    /* Don't force inline. */
+    display: block; /* inline-flex */
 }

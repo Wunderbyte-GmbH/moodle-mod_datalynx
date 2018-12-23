@@ -31,12 +31,13 @@ class datalynxfield_tag extends datalynxfield_option_multiple {
 
     /**
      * Can this field be used in fieldgroups?
+     * We don't want to add empty tags to the tag manager, this field can only be used if forced required.
      * @var boolean
      */
-    protected $forfieldgroup = true;
+    protected $forfieldgroup = false;
 
     /**
-     * Write tags and and associate them with the id of the contents recordd
+     * Write tags and and associate them with the id of the contents record
      *
      * @see datalynxfield_base::update_content()
      */

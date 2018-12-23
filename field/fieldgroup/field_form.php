@@ -47,6 +47,7 @@ class datalynxfield_fieldgroup_form extends datalynxfield_form {
         $options = array('multiple' => true);
         $mform->addElement('autocomplete', 'param1', get_string('fieldgroupfields', 'datalynx'),
                 $fieldnames, $options);
+        $mform->addHelpButton('param1', 'fieldgroupfields', 'datalynx');
 
         // Number of times the field group can be filled out.
         $mform->addElement('text', 'param2', 'beschreibung nummax'); // TODO: Multilang.
@@ -78,7 +79,6 @@ class datalynxfield_fieldgroup_form extends datalynxfield_form {
         $errors = parent::validation($data, $files);
 
         // Check if all fieldnames are actually found and only fieldtypes are entered that have been tested.
-        // $workingfields = array('text');
         $fields = $this->_df->get_fields(null, false, true);
         foreach ($data['param1'] as $fieldid) {
             if (!(array_key_exists($fieldid, $fields) and $fields[$fieldid]->for_use_in_fieldgroup())) {

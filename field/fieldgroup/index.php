@@ -90,7 +90,7 @@ $fieldgroups = $DB->get_records('datalynx_fields', array('dataid' => $datalynx->
 foreach ($fieldgroups as $fieldgroupid => $fieldgroup) {
 
     $fieldname = html_writer::link(
-            new moodle_url($editbaseurl, $linkparams + array('id' => $fieldgroupid)), $fieldgroup->name);
+            new moodle_url($editbaseurl, $linkparams + array('fid' => $fieldgroupid)), $fieldgroup->name);
     $fielddescription = shorten_text($fieldgroup->description, 30);
 
     $fieldgroupfields = $fieldgroup->param1; // What fields are in the group.

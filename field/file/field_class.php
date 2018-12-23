@@ -35,7 +35,7 @@ class datalynxfield_file extends datalynxfield_base {
      * Can this field be used in fieldgroups? Override if yes.
      * @var boolean
      */
-    protected $forfieldgroup = true;
+    protected $forfieldgroup = false;
 
     // Content - file manager.
     // Content1 - alt name.
@@ -55,11 +55,12 @@ class datalynxfield_file extends datalynxfield_base {
         $entryid = $entry->id;
         $fieldid = $this->field->id;
 
+        // This sets variables by resetting every part from the array key.
         $filemanager = $alttext = $delete = $editor = null;
         if (!empty($values)) {
             foreach ($values as $name => $value) {
                 if (!empty($name) and !empty($value)) {
-                    ${$name} = $value;
+                    ${$name} = $value; // Sets $filemanager etc.
                 }
             }
         }
@@ -69,19 +70,20 @@ class datalynxfield_file extends datalynxfield_base {
             return $this->save_changes_to_file($entry, $values);
         }
 
-        // Store uploaded files.
+        // Contentid to locate in table.
         $contentid = isset($entry->{"c{$this->field->id}_id"}) ? $entry->{"c{$this->field->id}_id"} : null;
-        $draftarea = $filemanager;
+
         $usercontext = context_user::instance($USER->id);
 
         $fs = get_file_storage();
-        $files = $fs->get_area_files($usercontext->id, 'user', 'draft', $draftarea);
+        $files = $fs->get_area_files($usercontext->id, 'user', 'draft', $filemanager);
+
         if (count($files) > 1) {
             // There are files to upload so add/update content record.
             $rec = new stdClass();
             $rec->fieldid = $fieldid;
             $rec->entryid = $entryid;
-            $rec->content = 1;
+            $rec->content = 1; // We just store a 1 to show there is something, look for files.
             $rec->content1 = $alttext;
 
             if (!empty($contentid)) {
@@ -95,15 +97,19 @@ class datalynxfield_file extends datalynxfield_base {
             $options = array('subdirs' => 0, 'maxbytes' => $this->field->param1,
                     'maxfiles' => $this->field->param2, 'accepted_types' => $this->field->param3
             );
+
+            // TODO: This is not precise enough, we only store contents and these are linked to the entry.
+            // We need a way to determine a specific line or remove field file and picture from fieldgroups for now.
             $contextid = $this->df->context->id;
             file_save_draft_area_files($filemanager, $contextid, 'mod_datalynx', 'content',
                     $contentid, $options);
 
             $this->update_content_files($contentid);
 
-            // User cleared files from the field.
         } else {
+            // User cleared files from the field.
             if (!empty($contentid)) {
+                // TODO: Fix this, don't delete whole entry only contentid we see.
                 $this->delete_content($entryid);
             }
         }

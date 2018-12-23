@@ -40,28 +40,20 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
         $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
         $url = isset($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : null;
         $alt = isset($entry->{"c{$fieldid}_content1"}) ? $entry->{"c{$fieldid}_content1"} : null;
-        /*
-        // TODO: Replace filepicker with normal text input fields.
-        $mform->addElement('text', 'name', "test", "");
-        $mform->setType('name', PARAM_URL);
-        */
+
         $url = empty($url) ? 'http://' : $url;
-        $usepicker = empty($field->field->param1) ? false : true;
         $displaylinktextfield = empty($field->field->param5) ? false : true;
-        $options = array('title' => s($field->field->description), 'size' => 64);
+        $options = array('title' => s($field->field->description), 'size' => 60);
 
         $group = array();
-        $group[] = $mform->createElement('url', "{$fieldname}_url", null, $options,
-                array('usefilepicker' => $usepicker));
+        $group[] = $mform->createElement('text', "{$fieldname}_url", null, $options);
         $mform->setType("{$fieldname}_url", PARAM_URL);
         $mform->setDefault("{$fieldname}_url", s($url));
 
         // Add alt name if not forcing name.
         if (empty($field->field->param2) && $displaylinktextfield) {
-            $group[] = $mform->createElement('static', '', '',
-                    get_string('linktext', 'datalynxfield_url'));
-            $group[] = $mform->createElement('text', "{$fieldname}_alt",
-                    get_string('linktext', 'datalynxfield_url'));
+            $options = array('placeholder' => get_string('linktext', 'datalynxfield_url'));
+            $group[] = $mform->createElement('text', "{$fieldname}_alt", null, $options);
             $mform->setType("{$fieldname}_alt", PARAM_TEXT);
             $mform->setDefault("{$fieldname}_alt", s($alt));
         }
@@ -80,7 +72,6 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
         ], array_keys($params));
         $type = isset($types[0]) ? $types[0] : '';
 
-        // TODO: In fieldgroups this fails, why aren't these read from field->param3?
         $attributes = array('class' => $field->class, 'target' => $field->target);
 
         if (isset($entry->{"c{$fieldid}_content"})) {
