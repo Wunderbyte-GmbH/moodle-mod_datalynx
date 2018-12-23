@@ -28,6 +28,7 @@
 require_once(__DIR__ . '/../../../../lib/behat/behat_files.php');
 require_once(__DIR__ . '/../../mod_class.php');
 
+use Behat\Behat\Definition\Call\Given;
 use Behat\Gherkin\Node\TableNode as TableNode;
 
 /**
@@ -39,8 +40,6 @@ use Behat\Gherkin\Node\TableNode as TableNode;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class behat_mod_datalynx extends behat_files {
-
-
     /**
      * Sets up fields for the given datalynx instance.
      * Optional, but must be used after instance declaration.
@@ -110,6 +109,11 @@ class behat_mod_datalynx extends behat_files {
         $this->map_view_names_for_redirect($newviews, $names);
     }
 
+    /**
+     * @param $name
+     * @return mixed
+     * @throws dml_exception
+     */
     private function get_instance_by_name($name) {
         global $DB;
         return $DB->get_record('datalynx', array('name' => $name));
@@ -563,10 +567,16 @@ class behat_mod_datalynx extends behat_files {
             if (!empty($entry['status'])) {
                 $status = trim($entry['status']);
             }
-            $record = array('dataid' => $instance->id, 'userid' => $authorid, 'groupid' => 0,
-                'description' => '', 'visible' => 1, 'timecreated' => time(),
-                'timemodified' => time(), 'approved' => $approved, 'status' => $status
-            );
+            $record = new stdClass();
+            $record->dataid = $instance->id;
+            $record->userid = $authorid;
+            $record->groupid = 0;
+            $record->description = '';
+            $record->visible = 1;
+            $record->timecreated = time();
+            $record->timemodified = time();
+            $record->approved = $approved;
+            $record->status = $status;
 
             $entryid = $DB->insert_record('datalynx_entries', $record);
 
@@ -581,18 +591,22 @@ class behat_mod_datalynx extends behat_files {
 
     private function create_content($dataid, $entryid, $fieldid, $type, $value) {
         global $DB, $CFG;
-
-        $content = array('fieldid' => $fieldid, 'entryid' => $entryid, 'content' => null,
-            'content1' => null, 'content2' => null, 'content3' => null, 'content4' => null);
-
+        $content = new stdClass();
+        $content->fieldid = $fieldid;
+        $content->entryid = $entryid;
+        $content->content = null;
+        $content->content1 = null;
+        $content->content2 = null;
+        $content->content3 = null;
+        $content->content4 = null;
         switch ($type) {
             case 'text':
             case 'number':
             case 'textarea':
-                $content['content'] = $value;
+                $content->content = $value;
                 break;
             case 'url':
-                list($content['content'], $content['content1']) = explode(' ', $value, 2);
+                list($content->content, $content->content1) = explode(' ', $value, 2);
                 break;
             case 'select':
             case 'radiobutton':
@@ -602,9 +616,9 @@ class behat_mod_datalynx extends behat_files {
                 $options = preg_split($pattern, $result->param1);
                 $id = array_search(trim($value), $options);
                 if ($id !== false) {
-                    $content['content'] = $id + 1;
+                    $content->content = $id + 1;
                 } else {
-                    $content['content'] = '';
+                    $content->content = '';
                 }
                 break;
             case 'checkbox':
@@ -621,17 +635,17 @@ class behat_mod_datalynx extends behat_files {
                     }
                 }
                 if (!empty($ids)) {
-                    $content['content'] = '#' . implode('#', $ids) . '#';
+                    $content->content = '#' . implode('#', $ids) . '#';
                 } else {
-                    $content['content'] = '';
+                    $content->content = '';
                 }
                 break;
             case 'duration':
-                $content['content'] = strtotime($value, 0);
+                $content->content = strtotime($value, 0);
                 break;
             case 'time':
                 list($day, $month, $year, $hour, $minute) = preg_split('/[ \.\/:-]+/', $value);
-                $content['content'] = mktime($hour, $minute, 0, $month, $day, $year);
+                $content->content = mktime($hour, $minute, 0, $month, $day, $year);
                 break;
             case 'teammemberselect':
                 $usernames = preg_split('/,[ ]?/', $value);
@@ -639,11 +653,11 @@ class behat_mod_datalynx extends behat_files {
                 foreach ($usernames as $username) {
                     $ids[] = '"' . $DB->get_field('user', 'id', array('username' => $username)) . '"';
                 }
-                $content['content'] = '[' . implode(',', $ids) . ']';
+                $content->content = '[' . implode(',', $ids) . ']';
                 break;
             case 'file':
             case 'picture':
-                $content['content'] = 1;
+                $content->content = 1;
                 $itemid = $DB->insert_record('datalynx_contents', $content);
 
                 $datalynx = new datalynx($dataid);
@@ -655,13 +669,13 @@ class behat_mod_datalynx extends behat_files {
                 );
                 $fs = get_file_storage();
                 $fs->create_file_from_pathname($fileinfo, $CFG->libdir . '/../' . $value);
-                $content['content'] = 0;
+                $content->content = 0;
                 break;
             default:
                 break;
         }
 
-        if ($content['content']) {
+        if ($content->content) {
             $DB->insert_record('datalynx_contents', $content);
         }
     }
