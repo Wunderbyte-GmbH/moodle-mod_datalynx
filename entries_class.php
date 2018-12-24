@@ -74,8 +74,7 @@ class datalynx_entries {
     /**
      * Populate the entries with content of the content table datalynx_contents. Gets the raw content
      * for each field for the entry and sets the content in $this->_entries
-     * Performs entries count in order to display number of entries. Updates user profiels if
-     * plugin local_userinfosync is installed
+     * Performs entries count in order to display number of entries.
      *
      * @param array $options
      * @throws coding_exception
@@ -99,20 +98,6 @@ class datalynx_entries {
                 $this->_entries);
         $this->_entriesfiltercount = !empty($entriesset->found) ? $entriesset->found : count(
                 $this->_entries);
-
-        $pluginmananger = core_plugin_manager::instance();
-        $plugininfo = $pluginmananger->get_plugin_info('local_userinfosync');
-        if ($plugininfo && $plugininfo->rootdir) {
-            require_once($plugininfo->rootdir . '/lib.php');
-
-            $userids = array();
-            foreach ($this->_entries as $entry) {
-                $userids[] = $entry->userid;
-            }
-            array_unique($userids);
-
-            userinfosync::update_user_fields($userids);
-        }
     }
 
     /**

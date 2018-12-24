@@ -1,0 +1,47 @@
+#@mod @mod_datalynx @mod_peter @wip5 @mink:selenium2
+#Feature:When a field is set to required
+#  The client and server have to respond to a null value
+#  With "Field Required!"
+#
+#  Background:
+#    Given the following "courses" exist:
+#      | fullname | shortname | category | groupmode |
+#      | Course 1 | C1        | 0        | 1         |
+#    And the following "users" exist:
+#      | username | firstname | lastname | email                   |
+#      | teacher1 | Teacher   | 1        | teacher1@mailinator.com |
+#    And the following "course enrolments" exist:
+#      | user     | course | role           |
+#      | teacher1 | C1     | editingteacher |
+#    And the following "activities" exist:
+#      | activity | course | idnumber | name                   | approval |
+#      | datalynx | C1     | 12345    | Datalynx Test Instance | 1        |
+#    And "Datalynx Test Instance" has following behaviors:
+#      | name              | description | visibleto                                  | editableby                                 | required |
+#      | testfieldBehavior |             | a:3:{i:0;s:1:"1";i:1;s:1:"2";i:2;s:1:"4";} | a:3:{i:0;s:1:"1";i:1;s:1:"2";i:2;s:1:"4";} | 1        |
+#    And "Datalynx Test Instance" has following fields:
+#      | type | name      | visible | edits |
+#      | text | testfield | 2       | -1    |
+#    And "Datalynx Test Instance" has following views:
+#      | type | name     | status        | redirect | param2                                                                                                                                               |
+#      | grid | testview | default, edit | testview | <div><table><tbody><tr><td>testfield:</td><td>[[testfield\|testfieldBehavior]]</td></tr><tr><td>##edit##  ##delete##</td></tr></tbody></table></div> |
+#
+#  @javascript
+#  Scenario: Check if the required field works
+#    Given I log in as "teacher1"
+#    And I am on "Course 1" course homepage
+#    And I follow "Datalynx Test Instance"
+#    And I follow "Manage"
+#    And I follow "Views"
+#    And I click "Edit" button of "testview" item
+#    And I follow "Entry template"
+#    And I click inside "id_eparam2_editoreditable"
+#    And I set the field "eparam2_editor_field_tag_menu" to ""
+#    And I press "Save changes"
+#    And I follow "Browse"
+#    And I follow "Add a new entry"
+#    Then I should see "New entry"
+#    And I should see "testfield"
+#    Then I press "Save changes"
+#    But I should not see "ntry(s) updated"
+#    And I should see "must supply a value here"

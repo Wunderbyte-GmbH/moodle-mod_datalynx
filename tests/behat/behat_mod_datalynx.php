@@ -19,733 +19,231 @@
  *
  * @package mod_datalynx
  * @category test
- * @copyright 2014 Ivan Šakić
+ * @copyright  2018 David Bogner
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 // NOTE: no MOODLE_INTERNAL test here, this file may be required by behat before including
 // /config.php.
-require_once(__DIR__ . '/../../../../lib/behat/behat_files.php');
-require_once(__DIR__ . '/../../mod_class.php');
+require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
-use Behat\Behat\Definition\Call\Given;
 use Behat\Gherkin\Node\TableNode as TableNode;
 
 /**
- * Datalynx-related steps definitions.
+ * Steps definition for mod_datalynx
  *
  * @package mod_datalynx
  * @category test
- * @copyright 2014 Ivan Šakić
+ * @copyright 2018 David Bogner
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class behat_mod_datalynx extends behat_files {
+class behat_mod_datalynx extends behat_base {
+
     /**
      * Sets up fields for the given datalynx instance.
      * Optional, but must be used after instance declaration.
      *
-     * @Given /^"(?P<activityname_string>(?:[^"]|\\")*)" has following fields:$/
+     * @Given /^I add to the "(?P<activityname_string>(?:[^"]|\\")*)" datalynx the following fields:$/
      *
      * @param string $activityname
      * @param TableNode $table
      */
-    public function has_following_fields($activityname, TableNode $table) {
+    public function i_add_to_the_datalynx_the_following_fields($activityname, TableNode $table) {
+
+        $this->execute("behat_general::click_link", $this->escape($activityname));
+        $this->execute("behat_general::click_link", "Manage");
+        $this->execute("behat_general::click_link", "Fields");
+
         $fields = $table->getHash();
-
-        $instance = $this->get_instance_by_name($activityname);
         foreach ($fields as $field) {
-            $field['dataid'] = $instance->id;
-            $this->create_field($field);
-        }
-    }
-
-    /**
-     * Sets up filters for the given datalynx instance.
-     * Optional, but must be used after fields setup.
-     *
-     * @Given /^"(?P<activityname_string>(?:[^"]|\\")*)" has following filters:$/
-     *
-     * @param string $activityname
-     * @param TableNode $table
-     */
-    public function has_following_filters($activityname, TableNode $table) {
-        $filters = $table->getHash();
-
-        $instance = $this->get_instance_by_name($activityname);
-        foreach ($filters as $filter) {
-            $filter['dataid'] = $instance->id;
-            $this->create_filter($filter);
-        }
-    }
-
-    /**
-     * Sets up views for the given datalynx instance.
-     * Optional, but must be called after fields and fitlers setup.
-     *
-     * @Given /^"(?P<activityname_string>(?:[^"]|\\")*)" has following views:$/
-     *
-     * @param string $activityname
-     * @param TableNode $table
-     */
-    public function has_following_views($activityname, TableNode $table) {
-        $views = $table->getHash();
-
-        $instance = $this->get_instance_by_name($activityname);
-        $names = array();
-        $newviews = array();
-        foreach ($views as $view) {
-            $view['dataid'] = $instance->id;
-            $statuses = explode(',', isset($view['status']) ? $view['status'] : '');
-            $options = array();
-            foreach ($statuses as $status) {
-                $options[trim($status)] = true;
-            }
-
-            $view['id'] = $this->create_view($view, $options);
-            $names[$view['name']] = $view['id'];
-            $newviews[] = $view;
-        }
-
-        $this->map_view_names_for_redirect($newviews, $names);
-    }
-
-    /**
-     * @param $name
-     * @return mixed
-     * @throws dml_exception
-     */
-    private function get_instance_by_name($name) {
-        global $DB;
-        return $DB->get_record('datalynx', array('name' => $name));
-    }
-
-    private function create_field($record = null) {
-        global $DB;
-
-        $record = (object) (array) $record;
-
-        $defaults = array('description' => '', 'visible' => 2, 'edits' => -1, 'label' => null,
-                'param1' => null,
-                'param2' => ($record->type == "teammemberselect") ? "[1,2,3,4,5,6,7,8]" : null,
-                'param3' => null, 'param4' => ($record->type == "teammemberselect") ? "4" : null,
-                'param5' => null, 'param6' => null, 'param7' => null, 'param8' => null, 'param9' => null,
-                'param10' => null);
-
-        foreach ($defaults as $name => $value) {
-            if (!isset($record->{$name})) {
-                $record->{$name} = $value;
-            }
-        }
-
-        if (isset($record->param1) && $record->type == "select") {
-            $record->param1 = preg_replace('/,[ ]?/', "\n", $record->param1);
-        }
-
-        // Checkboxes need to be defined with linebreaks, not comma seperated.
-        if (isset($record->param1) && $record->type == "checkbox") {
-            $record->param1 = preg_replace('/,[ ]?/', "\n", $record->param1);
-        }
-        // Radiobuttons need to be defined with linebreaks, not comma seperated.
-        if (isset($record->param1) && $record->type == "radiobutton") {
-            $record->param1 = preg_replace('/,[ ]?/', "\n", $record->param1);
-        }
-
-        if (!isset($record->param2) && ($record->type == "file" || $record->type == "picture")) {
-            $record->param2 = -1;
-        }
-
-        if (!isset($record->param3) && ($record->type == "file" || $record->type == "picture")) {
-            $record->param3 = '*';
-        }
-
-        $DB->insert_record('datalynx_fields', $record);
-    }
-
-    private function create_view($record = null, array $options = null) {
-        global $DB;
-
-        $record = (object) (array) $record;
-        $options = (array) $options;
-
-        $defaults = array('description' => '', 'visible' => 7, 'perpage' => '', 'groupby' => null,
-                'filter' => 0, 'patterns' => null, 'section' => null, 'sectionpos' => 0,
-                'param1' => null, 'param2' => null, 'param3' => ($record->type == "tabular") ? 1 : null,
-                'param4' => null, 'param5' => null, 'param6' => null, 'param7' => null, 'param8' => null,
-                'param9' => null, 'param10' => null);
-
-        foreach ($defaults as $name => $value) {
-            if (!isset($record->{$name})) {
-                $record->{$name} = $value;
-            }
-        }
-
-        if ($record->filter) {
-            $record->filter = $DB->get_field('datalynx_filters', 'id', array('name' => $record->filter));
-        }
-
-        $id = $DB->insert_record('datalynx_views', $record);
-
-        $datalynx = new datalynx($record->dataid);
-        $datalynx->process_views('reset', $id, true);
-
-        if ($record->param2) {
-            $DB->set_field('datalynx_views', 'param2', $record->param2, array('id' => $id));
-        }
-
-        if ($record->section) {
-            $DB->set_field('datalynx_views', 'section', $record->section, array('id' => $id));
-        }
-
-        if (isset($options['default'])) {
-            $DB->set_field('datalynx', 'defaultview', $id, array('id' => $record->dataid));
-        }
-        if (isset($options['edit'])) {
-            $DB->set_field('datalynx', 'singleedit', $id, array('id' => $record->dataid));
-        }
-        if (isset($options['more'])) {
-            $DB->set_field('datalynx', 'singleview', $id, array('id' => $record->dataid));
-        }
-
-        return $id;
-    }
-
-    private function create_filter($record = null) {
-        global $DB;
-
-        $record = (object) (array) $record;
-
-        $defaults = array('description' => '', 'visible' => 1, 'perpage' => 0, 'selection' => 0,
-                'groupby' => null, 'search' => null, 'customsort' => null, 'customsearch' => null);
-
-        foreach ($defaults as $name => $value) {
-            if (!isset($record->{$name})) {
-                $record->{$name} = $value;
-            }
-        }
-
-        $DB->insert_record('datalynx_filters', $record);
-    }
-
-    /**
-     * Creates a filter for a specified field with specified values.
-     *
-     * @Given /^"(?P<activityname_string>(?:[^"]|\\")*)" has a filter with following values:$/
-     *
-     * @param string $activityname
-     * @param TableNode $table
-     */
-    public function has_a_filter_with_values($activityname, TableNode $table) {
-        global $DB;
-
-        $entries = $table->getHash();
-        foreach ($entries as $entry) {
-            $filtername = $entry['filtername'];
-            $fieldname = $entry['fieldname'];
-            $customsearch = $entry['customsearch'];
-        }
-        $fieldid = $DB->get_field('datalynx_fields', 'id', array('name' => $fieldname));
-        $activityid = $DB->get_field('datalynx', 'id', array('name' => $activityname));
-
-        $customsearch = str_replace("xxxxxx", $fieldid, $customsearch);
-        $record = new \stdClass();
-        $record->dataid = $activityid;
-        $record->name = $filtername;
-        $record->description = 'desc';
-        $record->visible = 1;
-        $record->perpage = 18;
-        $record->selection = 0;
-        $record->customsearch = $customsearch;
-        $filterid = $DB->insert_record('datalynx_filters', $record);
-    }
-
-    private function map_view_names_for_redirect($views, $names) {
-        global $DB;
-        foreach ($views as $view) {
-            $DB->set_field('datalynx_views', 'param10', $names[$view['redirect']],
-                    array('id' => $view['id']));
-        }
-    }
-
-    /**
-     * Selects entry for editing
-     *
-     * @Given /^I edit "(?P<entrynumber_string>(?:[^"]|\\")*)" entry$/
-     *
-     * @param string $entrynumber
-     */
-    public function i_edit_entry($entrynumber) {
-        switch ($this->escape($entrynumber)) {
-            case "first":
-            case "1st":
-                $number = 1;
-                break;
-            case "second":
-            case "2nd":
-                $number = 2;
-                break;
-            case "third":
-            case "3rd":
-                $number = 3;
-                break;
-            case "fourth":
-            case "4th":
-                $number = 4;
-                break;
-            case "fifth":
-            case "5th":
-                $number = 5;
-                break;
-            default:
-                $number = $this->escape($entrynumber);
-                break;
-        }
-
-        $session = $this->getSession(); // Get the mink session.
-        $element = $session->getPage()->find('xpath', '//div[@class="entry"][' . $number . ']//i[@title="Edit"]//ancestor::a');
-        $element->click();
-    }
-
-    /**
-     * Select a select option.
-     *
-     * @Given /^I select option "(?P<option_string>(?:[^"]|\\")*)" from the "(?P<select_string>(?:[^"]|\\")*)" select$/
-
-     * @param string $option
-     * @param string $select
-     */
-    public function i_select_option_from_the_select($option, $select) {
-
-        $session = $this->getSession(); // Get the mink session.
-        $element = $session->getPage()->find('xpath', './/div[@data-field-name="' . $select . '"]//select[1]');
-        $element->selectOption($option);
-    }
-
-    /**
-     * Select a radio button option.
-     *
-     * @Given /^I click option "(?P<option_string>(?:[^"]|\\")*)" from a radio$/
-
-     * @param string $option
-     */
-    public function i_click_option_from_a_radio($option) {
-
-        $session = $this->getSession(); // Get the mink session.
-        $element = $session->getPage()->find('xpath',
-                '//input[@type="radio"][../following-sibling::*[position()=1][contains(., "' . $option . '")]]');
-        $element->click();
-    }
-
-    /**
-     * Select a checkbox option.
-     *
-     * @Given /^I click option "(?P<option_string>(?:[^"]|\\")*)" from a checkbox$/
-
-     * @param string $option
-     */
-    public function i_click_option_from_a_checkbox($option) {
-        $session = $this->getSession();
-        $element = $session->getPage()->find('xpath',
-                '//input[@type="checkbox"]/following::*[contains(text()[normalize-space()], "' . $option . '")]');
-        $element->click();
-    }
-
-    /**
-     * @Given /^I fill entry form with:$/
-     *
-     * @param TableNode $table
-     * @throws \Behat\Mink\Exception\ElementException
-     * @throws \Behat\Mink\Exception\ElementNotFoundException
-     * @throws \Behat\Mink\Exception\ExpectationException
-     * @throws coding_exception
-     */
-    public function i_fill_entry_form_with(TableNode $table) {
-        $session = $this->getSession();
-        $entries = array();
-        if (in_array('entry', $table->getRow(0))) {
-            $data = $table->getHash();
-            foreach ($data as $row) {
-                if (!isset($entries[$row['entry']])) {
-                    $entries[$row['entry']] = array();
-                }
-                $entries[$row['entry']][$row['field']] = $row['value'];
-            }
-        } else {
-            $entry = $table->getRowsHash();
-            unset($entry['field']);
-            $entries[1] = $entry;
-        }
-
-        foreach ($entries as $number => $entry) {
-            $entryelement = $session->getPage()->find('xpath', '//div[@class="entriesview"]/table/tbody/tr[' . $number . ']');
-            foreach ($entry as $name => $value) {
-                $fieldelement = $entryelement->find('xpath', '//div[@data-field-name="' . $name . '"]');
-                $type = $fieldelement->getAttribute('data-field-type');
-                $this->fill_data($fieldelement, $type, $value);
-            }
-        }
-    }
-
-    /**
-     * @Given /^I select "(?P<entrynumbers_string>(?:[^"]|\\")*)" entry$/
-     *
-     * @param string $entrynumbers
-     * @throws \Behat\Mink\Exception\ElementException
-     */
-    public function i_select_entry($entrynumbers) {
-        $entrynumbers = explode(',', $entrynumbers);
-        foreach ($entrynumbers as $entrynumber) {
-            switch ($this->escape($entrynumber)) {
-                case "first":
-                case "1st":
-                    $number = 1;
+            $this->execute("behat_forms::i_select_from_the_singleselect", array($field['name'], 'type'));
+            $field['name'] = "Datalynx field {$field['name']}";
+            $this->execute("behat_forms::set_field_value", array('name', $field['name']));
+            $this->execute("behat_forms::set_field_value", array('description', $field['description']));
+            switch ($field['type']) {
+                case "checkbox":
+                case "radiobutton":
+                    $field['addoptions'] = str_replace(',', "\n", $field['param1']);
+                    $this->execute("behat_forms::set_field_value", array('addoptions', $field['addoptions']));
+                    $field['param2'] ? "New line" : $field['param2'];
+                    $field['param3'] ? "No" : $field['param3'];
+                    $this->execute("behat_forms::set_field_value", array('param2', $field['param2']));
+                    $this->execute("behat_forms::set_field_value", array('param3', $field['param3']));
                     break;
-                case "second":
-                case "2nd":
-                    $number = 2;
+                case "gradeitem":
                     break;
-                case "third":
-                case "3rd":
-                    $number = 3;
+                case "coursegroup":
                     break;
-                case "fourth":
-                case "4th":
-                    $number = 4;
+                case "datalynxview":
                     break;
-                case "fifth":
-                case "5th":
-                    $number = 5;
+                case "duration":
+                    break;
+                case "fieldgroup":
+                    break;
+                case "file":
+                    break;
+                case "identifier":
+                    break;
+                case "number":
+                    if (!empty($field['param1'])) {
+                        $this->execute("behat_forms::set_field_value", array('param1', $field['param1']));
+                    }
+                    break;
+                case "picture":
+                    break;
+                case "select":
+                    $field['addoptions'] = str_replace(',', "\n", $field['param1']);
+                    $this->execute("behat_forms::set_field_value", array('addoptions', $field['addoptions']));
+                    if (!empty($field['param2'])) {
+                        $this->execute("behat_forms::set_field_value", array('param2', $field['param2']));
+                    }
+                    if (!empty($field['param6'])) {
+                        $this->execute("behat_forms::i_select_from_the_singleselect", array('param6', $field['param6']));
+                    }
+                    if (!empty($field['param4'])) {
+                        $this->execute("behat_forms::i_select_from_the_singleselect", array('param4', $field['param4']));
+                    }
+                    if (!empty($field['param5'])) {
+                        $this->execute("behat_forms::i_select_from_the_singleselect", array('param5', $field['param5']));
+                    }
+                    break;
+                case "multiselect":
+                    break;
+                case "tag":
+                    break;
+                case "teammemberselect":
+                    if (!empty($field['param1'])) {
+                        $this->execute("behat_forms::set_field_value", array('param1', $field['param1']));
+                    }
+                    if (!empty($field['param2'])) {
+                        $roles = explode(',', $field['param2']);
+                        foreach ($roles as $roleid) {
+                            $this->execute("behat_forms::set_field_value", array('param2' . "[{$roleid}]", 1));
+                        }
+                    }
+
+                    break;
+                case "text":
+                    if (!empty($field['param1'])) {
+                        $this->execute("behat_forms::set_field_value", array('param1', $field['param1']));
+                    }
+                    if (!empty($field['param8'])) {
+                        $this->execute("behat_forms::i_select_from_the_singleselect", array('param8', $field['param8']));
+                    }
+                    if (!empty($field['param9'])) {
+                        $this->execute("behat_forms::i_select_from_the_singleselect", array('param9', $field['param9']));
+                    }
+                    if (!empty($field['param4'])) {
+                        $this->execute("behat_forms::i_select_from_the_singleselect", array('param4', $field['param4']));
+                    }
+                    if (!empty($field['param5'])) {
+                        $this->execute("behat_forms::i_select_from_the_singleselect", array('param5', $field['param5']));
+                    }
+                    break;
+                case "textarea":
+                    if (!empty($field['param2'])) {
+                        $this->execute("behat_forms::set_field_value", array('param2', $field['param2']));
+                    }
+                    if (!empty($field['param3'])) {
+                        $this->execute("behat_forms::set_field_value", array('param3', $field['param3']));
+                    }
+                    break;
+                case "editor":
+                    break;
+                case "time":
+                    break;
+                case "url":
+                    break;
+                case "userinfo":
                     break;
                 default:
-                    $number = $this->escape($entrynumber);
                     break;
+
             }
-            $session = $this->getSession(); // Get the mink session.
-            $element = $session->getPage()->find('xpath',
-                    '//div[@class="entriesview"]/table/tbody/tr[' . $number . ']//input[@type="checkbox"]');
-            $element->click();
+            $this->execute('behat_forms::press_button', get_string('savechanges'));
         }
     }
 
     /**
-     * @param \Behat\Mink\Element\NodeElement $element
-     * @param $type
-     * @param $value
-     * @throws \Behat\Mink\Exception\ElementException
-     * @throws \Behat\Mink\Exception\ElementNotFoundException
-     * @throws \Behat\Mink\Exception\ExpectationException
-     * @throws coding_exception
-     */
-    private function fill_data(Behat\Mink\Element\NodeElement $element, $type, $value) {
-        switch ($type) {
-            case 'text':
-            case 'number':
-                $element->find('xpath', '//input[@type="text"]')->setValue($value);
-                break;
-            case 'url':
-                list($url, $alt) = explode(' ', $value, 2);
-                list($urlfield, $altfield) = $element->findAll('xpath', '//input[@type="text"]');
-                $urlfield->setValue($url);
-                $altfield->setValue($alt);
-                break;
-            case 'textarea': // TODO: account for the editor capability.
-                $element->find('xpath', '//textarea')->setValue($value);
-                break;
-            case 'select':
-                $element->find('xpath', '//select')->selectOption($value);
-                break;
-            case '_approve':
-                $checkbox = $element->find('xpath', '//input[@type="checkbox"]');
-                if (strtolower($value) == "yes") {
-                    $checkbox->check();
-                } else {
-                    $checkbox->uncheck();
-                }
-                break;
-            case 'checkbox':
-                $checkboxes = $element->findAll('xpath', '//input[@type="checkbox"]');
-                foreach ($checkboxes as $checkbox) {
-                    $checkbox->uncheck();
-                }
-                foreach (explode(',', $value) as $option) {
-                    if ($checkbox = $element->find('xpath',
-                        '//input[@type="checkbox"]/following::*[contains(text()[normalize-space()], "' . $option . '")]')) {
-                        $checkbox->click();
-                    }
-                }
-                break;
-            case 'radiobutton':
-                $element->find('xpath',
-                        '//input[@type="radio"][../following-sibling::*[position()=1][contains(., "' . $value . '")]]'
-                        )->click();
-                break;
-            case 'duration':
-                list($amount, $unit) = explode(' ', $value);
-                $element->find('xpath', '//input[@type="text"]')->setValue($amount);
-                $element->find('xpath', '//select')->selectOption($unit);
-                break;
-            case 'time':
-                $element->find('xpath', '//input[@type="checkbox"]')->check();
-                list($day, $month, $year, $hour, $minute) = preg_split('/[ \.\/:-]+/', $value);
-                $dateobj = DateTime::createFromFormat('!m', $month);
-                $month = $dateobj->format('F');
-                $element->find('xpath', '//select[contains(@name, "day")]')->selectOption($day);
-                $element->find('xpath', '//select[contains(@name, "month")]')->selectOption($month);
-                $element->find('xpath', '//select[contains(@name, "year")]')->selectOption($year);
-
-                $buffelement = $element->find('xpath', '//select[contains(@name, "hour")]');
-                if (is_object($buffelement)) {
-                    $buffelement->selectOption($hour);
-                }
-
-                $buffelement = $element->find('xpath', '//select[contains(@name, "minute")]');
-                if (is_object($buffelement)) {
-                    $buffelement->selectOption($minute);
-                }
-                break;
-            case 'teammemberselect':
-                $input = $element->find('xpath', '//input[contains(@id,"form_autocomplete_input")]');
-                $inputid = $input->getAttribute('id');
-                $this->execute("behat_forms::i_set_the_field_to", array($inputid, $value));
-                break;
-            case 'file':
-            case 'picture':
-                global $CFG;
-                $filemanagernode = $element->find('xpath', '//div[contains(@class, "filemanager")]');
-                $this->open_add_file_window($filemanagernode, get_string('pluginname', 'repository_upload'));
-                // Ensure all the form is ready.
-                // Opening the select repository window and selecting the upload repository.
-                $this->open_add_file_window($filemanagernode, get_string('pluginname', 'repository_upload'));
-                $this->getSession()->wait(self::TIMEOUT, self::PAGE_READY_JS);
-
-                // Form elements to interact with.
-                $file = $this->find_file('repo_upload_file');
-
-                // Attaching specified file to the node.
-                // Replace 'admin/' if it is in start of path with $CFG->admin .
-                $pos = strpos($value, 'admin/');
-                if ($pos === 0) {
-                    $value = $CFG->admin . DIRECTORY_SEPARATOR . substr($value, 6);
-                }
-                $filepath = str_replace('/', DIRECTORY_SEPARATOR, $value);
-                $fileabsolutepath = $CFG->dirroot . DIRECTORY_SEPARATOR . $filepath;
-                $file->attachFile($fileabsolutepath);
-
-                // Submit the file.
-                $submit = $this->find_button(get_string('upload', 'repository'));
-                $submit->press();
-
-                // We wait for all the JS to finish as it is performing an action.
-                $this->getSession()->wait(self::TIMEOUT, self::PAGE_READY_JS);
-                break;
-            default:
-                break;
-        }
-    }
-
-    /**
-     * Sets up entries for the given datalynx instance.
-     * Optional, but must be called after field setup.
+     * Sets up a view for the specified datalynx instance using the specified viewtype.
      *
-     * @Given /^"(?P<activityname_string>(?:[^"]|\\")*)" has following entries:$/
+     * @Given /^I add to "(?P<activityname_string>(?:[^"]|\\")*)" datalynx the view of "(?P<viewtype_string>(?:[^"]|\\")*)" type with:$/
      *
      * @param string $activityname
-     * @param TableNode $table
+     * @param string $viewtype
+     * @param TableNode $viewformdata
+     * @throws coding_exception
      */
-    public function has_following_entries($activityname, TableNode $table) {
-        global $DB;
-        $entries = $table->getHash();
-
-        $instance = $this->get_instance_by_name($activityname);
-
-        foreach ($entries as $entry) {
-            $authorid = $DB->get_field('user', 'id', array('username' => trim($entry['author'])));
-            $approved = 0;
-            $status = 0;
-            if (!empty($entry['approved'])) {
-                $approved = trim($entry['approved']);
-            }
-            if (!empty($entry['status'])) {
-                $status = trim($entry['status']);
-            }
-            $record = new stdClass();
-            $record->dataid = $instance->id;
-            $record->userid = $authorid;
-            $record->groupid = 0;
-            $record->description = '';
-            $record->visible = 1;
-            $record->timecreated = time();
-            $record->timemodified = time();
-            $record->approved = $approved;
-            $record->status = $status;
-
-            $entryid = $DB->insert_record('datalynx_entries', $record);
-
-            foreach ($entry as $fieldname => $value) {
-                $field = $DB->get_record('datalynx_fields', array('name' => $fieldname));
-                if ($field) {
-                    $this->create_content($instance->id, $entryid, $field->id, $field->type, $value);
-                }
-            }
-        }
+    public function i_add_to_datalynx_the_view_of_type_with($activityname, $viewtype, TableNode $viewformdata) {
+        $this->execute("behat_general::click_link", $this->escape($activityname));
+        $this->execute("behat_general::click_link", $this->escape("Manage"));
+        $this->execute("behat_general::click_link", $this->escape("Views"));
+        $this->execute("behat_forms::i_select_from_the_singleselect", array($viewtype, 'type'));
+        $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $viewformdata);
+        $this->execute('behat_forms::press_button', get_string('savechanges'));
     }
 
-    private function create_content($dataid, $entryid, $fieldid, $type, $value) {
-        global $DB, $CFG;
-        $content = new stdClass();
-        $content->fieldid = $fieldid;
-        $content->entryid = $entryid;
-        $content->content = null;
-        $content->content1 = null;
-        $content->content2 = null;
-        $content->content3 = null;
-        $content->content4 = null;
-        switch ($type) {
-            case 'text':
-            case 'number':
-            case 'textarea':
-                $content->content = $value;
-                break;
-            case 'url':
-                list($content->content, $content->content1) = explode(' ', $value, 2);
-                break;
-            case 'select':
-            case 'radiobutton':
-                $result = $DB->get_record('datalynx_fields', array('id' => $fieldid), 'param1, param3');
-
-                $pattern = '/[\n\r]+/m'; // Values are only stored in \n separated.
-                $options = preg_split($pattern, $result->param1);
-                $id = array_search(trim($value), $options);
-                if ($id !== false) {
-                    $content->content = $id + 1;
-                } else {
-                    $content->content = '';
-                }
-                break;
-            case 'checkbox':
-                $result = $DB->get_record('datalynx_fields', array('id' => $fieldid), 'param1, param3');
-
-                $pattern = '/[\n\r]+/m'; // Values are only stored in \n separated.
-                $options = preg_split($pattern, $result->param1);
-                $selectedoptions = preg_split($pattern, $value);
-                $ids = array();
-                foreach ($selectedoptions as $selectedoption) {
-                    $id = array_search($selectedoption, $options);
-                    if ($id !== false) {
-                        $ids[] = $id + 1;
+    /**
+     * Sets the entry form field to the given value.
+     *
+     * @Given /^I fill in the entry form fields$/
+     *
+     * @param TableNode $fielddata
+     * @throws coding_exception
+     * @throws Exception
+     */
+    public function i_fill_in_the_entry_form_fields(TableNode $fielddata) {
+        $fields = $fielddata->getHash();
+        foreach ($fields as $field) {
+            switch ($field['type']) {
+                case "checkbox":
+                    $values = explode(',', $field['value']);
+                    foreach ($values as $value) {
+                        $fieldvalue = substr($value, -1);
+                        $field = substr($value, 0, -2);
+                        $this->execute("behat_forms::i_set_the_field_to", array($field, $fieldvalue));
                     }
-                }
-                if (!empty($ids)) {
-                    $content->content = '#' . implode('#', $ids) . '#';
-                } else {
-                    $content->content = '';
-                }
-                break;
-            case 'duration':
-                $content->content = strtotime($value, 0);
-                break;
-            case 'time':
-                list($day, $month, $year, $hour, $minute) = preg_split('/[ \.\/:-]+/', $value);
-                $content->content = mktime($hour, $minute, 0, $month, $day, $year);
-                break;
-            case 'teammemberselect':
-                $usernames = preg_split('/,[ ]?/', $value);
-                $ids = array();
-                foreach ($usernames as $username) {
-                    $ids[] = '"' . $DB->get_field('user', 'id', array('username' => $username)) . '"';
-                }
-                $content->content = '[' . implode(',', $ids) . ']';
-                break;
-            case 'file':
-            case 'picture':
-                $content->content = 1;
-                $itemid = $DB->insert_record('datalynx_contents', $content);
-
-                $datalynx = new datalynx($dataid);
-                $path = explode(DIRECTORY_SEPARATOR, $value);
-                $filename = end($path);
-                $fileinfo = array('component' => 'mod_datalynx', 'filearea' => 'content',
-                    'itemid' => $itemid, 'contextid' => $datalynx->context->id, 'filepath' => '/',
-                    'filename' => $filename
-                );
-                $fs = get_file_storage();
-                $fs->create_file_from_pathname($fileinfo, $CFG->libdir . '/../' . $value);
-                $content->content = 0;
-                break;
-            default:
-                break;
-        }
-
-        if ($content->content) {
-            $DB->insert_record('datalynx_contents', $content);
-        }
-    }
-
-    /**
-     * @Given /^I refresh the Entry template of "([^"]*)"$/
-     */
-    public function irefreshtheentrytemplateof($arg1) {
-        $steps = array(new Given('I click "Edit" button of "' . $arg1 . '" item'),
-                new Given('I follow "Entry template"'),
-                new Given('I click inside "id_eparam2_editoreditable"'),
-                new Given('I set the field "eparam2_editor_field_tag_menu" to ""'),
-                new Given('I press "Save changes"'));
-        return $steps;
-    }
-
-    /**
-     * Clicks a control button of a field in the list
-     *
-     * @Given /^I click "(?P<button_string>(?:[^"]|\\")*)" button of "(?P<fieldname_string>(?:[^"]|\\")*)" item$/
-     *
-     * @param string $button
-     * @param string $fieldname
-     */
-    public function i_click_button_of_item($button, $fieldname) {
-        $session = $this->getSession(); // Get the mink session.
-        $element = $session->getPage()->find('xpath',
-                '//a[text()="' . $this->escape($fieldname) . '"]/ancestor::tr//a/i[@title="' .
-                $this->escape($button) . '"]/ancestor::a');
-        $element->click();
-    }
-
-    /**
-     * @Given /^I click inside "([^"]*)"$/
-     */
-    public function iclickon($arg1) {
-        $session = $this->getSession();
-        $element = $session->getPage()->findById($arg1);
-        $element->click();
-    }
-    /**
-     * @Given /^"([^"]*)" has following behaviors:$/
-     */
-    public function hasfollowingbehaviors($arg1, TableNode $table) {
-        $behaviors = $table->getHash();
-
-        $instance = $this->get_instance_by_name($arg1);
-
-        foreach ($behaviors as $behavior) {
-            $behavior['dataid'] = $instance->id;
-            $behavior['id'] = $this->create_behavior($behavior);
-        }
-    }
-
-    private function create_behavior($record = null) {
-        global $DB;
-
-        $record = (object) (array) $record;
-
-        $defaults = array('name' => 'Behavior', 'description' => '', 'visibleto' => '',
-                'editableby' => '', 'required' => 0);
-
-        foreach ($defaults as $name => $value) {
-            if (!isset($record->{$name})) {
-                $record->{$name} = $value;
+                    break;
+                case "select":
+                    $this->execute("behat_forms::i_set_the_field_with_xpath_to",
+                            array("//div[@data-field-type='select']//select", $field['value']));
+                    break;
+                case "radio":
+                    $this->execute("behat_forms::i_set_the_field_with_xpath_to",
+                            array("//div[@data-field-type='radiobutton']//em[.='{$field['value']}']/preceding-sibling::label//input",
+                                    "selected"));
+                    break;
+                case "text":
+                case "number":
+                    $this->execute("behat_forms::i_set_the_field_with_xpath_to",
+                            array("//div[@data-field-name='Datalynx field {$field['name']}']//input", $field['value']));
+                    break;
+                case "textarea":
+                    $this->execute("behat_forms::i_set_the_field_with_xpath_to",
+                            array("//div[@data-field-name='Datalynx field {$field['name']}']//textarea", $field['value']));
+                    break;
+                case "teammemberselect":
+                    $this->execute("behat_forms::i_open_the_autocomplete_suggestions_list");
+                    $this->execute("behat_forms::i_click_on_item_in_the_autocomplete_list", $field['value']);
+                    break;
+                case "duration":
+                    $values = explode(" ", $field['value']);
+                    $this->execute("behat_forms::i_set_the_field_with_xpath_to",
+                            array("//div[@data-field-name='Datalynx field {$field['name']}']//select", $values[1]));
+                    $this->execute("behat_forms::i_set_the_field_with_xpath_to",
+                            array("//div[@data-field-name='Datalynx field {$field['name']}']//input", $values[0]));
+                    break;
+                case "time":
+                    $values = explode(".", $field['value']);
+                    $this->execute("behat_forms::i_set_the_field_with_xpath_to",
+                            array("//div[@data-field-name='Datalynx field {$field['name']}']//input", 1));
+                    foreach ($values as $key => $value) {
+                        $number = $key +1;
+                        $this->execute("behat_forms::i_set_the_field_with_xpath_to",
+                                array("(//div[@data-field-name='Datalynx field {$field['name']}']//select)[{$number}]", $value));
+                    }
+                    break;
             }
         }
-
-        $id = $DB->insert_record('datalynx_behaviors', $record);
-
-        return $id;
     }
 }
