@@ -238,7 +238,7 @@ class behat_mod_datalynx extends behat_base {
                     $this->execute("behat_forms::i_set_the_field_with_xpath_to",
                             array("//div[@data-field-name='Datalynx field {$field['name']}']//input", 1));
                     foreach ($values as $key => $value) {
-                        $number = $key +1;
+                        $number = $key + 1;
                         $this->execute("behat_forms::i_set_the_field_with_xpath_to",
                                 array("(//div[@data-field-name='Datalynx field {$field['name']}']//select)[{$number}]", $value));
                     }

@@ -22,7 +22,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once('../../config.php');
-require_once('mod_class.php');
+require_once('classes/datalynx.php');
 
 $urlparams = new stdClass();
 
@@ -47,7 +47,7 @@ $urlparams->duplicate = optional_param('duplicate', 0, PARAM_SEQUENCE); // Ids (
 $urlparams->confirmed = optional_param('confirmed', 0, PARAM_INT);
 
 // Set a datalynx object.
-$df = new datalynx($urlparams->d, $urlparams->id);
+$df = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
 
 // Require capability.
 if (!has_capability('mod/datalynx:manageentries', $df->context) or

@@ -25,7 +25,7 @@
 define('AJAX_SCRIPT', true);
 
 require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/config.php');
-require_once("$CFG->dirroot/mod/datalynx/mod_class.php");
+require_once("$CFG->dirroot/mod/datalynx/classes/datalynx.php");
 require_once("$CFG->dirroot/mod/datalynx/entries_class.php");
 
 ob_start();
@@ -48,7 +48,7 @@ require_capability('mod/datalynx:approve', $context);
 
 global $DB;
 $completiontype = COMPLETION_UNKNOWN;
-$df = new datalynx($d);
+$df = new mod_datalynx\datalynx($d);
 if ($action == 'approve') {
     $DB->set_field('datalynx_entries', 'approved', 1, array('id' => $entryid));
     $entriesclass = new datalynx_entries($df);

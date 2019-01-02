@@ -61,7 +61,7 @@ class datalynx_entries {
      * @param datalynx_filter|null $filter
      * @throws coding_exception
      */
-    public function __construct(datalynx $datalynx, datalynx_filter $filter = null) {
+    public function __construct(mod_datalynx\datalynx $datalynx, datalynx_filter $filter = null) {
         if (empty($datalynx)) {
             throw new coding_exception(
                     'Datalynx id or object must be passed to entries constructor.');
@@ -1115,7 +1115,7 @@ class datalynx_entries {
         if ($entry->id > 0) {
             if ($df->user_can_manage_entry($entry)) { // Just in case the user opens two forms at the same time.
                 if (!has_capability('mod/datalynx:approve', $df->context)
-                        && ($df->data->approval == datalynx::APPROVAL_ON_UPDATE)
+                        && ($df->data->approval == mod_datalynx\datalynx::APPROVAL_ON_UPDATE)
                 ) {
                     $entry->approved = 0;
                 }

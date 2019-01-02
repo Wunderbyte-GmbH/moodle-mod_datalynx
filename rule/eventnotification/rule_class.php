@@ -215,11 +215,11 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
         $allneeded = [];
         $allforbidden = [];
 
-        $perms = [datalynx::PERMISSION_ADMIN => 'mod/datalynx:viewprivilegeadmin',
-                datalynx::PERMISSION_MANAGER => 'mod/datalynx:viewprivilegemanager',
-                datalynx::PERMISSION_TEACHER => 'mod/datalynx:viewprivilegeteacher',
-                datalynx::PERMISSION_STUDENT => 'mod/datalynx:viewprivilegestudent',
-                datalynx::PERMISSION_GUEST => 'mod/datalynx:viewprivilegeguest'
+        $perms = [mod_datalynx\datalynx::PERMISSION_ADMIN => 'mod/datalynx:viewprivilegeadmin',
+                mod_datalynx\datalynx::PERMISSION_MANAGER => 'mod/datalynx:viewprivilegemanager',
+                mod_datalynx\datalynx::PERMISSION_TEACHER => 'mod/datalynx:viewprivilegeteacher',
+                mod_datalynx\datalynx::PERMISSION_STUDENT => 'mod/datalynx:viewprivilegestudent',
+                mod_datalynx\datalynx::PERMISSION_GUEST => 'mod/datalynx:viewprivilegeguest'
         ];
 
         foreach ($perms as $permissionid => $capstring) {

@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace mod_datalynx\customfilter;
+use stdClass;
 defined('MOODLE_INTERNAL') or die();
 
 /**
@@ -26,9 +28,11 @@ defined('MOODLE_INTERNAL') or die();
  * @copyright 2016 Thomas Niedermaier
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_datalynx_customfilter_backend_form extends mod_datalynx_customfilter_base_form {
+class backend_form extends base_form {
 
     /**
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
     public function definition() {
         if ($id = $this->_customfilter->id) {
@@ -38,7 +42,7 @@ class mod_datalynx_customfilter_backend_form extends mod_datalynx_customfilter_b
             $customfilter->name = "";
             $customfilter->description = "";
             $customfilter->fulltextsearch = false;
-            $customfilter->visible = false;
+            $customfilter->visible = true;
             $customfilter->timecreated = false;
             $customfilter->timecreated_sortable = false;
             $customfilter->timemodified = false;
@@ -103,7 +107,7 @@ class mod_datalynx_customfilter_backend_form extends mod_datalynx_customfilter_b
         if ($customfilter->fieldlist) {
             $fieldlist = json_decode($customfilter->fieldlist);
         }
-        $fields = $this->_getpossiblecustomfilterfields($this->_df);
+        $fields = $this->_getpossiblecustomfilterfields($this->_dl);
         foreach ($fields as $fieldid => $field) {
             $formfieldname = 'fieldlist[' . $field->field->id . '][name]';
             $formfieldsortablename = 'fieldlist[' . $field->field->id . '][sortable]';
@@ -129,21 +133,31 @@ class mod_datalynx_customfilter_backend_form extends mod_datalynx_customfilter_b
         $this->add_action_buttons(true, get_string('savechanges'));
     }
 
-    protected function _getpossiblecustomfilterfields($df) {
+    /**
+     * @param $dl
+     * @return array
+     * @throws \dml_exception
+     */
+    protected function _getpossiblecustomfilterfields($dl) {
         global $DB;
 
         $fields = array();
-        $customfilterfieldtypes = $df->get_customfilterfieldtypes();
-        $fieldsdb = $DB->get_records('datalynx_fields', array('dataid' => $df->id()), 'name asc');
+        $customfilterfieldtypes = $dl->get_customfilterfieldtypes();
+        $fieldsdb = $DB->get_records('datalynx_fields', array('dataid' => $dl->id()), 'name asc');
         foreach ($fieldsdb as $fieldid => $field) {
             if (in_array($field->type, $customfilterfieldtypes)) {
-                $fields[$fieldid] = $df->get_field($field);
+                $fields[$fieldid] = $dl->get_field($field);
             }
         }
 
         return $fields;
     }
 
+    /**
+     * @param $filterid
+     * @return mixed
+     * @throws \dml_exception
+     */
     protected function _getcustomfilter($filterid) {
         global $DB;
 
@@ -152,6 +166,9 @@ class mod_datalynx_customfilter_backend_form extends mod_datalynx_customfilter_b
         return $customfilter;
     }
 
+    /**
+     * @return object
+     */
     public function get_data() {
         if ($data = parent::get_data()) {
             if (!empty($data->fieldlist)) {
@@ -171,6 +188,7 @@ class mod_datalynx_customfilter_backend_form extends mod_datalynx_customfilter_b
     }
 
     /**
+     * @return string
      */
     public function html() {
         return $this->_form->toHtml();

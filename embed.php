@@ -22,7 +22,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once('../../config.php');
-require_once("$CFG->dirroot/mod/datalynx/mod_class.php");
+require_once("$CFG->dirroot/mod/datalynx/classes/datalynx.php");
 
 $urlparams = new stdClass();
 $urlparams->d = optional_param('d', 0, PARAM_INT); // Datalynx id.
@@ -35,7 +35,7 @@ $urlparams->refresh = optional_param('refresh', 0, PARAM_INT);
 $urlparams->eids = optional_param('eids', 0, PARAM_SEQUENCE);
 
 // Set a datalynx object with guest autologin.
-$df = new datalynx($urlparams->d, $urlparams->id);
+$df = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
 
 require_login($df->data->course, false, $df->cm);
 

@@ -22,7 +22,7 @@
  */
 
 require_once('../../../config.php');
-require_once('../mod_class.php');
+require_once('../classes/datalynx.php');
 
 $urlparams = new stdClass();
 
@@ -48,7 +48,7 @@ $urlparams->update = optional_param('update', 0, PARAM_INT); // Update rule.
 $urlparams->cancel = optional_param('cancel', 0, PARAM_BOOL);
 
 // Set a datalynx object.
-$df = new datalynx($urlparams->d, $urlparams->id);
+$df = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
 
 require_login($df->data->course, false, $df->cm);
 

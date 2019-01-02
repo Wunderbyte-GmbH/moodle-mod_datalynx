@@ -21,7 +21,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once('../../../config.php');
-require_once("$CFG->dirroot/mod/datalynx/mod_class.php");
+require_once("$CFG->dirroot/mod/datalynx/classes/datalynx.php");
 
 $urlparams = new stdClass();
 $urlparams->d = required_param('d', PARAM_INT); // Datalynx ID.
@@ -31,7 +31,7 @@ $urlparams->vedit = optional_param('vedit', 0, PARAM_INT); // View id to edit.
 $urlparams->returnurl = optional_param('returnurl', '', PARAM_URL);
 
 // Set a datalynx object.
-$dl = new datalynx($urlparams->d);
+$dl = new mod_datalynx\datalynx($urlparams->d);
 
 require_login($dl->data->course, false, $dl->cm);
 

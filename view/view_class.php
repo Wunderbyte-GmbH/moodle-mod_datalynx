@@ -92,11 +92,11 @@ abstract class datalynxview_base {
             throw new coding_exception('Datalynx id or object must be passed to field constructor.');
             // Datalynx object.
         } else {
-            if ($df instanceof datalynx) {
+            if ($df instanceof \mod_datalynx\datalynx) {
                 $this->_df = $df;
                 // Datalynx id.
             } else {
-                $this->_df = new datalynx($df);
+                $this->_df = new mod_datalynx\datalynx($df);
             }
         }
 

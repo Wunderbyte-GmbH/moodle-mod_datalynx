@@ -24,16 +24,16 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace mod_datalynx\customfilter;
+use moodleform;
 defined('MOODLE_INTERNAL') or die();
 
-global $CFG;
-
-require_once("$CFG->libdir/formslib.php");
-
-
 /**
+ * Class mod_datalynx_customfilter_base_form
+ *
+ * @package mod_datalynx\customfilter
  */
-abstract class mod_datalynx_customfilter_base_form extends moodleform {
+abstract class base_form extends moodleform {
 
     protected $_customfilter = null;
 
@@ -41,15 +41,24 @@ abstract class mod_datalynx_customfilter_base_form extends moodleform {
      *
      * @var datalynx null
      */
-    protected $_df = null;
+    protected $_dl = null;
 
-    /*
+    /**
+     * mod_datalynx_customfilter_base_form constructor.
      *
+     * @param $dl
+     * @param $customfilter
+     * @param null $action
+     * @param null $customdata
+     * @param string $method
+     * @param string $target
+     * @param null $attributes
+     * @param bool $editable
      */
-    public function __construct($df, $customfilter, $action = null, $customdata = null, $method = 'post',
+    public function __construct($dl, $customfilter, $action = null, $customdata = null, $method = 'post',
             $target = '', $attributes = null, $editable = true) {
         $this->_customfilter = $customfilter;
-        $this->_df = $df;
+        $this->_dl = $dl;
 
         parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
     }

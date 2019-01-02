@@ -35,7 +35,7 @@ class datalynxtool_downloadfiles {
      *
      * @param datalynx $dl
      */
-    public static function run(datalynx $dl) {
+    public static function run(mod_datalynx\datalynx $dl) {
         global $DB, $CFG;
 
         // Create filter in order to get all files of all entries of a dl instance.

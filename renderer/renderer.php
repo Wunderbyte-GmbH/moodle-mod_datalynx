@@ -22,7 +22,7 @@
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once(dirname(__FILE__) . '/../mod_class.php');
+require_once(dirname(__FILE__) . '/../classes/datalynx.php');
 
 class datalynx_field_renderer {
 
@@ -114,7 +114,7 @@ class datalynx_field_renderer {
         if (isset($record->datalynx)) {
             $this->datalynx = $record->datalynx;
         } else {
-            $this->datalynx = new datalynx($record->dataid);
+            $this->datalynx = new mod_datalynx\datalynx($record->dataid);
         }
 
         $this->notvisibletemplate = $record->notvisibletemplate;
@@ -168,7 +168,7 @@ class datalynx_field_renderer {
      * @param datalynx $datalynx
      * @return datalynx_field_renderer
      */
-    public static function get_default_renderer(datalynx $datalynx) {
+    public static function get_default_renderer(mod_datalynx\datalynx $datalynx) {
         $record = (object) self::$default;
         $record->datalynx = $datalynx;
         $record->dataid = $datalynx->id();

@@ -38,7 +38,7 @@ class datalynx_field_renderer_form extends moodleform {
      *
      * @param datalynx $datalynx
      */
-    public function __construct(datalynx $datalynx) {
+    public function __construct(mod_datalynx\datalynx $datalynx) {
         $this->datalynx = $datalynx;
         parent::__construct();
     }

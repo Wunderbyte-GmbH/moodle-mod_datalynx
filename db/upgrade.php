@@ -974,10 +974,10 @@ function mod_datalynx_replace_field_rules() {
     global $DB;
 
     $defaultbehavior = (object) array('name' => '', 'description' => '',
-            'visibleto' => array(datalynx::PERMISSION_MANAGER, datalynx::PERMISSION_TEACHER,
-                    datalynx::PERMISSION_STUDENT, datalynx::PERMISSION_AUTHOR),
-            'editableby' => array(datalynx::PERMISSION_MANAGER, datalynx::PERMISSION_TEACHER,
-                    datalynx::PERMISSION_STUDENT, datalynx::PERMISSION_AUTHOR), 'required' => false
+            'visibleto' => array(mod_datalynx\datalynx::PERMISSION_MANAGER, mod_datalynx\datalynx::PERMISSION_TEACHER,
+                    mod_datalynx\datalynx::PERMISSION_STUDENT, mod_datalynx\datalynx::PERMISSION_AUTHOR),
+            'editableby' => array(mod_datalynx\datalynx::PERMISSION_MANAGER, mod_datalynx\datalynx::PERMISSION_TEACHER,
+                    mod_datalynx\datalynx::PERMISSION_STUDENT, mod_datalynx\datalynx::PERMISSION_AUTHOR), 'required' => false
     );
     $dataids = $DB->get_fieldset_select('datalynx', 'id', "id IS NOT NULL");
     foreach ($dataids as $dataid) {
