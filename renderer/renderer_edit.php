@@ -21,10 +21,10 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_datalynx\datalynx;
 require_once('../../../config.php');
 require_once('renderer_form.php');
 require_once('renderer.php');
-require_once("$CFG->dirroot/mod/datalynx/classes/datalynx.php");
 
 $urlparams = new stdClass();
 $urlparams->d = required_param('d', PARAM_INT);
@@ -32,7 +32,7 @@ $urlparams->id = required_param('id', PARAM_INT);
 $urlparams->action = optional_param('action', 'edit', PARAM_ALPHA);
 $urlparams->confirmed = optional_param('confirmed', false, PARAM_BOOL);
 
-$datalynx = new mod_datalynx\datalynx($urlparams->d);
+$datalynx = new datalynx($urlparams->d);
 
 require_login($datalynx->data->course, false, $datalynx->cm);
 

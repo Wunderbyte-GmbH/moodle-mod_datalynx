@@ -1010,6 +1010,12 @@ class datalynxview_patterns {
         }
     }
 
+    /**
+     * Retrieve and print advanced filter
+     *
+     * @param bool $return
+     * @return string
+     */
     protected function print_advanced_filter($return = false) {
 
         $view = $this->_view;
@@ -1029,16 +1035,24 @@ class datalynxview_patterns {
         }
     }
 
+    /**
+     * Get custom filter and print it
+     *
+     * @param $tag
+     * @param bool $return
+     * @return string
+     * @throws dml_exception
+     */
     protected function print_custom_filter($tag, $return = false) {
         global $DB;
 
         $view = $this->_view;
         $filter = $view->get_filter();
-        $df = $view->get_df();
+        $dl = $view->get_df();
         $customfiltername = str_replace('##', '', str_replace('##customfilter:', '', $tag));
-        $where = array('name' => $customfiltername);
+        $where = array('name' => $customfiltername, 'dataid' => $dl->id());
         $customfilter = $DB->get_record('datalynx_customfilters', $where);
-        $fm = $df->get_filter_manager();
+        $fm = $dl->get_filter_manager();
         $filterform = $fm->get_customfilter_frontend_form($filter, $view, $customfilter);
 
         if ($return) {

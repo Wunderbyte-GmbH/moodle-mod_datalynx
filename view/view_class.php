@@ -1277,6 +1277,11 @@ abstract class datalynxview_base {
     }
 
     /**
+     * Set display definition
+     *
+     * @param array|null $options
+     * @return bool
+     * @throws coding_exception
      */
     protected function set__display_definition(array $options = null) {
         $this->_display_definition = array();
@@ -1345,6 +1350,8 @@ abstract class datalynxview_base {
     }
 
     /**
+     * @param string $text
+     * @return mixed
      */
     protected function process_calculations($text) {
         global $CFG;
