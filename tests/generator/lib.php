@@ -44,7 +44,7 @@ class mod_datalynx_generator extends testing_module_generator {
     public function create_instance($record = null, array $options = null) {
         $record = (object) (array) $record;
 
-        $defaults = array('intro' => null, 'introformat' => 0, 'timemodified' => 0,
+        $defaults = array('intro' => null, 'introformat' => 0, 'timemodified' => time(),
                 'timeavailable' => 0, 'timedue' => 0, 'timeinterval' => 0, 'intervalcount' => 1,
                 'allowlate' => 0, 'grade' => 0, 'grademethod' => 0, 'anonymous' => 0,
                 'notification' => 0, 'notificationformat' => 1, 'entriesrequired' => 0,

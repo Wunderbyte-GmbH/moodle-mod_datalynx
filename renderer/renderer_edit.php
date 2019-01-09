@@ -21,10 +21,10 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_datalynx\datalynx;
 require_once('../../../config.php');
 require_once('renderer_form.php');
 require_once('renderer.php');
-require_once("$CFG->dirroot/mod/datalynx/mod_class.php");
 
 $urlparams = new stdClass();
 $urlparams->d = required_param('d', PARAM_INT);

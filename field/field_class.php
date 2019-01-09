@@ -22,7 +22,7 @@
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once(dirname(__FILE__) . '/../mod_class.php');
+require_once(dirname(__FILE__) . '/../classes/datalynx.php');
 require_once(dirname(__FILE__) . '/../behavior/behavior.php');
 require_once(dirname(__FILE__) . '/../renderer/renderer.php');
 
@@ -85,10 +85,10 @@ abstract class datalynxfield_base {
         if (empty($df)) {
             throw new coding_exception('Datalynx id or object must be passed to view constructor.');
         } else {
-            if ($df instanceof datalynx) {
+            if ($df instanceof \mod_datalynx\datalynx) {
                 $this->df = $df;
             } else { // Datalynx id/object.
-                $this->df = new datalynx($df);
+                $this->df = new mod_datalynx\datalynx($df);
             }
         }
 
@@ -288,7 +288,14 @@ abstract class datalynxfield_base {
     );
 
     // CONTENT MANAGEMENT.
+
     /**
+     * Get definition of tags/pattern
+     *
+     * @param $tags
+     * @param $entry
+     * @param array $options
+     * @return array
      */
     public function get_definitions($tags, $entry, array $options) {
         return $this->renderer()->replacements($tags, $entry,
@@ -301,15 +308,24 @@ abstract class datalynxfield_base {
     }
 
     /**
+     * @return bool
      */
     public static function is_internal() {
         return false;
     }
 
     /**
+     * Update the content of a field in an entry. That happens in table datalynx_conents.
+     *
+     * @param stdClass $entry
+     * @param array|null $values
+     * @return bool|int
+     * @throws dml_exception
      */
     public function update_content($entry, array $values = null) {
         global $DB;
+        $fieldid = $this->field->id;
+        $fieldgroup = false;
 
         $fieldid = $this->field->id;
         $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
@@ -351,6 +367,10 @@ abstract class datalynxfield_base {
 
     /**
      * Delete all content associated with the field.
+     *
+     * @param int $entryid
+     * @return bool
+     * @throws dml_exception
      */
     public function delete_content($entryid = 0) {
         global $DB;
@@ -375,7 +395,11 @@ abstract class datalynxfield_base {
     }
 
     /**
-     * returns an array of distinct content of the field (GROUP BY)
+     * Returns an array of distinct content of the field (GROUP BY)
+     *
+     * @param int $sortdir
+     * @return array
+     * @throws dml_exception
      */
     public function get_distinct_content($sortdir = 0) {
         global $DB;
@@ -404,6 +428,13 @@ abstract class datalynxfield_base {
     }
 
     /**
+     * Prepares content from uploaded csv files to be saved to DB
+     *
+     * @param $data
+     * @param $importsettings
+     * @param null $csvrecord
+     * @param null $entryid
+     * @return bool
      */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
         $fieldid = $this->field->id;
@@ -535,6 +566,9 @@ abstract class datalynxfield_base {
     }
 
     /**
+     * Get the select part of the sql query.
+     *
+     * @return string
      */
     public function get_select_sql() {
         if ($this->field->id > 0) {
@@ -551,6 +585,11 @@ abstract class datalynxfield_base {
     }
 
     /**
+     * Get the sort part of the sql query.
+     *
+     * @param string $paramname
+     * @param string $paramcount
+     * @return array|null
      */
     public function get_sort_from_sql($paramname = 'sortie', $paramcount = '') {
         $fieldid = $this->field->id;

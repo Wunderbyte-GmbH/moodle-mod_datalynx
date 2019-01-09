@@ -22,7 +22,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once('../../../config.php');
-require_once('../mod_class.php');
+require_once('../classes/datalynx.php');
 
 $urlparams = new stdClass();
 
@@ -43,7 +43,7 @@ $urlparams->confirmed = optional_param('confirmed', 0, PARAM_INT);
 $urlparams->update = optional_param('update', 0, PARAM_INT); // Update filter.
 $urlparams->cancel = optional_param('cancel', 0, PARAM_BOOL);
 
-$dl = new datalynx($urlparams->d, $urlparams->id);
+$dl = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
 require_capability('mod/datalynx:managetemplates', $dl->context);
 
 $dl->set_page('customfilter/index', array('modjs' => true, 'urlparams' => $urlparams));

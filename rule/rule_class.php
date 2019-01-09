@@ -22,7 +22,7 @@
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once(dirname(__FILE__) . "/../mod_class.php");
+require_once(dirname(__FILE__) . "/../classes/datalynx.php");
 
 /**
  * Base class for Datalynx Rule Types
@@ -47,10 +47,10 @@ abstract class datalynx_rule_base {
         if (empty($df)) {
             throw new coding_exception('Datalynx id or object must be passed to view constructor.');
         } else {
-            if ($df instanceof datalynx) {
+            if ($df instanceof \mod_datalynx\datalynx) {
                 $this->df = $df;
             } else { // Datalynx id/object.
-                $this->df = new datalynx($df);
+                $this->df = new mod_datalynx\datalynx($df);
             }
         }
 

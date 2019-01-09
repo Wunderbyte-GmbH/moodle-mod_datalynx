@@ -1,0 +1,36 @@
+#@mod @mod_datalynx @_file_upload
+#Feature: In a datalynx instance create and update entries with fieldtype picture
+#  In order to work with fields of picture type
+#  As a teacher
+#  I need to add fields of type picture to the instance
+#
+#  Background:
+#    Given the following "courses" exist:
+#      | fullname | shortname | category | groupmode |
+#      | Course 1 | C1        | 0        | 1         |
+#    And the following "users" exist:
+#      | username | firstname | lastname | email                   |
+#      | teacher1 | Teacher   | 1        | teacher1@mailinator.com |
+#    And the following "course enrolments" exist:
+#      | user     | course | role           |
+#      | teacher1 | C1     | editingteacher |
+#    And the following "activities" exist:
+#      | activity | course | idnumber | name                   |
+#      | datalynx | C1     | 12345    | Datalynx Test Instance |
+#    And "Datalynx Test Instance" has following fields:
+#      | type    | name    | param1 |
+#      | picture | Picture |        |
+#    And "Datalynx Test Instance" has following views:
+#      | type    | name    | status        | redirect |
+#      | tabular | Tabular | default, edit | Tabular  |
+#
+#  @javascript
+#  Scenario: test form
+#    Given I log in as "teacher1"
+#    And I am on "Course 1" course homepage
+#    And I follow "Datalynx Test Instance"
+#    And I follow "Add a new entry"
+#    And I upload "mod/datalynx/tests/fixtures/picture.jpg" file to "Picture" filemanager
+#    And I press "Save changes"
+#    And I press "Continue"
+#    Then I should see "Add a new entry"

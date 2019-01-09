@@ -25,7 +25,7 @@ defined('MOODLE_INTERNAL') or die();
 require_once('../../../config.php');
 require_once('filterform_form.php');
 require_once('../filter/filter_class.php');
-require_once("../mod_class.php");
+require_once("../classes/datalynx.php");
 
 $urlparams = new stdClass();
 $urlparams->d = required_param('d', PARAM_INT);
@@ -33,7 +33,7 @@ $urlparams->id = required_param('id', PARAM_INT);
 $urlparams->action = optional_param('action', 'edit', PARAM_ALPHA);
 $urlparams->confirmed = optional_param('confirmed', false, PARAM_BOOL);
 
-$datalynx = new datalynx($urlparams->d);
+$datalynx = new mod_datalynx\datalynx($urlparams->d);
 
 require_login($datalynx->data->course, false, $datalynx->cm);
 

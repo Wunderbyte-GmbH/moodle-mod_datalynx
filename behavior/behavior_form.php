@@ -37,7 +37,7 @@ class datalynx_field_behavior_form extends moodleform {
      */
     private $datalynx;
 
-    public function __construct(datalynx $datalynx) {
+    public function __construct(mod_datalynx\datalynx $datalynx) {
         $this->datalynx = $datalynx;
         parent::__construct();
     }
@@ -74,8 +74,8 @@ class datalynx_field_behavior_form extends moodleform {
         $mform->setType('visibleto', PARAM_RAW);
         if ($new) {
             $mform->setDefault('visibleto',
-                    array(datalynx::PERMISSION_MANAGER, datalynx::PERMISSION_TEACHER,
-                            datalynx::PERMISSION_STUDENT));
+                    array(mod_datalynx\datalynx::PERMISSION_MANAGER, mod_datalynx\datalynx::PERMISSION_TEACHER,
+                            mod_datalynx\datalynx::PERMISSION_STUDENT));
         }
 
         // EDITING OPTIONS.
@@ -94,8 +94,8 @@ class datalynx_field_behavior_form extends moodleform {
         $mform->setType('editableby', PARAM_RAW);
         if ($new) {
             $mform->setDefault('editableby',
-                    array(datalynx::PERMISSION_MANAGER, datalynx::PERMISSION_TEACHER,
-                            datalynx::PERMISSION_STUDENT));
+                    array(mod_datalynx\datalynx::PERMISSION_MANAGER, mod_datalynx\datalynx::PERMISSION_TEACHER,
+                            mod_datalynx\datalynx::PERMISSION_STUDENT));
         }
         $mform->disabledIf('editableby', 'editable', 'notchecked');
 

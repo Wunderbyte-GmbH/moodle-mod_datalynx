@@ -36,7 +36,7 @@ class datalynx_field_filterform_form extends moodleform {
      */
     private $datalynx;
 
-    public function __construct(datalynx $datalynx) {
+    public function __construct(mod_datalynx\datalynx $datalynx) {
         $this->datalynx = $datalynx;
         parent::__construct();
     }

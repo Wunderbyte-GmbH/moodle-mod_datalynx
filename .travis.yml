@@ -1,58 +1,81 @@
 language: php
 
-sudo: required # checking if sudo makes behat error go away.
-
-addons:
-  postgresql: "9.3"
-  apt:
-    packages:
-      - oracle-java8-installer
-      - oracle-java8-set-default
-      - chromium-chromedriver # used to start behat with chrome
+sudo: false
 
 cache:
   directories:
     - $HOME/.composer/cache
     - $HOME/.npm
 
+addons:
+  postgresql: "9.4"
+  apt:
+    packages:
+      - oracle-java8-installer
+      - oracle-java8-set-default
+      - chromium-chromedriver
+      - google-chrome-stable
+
 php:
- - 7.0
- - 7.1
+  - 7.0
+  - 7.1
 
 env:
- global:
-  - MOODLE_START_BEHAT_SERVERS=NO
-  - MOODLE_CI_VER=1
-  - MOODLE_DIR=/home/travis/build/moodle
-  - MOODLE_SELENIUM_JAR=/home/travis/build/moodle/selenium.jar
-  - IGNORE_PATHS=checkboxgroup/checkboxgroup.php # we know this dir is problematic
- matrix:
-  - DB=pgsql MOODLE_BRANCH=MOODLE_33_STABLE MOODLE_CI_VER=2
-  - DB=mysqli MOODLE_BRANCH=MOODLE_33_STABLE MOODLE_CI_VER=2
+  global:
+    - IGNORE_PATHS=checkboxgroup/checkboxgroup.php # we know this dir is problematic
+    - MOODLE_DIR=/home/travis/build/moodle
+    - MOODLE_SELENIUM_JAR=/home/travis/build/moodle/selenium.jar
+  matrix:
+    - DB=pgsql MOODLE_BRANCH=MOODLE_35_STABLE
+    - DB=pgsql MOODLE_BRANCH=master
+    - DB=mysqli MOODLE_BRANCH=MOODLE_35_STABLE
+    - DB=mysqli MOODLE_BRANCH=master
+
+matrix:
+  allow_failures:
+    - env: DB=pgsql MOODLE_BRANCH=master
+    - env: DB=mysqli MOODLE_BRANCH=master
+  fast_finish: true
 
 before_install:
   - phpenv config-rm xdebug.ini
-  - nvm install 8.9
-  - nvm use 8.9
+  - nvm install v8.9.4
   - cd ../..
   - composer selfupdate
-  - composer create-project -n --no-dev --prefer-dist moodlerooms/moodle-plugin-ci ci ^${MOODLE_CI_VER}
+  - composer create-project -n --no-dev --prefer-dist moodlerooms/moodle-plugin-ci ci ^2
   - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
-  - sleep 10
+
+jobs:
+  include:
+    # Prechecks against latest Moodle stable only.
+    - stage: static
+      php: 7.1
+      env: DB=mysqli MOODLE_BRANCH=MOODLE_34_STABLE
+      install:
+        - moodle-plugin-ci install --no-init
+      script:
+        - moodle-plugin-ci phplint
+        #- moodle-plugin-ci phpcpd
+        - moodle-plugin-ci phpmd
+        - moodle-plugin-ci codechecker
+        - moodle-plugin-ci savepoints
+        - moodle-plugin-ci mustache
+        - moodle-plugin-ci grunt
+        - moodle-plugin-ci validate
 
 install:
   - moodle-plugin-ci install
   - xvfb-run -a --server-args="-screen 0 1024x768x24" java -Dwebdriver.chrome.driver=/usr/lib/chromium-browser/chromedriver -jar ${MOODLE_SELENIUM_JAR} -log /tmp/selenium.log &
   - php -t ${MOODLE_DIR} -S localhost:8000 > /tmp/php-access.log 2> /tmp/php-error.log &
   - sleep 5s
+
+# Unit tests and behat tests against full matrix.
 script:
-  - moodle-plugin-ci phplint
-  #- moodle-plugin-ci phpcpd # bug#1065 as discussed.
-  - moodle-plugin-ci phpmd
-  - moodle-plugin-ci codechecker
-  - moodle-plugin-ci validate
-  - moodle-plugin-ci savepoints
-  - moodle-plugin-ci mustache
-  - moodle-plugin-ci grunt
-  - moodle-plugin-ci phpunit
-  - moodle-plugin-ci behat --profile chrome
+  - moodle-plugin-ci phpunit --coverage-clover
+  - moodle-plugin-ci behat --moodle=${MOODLE_DIR} --auto-rerun=0 --profile=chrome
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+
+stages:
+  - static
+  - test

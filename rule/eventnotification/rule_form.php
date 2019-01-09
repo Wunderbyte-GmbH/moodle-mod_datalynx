@@ -86,7 +86,7 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
 
     private function get_views_visible_to_datalynx_permission($permissionid) {
         global $DB;
-        if ($permissionid == datalynx::PERMISSION_ADMIN) {
+        if ($permissionid == mod_datalynx\datalynx::PERMISSION_ADMIN) {
             $sql = "SELECT id, name FROM {datalynx_views} WHERE dataid = :dataid";
             return $DB->get_records_sql_menu($sql, ['dataid' => $this->_df->id()]);
         } else {

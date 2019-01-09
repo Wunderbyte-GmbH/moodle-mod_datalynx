@@ -945,7 +945,7 @@ function datalynx_comment_validate($commentparam) {
 /**
  */
 function datalynx_comment_add($newcomment, $commentparam) {
-    $df = new datalynx($commentparam->cm->instance);
+    $df = new mod_datalynx\datalynx($commentparam->cm->instance);
     $eventdata = (object) array('items' => $newcomment);
 }
 
@@ -983,9 +983,9 @@ function datalynx_rating_permissions($contextid, $component, $ratingarea) {
 function datalynx_rating_validate($params) {
     global $DB, $USER;
 
-    require_once(dirname(__FILE__) . "/mod_class.php");
+    require_once(dirname(__FILE__) . "/classes/datalynx.php");
 
-    $df = new datalynx(null, $params['context']->instanceid);
+    $df = new mod_datalynx\datalynx(null, $params['context']->instanceid);
 
     // Check the component is mod_datalynx.
     if ($params['component'] != 'mod_datalynx') {
@@ -1397,7 +1397,7 @@ function mod_datalynx_get_tagged_entries($tag, $exclusivemode = false, $fromctx 
                             $datalynx = (object) array('id' => $taggeditem->datalynxid,
                                     'course' => $cm->course
                             );
-                            $datalynx = new datalynx($taggeditem->datalynxid);
+                            $datalynx = new mod_datalynx\datalynx($taggeditem->datalynxid);
 
                             if (!$datalynx->user_can_view_all_entries()) {
                                 if ($taggeditem->userid == $USER->id) {

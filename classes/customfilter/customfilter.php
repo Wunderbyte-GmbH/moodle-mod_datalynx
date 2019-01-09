@@ -24,12 +24,14 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace mod_datalynx\customfilter;
+use stdClass;
 defined('MOODLE_INTERNAL') or die();
 
 /**
  * Customfilter class
  */
-class mod_datalynx_customfilter {
+class customfilter {
 
     public $id;
 

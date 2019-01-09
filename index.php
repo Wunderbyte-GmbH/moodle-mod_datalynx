@@ -23,7 +23,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once("../../config.php");
-require_once("$CFG->dirroot/mod/datalynx/mod_class.php");
+require_once("$CFG->dirroot/mod/datalynx/classes/datalynx.php");
 require_once("$CFG->dirroot/mod/datalynx/lib.php");
 
 $id = required_param('id', PARAM_INT); // Course id.
@@ -107,7 +107,7 @@ $strdelete = get_string('delete');
 foreach ($datalynxs as $datalynx) {
     $tablerow = array();
 
-    $df = new datalynx($datalynx);
+    $df = new mod_datalynx\datalynx($datalynx);
 
     if (!has_capability('mod/datalynx:viewindex', $df->context)) {
         continue;
@@ -135,10 +135,10 @@ foreach ($datalynxs as $datalynx) {
     $tablerow[] = format_text($datalynx->intro, $datalynx->introformat, $options);
 
     // Number of entries.
-    $tablerow[] = $df->get_entriescount(datalynx::COUNT_ALL);
+    $tablerow[] = $df->get_entriescount(mod_datalynx\datalynx::COUNT_ALL);
 
     // Number of pending entries.
-    $tablerow[] = $df->get_entriescount(datalynx::COUNT_LEFT);
+    $tablerow[] = $df->get_entriescount(mod_datalynx\datalynx::COUNT_LEFT);
 
     // Rss.
     if ($rss) {

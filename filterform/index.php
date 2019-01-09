@@ -21,13 +21,13 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once('../../../config.php');
-require_once('../mod_class.php');
+require_once('../classes/datalynx.php');
 require_once("$CFG->libdir/tablelib.php");
 
 $urlparams = new stdClass();
 $urlparams->d = optional_param('d', 0, PARAM_INT);
 
-$datalynx = new datalynx($urlparams->d);
+$datalynx = new mod_datalynx\datalynx($urlparams->d);
 $urlparams->id = $datalynx->cm->id;
 
 require_login($datalynx->data->course, false, $datalynx->cm);

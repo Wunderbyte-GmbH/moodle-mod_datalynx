@@ -29,7 +29,7 @@
 defined('MOODLE_INTERNAL') or die();
 
 require_once("$CFG->dirroot/course/moodleform_mod.php");
-require_once($CFG->dirroot . '/mod/datalynx/mod_class.php');
+require_once($CFG->dirroot . '/mod/datalynx/classes/datalynx.php');
 
 class mod_datalynx_mod_form extends moodleform_mod {
 
@@ -39,7 +39,7 @@ class mod_datalynx_mod_form extends moodleform_mod {
         global $CFG;
 
         if ($cmid = optional_param('update', 0, PARAM_INT)) {
-            $this->_df = new datalynx(0, $cmid);
+            $this->_df = new mod_datalynx\datalynx(0, $cmid);
         }
 
         $mform = &$this->_form;
@@ -169,9 +169,9 @@ class mod_datalynx_mod_form extends moodleform_mod {
         $mform->setDefault('timelimit', -1);
         $mform->addRule('timelimit', null, 'numeric', null, 'client');
 
-        $options = array(datalynx::APPROVAL_NONE => get_string('approval_none', 'datalynx'),
-                datalynx::APPROVAL_ON_UPDATE => get_string('approval_required_update', 'datalynx'),
-                datalynx::APPROVAL_ON_NEW => get_string('approval_required_new', 'datalynx'));
+        $options = array(mod_datalynx\datalynx::APPROVAL_NONE => get_string('approval_none', 'datalynx'),
+                mod_datalynx\datalynx::APPROVAL_ON_UPDATE => get_string('approval_required_update', 'datalynx'),
+                mod_datalynx\datalynx::APPROVAL_ON_NEW => get_string('approval_required_new', 'datalynx'));
         $mform->addElement('select', 'approval', get_string('requireapproval', 'datalynx'), $options);
 
         // Common course elements.

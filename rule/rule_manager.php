@@ -22,7 +22,7 @@
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once(dirname(dirname(__FILE__)) . '/mod_class.php');
+require_once(dirname(dirname(__FILE__)) . '/classes/datalynx.php');
 
 /**
  * Class that manages and triggers rules
@@ -79,7 +79,7 @@ class datalynx_rule_manager {
      *
      * @param $datalynx datalynx
      */
-    public function __construct(datalynx $datalynx) {
+    public function __construct(mod_datalynx\datalynx $datalynx) {
         $this->_df = $datalynx;
         $this->_customrules = array();
     }
@@ -94,7 +94,7 @@ class datalynx_rule_manager {
         global $DB;
         $cmid = $event->get_data()['contextinstanceid'];
         $dataid = $DB->get_field('course_modules', 'instance', array('id' => $cmid));
-        $rulemanager = new datalynx_rule_manager(new datalynx($dataid));
+        $rulemanager = new datalynx_rule_manager(new mod_datalynx\datalynx($dataid));
         $rules = $rulemanager->get_rules_for_event($event->eventname);
         foreach ($rules as $rule) {
             $rule->trigger($event);

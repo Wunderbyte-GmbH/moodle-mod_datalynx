@@ -51,7 +51,7 @@ class datalynxfield_datalynxview extends datalynxfield_base {
             return;
         }
 
-        $datalynx = new datalynx($data, null);
+        $datalynx = new mod_datalynx\datalynx($data, null);
         // TODO Add capability check on view entries.
 
         // Is there a view? Otherwise return.

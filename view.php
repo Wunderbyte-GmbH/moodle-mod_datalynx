@@ -28,7 +28,7 @@
  */
 
 require_once('../../config.php');
-require_once("$CFG->dirroot/mod/datalynx/mod_class.php");
+require_once("$CFG->dirroot/mod/datalynx/classes/datalynx.php");
 
 $urlparams = new stdClass();
 $urlparams->d = optional_param('d', 0, PARAM_INT); // Datalynx id.
@@ -40,7 +40,7 @@ $urlparams->pagelayout = optional_param('pagelayout', '', PARAM_ALPHAEXT);
 $urlparams->refresh = optional_param('refresh', 0, PARAM_INT);
 
 // Set a datalynx object with guest autologin.
-$datalynx = new datalynx($urlparams->d, $urlparams->id);
+$datalynx = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
 
 $pageparams = array('js' => true, 'css' => true, 'rss' => true, 'modjs' => true,
         'completion' => true, 'comments' => true, 'urlparams' => $urlparams

@@ -26,7 +26,7 @@
  *          certain copyrights on the Database module may obtain.
  */
 require_once('../../../config.php');
-require_once('../mod_class.php');
+require_once('../classes/datalynx.php');
 require_once("$CFG->libdir/tablelib.php");
 
 $urlparams = new stdClass();
@@ -49,7 +49,7 @@ $urlparams->convert = optional_param('convert', 0, PARAM_INT); // Id of field to
 $urlparams->confirmed = optional_param('confirmed', 0, PARAM_INT);
 
 // Set a datalynx object.
-$df = new datalynx($urlparams->d, $urlparams->id);
+$df = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
 
 require_login($df->data->course, false, $df->cm);
 

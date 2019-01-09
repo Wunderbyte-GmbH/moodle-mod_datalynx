@@ -39,13 +39,13 @@ $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST)
 require_login($course, false, $cm);
 
 if ($urlparams->cssedit) {
-    require_once('mod_class.php');
+    require_once('classes/datalynx.php');
     require_once($CFG->libdir . '/formslib.php');
 
     class mod_datalynx_css_form extends moodleform {
 
         public function definition() {
-            global $CFG, $COURSE;
+            global $COURSE;
 
             $mform = &$this->_form;
 
@@ -76,7 +76,7 @@ if ($urlparams->cssedit) {
     }
 
     // Set a datalynx object.
-    $df = new datalynx($urlparams->d, $urlparams->id);
+    $df = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
     require_capability('mod/datalynx:managetemplates', $df->context);
 
     $df->set_page('css', array('urlparams' => $urlparams));

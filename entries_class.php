@@ -56,8 +56,12 @@ class datalynx_entries {
     /**
      * Constructor
      * View or datalynx or both, each can be id or object
+     *
+     * @param datalynx $datalynx
+     * @param datalynx_filter|null $filter
+     * @throws coding_exception
      */
-    public function __construct(datalynx $datalynx, datalynx_filter $filter = null) {
+    public function __construct(mod_datalynx\datalynx $datalynx, datalynx_filter $filter = null) {
         if (empty($datalynx)) {
             throw new coding_exception(
                     'Datalynx id or object must be passed to entries constructor.');
@@ -70,14 +74,13 @@ class datalynx_entries {
     /**
      * Populate the entries with content of the content table datalynx_contents. Gets the raw content
      * for each field for the entry and sets the content in $this->_entries
-     * Performs entries count in order to display number of entries. Updates user profiels if
-     * plugin local_userinfosync is installed
+     * Performs entries count in order to display number of entries.
      *
      * @param array $options
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public function set_content(array $options = array()) {
-        global $CFG;
-
         if (isset($options['entriesset'])) {
             $entriesset = $options['entriesset'];
         } else {
@@ -95,20 +98,6 @@ class datalynx_entries {
                 $this->_entries);
         $this->_entriesfiltercount = !empty($entriesset->found) ? $entriesset->found : count(
                 $this->_entries);
-
-        $pluginmananger = core_plugin_manager::instance();
-        $plugininfo = $pluginmananger->get_plugin_info('local_userinfosync');
-        if ($plugininfo && $plugininfo->rootdir) {
-            require_once($plugininfo->rootdir . '/lib.php');
-
-            $userids = array();
-            foreach ($this->_entries as $entry) {
-                $userids[] = $entry->userid;
-            }
-            array_unique($userids);
-
-            userinfosync::update_user_fields($userids);
-        }
     }
 
     /**
@@ -117,6 +106,8 @@ class datalynx_entries {
      *
      * @param array $options array of strings
      * @return object retrieved entries
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public function get_entries($options = null) {
         global $DB, $USER;
@@ -342,7 +333,6 @@ class datalynx_entries {
                     $entries->entries = $DB->get_records_sql($sqlselect, $allparams);
                 }
             }
-
             // Now get the contents if required and add it to the entry objects.
             if ($datalynxcontent && $entries->entries) {
                 // Get the node content of the requested entries.
@@ -353,6 +343,7 @@ class datalynx_entries {
                 $contents = $DB->get_records_select('datalynx_contents',
                         "entryid {$eids} AND fieldid {$fids}", $params);
 
+                // If we see multiple contents to one entry and field, build array with postfix _fieldgroup.
                 foreach ($contents as $contentid => $content) {
                     $entry = $entries->entries[$content->entryid];
 
@@ -386,7 +377,6 @@ class datalynx_entries {
                             $entry->{$varpart} = $content->{$part}; // Normal case, only one content item.
                         }
                     }
-
                     $entries->entries[$content->entryid] = $entry;
                 }
             }
@@ -400,6 +390,8 @@ class datalynx_entries {
      *
      * @param integer $userid the user id of the user who created the entry (or was assigned as author of the entry)
      * @return object
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public function get_user_entries($userid = null) {
         global $USER;
@@ -427,12 +419,11 @@ class datalynx_entries {
     /**
      * return entries
      *
-     * @return multitype:
+     * @return array:
      */
     public function entries() {
         return $this->_entries;
     }
-
 
     /**
      * Retrieves stored files which are embedded in the current content
@@ -440,6 +431,7 @@ class datalynx_entries {
      *
      * @param array $fids
      * @return array of stored files
+     * @throws coding_exception
      */
     public function get_embedded_files(array $fids) {
         $files = array();
@@ -500,10 +492,17 @@ class datalynx_entries {
     /**
      * Process entries when after editing content for saving into db
      *
+     * @param $action
+     * @param $eids
+     * @param null $data
+     * @param bool $confirmed
      * @return array notificationstrings, list of processed ids
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
     public function process_entries($action, $eids, $data = null, $confirmed = false) {
-        global $CFG, $DB, $USER, $OUTPUT, $PAGE;
+        global $DB, $USER, $OUTPUT, $PAGE;
         $df = $this->datalynx;
 
         $entries = array();
@@ -625,7 +624,6 @@ class datalynx_entries {
                             $contents = array_fill_keys(array_keys($entries),
                                     array('info' => array(), 'fields' => array()
                                     ));
-                            $calculations = array();
                             $entryinfo = array(datalynxfield__entry::_ENTRY,
                                     datalynxfield__time::_TIMECREATED,
                                     datalynxfield__time::_TIMEMODIFIED,
@@ -1093,7 +1091,7 @@ class datalynx_entries {
      * @param object $entry
      * @param array $data
      * @param boolean $updatetime
-     * @return boolean|Ambigous <boolean, number>
+     * @return boolean|integer <boolean, number>
      */
     public function update_entry($entry, $data = null, $updatetime = true) {
         global $CFG, $DB, $USER;
@@ -1117,7 +1115,7 @@ class datalynx_entries {
         if ($entry->id > 0) {
             if ($df->user_can_manage_entry($entry)) { // Just in case the user opens two forms at the same time.
                 if (!has_capability('mod/datalynx:approve', $df->context)
-                        && ($df->data->approval == datalynx::APPROVAL_ON_UPDATE)
+                        && ($df->data->approval == mod_datalynx\datalynx::APPROVAL_ON_UPDATE)
                 ) {
                     $entry->approved = 0;
                 }

@@ -22,7 +22,7 @@
  */
 
 require_once('../../../config.php');
-require_once("$CFG->dirroot/mod/datalynx/mod_class.php");
+require_once("$CFG->dirroot/mod/datalynx/classes/datalynx.php");
 
 $urlparams = new stdClass();
 $urlparams->d = required_param('d', PARAM_INT); // Datalynx ID.
@@ -31,7 +31,7 @@ $urlparams->type = optional_param('type', '', PARAM_ALPHA); // Type of a field t
 $urlparams->fid = optional_param('fid', 0, PARAM_INT); // Field id to edit.
 
 // Set a datalynx object.
-$df = new datalynx($urlparams->d);
+$df = new mod_datalynx\datalynx($urlparams->d);
 
 require_login($df->data->course, false, $df->cm);
 

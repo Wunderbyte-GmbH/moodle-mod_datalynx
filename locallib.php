@@ -29,7 +29,7 @@
 defined('MOODLE_INTERNAL') or die();
 
 require_once("$CFG->libdir/portfolio/caller.php");
-require_once("$CFG->dirroot/mod/datalynx/mod_class.php");
+require_once("$CFG->dirroot/mod/datalynx/classes/datalynx.php");
 require_once($CFG->libdir . '/filelib.php');
 
 /**
@@ -120,7 +120,7 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
      */
     public function prepare_package() {
         // Set the exported view content.
-        $df = new datalynx(null, $this->id);
+        $df = new mod_datalynx\datalynx(null, $this->id);
         $view = $df->get_view_from_id($this->vid);
         $view->set_filter(array('filterid' => $this->fid, 'eids' => $this->eids));
         $view->set_content();

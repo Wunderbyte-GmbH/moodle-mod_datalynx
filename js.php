@@ -27,14 +27,14 @@
  *          certain copyrights on the Database module may obtain.
  */
 require_once('../../config.php');
-require_once('mod_class.php');
+require_once('classes/datalynx.php');
 
 $urlparams = new stdClass();
 $urlparams->d = optional_param('d', 0, PARAM_INT); // Datalynx id.
 $urlparams->id = optional_param('id', 0, PARAM_INT); // Course module id.
 $urlparams->jsedit = optional_param('jsedit', 0, PARAM_BOOL); // Edit mode.
 
-$df = new datalynx($urlparams->d, $urlparams->id);
+$df = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
 
 require_login($df->data->course, false, $df->cm);
 

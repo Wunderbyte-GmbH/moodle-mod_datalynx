@@ -76,7 +76,7 @@ class datalynxfield_text_form extends datalynxfield_form {
         if ($datalynxs = $DB->get_records_sql($sql)) {
             foreach ($datalynxs as $dfid => $datalynx) {
                 if ($dfid != $this->_df->id()) {
-                    $df = new datalynx($datalynx);
+                    $df = new mod_datalynx\datalynx($datalynx);
                     // Remove if user cannot manage.
                     if (!has_capability('mod/datalynx:managetemplates', $df->context)) {
                         unset($datalynxs[$dfid]);
