@@ -41,8 +41,8 @@ Feature: Create entry and add fieldgroups
     And I follow "Set as default view"
     And I follow "Set as edit view"
 
-   @javascript
-   Scenario: Add a new fieldgroup to this instance instance
+  @javascript
+  Scenario: Add a new fieldgroup to this instance instance
     When I follow "Fields"
     And I select "Fieldgroup" from the "type" singleselect
     Then I should see "Fieldgroupfields"
@@ -71,6 +71,4 @@ Feature: Create entry and add fieldgroups
     ## And I click on "HTML" "button"
     ## And I click on "Datalynx field Number"
     ## And I press "datalynx-tag-button-delete"
-
-    ## When I set the following fields to these values:
-    ##  | eparam2_editor[text]         | asdfadfdsaf af saf sadf asdf asdf asdf sadf asf asdf asdf asdf saf sdasadfds       |
+    ## When I type in the atto textform "sdfadfdsaf af saf sadf asdf asdf asdf sadf asf asdf asdf asdf saf sdasadfds"

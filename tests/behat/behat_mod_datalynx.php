@@ -246,4 +246,13 @@ class behat_mod_datalynx extends behat_base {
             }
         }
     }
+
+    /**
+     * @When I type in the atto textform :arg1
+     */
+    public function iTypeInTheAttoTextform($newvalue)
+    {
+        $this->execute("behat_forms::i_set_the_field_with_xpath_to",
+        array("//div[@id='id_eparam2_editoreditable']", $newvalue));
+    }
 }
