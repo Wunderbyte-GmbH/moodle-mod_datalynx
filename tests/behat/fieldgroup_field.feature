@@ -77,12 +77,12 @@ Feature: Create entry and add fieldgroups
     Then I should see "Datalynx field Text"
     ## Names do not work bc. iterator.
     Then I set the following fields to these values:
-          | field_214000_-1_0       | Text 1 in the first line  |
-          | field_214001_-1_0       | 3       |
-          | field_214000_-1_1       | Text 1 in the second line  |
-          | field_214001_-1_1       | 6       |
-          | field_214000_-1_2       | Text 1 in the third line  |
-          | field_214001_-1_2       | 9       |
+      | field_214000_-1_0       | Text 1 in the first line  |
+      | field_214001_-1_0       | 3                         |
+      | field_214000_-1_1       | Text 1 in the second line |
+      | field_214001_-1_1       | 6                         |
+      | field_214000_-1_2       | Text 1 in the third line  |
+      | field_214001_-1_2       | 9                         |
     And I press "Save changes"
     Then I should see "updated"
     And I press "Continue"
@@ -90,26 +90,26 @@ Feature: Create entry and add fieldgroups
     ## Add a second entry
     When I follow "Add a new entry"
     Then I set the following fields to these values:
-          | field_214000_-1_0       | Text 2 in the first line  |
-          | field_214001_-1_0       | 12       |
-          | field_214000_-1_1       | Text 2 in the second line  |
-          | field_214001_-1_1       | 15       |
-          | field_214000_-1_2       | Text 2 in the third line  |
-          | field_214001_-1_2       | 18       |
+      | field_214000_-1_0       | Text 2 in the first line  |
+      | field_214001_-1_0       | 12                        |
+      | field_214000_-1_1       | Text 2 in the second line |
+      | field_214001_-1_1       | 15                        |
+      | field_214000_-1_2       | Text 2 in the third line  |
+      | field_214001_-1_2       | 18                        |
     And I press "Save changes"
     Then I should see "updated"
     And I press "Continue"
     ## Add a third entry
     When I follow "Add a new entry"
     Then I set the following fields to these values:
-          | field_214000_-1_0       | Text 3 in the first line  |
-          | field_214001_-1_0       | 21       |
-          | field_214000_-1_1       | Text 3 in the second line  |
-          | field_214001_-1_1       | 24       |
-          | field_214000_-1_2       | Text 3 in the third line  |
-          | field_214001_-1_2       | 27       |
-          | field_214000_-1_3       | Text 3 in the fourth line  |
-          | field_214001_-1_3       | 30       |
+      | field_214000_-1_0       | Text 3 in the first line  |
+      | field_214001_-1_0       | 21                        |
+      | field_214000_-1_1       | Text 3 in the second line |
+      | field_214001_-1_1       | 24                        |
+      | field_214000_-1_2       | Text 3 in the third line  |
+      | field_214001_-1_2       | 27                        |
+      | field_214000_-1_3       | Text 3 in the fourth line |
+      | field_214001_-1_3       | 30                        |
     And I press "Save changes"
     Then I should see "updated"
     And I press "Continue"
@@ -121,17 +121,35 @@ Feature: Create entry and add fieldgroups
 
     ## Change some values.
     Then I set the following fields to these values:
-          | field_214000_213001_0       | Second Text 2 in the first line  |
-          | field_214001_213001_0       | 33       |
-          | field_214000_213001_1       | Second Text 2 in the second line |
+      | field_214000_213001_0       | Second Text 2 in the first line  |
+      | field_214001_213001_0       | 33                               |
+      | field_214000_213001_1       | Second Text 2 in the second line |
+      | field_214000_213001_2       |                                  |
     ## Save and check.
     And I press "Save changes"
     Then I should see "updated"
     And I press "Continue"
     And I should see "Datalynx field Text: Second Text 2 in the first line"
     And I should not see "Datalynx field Text: Text 2 in the first line"
-
+    And I should not see "Datalynx field Text: Text 2 in the third line"
     ## Check order of content as well.
+    And "Datalynx field Text: Second Text 2 in the first line" "text" should appear before "Datalynx field Text: Second Text 2 in the second line" "text"
 
     ## Edit some more but this time remove a whole line.
+    And I click on "//section/div/div/div[2]/div/div[2]/div/a[3]" "xpath_element"
+    Then I set the following fields to these values:
+      | field_214000_213001_0       |                                 |
+      | field_214001_213001_0       |                                 |
+      | field_214000_213001_1       | Third Text 2 in the second line |
+      | field_214001_213001_1       | 36                              |
+      | field_214000_213001_2       |                                 |
+      | field_214001_213001_2       |                                 |
+      | field_214000_213001_3       |                                 |
+      | field_214001_213001_3       |                                 |
+    And I press "Save changes"
+    Then I should see "updated"
+    And I should not see "Datalynx field Text: Second Text 2 in the first line"
+    And I should not see "Datalynx field Number: 33"
+    ## And "Datalynx field Text: " "text" should appear before "Datalynx field Text: Third Text 2 in the second line" "text"
+
     ## Check if empty lines are kept.
