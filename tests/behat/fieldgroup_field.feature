@@ -43,13 +43,14 @@ Feature: Create entry and add fieldgroups
     And I follow "Set as edit view"
 
   @javascript
-  Scenario: Add a new fieldgroup to this instance instance
+  Scenario: Add a new fieldgroup to this instance
     When I follow "Fields"
     And I select "Fieldgroup" from the "type" singleselect
     Then I should see "Fieldgroupfields"
     When I set the following fields to these values:
-      | Name         | Testfieldgroup1       |
-      | Description  | This is a first test  |
+      | Name           | Testfieldgroup1       |
+      | Description    | This is a first test  |
+      | numshowdefault | 4                     |
 
     ## Use the autocomplete.
     And I open the autocomplete suggestions list
@@ -70,6 +71,8 @@ Feature: Create entry and add fieldgroups
     Then I add to "id_eparam2_editor" editor the text "[[Testfieldgroup1]] ##edit##  ##delete##"
     And I press "Save changes"
     When I follow "Browse"
+
+    ## Add some entries for testing.
     When I follow "Add a new entry"
     Then I should see "Datalynx field Text"
     ## Names do not work bc. iterator.
@@ -86,8 +89,6 @@ Feature: Create entry and add fieldgroups
     Then I should see "Datalynx field Number: 6"
     ## Add a second entry
     When I follow "Add a new entry"
-    Then I should see "Datalynx field Text"
-    ## Names do not work bc. iterator.
     Then I set the following fields to these values:
           | field_214000_-1_0       | Text 2 in the first line  |
           | field_214001_-1_0       | 12       |
@@ -98,4 +99,39 @@ Feature: Create entry and add fieldgroups
     And I press "Save changes"
     Then I should see "updated"
     And I press "Continue"
-    ## Find the right edit button and click it.
+    ## Add a third entry
+    When I follow "Add a new entry"
+    Then I set the following fields to these values:
+          | field_214000_-1_0       | Text 3 in the first line  |
+          | field_214001_-1_0       | 21       |
+          | field_214000_-1_1       | Text 3 in the second line  |
+          | field_214001_-1_1       | 24       |
+          | field_214000_-1_2       | Text 3 in the third line  |
+          | field_214001_-1_2       | 27       |
+          | field_214000_-1_3       | Text 3 in the fourth line  |
+          | field_214001_-1_3       | 30       |
+    And I press "Save changes"
+    Then I should see "updated"
+    And I press "Continue"
+    Then I should see "Datalynx field Number: 30"
+    And I should see "Datalynx field Text: Text 3 in the fourth line"
+
+    ## Find the right edit button for the second entry and click it.
+    And I click on "//section/div/div/div[2]/div/div[2]/div/a[3]" "xpath_element"
+
+    ## Change some values.
+    Then I set the following fields to these values:
+          | field_214000_213001_0       | Second Text 2 in the first line  |
+          | field_214001_213001_0       | 33       |
+          | field_214000_213001_1       | Second Text 2 in the second line |
+    ## Save and check.
+    And I press "Save changes"
+    Then I should see "updated"
+    And I press "Continue"
+    And I should see "Datalynx field Text: Second Text 2 in the first line"
+    And I should not see "Datalynx field Text: Text 2 in the first line"
+
+    ## Check order of content as well.
+
+    ## Edit some more but this time remove a whole line.
+    ## Check if empty lines are kept.
