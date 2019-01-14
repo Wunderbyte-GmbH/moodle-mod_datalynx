@@ -21,6 +21,7 @@ Feature: Create entry and add fieldgroups
     And the following "activities" exist:
       | activity | course | idnumber | name                   |
       | datalynx | C1     | 12345    | Datalynx Test Instance |
+
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I add to the "Datalynx Test Instance" datalynx the following fields:
@@ -59,16 +60,42 @@ Feature: Create entry and add fieldgroups
     And I click on "Datalynx field Number" item in the autocomplete list
     And I press "Save changes"
     Then I should see "Testfieldgroup1"
-
     When I follow "Views"
     ## And I follow "Edit" ## Klicks on editview icon bc. somewhere it says edit.
     And I click on "//table/tbody/tr[1]/td[9]/a" "xpath_element"
     Then I should see "Gridview"
     And I click on "Entry template" "link"
     Then I should see "Field tags"
-    ## And I click on "Show more buttons" "button" ## This button is differently named in bht_mdl
-    ## And I click on "Show/hide advanced buttons" "button"
-    ## And I click on "HTML" "button"
-    ## And I click on "Datalynx field Number"
-    ## And I press "datalynx-tag-button-delete"
-    ## When I type in the atto textform "sdfadfdsaf af saf sadf asdf asdf asdf sadf asf asdf asdf asdf saf sdasadfds"
+    ## Add fieldgroup and remove all other fields.
+    Then I add to "id_eparam2_editor" editor the text "[[Testfieldgroup1]] ##edit##  ##delete##"
+    And I press "Save changes"
+    When I follow "Browse"
+    When I follow "Add a new entry"
+    Then I should see "Datalynx field Text"
+    ## Names do not work bc. iterator.
+    Then I set the following fields to these values:
+          | field_214000_-1_0       | Text 1 in the first line  |
+          | field_214001_-1_0       | 3       |
+          | field_214000_-1_1       | Text 1 in the second line  |
+          | field_214001_-1_1       | 6       |
+          | field_214000_-1_2       | Text 1 in the third line  |
+          | field_214001_-1_2       | 9       |
+    And I press "Save changes"
+    Then I should see "updated"
+    And I press "Continue"
+    Then I should see "Datalynx field Number: 6"
+    ## Add a second entry
+    When I follow "Add a new entry"
+    Then I should see "Datalynx field Text"
+    ## Names do not work bc. iterator.
+    Then I set the following fields to these values:
+          | field_214000_-1_0       | Text 2 in the first line  |
+          | field_214001_-1_0       | 12       |
+          | field_214000_-1_1       | Text 2 in the second line  |
+          | field_214001_-1_1       | 15       |
+          | field_214000_-1_2       | Text 2 in the third line  |
+          | field_214001_-1_2       | 18       |
+    And I press "Save changes"
+    Then I should see "updated"
+    And I press "Continue"
+    ## Find the right edit button and click it.

@@ -248,10 +248,25 @@ class behat_mod_datalynx extends behat_base {
     }
 
     /**
-     * @When I type in the atto textform :arg1
+     * Sets the editor to the given value.
+     *
+     * @Then I add to :fieldlocator editor the text :newvalue
+     *
+     * @param string $fieldlocator
+     * @param string $newvalue
+     * @throws coding_exception
      */
-    public function itypeintheattotextform($newvalue) {
-        $this->execute("behat_forms::i_set_the_field_with_xpath_to",
-        array("//div[@id='id_eparam2_editoreditable']", $newvalue));
+    public function i_add_to_editor_the_text($fieldlocator, $newvalue) {
+        if (!$this->running_javascript()) {
+            throw new coding_exception('Updating text requires javascript.');
+        }
+        // We delegate to behat_form_field class, it will
+        // guess the type properly.
+        $field = behat_field_manager::get_form_field_from_label($fieldlocator, $this);
+
+        if (!method_exists($field, 'set_value')) {
+            throw new coding_exception('Field does not support the select_text function.');
+        }
+        $field->set_value($newvalue);
     }
 }
