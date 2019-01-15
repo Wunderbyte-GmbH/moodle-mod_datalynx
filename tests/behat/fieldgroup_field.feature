@@ -76,14 +76,13 @@ Feature: Create entry and add fieldgroups
     When I follow "Add a new entry"
     Then I should see "Datalynx field Text"
     ## Names do not work bc. iterator.
+    ## Expand third line first.
+    And I click on "Zeile 3" "link"
 
     When  I set the field with xpath "(//input[@type='text'])[2]" to "3"
     When  I set the field with xpath "(//input[@type='text'])[3]" to "Text 1 in the first line"
     When  I set the field with xpath "(//input[@type='text'])[4]" to "6"
     When  I set the field with xpath "(//input[@type='text'])[5]" to "Text 1 in the second line"
-
-    ## Expand third line first.
-    And I click on "Zeile 3" "link"
     When  I set the field with xpath "(//input[@type='text'])[6]" to "9"
     When  I set the field with xpath "(//input[@type='text'])[7]" to "Text 1 in the third line"
 
@@ -144,8 +143,8 @@ Feature: Create entry and add fieldgroups
     ## Check order of content as well.
     And "Datalynx field Text: Second Text 2 in the first line" "text" should appear before "Datalynx field Text: Second Text 2 in the second line" "text"
 
-    ## Edit some more but this time remove a whole line.
-    And I click on "//section/div/div/div[2]/div/div[2]/div/a[3]" "xpath_element"
+    ## Edit the first entry and remove a whole line.
+    And I click on "//section/div/div/div[2]/div/div[2]/div/a[1]" "xpath_element"
 
     And I click on "Zeile 3" "link"
     And I click on "Zeile 4" "link"
@@ -153,7 +152,7 @@ Feature: Create entry and add fieldgroups
     When  I set the field with xpath "(//input[@type='text'])[2]" to ""
     When  I set the field with xpath "(//input[@type='text'])[3]" to ""
     When  I set the field with xpath "(//input[@type='text'])[4]" to "36"
-    When  I set the field with xpath "(//input[@type='text'])[5]" to "Third Text 2 in the second line"
+    When  I set the field with xpath "(//input[@type='text'])[5]" to "Second Text 1 in the second line"
     When  I set the field with xpath "(//input[@type='text'])[6]" to ""
     When  I set the field with xpath "(//input[@type='text'])[7]" to ""
     When  I set the field with xpath "(//input[@type='text'])[8]" to ""
@@ -161,8 +160,12 @@ Feature: Create entry and add fieldgroups
 
     And I press "Save changes"
     Then I should see "updated"
-    And I should not see "Datalynx field Text: Second Text 2 in the first line"
-    And I should not see "Datalynx field Number: 33"
-    ## And "Datalynx field Text: " "text" should appear before "Datalynx field Text: Third Text 2 in the second line" "text"
+    And I press "Continue"
 
     ## Check if empty lines are kept.
+    And I should not see "Datalynx field Text: Text 1 in the first line"
+    And I should not see "Datalynx field Number: 3 "
+    And "Datalynx field Number: 0.00" "text" should appear before "Datalynx field Number: 36.00" "text"
+    ## Has false positives because it does not care what comes after string.
+    ## And "Datalynx field Text: " "text" should appear before "Datalynx field Text: Second Text 1 in the second line" "text"
+    And "//div[.='Datalynx field Text: ']" "xpath_element" should appear before "//div[.='Datalynx field Text: Second Text 1 in the second line']" "xpath_element"
