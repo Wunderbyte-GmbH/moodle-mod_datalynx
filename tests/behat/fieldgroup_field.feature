@@ -76,40 +76,49 @@ Feature: Create entry and add fieldgroups
     When I follow "Add a new entry"
     Then I should see "Datalynx field Text"
     ## Names do not work bc. iterator.
-    Then I set the following fields to these values:
-      | field_214000_-1_0       | Text 1 in the first line  |
-      | field_214001_-1_0       | 3                         |
-      | field_214000_-1_1       | Text 1 in the second line |
-      | field_214001_-1_1       | 6                         |
-      | field_214000_-1_2       | Text 1 in the third line  |
-      | field_214001_-1_2       | 9                         |
+
+    When  I set the field with xpath "(//input[@type='text'])[2]" to "3"
+    When  I set the field with xpath "(//input[@type='text'])[3]" to "Text 1 in the first line"
+    When  I set the field with xpath "(//input[@type='text'])[4]" to "6"
+    When  I set the field with xpath "(//input[@type='text'])[5]" to "Text 1 in the second line"
+
+    ## Expand third line first.
+    And I click on "Zeile 3" "link"
+    When  I set the field with xpath "(//input[@type='text'])[6]" to "9"
+    When  I set the field with xpath "(//input[@type='text'])[7]" to "Text 1 in the third line"
+
     And I press "Save changes"
     Then I should see "updated"
     And I press "Continue"
     Then I should see "Datalynx field Number: 6"
     ## Add a second entry
     When I follow "Add a new entry"
-    Then I set the following fields to these values:
-      | field_214000_-1_0       | Text 2 in the first line  |
-      | field_214001_-1_0       | 12                        |
-      | field_214000_-1_1       | Text 2 in the second line |
-      | field_214001_-1_1       | 15                        |
-      | field_214000_-1_2       | Text 2 in the third line  |
-      | field_214001_-1_2       | 18                        |
+    And I click on "Zeile 3" "link"
+
+    When  I set the field with xpath "(//input[@type='text'])[2]" to "12"
+    When  I set the field with xpath "(//input[@type='text'])[3]" to "Text 2 in the first line"
+    When  I set the field with xpath "(//input[@type='text'])[4]" to "15"
+    When  I set the field with xpath "(//input[@type='text'])[5]" to "Text 2 in the second line"
+    When  I set the field with xpath "(//input[@type='text'])[6]" to "18"
+    When  I set the field with xpath "(//input[@type='text'])[7]" to "Text 2 in the third line"
+
     And I press "Save changes"
     Then I should see "updated"
     And I press "Continue"
     ## Add a third entry
     When I follow "Add a new entry"
-    Then I set the following fields to these values:
-      | field_214000_-1_0       | Text 3 in the first line  |
-      | field_214001_-1_0       | 21                        |
-      | field_214000_-1_1       | Text 3 in the second line |
-      | field_214001_-1_1       | 24                        |
-      | field_214000_-1_2       | Text 3 in the third line  |
-      | field_214001_-1_2       | 27                        |
-      | field_214000_-1_3       | Text 3 in the fourth line |
-      | field_214001_-1_3       | 30                        |
+    And I click on "Zeile 3" "link"
+    And I click on "Zeile 4" "link"
+
+    When  I set the field with xpath "(//input[@type='text'])[2]" to "21"
+    When  I set the field with xpath "(//input[@type='text'])[3]" to "Text 3 in the first line"
+    When  I set the field with xpath "(//input[@type='text'])[4]" to "24"
+    When  I set the field with xpath "(//input[@type='text'])[5]" to "Text 3 in the second line"
+    When  I set the field with xpath "(//input[@type='text'])[6]" to "27"
+    When  I set the field with xpath "(//input[@type='text'])[7]" to "Text 3 in the third line"
+    When  I set the field with xpath "(//input[@type='text'])[8]" to "30"
+    When  I set the field with xpath "(//input[@type='text'])[9]" to "Text 3 in the fourth line"
+
     And I press "Save changes"
     Then I should see "updated"
     And I press "Continue"
@@ -120,32 +129,36 @@ Feature: Create entry and add fieldgroups
     And I click on "//section/div/div/div[2]/div/div[2]/div/a[3]" "xpath_element"
 
     ## Change some values.
-    Then I set the following fields to these values:
-      | field_214000_213001_0       | Second Text 2 in the first line  |
-      | field_214001_213001_0       | 33                               |
-      | field_214000_213001_1       | Second Text 2 in the second line |
-      | field_214000_213001_2       |                                  |
+    When  I set the field with xpath "(//input[@type='text'])[2]" to "33"
+    When  I set the field with xpath "(//input[@type='text'])[3]" to "Second Text 2 in the first line"
+    When  I set the field with xpath "(//input[@type='text'])[4]" to ""
+    When  I set the field with xpath "(//input[@type='text'])[5]" to "Second Text 2 in the second line"
+
     ## Save and check.
     And I press "Save changes"
     Then I should see "updated"
     And I press "Continue"
     And I should see "Datalynx field Text: Second Text 2 in the first line"
     And I should not see "Datalynx field Text: Text 2 in the first line"
-    And I should not see "Datalynx field Text: Text 2 in the third line"
+    And I should see "Datalynx field Text: Text 2 in the third line"
     ## Check order of content as well.
     And "Datalynx field Text: Second Text 2 in the first line" "text" should appear before "Datalynx field Text: Second Text 2 in the second line" "text"
 
     ## Edit some more but this time remove a whole line.
     And I click on "//section/div/div/div[2]/div/div[2]/div/a[3]" "xpath_element"
-    Then I set the following fields to these values:
-      | field_214000_213001_0       |                                 |
-      | field_214001_213001_0       |                                 |
-      | field_214000_213001_1       | Third Text 2 in the second line |
-      | field_214001_213001_1       | 36                              |
-      | field_214000_213001_2       |                                 |
-      | field_214001_213001_2       |                                 |
-      | field_214000_213001_3       |                                 |
-      | field_214001_213001_3       |                                 |
+
+    And I click on "Zeile 3" "link"
+    And I click on "Zeile 4" "link"
+
+    When  I set the field with xpath "(//input[@type='text'])[2]" to ""
+    When  I set the field with xpath "(//input[@type='text'])[3]" to ""
+    When  I set the field with xpath "(//input[@type='text'])[4]" to "36"
+    When  I set the field with xpath "(//input[@type='text'])[5]" to "Third Text 2 in the second line"
+    When  I set the field with xpath "(//input[@type='text'])[6]" to ""
+    When  I set the field with xpath "(//input[@type='text'])[7]" to ""
+    When  I set the field with xpath "(//input[@type='text'])[8]" to ""
+    When  I set the field with xpath "(//input[@type='text'])[9]" to ""
+
     And I press "Save changes"
     Then I should see "updated"
     And I should not see "Datalynx field Text: Second Text 2 in the first line"
