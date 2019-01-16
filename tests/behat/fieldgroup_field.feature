@@ -28,14 +28,13 @@ Feature: Create entry and add fieldgroups
       | type             | name                | description | param1                     | param2   | param3 |
       | text             | Text                |             |                            |          |        |
       | number           | Number              | 3           | 2                          |          |        |
-#      | textarea         | Text area          |             |                            | 90       | 15     |
-#      | time             | Time               |             |                            |          |        |
-#      | duration         | Duration           |             |                            |          |        |
-#      | radiobutton      | Radio              |             | Option A,Option B,Option C |          |        |
-#      | checkbox         | Checkbox           |             | Option 1,Option 2,Option 3 | Option 1 |        |
-#      | select           | Select             |             | Option X,Option Y,Option Z |          |        |
-#      | teammemberselect | Team member select | 3           | 20                         | 1,2,4,8  |        |
-
+#      | textarea         | Text area           |             |                            | 90       | 15     |
+#      | time             | Time                |             |                            |          |        |
+#      | duration         | Duration            |             |                            |          |        |
+#      | radiobutton      | Radio               |             | Option A,Option B,Option C |          |        |
+#      | checkbox         | Checkbox            |             | Option 1,Option 2,Option 3 | Option 1 |        |
+#      | select           | Select              |             | Option X,Option Y,Option Z |          |        |
+      | teammemberselect | Team member select  | 3           | 20                         | 1,2,4,8  |        |
     And I add to "Datalynx Test Instance" datalynx the view of "Grid" type with:
       | name        | Gridview |
       | description | Testgrid |
@@ -43,7 +42,48 @@ Feature: Create entry and add fieldgroups
     And I follow "Set as edit view"
 
   @javascript
-  Scenario: Add a new fieldgroup to this instance
+  Scenario: Add a fieldgroup with teammemberselect to this instance
+    When I follow "Fields"
+    And I select "Fieldgroup" from the "type" singleselect
+    Then I should see "Fieldgroupfields"
+    When I set the following fields to these values:
+      | Name           | Testfieldgroup1       |
+      | Description    | This is a first test  |
+      | numshowdefault | 4                     |
+
+    And I open the autocomplete suggestions list
+    Then "Datalynx field Team member select" "autocomplete_suggestions" should exist
+    And I click on "Datalynx field Team member select" item in the autocomplete list
+    And I press "Save changes"
+    When I follow "Views"
+    And I click on "//table/tbody/tr[1]/td[9]/a" "xpath_element"
+    Then I should see "Gridview"
+    And I click on "Entry template" "link"
+    Then I should see "Field tags"
+    Then I add to "id_eparam2_editor" editor the text "[[Testfieldgroup1]] ##edit##  ##delete##"
+    And I press "Save changes"
+    When I follow "Browse"
+    When I follow "Add a new entry"
+    And I open the autocomplete suggestions list
+    Then "Student 1 (student1@example.com)" "autocomplete_suggestions" should exist
+    And I click on "Student 1 (student1@example.com)" item in the autocomplete list
+    Then "Student 2 (student2@example.com)" "autocomplete_suggestions" should exist
+    And I click on "Student 2 (student2@example.com)" item in the autocomplete list
+
+    ## Add teammembers to the second line as well.
+    And I click on "(//html/descendant-or-self::*[@class and contains(concat(' ', normalize-space(@class), ' '), ' form-autocomplete-downarrow ')])[2]" "xpath_element"
+    And I click on "(//ul[@class='form-autocomplete-suggestions']//*[contains(concat('|', string(.), '|'),'|Student 1 (student1@example.com)|')])[1]" "xpath_element"
+    And I press "Save changes"
+    Then I should see "updated"
+    And I press "Continue"
+    Then I should see "Student 2"
+    And "Student 1" "text" should appear before "Student 2" "text"
+
+    ## Edit the first entry and remove a whole line.
+    And I click on "//section/div/div/div[2]/div/div[2]/div/a[1]" "xpath_element"
+
+  @javascript
+  Scenario: Add a new fieldgroup with text and number to this instance
     When I follow "Fields"
     And I select "Fieldgroup" from the "type" singleselect
     Then I should see "Fieldgroupfields"
