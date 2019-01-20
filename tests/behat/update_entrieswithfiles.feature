@@ -1,4 +1,4 @@
-@mod @mod_datalynx @_file_upload @devwip
+@mod @mod_datalynx @_file_upload
 Feature: In a datalynx instance create, update, and delete entries
   In order to create, update or delete an datalynx entry
   As a teacher
@@ -79,7 +79,6 @@ Feature: In a datalynx instance create, update, and delete entries
     And I press "multiedit"
     And I set the field with xpath "(//div[@data-field-name='Datalynx field Text'])[1]//input" to "This is 1"
     And I set the field with xpath "(//div[@data-field-name='Datalynx field Text'])[2]//input" to "This is 2"
-    And I upload and overwrite "mod/datalynx/tests/fixtures/picture.jpg" file to "File" filemanager
     And I press "Save changes"
     And I press "Continue"
     Then I should see "This is 1"
