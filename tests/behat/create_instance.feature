@@ -1,4 +1,4 @@
-@mod @mod_datalynx
+@mod @mod_datalynx @file_upload
 Feature: In a datalynx instance create a new entry
   In order to create a new entry
   As a teacher
@@ -34,6 +34,7 @@ Feature: In a datalynx instance create a new entry
       | select           | Select             |             | Option X,Option Y,Option Z |          |        |
       | teammemberselect | Team member select | 3           | 20                         | 1,2,4,8  |        |
       | number           | Number             | 3           | 2                          |          |        |
+      | file             | File               | My file     |                            | 2        |        |
     And I follow "Filters"
     And I follow "Add a filter"
     And I select "10" from the "perpage" singleselect
@@ -62,6 +63,7 @@ Feature: In a datalynx instance create a new entry
       | duration         | Duration           | 45 days                          |
       | number           | Number             | 9.67                             |
       | time             | Time               | 2.January.2017.20.23             |
+    And I upload "lib/tests/fixtures/empty.txt" file to "File" filemanager
     And I press "Save changes"
     Then I should see "updated"
     And I press "Continue"
@@ -74,6 +76,7 @@ Feature: In a datalynx instance create a new entry
     And I should see "45 days"
     And I should see "9.67"
     And I should see "2 January 2017, 8:23 PM"
+    And "empty.txt" "link" should exist
     But I should not see "Option Y"
     And I should not see "Option 3"
     And I should not see "Option 1"

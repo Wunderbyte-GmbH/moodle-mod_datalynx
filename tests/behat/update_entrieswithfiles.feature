@@ -1,4 +1,4 @@
-@mod @mod_datalynx @_file_upload @wip
+@mod @mod_datalynx @_file_upload @devwip
 Feature: In a datalynx instance create, update, and delete entries
   In order to create, update or delete an datalynx entry
   As a teacher
@@ -38,6 +38,7 @@ Feature: In a datalynx instance create, update, and delete entries
       | select           | Select             |             | Option X,Option Y,Option Z |          |        |
       | teammemberselect | Team member select | 3           | 20                         | 1,2,4,8  |        |
       | number           | Number             | 3           | 2                          |          |        |
+      | file             | File               | My file     |                            | 2        |        |
     And I add to "Datalynx Test Instance" datalynx the view of "Tabular" type with:
       | name | Tabular |
     And I follow "Set as default view"
@@ -68,6 +69,7 @@ Feature: In a datalynx instance create, update, and delete entries
       | select           | Select             | Option Y                         |
       | checkbox         | Checkbox           | Option 1=0,Option 3=1            |
       | teammemberselect | Team member select | Student 2 (student2@example.com) |
+    And I upload "lib/tests/fixtures/empty.txt" file to "File" filemanager
     And I press "Save changes"
     And I press "Continue"
 
@@ -77,6 +79,7 @@ Feature: In a datalynx instance create, update, and delete entries
     And I press "multiedit"
     And I set the field with xpath "(//div[@data-field-name='Datalynx field Text'])[1]//input" to "This is 1"
     And I set the field with xpath "(//div[@data-field-name='Datalynx field Text'])[2]//input" to "This is 2"
+    And I upload and overwrite "mod/datalynx/tests/fixtures/picture.jpg" file to "File" filemanager
     And I press "Save changes"
     And I press "Continue"
     Then I should see "This is 1"
