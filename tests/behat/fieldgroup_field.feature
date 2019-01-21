@@ -71,7 +71,8 @@ Feature: Create entry and add fieldgroups
     And I click on "Student 2 (student2@example.com)" item in the autocomplete list
 
     ## Add teammembers to the second line as well.
-    And I click on "(//html/descendant-or-self::*[@class and contains(concat(' ', normalize-space(@class), ' '), ' form-autocomplete-downarrow ')])[2]" "xpath_element"
+    And I click on "Expand all" "link"
+    And I click on "(//*[@class and contains(concat(' ', normalize-space(@class), ' '), ' form-autocomplete-downarrow ')])[2]" "xpath_element"
     And I click on "(//ul[@class='form-autocomplete-suggestions']//*[contains(concat('|', string(.), '|'),'|Student 1 (student1@example.com)|')])[1]" "xpath_element"
     And I press "Save changes"
     Then I should see "updated"
@@ -80,7 +81,7 @@ Feature: Create entry and add fieldgroups
     And "Student 1" "text" should appear before "Student 2" "text"
 
     ## Edit the first entry and remove a whole line.
-    And I click on "//section/div/div/div[2]/div/div[2]/div/a[1]" "xpath_element"
+    And I click on "(//*[@class='entriesview']/a/*[@title='Edit'])[1]" "xpath_element"
 
   @javascript
   Scenario: Add a new fieldgroup with text and number to this instance
@@ -102,8 +103,8 @@ Feature: Create entry and add fieldgroups
     And I press "Save changes"
     Then I should see "Testfieldgroup1"
     When I follow "Views"
-    ## And I follow "Edit" ## Klicks on editview icon bc. somewhere it says edit.
-    And I click on "//table/tbody/tr[1]/td[9]/a" "xpath_element"
+    And I follow "Gridview"
+    And I click on "Edit this view" "icon"
     Then I should see "Gridview"
     And I click on "Entry template" "link"
     Then I should see "Field tags"
@@ -165,7 +166,7 @@ Feature: Create entry and add fieldgroups
     And I should see "Datalynx field Text: Text 3 in the fourth line"
 
     ## Find the right edit button for the second entry and click it.
-    And I click on "//section/div/div/div[2]/div/div[2]/div/a[3]" "xpath_element"
+    And I click on "(//*[@class='entriesview']/a/*[@title='Edit'])[2]" "xpath_element"
 
     ## Change some values.
     When  I set the field with xpath "(//input[@type='text'])[2]" to "33"
@@ -184,7 +185,7 @@ Feature: Create entry and add fieldgroups
     And "Datalynx field Text: Second Text 2 in the first line" "text" should appear before "Datalynx field Text: Second Text 2 in the second line" "text"
 
     ## Edit the first entry and remove a whole line.
-    And I click on "//section/div/div/div[2]/div/div[2]/div/a[1]" "xpath_element"
+    And I click on "(//*[@class='entriesview']/a/*[@title='Edit'])[1]" "xpath_element"
 
     And I click on "Zeile 3" "link"
     And I click on "Zeile 4" "link"

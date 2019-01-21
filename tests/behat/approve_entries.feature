@@ -1,4 +1,4 @@
-@mod @mod_datalynx @dev @_file_upload @devwip
+@mod @mod_datalynx @dev @_file_upload
 Feature: In datalynx filter approved and not approved entries from multiple students
   In order to view approved and not approved entries
   As teacher
