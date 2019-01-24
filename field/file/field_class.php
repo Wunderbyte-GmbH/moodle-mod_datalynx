@@ -35,7 +35,7 @@ class datalynxfield_file extends datalynxfield_base {
      * Can this field be used in fieldgroups? Override if yes.
      * @var boolean
      */
-    protected $forfieldgroup = false;
+    protected $forfieldgroup = true;
 
     // Content - file manager.
     // Content1 - alt name.
@@ -98,8 +98,6 @@ class datalynxfield_file extends datalynxfield_base {
                     'maxfiles' => $this->field->param2, 'accepted_types' => $this->field->param3
             );
 
-            // TODO: This is not precise enough, we only store contents and these are linked to the entry.
-            // We need a way to determine a specific line or remove field file and picture from fieldgroups for now.
             $contextid = $this->df->context->id;
             file_save_draft_area_files($filemanager, $contextid, 'mod_datalynx', 'content',
                     $contentid, $options);
@@ -109,8 +107,8 @@ class datalynxfield_file extends datalynxfield_base {
         } else {
             // User cleared files from the field.
             if (!empty($contentid)) {
-                // TODO: Fix this, don't delete whole entry only contentid we see.
-                $this->delete_content($entryid);
+                // Don't delete whole entry only contentid we see.
+                $this->delete_content_by_id($contentid);
             }
         }
         return true;
@@ -198,5 +196,32 @@ class datalynxfield_file extends datalynxfield_base {
      */
     public static function is_customfilterfield() {
         return true;
+    }
+
+    /**
+     * Delete all content by id.
+     *
+     * @param int $contentid
+     * @return bool
+     * @throws dml_exception
+     */
+    public function delete_content_by_id($contentid = 0) {
+        global $DB;
+
+        $rec = array('fieldid' => $this->field->id, 'id' => $contentid);
+
+        $rs = $DB->get_recordset('datalynx_contents', $rec);
+        if ($rs->valid()) {
+            $fs = get_file_storage();
+            foreach ($rs as $content) {
+                $fs->delete_area_files($this->df->context->id, 'mod_datalynx', 'content',
+                        $content->id);
+            }
+        }
+        $rs->close();
+
+        // We don't delete the whole record but write a 0 in content.
+        $rec['content'] = 0;
+        return $DB->update_record('datalynx_contents', $rec);
     }
 }

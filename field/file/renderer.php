@@ -45,7 +45,11 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
                 'maxfiles' => $field->get('param2'),
                 'accepted_types' => explode(',', $field->get('param3')));
 
+        // TODO: This usually is 0, check when it is used and what for.
+        // Draftitemid is the id of the draft area to use, or 0 to create a new one.
+
         $draftitemid = file_get_submitted_draft_itemid("{$fieldname}_filemanager");
+
         file_prepare_draft_area($draftitemid, $field->df()->context->id, 'mod_datalynx', 'content',
                 $contentid, $fmoptions);
 
@@ -58,53 +62,6 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
         if ($required) {
             $mform->addRule("{$fieldname}_filemanager", null, 'required', null, 'client');
         }
-    }
-
-    /**
-     */
-    public function display_edit_content(&$mform, $entry) {
-        $field = $this->_field;
-        $fieldid = $field->id();
-        $entryid = $entry->id;
-        $fieldname = "field_{$fieldid}_{$entryid}";
-
-        $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
-        $content = isset($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : null;
-        $content1 = isset($entry->{"c{$fieldid}_content1"}) ? $entry->{"c{$fieldid}_content1"} : null;
-
-        // Get the file content.
-        $fs = get_file_storage();
-        $files = $fs->get_area_files($field->df()->context->id, 'mod_datalynx', 'content',
-                $contentid);
-        if (!$files or !(count($files) > 1)) {
-            return '';
-        }
-
-        $strcontent = '';
-        foreach ($files as $file) {
-            if (!$file->is_directory()) {
-                $strcontent = $file->get_content();
-                break;
-            }
-        }
-
-        $data = new stdClass();
-        $data->{$fieldname} = $strcontent;
-        $data->{"{$fieldname}format"} = FORMAT_HTML;
-
-        $options = array();
-        $options['context'] = $field->df()->context;
-        $options['collapsed'] = true;
-
-        $data = file_prepare_standard_editor($data, $fieldname, $options, $field->df()->context,
-                'mod_datalynx', 'content', $contentid);
-
-        $attr = array();
-
-        $mform->addElement('editor', "{$fieldname}_editor", null, null, $options);
-        $mform->setDefault("{$fieldname}_editor", $data->{"{$fieldname}_editor"});
-        $mform->setDefault("{$fieldname}[text]", $strcontent);
-        $mform->setDefault("{$fieldname}[format]", $data->{"{$fieldname}format"});
     }
 
     /**
@@ -128,6 +85,8 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
         }
 
         $fs = get_file_storage();
+
+        // Contentid is stored in itemid for lookup. This is usable with fieldgroups.
         $files = $fs->get_area_files($field->df()->context->id, 'mod_datalynx', 'content',
                 $contentid);
         if (!$files or !(count($files) > 1)) {
