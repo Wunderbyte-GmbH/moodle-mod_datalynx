@@ -45,9 +45,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
                 'maxfiles' => $field->get('param2'),
                 'accepted_types' => explode(',', $field->get('param3')));
 
-        // TODO: This usually is 0, check when it is used and what for.
-        // Draftitemid is the id of the draft area to use, or 0 to create a new one.
-
+        // Redundant draft areas are cleaned by the cronjob eventually.
         $draftitemid = file_get_submitted_draft_itemid("{$fieldname}_filemanager");
 
         file_prepare_draft_area($draftitemid, $field->df()->context->id, 'mod_datalynx', 'content',
