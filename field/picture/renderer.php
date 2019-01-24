@@ -82,6 +82,8 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
 
         $fs = get_file_storage();
         $files = $fs->get_area_files($field->df()->context->id, 'mod_datalynx', 'content', $contentid);
+
+        // If we see no file attached we are done here.
         if (!$files or !(count($files) > 1)) {
             return '';
         }
@@ -132,6 +134,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
             $imgattr['class'] = 'zoomable';
         }
 
+        // TODO: This fails when I upload something that looks like an image but is not.
         if ($file->is_valid_image()) {
             $filename = $file->get_filename();
             $pluginfileurl = new moodle_url('/pluginfile.php');

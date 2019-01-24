@@ -37,8 +37,6 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
 
         $entryid = $entry->id;
         $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
-        $content = isset($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : null;
-        $content1 = isset($entry->{"c{$fieldid}_content1"}) ? $entry->{"c{$fieldid}_content1"} : null;
 
         $fieldname = "field_{$fieldid}_{$entryid}";
         $fmoptions = array('subdirs' => 0, 'maxbytes' => $field->get('param1'),
