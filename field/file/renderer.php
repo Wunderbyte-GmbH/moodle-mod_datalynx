@@ -36,7 +36,14 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
         $fieldid = $field->id();
 
         $entryid = $entry->id;
-        $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
+
+        // If we see a 0 in content there are no files stored. Create new draft area.
+        $content = isset($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : null;
+        if($content == 0 || !isset($entry->{"c{$fieldid}_id"})) {
+            $contentid = null;
+        } else {
+            $contentid =  $entry->{"c{$fieldid}_id"};
+        }
 
         $fieldname = "field_{$fieldid}_{$entryid}";
         $fmoptions = array('subdirs' => 0, 'maxbytes' => $field->get('param1'),
