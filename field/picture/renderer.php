@@ -34,9 +34,14 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
         $fieldid = $field->id();
 
         $entryid = $entry->id;
-        $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
+
+        // If we see a 0 in content there are no files stored. Create new draft area.
         $content = isset($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : null;
-        $content1 = isset($entry->{"c{$fieldid}_content1"}) ? $entry->{"c{$fieldid}_content1"} : null;
+        if($content == 0 || !isset($entry->{"c{$fieldid}_id"})) {
+            $contentid = null;
+        } else {
+            $contentid =  $entry->{"c{$fieldid}_id"};
+        }
 
         $fieldname = "field_{$fieldid}_{$entryid}";
         $fmoptions = array('subdirs' => 0, 'maxbytes' => $field->get('param1'),
@@ -82,6 +87,8 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
 
         $fs = get_file_storage();
         $files = $fs->get_area_files($field->df()->context->id, 'mod_datalynx', 'content', $contentid);
+
+        // If we see no file attached we are done here.
         if (!$files or !(count($files) > 1)) {
             return '';
         }
@@ -132,6 +139,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
             $imgattr['class'] = 'zoomable';
         }
 
+        // TODO: This fails when I upload something that looks like an image but is not.
         if ($file->is_valid_image()) {
             $filename = $file->get_filename();
             $pluginfileurl = new moodle_url('/pluginfile.php');

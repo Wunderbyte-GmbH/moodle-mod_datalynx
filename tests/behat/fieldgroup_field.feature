@@ -74,14 +74,21 @@ Feature: Create entry and add fieldgroups
     And I click on "Expand all" "link"
     And I click on "(//*[@class and contains(concat(' ', normalize-space(@class), ' '), ' form-autocomplete-downarrow ')])[2]" "xpath_element"
     And I click on "(//ul[@class='form-autocomplete-suggestions']//*[contains(concat('|', string(.), '|'),'|Student 1 (student1@example.com)|')])[1]" "xpath_element"
+    And I click on "(//*[@class and contains(concat(' ', normalize-space(@class), ' '), ' form-autocomplete-downarrow ')])[2]" "xpath_element"
+    And I click on "(//ul[@class='form-autocomplete-suggestions']//*[contains(concat('|', string(.), '|'),'|Student 2 (student2@example.com)|')])[1]" "xpath_element"
     And I press "Save changes"
     Then I should see "updated"
     And I press "Continue"
     Then I should see "Student 2"
     And "Student 1" "text" should appear before "Student 2" "text"
 
-    ## Edit the first entry and remove a whole line.
-    And I click on "(//*[@class='entriesview']/a/*[@title='Edit'])[1]" "xpath_element"
+    ## Add a second entry, this time only to the second line.
+    When I follow "Add a new entry"
+    And I click on "(//*[@class and contains(concat(' ', normalize-space(@class), ' '), ' form-autocomplete-downarrow ')])[2]" "xpath_element"
+    And I click on "(//ul[@class='form-autocomplete-suggestions']//*[contains(concat('|', string(.), '|'),'|Student 2 (student2@example.com)|')])[2]" "xpath_element"
+    And I press "Save changes"
+    Then I should see "updated"
+    And I press "Continue"
 
   @javascript
   Scenario: Add a new fieldgroup with text and number to this instance
@@ -105,6 +112,7 @@ Feature: Create entry and add fieldgroups
     When I follow "Views"
     And I follow "Gridview"
     And I click on "Edit this view" "icon"
+
     Then I should see "Gridview"
     And I click on "Entry template" "link"
     Then I should see "Field tags"

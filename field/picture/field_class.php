@@ -33,18 +33,19 @@ class datalynxfield_picture extends datalynxfield_file {
      * Can this field be used in fieldgroups? Override if yes.
      * @var boolean
      */
-    protected $forfieldgroup = false;
+    protected $forfieldgroup = true;
 
     /**
      */
     public function update_content($entry, array $values = null) {
         global $DB;
         parent::update_content($entry, $values);
-        $content = $DB->get_record('datalynx_contents',
-                array('fieldid' => $this->field->id, 'entryid' => $entry->id));
-        if ($content) {
-            $this->update_content_files($content->id,
-                    array('updatethumb' => true, 'updatefile' => false));
+
+        // We can read the contentid from entry and update the right files.
+        $contentid = isset($entry->{"c{$this->field->id}_id"}) ? $entry->{"c{$this->field->id}_id"} : null;
+
+        if (!empty($contentid)) {
+            $this->update_content_files($contentid, array('updatethumb' => true, 'updatefile' => false));
         }
     }
 
@@ -122,6 +123,11 @@ class datalynxfield_picture extends datalynxfield_file {
 
         // Update dimensions and regenerate thumbs.
         foreach ($files as $file) {
+
+            // Catch in case we see a directory in this list.
+            if ($file->is_directory()) {
+                continue;
+            }
 
             if ($file->is_valid_image()) {
                 // Original first.

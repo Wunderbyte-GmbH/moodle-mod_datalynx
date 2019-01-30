@@ -186,10 +186,12 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
             // If we render a fieldgroup we assume there is fieldgroup content in the $entry.
             if ( isset ( $entry->{"c{$subfieldid}_content{$contentid}_fieldgroup"}) ) {
                 $tempcontent = $entry->{"c{$subfieldid}_content{$contentid}_fieldgroup"};
+                $tempid = $entry->{"c{$subfieldid}_id_fieldgroup"};
             } else {
                 // If we have exactly one content, show this and leave the rest blank.
                 if (isset( $entry->{"c{$subfieldid}_content{$contentid}"} )) {
                     $tempcontent = array( $entry->{"c{$subfieldid}_content{$contentid}"} );
+                    $tempid = array( $entry->{"c{$subfieldid}_id"} );
                 } else {
                     $tempcontent = array();
                 }
@@ -200,6 +202,12 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 $entry->{"c{$subfieldid}_content{$contentid}"} = $tempcontent[$line];
             } else {
                 $entry->{"c{$subfieldid}_content{$contentid}"} = null;
+            }
+            // We need to pass content ids too.
+            if (isset($tempid[$line])) {
+                $entry->{"c{$subfieldid}_id"} = $tempid[$line];
+            } else {
+                $entry->{"c{$subfieldid}_id"} = null;
             }
         }
     }
