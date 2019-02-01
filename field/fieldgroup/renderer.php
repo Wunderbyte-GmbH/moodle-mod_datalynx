@@ -81,8 +81,8 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         $fieldgroupfields = $this->get_subfields();
 
         // Number of lines to show and generate.
-        $defaultlines = $this->_field->field->param3;
-        $maxlines = $this->_field->field->param2;
+        $defaultlines = isset($this->_field->field->param3) ? $this->_field->field->param3 : 3;
+        $maxlines = isset($this->_field->field->param2) ? $this->_field->field->param2 : 3;
 
         // Add a fieldgroup marker to the entry data.
         $mform->addElement('hidden', 'fieldgroup', $this->_field->field->id);
