@@ -49,6 +49,8 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         // Loop through showdefault.
         $showdefault = $this->_field->field->param3;
 
+        // TODO: Show all lines with content, get rid of showdefault here.
+
         // Add key so the other renderers know they deal with fieldgroup.
         $params['fieldgroup'] = true;
 
@@ -78,24 +80,24 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         // We want to display these fields.
         $fieldgroupfields = $this->get_subfields();
 
-        // Number of lines to show by default.
-        $showdefault = $this->_field->field->param3;
+        // Number of lines to show and generate.
+        $defaultlines = $this->_field->field->param3;
+        $maxlines = $this->_field->field->param2;
 
         // Add a fieldgroup marker to the entry data.
         $mform->addElement('hidden', 'fieldgroup', $this->_field->field->id);
         $mform->setType('fieldgroup', PARAM_INT);
 
-        $mform->addElement('hidden', 'iterations', $showdefault);
+        // TODO: This needs to be updated by JS if more lines are added.
+        $mform->addElement('hidden', 'iterations', $defaultlines);
         $mform->setType('iterations', PARAM_INT);
 
         // Loop through all lines.
-        for ($line = 0; $line < $showdefault; $line++) {
+        for ($line = 0; $line < $maxlines; $line++) {
 
             // Allow every fieldgroup to be collapsed if not in use.
             $mform->addElement('header', $line + 1, 'Zeile ' . s($line + 1)); // TODO: Multilang.
-            if ($line + 1 <= 2) {
-                $mform->setExpanded($line + 1, true);
-            }
+            $mform->setExpanded($line + 1, true);
 
             foreach ($fieldgroupfields as $fieldid => $subfield) {
                 $this->renderer_split_content($entry, $fieldid, $line);
@@ -110,6 +112,11 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 $entry->id = $tempentryid;
             }
         }
+        // Hide and disable unused lines.
+        global $PAGE;
+        $PAGE->requires->js_call_amd('mod_datalynx/fieldgroups', 'init', array($defaultlines, $maxlines));
+
+        // Show a button that can show enable one more line.
     }
 
     /**
