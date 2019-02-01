@@ -112,11 +112,14 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 $entry->id = $tempentryid;
             }
         }
+
         // Hide and disable unused lines.
         global $PAGE;
         $PAGE->requires->js_call_amd('mod_datalynx/fieldgroups', 'init', array($defaultlines, $maxlines));
 
-        // Show a button that can show enable one more line.
+        // Show a button to add one more line.
+        $mform->closeHeaderBefore('addline');
+        $mform->addElement('button', 'addline', 'Noch eine Zeile.');
     }
 
     /**
