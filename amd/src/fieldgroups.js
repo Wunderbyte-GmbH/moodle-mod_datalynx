@@ -25,6 +25,13 @@ define(["jquery"], function($) {
                         $('fieldset:hidden:first').show();
                     });
             });
+            $( "#id_hideline" ).each(function () {
+                    $(this).off( "click" );
+                    $(this).click(function(e) {
+                        e.preventDefault(); // Don't follow hrefs.
+                        $('fieldset:visible:last').hide();
+                    });
+            });
 
         }
     };

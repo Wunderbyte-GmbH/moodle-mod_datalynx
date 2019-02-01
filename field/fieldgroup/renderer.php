@@ -119,7 +119,8 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
 
         // Show a button to add one more line.
         $mform->closeHeaderBefore('addline');
-        $mform->addElement('button', 'addline', 'Noch eine Zeile.');
+        $mform->addElement('button', 'addline', 'Noch eine Zeile.'); // TODO: Multilang.
+        $mform->addElement('button', 'hideline', 'Verstecke letzte Zeile.'); // TODO: Multilang.
     }
 
     /**
