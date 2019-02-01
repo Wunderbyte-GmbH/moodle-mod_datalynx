@@ -37,10 +37,10 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
 
         // If we see a 0 in content there are no files stored. Create new draft area.
         $content = isset($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : null;
-        if($content == 0 || !isset($entry->{"c{$fieldid}_id"})) {
+        if ($content == 0 || !isset($entry->{"c{$fieldid}_id"})) {
             $contentid = null;
         } else {
-            $contentid =  $entry->{"c{$fieldid}_id"};
+            $contentid = $entry->{"c{$fieldid}_id"};
         }
 
         $fieldname = "field_{$fieldid}_{$entryid}";
