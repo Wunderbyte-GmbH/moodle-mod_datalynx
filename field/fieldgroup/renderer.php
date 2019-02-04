@@ -46,10 +46,8 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         // We want to display these fields.
         $fieldgroupfields = $this->get_subfields();
 
-        // Loop through showdefault.
-        $showdefault = $this->_field->field->param3;
-
-        // TODO: Show all lines with content, get rid of showdefault here.
+        // Loop through maxlines.
+        $maxlines = $this->_field->field->param2;
 
         // Add key so the other renderers know they deal with fieldgroup.
         $params['fieldgroup'] = true;
@@ -57,17 +55,31 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         // In case we don't have anything to show there should be an error.
         $linedispl = array();
 
-        for ($line = 0; $line < $showdefault; $line++) {
+        // Show all lines with content, get rid of all after that.
+        $lastlinewithcontent = -1;
+
+        for ($line = 0; $line < $maxlines; $line++) {
             foreach ($fieldgroupfields as $fieldid => $subfield) {
                 $this->renderer_split_content($entry, $fieldid, $line);
                 $subfielddefinition['name'] = $subfield->field->name;
                 $subfielddefinition['content'] = $subfield->renderer()->render_display_mode($entry, $params);
+
+                // Remember if this line has some usercontent.
+                if ($subfielddefinition['content'] != "")  $lastlinewithcontent = $line;
+                // TODO: Some fields use default content here, find a way to spot.
+
                 $linedispl['subfield'][] = $subfielddefinition; // Build this multidimensional array for mustache context.
             }
             $completedispl['line'][] = $linedispl;
             $linedispl = array(); // Reset.
 
         }
+
+        // We need this construct to make sure intermittent empty lines are shown.
+        for ($line = $lastlinewithcontent+1; $line <= $maxlines; $line++) {
+            unset($completedispl['line'][$line]);
+        }
+
         return $OUTPUT->render_from_template('mod_datalynx/fieldgroup', $completedispl);
     }
 
