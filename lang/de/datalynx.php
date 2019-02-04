@@ -865,3 +865,6 @@ $string['deletingfieldgroup'] = 'Feldergruppierung löschen: "{$a}"';
 $string['duplicatingfieldgroup'] = 'Feldergruppierung duplizieren: "{$a}"';
 $string['confirmfieldgroupduplicate'] = 'Diese Feldergruppierung wirklich duplizieren?';
 $string['confirmfieldgroupdelete'] = 'Diese Feldergruppierung wirklich löschen?';
+$string['line'] = 'Zeile';
+$string['addline'] = 'Zeige eine weitere Zeile';
+$string['hideline'] = 'Verstecke die letzte Zeile';

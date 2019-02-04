@@ -99,15 +99,14 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         $mform->addElement('hidden', 'fieldgroup', $this->_field->field->id);
         $mform->setType('fieldgroup', PARAM_INT);
 
-        // TODO: This needs to be updated by JS if more lines are added.
-        $mform->addElement('hidden', 'iterations', $defaultlines);
+        $mform->addElement('hidden', 'iterations', $maxlines);
         $mform->setType('iterations', PARAM_INT);
 
         // Loop through all lines.
         for ($line = 0; $line < $maxlines; $line++) {
 
             // Allow every fieldgroup to be collapsed if not in use.
-            $mform->addElement('header', $line + 1, 'Zeile ' . s($line + 1)); // TODO: Multilang.
+            $mform->addElement('header', $line + 1, get_string('line', 'datalynx') . " " . s($line + 1));
             $mform->setExpanded($line + 1, true);
 
             foreach ($fieldgroupfields as $fieldid => $subfield) {
@@ -124,14 +123,14 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
             }
         }
 
-        // Hide and disable unused lines.
+        // Hide unused lines.
         global $PAGE;
         $PAGE->requires->js_call_amd('mod_datalynx/fieldgroups', 'init', array($defaultlines, $maxlines));
 
         // Show a button to add one more line.
         $mform->closeHeaderBefore('addline');
-        $mform->addElement('button', 'addline', 'Noch eine Zeile.'); // TODO: Multilang.
-        $mform->addElement('button', 'hideline', 'Verstecke letzte Zeile.'); // TODO: Multilang.
+        $mform->addElement('button', 'addline', get_string('addline', 'datalynx'));
+        $mform->addElement('button', 'hideline', get_string('hideline', 'datalynx'));
     }
 
     /**
