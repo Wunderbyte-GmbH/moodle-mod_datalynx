@@ -65,7 +65,9 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 $subfielddefinition['content'] = $subfield->renderer()->render_display_mode($entry, $params);
 
                 // Remember if this line has some usercontent.
-                if ($subfielddefinition['content'] != "")  $lastlinewithcontent = $line;
+                if ($subfielddefinition['content'] != "") {
+                    $lastlinewithcontent = $line;
+                }
 
                 $linedispl['subfield'][] = $subfielddefinition; // Build this multidimensional array for mustache context.
             }
@@ -75,7 +77,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         }
 
         // We need this construct to make sure intermittent empty lines are shown.
-        for ($line = $lastlinewithcontent+1; $line <= $maxlines; $line++) {
+        for ($line = $lastlinewithcontent + 1; $line <= $maxlines; $line++) {
             unset($completedispl['line'][$line]);
         }
 
