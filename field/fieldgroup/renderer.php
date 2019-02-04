@@ -66,7 +66,6 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
 
                 // Remember if this line has some usercontent.
                 if ($subfielddefinition['content'] != "")  $lastlinewithcontent = $line;
-                // TODO: Some fields use default content here, find a way to spot.
 
                 $linedispl['subfield'][] = $subfielddefinition; // Build this multidimensional array for mustache context.
             }
