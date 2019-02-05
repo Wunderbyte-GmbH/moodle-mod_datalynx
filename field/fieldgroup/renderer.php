@@ -53,7 +53,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         $params['fieldgroup'] = true;
 
         // In case we don't have anything to show there should be an error.
-        $linedispl = array();
+        $linedispl = $completedispl = array();
 
         // Show all lines with content, get rid of all after that.
         $lastlinewithcontent = -1;
