@@ -748,10 +748,8 @@ class datalynx_entries {
                                         // If we see a fieldgroup we split and reset the content.
                                         if (isset($content['fieldgroup'])) {
 
-                                            // Find highest iterator in content keys.
-                                            end($content);
-                                            $lastiterator = explode("_", key($content))[3];
-                                            reset($content);
+                                            // How many lines were visible to the user, store only those.
+                                            $lastiterator = $data->visiblelines - 1;
 
                                             $fieldname = "field_{$fieldid}_{$eid}";
 

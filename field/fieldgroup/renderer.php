@@ -101,8 +101,8 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         $mform->addElement('hidden', 'fieldgroup', $this->_field->field->id);
         $mform->setType('fieldgroup', PARAM_INT);
 
-        $mform->addElement('hidden', 'iterations', $maxlines);
-        $mform->setType('iterations', PARAM_INT);
+        $mform->addElement('hidden', 'visiblelines', $defaultlines);
+        $mform->setType('visiblelines', PARAM_INT);
 
         // Loop through all lines.
         for ($line = 0; $line < $maxlines; $line++) {

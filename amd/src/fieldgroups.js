@@ -9,11 +9,7 @@ define(["jquery"], function($) {
 
             // Loop from defaultlines to maxlines.
             for (var line = defaultlines; line <= maxlines; line++) {
-                // Disable every input within, this corrupts picture.
-                $("#mform1 #id_" + line + " :input").prop('disabled', true);
-
-                // Hide the whole line.
-                $("#mform1 #id_" + line).hide();
+                $("#mform1 #id_" + line).hide(); // Hide the whole line.
             }
 
             // Add button functionality.
@@ -21,8 +17,10 @@ define(["jquery"], function($) {
                     $(this).off( "click" );
                     $(this).click(function(e) {
                         e.preventDefault(); // Don't follow hrefs.
-                        $('fieldset:hidden:first').show(); // Find the first id that is hidden.
-                        $('fieldset:visible:last :input').prop('disabled', false);
+                        if ($('input[name=visiblelines]').get(0).value < maxlines) {
+                            $('fieldset:hidden:first').show(); // Find the first id that is hidden.
+                            $('input[name=visiblelines]').get(0).value++; // Add one to the visible lines input.
+                        }
                     });
             });
 
@@ -30,8 +28,10 @@ define(["jquery"], function($) {
                     $(this).off( "click" );
                     $(this).click(function(e) {
                         e.preventDefault(); // Don't follow hrefs.
-                        $('fieldset:visible:last').hide();
-                        $('fieldset:hidden:first :input').prop('disabled', false);
+                        if ($('input[name=visiblelines]').get(0).value > 0) {
+                            $('fieldset:visible:last').hide();
+                            $('input[name=visiblelines]').get(0).value--;
+                        }
                     });
             });
 
