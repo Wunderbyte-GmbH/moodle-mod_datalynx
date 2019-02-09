@@ -49,6 +49,7 @@ Feature: Create entry and add fieldgroups
     When I set the following fields to these values:
       | Name           | Testfieldgroup1       |
       | Description    | This is a first test  |
+      | nummax         | 4                     |
       | numshowdefault | 4                     |
 
     And I open the autocomplete suggestions list
@@ -71,7 +72,6 @@ Feature: Create entry and add fieldgroups
     And I click on "Student 2 (student2@example.com)" item in the autocomplete list
 
     ## Add teammembers to the second line as well.
-    And I click on "Expand all" "link"
     And I click on "(//*[@class and contains(concat(' ', normalize-space(@class), ' '), ' form-autocomplete-downarrow ')])[2]" "xpath_element"
     And I click on "(//ul[@class='form-autocomplete-suggestions']//*[contains(concat('|', string(.), '|'),'|Student 1 (student1@example.com)|')])[1]" "xpath_element"
     And I click on "(//*[@class and contains(concat(' ', normalize-space(@class), ' '), ' form-autocomplete-downarrow ')])[2]" "xpath_element"
@@ -98,6 +98,7 @@ Feature: Create entry and add fieldgroups
     When I set the following fields to these values:
       | Name           | Testfieldgroup1       |
       | Description    | This is a first test  |
+      | nummax         | 4                     |
       | numshowdefault | 4                     |
 
     ## Use the autocomplete.
@@ -125,15 +126,13 @@ Feature: Create entry and add fieldgroups
     When I follow "Add a new entry"
     Then I should see "Datalynx field Text"
     ## Names do not work bc. iterator.
-    ## Expand third line first.
-    And I click on "Zeile 3" "link"
 
-    When  I set the field with xpath "(//input[@type='text'])[2]" to "3"
-    When  I set the field with xpath "(//input[@type='text'])[3]" to "Text 1 in the first line"
-    When  I set the field with xpath "(//input[@type='text'])[4]" to "6"
-    When  I set the field with xpath "(//input[@type='text'])[5]" to "Text 1 in the second line"
-    When  I set the field with xpath "(//input[@type='text'])[6]" to "9"
-    When  I set the field with xpath "(//input[@type='text'])[7]" to "Text 1 in the third line"
+    When I set the field with xpath "(//input[@type='text'])[2]" to "3"
+    When I set the field with xpath "(//input[@type='text'])[3]" to "Text 1 in the first line"
+    When I set the field with xpath "(//input[@type='text'])[4]" to "6"
+    When I set the field with xpath "(//input[@type='text'])[5]" to "Text 1 in the second line"
+    When I set the field with xpath "(//input[@type='text'])[6]" to "9"
+    When I set the field with xpath "(//input[@type='text'])[7]" to "Text 1 in the third line"
 
     And I press "Save changes"
     Then I should see "updated"
@@ -141,31 +140,28 @@ Feature: Create entry and add fieldgroups
     Then I should see "Datalynx field Number: 6"
     ## Add a second entry
     When I follow "Add a new entry"
-    And I click on "Zeile 3" "link"
 
-    When  I set the field with xpath "(//input[@type='text'])[2]" to "12"
-    When  I set the field with xpath "(//input[@type='text'])[3]" to "Text 2 in the first line"
-    When  I set the field with xpath "(//input[@type='text'])[4]" to "15"
-    When  I set the field with xpath "(//input[@type='text'])[5]" to "Text 2 in the second line"
-    When  I set the field with xpath "(//input[@type='text'])[6]" to "18"
-    When  I set the field with xpath "(//input[@type='text'])[7]" to "Text 2 in the third line"
+    When I set the field with xpath "(//input[@type='text'])[2]" to "12"
+    When I set the field with xpath "(//input[@type='text'])[3]" to "Text 2 in the first line"
+    When I set the field with xpath "(//input[@type='text'])[4]" to "15"
+    When I set the field with xpath "(//input[@type='text'])[5]" to "Text 2 in the second line"
+    When I set the field with xpath "(//input[@type='text'])[6]" to "18"
+    When I set the field with xpath "(//input[@type='text'])[7]" to "Text 2 in the third line"
 
     And I press "Save changes"
     Then I should see "updated"
     And I press "Continue"
     ## Add a third entry
     When I follow "Add a new entry"
-    And I click on "Zeile 3" "link"
-    And I click on "Zeile 4" "link"
 
-    When  I set the field with xpath "(//input[@type='text'])[2]" to "21"
-    When  I set the field with xpath "(//input[@type='text'])[3]" to "Text 3 in the first line"
-    When  I set the field with xpath "(//input[@type='text'])[4]" to "24"
-    When  I set the field with xpath "(//input[@type='text'])[5]" to "Text 3 in the second line"
-    When  I set the field with xpath "(//input[@type='text'])[6]" to "27"
-    When  I set the field with xpath "(//input[@type='text'])[7]" to "Text 3 in the third line"
-    When  I set the field with xpath "(//input[@type='text'])[8]" to "30"
-    When  I set the field with xpath "(//input[@type='text'])[9]" to "Text 3 in the fourth line"
+    When I set the field with xpath "(//input[@type='text'])[2]" to "21"
+    When I set the field with xpath "(//input[@type='text'])[3]" to "Text 3 in the first line"
+    When I set the field with xpath "(//input[@type='text'])[4]" to "24"
+    When I set the field with xpath "(//input[@type='text'])[5]" to "Text 3 in the second line"
+    When I set the field with xpath "(//input[@type='text'])[6]" to "27"
+    When I set the field with xpath "(//input[@type='text'])[7]" to "Text 3 in the third line"
+    When I set the field with xpath "(//input[@type='text'])[8]" to "30"
+    When I set the field with xpath "(//input[@type='text'])[9]" to "Text 3 in the fourth line"
 
     And I press "Save changes"
     Then I should see "updated"
@@ -177,10 +173,10 @@ Feature: Create entry and add fieldgroups
     And I click on "(//*[@class='entriesview']/a/*[@title='Edit'])[2]" "xpath_element"
 
     ## Change some values.
-    When  I set the field with xpath "(//input[@type='text'])[2]" to "33"
-    When  I set the field with xpath "(//input[@type='text'])[3]" to "Second Text 2 in the first line"
-    When  I set the field with xpath "(//input[@type='text'])[4]" to ""
-    When  I set the field with xpath "(//input[@type='text'])[5]" to "Second Text 2 in the second line"
+    When I set the field with xpath "(//input[@type='text'])[2]" to "33"
+    When I set the field with xpath "(//input[@type='text'])[3]" to "Second Text 2 in the first line"
+    When I set the field with xpath "(//input[@type='text'])[4]" to ""
+    When I set the field with xpath "(//input[@type='text'])[5]" to "Second Text 2 in the second line"
 
     ## Save and check.
     And I press "Save changes"
@@ -195,17 +191,14 @@ Feature: Create entry and add fieldgroups
     ## Edit the first entry and remove a whole line.
     And I click on "(//*[@class='entriesview']/a/*[@title='Edit'])[1]" "xpath_element"
 
-    And I click on "Zeile 3" "link"
-    And I click on "Zeile 4" "link"
-
-    When  I set the field with xpath "(//input[@type='text'])[2]" to ""
-    When  I set the field with xpath "(//input[@type='text'])[3]" to ""
-    When  I set the field with xpath "(//input[@type='text'])[4]" to "36"
-    When  I set the field with xpath "(//input[@type='text'])[5]" to "Second Text 1 in the second line"
-    When  I set the field with xpath "(//input[@type='text'])[6]" to ""
-    When  I set the field with xpath "(//input[@type='text'])[7]" to ""
-    When  I set the field with xpath "(//input[@type='text'])[8]" to ""
-    When  I set the field with xpath "(//input[@type='text'])[9]" to ""
+    When I set the field with xpath "(//input[@type='text'])[2]" to ""
+    When I set the field with xpath "(//input[@type='text'])[3]" to ""
+    When I set the field with xpath "(//input[@type='text'])[4]" to "36"
+    When I set the field with xpath "(//input[@type='text'])[5]" to "Second Text 1 in the second line"
+    When I set the field with xpath "(//input[@type='text'])[6]" to ""
+    When I set the field with xpath "(//input[@type='text'])[7]" to ""
+    When I set the field with xpath "(//input[@type='text'])[8]" to ""
+    When I set the field with xpath "(//input[@type='text'])[9]" to ""
 
     And I press "Save changes"
     Then I should see "updated"

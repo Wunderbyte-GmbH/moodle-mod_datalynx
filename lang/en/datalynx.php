@@ -900,3 +900,6 @@ $string['deletingfieldgroup'] = 'Deleting fieldgroup "{$a}"';
 $string['duplicatingfieldgroup'] = 'Duplicating fieldgroup "{$a}"';
 $string['confirmfieldgroupduplicate'] = 'You are about to duplicate this fieldgroup!';
 $string['confirmfieldgroupdelete'] = 'You are about to delete this fieldgroup!';
+$string['line'] = 'Line';
+$string['addline'] = 'Show one more line';
+$string['hideline'] = 'Hide the last line';

@@ -58,7 +58,9 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
     public function render_display_mode(stdClass $entry, array $params) {
         $field = $this->_field;
         $fieldid = $field->id();
-        if (isset($entry->{"c{$fieldid}_content"})) {
+
+        // A duration of 0 means that this field was not set by the user.
+        if (isset($entry->{"c{$fieldid}_content"}) && $entry->{"c{$fieldid}_content"} != 0) {
             $duration = (int) $entry->{"c{$fieldid}_content"};
         } else {
             $duration = '';

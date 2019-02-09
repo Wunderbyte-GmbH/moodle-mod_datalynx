@@ -46,26 +46,41 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         // We want to display these fields.
         $fieldgroupfields = $this->get_subfields();
 
-        // Loop through showdefault.
-        $showdefault = $this->_field->field->param3;
+        // Loop through maxlines.
+        $maxlines = $this->_field->field->param2;
 
         // Add key so the other renderers know they deal with fieldgroup.
         $params['fieldgroup'] = true;
 
         // In case we don't have anything to show there should be an error.
-        $linedispl = array();
+        $linedispl = $completedispl = array();
 
-        for ($line = 0; $line < $showdefault; $line++) {
+        // Show all lines with content, get rid of all after that.
+        $lastlinewithcontent = -1;
+
+        for ($line = 0; $line < $maxlines; $line++) {
             foreach ($fieldgroupfields as $fieldid => $subfield) {
                 $this->renderer_split_content($entry, $fieldid, $line);
                 $subfielddefinition['name'] = $subfield->field->name;
                 $subfielddefinition['content'] = $subfield->renderer()->render_display_mode($entry, $params);
+
+                // Remember if this line has some usercontent.
+                if ($subfielddefinition['content'] != "") {
+                    $lastlinewithcontent = $line;
+                }
+
                 $linedispl['subfield'][] = $subfielddefinition; // Build this multidimensional array for mustache context.
             }
             $completedispl['line'][] = $linedispl;
             $linedispl = array(); // Reset.
 
         }
+
+        // We need this construct to make sure intermittent empty lines are shown.
+        for ($line = $lastlinewithcontent + 1; $line <= $maxlines; $line++) {
+            unset($completedispl['line'][$line]);
+        }
+
         return $OUTPUT->render_from_template('mod_datalynx/fieldgroup', $completedispl);
     }
 
@@ -78,23 +93,31 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         // We want to display these fields.
         $fieldgroupfields = $this->get_subfields();
 
-        // Number of lines to show by default.
-        $showdefault = $this->_field->field->param3;
+        // Number of lines to show and generate.
+        $defaultlines = isset($this->_field->field->param3) ? $this->_field->field->param3 : 3;
+        $maxlines = isset($this->_field->field->param2) ? $this->_field->field->param2 : 3;
+        $requiredlines = isset($this->_field->field->param4) ? $this->_field->field->param4 : 0;
 
         // Add a fieldgroup marker to the entry data.
         $mform->addElement('hidden', 'fieldgroup', $this->_field->field->id);
         $mform->setType('fieldgroup', PARAM_INT);
 
-        $mform->addElement('hidden', 'iterations', $showdefault);
-        $mform->setType('iterations', PARAM_INT);
+        $mform->addElement('hidden', 'visiblelines', $defaultlines);
+        $mform->setType('visiblelines', PARAM_INT);
+
+        // Set every field in this line required.
+        $options['required'] = true;
 
         // Loop through all lines.
-        for ($line = 0; $line < $showdefault; $line++) {
+        for ($line = 0; $line < $maxlines; $line++) {
 
             // Allow every fieldgroup to be collapsed if not in use.
-            $mform->addElement('header', $line + 1, 'Zeile ' . s($line + 1)); // TODO: Multilang.
-            if ($line + 1 <= 2) {
-                $mform->setExpanded($line + 1, true);
+            $mform->addElement('header', $line + 1, get_string('line', 'datalynx') . " " . s($line + 1));
+            $mform->setExpanded($line + 1, true);
+
+            // After this line none is required.
+            if ($line == $requiredlines) {
+                unset($options['required']);
             }
 
             foreach ($fieldgroupfields as $fieldid => $subfield) {
@@ -104,12 +127,22 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 $mform->addElement('static', '', $subfield->field->name . ': ');
                 $tempentryid = $entry->id;
                 $entry->id = $entry->id . "_" . $line; // Add iterator to fieldname.
+
                 $subfield->renderer()->render_edit_mode($mform, $entry, $options);
 
                 // Restore entryid to prior state.
                 $entry->id = $tempentryid;
             }
         }
+
+        // Hide unused lines.
+        global $PAGE;
+        $PAGE->requires->js_call_amd('mod_datalynx/fieldgroups', 'init', array($defaultlines, $maxlines));
+
+        // Show a button to add one more line.
+        $mform->closeHeaderBefore('addline');
+        $mform->addElement('button', 'addline', get_string('addline', 'datalynx'));
+        $mform->addElement('button', 'hideline', get_string('hideline', 'datalynx'));
     }
 
     /**

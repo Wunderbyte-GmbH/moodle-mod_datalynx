@@ -94,7 +94,7 @@ foreach ($fieldgroups as $fieldgroupid => $fieldgroup) {
     $fielddescription = shorten_text($fieldgroup->description, 30);
 
     $fieldgroupfields = $fieldgroup->param1; // What fields are in the group.
-    $fieldrequired = $fieldgroup->param2; // We show how many lines are required in the overview.
+    $fieldrequired = $fieldgroup->param4; // We show how many lines are required in the overview.
 
     // NOTE: We need fid NOT id here. These links are very inconsistent.
     $fieldedit = html_writer::link(new moodle_url($editbaseurl, $linkparams + array('fid' => $fieldgroupid)),

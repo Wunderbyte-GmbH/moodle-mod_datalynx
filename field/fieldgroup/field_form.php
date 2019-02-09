@@ -51,7 +51,7 @@ class datalynxfield_fieldgroup_form extends datalynxfield_form {
 
         // Number of times the field group can be filled out.
         $mform->addElement('text', 'param2', 'beschreibung nummax'); // TODO: Multilang.
-        $mform->setDefault('param2', 0); // Zero sets no limit.
+        $mform->setDefault('param2', 3);
         $mform->addRule('param2', null, 'numeric', null, 'client');
         $mform->setType('param2', PARAM_INT);
 
