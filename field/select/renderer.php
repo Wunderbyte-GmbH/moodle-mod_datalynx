@@ -147,25 +147,17 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
      * @see datalynxfield_renderer::render_search_mode()
      */
     public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
-        global $CFG;
-        HTML_QuickForm::registerElementType('checkboxgroup',
-                "$CFG->dirroot/mod/datalynx/checkboxgroup/checkboxgroup.php",
-                'HTML_QuickForm_checkboxgroup');
-
         $field = $this->_field;
         $fieldid = $field->id();
-
-        $selected = $value;
-
-        $options = $field->options_menu();
-
-        $fieldname = "f_{$i}_$fieldid";
-        $select = &$mform->createElement('checkboxgroup', $fieldname, null, $options, '');
-        $select->setValue($selected);
-
-        $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
-
-        return array(array($select), null);
+        $fieldname = "f_{$i}_{$fieldid}";
+        $menu = array(0 => '') + $field->options_menu();
+        $options = array('multiple' => true);
+        $elements = array();
+        $elements[] = $mform->createElement('autocomplete', $fieldname, null, $menu, $options);
+        $mform->setType($fieldname, PARAM_INT);
+        $mform->setDefault($fieldname, $value);
+        $mform->disabledIf($fieldname, "searchoperator{$i}", 'eq', '');
+        return array($elements, null);
     }
 
     /**
@@ -176,7 +168,6 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
      * @return string[]
      */
     public function validate($entryid, $tags, $formdata) {
-        global $DB;
         $fieldid = $this->_field->id();
         $errors = array();
 

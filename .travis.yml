@@ -22,7 +22,7 @@ php:
 
 env:
   global:
-    - IGNORE_PATHS=checkboxgroup/checkboxgroup.php # we know this dir is problematic
+    #- IGNORE_PATHS=checkboxgroup/checkboxgroup.php # we know this dir is problematic
     - MOODLE_DIR=/home/travis/build/moodle
     - MOODLE_SELENIUM_JAR=/home/travis/build/moodle/selenium.jar
   matrix:

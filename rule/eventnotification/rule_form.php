@@ -24,8 +24,6 @@
 defined('MOODLE_INTERNAL') or die();
 
 require_once("$CFG->dirroot/mod/datalynx/rule/rule_form.php");
-HTML_QuickForm::registerElementType('checkboxgroup',
-        "$CFG->dirroot/mod/datalynx/checkboxgroup/checkboxgroup.php", 'HTML_QuickForm_checkboxgroup');
 
 class datalynx_rule_eventnotification_form extends datalynx_rule_form {
 
@@ -44,14 +42,17 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
         // Recipient.
         $grp = array();
         $grp[] = &$mform->createElement('checkbox', 'author', null, get_string('author', 'datalynx'), null);
+
+        $options = array('multiple' => true);
+        $grp[] = &$mform->createElement('static', '', '', "<br><h4 class=\"w-100 mt-3\">" . get_string('roles') . "</h4>");
+
+        $grp[] = &$mform->createElement('autocomplete', 'roles', get_string('roles'),
+                $this->_df->get_datalynx_permission_names(true), $options);
         $grp[] = &$mform->createElement('static', '', '', $br);
 
-        $grp[] = &$mform->createElement('checkboxgroup', 'roles', get_string('roles'),
-                $this->_df->get_datalynx_permission_names(true), $br);
-        $grp[] = &$mform->createElement('static', '', '', $br);
-
-        $grp[] = &$mform->createElement('checkboxgroup', 'teams', get_string('teams', 'datalynx'),
-                $this->get_datalynx_team_fields(), $br);
+        $grp[] = &$mform->createElement('static', '', '', "<br><h4 class=\"w-100 mt-3\">" . get_string('teammembers', 'datalynx') . "</h4>");
+        $grp[] = &$mform->createElement('autocomplete', 'teams', get_string('teams', 'datalynx'),
+                $this->get_datalynx_team_fields(), $options);
 
         $mform->addGroup($grp, 'recipientgrp', get_string('to'), $br, false);
 

@@ -27,10 +27,27 @@ require_once('rule_manager.php');
 
 class datalynx_rule_form extends moodleform {
 
+    /**
+     * @var object
+     */
     protected $_rule = null;
 
+    /**
+     * @var \mod_datalynx\datalynx
+     */
     protected $_df = null;
 
+    /**
+     * datalynx_rule_form constructor.
+     *
+     * @param $rule
+     * @param null $action
+     * @param null $customdata
+     * @param string $method
+     * @param string $target
+     * @param null $attributes
+     * @param bool $editable
+     */
     public function __construct($rule, $action = null, $customdata = null, $method = 'post', $target = '',
             $attributes = null, $editable = true) {
         $this->_rule = $rule;
@@ -39,6 +56,11 @@ class datalynx_rule_form extends moodleform {
         parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
     }
 
+    /**
+     * Form definition
+     *
+     * @throws coding_exception
+     */
     public function definition() {
         global $CFG;
         $mform = &$this->_form;
@@ -81,6 +103,11 @@ class datalynx_rule_form extends moodleform {
         $this->add_action_buttons();
     }
 
+    /**
+     * Data to form
+     *
+     * @param array|stdClass $data
+     */
     public function set_data($data) {
         $selectedevents = unserialize($data->param1);
         if ($selectedevents) {
@@ -91,6 +118,13 @@ class datalynx_rule_form extends moodleform {
         parent::set_data($data);
     }
 
+    /**
+     * Get data
+     *
+     * @param bool $slashed
+     * @return object
+     * @throws coding_exception
+     */
     public function get_data($slashed = true) {
         if ($data = parent::get_data($slashed)) {
             $eventmenu = datalynx_rule_manager::get_event_data($this->_df->id());
@@ -105,6 +139,13 @@ class datalynx_rule_form extends moodleform {
         return $data;
     }
 
+    /**
+     * Add action buttons
+     *
+     * @param bool $cancel
+     * @param null $submit
+     * @throws coding_exception
+     */
     public function add_action_buttons($cancel = true, $submit = null) {
         $mform = &$this->_form;
 
@@ -120,6 +161,14 @@ class datalynx_rule_form extends moodleform {
         $mform->closeHeaderBefore('buttonar');
     }
 
+    /**
+     * Validate user data
+     *
+     * @param array $data
+     * @param array $files
+     * @return array
+     * @throws coding_exception
+     */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 

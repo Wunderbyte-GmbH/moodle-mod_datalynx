@@ -29,10 +29,19 @@ require_once(dirname(dirname(__FILE__)) . '/classes/datalynx.php');
  */
 class datalynx_rule_manager {
 
+    /**
+     * @var datalynx|\mod_datalynx\datalynx
+     */
     protected $_df;
 
+    /**
+     * @var array
+     */
     protected $_customrules;
 
+    /**
+     * @var array
+     */
     private static $observers = null;
 
     /**

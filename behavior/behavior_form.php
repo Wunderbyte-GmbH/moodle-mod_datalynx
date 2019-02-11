@@ -18,30 +18,38 @@
  *
  * @package mod_datalynx
  * @copyright 2014 Ivan Šakić
+ * @copyright 2016 onwards David Bogner
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die();
 
 require_once($CFG->libdir . '/formslib.php');
 
-HTML_QuickForm::registerElementType('checkboxgroup',
-        "$CFG->dirroot/mod/datalynx/checkboxgroup/checkboxgroup.php", 'HTML_QuickForm_checkboxgroup');
-
 /**
+ * Class datalynx_field_behavior_form
+ * This class is responsible for managin the form for the field behaviors
  */
 class datalynx_field_behavior_form extends moodleform {
 
     /**
      *
-     * @var datalynx
+     * @var mod_datalynx\datalynx
      */
     private $datalynx;
 
+    /**
+     * datalynx_field_behavior_form constructor.
+     *
+     * @param \mod_datalynx\datalynx $datalynx
+     */
     public function __construct(mod_datalynx\datalynx $datalynx) {
         $this->datalynx = $datalynx;
         parent::__construct();
     }
 
+    /**
+     * @throws coding_exception
+     */
     protected function definition() {
         $mform = &$this->_form;
 
@@ -68,9 +76,10 @@ class datalynx_field_behavior_form extends moodleform {
         $mform->addElement('header', 'visibilityoptions', get_string('visibility', 'datalynx'));
         $mform->setExpanded('visibilityoptions');
 
-        $mform->addElement('checkboxgroup', 'visibleto', get_string('roles'),
+        $options = array("multiple" => true);
+        $mform->addElement('autocomplete', 'visibleto', get_string('roles'),
                 $this->datalynx->get_datalynx_permission_names(false, false),
-                $this->get_permissions_menu_separators());
+                $options);
         $mform->setType('visibleto', PARAM_RAW);
         if ($new) {
             $mform->setDefault('visibleto',
@@ -88,9 +97,9 @@ class datalynx_field_behavior_form extends moodleform {
             $mform->setDefault('editable', true);
         }
 
-        $mform->addElement('checkboxgroup', 'editableby', get_string('editableby', 'datalynx'),
+        $mform->addElement('autocomplete', 'editableby', get_string('editableby', 'datalynx'),
                 $this->datalynx->get_datalynx_permission_names(false, false),
-                $this->get_permissions_menu_separators());
+                $options);
         $mform->setType('editableby', PARAM_RAW);
         if ($new) {
             $mform->setDefault('editableby',
@@ -108,6 +117,9 @@ class datalynx_field_behavior_form extends moodleform {
         $this->add_action_buttons();
     }
 
+    /**
+     * @return object
+     */
     public function get_data() {
         $data = parent::get_data();
         if ($data) {
@@ -125,6 +137,9 @@ class datalynx_field_behavior_form extends moodleform {
         return $data;
     }
 
+    /**
+     * @param array|stdClass $data
+     */
     public function set_data($data) {
         if (!isset($data->visibleto)) {
             $data->visibleto = [];
@@ -143,10 +158,13 @@ class datalynx_field_behavior_form extends moodleform {
         parent::set_data($data);
     }
 
-    private function get_permissions_menu_separators() {
-        return array('<br />', '<br />', '<br />', '<br /><br />', '<br />');
-    }
-
+    /**
+     * @param array $data
+     * @param array $files
+     * @return array
+     * @throws coding_exception
+     * @throws dml_exception
+     */
     public function validation($data, $files) {
         global $DB;
         $errors = array();

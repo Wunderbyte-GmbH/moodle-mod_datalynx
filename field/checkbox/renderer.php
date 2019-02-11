@@ -41,7 +41,11 @@ class datalynxfield_checkbox_renderer extends datalynxfield_multiselect_renderer
         $entryid = $entry->id;
         $fieldname = "field_{$fieldid}_$entryid";
         $menuoptions = $field->options_menu();
-        $required = $options['required'];
+        if (isset($options['required'])) {
+            $required = $options['required'];
+        } else {
+            $required = false;
+        }
 
         $content = !empty($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : null;
 
