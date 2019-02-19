@@ -29,19 +29,31 @@ require_once(dirname(__FILE__) . "/../classes/datalynx.php");
  */
 abstract class datalynx_rule_base {
 
+    /**
+     * Subclasses must override the type with their name.
+     * @var string
+     */
     public $type = 'unknown';
-    // Subclasses must override the type with their name.
-    public $df = null;
-    // The datalynx object that this rule belongs to.
-    public $rule = null;
-    // The rule object itself, if we know it.
 
     /**
-     * Class constructor
+     * The datalynx object that this rule belongs to.
+     * @var \mod_datalynx\datalynx|null
+     */
+    public $df = null;
+
+    /**
+     * The rule object itself, if we know it.
+     * @var object
+     */
+    public $rule = null;
+
+    /**
+     * datalynx_rule_base constructor.
      *
-     * @param integer $df datalynx id or class object
-     * @param integer $rule rule id or DB record
+     * @param int|mod_datalynx\datalynx $df
+     * @param int|object $rule
      * @throws coding_exception
+     * @throws moodle_exception
      */
     public function __construct($df = 0, $rule = 0) {
         if (empty($df)) {
@@ -131,6 +143,9 @@ abstract class datalynx_rule_base {
 
     /**
      * Insert a new rule in the database
+     * @param string $fromform
+     * @return bool|int
+     * @throws dml_exception
      */
     public function insert_rule($fromform = null) {
         global $DB, $OUTPUT;
@@ -149,6 +164,10 @@ abstract class datalynx_rule_base {
 
     /**
      * Update a rule in the database
+     *
+     * @param null $fromform
+     * @return bool
+     * @throws dml_exception
      */
     public function update_rule($fromform = null) {
         global $DB, $OUTPUT;
@@ -165,6 +184,9 @@ abstract class datalynx_rule_base {
 
     /**
      * Delete a rule completely
+     *
+     * @return bool
+     * @throws dml_exception
      */
     public function delete_rule() {
         global $DB;
@@ -177,19 +199,22 @@ abstract class datalynx_rule_base {
 
     /**
      * Returns the rule id
+     *
+     * @return number
      */
     public function get_id() {
         return $this->rule->id;
     }
 
     /**
+     * @return boolean
      */
     public function is_enabled() {
         return $this->rule->enabled;
     }
 
     /**
-     * Returns the rule type
+     * @return string
      */
     public function get_type() {
         return $this->type;
@@ -197,6 +222,7 @@ abstract class datalynx_rule_base {
 
     /**
      * Returns the name of the rule
+     * @return string
      */
     public function get_name() {
         return $this->rule->name;
@@ -204,18 +230,24 @@ abstract class datalynx_rule_base {
 
     /**
      * Returns the type name of the rule
+     *
+     * @return string
+     * @throws coding_exception
      */
     public function typename() {
         return get_string('pluginname', "datalynxrule_{$this->type}");
     }
 
     /**
+     * @return \mod_datalynx\datalynx|null
      */
     public function df() {
         return $this->df;
     }
 
     /**
+     * @return mixed
+     * @throws moodle_exception
      */
     public function get_form() {
         global $CFG;
@@ -233,12 +265,16 @@ abstract class datalynx_rule_base {
     }
 
     /**
+     * @return object
      */
     public function to_form() {
         return $this->rule;
     }
 
     /**
+     * Get SQL query
+     *
+     * @return string
      */
     public function get_select_sql() {
         if ($this->rule->id > 0) {
@@ -251,6 +287,11 @@ abstract class datalynx_rule_base {
     }
 
     /**
+     * Get sort part for SQL query
+     *
+     * @param string $paramname
+     * @param string $paramcount
+     * @return array|null
      */
     public function get_sort_from_sql($paramname = 'sortie', $paramcount = '') {
         $ruleid = $this->rule->id;
@@ -264,6 +305,8 @@ abstract class datalynx_rule_base {
     }
 
     /**
+     * Returngs empty string??
+     * @return string
      */
     public function get_sort_sql() {
         return '';

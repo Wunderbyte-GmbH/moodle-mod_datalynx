@@ -189,7 +189,6 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
     }
 
     public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
-        global $PAGE;
         $field = $this->_field;
         $fieldid = $field->id();
         $fieldname = "f_{$i}_{$fieldid}";

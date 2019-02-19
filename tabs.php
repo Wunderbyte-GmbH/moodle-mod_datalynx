@@ -51,7 +51,7 @@ if (isloggedin() and $istemplatemanager) {
                 'vedit' => $this->_currentview->id());
         $editviewurl = new moodle_url('/mod/datalynx/view/view_edit.php', $params);
         $row[] = new tabobject('editview', $editviewurl,
-                $OUTPUT->pix_icon('t/edit', get_string('vieweditthis', 'datalynx')));
+                $OUTPUT->pix_icon('t/edit', get_string('vieweditthis', 'datalynx')), get_string('vieweditthis', 'datalynx'));
     }
 
     $tabs[] = $row;

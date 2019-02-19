@@ -104,9 +104,9 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
 
     /**
      *
-     * @param unknown $customsearch
-     * @param unknown $fields
-     * @param unknown $fieldoptions
+     * @param string $customsearch
+     * @param array $fields
+     * @param array $fieldoptions
      * @param boolean $showlabel
      */
     public function custom_search_definition($customsearch, $fields, $fieldoptions,
@@ -336,8 +336,11 @@ class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
         $this->add_action_buttons(true);
     }
 
-    /*
-     *
+    /**
+     * @param array $data
+     * @param array $files
+     * @return array
+     * @throws coding_exception
      */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);

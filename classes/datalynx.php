@@ -19,6 +19,7 @@
  * @package mod
  * @subpackage datalynx
  * @copyright 2012 Itamar Tzadok
+ * @copyright 2015 onwards edulabs.org
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
  *          The Datalynx has been developed as an enhanced counterpart
@@ -42,7 +43,9 @@ use comment;
 defined('MOODLE_INTERNAL') or die();
 
 /**
- * Datalynx class
+ * Class datalynx
+ *
+ * @package mod_datalynx
  */
 class datalynx {
 
@@ -54,33 +57,48 @@ class datalynx {
 
     const COUNT_LEFT = 3;
 
-    /** no approval required **/
+    // No approval required.
     const APPROVAL_NONE = 0;
-    /** approval for new entries and updates required **/
+
+    // Approval for new entries and updates required.
     const APPROVAL_ON_UPDATE = 1;
-    /** approval only for new entries required **/
+
+    // Approval only for new entries required.
     const APPROVAL_ON_NEW = 2;
 
     /**
-     *
      * @var stdClass course module
      */
     public $cm = null;
 
     /**
-     *
-     * @var fieldset object of the course
+     * @var stdClass fieldset object of the course
      */
     public $course = null;
 
     /**
-     *
-     * @var fieldset record of datalynx instance
+     * @var stdClass fieldset record of datalynx instance
      */
     public $data = null;
+
+    /**
+     * @var context_module|null
+     */
     public $context = null;
+
+    /**
+     * @var int
+     */
     public $groupmode = 0;
+
+    /**
+     * @var int|mixed
+     */
     public $currentgroup = 0;
+
+    /**
+     * @var array
+     */
     public $notifications = array('bad' => array(), 'good' => array());
 
     protected $pagefile = 'view';
@@ -99,16 +117,20 @@ class datalynx {
 
     protected $_currentview = null;
 
-    // Internal fields.
     protected $internalfields = array();
 
     protected $customfilterfields = array();
 
-    // Internal group modes.
     protected $internalgroupmodes = array('separateparticipants' => -1);
 
     /**
-     * constructor
+     * datalynx constructor.
+     *
+     * @param int $d (id of datalynx instance fetchec from db table)
+     * @param int $id (course module id)
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws moodle_exception
      */
     public function __construct($d = 0, $id = 0) {
         global $DB;
@@ -164,42 +186,65 @@ class datalynx {
 
     }
 
+    /**
+     * Get datalynx object by instanceid (id of datalynx table)
+     *
+     * @param $instanceid
+     * @return mod_datalynx\datalynx
+     * @throws \coding_exception
+     */
     public static function get_datalynx_by_instance($instanceid) {
         $cm = get_coursemodule_from_instance('datalynx', $instanceid);
         return new mod_datalynx\datalynx($instanceid, $cm->id);
     }
 
     /**
+     * Get datalynx id.
+     *
+     * @return mixed
      */
     public function id() {
         return $this->data->id;
     }
 
     /**
+     * Get name of datalynx instance.
+     *
+     * @return mixed
      */
     public function name() {
         return $this->data->name;
     }
 
     /**
+     * @return string
      */
     public function pagefile() {
         return $this->pagefile;
     }
 
     /**
+     * Get internal group modes.
+     *
+     * @return array
      */
     public function internal_group_modes() {
         return $this->internalgroupmodes;
     }
 
     /**
+     * Get current view.
+     *
+     * @return null|object view object
      */
     public function get_current_view() {
         return $this->_currentview;
     }
 
     /**
+     * Get filter manager.
+     *
+     * @return datalynx_filter_manager|null
      */
     public function get_filter_manager() {
         global $CFG;
@@ -212,6 +257,9 @@ class datalynx {
     }
 
     /**
+     * Get custom filter manager.
+     *
+     * @return customfilter\manager|null
      */
     public function get_customfilter_manager() {
         if (!$this->_customfiltermanager) {
@@ -221,6 +269,9 @@ class datalynx {
     }
 
     /**
+     * Get rule manager.
+     *
+     * @return datalynx_rule_manager|null
      */
     public function get_rule_manager() {
         global $CFG;
@@ -233,6 +284,9 @@ class datalynx {
     }
 
     /**
+     * Get preset manager.
+     *
+     * @return datalynx_preset_manager|null
      */
     public function get_preset_manager() {
         global $CFG;
@@ -245,6 +299,12 @@ class datalynx {
     }
 
     /**
+     * Get number of entries.
+     *
+     * @param string $type
+     * @param int $user
+     * @return int|string
+     * @throws \dml_exception
      */
     public function get_entriescount($type, $user = 0) {
         global $DB;
@@ -276,6 +336,13 @@ class datalynx {
     }
 
     /**
+     * Update datalynx settings
+     *
+     * @param $params
+     * @param string $notify
+     * @return bool
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
     public function update($params, $notify = '') {
         global $DB;
@@ -313,7 +380,7 @@ class datalynx {
     }
 
     /**
-     * sets the datalynx page
+     * Sets the datalynx page
      *
      * @param string $page current page
      * @param array $params
@@ -681,6 +748,7 @@ class datalynx {
     }
 
     /**
+     * Set view content.
      */
     public function set_content() {
         if (!empty($this->_currentview)) {
@@ -690,6 +758,9 @@ class datalynx {
     }
 
     /**
+     * Output the view
+     *
+     * @throws \coding_exception
      */
     public function display() {
         global $PAGE;
@@ -749,6 +820,8 @@ class datalynx {
 
     /**
      * Initialize if needed and return the internal fields
+     *
+     * @return array
      */
     public function get_internal_fields() {
         global $CFG;
@@ -773,6 +846,7 @@ class datalynx {
 
     /**
      * Return the names of the internal fields
+     * @return array
      */
     public function get_internal_fields_names() {
         global $CFG;
@@ -796,6 +870,7 @@ class datalynx {
 
     /**
      * Returns an array of fields, suitable for use in customfilter form.
+     *
      * @return array of strings
      */
     public function get_customfilterfieldtypes() {
@@ -879,6 +954,9 @@ class datalynx {
      * returns a subclass field object given a record of the field
      * used to invoke plugin methods
      * input: $param $field record from db, or field type
+     *
+     * @param int|object $key
+     * @return bool
      */
     public function get_field($key) {
         global $CFG;
@@ -900,8 +978,9 @@ class datalynx {
     }
 
     /**
-     * returns a subclass field object given a record of the field
+     * Returns a subclass field object given a record of the field
      * used to invoke plugin methods
+     *
      * @param string $key
      * @return stdClass|boolean
      */
@@ -966,6 +1045,11 @@ class datalynx {
         }
     }
 
+    /**
+     * @param string $sort
+     * @return array
+     * @throws \dml_exception
+     */
     public function get_fieldnames($sort = '') {
         global $DB;
 
@@ -983,6 +1067,13 @@ class datalynx {
         return $retfieldnames;
     }
 
+    /**
+     * Find filters via fields
+     *
+     * @param array $fields
+     * @return array
+     * @throws \dml_exception
+     */
     private function find_filters_using_fields($fields) {
         global $DB;
         $filters = $DB->get_records('datalynx_filters', ['dataid' => $this->id()]);
@@ -1291,6 +1382,7 @@ class datalynx {
      *
      * @param stdClass $view datalynx_views entry
      * @return boolean true if user can see the view, false otherwise
+     * @throws \coding_exception
      */
     public function is_visible_to_user($view) {
         $isadmin = has_capability('mod/datalynx:viewprivilegeadmin', $this->context, null, true);
@@ -1303,7 +1395,10 @@ class datalynx {
 
     /**
      * TODO there is no need to instantiate all views!!!
-     * this function creates an instance of the particular subtemplate class *
+     * this function creates an instance of the particular subtemplate class
+     *
+     * @param int $viewid
+     * @return bool|mixed
      */
     public function get_current_view_from_id($viewid = 0) {
         if ($views = $this->get_view_records()) {
@@ -1321,9 +1416,13 @@ class datalynx {
         }
         return false;
     }
+
     /**
-     * TODO there is no need to instantiate all viewds!!!
+     * TODO there is no need to instantiate all views!!!
      * this function creates an instance of the particular subtemplate class *
+     *
+     * @param int $viewid
+     * @return bool|mixed
      */
     public function get_view_from_id($viewid = 0) {
         if ($views = $this->get_view_records()) {
@@ -1346,6 +1445,10 @@ class datalynx {
      * returns a view subclass object given a view record or view type
      * invoke plugin methods
      * input: $param $vt - mixed, view record or view type
+     *
+     * @param $viewortype
+     * @param bool $active
+     * @return mixed
      */
     public function get_view($viewortype, $active = false) {
         global $CFG;
@@ -1366,6 +1469,10 @@ class datalynx {
     /**
      * given a view type returns the view object from $this->views
      * Initializes $this->views if necessary
+     *
+     * @param string $type
+     * @param bool $forceget
+     * @return array|bool
      */
     public function get_views_by_type($type, $forceget = false) {
         if (!$views = $this->get_view_records($forceget)) {
@@ -1430,6 +1537,11 @@ class datalynx {
     }
 
     /**
+     * Set default view
+     *
+     * @param int $viewid
+     * @throws \dml_exception
+     * @throws moodle_exception
      */
     public function set_default_view($viewid = 0) {
         global $DB;
@@ -1444,6 +1556,11 @@ class datalynx {
     }
 
     /**
+     * Set default filter
+     *
+     * @param int $filterid
+     * @throws \dml_exception
+     * @throws moodle_exception
      */
     public function set_default_filter($filterid = 0) {
         global $DB;
@@ -1458,6 +1575,11 @@ class datalynx {
     }
 
     /**
+     * Set the default edit view
+     *
+     * @param int $viewid
+     * @throws \dml_exception
+     * @throws moodle_exception
      */
     public function set_single_edit_view($viewid = 0) {
         global $DB;
@@ -1472,6 +1594,11 @@ class datalynx {
     }
 
     /**
+     * Set view that is linked with the more-view patterns
+     *
+     * @param int $viewid
+     * @throws \dml_exception
+     * @throws moodle_exception
      */
     public function set_single_more_view($viewid = 0) {
         global $DB;
@@ -1490,10 +1617,12 @@ class datalynx {
     }
 
     /**
-     * Search for a field name and replaces it with another one in all the *
+     * Search for a field name and replaces it with another one in all the
      * form templates.
-     * Set $newfieldname as '' if you want to delete the *
-     * field from the form.
+     * Set $newfieldname as '' if you want to delete the field from the form.
+     *
+     * @param string $searchfieldname
+     * @param string $newfieldname
      */
     public function replace_field_in_views($searchfieldname, $newfieldname) {
         if ($views = $this->get_views()) {
@@ -1504,6 +1633,17 @@ class datalynx {
     }
 
     /**
+     * Apply actions to a view
+     *
+     * @param string $action
+     * @param string $vids viewids comma separated
+     * @param bool $confirmed
+     * @return array|bool
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \file_exception
+     * @throws \stored_file_creation_exception
+     * @throws moodle_exception
      */
     public function process_views($action, $vids, $confirmed = false) {
         global $DB, $OUTPUT;
@@ -1715,6 +1855,10 @@ class datalynx {
      */
 
     /**
+     * @param array|null $userids
+     * @return array|null
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
     public function get_gradebook_users(array $userids = null) {
         global $DB, $CFG;
@@ -1758,7 +1902,10 @@ class datalynx {
      * Has a user reached the max number of entries?
      * If interval is set then required entries, max entries etc. are relative to the current interval
      *
-     * @return boolean
+     * @param bool $perinterval
+     * @return bool
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
     public function user_at_max_entries($perinterval = false) {
         if ($this->data->maxentries < 0 or
@@ -1775,9 +1922,14 @@ class datalynx {
     }
 
     /**
-     * output bool
+     * Check if user has permission to view all entries.
+     *
+     * @param array $options
+     * @return bool
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
-    public function user_can_view_all_entries($options = null) {
+    public function user_can_view_all_entries(array $options = null) {
         global $OUTPUT;
         if (has_capability('mod/datalynx:manageentries', $this->context)) {
             return true;
@@ -1813,6 +1965,11 @@ class datalynx {
     }
 
     /**
+     * Check if user is allowed to export an entry.
+     *
+     * @param stdClass $entry
+     * @return bool
+     * @throws \coding_exception
      */
     public function user_can_export_entry($entry = null) {
         global $CFG, $USER;
@@ -1898,8 +2055,8 @@ class datalynx {
 
                 // If nor status 'draft' neither status 'not set' user is not allowed to manage this entry.
                 require_once($CFG->dirroot . '/mod/datalynx/field/_status/field_class.php');
-                if (!($entry->status == datalynxfield__status::STATUS_DRAFT ||
-                        $entry->status == datalynxfield__status::STATUS_NOT_SET)
+                if (!($entry->status == \datalynxfield__status::STATUS_DRAFT ||
+                        $entry->status == \datalynxfield__status::STATUS_NOT_SET)
                 ) {
                     return false;
                 }
@@ -2010,6 +2167,15 @@ class datalynx {
 
     const PERMISSION_ADMIN = 64;
 
+    /**
+     * Get permission localised permission names
+     * TODO: Rename mentor, this is team member?
+     *
+     * @param bool $absoluteonly
+     * @param bool $includeadmin
+     * @return array
+     * @throws \coding_exception
+     */
     public function get_datalynx_permission_names($absoluteonly = false, $includeadmin = false) {
         $permissions = [];
 
