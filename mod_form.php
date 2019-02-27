@@ -79,12 +79,14 @@ class mod_datalynx_mod_form extends moodleform_mod {
 
         // Interval between required entries.
         $mform->addElement('duration', 'timeinterval', get_string('dftimeinterval', 'datalynx'));
+        $mform->addHelpButton('timeinterval', 'dftimeinterval', 'datalynx');
         $mform->disabledIf('timeinterval', 'timeavailable[off]', 'checked');
         $mform->disabledIf('timeinterval', 'timedue[off]');
 
         // Number of intervals.
         $mform->addElement('select', 'intervalcount', get_string('dfintervalcount', 'datalynx'),
                 array_combine(range(1, 100), range(1, 100)));
+        $mform->addHelpButton('intervalcount', 'dfintervalcount', 'datalynx');
         $mform->setDefault('intervalcount', 1);
         $mform->disabledIf('intervalcount', 'timeavailable[off]', 'checked');
         $mform->disabledIf('intervalcount', 'timedue[off]');
@@ -142,6 +144,7 @@ class mod_datalynx_mod_form extends moodleform_mod {
 
             // Max entries.
             $mform->addElement('text', 'maxentries', get_string('entriesmax', 'datalynx'));
+            $mform->addHelpButton('maxentries', 'entriesmax', 'datalynx');
             $mform->setDefault('maxentries', -1);
             $mform->addRule('maxentries', null, 'numeric', null, 'client');
             $mform->setType('maxentries', PARAM_INT);
@@ -162,6 +165,7 @@ class mod_datalynx_mod_form extends moodleform_mod {
 
         // Time limit to manage an entry.
         $mform->addElement('text', 'timelimit', get_string('entrytimelimit', 'datalynx'));
+        $mform->addHelpButton('timelimit', 'entrytimelimit', 'datalynx');
         $mform->setType('timelimit', PARAM_INT);
         $mform->setDefault('timelimit', -1);
         $mform->addRule('timelimit', null, 'numeric', null, 'client');
