@@ -44,9 +44,6 @@ class mod_datalynx_mod_form extends moodleform_mod {
 
         $mform = &$this->_form;
 
-        // Buttons.
-        $this->add_action_buttons();
-
         // Name and intro.
         $mform->addElement('header', 'general', get_string('general', 'form'));
 

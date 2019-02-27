@@ -42,8 +42,6 @@ class datalynxfield_form extends moodleform {
     public function definition() {
         $mform = &$this->_form;
 
-        $this->add_action_buttons();
-
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
         $mform->addElement('text', 'name', get_string('name'), array('size' => '32'));
