@@ -39,7 +39,7 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
             $content = $entry->{"c{$fieldid}_content"};
         }
 
-        $includetime = empty($options['date']) && !isset($field->date_only);
+        $includetime = empty($options['date']) && !isset($field->dateonly);
 
         if ($field->masked) {
             $this->render_masked_selector($mform, $entry, $content, $includetime, $options);
@@ -57,7 +57,7 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
             if ($content = $entry->{"c{$fieldid}_content"}) {
                 if (!empty($params['format'])) {
                     $strtime = userdate($content, $params['format']);
-                } else if (isset($params['date'])) {
+                } else if (isset($params['date']) || $field->dateonly) {
                     $strtime = userdate($content, get_string("strftimedate"));
                 } else if (isset($params['timestamp'])) {
                     $strtime = $content;
@@ -99,7 +99,7 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         foreach (array('year', 'month', 'day', 'hour', 'minute') as $fieldidentifier) {
             $mform->disabledIf("f_{$i}_{$fieldid}_from[$fieldidentifier]", "searchoperator$i", 'eq', '');
         }
-        if ($field->date_only) {
+        if ($field->dateonly) {
             // Deactivate form elements for min and seconds when field is date only and operator is "=".
             foreach (array('hour', 'minute') as $fieldidentifier) {
                 $mform->disabledIf("f_{$i}_{$fieldid}_from[$fieldidentifier]", "searchoperator$i", 'eq', '=');
