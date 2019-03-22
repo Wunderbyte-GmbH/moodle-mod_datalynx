@@ -47,6 +47,8 @@ class datalynxfield_entryauthor extends datalynxfield_no_content {
 
     const _USERINSTITUTION = 'userinstitution';
 
+    const _BADGES = 'badges';
+
     public function supports_group_by() {
         return true;
     }
@@ -105,6 +107,11 @@ class datalynxfield_entryauthor extends datalynxfield_no_content {
                         'dataid' => $dataid, 'type' => 'entryauthor',
                         'name' => get_string('institution'), 'description' => '',
                         'visible' => 2, 'internalname' => 'institution');
+
+        $fieldobjects[self::_BADGES] = (object) array('id' => self::_BADGES,
+                        'dataid' => $dataid, 'type' => 'entryauthor',
+                        'name' => 'testingbadges', 'description' => '',
+                        'visible' => 2, 'internalname' => 'badges');
 
         return $fieldobjects;
     }
