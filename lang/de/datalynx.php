@@ -519,6 +519,7 @@ $string['viewnew'] = 'Neue {$a} Ansicht';
 $string['viewnodefault'] = 'Standardvorlage nicht festgelegt. Wählen Sie einer der Views in der {$a} Liste als Standarvorlage aus.';
 $string['viewnoneforaction'] = 'Keine Ansichten für die gewünschte Aktion gefunden';
 $string['viewnoneindatalynx'] = 'Für diese Datalynx sind keine Ansichten angelegt.';
+$string['viewrepeatedfields'] = 'Das Feld {$a} darf nicht mehrmals verwendet werden.';
 $string['toolnoneindatalynx'] = 'Keine Werkzeuge für diese Datalynx-Aktivität vorhanden.';
 $string['toolrun'] = 'Ausführen';
 $string['viewoptions'] = 'Optionen anzeigen';

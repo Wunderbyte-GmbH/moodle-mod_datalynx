@@ -81,6 +81,7 @@ class datalynxview_grid extends datalynxview_base {
         $table = new html_table();
         $table->attributes['align'] = 'center';
         $table->attributes['cellpadding'] = '2';
+
         // Fields.
         foreach ($fields as $field) {
             if ($field->field->id > 0) {
