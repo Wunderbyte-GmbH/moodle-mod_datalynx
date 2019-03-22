@@ -308,7 +308,7 @@ class datalynxview_base_form extends moodleform {
             if (substr_count($entryview, $field) > 1 ) {
 
                 // Make sure multiple errors are shown.
-                if(!array_key_exists('eparam2_editor', $errors)) {
+                if (!array_key_exists('eparam2_editor', $errors)) {
                     $errors['eparam2_editor'] = get_string('viewrepeatedfields', 'datalynx', substr($field, 2));
                 } else {
                     $errors['eparam2_editor'] .= "<br>" . get_string('viewrepeatedfields', 'datalynx', substr($field, 2));
