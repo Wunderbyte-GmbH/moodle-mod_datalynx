@@ -474,6 +474,31 @@ function bulk_action(elem, url, action, defaultval) {
     }
 }
 
+/**
+ * hiding/displaying advanced search form when viewing
+ */
+function showHideAdvSearch(checked) {
+    var divs = document.getElementsByTagName('div');
+    for (var i = 0; i < divs.length; i++) {
+        if (divs[i].id.match('datalynx_adv_form')) {
+            if (checked) {
+                divs[i].style.display = 'inline';
+            }
+            else {
+                divs[i].style.display = 'none';
+            }
+        }
+        else if (divs[i].id.match('reg_search')) {
+            if (!checked) {
+                divs[i].style.display = 'inline';
+            }
+            else {
+                divs[i].style.display = 'none';
+            }
+        }
+    }
+}
+
 M.mod_datalynx.field_gradeitem_form_init = function () {
     Y.one('#mform1').one('select[name="param1"]').set('value', Y.one('#mform1').one('input[type="hidden"][name="param1"]').get('value'));
 };
