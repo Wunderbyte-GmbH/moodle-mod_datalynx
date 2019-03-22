@@ -276,6 +276,24 @@ class datalynxview_base_form extends moodleform {
             $errors['name'] = get_string('invalidname', 'datalynx', get_string('view', 'datalynx'));
         }
 
+        // Check if a field is used multiple times in entryview.
+        $entryview = $data['eparam2_editor']['text'];
+
+        foreach ($view->field_tags()['Fields']['Fields'] as $field) {
+
+            // Error when we find more than one instance of this tag.
+            if (substr_count($entryview, $field) > 1 ) {
+
+                // Make sure multiple errors are shown.
+                if (!array_key_exists('eparam2_editor', $errors)) {
+                    $errors['eparam2_editor'] = get_string('viewrepeatedfields', 'datalynx', substr($field, 2, -2));
+                } else {
+                    $errors['eparam2_editor'] .= "<br>" . get_string('viewrepeatedfields', 'datalynx', substr($field, 2, -2));
+                }
+
+            }
+        }
+
         return $errors;
     }
 }
