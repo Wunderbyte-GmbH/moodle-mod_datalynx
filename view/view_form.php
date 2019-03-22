@@ -279,7 +279,33 @@ class datalynxview_base_form extends moodleform {
         // Check if a field is used multiple times in entryview.
         $entryview = $data['eparam2_editor']['text'];
 
+        // We check if fieldgroups is used multiple times or if subfields are repeated.
+        if (array_key_exists('Fieldgroups', $view->field_tags())) {
+            foreach ($view->field_tags()['Fieldgroups']['Fieldgroups'] as $fieldgroup) {
+
+                // Stop if the fieldgroup is not used in this entryview.
+                if (strpos($entryview, $fieldgroup) === false) {
+                    continue;
+                }
+
+                $fieldid = array_search(substr($fieldgroup, 2, -2), $df->get_fieldnames());
+                $subfields = $df->get_field_from_id($fieldid);
+
+                $lookup = '';
+                foreach ($subfields->fieldids as $subfieldid) {
+                    $subfield = $df->get_field_from_id($subfieldid);
+                    $lookup .= " [[".$subfield->field->name."]]";
+                }
+
+                // Find in view and append tags for individual fields.
+                $entryview = str_replace($fieldgroup, $lookup, $entryview);
+            }
+        }
+
         foreach ($view->field_tags()['Fields']['Fields'] as $field) {
+
+            // TODO: This fails because it triggers [[aa]] and [[aab]] .
+            // $field = substr($field, 0, -2); // Remove end brackets to also trigger with different renderers [[aa and [[aa:b .
 
             // Error when we find more than one instance of this tag.
             if (substr_count($entryview, $field) > 1 ) {
