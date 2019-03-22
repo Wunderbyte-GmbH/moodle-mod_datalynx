@@ -302,16 +302,16 @@ class datalynxview_base_form extends moodleform {
 
         foreach ($view->field_tags()['Fields']['Fields'] as $field) {
 
-            $field = substr($field, 0, -2); // Remove end brackets to also trigger with different renderers [[aa and [[aa:b .
+            // $field = substr($field, 0, -2); // Remove end brackets to also trigger with different renderers [[aa and [[aa:b .
 
             // Error when we find more than one instance of this tag.
             if (substr_count($entryview, $field) > 1 ) {
 
                 // Make sure multiple errors are shown.
                 if (!array_key_exists('eparam2_editor', $errors)) {
-                    $errors['eparam2_editor'] = get_string('viewrepeatedfields', 'datalynx', substr($field, 2));
+                    $errors['eparam2_editor'] = get_string('viewrepeatedfields', 'datalynx', substr($field, 2, -2));
                 } else {
-                    $errors['eparam2_editor'] .= "<br>" . get_string('viewrepeatedfields', 'datalynx', substr($field, 2));
+                    $errors['eparam2_editor'] .= "<br>" . get_string('viewrepeatedfields', 'datalynx', substr($field, 2, -2));
                 }
 
             }
