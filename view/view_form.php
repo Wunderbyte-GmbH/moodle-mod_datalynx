@@ -270,10 +270,42 @@ class datalynxview_base_form extends moodleform {
 
         $view = $this->_view;
         $df = $this->_df;
-        $errors = array();
+        // $errors = array(); TODO: We reset the errors?
 
         if ($df->name_exists('views', $data['name'], $view->id())) {
             $errors['name'] = get_string('invalidname', 'datalynx', get_string('view', 'datalynx'));
+        }
+
+        // Check if a field is used multiple times in entryview.
+        $entryview = $data['eparam2_editor']['text'];
+
+        // Special case for fieldgroups, we check if fieldgroups is used multiple times or if subfields are repeated.
+        foreach ($view->field_tags()['Fieldgroups']['Fieldgroups'] as $fieldgroup) {
+
+            // Stop if the fieldgroup is not used in this entryview.
+            if (strpos($entryview, $fieldgroup) === false) {
+                continue;
+            }
+
+            $fieldid = array_search(substr($fieldgroup, 2, -2), $df->get_fieldnames());
+            $subfields = $df->get_field_from_id($fieldid);
+
+            $lookup = '';
+            foreach ($subfields->fieldids as $subfieldid) {
+                $subfield = $df->get_field_from_id($subfieldid);
+                $lookup .= " [[".$subfield->field->name."]]";
+            }
+
+            // Find in view and append tags for individual fields.
+            $entryview = str_replace($fieldgroup, $lookup, $entryview);
+        }
+
+        foreach ($view->field_tags()['Fields']['Fields'] as $field) {
+            $field = substr($field, 0, -2);
+            if (substr_count($entryview, $field) > 1 ) {
+                $field = substr($field, 2);
+                $errors['eparam2_editor'] = "You are using the field $field more then once."; // TODO: Multilang.
+            }
         }
 
         return $errors;
