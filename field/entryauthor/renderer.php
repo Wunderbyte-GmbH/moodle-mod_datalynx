@@ -245,10 +245,16 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
     public function display_badges($entry) {
         global $USER, $PAGE;
 
+        if ($entry->id < 0) { // New entry.
+            $userid = $USER->id;
+        } else {
+            $userid = $entry->userid;
+        }
+
         $output = $PAGE->get_renderer('core', 'badges');
 
-        if ($badges = badges_get_user_badges($USER->id)) {
-            return $output->print_badges_list($badges, $USER->id, true);
+        if ($badges = badges_get_user_badges($userid)) {
+            return $output->print_badges_list($badges, $userid, true);
         }
         return '';
 

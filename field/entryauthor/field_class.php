@@ -108,9 +108,10 @@ class datalynxfield_entryauthor extends datalynxfield_no_content {
                         'name' => get_string('institution'), 'description' => '',
                         'visible' => 2, 'internalname' => 'institution');
 
+        // TODO: Multilang
         $fieldobjects[self::_BADGES] = (object) array('id' => self::_BADGES,
                         'dataid' => $dataid, 'type' => 'entryauthor',
-                        'name' => 'testingbadges', 'description' => '',
+                        'name' => 'Badges', 'description' => '',
                         'visible' => 2, 'internalname' => 'badges');
 
         return $fieldobjects;
