@@ -245,8 +245,9 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
     public function display_badges($entry) {
         global $USER, $PAGE;
 
+        $output = $PAGE->get_renderer('core', 'badges');
+
         if ($badges = badges_get_user_badges($USER->id)) {
-            $output = $PAGE->get_renderer('core', 'badges');
             return $output->print_badges_list($badges, $USER->id, true);
         }
         return '';
