@@ -102,8 +102,15 @@ class datalynxview_tabular extends datalynxview_base {
         $header[] = '';
         $entry[] = '##author:name##';
         $align[] = 'left';
+
         // Fields.
         foreach ($fields as $field) {
+
+            // Don't add fieldgroups to default view.
+            if ($field->type == 'fieldgroup') {
+                continue;
+            }
+
             if ($field->field->id > 0) {
                 $header[] = $field->field->name . " %%{$field->field->name}:bulkedit%%";
                 if ($field->type == "userinfo") {

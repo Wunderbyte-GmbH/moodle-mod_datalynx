@@ -440,8 +440,15 @@ class datalynxview_pdf extends datalynxview_base {
         $table = new html_table();
         $table->attributes['align'] = 'center';
         $table->attributes['cellpadding'] = '2';
+
         // Fields.
         foreach ($fields as $field) {
+
+            // Don't add fieldgroups to default view.
+            if ($field->type == 'fieldgroup') {
+                continue;
+            }
+
             if ($field->field->id > 0) {
                 $name = new html_table_cell($field->name() . ':');
                 $name->style = 'text-align:right;';

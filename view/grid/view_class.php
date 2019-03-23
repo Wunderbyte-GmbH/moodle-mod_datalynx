@@ -84,6 +84,12 @@ class datalynxview_grid extends datalynxview_base {
 
         // Fields.
         foreach ($fields as $field) {
+
+            // Don't add fieldgroups to default view.
+            if ($field->type == 'fieldgroup') {
+                continue;
+            }
+
             if ($field->field->id > 0) {
                 $name = new html_table_cell($field->name() . ':');
                 $name->style = 'text-align:right;';

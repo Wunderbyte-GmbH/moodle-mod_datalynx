@@ -577,6 +577,12 @@ class datalynxview_csv extends datalynxview_base {
         // Set content.
         $this->view->param2 = '';
         foreach ($fields as $field) {
+
+            // Don't add fieldgroups to default view.
+            if ($field->type == 'fieldgroup') {
+                continue;
+            }
+
             if ($field->field->id > 0) {
                 $fieldname = $field->name();
                 if ($field->type == "userinfo") {
