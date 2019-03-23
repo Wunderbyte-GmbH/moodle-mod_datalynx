@@ -240,15 +240,16 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Display all badges a user has earned in an entry view.
      */
     public function display_badges($entry) {
-        global $USER, $CFG, $PAGE;
+        global $USER, $PAGE;
 
-        $output = $PAGE->get_renderer('core', 'badges');
-
-        $records = badges_get_user_badges($USER->id);
-        $userbadges = new badge_user_collection($records, $USER->id);
-        return $output->render($userbadges);
+        if ($badges = badges_get_user_badges($USER->id)) {
+            $output = $PAGE->get_renderer('core', 'badges');
+            return $output->print_badges_list($badges, $USER->id, true);
+        }
+        return '';
 
     }
 
