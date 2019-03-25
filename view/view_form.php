@@ -302,10 +302,15 @@ class datalynxview_base_form extends moodleform {
             }
         }
 
-        foreach ($view->field_tags()['Fields']['Fields'] as $field) {
+        // Normalise fields that have filters or behaviours attached.
+        $regex = $replace = array();
+        $regex[0] = '/:.*?]]/';
+        $regex[1] = '/\|.*?]]/'; // Behaviours and renderers.
+        $replace[0] = ']]';
+        $replace[1] = ']]';
+        $entryview = preg_replace($regex, $replace, $entryview);
 
-            // TODO: This fails because it triggers [[aa]] and [[aab]] .
-            // $field = substr($field, 0, -2); // Remove end brackets to also trigger with different renderers [[aa and [[aa:b .
+        foreach ($view->field_tags()['Fields']['Fields'] as $field) {
 
             // Error when we find more than one instance of this tag.
             if (substr_count($entryview, $field) > 1 ) {
