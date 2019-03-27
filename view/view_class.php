@@ -1662,4 +1662,18 @@ abstract class datalynxview_base {
         $pattern = "/$pattern\/\d+\//";
         return preg_replace($pattern, $pluginfileurl, $html);
     }
+
+    /**
+     * Find all fields that occur within a fieldgroup and remove duplicates.
+     */
+    public function remove_duplicates($fields) {
+        foreach ($fields as $field) {
+            if ($field->type == 'fieldgroup') {
+                foreach ($field->fieldids as $fieldwithin) {
+                    unset($fields[$fieldwithin]);
+                }
+            }
+        }
+        return $fields;
+    }
 }

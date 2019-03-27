@@ -40,6 +40,9 @@ class datalynxview_grid extends datalynxview_base {
             return; // You shouldn't get that far if there are no user fields.
         }
 
+        // Remove fields that are used in fieldgroup.
+        $fields = parent::remove_duplicates($fields);
+
         // Set views and filters menus and quick search.
         $table = new html_table();
         $table->attributes['align'] = 'center';
@@ -84,11 +87,6 @@ class datalynxview_grid extends datalynxview_base {
 
         // Fields.
         foreach ($fields as $field) {
-
-            // Don't add fieldgroups to default view.
-            if ($field->type == 'fieldgroup') {
-                continue;
-            }
 
             if ($field->field->id > 0) {
                 $name = new html_table_cell($field->name() . ':');
