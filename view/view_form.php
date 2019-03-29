@@ -281,12 +281,16 @@ class datalynxview_base_form extends moodleform {
 
         // We check if fieldgroups is used multiple times or if subfields are repeated.
         if (array_key_exists('Fieldgroups', $view->field_tags())) {
+
+            $visiblefieldgroups = 0;
             foreach ($view->field_tags()['Fieldgroups']['Fieldgroups'] as $fieldgroup) {
 
                 // Stop if the fieldgroup is not used in this entryview.
                 if (strpos($entryview, $fieldgroup) === false) {
                     continue;
                 }
+
+                $visiblefieldgroups++;
 
                 $fieldid = array_search(substr($fieldgroup, 2, -2), $df->get_fieldnames());
                 $subfields = $df->get_field_from_id($fieldid);
@@ -300,6 +304,12 @@ class datalynxview_base_form extends moodleform {
                 // Find in view and append tags for individual fields.
                 $entryview = str_replace($fieldgroup, $lookup, $entryview);
             }
+
+            // Don't allow multiple visible fieldgroups in a view.
+            if ($visiblefieldgroups > 1) {
+                $errors['eparam2_editor'] = get_string('viewmultiplefieldgroups', 'datalynx');
+            }
+
         }
 
         // Normalise fields that have filters or behaviours attached.

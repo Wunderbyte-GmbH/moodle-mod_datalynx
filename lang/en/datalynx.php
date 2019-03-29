@@ -522,6 +522,7 @@ $string['viewnodefault'] = 'Default view is not set. Choose one of the views in 
 $string['viewnoneforaction'] = 'No views were found for the requested action';
 $string['viewnoneindatalynx'] = 'There are no views defined for this datalynx.';
 $string['viewrepeatedfields'] = 'You can not use the field {$a} more than once.';
+$string['viewmultiplefieldgroups'] = 'You can not use more than one fieldgroup.';
 $string['toolnoneindatalynx'] = 'There are no tools defined for this datalynx.';
 $string['toolrun'] = 'Run';
 $string['viewoptions'] = 'View options';
