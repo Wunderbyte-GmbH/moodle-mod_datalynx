@@ -169,10 +169,6 @@ class datalynxview_grid extends datalynxview_base {
         if ($name) {
             array_unshift($elements, array('html', $OUTPUT->heading($name, 3, 'main')));
         }
-        // Wrap with entriesview.
-        array_unshift($elements,
-                array('html', html_writer::start_tag('div', array('class' => 'entriesview'))));
-        array_push($elements, array('html', html_writer::end_tag('div')));
 
         return $elements;
     }
