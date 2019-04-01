@@ -170,7 +170,7 @@ Feature: Create entry and add fieldgroups
     And I should see "Datalynx field Text: Text 3 in the fourth line"
 
     ## Find the right edit button for the second entry and click it.
-    And I click on "(//*[@class='entriesview']/a/*[@title='Edit'])[2]" "xpath_element"
+    And I click on "(//a/i[@title='Edit'])[2]" "xpath_element"
 
     ## Change some values.
     When I set the field with xpath "(//input[@type='text'])[2]" to "33"
@@ -189,7 +189,7 @@ Feature: Create entry and add fieldgroups
     And "Datalynx field Text: Second Text 2 in the first line" "text" should appear before "Datalynx field Text: Second Text 2 in the second line" "text"
 
     ## Edit the first entry and remove a whole line.
-    And I click on "(//*[@class='entriesview']/a/*[@title='Edit'])[1]" "xpath_element"
+    And I click on "(//a/i[@title='Edit'])[1]" "xpath_element"
 
     When I set the field with xpath "(//input[@type='text'])[2]" to ""
     When I set the field with xpath "(//input[@type='text'])[3]" to ""
