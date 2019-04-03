@@ -112,7 +112,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         for ($line = 0; $line < $maxlines; $line++) {
 
             // Instead of collapsing header we use simple divs.
-            $mform->addElement('html', '<div class="lines" id="line_' . s($line + 1) . '">');
+            $mform->addElement('html', '<div class="lines" data-line="' . s($line + 1) . '">');
 
             // After this line none is required.
             if ($line == $requiredlines) {
@@ -139,7 +139,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
 
         // Hide unused lines.
         global $PAGE;
-        $PAGE->requires->js_call_amd('mod_datalynx/fieldgroups', 'init', array($defaultlines, $maxlines));
+        $PAGE->requires->js_call_amd('mod_datalynx/fieldgroups', 'init', array($this->_field->field->name, $defaultlines, $maxlines));
 
         // Show a button to add one more line.
         $mform->addElement('button', 'addline', get_string('addline', 'datalynx'));
