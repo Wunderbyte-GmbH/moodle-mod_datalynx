@@ -16,15 +16,11 @@
 
 /**
  *
- * @package mod
- * @subpackage datalynx
- * @copyright 2012 Itamar Tzadok
+ * @package mod_datalynx
+ * @copyright 2013 onwards Ivan Šakić, Thomas Niedermaier
+ * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- *          The Datalynx has been developed as an enhanced counterpart
- *          of Moodle's Database activity module (1.9.11+ (20110323)).
- *          To the extent that Datalynx code corresponds to Database code,
- *          certain copyrights on the Database module may obtain.
  */
 defined('MOODLE_INTERNAL') or die();
 
@@ -230,7 +226,8 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
  * Class representing the virtual node with all itemids in the file browser
  *
  * @category files
- * @copyright 2012 Itamar Tzadok
+ * @copyright 2013 onwards edulabs.org and associated programmers
+ * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class datalynx_file_info_container extends file_info {

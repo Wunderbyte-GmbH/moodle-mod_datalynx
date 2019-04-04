@@ -18,7 +18,8 @@
  *
  * @package datalynxview
  * @subpackage csv
- * @copyright 2012 Itamar Tzadok
+ * @copyright 2013 onwards edulabs.org and associated programmers
+ * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['exportfields'] = 'Export fields';

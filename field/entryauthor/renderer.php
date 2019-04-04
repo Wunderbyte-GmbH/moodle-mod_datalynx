@@ -18,8 +18,9 @@
  *
  * @package datalynxfield
  * @subpackage entryauthor
- * @copyright 2011 Itamar Tzadok
- * @copyright 2012 onwards David Bogner, Michael Pollak
+ * @copyright 2013 onwards edulabs.org and associated programmers
+ * @copyright based on the work  by 2011 Itamar Tzadok
+ * @copyright 2013 onwards David Bogner, Michael Pollak
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die();

@@ -1,10 +1,6 @@
 /**
  * This file is part of the Datalynx module for Moodle - http://moodle.org/.
  *
- * The Datalynx has been developed as an enhanced counterpart
- * of Moodle's Database activity module (1.9.11+ (20110323)).
- * To the extent that Datalynx code corresponds to Database code,
- * certain copyrights on the Database module may obtain.
  *
  * Moodle is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,8 +17,9 @@
  */
 
 /**
- * @package mod-datalynx
- * @copyright 2011 Itamar Tzadok
+ * @package mod_datalynx
+ * @copyright 2013 onwards Ivan Šakić, Michael Pollak
+ * @copyright based on the work by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 #page-mod-datalynx-view #sortsearch .c0 {
