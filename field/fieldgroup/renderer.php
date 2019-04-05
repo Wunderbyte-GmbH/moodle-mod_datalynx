@@ -60,14 +60,9 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
 
         for ($line = 0; $line < $maxlines; $line++) {
             foreach ($fieldgroupfields as $fieldid => $subfield) {
-                $this->renderer_split_content($entry, $fieldid, $line);
+                $lastlinewithcontent = $this->renderer_split_content($entry, $fieldid, $line, $lastlinewithcontent);
                 $subfielddefinition['name'] = $subfield->field->name;
                 $subfielddefinition['content'] = $subfield->renderer()->render_display_mode($entry, $params);
-
-                // Remember if this line has some usercontent.
-                if ($subfielddefinition['content'] != "") {
-                    $lastlinewithcontent = $line;
-                }
 
                 $linedispl['subfield'][] = $subfielddefinition; // Build this multidimensional array for mustache context.
             }
@@ -108,6 +103,9 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         // Set every field in this line required.
         $options['required'] = true;
 
+        // Show all lines with content, get rid of all after that.
+        $lastlinewithcontent = -1;
+
         // Loop through all lines.
         for ($line = 0; $line < $maxlines; $line++) {
 
@@ -120,7 +118,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
             }
 
             foreach ($fieldgroupfields as $fieldid => $subfield) {
-                $this->renderer_split_content($entry, $fieldid, $line);
+                $lastlinewithcontent = $this->renderer_split_content($entry, $fieldid, $line, $lastlinewithcontent);
 
                 // Add a static label.
                 $mform->addElement('static', '', $subfield->field->name . ': ');
@@ -133,8 +131,15 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 $entry->id = $tempentryid;
             }
 
+            $mform->addElement('button', 'removeline', 'Remove this line', 'data-removeline="' . s($line + 1) . '"');
+
             // Instead of collapsing header we use simple divs.
             $mform->addElement('html', '</div>');
+        }
+
+        // In case there are extra lines, change default lines to show.
+        if ($lastlinewithcontent > $defaultlines) {
+            $defaultlines = $lastlinewithcontent + 1;
         }
 
         // Hide unused lines.
@@ -143,7 +148,6 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
 
         // Show a button to add one more line.
         $mform->addElement('button', 'addline', get_string('addline', 'datalynx'));
-        $mform->addElement('button', 'hideline', get_string('hideline', 'datalynx'));
     }
 
     /**
@@ -206,8 +210,10 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
      * @param object $entry
      * @param number $subfieldid
      * @param number $line defines what line we want to pass here.
+     * @param number $lastlinewithcontent stores where we still see content entries.
+     * @return number $lastlinewithcontent the last line we want to show.
      */
-    public static function renderer_split_content($entry, $subfieldid, $line) {
+    public static function renderer_split_content($entry, $subfieldid, $line, $lastlinewithcontent) {
         // Retrieve only relevant part of content and hand it over.
         // Loop through all possible contents. content, content1, ...
         for ($i = 0; $i <= 4; $i++) {
@@ -234,6 +240,12 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
             // Don't touch content if it is not a fieldgroup.
             if (isset($tempcontent[$line])) {
                 $entry->{"c{$subfieldid}_content{$contentid}"} = $tempcontent[$line];
+
+                // Remember that this line has some usercontent.
+                if ($line > $lastlinewithcontent) {
+                    $lastlinewithcontent = $line;
+                }
+
             } else {
                 $entry->{"c{$subfieldid}_content{$contentid}"} = null;
             }
@@ -244,6 +256,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 $entry->{"c{$subfieldid}_id"} = null;
             }
         }
+        return $lastlinewithcontent;
     }
 
     /**
