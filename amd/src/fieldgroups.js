@@ -24,17 +24,6 @@ define(["jquery"], function($) {
                     });
             });
 
-            $("div[data-field-name='" + fieldgroupname + "'] #id_hideline").each(function () {
-                    $(this).off( "click" );
-                    $(this).click(function(e) {
-                        e.preventDefault(); // Don't follow hrefs.
-                        if ($("input[name=visiblelines]").get(0).value > 0) {
-                            $("div[data-field-name='" + fieldgroupname + "'] .lines:visible:last").hide();
-                            $("input[name=visiblelines]").get(0).value--;
-                        }
-                    });
-            });
-
             // Remove this one line.
             $("div[data-field-name='" + fieldgroupname + "'] #id_removeline").each(function () {
                     $(this).addClass("btn-danger");

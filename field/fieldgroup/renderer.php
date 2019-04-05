@@ -139,13 +139,17 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
             $mform->addElement('html', '</div>');
         }
 
+        // In case there are extra lines, change default lines to show.
+        if (false) {
+            $defaultlines = $maxlines;
+        }
+
         // Hide unused lines.
         global $PAGE;
         $PAGE->requires->js_call_amd('mod_datalynx/fieldgroups', 'init', array($this->_field->field->name, $defaultlines, $maxlines));
 
         // Show a button to add one more line.
         $mform->addElement('button', 'addline', get_string('addline', 'datalynx'));
-        $mform->addElement('button', 'hideline', get_string('hideline', 'datalynx'));
     }
 
     /**
