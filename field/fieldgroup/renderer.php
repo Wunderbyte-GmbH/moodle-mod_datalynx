@@ -133,6 +133,8 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 $entry->id = $tempentryid;
             }
 
+            $mform->addElement('button', 'removeline', 'Remove this line', 'data-removeline="' . s($line + 1) . '"');
+
             // Instead of collapsing header we use simple divs.
             $mform->addElement('html', '</div>');
         }

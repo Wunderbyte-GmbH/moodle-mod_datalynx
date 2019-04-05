@@ -35,6 +35,34 @@ define(["jquery"], function($) {
                     });
             });
 
+            // Remove this one line.
+            $("div[data-field-name='" + fieldgroupname + "'] #id_removeline").each(function () {
+                    $(this).addClass("btn-danger");
+                    $(this).off( "click" );
+                    $(this).click(function(e) {
+                        e.preventDefault(); // Don't follow hrefs.
+
+                        // Go from removeline to maxline and move all inputs up by one.
+                        var removeline = $(this).data('removeline');
+                        for (var i = removeline; i <= maxlines; i++) {
+
+                            var next = $("div[data-field-name='" + fieldgroupname +
+                                "'] div[data-line='" + (i+1) + "'] input[type='text']");
+                            for (var j = 0; j < next.length; j++) {
+                                var nextValue = next.eq(j).val();
+                                var currentFieldId = $("div[data-field-name='" + fieldgroupname +
+                                    "'] div[data-line='" + i + "'] input[type='text']")[j].id;
+                                $("#" + currentFieldId).val(nextValue);
+                            }
+                        }
+
+                        // Set the last line to empty.
+                         $("div[data-field-name='" + fieldgroupname + "'] div[data-line='" + maxlines +
+                            "'] input[type='text']").val('');
+
+                    });
+            });
+
         }
     };
 });
