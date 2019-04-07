@@ -25,12 +25,14 @@ define(["jquery"], function($) {
             });
 
             // Remove this one line.
-            $("div[data-field-name='" + fieldgroupname + "'] #id_removeline").each(function () {
+            $("div[data-field-name='" + fieldgroupname + "'] [data-removeline]").each(function () {
                     $(this).addClass("btn-danger");
                     $(this).off( "click" );
                     $(this).click(function(e) {
                         e.preventDefault(); // Don't follow hrefs.
 
+                        // Remove files from file manager....
+                        // $(this).closest('[data-line]').find('.fp-file').click();
                         // Go from removeline to maxline and move all inputs up by one.
                         var removeline = $(this).data('removeline');
                         for (var i = removeline; i <= maxlines; i++) {
