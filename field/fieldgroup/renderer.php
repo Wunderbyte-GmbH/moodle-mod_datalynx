@@ -61,7 +61,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         for ($line = 0; $line < $maxlines; $line++) {
             foreach ($fieldgroupfields as $fieldid => $subfield) {
                 $lastlinewithcontent = $this->renderer_split_content($entry, $fieldid, $line, $lastlinewithcontent);
-                $subfielddefinition['name'] = $subfield->field->name . $this->_field->field->id;
+                $subfielddefinition['name'] = $subfield->field->name;
                 $subfielddefinition['content'] = $subfield->renderer()->render_display_mode($entry, $params);
 
                 $linedispl['subfield'][] = $subfielddefinition; // Build this multidimensional array for mustache context.
@@ -94,8 +94,8 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         $requiredlines = isset($this->_field->field->param4) ? $this->_field->field->param4 : 0;
 
         // Add a fieldgroup marker to the entry data.
-        $mform->addElement('hidden', 'fieldgroup_' . $this->_field->field->id, $this->_field->field->id);
-        $mform->setType('fieldgroup_' . $this->_field->field->id, PARAM_INT);
+        $mform->addElement('hidden', 'fieldgroup', $this->_field->field->id);
+        $mform->setType('fieldgroup', PARAM_INT);
 
         $mform->addElement('hidden', 'visiblelines', $defaultlines);
         $mform->setType('visiblelines', PARAM_INT);
@@ -110,7 +110,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         for ($line = 0; $line < $maxlines; $line++) {
 
             // Instead of collapsing header we use simple divs.
-            $mform->addElement('html', '<div class="container"><div class="lines row" data-line="' . s($line + 1) . '">');
+            $mform->addElement('html', '<div class="lines" data-line="' . s($line + 1) . '">');
 
             // After this line none is required.
             if ($line == $requiredlines) {
@@ -118,7 +118,6 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
             }
 
             foreach ($fieldgroupfields as $fieldid => $subfield) {
-                $mform->addElement('html', '<div class="col">');
                 $lastlinewithcontent = $this->renderer_split_content($entry, $fieldid, $line, $lastlinewithcontent);
 
                 // Add a static label.
@@ -130,13 +129,12 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
 
                 // Restore entryid to prior state.
                 $entry->id = $tempentryid;
-                $mform->addElement('html', '</div>');
             }
 
-            $mform->addElement('button', "removeline_$line", get_string('delete'), 'data-removeline="' . s($line + 1) . '"');
+            $mform->addElement('button', 'removeline', 'Remove this line', 'data-removeline="' . s($line + 1) . '"');
 
             // Instead of collapsing header we use simple divs.
-            $mform->addElement('html', '</div></div>');
+            $mform->addElement('html', '</div>');
         }
 
         // In case there are extra lines, change default lines to show.

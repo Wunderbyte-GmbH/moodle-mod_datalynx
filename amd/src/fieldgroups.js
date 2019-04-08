@@ -51,6 +51,12 @@ define(["jquery"], function($) {
                          $("div[data-field-name='" + fieldgroupname + "'] div[data-line='" + maxlines +
                             "'] input[type='text']").val('');
 
+                        // Hide the last visible line.
+                        if ($("input[name=visiblelines]").get(0).value > 0) {
+                            $("div[data-field-name='" + fieldgroupname + "'] .lines:visible:last").hide();
+                            $("input[name=visiblelines]").get(0).value--;
+                        }
+
                     });
             });
 
