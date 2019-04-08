@@ -31,8 +31,13 @@ define(["jquery"], function($) {
                     $(this).click(function(e) {
                         e.preventDefault(); // Don't follow hrefs.
 
-                        // Remove files from file manager....
-                        // $(this).closest('[data-line]').find('.fp-file').click();
+                        // Remove all files from associated file manager.
+                        $(this).closest('[data-line]').find('.fp-file').each(function () {
+                            $(this).click();
+                            $(".fp-file-delete:visible").trigger('click');
+                            $(".fp-dlg-butconfirm:visible").trigger('click');
+                        });
+
                         // Go from removeline to maxline and move all inputs up by one.
                         var removeline = $(this).data('removeline');
                         for (var i = removeline; i <= maxlines; i++) {
