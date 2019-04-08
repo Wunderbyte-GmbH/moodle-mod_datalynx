@@ -97,9 +97,6 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         $mform->addElement('hidden', 'fieldgroup', $this->_field->field->id);
         $mform->setType('fieldgroup', PARAM_INT);
 
-        $mform->addElement('hidden', 'visiblelines', $defaultlines);
-        $mform->setType('visiblelines', PARAM_INT);
-
         // Set every field in this line required.
         $options['required'] = true;
 
@@ -141,6 +138,10 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         if ($lastlinewithcontent > $defaultlines) {
             $defaultlines = $lastlinewithcontent + 1;
         }
+
+        // Pass along how many lines are visible to the user.
+        $mform->addElement('hidden', 'visiblelines', $defaultlines);
+        $mform->setType('visiblelines', PARAM_INT);
 
         // Hide unused lines.
         global $PAGE;
