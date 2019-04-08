@@ -18,8 +18,7 @@
  *
  * Contains class mod_customfilter_base_form
  *
- * @package mod
- * @subpackage datalynx
+ * @package mod_datalynx
  * @copyright 2016 Thomas Niedermaier
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

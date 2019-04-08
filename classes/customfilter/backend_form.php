@@ -23,8 +23,7 @@ defined('MOODLE_INTERNAL') or die();
  * Contains class mod_customfilter_form used at the BACKEND ("Manage") to create or edit a
  * customfilter
  *
- * @package mod
- * @subpackage datalynx
+ * @package mod_datalynx
  * @copyright 2016 Thomas Niedermaier
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

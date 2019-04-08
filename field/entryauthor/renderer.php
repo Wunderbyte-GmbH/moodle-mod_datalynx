@@ -18,7 +18,9 @@
  *
  * @package datalynxfield
  * @subpackage entryauthor
- * @copyright 2011 Itamar Tzadok
+ * @copyright 2013 onwards edulabs.org and associated programmers
+ * @copyright based on the work  by 2011 Itamar Tzadok
+ * @copyright 2013 onwards David Bogner, Michael Pollak
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die();
@@ -30,6 +32,13 @@ require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
 
     /**
+     * Return replacements for all ##author:something## patterns.
+     *
+     * @param array|null $tags
+     * @param null $entry
+     * @param array|null $options
+     * @return array
+     * @throws coding_exception
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
         $field = $this->_field;
@@ -75,6 +84,14 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Display a list of users to choose as entry author.
+     * This allows to specify not the editing $USER but another user
+     * as author of an entry.
+     *
+     * @param $mform
+     * @param $entry
+     * @param array|null $options
+     * @throws coding_exception
      */
     public function display_edit(&$mform, $entry, array $options = null) {
         global $USER;
@@ -114,6 +131,12 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Display name.
+     *
+     * @param $entry
+     * @return string
+     * @throws dml_exception
+     * @throws moodle_exception
      */
     public function display_name($entry) {
         global $USER, $DB;
@@ -131,6 +154,10 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Display firstname.
+     *
+     * @param $entry
+     * @return string firstname
      */
     public function display_firstname($entry) {
         global $USER;
@@ -143,6 +170,10 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Display lastname.
+     *
+     * @param $entry
+     * @return string lastname
      */
     public function display_lastname($entry) {
         global $USER;
@@ -155,6 +186,10 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Display username.
+     *
+     * @param $entry
+     * @return string username
      */
     public function display_username($entry) {
         global $USER;
@@ -167,6 +202,10 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Display user id.
+     *
+     * @param $entry
+     * @return integer id
      */
     public function display_id($entry) {
         global $USER;
@@ -179,6 +218,10 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Display user idnumber (not user id!).
+     *
+     * @param $entry
+     * @return integer idnumber
      */
     public function display_idnumber($entry) {
         global $USER;
@@ -191,6 +234,11 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Display user picture.
+     *
+     * @param $entry
+     * @param bool $large
+     * @return mixed
      */
     public function display_picture($entry, $large = false) {
         global $USER, $OUTPUT;
@@ -216,6 +264,10 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Display email.
+     *
+     * @param $entry
+     * @return string email
      */
     public function display_email($entry) {
         global $USER;
@@ -228,6 +280,10 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Display the institution of user profile.
+     *
+     * @param $entry
+     * @return mixed
      */
     public function display_institution($entry) {
         global $USER;
@@ -241,6 +297,8 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
 
     /**
      * Display all badges a user has earned in an entry view.
+     * @param $entry
+     * @return string
      */
     public function display_badges($entry) {
         global $USER, $PAGE;
@@ -261,7 +319,10 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
     }
 
     /**
-     * Array of patterns this field supports
+     * Array of patterns this field supports.
+     *
+     * @return array
+     * @throws coding_exception
      */
     protected function patterns() {
         $fieldinternalname = $this->_field->get('internalname');

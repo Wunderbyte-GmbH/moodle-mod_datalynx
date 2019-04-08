@@ -16,15 +16,10 @@
 
 /**
  *
- * @package mod
- * @subpackage datalynx
- * @copyright 2011 Itamar Tzadok
+ * @package mod_datalynx
+ * @copyright 2013 onwards Ivan Sakic, Thomas Niedermaier, David Bogner
+ * @copyright based on the work by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- *          The Datalynx has been developed as an enhanced counterpart
- *          of Moodle's Database activity module (1.9.11+ (20110323)).
- *          To the extent that Datalynx code corresponds to Database code,
- *          certain copyrights on the Database module may obtain.
  */
 
 require_once('../../config.php');

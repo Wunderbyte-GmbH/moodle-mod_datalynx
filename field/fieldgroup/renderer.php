@@ -50,7 +50,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         $maxlines = $this->_field->field->param2;
 
         // Add key so the other renderers know they deal with fieldgroup.
-        $params['fieldgroup'] = true;
+        $params['fieldgroup_' . $this->_field->field->id] = true;
 
         // In case we don't have anything to show there should be an error.
         $linedispl = $completedispl = array();
@@ -131,7 +131,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 $entry->id = $tempentryid;
             }
 
-            $mform->addElement('button', 'removeline_'.s($line + 1), 'Remove this line', 'data-removeline="' . s($line + 1) . '"');
+            $mform->addElement('button', 'removeline', 'Remove this line', 'data-removeline="' . s($line + 1) . '"');
 
             // Instead of collapsing header we use simple divs.
             $mform->addElement('html', '</div>');

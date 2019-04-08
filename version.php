@@ -16,8 +16,7 @@
 
 /**
  *
- * @package mod
- * @subpackage datalynx
+ * @package mod_datalynx
  * @copyright 2015 onwards David Bogner
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

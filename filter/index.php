@@ -16,9 +16,9 @@
 
 /**
  *
- * @package mod
- * @subpackage datalynx
- * @copyright 2012 Itamar Tzadok
+ * @package mod_datalynx
+ * @copyright 2013 onwards edulabs.org and associated programmers
+ * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once('../../../config.php');
