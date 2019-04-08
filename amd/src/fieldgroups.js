@@ -25,7 +25,7 @@ define(["jquery"], function($) {
             });
 
             // Remove this one line.
-            $("div[data-field-name='" + fieldgroupname + "'] #id_removeline").each(function () {
+            $("div[data-field-name='" + fieldgroupname + "'] [name^='removeline']").each(function () {
                     $(this).addClass("btn-danger");
                     $(this).off( "click" );
                     $(this).click(function(e) {
@@ -48,6 +48,12 @@ define(["jquery"], function($) {
                         // Set the last line to empty.
                          $("div[data-field-name='" + fieldgroupname + "'] div[data-line='" + maxlines +
                             "'] input[type='text']").val('');
+
+                        // Hide the last visible line.
+                        if ($("input[name=visiblelines]").get(0).value > 0) {
+                            $("div[data-field-name='" + fieldgroupname + "'] .lines:visible:last").hide();
+                            $("input[name=visiblelines]").get(0).value--;
+                        }
 
                     });
             });
