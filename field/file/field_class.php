@@ -140,7 +140,7 @@ class datalynxfield_file extends datalynxfield_base {
         $fileurl = $csvrecord[$csvname];
 
         // Check if this is an url.
-        if (filter_var($fileurl, FILTER_VALIDATE_URL) === FALSE) {
+        if (filter_var($fileurl, FILTER_VALIDATE_URL) === false) {
             return false;
         }
 
@@ -166,12 +166,12 @@ class datalynxfield_file extends datalynxfield_base {
 
         $filepath = "/tmp/$filename";
         $filerecord = array(
-            'contextid'=>$contextid,
-            'component'=>'user',
-            'filearea'=>'draft',
-            'itemid'=>$itemid,
-            'filepath'=>'/',
-            'filename'=>$filename
+            'contextid' => $contextid,
+            'component' => 'user',
+            'filearea' => 'draft',
+            'itemid' => $itemid,
+            'filepath' => '/',
+            'filename' => $filename
         );
         $fs = get_file_storage();
         $file = $fs->create_file_from_pathname($filerecord, $filepath);
