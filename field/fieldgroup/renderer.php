@@ -107,7 +107,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         for ($line = 0; $line < $maxlines; $line++) {
 
             // Instead of collapsing header we use simple divs.
-            $mform->addElement('html', '<div class="lines" data-line="' . s($line + 1) . '">');
+            $mform->addElement('html', '<div class="row lines" data-line="' . s($line + 1) . '">');
 
             // After this line none is required.
             if ($line == $requiredlines) {
@@ -115,6 +115,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
             }
 
             foreach ($fieldgroupfields as $fieldid => $subfield) {
+                $mform->addElement('html', '<div class="col">');
                 $lastlinewithcontent = $this->renderer_split_content($entry, $fieldid, $line, $lastlinewithcontent);
 
                 // Add a static label.
@@ -126,6 +127,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
 
                 // Restore entryid to prior state.
                 $entry->id = $tempentryid;
+                $mform->addElement('html', '</div>');
             }
 
             $mform->addElement('button', 'removeline', 'Remove this line', 'data-removeline="' . s($line + 1) . '"');
