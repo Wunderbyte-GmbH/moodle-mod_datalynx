@@ -278,7 +278,10 @@ class datalynxview_base_form extends moodleform {
         }
 
         // Check if a field is used multiple times in entryview.
-        $entryview = $data['eparam2_editor']['text'];
+        $entryview = '';
+        if (array_key_exists('eparam2_editor', $data)) {
+            $entryview = $data['eparam2_editor']['text'];
+        }
 
         // We check if fieldgroups is used multiple times or if subfields are repeated.
         if (array_key_exists('Fieldgroups', $view->field_tags())) {
