@@ -158,26 +158,27 @@ class datalynxfield_file extends datalynxfield_base {
         $file = file_get_contents($fileurl);
         file_put_contents("/tmp/$filename", $file);
 
-        // Put the file in a draft area.
-        // TODO: How to generate a correct itemid?
-        $itemid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : 1234;
+        // Put the file in a draft area, if this is 0 we generate a new draft area.
+        $draftitemid = file_get_submitted_draft_itemid("field_{$fieldid}_{$entryid}_filemanager");
         // TODO: This generates a different contextid from ajax call, why?
         $contextid = $this->df->context->id;
+
+        file_prepare_draft_area($draftitemid, $contextid, 'mod_datalynx', 'content', null);
 
         $filepath = "/tmp/$filename";
         $filerecord = array(
             'contextid' => $contextid,
             'component' => 'user',
             'filearea' => 'draft',
-            'itemid' => $itemid,
+            'itemid' => $draftitemid,
             'filepath' => '/',
-            'filename' => $filename
+            'filename' => urldecode($filename)
         );
         $fs = get_file_storage();
         $file = $fs->create_file_from_pathname($filerecord, $filepath);
 
         // Tell the update script what itemid to look for.
-        $data->{"field_{$fieldid}_{$entryid}_filemanager"} = $itemid;
+        $data->{"field_{$fieldid}_{$entryid}_filemanager"} = $draftitemid;
 
         // Finally we can return true.
         return true;
