@@ -116,14 +116,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
 
         // For csv export we simply show link to first file.
         if ($exportcsv = optional_param('exportcsv', '', PARAM_ALPHA)) {
-            $regex = '/https?\:\/\/[^\" ]+/i';
-            $matches = array();
-            foreach ($strfiles as $strfile) {
-                preg_match($regex, $strfile, $match);
-                $matches[] = $match[0];
-            }
-
-            return implode(",", $matches);
+            return $this->render_csv($strfiles);
         }
 
         return implode("<br />\n", $strfiles);
