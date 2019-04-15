@@ -128,6 +128,7 @@ class datalynxfield_file extends datalynxfield_base {
     /**
      */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
+        global $USER;
 
         // Check if not a csv import.
         if (!$csvrecord) {
@@ -137,7 +138,10 @@ class datalynxfield_file extends datalynxfield_base {
         $fieldid = $this->field->id;
         $fieldname = $this->name();
         $csvname = $importsettings[$fieldname]['name'];
-        $fileurl = $csvrecord[$csvname];
+        $fileurls = $csvrecord[$csvname];
+
+        // TODO: Loop this to catch all files from an entry.
+        $fileurl = explode(',', $fileurls)[0];
 
         // Check if this is an url.
         if (filter_var($fileurl, FILTER_VALIDATE_URL) === false) {
@@ -150,34 +154,33 @@ class datalynxfield_file extends datalynxfield_base {
             return false;
         }
 
-        // DEBUG, this does not work yet, remove this return for testing.
-        return false;
-
         // Download this file in the temp folder.
         $filename = basename($fileurl);
         $file = file_get_contents($fileurl);
         file_put_contents("/tmp/$filename", $file);
 
-        // Put the file in a draft area.
-        // TODO: How to generate a correct itemid?
-        $itemid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : 1234;
-        // TODO: This generates a different contextid from ajax call, why?
-        $contextid = $this->df->context->id;
+        // Put the file in a draft area, if this is 0 we generate a new draft area.
+        $draftitemid = file_get_submitted_draft_itemid("field_{$fieldid}_{$entryid}_filemanager");
+
+        // For draftareas we use usercontextid for some reason, this is consistent with the ajax call.
+        $contextid = context_user::instance($USER->id)->id;
+
+        file_prepare_draft_area($draftitemid, $contextid, 'mod_datalynx', 'content', null);
 
         $filepath = "/tmp/$filename";
         $filerecord = array(
             'contextid' => $contextid,
             'component' => 'user',
             'filearea' => 'draft',
-            'itemid' => $itemid,
+            'itemid' => $draftitemid,
             'filepath' => '/',
-            'filename' => $filename
+            'filename' => urldecode($filename)
         );
         $fs = get_file_storage();
         $file = $fs->create_file_from_pathname($filerecord, $filepath);
 
         // Tell the update script what itemid to look for.
-        $data->{"field_{$fieldid}_{$entryid}_filemanager"} = $itemid;
+        $data->{"field_{$fieldid}_{$entryid}_filemanager"} = $draftitemid;
 
         // Finally we can return true.
         return true;
