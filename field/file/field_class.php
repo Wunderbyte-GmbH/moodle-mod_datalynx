@@ -138,7 +138,10 @@ class datalynxfield_file extends datalynxfield_base {
         $fieldid = $this->field->id;
         $fieldname = $this->name();
         $csvname = $importsettings[$fieldname]['name'];
-        $fileurl = $csvrecord[$csvname];
+        $fileurls = $csvrecord[$csvname];
+
+        // TODO: Loop this to catch all files from an entry.
+        $fileurl = explode(',', $fileurls)[0];
 
         // Check if this is an url.
         if (filter_var($fileurl, FILTER_VALIDATE_URL) === false) {
