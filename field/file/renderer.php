@@ -35,7 +35,6 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options = null) {
         $field = $this->_field;
         $fieldid = $field->id();
-
         $entryid = $entry->id;
 
         // If we see a 0 in content there are no files stored. Create new draft area.

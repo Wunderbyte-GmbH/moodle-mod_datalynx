@@ -2,7 +2,7 @@ define(["jquery"], function($) {
 
     return {
 
-        init: function(fieldgroupname, defaultlines, maxlines) {
+        init: function(fieldgroupname, defaultlines, maxlines, requiredlines) {
 
             // We hide lines after the last line we show by default.
             defaultlines++;
@@ -13,15 +13,9 @@ define(["jquery"], function($) {
             }
 
             // Add button functionality.
-            $("div[data-field-name='" + fieldgroupname + "'] #id_addline").each(function () {
-                    $(this).off( "click" );
-                    $(this).click(function(e) {
-                        e.preventDefault(); // Don't follow hrefs.
-                        if ($("input[name=visiblelines]").get(0).value < maxlines) {
-                            $("div[data-field-name='" + fieldgroupname + "'] .lines:hidden:first").show(); // Find the first hidden.
-                            $("input[name=visiblelines]").get(0).value++; // Add one to the visible lines input.
-                        }
-                    });
+            $("div.datalynx-field-wrapper #id_addline").click(function (e) {
+                e.preventDefault(); // Don't follow hrefs.
+                $(this).closest(".datalynx-field-wrapper").find("[data-line]:hidden:first").show();
             });
 
             // Remove this one line.
@@ -30,38 +24,56 @@ define(["jquery"], function($) {
                     $(this).off( "click" );
                     $(this).click(function(e) {
                         e.preventDefault(); // Don't follow hrefs.
-
+                        var thisline = $(this).closest('.lines');
+                        var lineid = thisline.data("line");
+                        var parentcontainer = thisline.closest('.datalynx-field-wrapper');
+                        var lastvisibleline = parentcontainer.find('.lines:visible').last();
+                        var lastvisiblelineid = lastvisibleline.data('line');
                         // Remove all files from associated file manager.
-                        $(this).closest('[data-line]').find('.fp-file').each(function () {
+                        thisline.find('.fp-file').each(function () {
                             $(this).click();
                             $(".fp-file-delete:visible").trigger('click');
                             $(".fp-dlg-butconfirm:visible").trigger('click');
                         });
-
-                        // Go from removeline to maxline and move all inputs up by one.
-                        var removeline = $(this).data('removeline');
-                        for (var i = removeline; i <= maxlines; i++) {
-
-                            var next = $("div[data-field-name='" + fieldgroupname +
-                                "'] div[data-line='" + (i+1) + "'] input[type='text']");
-                            for (var j = 0; j < next.length; j++) {
-                                var nextValue = next.eq(j).val();
-                                var currentFieldId = $("div[data-field-name='" + fieldgroupname +
-                                    "'] div[data-line='" + i + "'] input[type='text']")[j].id;
-                                $("#" + currentFieldId).val(nextValue);
+                        // Remove data from input fields.
+                        $(this).closest('.lines').find('input').each(function () {
+                            $(this).val('');
+                        });
+                        // Deactivate the time/date field.
+                        $(this).closest('.lines').find('[id$=enabled]:checked').each(function () {
+                            $(this).trigger('click');
+                        });
+                        // Hide the empty lines if not required or the only line remaining.
+                        if(lineid > requiredlines && lineid > 1) {
+                            thisline.hide();
+                            // Alter DOM: Reorder lines and make content ordered properly.
+                            // Strategy: The deleted line should be moved under the last
+                            // visible line. All visible lines from thisline up to lastvisibline get moved one line up.
+                            // Lines not visible should not be changed.
+                            // thisline will be first not visible line and gets id of lastvisibleline.
+                            // TODO: Also move the content if the lines in the right place.
+                            if (lineid != maxlines) {
+                                parentcontainer.find('[data-line]').each(function () {
+                                    if($(this).data('line') > lineid && $(this).data('line') <= lastvisiblelineid) {
+                                        // Line numbers minus one.
+                                        var newid = $(this).data('line') - 1;
+                                        $(this).attr('data-line', newid);
+                                    }
+                                    if($(this).data('line') == lineid) {
+                                    // New line number for removed line.
+                                    $(this).attr('data-line', lastvisiblelineid);
+                                    }
+                                });
+                            }
+                            var newcontentorder = [];
+                            parentcontainer.find('[data-line]').each(function () {
+                                newcontentorder[$(this).data('line')] = $(this);
+                            });
+                            parentcontainer.remove('.lines');
+                            for (var i = newcontentorder.length; i >= 0; i--){
+                                parentcontainer.prepend(newcontentorder[i]);
                             }
                         }
-
-                        // Set the last line to empty.
-                         $("div[data-field-name='" + fieldgroupname + "'] div[data-line='" + maxlines +
-                            "'] input[type='text']").val('');
-
-                        // Hide the last visible line.
-                        if ($("input[name=visiblelines]").get(0).value > 0) {
-                            $("div[data-field-name='" + fieldgroupname + "'] .lines:visible:last").hide();
-                            $("input[name=visiblelines]").get(0).value--;
-                        }
-
                     });
             });
 

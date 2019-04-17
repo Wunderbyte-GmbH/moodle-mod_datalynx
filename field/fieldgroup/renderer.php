@@ -119,10 +119,11 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 $lastlinewithcontent = $this->renderer_split_content($entry, $fieldid, $line, $lastlinewithcontent);
 
                 // Add a static label.
-                $mform->addElement('static', '', $subfield->field->name . ': ');
                 $tempentryid = $entry->id;
+                // Dirty hack to render elements with a unique id.
                 $entry->id = $entry->id . "_" . $line; // Add iterator to fieldname.
-
+                $mform->addElement('static', $entry->id, $subfield->field->name . ': ');
+                // Entry has an tmp id for rendering the subfields.
                 $subfield->renderer()->render_edit_mode($mform, $entry, $options);
 
                 // Restore entryid to prior state.
@@ -130,7 +131,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 $mform->addElement('html', '</div>');
             }
 
-            $mform->addElement('button', 'removeline', 'Remove this line', 'data-removeline="' . s($line + 1) . '"');
+            $mform->addElement('button', 'removeline' . s($line + 1), get_string('delete'), ['data-removeline' => $line + 1]);
 
             // Instead of collapsing header we use simple divs.
             $mform->addElement('html', '</div>');
@@ -147,7 +148,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
 
         // Hide unused lines.
         global $PAGE;
-        $PAGE->requires->js_call_amd('mod_datalynx/fieldgroups', 'init', array($this->_field->field->name, $defaultlines, $maxlines));
+        $PAGE->requires->js_call_amd('mod_datalynx/fieldgroups', 'init', array($this->_field->field->name, $defaultlines, $maxlines, $requiredlines));
 
         // Show a button to add one more line.
         $mform->addElement('button', 'addline', get_string('addline', 'datalynx'));
