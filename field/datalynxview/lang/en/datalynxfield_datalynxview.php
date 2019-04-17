@@ -19,8 +19,7 @@
  * @package datalynxfield
  * @subpackage datalynxview
  * @copyright 2014 onwards by edulabs.org and associated programmers
- * @copyright based on the work by 2013 Itamar Tzad
-ok
+ * @copyright based on the work by 2013 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['pluginname'] = 'Datalynx view';

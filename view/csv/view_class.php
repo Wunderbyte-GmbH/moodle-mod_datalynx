@@ -441,6 +441,11 @@ class datalynxview_csv extends datalynxview_base {
     }
 
     /**
+     * @param $data
+     * @return bool|null
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
     public function execute_import($data) {
         if ($data->eids) {
@@ -452,8 +457,12 @@ class datalynxview_csv extends datalynxview_base {
     }
 
     /**
+     * Process data from csv file.
      *
-     * @param array $options associative delimiter,enclosure,encoding,updateexisting,settings
+     * @param $data
+     * @param $csvcontent
+     * @param null|array $options associative delimiter,enclosure,encoding,updateexisting,settings
+     * @return mixed
      */
     public function process_csv(&$data, $csvcontent, $options = null) {
         global $CFG;
@@ -512,6 +521,8 @@ class datalynxview_csv extends datalynxview_base {
     }
 
     /**
+     * @return datalynxview_csv_import_form
+     * @throws moodle_exception
      */
     public function get_import_form() {
         global $CFG;
@@ -522,7 +533,7 @@ class datalynxview_csv extends datalynxview_base {
     }
 
     /**
-     * Returns a fieldset of view options
+     * Generates the view with default settings.
      */
     public function generate_default_view() {
         // Get all the fields.

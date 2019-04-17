@@ -138,52 +138,70 @@ class datalynxfield_file extends datalynxfield_base {
         $fieldid = $this->field->id;
         $fieldname = $this->name();
         $csvname = $importsettings[$fieldname]['name'];
-        $fileurls = $csvrecord[$csvname];
+        $fileurls = explode(',', $csvrecord[$csvname]); ;
 
-        // TODO: Loop this to catch all files from an entry.
-        $fileurl = explode(',', $fileurls)[0];
-
-        // Check if this is an url.
-        if (filter_var($fileurl, FILTER_VALIDATE_URL) === false) {
-            return false;
-        }
-
-        // Check if we can see the file.
-        $headers = get_headers($fileurl);
-        if (strpos($headers[0], 'OK') === false) {
-            return false;
-        }
-
-        // Download this file in the temp folder.
-        $filename = basename($fileurl);
-        $file = file_get_contents($fileurl);
-        file_put_contents("/tmp/$filename", $file);
-
-        // Put the file in a draft area, if this is 0 we generate a new draft area.
+        // Prepare the draftarea where to put all files
         $draftitemid = file_get_submitted_draft_itemid("field_{$fieldid}_{$entryid}_filemanager");
-
         // For draftareas we use usercontextid for some reason, this is consistent with the ajax call.
         $contextid = context_user::instance($USER->id)->id;
-
         file_prepare_draft_area($draftitemid, $contextid, 'mod_datalynx', 'content', null);
+        foreach ($fileurls as $fileurl) {
+            $filesprocessed = 0;
+            // Check if this is an url.
+            if (!$this->validate_url($fileurl)) {
+                continue;
+            }
 
-        $filepath = "/tmp/$filename";
-        $filerecord = array(
-            'contextid' => $contextid,
-            'component' => 'user',
-            'filearea' => 'draft',
-            'itemid' => $draftitemid,
-            'filepath' => '/',
-            'filename' => urldecode($filename)
-        );
-        $fs = get_file_storage();
-        $file = $fs->create_file_from_pathname($filerecord, $filepath);
+            // Check if we can see the file.
+            $headers = get_headers($fileurl);
+            if (strpos($headers[0], 'OK') === false) {
+                continue;
+            }
+            $filesprocessed++;
+
+            // Download this file in the temp folder.
+            $filename = basename($fileurl);
+            $file = file_get_contents($fileurl);
+            file_put_contents("/tmp/$filename", $file);
+
+            $filepath = "/tmp/$filename";
+            $filerecord = array(
+                'contextid' => $contextid,
+                'component' => 'user',
+                'filearea' => 'draft',
+                'itemid' => $draftitemid,
+                'filepath' => '/',
+                'filename' => urldecode($filename)
+            );
+            $fs = get_file_storage();
+            $fs->create_file_from_pathname($filerecord, $filepath);
+        }
+        // If no files, then return false.
+        if ($filesprocessed == 0) {
+            return false;
+        }
 
         // Tell the update script what itemid to look for.
         $data->{"field_{$fieldid}_{$entryid}_filemanager"} = $draftitemid;
 
         // Finally we can return true.
         return true;
+    }
+
+    /**
+     * As FILTER_VALIDATE_URL validates only URLs containing ASCII chars
+     * this function is needed to validate URLs containing special chars
+     * like ü or ä.
+     *
+     * @param $url
+     * @return bool
+     */
+    protected function validate_url($url) {
+        $path = parse_url($url, PHP_URL_PATH);
+        $encodedpath = array_map('urlencode', explode('/', $path));
+        $url = str_replace($path, implode('/', $encodedpath), $url);
+
+        return filter_var($url, FILTER_VALIDATE_URL) ? true : false;
     }
 
     /**
