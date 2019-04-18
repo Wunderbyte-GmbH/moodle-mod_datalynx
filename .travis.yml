@@ -11,8 +11,7 @@ addons:
   postgresql: "9.4"
   apt:
     packages:
-      - oracle-java8-installer
-      - oracle-java8-set-default
+      - openjdk-11-jdk
       - chromium-chromedriver
       - google-chrome-stable
 
