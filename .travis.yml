@@ -11,7 +11,7 @@ addons:
   postgresql: "9.4"
   apt:
     packages:
-      - openjdk-11-jdk
+      - default-jre
       - chromium-chromedriver
       - google-chrome-stable
 
