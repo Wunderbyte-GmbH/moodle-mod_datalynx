@@ -105,7 +105,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
 
         // Loop through all lines.
         for ($line = 0; $line < $maxlines; $line++) {
-            $thisline = $line +1;
+            $thisline = $line + 1;
             // After this line none is required.
             if ($line == $requiredlines) {
                 unset($options['required']);
