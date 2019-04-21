@@ -105,16 +105,19 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
 
         // Loop through all lines.
         for ($line = 0; $line < $maxlines; $line++) {
-
-            // Instead of collapsing header we use simple divs.
-            $mform->addElement('html', '<div class="row lines" data-line="' . s($line + 1) . '">');
-
+            $thisline = $line +1;
             // After this line none is required.
             if ($line == $requiredlines) {
                 unset($options['required']);
             }
-
+            // Instead of collapsing header we use simple divs.
+            $mform->addElement('html', '<div class="row mb-4 lines" data-line="' . $thisline . '">');
+            $counter = 0;
             foreach ($fieldgroupfields as $fieldid => $subfield) {
+                if ($counter % 3 == 0) {
+                    $mform->addElement('html', '<div class="w-100 p-10"></div>');
+                }
+                $counter++;
                 $mform->addElement('html', '<div class="col">');
                 $lastlinewithcontent = $this->renderer_split_content($entry, $fieldid, $line, $lastlinewithcontent);
 
@@ -130,10 +133,9 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 $entry->id = $tempentryid;
                 $mform->addElement('html', '</div>');
             }
-
-            $mform->addElement('button', 'removeline' . s($line + 1), get_string('delete'), ['data-removeline' => $line + 1]);
-
-            // Instead of collapsing header we use simple divs.
+            $mform->addElement('html',  '<div class="col"><button class="btn btn-secondary btn-danger" type="button" data-removeline="' . $thisline. '">
+                ' . get_string('delete') . '</button></div>');
+            // End of row.
             $mform->addElement('html', '</div>');
         }
 
@@ -151,7 +153,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         $PAGE->requires->js_call_amd('mod_datalynx/fieldgroups', 'init', array($this->_field->field->name, $defaultlines, $maxlines, $requiredlines));
 
         // Show a button to add one more line.
-        $mform->addElement('button', 'addline', get_string('addline', 'datalynx'));
+        $mform->addElement('button', 'addline', get_string('addline', 'datalynx', $this->_field->field->name));
     }
 
     /**

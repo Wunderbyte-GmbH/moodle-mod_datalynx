@@ -20,7 +20,6 @@ define(["jquery"], function($) {
 
             // Remove this one line.
             $("div[data-field-name='" + fieldgroupname + "'] [data-removeline]").each(function () {
-                    $(this).addClass("btn-danger");
                     $(this).off( "click" );
                     $(this).click(function(e) {
                         e.preventDefault(); // Don't follow hrefs.
@@ -39,9 +38,18 @@ define(["jquery"], function($) {
                         $(this).closest('.lines').find('input').each(function () {
                             $(this).val('');
                         });
-                        // Deactivate the time/date field.
-                        $(this).closest('.lines').find('[id$=enabled]:checked').each(function () {
+                        // Deactivate the time/date field and remove team members.
+                        $(this).closest('.lines').find('[id$=enabled]:checked,' +
+                            ' .form-autocomplete-selection .tag').each(function () {
                             $(this).trigger('click');
+                        });
+                        // Remove atto editor content.
+                        $(this).closest('.lines').find('.editor_atto_content').each(function () {
+                            $(this).html('');
+                        });
+                        // Remove textarea content.
+                        $(this).closest('.lines').find('textarea').each(function () {
+                            $(this).val('');
                         });
                         // Hide the empty lines if not required or the only line remaining.
                         if(lineid > requiredlines && lineid > 1) {
