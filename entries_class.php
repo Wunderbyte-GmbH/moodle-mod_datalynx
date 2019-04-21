@@ -746,8 +746,9 @@ class datalynx_entries {
                                     foreach ($contents[$eid]['fields'] as $fieldid => $content) {
 
                                         // If we see a fieldgroup we split and reset the content.
-                                        if (isset($content['fieldgroup'])) {
-
+                                        $fieldgroup = array_search (true, $content);
+                                        if (strpos($fieldgroup, "fieldgroup") === 0) {
+                                            // TODO: Rewrite this for fieldgroup_id instead of fieldgroup.
                                             // How many lines were visible to the user, store only those.
                                             $lastiterator = $data->visiblelines - 1;
 
@@ -767,7 +768,7 @@ class datalynx_entries {
                                                 $tempcontent = array();
                                                 foreach ($content as $key => $value) {
                                                     // Only add keys that start with our expected fieldname to tempcontent.
-                                                    if ( 0 === strpos($key, "{$fieldname}_{$i}")) {
+                                                    if ( 0 === strpos($key, "{$fieldname}_{$fieldgroup}_{$i}")) {
                                                         // If we found sth. relevant, split it up and rebuild key.
                                                         // Either it has content_name after the iterator or not.
                                                         $contentname = explode("_", $key);

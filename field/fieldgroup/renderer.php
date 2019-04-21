@@ -49,8 +49,14 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         // Loop through maxlines.
         $maxlines = $this->_field->field->param2;
 
+        // Field id.
+        $fieldid = $this->_field->id();
+
+        // Fieldname is special for the fieldgroup not including entryid as other fields.
+        $fieldname = "fieldgroup_{$fieldid}";
+
         // Add key so the other renderers know they deal with fieldgroup.
-        $params['fieldgroup_' . $this->_field->field->id] = true;
+        $params[$fieldname] = true;
 
         // In case we don't have anything to show there should be an error.
         $linedispl = $completedispl = array();
@@ -88,14 +94,20 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         // We want to display these fields.
         $fieldgroupfields = $this->get_subfields();
 
+        // Field id.
+        $fieldid = $this->_field->id();
+
+        // Fieldname is special for the fieldgroup not including entryid as other fields.
+        $fieldname = "fieldgroup_{$fieldid}";
+
         // Number of lines to show and generate.
         $defaultlines = isset($this->_field->field->param3) ? $this->_field->field->param3 : 3;
         $maxlines = isset($this->_field->field->param2) ? $this->_field->field->param2 : 3;
         $requiredlines = isset($this->_field->field->param4) ? $this->_field->field->param4 : 0;
 
         // Add a fieldgroup marker to the entry data.
-        $mform->addElement('hidden', 'fieldgroup', $this->_field->field->id);
-        $mform->setType('fieldgroup', PARAM_INT);
+        $mform->addElement('hidden', $fieldname, $this->_field->field->id);
+        $mform->setType($fieldname, PARAM_INT);
 
         // Set every field in this line required.
         $options['required'] = true;
@@ -124,7 +136,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 // Add a static label.
                 $tempentryid = $entry->id;
                 // Dirty hack to render elements with a unique id.
-                $entry->id = $entry->id . "_" . $line; // Add iterator to fieldname.
+                $entry->id = $entry->id . "_{$fieldname}_" . $line; // Add iterator to each line of fieldgroup.
                 $mform->addElement('static', $entry->id, $subfield->field->name . ': ');
                 // Entry has an tmp id for rendering the subfields.
                 $subfield->renderer()->render_edit_mode($mform, $entry, $options);

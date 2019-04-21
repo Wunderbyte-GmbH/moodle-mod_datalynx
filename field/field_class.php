@@ -467,29 +467,32 @@ abstract class datalynxfield_base {
     public function get_content_from_data($entryid, $data) {
         $fieldid = $this->field->id;
         $content = array();
+        $fieldgroups = [];
+        foreach ($data as $key => $value) {
+            if (strpos($key, 'fieldgroup_') === 0) {
+                $fieldgroups[$value]  = $key;
+            }
+        }
 
         // Keeping this for backwards compatibility.
         foreach ($this->content_names() as $name) {
+            // Add normal fields.
             $delim = $name ? '_' : '';
             $contentname = "field_{$fieldid}_$entryid" . $delim . $name;
             if (isset($data->$contentname)) {
                 $content[$name] = $data->$contentname;
             }
-        }
-
-        // In case the entryid is followed by _0 we see a fieldgroup.
-        foreach ($this->content_names() as $name) {
-            $delim = $name ? '_' : '';
-
-            $contentname = "field_{$fieldid}_$entryid" . "_0" . $delim . $name;
-
-            $i = 0;
-            while (isset($data->$contentname)) {
-                $content["fieldgroup"] = true;
-                $content[$contentname] = $data->$contentname;
-
-                $i++;
-                $contentname = "field_{$fieldid}_$entryid" . "_" . $i . $delim . $name;
+            // Add fieldgroup fields.
+            foreach ($fieldgroups as $fieldgroup) {
+                // Search for fieldgroup.
+                $contentname = "field_{$fieldid}_$entryid" . "_" . $fieldgroup . "_0" . $delim . $name;
+                $i = 0;
+                while (isset($data->$contentname)) {
+                    $content[$fieldgroup] = true;
+                    $content[$contentname] = $data->$contentname;
+                    $i++;
+                    $contentname = "field_{$fieldid}_$entryid" . "_" . $fieldgroup . "_" . $i . $delim . $name;
+                }
             }
         }
 
