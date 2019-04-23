@@ -758,7 +758,7 @@ class datalynx_entries {
                                             foreach ($content as $key => $value) {
                                                 // Only add keys that start with our expected pattern to tempcontent.
                                                 // Pattern of submitted field content.
-                                                if(strpos($key, 'fieldgroup_') === 0) {
+                                                if (strpos($key, 'fieldgroup_') === 0) {
                                                     continue;
                                                 }
                                                 $getlinenumber = explode("_", $key);
