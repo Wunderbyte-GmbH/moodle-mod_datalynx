@@ -187,7 +187,7 @@
         <FIELD NAME="content2" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="content3" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="content4" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="fieldgroupid" TYPE="int" LENGTH="20" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="lineid" TYPE="int" LENGTH="20" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

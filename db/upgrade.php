@@ -967,6 +967,22 @@ function xmldb_datalynx_upgrade($oldversion) {
 
         upgrade_mod_savepoint(true, 2018101700, 'datalynx');
     }
+    if ($oldversion < 2019042300) {
+        // Drop fieldgroupid from datalynx_contents.
+        $table = new xmldb_table('datalynx_contents');
+        $field = new xmldb_field('fieldgroupid');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Add lineid to every line of content.
+        $field = new xmldb_field('lineid', XMLDB_TYPE_INTEGER, '20', null, XMLDB_NOTNULL, null, '0', 'content4');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2019042300, 'datalynx');
+    }
     return true;
 }
 
