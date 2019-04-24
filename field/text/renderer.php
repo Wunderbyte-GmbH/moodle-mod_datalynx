@@ -142,15 +142,28 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
     }
 
     public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
-        $fieldid = $this->_field->id();
+        $field = $this->_field;
+        $fieldid = $field->id();
         $fieldname = "f_{$i}_$fieldid";
-
+        $autocomplete = $field->get('param9');
         $arr = array();
-        $arr[] = &$mform->createElement('text', $fieldname, null, array('size' => '32'));
-        $mform->setType($fieldname, PARAM_NOTAGS);
-        $mform->setDefault($fieldname, $value);
-        $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
 
+        if ($autocomplete) {
+            $fieldattr['class'] = "datalynxfield_datalynxview datalynxview_{$fieldid}";
+            // If param10 is empty take the values of this field itself for autocomplete options.
+            $reffieldid = $field->field->param10 ? $field->field->param10 : $field->field->id;
+            $menu = array(
+                    '_qf__force_multiselect_submission'
+                    => get_string('choose')) + $field->df->get_distinct_textfieldvalues_by_id($reffieldid);
+            $fieldattr['tags'] = true;
+            $arr[] = &$mform->createElement('autocomplete', $fieldname, null, $menu, $fieldattr);
+            $mform->setType($fieldname, PARAM_NOTAGS);
+        } else {
+            $arr[] = &$mform->createElement('text', $fieldname, null, array('size' => '32'));
+            $mform->setType($fieldname, PARAM_NOTAGS);
+            $mform->setDefault($fieldname, $value);
+            $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
+        }
         return array($arr, null);
     }
 

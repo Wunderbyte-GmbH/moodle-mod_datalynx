@@ -71,11 +71,11 @@ $string['csvfailed'] = 'Originaldaten der CSV Datei können nicht gelesen werden
 $string['csvoutput'] = 'CSV Ausgabe';
 $string['csvsettings'] = 'CSV Einstellungen';
 $string['csvwithselecteddelimiter'] = '<acronym title=\"Comma Separated Values\">CSV</acronym> Text mit ausgewähltem Trennzeichen:';
-$string['customfilter'] = 'Individueller Userfilter';
-$string['customfilteradd'] = 'Einen Custom Filter hinzufügen';
-$string['customfilternew'] = 'Neuer User-Filter';
-$string['customfilters'] = 'Userfilter';
-$string['customfiltersnoneindatalynx'] = 'Für diese Datalynx sind keine Custom Filter angelegt.';
+$string['customfilter'] = 'Benutzerdefinierter Filter';
+$string['customfilteradd'] = 'Einen benutzerdefinierten Filter hinzufügen';
+$string['customfilternew'] = 'Neuer benutzerdefinierter Filter';
+$string['customfilters'] = 'Benutzerdefinierte Filter';
+$string['customfiltersnoneindatalynx'] = 'Für diese Datalynx sind keine benutzerdefinierten Filter angelegt.';
 // Capability strings.
 $string['datalynx:addinstance'] = 'Neue Datalynx Aktivität anlegen';
 $string['datalynx:approve'] = 'Einträge freischalten';

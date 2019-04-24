@@ -44,4 +44,8 @@ class datalynxfield_text extends datalynxfield_base {
         return array('' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
                 'LIKE' => get_string('contains', 'datalynx'));
     }
+
+    public static function is_customfilterfield() {
+        return true;
+    }
 }
