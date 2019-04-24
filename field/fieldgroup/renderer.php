@@ -107,7 +107,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
 
         // Add a fieldgroup marker to the entry data.
         $mform->addElement('hidden', $fieldname, $this->_field->field->id);
-        $mform->setType($fieldname, PARAM_INT);
+        $mform->setType($fieldname, PARAM_NOTAGS);
 
         // Set every field in this line required.
         $options['required'] = true;

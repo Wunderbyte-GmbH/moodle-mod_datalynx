@@ -52,10 +52,12 @@ class datalynxview_entries_form extends moodleform {
             foreach ($entryids as $entryid) {
 
                 // If we see a fieldgroup loop through all visible lines.
-                if (isset($data['fieldgroup'])) {
+                $fieldgroupmarkers = preg_grep('/^fieldgroup_/', array_keys($data));
+                if(count($fieldgroupmarkers) > 0) {
+                    $fieldgroupid = $data[reset($fieldgroupmarkers)];
 
                     // Append the correct patterns to match.
-                    $patterns = $fields[$data['fieldgroup']]->renderer()->get_fieldgroup_patterns($patterns);
+                    $patterns = $fields[$fieldgroupid]->renderer()->get_fieldgroup_patterns($patterns);
 
                     for ($i = 0; $i < $data['visiblelines']; $i++) {
                         foreach ($fields as $fid => $field) {
