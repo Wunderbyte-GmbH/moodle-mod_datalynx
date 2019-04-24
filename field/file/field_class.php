@@ -161,10 +161,6 @@ class datalynxfield_file extends datalynxfield_base {
 
             // Download this file in the temp folder.
             $filename = basename($fileurl);
-            $file = file_get_contents($fileurl);
-            file_put_contents("/tmp/$filename", $file);
-
-            $filepath = "/tmp/$filename";
             $filerecord = array(
                 'contextid' => $contextid,
                 'component' => 'user',
@@ -174,7 +170,7 @@ class datalynxfield_file extends datalynxfield_base {
                 'filename' => urldecode($filename)
             );
             $fs = get_file_storage();
-            $fs->create_file_from_pathname($filerecord, $filepath);
+            $fs->create_file_from_url($filerecord, $fileurl, null, true);
         }
         // If no files, then return false.
         if ($filesprocessed == 0) {
