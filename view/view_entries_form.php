@@ -53,7 +53,7 @@ class datalynxview_entries_form extends moodleform {
 
                 // If we see a fieldgroup loop through all visible lines.
                 $fieldgroupmarkers = preg_grep('/^fieldgroup_/', array_keys($data));
-                if(count($fieldgroupmarkers) > 0) {
+                if (count($fieldgroupmarkers) > 0) {
                     $fieldgroupid = $data[reset($fieldgroupmarkers)];
 
                     // Append the correct patterns to match.
@@ -70,7 +70,7 @@ class datalynxview_entries_form extends moodleform {
                     // If no fieldgroup use standard behaviour.
                     foreach ($fields as $fid => $field) {
                         $errors = array_merge($errors,
-                                $field->renderer()->validate($entryid, $patterns[$fid], (object) $data));
+                            $field->renderer()->validate($entryid, $patterns[$fid], (object) $data));
                     }
                 }
             }
