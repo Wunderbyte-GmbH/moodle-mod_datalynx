@@ -757,6 +757,8 @@ class datalynx_entries {
                                         $deletedlines = str_getcsv($deletedlines);
                                     }
 
+                                    $deletedcontentids = array();
+
                                     // Variable $eid should be different from $entryid only in new entries.
                                     // Iterate through all the fields part of an entry and a fieldgroup. Field by field.
                                     foreach ($contents[$eid]['fields'] as $fieldid => $content) {
@@ -773,6 +775,7 @@ class datalynx_entries {
                                             $tempcontent = array();
 
                                             foreach ($content as $key => $value) {
+
                                                 // Only add keys that start with our expected pattern to tempcontent.
                                                 // Pattern of submitted field content.
                                                 if (strpos($key, 'fieldgroup_') === 0) {
@@ -782,10 +785,11 @@ class datalynx_entries {
                                                 // Line number is the 6th element of the array.
                                                 $i = $getlinenumber[5];
 
-                                                // In case this line was deleted, stop here and trigger deletion in database.
+                                                // In case this line was deleted, stop here and trigger deletion later.
                                                 if (in_array($i, $deletedlines)) {
-                                                    $contentid = $entry->{"c{$fieldid}_id_fieldgroup"}[$i];
-                                                    $DB->delete_records('datalynx_contents', array('id' => $contentid));
+                                                    if (isset($entry->{"c{$fieldid}_id_fieldgroup"}[$i])) {
+                                                        $deletedcontentids[] = $entry->{"c{$fieldid}_id_fieldgroup"}[$i];
+                                                    }
                                                     continue;
                                                 }
 
@@ -829,6 +833,13 @@ class datalynx_entries {
                                         }
 
                                     }
+
+                                    // Remove contentids that we have collected.
+                                    if ($deletedcontentids) {
+                                        $in = implode(',', $deletedcontentids);
+                                        // $DB->delete_records_select('datalynx_contents', "id IN ($in)"); // TESTING.
+                                    }
+
                                     $processed[$entry->id] = $entry;
 
                                     if (!$addorupdate) {
