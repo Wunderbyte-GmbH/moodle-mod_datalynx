@@ -109,6 +109,10 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         $mform->addElement('hidden', $fieldname, $this->_field->field->id);
         $mform->setType($fieldname, PARAM_NOTAGS);
 
+        // Lines that are deleted in the frontend.
+        $mform->addElement('hidden', "deletedlines_{$fieldid}", '');
+        $mform->setType("deletedlines_{$fieldid}", PARAM_NOTAGS);
+
         // Set every field in this line required.
         $options['required'] = true;
 

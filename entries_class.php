@@ -745,6 +745,18 @@ class datalynx_entries {
                                 }
 
                                 if ($entry->id = $this->update_entry($entry, $contents[$eid]['info'])) {
+
+                                    // Build array to store which lines should be deleted for this entry.
+                                    // TODO: This seems really heavy handed, keeping it for now but should be solved smarter.
+                                    $dataarray = (array)$data;
+                                    $fieldgroupmarkers = preg_grep('/^fieldgroup_/', array_keys($dataarray));
+                                    if (count($fieldgroupmarkers) > 0) {
+                                        $fieldgroupid = $dataarray[reset($fieldgroupmarkers)];
+                                        $deletedlines = $dataarray["deletedlines_{$fieldgroupid}"];
+                                        $deletedlines = "0,1,2,3"; // TESTING.
+                                        $deletedlines = str_getcsv($deletedlines);
+                                    }
+
                                     // Variable $eid should be different from $entryid only in new entries.
                                     // Iterate through all the fields part of an entry and a fieldgroup. Field by field.
                                     foreach ($contents[$eid]['fields'] as $fieldid => $content) {
@@ -759,6 +771,7 @@ class datalynx_entries {
                                             // Split $content and generate temporary content.
                                             // Look for all content_names like _url or _alt.
                                             $tempcontent = array();
+
                                             foreach ($content as $key => $value) {
                                                 // Only add keys that start with our expected pattern to tempcontent.
                                                 // Pattern of submitted field content.
@@ -768,6 +781,14 @@ class datalynx_entries {
                                                 $getlinenumber = explode("_", $key);
                                                 // Line number is the 6th element of the array.
                                                 $i = $getlinenumber[5];
+
+                                                // In case this line was deleted, stop here and trigger deletion in database.
+                                                if (in_array($i, $deletedlines)) {
+                                                    $contentid = $entry->{"c{$fieldid}_id_fieldgroup"}[$i];
+                                                    $DB->delete_records('datalynx_contents', array('id' => $contentid));
+                                                    continue;
+                                                }
+
                                                 $fieldcontentpattern = "{$fieldname}_{$fieldgroup}_{$i}";
                                                 if (0 === strpos($key, $fieldcontentpattern)) {
                                                     // If we found sth. relevant, split it up and rebuild key.
