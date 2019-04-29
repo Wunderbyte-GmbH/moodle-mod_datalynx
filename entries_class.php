@@ -753,7 +753,6 @@ class datalynx_entries {
                                     if (count($fieldgroupmarkers) > 0) {
                                         $fieldgroupid = $dataarray[reset($fieldgroupmarkers)];
                                         $deletedlines = $dataarray["deletedlines_{$fieldgroupid}"];
-                                        $deletedlines = "0,1,2,3"; // TESTING.
                                         $deletedlines = str_getcsv($deletedlines);
                                     }
 
