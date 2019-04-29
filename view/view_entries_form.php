@@ -59,7 +59,8 @@ class datalynxview_entries_form extends moodleform {
                     // Append the correct patterns to match.
                     $patterns = $fields[$fieldgroupid]->renderer()->get_fieldgroup_patterns($patterns);
 
-                    for ($i = 0; $i < $data['visiblelines']; $i++) {
+                    $maxlines = $fields[$fieldgroupid]->field->param2;
+                    for ($i = 0; $i < $maxlines; $i++) {
                         foreach ($fields as $fid => $field) {
                             $newerrors = $field->renderer()->validate($entryid . "_" . $i, $patterns[$fid], (object) $data);
                             $errors = array_merge($errors, $newerrors);

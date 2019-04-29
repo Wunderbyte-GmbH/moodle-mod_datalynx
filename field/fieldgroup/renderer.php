@@ -165,11 +165,6 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         $mform->addElement('hidden', "deletedlines_{$fgfieldid}", implode(",", $deletedlines));
         $mform->setType("deletedlines_{$fgfieldid}", PARAM_NOTAGS);
 
-        // Pass along how many lines are visible to the user.
-        // TODO: This is still used for validation in view_entries_form.php:62 .
-        $mform->addElement('hidden', 'visiblelines', $defaultlines);
-        $mform->setType('visiblelines', PARAM_INT);
-
         // Hide unused lines.
         global $PAGE;
         $PAGE->requires->js_call_amd('mod_datalynx/fieldgroups', 'init', array($this->_field->field->name, $defaultlines, $maxlines, $requiredlines));
