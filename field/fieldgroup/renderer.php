@@ -95,10 +95,10 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         $fieldgroupfields = $this->get_subfields();
 
         // Field id.
-        $fieldid = $this->_field->id();
+        $fgfieldid = $this->_field->id();
 
         // Fieldname is special for the fieldgroup not including entryid as other fields.
-        $fieldname = "fieldgroup_{$fieldid}";
+        $fieldname = "fieldgroup_{$fgfieldid}";
 
         // Number of lines to show and generate.
         $defaultlines = isset($this->_field->field->param3) ? $this->_field->field->param3 : 3;
@@ -108,10 +108,6 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         // Add a fieldgroup marker to the entry data.
         $mform->addElement('hidden', $fieldname, $this->_field->field->id);
         $mform->setType($fieldname, PARAM_NOTAGS);
-
-        // Lines that are deleted in the frontend.
-        $mform->addElement('hidden', "deletedlines_{$fieldid}", '');
-        $mform->setType("deletedlines_{$fieldid}", PARAM_NOTAGS);
 
         // Set every field in this line required.
         $options['required'] = true;
@@ -160,7 +156,17 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
             $defaultlines = $lastlinewithcontent + 1;
         }
 
+        // Lines that are deleted or not visible in the frontend.
+        $deletedlines = array();
+        // From defaultlines+1 to maxlines are not visible, so add here, remove once added in js.
+        for ($i = $defaultlines + 1; $i <= $maxlines; $i++) {
+            $deletedlines[] = $i;
+        }
+        $mform->addElement('hidden', "deletedlines_{$fgfieldid}", implode(",", $deletedlines));
+        $mform->setType("deletedlines_{$fgfieldid}", PARAM_NOTAGS);
+
         // Pass along how many lines are visible to the user.
+        // TODO: This is still used for validation in view_entries_form.php:62 .
         $mform->addElement('hidden', 'visiblelines', $defaultlines);
         $mform->setType('visiblelines', PARAM_INT);
 
