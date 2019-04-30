@@ -794,7 +794,6 @@ class datalynx_entries {
                                                     $contentname = explode("{$fieldcontentpattern}_", $key);
                                                     if (isset($contentname[1])) {
                                                         $tempcontent[$contentname[1]] = $value; // No need for fieldname.
-                                                        // $tempcontent[$fieldname . "_" . $contentname[4]] = $value;
                                                     } else {
                                                         $tempcontent[$fieldname] = $value;
                                                     }

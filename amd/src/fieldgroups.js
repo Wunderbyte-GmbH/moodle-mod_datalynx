@@ -2,7 +2,7 @@ define(["jquery"], function($) {
 
     return {
 
-        init: function(fieldgroupname, fieldgroupid, defaultlines, maxlines, requiredlines) {
+        init: function(fieldgroupname, defaultlines, maxlines, requiredlines) {
 
             // We hide lines after the last line we show by default.
             defaultlines++;

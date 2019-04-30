@@ -156,18 +156,9 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
             $defaultlines = $lastlinewithcontent + 1;
         }
 
-        // Lines that are deleted or not visible in the frontend.
-        $deletedlines = array();
-        // From defaultlines+1 to maxlines are not visible, so add here, remove once added in js.
-        for ($i = $defaultlines + 1; $i <= $maxlines; $i++) {
-            $deletedlines[] = $i;
-        }
-        $mform->addElement('hidden', "deletedlines_{$fgfieldid}", implode(",", $deletedlines));
-        $mform->setType("deletedlines_{$fgfieldid}", PARAM_NOTAGS);
-
         // Hide unused lines.
         global $PAGE;
-        $PAGE->requires->js_call_amd('mod_datalynx/fieldgroups', 'init', array($this->_field->field->name, $fgfieldid, $defaultlines, $maxlines, $requiredlines));
+        $PAGE->requires->js_call_amd('mod_datalynx/fieldgroups', 'init', array($this->_field->field->name, $defaultlines, $maxlines, $requiredlines));
 
         // Show a button to add one more line.
         $mform->addElement('button', 'addline', get_string('addline', 'datalynx', $this->_field->field->name));
