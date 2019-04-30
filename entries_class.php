@@ -829,7 +829,6 @@ class datalynx_entries {
                                     }
 
                                     // Remove contentids that we have collected.
-                                    print_object($emptycontent); exit; //DELETETHIS
                                     if ($emptycontent) {
                                         $deletedcontentids = array();
                                         foreach ($emptycontent as $line => $contentids) {
