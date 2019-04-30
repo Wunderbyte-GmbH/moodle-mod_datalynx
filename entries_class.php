@@ -844,7 +844,6 @@ class datalynx_entries {
                                             $deletedcontentids = array_diff($deletedcontentids, $removenew);
                                             $in = implode(',', $deletedcontentids);
                                             // $DB->delete_records_select('datalynx_contents', "id IN ($in)"); // TESTING.
-                                            */
                                         }
                                     }
                                     $processed[$entry->id] = $entry;
