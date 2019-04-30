@@ -746,17 +746,8 @@ class datalynx_entries {
 
                                 if ($entry->id = $this->update_entry($entry, $contents[$eid]['info'])) {
 
-                                    // Build array to store which lines should be deleted for this entry.
-                                    // TODO: This seems really heavy handed, keeping it for now but should be solved smarter.
-                                    $dataarray = (array)$data;
-                                    $fieldgroupmarkers = preg_grep('/^fieldgroup_/', array_keys($dataarray));
-                                    if (count($fieldgroupmarkers) > 0) {
-                                        $fieldgroupid = $dataarray[reset($fieldgroupmarkers)];
-                                        $deletedlines = $dataarray["deletedlines_{$fieldgroupid}"];
-                                        $deletedlines = str_getcsv($deletedlines);
-                                    }
-
-                                    $deletedcontentids = array();
+                                    $emptycontent = array(); // Array with lines and deleted contentids.
+                                    $countfgfields = 0; // Store how many fields exist per line.
 
                                     // Variable $eid should be different from $entryid only in new entries.
                                     // Iterate through all the fields part of an entry and a fieldgroup. Field by field.
@@ -765,6 +756,7 @@ class datalynx_entries {
                                         // If we see a fieldgroup we split and reset the content.
                                         $fieldgroup = array_search(true, $content);
                                         if (strpos($fieldgroup, "fieldgroup") === 0) {
+                                            $countfgfields++;
                                             // TODO: Rewrite this for fieldgroup_id instead of fieldgroup. Use $fieldgroup.
                                             // How many lines were visible to the user, store only those.
 
@@ -784,12 +776,15 @@ class datalynx_entries {
                                                 // Line number is the 6th element of the array.
                                                 $i = $getlinenumber[5];
 
-                                                // In case this line was deleted, stop here and trigger deletion later.
-                                                if (in_array($i, $deletedlines)) {
+                                                // In case this field has no content mark and check deletion later.
+                                                // TODO: Test for text, needs to be extended for all field classes in function.
+                                                if ($value == '') {
+
                                                     if (isset($entry->{"c{$fieldid}_id_fieldgroup"}[$i])) {
-                                                        $deletedcontentids[] = $entry->{"c{$fieldid}_id_fieldgroup"}[$i];
+                                                        $emptycontent[$i][] = $entry->{"c{$fieldid}_id_fieldgroup"}[$i];
+                                                    } else {
+                                                        $emptycontent[$i][] = '-1'; // Marks a new entry, keep this convention.
                                                     }
-                                                    continue;
                                                 }
 
                                                 $fieldcontentpattern = "{$fieldname}_{$fieldgroup}_{$i}";
@@ -834,11 +829,25 @@ class datalynx_entries {
                                     }
 
                                     // Remove contentids that we have collected.
-                                    if ($deletedcontentids) {
-                                        $in = implode(',', $deletedcontentids);
-                                        // $DB->delete_records_select('datalynx_contents', "id IN ($in)"); // TESTING.
+                                    print_object($emptycontent); exit; //DELETETHIS
+                                    if ($emptycontent) {
+                                        $deletedcontentids = array();
+                                        foreach ($emptycontent as $line => $contentids) {
+                                            // Check if every field is empty, only then remove line.
+                                            if (count($contentids) != $countfgfields) {
+                                                continue;
+                                            }
+                                            $deletedcontentids = array_merge($deletedcontentids, $contentids);
+                                        }
+                                        if ($deletedcontentids) {
+                                            // Get rid of the new markers.
+                                            $removenew = array('-1');
+                                            $deletedcontentids = array_diff($deletedcontentids, $removenew);
+                                            $in = implode(',', $deletedcontentids);
+                                            // $DB->delete_records_select('datalynx_contents', "id IN ($in)"); // TESTING.
+                                            */
+                                        }
                                     }
-
                                     $processed[$entry->id] = $entry;
 
                                     if (!$addorupdate) {
