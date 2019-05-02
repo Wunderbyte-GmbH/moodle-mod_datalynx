@@ -777,12 +777,13 @@ class datalynx_entries {
                                                 $i = $getlinenumber[5];
 
                                                 // In case this field has no content mark and check deletion later.
-                                                // TODO: Test for text, needs to be extended for all field classes in function.
-                                                if ($value == '') {
+                                                // TODO: Needs to be extended for all field classes in function.
+                                                if ($fields[$fieldid]->is_fieldvalue_empty($value)) {
 
                                                     if (isset($entry->{"c{$fieldid}_id_fieldgroup"}[$i])) {
                                                         $emptycontent[$i][] = $entry->{"c{$fieldid}_id_fieldgroup"}[$i];
                                                     } else {
+                                                        // TODO: Don't know the new contentid yet, but need to delete it later?
                                                         $emptycontent[$i][] = '-1'; // Marks a new entry, keep this convention.
                                                     }
                                                 }
