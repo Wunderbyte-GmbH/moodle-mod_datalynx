@@ -177,4 +177,15 @@ class datalynxfield_number extends datalynxfield_text {
                 '<' => get_string('less_than', 'datalynx'), '<=' => get_string('less_equal', 'datalynx'),
                 'BETWEEN' => get_string('between', 'datalynx'));
     }
+
+    /**
+     * Is $value a valid content or do we see an empty input?
+     * @return bool
+     */
+    public static function is_fieldvalue_empty($value) {
+        if ($value == 0) {
+            return true;
+        }
+        return false;
+    }
 }

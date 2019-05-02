@@ -157,4 +157,15 @@ class datalynxfield_editor extends datalynxfield_base {
         return array('' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
                 'LIKE' => get_string('contains', 'datalynx'));
     }
+
+    /**
+     * Is $value a valid content or do we see an empty input?
+     * @return bool
+     */
+    public static function is_fieldvalue_empty($value) {
+        if ($value['text'] == '') {
+            return true;
+        }
+        return false;
+    }
 }

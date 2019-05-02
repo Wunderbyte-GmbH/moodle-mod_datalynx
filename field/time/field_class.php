@@ -268,5 +268,15 @@ class datalynxfield_time extends datalynxfield_base {
                 '>' => get_string('after', 'datalynx'), '<' => get_string('before', 'datalynx'),
                 'BETWEEN' => get_string('between', 'datalynx'));
     }
-}
 
+    /**
+     * Is $value a valid content or do we see an empty input?
+     * @return bool
+     */
+    public static function is_fieldvalue_empty($value) {
+        if ($value == 0) {
+            return true;
+        }
+        return false;
+    }
+}

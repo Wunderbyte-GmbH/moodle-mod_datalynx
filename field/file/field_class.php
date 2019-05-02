@@ -264,4 +264,21 @@ class datalynxfield_file extends datalynxfield_base {
     public static function is_customfilterfield() {
         return true;
     }
+
+    /**
+     * Is $value a valid content or do we see an empty input?
+     * @return bool
+     */
+    public static function is_fieldvalue_empty($value) {
+        // TODO: We see a draftarea id, need to determine if files are linked to it.
+        global $DB;
+        $filesizes = $DB->get_records_menu('files',
+            array('itemid' => $value), 'filesize DESC', "id, filesize", '', 1);
+
+        // If the biggest file in the draftarea has a positive filesize, it is not empty.
+        if (!reset($filesizes)) {
+            return true;
+        }
+        return false;
+    }
 }
