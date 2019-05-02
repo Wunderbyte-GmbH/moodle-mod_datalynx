@@ -838,9 +838,6 @@ class datalynx_entries {
                                             $deletedcontentids = array_merge($deletedcontentids, $contentids);
                                         }
                                         if ($deletedcontentids) {
-                                            // Get rid of the new markers.
-                                            $removenew = array('-1');
-                                            $deletedcontentids = array_diff($deletedcontentids, $removenew);
                                             $in = implode(',', $deletedcontentids);
                                             // $DB->delete_records_select('datalynx_contents', "id IN ($in)"); // TESTING.
                                         }
