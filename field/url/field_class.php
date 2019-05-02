@@ -122,4 +122,15 @@ class datalynxfield_url extends datalynxfield_base {
         }
         return true;
     }
+
+    /**
+     * Is $value a valid content or do we see an empty input?
+     * @return bool
+     */
+    public static function is_fieldvalue_empty($value) {
+        if ($value == '' || $value == 'http://') {
+            return true;
+        }
+        return false;
+    }
 }

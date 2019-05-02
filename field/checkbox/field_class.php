@@ -62,5 +62,18 @@ class datalynxfield_checkbox extends datalynxfield_multiselect {
         return $defaults;
     }
 
+    /**
+     * Is $value a valid content or do we see an empty input?
+     * @return bool
+     */
+    public static function is_fieldvalue_empty($value) {
+        // The array is always passed, check every value.
+        foreach ($value as $val) {
+            if ($val) {
+                return false;
+            }
+        }
 
+        return true;
+    }
 }

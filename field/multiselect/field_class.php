@@ -88,4 +88,16 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
         }
         return $defaults;
     }
+
+    /**
+     * Is $value a valid content or do we see an empty input?
+     * @return bool
+     */
+    public static function is_fieldvalue_empty($value) {
+        // Multiselect passes an array if values exist.
+        if (!is_array($value)) {
+            return true;
+        }
+        return false;
+    }
 }
