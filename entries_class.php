@@ -776,18 +776,6 @@ class datalynx_entries {
                                                 // Line number is the 6th element of the array.
                                                 $i = $getlinenumber[5];
 
-                                                // In case this field has no content mark and check deletion later.
-                                                // TODO: Needs to be extended for all field classes in function.
-                                                if ($fields[$fieldid]->is_fieldvalue_empty($value)) {
-
-                                                    if (isset($entry->{"c{$fieldid}_id_fieldgroup"}[$i])) {
-                                                        $emptycontent[$i][] = $entry->{"c{$fieldid}_id_fieldgroup"}[$i];
-                                                    } else {
-                                                        // TODO: Don't know the new contentid yet, but need to delete it later?
-                                                        $emptycontent[$i][] = '-1'; // Marks a new entry, keep this convention.
-                                                    }
-                                                }
-
                                                 $fieldcontentpattern = "{$fieldname}_{$fieldgroup}_{$i}";
                                                 if (0 === strpos($key, $fieldcontentpattern)) {
                                                     // If we found sth. relevant, split it up and rebuild key.
@@ -819,7 +807,18 @@ class datalynx_entries {
                                                     }
                                                 }
                                                 // Pass tempstuff to updatecontent.
-                                                $fields[$fieldid]->update_content($entry, $tempcontent);
+                                                $newcontentid = $fields[$fieldid]->update_content($entry, $tempcontent);
+
+                                                // In case this field has no content mark and check deletion later.
+                                                // TODO: Needs to be extended for all field classes in function.
+                                                if ($fields[$fieldid]->is_fieldvalue_empty($value)) {
+
+                                                    if (isset($entry->{"c{$fieldid}_id_fieldgroup"}[$i])) {
+                                                        $emptycontent[$i][] = $entry->{"c{$fieldid}_id_fieldgroup"}[$i];
+                                                    } else {
+                                                        $emptycontent[$i][] = $newcontentid;
+                                                    }
+                                                }
                                             }
                                         } else {
                                             // Keep behaviour if no fieldgroup is detected.

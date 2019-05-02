@@ -800,7 +800,7 @@ abstract class datalynxfield_base {
      * @return bool
      */
     public static function is_fieldvalue_empty($value) {
-        if ($value != '') {
+        if ($value == '') {
             return true;
         }
         return false;
