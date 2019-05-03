@@ -208,7 +208,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
      * Update a teammemberselectfield when editing an entry and notify teammembers of changes
      */
     public function update_content($entry, array $values = null) {
-        parent::update_content($entry, $values);
+        $newcontentid = parent::update_content($entry, $values);
 
         // TODO: All this is only to notify team members. Check if we really need this here.
         global $DB;
@@ -232,7 +232,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         $field = $DB->get_record('datalynx_fields', array('id' => $this->field->id));
         $this->notify_team_members($entry, $field, $oldcontent, $newcontent);
 
-        return true;
+        return $newcontentid;
     }
 
     /**
