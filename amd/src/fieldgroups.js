@@ -36,7 +36,10 @@ define(["jquery"], function($) {
                         });
                         // Remove data from input fields.
                         $(this).closest('.lines').find('input').each(function () {
-                            $(this).val('');
+                            // Do not affect hidden inputs.
+                            if (!$(this).attr('type') == 'hidden') {
+                                $(this).val('');
+                            }
                         });
                         // Deactivate the time/date field and remove team members.
                         $(this).closest('.lines').find('[id$=enabled]:checked,' +
