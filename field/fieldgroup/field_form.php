@@ -79,7 +79,7 @@ class datalynxfield_fieldgroup_form extends datalynxfield_form {
         $errors = parent::validation($data, $files);
 
         // Check if any fieldnames are set.
-        if(!isset($data['param1'])) {
+        if (!isset($data['param1'])) {
             $errors['param1'] = "Sorry, you have to add at least one field to a fieldgroup."; // TODO: Multilang.
             return $errors;
         }
