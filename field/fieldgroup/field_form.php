@@ -78,6 +78,12 @@ class datalynxfield_fieldgroup_form extends datalynxfield_form {
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
+        // Check if any fieldnames are set.
+        if(!isset($data['param1'])) {
+            $errors['param1'] = "Sorry, you have to add at least one field to a fieldgroup."; // TODO: Multilang.
+            return $errors;
+        }
+
         // Check if all fieldnames are actually found and only fieldtypes are entered that have been tested.
         $fields = $this->_df->get_fields(null, false, true);
         foreach ($data['param1'] as $fieldid) {
