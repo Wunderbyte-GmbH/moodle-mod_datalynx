@@ -787,8 +787,10 @@ class datalynx_entries {
                                                         $tempcontent[$fieldname] = $value;
                                                     }
                                                 }
+
                                                 // We know this is a fieldgroup but there is only one line set.
-                                                if (!isset($entry->{"c{$fieldid}_id_fieldgroup"})) {
+                                                if (!isset($entry->{"c{$fieldid}_id_fieldgroup"})
+                                                    && isset($entry->{"c{$fieldid}_id"})) {
                                                     $entry->{"c{$fieldid}_id_fieldgroup"}[0] = $entry->{"c{$fieldid}_id"};
                                                 }
 

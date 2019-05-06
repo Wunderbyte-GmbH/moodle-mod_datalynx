@@ -131,8 +131,9 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 }
                 $counter++;
                 $mform->addElement('html', '<div class="col">');
+
                 // Keep contentid in _id for later.
-                $resetcontentid = $entry->{"c{$fieldid}_id"};
+                $resetcontentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : false;
 
                 $lastlinewithcontent = $this->renderer_split_content($entry, $fieldid, $line, $lastlinewithcontent);
 
@@ -144,9 +145,11 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 // Entry has an tmp id for rendering the subfields.
                 $subfield->renderer()->render_edit_mode($mform, $entry, $options);
 
-                // Restore entryid to prior state.
+                // Restore relevant parts of entry to prior state.
                 $entry->id = $tempentryid;
-                $entry->{"c{$fieldid}_id"} = $resetcontentid;
+                if ($resetcontentid) {
+                    $entry->{"c{$fieldid}_id"} = $resetcontentid;
+                }
                 $mform->addElement('html', '</div>');
             }
             $mform->addElement('html',  '<div class="col"><button class="btn btn-secondary btn-danger" type="button" data-removeline="' . $thisline. '">
@@ -234,7 +237,6 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
     public static function renderer_split_content($entry, $subfieldid, $line, $lastlinewithcontent) {
         // Retrieve only relevant part of content and hand it over.
 
-        // TODO: This was edited weirdly, don't loop everything for times, only the contents.
         // Loop through all possible contents. content, content1, ...
         for ($i = 0; $i <= 4; $i++) {
             if ($i == 0) {
@@ -244,12 +246,12 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
             }
 
             // If we render a fieldgroup we assume there is fieldgroup content in the $entry.
-            if ( isset ( $entry->{"c{$subfieldid}_content{$contentid}_fieldgroup"}) ) {
+            if (isset($entry->{"c{$subfieldid}_content{$contentid}_fieldgroup"})) {
                 $tempcontent = $entry->{"c{$subfieldid}_content{$contentid}_fieldgroup"};
                 $tempid = $entry->{"c{$subfieldid}_id_fieldgroup"};
             } else {
                 // If we have exactly one content, show this and leave the rest blank.
-                if (isset( $entry->{"c{$subfieldid}_content{$contentid}"} )) {
+                if (isset($entry->{"c{$subfieldid}_content{$contentid}"})) {
                     $tempcontent = array( $entry->{"c{$subfieldid}_content{$contentid}"} );
                     $tempid = array( $entry->{"c{$subfieldid}_id"} );
                 } else {
@@ -269,13 +271,15 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
             } else {
                 $entry->{"c{$subfieldid}_content{$contentid}"} = null;
             }
-            // We need to pass content ids too.
-            if (isset($tempid[$line])) {
-                $entry->{"c{$subfieldid}_id"} = $tempid[$line];
-            } else {
-                $entry->{"c{$subfieldid}_id"} = null;
-            }
         }
+
+        // We need to pass content ids too.
+        if (isset($tempid[$line])) {
+            $entry->{"c{$subfieldid}_id"} = $tempid[$line];
+        } else {
+            $entry->{"c{$subfieldid}_id"} = null;
+        }
+
         return $lastlinewithcontent;
     }
 
