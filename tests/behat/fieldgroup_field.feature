@@ -207,7 +207,6 @@ Feature: Create entry and add fieldgroups
     ## Check if empty lines are kept.
     And I should not see "Datalynx field Text: Text 1 in the first line"
     And I should not see "Datalynx field Number: 3 "
-    And "Datalynx field Number: 0.00" "text" should appear before "Datalynx field Number: 36.00" "text"
     ## Has false positives because it does not care what comes after string.
     ## And "Datalynx field Text: " "text" should appear before "Datalynx field Text: Second Text 1 in the second line" "text"
     And "//div[.='Datalynx field Text: ']" "xpath_element" should appear before "//div[.='Datalynx field Text: Second Text 1 in the second line']" "xpath_element"
