@@ -787,6 +787,11 @@ class datalynx_entries {
                                                         $tempcontent[$fieldname] = $value;
                                                     }
                                                 }
+                                                // We know this is a fieldgroup but there is only one line set.
+                                                if (!isset($entry->{"c{$fieldid}_id_fieldgroup"})) {
+                                                    $entry->{"c{$fieldid}_id_fieldgroup"}[0] = $entry->{"c{$fieldid}_id"};
+                                                }
+
                                                 // Split $entry and overwrite entry content.
                                                 $entry->{"c{$fieldid}_id"} = $entry->{"c{$fieldid}_content"} = null;
                                                 if (isset($entry->{"c{$fieldid}_id_fieldgroup"}[$i])) {
@@ -839,7 +844,7 @@ class datalynx_entries {
                                         }
                                         if ($deletedcontentids) {
                                             $in = implode(',', $deletedcontentids);
-                                            // $DB->delete_records_select('datalynx_contents', "id IN ($in)"); // TESTING.
+                                            $DB->delete_records_select('datalynx_contents', "id IN ($in)"); // TESTING.
                                         }
                                     }
                                     $processed[$entry->id] = $entry;

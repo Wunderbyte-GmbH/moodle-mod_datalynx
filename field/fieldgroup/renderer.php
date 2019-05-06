@@ -131,6 +131,9 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 }
                 $counter++;
                 $mform->addElement('html', '<div class="col">');
+                // Keep contentid in _id for later.
+                $resetcontentid = $entry->{"c{$fieldid}_id"};
+
                 $lastlinewithcontent = $this->renderer_split_content($entry, $fieldid, $line, $lastlinewithcontent);
 
                 // Add a static label.
@@ -143,6 +146,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
 
                 // Restore entryid to prior state.
                 $entry->id = $tempentryid;
+                $entry->{"c{$fieldid}_id"} = $resetcontentid;
                 $mform->addElement('html', '</div>');
             }
             $mform->addElement('html',  '<div class="col"><button class="btn btn-secondary btn-danger" type="button" data-removeline="' . $thisline. '">
@@ -229,6 +233,8 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
      */
     public static function renderer_split_content($entry, $subfieldid, $line, $lastlinewithcontent) {
         // Retrieve only relevant part of content and hand it over.
+
+        // TODO: This was edited weirdly, don't loop everything for times, only the contents.
         // Loop through all possible contents. content, content1, ...
         for ($i = 0; $i <= 4; $i++) {
             if ($i == 0) {

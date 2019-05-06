@@ -37,7 +37,7 @@ define(["jquery"], function($) {
                         // Remove data from input fields.
                         $(this).closest('.lines').find('input').each(function () {
                             // Do not affect hidden inputs.
-                            if (!$(this).attr('type') == 'hidden') {
+                            if ($(this).attr('type') != 'hidden') {
                                 $(this).val('');
                             }
                         });
