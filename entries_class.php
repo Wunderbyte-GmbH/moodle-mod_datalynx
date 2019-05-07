@@ -822,7 +822,7 @@ class datalynx_entries {
                                                 if ($fields[$fieldid]->is_fieldvalue_empty($value)) {
 
                                                     // Field class url has _alt, don't count this at all, only _url is relevant.
-                                                    if(!substr_compare($key,"_alt",-4,4)) {
+                                                    if (!substr_compare($key, "_alt", -4, 4)) {
                                                         continue;
                                                     }
 
