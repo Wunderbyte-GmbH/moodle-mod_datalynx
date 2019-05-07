@@ -814,11 +814,17 @@ class datalynx_entries {
                                                     }
                                                 }
                                                 // Pass tempstuff to updatecontent.
+                                                // TODO: This relies on the correctness of the field classes update content.
                                                 $newcontentid = $fields[$fieldid]->update_content($entry, $tempcontent);
 
                                                 // In case this field has no content mark and check deletion later.
                                                 // TODO: Needs to be extended for all field classes in function.
                                                 if ($fields[$fieldid]->is_fieldvalue_empty($value)) {
+
+                                                    // Field class url has _alt, don't count this at all, only _url is relevant.
+                                                    if(!substr_compare($key,"_alt",-4,4)) {
+                                                        continue;
+                                                    }
 
                                                     if (isset($entry->{"c{$fieldid}_id_fieldgroup"}[$i])) {
                                                         $emptycontent[$i][] = $entry->{"c{$fieldid}_id_fieldgroup"}[$i];

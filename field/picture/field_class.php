@@ -40,14 +40,17 @@ class datalynxfield_picture extends datalynxfield_file {
      */
     public function update_content($entry, array $values = null) {
         global $DB;
-        parent::update_content($entry, $values);
+        $parentcontentid = parent::update_content($entry, $values);
 
         // We can read the contentid from entry and update the right files.
+        // TODO: The parent class should return the correct contentid, why do we do this?
         $contentid = isset($entry->{"c{$this->field->id}_id"}) ? $entry->{"c{$this->field->id}_id"} : null;
 
         if (!empty($contentid)) {
             $this->update_content_files($contentid, array('updatethumb' => true, 'updatefile' => false));
         }
+
+        return $parentcontentid;
     }
 
     /**

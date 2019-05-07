@@ -54,6 +54,11 @@ define(["jquery"], function($) {
                         $(this).closest('.lines').find('textarea').each(function () {
                             $(this).val('');
                         });
+                        // Remove single select content.
+                        $(this).closest('.lines').find('select').each(function () {
+                            $(this).find('option[value=""]').prop('selected', true);
+                        });
+
                         // Hide the empty lines if not required or the only line remaining.
                         // TODO: Changed this to >= so people can remove the first line as well.
                         if(lineid > requiredlines && lineid >= 1) {

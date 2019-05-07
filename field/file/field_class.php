@@ -110,7 +110,7 @@ class datalynxfield_file extends datalynxfield_base {
 
             $this->update_content_files($contentid);
         }
-        return true;
+        return $contentid;
     }
 
     /**
