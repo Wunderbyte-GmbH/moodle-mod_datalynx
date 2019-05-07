@@ -63,7 +63,7 @@ class datalynxfield_tag extends datalynxfield_option_multiple {
             $rec->content = "";
             $DB->update_record('datalynx_contents', $rec);
             core_tag_tag::remove_all_item_tags('mod_datalynx', 'datalynx_contents', $contentid);
-            return true;
+            return $rec->id;
         }
 
         // Create empty datalynx_contents entry in order to get id for processing tags.
