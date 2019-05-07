@@ -80,10 +80,6 @@ class datalynxfield_textarea extends datalynxfield_base {
 
         $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
 
-        if (empty($values)) {
-            return true;
-        }
-
         $rec = new stdClass();
         $rec->fieldid = $fieldid;
         $rec->entryid = $entryid;
@@ -101,7 +97,10 @@ class datalynxfield_textarea extends datalynxfield_base {
         $value = str_replace("<br />", "\n", $value); // Reset carriage returns, bug#887.
         $rec->content = clean_param($value, PARAM_NOTAGS); // Replaced PARAM_RAW.
 
-        return $DB->update_record('datalynx_contents', $rec);
+        $DB->update_record('datalynx_contents', $rec);
+
+        // We need the contentid as return value.
+        return $rec->id;
     }
 
     /**

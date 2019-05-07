@@ -87,7 +87,9 @@ class datalynxfield_tag extends datalynxfield_option_multiple {
         }
         $rec->content = $content;
 
-        return $DB->update_record('datalynx_contents', $rec);
+        $DB->update_record('datalynx_contents', $rec);
+
+        return $rec->id;
     }
 
     /**

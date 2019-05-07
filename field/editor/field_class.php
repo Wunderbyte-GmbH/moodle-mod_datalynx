@@ -96,10 +96,6 @@ class datalynxfield_editor extends datalynxfield_base {
 
         $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
 
-        if (empty($values)) {
-            return true;
-        }
-
         $rec = new stdClass();
         $rec->fieldid = $fieldid;
         $rec->entryid = $entryid;
@@ -119,7 +115,10 @@ class datalynxfield_editor extends datalynxfield_base {
         $rec->content = $data->content;
         $rec->content1 = $data->contentformat;
 
-        return $DB->update_record('datalynx_contents', $rec);
+        $DB->update_record('datalynx_contents', $rec);
+
+        // We need the contentid as return value.
+        return $rec->id;
     }
 
     /**
