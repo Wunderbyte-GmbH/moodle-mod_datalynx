@@ -60,17 +60,28 @@ class datalynxfield_editor_renderer extends datalynxfield_renderer {
         }
     }
 
+    /**
+     * @param stdClass $entry
+     * @param array $params
+     * @return string
+     */
     public function render_display_mode(stdClass $entry, array $params) {
         $field = $this->_field;
         $fieldid = $field->id();
+        $excerpt = in_array('excerpt', array_keys($params)) ? true : false;
 
         if (isset($entry->{"c{$fieldid}_content"})) {
             $text = $entry->{"c{$fieldid}_content"};
             $format = isset($entry->{"c{$fieldid}_content1"}) ? $entry->{"c{$fieldid}_content1"} : FORMAT_HTML;
-
             $options = new stdClass();
             $options->para = false;
             $str = format_text($text, $format, $options);
+            if ($excerpt) {
+                $str = strip_tags($str, '<p><i><b><strong>');
+                $str = substr($str, 0, 500);
+                $str = str_replace("&nbsp;", ' ', $str);
+                $str = trim($str);
+            }
             return $str;
         } else {
             return '';
@@ -88,6 +99,18 @@ class datalynxfield_editor_renderer extends datalynxfield_renderer {
         $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
 
         return array($arr, null);
+    }
+
+    /**
+     * @return array field patterns
+     */
+    protected function patterns() {
+        $fieldname = $this->_field->name();
+
+        $patterns = parent::patterns();
+        $patterns["[[$fieldname]]"] = array(true);
+        $patterns["[[$fieldname:excerpt]]"] = array(true);
+        return $patterns;
     }
 
     public function validate($entryid, $tags, $formdata) {
