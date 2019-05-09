@@ -64,7 +64,6 @@ class datalynxview_entries_form extends moodleform {
                         $thisentryid = "{$entryid}_fieldgroup_{$fieldgroupid}_{$i}";
                         foreach ($fields as $fid => $field) {
                             $newerrors = $field->renderer()->validate($thisentryid, $patterns[$fid], (object) $data);
-                            // $newerrors = $field->renderer()->validate($entryid . "_" . $i, $patterns[$fid], (object) $data);
                             $errors = array_merge($errors, $newerrors);
                         }
                     }

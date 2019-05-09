@@ -60,6 +60,21 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
             }
         }
 
+        // If we edit an existing entry that is not required we need a workaround.
+        if ($entryid > 0 && !$required && $autocomplete) {
+            global $PAGE;
+            $PAGE->requires->js_amd_inline("
+            require(['jquery'], function($) {
+                $('option[value=\"-999\"]').removeAttr('selected');
+            });");
+        }
+
+        // We create a hidden field to force sending.
+        if (!$required && $autocomplete) {
+            $mform->addElement('html',
+                    '<input type="hidden" name="' . $fieldname . '[-1]" value="-999">');
+        }
+
         // Check for default values.
         if (!$selected and $field->get('param2')) {
             $selected = $field->default_values();
@@ -68,6 +83,8 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
         // Render as autocomplete field (param6 not empty) or select field.
         if ($autocomplete) {
             $menuoptions = $field->options_menu(false, true);
+            $menuoptions[-999] = null; // Allow this option for empty values.
+
             $select = &$mform->addElement('autocomplete', $fieldname, null, $menuoptions);
         } else {
             $menuoptions = $field->options_menu();
@@ -159,8 +176,13 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
         $errors = array();
         foreach ($tags as $tag) {
             list(, $behavior, ) = $this->process_tag($tag);
-            // Variable $behavior datalynx_field_behavior.
 
+            // Remove placeholder for empty autocomplete.
+            if (isset($formdata->$formfieldname[0]) && $formdata->$formfieldname[0] == -999) {
+                unset($formdata->$formfieldname[0]);
+            }
+
+            // Variable $behavior datalynx_field_behavior.
             if ($behavior->is_required()) {
                 if (empty($formdata->$formfieldname)) {
                     $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
