@@ -772,6 +772,12 @@ class datalynx_entries {
                                                 if (strpos($key, 'fieldgroup_') === 0) {
                                                     continue;
                                                 }
+
+                                                // Skip _alt from url, this does corrupt updating.
+                                                if (!substr_compare($key, "_alt", -4, 4)) {
+                                                    continue;
+                                                }
+
                                                 $getlinenumber = explode("_", $key);
                                                 // Line number is the 6th element of the array.
                                                 $i = $getlinenumber[5];
@@ -820,11 +826,6 @@ class datalynx_entries {
                                                 // In case this field has no content mark and check deletion later.
                                                 // TODO: Needs to be extended for all field classes in function.
                                                 if ($fields[$fieldid]->is_fieldvalue_empty($value)) {
-
-                                                    // Field class url has _alt, don't count this at all, only _url is relevant.
-                                                    if (!substr_compare($key, "_alt", -4, 4)) {
-                                                        continue;
-                                                    }
 
                                                     if (isset($entry->{"c{$fieldid}_id_fieldgroup"}[$i])) {
                                                         $emptycontent[$i][] = $entry->{"c{$fieldid}_id_fieldgroup"}[$i];
