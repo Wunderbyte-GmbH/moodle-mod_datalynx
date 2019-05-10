@@ -178,8 +178,8 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
             list(, $behavior, ) = $this->process_tag($tag);
 
             // Remove placeholder for empty autocomplete.
-            if (isset($formdata->$formfieldname[0]) && $formdata->$formfieldname[0] == -999) {
-                unset($formdata->$formfieldname[0]);
+            if (isset($formdata->{$formfieldname}[0]) && $formdata->{$formfieldname}[0] == -999) {
+                unset($formdata->{$formfieldname}[0]);
             }
 
             // Variable $behavior datalynx_field_behavior.
