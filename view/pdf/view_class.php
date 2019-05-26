@@ -710,7 +710,7 @@ class datalynxview_pdf extends datalynxview_base {
 
         // Process pluginfile images.
         $imagetypes = get_string('imagetypes', 'datalynxview_pdf');
-        if (preg_match_all("%$CFG->wwwroot/pluginfile.php(/[^.]+.($imagetypes))%", $content, $matches)) {
+        if (preg_match_all("%$CFG->wwwroot/pluginfile.php(/.+(\.$imagetypes$))%", $content, $matches)) {
             $replacements = array();
 
             $fs = get_file_storage();
