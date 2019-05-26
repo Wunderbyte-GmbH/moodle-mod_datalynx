@@ -323,22 +323,24 @@ class datalynxview_base_form extends moodleform {
         $replace[0] = ']]';
         $replace[1] = ']]';
         $entryview = preg_replace($regex, $replace, $entryview);
+        $fields = $view->field_tags();
 
-        foreach ($view->field_tags()['Fields']['Fields'] as $field) {
+        if (!empty($fields['Fields'])) {
+            foreach ($fields['Fields']['Fields'] as $field) {
 
-            // Error when we find more than one instance of this tag.
-            if (substr_count($entryview, $field) > 1 ) {
+                // Error when we find more than one instance of this tag.
+                if (substr_count($entryview, $field) > 1) {
 
-                // Make sure multiple errors are shown.
-                if (!array_key_exists('eparam2_editor', $errors)) {
-                    $errors['eparam2_editor'] = get_string('viewrepeatedfields', 'datalynx', substr($field, 2, -2));
-                } else {
-                    $errors['eparam2_editor'] .= "<br>" . get_string('viewrepeatedfields', 'datalynx', substr($field, 2, -2));
+                    // Make sure multiple errors are shown.
+                    if (!array_key_exists('eparam2_editor', $errors)) {
+                        $errors['eparam2_editor'] = get_string('viewrepeatedfields', 'datalynx', substr($field, 2, -2));
+                    } else {
+                        $errors['eparam2_editor'] .= "<br>" . get_string('viewrepeatedfields', 'datalynx', substr($field, 2, -2));
+                    }
+
                 }
-
             }
         }
-
         return $errors;
     }
 }
