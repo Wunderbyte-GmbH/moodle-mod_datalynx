@@ -88,6 +88,7 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
             $select = &$mform->addElement('autocomplete', $fieldname, null, $menuoptions);
         } else {
             $menuoptions = $field->options_menu();
+
             $select = &$mform->addElement('select', $fieldname, null, $menuoptions);
         }
         $select->setMultiple(true);

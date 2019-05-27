@@ -192,4 +192,23 @@ class backend_form extends base_form {
     public function html() {
         return $this->_form->toHtml();
     }
+
+    /**
+     * @param array $data
+     * @param array $files
+     * @return array
+     * @throws coding_exception
+     */
+    public function validation($data, $files) {
+        $errors = parent::validation($data, $files);
+
+        $dl = $this->_dl;
+        if (empty($data['name']) || $dl->name_exists('customfilters', $data['name'])) {
+            $errors['name'] = get_string('invalidname', 'datalynx',
+                    get_string('filter', 'datalynx'));
+        }
+
+        return $errors;
+    }
+
 }
