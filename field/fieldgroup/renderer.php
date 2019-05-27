@@ -143,7 +143,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 $entry->id = $entry->id . "_{$fieldname}_" . $line; // Add iterator to each line of fieldgroup.
                 $mform->addElement('static', $entry->id, $subfield->field->name . ': ');
                 // Entry has an tmp id for rendering the subfields.
-                $subfield->renderer()->render_edit_mode($mform, $entry, $options);
+                $subfield->renderer()->prerender_edit_mode($mform, $entry, $options);
 
                 // Restore relevant parts of entry to prior state.
                 $entry->id = $tempentryid;
