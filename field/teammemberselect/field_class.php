@@ -427,14 +427,13 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         $selected = !empty($first) ? $first : array();
 
         if (!empty($selected)) {
-
             // Remove Dummy value.
             if (isset($selected[0]) && $selected[0] == -999) {
                 array_shift($selected);
             }
-
-            $contents[] = json_encode($selected);
         }
+
+        $contents[] = json_encode($selected); // Empty values are kept.
         return array($contents, $oldcontents);
     }
 
