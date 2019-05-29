@@ -512,10 +512,16 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
      * @return bool
      */
     public static function is_fieldvalue_empty($value) {
-        // If array > 1 entry we see actual input from the user, next to -999.
-        if (count($value) < 2) {
+
+        if (empty($value)) {
             return true;
         }
+
+        // Backwards compatible, we added -999 to pass empty values.
+        if (count($value) === 1 && isset($value[0]) && $value[0] == -999) {
+            return true;
+        }
+
         return false;
     }
 }
