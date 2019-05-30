@@ -41,11 +41,6 @@ define(["jquery"], function($) {
                                 $(this).val('');
                             }
                         });
-                        // Deactivate the time/date field and remove team members.
-                        $(this).closest('.lines').find('[id$=enabled]:checked,' +
-                            ' .form-autocomplete-selection .tag').each(function () {
-                            $(this).trigger('click');
-                        });
                         // Remove atto editor content.
                         $(this).closest('.lines').find('.editor_atto_content').each(function () {
                             $(this).html('');
@@ -57,6 +52,11 @@ define(["jquery"], function($) {
                         // Remove single select content.
                         $(this).closest('.lines').find('select').each(function () {
                             $(this).find('option[value=""]').prop('selected', true);
+                        });
+                        // Deactivate the time/date field and remove team members.
+                        $(this).closest('.lines').find('[id$=enabled]:checked,' +
+                            ' .form-autocomplete-selection .tag').each(function () {
+                            $(this).trigger('click');
                         });
 
                         // Hide the empty lines if not required or the only line remaining.
