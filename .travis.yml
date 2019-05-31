@@ -16,7 +16,6 @@ addons:
       - google-chrome-stable
 
 php:
-  - 7.0
   - 7.1
 
 env:
@@ -28,12 +27,12 @@ env:
     - DB=pgsql MOODLE_BRANCH=MOODLE_35_STABLE
     - DB=pgsql MOODLE_BRANCH=master
     - DB=mysqli MOODLE_BRANCH=MOODLE_35_STABLE
-    - DB=mysqli MOODLE_BRANCH=master
+    - DB=mysqli MOODLE_BRANCH=MOODLE_36_STABLE
+    - DB=mysqli MOODLE_BRANCH=MOODLE_37_STABLE
 
 matrix:
   allow_failures:
     - env: DB=pgsql MOODLE_BRANCH=master
-    - env: DB=mysqli MOODLE_BRANCH=master
   fast_finish: true
 
 before_install:
@@ -46,10 +45,10 @@ before_install:
 
 jobs:
   include:
-    # Prechecks against latest Moodle stable only.
+    # Prechecks against latest Moodle LTS stable only.
     - stage: static
       php: 7.1
-      env: DB=mysqli MOODLE_BRANCH=MOODLE_34_STABLE
+      env: DB=mysqli MOODLE_BRANCH=MOODLE_35_STABLE
       install:
         - moodle-plugin-ci install --no-init
       script:
