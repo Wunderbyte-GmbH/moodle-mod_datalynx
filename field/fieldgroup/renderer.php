@@ -63,26 +63,36 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
 
         // Show all lines with content, get rid of all after that.
         $lastlinewithcontent = -1;
+        $subfieldnames = [];
 
         for ($line = 0; $line < $maxlines; $line++) {
             foreach ($fieldgroupfields as $fieldid => $subfield) {
                 $lastlinewithcontent = $this->renderer_split_content($entry, $fieldid, $line, $lastlinewithcontent);
                 $subfielddefinition['name'] = $subfield->field->name;
                 $subfielddefinition['content'] = $subfield->renderer()->render_display_mode($entry, $params);
-
+                $subfieldnames[] = $subfield->field->name;
                 $linedispl['subfield'][] = $subfielddefinition; // Build this multidimensional array for mustache context.
             }
             $completedispl['line'][] = $linedispl;
             $linedispl = array(); // Reset.
 
         }
+        $subfieldnames = array_unique($subfieldnames);
+        foreach ($subfieldnames as $name) {
+            $names[] =  ['name' => $name];
+        }
+        $completedispl['header'] = $names;
 
         // We need this construct to make sure intermittent empty lines are shown.
         for ($line = $lastlinewithcontent + 1; $line <= $maxlines; $line++) {
             unset($completedispl['line'][$line]);
         }
+        $viewtype = '';
+        if($view = $this->_field->df->get_current_view()) {
+            $viewtype = ($view->view->type == 'pdf') ? 'pdf' : '';
+        }
 
-        return $OUTPUT->render_from_template('mod_datalynx/fieldgroup', $completedispl);
+        return $OUTPUT->render_from_template('mod_datalynx/fieldgroup' . $viewtype, $completedispl);
     }
 
     /**
