@@ -35,18 +35,21 @@
     }
 }}
 
-
 <table class="table table-striped">
-        <thead>
+    <thead>
+        <tr>
             {{#header}}
-                <th>{{{name}}}</th>
+            <th>{{{name}}}</th>
             {{/header}}
-        </thead>
-{{#line}}
-    <tr>
-    {{#subfield}}
-        <td>{{{content}}}</td>
-    {{/subfield}}
-    </tr>
-{{/line}}
+        </tr>
+    </thead>
+    <tbody>
+        {{#line}}
+        <tr>
+            {{#subfield}}
+            <td>{{{content}}}</td>
+            {{/subfield}}
+        </tr>
+        {{/line}}
+    </tbody>
 </table>

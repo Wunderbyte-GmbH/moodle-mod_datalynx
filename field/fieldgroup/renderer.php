@@ -89,6 +89,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         }
         $viewtype = '';
         if ($view = $this->_field->df->get_current_view()) {
+            // Special mustache template for pdf rendering of fieldgroups.
             $viewtype = ($view->view->type == 'pdf') ? 'pdf' : '';
         }
 
