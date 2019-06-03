@@ -30,8 +30,13 @@
 
     Example context (json):
     {
-        "name" : "textfield",
-        "content" : "testtext"
+        "line":[
+            {"subfield":[{"name":"a","content":"a0"},{"name":"b","content":"b0"}]},
+            {"subfield":[{"name":"a","content":"a1"},{"name":"b","content":"b1"}]}
+        ],
+        "header":[
+            {"name":"a"},{"name":"b"}
+        ]
     }
 }}
 
@@ -39,7 +44,7 @@
     {{#header.0}}
     <tr>
         {{#header}}
-        <th>{{{name}}}</th>
+        <th><b>{{{name}}}</b></th>
         {{/header}}
     </tr>
     {{/header.0}}
