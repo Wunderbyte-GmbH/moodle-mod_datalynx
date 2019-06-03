@@ -79,7 +79,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         }
         $subfieldnames = array_unique($subfieldnames);
         foreach ($subfieldnames as $name) {
-            $names[] =  ['name' => $name];
+            $names[] = ['name' => $name];
         }
         $completedispl['header'] = $names;
 
@@ -88,7 +88,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
             unset($completedispl['line'][$line]);
         }
         $viewtype = '';
-        if($view = $this->_field->df->get_current_view()) {
+        if ($view = $this->_field->df->get_current_view()) {
             $viewtype = ($view->view->type == 'pdf') ? 'pdf' : '';
         }
 
