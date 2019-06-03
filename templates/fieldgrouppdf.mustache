@@ -36,20 +36,16 @@
 }}
 
 <table class="table table-striped">
-    <thead>
-        <tr>
-            {{#header}}
-            <th>{{{name}}}</th>
-            {{/header}}
-        </tr>
-    </thead>
-    <tbody>
-        {{#line}}
-        <tr>
-            {{#subfield}}
-            <td>{{{content}}}</td>
-            {{/subfield}}
-        </tr>
-        {{/line}}
-    </tbody>
+    <tr>
+        {{#header}}
+        <th>{{{name}}}</th>
+        {{/header}}
+    </tr>
+    {{#line}}
+    <tr>
+        {{#subfield}}
+        <td>{{{content}}}</td>
+        {{/subfield}}
+    </tr>
+    {{/line}}
 </table>
