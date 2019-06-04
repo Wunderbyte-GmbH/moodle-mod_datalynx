@@ -373,7 +373,9 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
                     // This is the "empty" operator.
                     $usecontent = false;
                     $sqlnot = $DB->sql_like("content", ":{$name}_hascontent");
-                    $params["{$name}_hascontent"] = "%";
+
+                    // Autocomplete stores [] if empty. Has content when at least [1].
+                    $params["{$name}_hascontent"] = "___%";
 
                     if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) { // There are
                                                                                       // non-empty.
