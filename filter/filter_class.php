@@ -786,6 +786,9 @@ class datalynx_filter_manager {
                                 }
                                 // Update cached filters.
                                 $this->_filters[$filter->id] = $filter;
+                            } else {
+                                // Form validation failed so return to form.
+                                $this->display_filter_form($filterform, $filter);
                             }
                         }
 
@@ -1680,5 +1683,3 @@ class datalynx_filter_manager {
     } // End function.
 
 }
-
-

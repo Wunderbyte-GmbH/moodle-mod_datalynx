@@ -271,6 +271,9 @@ class manager {
                                 $event->trigger();
                             }
                             $this->_filters[$filter->id] = $filter;
+                        } else {
+                            // Form validation failed so return to form.
+                            $this->display_filter_form($filterform, $filter);
                         }
 
                         break;

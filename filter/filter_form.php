@@ -511,4 +511,3 @@ class mod_datalynx_customfilter_frontend_form extends mod_datalynx_filter_base_f
         $this->add_action_buttons(false, get_string('search'));
     }
 }
-
