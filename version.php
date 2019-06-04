@@ -22,7 +22,7 @@
  */
 defined('MOODLE_INTERNAL') or die();
 $plugin->component = 'mod_datalynx';
-$plugin->version = 2019042300;
-$plugin->release = '1.6.0 Kim Wexler'; // Famous movie, theater and tv series characters.
+$plugin->version = 2019060400;
+$plugin->release = '1.6.1 Kim Wexler'; // Famous movie, theater and tv series characters.
 $plugin->requires = 2016052300;
 $plugin->maturity = MATURITY_STABLE;

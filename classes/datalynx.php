@@ -488,8 +488,10 @@ class datalynx {
                 $editmode = optional_param('editentries', 0, PARAM_SEQUENCE);
                 $editstring = get_string('editmode', 'datalynx');
                 $edit = $editmode ? " ({$editstring})" : "";
+                $editbodyclass = $editmode ? 'datalynx-editentry' : 'datalynx-displayentry';
                 $pagename = "{$modulename}: {$viewname}: {$pagestring} {$pagenum}{$edit}";
                 $PAGE->set_title($pagename);
+                $PAGE->add_body_classes([$editbodyclass]);
             } else {
                 $manage = get_string('managemode', 'datalynx');
                 $what = strpos($page, 'view') !== false ? get_string('views', 'datalynx') : '???';

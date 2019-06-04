@@ -46,7 +46,7 @@ class datalynxfield_number_renderer extends datalynxfield_text_renderer {
                 $entry->{"c{$fieldid}_content"})) {
             $content = $entry->{"c{$fieldid}_content"};
         }
-        $fieldattr = array();
+        $fieldattr = [];
         $mform->addElement('text', $fieldname, null, $fieldattr);
         $mform->setType($fieldname, PARAM_RAW);
         $mform->addRule($fieldname, get_string('err_numeric', 'datalynx'), 'numeric', null, 'client');
@@ -64,7 +64,6 @@ class datalynxfield_number_renderer extends datalynxfield_text_renderer {
     public function render_display_mode(stdClass $entry, array $params) {
         $field = $this->_field;
         $fieldid = $field->id();
-        $entryid = $entry->id;
         $outputemptystring = !empty($field->get('param4')) ? $field->get('param4') : 0;
         if (!isset($entry->{"c{$fieldid}_content"}) and !$outputemptystring) {
             return 0;
@@ -85,7 +84,7 @@ class datalynxfield_number_renderer extends datalynxfield_text_renderer {
 
     /**
      *
-     * {@inheritDoc}
+     * {@inheritDoc}$str
      * @see datalynxfield_text_renderer::render_search_mode()
      */
     public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
