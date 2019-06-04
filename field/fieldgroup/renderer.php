@@ -163,7 +163,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 }
                 $mform->addElement('html', '</div>');
             }
-            $mform->addElement('html',  '<div class="col"><button class="btn btn-secondary btn-danger" type="button" data-removeline="' . $thisline. '">
+            $mform->addElement('html',  '<div class="col"><button class="btn btn-secondary btn-danger btn-delete" type="button" data-removeline="' . $thisline. '">
                 ' . get_string('delete') . '</button></div>');
             // End of row.
             $mform->addElement('html', '</div>');
