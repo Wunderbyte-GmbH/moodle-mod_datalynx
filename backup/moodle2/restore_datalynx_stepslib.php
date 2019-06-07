@@ -143,8 +143,18 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
 
         $data->dataid = $this->get_new_parentid('datalynx');
 
-            // When datalynxview restored on the same site, keep the reference to the datalynx
-            // instance unchanged.
+        // In case we restore a fieldgroup we need to update mapping of param1.
+        if ($data->type == 'fieldgroup') {
+            $oldsubfields = json_decode($data->param1);
+            $newsubfields = array();
+            foreach ($oldsubfields as $oldsubfield) {
+                $newsubfields[] = $this->get_mappingid('datalynx_field', $oldsubfield);
+            }
+            $data->param1 = json_encode($newsubfields);
+        }
+
+        // When datalynxview restored on the same site, keep the reference to the datalynx
+        // instance unchanged.
         if ($data->type == 'datalynxview' && !$this->get_task()->is_samesite()) {
             // Otherwhise set references to 0. TODO: Add error messages.
             $data->param1 = $this->get_mappingid('datalynx', $data->param1);
