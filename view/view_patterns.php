@@ -252,8 +252,8 @@ class datalynxview_patterns {
         $userid = $userid ? $userid : $USER->id;
         $df = $this->_view->get_df();
         $maxentries = $df->data->maxentries;
-        if ($writeentry){
-            if ($maxentries == -1) {
+        if ($writeentry) {
+                if ($maxentries == -1) {
                 return true;
             }
             $params = array('userid' => $userid, 'dataid' => $df->id());
