@@ -254,7 +254,7 @@ class datalynxview_patterns {
         $maxentries = $df->data->maxentries;
         $writeentry = has_capability('mod/datalynx:writeentry', $df->context);
         if ($writeentry) {
-            if ($maxentries == -1) { 
+            if ($maxentries == -1) {
                 return true;
             }
             $params = array('userid' => $userid, 'dataid' => $df->id());
