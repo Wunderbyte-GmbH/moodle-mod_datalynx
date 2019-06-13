@@ -252,9 +252,9 @@ class datalynxview_patterns {
         $userid = $userid ? $userid : $USER->id;
         $df = $this->_view->get_df();
         $maxentries = $df->data->maxentries;
-        $writeentry = has_capability('mod/datalynx:writeentry',$df->context);
+        $writeentry = has_capability('mod/datalynx:writeentry', $df->context);
         if ($writeentry) {
-            if ($maxentries == -1){ 
+            if ($maxentries == -1) { 
                 return true;
             }
             $params = array('userid' => $userid, 'dataid' => $df->id());
@@ -265,8 +265,7 @@ class datalynxview_patterns {
             $count = $DB->get_field_sql($sql, $params);
 
             return $count < $maxentries;
-        }
-        else {
+        } else {
             return false;
         }
     }
