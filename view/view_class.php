@@ -597,7 +597,8 @@ abstract class datalynxview_base {
             $output = $notifications . $OUTPUT->continue_button($url);
         }
 
-        $viewname = 'datalynxview-' . preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $this->name()));
+        $is_student = $this->is_student();
+        $viewname = 'datalynxview-' . preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $this->name())) . " " . $is_student;
         $output = html_writer::tag('div', $output, array('class' => $viewname));
 
         if ($tohtml) {
@@ -1679,5 +1680,19 @@ abstract class datalynxview_base {
             }
         }
         return $fields;
+    }
+
+    private function is_student() {
+        global $DB,$COURSE; 
+        $courseid  = $COURSE->id;
+        $rolestr = array();
+        $context = context_course::instance($courseid);
+        $roles = get_user_roles($context, $singleuser->userid);
+        foreach ($roles as $role) {
+                if (role_get_name($role, $context) == "Student") {
+                $roleclass = "student";
+            } 
+        }
+        return $roleclass; 
     }
 }
