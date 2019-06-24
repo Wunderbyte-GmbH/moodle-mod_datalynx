@@ -2296,9 +2296,9 @@ class datalynx {
     }
 
     /**
-    * Checks if a name exists in the given table.
-    * Use $id to exclude known entry when editing.
-    */
+     * Checks if a name exists in the given table.
+     * Use $id to exclude known entry when editing.
+     */
     public function name_exists($table, $name, $id = 0) {
         global $DB;
 
