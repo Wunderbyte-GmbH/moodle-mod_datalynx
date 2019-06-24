@@ -203,7 +203,7 @@ class backend_form extends base_form {
         $errors = parent::validation($data, $files);
 
         $dl = $this->_dl;
-        if (empty($data['name']) || $dl->name_exists('customfilters', $data['name'])) {
+        if (empty($data['name']) || $dl->name_exists('customfilters', $data['name'], $this->_customfilter->id)) {
             $errors['name'] = get_string('invalidname', 'datalynx',
                     get_string('filter', 'datalynx'));
         }
