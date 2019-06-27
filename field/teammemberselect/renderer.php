@@ -238,7 +238,9 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
             }
             if (isset($formdata->$formfieldname)) {
                 // Get rid of Dummy value -999 to correct calculations.
-                array_shift($formdata->{$formfieldname});
+                if (isset($formdata->{$formfieldname}[0]) && $formdata->{$formfieldname}[0] == -999) {
+                    array_shift($formdata->{$formfieldname});
+                }
 
                 // Limit chosen users to max teamsize and ensure min teamsize users are chosen!
                 $teamsize = count($formdata->$formfieldname);
