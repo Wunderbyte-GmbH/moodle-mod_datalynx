@@ -102,7 +102,7 @@ if ($urlparams->duplicate and confirm_sesskey()) { // Duplicate any requested vi
 // Any notifications?
 $df->notifications['bad']['defaultview'] = '';
 $df->notifications['bad']['getstartedviews'] = '';
-if (!$views = $df->get_views_by_type('import', true)) {
+if (!$views = $df->get_views_by_type('csv', true)) {
     $df->notifications['bad'][] = get_string('importnoneindatalynx', 'datalynx'); // Nothing in.
     // Database.
 }
@@ -112,7 +112,7 @@ $df->print_header(array('tab' => 'import', 'urlparams' => $urlparams));
 
 // Print add import link.
 $addimporturl = new moodle_url('/mod/datalynx/view/view_edit.php',
-        array('d' => $df->id(), 'type' => 'import', 'sesskey' => sesskey()));
+        array('d' => $df->id(), 'type' => 'csv', 'sesskey' => sesskey()));
 $addimportlink = html_writer::link($addimporturl, get_string('importadd', 'datalynx'));
 $br = html_writer::empty_tag('br');
 echo html_writer::tag('div', $addimportlink . $br . $br, array('class' => 'mdl-align'));
