@@ -258,6 +258,23 @@ class datalynxfield_file extends datalynxfield_base {
     }
 
     /**
+     *
+     * @param $search
+     * @return array|null $fieldsql, $fieldparams, $fromcontent
+     * @throws coding_exception
+     * @throws dml_exception
+     */
+    public function get_search_sql($search) {
+        list($not, $operator, $value) = $search;
+
+        // If we deal with files it is also missing if content is 0.
+        // We keep the not and compare with exactly 1 in the content column.
+        $value = '1';
+        $operator = '=';
+        return parent::get_search_sql(array($not, $operator, $value));
+    }
+
+    /**
      * Are fields of this field type suitable for use in customfilters?
      * @return bool
      */

@@ -131,8 +131,8 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
             $arr = array();
             $options = array(
                     -1  => get_string('choose'),
-                    0 => get_string('filemissing', 'datalynx'),
-                    1 => get_string('fileexist', 'datalynx')
+                    1 => get_string('filemissing', 'datalynx'),
+                    0 => get_string('fileexist', 'datalynx')
             );
             $arr[] = $mform->createElement('select', $fieldname, '', $options);
             $mform->setType($fieldname, PARAM_INT);
