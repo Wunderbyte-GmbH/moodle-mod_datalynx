@@ -41,5 +41,5 @@ $messageproviders = array(
 
         'event_rating_updated' => array('capability' => 'mod/datalynx:notifyratingadded'),
 
-        'event_team_updated' => array('capability' => 'mod/datalynx:notifymemberupdated')
+        'event_team_updated' => array('capability' => 'mod/datalynx:notifyteamupdated')
 );
