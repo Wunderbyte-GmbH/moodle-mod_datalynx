@@ -249,7 +249,7 @@ class datalynxview_pdf extends datalynxview_base {
             $pagecount++;
 
         }
-        
+
         // Merge attached pdfs.
         $pagecount = $this->mergepdfs($pdf, $pagecount);
 
