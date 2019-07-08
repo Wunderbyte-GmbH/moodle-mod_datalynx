@@ -269,11 +269,20 @@ class datalynxview_pdf extends datalynxview_base {
                 continue;
             }
 
-            $pdf->AddPage();
-            $importpagecount = $pdf->setSourceFile('../../a.pdf');
-            $importtemplate = $pdf->ImportPage($importpagecount);
-            $pdf->useTemplate($importtemplate);
-            $pagecount = $pagecount + $importpagecount;
+            // We have to copy every file to the temp moodle fs to use it.
+            $tmpdir = make_temp_directory('files');
+            $filename = $file->get_filename();
+            $filepath = "$tmpdir/$filename";
+            if ($file->copy_content_to($filepath)) {
+                $this->_tmpfiles[] = $filepath;
+
+                $pdf->AddPage();
+                $importpagecount = $pdf->setSourceFile($filepath);
+                $importtemplate = $pdf->ImportPage($importpagecount);
+                $pdf->useTemplate($importtemplate);
+                $pagecount = $pagecount + $importpagecount;
+            }
+
         }
 
         // Set TOC.
