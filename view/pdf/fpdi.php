@@ -25,13 +25,11 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// namespace assignfeedback_editpdf;
-
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->libdir.'/pdflib.php');
-require_once($CFG->dirroot.'/mod/datalynx/view/pdf/fpdi/fpdi.php');
+require_once($CFG->dirroot.'/mod/assign/feedback/editpdf/fpdi/fpdi.php');
 
 /**
  * Library code for manipulating PDFs
@@ -115,7 +113,7 @@ class pdfi extends \FPDI {
         foreach ($pdflist as $file) {
             $pagecount = $this->setSourceFile($file);
             $totalpagecount += $pagecount;
-            for ($i = 1; $i<=$pagecount; $i++) {
+            for ($i = 1; $i <= $pagecount; $i++) {
                 $this->create_page_from_source($i);
             }
         }
@@ -194,7 +192,7 @@ class pdfi extends \FPDI {
         if (!$this->filename) {
             return false;
         }
-        if ($this->currentpage>=$this->pagecount) {
+        if ($this->currentpage >= $this->pagecount) {
             return false;
         }
         $this->currentpage++;
@@ -440,7 +438,7 @@ class pdfi extends \FPDI {
                 $sx = min($sx, $ex) + $rx;
                 $sy = min($sy, $ey) + $ry;
 
-                // $rx and $ry should be >= min width and height
+                // Variable $rx and $ry should be >= min width and height.
                 if ($rx < self::MIN_ANNOTATION_WIDTH) {
                     $rx = self::MIN_ANNOTATION_WIDTH;
                 }
@@ -456,7 +454,7 @@ class pdfi extends \FPDI {
                 $sx = min($sx, $ex);
                 $sy = min($sy, $ey);
 
-                // Width or height should be >= min width and height
+                // Width or height should be >= min width and height.
                 if ($w < self::MIN_ANNOTATION_WIDTH) {
                     $w = self::MIN_ANNOTATION_WIDTH;
                 }
@@ -473,7 +471,7 @@ class pdfi extends \FPDI {
                 $this->SetAlpha(0.5, 'Normal', 0.5, 'Normal');
                 $this->SetLineWidth(8.0 * $this->scale);
 
-                // width should be >= min width
+                // Width should be >= min width.
                 if ($w < self::MIN_ANNOTATION_WIDTH) {
                     $w = self::MIN_ANNOTATION_WIDTH;
                 }
@@ -570,8 +568,8 @@ class pdfi extends \FPDI {
             $imagefilearg = \escapeshellarg($imagefile);
             $filename = \escapeshellarg($this->filename);
             $pagenoinc = \escapeshellarg($pageno + 1);
-            $command = "$gsexec -q -sDEVICE=png16m -dSAFER -dBATCH -dNOPAUSE -r$imageres -dFirstPage=$pagenoinc -dLastPage=$pagenoinc ".
-                "-dDOINTERPOLATE -dGraphicsAlphaBits=4 -dTextAlphaBits=4 -sOutputFile=$imagefilearg $filename";
+            $command = "$gsexec -q -sDEVICE=png16m -dSAFER -dBATCH -dNOPAUSE -r$imageres -dFirstPage=$pagenoinc ".
+            "-dLastPage=$pagenoinc -dDOINTERPOLATE -dGraphicsAlphaBits=4 -dTextAlphaBits=4 -sOutputFile=$imagefilearg $filename";
 
             $output = null;
             $result = exec($command, $output);

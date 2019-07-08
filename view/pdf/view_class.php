@@ -840,7 +840,7 @@ class dfpdf extends pdfi {
         }
     }
 
-    // phpcs:enable
+    // Phpcs:enable.
     protected function set_page_numbers($text) {
         $replacements = array('##pagenumber##' => $this->getAliasNumPage(),
                 '##totalpages##' => $this->getAliasNbPages());
