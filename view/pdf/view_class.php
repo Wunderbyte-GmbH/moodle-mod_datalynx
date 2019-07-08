@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') or die();
 
 require_once("$CFG->dirroot/mod/datalynx/view/view_class.php");
-require_once("$CFG->libdir/pdflib.php");
+require_once("$CFG->dirroot/mod/datalynx/view/pdf/fpdi.php");
 
 class datalynxview_pdf extends datalynxview_base {
 
@@ -251,6 +251,29 @@ class datalynxview_pdf extends datalynxview_base {
             $pagecontent = $this->process_content_images($pagecontent);
             $this->write_html($pdf, $pagecontent);
             $pagecount++;
+
+            // If we want to keep attached pdf with their entry we have to modify this process.
+
+        }
+
+        // If pdf is attached add it after this, add all files after all entries.
+        // Current code assumes we want to attach all files linked to this context.
+        $contextid = $this->_df->context->id;
+        $fs = get_file_storage();
+        $files = $fs->get_area_files($contextid, 'mod_datalynx', 'content');
+        foreach ($files as $file) {
+            if ($file->is_directory()) {
+                continue;
+            }
+            if ($file->get_mimetype() != 'application/pdf') {
+                continue;
+            }
+
+            $pdf->AddPage();
+            $importpagecount = $pdf->setSourceFile('../../a.pdf');
+            $importtemplate = $pdf->ImportPage($importpagecount);
+            $pdf->useTemplate($importtemplate);
+            $pagecount = $pagecount + $importpagecount;
         }
 
         // Set TOC.
@@ -778,7 +801,7 @@ class datalynxview_pdf extends datalynxview_base {
 }
 
 // Extend the TCPDF class to create custom Header and Footer.
-class dfpdf extends pdf {
+class dfpdf extends pdfi {
 
     protected $_dfsettings;
 
