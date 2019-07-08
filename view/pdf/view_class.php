@@ -69,7 +69,7 @@ class datalynxview_pdf extends datalynxview_base {
         parent::__construct($df, $view);
 
         if (!empty($this->view->param1)) {
-            if ($decoded = base64_decode($this->view->param1, true)) {
+            if (base64_decode($this->view->param1, true)) {
                 $settings = unserialize(base64_decode($this->view->param1));
             } else {
                 $settings = unserialize($this->view->param1);
@@ -155,8 +155,6 @@ class datalynxview_pdf extends datalynxview_base {
     /**
      */
     public function process_export($export = self::EXPORT_PAGE) {
-        global $CFG;
-
         $settings = $this->_settings;
         $this->_tmpfiles = array();
 
@@ -197,7 +195,6 @@ class datalynxview_pdf extends datalynxview_base {
         } else {
             if ($export == self::EXPORT_PAGE) {
                 // Nothing to change in filter.
-                $x = 1;
             } else {
                 if ($export) {
                     // Specific entry requested.
@@ -253,38 +250,10 @@ class datalynxview_pdf extends datalynxview_base {
             $this->write_html($pdf, $pagecontent);
             $pagecount++;
 
-            // If we want to keep attached pdf with their entry we have to modify this process.
-
         }
 
-        // If pdf is attached add it after this, add all files after all entries.
-        // Current code assumes we want to attach all files linked to this context.
-        $contextid = $this->_df->context->id;
-        $fs = get_file_storage();
-        $files = $fs->get_area_files($contextid, 'mod_datalynx', 'content');
-        foreach ($files as $file) {
-            if ($file->is_directory()) {
-                continue;
-            }
-            if ($file->get_mimetype() != 'application/pdf') {
-                continue;
-            }
-
-            // We have to copy every file to the temp moodle fs to use it.
-            $tmpdir = make_temp_directory('files');
-            $filename = $file->get_filename();
-            $filepath = "$tmpdir/$filename";
-            if ($file->copy_content_to($filepath)) {
-                $this->_tmpfiles[] = $filepath;
-
-                $pdf->AddPage();
-                $importpagecount = $pdf->setSourceFile($filepath);
-                $importtemplate = $pdf->ImportPage($importpagecount);
-                $pdf->useTemplate($importtemplate);
-                $pagecount = $pagecount + $importpagecount;
-            }
-
-        }
+        //
+        $pagecount = $this->mergepdfs($pdf, $pagecount);
 
         // Set TOC.
         if (!empty($settings->toc->page)) {
@@ -791,7 +760,7 @@ class datalynxview_pdf extends datalynxview_base {
         if (count($this->_entries->entries()) == 1 && $fields = $this->_df->get_fields()) {
             $entries = $this->_entries->entries();
             $entry = reset($entries);
-            foreach ($fields as $fieldid => $field) {
+            foreach ($fields as $field) {
                 $addtags = $field->renderer()->search($namepattern);
                 $additional = $field->get_definitions($foundtags, $entry, array());
                 if ($addtags && $additional) {
@@ -807,6 +776,39 @@ class datalynxview_pdf extends datalynxview_base {
         }
         $namepattern = clean_param($namepattern, PARAM_FILE);
         return "$namepattern.pdf";
+    }
+
+    /**
+     * Merges all pdfs that were uploaded by users in the field class file.
+     * Current code assumes we want to attach all files linked to this context.
+     */
+    protected function mergepdfs($pdf, $pagecount) {
+        $contextid = $this->_df->context->id;
+        $fs = get_file_storage();
+        $files = $fs->get_area_files($contextid, 'mod_datalynx', 'content');
+        foreach ($files as $file) {
+            if ($file->is_directory()) {
+                continue;
+            }
+            if ($file->get_mimetype() != 'application/pdf') {
+                continue;
+            }
+            // We have to copy every file to the temp moodle fs to use it.
+            $tmpdir = make_temp_directory('files');
+            $filename = $file->get_filename();
+            $filepath = "$tmpdir/$filename";
+            if ($file->copy_content_to($filepath)) {
+                $this->_tmpfiles[] = $filepath;
+
+                $pdf->AddPage();
+                $importpagecount = $pdf->setSourceFile($filepath);
+                $importtemplate = $pdf->ImportPage($importpagecount);
+                $pdf->useTemplate($importtemplate);
+                $pagecount = $pagecount + $importpagecount;
+            }
+
+        }
+        return $pagecount;
     }
 }
 
