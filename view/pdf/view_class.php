@@ -193,9 +193,7 @@ class datalynxview_pdf extends datalynxview_base {
         if ($export == self::EXPORT_ALL) {
             $this->_filter->perpage = 0;
         } else {
-            if ($export == self::EXPORT_PAGE) {
-                // Nothing to change in filter.
-            } else {
+            if ($export != self::EXPORT_PAGE) {
                 if ($export) {
                     // Specific entry requested.
                     $this->_filter->eids = $export;
@@ -251,8 +249,8 @@ class datalynxview_pdf extends datalynxview_base {
             $pagecount++;
 
         }
-
-        //
+        
+        // Merge attached pdfs.
         $pagecount = $this->mergepdfs($pdf, $pagecount);
 
         // Set TOC.
