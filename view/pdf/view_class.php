@@ -25,7 +25,8 @@
 defined('MOODLE_INTERNAL') or die();
 
 require_once("$CFG->dirroot/mod/datalynx/view/view_class.php");
-require_once("$CFG->dirroot/mod/datalynx/view/pdf/fpdi.php");
+require_once("$CFG->libdir/pdflib.php");
+require_once("$CFG->dirroot/mod/assign/feedback/editpdf/fpdi/fpdi.php");
 
 class datalynxview_pdf extends datalynxview_base {
 
@@ -810,7 +811,7 @@ class datalynxview_pdf extends datalynxview_base {
 }
 
 // Extend the TCPDF class to create custom Header and Footer.
-class dfpdf extends pdfi {
+class dfpdf extends FPDI {
 
     protected $_dfsettings;
 
