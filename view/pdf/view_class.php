@@ -780,19 +780,21 @@ class datalynxview_pdf extends datalynxview_base {
      */
     protected function mergepdfs($pdf, $pagecount) {
         // Check what fields are file class.
-        $fieldsinview = $this->get_view_fields();
-        foreach ($fieldsinview as $fieldid => $fieldinview) {
-            if ($fieldinview->type != 'file') {
-                unset($fieldsinview[$fieldid]);
+        $filefieldids = array();
+        foreach ($this->get_view_fields() as $fieldid => $fieldinview) {
+            if ($fieldinview->type == 'file') {
+                $filefieldids[] = $fieldid);
             }
+        }
+        // Stop here if no file fields in this view.
+        if (!$filefieldids) {
+            return $pagecount;
         }
 
         // Create a list of files we need to merge to the export pdf.
         $filestomerge = array();
-
-        // Loop every entry and check for file related content.
         foreach ($this->_entries->get_entries()->entries as $entry) {
-            foreach ($fieldsinview as $fieldid => $fieldinview) {
+            foreach ($filefieldids as $fieldid) {
                 if (!isset($entry->{'c'.$fieldid.'_content'})) {
                     continue;
                 }
@@ -803,7 +805,6 @@ class datalynxview_pdf extends datalynxview_base {
                 $filestomerge[] = $entry->{'c'.$fieldid.'_id'};
             }
         }
-
         // Stop here if nothing to merge.
         if (!$filestomerge) {
             return $pagecount;
