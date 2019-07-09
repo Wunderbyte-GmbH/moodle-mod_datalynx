@@ -783,7 +783,7 @@ class datalynxview_pdf extends datalynxview_base {
         $filefieldids = array();
         foreach ($this->get_view_fields() as $fieldid => $fieldinview) {
             if ($fieldinview->type == 'file') {
-                $filefieldids[] = $fieldid);
+                $filefieldids[] = $fieldid;
             }
         }
         // Stop here if no file fields in this view.
