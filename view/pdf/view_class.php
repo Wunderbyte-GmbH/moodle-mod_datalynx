@@ -59,8 +59,7 @@ class datalynxview_pdf extends datalynxview_base {
                 'fill-forms' => get_string('perm_fill-forms', 'datalynxview_pdf'),
                 'extract' => get_string('perm_extract', 'datalynxview_pdf'),
                 'assemble' => get_string('perm_assemble', 'datalynxview_pdf'),
-                'print-high' => get_string('perm_print-high',
-                        'datalynxview_pdf'));
+                'print-high' => get_string('perm_print-high', 'datalynxview_pdf'));
     }
 
     /**
@@ -133,7 +132,6 @@ class datalynxview_pdf extends datalynxview_base {
      * process any view specific actions
      */
     public function process_data() {
-        global $CFG;
 
         // Process pdf export request.
         if (optional_param('pdfexportall', 0, PARAM_INT)) {
@@ -781,6 +779,36 @@ class datalynxview_pdf extends datalynxview_base {
      * Current code assumes we want to attach all files linked to this context.
      */
     protected function mergepdfs($pdf, $pagecount) {
+        // Check what fields are file class.
+        $fieldsinview = $this->get_view_fields();
+        foreach ($fieldsinview as $fieldid => $fieldinview) {
+            if ($fieldinview->type != 'file') {
+                unset($fieldsinview[$fieldid]);
+            }
+        }
+
+        // Create a list of files we need to merge to the export pdf.
+        $filestomerge = array();
+
+        // Loop every entry and check for file related content.
+        foreach ($this->_entries->get_entries()->entries as $entry) {
+            foreach ($fieldsinview as $fieldid => $fieldinview) {
+                if (!isset($entry->{'c'.$fieldid.'_content'})) {
+                    continue;
+                }
+                if ($entry->{'c'.$fieldid.'_content'} != 1) {
+                    continue;
+                }
+                // If content == 1 and id is set add to merging files.
+                $filestomerge[] = $entry->{'c'.$fieldid.'_id'};
+            }
+        }
+
+        // Stop here if nothing to merge.
+        if (!$filestomerge) {
+            return $pagecount;
+        }
+
         $contextid = $this->_df->context->id;
         $fs = get_file_storage();
         $files = $fs->get_area_files($contextid, 'mod_datalynx', 'content');
@@ -791,6 +819,10 @@ class datalynxview_pdf extends datalynxview_base {
             if ($file->get_mimetype() != 'application/pdf') {
                 continue;
             }
+            if (!in_array($file->get_itemid(), $filestomerge)) {
+                continue;
+            }
+
             // We have to copy every file to the temp moodle fs to use it.
             $tmpdir = make_temp_directory('files');
             $filename = $file->get_filename();
@@ -798,10 +830,12 @@ class datalynxview_pdf extends datalynxview_base {
             if ($file->copy_content_to($filepath)) {
                 $this->_tmpfiles[] = $filepath;
 
-                $pdf->AddPage();
                 $importpagecount = $pdf->setSourceFile($filepath);
-                $importtemplate = $pdf->ImportPage($importpagecount);
-                $pdf->useTemplate($importtemplate);
+                for ($pagenumber = 1; $pagenumber <= $importpagecount; $pagenumber++) {
+                    $importtemplate = $pdf->ImportPage($pagenumber);
+                    $pdf->AddPage();
+                    $pdf->useTemplate($importtemplate);
+                }
                 $pagecount = $pagecount + $importpagecount;
             }
 
