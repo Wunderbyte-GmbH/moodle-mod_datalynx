@@ -26,6 +26,7 @@ defined('MOODLE_INTERNAL') or die();
 
 require_once("$CFG->dirroot/mod/datalynx/view/view_class.php");
 require_once("$CFG->libdir/pdflib.php");
+require_once("$CFG->dirroot/mod/assign/feedback/editpdf/fpdi/fpdi.php");
 
 class datalynxview_pdf extends datalynxview_base {
 
@@ -58,8 +59,7 @@ class datalynxview_pdf extends datalynxview_base {
                 'fill-forms' => get_string('perm_fill-forms', 'datalynxview_pdf'),
                 'extract' => get_string('perm_extract', 'datalynxview_pdf'),
                 'assemble' => get_string('perm_assemble', 'datalynxview_pdf'),
-                'print-high' => get_string('perm_print-high',
-                        'datalynxview_pdf'));
+                'print-high' => get_string('perm_print-high', 'datalynxview_pdf'));
     }
 
     /**
@@ -68,7 +68,7 @@ class datalynxview_pdf extends datalynxview_base {
         parent::__construct($df, $view);
 
         if (!empty($this->view->param1)) {
-            if ($decoded = base64_decode($this->view->param1, true)) {
+            if (base64_decode($this->view->param1, true)) {
                 $settings = unserialize(base64_decode($this->view->param1));
             } else {
                 $settings = unserialize($this->view->param1);
@@ -132,7 +132,6 @@ class datalynxview_pdf extends datalynxview_base {
      * process any view specific actions
      */
     public function process_data() {
-        global $CFG;
 
         // Process pdf export request.
         if (optional_param('pdfexportall', 0, PARAM_INT)) {
@@ -154,8 +153,6 @@ class datalynxview_pdf extends datalynxview_base {
     /**
      */
     public function process_export($export = self::EXPORT_PAGE) {
-        global $CFG;
-
         $settings = $this->_settings;
         $this->_tmpfiles = array();
 
@@ -194,10 +191,7 @@ class datalynxview_pdf extends datalynxview_base {
         if ($export == self::EXPORT_ALL) {
             $this->_filter->perpage = 0;
         } else {
-            if ($export == self::EXPORT_PAGE) {
-                // Nothing to change in filter.
-                $x = 1;
-            } else {
+            if ($export != self::EXPORT_PAGE) {
                 if ($export) {
                     // Specific entry requested.
                     $this->_filter->eids = $export;
@@ -251,7 +245,11 @@ class datalynxview_pdf extends datalynxview_base {
             $pagecontent = $this->process_content_images($pagecontent);
             $this->write_html($pdf, $pagecontent);
             $pagecount++;
+
         }
+
+        // Merge attached pdfs.
+        $pagecount = $this->mergepdfs($pdf, $pagecount);
 
         // Set TOC.
         if (!empty($settings->toc->page)) {
@@ -758,7 +756,7 @@ class datalynxview_pdf extends datalynxview_base {
         if (count($this->_entries->entries()) == 1 && $fields = $this->_df->get_fields()) {
             $entries = $this->_entries->entries();
             $entry = reset($entries);
-            foreach ($fields as $fieldid => $field) {
+            foreach ($fields as $field) {
                 $addtags = $field->renderer()->search($namepattern);
                 $additional = $field->get_definitions($foundtags, $entry, array());
                 if ($addtags && $additional) {
@@ -775,10 +773,80 @@ class datalynxview_pdf extends datalynxview_base {
         $namepattern = clean_param($namepattern, PARAM_FILE);
         return "$namepattern.pdf";
     }
+
+    /**
+     * Merges all pdfs that were uploaded by users in the field class file.
+     * Current code assumes we want to attach all files linked to this context.
+     */
+    protected function mergepdfs($pdf, $pagecount) {
+        // Check what fields are file class.
+        $filefieldids = array();
+        foreach ($this->get_view_fields() as $fieldid => $fieldinview) {
+            if ($fieldinview->type == 'file') {
+                $filefieldids[] = $fieldid;
+            }
+        }
+        // Stop here if no file fields in this view.
+        if (!$filefieldids) {
+            return $pagecount;
+        }
+
+        // Create a list of files we need to merge to the export pdf.
+        $filestomerge = array();
+        foreach ($this->_entries->get_entries()->entries as $entry) {
+            foreach ($filefieldids as $fieldid) {
+                if (!isset($entry->{'c'.$fieldid.'_content'})) {
+                    continue;
+                }
+                if ($entry->{'c'.$fieldid.'_content'} != 1) {
+                    continue;
+                }
+                // If content == 1 and id is set add to merging files.
+                $filestomerge[] = $entry->{'c'.$fieldid.'_id'};
+            }
+        }
+        // Stop here if nothing to merge.
+        if (!$filestomerge) {
+            return $pagecount;
+        }
+
+        $contextid = $this->_df->context->id;
+        $fs = get_file_storage();
+        $files = $fs->get_area_files($contextid, 'mod_datalynx', 'content');
+        foreach ($files as $file) {
+            if ($file->is_directory()) {
+                continue;
+            }
+            if ($file->get_mimetype() != 'application/pdf') {
+                continue;
+            }
+            if (!in_array($file->get_itemid(), $filestomerge)) {
+                continue;
+            }
+
+            // We have to copy every file to the temp moodle fs to use it.
+            $tmpdir = make_temp_directory('files');
+            $filename = $file->get_filename();
+            $filepath = "$tmpdir/$filename";
+            if ($file->copy_content_to($filepath)) {
+                $this->_tmpfiles[] = $filepath;
+
+                $importpagecount = $pdf->setSourceFile($filepath);
+                for ($pagenumber = 1; $pagenumber <= $importpagecount; $pagenumber++) {
+                    $importtemplate = $pdf->ImportPage($pagenumber);
+                    $pdf->AddPage();
+                    $pdf->useTemplate($importtemplate);
+                }
+                $pagecount = $pagecount + $importpagecount;
+            }
+
+        }
+        return $pagecount;
+    }
 }
 
 // Extend the TCPDF class to create custom Header and Footer.
-class dfpdf extends pdf {
+class dfpdf extends FPDI {
 
     protected $_dfsettings;
 
@@ -808,7 +876,7 @@ class dfpdf extends pdf {
         }
     }
 
-    // phpcs:enable
+    // Phpcs:enable.
     protected function set_page_numbers($text) {
         $replacements = array('##pagenumber##' => $this->getAliasNumPage(),
                 '##totalpages##' => $this->getAliasNbPages());
