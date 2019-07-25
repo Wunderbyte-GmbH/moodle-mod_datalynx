@@ -49,22 +49,28 @@ class datalynxfield_file_form extends datalynxfield_form {
         $mform->addElement('select', 'param2', get_string('filesmax', 'datalynx'), $options);
         $mform->setDefault('param2', -1);
 
-        // Accetped types.
+        // Accepted types.
         $this->filetypes_definition();
     }
 
     /**
+     * Looks up all moodle mimetypes and shows an autocomplete list for selection.
      */
     public function filetypes_definition() {
         $mform = &$this->_form;
 
-        // Accetped types (param3).
-        $options = array();
-        $options['*'] = get_string('filetypeany', 'datalynx');
-        $options['image'] = get_string('filetypeimage', 'datalynx');
-        $options['.html'] = get_string('filetypehtml', 'datalynx');
+        $mimetypes = array();
+        $mimetypes['*'] = get_string('filetypeany', 'datalynx');
+        $mimetypes['image'] = get_string('filetypeimage', 'datalynx');
+        foreach(get_mimetypes_array() as $mimetype => $content) {
+            $mimetypes[$mimetype] = $mimetype;
+        }
 
-        $mform->addElement('select', 'param3', get_string('filetypes', 'datalynx'), $options);
+        // Only allow single choice for now to keep compatible.
+        $options = array("multiple" => false);
+
+        // Accepted mimetype is stored in param3.
+        $mform->addElement('autocomplete', 'param3', get_string('filetypes', 'datalynx'), $mimetypes, $options);
         $mform->setDefault('param3', '*');
     }
 }
