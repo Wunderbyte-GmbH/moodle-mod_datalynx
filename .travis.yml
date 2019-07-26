@@ -15,6 +15,9 @@ addons:
       - chromium-chromedriver
       - google-chrome-stable
 
+services:
+  - mysql
+
 php:
   - 7.1
 
