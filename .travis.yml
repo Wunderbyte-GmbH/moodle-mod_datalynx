@@ -44,7 +44,6 @@ matrix:
   fast_finish: true
 
 before_install:
-    before_install:
   - google-chrome-stable --headless --disable-gpu --remote-debugging-port=9222 http://localhost &
   - phpenv config-rm xdebug.ini
   - nvm install v8.9.4
