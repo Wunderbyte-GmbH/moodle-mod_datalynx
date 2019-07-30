@@ -54,6 +54,7 @@ class datalynxfield_editor extends datalynxfield_base {
 
         $this->editoroptions = array();
         $this->editoroptions['context'] = $this->df->context;
+        $this->editoroptions['maxfiles'] = EDITOR_UNLIMITED_FILES;
         $this->editoroptions['trusttext'] = true;
         $this->editoroptions['maxbytes'] = $maxbytes;
         $this->editoroptions['subdirs'] = false;
