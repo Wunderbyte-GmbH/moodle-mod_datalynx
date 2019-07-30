@@ -89,6 +89,11 @@ class datalynxview_base_form extends moodleform {
         $mform->addElement('select', '_filter', get_string('viewfilter', 'datalynx'), $filtersmenu);
         $mform->setDefault('_filter', 0);
 
+        // Overridefilter.
+        $mform->addElement('advcheckbox', 'param5', 'Filteroverride', 'Any user can override this filter'); // TODO: Multilang.
+        $mform->setType('param5', PARAM_INT);
+        $mform->setDefault('param5', 0);
+
         $mform->addElement('header', 'redirectsettings', get_string('redirectsettings', 'datalynx'));
         $mform->addHelpButton('redirectsettings', 'redirectsettings', 'datalynx');
         $mform->addElement('select', 'param10', get_string('redirectto', 'datalynx'),

@@ -123,6 +123,7 @@ abstract class datalynxview_base {
             $this->view->perpage = 0;
             $this->view->groupby = '';
             $this->view->param10 = 0;
+            $this->view->param5 = 0; // Overridefilter.
         }
 
         $this->_redirect = $this->view->param10;
@@ -761,7 +762,6 @@ abstract class datalynxview_base {
      * @return array of strings (field pattern used in the view)
      */
     public function field_tags() {
-        global $DB;
 
         $patterns = array();
         if ($fields = $this->_df->get_fields()) {
@@ -977,7 +977,6 @@ abstract class datalynxview_base {
      * Set sort and search criteria for grouping by
      */
     protected function set_groupby_per_page() {
-        global $CFG;
 
         // Get the group by fieldid.
         if (empty($this->_filter->groupby)) {
@@ -1110,7 +1109,7 @@ abstract class datalynxview_base {
     /**
      */
     public function display_entries(array $options = null) {
-        global $DB, $OUTPUT, $USER;
+        global $DB, $OUTPUT;
 
         if (!$this->user_is_editing()) {
             $html = $this->definition_to_html();
@@ -1476,6 +1475,11 @@ abstract class datalynxview_base {
     /**
      */
     public function is_forcing_filter() {
+
+        // If overridefilter is selected we don't force filters.
+        if ($this->view->param5) {
+            return false;
+        }
         return $this->view->filter;
     }
 
