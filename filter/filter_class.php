@@ -193,7 +193,6 @@ class datalynx_filter {
 
                 $field = $fields[$fieldid];
                 $internalfield = $field::is_internal();
-                $isdatalynxcontent = $field->is_datalynx_content();
 
                 // Register join field if applicable.
                 $this->register_join_field($field);
@@ -205,21 +204,8 @@ class datalynx_filter {
                         if ($fieldsqloptions = $field->get_search_sql($option)) {
                             list($fieldsql, $fieldparams, $fromcontent) = $fieldsqloptions;
                             if ($fieldsql) {
-
-                                $addthefield = true;
-
-                                // The operator "" means we look for empty fields, don't add fieldids.
-                                if ($option[1] == "") {
-                                    $addthefield = false;
-                                }
-                                // Exclude tags because they use an intermediate db query.
-                                if ($field->type == 'tag') {
-                                    $addthefield = false;
-                                }
-
                                 // If we use values from content we make it an implied AND statement.
-                                // TODO: Make sure isdatalynxcontent does the same thing is_numeric promises to do.
-                                if (is_numeric($fieldid) && $isdatalynxcontent && $addthefield) {
+                                if (is_numeric($fieldid) && $this->add_fieldid($option, $field)) {
                                     $whereand[] = " ( " . $fieldsql . " AND c$fieldid.fieldid = $fieldid )";
                                 } else {
                                     $whereand[] = $fieldsql;
@@ -242,8 +228,7 @@ class datalynx_filter {
                         if ($fieldsqloptions = $field->get_search_sql($option)) {
                             list($fieldsql, $fieldparams, $fromcontent) = $fieldsqloptions;
                             // If we use values from content we make it an implied AND statement.
-                            // TODO: Make sure isdatalynxcontent does the same thing is_numeric promises to do.
-                            if (is_numeric($fieldid) && $isdatalynxcontent) {
+                            if (is_numeric($fieldid) && $this->add_fieldid($option, $field)) {
                                  $whereor[] = " ( " . $fieldsql . " AND c$fieldid.fieldid = $fieldid )";
                             } else {
                                 $whereor[] = $fieldsql;
@@ -361,6 +346,28 @@ class datalynx_filter {
     }
 
     /**
+     * Check if we should add this fieldid to our whereand and whereor clause.
+     * Catches all field situations that cause problems.
+     */
+    public function add_fieldid($option, $field) {
+
+        // If the field says it needs no content we trust its judgement.
+        if (!$field->is_datalynx_content()) {
+            return false;
+        }
+        // The operator "" means we look for empty fields, don't add fieldids.
+        if ($option[1] == "") {
+            return false;
+        }
+        // Exclude tags because they use an intermediate db query.
+        if ($field->type == 'tag') {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      */
     public function get_sort_sql($fields) {
         global $DB;
@@ -394,7 +401,7 @@ class datalynx_filter {
                         $field instanceof datalynxfield_option_single) {
                     // Read values of field from database.
                     $fieldvalues = $DB->get_field('datalynx_fields', 'param1',
-                            array('id' => $fieldid), $strictness = MUST_EXIST);
+                            array('id' => $fieldid), MUST_EXIST);
                     $fieldvalues = explode("\n", $fieldvalues);
 
                     $replacestring = $sortname; // Works only for single values yet.
@@ -929,7 +936,6 @@ class datalynx_filter_manager {
      * Get filter form data from customfilter form
      */
     public function get_filter_from_customfilterform($filter, $formdata, $customfilter) {
-        global $DB;
 
         $customfilterfields = json_decode($customfilter->fieldlist);
         $customfilterfieldids = array();
@@ -1260,7 +1266,6 @@ class datalynx_filter_manager {
                 // Verbose search criteria.
                 if ($searchfields) {
                     $searcharr = array();
-                    $searchurlarr = array();
                     foreach ($searchfields as $fieldid => $searchfield) {
                         if (empty($fields[$fieldid])) {
                             continue;
