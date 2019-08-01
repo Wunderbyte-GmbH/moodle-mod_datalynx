@@ -69,12 +69,15 @@ class datalynxfield_editor_renderer extends datalynxfield_renderer {
         $field = $this->_field;
         $fieldid = $field->id();
         $excerpt = in_array('excerpt', array_keys($params)) ? true : false;
+        $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
 
         if (isset($entry->{"c{$fieldid}_content"})) {
             $text = $entry->{"c{$fieldid}_content"};
             $format = isset($entry->{"c{$fieldid}_content1"}) ? $entry->{"c{$fieldid}_content1"} : FORMAT_HTML;
             $options = new stdClass();
             $options->para = false;
+            $text = file_rewrite_pluginfile_urls($text, 'pluginfile.php',  $field->df()->context->id, 'mod_datalynx', 'content',
+                $contentid);
             $str = format_text($text, $format, $options);
             if ($excerpt) {
                 $str = strip_tags($str, '<p><i><b><strong>');
