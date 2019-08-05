@@ -1,6 +1,6 @@
 language: php
 
-sudo: false
+sudo: true
 
 dist: xenial # Works with trusty.
 cache:
@@ -77,7 +77,6 @@ install:
 
 # Unit tests and behat tests against full matrix.
 script:
-  - moodle-plugin-ci phpunit --coverage-clover
   - moodle-plugin-ci behat
 
 after_success:
