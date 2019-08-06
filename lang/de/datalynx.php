@@ -536,6 +536,10 @@ $string['views'] = 'Ansichten';
 $string['viewtodate'] = 'Sichtbar für';
 $string['view'] = 'Ansicht';
 $string['viewvisibility'] = 'Sichtbarkeit';
+$string['viewfilteroverride'] = 'Filteroverride';
+$string['viewfoverride'] = 'BenutzerInnen dürfen auch andere Filter wählen.';
+$string['viewfoverride_help'] = 'Unachtsame Verwendung dieser Funktion kann Nutzerdaten sichtbar machen, Vorsicht beim Aktivieren.';
+
 $string['wrongdataid'] = 'Falsche Datalynx ID';
 
 $string['teamsize'] = 'Höchstzahl an Teammitglieder';

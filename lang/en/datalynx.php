@@ -542,6 +542,10 @@ $string['views'] = 'Views';
 $string['viewtodate'] = 'Viewable to';
 $string['view'] = 'view';
 $string['viewvisibility'] = 'Visibility';
+$string['viewfilteroverride'] = 'Filteroverride';
+$string['viewfoverride'] = 'Any user can override this filter.';
+$string['viewfoverride_help'] = 'Improper use of this feature can display unintended information, be aware if using.';
+
 $string['wrongdataid'] = 'Wrong datalynx id provided';
 
 // Teammemberselect strings.
