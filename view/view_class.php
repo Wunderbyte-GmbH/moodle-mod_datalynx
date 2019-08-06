@@ -131,8 +131,7 @@ abstract class datalynxview_base {
         // Set editors and patterns.
         $this->set__editors();
         $this->set__patterns();
-
-        $this->set_filter($filteroptions);
+        $this->set_filter($filteroptions, $this->is_forcing_filter()); // If filter is forced ignore URL parameters.
 
         // Base url params.
         $baseurlparams = array();
