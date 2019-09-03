@@ -86,20 +86,22 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
             $menuoptions[-999] = null; // Allow this option for empty values.
 
             // If we see the pattern addnew open up option to add menuoptions.
-            $autocompleteoptions = array();
+            $fieldattr = array();
+            $mform->setType($fieldname, PARAM_INT);
             if (isset($options['addnew'])) {
-                $autocompleteoptions['tags'] = true;
+                $fieldattr['tags'] = true;
+                $mform->setType($fieldname, PARAM_NOTAGS);
             }
 
-            $select = &$mform->addElement('autocomplete', $fieldname, null, $menuoptions, $autocompleteoptions);
+            $select = &$mform->addElement('autocomplete', $fieldname, null, $menuoptions, $fieldattr);
         } else {
             $menuoptions = $field->options_menu();
 
             $select = &$mform->addElement('select', $fieldname, null, $menuoptions);
+            $mform->setType($fieldname, PARAM_INT);
         }
         $select->setMultiple(true);
         $select->setSelected($selected);
-        $mform->setType($fieldname, PARAM_INT);
 
         if ($required) {
             $mform->addRule($fieldname, null, 'required', null, 'client');

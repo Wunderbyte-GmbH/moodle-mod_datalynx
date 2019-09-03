@@ -103,8 +103,24 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
     }
 
     public function update_content($entry, array $values = null) {
+
         // Check if all values are known in field definition.
-        // If not and addnew is set, add new value to the field definition.
-        $newcontentid = parent::update_content($entry, $values);
+        $knownvalues = explode("\n", $this->field->param1);
+        foreach ($values[''] as $key => $value) {
+            if (array_key_exists($value, $knownvalues)) {
+                continue;
+            }
+
+            // Add new value to the field definition.
+            $forminput = new \stdClass();
+            $forminput->id = $this->field->id;
+            $forminput->addoptions = $value;
+            $this->update_field($forminput);
+
+            // Change $values to work with update_content.
+
+        }
+
+        parent::update_content($entry, $values);
     }
 }
