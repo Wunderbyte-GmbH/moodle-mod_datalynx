@@ -112,13 +112,15 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
             }
 
             // Add new value to the field definition.
-            $forminput = new \stdClass();
-            $forminput->id = $this->field->id;
+            $forminput = clone $this->field;
             $forminput->addoptions = $value;
             $this->update_field($forminput);
 
             // Change $values to work with update_content.
-
+            $newknownvalue = count($knownvalues);
+            $knownvalues[] = $newknownvalue;
+            unset($values[''][$key]);
+            $values[''][] = $newknownvalue;
         }
 
         parent::update_content($entry, $values);
