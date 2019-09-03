@@ -279,4 +279,8 @@ class datalynxfield_time extends datalynxfield_base {
         }
         return false;
     }
+
+    public static function is_customfilterfield() {
+        return true;
+    }
 }
