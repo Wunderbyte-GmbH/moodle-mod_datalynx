@@ -101,4 +101,10 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
         }
         return false;
     }
+
+    public function update_content($entry, array $values = null) {
+        // Check if all values are known in field definition.
+        // If not and addnew is set, add new value to the field definition.
+        $newcontentid = parent::update_content($entry, $values);
+    }
 }

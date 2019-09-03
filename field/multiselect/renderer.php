@@ -85,7 +85,13 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
             $menuoptions = $field->options_menu(false, true);
             $menuoptions[-999] = null; // Allow this option for empty values.
 
-            $select = &$mform->addElement('autocomplete', $fieldname, null, $menuoptions);
+            // If we see the pattern addnew open up option to add menuoptions.
+            $autocompleteoptions = array();
+            if (isset($options['addnew'])) {
+                $autocompleteoptions['tags'] = true;
+            }
+
+            $select = &$mform->addElement('autocomplete', $fieldname, null, $menuoptions, $autocompleteoptions);
         } else {
             $menuoptions = $field->options_menu();
 
@@ -200,5 +206,23 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
         }
 
         return $errors;
+    }
+
+    /**
+     * Array of patterns this field supports
+     * The label pattern should always be first where applicable
+     * so that it is processed first in view templates
+     * so that in turn patterns it may contain could be processed.
+     *
+     * @return array pattern => array(visible in menu, category)
+     */
+    protected function patterns() {
+        $fieldname = $this->_field->name();
+
+        $patterns = parent::patterns();
+        $patterns["[[$fieldname]]"] = array(true);
+        $patterns["[[$fieldname:addnew]]"] = array(true);
+
+        return $patterns;
     }
 }
