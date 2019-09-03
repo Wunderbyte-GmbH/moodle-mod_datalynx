@@ -123,12 +123,12 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
     }
 
     public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
+        $fieldid = $this->_field->id();
+        $fieldname = "f_{$i}_$fieldid";
+
+        $arr = array();
 
         if ($mform->_formName == 'mod_datalynx_customfilter_frontend_form') {
-            $fieldid = $this->_field->id();
-            $fieldname = "f_{$i}_$fieldid";
-
-            $arr = array();
             $options = array(
                     -1  => get_string('choose'),
                     1 => get_string('filemissing', 'datalynx'),
@@ -137,21 +137,13 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
             $arr[] = $mform->createElement('select', $fieldname, '', $options);
             $mform->setType($fieldname, PARAM_INT);
             $mform->setDefault($fieldname, $value);
-
-            return array($arr, null);
-
         } else {
-            $fieldid = $this->_field->id();
-            $fieldname = "f_{$i}_$fieldid";
-
-            $arr = array();
             $arr[] = &$mform->createElement('text', $fieldname, null, array('size' => '32'));
             $mform->setType($fieldname, PARAM_NOTAGS);
             $mform->setDefault($fieldname, $value ? 1 : 0);
             $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
-
-            return array($arr, null);
         }
+        return array($arr, null);
     }
 
     /**
