@@ -66,7 +66,7 @@ jobs:
         - moodle-plugin-ci phpmd
         - moodle-plugin-ci codechecker
         - moodle-plugin-ci savepoints
-        #- moodle-plugin-ci mustache
+        - moodle-plugin-ci mustache
         - moodle-plugin-ci grunt
         - moodle-plugin-ci validate
 
