@@ -134,6 +134,6 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
             $DB->update_record('datalynx_fields', $update);
         }
 
-        parent::update_content($entry, $values);
+        return parent::update_content($entry, $values);
     }
 }
