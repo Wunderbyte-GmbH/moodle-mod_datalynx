@@ -110,17 +110,6 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
             if (array_key_exists($value, $knownvalues)) {
                 continue;
             }
-
-            // Add new value to the field definition.
-            $forminput = clone $this->field;
-            $forminput->addoptions = $value;
-            $this->update_field($forminput);
-
-            // Change $values to work with update_content.
-            $newknownvalue = count($knownvalues);
-            $knownvalues[] = $newknownvalue;
-            unset($values[''][$key]);
-            $values[''][] = $newknownvalue;
         }
 
         parent::update_content($entry, $values);
