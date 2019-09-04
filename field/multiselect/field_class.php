@@ -106,11 +106,30 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
 
         // Check if all values are known in field definition.
         $knownvalues = explode("\n", $this->field->param1);
+        $addoption = null;
         foreach ($values[''] as $key => $value) {
             if (array_key_exists($value, $knownvalues)) {
                 continue;
             }
+
+            // Add new value to the field definitions known values.
+            $addoption = count($knownvalues) + 1;
+            $knownvalues[$addoption] = $value;
+
+            // Change $values to work with update_content.
+            unset($values[''][$key]);
+            $values[''][] = $addoption;
         }
+
+        // In case we have spotted some addoptions, update field definition.
+        if ($addoption) {
+            global $DB;
+            $update = new \stdClass;
+            $update->id = $this->field->id;
+            $update->param1 = implode("\n", $knownvalues);
+            $DB->update_record('datalynx_fields', $update);
+        }
+
 
         parent::update_content($entry, $values);
     }
