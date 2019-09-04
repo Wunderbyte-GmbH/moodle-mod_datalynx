@@ -109,7 +109,7 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
 
         // Our values start counting at 1, correct knownvalues array keys.
         $knownvalues = array_combine(range(1, count($knownvalues)), $knownvalues);
-        
+
         $addoption = null;
         foreach ($values[''] as $key => $value) {
             if (array_key_exists($value, $knownvalues)) {
