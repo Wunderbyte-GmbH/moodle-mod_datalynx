@@ -80,6 +80,9 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
             $selected = $field->default_values();
         }
 
+        // Normally we just pass integer, option for addnew.
+        $paramtype = PARAM_INT;
+
         // Render as autocomplete field (param6 not empty) or select field.
         if ($autocomplete) {
             $menuoptions = $field->options_menu(false, true);
@@ -89,6 +92,7 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
             $fieldattr = array();
             if (isset($options['addnew'])) {
                 $fieldattr['tags'] = true;
+                $paramtype = PARAM_NOTAGS;
             }
 
             $select = &$mform->addElement('autocomplete', $fieldname, null, $menuoptions, $fieldattr);
@@ -99,7 +103,7 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
         }
         $select->setMultiple(true);
         $select->setSelected($selected);
-        $mform->setType($fieldname, PARAM_INT);
+        $mform->setType($fieldname, $paramtype);
 
         if ($required) {
             $mform->addRule($fieldname, null, 'required', null, 'client');
