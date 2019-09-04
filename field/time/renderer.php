@@ -86,7 +86,8 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         $fieldid = $field->id();
 
         $elements = array();
-        // With customfilter we only allow sort.
+
+        // With normal filter display whole form and disable cases.
         if ($mform->_formName != 'mod_datalynx_customfilter_frontend_form') {
             $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_from", get_string('from'));
             $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_to", get_string('to'));
@@ -108,6 +109,12 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
                     $mform->disabledIf("f_{$i}_{$fieldid}_from[$fieldidentifier]", "searchoperator$i", 'eq', '=');
                 }
             }
+        }
+
+        // With customfilter we have to simplify the form.
+        if ($mform->_formName == 'mod_datalynx_customfilter_frontend_form') {
+            $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}[0]", get_string('from'));
+            $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}[1]", get_string('to'));
         }
 
         $separators = array('<br>', '<br>');
