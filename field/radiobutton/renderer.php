@@ -55,7 +55,7 @@ class datalynxfield_radiobutton_renderer extends datalynxfield_select_renderer {
 
         $elemgrp = array();
         foreach ($menuoptions as $id => $option) {
-            $radio = &$mform->createElement('radio', $fieldname, $separator, $option, $id);
+            $radio = &$mform->createElement('radio', $fieldname, '', $option, $id);
             if ($id == $selected) {
                 $radio->setChecked(true);
             }
