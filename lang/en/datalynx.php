@@ -865,6 +865,7 @@ $string['thisdatalynx'] = 'This datalynx instance';
 $string['thisfield'] = 'This field';
 
 $string['fulltextsearch'] = 'Fulltextsearch';
+$string['authorsearch'] = 'Authorsearch';
 $string['fieldlist'] = 'Searchable Fields';
 $string['userfields'] = 'User defined fields';
 $string['sortable'] = 'sortable';

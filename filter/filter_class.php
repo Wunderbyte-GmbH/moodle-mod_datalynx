@@ -118,6 +118,7 @@ class datalynx_filter {
         $filter->customsort = $this->customsort;
         $filter->customsearch = $this->customsearch;
         $filter->search = $this->search;
+        $filter->authorsearch = $this->authorsearch;
 
         return $filter;
     }
@@ -1007,6 +1008,11 @@ class datalynx_filter_manager {
             } else {
                 if ($key == "search" && $value) {
                     $filter->search = $value;
+                }
+
+                if ($key == "authorsearch" && $value) {
+                    $searchfields['userid']['AND'][] = array('', '=', $value);
+                    $filter->authorsearch = $value;
                 }
             }
         }

@@ -492,6 +492,22 @@ class mod_datalynx_customfilter_frontend_form extends mod_datalynx_filter_base_f
             $mform->setType('search', PARAM_TEXT);
         }
 
+        // Search for author.
+        if ($customfilter->authorsearch) {
+
+            // We need this to sidetrack autocomplete.
+            $menu = array();
+            $menu += array(0 => null); // NULL to "not" show in lists.
+
+            // Add all enrolled users to list.
+            global $PAGE;
+            foreach (get_enrolled_users($PAGE->context) as $id => $user) {
+                $menu[$id] = $user->firstname . " " . $user->lastname;
+            }
+            $mform->addElement('autocomplete', 'authorsearch', null, $menu);
+            $mform->setType('authorsearch', PARAM_INT);
+        }
+
         // Custom search.
         if ($customfilter->fieldlist) {
             $this->customfilter_search_definition($fields, $fieldoptions);

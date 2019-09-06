@@ -829,6 +829,7 @@ $string['notallowedtoeditentry'] = 'Es ist nicht erlaubt, diesen Eintrag zu änd
 $string['thisdatalynx'] = 'Diese Datalynx-Instanz';
 $string['thisfield'] = 'Dieses Feld';
 $string['fulltextsearch'] = 'Volltextsuche';
+$string['authorsearch'] = 'AutorInnensuche';
 $string['fieldlist'] = 'Durchsuchbare Felder';
 $string['userfields'] = 'Benutzer-definierte Felder';
 $string['sortable'] = 'sortierbar';
