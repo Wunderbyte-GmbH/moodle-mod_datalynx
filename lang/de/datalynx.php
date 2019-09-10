@@ -874,3 +874,6 @@ $string['confirmfieldgroupdelete'] = 'Diese Feldergruppierung wirklich löschen?
 $string['line'] = 'Zeile';
 $string['addline'] = 'Füge {$a} hinzu';
 $string['hideline'] = 'Verstecke die letzte Zeile';
+
+// Global search
+$string['search:activity'] = "Datalynx Instanzen";

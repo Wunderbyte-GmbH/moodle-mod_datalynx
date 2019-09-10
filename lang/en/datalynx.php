@@ -910,3 +910,6 @@ $string['confirmfieldgroupdelete'] = 'You are about to delete this fieldgroup!';
 $string['line'] = 'Line';
 $string['addline'] = 'Add {$a}';
 $string['hideline'] = 'Hide the last line';
+
+// Global search
+$string['search:activity'] = "Datalynx instances";
