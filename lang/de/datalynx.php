@@ -743,7 +743,8 @@ Der folgende Eintrag wurde deaktiviert: {$a->viewlink}.';
 
 $string['message_comment_created'] = 'Guten Tag {$a->fullname},
 
-Der folgende Eintrag wurde von {$a->senderprofilelink}  kommentiert: {$a->viewlink}.';
+Der folgende Eintrag wurde von {$a->senderprofilelink} kommentiert: {$a->viewlink}.
+Die Nachricht lautet: "{$a->commenttext}"';
 $string['message_rating_added'] = 'Eintrag bewertet';
 $string['message_rating_updated'] = 'Bewertung eines Eintrags aktualisiert';
 
