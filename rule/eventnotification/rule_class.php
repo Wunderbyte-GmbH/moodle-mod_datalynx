@@ -126,7 +126,7 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
         // In case a comment was added also show commenttext in mail.
         if (strpos($eventname, 'comment') !== false) {
             $commentid = $event->get_data()['objectid'];
-            $messagedata->commenttext = $DB->get_record('comments', array('id' => $commentid), 'content')
+            $messagedata->commenttext = $DB->get_record('comments', array('id' => $commentid), 'content');
         }
 
         $messagestosend = array();
