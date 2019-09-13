@@ -10,7 +10,7 @@ cache:
     - $HOME/.npm
 
 addons:
-  chrome: beta
+  chrome: stable
   postgresql: "9.4"
   apt:
     packages:
