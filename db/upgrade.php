@@ -983,6 +983,21 @@ function xmldb_datalynx_upgrade($oldversion) {
 
         upgrade_mod_savepoint(true, 2019042300, 'datalynx');
     }
+
+    if ($oldversion < 2019090600) {
+
+        // Define field authorsearch to be added to datalynx_customfilters.
+        $table = new xmldb_table('datalynx_customfilters');
+        $field = new xmldb_field('authorsearch', XMLDB_TYPE_INTEGER, '1', null, null, null, '0', 'timemodified_sortable');
+
+        // Conditionally launch add field authorsearch.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Datalynx savepoint reached.
+        upgrade_mod_savepoint(true, 2019090600, 'datalynx');
+    }
     return true;
 }
 

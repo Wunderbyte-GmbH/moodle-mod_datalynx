@@ -210,7 +210,7 @@ class behat_mod_datalynx extends behat_base {
                     break;
                 case "radio":
                     $this->execute("behat_forms::i_set_the_field_with_xpath_to",
-                            array("//div[@data-field-type='radiobutton']//em[.='{$field['value']}']/preceding-sibling::label//input",
+                            array("//div[@data-field-type='radiobutton']//label[contains(.,'{$field['value']}')]/input",
                                     "selected"));
                     break;
                 case "text":

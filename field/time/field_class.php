@@ -151,12 +151,6 @@ class datalynxfield_time extends datalynxfield_base {
         $params = array();
 
         switch ($operator) {
-            case 'BETWEEN':
-                $params[$namefrom] = $from;
-                $params[$nameto] = $to;
-                $return = array(" ($not $varcharcontent >= :$namefrom AND $varcharcontent < :$nameto) ",
-                        $params, true);
-                break;
             case '=':
                 if ($this->dateonly) {
                     $fromdate = date("Y-m-d", $from);
@@ -168,17 +162,11 @@ class datalynxfield_time extends datalynxfield_base {
                 $return = array(" $not $varcharcontent $operator :$namefrom ", $params, true);
                 break;
             default:
-                if ($not) {  // Content value is not empty.
-                    $return = array(" $not $varcharcontent = '' ", $params, true);
-                } else { // Content value is empty or there is no content dataset at all.
-                    global $DB;
-                    $eids = $this->get_entry_ids_for_empty_content();
-                    // Get NOT IN sql.
-                    list($inids, $params) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED,
-                            "df_{$this->field->id}_", true);
-                    $sql = " e.id $inids ";
-                    return array($sql, $params, false);
-                }
+                $params[$namefrom] = $from;
+                $params[$nameto] = $to;
+                $return = array(" ($not $varcharcontent >= :$namefrom AND $varcharcontent < :$nameto) ",
+                        $params, true);
+                break;
         } // End switch.
 
         return $return;
@@ -278,5 +266,13 @@ class datalynxfield_time extends datalynxfield_base {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Are fields of this field type suitable for use in customfilters?
+     * @return bool
+     */
+    public static function is_customfilterfield() {
+        return true;
     }
 }

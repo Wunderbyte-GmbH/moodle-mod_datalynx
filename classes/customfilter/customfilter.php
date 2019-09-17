@@ -48,6 +48,8 @@ class customfilter {
 
     public $timemodified;
 
+    public $authorsearch;
+
     public $approve;
 
     public $status;
@@ -66,6 +68,7 @@ class customfilter {
         $this->fulltextsearch = !isset($filterdata->fulltextsearch) ? 0 : $filterdata->fulltextsearch;
         $this->timecreated = empty($filterdata->timecreated) ? 0 : $filterdata->timecreated;
         $this->timemodified = empty($filterdata->timemodified) ? 0 : $filterdata->timemodified;
+        $this->authorsearch = !isset($filterdata->authorsearch) ? 0 : $filterdata->authorsearch;
         $this->approve = empty($filterdata->approve) ? 0 : $filterdata->approve;
         $this->status = empty($filterdata->status) ? 0 : $filterdata->status;
         $this->fieldlist = empty($filterdata->fieldlist) ? 0 : $filterdata->fieldlist;
@@ -83,6 +86,7 @@ class customfilter {
         $filter->fulltextsearch = $this->fulltextsearch;
         $filter->timecreated = $this->timecreated;
         $filter->timemodified = $this->timemodified;
+        $filter->authorsearch = $this->authorsearch;
         $filter->approve = $this->approve;
         $filter->status = $this->status;
         $filter->fieldlist = $this->fieldlist;

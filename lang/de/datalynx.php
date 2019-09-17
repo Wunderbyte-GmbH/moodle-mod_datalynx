@@ -743,7 +743,8 @@ Der folgende Eintrag wurde deaktiviert: {$a->viewlink}.';
 
 $string['message_comment_created'] = 'Guten Tag {$a->fullname},
 
-Der folgende Eintrag wurde von {$a->senderprofilelink}  kommentiert: {$a->viewlink}.';
+Der folgende Eintrag wurde von {$a->senderprofilelink} kommentiert: {$a->viewlink}.
+Die Nachricht lautet: "{$a->commenttext}"';
 $string['message_rating_added'] = 'Eintrag bewertet';
 $string['message_rating_updated'] = 'Bewertung eines Eintrags aktualisiert';
 
@@ -829,6 +830,7 @@ $string['notallowedtoeditentry'] = 'Es ist nicht erlaubt, diesen Eintrag zu änd
 $string['thisdatalynx'] = 'Diese Datalynx-Instanz';
 $string['thisfield'] = 'Dieses Feld';
 $string['fulltextsearch'] = 'Volltextsuche';
+$string['authorsearch'] = 'AutorInnensuche';
 $string['fieldlist'] = 'Durchsuchbare Felder';
 $string['userfields'] = 'Benutzer-definierte Felder';
 $string['sortable'] = 'sortierbar';
@@ -873,3 +875,6 @@ $string['confirmfieldgroupdelete'] = 'Diese Feldergruppierung wirklich löschen?
 $string['line'] = 'Zeile';
 $string['addline'] = 'Füge {$a} hinzu';
 $string['hideline'] = 'Verstecke die letzte Zeile';
+
+// Global search
+$string['search:activity'] = "Datalynx Instanzen";

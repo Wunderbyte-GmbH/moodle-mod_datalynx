@@ -86,25 +86,35 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         $fieldid = $field->id();
 
         $elements = array();
-        $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_from", get_string('from'));
-        $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_to", get_string('to'));
-        if (isset($value[0])) {
-            $mform->setDefault("f_{$i}_{$fieldid}_from", $value[0]);
-        }
-        if (isset($value[1])) {
-            $mform->setDefault("f_{$i}_{$fieldid}_to", $value[1]);
-        }
-        foreach (array('year', 'month', 'day', 'hour', 'minute') as $fieldidentifier) {
-            $mform->disabledIf("f_{$i}_{$fieldid}_to[$fieldidentifier]", "searchoperator$i", 'neq', 'BETWEEN');
-        }
-        foreach (array('year', 'month', 'day', 'hour', 'minute') as $fieldidentifier) {
-            $mform->disabledIf("f_{$i}_{$fieldid}_from[$fieldidentifier]", "searchoperator$i", 'eq', '');
-        }
-        if ($field->dateonly) {
-            // Deactivate form elements for min and seconds when field is date only and operator is "=".
-            foreach (array('hour', 'minute') as $fieldidentifier) {
-                $mform->disabledIf("f_{$i}_{$fieldid}_from[$fieldidentifier]", "searchoperator$i", 'eq', '=');
+
+        // With normal filter display whole form and disable cases.
+        if ($mform->_formName != 'mod_datalynx_customfilter_frontend_form') {
+            $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_from", get_string('from'));
+            $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_to", get_string('to'));
+            if (isset($value[0])) {
+                $mform->setDefault("f_{$i}_{$fieldid}_from", $value[0]);
             }
+            if (isset($value[1])) {
+                $mform->setDefault("f_{$i}_{$fieldid}_to", $value[1]);
+            }
+            foreach (array('year', 'month', 'day', 'hour', 'minute') as $fieldidentifier) {
+                $mform->disabledIf("f_{$i}_{$fieldid}_to[$fieldidentifier]", "searchoperator$i", 'neq', 'BETWEEN');
+            }
+            foreach (array('year', 'month', 'day', 'hour', 'minute') as $fieldidentifier) {
+                $mform->disabledIf("f_{$i}_{$fieldid}_from[$fieldidentifier]", "searchoperator$i", 'eq', '');
+            }
+            if ($field->dateonly) {
+                // Deactivate form elements for min and seconds when field is date only and operator is "=".
+                foreach (array('hour', 'minute') as $fieldidentifier) {
+                    $mform->disabledIf("f_{$i}_{$fieldid}_from[$fieldidentifier]", "searchoperator$i", 'eq', '=');
+                }
+            }
+        }
+
+        // With customfilter we have to simplify the form.
+        if ($mform->_formName == 'mod_datalynx_customfilter_frontend_form') {
+            $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}[0]", get_string('from'));
+            $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}[1]", get_string('to'));
         }
 
         $separators = array('<br>', '<br>');
