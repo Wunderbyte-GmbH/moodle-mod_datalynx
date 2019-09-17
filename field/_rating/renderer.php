@@ -36,7 +36,6 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
         global $CFG, $DB;
 
         $field = $this->_field;
-        $fieldname = $field->get('internalname');
         $edit = !empty($options['edit']) ? $options['edit'] : false;
 
         // If edit mode or rating not active return.
@@ -273,7 +272,6 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
             $rating = $entry->rating;
 
             $width = round($value / $rating->settings->scale->max * 100);
-            $displayvalue = round($value, 2);
             $bar = html_writer::tag('div', '.',
                     array('style' => "width:$width%;height:100%;background:gold;color:gold"
                     ));
@@ -317,7 +315,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
     /**
      */
     public function render_rating($entry) {
-        global $CFG, $USER, $PAGE;
+        global $PAGE, $OUTPUT;
 
         $ratinghtml = '';
 
@@ -387,8 +385,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
                 $ratinghtml .= html_writer::empty_tag('input', $attributes);
 
                 if (!$rating->settings->scale->isnumeric) {
-                    $ratinghtml .= $this->help_icon_scale($rating->settings->scale->courseid,
-                            $rating->settings->scale);
+                    $ratinghtml .= $OUTPUT->help_icon_scale($rating->settings->scale->courseid, $rating->settings->scale);
                 }
                 $ratinghtml .= html_writer::end_tag('span');
                 $ratinghtml .= html_writer::end_tag('div');
