@@ -38,5 +38,8 @@ class datalynxfield_radiobutton_form extends datalynxfield_select_form {
         // Options separator.
         $mform->addElement('select', 'param3', get_string('fieldoptionsseparator', 'datalynx'),
                 array_map('current', $this->_field->separators));
+
+        // Hide autocomplete, it does not apply.
+        $mform->hideIf('param6', '');
     }
 }

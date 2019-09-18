@@ -27,4 +27,13 @@ defined('MOODLE_INTERNAL') or die();
 require_once("$CFG->dirroot/mod/datalynx/field/multiselect/field_form.php");
 
 class datalynxfield_checkbox_form extends datalynxfield_multiselect_form {
+
+    public function field_definition() {
+        parent::field_definition();
+
+        $mform = &$this->_form;
+
+        // Hide autocomplete, it does not apply.
+        $mform->hideIf('param6', '');
+    }
 }
