@@ -779,10 +779,10 @@ The following entry has been deactivated: {$a->viewlink}.';
 
 $string['message_comment_created'] = 'Hello {$a->fullname},
 
-a comment to one of your entries was added by {$a->senderprofilelink}.
+the following comment was added by {$a->senderprofilelink} to this entry: {$a->viewlink}:
 
-The following entry has been commented on: {$a->viewlink},
-this text was added: "{$a->commenttext}"';
+
+{$a->commenttext}';
 $string['message_rating_added'] = 'Datalynx rating added';
 $string['message_rating_updated'] = 'Datalynx rating updated';
 
