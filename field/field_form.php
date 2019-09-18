@@ -141,7 +141,7 @@ class datalynxfield_option_form extends datalynxfield_form {
                 get_string('addoptions', 'datalynx'), 'wrap="virtual" rows="5" cols="30"');
         $mform->insertElementBefore($addnew, 'param2');
         if (empty($options)) {
-            $mform->addRule('addoptions', null, 'required', null, 'client');
+            $mform->addRule('addoptions', get_string('err_required', 'form'), 'required', null, 'client');
         }
     }
 
