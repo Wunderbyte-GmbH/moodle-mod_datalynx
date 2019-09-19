@@ -180,13 +180,51 @@ class datalynx_field_behavior {
     public static function update_behavior($formdata) {
         global $DB;
         $record = self::form_to_db($formdata);
+        if ($DB->get_field('datalynx_renderers', 'name', ['id' => $record->id]) != $record->name) {
+            self::update_behavior_pattern($record->id, $record->name);
+        }
         $DB->update_record('datalynx_behaviors', $record);
         return $record->id;
     }
 
     public static function delete_behavior($behaviorid) {
         global $DB;
+        self::update_behavior_pattern($behaviorid);
         return $DB->delete_records('datalynx_behaviors', array('id' => $behaviorid));
+    }
+
+    /**
+     * Delete behaviorer when $behaviorname is empty otherwise update view patterns.
+     *
+     * @param integer $behaviorid
+     * @param string $behaviorname empty if it is deleted
+     * @return bool success status of deletion
+     */
+    public static function update_behavior_pattern($behaviorid, $behaviorname = '') {
+        global $DB;
+        // Read dataid from DB and find patterns and param2 from all connected views.
+        $behaviorinfo = $DB->get_record('datalynx_behaviors', array('id' => $behaviorid),
+            $fields = 'dataid, name', $strictness = IGNORE_MISSING);
+        $connected = $DB->get_records('datalynx_views', array('dataid' => $behaviorinfo->dataid),
+            null, 'id, patterns, param2');
+        // Update every instance that still has the string ||behaviorname in it.
+        foreach ($connected as $view) {
+            // TODO: Is one check enough or are these separate?
+            if (strpos($view->patterns, '|' . $behaviorinfo->name) !== false ||
+                strpos($view->param2, '|' . $behaviorinfo->name) !== false) {
+                if (strpos($view->param2, '|' . $behaviorinfo->name . '|')) {
+                    $view->patterns = str_replace('|' . $behaviorinfo->name . '|', '|' . $behaviorname . '|', $view->patterns);
+                    $view->param2 = str_replace('|' . $behaviorinfo->name . '|', '|' . $behaviorname . '|', $view->param2);
+                } else {
+                    if (!empty($behaviorname)) {
+                        $behaviorname = '|' . $behaviorname;
+                    }
+                    $view->patterns = str_replace('|' . $behaviorinfo->name, $behaviorname, $view->patterns);
+                    $view->param2 = str_replace('|' . $behaviorinfo->name, $behaviorname, $view->param2);
+                }
+            }
+            $DB->update_record('datalynx_views', $view, $bulk = true);
+        }
     }
 
     /**
