@@ -637,9 +637,9 @@ abstract class datalynxview_base {
         if ($this->view->filter > 0) { // This view has a forced filter set.
             $output = $OUTPUT->notification(get_string('noentries', 'datalynx'));
         } else {
-            if ($this->_filter->id) { // This view has a user filter set.
+            if ($this->_filter->id or $this->_filter->search) { // This view has a user filter set.
                 $output = $OUTPUT->notification(get_string('nomatchingentries', 'datalynx'));
-                $url = new moodle_url($this->_baseurl, array('filter' => 0));
+                $url = new moodle_url($this->_baseurl, array('filter' => 0, 'usersearch' => 0));
                 $output .= str_replace(get_string('continue'), get_string('resetsettings', 'datalynx'),
                         $OUTPUT->continue_button($url));
             } else {
