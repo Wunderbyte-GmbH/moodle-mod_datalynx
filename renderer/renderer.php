@@ -261,18 +261,38 @@ class datalynx_field_renderer {
     public static function update_renderer($formdata) {
         global $DB;
         $formdata->dataid = $formdata->d;
+        // When name is altered we have to replace patterns.
+        if ($DB->get_field('datalynx_renderers', 'name', ['id' => $formdata->id]) != $formdata->name) {
+            self::update_render_pattern($formdata->id, $formdata->name);
+        }
         $DB->update_record('datalynx_renderers', $formdata);
         return $formdata->id;
     }
 
     /**
-     * delete a renderer
+     * Delete renderer.
      *
      * @param integer $rendererid
-     * @return bool success status of deletion
+     * @return integer id
      */
     public static function delete_renderer($rendererid) {
         global $DB;
+        self::update_render_pattern($rendererid);
+        return $DB->delete_records('datalynx_renderers', array('id' => $rendererid));
+    }
+
+    /**
+     * Delete renderer when $renderername is empty otherwise update view patterns.
+     *
+     * @param integer $rendererid
+     * @param string $renderername
+     * @return bool success status of deletion
+     */
+    public static function update_render_pattern($rendererid, $renderername = '') {
+        global $DB;
+        if (!empty($renderername)) {
+            $renderername = '|' . $renderername;
+        }
         // Read dataid from DB and find patterns and param2 from all connected views.
         $rendererinfo = $DB->get_record('datalynx_renderers', array('id' => $rendererid),
             $fields = 'dataid, name', $strictness = IGNORE_MISSING);
@@ -281,15 +301,18 @@ class datalynx_field_renderer {
         // Update every instance that still has the string ||renderername in it.
         foreach ($connected as $view) {
             // TODO: Is one check enough or are these separate?
-            if (strpos($view->patterns, '|'.$rendererinfo->name) !== false ||
-                strpos($view->param2, '|'.$rendererinfo->name) !== false) {
-                $view->patterns = str_replace('|'.$rendererinfo->name, '', $view->patterns);
-                $view->param2 = str_replace('|'.$rendererinfo->name, '', $view->param2);
+            if (strpos($view->patterns, '|' . $rendererinfo->name) !== false ||
+                strpos($view->param2, '|' . $rendererinfo->name) !== false) {
+                if (strpos($view->param2, '||' . $rendererinfo->name) !== false) {
+                    $view->patterns = str_replace('||' . $rendererinfo->name, $renderername, $view->patterns);
+                    $view->param2 = str_replace('||' . $rendererinfo->name, $renderername, $view->param2);
+                } else {
+                    $view->patterns = str_replace('|' . $rendererinfo->name, $renderername, $view->patterns);
+                    $view->param2 = str_replace('|' . $rendererinfo->name, $renderername, $view->param2);
+                }
                 $DB->update_record('datalynx_views', $view, $bulk = true);
             }
         }
-        // Remove renderers finally.
-        return $DB->delete_records('datalynx_renderers', array('id' => $rendererid));
     }
 
     public function process_renderer_pattern() {

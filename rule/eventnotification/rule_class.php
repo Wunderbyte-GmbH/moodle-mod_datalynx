@@ -111,6 +111,8 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
 
         if (strpos($eventname, 'comment') !== false) {
             $entryid = $event->get_data()['other']['itemid'];
+            $commentid = $event->get_data()['objectid'];
+            $messagedata->commenttext = $DB->get_field('comments', 'content', array('id' => $commentid));
         } else {
             $entryid = $event->get_data()['objectid'];
         }
@@ -122,12 +124,6 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
         $messagedata->senderprofilelink = html_writer::link(
                 new moodle_url('/user/profile.php', array('id' => $userfrom->id)),
                 fullname($userfrom));
-
-        // In case a comment was added also show commenttext in mail.
-        if (strpos($eventname, 'comment') !== false) {
-            $commentid = $event->get_data()['objectid'];
-            $messagedata->commenttext = $DB->get_record('comments', array('id' => $commentid), 'content');
-        }
 
         $messagestosend = array();
         foreach ($this->get_recipients($author->id, $entryid) as $userid) {
