@@ -53,7 +53,6 @@ class backend_form extends base_form {
         }
 
         $name = empty($customfilter->name) ? get_string('filternew', 'datalynx') : $customfilter->name;
-        $customfilter->authorsearch = !isset($formdata->authorsearch) ? 0 : $customfilter->authorsearch;
 
         $mform = &$this->_form;
 

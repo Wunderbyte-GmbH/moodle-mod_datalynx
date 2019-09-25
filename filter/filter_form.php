@@ -432,8 +432,6 @@ class mod_datalynx_customfilter_frontend_form extends mod_datalynx_filter_base_f
             throw new moodle_exception('nocustomfilter', 'datalynx');
         }
 
-        $customfilter->authorsearch = !isset($formdata->authorsearch) ? 0 : $customfilter->authorsearch;
-
         $customfilterfieldlistfields = array();
         if ($customfilter->fieldlist) {
             $customfilterfieldlistfields = json_decode($customfilter->fieldlist);
