@@ -345,7 +345,7 @@ class datalynxview_patterns {
                 case '##advancedfilter##':
                     return $this->print_advanced_filter($filter, true);
             }
-            if (strpos($tag, '##customfilter') !== false) {
+            if (strpos($tag, '##customfilter') !== false && !$view->user_is_editing()) {
                 return $this->print_custom_filter($tag, true);
             }
         }
