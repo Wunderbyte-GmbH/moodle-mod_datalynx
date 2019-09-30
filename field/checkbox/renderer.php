@@ -53,7 +53,7 @@ class datalynxfield_checkbox_renderer extends datalynxfield_multiselect_renderer
 
         $elemgrp = array();
         foreach ($menuoptions as $i => $option) {
-            $elemgrp[] = &$mform->createElement('advcheckbox', $i, null, $option, null,
+            $elemgrp[] = &$mform->createElement('advcheckbox', $i, null, $option, array('size' => 1),
                     array(null, $i));
         }
 

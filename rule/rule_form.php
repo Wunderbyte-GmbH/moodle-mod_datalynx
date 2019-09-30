@@ -93,7 +93,7 @@ class datalynx_rule_form extends moodleform {
         $eventmenu = datalynx_rule_manager::get_event_data($this->_df->id());
         $eventgroup = array();
         foreach ($eventmenu as $eventname => $eventlabel) {
-            $eventgroup[] = &$mform->createElement('checkbox', $eventname, null, $eventlabel);
+            $eventgroup[] = &$mform->createElement('checkbox', $eventname, null, $eventlabel, array('size' => 32));
         }
         $mform->addGroup($eventgroup, 'eventsgroup', get_string('triggeringevent', 'datalynx'),
                 '<br />', false);

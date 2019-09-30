@@ -61,7 +61,7 @@ class datalynxfield_teammemberselect_form extends datalynxfield_form {
         $permissions = $this->_df->get_datalynx_permission_names(true);
 
         foreach ($permissions as $key => $label) {
-            $checkbox = &$mform->createElement('checkbox', $key, null, $label, array('group' => 1));
+            $checkbox = &$mform->createElement('checkbox', $key, null, $label, array('group' => 1, 'size' => 1));
             $group[] = $checkbox;
         }
         $mform->addGroup($group, 'param2', get_string('admissibleroles', 'datalynx'), '<br />');

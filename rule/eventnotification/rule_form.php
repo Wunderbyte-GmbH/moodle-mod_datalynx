@@ -42,7 +42,7 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
 
         // Recipient.
         $grp = array();
-        $grp[] = &$mform->createElement('checkbox', 'author', null, get_string('author', 'datalynx'), null);
+        $grp[] = &$mform->createElement('checkbox', 'author', null, get_string('author', 'datalynx'), array('size' => 1));
 
         $options = array('multiple' => true);
         $grp[] = &$mform->createElement('static', '', '', "<br><h4 class=\"w-100 mt-3\">" . get_string('roles') . "</h4>");

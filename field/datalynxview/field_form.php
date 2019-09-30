@@ -89,10 +89,11 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
 
         // Special filter by entry attributes "author" AND/OR "group" (to be stored in param6).
         $grp = array();
+        $attr = array('size' => 1);
         $grp[] = &$mform->createElement('advcheckbox', 'entryauthor', null,
-                get_string('entryauthor', 'datalynxfield_datalynxview'), null, array(0, 1));
+                get_string('entryauthor', 'datalynxfield_datalynxview'), $attr, array(0, 1));
         $grp[] = &$mform->createElement('advcheckbox', 'entrygroup', null,
-                get_string('entrygroup', 'datalynxfield_datalynxview'), null, array(0, 1));
+                get_string('entrygroup', 'datalynxfield_datalynxview'), $attr, array(0, 1));
         $mform->addGroup($grp, 'filterbyarr', get_string('filterby', 'datalynxfield_datalynxview'),
                 '<br />', false);
         $mform->addHelpButton('filterbyarr', 'filterby', 'datalynxfield_datalynxview');

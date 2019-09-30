@@ -124,9 +124,9 @@ class datalynxfield_option_form extends datalynxfield_form {
             foreach ($options as $id => $option) {
                 $group[] = &$mform->createElement('static', null, null,
                         "<tr><td>{$option}</td><td>");
-                $group[] = &$mform->createElement('text', "renameoption[{$id}]", '');
+                $group[] = &$mform->createElement('text', "renameoption[{$id}]", '', array('size' => 32));
                 $group[] = &$mform->createElement('static', null, null, '</td><td>');
-                $group[] = &$mform->createElement('checkbox', "deleteoption[{$id}]", '');
+                $group[] = &$mform->createElement('checkbox', "deleteoption[{$id}]", '', array('size' => 1));
                 foreach ($options as $newid => $newoption) {
                     $mform->disabledIf("renameoption[{$id}]", "deleteoption[{$newid}]", 'checked');
                 }
