@@ -113,7 +113,7 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
 
         // With customfilter we have to simplify the form.
         if ($mform->_formName == 'mod_datalynx_customfilter_frontend_form') {
-            $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}[0]", get_string('from'));
+            $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}[0]", get_string('from'), array('optional' => true));
             $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}[1]", get_string('to'));
         }
 
