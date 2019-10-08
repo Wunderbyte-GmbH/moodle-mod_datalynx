@@ -843,13 +843,12 @@ class datalynxview_pdf extends datalynxview_base {
                     $filepath = \escapeshellarg($filepath);
                     $arguments = " -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dBATCH -dNOPAUSE"; // Add -q, remove 2>&1!
                     shell_exec("$gsexec $arguments -sOutputFile=$filepath $filepath 2>&1");
-                }
-
-                // Try once more, if not just skip this file.
-                try {
-                    $importpagecount = $pdf->setSourceFile($filepath);
-                } catch (\Exception $e) {
-                    return $pagecount;
+                    // Try once more, if not just skip this file.
+                    try {
+                        $importpagecount = $pdf->setSourceFile($filepath);
+                    } catch (\Exception $e) {
+                        return $pagecount;
+                    }
                 }
 
                 for ($pagenumber = 1; $pagenumber <= $importpagecount; $pagenumber++) {
