@@ -833,16 +833,22 @@ class datalynxview_pdf extends datalynxview_base {
             if ($file->copy_content_to($filepath)) {
                 $this->_tmpfiles[] = $filepath;
 
-                $importpagecount = 0;
                 // Try if this pdf files version is <= 1.4 to work with pdftk.
                 try {
                     $importpagecount = $pdf->setSourceFile($filepath);
                 } catch (\Exception $e) {
                     // PDF was not valid - try running it through ghostscript to clean it up.
+                    $saved = getenv("LD_LIBRARY_PATH"); // Store current env variables.
+                    $libpath = "/usr/share/ghostscript/9.26/lib"; // This is shown in gs --help.
+                    putenv("LD_LIBRARY_PATH=$libpath"); // Set env variable for ghostscript.
+
                     $gsexec = \escapeshellarg($CFG->pathtogs);
-                    $filepath = \escapeshellarg($filepath);
+                    $shellfilepath = \escapeshellarg($filepath);
                     $arguments = " -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dBATCH -dNOPAUSE"; // Add -q, remove 2>&1!
-                    shell_exec("$gsexec $arguments -sOutputFile=$filepath $filepath 2>&1");
+                    shell_exec("$gsexec $arguments -sOutputFile=$shellfilepath.14 $shellfilepath 2>&1");
+                    shell_exec("mv $filepath.14 $filepath");
+                    putenv("LD_LIBRARY_PATH=$saved"); // Restore old env variables.
+
                     // Try once more, if not just skip this file.
                     try {
                         $importpagecount = $pdf->setSourceFile($filepath);
