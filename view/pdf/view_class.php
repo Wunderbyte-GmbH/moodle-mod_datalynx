@@ -838,22 +838,18 @@ class datalynxview_pdf extends datalynxview_base {
                     $importpagecount = $pdf->setSourceFile($filepath);
                 } catch (\Exception $e) {
                     // PDF was not valid - try running it through ghostscript to clean it up.
-                    $saved = getenv("LD_LIBRARY_PATH"); // Store current env variables.
-                    $libpath = "/usr/share/ghostscript/9.26/lib"; // This is shown in gs --help.
-                    putenv("LD_LIBRARY_PATH=$libpath"); // Set env variable for ghostscript.
-
                     $gsexec = \escapeshellarg($CFG->pathtogs);
                     $shellfilepath = \escapeshellarg($filepath);
-                    $arguments = " -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dBATCH -dNOPAUSE"; // Add -q, remove 2>&1!
-                    shell_exec("$gsexec $arguments -sOutputFile=$shellfilepath.14 $shellfilepath 2>&1");
+                    $arguments = " -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dBATCH -dNOPAUSE -q";
+                    putenv("LD_LIBRARY_PATH"); // Set env variable for ghostscript.
+                    shell_exec("$gsexec $arguments -sOutputFile=$shellfilepath.14 $shellfilepath");
                     shell_exec("mv $filepath.14 $filepath");
-                    putenv("LD_LIBRARY_PATH=$saved"); // Restore old env variables.
 
                     // Try once more, if not just skip this file.
                     try {
                         $importpagecount = $pdf->setSourceFile($filepath);
                     } catch (\Exception $e) {
-                        return $pagecount;
+                        continue;
                     }
                 }
 
