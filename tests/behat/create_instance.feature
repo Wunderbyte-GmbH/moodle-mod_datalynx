@@ -47,7 +47,7 @@ Feature: In a datalynx instance create a new entry
     And I follow "Set as default view"
     And I follow "Set as edit view"
 
-  @javascript
+  @javascript @_file_upload
   Scenario: Add a new entry to datalynx instance
     When I follow "Browse"
     And I follow "Add a new entry"
