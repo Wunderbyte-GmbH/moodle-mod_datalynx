@@ -130,7 +130,7 @@ class entry extends \core_search\base_mod {
      * @return bool
      */
     public function check_access($id) {
-        global $DB, $USER;
+        global $DB;
 
         if (isguestuser()) {
             return \core_search\manager::ACCESS_DENIED;
@@ -217,7 +217,7 @@ class entry extends \core_search\base_mod {
             }
         }
 
-        foreach ($filteredcontents as $key => $content) {
+        foreach ($filteredcontents as $content) {
             $indexfields[] = $content->fieldname . ": " . $content->content;
         }
 
