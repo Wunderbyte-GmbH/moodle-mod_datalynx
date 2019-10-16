@@ -913,4 +913,5 @@ $string['addline'] = 'Add {$a}';
 $string['hideline'] = 'Hide the last line';
 
 // Global search
-$string['search:activity'] = "Datalynx instances";
+$string['search:activity'] = "Datalynx - instances";
+$string['search:entry'] = "Datalynx - entries";
