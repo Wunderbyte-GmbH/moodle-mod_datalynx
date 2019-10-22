@@ -179,12 +179,10 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
                 array('class' => "datalynxfield_teammemberselect $classname", 'multiple' => true,
                     'noselectionstring' => "Gerade keine Auswahl."));
         $mform->setType($fieldname, PARAM_INT);
-        $mform->setDefault("{$fieldname}", $selected); // Not value after validation fails.
+        $mform->setDefault($fieldname, $selected); // Not value after validation fails.
 
         if ($required) {
-            $mform->addRule("{$fieldname}",
-                    'Hier ist leider ein Fehler aufgetreten, bitte wählen Sie.', 'required', null, 0,
-                    'client'); // TODO: Multilang.
+            $mform->addRule($fieldname, get_string('fieldrequired', 'datalynx'), 'required', null, 'client');
         }
     }
 
