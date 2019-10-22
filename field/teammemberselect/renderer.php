@@ -74,12 +74,12 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
                 $entry->{"c{$fieldid}_content"}, true) : [];
         $selected = $selected ? $selected : []; // TODO: Seems obsolete.
         $teamfull = $field->teamsize < count($selected);
-        $userhasadmissiblerole = array_intersect(
+        $hasadmissiblerole = array_intersect(
                 $field->df()->get_user_datalynx_permissions($USER->id), $field->admissibleroles);
         $userismember = in_array($USER->id, $selected);
         $canunsubscribe = $this->_field->allowunsubscription;
 
-        if ($subscribeenabled && $userhasadmissiblerole && (!$teamfull || $userismember) &&
+        if ($subscribeenabled && $hasadmissiblerole && (!$teamfull || $userismember) &&
                 (!$userismember || $canunsubscribe)) {
 
             $str .= html_writer::link(
@@ -151,7 +151,6 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         $fieldid = $field->id();
         $entryid = $entry->id;
         $fieldname = "field_{$fieldid}_$entryid";
-        $fieldnamedropdown = "field_{$fieldid}_{$entryid}_dropdown"; // TODO: We don't use this.
         $classname = "teammemberselect_{$fieldid}_{$entryid}";
         $required = !empty($options['required']);
 
