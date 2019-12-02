@@ -214,7 +214,7 @@ class mod_datalynx_mod_form extends moodleform_mod {
 
         $group = array();
         $group[] = &$mform->createElement('checkbox', 'completionentriesenabled', '',
-                get_string('completionentries', 'datalynx'));
+                get_string('completionentries', 'datalynx'), array('size' => 1));
         $group[] = &$mform->createElement('text', 'completionentries', '', array('size' => 3));
         $mform->setType('completionentries', PARAM_INT);
         $mform->addGroup($group, 'completionentriesgroup',

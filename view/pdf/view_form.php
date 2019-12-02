@@ -188,7 +188,7 @@ class datalynxview_pdf_form extends datalynxview_base_form {
         // Permissions.
         $perms = $view::get_permission_options();
         foreach ($perms as $perm => $label) {
-            $elemgrp[] = &$mform->createElement('advcheckbox', "perm_$perm", null, $label, null,
+            $elemgrp[] = &$mform->createElement('advcheckbox', "perm_$perm", null, $label, array('size' => 1),
                     array('', $perm));
         }
         $mform->addGroup($elemgrp, "perms_grp", get_string('protperms', 'datalynxview_pdf'),

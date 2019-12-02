@@ -911,6 +911,12 @@ $string['confirmfieldgroupdelete'] = 'You are about to delete this fieldgroup!';
 $string['line'] = 'Line';
 $string['addline'] = 'Add {$a}';
 $string['hideline'] = 'Hide the last line';
+$string['nummax'] = 'Max. repetitions';
+$string['numshowdefault'] = 'Shown repetitions';
+$string['numrequired'] = 'Required repetitions';
+$string['onefieldrequired'] = 'Sorry, you have to add at least one field to a fieldgroup.';
+$string['unsupportedfield'] = 'Sorry, fields of type {$a} are not yet supported in fieldgroups.';
 
 // Global search
-$string['search:activity'] = "Datalynx instances";
+$string['search:activity'] = "Datalynx - instances";
+$string['search:entry'] = "Datalynx - entries";

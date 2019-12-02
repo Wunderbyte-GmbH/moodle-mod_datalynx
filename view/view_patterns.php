@@ -53,8 +53,6 @@ class datalynxview_patterns {
      * @return multitype:unknown
      */
     public function search($text, $checkvisibility = true) {
-        $viewid = $this->_view->view->id;
-
         $found = array();
         // Fixed patterns.
         $patterns = array_keys($this->patterns($checkvisibility));
@@ -340,15 +338,14 @@ class datalynxview_patterns {
     protected function get_userpref_replacements($tag, array $options = null) {
         $view = $this->_view;
         $filter = $view->get_filter();
-
-        if (!$view->is_forcing_filter() and (!$filter->id or !empty($options['entriescount']))) {
+        if (!$view->is_forcing_filter() and (!$filter->id or $filter->customsearch or !empty($options['entriescount']))) {
             switch ($tag) {
                 case '##quickperpage##':
                     return $this->print_quick_perpage(true);
                 case '##advancedfilter##':
                     return $this->print_advanced_filter($filter, true);
             }
-            if (strpos($tag, '##customfilter') !== false) {
+            if (strpos($tag, '##customfilter') !== false && !$view->user_is_editing()) {
                 return $this->print_custom_filter($tag, true);
             }
         }
@@ -367,13 +364,12 @@ class datalynxview_patterns {
      * @return string
      */
     protected function get_action_replacements($tag, $entry = null, array $options = null) {
-        global $CFG, $OUTPUT, $USER;
+        global $CFG, $OUTPUT;
 
         $replacement = '';
 
         $view = $this->_view;
         $df = $view->get_df();
-        $filter = $view->get_filter();
         $baseurl = new moodle_url($view->get_baseurl());
         $baseurl->param('sesskey', sesskey());
         $baseurl->param('sourceview', $this->_view->id());
@@ -865,7 +861,6 @@ class datalynxview_patterns {
 
         $view = $this->_view;
         $df = $view->get_df();
-        $filter = $view->get_filter();
         $baseurl = $view->get_baseurl();
 
         $viewjump = '';
@@ -1068,9 +1063,5 @@ class datalynxview_patterns {
             $filterform->display();
             html_writer::end_tag('div');
         }
-    }
-
-    protected function _customize_advanced_filter($filter, $customfilter) {
-
     }
 }

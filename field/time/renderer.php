@@ -73,7 +73,7 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
                     }
                 }
                 // Time is exported as timestamp to csv.
-                if ($exportcsv = optional_param('exportcsv', '', PARAM_ALPHA)) {
+                if (optional_param('exportcsv', '', PARAM_ALPHA)) {
                     return $content;
                 }
             }
@@ -84,37 +84,39 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
     public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
         $field = $this->_field;
         $fieldid = $field->id();
+        $fieldname = "f_{$i}_{$fieldid}";
 
         $elements = array();
 
         // With normal filter display whole form and disable cases.
         if ($mform->_formName != 'mod_datalynx_customfilter_frontend_form') {
-            $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_from", get_string('from'));
-            $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_to", get_string('to'));
+            $elements[] = &$mform->createElement('date_time_selector', "{$fieldname}_from", get_string('from'));
+            $elements[] = &$mform->createElement('date_time_selector', "{$fieldname}_to", get_string('to'));
             if (isset($value[0])) {
-                $mform->setDefault("f_{$i}_{$fieldid}_from", $value[0]);
+                $mform->setDefault("{$fieldname}_from", $value[0]);
             }
             if (isset($value[1])) {
-                $mform->setDefault("f_{$i}_{$fieldid}_to", $value[1]);
+                $mform->setDefault("{$fieldname}_to", $value[1]);
             }
             foreach (array('year', 'month', 'day', 'hour', 'minute') as $fieldidentifier) {
-                $mform->disabledIf("f_{$i}_{$fieldid}_to[$fieldidentifier]", "searchoperator$i", 'neq', 'BETWEEN');
+                $mform->disabledIf("{$fieldname}_to[$fieldidentifier]", "searchoperator$i", 'neq', 'BETWEEN');
             }
             foreach (array('year', 'month', 'day', 'hour', 'minute') as $fieldidentifier) {
-                $mform->disabledIf("f_{$i}_{$fieldid}_from[$fieldidentifier]", "searchoperator$i", 'eq', '');
+                $mform->disabledIf("{$fieldname}_from[$fieldidentifier]", "searchoperator$i", 'eq', '');
             }
             if ($field->dateonly) {
                 // Deactivate form elements for min and seconds when field is date only and operator is "=".
                 foreach (array('hour', 'minute') as $fieldidentifier) {
-                    $mform->disabledIf("f_{$i}_{$fieldid}_from[$fieldidentifier]", "searchoperator$i", 'eq', '=');
+                    $mform->disabledIf("{$fieldname}_from[$fieldidentifier]", "searchoperator$i", 'eq', '=');
                 }
             }
         }
 
         // With customfilter we have to simplify the form.
         if ($mform->_formName == 'mod_datalynx_customfilter_frontend_form') {
-            $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}[0]", get_string('from'));
-            $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}[1]", get_string('to'));
+            $attr = array('optional' => true); // Allows date_time to be enabled, passes 0 if disabled.
+            $elements[] = &$mform->createElement('date_time_selector', "{$fieldname}[0]", get_string('from'), $attr);
+            $elements[] = &$mform->createElement('date_time_selector', "{$fieldname}[1]", get_string('to'));
         }
 
         $separators = array('<br>', '<br>');

@@ -74,12 +74,12 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
                 $entry->{"c{$fieldid}_content"}, true) : [];
         $selected = $selected ? $selected : []; // TODO: Seems obsolete.
         $teamfull = $field->teamsize < count($selected);
-        $userhasadmissiblerole = array_intersect(
+        $hasadmissiblerole = array_intersect(
                 $field->df()->get_user_datalynx_permissions($USER->id), $field->admissibleroles);
         $userismember = in_array($USER->id, $selected);
         $canunsubscribe = $this->_field->allowunsubscription;
 
-        if ($subscribeenabled && $userhasadmissiblerole && (!$teamfull || $userismember) &&
+        if ($subscribeenabled && $hasadmissiblerole && (!$teamfull || $userismember) &&
                 (!$userismember || $canunsubscribe)) {
 
             $str .= html_writer::link(
@@ -151,7 +151,6 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         $fieldid = $field->id();
         $entryid = $entry->id;
         $fieldname = "field_{$fieldid}_$entryid";
-        $fieldnamedropdown = "field_{$fieldid}_{$entryid}_dropdown"; // TODO: We don't use this.
         $classname = "teammemberselect_{$fieldid}_{$entryid}";
         $required = !empty($options['required']);
 
@@ -179,12 +178,10 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
                 array('class' => "datalynxfield_teammemberselect $classname", 'multiple' => true,
                     'noselectionstring' => "Gerade keine Auswahl."));
         $mform->setType($fieldname, PARAM_INT);
-        $mform->setDefault("{$fieldname}", $selected); // Not value after validation fails.
+        $mform->setDefault($fieldname, $selected); // Not value after validation fails.
 
         if ($required) {
-            $mform->addRule("{$fieldname}",
-                    'Hier ist leider ein Fehler aufgetreten, bitte wählen Sie.', 'required', null, 0,
-                    'client'); // TODO: Multilang.
+            $mform->addRule($fieldname, get_string('fieldrequired', 'datalynx'), 'required', null, 'client');
         }
     }
 

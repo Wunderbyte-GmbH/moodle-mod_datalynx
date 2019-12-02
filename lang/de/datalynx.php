@@ -876,6 +876,12 @@ $string['confirmfieldgroupdelete'] = 'Diese Feldergruppierung wirklich löschen?
 $string['line'] = 'Zeile';
 $string['addline'] = 'Füge {$a} hinzu';
 $string['hideline'] = 'Verstecke die letzte Zeile';
+$string['nummax'] = 'Maximale Wiederholungen';
+$string['numshowdefault'] = 'Anzuzeigende Wiederholungen';
+$string['numrequired'] = 'Notwendige Wiederholungen';
+$string['onefieldrequired'] = 'Es muss mindestens ein Feld angegeben werden.';
+$string['unsupportedfield'] = 'Felder vom Typ {$a} können noch nicht in einer Gruppe genutzt werden.';
 
 // Global search
-$string['search:activity'] = "Datalynx Instanzen";
+$string['search:activity'] = "Datalynx - Instanzen";
+$string['search:entry'] = "Datalynx - Einträge";

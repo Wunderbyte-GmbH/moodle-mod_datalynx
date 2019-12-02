@@ -49,8 +49,8 @@ Feature: Create entry and add fieldgroups
     When I set the following fields to these values:
       | Name           | Testfieldgroup1       |
       | Description    | This is a first test  |
-      | nummax         | 4                     |
-      | numshowdefault | 4                     |
+      | param2         | 4                     |
+      | param3         | 4                     |
 
     And I open the autocomplete suggestions list
     Then "Datalynx field Team member select" "autocomplete_suggestions" should exist
@@ -98,8 +98,8 @@ Feature: Create entry and add fieldgroups
     When I set the following fields to these values:
       | Name           | Testfieldgroup1       |
       | Description    | This is a first test  |
-      | nummax         | 4                     |
-      | numshowdefault | 4                     |
+      | param2         | 4                     |
+      | param3         | 4                     |
 
     ## Use the autocomplete.
     And I open the autocomplete suggestions list

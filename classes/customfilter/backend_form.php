@@ -53,7 +53,6 @@ class backend_form extends base_form {
         }
 
         $name = empty($customfilter->name) ? get_string('filternew', 'datalynx') : $customfilter->name;
-        $customfilter->authorsearch = !isset($formdata->authorsearch) ? 0 : $customfilter->authorsearch;
 
         $mform = &$this->_form;
 
@@ -73,10 +72,11 @@ class backend_form extends base_form {
         $mform->setDefault('fulltextsearch', $customfilter->fulltextsearch);
 
         $grp = array();
+        $attr = array('size' => 1);
         $grp[] = $mform->createElement('advcheckbox', 'timecreated',
-                get_string('timecreated', 'datalynx'));
-        $grp[] = $mform->createElement('advcheckbox', 'timecreated_sortable', '',
-                get_string('sortable', 'datalynx'), '', array(0, 1));
+                get_string('timecreated', 'datalynx'), null, $attr);
+        $grp[] = $mform->createElement('advcheckbox', 'timecreated_sortable', null,
+                get_string('sortable', 'datalynx'), $attr, array(0, 1));
         $mform->addGroup($grp, '', null, ' ', false);
         $mform->setType('timecreated', PARAM_INT);
         $mform->setDefault('timecreated', $customfilter->timecreated);
@@ -85,24 +85,24 @@ class backend_form extends base_form {
 
         $grp = array();
         $grp[] = $mform->createElement('advcheckbox', 'timemodified',
-                get_string('timemodified', 'datalynx'));
-        $grp[] = $mform->createElement('advcheckbox', 'timemodified_sortable', '',
-                get_string('sortable', 'datalynx'), '', array(0, 1));
+                get_string('timemodified', 'datalynx'), null, $attr);
+        $grp[] = $mform->createElement('advcheckbox', 'timemodified_sortable', null,
+                get_string('sortable', 'datalynx'), $attr, array(0, 1));
         $mform->addGroup($grp, '', null, ' ', false);
         $mform->setType('timemodified', PARAM_INT);
         $mform->setDefault('timemodified', $customfilter->timemodified);
         $mform->setType('timemodified_sortable', PARAM_INT);
         $mform->setDefault('timemodified_sortable', $customfilter->timemodified_sortable);
 
-        $mform->addElement('advcheckbox', 'authorsearch', get_string('authorsearch', 'datalynx'));
+        $mform->addElement('advcheckbox', 'authorsearch', get_string('authorsearch', 'datalynx'), null, $attr);
         $mform->setType('authorsearch', PARAM_INT);
         $mform->setDefault('authorsearch', $customfilter->authorsearch);
 
-        $mform->addElement('advcheckbox', 'approve', get_string('approved', 'datalynx'));
+        $mform->addElement('advcheckbox', 'approve', get_string('approved', 'datalynx'), null, $attr);
         $mform->setType('approve', PARAM_INT);
         $mform->setDefault('approve', $customfilter->approve);
 
-        $mform->addElement('advcheckbox', 'status', get_string('status', 'datalynx'));
+        $mform->addElement('advcheckbox', 'status', get_string('status', 'datalynx'), null, $attr);
         $mform->setType('status', PARAM_INT);
         $mform->setDefault('status', $customfilter->status);
 

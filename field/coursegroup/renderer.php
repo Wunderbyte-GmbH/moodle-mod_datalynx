@@ -205,9 +205,9 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
         // Select yes/no for member.
         $elements[] = &$mform->createElement('selectyesno', "f_{$i}_{$fieldid}_member");
         // Number field for course id.
-        $elements[] = &$mform->createElement('text', "f_{$i}_{$fieldid}_course");
+        $elements[] = &$mform->createElement('text', "f_{$i}_{$fieldid}_course", null, array('size' => 32));
         // Number field for group id.
-        $elements[] = &$mform->createElement('text', "f_{$i}_{$fieldid}_group");
+        $elements[] = &$mform->createElement('text', "f_{$i}_{$fieldid}_group", null, array('size' => 32));
         $mform->setDefault("f_{$i}_{$fieldid}_member", $member);
         $mform->setDefault("f_{$i}_{$fieldid}_course", $course);
         $mform->setDefault("f_{$i}_{$fieldid}_group", $group);

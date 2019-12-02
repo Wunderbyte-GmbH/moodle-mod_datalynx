@@ -50,19 +50,19 @@ class datalynxfield_fieldgroup_form extends datalynxfield_form {
         $mform->addHelpButton('param1', 'fieldgroupfields', 'datalynx');
 
         // Number of times the field group can be filled out.
-        $mform->addElement('text', 'param2', 'beschreibung nummax'); // TODO: Multilang.
+        $mform->addElement('text', 'param2', get_string('nummax', 'datalynx'));
         $mform->setDefault('param2', 3);
         $mform->addRule('param2', null, 'numeric', null, 'client');
         $mform->setType('param2', PARAM_INT);
 
         // Number of fieldgroups to show by default.
-        $mform->addElement('text', 'param3', 'beschreibung numshowdefault'); // TODO: Multilang.
+        $mform->addElement('text', 'param3', get_string('numshowdefault', 'datalynx'));
         $mform->setDefault('param3', 3); // Defaults to three.
         $mform->addRule('param3', null, 'numeric', null, 'client');
         $mform->setType('param3', PARAM_INT);
 
         // Number of required fieldgroups to be filled out.
-        $mform->addElement('text', 'param4', 'beschreibung numrequired'); // TODO: Multilang.
+        $mform->addElement('text', 'param4', get_string('numrequired', 'datalynx'));
         $mform->setDefault('param4', 0);
         $mform->addRule('param4', null, 'numeric', null, 'client');
         $mform->setType('param4', PARAM_INT);
@@ -80,7 +80,7 @@ class datalynxfield_fieldgroup_form extends datalynxfield_form {
 
         // Check if any fieldnames are set.
         if (!isset($data['param1']) || isset($data['param1']) && empty($data['param1'])) {
-            $errors['param1'] = "Sorry, you have to add at least one field to a fieldgroup."; // TODO: Multilang.
+            $errors['param1'] = get_string('onefieldrequired', 'datalynx');
             return $errors;
         }
 
@@ -88,8 +88,7 @@ class datalynxfield_fieldgroup_form extends datalynxfield_form {
         $fields = $this->_df->get_fields(null, false, true);
         foreach ($data['param1'] as $fieldid) {
             if (!(array_key_exists($fieldid, $fields) and $fields[$fieldid]->for_use_in_fieldgroup())) {
-                $errors['param1'] = "Sorry, fields of type " . $fields[$fieldid]->type .
-                        " are not yet supported in fieldgroups."; // TODO: Multilang.
+                $errors['param1'] = get_string('unsupportedfield', 'datalynx', $fields[$fieldid]->type);
             }
         }
         return $errors;
