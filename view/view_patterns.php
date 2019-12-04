@@ -894,6 +894,12 @@ class datalynxview_patterns {
         global $OUTPUT;
 
         $view = $this->_view;
+
+        // If in edit view filters should never be displayed.
+        if ($view->user_is_editing()) {
+            return '';
+        }
+
         $df = $view->get_df();
         $filter = $view->get_filter();
         $baseurl = $view->get_baseurl();
