@@ -501,7 +501,7 @@ class mod_datalynx_customfilter_frontend_form extends mod_datalynx_filter_base_f
 
             // Add users that have written an entry in the current datalynx instance to list.
             global $DB, $PAGE;
-            $entryauthors = $DB->get_records_menu('datalynx_entries', array('dataid' => $this->_df->id()), null, $fields='id, userid');
+            $entryauthors = $DB->get_records_menu('datalynx_entries', array('dataid' => $this->_df->id()), null, 'id, userid');
             $allusers = get_enrolled_users($PAGE->context);
             foreach ($entryauthors as $userid) {
                 // Skip duplicates.
