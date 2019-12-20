@@ -2,7 +2,7 @@ define(["jquery"], function($) {
 
     return {
 
-        init: function(fieldgroupname, defaultlines, maxlines, requiredlines) {
+        init: function(fieldgroupname, defaultlines, maxlines, requiredlines, fieldgroup) {
 
             // We hide lines after the last line we show by default.
             defaultlines++;
@@ -16,6 +16,11 @@ define(["jquery"], function($) {
             $("div.datalynx-field-wrapper #id_addline").click(function (e) {
                 e.preventDefault(); // Don't follow hrefs.
                 $(this).closest(".datalynx-field-wrapper").find("[data-line]:hidden:first").show();
+
+                // Add one to lastvisible.
+                if ($('input[name='+fieldgroup+'_lastvisible]').val() < maxlines) {
+                    $('input[name='+fieldgroup+'_lastvisible]').get(0).value++;
+                }
             });
 
             // Remove this one line.
@@ -58,6 +63,9 @@ define(["jquery"], function($) {
                             ' .form-autocomplete-selection .tag').each(function () {
                             $(this).trigger('click');
                         });
+
+                        // Subtract one from lastvisible.
+                        $('input[name='+fieldgroup+'_lastvisible]').get(0).value--;
 
                         // Hide the empty lines if not required or the only line remaining.
                         // TODO: Changed this to >= so people can remove the first line as well.

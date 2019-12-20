@@ -174,9 +174,13 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
             $defaultlines = $lastlinewithcontent + 1;
         }
 
+        // Add line visible anchor, starts at 0.
+        $mform->addElement('hidden', $fieldname.'_lastvisible', $defaultlines);
+        $mform->setType($fieldname.'_lastvisible', PARAM_INT);
+
         // Hide unused lines.
         global $PAGE;
-        $PAGE->requires->js_call_amd('mod_datalynx/fieldgroups', 'init', array($this->_field->field->name, $defaultlines, $maxlines, $requiredlines));
+        $PAGE->requires->js_call_amd('mod_datalynx/fieldgroups', 'init', array($this->_field->field->name, $defaultlines, $maxlines, $requiredlines, $fieldname));
 
         // Show a button to add one more line.
         $mform->addElement('button', 'addline', get_string('addline', 'datalynx', $this->_field->field->name));

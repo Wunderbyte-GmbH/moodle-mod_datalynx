@@ -215,6 +215,17 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         $fieldid = $this->_field->id();
 
         $formfieldname = "field_{$fieldid}_{$entryid}";
+
+        // In case we see a fieldgroup validate inputs only if line was visible to the user.
+        if(!is_numeric($entryid)) {
+            $linenumber = explode("_", $entryid)[3];
+            $lastvisible = "fieldgroup_" . explode("_", $entryid)[2] . "_lastvisible";
+            $lastvisibleline = $formdata->$lastvisible;
+            if ($linenumber >= $lastvisibleline) {
+                return array();
+            }
+        }
+
         $errors = array();
         foreach ($tags as $tag) {
             list(, $behavior, ) = $this->process_tag($tag);
