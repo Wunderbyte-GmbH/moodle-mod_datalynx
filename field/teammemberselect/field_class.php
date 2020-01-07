@@ -348,26 +348,13 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         } else {
             // Customfilter adds ANY_OF instead of OTHER_USER.
             if ($operator === 'OTHER_USER' || $operator === 'ANY_OF') {
-
-                $params[$name] = "%\"{$value}\"%";
-
-                if (!!$not) {
-                    $like = $DB->sql_like("content", ":{$name}", true, true);
-
-                    if ($eids = $this->get_entry_ids_for_content($like, $params)) {
-                        list($notinids, $paramsnot) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED,
-                                "df_{$fieldid}_x_", false);
-                        $params = array_merge($params, $paramsnot);
-                        $sql = " (e.id $notinids) ";
-                    } else {
-                        $sql = " 0 ";
-                    }
-
-                    $usecontent = false;
-                } else {
-                    $sql = $DB->sql_like("c{$fieldid}.content", ":{$name}", true, true);
-                    $usecontent = true;
+                foreach ($value as $key => $userid) {
+                    $xname = $name . $key; // Unique name for every parameter.
+                    $conditions[] = $DB->sql_like($content, ":{$xname}");
+                    $params[$xname] = "%\"$userid\"%";
                 }
+                $sql = " $not (" . implode(" OR ", $conditions) . ") ";
+                $usecontent = true;
             } else {
                 if ($operator === '') {
                     // This is the "empty" operator.

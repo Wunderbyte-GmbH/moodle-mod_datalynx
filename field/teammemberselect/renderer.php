@@ -190,9 +190,10 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         $fieldid = $field->id();
         $fieldname = "f_{$i}_{$fieldid}";
         $menu = array(0 => '') + $field->options_menu();
+        $options = array('multiple' => true);
 
         $elements = array();
-        $elements[] = $mform->createElement('autocomplete', $fieldname, null, $menu);
+        $elements[] = $mform->createElement('autocomplete', $fieldname, null, $menu, $options);
         $mform->setType($fieldname, PARAM_INT);
         $mform->setDefault($fieldname, $value);
         $mform->disabledIf($fieldname, "searchoperator{$i}", 'eq', '');
