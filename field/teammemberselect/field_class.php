@@ -488,6 +488,19 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
     }
 
     /**
+     * Allow array in filter definition.
+     */
+    public function format_search_value($searchparams) {
+        list($not, $operator, $value) = $searchparams;
+        if (is_array($value)) {
+            $selected = implode(', ', $value);
+            return $not . ' ' . $operator . ' ' . $selected;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Are fields of this field type suitable for use in customfilters?
      *
      * @return bool
