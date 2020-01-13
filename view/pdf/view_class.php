@@ -26,7 +26,14 @@ defined('MOODLE_INTERNAL') or die();
 
 require_once("$CFG->dirroot/mod/datalynx/view/view_class.php");
 require_once("$CFG->libdir/pdflib.php");
-require_once("$CFG->dirroot/mod/assign/feedback/editpdf/fpdi/fpdi.php");
+use setasign\Fpdi\TcpdfFpdi;
+
+// Fallback for older Moodle Versions < 3.8.
+if (is_file("$CFG->dirroot/mod/assign/feedback/editpdf/fpdi/autoload.php")) {
+    require_once($CFG->dirroot.'/mod/assign/feedback/editpdf/fpdi/autoload.php');
+} else {
+    require_once("$CFG->dirroot/mod/assign/feedback/editpdf/fpdi/fpdi.php");
+}
 
 class datalynxview_pdf extends datalynxview_base {
 
@@ -866,8 +873,15 @@ class datalynxview_pdf extends datalynxview_base {
     }
 }
 
+// Because different implementations in mdl 3.5 and 3.8 we extend dynamically.
+if (is_file("$CFG->dirroot/mod/assign/feedback/editpdf/fpdi/autoload.php")) {
+    class DynamicParent extends TcpdfFpdi {}
+} else {
+    class DynamicParent extends FPDI {}
+}
+
 // Extend the TCPDF class to create custom Header and Footer.
-class dfpdf extends FPDI {
+class dfpdf extends DynamicParent {
 
     protected $_dfsettings;
 
