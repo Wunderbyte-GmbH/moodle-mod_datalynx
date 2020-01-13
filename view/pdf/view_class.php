@@ -875,9 +875,11 @@ class datalynxview_pdf extends datalynxview_base {
 
 // Because different implementations in mdl 3.5 and 3.8 we extend dynamically.
 if (is_file("$CFG->dirroot/mod/assign/feedback/editpdf/fpdi/autoload.php")) {
-    class DynamicParent extends TcpdfFpdi {}
+    class DynamicParent extends TcpdfFpdi {
+    }
 } else {
-    class DynamicParent extends FPDI {}
+    class DynamicParent extends FPDI {
+    }
 }
 
 // Extend the TCPDF class to create custom Header and Footer.
