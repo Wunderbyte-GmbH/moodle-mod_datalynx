@@ -28,6 +28,7 @@ require_once("$CFG->dirroot/mod/datalynx/view/view_class.php");
 require_once("$CFG->libdir/pdflib.php");
 use setasign\Fpdi\TcpdfFpdi;
 
+// TODO: Remove at EOL 3.5
 // Fallback for older Moodle Versions < 3.8.
 if (is_file("$CFG->dirroot/mod/assign/feedback/editpdf/fpdi/autoload.php")) {
     require_once($CFG->dirroot.'/mod/assign/feedback/editpdf/fpdi/autoload.php');
@@ -873,6 +874,7 @@ class datalynxview_pdf extends datalynxview_base {
     }
 }
 
+// TODO: Remove at EOL 3.5
 // Because different implementations in mdl 3.5 and 3.8 we extend dynamically.
 if (is_file("$CFG->dirroot/mod/assign/feedback/editpdf/fpdi/autoload.php")) {
     class DynamicParent extends TcpdfFpdi {
