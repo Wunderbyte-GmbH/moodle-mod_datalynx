@@ -338,7 +338,7 @@ class datalynx_filter {
             $searchwhere[] = ' (' . implode(' OR ', $searchlike) . ') ';
         }
 
-        $wheresearch = $searchwhere ? ' AND (' . implode(' OR ', $searchwhere) .')' : '';
+        $wheresearch = $searchwhere ? ' AND (' . implode(' AND ', $searchwhere) .')' : '';
 
         // Register referred tables.
         $this->_filteredtables = $searchfrom;
