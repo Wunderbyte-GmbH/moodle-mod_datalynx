@@ -109,7 +109,7 @@ class datalynxfield_entryauthor extends datalynxfield_no_content {
                         'name' => get_string('institution'), 'description' => '',
                         'visible' => 2, 'internalname' => 'institution');
 
-        // TODO: Multilang
+        // TODO: Multilang.
         $fieldobjects[self::_BADGES] = (object) array('id' => self::_BADGES,
                         'dataid' => $dataid, 'type' => 'entryauthor',
                         'name' => 'Badges', 'description' => '',
@@ -181,7 +181,7 @@ class datalynxfield_entryauthor extends datalynxfield_no_content {
      * returns an array of distinct content of the field
      */
     public function get_distinct_content($sortdir = 0) {
-        global $CFG, $DB;
+        global $DB;
 
         $sortdir = $sortdir ? 'DESC' : 'ASC';
         $contentfull = $this->get_sort_sql();
