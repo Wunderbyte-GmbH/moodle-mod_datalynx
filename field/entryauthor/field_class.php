@@ -144,21 +144,17 @@ class datalynxfield_entryauthor extends datalynxfield_no_content {
     /**
      */
     public function get_search_sql($search) {
-        global $USER;
-        $internalname = $this->field->internalname;
+        global $USER, $DB;
+        list($not, $operator, $value) = $search;
 
-        if ($internalname == 'id' || $internalname == 'name') {
-            if ($search[1] == 'ME') {
-                $search[1] = '=';
-                $search[2] = $USER->id;
-            } else {
-                if ($search[1] == 'OTHER_USER') {
-                    $search[1] = '=';
-                }
-            }
+        if ($operator == 'ME') {
+            $operator = '=';
+            $value = $USER->id;
         }
 
-        return parent::get_search_sql($search);
+        list($sql, $params) = $DB->get_in_or_equal($value, SQL_PARAMS_NAMED);
+        $sql = " $not ( e.userid $sql ) ";
+        return array($sql, $params, false);
     }
 
     public function parse_search($formdata, $i) {

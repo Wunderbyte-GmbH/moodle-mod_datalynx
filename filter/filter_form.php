@@ -495,14 +495,12 @@ class mod_datalynx_customfilter_frontend_form extends mod_datalynx_filter_base_f
         // Search for author.
         if ($customfilter->authorsearch) {
 
-            // We need this to sidetrack autocomplete.
-            $menu = array();
-            $menu += array(0 => null); // NULL to "not" show in lists.
-
             // Add users that have written an entry in the current datalynx instance to list.
             global $DB, $PAGE;
             $entryauthors = $DB->get_records_menu('datalynx_entries', array('dataid' => $this->_df->id()), null, 'id, userid');
             $allusers = get_enrolled_users($PAGE->context);
+
+            $menu = array();
             foreach ($entryauthors as $userid) {
                 // Skip duplicates.
                 if (isset($menu[$userid])) {
@@ -510,8 +508,8 @@ class mod_datalynx_customfilter_frontend_form extends mod_datalynx_filter_base_f
                 }
                 $menu[$userid] = $allusers[$userid]->firstname . " " . $allusers[$userid]->lastname;
             }
-
-            $mform->addElement('autocomplete', 'authorsearch', get_string('authorsearch', 'datalynx'), $menu);
+            $options = array('multiple' => true);
+            $mform->addElement('autocomplete', 'authorsearch', get_string('authorsearch', 'datalynx'), $menu, $options);
             $mform->setType('authorsearch', PARAM_INT);
         }
 
