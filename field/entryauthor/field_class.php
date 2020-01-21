@@ -148,7 +148,6 @@ class datalynxfield_entryauthor extends datalynxfield_no_content {
         list($not, $operator, $value) = $search;
 
         if ($operator == 'ME') {
-            $operator = '=';
             $value = $USER->id;
         }
 
