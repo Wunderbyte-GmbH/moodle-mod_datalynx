@@ -62,7 +62,7 @@ class datalynxview_base_form extends moodleform {
         $mform->addHelpButton('general', 'viewgeneral', 'datalynx');
 
         // Name and description.
-        $mform->addElement('text', 'name', get_string('name'));
+        $mform->addElement('text', 'name', get_string('name'), array('size' => '64'));
         $mform->addRule('name', null, 'required', null, 'client');
 
         $mform->addElement('text', 'description', get_string('description'), array('size' => '64'));

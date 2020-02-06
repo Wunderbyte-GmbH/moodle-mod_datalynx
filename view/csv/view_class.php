@@ -546,7 +546,6 @@ class datalynxview_csv extends datalynxview_base {
 
         // Set views and filters menus and quick search.
         $table = new html_table();
-        $table->attributes['align'] = 'center';
         $table->attributes['cellpadding'] = '2';
         // First row: menus.
         $row1 = new html_table_row();

@@ -46,7 +46,6 @@ class datalynxview_grid extends datalynxview_base {
 
         // Set views and filters menus and quick search.
         $table = new html_table();
-        $table->attributes['align'] = 'center';
         $table->attributes['cellpadding'] = '2';
         // First row: menus.
         $row1 = new html_table_row();
@@ -83,7 +82,6 @@ class datalynxview_grid extends datalynxview_base {
 
         // Set content.
         $table = new html_table();
-        $table->attributes['align'] = 'center';
         $table->attributes['cellpadding'] = '2';
 
         // Fields.
@@ -217,7 +215,6 @@ class datalynxview_grid extends datalynxview_base {
     protected function make_table($cols, $rows) {
         $table = new html_table();
         $table->align = array_fill(0, $cols, 'center');
-        $table->attributes['align'] = 'center';
         for ($r = 0; $r < $rows; $r++) {
             $row = new html_table_row();
             for ($c = 0; $c < $cols; $c++) {
