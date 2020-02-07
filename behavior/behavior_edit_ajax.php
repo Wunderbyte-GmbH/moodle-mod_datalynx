@@ -28,13 +28,12 @@ $behaviorid = required_param('behaviorid', PARAM_INT);
 $permissionid = optional_param('permissionid', 0, PARAM_INT);
 $forproperty = required_param('forproperty', PARAM_ALPHA);
 
+// Get the datalynxid from the database.
 $dataid = $DB->get_field('datalynx_behaviors', 'dataid', array('id' => $behaviorid));
-$courseid = $DB->get_field('datalynx', 'course', array('id' => $dataid));
 
-// This cannot work as the id needs to be courseid not dataid.
-// $cm = get_coursemodule_from_id('datalynx', $dataid, 0, false, MUST_EXIST);
-// require_login($courseid, false, $cm);
-
+$datalynx = new mod_datalynx\datalynx($dataid);
+require_login($datalynx->data->course, false, $datalynx->cm);
+require_capability('mod/datalynx:managetemplates', $datalynx->context);
 require_sesskey();
 
 $toggle = "ERROR";
