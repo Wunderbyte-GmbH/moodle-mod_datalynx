@@ -37,7 +37,36 @@ class datalynxview_entries_form extends moodleform {
 
         $view->definition_to_form($mform);
 
-        $this->add_action_buttons();
+        $this->add_action_buttons(true, null, "_1");
+    }
+
+    /**
+     * Override add_action_buttons to allow multiple buttons on one form.
+     *
+     * @param bool $cancel whether to show cancel button, default true
+     * @param string $submitlabel label for submit button, defaults to get_string('savechanges')
+     * @param string $multiple if we need a secondary buttongroup we add an iterator here.
+     */
+    function add_action_buttons($cancel = true, $submitlabel = null, $multiple = null){
+        if (is_null($submitlabel)){
+            $submitlabel = get_string('savechanges');
+        }
+        $mform =& $this->_form;
+        if ($cancel){
+            // When two elements we need a group.
+            $buttonarray=array();
+            $buttonarray[] = &$mform->createElement('submit', 'submitbutton'.$multiple, $submitlabel);
+            $buttonarray[] = &$mform->createElement('cancel', 'cancel'.$multiple ,null ,array('class' => ' btn-cancel'));
+
+            // $this->updateAttributes(array('class' => $class . ' btn-cancel'));
+
+            $mform->addGroup($buttonarray, 'buttonar'.$multiple, '', array(' '), false);
+            $mform->closeHeaderBefore('buttonar'.$multiple);
+        } else {
+            // No group needed.
+            $mform->addElement('submit', 'submitbutton'.$multiple, $submitlabel);
+            $mform->closeHeaderBefore('submitbutton'.$multiple);
+        }
     }
 
     public function validation($data, $files) {
