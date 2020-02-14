@@ -56,9 +56,7 @@ class datalynxview_entries_form extends moodleform {
             // When two elements we need a group.
             $buttonarray=array();
             $buttonarray[] = &$mform->createElement('submit', 'submitbutton'.$multiple, $submitlabel);
-            $buttonarray[] = &$mform->createElement('cancel', 'cancel'.$multiple ,null ,array('class' => ' btn-cancel'));
-
-            // $this->updateAttributes(array('class' => $class . ' btn-cancel'));
+            $buttonarray[] = &$mform->createElement('cancel', 'cancel'.$multiple, get_string('cancel'));
 
             $mform->addGroup($buttonarray, 'buttonar'.$multiple, '', array(' '), false);
             $mform->closeHeaderBefore('buttonar'.$multiple);
