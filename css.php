@@ -52,11 +52,11 @@ if ($urlparams->cssedit) {
             $mform->addElement('header', 'generalhdr', get_string('headercss', 'datalynx'));
 
             // Includes.
-            $attributes = array('wrap' => 'virtual', 'rows' => 5, 'cols' => 60);
+            $attributes = array('wrap' => 'soft', 'rows' => 5, 'cols' => 60);
             $mform->addElement('textarea', 'cssincludes', get_string('cssincludes', 'datalynx'), $attributes);
 
             // Code.
-            $attributes = array('wrap' => 'virtual', 'rows' => 15, 'cols' => 60);
+            $attributes = array('wrap' => 'soft', 'rows' => 15, 'cols' => 60);
             $mform->addElement('textarea', 'css', get_string('csscode', 'datalynx'), $attributes);
 
             // Uploads.

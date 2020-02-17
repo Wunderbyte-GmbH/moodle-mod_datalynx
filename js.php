@@ -52,13 +52,13 @@ if ($urlparams->jsedit) {
             $mform->addElement('header', 'generalhdr', get_string('headerjs', 'datalynx'));
 
             // Includes.
-            $attributes = array('wrap' => 'virtual', 'rows' => 5, 'cols' => 60
+            $attributes = array('wrap' => 'soft', 'rows' => 5, 'cols' => 60
             );
             $mform->addElement('textarea', 'jsincludes', get_string('jsincludes', 'datalynx'),
                     $attributes);
 
             // Code.
-            $attributes = array('wrap' => 'virtual', 'rows' => 15, 'cols' => 60
+            $attributes = array('wrap' => 'soft', 'rows' => 15, 'cols' => 60
             );
             $mform->addElement('textarea', 'js', get_string('jscode', 'datalynx'), $attributes);
 

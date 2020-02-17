@@ -36,7 +36,7 @@ class datalynxfield_multiselect_form extends datalynxfield_option_form {
 
         // Default options.
         $mform->addElement('textarea', 'param2', get_string('fieldoptionsdefault', 'datalynx'),
-                'wrap="virtual" rows="5" cols="50"');
+                'wrap="soft" rows="5" cols="50"');
 
         // Options separator.
         $mform->addElement('select', 'param3', get_string('fieldoptionsseparator', 'datalynx'),

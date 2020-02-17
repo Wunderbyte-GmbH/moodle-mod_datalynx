@@ -131,7 +131,7 @@ class datalynxview_csv_import_form extends moodleform {
 
         // Upload text.
         $mform->addElement('textarea', 'csvtext', get_string('uploadtext', 'mod_datalynx'),
-                array('wrap' => 'virtual', 'rows' => '5', 'style' => 'width:100%;'));
+                array('wrap' => 'soft', 'rows' => '5', 'style' => 'width:100%;'));
 
         // Update existing entries.
         $mform->addElement('selectyesno', 'updateexisting', get_string('updateexisting', 'mod_datalynx'));
