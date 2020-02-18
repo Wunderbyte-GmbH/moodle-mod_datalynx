@@ -533,5 +533,10 @@ class mod_datalynx_customfilter_frontend_form extends mod_datalynx_filter_base_f
         }
 
         $mform->addElement('submit', 'customsearch', get_string("search"));
+
+        $url = new moodle_url('/mod/datalynx/view.php', array('id' => $this->_df->cm->id, 'filter' => 0));
+        $mform->addElement('button', 'clearcustomsearch', get_string('resetsettings', 'datalynx'),
+            array('onclick' => "location.href = '$url'"));
+
     }
 }
