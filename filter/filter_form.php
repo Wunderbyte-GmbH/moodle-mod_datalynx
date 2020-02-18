@@ -486,6 +486,8 @@ class mod_datalynx_customfilter_frontend_form extends mod_datalynx_filter_base_f
         }
 
         $mform = &$this->_form;
+        $mform->addElement('header', 'collapseCustomfilter', get_string('filteradvanced', 'datalynx'));
+        $mform->setExpanded('collapseCustomfilter', false);
 
         if ($customfilter->fulltextsearch) {
             $mform->addElement('text', 'search', get_string('search'));
@@ -529,6 +531,7 @@ class mod_datalynx_customfilter_frontend_form extends mod_datalynx_filter_base_f
             $grp[] = $mform->createElement('select', 'customfiltersortdirection', '', $directions);
             $mform->addGroup($grp, "customfiltersort_grp", get_string('sortby'), ' ', false);
         }
-        $this->add_action_buttons(false, get_string('search'));
+
+        $mform->addElement('submit', 'customsearch', get_string("search"));
     }
 }
