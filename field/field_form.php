@@ -126,16 +126,17 @@ class datalynxfield_option_form extends datalynxfield_form {
                         "<tr><td>{$option}</td><td>");
                 $group[] = &$mform->createElement('text', "renameoption[{$id}]", '', array('size' => 32));
                 $group[] = &$mform->createElement('static', null, null, '</td><td>');
-                $group[] = &$mform->createElement('checkbox', "deleteoption[{$id}]", '', null, array('size' => 1));
+                $group[] = &$mform->createElement('advcheckbox', "deleteoption[{$id}]", '', null, array('size' => 1, 'group' => 1));
                 foreach ($options as $newid => $newoption) {
                     $mform->disabledIf("renameoption[{$id}]", "deleteoption[{$newid}]", 'checked');
                 }
                 $group[] = &$mform->createElement('static', null, null, '</td></tr>');
             }
             $group[] = &$mform->createElement('static', null, null, '</tbody></table>');
-            $tablerow = &$mform->createElement('group', 'existingoptions',
-                    get_string('existingoptions', 'datalynx'), $group, null, false);
+            $tablerow = &$mform->createElement('group', 'existingoptions', get_string('existingoptions', 'datalynx'), $group, null, false);
             $mform->insertElementBefore($tablerow, 'param2');
+            $this->add_checkbox_controller(1, "Click here to remove all options.", null, 0);
+
         }
         $addnew = &$mform->createElement('textarea', 'addoptions',
                 get_string('addoptions', 'datalynx'), 'wrap="soft" rows="5" cols="30"');
@@ -160,7 +161,7 @@ class datalynxfield_option_form extends datalynxfield_form {
                 $errors['existingoptions'] = get_string('nooptions', 'datalynx');
             } else {
                 if (isset($data['deleteoption']) && isset($data['renameoption'])) {
-                    $errors['existingoptions'] = get_string('avoidaddanddeletesimultaneously' . 'datalynx');
+                    $errors['existingoptions'] = get_string('avoidaddanddeletesimultaneously', 'datalynx');
                 }
             }
         }
