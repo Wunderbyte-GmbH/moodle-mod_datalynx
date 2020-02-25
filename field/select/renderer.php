@@ -80,7 +80,7 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
         $sortalphbetically = $field->field->param4;
         if ($sortalphbetically) {
             usort($menuoptions, function($a, $b) {
-                return strcmp($a->name, $b->name);
+                return strcoll($a->name, $b->name);
             });
         }
         $choosedots = new stdClass();
