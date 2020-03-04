@@ -532,13 +532,16 @@ class mod_datalynx_customfilter_frontend_form extends mod_datalynx_filter_base_f
             $mform->addGroup($grp, "customfiltersort_grp", get_string('sortby'), ' ', false);
         }
 
-        $mform->addElement('submit', 'customsearch', get_string("search"));
+        // Show buttons in line with each other.
+        $buttonarray = array();
+        $buttonarray[] = &$mform->createElement('submit', 'customsearch', get_string("search"));
 
         // Add a button that resets all custom filter values at once.
         $clearcustomsearch = '<a  class="btn btn-secondary" href="';
         $clearcustomsearch .= new moodle_url('/mod/datalynx/view.php', array('id' => $this->_df->cm->id, 'filter' => 0));
         $clearcustomsearch .= '"> ' . get_string('resetsettings', 'datalynx') . '</a>';
-        $mform->addElement('static', 'clearcustomsearch', '',  $clearcustomsearch);
+        $buttonarray[] = &$mform->createElement('static', 'clearcustomsearch', '',  $clearcustomsearch);
 
+        $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
     }
 }
