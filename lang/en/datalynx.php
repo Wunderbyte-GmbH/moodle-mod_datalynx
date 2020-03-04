@@ -77,6 +77,9 @@ $string['customfilteradd'] = 'Add a custom filter';
 $string['customfilternew'] = 'New custom filter';
 $string['customfilters'] = 'Custom Filters';
 $string['customfiltersnoneindatalynx'] = 'There are no custom filters defined for this datalynx.';
+$string['customfilterandor'] = 'All selected options have to be part of the entry';
+$string['customfilterandor_help'] = 'If selected all selected options have to be part of the entry.';
+
 // Capability strings.
 $string['datalynx:addinstance'] = 'Add a new datalynx';
 $string['datalynx:approve'] = 'Approve unapproved entries';
