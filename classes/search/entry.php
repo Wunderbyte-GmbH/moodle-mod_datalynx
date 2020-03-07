@@ -60,8 +60,9 @@ class entry extends \core_search\base_mod {
         $sql = "SELECT de.*, dl.course
                 FROM {datalynx_entries} de
                 JOIN {datalynx} dl ON dl.id = de.dataid $contextjoin
-                WHERE de.timemodified >= ? ORDER BY de.timemodified ASC";
-        return $DB->get_recordset_sql($sql, array_merge($contextparams, [$modifiedfrom]));
+                WHERE de.timemodified >= :timemodified ORDER BY de.timemodified ASC";
+
+        return $DB->get_recordset_sql($sql, array_merge($contextparams, ['timemodified' => $modifiedfrom]));
     }
 
     /**
