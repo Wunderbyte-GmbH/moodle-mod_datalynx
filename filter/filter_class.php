@@ -267,7 +267,7 @@ class datalynx_filter {
         }
         if ($simplesearch) {
             $searchtables .= " JOIN {datalynx_contents} cs ON cs.entryid = e.id ";
-            $searchtables .= " JOIN {datalynx_fields} f ON cs.fieldid = f.id ";
+            $searchtables .= " JOIN {datalynx_fields} fsimple ON cs.fieldid = fsimple.id ";
             $searchlike = array('search1' => $DB->sql_like('cs.content', ':search1', false, false),
                 'search2' => $DB->sql_like('u.firstname', ':search2', false, false),
                 'search3' => $DB->sql_like('u.lastname', ':search3', false, false),
@@ -298,7 +298,7 @@ class datalynx_filter {
                             if (stripos($option, $simplesearch) !== false) {
                                 $paramlike = "fieldquicksearch$i";
                                 $paramid = "fieldid$i";
-                                $searchlike[$paramlike] = "(cs.content = :$paramlike AND f.id = :$paramid)";
+                                $searchlike[$paramlike] = "(cs.content = :$paramlike AND fsimple.id = :$paramid)";
                                 $searchparams[$paramlike] = "$id";
                                 $searchparams[$paramid] = $field->id();
                                 $i++;
