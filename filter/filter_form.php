@@ -486,7 +486,7 @@ class mod_datalynx_customfilter_frontend_form extends mod_datalynx_filter_base_f
         }
 
         $mform = &$this->_form;
-        $mform->addElement('header', 'collapseCustomfilter', get_string('filteradvanced', 'datalynx'));
+        $mform->addElement('header', 'collapseCustomfilter', get_string('search'));
         $mform->setExpanded('collapseCustomfilter', false);
 
         if ($customfilter->fulltextsearch) {
