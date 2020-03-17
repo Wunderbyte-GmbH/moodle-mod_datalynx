@@ -229,4 +229,53 @@ class entry extends \core_search\base_mod {
 
         return $indexfields;
     }
+
+    /**
+     * Returns true if this area uses file indexing.
+     *
+     * @return bool
+     */
+    public function uses_file_indexing() {
+        return true;
+    }
+
+    /**
+     * Return the context info required to index files for
+     * this search area.
+     *
+     * @return array
+     */
+    public function get_search_fileareas() {
+        return array('content');
+    }
+
+    /**
+     * Add the database entries attachments.
+     *
+     * @param \core_search\document $doc
+     * @return void
+     */
+    public function attach_files($doc) {
+        global $DB;
+
+        $entryid = $doc->get('itemid');
+
+        try {
+            $entry = $this->get_entry($entryid);
+        } catch (\dml_missing_record_exception $e) {
+            debugging('Could not get record to attach files to '.$doc->get('id'), DEBUG_DEVELOPER);
+            return;
+        }
+
+        $cm = $this->get_cm('datalynx', $entry->dataid, $doc->get('courseid'));
+        $context = \context_module::instance($cm->id);
+
+        // Get the files and attach them.
+        $fs = get_file_storage();
+
+        $files = $fs->get_area_files($context->id, 'mod_datalynx', 'content', $entryid);
+        foreach ($files as $file) {
+            $doc->add_stored_file($file);
+        }
+    }
 }
