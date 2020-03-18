@@ -201,7 +201,6 @@ class entry extends \core_search\base_mod {
         global $DB;
 
         $indexfields = array();
-        $validfieldtypes = array('text', 'textarea', 'url', 'number', 'editor');
 
         $sql = "SELECT dc.*, df.name AS fieldname, df.type AS fieldtype
                 FROM {datalynx_contents} dc, {datalynx_fields} df
@@ -213,9 +212,7 @@ class entry extends \core_search\base_mod {
 
         // Filter invalid fieldtypes.
         foreach ($contents as $content) {
-            if (in_array($content->fieldtype, $validfieldtypes)) {
-                $filteredcontents[] = $content;
-            }
+            $filteredcontents[] = $content;
         }
 
         foreach ($filteredcontents as $content) {
