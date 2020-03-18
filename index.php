@@ -138,7 +138,7 @@ foreach ($datalynxs as $datalynx) {
     $tablerow[] = $df->get_entriescount(mod_datalynx\datalynx::COUNT_ALL);
 
     // Number of pending entries.
-    $tablerow[] = $df->get_entriescount(mod_datalynx\datalynx::COUNT_LEFT);
+    $tablerow[] = $df->get_entriescount(mod_datalynx\datalynx::COUNT_UNAPPROVED);
 
     // Rss.
     if ($rss) {

@@ -315,7 +315,9 @@ class datalynx {
                 break;
 
             case self::COUNT_UNAPPROVED:
-                $count = '---';
+                $count = $DB->count_records_sql(
+                    'SELECT COUNT(e.id) FROM {datalynx_entries} e WHERE e.approved = 0 AND e.dataid = ?',
+                    array($this->id()));
                 break;
 
             case self::COUNT_LEFT:
