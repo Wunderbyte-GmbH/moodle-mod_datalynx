@@ -919,12 +919,20 @@ class datalynx_filter_manager {
     public function get_filter_from_form($filter, $formdata, $finalize = false) {
         $filter->name = $formdata->name;
         $filter->description = !empty($formdata->description) ? $formdata->description : '';
-        $filter->perpage = !empty($formdata->perpage) ? $formdata->perpage : 0;
         $filter->selection = !empty($formdata->selection) ? $formdata->selection : 0;
         $filter->groupby = !empty($formdata->groupby) ? $formdata->groupby : 0;
         $filter->search = isset($formdata->search) ? $formdata->search : '';
         $filter->customsort = $this->get_sort_options_from_form($formdata);
         $filter->customsearch = $this->get_search_options_from_form($formdata, $finalize);
+
+        // Userpreferences for perpage overwrites filterpreferences.
+        $filter->perpage = 0;
+        if (isset($formdata->perpage)) {
+            $filter->perpage = $formdata->perpage;
+        }
+        if (isset($formdata->uperpage)) {
+            $filter->perpage = $formdata->uperpage;
+        }
 
         if ($filter->customsearch) {
             $filter->search = '';
