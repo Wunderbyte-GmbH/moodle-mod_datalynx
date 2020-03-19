@@ -673,7 +673,7 @@ class datalynx_filter_manager {
         global $DB;
         if (!$this->_filters or $forceget) {
             $this->_filters = array();
-            if ($filters = $DB->get_records('datalynx_filters', array('dataid' => $this->_df->id()))) {
+            if ($filters = $DB->get_records('datalynx_filters', array('dataid' => $this->_df->id()), 'name')) {
                 foreach ($filters as $filterid => $filterdata) {
                     $this->_filters[$filterid] = new datalynx_filter($filterdata);
                 }
