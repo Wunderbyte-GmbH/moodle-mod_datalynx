@@ -246,6 +246,9 @@ class datalynxview_pdf extends datalynxview_base {
             if ($pagecount < 1 AND $this->_settings->pdfframefirstpageonly) {
                 $this->set_frame($pdf);
             }
+            if (!$this->_settings->pdfframefirstpageonly) {
+                $this->set_frame($pdf);
+            }
 
             // Set watermark.
             $this->set_watermark($pdf);
