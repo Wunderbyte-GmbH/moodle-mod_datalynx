@@ -23,6 +23,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['exportfields'] = 'Export fields';
+$string['exportfields_help'] = 'Add fields that will be exported to your csv file like this: [[fieldname]] and seperate by line.';
 $string['outputtype'] = 'Output type';
 $string['pluginname'] = 'Csv';
 $string['csv'] = 'CSV';

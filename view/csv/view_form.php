@@ -60,8 +60,8 @@ class datalynxview_csv_form extends datalynxview_base_form {
         // Fields to import.
         $attributes = array('wrap' => 'soft', 'rows' => 10, 'cols' => 50);
         $mform->addElement('textarea', 'param2', get_string('exportfields', 'datalynxview_csv'), $attributes);
+        $mform->addHelpButton('param2', 'exportfields', 'datalynxview_csv');
         $mform->setDefault('param2', FORMAT_PLAIN);
-        $this->add_tags_selector('param2', 'field');
     }
 
     /**
