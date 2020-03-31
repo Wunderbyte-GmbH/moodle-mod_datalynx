@@ -72,10 +72,6 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
                         $strtime = userdate($content, get_string("strftimedate"));
                     }
                 }
-                // Time is exported as timestamp to csv.
-                if (optional_param('exportcsv', '', PARAM_ALPHA)) {
-                    return $content;
-                }
             }
         }
         return $strtime;
