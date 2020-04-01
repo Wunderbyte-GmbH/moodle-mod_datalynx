@@ -286,7 +286,7 @@ class datalynx_filter {
                             $paramid = "fieldid$i";
                             $searchlike[$paramlike] = "(" .
                                     $DB->sql_like("cs.content", ":$paramlike", false, false) .
-                                    " AND f.id = :$paramid)";
+                                    " AND fsimple.id = :$paramid)";
                             $searchparams[$paramlike] = "%#{$id}%#";
                             $searchparams[$paramid] = $field->id();
                             $i++;
@@ -997,7 +997,7 @@ class datalynx_filter_manager {
                                 if ($value) {
                                     $searchfields[$fieldname]['AND'][] = array('', 'LIKE', $value);
                                 }
-                            } else if ($type == "multiselect") {
+                            } else if ($type == "multiselect" OR $type == "checkbox") {
                                 // If andor is checked we set operator to ALL_OF.
                                 if ($value['andor']) {
                                     $searchfields[$fieldname]['AND'][] = array('', 'ALL_OF', $value);
