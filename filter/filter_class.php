@@ -312,7 +312,7 @@ class datalynx_filter {
                                     $paramid = "fieldid$i";
                                     $searchlike[$paramlike] = "(" .
                                             $DB->sql_like("cs.content", ":$paramlike", false, false) .
-                                            " AND f.id = :$paramid)";
+                                            " AND fsimple.id = :$paramid)";
                                     $searchparams[$paramlike] = "%\"$id\"%";
                                     $searchparams[$paramid] = $field->id();
                                     $i++;
