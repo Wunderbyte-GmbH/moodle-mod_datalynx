@@ -36,6 +36,8 @@ class datalynxview_grid extends datalynxview_base {
      * Returns a fieldset of view options
      */
     public function generate_default_view() {
+        global $OUTPUT; // Needed for mustache implementation.
+
         // Get all the fields.
         if (!$fields = $this->_df->get_fields()) {
             return; // You shouldn't get that far if there are no user fields.
@@ -80,34 +82,21 @@ class datalynxview_grid extends datalynxview_base {
         $this->view->esection = html_writer::tag('div', $sectiondefault,
                         array('class' => 'mdl-align')) . "<div>##entries##</div>";
 
-        // Set content.
-        $table = new html_table();
-        $table->attributes['cellpadding'] = '2';
-
-        // Fields.
+        // Set content fields in responsive grid.
+        $mustache = array();
         foreach ($fields as $field) {
-
             if ($field->field->id > 0) {
-                $name = new html_table_cell($field->name() . ':');
-                $name->style = 'text-align:right;';
+
+                $thisfield['name'] = $field->name();
+                $thisfield['tag'] = "[[{$field->name()}]]";
                 if ($field->type == "userinfo") {
-                    $content = new html_table_cell("##author:{$field->name()}##");
-                } else {
-                    $content = new html_table_cell("[[{$field->name()}]]");
+                    $thisfield['tag'] =  "##author:{$field->name()}##";
                 }
-                $row = new html_table_row();
-                $row->cells = array($name, $content);
-                $table->data[] = $row;
+
+                $mustache['fields'][] = $thisfield;
             }
         }
-        // Actions.
-        $row = new html_table_row();
-        $actions = new html_table_cell('##edit##  ##delete##');
-        $actions->colspan = 2;
-        $row->cells = array($actions);
-        $table->data[] = $row;
-        // Construct the table.
-        $entrydefault = html_writer::table($table);
+        $entrydefault = $OUTPUT->render_from_template('mod_datalynx/gridview', $mustache);
         $this->view->eparam2 = html_writer::tag('div', $entrydefault, array('class' => 'entry'));
     }
 
