@@ -77,9 +77,9 @@ class datalynx_field_behavior_form extends moodleform {
         $mform->setExpanded('visibilityoptions');
 
         $options = array("multiple" => true);
-        $mform->addElement('autocomplete', 'visibleto', get_string('roles'),
-                $this->datalynx->get_datalynx_permission_names(false, false),
-                $options);
+        $mform->addElement('autocomplete', 'visibleto', get_string('visibleto', 'datalynx'),
+                $this->datalynx->get_datalynx_permission_names(false, false), $options);
+        $mform->addHelpButton('visibleto', 'visibleto', 'datalynx');
         $mform->setType('visibleto', PARAM_RAW);
         if ($new) {
             $mform->setDefault('visibleto',
@@ -98,8 +98,9 @@ class datalynx_field_behavior_form extends moodleform {
         }
 
         $mform->addElement('autocomplete', 'editableby', get_string('editableby', 'datalynx'),
-                $this->datalynx->get_datalynx_permission_names(false, false),
-                $options);
+                $this->datalynx->get_datalynx_permission_names(false, false), $options);
+        $mform->addHelpButton('editableby', 'editableby', 'datalynx');
+
         $mform->setType('editableby', PARAM_RAW);
         if ($new) {
             $mform->setDefault('editableby',

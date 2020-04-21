@@ -591,6 +591,7 @@ $string['targetview_default'] = '(Default)';
 $string['targetview_edit'] = '(Edit)';
 $string['targetview_more'] = '(More)';
 $string['visibleto'] = 'Visible to';
+$string['visibleto_help'] = 'Users with these view privileges can see this field, you can assign these privileges to multiple roles.';
 $string['visible_1'] = 'Manager';
 $string['visible_2'] = 'Teacher';
 $string['visible_4'] = 'Student';
@@ -688,6 +689,7 @@ $string['editing'] = 'Editing';
 $string['editable'] = 'Editable';
 $string['required'] = 'Required';
 $string['editableby'] = 'Editable by';
+$string['editableby_help'] = 'Users with these view privileges can edit this field, you can assign these privileges to multiple roles.';
 $string['entryauthor'] = 'Entry author';
 
 $string['behavior'] = 'Behavior';
