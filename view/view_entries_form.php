@@ -37,34 +37,24 @@ class datalynxview_entries_form extends moodleform {
 
         $view->definition_to_form($mform);
 
-        $this->add_action_buttons(true, null, "_1");
+        // Add delegate action button... try.
+        $this->add_delegate_action_buttons();
     }
 
     /**
-     * Override add_action_buttons to allow multiple buttons on one form.
-     *
-     * @param bool $cancel whether to show cancel button, default true
-     * @param string $submitlabel label for submit button, defaults to get_string('savechanges')
-     * @param string $multiple if we need a secondary buttongroup we add an iterator here.
+     * Add action buttons that delegate functions to allow multiple buttons on one form.
      */
-    function add_action_buttons($cancel = true, $submitlabel = null, $multiple = null){
-        if (is_null($submitlabel)){
-            $submitlabel = get_string('savechanges');
-        }
+    function add_delegate_action_buttons(){
         $mform =& $this->_form;
-        if ($cancel){
-            // When two elements we need a group.
-            $buttonarray=array();
-            $buttonarray[] = &$mform->createElement('submit', 'submitbutton'.$multiple, $submitlabel);
-            $buttonarray[] = &$mform->createElement('cancel', null, null, array('id' => 'cancel'.$multiple));
-            
-            $mform->addGroup($buttonarray, 'buttonar'.$multiple, '', array(' '), false);
-            $mform->closeHeaderBefore('buttonar'.$multiple);
-        } else {
-            // No group needed.
-            $mform->addElement('submit', 'submitbutton'.$multiple, $submitlabel);
-            $mform->closeHeaderBefore('submitbutton'.$multiple);
-        }
+
+        $buttonarray=array();
+        $buttonarray[] = &$mform->createElement('html', '<input type="button" class="form-group btn btn-primary"
+            onclick="document.getElementById(\'id_submitbutton\').click();" value="' . get_string('savechanges'). '"/>');
+        $buttonarray[] = &$mform->createElement('html', '<input type="button" class="btn btn-secondary"
+            onclick="document.getElementById(\'id_cancel\').click();" value="' . get_string('cancel'). '"/>');
+
+        $mform->addGroup($buttonarray, 'delegatebuttonar', '', array(' '), false);
+        $mform->closeHeaderBefore('delegatebuttonar');
     }
 
     public function validation($data, $files) {
