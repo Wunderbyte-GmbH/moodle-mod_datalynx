@@ -99,7 +99,13 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
         } else {
             $menuoptions = $field->options_menu();
 
-            $select = &$mform->addElement('select', $fieldname, null, $menuoptions);
+            // Adapt height of select menu to options within bounds.
+            $size = 5;
+            if (count($menuoptions) < 10) {
+                $size = count($menuoptions);
+            }
+
+            $select = &$mform->addElement('select', $fieldname, null, $menuoptions, array('size'=>$size));
         }
         $select->setMultiple(true);
         $select->setSelected($selected);
