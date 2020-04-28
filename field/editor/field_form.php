@@ -25,12 +25,4 @@ defined('MOODLE_INTERNAL') or die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
-class datalynxfield_editor_form extends datalynxfield_form {
-
-    public function field_definition() {
-        $mform = &$this->_form;
-
-        $mform->addElement('header', 'fieldattributeshdr',
-                get_string('fieldattributes', 'datalynx'));
-    }
-}
+class datalynxfield_editor_form extends datalynxfield_form {}
