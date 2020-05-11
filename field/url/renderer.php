@@ -140,7 +140,7 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
 
         $patterns = parent::patterns();
         $patterns["[[$fieldname]]"] = array(true);
-        $patterns["[[$fieldname:link]]"] = array(false);
+        $patterns["[[$fieldname:link]]"] = array(true);
         $patterns["[[$fieldname:image]]"] = array(false);
         $patterns["[[$fieldname:imageflex]]"] = array(false);
         $patterns["[[$fieldname:media]]"] = array(false);
