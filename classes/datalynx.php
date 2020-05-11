@@ -441,7 +441,7 @@ class datalynx {
 
         if ($page != 'external') {
             // Is user editing.
-            $urlparams['edit'] = optional_param('edit', 0, PARAM_BOOL);
+            $urlparams['edit'] = optional_param('edit', -1, PARAM_BOOL);
             $PAGE->set_url("/mod/datalynx/$page.php", $urlparams);
 
             // Blocks editing button (omit in embedded datalynxs).
