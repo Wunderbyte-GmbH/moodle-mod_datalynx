@@ -62,6 +62,12 @@ class datalynxview_csv_form extends datalynxview_base_form {
         $mform->addElement('textarea', 'param2', get_string('exportfields', 'datalynxview_csv'), $attributes);
         $mform->addHelpButton('param2', 'exportfields', 'datalynxview_csv');
         $mform->setDefault('param2', FORMAT_PLAIN);
+
+        // Show a list of fields in this view.
+        $view = $this->_view;
+        $tags = $view->field_tags();
+        $tags =implode("<br>", $tags['Fields']['Fields']);
+        $mform->addElement('static', 'availablefields', get_string('fields', 'datalynx'), $tags);
     }
 
     /**
