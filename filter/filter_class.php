@@ -406,14 +406,20 @@ class datalynx_filter {
                     $fieldvalues = explode("\n", $fieldvalues);
 
                     $replacestring = $sortname; // Works only for single values yet.
-                    foreach ($fieldvalues as $key => $value) {
-                        $replacestring = "REPLACE(" . $replacestring . ",'#" . ($key + 1) . "#', '" .
-                                $value . "')";
+                    
+                    // Select has no spacer hashes infront and behind values.
+                    $spacer = "#";
+                    if ($field instanceof datalynxfield_select) {
+                        $spacer = '';
                     }
-                    $orderby[] = $replacestring . ($sortdir ? 'DESC' : 'ASC');
+
+                    foreach ($fieldvalues as $key => $value) {
+                        $replacestring = "REPLACE($replacestring,'$spacer" . ($key + 1) . "$spacer', '$value')";
+                    }
+                    $orderby[] = $replacestring . ($sortdir ? ' DESC' : ' ASC');
                     $stringindexed = true;
                 } else {
-                    $orderby[] = "$sortname " . ($sortdir ? 'DESC' : 'ASC');
+                    $orderby[] = "$sortname " . ($sortdir ? ' DESC' : ' ASC');
                 }
 
                 // Register join field if applicable.
