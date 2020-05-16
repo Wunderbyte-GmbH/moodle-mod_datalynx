@@ -163,7 +163,15 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 }
                 $mform->addElement('html', '</div>');
             }
-            $mform->addElement('html',  '<div class="col"><button class="btn btn-secondary btn-danger btn-delete" type="button" data-removeline="' . $thisline. '">
+
+            // Fill elements to have three in every line.
+            while ($counter % 3 > 0 && $counter % 3 < 3) {
+                $mform->addElement('html', '<div class="col"></div>');
+                $counter++;
+            }
+
+            $mform->addElement('html', '<div class="w-100 p-10"></div>');
+            $mform->addElement('html',  '<div class="col text-center"><button class="btn btn-secondary btn-danger btn-delete" type="button" data-removeline="' . $thisline. '">
                 ' . get_string('delete') . '</button></div>');
             // End of row.
             $mform->addElement('html', '</div>');
