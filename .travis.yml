@@ -46,7 +46,6 @@ matrix:
 before_install:
   - google-chrome-stable --headless --disable-gpu --remote-debugging-port=9222 http://localhost &
   - phpenv config-rm xdebug.ini
-  - nvm install v14.0.0
   - cd ../..
   - composer selfupdate
   - composer create-project -n --no-dev --prefer-dist moodlerooms/moodle-plugin-ci ci ^2
@@ -71,6 +70,7 @@ jobs:
         - moodle-plugin-ci validate
 
 install:
+  - nvm install node
   - moodle-plugin-ci install
   - xvfb-run -a --server-args="-screen 0 1024x768x24" make test java -Dwebdriver.chrome.driver=/usr/lib/chromium-browser/chromedriver -jar ${MOODLE_SELENIUM_JAR} -log /tmp/selenium.log &
   - php -t ${MOODLE_DIR} -S localhost:8000 > /tmp/php-access.log 2> /tmp/php-error.log &
