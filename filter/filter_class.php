@@ -1003,13 +1003,9 @@ class datalynx_filter_manager {
                                 if ($value) {
                                     $searchfields[$fieldname]['AND'][] = array('', 'LIKE', $value);
                                 }
-                            } else if ($type == "multiselect" OR $type == "checkbox") {
+                            } else if (($type == "multiselect" OR $type == "checkbox") AND $value['andor']) {
                                 // If andor is checked we set operator to ALL_OF.
-                                if ($value['andor']) {
-                                    $searchfields[$fieldname]['AND'][] = array('', 'ALL_OF', $value);
-                                } else {
-                                    $searchfields[$fieldname]['AND'][] = array('', 'ANY_OF', $value);
-                                }
+                                $searchfields[$fieldname]['AND'][] = array('', 'ALL_OF', $value);
                                 unset($value['andor']);
                             } else if ($type == "file") {
                                 if ($value == '0') {
