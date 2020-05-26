@@ -406,7 +406,7 @@ class datalynx_filter {
                     $fieldvalues = explode("\n", $fieldvalues);
 
                     $replacestring = $sortname; // Works only for single values yet.
-                    
+
                     // Select has no spacer hashes infront and behind values.
                     $spacer = "#";
                     if ($field instanceof datalynxfield_select) {
@@ -1003,10 +1003,10 @@ class datalynx_filter_manager {
                                 if ($value) {
                                     $searchfields[$fieldname]['AND'][] = array('', 'LIKE', $value);
                                 }
-                            } else if (($type == "multiselect" OR $type == "checkbox") AND $value['andor']) {
-                                // If andor is checked we set operator to ALL_OF.
-                                $searchfields[$fieldname]['AND'][] = array('', 'ALL_OF', $value);
+                            } else if (($type == "multiselect" OR $type == "checkbox") AND $value['andor'] == -2) {
+                                // If andor is set to -2 operator is ALL_OF.
                                 unset($value['andor']);
+                                $searchfields[$fieldname]['AND'][] = array('', 'ALL_OF', $value);
                             } else if ($type == "file") {
                                 if ($value == '0') {
                                     $searchfields[$fieldname]['AND'][] = array('', '', false);
