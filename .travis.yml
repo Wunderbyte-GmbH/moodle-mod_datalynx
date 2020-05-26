@@ -70,7 +70,7 @@ jobs:
         - moodle-plugin-ci validate
 
 install:
-  - nvm install node
+  - nvm install --lts
   - moodle-plugin-ci install
   - xvfb-run -a --server-args="-screen 0 1024x768x24" make test java -Dwebdriver.chrome.driver=/usr/lib/chromium-browser/chromedriver -jar ${MOODLE_SELENIUM_JAR} -log /tmp/selenium.log &
   - php -t ${MOODLE_DIR} -S localhost:8000 > /tmp/php-access.log 2> /tmp/php-error.log &
