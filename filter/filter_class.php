@@ -1007,6 +1007,8 @@ class datalynx_filter_manager {
                                 // If andor is checked we set operator to ALL_OF.
                                 if ($value['andor']) {
                                     $searchfields[$fieldname]['AND'][] = array('', 'ALL_OF', $value);
+                                } else {
+                                    $searchfields[$fieldname]['AND'][] = array('', 'ANY_OF', $value);
                                 }
                                 unset($value['andor']);
                             } else if ($type == "file") {
