@@ -27,13 +27,32 @@ Feature: Create entry, add multiselect and use customfilter
     And I add to the "Datalynx Test Instance" datalynx the following fields:
       | type             | name                | description | param1                     | param2   | param3 |
       | text             | Text                |             |                            |          |        |
-      | multiselect      | Multiselect         |             | Option 1,Option 2,Option 3 | Option 1 |        |
+      | multiselect      | Select (multiple)   |             | Option 1,Option 2,Option 3 |          |        |
     And I add to "Datalynx Test Instance" datalynx the view of "Grid" type with:
       | name        | Gridview |
       | description | Testgrid |
     And I follow "Set as default view"
     And I follow "Set as edit view"
-    # TOOD: Add customfilter.
+
+    # Add customfilter.
+    When I follow "Custom Filters"
+    And I click on "Add a custom filter" "link"
+    When I set the following fields to these values:
+      | Name           | customfilter       |
+
+    # TODO: Select the field "Datalynx field Select (multiple)" checkbox by label.
+
+    # TODO: Make customfilter visible in view.
+
+#    And I click on "//table/tbody/tr[1]/td[9]/a" "xpath_element"
+#    Then I should see "Gridview"
+#    And I click on "Entry template" "link"
+#    Then I should see "Field tags"
+#    Then I add to "id_eparam2_editor" editor the text "testfield:[[Datalynx field Select (multiple)]] ##edit##  ##delete##"
+#    And I press "Save changes"
+#    When I follow "Browse"
+
+    And I press "Save changes"
 
   @javascript
   Scenario: Add three multiselects to this instance
@@ -42,7 +61,7 @@ Feature: Create entry, add multiselect and use customfilter
     And I fill in the entry form fields
       | type             | name               | value                |
       | text             | Text               | testtext1            |
-      | multiselect      | Multiselect        | Option 1             |
+      | multiselect      | Select (multiple)  | Option 1             |
     And I press "Save changes"
     And I press "Continue"
 
