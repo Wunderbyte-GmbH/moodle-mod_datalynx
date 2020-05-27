@@ -108,6 +108,12 @@ class behat_mod_datalynx extends behat_base {
                     }
                     break;
                 case "multiselect":
+                    $field['addoptions'] = str_replace(',', "\n", $field['param1']);
+                    $this->execute("behat_forms::set_field_value", array('addoptions', $field['addoptions']));
+                    $field['param2'] ? "New line" : $field['param2'];
+                    $field['param3'] ? "No" : $field['param3'];
+                    $this->execute("behat_forms::set_field_value", array('param2', $field['param2']));
+                    $this->execute("behat_forms::set_field_value", array('param3', $field['param3']));
                     break;
                 case "tag":
                     break;
