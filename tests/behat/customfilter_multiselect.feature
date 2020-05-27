@@ -39,7 +39,6 @@ Feature: Create entry, add multiselect and use customfilter
   Scenario: Add three multiselects to this instance
     When I follow "Browse"
     And I follow "Add a new entry"
-    Then I should see "Multiselect"
     And I fill in the entry form fields
       | type             | name               | value                |
       | text             | Text               | testtext1            |
@@ -48,7 +47,6 @@ Feature: Create entry, add multiselect and use customfilter
     And I press "Continue"
 
     And I follow "Add a new entry"
-    Then I should see "Multiselect"
     And I fill in the entry form fields
       | type             | name               | value                |
       | text             | Text               | testtext2            |
@@ -57,7 +55,6 @@ Feature: Create entry, add multiselect and use customfilter
     And I press "Continue"
 
     And I follow "Add a new entry"
-    Then I should see "Multiselect"
     And I fill in the entry form fields
       | type             | name               | value                |
       | text             | Text               | testtext3            |
