@@ -214,6 +214,10 @@ class behat_mod_datalynx extends behat_base {
                     $this->execute("behat_forms::i_set_the_field_with_xpath_to",
                             array("//div[@data-field-type='select']//select", $field['value']));
                     break;
+                case "multiselect":
+                    $this->execute("behat_forms::i_open_the_autocomplete_suggestions_list");
+                    $this->execute("behat_forms::i_click_on_item_in_the_autocomplete_list", $field['value']);
+                    break;
                 case "radio":
                     $this->execute("behat_forms::i_set_the_field_with_xpath_to",
                             array("//div[@data-field-type='radiobutton']//label[contains(.,'{$field['value']}')]/input",
@@ -229,7 +233,7 @@ class behat_mod_datalynx extends behat_base {
                             array("//div[@data-field-name='Datalynx field {$field['name']}']//textarea", $field['value']));
                     break;
                 case "file":
-                break;
+                    break;
                 case "teammemberselect":
                     $this->execute("behat_forms::i_open_the_autocomplete_suggestions_list");
                     $this->execute("behat_forms::i_click_on_item_in_the_autocomplete_list", $field['value']);
