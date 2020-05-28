@@ -495,7 +495,7 @@ class mod_datalynx_customfilter_frontend_form extends mod_datalynx_filter_base_f
         }
 
         // Search for author.
-        if (isset($customfilter->authorsearch) AND $customfilter->authorsearch) {
+        if (isset($customfilter->authorsearch) && $customfilter->authorsearch) {
 
             // Add users that have written an entry in the current datalynx instance to list.
             global $DB, $PAGE;
