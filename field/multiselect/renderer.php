@@ -177,7 +177,10 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
         $elements[] = $mform->createElement('autocomplete', $fieldname, null, $menu, $options);
         $mform->setType($fieldname, PARAM_INT);
         $mform->setDefault($fieldname, $value);
-        $mform->disabledIf($fieldname, "searchoperator{$i}", 'eq', '');
+
+        if ($mform->_formName == 'mod_datalynx_filter_form' || $mform->_formName == 'mod_datalynx_advanced_filter_form') {
+            $mform->disabledIf($fieldname, "searchoperator{$i}", 'eq', '');
+        }
 
         // Add a checkbox to select if any of or all elements are needed, only show this in customfilter forms..
         if ($mform->_formName == 'mod_datalynx_customfilter_frontend_form') {
