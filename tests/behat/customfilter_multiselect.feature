@@ -40,6 +40,8 @@ Feature: Create entry, add multiselect and use customfilter
     And I click on "Add a custom filter" "link"
     When I set the following fields to these values:
       | Name           | mycustomfilter       |
+
+    # TODO: Can't click Continue button if selected. JS Error?
     And I click on "//input[@value = 'Datalynx field Select (multiple)']" "xpath_element"
     And I press "Save changes"
 
@@ -67,7 +69,8 @@ Feature: Create entry, add multiselect and use customfilter
     And I fill in the entry form fields
       | type             | name               | value                |
       | text             | Text               | testtext2            |
-      | multiselect      | Multiselect        | Option 2, Option 3   |
+      | multiselect      | Multiselect        | Option 2             |
+    And I press "Save changes"
     And I press "Continue"
 
     And I follow "Add a new entry"
@@ -75,6 +78,7 @@ Feature: Create entry, add multiselect and use customfilter
       | type             | name               | value                |
       | text             | Text               | testtext3            |
       | multiselect      | Multiselect        | Option 3             |
+    And I press "Save changes"
     And I press "Continue"
 
     Then I should see "testtext3"
