@@ -93,7 +93,7 @@ Feature: Create entry, add multiselect and use customfilter
     And I should not see "Opt6"
 
   @javascript
-  Scenario: Use customfilter to select Opt2.
+  Scenario: Use customfilter.
     When I follow "Search"
     And I open the autocomplete suggestions list
     Then "Opt2" "autocomplete_suggestions" should exist
@@ -129,7 +129,8 @@ Feature: Create entry, add multiselect and use customfilter
     When I follow "Manage"
     And I follow "Custom Filters"
     And I click on "mycustomfilter" "link"
-    And I click on "//input[@value = 'Fulltextsearch']" "xpath_element"
+    # NOTE: name|label did not work.
+    And I click on "//input[@id = 'id_fulltextsearch']" "xpath_element"
     And I press "Save changes"
 
     # Look for Opt1 and testtext1.
