@@ -101,8 +101,8 @@ Feature: Create entry, add multiselect and use customfilter
     And I close the autocomplete suggestions list
     And I click on "//input[@value = 'Search']" "xpath_element"
     And I should see "Opt2"
+    And I should not see "Opt3"
     And I should not see "Opt5"
-    And I should not see "Opt6"
 
     # Use customfilter to select Opt1 OR Opt2.
     And I open the autocomplete suggestions list
@@ -113,7 +113,7 @@ Feature: Create entry, add multiselect and use customfilter
     And I should see "Opt2"
     And I should see "Opt4"
     And I should see "Opt5"
-    And I should not see "Opt6"
+    And I should not see "Opt3"
 
     # Use customfilter to select Opt1 AND Opt5 after deselecting Opt2.
     And I click on "//span[@data-value = '2']" "xpath_element"
@@ -121,10 +121,27 @@ Feature: Create entry, add multiselect and use customfilter
     And I click on "Opt5" item in the autocomplete list
     And I close the autocomplete suggestions list
     And I click on "All selected options have to be part of the entry" "checkbox"
-    #And I click on "//input[@value = '-2']" "xpath_element"
     And I click on "//input[@value = 'Search']" "xpath_element"
     And I should not see "Opt2"
     And I should not see "testtext2"
 
-  #@javascript
-  #Scenario: Use customfilter to select Opt1 AND Opt6.
+    # Reopen customfilter and add fulltextsearch.
+    When I follow "Manage"
+    And I follow "Custom Filters"
+    And I click on "mycustomfilter" "link"
+    And I click on "//input[@value = 'Fulltextsearch']" "xpath_element"
+    And I press "Save changes"
+
+    # Look for Opt1 and testtext1.
+    When I follow "Browse"
+    And I follow "Search"
+    Then I add to "Search" editor the text "testtext1"
+    And I open the autocomplete suggestions list
+    And I click on "Opt1" item in the autocomplete list
+    And I close the autocomplete suggestions list
+    And I click on "//input[@value = 'Search']" "xpath_element"
+    And I should see "Opt1"
+    And I should see "testtext1"
+    And I should see "Opt4"
+    And I should see "Opt5"
+    And I should not see "testtext2"
