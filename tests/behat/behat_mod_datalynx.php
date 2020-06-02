@@ -281,4 +281,14 @@ class behat_mod_datalynx extends behat_base {
         }
         $field->set_value($newvalue);
     }
+
+    /**
+     * Close the auto-complete suggestions list (Assuming there is only one on the page.).
+     *
+     * @Given /^I close the autocomplete suggestions list$/
+     */
+    public function i_close_the_autocomplete_suggestions_list() {
+        $csstarget = ".col-form-label";
+        $this->execute('behat_general::i_click_on', [$csstarget, 'css_element']);
+    }
 }

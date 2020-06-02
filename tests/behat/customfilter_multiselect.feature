@@ -25,9 +25,9 @@ Feature: Create entry, add multiselect and use customfilter
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I add to the "Datalynx Test Instance" datalynx the following fields:
-      | type             | name                | description | param1                     | param2   | param3 |
-      | text             | Text                |             |                            |          |        |
-      | multiselect      | Select (multiple)   |             | Option 1,Option 2,Option 3 |          |        |
+      | type             | name                | description | param1                     | param2 | param3 |
+      | text             | Text                |             |                            |        |        |
+      | multiselect      | Select (multiple)   |             | Opt1,Opt2,Opt3,Opt4,Opt5   |        |        |
 
     And I add to "Datalynx Test Instance" datalynx the view of "Grid" type with:
       | name        | Gridview |
@@ -40,8 +40,6 @@ Feature: Create entry, add multiselect and use customfilter
     And I click on "Add a custom filter" "link"
     When I set the following fields to these values:
       | Name           | mycustomfilter       |
-
-    # TODO: Can't click Continue button if selected. JS Error?
     And I click on "//input[@value = 'Datalynx field Select (multiple)']" "xpath_element"
     And I press "Save changes"
 
@@ -50,17 +48,19 @@ Feature: Create entry, add multiselect and use customfilter
     And I click on "//table/tbody/tr[1]/td[9]/a" "xpath_element"
     Then I should see "Gridview"
     And I click on "View template" "link"
-    Then I add to "id_esection_editor" editor the text "... ##addnewentry## ##customfilter:mycustomfilter## ##entries## ..."
+    Then I add to "id_esection_editor" editor the text ". ##addnewentry## ##customfilter:mycustomfilter## ##entries## ."
     And I press "Save changes"
 
-  @javascript
-  Scenario: Add three multiselects to this instance
+    # Add me some fields.
     When I follow "Browse"
     And I follow "Add a new entry"
     And I fill in the entry form fields
       | type             | name               | value                |
       | text             | Text               | testtext1            |
-      | multiselect      | Select (multiple)  | Option 1             |
+      | multiselect      | Select (multiple)  | Opt1                 |
+    And I open the autocomplete suggestions list
+    And I click on "Opt4" item in the autocomplete list
+    And I click on "Opt5" item in the autocomplete list
     And I press "Save changes"
     And I should see "1 entry(s) updated"
     Then I press "Continue"
@@ -69,7 +69,7 @@ Feature: Create entry, add multiselect and use customfilter
     And I fill in the entry form fields
       | type             | name               | value                |
       | text             | Text               | testtext2            |
-      | multiselect      | Multiselect        | Option 2             |
+      | multiselect      | Multiselect        | Opt2                 |
     And I press "Save changes"
     And I press "Continue"
 
@@ -77,12 +77,54 @@ Feature: Create entry, add multiselect and use customfilter
     And I fill in the entry form fields
       | type             | name               | value                |
       | text             | Text               | testtext3            |
-      | multiselect      | Multiselect        | Option 3             |
+      | multiselect      | Multiselect        | Opt3                 |
     And I press "Save changes"
     And I press "Continue"
 
+    And I follow "Add a new entry"
+    And I fill in the entry form fields
+      | type             | name               | value                |
+      | text             | Text               | testtext4            |
+      | multiselect      | Multiselect        | Opt4                 |
+    And I press "Save changes"
+    And I press "Continue"
     Then I should see "testtext3"
-    And I should see "Option 3"
-    And I should not see "Option 4"
+    And I should see "Opt3"
+    And I should not see "Opt6"
 
-    # TODO: Use customfilter.
+  @javascript
+  Scenario: Use customfilter to select Opt2.
+    When I follow "Search"
+    And I open the autocomplete suggestions list
+    Then "Opt2" "autocomplete_suggestions" should exist
+    And I click on "Opt2" item in the autocomplete list
+    And I close the autocomplete suggestions list
+    And I click on "//input[@value = 'Search']" "xpath_element"
+    And I should see "Opt2"
+    And I should not see "Opt5"
+    And I should not see "Opt6"
+
+    # Use customfilter to select Opt1 OR Opt2.
+    And I open the autocomplete suggestions list
+    And I click on "Opt1" item in the autocomplete list
+    And I close the autocomplete suggestions list
+    And I click on "//input[@value = 'Search']" "xpath_element"
+    And I should see "Opt1"
+    And I should see "Opt2"
+    And I should see "Opt4"
+    And I should see "Opt5"
+    And I should not see "Opt6"
+
+    # Use customfilter to select Opt1 AND Opt5 after deselecting Opt2.
+    And I click on "//span[@data-value = '2']" "xpath_element"
+    And I open the autocomplete suggestions list
+    And I click on "Opt5" item in the autocomplete list
+    And I close the autocomplete suggestions list
+    And I click on "All selected options have to be part of the entry" "checkbox"
+    #And I click on "//input[@value = '-2']" "xpath_element"
+    And I click on "//input[@value = 'Search']" "xpath_element"
+    And I should not see "Opt2"
+    And I should not see "testtext2"
+
+  #@javascript
+  #Scenario: Use customfilter to select Opt1 AND Opt6.
