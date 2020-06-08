@@ -538,7 +538,7 @@ class mod_datalynx_customfilter_frontend_form extends mod_datalynx_filter_base_f
 
         // Add a button that resets all custom filter values at once.
         $clearcustomsearch = '<a  class="btn btn-secondary" href="';
-        $clearcustomsearch .= new moodle_url('/mod/datalynx/view.php', array('id' => $this->_df->cm->id, 'filter' => 0));
+        $clearcustomsearch .= new moodle_url('/mod/datalynx/view.php', array('id' => $this->_df->cm->id, 'view' => $view->view->id, 'filter' => 0));
         $clearcustomsearch .= '"> ' . get_string('resetsettings', 'datalynx') . '</a>';
         $buttonarray[] = &$mform->createElement('static', 'clearcustomsearch', '',  $clearcustomsearch);
 
