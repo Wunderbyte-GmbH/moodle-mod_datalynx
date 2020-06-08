@@ -146,13 +146,3 @@ Feature: Create entry, add multiselect and use customfilter
     And I should see "Opt4"
     And I should see "Opt5"
     And I should not see "testtext2"
-
-    # Deselect Opt1 and text and check if I can see the whole list now.
-    Then I add to "Search" editor the text ""
-    And I click on "//span[@data-value = '1']" "xpath_element"
-    And I click on "//input[@value = 'Search']" "xpath_element"
-    And I should see "Opt1"
-    And I should see "testtext1"
-    And I should see "Opt4"
-    And I should see "Opt5"
-    And I should not see "testtext2"
