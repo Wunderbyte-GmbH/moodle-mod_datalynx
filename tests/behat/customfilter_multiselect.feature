@@ -148,7 +148,6 @@ Feature: Create entry, add multiselect and use customfilter
     And I should not see "testtext2"
 
     # Deselect Opt1 and text and check if I can see the whole list now.
-    And I follow "Search"
     Then I add to "Search" editor the text ""
     And I click on "//span[@data-value = '1']" "xpath_element"
     And I click on "//input[@value = 'Search']" "xpath_element"
