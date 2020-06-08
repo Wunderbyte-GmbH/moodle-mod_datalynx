@@ -124,7 +124,8 @@ class datalynx_field_behavior {
         $permissions = $this->datalynx->get_user_datalynx_permissions($user->id, 'edit');
         return (array_intersect($permissions, $this->editableby)) ||
         ($isentryauthor && in_array(mod_datalynx\datalynx::PERMISSION_AUTHOR, $this->editableby)) ||
-        ($ismentor && in_array(mod_datalynx\datalynx::PERMISSION_MENTOR, $this->editableby));
+        ($ismentor && in_array(mod_datalynx\datalynx::PERMISSION_MENTOR, $this->editableby)) ||
+        (isguestuser() && in_array(mod_datalynx\datalynx::PERMISSION_GUEST, $this->editableby));
     }
 
     public static function db_to_form($record) {
