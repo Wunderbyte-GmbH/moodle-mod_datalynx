@@ -499,16 +499,14 @@ class mod_datalynx_customfilter_frontend_form extends mod_datalynx_filter_base_f
 
             // Add users that have written an entry in the current datalynx instance to list.
             global $DB, $PAGE;
-            $entryauthors = $DB->get_records_menu('datalynx_entries', array('dataid' => $this->_df->id()), null, 'id, userid');
-            $allusers = $DB->get_records('user', null, '', 'id, firstname, lastname');
+            $entryauthors = $DB->get_records_sql('SELECT DISTINCT userid, firstname, lastname
+                FROM {datalynx_entries}
+                INNER JOIN {user} on {datalynx_entries}.userid = {user}.id
+                WHERE {datalynx_entries}.dataid = '. $this->_df->id() .';');
 
             $menu = array();
-            foreach ($entryauthors as $userid) {
-                // Skip duplicates.
-                if (isset($menu[$userid])) {
-                    continue;
-                }
-                $menu[$userid] = $allusers[$userid]->firstname . " " . $allusers[$userid]->lastname;
+            foreach ($entryauthors as $userid => $author) {
+                $menu[$userid] = $author->firstname . " " . $author->lastname;
             }
             $options = array('multiple' => true);
             $mform->addElement('autocomplete', 'authorsearch', get_string('authorsearch', 'datalynx'), $menu, $options);
