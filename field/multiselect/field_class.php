@@ -102,7 +102,13 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
         return false;
     }
 
-    public function update_content($entry, array $values = null) {
+    /**
+     * @param stdClass $entry
+     * @param array|null $values
+     * @return bool|int
+     * @throws dml_exception
+     */
+    public function update_content(stdClass $entry, array $values = null) {
 
         // Check if all values are known in field definition.
         $knownvalues = explode("\n", $this->field->param1);
@@ -111,20 +117,22 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
         $knownvalues = array_combine(range(1, count($knownvalues)), $knownvalues);
 
         $addoption = null;
-        foreach ($values[''] as $key => $value) {
+        if (!empty($values[''])){
+            foreach ($values[''] as $key => $value) {
 
-            // When left empty multiselect passes 0, catch this.
-            if (!$value || array_key_exists($value, $knownvalues)) {
-                continue;
+                // When left empty multiselect passes 0, catch this.
+                if (!$value || array_key_exists($value, $knownvalues)) {
+                    continue;
+                }
+
+                // Add new value to the field definitions known values.
+                $addoption = count($knownvalues) + 1;
+                $knownvalues[$addoption] = $value;
+
+                // Change $values to work with update_content.
+                unset($values[''][$key]);
+                $values[''][] = $addoption;
             }
-
-            // Add new value to the field definitions known values.
-            $addoption = count($knownvalues) + 1;
-            $knownvalues[$addoption] = $value;
-
-            // Change $values to work with update_content.
-            unset($values[''][$key]);
-            $values[''][] = $addoption;
         }
 
         // In case we have spotted some addoptions, update field definition.
@@ -135,7 +143,6 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
             $update->param1 = implode("\n", $knownvalues);
             $DB->update_record('datalynx_fields', $update);
         }
-
         return parent::update_content($entry, $values);
     }
 
