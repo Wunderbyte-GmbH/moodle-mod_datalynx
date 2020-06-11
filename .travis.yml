@@ -1,8 +1,10 @@
 language: php
 
-sudo: false
+sudo: required
 
 dist: xenial
+
+jdk: openjdk8
 
 cache:
   directories:
@@ -23,7 +25,8 @@ services:
   - xvfb
 
 php:
-  - 7.2
+  - 7.1
+  - 7.4
 
 env:
   global:
@@ -51,14 +54,6 @@ before_install:
   - composer create-project -n --no-dev --prefer-dist moodlerooms/moodle-plugin-ci ci ^2
   - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
 
-install:
-  - nvm install node
-  - nvm use node
-  - moodle-plugin-ci install
-  - xvfb-run -a --server-args="-screen 0 1024x768x24" make test java -Dwebdriver.chrome.driver=/usr/lib/chromium-browser/chromedriver -jar ${MOODLE_SELENIUM_JAR} -log /tmp/selenium.log &
-  - php -t ${MOODLE_DIR} -S localhost:8000 > /tmp/php-access.log 2> /tmp/php-error.log &
-  - sleep 5s
-
 jobs:
   include:
     # Prechecks against latest Moodle LTS stable only.
@@ -69,15 +64,28 @@ jobs:
         - moodle-plugin-ci install --no-init
       script:
         - moodle-plugin-ci phplint
-        #- moodle-plugin-ci phpcpd
+        - moodle-plugin-ci phpcpd || true # Do not fail. There are kown issues but show problems.
         - moodle-plugin-ci phpmd
         - moodle-plugin-ci codechecker
         - moodle-plugin-ci savepoints
         - moodle-plugin-ci mustache
         - moodle-plugin-ci grunt
         - moodle-plugin-ci validate
-        - moodle-plugin-ci phpunit --coverage-clover
-        - moodle-plugin-ci behat --moodle=${MOODLE_DIR} --auto-rerun=0 --profile=chrome --dump
+
+install:
+  - nvm install node
+  - nvm use node
+  - moodle-plugin-ci install
+  - xvfb-run -a --server-args="-screen 0 1024x768x24" make test java -Dwebdriver.chrome.driver=/usr/lib/chromium-browser/chromedriver -jar ${MOODLE_SELENIUM_JAR} -log /tmp/selenium.log &
+  - php -t ${MOODLE_DIR} -S localhost:8000 > /tmp/php-access.log 2> /tmp/php-error.log &
+  - sleep 5s
+
+# Unit tests and behat tests against full matrix.
+script:
+  - export JAVA_HOME=$HOME/openjdk8
+  - $TRAVIS_BUILD_DIR/install-jdk.sh --install openjdk8 --target $JAVA_HOME
+  - moodle-plugin-ci phpunit --coverage-clover
+  - moodle-plugin-ci behat --moodle=${MOODLE_DIR} --auto-rerun=0 --profile=chrome --dump
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
