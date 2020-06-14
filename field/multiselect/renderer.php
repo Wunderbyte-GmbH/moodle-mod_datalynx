@@ -72,7 +72,7 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
         // We create a hidden field to force sending.
         if (!$required && $autocomplete) {
             $mform->addElement('html',
-                    '<input type="hidden" name="' . $fieldname . '[-1]" value="-999">');
+                '<input type="hidden" name="' . $fieldname . '[-1]" value="-999">');
         }
 
         // Check for default values.
@@ -105,7 +105,7 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
                 $size = count($menuoptions);
             }
 
-            $select = &$mform->addElement('select', $fieldname, null, $menuoptions, array('size'=>$size));
+            $select = &$mform->addElement('select', $fieldname, null, $menuoptions, array('size' => $size));
         }
         $select->setMultiple(true);
         $select->setSelected($selected);

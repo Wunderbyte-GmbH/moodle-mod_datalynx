@@ -90,9 +90,8 @@ class datalynxview_grid extends datalynxview_base {
                 $thisfield['name'] = $field->name();
                 $thisfield['tag'] = "[[{$field->name()}]]";
                 if ($field->type == "userinfo") {
-                    $thisfield['tag'] =  "##author:{$field->name()}##";
+                    $thisfield['tag'] = "##author:{$field->name()}##";
                 }
-
                 $mustache['fields'][] = $thisfield;
             }
         }

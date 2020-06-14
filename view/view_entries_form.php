@@ -44,14 +44,13 @@ class datalynxview_entries_form extends moodleform {
     /**
      * Add action buttons that delegate functions to allow multiple buttons on one form.
      */
-    function add_delegate_action_buttons(){
+    public function add_delegate_action_buttons() {
         $mform =& $this->_form;
-
-        $buttonarray=array();
+        $buttonarray = array();
         $buttonarray[] = &$mform->createElement('html', '<input type="button" class="form-group btn btn-primary"
-            onclick="document.getElementById(\'id_submitbutton\').click();" value="' . get_string('savechanges'). '"/>');
+            onclick="document.getElementById(\'id_submitbutton\').click();" value="' . get_string('savechanges') . '"/>');
         $buttonarray[] = &$mform->createElement('html', '<input type="button" class="btn btn-secondary"
-            onclick="document.getElementById(\'id_cancel\').click();" value="' . get_string('cancel'). '"/>');
+            onclick="document.getElementById(\'id_cancel\').click();" value="' . get_string('cancel') . '"/>');
 
         $mform->addGroup($buttonarray, 'delegatebuttonar', '', array(' '), false);
         $mform->closeHeaderBefore('delegatebuttonar');

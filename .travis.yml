@@ -2,8 +2,6 @@ language: php
 
 os: linux
 
-sudo: required
-
 dist: bionic
 
 jdk: openjdk8
@@ -25,10 +23,6 @@ addons:
 services:
   - mysql
   - xvfb
-
-php:
-  - 7.1
-  - 7.4
 
 env:
   global:
@@ -62,39 +56,28 @@ install:
 
 jobs:
   fast_finish: true
-  exclude:
-    - php: 7.1
-      env: DB=pgsql MOODLE_BRANCH=master
-    - php: 7.1
-      env: DB=mysqli MOODLE_BRANCH=master
-    - php: 7.1
-      env: DB=pgsql MOODLE_BRANCH=MOODLE_38_STABLE
-    - php: 7.1
-      env: DB=mysqli MOODLE_BRANCH=MOODLE_38_STABLE
-    - php: 7.4
-      env: DB=pgsql MOODLE_BRANCH=MOODLE_35_STABLE
-    - php: 7.4
-      env: DB=mysqli MOODLE_BRANCH=MOODLE_35_STABLE
-    - php: 7.4
-      env: DB=pgsql MOODLE_BRANCH=MOODLE_37_STABLE
-    - php: 7.4
-      env: DB=mysqli MOODLE_BRANCH=MOODLE_37_STABLE
   include:
-    # Prechecks against latest Moodle LTS stable only.
+    # Pre-checks against latest Moodle LTS stable only.
     - stage: static
       php: 7.1
       env: DB=mysqli MOODLE_BRANCH=MOODLE_35_STABLE
       script:
         - moodle-plugin-ci phplint
-        - moodle-plugin-ci phpcpd || true # Do not fail. There are kown issues but show problems.
+        - moodle-plugin-ci phpcpd || true # Do not fail. There are known issues but show problems.
         - moodle-plugin-ci phpmd
         - moodle-plugin-ci codechecker
         - moodle-plugin-ci savepoints
-        - moodle-plugin-ci mustache
+        - moodle-plugin-ci mustache || true # A code checker bug does currently not validate mustache correctly.
         - moodle-plugin-ci grunt
         - moodle-plugin-ci validate
     - stage: test
-      php: 7.2
+    - php: 7.4
+      env: DB=pgsql MOODLE_BRANCH=MOODLE_38_STABLE
+    - php: 7.4
+      env: DB=mysqli MOODLE_BRANCH=MOODLE_38_STABLE
+    - php: 7.1
+      env: DB=mysqli MOODLE_BRANCH=MOODLE_35_STABLE
+    - php: 7.1
       env: DB=pgsql MOODLE_BRANCH=MOODLE_35_STABLE
       # Unit tests and behat tests against full matrix.
       script:

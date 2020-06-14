@@ -117,7 +117,7 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
         $knownvalues = array_combine(range(1, count($knownvalues)), $knownvalues);
 
         $addoption = null;
-        if (!empty($values[''])){
+        if (!empty($values[''])) {
             foreach ($values[''] as $key => $value) {
 
                 // When left empty multiselect passes 0, catch this.
