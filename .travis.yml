@@ -1,5 +1,7 @@
 language: php
 
+os: linux
+
 sudo: required
 
 dist: bionic
@@ -33,17 +35,32 @@ env:
     #- IGNORE_PATHS=checkboxgroup/checkboxgroup.php # we know this dir is problematic
     - MOODLE_DIR=/home/travis/build/moodle
     - MOODLE_SELENIUM_JAR=/home/travis/build/moodle/selenium.jar
-  matrix:
-    - DB=pgsql MOODLE_BRANCH=MOODLE_35_STABLE
-    - DB=mysqli MOODLE_BRANCH=MOODLE_35_STABLE
-    #- DB=pgsql MOODLE_BRANCH=MOODLE_36_STABLE
-    #- DB=mysqli MOODLE_BRANCH=MOODLE_36_STABLE
-    - DB=pgsql MOODLE_BRANCH=MOODLE_37_STABLE
-    - DB=mysqli MOODLE_BRANCH=MOODLE_37_STABLE
-    - DB=pgsql MOODLE_BRANCH=MOODLE_38_STABLE
-    - DB=mysqli MOODLE_BRANCH=MOODLE_38_STABLE
 
-matrix:
+before_install:
+  - google-chrome-stable --headless --disable-gpu --remote-debugging-port=9222 http://localhost &
+  - phpenv config-rm xdebug.ini
+  - cd ../..
+  - composer selfupdate
+  - composer create-project -n --no-dev --prefer-dist moodlerooms/moodle-plugin-ci ci ^2
+  - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
+  - echo $JAVA_HOME
+  - which java
+  - sudo rm -rf /usr/local/lib/jvm/
+  - sudo apt-get install -y openjdk-8-jdk-headless
+  - export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
+  - which java
+  - java -version
+  - $JAVA_HOME/bin/java -version
+
+install:
+  - nvm install node
+  - nvm use node
+  - moodle-plugin-ci install
+  - xvfb-run -a --server-args="-screen 0 1024x768x24" make test java -Dwebdriver.chrome.driver=/usr/lib/chromium-browser/chromedriver -jar ${MOODLE_SELENIUM_JAR} -log /tmp/selenium.log &
+  - php -t ${MOODLE_DIR} -S localhost:8000 > /tmp/php-access.log 2> /tmp/php-error.log &
+  - sleep 5s
+
+jobs:
   fast_finish: true
   exclude:
     - php: 7.1
@@ -62,23 +79,6 @@ matrix:
       env: DB=pgsql MOODLE_BRANCH=MOODLE_37_STABLE
     - php: 7.4
       env: DB=mysqli MOODLE_BRANCH=MOODLE_37_STABLE
-
-before_install:
-  - google-chrome-stable --headless --disable-gpu --remote-debugging-port=9222 http://localhost &
-  - phpenv config-rm xdebug.ini
-  - cd ../..
-  - composer selfupdate
-  - composer create-project -n --no-dev --prefer-dist moodlerooms/moodle-plugin-ci ci ^2
-  - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
-  - echo $JAVA_HOME
-  - which java
-  - sudo rm -rf /usr/local/lib/jvm/
-  - sudo apt-get install -y openjdk-8-jdk-headless
-  - export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
-  - which java
-  - java -version
-  - $JAVA_HOME/bin/java -version
-jobs:
   include:
     # Prechecks against latest Moodle LTS stable only.
     - stage: static
@@ -94,20 +94,12 @@ jobs:
         - moodle-plugin-ci grunt
         - moodle-plugin-ci validate
     - stage: test
+      php: 7.2
+      env: DB=pgsql MOODLE_BRANCH=MOODLE_35_STABLE
       # Unit tests and behat tests against full matrix.
       script:
         - moodle-plugin-ci phpunit --coverage-clover
         - moodle-plugin-ci behat --moodle=${MOODLE_DIR} --auto-rerun=0 --profile=chrome --dump
-
-install:
-  - nvm install node
-  - nvm use node
-  - moodle-plugin-ci install
-  - xvfb-run -a --server-args="-screen 0 1024x768x24" make test java -Dwebdriver.chrome.driver=/usr/lib/chromium-browser/chromedriver -jar ${MOODLE_SELENIUM_JAR} -log /tmp/selenium.log &
-  - php -t ${MOODLE_DIR} -S localhost:8000 > /tmp/php-access.log 2> /tmp/php-error.log &
-  - sleep 5s
-  - moodle-plugin-ci install
-
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
