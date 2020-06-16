@@ -884,7 +884,7 @@ $string['uploadfile'] = 'File to import';
 $string['uploadtext'] = 'Text to import';
 $string['updateexisting'] = 'Overwrite existing';
 
-// Privacy API
+// Privacy API.
 $string['privacy:metadata:datalynx_entries'] = 'Represent entries in a datalynx instance.';
 $string['privacy:metadata:datalynx_entries:userid'] = 'User who created the record';
 $string['privacy:metadata:datalynx_entries:groupid'] = 'Group';
@@ -902,7 +902,7 @@ $string['privacy:metadata:datalynx_contents:content3'] = 'Additional content 3';
 $string['privacy:metadata:datalynx_contents:content4'] = 'Additional content 4';
 $string['privacy:metadata:filepurpose'] = 'File or picture attached to a datalynx instance.';
 
-// Fieldgroups
+// Fieldgroups.
 $string['fieldgroups'] = 'Fieldgroups';
 $string['fieldgroupfields'] = 'Fieldgroupfields';
 $string['fieldgroupfields_help'] = 'Fields that are repeated as a group. The order of the fields is alphabetically so in order to have the fields ordered according to your preferences name them appropriatly';
@@ -922,6 +922,6 @@ $string['numrequired'] = 'Required repetitions';
 $string['onefieldrequired'] = 'Sorry, you have to add at least one field to a fieldgroup.';
 $string['unsupportedfield'] = 'Sorry, fields of type {$a} are not yet supported in fieldgroups.';
 
-// Global search
+// Global search.
 $string['search:activity'] = "Datalynx - instances";
 $string['search:entry'] = "Datalynx - entries";

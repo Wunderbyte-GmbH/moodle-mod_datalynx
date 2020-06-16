@@ -173,7 +173,8 @@ class behat_mod_datalynx extends behat_base {
     /**
      * Sets up a view for the specified datalynx instance using the specified viewtype.
      *
-     * @Given /^I add to "(?P<activityname_string>(?:[^"]|\\")*)" datalynx the view of "(?P<viewtype_string>(?:[^"]|\\")*)" type with:$/
+     * @Given /^I add to "(?P<activityname_string>(?:[^"]|\\")*)" datalynx
+     * the view of "(?P<viewtype_string>(?:[^"]|\\")*)" type with:$/
      *
      * @param string $activityname
      * @param string $viewtype

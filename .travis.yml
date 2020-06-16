@@ -76,24 +76,26 @@ jobs:
     - stage: test
       php: 7.1
       env: DB=mysqli MOODLE_BRANCH=MOODLE_35_STABLE
-#    - stage: test
-#      php: 7.1
-#      env: DB=pgsql MOODLE_BRANCH=MOODLE_35_STABLE
     - stage: test
-      php: 7.2
-      env: DB=mysqli MOODLE_BRANCH=MOODLE_36_STABLE
+      php: 7.1
+      env: DB=pgsql MOODLE_BRANCH=MOODLE_35_STABLE
+#    - stage: test
+#      php: 7.2
+#      env: DB=mysqli MOODLE_BRANCH=MOODLE_36_STABLE
 #    - stage: test
 #      php: 7.2
 #      env: DB=pgsql MOODLE_BRANCH=MOODLE_36_STABLE
-#    - stage: test
-#      php: 7.4
-#      env: DB=mysqli MOODLE_BRANCH=MOODLE_38_STABLE
+    - stage: test
+      php: 7.4
+      env: DB=mysqli MOODLE_BRANCH=MOODLE_36_STABLE
+    - stage: test
+      php: 7.2 # Testing 7.2 with oder moodle branch.
+      env: DB=mysqli MOODLE_BRANCH=MOODLE_38_STABLE
     - stage: test
       php: 7.4
       env: DB=pgsql MOODLE_BRANCH=MOODLE_38_STABLE
-# Adding mdl 3.9 to the mix.
     - stage: test
-      php: 7.1
+      php: 7.4 # >= 7.2
       env: DB=mysqli MOODLE_BRANCH=MOODLE_39_STABLE
 
 # Unit tests and behat tests against full matrix.

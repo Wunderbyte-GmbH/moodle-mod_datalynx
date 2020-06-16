@@ -844,7 +844,7 @@ $string['uploadfile'] = 'Importdatei';
 $string['uploadtext'] = 'Importtext';
 $string['updateexisting'] = 'Vorhandene überschreiben';
 
-// Privacy API
+// Privacy API.
 $string['privacy:metadata:datalynx_entries'] = 'Einträge in einer datalynx Instanz.';
 $string['privacy:metadata:datalynx_entries:userid'] = 'Nutzer der den Eintrag angelegt hat';
 $string['privacy:metadata:datalynx_entries:groupid'] = 'Gruppe';
@@ -862,7 +862,7 @@ $string['privacy:metadata:datalynx_contents:content3'] = 'Zusätzlicher content 
 $string['privacy:metadata:datalynx_contents:content4'] = 'Zusätzlicher content 4';
 $string['privacy:metadata:filepurpose'] = 'Datei oder Bild zur datalynx Instanz.';
 
-// Fieldgroups
+// Fieldgroups.
 $string['fieldgroups'] = 'Feldergruppierung';
 $string['fieldgroupfields'] = 'Feldergruppe';
 $string['fieldgroupfields_help'] = 'Felder die als Gruppierung wiederholt ausgefüllt/angezeigt werden sollen. Die Felder werden alphabetisch gereiht. Um die Reihenfolge den eigenen Vorstellungen anzupassen, müssen die Felder entsprechend benamst werden';
@@ -882,6 +882,6 @@ $string['numrequired'] = 'Notwendige Wiederholungen';
 $string['onefieldrequired'] = 'Es muss mindestens ein Feld angegeben werden.';
 $string['unsupportedfield'] = 'Felder vom Typ {$a} können noch nicht in einer Gruppe genutzt werden.';
 
-// Global search
+// Global search.
 $string['search:activity'] = "Datalynx - Instanzen";
 $string['search:entry'] = "Datalynx - Einträge";
