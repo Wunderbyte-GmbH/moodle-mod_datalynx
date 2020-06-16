@@ -38,7 +38,7 @@ class datalynxfield_picture extends datalynxfield_file {
 
     /**
      */
-    public function update_content($entry, array $values = null) {
+    public function update_content(stdClass $entry, array $values = null) {
         global $DB;
         $parentcontentid = parent::update_content($entry, $values);
 

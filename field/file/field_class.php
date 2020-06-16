@@ -50,7 +50,7 @@ class datalynxfield_file extends datalynxfield_base {
 
     /**
      */
-    public function update_content($entry, array $values = null) {
+    public function update_content(stdClass $entry, array $values = null) {
         global $DB, $USER;
 
         $entryid = $entry->id;

@@ -90,7 +90,7 @@ class datalynxfield_editor extends datalynxfield_base {
      *
      * @see datalynxfield_base::update_content()
      */
-    public function update_content($entry, array $values = null) {
+    public function update_content(stdClass $entry, array $values = null) {
         global $DB;
         $entryid = $entry->id;
         $fieldid = $this->field->id;
