@@ -2,7 +2,9 @@ language: php
 
 os: linux
 
-dist: bionic
+sudo: false
+
+dist: trusty
 
 jdk: openjdk8
 
@@ -70,6 +72,7 @@ jobs:
         - moodle-plugin-ci mustache || true # A code checker bug does currently not validate mustache correctly.
         - moodle-plugin-ci grunt
         - moodle-plugin-ci validate
+
     - stage: test
       php: 7.1
       env: DB=mysqli MOODLE_BRANCH=MOODLE_35_STABLE
@@ -88,10 +91,11 @@ jobs:
     - stage: test
       php: 7.4
       env: DB=pgsql MOODLE_BRANCH=MOODLE_38_STABLE
-      # Unit tests and behat tests against full matrix.
-      script:
-        - moodle-plugin-ci phpunit --coverage-clover
-        - moodle-plugin-ci behat --moodle=${MOODLE_DIR} --auto-rerun=0 --profile=chrome --dump
+
+# Unit tests and behat tests against full matrix.
+script:
+  - moodle-plugin-ci phpunit --coverage-clover
+  - moodle-plugin-ci behat --moodle=${MOODLE_DIR} --auto-rerun=0 --profile=chrome --dump
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
