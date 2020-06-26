@@ -43,6 +43,7 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
             $content = $entry->{"c{$fieldid}_content"};
         }
         $fieldattr = array();
+        $fieldattr['size'] = 30;
 
         if ($field->get('param4')) {
             $fieldattr['class'] = s($field->get('param4'));
