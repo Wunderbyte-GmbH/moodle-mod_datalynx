@@ -1,0 +1,19 @@
+{{=<% %>=}}
+<div>
+    <core-course-module-description description="<% intro %>" component="mod_datalynx" componentId="<% cmid %>"></core-course-module-description>
+
+    <ion-list>
+
+    <%#entries%>
+    <ion-item>
+        <h2>Entry <% id %></h2>
+        <p>
+        <%#contents%>
+            <% content %>;
+        <%/contents%>
+        </p>
+    </ion-item>
+    <%/entries%>
+
+</ion-list>
+</div>
