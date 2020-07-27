@@ -21,7 +21,7 @@ defined('MOODLE_INTERNAL') || die();
 use context_module;
 
 /**
- * Mobile output class for datalynx based on mod_certificate.
+ * Mobile output class for datalynx based on mod_certificate and mod_questionnaire.
  *
  * @package    mod_datalynx
  * @copyright  2020 Michael Pollak
@@ -30,13 +30,13 @@ use context_module;
 class mobile {
 
     /**
-     * Returns the certificate course view for the mobile app.
+     * Returns all entries of an instance for the mobile app.
      * @param  array $args Arguments from tool_mobile_get_content WS
-     *
-     * @return array       HTML, javascript and otherdata
+     * @return array HTML, javascript and otherdata
      */
     public static function mobile_course_view($args) {
-        global $OUTPUT, $USER, $DB;
+        global $OUTPUT, $USER, $DB, $CFG;
+        require_once("$CFG->dirroot/mod/datalynx/classes/datalynx.php");
 
         $args = (object) $args;
         $cm = get_coursemodule_from_id('datalynx', $args->cmid);
@@ -49,43 +49,22 @@ class mobile {
             require_capability('mod/datalynx:manageentries', $context);
         }
 
-        $datalynx = $DB->get_record('datalynx', array('id' => $cm->instance));
+        $datalynx = new \mod_datalynx\datalynx($cm->instance);
 
-        $entries = self::get_entries(7);
-
-        $data['intro'] = $datalynx->intro;
-        $data['cmid'] = $cm->id;
-        $data['entries'] = $entries;
-        $data['courseid'] = $args->courseid;
+        $view = 0;
+        if (!empty($datalynx->data->defaultview)) {
+            $view = $datalynx->data->defaultview;
+        }
 
         return [
             'templates' => [
                 [
                     'id' => 'main',
-                    'html' => $OUTPUT->render_from_template('mod_datalynx/mobile_view_page', $data),
+                    'html' => $datalynx->get_content_inline($cm->instance, $view),
                 ],
             ],
             'javascript' => '',
             'otherdata' => '',
         ];
-    }
-
-    public static function get_entries($id) {
-        global $DB;
-
-        $sql = "SELECT {datalynx_contents}.id, entryid, fieldid, content FROM {datalynx_entries}
-            JOIN {datalynx_contents} ON {datalynx_entries}.id = entryid  WHERE dataid = $id";
-        $tempentries = $DB->get_records_sql($sql);
-
-        // Create a format that mustache can handle.
-        foreach ($tempentries as $entry) {
-            $entryid = $entry->entryid;
-            $entries[$entryid]['id'] = $entryid;
-            $entries[$entryid]['contents'][]['content'] = $entry->content;
-            $entries[$entryid]['contents'][]['fieldid'] = $entry->content;
-        }
-
-        // Set keys to start at 0, does not work otherwhise.
-        return array_values($entries);
     }
 }
