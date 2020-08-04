@@ -56,11 +56,14 @@ class mobile {
             $view = $datalynx->data->defaultview;
         }
 
+        // Hide edit, remove and search for now.
+        $options = array('tohtml' => true, 'controls' => false, 'entryactions' => false);
+
         return [
             'templates' => [
                 [
                     'id' => 'main',
-                    'html' => $datalynx->get_content_inline($cm->instance, $view),
+                    'html' => $datalynx->get_content_inline($cm->instance, $view, null, $options),
                 ],
             ],
             'javascript' => '',

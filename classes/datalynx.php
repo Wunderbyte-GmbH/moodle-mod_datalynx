@@ -784,7 +784,7 @@ class datalynx {
      * @param int $viewid The id of the datalynx's view whose content should be displayed
      * @return string
      */
-    public static function get_content_inline($datalynxid, $viewid = 0, $eids = null) {
+    public static function get_content_inline($datalynxid, $viewid = 0, $eids = null, $options = array('tohtml' => true)) {
         global $CFG;
         require_once($CFG->dirroot . '/mod/datalynx/view/view_class.php');
         $urlparams = new stdClass();
@@ -807,7 +807,7 @@ class datalynx {
         if ($view = new $viewclass($datalynxid, $viewid)) {
             $view->set_content();
             $view->get_df()->_currentview = $datalynx->_currentview;
-            $viewcontent = $view->display(array('tohtml' => true));
+            $viewcontent = $view->display($options);
             return "$viewcontent";
         }
         return null;
