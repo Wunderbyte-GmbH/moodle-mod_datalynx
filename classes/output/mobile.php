@@ -56,14 +56,45 @@ class mobile {
             $view = $datalynx->data->defaultview;
         }
 
-        // Hide edit, remove and search for now.
-        $options = array('tohtml' => true, 'controls' => false, 'entryactions' => false);
+        // Hide edit, remove with entryactions, hide filter with controls.
+        $options = array('tohtml' => true, 'controls' => false);
+        $options['pagelayout'] = 'mobile';
+
+        // Add intro in native blob.
+        // TODO: use template for this?
+        $html = '<core-course-module-description description="';
+        $html .= $datalynx->data->intro;
+        $html .='" component="mod_datalynx"></core-course-module-description>';
+
+        // Show only single entry when button was clicked.
+        $entry = null;
+        if ($args->entry) {
+            $entry = $args->entry;
+        }
+
+        // Do something when delete was clicked.
+        if ($args->action == "delete") {
+            // TODO: Check and call delete.
+        }
+
+        // Do something when new was clicked.
+        if ($args->action == "new") {
+            // TODO: Check and call new.
+        }
+
+        // Add content html.
+        $html .= $datalynx->get_content_inline($cm->instance, $view, $entry, $options);
+
+        // Add new button, check if that makes sense first.
+        $args = "[args]='{entry: -1, action: \"new\", cmid: $args->cmid, courseid: $args->courseid }'";
+        $html .= "<button ion-button core-site-plugins-new-content title='newbutton' component='mod_datalynx'
+            method='mobile_course_view' $args>".get_string('entryaddnew', 'datalynx')."</button>";
 
         return [
             'templates' => [
                 [
                     'id' => 'main',
-                    'html' => $datalynx->get_content_inline($cm->instance, $view, null, $options),
+                    'html' => $html,
                 ],
             ],
             'javascript' => '',

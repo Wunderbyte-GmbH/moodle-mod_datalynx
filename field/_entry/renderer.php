@@ -118,6 +118,16 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
             $url->param('eids', $entry->id);
         }
         $str = get_string('edit');
+
+        // In case we serve the app show a nice button for mobile devices.
+        if (WS_SERVER) {
+            $cmid = $field->df()->cm->id;
+            $courseid = $field->df()->cm->course;
+            $args = "[args]='{entry: $entry->id, action: \"show\", cmid: $cmid, courseid: $courseid }'";
+            return "<button ion-button core-site-plugins-new-content title='editbutton'
+                component='mod_datalynx' method='mobile_course_view' $args>$str</button>";
+        }
+
         return html_writer::link($url->out(false), $OUTPUT->pix_icon('t/edit', $str));
     }
 
@@ -147,6 +157,16 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
                 'sourceview' => $this->_field->df()->get_current_view()->id());
         $url = new moodle_url($entry->baseurl, $params);
         $str = get_string('delete');
+
+        // In case we serve the app show a nice button for mobile devices.
+        if (WS_SERVER) {
+            $cmid = $field->df()->cm->id;
+            $courseid = $field->df()->cm->course;
+            $args = "[args]='{entry: $entry->id, action: \"delete\", cmid: $cmid, courseid: $courseid }'";
+            return "<button ion-button core-site-plugins-new-content title='deletebutton'
+                component='mod_datalynx' method='mobile_course_view' $args>$str</button>";
+        }
+
         return html_writer::link($url->out(false), $OUTPUT->pix_icon('t/delete', $str));
     }
 

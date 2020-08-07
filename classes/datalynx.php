@@ -780,8 +780,10 @@ class datalynx {
      * Returns datalynx content for inline display.
      * Used in mod_datalynxcoursepage only.
      *
-     * @param int $datalynxid The id of the datalynx whose content should be displayed
-     * @param int $viewid The id of the datalynx's view whose content should be displayed
+     * @param int $datalynxid The id of the datalynx whose content should be displayed.
+     * @param int $viewid The id of the datalynx's view whose content should be displayed.
+     * @param int $eids The id of the datalynx entrie that should be displayed.
+     * @param int $options Pass options what should be displayed, esp. to hide control interfaces.
      * @return string
      */
     public static function get_content_inline($datalynxid, $viewid = 0, $eids = null, $options = array('tohtml' => true)) {
@@ -791,7 +793,18 @@ class datalynx {
         $datalynx = new datalynx($datalynxid, null);
         $urlparams->d = $datalynxid;
         $urlparams->view = $viewid;
+
+        // It's used nowhere but keeping for backwards compatibility.
         $urlparams->pagelayout = 'external';
+        $filteroptions = true;
+
+        // In case we come from the app, do stuff.
+        if(isset($options['pagelayout']) AND $options['pagelayout'] == 'mobile') {
+            $urlparams->pagelayout = 'mobile';
+            $filteroptions = array('eids' => $eids);
+        }
+
+        // NOTE: The app ignores urlparams, added filter to view constructor.
         if ($eids) {
             $urlparams->eids = $eids;
         }
@@ -804,7 +817,7 @@ class datalynx {
         $viewclass = "datalynxview_$type";
         $datalynx->_currentview = $datalynx->get_current_view_from_id($viewid);
 
-        if ($view = new $viewclass($datalynxid, $viewid)) {
+        if ($view = new $viewclass($datalynxid, $viewid, $filteroptions)) {
             $view->set_content();
             $view->get_df()->_currentview = $datalynx->_currentview;
             $viewcontent = $view->display($options);
