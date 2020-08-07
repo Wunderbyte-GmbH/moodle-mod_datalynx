@@ -799,7 +799,7 @@ class datalynx {
         $filteroptions = true;
 
         // In case we come from the app, do stuff.
-        if(isset($options['pagelayout']) AND $options['pagelayout'] == 'mobile') {
+        if (isset($options['pagelayout']) AND $options['pagelayout'] == 'mobile') {
             $urlparams->pagelayout = 'mobile';
             $filteroptions = array('eids' => $eids);
         }

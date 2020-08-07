@@ -64,22 +64,12 @@ class mobile {
         // TODO: use template for this?
         $html = '<core-course-module-description description="';
         $html .= $datalynx->data->intro;
-        $html .='" component="mod_datalynx"></core-course-module-description>';
+        $html .= '" component="mod_datalynx"></core-course-module-description>';
 
         // Show only single entry when button was clicked.
         $entry = null;
         if ($args->entry) {
             $entry = $args->entry;
-        }
-
-        // Do something when delete was clicked.
-        if ($args->action == "delete") {
-            // TODO: Check and call delete.
-        }
-
-        // Do something when new was clicked.
-        if ($args->action == "new") {
-            // TODO: Check and call new.
         }
 
         // Add content html.
