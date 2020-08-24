@@ -407,15 +407,18 @@ class datalynx_filter {
 
                     $replacestring = $sortname; // Works only for single values yet.
 
-                    // Select has no spacer hashes infront and behind values.
-                    $spacer = "#";
+                    // Select does not work with REPLACE and has no spacer hashes infront and behind values.
                     if ($field instanceof datalynxfield_select) {
-                        $spacer = '';
+                        foreach ($fieldvalues as $key => $value) {
+                            $replacestring = "REGEXP_REPLACE($replacestring,'^" . ($key + 1) . "$', '$value')";
+                        }
+                    } else {
+                        $spacer = "#";
+                        foreach ($fieldvalues as $key => $value) {
+                            $replacestring = "REPLACE($replacestring,'$spacer" . ($key + 1) . "$spacer', '$value')";
+                        }
                     }
 
-                    foreach ($fieldvalues as $key => $value) {
-                        $replacestring = "REPLACE($replacestring,'$spacer" . ($key + 1) . "$spacer', '$value')";
-                    }
                     $orderby[] = $replacestring . ($sortdir ? ' DESC' : ' ASC');
                     $stringindexed = true;
                 } else {
