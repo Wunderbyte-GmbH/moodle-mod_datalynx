@@ -65,6 +65,12 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
                         'customsort', 'customsearch'
                 ));
 
+        $customfilters = new backup_nested_element('customfilters');
+        $customfilter = new backup_nested_element('customfilter', array('id'),
+                array('name', 'description', 'visible', 'fulltextsearch', 'timecreated', 'timecreated_sortable',
+                        'timemodified', 'timemodified_sortable', 'authorsearch', 'approve', 'status', 'fieldlist'
+                ));
+
         $views = new backup_nested_element('views');
         $view = new backup_nested_element('view', array('id'),
                 array('type', 'name', 'description', 'visible', 'perpage', 'groupby', 'filter',
@@ -121,6 +127,9 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
 
         $datalynx->add_child($filters);
         $filters->add_child($filter);
+
+        $datalynx->add_child($customfilters);
+        $customfilters->add_child($customfilter);
 
         $datalynx->add_child($views);
         $views->add_child($view);
@@ -194,6 +203,7 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
         }
 
         $filter->set_source_table('datalynx_filters', array('dataid' => backup::VAR_PARENTID));
+        $customfilter->set_source_table('datalynx_customfilters', array('dataid' => backup::VAR_PARENTID));
         $view->set_source_table('datalynx_views', array('dataid' => backup::VAR_PARENTID));
         $rule->set_source_table('datalynx_rules', array('dataid' => backup::VAR_PARENTID));
         $behavior->set_source_table('datalynx_behaviors', array('dataid' => backup::VAR_PARENTID));

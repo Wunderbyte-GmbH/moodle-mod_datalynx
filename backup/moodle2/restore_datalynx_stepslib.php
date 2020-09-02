@@ -44,6 +44,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         $paths[] = new restore_path_element('datalynx_module', '/activity/datalynx/module');
         $paths[] = new restore_path_element('datalynx_field', '/activity/datalynx/fields/field');
         $paths[] = new restore_path_element('datalynx_filter', '/activity/datalynx/filters/filter');
+        $paths[] = new restore_path_element('datalynx_customfilter', '/activity/datalynx/customfilters/customfilter');
         $paths[] = new restore_path_element('datalynx_view', '/activity/datalynx/views/view');
         $paths[] = new restore_path_element('datalynx_rule', '/activity/datalynx/rules/rule');
         $paths[] = new restore_path_element('datalynx_behavior', '/activity/datalynx/behaviors/behavior');
@@ -225,6 +226,36 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         // Insert the datalynx_filters record.
         $newitemid = $DB->insert_record('datalynx_filters', $data);
         $this->set_mapping('datalynx_filter', $oldid, $newitemid, false); // No files associated.
+    }
+
+
+    /**
+     */
+    protected function process_datalynx_customfilter($data) {
+        global $DB;
+
+        $data = (object) $data;
+        $oldid = $data->id;
+
+        $data->dataid = $this->get_new_parentid('datalynx');
+
+        // Read fieldlist and update field ids.
+        if ($data->fieldlist) {
+
+            $oldfieldlist = json_decode($data->fieldlist);
+            $newfieldlist = array();
+
+            foreach ($oldfieldlist as $oldfieldid => $value) {
+                $newfieldid = $this->get_mappingid('datalynx_field', $oldfieldid);
+                $newfieldlist[$newfieldid] = $value;
+            }
+
+            $data->fieldlist = json_encode($newfieldlist);
+        }
+
+        // Insert the datalynx_customfilters record.
+        $newitemid = $DB->insert_record('datalynx_customfilters', $data);
+        $this->set_mapping('datalynx_customfilter', $oldid, $newitemid, false); // No files associated.
     }
 
     /**
