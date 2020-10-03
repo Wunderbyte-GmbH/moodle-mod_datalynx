@@ -89,9 +89,9 @@ jobs:
     - stage: test
       php: 7.3
       env: DB=pgsql MOODLE_BRANCH=MOODLE_38_STABLE
-#    - stage: test
-#      php: 7.3 # >= 7.2
-#      env: DB=mysqli MOODLE_BRANCH=MOODLE_39_STABLE
+    - stage: test
+      php: 7.3 # >= 7.2
+      env: DB=mysqli MOODLE_BRANCH=MOODLE_39_STABLE
 
 # Unit tests and behat tests against full matrix.
 script:
