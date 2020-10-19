@@ -25,6 +25,7 @@ Feature: In a datalynx instance create a new entry
     And I am on "Course 1" course homepage
     And I add to the "Datalynx Test Instance" datalynx the following fields:
       | type             | name               | description | param1                     | param2   | param3 |
+      | file             | File               | My file     |                            | 2        |        |
       | text             | Text               |             |                            |          |        |
       | textarea         | Text area          |             |                            | 90       | 15     |
       | time             | Time               |             |                            |          |        |
@@ -34,7 +35,6 @@ Feature: In a datalynx instance create a new entry
       | select           | Select             |             | Option X,Option Y,Option Z |          |        |
       | teammemberselect | Team member select | 3           | 20                         | 1,2,4,8  |        |
       | number           | Number             | 3           | 2                          |          |        |
-      | file             | File               | My file     |                            | 2        |        |
     And I follow "Filters"
     And I follow "Add a filter"
     And I select "10" from the "perpage" singleselect
