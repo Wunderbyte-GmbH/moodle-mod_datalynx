@@ -24,4 +24,15 @@
 
 defined('MOODLE_INTERNAL') or die();
 
-$functions = array();
+
+$functions = array(
+
+    'mod_datalynx_get_datalynxs_by_courses' => array(
+        'classname' => 'mod_datalynx_external',
+        'methodname' => 'get_datalynxs_by_courses',
+        'description' => 'Returns a list of datalynx instances in a provided set of courses, if
+            no courses are provided then all the database instances the user has access to will be returned.',
+        'type' => 'read',
+        'capabilities' => 'mod/datalynx:viewentry'
+    )
+);

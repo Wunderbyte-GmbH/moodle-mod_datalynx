@@ -19,6 +19,7 @@ namespace mod_datalynx\output;
 defined('MOODLE_INTERNAL') || die();
 
 use context_module;
+use completion_info;
 
 /**
  * Mobile output class for datalynx based on mod_certificate and mod_questionnaire.
@@ -41,6 +42,8 @@ class mobile {
         $args = (object) $args;
         $cm = get_coursemodule_from_id('datalynx', $args->cmid);
 
+        $buttons = true; // Hide buttons if false.
+
         // Capabilities check.
         require_login($args->courseid , false , $cm, true, true);
         $context = context_module::instance($cm->id);
@@ -56,29 +59,54 @@ class mobile {
             $view = $datalynx->data->defaultview;
         }
 
-        // Hide edit, remove with entryactions, hide filter with controls.
-        $options = array('tohtml' => true, 'controls' => false);
-        $options['pagelayout'] = 'mobile';
-
         // Add intro in native blob.
-        // TODO: use template for this?
         $html = '<core-course-module-description description="';
         $html .= $datalynx->data->intro;
         $html .= '" component="mod_datalynx"></core-course-module-description>';
 
-        // Show only single entry when button was clicked.
         $entry = null;
         if ($args->entry) {
             $entry = $args->entry;
         }
 
-        // Add content html.
+        if ($args->action == 'delete') {
+
+            // Check if we are allowed to do that.
+            require_capability('mod/datalynx:manageentries', $context);
+
+            /*
+            require_once("$CFG->dirroot/mod/datalynx/entries_class.php");
+            require_once("$CFG->dirroot/lib/completionlib.php");
+
+            // Remove all field data and entry.
+            $entriesclass = new \mod_datalynx\datalynx_entries($datalynx);
+            $entriesclass->process_entries('delete', 638, null, true);
+            */
+            $html .= "<h1>Mock-deleted entry $args->entry!</h1>";
+            $entry = null; // Show all remaining entries.
+        }
+
+        // White background to keep standards.
+        $html .= '<div class="addon-data-contents">';
+
+        // Add content html. Hide edit, remove with entryactions, hide filter with controls.
+        $options = array('tohtml' => true, 'controls' => false, 'entryactions' => $buttons);
+        $options['pagelayout'] = 'mobile';
         $html .= $datalynx->get_content_inline($cm->instance, $view, $entry, $options);
 
+        $html .= "</div>";
+
         // Add new button, check if that makes sense first.
-        $args = "[args]='{entry: -1, action: \"new\", cmid: $args->cmid, courseid: $args->courseid }'";
-        $html .= "<button ion-button core-site-plugins-new-content title='newbutton' component='mod_datalynx'
-            method='mobile_course_view' $args>".get_string('entryaddnew', 'datalynx')."</button>";
+        if ($buttons && has_capability('mod/datalynx:writeentry', $context)) {
+            // TODO: Ion-footer does not work, make this look like the plus in data or forum.
+            $args = "[args]='{entry: -1, action: \"new\", cmid: $args->cmid, courseid: $args->courseid }'";
+            $html .= "<button ion-button core-site-plugins-new-content title='newbutton' component='mod_datalynx' method='mobile_course_view' $args>".get_string('entryaddnew', 'datalynx')."</button>";
+
+            // Round button icon with plus.
+            $html .= '<button ion-fab class="fab fab-md" aria-label="Add a new entry">
+                        <ion-icon name="add" role="img" class="icon icon-md ion-md-add" aria-label="add"></ion-icon>
+                        </button>';
+        }
 
         return [
             'templates' => [
