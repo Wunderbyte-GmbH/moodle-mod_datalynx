@@ -43,8 +43,13 @@ class datalynxfield_userinfo_form extends datalynxfield_form {
         $options = array('' => get_string('choosedots')) + $options;
         $mform->addElement('select', "param1", get_string('infofield', 'datalynxfield_userinfo'), $options);
 
-        // Allow field to be edited by manager.
-        $mform->addElement('advcheckbox', "param6", 'editable');
+        // Allow field to be edited by manager and owning user.
+        $mform->addElement('advcheckbox', 'param6', 'editable');
         // TODO: Add better description, add to documentation, explain that only users and teachers can edit.
+
+        // Entry can not be safed with empty userinfo field.
+        $mform->addElement('advcheckbox', 'param7', 'mandatory');
+        // TODO: Add better description, add to documentation.
+
     }
 }

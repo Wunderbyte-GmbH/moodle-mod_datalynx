@@ -37,7 +37,7 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
         $entryid = $entry->id;
         $fieldname = "field_{$fieldid}_{$entryid}";
 
-        if ($entry->id == "-1") {
+        if ($entryid == "-1") {
             global $USER;
             $userid = $USER->id;
         } else {
@@ -53,6 +53,11 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
         $mform->setType($fieldname, PARAM_TEXT);
         $mform->setDefault($fieldname, $content);
 
+        // Add required.
+        if ($field->mandatory) {
+            $mform->addRule($fieldname, null, 'required', null, 'client');
+        }
+
     }
 
     /**
@@ -67,10 +72,9 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
         $tag = "##author:$fieldname##";
 
         $manageable = has_capability('mod/datalynx:manageentries', $field->df()->context);
+        $manageable += true; // Is entry author.
         $editable = $field->editable;
-
-        // TODO: Does not work...
-        $isediting = true; // optional_param('editentries', 0, PARAM_INT); // user_is_editing not working.
+        $isediting = $options['edit'];
 
         if ($isediting AND $manageable AND $editable) {
             $replacements[$tag] = array('', array(array($this, 'display_edit'), array($entry)));
@@ -231,18 +235,30 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
         $fieldid = $this->_field->id();
         $formfieldname = "field_{$fieldid}_{$entryid}";
 
-        // TODO: Find a way to get rid of this database call to find original author.
-        global $DB;
-        $entry = $DB->get_record('datalynx_entries', array('id' => $entryid), 'userid', MUST_EXIST);
+        $errors = array();
+        if ($entryid == -1) {
+            global $USER;
+            $userid = $USER->id;
+        } else {
+            // TODO: Find a way to get rid of this database call to find original author.
+            global $DB;
+            $entry = $DB->get_record('datalynx_entries', array('id' => $entryid), 'userid', MUST_EXIST);
+            $userid = $entry->userid;
+        }
 
         // Check really hard if we are allowed to do this.
 
-        // Update.
-        $user["id"] = $entry->userid;
-        $user["profile_field_{$this->_field->infoshortname}"] = $formdata->{$formfieldname};
-        profile_save_data((object) $user);
+        // Check if required.
+        if ($this->_field->mandatory && !$formdata->{$formfieldname}) {
+            $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
+        } else {
+            // Update.
+            $user["id"] = $userid;
+            $user["profile_field_{$this->_field->infoshortname}"] = $formdata->{$formfieldname};
+            profile_save_data((object) $user);
+        }
 
-        return array();
+        return $errors;
 
     }
 
