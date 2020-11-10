@@ -24,4 +24,9 @@
  */
 $string['pluginname'] = 'User custom info';
 $string['infofield'] = 'Info field';
+$string['infofield_editable'] = 'Editable';
+$string['infofield_editable_help'] = 'Make user information field editable to the user that created an entry.';
+$string['infofield_mandatory'] = 'Mandatory';
+$string['infofield_mandatory_help'] = 'Make this field mandatory, can not be empty.';
+
 $string['privacy:metadata'] = 'The field user custom info does not store personal data.';

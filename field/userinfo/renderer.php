@@ -49,7 +49,6 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
         $content = $userprofile->{$field->infoshortname};
 
         $mform->addElement('text', $fieldname);
-        // TODO: Add setHelpButton strings and pass infoshortname.
         $mform->setType($fieldname, PARAM_TEXT);
         $mform->setDefault($fieldname, $content);
 
@@ -63,19 +62,28 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
     /**
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
+        global $USER;
         $field = $this->_field;
         $fieldname = $field->name();
-
-        $replacements = array();
 
         // There is only one possible tag here, no edit.
         $tag = "##author:$fieldname##";
 
-        $manageable = has_capability('mod/datalynx:manageentries', $field->df()->context);
-        $manageable += true; // Is entry author.
+        $manageable = false;
+        if ($entry->id == -1) {
+            $manageable = true;
+        }
+        if (has_capability('mod/datalynx:manageentries', $field->df()->context)) {
+            $manageable = true;
+        }
+        if ($USER->id == $entry->userid) {
+            $manageable = true;
+        }
+
         $editable = $field->editable;
         $isediting = $options['edit'];
 
+        $replacements = array();
         if ($isediting AND $manageable AND $editable) {
             $replacements[$tag] = array('', array(array($this, 'display_edit'), array($entry)));
             return $replacements;
@@ -245,8 +253,6 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
             $entry = $DB->get_record('datalynx_entries', array('id' => $entryid), 'userid', MUST_EXIST);
             $userid = $entry->userid;
         }
-
-        // Check really hard if we are allowed to do this.
 
         // Check if required.
         if ($this->_field->mandatory && !$formdata->{$formfieldname}) {
