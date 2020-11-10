@@ -40,6 +40,8 @@ class datalynxfield_userinfo extends datalynxfield_base {
 
     public $defaultdataformat;
 
+    public $editable;
+
     public function __construct($df = 0, $field = 0) {
         parent::__construct($df, $field);
         $this->infoid = $this->field->param1;
@@ -47,6 +49,7 @@ class datalynxfield_userinfo extends datalynxfield_base {
         $this->infotype = $this->field->param3;
         $this->defaultdata = $this->field->param4;
         $this->defaultdataformat = $this->field->param5;
+        $this->editable = $this->field->param6;
     }
 
     /**
@@ -66,13 +69,16 @@ class datalynxfield_userinfo extends datalynxfield_base {
                 $this->field->param4 = $info->defaultdata;
                 $this->field->param5 = $info->defaultdataformat;
 
-                $this->field->param6 = $info->param1;
                 $this->field->param7 = $info->param2;
                 $this->field->param8 = $info->param3;
                 $this->field->param9 = $info->param4;
                 $this->field->param10 = $info->param5;
             }
         }
+    }
+
+    public function is_editable() {
+        return true;
     }
 
     /**

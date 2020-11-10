@@ -25,10 +25,35 @@
 defined('MOODLE_INTERNAL') or die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
+require_once("$CFG->dirroot/user/profile/lib.php");
 
 /**
  */
 class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
+
+    public function display_edit(&$mform, $entry, array $options = null) {
+        $field = $this->_field;
+        $fieldid = $field->id();
+        $entryid = $entry->id;
+        $fieldname = "field_{$fieldid}_{$entryid}";
+
+        if ($entry->id == "-1") {
+            global $USER;
+            $userid = $USER->id;
+        } else {
+            $userid = $entry->userid;
+        }
+
+        // NOTE: If none is found default is shown.
+        $userprofile = profile_user_record($userid);
+        $content = $userprofile->{$field->infoshortname};
+
+        $mform->addElement('text', $fieldname);
+        // TODO: Add setHelpButton strings and pass infoshortname.
+        $mform->setType($fieldname, PARAM_TEXT);
+        $mform->setDefault($fieldname, $content);
+
+    }
 
     /**
      */
@@ -40,6 +65,18 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
 
         // There is only one possible tag here, no edit.
         $tag = "##author:$fieldname##";
+
+        $manageable = has_capability('mod/datalynx:manageentries', $field->df()->context);
+        $editable = $field->editable;
+
+        // TODO: Does not work...
+        $isediting = true; // optional_param('editentries', 0, PARAM_INT); // user_is_editing not working.
+
+        if ($isediting AND $manageable AND $editable) {
+            $replacements[$tag] = array('', array(array($this, 'display_edit'), array($entry)));
+            return $replacements;
+        }
+
         switch ($field->infotype) {
             case 'checkbox':
                 $replacements[$tag] = array('html', $this->display_checkbox($entry));
@@ -188,4 +225,25 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
 
         return $patterns;
     }
+
+    public function validate($entryid, $tags, $formdata) {
+
+        $fieldid = $this->_field->id();
+        $formfieldname = "field_{$fieldid}_{$entryid}";
+
+        // TODO: Find a way to get rid of this database call to find original author.
+        global $DB;
+        $entry = $DB->get_record('datalynx_entries', array('id' => $entryid), 'userid', MUST_EXIST);
+
+        // Check really hard if we are allowed to do this.
+
+        // Update.
+        $user["id"] = $entry->userid;
+        $user["profile_field_{$this->_field->infoshortname}"] = $formdata->{$formfieldname};
+        profile_save_data((object) $user);
+
+        return array();
+
+    }
+
 }
