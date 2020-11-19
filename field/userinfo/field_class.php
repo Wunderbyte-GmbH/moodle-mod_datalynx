@@ -44,6 +44,10 @@ class datalynxfield_userinfo extends datalynxfield_base {
 
     public $mandatory;
 
+    public $param8; // Dropdown options.
+
+    public $param10; // Include time or not.
+
     public function __construct($df = 0, $field = 0) {
         parent::__construct($df, $field);
         $this->infoid = $this->field->param1;
@@ -53,6 +57,8 @@ class datalynxfield_userinfo extends datalynxfield_base {
         $this->defaultdataformat = $this->field->param5;
         $this->editable = $this->field->param6;
         $this->mandatory = $this->field->param7;
+        $this->param8 = $this->field->param8;
+        $this->param10 = $this->field->param10;
     }
 
     /**

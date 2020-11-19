@@ -48,9 +48,28 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
         $userprofile = profile_user_record($userid);
         $content = $userprofile->{$field->infoshortname};
 
-        $mform->addElement('text', $fieldname);
-        $mform->setType($fieldname, PARAM_TEXT);
-        $mform->setDefault($fieldname, $content);
+        switch ($field->infotype) {
+            case 'datetime':
+                $fieldtype = 'date_selector';
+                if ($param10) {
+                    $fieldtype = 'date_time_selector';
+                }
+                $mform->addElement($fieldtype, $fieldname, $field->infoshortname);
+                $mform->setDefault($fieldname, $content);
+                break;
+            case 'menu':
+                $dropdown = explode("\n", $field->param8);
+                $dropdown = array_combine($dropdown, $dropdown); // Keys and values are the same.
+                $mform->addElement('select', $fieldname, $field->infoshortname, $dropdown);
+                $mform->setDefault($fieldname, $content);
+                break;
+            default:
+                $mform->addElement('text', $fieldname);
+                $mform->setType($fieldname, PARAM_TEXT);
+                $mform->setDefault($fieldname, $content);
+        }
+
+
 
         // Add required.
         if ($field->mandatory) {
@@ -147,7 +166,7 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
         }
 
         // Check if time was specified.
-        if (!empty($field->field->param8)) {
+        if ($param10) {
             $format = get_string('strftimedaydatetime', 'langconfig');
         } else {
             $format = get_string('strftimedate', 'langconfig');
