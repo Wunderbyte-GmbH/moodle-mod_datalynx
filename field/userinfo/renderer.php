@@ -55,21 +55,20 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
                     $fieldtype = 'date_time_selector';
                 }
                 $mform->addElement($fieldtype, $fieldname, $field->infoshortname);
-                $mform->setDefault($fieldname, $content);
                 break;
             case 'menu':
                 $dropdown = explode("\n", $field->param8);
                 $dropdown = array_combine($dropdown, $dropdown); // Keys and values are the same.
                 $mform->addElement('select', $fieldname, $field->infoshortname, $dropdown);
-                $mform->setDefault($fieldname, $content);
+                break;
+            case 'checkbox':
+                $mform->addElement('advcheckbox', $fieldname, $field->infoshortname);
                 break;
             default:
                 $mform->addElement('text', $fieldname);
                 $mform->setType($fieldname, PARAM_TEXT);
-                $mform->setDefault($fieldname, $content);
         }
-
-
+        $mform->setDefault($fieldname, $content);
 
         // Add required.
         if ($field->mandatory) {
@@ -274,13 +273,15 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
         }
 
         // Check if required.
-        if ($this->_field->mandatory && !$formdata->{$formfieldname}) {
+        if ($this->_field->mandatory && $formdata->{$formfieldname} == '') {
             $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
         } else {
             // Update.
             $user["id"] = $userid;
             $user["profile_field_{$this->_field->infoshortname}"] = $formdata->{$formfieldname};
             profile_save_data((object) $user);
+            // We don't want these infos to be stored in the datalynx content table.
+            unset($formdata->{$formfieldname});
         }
 
         return $errors;
