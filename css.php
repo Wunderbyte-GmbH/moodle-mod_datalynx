@@ -131,7 +131,7 @@ if ($urlparams->cssedit) {
 
     defined('NO_MOODLE_COOKIES') or define('NO_MOODLE_COOKIES', true); // Session not used here.
 
-    $lifetime = 600; // Seconds to cache this stylesheet.
+    $lifetime = 0; // Seconds to cache this stylesheet.
 
     $PAGE->set_url('/mod/datalynx/css.php', array('d' => $urlparams->d));
 
