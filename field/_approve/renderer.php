@@ -120,11 +120,11 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
 
         if (has_capability('mod/datalynx:approve', $field->df()->context)) {
             if ($CFG->branch >= 33) {
-                $this->page->requires->js_call_amd('mod_datalynx/approve', 'init',
+                $PAGE->requires->js_call_amd('mod_datalynx/approve', 'init',
                         array($OUTPUT->image_url('i/completion-auto-pass')->__toString(),
                             $OUTPUT->image_url('i/completion-auto-n')->__toString()));
             } else {
-                $this->page->requires->js_call_amd('mod_datalynx/approve', 'init',
+                $$PAGE->requires->js_call_amd('mod_datalynx/approve', 'init',
                         array($OUTPUT->pix_url('i/completion-auto-pass')->__toString(),
                             $OUTPUT->pix_url('i/completion-auto-n')->__toString()));
             }
