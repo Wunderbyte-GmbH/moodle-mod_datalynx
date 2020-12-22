@@ -38,7 +38,7 @@ before_install:
   - phpenv config-rm xdebug.ini
   - cd ../..
   - composer selfupdate -vvv
-  - composer create-project -n --no-dev --no-interaction --prefer-dist moodlerooms/moodle-plugin-ci ci ^3
+  - composer create-project -n --no-dev --no-interaction --prefer-dist moodlehq/moodle-plugin-ci ci ^3
   - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
   - echo $JAVA_HOME
   - which java
