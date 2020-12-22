@@ -38,8 +38,7 @@ before_install:
   - phpenv config-rm xdebug.ini
   - cd ../..
   - composer selfupdate -vvv
-  - composer create-project -n --no-dev --no-interaction moodlerooms/moodle-plugin-ci ci ^1
-  # - composer create-project -vvv -n --no-dev --prefer-dist --no-interaction moodlerooms/moodle-plugin-ci ci ^2
+  - composer create-project -n --no-dev --no-interaction --prefer-dist moodlerooms/moodle-plugin-ci ci ^3
   - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
   - echo $JAVA_HOME
   - which java
@@ -93,14 +92,14 @@ jobs:
     - stage: test
       php: 7.3 # >= 7.2
       env: DB=mysqli MOODLE_BRANCH=MOODLE_39_STABLE
-    - stage: test
-      php: 7.3 # >= 7.2
-      env: DB=mysqli MOODLE_BRANCH=MOODLE_310_STABLE
+#    - stage: test
+#      php: 7.3 # >= 7.2
+#      env: DB=mysqli MOODLE_BRANCH=MOODLE_310_STABLE
 
 # Unit tests and behat tests against full matrix.
 script:
   - moodle-plugin-ci phpunit --coverage-clover
-  - moodle-plugin-ci behat --moodle=${MOODLE_DIR} --auto-rerun=0 --profile=chrome --dump
+  - moodle-plugin-ci behat --moodle=${MOODLE_DIR} --profile=chrome --dump
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
