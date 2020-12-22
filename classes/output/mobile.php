@@ -70,21 +70,13 @@ class mobile {
         }
 
         if ($args->action == 'edit') {
+            $html .= "<h1>Mock-edit entry $args->entry!</h1>";
         }
 
         if ($args->action == 'delete') {
 
             // Check if we are allowed to do that.
             require_capability('mod/datalynx:manageentries', $context);
-
-            /*
-            require_once("$CFG->dirroot/mod/datalynx/entries_class.php");
-            require_once("$CFG->dirroot/lib/completionlib.php");
-
-            // Remove all field data and entry.
-            $entriesclass = new \mod_datalynx\datalynx_entries($datalynx);
-            $entriesclass->process_entries('delete', 638, null, true);
-            */
             $html .= "<h1>Mock-deleted entry $args->entry!</h1>";
             $entry = null; // Show all remaining entries.
         }
