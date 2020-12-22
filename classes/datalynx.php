@@ -519,12 +519,12 @@ class datalynx {
 
             // Include blocks dragdrop when blocks/moodle editing.
             if ($PAGE->user_is_editing()) {
-                $params_yui = array('courseid' => $this->course->id, 'cmid' => $this->cm->id,
+                $paramsforyui = array('courseid' => $this->course->id, 'cmid' => $this->cm->id,
                         'pagetype' => $PAGE->pagetype, 'pagelayout' => $PAGE->pagelayout,
                         'regions' => $PAGE->blocks->get_regions()
                 );
                 $PAGE->requires->yui_module('moodle-core-blocks', 'M.core_blocks.init_dragdrop',
-                        array($params_yui), null, true);
+                        array($paramsfoyui), null, true);
             }
         }
 

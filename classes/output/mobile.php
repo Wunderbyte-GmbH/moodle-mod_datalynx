@@ -69,6 +69,9 @@ class mobile {
             $entry = $args->entry;
         }
 
+        if ($args->action == 'edit') {
+        }
+
         if ($args->action == 'delete') {
 
             // Check if we are allowed to do that.
@@ -100,7 +103,8 @@ class mobile {
         if ($buttons && has_capability('mod/datalynx:writeentry', $context)) {
             // TODO: Ion-footer does not work, make this look like the plus in data or forum.
             $args = "[args]='{entry: -1, action: \"new\", cmid: $args->cmid, courseid: $args->courseid }'";
-            $html .= "<button ion-button core-site-plugins-new-content title='newbutton' component='mod_datalynx' method='mobile_course_view' $args>".get_string('entryaddnew', 'datalynx')."</button>";
+            $html .= "<button ion-button core-site-plugins-new-content title='newbutton' component='mod_datalynx'";
+            $html .= " method='mobile_course_view' $args>".get_string('entryaddnew', 'datalynx')."</button>";
 
             // Round button icon with plus.
             $html .= '<button ion-fab class="fab fab-md" aria-label="Add a new entry">

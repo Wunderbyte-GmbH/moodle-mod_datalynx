@@ -806,7 +806,7 @@ class datalynx_entries {
                                                     $entry->{"c{$fieldid}_id"} = $entry->{"c{$fieldid}_id_fieldgroup"}[$i];
                                                 }
                                                 if (isset($entry->{"c{$fieldid}_content_fieldgroup"}[$i])) {
-                                                    $entry->{"c{$fieldid}_content"} =
+                                                    $entry->{"c{$fieldid}_content"} = 
                                                         $entry->{"c{$fieldid}_content_fieldgroup"}[$i];
                                                 }
 
@@ -815,7 +815,7 @@ class datalynx_entries {
                                                     used in the field class. */
                                                 for ($j = 1; $j <= 4; $j++) {
                                                     if (isset($entry->{"c{$fieldid}_content{$j}_fieldgroup"}[$i])) {
-                                                        $entry->{"c{$fieldid}_content{$j}"} =
+                                                        $entry->{"c{$fieldid}_content{$j}"} = 
                                                             $entry->{"c{$fieldid}_content{$j}_fieldgroup"}[$i];
                                                     }
                                                 }

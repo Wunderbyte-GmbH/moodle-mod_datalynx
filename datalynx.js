@@ -119,11 +119,11 @@ M.mod_datalynx.tag_manager.init_span_dialog = function (Y) {
     };
 
     var dialog = M.mod_datalynx.tag_manager.dialog = new M.core.dialogue(config);
-    var dialogcontent = Y.Node.create('<div id="datalynx-tag-dialog-content">' + '<div id="datalynx-field-tag-contols">' + '<p><label for="datalynx-tag-fieldtype">' +
-        M.util.get_string('fieldtype', 'datalynx', null) + ':</label><span id="datalynx-tag-fieldtype"></span></p>' +
-        '<p><label for="datalynx-tag-behavior-menu">' + M.util.get_string('behavior', 'datalynx', null) +
-        ':</label><select id="datalynx-tag-behavior-menu"></select></p>' + '<p><label for="datalynx-tag-renderer-menu">' +
-        M.util.get_string('renderer', 'datalynx', null) + ':</label><select id="datalynx-tag-renderer-menu"></select></p>' + '</div>' +
+    var dialogcontent = Y.Node.create('<div id="datalynx-tag-dialog-content">' + '<div id="datalynx-field-tag-contols">' + '<p><label for="datalynx-tag-fieldtype">' + 
+        M.util.get_string('fieldtype', 'datalynx', null) + ':</label><span id="datalynx-tag-fieldtype"></span></p>' + 
+        '<p><label for="datalynx-tag-behavior-menu">' + M.util.get_string('behavior', 'datalynx', null) + 
+        ':</label><select id="datalynx-tag-behavior-menu"></select></p>' + '<p><label for="datalynx-tag-renderer-menu">' + 
+        M.util.get_string('renderer', 'datalynx', null) + ':</label><select id="datalynx-tag-renderer-menu"></select></p>' + '</div>' + 
         '<button type="button" id="datalynx-tag-button-delete">' + M.util.get_string('deletetag', 'datalynx', null) + '</button>' + '</div>');
     var behaviorselect = dialogcontent.one('#datalynx-tag-behavior-menu');
     var rendererselect = dialogcontent.one('#datalynx-tag-renderer-menu');
