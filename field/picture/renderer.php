@@ -65,9 +65,9 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
     }
 
     public function render_display_mode(stdClass $entry, array $params) {
-        global $CFG;
+        global $CFG, $PAGE;
 
-        $this->page->requires->js_call_amd('mod_datalynx/zoomable', 'init');
+        $PAGE->requires->js_call_amd('mod_datalynx/zoomable', 'init');
 
         $field = $this->_field;
         $fieldid = $field->id();

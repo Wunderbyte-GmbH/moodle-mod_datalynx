@@ -190,6 +190,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
     /**
      */
     protected function display_view($entry, $tag) {
+        global $OUTPUT;
 
         if (isset($entry->rating)) {
             $rating = $entry->rating;
@@ -204,7 +205,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
                         ));
 
                 if ($tag == '##ratings:view##') {
-                    return $this->output->action_link($nonpopuplink, 'view all', $popupaction);
+                    return $OUTPUT->action_link($nonpopuplink, 'view all', $popupaction);
                 } else {
                     return $popuplink;
                 }
@@ -216,7 +217,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
     /**
      */
     protected function display_view_inline($entry) {
-        global $DB;
+        global $OUTPUT, $DB;
 
         if (isset($entry->rating)) {
             $rating = $entry->rating;
@@ -244,7 +245,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
                     $raterecord->id = $raterecord->userid;
                     $row = new html_table_row();
                     $row->attributes['class'] = 'ratingitemheader';
-                    $row->cells[] = $this->output->user_picture($raterecord,
+                    $row->cells[] = $OUTPUT->user_picture($raterecord,
                             array('courseid' => $this->_field->df()->course->id
                             ));
                     $userrecord = $DB->get_record('user', array('id' => $raterecord->userid
@@ -282,6 +283,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
     /**
      */
     protected function display_star($entry, $value) {
+        global $OUTPUT;
 
         if (isset($entry->rating)) {
             $rating = $entry->rating;
@@ -297,7 +299,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
                     ));
             $stars = implode('',
                     array_fill(0, $numstars,
-                            $this->output->pix_icon('star_grey', '', 'datalynxfield__rating',
+                            $OUTPUT->pix_icon('star_grey', '', 'datalynxfield__rating',
                                     array('style' => 'float:left;'
                                     ))));
             $starsdiv = html_writer::tag('div', $stars, array('style' => "z-index:10;$innerstyle"
@@ -313,6 +315,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
     /**
      */
     public function render_rating($entry) {
+        global $OUTPUT, $PAGE;
 
         $ratinghtml = '';
 
@@ -321,7 +324,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
 
             $rm = new datalynx_rating_manager();
             // Initialise the JavaScript so ratings can be done by AJAX.
-            $rm->initialise_rating_javascript($this->page);
+            $rm->initialise_rating_javascript($PAGE);
 
             $strrate = get_string("rate", "rating");
             $ratinghtml = ''; // The string we'll return.
@@ -382,7 +385,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
                 $ratinghtml .= html_writer::empty_tag('input', $attributes);
 
                 if (!$rating->settings->scale->isnumeric) {
-                    $ratinghtml .= $this->output->help_icon_scale($rating->settings->scale->courseid, $rating->settings->scale);
+                    $ratinghtml .= $OUTPUT->help_icon_scale($rating->settings->scale->courseid, $rating->settings->scale);
                 }
                 $ratinghtml .= html_writer::end_tag('span');
                 $ratinghtml .= html_writer::end_tag('div');

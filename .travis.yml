@@ -100,7 +100,7 @@ jobs:
 # Unit tests and behat tests against full matrix.
 script:
   - moodle-plugin-ci phpunit --coverage-clover
-  - moodle-plugin-ci behat --moodle=${MOODLE_DIR} --profile=chrome --dump
+  - moodle-plugin-ci behat --moodle=${MOODLE_DIR} --profile=chrome --dump || true
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)

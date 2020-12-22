@@ -93,7 +93,7 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
     /**
      */
     protected function display_browse($entry, $params = null) {
-        global $CFG;
+        global $OUTPUT, $CFG;
 
         $field = $this->_field;
         if ($entry && isset($entry->approved) && $entry->approved) {
@@ -108,12 +108,12 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
         $strapproved = get_string($approved, 'datalynx');
         if ($CFG->branch >= 33) {
             $approvedimage = html_writer::empty_tag('img',
-                    array('src' => $this->output->image_url($approvedimagesrc),
+                    array('src' => $OUTPUT->image_url($approvedimagesrc),
                         'class' => "iconsmall" . (isset($entry->approved) && $entry->approved ? ' approved' : ''),
                         'alt' => $strapproved, 'title' => $strapproved));
         } else {
             $approvedimage = html_writer::empty_tag('img',
-                    array('src' => $this->output->pix_url($approvedimagesrc),
+                    array('src' => $OUTPUT->pix_url($approvedimagesrc),
                         'class' => "iconsmall" . (isset($entry->approved) && $entry->approved ? ' approved' : ''),
                         'alt' => $strapproved, 'title' => $strapproved));
         }
@@ -121,12 +121,12 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
         if (has_capability('mod/datalynx:approve', $field->df()->context)) {
             if ($CFG->branch >= 33) {
                 $this->page->requires->js_call_amd('mod_datalynx/approve', 'init',
-                        array($this->output->image_url('i/completion-auto-pass')->__toString(),
-                            $this->output->image_url('i/completion-auto-n')->__toString()));
+                        array($OUTPUT->image_url('i/completion-auto-pass')->__toString(),
+                            $OUTPUT->image_url('i/completion-auto-n')->__toString()));
             } else {
                 $this->page->requires->js_call_amd('mod_datalynx/approve', 'init',
-                        array($this->output->pix_url('i/completion-auto-pass')->__toString(),
-                            $this->output->pix_url('i/completion-auto-n')->__toString()));
+                        array($OUTPUT->pix_url('i/completion-auto-pass')->__toString(),
+                            $OUTPUT->pix_url('i/completion-auto-n')->__toString()));
             }
 
             return html_writer::link(

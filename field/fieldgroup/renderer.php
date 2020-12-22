@@ -41,6 +41,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
      * @see datalynxfield_renderer::render_display_mode()
      */
     public function render_display_mode(stdClass $entry, array $params) {
+        global $OUTPUT;
         
         // We want to display these fields.
         $fieldgroupfields = $this->get_subfields();
@@ -92,7 +93,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
             $viewtype = ($view->view->type == 'pdf') ? 'pdf' : '';
         }
 
-        return $this->output->render_from_template('mod_datalynx/fieldgroup' . $viewtype, $completedispl);
+        return $OUTPUT->render_from_template('mod_datalynx/fieldgroup' . $viewtype, $completedispl);
     }
 
     /**
@@ -188,7 +189,8 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         $mform->setType($fieldname.'_lastvisible', PARAM_INT);
 
         // Hide unused lines.
-        $this->page->requires->js_call_amd('mod_datalynx/fieldgroups', 'init', 
+        global $PAGE;
+        $PAGE->requires->js_call_amd('mod_datalynx/fieldgroups', 'init', 
             array($this->_field->field->name, $defaultlines, $maxlines, $requiredlines, $fieldname));
 
         // Show a button to add one more line.

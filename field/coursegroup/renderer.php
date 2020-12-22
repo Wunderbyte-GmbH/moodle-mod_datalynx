@@ -60,7 +60,7 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
     /**
      */
     public function display_edit(&$mform, $entry, array $options = null) {
-        global $CFG, $DB, $SITE;
+        global $CFG, $DB, $SITE, $PAGE;
 
         $field = $this->_field;
         $fieldid = $field->id();
@@ -102,7 +102,7 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
             );
 
             // Add JQuery.
-            $this->page->requires->js_call_amd('mod_datalynx/coursegroup', 'init', array($options));
+            $PAGE->requires->js_call_amd('mod_datalynx/coursegroup', 'init', array($options));
         }
 
         // Group id.

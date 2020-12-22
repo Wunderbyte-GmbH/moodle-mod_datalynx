@@ -87,6 +87,7 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
     /**
      */
     protected function display_more($entry, $href = false) {
+        global $OUTPUT;
 
         $field = $this->_field;
         $params = array('eids' => $entry->id);
@@ -97,7 +98,7 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
         }
         $str = get_string('more', 'datalynx');
         if (!$href) {
-            return html_writer::link($url->out(false), $this->output->pix_icon('i/search', $str));
+            return html_writer::link($url->out(false), $OUTPUT->pix_icon('i/search', $str));
         } else {
             return $url->out(false);
         }
@@ -106,6 +107,7 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
     /**
      */
     protected function display_edit($entry) {
+        global $OUTPUT;
 
         $field = $this->_field;
         $params = array('editentries' => $entry->id, 'sesskey' => sesskey(),
@@ -126,12 +128,13 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
                 component='mod_datalynx' method='mobile_course_view' $args>$str</button>";
         }
 
-        return html_writer::link($url->out(false), $this->output->pix_icon('t/edit', $str));
+        return html_writer::link($url->out(false), $OUTPUT->pix_icon('t/edit', $str));
     }
 
     /**
      */
     protected function display_duplicate($entry) {
+        global $OUTPUT;
 
         $field = $this->_field;
         $params = array('duplicate' => $entry->id, 'sesskey' => sesskey(),
@@ -141,12 +144,13 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
             $url->param('view', $field->df()->data->singleedit);
         }
         $str = get_string('copy');
-        return html_writer::link($url->out(false), $this->output->pix_icon('t/copy', $str));
+        return html_writer::link($url->out(false), $OUTPUT->pix_icon('t/copy', $str));
     }
 
     /**
      */
     protected function display_delete($entry) {
+        global $OUTPUT;
 
         $field = $this->_field;
         $params = array('delete' => $entry->id, 'sesskey' => sesskey(),
@@ -163,13 +167,13 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
                 component='mod_datalynx' method='mobile_course_view' $args>$str</button>";
         }
 
-        return html_writer::link($url->out(false), $this->output->pix_icon('t/delete', $str));
+        return html_writer::link($url->out(false), $OUTPUT->pix_icon('t/delete', $str));
     }
 
     /**
      */
     protected function display_export($entry) {
-        global $CFG;
+        global $OUTPUT, $CFG;
 
         if (!$CFG->enableportfolios) {
             return '';
@@ -181,7 +185,7 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
             $url = new moodle_url($entry->baseurl,
                     array('export' => $entry->id, 'sesskey' => sesskey()));
             $strexport = get_string('export', 'datalynx');
-            return html_writer::link($url, $this->output->pix_icon('t/portfolioadd', $strexport));
+            return html_writer::link($url, $OUTPUT->pix_icon('t/portfolioadd', $strexport));
         }
         return $str;
     }
