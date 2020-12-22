@@ -61,7 +61,6 @@ class datalynxfield_tag_renderer extends datalynxfield_renderer {
      * @see datalynxfield_renderer::render_display_mode()
      */
     public function render_display_mode(stdClass $entry, array $params) {
-        global $OUTPUT;
         $str = '';
         $field = $this->_field;
         $fieldid = $field->id();
@@ -76,7 +75,7 @@ class datalynxfield_tag_renderer extends datalynxfield_renderer {
             }
             return implode("#", $exportstring);
         }
-        $str = $OUTPUT->tag_list($items, null, 'datalynx-tags');
+        $str = $this->output->tag_list($items, null, 'datalynx-tags');
         if (isset($params['nolink'])) {
             $str = preg_replace("/<b>.+<\/b>/i", '', $str);
             $str = preg_replace("/<a[^>]*(href=\"[^\"]+?\")([^>]*?)(\/?)>([^<]+)(<\/a>)/i", '<span$2>$4</span>', $str);

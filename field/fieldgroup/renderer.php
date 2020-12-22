@@ -41,8 +41,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
      * @see datalynxfield_renderer::render_display_mode()
      */
     public function render_display_mode(stdClass $entry, array $params) {
-        global $OUTPUT; // Needed for mustache implementation.
-
+        
         // We want to display these fields.
         $fieldgroupfields = $this->get_subfields();
 
@@ -93,7 +92,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
             $viewtype = ($view->view->type == 'pdf') ? 'pdf' : '';
         }
 
-        return $OUTPUT->render_from_template('mod_datalynx/fieldgroup' . $viewtype, $completedispl);
+        return $this->output->render_from_template('mod_datalynx/fieldgroup' . $viewtype, $completedispl);
     }
 
     /**
@@ -171,7 +170,9 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
             }
 
             $mform->addElement('html', '<div class="w-100 p-10"></div>');
-            $mform->addElement('html',  '<div class="col text-center"><button class="btn btn-secondary btn-danger btn-delete" type="button" data-removeline="' . $thisline. '">
+            $elementstring = '<div class="col text-center">';
+            $elementstring .= '<button class="btn btn-secondary btn-danger btn-delete" type="button" data-removeline="';
+            $mform->addElement('html', $elementstring . $thisline . '">
                 ' . get_string('delete') . '</button></div>');
             // End of row.
             $mform->addElement('html', '</div>');
@@ -187,8 +188,8 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         $mform->setType($fieldname.'_lastvisible', PARAM_INT);
 
         // Hide unused lines.
-        global $PAGE;
-        $PAGE->requires->js_call_amd('mod_datalynx/fieldgroups', 'init', array($this->_field->field->name, $defaultlines, $maxlines, $requiredlines, $fieldname));
+        $this->page->requires->js_call_amd('mod_datalynx/fieldgroups', 'init', 
+            array($this->_field->field->name, $defaultlines, $maxlines, $requiredlines, $fieldname));
 
         // Show a button to add one more line.
         $mform->addElement('button', 'addline', get_string('addline', 'datalynx', $this->_field->field->name));

@@ -32,7 +32,7 @@ require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
 
     public function render_display_mode(stdClass $entry, array $params) {
-        global $PAGE, $USER;
+        global $USER;
 
         // Variable $field datalynxfield_teammemberselect.
         $field = $this->_field;
@@ -98,10 +98,10 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
                     array('course' => $field->df()->course->id, 'id' => $USER->id));
 
             // Load jquery and parse parameters.
-            $PAGE->requires->js_call_amd('mod_datalynx/teammemberselect', 'init',
+            $this->page->requires->js_call_amd('mod_datalynx/teammemberselect', 'init',
                     array($fieldid, $userurl->out(false), fullname($USER), $canunsubscribe));
 
-            $PAGE->requires->strings_for_js(array('subscribe', 'unsubscribe'), 'datalynx');
+            $this->page->requires->strings_for_js(array('subscribe', 'unsubscribe'), 'datalynx');
         }
 
         return $str;
@@ -144,7 +144,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
     }
 
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options = null) {
-        global $PAGE, $USER;
+        global $USER;
 
         // Variable $field datalynxfield_teammemberselect.
         $field = $this->_field;
@@ -157,7 +157,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         // If we edit an existing entry that is not required we need a workaround.
         $newentry = optional_param('new', null, PARAM_INT) === null ? 1 : 0;
         if (!$newentry && !$required) {
-            $PAGE->requires->js_amd_inline("
+            $this->page->requires->js_amd_inline("
             require(['jquery'], function($) {
                 $('option[value=\"-999\"]').removeAttr('selected');
             });");

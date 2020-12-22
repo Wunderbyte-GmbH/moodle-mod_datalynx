@@ -62,8 +62,7 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
 
         // If we edit an existing entry that is not required we need a workaround.
         if ($entryid > 0 && !$required && $autocomplete) {
-            global $PAGE;
-            $PAGE->requires->js_amd_inline("
+            $this->page->requires->js_amd_inline("
             require(['jquery'], function($) {
                 $('option[value=\"-999\"]').removeAttr('selected');
             });");
