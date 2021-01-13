@@ -510,6 +510,9 @@ function datalynx_get_file_info($browser, $areas, $course, $cm, $context, $filea
  */
 function mod_datalynx_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload) {
     global $CFG, $DB, $USER;
+    
+    // Check permissions, if anonymous access is allowed login user.
+    require_login($course, true, $cm);
 
     // FIELD CONTENT files.
     if (($filearea === 'content' or $filearea === 'thumb') and
