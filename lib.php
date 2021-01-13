@@ -512,7 +512,7 @@ function mod_datalynx_pluginfile($course, $cm, $context, $filearea, $args, $forc
     global $CFG, $DB, $USER;
     
     // Check permissions, if anonymous access is allowed login user.
-    require_login($course, true, $cm);
+    require_course_login($course, true, $cm);
 
     // FIELD CONTENT files.
     if (($filearea === 'content' or $filearea === 'thumb') and
