@@ -93,7 +93,7 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
     /**
      */
     protected function display_browse($entry, $params = null) {
-        global $OUTPUT, $CFG;
+        global $OUTPUT, $CFG, $PAGE;
 
         $field = $this->_field;
         if ($entry && isset($entry->approved) && $entry->approved) {
