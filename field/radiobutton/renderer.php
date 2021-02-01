@@ -50,8 +50,12 @@ class datalynxfield_radiobutton_renderer extends datalynxfield_select_renderer {
         if (!$selected and $defaultval = $field->get('param2')) {
             $selected = (int) array_search($defaultval, $menuoptions);
         }
-
-        $separator = $field->separators[(int) $field->get('param2')]['chr'];
+        
+        $separator = $field->separators[0]['chr'];
+        $param2 = (int) $field->get('param2');
+        if (isset($param2) && array_key_exists($param2, $field->separators)) {
+            $separator = $field->separators[$param2]['chr'];
+        }
 
         $elemgrp = array();
         foreach ($menuoptions as $id => $option) {
