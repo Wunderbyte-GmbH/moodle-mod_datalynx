@@ -45,7 +45,7 @@ class datalynxfield_text_form extends datalynxfield_form {
         // uses param2 for displaying default value when field is left empty.
 
         // Check for duplicate entries.
-        $duplicates = $this->get_list_of_duplicates();
+        $duplicates = $this->has_duplicates();
 
         $mform->addElement('selectyesno', 'param8', get_string('unique', 'datalynx'));
         $mform->setType('param8', PARAM_BOOL);
@@ -55,10 +55,8 @@ class datalynxfield_text_form extends datalynxfield_form {
             $mform->setConstant('param8', 0);
             $mform->freeze('param8');
             // Display the duplicate-entries-message and the list of duplicate entries.
-            $listtext = $this->print_list_of_duplicates($duplicates);
             $mform->addElement('static', 'duplicatestext', '',
-                    $OUTPUT->notification(get_string('field_has_duplicate_entries', 'datalynx') .
-                            $listtext, 'notifymessage'));
+                    $OUTPUT->notification(get_string('field_has_duplicate_entries', 'datalynx'), 'notifymessage'));
         } else {
             // If there are no duplicates the default option for unique is "No" as well, but the user can change it.
             $mform->setDefault('param8', 0);
@@ -217,14 +215,9 @@ class datalynxfield_text_form extends datalynxfield_form {
         if (!empty($data['param8']) && !empty($fieldid)) {
             // Unique is activated, we check if there are doubles!
             // Should never happen, because we freeze it to 'no' if there are duplicates!
-
-            $duplicates = $this->get_list_of_duplicates();
-
-            if ($duplicates) {
-                $listtext = $this->print_list_of_duplicates($duplicates);
-                $mform->addElement('static', 'duplicatestext', '',
-                        $OUTPUT->notification(get_string('field_has_duplicate_entries', 'datalynx')
-                                . $listtext, 'notifymessage'));
+            if ($this->has_duplicates()) {
+                $formfieldname = "field_{$fieldid}_{$entryid}";
+                $errors[$formfieldname] = get_string('field_has_duplicate_entries', 'datalynx');
             }
         }
 
@@ -232,11 +225,11 @@ class datalynxfield_text_form extends datalynxfield_form {
     }
 
     /**
-     * Returns a list of entries with duplicate content in the given text field
+     * Return true if duplicate content in the given text field
      *
-     * @return $array entries with duplicate content (entryid, content)
+     * @return bool true if duplicates are found.
      */
-    public function get_list_of_duplicates() {
+    public function has_duplicates() {
         global $DB;
 
         $fieldid = $this->_field->id();
@@ -246,53 +239,15 @@ class datalynxfield_text_form extends datalynxfield_form {
         }
 
         // Added id to records to make the first column something unique.
-        $records = $DB->get_records_sql("SELECT id, COUNT(*) AS amount, c.content
+        $records = $DB->get_records_sql("SELECT id, COUNT(*), c.content
                                      FROM {datalynx_contents} c
                                     WHERE c.fieldid = :fieldid AND c.content IS NOT NULL
                                  GROUP BY c.content
                                    HAVING COUNT(*) > 1", array('fieldid' => $fieldid));
-        $listofduplicates = array();
-        foreach ($records as $record) {
-            $ids = $DB->get_fieldset_sql("SELECT c.entryid
-                                     FROM {datalynx_contents} c
-                                    WHERE c.fieldid = :fieldid AND c.content = :content",
-                    array('fieldid' => $fieldid, 'content' => $record->content));
-            foreach ($ids as $id) {
-                $listofduplicates[] = array('id' => $id, 'content' => $record->content);
-            }
+        if (empty($records)) {
+            return false;
         }
-        return $listofduplicates;
-
-    }
-
-    public function print_list_of_duplicates($duplicates) {
-        $entryurl = $baseurl = $this->get_editviewlink();
-        $listtext = "";
-        foreach ($duplicates as $entry) {
-            $entryurl->param('editentries', $entry['id']);
-            $entryurl->param('eids', $entry['id']);
-            $label = html_writer::tag('span', get_string('entry', 'datalynx') . ' ' .
-                    get_string('id', 'datalynx') . ' ' . $entry['id'] . ' ' . $entry['content']);
-            $link = html_writer::link($entryurl, $label);
-            $listtext .= "<br \>" . $link;
-        }
-        return $listtext;
-    }
-
-    public function get_editviewlink() {
-
-        $df = $this->_df;
-        $view = $df->get_current_view();
-        $baseurl = new moodle_url('/mod/datalynx/view.php');
-        $baseurl->param('d', $df->data->id);
-        $baseurl->param('filter', '0');
-        $baseurl->param('sesskey', sesskey());
-        $baseurl->param('sourceview', $view->view->id);
-
-        if (!empty($df->data->singleedit)) {
-            $baseurl->param('view', $df->data->singleedit);
-        }
-
-        return $baseurl;
+        
+        return true;
     }
 }
