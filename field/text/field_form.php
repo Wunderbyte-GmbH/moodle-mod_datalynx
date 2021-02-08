@@ -225,7 +225,7 @@ class datalynxfield_text_form extends datalynxfield_form {
     }
 
     /**
-     * Return true if duplicate content in the given text field
+     * Check if duplicate content is found for the given text field.
      *
      * @return bool true if duplicates are found.
      */
