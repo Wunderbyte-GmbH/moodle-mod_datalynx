@@ -260,11 +260,17 @@ abstract class datalynxview_base {
      */
     public function set_filter($filteroptions = true, $ignoreurl = false) {
         $fm = $this->_df->get_filter_manager($this);
+        $urlparams = $fm::get_filter_options_from_url();
+        $urloptions = array();
 
-        if (!$ignoreurl) {
-            $urloptions = $filteroptions ? $fm::get_filter_options_from_url() : array();
-        } else {
-            $urloptions = array();
+        // Keep page to allow for pagination.
+        if (isset($urlparams['page'])) {
+            $urloptions['page'] = $urlparams['page'];
+        }
+
+        // Add all url parameters.
+        if (!$ignoreurl && $filteroptions) {
+            $urloptions =  $urlparams;
         }
 
         if (is_array($filteroptions)) {
