@@ -174,14 +174,34 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
                     return $img;
                 }
             }
-            return '';
         }
+        
+        // Extension to display and embed videos.
+        if ($this->is_valid_video($file)) {
+            $filename = $file->get_filename();
+            $pluginfileurl = new moodle_url('/pluginfile.php');
+            $videopath = moodle_url::make_file_url($pluginfileurl, "$path/$filename");
+            $videoattr['src'] = $videopath;
+
+            if ($field->get('param4')) {
+                $videoattr['style'][] = 'width:' . s($field->get('param4')) . s($field->get('param6'));
+            }
+            if ($field->get('param5')) {
+                $videoattr['style'][] = 'height:' . s($field->get('param5')) . s($field->get('param6'));
+            }
+            $videoattr['style'] = implode(';', $videoattr['style']);
+
+            $video = html_writer::empty_tag('video', $videoattr);
+            return $video;
+        }
+        
+        return '';
     }
 
     /**
      * Array of patterns this field supports
      */
-    protected function patterns() {
+    public function patterns() {
         $fieldname = $this->_field->name();
 
         $patterns = parent::patterns();
@@ -193,4 +213,17 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
 
         return $patterns;
     }
+
+    /**
+     * Verifies the file is a valid video file based on simplified is_valid_image.
+     * @return bool true if file ok
+     */
+    public function is_valid_video($file) {
+        $mimetype = $file->get_mimetype();
+        if (!file_mimetype_in_typegroup($mimetype, 'web_video')) {
+            return false;
+        }
+        return true;
+    }
+    
 }

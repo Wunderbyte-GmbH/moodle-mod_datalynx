@@ -94,6 +94,7 @@ class datalynxfield_picture_form extends datalynxfield_file_form {
         $options['.jpg'] = get_string('filetypejpg', 'datalynx');
         $options['.gif'] = get_string('filetypegif', 'datalynx');
         $options['.png'] = get_string('filetypepng', 'datalynx');
+        $options['video'] = get_string('filetypevideo', 'datalynx');
         $mform->addElement('select', 'param3', get_string('filetypes', 'datalynx'), $options);
     }
 }
