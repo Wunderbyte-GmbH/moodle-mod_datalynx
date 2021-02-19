@@ -228,6 +228,7 @@ $string['filetypegif'] = 'gif files';
 $string['filetypehtml'] = 'Html files';
 $string['filetypeimage'] = 'Image files';
 $string['filetypevideo'] = 'Video files';
+$string['filetypeaudio'] = 'Audio files';
 $string['filetypejpg'] = 'jpg files';
 $string['filetypepng'] = 'png files';
 $string['filetypes'] = 'Accepted file types';

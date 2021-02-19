@@ -138,7 +138,6 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
             $imgattr['class'] = 'zoomable';
         }
 
-        // TODO: This fails when I upload something that looks like an image but is not.
         if ($file->is_valid_image()) {
             $filename = $file->get_filename();
             $pluginfileurl = new moodle_url('/pluginfile.php');
@@ -177,11 +176,10 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
         }
         
         // Extension to display and embed videos.
-        if ($this->is_valid_video($file)) {
+        if (false AND $this->is_valid_video($file)) {
             $filename = $file->get_filename();
             $pluginfileurl = new moodle_url('/pluginfile.php');
-            $videopath = moodle_url::make_file_url($pluginfileurl, "$path/$filename");
-            $videoattr['src'] = $videopath;
+            $videoattr['src'] = moodle_url::make_file_url($pluginfileurl, "$path/$filename");
 
             if ($field->get('param4')) {
                 $videoattr['style'][] = 'width:' . s($field->get('param4')) . s($field->get('param6'));
@@ -191,8 +189,17 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
             }
             $videoattr['style'] = implode(';', $videoattr['style']);
 
-            $video = html_writer::empty_tag('video', $videoattr);
+            $video = html_writer::empty_tag('video controls', $videoattr);
             return $video;
+        }
+        
+        // Embed Audio.
+        if (true OR $this->is_valid_audio($file)) {
+            $filename = $file->get_filename();
+            $pluginfileurl = new moodle_url('/pluginfile.php');
+            $audioattr['src'] = moodle_url::make_file_url($pluginfileurl, "$path/$filename");
+            $audio = html_writer::empty_tag('audio controls', $audioattr);
+            return $audio;
         }
         
         return '';
@@ -226,4 +233,15 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
         return true;
     }
     
+    /**
+     * Verifies the file is a valid audio file based on simplified is_valid_image.
+     * @return bool true if file ok
+     */
+    public function is_valid_audio($file) {
+        $mimetype = $file->get_mimetype();
+        if (!file_mimetype_in_typegroup($mimetype, 'web_audio')) {
+            return false;
+        }
+        return true;
+    }
 }
