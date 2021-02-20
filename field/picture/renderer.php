@@ -176,7 +176,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
         }
         
         // Extension to display and embed videos.
-        if (false AND $this->is_valid_video($file)) {
+        if ($this->is_valid_video($file)) {
             $filename = $file->get_filename();
             $pluginfileurl = new moodle_url('/pluginfile.php');
             $videoattr['src'] = moodle_url::make_file_url($pluginfileurl, "$path/$filename");
@@ -194,7 +194,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
         }
         
         // Embed Audio.
-        if (true OR $this->is_valid_audio($file)) {
+        if ($this->is_valid_audio($file)) {
             $filename = $file->get_filename();
             $pluginfileurl = new moodle_url('/pluginfile.php');
             $audioattr['src'] = moodle_url::make_file_url($pluginfileurl, "$path/$filename");
