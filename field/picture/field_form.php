@@ -34,6 +34,23 @@ class datalynxfield_picture_form extends datalynxfield_file_form {
         global $CFG;
 
         $mform = &$this->_form;
+        
+        // Accepted types.
+        $this->filetypes_definition();
+
+        $mform->addElement('header', 'fieldattributeshdr',
+                get_string('fieldattributes', 'datalynx'));
+
+        // Max bytes (param1).
+        $options = get_max_upload_sizes($CFG->maxbytes, $this->_df->course->maxbytes);
+        $mform->addElement('select', 'param1', get_string('filemaxsize', 'datalynx'), $options);
+
+        // Max files (param2).
+        $range = range(1, 100);
+        $options = array_combine($range, $range);
+        $options[-1] = get_string('unlimited');
+        $mform->addElement('select', 'param2', get_string('filesmax', 'datalynx'), $options);
+        $mform->setDefault('param2', -1);
 
         // Pic display dimensions.
         $dispdimgrp = array();
@@ -79,8 +96,13 @@ class datalynxfield_picture_form extends datalynxfield_file_form {
                 array('param10' => array(array(null, 'numeric', null, 'client'))));
         $mform->setDefault('param9', '');
         $mform->setDefault('param10', '');
-
-        parent::field_definition();
+        
+        // Clean up the user interface.
+        $mform->hideIf('dispdim', 'param3', 'eq', 'audio');
+        $mform->hideIf('maxpicdim', 'param3', 'eq', 'audio');
+        $mform->hideIf('thumbnaildim', 'param3', 'eq', 'audio');
+        $mform->hideIf('thumbnaildim', 'param3', 'eq', 'video');
+        
     }
 
     /**
@@ -91,11 +113,11 @@ class datalynxfield_picture_form extends datalynxfield_file_form {
         // Accetped types.
         $options = array();
         $options['image'] = get_string('filetypeimage', 'datalynx');
+        $options['video'] = get_string('filetypevideo', 'datalynx');
+        $options['audio'] = get_string('filetypeaudio', 'datalynx');
         $options['.jpg'] = get_string('filetypejpg', 'datalynx');
         $options['.gif'] = get_string('filetypegif', 'datalynx');
         $options['.png'] = get_string('filetypepng', 'datalynx');
-        $options['video'] = get_string('filetypevideo', 'datalynx');
-        $options['audio'] = get_string('filetypeaudio', 'datalynx');
         $mform->addElement('select', 'param3', get_string('filetypes', 'datalynx'), $options);
     }
 }
