@@ -327,7 +327,7 @@ class datalynxview_patterns {
     }
 
     /**
-     * Get the HTML code that replacee the user preferences tags like
+     * Get the HTML code that replaces the user preferences tags like
      * ##quickperpage##
      *
      * @param string $tag

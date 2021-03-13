@@ -59,9 +59,9 @@ abstract class datalynxview_base {
      */
     protected $patternclass = null;
 
-    protected $_editors = array('section');
+    protected $_editors = array('section', 'param2');
 
-    protected $_vieweditors = array('section');
+    protected $_vieweditors = array('section', 'param2');
 
     protected $_entries = null;
 
@@ -693,9 +693,9 @@ abstract class datalynxview_base {
         foreach ($this->_vieweditors as $editor) {
             $text = $this->view->{"e$editor"};
             $text = $this->mask_tags($text);
-            $this->view->{"e$editor"} = format_text($text, FORMAT_HTML, array('trusted' => 1, 'filter' => true));
-            $this->view->{"e$editor"} = $this->unmask_tags($text);
-            $this->view->{"e$editor"} = str_replace($tags, $replacements, $this->view->{"e$editor"});
+            $text = format_text($text, FORMAT_HTML, array('trusted' => 1, 'filter' => true));
+            $text = $this->unmask_tags($text);
+            $this->view->{"e$editor"} = str_replace($tags, $replacements, $text);
         }
         // Remove customfilter tags after we have displayed them.
         foreach ($tags as $key => $value) {
