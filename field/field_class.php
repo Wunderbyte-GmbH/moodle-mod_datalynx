@@ -1311,24 +1311,19 @@ class datalynxfield_option_single extends datalynxfield_option {
      * @param int $userid ID of the user modifying an entry; if not specified defaults to $USER->id
      * @return array an array of disabled values
      */
-    public function get_disabled_values_for_user($userid = 0, $entryid = 0) {
-        global $DB, $USER;
-
-        if ($userid == 0) {
-            $userid = $USER->id;
-        }
+    public function get_disabled_values_for_user($entryid = 0) {
+        global $DB;
 
         $sql = "SELECT dc.content, COUNT(dc.id)
         FROM {datalynx_contents} dc
         INNER JOIN {datalynx_entries} de ON dc.entryid = de.id
-        WHERE de.userid = :userid
-        AND de.dataid = :dataid
+        WHERE de.dataid = :dataid
         AND dc.fieldid = :fieldid
         AND de.id != :entryid
         GROUP BY dc.content
         HAVING COUNT(dc.id) >= :selectlimit";
-        $params = array('userid' => $userid, 'dataid' => $this->df->id(),
-                'fieldid' => $this->field->id, 'selectlimit' => $this->field->param5, 'entryid' => $entryid);
+        $params = array('dataid' => $this->df->id(), 'fieldid' => $this->field->id, 
+                'selectlimit' => $this->field->param5, 'entryid' => $entryid);
 
         $results = $DB->get_records_sql($sql, $params);
 

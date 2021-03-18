@@ -176,7 +176,7 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
         // Not every field of this dataynx-instance has to be in the form!
         if (isset($formdata->{$formfieldname})) {
             if (isset($this->_field->field->param5) && $this->_field->field->param5 > 0) {
-                $disabled = $this->_field->get_disabled_values_for_user(0, $entryid);
+                $disabled = $this->_field->get_disabled_values_for_user($entryid);
                 $content = clean_param($formdata->{$formfieldname}, PARAM_INT);
                 if (array_search($content, $disabled) !== false) {
                     $menu = $this->_field->options_menu();
