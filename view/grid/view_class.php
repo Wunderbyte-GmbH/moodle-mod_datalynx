@@ -86,12 +86,14 @@ class datalynxview_grid extends datalynxview_base {
         $mustache = array();
         foreach ($fields as $field) {
             if ($field->field->id > 0) {
-
                 $thisfield['name'] = $field->name();
                 $thisfield['tag'] = "[[{$field->name()}]]";
+                $thisfield['size'] = 3; // Show four elements per row, extend if necessary.
+                
                 if ($field->type == "userinfo") {
                     $thisfield['tag'] = "##author:{$field->name()}##";
                 }
+                
                 $mustache['fields'][] = $thisfield;
             }
         }
