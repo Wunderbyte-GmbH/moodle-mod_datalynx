@@ -941,11 +941,16 @@ abstract class datalynxfield_option extends datalynxfield_base {
                 unset($newvalues[$id]);
             }
         }
-        $dummyentry = "0";
-        while (array_search($dummyentry, $newvalues) !== false) {
-            $dummyentry .= "0";
+        
+        if ($this->field->type != "multiselect") {
+            $dummyentry = "0";
+            while (array_search($dummyentry, $newvalues) !== false) {
+                $dummyentry .= "0";
+            }
+            $newvalues = array_merge(array(0 => $dummyentry), $newvalues);
         }
-        $newvalues = array_merge(array(0 => $dummyentry), $newvalues);
+        
+        
 
         $map = array(0 => 0);
         for ($i = 1; $i <= count($oldvalues); $i++) {
