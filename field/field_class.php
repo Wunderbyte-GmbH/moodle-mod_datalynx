@@ -942,6 +942,7 @@ abstract class datalynxfield_option extends datalynxfield_base {
             }
         }
         
+        // NOTE: We don't use this code ever, test till 30.04.2021 and remove after.
         if ($this->field->type != "multiselect") {
             $dummyentry = "0";
             while (array_search($dummyentry, $newvalues) !== false) {
@@ -949,8 +950,6 @@ abstract class datalynxfield_option extends datalynxfield_base {
             }
             $newvalues = array_merge(array(0 => $dummyentry), $newvalues);
         }
-        
-        
 
         $map = array(0 => 0);
         for ($i = 1; $i <= count($oldvalues); $i++) {
