@@ -300,12 +300,7 @@ abstract class datalynxfield_base {
      */
     public function get_definitions($tags, $entry, array $options) {
         return $this->renderer()->replacements($tags, $entry,
-                array_merge(self::$defaultoptions, $options)); // FIXME:.
-        // YOU
-        // *MUST*
-        // REMOVE
-        // THIS
-        // MERGE!
+                array_merge(self::$defaultoptions, $options));
     }
 
     /**
