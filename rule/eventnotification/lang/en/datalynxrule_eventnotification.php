@@ -25,3 +25,4 @@
 $string['event'] = 'Datalynx event';
 $string['pluginname'] = 'Event notification';
 $string['privacy:metadata'] = 'Even notifications do not store personal data.';
+$string['triggerspecificevent'] = 'Trigger only on specific checkbox';

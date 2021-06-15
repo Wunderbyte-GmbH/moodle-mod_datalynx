@@ -885,3 +885,5 @@ $string['unsupportedfield'] = 'Felder vom Typ {$a} können noch nicht in einer G
 // Global search.
 $string['search:activity'] = "Datalynx - Instanzen";
 $string['search:entry'] = "Datalynx - Einträge";
+
+$string['noselection'] = "Keine Auswahl";

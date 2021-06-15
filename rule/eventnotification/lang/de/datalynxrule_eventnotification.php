@@ -23,3 +23,4 @@
  */
 $string['event'] = 'Datalynx Ereignis';
 $string['pluginname'] = 'Ereignisbenachrichtigung';
+$string['triggerspecificevent'] = 'Nur bei markierter Checkbox senden';

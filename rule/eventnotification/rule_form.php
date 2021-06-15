@@ -55,6 +55,11 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
         $grp[] = &$mform->createElement('autocomplete', 'teams', get_string('teams', 'datalynx'),
                 $this->get_datalynx_team_fields(), $options);
 
+        // Single userid can be selected.
+        $grp[] = &$mform->createElement('static', '', '', "<br><h4 class=\"w-100 mt-3\">" . get_string('otheruser', 'datalynx') . "</h4>");
+        $allusers = $this->get_allusers();
+        $grp[] = $mform->createElement('autocomplete', 'specificuserid', get_string('otheruser', 'datalynx'), $allusers);
+
         $mform->addGroup($grp, 'recipientgrp', get_string('to'), $br, false);
 
         $mform->addElement('header', 'settingshdr', get_string('linksettings', 'datalynx'));
@@ -71,6 +76,27 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
         }
     }
 
+    /**
+     * Get all users in moodle instance for autocomplete list.
+     *
+     * @return array with userid -> firstname lastname. 
+     * @throws coding_exception
+     */
+    public function get_allusers() {
+        global $DB;
+        $tempusers = $DB->get_records('user', array(), '', $fields='id, firstname, lastname');
+
+        $allusers[0] = get_string('noselection', 'datalynx');
+        foreach($tempusers as $userdata) {
+            // Remove empties to make list more usable.
+            if($userdata->lastname == '') {
+                continue;
+            }
+            $allusers[$userdata->id] = "$userdata->firstname $userdata->lastname";
+        }
+        return $allusers;
+    }
+    
     public function definition_after_data() {
         $mform = &$this->_form;
         $data = $this->get_submitted_data();
@@ -126,6 +152,10 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
         if (isset($recipients['teams'])) {
             $data->teams = $recipients['teams'];
         }
+        if (isset($recipients['specificuserid'])) {
+            $data->specificuserid = $recipients['specificuserid'];
+        }
+        
         $data->param4 = unserialize($data->param4);
         parent::set_data($data);
     }
@@ -144,6 +174,9 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
 
             if (isset($data->teams)) {
                 $recipients['teams'] = $data->teams;
+            }
+            if (isset($data->specificuserid)) {
+                $recipients['specificuserid'] = $data->specificuserid;
             }
             $data->param3 = serialize($recipients);
             $data->param4 = serialize($data->param4);

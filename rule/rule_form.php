@@ -98,6 +98,13 @@ class datalynx_rule_form extends moodleform {
         $mform->addGroup($eventgroup, 'eventsgroup', get_string('triggeringevent', 'datalynx'),
                 '<br />', false);
 
+        // If we have selected entry updated, add a new UI when the instance includes a checkbox.
+        if($checkboxes = $this->_df->get_fields_by_type('checkbox', true)) {
+            $checkboxes = array('0' => get_string('noselection', 'datalynx')) + $checkboxes;
+            $mform->addElement('select', 'param5', get_string('triggerspecificevent', 'datalynxrule_eventnotification'), $checkboxes);
+            $mform->hideIf('param5', 'entry_updated');        
+        }
+        
         $this->rule_definition();
 
         // Buttons.

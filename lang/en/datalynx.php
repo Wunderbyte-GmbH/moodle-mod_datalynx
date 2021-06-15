@@ -927,3 +927,5 @@ $string['unsupportedfield'] = 'Sorry, fields of type {$a} are not yet supported 
 // Global search.
 $string['search:activity'] = "Datalynx - instances";
 $string['search:entry'] = "Datalynx - entries";
+
+$string['noselection'] = "Nothing selected";
