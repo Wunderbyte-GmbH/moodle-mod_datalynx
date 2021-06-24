@@ -715,7 +715,8 @@ abstract class datalynxview_base {
         $matches = array();
         $find = array();
         $replace = array();
-        preg_match_all('/(?:(\[\[[^\]]+\]\])|(##[^#]+##)|(%%[^%]+%%)|(#\{\{[^\}#]+\}\}#))/', $text,
+        // Regex to mask all known tag patterns. Patterns followed by @ are not masked.
+        preg_match_all('/(?:(\[\[[^\]]+\]\])(?!@)|(##[^#]+##)|(%%[^%]+%%)|(#\{\{[^\}#]+\}\}#))/', $text,
                 $matches, PREG_PATTERN_ORDER);
         $map = array_unique($matches[0]);
         foreach ($map as $index => $match) {
