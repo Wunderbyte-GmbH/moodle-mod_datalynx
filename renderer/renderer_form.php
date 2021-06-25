@@ -86,7 +86,7 @@ class datalynx_field_renderer_form extends moodleform {
         $mform->addGroup($group, 'notvisiblegroup', get_string('notvisible', 'datalynx'),
                 array('<br />'
                 ), false);
-        $mform->setType('notvisibletemplate', PARAM_CLEANHTML);
+        $mform->setType('notvisibletemplate', PARAM_RAW);
         $mform->setDefault('notvisibleoptions', '___0___');
 
         // Display template.
@@ -99,7 +99,7 @@ class datalynx_field_renderer_form extends moodleform {
         $mform->addGroup($group, 'displaytemplategroup', get_string('displaytemplate', 'datalynx'),
                 array('<br />'
                 ), false);
-        $mform->setType('displaytemplate', PARAM_CLEANHTML);
+        $mform->setType('displaytemplate', PARAM_RAW);
         $mform->addHelpButton('displaytemplategroup', 'displaytemplate', 'datalynx');
         $mform->setDefault('displayoptions', '___4___');
 
@@ -115,7 +115,7 @@ class datalynx_field_renderer_form extends moodleform {
         $mform->disabledIf('novaluetemplate', 'novalueoptions', 'eq', '___0___');
         $mform->disabledIf('novaluetemplate', 'novalueoptions', 'eq', '___1___');
         $mform->addGroup($group, 'novaluetemplategroup', get_string('novalue', 'datalynx'), array('<br />'), false);
-        $mform->setType('novaluetemplate', PARAM_CLEANHTML);
+        $mform->setType('novaluetemplate', PARAM_RAW);
         $mform->setDefault('novalueoptions', '___1___');
 
         // Edit template.
@@ -128,7 +128,7 @@ class datalynx_field_renderer_form extends moodleform {
         $mform->disabledIf('edittemplate', 'editoptions', 'eq', '___1___');
         $mform->disabledIf('edittemplate', 'editoptions', 'eq', '___4___');
         $mform->addGroup($group, 'edittemplategroup', get_string('edittemplate', 'datalynx'), array('<br />'), false);
-        $mform->setType('edittemplate', PARAM_CLEANHTML);
+        $mform->setType('edittemplate', PARAM_RAW);
         $mform->addHelpButton('edittemplategroup', 'edittemplate', 'datalynx');
         $mform->setDefault('editoptions', '___1___');
 
@@ -143,7 +143,7 @@ class datalynx_field_renderer_form extends moodleform {
         $mform->disabledIf('noteditabletemplate', 'noteditableoptions', 'eq', '___1___');
         $mform->disabledIf('noteditabletemplate', 'noteditableoptions', 'eq', '___3___');
         $mform->addGroup($group, 'noteditablegroup', get_string('noteditable', 'datalynx'), array('<br />'), false);
-        $mform->setType('noteditabletemplate', PARAM_CLEANHTML);
+        $mform->setType('noteditabletemplate', PARAM_RAW);
         $mform->setDefault('noteditableoptions', '___1___');
 
         $this->add_action_buttons();
