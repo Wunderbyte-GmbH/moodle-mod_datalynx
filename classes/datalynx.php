@@ -524,7 +524,7 @@ class datalynx {
                         'regions' => $PAGE->blocks->get_regions()
                 );
                 $PAGE->requires->yui_module('moodle-core-blocks', 'M.core_blocks.init_dragdrop',
-                        array($paramsfoyui), null, true);
+                        array($paramsforyui), null, true);
             }
         }
 
