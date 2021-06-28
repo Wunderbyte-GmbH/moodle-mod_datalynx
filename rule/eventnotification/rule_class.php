@@ -93,8 +93,8 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
             }
         }
         
-        // If event is "update_entry" check if we only trigger on specific checkbox.
-        if ($eventname == "entry_updated" && $this->rule->param5) {
+        // Check if we only trigger on specific checkbox.
+        if ($this->rule->param5) {
             
             // If so, test for conditions and stop sending if not met.
             $entryid = $entryid = $event->get_data()['objectid'];
