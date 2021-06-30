@@ -207,19 +207,8 @@ class datalynxview_patterns {
                         $linktext = $OUTPUT->pix_icon($icon, $titletext);
                     }
                     // Replace pipes in urlquery with &.
-                    $urlparams = explode('|', $urlquery);
+                    $urlquery = str_replace('|', '&', $urlquery);
                     $linkparams = [];
-                    if (!empty($urlparams)) {
-                        foreach ($urlparams as $param) {
-                            if(empty($param) || !strstr($param, '=')){
-                                break;
-                            }
-                            list($key, $value) = explode("=", $param);
-                            if (!empty($key)) {
-                                $linkparams[$key] = $value;
-                            }
-                        }
-                    }
                     // If it is a link with session (viewsesslink).
                     if ($sesslink === 0) {
                         $linkparams['sesskey'] = sesskey();
@@ -231,8 +220,7 @@ class datalynxview_patterns {
                             return '';
                         }
                     }
-
-                    return html_writer::link($viewurl, $linktext, ['class' => $class]);
+                    return html_writer::link($viewurl->out(false) . "&$urlquery", $linktext, ['class' => $class]);
                 }
             }
         }
