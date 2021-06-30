@@ -168,7 +168,8 @@ class datalynxview_patterns {
      * @param array $options
      * @return string
      */
-    protected function get_regexp_replacements($tag, $entry = null, array $options = null) {
+    protected function get_regexp_replacements($tag, $entry = null, array $options = null)
+    {
         global $OUTPUT;
 
         $df = $this->_view->get_df();
@@ -185,42 +186,53 @@ class datalynxview_patterns {
                 $baseurlparams['view'] = $view->id;
 
                 $view->baseurl = new moodle_url(
-                        "/mod/datalynx/{$this->_view->get_df()->pagefile()}.php", $baseurlparams);
+                    "/mod/datalynx/{$this->_view->get_df()->pagefile()}.php", $baseurlparams);
             }
         }
         if ($views) {
             foreach ($views as $view) {
                 $viewname = $view->name;
-                if (strpos($tag, "#{{viewlink:$viewname;") === 0) {
-                    list(, $linktext, $urlquery, ) = explode(';', $tag);
+                $viewlink = strpos($tag, "#{{viewlink:$viewname;");
+                $sesslink = strpos($tag, "#{{viewsesslink:$viewname;");
+                if ($viewlink === 0 || $sesslink === 0) {
+                    // Already editing the entry so do not show link for editing entry.
+                    if ($currentview->user_is_editing() && is_numeric(strpos($tag, 'editentries') && $sesslink === 0)) {
+                        return '';
+                    }
+                    $tag = trim($tag, '}}#');
+                    list(, $linktext, $urlquery, $class) = explode(';', $tag);
                     // Pix icon for text.
                     if (strpos($linktext, '_pixicon:') === 0) {
                         list(, $icon, $titletext) = explode(':', $linktext);
                         $linktext = $OUTPUT->pix_icon($icon, $titletext);
                     }
                     // Replace pipes in urlquery with &.
-                    $urlquery = str_replace('|', '&', $urlquery);
-                    return html_writer::link($view->baseurl->out(false) . "&$urlquery", $linktext);
-                }
-                if (strpos($tag, "#{{viewsesslink:$viewname;") === 0) {
-                    // Already editing the entry so do not show link for editing entry.
-                    if ($currentview->user_is_editing() && is_numeric(strpos($tag, 'editentries'))) {
-                        return '';
+                    $urlparams = explode('|', $urlquery);
+                    $linkparams = [];
+                    if (!empty($urlparams)) {
+                        foreach ($urlparams as $param) {
+                            if(empty($param) || !strstr($param, '=')){
+                                break;
+                            }
+                            list($key, $value) = explode("=", $param);
+                            if (!empty($key)) {
+                                $linkparams[$key] = $value;
+                            }
+                        }
                     }
-                    list(, $linktext, $urlquery, ) = explode(';', $tag);
-                    // Pix icon for text.
-                    if (strpos($linktext, '_pixicon:') === 0) {
-                        list(, $icon, $titletext) = explode(':', $linktext);
-                        $linktext = $OUTPUT->pix_icon($icon, $titletext);
+                    // If it is a link with session (viewsesslink).
+                    if ($sesslink === 0) {
+                        $linkparams['sesskey'] = sesskey();
+                        $linkparams['sourceview'] = $this->_view->id();
                     }
-                    $urlquery = str_replace('|', '&', $urlquery);
-                    $linkparams = array('sesskey' => sesskey(), 'sourceview' => $this->_view->id());
-                    $viewlink = new moodle_url($view->baseurl, $linkparams);
-                    if (strpos($urlquery, 'new=1') === false || $this->user_can_add_new_entry()) {
-                        return html_writer::link($viewlink->out(false) . "&$urlquery", $linktext);
-                    } else {
-                        return '';
+                    $viewurl = new moodle_url($view->baseurl, $linkparams);
+                    if ($sesslink === 0) {
+                        if (!((strpos($urlquery, 'new=1') === false || $this->user_can_add_new_entry()))) {
+                            return '';
+                        }
                     }
+
+                    return html_writer::link($viewurl, $linktext, ['class' => $class]);
                 }
             }
         }
@@ -784,8 +796,8 @@ class datalynxview_patterns {
             $cat = get_string('reference', 'datalynx');
             foreach ($views as $viewname) {
                 $viewname = preg_quote($viewname, '/');
-                $patterns["#{{viewlink:$viewname;[^;]*;[^;]*;}}#"] = array(true, $cat);
-                $patterns["#{{viewsesslink:$viewname;[^;]*;[^;]*;}}#"] = array(true, $cat);
+                $patterns["#{{viewlink:$viewname;[^;]*;[^;]*;[a-z\d\-_\s]*}}#"] = array(true, $cat);
+                $patterns["#{{viewsesslink:$viewname;[^;]*;[^;]*;[a-z\d\-_\s]*}}#"] = array(true, $cat);
             }
         }
 
