@@ -139,7 +139,7 @@ class datalynx_rule_manager {
         foreach ($this->get_rules() as $ruleid => $rule) {
             if ($rule->get_type() === $type) {
                 if ($menu) {
-                    $typerules[$ruleid] = $rule->name();
+                    $typerules[$ruleid] = $rule->get_name();
                 } else {
                     $typerules[$ruleid] = $rule;
                 }
@@ -169,7 +169,7 @@ class datalynx_rule_manager {
      */
     public function get_rule_by_name($name) {
         foreach ($this->get_rules() as $rule) {
-            if ($rule->name() === $name) {
+            if ($rule->get_name() === $name) {
                 return $rule;
             }
         }
@@ -230,7 +230,7 @@ class datalynx_rule_manager {
                     continue;
                 }
                 if ($menu) {
-                    $retrules[$ruleid] = $rule->name();
+                    $retrules[$ruleid] = $rule->get_name();
                 } else {
                     $retrules[$ruleid] = $rule;
                 }
@@ -344,7 +344,7 @@ class datalynx_rule_manager {
                     case 'duplicate':
                         foreach ($rules as $rule) {
                             // Set new name.
-                            while ($df->name_exists('rules', $rule->name())) {
+                            while ($df->name_exists('rules', $rule->get_name())) {
                                 $rule->rule->name .= '_1';
                             }
                             $ruleid = $DB->insert_record('datalynx_rules', $rule->rule);
