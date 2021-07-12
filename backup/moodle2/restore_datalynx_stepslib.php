@@ -336,7 +336,12 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             $data->param4 = serialize($views);
         }
 
-        // Insert the datalynx_fields record.
+        // Update the link to the checkbox fields used for conditionally triggering the event.
+        if ($data->param5 && $data->type == 'eventnotification') {
+            $data->param5 = $this->get_mappingid('datalynx_field', $data->param5);
+        }
+
+        // Insert the datalynx_rules record.
         $newitemid = $DB->insert_record('datalynx_rules', $data);
         $this->set_mapping('datalynx_rule', $oldid, $newitemid, false); // No files.
     }
