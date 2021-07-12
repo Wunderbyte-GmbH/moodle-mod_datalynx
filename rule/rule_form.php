@@ -103,7 +103,6 @@ class datalynx_rule_form extends moodleform {
             $checkboxes = array('0' => get_string('noselection', 'datalynx')) + $checkboxes;
             $mform->addElement('select', 'param5', get_string('triggerspecificevent', 'datalynxrule_eventnotification'), $checkboxes);      
         }
-        
         $this->rule_definition();
 
         // Buttons.

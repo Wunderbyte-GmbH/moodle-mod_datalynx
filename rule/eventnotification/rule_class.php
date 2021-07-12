@@ -125,8 +125,11 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
 
         $pluginname = get_string('pluginname', 'datalynx');
         $sitename = format_string($SITE->fullname);
-        $subject = "$sitename -> $coursename -> $pluginname $datalynxname:  $notename";
-
+        if (empty(trim($this->rule->param6))) {
+            $subject = "$sitename -> $coursename -> $pluginname $datalynxname:  $notename";
+        } else {
+            $subject = format_string(trim($this->rule->param6));
+        }
         if (strpos($eventname, 'comment') !== false) {
             $entryid = $event->get_data()['other']['itemid'];
             $commentid = $event->get_data()['objectid'];

@@ -32,6 +32,10 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
         $br = html_writer::empty_tag('br');
         $mform = &$this->_form;
 
+        // Message subject. When empty then use default subject in message.
+        $mform->addElement('text', 'param6', get_string('asyncmessagesubject', 'backup'), array('size' => '64'));
+        $mform->setType('param6', PARAM_TEXT);
+
         $mform->addElement('header', 'settingshdr', get_string('settings'));
 
         // Sender.
