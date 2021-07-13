@@ -691,6 +691,12 @@ abstract class datalynxview_base {
         $tags = $this->_tags['view'];
         $replacements = $this->patternclass()->get_replacements($tags, null, $options);
         foreach ($this->_vieweditors as $editor) {
+            // Catch potential data mismatch.
+            if (!isset($this->view->{"e$editor"})) {
+                $this->view->{"e$editor"} = NULL;
+                continue;
+            }
+            
             $text = $this->view->{"e$editor"};
             $text = $this->mask_tags($text);
             $text = format_text($text, FORMAT_HTML, array('trusted' => 1, 'filter' => true));
