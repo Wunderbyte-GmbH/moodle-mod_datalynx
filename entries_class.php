@@ -120,9 +120,14 @@ class datalynx_entries {
             $filter = $this->filter;
         } else {
             if ($filter = $options['filter']) {
-                $optionsfilterusers = $filter->users[0]; // When view is called by a datalynxview_field.
-                $optionsfiltergroups = $filter->groups[0]; // When view is called by a datalynxview_field.
-                $optionseids = $filter->eids; // When view is called by a datalynxview_field.
+                // When view is called by a datalynxview_field.
+                if (is_array($filter->users)) {
+                    $optionsfilterusers = $filter->users[0];
+                }
+                if (is_array($filter->groups)) {
+                    $optionsfiltergroups = $filter->groups[0];
+                }
+                $optionseids = $filter->eids;
             }
         }
 
