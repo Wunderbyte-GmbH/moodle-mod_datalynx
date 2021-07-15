@@ -240,10 +240,10 @@ class datalynxfield_text_form extends datalynxfield_form {
 
         // Added id to records to make the first column something unique.
         $records = $DB->get_records_sql("SELECT id, COUNT(*), c.content
-                                     FROM {datalynx_contents} c
+                                    FROM {datalynx_contents} c
                                     WHERE c.fieldid = :fieldid AND c.content IS NOT NULL
-                                 GROUP BY c.content
-                                   HAVING COUNT(*) > 1", array('fieldid' => $fieldid));
+                                    GROUP BY c.id, c.content
+                                    HAVING COUNT(*) > 1", array('fieldid' => $fieldid));
         if (empty($records)) {
             return false;
         }
