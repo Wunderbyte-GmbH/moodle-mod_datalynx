@@ -727,7 +727,7 @@ abstract class datalynxview_base {
         $map = array_unique($matches[0]);
         foreach ($map as $index => $match) {
             if ($match != '##entries##') {
-                $find[$index] = "/" . preg_quote($match, '/') . "/";
+                $find[$index] = "/" . preg_quote($match, '/') . "(?!@)/";
                 $replace[$index] = '<span class="nolink" title="donotreplaceme">' . $match . '</span>';
             }
         }
