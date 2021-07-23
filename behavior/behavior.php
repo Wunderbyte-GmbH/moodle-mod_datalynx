@@ -144,6 +144,7 @@ class datalynx_field_behavior {
         
         if(isset($formdata->visibleto['user'])) {
             $formdata->visibletouser = $formdata->visibleto['user'];
+            unset($formdata->visibleto['user']);
         }
         
         $formdata->editableby = unserialize($record->editableby);

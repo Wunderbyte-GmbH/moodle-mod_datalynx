@@ -116,6 +116,8 @@ foreach ($behaviors as $behaviorid => $behavior) {
 
     $permissionnames = $datalynx->get_datalynx_permission_names();
     $visibleto = unserialize($behavior->visibleto);
+    unset($visibleto['user']);
+
     $fieldvisible = '';
     foreach ($permissionnames as $permissionid => $permissionname) {
         if (in_array($permissionid, $visibleto)) {
