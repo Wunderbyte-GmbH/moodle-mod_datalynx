@@ -86,9 +86,13 @@ class datalynx_field_behavior_form extends moodleform {
                     array(mod_datalynx\datalynx::PERMISSION_MANAGER, mod_datalynx\datalynx::PERMISSION_TEACHER,
                             mod_datalynx\datalynx::PERMISSION_STUDENT));
         }
+        
+        // Interface for single user, this overrules other visibility options.
+        $allusers = $this->get_allusers();
+        $mform->addElement('autocomplete', 'visibletouser', get_string('otheruser', 'datalynx'), $allusers);
+        $mform->setType('visibletouser', PARAM_INT);
 
         // EDITING OPTIONS.
-
         $mform->addElement('header', 'editing', get_string('editing', 'datalynx'));
         $mform->setExpanded('editing');
 
@@ -118,6 +122,27 @@ class datalynx_field_behavior_form extends moodleform {
         $this->add_action_buttons();
     }
 
+    /**
+     * Get all users in moodle instance for autocomplete list.
+     *
+     * @return array with userid -> firstname lastname. 
+     * @throws coding_exception
+     */
+    public function get_allusers() {
+        global $DB;
+        $tempusers = $DB->get_records('user', array(), '', $fields='id, firstname, lastname');
+
+        $allusers[0] = get_string('noselection', 'datalynx');
+        foreach($tempusers as $userdata) {
+            // Remove empties to make list more usable.
+            if($userdata->lastname == '') {
+                continue;
+            }
+            $allusers[$userdata->id] = "$userdata->firstname $userdata->lastname";
+        }
+        return $allusers;
+    }
+    
     /**
      * @return object
      */

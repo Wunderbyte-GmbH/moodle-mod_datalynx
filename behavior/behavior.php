@@ -112,6 +112,12 @@ class datalynx_field_behavior {
     public function is_visible_to_user($user = null, $isentryauthor = false, $ismentor = false) {
         global $USER;
         $user = $user ? $user : $USER;
+
+        // If special visibletouser is set overrule other visibility options.
+        if (isset($this->visibleto['user']) AND $this->visibleto['user'] == $user->id) {
+            return true;
+        }
+        
         $permissions = $this->datalynx->get_user_datalynx_permissions($user->id, 'view');
         return $this->user_is_admin($user) || (array_intersect($permissions, $this->visibleto)) ||
         ($isentryauthor && in_array(mod_datalynx\datalynx::PERMISSION_AUTHOR, $this->visibleto)) ||
@@ -135,6 +141,11 @@ class datalynx_field_behavior {
         $formdata->name = $record->name;
         $formdata->description = $record->description;
         $formdata->visibleto = unserialize($record->visibleto);
+        
+        if(isset($formdata->visibleto['user'])) {
+            $formdata->visibletouser = $formdata->visibleto['user'];
+        }
+        
         $formdata->editableby = unserialize($record->editableby);
         $formdata->required = $record->required;
 
@@ -147,6 +158,11 @@ class datalynx_field_behavior {
         $record->dataid = $formdata->d;
         $record->name = $formdata->name;
         $record->description = $formdata->description;
+        
+        if($formdata->visibletouser) {
+            $formdata->visibleto['user'] = $formdata->visibletouser;
+        }
+        
         $record->visibleto = serialize(isset($formdata->visibleto) ? $formdata->visibleto : []);
         $record->editableby = serialize(isset($formdata->editableby) ? $formdata->editableby : []);
         $record->required = $formdata->required;
