@@ -53,6 +53,9 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
                     case '##entryid##':
                         $str = $entry->id;
                         break;
+                    case '##entrynr##';
+                        $str = str_pad($entry->id, 4, 0, STR_PAD_LEFT);
+                        break;
                     case '##more##':
                         $str = $this->display_more($entry);
                         break;
@@ -208,8 +211,11 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
         $reference = get_string('reference', 'datalynx');
         $patterns["##anchor##"] = array(true, $reference);
         $patterns["##more##"] = array(true, $reference);
-
-        // Entryinfo.
+        
+        $entrynr = get_string('entrynr', 'datalynx');
+        $patterns["##entrynr##"] = array(true, $entrynr);
+        
+        // Entryinfo. 
         $entryinfo = get_string('entryinfo', 'datalynx');
         $patterns["##entryid##"] = array(true, $entryinfo);
 
