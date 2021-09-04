@@ -163,6 +163,7 @@ $string['entrylockoncomments'] = 'sperren wenn kommentiert';
 $string['entrylockonratings'] = 'sperren wenn bewertet';
 $string['entrylocks'] = 'Entry locks';
 $string['entrynew'] = 'Neuer Eintrag';
+$string['entrynr'] = 'Entryid mit 000 für z.B. Rechnungsnr';
 $string['entrynoneforaction'] = 'Keine Einträge für die gewünschte Aktion gefunden.';
 $string['entrynoneindatalynx'] = 'Keine Einträge in Datalynx';
 $string['entryrating'] = 'Eintragsbewertung';
