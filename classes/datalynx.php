@@ -25,6 +25,7 @@
 namespace mod_datalynx;
 use completion_info;
 use context_module;
+use core_course_category;
 use datalynx_filter_manager;
 use datalynx_preset_manager;
 use datalynx_rule_manager;
@@ -310,6 +311,7 @@ class datalynx {
                         array($this->id()));
                 break;
 
+            case self::COUNT_LEFT:
             case self::COUNT_APPROVED:
                 $count = '---';
                 break;
@@ -321,10 +323,6 @@ class datalynx {
                 $count = $DB->count_records_sql(
                     'SELECT COUNT(e.id) FROM {datalynx_entries} e WHERE e.approved = 0 AND e.dataid = ?',
                     array($this->id()));
-                break;
-
-            case self::COUNT_LEFT:
-                $count = '---';
                 break;
 
             default:
@@ -469,6 +467,12 @@ class datalynx {
             if (!empty($params->pagelayout)) {
                 $PAGE->set_pagelayout($params->pagelayout);
             }
+
+            // Set css body class to add top level category of the dl instance.
+            $category = core_course_category::get($PAGE->course->category);
+            $categories = explode("/", $category->path);
+            $bodyclass = "top-cat-{$categories[1]}";
+            $PAGE->add_body_class($bodyclass);
 
             $PAGE->requires->css(
                     new moodle_url(
