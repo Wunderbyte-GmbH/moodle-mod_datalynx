@@ -51,6 +51,14 @@ jobs:
           sudo locale-gen en_AU.UTF-8
           echo "NVM_DIR=$HOME/.nvm" >> $GITHUB_ENV
 
+      - name: Configure MariaDB
+        if: ${{ matrix.database == 'mariadb' }}
+        run: |
+          systemctl status mariadb.service
+          mysql -uroot -hlocalhost -P 3306 -e 'SET GLOBAL innodb_read_only_compressed=OFF'
+          echo 'Using service'
+          echo ${{ matrix.database }}
+
       - name: Install moodle-plugin-ci
         run: |
           moodle-plugin-ci install --plugin ./plugin --db-host=127.0.0.1
