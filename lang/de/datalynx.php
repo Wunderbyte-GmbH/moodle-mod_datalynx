@@ -106,6 +106,7 @@ $string['datalynx:viewentry'] = 'Einträge anzeigen';
 $string['datalynx:viewindex'] = 'Index anzeigen';
 $string['datalynx:writeentry'] = 'Einträge schreiben';
 // End Capability strings.
+$string['coursevisible'] = 'Der Kurs wurde freigeschaltet und ist für Studierende verfügbar';
 $string['defaultview'] = 'D';
 $string['deletenotenrolled'] = 'Einträge von nicht eingeschriebenen UserInnen löschen.';
 $string['descending'] = 'Absteigend';
@@ -163,7 +164,7 @@ $string['entrylockoncomments'] = 'sperren wenn kommentiert';
 $string['entrylockonratings'] = 'sperren wenn bewertet';
 $string['entrylocks'] = 'Entry locks';
 $string['entrynew'] = 'Neuer Eintrag';
-$string['entrynr'] = 'Entryid mit 000 für z.B. Rechnungsnr';
+$string['entryidzerofill'] = 'Entryid mit 000 für z.B. Rechnungsnr';
 $string['entrynoneforaction'] = 'Keine Einträge für die gewünschte Aktion gefunden.';
 $string['entrynoneindatalynx'] = 'Keine Einträge in Datalynx';
 $string['entryrating'] = 'Eintragsbewertung';

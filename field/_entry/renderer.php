@@ -53,8 +53,11 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
                     case '##entryid##':
                         $str = $entry->id;
                         break;
-                    case '##entrynr##';
+                    case '##entryidzerofill##';
                         $str = str_pad($entry->id, 4, 0, STR_PAD_LEFT);
+                        break;
+                    case '##coursevisible##';
+                        $str = $this->_field->df->course->visible ? get_string('coursevisible', 'datalynx') : '';
                         break;
                     case '##more##':
                         $str = $this->display_more($entry);
@@ -211,13 +214,14 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
         $reference = get_string('reference', 'datalynx');
         $patterns["##anchor##"] = array(true, $reference);
         $patterns["##more##"] = array(true, $reference);
-        
-        $entrynr = get_string('entrynr', 'datalynx');
-        $patterns["##entrynr##"] = array(true, $entrynr);
-        
-        // Entryinfo. 
+
+        // Entryinfo.
         $entryinfo = get_string('entryinfo', 'datalynx');
         $patterns["##entryid##"] = array(true, $entryinfo);
+        // Entry id with prepended zeroes.
+        $patterns["##entryidzerofill##"] = array(true, $entryinfo);
+        // Display if course is visible to students.
+        $patterns["##coursevisible##"] = array(true, $entryinfo);
 
         return $patterns;
     }
