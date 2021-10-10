@@ -92,11 +92,11 @@ abstract class datalynxfield_renderer {
      * so that in turn patterns it may contain could be processed.
      *
      * @param array $tags
-     * @param null $entry
+     * @param stdClass $entry
      * @param array $options
      * @return array
      */
-    public function replacements(array $tags = null, $entry = null, array $options = null) {
+    public function replacements(array $tags = null, stdClass $entry = null, array $options = null) {
         $replacements = array();
         foreach ($tags as $tag) {
             $currentoptions = array_merge(self::$defaultoptions, $options);
@@ -110,7 +110,7 @@ abstract class datalynxfield_renderer {
                 $currentoptions[$splitfieldname[1]] = true;
             }
 
-            $currentoptions['visible'] = $behavior->is_visible_to_user();
+            $currentoptions['visible'] = $behavior->is_visible_to_user($entry);
             $currentoptions['editable'] = $behavior->is_editable_by_user();
             $currentoptions['required'] = $behavior->is_required();
             $currentoptions['internal'] = $this->_field->is_internal();

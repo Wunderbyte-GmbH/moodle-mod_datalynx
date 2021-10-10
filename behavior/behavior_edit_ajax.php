@@ -49,18 +49,18 @@ if ($forproperty == "required") {
 
     $DB->set_field('datalynx_behaviors', $forproperty, $required, array('id' => $behaviorid));
 } else {
-    $permissions = unserialize(
+    $visibleto = unserialize(
             $DB->get_field('datalynx_behaviors', $forproperty, array('id' => $behaviorid)));
-    if (!in_array($permissionid, $permissions)) {
-        $permissions[] = $permissionid;
+    if (!in_array($permissionid, $visibleto['permissions'])) {
+        $visibleto['permissions'][] = $permissionid;
         $toggle = "ON";
     } else {
-        if (($key = array_search($permissionid, $permissions)) !== false) {
-            unset($permissions[$key]);
+        if (($key = array_search($permissionid, $visibleto['permissions'])) !== false) {
+            unset($visibleto['permissions'][$key]);
         }
         $toggle = "OFF";
     }
-    $DB->set_field('datalynx_behaviors', $forproperty, serialize($permissions),
+    $DB->set_field('datalynx_behaviors', $forproperty, serialize($visibleto),
             array('id' => $behaviorid));
 }
 

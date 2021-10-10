@@ -102,6 +102,10 @@ class datalynxfield_teammemberselect_form extends datalynxfield_form {
         $mform->addHelpButton('param5', 'referencefield', 'datalynx');
         $mform->setType('param5', PARAM_INT);
         $mform->disabledIf('param5', 'teamfieldenable', 'notchecked');
+
+        $mform->addElement('checkbox', 'param9', get_string('teammembercaneditentry', 'datalynx'));
+        $mform->addHelpButton('param9', 'teammembercaneditentry', 'datalynx');
+        $mform->setType('param9', PARAM_INT);
     }
 
     /**

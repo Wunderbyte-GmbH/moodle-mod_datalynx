@@ -116,11 +116,10 @@ foreach ($behaviors as $behaviorid => $behavior) {
 
     $permissionnames = $datalynx->get_datalynx_permission_names();
     $visibleto = unserialize($behavior->visibleto);
-    unset($visibleto['user']);
 
     $fieldvisible = '';
     foreach ($permissionnames as $permissionid => $permissionname) {
-        if (in_array($permissionid, $visibleto)) {
+        if (in_array($permissionid, $visibleto['permissions'])) {
             $fieldvisible .= $OUTPUT->pix_icon('i/completion-manual-enabled', $permissionname, 'moodle',
                     array('data-behavior-id' => $behaviorid, 'data-permission-id' => $permissionid,
                             'data-for' => 'visibleto'));

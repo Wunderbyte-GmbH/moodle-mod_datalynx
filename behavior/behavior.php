@@ -17,7 +17,7 @@
 /**
  *
  * @package datalynx_field_behavior
- * @copyright 2014 Ivan Šakić
+ * @copyright David Bogner 2021 based on 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die();
@@ -49,8 +49,20 @@ class datalynx_field_behavior {
      *
      * @var stdClass related datalynx behavior DB record
      */
+
+    /**
+     * @var stdClass the db record
+     */
     private $record;
 
+    /**
+     * Constructor for behavior instance. Unserializes serialized data fetched from behavior table.
+     *
+     * @param $record
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     */
     private function __construct($record) {
         $this->id = $record->id;
         $this->name = $record->name;
@@ -69,6 +81,16 @@ class datalynx_field_behavior {
         $this->record = $record;
     }
 
+    /**
+     * Given the name and tha datalynx id of the behavior instantiate the object.
+     *
+     * @param $name
+     * @param $dataid
+     * @return datalynx_field_behavior|false
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     */
     public static function from_name($name, $dataid) {
         global $DB;
         $record = $DB->get_record('datalynx_behaviors', array('name' => $name, 'dataid' => $dataid));
@@ -79,6 +101,14 @@ class datalynx_field_behavior {
         }
     }
 
+    /**
+     * Get behavior object from the behavior id.
+     * @param $id
+     * @return datalynx_field_behavior|false
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     */
     public static function from_id($id) {
         global $DB;
         $record = $DB->get_record('datalynx_behaviors', array('id' => $id));
@@ -89,12 +119,27 @@ class datalynx_field_behavior {
         }
     }
 
+    /**
+     * @var array default behavior for any field.
+     */
     private static $default = array('id' => 0, 'name' => '', 'description' => '',
-            'visibleto' => array(mod_datalynx\datalynx::PERMISSION_MANAGER, mod_datalynx\datalynx::PERMISSION_TEACHER,
-                    mod_datalynx\datalynx::PERMISSION_STUDENT, mod_datalynx\datalynx::PERMISSION_AUTHOR, mod_datalynx\datalynx::PERMISSION_GUEST),
-            'editableby' => array(mod_datalynx\datalynx::PERMISSION_MANAGER, mod_datalynx\datalynx::PERMISSION_TEACHER,
-                    mod_datalynx\datalynx::PERMISSION_STUDENT, mod_datalynx\datalynx::PERMISSION_AUTHOR), 'required' => false);
+            'visibleto' => array('permissions' => array(mod_datalynx\datalynx::PERMISSION_MANAGER,
+                    mod_datalynx\datalynx::PERMISSION_TEACHER,
+                    mod_datalynx\datalynx::PERMISSION_STUDENT,
+                    mod_datalynx\datalynx::PERMISSION_AUTHOR,
+                    mod_datalynx\datalynx::PERMISSION_GUEST)),
+            'editableby' => [mod_datalynx\datalynx::PERMISSION_MANAGER, mod_datalynx\datalynx::PERMISSION_TEACHER,
+                    mod_datalynx\datalynx::PERMISSION_STUDENT, mod_datalynx\datalynx::PERMISSION_AUTHOR], 'required' => false);
 
+    /**
+     * The default behavior used in any instance without user settings applied.
+     *
+     * @param \mod_datalynx\datalynx $datalynx
+     * @return datalynx_field_behavior
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     */
     public static function get_default_behavior(mod_datalynx\datalynx $datalynx) {
         $record = (object) self::$default;
         $record->visibleto = serialize($record->visibleto);
@@ -109,22 +154,72 @@ class datalynx_field_behavior {
         return in_array($user->id, array_keys($admins));
     }
 
-    public function is_visible_to_user($user = null, $isentryauthor = false, $ismentor = false) {
+    /**
+     * Checks if a field in an entry is visible to the current user.
+     *
+     * @param null $user
+     * @param stdClass $entry
+     * @return bool
+     */
+    public function is_visible_to_user(stdClass $entry): bool {
         global $USER;
-        $user = $user ? $user : $USER;
-
-        // If special visibletouser is set overrule other visibility options.
-        if (isset($this->visibleto['user']) AND $this->visibleto['user'] == $user->id) {
+        if (!isset($entry->userid)) {
+            // This is for creating a new entry and no author yet defined. Assuming the user is going to be the author.
+            $isentryauthor = true;
+        } else {
+            $isentryauthor = $entry->userid == $USER->id;
+        }
+        // If user is member of teammemberselect field allowed to view overrule.
+        if ($this->is_visible_to_teammember($entry)) {
             return true;
         }
-        
-        $permissions = $this->datalynx->get_user_datalynx_permissions($user->id, 'view');
-        return $this->user_is_admin($user) || (array_intersect($permissions, $this->visibleto)) ||
-        ($isentryauthor && in_array(mod_datalynx\datalynx::PERMISSION_AUTHOR, $this->visibleto)) ||
-        ($ismentor && in_array(mod_datalynx\datalynx::PERMISSION_MENTOR, $this->visibleto));
+        // If special visibletouser is set overrule other visibility options.
+        if (isset($this->visibleto['users']) AND in_array($USER->id, $this->visibleto['users'])) {
+            return true;
+        }
+
+        $permissions = $this->datalynx->get_user_datalynx_permissions($USER->id, 'view');
+        $visible = array_values($this->visibleto['permissions']);
+        // Make a simple array.
+        return $this->user_is_admin($USER) || (array_intersect($permissions, $this->visibleto['permissions'])) ||
+        ($isentryauthor && in_array(mod_datalynx\datalynx::PERMISSION_AUTHOR, $visible));
     }
 
-    public function is_editable_by_user($user = null, $isentryauthor = false, $ismentor = false) {
+    /**
+     * Checks if user is a teammember of the teammemberselect field allowed to view the field.
+     *
+     * @param stdClass $entry
+     * @return bool
+     */
+    public function is_visible_to_teammember(stdClass $entry): bool {
+        global $USER;
+        // Teammemberselect fields that allow viewing of the field to the members of the field.
+        if (isset($this->visibleto['teammember'])) {
+            // Teammemberselect fields that allow viewing of the field to the members of the field.
+            $allowedfieldids = $this->visibleto['teammember'];
+            if (!empty($allowedfieldids)) {
+                foreach ($allowedfieldids as $fieldid) {
+                    $userids = isset($entry->{"c{$fieldid}_content"}) ? json_decode(
+                            $entry->{"c{$fieldid}_content"}, true) : [];
+                    if (in_array($USER->id, $userids)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     *  Checks if a field in an entry is editable by the current user.
+     *
+     * @param null $user
+     * @param bool $isentryauthor
+     * @param bool $ismentor
+     * @return bool
+     * @throws coding_exception
+     */
+    public function is_editable_by_user($user = null, bool $isentryauthor = false, bool $ismentor = false) {
         global $USER;
         $user = $user ? $user : $USER;
         $permissions = $this->datalynx->get_user_datalynx_permissions($user->id, 'edit');
@@ -134,55 +229,98 @@ class datalynx_field_behavior {
         (isguestuser() && in_array(mod_datalynx\datalynx::PERMISSION_GUEST, $this->editableby));
     }
 
-    public static function db_to_form($record) {
+    /**
+     * Given a db record make it ready for the form.
+     *
+     * @param stdClass $record
+     * @return stdClass
+     */
+    public static function db_to_form(stdClass $record): stdClass {
         $formdata = new stdClass();
         $formdata->id = isset($record->id) ? $record->id : 0;
         $formdata->d = $record->dataid;
         $formdata->name = $record->name;
         $formdata->description = $record->description;
-        $formdata->visibleto = unserialize($record->visibleto);
-        
-        if(isset($formdata->visibleto['user'])) {
-            $formdata->visibletouser = $formdata->visibleto['user'];
-            unset($formdata->visibleto['user']);
-        }
-        
+        $visible = unserialize($record->visibleto);
+        $formdata->visibletopermission = $visible['permissions'];
+        $formdata->visibletouser = $visible['users'] ?? [];
+        $formdata->visibletoteammember = $visible['teammember'] ?? [];
         $formdata->editableby = unserialize($record->editableby);
         $formdata->required = $record->required;
-
         return $formdata;
     }
 
-    public static function form_to_db($formdata) {
+    /**
+     * Prepare submitted form data for writing to db.
+     *
+     * @param stdClass $formdata
+     * @return stdClass
+     */
+    public static function form_to_db(stdClass $formdata): stdClass {
         $record = new stdClass();
         $record->id = isset($formdata->id) ? $formdata->id : 0;
         $record->dataid = $formdata->d;
         $record->name = $formdata->name;
         $record->description = $formdata->description;
-        
-        if($formdata->visibletouser) {
-            $formdata->visibleto['user'] = $formdata->visibletouser;
+
+        // Prepare formdata for serialization to be saved into a single db column.
+        if($formdata->visibletopermission) {
+            $formdata->visibleto['permissions'] = $formdata->visibletopermission;
+        } else {
+            $formdata->visibleto['permissions'] = [];
         }
-        
-        $record->visibleto = serialize(isset($formdata->visibleto) ? $formdata->visibleto : []);
+        if($formdata->visibletouser) {
+            $formdata->visibleto['users'] = $formdata->visibletouser;
+        } else {
+            $formdata->visibleto['users'] = [];
+        }
+        if($formdata->visibletoteammember) {
+            $formdata->visibleto['teammember'] = $formdata->visibletoteammember;
+        } else {
+            $formdata->visibleto['teammember'] = [];
+        }
+
+        $record->visibleto = serialize($formdata->visibleto);
         $record->editableby = serialize(isset($formdata->editableby) ? $formdata->editableby : []);
         $record->required = $formdata->required;
 
         return $record;
     }
 
-    public static function insert_behavior($formdata) {
+    /**
+     * Prepare formdata and write prepared data to db.
+     *
+     * @param stdClass $formdata
+     * @return bool|int
+     * @throws dml_exception
+     */
+    public static function insert_behavior(stdClass $formdata) {
         global $DB;
         $record = self::form_to_db($formdata);
         return $DB->insert_record('datalynx_behaviors', $record);
     }
 
-    public static function get_behavior($behaviorid) {
+    /**
+     * Given the behavior id, get data from db formatted for moodle form.
+     *
+     * @param int $behaviorid
+     * @return stdClass
+     * @throws dml_exception
+     */
+    public static function get_behavior(int $behaviorid): stdClass {
         global $DB;
         $record = $DB->get_record('datalynx_behaviors', array('id' => $behaviorid));
         return self::db_to_form($record);
     }
 
+    /**
+     * Duplicate a behavior instance.
+     *
+     * @param $behaviorid
+     * @return bool|int
+     * @throws coding_exception
+     * @throws dml_exception
+     */
     public static function duplicate_behavior($behaviorid) {
         global $DB;
         $object = self::get_behavior($behaviorid);
@@ -195,6 +333,13 @@ class datalynx_field_behavior {
         return self::insert_behavior($object);
     }
 
+    /**
+     * Write new formdata to existing behavior.
+     *
+     * @param $formdata
+     * @return mixed
+     * @throws dml_exception
+     */
     public static function update_behavior($formdata) {
         global $DB;
         $record = self::form_to_db($formdata);
@@ -205,6 +350,13 @@ class datalynx_field_behavior {
         return $record->id;
     }
 
+    /**
+     * Deleta a behavior instance.
+     *
+     * @param $behaviorid
+     * @return bool
+     * @throws dml_exception
+     */
     public static function delete_behavior($behaviorid) {
         global $DB;
         self::update_behavior_pattern($behaviorid);
@@ -246,7 +398,7 @@ class datalynx_field_behavior {
     }
 
     /**
-     *
+     * Get id of behavior instance.
      * @return int
      */
     public function get_id() {
@@ -254,6 +406,7 @@ class datalynx_field_behavior {
     }
 
     /**
+     * Get the name of a behavior instance.
      *
      * @return string
      */
@@ -262,7 +415,7 @@ class datalynx_field_behavior {
     }
 
     /**
-     *
+     * Get the description of a behavior instance.
      * @return string
      */
     public function get_description() {
@@ -270,6 +423,7 @@ class datalynx_field_behavior {
     }
 
     /**
+     * Is the field required to be filled out by the user in the form?
      *
      * @return bool
      */

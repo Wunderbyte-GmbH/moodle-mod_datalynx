@@ -77,20 +77,29 @@ class datalynx_field_behavior_form extends moodleform {
         $mform->setExpanded('visibilityoptions');
 
         $options = array("multiple" => true);
-        $mform->addElement('autocomplete', 'visibleto', get_string('visibleto', 'datalynx'),
+        $mform->addElement('autocomplete', 'visibletopermission', get_string('visibleto', 'datalynx'),
                 $this->datalynx->get_datalynx_permission_names(false, false), $options);
-        $mform->addHelpButton('visibleto', 'visibleto', 'datalynx');
-        $mform->setType('visibleto', PARAM_RAW);
+        $mform->addHelpButton('visibletopermission', 'visibleto', 'datalynx');
+        $mform->setType('visibletopermission', PARAM_RAW);
         if ($new) {
-            $mform->setDefault('visibleto',
+            $mform->setDefault('visibletopermission',
                     array(mod_datalynx\datalynx::PERMISSION_MANAGER, mod_datalynx\datalynx::PERMISSION_TEACHER,
                             mod_datalynx\datalynx::PERMISSION_STUDENT));
         }
-        
+
         // Interface for single user, this overrules other visibility options.
         $allusers = $this->get_allusers();
-        $mform->addElement('autocomplete', 'visibletouser', get_string('otheruser', 'datalynx'), $allusers);
+        $options = array("multiple" => true);
+        $mform->addElement('autocomplete', 'visibletouser',
+                get_string('otheruser', 'datalynx'), $allusers, $options);
         $mform->setType('visibletouser', PARAM_INT);
+
+        // Interface for teammemberselect fields.
+        $options = array("multiple" => true);
+        $teammemberselect = $this->get_teammemberselect_fields();
+        $mform->addElement('autocomplete', 'visibletoteammember', get_string('teammemberselect', 'datalynx'),
+                $teammemberselect, $options);
+        $mform->setType('visibletoteammember', PARAM_RAW);
 
         // EDITING OPTIONS.
         $mform->addElement('header', 'editing', get_string('editing', 'datalynx'));
@@ -123,16 +132,34 @@ class datalynx_field_behavior_form extends moodleform {
     }
 
     /**
-     * Get all users in moodle instance for autocomplete list.
+     * Get all teammemberselect fields in datalynx.
      *
-     * @return array with userid -> firstname lastname. 
+     * @return array fieldid => fieldname
+     */
+    public function get_teammemberselect_fields(): array {
+        $allfields = $this->datalynx->get_fields();
+        $fields = [];
+        if (!empty($allfields)) {
+            foreach ($allfields as $fieldid => $field) {
+                if ($field->type === 'teammemberselect') {
+                    $fields[$fieldid] = $field->field->name;
+                }
+            }
+        }
+        return $fields;
+    }
+    /**
+     * Get all users in moodle instance for autocomplete list.
+     * TODO: Really all users or only those with access to this datalynx instance?
+     *
+     * @return array with userid -> firstname lastname.
      * @throws coding_exception
      */
     public function get_allusers() {
         global $DB;
+        $allusers = [];
         $tempusers = $DB->get_records('user', array(), '', $fields='id, firstname, lastname');
 
-        $allusers[0] = get_string('noselection', 'datalynx');
         foreach($tempusers as $userdata) {
             // Remove empties to make list more usable.
             if($userdata->lastname == '') {
@@ -142,7 +169,7 @@ class datalynx_field_behavior_form extends moodleform {
         }
         return $allusers;
     }
-    
+
     /**
      * @return object
      */

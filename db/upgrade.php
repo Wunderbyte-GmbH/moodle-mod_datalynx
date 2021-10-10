@@ -998,7 +998,39 @@ function xmldb_datalynx_upgrade($oldversion) {
         // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2019090600, 'datalynx');
     }
+
+    if ($oldversion < 2021102102) {
+        mod_datalynx_upgrade_behaviors();
+        // Datalynx savepoint reached.
+        upgrade_mod_savepoint(true, 2021102102, 'datalynx');
+    }
     return true;
+}
+
+function mod_datalynx_upgrade_behaviors() {
+    require_once(dirname(__FILE__) . '/../behavior/behavior.php');
+    global $DB;
+    $existingdata = [];
+    $allbehaviorids = $DB->get_fieldset_select('datalynx_behaviors', 'id', 'id > 0');
+    if (!empty($allbehaviorids)) {
+        foreach ($allbehaviorids as $behaviorid) {
+            $formdata = datalynx_field_behavior::get_behavior($behaviorid);
+            $visibleto = $DB->get_field('datalynx_behaviors', 'visibleto', ['id' => $behaviorid]);
+            $visibletoperm = unserialize($visibleto);
+            if(!empty($visibletoperm)) {
+                if(isset($visibletoperm['users']) ){
+                    unset($visibletoperm['users']);
+                }
+                if(isset($visibletoperm['teammember']) ){
+                    unset($visibletoperm['teammember']);
+                }
+                $formdata->visibletopermission = array_values($visibletoperm);
+                $formdata->visibletouser = [];
+                $formdata->visibletoteammember = [];
+                datalynx_field_behavior::update_behavior($formdata);
+            }
+        }
+    }
 }
 
 function mod_datalynx_replace_field_rules() {

@@ -2065,7 +2065,7 @@ class datalynx {
             if (!empty($entry->id)) {
                 // Entry owner.
                 // TODO groups_is_member queries DB for each entry!
-                if (empty($USER->id) or (!$this->data->grouped and $USER->id != $entry->userid) or
+                if (empty($USER->id) or (!$this->data->grouped and $USER->id != $entry->userid and !$this->teammember_can_edit($entry)) or
                         ($this->data->grouped and !groups_is_member($entry->groupid))
                 ) {
                     return false; // Who are you anyway???
@@ -2099,6 +2099,37 @@ class datalynx {
             return true;
         }
 
+        return false;
+    }
+
+    /**
+     * Checks if team member can edit the entry.
+     *
+     * @param null $entry
+     * @return bool
+     */
+    public function teammember_can_edit($entry = null) {
+        global $USER;
+        // Get all teammemberselect fields, that allow editing of entry.
+        $teammemberfields = $this->get_fields_by_type('teammemberselect');
+        foreach ($teammemberfields as $fieldid => $field) {
+            if ($field->field->param9 == "1") {
+                $fieldids[] = $fieldid;
+            }
+        }
+        if (empty($fieldids)) {
+            return false;
+        }
+        $userids = [];
+        foreach ($fieldids as $fieldid) {
+            // Extract all userids of teammemberselect field.
+            $userids = isset($entry->{"c{$fieldid}_content"}) ? json_decode(
+                    $entry->{"c{$fieldid}_content"}, true) : [];
+            // Check if $USER is part of the teammembers who are allowed to edit.
+            if (in_array($USER->id, $userids)) {
+                return true;
+            }
+        }
         return false;
     }
 
