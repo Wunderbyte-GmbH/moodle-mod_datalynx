@@ -43,12 +43,10 @@ class datalynxfield_entrygroup_renderer extends datalynxfield_renderer {
             $entry->groupid = $field->df()->currentgroup;
             $group->id = $entry->groupid;
             $group->name = null;
-            $group->hidepicture = null;
             $group->picture = null;
         } else {
             $group->id = $entry->groupid;
             $group->name = $entry->groupname;
-            $group->hidepicture = $entry->grouphidepic;
             $group->picture = $entry->grouppic;
         }
 
