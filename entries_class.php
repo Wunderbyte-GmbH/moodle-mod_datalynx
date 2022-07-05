@@ -21,6 +21,9 @@
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+use core_user\fields;
+
 defined('MOODLE_INTERNAL') or die();
 
 /**
@@ -201,14 +204,16 @@ class datalynx_entries {
         }
 
         // Sql for fetching the entries.
+        $userfields = fields::for_name()->including('idnumber', 'username', 'institution', 'email');
+        $selectfields = $userfields->get_sql('u', false, '', 'uid')->selects;
+
         $what = ' DISTINCT ' .
                 // Entry.
-                ' e.id, e.approved, e.timecreated, e.timemodified, e.userid, e.groupid, e.status, ' .
+                ' e.id, e.approved, e.timecreated, e.timemodified, e.userid, e.groupid, e.status ' .
                 // User.
-                user_picture::fields('u', array('idnumber', 'username', 'institution'
-                ), 'uid ') . ', ' .
+                $selectfields . ', ' .
                 // Group (TODO g.description AS groupdesc need to be varchar for MSSQL).
-                'g.name AS groupname, g.hidepicture AS grouphidepic, g.picture AS grouppic ' .
+                'g.name AS groupname, g.picture AS grouppic ' .
                 // Content (including ratings and comments if required).
                 $whatcontent;
         $count = ' COUNT(e.id) ';
