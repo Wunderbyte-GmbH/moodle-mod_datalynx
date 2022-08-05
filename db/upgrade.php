@@ -1004,6 +1004,12 @@ function xmldb_datalynx_upgrade($oldversion) {
         // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2021102102, 'datalynx');
     }
+
+    if ($oldversion < 2022080406) {
+        mod_datalynx_fix_behavior_in_template();
+        // Datalynx savepoint reached.
+        upgrade_mod_savepoint(true, 2022080406, 'datalynx');
+    }
     return true;
 }
 
@@ -1146,6 +1152,40 @@ function mod_datalynx_replace_field_labels() {
             }
             $view->param2 = str_replace(array_keys($fieldtags), array_values($fieldtags), $view->param2);
             $DB->update_record('datalynx_views', $view);
+        }
+    }
+}
+
+/**
+ * Replace behavior that have been falsly inserted as renderers by previous update script.
+ * @return void
+ * @throws dml_exception
+ */
+function mod_datalynx_fix_behavior_in_template() {
+    global $DB;
+
+    $dataids = $DB->get_fieldset_select('datalynx', 'id', "id IS NOT NULL");
+    foreach ($dataids as $dataid) {
+        $views = $DB->get_records('datalynx_views', ['dataid' => $dataid], '', 'id, param2');
+        $behaviors = $DB->get_records('datalynx_behaviors', ['dataid' => $dataid], '', 'id, dataid, name');
+        foreach ($behaviors as $behavior) {
+            $behaviorsbydataid[$behavior->dataid][] = $behavior->name;
+        }
+        foreach ($views as $view) {
+            $newparam2 = $view->param2;
+            // Replace row-fluid with row.
+            $newparam2 = str_replace('row-fluid', 'row', $view->param2);
+            if (isset($behaviorsbydataid[$dataid]) && !empty($behaviorsbydataid[$dataid])) {
+                foreach ($behaviorsbydataid[$dataid] as $behaname) {
+                    $searchstring = "||$behaname]]";
+                    $replacestring = "|$behaname]]";
+                    $newparam2 = str_replace($searchstring, $replacestring, $newparam2);
+                }
+            }
+            if ($newparam2 !== $view->param2) {
+                $view->param2 = $newparam2;
+                $DB->update_record('datalynx_views', $view);
+            }
         }
     }
 }
