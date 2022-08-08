@@ -1005,10 +1005,10 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2021102102, 'datalynx');
     }
 
-    if ($oldversion < 2022080406) {
+    if ($oldversion < 2022080800) {
         mod_datalynx_fix_behavior_in_template();
         // Datalynx savepoint reached.
-        upgrade_mod_savepoint(true, 2022080406, 'datalynx');
+        upgrade_mod_savepoint(true, 2022080800, 'datalynx');
     }
     return true;
 }
@@ -1172,7 +1172,6 @@ function mod_datalynx_fix_behavior_in_template() {
             $behaviorsbydataid[$behavior->dataid][] = $behavior->name;
         }
         foreach ($views as $view) {
-            $newparam2 = $view->param2;
             // Replace row-fluid with row.
             $newparam2 = str_replace('row-fluid', 'row', $view->param2);
             if (isset($behaviorsbydataid[$dataid]) && !empty($behaviorsbydataid[$dataid])) {
