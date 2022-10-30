@@ -179,7 +179,10 @@ class datalynx_field_behavior {
         }
 
         $permissions = $this->datalynx->get_user_datalynx_permissions($USER->id, 'view');
-        $visible = array_values($this->visibleto['permissions']);
+        $visible = [];
+        if (isset($this->visibleto['permissions'])) {
+            $visible = array_values($this->visibleto['permissions']);
+        }
         // Make a simple array.
         return $this->user_is_admin($USER) || (array_intersect($permissions, $this->visibleto['permissions'])) ||
         ($isentryauthor && in_array(mod_datalynx\datalynx::PERMISSION_AUTHOR, $visible));
@@ -242,7 +245,9 @@ class datalynx_field_behavior {
         $formdata->name = $record->name;
         $formdata->description = $record->description;
         $visible = unserialize($record->visibleto);
-        $formdata->visibletopermission = $visible['permissions'];
+        if (isset($visible['permissions'])){
+            $formdata->visibletopermission = $visible['permissions'];
+        }
         $formdata->visibletouser = $visible['users'] ?? [];
         $formdata->visibletoteammember = $visible['teammember'] ?? [];
         $formdata->editableby = unserialize($record->editableby);

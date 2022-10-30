@@ -119,7 +119,7 @@ foreach ($behaviors as $behaviorid => $behavior) {
 
     $fieldvisible = '';
     foreach ($permissionnames as $permissionid => $permissionname) {
-        if (in_array($permissionid, $visibleto['permissions'])) {
+        if (isset($visibleto['permissions']) && in_array($permissionid, $visibleto['permissions'])) {
             $fieldvisible .= $OUTPUT->pix_icon('i/completion-manual-enabled', $permissionname, 'moodle',
                     array('data-behavior-id' => $behaviorid, 'data-permission-id' => $permissionid,
                             'data-for' => 'visibleto'));

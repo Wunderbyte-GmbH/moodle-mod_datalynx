@@ -22,9 +22,9 @@
  */
 defined('MOODLE_INTERNAL') or die();
 $plugin->component = 'mod_datalynx';
-$plugin->version = 2022080800;
-$plugin->release = 'v2.3-DataMystery'; // Data words like data science, data mining.
-$plugin->requires = 2020061500;
+$plugin->version = 2022103000;
+$plugin->release = 'v2.4-DataMystery'; // Data words like data science, data mining.
+$plugin->requires = 2022041900;
 $plugin->maturity = MATURITY_STABLE;
 $plugin->dependencies = array(
     'assignfeedback_editpdf' => ANY_VERSION // We use fpdi from this core module.

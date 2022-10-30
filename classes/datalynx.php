@@ -2253,7 +2253,7 @@ class datalynx {
      * @return int[] Array of IDs of permissions the user has in this instance.
      * @throws coding_exception
      */
-    public function get_user_datalynx_permissions($userid = 0, $type = 'any') {
+    public function get_user_datalynx_permissions(int $userid = 0, string $type = 'any'): array {
         global $USER, $DB;
 
         if (!$userid) {
