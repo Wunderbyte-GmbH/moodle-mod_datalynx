@@ -23,6 +23,9 @@
  * @copyright 2013 onwards David Bogner, Michael Pollak
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+use core_user\fields;
+
 defined('MOODLE_INTERNAL') or die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
@@ -247,11 +250,12 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
             $user = $USER;
         } else {
             $user = new stdClass();
-            foreach (explode(',', user_picture::fields()) as $userfield) {
-                if ($userfield == 'id') {
-                    $user->id = $entry->uid;
-                } else {
+            $picturefields = fields::get_picture_fields();
+            foreach ($picturefields as $userfield) {
+                if (isset($entry->{$userfield})) {
                     $user->{$userfield} = $entry->{$userfield};
+                } else {
+                    $user->{$userfield} = "";
                 }
             }
         }
@@ -297,6 +301,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
 
     /**
      * Display all badges a user has earned in an entry view.
+     *
      * @param $entry
      * @return string
      */
