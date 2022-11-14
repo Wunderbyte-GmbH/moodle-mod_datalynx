@@ -167,6 +167,7 @@ if ($fields) {
     $table->no_sorting('duplicate');
     $table->no_sorting('delete');
     $table->no_sorting('selectallnone');
+    $table->no_sorting('convert');
 
     // Column styles.
     $table->set_attribute('class', 'generaltable generalbox boxaligncenter boxwidthwide');
