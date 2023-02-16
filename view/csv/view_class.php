@@ -449,7 +449,8 @@ class datalynxview_csv extends datalynxview_base {
      */
     public function execute_import($data) {
         if ($data->eids) {
-            $this->_entries->process_entries('update', $data->eids, $data, true);
+            list($strnotify, $data) = $this->_entries->process_entries('update', $data->eids, $data, true);
+            $this->_notifications['good']['entries'] = $strnotify;
             return true;
         } else {
             return null;
