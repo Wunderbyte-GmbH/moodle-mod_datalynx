@@ -696,7 +696,7 @@ abstract class datalynxview_base {
                 $this->view->{"e$editor"} = NULL;
                 continue;
             }
-            
+
             $text = $this->view->{"e$editor"};
             $text = $this->mask_tags($text);
             $text = format_text($text, FORMAT_HTML, array('trusted' => 1, 'filter' => true));
@@ -1295,7 +1295,7 @@ abstract class datalynxview_base {
      * Set display definition
      *
      * @param array|null $options
-     * @return bool
+     * @return booly
      * @throws coding_exception
      */
     protected function set__display_definition(array $options = null) {
@@ -1305,9 +1305,8 @@ abstract class datalynxview_base {
         $requiresmanageentries = false;
 
         $editentries = null;
-
         // Display a new entry to add in its own group.
-        if ($this->_editentries < 0) {
+        if ($this->_editentries < 0 && $this->_editentries != "") {
             if ($this->_df->user_can_manage_entry()) {
                 $this->_display_definition['newentry'] = array();
                 for ($i = -1; $i >= $this->_editentries; $i--) {
@@ -1335,7 +1334,7 @@ abstract class datalynxview_base {
                 // Calculate manageability for this entry only if action buttons can be displayed.
                 // And we're not already editing it.
                 $manageable = false;
-                if ($displayactions and !$editthisone) {
+                if ($displayactions && !$editthisone) {
                     $manageable = $this->_df->user_can_manage_entry($entry);
                 }
 
