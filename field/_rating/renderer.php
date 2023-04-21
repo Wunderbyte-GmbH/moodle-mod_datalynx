@@ -95,10 +95,10 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
 
             $entry->rating = $rm->get_rating_object($entry, $rec);
 
-            $aggravg = round($entry->rating->aggregate[datalynxfield__rating::AGGREGATE_AVG], 2);
-            $aggrmax = round($entry->rating->aggregate[datalynxfield__rating::AGGREGATE_MAX], 2);
-            $aggrmin = round($entry->rating->aggregate[datalynxfield__rating::AGGREGATE_MIN], 2);
-            $aggrsum = round($entry->rating->aggregate[datalynxfield__rating::AGGREGATE_SUM], 2);
+            $aggravg = round($entry->rating->aggregate[datalynxfield__rating::AGGREGATE_AVG] ?: 0, 2);
+            $aggrmax = round($entry->rating->aggregate[datalynxfield__rating::AGGREGATE_MAX] ?: 0, 2);
+            $aggrmin = round($entry->rating->aggregate[datalynxfield__rating::AGGREGATE_MIN] ?: 0, 2);
+            $aggrsum = round($entry->rating->aggregate[datalynxfield__rating::AGGREGATE_SUM] ?: 0, 2);
 
             // Get all ratings for inline view.
             if (in_array('##ratings:viewinline##', $tags)) {
