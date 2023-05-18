@@ -954,7 +954,7 @@ abstract class datalynxview_base {
             $patterns[$id] = preg_quote($pattern, '/');
         }
         $delims = implode('|', $patterns);
-        $elements = preg_split("/($delims)/", $subject, null, PREG_SPLIT_DELIM_CAPTURE);
+        $elements = preg_split("/($delims)/", $subject, 0, PREG_SPLIT_DELIM_CAPTURE);
 
         return $elements;
     }
