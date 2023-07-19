@@ -143,8 +143,10 @@ class datalynxfield_coursegroup extends datalynxfield_base {
     }
 
     /**
+     * {@inheritDoc}
+     * @see datalynxfield_base::get_search_sql()
      */
-    public function get_search_sql($search) {
+    public function get_search_sql(array $search): array {
         global $DB, $CFG, $USER, $PAGE;
 
         list($not, $operator, $value) = $search;

@@ -161,8 +161,10 @@ class datalynxfield_duration extends datalynxfield_base {
     }
 
     /**
+     * {@inheritDoc}
+     * @see datalynxfield_base::get_search_sql()
      */
-    public function get_search_sql($search) {
+    public function get_search_sql(array $search): array {
         global $DB;
 
         list($not, $operator, $value) = $search;

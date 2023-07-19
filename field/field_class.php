@@ -620,13 +620,12 @@ abstract class datalynxfield_base {
     }
 
     /**
+     * Create the SQL query based on different params.
      *
-     * @param $search
-     * @return array|null $fieldsql, $fieldparams, $fromcontent
-     * @throws coding_exception
-     * @throws dml_exception
+     * @param array $search
+     * @return array $fieldsql, $fieldparams, $fromcontent or empty array
      */
-    public function get_search_sql($search) {
+    public function get_search_sql(array $search): array {
         global $DB;
 
         list($not, $operator, $value) = $search;
@@ -686,7 +685,7 @@ abstract class datalynxfield_base {
                 $sql = " e.id $notinids ";
                 return array($sql, $params, false);
             } else {
-                return null;
+                return array('', '', '');
             }
         } else {
             return array($sql, $params, true);
@@ -1107,7 +1106,11 @@ class datalynxfield_option_multiple extends datalynxfield_option {
         return array($contents, $oldcontents);
     }
 
-    public function get_search_sql($search) {
+    /**
+     * {@inheritDoc}
+     * @see datalynxfield_base::get_search_sql()
+     */
+    public function get_search_sql(array $search): array {
         global $DB;
 
         list($not, $operator, $value) = $search;
@@ -1343,7 +1346,7 @@ class datalynxfield_option_single extends datalynxfield_option {
      * {@inheritDoc}
      * @see datalynxfield_base::get_search_sql()
      */
-    public function get_search_sql($search) {
+    public function get_search_sql(array $search): array {
         global $DB;
 
         list($not, $operator, $value) = $search;

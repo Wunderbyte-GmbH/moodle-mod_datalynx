@@ -63,8 +63,10 @@ class datalynxfield__approve extends datalynxfield_no_content {
     }
 
     /**
+     * {@inheritDoc}
+     * @see datalynxfield_base::get_search_sql()
      */
-    public function get_search_sql($search) {
+    public function get_search_sql(array $search): array {
         $value = $search[2];
         return array(" e.approved = $value ", array(), false);
     }

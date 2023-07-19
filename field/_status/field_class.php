@@ -76,7 +76,11 @@ class datalynxfield__status extends datalynxfield_no_content {
         return 'e.status';
     }
 
-    public function get_search_sql($search) {
+    /**
+     * {@inheritDoc}
+     * @see datalynxfield_base::get_search_sql()
+     */
+    public function get_search_sql(array $search): array {
         static $i = 0;
         $not = $search[0];
         $value = $search[2];

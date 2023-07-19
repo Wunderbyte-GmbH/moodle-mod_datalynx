@@ -131,8 +131,10 @@ class datalynxfield_time extends datalynxfield_base {
     /**
      * Returns the sql for selecting entries which match the given criterion for this field
      * Possible criterions: BETWEEN, equal(=), after(>), before(<), IS EMPTY, IS NOT EMPTY
+     * {@inheritDoc}
+     * @see datalynxfield_base::get_search_sql()
      */
-    public function get_search_sql($search) {
+    public function get_search_sql(array $search): array {
         list($not, $operator, $value) = $search;
 
         if (is_array($value)) {

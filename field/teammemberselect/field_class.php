@@ -311,7 +311,11 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         return $options;
     }
 
-    public function get_search_sql($search) {
+    /**
+     * {@inheritDoc}
+     * @see datalynxfield_base::get_search_sql()
+     */
+    public function get_search_sql(array $search): array {
         global $DB;
         static $i = 0;
         list($not, $operator, $value) = $search;

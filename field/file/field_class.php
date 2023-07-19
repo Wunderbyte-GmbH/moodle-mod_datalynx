@@ -259,12 +259,10 @@ class datalynxfield_file extends datalynxfield_base {
 
     /**
      *
-     * @param $search
-     * @return array|null $fieldsql, $fieldparams, $fromcontent
-     * @throws coding_exception
-     * @throws dml_exception
+     * {@inheritDoc}
+     * @see datalynxfield_base::get_search_sql()
      */
-    public function get_search_sql($search) {
+    public function get_search_sql(array $search): array {
         list($not, $operator, $value) = $search;
 
         // If we deal with files it is also missing if content is 0.

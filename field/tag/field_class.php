@@ -119,7 +119,7 @@ class datalynxfield_tag extends datalynxfield_option_multiple {
      * {@inheritDoc}
      * @see datalynxfield_option_multiple::get_search_sql()
      */
-    public function get_search_sql($search) {
+    public function get_search_sql(array $search): array {
         global $DB;
 
         // Variable $not is either empty or "NOT".

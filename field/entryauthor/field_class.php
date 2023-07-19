@@ -142,8 +142,10 @@ class datalynxfield_entryauthor extends datalynxfield_no_content {
     }
 
     /**
+     * {@inheritDoc}
+     * @see datalynxfield_base::get_search_sql()
      */
-    public function get_search_sql($search) {
+    public function get_search_sql(array $search): array {
         global $USER, $DB;
         list($not, $operator, $value) = $search;
 
