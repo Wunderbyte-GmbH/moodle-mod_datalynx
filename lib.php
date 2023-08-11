@@ -700,31 +700,32 @@ function datalynx_extend_navigation($navigation, $course, $module, $cm) {
  * @param navigation_node $datanode The node to add module settings to
  */
 function datalynx_extend_settings_navigation(settings_navigation $settings, navigation_node $dfnode) {
-    global $PAGE, $USER;
+    global $USER;
 
-    $templatesmanager = has_capability('mod/datalynx:managetemplates', $PAGE->cm->context);
-    $entriesmanager = has_capability('mod/datalynx:manageentries', $PAGE->cm->context);
+    $page = $settings->get_page();
+    $templatesmanager = has_capability('mod/datalynx:managetemplates', $page->cm->context);
+    $entriesmanager = has_capability('mod/datalynx:manageentries', $page->cm->context);
 
     // Delete.
     if ($templatesmanager) {
         $dfnode->add(get_string('delete'),
                 new moodle_url('/course/mod.php',
-                        array('delete' => $PAGE->cm->id, 'sesskey' => sesskey()
+                        array('delete' => $page->cm->id, 'sesskey' => sesskey()
                         )));
     }
 
     // Index.
-    if (has_capability('mod/datalynx:viewindex', $PAGE->cm->context)) {
+    if (has_capability('mod/datalynx:viewindex', $page->cm->context)) {
         $dfnode->add(get_string('index', 'datalynx'),
-                new moodle_url('/mod/datalynx/index.php', array('id' => $PAGE->course->id)));
+                new moodle_url('/mod/datalynx/index.php', array('id' => $page->course->id)));
     }
 
     // Notifications.
     if (isloggedin() and !isguestuser()) {
         $dfnode->add(get_string('messages', 'message'),
                 new moodle_url('/message/edit.php',
-                        array('id' => $USER->id, 'course' => $PAGE->course->id,
-                                'context' => $PAGE->context->id)));
+                        array('id' => $USER->id, 'course' => $page->course->id,
+                                'context' => $page->context->id)));
     }
 
     // Manage.
@@ -732,35 +733,35 @@ function datalynx_extend_settings_navigation(settings_navigation $settings, navi
         $manage = $dfnode->add(get_string('manage', 'datalynx'));
         if ($templatesmanager) {
             $manage->add(get_string('views', 'datalynx'),
-                    new moodle_url('/mod/datalynx/view/index.php', array('id' => $PAGE->cm->id)));
+                    new moodle_url('/mod/datalynx/view/index.php', array('id' => $page->cm->id)));
             $fields = $manage->add(get_string('fields', 'datalynx'),
-                    new moodle_url('/mod/datalynx/field/index.php', array('id' => $PAGE->cm->id)));
+                    new moodle_url('/mod/datalynx/field/index.php', array('id' => $page->cm->id)));
             $manage->add(get_string('filters', 'datalynx'),
-                    new moodle_url('/mod/datalynx/filter/index.php', array('id' => $PAGE->cm->id)));
+                    new moodle_url('/mod/datalynx/filter/index.php', array('id' => $page->cm->id)));
             $manage->add(get_string('customfilters', 'datalynx'),
-                    new moodle_url('/mod/datalynx/customfilter/index.php', array('id' => $PAGE->cm->id)));
+                    new moodle_url('/mod/datalynx/customfilter/index.php', array('id' => $page->cm->id)));
             $manage->add(get_string('rules', 'datalynx'),
-                    new moodle_url('/mod/datalynx/rule/index.php', array('id' => $PAGE->cm->id)));
+                    new moodle_url('/mod/datalynx/rule/index.php', array('id' => $page->cm->id)));
             $manage->add(get_string('tools', 'datalynx'),
-                    new moodle_url('/mod/datalynx/tool/index.php', array('id' => $PAGE->cm->id)));
+                    new moodle_url('/mod/datalynx/tool/index.php', array('id' => $page->cm->id)));
             $manage->add(get_string('jsinclude', 'datalynx'),
                     new moodle_url('/mod/datalynx/js.php',
-                            array('id' => $PAGE->cm->id, 'jsedit' => 1)));
+                            array('id' => $page->cm->id, 'jsedit' => 1)));
             $manage->add(get_string('cssinclude', 'datalynx'),
                     new moodle_url('/mod/datalynx/css.php',
-                            array('id' => $PAGE->cm->id, 'cssedit' => 1)));
+                            array('id' => $page->cm->id, 'cssedit' => 1)));
             $manage->add(get_string('presets', 'datalynx'),
-                    new moodle_url('/mod/datalynx/preset/index.php', array('id' => $PAGE->cm->id)));
+                    new moodle_url('/mod/datalynx/preset/index.php', array('id' => $page->cm->id)));
             $manage->add(get_string('statistics', 'datalynx'),
                     new moodle_url('/mod/datalynx/statistics/index.php',
-                            array('id' => $PAGE->cm->id)));
+                            array('id' => $page->cm->id)));
             $fields->add(get_string('behaviors', 'datalynx'),
-                    new moodle_url('/mod/datalynx/behavior/index.php', array('id' => $PAGE->cm->id)));
+                    new moodle_url('/mod/datalynx/behavior/index.php', array('id' => $page->cm->id)));
             $fields->add(get_string('renderers', 'datalynx'),
-                    new moodle_url('/mod/datalynx/renderer/index.php', array('id' => $PAGE->cm->id)));
+                    new moodle_url('/mod/datalynx/renderer/index.php', array('id' => $page->cm->id)));
         }
         $manage->add(get_string('import', 'datalynx'),
-                new moodle_url('/mod/datalynx/import.php', array('id' => $PAGE->cm->id)));
+                new moodle_url('/mod/datalynx/import.php', array('id' => $page->cm->id)));
     }
 }
 
