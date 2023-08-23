@@ -506,8 +506,8 @@ class datalynx_entries {
     /**
      * Process entries when after editing content for saving into db
      *
-     * @param $action
-     * @param $eids
+     * @param string $action
+     * @param string $eids
      * @param null $data
      * @param bool $confirmed
      * @return array notificationstrings, list of processed ids
@@ -515,9 +515,10 @@ class datalynx_entries {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public function process_entries($action, $eids, $data = null, $confirmed = false) {
+    public function process_entries(string $action, string $eids, $data = null, bool $confirmed = false): array {
         global $DB, $USER, $OUTPUT, $PAGE;
-        $df = $this->datalynx;
+        $dl = $this->datalynx;
+        $errorstring = '';
 
         $entries = array();
         // Some entries may be specified for action.
@@ -537,13 +538,13 @@ class datalynx_entries {
 
                 // TODO Prepare counters for adding new entries.
                 $addcount = 0;
-                $addmax = $df->data->maxentries;
-                $perinterval = ($df->data->intervalcount > 1);
-                if ($addmax != -1 and has_capability('mod/datalynx:manageentries', $df->context)) {
+                $addmax = $dl->data->maxentries;
+                $perinterval = ($dl->data->intervalcount > 1);
+                if ($addmax != -1 and has_capability('mod/datalynx:manageentries', $dl->context)) {
                     $addmax = -1;
                 } else {
                     if ($addmax != -1) {
-                        $addmax = max(0, $addmax - $df->user_num_entries($perinterval));
+                        $addmax = max(0, $addmax - $dl->user_num_entries($perinterval));
                     }
                 }
 
@@ -560,13 +561,13 @@ class datalynx_entries {
                         if ($eid > 0) {
                             $importentryids[] = $eid;
 
-                            // New entries ($eid is the number of new entries.
+                            // New entries $eid is the number of new entries.
                         } else {
                             if ($eid < 0) {
                                 $addcount++;
                                 if ($addmax == -1 || $addmax >= $addcount) {
                                     $entry->id = 0;
-                                    $entry->groupid = $df->currentgroup;
+                                    $entry->groupid = $dl->currentgroup;
                                     $entry->userid = $USER->id;
                                     $entries[$eid] = $entry;
                                 }
@@ -577,11 +578,11 @@ class datalynx_entries {
 
                 // All other types of processing must refer to specific entry ids.
             } else {
-                $entries = $DB->get_records_select('datalynx_entries', "dataid = ? AND id IN ($eids)", array($df->id()));
+                $entries = $DB->get_records_select('datalynx_entries', "dataid = ? AND id IN ($eids)", array($dl->id()));
             }
 
             if (!empty($importentryids)) {
-                $filterdata = array('dataid' => $df->id(), 'eids' => $importentryids);
+                $filterdata = array('dataid' => $dl->id(), 'eids' => $importentryids);
                 $filter = new datalynx_filter((object) $filterdata);
                 $entries += $this->get_entries(array('filter' => $filter))->entries;
             }
@@ -590,14 +591,19 @@ class datalynx_entries {
                 foreach ($entries as $eid => $entry) {
                     // Filter approvable entries.
                     if (($action == 'approve' or $action == 'disapprove') and
-                            !has_capability('mod/datalynx:approve', $df->context)
+                            !has_capability('mod/datalynx:approve', $dl->context)
                     ) {
                         unset($entries[$eid]);
-
+                        $capname = get_string('datalynx:approve', 'mod_datalynx');
+                        $errorstring .= get_string('missingrequiredcapability', 'webservice', $capname) ;
+                        $errorstring .= get_string('affectedid', 'mod_datalynx', $eid) . '<br>';
                         // Filter managable entries.
                     } else {
-                        if (!$df->user_can_manage_entry($entry)) {
+                        if (!$dl->user_can_manage_entry($entry)) {
                             unset($entries[$eid]);
+                            $capname = get_string('updateentry', 'mod_datalynx');
+                            $errorstring .= get_string('missingrequiredcapability', 'webservice', $capname) ;
+                            $errorstring .= get_string('affectedid', 'mod_datalynx', $eid) . '<br>';
                         }
                     }
                 }
@@ -605,7 +611,7 @@ class datalynx_entries {
         }
 
         if (empty($entries)) {
-            return array(get_string("entrynoneforaction", 'datalynx'), '');
+            return array(get_string("entrynoneforaction", 'datalynx') . '<br>' . $errorstring, '');
         } else {
             if (!$confirmed) {
 
@@ -632,7 +638,7 @@ class datalynx_entries {
                         $strnotify = 'entriesupdated';
 
                         if (!is_null($data)) {
-                            $fields = $df->get_fields();
+                            $fields = $dl->get_fields();
 
                             // First parse the data to collate content in an array for each recognized field.
                             $contents = array_fill_keys(array_keys($entries),
@@ -875,7 +881,7 @@ class datalynx_entries {
                             }
                             if ($processed) {
                                 $eventdata = (object) array('items' => $processed);
-                                $df->events_trigger("entry$addorupdate", $eventdata);
+                                $dl->events_trigger("entry$addorupdate", $eventdata);
                             }
                         }
                         break;
@@ -884,7 +890,7 @@ class datalynx_entries {
                         $completiontype = COMPLETION_COMPLETE;
                         foreach ($entries as $entry) {
                             // Can user add anymore entries?
-                            if (!$df->user_can_manage_entry()) {
+                            if (!$dl->user_can_manage_entry()) {
                                 // TODO: notify something.
                                 break;
                             }
@@ -895,12 +901,12 @@ class datalynx_entries {
                             // Add a duplicated entry and content.
                             $newentry = $entry;
                             $newentry->userid = $USER->id;
-                            $newentry->dataid = $df->id();
-                            $newentry->groupid = $df->currentgroup;
+                            $newentry->dataid = $dl->id();
+                            $newentry->groupid = $dl->currentgroup;
                             $newentry->timecreated = $newentry->timemodified = time();
 
-                            if ($df->data->approval and
-                                    !has_capability('mod/datalynx:approve', $df->context)
+                            if ($dl->data->approval and
+                                    !has_capability('mod/datalynx:approve', $dl->context)
                             ) {
                                 $newentry->approved = 0;
                             }
@@ -919,7 +925,7 @@ class datalynx_entries {
 
                         if ($processed) {
                             $eventdata = (object) array('items' => $processed);
-                            $df->events_trigger("entryadded", $eventdata);
+                            $dl->events_trigger("entryadded", $eventdata);
                         }
 
                         $strnotify = 'entriesduplicated';
@@ -931,14 +937,14 @@ class datalynx_entries {
                         $entryids = array_keys($entries);
                         $ids = implode(',', $entryids);
                         $DB->set_field_select('datalynx_entries', 'approved', 1,
-                                " dataid = ? AND id IN ($ids) ", array($df->id()));
+                                " dataid = ? AND id IN ($ids) ", array($dl->id()));
                         $processed = $entries;
 
                         $processed += $this->create_approved_entries_for_team($entryids);
 
                         if ($processed) {
                             $eventdata = (object) array('items' => $processed);
-                            $df->events_trigger("entryapproved", $eventdata);
+                            $dl->events_trigger("entryapproved", $eventdata);
                         }
 
                         $strnotify = 'entriesapproved';
@@ -950,11 +956,11 @@ class datalynx_entries {
                         $entryids = array_keys($entries);
                         $ids = implode(',', $entryids);
                         $DB->set_field_select('datalynx_entries', 'approved', 0,
-                                " dataid = ? AND id IN ($ids) ", array($df->id()));
+                                " dataid = ? AND id IN ($ids) ", array($dl->id()));
                         $processed = $entries;
                         if ($processed) {
                             $eventdata = (object) array('items' => $processed);
-                            $df->events_trigger("entrydisapproved", $eventdata);
+                            $dl->events_trigger("entrydisapproved", $eventdata);
                         }
 
                         $strnotify = 'entriesdisapproved';
@@ -964,7 +970,7 @@ class datalynx_entries {
                         $completiontype = COMPLETION_INCOMPLETE;
                         // Deletable entries should be filtered above.
                         foreach ($entries as $entry) {
-                            $fields = $df->get_fields();
+                            $fields = $dl->get_fields();
                             foreach ($fields as $field) {
                                 $field->delete_content($entry->id);
                             }
@@ -974,7 +980,7 @@ class datalynx_entries {
                         }
                         if ($processed) {
                             $eventdata = (object) array('items' => $processed);
-                            $df->events_trigger("entrydeleted", $eventdata);
+                            $dl->events_trigger("entrydeleted", $eventdata);
                         }
 
                         $strnotify = 'entriesdeleted';
@@ -986,13 +992,13 @@ class datalynx_entries {
 
                 if ($processed) {
                     // Update completion state.
-                    $completion = new completion_info($df->course);
-                    if ($completion->is_enabled($df->cm) &&
-                            $df->cm->completion == COMPLETION_TRACKING_AUTOMATIC &&
-                            $df->data->completionentries
+                    $completion = new completion_info($dl->course);
+                    if ($completion->is_enabled($dl->cm) &&
+                            $dl->cm->completion == COMPLETION_TRACKING_AUTOMATIC &&
+                            $dl->data->completionentries
                     ) {
                         foreach ($processed as $entry) {
-                            $completion->update_state($df->cm, $completiontype, $entry->userid);
+                            $completion->update_state($dl->cm, $completiontype, $entry->userid);
                         }
                     }
                     $strnotify = get_string($strnotify, 'datalynx', count($processed));
@@ -1000,7 +1006,7 @@ class datalynx_entries {
                     $strnotify = get_string($strnotify, 'datalynx', get_string('no'));
                 }
 
-                return array($strnotify, array_keys($processed));
+                return array($strnotify . $errorstring, array_keys($processed));
             }
         }
     }
@@ -1014,10 +1020,9 @@ class datalynx_entries {
      */
     public function create_approved_entries_for_team(array $entryids) {
         global $DB;
+        $dl = $this->datalynx;
 
-        $df = $this->datalynx;
-
-        $fields = $df->get_fields();
+        $fields = $dl->get_fields();
         $teamfield = false;
         foreach ($fields as $field) {
             if ($field->type == 'teammemberselect' && $field->referencefieldid) {
@@ -1072,7 +1077,7 @@ class datalynx_entries {
                                  AND dc.fieldid = :fieldid
                                  AND $sqllike";
                         $existingentryid = $DB->get_field_sql($query,
-                                array('dataid' => $df->id(), 'userid' => $teammemberid,
+                                array('dataid' => $dl->id(), 'userid' => $teammemberid,
                                         'fieldid' => $teamfield->referencefieldid,
                                         'content' => $likecontent
                                 ));
@@ -1099,8 +1104,8 @@ class datalynx_entries {
                     } else {
                         $newentry = clone $entry;
                         $newentry->userid = $teammemberid;
-                        $newentry->dataid = $df->id();
-                        $newentry->groupid = $df->currentgroup;
+                        $newentry->dataid = $dl->id();
+                        $newentry->groupid = $dl->currentgroup;
                         $newentry->timecreated = $newentry->timemodified = time();
                         $newentry->approved = 1;
                         $newentry->id = $DB->insert_record('datalynx_entries', $newentry);

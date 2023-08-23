@@ -23,6 +23,7 @@
  *
  */
 $string['actions'] = 'Entry actions';
+$string['affectedid'] = ' Affected entry id: {$a}.';
 $string['alignment'] = 'Alignment';
 $string['allowaddoption'] = 'Allow adding options';
 $string['alphabeticalorder'] = 'Sort the options in alphabetical order when editing an entry?';
@@ -891,6 +892,7 @@ $string['fieldsimportsettings'] = 'Importsettings';
 $string['uploadfile'] = 'File to import';
 $string['uploadtext'] = 'Text to import';
 $string['updateexisting'] = 'Overwrite existing';
+$string['updateentry'] = 'Update entry';
 
 // Privacy API.
 $string['privacy:metadata:datalynx_entries'] = 'Represent entries in a datalynx instance.';

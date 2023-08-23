@@ -22,6 +22,7 @@
  *
  */
 $string['actions'] = 'Aktionen nach Hinzufügen eines Eintrags';
+$string['affectedid'] = ' Betroffene Eintrags-ID: {$a}.';
 $string['alignment'] = 'Ausrichtung';
 $string['allowaddoption'] = 'Bearbeitungseinstellungen zulassen';
 $string['alphabeticalorder'] = 'In der Eintragsbearbeitung die Optionen alphabetisch sortieren?';
@@ -334,6 +335,7 @@ $string['noaccess'] = 'Sie haben zu dieser Seite keinen Zutritt.';
 $string['nocustomfilter'] = 'Fehler in der Programmierung [nocustomfilter]. Kontaktieren Sie bitte den Support.';
 $string['nomatch'] = 'Keine übereinstimmenden Einträge gefunden!';
 $string['nomaximum'] = 'Kein Maximum';
+$string['norighttoapprove'] = 'Sie besitzen nicht die Berechtigung für: ';
 $string['notapproved'] = 'Eintrag wurde noch nicht freigeschaltet.';
 $string['notificationenable'] = 'Benachrichtigungen einschalten für';
 $string['notinjectivemap'] = 'Not an injective map';
@@ -848,6 +850,7 @@ $string['fieldsimportsettings'] = 'Importeinstellungen';
 $string['uploadfile'] = 'Importdatei';
 $string['uploadtext'] = 'Importtext';
 $string['updateexisting'] = 'Vorhandene überschreiben';
+$string['updateentry'] = 'Eintrag bearbeiten';
 
 // Privacy API.
 $string['privacy:metadata:datalynx_entries'] = 'Einträge in einer datalynx Instanz.';
