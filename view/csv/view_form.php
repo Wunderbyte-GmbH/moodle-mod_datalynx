@@ -66,8 +66,10 @@ class datalynxview_csv_form extends datalynxview_base_form {
         // Show a list of fields in this view.
         $view = $this->_view;
         $tags = $view->field_tags();
-        $tags = implode("<br>", $tags['Fields']['Fields']);
-        $mform->addElement('static', 'availablefields', get_string('fields', 'datalynx'), $tags);
+        if (isset($tags['Fields']['Fields']) && !empty($tags['Fields']['Fields'])) {
+            $tags = implode("<br>", $tags['Fields']['Fields']);
+            $mform->addElement('static', 'availablefields', get_string('fields', 'datalynx'), $tags);
+        }
     }
 
     /**
