@@ -34,10 +34,6 @@ class datalynxfield_duration extends datalynxfield_base {
      */
     public $type = 'duration';
 
-    public $width;
-
-    public $widthunit;
-
     protected $_units = null;
 
     /**
@@ -50,9 +46,6 @@ class datalynxfield_duration extends datalynxfield_base {
      */
     public function __construct($df = 0, $field = 0) {
         parent::__construct($df, $field);
-
-        $this->width = $this->field->param2;
-        $this->widthunit = $this->field->param3;
     }
 
     /**

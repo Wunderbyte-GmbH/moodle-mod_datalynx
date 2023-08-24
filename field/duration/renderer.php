@@ -36,13 +36,7 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
         $entryid = $entry->id;
         $fieldname = "field_{$fieldid}_{$entryid}";
 
-        // Field width.
-        $fieldattr = array();
-        if ($field->get('param2')) {
-            $fieldattr['style'] = 'width:' . s($field->get('param2')) . s($field->get('param3')) . ';';
-        }
-
-        $mform->addElement('duration', $fieldname, '', array('optional' => null), $fieldattr);
+        $mform->addElement('duration', $fieldname, '', array('optional' => null));
         $mform->setType($fieldname, PARAM_ALPHANUMEXT);
 
         if ($entryid > 0 and !empty($entry->{"c{$fieldid}_content"})) {
