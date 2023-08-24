@@ -469,7 +469,7 @@ class datalynx {
             }
 
             // Set css body class to add top level category of the dl instance.
-            $category = core_course_category::get($PAGE->course->category);
+            $category = core_course_category::get($PAGE->course->category, MUST_EXIST, true);
             $categories = explode("/", $category->path);
             $bodyclass = "top-cat-{$categories[1]}";
             $PAGE->add_body_class($bodyclass);
