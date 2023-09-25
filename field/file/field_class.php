@@ -43,8 +43,10 @@ class datalynxfield_file extends datalynxfield_base {
     // Content2 - download counter.
 
     /**
+     *  Get alt text, delete, etc.
+     * @return string[]
      */
-    protected function content_names() {
+    protected function content_names(): array {
         return array('filemanager', 'alttext', 'delete', 'editor');
     }
 
@@ -57,7 +59,7 @@ class datalynxfield_file extends datalynxfield_base {
         $fieldid = $this->field->id;
 
         // This sets variables by resetting every part from the array key.
-        $filemanager = $alttext = $delete = $editor = null;
+        $filemanager = $alttext = $editor = null;
         if (!empty($values)) {
             foreach ($values as $name => $value) {
                 if (!empty($name) and !empty($value)) {
@@ -72,7 +74,7 @@ class datalynxfield_file extends datalynxfield_base {
         }
 
         // Contentid to locate in table.
-        $contentid = isset($entry->{"c{$this->field->id}_id"}) ? $entry->{"c{$this->field->id}_id"} : null;
+        $contentid = $entry->{"c{$this->field->id}_id"} ?? null;
 
         $usercontext = context_user::instance($USER->id);
 
@@ -115,19 +117,19 @@ class datalynxfield_file extends datalynxfield_base {
 
     /**
      */
-    protected function format_content($entry, array $values = null) {
+    protected function format_content($entry, array $values = null): array {
         return array(null, null, null);
     }
 
     /**
      */
-    public function get_content_parts() {
+    public function get_content_parts(): array {
         return array('content', 'content1', 'content2');
     }
 
     /**
      */
-    public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
+    public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null): bool {
         global $USER;
 
         // Check if not a csv import.
@@ -138,7 +140,7 @@ class datalynxfield_file extends datalynxfield_base {
         $fieldid = $this->field->id;
         $fieldname = $this->name();
         $csvname = $importsettings[$fieldname]['name'];
-        $fileurls = explode(',', $csvrecord[$csvname]); ;
+        $fileurls = explode(',', $csvrecord[$csvname]);
 
         // Prepare the draftarea where to put all files
         $draftitemid = file_get_submitted_draft_itemid("field_{$fieldid}_{$entryid}_filemanager");
@@ -192,7 +194,7 @@ class datalynxfield_file extends datalynxfield_base {
      * @param $url
      * @return bool
      */
-    protected function validate_url($url) {
+    protected function validate_url($url): bool {
         $path = parse_url($url, PHP_URL_PATH);
         $encodedpath = array_map('urlencode', explode('/', $path));
         $url = str_replace($path, implode('/', $encodedpath), $url);
@@ -202,18 +204,22 @@ class datalynxfield_file extends datalynxfield_base {
 
     /**
      */
-    protected function update_content_files($contentid, $params = null) {
+    protected function update_content_files($contentid, $params = null): bool {
         return true;
     }
 
     /**
+     * @param $entry
+     * @param array|null $values
+     * @return bool
+     * @throws file_exception
+     * @throws stored_file_creation_exception
      */
-    protected function save_changes_to_file($entry, array $values = null) {
+    protected function save_changes_to_file($entry, array $values = null): bool {
         $fieldid = $this->field->id;
-        $entryid = $entry->id;
         $fieldname = "field_{$fieldid}_{$entry->id}";
 
-        $contentid = isset($entry->{"c{$this->field->id}_id"}) ? $entry->{"c{$this->field->id}_id"} : null;
+        $contentid = $entry->{"c{$this->field->id}_id"} ?? null;
 
         $options = array('context' => $this->df->context);
         $data = (object) $values;
@@ -222,9 +228,9 @@ class datalynxfield_file extends datalynxfield_base {
 
         // Get the file content.
         $fs = get_file_storage();
-        $file = reset(
-                $fs->get_area_files($this->df->context->id, 'mod_datalynx', 'content', $contentid,
-                        'sortorder', false));
+        $array = $fs->get_area_files($this->df->context->id, 'mod_datalynx', 'content', $contentid,
+                'sortorder', false);
+        $file = reset($array);
         $filecontent = $file->get_content();
 
         // Find content position (between body tags).
@@ -276,15 +282,17 @@ class datalynxfield_file extends datalynxfield_base {
      * Are fields of this field type suitable for use in customfilters?
      * @return bool
      */
-    public static function is_customfilterfield() {
+    public static function is_customfilterfield(): bool {
         return true;
     }
 
     /**
      * Is $value a valid content or do we see an empty input?
+     *
+     * @param $value
      * @return bool
      */
-    public static function is_fieldvalue_empty($value) {
+    public static function is_fieldvalue_empty($value): bool {
         // TODO: We see a draftarea id, need to determine if files are linked to it.
         global $DB;
         $filesizes = $DB->get_records_menu('files',

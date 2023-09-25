@@ -38,7 +38,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
         $entryid = $entry->id;
 
         // If we see a 0 in content there are no files stored. Create new draft area.
-        $content = isset($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : null;
+        $content = $entry->{"c{$fieldid}_content"} ?? null;
         if ($content == 0 || !isset($entry->{"c{$fieldid}_id"})) {
             $contentid = null;
         } else {
@@ -74,10 +74,10 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
         $fieldid = $field->id();
         $entryid = $entry->id;
 
-        $content = isset($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : null;
-        $content1 = isset($entry->{"c{$fieldid}_content1"}) ? $entry->{"c{$fieldid}_content1"} : null;
-        $content2 = isset($entry->{"c{$fieldid}_content2"}) ? $entry->{"c{$fieldid}_content2"} : null;
-        $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
+        $content = $entry->{"c{$fieldid}_content"} ?? null;
+        $content1 = $entry->{"c{$fieldid}_content1"} ?? null;
+        $content2 = $entry->{"c{$fieldid}_content2"} ?? null;
+        $contentid = $entry->{"c{$fieldid}_id"} ?? null;
 
         if (empty($content)) {
             return '';
@@ -96,12 +96,6 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
             return '';
         }
 
-        $altname = empty($content1) ? '' : s($content1);
-
-        if (!empty($params['alt'])) {
-            return $altname;
-        }
-
         $strfiles = array();
         foreach ($files as $file) {
             if (!$file->is_directory()) {
@@ -109,7 +103,8 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
                 $filename = $file->get_filename();
                 $filenameinfo = pathinfo($filename);
                 $path = "/{$field->df()->context->id}/mod_datalynx/content/$contentid";
-
+                // ToDo: Remove or implement altname.
+                $altname = "";
                 $strfiles[] = $this->display_file($file, $path, $altname, $params);
             }
         }
@@ -148,9 +143,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
 
     /**
      */
-    protected function display_file($file, $path, $altname, $params = null) {
-        global $CFG;
-
+    protected function display_file($file, string $path, string $altname = '', ?array $params = null) {
         $filename = $file->get_filename();
         $pluginfileurl = '/pluginfile.php';
 
@@ -177,20 +170,14 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
 
     /**
      */
-    protected function display_link($file, $path, $altname, $params = null) {
-        global $OUTPUT, $CFG;
+    protected function display_link($file, $path, $altname, $params = null): string {
+        global $OUTPUT;
 
         $filename = $file->get_filename();
-        $displayname = $altname ? $altname : $filename;
-        if ($CFG->branch >= 33) {
-            $fileicon = html_writer::empty_tag('img',
-                    array('src' => $OUTPUT->image_url(file_mimetype_icon($file->get_mimetype())),
+        $displayname = $altname ?: $filename;
+        $fileicon = html_writer::empty_tag('img',
+                array('src' => $OUTPUT->image_url(file_mimetype_icon($file->get_mimetype())),
                         'alt' => $file->get_mimetype(), 'height' => 16, 'width' => 16));
-        } else {
-            $fileicon = html_writer::empty_tag('img',
-                    array('src' => $OUTPUT->pix_url(file_mimetype_icon($file->get_mimetype())),
-                        'alt' => $file->get_mimetype(), 'height' => 16, 'width' => 16));
-        }
 
         if (!empty($params['download'])) {
             list(, $context, , , $contentid) = explode('/', $path);
@@ -205,14 +192,14 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
 
     /**
      */
-    public function pluginfile_patterns() {
+    public function pluginfile_patterns(): array {
         return array("[[{$this->_field->name()}]]");
     }
 
     /**
      * Array of patterns this field supports
      */
-    protected function patterns() {
+    protected function patterns(): array {
         $fieldname = $this->_field->name();
 
         $patterns = parent::patterns();
@@ -230,7 +217,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
     /**
      * Returns comma seperated list of urls in this entry.
      */
-    public function render_csv($strfiles) {
+    public function render_csv($strfiles): string {
         $regex = '/https?\:\/\/[^\" ]+/i';
         $matches = array();
         foreach ($strfiles as $strfile) {
@@ -239,6 +226,5 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
         }
 
         return implode(",", $matches);
-
     }
 }

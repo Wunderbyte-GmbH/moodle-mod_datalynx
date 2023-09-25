@@ -47,7 +47,7 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
                 WHERE m.name = 'datalynx'";
         if ($CFG->branch >= 32) {
             $sql .= " AND cm.deletioninprogress = 0";
-        };
+        }
         if ($datalynxs = $DB->get_records_sql($sql)) {
             foreach ($datalynxs as $dfid => $datalynx) {
                 if ($dfid != $this->_df->id()) {

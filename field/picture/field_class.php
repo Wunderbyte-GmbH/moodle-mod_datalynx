@@ -114,7 +114,7 @@ class datalynxfield_picture extends datalynxfield_file {
      * (Re)generate pic and thumbnail images according to the dimensions specified in the field
      * settings.
      */
-    protected function update_content_files($contentid, $params = null) {
+    protected function update_content_files($contentid, $params = null): bool {
         $updatefile = isset($params['updatefile']) ? $params['updatefile'] : true;
         $updatethumb = isset($params['updatethumb']) ? $params['updatethumb'] : true;
 
@@ -122,7 +122,7 @@ class datalynxfield_picture extends datalynxfield_file {
         if (!$files = $fs->get_area_files($this->df->context->id, 'mod_datalynx', 'content',
                 $contentid)
         ) {
-            return;
+            return false;
         }
 
         // Update dimensions and regenerate thumbs.
