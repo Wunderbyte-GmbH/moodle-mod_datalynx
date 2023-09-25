@@ -93,7 +93,7 @@ abstract class datalynx_rule_base {
      * @return bool
      * @throws coding_exception
      */
-    public abstract function trigger(\core\event\base $event);
+    abstract public function trigger(\core\event\base $event);
 
     /**
      * Checks if the rule triggers on the given event

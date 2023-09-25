@@ -34,7 +34,7 @@ class datalynxfield_picture_form extends datalynxfield_file_form {
         global $CFG;
 
         $mform = &$this->_form;
-        
+
         // Accepted types.
         $this->filetypes_definition();
 
@@ -96,13 +96,13 @@ class datalynxfield_picture_form extends datalynxfield_file_form {
                 array('param10' => array(array(null, 'numeric', null, 'client'))));
         $mform->setDefault('param9', '');
         $mform->setDefault('param10', '');
-        
+
         // Clean up the user interface.
         $mform->hideIf('dispdim', 'param3', 'eq', 'audio');
         $mform->hideIf('maxpicdim', 'param3', 'eq', 'audio');
         $mform->hideIf('thumbnaildim', 'param3', 'eq', 'audio');
         $mform->hideIf('thumbnaildim', 'param3', 'eq', 'video');
-        
+
     }
 
     /**

@@ -295,7 +295,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
             $entryid = $entry->id;
             $fieldname = "field_{$fieldid}_$entryid";
             $classname = "datalynxview_{$fieldid}_{$entryid}";
-            $required = !empty($options ['required']);
+            $required = !empty($options['required']);
 
             $selected = !empty($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : array();
             // A hidden field is added to autocomplete fields by parent Quickform element.

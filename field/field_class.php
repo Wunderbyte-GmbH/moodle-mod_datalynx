@@ -892,7 +892,7 @@ abstract class datalynxfield_option extends datalynxfield_base {
      * @param array $map
      * @return mixed
      */
-    public abstract function update_options($map = array());
+    abstract public function update_options($map = array());
 
     /**
      * When an option from a single/multi choice is deleted / renamed or added
@@ -935,7 +935,7 @@ abstract class datalynxfield_option extends datalynxfield_base {
                 unset($newvalues[$id]);
             }
         }
-        
+
         // NOTE: We don't use this code ever, test till 30.04.2021 and remove after.
         if ($this->field->type != "multiselect") {
             $dummyentry = "0";
@@ -1324,7 +1324,7 @@ class datalynxfield_option_single extends datalynxfield_option {
         AND de.id != :entryid
         GROUP BY dc.content
         HAVING COUNT(dc.id) >= :selectlimit";
-        $params = array('dataid' => $this->df->id(), 'fieldid' => $this->field->id, 
+        $params = array('dataid' => $this->df->id(), 'fieldid' => $this->field->id,
                 'selectlimit' => $this->field->param5, 'entryid' => $entryid);
 
         $results = $DB->get_records_sql($sql, $params);

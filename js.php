@@ -89,51 +89,51 @@ if ($urlparams->jsedit) {
             new moodle_url('/mod/datalynx/js.php', array('d' => $df->id(), 'jsedit' => 1
             )));
 
-            if (!$mform->is_cancelled()) {
-                if ($data = $mform->get_data()) {
-                    $rec = new stdClass();
-                    $rec->js = $data->js;
-                    $rec->jsincludes = $data->jsincludes;
-                    $df->update($rec, get_string('jssaved', 'datalynx'));
+    if (!$mform->is_cancelled()) {
+        if ($data = $mform->get_data()) {
+            $rec = new stdClass();
+            $rec->js = $data->js;
+            $rec->jsincludes = $data->jsincludes;
+            $df->update($rec, get_string('jssaved', 'datalynx'));
 
-                    // Add uploaded files.
-                    $usercontext = context_user::instance($USER->id);
-                    $fs = get_file_storage();
-                    if ($files = $fs->get_area_files($usercontext->id, 'user', 'draft', $data->jsupload,
-                    'sortorder', false)
-                    ) {
-                        $filerec = new stdClass();
-                        $filerec->contextid = $df->context->id;
-                        $filerec->component = 'mod_datalynx';
-                        $filerec->filearea = 'js';
-                        $filerec->filepath = '/';
+            // Add uploaded files.
+            $usercontext = context_user::instance($USER->id);
+            $fs = get_file_storage();
+            if ($files = $fs->get_area_files($usercontext->id, 'user', 'draft', $data->jsupload,
+            'sortorder', false)
+            ) {
+                $filerec = new stdClass();
+                $filerec->contextid = $df->context->id;
+                $filerec->component = 'mod_datalynx';
+                $filerec->filearea = 'js';
+                $filerec->filepath = '/';
 
-                        foreach ($files as $file) {
-                                    $filerec->filename = $file->get_filename();
-                                    $fs->create_file_from_storedfile($filerec, $file);
-                        }
-                        $fs->delete_area_files($usercontext->id, 'user', 'draft', $data->jsupload);
-                    }
-
-                    $event = \mod_datalynx\event\js_saved::create(
-                    array('context' => $df->context, 'objectid' => $df->id()
-                    ));
-                    $event->trigger();
+                foreach ($files as $file) {
+                            $filerec->filename = $file->get_filename();
+                            $fs->create_file_from_storedfile($filerec, $file);
                 }
+                $fs->delete_area_files($usercontext->id, 'user', 'draft', $data->jsupload);
             }
+
+            $event = \mod_datalynx\event\js_saved::create(
+            array('context' => $df->context, 'objectid' => $df->id()
+            ));
+            $event->trigger();
+        }
+    }
 
             $df->print_header(array('tab' => 'js', 'urlparams' => $urlparams
             ));
 
             $options = array('subdirs' => 0, 'maxbytes' => $COURSE->maxbytes, 'maxfiles' => 10
-    );
-    $draftitemid = file_get_submitted_draft_itemid('jsupload');
-    file_prepare_draft_area($draftitemid, $df->context->id, 'mod_datalynx', 'js', 0, $options);
-    $df->data->jsupload = $draftitemid;
+            );
+            $draftitemid = file_get_submitted_draft_itemid('jsupload');
+            file_prepare_draft_area($draftitemid, $df->context->id, 'mod_datalynx', 'js', 0, $options);
+            $df->data->jsupload = $draftitemid;
 
-    $mform->set_data($df->data);
-    $mform->display();
-    $df->print_footer();
+            $mform->set_data($df->data);
+            $mform->display();
+            $df->print_footer();
 } else {
 
     defined('NO_MOODLE_COOKIES') or define('NO_MOODLE_COOKIES', true); // Session not used here.

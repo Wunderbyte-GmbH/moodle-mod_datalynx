@@ -260,7 +260,7 @@ abstract class datalynxfield_renderer {
      * @param array $options rendering options
      * @see datalynxfield_renderer::render_edit_mode
      */
-    public final function prerender_edit_mode(MoodleQuickForm &$mform, stdClass $entry,
+    final public function prerender_edit_mode(MoodleQuickForm &$mform, stdClass $entry,
             array $options) {
         if ($options['editable']) {
             if (isset($options['template']) && strpos($options['template'], '#input') !== false) {
@@ -352,7 +352,7 @@ abstract class datalynxfield_renderer {
 
     /**
      */
-    public final function get_menu($showall = false) {
+    final public function get_menu($showall = false) {
         // The default menu category for fields.
         $patternsmenu = array();
         foreach ($this->patterns() as $tag => $pattern) {

@@ -595,14 +595,14 @@ class datalynx_entries {
                     ) {
                         unset($entries[$eid]);
                         $capname = get_string('datalynx:approve', 'mod_datalynx');
-                        $errorstring .= get_string('missingrequiredcapability', 'webservice', $capname) ;
+                        $errorstring .= get_string('missingrequiredcapability', 'webservice', $capname);
                         $errorstring .= get_string('affectedid', 'mod_datalynx', $eid) . '<br>';
                         // Filter managable entries.
                     } else {
                         if (!$dl->user_can_manage_entry($entry)) {
                             unset($entries[$eid]);
                             $capname = get_string('updateentry', 'mod_datalynx');
-                            $errorstring .= get_string('missingrequiredcapability', 'webservice', $capname) ;
+                            $errorstring .= get_string('missingrequiredcapability', 'webservice', $capname);
                             $errorstring .= get_string('affectedid', 'mod_datalynx', $eid) . '<br>';
                         }
                     }

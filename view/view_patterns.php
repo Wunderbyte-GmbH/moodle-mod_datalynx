@@ -81,7 +81,7 @@ class datalynxview_patterns {
      * @param string $showall
      * @return array
      */
-    public final function get_menu($showall = false) {
+    final public function get_menu($showall = false) {
         // The default menu category for views.
         $patternsmenu = array();
         foreach ($this->patterns() as $tag => $pattern) {
@@ -168,8 +168,7 @@ class datalynxview_patterns {
      * @param array $options
      * @return string
      */
-    protected function get_regexp_replacements($tag, $entry = null, array $options = null)
-    {
+    protected function get_regexp_replacements($tag, $entry = null, array $options = null) {
         global $OUTPUT;
 
         $df = $this->_view->get_df();

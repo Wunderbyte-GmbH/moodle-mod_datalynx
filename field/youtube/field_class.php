@@ -51,7 +51,7 @@ class datalynxfield_youtube extends datalynxfield_base {
         $fieldid = $this->field->id;
         $oldcontents = array();
         $contents = array();
-        
+
         if (!empty($values)) {
             if (count($values) === 1) {
                 $values = reset($values);
@@ -60,8 +60,8 @@ class datalynxfield_youtube extends datalynxfield_base {
         // Remove youtube prefix and only store the key.
         // Source: https://stackoverflow.com/questions/3392993/php-regex-to-get-youtube-video-id.
         parse_str( parse_url( $values, PHP_URL_QUERY ), $vars );
-        $contents[] = $vars['v']; 
-        
+        $contents[] = $vars['v'];
+
         return array($contents);
     }
 }

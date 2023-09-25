@@ -174,7 +174,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
                 }
             }
         }
-        
+
         // Extension to display and embed videos.
         if ($this->is_valid_video($file)) {
             $filename = $file->get_filename();
@@ -192,7 +192,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
             $video = html_writer::empty_tag('video controls', $videoattr);
             return $video;
         }
-        
+
         // Embed Audio.
         if ($this->is_valid_audio($file)) {
             $filename = $file->get_filename();
@@ -201,7 +201,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
             $audio = html_writer::empty_tag('audio controls', $audioattr);
             return $audio;
         }
-        
+
         return '';
     }
 
@@ -232,7 +232,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
         }
         return true;
     }
-    
+
     /**
      * Verifies the file is a valid audio file based on simplified is_valid_image.
      * @return bool true if file ok

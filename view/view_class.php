@@ -270,7 +270,7 @@ abstract class datalynxview_base {
 
         // Add all url parameters.
         if (!$ignoreurl && $filteroptions) {
-            $urloptions =  $urlparams;
+            $urloptions = $urlparams;
         }
 
         if (is_array($filteroptions)) {
@@ -693,7 +693,7 @@ abstract class datalynxview_base {
         foreach ($this->_vieweditors as $editor) {
             // Catch potential data mismatch.
             if (!isset($this->view->{"e$editor"})) {
-                $this->view->{"e$editor"} = NULL;
+                $this->view->{"e$editor"} = null;
                 continue;
             }
 
@@ -798,7 +798,7 @@ abstract class datalynxview_base {
 
     /**
      */
-    public abstract function generate_default_view();
+    abstract public function generate_default_view();
 
     /**
      */
@@ -914,11 +914,11 @@ abstract class datalynxview_base {
 
     /**
      */
-    protected abstract function apply_entry_group_layout($entriesset, $name = '');
+    abstract protected function apply_entry_group_layout($entriesset, $name = '');
 
     /**
      */
-    protected abstract function new_entry_definition($entryid = -1);
+    abstract protected function new_entry_definition($entryid = -1);
 
     /**
      *

@@ -247,7 +247,7 @@ class datalynxfield_text_form extends datalynxfield_form {
         if (empty($records)) {
             return false;
         }
-        
+
         return true;
     }
 }

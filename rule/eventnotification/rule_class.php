@@ -92,10 +92,10 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
                 // TODO: In else branch: combine added and removed members if notification sent to changed team.
             }
         }
-        
+
         // Check if we only trigger on specific checkbox.
         if ($this->rule->param5) {
-            
+
             // If so, test for conditions and stop sending if not met.
             $entryid = $entryid = $event->get_data()['objectid'];
             $fieldid = $this->rule->param5;
@@ -108,7 +108,7 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
             if ($content->content != '#1#') {
                 return false;
             }
-    
+
         }
 
         $df = $this->df;
@@ -223,11 +223,11 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
             $recipientids = array_merge($recipientids,
                     $this->get_team_recipients($this->recipient['teams'], $entryid));
         }
-        
+
         if (isset($this->recipient['specificuserid'])) {
             $recipientids[] = $this->recipient['specificuserid'];
         }
-        
+
         return array_diff(array_unique($recipientids), [0]);
     }
 

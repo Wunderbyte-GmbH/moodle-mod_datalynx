@@ -42,7 +42,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
      */
     public function render_display_mode(stdClass $entry, array $params) {
         global $OUTPUT;
-        
+
         // We want to display these fields.
         $fieldgroupfields = $this->get_subfields();
 
@@ -190,7 +190,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
 
         // Hide unused lines.
         global $PAGE;
-        $PAGE->requires->js_call_amd('mod_datalynx/fieldgroups', 'init', 
+        $PAGE->requires->js_call_amd('mod_datalynx/fieldgroups', 'init',
             array($this->_field->field->name, $defaultlines, $maxlines, $requiredlines, $fieldname));
 
         // Show a button to add one more line.

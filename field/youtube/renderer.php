@@ -43,12 +43,12 @@ class datalynxfield_youtube_renderer extends datalynxfield_renderer {
         }
         $fieldattr = array();
         $fieldattr['size'] = 45;
-        
+
         $mform->addElement('text', $fieldname, null, $fieldattr);
         $mform->addHelpButton($fieldname, 'youtubeurl', 'datalynxfield_youtube');
         // TODO: Add help string.
         $mform->setType($fieldname, PARAM_TEXT);
-        
+
         $mform->setDefault($fieldname, $content);
         if ($required) {
             $mform->addRule($fieldname, null, 'required', null, 'client');
@@ -59,7 +59,7 @@ class datalynxfield_youtube_renderer extends datalynxfield_renderer {
         $field = $this->_field;
         $fieldid = $field->id();
         $content = $entry->{"c{$fieldid}_content"};
-        
+
         if (isset($content)) {
             $width = $field->field->param1;
             $height = $field->field->param2;
@@ -78,7 +78,7 @@ class datalynxfield_youtube_renderer extends datalynxfield_renderer {
         $fieldid = $this->_field->id();
 
         $formfieldname = "field_{$fieldid}_{$entryid}";
-        
+
         $errors = array();
         foreach ($tags as $tag) {
             list(, $behavior, ) = $this->process_tag($tag);
@@ -90,7 +90,7 @@ class datalynxfield_youtube_renderer extends datalynxfield_renderer {
             }
             // Check for valid url.
             $isurl = filter_var($formdata->$formfieldname, FILTER_VALIDATE_URL);
-            if (!$isurl && $formdata->$formfieldname !='') {
+            if (!$isurl && $formdata->$formfieldname != '') {
                 $errors[$formfieldname] = get_string('invalidurl', 'datalynx');
             }
         }

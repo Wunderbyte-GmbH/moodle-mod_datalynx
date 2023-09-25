@@ -62,7 +62,7 @@ class datalynxfield_tag_renderer extends datalynxfield_renderer {
      */
     public function render_display_mode(stdClass $entry, array $params) {
         global $OUTPUT;
-        
+
         $str = '';
         $field = $this->_field;
         $fieldid = $field->id();
