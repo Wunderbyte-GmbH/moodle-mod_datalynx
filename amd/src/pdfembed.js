@@ -20,33 +20,56 @@
  * @copyright   2023 David Bogner <david.bogner@wunderbyte.at>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-import {pdfjsLib} from 'pdf';
-// eslint-disable-next-line no-console
-console.log(pdfjsLib);
-define(['mod_datalynx/pdf'], function (pdfjsLib) {
-    var MyPDFModule = {
-        renderPDF: function (pdfUrl, containerId) {
-            pdfjsLib.getDocument(pdfUrl).promise.then(function (pdf) {
-                pdf.getPage(1).then(function (page) {
-                    var scale = 1.5; // Adjust the scale as needed.
-                    var viewport = page.getViewport({ scale: scale });
-                    var canvas = document.createElement('canvas');
-                    var context = canvas.getContext('2d');
-                    canvas.height = viewport.height;
-                    canvas.width = viewport.width;
+// import 'mod_datalynx/pdf';
 
-                    var renderContext = {
-                        canvasContext: context,
-                        viewport: viewport,
-                    };
+import * as pdfjsLib from 'mod_datalynx/pdf';
+import pdfjsWorker from 'mod_datalynx/pdf.worker';
 
-                    page.render(renderContext).promise.then(function () {
-                        var container = document.getElementById(containerId);
-                        container.appendChild(canvas);
-                    });
-                });
-            });
-        }
-    };
-    return MyPDFModule;
-});
+function renderPDFfunction(url, canvasContainer, options) {
+
+    var options = options || { scale: 1 };
+
+    function renderPage(page) {
+        var viewport = page.getViewport(options.scale);
+        var canvas = document.createElement('canvas');
+        var ctx = canvas.getContext('2d');
+        var renderContext = {
+            canvasContext: ctx,
+            viewport: viewport
+        };
+
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+
+        canvasContainer.appendChild(canvas);
+
+        console.log(canvasContainer, canvas);
+
+        page.render(renderContext);
+    }
+
+    function renderPages(pdfDoc) {
+        for (var num = 1; num <= pdfDoc.numPages; num++)
+            pdfDoc.getPage(num).then(renderPage);
+    }
+
+    pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+
+    // eslint-disable-next-line no-console
+    console.log(pdfjsLib.version, pdfjsWorker);
+
+    pdfjsLib.getDocument(url).promise.then(renderPages);
+
+}
+
+// eslint-disable-next-line require-jsdoc
+export function renderPDF() {
+
+    const pdf = M.cfg.wwwroot + '/mod/datalynx/tests/turnen.pdf';
+    const canvas = document.querySelector('#resourceobject').parentElement;
+
+    // eslint-disable-next-line no-console
+    console.log(pdfjsLib);
+
+    renderPDFfunction(pdf, canvas);
+};
