@@ -14,7 +14,7 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package mod_datalynx
+ * @module mod_datalynx/zoomable
  * @copyright 2017 Thomas Niedermaier (thomas.niedermaier@gmail.com)
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -75,6 +75,12 @@ define(
             this.getOverlay().fadeOut(this.getConf().closeSpeed, onClose);
         });
 
+            /**
+             * The overlay function.
+             * @param {HTMLElement} trigger
+             * @param {function} conf
+             * @constructor
+             */
         function Overlay(trigger, conf) {
             var self = this,
                 fire = trigger.add(self),
@@ -269,6 +275,10 @@ define(
                 });
             });
 
+            /**
+             * Write the overlay.
+             * @param {HTMLElement} trigger
+             */
             function writenewoverlay(trigger) {
                 divname = 'zoomable' + index;
                 index = index + 1;

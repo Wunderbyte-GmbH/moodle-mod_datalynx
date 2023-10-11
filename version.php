@@ -22,7 +22,7 @@
  */
 defined('MOODLE_INTERNAL') or die();
 $plugin->component = 'mod_datalynx';
-$plugin->version = 2023082300;
+$plugin->version = 2023082301;
 $plugin->release = 'v3.0-DataIntelligence'; // Data words like data science, data mining.
 $plugin->requires = 2022112800;
 $plugin->maturity = MATURITY_STABLE;

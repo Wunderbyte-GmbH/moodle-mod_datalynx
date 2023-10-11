@@ -101,6 +101,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
             if (!$file->is_directory()) {
 
                 $filename = $file->get_filename();
+                $mimetype = $file->get_mimetype();
                 $filenameinfo = pathinfo($filename);
                 $path = "/{$field->df()->context->id}/mod_datalynx/content/$contentid";
                 // ToDo: Remove or implement altname.
@@ -144,8 +145,18 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
     /**
      */
     protected function display_file($file, string $path, string $altname = '', ?array $params = null) {
+        global $PAGE;
+        $PAGE->requires->js_call_amd('mod_datalynx/pdfembed', 'renderPDF', ['http://localhost/401_moodle/pluginfile.php/14444/mod_resource/content/1/%28SDAW%29%20Search%20on%20Commons%20Research%20Report%20%28June%202020%29.pdf', 'maincontent']);
+
         $filename = $file->get_filename();
+        $mimetype = $file->get_mimetype();
         $pluginfileurl = '/pluginfile.php';
+
+        if ($mimetype === 'application/pdf') {
+            // PDF document
+            $moodleurl = moodle_url::make_file_url($pluginfileurl, "$path/$filename");
+            return $this->embed_pdf($moodleurl->out(), $filename, "Click");
+        }
 
         if (!empty($params['url'])) {
             return moodle_url::make_file_url($pluginfileurl, "$path/$filename");
@@ -166,6 +177,34 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
                 }
             }
         }
+    }
+
+    /**
+     * Returns general link or pdf embedding html.
+     * @param string $fullurl
+     * @param string $title
+     * @param string $clicktoopen
+     * @return string html
+     */
+    protected function embed_pdf(string $fullurl): string {
+        global $PAGE;
+        $html = <<<EOT
+<div class="resourcecontent resourcepdf">
+  <object id="resourceobject" data="$fullurl" type="application/pdf" width="800" height="600">
+    <param name="src" value="$fullurl" />
+  </object>
+</div>
+EOT;
+        /**
+        $html = '<div class="resourcecontent resourcepdf w-100">
+  <object id="resourceembed" data="' . $fullurl . '" type="application/pdf" width="800" height="600">
+  <p>Unable to display PDF file. <a href="' . $fullurl . '">Download</a> instead.</p>
+</div>';
+        **/
+
+        // the size is hardcoded in the boject obove intentionally because it is adjusted by the following function on-the-fly
+        $PAGE->requires->js_call_amd('mod_datalynx/maximiseembed', 'initMaximisedEmbed', ['resourceembed']);
+        return $html;
     }
 
     /**

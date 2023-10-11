@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') or die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
+require_once("$CFG->dirroot/lib/resourcelib.php");
 
 /**
  */

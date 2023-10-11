@@ -5,16 +5,16 @@ define(["jquery"], function($) {
         init: function(fieldid, userurl, username, canunsubscribe) {
 
             // After initialisation we loop through all links for subscribe / unsubscribe.
-            $( "a.datalynxfield_subscribe" ).each(function () {
+            $("a.datalynxfield_subscribe").each(function() {
                     var href = $(this).attr("href");
-                    var params = extract_params(href.split("?")[1]);
+                    var params = extractParams(href.split("?")[1]);
                     if (params.fieldid !== fieldid) {
                         return;
                     }
                     params.ajax = true;
 
-                    $( "a.datalynxfield_subscribe" ).off( "click" );
-                    $( "a.datalynxfield_subscribe" ).click(function(e) {
+                    $("a.datalynxfield_subscribe").off("click");
+                    $("a.datalynxfield_subscribe").click(function(e) {
                         e.preventDefault();
                         if (!$(this).prev("ul").length) {
                             $(this).before("<ul></ul>");
@@ -38,7 +38,7 @@ define(["jquery"], function($) {
                                             params.action = "subscribe";
                                             $(this).prop("href", $(this).prop("href").replace("unsubscribe", "subscribe"));
                                         }
-                                    remove_user(ul);
+                                    removeUser(ul);
                                     } else if (data && !$(this).hasClass("subscribed")) {
                                         $(this).toggleClass("subscribed");
                                         $(this).prop("title", "Austragen"); // TODO: Multilang.
@@ -53,24 +53,34 @@ define(["jquery"], function($) {
                 });
             });
 
-            function remove_user(listelement) {
-                var userurlparams = extract_params(userurl.split("?")[1]);
+            /**
+             * Remove user from selection.
+             *
+             * @param {HTMLElement} listelement
+             */
+            function removeUser(listelement) {
+                var userurlparams = extractParams(userurl.split("?")[1]);
 
                 // Loop through jquery object and find all lis.
-                var listItems = $( listelement ).find( "li" );
-                listItems.find( "a" ).each(function(idx, li) {
-                    var anchorparams = extract_params($(li).prop("href").split("?")[1]);
+                var listItems = $(listelement).find("li");
+                listItems.find("a").each(function(idx, li) {
+                    var anchorparams = extractParams($(li).prop("href").split("?")[1]);
                     if (userurlparams.id == anchorparams.id) {
                         $(li).parent().remove();
                     }
                 });
                 // Delete <ul> if no <li> is required.
-                if (listelement.children().length == 0 ) {
+                if (listelement.children().length == 0) {
                     listelement.remove();
                 }
             }
 
-            function extract_params(paramstring) {
+            /**
+             * Extract params.
+             * @param {string} paramstring
+             * @returns {{}}
+             */
+            function extractParams(paramstring) {
                 var params = paramstring.split("&");
                 var output = {}; // Create an object.
                 for (var i = 0; i < params.length; i++) {

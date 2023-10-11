@@ -5,7 +5,7 @@ define(['jquery'], function($) {
             // After initialisation we loop through all links for subscribe / unsubscribe.
             $( ".datalynxfield__approve" ).each(function () {
                 var href = this.href;
-                var params = extract_params(href.split('?')[1]);
+                var params = extractParams(href.split('?')[1]);
 
                     $(this).off( "click" );
                     $(this).click(function(e) {
@@ -39,9 +39,15 @@ define(['jquery'], function($) {
 
             });
 
-            function extract_params(paramstring) {
-                var params = paramstring.split("&");
-                var output = {}; // Create an object.
+            /**
+             * Extract params.
+             *
+             * @param {string} paramstring
+             * @returns {{}}
+             */
+            function extractParams(paramstring) {
+                let params = paramstring.split("&");
+                let output = {}; // Create an object.
                 for (var i = 0; i < params.length; i++) {
                     var param = params[i];
                     output[param.split("=")[0]] = param.split("=")[1];
