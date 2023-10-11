@@ -16,34 +16,35 @@
 
 /**
  *
- * @package datalynxview
- * @subpackage csv
+ * @package datalynx_rule
+ * @subpackage ftpsyncfiles
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die();
 
-require_once("$CFG->dirroot/mod/datalynx/view/view_form.php");
-require_once("$CFG->libdir/csvlib.class.php");
+require_once("$CFG->dirroot/mod/datalynx/rule/rule_form.php");
+require_once($CFG->libdir . '/csvlib.class.php');
 
-class datalynxview_csv_form extends datalynxview_base_form {
+class datalynx_rule_ftpsyncfiles_form extends datalynx_rule_form {
 
-    /**
-     */
-    public function view_definition_after_gps() {
+    public function rule_definition() {
+        $br = html_writer::empty_tag('br');
         $mform = &$this->_form;
 
+        $mform->addElement('header', 'settingshdr', get_string('sftpsettings', 'datalynxrule_ftpsyncfiles'));
+        $sftpgrp = array();
+        $mform->addElement('text', 'param2', get_string('sftpserver', 'datalynxrule_ftpsyncfiles'));
+        $mform->addElement('text', 'param3', get_string('sftpport', 'datalynxrule_ftpsyncfiles'));
+        $mform->addElement('text', 'param4', get_string('sftpusername', 'datalynxrule_ftpsyncfiles'));
+        $mform->addElement('text', 'param5', get_string('sftppassword', 'datalynxrule_ftpsyncfiles'));
+        $mform->addElement('text', 'param6', get_string('sftppath', 'datalynxrule_ftpsyncfiles'));
+        // TODO: ADD SELECT for mode.
         $mform->addElement('header', 'settingshdr', get_string('settings'));
 
-        // Export type.
-        $options = array('csv' => get_string('csv', 'datalynxview_csv'),
-                'ods' => get_string('ods', 'datalynxview_csv'),
-                'xls' => get_string('xls', 'datalynxview_csv'));
-        $mform->addElement('select', 'param3', get_string('outputtype', 'datalynxview_csv'), $options);
-
         // Delimiter.
-        $delimiters = \csv_import_reader::get_delimiter_list();
+        $delimiters = csv_import_reader::get_delimiter_list();
         $mform->addElement('select', 'delimiter', get_string('csvdelimiter', 'datalynx'), $delimiters);
         $mform->setDefault('delimiter', 'comma');
 
@@ -53,32 +54,18 @@ class datalynxview_csv_form extends datalynxview_base_form {
         $mform->setDefault('enclosure', '"');
 
         // Encoding.
-        $choices = \core_text::get_encodings();
+        $choices = core_text::get_encodings();
         $mform->addElement('select', 'encoding', get_string('encoding', 'grades'), $choices);
         $mform->setDefault('encoding', 'UTF-8');
 
-        // Fields to import.
-        $attributes = array('wrap' => 'soft', 'rows' => 10, 'cols' => 50);
-        $mform->addElement('textarea', 'param2', get_string('exportfields', 'datalynxview_csv'), $attributes);
-        $mform->addHelpButton('param2', 'exportfields', 'datalynxview_csv');
-        $mform->setDefault('param2', FORMAT_PLAIN);
-
-        // Show a list of fields in this view.
-        $view = $this->_view;
-        $tags = $view->field_tags();
-        if (isset($tags['Fields']['Fields']) && !empty($tags['Fields']['Fields'])) {
-            $tags = implode("<br>", $tags['Fields']['Fields']);
-            $mform->addElement('static', 'availablefields', get_string('fields', 'datalynx'), $tags);
-        }
     }
 
     /**
      */
     public function data_preprocessing(&$data) {
-        parent::data_preprocessing($data);
         // CSV settings.
-        if (!empty($data->param1)) {
-            list($data->delimiter, $data->enclosure, $data->encoding) = explode(',', $data->param1);
+        if (!empty($data->param7)) {
+            list($data->delimiter, $data->enclosure, $data->encoding) = explode(',', $data->param7);
         }
     }
 
@@ -93,7 +80,7 @@ class datalynxview_csv_form extends datalynxview_base_form {
      */
     public function get_data($slashed = true) {
         if ($data = parent::get_data($slashed)) {
-            $data->param1 = "$data->delimiter,$data->enclosure,$data->encoding";
+            $data->param7 = "$data->delimiter,$data->enclosure,$data->encoding";
         }
         return $data;
     }

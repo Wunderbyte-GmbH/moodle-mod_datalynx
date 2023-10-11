@@ -937,3 +937,6 @@ $string['search:activity'] = "Datalynx - instances";
 $string['search:entry'] = "Datalynx - entries";
 
 $string['noselection'] = "Nothing selected";
+
+// Task.
+$string['datalynx_cron_trigger'] = "DL Cron Job";

@@ -16,16 +16,17 @@
 
 /**
  *
- * @package mod_datalynx
- * @copyright 2015 onwards David Bogner
+ * @package datalynxrule
+ * @subpackage ftpsyncfiles
+ * @copyright 2023 Thomas Winkler
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die();
-$plugin->component = 'mod_datalynx';
-$plugin->version = 2023101000;
-$plugin->release = 'v3.0-DataIntelligence'; // Data words like data science, data mining.
-$plugin->requires = 2022112800;
-$plugin->maturity = MATURITY_STABLE;
-$plugin->dependencies = array(
-    'assignfeedback_editpdf' => ANY_VERSION // We use fpdi from this core module.
-);
+$string['event'] = 'Datalynx Ereignis';
+$string['pluginname'] = 'FTP Sync Data';
+$string['triggerspecificevent'] = 'Nur bei markierter Checkbox senden';
+
+$string['sftpsettings'] = 'SFTP Settings';
+$string['sftpserver'] = 'STFP Server';
+$string['sftpusername'] = 'STFP Username';
+$string['sftppassword'] = 'STFP Passwort';
+$string['sftppath'] = 'STFP Path';

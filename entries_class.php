@@ -507,7 +507,7 @@ class datalynx_entries {
      * Process entries when after editing content for saving into db
      *
      * @param string $action
-     * @param string $eids
+     * @param string||array $eids
      * @param null $data
      * @param bool $confirmed
      * @return array notificationstrings, list of processed ids
@@ -515,7 +515,7 @@ class datalynx_entries {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public function process_entries(string $action, string $eids, $data = null, bool $confirmed = false): array {
+    public function process_entries(string $action, $eids, $data = null, bool $confirmed = false): array {
         global $DB, $USER, $OUTPUT, $PAGE;
         $dl = $this->datalynx;
         $errorstring = '';
