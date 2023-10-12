@@ -25,25 +25,38 @@
 import * as pdfjsLib from 'mod_datalynx/pdf';
 import pdfjsWorker from 'mod_datalynx/pdf.worker';
 
-function renderPDFfunction(url, canvasContainer, options) {
 
-    var options = options || { scale: 1 };
+function renderPDFfunction(url, canvasContainer) {
 
     function renderPage(page) {
-        var viewport = page.getViewport(options.scale);
+        var viewport = page.getViewport({scale: 1});
         var canvas = document.createElement('canvas');
         var ctx = canvas.getContext('2d');
         var renderContext = {
             canvasContext: ctx,
             viewport: viewport
         };
+        // Calculate the scaling factors to fit the container's width and height
+        var widthScale = canvasContainer.clientWidth / viewport.width;
+        var heightScale = canvasContainer.clientHeight / viewport.height;
 
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
+        // Use the minimum scale to ensure that the entire page fits within the container
+        var scale = Math.min(widthScale, heightScale);
+
+        // Apply the scaling factor
+        canvas.width = viewport.width * scale;
+        canvas.height = viewport.height * scale;
+
+        // canvas.height = canvasContainer.clientHeight;
+        // canvas.width = canvasContainer.clientWidth;
+
+        // canvas.height = 800;
+        // canvas.width = 1200;
 
         canvasContainer.appendChild(canvas);
 
-        console.log(canvasContainer, canvas);
+        // eslint-disable-next-line no-console
+        console.log(canvasContainer, canvas, canvas.height);
 
         page.render(renderContext);
     }
@@ -63,13 +76,16 @@ function renderPDFfunction(url, canvasContainer, options) {
 }
 
 // eslint-disable-next-line require-jsdoc
-export function renderPDF() {
+export function renderPDF(pdfUrl, canvasContainerId) {
 
+    // eslint-disable-next-line no-unused-vars
     const pdf = M.cfg.wwwroot + '/mod/datalynx/tests/turnen.pdf';
-    const canvas = document.querySelector('#resourceobject').parentElement;
+    const container = document.querySelector(`#${canvasContainerId}`);
 
     // eslint-disable-next-line no-console
     console.log(pdfjsLib);
+    console.log(pdfUrl);
+    console.log(container);
 
-    renderPDFfunction(pdf, canvas);
-};
+    renderPDFfunction(pdfUrl, container);
+}

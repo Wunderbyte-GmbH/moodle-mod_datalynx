@@ -69,7 +69,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
 
     /**
      */
-    public function render_display_mode(stdClass $entry, array $params) {
+    public function render_display_mode(stdClass $entry, array $params): ?string {
         $field = $this->_field;
         $fieldid = $field->id();
         $entryid = $entry->id;
@@ -101,12 +101,10 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
             if (!$file->is_directory()) {
 
                 $filename = $file->get_filename();
-                $mimetype = $file->get_mimetype();
-                $filenameinfo = pathinfo($filename);
                 $path = "/{$field->df()->context->id}/mod_datalynx/content/$contentid";
                 // ToDo: Remove or implement altname.
                 $altname = "";
-                $strfiles[] = $this->display_file($file, $path, $altname, $params);
+                $strfiles[] = $this->display_file($file, $entryid, $path, $altname, $params);
             }
         }
 
@@ -118,7 +116,13 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
         return implode("<br />\n", $strfiles);
     }
 
-    public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
+    /**
+     * @param MoodleQuickForm $mform
+     * @param int $i
+     * @param string $value
+     * @return array
+     */
+    public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = ''): array {
         $fieldid = $this->_field->id();
         $fieldname = "f_{$i}_$fieldid";
 
@@ -143,19 +147,27 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Render file html.
+     *
+     * @param stored_file $file
+     * @param int $entryid
+     * @param string $path
+     * @param string $altname
+     * @param array|null $params
+     * @return moodle_url|string
      */
-    protected function display_file($file, string $path, string $altname = '', ?array $params = null) {
-        global $PAGE;
-        $PAGE->requires->js_call_amd('mod_datalynx/pdfembed', 'renderPDF', ['http://localhost/401_moodle/pluginfile.php/14444/mod_resource/content/1/%28SDAW%29%20Search%20on%20Commons%20Research%20Report%20%28June%202020%29.pdf', 'maincontent']);
-
+    protected function display_file(stored_file $file, int $entryid, string $path, string $altname = '', ?array $params = null) {
+        $field = $this->_field;
+        $fieldid = $field->id();
+        $fieldname = "field_{$fieldid}_{$entryid}";
         $filename = $file->get_filename();
         $mimetype = $file->get_mimetype();
         $pluginfileurl = '/pluginfile.php';
 
         if ($mimetype === 'application/pdf') {
-            // PDF document
+            // PDF document.
             $moodleurl = moodle_url::make_file_url($pluginfileurl, "$path/$filename");
-            return $this->embed_pdf($moodleurl->out(), $filename, "Click");
+            return $this->embed_pdf($moodleurl->out(), $fieldname);
         }
 
         if (!empty($params['url'])) {
@@ -182,32 +194,30 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
     /**
      * Returns general link or pdf embedding html.
      * @param string $fullurl
-     * @param string $title
-     * @param string $clicktoopen
+     * @param string $fieldname
      * @return string html
      */
-    protected function embed_pdf(string $fullurl): string {
+    protected function embed_pdf(string $fullurl, string $fieldname): string {
         global $PAGE;
-        $html = <<<EOT
-<div class="resourcecontent resourcepdf">
-  <object id="resourceobject" data="$fullurl" type="application/pdf" width="800" height="600">
-    <param name="src" value="$fullurl" />
-  </object>
-</div>
-EOT;
-        /**
-        $html = '<div class="resourcecontent resourcepdf w-100">
-  <object id="resourceembed" data="' . $fullurl . '" type="application/pdf" width="800" height="600">
-  <p>Unable to display PDF file. <a href="' . $fullurl . '">Download</a> instead.</p>
-</div>';
-        **/
+        $PAGE->requires->js_call_amd('mod_datalynx/pdfembed', 'renderPDF',
+                [$fullurl, $fieldname]);
+        return '<div><a href="' . $fullurl . '" target="_blank" class="btn btn-primary">' .
+                get_string('download', 'core_repository') . ' ' .
+                get_string('application/pdf', 'core_mimetypes') .  '</a></div><br>
+        <div style="width: 800px; min-height: 400px;" id="' . $fieldname . '"></div>
+        ';
 
         // the size is hardcoded in the boject obove intentionally because it is adjusted by the following function on-the-fly
-        $PAGE->requires->js_call_amd('mod_datalynx/maximiseembed', 'initMaximisedEmbed', ['resourceembed']);
-        return $html;
+        // $PAGE->requires->js_call_amd('mod_datalynx/maximiseembed', 'initMaximisedEmbed', ['resourceembed']);
     }
 
     /**
+     * Render a link.
+     * @param $file
+     * @param $path
+     * @param $altname
+     * @param $params
+     * @return string
      */
     protected function display_link($file, $path, $altname, $params = null): string {
         global $OUTPUT;
