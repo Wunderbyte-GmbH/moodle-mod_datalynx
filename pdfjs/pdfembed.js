@@ -20,12 +20,11 @@
  * @copyright   2023 David Bogner <david.bogner@wunderbyte.at>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+// import 'mod_datalynx/pdf';
 
-// import * as pdfjsLib from 'mod_datalynx/pdf';
-// import * as pdfjsWorker from 'mod_datalynx/pdf.worker';
-
-// eslint-disable-next-line require-jsdoc
 function renderPDFfunction(url, canvasContainer) {
+
+    console.log(pdfjsLib, pdfjsWorker);
 
     function renderPage(page) {
         var viewport = page.getViewport({scale: 1});
@@ -74,14 +73,8 @@ function renderPDFfunction(url, canvasContainer) {
 
 }
 
-/**
- *
- * @param {*} pdfUrl
- * @param {*} canvasContainerId
- */
-export function renderPDF(pdfUrl, canvasContainerId) {
-
-    console.log(pdfUrl, canvasContainerId);
+// eslint-disable-next-line require-jsdoc
+function renderPDF(pdfUrl, canvasContainerId) {
 
     // eslint-disable-next-line no-unused-vars
     const pdf = M.cfg.wwwroot + '/mod/datalynx/tests/turnen.pdf';
