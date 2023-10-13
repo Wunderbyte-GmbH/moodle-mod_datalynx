@@ -36,8 +36,6 @@ $context = \context_system::instance();
 $PAGE->set_context($context);
 require_login();
 
-require_capability('local/catquiz:manage_catscales', $context);
-
 $PAGE->set_url(new moodle_url('/local/catquiz/test.php', []));
 
 $title = "Test cases";
@@ -53,9 +51,6 @@ $sftpusername = 'wunder_1';
 $sftppassword = 'Gcb2BWeBtLpWVZt4';
 $username = $sftpusername;
 $password = $sftppassword;
-
-// Local directory to save downloaded files
-$localdir = $CFG->dataroot . '/temp/' . $did . '/';
 
 $server = $sftpserver;
 
@@ -95,9 +90,6 @@ if ($result === false) {
             // Download the file.
             $filedata = curl_exec($filehandle);
 
-            // Todo: get context.
-            $context = context_module::instance(1);
-
             if ($filedata !== false) {
 
                 // TODO: Store Data in Moodle.
@@ -107,7 +99,7 @@ if ($result === false) {
                 $file = $fs->create_file_from_string(
                     [
                         'contextid' => $context->id, // Replace with the appropriate context if necessary.
-                        'component' => 'user',
+                        'component' => 'datalynx',
                         'filearea' => 'draft',
                         'itemid' => $draftitemid,
                         'filepath' => '/',
@@ -116,30 +108,14 @@ if ($result === false) {
                     $filedata
                 );
 
-                echo "Downloaded $file successfully." . PHP_EOL;
+                echo "Downloaded successfully." . PHP_EOL;
             } else {
-                echo "Failed to download $file." . PHP_EOL;
+                echo "Failed to download ." . PHP_EOL;
             }
 
             curl_close($filehandle);
         }
     }
-}
-
-        curl_close($ch);
-
-if (!is_dir($localdir)) {
-    // Create the directory if it doesn't exist
-    if (!mkdir($localdir)) {
-        // Handle directory creation error (e.g., display an error message)
-        throw new Exception('Error creating directory');
-    }
-}
-        $filenames = scandir($localdir);
-if ($filenames) {
-    return $filenames;
-} else {
-    return [];
 }
 
 echo $OUTPUT->footer();
