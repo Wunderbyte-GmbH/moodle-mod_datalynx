@@ -540,7 +540,7 @@ class datalynx_entries {
                 $addcount = 0;
                 $addmax = $dl->data->maxentries;
                 $perinterval = ($dl->data->intervalcount > 1);
-                if ($addmax != -1 and has_capability('mod/datalynx:manageentries', $dl->context)) {
+                if ($addmax != -1 && has_capability('mod/datalynx:manageentries', $dl->context)) {
                     $addmax = -1;
                 } else {
                     if ($addmax != -1) {
@@ -553,7 +553,7 @@ class datalynx_entries {
                     $entry = new stdClass();
 
                     // Existing entry from view.
-                    if ($eid > 0 and isset($this->_entries[$eid])) {
+                    if ($eid > 0 && isset($this->_entries[$eid])) {
                         $entries[$eid] = $this->_entries[$eid];
 
                         // TODO existing entry *not* from view (import).

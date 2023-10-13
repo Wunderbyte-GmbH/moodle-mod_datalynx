@@ -95,8 +95,9 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
      * @param \core\event\base $event
      */
     public function trigger(\core\event\base $event) {
-        global $CFG;
+        global $CFG, $DB, $USER;
         require_once("$CFG->dirroot/mod/datalynx/classes/datalynx.php");
+        require_once("$CFG->dirroot/mod/datalynx/entries_class.php");
         require_once("$CFG->dirroot/mod/datalynx/view/csv/view_class.php");
         require_once($CFG->libdir.'/filelib.php');
 
@@ -104,39 +105,39 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
         $this->dl = new mod_datalynx\datalynx($did);
 
         // Download Server files.
-        $this->draftitemid = file_get_submitted_draft_itemid('file');
+        $this->draftitemid = file_get_unused_draft_itemid();
+
         $this->fs = get_file_storage();
         $this->download_files((int)$did);
 
-        $files = $this->fs->get_area_files($this->dl->context, 'mod_datalynx', 'draft', $this->draftitemid);
+        $context = context_user::instance($USER->id);
+
+        $files = $this->fs->get_area_files($context->id, 'mod_datalynx', 'draft', $this->draftitemid);
+
+        // fieldid?
+        // für welchen user?
 
         if (!empty($files)) {
             foreach ($files as $file) {
-                if (file_exists($file) && is_readable($file)) {
-                    $filename = $file->get_filename();
-                    $filecontents = file_get_contents($file);
-                    if ($filecontents !== false) {
-                        $data = new stdClass();
-                        $data->eids = [];
 
-                        $fieldid = datalynxfield_entryauthor::_USERID;
-                        $entryid = -1;
-                        $data->eids[$entryid] = $entryid;
-                        // TODO: If filename is not userid get userid here.
-                        // Entry author is specified in the rule settings:
-                        $data->{"field_{$fieldid}_{$entryid}"} = $this->authorid;
-                        $dlentries = new datalynx_entries($this->dl);
-                        // Set teammember from filename.
-                        $data->{"field_{$this->teammemberfieldid}_{$entryid}"} = $this->get_userid_from_filename($filename);
-                        $processed = $dlentries->process_entries('update', $data->eids, $data, true);
-                    } else {
-                        // handle the case where reading the file failed.
-                        echo 'Error reading the file.';
-                    }
-                } else {
-                    // handle the case where the file does not exist or is not readable.
-                    echo 'File does not exist or is not readable.';
-                }
+                $data = new stdClass();
+                $data->eids = [];
+
+                $fields = $this->dl->get_fields();
+
+                $fieldid = datalynxfield_entryauthor::_USERID;
+                $filename = $file->get_filename();
+
+                $entryid = -1;
+                $data->eids[$entryid] = $entryid;
+                // TODO: If filename is not userid get userid here.
+                // Entry author is specified in the rule settings:
+                $data->{"field_{$fieldid}_{$entryid}"} = $this->authorid;
+                $data->{"field_{$fieldid}_{$entryid}_filemanager"} = $this->draftitemid;
+                $dlentries = new datalynx_entries($this->dl);
+                // Set teammember from filename.
+                $data->{"field_{$this->teammemberfieldid}_{$entryid}"} = $this->get_userid_from_filename($filename);
+                $processed = $dlentries->process_entries('update', $data->eids, $data, true);
             }
         }
         return true;
@@ -149,7 +150,7 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
      * @return void
      */
     private function download_files(int $did): void {
-        global $CFG;
+        global $CFG, $USER;
         $server = $this->sftpserver;
         $remotedir = $this->sftppath;
         $username = $this->sftpusername;
@@ -189,7 +190,8 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
                     $filedata = curl_exec($filehandle);
 
                     // Todo: get context.
-                    $context = $this->dl->context;
+                    $context = context_user::instance($USER->id);
+                    // $context = $this->dl->context;
 
                     if ($filedata !== false) {
 
