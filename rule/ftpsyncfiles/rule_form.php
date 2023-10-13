@@ -25,7 +25,6 @@
 defined('MOODLE_INTERNAL') or die();
 
 require_once("$CFG->dirroot/mod/datalynx/rule/rule_form.php");
-require_once($CFG->libdir . '/csvlib.class.php');
 
 class datalynx_rule_ftpsyncfiles_form extends datalynx_rule_form {
 

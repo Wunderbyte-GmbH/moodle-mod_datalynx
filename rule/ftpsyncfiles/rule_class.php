@@ -98,13 +98,13 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
         global $CFG;
         require_once("$CFG->dirroot/mod/datalynx/classes/datalynx.php");
         require_once("$CFG->dirroot/mod/datalynx/view/csv/view_class.php");
-        require_once($CFG->libdir.'/completionlib.php');
+        require_once($CFG->libdir.'/filelib.php');
 
         $did = $event->get_data()['objectid'];
         $this->dl = new mod_datalynx\datalynx($did);
 
         // Download Server files.
-        $this->draftitemid = file_get_submitted_draft_itemid('file'); // Assuming 'file' is the form field name.
+        $this->draftitemid = file_get_submitted_draft_itemid('file');
         $this->fs = get_file_storage();
         $this->download_files((int)$did);
 
