@@ -20,7 +20,6 @@
  * @copyright   2023 David Bogner <david.bogner@wunderbyte.at>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-// import 'mod_datalynx/pdf';
 
 import * as pdfjsLib from 'mod_datalynx/pdf';
 import * as pdfjsWorker from 'mod_datalynx/pdf.worker';

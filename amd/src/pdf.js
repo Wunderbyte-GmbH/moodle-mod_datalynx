@@ -24,11 +24,11 @@
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = root.pdfjsLib = factory();
 	else if(typeof define === 'function' && define.amd)
-		define("pdf", [], () => { return (root.pdfjsLib = factory()); });
+		define("mod_datalynx/pdf", [], () => { return (root.pdfjsLib = factory()); });
 	else if(typeof exports === 'object')
-		exports["pdf"] = root.pdfjsLib = factory();
+		exports["mod_datalynx/pdf"] = root.pdfjsLib = factory();
 	else
-		root["pdf"] = root.pdfjsLib = factory();
+		root["mod_datalynx/pdf"] = root.pdfjsLib = factory();
 })(globalThis, () => {
 return /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";

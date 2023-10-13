@@ -31,7 +31,7 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
 
     protected $sftpserver;
 
-    protected $stfpport;
+    protected $sftpport;
 
     protected $sftpusername;
 
@@ -44,10 +44,33 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
     const USERNAME = 2;
 
     const USEREMAIL = 3;
+    /**
+     * user profile field to use to identify the user.
+     * @var string
+     */
     private $matchingfield;
+
+    /**
+     * Field id of the teammemberselect field the user should be assigned to.
+     * @var int
+     */
     private $teammemberfieldid;
+
+    /**
+     * The id of the user who should own the entry. This is different from the user matched from the file.
+     * @var
+     */
     private $authorid;
+    /**
+     * The datalynx object to use.
+     * @var \mod_datalynx\datalynx
+     */
     private \mod_datalynx\datalynx $dl;
+    private ?file_storage $fs;
+    /**
+     * @var false|int
+     */
+    private $draftitemid;
 
     /**
      * Class constructor
@@ -58,7 +81,7 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
     public function __construct($df = 0, $rule = 0) {
         parent::__construct($df, $rule);
         $this->sftpserver = $this->rule->param2;
-        $this->stfpport = $this->rule->param3;
+        $this->sftpport = $this->rule->param3;
         $this->sftpusername = $this->rule->param4;
         $this->sftppassword = $this->rule->param5;
         $this->sftppath = $this->rule->param6;
@@ -78,42 +101,19 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
         require_once($CFG->libdir.'/completionlib.php');
 
         $did = $event->get_data()['objectid'];
+        $this->dl = new mod_datalynx\datalynx($did);
 
         // Download Server files.
-        $filenames = $this->download_files((int)$did);
+        $this->draftitemid = file_get_submitted_draft_itemid('file'); // Assuming 'file' is the form field name.
+        $this->fs = get_file_storage();
+        $this->download_files((int)$did);
 
-        $this->dl = new mod_datalynx\datalynx($did);
-        $fs = get_file_storage();
+        $files = $this->fs->get_area_files($this->dl->context, 'mod_datalynx', 'draft', $this->draftitemid);
 
-        // Scan folder
-        // $folder = $CFG->dataroot . '/temp/csvimport/moddatalynx/' . $did . '/';
-        // $files = scandir($folder);
-
-        // foreach ($files as $file) {
-        // if ($file !== '.' && $file !== '..') {
-        // if (preg_match('/^(\d+)_/', $file, $matches)) {
-        // $prefix = $matches[1];
-        // }
-        // }
-        // }
-
-        // How
-        // $filerecord = [
-        // 'contextid'    => $df->context->id,
-        // 'component'    => 'mod_datalynx',
-        // 'filearea'     => 'content',
-        // 'itemid'       => 204,  -> (not entryid datalynx_contents -> id)
-        // 'filepath'     => '/',
-        // 'filename'     => 'test.csv',
-        // 'timecreated'  => time(),
-        // 'timemodified' => time(),
-        // 'userid' => $userid,
-        // ];
-        // $fs->create_file_from_pathname($filerecord, $file);
-
-        if (!empty($filenames)) {
-            foreach ($filenames as $filename) {
+        if (!empty($files)) {
+            foreach ($files as $file) {
                 if (file_exists($file) && is_readable($file)) {
+                    $filename = $file->get_filename();
                     $filecontents = file_get_contents($file);
                     if ($filecontents !== false) {
                         $data = new stdClass();
@@ -126,17 +126,9 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
                         // Entry author is specified in the rule settings:
                         $data->{"field_{$fieldid}_{$entryid}"} = $this->authorid;
                         $dlentries = new datalynx_entries($this->dl);
-
                         // Set teammember from filename.
-                        $data->{"field_{$this->teammemberfieldid}_{$entryid}"} = $filename;
+                        $data->{"field_{$this->teammemberfieldid}_{$entryid}"} = $this->get_userid_from_filename($filename);
                         $processed = $dlentries->process_entries('update', $data->eids, $data, true);
-
-                        // Get all the fields and write it into fieldsettings array.
-                        $fieldsettings = [];
-                        foreach ($fields as $field => $value) {
-                            $fieldsettings[$field] = [$value->field->name => array('name' => $value->field->name)];
-                        }
-
                     } else {
                         // handle the case where reading the file failed.
                         echo 'Error reading the file.';
@@ -151,27 +143,25 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
     }
 
     /**
-     * Download the files from the server and place it in a temporary folder.
+     * Download the files from the server and place in draftitemid.
      *
-     * @param  integer $did
-     * @return array
+     * @param  int $did
+     * @return void
      */
-    private function download_files(int $did): array {
+    private function download_files(int $did): void {
         global $CFG;
-        $server = "sftp://" . $this->sftpserver . ":" . $this->stfpport . "/" . $this->sftppath;
+        $server = $this->sftpserver;
+        $remotedir = $this->sftppath;
         $username = $this->sftpusername;
         $password = $this->sftppassword;
-
-        // Local directory to save downloaded files
-        $localdir = $CFG->dataroot . '/temp/' . $did . '/';
-
-        $remotedir = '/';
-        $localdir = '';
-
+        $port = $this->sftpport;
+        $connection = "sftp://$username:$password@$server:$port$remotedir";
         $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_URL, "sftp://$username:$password@$server$remotedir");
+        curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_SFTP);
+        curl_setopt($ch, CURLOPT_URL, $server);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_URL, $connection);
 
         $result = curl_exec($ch);
 
@@ -183,69 +173,74 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
 
             foreach ($remotelist as $line) {
                 $parts = preg_split('/\s+/', trim($line));
-                $file = end($parts);
+                $filename = end($parts);
 
-                if (!empty($file) && $file !== '.' && $file !== '..') {
-                    $remotepath = "$remotedir$file";
-                    $localpath = $localdir . $file;
-
-
+                if (!empty($filename) && $filename !== '.' && $filename !== '..') {
+                    $remotepath = "$this->sftppath$filename";
                     // Todo: Check filename and get all information.
 
                     $filehandle = curl_init();
 
                     // Set cURL options for file download.
-                    curl_setopt($filehandle, CURLOPT_URL, "sftp://$username:$password@$server$remotepath");
+                    curl_setopt($filehandle, CURLOPT_URL, $connection);
                     curl_setopt($filehandle, CURLOPT_RETURNTRANSFER, 1);
 
                     // Download the file.
                     $filedata = curl_exec($filehandle);
 
                     // Todo: get context.
-                    $context = context_module::instance(1);
+                    $context = $this->dl->context;
 
                     if ($filedata !== false) {
 
                         // TODO: Store Data in Moodle.
-
-                        $fs = get_file_storage();
-                        $draftitemid = file_get_submitted_draft_itemid('file'); // Assuming 'file' is the form field name.
-                        $file = $fs->create_file_from_string(
+                        $file = $this->fs->create_file_from_string(
                             [
                                 'contextid' => $context->id, // Replace with the appropriate context if necessary.
-                                'component' => 'user',
+                                'component' => 'mod_datalynx',
                                 'filearea' => 'draft',
-                                'itemid' => $draftitemid,
+                                'itemid' => $this->draftitemid,
                                 'filepath' => '/',
-                                'filename' => $file,
+                                'filename' => $filename,
                             ],
                             $filedata
                         );
 
-                        echo "Downloaded $file successfully." . PHP_EOL;
+                        echo "Downloaded $filename successfully." . PHP_EOL;
                     } else {
-                        echo "Failed to download $file." . PHP_EOL;
+                        echo "Failed to download $filename." . PHP_EOL;
                     }
-
                     curl_close($filehandle);
                 }
             }
         }
-
         curl_close($ch);
+    }
 
-        if (!is_dir($localdir)) {
-            // Create the directory if it doesn't exist
-            if (!mkdir($localdir)) {
-                // Handle directory creation error (e.g., display an error message)
-                throw new Exception('Error creating directory');
-            }
+    /**
+     * Find out the user the uploaded file belongs to based on the filename
+     * @param string $filename
+     * @return int
+     */
+    protected function get_userid_from_filename(string $filename): int {
+        global $DB;
+        switch ($this->matchingfield) {
+            case 'idnumber':
+                $userid = $DB->get_field('user', 'id', array('idnumber' => $filename));
+                break;
+            case 'email':
+                $userid = $DB->get_field('user', 'id', array('email' => $filename));
+                break;
+            case 'id':
+                $userid = $filename;
+                break;
+            case 'username':
+                $userid = $DB->get_field('user', 'id', array('username' => $filename));
+                break;
+            default:
+                $userid = 0;
+                break;
         }
-        $filenames = scandir($localdir);
-        if ($filenames) {
-            return $filenames;
-        } else {
-            return [];
-        }
+        return $userid;
     }
 }
