@@ -39,7 +39,7 @@ class datalynx_rule_ftpsyncfiles_form extends datalynx_rule_form {
         $mform->addElement('text', 'param3', get_string('sftpport', 'datalynxrule_ftpsyncfiles'));
         $mform->setType('param3', PARAM_INT);
         $mform->addElement('text', 'param4', get_string('sftpusername', 'datalynxrule_ftpsyncfiles'));
-        $mform->setType('param4', PARAM_ALPHAEXT);
+        $mform->setType('param4', PARAM_TEXT);
         $mform->addElement('text', 'param5', get_string('sftppassword', 'datalynxrule_ftpsyncfiles'));
         $mform->setType('param5', PARAM_TEXT);
         $mform->addElement('text', 'param6', get_string('sftppath', 'datalynxrule_ftpsyncfiles'));
