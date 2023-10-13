@@ -23,8 +23,7 @@
 // import 'mod_datalynx/pdf';
 
 import * as pdfjsLib from 'mod_datalynx/pdf';
-import pdfjsWorker from 'mod_datalynx/pdf.worker';
-
+import * as pdfjsWorker from 'mod_datalynx/pdf.worker';
 
 function renderPDFfunction(url, canvasContainer) {
 
