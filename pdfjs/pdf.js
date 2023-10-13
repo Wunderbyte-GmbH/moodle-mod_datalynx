@@ -24,11 +24,11 @@
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = root.pdfjsLib = factory();
 	else if(typeof define === 'function' && define.amd)
-		define("pdf", [], () => { return (root.pdfjsLib = factory()); });
+		define("pdfjs-dist/build/pdf", [], () => { return (root.pdfjsLib = factory()); });
 	else if(typeof exports === 'object')
-		exports["pdf"] = root.pdfjsLib = factory();
+		exports["pdfjs-dist/build/pdf"] = root.pdfjsLib = factory();
 	else
-		root["pdf"] = root.pdfjsLib = factory();
+		root["pdfjs-dist/build/pdf"] = root.pdfjsLib = factory();
 })(globalThis, () => {
 return /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";

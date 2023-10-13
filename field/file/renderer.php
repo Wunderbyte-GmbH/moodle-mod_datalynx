@@ -201,14 +201,17 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
         global $PAGE;
         $PAGE->requires->js_call_amd('mod_datalynx/pdfembed', 'renderPDF',
                 [$fullurl, $fieldname]);
+
+        $a = html_writer::tag('script', '', [
+            'src' => 'pdfjs/pdf.js']);
+        $b = html_writer::tag('script', '', [
+                'src' => 'pdfjs/pdf.worker.js']);
+
         return '<div><a href="' . $fullurl . '" target="_blank" class="btn btn-primary">' .
                 get_string('download', 'core_repository') . ' ' .
                 get_string('application/pdf', 'core_mimetypes') .  '</a></div><br>
         <div style="width: 800px; min-height: 400px;" id="' . $fieldname . '"></div>
-        ';
-
-        // the size is hardcoded in the boject obove intentionally because it is adjusted by the following function on-the-fly
-        // $PAGE->requires->js_call_amd('mod_datalynx/maximiseembed', 'initMaximisedEmbed', ['resourceembed']);
+        ' . $a . $b;
     }
 
     /**
