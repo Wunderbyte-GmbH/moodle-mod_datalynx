@@ -83,7 +83,7 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
         $this->sftpserver = $this->rule->param2;
         $this->sftpport = $this->rule->param3;
         $this->sftpusername = $this->rule->param4;
-        $this->sftppassword = $this->rule->param5;
+        $this->sftppassword = $this->rule->param10;
         $this->sftppath = $this->rule->param6;
         $this->matchingfield = $this->rule->param7;
         $this->teammemberfieldid = $this->rule->param8;
