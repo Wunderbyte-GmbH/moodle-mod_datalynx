@@ -44,12 +44,16 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
     const USERNAME = 2;
 
     const USEREMAIL = 3;
+    private $matchingfield;
+    private $teammemberfieldid;
+    private $authorid;
+    private \mod_datalynx\datalynx $dl;
 
     /**
      * Class constructor
      *
-     * @param datalynx|int $df datalynx id or class object
-     * @param stdClass|int $rule rule id or DB record
+     * @param int $df datalynx id or class object
+     * @param int $rule rule id or DB record
      */
     public function __construct($df = 0, $rule = 0) {
         parent::__construct($df, $rule);
@@ -58,8 +62,15 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
         $this->sftpusername = $this->rule->param4;
         $this->sftppassword = $this->rule->param5;
         $this->sftppath = $this->rule->param6;
+        $this->matchingfield = $this->rule->param7;
+        $this->teammemberfieldid = $this->rule->param8;
+        $this->authorid = $this->rule->param9;
     }
 
+    /**
+     * Based on a triggered event we start downloading files.
+     * @param \core\event\base $event
+     */
     public function trigger(\core\event\base $event) {
         global $CFG;
         require_once("$CFG->dirroot/mod/datalynx/classes/datalynx.php");
@@ -69,12 +80,9 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
         $did = $event->get_data()['objectid'];
 
         // Download Server files.
-        $dl = $this->download_files($did);
+        $filenames = $this->download_files((int)$did);
 
-        $instance = new datalynxview_csv($did);
-        $df = new mod_datalynx\datalynx($did);
-
-        // $file = $CFG->dirroot . '/mod/datalynx/testfile/1_test.csv';
+        $this->dl = new mod_datalynx\datalynx($did);
         $fs = get_file_storage();
 
         // Scan folder
@@ -103,35 +111,42 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
         // ];
         // $fs->create_file_from_pathname($filerecord, $file);
 
-        if (file_exists($file) && is_readable($file)) {
-                $filecontents = file_get_contents($file);
+        if (!empty($filenames)) {
+            foreach ($filenames as $filename) {
+                if (file_exists($file) && is_readable($file)) {
+                    $filecontents = file_get_contents($file);
+                    if ($filecontents !== false) {
+                        $data = new stdClass();
+                        $data->eids = [];
 
-            if ($filecontents !== false) {
-                $data = new stdClass();
-                $data->eids = array();
-                $df = new mod_datalynx\datalynx($did);
-                $fields = $df->get_fields();
-                // Get all the fields and write it into fieldsettings array. Needed for process_csv function.
-                $fieldsettings = [];
-                foreach ($fields as $field => $value) {
-                    $fieldsettings[$field] = [$value->field->name => array('name' => $value->field->name)];
+                        $fieldid = datalynxfield_entryauthor::_USERID;
+                        $entryid = -1;
+                        $data->eids[$entryid] = $entryid;
+                        // TODO: If filename is not userid get userid here.
+                        // Entry author is specified in the rule settings:
+                        $data->{"field_{$fieldid}_{$entryid}"} = $this->authorid;
+                        $dlentries = new datalynx_entries($this->dl);
+
+                        // Set teammember from filename.
+                        $data->{"field_{$this->teammemberfieldid}_{$entryid}"} = $filename;
+                        $processed = $dlentries->process_entries('update', $data->eids, $data, true);
+
+                        // Get all the fields and write it into fieldsettings array.
+                        $fieldsettings = [];
+                        foreach ($fields as $field => $value) {
+                            $fieldsettings[$field] = [$value->field->name => array('name' => $value->field->name)];
+                        }
+
+                    } else {
+                        // handle the case where reading the file failed.
+                        echo 'Error reading the file.';
+                    }
+                } else {
+                    // handle the case where the file does not exist or is not readable.
+                    echo 'File does not exist or is not readable.';
                 }
-                // Options array for process_csv
-                $options = array(
-                'settings' => $fieldsettings,
-                );
-                $data->ftpsyncmode = true;
-                $data = $instance->process_csv($data, $filecontents, $options);
-                $instance->execute_import($data);
-            } else {
-                // handle the case where reading the file failed.
-                echo 'Error reading the file.';
             }
-        } else {
-            // handle the case where the file does not exist or is not readable.
-            echo 'File does not exist or is not readable.';
         }
-
         return true;
     }
 
@@ -139,89 +154,54 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
      * Download the files from the server and place it in a temporary folder.
      *
      * @param  integer $did
-     *
-     * @return void
+     * @return array
      */
-    private function download_files(int $did) {
+    private function download_files(int $did): array {
         global $CFG;
-        // Initialize cURL.
-        $c = curl_init("sftp://$this->sftpusername:$this->sftppassword@$this->sftpserver:$this->stfpport/$this->sftppath");
+        $server = "sftp://" . $this->sftpserver . ":" . $this->stfpport . "/" . $this->sftppath;
+        $username = $this->sftpusername;
+        $password = $this->sftppassword;
 
-        // Set cURL options for SFTP.
-        curl_setopt($c, CURLOPT_RETURNTRANSFER, CURLPROTO_SFTP);
+        // Local directory to save downloaded files
+        $localdir = $CFG->dataroot . '/temp/' . $did . '/';
 
-        // Get a list of files in the SFTP folder.
-        $list = curl_exec($c);
-        $info = curl_getinfo($c);
+        // Initialize cURL session
+        $ch = curl_init();
 
-        // Close the cURL connection.
-        curl_close($c);
+        // Set cURL options
+        curl_setopt($ch, CURLOPT_URL, $server);
+        curl_setopt($ch, CURLOPT_USERPWD, "$username:$password");
+        curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_SFTP);
+        curl_setopt($ch, CURLOPT_FILE, null); // Output to standard output
+        curl_setopt($ch, CURLOPT_VERBOSE, true); // For debugging
 
-        // Split the directory listing into an array of file names.
-        $lines = explode("\n", trim($list));
+        // Execute cURL session
+        $result = curl_exec($ch);
 
-        foreach ($lines as $line) {
-            // Split each line by whitespace and extract the last field as the file name.
-            $fields = preg_split('/\s+/', trim($line));
-            $filename = end($fields);
-
-            // Skip directories and any other non-file entries.
-            if ($filename && strpos($filename, '.') !== 0) {
-                $filenames[] = $filename;
-            }
+        // Check for errors
+        if ($result === false) {
+            $error = curl_error($ch);
+            $info = curl_getinfo($ch);
+            mtrace('cURL Error: ' . json_encode($error) . json_encode($info));
+        } else {
+            mtrace('Files downloaded successfully.');
         }
 
-        $datadir = $CFG->dataroot . '/temp/csvimport/moddatalynx/' . $did . '/';
-        if (!is_dir($datadir)) {
+        // Close cURL session
+        curl_close($ch);
+
+        if (!is_dir($localdir)) {
             // Create the directory if it doesn't exist
-            if (!make_temp_directory('/csvimport/moddatalynx/' .$did .'/')) {
+            if (!mkdir($localdir)) {
                 // Handle directory creation error (e.g., display an error message)
-                throw new Exception('Error creating sapfiles directory');
+                throw new Exception('Error creating directory');
             }
         }
-        // Loop through the file names and download each file.
-        foreach ($filenames as $filename) {
-            // Initialize a new cURL handle to download the file.
-            $c = curl_init("sftp://$this->sftpusername:$this->sftppassword@$this->sftpserver:$this->stfpport/$this->sftppath/$filename");
-
-            // Set cURL options for SFTP file transfer.
-            $destinationpath = $CFG->dataroot . '/temp/csvimport/moddatalynx/' . $did . '/' . $filename; // Replace with your local download path
-            $fp = fopen($destinationpath, 'w');
-
-            curl_setopt($c, CURLOPT_FILE, $fp);
-            curl_setopt($c, CURLOPT_PROTOCOLS, CURLPROTO_SFTP);
-
-            // Execute the cURL request to download the file.
-            curl_exec($c);
-
-            // Close the cURL handle and the local file pointer.
-            curl_close($c);
-            fclose($fp);
-            return true;
+        $filenames = scandir($localdir);
+        if ($filenames) {
+            return $filenames;
+        } else {
+            return [];
         }
     }
-
-    /**
-     * Check how to get the userid based on rule setting
-     *
-     * @param  string $userinfo
-     *
-     * @return void
-     */
-    // private function get_userid(string $userinfo) {
-    //     switch ($this->mode) {
-    //         case self::USERID:
-    //             $userid  = 2; // Replace with the actual user ID
-    //             break;
-    //         case self::USERNAME:
-    //             // $userid =
-    //             break;
-    //         case self::USEREMAIL:
-
-    //             break;
-    //         default:
-    //             echo "Invalid mode selected.";
-    //             break;
-    //     }
-    // }
 }

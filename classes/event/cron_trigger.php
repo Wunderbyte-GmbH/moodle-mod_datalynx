@@ -53,7 +53,7 @@ class cron_trigger extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('datalynx_cron_trigger', 'mod_datalynx');
+        return get_string('cron_trigger', 'mod_datalynx');
     }
 
     /**

@@ -1010,6 +1010,17 @@ function xmldb_datalynx_upgrade($oldversion) {
         // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2022080800, 'datalynx');
     }
+    if ($oldversion < 2023101202) {
+        // Get all fieldids of type teammemberselect.
+
+        $ids = $DB->get_fieldset_select('datalynx', 'id', 'id > 0');
+        if (!empty($ids)){
+            list($sql, $params) = $DB->get_in_or_equal($ids, SQL_PARAMS_QM, 'param', false);
+            $DB->delete_records_select('datalynx_rules', 'dataid ' . $sql, $params);
+        }
+        // Datalynx savepoint reached.
+        upgrade_mod_savepoint(true, 2023101202, 'datalynx');
+    }
     return true;
 }
 

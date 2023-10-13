@@ -64,16 +64,15 @@ class datalynx_rule_manager {
                 // Chars just in case.
                 $eventname = explode('\\', trim($observer['eventname'], '\\'))[2];
                 if ($eventname !== 'team_updated') {
-                    $eventmenu[$eventname] = get_string("event_$eventname", 'datalynx');
+                    $eventmenu[$eventname] = get_string("event_$eventname", 'mod_datalynx');
                 } else {
                     foreach (self::get_team_fields_menu($dataid) as $id => $teamfieldname) {
-                        $eventmenu["$eventname:$id"] = get_string("event_$eventname", 'datalynx') .
+                        $eventmenu["$eventname:$id"] = get_string("event_$eventname", 'mod_datalynx') .
                                 ": $teamfieldname";
                     }
                 }
             }
         }
-
         return $eventmenu;
     }
 

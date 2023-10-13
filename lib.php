@@ -186,6 +186,7 @@ function datalynx_delete_instance($id) {
     $DB->delete_records('datalynx_views', array('dataid' => $id));
     $DB->delete_records('datalynx_filters', array('dataid' => $id));
     $DB->delete_records('datalynx_entries', array('dataid' => $id));
+    $DB->delete_records('datalynx_rules', array('dataid' => $id));
 
     // Delete the instance itself.
     $result = $DB->delete_records('datalynx', array('id' => $id));

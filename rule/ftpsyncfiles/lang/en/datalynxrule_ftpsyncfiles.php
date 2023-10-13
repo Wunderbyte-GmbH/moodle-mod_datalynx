@@ -30,3 +30,4 @@ $string['sftpserver'] = 'STFP Server';
 $string['sftpusername'] = 'STFP Username';
 $string['sftppassword'] = 'STFP Password';
 $string['sftppath'] = 'STFP Path';
+$string['sftpport'] = 'STFP Port';

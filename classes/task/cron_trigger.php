@@ -49,9 +49,13 @@ class cron_trigger extends \core\task\scheduled_task {
         global $DB;
         $records = $DB->get_records('datalynx_rules', null, '', 'DISTINCT dataid');
         foreach ($records as $record) {
-            $df = new \mod_datalynx\datalynx($record->dataid);
-            $event = \mod_datalynx\event\cron_trigger::create(array('context' => $df->context, 'objectid' => $df->id()));
-            $event->trigger();
+            // Needed to prevent errors. In the past datalynx_rules was not deleted when dl instance was deleted.
+            // TODO: In upgrade.php remove all deleted rules.
+            if ($DB->record_exists('datalynx', ['id' => $record->dataid])) {
+                $df = new \mod_datalynx\datalynx($record->dataid);
+                $event = \mod_datalynx\event\cron_trigger::create(array('context' => $df->context, 'objectid' => $df->id()));
+                $event->trigger();
+            }
         }
     }
 }

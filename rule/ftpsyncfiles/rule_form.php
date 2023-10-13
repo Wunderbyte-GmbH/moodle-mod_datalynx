@@ -33,40 +33,41 @@ class datalynx_rule_ftpsyncfiles_form extends datalynx_rule_form {
         $br = html_writer::empty_tag('br');
         $mform = &$this->_form;
 
-        $mform->addElement('header', 'settingshdr', get_string('sftpsettings', 'datalynxrule_ftpsyncfiles'));
-        $sftpgrp = array();
+        $mform->addElement('header', 'settingshdr', get_string('sftpsettings',
+                'datalynxrule_ftpsyncfiles'));
         $mform->addElement('text', 'param2', get_string('sftpserver', 'datalynxrule_ftpsyncfiles'));
         $mform->addElement('text', 'param3', get_string('sftpport', 'datalynxrule_ftpsyncfiles'));
         $mform->addElement('text', 'param4', get_string('sftpusername', 'datalynxrule_ftpsyncfiles'));
         $mform->addElement('text', 'param5', get_string('sftppassword', 'datalynxrule_ftpsyncfiles'));
         $mform->addElement('text', 'param6', get_string('sftppath', 'datalynxrule_ftpsyncfiles'));
-        // TODO: ADD SELECT for mode.
-        $mform->addElement('header', 'settingshdr', get_string('settings'));
+        $mform->addElement('header', 'settingsprofile', get_string('fields', 'datalynx'));
+        $standardfields = array('idnumber' => 'idnumber', 'email' => 'email', 'id' => 'id', 'username' => 'username');
+        $mform->addElement('autocomplete', 'param7', get_string('profilefields', 'core_admin'),
+                $standardfields);
 
-        // Delimiter.
-        $delimiters = csv_import_reader::get_delimiter_list();
-        $mform->addElement('select', 'delimiter', get_string('csvdelimiter', 'datalynx'), $delimiters);
-        $mform->setDefault('delimiter', 'comma');
-
-        // Enclosure.
-        $mform->addElement('text', 'enclosure', get_string('csvenclosure', 'datalynx'), array('size' => '10'));
-        $mform->setType('enclosure', PARAM_NOTAGS);
-        $mform->setDefault('enclosure', '"');
-
-        // Encoding.
-        $choices = core_text::get_encodings();
-        $mform->addElement('select', 'encoding', get_string('encoding', 'grades'), $choices);
-        $mform->setDefault('encoding', 'UTF-8');
-
+        $fields = $this->_df->get_fields(null, false, true);
+        $fieldnames = array();
+        foreach ($fields as $fieldid => $field) {
+            if ($field->type == 'teammemberselect') {
+                $fieldnames[$fieldid] = $field->name();
+            }
+        }
+        asort($fieldnames);
+        $options = array('multiple' => false);
+        $mform->addElement('autocomplete', 'param8', get_string('teammemberselect', 'datalynx'),
+                $fieldnames, $options);
+        $potentialusers = get_users_by_capability($this->_df->context, 'mod/datalynx:manageentries');
+        $choosuser = [];
+        foreach ($potentialusers as $user) {
+            $choosuser[$user->id] = $user->firstname . ' ' . $user->lastname;
+        }
+        $mform->addElement('autocomplete', 'param9', get_string('user'),
+                $choosuser, $options);
     }
 
     /**
      */
     public function data_preprocessing(&$data) {
-        // CSV settings.
-        if (!empty($data->param7)) {
-            list($data->delimiter, $data->enclosure, $data->encoding) = explode(',', $data->param7);
-        }
     }
 
     /**
@@ -79,9 +80,6 @@ class datalynx_rule_ftpsyncfiles_form extends datalynx_rule_form {
     /**
      */
     public function get_data($slashed = true) {
-        if ($data = parent::get_data($slashed)) {
-            $data->param7 = "$data->delimiter,$data->enclosure,$data->encoding";
-        }
-        return $data;
+        return parent::get_data($slashed);
     }
 }
