@@ -97,6 +97,7 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
     public function trigger(\core\event\base $event) {
         global $CFG, $DB, $USER;
         require_once("$CFG->dirroot/mod/datalynx/classes/datalynx.php");
+        require_once("$CFG->dirroot/mod/datalynx/field/entryauthor/fieldclass/datalynx_entryauthor.php");
         require_once("$CFG->dirroot/mod/datalynx/entries_class.php");
         require_once("$CFG->dirroot/mod/datalynx/view/csv/view_class.php");
         require_once($CFG->libdir.'/filelib.php');
@@ -123,17 +124,15 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
                 $data = new stdClass();
                 $data->eids = [];
 
-                $fields = $this->dl->get_fields();
-
                 $fieldid = datalynxfield_entryauthor::_USERID;
                 $filename = $file->get_filename();
 
                 $entryid = -1;
                 $data->eids[$entryid] = $entryid;
                 // TODO: If filename is not userid get userid here.
-                // Entry author is specified in the rule settings:
                 $data->{"field_{$fieldid}_{$entryid}"} = $this->authorid;
                 $data->{"field_{$fieldid}_{$entryid}_filemanager"} = $this->draftitemid;
+                $data->{"field_{$fieldid}_{$entryid}_content"} = 1;
                 $dlentries = new datalynx_entries($this->dl);
                 // Set teammember from filename.
                 $data->{"field_{$this->teammemberfieldid}_{$entryid}"} = $this->get_userid_from_filename($filename);
