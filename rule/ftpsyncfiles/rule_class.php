@@ -90,24 +90,24 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
         // $files = scandir($folder);
 
         // foreach ($files as $file) {
-        //     if ($file !== '.' && $file !== '..') {
-        //         if (preg_match('/^(\d+)_/', $file, $matches)) {
-        //             $prefix = $matches[1];
-        //         }
-        //     }
+        // if ($file !== '.' && $file !== '..') {
+        // if (preg_match('/^(\d+)_/', $file, $matches)) {
+        // $prefix = $matches[1];
+        // }
+        // }
         // }
 
         // How
         // $filerecord = [
-        //     'contextid'    => $df->context->id,
-        //     'component'    => 'mod_datalynx',
-        //     'filearea'     => 'content',
-        //     'itemid'       => 204,  -> (not entryid datalynx_contents -> id)
-        //     'filepath'     => '/',
-        //     'filename'     => 'test.csv',
-        //     'timecreated'  => time(),
-        //     'timemodified' => time(),
-        //     'userid' => $userid,
+        // 'contextid'    => $df->context->id,
+        // 'component'    => 'mod_datalynx',
+        // 'filearea'     => 'content',
+        // 'itemid'       => 204,  -> (not entryid datalynx_contents -> id)
+        // 'filepath'     => '/',
+        // 'filename'     => 'test.csv',
+        // 'timecreated'  => time(),
+        // 'timemodified' => time(),
+        // 'userid' => $userid,
         // ];
         // $fs->create_file_from_pathname($filerecord, $file);
 
@@ -165,29 +165,73 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
         // Local directory to save downloaded files
         $localdir = $CFG->dataroot . '/temp/' . $did . '/';
 
-        // Initialize cURL session
+        $remotedir = '/';
+        $localdir = '';
+
         $ch = curl_init();
 
-        // Set cURL options
-        curl_setopt($ch, CURLOPT_URL, $server);
-        curl_setopt($ch, CURLOPT_USERPWD, "$username:$password");
-        curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_SFTP);
-        curl_setopt($ch, CURLOPT_FILE, null); // Output to standard output
-        curl_setopt($ch, CURLOPT_VERBOSE, true); // For debugging
+        curl_setopt($ch, CURLOPT_URL, "sftp://$username:$password@$server$remotedir");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
-        // Execute cURL session
         $result = curl_exec($ch);
 
-        // Check for errors
         if ($result === false) {
-            $error = curl_error($ch);
-            $info = curl_getinfo($ch);
-            mtrace('cURL Error: ' . json_encode($error) . json_encode($info));
+            echo 'cURL error: ' . curl_error($ch);
         } else {
-            mtrace('Files downloaded successfully.');
+            // List of remote files and directories.
+            $remotelist = explode("\n", trim($result));
+
+            foreach ($remotelist as $line) {
+                $parts = preg_split('/\s+/', trim($line));
+                $file = end($parts);
+
+                if (!empty($file) && $file !== '.' && $file !== '..') {
+                    $remotepath = "$remotedir$file";
+                    $localpath = $localdir . $file;
+
+
+                    // Todo: Check filename and get all information.
+
+                    $filehandle = curl_init();
+
+                    // Set cURL options for file download.
+                    curl_setopt($filehandle, CURLOPT_URL, "sftp://$username:$password@$server$remotepath");
+                    curl_setopt($filehandle, CURLOPT_RETURNTRANSFER, 1);
+
+                    // Download the file.
+                    $filedata = curl_exec($filehandle);
+
+                    // Todo: get context.
+                    $context = context_module::instance(1);
+
+                    if ($filedata !== false) {
+
+                        // TODO: Store Data in Moodle.
+
+                        $fs = get_file_storage();
+                        $draftitemid = file_get_submitted_draft_itemid('file'); // Assuming 'file' is the form field name.
+                        $file = $fs->create_file_from_string(
+                            [
+                                'contextid' => $context->id, // Replace with the appropriate context if necessary.
+                                'component' => 'user',
+                                'filearea' => 'draft',
+                                'itemid' => $draftitemid,
+                                'filepath' => '/',
+                                'filename' => $file,
+                            ],
+                            $filedata
+                        );
+
+                        echo "Downloaded $file successfully." . PHP_EOL;
+                    } else {
+                        echo "Failed to download $file." . PHP_EOL;
+                    }
+
+                    curl_close($filehandle);
+                }
+            }
         }
 
-        // Close cURL session
         curl_close($ch);
 
         if (!is_dir($localdir)) {
