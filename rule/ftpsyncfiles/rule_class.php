@@ -95,12 +95,14 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
      * @param \core\event\base $event
      */
     public function trigger(\core\event\base $event) {
+
         global $CFG, $DB, $USER;
         require_once("$CFG->dirroot/mod/datalynx/classes/datalynx.php");
-        require_once("$CFG->dirroot/mod/datalynx/field/entryauthor/fieldclass/datalynx_entryauthor.php");
+        require_once("$CFG->dirroot/mod/datalynx/field/entryauthor/field_class.php");
         require_once("$CFG->dirroot/mod/datalynx/entries_class.php");
         require_once("$CFG->dirroot/mod/datalynx/view/csv/view_class.php");
         require_once($CFG->libdir.'/filelib.php');
+        require_once($CFG->libdir . '/completionlib.php');
 
         $did = $event->get_data()['objectid'];
         $this->dl = new mod_datalynx\datalynx($did);
