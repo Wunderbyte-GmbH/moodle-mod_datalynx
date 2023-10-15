@@ -244,6 +244,6 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
                 $userid = 0;
                 break;
         }
-        return $userid;
+        return (int) $userid;
     }
 }
