@@ -587,7 +587,7 @@ function mod_datalynx_pluginfile($course, $cm, $context, $filearea, $args, $forc
         }
 
         // Finally send the file.
-        send_stored_file($file, 0, 0, true); // Download MUST be forced - security!
+        send_stored_file($file, 0, 0, false); // Download MUST be forced - security!
     }
 
     // VIEW TEMPLATE files.

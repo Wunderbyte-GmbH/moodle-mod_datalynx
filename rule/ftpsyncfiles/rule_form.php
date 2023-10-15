@@ -116,21 +116,23 @@ class datalynx_rule_ftpsyncfiles_form extends datalynx_rule_form {
     /**
      */
     public function set_data($data) {
-        $sftpsetting = unserialize($data->param2);
-        if (isset($sftpsetting['sftpserver'])) {
-            $data->sftpserver = $sftpsetting['sftpserver'];
-        }
-        if (isset($sftpsetting['sftpport'])) {
-            $data->sftpport = $sftpsetting['sftpport'];
-        }
-        if (isset($sftpsetting['sftpusername'])) {
-            $data->sftpusername = $sftpsetting['sftpusername'];
-        }
-        if (isset($sftpsetting['sftppassword'])) {
-            $data->sftppassword = $sftpsetting['sftppassword'];
-        }
-        if (isset($sftpsetting['sftppath'])) {
-            $data->sftppath = $sftpsetting['sftppath'];
+        if (!empty($data->param2)) {
+            $sftpsetting = unserialize($data->param2);
+            if (isset($sftpsetting['sftpserver'])) {
+                $data->sftpserver = $sftpsetting['sftpserver'];
+            }
+            if (isset($sftpsetting['sftpport'])) {
+                $data->sftpport = $sftpsetting['sftpport'];
+            }
+            if (isset($sftpsetting['sftpusername'])) {
+                $data->sftpusername = $sftpsetting['sftpusername'];
+            }
+            if (isset($sftpsetting['sftppassword'])) {
+                $data->sftppassword = $sftpsetting['sftppassword'];
+            }
+            if (isset($sftpsetting['sftppath'])) {
+                $data->sftppath = $sftpsetting['sftppath'];
+            }
         }
         parent::set_data($data);
     }

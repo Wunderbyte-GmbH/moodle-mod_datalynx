@@ -35,22 +35,13 @@ function renderPDFfunction(url, canvasContainer) {
             canvasContext: ctx,
             viewport: viewport
         };
-        // Calculate the scaling factors to fit the container's width and height
-        var widthScale = canvasContainer.clientWidth / viewport.width;
-        var heightScale = canvasContainer.clientHeight / viewport.height;
 
-        // Use the minimum scale to ensure that the entire page fits within the container
-        var scale = Math.min(widthScale, heightScale);
+        var customScale = 1;
+        var desiredWidth = 595;
+        var desiredHeight = 841;
 
-        // Apply the scaling factor
-        canvas.width = viewport.width * scale;
-        canvas.height = viewport.height * scale;
-
-        // canvas.height = canvasContainer.clientHeight;
-        // canvas.width = canvasContainer.clientWidth;
-
-        // canvas.height = 800;
-        // canvas.width = 1200;
+        canvas.height = desiredHeight * customScale;
+        canvas.width = desiredWidth * customScale;
 
         canvasContainer.appendChild(canvas);
 

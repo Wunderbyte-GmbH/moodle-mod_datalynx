@@ -115,10 +115,12 @@ class datalynx_rule_form extends moodleform {
      * @param array|stdClass $data
      */
     public function set_data($data) {
-        $selectedevents = unserialize($data->param1);
-        if ($selectedevents) {
-            foreach ($selectedevents as $eventname) {
-                $data->$eventname = true;
+        if (!empty($data->param1)) {
+            $selectedevents = unserialize($data->param1);
+            if ($selectedevents) {
+                foreach ($selectedevents as $eventname) {
+                    $data->$eventname = true;
+                }
             }
         }
         parent::set_data($data);

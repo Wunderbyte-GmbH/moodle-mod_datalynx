@@ -75,7 +75,7 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
      * @var mixed
      */
     private array $sftpsetting;
-    private int $filefieldid;
+    private ?int $filefieldid;
     private array $files;
 
     /**
@@ -86,12 +86,14 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
      */
     public function __construct($df = 0, $rule = 0) {
         parent::__construct($df, $rule);
-        $this->sftpsetting = unserialize($this->rule->param2);
-        $this->sftpserver = $this->sftpsetting['sftpserver'];
-        $this->sftpport = $this->sftpsetting['sftpport'];
-        $this->sftpusername = $this->sftpsetting['sftpusername'];
-        $this->sftppassword = $this->sftpsetting['sftppassword'];
-        $this->sftppath = $this->sftpsetting['sftppath'];
+        if (isset($this->rule->param2)) {
+            $this->sftpsetting = unserialize($this->rule->param2);
+            $this->sftpserver = $this->sftpsetting['sftpserver'];
+            $this->sftpport = $this->sftpsetting['sftpport'];
+            $this->sftpusername = $this->sftpsetting['sftpusername'];
+            $this->sftppassword = $this->sftpsetting['sftppassword'];
+            $this->sftppath = $this->sftpsetting['sftppath'];
+        }
         $this->matchingfield = $this->rule->param7;
         $this->teammemberfieldid = $this->rule->param8;
         $this->authorid = $this->rule->param9;
@@ -117,29 +119,26 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
 
         $this->fs = get_file_storage();
         $this->download_files((int)$did);
-
         $context = context_user::instance($USER->id);
 
         // $files = $this->fs->get_area_files($context->id, 'mod_datalynx', 'draft', $this->draftitemid);
 
         if (!empty($this->files)) {
-            foreach ($files as $file) {
-
+            foreach ($this->files as $draftitemid => $file) {
                 $data = new stdClass();
                 $data->eids = [];
-
                 $fieldid = datalynxfield_entryauthor::_USERID;
                 $filename = $file->get_filename();
-
                 $entryid = -1;
                 $data->eids[$entryid] = $entryid;
                 // TODO: If filename is not userid get userid here.
                 $data->{"field_{$fieldid}_{$entryid}"} = $this->authorid;
-                $data->{"field_{$this->filefieldid}_{$entryid}_filemanager"} = $this->draftitemid;
-                $data->{"field_{$this->filefieldid}_{$entryid}_content"} = 1;
+                $data->{"field_{$this->filefieldid}_{$entryid}_filemanager"} = $draftitemid;
+                $data->{"field_{$this->filefieldid}_{$entryid}_alttext"} = "PDF";
                 $dlentries = new datalynx_entries($this->dl);
                 // Set teammember from filename.
-                $data->{"field_{$this->teammemberfieldid}_{$entryid}"} = [$this->get_userid_from_filename($filename)];
+                $userid = $this->get_userid_from_filename($filename);
+                $data->{"field_{$this->teammemberfieldid}_{$entryid}"} = ["$userid"];
                 $processed = $dlentries->process_entries('update', $data->eids, $data, true);
             }
         }
@@ -180,30 +179,30 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
                 $filename = end($parts);
 
                 if (!empty($filename) && $filename !== '.' && $filename !== '..') {
-                    $remotepath = "$this->sftppath$filename";
+                    $remotepath = "$connection/$filename";
+                    mtrace($remotepath);
                     // Todo: Check filename and get all information.
 
                     $filehandle = curl_init();
 
                     // Set cURL options for file download.
-                    curl_setopt($filehandle, CURLOPT_URL, $connection);
+                    curl_setopt($filehandle, CURLOPT_URL, $remotepath);
                     curl_setopt($filehandle, CURLOPT_RETURNTRANSFER, 1);
 
                     // Download the file.
                     $filedata = curl_exec($filehandle);
 
-                    // Todo: get context.
                     $context = context_user::instance($USER->id);
                     // $context = $this->dl->context;
 
                     if ($filedata !== false) {
-
                         // TODO: Store Data in Moodle.
                         $draftitemid = file_get_unused_draft_itemid();
+                        file_prepare_draft_area($draftitemid, $context->id, 'user', 'content', null);
                         $this->files[$draftitemid] = $this->fs->create_file_from_string(
                             [
                                 'contextid' => $context->id, // Replace with the appropriate context if necessary.
-                                'component' => 'mod_datalynx',
+                                'component' => 'user',
                                 'filearea' => 'draft',
                                 'itemid' => $draftitemid,
                                 'filepath' => '/',
@@ -211,7 +210,6 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
                             ],
                             $filedata
                         );
-
                         echo "Downloaded $filename successfully." . PHP_EOL;
                     } else {
                         echo "Failed to download $filename." . PHP_EOL;
