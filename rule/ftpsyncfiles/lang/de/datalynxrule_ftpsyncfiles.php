@@ -31,3 +31,9 @@ $string['sftpusername'] = 'STFP Username';
 $string['sftppassword'] = 'STFP Passwort';
 $string['sftppath'] = 'STFP Path';
 $string['sftpport'] = 'STFP Port';
+
+$string['matchfields'] = 'Importierte Daten entsprechend den Formularfeldern zuordnen';
+$string['identifier'] = 'Im Dateinamen verwendetes Identifikationsmerkmal, um die Datei dem richtigen User zuzuordnen';
+$string['teammemberfield'] = 'Formularfeld, das verwendet wird um den User zu bestimmen, dem die Datei zugeordnet werden soll';
+$string['manager'] = 'Der User, der die Einträge verwaltet';
+$string['filefield'] = 'Feld in dem die Datei gespeichert werden soll';

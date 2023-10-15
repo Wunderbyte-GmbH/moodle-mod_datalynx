@@ -34,19 +34,52 @@ class datalynx_rule_ftpsyncfiles_form extends datalynx_rule_form {
 
         $mform->addElement('header', 'settingshdr', get_string('sftpsettings',
                 'datalynxrule_ftpsyncfiles'));
-        $mform->addElement('text', 'param2', get_string('sftpserver', 'datalynxrule_ftpsyncfiles'));
+
+        $mform->addElement('hidden', 'param2', '');
         $mform->setType('param2', PARAM_TEXT);
-        $mform->addElement('text', 'param3', get_string('sftpport', 'datalynxrule_ftpsyncfiles'));
-        $mform->setType('param3', PARAM_INT);
-        $mform->addElement('text', 'param4', get_string('sftpusername', 'datalynxrule_ftpsyncfiles'));
-        $mform->setType('param4', PARAM_TEXT);
-        $mform->addElement('text', 'param10', get_string('sftppassword', 'datalynxrule_ftpsyncfiles'));
-        $mform->setType('param10', PARAM_TEXT);
-        $mform->addElement('text', 'param6', get_string('sftppath', 'datalynxrule_ftpsyncfiles'));
-        $mform->setType('param6', PARAM_SAFEPATH);
-        $mform->addElement('header', 'settingsprofile', get_string('fields', 'datalynx'));
+
+        // SFTP connection and credentials. Save in param2 as serialized data.
+        $grp = [];
+        $grp[] = &$mform->createElement('static', '', '',
+                "<br><b class=\"w-100 mt-3\">" . get_string('sftpserver', 'datalynxrule_ftpsyncfiles') . "</b>");
+        $grp[] = &$mform->createElement('text', 'sftpserver', null,
+                get_string('sftpserver', 'datalynxrule_ftpsyncfiles'));
+
+        $grp[] = &$mform->createElement('static', '', '',
+                "<br><b class=\"w-100 mt-3\">" . get_string('sftpport', 'datalynxrule_ftpsyncfiles') . "</b>");
+        $grp[] = &$mform->createElement('text', 'sftpport',
+                get_string('sftpport', 'datalynxrule_ftpsyncfiles'));
+
+        $grp[] = &$mform->createElement('static', '', '',
+                "<br><b class=\"w-100 mt-3\">" . get_string('sftpusername', 'datalynxrule_ftpsyncfiles') . "</b>");
+        $grp[] = &$mform->createElement('text', 'sftpusername',
+                get_string('sftpusername', 'datalynxrule_ftpsyncfiles'));
+
+        $grp[] = &$mform->createElement('static', '', '',
+                "<br><b class=\"w-100 mt-3\">" . get_string('sftppassword', 'datalynxrule_ftpsyncfiles') . "</b>");
+        $grp[] = &$mform->createElement('text', 'sftppassword',
+                get_string('sftppassword', 'datalynxrule_ftpsyncfiles'));
+
+        $grp[] = &$mform->createElement('static', '', '',
+                "<br><b class=\"w-100 mt-3\">" . get_string('sftppath', 'datalynxrule_ftpsyncfiles') . "</b>");
+        $grp[] = &$mform->createElement('text', 'sftppath',
+                get_string('sftppath', 'datalynxrule_ftpsyncfiles'));
+
+        $mform->addGroup($grp, 'sftpgrp',
+                get_string('sftpsettings', 'datalynxrule_ftpsyncfiles'), $br, false);
+
+        $mform->setType('sftppath', PARAM_SAFEPATH);
+        $mform->setType('sftpserver', PARAM_TEXT);
+        $mform->setType('sftppassword', PARAM_TEXT);
+        $mform->setType('sftpport', PARAM_INT);
+        $mform->setType('sftpusername', PARAM_TEXT);
+
+        $mform->addElement('header', 'settingsprofile',
+                get_string('matchfields', 'datalynxrule_ftpsyncfiles'));
+
         $standardfields = array('idnumber' => 'idnumber', 'email' => 'email', 'id' => 'id', 'username' => 'username');
-        $mform->addElement('autocomplete', 'param7', get_string('profilefields', 'core_admin'),
+        $mform->addElement('autocomplete', 'param7',
+                get_string('identifier', 'datalynxrule_ftpsyncfiles'),
                 $standardfields);
 
         $fields = $this->_df->get_fields(null, false, true);
@@ -58,18 +91,24 @@ class datalynx_rule_ftpsyncfiles_form extends datalynx_rule_form {
         }
         asort($fieldnames);
         $options = array('multiple' => false);
-        $mform->addElement('autocomplete', 'param8', get_string('teammemberselect', 'datalynx'),
-                $fieldnames, $options);
+        $mform->addElement('autocomplete', 'param8',
+                get_string('teammemberfield', 'datalynxrule_ftpsyncfiles'), $fieldnames, $options);
         $potentialusers = get_users_by_capability($this->_df->context, 'mod/datalynx:manageentries');
         $choosuser = [];
         foreach ($potentialusers as $user) {
             $choosuser[$user->id] = $user->firstname . ' ' . $user->lastname;
         }
-        $mform->addElement('autocomplete', 'param9', get_string('user'),
-                $choosuser, $options);
+        $mform->addElement('autocomplete', 'param9',
+                get_string('manager', 'datalynxrule_ftpsyncfiles'), $choosuser, $options);
+
+        $fields = $this->_df->get_fields_by_type('file', true);
+        $mform->addElement('autocomplete', 'param3',
+                get_string('filefield', 'datalynxrule_ftpsyncfiles'), $fields, $options);
     }
 
     /**
+     * @param $data
+     * @return void
      */
     public function data_preprocessing(&$data) {
     }
@@ -77,13 +116,51 @@ class datalynx_rule_ftpsyncfiles_form extends datalynx_rule_form {
     /**
      */
     public function set_data($data) {
-        $this->data_preprocessing($data);
+        $sftpsetting = unserialize($data->param2);
+        if (isset($sftpsetting['sftpserver'])) {
+            $data->sftpserver = $sftpsetting['sftpserver'];
+        }
+        if (isset($sftpsetting['sftpport'])) {
+            $data->sftpport = $sftpsetting['sftpport'];
+        }
+        if (isset($sftpsetting['sftpusername'])) {
+            $data->sftpusername = $sftpsetting['sftpusername'];
+        }
+        if (isset($sftpsetting['sftppassword'])) {
+            $data->sftppassword = $sftpsetting['sftppassword'];
+        }
+        if (isset($sftpsetting['sftppath'])) {
+            $data->sftppath = $sftpsetting['sftppath'];
+        }
         parent::set_data($data);
     }
 
     /**
+     * @param $slashed
+     * @return object
      */
     public function get_data($slashed = true) {
-        return parent::get_data($slashed);
+        $data = parent::get_data($slashed);
+        $sftpsetting = [];
+        if (isset($data->sftpserver)) {
+            $sftpsetting['sftpserver'] = $data->sftpserver;
+        }
+        if (isset($data->sftpport)) {
+            $sftpsetting['sftpport'] = $data->sftpport;
+        }
+        if (isset($data->sftpusername)) {
+            $sftpsetting['sftpusername'] = $data->sftpusername;
+        }
+        if (isset($data->sftppassword)) {
+            $sftpsetting['sftppassword'] = $data->sftppassword;
+        }
+        if (isset($data->sftppath)) {
+            $sftpsetting['sftppath'] = $data->sftppath;
+        }
+        // Aggregate all form fields into param2 table field.
+        if (isset($sftpsetting) && isset($data)) {
+            $data->param2 = serialize($sftpsetting);
+        }
+        return $data;
     }
 }
