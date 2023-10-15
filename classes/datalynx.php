@@ -185,16 +185,15 @@ class datalynx {
      * Get datalynx object by instanceid (id of datalynx table)
      *
      * @param $instanceid
-     * @return mod_datalynx\datalynx
-     * @throws \coding_exception
+     * @return datalynx
      */
-    public static function get_datalynx_by_instance($instanceid) {
+    public static function get_datalynx_by_instance($instanceid): datalynx {
         $cm = get_coursemodule_from_instance('datalynx', $instanceid);
-        return new mod_datalynx\datalynx($instanceid, $cm->id);
+        return new datalynx($instanceid, $cm->id);
     }
 
     /**
-     * Get datalynx id.
+     * Get datalynx table id. Not cmid.
      *
      * @return mixed
      */
@@ -1029,7 +1028,7 @@ class datalynx {
      * @param string $sort
      * @return datalynxfield_base[]
      */
-    public function get_fields($exclude = null, $menu = false, $forceget = false, $sort = '') {
+    public function get_fields($exclude = null, $menu = false, $forceget = false, $sort = ''): array {
         global $DB;
 
         if (!$this->fields or $forceget) {

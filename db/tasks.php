@@ -1,3 +1,4 @@
+<?php
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -13,16 +14,25 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/*
- * @package    mod_datalynx
- * @copyright  Wunderbyte GmbH <info@wunderbyte.at>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+/**
+ * Definition of Quiz scheduled tasks.
+ *
+ * @package   mod _datalynx
+ * @category  task
+ * @copyright 2023 Thomas Winkler Michael Hughes <michaelhughes@strath.ac.uk>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['pdfjs-dist/build/pdf', 'pdfjs-dist/build/pdf.worker'], function(pdfjsLib, pdfjsWorker) {
-    // pdf.js is now available via pdfjsLib and pdfjsWorker
-    return {
-        pdf: pdfjsLib,
-        pdfworker: pdfjsWorker
-    };
-});
+defined('MOODLE_INTERNAL') || die();
+
+$tasks = [
+    [
+        'classname' => 'mod_datalynx\task\cron_trigger',
+        'blocking' => 0,
+        'minute' => '*',
+        'hour' => '*',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    ]
+];

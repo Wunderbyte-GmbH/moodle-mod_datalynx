@@ -88,7 +88,8 @@ class datalynxfield_file extends datalynxfield_base {
         $rec->entryid = $entryid;
         $rec->content1 = $alttext;
 
-        if (count($files) > 1) {
+        // Hack for update field for ftpsync.
+        if (count($files) > 1 || $filemanager == 111111) {
             $rec->content = 1; // We just store a 1 to show there is something, look for files.
         } else {
             $rec->content = 0; // In case there is no file, add a 0.
@@ -175,9 +176,15 @@ class datalynxfield_file extends datalynxfield_base {
             $fs = get_file_storage();
             $fs->create_file_from_url($filerecord, $fileurl, null, true);
         }
+
         // If no files, then return false.
-        if ($filesprocessed == 0) {
+        if ($filesprocessed == 0 && $data->ftpsyncmode == 0) {
             return false;
+        }
+
+        if ($data->ftpsyncmode) {
+            $data->{"field_{$fieldid}_{$entryid}"} = 1;
+            $draftitemid = 111111;
         }
 
         // Tell the update script what itemid to look for.

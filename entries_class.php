@@ -507,7 +507,7 @@ class datalynx_entries {
      * Process entries when after editing content for saving into db
      *
      * @param string $action
-     * @param string $eids
+     * @param string||array $eids
      * @param null $data
      * @param bool $confirmed
      * @return array notificationstrings, list of processed ids
@@ -515,7 +515,7 @@ class datalynx_entries {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public function process_entries(string $action, string $eids, $data = null, bool $confirmed = false): array {
+    public function process_entries(string $action, $eids, $data = null, bool $confirmed = false): array {
         global $DB, $USER, $OUTPUT, $PAGE;
         $dl = $this->datalynx;
         $errorstring = '';
@@ -540,7 +540,7 @@ class datalynx_entries {
                 $addcount = 0;
                 $addmax = $dl->data->maxentries;
                 $perinterval = ($dl->data->intervalcount > 1);
-                if ($addmax != -1 and has_capability('mod/datalynx:manageentries', $dl->context)) {
+                if ($addmax != -1 && has_capability('mod/datalynx:manageentries', $dl->context)) {
                     $addmax = -1;
                 } else {
                     if ($addmax != -1) {
@@ -553,7 +553,7 @@ class datalynx_entries {
                     $entry = new stdClass();
 
                     // Existing entry from view.
-                    if ($eid > 0 and isset($this->_entries[$eid])) {
+                    if ($eid > 0 && isset($this->_entries[$eid])) {
                         $entries[$eid] = $this->_entries[$eid];
 
                         // TODO existing entry *not* from view (import).

@@ -24,11 +24,11 @@
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = root.pdfjsWorker = factory();
 	else if(typeof define === 'function' && define.amd)
-		define("pdfjs-dist/build/pdf.worker", [], () => { return (root.pdfjsWorker = factory()); });
+		define("mod_datalynx/pdf.worker", [], () => { return (root.pdfjsWorker = factory()); });
 	else if(typeof exports === 'object')
-		exports["pdfjs-dist/build/pdf.worker"] = root.pdfjsWorker = factory();
+		exports["mod_datalynx/pdf.worker"] = root.pdfjsWorker = factory();
 	else
-		root["pdfjs-dist/build/pdf.worker"] = root.pdfjsWorker = factory();
+		root["mod_datalynx/pdf.worker"] = root.pdfjsWorker = factory();
 })(globalThis, () => {
 return /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";

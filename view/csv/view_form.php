@@ -43,7 +43,7 @@ class datalynxview_csv_form extends datalynxview_base_form {
         $mform->addElement('select', 'param3', get_string('outputtype', 'datalynxview_csv'), $options);
 
         // Delimiter.
-        $delimiters = csv_import_reader::get_delimiter_list();
+        $delimiters = \csv_import_reader::get_delimiter_list();
         $mform->addElement('select', 'delimiter', get_string('csvdelimiter', 'datalynx'), $delimiters);
         $mform->setDefault('delimiter', 'comma');
 
@@ -53,7 +53,7 @@ class datalynxview_csv_form extends datalynxview_base_form {
         $mform->setDefault('enclosure', '"');
 
         // Encoding.
-        $choices = core_text::get_encodings();
+        $choices = \core_text::get_encodings();
         $mform->addElement('select', 'encoding', get_string('encoding', 'grades'), $choices);
         $mform->setDefault('encoding', 'UTF-8');
 

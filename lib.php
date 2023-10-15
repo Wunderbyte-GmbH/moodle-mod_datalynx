@@ -186,6 +186,7 @@ function datalynx_delete_instance($id) {
     $DB->delete_records('datalynx_views', array('dataid' => $id));
     $DB->delete_records('datalynx_filters', array('dataid' => $id));
     $DB->delete_records('datalynx_entries', array('dataid' => $id));
+    $DB->delete_records('datalynx_rules', array('dataid' => $id));
 
     // Delete the instance itself.
     $result = $DB->delete_records('datalynx', array('id' => $id));
@@ -586,7 +587,7 @@ function mod_datalynx_pluginfile($course, $cm, $context, $filearea, $args, $forc
         }
 
         // Finally send the file.
-        send_stored_file($file, 0, 0, true); // Download MUST be forced - security!
+        send_stored_file($file, 0, 0, false); // Download MUST be forced - security!
     }
 
     // VIEW TEMPLATE files.

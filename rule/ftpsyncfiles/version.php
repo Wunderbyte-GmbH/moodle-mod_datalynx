@@ -13,19 +13,15 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
 /**
  *
- * @package mod_datalynx
- * @copyright 2015 onwards David Bogner
+ * @package datalynxrule
+ * @subpackage ftpsyncfiles
+ * @copyright 2023 Thomas Winkler
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') or die();
-$plugin->component = 'mod_datalynx';
-$plugin->version = 2023101202;
-$plugin->release = 'v3.0-DataIntelligence'; // Data words like data science, data mining.
-$plugin->requires = 2022112800;
-$plugin->maturity = MATURITY_STABLE;
-$plugin->dependencies = array(
-    'assignfeedback_editpdf' => ANY_VERSION // We use fpdi from this core module.
-);
+
+$plugin->component = 'datalynxrule_ftpsyncfiles';
+$plugin->version = 2023101001;
+$plugin->requires = 2014051200;

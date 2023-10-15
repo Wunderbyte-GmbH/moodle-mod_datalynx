@@ -895,3 +895,7 @@ $string['search:activity'] = "Datalynx - Instanzen";
 $string['search:entry'] = "Datalynx - Einträge";
 
 $string['noselection'] = "Keine Auswahl";
+
+// Task.
+$string['event_cron_trigger'] = "Datalynx Scheduled Task";
+$string['cron_trigger'] = "Datalynx Scheduled Task";

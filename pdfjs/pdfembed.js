@@ -20,12 +20,11 @@
  * @copyright   2023 David Bogner <david.bogner@wunderbyte.at>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+// import 'mod_datalynx/pdf';
 
-// import * as pdfjsLib from 'mod_datalynx/pdf';
-// import * as pdfjsWorker from 'mod_datalynx/pdf.worker';
-
-// eslint-disable-next-line require-jsdoc
 function renderPDFfunction(url, canvasContainer) {
+
+    console.log(pdfjsLib, pdfjsWorker);
 
     function renderPage(page) {
         var viewport = page.getViewport({scale: 1});
@@ -35,13 +34,22 @@ function renderPDFfunction(url, canvasContainer) {
             canvasContext: ctx,
             viewport: viewport
         };
+        // Calculate the scaling factors to fit the container's width and height
+        var widthScale = canvasContainer.clientWidth / viewport.width;
+        var heightScale = canvasContainer.clientHeight / viewport.height;
 
-        var customScale = 1;
-        var desiredWidth = 595;
-        var desiredHeight = 841;
+        // Use the minimum scale to ensure that the entire page fits within the container
+        var scale = Math.min(widthScale, heightScale);
 
-        canvas.height = desiredHeight * customScale;
-        canvas.width = desiredWidth * customScale;
+        // Apply the scaling factor
+        canvas.width = viewport.width * scale;
+        canvas.height = viewport.height * scale;
+
+        // canvas.height = canvasContainer.clientHeight;
+        // canvas.width = canvasContainer.clientWidth;
+
+        // canvas.height = 800;
+        // canvas.width = 1200;
 
         canvasContainer.appendChild(canvas);
 
@@ -65,14 +73,8 @@ function renderPDFfunction(url, canvasContainer) {
 
 }
 
-/**
- *
- * @param {*} pdfUrl
- * @param {*} canvasContainerId
- */
-export function renderPDF(pdfUrl, canvasContainerId) {
-
-    console.log(pdfUrl, canvasContainerId);
+// eslint-disable-next-line require-jsdoc
+function renderPDF(pdfUrl, canvasContainerId) {
 
     // eslint-disable-next-line no-unused-vars
     const pdf = M.cfg.wwwroot + '/mod/datalynx/tests/turnen.pdf';
