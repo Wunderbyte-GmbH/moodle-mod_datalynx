@@ -24,3 +24,5 @@
 $string['event'] = 'Datalynx Ereignis';
 $string['pluginname'] = 'Ereignisbenachrichtigung';
 $string['triggerspecificevent'] = 'Nur bei markierter Checkbox senden';
+$string['regex'] = 'Regulärer Ausdruck, der verwendet wird, um die Kennung aus dem Dateinamen zu extrahieren';
+$string['regex_desc'] = 'Wenn leer gelassen, wird es standardmäßig auf /^(\d+)_/ gesetzt.';

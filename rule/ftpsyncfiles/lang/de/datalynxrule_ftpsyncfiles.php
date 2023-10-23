@@ -37,3 +37,5 @@ $string['identifier'] = 'Im Dateinamen verwendetes Identifikationsmerkmal, um di
 $string['teammemberfield'] = 'Formularfeld, das verwendet wird um den User zu bestimmen, dem die Datei zugeordnet werden soll';
 $string['manager'] = 'Der User, der die Einträge verwaltet';
 $string['filefield'] = 'Feld in dem die Datei gespeichert werden soll';
+$string['regex'] = 'Regulärer Ausdruck, der verwendet wird, um die Kennung aus dem Dateinamen zu extrahieren.
+Wenn leer gelassen, wird standardmäßig /^(\d+)_/ verwendet.';

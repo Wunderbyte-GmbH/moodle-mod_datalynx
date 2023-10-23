@@ -37,3 +37,5 @@ $string['identifier'] = 'Identifier used in the filename to match a specific use
 $string['teammemberfield'] = 'Form field to use for selecting the user the file is assigned to';
 $string['manager'] = 'User who manages all entries';
 $string['filefield'] = 'Field where the file should be saved';
+$string['regex'] = 'Regular expression used to extract the identifier from the filename.
+If left empty it defaults to /^(\d+)_/.';
