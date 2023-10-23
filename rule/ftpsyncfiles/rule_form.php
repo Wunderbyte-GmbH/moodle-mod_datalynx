@@ -104,6 +104,11 @@ class datalynx_rule_ftpsyncfiles_form extends datalynx_rule_form {
         $fields = $this->_df->get_fields_by_type('file', true);
         $mform->addElement('autocomplete', 'param3',
                 get_string('filefield', 'datalynxrule_ftpsyncfiles'), $fields, $options);
+
+        // Regular expression for extracting the user identifier from the filename.
+        $mform->addElement('text', 'param6', get_string('regex', 'datalynxrule_ftpsyncfiles'));
+        $mform->setType('param6', PARAM_TEXT);
+
     }
 
     /**

@@ -67,16 +67,10 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
      */
     private \mod_datalynx\datalynx $dl;
     private ?file_storage $fs;
-    /**
-     * @var false|int
-     */
-    private $draftitemid;
-    /**
-     * @var mixed
-     */
     private array $sftpsetting;
     private ?int $filefieldid;
     private array $files;
+    private $regex;
 
     /**
      * Class constructor
@@ -98,6 +92,7 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
         $this->teammemberfieldid = $this->rule->param8;
         $this->authorid = $this->rule->param9;
         $this->filefieldid = $this->rule->param3;
+        $this->regex = $this->rule->param6;
     }
 
     /**
@@ -118,10 +113,9 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
         $this->dl = new mod_datalynx\datalynx($did);
 
         $this->fs = get_file_storage();
+        // Download files to $this->files array indexed by draftitemid.
         $this->download_files((int)$did);
         $context = context_user::instance($USER->id);
-
-        // $files = $this->fs->get_area_files($context->id, 'mod_datalynx', 'draft', $this->draftitemid);
 
         if (!empty($this->files)) {
             foreach ($this->files as $draftitemid => $file) {
@@ -222,24 +216,35 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
     }
 
     /**
-     * Find out the user the uploaded file belongs to based on the filename
+     * Find out the user the uploaded file belongs to based on the filename.
+     * Regex defaults to ^idnumber_
+     *
      * @param string $filename
      * @return int
      */
     protected function get_userid_from_filename(string $filename): int {
         global $DB;
+        // Extract user identifier from filename using a pattern.
+        if (empty($this->regex)) {
+            $this->regex = "/^(\d+)_/";
+        }
+        if (preg_match($this->regex, $filename, $matches)) {
+            $identifier = $matches[1];
+        } else {
+            return 0;
+        }
         switch ($this->matchingfield) {
             case 'idnumber':
-                $userid = $DB->get_field('user', 'id', array('idnumber' => $filename));
+                $userid = $DB->get_field('user', 'id', array('idnumber' => $identifier));
                 break;
             case 'email':
-                $userid = $DB->get_field('user', 'id', array('email' => $filename));
+                $userid = $DB->get_field('user', 'id', array('email' => $identifier));
                 break;
             case 'id':
-                $userid = $filename;
+                $userid = $identifier;
                 break;
             case 'username':
-                $userid = $DB->get_field('user', 'id', array('username' => $filename));
+                $userid = $DB->get_field('user', 'id', array('username' => $identifier));
                 break;
             default:
                 $userid = 0;
