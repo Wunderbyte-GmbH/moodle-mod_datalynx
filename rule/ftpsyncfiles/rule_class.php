@@ -158,6 +158,7 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
         curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_SFTP);
         curl_setopt($ch, CURLOPT_URL, $server);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_DIRLISTONLY, 1);
         curl_setopt($ch, CURLOPT_URL, $connection);
 
         $result = curl_exec($ch);
@@ -167,16 +168,11 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
         } else {
             // List of remote files and directories.
             $remotelist = explode("\n", trim($result));
-
             foreach ($remotelist as $line) {
-                $parts = preg_split('/\s+/', trim($line));
-                $filename = end($parts);
-
+                $filename = trim($line);
                 if (!empty($filename) && $filename !== '.' && $filename !== '..') {
                     $remotepath = "$connection/$filename";
-                    mtrace($remotepath);
                     // Todo: Check filename and get all information.
-
                     $filehandle = curl_init();
 
                     // Set cURL options for file download.
@@ -185,9 +181,7 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
 
                     // Download the file.
                     $filedata = curl_exec($filehandle);
-
                     $context = context_user::instance($USER->id);
-                    // $context = $this->dl->context;
 
                     if ($filedata !== false) {
                         // TODO: Store Data in Moodle.
@@ -205,21 +199,36 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
                             $filedata
                         );
                         echo "Downloaded $filename successfully." . PHP_EOL;
-                        // Delete the file from the remote server using cURL.
-                        $deletech = curl_init();
-                        curl_setopt($deletech, CURLOPT_URL, $remotepath);
-                        curl_setopt($deletech, CURLOPT_QUOTE, array("rm ".escapeshellarg("$remotepath"));
-                        $deleteresult = curl_exec($deletech);
-                        curl_close($deletech);
-                        if ($deleteresult === false) {
-                            echo "Failed to delete $filename on the remote server." . PHP_EOL;
-                        } else {
-                            echo "Deleted $filename successfully." . PHP_EOL;
-                        }
                     } else {
                         echo "Failed to download $filename." . PHP_EOL;
                     }
                     curl_close($filehandle);
+                }
+            }
+            foreach ($remotelist as $line) {
+                $filename = trim($line);
+                if (!empty($filename) && $filename !== '.' && $filename !== '..') {
+                    // Delete the file from the remote server using cURL.
+                    curl_setopt($ch, CURLOPT_QUOTE, ["rm " . escapeshellarg($filename)]);
+                    $deleteresult = curl_exec($ch);
+                    if ($deleteresult === false) {
+                        curl_setopt($ch, CURLOPT_QUOTE, ["rm " . $filename]);
+                        $deleteresult = curl_exec($ch);
+                        if ($deleteresult === false) {
+                            curl_setopt($ch, CURLOPT_QUOTE, ["rm \"$filename\""]);
+                            $deleteresult = curl_exec($ch);
+                            if ($deleteresult === false) {
+                                echo "Failed to delete $filename on the remote server." . PHP_EOL;
+                                var_dump(curl_errno($ch),curl_error($ch));
+                            } else {
+                                echo "Deleted $filename successfully." . PHP_EOL;
+                            }
+                        } else {
+                            echo "Deleted $filename successfully." . PHP_EOL;
+                        }
+                    } else {
+                        echo "Deleted $filename successfully." . PHP_EOL;
+                    }
                 }
             }
         }
