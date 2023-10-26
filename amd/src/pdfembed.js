@@ -25,7 +25,7 @@
 // import * as pdfjsWorker from 'mod_datalynx/pdf.worker';
 
 // eslint-disable-next-line require-jsdoc
-function renderPDFfunction(url, canvasContainer) {
+function renderPDFfunction(url, canvasContainer, customScale) {
 
     function renderPage(page) {
         var viewport = page.getViewport({scale: 1});
@@ -36,7 +36,6 @@ function renderPDFfunction(url, canvasContainer) {
             viewport: viewport
         };
 
-        var customScale = 1;
         var desiredWidth = 595;
         var desiredHeight = 841;
 
@@ -70,9 +69,9 @@ function renderPDFfunction(url, canvasContainer) {
  * @param {*} pdfUrl
  * @param {*} canvasContainerId
  */
-export function renderPDF(pdfUrl, canvasContainerId) {
+export function renderPDF(pdfUrl, canvasContainerId, customScale) {
 
-    console.log(pdfUrl, canvasContainerId);
+    console.log(pdfUrl, canvasContainerId, customScale);
 
     // eslint-disable-next-line no-unused-vars
     const pdf = M.cfg.wwwroot + '/mod/datalynx/tests/turnen.pdf';
@@ -83,5 +82,5 @@ export function renderPDF(pdfUrl, canvasContainerId) {
     console.log(pdfUrl);
     console.log(container);
 
-    renderPDFfunction(pdfUrl, container);
+    renderPDFfunction(pdfUrl, container, customScale);
 }

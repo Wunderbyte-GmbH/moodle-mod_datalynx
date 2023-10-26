@@ -51,6 +51,9 @@ class datalynxfield_file_form extends datalynxfield_form {
 
         // Accepted types.
         $this->filetypes_definition();
+        $mform->addElement('text', 'param4', get_string('resizefactor', 'datalynx'));
+        $mform->setType('param4', PARAM_FLOAT);
+        $mform->setDefault('param4', 1.0);
     }
 
     /**

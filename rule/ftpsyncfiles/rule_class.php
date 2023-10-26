@@ -205,6 +205,17 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
                             $filedata
                         );
                         echo "Downloaded $filename successfully." . PHP_EOL;
+                        // Delete the file from the remote server using cURL.
+                        $deletech = curl_init();
+                        curl_setopt($deletech, CURLOPT_URL, $remotepath);
+                        curl_setopt($deletech, CURLOPT_CUSTOMREQUEST, 'DELETE');
+                        $deleteresult = curl_exec($deletech);
+                        curl_close($deletech);
+                        if ($deleteresult === false) {
+                            echo "Failed to delete $filename on the remote server." . PHP_EOL;
+                        } else {
+                            echo "Deleted $filename successfully." . PHP_EOL;
+                        }
                     } else {
                         echo "Failed to download $filename." . PHP_EOL;
                     }
@@ -233,6 +244,7 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
         } else {
             return 0;
         }
+
         switch ($this->matchingfield) {
             case 'idnumber':
                 $userid = $DB->get_field('user', 'id', array('idnumber' => $identifier));
