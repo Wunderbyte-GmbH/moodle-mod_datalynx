@@ -208,7 +208,7 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
                         // Delete the file from the remote server using cURL.
                         $deletech = curl_init();
                         curl_setopt($deletech, CURLOPT_URL, $remotepath);
-                        curl_setopt($deletech, CURLOPT_CUSTOMREQUEST, 'DELETE');
+                        curl_setopt($deletech, CURLOPT_QUOTE, array("rm ".escapeshellarg("$remotepath"));
                         $deleteresult = curl_exec($deletech);
                         curl_close($deletech);
                         if ($deleteresult === false) {
