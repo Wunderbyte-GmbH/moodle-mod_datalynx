@@ -31,16 +31,31 @@ function renderPDFfunction(url, canvasContainer, customScale) {
         var viewport = page.getViewport({scale: 1});
         var canvas = document.createElement('canvas');
         var ctx = canvas.getContext('2d');
-        var renderContext = {
-            canvasContext: ctx,
-            viewport: viewport
-        };
+        // var renderContext = {
+        //     canvasContext: ctx,
+        //     viewport: viewport
+        // };
 
         var desiredWidth = 595;
         var desiredHeight = 841;
 
+        canvas.width = Math.floor(viewport.width * customScale);
+        canvas.height = Math.floor(viewport.height * customScale);
+        canvas.style.width = Math.floor(viewport.width) + "px";
+        canvas.style.height = Math.floor(viewport.height) + "px";
+
+        var transform = customScale !== 1
+            ? [customScale, 0, 0, customScale, 0, 0]
+            : null;
+
+        var renderContext = {
+            canvasContext: ctx,
+            transform: transform,
+            viewport: viewport
+        };
         canvas.height = desiredHeight * customScale;
         canvas.width = desiredWidth * customScale;
+        canvas.style = "width: " + (desiredWidth * customScale) + "px; height: " + (desiredHeight * customScale) + "px;";
 
         canvasContainer.appendChild(canvas);
 
