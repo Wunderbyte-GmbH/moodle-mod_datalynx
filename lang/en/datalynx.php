@@ -415,6 +415,7 @@ $string['requireapproval'] = 'Require approval?';
 $string['requiredall'] = 'all required';
 $string['requirednotall'] = 'not all required';
 $string['resetsettings'] = 'Reset filters';
+$string['resizefactor'] = 'Factor for resizing PDF. Default display size is: 595x841';
 $string['returntoimport'] = 'Return to import';
 $string['rssglobaldisabled'] = 'Disabled. See site configuration variables.';
 $string['rsshowmany'] = '(number of latest entries to show, 0 to disable RSS)';
