@@ -191,7 +191,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         $data->dataid = $this->get_new_parentid('datalynx');
 
         // Adjust groupby field id.
-        if ($data->groupby > 0) {
+        if (is_numeric($data->groupby) && $data->groupby > 0) {
             $data->groupby = $this->get_mappingid('datalynx_field', $data->groupby);
         }
 
@@ -200,7 +200,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             $customsort = unserialize($data->customsort);
             $sortfields = array();
             foreach ($customsort as $sortfield => $sortdir) {
-                if ($sortfield > 0) {
+                if (is_numeric($sortfield) && $sortfield > 0) {
                     $sortfields[$this->get_mappingid('datalynx_field', $sortfield)] = $sortdir;
                 } else {
                     $sortfields[$sortfield] = $sortdir;
@@ -214,7 +214,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             $customsearch = unserialize($data->customsearch);
             $searchfields = array();
             foreach ($customsearch as $searchfield => $options) {
-                if ($searchfield > 0) {
+                if (is_numeric($searchfield) && $searchfield > 0) {
                     $searchfields[$this->get_mappingid('datalynx_field', $searchfield)] = $options;
                 } else {
                     $searchfields[$searchfield] = $options;
@@ -269,7 +269,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         $data->dataid = $this->get_new_parentid('datalynx');
 
         // Adjust groupby field id.
-        if ($data->groupby > 0) {
+        if (is_numeric($data->groupby) && $data->groupby > 0) {
             $data->groupby = $this->get_mappingid('datalynx_field', $data->groupby);
         }
 
@@ -453,7 +453,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
 
     /**
      *
-     * @param unknown $data
+     * @param object $data
      */
     protected function process_datalynx_tag($data) {
         $data = (object) $data;

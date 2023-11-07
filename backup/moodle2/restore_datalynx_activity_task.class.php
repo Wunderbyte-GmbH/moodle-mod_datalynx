@@ -53,6 +53,8 @@ class restore_datalynx_activity_task extends restore_activity_task {
     }
 
     /**
+     * @param string $commentarea
+     * @return string
      */
     public function get_comment_mapping_itemname($commentarea) {
         if ($commentarea == 'entry') {
