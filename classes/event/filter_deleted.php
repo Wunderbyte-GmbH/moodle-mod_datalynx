@@ -76,16 +76,6 @@ class filter_deleted extends \core\event\base {
     }
 
     /**
-     * Get the legacy event log data.
-     *
-     * @return array
-     */
-    public function get_legacy_logdata() {
-        return array($this->courseid, 'datalynx', 'filter_created',
-                'view.php?d=' . $this->other['dataid'], $this->other['dataid'], $this->contextinstanceid);
-    }
-
-    /**
      * Custom validation.
      *
      * @throws \coding_exception when validation does not pass.

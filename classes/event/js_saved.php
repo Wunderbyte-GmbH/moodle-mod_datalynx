@@ -73,14 +73,4 @@ class js_saved extends \core\event\base {
         return new \moodle_url('/mod/datalynx/view.php',
                 array('d' => $this->objectid, 'jsedit' => 1));
     }
-
-    /**
-     * Get the legacy event log data.
-     *
-     * @return array
-     */
-    public function get_legacy_logdata() {
-        return array($this->courseid, 'datalynx', 'js_saved',
-                'view.php?d=' . $this->objectid . '&jsedit=1', $this->objectid, $this->contextinstanceid);
-    }
 }

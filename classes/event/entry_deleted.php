@@ -82,17 +82,6 @@ class entry_deleted extends \core\event\base {
     }
 
     /**
-     * Get the legacy event log data.
-     *
-     * @return array
-     */
-    public function get_legacy_logdata() {
-        return array($this->courseid, 'datalynx', 'entry_deleted',
-                'view.php?id=' . $this->contextinstanceid, $this->other['dataid'],
-                $this->contextinstanceid);
-    }
-
-    /**
      * Custom validation.
      *
      * @throws \coding_exception when validation does not pass.

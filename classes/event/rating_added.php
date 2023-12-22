@@ -83,17 +83,6 @@ class rating_added extends \core\event\base {
     }
 
     /**
-     * Get the legacy event log data.
-     *
-     * @return array
-     */
-    public function get_legacy_logdata() {
-        return array($this->courseid, 'datalynx', 'rating_added',
-                'view.php?d=' . $this->other['dataid'] . '&amp;eid=' . $this->objectid,
-                $this->other['dataid'], $this->contextinstanceid);
-    }
-
-    /**
      * Custom validation.
      *
      * @throws \coding_exception when validation does not pass.
