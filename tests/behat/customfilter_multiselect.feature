@@ -53,6 +53,7 @@ Feature: Create entry, add multiselect and use customfilter
 
     # Add me some fields.
     When I follow "Browse"
+    And I wait "60" seconds
     And I follow "Add a new entry"
     And I fill in the entry form fields
       | type             | name               | value                |
@@ -94,7 +95,7 @@ Feature: Create entry, add multiselect and use customfilter
 
   @javascript
   Scenario: Use customfilter.
-    When I follow "Search"
+    When I follow "Search" 
     And I open the autocomplete suggestions list
     Then "Opt2" "autocomplete_suggestions" should exist
     And I click on "Opt2" item in the autocomplete list
