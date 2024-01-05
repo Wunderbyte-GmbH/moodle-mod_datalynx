@@ -36,7 +36,7 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
         $df = $this->_field->df();
 
         $canapprove = has_capability('mod/datalynx:approve', $df->context);
-        $edit = !empty($options['edit']) ? $options['edit'] and $canapprove : false;
+        $edit = !empty($options['edit']) ? $options['edit'] && $canapprove : false;
         $replacements = array();
         // Just one tag, empty until we check df settings.
         $replacements['##approve##'] = '';

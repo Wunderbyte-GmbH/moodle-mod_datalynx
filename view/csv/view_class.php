@@ -496,13 +496,13 @@ class datalynxview_csv extends datalynxview_base {
         }
 
         // Process each csv record.
-        $updateexisting = $updateexisting and !empty($csvfieldnames['Entry']);
+        $updateexisting = $updateexisting && !empty($csvfieldnames['Entry']);
         $i = 0;
         $cir->init();
         while ($csvrecord = $cir->next()) {
             $csvrecord = array_combine($fieldnames, $csvrecord);
             // Set the entry id.
-            if ($updateexisting and $csvrecord['Entry'] > 0) {
+            if ($updateexisting && $csvrecord['Entry'] > 0) {
                 $data->eids[$csvrecord['Entry']] = $entryid = $csvrecord['Entry'];
             } else {
                 $i--;

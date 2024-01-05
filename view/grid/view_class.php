@@ -109,7 +109,7 @@ class datalynxview_grid extends datalynxview_base {
         $elements = array();
 
         // Prepare grid table if needed.
-        if ($name != 'newentry' and !empty($this->view->param3)) {
+        if ($name != 'newentry' && !empty($this->view->param3)) {
             $entriescount = count($entriesset);
             list($cols, $rows) = explode(' ', $this->view->param3);
             if ($entriescount < $cols) {

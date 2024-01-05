@@ -36,7 +36,7 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         $entryid = $entry->id;
 
         $content = 0;
-        if ($entryid > 0 and !empty($entry->{"c{$fieldid}_content"})) {
+        if ($entryid > 0 && !empty($entry->{"c{$fieldid}_content"})) {
             $content = $entry->{"c{$fieldid}_content"};
         }
 

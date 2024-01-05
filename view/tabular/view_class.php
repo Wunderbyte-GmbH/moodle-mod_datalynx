@@ -204,7 +204,7 @@ class datalynxview_tabular extends datalynxview_base {
             }
             // Assuming a simple two rows structure for now.
             // If no theader the first row should be the header.
-            if ($requireheaderrow and empty($headerrow)) {
+            if ($requireheaderrow && empty($headerrow)) {
                 // Assuming header row does not contain nested tables.
                 $trpattern = '/^<tr>[\s\S]*<\/tr>/i';
                 preg_match($trpattern, $tablehtml, $match);

@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 $istemplatemanager = has_capability('mod/datalynx:managetemplates', $this->context);
 
 // Tabs are displayed only for template managers.
-if (isloggedin() and $istemplatemanager) {
+if (isloggedin() && $istemplatemanager) {
     if (empty($currenttab) || empty($this->data) || empty($this->course)) {
         throw new moodle_exception('emptytab', 'datalynx');
     }
@@ -42,7 +42,7 @@ if (isloggedin() and $istemplatemanager) {
     $row[] = new tabobject('manage',
             new moodle_url('/mod/datalynx/view/index.php', array('d' => $this->id())), get_string('manage', 'datalynx'));
     // Add view edit tab.
-    if ($currenttab == 'browse' and !empty($this->_currentview)) {
+    if ($currenttab == 'browse' && !empty($this->_currentview)) {
         $params = array('d' => $this->id(), 'sesskey' => sesskey(),
                 'vedit' => $this->_currentview->id());
         $editviewurl = new moodle_url('/mod/datalynx/view/view_edit.php', $params);

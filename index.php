@@ -84,7 +84,7 @@ $table->head[] = get_string('entriespending', 'datalynx');
 $table->align[] = 'center';
 
 // Rss.
-$rss = (!empty($CFG->enablerssfeeds) and !empty($CFG->datalynx_enablerssfeeds));
+$rss = (!empty($CFG->enablerssfeeds) && !empty($CFG->datalynx_enablerssfeeds));
 if ($rss) {
     require_once($CFG->libdir . "/rsslib.php");
     $table->head[] = 'RSS';

@@ -337,7 +337,7 @@ class datalynxview_patterns {
     protected function get_userpref_replacements($tag, array $options = null) {
         $view = $this->_view;
         $filter = $view->get_filter();
-        if (!$view->is_forcing_filter() and (!$filter->id or $filter->customsearch or !empty($options['entriescount']))) {
+        if (!$view->is_forcing_filter() && (!$filter->id or $filter->customsearch or !empty($options['entriescount']))) {
             switch ($tag) {
                 case '##quickperpage##':
                     return $this->print_quick_perpage(true);
@@ -469,7 +469,7 @@ class datalynxview_patterns {
 
             case '##multiapprove##':
             case '##multiapprove:icon##':
-                if ($df->data->approval and has_capability('mod/datalynx:approve', $df->context)) {
+                if ($df->data->approval && has_capability('mod/datalynx:approve', $df->context)) {
                     if ($tag == '##multiapprove##') {
                         $replacement = html_writer::empty_tag('input',
                                 array('type' => 'button', 'name' => 'multiapprove',
@@ -543,7 +543,7 @@ class datalynxview_patterns {
                         'page', '', true);
                 // Standard paging bar case.
             } else {
-                if (!empty($filter->perpage) and !empty($options['entriescount']) and
+                if (!empty($filter->perpage) && !empty($options['entriescount']) and
                         !empty($options['entriesfiltercount']) and
                         $options['entriescount'] != $options['entriesfiltercount']
                 ) {
@@ -864,7 +864,7 @@ class datalynxview_patterns {
 
         $viewjump = '';
 
-        if ($menuviews = $df->get_views_menu() and count($menuviews) > 1) {
+        if ($menuviews = $df->get_views_menu() && count($menuviews) > 1) {
 
             // Display the view form jump list.
             $baseurl = $baseurl->out_omit_querystring();
@@ -905,7 +905,7 @@ class datalynxview_patterns {
 
         $filterjump = '';
 
-        if (!$view->is_forcing_filter() and ($filter->id or !empty($options['entriescount']))) {
+        if (!$view->is_forcing_filter() && ($filter->id or !empty($options['entriescount']))) {
             $fm = $df->get_filter_manager();
             if (!$menufilters = $fm->get_filters(null, true)) {
                 $menufilters = array();
@@ -993,7 +993,7 @@ class datalynxview_patterns {
         $baseurlparams = array('d' => $df->id(), 'sesskey' => sesskey(), 'view' => $view->id(),
                 'filter' => datalynx_filter_manager::USER_FILTER_SET);
 
-        if ($filter->id < 0 and $filter->perpage) {
+        if ($filter->id < 0 && $filter->perpage) {
             $perpagevalue = $filter->perpage;
         } else {
             $perpagevalue = 0;

@@ -41,7 +41,7 @@ class datalynxfield__comment_renderer extends datalynxfield_renderer {
         $replacements = array_fill_keys($tags, '');
 
         // No edit mode for this field so just return html.
-        if ($entry->id > 0 and !empty($CFG->usecomments)) {
+        if ($entry->id > 0 && !empty($CFG->usecomments)) {
             foreach ($tags as $tag) {
                 switch (trim($tag, '@')) {
                     case '##comments:count##':

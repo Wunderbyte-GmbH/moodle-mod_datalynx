@@ -64,16 +64,16 @@ navigation_node::override_active_url(
 $rm = $df->get_rule_manager();
 
 // DATA PROCESSING.
-if ($urlparams->duplicate and confirm_sesskey()) { // Duplicate any requested rules.
+if ($urlparams->duplicate && confirm_sesskey()) { // Duplicate any requested rules.
     $rm->process_rules('duplicate', $urlparams->duplicate, $urlparams->confirmed);
 } else {
-    if ($urlparams->delete and confirm_sesskey()) { // Delete any requested rules.
+    if ($urlparams->delete && confirm_sesskey()) { // Delete any requested rules.
         $rm->process_rules('delete', $urlparams->delete, $urlparams->confirmed);
     } else {
-        if ($urlparams->enabled and confirm_sesskey()) { // Set rule to enabled/disabled.
+        if ($urlparams->enabled && confirm_sesskey()) { // Set rule to enabled/disabled.
             $rm->process_rules('enabled', $urlparams->enabled, true); // Confirmed by default.
         } else {
-            if ($urlparams->update and confirm_sesskey()) { // Add/update a new rule.
+            if ($urlparams->update && confirm_sesskey()) { // Add/update a new rule.
                 $rm->process_rules('update', $urlparams->rid, true);
             }
         }

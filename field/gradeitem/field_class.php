@@ -58,7 +58,7 @@ class datalynxfield_gradeitem extends datalynxfield_base {
         $itemid = !empty($this->field->param1) ? $this->field->param1 : null;
         parent::set_field($forminput);
 
-        if ($this->field->param1 and ($this->field->param1 != $itemid or !$this->field->param2)) {
+        if ($this->field->param1 && ($this->field->param1 != $itemid or !$this->field->param2)) {
             $gradeiteminfo = 'id,itemname,itemtype,itemmodule,iteminstance';
             if ($item = $DB->get_record('grade_items', array('id' => $this->field->param1), $gradeiteminfo)) {
                 $this->field->param2 = $item->itemname;

@@ -53,7 +53,7 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
         $autocomplete = $field->get('param6');
 
         // Check for default value.
-        if (!$selected and $defaultval = $field->get('param2')) {
+        if (!$selected && $defaultval = $field->get('param2')) {
             $selected = (int) array_search($defaultval, $menuoptions);
         }
 

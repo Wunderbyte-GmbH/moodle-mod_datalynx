@@ -365,7 +365,7 @@ function xmldb_datalynx_upgrade($oldversion) {
                     $patterns = unserialize($view->patterns);
                     $newpatterns = array('view' => $patterns['view'], 'field' => array());
                     foreach ($patterns['field'] as $fieldid => $tags) {
-                        if ($fieldid < 0 and !empty($newfieldids[$fieldid])) {
+                        if ($fieldid < 0 && !empty($newfieldids[$fieldid])) {
                             $newpatterns['field'][$newfieldids[$fieldid]] = $tags;
                             $update = true;
                         } else {
@@ -389,7 +389,7 @@ function xmldb_datalynx_upgrade($oldversion) {
                     $customsort = unserialize($filter->customsort);
                     $sortfields = array();
                     foreach ($customsort as $fieldid => $sortdir) {
-                        if ($fieldid < 0 and !empty($newfieldids[$fieldid])) {
+                        if ($fieldid < 0 && !empty($newfieldids[$fieldid])) {
                             $sortfields[$newfieldids[$fieldid]] = $sortdir;
                             $update = true;
                         } else {
@@ -404,7 +404,7 @@ function xmldb_datalynx_upgrade($oldversion) {
                     $customsearch = unserialize($filter->customsearch);
                     $searchfields = array();
                     foreach ($customsearch as $fieldid => $options) {
-                        if ($fieldid < 0 and !empty($newfieldids[$fieldid])) {
+                        if ($fieldid < 0 && !empty($newfieldids[$fieldid])) {
                             $searchfields[$newfieldids[$fieldid]] = $options;
                             $update = true;
                         } else {

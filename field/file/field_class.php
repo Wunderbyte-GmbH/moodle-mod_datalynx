@@ -63,7 +63,7 @@ class datalynxfield_file extends datalynxfield_base {
         $filemanager = $alttext = $editor = null;
         if (!empty($values)) {
             foreach ($values as $name => $value) {
-                if (!empty($name) and !empty($value)) {
+                if (!empty($name) && !empty($value)) {
                     ${$name} = $value; // Sets $filemanager etc.
                 }
             }

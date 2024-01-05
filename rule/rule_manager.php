@@ -220,12 +220,12 @@ class datalynx_rule_manager {
         }
 
         $rules = $this->_customrules;
-        if (empty($exclude) and !$menu) {
+        if (empty($exclude) && !$menu) {
             return $rules;
         } else {
             $retrules = array();
             foreach ($rules as $ruleid => $rule) {
-                if (!empty($exclude) and in_array($ruleid, $exclude)) {
+                if (!empty($exclude) && in_array($ruleid, $exclude)) {
                     continue;
                 }
                 if ($menu) {
@@ -255,7 +255,7 @@ class datalynx_rule_manager {
         // Collate the rules for processing.
         if ($ruleids = explode(',', $rids)) {
             foreach ($ruleids as $ruleid) {
-                if ($ruleid > 0 and isset($dfrules[$ruleid])) {
+                if ($ruleid > 0 && isset($dfrules[$ruleid])) {
                     $rules[$ruleid] = $dfrules[$ruleid];
                 }
             }
@@ -264,7 +264,7 @@ class datalynx_rule_manager {
         $processedrids = array();
         $strnotify = '';
 
-        if (empty($rules) and $action != 'add') {
+        if (empty($rules) && $action != 'add') {
             $df->notifications['bad'][] = get_string("rulenoneforaction", 'datalynx');
             return false;
         } else {

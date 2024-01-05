@@ -530,7 +530,7 @@ abstract class datalynxview_base {
         }
 
         // With one entry per page show the saved entry.
-        if ($processedeids and $this->_editentries and !$this->_returntoentriesform) {
+        if ($processedeids && $this->_editentries and !$this->_returntoentriesform) {
             if ($this->_filter->perpage == 1) {
                 $this->_filter->eids = $this->_editentries;
             }

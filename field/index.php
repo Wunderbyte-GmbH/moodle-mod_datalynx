@@ -60,22 +60,22 @@ navigation_node::override_active_url(
 
 // DATA PROCESSING.
 // Duplicate requested fields.
-if ($urlparams->duplicate and confirm_sesskey()) {
+if ($urlparams->duplicate && confirm_sesskey()) {
     $df->process_fields('duplicate', $urlparams->duplicate, $urlparams->confirmed);
     // Delete requested fields.
 } else {
-    if ($urlparams->delete and confirm_sesskey()) {
+    if ($urlparams->delete && confirm_sesskey()) {
         $df->process_fields('delete', $urlparams->delete, $urlparams->confirmed);
         // Set field visibility.
     } else {
-        if ($urlparams->visible and confirm_sesskey()) {
+        if ($urlparams->visible && confirm_sesskey()) {
             $df->process_fields('visible', $urlparams->visible, true); // Confirmed by default.
             // Set field editability.
         } else {
-            if ($urlparams->editable and confirm_sesskey()) {
+            if ($urlparams->editable && confirm_sesskey()) {
                 $df->process_fields('editable', $urlparams->editable, true); // Confirmed by default.
             } else {
-                if ($urlparams->convert and confirm_sesskey()) {
+                if ($urlparams->convert && confirm_sesskey()) {
                     $df->process_fields('convert', $urlparams->convert, true); // Confirmed by default.
                 }
             }

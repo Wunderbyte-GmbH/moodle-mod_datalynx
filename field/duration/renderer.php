@@ -39,7 +39,7 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
         $mform->addElement('duration', $fieldname, '', array('optional' => null));
         $mform->setType($fieldname, PARAM_ALPHANUMEXT);
 
-        if ($entryid > 0 and !empty($entry->{"c{$fieldid}_content"})) {
+        if ($entryid > 0 && !empty($entry->{"c{$fieldid}_content"})) {
             $number = $entry->{"c{$fieldid}_content"};
             $mform->setDefault($fieldname, $number);
         }
@@ -141,7 +141,7 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
         foreach ($tags as $tag) {
             list(, $behavior, ) = $this->process_tag($tag);
             // Variable $behavior datalynx_field_behavior.
-            if ($behavior->is_required() and isset($formdata->$formfieldname)) {
+            if ($behavior->is_required() && isset($formdata->$formfieldname)) {
                 $value = optional_param_array($formfieldname, [], PARAM_RAW)['number'];
                 $intvalue = intval($value);
                 if ($value !== "$intvalue") {

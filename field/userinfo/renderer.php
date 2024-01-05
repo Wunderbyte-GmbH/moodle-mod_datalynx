@@ -102,7 +102,7 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
         $isediting = $options['edit'];
 
         $replacements = array();
-        if ($isediting AND $manageable AND $editable) {
+        if ($isediting && $manageable AND $editable) {
             $replacements[$tag] = array('', array(array($this, 'display_edit'), array($entry)));
             return $replacements;
         }

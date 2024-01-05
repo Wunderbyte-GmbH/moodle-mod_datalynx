@@ -38,7 +38,7 @@ class datalynxfield_youtube_renderer extends datalynxfield_renderer {
         $required = !empty($options['required']);
 
         $content = '';
-        if ($entryid > 0 and !empty($entry->{"c{$fieldid}_content"})) {
+        if ($entryid > 0 && !empty($entry->{"c{$fieldid}_content"})) {
             $content = "https://www.youtube.com/watch?v=" . $entry->{"c{$fieldid}_content"};
         }
         $fieldattr = array();
@@ -83,7 +83,7 @@ class datalynxfield_youtube_renderer extends datalynxfield_renderer {
         foreach ($tags as $tag) {
             list(, $behavior, ) = $this->process_tag($tag);
             // Variable $behavior datalynx_field_behavior.
-            if ($behavior->is_required() and isset($formdata->$formfieldname)) {
+            if ($behavior->is_required() && isset($formdata->$formfieldname)) {
                 if (!clean_param($formdata->$formfieldname, PARAM_NOTAGS)) {
                     $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
                 }

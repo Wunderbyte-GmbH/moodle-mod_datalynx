@@ -131,7 +131,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
         // No edit mode for this field so just return html.
         $replacements = array();
         foreach ($tags as $tag) {
-            if ($entry->id > 0 and !empty($entry->rating)) {
+            if ($entry->id > 0 && !empty($entry->rating)) {
                 switch (trim($tag, '@')) {
                     case '##ratings:count##':
                         $str = !empty($entry->rating->count) ? $entry->rating->count : '-';

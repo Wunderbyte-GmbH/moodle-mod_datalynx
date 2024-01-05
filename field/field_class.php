@@ -339,7 +339,7 @@ abstract class datalynxfield_base {
         // When we add a list of values but the first is empty, this insert is not triggered and the order is inserted wrong.
 
         // Insert only if no old contents and there is new contents.
-        if (is_null($contentid) and !empty($contents)) {
+        if (is_null($contentid) && !empty($contents)) {
             return $DB->insert_record('datalynx_contents', $rec);
         }
 

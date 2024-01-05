@@ -125,7 +125,7 @@ class datalynxfield_editor_renderer extends datalynxfield_renderer {
         foreach ($tags as $tag) {
             list(, $behavior, ) = $this->process_tag($tag);
             // Variable $behavior datalynx_field_behavior.
-            if ($behavior->is_required() and isset($formdata->$formfieldname)) {
+            if ($behavior->is_required() && isset($formdata->$formfieldname)) {
                 if (!clean_param($formdata->$formfieldname, PARAM_NOTAGS)) {
                     $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
                 }

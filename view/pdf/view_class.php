@@ -243,7 +243,7 @@ class datalynxview_pdf extends datalynxview_base {
             $pagecontent = $this->set_page_bookmarks($pdf, $pagecontent);
 
             // Set frame.
-            if ($pagecount < 1 AND $this->_settings->pdfframefirstpageonly) {
+            if ($pagecount < 1 && $this->_settings->pdfframefirstpageonly) {
                 $this->set_frame($pdf);
             }
             if (!$this->_settings->pdfframefirstpageonly) {

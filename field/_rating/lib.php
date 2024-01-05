@@ -41,8 +41,8 @@ class datalynx_rating extends rating {
     public function get_aggregate_value($aggregation) {
         $aggregate = isset($this->aggregate[$aggregation]) ? $this->aggregate[$aggregation] : '';
 
-        if ($aggregate and $aggregation != RATING_AGGREGATE_COUNT) {
-            if ($aggregation != RATING_AGGREGATE_SUM and !$this->settings->scale->isnumeric) {
+        if ($aggregate && $aggregation != RATING_AGGREGATE_COUNT) {
+            if ($aggregation != RATING_AGGREGATE_SUM && !$this->settings->scale->isnumeric) {
                 // Round aggregate as we're using it as an index.
                 $aggregate = $this->settings->scale->scaleitems[round($aggregate)];
             } else {

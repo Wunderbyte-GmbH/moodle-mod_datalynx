@@ -65,11 +65,11 @@ navigation_node::override_active_url(
 
 // DATA PROCESSING.
 // Import.
-if ($urlparams->vid and confirm_sesskey()) {
+if ($urlparams->vid && confirm_sesskey()) {
     $view = $df->get_view_from_id($urlparams->vid);
 
     // Process import.
-    if ($urlparams->import and confirm_sesskey()) {
+    if ($urlparams->import && confirm_sesskey()) {
         if ($view->process_data()) {
             redirect(new moodle_url('/mod/datalynx/view.php', array('d' => $urlparams->d)));
         }
@@ -87,13 +87,13 @@ if ($urlparams->vid and confirm_sesskey()) {
 }
 
 // View actions.
-if ($urlparams->duplicate and confirm_sesskey()) { // Duplicate any requested views.
+if ($urlparams->duplicate && confirm_sesskey()) { // Duplicate any requested views.
     $df->process_views('duplicate', $urlparams->duplicate, true);
 } else {
-    if ($urlparams->reset and confirm_sesskey()) { // Reset to default any requested views.
+    if ($urlparams->reset && confirm_sesskey()) { // Reset to default any requested views.
         $df->process_views('reset', $urlparams->reset, true);
     } else {
-        if ($urlparams->delete and confirm_sesskey()) { // Delete any requested views.
+        if ($urlparams->delete && confirm_sesskey()) { // Delete any requested views.
             $df->process_views('delete', $urlparams->delete, true);
         }
     }

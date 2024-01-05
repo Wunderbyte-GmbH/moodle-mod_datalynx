@@ -49,7 +49,7 @@ navigation_node::override_active_url(
         new moodle_url('/mod/datalynx/tool/index.php', array('id' => $df->cm->id)));
 
 // DATA PROCESSING.
-if ($urlparams->run and confirm_sesskey()) { // Run selected tool.
+if ($urlparams->run && confirm_sesskey()) { // Run selected tool.
     $tooldir = "$CFG->dirroot/mod/datalynx/tool/$urlparams->run";
     $toolclass = "datalynxtool_$urlparams->run";
     if (file_exists($tooldir)) {

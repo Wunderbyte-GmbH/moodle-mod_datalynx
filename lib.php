@@ -544,8 +544,8 @@ function mod_datalynx_pluginfile($course, $cm, $context, $filearea, $args, $forc
         }
 
         // Check if approved.
-        if ($datalynx->approval and !has_capability('mod/datalynx:approve', $context) and
-                !$entry->approved and $USER->id != $entry->userid
+        if ($datalynx->approval && !has_capability('mod/datalynx:approve', $context) and
+                !$entry->approved && $USER->id != $entry->userid
         ) {
             return false;
         }
@@ -591,7 +591,7 @@ function mod_datalynx_pluginfile($course, $cm, $context, $filearea, $args, $forc
     }
 
     // VIEW TEMPLATE files.
-    if (strpos($filearea, 'view') !== false and $context->contextlevel == CONTEXT_MODULE) {
+    if (strpos($filearea, 'view') !== false && $context->contextlevel == CONTEXT_MODULE) {
         require_course_login($course, true, $cm);
 
         $relativepath = implode('/', $args);
@@ -611,7 +611,7 @@ function mod_datalynx_pluginfile($course, $cm, $context, $filearea, $args, $forc
 
     // PDF VIEW files.
     $viewpdfareas = array('view_pdfframe', 'view_pdfwmark', 'view_pdfcert');
-    if (in_array($filearea, $viewpdfareas) and $context->contextlevel == CONTEXT_MODULE) {
+    if (in_array($filearea, $viewpdfareas) && $context->contextlevel == CONTEXT_MODULE) {
         require_course_login($course, true, $cm);
 
         $relativepath = implode('/', $args);
@@ -666,7 +666,7 @@ function mod_datalynx_pluginfile($course, $cm, $context, $filearea, $args, $forc
         send_stored_file($file, 0, 0, true); // Download MUST be forced - security!
     }
 
-    if (strpos($filearea, 'actor-') === 0 and $context->contextlevel == CONTEXT_MODULE) {
+    if (strpos($filearea, 'actor-') === 0 && $context->contextlevel == CONTEXT_MODULE) {
         require_course_login($course, true, $cm);
 
         $itemid = (int) array_shift($args);
@@ -722,7 +722,7 @@ function datalynx_extend_settings_navigation(settings_navigation $settings, navi
     }
 
     // Notifications.
-    if (isloggedin() and !isguestuser()) {
+    if (isloggedin() && !isguestuser()) {
         $dfnode->add(get_string('messages', 'message'),
                 new moodle_url('/message/edit.php',
                         array('id' => $USER->id, 'course' => $page->course->id,
@@ -966,7 +966,7 @@ function datalynx_comment_add($newcomment, $commentparam) {
  */
 function datalynx_rating_permissions($contextid, $component, $ratingarea) {
     $context = context::instance_by_id($contextid, MUST_EXIST);
-    if ($component == 'mod_datalynx' and ($ratingarea == 'entry' or $ratingarea == 'activity')) {
+    if ($component == 'mod_datalynx' && ($ratingarea == 'entry' or $ratingarea == 'activity')) {
         return array('view' => has_capability('mod/datalynx:ratingsview', $context),
                 'viewany' => has_capability('mod/datalynx:ratingsviewany', $context),
                 'viewall' => has_capability('mod/datalynx:ratingsviewall', $context),
@@ -1007,7 +1007,7 @@ function datalynx_rating_validate($params) {
     }
 
     // Check the ratingarea is entry or activity.
-    if ($params['ratingarea'] != 'entry' and $params['ratingarea'] != 'activity') {
+    if ($params['ratingarea'] != 'entry' && $params['ratingarea'] != 'activity') {
         throw new rating_exception('invalidratingarea');
     }
 
@@ -1067,7 +1067,7 @@ function datalynx_rating_validate($params) {
     }
 
     // Lower limit.
-    if ($params['rating'] < 0 and $params['rating'] != RATING_UNSET_RATING) {
+    if ($params['rating'] < 0 && $params['rating'] != RATING_UNSET_RATING) {
         throw new rating_exception('invalidnum');
     }
 
@@ -1083,7 +1083,7 @@ function datalynx_rating_validate($params) {
 
     // Make sure groups allow this user to see the item they're rating.
     $groupid = $df->currentgroup;
-    if ($groupid > 0 and $groupmode = groups_get_activity_groupmode($df->cm, $df->course)) {
+    if ($groupid > 0 && $groupmode = groups_get_activity_groupmode($df->cm, $df->course)) {
         // Groups are being used.
         if (!groups_group_exists($groupid)) {
             // Can't find group.
@@ -1149,7 +1149,7 @@ function datalynx_update_grades($data = null, $userid = 0, $nullifnone = true) {
         if ($grades = datalynx_get_user_grades($data, $userid)) {
             datalynx_grade_item_update($data, $grades);
         } else {
-            if ($userid and $nullifnone) {
+            if ($userid && $nullifnone) {
                 $grade = new stdClass();
                 $grade->userid = $userid;
                 $grade->rawgrade = null;
@@ -1317,7 +1317,7 @@ function datalynx_scale_used($dataid, $scaleid) {
  */
 function datalynx_scale_used_anywhere($scaleid) {
     global $DB;
-    return ($scaleid and $DB->record_exists('datalynx', array('rating' => "-$scaleid")));
+    return ($scaleid && $DB->record_exists('datalynx', array('rating' => "-$scaleid")));
 }
 
 /**
@@ -1408,7 +1408,7 @@ function mod_datalynx_get_tagged_entries($tag, $exclusivemode = false, $fromctx 
                                 if ($datalynx->data->approval and
                                         !has_capability('mod/datalynx:manageentries', $datalynx->context)
                                 ) {
-                                    if (isloggedin() AND $taggeditem->approved == 1) {
+                                    if (isloggedin() && $taggeditem->approved == 1) {
                                         $accessible = true;
                                     }
                                 }

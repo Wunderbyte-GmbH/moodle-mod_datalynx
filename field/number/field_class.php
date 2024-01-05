@@ -52,7 +52,7 @@ class datalynxfield_number extends datalynxfield_text {
         $name = "df_{$fieldid}_{$i}";
 
         // For all NOT criteria except NOT Empty, exclude entries which don't meet the positive criterion.
-        $excludeentries = (($not and $operator !== '') or (!$not and $operator === ''));
+        $excludeentries = (($not && $operator !== '') or (!$not && $operator === ''));
 
         if ($excludeentries) {
             $varcharcontent = $DB->sql_compare_text('content');

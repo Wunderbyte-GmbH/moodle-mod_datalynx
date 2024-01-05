@@ -42,7 +42,7 @@ class datalynxfield_number_renderer extends datalynxfield_text_renderer {
         $fieldname = "field_{$fieldid}_{$entryid}";
         $required = !empty($options['required']);
         $content = '';
-        if (isset($entry->{"c{$fieldid}_content"}) and $entry->{"c{$fieldid}_content"} === "0" or !empty(
+        if (isset($entry->{"c{$fieldid}_content"}) && $entry->{"c{$fieldid}_content"} === "0" or !empty(
                 $entry->{"c{$fieldid}_content"})) {
             $content = $entry->{"c{$fieldid}_content"};
         }
@@ -65,7 +65,7 @@ class datalynxfield_number_renderer extends datalynxfield_text_renderer {
         $field = $this->_field;
         $fieldid = $field->id();
         $outputemptystring = !empty($field->get('param4')) ? $field->get('param4') : 0;
-        if (!isset($entry->{"c{$fieldid}_content"}) and !$outputemptystring) {
+        if (!isset($entry->{"c{$fieldid}_content"}) && !$outputemptystring) {
             return 0;
         } else if (!isset($entry->{"c{$fieldid}_content"})) {
             return '';
@@ -120,7 +120,7 @@ class datalynxfield_number_renderer extends datalynxfield_text_renderer {
         foreach ($tags as $tag) {
             list(, $behavior, ) = $this->process_tag($tag);
             // Variable $behavior datalynx_field_behavior.
-            if ($behavior->is_required() and isset($formdata->$formfieldname)) {
+            if ($behavior->is_required() && isset($formdata->$formfieldname)) {
                 $value = optional_param($formfieldname, '', PARAM_RAW);
                 if (!is_numeric($value)) {
                     $errors[$formfieldname] = get_string('err_numeric', 'datalynx');

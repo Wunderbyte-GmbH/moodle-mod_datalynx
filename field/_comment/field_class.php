@@ -63,7 +63,7 @@ class datalynxfield__comment extends datalynxfield_no_content {
         global $USER;
 
         if (has_capability('mod/datalynx:managecomments', $this->df->context) or
-                ($params->commentarea == 'activity' and $params->itemid == $USER->id) or
+                ($params->commentarea == 'activity' && $params->itemid == $USER->id) or
                 ($params->commentarea == 'entry')
         ) {
             return array('post' => true, 'view' => true);
@@ -92,7 +92,7 @@ class datalynxfield__comment extends datalynxfield_no_content {
         }
 
         // Validate comment area.
-        if ($params->commentarea != 'entry' and $params->commentarea != 'activity') {
+        if ($params->commentarea != 'entry' && $params->commentarea != 'activity') {
             throw new comment_exception('invalidcommentarea');
         }
 
@@ -135,7 +135,7 @@ class datalynxfield__comment extends datalynxfield_no_content {
             if ($comment = $DB->get_record('comments', array('id' => $params->commentid
             ))
             ) {
-                if ($comment->commentarea != 'entry' and $comment->commentarea != 'activity') {
+                if ($comment->commentarea != 'entry' && $comment->commentarea != 'activity') {
                     throw new comment_exception('invalidcommentarea');
                 }
                 if ($comment->contextid != $params->context->id) {

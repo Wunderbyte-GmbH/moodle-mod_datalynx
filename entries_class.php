@@ -291,7 +291,7 @@ class datalynx_entries {
 
                 // Get perpage subset.
             } else {
-                if (!$filter->groupby and $perpage = $filter->perpage) {
+                if (!$filter->groupby && $perpage = $filter->perpage) {
 
                     // A random set (filter->selection == 1).
                     if (!empty($filter->selection)) {
@@ -450,7 +450,7 @@ class datalynx_entries {
     public function get_embedded_files(array $fids) {
         $files = array();
 
-        if (!empty($fids) and !empty($this->_entries)) {
+        if (!empty($fids) && !empty($this->_entries)) {
             $fs = get_file_storage();
             foreach ($this->_entries as $entry) {
                 foreach ($fids as $fieldid) {
@@ -484,7 +484,7 @@ class datalynx_entries {
     public function get_contentinfo(array $fids) {
         $contentinfo = array();
 
-        if (!empty($fids) and !empty($this->_entries)) {
+        if (!empty($fids) && !empty($this->_entries)) {
             foreach ($this->_entries as $entry) {
                 foreach ($fids as $fieldid) {
                     $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
@@ -1149,7 +1149,7 @@ class datalynx_entries {
 
         $df = $this->datalynx;
 
-        if ($data and has_capability('mod/datalynx:manageentries', $df->context)) {
+        if ($data && has_capability('mod/datalynx:manageentries', $df->context)) {
             foreach ($data as $key => $value) {
                 if ($key == 'name') {
                     $entry->userid = $value;

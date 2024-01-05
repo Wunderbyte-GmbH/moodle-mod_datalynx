@@ -39,7 +39,7 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
         $autocomplete = $field->get('param9');
 
         $content = '';
-        if ($entryid > 0 and !empty($entry->{"c{$fieldid}_content"})) {
+        if ($entryid > 0 && !empty($entry->{"c{$fieldid}_content"})) {
             $content = $entry->{"c{$fieldid}_content"};
         }
         $fieldattr = array();
@@ -120,7 +120,7 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
         $fieldid = $field->id();
         $nolinkend = "";
         $nolinkstart = "";
-        if (isset($entry->{"c{$fieldid}_content"}) and !empty($entry->{"c{$fieldid}_content"})) {
+        if (isset($entry->{"c{$fieldid}_content"}) && !empty($entry->{"c{$fieldid}_content"})) {
             $content = $entry->{"c{$fieldid}_content"};
 
             $options = new stdClass();
@@ -180,7 +180,7 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
         foreach ($tags as $tag) {
             list(, $behavior, ) = $this->process_tag($tag);
             // Variable $behavior datalynx_field_behavior.
-            if ($behavior->is_required() and isset($formdata->$formfieldname)) {
+            if ($behavior->is_required() && isset($formdata->$formfieldname)) {
                 if (!clean_param($formdata->$formfieldname, PARAM_NOTAGS)) {
                     $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
                 }

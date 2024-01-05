@@ -70,7 +70,7 @@ class datalynxfield_userinfo extends datalynxfield_base {
         $infoid = !empty($this->field->param1) ? $this->field->param1 : null;
         parent::set_field($forminput);
 
-        if ($this->field->param1 and ($this->field->param1 != $infoid or !$this->field->param2)) {
+        if ($this->field->param1 && ($this->field->param1 != $infoid or !$this->field->param2)) {
             $infoitems = 'shortname,datatype,defaultdata,defaultdataformat,param1,param2,param3,param4,param5';
             if ($info = $DB->get_record('user_info_field', array('id' => $this->field->param1), $infoitems)) {
                 $this->field->param2 = $info->shortname;
