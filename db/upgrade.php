@@ -42,7 +42,7 @@
  * Please do not forget to use upgrade_set_timeout()
  * before any action that may take longer time to finish.
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 function xmldb_datalynx_upgrade($oldversion) {
     global $CFG, $DB;
@@ -183,7 +183,7 @@ function xmldb_datalynx_upgrade($oldversion) {
         // Move content of matrixext param1 -> param4 and param3 -> param5.
         if ($views = $DB->get_records('datalynx_views', array('type' => 'matrixext'))) {
             foreach ($views as $view) {
-                if (!empty($view->param1) or !empty($view->param3)) {
+                if (!empty($view->param1) || !empty($view->param3)) {
                     $view->param4 = $view->param1;
                     $view->param5 = $view->param3;
                     $view->param1 = null;

@@ -25,7 +25,7 @@
 /**
  * Definition of log events
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 $logs = array(
         array('module' => 'datalynx', 'action' => 'view', 'mtable' => 'datalynx', 'field' => 'name'),

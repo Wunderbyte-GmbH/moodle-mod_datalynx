@@ -22,7 +22,7 @@
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
@@ -105,7 +105,7 @@ class datalynxfield__time extends datalynxfield_no_content {
         $params = array();
 
         if ($operator != 'BETWEEN') {
-            if (!$operator or $operator == 'LIKE') {
+            if (!$operator || $operator == 'LIKE') {
                 $operator = '=';
             }
             $params[$namefrom] = $from;

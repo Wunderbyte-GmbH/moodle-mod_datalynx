@@ -21,7 +21,7 @@
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Base class for view patterns
@@ -85,7 +85,7 @@ class datalynxview_patterns {
         // The default menu category for views.
         $patternsmenu = array();
         foreach ($this->patterns() as $tag => $pattern) {
-            if ($showall or $pattern[self::PATTERN_SHOW_IN_MENU]) {
+            if ($showall || $pattern[self::PATTERN_SHOW_IN_MENU]) {
                 // Which category.
                 if (!empty($pattern[self::PATTERN_CATEGORY])) {
                     $cat = $pattern[self::PATTERN_CATEGORY];

@@ -24,7 +24,7 @@
 
 use core_user\fields;
 
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 /**
  */
@@ -281,7 +281,7 @@ class datalynx_entries {
 
                 if ($entries->entries = $DB->get_records_sql($sqlselect, $allparams + $eidparams)) {
                     // If one entry was requested get its position.
-                    if (!is_array($filter->eids) or count($filter->eids) == 1) {
+                    if (!is_array($filter->eids) || count($filter->eids) == 1) {
                         $sqlselect = "$sqlcount AND e.id $ineids";
                         $eidposition = $DB->get_records_sql($sqlselect, $allparams + $eidparams);
 
@@ -590,7 +590,7 @@ class datalynx_entries {
             if ($entries) {
                 foreach ($entries as $eid => $entry) {
                     // Filter approvable entries.
-                    if (($action == 'approve' or $action == 'disapprove') and
+                    if (($action == 'approve' || $action == 'disapprove') and
                             !has_capability('mod/datalynx:approve', $dl->context)
                     ) {
                         unset($entries[$eid]);

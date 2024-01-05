@@ -20,7 +20,7 @@
  * @copyright 2023 Thomas Winkler, David Bogner
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'datalynxrule_ftpsyncfiles';
 $plugin->version = 2023102300;

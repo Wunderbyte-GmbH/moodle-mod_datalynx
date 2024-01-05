@@ -136,7 +136,7 @@ if ($urlparams->jsedit) {
             $df->print_footer();
 } else {
 
-    defined('NO_MOODLE_COOKIES') or define('NO_MOODLE_COOKIES', true); // Session not used here.
+    defined('NO_MOODLE_COOKIES') || define('NO_MOODLE_COOKIES', true); // Session not used here.
 
     $lifetime = 0; // Seconds to cache this stylesheet.
 

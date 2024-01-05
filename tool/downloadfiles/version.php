@@ -21,7 +21,7 @@
  * @copyright 2017 David Bogner {@link http://www.edulabs.org}
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 $plugin->component = 'datalynxtool_downloadfiles';
 $plugin->version = 2017080600;
 $plugin->requires = 2014051200;

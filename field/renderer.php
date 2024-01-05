@@ -21,7 +21,7 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(__FILE__) . '/../behavior/behavior.php');
 require_once(dirname(__FILE__) . '/../renderer/renderer.php');
@@ -356,7 +356,7 @@ abstract class datalynxfield_renderer {
         // The default menu category for fields.
         $patternsmenu = array();
         foreach ($this->patterns() as $tag => $pattern) {
-            if ($showall or $pattern[self::PATTERN_SHOW_IN_MENU]) {
+            if ($showall || $pattern[self::PATTERN_SHOW_IN_MENU]) {
                 // Which category.
                 if (!empty($pattern[self::PATTERN_CATEGORY])) {
                     $cat = $pattern[self::PATTERN_CATEGORY];

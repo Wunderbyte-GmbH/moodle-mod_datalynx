@@ -21,7 +21,7 @@
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 $subplugins = array('datalynxfield' => 'mod/datalynx/field', 'datalynxview' => 'mod/datalynx/view',
         'datalynxrule' => 'mod/datalynx/rule', 'datalynxtool' => 'mod/datalynx/tool'

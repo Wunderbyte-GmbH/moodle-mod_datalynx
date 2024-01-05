@@ -20,7 +20,7 @@
  * @copyright 2015 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(dirname(__FILE__)) . '/classes/datalynx.php');
 
@@ -209,7 +209,7 @@ class datalynx_rule_manager {
     public function get_rules($exclude = null, $menu = false, $forceget = false) {
         global $DB;
 
-        if (!$this->_customrules or $forceget) {
+        if (!$this->_customrules || $forceget) {
             $this->_customrules = array();
             // Collate user rules.
             if ($rules = $DB->get_records('datalynx_rules', array('dataid' => $this->_df->id()))) {

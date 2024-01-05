@@ -21,13 +21,13 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 $istemplatemanager = has_capability('mod/datalynx:managetemplates', $this->context);
 
 // Tabs are displayed only for template managers.
 if (isloggedin() and $istemplatemanager) {
-    if (empty($currenttab) or empty($this->data) or empty($this->course)) {
+    if (empty($currenttab) || empty($this->data) || empty($this->course)) {
         throw new moodle_exception('emptytab', 'datalynx');
     }
 

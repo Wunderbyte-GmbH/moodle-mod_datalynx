@@ -22,7 +22,7 @@
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/view/view_class.php");
 
@@ -137,7 +137,7 @@ class datalynxview_grid extends datalynxview_base {
         foreach ($entriesset as $entrydefinitions) {
             $elements = array_merge($elements, $entrydefinitions);
             if (!empty($cells)) {
-                if (empty($percol) or $count >= $percol - 1) {
+                if (empty($percol) || $count >= $percol - 1) {
                     $count = 0;
                     $elements[] = array('html', array_shift($cells));
                 } else {

@@ -22,7 +22,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->libdir/portfolio/caller.php");
 require_once("$CFG->dirroot/mod/datalynx/classes/datalynx.php");

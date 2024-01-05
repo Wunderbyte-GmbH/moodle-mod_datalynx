@@ -22,7 +22,7 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
@@ -91,7 +91,7 @@ class datalynxfield_time extends datalynxfield_base {
                     }
                 }
                 if ($enabled) {
-                    if ($year or $month or $day or $hour or $minute) {
+                    if ($year || $month or $day or $hour or $minute) {
                         $timestamp = make_timestamp($year, $month, $day, $hour, $minute, 0);
                     }
                 }

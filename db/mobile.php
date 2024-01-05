@@ -21,7 +21,7 @@
  * @copyright 2020 Michael Pollak <moodle@michaelpollak.org>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 $addons = [
     'mod_datalynx' => [ // Plugin identifier

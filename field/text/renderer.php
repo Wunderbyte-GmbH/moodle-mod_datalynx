@@ -21,7 +21,7 @@
  * @copyright 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(__FILE__) . "/../renderer.php");
 
@@ -94,8 +94,8 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
         }
         // Length rule.
         if ($length = $field->get('param5')) {
-            ($min = $field->get('param6')) or ($min = 0);
-            ($max = $field->get('param7')) or ($max = 64);
+            ($min = $field->get('param6')) || ($min = 0);
+            ($max = $field->get('param7')) || ($max = 64);
 
             $val = false;
             switch ($length) {

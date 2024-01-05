@@ -22,7 +22,7 @@
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
@@ -77,7 +77,7 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
 
         if (isset($entry->{"c{$fieldid}_content"})) {
             $url = $entry->{"c{$fieldid}_content"};
-            if (empty($url) or ($url == 'http://')) {
+            if (empty($url) || ($url == 'http://')) {
                 return '';
             }
 
@@ -166,7 +166,7 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
             $isurl = filter_var($formdata->$formfieldname, FILTER_VALIDATE_URL);
             $isdefault = $formdata->$formfieldname === 'http://';
             $isempty = $formdata->$formfieldname === '';
-            if ($isurl or $isdefault or $isempty) {
+            if ($isurl || $isdefault || $isempty) {
                 continue;
             } else {
                 $errors["field_{$fieldid}_{$entryid}_grp"] = "Please enter a valid URL."; // TODO: Multilang.
