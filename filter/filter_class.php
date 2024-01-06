@@ -27,37 +27,21 @@ defined('MOODLE_INTERNAL') || die();
  * Filter class
  */
 class datalynx_filter {
-
     public $id;
-
     public $dataid;
-
     public $name;
-
     public $description;
-
     public $visible;
-
     public $perpage;
-
     public $pagenum;
-
     public $selection;
-
     public $groupby;
-
     public $customsort;
-
     public $customsearch;
-
     public $search;
-
     public $contentfields;
-
     public $eids;
-
     public $users;
-
     public $page;
 
     protected $_filteredtables = null;
@@ -618,7 +602,7 @@ class datalynx_filter_manager {
             }
 
             // Retrieve existing user filter (filter id > blank filter).
-            if ($filterid != self::USER_FILTER_SET and
+            if ($filterid != self::USER_FILTER_SET &&
                     $filter = get_user_preferences("datalynxfilter-$dfid-$viewid-$filterid", null)
             ) {
                 $filter = unserialize($filter);

@@ -194,7 +194,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
 
         if (isset($entry->rating)) {
             $rating = $entry->rating;
-            if ($rating->settings->permissions->viewall and
+            if ($rating->settings->permissions->viewall &&
                     $rating->settings->pluginpermissions->viewall
             ) {
 
@@ -221,7 +221,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
 
         if (isset($entry->rating)) {
             $rating = $entry->rating;
-            if ($rating->settings->permissions->viewall and
+            if ($rating->settings->permissions->viewall &&
                     $rating->settings->pluginpermissions->viewall && !empty($rating->records)
             ) {
                 $scalemenu = make_grades_menu($rating->settings->scale->id);

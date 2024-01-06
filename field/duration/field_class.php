@@ -43,12 +43,6 @@ class datalynxfield_duration extends datalynxfield_base {
     protected $forfieldgroup = true;
 
     /**
-     */
-    public function __construct($df = 0, $field = 0) {
-        parent::__construct($df, $field);
-    }
-
-    /**
      * Returns time associative array of unit length.
      *
      * @return array unit length in seconds => string unit name.
@@ -91,22 +85,13 @@ class datalynxfield_duration extends datalynxfield_base {
         $fieldid = $this->field->id;
         $contents = array();
         $oldcontents = array();
-
         // Old contents.
         if (isset($entry->{"c{$fieldid}_content"})) {
             $oldcontents[] = $entry->{"c{$fieldid}_content"};
         }
 
         $value = reset($values);
-        // I don't understand what we are trying to do here.
-        /*
-        $rawvalue = optional_param_array("field_{$fieldid}_{$entry->id}", ['number' => ''], PARAM_RAW);
-        if ($rawvalue['number'] !== '') {
-            $contents[] = $value;
-        }
-        */
         $contents[] = $value;
-
         return array($contents, $oldcontents);
     }
 

@@ -34,8 +34,6 @@ use core_privacy\local\request\transform;
 use core_privacy\local\request\writer;
 use core_privacy\manager;
 
-defined('MOODLE_INTERNAL') || die();
-
 class provider implements
 
     // This plugin stores personal data.

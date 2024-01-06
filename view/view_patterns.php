@@ -543,8 +543,8 @@ class datalynxview_patterns {
                         'page', '', true);
                 // Standard paging bar case.
             } else {
-                if (!empty($filter->perpage) && !empty($options['entriescount']) and
-                        !empty($options['entriesfiltercount']) and
+                if (!empty($filter->perpage) && !empty($options['entriescount']) &&
+                        !empty($options['entriesfiltercount']) &&
                         $options['entriescount'] != $options['entriesfiltercount']
                 ) {
 

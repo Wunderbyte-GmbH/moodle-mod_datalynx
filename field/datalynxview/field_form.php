@@ -116,7 +116,7 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
                 'fieldtype' => 'datalynxview'
         );
 
-        // Add JQuery
+        // Add JQuery.
         $PAGE->requires->js_call_amd('mod_datalynx/datalynxloadviews', 'init', array($options));
 
     }

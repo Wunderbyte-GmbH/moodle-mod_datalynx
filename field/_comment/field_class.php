@@ -62,8 +62,8 @@ class datalynxfield__comment extends datalynxfield_no_content {
     public function permissions($params) {
         global $USER;
 
-        if (has_capability('mod/datalynx:managecomments', $this->df->context) or
-                ($params->commentarea == 'activity' && $params->itemid == $USER->id) or
+        if (has_capability('mod/datalynx:managecomments', $this->df->context) ||
+                ($params->commentarea == 'activity' && $params->itemid == $USER->id) ||
                 ($params->commentarea == 'entry')
         ) {
             return array('post' => true, 'view' => true);
@@ -119,7 +119,7 @@ class datalynxfield__comment extends datalynxfield_no_content {
                 // Group access.
                 if ($entry->groupid) {
                     $groupmode = groups_get_activity_groupmode($this->df->cm, $this->df->course);
-                    if ($groupmode == SEPARATEGROUPS and
+                    if ($groupmode == SEPARATEGROUPS &&
                             !has_capability('moodle/site:accessallgroups', $this->df->context)
                     ) {
                         if (!groups_is_member($entry->groupid)) {

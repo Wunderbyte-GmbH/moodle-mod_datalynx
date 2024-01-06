@@ -21,7 +21,6 @@
  * @copyright 2013 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die();
 
 class datalynx_statistics_class {
 
@@ -96,7 +95,8 @@ class datalynx_statistics_class {
                     $to = PHP_INT_MAX;
                     break;
                 default:
-                    print_error('This shouldn\'t happen.');
+                    throw new moodle_exception('generalexceptionmessage', 'error',
+                            '', 'This should not happen');
             }
             list($total, $approved, $deleted, $visits) = $this->get_count($params->mode, $from, $to);
             $dateformat = get_string('strftimedate', 'langconfig');

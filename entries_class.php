@@ -185,7 +185,7 @@ class datalynx_entries {
 
         // APPROVE filtering.
         $whereapprove = '';
-        if ($datalynx->data->approval and
+        if ($datalynx->data->approval &&
                 !has_capability('mod/datalynx:manageentries', $datalynx->context)
         ) {
             if (isloggedin()) {
@@ -590,7 +590,7 @@ class datalynx_entries {
             if ($entries) {
                 foreach ($entries as $eid => $entry) {
                     // Filter approvable entries.
-                    if (($action == 'approve' || $action == 'disapprove') and
+                    if (($action == 'approve' || $action == 'disapprove') &&
                             !has_capability('mod/datalynx:approve', $dl->context)
                     ) {
                         unset($entries[$eid]);
@@ -680,7 +680,7 @@ class datalynx_entries {
                                     // Entry info.
                                     if (in_array($fieldid, $entryinfo)) {
                                         // TODO.
-                                        if ($fieldid == datalynxfield_entryauthor::_USERID or
+                                        if ($fieldid == datalynxfield_entryauthor::_USERID ||
                                                 $fieldid == datalynxfield_entryauthor::_USERNAME
                                         ) {
                                             $entryvar = 'userid';
@@ -905,7 +905,7 @@ class datalynx_entries {
                             $newentry->groupid = $dl->currentgroup;
                             $newentry->timecreated = $newentry->timemodified = time();
 
-                            if ($dl->data->approval and
+                            if ($dl->data->approval &&
                                     !has_capability('mod/datalynx:approve', $dl->context)
                             ) {
                                 $newentry->approved = 0;

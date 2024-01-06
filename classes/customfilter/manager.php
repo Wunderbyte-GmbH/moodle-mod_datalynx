@@ -88,7 +88,7 @@ class manager {
                 return new customfilter($filter);
             }
 
-            if ($filterid != self::USER_FILTER_SET and
+            if ($filterid != self::USER_FILTER_SET &&
                     $filter = get_user_preferences("datalynxcustomfilter-$dlid-$viewid-$filterid",
                             null)) {
                 $filter = unserialize($filter);

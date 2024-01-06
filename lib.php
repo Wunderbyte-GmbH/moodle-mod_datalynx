@@ -343,7 +343,7 @@ function datalynx_reset_userdata($data) {
         $fields = array();
         $rs = $DB->get_recordset_sql($recordssql, array($data->courseid));
         foreach ($rs as $record) {
-            if (array_key_exists($record->userid, $notenrolled) || !$record->userexists or
+            if (array_key_exists($record->userid, $notenrolled) || !$record->userexists ||
                     $record->userdeleted || !is_enrolled($coursecontext, $record->userid)
             ) {
                 // Delete ratings.
@@ -516,7 +516,7 @@ function mod_datalynx_pluginfile($course, $cm, $context, $filearea, $args, $forc
     require_course_login($course, true, $cm);
 
     // FIELD CONTENT files.
-    if (($filearea === 'content' || $filearea === 'thumb') and
+    if (($filearea === 'content' || $filearea === 'thumb') &&
             $context->contextlevel == CONTEXT_MODULE
     ) {
 
@@ -544,7 +544,7 @@ function mod_datalynx_pluginfile($course, $cm, $context, $filearea, $args, $forc
         }
 
         // Check if approved.
-        if ($datalynx->approval && !has_capability('mod/datalynx:approve', $context) and
+        if ($datalynx->approval && !has_capability('mod/datalynx:approve', $context) &&
                 !$entry->approved && $USER->id != $entry->userid
         ) {
             return false;
@@ -553,7 +553,7 @@ function mod_datalynx_pluginfile($course, $cm, $context, $filearea, $args, $forc
         // Group access.
         if ($entry->groupid) {
             $groupmode = groups_get_activity_groupmode($cm, $course);
-            if ($groupmode == SEPARATEGROUPS and
+            if ($groupmode == SEPARATEGROUPS &&
                     !has_capability('moodle/site:accessallgroups', $context)
             ) {
                 if (!groups_is_member($entry->groupid)) {
@@ -568,7 +568,7 @@ function mod_datalynx_pluginfile($course, $cm, $context, $filearea, $args, $forc
             if (empty($USER->id)) {
                 return false;
             }
-            if ($USER->id != $entry->userid and
+            if ($USER->id != $entry->userid &&
                     !has_capability('mod/datalynx:manageentries', $context)
             ) {
                 return false;
@@ -995,7 +995,7 @@ function datalynx_rating_validate($params) {
     }
 
     // You can't rate your own entries unless you can manage ratings.
-    if (!has_capability('mod/datalynx:manageratings', $params['context']) and
+    if (!has_capability('mod/datalynx:manageratings', $params['context']) &&
             $params['rateduserid'] == $USER->id
     ) {
         throw new rating_exception('nopermissiontorate');
@@ -1090,7 +1090,7 @@ function datalynx_rating_validate($params) {
             throw new rating_exception('cannotfindgroup'); // Something is wrong.
         }
 
-        if (!groups_is_member($groupid) and
+        if (!groups_is_member($groupid) &&
                 !has_capability('moodle/site:accessallgroups', $df->context)
         ) {
             // Do not allow rating of posts from other groups when in SEPARATEGROUPS or.
@@ -1405,7 +1405,7 @@ function mod_datalynx_get_tagged_entries($tag, $exclusivemode = false, $fromctx 
                                 if ($taggeditem->userid == $USER->id) {
                                     $accessible = true;
                                 }
-                                if ($datalynx->data->approval and
+                                if ($datalynx->data->approval &&
                                         !has_capability('mod/datalynx:manageentries', $datalynx->context)
                                 ) {
                                     if (isloggedin() && $taggeditem->approved == 1) {

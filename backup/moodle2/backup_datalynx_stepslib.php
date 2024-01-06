@@ -21,7 +21,6 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Define all the backup steps that will be used by the backup_datalynx_activity_task
@@ -173,12 +172,6 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
                 backup_helper::is_sqlparam('mod_datalynx'),
                 backup::VAR_PARENTID));
 
-            // TODO: fix sql, this is just a temporary fix and does not provide same functionality for postgresql.
-            // SQL for mysql provides id mapping of the field datalynx view, whereas there is no id mapping for postgresql.
-            // Possible DBs: 'pgsql', 'mariadb', 'mysqli', 'mssql', 'sqlsrv' or 'oci'
-            // The cases are weird, they are formated differently in mssql, postgresql, mysql, ... fix that.
-            // else if ($CFG->dbtype == 'pgsql') {}
-            /* SELECT *, case when rev=1 then 'blabla' end FROM docs works on mysql, mssql, postgresql */
         if ($CFG->dbtype == 'mysqli' || $CFG->dbtype == 'mysql' || $CFG->dbtype == 'mariadb') {
             $field->set_source_sql(
                     "SELECT f.*,
@@ -194,12 +187,30 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
               LEFT JOIN {datalynx_filters} fil ON " . $DB->sql_cast_char2int('f.param3') . " = fil.id
                   WHERE f.dataid = :dataid
                GROUP BY f.id", array('dataid' => backup::VAR_PARENTID));
-        } else {
+        } else if ($CFG->dbtype == 'pgsql') {
             $field->set_source_sql(
-                    "SELECT f.*
+                    "SELECT f.*,
+            CASE WHEN f.type = 'datalynxview' THEN MAX(c.fullname) ELSE NULL END AS targetcourse,
+            CASE WHEN f.type = 'datalynxview' THEN MAX(d.name) ELSE NULL END AS targetinstance,
+            CASE WHEN f.type = 'datalynxview' THEN MAX(v.name) ELSE NULL END AS targetview,
+                CASE WHEN f.type = 'datalynxview' THEN MAX(fil.name) ELSE NULL END AS targetfilter
+            FROM {datalynx_fields} f
+            LEFT JOIN {datalynx} d ON f.param1::INTEGER = d.id
+            LEFT JOIN {course_modules} cm ON cm.instance = d.id
+            LEFT JOIN {course} c ON cm.course = c.id
+            LEFT JOIN {datalynx_views} v ON f.param2::INTEGER = v.id
+            LEFT JOIN {datalynx_filters} fil ON f.param3::INTEGER = fil.id
+            WHERE f.dataid = :dataid
+            GROUP BY f.id",
+                    array('dataid' => backup::VAR_PARENTID)
+            );
+        } else {
+                $field->set_source_sql(
+                        "SELECT f.*
                FROM {datalynx_fields} f
               WHERE f.dataid = :dataid
                 AND f.type != 'datalynxview'", array('dataid' => backup::VAR_PARENTID));
+            }
         }
 
         $filter->set_source_table('datalynx_filters', array('dataid' => backup::VAR_PARENTID));

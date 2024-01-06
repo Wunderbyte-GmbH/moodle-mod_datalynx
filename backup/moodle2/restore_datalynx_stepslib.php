@@ -21,7 +21,6 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Define all the restore steps that will be used by the restore_datalynx_activity_task
@@ -167,20 +166,24 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             $filter = isset($data->targetfilter) ? $data->targetfilter : 'NULL';
 
             $this->log(
-                    "WARNING! 'datalynxview' field type cannot be restored if referencing instances are not included in the backup!",
+                    "WARNING! datalynxview field type can't be restored if referencing instances are not included in backup!",
                     backup::LOG_WARNING);
             $this->log("* Please verify the references of the field:", backup::LOG_WARNING);
             $this->log(
-                    "* Field '$data->name' originally referenced: course '$course', instance '$instance', view '$view', filter '$filter'",
+                    "* Field '$data->name' original reference: '$course', instance '$instance', view '$view', filter '$filter'",
                     backup::LOG_WARNING);
         }
 
         // Insert the datalynx_fields record.
         $newitemid = $DB->insert_record('datalynx_fields', $data);
-        $this->set_mapping('datalynx_field', $oldid, $newitemid, true); // Files by this item id.
+        // Files by this item id.
+        $this->set_mapping('datalynx_field', $oldid, $newitemid, true);
     }
 
     /**
+     * Restore filters
+     * @param $data
+     * @return void
      */
     protected function process_datalynx_filter($data) {
         global $DB;

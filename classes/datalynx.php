@@ -418,7 +418,7 @@ class datalynx {
         }
 
         // RSS.
-        if (!empty($params->rss) && !empty($CFG->enablerssfeeds) and
+        if (!empty($params->rss) && !empty($CFG->enablerssfeeds) &&
                 !empty($CFG->datalynx_enablerssfeeds) && $this->data->rssarticles > 0
         ) {
             require_once("$CFG->libdir/rsslib.php");
@@ -2031,7 +2031,7 @@ class datalynx {
         }
 
         // Anonymous/guest can only add entries if enabled.
-        if ((!isloggedin() || isguestuser()) && empty($entry->id) && $CFG->datalynx_anonymous and
+        if ((!isloggedin() || isguestuser()) && empty($entry->id) && $CFG->datalynx_anonymous &&
                 $this->data->anonymous
         ) {
             return true;
@@ -2052,8 +2052,8 @@ class datalynx {
             }
 
             // If group mode is enabled user has to be in the right group.
-            if ($this->groupmode && !in_array($this->groupmode, $this->internalgroupmodes) and
-                    !has_capability('moodle/site:accessallgroups', $this->context) && (($this->currentgroup and
+            if ($this->groupmode && !in_array($this->groupmode, $this->internalgroupmodes) &&
+                    !has_capability('moodle/site:accessallgroups', $this->context) && (($this->currentgroup &&
                                     !groups_is_member($this->currentgroup)) or
                             (!$this->currentgroup && $this->groupmode == VISIBLEGROUPS))
             ) {

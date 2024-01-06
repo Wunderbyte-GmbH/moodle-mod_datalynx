@@ -50,7 +50,7 @@ $urlparams->confirmed = optional_param('confirmed', 0, PARAM_INT);
 $df = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
 
 // Require capability.
-if (!has_capability('mod/datalynx:manageentries', $df->context) or
+if (!has_capability('mod/datalynx:manageentries', $df->context) ||
         !has_capability('mod/datalynx:managetemplates', $df->context)
 ) {
     throw new required_capability_exception($df->context, 'mod/datalynx:manageentries',

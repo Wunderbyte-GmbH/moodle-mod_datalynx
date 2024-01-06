@@ -335,7 +335,7 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         foreach ($tags as $tag) {
             list(, $behavior, ) = $this->process_tag($tag);
             // Variable $behavior datalynx_field_behavior.
-            if ($behavior->is_required() and
+            if ($behavior->is_required() &&
                     !isset(optional_param_array($formfieldname, [], PARAM_RAW)['enabled'])
             ) {
                 $errors[$formfieldname] = get_string('check_enable', 'datalynx');

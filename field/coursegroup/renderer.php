@@ -167,7 +167,7 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
                 break;
             case 'group':
                 // Return the group name.
-                if ($groupid and
+                if ($groupid &&
                         $groupname = $DB->get_field('groups', 'name', array('id' => $groupid))
                 ) {
                     return $groupname;
