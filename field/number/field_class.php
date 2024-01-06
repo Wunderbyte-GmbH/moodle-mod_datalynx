@@ -22,7 +22,7 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/text/field_class.php");
 
@@ -52,7 +52,7 @@ class datalynxfield_number extends datalynxfield_text {
         $name = "df_{$fieldid}_{$i}";
 
         // For all NOT criteria except NOT Empty, exclude entries which don't meet the positive criterion.
-        $excludeentries = (($not && $operator !== '') or (!$not && $operator === ''));
+        $excludeentries = (($not && $operator !== '') || (!$not && $operator === ''));
 
         if ($excludeentries) {
             $varcharcontent = $DB->sql_compare_text('content');

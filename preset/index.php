@@ -65,7 +65,7 @@ $localpresets = $pm->get_user_presets($pm::PRESET_COURSEAREA);
 $sharedpresets = $pm->get_user_presets($pm::PRESET_SITEAREA);
 
 // Any notifications.
-if (!$localpresets and !$sharedpresets) {
+if (!$localpresets && !$sharedpresets) {
     $df->notifications['bad'][] = get_string('presetnoneavailable', 'datalynx'); // No presets in.
     // Datalynx.
 }

@@ -21,7 +21,7 @@
  * @copyright 2021 michael pollak <moodle@michaelpollak.org>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'datalynxfield_youtube';
 $plugin->version = 2021020501;

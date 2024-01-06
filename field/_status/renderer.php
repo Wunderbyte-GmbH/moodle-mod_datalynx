@@ -21,7 +21,7 @@
  * @copyright 2013 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
@@ -45,7 +45,7 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
         $replacements = array();
 
         foreach ($tags as $tag) {
-            if (!$entry or $edit) {
+            if (!$entry || $edit) {
                 if (trim($tag, '@') == "##status##" || trim($tag, '@') == "##*status##") {
                     $required = trim($tag, '@') === "##*status##";
                     $replacements[$tag] = array('',

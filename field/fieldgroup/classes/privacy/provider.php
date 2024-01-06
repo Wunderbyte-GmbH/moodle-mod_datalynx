@@ -24,7 +24,7 @@
  */
 
 namespace datalynxfield_fieldgroup\privacy;
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 class provider implements
     // This plugin does not store any personal user data.

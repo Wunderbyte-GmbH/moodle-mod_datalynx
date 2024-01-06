@@ -20,7 +20,7 @@
  * @copyright 2015 David Bogner {@link http:// Www.edulabs.org}.
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'datalynxfield_gradeitem';
 $plugin->version = 2015092200;

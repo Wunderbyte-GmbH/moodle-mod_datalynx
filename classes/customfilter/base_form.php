@@ -25,7 +25,7 @@
 
 namespace mod_datalynx\customfilter;
 use moodleform;
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Class mod_datalynx_customfilter_base_form

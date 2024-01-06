@@ -337,7 +337,7 @@ class datalynxview_patterns {
     protected function get_userpref_replacements($tag, array $options = null) {
         $view = $this->_view;
         $filter = $view->get_filter();
-        if (!$view->is_forcing_filter() && (!$filter->id or $filter->customsearch or !empty($options['entriescount']))) {
+        if (!$view->is_forcing_filter() && (!$filter->id || $filter->customsearch || !empty($options['entriescount']))) {
             switch ($tag) {
                 case '##quickperpage##':
                     return $this->print_quick_perpage(true);
@@ -905,7 +905,7 @@ class datalynxview_patterns {
 
         $filterjump = '';
 
-        if (!$view->is_forcing_filter() && ($filter->id or !empty($options['entriescount']))) {
+        if (!$view->is_forcing_filter() && ($filter->id || !empty($options['entriescount']))) {
             $fm = $df->get_filter_manager();
             if (!$menufilters = $fm->get_filters(null, true)) {
                 $menufilters = array();

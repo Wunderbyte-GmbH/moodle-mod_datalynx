@@ -22,7 +22,7 @@
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Preset manager class
@@ -67,7 +67,7 @@ class datalynx_preset_manager {
         $canviewall = has_capability('mod/datalynx:presetsviewall', $this->_df->context);
         if (!empty($files)) {
             foreach ($files as $file) {
-                if ($file->is_directory() || ($file->get_userid() != $USER->id and !$canviewall)) {
+                if ($file->is_directory() || ($file->get_userid() != $USER->id && !$canviewall)) {
                     continue;
                 }
                 $preset = new stdClass();
@@ -92,7 +92,7 @@ class datalynx_preset_manager {
         global $CFG, $OUTPUT;
 
         $targetpage = '/mod/datalynx/preset/index.php';
-        if ($localpresets or $sharedpresets) {
+        if ($localpresets || $sharedpresets) {
 
             $linkparams = array('d' => $this->_df->id(), 'sesskey' => sesskey());
             $actionurl = htmlspecialchars_decode(new moodle_url($targetpage, $linkparams));
@@ -265,24 +265,24 @@ class datalynx_preset_manager {
             }
             // Apply a preset.
         } else {
-            if ($params->apply and confirm_sesskey()) {
+            if ($params->apply && confirm_sesskey()) {
                 $this->apply_preset($params->apply, $params->torestorer);
                 // Rebuild course cache to show new datalynx name on the course page.
                 rebuild_course_cache($this->_df->course->id);
 
                 // Download (bulk in zip).
             } else {
-                if ($params->download and confirm_sesskey()) {
+                if ($params->download && confirm_sesskey()) {
                     $this->download_presets($params->download);
 
                     // Share presets.
                 } else {
-                    if ($params->share and confirm_sesskey()) {
+                    if ($params->share && confirm_sesskey()) {
                         $this->share_presets($params->share);
 
                         // Delete presets.
                     } else {
-                        if ($params->delete and confirm_sesskey()) {
+                        if ($params->delete && confirm_sesskey()) {
                             $this->delete_presets($params->delete);
                         }
                     }
@@ -325,7 +325,7 @@ class datalynx_preset_manager {
         $bc->destroy();
 
         $fs = get_file_storage();
-        if ($users and !$anon) {
+        if ($users && !$anon) {
             $contextid = $this->_df->context->id;
             $files = $fs->get_area_files($contextid, 'backup', 'activity', 0, 'timemodified', false);
         } else {

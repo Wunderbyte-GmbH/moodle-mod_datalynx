@@ -26,7 +26,7 @@
 
 use core_user\fields;
 
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
@@ -55,7 +55,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
         if ($fieldname == 'name') {
             // Two tags are possible.
             foreach ($tags as $tag) {
-                if (trim($tag, '@') == "##author:edit##" and $edit and
+                if (trim($tag, '@') == "##author:edit##" && $edit and
                         has_capability('mod/datalynx:manageentries', $field->df()->context)
                 ) {
                     $replacements[$tag] = array('',

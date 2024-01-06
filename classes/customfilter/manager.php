@@ -28,7 +28,7 @@ use html_table;
 use html_writer;
 use moodle_url;
 use stdClass;
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Class manager
@@ -83,7 +83,7 @@ class manager {
             $view = !empty($options['view']) ? $options['view'] : null;
             $viewid = $view ? $view->id() : 0;
 
-            if ($filterid == self::USER_FILTER_SET and $view and $view->is_active()) {
+            if ($filterid == self::USER_FILTER_SET && $view && $view->is_active()) {
                 $filter = $this->set_user_filter($filterid, $view);
                 return new customfilter($filter);
             }
@@ -110,7 +110,7 @@ class manager {
             }
         }
 
-        if ($this->get_filters() and isset($this->_customfilters[$filterid])) {
+        if ($this->get_filters() && isset($this->_customfilters[$filterid])) {
             return clone ($this->_customfilters[$filterid]);
         } else {
             $filter = new stdClass();
@@ -155,7 +155,7 @@ class manager {
      */
     public function get_filters($exclude = null, $menu = false, $forceget = false) {
         global $DB;
-        if (!$this->_customfilters or $forceget) {
+        if (!$this->_customfilters || $forceget) {
             $this->_filters = array();
             if ($filters = $DB->get_records('datalynx_customfilters', array('dataid' => $this->_dl->id()))) {
                 foreach ($filters as $filterid => $filterdata) {
@@ -165,12 +165,12 @@ class manager {
         }
 
         if ($this->_customfilters) {
-            if (empty($exclude) and !$menu) {
+            if (empty($exclude) && !$menu) {
                 return $this->_customfilters;
             } else {
                 $filters = array();
                 foreach ($this->_customfilters as $filterid => $filter) {
-                    if (!empty($exclude) and in_array($filterid, $exclude)) {
+                    if (!empty($exclude) && in_array($filterid, $exclude)) {
                         continue;
                     }
                     if ($menu) {

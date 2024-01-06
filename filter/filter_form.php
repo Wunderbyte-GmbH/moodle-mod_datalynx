@@ -21,7 +21,7 @@
  * @copyright based on the work by 2013 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->libdir/formslib.php");
 
@@ -349,7 +349,7 @@ class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
         $filter = $this->_filter;
 
         // Validate unique name.
-        if (empty($data['name']) or $df->name_exists('filters', $data['name'], $filter->id)) {
+        if (empty($data['name']) || $df->name_exists('filters', $data['name'], $filter->id)) {
             $errors['name'] = get_string('invalidname', 'datalynx',
                     get_string('filter', 'datalynx'));
         }

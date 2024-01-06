@@ -22,7 +22,7 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
@@ -78,7 +78,7 @@ class datalynxfield_entrygroup_renderer extends datalynxfield_renderer {
                     break;
 
                 case '##group:edit##':
-                    if ($edit and has_capability('mod/datalynx:manageentries',
+                    if ($edit && has_capability('mod/datalynx:manageentries',
                                     $field->df()->context)
                     ) {
                         $replacements[$tag] = array('',

@@ -22,7 +22,7 @@
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
@@ -77,7 +77,7 @@ class datalynxfield__comment extends datalynxfield_no_content {
         global $DB, $USER;
 
         // Validate context.
-        if (empty($params->context) or $params->context->id != $this->df->context->id) {
+        if (empty($params->context) || $params->context->id != $this->df->context->id) {
             throw new comment_exception('invalidcontextid', 'datalynx');
         }
 

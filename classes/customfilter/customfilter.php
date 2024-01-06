@@ -25,7 +25,7 @@
 
 namespace mod_datalynx\customfilter;
 use stdClass;
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Customfilter class

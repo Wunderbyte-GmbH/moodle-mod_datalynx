@@ -22,7 +22,7 @@
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 require_once("$CFG->dirroot/user/profile/lib.php");
@@ -102,7 +102,7 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
         $isediting = $options['edit'];
 
         $replacements = array();
-        if ($isediting && $manageable AND $editable) {
+        if ($isediting && $manageable && $editable) {
             $replacements[$tag] = array('', array(array($this, 'display_edit'), array($entry)));
             return $replacements;
         }

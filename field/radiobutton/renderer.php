@@ -22,7 +22,7 @@
  * @copyright 2016 David Bogner
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(__FILE__) . "/../select/renderer.php");
 
@@ -47,7 +47,7 @@ class datalynxfield_radiobutton_renderer extends datalynxfield_select_renderer {
         $selected = !empty($entry->{"c{$fieldid}_content"}) ? (int) $entry->{"c{$fieldid}_content"} : 0;
 
         // Check for default value.
-        if (!$selected and $defaultval = $field->get('param2')) {
+        if (!$selected && $defaultval = $field->get('param2')) {
             $selected = (int) array_search($defaultval, $menuoptions);
         }
 

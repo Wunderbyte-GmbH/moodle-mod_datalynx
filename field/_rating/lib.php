@@ -27,7 +27,7 @@
  * A class representing a single datalynx rating
  * Extends the core rating class
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/rating/lib.php");
 

@@ -22,7 +22,7 @@
  * @copyright based on the work by 2013 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/filter/filter_class.php");
 require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
@@ -59,7 +59,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
     protected function display_browse($entry, $type = null) {
         $field = $this->_field;
 
-        if (empty($field->refdatalynx) or empty($field->refview)) {
+        if (empty($field->refdatalynx) || empty($field->refview)) {
             return '';
         }
 
@@ -92,7 +92,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         // Search filter by entry author or group.
         $foptions = $this->get_filter_by_options($foptions, $entry);
 
-        if (!isset($foptions['eids']) AND !isset($foptions['users'])) {
+        if (!isset($foptions['eids']) && !isset($foptions['users'])) {
             return "";
         }
 
@@ -218,7 +218,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
             return $soptions;
         }
 
-        if (!$refdatalynx = $field->refdatalynx or !$refview = $field->refview or !$localview = $field->localview
+        if (!$refdatalynx = $field->refdatalynx || !$refview = $field->refview || !$localview = $field->localview
         ) {
             return $soptions;
         }
@@ -226,7 +226,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         foreach (explode("\n", $field->field->param5) as $key => $searchy) {
             list($andor, $refpattern, $not, $operator, $localpattern) = explode(',', $searchy);
             // And/or.
-            if (empty($andor) or !in_array($andor, array('AND', 'OR'))) {
+            if (empty($andor) || !in_array($andor, array('AND', 'OR'))) {
                 continue;
             }
             // Get the ref field id from pattern.
@@ -330,7 +330,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         foreach ($tags as $tag) {
             list(, $behavior, ) = $this->process_tag($tag);
             // Variable $behavior datalynx_field_behavior.
-            if ($behavior->is_required() AND (!isset($formdata->$formfieldname))) {
+            if ($behavior->is_required() && (!isset($formdata->$formfieldname))) {
                 $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
             }
         }

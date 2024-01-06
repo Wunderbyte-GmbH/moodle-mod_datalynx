@@ -23,7 +23,7 @@
  */
 namespace mod_datalynx\plugininfo;
 
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 class datalynxtool extends \core\plugininfo\base {
 }

@@ -21,7 +21,7 @@
  * @copyright 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(__FILE__) . "/../renderer.php");
 
@@ -51,7 +51,7 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
         $content = !empty($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : null;
 
         $selected = array();
-        if ($entryid > 0 and $content) {
+        if ($entryid > 0 && $content) {
             $contentprepare = str_replace("#", "", $content);
             $selectedraw = explode(',', $contentprepare);
 
@@ -76,7 +76,7 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
         }
 
         // Check for default values.
-        if (!$selected and $field->get('param2')) {
+        if (!$selected && $field->get('param2')) {
             $selected = $field->default_values();
         }
 

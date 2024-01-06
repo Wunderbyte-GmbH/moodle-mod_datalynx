@@ -20,7 +20,7 @@
  * @copyright David Bogner 2021 based on 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 require_once(dirname(__FILE__) . '/../classes/datalynx.php');
 
 class datalynx_field_behavior {
@@ -174,7 +174,7 @@ class datalynx_field_behavior {
             return true;
         }
         // If special visibletouser is set overrule other visibility options.
-        if (isset($this->visibleto['users']) AND in_array($USER->id, $this->visibleto['users'])) {
+        if (isset($this->visibleto['users']) && in_array($USER->id, $this->visibleto['users'])) {
             return true;
         }
 

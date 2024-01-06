@@ -22,7 +22,7 @@
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/view/view_class.php");
 require_once("$CFG->libdir/pdflib.php");
@@ -723,7 +723,7 @@ class datalynxview_pdf extends datalynxview_base {
             $fs = get_file_storage();
             foreach ($matches[1] as $imagepath) {
                 // Moodle does not replace spaces prior to creating a hashvalue for the file.
-                if (!$file = $fs->get_file_by_hash(sha1(urldecode($imagepath))) or $file->is_directory()) {
+                if (!$file = $fs->get_file_by_hash(sha1(urldecode($imagepath))) || $file->is_directory()) {
                     continue;
                 }
                 $filename = $file->get_filename();

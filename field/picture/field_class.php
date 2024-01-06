@@ -22,7 +22,7 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/file/field_class.php");
 
@@ -140,7 +140,7 @@ class datalynxfield_picture extends datalynxfield_file {
                     $maxheight = !empty($this->field->param8) ? $this->field->param8 : '';
 
                     // If either width or height try to (re)generate.
-                    if ($maxwidth or $maxheight) {
+                    if ($maxwidth || $maxheight) {
                         // This may fail for various reasons.
                         try {
                             global $DB;
@@ -163,7 +163,7 @@ class datalynxfield_picture extends datalynxfield_file {
                     }
 
                     // If either width or height try to (re)generate, otherwise delete what exists.
-                    if ($thumbwidth or $thumbheight) {
+                    if ($thumbwidth || $thumbheight) {
 
                         $filerecord = array('contextid' => $this->df->context->id,
                                 'component' => 'mod_datalynx', 'filearea' => 'thumb',

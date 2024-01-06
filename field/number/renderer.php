@@ -22,7 +22,7 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/text/renderer.php");
 
@@ -42,7 +42,7 @@ class datalynxfield_number_renderer extends datalynxfield_text_renderer {
         $fieldname = "field_{$fieldid}_{$entryid}";
         $required = !empty($options['required']);
         $content = '';
-        if (isset($entry->{"c{$fieldid}_content"}) && $entry->{"c{$fieldid}_content"} === "0" or !empty(
+        if (isset($entry->{"c{$fieldid}_content"}) && $entry->{"c{$fieldid}_content"} === "0" || !empty(
                 $entry->{"c{$fieldid}_content"})) {
             $content = $entry->{"c{$fieldid}_content"};
         }

@@ -22,7 +22,7 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/file/renderer.php");
 
@@ -90,7 +90,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
         $files = $fs->get_area_files($field->df()->context->id, 'mod_datalynx', 'content', $contentid);
 
         // If we see no file attached we are done here.
-        if (!$files or !(count($files) > 1)) {
+        if (!$files || !(count($files) > 1)) {
             return '';
         }
 

@@ -345,14 +345,14 @@ abstract class datalynxfield_base {
 
         // TODO: This needs upgrading, we don't delete the whole entry id but only the one value if other lines exist.
         // Delete if old content but not new.
-        if (!is_null($contentid) and empty($contents)) {
+        if (!is_null($contentid) && empty($contents)) {
             return $this->delete_content($entry->id);
         }
 
         // Update if new is different from old.
         if (!is_null($contentid)) {
             foreach ($contents as $key => $content) {
-                if (!isset($oldcontents[$key]) or $content !== $oldcontents[$key]) {
+                if (!isset($oldcontents[$key]) || $content !== $oldcontents[$key]) {
                     $rec->id = $contentid; // MUST_EXIST.
                     $DB->update_record('datalynx_contents', $rec);
                     return $rec->id;
@@ -445,7 +445,7 @@ abstract class datalynxfield_base {
             $csvname = $importsettings[$fieldname]['name'];
         }
 
-        if (isset($csvrecord[$csvname]) and $csvrecord[$csvname] !== '') {
+        if (isset($csvrecord[$csvname]) && $csvrecord[$csvname] !== '') {
             $data->{"field_{$fieldid}_{$entryid}"} = $csvrecord[$csvname];
         }
 
@@ -640,7 +640,7 @@ abstract class datalynxfield_base {
         // Because some fields may not have content records.
         // And the respective entries may be filter out.
         // Despite meeting the criterion.
-        $excludeentries = (($not and $operator !== '') or (!$not and $operator === ''));
+        $excludeentries = (($not && $operator !== '') || (!$not && $operator === ''));
 
         if ($excludeentries) {
             $varcharcontent = $DB->sql_compare_text('content');
@@ -870,7 +870,7 @@ abstract class datalynxfield_option extends datalynxfield_base {
      * @return Ambigous <multitype:, string>
      */
     public function options_menu($forceget = false, $addnoselection = false) {
-        if (!$this->_options or $forceget) {
+        if (!$this->_options || $forceget) {
             if (!empty($this->field->param1)) {
                 if ($addnoselection) {
                     $this->_options[0] = '...';
@@ -1130,7 +1130,7 @@ class datalynxfield_option_multiple extends datalynxfield_option {
         // Because some fields may not have content records.
         // And the respective entries may be filter out.
         // Despite meeting the criterion.
-        $excludeentries = (($not and $operator !== '') or (!$not and $operator === ''));
+        $excludeentries = (($not && $operator !== '') || (!$not && $operator === ''));
 
         if ($operator === 'EXACTLY' && empty($value)) {
             $operator = '';
@@ -1365,7 +1365,7 @@ class datalynxfield_option_single extends datalynxfield_option {
         // Because some fields may not have content records.
         // And the respective entries may be filter out.
         // Despite meeting the criterion.
-        $excludeentries = (($not and $operator !== '') or (!$not and $operator === ''));
+        $excludeentries = (($not && $operator !== '') || (!$not && $operator === ''));
 
         $content = "c{$this->field->id}.content";
 

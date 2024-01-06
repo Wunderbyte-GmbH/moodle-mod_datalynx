@@ -24,7 +24,7 @@
 
 namespace mod_datalynx\event;
 
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * The mod_datalynx comment created event class.

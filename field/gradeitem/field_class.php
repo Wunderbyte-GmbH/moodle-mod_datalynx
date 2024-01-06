@@ -22,7 +22,7 @@
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
@@ -58,7 +58,7 @@ class datalynxfield_gradeitem extends datalynxfield_base {
         $itemid = !empty($this->field->param1) ? $this->field->param1 : null;
         parent::set_field($forminput);
 
-        if ($this->field->param1 && ($this->field->param1 != $itemid or !$this->field->param2)) {
+        if ($this->field->param1 && ($this->field->param1 != $itemid || !$this->field->param2)) {
             $gradeiteminfo = 'id,itemname,itemtype,itemmodule,iteminstance';
             if ($item = $DB->get_record('grade_items', array('id' => $this->field->param1), $gradeiteminfo)) {
                 $this->field->param2 = $item->itemname;

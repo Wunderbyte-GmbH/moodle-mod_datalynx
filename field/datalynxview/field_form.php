@@ -22,7 +22,7 @@
  * @copyright based on the work by 2013 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
@@ -171,7 +171,7 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
     public function get_data($slashed = true) {
         if ($data = parent::get_data($slashed)) {
             // Set filter by (param6).
-            if ($data->entryauthor or $data->entrygroup) {
+            if ($data->entryauthor || $data->entrygroup) {
                 $data->param6 = "$data->entryauthor,$data->entrygroup";
             } else {
                 $data->param6 = '';
@@ -187,7 +187,7 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
 
         $errors = array();
 
-        if (!empty($data['param1']) and empty($data['param2'])) {
+        if (!empty($data['param1']) && empty($data['param2'])) {
             $errors['param2'] = get_string('missingview', 'datalynxfield_datalynxview');
         }
 

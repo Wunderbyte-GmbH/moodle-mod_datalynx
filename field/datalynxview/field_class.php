@@ -22,7 +22,7 @@
  * @copyright based on the work by 2013 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
@@ -56,7 +56,7 @@ class datalynxfield_datalynxview extends datalynxfield_base {
         // TODO Add capability check on view entries.
 
         // Is there a view? Otherwise return.
-        if (empty($this->field->param2) or !$viewid = $DB->get_field('datalynx_views', 'id', array('id' => $this->field->param2))) {
+        if (empty($this->field->param2) || !$viewid = $DB->get_field('datalynx_views', 'id', array('id' => $this->field->param2))) {
             return;
         }
         $this->refdatalynx = $datalynx;

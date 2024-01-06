@@ -22,7 +22,7 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
@@ -82,7 +82,7 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
         $defaults = array();
         foreach ($rawdefaults as $default) {
             $default = trim($default);
-            if ($default and $key = array_search($default, $options)) {
+            if ($default && $key = array_search($default, $options)) {
                 $defaults[] = $key;
             }
         }

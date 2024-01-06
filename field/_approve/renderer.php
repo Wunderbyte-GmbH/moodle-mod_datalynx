@@ -22,7 +22,7 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') or die();
+defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
@@ -42,7 +42,7 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
         $replacements['##approve##'] = '';
 
         if ($df->data->approval) {
-            if (!$entry or $edit) {
+            if (!$entry || $edit) {
                 $replacements['##approve##'] = array('', array(array($this, 'display_edit'), array($entry)));
 
                 // Existing entry to browse.

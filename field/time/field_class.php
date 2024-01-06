@@ -91,7 +91,7 @@ class datalynxfield_time extends datalynxfield_base {
                     }
                 }
                 if ($enabled) {
-                    if ($year || $month or $day or $hour or $minute) {
+                    if ($year || $month || $day || $hour || $minute) {
                         $timestamp = make_timestamp($year, $month, $day, $hour, $minute, 0);
                     }
                 }
