@@ -29,7 +29,7 @@ require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
  */
 class datalynxfield_gradeitem_renderer extends datalynxfield_renderer {
 
-    public function render_display_mode(stdClass $entry, array $options) {
+    public function render_display_mode(stdClass $entry, array $options): string {
         $field = $this->_field;
         $fieldid = $field->id();
 

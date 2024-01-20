@@ -85,7 +85,7 @@ class datalynxfield__time_renderer extends datalynxfield_renderer {
 
     /**
      */
-    public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '', $activecheckbox = false) {
+    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
         $fieldid = $this->_field->id();
 
         if (is_array($value)) {

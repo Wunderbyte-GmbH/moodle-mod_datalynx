@@ -49,18 +49,18 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         }
     }
 
-    public function render_display_mode(stdClass $entry, array $params) {
+    public function render_display_mode(stdClass $entry, array $options): string {
         $field = $this->_field;
         $fieldid = $field->id();
 
         $strtime = '';
         if (isset($entry->{"c{$fieldid}_content"})) {
             if ($content = $entry->{"c{$fieldid}_content"}) {
-                if (!empty($params['format'])) {
-                    $strtime = userdate($content, $params['format']);
-                } else if (isset($params['date']) || $field->dateonly) {
+                if (!empty($options['format'])) {
+                    $strtime = userdate($content, $options['format']);
+                } else if (isset($options['date']) || $field->dateonly) {
                     $strtime = userdate($content, get_string("strftimedate"));
-                } else if (isset($params['timestamp'])) {
+                } else if (isset($options['timestamp'])) {
                     $strtime = $content;
                 } else if (!empty($field->displayformat)) {
                     $strtime = userdate($content, $field->displayformat);
@@ -77,7 +77,7 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         return $strtime;
     }
 
-    public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
+    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
         $field = $this->_field;
         $fieldid = $field->id();
         $fieldname = "f_{$i}_{$fieldid}";

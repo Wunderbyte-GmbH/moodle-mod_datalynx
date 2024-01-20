@@ -64,7 +64,14 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
         }
     }
 
-    public function render_display_mode(stdClass $entry, array $params) {
+    /**
+     * Render the field of type picture.
+     *
+     * @param stdClass $entry
+     * @param array $options
+     * @return string
+     */
+    public function render_display_mode(stdClass $entry, array $options): string {
         global $CFG, $PAGE;
 
         $PAGE->requires->js_call_amd('mod_datalynx/zoomable', 'init');
@@ -82,7 +89,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
             return '';
         }
 
-        if (!empty($params['downloadcount'])) {
+        if (!empty($options['downloadcount'])) {
             return $content2;
         }
 
@@ -96,7 +103,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
 
         $altname = empty($content1) ? '' : s($content1);
 
-        if (!empty($params['alt'])) {
+        if (!empty($options['alt'])) {
             return $altname;
         }
 
@@ -109,7 +116,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
                 $path = "/{$field->df()->context->id}/mod_datalynx/content/$contentid";
 
                 if (strpos($filename, 'thumb_') === false) {
-                    $strfiles[] = $this->display_file($file, $path, $altname, $params);
+                    $strfiles[] = $this->display_file($file, $path, $altname, $options);
                 }
             }
         }

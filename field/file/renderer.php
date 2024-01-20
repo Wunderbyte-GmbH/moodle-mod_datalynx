@@ -68,8 +68,13 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Render the field of type file.
+     *
+     * @param stdClass $entry
+     * @param array $options
+     * @return string
      */
-    public function render_display_mode(stdClass $entry, array $params): ?string {
+    public function render_display_mode(stdClass $entry, array $options): string {
         $field = $this->_field;
         $fieldid = $field->id();
         $entryid = $entry->id;
@@ -83,7 +88,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
             return '';
         }
 
-        if (!empty($params['downloadcount'])) {
+        if (!empty($options['downloadcount'])) {
             return $content2;
         }
 
@@ -104,7 +109,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
                 $path = "/{$field->df()->context->id}/mod_datalynx/content/$contentid";
                 // ToDo: Remove or implement altname.
                 $altname = "";
-                $strfiles[] = $this->display_file($file, $entryid, $path, $altname, $params);
+                $strfiles[] = $this->display_file($file, $entryid, $path, $altname, $options);
             }
         }
 
@@ -122,7 +127,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
      * @param string $value
      * @return array
      */
-    public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = ''): array {
+    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = ''): array {
         $fieldid = $this->_field->id();
         $fieldname = "f_{$i}_$fieldid";
 

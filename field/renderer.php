@@ -236,7 +236,7 @@ abstract class datalynxfield_renderer {
      * @param array $options rendering options
      * @return string HTML representation of the field
      */
-    public function render_display_mode(stdClass $entry, array $options) {
+    public function render_display_mode(stdClass $entry, array $options): string {
         $fieldid = $this->_field->id();
 
         if (isset($entry->{"c{$fieldid}_content"})) {
@@ -337,7 +337,7 @@ abstract class datalynxfield_renderer {
      * @param string $value
      * @return array
      */
-    public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
+    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
         $fieldid = $this->_field->id();
         $fieldname = "f_{$i}_$fieldid";
 

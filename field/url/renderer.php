@@ -64,13 +64,13 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
 
     /**
      */
-    public function render_display_mode(stdClass $entry, array $params) {
+    public function render_display_mode(stdClass $entry, array $options): string {
         global $CFG;
 
         $field = $this->_field;
         $fieldid = $field->id();
         $types = array_intersect(['link', 'image', 'imageflex', 'media'
-        ], array_keys($params));
+        ], array_keys($options));
         $type = isset($types[0]) ? $types[0] : '';
 
         $attributes = array('class' => $field->class, 'target' => $field->target);
@@ -119,7 +119,7 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
         return '';
     }
 
-    public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
+    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
         $fieldid = $this->_field->id();
         $fieldname = "f_{$i}_$fieldid";
 

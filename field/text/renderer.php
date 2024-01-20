@@ -115,7 +115,7 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
         }
     }
 
-    public function render_display_mode(stdClass $entry, array $params) {
+    public function render_display_mode(stdClass $entry, array $options): string {
         $field = $this->_field;
         $fieldid = $field->id();
         $nolinkend = "";
@@ -142,7 +142,7 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
         return $str;
     }
 
-    public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
+    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
         $field = $this->_field;
         $fieldid = $field->id();
         $fieldname = "f_{$i}_$fieldid";

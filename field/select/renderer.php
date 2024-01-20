@@ -107,7 +107,7 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
      * {@inheritDoc}
      * @see datalynxfield_renderer::render_display_mode()
      */
-    public function render_display_mode(stdClass $entry, array $params) {
+    public function render_display_mode(stdClass $entry, array $options): string {
         $field = $this->_field;
         $fieldid = $field->id();
 
@@ -115,7 +115,7 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
             $selected = (int) $entry->{"c{$fieldid}_content"};
             $options = $field->options_menu();
 
-            if (!empty($params['options'])) {
+            if (!empty($options['options'])) {
                 $str = array();
                 foreach ($options as $key => $option) {
                     $isselected = (int) ($key == $selected);
@@ -125,7 +125,7 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
                 return $str;
             }
 
-            if (!empty($params['key'])) {
+            if (!empty($options['key'])) {
                 if ($selected) {
                     return $selected;
                 } else {
@@ -146,7 +146,7 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
      * {@inheritDoc}
      * @see datalynxfield_renderer::render_search_mode()
      */
-    public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
+    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
         $field = $this->_field;
         $fieldid = $field->id();
         $fieldname = "f_{$i}_{$fieldid}";

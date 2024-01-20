@@ -40,7 +40,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
      * array @params     the type of the display, "" for default
      * @returns          the function which displays this field-instance
      */
-    public function render_display_mode(stdClass $entry, array $params) {
+    public function render_display_mode(stdClass $entry, array $options): string {
 
         // We don't export dlview to csv.
         if (optional_param('exportcsv', '', PARAM_ALPHA)) {

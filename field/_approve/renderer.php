@@ -57,7 +57,7 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
 
     /**
      */
-    public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
+    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
         $field = $this->_field;
         $fieldid = $field->id();
 

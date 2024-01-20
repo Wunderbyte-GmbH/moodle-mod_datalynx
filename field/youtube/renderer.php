@@ -55,7 +55,7 @@ class datalynxfield_youtube_renderer extends datalynxfield_renderer {
         }
     }
 
-    public function render_display_mode(stdClass $entry, array $params) {
+    public function render_display_mode(stdClass $entry, array $options): string {
         $field = $this->_field;
         $fieldid = $field->id();
         $content = $entry->{"c{$fieldid}_content"};

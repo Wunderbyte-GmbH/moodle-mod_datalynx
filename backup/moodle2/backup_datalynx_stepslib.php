@@ -26,6 +26,8 @@
  * Define all the backup steps that will be used by the backup_datalynx_activity_task
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Define the complete data structure for backup, with file and id annotations
  */
@@ -193,7 +195,7 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
             CASE WHEN f.type = 'datalynxview' THEN MAX(c.fullname) ELSE NULL END AS targetcourse,
             CASE WHEN f.type = 'datalynxview' THEN MAX(d.name) ELSE NULL END AS targetinstance,
             CASE WHEN f.type = 'datalynxview' THEN MAX(v.name) ELSE NULL END AS targetview,
-                CASE WHEN f.type = 'datalynxview' THEN MAX(fil.name) ELSE NULL END AS targetfilter
+            CASE WHEN f.type = 'datalynxview' THEN MAX(fil.name) ELSE NULL END AS targetfilter
             FROM {datalynx_fields} f
             LEFT JOIN {datalynx} d ON f.param1::INTEGER = d.id
             LEFT JOIN {course_modules} cm ON cm.instance = d.id
@@ -210,7 +212,6 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
                FROM {datalynx_fields} f
               WHERE f.dataid = :dataid
                 AND f.type != 'datalynxview'", array('dataid' => backup::VAR_PARENTID));
-            }
         }
 
         $filter->set_source_table('datalynx_filters', array('dataid' => backup::VAR_PARENTID));

@@ -61,7 +61,7 @@ class datalynxfield_number_renderer extends datalynxfield_text_renderer {
      * {@inheritdoc}
      * @see datalynxfield_text_renderer::render_display_mode()
      */
-    public function render_display_mode(stdClass $entry, array $params) {
+    public function render_display_mode(stdClass $entry, array $options): string {
         $field = $this->_field;
         $fieldid = $field->id();
         $outputemptystring = !empty($field->get('param4')) ? $field->get('param4') : 0;
@@ -87,7 +87,7 @@ class datalynxfield_number_renderer extends datalynxfield_text_renderer {
      * {@inheritDoc}$str
      * @see datalynxfield_text_renderer::render_search_mode()
      */
-    public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
+    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
         $fieldid = $this->_field->id();
         $fieldname = "f_{$i}_$fieldid";
 

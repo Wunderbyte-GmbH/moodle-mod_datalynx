@@ -40,7 +40,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
      * {@inheritDoc}
      * @see datalynxfield_renderer::render_display_mode()
      */
-    public function render_display_mode(stdClass $entry, array $params) {
+    public function render_display_mode(stdClass $entry, array $options): string {
         global $OUTPUT;
 
         // We want to display these fields.
@@ -56,7 +56,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         $fieldname = "fieldgroup_{$fieldid}";
 
         // Add key so the other renderers know they deal with fieldgroup.
-        $params[$fieldname] = true;
+        $options[$fieldname] = true;
 
         // In case we don't have anything to show there should be an error.
         $linedispl = $completedispl = array();
@@ -69,7 +69,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
             foreach ($fieldgroupfields as $fieldid => $subfield) {
                 $lastlinewithcontent = $this->renderer_split_content($entry, $fieldid, $line, $lastlinewithcontent);
                 $subfielddefinition['name'] = $subfield->field->name;
-                $subfielddefinition['content'] = $subfield->renderer()->render_display_mode($entry, $params);
+                $subfielddefinition['content'] = $subfield->renderer()->render_display_mode($entry, $options);
                 $subfieldnames[] = $subfield->field->name;
                 $linedispl['subfield'][] = $subfielddefinition; // Build this multidimensional array for mustache context.
             }
@@ -221,7 +221,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
      * {@inheritDoc}
      * @see datalynxfield_renderer::render_search_mode()
      */
-    public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
+    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
         return false; // Remove from search.
     }
 
