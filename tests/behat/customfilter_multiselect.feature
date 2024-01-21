@@ -53,7 +53,6 @@ Feature: Create entry, add multiselect and use customfilter
 
     # Add me some fields.
     When I follow "Browse"
-    And I wait "60" seconds
     And I follow "Add a new entry"
     And I fill in the entry form fields
       | type             | name               | value                |

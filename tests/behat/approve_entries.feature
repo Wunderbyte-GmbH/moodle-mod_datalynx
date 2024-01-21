@@ -30,8 +30,7 @@ Feature: Filter approved and not approved entries from multiple students
     And I add to the "Datalynx Test Instance" datalynx the following fields:
       | type             | name               | description | param1                     | param2   | param3 |
       | text             | Text               |             |                            |          |        |
-    And I follow "More"
-    And I follow "Filters"
+    And I follow the datalynx "Filters" link
     And I follow "Add a filter"
     And I set the field "name" to "notapprovedfilter"
     And I set the field "searchandor0" to "AND"

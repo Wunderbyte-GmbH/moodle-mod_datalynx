@@ -292,4 +292,26 @@ class behat_mod_datalynx extends behat_base {
         $csstarget = ".col-form-label";
         $this->execute('behat_general::i_click_on', [$csstarget, 'css_element']);
     }
+
+    /**
+     * Follow the datalynx link of the elements matching the selector.
+     *
+     * @When /^I follow the datalynx "(?P<link_string>(?:[^"]|\\")*)" link$/
+     */
+    public function i_follow_the_datalynx_link($linktext) {
+        $page = $this->getSession()->getPage();
+        switch ($linktext) {
+            case 'Filters':
+                // Code to handle the "Filters" case.
+                $link = $page->find('css', sprintf('.nav-item [title="Filters"]', $linktext));
+                break;
+            case 'Manage':
+                $link = $page->find('css', sprintf('.nav-item [title="Manage"]', $linktext));
+                break;
+        }
+        if (null === $link) {
+            throw new \RuntimeException(sprintf('The link "%s" was not found or is not visible', $linktext));
+        }
+        $link->click();
+    }
 }
