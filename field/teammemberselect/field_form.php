@@ -114,16 +114,19 @@ class datalynxfield_teammemberselect_form extends datalynxfield_form {
      * @param array $data new contents of the form
      */
     public function set_data($data) {
-        $elements = json_decode($data->param2, true);
-        $elements = $elements == null ? array() : $elements;
-        $data->param2 = array();
+        if (empty($data->param2)) {
+            $elements = [];
+            $data->param2 = [];
+        } else {
+            $elements = json_decode($data->param2, true);
+        }
         foreach ($elements as $element) {
             $data->param2[$element] = 1;
         }
-        $data->param5 = isset($data->param5) ? $data->param5 : 0;
-        $data->param6 = isset($data->param6) ? $data->param6 : 0;
-        $data->param7 = isset($data->param7) ? $data->param7 : 0;
-        $data->param8 = isset($data->param8) ? $data->param8 : 0;
+        $data->param5 = $data->param5 ?? 0;
+        $data->param6 = $data->param6 ?? 0;
+        $data->param7 = $data->param7 ?? 0;
+        $data->param8 = $data->param8 ?? 0;
         $data->teamfieldenable = $data->param5 != 0;
         parent::set_data($data);
     }
@@ -133,15 +136,15 @@ class datalynxfield_teammemberselect_form extends datalynxfield_form {
      * string
      *
      * @param boolean $slashed TODO: add description!
-     * @return array submitted, validated and processed form contents
+     * @return object submitted, validated and processed form contents
      */
     public function get_data($slashed = true) {
         if ($data = parent::get_data($slashed)) {
             $data->param2 = json_encode(array_keys($data->param2));
-            $data->param5 = isset($data->param5) ? $data->param5 : 0;
-            $data->param6 = isset($data->param6) ? $data->param6 : 0;
-            $data->param7 = isset($data->param7) ? $data->param7 : 0;
-            $data->param8 = isset($data->param8) ? $data->param8 : 0;
+            $data->param5 = $data->param5 ?? 0;
+            $data->param6 = $data->param6 ?? 0;
+            $data->param7 = $data->param7 ?? 0;
+            $data->param8 = $data->param8 ?? 0;
         }
         return $data;
     }
