@@ -1130,7 +1130,7 @@ abstract class datalynxview_base {
             }
         } else {
             $editallowed = false;
-            if ($editallowed = $this->get_df()->user_can_manage_entry()) {
+            if ($editallowed = $this->get_dl()->user_can_manage_entry()) {
                 if (count(explode(",", $this->_editentries)) == 1) {
                     $entrystatus = $DB->get_field('datalynx_entries', 'status',
                             array('id' => $this->_editentries));
@@ -1455,7 +1455,7 @@ abstract class datalynxview_base {
     /**
      * Returns the parent datalynx
      */
-    public function get_df() {
+    public function get_dl() {
         return $this->_df;
     }
 

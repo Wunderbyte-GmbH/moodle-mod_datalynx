@@ -71,7 +71,7 @@ class datalynxview_csv_import_form extends moodleform {
      */
     protected function field_settings() {
         $view = $this->_view;
-        $df = $view->get_df();
+        $df = $view->get_dl();
         $mform = &$this->_form;
 
         $mform->addElement('header', 'fieldsettingshdr',

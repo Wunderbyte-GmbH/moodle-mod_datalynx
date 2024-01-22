@@ -40,7 +40,7 @@ class datalynxview_base_form extends moodleform {
     public function __construct($view, $action = null, $customdata = null, $method = 'post', $target = '',
             $attributes = null, $editable = true) {
         $this->_view = $view;
-        $this->_df = $view->get_df();
+        $this->_df = $view->get_dl();
         $attributes['id'] = 'datalynx-view-edit-form';
         parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
     }

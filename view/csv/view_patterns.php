@@ -39,7 +39,7 @@ class datalynxview_csv_patterns extends datalynxview_patterns {
         $replacements = parent::get_replacements($tags, $entry, $options);
 
         $view = $this->_view;
-        $df = $view->get_df();
+        $df = $view->get_dl();
         $filter = $view->get_filter();
         $baseurl = new moodle_url($view->get_baseurl());
         $baseurl->param('sesskey', sesskey());

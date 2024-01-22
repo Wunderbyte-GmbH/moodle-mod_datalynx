@@ -786,10 +786,10 @@ class datalynx {
      * @param int $datalynxid The id of the datalynx whose content should be displayed.
      * @param int $viewid The id of the datalynx's view whose content should be displayed.
      * @param int $eids The id of the datalynx entrie that should be displayed.
-     * @param int $options Pass options what should be displayed, esp. to hide control interfaces.
+     * @param array $options Pass options what should be displayed, esp. to hide control interfaces.
      * @return string
      */
-    public static function get_content_inline($datalynxid, $viewid = 0, $eids = null, $options = array('tohtml' => true)) {
+    public static function get_content_inline(int $datalynxid, int $viewid = 0, ?int $eids = null, array $options = array('tohtml' => true)) {
         global $CFG;
         require_once($CFG->dirroot . '/mod/datalynx/view/view_class.php');
         $urlparams = new stdClass();
@@ -822,7 +822,7 @@ class datalynx {
 
         if ($view = new $viewclass($datalynxid, $viewid, $filteroptions)) {
             $view->set_content();
-            $view->get_df()->_currentview = $datalynx->_currentview;
+            $view->get_dl()->_currentview = $datalynx->_currentview;
             $viewcontent = $view->display($options);
             return "$viewcontent";
         }
@@ -1417,14 +1417,14 @@ class datalynx {
      * @param int $viewid
      * @return bool|mixed
      */
-    public function get_current_view_from_id($viewid = 0) {
+    public function get_current_view_from_id(int $viewid = 0) {
         if ($views = $this->get_view_records()) {
             if ($viewid && isset($views[$viewid])) {
                 $view = $views[$viewid];
                 // If can't find the requested, try the default.
             } else {
-                if ($viewid = $this->data->defaultview && isset($views[$viewid])) {
-                    $view = $views[$viewid];
+                if ($this->data->defaultview && isset($views[$this->data->defaultview])) {
+                    $view = $views[$this->data->defaultview];
                 } else {
                     return false;
                 }
@@ -2393,7 +2393,7 @@ class datalynx {
         $data->coursename = $this->course->shortname;
         $data->datalynxname = $this->name();
         if (isset($data->view)) {
-            $data->datalynxbaselink = html_writer::link($data->view->get_df()->get_baseurl(),
+            $data->datalynxbaselink = html_writer::link($data->view->get_dl()->get_baseurl(),
                     $data->datalynxname);
             $data->datalynxlink = html_writer::link($data->view->get_baseurl(), $data->datalynxname);
         }
