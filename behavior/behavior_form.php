@@ -148,6 +148,7 @@ class datalynx_field_behavior_form extends moodleform {
         }
         return $fields;
     }
+
     /**
      * Get all users in moodle instance for autocomplete list.
      * TODO: Really all users or only those with access to this datalynx instance?
@@ -160,9 +161,9 @@ class datalynx_field_behavior_form extends moodleform {
         $allusers = [];
         $tempusers = $DB->get_records('user', array(), '', $fields = 'id, firstname, lastname');
 
-        foreach($tempusers as $userdata) {
+        foreach ($tempusers as $userdata) {
             // Remove empties to make list more usable.
-            if($userdata->lastname == '') {
+            if ($userdata->lastname == '') {
                 continue;
             }
             $allusers[$userdata->id] = "$userdata->firstname $userdata->lastname";

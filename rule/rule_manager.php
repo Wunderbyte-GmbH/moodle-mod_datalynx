@@ -520,7 +520,7 @@ class datalynx_rule_manager {
         $data->siteurl = $CFG->wwwroot;
         $data->coursename = !empty($data->coursename) ? $data->coursename : 'Unspecified course';
         $data->datalynxname = !empty($data->datalynxname) ? $data->datalynxname : 'Unspecified datalynx';
-        $data->entryid = implode(array_keys($data->items), ',');
+        $data->entryid = implode(',', array_keys($data->items));
 
         if ($df->data->singleview) {
             $entryurl = new moodle_url($data->url,

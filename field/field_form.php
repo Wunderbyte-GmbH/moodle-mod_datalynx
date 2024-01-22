@@ -133,7 +133,8 @@ class datalynxfield_option_form extends datalynxfield_form {
                 $group[] = &$mform->createElement('static', null, null, '</td></tr>');
             }
             $group[] = &$mform->createElement('static', null, null, '</tbody></table>');
-            $tablerow = &$mform->createElement('group', 'existingoptions', get_string('existingoptions', 'datalynx'), $group, null, false);
+            $tablerow = &$mform->createElement('group', 'existingoptions',
+                    get_string('existingoptions', 'datalynx'), $group, null, false);
             $mform->insertElementBefore($tablerow, 'param2');
 
         }
@@ -141,7 +142,8 @@ class datalynxfield_option_form extends datalynxfield_form {
                 get_string('addoptions', 'datalynx'), 'wrap="soft" rows="5" cols="30"');
         $mform->insertElementBefore($addnew, 'param2');
         if (empty($options)) {
-            $mform->addRule('addoptions', get_string('err_required', 'form'), 'required', null, 'client');
+            $mform->addRule('addoptions',
+                    get_string('err_required', 'form'), 'required', null, 'client');
         }
     }
 

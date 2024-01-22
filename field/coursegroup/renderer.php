@@ -96,7 +96,7 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
             $mform->setDefault("{$fieldname}_course", $courseid);
 
             // Ajax.
-            $options = array('coursefield' => "${fieldname}_course",
+            $options = array('coursefield' => "{$fieldname}_course",
                     'groupfield' => "{$fieldname}_group",
                     'acturl' => "$CFG->wwwroot/mod/datalynx/field/coursegroup/loadgroups.php"
             );

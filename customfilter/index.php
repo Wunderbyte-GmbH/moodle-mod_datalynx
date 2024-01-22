@@ -46,6 +46,7 @@ $dl = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
 require_capability('mod/datalynx:managetemplates', $dl->context);
 
 $dl->set_page('customfilter/index', array('modjs' => true, 'urlparams' => $urlparams));
+require_login($dl->data->course, false, $dl->cm);
 
 navigation_node::override_active_url(
         new moodle_url('/mod/datalynx/customfilter/index.php', array('id' => $dl->cm->id)));

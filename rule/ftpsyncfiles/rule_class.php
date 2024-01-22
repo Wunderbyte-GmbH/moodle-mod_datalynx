@@ -46,23 +46,27 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
     const USEREMAIL = 3;
     /**
      * user profile field to use to identify the user.
+     *
      * @var string
      */
     private $matchingfield;
 
     /**
      * Field id of the teammemberselect field the user should be assigned to.
+     *
      * @var int
      */
     private $teammemberfieldid;
 
     /**
      * The id of the user who should own the entry. This is different from the user matched from the file.
+     *
      * @var
      */
     private $authorid;
     /**
      * The datalynx object to use.
+     *
      * @var \mod_datalynx\datalynx
      */
     private \mod_datalynx\datalynx $dl;
@@ -97,6 +101,7 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
 
     /**
      * Based on a triggered event we start downloading files.
+     *
      * @param \core\event\base $event
      */
     public function trigger(\core\event\base $event) {
@@ -106,7 +111,7 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
         require_once("$CFG->dirroot/mod/datalynx/field/entryauthor/field_class.php");
         require_once("$CFG->dirroot/mod/datalynx/entries_class.php");
         require_once("$CFG->dirroot/mod/datalynx/view/csv/view_class.php");
-        require_once($CFG->libdir.'/filelib.php');
+        require_once($CFG->libdir . '/filelib.php');
         require_once($CFG->libdir . '/completionlib.php');
 
         $did = $event->get_data()['objectid'];
@@ -114,7 +119,7 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
 
         $this->fs = get_file_storage();
         // Download files to $this->files array indexed by draftitemid.
-        $this->download_files((int)$did);
+        $this->download_files((int) $did);
         $context = context_user::instance($USER->id);
 
         if (!empty($this->files)) {
@@ -142,7 +147,7 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
     /**
      * Download the files from the server and place in draftitemid.
      *
-     * @param  int $did
+     * @param int $did
      * @return void
      */
     private function download_files(int $did): void {
@@ -188,15 +193,15 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
                         $draftitemid = file_get_unused_draft_itemid();
                         file_prepare_draft_area($draftitemid, $context->id, 'user', 'content', null);
                         $this->files[$draftitemid] = $this->fs->create_file_from_string(
-                            [
-                                'contextid' => $context->id, // Replace with the appropriate context if necessary.
-                                'component' => 'user',
-                                'filearea' => 'draft',
-                                'itemid' => $draftitemid,
-                                'filepath' => '/',
-                                'filename' => $filename,
-                            ],
-                            $filedata
+                                [
+                                        'contextid' => $context->id, // Replace with the appropriate context if necessary.
+                                        'component' => 'user',
+                                        'filearea' => 'draft',
+                                        'itemid' => $draftitemid,
+                                        'filepath' => '/',
+                                        'filename' => $filename,
+                                ],
+                                $filedata
                         );
                         echo "Downloaded $filename successfully." . PHP_EOL;
                     } else {
@@ -219,7 +224,7 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
                             $deleteresult = curl_exec($ch);
                             if ($deleteresult === false) {
                                 echo "Failed to delete $filename on the remote server." . PHP_EOL;
-                                var_dump(curl_errno($ch),curl_error($ch));
+                                var_dump(curl_errno($ch), curl_error($ch));
                             } else {
                                 echo "Deleted $filename successfully." . PHP_EOL;
                             }

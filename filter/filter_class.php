@@ -683,8 +683,7 @@ class datalynx_filter_manager {
                         continue;
                     }
                     if ($menu) {
-                        if ($filter->visible or
-                                has_capability('mod/datalynx:managetemplates', $this->_df->context)
+                        if ($filter->visible || has_capability('mod/datalynx:managetemplates', $this->_df->context)
                         ) {
                             $filters[$filterid] = $filter->name;
                         }

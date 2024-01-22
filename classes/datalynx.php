@@ -1925,7 +1925,7 @@ class datalynx {
      * @throws \dml_exception
      */
     public function user_at_max_entries($perinterval = false) {
-        if ($this->data->maxentries < 0 or
+        if ($this->data->maxentries < 0 ||
                 has_capability('mod/datalynx:manageentries', $this->context)
         ) {
             return false;
@@ -2045,7 +2045,7 @@ class datalynx {
             $now = time();
 
             // If there is an activity timeframe, we must be inside the timeframe right now.
-            if ($timeavailable && !($now >= $timeavailable) or
+            if ($timeavailable && !($now >= $timeavailable) ||
                     ($timedue && !($now < $timedue) && !$allowlate)
             ) {
                 return false;
@@ -2054,7 +2054,7 @@ class datalynx {
             // If group mode is enabled user has to be in the right group.
             if ($this->groupmode && !in_array($this->groupmode, $this->internalgroupmodes) &&
                     !has_capability('moodle/site:accessallgroups', $this->context) && (($this->currentgroup &&
-                                    !groups_is_member($this->currentgroup)) or
+                                    !groups_is_member($this->currentgroup)) ||
                             (!$this->currentgroup && $this->groupmode == VISIBLEGROUPS))
             ) {
                 return false; // For members only.
@@ -2064,7 +2064,8 @@ class datalynx {
             if (!empty($entry->id)) {
                 // Entry owner.
                 // TODO groups_is_member queries DB for each entry!
-                if (empty($USER->id) || (!$this->data->grouped && $USER->id != $entry->userid && !$this->teammember_can_edit($entry)) or
+                if (empty($USER->id) ||
+                        (!$this->data->grouped && $USER->id != $entry->userid && !$this->teammember_can_edit($entry)) ||
                         ($this->data->grouped && !groups_is_member($entry->groupid))
                 ) {
                     return false; // Who are you anyway???

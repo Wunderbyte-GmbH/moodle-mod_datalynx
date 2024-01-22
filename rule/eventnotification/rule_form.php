@@ -55,12 +55,14 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
                 $this->_df->get_datalynx_permission_names(true), $options);
         $grp[] = &$mform->createElement('static', '', '', $br);
 
-        $grp[] = &$mform->createElement('static', '', '', "<br><h4 class=\"w-100 mt-3\">" . get_string('teammembers', 'datalynx') . "</h4>");
+        $grp[] = &$mform->createElement('static', '', '',
+                "<br><h4 class=\"w-100 mt-3\">" . get_string('teammembers', 'datalynx') . "</h4>");
         $grp[] = &$mform->createElement('autocomplete', 'teams', get_string('teams', 'datalynx'),
                 $this->get_datalynx_team_fields(), $options);
 
         // Single userid can be selected.
-        $grp[] = &$mform->createElement('static', '', '', "<br><h4 class=\"w-100 mt-3\">" . get_string('otheruser', 'datalynx') . "</h4>");
+        $grp[] = &$mform->createElement('static', '', '',
+                "<br><h4 class=\"w-100 mt-3\">" . get_string('otheruser', 'datalynx') . "</h4>");
         $allusers = $this->get_allusers();
         $grp[] = $mform->createElement('autocomplete', 'specificuserid', get_string('otheruser', 'datalynx'), $allusers);
 
@@ -91,9 +93,9 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
         $tempusers = $DB->get_records('user', array(), '', $fields = 'id, firstname, lastname');
 
         $allusers[0] = get_string('noselection', 'datalynx');
-        foreach($tempusers as $userdata) {
+        foreach ($tempusers as $userdata) {
             // Remove empties to make list more usable.
-            if($userdata->lastname == '') {
+            if ($userdata->lastname == '') {
                 continue;
             }
             $allusers[$userdata->id] = "$userdata->firstname $userdata->lastname";

@@ -205,20 +205,20 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
     protected function embed_pdf(string $fullurl, string $fieldname): string {
         global $PAGE;
         $customscale = $this->_field->get('param4');
-        if(empty($customscale)) {
+        if (empty($customscale)) {
             $customscale = 1;
         }
         $PAGE->requires->js_call_amd('mod_datalynx/pdfembed', 'renderPDF',
                 [$fullurl, $fieldname, $customscale]);
 
         $a = html_writer::tag('script', '', [
-            'src' => 'pdfjs/pdf.js']);
+                'src' => 'pdfjs/pdf.js']);
         $b = html_writer::tag('script', '', [
                 'src' => 'pdfjs/pdf.worker.js']);
 
         return '<div><a href="' . $fullurl . '" target="_blank" class="btn btn-primary">' .
                 get_string('download', 'core_repository') . ' ' .
-                get_string('application/pdf', 'core_mimetypes') .  '</a></div><br>
+                get_string('application/pdf', 'core_mimetypes') . '</a></div><br>
         <div style="width: 1800px; min-height: 1400px;" id="' . $fieldname . '"></div>
         ' . $a . $b;
     }

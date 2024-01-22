@@ -144,7 +144,7 @@ class datalynxfield_file extends datalynxfield_base {
         $csvname = $importsettings[$fieldname]['name'];
         $fileurls = explode(',', $csvrecord[$csvname]);
 
-        // Prepare the draftarea where to put all files
+        // Prepare the draftarea where to put all files.
         $draftitemid = file_get_submitted_draft_itemid("field_{$fieldid}_{$entryid}_filemanager");
         // For draftareas we use usercontextid for some reason, this is consistent with the ajax call.
         $contextid = context_user::instance($USER->id)->id;

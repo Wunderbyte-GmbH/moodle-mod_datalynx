@@ -26,8 +26,10 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
+/**
+ *
+ */
 class datalynxfield_coursegroup extends datalynxfield_base {
-
     public $type = 'coursegroup';
 
     public $course;
@@ -180,7 +182,7 @@ class datalynxfield_coursegroup extends datalynxfield_base {
 
         // Set user id to filter on, from url if user profile page.
         $path = $PAGE->url->get_path();
-        $isprofilepage = (strpos($path, '/user/view.php') !== false or
+        $isprofilepage = (strpos($path, '/user/view.php') !== false ||
                 strpos($path, '/user/profile.php') !== false);
         if (!$isprofilepage || !$userid = optional_param('id', 0, PARAM_INT)) {
             $userid = $USER->id;

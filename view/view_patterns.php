@@ -373,7 +373,7 @@ class datalynxview_patterns {
         $baseurl->param('sesskey', sesskey());
         $baseurl->param('sourceview', $this->_view->id());
 
-        $showentryactions = (!empty($options['showentryactions']) or
+        $showentryactions = (!empty($options['showentryactions']) ||
                 has_capability('mod/datalynx:manageentries', $df->context));
         // TODO: move to a view attribute so as to call only once.
         // Can this user add entries?

@@ -26,8 +26,6 @@
  * Define all the backup steps that will be used by the backup_datalynx_activity_task
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Define the complete data structure for backup, with file and id annotations
  */

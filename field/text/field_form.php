@@ -29,6 +29,7 @@ require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 class datalynxfield_text_form extends datalynxfield_form {
 
     /**
+     * @return void
      */
     public function field_definition() {
         global $OUTPUT, $DB, $PAGE, $CFG;

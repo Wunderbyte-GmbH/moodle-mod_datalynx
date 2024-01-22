@@ -1014,7 +1014,7 @@ function xmldb_datalynx_upgrade($oldversion) {
         // Get all fieldids of type teammemberselect.
 
         $ids = $DB->get_fieldset_select('datalynx', 'id', 'id > 0');
-        if (!empty($ids)){
+        if (!empty($ids)) {
             list($sql, $params) = $DB->get_in_or_equal($ids, SQL_PARAMS_QM, 'param', false);
             $DB->delete_records_select('datalynx_rules', 'dataid ' . $sql, $params);
         }
@@ -1034,11 +1034,11 @@ function mod_datalynx_upgrade_behaviors() {
             $formdata = datalynx_field_behavior::get_behavior($behaviorid);
             $visibleto = $DB->get_field('datalynx_behaviors', 'visibleto', ['id' => $behaviorid]);
             $visibletoperm = unserialize($visibleto);
-            if(!empty($visibletoperm)) {
-                if(isset($visibletoperm['users']) ){
+            if (!empty($visibletoperm)) {
+                if (isset($visibletoperm['users'])) {
                     unset($visibletoperm['users']);
                 }
-                if(isset($visibletoperm['teammember']) ){
+                if (isset($visibletoperm['teammember'])) {
                     unset($visibletoperm['teammember']);
                 }
                 $formdata->visibletopermission = array_values($visibletoperm);
