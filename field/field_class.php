@@ -571,7 +571,7 @@ abstract class datalynxfield_base {
      * @return string
      */
     public function get_select_sql() {
-        if ($this->field->id > 0) {
+        if (is_numeric($this->field->id) && $this->field->id > 0) {
             $arr = array();
             $arr[] = " c{$this->field->id}.id AS c{$this->field->id}_id ";
             foreach ($this->get_content_parts() as $part) {
@@ -593,7 +593,7 @@ abstract class datalynxfield_base {
      */
     public function get_sort_from_sql($paramname = 'sortie', $paramcount = '') {
         $fieldid = $this->field->id;
-        if ($fieldid > 0) {
+        if (is_numeric($fieldid) && $fieldid > 0) {
             $sql = " LEFT JOIN {datalynx_contents} c$fieldid
             ON (c$fieldid.entryid = e.id AND c$fieldid.fieldid = :$paramname$paramcount)";
             return array($sql, $fieldid);
@@ -612,7 +612,7 @@ abstract class datalynxfield_base {
      */
     public function get_search_from_sql() {
         $fieldid = $this->field->id;
-        if ($fieldid > 0) {
+        if (is_numeric($fieldid) && $fieldid > 0) {
             return " LEFT JOIN {datalynx_contents} c$fieldid ON c$fieldid.entryid = e.id AND c$fieldid.fieldid = $fieldid ";
         } else {
             return '';

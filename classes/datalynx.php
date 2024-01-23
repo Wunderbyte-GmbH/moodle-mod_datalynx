@@ -1141,7 +1141,7 @@ class datalynx {
         // Collate the fields for processing.
         if ($fieldids = explode(',', $fids)) {
             foreach ($fieldids as $fieldid) {
-                if ($fieldid > 0 && isset($dffields[$fieldid])) {
+                if (is_numeric($fieldid) && $fieldid > 0 && isset($dffields[$fieldid])) {
                     $fields[$fieldid] = $dffields[$fieldid];
                 }
             }

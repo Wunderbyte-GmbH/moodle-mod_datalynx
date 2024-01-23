@@ -32,12 +32,13 @@ class datalynxfield_fieldgroup extends datalynxfield_base {
      * Fieldids of the fields belonging to the fieldgroup#
      * @var integer[]
      */
-    public $fieldids = array();
+    public $fieldids = [];
 
     public function __construct($df = 0, $field = 0) {
         parent::__construct($df, $field);
-
-        $this->fieldids = json_decode($this->field->param1, true);
+        if (!empty($this->field->param1)) {
+            $this->fieldids = json_decode($this->field->param1, true);
+        }
     }
 
     protected function content_names() {

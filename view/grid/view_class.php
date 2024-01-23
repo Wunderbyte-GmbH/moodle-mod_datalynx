@@ -85,7 +85,8 @@ class datalynxview_grid extends datalynxview_base {
         // Set content fields in responsive grid.
         $mustache = array();
         foreach ($fields as $field) {
-            if ($field->field->id > 0) {
+            // Check if the fieldid is a generic field like approve or a user defined field.
+            if (is_numeric($field->field->id) && $field->field->id > 0) {
                 $thisfield['name'] = $field->name();
                 $thisfield['tag'] = "[[{$field->name()}]]";
                 $thisfield['size'] = 3; // Show four elements per row, extend if necessary.

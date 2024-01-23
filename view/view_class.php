@@ -188,6 +188,9 @@ abstract class datalynxview_base {
         $this->set__patterns($data);
     }
 
+    /**
+     * @return object
+     */
     public function get_default_view_settings() {
         return (object) array('description' => '', 'visible' => 7, 'perpage' => 3, 'groupby' => '', 'filter' => 0);
     }
@@ -773,9 +776,8 @@ abstract class datalynxview_base {
      *
      * @return array of strings (field pattern used in the view)
      */
-    public function field_tags() {
-
-        $patterns = array();
+    public function field_tags(): array {
+        $patterns = [];
         if ($fields = $this->_df->get_fields()) {
             foreach ($fields as $field) {
                 if ($fieldpatterns = $field->renderer()->get_menu()) {
@@ -787,8 +789,9 @@ abstract class datalynxview_base {
     }
 
     /**
+     * @return array[]
      */
-    public function character_tags() {
+    public function character_tags(): array {
         $patterns = array('---' => array('---' => array()));
         $patterns['9'] = 'tab';
         $patterns['10'] = 'new line';
@@ -1503,7 +1506,7 @@ abstract class datalynxview_base {
     /**
      * Process the submitted data of entries
      *
-     * @return boolean|multitype:|number
+     * @return array|bool
      */
     public function process_entries_data() {
         $illegalaction = false;

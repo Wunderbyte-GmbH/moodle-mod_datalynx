@@ -97,12 +97,14 @@ class datalynxfield_fieldgroup_form extends datalynxfield_form {
     /**
      * This function is overriden to decode param1 field from JSON notation into an array
      *
-     * @param array $data new contents of the form
+     * @param array|stdClass $data new contents of the form
      */
     public function set_data($data) {
-        $elements = json_decode($data->param1, true);
-        $elements = $elements == null ? array() : $elements;
-        $data->param1 = array();
+        $elements = [];
+        if (!empty($data->param1)) {
+            $elements = json_decode($data->param1, true);
+        }
+        $data->param1 = [];
         foreach ($elements as $element) {
             $data->param1[] = $element;
         }

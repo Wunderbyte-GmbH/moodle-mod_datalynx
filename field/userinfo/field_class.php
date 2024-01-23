@@ -110,7 +110,7 @@ class datalynxfield_userinfo extends datalynxfield_base {
      */
     public function get_sort_from_sql($paramname = 'sortie', $paramcount = '') {
         $fieldid = $this->field->id;
-        if ($fieldid > 0) {
+        if (is_numeric($fieldid) && $fieldid > 0) {
             $sql = " LEFT JOIN {user_info_data} c$fieldid ON
                 (c$fieldid.userid = e.userid AND c$fieldid.fieldid = :$paramname$paramcount) ";
             return array($sql, $this->infoid);
@@ -123,7 +123,7 @@ class datalynxfield_userinfo extends datalynxfield_base {
      */
     public function get_search_from_sql() {
         $fieldid = $this->field->id;
-        if ($fieldid > 0) {
+        if (is_numeric($fieldid) && $fieldid > 0) {
             return " JOIN {user_info_data} c$fieldid ON c$fieldid.userid = e.userid ";
         } else {
             return '';

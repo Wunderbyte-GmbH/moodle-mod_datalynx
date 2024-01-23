@@ -107,8 +107,7 @@ class datalynxview_tabular extends datalynxview_base {
 
         // Fields.
         foreach ($fields as $field) {
-
-            if ($field->field->id > 0) {
+            if (is_numeric($field->field->id) && $field->field->id > 0) {
                 $header[] = $field->field->name . " %%{$field->field->name}:bulkedit%%";
                 if ($field->type == "userinfo") {
                     $entry[] = "##author:{$field->field->name}##";
