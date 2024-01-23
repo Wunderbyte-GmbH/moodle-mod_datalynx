@@ -308,6 +308,9 @@ class behat_mod_datalynx extends behat_base {
             case 'Manage':
                 $link = $page->find('css', sprintf('.nav-item [title="Manage"]', $linktext));
                 break;
+            case 'Views':
+                $link = $page->find('css', sprintf('.nav-item [title="Views"]', $linktext));
+                break;
         }
         if (null === $link) {
             throw new \RuntimeException(sprintf('The link "%s" was not found or is not visible', $linktext));

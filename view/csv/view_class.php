@@ -256,8 +256,8 @@ class datalynxview_csv extends datalynxview_base {
         global $CFG;
 
         require_once($CFG->libdir . '/csvlib.class.php');
-
-        if (!$csvcontent = $this->get_csv_content($range)) {
+        $csvcontent = $this->get_csv_content($range);
+        if (!$csvcontent) {
             return;
         }
         $datalynxname = $this->_df->name();
@@ -490,7 +490,8 @@ class datalynxview_csv extends datalynxview_base {
         }
 
         // Csv column headers.
-        if (!$fieldnames = $cir->get_columns()) {
+        $fieldnames = $cir->get_columns();
+        if (!$fieldnames) {
             $data->error = $cir->get_error();
             return $data;
         }

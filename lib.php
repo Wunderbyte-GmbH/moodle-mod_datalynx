@@ -102,8 +102,8 @@ function datalynx_add_instance($data) {
     if ($CFG->datalynx_maxentries) {
         $data->maxentries = $CFG->datalynx_maxentries;
     }
-
-    if (!$data->id = $DB->insert_record('datalynx', $data)) {
+    $data->id = $DB->insert_record('datalynx', $data);
+    if (!$data->id) {
         return false;
     }
 
@@ -165,8 +165,8 @@ function datalynx_update_instance($data) {
  */
 function datalynx_delete_instance($id) {
     global $DB;
-
-    if (!$data = $DB->get_record('datalynx', array('id' => $id))) {
+    $data = $DB->get_record('datalynx', array('id' => $id));
+    if (!$data) {
         return false;
     }
 
@@ -311,8 +311,8 @@ function datalynx_reset_userdata($data) {
         if ($datas = $DB->get_records_sql($alldatassql, array($data->courseid))) {
             foreach ($datas as $dataid => $unused) {
                 fulldelete("$CFG->dataroot/$data->courseid/moddata/datalynx/$dataid");
-
-                if (!$cm = get_coursemodule_from_instance('datalynx', $dataid)) {
+                $cm = get_coursemodule_from_instance('datalynx', $dataid);
+                if (!$cm) {
                     continue;
                 }
                 $datacontext = context_module::instance($cm->id);
@@ -347,7 +347,8 @@ function datalynx_reset_userdata($data) {
                     $record->userdeleted || !is_enrolled($coursecontext, $record->userid)
             ) {
                 // Delete ratings.
-                if (!$cm = get_coursemodule_from_instance('datalynx', $record->dataid)) {
+                $cm = get_coursemodule_from_instance('datalynx', $record->dataid);
+                if (!$cm) {
                     continue;
                 }
                 $datacontext = context_module::instance($cm->id);
@@ -382,7 +383,8 @@ function datalynx_reset_userdata($data) {
     if (!empty($data->reset_datalynx_ratings)) {
         if ($datas = $DB->get_records_sql($alldatassql, array($data->courseid))) {
             foreach ($datas as $dataid => $unused) {
-                if (!$cm = get_coursemodule_from_instance('datalynx', $dataid)) {
+                $cm = get_coursemodule_from_instance('datalynx', $dataid);
+                if (!$cm) {
                     continue;
                 }
                 $datacontext = context_module::instance($cm->id);
@@ -477,17 +479,16 @@ function datalynx_get_file_info($browser, $areas, $course, $cm, $context, $filea
         require_once($CFG->dirroot . '/mod/datalynx/locallib.php');
         return new datalynx_file_info_container($browser, $course, $cm, $context, $areas, $filearea);
     }
-
-    if (!$view = $DB->get_record('datalynx_views', array('id' => $itemid))) {
+    $view = $DB->get_record('datalynx_views', array('id' => $itemid));
+    if (!$view) {
         return null;
     }
 
     $fs = get_file_storage();
     $filepath = is_null($filepath) ? '/' : $filepath;
     $filename = is_null($filename) ? '.' : $filename;
-    if (!($storedfile = $fs->get_file($context->id, 'mod_datalynx', $filearea, $itemid, $filepath,
-            $filename))
-    ) {
+    $storedfile = $fs->get_file($context->id, 'mod_datalynx', $filearea, $itemid, $filepath, $filename);
+    if (!$storedfile) {
         return null;
     }
 
@@ -521,20 +522,20 @@ function mod_datalynx_pluginfile($course, $cm, $context, $filearea, $args, $forc
     ) {
 
         $contentid = (int) array_shift($args);
-
-        if (!$content = $DB->get_record('datalynx_contents', array('id' => $contentid))) {
+        $content = $DB->get_record('datalynx_contents', array('id' => $contentid));
+        if (!$content) {
             return false;
         }
-
-        if (!$field = $DB->get_record('datalynx_fields', array('id' => $content->fieldid))) {
+        $field = $DB->get_record('datalynx_fields', array('id' => $content->fieldid));
+        if (!$field) {
             return false;
         }
-
-        if (!$entry = $DB->get_record('datalynx_entries', array('id' => $content->entryid))) {
+        $entry = $DB->get_record('datalynx_entries', array('id' => $content->entryid));
+        if (!$entry) {
             return false;
         }
-
-        if (!$datalynx = $DB->get_record('datalynx', array('id' => $field->dataid))) {
+        $datalynx = $DB->get_record('datalynx', array('id' => $field->dataid));
+        if (!$datalynx) {
             return false;
         }
 
@@ -600,8 +601,10 @@ function mod_datalynx_pluginfile($course, $cm, $context, $filearea, $args, $forc
         $oldpath = "/$context->id/mod_dataform/$filearea/$relativepath";
 
         $fs = get_file_storage();
-        if (!$file = $fs->get_file_by_hash(sha1($fullpath)) || $file->is_directory()) {
-            if (!$file = $fs->get_file_by_hash(sha1($oldpath)) || $file->is_directory()) {
+        $file = $fs->get_file_by_hash(sha1($fullpath));
+        if (!$file || $file->is_directory()) {
+            $file = $fs->get_file_by_hash(sha1($oldpath));
+            if (!$file || $file->is_directory()) {
                 return false;
             }
         }
@@ -620,8 +623,10 @@ function mod_datalynx_pluginfile($course, $cm, $context, $filearea, $args, $forc
         $oldpath = "/$context->id/mod_dataform/$filearea/$relativepath";
 
         $fs = get_file_storage();
-        if (!$file = $fs->get_file_by_hash(sha1($fullpath)) || $file->is_directory()) {
-            if (!$file = $fs->get_file_by_hash(sha1($oldpath)) || $file->is_directory()) {
+        $file = $fs->get_file_by_hash(sha1($fullpath));
+        if (!$file || $file->is_directory()) {
+            $file = $fs->get_file_by_hash(sha1($oldpath));
+            if (!$file || $file->is_directory()) {
                 return false;
             }
         }
@@ -639,8 +644,10 @@ function mod_datalynx_pluginfile($course, $cm, $context, $filearea, $args, $forc
         $oldpath = "/$context->id/mod_dataform/$filearea/$relativepath";
 
         $fs = get_file_storage();
-        if (!$file = $fs->get_file_by_hash(sha1($fullpath)) || $file->is_directory()) {
-            if (!$file = $fs->get_file_by_hash(sha1($oldpath)) || $file->is_directory()) {
+        $file = $fs->get_file_by_hash(sha1($fullpath));
+        if (!$file || $file->is_directory()) {
+            $file = $fs->get_file_by_hash(sha1($oldpath));
+            if (!$file || $file->is_directory()) {
                 return false;
             }
         }
@@ -657,8 +664,10 @@ function mod_datalynx_pluginfile($course, $cm, $context, $filearea, $args, $forc
         $oldpath = "/$context->id/mod_dataform/$filearea/$relativepath";
 
         $fs = get_file_storage();
-        if (!$file = $fs->get_file_by_hash(sha1($fullpath)) || $file->is_directory()) {
-            if (!$file = $fs->get_file_by_hash(sha1($oldpath)) || $file->is_directory()) {
+        $file = $fs->get_file_by_hash(sha1($fullpath));
+        if (!$file || $file->is_directory()) {
+            $file = $fs->get_file_by_hash(sha1($oldpath));
+            if (!$file || $file->is_directory()) {
                 return false;
             }
         }
@@ -677,8 +686,10 @@ function mod_datalynx_pluginfile($course, $cm, $context, $filearea, $args, $forc
         $oldpath = "/$context->id/mod_dataform/$filearea/$itemid/$relativepath";
 
         $fs = get_file_storage();
-        if (!$file = $fs->get_file_by_hash(sha1($fullpath)) || $file->is_directory()) {
-            if (!$file = $fs->get_file_by_hash(sha1($oldpath)) || $file->is_directory()) {
+        $file = $fs->get_file_by_hash(sha1($fullpath));
+        if (!$file || $file->is_directory()) {
+            $file = $fs->get_file_by_hash(sha1($oldpath));
+            if (!$file || $file->is_directory()) {
                 return false;
             }
         }

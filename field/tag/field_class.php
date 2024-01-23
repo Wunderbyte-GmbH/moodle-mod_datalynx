@@ -59,7 +59,8 @@ class datalynxfield_tag extends datalynxfield_option_multiple {
         $rec->entryid = $entryid;
 
         // Remove content from entry and remove tags from item when tags were removed in entry.
-        if (empty($tags) && $rec->id = $contentid) {
+        $rec->id = $contentid;
+        if (empty($tags) && $rec->id) {
             $rec->content = "";
             $DB->update_record('datalynx_contents', $rec);
             core_tag_tag::remove_all_item_tags('mod_datalynx', 'datalynx_contents', $contentid);
@@ -67,7 +68,8 @@ class datalynxfield_tag extends datalynxfield_option_multiple {
         }
 
         // Create empty datalynx_contents entry in order to get id for processing tags.
-        if (!$rec->id = $contentid) {
+        $rec->id = $contentid;
+        if (!$rec->id) {
             $rec->id = $DB->insert_record('datalynx_contents', $rec);
         }
         core_tag_tag::set_item_tags('mod_datalynx', 'datalynx_contents', $rec->id, $this->df->context, $tags);

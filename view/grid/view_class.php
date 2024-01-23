@@ -39,7 +39,8 @@ class datalynxview_grid extends datalynxview_base {
         global $OUTPUT; // Needed for mustache implementation.
 
         // Get all the fields.
-        if (!$fields = $this->_df->get_fields()) {
+        $fields = $this->_df->get_fields());
+        if (!$fields) {
             return; // You shouldn't get that far if there are no user fields.
         }
 

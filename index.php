@@ -27,8 +27,8 @@ require_once("$CFG->dirroot/mod/datalynx/classes/datalynx.php");
 require_once("$CFG->dirroot/mod/datalynx/lib.php");
 
 $id = required_param('id', PARAM_INT); // Course id.
-
-if (!$course = $DB->get_record('course', array('id' => $id))) {
+$course = $DB->get_record('course', array('id' => $id));
+if (!$course) {
     throw new moodle_exception('invalidcourseid');
 }
 
@@ -48,8 +48,8 @@ $PAGE->set_title($modulename);
 $PAGE->set_heading($course->fullname);
 
 echo $OUTPUT->header();
-
-if (!$datalynxs = get_all_instances_in_course("datalynx", $course)) {
+$datalynxs = get_all_instances_in_course("datalynx", $course);
+if (!$datalynxs) {
     notice(get_string('thereareno', 'moodle', $modulenameplural),
             new moodle_url('/course/view.php', array('id', $course->id)));
 }

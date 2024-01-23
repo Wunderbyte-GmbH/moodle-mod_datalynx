@@ -291,7 +291,8 @@ class datalynx_entries {
 
                 // Get perpage subset.
             } else {
-                if (!$filter->groupby && $perpage = $filter->perpage) {
+                $perpage = $filter->perpage;
+                if (!$filter->groupby && $perpage) {
 
                     // A random set (filter->selection == 1).
                     if (!empty($filter->selection)) {

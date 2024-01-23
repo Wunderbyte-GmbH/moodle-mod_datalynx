@@ -405,7 +405,8 @@ class datalynxview_pdf extends datalynxview_base {
      */
     public function generate_default_view() {
         // Get all the fields.
-        if (!$fields = $this->_df->get_fields()) {
+        $fields = $this->_df->get_fields();
+        if (!$fields) {
             return; // You shouldn't get that far if there are no user fields.
         }
 

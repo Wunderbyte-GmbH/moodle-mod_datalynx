@@ -102,7 +102,8 @@ if ($urlparams->duplicate && confirm_sesskey()) { // Duplicate any requested vie
 // Any notifications?
 $df->notifications['bad']['defaultview'] = '';
 $df->notifications['bad']['getstartedviews'] = '';
-if (!$views = $df->get_views_by_type('csv', true)) {
+$views = $df->get_views_by_type('csv', true);
+if (!$views) {
     $df->notifications['bad'][] = get_string('importnoneindatalynx', 'datalynx'); // Nothing in.
     // Database.
 }

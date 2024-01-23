@@ -100,8 +100,8 @@ class datalynxfield_editor extends datalynxfield_base {
         $rec = new stdClass();
         $rec->fieldid = $fieldid;
         $rec->entryid = $entryid;
-
-        if (!$rec->id = $contentid) {
+        $rec->id = $contentid;
+        if (!$rec->id) {
             $rec->id = $DB->insert_record('datalynx_contents', $rec);
         }
         // The editor's content is an array, so reset is used in order to access the data in the.

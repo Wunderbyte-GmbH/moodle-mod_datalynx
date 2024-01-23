@@ -81,7 +81,8 @@ class datalynxview_base_form extends moodleform {
         $mform->addElement('checkbox', 'visible[8]', '', get_string('visible_8', 'datalynx'), 1);
 
         // Filter.
-        if (!$filtersmenu = $df->get_filter_manager()->get_filters(null, true)) {
+        $filtersmenu = $df->get_filter_manager()->get_filters(null, true);
+        if (!$filtersmenu) {
             $filtersmenu = array(0 => get_string('filtersnonedefined', 'datalynx'));
         } else {
             $filtersmenu = array(0 => get_string('choose')) + $filtersmenu;

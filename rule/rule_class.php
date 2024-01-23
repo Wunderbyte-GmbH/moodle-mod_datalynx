@@ -154,8 +154,8 @@ abstract class datalynx_rule_base {
         if (!empty($fromform)) {
             $this->set_rule($fromform);
         }
-
-        if (!$this->rule->id = $DB->insert_record('datalynx_rules', $this->rule)) {
+        $this->rule->id = $DB->insert_record('datalynx_rules', $this->rule);
+        if (!$this->rule->id) {
             echo $OUTPUT->notification('Insertion of new rule failed!');
             return false;
         } else {

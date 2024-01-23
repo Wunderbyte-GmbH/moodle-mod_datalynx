@@ -82,12 +82,12 @@ class datalynxview_csv_import_form extends moodleform {
             list($pattern, $header, ) = $column;
             $patternname = trim($pattern, '[#]');
             $header = $header ? $header : $patternname;
-
-            if (!$fieldid = $view->get_pattern_fieldid($pattern)) {
+            $fieldid = $view->get_pattern_fieldid($pattern);
+            if (!$fieldid) {
                 continue;
             }
-
-            if (!$field = $df->get_field_from_id($fieldid)) {
+            $field = $df->get_field_from_id($fieldid);
+            if (!$field) {
                 continue;
             }
 

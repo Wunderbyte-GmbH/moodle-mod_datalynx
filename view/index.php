@@ -105,9 +105,9 @@ if ($urlparams->duplicate && confirm_sesskey()) { // Duplicate any requested vie
 
 // Any notifications?
 $dl->notifications['bad']['defaultview'] = '';
-if (!$views = $dl->get_views(null, true,
-        flexible_table::get_sort_for_table('datalynxviewsindex' . $dl->id()))
-) {
+$views = $dl->get_views(null, true,
+        flexible_table::get_sort_for_table('datalynxviewsindex' . $dl->id()));
+if (!$views) {
     $dl->notifications['bad']['getstartedviews'] = get_string('viewnoneindatalynx', 'datalynx'); // Nothing.
     // In.
     // Database.

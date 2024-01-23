@@ -105,7 +105,8 @@ abstract class datalynxview_base {
             if (is_object($view)) {
                 $this->view = $view; // Programmer knows what they are doing, we hope.
             } else {
-                if (!$this->view = $DB->get_record('datalynx_views', array('id' => $view))) {
+                $this->view = $DB->get_record('datalynx_views', array('id' => $view));
+                if (!$this->view) {
                     throw new moodle_exception('invalidview', 'datalynx', null, null, $view);
                 }
             }

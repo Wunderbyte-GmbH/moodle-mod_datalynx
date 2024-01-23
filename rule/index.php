@@ -81,7 +81,8 @@ if ($urlparams->duplicate && confirm_sesskey()) { // Duplicate any requested rul
 }
 
 // Any notifications?
-if (!$rules = $rm->get_rules()) {
+$rules = $rm->get_rules();
+if (!$rules) {
     $df->notifications['bad'][] = get_string('rulesnoneindatalynx', 'datalynx'); // Nothing in.
     // Datalynx.
 }

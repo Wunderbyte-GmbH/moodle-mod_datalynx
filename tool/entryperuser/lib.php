@@ -35,7 +35,8 @@ class datalynxtool_entryperuser {
         global $DB;
 
         // Get gradebook users.
-        if (!$users = $df->get_gradebook_users()) {
+        $users = $df->get_gradebook_users();
+        if (!$users) {
             return;
         }
 
@@ -54,7 +55,8 @@ class datalynxtool_entryperuser {
 
         if (is_array($processed)) {
             list($strnotify, $processedeids) = $processed;
-            if ($entriesprocessed = ($processedeids ? count($processedeids) : 0)) {
+            $entriesprocessed = $processedeids ? count($processedeids) : 0;
+            if ($entriesprocessed) {
                 return array('good', $strnotify);
             }
         }

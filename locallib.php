@@ -70,7 +70,8 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
      * @throws portfolio_caller_exception
      */
     public function load_data() {
-        if (!$this->cm = get_coursemodule_from_id('datalynx', $this->id)) {
+        $this->cm = get_coursemodule_from_id('datalynx', $this->id);
+        if (!$this->cm) {
             throw new portfolio_caller_exception('invalidid', 'datalynx');
         }
     }
