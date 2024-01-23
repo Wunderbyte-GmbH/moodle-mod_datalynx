@@ -580,12 +580,13 @@ function mod_datalynx_pluginfile($course, $cm, $context, $filearea, $args, $forc
         $oldpath = "/$context->id/mod_dataform/$filearea/$contentid/$relativepath";
 
         $fs = get_file_storage();
-        if (!$file = $fs->get_file_by_hash(sha1($fullpath)) || $file->is_directory()) {
-            if (!$file = $fs->get_file_by_hash(sha1($oldpath)) || $file->is_directory()) {
+        $file = $fs->get_file_by_hash(sha1($fullpath));
+        if (!$file || $file->is_directory()) {
+            $file = $fs->get_file_by_hash(sha1($oldpath));
+            if (!$file || $file->is_directory()) {
                 return false;
             }
         }
-
         // Finally send the file.
         send_stored_file($file, 0, 0, false); // Download MUST be forced - security!
     }
