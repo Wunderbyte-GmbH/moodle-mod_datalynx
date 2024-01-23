@@ -224,7 +224,7 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
 
             $label = $fieldname;
 
-            $value = null;
+            $value = '';
 
             // Render search elements.
             if ($fieldid == 'timecreated' || $fieldid == 'timemodified') {
