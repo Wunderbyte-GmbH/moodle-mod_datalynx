@@ -91,12 +91,12 @@ Feature: Filter approved and not approved entries from multiple students
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Datalynx Test Instance"
-    And I follow "Manage"
+    And I follow the datalynx "Manage" link
     And I follow "Views"
     And I follow "Manage view"
     And I click on "//td[text()='Text of student1']/following-sibling::td/a[@class='datalynxfield__approve']" "xpath_element"
     Then I wait until "approved" "text" exists
-    And I follow "Manage"
+    And I follow the datalynx "Manage" link
     And I follow "Notapproved view"
     Then I should not see "Text of student1"
     But I should see "Text of student2"

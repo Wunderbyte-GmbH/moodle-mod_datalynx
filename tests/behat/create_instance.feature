@@ -35,7 +35,7 @@ Feature: In a datalynx instance create a new entry
       | select           | Select             |             | Option X,Option Y,Option Z |          |        |
       | teammemberselect | Team member select | 3           | 20                         | 1,2,4,8  |        |
       | number           | Number             | 3           | 2                          |          |        |
-    And I follow "Filters"
+    And I follow the datalynx "Filters" link
     And I follow "Add a filter"
     And I select "10" from the "perpage" singleselect
     And I select "Time created" from the "sortfield0" singleselect
