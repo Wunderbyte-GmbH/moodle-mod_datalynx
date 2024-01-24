@@ -1349,9 +1349,8 @@ function datalynx_scale_used_anywhere($scaleid) {
  * @return \core_tag\output\tagindex
  */
 function mod_datalynx_get_tagged_entries($tag, $exclusivemode = false, $fromctx = 0, $ctx = 0, $rec = 1, $page = 0) {
-    global $OUTPUT, $DB, $USER;
+    global $OUTPUT, $USER;
     $perpage = $exclusivemode ? 20 : 5;
-
     // Build the SQL query.
     $ctxselect = context_helper::get_preload_record_columns_sql('ctx');
     $query = "SELECT dc.entryid  AS eid, de.dataid, de.userid, de.groupid, de.approved,
@@ -1412,9 +1411,8 @@ function mod_datalynx_get_tagged_entries($tag, $exclusivemode = false, $fromctx 
                                     'course' => $cm->course
                             );
                             $datalynx = new mod_datalynx\datalynx($taggeditem->datalynxid);
-
                             if (!$datalynx->user_can_view_all_entries()) {
-                                if ($taggeditem->userid == $USER->id) {
+                                if ($taggeditem->userid === $USER->id) {
                                     $accessible = true;
                                 }
                                 if ($datalynx->data->approval &&

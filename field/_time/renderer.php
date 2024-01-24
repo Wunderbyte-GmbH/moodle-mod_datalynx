@@ -98,6 +98,7 @@ class datalynxfield__time_renderer extends datalynxfield_renderer {
 
         $elements = array();
         $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_from", get_string('from'));
+        // TODO: Fix form rendering and get rid of $activecheckbox.
         if ($activecheckbox) {
             $elements[] = &$mform->createElement('checkbox', "f_{$i}_{$fieldid}_from_active", get_string('activate', 'datalynx'), null, array('size' => 1));
             foreach (array('year', 'month', 'day', 'hour', 'minute') as $fieldidentifier) {
