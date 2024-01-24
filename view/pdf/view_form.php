@@ -341,7 +341,7 @@ class datalynxview_pdf_form extends datalynxview_base_form {
      * @see datalynxview_base_form::get_data()
      */
     public function get_data($slashed = true) {
-        $data = parent::get_data($slashed)
+        $data = parent::get_data($slashed);
         if (!$data) {
             return null;
         }

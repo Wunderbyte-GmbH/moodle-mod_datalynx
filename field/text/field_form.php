@@ -206,19 +206,14 @@ class datalynxfield_text_form extends datalynxfield_form {
      * @return string[] Associative array with errors
      */
     public function validation($data, $files) {
-        global $OUTPUT;
-
         $mform = &$this->_form;
-
         $errors = parent::validation($data, $files);
-
         $fieldid = $this->_field->id();
         if (!empty($data['param8']) && !empty($fieldid)) {
             // Unique is activated, we check if there are doubles!
             // Should never happen, because we freeze it to 'no' if there are duplicates!
             if ($this->has_duplicates()) {
-                $formfieldname = "field_{$fieldid}_{$entryid}";
-                $errors[$formfieldname] = get_string('field_has_duplicate_entries', 'datalynx');
+                $errors['param8'] = get_string('field_has_duplicate_entries', 'datalynx');
             }
         }
 
@@ -240,15 +235,14 @@ class datalynxfield_text_form extends datalynxfield_form {
         }
 
         // Added id to records to make the first column something unique.
-        $records = $DB->get_records_sql("SELECT id, COUNT(*), c.content
+        $records = $DB->get_records_sql("SELECT c.fieldid, c.content, COUNT(*) as cnt
                                     FROM {datalynx_contents} c
                                     WHERE c.fieldid = :fieldid AND c.content IS NOT NULL
-                                    GROUP BY c.id, c.content
+                                    GROUP BY c.fieldid, c.content
                                     HAVING COUNT(*) > 1", array('fieldid' => $fieldid));
         if (empty($records)) {
             return false;
         }
-
         return true;
     }
 }

@@ -123,9 +123,11 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
             }
             $mform->addElement('select', "{$fieldname}_group", null, $groupmenu);
             $mform->setDefault("{$fieldname}_group", $groupid);
+            $mform->setType("{$fieldname}_group", PARAM_INT);
             $mform->disabledIf("{$fieldname}_group", "{$fieldname}_course", 'eq', '');
 
             $mform->addElement('text', "{$fieldname}_groupid", null, array('class' => 'hide'));
+            $mform->setType("{$fieldname}_groupid", PARAM_TEXT);
             $mform->setDefault("{$fieldname}_groupid", $groupid);
         }
     }
