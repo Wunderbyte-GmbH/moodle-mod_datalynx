@@ -141,7 +141,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
      * @param $params
      * @return moodle_url|string
      */
-    protected function display_file(stored_file $file, int $entryid, string $path, string $altname, ?array $params = null) {
+    protected function display_file(stored_file $file, int $entryid, string $path, string $altname = '', ?array $params = null) {
         $field = $this->_field;
 
         $imgattr = array('style' => array());
