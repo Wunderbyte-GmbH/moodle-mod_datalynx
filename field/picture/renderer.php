@@ -127,7 +127,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
 
     /**
      */
-    public function pluginfile_patterns() {
+    public function pluginfile_patterns(): array {
         $fieldname = $this->_field->name();
         return array("[[{$fieldname}]]", "[[{$fieldname}:thumb]]", "[[{$fieldname}:linked]]",
                 "[[{$fieldname}:lightbox]]");
@@ -219,7 +219,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
     /**
      * Array of patterns this field supports
      */
-    public function patterns() {
+    public function patterns(): array {
         $fieldname = $this->_field->name();
 
         $patterns = parent::patterns();
