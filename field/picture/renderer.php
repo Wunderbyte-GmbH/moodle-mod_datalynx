@@ -73,9 +73,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
      */
     public function render_display_mode(stdClass $entry, array $options): string {
         global $CFG, $PAGE;
-
         $PAGE->requires->js_call_amd('mod_datalynx/zoomable', 'init');
-
         $field = $this->_field;
         $fieldid = $field->id();
         $entryid = $entry->id;
@@ -110,13 +108,11 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
         $strfiles = array();
         foreach ($files as $file) {
             if (!$file->is_directory()) {
-
                 $filename = $file->get_filename();
                 $filenameinfo = pathinfo($filename);
                 $path = "/{$field->df()->context->id}/mod_datalynx/content/$contentid";
-
                 if (strpos($filename, 'thumb_') === false) {
-                    $strfiles[] = $this->display_file($file, $path, $altname, $options);
+                    $strfiles[] = $this->display_file($file, $entryid, $path, $altname, $options);
                 }
             }
         }
@@ -137,7 +133,15 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
                 "[[{$fieldname}:lightbox]]");
     }
 
-    protected function display_file($file, $path, $altname, $params = null) {
+    /**
+     * @param stored_file $file
+     * @param int $entryid
+     * @param $path
+     * @param $altname
+     * @param $params
+     * @return moodle_url|string
+     */
+    protected function display_file(stored_file $file, int $entryid, string $path, string $altname, ?array $params = null) {
         $field = $this->_field;
 
         $imgattr = array('style' => array());
