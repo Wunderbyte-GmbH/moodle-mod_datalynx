@@ -27,7 +27,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $shortcodes = [
-    'recommendedin' => [
+    'displayview' => [
         'callback' => 'mod_datalynx\shortcodes::displayview',
         'description' => 'Displays a datalynx view',
     ],

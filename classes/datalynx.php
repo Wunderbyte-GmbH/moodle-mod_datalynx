@@ -786,7 +786,7 @@ class datalynx {
      * @param int $datalynxid The id of the datalynx whose content should be displayed.
      * @param int $viewid The id of the datalynx's view whose content should be displayed.
      * @param int $eids The id of the datalynx entrie that should be displayed.
-     * @param array $options Pass options what should be displayed, esp. to hide control interfaces.
+     * @param array $options bool skiplogincheck, bool tohtml, string pagelayout.
      * @return string
      */
     public static function get_content_inline(int $datalynxid, int $viewid = 0, ?int $eids = null, array $options = array('tohtml' => true)) {
@@ -796,6 +796,7 @@ class datalynx {
         $datalynx = new datalynx($datalynxid, null);
         $urlparams->d = $datalynxid;
         $urlparams->view = $viewid;
+        $skiplogincheck = $options['skiplogincheck'] ?? false;
 
         // It's used nowhere but keeping for backwards compatibility.
         $urlparams->pagelayout = 'external';
@@ -814,7 +815,7 @@ class datalynx {
 
         $pageparams = array('js' => true, 'css' => true, 'rss' => true, 'modjs' => true,
                 'completion' => true, 'comments' => true, 'urlparams' => $urlparams);
-        $datalynx->set_page('external', $pageparams);
+        $datalynx->set_page('external', $pageparams, $skiplogincheck);
         $type = $datalynx->views[$viewid]->type;
         require_once($CFG->dirroot . "/mod/datalynx/view/$type/view_class.php");
         $viewclass = "datalynxview_$type";
@@ -1361,12 +1362,12 @@ class datalynx {
      * @param string $sort SQL ORDER BY clause
      * @return array an array of datalynx_views entry objects
      */
-    public function get_view_records($forceget = false, $sort = '') {
+    public function get_view_records($forceget = false, $sort = ''): array {
         global $DB;
         if (empty($this->views) || $forceget) {
             $views = array();
             if (!$views = $DB->get_records('datalynx_views', array('dataid' => $this->id()), $sort)) {
-                return false;
+                return [];
             }
             $this->views = array();
             foreach ($views as $viewid => $view) {
@@ -1376,6 +1377,22 @@ class datalynx {
             }
         }
         return $this->views;
+    }
+
+    /**
+     * Get view by name
+     *
+     * @param string $viewname
+     * @return stdClass
+     */
+    public function get_view_by_name(string $viewname): ?stdClass {
+        $views = $this->get_view_records();
+        foreach ($views as $view) {
+            if($view->name === $viewname) {
+                return $view;
+            }
+        }
+        return null;
     }
 
     /**
@@ -1442,7 +1459,8 @@ class datalynx {
      * @return bool|mixed
      */
     public function get_view_from_id($viewid = 0) {
-        if ($views = $this->get_view_records()) {
+        $views = $this->get_view_records();
+        if (!empty($views)) {
             if ($viewid && isset($views[$viewid])) {
                 $view = $views[$viewid];
                 // If can't find the requested, try the default.
@@ -1492,7 +1510,8 @@ class datalynx {
      * @return array|bool
      */
     public function get_views_by_type($type, $forceget = false) {
-        if (!$views = $this->get_view_records($forceget)) {
+        $views = $this->get_view_records($forceget);
+        if (!empty($views)) {
             return false;
         }
 
@@ -1513,8 +1532,8 @@ class datalynx {
      * @param string $sort
      * @return array of view objects indexed by view id or false if no views are found
      */
-    public function get_views($exclude = null, $forceget = false, $sort = '') {
-        if (!$this->get_view_records($forceget, $sort)) {
+    public function get_views(array $exclude = [], bool $forceget = false, string $sort = '') {
+        if (!empty($this->get_view_records($forceget, $sort))) {
             return false;
         }
 
@@ -1532,17 +1551,17 @@ class datalynx {
     }
 
     /**
-     * Get all views visible to the user of a datalynx instance as an array indexed by viewid
+     * Get all viewnames visible to the user of a datalynx instance as an array indexed by viewid
      *
      * @param string $exclude
      * @param boolean $forceget
      * @param string $sort
-     * @return string[viewid]
+     * @return array $viewids[viewid]
      */
     public function get_views_menu($exclude = null, $forceget = false, $sort = '') {
         $views = array();
 
-        if ($this->get_view_records($forceget, $sort)) {
+        if (!empty($this->get_view_records($forceget, $sort))) {
             foreach ($this->views as $viewid => $view) {
                 if (!empty($exclude) && in_array($viewid, $exclude)) {
                     continue;

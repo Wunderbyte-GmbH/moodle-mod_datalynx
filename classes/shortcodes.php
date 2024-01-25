@@ -26,6 +26,8 @@
 
 namespace mod_datalynx;
 
+use moodle_url;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/booking/lib.php');
@@ -36,9 +38,8 @@ require_once($CFG->dirroot . '/mod/booking/lib.php');
 class shortcodes {
 
     /**
-     * This shortcode shows a list of booking options, which have a booking customfield...
-     * ... with the shortname "recommendedin" and the value set to the shortname of the course...
-     * ... in which they should appear.
+     * This shortcode shows a view of a datalynx instance.
+     * Arguments: view="My view name" datalynx=5 (cmid)
      *
      * @param string $shortcode
      * @param array $args
@@ -48,7 +49,39 @@ class shortcodes {
      * @return string
      */
     public static function displayview($shortcode, $args, $content, $env, $next) {
-        TODO:
-        return "x";
+        global $DB, $CFG, $PAGE;
+        require_once("{$CFG->dirroot}/mod/datalynx/locallib.php");
+        if (isset($args['view']) && isset($args['cmid'])) {
+            $viewname = $args['view'];
+            $cmid = $args['cmid'];
+            $cm = get_coursemodule_from_id('datalynx', $cmid);
+            if (!$cm) {
+                return get_string('invalidcoursemodule', 'error');
+            }
+            // Sanity check in case the designated datalynx has been deleted or does not exist.
+            if (!$DB->record_exists('datalynx', array('id' => $cm->instance))) {
+                return get_string('datalynxinstance_deleted', 'mod_datalynxcoursepage');
+            }
+
+            // Sanity check in case the designated view has been deleted.
+            if (!$DB->record_exists('datalynx_views',
+                            array('dataid' => $cm->instance, 'name' => $viewname))) {
+                return get_string('datalynxview_deleted', 'mod_datalynxcoursepage');
+            }
+            $dl = new datalynx($cm->instance, $cmid);
+            $view = $dl->get_view_by_name($viewname);
+            if (!has_capability('mod/datalynx:viewentry', $dl->context)) {
+                // No right to view datalynx instance. Return empty string.
+                return '';
+            }
+
+            $jsurl = new moodle_url('/mod/datalynxcoursepage/js.php', array('id' => $cmid));
+            $PAGE->requires->js($jsurl);
+            $options = ['tohtml' => true, 'skiplogincheck' => true];
+
+            return datalynx::get_content_inline($cm->instance, $view->id, null, $options);
+        } else {
+            return "You must set arguments view and datalynx. Here is an example: [displayview view=\"My datalynx viewname\" cmid=5]";
+        }
     }
 }

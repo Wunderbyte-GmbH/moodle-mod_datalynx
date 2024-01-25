@@ -61,6 +61,7 @@ $string['configmaxviews'] = 'Dieser Wert bestimmt die Höchstanzahl an Ansichten
 $string['convert'] = 'Konvertieren';
 $string['converttoeditor'] = 'Zu Editorfeld konvertieren';
 $string['correct'] = 'Richtig';
+$string['coursevisible'] = 'Der Kurs wurde freigeschaltet und ist für Studierende verfügbar';
 $string['csscode'] = 'CSS Code';
 $string['cssinclude'] = 'CSS';
 $string['cssincludes'] = 'Externes CSS einbinden';
@@ -106,8 +107,8 @@ $string['datalynx:viewanonymousentry'] = 'Anonyme Einträge anzeigen';
 $string['datalynx:viewentry'] = 'Einträge anzeigen';
 $string['datalynx:viewindex'] = 'Index anzeigen';
 $string['datalynx:writeentry'] = 'Einträge schreiben';
+$string['displayview'] = 'Eine Datalynx Ansicht via Shortcodes anzeigen';
 // End Capability strings.
-$string['coursevisible'] = 'Der Kurs wurde freigeschaltet und ist für Studierende verfügbar';
 $string['defaultview'] = 'D';
 $string['deletenotenrolled'] = 'Einträge von nicht eingeschriebenen UserInnen löschen.';
 $string['descending'] = 'Absteigend';

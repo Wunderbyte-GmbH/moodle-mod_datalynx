@@ -126,6 +126,7 @@ $string['dftimeinterval'] = 'Pause until next entry is unlocked';
 $string['dftimeinterval_help'] = 'Select a time interval until next entry is unlocked for the user';
 $string['dfupdatefailed'] = 'Failed to update datalynx!';
 $string['disapproved'] = 'Not approved';
+$string['displayview'] = 'Display a datalynx view via shortcodes';
 $string['documenttype'] = 'Document type';
 $string['dots'] = '...';
 $string['download'] = 'Download';
