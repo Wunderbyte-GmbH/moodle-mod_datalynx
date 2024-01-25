@@ -57,7 +57,6 @@ Feature: Create entry, add multiselect and use customfilter
     And I fill in the entry form fields
       | type             | name               | value                |
       | text             | Text               | testtext1            |
-      | multiselect      | Select (multiple)  | Opt1                 |
     And I open the autocomplete suggestions list
     And I click on "Opt4" item in the autocomplete list
     And I click on "Opt5" item in the autocomplete list
@@ -69,7 +68,7 @@ Feature: Create entry, add multiselect and use customfilter
     And I fill in the entry form fields
       | type             | name               | value                |
       | text             | Text               | testtext2            |
-      | multiselect      | Multiselect        | Opt2                 |
+    And I click on "Opt2" item in the autocomplete list
     And I press "Save changes"
     And I press "Continue"
 
@@ -77,7 +76,7 @@ Feature: Create entry, add multiselect and use customfilter
     And I fill in the entry form fields
       | type             | name               | value                |
       | text             | Text               | testtext3            |
-      | multiselect      | Multiselect        | Opt3                 |
+    And I click on "Opt3" item in the autocomplete list
     And I press "Save changes"
     And I press "Continue"
 
@@ -85,7 +84,7 @@ Feature: Create entry, add multiselect and use customfilter
     And I fill in the entry form fields
       | type             | name               | value                |
       | text             | Text               | testtext4            |
-      | multiselect      | Multiselect        | Opt4                 |
+    And I click on "Opt4" item in the autocomplete list
     And I press "Save changes"
     And I press "Continue"
     Then I should see "testtext3"
