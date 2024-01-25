@@ -1533,7 +1533,7 @@ class datalynx {
      * @return array of view objects indexed by view id or false if no views are found
      */
     public function get_views(array $exclude = [], bool $forceget = false, string $sort = '') {
-        if (!empty($this->get_view_records($forceget, $sort))) {
+        if (empty($this->get_view_records($forceget, $sort))) {
             return false;
         }
 
@@ -1691,7 +1691,7 @@ class datalynx {
 
         if ($vids) { // Some views are specified for action.
             $views = array();
-            $viewobjs = $this->get_views(false, true);
+            $viewobjs = $this->get_views([], true);
             foreach (explode(',', $vids) as $vid) {
                 if (!empty($viewobjs[$vid])) {
                     $views[$vid] = $viewobjs[$vid];
