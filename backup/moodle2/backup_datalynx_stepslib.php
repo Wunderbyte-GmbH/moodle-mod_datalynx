@@ -187,23 +187,6 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
               LEFT JOIN {datalynx_filters} fil ON " . $DB->sql_cast_char2int('f.param3') . " = fil.id
                   WHERE f.dataid = :dataid
                GROUP BY f.id", array('dataid' => backup::VAR_PARENTID));
-        } else if ($CFG->dbtype == 'pgsql') {
-            $field->set_source_sql(
-                    "SELECT f.*,
-            CASE WHEN f.type = 'datalynxview' THEN MAX(c.fullname) ELSE NULL END AS targetcourse,
-            CASE WHEN f.type = 'datalynxview' THEN MAX(d.name) ELSE NULL END AS targetinstance,
-            CASE WHEN f.type = 'datalynxview' THEN MAX(v.name) ELSE NULL END AS targetview,
-            CASE WHEN f.type = 'datalynxview' THEN MAX(fil.name) ELSE NULL END AS targetfilter
-            FROM {datalynx_fields} f
-            LEFT JOIN {datalynx} d ON f.param1::INTEGER = d.id
-            LEFT JOIN {course_modules} cm ON cm.instance = d.id
-            LEFT JOIN {course} c ON cm.course = c.id
-            LEFT JOIN {datalynx_views} v ON f.param2::INTEGER = v.id
-            LEFT JOIN {datalynx_filters} fil ON f.param3::INTEGER = fil.id
-            WHERE f.dataid = :dataid
-            GROUP BY f.id",
-                    array('dataid' => backup::VAR_PARENTID)
-            );
         } else {
                 $field->set_source_sql(
                         "SELECT f.*
