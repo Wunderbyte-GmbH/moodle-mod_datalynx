@@ -251,10 +251,11 @@ class datalynxview_csv extends datalynxview_base {
     }
 
     /**
+     * @param $range
+     * @return void
      */
-    public function process_export($range = self::EXPORT_PAGE) {
+    public function process_export(string $range = self::EXPORT_PAGE) {
         global $CFG;
-
         require_once($CFG->libdir . '/csvlib.class.php');
         $csvcontent = $this->get_csv_content($range);
         if (!$csvcontent) {
@@ -443,9 +444,6 @@ class datalynxview_csv extends datalynxview_base {
     /**
      * @param $data
      * @return bool|null
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws moodle_exception
      */
     public function execute_import($data) {
         if ($data->eids) {
