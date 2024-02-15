@@ -19,7 +19,7 @@
  *
  * @package   mod _datalynx
  * @category  task
- * @copyright 2023 Thomas Winkler Michael Hughes <michaelhughes@strath.ac.uk>
+ * @copyright 2023 Thomas Winkler <thomas.winkler@wunderbyte.at>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -29,8 +29,8 @@ $tasks = [
     [
         'classname' => 'mod_datalynx\task\cron_trigger',
         'blocking' => 0,
-        'minute' => '*',
-        'hour' => '*',
+        'minute' => '0',
+        'hour' => '1',
         'day' => '*',
         'dayofweek' => '*',
         'month' => '*'

@@ -24,8 +24,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_datalynx';
-$plugin->version = 2024021300;
-$plugin->release = 'v3.5-DataIntelligence'; // Data words like data science, data mining.
+$plugin->version = 2024021500;
+$plugin->release = 'v3.6-DataIntelligence'; // Data words like data science, data mining.
 $plugin->requires = 2022112800;
 $plugin->maturity = MATURITY_STABLE;
 $plugin->dependencies = array(
