@@ -1386,7 +1386,7 @@ class datalynx {
      * @return stdClass
      */
     public function get_view_by_name(string $viewname): ?stdClass {
-        $views = $this->get_view_records();
+        $views = $this->get_view_records(true);
         foreach ($views as $view) {
             if($view->name === $viewname) {
                 return $view;

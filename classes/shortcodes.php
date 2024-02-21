@@ -70,15 +70,14 @@ class shortcodes {
             }
             $dl = new datalynx($cm->instance, $cmid);
             $view = $dl->get_view_by_name($viewname);
-            if (!has_capability('mod/datalynx:viewentry', $dl->context)) {
-                // No right to view datalynx instance. Return empty string.
+            // If view has not been found, the user has no right to view it. Return an empty string instead.
+            if (!has_capability('mod/datalynx:viewentry', $dl->context) || !$view) {
+                // No right to view datalynx instance or view or entry. Return empty string.
                 return '';
             }
-
             $jsurl = new moodle_url('/mod/datalynxcoursepage/js.php', array('id' => $cmid));
             $PAGE->requires->js($jsurl);
             $options = ['tohtml' => true, 'skiplogincheck' => true];
-
             return datalynx::get_content_inline($cm->instance, $view->id, null, $options);
         } else {
             return "You must set arguments view and datalynx. Here is an example: [displayview view=\"My datalynx viewname\" cmid=5]";
