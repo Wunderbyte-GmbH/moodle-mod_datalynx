@@ -21,29 +21,46 @@
  * @copyright 2015 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+use core\event\base;
+use mod_datalynx\datalynx;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(__FILE__) . "/../rule_class.php");
 
+/**
+ * Download files via sftp.
+ */
 class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
 
     public $type = 'ftpsyncfiles';
 
+    /**
+     * @var string
+     */
     protected $sftpserver;
 
+    /**
+     * @var string
+     */
     protected $sftpport;
 
+    /**
+     * @var string
+     */
     protected $sftpusername;
 
+    /**
+     * @var string
+     */
     protected $sftppassword;
 
+    /**
+     * @var string
+     */
     protected $sftppath;
 
-    const USERID = 1;
-
-    const USERNAME = 2;
-
-    const USEREMAIL = 3;
     /**
      * user profile field to use to identify the user.
      *
@@ -67,13 +84,28 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
     /**
      * The datalynx object to use.
      *
-     * @var \mod_datalynx\datalynx
+     * @var datalynx
      */
-    private \mod_datalynx\datalynx $dl;
+    private datalynx $dl;
+    /**
+     * @var ?file_storage
+     */
     private ?file_storage $fs;
+    /**
+     * @var array
+     */
     private array $sftpsetting;
+    /**
+     * @var ?int
+     */
     private ?int $filefieldid;
+    /**
+     * @var array
+     */
     private array $files;
+    /**
+     * @var string
+     */
     private $regex;
 
     /**
@@ -101,11 +133,10 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
 
     /**
      * Based on a triggered event we start downloading files.
-     *
-     * @param \core\event\base $event
+     * @param base $event
+     * @return true
      */
-    public function trigger(\core\event\base $event) {
-
+    public function trigger(base $event) {
         global $CFG, $USER;
         require_once("$CFG->dirroot/mod/datalynx/classes/datalynx.php");
         require_once("$CFG->dirroot/mod/datalynx/field/entryauthor/field_class.php");
@@ -120,7 +151,6 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
         $this->fs = get_file_storage();
         // Download files to $this->files array indexed by draftitemid.
         $this->download_files((int) $did);
-        $context = context_user::instance($USER->id);
 
         if (!empty($this->files)) {
             foreach ($this->files as $draftitemid => $file) {
@@ -130,7 +160,6 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
                 $filename = $file->get_filename();
                 $entryid = -1;
                 $data->eids[$entryid] = $entryid;
-                // TODO: If filename is not userid get userid here.
                 $data->{"field_{$fieldid}_{$entryid}"} = $this->authorid;
                 $data->{"field_{$this->filefieldid}_{$entryid}_filemanager"} = $draftitemid;
                 $data->{"field_{$this->filefieldid}_{$entryid}_alttext"} = "PDF";
@@ -158,34 +187,24 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
         $password = $this->sftppassword;
         $port = $this->sftpport;
         $connection = "sftp://$username:$password@$server:$port$remotedir";
-        $ch = curl_init();
-
-        curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_SFTP);
-        curl_setopt($ch, CURLOPT_URL, $server);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_DIRLISTONLY, 1);
-        curl_setopt($ch, CURLOPT_URL, $connection);
-
+        $ch = $this->init_curl($server, $connection);
+        mtrace ("Executing file download for this datalynx instance: {$this->dl->name()} {$this->dl->get_baseurl()}");
         $result = curl_exec($ch);
-
         if ($result === false) {
-            echo 'cURL error: ' . curl_error($ch);
+            $info = curl_getinfo($ch);
+            mtrace ('cURL error: ' . curl_error($ch) . " Curl error number: " . curl_errno($ch));
+            mtrace(var_export($info, true));
         } else {
             // List of remote files and directories.
             $remotelist = explode("\n", trim($result));
             foreach ($remotelist as $line) {
-                $filename = trim($line);
-                if (!empty($filename) && $filename !== '.' && $filename !== '..') {
+                $filename = rawurlencode(trim($line));
+                if (!empty($filename) && $filename !== rawurlencode('.') && $filename !== rawurlencode('..')) {
                     $remotepath = "$connection/$filename";
                     // Todo: Check filename and get all information.
-                    $filehandle = curl_init();
-
-                    // Set cURL options for file download.
-                    curl_setopt($filehandle, CURLOPT_URL, $remotepath);
-                    curl_setopt($filehandle, CURLOPT_RETURNTRANSFER, 1);
-
+                    curl_setopt($ch, CURLOPT_URL, $remotepath);
                     // Download the file.
-                    $filedata = curl_exec($filehandle);
+                    $filedata = curl_exec($ch);
                     $context = context_user::instance($USER->id);
 
                     if ($filedata !== false) {
@@ -203,13 +222,13 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
                                 ],
                                 $filedata
                         );
-                        echo "Downloaded $filename successfully." . PHP_EOL;
+                        mtrace("Downloaded $filename successfully." . PHP_EOL);
                     } else {
-                        echo "Failed to download $filename." . PHP_EOL;
+                        mtrace("Failed to download $filename." . PHP_EOL);
                     }
-                    curl_close($filehandle);
                 }
             }
+            curl_close($ch);
             foreach ($remotelist as $line) {
                 $filename = trim($line);
                 if (!empty($filename) && $filename !== '.' && $filename !== '..') {
@@ -223,21 +242,57 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
                             curl_setopt($ch, CURLOPT_QUOTE, ["rm \"$filename\""]);
                             $deleteresult = curl_exec($ch);
                             if ($deleteresult === false) {
-                                echo "Failed to delete $filename on the remote server." . PHP_EOL;
-                                var_dump(curl_errno($ch), curl_error($ch));
+                                curl_close($ch);
+                                $ch1 = $this->init_curl($server, $connection);
+                                // Tried to delete files using different char encodings. Now checking if dir is empty:
+                                $response = curl_exec($ch1);
+                                if ($response === false) {
+                                    // cURL request failed.
+                                    mtrace(var_export(curl_errno($ch1), true) . curl_error($ch1) . curl_getinfo($ch1));
+                                } else {
+                                    // cURL request succeeded. Check if the directory is empty.
+                                    if (empty(trim($response, " \n\r\t\v\0\."))) {
+                                        mtrace('All files deleted. The remote directory is now empty.' . PHP_EOL);
+                                    } else {
+                                        mtrace(var_export($response, true));
+                                        mtrace('The remote directory is not empty. 
+                                        There was a problem deleting all files.' . PHP_EOL);
+                                    }
+                                }
+                                curl_close($ch1);
                             } else {
-                                echo "Deleted $filename successfully." . PHP_EOL;
+                                mtrace("Deleted $filename successfully." . PHP_EOL);
                             }
                         } else {
-                            echo "Deleted $filename successfully." . PHP_EOL;
+                            mtrace("Deleted $filename successfully." . PHP_EOL);
                         }
                     } else {
-                        echo "Deleted $filename successfully." . PHP_EOL;
+                        mtrace("Deleted $filename successfully." . PHP_EOL);
                     }
                 }
             }
         }
         curl_close($ch);
+    }
+
+    /**
+     * Initialise curl session with necessary params.
+     *
+     * @param string $server
+     * @param string $connection
+     * @return false|resource
+     */
+    public function init_curl(string $server,string $connection) {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_SFTP);
+        curl_setopt($ch, CURLOPT_URL, $server);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_DIRLISTONLY, 1);
+        curl_setopt($ch, CURLOPT_URL, $connection);
+        curl_setopt($ch, CURLOPT_VERBOSE, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        return $ch;
     }
 
     /**
