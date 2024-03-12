@@ -38,6 +38,7 @@ $string['autocompletion_help'] = 'Aktiviere Autocompletion für den Editier-Modu
 $string['autocompletion_textfield'] = 'Textfeld';
 $string['autocompletion_textfield_help'] = 'Wähle das datalynx-Modul und das Textfeld von dem die Autocompletion-Daten genommen werden sollen.';
 $string['browse'] = 'Durchblättern';
+$string['cachedef_patterns'] = 'Muster (Cache)';
 $string['columns'] = 'Spalten';
 $string['commentadd'] = 'Kommentar hinzufügen';
 $string['commentbynameondate'] = 'von {$a->name} - {$a->date}';
