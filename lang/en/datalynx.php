@@ -39,6 +39,7 @@ $string['autocompletion_help'] = 'Choose whether autocompletion shall be active 
 $string['autocompletion_textfield'] = 'Textfield';
 $string['autocompletion_textfield_help'] = 'Choose datalynx module and textfield to retrieve the autocompletion data of.';
 $string['browse'] = 'Browse';
+$string['cachedef_patterns'] = 'Patterns (Cache)';
 $string['columns'] = 'columns';
 $string['commentadd'] = 'Add comment';
 $string['commentbynameondate'] = 'by {$a->name} - {$a->date}';
