@@ -119,15 +119,12 @@ class datalynx {
     protected $internalgroupmodes = array('separateparticipants' => -1);
 
     /**
-     * datalynx constructor.
+     * datalynx constructor
      *
-     * @param int $d (id of datalynx instance fetchec from db table)
+     * @param int $d (id of datalynx instance fetched from db table)
      * @param int $id (course module id)
-     * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws moodle_exception
      */
-    public function __construct($d = 0, $id = 0) {
+    public function __construct(int $d = 0, int $id = 0) {
         global $DB;
 
         // Initialize from datalynx id or object.
@@ -793,7 +790,7 @@ class datalynx {
         global $CFG;
         require_once($CFG->dirroot . '/mod/datalynx/view/view_class.php');
         $urlparams = new stdClass();
-        $datalynx = new datalynx($datalynxid, null);
+        $datalynx = new datalynx($datalynxid);
         $urlparams->d = $datalynxid;
         $urlparams->view = $viewid;
         $skiplogincheck = $options['skiplogincheck'] ?? false;

@@ -77,10 +77,9 @@ abstract class datalynxfield_base {
     /**
      * Class constructor
      *
+     * TODO: $df should always be an int value.
      * @param number $df datalynx id or class object
      * @param number $field fieldid or fieldobject
-     * @throws coding_exception
-     * @throws moodle_exception
      */
     public function __construct($df = 0, $field = 0) {
         if (empty($df)) {
@@ -88,7 +87,8 @@ abstract class datalynxfield_base {
         } else {
             if ($df instanceof \mod_datalynx\datalynx) {
                 $this->df = $df;
-            } else { // Datalynx id/object.
+            } else {
+                // $df is the datalynx id.
                 $this->df = new mod_datalynx\datalynx($df);
             }
         }

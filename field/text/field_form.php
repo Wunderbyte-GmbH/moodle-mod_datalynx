@@ -62,50 +62,7 @@ class datalynxfield_text_form extends datalynxfield_form {
             // If there are no duplicates the default option for unique is "No" as well, but the user can change it.
             $mform->setDefault('param8', 0);
         }
-
-        // Get all Datalynxs where user has managetemplate capability.
-        // TODO there may be too many.
-        $sql = "SELECT DISTINCT d.*
-                FROM {datalynx} d
-                INNER JOIN {course_modules} cm ON d.id = cm.instance
-                INNER JOIN {modules} m ON m.id = cm.module
-                WHERE m.name = 'datalynx'";
-        if ($CFG->branch >= 32) {
-            $sql .= " AND cm.deletioninprogress = 0";
-        }
-        if ($datalynxs = $DB->get_records_sql($sql)) {
-            foreach ($datalynxs as $dfid => $datalynx) {
-                if ($dfid != $this->_df->id()) {
-                    $df = new mod_datalynx\datalynx($datalynx);
-                    // Remove if user cannot manage.
-                    if (!has_capability('mod/datalynx:managetemplates', $df->context)) {
-                        unset($datalynxs[$dfid]);
-                        continue;
-                    }
-                    $datalynxs[$dfid] = $df;
-                } else {
-                    unset($datalynxs[$dfid]);
-                }
-            }
-        }
-
-        // Autocompletion with content of other textfield from the same or other datalynx instance.
-        //
-        // Select Datalynx instance (to be stored in param9).
-        if ($datalynxs || $this->_df->id() > 0) {
-            $dfmenu = array('' => array(0 => get_string('noautocompletion', 'datalynx')));
-            $dfmenu[''][$this->_df->id()] = get_string('thisdatalynx', 'datalynx') .
-                    " (" . strip_tags(format_string($this->_df->name(), true)) . ")";
-            foreach ($datalynxs as $dfid => $df) {
-                if (!isset($dfmenu[$df->course->shortname])) {
-                    $dfmenu[$df->course->shortname] = array();
-                }
-                $dfmenu[$df->course->shortname][$dfid] = strip_tags(
-                        format_string($df->name(), true));
-            }
-        } else {
-            $dfmenu = array('' => array(0 => get_string('nodatalynxs', 'datalynx')));
-        }
+        $dfmenu = $this->get_datalynx_instances_menu();
         $mform->addElement('selectgroups', 'param9', get_string('autocompletion', 'datalynx'), $dfmenu);
         $mform->addHelpButton('param9', 'autocompletion_textfield', 'datalynx');
 

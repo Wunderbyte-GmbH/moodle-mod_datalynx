@@ -107,7 +107,7 @@ $strdelete = get_string('delete');
 foreach ($datalynxs as $datalynx) {
     $tablerow = array();
 
-    $df = new mod_datalynx\datalynx($datalynx);
+    $df = new mod_datalynx\datalynx($datalynx->id);
 
     if (!has_capability('mod/datalynx:viewindex', $df->context)) {
         continue;

@@ -87,8 +87,57 @@ class datalynxfield_form extends moodleform {
         if ($this->_df->name_exists('fields', $data['name'], $this->_field->id())) {
             $errors['name'] = get_string('invalidname', 'datalynx', get_string('field', 'datalynx'));
         }
-
         return $errors;
+    }
+
+    /**
+     * Return array of select menu entries for chosing a datalynx instance that has a textfield.
+     * It is used to provide choices for other datalynx instances that are interlinked
+     * @return array[]
+     */
+    public function get_datalynx_instances_menu(): array {
+        global $DB;
+        // Get all Datalynxs where user has managetemplate capability.
+        // TODO there may be too many.
+        $sql = "SELECT DISTINCT d.id
+                FROM {datalynx} d
+                INNER JOIN {course_modules} cm ON d.id = cm.instance
+                INNER JOIN {modules} m ON m.id = cm.module
+                LEFT JOIN {datalynx_fields} df ON d.id = df.dataid
+                WHERE m.name = 'datalynx'
+                AND cm.deletioninprogress = 0
+                AND df.type = 'text'";
+
+        $datalynxs = [];
+        if ($dlids = $DB->get_fieldset_sql($sql)) {
+            foreach ($dlids as $dlid) {
+                if ($dlid != $this->_df->id()) {
+                    $dl = new mod_datalynx\datalynx($dlid);
+                    // Only add if user can manage dl templates.
+                    if (has_capability('mod/datalynx:managetemplates', $dl->context)) {
+                        $datalynxs[$dlid] = $dl;
+                    }
+                }
+            }
+        }
+
+        // Autocompletion with content of other textfield from the same or other datalynx instance.
+        // Select Datalynx instance (to be stored in param9).
+        if ($datalynxs || $this->_df->id() > 0) {
+            $dfmenu = array('' => array(0 => get_string('noautocompletion', 'datalynx')));
+            $dfmenu[''][$this->_df->id()] = get_string('thisdatalynx', 'datalynx') .
+                    " (" . strip_tags(format_string($this->_df->name(), true)) . ")";
+            foreach ($datalynxs as $dlid => $dl) {
+                if (!isset($dfmenu[$dl->course->shortname])) {
+                    $dfmenu[$dl->course->shortname] = array();
+                }
+                $dfmenu[$dl->course->shortname][$dlid] = strip_tags(
+                        format_string($dl->name(), true));
+            }
+        } else {
+            $dfmenu = array('' => array(0 => get_string('nodatalynxs', 'datalynx')));
+        }
+        return $dfmenu;
     }
 }
 
@@ -110,7 +159,8 @@ class datalynxfield_option_form extends datalynxfield_form {
     }
 
     /**
-     * Prepare the form to edit the options for a single or multi choice field
+     *  Prepare the form to edit the options for a single or multi choice field*
+     * @return void
      */
     protected function add_option_dialog() {
         $mform = &$this->_form;
@@ -148,6 +198,10 @@ class datalynxfield_option_form extends datalynxfield_form {
     }
 
     /**
+     * Validate form data
+     * @param $data
+     * @param $files
+     * @return array
      */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
