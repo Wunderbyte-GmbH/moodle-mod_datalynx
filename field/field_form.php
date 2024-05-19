@@ -115,7 +115,10 @@ class datalynxfield_form extends moodleform {
                     $dl = new mod_datalynx\datalynx($dlid);
                     // Only add if user can manage dl templates.
                     if (has_capability('mod/datalynx:managetemplates', $dl->context)) {
-                        $datalynxs[$dlid] = $dl;
+                        $dlinfo = new stdClass();
+                        $dlinfo->courseshortname = $dl->course->shortname;
+                        $dlinfo->name = $dl->name();
+                        $datalynxs[$dlid] = $dlinfo;
                     }
                 }
             }
@@ -128,11 +131,11 @@ class datalynxfield_form extends moodleform {
             $dfmenu[''][$this->_df->id()] = get_string('thisdatalynx', 'datalynx') .
                     " (" . strip_tags(format_string($this->_df->name(), true)) . ")";
             foreach ($datalynxs as $dlid => $dl) {
-                if (!isset($dfmenu[$dl->course->shortname])) {
-                    $dfmenu[$dl->course->shortname] = array();
+                if (!isset($dfmenu[$dl->courseshortname])) {
+                    $dfmenu[$dl->courseshortname] = array();
                 }
-                $dfmenu[$dl->course->shortname][$dlid] = strip_tags(
-                        format_string($dl->name(), true));
+                $dfmenu[$dl->courseshortname][$dlid] = strip_tags(
+                        format_string($dl->name, true));
             }
         } else {
             $dfmenu = array('' => array(0 => get_string('nodatalynxs', 'datalynx')));
