@@ -46,13 +46,13 @@ class datalynxfield_datalynxview extends datalynxfield_base {
         parent::__construct($df, $field);
 
         // Get the datalynx.
-        if (empty($this->field->param1) or
-                !$data = $DB->get_record('datalynx', array('id' => $this->field->param1))
+        if (empty($this->field->param1) AND
+                !$DB->record_exists('datalynx', array('id' => $this->field->param1))
         ) {
             return;
         }
 
-        $datalynx = new mod_datalynx\datalynx($data, null);
+        $datalynx = new mod_datalynx\datalynx($this->field->param1);
         // TODO Add capability check on view entries.
 
         // Is there a view? Otherwise return.

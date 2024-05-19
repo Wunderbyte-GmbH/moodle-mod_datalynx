@@ -999,7 +999,7 @@ function datalynx_rating_validate($params) {
 
     require_once(dirname(__FILE__) . "/classes/datalynx.php");
 
-    $df = new mod_datalynx\datalynx(null, $params['context']->instanceid);
+    $df = new mod_datalynx\datalynx(0, $params['context']->instanceid);
 
     // Check the component is mod_datalynx.
     if ($params['component'] != 'mod_datalynx') {
