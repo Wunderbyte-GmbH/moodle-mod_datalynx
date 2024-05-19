@@ -104,9 +104,11 @@ class datalynxfield_form extends moodleform {
                 INNER JOIN {course_modules} cm ON d.id = cm.instance
                 INNER JOIN {modules} m ON m.id = cm.module
                 LEFT JOIN {datalynx_fields} df ON d.id = df.dataid
+                LEFT JOIN {course} c ON c.id = d.course
                 WHERE m.name = 'datalynx'
                 AND cm.deletioninprogress = 0
-                AND df.type = 'text'";
+                AND df.type = 'text'
+                AND c.visible = 1";
 
         $datalynxs = [];
         if ($dlids = $DB->get_fieldset_sql($sql)) {
