@@ -73,7 +73,7 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
         foreach ($menuoptions as $id => $name) {
             $option = new stdClass();
             $option->id = $id;
-            $option->name = $name;
+            $option->name = format_string($name);
             $menuoptions[$id] = $option;
         }
         // Sort the options alphabetically.
@@ -122,22 +122,21 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
                     $str[] = "$isselected $option";
                 }
                 $str = implode(',', $str);
-                return $str;
+                return format_string($str);
             }
 
             if (!empty($options['key'])) {
                 if ($selected) {
-                    return $selected;
+                    return format_string($selected);
                 } else {
                     return '';
                 }
             }
 
             if ($selected && $selected <= count($options)) {
-                return $options[$selected];
+                return format_string($options[$selected]);
             }
         }
-
         return '';
     }
 

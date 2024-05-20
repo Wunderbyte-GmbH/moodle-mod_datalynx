@@ -177,6 +177,7 @@ class datalynxfield_option_form extends datalynxfield_form {
                     get_string('renameoption', 'datalynx') . '</th><th>' .
                     get_string('deleteoption', 'datalynx') . '</th></thead><tbody>');
             foreach ($options as $id => $option) {
+                $option = htmlspecialchars($option);
                 $group[] = &$mform->createElement('static', null, null,
                         "<tr><td>{$option}</td><td>");
                 $group[] = &$mform->createElement('text', "renameoption[{$id}]", '', array('size' => 32));
