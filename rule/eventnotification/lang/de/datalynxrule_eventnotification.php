@@ -23,6 +23,11 @@
  */
 $string['event'] = 'Datalynx Ereignis';
 $string['pluginname'] = 'Ereignisbenachrichtigung';
-$string['triggerspecificevent'] = 'Nur bei markierter Checkbox senden';
+$string['triggerspecificevent'] = 'Nur wenn folgendes Feld eine Bedingung erfüllt senden';
 $string['regex'] = 'Regulärer Ausdruck, der verwendet wird, um die Kennung aus dem Dateinamen zu extrahieren';
 $string['regex_desc'] = 'Wenn leer gelassen, wird es standardmäßig auf /^(\d+)_/ gesetzt.';
+$string['messagecontent'] = 'Felder deren Inhalt in der Nachricht inkludiert wird';
+$string['condition'] = 'Der Wert, den das ausgewählte Feld haben muss';
+$string['condition_help'] = 'Der Wert, den das ausgewählte Feld erfüllen muss, um die Bedingung zu erfüllen.
+Bei Checkboxen müssen die ausgewählten Zeilen eingegeben werden, getrennt durch einen Beistrich: Für erste Zeile und dritte Zeile: 1,3
+Bei Optionsfeldern: 1 für die erste Auswahl, 2 für die zweite.';

@@ -68,6 +68,7 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
 
         $mform->addGroup($grp, 'recipientgrp', get_string('to'), $br, false);
 
+        // Link settings.
         $mform->addElement('header', 'settingshdr', get_string('linksettings', 'datalynx'));
         $mform->addElement('static', '', get_string('targetviewforroles', 'datalynx'));
 
@@ -80,7 +81,21 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
                         get_string('noviewsavailable', 'datalynx'));
             }
         }
-    }
+
+        // Content to be included.
+        $mform->addElement('header', 'message', get_string('messagecontent', 'datalynxrule_eventnotification'));
+        $dlfields = $this->_df->get_fields();
+        $fieldmenu = array();
+        foreach ($dlfields as $fieldid => $field) {
+            if ($field->type == 'text' || $field->type == 'editor') {
+                $fieldmenu[$fieldid] = $field->field->name;
+            }
+        }
+        $options = array(
+                'multiple' => true,
+                'noselectionstring' => get_string('noselection', 'form'),
+        );
+        $mform->addElement('autocomplete', 'param7', get_string('searcharea', 'search'), $fieldmenu, $options);    }
 
     /**
      * Get all users in moodle instance for autocomplete list.
@@ -88,7 +103,7 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
      * @return array with userid -> firstname lastname.
      * @throws coding_exception
      */
-    public function get_allusers() {
+    public function get_allusers(): array {
         global $DB;
         $tempusers = $DB->get_records('user', array(), '', $fields = 'id, firstname, lastname');
 
@@ -118,7 +133,13 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
         }
     }
 
-    private function get_views_visible_to_datalynx_permission($permissionid) {
+    /**
+     * Get the visible to permissions for a view.
+     *
+     * @param int $permissionid
+     * @return array
+     */
+    private function get_views_visible_to_datalynx_permission(int $permissionid): array {
         global $DB;
         if ($permissionid == mod_datalynx\datalynx::PERMISSION_ADMIN) {
             $sql = "SELECT id, name FROM {datalynx_views} WHERE dataid = :dataid";
@@ -139,7 +160,10 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
         return $DB->get_records_sql_menu($sql, $params);
     }
 
-    protected function menu_roles_used_in_context() {
+    /**
+     * @return array
+     */
+    protected function menu_roles_used_in_context(): array {
         $roles = array();
         foreach (get_roles_used_in_context($this->_df->context) as $roleid => $role) {
             $roles[$roleid] = $role->coursealias ? $role->coursealias : ($role->name ? $role->name : $role->shortname);
@@ -163,6 +187,7 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
         }
 
         $data->param4 = unserialize($data->param4);
+        $data->param7 = json_decode($data->param7);
         parent::set_data($data);
     }
 
@@ -186,6 +211,7 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
             }
             $data->param3 = serialize($recipients);
             $data->param4 = serialize($data->param4);
+            $data->param7 = json_encode($data->param7);
         }
         return $data;
     }

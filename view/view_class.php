@@ -540,7 +540,6 @@ abstract class datalynxview_base {
             }
             $this->_editentries = '';
         }
-
         return $processed;
     }
 
@@ -1669,7 +1668,7 @@ abstract class datalynxview_base {
      * @param $action String of the action
      * @return bool true, if the action is allowed; false otherwise.
      */
-    private function confirm_view_action($action) {
+    private function confirm_view_action($action): bool {
         global $DB;
         $targetview = optional_param('view', 0, PARAM_INT);
         $view = $DB->get_record('datalynx_views', array('id' => $targetview));

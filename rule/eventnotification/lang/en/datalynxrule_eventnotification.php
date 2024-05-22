@@ -25,4 +25,9 @@
 $string['event'] = 'Datalynx event';
 $string['pluginname'] = 'Event notification';
 $string['privacy:metadata'] = 'Even notifications do not store personal data.';
-$string['triggerspecificevent'] = 'Trigger only on specific checkbox';
+$string['triggerspecificevent'] = 'Trigger only if the selected field meets a condition';
+$string['messagecontent'] = 'Field content that is included in the message';
+$string['condition'] = 'The value the selected field has to have';
+$string['condition_help'] = 'The value the selected field has to meet in order to be true.
+For checkboxes the selected rows have to be entered in comma separated way: First row and third row will be: 1,3
+For radio buttons, 1 for the first choice, 2 for the second.';

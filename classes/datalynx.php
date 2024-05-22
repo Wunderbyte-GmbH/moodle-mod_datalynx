@@ -934,10 +934,10 @@ class datalynx {
      *
      * @param string $type
      * @param string $menu
-     * @return NULL[]|datalynxfield_base[]
+     * @return datalynxfield_base[]
      */
-    public function get_fields_by_type($type, $menu = false) {
-        $typefields = array();
+    public function get_fields_by_type($type, $menu = false): array {
+        $typefields = [];
         foreach ($this->get_fields() as $fieldid => $field) {
             if ($field->type() === $type) {
                 if ($menu) {
@@ -1412,10 +1412,9 @@ class datalynx {
      * permission to access a particular datalynx view.
      *
      * @param stdClass $view datalynx_views entry
-     * @return boolean true if user can see the view, false otherwise
-     * @throws \coding_exception
+     * @return bool true if user can see the view, false otherwise
      */
-    public function is_visible_to_user($view) {
+    public function is_visible_to_user($view): bool {
         $isadmin = has_capability('mod/datalynx:viewprivilegeadmin', $this->context, null, true);
         $mask = has_capability('mod/datalynx:viewprivilegemanager', $this->context, null, false) ? 1 : 0;
         $mask |= has_capability('mod/datalynx:viewprivilegeteacher', $this->context, null, false) ? 2 : 0;

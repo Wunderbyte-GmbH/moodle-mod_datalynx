@@ -97,18 +97,26 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
         if ($this->rule->param5) {
 
             // If so, test for conditions and stop sending if not met.
-            $entryid = $entryid = $event->get_data()['objectid'];
+            $entryid = $event->get_data()['objectid'];
             $fieldid = $this->rule->param5;
             $content = $DB->get_record('datalynx_contents', array('fieldid' => $fieldid, 'entryid' => $entryid));
 
             if (!$content) {
                 return false;
             }
-            // We assume the checkbox has only one option.
-            if ($content->content != '#1#') {
+            // For now only checkbox and radiobutton are supported.
+            $field = $this->df()->get_field_from_id($fieldid);
+            if ($field->type === 'radiobutton') {
+                $compare = $content->content;
+                $condition = $this->rule->param10;
+            }
+            if ($field->type === 'checkbox') {
+                $compare = explode('#,#', trim($content->content, '#'));
+                $condition = explode(',', $this->rule->param10);
+            }
+            if (isset($compare) && isset($condition) && ($compare !== $condition)) {
                 return false;
             }
-
         }
 
         $df = $this->df;
@@ -180,6 +188,16 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
                     if ($df->data->defaultview) {
                         $viewurlparams['view'] = $df->data->defaultview;
                     }
+                }
+            }
+
+            // Include defined field contents in the message.
+            $messagedfields = json_decode($this->rule->param7);
+            $messagedata->messagecontent = '';
+            if(!empty($messagedfields)) {
+                foreach ($messagedfields AS $fieldid) {
+                    $entrydata = $DB->get_record('datalynx_contents', array('fieldid' => $fieldid, 'entryid' => $entryid));
+                    $messagedata->messagecontent .= format_text($entrydata->content);
                 }
             }
 

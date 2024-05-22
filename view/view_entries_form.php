@@ -27,7 +27,6 @@ require_once($CFG->libdir . '/formslib.php');
 class datalynxview_entries_form extends moodleform {
 
     protected function definition() {
-        global $USER, $OUTPUT;
         $view = $this->_customdata['view'];
         $mform = &$this->_form;
         $mform->addElement('hidden', 'new', optional_param('new', 0, PARAM_INT));
@@ -43,6 +42,7 @@ class datalynxview_entries_form extends moodleform {
 
     /**
      * Add action buttons that delegate functions to allow multiple buttons on one form.
+     * @return void
      */
     public function add_delegate_action_buttons() {
         $mform =& $this->_form;

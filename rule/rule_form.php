@@ -99,12 +99,20 @@ class datalynx_rule_form extends moodleform {
                 '<br />', false);
 
         // If we have selected entry updated, add a new UI when the instance includes a checkbox.
-        if($checkboxes = $this->_df->get_fields_by_type('checkbox', true)) {
-            $checkboxes = array('0' => get_string('noselection', 'datalynx')) + $checkboxes;
-            $mform->addElement('select', 'param5', get_string('triggerspecificevent', 'datalynxrule_eventnotification'), $checkboxes);
+        $checkboxes = $this->_df->get_fields_by_type('checkbox', true);
+        $radiobuttons = $this->_df->get_fields_by_type('radiobutton', true);
+        $choices = $radiobuttons + $checkboxes;
+        if(!empty($choices)) {
+            $choices = array('0' => get_string('noselection', 'datalynx')) + $choices;
+            $mform->addElement('select', 'param5',
+                    get_string('triggerspecificevent', 'datalynxrule_eventnotification'), $choices);
+            $attributes=array('size'=>'5');
+            $mform->addElement('text', 'param10',
+                    get_string('condition', 'datalynxrule_eventnotification'), $attributes);
+            $mform->addHelpButton('param10', 'condition', 'datalynxrule_eventnotification');
+            $mform->disabledIf('param10', 'param5', 'eq', 0);
         }
         $this->rule_definition();
-
         // Buttons.
         $this->add_action_buttons();
     }

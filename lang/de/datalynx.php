@@ -724,13 +724,17 @@ $string['message_entry_created'] = 'Guten Tag {$a->fullname},
 
 der Inhalt von {$a->datalynxlink} wurde von {$a->senderprofilelink} bearbeitet.
 
-Der folgende Eintrag wurde hinzugefügt: {$a->viewlink}.';
+Der folgende Eintrag wurde hinzugefügt: {$a->viewlink}.
+
+{$a->messagecontent}';
 
 $string['message_entry_updated'] = 'Guten Tag {$a->fullname},
 
 der Inhalt von {$a->datalynxlink} wurde von {$a->senderprofilelink} bearbeitet.
 
-Der folgende Eintrag wurde aktualisiert: {$a->viewlink}.';
+Der folgende Eintrag wurde aktualisiert: {$a->viewlink}.
+
+{$a->messagecontent}';
 
 $string['message_entry_deleted'] = 'Guten Tag {$a->fullname},
 

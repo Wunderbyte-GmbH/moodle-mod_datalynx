@@ -767,13 +767,17 @@ $string['message_entry_created'] = 'Hello {$a->fullname},
 
 the content in {$a->datalynxlink} has been modified by {$a->senderprofilelink}.
 
-The following entry has been created: {$a->viewlink}.';
+The following entry has been created: {$a->viewlink}.
+
+{$a->messagecontent}';
 
 $string['message_entry_updated'] = 'Hello {$a->fullname},
 
 the content in {$a->datalynxlink} has been modified by {$a->senderprofilelink}.
 
-The following entry has been updated: {$a->viewlink}.';
+The following entry has been updated: {$a->viewlink}.
+
+{$a->messagecontent}';
 
 $string['message_entry_deleted'] = 'Hello {$a->fullname},
 
