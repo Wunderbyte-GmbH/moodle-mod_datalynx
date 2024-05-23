@@ -154,6 +154,7 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
         $elements = array();
         $elements[] = $mform->createElement('autocomplete', $fieldname, null, $menu, $options);
         $mform->setType($fieldname, PARAM_INT);
+        $value = json_decode($value);
         $mform->setDefault($fieldname, $value);
         $mform->disabledIf($fieldname, "searchoperator{$i}", 'eq', '');
         return array($elements, null);

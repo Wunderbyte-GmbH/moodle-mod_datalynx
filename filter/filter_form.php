@@ -140,6 +140,9 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
                         foreach ($searchoptions as $searchoption) {
                             if ($searchoption) {
                                 list($not, $operator, $value) = $searchoption;
+                                if (is_array($value)) {
+                                    $value = json_encode($value);
+                                }
                             } else {
                                 list($not, $operator, $value) = array('', '', '');
                             }
