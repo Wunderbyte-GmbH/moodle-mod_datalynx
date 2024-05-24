@@ -87,7 +87,7 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
         $dlfields = $this->_df->get_fields();
         $fieldmenu = array();
         foreach ($dlfields as $fieldid => $field) {
-            if ($field->type == 'text' || $field->type == 'editor') {
+            if ($field->type == 'text' || $field->type == 'editor' || $field->type == 'textarea') {
                 $fieldmenu[$fieldid] = $field->field->name;
             }
         }
