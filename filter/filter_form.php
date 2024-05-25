@@ -181,6 +181,10 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
                         $operatoroptions);
                 $mform->setDefault('searchoperator' . $count, $operator);
                 // Field search elements.
+                // For select options $value is an arry, we have to convert it to string, function param only accepts strings.
+                if (is_array($value)) {
+                    $value = json_encode($value);
+                }
                 list($elems, $separators) = $fields[$fieldid]->renderer()->render_search_mode(
                         $mform, $count, $value);
 
