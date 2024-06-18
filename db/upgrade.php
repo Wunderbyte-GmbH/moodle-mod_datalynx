@@ -1021,11 +1021,11 @@ function xmldb_datalynx_upgrade($oldversion) {
         // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2023101202, 'datalynx');
     }
-    if ($oldversion < 2024061401) {
+    if ($oldversion < 2024061402) {
         // Get all fieldids of type teammemberselect.
 
         $sql = "UPDATE {datalynx_rules} mdr
-SET param7 = json_build_array(mdf.id)::text
+SET param7 = json_build_array(CAST(mdf.id AS text))::text
 FROM {datalynx_fields} mdf
 WHERE mdr.dataid = mdf.dataid
   AND mdr.type = 'eventnotification'
@@ -1033,7 +1033,7 @@ WHERE mdr.dataid = mdf.dataid
   AND mdf.name = 'Kommentar'";
         $DB->execute($sql);
         // Datalynx savepoint reached.
-        upgrade_mod_savepoint(true, 2024061401, 'datalynx');
+        upgrade_mod_savepoint(true, 2024061402, 'datalynx');
     }
     return true;
 }
