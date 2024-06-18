@@ -343,6 +343,16 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         if ($data->param5 && $data->type == 'eventnotification') {
             $data->param5 = $this->get_mappingid('datalynx_field', $data->param5);
         }
+        
+        // Update the text comment reference to be sent with the notification.
+        $param7 = json_decode($data->param7);
+        if (!empty($param7) && $data->type == 'eventnotification') {
+            $newparam = [];
+            foreach ($param7 as $paramid) {
+                $newparam[] = $this->get_mappingid('datalynx_field', $paramid);
+            }
+            $data->param7 = json_encode($newparam);
+        }
 
         // Insert the datalynx_rules record.
         $newitemid = $DB->insert_record('datalynx_rules', $data);
