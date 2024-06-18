@@ -17,17 +17,10 @@
 /**
  *
  * @package mod_datalynx
- * @copyright 2015 onwards David Bogner
+ * @copyright 2013 onwards edulabs.org and associated programmers
+ * @copyright based on the work by 2012 Itamar Tzadok
+ * @copyright 2016 onwards edulabs.org
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->component = 'mod_datalynx';
-$plugin->version = 2024041800;
-$plugin->release = 'v3.9-DataIntelligence'; // Data words like data science, data mining.
-$plugin->requires = 2022112800;
-$plugin->maturity = MATURITY_STABLE;
-$plugin->dependencies = array(
-    'assignfeedback_editpdf' => ANY_VERSION // We use fpdi from this core module.
-);
+require_once("../../config.php");
+echo var_export($CFG);
