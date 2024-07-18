@@ -45,17 +45,17 @@ $fields = $DB->get_fieldset_select('datalynx_fields', 'name', 'dataid = :dataid'
         ['dataid' => $urlparams->d]);
 $options['renderers'] = [];
 $commonrenderers = $DB->get_records_select_menu('datalynx_renderers', 'dataid = :dataid',
-        ['dataid' => $urlparams->d], 'value ASC', 'name AS value, name AS label');
+        array('dataid' => $urlparams->d), 'value ASC', 'name AS value, name AS label');
 foreach ($fields as $field) {
     $options['renderers'][$field] = $commonrenderers; // TODO: add field-specific renderers here.
     $options['renderers'][$field][''] = get_string('defaultrenderer', 'datalynx');
 }
 $options['types'] = $DB->get_records_select_menu('datalynx_fields', 'dataid = :dataid',
-        ['dataid' => $urlparams->d], 'name ASC', 'name, type');
+        array('dataid' => $urlparams->d), 'name ASC', 'name, type');
 
-$module = ['name' => 'mod_datalynx', 'fullpath' => '/mod/datalynx/datalynx.js',
-        'requires' => ['moodle-core-notification-dialogue']
-];
+$module = array('name' => 'mod_datalynx', 'fullpath' => '/mod/datalynx/datalynx.js',
+        'requires' => array('moodle-core-notification-dialogue')
+);
 
 $PAGE->requires->js_init_call('M.mod_datalynx.tag_manager.init', $options, true, $module);
 $PAGE->requires->string_for_js('behavior', 'datalynx');
@@ -67,7 +67,7 @@ $PAGE->requires->string_for_js('deletetag', 'datalynx');
 $PAGE->requires->string_for_js('action', 'datalynx');
 $PAGE->requires->string_for_js('field', 'datalynx');
 
-$dl->set_page('view/view_edit', ['modjs' => true, 'urlparams' => $urlparams]);
+$dl->set_page('view/view_edit', array('modjs' => true, 'urlparams' => $urlparams));
 
 require_sesskey();
 require_capability('mod/datalynx:managetemplates', $dl->context);
@@ -168,7 +168,7 @@ $mform->set_data($view->to_form());
 
 // ToDo: Ugly hack for forcing atto as the only editor available even if user chose another editor.
 $texteditors = $CFG->texteditors;
-$CFG->texteditors = 'atto,textarea';
+$CFG->texteditors = 'tiny';
 $mform->display();
 $CFG->texteditors = $texteditors;
 

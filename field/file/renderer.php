@@ -185,6 +185,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
 
         // Embed PDF if it's a PDF file and no specific pattern was requested
         if ($mimetype === 'application/pdf') {
+            // PDF document.
             $moodleurl = moodle_url::make_file_url($pluginfileurl, "$path/$filename");
             return $this->embed_pdf($moodleurl->out(), $fieldname);
         }
