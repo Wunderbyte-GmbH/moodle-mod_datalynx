@@ -24,292 +24,258 @@
  */
 
 
-define(
-    ['jquery'], function($) {
+define([], () => {
+    /**
+     * @constructor
+     * @alias module:mod_datalynx/zoomable
+     */
+    class Zoomable {
+        constructor() {
+            this.instances = [];
+            this.effects = {};
+        }
 
-        /**
-         * @constructor
-         * @alias module:mod_datalynx/zoomable
-         */
-        var Zoomable = function(){};
-
-        var instance = new Zoomable();
-
-        instance.init = function() {
-
-        $.tools = $.tools || {
-            version: '@VERSION'
-        };
-        $.tools.overlay = {
-            addEffect: function(name, loadFn, closeFn) {
-                effects[name] = [loadFn, closeFn];
-            },
-            conf: {
-                close: null,
-                closeOnClick: true,
-                closeOnEsc: true,
-                closeSpeed: 'fast',
-                effect: 'default',
-                fixed: !/msie/.test(navigator.userAgent.toLowerCase()) || navigator.appVersion > 6,
-                left: 'center',
-                load: false,
-                mask: null,
-                oneInstance: true,
-                speed: 'normal',
-                target: null,
-                top: '10%'
+        init() {
+            if (!window.tools) {
+                window.tools = { version: '@VERSION' };
             }
-        };
-        var instances = [],
-            effects = {};
-        $.tools.overlay.addEffect('default', function(pos, onLoad) {
-            var conf = this.getConf(),
-                w = $(window);
-            if (!conf.fixed) {
-                pos.top += w.scrollTop();
-                pos.left += w.scrollLeft();
-            }
-            pos.position = conf.fixed ? 'fixed' : 'absolute';
-            this.getOverlay().css(pos).fadeIn(conf.speed, onLoad);
-        }, function(onClose) {
-            this.getOverlay().fadeOut(this.getConf().closeSpeed, onClose);
-        });
 
-            /**
-             * The overlay function.
-             * @param {HTMLElement} trigger
-             * @param {function} conf
-             * @constructor
-             */
-        function Overlay(trigger, conf) {
-            var self = this,
-                fire = trigger.add(self),
-                w = $(window),
-                closers, overlay, opened, maskConf = $.tools.expose && (conf.mask || conf.expose),
-                uid = Math.random().toString().slice(10);
-            if (maskConf) {
-                if (typeof maskConf == 'string') {
-                    maskConf = {
-                        color: maskConf
-                    };
+            window.tools.overlay = {
+                addEffect: (name, loadFn, closeFn) => {
+                    this.effects[name] = [loadFn, closeFn];
+                },
+                conf: {
+                    close: null,
+                    closeOnClick: true,
+                    closeOnEsc: true,
+                    closeSpeed: 'fast',
+                    effect: 'default',
+                    fixed: !/msie/.test(navigator.userAgent.toLowerCase()) || navigator.appVersion > 6,
+                    left: 'center',
+                    load: false,
+                    mask: null,
+                    oneInstance: true,
+                    speed: 'normal',
+                    target: null,
+                    top: '10%',
+                },
+            };
+
+            window.tools.overlay.addEffect('default', function (pos, onLoad) {
+                const conf = this.getConf();
+                const scrollTop = window.scrollY || document.documentElement.scrollTop;
+                const scrollLeft = window.scrollX || document.documentElement.scrollLeft;
+
+                if (!conf.fixed) {
+                    pos.top += scrollTop;
+                    pos.left += scrollLeft;
                 }
-                maskConf.closeOnClick = maskConf.closeOnEsc = false;
+                pos.position = conf.fixed ? 'fixed' : 'absolute';
+                this.getOverlay().style.position = pos.position;
+                this.getOverlay().style.top = `${pos.top}px`;
+                this.getOverlay().style.left = `${pos.left}px`;
+                this.getOverlay().style.display = 'block';
+                setTimeout(onLoad, conf.speed === 'fast' ? 200 : 400); // Mocking fade-in timing
+            }, function (onClose) {
+                const overlay = this.getOverlay();
+                overlay.style.display = 'none';
+                setTimeout(onClose, this.getConf().closeSpeed === 'fast' ? 200 : 400); // Mocking fade-out timing
+            });
+        }
+
+        Overlay(trigger, conf) {
+            const self = this;
+            const fireEvent = (type, detail) => {
+                trigger.dispatchEvent(new CustomEvent(type, { detail }));
+            };
+
+            let overlay = conf.target || document.querySelector(trigger.getAttribute("rel")) || trigger;
+            let opened = false;
+
+            if (!overlay) {
+                throw new Error(`Could not find Overlay: ${conf.target || trigger.getAttribute('rel')}`);
             }
-            var jq = conf.target || trigger.attr("rel");
-            overlay = jq ? $(jq) : null || trigger;
-            if (!overlay.length) {
-                throw "Could not find Overlay: " + jq;
-            }
-            if (trigger && trigger.index(overlay) == -1) {
-                trigger.click(function(e) {
-                    self.load(e);
-                    return e.preventDefault();
-                });
-            }
-            $.extend(self, {
-                load: function(e) {
+
+            trigger.addEventListener('click', (e) => {
+                e.preventDefault();
+                self.load(e);
+            });
+
+            Object.assign(self, {
+                load(e = new Event('load')) {
                     if (self.isOpened()) {
                         return self;
                     }
-                    var eff = effects[conf.effect];
+                    const eff = this.effects[conf.effect];
                     if (!eff) {
-                        throw "Overlay: cannot find effect : \"" + conf.effect + "\"";
+                        throw new Error(`Overlay: cannot find effect: "${conf.effect}"`);
                     }
                     if (conf.oneInstance) {
-                        $.each(instances, function() {
-                            this.close(e);
+                        this.instances.forEach((instance) => {
+                            instance.close(e);
                         });
                     }
-                    e = e || $.Event();
-                    e.type = "onBeforeLoad";
-                    fire.trigger(e);
-                    if (e.isDefaultPrevented()) {
+
+                    fireEvent('onBeforeLoad', e);
+                    if (e.defaultPrevented) {
                         return self;
                     }
+
                     opened = true;
-                    if (maskConf) {
-                        $(overlay).expose(maskConf);
-                    }
-                    var top = conf.top,
-                        left = conf.left,
-                        oWidth = overlay.outerWidth(true),
-                        oHeight = overlay.outerHeight(true);
-                    if (typeof top == 'string') {
-                        top = top == 'center' ? Math.max((w.height() - oHeight) / 2, 0) : parseInt(top, 10) / 100 * w.height();
-                    }
-                    if (left == 'center') {
-                        left = Math.max((w.width() - oWidth) / 2, 0);
-                    }
-                    eff[0].call(self, {
-                        top: top,
-                        left: left
-                    }, function() {
+
+                    const windowHeight = window.innerHeight;
+                    const windowWidth = window.innerWidth;
+                    const overlayRect = overlay.getBoundingClientRect();
+                    let top = conf.top === 'center' ?
+                        Math.max((windowHeight - overlayRect.height) / 2, 0) : parseInt(conf.top, 10);
+                    let left = conf.left === 'center' ?
+                        Math.max((windowWidth - overlayRect.width) / 2, 0) : parseInt(conf.left, 10);
+
+                    eff[0].call(self, { top, left }, () => {
                         if (opened) {
-                            e.type = "onLoad";
-                            fire.trigger(e);
+                            fireEvent('onLoad', e);
                         }
                     });
-                    if (maskConf && conf.closeOnClick) {
-                        $.mask.getMask().one("click", self.close);
-                    }
+
                     if (conf.closeOnClick) {
-                        $(document).on("click." + uid, function(e) {
-                            if (!$(e.target).parents(overlay).length) {
-                                self.close(e);
+                        document.addEventListener('click', (ev) => {
+                            if (!overlay.contains(ev.target)) {
+                                self.close(ev);
                             }
                         });
                     }
+
                     if (conf.closeOnEsc) {
-                        $(document).on("keydown." + uid, function(e) {
-                            if (e.keyCode == 27) {
-                                self.close(e);
+                        document.addEventListener('keydown', (ev) => {
+                            if (ev.key === 'Escape') {
+                                self.close(ev);
                             }
                         });
                     }
+
                     return self;
                 },
-                close: function(e) {
+
+                close(e = new Event('close')) {
                     if (!self.isOpened()) {
                         return self;
                     }
-                    e = e || $.Event();
-                    e.type = "onBeforeClose";
-                    fire.trigger(e);
-                    if (e.isDefaultPrevented()) {
+
+                    fireEvent('onBeforeClose', e);
+                    if (e.defaultPrevented) {
                         return;
                     }
+
                     opened = false;
-                    effects[conf.effect][1].call(self, function() {
-                        e.type = "onClose";
-                        fire.trigger(e);
+                    this.effects[conf.effect][1].call(self, () => {
+                        fireEvent('onClose', e);
                     });
-                    $(document).off("click." + uid + " keydown." + uid);
-                    if (maskConf) {
-                        $.mask.close();
-                    }
+
                     return self;
                 },
-                getOverlay: function() {
+
+                getOverlay() {
                     return overlay;
                 },
-                getTrigger: function() {
-                    return trigger;
-                },
-                getClosers: function() {
-                    return closers;
-                },
-                isOpened: function() {
+
+                isOpened() {
                     return opened;
                 },
-                getConf: function() {
+
+                getConf() {
                     return conf;
                 }
             });
-            $.each("onBeforeLoad,onStart,onLoad,onBeforeClose,onClose".split(","), function(i, name) {
-                if ($.isFunction(conf[name])) {
-                    $(self).on(name, conf[name]);
-                }
-                self[name] = function(fn) {
-                    if (fn) {
-                        $(self).on(name, fn);
-                    }
-                    return self;
-                };
+
+            const closers = overlay.querySelectorAll(conf.close || '.close');
+            closers.forEach((closer) => {
+                closer.addEventListener('click', (e) => {
+                    self.close(e);
+                });
             });
-            closers = overlay.find(conf.close || ".close");
-            if (!closers.length && !conf.close) {
-                closers = $('<a class="close"></a>');
-                overlay.prepend(closers);
-            }
-            closers.click(function(e) {
-                self.close(e);
-            });
+
             if (conf.load) {
                 self.load();
             }
         }
-        $.fn.overlay = function(conf) {
-            var el = this.data("overlay");
-            if (el) {
-                return el;
-            }
-            if ($.isFunction(conf)) {
-                conf = {
-                    onBeforeLoad: conf
-                };
-            }
-            conf = $.extend(true, {}, $.tools.overlay.conf, conf);
-            this.each(function() {
-                el = new Overlay($(this), conf);
-                instances.push(el);
-                $(this).data("overlay", el);
-            });
-            return conf.api ? el : this;
-        };
 
-        var divname = "",
-            index = 0;
-        $(function() {
-            $('img.zoomable').attr('title', "Zum Vergrößern klicken");
-            $(document).on('click', 'img.zoomable', function() {
-                var $this = $(this);
-                if ($this.attr('rel')) {
-                    $this.removeData("overlay");
-                    $($this.attr('rel')).remove();
-                    $this.removeAttr("rel");
+        static writeNewOverlay(trigger) {
+            let divname = `zoomable${Zoomable.index}`;
+            Zoomable.index += 1;
+
+            const img = document.createElement('img');
+            img.src = trigger.src;
+
+            img.onload = function () {
+                let { width, height } = img;
+                const windowHeight = window.innerHeight - 60;
+                const windowWidth = window.innerWidth - 60;
+
+                if (height > windowHeight) {
+                    width = Math.round(windowHeight * width / height);
+                    height = windowHeight;
                 }
-                writenewoverlay($this);
-            });
-            $(window).resize(function() {
-                $("[rel]").each(function() {
-                    var $this = $(this),
-                        api = $this.data("overlay");
-                    if (api != undefined) {
-                        if (api.isOpened()) {
-                            $this.removeData("overlay");
-                            $($this.attr('rel')).remove();
-                            $this.removeAttr("rel");
-                            writenewoverlay($this);
-                        }
-                    }
-                });
-            });
 
-            /**
-             * Write the overlay.
-             * @param {HTMLElement} trigger
-             */
-            function writenewoverlay(trigger) {
-                divname = 'zoomable' + index;
-                index = index + 1;
-                $("<img/>").attr("src", trigger.attr("src")).on('load', function() {
-                    var height = this.height,
-                        width = this.width;
-                    if (height > $(window).height() - 60) {
-                        var heightbefore = height;
-                        height = $(window).height() - 60;
-                        width = Math.round(height * width / heightbefore);
-                    }
-                    if (width > $(window).width() - 60) {
-                        var widthbefore = width;
-                        width = $(window).width() - 60;
-                        height = Math.round(width * height / widthbefore);
-                    }
-                    $('body').append('<div id="' + divname +
-                        '" class="m3e-overlay"><div class="close m3e-closebutton"></div><img src="' +
-                        trigger.attr('src') + '" width="' + width + '" height="' + height + '" class="close" /></div>');
-                    trigger.attr('rel', '#' + divname);
-                    trigger.overlay({
-                        load: true,
-                        top: "center"
-                    });
-                });
-            }
-        });
-    };
+                if (width > windowWidth) {
+                    height = Math.round(windowWidth * height / width);
+                    width = windowWidth;
+                }
 
-    return instance;
+                const overlayDiv = document.createElement('div');
+                overlayDiv.id = divname;
+                overlayDiv.className = 'm3e-overlay';
 
+                const closeButton = document.createElement('div');
+                closeButton.className = 'close m3e-closebutton';
+                overlayDiv.appendChild(closeButton);
+
+                const imgElement = document.createElement('img');
+                imgElement.src = trigger.src;
+                imgElement.width = width;
+                imgElement.height = height;
+                imgElement.className = 'close';
+                overlayDiv.appendChild(imgElement);
+
+                document.body.appendChild(overlayDiv);
+
+                trigger.setAttribute('rel', `#${divname}`);
+                new Zoomable().Overlay(trigger, { load: true, top: 'center' });
+            };
+        }
     }
-);
 
+    Zoomable.index = 0;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const zoomableImages = document.querySelectorAll('img.zoomable');
+        zoomableImages.forEach((img) => {
+            img.setAttribute('title', 'Zum Vergrößern klicken');
+            img.addEventListener('click', () => {
+                if (img.getAttribute('rel')) {
+                    const overlay = document.querySelector(img.getAttribute('rel'));
+                    if (overlay) {
+                        img.removeAttribute('rel');
+                        overlay.remove();
+                    }
+                }
+                Zoomable.writeNewOverlay(img);
+            });
+        });
+
+        window.addEventListener('resize', () => {
+            document.querySelectorAll('[rel]').forEach((el) => {
+                const api = el.dataset.overlay;
+                if (api && api.isOpened()) {
+                    const overlay = document.querySelector(el.getAttribute('rel'));
+                    if (overlay) {
+                        el.removeAttribute('rel');
+                        overlay.remove();
+                        Zoomable.writeNewOverlay(el);
+                    }
+                }
+            });
+        });
+    });
+
+    return new Zoomable();
+});

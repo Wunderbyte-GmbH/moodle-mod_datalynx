@@ -1,80 +1,90 @@
-define(['jquery'], function($) {
+export default {
+    init(options) {
+        // Destructure the options object for easier access
+        const { dffield, viewfield, textfieldfield, acturl: actionurl, presentdlid, thisfieldstring, update, fieldtype } = options;
 
-    return {
-        init: function(options) {
-            // Get field name from options.
-            var dffield = options.dffield;
-            var viewfield = options.viewfield;
-            var textfieldfield = options.textfieldfield;
-            var actionurl = options.acturl;
-            var presentdlid = options.presentdlid;
-            var thisfieldstring = options.thisfieldstring;
-            var update = options.update;
-            var fieldtype = options.fieldtype;
+        // Read courseid and call ajax at change to receive all groups in course.
+        const dffieldElement = document.getElementById(`id_${dffield}`);
+        const viewElement = document.getElementById(`id_${viewfield}`);
+        const textfieldElement = document.getElementById(`id_${textfieldfield}`);
 
-            // Read courseid and call ajax at change to receive all groups in course.
-            $("#id_"+dffield).on( "change", function () {
-                var view = $( "#id_"+viewfield ); // Get view select.
-                var textfield = $( "#id_"+textfieldfield ); // Get textfield select.
-                var dfid = $(this).val(); // Get the datalynx id.
+        if (dffieldElement) {
+            dffieldElement.addEventListener("change", function() {
+                const dfid = this.value; // Get the datalynx id.
 
-                // Remove view and textfield options from view select.
-                if (view) {
-                    view.find('option').remove().end(); // Remove current options.
+                // Remove view and textfield options.
+                if (viewElement) {
+                    viewElement.innerHTML = ''; // Clear all current options.
                 }
-                if (textfield) {
-                    textfield.find('option').remove().end(); // Remove current options.
+                if (textfieldElement) {
+                    textfieldElement.innerHTML = ''; // Clear all current options.
                 }
 
-
-                // Load views and/or textfields from datalynx.
+                // Load views and/or textfields from datalynx if dfid is not zero.
                 if (dfid != 0) {
-                    // Ajax request to get current options.
-                    $.ajax(
-                        {
-                            method: "POST",
-                            url: actionurl,
-                            data: 'dfid=' + dfid,
-                            context: this,
-                            dataType: "text",
-                            success: function(data) {
-                                if (data != '') {
-                                    var respoptions = data.split('#');
+                    // Fetch request to get current options.
+                    return fetch(actionurl, {
+                        method: "POST",
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `dfid=${dfid}`
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.text(); // Ensure we return the result of this then
+                    })
+                    .then(data => {
+                        if (data !== '') {
+                            const respoptions = data.split('#');
 
-                                    // Add view options.
-                                    if (view) {
-                                        var viewoptions = respoptions[0].split(',');
-                                        for (var i = 0; i < viewoptions.length; ++i) {
-                                            var arr = viewoptions[i].trim().split(' ');
-                                            var qid = arr.shift();
-                                            var qname = arr.join(' ');
-                                            view.append($("<option></option>").attr("value",qid).text(qname));
-                                        }
-                                    }
-
-                                    // Add textfield options.
-                                    if (textfield) {
-                                        var textfieldoptions = respoptions[1].split(',');
-
-                                        // If this datalynx instance itself is chosen provide this new field itself as first option.
-                                        if (dfid == presentdlid && update == 0 && fieldtype == 'text') {
-                                            textfield.append($("<option></option>").attr("value","-1").text(thisfieldstring));
-                                        }
-                                        for (var i = 0; i < textfieldoptions.length; ++i) {
-                                            var arr = textfieldoptions[i].trim().split(' ');
-                                            var qid = arr.shift();
-                                            var qname = arr.join(' ');
-                                            textfield.append($("<option></option>").attr("value",qid).text(qname));
-                                        }
-                                    }
-                                }
-                            },
-                            error: function() {
-                                alert("Error while loading views and textfields.");
+                            // Add view options.
+                            if (viewElement) {
+                                const viewoptions = respoptions[0].split(',');
+                                viewoptions.forEach(option => {
+                                    const [qid, ...qnameArr] = option.trim().split(' ');
+                                    const qname = qnameArr.join(' ');
+                                    const optionElement = document.createElement('option');
+                                    optionElement.value = qid;
+                                    optionElement.textContent = qname;
+                                    viewElement.appendChild(optionElement);
+                                });
                             }
-                        });
+
+                            // Add textfield options.
+                            if (textfieldElement) {
+                                const textfieldoptions = respoptions[1].split(',');
+
+                                // If this datalynx instance itself is chosen, provide this new field itself as first option.
+                                if (dfid == presentdlid && update === 0 && fieldtype === 'text') {
+                                    const optionElement = document.createElement('option');
+                                    optionElement.value = '-1';
+                                    optionElement.textContent = thisfieldstring;
+                                    textfieldElement.appendChild(optionElement);
+                                }
+
+                                textfieldoptions.forEach(option => {
+                                    const [qid, ...qnameArr] = option.trim().split(' ');
+                                    const qname = qnameArr.join(' ');
+                                    const optionElement = document.createElement('option');
+                                    optionElement.value = qid;
+                                    optionElement.textContent = qname;
+                                    textfieldElement.appendChild(optionElement);
+                                });
+                            }
+                        }
+                        return data; // Ensure we return the result of this then
+                    })
+                    .catch(() => {
+                        throw new Error("Error while loading views and textfields.");
+                    });
+                } else {
+                    // If dfid is 0, we should return undefined explicitly to satisfy consistent-return.
+                    return undefined;
                 }
             });
         }
-    };
-});
+    }
+};

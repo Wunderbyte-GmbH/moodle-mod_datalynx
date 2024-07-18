@@ -13,6 +13,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+// eslint-disable-next-line no-unused-vars
+import validation from "ajv/dist/vocabularies/validation";
+
 /*
  * @package    mod_datalynx
  * @author     David Bogner
@@ -70,7 +73,7 @@ export const initMaximisedEmbed = (id) => {
 
         const headerHeight = getHtmlElementSize(header, 'height');
         const footerHeight = getHtmlElementSize(footer, 'height');
-        const newHeight = document.body.scrollHeight - footerHeight - headerHeight - 100;
+        var newHeight = document.body.scrollHeight - footerHeight - headerHeight - 100;
         if (newHeight < 400) {
             newHeight = 400;
         }

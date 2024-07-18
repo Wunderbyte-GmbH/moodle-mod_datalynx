@@ -611,7 +611,7 @@ class datalynx {
 
         // MOD JS.
         if (!empty($params->modjs)) {
-            $PAGE->requires->js('/mod/datalynx/datalynx.js');
+            $PAGE->requires->js('/mod/datalynx/amd/src/patterndialogue.js');
         }
 
         // Set current view and view's page requirements.

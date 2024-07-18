@@ -53,11 +53,11 @@ foreach ($fields as $field) {
 $options['types'] = $DB->get_records_select_menu('datalynx_fields', 'dataid = :dataid',
         array('dataid' => $urlparams->d), 'name ASC', 'name, type');
 
-$module = array('name' => 'mod_datalynx', 'fullpath' => '/mod/datalynx/datalynx.js',
+$module = array('name' => 'mod_datalynx', 'fullpath' => '/mod/datalynx/amd/src/patterndialogue.js',
         'requires' => array('moodle-core-notification-dialogue')
 );
 
-$PAGE->requires->js_init_call('M.mod_datalynx.tag_manager.init', $options, true, $module);
+// Fix: need to add a $PAGE->requires for datalynx.js
 $PAGE->requires->string_for_js('behavior', 'datalynx');
 $PAGE->requires->string_for_js('renderer', 'datalynx');
 $PAGE->requires->string_for_js('fieldname', 'datalynx');
@@ -168,7 +168,7 @@ $mform->set_data($view->to_form());
 
 // ToDo: Ugly hack for forcing atto as the only editor available even if user chose another editor.
 $texteditors = $CFG->texteditors;
-$CFG->texteditors = 'atto,textarea';
+$CFG->texteditors = 'tiny';
 $mform->display();
 $CFG->texteditors = $texteditors;
 
