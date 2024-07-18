@@ -42,11 +42,11 @@ require_login($df->data->course, false, $df->cm);
 
 require_capability('mod/datalynx:managetemplates', $df->context);
 
-$df->set_page('tool/index', array('modjs' => true, 'urlparams' => $urlparams));
+$df->set_page('tool/index', ['modjs' => true, 'urlparams' => $urlparams]);
 
 // Activate navigation node.
 navigation_node::override_active_url(
-        new moodle_url('/mod/datalynx/tool/index.php', array('id' => $df->cm->id)));
+        new moodle_url('/mod/datalynx/tool/index.php', ['id' => $df->cm->id]));
 
 // DATA PROCESSING.
 if ($urlparams->run && confirm_sesskey()) { // Run selected tool.
@@ -66,12 +66,12 @@ if ($urlparams->run && confirm_sesskey()) { // Run selected tool.
 
 // Get the list of tools.
 $directories = get_list_of_plugins('mod/datalynx/tool/');
-$tools = array();
+$tools = [];
 foreach ($directories as $directory) {
-    $tools[$directory] = (object) array(
+    $tools[$directory] = (object) [
             'name' => get_string('pluginname', "datalynxtool_$directory"),
             'description' => get_string('pluginname_help', "datalynxtool_$directory")
-    );
+    ];
 }
 ksort($tools); // Sort in alphabetical order.
 
@@ -82,12 +82,12 @@ if (!$tools) {
 }
 
 // Print header.
-$df->print_header(array('tab' => 'tools', 'urlparams' => $urlparams));
+$df->print_header(['tab' => 'tools', 'urlparams' => $urlparams]);
 
 // If there are tools print admin style list of them.
 if ($tools) {
     $actionbaseurl = '/mod/datalynx/tool/index.php';
-    $linkparams = array('d' => $df->id(), 'sesskey' => sesskey());
+    $linkparams = ['d' => $df->id(), 'sesskey' => sesskey()];
 
     // Table headings.
     $strname = get_string('name');
@@ -95,18 +95,18 @@ if ($tools) {
     $strrun = get_string('toolrun', 'datalynx');
 
     $table = new html_table();
-    $table->head = array($strname, $strdesc, $strrun);
-    $table->align = array('left', 'left', 'center');
-    $table->wrap = array(false, false, false);
+    $table->head = [$strname, $strdesc, $strrun];
+    $table->align = ['left', 'left', 'center'];
+    $table->wrap = [false, false, false];
     $table->attributes['align'] = 'center';
 
     foreach ($tools as $dir => $tool) {
 
         $runlink = html_writer::link(
-                new moodle_url($actionbaseurl, $linkparams + array('run' => $dir)),
+                new moodle_url($actionbaseurl, $linkparams + ['run' => $dir]),
                 $OUTPUT->pix_icon('t/collapsed', $strrun));
 
-        $table->data[] = array($tool->name, $tool->description, $runlink);
+        $table->data[] = [$tool->name, $tool->description, $runlink];
     }
     echo html_writer::table($table);
 }

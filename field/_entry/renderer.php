@@ -39,7 +39,7 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
                         has_capability('mod/datalynx:manageentries', $this->_field->df->context));
 
         // No edit mode.
-        $replacements = array();
+        $replacements = [];
         foreach ($tags as $tag) {
 
             // New entry displays nothing.
@@ -63,7 +63,7 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
                         $str = $this->display_more($entry);
                         break;
                     case '##anchor##':
-                        $str = html_writer::tag('a', '', array('name' => $entry->id));
+                        $str = html_writer::tag('a', '', ['name' => $entry->id]);
                         break;
                     // Actions.
                     case '##select##':
@@ -84,7 +84,7 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
                     default:
                         $str = '';
                 }
-                $replacements[$tag] = array('html', $str);
+                $replacements[$tag] = ['html', $str];
             }
         }
         return $replacements;
@@ -96,7 +96,7 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
         global $OUTPUT;
 
         $field = $this->_field;
-        $params = array('eids' => $entry->id);
+        $params = ['eids' => $entry->id];
         $url = new moodle_url($entry->baseurl, $params);
         if ($field->df()->data->singleview) {
             $url->param('ret', $url->param('view'));
@@ -116,8 +116,8 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
         global $OUTPUT;
 
         $field = $this->_field;
-        $params = array('editentries' => $entry->id, 'sesskey' => sesskey(),
-                'sourceview' => $this->_field->df()->get_current_view()->id());
+        $params = ['editentries' => $entry->id, 'sesskey' => sesskey(),
+                'sourceview' => $this->_field->df()->get_current_view()->id()];
         $url = new moodle_url($entry->baseurl, $params);
         if ($field->df()->data->singleedit) {
             $url->param('view', $field->df()->data->singleedit);
@@ -143,8 +143,8 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
         global $OUTPUT;
 
         $field = $this->_field;
-        $params = array('duplicate' => $entry->id, 'sesskey' => sesskey(),
-                'sourceview' => $this->_field->df()->get_current_view()->id());
+        $params = ['duplicate' => $entry->id, 'sesskey' => sesskey(),
+                'sourceview' => $this->_field->df()->get_current_view()->id()];
         $url = new moodle_url($entry->baseurl, $params);
         if ($field->df()->data->singleedit) {
             $url->param('view', $field->df()->data->singleedit);
@@ -159,8 +159,8 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
         global $OUTPUT;
 
         $field = $this->_field;
-        $params = array('delete' => $entry->id, 'sesskey' => sesskey(),
-                'sourceview' => $this->_field->df()->get_current_view()->id());
+        $params = ['delete' => $entry->id, 'sesskey' => sesskey(),
+                'sourceview' => $this->_field->df()->get_current_view()->id()];
         $url = new moodle_url($entry->baseurl, $params);
         $str = get_string('delete');
 
@@ -189,7 +189,7 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
         $canexportentry = $this->_field->df()->user_can_export_entry($entry);
         if ($canexportentry) {
             $url = new moodle_url($entry->baseurl,
-                    array('export' => $entry->id, 'sesskey' => sesskey()));
+                    ['export' => $entry->id, 'sesskey' => sesskey()]);
             $strexport = get_string('export', 'datalynx');
             return html_writer::link($url, $OUTPUT->pix_icon('t/portfolioadd', $strexport));
         }
@@ -200,28 +200,28 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
      * Array of patterns this field supports
      */
     protected function patterns() {
-        $patterns = array();
+        $patterns = [];
 
         // Actions.
         $actions = get_string('actions', 'datalynx');
-        $patterns["##edit##"] = array(true, $actions);
-        $patterns["##delete##"] = array(true, $actions);
-        $patterns["##select##"] = array(true, $actions);
-        $patterns["##export##"] = array(true, $actions);
-        $patterns["##duplicate##"] = array(true, $actions);
+        $patterns["##edit##"] = [true, $actions];
+        $patterns["##delete##"] = [true, $actions];
+        $patterns["##select##"] = [true, $actions];
+        $patterns["##export##"] = [true, $actions];
+        $patterns["##duplicate##"] = [true, $actions];
 
         // Reference.
         $reference = get_string('reference', 'datalynx');
-        $patterns["##anchor##"] = array(true, $reference);
-        $patterns["##more##"] = array(true, $reference);
+        $patterns["##anchor##"] = [true, $reference];
+        $patterns["##more##"] = [true, $reference];
 
         // Entryinfo.
         $entryinfo = get_string('entryinfo', 'datalynx');
-        $patterns["##entryid##"] = array(true, $entryinfo);
+        $patterns["##entryid##"] = [true, $entryinfo];
         // Entry id with prepended zeroes.
-        $patterns["##entryidzerofill##"] = array(true, $entryinfo);
+        $patterns["##entryidzerofill##"] = [true, $entryinfo];
         // Display if course is visible to students.
-        $patterns["##coursevisible##"] = array(true, $entryinfo);
+        $patterns["##coursevisible##"] = [true, $entryinfo];
 
         return $patterns;
     }

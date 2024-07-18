@@ -44,7 +44,7 @@ class mod_datalynx_mod_form extends moodleform_mod {
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
         // Name.
-        $mform->addElement('text', 'name', get_string('name'), array('size' => '64'));
+        $mform->addElement('text', 'name', get_string('name'), ['size' => '64']);
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('name', PARAM_TEXT);
         } else {
@@ -67,10 +67,10 @@ class mod_datalynx_mod_form extends moodleform_mod {
 
         // Time available.
         $mform->addElement('date_time_selector', 'timeavailable',
-                get_string('dftimeavailable', 'datalynx'), array('optional' => true));
+                get_string('dftimeavailable', 'datalynx'), ['optional' => true]);
         // Time due.
         $mform->addElement('date_time_selector', 'timedue', get_string('dftimedue', 'datalynx'),
-                array('optional' => true));
+                ['optional' => true]);
         $mform->disabledIf('timedue', 'interval', 'gt', 0);
 
         // Interval between required entries.
@@ -111,10 +111,10 @@ class mod_datalynx_mod_form extends moodleform_mod {
             // Required entries.
             $mform->addElement('select', 'entriesrequired',
                     get_string('entriesrequired', 'datalynx'),
-                    array(0 => get_string('none')) + $maxoptions);
+                    [0 => get_string('none')] + $maxoptions);
             // Required entries to view.
             $mform->addElement('select', 'entriestoview', get_string('entriestoview', 'datalynx'),
-                    array(0 => get_string('none')) + $maxoptions);
+                    [0 => get_string('none')] + $maxoptions);
             // Max entries.
             $mform->addElement('select', 'maxentries', get_string('entriesmax', 'datalynx'), $maxoptions);
             $mform->setDefault('maxentries', $CFG->datalynx_maxentries);
@@ -166,9 +166,9 @@ class mod_datalynx_mod_form extends moodleform_mod {
         $mform->setDefault('timelimit', -1);
         $mform->addRule('timelimit', null, 'numeric', null, 'client');
 
-        $options = array(mod_datalynx\datalynx::APPROVAL_NONE => get_string('approvalnone', 'datalynx'),
+        $options = [mod_datalynx\datalynx::APPROVAL_NONE => get_string('approvalnone', 'datalynx'),
                 mod_datalynx\datalynx::APPROVAL_ON_UPDATE => get_string('approvalrequiredupdate', 'datalynx'),
-                mod_datalynx\datalynx::APPROVAL_ON_NEW => get_string('approvalrequirednew', 'datalynx'));
+                mod_datalynx\datalynx::APPROVAL_ON_NEW => get_string('approvalrequirednew', 'datalynx')];
         $mform->addElement('select', 'approval', get_string('requireapproval', 'datalynx'), $options);
 
         // Common course elements.
@@ -212,17 +212,17 @@ class mod_datalynx_mod_form extends moodleform_mod {
     public function add_completion_rules() {
         $mform = &$this->_form;
 
-        $group = array();
+        $group = [];
         $group[] = &$mform->createElement('checkbox', 'completionentriesenabled', '',
-                get_string('completionentries', 'datalynx'), array('size' => 1));
-        $group[] = &$mform->createElement('text', 'completionentries', '', array('size' => 3));
+                get_string('completionentries', 'datalynx'), ['size' => 1]);
+        $group[] = &$mform->createElement('text', 'completionentries', '', ['size' => 3]);
         $mform->setType('completionentries', PARAM_INT);
         $mform->addGroup($group, 'completionentriesgroup',
-                get_string('completionentriesgroup', 'datalynx'), array(' '), false);
+                get_string('completionentriesgroup', 'datalynx'), [' '], false);
         $mform->disabledIf('completionentries', 'completionentriesenabled', 'notchecked');
         $mform->addHelpButton('completionentriesgroup', 'completionentriesgroup', 'datalynx');
 
-        return array('completionentriesgroup');
+        return ['completionentriesgroup'];
     }
 
     public function definition_after_data() {

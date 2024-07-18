@@ -57,7 +57,7 @@ class datalynx_rule_manager {
             self::$observers = $observers;
         }
 
-        $eventmenu = array();
+        $eventmenu = [];
         foreach (self::$observers as $observer) {
             if ($observer['callback'] == 'datalynx_rule_manager::trigger_rules') {
                 // Eventname is formed as follows: mod_datalynx\event\<name>, trimming backspace.
@@ -78,7 +78,7 @@ class datalynx_rule_manager {
 
     private static function get_team_fields_menu($dataid) {
         global $DB;
-        $params = array('dataid' => $dataid, 'type' => 'teammemberselect');
+        $params = ['dataid' => $dataid, 'type' => 'teammemberselect'];
         return $DB->get_records_menu('datalynx_fields', $params, '', 'id, name');
     }
 
@@ -89,7 +89,7 @@ class datalynx_rule_manager {
      */
     public function __construct(mod_datalynx\datalynx $datalynx) {
         $this->_df = $datalynx;
-        $this->_customrules = array();
+        $this->_customrules = [];
     }
 
     /**
@@ -101,7 +101,7 @@ class datalynx_rule_manager {
     public static function trigger_rules(\core\event\base $event) {
         global $DB;
         $cmid = $event->get_data()['contextinstanceid'];
-        $dataid = $DB->get_field('course_modules', 'instance', array('id' => $cmid));
+        $dataid = $DB->get_field('course_modules', 'instance', ['id' => $cmid]);
         $rulemanager = new datalynx_rule_manager(new mod_datalynx\datalynx($dataid));
         $rules = $rulemanager->get_rules_for_event($event->eventname);
         foreach ($rules as $rule) {
@@ -134,7 +134,7 @@ class datalynx_rule_manager {
      * @return datalynx_rule_base[]
      */
     public function get_rules_by_plugintype($type, $menu = false) {
-        $typerules = array();
+        $typerules = [];
         foreach ($this->get_rules() as $ruleid => $rule) {
             if ($rule->get_type() === $type) {
                 if ($menu) {
@@ -154,7 +154,7 @@ class datalynx_rule_manager {
      * @return datalynx_rule_base[]
      */
     public function get_rules_for_event($eventname, $enabledonly = true) {
-        $rules = array();
+        $rules = [];
         foreach ($this->get_rules() as $ruleid => $rule) {
             if ($rule->is_triggered_by($eventname) && (!$enabledonly || $rule->is_enabled())) {
                 $rules[$ruleid] = $rule;
@@ -210,9 +210,9 @@ class datalynx_rule_manager {
         global $DB;
 
         if (!$this->_customrules || $forceget) {
-            $this->_customrules = array();
+            $this->_customrules = [];
             // Collate user rules.
-            if ($rules = $DB->get_records('datalynx_rules', array('dataid' => $this->_df->id()))) {
+            if ($rules = $DB->get_records('datalynx_rules', ['dataid' => $this->_df->id()])) {
                 foreach ($rules as $ruleid => $rule) {
                     $this->_customrules[$ruleid] = $this->get_rule($rule);
                 }
@@ -223,7 +223,7 @@ class datalynx_rule_manager {
         if (empty($exclude) && !$menu) {
             return $rules;
         } else {
-            $retrules = array();
+            $retrules = [];
             foreach ($rules as $ruleid => $rule) {
                 if (!empty($exclude) && in_array($ruleid, $exclude)) {
                     continue;
@@ -251,7 +251,7 @@ class datalynx_rule_manager {
         }
 
         $dfrules = $this->get_rules();
-        $rules = array();
+        $rules = [];
         // Collate the rules for processing.
         if ($ruleids = explode(',', $rids)) {
             foreach ($ruleids as $ruleid) {
@@ -261,7 +261,7 @@ class datalynx_rule_manager {
             }
         }
 
-        $processedrids = array();
+        $processedrids = [];
         $strnotify = '';
 
         if (empty($rules) && $action != 'add') {
@@ -275,9 +275,9 @@ class datalynx_rule_manager {
                 // Print a confirmation page.
                 echo $OUTPUT->confirm(get_string("rulesconfirm$action", 'datalynx', count($rules)),
                         new moodle_url('/mod/datalynx/rule/index.php',
-                                array('d' => $df->id(), $action => implode(',', array_keys($rules)),
-                                        'sesskey' => sesskey(), 'confirmed' => 1)),
-                        new moodle_url('/mod/datalynx/rule/index.php', array('d' => $df->id())));
+                                ['d' => $df->id(), $action => implode(',', array_keys($rules)),
+                                        'sesskey' => sesskey(), 'confirmed' => 1]),
+                        new moodle_url('/mod/datalynx/rule/index.php', ['d' => $df->id()]));
 
                 $df->print_footer();
                 exit();
@@ -293,10 +293,10 @@ class datalynx_rule_manager {
                             $rule = $this->get_rule($forminput->type);
                             $ruleid = $rule->insert_rule($forminput);
 
-                            $other = array('dataid' => $this->_df->id());
+                            $other = ['dataid' => $this->_df->id()];
                             $event = \mod_datalynx\event\rule_created::create(
-                                    array('context' => $this->_df->context, 'objectid' => $ruleid,
-                                            'other' => $other));
+                                    ['context' => $this->_df->context, 'objectid' => $ruleid,
+                                            'other' => $other]);
                             $event->trigger();
                         }
                         $strnotify = 'rulesadded';
@@ -312,10 +312,10 @@ class datalynx_rule_manager {
                             $oldrulename = $rule->rule->name;
                             $rule->update_rule($forminput);
 
-                            $other = array('dataid' => $this->_df->id());
+                            $other = ['dataid' => $this->_df->id()];
                             $event = \mod_datalynx\event\rule_updated::create(
-                                    array('context' => $this->_df->context,
-                                            'objectid' => $rule->rule->id, 'other' => $other));
+                                    ['context' => $this->_df->context,
+                                            'objectid' => $rule->rule->id, 'other' => $other]);
                             $event->trigger();
                         }
                         $strnotify = 'rulesupdated';
@@ -326,14 +326,14 @@ class datalynx_rule_manager {
                             // Disable = 0; enable = 1.
                             $enabled = ($rule->rule->enabled ? 0 : 1);
                             $DB->set_field('datalynx_rules', 'enabled', $enabled,
-                                    array('id' => $rid));
+                                    ['id' => $rid]);
 
                             $processedrids[] = $rid;
 
-                            $other = array('dataid' => $this->_df->id());
+                            $other = ['dataid' => $this->_df->id()];
                             $event = \mod_datalynx\event\rule_updated::create(
-                                    array('context' => $this->_df->context, 'objectid' => $rid,
-                                            'other' => $other));
+                                    ['context' => $this->_df->context, 'objectid' => $rid,
+                                            'other' => $other]);
                             $event->trigger();
                         }
 
@@ -349,10 +349,10 @@ class datalynx_rule_manager {
                             $ruleid = $DB->insert_record('datalynx_rules', $rule->rule);
                             $processedrids[] = $ruleid;
 
-                            $other = array('dataid' => $this->_df->id());
+                            $other = ['dataid' => $this->_df->id()];
                             $event = \mod_datalynx\event\rule_created::create(
-                                    array('context' => $this->_df->context, 'objectid' => $ruleid,
-                                            'other' => $other));
+                                    ['context' => $this->_df->context, 'objectid' => $ruleid,
+                                            'other' => $other]);
                             $event->trigger();
                         }
                         $strnotify = 'rulesadded';
@@ -363,10 +363,10 @@ class datalynx_rule_manager {
                             $rule->delete_rule();
                             $processedrids[] = $rule->rule->id;
 
-                            $other = array('dataid' => $this->_df->id());
+                            $other = ['dataid' => $this->_df->id()];
                             $event = \mod_datalynx\event\rule_deleted::create(
-                                    array('context' => $this->_df->context,
-                                            'objectid' => $rule->rule->id, 'other' => $other));
+                                    ['context' => $this->_df->context,
+                                            'objectid' => $rule->rule->id, 'other' => $other]);
                             $event->trigger();
                         }
                         $strnotify = 'rulesdeleted';
@@ -399,7 +399,7 @@ class datalynx_rule_manager {
 
         $editbaseurl = '/mod/datalynx/rule/rule_edit.php';
         $actionbaseurl = '/mod/datalynx/rule/index.php';
-        $linkparams = array('d' => $df->id(), 'sesskey' => sesskey());
+        $linkparams = ['d' => $df->id(), 'sesskey' => sesskey()];
 
         // Table headings.
         $strname = get_string('name');
@@ -414,26 +414,26 @@ class datalynx_rule_manager {
 
         // The default value of the type attr of a button is submit, so set it to button so that it doesn't submit the form.
         $selectallnone = html_writer::checkbox(null, null, false, null,
-                array('onclick' => 'select_allnone(\'rule\'&#44;this.checked)'));
+                ['onclick' => 'select_allnone(\'rule\'&#44;this.checked)']);
         $multiactionurl = new moodle_url($actionbaseurl, $linkparams);
         $multidelete = html_writer::tag('button',
                 $OUTPUT->pix_icon('t/delete', get_string('multidelete', 'datalynx')),
-                array('type' => 'button', 'name' => 'multidelete',
+                ['type' => 'button', 'name' => 'multidelete',
                         'onclick' => 'bulk_action(\'rule\'&#44; \'' . $multiactionurl->out(false) .
                                 '\'&#44; \'delete\')'
-                ));
+                ]);
         $multiduplicate = html_writer::tag('button',
                 $OUTPUT->pix_icon('t/copy', get_string('multiduplicate', 'datalynx')),
-                array('type' => 'button', 'name' => 'multiduplicate',
+                ['type' => 'button', 'name' => 'multiduplicate',
                         'onclick' => 'bulk_action(\'rule\'&#44; \'' . $multiactionurl->out(false) .
                                 '\'&#44; \'duplicate\')'
-                ));
+                ]);
 
         $table = new html_table();
-        $table->head = array($strname, $strtype, $strdescription, $strenabled, $stredit,
-                $multiduplicate, $multidelete, $selectallnone);
-        $table->align = array('left', 'left', 'left', 'center', 'center', 'center', 'center', 'center');
-        $table->wrap = array(false, false, false, false, false, false, false, false);
+        $table->head = [$strname, $strtype, $strdescription, $strenabled, $stredit,
+                $multiduplicate, $multidelete, $selectallnone];
+        $table->align = ['left', 'left', 'left', 'center', 'center', 'center', 'center', 'center'];
+        $table->wrap = [false, false, false, false, false, false, false, false];
         $table->attributes['align'] = 'center';
 
         $rules = $this->get_rules();
@@ -444,15 +444,15 @@ class datalynx_rule_manager {
             }
 
             $rulename = html_writer::link(
-                    new moodle_url($editbaseurl, $linkparams + array('rid' => $ruleid)), $rule->get_name());
+                    new moodle_url($editbaseurl, $linkparams + ['rid' => $ruleid]), $rule->get_name());
             $ruleedit = html_writer::link(
-                    new moodle_url($editbaseurl, $linkparams + array('rid' => $ruleid)),
+                    new moodle_url($editbaseurl, $linkparams + ['rid' => $ruleid]),
                     $OUTPUT->pix_icon('t/edit', $stredit));
             $ruleduplicate = html_writer::link(
-                    new moodle_url($actionbaseurl, $linkparams + array('duplicate' => $ruleid)),
+                    new moodle_url($actionbaseurl, $linkparams + ['duplicate' => $ruleid]),
                     $OUTPUT->pix_icon('t/copy', $strduplicate));
             $ruledelete = html_writer::link(
-                    new moodle_url($actionbaseurl, $linkparams + array('delete' => $ruleid)),
+                    new moodle_url($actionbaseurl, $linkparams + ['delete' => $ruleid]),
                     $OUTPUT->pix_icon('t/delete', $strdelete));
             $ruleselector = html_writer::checkbox("ruleselector", $ruleid, false);
 
@@ -466,14 +466,14 @@ class datalynx_rule_manager {
                 $enabledicon = $OUTPUT->pix_icon('t/show', $strshow);
             }
             $ruleenabled = html_writer::link(
-                    new moodle_url($actionbaseurl, $linkparams + array('enabled' => $ruleid)), $enabledicon);
+                    new moodle_url($actionbaseurl, $linkparams + ['enabled' => $ruleid]), $enabledicon);
 
-            $table->data[] = array($rulename, $ruletype, $ruledescription, $ruleenabled, $ruleedit,
+            $table->data[] = [$rulename, $ruletype, $ruledescription, $ruleenabled, $ruleedit,
                     $ruleduplicate, $ruledelete, $ruleselector
-            );
+            ];
         }
 
-        echo html_writer::tag('div', html_writer::table($table), array('class' => 'ruleslist'));
+        echo html_writer::tag('div', html_writer::table($table), ['class' => 'ruleslist']);
     }
 
     /**
@@ -483,7 +483,7 @@ class datalynx_rule_manager {
 
         // Display the rule form jump list.
         $directories = get_list_of_plugins('mod/datalynx/rule/');
-        $rulemenu = array();
+        $rulemenu = [];
 
         foreach ($directories as $directory) {
             if ($directory[0] != '_') {
@@ -495,12 +495,12 @@ class datalynx_rule_manager {
         asort($rulemenu);
 
         $popupurl = new moodle_url('/mod/datalynx/rule/rule_edit.php',
-                array('d' => $this->_df->id(), 'sesskey' => sesskey()));
-        $ruleselect = new single_select($popupurl, 'type', $rulemenu, null, array('' => 'choosedots'), 'ruleform');
+                ['d' => $this->_df->id(), 'sesskey' => sesskey()]);
+        $ruleselect = new single_select($popupurl, 'type', $rulemenu, null, ['' => 'choosedots'], 'ruleform');
         $ruleselect->set_label(get_string('ruleadd', 'datalynx') . '&nbsp;');
         $br = html_writer::empty_tag('br');
         echo html_writer::tag('div', $br . $OUTPUT->render($ruleselect) . $br,
-                array('class' => 'ruleadd mdl-align'));
+                ['class' => 'ruleadd mdl-align']);
     }
 
     private static function notify_team_members(stdClass $data, $event) {
@@ -524,11 +524,11 @@ class datalynx_rule_manager {
 
         if ($df->data->singleview) {
             $entryurl = new moodle_url($data->url,
-                    array('view' => $df->data->singleview, 'eids' => $data->entryid));
+                    ['view' => $df->data->singleview, 'eids' => $data->entryid]);
         } else {
             if ($df->data->defaultview) {
                 $entryurl = new moodle_url($data->url,
-                        array('view' => $df->data->defaultview, 'eids' => $data->entryid));
+                        ['view' => $df->data->defaultview, 'eids' => $data->entryid]);
             } else {
                 $entryurl = new moodle_url($data->url);
             }
@@ -539,8 +539,8 @@ class datalynx_rule_manager {
         $subject = "$sitename -> $data->coursename -> $strdatalynx $data->datalynxname:  $notename";
 
         $data->senderprofilelink = html_writer::link(
-                new moodle_url('/user/profile.php', array('id' => $data->userfrom->id)), fullname($data->userfrom));
-        $messagestosend = array();
+                new moodle_url('/user/profile.php', ['id' => $data->userfrom->id]), fullname($data->userfrom));
+        $messagestosend = [];
         foreach ($data->users as $user) {
             // Prepare message object.
             $message = new \core\message\message();
@@ -554,7 +554,7 @@ class datalynx_rule_manager {
             if ($CFG->branch > 31) {
                 $message->courseid = $df->course->id;
             }
-            $userto = $DB->get_record('user', array('id' => $user->id));
+            $userto = $DB->get_record('user', ['id' => $user->id]);
             $message->userto = $userto;
             $data->fullname = fullname($userto);
             $notedetails = get_string("message_$event", 'datalynx', $data);

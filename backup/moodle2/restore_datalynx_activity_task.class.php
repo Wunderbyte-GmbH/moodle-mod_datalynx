@@ -143,17 +143,17 @@ class restore_datalynx_activity_task extends restore_activity_task {
      * processed by the link decoder
      */
     public static function define_decode_contents() {
-        $contents = array();
+        $contents = [];
 
-        $contents[] = new restore_decode_content('datalynx', array('intro'), 'datalynx');
+        $contents[] = new restore_decode_content('datalynx', ['intro'], 'datalynx');
         $contents[] = new restore_decode_content('datalynx_fields',
-                array('description', 'param1', 'param2', 'param3', 'param4', 'param5', 'param6',
-                        'param7', 'param8', 'param9', 'param10'), 'datalynx_field');
+                ['description', 'param1', 'param2', 'param3', 'param4', 'param5', 'param6',
+                        'param7', 'param8', 'param9', 'param10'], 'datalynx_field');
         $contents[] = new restore_decode_content('datalynx_views',
-                array('description', 'section', 'param1', 'param2', 'param3', 'param4', 'param5',
-                        'param6', 'param7', 'param8', 'param9', 'param10'), 'datalynx_view');
+                ['description', 'section', 'param1', 'param2', 'param3', 'param4', 'param5',
+                        'param6', 'param7', 'param8', 'param9', 'param10'], 'datalynx_view');
         $contents[] = new restore_decode_content('datalynx_contents',
-                array('content', 'content1', 'content2', 'content3', 'content4'), 'datalynx_content');
+                ['content', 'content1', 'content2', 'content3', 'content4'], 'datalynx_content');
 
         return $contents;
     }
@@ -163,7 +163,7 @@ class restore_datalynx_activity_task extends restore_activity_task {
      * to the activity to be executed by the link decoder
      */
     public static function define_decode_rules() {
-        $rules = array();
+        $rules = [];
 
         $rules[] = new restore_decode_rule('DFINDEX', '/mod/datalynx/index.php?id=$1', 'course');
 
@@ -176,21 +176,21 @@ class restore_datalynx_activity_task extends restore_activity_task {
         $rules[] = new restore_decode_rule('DFEMBEDBYD', '/mod/datalynx/embed.php?d=$1', 'datalynx');
 
         $rules[] = new restore_decode_rule('DFVIEWVIEW', '/mod/datalynx/view.php?d=$1&amp;view=$2',
-                array('datalynx', 'datalynx_view'));
+                ['datalynx', 'datalynx_view']);
         $rules[] = new restore_decode_rule('DFEMBEDVIEW', '/mod/datalynx/embed.php?d=$1&amp;view=$2',
-                array('datalynx', 'datalynx_view'));
+                ['datalynx', 'datalynx_view']);
 
         $rules[] = new restore_decode_rule('DFVIEWVIEWFILTER',
                 '/mod/datalynx/view.php?d=$1&amp;view=$2&amp;filter=$3',
-                array('datalynx', 'datalynx_view', 'datalynx_filter'));
+                ['datalynx', 'datalynx_view', 'datalynx_filter']);
         $rules[] = new restore_decode_rule('DFEMBEDVIEWFILTER',
                 '/mod/datalynx/embed.php?d=$1&amp;view=$2&amp;filter=$3',
-                array('datalynx', 'datalynx_view', 'datalynx_filter'));
+                ['datalynx', 'datalynx_view', 'datalynx_filter']);
 
         $rules[] = new restore_decode_rule('DFVIEWENTRY', '/mod/datalynx/view.php?d=$1&amp;eid=$2',
-                array('datalynx', 'datalynx_entry'));
+                ['datalynx', 'datalynx_entry']);
         $rules[] = new restore_decode_rule('DFEMBEDENTRY', '/mod/datalynx/embed.php?d=$1&amp;eid=$2',
-                array('datalynx', 'datalynx_entry'));
+                ['datalynx', 'datalynx_entry']);
 
         return $rules;
     }
@@ -203,7 +203,7 @@ class restore_datalynx_activity_task extends restore_activity_task {
      * of {@link restore_log_rule} objects
      */
     public static function define_restore_log_rules() {
-        $rules = array();
+        $rules = [];
 
         $rules[] = new restore_log_rule('datalynx', 'add',
                 'view.php?d={datalynx}&eid={datalynx_entry}', '{datalynx}');
@@ -253,7 +253,7 @@ class restore_datalynx_activity_task extends restore_activity_task {
      * activity level. All them are rules not linked to any module instance (cmid = 0)
      */
     public static function define_restore_log_rules_for_course() {
-        $rules = array();
+        $rules = [];
 
         $rules[] = new restore_log_rule('datalynx', 'view all', 'index.php?id={course}', null);
 

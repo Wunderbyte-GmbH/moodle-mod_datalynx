@@ -98,7 +98,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
             return '';
         }
 
-        $strfiles = array();
+        $strfiles = [];
         foreach ($files as $file) {
             if (!$file->is_directory()) {
 
@@ -128,24 +128,24 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
         $fieldid = $this->_field->id();
         $fieldname = "f_{$i}_$fieldid";
 
-        $arr = array();
+        $arr = [];
 
         if ($mform->_formName == 'mod_datalynx_customfilter_frontend_form') {
-            $options = array(
+            $options = [
                     -1  => get_string('choose'),
                     1 => get_string('filemissing', 'datalynx'),
                     0 => get_string('fileexist', 'datalynx')
-            );
+            ];
             $arr[] = $mform->createElement('select', $fieldname, '', $options);
             $mform->setType($fieldname, PARAM_INT);
             $mform->setDefault($fieldname, $value);
         } else {
-            $arr[] = &$mform->createElement('text', $fieldname, null, array('size' => '32'));
+            $arr[] = &$mform->createElement('text', $fieldname, null, ['size' => '32']);
             $mform->setType($fieldname, PARAM_NOTAGS);
             $mform->setDefault($fieldname, $value ? 1 : 0);
             $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
         }
-        return array($arr, null);
+        return [$arr, null];
     }
 
     /**
@@ -234,13 +234,13 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
         $filename = $file->get_filename();
         $displayname = $altname ?: $filename;
         $fileicon = html_writer::empty_tag('img',
-                array('src' => $OUTPUT->image_url(file_mimetype_icon($file->get_mimetype())),
-                        'alt' => $file->get_mimetype(), 'height' => 16, 'width' => 16));
+                ['src' => $OUTPUT->image_url(file_mimetype_icon($file->get_mimetype())),
+                        'alt' => $file->get_mimetype(), 'height' => 16, 'width' => 16]);
 
         if (!empty($params['download'])) {
             list(, $context, , , $contentid) = explode('/', $path);
             $url = new moodle_url("/mod/datalynx/field/file/download.php",
-                    array('cid' => $contentid, 'context' => $context, 'file' => $filename));
+                    ['cid' => $contentid, 'context' => $context, 'file' => $filename]);
         } else {
             $url = moodle_url::make_file_url('/pluginfile.php', "$path/$filename");
         }
@@ -251,7 +251,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
     /**
      */
     public function pluginfile_patterns(): array {
-        return array("[[{$this->_field->name()}]]");
+        return ["[[{$this->_field->name()}]]"];
     }
 
     /**
@@ -261,13 +261,13 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
         $fieldname = $this->_field->name();
 
         $patterns = parent::patterns();
-        $patterns["[[$fieldname]]"] = array(true);
-        $patterns["[[$fieldname:url]]"] = array(false);
-        $patterns["[[$fieldname:alt]]"] = array(true);
-        $patterns["[[$fieldname:size]]"] = array(false);
-        $patterns["[[$fieldname:content]]"] = array(false);
-        $patterns["[[$fieldname:download]]"] = array(false);
-        $patterns["[[$fieldname:downloadcount]]"] = array(false);
+        $patterns["[[$fieldname]]"] = [true];
+        $patterns["[[$fieldname:url]]"] = [false];
+        $patterns["[[$fieldname:alt]]"] = [true];
+        $patterns["[[$fieldname:size]]"] = [false];
+        $patterns["[[$fieldname:content]]"] = [false];
+        $patterns["[[$fieldname:download]]"] = [false];
+        $patterns["[[$fieldname:downloadcount]]"] = [false];
 
         return $patterns;
     }
@@ -277,7 +277,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
      */
     public function render_csv($strfiles): string {
         $regex = '/https?\:\/\/[^\" ]+/i';
-        $matches = array();
+        $matches = [];
         foreach ($strfiles as $strfile) {
             preg_match($regex, $strfile, $match);
             $matches[] = $match[0];

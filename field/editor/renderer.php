@@ -95,13 +95,13 @@ class datalynxfield_editor_renderer extends datalynxfield_renderer {
         $fieldid = $this->_field->id();
         $fieldname = "f_{$i}_$fieldid";
 
-        $arr = array();
-        $arr[] = &$mform->createElement('text', $fieldname, null, array('size' => '32'));
+        $arr = [];
+        $arr[] = &$mform->createElement('text', $fieldname, null, ['size' => '32']);
         $mform->setType($fieldname, PARAM_NOTAGS);
         $mform->setDefault($fieldname, $value);
         $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
 
-        return array($arr, null);
+        return [$arr, null];
     }
 
     /**
@@ -111,8 +111,8 @@ class datalynxfield_editor_renderer extends datalynxfield_renderer {
         $fieldname = $this->_field->name();
 
         $patterns = parent::patterns();
-        $patterns["[[$fieldname]]"] = array(true);
-        $patterns["[[$fieldname:excerpt]]"] = array(true);
+        $patterns["[[$fieldname]]"] = [true];
+        $patterns["[[$fieldname:excerpt]]"] = [true];
         return $patterns;
     }
 
@@ -121,7 +121,7 @@ class datalynxfield_editor_renderer extends datalynxfield_renderer {
 
         $formfieldname = "field_{$fieldid}_{$entryid}";
 
-        $errors = array();
+        $errors = [];
         foreach ($tags as $tag) {
             list(, $behavior, ) = $this->process_tag($tag);
             // Variable $behavior datalynx_field_behavior.

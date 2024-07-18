@@ -72,11 +72,11 @@ class datalynx_rule_form extends moodleform {
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
         // Name.
-        $mform->addElement('text', 'name', get_string('name'), array('size' => '32'));
+        $mform->addElement('text', 'name', get_string('name'), ['size' => '32']);
         $mform->addRule('name', null, 'required', null, 'client');
 
         // Description.
-        $mform->addElement('text', 'description', get_string('description'), array('size' => '64'));
+        $mform->addElement('text', 'description', get_string('description'), ['size' => '64']);
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('name', PARAM_TEXT);
             $mform->setType('description', PARAM_TEXT);
@@ -87,13 +87,13 @@ class datalynx_rule_form extends moodleform {
 
         // Enabled.
         $mform->addElement('advcheckbox', 'enabled', get_string('ruleenabled', 'datalynx'), '',
-                null, array(0, 1));
+                null, [0, 1]);
 
         // Events.
         $eventmenu = datalynx_rule_manager::get_event_data($this->_df->id());
-        $eventgroup = array();
+        $eventgroup = [];
         foreach ($eventmenu as $eventname => $eventlabel) {
-            $eventgroup[] = &$mform->createElement('checkbox', $eventname, null, $eventlabel, array('size' => 32));
+            $eventgroup[] = &$mform->createElement('checkbox', $eventname, null, $eventlabel, ['size' => 32]);
         }
         $mform->addGroup($eventgroup, 'eventsgroup', get_string('triggeringevent', 'datalynx'),
                 '<br />', false);
@@ -103,10 +103,10 @@ class datalynx_rule_form extends moodleform {
         $radiobuttons = $this->_df->get_fields_by_type('radiobutton', true);
         $choices = $radiobuttons + $checkboxes;
         if(!empty($choices)) {
-            $choices = array('0' => get_string('noselection', 'datalynx')) + $choices;
+            $choices = ['0' => get_string('noselection', 'datalynx')] + $choices;
             $mform->addElement('select', 'param5',
                     get_string('triggerspecificevent', 'datalynxrule_eventnotification'), $choices);
-            $attributes=array('size'=>'5');
+            $attributes= ['size'=>'5'];
             $mform->addElement('text', 'param10',
                     get_string('condition', 'datalynxrule_eventnotification'), $attributes);
             $mform->addHelpButton('param10', 'condition', 'datalynxrule_eventnotification');
@@ -144,7 +144,7 @@ class datalynx_rule_form extends moodleform {
     public function get_data($slashed = true) {
         if ($data = parent::get_data($slashed)) {
             $eventmenu = datalynx_rule_manager::get_event_data($this->_df->id());
-            $selectedevents = array();
+            $selectedevents = [];
             foreach (array_keys($eventmenu) as $eventname) {
                 if (isset($data->$eventname)) {
                     $selectedevents[] = $eventname;
@@ -165,7 +165,7 @@ class datalynx_rule_form extends moodleform {
     public function add_action_buttons($cancel = true, $submit = null) {
         $mform = &$this->_form;
 
-        $buttonarray = array();
+        $buttonarray = [];
         // Save and display.
         $buttonarray[] = &$mform->createElement('submit', 'submitbutton', get_string('savechanges'));
         // Save and continue.
@@ -173,7 +173,7 @@ class datalynx_rule_form extends moodleform {
                 get_string('savecontinue', 'datalynx'));
         // Cancel.
         $buttonarray[] = &$mform->createElement('cancel');
-        $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
+        $mform->addGroup($buttonarray, 'buttonar', '', [' '], false);
         $mform->closeHeaderBefore('buttonar');
     }
 

@@ -62,7 +62,7 @@ class datalynxfield_file_form extends datalynxfield_form {
     public function filetypes_definition() {
         $mform = &$this->_form;
 
-        $mimetypes = array();
+        $mimetypes = [];
         $mimetypes['*'] = get_string('filetypeany', 'datalynx');
         $mimetypes['image'] = get_string('filetypeimage', 'datalynx');
         foreach (get_mimetypes_array() as $mimetype => $content) {
@@ -70,7 +70,7 @@ class datalynxfield_file_form extends datalynxfield_form {
         }
 
         // Only allow single choice for now to keep compatible.
-        $options = array("multiple" => false);
+        $options = ["multiple" => false];
 
         // Accepted mimetype is stored in param3.
         $mform->addElement('autocomplete', 'param3', get_string('filetypes', 'datalynx'), $mimetypes, $options);

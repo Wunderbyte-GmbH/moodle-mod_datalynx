@@ -52,7 +52,7 @@ class datalynxfield_editor extends datalynxfield_base {
 
         // TODO: provide options for the editor field to configure in the field settings.
 
-        $this->editoroptions = array();
+        $this->editoroptions = [];
         $this->editoroptions['context'] = $this->df->context;
         $this->editoroptions['maxfiles'] = EDITOR_UNLIMITED_FILES;
         $this->editoroptions['trusttext'] = true;
@@ -70,7 +70,7 @@ class datalynxfield_editor extends datalynxfield_base {
      * @see datalynxfield_base::content_names()
      */
     protected function content_names() {
-        return array('editor');
+        return ['editor'];
     }
 
     /**
@@ -128,7 +128,7 @@ class datalynxfield_editor extends datalynxfield_base {
      * @see datalynxfield_base::get_content_parts()
      */
     public function get_content_parts() {
-        return array('content', 'content1');
+        return ['content', 'content1'];
     }
 
     /**
@@ -142,7 +142,7 @@ class datalynxfield_editor extends datalynxfield_base {
         if ($this->is_editor()) {
             if (isset($data->{"field_{$fieldid}_{$entryid}"})) {
                 $valuearr = explode('##', $data->{"field_{$fieldid}_{$entryid}"});
-                $content = array();
+                $content = [];
                 if ($csvrecord) {
                     $content['text'] = !empty($valuearr[0]) ? htmlspecialchars_decode($valuearr[0]) : null;
                 } else {
@@ -158,8 +158,8 @@ class datalynxfield_editor extends datalynxfield_base {
     }
 
     public function get_supported_search_operators() {
-        return array('' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
-                'LIKE' => get_string('contains', 'datalynx'));
+        return ['' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
+                'LIKE' => get_string('contains', 'datalynx')];
     }
 
     /**

@@ -24,13 +24,13 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$tagareas = array(
-        array(
+$tagareas = [
+        [
                 'itemtype' => 'datalynx_contents',
                 'component' => 'mod_datalynx',
                 'callback' => 'mod_datalynx_get_tagged_entries',
                 'callbackfile' => '/mod/datalynx/lib.php',
                 'collection' => 'datalynx',
                 'showstandard' => core_tag_tag::BOTH_STANDARD_AND_NOT,
-        ),
-);
+        ],
+];

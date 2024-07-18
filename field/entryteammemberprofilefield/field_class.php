@@ -49,23 +49,23 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
      * @param $fields
      * @return array
      */
-    public static function get_field_objects($dataid, $fields = array()) {
+    public static function get_field_objects($dataid, $fields = []) {
         $fieldobjects = [];
 
         $teammemberselectfields = array_filter($fields, function($field) {
             return $field instanceof datalynxfield_teammemberselect;
         });
 
-        $userprofilefields = array('institution', 'department');
+        $userprofilefields = ['institution', 'department'];
 
         foreach ($teammemberselectfields as $field) {
             $fieldname = $field->field->name;
             foreach ($userprofilefields as $profilefield) {
                 $fieldid = 'entryteammemberprofilefield_' . $field->field->id . "_$profilefield";
-                $fieldobjects[$fieldid] = (object) array('id' => $fieldid,
+                $fieldobjects[$fieldid] = (object) ['id' => $fieldid,
                     'dataid' => $dataid, 'type' => 'entryteammemberprofilefield',
                     'name' => $fieldname . ' ' . get_string($profilefield), 'description' => '',
-                    'visible' => 2, 'internalname' => $fieldid);
+                    'visible' => 2, 'internalname' => $fieldid];
             }
         }
 
@@ -105,10 +105,10 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
      */
     private function get_field_id_components(): array {
         $components = explode("_", $this->field->id);
-        return array(
+        return [
             'queriedfieldid' => $components[1],
             'profilefieldname' => $components[2]
-        );
+        ];
     }
 
     /**
@@ -125,7 +125,7 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
         global $DB;
 
         list($not, $operator, $value) = $search;
-    
+
         $fieldidcomponents = $this->get_field_id_components();
         $queriedfieldid = $fieldidcomponents["queriedfieldid"];
         $profilefieldname = $fieldidcomponents["profilefieldname"];
@@ -167,14 +167,14 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
 
             $eids = $DB->get_fieldset_sql($eidsql, $params);
             if (empty($eids)) {
-                return array(self::SQL_NEVERTRUE, [], false);
+                return [self::SQL_NEVERTRUE, [], false];
             }
             [$insql, $inparams] = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED, $paramprefix);
             $sql = "e.id $insql";
             $params = $inparams;
         }
         $usecontent = false;
-        return array($sql, $params, $usecontent);
+        return [$sql, $params, $usecontent];
     }
 
     private function wrap_ids($value) {
@@ -184,7 +184,7 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
     private function get_users_with_profile_field_value($profilefieldname, $operator, $value, $not) {
         global $DB, $USER;
 
-        $sql = $not ? 
+        $sql = $not ?
                 "SELECT u.id
                 FROM {user} u
                 WHERE u.$profilefieldname != ?"
@@ -194,7 +194,7 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
 
         $searchvalue = ($operator == self::OPERATOR_MY_PROFILE_FIELD) ? $USER->$profilefieldname : $value;
 
-        return $DB->get_records_sql($sql, array($searchvalue));
+        return $DB->get_records_sql($sql, [$searchvalue]);
     }
 
     public function parse_search($formdata, $i) {
@@ -204,7 +204,7 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
         $operator = !empty($formdata->{"searchoperator{$i}"}) ? $formdata->{"searchoperator{$i}"} : '';
         $fieldvalue = !empty($formdata->{"f_{$i}_$fieldid"}) ? $formdata->{"f_{$i}_$fieldid"} : false;
         if ($operator == self::OPERATOR_MY_PROFILE_FIELD) {
-            return ""; 
+            return "";
         } else {
             if ($operator == self::OPERATOR_LITERAL_VALUE) {
                 return $fieldvalue;
@@ -228,7 +228,7 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
                  ORDER BY $contentfull $sortdir";
 
         $distinctvalues = [];
-        if ($options = $DB->get_records_sql($sql, array($this->df->id()))) {
+        if ($options = $DB->get_records_sql($sql, [$this->df->id()])) {
             if ($this->field->internalname == 'name') {
                 $internalname = 'id';
             } else {
@@ -246,11 +246,11 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
     }
 
     public function get_supported_search_operators() {
-        return array(
+        return [
             '' => '&lt;' . get_string('choose') . '&gt;',
             self::OPERATOR_LITERAL_VALUE => get_string('literalvalue', 'datalynxfield_entryteammemberprofilefield'),
             self::OPERATOR_MY_PROFILE_FIELD => get_string('myprofilefield', 'datalynxfield_entryteammemberprofilefield')
-        );
+        ];
     }
 
     public function get_argument_count(string $operator) {

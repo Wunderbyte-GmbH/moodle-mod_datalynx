@@ -37,7 +37,7 @@ class datalynxfield__time_renderer extends datalynxfield_renderer {
         $fieldname = $field->get('internalname');
 
         // No edit mode.
-        $replacements = array();
+        $replacements = [];
 
         foreach ($tags as $tag) {
             // Display nothing on new entries.
@@ -76,7 +76,7 @@ class datalynxfield__time_renderer extends datalynxfield_renderer {
                         $format = '%Y';
                         break;
                 }
-                $replacements[$tag] = array('html', userdate($entry->{$fieldname}, $format));
+                $replacements[$tag] = ['html', userdate($entry->{$fieldname}, $format)];
             }
         }
 
@@ -110,20 +110,20 @@ class datalynxfield__time_renderer extends datalynxfield_renderer {
 
             $mform->setDefault("f_{$i}_{$fieldid}_from", (int) $from);
             $mform->setDefault("f_{$i}_{$fieldid}_to", (int) $to);
-            foreach (array('year', 'month', 'day', 'hour', 'minute') as $fieldidentifier) {
+            foreach (['year', 'month', 'day', 'hour', 'minute'] as $fieldidentifier) {
                 $mform->disabledIf("f_{$i}_{$fieldid}_to[$fieldidentifier]", "searchoperator$i", 'neq', 'BETWEEN');
             }
         }
 
         if ($mform->_formName == 'mod_datalynx_customfilter_frontend_form') {
-            $attr = array('optional' => true); // Allows date_time to be enabled, passes 0 if disabled.
+            $attr = ['optional' => true]; // Allows date_time to be enabled, passes 0 if disabled.
             $elements[] = $element = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_from", get_string('from'), $attr);
             $element->setAttributes(['size' => 1]);
             $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_to", get_string('to'), $attr);
         }
 
-        $separators = array('<div class="w-100"><br></div>', '<div class="w-100"><br></div>');
-        return array($elements, $separators);
+        $separators = ['<div class="w-100"><br></div>', '<div class="w-100"><br></div>'];
+        return [$elements, $separators];
     }
 
     /**
@@ -133,27 +133,27 @@ class datalynxfield__time_renderer extends datalynxfield_renderer {
         $fieldname = $this->_field->get('internalname');
         $cat = get_string('entryinfo', 'datalynx');
 
-        $patterns = array();
-        $patterns["##$fieldname##"] = array(true, $cat);
+        $patterns = [];
+        $patterns["##$fieldname##"] = [true, $cat];
         // Date without time.
-        $patterns["##$fieldname:date##"] = array(true, $cat);
+        $patterns["##$fieldname:date##"] = [true, $cat];
         // Date with time.
-        $patterns["##$fieldname:timestamp##"] = array(true, $cat);
+        $patterns["##$fieldname:timestamp##"] = [true, $cat];
         // Minute (M).
-        $patterns["##$fieldname:minute##"] = array(false);
+        $patterns["##$fieldname:minute##"] = [false];
         // Hour (H).
-        $patterns["##$fieldname:hour##"] = array(false);
+        $patterns["##$fieldname:hour##"] = [false];
         // Day (a).
-        $patterns["##$fieldname:day##"] = array(false);
-        $patterns["##$fieldname:d##"] = array(false);
+        $patterns["##$fieldname:day##"] = [false];
+        $patterns["##$fieldname:d##"] = [false];
         // Week (V).
-        $patterns["##$fieldname:week##"] = array(false);
+        $patterns["##$fieldname:week##"] = [false];
         // Month (b).
-        $patterns["##$fieldname:month##"] = array(false);
-        $patterns["##$fieldname:m##"] = array(false);
+        $patterns["##$fieldname:month##"] = [false];
+        $patterns["##$fieldname:m##"] = [false];
         // Year (G).
-        $patterns["##$fieldname:year##"] = array(false);
-        $patterns["##$fieldname:Y##"] = array(false);
+        $patterns["##$fieldname:year##"] = [false];
+        $patterns["##$fieldname:Y##"] = [false];
 
         return $patterns;
     }

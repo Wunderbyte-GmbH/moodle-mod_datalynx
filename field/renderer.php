@@ -35,9 +35,9 @@ abstract class datalynxfield_renderer {
 
     const PATTERN_CATEGORY = 1;
 
-    protected static $defaultoptions = array('manage' => false, 'visible' => false, 'edit' => false,
+    protected static $defaultoptions = ['manage' => false, 'visible' => false, 'edit' => false,
             'editable' => false, 'disabled' => false, 'required' => false, 'internal' => false
-    );
+    ];
 
     protected $_field = null;
 
@@ -55,9 +55,9 @@ abstract class datalynxfield_renderer {
      * @return array Field patterns found in the text
      */
     public function search($text) {
-        $found = array();
+        $found = [];
 
-        $matches = array();
+        $matches = [];
         $fieldname = preg_quote($this->_field->name(), '/');
         if (preg_match_all("/\[\[$fieldname(?:\|(?:[^\]]+))?\]\](?:@)?/", $text, $matches)) {
             $found = array_merge($found, $matches[0]);
@@ -97,7 +97,7 @@ abstract class datalynxfield_renderer {
      * @return array
      */
     public function replacements(array $tags = null, stdClass $entry = null, array $options = null) {
-        $replacements = array();
+        $replacements = [];
         foreach ($tags as $tag) {
             $currentoptions = array_merge(self::$defaultoptions, $options);
             list($fieldname, $behavior, $renderer) = $this->process_tag($tag);
@@ -118,9 +118,9 @@ abstract class datalynxfield_renderer {
             if (!$currentoptions['visible']) {
                 // NOT VISIBLE ===.
                 if ($renderer->get_not_visible_template() === $renderer::NOT_VISIBLE_SHOW_NOTHING) {
-                    $replacements[$tag] = array('html', '');
+                    $replacements[$tag] = ['html', ''];
                 } else {
-                    $replacements[$tag] = array('html', $renderer->get_not_visible_template());
+                    $replacements[$tag] = ['html', $renderer->get_not_visible_template()];
                 }
             } else {
                 // VISIBLE ===.
@@ -130,7 +130,7 @@ abstract class datalynxfield_renderer {
                         // NOT EDITABLE ===.
                         if ($renderer->get_not_editable_template() === $renderer::NOT_EDITABLE_SHOW_NOTHING
                         ) {
-                            $replacements[$tag] = array('html', '');
+                            $replacements[$tag] = ['html', ''];
                         } else {
                             if ($renderer->get_not_editable_template() === $renderer::NOT_EDITABLE_SHOW_AS_DISPLAY_MODE
                             ) {
@@ -138,7 +138,7 @@ abstract class datalynxfield_renderer {
                                 $currentoptions['value'] = $this->render_display_mode($entry, $currentoptions);
                                 $replacements[$tag] = ['', [[$this, 'prerender_edit_mode'], [$entry, $currentoptions]]];
                             } else {
-                                $replacements[$tag] = array('html', $renderer->get_not_editable_template());
+                                $replacements[$tag] = ['html', $renderer->get_not_editable_template()];
                             }
                         }
                     } else {
@@ -156,26 +156,26 @@ abstract class datalynxfield_renderer {
                     if ($replacement === '') {
                         // NO VALUE ===.
                         if ($renderer->get_no_value_template() === $renderer::NO_VALUE_SHOW_NOTHING) {
-                            $replacements[$tag] = array('html', '');
+                            $replacements[$tag] = ['html', ''];
                         } else {
                             if ($renderer->get_no_value_template() === $renderer::NO_VALUE_SHOW_DISPLAY_MODE_TEMPLATE
                             ) {
-                                $replacements[$tag] = array('html',
-                                        $this->replace_renderer_template_tags($renderer->get_display_template(), ''));
+                                $replacements[$tag] = ['html',
+                                        $this->replace_renderer_template_tags($renderer->get_display_template(), '')];
                             } else {
-                                $replacements[$tag] = array('html', $renderer->get_no_value_template());
+                                $replacements[$tag] = ['html', $renderer->get_no_value_template()];
                             }
                         }
                     } else {
                         // HAS VALUE ===.
                         if ($renderer->get_display_template() === $renderer::DISPLAY_MODE_TEMPLATE_NONE
                         ) {
-                            $replacements[$tag] = array('html', $replacement);
+                            $replacements[$tag] = ['html', $replacement];
                         } else {
-                            $replacements[$tag] = array('html',
+                            $replacements[$tag] = ['html',
                                     $this->replace_renderer_template_tags(
                                             $renderer->get_display_template(), $replacement)
-                            );
+                            ];
                         }
                     }
                 }
@@ -205,7 +205,7 @@ abstract class datalynxfield_renderer {
      */
     protected function process_tag($tag) {
         $pattern = '/\[\[([^\|\]]+)(?:\|([^\|\]]*))?(?:\|([^\|\]]*))?\]\]/';
-        $matches = array();
+        $matches = [];
 
         $fieldname = $this->_field->name();
         $behavior = datalynx_field_behavior::get_default_behavior($this->_field->df());
@@ -225,7 +225,7 @@ abstract class datalynxfield_renderer {
             }
         }
 
-        return array($fieldname, $behavior, $renderer);
+        return [$fieldname, $behavior, $renderer];
     }
 
     /**
@@ -321,10 +321,10 @@ abstract class datalynxfield_renderer {
             $content = $entry->{"c{$fieldid}_content"};
         }
 
-        $arr = array();
+        $arr = [];
         $arr[] = &$mform->createElement('text', $fieldname, null,
-                array('size' => '32', 'disabled' => ($options['disabled'] ? 'disabled' : null)
-                ));
+                ['size' => '32', 'disabled' => ($options['disabled'] ? 'disabled' : null)
+                ]);
         $mform->setType($fieldname, PARAM_NOTAGS);
         $mform->setDefault($fieldname, $content);
     }
@@ -341,20 +341,20 @@ abstract class datalynxfield_renderer {
         $fieldid = $this->_field->id();
         $fieldname = "f_{$i}_$fieldid";
 
-        $arr = array();
-        $arr[] = &$mform->createElement('text', $fieldname, null, array('size' => '32'));
+        $arr = [];
+        $arr[] = &$mform->createElement('text', $fieldname, null, ['size' => '32']);
         $mform->setType($fieldname, PARAM_NOTAGS);
         $mform->setDefault($fieldname, $value);
         $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
 
-        return array($arr, null);
+        return [$arr, null];
     }
 
     /**
      */
     final public function get_menu($showall = false) {
         // The default menu category for fields.
-        $patternsmenu = array();
+        $patternsmenu = [];
         foreach ($this->patterns() as $tag => $pattern) {
             if ($showall || $pattern[self::PATTERN_SHOW_IN_MENU]) {
                 // Which category.
@@ -365,7 +365,7 @@ abstract class datalynxfield_renderer {
                 }
                 // Prepare array.
                 if (!isset($patternsmenu[$cat])) {
-                    $patternsmenu[$cat] = array($cat => array());
+                    $patternsmenu[$cat] = [$cat => []];
                 }
                 // Add tag.
                 $patternsmenu[$cat][$cat][$tag] = $tag;
@@ -383,7 +383,7 @@ abstract class datalynxfield_renderer {
      * @return array
      */
     public function validate($entryid, $tags, $data) {
-        return array();
+        return [];
     }
 
     /**
@@ -397,8 +397,8 @@ abstract class datalynxfield_renderer {
     protected function patterns() {
         $fieldname = $this->_field->name();
 
-        $patterns = array();
-        $patterns["[[$fieldname]]"] = array(true);
+        $patterns = [];
+        $patterns["[[$fieldname]]"] = [true];
 
         return $patterns;
     }
@@ -406,6 +406,6 @@ abstract class datalynxfield_renderer {
     /**
      */
     public function pluginfile_patterns() {
-        return array();
+        return [];
     }
 }

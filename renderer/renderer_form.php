@@ -58,13 +58,13 @@ class datalynx_field_renderer_form extends moodleform {
 
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
-        $mform->addElement('text', 'name', get_string('name'), array('size' => '32'));
+        $mform->addElement('text', 'name', get_string('name'), ['size' => '32']);
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', "Renderer name may not contain the pipe symbol \" | \"!", 'regex',
                 '/^[^\|]+$/', 'client');
 
-        $mform->addElement('text', 'description', get_string('description'), array('size' => '64'));
+        $mform->addElement('text', 'description', get_string('description'), ['size' => '64']);
         $mform->setType('description', PARAM_TEXT);
 
         /*
@@ -78,33 +78,33 @@ class datalynx_field_renderer_form extends moodleform {
          */
 
         // When not visible.
-        $group = array();
+        $group = [];
         $group[] = $mform->createElement('radio', 'notvisibleoptions', '', get_string('shownothing', 'datalynx'), '___0___');
         $group[] = $mform->createElement('radio', 'notvisibleoptions', '', get_string('custom', 'datalynx'), '___2___');
         $group[] = $mform->createElement('textarea', 'notvisibletemplate', '', '');
         $mform->disabledIf('notvisibletemplate', 'notvisibleoptions', 'eq', '___0___');
         $mform->addGroup($group, 'notvisiblegroup', get_string('notvisible', 'datalynx'),
-                array('<br />'
-                ), false);
+                ['<br />'
+                ], false);
         $mform->setType('notvisibletemplate', PARAM_RAW);
         $mform->setDefault('notvisibleoptions', '___0___');
 
         // Display template.
-        $group = array();
+        $group = [];
         $group[] = $mform->createElement('radio', 'displayoptions', '', get_string('none'), '___4___');
         $group[] = $mform->createElement('radio', 'displayoptions', '', get_string('custom', 'datalynx'), '___2___');
         $group[] = $mform->createElement('textarea', 'displaytemplate', '', '');
         $mform->setDefault('displaytemplate', '#value');
         $mform->disabledIf('displaytemplate', 'displayoptions', 'eq', '___4___');
         $mform->addGroup($group, 'displaytemplategroup', get_string('displaytemplate', 'datalynx'),
-                array('<br />'
-                ), false);
+                ['<br />'
+                ], false);
         $mform->setType('displaytemplate', PARAM_RAW);
         $mform->addHelpButton('displaytemplategroup', 'displaytemplate', 'datalynx');
         $mform->setDefault('displayoptions', '___4___');
 
         // When empty.
-        $group = array();
+        $group = [];
         $group[] = $mform->createElement('radio', 'novalueoptions', '',
                 get_string('shownothing', 'datalynx'), '___0___');
         $group[] = $mform->createElement('radio', 'novalueoptions', '',
@@ -114,12 +114,12 @@ class datalynx_field_renderer_form extends moodleform {
         $group[] = $mform->createElement('textarea', 'novaluetemplate', '', '');
         $mform->disabledIf('novaluetemplate', 'novalueoptions', 'eq', '___0___');
         $mform->disabledIf('novaluetemplate', 'novalueoptions', 'eq', '___1___');
-        $mform->addGroup($group, 'novaluetemplategroup', get_string('novalue', 'datalynx'), array('<br />'), false);
+        $mform->addGroup($group, 'novaluetemplategroup', get_string('novalue', 'datalynx'), ['<br />'], false);
         $mform->setType('novaluetemplate', PARAM_RAW);
         $mform->setDefault('novalueoptions', '___1___');
 
         // Edit template.
-        $group = array();
+        $group = [];
         $group[] = $mform->createElement('radio', 'editoptions', '', get_string('none'), '___4___');
         $group[] = $mform->createElement('radio', 'editoptions', '', get_string('asdisplay', 'datalynx'), '___1___');
         $group[] = $mform->createElement('radio', 'editoptions', '', get_string('custom', 'datalynx'), '___2___');
@@ -127,13 +127,13 @@ class datalynx_field_renderer_form extends moodleform {
         $mform->setDefault('edittemplate', '#input');
         $mform->disabledIf('edittemplate', 'editoptions', 'eq', '___1___');
         $mform->disabledIf('edittemplate', 'editoptions', 'eq', '___4___');
-        $mform->addGroup($group, 'edittemplategroup', get_string('edittemplate', 'datalynx'), array('<br />'), false);
+        $mform->addGroup($group, 'edittemplategroup', get_string('edittemplate', 'datalynx'), ['<br />'], false);
         $mform->setType('edittemplate', PARAM_RAW);
         $mform->addHelpButton('edittemplategroup', 'edittemplate', 'datalynx');
         $mform->setDefault('editoptions', '___1___');
 
         // When not editable.
-        $group = array();
+        $group = [];
         $group[] = $mform->createElement('radio', 'noteditableoptions', '', get_string('shownothing', 'datalynx'), '___0___');
         $group[] = $mform->createElement('radio', 'noteditableoptions', '', get_string('asdisplay', 'datalynx'), '___1___');
         $group[] = $mform->createElement('radio', 'noteditableoptions', '', get_string('disabled', 'datalynx'), '___3___');
@@ -142,7 +142,7 @@ class datalynx_field_renderer_form extends moodleform {
         $mform->disabledIf('noteditabletemplate', 'noteditableoptions', 'eq', '___0___');
         $mform->disabledIf('noteditabletemplate', 'noteditableoptions', 'eq', '___1___');
         $mform->disabledIf('noteditabletemplate', 'noteditableoptions', 'eq', '___3___');
-        $mform->addGroup($group, 'noteditablegroup', get_string('noteditable', 'datalynx'), array('<br />'), false);
+        $mform->addGroup($group, 'noteditablegroup', get_string('noteditable', 'datalynx'), ['<br />'], false);
         $mform->setType('noteditabletemplate', PARAM_RAW);
         $mform->setDefault('noteditableoptions', '___1___');
 
@@ -162,7 +162,7 @@ class datalynx_field_renderer_form extends moodleform {
             return null;
         }
 
-        $formfields = array('notvisible', 'display', 'novalue', 'edit', 'noteditable');
+        $formfields = ['notvisible', 'display', 'novalue', 'edit', 'noteditable'];
 
         foreach ($formfields as $formfield) {
             $template = $formfield . 'template';
@@ -181,12 +181,12 @@ class datalynx_field_renderer_form extends moodleform {
      * @see moodleform::set_data()
      */
     public function set_data($data) {
-        $formfields = array('notvisible', 'display', 'novalue', 'edit', 'noteditable');
+        $formfields = ['notvisible', 'display', 'novalue', 'edit', 'noteditable'];
 
         foreach ($formfields as $formfield) {
             $template = $formfield . 'template';
             $option = $formfield . 'options';
-            $signifiers = array('___0___', '___1___', '___2___', '___3___', '___4___');
+            $signifiers = ['___0___', '___1___', '___2___', '___3___', '___4___'];
             if (in_array($data->$template, $signifiers)) {
                 // If we see a signifier we set options and delete template.
                 $data->$option = $data->$template;
@@ -215,7 +215,7 @@ class datalynx_field_renderer_form extends moodleform {
         }
         if ($data['id'] == 0) {
             // To prevent duplicate renderer names when creating a new renderer.
-            if ($DB->record_exists('datalynx_renderers', array('name' => $data['name'], 'dataid' => $data['d']))) {
+            if ($DB->record_exists('datalynx_renderers', ['name' => $data['name'], 'dataid' => $data['d']])) {
                 $errors['name'] = get_string('duplicatename', 'datalynx');
             }
         } else {
@@ -223,7 +223,7 @@ class datalynx_field_renderer_form extends moodleform {
             $sql = "SELECT 'x'
                     FROM {datalynx_renderers} r
                     WHERE r.name = ? AND r.dataid = ? AND r.id <> ?";
-            $params = array($data['name'], $data['d'], $data['id']);
+            $params = [$data['name'], $data['d'], $data['id']];
             if ($DB->record_exists_sql($sql, $params)) {
                 $errors['name'] = get_string('duplicatename', 'datalynx');
             }

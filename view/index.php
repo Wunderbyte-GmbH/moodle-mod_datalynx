@@ -54,11 +54,11 @@ require_login($dl->data->course, false, $dl->cm);
 
 require_capability('mod/datalynx:managetemplates', $dl->context);
 
-$dl->set_page('view/index', array('modjs' => true, 'urlparams' => $urlparams));
+$dl->set_page('view/index', ['modjs' => true, 'urlparams' => $urlparams]);
 
 // Activate navigation node.
 navigation_node::override_active_url(
-        new moodle_url('/mod/datalynx/view/index.php', array('id' => $dl->cm->id)));
+        new moodle_url('/mod/datalynx/view/index.php', ['id' => $dl->cm->id]));
 
 // DATA PROCESSING.
 if ($urlparams->duplicate && confirm_sesskey()) { // Duplicate any requested views.
@@ -116,7 +116,7 @@ if (empty($views)) {
 }
 
 // Print header.
-$dl->print_header(array('tab' => 'views', 'urlparams' => $urlparams));
+$dl->print_header(['tab' => 'views', 'urlparams' => $urlparams]);
 
 // Display the view form jump list.
 $directories = get_list_of_plugins('mod/datalynx/view/');
@@ -134,10 +134,10 @@ asort($menuview); // Sort in alphabetical order.
 $br = html_writer::empty_tag('br');
 $popupurl = $CFG->wwwroot . '/mod/datalynx/view/view_edit.php?d=' . $dl->id() . '&amp;sesskey=' . sesskey();
 $viewselect = new single_select(new moodle_url($popupurl), 'type', $menuview, null,
-        array('' => 'choosedots'), 'viewform');
+        ['' => 'choosedots'], 'viewform');
 $viewselect->set_label(get_string('viewadd', 'datalynx') . '&nbsp;');
 echo $output = html_writer::tag('div', $br . $OUTPUT->render($viewselect) . $br,
-        array('class' => 'viewadd mdl-align'));
+        ['class' => 'viewadd mdl-align']);
 
 // If there are views print admin style list of them.
 if (!empty($views)) {
@@ -145,7 +145,7 @@ if (!empty($views)) {
     $viewbaseurl = '/mod/datalynx/view.php';
     $editbaseurl = '/mod/datalynx/view/view_edit.php';
     $actionbaseurl = '/mod/datalynx/view/index.php';
-    $linkparams = array('d' => $dl->id(), 'sesskey' => sesskey());
+    $linkparams = ['d' => $dl->id(), 'sesskey' => sesskey()];
 
     // Table headings.
     $strdefault = get_string('defaultview', 'datalynx');
@@ -158,17 +158,17 @@ if (!empty($views)) {
     $strchoose = get_string('choose');
 
     $selectallnone = html_writer::checkbox(null, null, false, null,
-            array('onclick' => 'select_allnone(\'view\'&#44;this.checked)'));
+            ['onclick' => 'select_allnone(\'view\'&#44;this.checked)']);
     $multiactionurl = new moodle_url($actionbaseurl, $linkparams);
     $multidelete = html_writer::tag('button', $OUTPUT->pix_icon('t/delete', get_string('multidelete', 'datalynx')),
-            array('name' => 'multidelete',
+            ['name' => 'multidelete',
                     'onclick' => 'bulk_action(\'view\'&#44; \'' . $multiactionurl->out(false) . '\'&#44; \'delete\')'
-            ));
+            ]);
     $multiduplicate = html_writer::tag('button',
             $OUTPUT->pix_icon('t/copy', get_string('multiduplicate', 'datalynx')),
-            array('type' => 'button', 'name' => 'multiduplicate',
+            ['type' => 'button', 'name' => 'multiduplicate',
                     'onclick' => 'bulk_action(\'view\'&#44; \'' . $multiactionurl->out(false) . '\'&#44; \'duplicate\')'
-            ));
+            ]);
 
     $strhide = get_string('hide');
     $strshow = get_string('show');
@@ -177,15 +177,15 @@ if (!empty($views)) {
     $filtersmenu = $dl->get_filter_manager()->get_filters(null, true);
 
     // Table headers.
-    $headers = array('name' => get_string('name'), 'type' => get_string('type', 'datalynx'),
+    $headers = ['name' => get_string('name'), 'type' => get_string('type', 'datalynx'),
             'description' => get_string('description'), 'visible' => get_string('visible'),
             'default' => $strdefault, 'singleedit' => $strsingleedit, 'singlemore' => $strsinglemore,
             'filter' => $strfilter, 'edit' => $stredit, 'reset' => $strreset,
             'duplicate' => $multiduplicate, 'delete' => $multidelete, 'selectallnone' => $selectallnone
-    );
+    ];
 
     $table = new flexible_table('datalynxviewsindex' . $dl->id());
-    $table->define_baseurl(new moodle_url('/mod/datalynx/view/index.php', array('d' => $dl->id())));
+    $table->define_baseurl(new moodle_url('/mod/datalynx/view/index.php', ['d' => $dl->id()]));
     $table->define_columns(array_keys($headers));
     $table->define_headers(array_values($headers));
 
@@ -215,28 +215,28 @@ if (!empty($views)) {
     foreach ($views as $viewid => $view) {
 
         $viewname = html_writer::link(
-                new moodle_url($viewbaseurl, array('d' => $dl->id(), 'view' => $viewid)), $view->name());
+                new moodle_url($viewbaseurl, ['d' => $dl->id(), 'view' => $viewid]), $view->name());
         $viewtype = $view->typename();
         $viewdescription = shorten_text($view->view->description, 30);
         $viewedit = html_writer::link(
-                new moodle_url($editbaseurl, $linkparams + array('vedit' => $viewid)),
+                new moodle_url($editbaseurl, $linkparams + ['vedit' => $viewid]),
                 $OUTPUT->pix_icon('t/edit', $stredit . " " . $view->name()),
-                array('title' => $stredit . " " . $view->name()));
+                ['title' => $stredit . " " . $view->name()]);
         $viewduplicate = html_writer::link(
-                new moodle_url($actionbaseurl, $linkparams + array('duplicate' => $viewid)),
+                new moodle_url($actionbaseurl, $linkparams + ['duplicate' => $viewid]),
                 $OUTPUT->pix_icon('t/copy', $strduplicate));
         $viewreset = html_writer::link(
-                new moodle_url($actionbaseurl, $linkparams + array('reset' => $viewid)),
+                new moodle_url($actionbaseurl, $linkparams + ['reset' => $viewid]),
                 $OUTPUT->pix_icon('t/reload', $strreset));
         $viewdelete = html_writer::link(
-                new moodle_url($actionbaseurl, $linkparams + array('delete' => $viewid)),
+                new moodle_url($actionbaseurl, $linkparams + ['delete' => $viewid]),
                 $OUTPUT->pix_icon('t/delete', $strdelete));
         $viewselector = html_writer::checkbox("viewselector", $viewid, false);
 
         $viewvisible = '';
         for ($i = 1; $i < 16; $i = $i << 1) {
             $viewvisible .= html_writer::checkbox("visible[{$i}]", 1, ($i & $view->view->visible),
-                    '', array('disabled' => '', 'title' => get_string("visible{$i}", 'datalynx')));
+                    '', ['disabled' => '', 'title' => get_string("visible{$i}", 'datalynx')]);
         }
 
         // Default view.
@@ -244,29 +244,29 @@ if (!empty($views)) {
             $defaultview = $OUTPUT->pix_icon('t/approve', get_string('isdefault', 'mod_datalynx'));
         } else {
             $defaultview = html_writer::link(
-                    new moodle_url($actionbaseurl, $linkparams + array('default' => $viewid)),
+                    new moodle_url($actionbaseurl, $linkparams + ['default' => $viewid]),
                     $OUTPUT->pix_icon('t/switch_whole', get_string('setdefault', 'mod_datalynx')));
         }
 
         // Single edit view.
         if ($viewid == $dl->data->singleedit) {
             $singleedit = html_writer::link(
-                    new moodle_url($actionbaseurl, $linkparams + array('singleedit' => -1)),
+                    new moodle_url($actionbaseurl, $linkparams + ['singleedit' => -1]),
                     $OUTPUT->pix_icon('t/approve', get_string('isedit', 'mod_datalynx')));
         } else {
             $singleedit = html_writer::link(
-                    new moodle_url($actionbaseurl, $linkparams + array('singleedit' => $viewid)),
+                    new moodle_url($actionbaseurl, $linkparams + ['singleedit' => $viewid]),
                     $OUTPUT->pix_icon('t/switch_whole', get_string('setedit', 'mod_datalynx')));
         }
 
         // Single more view.
         if ($viewid == $dl->data->singleview) {
             $singlemore = html_writer::link(
-                    new moodle_url($actionbaseurl, $linkparams + array('singlemore' => -1)),
+                    new moodle_url($actionbaseurl, $linkparams + ['singlemore' => -1]),
                     $OUTPUT->pix_icon('t/approve', get_string('ismore', 'mod_datalynx')));
         } else {
             $singlemore = html_writer::link(
-                    new moodle_url($actionbaseurl, $linkparams + array('singlemore' => $viewid)),
+                    new moodle_url($actionbaseurl, $linkparams + ['singlemore' => $viewid]),
                     $OUTPUT->pix_icon('t/switch_whole', get_string('setmore', 'mod_datalynx')));
         }
 
@@ -276,20 +276,20 @@ if (!empty($views)) {
             if ($viewfilterid && !in_array($viewfilterid, array_keys($filtersmenu))) {
                 $viewfilter = html_writer::link(
                         new moodle_url($actionbaseurl,
-                                $linkparams + array('setfilter' => $viewid, 'fid' => -1)),
+                                $linkparams + ['setfilter' => $viewid, 'fid' => -1]),
                         $OUTPUT->pix_icon('i/risk_xss', $strreset));
             } else {
-                $blankfilteroption = array(-1 => get_string('blankfilter', 'datalynx'));
+                $blankfilteroption = [-1 => get_string('blankfilter', 'datalynx')];
                 if ($dl->data->defaultfilter) {
                     $defaultfilter = $dl->get_filter_manager()->get_filter_from_id($dl->data->defaultfilter);
                     $defaultfiltername = $defaultfilter->name;
-                    $defaultfilteroption = array(
+                    $defaultfilteroption = [
                             0 => get_string('defaultfilterlabel', 'datalynx', $defaultfiltername)
-                    );
+                    ];
                 } else {
-                    $defaultfilteroption = array(
+                    $defaultfilteroption = [
                             0 => get_string('defaultfilterlabel', 'datalynx', get_string('blankfilter', 'datalynx'))
-                    );
+                    ];
                 }
 
                 if ($viewfilterid) {
@@ -301,8 +301,8 @@ if (!empty($views)) {
                 $options = $blankfilteroption + $defaultfilteroption + $filtersmenu;
 
                 $selecturl = new moodle_url($actionbaseurl,
-                        $linkparams + array('setfilter' => $viewid));
-                $viewselect = new single_select($selecturl, 'fid', $options, $selected, array());
+                        $linkparams + ['setfilter' => $viewid]);
+                $viewselect = new single_select($selecturl, 'fid', $options, $selected, []);
 
                 $viewfilter = $OUTPUT->render($viewselect);
             }
@@ -311,9 +311,9 @@ if (!empty($views)) {
         }
 
         $table->add_data(
-                array($viewname, $viewtype, $viewdescription, $viewvisible, $defaultview,
+                [$viewname, $viewtype, $viewdescription, $viewvisible, $defaultview,
                         $singleedit, $singlemore, $viewfilter, $viewedit, $viewreset, $viewduplicate,
-                        $viewdelete, $viewselector));
+                        $viewdelete, $viewselector]);
     }
 
     $table->finish_output();

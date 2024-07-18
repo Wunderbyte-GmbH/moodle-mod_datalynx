@@ -39,7 +39,7 @@ class entry extends \core_search\base_mod {
     /**
      * @var array Cache of datalynx entries.
      */
-    protected $entriesdata = array();
+    protected $entriesdata = [];
 
     /**
      * Returns a recordset with all required entry information.
@@ -72,7 +72,7 @@ class entry extends \core_search\base_mod {
      * @param array    $options
      * @return \core_search\document
      */
-    public function get_document($entry, $options = array()) {
+    public function get_document($entry, $options = []) {
         try {
             $cm = $this->get_cm('datalynx', $entry->dataid, $entry->course);
             $context = \context_module::instance($cm->id);
@@ -142,7 +142,7 @@ class entry extends \core_search\base_mod {
                 JOIN {datalynx} dl ON dl.id = de.dataid
                 WHERE de.id = ?";
 
-        $entry = $DB->get_record_sql($sql, array( $id ), IGNORE_MISSING);
+        $entry = $DB->get_record_sql($sql, [$id], IGNORE_MISSING);
 
         if (!$entry) {
             return \core_search\manager::ACCESS_DELETED;
@@ -165,12 +165,12 @@ class entry extends \core_search\base_mod {
 
     public function get_doc_url(\core_search\document $doc) {
         $entry = $this->get_entry($doc->get('itemid'));
-        return new \moodle_url('/mod/datalynx/view.php', array( 'd' => $entry->dataid, 'eids' => $entry->id ));
+        return new \moodle_url('/mod/datalynx/view.php', ['d' => $entry->dataid, 'eids' => $entry->id]);
     }
 
     public function get_context_url(\core_search\document $doc) {
         $entry = $this->get_entry($doc->get('itemid'));
-        return new \moodle_url('/mod/datalynx/view.php', array('d' => $entry->dataid));
+        return new \moodle_url('/mod/datalynx/view.php', ['d' => $entry->dataid]);
     }
 
     /**
@@ -184,7 +184,7 @@ class entry extends \core_search\base_mod {
         global $DB;
 
         if (empty($this->entriesdata[$entryid])) {
-            $this->entriesdata[$entryid] = $DB->get_record('datalynx_entries', array( 'id' => $entryid ), '*', MUST_EXIST);
+            $this->entriesdata[$entryid] = $DB->get_record('datalynx_entries', ['id' => $entryid], '*', MUST_EXIST);
         }
 
         return $this->entriesdata[$entryid];
@@ -200,16 +200,16 @@ class entry extends \core_search\base_mod {
     protected function get_fields_for_entries($entry) {
         global $DB;
 
-        $indexfields = array();
-        $validfieldtypes = array('text', 'textarea', 'url', 'number', 'editor', 'file');
+        $indexfields = [];
+        $validfieldtypes = ['text', 'textarea', 'url', 'number', 'editor', 'file'];
 
         $sql = "SELECT dc.*, df.name AS fieldname, df.type AS fieldtype
                 FROM {datalynx_contents} dc, {datalynx_fields} df
                 WHERE dc.fieldid = df.id
                 AND dc.entryid = :entryid";
 
-        $contents = $DB->get_records_sql($sql, array('entryid' => $entry->id));
-        $filteredcontents = array();
+        $contents = $DB->get_records_sql($sql, ['entryid' => $entry->id]);
+        $filteredcontents = [];
 
         // Filter invalid fieldtypes.
         foreach ($contents as $content) {
@@ -246,7 +246,7 @@ class entry extends \core_search\base_mod {
      * @return array
      */
     public function get_search_fileareas() {
-        return array('content');
+        return ['content'];
     }
 
     /**

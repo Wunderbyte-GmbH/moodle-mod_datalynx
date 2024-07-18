@@ -45,11 +45,11 @@ $urlparams->cancel = optional_param('cancel', 0, PARAM_BOOL);
 $dl = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
 require_capability('mod/datalynx:managetemplates', $dl->context);
 
-$dl->set_page('customfilter/index', array('modjs' => true, 'urlparams' => $urlparams));
+$dl->set_page('customfilter/index', ['modjs' => true, 'urlparams' => $urlparams]);
 require_login($dl->data->course, false, $dl->cm);
 
 navigation_node::override_active_url(
-        new moodle_url('/mod/datalynx/customfilter/index.php', array('id' => $dl->cm->id)));
+        new moodle_url('/mod/datalynx/customfilter/index.php', ['id' => $dl->cm->id]));
 
 $fm = $dl->get_customfilter_manager();
 
@@ -79,7 +79,7 @@ if ($urlparams->new && confirm_sesskey()) {
         $dl->notifications['bad'][] = get_string('customfiltersnoneindatalynx', 'datalynx');
     }
     // Print header.
-    $dl->print_header(array('tab' => 'customfilters', 'urlparams' => $urlparams));
+    $dl->print_header(['tab' => 'customfilters', 'urlparams' => $urlparams]);
     // Print the filter add link.
     $fm->print_add_filter();
     // If there are filters print admin style list of them.

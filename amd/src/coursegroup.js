@@ -1,47 +1,51 @@
-define(['jquery'], function($) {
-
-    return {
-        init: function(options) {
-            var coursefield = options.coursefield;
-            var groupfield = options.groupfield;
-            var actionurl = options.acturl; // Points to loadgroups.php.
-
-            // Read groupid from second select and enter in input field.
-            $("#id_"+groupfield).on( "change", function () {
-                $("#id_"+groupfield + 'id').val($( "#id_"+groupfield+" option:selected" ).val());
-            });
-
-            // Read courseid and call ajax at change to receive all groups in course.
-            $("#id_"+coursefield).on( "change", function () {
-                var group = $( "#id_"+groupfield ); // Get group select.
-                var courseid =  $( "#id_"+coursefield+" option:selected" ).val(); // Get the courseid.
-                group.find('option').remove().end(); // Remove current options.
-
-                // Load groups from course.
-                if (courseid != 0) {
-                    // Ajax request to get current options.
-                    $.ajax(
-                        {
-                            method: "POST",
-                            url: actionurl,
-                            data: 'courseid=' + courseid,
-                            context: this,
-                            dataType: "text",
-                            success: function(data) {
-                                if (data != '') {
-                                    // Add Group to options, value is groupid.
-                                    $.each(data.split(','), function(key, value) {
-                                        group.append($("<option></option>").attr("value",value.split(" ",1)).text(value));
-                                    });
-                                }
-                            },
-                            error: function() {
-                                alert("Error");
-                            }
-                        }
-                    );
-                }
-            }); // End on change _course.
+export default {
+    init(options) {
+      const {coursefield, groupfield, acturl: actionurl} = options;
+      // Update input field with the selected group id
+      document.getElementById(`id_${groupfield}`).addEventListener('change', function() {
+        const selectedValue = document.querySelector(`#id_${groupfield} option:checked`).value;
+        document.getElementById(`id_${groupfield}id`).value = selectedValue;
+      });
+      // When the course is changed, fetch groups using AJAX
+      document.getElementById(`id_${coursefield}`).addEventListener('change', function() {
+        const groupSelect = document.getElementById(`id_${groupfield}`);
+        const selectedCourseId = document.querySelector(`#id_${coursefield} option:checked`).value;
+        // Remove current options
+        groupSelect.innerHTML = '';
+        // Load groups for selected course
+        if (selectedCourseId !== '0') {
+          // Fetch groups via fetch API
+          return fetch(actionurl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: `courseid=${selectedCourseId}`
+          })
+          .then(response => {
+            // Return the response text to the next .then()
+            return response.text();
+          })
+          .then(data => {
+            if (data) {
+              // Populate group options
+              data.split(',').forEach(group => {
+                const value = group.split(' ', 1)[0];
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = group;
+                groupSelect.appendChild(option);
+              });
+            }
+            // Return null if there's nothing further to do
+            return null;
+          })
+          .catch(() => {
+            throw new Error('Group loading failed');
+          });
+        } else {
+          return Promise.resolve(); // Return a resolved promise if no action is needed
         }
-    };
-});
+      });
+    }
+  };

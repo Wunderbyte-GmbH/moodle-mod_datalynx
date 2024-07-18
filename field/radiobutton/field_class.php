@@ -37,10 +37,10 @@ class datalynxfield_radiobutton extends datalynxfield_select {
      */
     protected $forfieldgroup = false;
 
-    public $separators = array(array('name' => 'New line', 'chr' => '<br />'),
-            array('name' => 'Space', 'chr' => '&#32;'),
-            array('name' => ',', 'chr' => '&#44;'),
-            array('name' => ', (with space)', 'chr' => '&#44;&#32;')
-    );
+    public $separators = [['name' => 'New line', 'chr' => '<br />'],
+            ['name' => 'Space', 'chr' => '&#32;'],
+            ['name' => ',', 'chr' => '&#44;'],
+            ['name' => ', (with space)', 'chr' => '&#44;&#32;']
+    ];
 
 }

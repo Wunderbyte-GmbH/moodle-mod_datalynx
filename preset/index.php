@@ -50,11 +50,11 @@ require_login($df->data->course, false, $df->cm);
 
 require_capability('mod/datalynx:managetemplates', $df->context);
 
-$df->set_page('preset/index', array('modjs' => true, 'urlparams' => $urlparams));
+$df->set_page('preset/index', ['modjs' => true, 'urlparams' => $urlparams]);
 
 // Activate navigation node.
 navigation_node::override_active_url(
-        new moodle_url('/mod/datalynx/preset/index.php', array('id' => $df->cm->id)));
+        new moodle_url('/mod/datalynx/preset/index.php', ['id' => $df->cm->id]));
 
 $pm = $df->get_preset_manager();
 
@@ -71,7 +71,7 @@ if (!$localpresets && !$sharedpresets) {
 }
 
 // Print header.
-$df->print_header(array('tab' => 'presets', 'urlparams' => $urlparams));
+$df->print_header(['tab' => 'presets', 'urlparams' => $urlparams]);
 
 // Print the preset form.
 $pm->print_preset_form();

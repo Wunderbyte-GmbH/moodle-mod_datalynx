@@ -71,7 +71,7 @@ class css_saved extends \core\event\base {
      */
     public function get_url() {
         return new \moodle_url('/mod/datalynx/view.php',
-                array('d' => $this->objectid, 'cssedit' => 1
-                ));
+                ['d' => $this->objectid, 'cssedit' => 1
+                ]);
     }
 }

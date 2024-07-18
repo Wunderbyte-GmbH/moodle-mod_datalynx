@@ -57,13 +57,13 @@ class shortcodes {
                 return get_string('invalidcoursemodule', 'error');
             }
             // Sanity check in case the designated datalynx has been deleted or does not exist.
-            if (!$DB->record_exists('datalynx', array('id' => $cm->instance))) {
+            if (!$DB->record_exists('datalynx', ['id' => $cm->instance])) {
                 return get_string('datalynxinstance_deleted', 'mod_datalynxcoursepage');
             }
 
             // Sanity check in case the designated view has been deleted.
             if (!$DB->record_exists('datalynx_views',
-                            array('dataid' => $cm->instance, 'name' => $viewname))) {
+                            ['dataid' => $cm->instance, 'name' => $viewname])) {
                 return get_string('datalynxview_deleted', 'mod_datalynxcoursepage');
             }
             $dl = new datalynx($cm->instance, $cmid);
@@ -73,7 +73,7 @@ class shortcodes {
                 // No right to view datalynx instance or view or entry. Return empty string.
                 return '';
             }
-            $jsurl = new moodle_url('/mod/datalynxcoursepage/js.php', array('id' => $cmid));
+            $jsurl = new moodle_url('/mod/datalynxcoursepage/js.php', ['id' => $cmid]);
             $PAGE->requires->js($jsurl);
             $options = ['tohtml' => true, 'skiplogincheck' => true];
             return datalynx::get_content_inline($cm->instance, $view->id, null, $options);

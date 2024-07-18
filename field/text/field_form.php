@@ -67,14 +67,14 @@ class datalynxfield_text_form extends datalynxfield_form {
         $mform->addHelpButton('param9', 'autocompletiontextfield', 'datalynx');
 
         // Select textfields of given instance (stored in param10).
-        $options = array(0 => get_string('choosedots'));
+        $options = [0 => get_string('choosedots')];
         $mform->addElement('select', 'param10', get_string('textfield', 'datalynx'), $options);
         $mform->disabledIf('param10', 'param9', 'eq', 0);
         $mform->addHelpButton('param10', 'textfield', 'datalynx');
         $mform->setType('param10', PARAM_INT);
 
         // Ajax view loading.
-        $options = array(
+        $options = [
                 'dffield' => 'param9',
                 'textfieldfield' => 'param10',
                 'acturl' => "$CFG->wwwroot/mod/datalynx/loaddfviews.php",
@@ -82,37 +82,37 @@ class datalynxfield_text_form extends datalynxfield_form {
                 'thisfieldstring' => get_string('thisfield', 'datalynx'),
                 'update' => $this->_field->id() ? $this->_field->id() : 0,
                 'fieldtype' => 'text'
-        );
+        ];
 
         // Add JQuery
-        $PAGE->requires->js_call_amd('mod_datalynx/datalynxloadviews', 'init', array($options));
+        $PAGE->requires->js_call_amd('mod_datalynx/datalynxloadviews', 'init', [$options]);
 
         // Rules.
         $mform->addElement('header', 'fieldruleshdr', get_string('fieldrules', 'datalynx'));
 
         // Format rules.
-        $options = array('' => get_string('choosedots'),
+        $options = ['' => get_string('choosedots'),
                 'alphanumeric' => get_string('err_alphanumeric', 'form'),
                 'lettersonly' => get_string('err_lettersonly', 'form'),
                 'numeric' => get_string('err_numeric', 'form'),
                 'email' => get_string('err_email', 'form'),
-                'nopunctuation' => get_string('err_nopunctuation', 'form'));
+                'nopunctuation' => get_string('err_nopunctuation', 'form')];
         $mform->addElement('select', 'param4', get_string('format'), $options);
 
         // Length (param5, 6, 7) minimum, maximum, range.
-        $options = array('' => get_string('choosedots'),
+        $options = ['' => get_string('choosedots'),
                 'minlength' => get_string('min', 'datalynx'),
                 'maxlength' => get_string('max', 'datalynx'),
-                'rangelength' => get_string('range', 'datalynx'));
-        $grp = array();
+                'rangelength' => get_string('range', 'datalynx')];
+        $grp = [];
         $grp[] = &$mform->createElement('select', 'param5', null, $options);
-        $grp[] = &$mform->createElement('text', 'param6', null, array('size' => 8));
-        $grp[] = &$mform->createElement('text', 'param7', null, array('size' => 8));
+        $grp[] = &$mform->createElement('text', 'param6', null, ['size' => 8]);
+        $grp[] = &$mform->createElement('text', 'param7', null, ['size' => 8]);
         $mform->addGroup($grp, 'lengthgrp', get_string('numcharsallowed', 'datalynx'), '    ', false);
         $mform->addGroupRule('lengthgrp',
-                array('param6' => array(array(null, 'numeric', null, 'client'))));
+                ['param6' => [[null, 'numeric', null, 'client']]]);
         $mform->addGroupRule('lengthgrp',
-                array('param7' => array(array(null, 'numeric', null, 'client'))));
+                ['param7' => [[null, 'numeric', null, 'client']]]);
         $mform->disabledIf('param6', 'param5', 'eq', '');
         $mform->disabledIf('param6', 'param5', 'eq', 'maxlength');
         $mform->disabledIf('param7', 'param5', 'eq', '');
@@ -140,7 +140,7 @@ class datalynxfield_text_form extends datalynxfield_form {
 
         if ($refdatalynxid) {
             if ($textfields = $DB->get_records_menu('datalynx_fields',
-                    array('dataid' => $refdatalynxid, 'type' => 'text'), 'name', 'id,name')
+                    ['dataid' => $refdatalynxid, 'type' => 'text'], 'name', 'id,name')
             ) {
                 $formfield = &$this->_form->getElement('param10');
                 // Add the option to choose this new field itself as autocompletion reference field.
@@ -196,7 +196,7 @@ class datalynxfield_text_form extends datalynxfield_form {
                                     FROM {datalynx_contents} c
                                     WHERE c.fieldid = :fieldid AND c.content IS NOT NULL
                                     GROUP BY c.fieldid, c.content
-                                    HAVING COUNT(*) > 1", array('fieldid' => $fieldid));
+                                    HAVING COUNT(*) > 1", ['fieldid' => $fieldid]);
         if (empty($records)) {
             return false;
         }

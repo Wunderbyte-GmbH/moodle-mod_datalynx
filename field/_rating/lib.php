@@ -111,7 +111,7 @@ class datalynx_rating_manager extends rating_manager {
             throw new coding_exception('The items option is a required option when getting ratings.');
         } else {
             if (empty($options->items)) {
-                return array();
+                return [];
             }
         }
 
@@ -148,7 +148,7 @@ class datalynx_rating_manager extends rating_manager {
         }
 
         // Params.
-        $params = array();
+        $params = [];
         $params['contextid'] = $options->context->id;
         $params['userid'] = $userid;
         $params['component'] = $options->component;
@@ -159,7 +159,7 @@ class datalynx_rating_manager extends rating_manager {
             // Ugly hack to work around the exception in generate_settings.
             $options->aggregate = RATING_AGGREGATE_COUNT;
         } else {
-            $aggregatessql = array();
+            $aggregatessql = [];
             foreach ($options->aggregate as $aggregation) {
                 if (empty($aggregation)) {
                     continue;
@@ -198,7 +198,7 @@ class datalynx_rating_manager extends rating_manager {
                 GROUP BY r.itemid, r.component, r.ratingarea, r.contextid, ur.id, ur.userid, ur.scaleid
                 ORDER BY r.itemid";
 
-        return array($sql, $params);
+        return [$sql, $params];
     }
 
     /**
@@ -216,7 +216,7 @@ class datalynx_rating_manager extends rating_manager {
         }
 
         // Params.
-        $params = array();
+        $params = [];
         $params['contextid'] = $options->context->id;
         $params['userid'] = $userid;
         $params['component'] = $options->component;
@@ -233,8 +233,8 @@ class datalynx_rating_manager extends rating_manager {
 
         $sql = "SELECT r.id, r.itemid, r.component, r.ratingarea, r.contextid, r.scaleid,
                        r.rating, r.userid, r.timecreated, r.timemodified, " .
-                user_picture::fields('u', array('idnumber', 'username'
-                ), 'uid ') . " FROM {rating} r
+                user_picture::fields('u', ['idnumber', 'username'
+                ], 'uid ') . " FROM {rating} r
                     JOIN {user} u ON u.id = r.userid
                 WHERE r.contextid = :contextid
                         AND r.component = :component
@@ -242,7 +242,7 @@ class datalynx_rating_manager extends rating_manager {
                         $andwhereitems
                 ORDER BY r.itemid";
 
-        return array($sql, $params);
+        return [$sql, $params];
     }
 
     /**
@@ -282,8 +282,8 @@ class datalynx_rating_manager extends rating_manager {
 
         if (!empty($rec->aggregate)) {
             if (!is_array($rec->aggregate)) {
-                $rec->aggregate = array($rec->aggregate
-                );
+                $rec->aggregate = [$rec->aggregate
+                ];
             }
             foreach ($rec->aggregate as $aggregation) {
                 if (empty($aggregation)) {

@@ -33,22 +33,22 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
         $mform = &$this->_form;
 
         // Message subject. When empty then use default subject in message.
-        $mform->addElement('text', 'param6', get_string('asyncmessagesubject', 'backup'), array('size' => '64'));
+        $mform->addElement('text', 'param6', get_string('asyncmessagesubject', 'backup'), ['size' => '64']);
         $mform->setType('param6', PARAM_TEXT);
 
         $mform->addElement('header', 'settingshdr', get_string('settings'));
 
         // Sender.
-        $options = array(
+        $options = [
                 datalynx_rule_eventnotification::FROM_AUTHOR => get_string('author', 'datalynx'),
-                datalynx_rule_eventnotification::FROM_CURRENT_USER => get_string('user'));
+                datalynx_rule_eventnotification::FROM_CURRENT_USER => get_string('user')];
         $mform->addElement('select', 'param2', get_string('from'), $options);
 
         // Recipient.
         $grp = [];
-        $grp[] = &$mform->createElement('checkbox', 'author', null, get_string('author', 'datalynx'), array('size' => 1));
+        $grp[] = &$mform->createElement('checkbox', 'author', null, get_string('author', 'datalynx'), ['size' => 1]);
 
-        $options = array('multiple' => true);
+        $options = ['multiple' => true];
         $grp[] = &$mform->createElement('static', '', '', "<br><h4 class=\"w-100 mt-3\">" . get_string('roles') . "</h4>");
 
         $grp[] = &$mform->createElement('autocomplete', 'roles', get_string('roles'),
@@ -85,16 +85,16 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
         // Content to be included.
         $mform->addElement('header', 'message', get_string('messagecontent', 'datalynxrule_eventnotification'));
         $dlfields = $this->_df->get_fields();
-        $fieldmenu = array();
+        $fieldmenu = [];
         foreach ($dlfields as $fieldid => $field) {
             if ($field->type == 'text' || $field->type == 'editor' || $field->type == 'textarea') {
                 $fieldmenu[$fieldid] = $field->field->name;
             }
         }
-        $options = array(
+        $options = [
                 'multiple' => true,
                 'noselectionstring' => get_string('noselection', 'form'),
-        );
+        ];
         $mform->addElement('autocomplete', 'param7', get_string('searcharea', 'search'), $fieldmenu, $options);    }
 
     /**
@@ -105,7 +105,7 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
      */
     public function get_allusers(): array {
         global $DB;
-        $tempusers = $DB->get_records('user', array(), '', $fields = 'id, firstname, lastname');
+        $tempusers = $DB->get_records('user', [], '', $fields = 'id, firstname, lastname');
 
         $allusers[0] = get_string('noselection', 'datalynx');
         foreach ($tempusers as $userdata) {
@@ -164,7 +164,7 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
      * @return array
      */
     protected function menu_roles_used_in_context(): array {
-        $roles = array();
+        $roles = [];
         foreach (get_roles_used_in_context($this->_df->context) as $roleid => $role) {
             $roles[$roleid] = $role->coursealias ? $role->coursealias : ($role->name ? $role->name : $role->shortname);
         }
@@ -194,7 +194,7 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
     public function get_data($slashed = true) {
         if ($data = parent::get_data($slashed)) {
             // Set recipient.
-            $recipients = array();
+            $recipients = [];
             if (isset($data->author)) {
                 $recipients['author'] = 1;
             }

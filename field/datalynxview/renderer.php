@@ -66,7 +66,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         // Inline.
         if (empty($type)) {
             // TODO Including controls seems to mess up the hosting view controls.
-            $voptions = array('controls' => false);
+            $voptions = ['controls' => false];
             return $this->get_view_display_content($entry, $voptions);
         }
 
@@ -80,14 +80,14 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
      *
      * @returns                 the display-method of the view
      */
-    protected function get_view_display_content($entry, array $options = array()) {
+    protected function get_view_display_content($entry, array $options = []) {
         $field = $this->_field;
 
         $refdatalynx = $field->refdatalynx;
         $refview = $refdatalynx->get_view_from_id($field->refview);
 
         // Options for setting the filter.
-        $foptions = array();
+        $foptions = [];
 
         // Search filter by entry author or group.
         $foptions = $this->get_filter_by_options($foptions, $entry);
@@ -99,14 +99,14 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         $refview->set_filter($foptions, true);
 
         // Set the ref datalynx.
-        $params = array('js' => true, 'css' => true, 'modjs' => true, 'completion' => true,
-                'comments' => true);
+        $params = ['js' => true, 'css' => true, 'modjs' => true, 'completion' => true,
+                'comments' => true];
 
         // Ref datalynx page type defaults to external.
         $refpagetype = !empty($options['pagetype']) ? $options['pagetype'] : 'external';
         $pageoutput = $refdatalynx->set_page('external', $params, true);
 
-        $refview->set_content(array('filter' => $refview->get_filter()));
+        $refview->set_content(['filter' => $refview->get_filter()]);
         // Set to return html.
         $options['tohtml'] = true;
         $options['fieldview'] = true;
@@ -132,18 +132,18 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
             // Entry author.
             if ($filterauthor) {
                 if ($entry->id != -1) {
-                    $users = $urlquery ? $entry->userid : array($entry->userid);
+                    $users = $urlquery ? $entry->userid : [$entry->userid];
                     $options['users'] = $users;
                 } else {
                     global $USER;
-                    $users = $urlquery ? $USER->id : array($USER->id);
+                    $users = $urlquery ? $USER->id : [$USER->id];
                     $options['users'] = $users;
                 }
             }
             // Entry group.
             if ($filtergroup) {
                 if ($entry->id != -1) {
-                    $groups = $urlquery ? $entry->groupid : array($entry->groupid);
+                    $groups = $urlquery ? $entry->groupid : [$entry->groupid];
                     $options['groups'] = $groups;
                 } else {
                     $allgroups = groups_get_user_groups($this->_df->course);
@@ -160,7 +160,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         if ($fieldid = $field->field->param7) {  // Field-ID of the external field.
             if ($contents = $DB->get_fieldset_select('datalynx_contents', 'content',
                     'entryid = :entryid and fieldid = :fieldid',
-                    array('entryid' => $entry->id, 'fieldid' => $field->field->id))
+                    ['entryid' => $entry->id, 'fieldid' => $field->field->id])
             ) {
                 $contentsarr = explode(",", $contents[0]);
                 list($insql, $params) = $DB->get_in_or_equal($contentsarr, SQL_PARAMS_NAMED);
@@ -187,7 +187,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         $refdatalynx = $field->refdatalynx;
         $refview = $field->df->get_view_from_id($field->refview);
 
-        $soptions = array();
+        $soptions = [];
         // Custom sort (ref-field-patten,ASC/DESC).
         if (!empty($field->field->param4)) {
             foreach (explode("\n", $field->field->param4) as $key => $sorty) {
@@ -211,7 +211,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
      */
     protected function get_search_options($entry) {
         $field = $this->_field;
-        $soptions = array();
+        $soptions = [];
 
         // Custom search (AND/OR,ref-field-patten,[NOT],OPT,local-field-pattern/value.
         if (empty($field->field->param5)) {
@@ -226,7 +226,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         foreach (explode("\n", $field->field->param5) as $key => $searchy) {
             list($andor, $refpattern, $not, $operator, $localpattern) = explode(',', $searchy);
             // And/or.
-            if (empty($andor) || !in_array($andor, array('AND', 'OR'))) {
+            if (empty($andor) || !in_array($andor, ['AND', 'OR'])) {
                 continue;
             }
             // Get the ref field id from pattern.
@@ -242,7 +242,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
             } else {
                 if ($localfield = $field->df->get_field_from_id($localfieldid)) {
                     // Get the array of values for the patterns.
-                    if ($replacements = $localfield->renderer()->replacements(array($localpattern), $entry)) {
+                    if ($replacements = $localfield->renderer()->replacements([$localpattern], $entry)) {
                         // Take the first: array('html', value).
                         $first = reset($replacements);
                         // Extract the value part.
@@ -256,9 +256,9 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
 
             // Add to the search options.
             if (empty($soptions[$rfieldid])) {
-                $soptions[$rfieldid] = array('AND' => array(), 'OR' => array());
+                $soptions[$rfieldid] = ['AND' => [], 'OR' => []];
             }
-            $soptions[$rfieldid][$andor][] = array($not, $operator, $value);
+            $soptions[$rfieldid][$andor][] = [$not, $operator, $value];
         }
 
         return $soptions;
@@ -273,7 +273,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         $fieldname = $this->_field->name();
 
         $patterns = parent::patterns();
-        $patterns["[[$fieldname]]"] = array(true);
+        $patterns["[[$fieldname]]"] = [true];
 
         return $patterns;
     }
@@ -297,16 +297,16 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
             $classname = "datalynxview_{$fieldid}_{$entryid}";
             $required = !empty($options['required']);
 
-            $selected = !empty($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : array();
+            $selected = !empty($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : [];
             // A hidden field is added to autocomplete fields by parent Quickform element.
             // The value of the hidden field must be added as option in order to process an empty autocomplete field.
-            $menu = array("_qf__force_multiselect_submission" => "...");
+            $menu = ["_qf__force_multiselect_submission" => "..."];
             $menu = array_merge($menu, $field->refdatalynx->get_distinct_textfieldvalues_by_id($field->field->param7));
 
-            $mform->addElement('autocomplete', $fieldname, null, $menu, array(
+            $mform->addElement('autocomplete', $fieldname, null, $menu, [
                     "class" => "datalynxfield_datalynxview $classname",
                     "multiple" => "true"
-            ));
+            ]);
             $mform->setType($fieldname, PARAM_NOTAGS);
             $mform->setDefault($fieldname, $selected);
             if ($required) {
@@ -326,7 +326,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         $formfieldname = "field_{$fieldid}_{$entryid}";
         $required = true;
 
-        $errors = array();
+        $errors = [];
         foreach ($tags as $tag) {
             list(, $behavior, ) = $this->process_tag($tag);
             // Variable $behavior datalynx_field_behavior.

@@ -179,7 +179,7 @@ abstract class datalynxfield_base {
                 $success = $fs->delete_area_files($this->df->context->id, 'mod_datalynx', $filearea);
             }
             $this->delete_content();
-            $DB->delete_records('datalynx_fields', array('id' => $this->field->id));
+            $DB->delete_records('datalynx_fields', ['id' => $this->field->id]);
         }
         return true;
     }
@@ -251,7 +251,7 @@ abstract class datalynxfield_base {
             $formclass = 'datalynxfield_form';
         }
         $actionurl = new moodle_url('/mod/datalynx/field/field_edit.php',
-                array('d' => $this->df->id(), 'fid' => $this->id(), 'type' => $this->type));
+                ['d' => $this->df->id(), 'fid' => $this->id(), 'type' => $this->type]);
         return new $formclass($this, $actionurl);
     }
 
@@ -284,9 +284,9 @@ abstract class datalynxfield_base {
         return $this->_renderer;
     }
 
-    protected static $defaultoptions = array('manage' => false, 'visible' => false, 'edit' => false,
+    protected static $defaultoptions = ['manage' => false, 'visible' => false, 'edit' => false,
             'editable' => false, 'disabled' => false, 'required' => false, 'internal' => false
-    );
+    ];
 
     // CONTENT MANAGEMENT.
 
@@ -373,9 +373,9 @@ abstract class datalynxfield_base {
         global $DB;
 
         if ($entryid) {
-            $params = array('fieldid' => $this->field->id, 'entryid' => $entryid);
+            $params = ['fieldid' => $this->field->id, 'entryid' => $entryid];
         } else {
-            $params = array('fieldid' => $this->field->id);
+            $params = ['fieldid' => $this->field->id];
         }
 
         $rs = $DB->get_recordset('datalynx_contents', $params);
@@ -402,7 +402,7 @@ abstract class datalynxfield_base {
         global $DB;
 
         if (is_null($this->_distinctvalues)) {
-            $this->_distinctvalues = array();
+            $this->_distinctvalues = [];
             $fieldid = $this->field->id;
             $sortdir = $sortdir ? 'DESC' : 'ASC';
             $contentname = $this->get_sort_sql();
@@ -462,7 +462,7 @@ abstract class datalynxfield_base {
      */
     public function get_content_from_data($entryid, $data) {
         $fieldid = $this->field->id;
-        $content = array();
+        $content = [];
         $fieldgroups = [];
         foreach ($data as $key => $value) {
             if (strpos($key, 'fieldgroup_') === 0) {
@@ -507,7 +507,7 @@ abstract class datalynxfield_base {
      * @return array of strings
      */
     protected function content_names() {
-        return array('');
+        return [''];
     }
 
     /**
@@ -541,7 +541,7 @@ abstract class datalynxfield_base {
             $oldcontent = $entry->{"c{$fieldid}_content"};
         }
 
-        return array(array($newcontent), array($oldcontent));
+        return [[$newcontent], [$oldcontent]];
     }
 
     /**
@@ -562,7 +562,7 @@ abstract class datalynxfield_base {
      * @return array of strings
      */
     public function get_content_parts() {
-        return array('content');
+        return ['content'];
     }
 
     /**
@@ -572,7 +572,7 @@ abstract class datalynxfield_base {
      */
     public function get_select_sql() {
         if (is_numeric($this->field->id) && $this->field->id > 0) {
-            $arr = array();
+            $arr = [];
             $arr[] = " c{$this->field->id}.id AS c{$this->field->id}_id ";
             foreach ($this->get_content_parts() as $part) {
                 $arr[] = $this->get_sql_compare_text($part) . " AS c{$this->field->id}_$part";
@@ -596,7 +596,7 @@ abstract class datalynxfield_base {
         if (is_numeric($fieldid) && $fieldid > 0) {
             $sql = " LEFT JOIN {datalynx_contents} c$fieldid
             ON (c$fieldid.entryid = e.id AND c$fieldid.fieldid = :$paramname$paramcount)";
-            return array($sql, $fieldid);
+            return [$sql, $fieldid];
         } else {
             return null;
         }
@@ -665,11 +665,11 @@ abstract class datalynxfield_base {
                             "df_{$fieldid}_");
                     $sql = " $varcharcontent $sql ";
                 } else {
-                    if (in_array($operator, array('LIKE', 'BETWEEN', ''))) {
-                        $params = array($name => "%$value%");
+                    if (in_array($operator, ['LIKE', 'BETWEEN', ''])) {
+                        $params = [$name => "%$value%"];
                         $sql = $DB->sql_like($varcharcontent, ":$name", false);
                     } else {
-                        $params = array($name => "'$value'");
+                        $params = [$name => "'$value'"];
                         $sql = " $varcharcontent $operator :$name ";
                     }
                 }
@@ -683,12 +683,12 @@ abstract class datalynxfield_base {
                 list($notinids, $params) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED,
                         "df_{$fieldid}_", false);
                 $sql = " e.id $notinids ";
-                return array($sql, $params, false);
+                return [$sql, $params, false];
             } else {
-                return array('', '', '');
+                return ['', '', ''];
             }
         } else {
-            return array($sql, $params, true);
+            return [$sql, $params, true];
         }
     }
 
@@ -784,7 +784,7 @@ abstract class datalynxfield_base {
      * @return array an array of operators
      */
     public function get_supported_search_operators() {
-        return array(); // If search is not supported, offer no operators.
+        return []; // If search is not supported, offer no operators.
     }
 
     public function get_argument_count(string $operator) {
@@ -829,7 +829,7 @@ abstract class datalynxfield_no_content extends datalynxfield_base {
     }
 
     public function get_distinct_content($sortdir = 0) {
-        return array();
+        return [];
     }
 
     public function get_select_sql() {
@@ -855,7 +855,7 @@ abstract class datalynxfield_no_content extends datalynxfield_base {
  */
 abstract class datalynxfield_option extends datalynxfield_base {
 
-    protected $_options = array();
+    protected $_options = [];
 
     /**
      * TODO: see if this can be changed or merged with function below
@@ -905,7 +905,7 @@ abstract class datalynxfield_option extends datalynxfield_base {
      * @param array $map
      * @return mixed
      */
-    abstract public function update_options($map = array());
+    abstract public function update_options($map = []);
 
     /**
      * When an option from a single/multi choice is deleted / renamed or added
@@ -927,15 +927,15 @@ abstract class datalynxfield_option extends datalynxfield_base {
         $this->field->label = !empty($forminput->label) ? $forminput->label : '';
 
         $oldvalues = $newvalues = $this->_options;
-        $renames = !empty($forminput->renameoption) ? $forminput->renameoption : array();
-        $deletes = !empty($forminput->deleteoption) ? $forminput->deleteoption : array();
+        $renames = !empty($forminput->renameoption) ? $forminput->renameoption : [];
+        $deletes = !empty($forminput->deleteoption) ? $forminput->deleteoption : [];
         $adds = preg_split("/[\|\r\n]+/",
                 !empty($forminput->addoptions) ? $forminput->addoptions : '');
 
         // Make sure there are no renames when options are deleted. That will not work.
         $delvalues = array_values($deletes);
         if (!empty($delvalues)) {
-            $renames = array();
+            $renames = [];
         }
 
         $delkeys = array_keys($deletes);
@@ -949,7 +949,7 @@ abstract class datalynxfield_option extends datalynxfield_base {
             }
         }
 
-        $map = array(0 => 0);
+        $map = [0 => 0];
         for ($i = 1; $i <= count($oldvalues); $i++) {
             $j = array_search($oldvalues[$i], $newvalues);
             if ($j !== false) {
@@ -1040,9 +1040,9 @@ class datalynxfield_option_multiple extends datalynxfield_option {
      *
      * @see datalynxfield_option::update_options()
      */
-    public function update_options($map = array()) {
+    public function update_options($map = []) {
         global $DB;
-        $params = array();
+        $params = [];
         $i = 0;
         $where = 'c.fieldid = :fieldid AND (';
         foreach ($map as $old => $new) {
@@ -1061,7 +1061,7 @@ class datalynxfield_option_multiple extends datalynxfield_option {
         foreach ($oldcontents as $id => $oldcontent) {
             $prepareoldcontent = str_replace('#', '', $oldcontent);
             $prepared = explode(",", $prepareoldcontent);
-            $replaced = array();
+            $replaced = [];
             foreach ($prepared as $value) {
                 if ($map[$value] !== 0) {
                     $replaced[$map[$value]] = $map[$value];
@@ -1070,7 +1070,7 @@ class datalynxfield_option_multiple extends datalynxfield_option {
             $implodedcontent = implode(",", $replaced);
             $newcontent = "#" . str_replace(",", "#,#", $implodedcontent) . "#";
 
-            $DB->set_field('datalynx_contents', 'content', $newcontent, array('id' => $id));
+            $DB->set_field('datalynx_contents', 'content', $newcontent, ['id' => $id]);
         }
     }
 
@@ -1092,8 +1092,8 @@ class datalynxfield_option_multiple extends datalynxfield_option {
      */
     protected function format_content($entry, array $values = null) {
         $fieldid = $this->field->id;
-        $contents = array();
-        $oldcontents = array();
+        $contents = [];
+        $oldcontents = [];
 
         // Old contents.
         if (isset($entry->{"c{$fieldid}_content"})) {
@@ -1114,7 +1114,7 @@ class datalynxfield_option_multiple extends datalynxfield_option {
             $contents[] = ''; // Keep empties in database.
         }
 
-        return array($contents, $oldcontents);
+        return [$contents, $oldcontents];
     }
 
     /**
@@ -1249,13 +1249,13 @@ class datalynxfield_option_multiple extends datalynxfield_option {
             }
         }
 
-        return array($sql, $params, $usecontent);
+        return [$sql, $params, $usecontent];
     }
 
     public function get_supported_search_operators() {
-        return array('ANY_OF' => get_string('anyof', 'datalynx'),
+        return ['ANY_OF' => get_string('anyof', 'datalynx'),
                 'ALL_OF' => get_string('allof', 'datalynx'),
-                'EXACTLY' => get_string('exactly', 'datalynx'), '' => get_string('empty', 'datalynx'));
+                'EXACTLY' => get_string('exactly', 'datalynx'), '' => get_string('empty', 'datalynx')];
     }
 
     public function get_argument_count(string $operator) {
@@ -1277,10 +1277,10 @@ class datalynxfield_option_single extends datalynxfield_option {
      * {@inheritDoc}
      * @see datalynxfield_option::update_options()
      */
-    public function update_options($map = array()) {
+    public function update_options($map = []) {
         global $DB;
 
-        $params = array();
+        $params = [];
         $i = 0;
         $updatesql = "UPDATE {datalynx_contents}
                          SET content = (
@@ -1305,12 +1305,12 @@ class datalynxfield_option_single extends datalynxfield_option {
     protected function format_content($entry, array $values = null) {
         $fieldid = $this->field->id;
         // Old contents.
-        $oldcontents = array();
+        $oldcontents = [];
         if (isset($entry->{"c{$fieldid}_content"})) {
             $oldcontents[] = $entry->{"c{$fieldid}_content"};
         }
         // New contents.
-        $contents = array();
+        $contents = [];
 
         $selected = null;
 
@@ -1322,7 +1322,7 @@ class datalynxfield_option_single extends datalynxfield_option {
         // Add the content.
         $contents[] = $selected;
 
-        return array($contents, $oldcontents);
+        return [$contents, $oldcontents];
     }
 
     /**
@@ -1343,8 +1343,8 @@ class datalynxfield_option_single extends datalynxfield_option {
         AND de.id != :entryid
         GROUP BY dc.content
         HAVING COUNT(dc.id) >= :selectlimit";
-        $params = array('dataid' => $this->df->id(), 'fieldid' => $this->field->id,
-                'selectlimit' => $this->field->param5, 'entryid' => $entryid);
+        $params = ['dataid' => $this->df->id(), 'fieldid' => $this->field->id,
+                'selectlimit' => $this->field->param5, 'entryid' => $entryid];
 
         $results = $DB->get_records_sql($sql, $params);
 
@@ -1426,7 +1426,7 @@ class datalynxfield_option_single extends datalynxfield_option {
             }
         }
 
-        return array($sql, $params, $usecontent);
+        return [$sql, $params, $usecontent];
     }
 
     /**
@@ -1458,6 +1458,6 @@ class datalynxfield_option_single extends datalynxfield_option {
      * @see datalynxfield_base::get_supported_search_operators()
      */
     public function get_supported_search_operators() {
-        return array('ANY_OF' => get_string('anyof', 'datalynx'), '' => get_string('empty', 'datalynx'));
+        return ['ANY_OF' => get_string('anyof', 'datalynx'), '' => get_string('empty', 'datalynx')];
     }
 }

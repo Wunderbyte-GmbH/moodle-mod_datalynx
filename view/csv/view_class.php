@@ -77,7 +77,7 @@ class datalynxview_csv extends base {
             $columns = $this->get_columns();
             foreach ($columns as $column) {
                 list(, $header, $class) = $column;
-                $tableheader .= html_writer::tag('th', $header, array('class' => $class));
+                $tableheader .= html_writer::tag('th', $header, ['class' => $class]);
             }
             $tableheader = html_writer::tag('thead', html_writer::tag('tr', $tableheader));
 
@@ -87,24 +87,24 @@ class datalynxview_csv extends base {
             $tableheader = str_replace($tags, $replacements, $tableheader);
         }
         // Open table and wrap header with thead.
-        $elements[] = array('html',
-                html_writer::start_tag('table', array('class' => 'table table-striped')) . $tableheader);
+        $elements[] = ['html',
+                html_writer::start_tag('table', ['class' => 'table table-striped']) . $tableheader];
 
         // Flatten the set to a list of elements, wrap with tbody and close table.
-        $elements[] = array('html', html_writer::start_tag('tbody'));
+        $elements[] = ['html', html_writer::start_tag('tbody')];
         foreach ($entriesset as $entryid => $entrydefinitions) {
             $elements = array_merge($elements, $entrydefinitions);
         }
-        $elements[] = array('html', html_writer::end_tag('tbody') . html_writer::end_tag('table'));
+        $elements[] = ['html', html_writer::end_tag('tbody') . html_writer::end_tag('table')];
 
         // Add group heading.
         $name = ($name == 'newentry') ? get_string('entrynew', 'datalynx') : $name;
         if ($name) {
-            array_unshift($elements, array('html', $OUTPUT->heading($name, 3, 'main')));
+            array_unshift($elements, ['html', $OUTPUT->heading($name, 3, 'main')]);
         }
         // Wrap with entriesview.
-        array_unshift($elements, array('html', html_writer::start_tag('div', array('class' => 'entriesview'))));
-        array_push($elements, array('html', html_writer::end_tag('div')));
+        array_unshift($elements, ['html', html_writer::start_tag('div', ['class' => 'entriesview'])]);
+        array_push($elements, ['html', html_writer::end_tag('div')]);
 
         return $elements;
     }
@@ -134,27 +134,27 @@ class datalynxview_csv extends base {
         $columns = $this->get_columns();
 
         // Generate entry table row.
-        $elements[] = array('html', html_writer::start_tag('tr'));
+        $elements[] = ['html', html_writer::start_tag('tr')];
         foreach ($columns as $column) {
             list($tag, , $class) = array_map('trim', $column);
             if (!empty($fielddefinitions[$tag])) {
                 $fielddefinition = $fielddefinitions[$tag];
                 if ($fielddefinition[0] == 'html') {
-                    $elements[] = array('html',
-                            html_writer::tag('td', $fielddefinition[1], array('class' => $class))
-                    );
+                    $elements[] = ['html',
+                            html_writer::tag('td', $fielddefinition[1], ['class' => $class])
+                    ];
                 } else {
-                    $elements[] = array('html',
-                            html_writer::start_tag('td', array('class' => $class))
-                    );
+                    $elements[] = ['html',
+                            html_writer::start_tag('td', ['class' => $class])
+                    ];
                     $elements[] = $fielddefinition;
-                    $elements[] = array('html', html_writer::end_tag('td'));
+                    $elements[] = ['html', html_writer::end_tag('td')];
                 }
             } else {
-                $elements[] = array('html', html_writer::tag('td', '', array('class' => $class)));
+                $elements[] = ['html', html_writer::tag('td', '', ['class' => $class])];
             }
         }
-        $elements[] = array('html', html_writer::end_tag('tr'));
+        $elements[] = ['html', html_writer::end_tag('tr')];
 
         return $elements;
     }
@@ -169,38 +169,38 @@ class datalynxview_csv extends base {
 
         // Get field definitions for new entry.
         $fields = $this->_df->get_fields();
-        $entry = (object) array('id' => $entryid);
+        $entry = (object) ['id' => $entryid];
         $fielddefinitions = [];
         foreach ($this->_tags['field'] as $fieldid => $patterns) {
             $field = $fields[$fieldid];
-            $options = array('edit' => true, 'manage' => true);
+            $options = ['edit' => true, 'manage' => true];
             if ($definitions = $field->get_definitions($patterns, $entry, $options)) {
                 $fielddefinitions = array_merge($fielddefinitions, $definitions);
             }
         }
 
         // Generate entry table row.
-        $elements[] = array('html', html_writer::start_tag('tr'));
+        $elements[] = ['html', html_writer::start_tag('tr')];
         foreach ($columns as $column) {
             list($tag, , $class) = array_map('trim', $column);
             if (!empty($fielddefinitions[$tag])) {
                 $fielddefinition = $fielddefinitions[$tag];
                 if ($fielddefinition[0] == 'html') {
-                    $elements[] = array('html',
-                            html_writer::tag('td', $fielddefinition[1], array('class' => $class))
-                    );
+                    $elements[] = ['html',
+                            html_writer::tag('td', $fielddefinition[1], ['class' => $class])
+                    ];
                 } else {
-                    $elements[] = array('html',
-                            html_writer::start_tag('td', array('class' => $class))
-                    );
+                    $elements[] = ['html',
+                            html_writer::start_tag('td', ['class' => $class])
+                    ];
                     $elements[] = $fielddefinition;
-                    $elements[] = array('html', html_writer::end_tag('td'));
+                    $elements[] = ['html', html_writer::end_tag('td')];
                 }
             } else {
-                $elements[] = array('html', html_writer::tag('td', '', array('class' => $class)));
+                $elements[] = ['html', html_writer::tag('td', '', ['class' => $class])];
             }
         }
-        $elements[] = array('html', html_writer::end_tag('tr'));
+        $elements[] = ['html', html_writer::end_tag('tr')];
 
         return $elements;
     }
@@ -244,9 +244,9 @@ class datalynxview_csv extends base {
             // Print view.
             $viewname = 'datalynxview-' . preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $this->name()));
             if ($tohtml) {
-                return html_writer::tag('div', $mform->html(), array('class' => $viewname));
+                return html_writer::tag('div', $mform->html(), ['class' => $viewname]);
             } else {
-                echo html_writer::start_tag('div', array('class' => $viewname));
+                echo html_writer::start_tag('div', ['class' => $viewname]);
                 $mform->display();
                 echo html_writer::end_tag('div');
                 return '';
@@ -274,8 +274,8 @@ class datalynxview_csv extends base {
         $filename .= clean_filename("-{$this->_delimiter}_separated");
         $filename .= '.' . $this->_output;
 
-        $patterns = array("\n");
-        $adjustments = array('');
+        $patterns = ["\n"];
+        $adjustments = [''];
         if ($this->_enclosure) {
             $patterns[] = $this->_enclosure;
             $adjustments[] = '&#' . ord($this->_enclosure) . ';';
@@ -339,7 +339,7 @@ class datalynxview_csv extends base {
         $entryvalues = [];
         foreach ($exportentries as $entryid => $entry) {
             $patternvalues = [];
-            $definitions = $this->get_entry_tag_replacements($entry, array());
+            $definitions = $this->get_entry_tag_replacements($entry, []);
             foreach ($definitions as $pattern => $definition) {
                 if (is_array($definition)) {
                     list(, $value) = $definition;
@@ -419,11 +419,11 @@ class datalynxview_csv extends base {
                         $csvcontent = $mform->get_file_content('importfile');
                     }
 
-                    $options = array('delimiter' => $formdata->delimiter,
+                    $options = ['delimiter' => $formdata->delimiter,
                             'enclosure' => ($formdata->enclosure ? $formdata->enclosure : ''),
                             'encoding' => $formdata->encoding, 'updateexisting' => $formdata->updateexisting,
                             'settings' => $fieldsettings
-                    );
+                    ];
 
                     if (!empty($csvcontent)) {
                         $data = $this->process_csv($data, $csvcontent, $options);
@@ -484,7 +484,7 @@ class datalynxview_csv extends base {
         $enclosure = !empty($options['enclosure']) ? $options['enclosure'] : $this->_enclosure;
         $encoding = !empty($options['encoding']) ? $options['encoding'] : $this->_encoding;
         $updateexisting = !empty($options['updateexisting']) ? $options['updateexisting'] : false;
-        $fieldsettings = !empty($options['settings']) ? $options['settings'] : array();
+        $fieldsettings = !empty($options['settings']) ? $options['settings'] : [];
 
         $readcount = $cir->load_csv_content($csvcontent, $encoding, $delimiter);
 
@@ -534,7 +534,7 @@ class datalynxview_csv extends base {
         global $CFG;
         require_once("$CFG->dirroot/mod/datalynx/view/csv/import_form.php");
 
-        $actionurl = new moodle_url($this->_baseurl, array('importcsv' => 1));
+        $actionurl = new moodle_url($this->_baseurl, ['importcsv' => 1]);
         return new datalynxview_csv_import_form($this, $actionurl);
     }
 
@@ -560,7 +560,7 @@ class datalynxview_csv extends base {
         $filtersmenu = new html_table_cell('##filtersmenu##');
         $quicksearch = new html_table_cell('##quicksearch##');
         $quickperpage = new html_table_cell('##quickperpage##');
-        $row1->cells = array($viewsmenu, $seperator, $filtersmenu, $quicksearch, $quickperpage);
+        $row1->cells = [$viewsmenu, $seperator, $filtersmenu, $quicksearch, $quickperpage];
         foreach ($row1->cells as $cell) {
             $cell->style = 'border:0 none;';
         }
@@ -568,7 +568,7 @@ class datalynxview_csv extends base {
         $row2 = new html_table_row();
         $addentries = new html_table_cell('');
         $addentries->colspan = 5;
-        $row2->cells = array($addentries);
+        $row2->cells = [$addentries];
         foreach ($row2->cells as $cell) {
             $cell->style = 'border:0 none;';
         }
@@ -576,7 +576,7 @@ class datalynxview_csv extends base {
         $row2a = new html_table_row();
         $addentries = new html_table_cell('##export:all## | ##export:page## | ##import##');
         $addentries->colspan = 5;
-        $row2a->cells = array($addentries);
+        $row2a->cells = [$addentries];
         foreach ($row2a->cells as $cell) {
             $cell->style = 'border:0 none;';
         }
@@ -584,15 +584,15 @@ class datalynxview_csv extends base {
         $row3 = new html_table_row();
         $pagingbar = new html_table_cell('##pagingbar##');
         $pagingbar->colspan = 5;
-        $row3->cells = array($pagingbar);
+        $row3->cells = [$pagingbar];
         foreach ($row3->cells as $cell) {
             $cell->style = 'border:0 none;';
         }
         // Construct the table.
-        $table->data = array($row1, $row2, $row2a, $row3);
+        $table->data = [$row1, $row2, $row2a, $row3];
         $sectiondefault = html_writer::table($table);
         $this->view->esection = html_writer::tag('div', $sectiondefault,
-                        array('class' => 'mdl-align')) . "<div>##entries##</div>";
+                        ['class' => 'mdl-align']) . "<div>##entries##</div>";
 
         // Set content.
         $this->view->param2 = '';
@@ -626,7 +626,7 @@ class datalynxview_csv extends base {
                 $header = !empty($arr[1]) ? $arr[1] : trim($tag, '[]#');
                 $class = !empty($arr[2]) ? $arr[2] : '';
 
-                $definition = array($tag, $header, $class);
+                $definition = [$tag, $header, $class];
                 $this->_columns[] = $definition;
             }
         }

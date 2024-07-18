@@ -41,7 +41,7 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
 
         foreach ($tags as $tag) {
             if ($edit) {
-                $replacements[$tag] = array('', array(array($this, 'display_edit'), array($entry)));
+                $replacements[$tag] = ['', [[$this, 'display_edit'], [$entry]]];
                 break;
             } else {
                 $parts = explode(':', trim($tag, '[]'));
@@ -50,7 +50,7 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
                 } else {
                     $type = '';
                 }
-                $replacements[$tag] = array('html', $this->display_browse($entry, $type));
+                $replacements[$tag] = ['html', $this->display_browse($entry, $type)];
             }
         }
 
@@ -81,7 +81,7 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
         $fieldname = "field_{$fieldid}_{$entryid}";
         // Group course.
         $courses = get_courses("all", "c.sortorder ASC", "c.id,c.fullname");
-        $coursemenu = array(0 => get_string('choosedots'));
+        $coursemenu = [0 => get_string('choosedots')];
         foreach ($courses as $cid => $course) {
             $coursemenu[$cid] = $course->fullname;
         }
@@ -96,27 +96,27 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
             $mform->setDefault("{$fieldname}_course", $courseid);
 
             // Ajax.
-            $options = array('coursefield' => "{$fieldname}_course",
+            $options = ['coursefield' => "{$fieldname}_course",
                     'groupfield' => "{$fieldname}_group",
                     'acturl' => "$CFG->wwwroot/mod/datalynx/field/coursegroup/loadgroups.php"
-            );
+            ];
 
             // Add JQuery.
-            $PAGE->requires->js_call_amd('mod_datalynx/coursegroup', 'init', array($options));
+            $PAGE->requires->js_call_amd('mod_datalynx/coursegroup', 'init', [$options]);
         }
 
         // Group id.
         if ($field->group) {
-            if ($group = $DB->get_record('groups', array('id' => $groupid), 'name')) {
+            if ($group = $DB->get_record('groups', ['id' => $groupid], 'name')) {
                 $groupname = $group->name;
             } else {
                 $groupname = get_string('groupnotfound', 'datalynxfield_coursegroup', $groupid);
             }
             $mform->addElement('html', html_writer::tag('h3', $groupname));
         } else {
-            $groupmenu = array('' => get_string('choosedots'));
+            $groupmenu = ['' => get_string('choosedots')];
             if ($courseid) {
-                $groups = $DB->get_records_menu('groups', array('courseid' => $courseid), 'name', 'id,name');
+                $groups = $DB->get_records_menu('groups', ['courseid' => $courseid], 'name', 'id,name');
                 foreach ($groups as $gid => $groupname) {
                     $groupmenu[$gid] = $groupname;
                 }
@@ -126,7 +126,7 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
             $mform->setType("{$fieldname}_group", PARAM_INT);
             $mform->disabledIf("{$fieldname}_group", "{$fieldname}_course", 'eq', '');
 
-            $mform->addElement('text', "{$fieldname}_groupid", null, array('class' => 'hide'));
+            $mform->addElement('text', "{$fieldname}_groupid", null, ['class' => 'hide']);
             $mform->setType("{$fieldname}_groupid", PARAM_TEXT);
             $mform->setDefault("{$fieldname}_groupid", $groupid);
         }
@@ -163,14 +163,14 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
         switch ($type) {
             case 'course':
                 // Return the course name.
-                if ($coursename = $DB->get_field('course', 'fullname', array('id' => $courseid))) {
+                if ($coursename = $DB->get_field('course', 'fullname', ['id' => $courseid])) {
                     return $coursename;
                 }
                 break;
             case 'group':
                 // Return the group name.
                 if ($groupid &&
-                        $groupname = $DB->get_field('groups', 'name', array('id' => $groupid))
+                        $groupname = $DB->get_field('groups', 'name', ['id' => $groupid])
                 ) {
                     return $groupname;
                 }
@@ -203,22 +203,22 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
             $member = $course = $group = 0;
         }
 
-        $elements = array();
+        $elements = [];
         // Select yes/no for member.
         $elements[] = &$mform->createElement('selectyesno', "f_{$i}_{$fieldid}_member");
         // Number field for course id.
-        $elements[] = &$mform->createElement('text', "f_{$i}_{$fieldid}_course", null, array('size' => 32));
+        $elements[] = &$mform->createElement('text', "f_{$i}_{$fieldid}_course", null, ['size' => 32]);
         // Number field for group id.
-        $elements[] = &$mform->createElement('text', "f_{$i}_{$fieldid}_group", null, array('size' => 32));
+        $elements[] = &$mform->createElement('text', "f_{$i}_{$fieldid}_group", null, ['size' => 32]);
         $mform->setDefault("f_{$i}_{$fieldid}_member", $member);
         $mform->setDefault("f_{$i}_{$fieldid}_course", $course);
         $mform->setDefault("f_{$i}_{$fieldid}_group", $group);
         $mform->disabledIf("coursegroupelements$i", "searchoperator$i", 'eq', '');
 
-        return array($elements,
-                array(get_string('member', 'datalynxfield_coursegroup'),
+        return [$elements,
+                [get_string('member', 'datalynxfield_coursegroup'),
                         '<br />' . get_string('course') . ' ', '<br />' . get_string('group') . ' '
-                ));
+                ]];
     }
 
     /**
@@ -228,11 +228,11 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
         $fieldname = $this->_field->name();
 
         $patterns = parent::patterns();
-        $patterns["[[$fieldname]]"] = array(true);
-        $patterns["[[$fieldname:course]]"] = array(true);
-        $patterns["[[$fieldname:group]]"] = array(true);
-        $patterns["[[$fieldname:courseid]]"] = array(false);
-        $patterns["[[$fieldname:groupid]]"] = array(false);
+        $patterns["[[$fieldname]]"] = [true];
+        $patterns["[[$fieldname:course]]"] = [true];
+        $patterns["[[$fieldname:group]]"] = [true];
+        $patterns["[[$fieldname:courseid]]"] = [false];
+        $patterns["[[$fieldname:groupid]]"] = [false];
 
         return $patterns;
     }

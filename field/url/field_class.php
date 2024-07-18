@@ -49,13 +49,13 @@ class datalynxfield_url extends datalynxfield_base {
     /**
      */
     protected function content_names() {
-        return array('url', 'alt');
+        return ['url', 'alt'];
     }
 
     protected function format_content($entry, array $values = null) {
         $fieldid = $this->field->id;
-        $oldcontents = array();
-        $contents = array();
+        $oldcontents = [];
+        $contents = [];
         // Old contents.
         if (isset($entry->{"c{$fieldid}_content"})) {
             $oldcontents[] = isset($entry->{"c$fieldid" . '_content'}) ? $entry->{"c$fieldid" .
@@ -96,18 +96,18 @@ class datalynxfield_url extends datalynxfield_base {
             $contents[] = $url;
             $contents[] = $linktext;
         }
-        return array($contents, $oldcontents);
+        return [$contents, $oldcontents];
     }
 
     /**
      */
     public function get_content_parts() {
-        return array('content', 'content1');
+        return ['content', 'content1'];
     }
 
     public function get_supported_search_operators() {
-        return array('' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
-                'LIKE' => get_string('contains', 'datalynx'));
+        return ['' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
+                'LIKE' => get_string('contains', 'datalynx')];
     }
 
     /**

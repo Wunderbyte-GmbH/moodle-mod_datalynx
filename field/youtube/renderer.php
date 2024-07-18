@@ -41,7 +41,7 @@ class datalynxfield_youtube_renderer extends datalynxfield_renderer {
         if ($entryid > 0 && !empty($entry->{"c{$fieldid}_content"})) {
             $content = "https://www.youtube.com/watch?v=" . $entry->{"c{$fieldid}_content"};
         }
-        $fieldattr = array();
+        $fieldattr = [];
         $fieldattr['size'] = 45;
 
         $mform->addElement('text', $fieldname, null, $fieldattr);
@@ -79,7 +79,7 @@ class datalynxfield_youtube_renderer extends datalynxfield_renderer {
 
         $formfieldname = "field_{$fieldid}_{$entryid}";
 
-        $errors = array();
+        $errors = [];
         foreach ($tags as $tag) {
             list(, $behavior, ) = $this->process_tag($tag);
             // Variable $behavior datalynx_field_behavior.

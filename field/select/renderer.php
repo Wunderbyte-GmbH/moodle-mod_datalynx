@@ -67,7 +67,7 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
         if (isset($this->_field->field->param5) && is_numeric($this->_field->field->param5) && $this->_field->field->param5 > 0) {
             $disabled = $this->_field->get_disabled_values_for_user();
         } else {
-            $disabled = array();
+            $disabled = [];
         }
 
         foreach ($menuoptions as $id => $name) {
@@ -86,12 +86,12 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
         $choosedots = new stdClass();
         $choosedots->id = '';
         $choosedots->name = get_string('choosedots');
-        $menuoptions = array('' => $choosedots) + $menuoptions;
+        $menuoptions = ['' => $choosedots] + $menuoptions;
         foreach ($menuoptions as $option) {
             if (array_search($option->id, $disabled) === false || $option->id == $selected) {
                 $select->addOption($option->name, $option->id);
             } else {
-                $select->addOption($option->name, $option->id, array('disabled' => 'disabled'));
+                $select->addOption($option->name, $option->id, ['disabled' => 'disabled']);
             }
         }
 
@@ -116,7 +116,7 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
             $options = $field->options_menu();
 
             if (!empty($options['options'])) {
-                $str = array();
+                $str = [];
                 foreach ($options as $key => $option) {
                     $isselected = (int) ($key == $selected);
                     $str[] = "$isselected $option";
@@ -149,15 +149,15 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
         $field = $this->_field;
         $fieldid = $field->id();
         $fieldname = "f_{$i}_{$fieldid}";
-        $menu = array(-1 => '') + $field->options_menu();
-        $options = array('multiple' => true);
-        $elements = array();
+        $menu = [-1 => ''] + $field->options_menu();
+        $options = ['multiple' => true];
+        $elements = [];
         $elements[] = $mform->createElement('autocomplete', $fieldname, null, $menu, $options);
         $mform->setType($fieldname, PARAM_INT);
         $value = json_decode($value);
         $mform->setDefault($fieldname, $value);
         $mform->disabledIf($fieldname, "searchoperator{$i}", 'eq', '');
-        return array($elements, null);
+        return [$elements, null];
     }
 
     /**
@@ -169,7 +169,7 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
      */
     public function validate($entryid, $tags, $formdata) {
         $fieldid = $this->_field->id();
-        $errors = array();
+        $errors = [];
 
         $formfieldname = "field_{$fieldid}_{$entryid}";
 

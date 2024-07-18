@@ -33,7 +33,7 @@ class datalynxview_grid extends base {
 
     protected string $type = 'grid';
 
-    protected array $_editors = array('section', 'param2');
+    protected array $_editors = ['section', 'param2'];
 
     /**
      * Returns a fieldset of view options
@@ -60,7 +60,7 @@ class datalynxview_grid extends base {
         $filtersmenu = new html_table_cell('##filtersmenu##');
         $quicksearch = new html_table_cell('##quicksearch##');
         $quickperpage = new html_table_cell('##quickperpage##');
-        $row1->cells = array($viewsmenu, $seperator, $filtersmenu, $quicksearch, $quickperpage);
+        $row1->cells = [$viewsmenu, $seperator, $filtersmenu, $quicksearch, $quickperpage];
         foreach ($row1->cells as $cell) {
             $cell->style = 'border:0 none;';
         }
@@ -68,7 +68,7 @@ class datalynxview_grid extends base {
         $row2 = new html_table_row();
         $addentries = new html_table_cell('##addnewentry##');
         $addentries->colspan = 5;
-        $row2->cells = array($addentries);
+        $row2->cells = [$addentries];
         foreach ($row2->cells as $cell) {
             $cell->style = 'border:0 none;';
         }
@@ -76,15 +76,15 @@ class datalynxview_grid extends base {
         $row3 = new html_table_row();
         $pagingbar = new html_table_cell('##pagingbar##');
         $pagingbar->colspan = 5;
-        $row3->cells = array($pagingbar);
+        $row3->cells = [$pagingbar];
         foreach ($row3->cells as $cell) {
             $cell->style = 'border:0 none;';
         }
         // Construct the table.
-        $table->data = array($row1, $row2, $row3);
+        $table->data = [$row1, $row2, $row3];
         $sectiondefault = html_writer::table($table);
         $this->view->esection = html_writer::tag('div', $sectiondefault,
-                        array('class' => 'mdl-align')) . "<div>##entries##</div>";
+                        ['class' => 'mdl-align']) . "<div>##entries##</div>";
 
         // Set content fields in responsive grid.
         $mustache = [];
@@ -103,7 +103,7 @@ class datalynxview_grid extends base {
             }
         }
         $entrydefault = $OUTPUT->render_from_template('mod_datalynx/gridview', $mustache);
-        $this->view->eparam2 = html_writer::tag('div', $entrydefault, array('class' => 'entry'));
+        $this->view->eparam2 = html_writer::tag('div', $entrydefault, ['class' => 'entry']);
     }
 
     /**
@@ -134,7 +134,7 @@ class datalynxview_grid extends base {
             // Now split $tablehtml to cells by ##begintablecell##.
             $cells = explode('##begintablecell##', $grouphtml);
             // The first part is everything before first cell.
-            $elements[] = array('html', array_shift($cells));
+            $elements[] = ['html', array_shift($cells)];
         }
 
         // Flatten the set to a list of elements.
@@ -144,7 +144,7 @@ class datalynxview_grid extends base {
             if (!empty($cells)) {
                 if (empty($percol) || $count >= $percol - 1) {
                     $count = 0;
-                    $elements[] = array('html', array_shift($cells));
+                    $elements[] = ['html', array_shift($cells)];
                 } else {
                     $count++;
                 }
@@ -154,14 +154,14 @@ class datalynxview_grid extends base {
         // Add remaining cells.
         if (!empty($cells)) {
             foreach ($cells as $cell) {
-                $elements[] = array('html', $cell);
+                $elements[] = ['html', $cell];
             }
         }
 
         // Add group heading.
         $name = ($name == 'newentry') ? get_string('entrynew', 'datalynx') : $name;
         if ($name) {
-            array_unshift($elements, array('html', $OUTPUT->heading($name, 3, 'main')));
+            array_unshift($elements, ['html', $OUTPUT->heading($name, 3, 'main')]);
         }
 
         return $elements;
@@ -181,7 +181,7 @@ class datalynxview_grid extends base {
             if (isset($fields[$fieldid])) {
                 $field = $fields[$fieldid];
                 $entry->id = $entryid;
-                $options = array('edit' => true, 'manage' => true);
+                $options = ['edit' => true, 'manage' => true];
                 if ($fielddefinitions = $field->get_definitions($patterns, $entry, $options)) {
                     $patterndefinitions = array_merge($patterndefinitions, $fielddefinitions);
                 }
@@ -198,7 +198,7 @@ class datalynxview_grid extends base {
                     $elements[] = $def;
                 }
             } else {
-                $elements[] = array('html', $part);
+                $elements[] = ['html', $part];
             }
         }
 

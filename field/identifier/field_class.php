@@ -33,7 +33,7 @@ class datalynxfield_identifier extends datalynxfield_base {
     public static function get_salt_options() {
         global $CFG;
 
-        $options = array('' => get_string('none'), 'random' => get_string('random', 'datalynx'));
+        $options = ['' => get_string('none'), 'random' => get_string('random', 'datalynx')];
         if (!empty($CFG->passwordsaltmain)) {
             $options[] = get_string('system', 'datalynxfield_identifier');
         }
@@ -44,8 +44,8 @@ class datalynxfield_identifier extends datalynxfield_base {
      */
     protected function format_content($entry, array $values = null) {
         $fieldid = $this->field->id;
-        $oldcontents = array();
-        $contents = array();
+        $oldcontents = [];
+        $contents = [];
         // Old content (should not exist if we get here, as update should be triggered only when no content).
         if (isset($entry->{"c{$fieldid}_content"})) {
             $oldcontent = $entry->{"c{$fieldid}_content"};
@@ -58,7 +58,7 @@ class datalynxfield_identifier extends datalynxfield_base {
         } else {
             $content = null;
         }
-        return array(array($content), array($oldcontent));
+        return [[$content], [$oldcontent]];
     }
 
     /**
@@ -100,7 +100,7 @@ class datalynxfield_identifier extends datalynxfield_base {
         $userid = (!empty($entry->userid) ? $entry->userid : $USER->id);
 
         // Collate elements for hashing.
-        $elements = array();
+        $elements = [];
         $elements[] = $entryid;
 
         // Salt.
@@ -132,12 +132,12 @@ class datalynxfield_identifier extends datalynxfield_base {
         global $DB;
 
         return $DB->record_exists('datalynx_contents',
-                array('fieldid' => $this->fieldid, 'content' => $key));
+                ['fieldid' => $this->fieldid, 'content' => $key]);
     }
 
     public function get_supported_search_operators() {
-        return array('' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
-                'LIKE' => get_string('contains', 'datalynx'));
+        return ['' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
+                'LIKE' => get_string('contains', 'datalynx')];
     }
 }
 

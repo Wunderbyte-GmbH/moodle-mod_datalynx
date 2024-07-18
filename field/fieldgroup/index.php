@@ -37,36 +37,36 @@ require_login($datalynx->data->course, false, $datalynx->cm);
 
 require_capability('mod/datalynx:managetemplates', $datalynx->context);
 
-$datalynx->set_page('fieldgroups/index', array('urlparams' => $urlparams));
+$datalynx->set_page('fieldgroups/index', ['urlparams' => $urlparams]);
 
 // Activate navigation node.
 navigation_node::override_active_url(
-        new moodle_url('/mod/datalynx/flield/fieldgroup/index.php', array('id' => $datalynx->cm->id)));
+        new moodle_url('/mod/datalynx/flield/fieldgroup/index.php', ['id' => $datalynx->cm->id]));
 
 // Print header.
-$datalynx->print_header(array('tab' => 'fieldgroups', 'urlparams' => $urlparams));
+$datalynx->print_header(['tab' => 'fieldgroups', 'urlparams' => $urlparams]);
 
 echo html_writer::empty_tag('br');
-echo html_writer::start_tag('div', array('class' => 'fieldadd mdl-align'));
+echo html_writer::start_tag('div', ['class' => 'fieldadd mdl-align']);
 echo html_writer::link(new moodle_url('/mod/datalynx/field/field_edit.php',
-        array('d' => $datalynx->id(), 'sesskey' => sesskey(), 'type' => 'fieldgroup')), get_string('fieldgroupsadd', 'datalynx'));
+        ['d' => $datalynx->id(), 'sesskey' => sesskey(), 'type' => 'fieldgroup']), get_string('fieldgroupsadd', 'datalynx'));
 echo html_writer::end_tag('div');
 echo html_writer::empty_tag('br');
 
 $editbaseurl = '/mod/datalynx/field/field_edit.php';
 $deletebaseurl = '/mod/datalynx/field/index.php'; // Deletelink is via index.
-$linkparams = array('d' => $datalynx->id(), 'sesskey' => sesskey());
+$linkparams = ['d' => $datalynx->id(), 'sesskey' => sesskey()];
 
 // Table headers.
-$headers = array('name' => get_string('name'), 'description' => get_string('description'),
+$headers = ['name' => get_string('name'), 'description' => get_string('description'),
         'fieldgroupfields' => get_string('fieldgroupfields', 'datalynx'),
         'required' => get_string('required'),
         'edit' => get_string('edit'), 'duplicate' => get_string('duplicate'),
-        'delete' => get_string('delete'));
+        'delete' => get_string('delete')];
 
 $table = new flexible_table('datalynxbehaviorsindex' . $datalynx->id());
 $table->define_baseurl(
-        new moodle_url('/mod/datalynx/field/fieldgroup/index.php', array('d' => $datalynx->id())));
+        new moodle_url('/mod/datalynx/field/fieldgroup/index.php', ['d' => $datalynx->id()]));
 $table->define_columns(array_keys($headers));
 $table->define_headers(array_values($headers));
 
@@ -84,30 +84,30 @@ $table->column_style('delete', 'text-align', 'center');
 
 $table->setup();
 
-$fieldgroups = $DB->get_records('datalynx_fields', array('dataid' => $datalynx->id(), 'type' => 'fieldgroup'));
+$fieldgroups = $DB->get_records('datalynx_fields', ['dataid' => $datalynx->id(), 'type' => 'fieldgroup']);
 
 // Create table entries from fieldgroups.
 foreach ($fieldgroups as $fieldgroupid => $fieldgroup) {
 
     $fieldname = html_writer::link(
-            new moodle_url($editbaseurl, $linkparams + array('fid' => $fieldgroupid)), $fieldgroup->name);
+            new moodle_url($editbaseurl, $linkparams + ['fid' => $fieldgroupid]), $fieldgroup->name);
     $fielddescription = shorten_text($fieldgroup->description, 30);
 
     $fieldgroupfields = $fieldgroup->param1; // What fields are in the group.
     $fieldrequired = $fieldgroup->param4; // We show how many lines are required in the overview.
 
     // NOTE: We need fid NOT id here. These links are very inconsistent.
-    $fieldedit = html_writer::link(new moodle_url($editbaseurl, $linkparams + array('fid' => $fieldgroupid)),
+    $fieldedit = html_writer::link(new moodle_url($editbaseurl, $linkparams + ['fid' => $fieldgroupid]),
             $OUTPUT->pix_icon('t/edit', get_string('edit')));
     $fieldduplicate = html_writer::link(new moodle_url($editbaseurl,
-            $linkparams + array('action' => 'duplicate', 'id' => $fieldgroupid)),
+            $linkparams + ['action' => 'duplicate', 'id' => $fieldgroupid]),
             $OUTPUT->pix_icon('t/copy', get_string('duplicate')));
     $fielddelete = html_writer::link(new moodle_url($deletebaseurl,
-            $linkparams + array('delete' => $fieldgroupid)),
+            $linkparams + ['delete' => $fieldgroupid]),
             $OUTPUT->pix_icon('t/delete', get_string('delete')));
 
-    $table->add_data(array($fieldname, $fielddescription, $fieldgroupfields, $fieldrequired,
-            $fieldedit, $fieldduplicate, $fielddelete));
+    $table->add_data([$fieldname, $fielddescription, $fieldgroupfields, $fieldrequired,
+            $fieldedit, $fieldduplicate, $fielddelete]);
 }
 
 // Print table.

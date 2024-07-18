@@ -23,6 +23,6 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-$subplugins = array('datalynxfield' => 'mod/datalynx/field', 'datalynxview' => 'mod/datalynx/view',
+$subplugins = ['datalynxfield' => 'mod/datalynx/field', 'datalynxview' => 'mod/datalynx/view',
         'datalynxrule' => 'mod/datalynx/rule', 'datalynxtool' => 'mod/datalynx/tool'
-);
+];

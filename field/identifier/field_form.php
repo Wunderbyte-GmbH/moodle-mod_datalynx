@@ -44,7 +44,7 @@ class datalynxfield_identifier_form extends datalynxfield_form {
 
         // Field Salt length (param2).
         $mform->addElement('text', 'param2', get_string('saltsize', 'datalynxfield_identifier'),
-                array('size' => '8'));
+                ['size' => '8']);
         $mform->setType('param2', PARAM_INT);
         $mform->addRule('param2', null, 'numeric', null, 'client');
         $mform->setDefault('param2', 10);

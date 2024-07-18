@@ -175,13 +175,13 @@ function xmldb_datalynx_upgrade($oldversion) {
     if ($oldversion < 2012061700) {
         // Remove version record of datalynx views and fields from config_plugin.
         $DB->delete_records_select('config_plugins', $DB->sql_like('plugin', '?'),
-                array('datalynx%'));
+                ['datalynx%']);
         // Change type of view block/blockext to matrix/matrixext.
-        $DB->set_field('datalynx_views', 'type', 'matrix', array('type' => 'block'));
-        $DB->set_field('datalynx_views', 'type', 'matrixext', array('type' => 'blockext'));
+        $DB->set_field('datalynx_views', 'type', 'matrix', ['type' => 'block']);
+        $DB->set_field('datalynx_views', 'type', 'matrixext', ['type' => 'blockext']);
 
         // Move content of matrixext param1 -> param4 and param3 -> param5.
-        if ($views = $DB->get_records('datalynx_views', array('type' => 'matrixext'))) {
+        if ($views = $DB->get_records('datalynx_views', ['type' => 'matrixext'])) {
             foreach ($views as $view) {
                 if (!empty($view->param1) || !empty($view->param3)) {
                     $view->param4 = $view->param1;
@@ -194,7 +194,7 @@ function xmldb_datalynx_upgrade($oldversion) {
         }
 
         // Move content of editon param3 -> param7.
-        if ($views = $DB->get_records('datalynx_views', array('type' => 'editon'))) {
+        if ($views = $DB->get_records('datalynx_views', ['type' => 'editon'])) {
             foreach ($views as $view) {
                 if (!empty($view->param3)) {
                     $view->param7 = $view->param3;
@@ -206,7 +206,7 @@ function xmldb_datalynx_upgrade($oldversion) {
         }
 
         // Move content of tabular param1 -> param3.
-        if ($views = $DB->get_records('datalynx_views', array('type' => 'tabular'))) {
+        if ($views = $DB->get_records('datalynx_views', ['type' => 'tabular'])) {
             foreach ($views as $view) {
                 $view->param3 = $view->param1;
                 $view->param1 = null;
@@ -241,7 +241,7 @@ function xmldb_datalynx_upgrade($oldversion) {
                     $filter->customsort = $datalynx->defaultsort;
 
                     if ($filterid = $DB->insert_record('datalynx_filters', $filter)) {
-                        $DB->set_field('datalynx', 'defaultfilter', $filterid, array('id' => $dfid));
+                        $DB->set_field('datalynx', 'defaultfilter', $filterid, ['id' => $dfid]);
                     }
                 }
             }
@@ -342,8 +342,8 @@ function xmldb_datalynx_upgrade($oldversion) {
 
     if ($oldversion < 2012092207) {
         // Change type of view matrix/matrixext to grid/gridext.
-        $DB->set_field('datalynx_views', 'type', 'grid', array('type' => 'matrix'));
-        $DB->set_field('datalynx_views', 'type', 'gridext', array('type' => 'matrixext'));
+        $DB->set_field('datalynx_views', 'type', 'grid', ['type' => 'matrix']);
+        $DB->set_field('datalynx_views', 'type', 'gridext', ['type' => 'matrixext']);
 
         // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2012092207, 'datalynx');
@@ -351,11 +351,11 @@ function xmldb_datalynx_upgrade($oldversion) {
 
     if ($oldversion < 2012121600) {
         // Convert internal field ids whereever they are cached or referenced.
-        $newfieldids = array(-1 => 'entry', -2 => 'timecreated', -3 => 'timemodified',
+        $newfieldids = [-1 => 'entry', -2 => 'timecreated', -3 => 'timemodified',
                 -4 => 'approve', -5 => 'group', -6 => 'userid', -7 => 'username', -8 => 'userfirstname',
                 -9 => 'userlastname', -10 => 'userusername', -11 => 'useridnumber', -12 => 'userpicture',
                 -13 => 'comment', -14 => 'rating', -141 => 'ratingavg', -142 => 'ratingcount',
-                -143 => 'ratingmax', -144 => 'ratingmin', -145 => 'ratingsum');
+                -143 => 'ratingmax', -144 => 'ratingmin', -145 => 'ratingsum'];
 
         // View patterns.
         if ($views = $DB->get_records('datalynx_views')) {
@@ -363,7 +363,7 @@ function xmldb_datalynx_upgrade($oldversion) {
                 $update = false;
                 if ($view->patterns) {
                     $patterns = unserialize($view->patterns);
-                    $newpatterns = array('view' => $patterns['view'], 'field' => array());
+                    $newpatterns = ['view' => $patterns['view'], 'field' => []];
                     foreach ($patterns['field'] as $fieldid => $tags) {
                         if ($fieldid < 0 && !empty($newfieldids[$fieldid])) {
                             $newpatterns['field'][$newfieldids[$fieldid]] = $tags;
@@ -387,7 +387,7 @@ function xmldb_datalynx_upgrade($oldversion) {
                 // Adjust customsort field ids.
                 if ($filter->customsort) {
                     $customsort = unserialize($filter->customsort);
-                    $sortfields = array();
+                    $sortfields = [];
                     foreach ($customsort as $fieldid => $sortdir) {
                         if ($fieldid < 0 && !empty($newfieldids[$fieldid])) {
                             $sortfields[$newfieldids[$fieldid]] = $sortdir;
@@ -402,7 +402,7 @@ function xmldb_datalynx_upgrade($oldversion) {
                 // Adjust customsearch field ids.
                 if ($filter->customsearch) {
                     $customsearch = unserialize($filter->customsearch);
-                    $searchfields = array();
+                    $searchfields = [];
                     foreach ($customsearch as $fieldid => $options) {
                         if ($fieldid < 0 && !empty($newfieldids[$fieldid])) {
                             $searchfields[$newfieldids[$fieldid]] = $options;
@@ -436,8 +436,8 @@ function xmldb_datalynx_upgrade($oldversion) {
         $dbman->change_field_type($table, $field);
 
         // Change groupby 0 to null in existing views and filters.
-        $DB->set_field('datalynx_views', 'groupby', null, array('groupby' => 0));
-        $DB->set_field('datalynx_filters', 'groupby', null, array('groupby' => 0));
+        $DB->set_field('datalynx_views', 'groupby', null, ['groupby' => 0]);
+        $DB->set_field('datalynx_filters', 'groupby', null, ['groupby' => 0]);
 
         // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2012121900, 'datalynx');
@@ -503,8 +503,8 @@ function xmldb_datalynx_upgrade($oldversion) {
         // Launch change of precision for field visible.
         $dbman->change_field_precision($table, $field);
 
-        $DB->set_field('datalynx_views', 'visible', '15', array('visible' => '2'));
-        $DB->set_field('datalynx_views', 'visible', '1', array('visible' => '1'));
+        $DB->set_field('datalynx_views', 'visible', '15', ['visible' => '2']);
+        $DB->set_field('datalynx_views', 'visible', '1', ['visible' => '1']);
 
         // Datalynx savepoint reached..
         upgrade_mod_savepoint(true, 2013082800, 'datalynx');
@@ -619,7 +619,7 @@ function xmldb_datalynx_upgrade($oldversion) {
         $contents = $DB->get_records_sql_menu($sql);
         foreach ($contents as $id => $content) {
             if (preg_match('/^#+$/', $content)) {
-                $DB->delete_records('datalynx_contents', array('id' => $id));
+                $DB->delete_records('datalynx_contents', ['id' => $id]);
             }
         }
 
@@ -631,7 +631,7 @@ function xmldb_datalynx_upgrade($oldversion) {
         $contents = $DB->get_records_sql_menu($sql);
         foreach ($contents as $id => $content) {
             if (preg_match('/^\[(?:\"0\",?)*\]$/', $content)) {
-                $DB->delete_records('datalynx_contents', array('id' => $id));
+                $DB->delete_records('datalynx_contents', ['id' => $id]);
             }
         }
 
@@ -648,7 +648,7 @@ function xmldb_datalynx_upgrade($oldversion) {
         $contents = $DB->get_records_sql_menu($sql);
         foreach ($contents as $id => $content) {
             if (!$content) {
-                $DB->delete_records('datalynx_contents', array('id' => $id));
+                $DB->delete_records('datalynx_contents', ['id' => $id]);
             }
         }
 
@@ -660,7 +660,7 @@ function xmldb_datalynx_upgrade($oldversion) {
         $contents = $DB->get_records_sql_menu($sql);
         foreach ($contents as $id => $content) {
             if (!$content) {
-                $DB->delete_records('datalynx_contents', array('id' => $id));
+                $DB->delete_records('datalynx_contents', ['id' => $id]);
             }
         }
 
@@ -677,7 +677,7 @@ function xmldb_datalynx_upgrade($oldversion) {
         $contents = $DB->get_records_sql_menu($sql);
         foreach ($contents as $id => $content) {
             if (!$content && "$content" !== "0") {
-                $DB->delete_records('datalynx_contents', array('id' => $id));
+                $DB->delete_records('datalynx_contents', ['id' => $id]);
             }
         }
 
@@ -743,7 +743,7 @@ function xmldb_datalynx_upgrade($oldversion) {
                 }
                 $serializedcustomsearch = serialize($newcustomsearch);
                 $DB->set_field('datalynx_filters', 'customsearch', $serializedcustomsearch,
-                        array('id' => $filterid));
+                        ['id' => $filterid]);
             }
         }
         // Datalynx savepoint reached.
@@ -754,8 +754,8 @@ function xmldb_datalynx_upgrade($oldversion) {
         $instances = $DB->get_records('datalynx');
         if (!empty($instances)) {
             foreach ($instances as $instance) {
-                $views = $DB->get_records('datalynx_views', array('dataid' => $instance->id));
-                $moreview = $DB->get_record('datalynx_views', array('id' => $instance->singleview));
+                $views = $DB->get_records('datalynx_views', ['dataid' => $instance->id]);
+                $moreview = $DB->get_record('datalynx_views', ['id' => $instance->singleview]);
                 if ($moreview) {
                     foreach ($views as $view) {
                         $view->section = preg_replace('/\<a.*##moreurl##[^>]*\>(.+)\<\/a\>/',
@@ -927,7 +927,7 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2018062211, 'datalynx');
     }
     if ($oldversion < 2018081000) {
-        $ids = $DB->get_records_menu('datalynx_views', array('type' => 'csv'), '', 'id, param1');
+        $ids = $DB->get_records_menu('datalynx_views', ['type' => 'csv'], '', 'id, param1');
         foreach ($ids as $id => $param1) {
             $singleparams = explode(',', $param1);
             $singleparams[1] = '"';
@@ -1054,20 +1054,20 @@ function mod_datalynx_replace_field_rules() {
     require_once(dirname(__FILE__) . '/../behavior/behavior.php');
     global $DB;
 
-    $defaultbehavior = (object) array('name' => '', 'description' => '',
-            'visibleto' => array(mod_datalynx\datalynx::PERMISSION_MANAGER, mod_datalynx\datalynx::PERMISSION_TEACHER,
-                    mod_datalynx\datalynx::PERMISSION_STUDENT, mod_datalynx\datalynx::PERMISSION_AUTHOR),
-            'editableby' => array(mod_datalynx\datalynx::PERMISSION_MANAGER, mod_datalynx\datalynx::PERMISSION_TEACHER,
-                    mod_datalynx\datalynx::PERMISSION_STUDENT, mod_datalynx\datalynx::PERMISSION_AUTHOR), 'required' => false
-    );
+    $defaultbehavior = (object) ['name' => '', 'description' => '',
+            'visibleto' => [mod_datalynx\datalynx::PERMISSION_MANAGER, mod_datalynx\datalynx::PERMISSION_TEACHER,
+                    mod_datalynx\datalynx::PERMISSION_STUDENT, mod_datalynx\datalynx::PERMISSION_AUTHOR],
+            'editableby' => [mod_datalynx\datalynx::PERMISSION_MANAGER, mod_datalynx\datalynx::PERMISSION_TEACHER,
+                    mod_datalynx\datalynx::PERMISSION_STUDENT, mod_datalynx\datalynx::PERMISSION_AUTHOR], 'required' => false
+    ];
     $dataids = $DB->get_fieldset_select('datalynx', 'id', "id IS NOT NULL");
     foreach ($dataids as $dataid) {
-        $views = $DB->get_records('datalynx_views', array('dataid' => $dataid), '', 'id, param2');
+        $views = $DB->get_records('datalynx_views', ['dataid' => $dataid], '', 'id, param2');
         foreach ($views as $view) {
             $changed = false;
 
             $regex = '/\[\[\*([^\]]+)\]\]/';
-            $matches = array();
+            $matches = [];
             if (preg_match_all($regex, $view->param2, $matches, PREG_SET_ORDER)) {
                 $behavior = $defaultbehavior;
                 $behavior->name = get_string('required', 'datalynx');
@@ -1084,11 +1084,11 @@ function mod_datalynx_replace_field_rules() {
             }
 
             $regex = '/\[\[\^([^\]]+)\]\]/';
-            $matches = array();
+            $matches = [];
             if (preg_match_all($regex, $view->param2, $matches, PREG_SET_ORDER)) {
                 $behavior = $defaultbehavior;
                 $behavior->name = get_string('hidden', 'datalynx');
-                $behavior->visibleto = array();
+                $behavior->visibleto = [];
                 $behavior->d = $dataid;
                 datalynx_field_behavior::insert_behavior($behavior);
 
@@ -1101,11 +1101,11 @@ function mod_datalynx_replace_field_rules() {
             }
 
             $regex = '/\[\[\!([^\]]+)\]\]/';
-            $matches = array();
+            $matches = [];
             if (preg_match_all($regex, $view->param2, $matches, PREG_SET_ORDER)) {
                 $behavior = $defaultbehavior;
                 $behavior->name = get_string('noedit', 'datalynx');
-                $behavior->editableby = array();
+                $behavior->editableby = [];
                 $behavior->d = $dataid;
                 datalynx_field_behavior::insert_behavior($behavior);
 
@@ -1128,22 +1128,22 @@ function mod_datalynx_replace_field_labels() {
     require_once(dirname(__FILE__) . '/../renderer/renderer.php');
     global $DB;
 
-    $defaultrenderer = (object) array('id' => 0, 'name' => '', 'description' => '',
+    $defaultrenderer = (object) ['id' => 0, 'name' => '', 'description' => '',
             'notvisibletemplate' => datalynx_field_renderer::NOT_VISIBLE_SHOW_NOTHING,
             'displaytemplate' => datalynx_field_renderer::DISPLAY_MODE_TEMPLATE_NONE,
             'novaluetemplate' => datalynx_field_renderer::NO_VALUE_SHOW_NOTHING,
             'edittemplate' => datalynx_field_renderer::EDIT_MODE_TEMPLATE_NONE,
             'noteditabletemplate' => datalynx_field_renderer::NOT_EDITABLE_SHOW_NOTHING
-    );
+    ];
 
     $dataids = $DB->get_fieldset_select('datalynx', 'id', "id IS NOT NULL");
     foreach ($dataids as $dataid) {
-        $views = $DB->get_records('datalynx_views', array('dataid' => $dataid), '', 'id, param2');
+        $views = $DB->get_records('datalynx_views', ['dataid' => $dataid], '', 'id, param2');
         foreach ($views as $view) {
-            $fieldtags = array();
-            $fieldlabels = $DB->get_records_menu('datalynx_fields', array('dataid' => $dataid), '', 'name, label');
+            $fieldtags = [];
+            $fieldlabels = $DB->get_records_menu('datalynx_fields', ['dataid' => $dataid], '', 'name, label');
             $regex = '/\[\[([^\]]+)\@\]\]/';
-            $matches = array();
+            $matches = [];
             if (preg_match_all($regex, $view->param2, $matches, PREG_SET_ORDER)) {
                 foreach ($matches as $match) {
                     $oldtag = $match[0];

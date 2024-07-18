@@ -51,15 +51,15 @@ class datalynxfield_checkbox_renderer extends datalynxfield_multiselect_renderer
 
         $separator = $field->separators[(int) $field->get('param2')]['chr'];
 
-        $elemgrp = array();
+        $elemgrp = [];
         foreach ($menuoptions as $i => $option) {
-            $elemgrp[] = &$mform->createElement('advcheckbox', $i, null, $option, array('size' => 1),
-                    array(null, $i));
+            $elemgrp[] = &$mform->createElement('advcheckbox', $i, null, $option, ['size' => 1],
+                    [null, $i]);
         }
 
         $mform->addGroup($elemgrp, $fieldname, null, $separator, true);
 
-        $selected = array();
+        $selected = [];
         if ($entryid > 0 && $content) {
             $contentprepare = str_replace("#", "", $content);
             $selectedraw = explode(',', $contentprepare);

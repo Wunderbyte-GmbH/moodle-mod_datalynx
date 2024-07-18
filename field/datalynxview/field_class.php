@@ -47,7 +47,7 @@ class datalynxfield_datalynxview extends datalynxfield_base {
 
         // Get the datalynx.
         if (empty($this->field->param1) AND
-                !$DB->record_exists('datalynx', array('id' => $this->field->param1))
+                !$DB->record_exists('datalynx', ['id' => $this->field->param1])
         ) {
             return;
         }
@@ -56,7 +56,7 @@ class datalynxfield_datalynxview extends datalynxfield_base {
         // TODO Add capability check on view entries.
 
         // Is there a view? Otherwise return.
-        if (empty($this->field->param2) || !$viewid = $DB->get_field('datalynx_views', 'id', array('id' => $this->field->param2))) {
+        if (empty($this->field->param2) || !$viewid = $DB->get_field('datalynx_views', 'id', ['id' => $this->field->param2])) {
             return;
         }
         $this->refdatalynx = $datalynx;

@@ -55,11 +55,11 @@ require_login($df->data->course, false, $df->cm);
 
 require_capability('mod/datalynx:managetemplates', $df->context);
 
-$df->set_page('rule/index', array('modjs' => true, 'urlparams' => $urlparams));
+$df->set_page('rule/index', ['modjs' => true, 'urlparams' => $urlparams]);
 
 // Activate navigation node.
 navigation_node::override_active_url(
-        new moodle_url('/mod/datalynx/rule/index.php', array('id' => $df->cm->id)));
+        new moodle_url('/mod/datalynx/rule/index.php', ['id' => $df->cm->id]));
 
 $rm = $df->get_rule_manager();
 
@@ -88,7 +88,7 @@ if (!$rules) {
 }
 
 // Print header.
-$df->print_header(array('tab' => 'rules', 'urlparams' => $urlparams));
+$df->print_header(['tab' => 'rules', 'urlparams' => $urlparams]);
 
 // Print the rule add link.
 $rm->print_add_rule();

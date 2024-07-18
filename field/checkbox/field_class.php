@@ -51,7 +51,7 @@ class datalynxfield_checkbox extends datalynxfield_multiselect {
         $rawdefaults = explode("\n", $this->field->param2); // Create array of default values.
         $rawdefaults = array_map('trim', $rawdefaults); // Trim random spaces (1b, 2c).
         $options = array_map('trim', $this->options_menu()); // Read available checkboxes (1a, 2b, 3c).
-        $defaults = array(); // Should become 2b, 3c.
+        $defaults = []; // Should become 2b, 3c.
 
         foreach ($options as $key => $value) {
             if (in_array($value, $rawdefaults)) {

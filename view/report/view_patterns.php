@@ -47,24 +47,24 @@ class datalynxview_report_patterns extends datalynxview_patterns {
         foreach ($tags as $tag) {
             switch ($tag) {
                 case '##export:all##':
-                    $actionurl = new moodle_url($baseurl, array('exportreport' => $view::EXPORT_ALL));
+                    $actionurl = new moodle_url($baseurl, ['exportreport' => $view::EXPORT_ALL]);
                     $label = html_writer::tag('span', get_string('exportall', 'datalynx'));
                     $replacements[$tag] = html_writer::link($actionurl, $label,
-                            array('class' => 'actionlink exportall'));
+                            ['class' => 'actionlink exportall']);
 
                     break;
                 case '##export:page##':
-                    $actionurl = new moodle_url($baseurl, array('exportreport' => $view::EXPORT_PAGE));
+                    $actionurl = new moodle_url($baseurl, ['exportreport' => $view::EXPORT_PAGE]);
                     $label = html_writer::tag('span', get_string('exportpage', 'datalynx'));
                     $replacements[$tag] = html_writer::link($actionurl, $label,
-                            array('class' => 'actionlink exportpage'));
+                            ['class' => 'actionlink exportpage']);
 
                     break;
                 case '##import##':
-                    $actionurl = new moodle_url($baseurl, array('importreport' => 1));
+                    $actionurl = new moodle_url($baseurl, ['importreport' => 1]);
                     $label = html_writer::tag('span', get_string('import', 'datalynx'));
                     $replacements[$tag] = html_writer::link($actionurl, $label,
-                            array('class' => 'actionlink exportall'));
+                            ['class' => 'actionlink exportall']);
 
                     break;
             }
@@ -80,9 +80,9 @@ class datalynxview_report_patterns extends datalynxview_patterns {
     protected function patterns($checkvisibility = true): array {
         $patterns = parent::patterns($checkvisibility);
         $cat = get_string('pluginname', 'datalynxview_report');
-        $patterns['##export:all##'] = array(true, $cat);
-        $patterns['##export:page##'] = array(true, $cat);
-        $patterns['##import##'] = array(true, $cat);
+        $patterns['##export:all##'] = [true, $cat];
+        $patterns['##export:page##'] = [true, $cat];
+        $patterns['##import##'] = [true, $cat];
 
         return $patterns;
     }

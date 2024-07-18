@@ -39,25 +39,25 @@ require_login($dl->data->course, false, $dl->cm);
 global $DB;
 $options = [];
 $options['behaviors'] = $DB->get_records_select_menu('datalynx_behaviors', 'dataid = :dataid',
-        array('dataid' => $urlparams->d), 'value ASC', 'name AS value, name AS label');
+        ['dataid' => $urlparams->d], 'value ASC', 'name AS value, name AS label');
 $options['behaviors'][''] = get_string('defaultbehavior', 'datalynx');
 $fields = $DB->get_fieldset_select('datalynx_fields', 'name', 'dataid = :dataid',
-        array('dataid' => $urlparams->d));
+        ['dataid' => $urlparams->d]);
 $options['renderers'] = [];
 $commonrenderers = $DB->get_records_select_menu('datalynx_renderers', 'dataid = :dataid',
-        array('dataid' => $urlparams->d), 'value ASC', 'name AS value, name AS label');
+        ['dataid' => $urlparams->d], 'value ASC', 'name AS value, name AS label');
 foreach ($fields as $field) {
     $options['renderers'][$field] = $commonrenderers; // TODO: add field-specific renderers here.
     $options['renderers'][$field][''] = get_string('defaultrenderer', 'datalynx');
 }
 $options['types'] = $DB->get_records_select_menu('datalynx_fields', 'dataid = :dataid',
-        array('dataid' => $urlparams->d), 'name ASC', 'name, type');
+        ['dataid' => $urlparams->d], 'name ASC', 'name, type');
 
-$module = array('name' => 'mod_datalynx', 'fullpath' => '/mod/datalynx/datalynx.js',
-        'requires' => array('moodle-core-notification-dialogue')
-);
+$module = ['name' => 'mod_datalynx', 'fullpath' => '/mod/datalynx/amd/src/patterndialogue.js',
+        'requires' => ['moodle-core-notification-dialogue']
+];
 
-$PAGE->requires->js_init_call('M.mod_datalynx.tag_manager.init', $options, true, $module);
+// Fix: need to add a $PAGE->requires for datalynx.js
 $PAGE->requires->string_for_js('behavior', 'datalynx');
 $PAGE->requires->string_for_js('renderer', 'datalynx');
 $PAGE->requires->string_for_js('fieldname', 'datalynx');
@@ -66,8 +66,9 @@ $PAGE->requires->string_for_js('tagproperties', 'datalynx');
 $PAGE->requires->string_for_js('deletetag', 'datalynx');
 $PAGE->requires->string_for_js('action', 'datalynx');
 $PAGE->requires->string_for_js('field', 'datalynx');
+$PAGE->requires->js_call_amd('mod_datalynx/patterndialogue', 'init', $options);
 
-$dl->set_page('view/view_edit', array('modjs' => true, 'urlparams' => $urlparams));
+$dl->set_page('view/view_edit', ['modjs' => true, 'urlparams' => $urlparams]);
 
 require_sesskey();
 require_capability('mod/datalynx:managetemplates', $dl->context);
@@ -99,7 +100,7 @@ if ($mform->is_cancelled()) {
     if ($urlparams->returnurl) {
         redirect($urlparams->returnurl);
     } else {
-        redirect(new moodle_url('/mod/datalynx/view/index.php', array('d' => $urlparams->d)));
+        redirect(new moodle_url('/mod/datalynx/view/index.php', ['d' => $urlparams->d]));
     }
 
     // No submit buttons: reset to default.
@@ -112,7 +113,7 @@ if ($mform->is_cancelled()) {
             $urlparams->resetdefault = 1;
             redirect(
                     new moodle_url('/mod/datalynx/view/view_edit.php',
-                            ((array) $urlparams) + array('sesskey' => sesskey())));
+                            ((array) $urlparams) + ['sesskey' => sesskey()]));
         }
 
         // Process validated.
@@ -122,17 +123,17 @@ if ($mform->is_cancelled()) {
             if (!$view->id()) {
                 $vid = $view->add($data);
 
-                $other = array('dataid' => $dl->id());
+                $other = ['dataid' => $dl->id()];
                 $event = \mod_datalynx\event\view_created::create(
-                        array('context' => $dl->context, 'objectid' => $vid, 'other' => $other));
+                        ['context' => $dl->context, 'objectid' => $vid, 'other' => $other]);
                 $event->trigger();
                 // Update view.
             } else {
                 $view->update($data);
 
-                $other = array('dataid' => $dl->id());
+                $other = ['dataid' => $dl->id()];
                 $event = \mod_datalynx\event\view_updated::create(
-                        array('context' => $dl->context, 'objectid' => $view->id(), 'other' => $other));
+                        ['context' => $dl->context, 'objectid' => $view->id(), 'other' => $other]);
                 $event->trigger();
             }
 
@@ -142,7 +143,7 @@ if ($mform->is_cancelled()) {
                 if ($urlparams->returnurl) {
                     redirect($urlparams->returnurl);
                 } else {
-                    redirect(new moodle_url('/mod/datalynx/view/index.php', array('d' => $urlparams->d)));
+                    redirect(new moodle_url('/mod/datalynx/view/index.php', ['d' => $urlparams->d]));
                 }
             }
 
@@ -154,21 +155,21 @@ if ($mform->is_cancelled()) {
 
 // Activate navigation node.
 navigation_node::override_active_url(
-        new moodle_url('/mod/datalynx/view/index.php', array('id' => $dl->cm->id)));
+        new moodle_url('/mod/datalynx/view/index.php', ['id' => $dl->cm->id]));
 
 // Print header.
-$dl->print_header(array('tab' => 'views', 'nonotifications' => true, 'urlparams' => $urlparams));
+$dl->print_header(['tab' => 'views', 'nonotifications' => true, 'urlparams' => $urlparams]);
 
 $formheading = $view->id() ? get_string('viewedit', 'datalynx', $view->name()) : get_string(
         'viewnew', 'datalynx', $view->typename());
-$output = html_writer::tag('h2', format_string($formheading), array('class' => 'mdl-align'));
+$output = html_writer::tag('h2', format_string($formheading), ['class' => 'mdl-align']);
 
 // Display form.
 $mform->set_data($view->to_form());
 
 // ToDo: Ugly hack for forcing atto as the only editor available even if user chose another editor.
 $texteditors = $CFG->texteditors;
-$CFG->texteditors = 'atto,textarea';
+$CFG->texteditors = 'tiny';
 $mform->display();
 $CFG->texteditors = $texteditors;
 

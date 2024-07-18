@@ -43,15 +43,15 @@ class datalynxfield__time extends datalynxfield_no_content {
     /**
      */
     public static function get_field_objects($dataid) {
-        $fieldobjects = array();
+        $fieldobjects = [];
 
-        $fieldobjects[self::_TIMECREATED] = (object) array('id' => self::_TIMECREATED,
+        $fieldobjects[self::_TIMECREATED] = (object) ['id' => self::_TIMECREATED,
                 'dataid' => $dataid, 'type' => '_time', 'name' => get_string('timecreated', 'datalynx'),
-                'description' => '', 'visible' => 2, 'internalname' => 'timecreated');
+                'description' => '', 'visible' => 2, 'internalname' => 'timecreated'];
 
-        $fieldobjects[self::_TIMEMODIFIED] = (object) array('id' => self::_TIMEMODIFIED,
+        $fieldobjects[self::_TIMEMODIFIED] = (object) ['id' => self::_TIMEMODIFIED,
                 'dataid' => $dataid, 'type' => '_time', 'name' => get_string('timemodified', 'datalynx'),
-                'description' => '', 'visible' => 2, 'internalname' => 'timemodified');
+                'description' => '', 'visible' => 2, 'internalname' => 'timemodified'];
 
         return $fieldobjects;
     }
@@ -68,7 +68,7 @@ class datalynxfield__time extends datalynxfield_no_content {
      * @return array|false
      */
     public function parse_search($formdata, $i) {
-        $time = array();
+        $time = [];
 
         if (!empty($formdata->{'f_' . $i . '_' . $this->field->id . '_from'})) {
             $time[0] = $formdata->{'f_' . $i . '_' . $this->field->id . '_from'};
@@ -105,21 +105,21 @@ class datalynxfield__time extends datalynxfield_no_content {
         $namefrom = "df__time_{$i}_from";
         $nameto = "df__time_{$i}_to";
         $varcharcontent = $this->get_sql_compare_text();
-        $params = array();
+        $params = [];
 
         if ($operator != 'BETWEEN') {
             if (!$operator || $operator == 'LIKE') {
                 $operator = '=';
             }
             $params[$namefrom] = $from;
-            return array(" $not $varcharcontent $operator :$namefrom ", $params, false
-            );
+            return [" $not $varcharcontent $operator :$namefrom ", $params, false
+            ];
         } else {
             $params[$namefrom] = $from;
             $params[$nameto] = $to;
-            return array(" ($not $varcharcontent >= :$namefrom AND $varcharcontent <= :$nameto) ",
+            return [" ($not $varcharcontent >= :$namefrom AND $varcharcontent <= :$nameto) ",
                     $params, false
-            );
+            ];
         }
     }
 
@@ -152,7 +152,7 @@ class datalynxfield__time extends datalynxfield_no_content {
                     WHERE $contentfull IS NOT NULL
                     ORDER BY $contentfull $sortdir";
 
-        $distinctvalues = array();
+        $distinctvalues = [];
         if ($options = $DB->get_records_sql($sql)) {
             foreach ($options as $data) {
                 $value = $data->{$this->field->internalname};
@@ -184,9 +184,9 @@ class datalynxfield__time extends datalynxfield_no_content {
     }
 
     public function get_supported_search_operators() {
-        return array('' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
+        return ['' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
                 '>' => get_string('after', 'datalynx'), '<' => get_string('before', 'datalynx'),
-                'BETWEEN' => get_string('between', 'datalynx'));
+                'BETWEEN' => get_string('between', 'datalynx')];
     }
 
     /**

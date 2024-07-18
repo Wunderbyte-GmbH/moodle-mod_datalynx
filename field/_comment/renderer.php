@@ -45,11 +45,11 @@ class datalynxfield__comment_renderer extends datalynxfield_renderer {
             foreach ($tags as $tag) {
                 switch (trim($tag, '@')) {
                     case '##comments:count##':
-                        $options = array('count' => true);
+                        $options = ['count' => true];
                         $str = $this->display_browse($entry, $options);
                         break;
                     case '##comments:inline##':
-                        $options = array('notoggle' => true, 'autostart' => true);
+                        $options = ['notoggle' => true, 'autostart' => true];
                         $str = $this->display_browse($entry, $options);
                         break;
                     case '##comments##':
@@ -59,7 +59,7 @@ class datalynxfield__comment_renderer extends datalynxfield_renderer {
                     default:
                         $str = '';
                 }
-                $replacements[$tag] = array('html', $str);
+                $replacements[$tag] = ['html', $str];
             }
         }
 
@@ -68,7 +68,7 @@ class datalynxfield__comment_renderer extends datalynxfield_renderer {
 
     /**
      */
-    public function display_browse($entry, $options = array()) {
+    public function display_browse($entry, $options = []) {
         global $CFG;
 
         $df = $this->_field->df();
@@ -104,11 +104,11 @@ class datalynxfield__comment_renderer extends datalynxfield_renderer {
     protected function patterns() {
         $cat = get_string('comments', 'datalynx');
 
-        $patterns = array();
-        $patterns['##comments##'] = array(true, $cat);
-        $patterns['##comments:count##'] = array(true, $cat);
-        $patterns['##comments:inline##'] = array(true, $cat);
-        $patterns['##comments:add##'] = array(false);
+        $patterns = [];
+        $patterns['##comments##'] = [true, $cat];
+        $patterns['##comments:count##'] = [true, $cat];
+        $patterns['##comments:inline##'] = [true, $cat];
+        $patterns['##comments:add##'] = [false];
 
         return $patterns;
     }

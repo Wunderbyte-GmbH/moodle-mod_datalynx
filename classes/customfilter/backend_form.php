@@ -56,7 +56,7 @@ class backend_form extends base_form {
         $mform = &$this->_form;
 
         $mform->addElement('text', 'name', get_string('name'));
-        $mform->addElement('text', 'description', get_string('description'), array('size' => '64'));
+        $mform->addElement('text', 'description', get_string('description'), ['size' => '64']);
         $mform->setType('name', PARAM_TEXT);
         $mform->setType('description', PARAM_TEXT);
         $mform->setDefault('name', $name);
@@ -70,23 +70,23 @@ class backend_form extends base_form {
         $mform->setType('fulltextsearch', PARAM_INT);
         $mform->setDefault('fulltextsearch', $customfilter->fulltextsearch);
 
-        $grp = array();
-        $attr = array('size' => 1);
+        $grp = [];
+        $attr = ['size' => 1];
         $grp[] = $mform->createElement('advcheckbox', 'timecreated',
                 get_string('timecreated', 'datalynx'), null, $attr);
         $grp[] = $mform->createElement('advcheckbox', 'timecreated_sortable', null,
-                get_string('sortable', 'datalynx'), $attr, array(0, 1));
+                get_string('sortable', 'datalynx'), $attr, [0, 1]);
         $mform->addGroup($grp, '', null, ' ', false);
         $mform->setType('timecreated', PARAM_INT);
         $mform->setDefault('timecreated', $customfilter->timecreated);
         $mform->setType('timecreated_sortable', PARAM_INT);
         $mform->setDefault('timecreated_sortable', $customfilter->timecreated_sortable);
 
-        $grp = array();
+        $grp = [];
         $grp[] = $mform->createElement('advcheckbox', 'timemodified',
                 get_string('timemodified', 'datalynx'), null, $attr);
         $grp[] = $mform->createElement('advcheckbox', 'timemodified_sortable', null,
-                get_string('sortable', 'datalynx'), $attr, array(0, 1));
+                get_string('sortable', 'datalynx'), $attr, [0, 1]);
         $mform->addGroup($grp, '', null, ' ', false);
         $mform->setType('timemodified', PARAM_INT);
         $mform->setDefault('timemodified', $customfilter->timemodified);
@@ -107,7 +107,7 @@ class backend_form extends base_form {
 
         $mform->addElement('header', 'fieldlistheader', get_string('userfields', 'datalynx'));
 
-        $fieldlist = array();
+        $fieldlist = [];
         if ($customfilter->fieldlist) {
             $fieldlist = json_decode($customfilter->fieldlist);
         }
@@ -115,11 +115,11 @@ class backend_form extends base_form {
         foreach ($fields as $fieldid => $field) {
             $formfieldname = 'fieldlist[' . $field->field->id . '][name]';
             $formfieldsortablename = 'fieldlist[' . $field->field->id . '][sortable]';
-            $grp = array();
+            $grp = [];
             $grp[] = $mform->createElement('advcheckbox', $formfieldname,
                     $field->field->name . ' (' . $field->type . ')', '', '', $field->field->name);
             $grp[] = $mform->createElement('advcheckbox', $formfieldsortablename, '',
-                    get_string('sortable', 'datalynx'), '', array(0, 1));
+                    get_string('sortable', 'datalynx'), '', [0, 1]);
             $mform->addGroup($grp, '', null, ' ', false);
             $mform->setType($formfieldname, PARAM_TEXT);
             $mform->setType($formfieldsortablename, PARAM_INT);
@@ -144,9 +144,9 @@ class backend_form extends base_form {
     protected function get_possible_customfilter_fields($dl): array {
         global $DB;
 
-        $fields = array();
+        $fields = [];
         $customfilterfieldtypes = $dl->get_customfilterfieldtypes();
-        $fieldsdb = $DB->get_records('datalynx_fields', array('dataid' => $dl->id()), 'name asc');
+        $fieldsdb = $DB->get_records('datalynx_fields', ['dataid' => $dl->id()], 'name asc');
         foreach ($fieldsdb as $fieldid => $field) {
             if (in_array($field->type, $customfilterfieldtypes)) {
                 $fields[$fieldid] = $dl->get_field($field);
@@ -162,7 +162,7 @@ class backend_form extends base_form {
      */
     protected function get_customfilter($filterid) {
         global $DB;
-        return $DB->get_record('datalynx_customfilters', array('id' => $filterid));
+        return $DB->get_record('datalynx_customfilters', ['id' => $filterid]);
     }
 
     /**
@@ -171,7 +171,7 @@ class backend_form extends base_form {
     public function get_data() {
         if ($data = parent::get_data()) {
             if (!empty($data->fieldlist)) {
-                $fieldlistarray = array();
+                $fieldlistarray = [];
                 foreach ($data->fieldlist as $fieldid => $field) {
                     if ($field['name']) {
                         $fieldlistarray[$fieldid]['name'] = $field['name'];

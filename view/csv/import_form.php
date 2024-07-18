@@ -94,9 +94,9 @@ class datalynxview_csv_import_form extends moodleform {
             $name = "f_{$fieldid}_$patternname";
 
             $grp = [];
-            $grp[] = &$mform->createElement('text', "{$name}_name", null, array('size' => '16'));
+            $grp[] = &$mform->createElement('text', "{$name}_name", null, ['size' => '16']);
 
-            $mform->addGroup($grp, "grp$patternname", $patternname, array(), false);
+            $mform->addGroup($grp, "grp$patternname", $patternname, [], false);
 
             $mform->setType("{$name}_name", PARAM_NOTAGS);
             $mform->setDefault("{$name}_name", $header);
@@ -117,7 +117,7 @@ class datalynxview_csv_import_form extends moodleform {
         $mform->setDefault('delimiter', $view->get_delimiter());
 
         // Enclosure.
-        $mform->addElement('text', 'enclosure', get_string('csvenclosure', 'datalynx'), array('size' => '10'));
+        $mform->addElement('text', 'enclosure', get_string('csvenclosure', 'datalynx'), ['size' => '10']);
         $mform->setType('enclosure', PARAM_NOTAGS);
         $mform->setDefault('enclosure', $view->get_enclosure());
 
@@ -131,7 +131,7 @@ class datalynxview_csv_import_form extends moodleform {
 
         // Upload text.
         $mform->addElement('textarea', 'csvtext', get_string('uploadtext', 'mod_datalynx'),
-                array('wrap' => 'soft', 'rows' => '5', 'style' => 'width:100%;'));
+                ['wrap' => 'soft', 'rows' => '5', 'style' => 'width:100%;']);
 
         // Update existing entries.
         $mform->addElement('selectyesno', 'updateexisting', get_string('updateexisting', 'mod_datalynx'));

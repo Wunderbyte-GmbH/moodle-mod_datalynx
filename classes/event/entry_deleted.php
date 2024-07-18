@@ -78,7 +78,7 @@ class entry_deleted extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/mod/datalynx/view.php', array('d' => $this->other['dataid']));
+        return new \moodle_url('/mod/datalynx/view.php', ['d' => $this->other['dataid']]);
     }
 
     /**

@@ -57,7 +57,7 @@ class datalynxfield_radiobutton_renderer extends datalynxfield_select_renderer {
             $separator = $field->separators[$param2]['chr'];
         }
 
-        $elemgrp = array();
+        $elemgrp = [];
         foreach ($menuoptions as $id => $option) {
             $radio = &$mform->createElement('radio', $fieldname, '', $option, $id);
             if ($id == $selected) {
@@ -68,7 +68,7 @@ class datalynxfield_radiobutton_renderer extends datalynxfield_select_renderer {
 
         $mform->addGroup($elemgrp, "{$fieldname}_group", null, $separator, false);
 
-        $mform->setDefaults(array($fieldname => (int) $selected));
+        $mform->setDefaults([$fieldname => (int) $selected]);
 
         if ($required) {
             $mform->addRule("{$fieldname}_group", null, 'required', null, 'client');

@@ -37,14 +37,14 @@ require_login($df->data->course, false, $df->cm);
 
 require_capability('mod/datalynx:viewstatistics', $df->context);
 
-$df->set_page('statistics/index', array('modjs' => true, 'urlparams' => $urlparams));
+$df->set_page('statistics/index', ['modjs' => true, 'urlparams' => $urlparams]);
 
 // Activate navigation node.
 navigation_node::override_active_url(
-        new moodle_url('/mod/datalynx/statistics/index.php', array('id' => $df->cm->id)));
+        new moodle_url('/mod/datalynx/statistics/index.php', ['id' => $df->cm->id]));
 
 // Print header.
-$df->print_header(array('tab' => 'statistics', 'urlparams' => $urlparams));
+$df->print_header(['tab' => 'statistics', 'urlparams' => $urlparams]);
 
 $stats = new datalynx_statistics_class($df);
 
@@ -53,7 +53,7 @@ if ($data = $mform->get_data()) {
     $data->from_old = $data->from;
     $data->to_old = $data->to;
     $data->mode_old = $data->mode;
-    $data->show_old = isset($data->show) ? $data->show : array();
+    $data->show_old = isset($data->show) ? $data->show : [];
     $mform->set_data($data);
 } else {
     if ($mform->is_submitted()) {
@@ -63,7 +63,7 @@ if ($data = $mform->get_data()) {
         $data->from = 0;
         $data->to = time();
         $data->mode = datalynx_statistics_class::MODE_ALL_TIME;
-        $data->show = array(1 => 1, 2 => 1, 4 => 1, 8 => 1);
+        $data->show = [1 => 1, 2 => 1, 4 => 1, 8 => 1];
         $mform->set_data($data);
     }
 }

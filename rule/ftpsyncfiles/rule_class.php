@@ -316,16 +316,16 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
 
         switch ($this->matchingfield) {
             case 'idnumber':
-                $userid = $DB->get_field('user', 'id', array('idnumber' => $identifier));
+                $userid = $DB->get_field('user', 'id', ['idnumber' => $identifier]);
                 break;
             case 'email':
-                $userid = $DB->get_field('user', 'id', array('email' => $identifier));
+                $userid = $DB->get_field('user', 'id', ['email' => $identifier]);
                 break;
             case 'id':
                 $userid = $identifier;
                 break;
             case 'username':
-                $userid = $DB->get_field('user', 'id', array('username' => $identifier));
+                $userid = $DB->get_field('user', 'id', ['username' => $identifier]);
                 break;
             default:
                 $userid = 0;

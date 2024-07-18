@@ -42,7 +42,7 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
         if ($entryid > 0 && !empty($entry->{"c{$fieldid}_content"})) {
             $content = $entry->{"c{$fieldid}_content"};
         }
-        $fieldattr = array();
+        $fieldattr = [];
         $fieldattr['size'] = 30;
 
         if ($field->get('param4')) {
@@ -52,9 +52,9 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
             $fieldattr['class'] = "datalynxfield_datalynxview datalynxview_{$fieldid}_{$entryid}";
             // If param10 is empty take the values of this field itself for autocomplete options.
             $reffieldid = $field->field->param10 ? $field->field->param10 : $field->field->id;
-            $menu = array(
+            $menu = [
                     '_qf__force_multiselect_submission'
-                    => get_string('choose')) + $field->df->get_distinct_textfieldvalues_by_id($reffieldid);
+                    => get_string('choose')] + $field->df->get_distinct_textfieldvalues_by_id($reffieldid);
         }
 
         if ($autocomplete) {  // Render as autocomplete field if param9 is not empty.
@@ -106,7 +106,7 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
                     $val = $max;
                     break;
                 case 'rangelength':
-                    $val = array($min, $max);
+                    $val = [$min, $max];
                     break;
             }
             if ($val !== false) {
@@ -147,25 +147,25 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
         $fieldid = $field->id();
         $fieldname = "f_{$i}_$fieldid";
         $autocomplete = $field->get('param9');
-        $arr = array();
+        $arr = [];
 
         if ($autocomplete) {
             $fieldattr['class'] = "datalynxfield_datalynxview datalynxview_{$fieldid}";
             // If param10 is empty take the values of this field itself for autocomplete options.
             $reffieldid = $field->field->param10 ? $field->field->param10 : $field->field->id;
-            $menu = array(
+            $menu = [
                     '_qf__force_multiselect_submission'
-                    => get_string('choose')) + $field->df->get_distinct_textfieldvalues_by_id($reffieldid);
+                    => get_string('choose')] + $field->df->get_distinct_textfieldvalues_by_id($reffieldid);
             $fieldattr['tags'] = true;
             $arr[] = &$mform->createElement('autocomplete', $fieldname, null, $menu, $fieldattr);
             $mform->setType($fieldname, PARAM_NOTAGS);
         } else {
-            $arr[] = &$mform->createElement('text', $fieldname, null, array('size' => '32'));
+            $arr[] = &$mform->createElement('text', $fieldname, null, ['size' => '32']);
             $mform->setType($fieldname, PARAM_NOTAGS);
             $mform->setDefault($fieldname, $value);
             $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
         }
-        return array($arr, null);
+        return [$arr, null];
     }
 
     public function validate($entryid, $tags, $formdata) {
@@ -176,7 +176,7 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
         $formfieldname = "field_{$fieldid}_{$entryid}";
         $param8 = $this->_field->get('param8');
 
-        $errors = array();
+        $errors = [];
         foreach ($tags as $tag) {
             list(, $behavior, ) = $this->process_tag($tag);
             // Variable $behavior datalynx_field_behavior.
@@ -193,9 +193,9 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
                                              WHERE c.fieldid = :fieldid
                                                AND c.entryid <> :entryid
                                                AND c.content LIKE :content",
-                        array('fieldid' => $fieldid,
+                        ['fieldid' => $fieldid,
                                 'entryid' => $entryid,
-                                'content' => $formdata->$formfieldname))
+                                'content' => $formdata->$formfieldname])
                 ) {
                     // It's not the first of it's kind!
                     $errors[$formfieldname] = get_string('uniquerequired', 'datalynx');

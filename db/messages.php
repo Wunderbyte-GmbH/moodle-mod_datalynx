@@ -23,23 +23,23 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-$messageproviders = array(
+$messageproviders = [
 
-        'event_entry_created' => array('capability' => 'mod/datalynx:notifyentryadded'),
+        'event_entry_created' => ['capability' => 'mod/datalynx:notifyentryadded'],
 
-        'event_entry_updated' => array('capability' => 'mod/datalynx:notifyentryupdated'),
+        'event_entry_updated' => ['capability' => 'mod/datalynx:notifyentryupdated'],
 
-        'event_entry_deleted' => array('capability' => 'mod/datalynx:notifyentrydeleted'),
+        'event_entry_deleted' => ['capability' => 'mod/datalynx:notifyentrydeleted'],
 
-        'event_entry_approved' => array('capability' => 'mod/datalynx:notifyentryapproved'),
+        'event_entry_approved' => ['capability' => 'mod/datalynx:notifyentryapproved'],
 
-        'event_entry_disapproved' => array('capability' => 'mod/datalynx:notifyentrydisapproved'),
+        'event_entry_disapproved' => ['capability' => 'mod/datalynx:notifyentrydisapproved'],
 
-        'event_comment_created' => array('capability' => 'mod/datalynx:notifycommentadded'),
+        'event_comment_created' => ['capability' => 'mod/datalynx:notifycommentadded'],
 
-        'event_rating_added' => array('capability' => 'mod/datalynx:notifyratingadded'),
+        'event_rating_added' => ['capability' => 'mod/datalynx:notifyratingadded'],
 
-        'event_rating_updated' => array('capability' => 'mod/datalynx:notifyratingadded'),
+        'event_rating_updated' => ['capability' => 'mod/datalynx:notifyratingadded'],
 
-        'event_team_updated' => array('capability' => 'mod/datalynx:notifyteamupdated')
-);
+        'event_team_updated' => ['capability' => 'mod/datalynx:notifyteamupdated']
+];

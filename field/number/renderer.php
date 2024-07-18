@@ -91,19 +91,19 @@ class datalynxfield_number_renderer extends datalynxfield_text_renderer {
         $fieldid = $this->_field->id();
         $fieldname = "f_{$i}_$fieldid";
 
-        $arr = array();
+        $arr = [];
 
-        $arr[] = &$mform->createElement('text', "{$fieldname}[0]", null, array('size' => '6'));
+        $arr[] = &$mform->createElement('text', "{$fieldname}[0]", null, ['size' => '6']);
         $mform->setType("{$fieldname}[0]", PARAM_FLOAT);
         $mform->setDefault("{$fieldname}[0]", isset($value[0]) ? $value[0] : '');
         $mform->disabledIf("{$fieldname}[0]", "searchoperator$i", 'eq', '');
 
-        $arr[] = &$mform->createElement('text', "{$fieldname}[1]", null, array('size' => '6'));
+        $arr[] = &$mform->createElement('text', "{$fieldname}[1]", null, ['size' => '6']);
         $mform->setType("{$fieldname}[1]", PARAM_FLOAT);
         $mform->setDefault("{$fieldname}[1]", isset($value[1]) ? $value[1] : '');
         $mform->disabledIf("{$fieldname}[1]", "searchoperator$i", 'neq', 'BETWEEN');
 
-        return array($arr, null);
+        return [$arr, null];
     }
 
     /**
@@ -116,7 +116,7 @@ class datalynxfield_number_renderer extends datalynxfield_text_renderer {
 
         $formfieldname = "field_{$fieldid}_{$entryid}";
 
-        $errors = array();
+        $errors = [];
         foreach ($tags as $tag) {
             list(, $behavior, ) = $this->process_tag($tag);
             // Variable $behavior datalynx_field_behavior.

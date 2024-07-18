@@ -62,10 +62,10 @@ class datalynxview_base_form extends moodleform {
         $mform->addHelpButton('general', 'viewgeneral', 'datalynx');
 
         // Name and description.
-        $mform->addElement('text', 'name', get_string('name'), array('size' => '64'));
+        $mform->addElement('text', 'name', get_string('name'), ['size' => '64']);
         $mform->addRule('name', null, 'required', null, 'client');
 
-        $mform->addElement('text', 'description', get_string('description'), array('size' => '64'));
+        $mform->addElement('text', 'description', get_string('description'), ['size' => '64']);
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('name', PARAM_NOTAGS);
             $mform->setType('description', PARAM_NOTAGS);
@@ -84,9 +84,9 @@ class datalynxview_base_form extends moodleform {
         // Filter.
         $filtersmenu = $df->get_filter_manager()->get_filters(null, true);
         if (!$filtersmenu) {
-            $filtersmenu = array(0 => get_string('filtersnonedefined', 'datalynx'));
+            $filtersmenu = [0 => get_string('filtersnonedefined', 'datalynx')];
         } else {
-            $filtersmenu = array(0 => get_string('choose')) + $filtersmenu;
+            $filtersmenu = [0 => get_string('choose')] + $filtersmenu;
         }
         $mform->addElement('select', '_filter', get_string('viewfilter', 'datalynx'), $filtersmenu);
         $mform->setDefault('_filter', 0);
@@ -101,7 +101,7 @@ class datalynxview_base_form extends moodleform {
         $mform->addElement('header', 'redirectsettings', get_string('redirectsettings', 'datalynx'));
         $mform->addHelpButton('redirectsettings', 'redirectsettings', 'datalynx');
         $mform->addElement('select', 'param10', get_string('redirectto', 'datalynx'), $this->get_view_menu());
-        $mform->setDefault('param10', $DB->get_field('datalynx', 'defaultview', array('id' => $this->_df->id())));
+        $mform->setDefault('param10', $DB->get_field('datalynx', 'defaultview', ['id' => $this->_df->id()]));
         $mform->setType('param10', PARAM_INT);
 
         // View specific definition.
@@ -176,10 +176,10 @@ class datalynxview_base_form extends moodleform {
         $query = "SELECT dv.id, dv.name
                     FROM {datalynx_views} dv
                    WHERE dv.dataid = :dataid";
-        $dviewid = $DB->get_field('datalynx', 'defaultview', array('id' => $dataid));
-        $eviewid = $DB->get_field('datalynx', 'singleedit', array('id' => $dataid));
-        $mviewid = $DB->get_field('datalynx', 'singleview', array('id' => $dataid));
-        $menu = $DB->get_records_sql_menu($query, array('dataid' => $dataid));
+        $dviewid = $DB->get_field('datalynx', 'defaultview', ['id' => $dataid]);
+        $eviewid = $DB->get_field('datalynx', 'singleedit', ['id' => $dataid]);
+        $mviewid = $DB->get_field('datalynx', 'singleview', ['id' => $dataid]);
+        $menu = $DB->get_records_sql_menu($query, ['dataid' => $dataid]);
         if (isset($menu[$dviewid])) {
             $menu[$dviewid] .= ' ' . get_string('targetviewdefault', 'datalynx');
         }
@@ -190,7 +190,7 @@ class datalynxview_base_form extends moodleform {
             $menu[$mviewid] .= ' ' . get_string('targetviewmore', 'datalynx');
         }
         if (!$viewid) {
-            $menu = array(0 => get_string('targetviewthisnew', 'datalynx')) + $menu;
+            $menu = [0 => get_string('targetviewthisnew', 'datalynx')] + $menu;
         } else {
             $menu[$viewid] .= ' ' . get_string('targetviewthis', 'datalynx');
         }
@@ -232,7 +232,7 @@ class datalynxview_base_form extends moodleform {
         // Switch editor.
         // Cancel.
         $buttonarray[] = &$mform->createElement('cancel');
-        $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
+        $mform->addGroup($buttonarray, 'buttonar', '', [' '], false);
         $mform->closeHeaderBefore('buttonar');
     }
 
@@ -271,15 +271,15 @@ class datalynxview_base_form extends moodleform {
             $name = "{$editorname}_{$tagstype}_tag_menu";
             $grp = [];
             $grp[] = &$mform->createElement('html',
-                    html_writer::start_tag('div', array('class' => 'fitem')));
+                    html_writer::start_tag('div', ['class' => 'fitem']));
             $grp[] = &$mform->createElement('html',
                     '<div class="fitemtitle"><label>' . $label . '</label></div>');
             $grp[] = &$mform->createElement('html',
                     '<div class="felement fselect">' .
-                    html_writer::select($tags, $name, '', array('' => 'choosedots'),
-                            array('id' => $name)) . '</div>');
+                    html_writer::select($tags, $name, '', ['' => 'choosedots'],
+                            ['id' => $name]) . '</div>');
             $grp[] = &$mform->createElement('html', html_writer::end_tag('div'));
-            $mform->addGroup($grp, "{$editorname}{$tagstype}tagsgrp", '', array(' '), false);
+            $mform->addGroup($grp, "{$editorname}{$tagstype}tagsgrp", '', [' '], false);
         }
     }
 
