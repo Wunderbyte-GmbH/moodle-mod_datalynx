@@ -693,8 +693,13 @@ abstract class datalynxfield_base {
     }
 
     /**
+     * Get the entry ids for the specific sql using the field id and the field value.
+     *
+     * @param $sql
+     * @param $params
+     * @return array
      */
-    protected function get_entry_ids_for_content($sql, $params) {
+    protected function get_entry_ids_for_content(string $sql, array $params): array {
         global $DB;
 
         $sql = " fieldid = :fieldid AND $sql ";
@@ -803,7 +808,7 @@ abstract class datalynxfield_base {
 }
 
 /**
- * Base class for Datalynx field types that require no content
+ * Base class for Datalynx field types that require no content. Example: User profile fields.
  */
 abstract class datalynxfield_no_content extends datalynxfield_base {
 
@@ -1216,9 +1221,9 @@ class datalynxfield_option_multiple extends datalynxfield_option {
                             $sql = " (e.id $contentids) ";
                         } else { // There are no non-empty contents.
                             if ($not) {
-                                $sql = " 0 ";
+                                $sql = " 1 = 0 ";
                             } else {
-                                $sql = " 1 ";
+                                $sql = " 1 = 1 ";
                             }
                         }
                     }
@@ -1342,7 +1347,7 @@ class datalynxfield_option_single extends datalynxfield_option {
     }
 
     /**
-     *
+     * Get search sql for single choice fields.
      * {@inheritDoc}
      * @see datalynxfield_base::get_search_sql()
      */
@@ -1389,7 +1394,7 @@ class datalynxfield_option_single extends datalynxfield_option {
                     if ($not) {
                         $sql = " 0 ";
                     } else {
-                        $sql = " 1 ";
+                        $sql = " 1 = 1 ";
                     }
                 }
             }

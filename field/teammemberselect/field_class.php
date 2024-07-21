@@ -346,7 +346,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
                     $params = array_merge($params, $paramsnot);
                     $sql = " (e.id $notinids)";
                 } else {
-                    $sql = " 0 ";
+                    $sql = " 1 = 0 ";
                 }
 
                 $usecontent = false;
@@ -384,7 +384,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
                         if ($not) {
                             $sql = " 0 ";
                         } else {
-                            $sql = " 1 ";
+                            $sql = " 1 = 1 ";
                         }
                     }
                 }

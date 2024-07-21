@@ -180,7 +180,7 @@ class datalynxfield_duration extends datalynxfield_base {
                 $sql = "$not ($varcharcontent > :{$paramname}_l AND $varcharcontent < :{$paramname}_u) ";
                 break;
             default:
-                $sql = " 1 ";
+                $sql = " 1 = 1 ";
                 break;
         }
 

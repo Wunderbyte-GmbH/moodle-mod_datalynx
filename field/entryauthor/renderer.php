@@ -104,6 +104,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
             $entry->email = $USER->email;
             $entry->userid = $USER->id;
             $entry->institution = $USER->institution;
+            $entry->department = $USER->department;
         }
         $field = $this->_field;
         $fieldid = $field->id();
@@ -122,6 +123,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
                 $user->lastname = $entry->lastname;
                 $user->email = $entry->email;
                 $user->institution = $entry->institution;
+                $user->department = $entry->department;
                 $users[$entry->userid] = $user;
             }
         }
@@ -296,6 +298,22 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
             return $USER->institution;
         } else {
             return $entry->institution;
+        }
+    }
+
+    /**
+     * Display the department of user profile.
+     *
+     * @param $entry
+     * @return mixed
+     */
+    public function display_department($entry) {
+        global $USER;
+
+        if ($entry->id < 0) { // New entry.
+            return $USER->department;
+        } else {
+            return $entry->department;
         }
     }
 

@@ -48,6 +48,8 @@ class datalynxfield_entryauthor extends datalynxfield_no_content {
 
     const _USERINSTITUTION = 'userinstitution';
 
+    const _USERDEPARTMENT = 'userdepartment';
+
     const _BADGES = 'badges';
 
     public function supports_group_by() {
@@ -109,6 +111,11 @@ class datalynxfield_entryauthor extends datalynxfield_no_content {
                         'name' => get_string('institution'), 'description' => '',
                         'visible' => 2, 'internalname' => 'institution');
 
+        $fieldobjects[self::_USERDEPARTMENT] = (object) array('id' => self::_USERDEPARTMENT,
+                'dataid' => $dataid, 'type' => 'entryauthor',
+                'name' => get_string('department'), 'description' => '',
+                'visible' => 2, 'internalname' => 'department');
+
         // TODO: Multilang.
         $fieldobjects[self::_BADGES] = (object) array('id' => self::_BADGES,
                         'dataid' => $dataid, 'type' => 'entryauthor',
@@ -145,7 +152,7 @@ class datalynxfield_entryauthor extends datalynxfield_no_content {
      * {@inheritDoc}
      * @see datalynxfield_base::get_search_sql()
      */
-    public function get_search_sql(array $search): array {
+        public function get_search_sql(array $search): array {
         global $USER, $DB;
         list($not, $operator, $value) = $search;
 

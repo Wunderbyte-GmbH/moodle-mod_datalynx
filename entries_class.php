@@ -204,7 +204,7 @@ class datalynx_entries {
         }
 
         // Sql for fetching the entries.
-        $userfields = fields::for_name()->including('idnumber', 'username', 'institution', 'email');
+        $userfields = fields::for_name()->including('idnumber', 'username', 'institution', 'department', 'email');
         $selectfields = $userfields->get_sql('u', false, '', 'uid')->selects;
 
         $what = ' DISTINCT ' .

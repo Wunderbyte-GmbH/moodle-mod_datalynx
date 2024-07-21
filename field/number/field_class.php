@@ -78,7 +78,7 @@ class datalynxfield_number extends datalynxfield_text {
                 $sql = " ($varcharcontent > :{$paramname}_l AND $varcharcontent < :{$paramname}_u) ";
                 break;
             default:
-                $sql = " 1 ";
+                $sql = " 1 = 1 ";
                 break;
         }
 
