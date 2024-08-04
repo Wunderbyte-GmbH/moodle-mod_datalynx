@@ -198,8 +198,11 @@ class datalynx_filter {
                                 $searchparams = array_merge($searchparams, $fieldparams);
 
                                 // Add searchfrom (JOIN) only for search in datalynx content or external.
-                                // Tables.
-                                if (!$internalfield && $fromcontent) {
+                                // tables or fields inherited from datalynxfield_no_content_can_join.
+
+                                $field_should_add_join = !$internalfield || $field instanceof datalynxfield_no_content_can_join;
+
+                                if ($field_should_add_join && $fromcontent) {
                                     $searchfrom[$fieldid] = $fieldid;
                                 }
                             }
@@ -221,8 +224,11 @@ class datalynx_filter {
                             $searchparams = array_merge($searchparams, $fieldparams);
 
                             // Add searchfrom (JOIN) only for search in datalynx content or external.
-                            // Tables.
-                            if (!$internalfield && $fromcontent) {
+                            // tables or fields inherited from datalynxfield_no_content_can_join.
+
+                            $field_should_add_join = !$internalfield || $field instanceof datalynxfield_no_content_can_join;
+
+                            if ($field_should_add_join && $fromcontent) {
                                 $searchfrom[$fieldid] = $fieldid;
                             }
                         }
