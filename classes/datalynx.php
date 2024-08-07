@@ -849,7 +849,8 @@ class datalynx {
                 if (!$fieldclass::is_internal()) {
                     continue;
                 }
-                $internalfields = $fieldclass::get_field_objects($this->data->id);
+                // By this time, $this->fields should be filled up.
+                $internalfields = $fieldclass::get_field_objects($this->data->id, $this->fields);
                 foreach ($internalfields as $fid => $field) {
                     $this->internalfields[$fid] = $this->get_field($field);
                 }

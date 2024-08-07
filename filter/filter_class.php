@@ -198,8 +198,11 @@ class datalynx_filter {
                                 $searchparams = array_merge($searchparams, $fieldparams);
 
                                 // Add searchfrom (JOIN) only for search in datalynx content or external.
-                                // Tables.
-                                if (!$internalfield && $fromcontent) {
+                                // tables or fields inherited from datalynxfield_no_content_can_join.
+
+                                $field_should_add_join = !$internalfield || $field instanceof datalynxfield_no_content_can_join;
+
+                                if ($field_should_add_join && $fromcontent) {
                                     $searchfrom[$fieldid] = $fieldid;
                                 }
                             }
@@ -221,8 +224,11 @@ class datalynx_filter {
                             $searchparams = array_merge($searchparams, $fieldparams);
 
                             // Add searchfrom (JOIN) only for search in datalynx content or external.
-                            // Tables.
-                            if (!$internalfield && $fromcontent) {
+                            // tables or fields inherited from datalynxfield_no_content_can_join.
+
+                            $field_should_add_join = !$internalfield || $field instanceof datalynxfield_no_content_can_join;
+
+                            if ($field_should_add_join && $fromcontent) {
                                 $searchfrom[$fieldid] = $fieldid;
                             }
                         }
@@ -1063,9 +1069,9 @@ class datalynx_filter_manager {
                         $not = !empty($formdata->{"searchnot$i"}) ? $formdata->{"searchnot$i"} : '';
                         $operator = isset($formdata->{"searchoperator$i"}) ? $formdata->{"searchoperator$i"} : '';
                         $parsedvalue = $fields[$searchfieldid]->parse_search($formdata, $i);
-                        // Don't add empty criteria on cleanup (unless operator is Empty and thus.
-                        // Doesn't need search value).
-                        if ($finalize && $operator && !$parsedvalue) {
+                        // Don't add empty criteria on cleanup (unless operator
+                        // doesn't need an argument/search value (e.g. the "Empty" operator)).
+                        if ($finalize && ($fields[$searchfieldid]->get_argument_count($operator) > 0) && !$parsedvalue) {
                             continue;
                         }
 
