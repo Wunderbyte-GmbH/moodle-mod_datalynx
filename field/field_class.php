@@ -1251,6 +1251,14 @@ class datalynxfield_option_multiple extends datalynxfield_option {
                 'ALL_OF' => get_string('allof', 'datalynx'),
                 'EXACTLY' => get_string('exactly', 'datalynx'), '' => get_string('empty', 'datalynx'));
     }
+
+    public function get_argument_count(string $operator) {
+        if ($operator === "") { // "Empty" operator
+            return 0;
+        } else {
+            return 1;
+        }
+    }
 }
 
 /**

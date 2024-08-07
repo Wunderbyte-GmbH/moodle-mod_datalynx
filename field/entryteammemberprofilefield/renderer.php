@@ -33,5 +33,18 @@ require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 /**
  */
 class datalynxfield_entryteammemberprofilefield_renderer extends datalynxfield_renderer {
-    
+
+    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
+        $fieldid = $this->_field->id();
+        $fieldname = "f_{$i}_$fieldid";
+
+        $arr = array();
+        $arr[] = &$mform->createElement('text', $fieldname, null, array('size' => '32'));
+        $mform->setType($fieldname, PARAM_NOTAGS);
+        $mform->setDefault($fieldname, $value);
+        $mform->disabledIf($fieldname, "searchoperator$i", 'eq', datalynxfield_entryteammemberprofilefield::OPERATOR_MY_PROFILE_FIELD);
+
+        return array($arr, null);
+    }
+
 }

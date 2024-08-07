@@ -169,7 +169,7 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
         $operator = !empty($formdata->{"searchoperator{$i}"}) ? $formdata->{"searchoperator{$i}"} : '';
         $fieldvalue = !empty($formdata->{"f_{$i}_$field_id"}) ? $formdata->{"f_{$i}_$field_id"} : false;
         if ($operator == self::OPERATOR_MY_PROFILE_FIELD) {
-            return "-"; // FIXME: Find a way to save the filter without returning any value here.
+            return ""; 
         } else {
             if ($operator == self::OPERATOR_LITERAL_VALUE) {
                 return $fieldvalue;
@@ -217,5 +217,13 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
             self::OPERATOR_LITERAL_VALUE => get_string('literalvalue', 'datalynxfield_entryteammemberprofilefield'),
             self::OPERATOR_MY_PROFILE_FIELD => get_string('myprofilefield', 'datalynxfield_entryteammemberprofilefield')
         );
+    }
+
+    public function get_argument_count(string $operator) {
+        if ($operator === self::OPERATOR_MY_PROFILE_FIELD) {
+            return 0;
+        } else {
+            return 1;
+        }
     }
 }

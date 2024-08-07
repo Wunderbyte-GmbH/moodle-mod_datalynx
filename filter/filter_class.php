@@ -1069,9 +1069,9 @@ class datalynx_filter_manager {
                         $not = !empty($formdata->{"searchnot$i"}) ? $formdata->{"searchnot$i"} : '';
                         $operator = isset($formdata->{"searchoperator$i"}) ? $formdata->{"searchoperator$i"} : '';
                         $parsedvalue = $fields[$searchfieldid]->parse_search($formdata, $i);
-                        // Don't add empty criteria on cleanup (unless operator is Empty and thus.
-                        // Doesn't need search value).
-                        if ($finalize && $operator && !$parsedvalue) {
+                        // Don't add empty criteria on cleanup (unless operator
+                        // doesn't need an argument/search value (e.g. the "Empty" operator)).
+                        if ($finalize && ($fields[$searchfieldid]->get_argument_count($operator) > 0) && !$parsedvalue) {
                             continue;
                         }
 
