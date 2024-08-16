@@ -160,7 +160,7 @@ $mform->set_data($view->to_form());
 
 // ToDo: Ugly hack for forcing atto as the only editor available even if user chose another editor.
 $texteditors = $CFG->texteditors;
-$CFG->texteditors = 'atto,textarea';
+$CFG->texteditors = 'tiny';
 $mform->display();
 $CFG->texteditors = $texteditors;
 
