@@ -119,7 +119,7 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
         $profile_field_name = $field_id_components["profile_field_name"];
 
         $field_id = $this->field->id;
-        $param_prefix = "df_{$field_id}";
+        $param_prefix = "profile_";
 
         $users_with_profile_field_value = $this->get_users_with_profile_field_value($profile_field_name, $operator, $value, $not);
 
