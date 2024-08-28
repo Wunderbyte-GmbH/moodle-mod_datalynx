@@ -219,6 +219,16 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             foreach ($customsearch as $searchfield => $options) {
                 if (is_numeric($searchfield) && $searchfield > 0) {
                     $searchfields[$this->get_mappingid('datalynx_field', $searchfield)] = $options;
+                } else if (str_contains($searchfield, 'entryteammemberprofilefield_')) {
+                    // Check for filter of entryteammemberprofilefield.
+                    // It has pattern entryteammemberprofilefield_fieldid_profielfieldname.
+                    // Example: entryteammemberprofilefield_1026_department
+                    preg_match('/entryteammemberprofilefield_(\d+)_(.+)/', $searchfield, $matches);
+                    if (is_numeric($matches[1])) {
+                        $newfieldid = $this->get_mappingid('datalynx_field', $matches[1]);
+                        $newname = "entryteammemberprofilefield_{$newfieldid}_{$matches[2]}";
+                        $searchfields[$newname] = $options;
+                    }
                 } else {
                     $searchfields[$searchfield] = $options;
                 }
