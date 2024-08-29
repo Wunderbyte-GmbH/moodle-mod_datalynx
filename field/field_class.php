@@ -787,6 +787,14 @@ abstract class datalynxfield_base {
         return array(); // If search is not supported, offer no operators.
     }
 
+    public function get_argument_count(string $operator) {
+        if ($operator === "") { // "Empty" operator
+            return 0;
+        } else {
+            return 1;
+        }
+    }
+
     /**
      * Are fields of this field type suitable for use in customfilters?
      * @return bool
@@ -1018,6 +1026,14 @@ abstract class datalynxfield_option extends datalynxfield_base {
      */
     public static function is_customfilterfield() {
         return true;
+    }
+
+    public function get_argument_count(string $operator) {
+        if ($operator === "") { // "Empty" operator
+            return 0;
+        } else {
+            return 1;
+        }
     }
 }
 

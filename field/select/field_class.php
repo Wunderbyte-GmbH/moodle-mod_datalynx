@@ -59,4 +59,12 @@ class datalynxfield_select extends datalynxfield_option_single {
             return '';
         }
     }
+
+    public function get_argument_count(string $operator) {
+        if ($operator === "") { // "Empty" operator
+            return 0;
+        } else {
+            return 1;
+        }
+    }
 }
