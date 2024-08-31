@@ -20,13 +20,29 @@
  * @copyright based on the work by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+namespace mod_datalynx\view;
+
+use coding_exception;
+use datalynx_entries;
+use datalynx_filter;
+use datalynxfield__rating;
+use datalynxview_entries_form;
+use datalynxview_patterns;
+use HTML_QuickForm;
+use html_writer;
+use mod_datalynx\datalynx;
+use moodle_exception;
+use moodle_url;
+use stdClass;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * A base class for datalynx views
- * (see view/<view type>/view_class.php)
+ * (see view/<view type>/base.php)
  */
-abstract class datalynxview_base {
+abstract class base {
 
     const ADD_NEW_ENTRY = -1;
 
@@ -34,52 +50,52 @@ abstract class datalynxview_base {
      *
      * @var string view type Subclasses must override the type with their name
      */
-    protected $type = 'unknown';
+    protected string $type = 'unknown';
 
     /**
      *
-     * @var stdClass get_record object of datalynx_views
+     * @var ?stdClass get_record object of datalynx_views
      */
-    public $view = null;
+    public ?stdClass $view = null;
 
     /**
      *
-     * @var datalynx object that this view belongs to
+     * @var ?datalynx object that this view belongs to
      */
-    protected $_df = null;
+    protected ?datalynx $_df = null;
 
     /**
      *
-     * @var datalynx_filter
+     * @var ?datalynx_filter
      */
-    protected $_filter = null;
+    protected ?datalynx_filter $_filter = null;
 
     /**
-     * @var datalynxview_patterns
+     * @var ?datalynxview_patterns
      */
-    protected $patternclass = null;
+    protected ?datalynxview_patterns $patternclass = null;
 
-    protected $_editors = array('section', 'param2');
+    protected array $_editors = ['section', 'param2'];
 
-    protected $_vieweditors = array('section', 'param2');
+    protected array $_vieweditors = ['section', 'param2'];
 
-    protected $_entries = null;
+    protected ?datalynx_entries $_entries = null;
 
-    protected $_tags = array();
+    protected array $_tags = [];
 
-    protected $_baseurl = '';
+    protected string|moodle_url $_baseurl = '';
 
-    protected $_notifications = array('good' => array(), 'bad' => array());
+    protected array $_notifications = ['good' => [], 'bad' => []];
 
-    protected $_editentries = 0;
+    protected int $_editentries = 0;
 
     protected $_entriesform = null;
 
-    protected $_display_definition = array();
+    protected array $_display_definition = [];
 
     protected $_returntoentriesform = null;
 
-    protected $_redirect = 0;
+    protected int $_redirect = 0;
 
     /**
      * Constructor
@@ -92,11 +108,11 @@ abstract class datalynxview_base {
             throw new coding_exception('Datalynx id or object must be passed to field constructor.');
             // Datalynx object.
         } else {
-            if ($df instanceof \mod_datalynx\datalynx) {
+            if ($df instanceof datalynx) {
                 $this->_df = $df;
                 // Datalynx id.
             } else {
-                $this->_df = new mod_datalynx\datalynx($df);
+                $this->_df = new datalynx($df);
             }
         }
 
@@ -386,7 +402,7 @@ abstract class datalynxview_base {
             $fs = get_file_storage();
             foreach ($this->_editors as $key => $editorname) {
                 $fs->delete_area_files($this->_df->context->id, 'mod_datalynx', "view$editorname",
-                        $this->id() . $key);
+                    $this->id() . $key);
             }
             return $DB->delete_records('datalynx_views', array('id' => $this->view->id));
         }
@@ -413,7 +429,7 @@ abstract class datalynxview_base {
      * prepare view data for form
      */
     public function to_form($data = null) {
-        $data = $data ? $data : $this->view;
+        $data = $data ?: $this->view;
         $data = $this->prepare_view_editors($data);
         return $data;
     }
@@ -513,7 +529,7 @@ abstract class datalynxview_base {
     /**
      * process any view specific actions
      *
-     * @return Ambigous <boolean, number, unknown, multitype:>
+     * @return mixed <boolean, number, unknown, multitype:>
      */
     public function process_data() {
 
@@ -538,7 +554,7 @@ abstract class datalynxview_base {
             if ($this->_filter->perpage == 1) {
                 $this->_filter->eids = $this->_editentries;
             }
-            $this->_editentries = '';
+            $this->_editentries = 0;
         }
         return $processed;
     }
@@ -656,10 +672,10 @@ abstract class datalynxview_base {
                     list($insql, $params) = $DB->get_in_or_equal($this->_filter->eids, SQL_PARAMS_NAMED);
                     if (!$DB->record_exists_select('datalynx_entries', "id $insql", $params)) {
                         $output = $OUTPUT->notification(get_string('nosuchentries', 'datalynx')) .
-                                $OUTPUT->continue_button($this->_df->get_baseurl());
+                            $OUTPUT->continue_button($this->_df->get_baseurl());
                     } else {
                         $output = $OUTPUT->notification(get_string('nopermission', 'datalynx')) .
-                                $OUTPUT->continue_button($this->_df->get_baseurl());
+                            $OUTPUT->continue_button($this->_df->get_baseurl());
                     }
                 } else { // There are no entries in this datalynx.
                     $output = $OUTPUT->notification(get_string('noentries', 'datalynx'));
@@ -890,7 +906,7 @@ abstract class datalynxview_base {
                 // Variable $editor = "e$editorname";.
                 $files = array_merge($files,
                         $fs->get_area_files($this->_df->context->id, 'mod_datalynx', 'view',
-                                $this->id() . $key, 'sortorder, itemid, filepath, filename', false));
+                            $this->id() . $key, 'sortorder, itemid, filepath, filename', false));
             }
         }
 
@@ -1153,7 +1169,7 @@ abstract class datalynxview_base {
                 $redirectid = $this->_redirect ? $this->_redirect : $this->id();
                 $url = new moodle_url($this->_baseurl, array('view' => $redirectid));
                 $html = $OUTPUT->notification(get_string('notallowedtoeditentry', 'datalynx')) .
-                         $OUTPUT->continue_button($url);
+                    $OUTPUT->continue_button($url);
             }
         }
         // Process calculations if any.
@@ -1368,9 +1384,9 @@ abstract class datalynxview_base {
 
     /**
      * @param string $text
-     * @return mixed
+     * @return string
      */
-    protected function process_calculations($text) {
+    protected function process_calculations(string $text): string {
         global $CFG;
 
         if (preg_match_all("/%%F\d*:=[^%]+%%/", $text, $matches)) {

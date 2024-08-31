@@ -22,29 +22,32 @@
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+use mod_datalynx\view\base;
+
 defined('MOODLE_INTERNAL') || die();
 
-require_once("$CFG->dirroot/mod/datalynx/view/view_class.php");
+require_once("$CFG->dirroot/mod/datalynx/classes/view/base.php");
 
-class datalynxview_csv extends datalynxview_base {
+class datalynxview_csv extends base {
 
     const EXPORT_ALL = 'all';
 
     const EXPORT_PAGE = 'page';
 
-    protected $type = 'csv';
+    protected string $type = 'csv';
 
-    protected $_output = 'csv';
+    protected string $_output = 'csv';
 
-    protected $_delimiter = 'comma';
+    protected string $_delimiter = 'comma';
 
-    protected $_enclosure = '';
+    protected string $_enclosure = '';
 
-    protected $_encoding = 'UTF-8';
+    protected string $_encoding = 'UTF-8';
 
-    protected $_editors = array('section');
+    protected array $_editors = ['section'];
 
-    protected $_columns = null;
+    protected ?array $_columns = null;
 
     protected $_showimportform = false;
 
@@ -606,7 +609,7 @@ class datalynxview_csv extends datalynxview_base {
     /**
      * Overridden to add default headers from patterns
      */
-    public function get_columns() {
+    public function get_columns(): ?array {
         if (empty($this->_columns)) {
             $this->_columns = array();
             $columns = explode("\n", $this->view->param2);

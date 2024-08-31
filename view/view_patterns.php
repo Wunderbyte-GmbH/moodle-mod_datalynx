@@ -34,7 +34,7 @@ class datalynxview_patterns {
 
     /**
      *
-     * @var datalynxview_base
+     * @var base
      */
     protected $_view = null;
 

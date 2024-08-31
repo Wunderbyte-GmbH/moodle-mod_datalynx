@@ -63,7 +63,7 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
                 $field_id = 'entryteammemberprofilefield_' . $field->field->id . "_$profile_field";
                 $fieldobjects[$field_id] = (object) array('id' => $field_id,
                     'dataid' => $dataid, 'type' => 'entryteammemberprofilefield',
-                    'name' => $field_name . ' -> ' . get_string($profile_field), 'description' => '',
+                    'name' => $field_name . ' ' . get_string($profile_field), 'description' => '',
                     'visible' => 2, 'internalname' => $field_id);
             }
         }

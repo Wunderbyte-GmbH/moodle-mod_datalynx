@@ -22,15 +22,18 @@
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+use mod_datalynx\view\base;
+
 defined('MOODLE_INTERNAL') || die();
 
-require_once("$CFG->dirroot/mod/datalynx/view/view_class.php");
+require_once("$CFG->dirroot/mod/datalynx/classes/view/base.php");
 
-class datalynxview_grid extends datalynxview_base {
+class datalynxview_grid extends base {
 
-    protected $type = 'grid';
+    protected string $type = 'grid';
 
-    protected $_editors = array('section', 'param2');
+    protected array $_editors = array('section', 'param2');
 
     /**
      * Returns a fieldset of view options

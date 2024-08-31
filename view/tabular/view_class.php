@@ -24,9 +24,12 @@
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+use mod_datalynx\view\base;
+
 defined('MOODLE_INTERNAL') || die();
 
-require_once("$CFG->dirroot/mod/datalynx/view/view_class.php");
+require_once("$CFG->dirroot/mod/datalynx/classes/view/base.php");
 
 /**
  * A template for displaying datalynx entries in a tabular list
@@ -35,13 +38,13 @@ require_once("$CFG->dirroot/mod/datalynx/view/view_class.php");
  * param2 - repeated entry section
  * param3 - table header
  */
-class datalynxview_tabular extends datalynxview_base {
+class datalynxview_tabular extends base {
 
-    protected $type = 'tabular';
+    protected string $type = 'tabular';
 
-    protected $_editors = array('section', 'param2');
+    protected array $_editors = array('section', 'param2');
 
-    protected $_vieweditors = array('section', 'param2');
+    protected array $_vieweditors = array('section', 'param2');
 
     /**
      */
