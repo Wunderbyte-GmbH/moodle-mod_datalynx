@@ -87,7 +87,7 @@ class datalynxview_grid extends base {
                         array('class' => 'mdl-align')) . "<div>##entries##</div>";
 
         // Set content fields in responsive grid.
-        $mustache = array();
+        $mustache = [];
         foreach ($fields as $field) {
             // Check if the fieldid is a generic field like approve or a user defined field.
             if (is_numeric($field->field->id) && $field->field->id > 0) {
@@ -111,7 +111,7 @@ class datalynxview_grid extends base {
     protected function apply_entry_group_layout($entriesset, $name = '') {
         global $OUTPUT;
 
-        $elements = array();
+        $elements = [];
 
         // Prepare grid table if needed.
         if ($name != 'newentry' && !empty($this->view->param3)) {
@@ -170,12 +170,12 @@ class datalynxview_grid extends base {
     /**
      */
     protected function new_entry_definition($entryid = -1) {
-        $elements = array();
+        $elements = [];
 
         // Get patterns definitions.
         $fields = $this->_df->get_fields();
-        $tags = array();
-        $patterndefinitions = array();
+        $tags = [];
+        $patterndefinitions = [];
         $entry = new stdClass();
         foreach ($this->_tags['field'] as $fieldid => $patterns) {
             if (isset($fields[$fieldid])) {

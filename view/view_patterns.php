@@ -53,7 +53,7 @@ class datalynxview_patterns {
      * @return multitype:unknown
      */
     public function search($text, $checkvisibility = true) {
-        $found = array();
+        $found = [];
         // Fixed patterns.
         $patterns = array_keys($this->patterns($checkvisibility));
         foreach ($patterns as $pattern) {
@@ -83,7 +83,7 @@ class datalynxview_patterns {
      */
     final public function get_menu($showall = false) {
         // The default menu category for views.
-        $patternsmenu = array();
+        $patternsmenu = [];
         foreach ($this->patterns() as $tag => $pattern) {
             if ($showall || $pattern[self::PATTERN_SHOW_IN_MENU]) {
                 // Which category.
@@ -111,7 +111,7 @@ class datalynxview_patterns {
      * @param array $options options like pluginfileurl, entriescount, entriesfiltercount, hidenewentry, baseurl
      * @return array of strings key: tagname, value:the string that replaces the tag
      */
-    public function get_replacements($tags = null, $entry = null, array $options = array()) {
+    public function get_replacements($tags = null, $entry = null, array $options = []) {
         $view = $this->_view;
 
         // Existing tag types.
@@ -124,7 +124,7 @@ class datalynxview_patterns {
         $options['filter'] = $view->get_filter();
         $options['baseurl'] = new moodle_url($view->get_baseurl(), array('sesskey' => sesskey()));
 
-        $replacements = array();
+        $replacements = [];
         foreach ($tags as $tag) {
             if ($tag == '##entries##') {
                 $replacements[$tag] = '##entries##';
@@ -180,7 +180,7 @@ class datalynxview_patterns {
             foreach ($views as $view) {
                 $viewname = $view->name;
 
-                $baseurlparams = array();
+                $baseurlparams = [];
                 $baseurlparams['d'] = $view->dataid;
                 $baseurlparams['view'] = $view->id;
 
@@ -597,7 +597,7 @@ class datalynxview_patterns {
         $df = $this->_view->get_dl();
         static $views = null;
         if ($views === null) {
-            $views = array();
+            $views = [];
             if ($theviews = $df->get_views()) {
                 foreach ($theviews as $theview) {
                     $views[$theview->name()] = $theview;
@@ -621,7 +621,7 @@ class datalynxview_patterns {
         $df = $this->_view->get_dl();
         static $views = null;
         if ($views === null) {
-            $views = array();
+            $views = [];
             if ($theviews = $df->get_views()) {
                 foreach ($theviews as $theview) {
                     $views[$theview->name()] = $theview;
@@ -765,8 +765,8 @@ class datalynxview_patterns {
     protected function regexp_patterns($checkvisibility = true) {
         $df = $this->_view->get_dl();
 
-        $views = array();
-        $patterns = array();
+        $views = [];
+        $patterns = [];
         if ($checkvisibility) {
             $views = $df->get_views_menu();
         } else {
@@ -799,7 +799,7 @@ class datalynxview_patterns {
     protected function bulkedit_patterns() {
         $df = $this->_view->get_dl();
 
-        $patterns = array();
+        $patterns = [];
 
         $fieldnames = $df->get_fieldnames();
         $cat = get_string('reference', 'datalynx');
@@ -906,7 +906,7 @@ class datalynxview_patterns {
         if (!$view->is_forcing_filter() && ($filter->id || !empty($options['entriescount']))) {
             $fm = $df->get_filter_manager();
             if (!$menufilters = $fm->get_filters(null, true)) {
-                $menufilters = array();
+                $menufilters = [];
             }
             if ($userfilters = $fm->get_user_filters_menu($view->id())) {
                 $menufilters[] = array(get_string('filtermy', 'datalynx') => $userfilters);

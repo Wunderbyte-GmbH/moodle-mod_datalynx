@@ -33,7 +33,7 @@ class datalynxview_csv_patterns extends datalynxview_patterns {
 
     /**
      */
-    public function get_replacements($tags = null, $entry = null, array $options = array()) {
+    public function get_replacements($tags = null, $entry = null, array $options = []) {
         global $CFG, $OUTPUT;
 
         $replacements = parent::get_replacements($tags, $entry, $options);

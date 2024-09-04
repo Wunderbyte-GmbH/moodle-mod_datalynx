@@ -25,4 +25,4 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'datalynxfield_entryauthor';
 $plugin->version = 2015092200;
-$plugin->requires = 2014051200;
+$plugin->requires = 2022112800;

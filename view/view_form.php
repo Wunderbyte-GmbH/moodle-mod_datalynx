@@ -142,7 +142,7 @@ class datalynxview_base_form extends moodleform {
                     4 => $visible & 4 ? 1 : null, 8 => $visible & 8 ? 1 : null
             );
         } else {
-            $data->visible = array();
+            $data->visible = [];
         }
         if (isset($data->filter)) {
             $data->_filter = $data->filter;
@@ -201,7 +201,7 @@ class datalynxview_base_form extends moodleform {
     public function add_action_buttons($cancel = true, $submit = null) {
         $mform = &$this->_form;
 
-        $buttonarray = array();
+        $buttonarray = [];
         // Save and display.
         $buttonarray[] = &$mform->createElement('submit', 'submitbutton', get_string('savechanges'));
         // Save and continue.
@@ -251,7 +251,7 @@ class datalynxview_base_form extends moodleform {
 
         if (!empty($tags)) {
             $name = "{$editorname}_{$tagstype}_tag_menu";
-            $grp = array();
+            $grp = [];
             $grp[] = &$mform->createElement('html',
                     html_writer::start_tag('div', array('class' => 'fitem')));
             $grp[] = &$mform->createElement('html',
@@ -323,7 +323,7 @@ class datalynxview_base_form extends moodleform {
         }
 
         // Normalise fields that have filters or behaviours attached.
-        $regex = $replace = array();
+        $regex = $replace = [];
         $regex[0] = '/:.*?]]/';
         $regex[1] = '/\|.*?]]/'; // Behaviours and renderers.
         $replace[0] = ']]';

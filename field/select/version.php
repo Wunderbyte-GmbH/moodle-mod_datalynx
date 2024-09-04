@@ -24,4 +24,4 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'datalynxfield_select';
 $plugin->version = 2016111900;
-$plugin->requires = 2014051200;
+$plugin->requires = 2022112800;

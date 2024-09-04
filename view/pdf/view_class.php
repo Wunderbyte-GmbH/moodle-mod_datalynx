@@ -158,7 +158,7 @@ class datalynxview_pdf extends base {
      */
     public function process_export($export = self::EXPORT_PAGE) {
         $settings = $this->_settings;
-        $this->_tmpfiles = array();
+        $this->_tmpfiles = [];
 
         // Generate the pdf.
         $pdf = new dfpdf($settings);
@@ -211,7 +211,7 @@ class datalynxview_pdf extends base {
         }
 
         if ($settings->pagebreak == 'entry') {
-            $content = array();
+            $content = [];
             $totalcontent = $this->display(
                     array('export' => true, 'tohtml' => true, 'controls' => false, 'entryactions' => false));
             $totalcontent = preg_replace('/\<\/div\>\<div class\=\"entry\"\>/',
@@ -374,7 +374,7 @@ class datalynxview_pdf extends base {
     /**
      * Override parent to remove pdf bookmark tags
      */
-    public function display(array $options = array()) {
+    public function display(array $options = []): string {
         // For export just return the parent.
         if (!empty($options['export'])) {
             return parent::display($options);
@@ -481,7 +481,7 @@ class datalynxview_pdf extends base {
     protected function apply_entry_group_layout($entriesset, $name = '') {
         global $OUTPUT;
 
-        $elements = array();
+        $elements = [];
 
         // Flatten the set to a list of elements.
         foreach ($entriesset as $entrydefinitions) {
@@ -504,12 +504,12 @@ class datalynxview_pdf extends base {
     /**
      */
     protected function new_entry_definition($entryid = -1) {
-        $elements = array();
+        $elements = [];
 
         // Get patterns definitions.
         $fields = $this->_df->get_fields();
-        $tags = array();
-        $patterndefinitions = array();
+        $tags = [];
+        $patterndefinitions = [];
         $entry = new stdClass();
         foreach ($this->_tags['field'] as $fieldid => $patterns) {
             $field = $fields[$fieldid];
@@ -707,7 +707,7 @@ class datalynxview_pdf extends base {
     protected function process_content_images($content) {
         global $CFG;
 
-        $replacements = array();
+        $replacements = [];
         $tmpdir = make_temp_directory('files');
 
         // Does not support theme images (until we find a way to process them).
@@ -715,12 +715,12 @@ class datalynxview_pdf extends base {
         // Process pluginfile images.
         $imagetypes = get_string('imagetypes', 'datalynxview_pdf');
         if (preg_match_all("%$CFG->wwwroot/pluginfile.php(/.+(\.$imagetypes$))%", $content, $matches)) {
-            $replacements = array();
+            $replacements = [];
 
             $fs = get_file_storage();
             foreach ($matches[1] as $imagepath) {
                 // Moodle does not replace spaces prior to creating a hashvalue for the file.
-                if (!$file = $fs->get_file_by_hash(sha1(urldecode($imagepath))) || $file->is_directory()) {
+                if (!$file = $fs->get_file_by_hash(sha1(urldecode($imagepath)))) {
                     continue;
                 }
                 $filename = $file->get_filename();
@@ -757,8 +757,8 @@ class datalynxview_pdf extends base {
      */
     protected function get_documentname($namepattern) {
         $namepattern = !empty($namepattern) ? $namepattern : '';
-        $foundtags = array();
-        $replacements = array();
+        $foundtags = [];
+        $replacements = [];
         if (count($this->_entries->entries()) == 1 && $fields = $this->_df->get_fields()) {
             $entries = $this->_entries->entries();
             $entry = reset($entries);
@@ -788,7 +788,7 @@ class datalynxview_pdf extends base {
         global $CFG;
 
         // Check what fields are file class.
-        $filefieldids = array();
+        $filefieldids = [];
         foreach ($this->get_view_fields() as $fieldid => $fieldinview) {
             if ($fieldinview->type == 'file') {
                 $filefieldids[] = $fieldid;
@@ -800,7 +800,7 @@ class datalynxview_pdf extends base {
         }
 
         // Create a list of files we need to merge to the export pdf.
-        $filestomerge = array();
+        $filestomerge = [];
         foreach ($this->_entries->get_entries()->entries as $entry) {
             foreach ($filefieldids as $fieldid) {
                 if (!isset($entry->{'c'.$fieldid.'_content'})) {

@@ -69,7 +69,7 @@ class datalynxview_csv extends base {
     protected function apply_entry_group_layout($entriesset, $name = '') {
         global $OUTPUT;
 
-        $elements = array();
+        $elements = [];
 
         // Generate the header row.
         $tableheader = '';
@@ -88,7 +88,7 @@ class datalynxview_csv extends base {
         }
         // Open table and wrap header with thead.
         $elements[] = array('html',
-                html_writer::start_tag('table', array('class' => 'generaltable')) . $tableheader);
+                html_writer::start_tag('table', array('class' => 'table table-striped')) . $tableheader);
 
         // Flatten the set to a list of elements, wrap with tbody and close table.
         $elements[] = array('html', html_writer::start_tag('tbody'));
@@ -129,7 +129,7 @@ class datalynxview_csv extends base {
     /**
      */
     protected function entry_definition($fielddefinitions) {
-        $elements = array();
+        $elements = [];
         // Get the columns definition from the view template.
         $columns = $this->get_columns();
 
@@ -162,7 +162,7 @@ class datalynxview_csv extends base {
     /**
      */
     protected function new_entry_definition($entryid = -1) {
-        $elements = array();
+        $elements = [];
 
         // Get the columns definition from the view template.
         $columns = $this->get_columns();
@@ -170,7 +170,7 @@ class datalynxview_csv extends base {
         // Get field definitions for new entry.
         $fields = $this->_df->get_fields();
         $entry = (object) array('id' => $entryid);
-        $fielddefinitions = array();
+        $fielddefinitions = [];
         foreach ($this->_tags['field'] as $fieldid => $patterns) {
             $field = $fields[$fieldid];
             $options = array('edit' => true, 'manage' => true);
@@ -232,8 +232,11 @@ class datalynxview_csv extends base {
 
     /**
      * Overridden to show import form without entries
+     * @param array $options
+     * @return string|void
+     * @throws moodle_exception
      */
-    public function display(array $params = array()) {
+    public function display(array $options = []): string {
         if ($this->_showimportform) {
 
             $mform = $this->get_import_form();
@@ -244,12 +247,12 @@ class datalynxview_csv extends base {
             if ($tohtml) {
                 return html_writer::tag('div', $mform->html(), array('class' => $viewname));
             } else {
-                echo html_writer::start_tag('div', array('class' => $viewname));
+                $output .= html_writer::start_tag('div', array('class' => $viewname));
                 $mform->display();
-                echo html_writer::end_tag('div');
+                $output .= html_writer::end_tag('div');
             }
         } else {
-            return parent::display($params);
+            return parent::display($options);
         }
     }
 
@@ -308,7 +311,7 @@ class datalynxview_csv extends base {
         // Set content.
         if ($range == self::EXPORT_ALL) {
             $entries = new datalynx_entries($this->_df, $this->_filter);
-            $options = array();
+            $options = [];
             // Set a filter to take it all.
             $filter = $this->get_filter();
             $filter->perpage = 0;
@@ -333,9 +336,9 @@ class datalynxview_csv extends base {
         }
 
         // Get the field definitions.
-        $entryvalues = array();
+        $entryvalues = [];
         foreach ($exportentries as $entryid => $entry) {
-            $patternvalues = array();
+            $patternvalues = [];
             $definitions = $this->get_entry_tag_replacements($entry, array());
             foreach ($definitions as $pattern => $definition) {
                 if (is_array($definition)) {
@@ -347,8 +350,8 @@ class datalynxview_csv extends base {
         }
 
         // Get csv headers from view columns.
-        $columnpatterns = array();
-        $csvheader = array();
+        $columnpatterns = [];
+        $csvheader = [];
         $columns = $this->get_columns();
         foreach ($columns as $column) {
             list($pattern, $header, ) = $column;
@@ -356,12 +359,12 @@ class datalynxview_csv extends base {
             $csvheader[] = $header ? $header : trim($pattern, '[#]');
         }
 
-        $csvcontent = array();
+        $csvcontent = [];
         $csvcontent[] = $csvheader;
 
         // Get the field definitions.
         foreach ($entryvalues as $entryid => $patternvalues) {
-            $row = array();
+            $row = [];
             foreach ($columnpatterns as $pattern) {
                 if (isset($patternvalues[$pattern])) {
                     $row[] = $patternvalues[$pattern];
@@ -388,19 +391,19 @@ class datalynxview_csv extends base {
             if ($formdata = $mform->get_data()) {
 
                 $data = new stdClass();
-                $data->eids = array();
+                $data->eids = [];
 
-                $fieldsettings = array();
+                $fieldsettings = [];
 
                 // Collect field import settings from formdata by field, tag and element.
                 foreach ($formdata as $name => $value) {
                     if (strpos($name, 'f_') !== false) { // Assuming only field settings start with f_.
                         list(, $fieldid, $tag, $elem) = explode('_', $name);
                         if (!array_key_exists($fieldid, $fieldsettings)) {
-                            $fieldsettings[$fieldid] = array();
+                            $fieldsettings[$fieldid] = [];
                         } else {
                             if (!array_key_exists($tag, $fieldsettings[$fieldid])) {
-                                $fieldsettings[$fieldid][$tag] = array();
+                                $fieldsettings[$fieldid][$tag] = [];
                             }
                         }
                         $fieldsettings[$fieldid][$tag][$elem] = $value;
@@ -611,7 +614,7 @@ class datalynxview_csv extends base {
      */
     public function get_columns(): ?array {
         if (empty($this->_columns)) {
-            $this->_columns = array();
+            $this->_columns = [];
             $columns = explode("\n", $this->view->param2);
             foreach ($columns as $column) {
                 $column = trim($column);

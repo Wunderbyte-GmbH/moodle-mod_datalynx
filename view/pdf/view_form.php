@@ -405,7 +405,7 @@ class datalynxview_pdf_form extends datalynxview_base_form {
         $view = $this->_view;
 
         $protection = $settings->protection;
-        $protection->permissions = array();
+        $protection->permissions = [];
         $perms = $view::get_permission_options();
         foreach ($perms as $perm => $unused) {
             $var = "perm_$perm";

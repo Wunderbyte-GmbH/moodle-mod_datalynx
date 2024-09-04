@@ -37,13 +37,13 @@ $dl = new mod_datalynx\datalynx($urlparams->d);
 require_login($dl->data->course, false, $dl->cm);
 
 global $DB;
-$options = array();
+$options = [];
 $options['behaviors'] = $DB->get_records_select_menu('datalynx_behaviors', 'dataid = :dataid',
         array('dataid' => $urlparams->d), 'value ASC', 'name AS value, name AS label');
 $options['behaviors'][''] = get_string('defaultbehavior', 'datalynx');
 $fields = $DB->get_fieldset_select('datalynx_fields', 'name', 'dataid = :dataid',
         array('dataid' => $urlparams->d));
-$options['renderers'] = array();
+$options['renderers'] = [];
 $commonrenderers = $DB->get_records_select_menu('datalynx_renderers', 'dataid = :dataid',
         array('dataid' => $urlparams->d), 'value ASC', 'name AS value, name AS label');
 foreach ($fields as $field) {
@@ -153,7 +153,7 @@ $dl->print_header(array('tab' => 'views', 'nonotifications' => true, 'urlparams'
 
 $formheading = $view->id() ? get_string('viewedit', 'datalynx', $view->name()) : get_string(
         'viewnew', 'datalynx', $view->typename());
-echo html_writer::tag('h2', format_string($formheading), array('class' => 'mdl-align'));
+$output = html_writer::tag('h2', format_string($formheading), array('class' => 'mdl-align'));
 
 // Display form.
 $mform->set_data($view->to_form());

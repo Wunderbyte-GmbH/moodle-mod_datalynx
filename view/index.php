@@ -122,7 +122,7 @@ $dl->print_header(array('tab' => 'views', 'urlparams' => $urlparams));
 
 // Display the view form jump list.
 $directories = get_list_of_plugins('mod/datalynx/view/');
-$menuview = array();
+$menuview = [];
 
 foreach ($directories as $directory) {
     if ($directory[0] != '_') {
@@ -138,7 +138,7 @@ $popupurl = $CFG->wwwroot . '/mod/datalynx/view/view_edit.php?d=' . $dl->id() . 
 $viewselect = new single_select(new moodle_url($popupurl), 'type', $menuview, null,
         array('' => 'choosedots'), 'viewform');
 $viewselect->set_label(get_string('viewadd', 'datalynx') . '&nbsp;');
-echo html_writer::tag('div', $br . $OUTPUT->render($viewselect) . $br,
+$output .= html_writer::tag('div', $br . $OUTPUT->render($viewselect) . $br,
         array('class' => 'fieldadd mdl-align'));
 
 // If there are views print admin style list of them.

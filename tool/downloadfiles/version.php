@@ -24,4 +24,4 @@
 defined('MOODLE_INTERNAL') || die();
 $plugin->component = 'datalynxtool_downloadfiles';
 $plugin->version = 2017080600;
-$plugin->requires = 2014051200;
+$plugin->requires = 2022112800;

@@ -46,7 +46,7 @@ class datalynxview_entries_form extends moodleform {
      */
     public function add_delegate_action_buttons() {
         $mform =& $this->_form;
-        $buttonarray = array();
+        $buttonarray = [];
         $buttonarray[] = &$mform->createElement('html', '<input type="button" class="form-group btn btn-primary"
             onclick="document.getElementById(\'id_submitbutton\').click();" value="' . get_string('savechanges') . '"/>');
         $buttonarray[] = &$mform->createElement('html', '<input type="button" class="btn btn-secondary"

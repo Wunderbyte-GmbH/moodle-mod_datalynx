@@ -510,6 +510,48 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
     }
 
     /**
+     * Return all user ids of the field across all entries in the specific datalynx instance.
+     *
+     * @param string $insql to be used with: AND entryid $insql
+     * @param array $inparams
+     * @return array a multidimensional array with userid as keys and an array of entryids as value.
+     */
+    public function get_all_userids_in_all_entries(string $insql = '', array $inparams = []): array {
+        global $DB;
+        $sql = "SELECT c.id, c.content, c.entryid
+                FROM {datalynx_contents} c
+                JOIN {datalynx_entries} e ON e.id = c.entryid
+                WHERE c.fieldid = :fieldid 
+                  AND e.dataid = :datalynxid";
+        $params = [
+                'fieldid' => $this->field->id,
+                'datalynxid' => $this->df->id()
+        ];
+        if (!empty($insql)) {
+            $sql .= " AND c.entryid $insql";
+            $params = array_merge($params, $inparams);
+        }
+        $records = $DB->get_records_sql($sql, $params);
+        // Iterate through the records and extract user IDs.
+        $userarray = [];
+        foreach ($records as $record) {
+            $content = json_decode($record->content, true);
+            if (is_array($content)) {
+                foreach ($content as $userid) {
+                    if (is_numeric($userid)) { // Ensure the value is a valid user ID.
+                        $userarray[$userid][] = $record->entryid; // Use boolean to simplify counting.
+                    }
+                }
+            }
+        }
+        if (!empty($userarray)) {
+            return $userarray;
+        } else {
+            return [];
+        }
+    }
+
+    /**
      * Are fields of this field type suitable for use in customfilters?
      *
      * @return bool
@@ -535,4 +577,5 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
 
         return false;
     }
+
 }

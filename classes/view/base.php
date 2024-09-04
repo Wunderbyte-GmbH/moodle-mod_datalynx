@@ -87,13 +87,11 @@ abstract class base {
 
     protected array $_notifications = ['good' => [], 'bad' => []];
 
-    protected int $_editentries = 0;
-
-    protected $_entriesform = null;
+    protected int|string $_editentries = '';
 
     protected array $_display_definition = [];
 
-    protected $_returntoentriesform = null;
+    protected bool $_returntoentriesform = false;
 
     protected int $_redirect = 0;
 
@@ -579,7 +577,7 @@ abstract class base {
      * @param array $options (tohtml = true means output is returned instead of echoed)
      * @return string (empty string of tohtml = false, html when tohtml is true)
      */
-    public function display(array $options = array()) {
+    public function display(array $options = array()): string {
         global $OUTPUT;
 
         // Set display options.
@@ -604,7 +602,7 @@ abstract class base {
 
         $notifications = $notify ? $this->print_notifications() : '';
 
-        if ($this->_returntoentriesform !== false) {
+        if ($this->_returntoentriesform === false) {
             if ($displaycontrols) {
                 $output = $notifications . $this->process_calculations($this->view->esection);
             } else {
@@ -623,7 +621,8 @@ abstract class base {
         }
 
         $viewname = 'datalynxview-' . preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $this->name()));
-        $output = html_writer::tag('div', $output, array('class' => $viewname));
+        $output = html_writer::tag('div', $output, array('class' => $viewname, 'data-viewname' => $this->name(),
+                'data-id' => $this->_df->id(), 'data-viewid' => $this->view->id));
 
         if ($tohtml) {
             return $output;
@@ -1136,10 +1135,12 @@ abstract class base {
         return $gradingoptions;
     }
 
-    // VIEW ENTRIES.
     /**
+     * Render entries of the datalynx view.
+     * @param ?array $options
+     * @return string
      */
-    public function display_entries(array $options = null) {
+    public function display_entries(array $options = null): string {
         global $DB, $OUTPUT;
 
         if (!$this->user_is_editing()) {
@@ -1173,8 +1174,7 @@ abstract class base {
             }
         }
         // Process calculations if any.
-        $html = $this->process_calculations($html);
-        return $html;
+        return $this->process_calculations($html);
     }
 
     /**
@@ -1574,7 +1574,7 @@ abstract class base {
                                 $this->_editentries = is_array($processed[1]) ? implode(',',
                                         $processed[1]) : $processed[1];
                             } else {
-                                $this->_editentries = '';
+                                $this->_editentries = 0;
                             }
                             $this->_returntoentriesform = false;
                             return $processed;

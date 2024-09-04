@@ -24,4 +24,4 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'datalynxrule_ftpsyncfiles';
 $plugin->version = 2023102300;
-$plugin->requires = 2014051200;
+$plugin->requires = 2022112800;

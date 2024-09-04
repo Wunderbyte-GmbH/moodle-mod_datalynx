@@ -97,9 +97,9 @@ class datalynxview_tabular extends base {
         // Set content table.
         $table = new html_table();
         $table->attributes['cellpadding'] = '2';
-        $header = array();
-        $entry = array();
-        $align = array();
+        $header = [];
+        $entry = [];
+        $align = [];
         // Author picture.
         $header[] = '';
         $entry[] = '##author:picture##';
@@ -145,7 +145,7 @@ class datalynxview_tabular extends base {
         $this->view->eparam2 = html_writer::table($table);
     }
 
-    public function display(array $options = array()) {
+    public function display(array $options = []): string {
         parent::display($options);
         global $PAGE;
         $PAGE->requires->js_init_call('M.datalynxview_tabular.init', array(), false,
@@ -173,7 +173,7 @@ class datalynxview_tabular extends base {
         }
         $groupheading = $OUTPUT->heading($name, 3, 'main');
 
-        $elements = array();
+        $elements = [];
 
         // If there are no field definition just return everything as html.
         if (empty($entriesset)) {
@@ -252,7 +252,7 @@ class datalynxview_tabular extends base {
     /**
      */
     protected function entry_definition($fielddefinitions) {
-        $elements = array();
+        $elements = [];
         // Just store the definitions.
         // And group_entries_definition will process them.
         $elements[] = $fielddefinitions;
@@ -262,11 +262,11 @@ class datalynxview_tabular extends base {
     /**
      */
     protected function new_entry_definition($entryid = -1) {
-        $elements = array();
+        $elements = [];
 
         // Get patterns definitions.
         $fields = $this->_df->get_fields();
-        $fielddefinitions = array();
+        $fielddefinitions = [];
         $entry = new stdClass();
         foreach ($this->_tags['field'] as $fieldid => $patterns) {
             $field = $fields[$fieldid];
