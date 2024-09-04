@@ -103,17 +103,26 @@ class datalynxfield__time_renderer extends datalynxfield_renderer {
             $to = 0;
         }
 
-        $elements = [];
-        $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_from", get_string('from'));
-        $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_to", get_string('to'));
+        if ($mform->_formName != 'mod_datalynx_customfilter_frontend_form') {
+            $elements = [];
+            $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_from", get_string('from'));
+            $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_to", get_string('to'));
 
-        $mform->setDefault("f_{$i}_{$fieldid}_from", (int) $from);
-        $mform->setDefault("f_{$i}_{$fieldid}_to", (int) $to);
-        foreach (array('year', 'month', 'day', 'hour', 'minute') as $fieldidentifier) {
-            $mform->disabledIf("f_{$i}_{$fieldid}_to[$fieldidentifier]", "searchoperator$i", 'neq', 'BETWEEN');
+            $mform->setDefault("f_{$i}_{$fieldid}_from", (int) $from);
+            $mform->setDefault("f_{$i}_{$fieldid}_to", (int) $to);
+            foreach (array('year', 'month', 'day', 'hour', 'minute') as $fieldidentifier) {
+                $mform->disabledIf("f_{$i}_{$fieldid}_to[$fieldidentifier]", "searchoperator$i", 'neq', 'BETWEEN');
+            }
         }
 
-        $separators = array('<div class="w-100"><br></div>', '<div class="w-100"><br></div>',);
+        if ($mform->_formName == 'mod_datalynx_customfilter_frontend_form') {
+            $attr = array('optional' => true); // Allows date_time to be enabled, passes 0 if disabled.
+            $elements[] = $element = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_from", get_string('from'), $attr);
+            $element->setAttributes(['size' => 1]);
+            $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_to", get_string('to'), $attr);
+        }
+
+        $separators = array('<div class="w-100"><br></div>', '<div class="w-100"><br></div>');
         return array($elements, $separators);
     }
 

@@ -964,21 +964,17 @@ class datalynx_filter_manager {
                         break;
                     case ("timecreated"):
                     case ("timemodified"):
-                        if (count($formfieldarray) > 4 && $formfieldarray[3] == 'from' &&
-                                $formfieldarray[4] == 'active') {
-                            if ($formdata->{$key}) {
+                        if (count($formfieldarray) == 4 && $formfieldarray[3] == 'from') {
+                            if ($formdata->{$key} > 0) {
                                 $valuearr = array();
-                                $fromkey = str_replace('_active', '', $key);
-                                $valuearr[] = $formdata->{$fromkey};
+                                $valuearr[] = $key;
                                 $tokeyactive = str_replace('_from', '_to', $key);
-                                if (isset($formdata->{$tokeyactive})) {
-                                    $tokey = str_replace('_active', '', $tokeyactive);
-                                    $valuearr[] = $formdata->{$tokey};
+                                if (isset($formdata->{$tokeyactive}) && $formdata->{$tokeyactive} > $formdata->{$key}) {
+                                    $valuearr[] = $formdata->{$tokeyactive};
                                     $searchfields[$fieldname]['AND'][] = array('', 'BETWEEN',
                                         $valuearr);
                                 } else {
-                                    $searchfields[$fieldname]['AND'][] = array('', '>=',
-                                        $valuearr[0]);
+                                    $searchfields[$fieldname]['AND'][] = array('', '>', [$formdata->{$key}]);
                                 }
                             }
                         }

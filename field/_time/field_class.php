@@ -63,6 +63,9 @@ class datalynxfield__time extends datalynxfield_no_content {
     }
 
     /**
+     * @param $formdata
+     * @param $i
+     * @return array|false
      */
     public function parse_search($formdata, $i) {
         $time = array();

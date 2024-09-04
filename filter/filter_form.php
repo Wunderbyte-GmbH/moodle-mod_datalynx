@@ -233,12 +233,7 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
 
             $value = '';
 
-            // Render search elements.
-            if ($fieldid == 'timecreated' || $fieldid == 'timemodified') {
-                list($elems, $separators) = $fields[$fieldid]->renderer()->render_search_mode($mform, $count, $value, true);
-            } else {
-                list($elems, $separators) = $fields[$fieldid]->renderer()->render_search_mode($mform, $count, $value);
-            }
+            list($elems, $separators) = $fields[$fieldid]->renderer()->render_search_mode($mform, $count, $value);
 
             if ($separators) {
                 $sep = array_merge(array(' ', ' ', ' '), $separators);

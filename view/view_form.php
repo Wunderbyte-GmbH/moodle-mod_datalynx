@@ -67,11 +67,11 @@ class datalynxview_base_form extends moodleform {
 
         $mform->addElement('text', 'description', get_string('description'), array('size' => '64'));
         if (!empty($CFG->formatstringstriptags)) {
+            $mform->setType('name', PARAM_NOTAGS);
+            $mform->setType('description', PARAM_NOTAGS);
+        } else {
             $mform->setType('name', PARAM_TEXT);
             $mform->setType('description', PARAM_TEXT);
-        } else {
-            $mform->setType('name', PARAM_CLEAN);
-            $mform->setType('description', PARAM_CLEAN);
         }
 
         $mform->addElement('checkbox', 'visible[1]', get_string('visibleto', 'datalynx'),
