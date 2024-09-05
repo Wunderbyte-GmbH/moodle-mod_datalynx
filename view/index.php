@@ -138,8 +138,8 @@ $popupurl = $CFG->wwwroot . '/mod/datalynx/view/view_edit.php?d=' . $dl->id() . 
 $viewselect = new single_select(new moodle_url($popupurl), 'type', $menuview, null,
         array('' => 'choosedots'), 'viewform');
 $viewselect->set_label(get_string('viewadd', 'datalynx') . '&nbsp;');
-$output = html_writer::tag('div', $br . $OUTPUT->render($viewselect) . $br,
-        array('class' => 'fieldadd mdl-align'));
+echo $output = html_writer::tag('div', $br . $OUTPUT->render($viewselect) . $br,
+        array('class' => 'viewadd mdl-align'));
 
 // If there are views print admin style list of them.
 if ($views) {

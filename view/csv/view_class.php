@@ -247,9 +247,10 @@ class datalynxview_csv extends base {
             if ($tohtml) {
                 return html_writer::tag('div', $mform->html(), array('class' => $viewname));
             } else {
-                $output .= html_writer::start_tag('div', array('class' => $viewname));
+                echo html_writer::start_tag('div', array('class' => $viewname));
                 $mform->display();
-                $output .= html_writer::end_tag('div');
+                echo html_writer::end_tag('div');
+                return '';
             }
         } else {
             return parent::display($options);
