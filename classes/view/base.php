@@ -27,6 +27,7 @@ use coding_exception;
 use datalynx_entries;
 use datalynx_filter;
 use datalynxfield__rating;
+use datalynxfield__status;
 use datalynxview_entries_form;
 use datalynxview_patterns;
 use HTML_QuickForm;
@@ -1576,7 +1577,7 @@ abstract class base {
                             } else {
                                 $this->_editentries = 0;
                             }
-                            $this->_returntoentriesform = false;
+                            $this->_returntoentriesform = true;
                             return $processed;
                         }
                     } else {

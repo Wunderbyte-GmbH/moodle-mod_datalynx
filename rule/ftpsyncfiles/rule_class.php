@@ -141,7 +141,7 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
         require_once("$CFG->dirroot/mod/datalynx/classes/datalynx.php");
         require_once("$CFG->dirroot/mod/datalynx/field/entryauthor/field_class.php");
         require_once("$CFG->dirroot/mod/datalynx/entries_class.php");
-        require_once("$CFG->dirroot/mod/datalynx/view/csv/base.php");
+        require_once("$CFG->dirroot/mod/datalynx/view/csv/view_class.php");
         require_once($CFG->libdir . '/filelib.php');
         require_once($CFG->libdir . '/completionlib.php');
 

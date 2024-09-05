@@ -467,7 +467,11 @@ class datalynx {
             // Set css body class to add top level category of the dl instance.
             $category = core_course_category::get($PAGE->course->category, MUST_EXIST, true);
             $categories = explode("/", $category->path);
-            $bodyclass = "top-cat-{$categories[1]}";
+            if (isset($categories[1])) {
+                $bodyclass = "top-cat-{$categories[1]}";
+            } else {
+                $bodyclass = "top-cat";
+            }
             $PAGE->add_body_class($bodyclass);
 
             $PAGE->requires->css(
@@ -788,7 +792,7 @@ class datalynx {
      */
     public static function get_content_inline(int $datalynxid, int $viewid = 0, ?int $eids = null, array $options = array('tohtml' => true)) {
         global $CFG;
-        require_once($CFG->dirroot . '/mod/datalynx/view/base.php');
+        require_once($CFG->dirroot . '/mod/datalynx/classes/view/base.php');
         $urlparams = new stdClass();
         $datalynx = new datalynx($datalynxid);
         $urlparams->d = $datalynxid;
@@ -814,7 +818,7 @@ class datalynx {
                 'completion' => true, 'comments' => true, 'urlparams' => $urlparams);
         $datalynx->set_page('external', $pageparams, $skiplogincheck);
         $type = $datalynx->views[$viewid]->type;
-        require_once($CFG->dirroot . "/mod/datalynx/view/$type/base.php");
+        require_once($CFG->dirroot . "/mod/datalynx/view/$type/view_class.php");
         $viewclass = "datalynxview_$type";
         $datalynx->_currentview = $datalynx->get_current_view_from_id($viewid);
 

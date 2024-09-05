@@ -150,6 +150,7 @@ class datalynxview_tabular extends base {
         global $PAGE;
         $PAGE->requires->js_init_call('M.datalynxview_tabular.init', array(), false,
                 $this->get_js_module());
+        return '';
     }
 
     private function get_js_module() {
