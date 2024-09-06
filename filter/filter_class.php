@@ -42,7 +42,9 @@ class datalynx_filter {
     public $contentfields;
     public $eids;
     public $users;
+    public $groups;
     public $page;
+    public $authorsearch;
 
     protected $_filteredtables = null;
 

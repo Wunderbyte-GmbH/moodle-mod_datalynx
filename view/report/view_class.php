@@ -159,75 +159,94 @@ class datalynxview_report extends base {
         $output = html_writer::start_tag('div', ['class' => 'table-responsive']);
 
         if ($this->view->param2 === 'month') {
-            // Iterate over each month and create a table
+            // Collect and aggregate data by month
+            $monthlydatabymonth = [];
+
             foreach ($report as $userid => $data) {
                 $user = $DB->get_record('user', ['id' => $userid], 'id, firstname, lastname, email');
-                $user_info = "{$user->firstname} {$user->lastname} ({$user->id})<br>{$user->email}";
+                $userinfo = "{$user->firstname} {$user->lastname} ({$user->id})<br>{$user->email}";
 
-                foreach ($data['monthly'] as $month => $monthly_data) {
-                    // Initialize sum variables for this month's table
-                    $total_entries_sum = 0;
-                    $matching_contents_sums = array_fill_keys(array_values($desiredfieldoptions), 0);
-                    $not_yet_edited_sum = 0;
-
-                    // Create a new table for the month
-                    $output .= html_writer::tag('h3', get_string('month') . ": " . $month);
-                    $output .= html_writer::start_tag('table', ['class' => 'table table-striped table-bordered']);
-
-                    // Table header
-                    $output .= html_writer::start_tag('thead');
-                    $output .= html_writer::start_tag('tr');
-                    $output .= html_writer::tag('th', get_string('user'));
-                    $output .= html_writer::tag('th', get_string('month'));
-                    $output .= html_writer::tag('th', get_string('aggregationsum', 'reportbuilder'));
-                    foreach ($desiredfieldoptions as $label) {
-                        $output .= html_writer::tag('th', $label);
+                foreach ($data['monthly'] as $month => $monthlydata) {
+                    if (!isset($monthlydatabymonth[$month])) {
+                        $monthlydatabymonth[$month] = [];
                     }
-                    $output .= html_writer::tag('th', get_string('notyetanswered', 'question'));
-                    $output .= html_writer::end_tag('tr');
-                    $output .= html_writer::end_tag('thead');
 
-                    $output .= html_writer::start_tag('tbody');
+                    $monthlydatabymonth[$month][$userid] = [
+                            'userinfo' => $userinfo,
+                            'totalentries' => $monthlydata['totalentries'],
+                            'matchingcontents' => $monthlydata['matchingcontents'],
+                    ];
+                }
+            }
 
-                    // Data rows
+            // Sort months in descending order
+            krsort($monthlydatabymonth);
+
+            foreach ($monthlydatabymonth as $month => $usersdata) {
+                // Initialize sum variables for this month's table
+                $totalentriessum = 0;
+                $matchingcontentssums = array_fill_keys($desiredfieldoptions, 0);
+                $notyeteditedsum = 0;
+
+                // Create a new table for the month
+                $output .= html_writer::tag('h3', get_string('month') . ": " . $month);
+                $output .= html_writer::start_tag('table', ['class' => 'table table-striped table-bordered']);
+
+                // Table header
+                $output .= html_writer::start_tag('thead');
+                $output .= html_writer::start_tag('tr');
+                $output .= html_writer::tag('th', get_string('user'));
+                $output .= html_writer::tag('th', get_string('aggregationsum', 'reportbuilder'));
+                foreach ($desiredfieldoptions as $label) {
+                    $output .= html_writer::tag('th', $label);
+                }
+                $output .= html_writer::tag('th', get_string('notyetanswered', 'question'));
+                $output .= html_writer::end_tag('tr');
+                $output .= html_writer::end_tag('thead');
+
+                $output .= html_writer::start_tag('tbody');
+
+                foreach ($usersdata as $userid => $user_month_data) {
                     $output .= html_writer::start_tag('tr');
-                    $output .= html_writer::tag('td', $user_info);
-                    $output .= html_writer::tag('td', $month);
+                    $output .= html_writer::tag('td', $user_month_data['userinfo']);
 
                     // Total entries for this user in this month
-                    $output .= html_writer::tag('td', $monthly_data['total_entries']);
-                    $total_entries_sum += $monthly_data['total_entries'];
+                    $usertotalentries = $user_month_data['totalentries'];
+                    $output .= html_writer::tag('td', $usertotalentries);
+                    $totalentriessum += $usertotalentries;
 
-                    // Matching contents counts and "Not Yet Edited"
-                    $sum_matching_contents = 0;
+                    // Matching contents counts and "Not Yet Edited" for each user
+                    $summatchingcontents = 0;
                     foreach ($desiredfieldoptions as $label) {
-                        $count = isset($monthly_data['matching_contents'][$label]) ? $monthly_data['matching_contents'][$label] : 0;
-                        $sum_matching_contents += $count;
-                        $matching_contents_sums[$label] += $count;
+                        $count = $user_month_data['matchingcontents'][$label] ?? 0;
+                        if ($count !== 0) {
+                            $summatchingcontents += $count;
+                            $matchingcontentssums[$label] += $count;
+                        }
                         $output .= html_writer::tag('td', $count);
                     }
 
-                    $not_yet_edited = $monthly_data['total_entries'] - $sum_matching_contents;
-                    $output .= html_writer::tag('td', $not_yet_edited);
-                    $not_yet_edited_sum += $not_yet_edited;
+                    $notyetedited = $usertotalentries - $summatchingcontents;
+                    $output .= html_writer::tag('td', $notyetedited);
+                    $notyeteditedsum += $notyetedited;
 
                     $output .= html_writer::end_tag('tr');
-
-                    // Totals row for this month
-                    $output .= html_writer::start_tag('tr');
-                    $output .= html_writer::tag('td', get_string('total'), ['colspan' => 2]);
-                    $output .= html_writer::tag('td', $total_entries_sum);
-
-                    foreach ($matching_contents_sums as $sum) {
-                        $output .= html_writer::tag('td', $sum);
-                    }
-
-                    $output .= html_writer::tag('td', $not_yet_edited_sum);
-                    $output .= html_writer::end_tag('tr');
-
-                    $output .= html_writer::end_tag('tbody');
-                    $output .= html_writer::end_tag('table');
                 }
+
+                // Totals row for this month
+                $output .= html_writer::start_tag('tr');
+                $output .= html_writer::tag('td', get_string('total'));
+                $output .= html_writer::tag('td', $totalentriessum);
+
+                foreach ($matchingcontentssums as $sum) {
+                    $output .= html_writer::tag('td', $sum);
+                }
+
+                $output .= html_writer::tag('td', $notyeteditedsum);
+                $output .= html_writer::end_tag('tr');
+
+                $output .= html_writer::end_tag('tbody');
+                $output .= html_writer::end_tag('table');
             }
         } else {
             $output .= html_writer::start_tag('table', ['class' => 'table table-striped table-bordered']);
@@ -235,15 +254,15 @@ class datalynxview_report extends base {
             $output .= html_writer::start_tag('thead');
             $output .= html_writer::start_tag('tr');
 
-            // Header row
-            $output .= html_writer::tag('th', get_string('user')); // Assuming you have a lang string for this
+            // Header row.
+            $output .= html_writer::tag('th', get_string('user')); // Assuming you have a lang string for this.
             $output .= html_writer::tag('th', get_string('month'));
             $output .= html_writer::tag('th', get_string('total'));
 
             foreach ($desiredfieldoptions as $label) {
                 $output .= html_writer::tag('th', $label);
             }
-            // Additional column for "Not Yet Edited"
+            // Additional column for "Not Yet Edited".
             $output .= html_writer::tag('th', get_string('notyetanswered', 'question'));
 
             $output .= html_writer::end_tag('tr');
@@ -251,31 +270,31 @@ class datalynxview_report extends base {
 
             $output .= html_writer::start_tag('tbody');
 
-            // Data rows
+            // Data rows.
             foreach ($report as $userid => $data) {
-                // Get user info
+                // Get user info.
                 $user = $DB->get_record('user', ['id' => $userid], 'id, firstname, lastname, email, department');
 
-                // Prepare user column content
-                $user_info = "{$user->firstname} {$user->lastname} ({$user->id})<br>{$user->email} ({$user->department})";
+                // Prepare user column content.
+                $userinfo = "{$user->firstname} {$user->lastname} ({$user->id})<br>{$user->email} ({$user->department})";
 
-                foreach ($data['monthly'] as $month => $monthly_data) {
+                foreach ($data['monthly'] as $month => $monthlydata) {
                     $output .= html_writer::start_tag('tr');
-                    $output .= html_writer::tag('td', $user_info);
+                    $output .= html_writer::tag('td', $userinfo);
                     $output .= html_writer::tag('td', $month);
-                    $output .= html_writer::tag('td', $monthly_data['total_entries']);
+                    $output .= html_writer::tag('td', $monthlydata['totalentries']);
 
-                    // Calculate the sum of matching contents
-                    $sum_matching_contents = 0;
+                    // Calculate the sum of matching contents.
+                    $summatchingcontents = 0;
                     foreach ($desiredfieldoptions as $label) {
-                        $count = isset($monthly_data['matching_contents'][$label]) ? $monthly_data['matching_contents'][$label] : 0;
-                        $sum_matching_contents += $count;
+                        $count = isset($monthlydata['matchingcontents'][$label]) ? $monthlydata['matchingcontents'][$label] : 0;
+                        $summatchingcontents += $count;
                         $output .= html_writer::tag('td', $count);
                     }
 
-                    // Calculate and display "Not Yet Edited"
-                    $not_yet_edited = $monthly_data['total_entries'] - $sum_matching_contents;
-                    $output .= html_writer::tag('td', $not_yet_edited);
+                    // Calculate and display "Not Yet Edited".
+                    $notyetedited = $monthlydata['totalentries'] - $summatchingcontents;
+                    $output .= html_writer::tag('td', $notyetedited);
 
                     $output .= html_writer::end_tag('tr');
                 }
@@ -339,11 +358,11 @@ class datalynxview_report extends base {
         $report = [];
 
         foreach ($userarray as $userid => $entryids) {
-            $total_entries = count($entryids);
+            $totalentries = count($entryids);
 
-            // Initialize the report array for this user
+            // Initialize the report array for this user.
             $report[$userid] = [
-                    'total_entries' => 0,
+                    'totalentries' => 0,
                     'monthly' => []
             ];
 
@@ -356,15 +375,15 @@ class datalynxview_report extends base {
                     // Initialize the month data if not set.
                     if (!isset($report[$userid]['monthly'][$month])) {
                         $report[$userid]['monthly'][$month] = [
-                                'total_entries' => 0,
-                                'matching_contents' => []
+                                'totalentries' => 0,
+                                'matchingcontents' => []
                         ];
                     }
 
                     // Increment total entries for this month.
-                    $report[$userid]['monthly'][$month]['total_entries'] += 1;
+                    $report[$userid]['monthly'][$month]['totalentries'] += 1;
 
-                    // Check for each desired field option in datalynx_contents using SQL
+                    // Check for each desired field option in datalynx_contents using SQL.
                     foreach ($desiredfieldoptions as $value => $label) {
                         $sql = "SELECT COUNT(1) 
                         FROM {datalynx_contents} 
@@ -377,25 +396,25 @@ class datalynxview_report extends base {
                                 'value' => (string)$value // Cast the value to string to ensure proper comparison.
                         ];
 
-                        $matching_contents_count = $DB->count_records_sql($sql, $params);
+                        $matchingcontents_count = $DB->count_records_sql($sql, $params);
 
-                        // Initialize the matching content count for this value if not set
-                        if (!isset($report[$userid]['monthly'][$month]['matching_contents'][$label])) {
-                            $report[$userid]['monthly'][$month]['matching_contents'][$label] = 0;
+                        // Initialize the matching content count for this value if not set.
+                        if (!isset($report[$userid]['monthly'][$month]['matchingcontents'][$label])) {
+                            $report[$userid]['monthly'][$month]['matchingcontents'][$label] = 0;
                         }
 
-                        // Increment matching content count for this value
-                        $report[$userid]['monthly'][$month]['matching_contents'][$label] += $matching_contents_count;
+                        // Increment matching content count for this value.
+                        $report[$userid]['monthly'][$month]['matchingcontents'][$label] += $matchingcontents_count;
                     }
                 }
             }
 
-            // Set total entries for the user.
-            $report[$userid]['total_entries'] = $total_entries;
+            // Set total entries for the user..
+            $report[$userid]['totalentries'] = $totalentries;
         }
-        // Sort the report array by month in descending order
+        // Sort the report array by month in descending order.
         foreach ($report as &$data) {
-            krsort($data['monthly']); // Sorts the 'monthly' array in descending order by month
+            krsort($data['monthly']); // Sorts the 'monthly' array in descending order by month.
         }
         return $report;
     }

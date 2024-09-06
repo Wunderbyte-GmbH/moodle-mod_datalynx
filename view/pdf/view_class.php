@@ -394,6 +394,7 @@ class datalynxview_pdf extends base {
 
             echo $displaycontent;
         }
+        return '';
     }
 
     /**
