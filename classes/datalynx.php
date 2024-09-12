@@ -98,9 +98,9 @@ class datalynx {
 
     protected $pagefile = 'view';
 
-    protected $fields = array();
+    protected $fields = [];
 
-    protected $views = array();
+    protected $views = [];
 
     protected $_filtermanager = null;
 
@@ -112,9 +112,9 @@ class datalynx {
 
     protected $_currentview = null;
 
-    protected $internalfields = array();
+    protected $internalfields = [];
 
-    protected $customfilterfields = array();
+    protected $customfilterfields = [];
 
     protected $internalgroupmodes = array('separateparticipants' => -1);
 
@@ -387,7 +387,7 @@ class datalynx {
         $thisid = $this->id();
 
         $params = (object) $params;
-        $urlparams = array();
+        $urlparams = [];
         if (!empty($params->urlparams)) {
             foreach ($params->urlparams as $param => $value) {
                 if ($value != 0 && $value != '') {
@@ -538,7 +538,7 @@ class datalynx {
         $output = '';
 
         // CSS (cannot be required after head).
-        $cssurls = array();
+        $cssurls = [];
         if (!empty($params->css)) {
             // Js includes from the js template.
             if ($this->data->cssincludes) {
@@ -578,7 +578,7 @@ class datalynx {
         }
 
         // JS.
-        $jsurls = array();
+        $jsurls = [];
         if (!empty($params->js)) {
             // Js includes from the js template.
             if ($this->data->jsincludes) {
@@ -872,7 +872,7 @@ class datalynx {
         global $CFG;
 
         $fieldplugins = get_list_of_plugins('mod/datalynx/field/');
-        $internalfieldsnames = array();
+        $internalfieldsnames = [];
         foreach ($fieldplugins as $fieldname) {
             require_once("$CFG->dirroot/mod/datalynx/field/$fieldname/field_class.php");
             $fieldclass = "datalynxfield_$fieldname";
@@ -897,7 +897,7 @@ class datalynx {
         global $CFG;
 
         if (!$this->customfilterfields) {
-            $this->customfilterfields = array();
+            $this->customfilterfields = [];
             // Collate customfilter fields.
             $fieldplugins = get_list_of_plugins('mod/datalynx/field/');
             foreach ($fieldplugins as $fieldname) {
@@ -1035,7 +1035,7 @@ class datalynx {
         global $DB;
 
         if (!$this->fields || $forceget) {
-            $this->fields = array();
+            $this->fields = [];
             // Collate user fields.
             if ($fields = $DB->get_records('datalynx_fields', array('dataid' => $this->id()), $sort)) {
                 foreach ($fields as $fieldid => $field) {
@@ -1050,7 +1050,7 @@ class datalynx {
         if (empty($exclude) && !$menu) {
             return $fields;
         } else {
-            $retfields = array();
+            $retfields = [];
             foreach ($fields as $fieldid => $field) {
                 if (!empty($exclude) && in_array($fieldid, $exclude)) {
                     continue;
@@ -1073,7 +1073,7 @@ class datalynx {
     public function get_fieldnames($sort = '') {
         global $DB;
 
-        $fieldnames = array();
+        $fieldnames = [];
         // Collate user fields.
         if ($fields = $DB->get_records('datalynx_fields', array('dataid' => $this->id()), $sort)) {
             foreach ($fields as $fieldid => $field) {
@@ -1140,7 +1140,7 @@ class datalynx {
         }
 
         $dffields = $this->get_fields();
-        $fields = array();
+        $fields = [];
         // Collate the fields for processing.
         if ($fieldids = explode(',', $fids)) {
             foreach ($fieldids as $fieldid) {
@@ -1150,7 +1150,7 @@ class datalynx {
             }
         }
 
-        $processedfids = array();
+        $processedfids = [];
         $strnotify = '';
 
         if (empty($fields) && $action != 'add') {
@@ -1364,14 +1364,15 @@ class datalynx {
      * @param string $sort SQL ORDER BY clause
      * @return array an array of datalynx_views entry objects
      */
-    public function get_view_records($forceget = false, $sort = ''): array {
+    public function get_view_records(bool $forceget = false, string $sort = ''): array {
         global $DB;
         if (empty($this->views) || $forceget) {
-            $views = array();
-            if (!$views = $DB->get_records('datalynx_views', array('dataid' => $this->id()), $sort)) {
-                return [];
+            $views = $DB->get_records('datalynx_views', array('dataid' => $this->id()), $sort);
+            // Reinitialise the views array.
+            $this->views = [];
+            if (empty($views)) {
+                return $views;
             }
-            $this->views = array();
             foreach ($views as $viewid => $view) {
                 if ($this->is_visible_to_user($view)) {
                     $this->views[$viewid] = $view;
@@ -1382,19 +1383,19 @@ class datalynx {
     }
 
     /**
-     * Get view by name
+     * Get view by name. Return the view record as stdClass or an empty stdClass if view was not found.
      *
      * @param string $viewname
      * @return stdClass
      */
-    public function get_view_by_name(string $viewname): ?stdClass {
+    public function get_view_by_name(string $viewname): stdClass {
         $views = $this->get_view_records(true);
         foreach ($views as $view) {
             if($view->name === $viewname) {
                 return $view;
             }
         }
-        return null;
+        return new stdClass();
     }
 
     /**
@@ -1404,9 +1405,9 @@ class datalynx {
      */
     public function get_all_views() {
         global $DB;
-        $views = array();
+        $views = [];
         if (!$views = $DB->get_records('datalynx_views', array('dataid' => $this->id()))) {
-            return array();
+            return [];
         } else {
             return $views;
         }
@@ -1516,7 +1517,7 @@ class datalynx {
             return false;
         }
 
-        $typeviews = array();
+        $typeviews = [];
         foreach ($views as $viewid => $view) {
             if ($view->type === $type) {
                 $typeviews[$viewid] = $this->get_view($view);
@@ -1540,7 +1541,7 @@ class datalynx {
 
         static $views = null;
         if ($views === null || $forceget) {
-            $views = array();
+            $views = [];
             foreach ($this->views as $viewid => $view) {
                 if (!empty($exclude) && in_array($viewid, $exclude)) {
                     continue;
@@ -1560,7 +1561,7 @@ class datalynx {
      * @return array $viewids[viewid]
      */
     public function get_views_menu($exclude = null, $forceget = false, $sort = '') {
-        $views = array();
+        $views = [];
 
         if (!empty($this->get_view_records($forceget, $sort))) {
             foreach ($this->views as $viewid => $view) {
@@ -1691,7 +1692,7 @@ class datalynx {
         }
 
         if ($vids) { // Some views are specified for action.
-            $views = array();
+            $views = [];
             $viewobjs = $this->get_views([], true);
             foreach (explode(',', $vids) as $vid) {
                 if (!empty($viewobjs[$vid])) {
@@ -1700,7 +1701,7 @@ class datalynx {
             }
         }
 
-        $processedvids = array();
+        $processedvids = [];
         $strnotify = '';
 
         if (empty($views)) {
@@ -2174,7 +2175,7 @@ class datalynx {
             return $numentriesintervaled;
         }
 
-        $params = array();
+        $params = [];
         $params['dataid'] = $this->id();
 
         $andwhereuserorgroup = '';
@@ -2459,7 +2460,7 @@ class datalynx {
 
     public function get_baseurl() {
         // Base url params.
-        $baseurlparams = array();
+        $baseurlparams = [];
         $baseurlparams['d'] = $this->id();
         return new moodle_url("/mod/datalynx/{$this->pagefile()}.php", $baseurlparams);
     }
