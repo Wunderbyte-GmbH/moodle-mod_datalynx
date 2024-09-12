@@ -74,11 +74,12 @@ class datalynxview_base_form extends moodleform {
             $mform->setType('description', PARAM_TEXT);
         }
 
-        $mform->addElement('checkbox', 'visible[1]', get_string('visibleto', 'datalynx'),
-                get_string('visible_1', 'datalynx'), 1);
-        $mform->addElement('checkbox', 'visible[2]', '', get_string('visible_2', 'datalynx'), 1);
-        $mform->addElement('checkbox', 'visible[4]', '', get_string('visible_4', 'datalynx'), 1);
-        $mform->addElement('checkbox', 'visible[8]', '', get_string('visible_8', 'datalynx'), 1);
+        $visiblegrp = [];
+        $visiblegrp[] = $mform->createElement('advcheckbox', 'visible1', '', get_string('visible1', 'datalynx'), ['group' => 1], [0, 1]);
+        $visiblegrp[] = $mform->createElement('advcheckbox', 'visible2', '', get_string('visible2', 'datalynx'), ['group' => 1], [0, 2]);
+        $visiblegrp[] = $mform->createElement('advcheckbox', 'visible4', '', get_string('visible4', 'datalynx'), ['group' => 1], [0, 4]);
+        $visiblegrp[] = $mform->createElement('advcheckbox', 'visible8', '', get_string('visible8', 'datalynx'), ['group' => 1], [0, 8]);
+        $mform->addGroup($visiblegrp, 'visiblegroup', get_string('visibleto', 'datalynx'), null, false);
 
         // Filter.
         $filtersmenu = $df->get_filter_manager()->get_filters(null, true);
@@ -121,12 +122,14 @@ class datalynxview_base_form extends moodleform {
 
     public function get_data() {
         $data = parent::get_data();
-        if (isset($data) && isset($data->visible) && !empty($data->visible)) {
-            $data->visible = array_sum(array_keys($data->visible));
-        } else {
-            if (isset($data)) {
-                $data->visible = 0;
-            }
+        if (isset($data)) {
+            $visiblesum = 0;
+            $visiblesum += (int)$data->visible1;
+            $visiblesum += (int)$data->visible2;
+            $visiblesum += (int)$data->visible4;
+            $visiblesum += (int)$data->visible8;
+            // Store the sum in the visible field.
+            $data->visible = $visiblesum;
         }
         if (isset($data->_filter)) {
             $data->filter = $data->_filter;
@@ -136,13 +139,28 @@ class datalynxview_base_form extends moodleform {
     }
 
     public function set_data($data) {
-        if ($data->visible) {
-            $visible = $data->visible;
-            $data->visible = array(1 => $visible & 1 ? 1 : null, 2 => $visible & 2 ? 1 : null,
-                    4 => $visible & 4 ? 1 : null, 8 => $visible & 8 ? 1 : null
-            );
-        } else {
-            $data->visible = [];
+        // The checkboxes of the view form have an initial value of unchecked.
+        $data->visible1 = 0;
+        $data->visible2 = 0;
+        $data->visible4 = 0;
+        $data->visible8 = 0;
+        if ($data->visible > 0) {
+            // Data saved is the sum of all checkbox values. Based on the sum we find out which checkboxes are checked.
+            $sum = $data->visible;
+            // Define the values corresponding to each checkbox.
+            $checkboxvalues = [
+                    'visible1' => 1,
+                    'visible2' => 2,
+                    'visible4' => 4,
+                    'visible8' => 8,
+            ];
+            // Loop through the checkbox values in reverse order.
+            foreach (array_reverse($checkboxvalues) as $checkbox => $value) {
+                if ($sum >= $value) {
+                    $data->$checkbox = $value; // Mark checkbox as checked.
+                    $sum -= $value; // Subtract the value from the sum.
+                }
+            }
         }
         if (isset($data->filter)) {
             $data->_filter = $data->filter;
@@ -266,6 +284,10 @@ class datalynxview_base_form extends moodleform {
     }
 
     /**
+     * Process saved data before it is put into the form.
+     *
+     * @param $data
+     * @return void
      */
     public function data_preprocessing(&$data) {
     }

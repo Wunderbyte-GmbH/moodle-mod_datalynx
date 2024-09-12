@@ -1419,7 +1419,7 @@ class datalynx {
      * @param stdClass $view datalynx_views entry
      * @return bool true if user can see the view, false otherwise
      */
-    public function is_visible_to_user($view): bool {
+    public function is_visible_to_user(stdClass $view): bool {
         $isadmin = has_capability('mod/datalynx:viewprivilegeadmin', $this->context, null, true);
         $mask = has_capability('mod/datalynx:viewprivilegemanager', $this->context, null, false) ? 1 : 0;
         $mask |= has_capability('mod/datalynx:viewprivilegeteacher', $this->context, null, false) ? 2 : 0;
@@ -2252,10 +2252,10 @@ class datalynx {
             $permissions[self::PERMISSION_ADMIN] = get_string('admin', 'datalynx');
         }
 
-        $permissions[self::PERMISSION_MANAGER] = get_string('visible_1', 'datalynx');
-        $permissions[self::PERMISSION_TEACHER] = get_string('visible_2', 'datalynx');
-        $permissions[self::PERMISSION_STUDENT] = get_string('visible_4', 'datalynx');
-        $permissions[self::PERMISSION_GUEST] = get_string('visible_8', 'datalynx');
+        $permissions[self::PERMISSION_MANAGER] = get_string('visible1', 'datalynx');
+        $permissions[self::PERMISSION_TEACHER] = get_string('visible2', 'datalynx');
+        $permissions[self::PERMISSION_STUDENT] = get_string('visible4', 'datalynx');
+        $permissions[self::PERMISSION_GUEST] = get_string('visible8', 'datalynx');
 
         if (!$absoluteonly) {
             $permissions[self::PERMISSION_AUTHOR] = get_string('author', 'datalynx');

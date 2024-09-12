@@ -237,7 +237,7 @@ if ($views) {
         $viewvisible = '';
         for ($i = 1; $i < 16; $i = $i << 1) {
             $viewvisible .= html_writer::checkbox("visible[{$i}]", 1, ($i & $view->view->visible),
-                    '', array('disabled' => '', 'title' => get_string("visible_{$i}", 'datalynx')));
+                    '', array('disabled' => '', 'title' => get_string("visible{$i}", 'datalynx')));
         }
 
         // Default view.

@@ -28,8 +28,8 @@
 #    And I follow "Manage"
 #    And I should see "DefaultView"
 #    Then I click "Edit" button of "DefaultView" item
-#    And I click inside "id_visible_1"
-#    And I click inside "id_visible_2"
-#    And I click inside "id_visible_4"
+#    And I click inside "id_visible1"
+#    And I click inside "id_visible2"
+#    And I click inside "id_visible4"
 #    And I press "Save changes"
 #    Then I should not see "DefaultView"
