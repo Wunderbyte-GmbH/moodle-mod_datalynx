@@ -490,7 +490,7 @@ M.mod_datalynx.filter_form_init = function () {
 
         // TODO: Not all custom selects should trigger a refresh.
         container.addEventListener('change', e => {
-            if (e.target.matches('.custom-select')) {
+            if (e.target.matches('.custom-select') && e.target.name.startsWith('searchfield')) {
                 e.preventDefault();
                 document.getElementsByName("refreshonly")[0].value = "1";
                 dynamicForm.submitFormAjax();
