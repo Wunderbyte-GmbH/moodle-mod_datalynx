@@ -488,7 +488,6 @@ M.mod_datalynx.filter_form_init = function () {
             dynamicForm.load(e.details);
         });
 
-        // TODO: Not all custom selects should trigger a refresh.
         container.addEventListener('change', e => {
             if (e.target.matches('.custom-select') && e.target.name.startsWith('searchfield')) {
                 e.preventDefault();
@@ -505,7 +504,7 @@ M.mod_datalynx.filter_form_init = function () {
             }
         });
 
-        $( document ).ready(function() {
+        $(document).ready(function() {
             let searchParams = new URLSearchParams(window.location.search)
             dynamicForm.load({
                 d: searchParams.get("d"),
