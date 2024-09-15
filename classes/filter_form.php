@@ -312,10 +312,9 @@ class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
      */
     public function definition() {
 
-        // print_r($this->_ajaxformdata);
-
         $datalynx_id = $this->_ajaxformdata["d"];
         $filter_id = $this->_ajaxformdata["fid"];
+
 
         if ($datalynx_id == null || $filter_id == null) {
             return;

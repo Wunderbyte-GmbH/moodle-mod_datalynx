@@ -1016,7 +1016,7 @@ class datalynx_filter_manager {
 
     /**
      */
-    public function display_filter_form($mform, $filter, $urlparams = null) {
+    public function display_filter_form($filter, $urlparams = null) {
         $streditinga = $filter->id ? get_string('filteredit', 'datalynx', $filter->name) : get_string(
                 'filternew', 'datalynx');
         $heading = html_writer::tag('h2', format_string($streditinga),
