@@ -56,7 +56,7 @@ $module = array(
     'fullpath' => '/mod/datalynx/datalynx.js',
     'requires' => array('moodle-core-notification-dialogue')
 );
-$PAGE->requires->js_init_call('M.mod_datalynx.filter_form_init', $options, true, $module);
+$PAGE->requires->js_init_call('M.mod_datalynx.filter_form_init', array(), true, $module);
 
 $df->set_page('filter/index', array('modjs' => true, 'urlparams' => $urlparams));
 
@@ -69,24 +69,20 @@ navigation_node::override_active_url(
 $fm = $df->get_filter_manager();
 
 // DATA PROCESSING.
-if ($urlparams->update && confirm_sesskey()) { // Add/update a new filter.
-    $fm->process_filters('update', $urlparams->fid, true);
+if ($urlparams->duplicate && confirm_sesskey()) { // Duplicate any requested filters.
+    $fm->process_filters('duplicate', $urlparams->duplicate, $urlparams->confirmed);
 } else {
-    if ($urlparams->duplicate && confirm_sesskey()) { // Duplicate any requested filters.
-        $fm->process_filters('duplicate', $urlparams->duplicate, $urlparams->confirmed);
+    if ($urlparams->delete && confirm_sesskey()) { // Delete any requested filters.
+        $fm->process_filters('delete', $urlparams->delete, $urlparams->confirmed);
     } else {
-        if ($urlparams->delete && confirm_sesskey()) { // Delete any requested filters.
-            $fm->process_filters('delete', $urlparams->delete, $urlparams->confirmed);
+        if ($urlparams->visible && confirm_sesskey()) { // Set filter's visibility.
+            $fm->process_filters('visible', $urlparams->visible, true); // Confirmed by default.
         } else {
-            if ($urlparams->visible && confirm_sesskey()) { // Set filter's visibility.
-                $fm->process_filters('visible', $urlparams->visible, true); // Confirmed by default.
-            } else {
-                if ($urlparams->default && confirm_sesskey()) { // Set filter to default.
-                    if ($urlparams->default == -1) {
-                        $df->set_default_filter(); // Reset.
-                    } else {
-                        $df->set_default_filter($urlparams->default);
-                    }
+            if ($urlparams->default && confirm_sesskey()) { // Set filter to default.
+                if ($urlparams->default == -1) {
+                    $df->set_default_filter(); // Reset.
+                } else {
+                    $df->set_default_filter($urlparams->default);
                 }
             }
         }
@@ -96,15 +92,13 @@ if ($urlparams->update && confirm_sesskey()) { // Add/update a new filter.
 // Edit a new filter.
 if ($urlparams->new && confirm_sesskey()) {
     $filter = $fm->get_filter_from_id($fm::BLANK_FILTER);
-    $filterform = $fm->get_filter_form($filter);
-    $fm->display_filter_form($filterform, $filter, $urlparams);
+    $fm->display_filter_form($filter, $urlparams);
 
     // Or edit existing filter.
 } else {
     if ($urlparams->fedit && confirm_sesskey()) {
         $filter = $fm->get_filter_from_id($urlparams->fedit);
-        $filterform = $fm->get_filter_form($filter);
-        $fm->display_filter_form($filterform, $filter, $urlparams);
+        $fm->display_filter_form($filter, $urlparams);
 
         // Or display the filters list.
     } else {
