@@ -847,6 +847,15 @@ abstract class datalynxfield_no_content extends datalynxfield_base {
     protected function filearea($suffix = null) {
         return false;
     }
+
+    // TODO: Git PR to move this to the base class.
+    public function get_argument_count(string $operator) {
+        if ($operator === "") { // "Empty" operator
+            return 0;
+        } else {
+            return 1;
+        }
+    }
 }
 
 /**
@@ -1256,14 +1265,6 @@ class datalynxfield_option_multiple extends datalynxfield_option {
         return array('ANY_OF' => get_string('anyof', 'datalynx'),
                 'ALL_OF' => get_string('allof', 'datalynx'),
                 'EXACTLY' => get_string('exactly', 'datalynx'), '' => get_string('empty', 'datalynx'));
-    }
-
-    public function get_argument_count(string $operator) {
-        if ($operator === "") { // "Empty" operator
-            return 0;
-        } else {
-            return 1;
-        }
     }
 }
 

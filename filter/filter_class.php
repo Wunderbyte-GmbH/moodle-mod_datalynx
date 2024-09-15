@@ -715,6 +715,115 @@ class datalynx_filter_manager {
         }
     }
 
+    public function process_filters_ajax($action, $fids, $mform) {
+        global $DB, $OUTPUT;
+
+        $df = $this->_df;
+
+        $filters = array();
+        // TODO may need new roles.
+        if (has_capability('mod/datalynx:managetemplates', $df->context)) {
+            // Don't need record from database for filter form submission.
+            if ($fids) { // Some filters are specified for action.
+                $filters = $DB->get_records_select('datalynx_filters', "id IN ($fids)");
+            } else {
+                if ($action == 'update') {
+                    $filters[] = $this->get_filter_from_id(self::BLANK_FILTER);
+                }
+            }
+        }
+        $processedfids = array();
+        $processedfilters = array();
+        $strnotify = '';
+
+        // TODO update should be roled.
+        if (empty($filters)) {
+            $df->notifications['bad'][] = get_string("filternoneforaction", 'datalynx');
+            return false;
+        } else {
+            // Go ahead and perform the requested action.
+            switch ($action) {
+                case 'update': // Add new or update existing.
+                    $filter = reset($filters);
+
+                    if ($mform->is_cancelled()) {
+                        break;
+                    }
+
+                    // Regenerate form and filter to obtain custom search data.
+                    $formdata = $mform->get_ajax_form_data();
+                    // $formdata["dataid"] = $formdata["d"];
+                    // $formdata["id"] = $formdata["fid"];
+
+                    $filter = $this->get_filter_from_form($filter, $formdata);
+                    $filterform = $this->get_filter_form($filter);
+
+                    // Return to form (on reload button press).
+                    //print_r($formdata);
+                    if ($formdata->refreshonly == '1') { // VP: no submit button pressed (reload only)
+                        // $this->display_filter_form($filterform, $filter);
+
+                        $processedfids[] = $filter->id; // VP Added this line.
+                        $processedfilters[] = $filter; // VP Added this line.
+                        //print("FILTER2");
+                        //print_r($filter);
+
+                        // Process validated.
+                    } else {
+
+                        //if ($formdata = $filterform->get_data()) { // TODO VP: This should fail if there are validation errors
+                        if ($formdata = $mform->get_ajax_form_data()) {
+
+                            // Get clean filter from formdata.
+                            $filter = $this->get_filter_from_form($filter, $formdata, true);
+
+                            if ($filter->id) {
+                                $DB->update_record('datalynx_filters', $filter);
+                                $processedfids[] = $filter->id;
+                                $processedfilters[] = $filter; // VP Added this line.
+                                $strnotify = 'filtersupdated';
+
+                                $other = array('dataid' => $this->_df->id());
+                                $event = \mod_datalynx\event\field_updated::create(
+                                        array('context' => $this->_df->context,
+                                                'objectid' => $filter->id, 'other' => $other));
+                                $event->trigger();
+                            } else {
+                                $filter->id = $DB->insert_record('datalynx_filters', $filter, true);
+                                $processedfids[] = $filter->id;
+                                $processedfilters[] = $filter; // VP Added this line.
+                                $strnotify = 'filtersadded';
+
+                                $other = array('dataid' => $this->_df->id());
+                                $event = \mod_datalynx\event\field_created::create(
+                                        array('context' => $this->_df->context,
+                                                'objectid' => $filter->id, 'other' => $other
+                                        ));
+                                $event->trigger();
+                            }
+                            // Update cached filters.
+                            $this->_filters[$filter->id] = $filter;
+                        } else {
+                            // Form validation failed so return to form.
+                            //$this->display_filter_form($filterform, $filter);
+                        }
+                    }
+
+                    break;
+                default:
+                    break;
+            }
+
+            if (!empty($strnotify)) {
+                $filtersprocessed = $processedfids ? count($processedfids) : 'No';
+                $df->notifications['good'][] = get_string($strnotify, 'datalynx',
+                        $filtersprocessed);
+            }
+            return $processedfilters;
+        }
+    }
+
+    // TODO VP: Remove Update and Refresh from here (handled via AJAX)
     /**
      */
     public function process_filters($action, $fids, $confirmed = false) {
@@ -899,11 +1008,9 @@ class datalynx_filter_manager {
      */
     public function get_filter_form($filter) {
         global $CFG;
-
-        require_once("$CFG->dirroot/mod/datalynx/filter/filter_form.php");
         $formurl = new moodle_url('/mod/datalynx/filter/index.php',
                 array('d' => $this->_df->id(), 'fid' => $filter->id, 'update' => 1));
-        $mform = new mod_datalynx_filter_form($this->_df, $filter, $formurl);
+        $mform = new mod_datalynx_filter_form($formurl); 
         return $mform;
     }
 
@@ -917,7 +1024,7 @@ class datalynx_filter_manager {
 
         $this->_df->print_header(array('tab' => 'filters', 'urlparams' => $urlparams));
         echo $heading;
-        $mform->display();
+        echo html_writer::div('', '', ['id' => 'formcontainer', 'data-region' => 'form']);
         $this->_df->print_footer();
 
         exit();

@@ -24,11 +24,12 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->libdir/formslib.php");
+use core_form\dynamic_form;
 
 /**
  *
  */
-abstract class mod_datalynx_filter_base_form extends moodleform {
+abstract class mod_datalynx_filter_base_form extends dynamic_form {
 
     protected $_filter = null;
     protected $_customfilter = null;
@@ -39,16 +40,66 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
      */
     protected $_df = null;
 
-    /*
-     *
-     */
-    public function __construct($df, $filter, $action = null, $customdata = null, $method = 'post', $target = '',
-            $attributes = null, $editable = true, $customfilter = false) {
-        $this->_filter = $filter;
-        $this->_customfilter = $customfilter;
-        $this->_df = $df;
+    public function get_context_for_dynamic_submission(): context {
+        //return context_module::instance($this->_df->cm->id);
+        return \context_system::instance();
+    }
 
-        parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
+    public function check_access_for_dynamic_submission(): void {
+        return;
+        //return has_capability('mod/datalynx:edit', $this->get_context_for_dynamic_submission());
+        require_capability('moodle/site:config', \context_system::instance());
+    }
+
+    public function set_data_for_dynamic_submission(): void {
+        global $DB;
+
+        // echo "set_data_for_dynamic_submission";
+        // print_r($this->_filter);
+        // print_r($this->_df);
+       //  print_r($this->_form);
+        // print_r($this->_customdata);
+        // print_r($this->_ajaxformdata["d"]);
+        // print_r($this->_ajaxformdata["fid"]);
+
+        $datalynx_id = $this->_ajaxformdata["d"];
+
+        // $this->_filter = 
+        $this->_df = \mod_datalynx\datalynx::get_datalynx_by_instance($datalynx_id);
+
+        // if (!$this->_df = $DB->get_record('datalynx', array('id' => $datalynx_id))) {
+           // throw new moodle_exception('invaliddatalynx', 'datalynx', null, null,
+               //     "Datalynx id: $datalynx_id");
+        //} else {
+          //  print_r($this->_df);
+        //}
+    }
+
+    public function process_dynamic_submission() {
+        /* $data = $this->get_ajax_form_data();
+        //print("PROCESS_DYNAMIC_SUBMISSION");
+        //print_r($data);
+
+        // Save the filter.
+        $filter = $this->_filter;
+        $filter->name = $data['name'];
+        $filter->description = $data['description'];
+        $filter->visible = $data['visible'];
+        $filter->perpage = $data['perpage'];
+        $filter->selection = $data['selection'];
+        $filter->groupby = $data['groupby'];
+        $filter->search = $data['search'];
+        // $filter->customsort = serialize($this->process_custom_sort($data)); TODO VP: Where should these methods be lcocated?
+        // $filter->customsearch = serialize($this->process_custom_search($data));
+        $filter->timemodified = time();
+
+        // $filter->save(); TODO VP: Method not found
+
+        return $filter; */
+    }
+
+    public function get_page_url_for_dynamic_submission(): moodle_url {
+        return new moodle_url('/mod/datalynx/view.php', array('id' => $this->_df->id));
     }
 
     /*
@@ -214,9 +265,6 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
                 $mform->disabledIf("searchoption$count", 'searchandor' . ($count - 1), 'eq', 0);
             }
         }
-
-        $mform->registerNoSubmitButton('addsearchsettings');
-        $mform->addElement('submit', 'addsearchsettings', get_string('reload'));
     }
 
     /*
@@ -263,13 +311,48 @@ class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
      *
      */
     public function definition() {
+
+        // print_r($this->_ajaxformdata);
+
+        $datalynx_id = $this->_ajaxformdata["d"];
+        $filter_id = $this->_ajaxformdata["fid"];
+
+        if ($datalynx_id == null || $filter_id == null) {
+            return;
+        }
+
+        $this->_df = \mod_datalynx\datalynx::get_datalynx_by_instance($datalynx_id);
+        $fm = $this->_df->get_filter_manager();
+        $this->_filter = $fm->get_filter_from_id($filter_id);
+
+        // VP: Taken over from filter/index.php. START
+
+        // TODO: Delete, duplicate, etc... should these be available in AJAX?
+
+        //print("FILTER1");
+        //print_r($this->_filter);
+
+        // DATA PROCESSING.
+        if ($this->_ajaxformdata["update"] && confirm_sesskey()) { // Add/update a new filter.
+            $procesedfilters = $fm->process_filters_ajax('update', $filter_id, $this, true);
+            $this->_filter = $procesedfilters[0];
+        }
+        // END
+
         $df = $this->_df;
         $filter = $this->_filter;
         $name = empty($filter->name) ? get_string('filternew', 'datalynx') : $filter->name;
         $description = empty($filter->description) ? '' : $filter->description;
         $visible = !isset($filter->visible) ? 1 : $filter->visible;
-        $fields = $df->get_fields();
-        $fieldoptions = array(0 => get_string('choose')) + $df->get_fields(array('entry'), true);
+
+        // VP: We won't need this null check, as the filter will only be instantiated from AJAX in the future (the old instantiation is superfluous).
+        if ($df !== null) {
+            $fields = $df->get_fields();
+            $fieldoptions = array(0 => get_string('choose')) + $df->get_fields(array('entry'), true);
+        } else {
+            $fields = [];
+            $fieldoptions = [];
+        }
 
         $mform = &$this->_form;
 
@@ -334,8 +417,22 @@ class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
 
         $this->custom_search_definition($filter->customsearch, $fields, $fieldoptions, true);
 
+        // Hidden fields to track the Datalynx instance and the filter id.
+        if ($df !== null) {
+            $mform->addElement('hidden', 'd', $df->id());
+        }
+        if ($filter !== null) {
+            $mform->addElement('hidden', 'fid', $filter->id);
+        }
+        $mform->addElement('hidden', 'refreshonly', '0');
+        $mform->addElement('hidden', 'update', '1');
+
         // Buttons.
         $this->add_action_buttons(true);
+    }
+
+    public function get_ajax_form_data() {
+        return json_decode(json_encode($this->_ajaxformdata));
     }
 
     /**
@@ -346,16 +443,20 @@ class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
      */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
+        if ($data['refreshonly'] == '0') {
 
-        $df = $this->_df;
-        $filter = $this->_filter;
+            $df = $this->_df;
+            $filter = $this->_filter;
 
-        // Validate unique name.
-        if (empty($data['name']) || $df->name_exists('filters', $data['name'], $filter->id)) {
-            $errors['name'] = get_string('invalidname', 'datalynx',
-                    get_string('filter', 'datalynx'));
+            // Validate unique name.
+            if (empty($data['name']) || $df->name_exists('filters', $data['name'], $filter->id)) {
+                $errors['name'] = get_string('invalidname', 'datalynx',
+                        get_string('filter', 'datalynx'));
+            }
         }
 
+        // FIXME: It looks like if we don't return any errors, the form will not be refreshed. Need to debug this.
+        $errors['fake'] = 'fake';
         return $errors;
     }
 }
