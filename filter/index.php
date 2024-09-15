@@ -51,6 +51,13 @@ $urlparams->cancel = optional_param('cancel', 0, PARAM_BOOL);
 $df = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
 require_capability('mod/datalynx:managetemplates', $df->context);
 
+$module = array(
+    'name' => 'mod_datalynx', 
+    'fullpath' => '/mod/datalynx/datalynx.js',
+    'requires' => array('moodle-core-notification-dialogue')
+);
+$PAGE->requires->js_init_call('M.mod_datalynx.filter_form_init', $options, true, $module);
+
 $df->set_page('filter/index', array('modjs' => true, 'urlparams' => $urlparams));
 
 require_login($df->data->course, false, $df->cm);

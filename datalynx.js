@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // Along with Moodle. If not, see <http:// Www.gnu.org/licenses/>.
 
+
 /**
  * @package mod_datalynx
  * @copyright 2013 onwards David Bogner, Michael Pollak, Ivan Sakic and others.
@@ -473,4 +474,44 @@ function bulk_action(elem, url, action, defaultval) {
 
 M.mod_datalynx.field_gradeitem_form_init = function () {
     Y.one('#mform1').one('select[name="param1"]').set('value', Y.one('#mform1').one('input[type="hidden"][name="param1"]').get('value'));
+};
+
+M.mod_datalynx.filter_form_init = function () {
+    require(['core_form/dynamicform'], function (DynamicForm) {
+        const container = document.querySelector('#formcontainer');
+        const dynamicForm = new DynamicForm(container, 'mod_datalynx_filter_form');
+    
+        dynamicForm.addEventListener(dynamicForm.events.FORM_SUBMITTED, e => {
+            e.preventDefault();
+            e.details.d = e.details.dataid;
+            e.details.fid = e.details.id;
+            dynamicForm.load(e.details);
+        });
+
+        // TODO: Not all custom selects should trigger a refresh.
+        container.addEventListener('change', e => {
+            if (e.target.matches('.custom-select')) {
+                e.preventDefault();
+                document.getElementsByName("refreshonly")[0].value = "1";
+                dynamicForm.submitFormAjax();
+            }
+        });
+
+        container.addEventListener('click', e => {
+            if (e.target.matches('input[type="submit"]')) {
+                e.preventDefault();
+                document.getElementsByName("refreshonly")[0].value = "0";
+                dynamicForm.submitFormAjax();
+            }
+        });
+
+        $( document ).ready(function() {
+            let searchParams = new URLSearchParams(window.location.search)
+            dynamicForm.load({
+                d: searchParams.get("d"),
+                fid: searchParams.get("fid")
+            });
+        });
+
+    });
 };
