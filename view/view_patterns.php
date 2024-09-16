@@ -21,6 +21,9 @@
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+use mod_datalynx\view\base;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -34,12 +37,13 @@ class datalynxview_patterns {
 
     /**
      *
-     * @var base
+     * @var ?base
      */
-    protected $_view = null;
+    protected ?base $_view = null;
 
     /**
      * Constructor
+     * @param $view
      */
     public function __construct(&$view) {
         $this->_view = $view;
@@ -598,7 +602,8 @@ class datalynxview_patterns {
         static $views = null;
         if ($views === null) {
             $views = [];
-            if ($theviews = $df->get_views()) {
+            $theviews = $df->get_views();
+            if (!empty($theviews)) {
                 foreach ($theviews as $theview) {
                     $views[$theview->name()] = $theview;
                 }
@@ -614,15 +619,16 @@ class datalynxview_patterns {
     /**
      * return HTML of the content of a given view $viewname
      *
-     * @param string $viewname
+     * @param ?string $viewname
      * @return string
      */
-    protected function get_viewcontent_replacement($viewname = null) {
+    protected function get_viewcontent_replacement(?string $viewname = null): string {
         $df = $this->_view->get_dl();
         static $views = null;
         if ($views === null) {
             $views = [];
-            if ($theviews = $df->get_views()) {
+            $theviews = $df->get_views();
+            if (!empty($theviews)) {
                 foreach ($theviews as $theview) {
                     $views[$theview->name()] = $theview;
                 }

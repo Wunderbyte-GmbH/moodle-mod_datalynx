@@ -73,13 +73,21 @@ require_sesskey();
 require_capability('mod/datalynx:managetemplates', $dl->context);
 
 if ($urlparams->vedit) {
-    $view = $dl->get_view_from_id($urlparams->vedit);
-    if ($default = optional_param('resetdefault', 0, PARAM_INT)) {
-        $view->generate_default_view();
+    $views = $dl->get_views_editable_by_user('');
+    if (!empty($views) && array_key_exists($urlparams->vedit, $views)) {
+        $view = $views[$urlparams->vedit];
+        if ($default = optional_param('resetdefault', 0, PARAM_INT)) {
+            $view->generate_default_view();
+        }
+    } else {
+        throw new moodle_exception('The requested view does not exist or you do not have permission to edit it.');
     }
 } else {
     if ($urlparams->type) {
         $view = $dl->get_view($urlparams->type);
+        if (!$view) {
+            throw new moodle_exception('The requested view type does not exist.');
+        }
         $view->generate_default_view();
     }
 }

@@ -105,12 +105,10 @@ if ($urlparams->duplicate && confirm_sesskey()) { // Duplicate any requested vie
 
 // Any notifications?
 $dl->notifications['bad']['defaultview'] = '';
-$views = $dl->get_views([], true,
-        flexible_table::get_sort_for_table('datalynxviewsindex' . $dl->id()));
-if (!$views) {
-    $dl->notifications['bad']['getstartedviews'] = get_string('viewnoneindatalynx', 'datalynx'); // Nothing.
-    // In.
-    // Database.
+$views = $dl->get_views_editable_by_user(flexible_table::get_sort_for_table('datalynxviewsindex' . $dl->id()));
+if (empty($views)) {
+    // Now views defined yet.
+    $dl->notifications['bad']['getstartedviews'] = get_string('viewnoneindatalynx', 'datalynx');
 } else {
     if (empty($dl->data->defaultview)) {
         $dl->notifications['bad']['defaultview'] = get_string('viewnodefault', 'datalynx', '');
@@ -142,7 +140,7 @@ echo $output = html_writer::tag('div', $br . $OUTPUT->render($viewselect) . $br,
         array('class' => 'viewadd mdl-align'));
 
 // If there are views print admin style list of them.
-if ($views) {
+if (!empty($views)) {
 
     $viewbaseurl = '/mod/datalynx/view.php';
     $editbaseurl = '/mod/datalynx/view/view_edit.php';

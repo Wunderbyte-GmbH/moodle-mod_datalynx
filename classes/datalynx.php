@@ -30,6 +30,7 @@ use datalynx_filter_manager;
 use datalynx_preset_manager;
 use datalynx_rule_manager;
 use html_writer;
+use mod_datalynx\view\base;
 use moodle_page;
 use moodle_url;
 use stdClass;
@@ -1383,6 +1384,27 @@ class datalynx {
     }
 
     /**
+     * Get view subclass objects editable by the user
+     *
+     * @param string $sort SQL ORDER BY clause
+     * @return array an array of datalynx_views subclass objects
+     */
+    public function get_views_editable_by_user(string $sort = ''): array {
+        global $DB;
+        if (has_capability('mod/datalynx:managetemplates', $this->context)) {
+            $views = $DB->get_records('datalynx_views', array('dataid' => $this->id()), $sort);
+            $returnviews = [];
+            if (!empty($views)) {
+                foreach ($views as $viewid => $view) {
+                    $returnviews[$viewid] = $this->get_view($view);
+                }
+            }
+            return $returnviews;
+        }
+        return [];
+    }
+
+    /**
      * Get view by name. Return the view record as stdClass or an empty stdClass if view was not found.
      *
      * @param string $viewname
@@ -1460,7 +1482,8 @@ class datalynx {
      * @param int $viewid
      * @return bool|mixed
      */
-    public function get_view_from_id($viewid = 0) {
+    public function get_view_from_id(int $viewid = 0) {
+        // Get views visible to user.
         $views = $this->get_view_records();
         if (!empty($views)) {
             if ($viewid && isset($views[$viewid])) {
@@ -1487,7 +1510,7 @@ class datalynx {
      * @param bool $active
      * @return mixed
      */
-    public function get_view($viewortype, $active = false) {
+    public function get_view($viewortype, $active = false): base {
         global $CFG;
 
         if ($viewortype) {
@@ -1534,9 +1557,9 @@ class datalynx {
      * @param string $sort
      * @return array of view objects indexed by view id or false if no views are found
      */
-    public function get_views(array $exclude = [], bool $forceget = false, string $sort = '') {
+    public function get_views(array $exclude = [], bool $forceget = false, string $sort = ''): array {
         if (empty($this->get_view_records($forceget, $sort))) {
-            return false;
+            return [];
         }
 
         static $views = null;
@@ -1578,10 +1601,8 @@ class datalynx {
      * Set default view
      *
      * @param int $viewid
-     * @throws \dml_exception
-     * @throws moodle_exception
      */
-    public function set_default_view($viewid = 0) {
+    public function set_default_view(int $viewid = 0): void {
         global $DB;
 
         $rec = new stdClass();
@@ -1597,10 +1618,8 @@ class datalynx {
      * Set default filter
      *
      * @param int $filterid
-     * @throws \dml_exception
-     * @throws moodle_exception
      */
-    public function set_default_filter($filterid = 0) {
+    public function set_default_filter(int $filterid = 0): void {
         global $DB;
 
         $rec = new stdClass();
@@ -1616,10 +1635,8 @@ class datalynx {
      * Set the default edit view
      *
      * @param int $viewid
-     * @throws \dml_exception
-     * @throws moodle_exception
      */
-    public function set_single_edit_view($viewid = 0) {
+    public function set_single_edit_view(int $viewid = 0): void {
         global $DB;
 
         $rec = new stdClass();
@@ -1635,10 +1652,8 @@ class datalynx {
      * Set view that is linked with the more-view patterns
      *
      * @param int $viewid
-     * @throws \dml_exception
-     * @throws moodle_exception
      */
-    public function set_single_more_view($viewid = 0) {
+    public function set_single_more_view(int $viewid = 0): void {
         global $DB;
 
         $rec = new stdClass();
@@ -1662,8 +1677,9 @@ class datalynx {
      * @param string $searchfieldname
      * @param string $newfieldname
      */
-    public function replace_field_in_views($searchfieldname, $newfieldname) {
-        if ($views = $this->get_views()) {
+    public function replace_field_in_views(string $searchfieldname, string $newfieldname): void {
+        $views  = $this->get_views();
+        if (!empty($views)) {
             foreach ($views as $view) {
                 $view->replace_field_in_view($searchfieldname, $newfieldname);
             }
