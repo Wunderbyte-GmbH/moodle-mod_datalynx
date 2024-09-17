@@ -150,7 +150,7 @@ class datalynxview_report extends base {
      * @return string
      */
     public function display_entries(?array $options = null): string {
-        global $DB;
+        global $DB, $OUTPUT;
         $report = $this->create_report_sql();
         $fieldid = (int) $this->view->param1;
         $countfield = $this->_df->get_field_from_id($fieldid);
@@ -161,6 +161,9 @@ class datalynxview_report extends base {
         if ($this->view->param2 === 'month') {
             // Collect and aggregate data by month
             $monthlydatabymonth = [];
+            $overalltotalentriessum = 0;
+            $overallmatchingcontentssums = array_fill_keys($desiredfieldoptions, 0);
+            $overallnotyeteditedsum = 0;
 
             foreach ($report as $userid => $data) {
                 $user = $DB->get_record('user', ['id' => $userid], 'id, firstname, lastname, email');
@@ -182,11 +185,81 @@ class datalynxview_report extends base {
             // Sort months in descending order
             krsort($monthlydatabymonth);
 
+            // Create containers for chart output
+            $chartoutput = '';
+            $overallchartdata = [];
+            foreach ($desiredfieldoptions as $label) {
+                $overallchartdata[$label] = 0;
+            }
+
             foreach ($monthlydatabymonth as $month => $usersdata) {
                 // Initialize sum variables for this month's table
                 $totalentriessum = 0;
                 $matchingcontentssums = array_fill_keys($desiredfieldoptions, 0);
-                $notyeteditedsum = 0;
+                $notyetansweredsum = 0;
+
+                foreach ($usersdata as $userid => $user_month_data) {
+                    // Total entries for this user in this month
+                    $usertotalentries = $user_month_data['totalentries'];
+                    $totalentriessum += $usertotalentries;
+                    $overalltotalentriessum += $usertotalentries;
+
+                    // Matching contents counts and "Not Yet Answered" for each user
+                    $summatchingcontents = 0;
+                    foreach ($desiredfieldoptions as $label) {
+                        $count = $user_month_data['matchingcontents'][$label] ?? 0;
+                        if ($count !== 0) {
+                            $summatchingcontents += $count;
+                            $matchingcontentssums[$label] += $count;
+                            $overallmatchingcontentssums[$label] += $count;
+                            $overallchartdata[$label] += $count;
+                        }
+                    }
+
+                    $notyetanswered = $usertotalentries - $summatchingcontents;
+                    $notyetansweredsum += $notyetanswered;
+                    $overallnotyeteditedsum += $notyetanswered;
+                    $overallchartdata['notyetanswered'] = isset($overallchartdata['notyetanswered']) ?
+                            $overallchartdata['notyetanswered'] + $notyetanswered : $notyetanswered;
+                }
+
+                // Create the monthly pie chart
+                $chart = new \core\chart_pie();
+                $chart->set_title(get_string('month') . ": " . $month);
+                $labels = array_merge($desiredfieldoptions, [get_string('notyetanswered', 'question')]);
+                $values = array_merge(array_values($matchingcontentssums), [$notyetansweredsum]);
+                $series = new \core\chart_series(get_string('aggregationsum', 'reportbuilder'), $values);
+                $chart->add_series($series);
+                $chart->set_labels($labels);
+                $chartoutput .= html_writer::start_div('col-md-6 col-lg-4 mb-4');
+                $chartoutput .= $OUTPUT->render($chart);
+                $chartoutput .= html_writer::end_div();
+            }
+
+            // Create the overall pie chart
+            $overallchart = new \core\chart_pie();
+            $overallchart->set_title(get_string('aggregationsum', 'reportbuilder'));
+            $overallseries = new \core\chart_series(get_string('aggregationsum', 'reportbuilder'), array_values($overallchartdata));
+            $overallchart->add_series($overallseries);
+            $overallchart->set_labels(array_keys($overallchartdata));
+            $chartoutput .= html_writer::start_div('row clearfix');
+            $chartoutput .= html_writer::start_div('col-12 mb-4');
+            $chartoutput .= $OUTPUT->render($overallchart);
+            $chartoutput .= html_writer::end_div();
+            $chartoutput .= html_writer::end_div();
+            // Output the charts in a responsive grid layout
+            $output .= html_writer::start_div('container');
+            $output .= html_writer::start_div('row');
+            $output .= $chartoutput;
+            $output .= html_writer::end_div(); // Close row
+            $output .= html_writer::end_div(); // Close container
+
+            // Output the tables with the data
+            foreach ($monthlydatabymonth as $month => $usersdata) {
+                // Initialize sum variables for this month's table
+                $totalentriessum = 0;
+                $matchingcontentssums = array_fill_keys($desiredfieldoptions, 0);
+                $notyetansweredsum = 0;
 
                 // Create a new table for the month
                 $output .= html_writer::tag('h3', get_string('month') . ": " . $month);
@@ -215,7 +288,7 @@ class datalynxview_report extends base {
                     $output .= html_writer::tag('td', $usertotalentries);
                     $totalentriessum += $usertotalentries;
 
-                    // Matching contents counts and "Not Yet Edited" for each user
+                    // Matching contents counts and "Not Yet Answered" for each user
                     $summatchingcontents = 0;
                     foreach ($desiredfieldoptions as $label) {
                         $count = $user_month_data['matchingcontents'][$label] ?? 0;
@@ -226,9 +299,9 @@ class datalynxview_report extends base {
                         $output .= html_writer::tag('td', $count);
                     }
 
-                    $notyetedited = $usertotalentries - $summatchingcontents;
-                    $output .= html_writer::tag('td', $notyetedited);
-                    $notyeteditedsum += $notyetedited;
+                    $notyetanswered = $usertotalentries - $summatchingcontents;
+                    $output .= html_writer::tag('td', $notyetanswered);
+                    $notyetansweredsum += $notyetanswered;
 
                     $output .= html_writer::end_tag('tr');
                 }
@@ -242,12 +315,41 @@ class datalynxview_report extends base {
                     $output .= html_writer::tag('td', $sum);
                 }
 
-                $output .= html_writer::tag('td', $notyeteditedsum);
+                $output .= html_writer::tag('td', $notyetansweredsum);
                 $output .= html_writer::end_tag('tr');
 
                 $output .= html_writer::end_tag('tbody');
                 $output .= html_writer::end_tag('table');
             }
+
+            // Overall totals
+            $output .= html_writer::tag('h3', get_string('aggregationsum', 'reportbuilder'));
+            $output .= html_writer::start_tag('table', ['class' => 'table table-striped table-bordered']);
+
+            // Table header
+            $output .= html_writer::start_tag('thead');
+            $output .= html_writer::start_tag('tr');
+            $output .= html_writer::tag('th', get_string('total'));
+            $output .= html_writer::tag('th', get_string('aggregationsum', 'reportbuilder'));
+            foreach ($desiredfieldoptions as $label) {
+                $output .= html_writer::tag('th', $label);
+            }
+            $output .= html_writer::tag('th', get_string('notyetanswered', 'question'));
+            $output .= html_writer::end_tag('tr');
+            $output .= html_writer::end_tag('thead');
+
+            $output .= html_writer::start_tag('tbody');
+            $output .= html_writer::start_tag('tr');
+            $output .= html_writer::tag('td', get_string('total'));
+            $output .= html_writer::tag('td', $overalltotalentriessum);
+
+            foreach ($overallmatchingcontentssums as $sum) {
+                $output .= html_writer::tag('td', $sum);
+            }
+
+            $output .= html_writer::tag('td', $overallnotyeteditedsum);
+            $output .= html_writer::end_tag('tr');
+
         } else {
             $output .= html_writer::start_tag('table', ['class' => 'table table-striped table-bordered']);
 
@@ -262,7 +364,7 @@ class datalynxview_report extends base {
             foreach ($desiredfieldoptions as $label) {
                 $output .= html_writer::tag('th', $label);
             }
-            // Additional column for "Not Yet Edited".
+            // Additional column for "Not Yet Answered".
             $output .= html_writer::tag('th', get_string('notyetanswered', 'question'));
 
             $output .= html_writer::end_tag('tr');
@@ -292,17 +394,17 @@ class datalynxview_report extends base {
                         $output .= html_writer::tag('td', $count);
                     }
 
-                    // Calculate and display "Not Yet Edited".
-                    $notyetedited = $monthlydata['totalentries'] - $summatchingcontents;
-                    $output .= html_writer::tag('td', $notyetedited);
+                    // Calculate and display "Not Yet Answered".
+                    $notyetanswered = $monthlydata['totalentries'] - $summatchingcontents;
+                    $output .= html_writer::tag('td', $notyetanswered);
 
                     $output .= html_writer::end_tag('tr');
                 }
             }
 
-            $output .= html_writer::end_tag('tbody');
-            $output .= html_writer::end_tag('table');
         }
+        $output .= html_writer::end_tag('tbody');
+        $output .= html_writer::end_tag('table');
         $output .= html_writer::end_tag('div');
         return $output;
     }
