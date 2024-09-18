@@ -56,7 +56,7 @@ class datalynxview_report extends base {
         $elements = [];
         // Open table and wrap header with thead.
         $elements[] = array('html',
-                html_writer::start_tag('table', array('class' => 'generaltable')));
+                html_writer::start_tag('table', array('class' => 'generaltable table table-responsive table-striped')));
 
         // Flatten the set to a list of elements, wrap with tbody and close table.
         $elements[] = array('html', html_writer::start_tag('tbody'));
@@ -155,6 +155,7 @@ class datalynxview_report extends base {
         $fieldid = (int) $this->view->param1;
         $countfield = $this->_df->get_field_from_id($fieldid);
         $desiredfieldoptions = $countfield->get_options();
+        $notyetansweredlabel = get_string('notyetanswered', 'question');
 
         $output = html_writer::start_tag('div', ['class' => 'table-responsive']);
 
@@ -219,14 +220,14 @@ class datalynxview_report extends base {
                     $notyetanswered = $usertotalentries - $summatchingcontents;
                     $notyetansweredsum += $notyetanswered;
                     $overallnotyeteditedsum += $notyetanswered;
-                    $overallchartdata['notyetanswered'] = isset($overallchartdata['notyetanswered']) ?
-                            $overallchartdata['notyetanswered'] + $notyetanswered : $notyetanswered;
+                    $overallchartdata[$notyetansweredlabel] = isset($overallchartdata[$notyetansweredlabel]) ?
+                            $overallchartdata[$notyetansweredlabel] + $notyetanswered : $notyetanswered;
                 }
 
                 // Create the monthly pie chart
                 $chart = new \core\chart_pie();
                 $chart->set_title(get_string('month') . ": " . $month);
-                $labels = array_merge($desiredfieldoptions, [get_string('notyetanswered', 'question')]);
+                $labels = array_merge($desiredfieldoptions, [$notyetansweredlabel]);
                 $values = array_merge(array_values($matchingcontentssums), [$notyetansweredsum]);
                 $series = new \core\chart_series(get_string('aggregationsum', 'reportbuilder'), $values);
                 $chart->add_series($series);
@@ -263,7 +264,7 @@ class datalynxview_report extends base {
 
                 // Create a new table for the month
                 $output .= html_writer::tag('h3', get_string('month') . ": " . $month);
-                $output .= html_writer::start_tag('table', ['class' => 'table table-striped table-bordered']);
+                $output .= html_writer::start_tag('table', ['class' => 'table table-striped table-bordered datalynx-report']);
 
                 // Table header
                 $output .= html_writer::start_tag('thead');
@@ -324,7 +325,7 @@ class datalynxview_report extends base {
 
             // Overall totals
             $output .= html_writer::tag('h3', get_string('aggregationsum', 'reportbuilder'));
-            $output .= html_writer::start_tag('table', ['class' => 'table table-striped table-bordered']);
+            $output .= html_writer::start_tag('table', ['class' => 'table table-striped table-bordered datalynx-report']);
 
             // Table header
             $output .= html_writer::start_tag('thead');
@@ -351,7 +352,7 @@ class datalynxview_report extends base {
             $output .= html_writer::end_tag('tr');
 
         } else {
-            $output .= html_writer::start_tag('table', ['class' => 'table table-striped table-bordered']);
+            $output .= html_writer::start_tag('table', ['class' => 'table table-striped table-bordered datalynx-report']);
 
             $output .= html_writer::start_tag('thead');
             $output .= html_writer::start_tag('tr');

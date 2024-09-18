@@ -94,7 +94,9 @@ class datalynxfield__time extends datalynxfield_no_content {
 
         if (is_array($value)) {
             $from = $value[0];
-            $to = $value[1];
+            if (isset($value[1])) {
+                $to = $value[1];
+            }
         } else {
             $from = 0;
             $to = 0;
