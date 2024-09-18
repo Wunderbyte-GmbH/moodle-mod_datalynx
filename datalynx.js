@@ -477,16 +477,18 @@ M.mod_datalynx.field_gradeitem_form_init = function () {
 };
 
 M.mod_datalynx.filter_form_init = function () {
-    require(['core_form/dynamicform'], function (DynamicForm) {
+    require(['core_form/dynamicform', 'core/toast'], function (DynamicForm, Toast) {
         const container = document.querySelector('#formcontainer');
         const dynamicForm = new DynamicForm(container, 'mod_datalynx_filter_form');
     
         dynamicForm.addEventListener(dynamicForm.events.FORM_SUBMITTED, e => {
-            e.preventDefault();
-            e.details.d = e.details.dataid;
-            e.details.fid = e.details.id;
-            dynamicForm.load(e.details);
-        });
+            Toast.add('Form saved successfully.');
+            let searchParams = new URLSearchParams(window.location.search)
+            dynamicForm.load({
+                d: searchParams.get("d"),
+                fid: searchParams.get("fid")
+            });
+        })
 
         container.addEventListener('change', e => {
             if (e.target.matches('.custom-select') && e.target.name.startsWith('searchfield')) {
@@ -504,7 +506,7 @@ M.mod_datalynx.filter_form_init = function () {
             }
         });
 
-        $(document).ready(function() {
+        $(function() {
             let searchParams = new URLSearchParams(window.location.search)
             dynamicForm.load({
                 d: searchParams.get("d"),

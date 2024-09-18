@@ -52,7 +52,19 @@ abstract class mod_datalynx_filter_base_form extends dynamic_form {
     }
 
     public function set_data_for_dynamic_submission(): void {
+        // Since this runs after definition(), we are not using it, as the form's composition already depends on the data loaded.
         global $DB;
+
+        $datalynx_id = $this->_ajaxformdata["d"];
+        $filter_id = $this->_ajaxformdata["fid"];
+
+        if ($datalynx_id == null || $filter_id == null) {
+            return;
+        }
+
+        $this->_df = \mod_datalynx\datalynx::get_datalynx_by_instance($datalynx_id);
+        $fm = $this->_df->get_filter_manager();
+        $this->_filter = $fm->get_filter_from_id($filter_id);
 
         // echo "set_data_for_dynamic_submission";
         // print_r($this->_filter);
@@ -62,10 +74,10 @@ abstract class mod_datalynx_filter_base_form extends dynamic_form {
         // print_r($this->_ajaxformdata["d"]);
         // print_r($this->_ajaxformdata["fid"]);
 
-        $datalynx_id = $this->_ajaxformdata["d"];
+        //$datalynx_id = $this->_ajaxformdata["d"];
 
         // $this->_filter = 
-        $this->_df = \mod_datalynx\datalynx::get_datalynx_by_instance($datalynx_id);
+        //$this->_df = \mod_datalynx\datalynx::get_datalynx_by_instance($datalynx_id);
 
         // if (!$this->_df = $DB->get_record('datalynx', array('id' => $datalynx_id))) {
            // throw new moodle_exception('invaliddatalynx', 'datalynx', null, null,
@@ -76,6 +88,24 @@ abstract class mod_datalynx_filter_base_form extends dynamic_form {
     }
 
     public function process_dynamic_submission() {
+        //echo "PRODISU";
+
+        $datalynx_id = $this->_ajaxformdata["d"];
+        $filter_id = $this->_ajaxformdata["fid"];
+
+        if ($datalynx_id == null || $filter_id == null) {
+            return;
+        }
+
+        $this->_df = \mod_datalynx\datalynx::get_datalynx_by_instance($datalynx_id);
+        $fm = $this->_df->get_filter_manager();
+        $this->_filter = $fm->get_filter_from_id($filter_id);
+
+        if ($this->_ajaxformdata["update"] && confirm_sesskey()) { // Add/update a new filter.
+            $procesedfilters = $fm->process_filters_ajax('update', $filter_id, $this, true);
+            $this->_filter = $procesedfilters[0];
+        }
+
         /* $data = $this->get_ajax_form_data();
         //print("PROCESS_DYNAMIC_SUBMISSION");
         //print_r($data);
@@ -312,6 +342,8 @@ class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
      */
     public function definition() {
 
+        //print("FILTER FORM DEFINITION");
+
         $datalynx_id = $this->_ajaxformdata["d"];
         $filter_id = $this->_ajaxformdata["fid"];
 
@@ -319,13 +351,12 @@ class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
             return;
         }
 
+        // TODO VP: Conditionally set these (if not yet set by PRODISU) // Move these to LOAD_DATA:
         $this->_df = \mod_datalynx\datalynx::get_datalynx_by_instance($datalynx_id);
         $fm = $this->_df->get_filter_manager();
         $this->_filter = $fm->get_filter_from_id($filter_id);
 
         // VP: Taken over from filter/index.php. START
-
-        // TODO: Delete, duplicate, etc... should these be available in AJAX?
 
         //print("FILTER1");
         //print_r($this->_filter);
@@ -430,6 +461,7 @@ class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
     }
 
     public function get_ajax_form_data() {
+        // Convert to stdClass:
         return json_decode(json_encode($this->_ajaxformdata));
     }
 
@@ -451,10 +483,12 @@ class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
                 $errors['name'] = get_string('invalidname', 'datalynx',
                         get_string('filter', 'datalynx'));
             }
+        } else {
+            // If we do not return any error after a submission, the form will 
+            // be regarded as submitted and will render empty. 
+            // We need to return a dummy error to prevent this:
+            $errors['dummy_error_for_refreshing'] = 'dummy_error_for_refreshing';
         }
-
-        // FIXME: It looks like if we don't return any errors, the form will not be refreshed. Need to debug this.
-        $errors['fake'] = 'fake';
         return $errors;
     }
 }
