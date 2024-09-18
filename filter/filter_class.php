@@ -978,6 +978,13 @@ class datalynx_filter_manager {
                                 } else {
                                     $searchfields[$fieldname]['AND'][] = array('', '>', [$formdata->{$key}]);
                                 }
+                            } else {
+                                $tokeyactive = str_replace('_from', '_to', $key);
+                                if (isset($formdata->{$tokeyactive}) && $formdata->{$tokeyactive} > 0) {
+                                    $valuearr[] = $formdata->{$tokeyactive};
+                                    $searchfields[$fieldname]['AND'][] = array('', '<',
+                                            $valuearr);
+                                }
                             }
                         }
                         break;
