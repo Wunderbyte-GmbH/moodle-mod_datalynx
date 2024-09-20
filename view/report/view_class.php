@@ -167,8 +167,8 @@ class datalynxview_report extends base {
             $overallnotyeteditedsum = 0;
 
             foreach ($report as $userid => $data) {
-                $user = $DB->get_record('user', ['id' => $userid], 'id, firstname, lastname, email');
-                $userinfo = "{$user->firstname} {$user->lastname} ({$user->id})<br>{$user->email}";
+                $user = $DB->get_record('user', ['id' => $userid], 'id, firstname, lastname, email, department');
+                $userinfo = "{$user->firstname} {$user->lastname} ({$user->id})<br>{$user->email} <br> {$user->department}";
 
                 foreach ($data['monthly'] as $month => $monthlydata) {
                     if (!isset($monthlydatabymonth[$month])) {

@@ -43,7 +43,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
             $selected = json_decode($entry->{"c{$fieldid}_content"}, true);
             $selected = $selected ? $selected : [];
 
-            $str = $this->get_user_list($selected);
+            $str = $this->get_user_list($selected, $options);
 
             switch ($field->listformat) {
                 case datalynxfield_teammemberselect::TEAMMEMBERSELECT_FORMAT_NEWLINE:
@@ -107,9 +107,9 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         return $str;
     }
 
-    private static $userlist = [];
+    private static array $userlist = [];
 
-    private function get_user_list($userids) {
+    private function get_user_list(array $userids, array $options = []): array {
         global $DB, $COURSE;
 
         $list = [];
@@ -135,6 +135,11 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
                 $baseurl->param('id', $user->id);
                 $fullname = fullname($user);
                 $item = "<a href=\"$baseurl\">$fullname</a>";
+                foreach ((array) $user as $property => $value) {
+                    if (isset($options[$property]) && !empty($value)) {
+                        $item .= "<br> " . get_string($property) . ": $value";
+                    }
+                }
                 self::$userlist[$user->id] = $item;
                 $list[] = $item;
             }
@@ -208,6 +213,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         $patterns = parent::patterns();
         $patterns["[[$fieldname]]"] = array(true);
         $patterns["[[$fieldname:subscribe]]"] = array(true);
+        $patterns["[[$fieldname:department]]"] = array(false);
 
         return $patterns;
     }
