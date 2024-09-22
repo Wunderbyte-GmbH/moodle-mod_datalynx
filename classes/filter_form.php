@@ -337,12 +337,20 @@ abstract class mod_datalynx_filter_base_form extends dynamic_form {
 
 class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
 
+    //public function is_submitted() {
+        // TODO: Should return true if reloadonly is set to 0.
+        //return true;
+    //}
+
+    public function definition() {
+
+    }
+
     /*
      *
      */
-    public function definition() {
-
-        //print("FILTER FORM DEFINITION");
+    //public function definition_after_data() {
+    public function definition_after_data() {
 
         $datalynx_id = $this->_ajaxformdata["d"];
         $filter_id = $this->_ajaxformdata["fid"];
@@ -473,21 +481,23 @@ class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
      */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
-        if ($data['refreshonly'] == '0') {
+        if (array_key_exists('refreshonly', $data)) {
+            if ($data['refreshonly'] == '0') {
 
-            $df = $this->_df;
-            $filter = $this->_filter;
+                $df = $this->_df;
+                $filter = $this->_filter;
 
-            // Validate unique name.
-            if (empty($data['name']) || $df->name_exists('filters', $data['name'], $filter->id)) {
-                $errors['name'] = get_string('invalidname', 'datalynx',
-                        get_string('filter', 'datalynx'));
+                // Validate unique name.
+                if (empty($data['name']) || $df->name_exists('filters', $data['name'], $filter->id)) {
+                    $errors['name'] = get_string('invalidname', 'datalynx',
+                            get_string('filter', 'datalynx'));
+                }
+            } else {
+                // If we do not return any error after a submission, the form will 
+                // be regarded as submitted and will render empty. 
+                // We need to return a dummy error to prevent this:
+                $errors['dummy_error_for_refreshing'] = 'dummy_error_for_refreshing';
             }
-        } else {
-            // If we do not return any error after a submission, the form will 
-            // be regarded as submitted and will render empty. 
-            // We need to return a dummy error to prevent this:
-            $errors['dummy_error_for_refreshing'] = 'dummy_error_for_refreshing';
         }
         return $errors;
     }

@@ -501,6 +501,7 @@ M.mod_datalynx.filter_form_init = function () {
         container.addEventListener('click', e => {
             if (e.target.matches('input[type="submit"]')) {
                 e.preventDefault();
+                alert("Submit");
                 document.getElementsByName("refreshonly")[0].value = "0";
                 dynamicForm.submitFormAjax();
             }
