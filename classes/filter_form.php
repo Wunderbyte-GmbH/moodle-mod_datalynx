@@ -66,25 +66,11 @@ abstract class mod_datalynx_filter_base_form extends dynamic_form {
         $fm = $this->_df->get_filter_manager();
         $this->_filter = $fm->get_filter_from_id($filter_id);
 
-        // echo "set_data_for_dynamic_submission";
-        // print_r($this->_filter);
-        // print_r($this->_df);
-       //  print_r($this->_form);
-        // print_r($this->_customdata);
-        // print_r($this->_ajaxformdata["d"]);
-        // print_r($this->_ajaxformdata["fid"]);
-
-        //$datalynx_id = $this->_ajaxformdata["d"];
-
-        // $this->_filter = 
-        //$this->_df = \mod_datalynx\datalynx::get_datalynx_by_instance($datalynx_id);
-
-        // if (!$this->_df = $DB->get_record('datalynx', array('id' => $datalynx_id))) {
-           // throw new moodle_exception('invaliddatalynx', 'datalynx', null, null,
-               //     "Datalynx id: $datalynx_id");
-        //} else {
-          //  print_r($this->_df);
-        //}
+        // Update filter parameters based on the current form data (in order to dynamically render new form fields for filter details):
+        if ($this->_ajaxformdata["update"] && confirm_sesskey()) {
+            $procesedfilters = $fm->process_filters_for_ajax_refresh('update', $filter_id, $this, true);
+            $this->_filter = $procesedfilters[0];
+        }
     }
 
     public function process_dynamic_submission() {
@@ -317,38 +303,12 @@ abstract class mod_datalynx_filter_base_form extends dynamic_form {
 
 class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
 
-    //public function is_submitted() {
-        // TODO: Should return true if reloadonly is set to 0.
-        //return true;
-    //}
-
-    public function definition() {
-
-    }
+    public function definition() {}
 
     /*
      *
      */
     public function definition_after_data() {
-
-        $datalynx_id = $this->_ajaxformdata["d"];
-        $filter_id = $this->_ajaxformdata["fid"];
-
-        if ($datalynx_id == null || $filter_id == null) {
-            return;
-        }
-
-        // TODO VP: Conditionally set these (if not yet set by PRODISU) // Move these to LOAD_DATA:
-        $this->_df = \mod_datalynx\datalynx::get_datalynx_by_instance($datalynx_id);
-        $fm = $this->_df->get_filter_manager();
-        $this->_filter = $fm->get_filter_from_id($filter_id);
-
-        // Update filter parameters based on the current form data (in order to dynamically render new form fields for filter details):
-        if ($this->_ajaxformdata["update"] && confirm_sesskey()) {
-            $procesedfilters = $fm->process_filters_for_ajax_refresh('update', $filter_id, $this, true);
-            $this->_filter = $procesedfilters[0];
-        }
-
         $df = $this->_df;
         $filter = $this->_filter;
         $name = empty($filter->name) ? get_string('filternew', 'datalynx') : $filter->name;
