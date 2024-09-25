@@ -88,7 +88,6 @@ abstract class mod_datalynx_filter_base_form extends dynamic_form {
     }
 
     public function process_dynamic_submission() {
-        //echo "PRODISU";
 
         $datalynx_id = $this->_ajaxformdata["d"];
         $filter_id = $this->_ajaxformdata["fid"];
@@ -106,26 +105,7 @@ abstract class mod_datalynx_filter_base_form extends dynamic_form {
             $this->_filter = $procesedfilters[0];
         }
 
-        /* $data = $this->get_ajax_form_data();
-        //print("PROCESS_DYNAMIC_SUBMISSION");
-        //print_r($data);
-
-        // Save the filter.
-        $filter = $this->_filter;
-        $filter->name = $data['name'];
-        $filter->description = $data['description'];
-        $filter->visible = $data['visible'];
-        $filter->perpage = $data['perpage'];
-        $filter->selection = $data['selection'];
-        $filter->groupby = $data['groupby'];
-        $filter->search = $data['search'];
-        // $filter->customsort = serialize($this->process_custom_sort($data)); TODO VP: Where should these methods be lcocated?
-        // $filter->customsearch = serialize($this->process_custom_search($data));
-        $filter->timemodified = time();
-
-        // $filter->save(); TODO VP: Method not found
-
-        return $filter; */
+        return $this->_df->notifications;
     }
 
     public function get_page_url_for_dynamic_submission(): moodle_url {
