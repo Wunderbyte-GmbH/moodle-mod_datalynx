@@ -1017,7 +1017,7 @@ abstract class datalynxfield_option extends datalynxfield_base {
      */
     public function parse_search($formdata, $i) {
         $fieldname = "f_{$i}_{$this->field->id}";
-        return optional_param_array($fieldname, false, PARAM_NOTAGS);
+        return is_array($formdata->$fieldname) ? $formdata->$fieldname : false;
     }
 
     /**
