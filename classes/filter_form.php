@@ -102,7 +102,7 @@ abstract class mod_datalynx_filter_base_form extends dynamic_form {
         $this->_filter = $fm->get_filter_from_id($filter_id);
 
         if ($this->_ajaxformdata["update"] && confirm_sesskey()) { // Add/update a new filter.
-            $procesedfilters = $fm->process_filters_ajax('update', $filter_id, $this, true);
+            $procesedfilters = $fm->process_filters_for_ajax_submission('update', $filter_id, $this, true);
             $this->_filter = $procesedfilters[0];
         }
 
@@ -349,7 +349,6 @@ class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
     /*
      *
      */
-    //public function definition_after_data() {
     public function definition_after_data() {
 
         $datalynx_id = $this->_ajaxformdata["d"];
@@ -364,17 +363,11 @@ class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
         $fm = $this->_df->get_filter_manager();
         $this->_filter = $fm->get_filter_from_id($filter_id);
 
-        // VP: Taken over from filter/index.php. START
-
-        //print("FILTER1");
-        //print_r($this->_filter);
-
-        // DATA PROCESSING.
-        if ($this->_ajaxformdata["update"] && confirm_sesskey()) { // Add/update a new filter.
-            $procesedfilters = $fm->process_filters_ajax('update', $filter_id, $this, true);
+        // Update filter parameters based on the current form data (in order to dynamically render new form fields for filter details):
+        if ($this->_ajaxformdata["update"] && confirm_sesskey()) {
+            $procesedfilters = $fm->process_filters_for_ajax_refresh('update', $filter_id, $this, true);
             $this->_filter = $procesedfilters[0];
         }
-        // END
 
         $df = $this->_df;
         $filter = $this->_filter;
@@ -382,14 +375,8 @@ class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
         $description = empty($filter->description) ? '' : $filter->description;
         $visible = !isset($filter->visible) ? 1 : $filter->visible;
 
-        // VP: We won't need this null check, as the filter will only be instantiated from AJAX in the future (the old instantiation is superfluous).
-        if ($df !== null) {
-            $fields = $df->get_fields();
-            $fieldoptions = array(0 => get_string('choose')) + $df->get_fields(array('entry'), true);
-        } else {
-            $fields = [];
-            $fieldoptions = [];
-        }
+        $fields = $df->get_fields();
+        $fieldoptions = array(0 => get_string('choose')) + $df->get_fields(array('entry'), true);
 
         $mform = &$this->_form;
 
@@ -495,7 +482,9 @@ class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
             } else {
                 // If we do not return any error after a submission, the form will 
                 // be regarded as submitted and will render empty. 
-                // We need to return a dummy error to prevent this:
+                // We need to return a dummy error to prevent this.
+                // This also prevents process_dynamic_submission from being executed in this case, 
+                // as the form gets no validated flag:
                 $errors['dummy_error_for_refreshing'] = 'dummy_error_for_refreshing';
             }
         }
