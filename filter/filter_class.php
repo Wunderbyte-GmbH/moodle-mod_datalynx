@@ -756,7 +756,6 @@ class datalynx_filter_manager {
                     // $formdata["id"] = $formdata["fid"];
 
                     $filter = $this->get_filter_from_form($filter, $formdata);
-                    $filterform = $this->get_filter_form($filter);
 
                     // Return to form (on reload button press).
                     //print_r($formdata);
@@ -771,6 +770,10 @@ class datalynx_filter_manager {
                         // Process validated.
                     } else {
 
+                        // Temp: VP: This is a hack to get the form data from the form. We should not need this.
+                        $processedfids[] = $filter->id; // VP Added this line.
+                        $processedfilters[] = $filter; // VP Added this line.
+
                         //$valid = $filterform->is_validated();
                         //$formdata = $mform->get_data(); // This returns null because is_submitted() is false.
                         //var_dump($formdata);
@@ -780,18 +783,14 @@ class datalynx_filter_manager {
                         //if ($formdata = $filterform->get_data()) { // TODO VP: This should fail if there are validation errors
                         //if ($formdata = $mform->get_data()) {
 
-                        $formdata1 = $mform->get_ajax_form_data();
-                        $formdata2 = $mform->get_data(); // Something is missing from get_data that is contained in ajax_form_data. Some filters do not save correctly with this. New data entered is not there.
+                        //$formdata1 = $mform->get_ajax_form_data();
+                        //$formdata2 = $mform->get_data(); // Something is missing from get_data that is contained in ajax_form_data. Some filters do not save correctly with this. New data entered is not there.
 
                         // VP TODO: Problem: $mform is validated, but it does not contain the correct form definition! It is mising the dynamic parts. Can we somehow retrieve the correct form definition ($filterform) before validation runs?
                         // Need to check where QuickForm=>validate() is called and need to change the contents of the form by then (if we can). Or just perhaps see if definition_after_data is generating the correct fields...
                         // Hofix (if it needs to be fixed fast): just use ajax_form_data here, but only if the submitted data is valid (i.e. get_data is not null.) However: we are probably not validating the dynamically placed fields...
 
-                        if ($formdata2 != null) {
-                            $formdata2->_qf__mod_datalynx_filter_form = "1";
-                        }
-
-                        if ($formdata = $formdata2) {
+                        if ($formdata = $mform->get_data()) {
 
                             // Get clean filter from formdata.
                             $filter = $this->get_filter_from_form($filter, $formdata, true);
