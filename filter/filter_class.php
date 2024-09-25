@@ -827,7 +827,6 @@ class datalynx_filter_manager {
                 }
             }
 
-            // TODO VP: Display $strnotify as the JS toast notification after AJAX submission.
             if (!empty($strnotify)) {
                 $filtersprocessed = $processedfids ? count($processedfids) : 'No';
                 $df->notifications['good'][] = get_string($strnotify, 'datalynx',
@@ -837,7 +836,6 @@ class datalynx_filter_manager {
         }
     }
 
-    // TODO VP: Remove Update and Refresh from here (handled via AJAX)
     /**
      */
     public function process_filters($action, $fids, $confirmed = false) {
@@ -883,61 +881,6 @@ class datalynx_filter_manager {
             } else {
                 // Go ahead and perform the requested action.
                 switch ($action) {
-                    case 'update': // Add new or update existing.
-                        $filter = reset($filters);
-                        $mform = $this->get_filter_form($filter);
-
-                        if ($mform->is_cancelled()) {
-                            break;
-                        }
-
-                        // Regenerate form and filter to obtain custom search data.
-                        $formdata = $mform->get_submitted_data();
-                        $filter = $this->get_filter_from_form($filter, $formdata);
-                        $filterform = $this->get_filter_form($filter);
-
-                        // Return to form (on reload button press).
-                        if ($filterform->no_submit_button_pressed()) {
-                            $this->display_filter_form($filterform, $filter);
-
-                            // Process validated.
-                        } else {
-                            if ($formdata = $filterform->get_data()) {
-                                // Get clean filter from formdata.
-                                $filter = $this->get_filter_from_form($filter, $formdata, true);
-
-                                if ($filter->id) {
-                                    $DB->update_record('datalynx_filters', $filter);
-                                    $processedfids[] = $filter->id;
-                                    $strnotify = 'filtersupdated';
-
-                                    $other = array('dataid' => $this->_df->id());
-                                    $event = \mod_datalynx\event\field_updated::create(
-                                            array('context' => $this->_df->context,
-                                                    'objectid' => $filter->id, 'other' => $other));
-                                    $event->trigger();
-                                } else {
-                                    $filter->id = $DB->insert_record('datalynx_filters', $filter, true);
-                                    $processedfids[] = $filter->id;
-                                    $strnotify = 'filtersadded';
-
-                                    $other = array('dataid' => $this->_df->id());
-                                    $event = \mod_datalynx\event\field_created::create(
-                                            array('context' => $this->_df->context,
-                                                    'objectid' => $filter->id, 'other' => $other
-                                            ));
-                                    $event->trigger();
-                                }
-                                // Update cached filters.
-                                $this->_filters[$filter->id] = $filter;
-                            } else {
-                                // Form validation failed so return to form.
-                                $this->display_filter_form($filterform, $filter);
-                            }
-                        }
-
-                        break;
-
                     case 'duplicate':
                         if (!empty($filters)) {
                             foreach ($filters as $filter) {

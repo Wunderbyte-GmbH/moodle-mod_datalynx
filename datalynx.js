@@ -482,7 +482,16 @@ M.mod_datalynx.filter_form_init = function () {
         const dynamicForm = new DynamicForm(container, 'mod_datalynx_filter_form');
     
         dynamicForm.addEventListener(dynamicForm.events.FORM_SUBMITTED, e => {
-            Toast.add('Form saved successfully.');
+            e.detail.good.forEach(successMessage => {
+                Toast.add(successMessage, {
+                    type: 'success',
+                });
+            });
+            e.detail.bad.forEach(errorMessage => {
+                Toast.add(errorMessage, {
+                    type: 'danger',
+                });
+            });
             let searchParams = new URLSearchParams(window.location.search)
             dynamicForm.load({
                 d: searchParams.get("d"),
