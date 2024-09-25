@@ -847,15 +847,6 @@ abstract class datalynxfield_no_content extends datalynxfield_base {
     protected function filearea($suffix = null) {
         return false;
     }
-
-    // TODO: Git PR to move this to the base class.
-    public function get_argument_count(string $operator) {
-        if ($operator === "") { // "Empty" operator
-            return 0;
-        } else {
-            return 1;
-        }
-    }
 }
 
 /**
@@ -1025,14 +1016,6 @@ abstract class datalynxfield_option extends datalynxfield_base {
      */
     public static function is_customfilterfield() {
         return true;
-    }
-
-    public function get_argument_count(string $operator) {
-        if ($operator === "") { // "Empty" operator
-            return 0;
-        } else {
-            return 1;
-        }
     }
 }
 

@@ -13,7 +13,6 @@
 // You should have received a copy of the GNU General Public License
 // Along with Moodle. If not, see <http:// Www.gnu.org/licenses/>.
 
-
 /**
  * @package mod_datalynx
  * @copyright 2013 onwards David Bogner, Michael Pollak, Ivan Sakic and others.
