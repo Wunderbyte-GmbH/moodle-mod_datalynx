@@ -1,109 +1,117 @@
-define(["jquery"], function($) {
+export default {
+    init(fieldgroupname, defaultlines, maxlines, requiredlines, fieldgroup) {
+        // Increment defaultlines to match the logic in original code
+        defaultlines++;
 
-    return {
-
-        init: function(fieldgroupname, defaultlines, maxlines, requiredlines, fieldgroup) {
-
-            // We hide lines after the last line we show by default.
-            defaultlines++;
-
-            // Loop from defaultlines to maxlines.
-            for (var line = defaultlines; line <= maxlines; line++) {
-                $("div[data-field-name='" + fieldgroupname + "'] [data-line='" + line + "']").hide(); // Hide the whole line.
-            }
-
-            // Add button functionality.
-            $("div.datalynx-field-wrapper #id_addline").click(function (e) {
-                e.preventDefault(); // Don't follow hrefs.
-                $(this).closest(".datalynx-field-wrapper").find("[data-line]:hidden:first").show();
-
-                // Add one to lastvisible.
-                if ($('input[name='+fieldgroup+'_lastvisible]').val() < maxlines) {
-                    $('input[name='+fieldgroup+'_lastvisible]').get(0).value++;
-                }
+        // Loop from defaultlines to maxlines to hide lines
+        for (let line = defaultlines; line <= maxlines; line++) {
+            document.querySelectorAll(`div[data-field-name='${fieldgroupname}'] [data-line='${line}']`).forEach(element => {
+                element.style.display = 'none'; // Hide the line
             });
-
-            // Remove this one line.
-            $("div[data-field-name='" + fieldgroupname + "'] [data-removeline]").each(function () {
-                    $(this).off( "click" );
-                    $(this).click(function(e) {
-                        e.preventDefault(); // Don't follow hrefs.
-                        var thisline = $(this).closest('.lines');
-                        var lineid = thisline.data("line");
-                        var parentcontainer = thisline.closest('.datalynx-field-wrapper');
-                        var lastvisibleline = parentcontainer.find('.lines:visible').last();
-                        var lastvisiblelineid = lastvisibleline.data('line');
-                        // Remove all files from associated file manager.
-                        thisline.find('.fp-file').each(function () {
-                            $(this).click();
-                            $(".fp-file-delete:visible").trigger('click');
-                            $(".fp-dlg-butconfirm:visible").trigger('click');
-                        });
-                        // Remove data from input fields.
-                        $(this).closest('.lines').find('input').each(function () {
-                            // Do not affect hidden inputs.
-                            if ($(this).attr('type') != 'hidden') {
-                                $(this).val('');
-                            }
-                        });
-                        // Remove atto editor content.
-                        $(this).closest('.lines').find('.editor_atto_content').each(function () {
-                            $(this).html('');
-                        });
-                        // Remove textarea content.
-                        $(this).closest('.lines').find('textarea').each(function () {
-                            $(this).val('');
-                        });
-                        // Remove single select content.
-                        $(this).closest('.lines').find('select').each(function () {
-                            $(this).find('option[value=""]').prop('selected', true);
-                        });
-                        // Deactivate the time/date field and remove team members.
-                        $(this).closest('.lines').find('[id$=enabled]:checked,' +
-                            ' .form-autocomplete-selection .tag').each(function () {
-                            $(this).trigger('click');
-                        });
-
-                        // Subtract one from lastvisible.
-                        $('input[name='+fieldgroup+'_lastvisible]').get(0).value--;
-
-                        // Hide the empty lines if not required or the only line remaining.
-                        // TODO: Changed this to >= so people can remove the first line as well.
-                        if(lineid > requiredlines && lineid >= 1) {
-                            thisline.hide();
-                            // Alter DOM: Reorder lines and make content ordered properly.
-                            // Strategy: The deleted line should be moved under the last
-                            // visible line. All visible lines from thisline up to lastvisibline get moved one line up.
-                            // Lines not visible should not be changed.
-                            // thisline will be first not visible line and gets id of lastvisibleline.
-                            // TODO: Also move the content if the lines in the right place.
-                            if (lineid != maxlines) {
-                                parentcontainer.find('[data-line]').each(function () {
-                                    if($(this).data('line') > lineid && $(this).data('line') <= lastvisiblelineid) {
-                                        // Line numbers minus one.
-                                        var newid = $(this).data('line') - 1;
-                                        $(this).attr('data-line', newid);
-                                    }
-                                    if($(this).data('line') == lineid) {
-                                    // New line number for removed line.
-                                    $(this).attr('data-line', lastvisiblelineid);
-                                    }
-                                });
-                            }
-                            var newcontentorder = [];
-                            parentcontainer.find('[data-line]').each(function () {
-                                newcontentorder[$(this).data('line')] = $(this);
-                            });
-                            parentcontainer.remove('.lines');
-                            for (var i = newcontentorder.length; i >= 0; i--){
-                                parentcontainer.prepend(newcontentorder[i]);
-                            }
-                        }
-
-                    });
-            });
-
         }
 
-    };
-});
+        // Add button functionality to show hidden lines
+        document.querySelectorAll("div.datalynx-field-wrapper #id_addline").forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault(); // Prevent default button behavior
+                const wrapper = button.closest(".datalynx-field-wrapper");
+                const firstHiddenLine = wrapper.querySelector("[data-line]:not([style*='display: none'])");
+                if (firstHiddenLine) {
+                    firstHiddenLine.style.display = ''; // Show the first hidden line
+                }
+
+                // Increment lastvisible if less than maxlines
+                const lastVisibleInput = document.querySelector(`input[name='${fieldgroup}_lastvisible']`);
+                if (parseInt(lastVisibleInput.value, 10) < maxlines) {
+                    lastVisibleInput.value = parseInt(lastVisibleInput.value, 10) + 1;
+                }
+            });
+        });
+
+        // Remove line functionality
+        document.querySelectorAll(`div[data-field-name='${fieldgroupname}'] [data-removeline]`).forEach(removeButton => {
+            removeButton.removeEventListener('click', this.handleRemoveLine); // Remove any existing event listeners
+            removeButton.addEventListener('click', this.handleRemoveLine
+                .bind(this, removeButton, fieldgroupname, maxlines, requiredlines, fieldgroup)); // Attach new event listener
+        });
+    },
+
+    handleRemoveLine(removeButton, fieldgroupname, maxlines, requiredlines, fieldgroup, e) {
+        e.preventDefault(); // Prevent default link behavior
+
+        const thisLine = removeButton.closest('.lines');
+        const lineId = parseInt(thisLine.dataset.line, 10);
+        const parentContainer = thisLine.closest('.datalynx-field-wrapper');
+        const lastVisibleLine = Array.from(parentContainer
+            .querySelectorAll('.lines')).reverse().find(line => line.style.display !== 'none');
+        const lastVisibleLineId = parseInt(lastVisibleLine.dataset.line, 10);
+
+        // Remove all associated files
+        thisLine.querySelectorAll('.fp-file').forEach(file => {
+            file.click();
+            document.querySelector(".fp-file-delete:visible")?.click();
+            document.querySelector(".fp-dlg-butconfirm:visible")?.click();
+        });
+
+        // Clear input fields (except hidden)
+        thisLine.querySelectorAll('input').forEach(input => {
+            if (input.type !== 'hidden') {
+                input.value = '';
+            }
+        });
+
+        // Clear editor content
+        thisLine.querySelectorAll('.editor_atto_content').forEach(editor => {
+            editor.innerHTML = '';
+        });
+
+        // Clear textareas
+        thisLine.querySelectorAll('textarea').forEach(textarea => {
+            textarea.value = '';
+        });
+
+        // Clear select elements
+        thisLine.querySelectorAll('select').forEach(select => {
+            select.querySelector('option[value=""]').selected = true;
+        });
+
+        // Deactivate time/date and remove tags
+        thisLine.querySelectorAll('[id$=enabled]:checked, .form-autocomplete-selection .tag').forEach(element => {
+            element.click();
+        });
+
+        // Update last visible line
+        const lastVisibleInput = document.querySelector(`input[name='${fieldgroup}_lastvisible']`);
+        lastVisibleInput.value = parseInt(lastVisibleInput.value, 10) - 1;
+
+        // Hide the line if not required
+        if (lineId > requiredlines && lineId >= 1) {
+            thisLine.style.display = 'none';
+
+            // Reorder lines
+            if (lineId !== maxlines) {
+                parentContainer.querySelectorAll('[data-line]').forEach(line => {
+                    const currentLineId = parseInt(line.dataset.line, 10);
+                    if (currentLineId > lineId && currentLineId <= lastVisibleLineId) {
+                        line.dataset.line = currentLineId - 1;
+                    } else if (currentLineId === lineId) {
+                        line.dataset.line = lastVisibleLineId;
+                    }
+                });
+            }
+
+            // Rebuild content order
+            const newContentOrder = [];
+            parentContainer.querySelectorAll('[data-line]').forEach(line => {
+                newContentOrder[line.dataset.line] = line;
+            });
+
+            parentContainer.innerHTML = ''; // Clear parent container
+            newContentOrder.reverse().forEach(line => {
+                if (line) {
+                    parentContainer.appendChild(line);
+                }
+            });
+        }
+    }
+};
