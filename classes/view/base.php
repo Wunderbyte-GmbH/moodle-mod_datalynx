@@ -32,6 +32,7 @@ use datalynxview_entries_form;
 use datalynxview_patterns;
 use HTML_QuickForm;
 use html_writer;
+use calc_formula;
 use mod_datalynx\datalynx;
 use moodle_exception;
 use moodle_url;
