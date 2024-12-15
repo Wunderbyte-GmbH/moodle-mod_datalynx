@@ -145,9 +145,6 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
      */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
-
-        $errors = array();
-
         if (!empty($data['param1']) && empty($data['param2'])) {
             $errors['param2'] = get_string('missingview', 'datalynxfield_datalynxview');
         }
