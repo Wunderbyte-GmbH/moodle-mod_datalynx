@@ -34,7 +34,7 @@ class datalynxview_report_form extends datalynxview_base_form {
      */
     public function view_definition_after_gps(): void {
         $mform = &$this->_form;
-
+        $options =  [];
         $mform->addElement('header', 'settingshdr', get_string('settings'));
 
         // Report count for this field (only select supported right now: A sum of the values choson for this field is being created.
@@ -48,7 +48,7 @@ class datalynxview_report_form extends datalynxview_base_form {
         }
         if (!empty($fieldnames)) {
             asort($fieldnames);
-            $options = array('multiple' => false);
+            $options = ['multiple' => false];
             $mform->addElement('autocomplete', 'param1', get_string('fieldtobecounted', 'datalynxview_report'),
                     $fieldnames, $options);
             $mform->addHelpButton('param1', 'fieldtobecounted', 'datalynxview_report');

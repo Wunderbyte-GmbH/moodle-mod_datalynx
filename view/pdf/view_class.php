@@ -135,8 +135,7 @@ class datalynxview_pdf extends base {
     /**
      * process any view specific actions
      */
-    public function process_data() {
-
+    public function process_data(): void {
         // Process pdf export request.
         if (optional_param('pdfexportall', 0, PARAM_INT)) {
             $this->process_export(self::EXPORT_ALL);
@@ -151,7 +150,7 @@ class datalynxview_pdf extends base {
         }
 
         // Do standard view processing.
-        return parent::process_data();
+        parent::process_data();
     }
 
     /**
@@ -453,7 +452,7 @@ class datalynxview_pdf extends base {
         // Fields.
         foreach ($fields as $field) {
 
-            if ($field->field->id > 0) {
+            if (is_numeric($field->field->id) && $field->field->id > 0) {
                 $name = new html_table_cell($field->name() . ':');
                 $name->style = 'text-align:right;';
                 if ($field->type == "userinfo") {
@@ -478,6 +477,9 @@ class datalynxview_pdf extends base {
     }
 
     /**
+     * @param $entriesset
+     * @param $name string
+     * @return array
      */
     protected function apply_entry_group_layout($entriesset, $name = '') {
         global $OUTPUT;

@@ -85,11 +85,20 @@ abstract class base {
 
     protected array $_tags = [];
 
-    protected string|moodle_url $_baseurl = '';
+    protected moodle_url $_baseurl;
 
     protected array $_notifications = ['good' => [], 'bad' => []];
 
-    protected int|string $_editentries = '';
+    /**
+     * Empty array: Not editing entries.
+     * One element: Editing one entry
+     * More elements with positive numbers: Editing entries with these ids.
+     * One element  with -1: New entry
+     * Not sure: One element with -3: Three new entries?
+     * TODO: Array of strings should be converted to array of int.
+     * @var array
+     */
+    protected array $_editentries = [];
 
     protected array $_display_definition = [];
 
@@ -531,17 +540,20 @@ abstract class base {
      *
      * @return mixed <boolean, number, unknown, multitype:>
      */
-    public function process_data() {
+    public function process_data(): void {
 
         // Process entries data.
         $processed = $this->process_entries_data();
         if (is_array($processed)) {
+            if ($processed[0] === -1) {
+                return;
+            }
             list($strnotify, $processedeids) = $processed;
         } else {
-            list($strnotify, $processedeids) = array('', '');
+            list($strnotify, $processedeids) = ['', ''];
         }
 
-        if ($processedeids) {
+        if (!empty($processedeids)) {
             $this->_notifications['good']['entries'] = $strnotify;
         } else {
             if ($strnotify) {
@@ -549,18 +561,20 @@ abstract class base {
             }
         }
 
-        // With one entry per page show the saved entry.
-        if ($processedeids && $this->_editentries && !$this->_returntoentriesform) {
+        // TODO: Revise this. Does not seem to make much sense. Old description: With one entry per page show the saved entry.
+        if ($processedeids && !empty($this->_editentries) && !$this->_returntoentriesform) {
             if ($this->_filter->perpage == 1) {
-                $this->_filter->eids = $this->_editentries;
+                $this->_filter->eids = implode(',', $this->_editentries);
             }
-            $this->_editentries = 0;
+            $this->_editentries = [];
         }
-        return $processed;
     }
 
     /**
      * Retrieve the content for the fields which is saved in the table datalynx_contents
+     *
+     * @param array $options
+     * @return void
      */
     public function set_content(array $options = array()) {
         // Options: added for datalynxview_field calling external view.
@@ -568,7 +582,7 @@ abstract class base {
         if ($this->_returntoentriesform) {
             return;
         }
-        if ($this->_editentries >= 0 || $this->view->perpage != 1) {
+        if (!empty($this->_editentries) && $this->_editentries[0] >= 0 || $this->view->perpage != 1) {
             $this->_entries->set_content($options);
         }
     }
@@ -579,16 +593,15 @@ abstract class base {
      * @param array $options (tohtml = true means output is returned instead of echoed)
      * @return string (empty string of tohtml = false, html when tohtml is true)
      */
-    public function display(array $options = array()): string {
+    public function display(array $options = []): string {
         global $OUTPUT;
-
         // Set display options.
         $new = optional_param('new', 0, PARAM_INT);
-        $displaycontrols = isset($options['controls']) ? $options['controls'] : true;
-        $showentryactions = isset($options['entryactions']) ? $options['entryactions'] : true;
-        $notify = isset($options['notify']) ? $options['notify'] : true;
-        $tohtml = isset($options['tohtml']) ? $options['tohtml'] : false;
-        $pluginfileurl = isset($options['pluginfileurl']) ? $options['pluginfileurl'] : null;
+        $displaycontrols = $options['controls'] ?? true;
+        $showentryactions = $options['entryactions'] ?? true;
+        $notify = $options['notify'] ?? true;
+        $tohtml = $options['tohtml'] ?? false;
+        $pluginfileurl = $options['pluginfileurl'] ?? null;
 
         // Build entries display definition.
         $requiresmanageentries = $this->set__display_definition($options);
@@ -597,7 +610,7 @@ abstract class base {
         $viewoptions = array('pluginfileurl' => $pluginfileurl,
                 'entriescount' => $this->_entries->get_count(),
                 'entriesfiltercount' => $this->_entries->get_count(true),
-                'hidenewentry' => $this->user_is_editing() ? 1 : 0,
+                'hidenewentry' => !empty($this->_editentries) ? 1 : 0,
                 'showentryactions' => $requiresmanageentries && $showentryactions);
 
         $this->set_view_tags($viewoptions);
@@ -617,9 +630,8 @@ abstract class base {
                 $output = str_replace('##entries##', $this->display_no_entries(), $output);
             }
         } else {
-            $redirectid = $this->_redirect ? $this->_redirect : $this->id();
-            $url = new moodle_url($this->_baseurl, array('view' => $redirectid));
-            $output = $notifications . $OUTPUT->continue_button($url);
+            $entriesform = $this->get_entries_form();
+            $output = $notifications . $entriesform->html();
         }
 
         $viewname = 'datalynxview-' . preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $this->name()));
@@ -631,7 +643,6 @@ abstract class base {
         } else {
             echo $output;
         }
-
         return '';
     }
 
@@ -644,10 +655,10 @@ abstract class base {
         global $OUTPUT;
         $notifications = '';
         foreach ($this->_notifications['good'] as $notification) {
-            $notifications = $OUTPUT->notification($notification, 'notifysuccess');
+            $notifications .= $OUTPUT->notification($notification, 'notifysuccess');
         }
         foreach ($this->_notifications['bad'] as $notification) {
-            $notifications = $OUTPUT->notification($notification);
+            $notifications .= $OUTPUT->notification($notification);
         }
         return $notifications;
     }
@@ -1143,20 +1154,21 @@ abstract class base {
      * @return string
      */
     public function display_entries(array $options = null): string {
-        global $DB, $OUTPUT;
+        global $DB, $OUTPUT, $CFG;
 
-        if (!$this->user_is_editing()) {
+        if (empty($this->_editentries)) {
             $html = $this->definition_to_html();
             if (isset($options['pluginfileurl'])) {
                 $html = $this->replace_pluginfile_urls($html, $options['pluginfileurl']);
             }
         } else {
             $editallowed = false;
+            // TODO: is this compatible for editing multiple entries? Check if this has to be changed. Check if isset is necessary.
             if ($editallowed = $this->get_dl()->user_can_manage_entry()) {
-                if (count(explode(",", $this->_editentries)) == 1) {
+                if (isset($this->_editentries[0]) && count($this->_editentries) == 1) {
                     $entrystatus = $DB->get_field('datalynx_entries', 'status',
-                            array('id' => $this->_editentries));
-                    require_once('field/_status/field_class.php');
+                            array('id' => $this->_editentries[0]));
+                    require_once($CFG->dirroot . '/mod/datalynx/field/_status/field_class.php');
                     if (!has_capability('mod/datalynx:manageentries', $this->_df->context) &&
                              $entrystatus == datalynxfield__status::STATUS_FINAL_SUBMISSION) {
                         $editallowed = false;
@@ -1216,10 +1228,11 @@ abstract class base {
     }
 
     /**
+     * Get view specific form for data input via Moodle form.
      *
      * @return datalynxview_entries_form
      */
-    protected function get_entries_form() {
+    protected function get_entries_form(): ?datalynxview_entries_form {
         static $entriesform = null;
 
         if ($entriesform == null) {
@@ -1227,11 +1240,11 @@ abstract class base {
             // Prepare params for for content management.
             $actionparams = array('d' => $this->_df->id(), 'view' => $this->id(),
                     'page' => $this->_filter->page, 'eids' => $this->_filter->eids,
-                    'update' => $this->_editentries,
+                    'update' => implode(',', $this->_editentries),
                     'sourceview' => optional_param('sourceview', null, PARAM_INT)
             );
             $actionurl = new moodle_url("/mod/datalynx/{$this->_df->pagefile()}.php", $actionparams);
-            $customdata = array('view' => $this, 'update' => $this->_editentries);
+            $customdata = array('view' => $this, 'update' => implode(',', $this->_editentries));
 
             $formclass = 'datalynxview_entries_form';
             require_once("$CFG->dirroot/mod/datalynx/view/view_entries_form.php");
@@ -1316,7 +1329,7 @@ abstract class base {
      * Set display definition
      *
      * @param array|null $options
-     * @return booly
+     * @return bool
      * @throws coding_exception
      */
     protected function set__display_definition(array $options = null) {
@@ -1325,19 +1338,17 @@ abstract class base {
         // In which case edit/delete action.
         $requiresmanageentries = false;
 
-        $editentries = null;
+        $editentries = [];
         // Display a new entry to add in its own group.
-        if ($this->_editentries < 0 && $this->_editentries != "") {
+        if (count($this->_editentries) == 1 && $this->_editentries[0] < 0) {
             if ($this->_df->user_can_manage_entry()) {
                 $this->_display_definition['newentry'] = array();
-                for ($i = -1; $i >= $this->_editentries; $i--) {
+                for ($i = -1; $i >= $this->_editentries[0]; $i--) {
                     $this->_display_definition['newentry'][$i] = null;
                 }
             }
         } else {
-            if ($this->_editentries) {
-                $editentries = explode(',', $this->_editentries);
-            }
+            $editentries = $this->_editentries;
         }
 
         // Compile entries if any.
@@ -1487,8 +1498,9 @@ abstract class base {
     }
 
     /**
+     * @return moodle_url
      */
-    public function get_baseurl() {
+    public function get_baseurl(): moodle_url {
         return $this->_baseurl;
     }
 
@@ -1517,7 +1529,7 @@ abstract class base {
 
     /**
      */
-    public function user_is_editing() {
+    public function user_is_editing(): array {
         return $this->_editentries;
     }
 
@@ -1531,6 +1543,24 @@ abstract class base {
 
         // Check first if returning from form.
         $update = optional_param('update', '', PARAM_RAW);
+        // Direct url params; not from form.
+        $new = optional_param('new', 0, PARAM_INT); // Open new entry form.
+        // Edit entries(all) or by record ids (comma delimited eids).
+        $editentries = optional_param('editentries', 0, PARAM_SEQUENCE);
+        $editentries = explode(',', $editentries);
+        // Duplicate entries (all) or by record ids (comma delimited eids).
+        $duplicate = optional_param('duplicate', '', PARAM_SEQUENCE);
+        // Delete entries (all) or by record Ids (comma delimited eids).
+        $delete = optional_param('delete', '', PARAM_SEQUENCE);
+        // Approve entries (all) or by record ids (comma delimited eids).
+        $approve = optional_param('approve', '', PARAM_SEQUENCE);
+        // Disapprove entries (all)or by record ids (comma delimited eids).
+        $disapprove = optional_param('disapprove', '', PARAM_SEQUENCE);
+        // Set status of entries (all) or by record ids (comma delimited eids).
+        $status = optional_param('status', '', PARAM_SEQUENCE);
+        // Confirm submission of data.
+        $confirmed = optional_param('confirmed', 0, PARAM_BOOL);
+
         if ($update) {
             $action = ($update != self::ADD_NEW_ENTRY) ? "edit" : "addnewentry";
             if (confirm_sesskey() && $this->confirm_view_action($action)) {
@@ -1541,7 +1571,7 @@ abstract class base {
                 }
 
                 // Set the display definition for the form.
-                $this->_editentries = $update;
+                $this->_editentries = explode(',', $update);
                 $this->set__display_definition();
 
                 $entriesform = $this->get_entries_form();
@@ -1552,39 +1582,27 @@ abstract class base {
                         // Validated successfully so process request.
                         $processed = $this->_entries->process_entries('update', $update, $data,
                                 true);
+
                         if (!$processed) {
                             $this->_returntoentriesform = true;
                             return false;
                         }
-
-                        if (!empty($data->submitreturnbutton)) {
-                            // If we have just added new entries refresh the content.
-                            // This is far from ideal because this new entries may be.
-                            // Spread out in the form when we return to edit them.
-                            if ($this->_editentries < 0) {
-                                $this->_entries->set_content();
-                            }
-
-                            // So that return after adding new entry will return the added entry.
-                            $this->_editentries = is_array($processed[1]) ? implode(',',
-                                    $processed[1]) : $processed[1];
-                            $this->_returntoentriesform = true;
-                            return true;
+                        // So that we can show the new entries if we so wish.
+                        if (isset($this->_editentries[0]) && $this->_editentries[0] < 0) {
+                            $this->_editentries = is_array($processed[1]) ? $processed[1] : [$processed[1]];
                         } else {
-                            // So that we can show the new entries if we so wish.
-                            if ($this->_editentries < 0) {
-                                $this->_editentries = is_array($processed[1]) ? implode(',',
-                                        $processed[1]) : $processed[1];
-                            } else {
-                                $this->_editentries = 0;
-                            }
-                            $this->_returntoentriesform = true;
-                            return $processed;
+                            $this->_editentries = [];
                         }
+                        // TODO: Replace with more standard way to tell datalynx there is no new entry anymore to edit.
+                        $_POST['new'] = 0;
+                        $this->_entries->set_content();
+                        return $processed;
                     } else {
                         // Form validation failed so return to form.
                         $this->_returntoentriesform = true;
-                        return false;
+                        $formdata = (array) $entriesform->get_submitted_data();
+                        $errors = $entriesform->validation($formdata, []);
+                        return array(implode('<br>', $errors), []);
                     }
                 } else {
                     $redirectid = $this->_redirect ? $this->_redirect : $this->id();
@@ -1597,23 +1615,7 @@ abstract class base {
             }
         }
 
-        // Direct url params; not from form.
-        $new = optional_param('new', 0, PARAM_INT); // Open new entry form.
-        // Edit entries(all) or by record ids (comma delimited eids).
-        $editentries = optional_param('editentries', 0, PARAM_SEQUENCE);
-        // Duplicate entries (all) or by record ids (comma delimited eids).
-        $duplicate = optional_param('duplicate', '', PARAM_SEQUENCE);
-        // Delete entries (all) or by record Ids (comma delimited eids).
-        $delete = optional_param('delete', '', PARAM_SEQUENCE);
-        // Approve entries (all) or by record ids (comma delimited eids).
-        $approve = optional_param('approve', '', PARAM_SEQUENCE);
-        // Disapprove entries (all)or by record ids (comma delimited eids).
-        $disapprove = optional_param('disapprove', '', PARAM_SEQUENCE);
-        // Set status of entries (all) or by record ids (comma delimited eids).
-        $status = optional_param('status', '', PARAM_SEQUENCE);
-
-        $confirmed = optional_param('confirmed', 0, PARAM_BOOL);
-
+        // TODO: Check if this is the right place to assign the var.
         $this->_editentries = $editentries;
 
         if ($new) {
@@ -1621,7 +1623,7 @@ abstract class base {
                     ($this->confirm_view_action("addnewentry") ||
                             $this->confirm_view_action("addnewentries"))
             ) {
-                return $this->_editentries = -$new;
+                return $this->_editentries = [-$new];
             } else {
                 $illegalaction = true;
             }
