@@ -30,8 +30,8 @@ Feature: Create entry, add multiselect and use customfilter
       | multiselect      | Select (multiple)   |             | Opt1,Opt2,Opt3,Opt4,Opt5   |        |        |
 
     And I add to "Datalynx Test Instance" datalynx the view of "Grid" type with:
-      | name        | description |
-      | Gridview    | Testgrid    |
+      | name | Gridview |
+      | description | Testgrid |
     And I follow "Set as default view"
     And I follow "Set as edit view"
 

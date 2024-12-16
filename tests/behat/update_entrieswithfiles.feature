@@ -40,8 +40,8 @@ Feature: In a datalynx instance create, update, and delete entries
       | number           | Number             | 3           | 2                          |          |        |
       | file             | File               | My file     |                            | 2        |        |
     And I add to "Datalynx Test Instance" datalynx the view of "Tabular" type with:
-      | name    | description  |
-      | Tabular | Tabular view |
+      | name    | Tabular |
+      | description | Tabular view |
     And I follow "Set as default view"
     And I follow "Set as edit view"
     And I am on "Course 1" course homepage
