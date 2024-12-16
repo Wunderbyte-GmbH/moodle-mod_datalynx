@@ -112,7 +112,7 @@ class datalynxview_csv extends base {
     /**
      * process any view specific actions
      */
-    public function process_data() {
+    public function process_data(): void {
         global $CFG;
 
         // Proces csv export request.
@@ -233,15 +233,14 @@ class datalynxview_csv extends base {
     /**
      * Overridden to show import form without entries
      * @param array $options
-     * @return string|void
-     * @throws moodle_exception
+     * @return string
      */
     public function display(array $options = []): string {
         if ($this->_showimportform) {
 
             $mform = $this->get_import_form();
 
-            $tohtml = isset($params['tohtml']) ? $params['tohtml'] : false;
+            $tohtml = $params['tohtml'] ?? false;
             // Print view.
             $viewname = 'datalynxview-' . preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $this->name()));
             if ($tohtml) {

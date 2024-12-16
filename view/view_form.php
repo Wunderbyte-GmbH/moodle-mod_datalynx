@@ -357,13 +357,13 @@ class datalynxview_base_form extends moodleform {
             foreach ($fields['Fields']['Fields'] as $field) {
 
                 // Error when we find more than one instance of this tag.
-                if (substr_count($entryview, $field) > 1) {
+                if (is_array($field)) {
 
                     // Make sure multiple errors are shown.
                     if (!array_key_exists('eparam2_editor', $errors)) {
-                        $errors['eparam2_editor'] = get_string('viewrepeatedfields', 'datalynx', substr($field, 2, -2));
+                        $errors['eparam2_editor'] = get_string('viewrepeatedfields', 'datalynx', substr($field[0], 2, -2));
                     } else {
-                        $errors['eparam2_editor'] .= "<br>" . get_string('viewrepeatedfields', 'datalynx', substr($field, 2, -2));
+                        $errors['eparam2_editor'] .= "<br>" . get_string('viewrepeatedfields', 'datalynx', substr($field[0], 2, -2));
                     }
 
                 }

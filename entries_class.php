@@ -508,28 +508,25 @@ class datalynx_entries {
      * Process entries when after editing content for saving into db
      *
      * @param string $action
-     * @param string||array $eids
+     * @param string $eids
      * @param null $data
      * @param bool $confirmed
      * @return array notificationstrings, list of processed ids
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws moodle_exception
      */
     public function process_entries(string $action, $eids, $data = null, bool $confirmed = false): array {
         global $DB, $USER, $OUTPUT, $PAGE;
         $dl = $this->datalynx;
         $errorstring = '';
 
-        $entries = array();
+        $entries = [];
         // Some entries may be specified for action.
         if ($eids) {
-            $importentryids = array();
+            $importentryids = [];
             // Adding or updating entries.
             if ($action == 'update') {
                 if (!is_array($eids)) {
                     // Adding new entries.
-                    if ($eids < 0) {
+                    if ((int)$eids < 0) {
                         $eids = array_reverse(range($eids, -1));
                         // Editing existing entries.
                     } else {
@@ -746,7 +743,6 @@ class datalynx_entries {
                             }
                             $contents = $newcontents;
 
-                            global $DB;
                             // Now update entry and contents TODO: TEAM_CHANGED - check this!
                             $addorupdate = '';
                             foreach ($entries as $eid => $entry) {

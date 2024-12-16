@@ -36,7 +36,7 @@ Feature: Create entry and add fieldgroups
 #      | select           | Select              |             | Option X,Option Y,Option Z |          |        |
       | teammemberselect | Team member select  | 3           | 20                         | 1,2,4,8  |        |
     And I add to "Datalynx Test Instance" datalynx the view of "Grid" type with:
-      | name        | Gridview |
+      | name | Gridview |
       | description | Testgrid |
     And I follow "Set as default view"
     And I follow "Set as edit view"

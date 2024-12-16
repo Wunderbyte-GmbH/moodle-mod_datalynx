@@ -74,8 +74,10 @@ class datalynxview_report_patterns extends datalynxview_patterns {
     }
 
     /**
+     * @param $checkvisibility
+     * @return array
      */
-    protected function patterns($checkvisibility = true) {
+    protected function patterns($checkvisibility = true): array {
         $patterns = parent::patterns($checkvisibility);
         $cat = get_string('pluginname', 'datalynxview_report');
         $patterns['##export:all##'] = array(true, $cat);

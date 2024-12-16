@@ -87,14 +87,6 @@ class datalynxview_report extends base {
     }
 
     /**
-     * Process any view specific data.
-     * @return array|bool|mixed
-     */
-    public function process_data() {
-        return parent::process_data();
-    }
-
-    /**
      * @param $fielddefinitions
      * @return array
      */

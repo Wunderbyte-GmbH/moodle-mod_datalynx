@@ -348,7 +348,7 @@ class datalynxview_patterns {
                 case '##advancedfilter##':
                     return $this->print_advanced_filter($filter, true);
             }
-            if (strpos($tag, '##customfilter') !== false && !$view->user_is_editing()) {
+            if (strpos($tag, '##customfilter') !== false && empty($view->user_is_editing())) {
                 return $this->print_custom_filter($tag, true);
             }
         }
@@ -653,7 +653,7 @@ class datalynxview_patterns {
      * @param boolean $checkvisibility if true only views visible to user are considered
      * @return array of tags/patterns
      */
-    protected function patterns($checkvisibility = true) {
+    protected function patterns($checkvisibility = true): array {
         $patterns = array_merge($this->info_patterns(), $this->ref_patterns($checkvisibility),
                 $this->userpref_patterns(), $this->action_patterns(), $this->paging_patterns(),
                 $this->bulkedit_patterns());
@@ -899,7 +899,7 @@ class datalynxview_patterns {
         $view = $this->_view;
 
         // If in edit view filters should never be displayed.
-        if ($view->user_is_editing()) {
+        if (!empty($view->user_is_editing())) {
             return '';
         }
 

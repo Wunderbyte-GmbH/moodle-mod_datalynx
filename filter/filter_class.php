@@ -82,7 +82,9 @@ class datalynx_filter {
         }
         $this->contentfields = empty($filterdata->contentfields) ? null : $filterdata->contentfields;
 
+        // TODO: Make eids string only and then do ? '' instead of null value.
         $this->eids = empty($filterdata->eids) ? null : $filterdata->eids;
+
         $this->users = empty($filterdata->users) ? null : $filterdata->users;
         $this->groups = empty($filterdata->groups) ? null : $filterdata->groups;
         $this->page = empty($filterdata->page) ? 0 : $filterdata->page;

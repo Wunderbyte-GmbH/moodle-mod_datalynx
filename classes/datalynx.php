@@ -768,15 +768,13 @@ class datalynx {
      *
      * @throws \coding_exception
      */
-    public function display() {
+    public function display(): void {
         global $PAGE;
         if (!empty($this->_currentview)) {
-
             $event = event\course_module_viewed::create(
                     array('objectid' => $PAGE->cm->instance, 'context' => $PAGE->context));
             $event->add_record_snapshot('course', $PAGE->course);
             $event->trigger();
-
             $this->_currentview->display();
         }
     }
@@ -787,11 +785,11 @@ class datalynx {
      *
      * @param int $datalynxid The id of the datalynx whose content should be displayed.
      * @param int $viewid The id of the datalynx's view whose content should be displayed.
-     * @param int $eids The id of the datalynx entrie that should be displayed.
+     * @param ?int $eids The id of the datalynx entrie that should be displayed.
      * @param array $options bool skiplogincheck, bool tohtml, string pagelayout.
      * @return string
      */
-    public static function get_content_inline(int $datalynxid, int $viewid = 0, ?int $eids = null, array $options = array('tohtml' => true)) {
+    public static function get_content_inline(int $datalynxid, int $viewid = 0, ?int $eids = null, array $options = ['tohtml' => true]) {
         global $CFG;
         require_once($CFG->dirroot . '/mod/datalynx/classes/view/base.php');
         $urlparams = new stdClass();
@@ -843,7 +841,7 @@ class datalynx {
      *
      * @return array
      */
-    public function get_internal_fields() {
+    public function get_internal_fields(): array {
         global $CFG;
 
         if (!$this->internalfields) {
@@ -869,7 +867,7 @@ class datalynx {
      * Return the names of the internal fields
      * @return array
      */
-    public function get_internal_fields_names() {
+    public function get_internal_fields_names(): array {
         global $CFG;
 
         $fieldplugins = get_list_of_plugins('mod/datalynx/field/');

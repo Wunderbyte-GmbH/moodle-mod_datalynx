@@ -70,7 +70,7 @@ class datalynxview_pdf_patterns extends datalynxview_patterns {
 
     /**
      */
-    protected function patterns($checkvisibility = true) {
+    protected function patterns($checkvisibility = true): array {
         $patterns = parent::patterns($checkvisibility);
         $cat = get_string('pluginname', 'datalynxview_pdf');
         $patterns['##export:all##'] = array(true, $cat);
