@@ -18,8 +18,6 @@
  *
  * @package datalynxfield
  * @subpackage entryteammemberprofilefield
- * @copyright 2013 onwards edulabs.org and associated programmers
- * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
@@ -47,24 +45,27 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
     }
 
     /**
+     * @param $dataid
+     * @param $fields
+     * @return array
      */
     public static function get_field_objects($dataid, $fields = array()) {
-        $fieldobjects = array();
+        $fieldobjects = [];
 
-        $team_member_select_fields = array_filter($fields, function($field) {
+        $teammemberselectfields = array_filter($fields, function($field) {
             return $field instanceof datalynxfield_teammemberselect;
         });
 
-        $user_profile_fields = array('institution', 'department');
+        $userprofilefields = array('institution', 'department');
 
-        foreach ($team_member_select_fields as $field) {
-            $field_name = $field->field->name;
-            foreach ($user_profile_fields as $profile_field) {
-                $field_id = 'entryteammemberprofilefield_' . $field->field->id . "_$profile_field";
-                $fieldobjects[$field_id] = (object) array('id' => $field_id,
+        foreach ($teammemberselectfields as $field) {
+            $fieldname = $field->field->name;
+            foreach ($userprofilefields as $profilefield) {
+                $fieldid = 'entryteammemberprofilefield_' . $field->field->id . "_$profilefield";
+                $fieldobjects[$fieldid] = (object) array('id' => $fieldid,
                     'dataid' => $dataid, 'type' => 'entryteammemberprofilefield',
-                    'name' => $field_name . ' ' . get_string($profile_field), 'description' => '',
-                    'visible' => 2, 'internalname' => $field_id);
+                    'name' => $fieldname . ' ' . get_string($profilefield), 'description' => '',
+                    'visible' => 2, 'internalname' => $fieldid);
             }
         }
 
@@ -72,29 +73,41 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
     }
 
     /**
+     * @param string $column
+     * @return string
      */
-    protected function get_sql_compare_text($column = 'content') {
+    protected function get_sql_compare_text(string $column = 'content'): string {
         global $DB;
         // The sort sql here returns the field's sql name.
         return $DB->sql_compare_text($this->get_sort_sql());
     }
 
-    public function get_search_from_sql() {
-        $field_id_components = $this->get_field_id_components();
-        $queried_field_id = $field_id_components["queried_field_id"];
+    /**
+     * Return JOIN SQL string or empty string for search.
+     *
+     * @return string
+     */
+    public function get_search_from_sql(): string {
+        $fieldidcomponents = $this->get_field_id_components();
+        $queriedfieldid = $fieldidcomponents["queriedfieldid"];
 
-        if (is_numeric($queried_field_id) && $queried_field_id > 0) {
-            return " LEFT JOIN {datalynx_contents} c$queried_field_id ON c$queried_field_id.entryid = e.id AND c$queried_field_id.fieldid = $queried_field_id ";
+        if (is_numeric($queriedfieldid) && $queriedfieldid > 0) {
+            return " LEFT JOIN {datalynx_contents} c$queriedfieldid ON c$queriedfieldid.entryid = e.id AND c$queriedfieldid.fieldid = $queriedfieldid ";
         } else {
             return "";
         }
     }
 
-    private function get_field_id_components() {
+    /**
+     * Get field id and name as an array.
+     *
+     * @return array
+     */
+    private function get_field_id_components(): array {
         $components = explode("_", $this->field->id);
         return array(
-            'queried_field_id' => $components[1],
-            'profile_field_name' => $components[2]
+            'queriedfieldid' => $components[1],
+            'profilefieldname' => $components[2]
         );
     }
 
@@ -110,64 +123,86 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
      */
     public function get_search_sql(array $search): array {
         global $DB;
-        global $USER;
 
         list($not, $operator, $value) = $search;
     
-        $field_id_components = $this->get_field_id_components();
-        $queried_field_id = $field_id_components["queried_field_id"];
-        $profile_field_name = $field_id_components["profile_field_name"];
+        $fieldidcomponents = $this->get_field_id_components();
+        $queriedfieldid = $fieldidcomponents["queriedfieldid"];
+        $profilefieldname = $fieldidcomponents["profilefieldname"];
 
-        $field_id = $this->field->id;
-        $param_prefix = "profile_";
+        $paramprefix = "eid_";
 
-        $users_with_profile_field_value = $this->get_users_with_profile_field_value($profile_field_name, $operator, $value, $not);
+        $userswithprofilefieldvalue = $this->get_users_with_profile_field_value($profilefieldname, $operator, $value, $not);
 
-        if (empty($users_with_profile_field_value)) {
+        if (empty($userswithprofilefieldvalue)) {
             $sql = self::SQL_NEVERTRUE;
-            $params = array();
-            $usecontent = false;
+            $params = [];
         } else {
-            $user_ids = array_map(function($user) {return $user->id;}, $users_with_profile_field_value);
-            $user_ids_json = array_map(function($id) {return $this->wrap_as_json_string_array($id);}, $user_ids);
+            $userids = array_keys($userswithprofilefieldvalue);
+            $useridsasstring = array_map('strval', $userids);
+            // Get entryids for the users that have the selected field value:
+            $conditions = [];
+            $params = [
+                    'dataid' => $this->df->id(),
+                    'fieldid' => $queriedfieldid
+            ];
 
-            [$insql, $inparams] = $DB->get_in_or_equal($user_ids_json, $type = SQL_PARAMS_NAMED, $param_prefix);
-            
-            $sql = "c{$queried_field_id}.content $insql";
+            foreach ($userids as $key => $userid) {
+                // Use placeholders for user IDs to prevent SQL injection
+                $conditions[] = $DB->sql_like('dc.content', ':userid' . $key, false, false, false);
+                // Add user ID to the parameters array
+                $params['userid' . $key] = '%"' . $userid . '"%';
+            }
+
+            $like = implode(' OR ', $conditions);
+
+            $eidsql = "
+                SELECT dc.entryid 
+                FROM {datalynx_contents} dc
+                JOIN {datalynx_fields} df ON dc.fieldid = df.id
+                WHERE df.dataid = :dataid 
+                  AND dc.fieldid = :fieldid 
+                  AND ($like)
+            ";
+
+            $eids = $DB->get_fieldset_sql($eidsql, $params);
+            if (empty($eids)) {
+                return array(self::SQL_NEVERTRUE, [], false);
+            }
+            [$insql, $inparams] = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED, $paramprefix);
+            $sql = "e.id $insql";
             $params = $inparams;
-            $usecontent = true;
         }
-
+        $usecontent = false;
         return array($sql, $params, $usecontent);
     }
 
-    private function get_users_with_profile_field_value($profile_field_name, $operator, $value, $not) {
-        global $DB;
-        global $USER;
+    private function wrap_ids($value) {
+        return "\"$value\"";
+    }
+
+    private function get_users_with_profile_field_value($profilefieldname, $operator, $value, $not) {
+        global $DB, $USER;
 
         $sql = $not ? 
                 "SELECT u.id
                 FROM {user} u
-                WHERE u.$profile_field_name != ?" 
+                WHERE u.$profilefieldname != ?"
                 : "SELECT u.id
                 FROM {user} u
-                WHERE u.$profile_field_name = ?";
+                WHERE u.$profilefieldname = ?";
 
-        $search_value = ($operator == self::OPERATOR_MY_PROFILE_FIELD) ? $USER->$profile_field_name : $value;
+        $searchvalue = ($operator == self::OPERATOR_MY_PROFILE_FIELD) ? $USER->$profilefieldname : $value;
 
-        return $DB->get_records_sql($sql, array($search_value)); 
-    }
-
-    private function wrap_as_json_string_array($value) {
-        return "[\"$value\"]";
+        return $DB->get_records_sql($sql, array($searchvalue));
     }
 
     public function parse_search($formdata, $i) {
         global $USER;
-        $field_id = $this->field->id;
+        $fieldid = $this->field->id;
         $internalname = $this->field->internalname;
         $operator = !empty($formdata->{"searchoperator{$i}"}) ? $formdata->{"searchoperator{$i}"} : '';
-        $fieldvalue = !empty($formdata->{"f_{$i}_$field_id"}) ? $formdata->{"f_{$i}_$field_id"} : false;
+        $fieldvalue = !empty($formdata->{"f_{$i}_$fieldid"}) ? $formdata->{"f_{$i}_$fieldid"} : false;
         if ($operator == self::OPERATOR_MY_PROFILE_FIELD) {
             return ""; 
         } else {
@@ -184,7 +219,6 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
      */
     public function get_distinct_content($sortdir = 0) {
         global $DB;
-
         $sortdir = $sortdir ? 'DESC' : 'ASC';
         $contentfull = $this->get_sort_sql();
         $sql = "SELECT DISTINCT $contentfull
@@ -193,7 +227,7 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
                  WHERE e.dataid = ? AND  $contentfull IS NOT NULL
                  ORDER BY $contentfull $sortdir";
 
-        $distinctvalues = array();
+        $distinctvalues = [];
         if ($options = $DB->get_records_sql($sql, array($this->df->id()))) {
             if ($this->field->internalname == 'name') {
                 $internalname = 'id';

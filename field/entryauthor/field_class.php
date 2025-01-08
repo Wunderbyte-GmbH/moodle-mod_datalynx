@@ -127,7 +127,7 @@ class datalynxfield_entryauthor extends datalynxfield_no_content {
 
     /**
      */
-    protected function get_sql_compare_text($column = 'content') {
+    protected function get_sql_compare_text(string $column = 'content'): string {
         global $DB;
         // The sort sql here returns the field's sql name.
         return $DB->sql_compare_text($this->get_sort_sql());

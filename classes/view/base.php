@@ -183,7 +183,11 @@ abstract class base {
         }
 
         $this->_baseurl = new moodle_url("/mod/datalynx/{$this->_df->pagefile()}.php", $baseurlparams);
-
+        $this->set_filter($filteroptions, $this->is_forcing_filter()); // If filter is forced ignore URL parameters.
+        if ($this->_filter->page) {
+            $this->_baseurl->param('page', $this->_filter->page);
+        }
+        $this->_baseurl->param('filter', $this->_filter->id);
         $this->set_groupby_per_page();
 
         require_once("$CFG->dirroot/mod/datalynx/entries_class.php");
@@ -610,7 +614,7 @@ abstract class base {
         $viewoptions = array('pluginfileurl' => $pluginfileurl,
                 'entriescount' => $this->_entries->get_count(),
                 'entriesfiltercount' => $this->_entries->get_count(true),
-                'hidenewentry' => !empty($this->_editentries) ? 1 : 0,
+                'hidenewentry' => (!empty($this->_editentries) || $new) ? 1 : 0,
                 'showentryactions' => $requiresmanageentries && $showentryactions);
 
         $this->set_view_tags($viewoptions);
@@ -624,7 +628,10 @@ abstract class base {
                 $output = '##entries##';
             }
             $entryhtml = $this->display_entries($options);
-            if ($entryhtml && ($this->_entries->get_count() || $new)) {
+            if ($new || !empty($this->_editentries)) {
+                $entriesform = $this->get_entries_form();
+                $output = $notifications . $entriesform->html();
+            } else if ($entryhtml && ($this->_entries->get_count())) {
                 $output = str_replace('##entries##', $entryhtml, $output);
             } else {
                 $output = str_replace('##entries##', $this->display_no_entries(), $output);
@@ -1546,8 +1553,10 @@ abstract class base {
         // Direct url params; not from form.
         $new = optional_param('new', 0, PARAM_INT); // Open new entry form.
         // Edit entries(all) or by record ids (comma delimited eids).
-        $editentries = optional_param('editentries', 0, PARAM_SEQUENCE);
-        $editentries = explode(',', $editentries);
+        $editentries = optional_param('editentries', [], PARAM_SEQUENCE);
+        if (!is_array($editentries)) {
+            $editentries = explode(',', $editentries);
+        }
         // Duplicate entries (all) or by record ids (comma delimited eids).
         $duplicate = optional_param('duplicate', '', PARAM_SEQUENCE);
         // Delete entries (all) or by record Ids (comma delimited eids).

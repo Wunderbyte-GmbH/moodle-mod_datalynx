@@ -270,7 +270,7 @@ class datalynxfield_time extends datalynxfield_base {
      * {@inheritDoc}
      * @see datalynxfield_base::get_sql_compare_text()
      */
-    public function get_sql_compare_text($column = 'content') {
+    public function get_sql_compare_text(string $column = 'content'): string {
         global $DB;
         return $DB->sql_cast_char2int("c{$this->field->id}.$column", true);
     }

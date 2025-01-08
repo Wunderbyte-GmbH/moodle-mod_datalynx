@@ -124,10 +124,11 @@ class datalynxfield__time extends datalynxfield_no_content {
     }
 
     /**
+     * @param string $column
+     * @return string
      */
-    protected function get_sql_compare_text($column = 'content') {
+    protected function get_sql_compare_text(string $column = 'content'): string {
         global $DB;
-
         return $DB->sql_compare_text("e.{$this->field->internalname}");
     }
 

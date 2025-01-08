@@ -76,7 +76,11 @@ class datalynxfield_duration extends datalynxfield_base {
         return array($seconds, 1);
     }
 
-    protected function get_sql_compare_text($column = 'content') {
+    /**
+     * @param string $column
+     * @return string
+     */
+    protected function get_sql_compare_text(string $column = 'content'): string {
         global $DB;
         return $DB->sql_cast_char2int("c{$this->field->id}.$column", true);
     }

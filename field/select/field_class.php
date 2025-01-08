@@ -41,7 +41,7 @@ class datalynxfield_select extends datalynxfield_option_single {
      * {@inheritDoc}
      * @see datalynxfield_base::get_sql_compare_text()
      */
-    protected function get_sql_compare_text($column = 'content') {
+    protected function get_sql_compare_text(string $column = 'content'): string {
         global $DB;
         return $DB->sql_compare_text("c{$this->field->id}.$column", 255);
     }

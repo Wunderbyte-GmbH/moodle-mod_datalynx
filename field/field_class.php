@@ -701,7 +701,6 @@ abstract class datalynxfield_base {
      */
     protected function get_entry_ids_for_content(string $sql, array $params): array {
         global $DB;
-
         $sql = " fieldid = :fieldid AND $sql ";
         $params['fieldid'] = $this->id();
         return $DB->get_records_select_menu('datalynx_contents', $sql, $params, '', 'id,entryid');
@@ -732,10 +731,11 @@ abstract class datalynxfield_base {
     }
 
     /**
+     * @param string $column
+     * @return string
      */
-    protected function get_sql_compare_text($column = 'content') {
+    protected function get_sql_compare_text(string $column = 'content'): string {
         global $DB;
-
         return $DB->sql_compare_text("c{$this->field->id}.$column");
     }
 
@@ -744,7 +744,7 @@ abstract class datalynxfield_base {
      *
      * @return bool
      */
-    public function is_joined() {
+    public function use_join() {
         return false;
     }
 
