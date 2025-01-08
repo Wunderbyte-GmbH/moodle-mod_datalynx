@@ -78,10 +78,11 @@ class datalynxfield_gradeitem extends datalynxfield_base {
     }
 
     /**
+     * @param string $column
+     * @return string
      */
-    protected function get_sql_compare_text($column = 'content') {
+    protected function get_sql_compare_text(string $column = 'content'): string {
         global $DB;
-
         return $DB->sql_compare_text("c{$this->field->id}.finalgrade");
     }
 

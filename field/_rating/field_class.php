@@ -56,7 +56,7 @@ class datalynxfield__rating extends datalynxfield_no_content {
         return true;
     }
 
-    public function is_joined() {
+    public function use_join() {
         return true;
     }
 
@@ -97,7 +97,11 @@ class datalynxfield__rating extends datalynxfield_no_content {
                 er.ratingid, er.ratinguserid, er.scaleid, er.usersrating ';
     }
 
-    protected function get_sql_compare_text($column = 'content') {
+    /**
+     * @param string $column
+     * @return string
+     */
+    protected function get_sql_compare_text(string $column = 'content'): string {
         return $this->get_sort_sql();
     }
 

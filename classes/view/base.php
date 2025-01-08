@@ -157,18 +157,13 @@ abstract class base {
         // Set editors and patterns.
         $this->set__editors();
         $this->set__patterns();
-        $this->set_filter($filteroptions, $this->is_forcing_filter()); // If filter is forced ignore URL parameters.
 
         // Base url params.
         $baseurlparams = array();
         $baseurlparams['d'] = $this->_df->id();
         $baseurlparams['view'] = $this->id();
-        $baseurlparams['filter'] = $this->_filter->id;
         if (!empty($eids)) {
             $baseurlparams['eids'] = $eids;
-        }
-        if ($this->_filter->page) {
-            $baseurlparams['page'] = $this->_filter->page;
         }
         if ($this->_df->currentgroup) {
             $baseurlparams['currentgroup'] = $this->_df->currentgroup;
@@ -183,7 +178,11 @@ abstract class base {
         }
 
         $this->_baseurl = new moodle_url("/mod/datalynx/{$this->_df->pagefile()}.php", $baseurlparams);
-
+        $this->set_filter($filteroptions, $this->is_forcing_filter()); // If filter is forced ignore URL parameters.
+        if ($this->_filter->page) {
+            $this->_baseurl->param('page', $this->_filter->page);
+        }
+        $this->_baseurl->param('filter', $this->_filter->id);
         $this->set_groupby_per_page();
 
         require_once("$CFG->dirroot/mod/datalynx/entries_class.php");

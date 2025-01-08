@@ -200,8 +200,10 @@ class datalynxfield_coursegroup extends datalynxfield_base {
     }
 
     /**
+     * @param string $column
+     * @return string
      */
-    protected function get_sql_compare_text($column = 'content') {
+    protected function get_sql_compare_text(string $column = 'content'): string {
         global $DB;
 
         $comparetext = $this->_comparetext;

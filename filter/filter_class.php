@@ -159,8 +159,12 @@ class datalynx_filter {
     }
 
     /**
+     * Get field specific SQL for searching.
+     *
+     * @param array $fields
+     * @return array
      */
-    public function get_search_sql($fields) {
+    public function get_search_sql(array $fields): array {
         global $DB;
 
         $searchfrom = array();
@@ -204,9 +208,9 @@ class datalynx_filter {
                                 // Add searchfrom (JOIN) only for search in datalynx content or external.
                                 // tables or fields inherited from datalynxfield_no_content_can_join.
 
-                                $field_should_add_join = !$internalfield || $field instanceof datalynxfield_no_content_can_join;
+                                $fieldshouldaddjoin = !$internalfield || $field instanceof datalynxfield_no_content_can_join;
 
-                                if ($field_should_add_join && $fromcontent) {
+                                if ($fieldshouldaddjoin && $fromcontent) {
                                     $searchfrom[$fieldid] = $fieldid;
                                 }
                             }
@@ -230,9 +234,9 @@ class datalynx_filter {
                             // Add searchfrom (JOIN) only for search in datalynx content or external.
                             // tables or fields inherited from datalynxfield_no_content_can_join.
 
-                            $field_should_add_join = !$internalfield || $field instanceof datalynxfield_no_content_can_join;
+                            $fieldshouldaddjoin = !$internalfield || $field instanceof datalynxfield_no_content_can_join;
 
-                            if ($field_should_add_join && $fromcontent) {
+                            if ($fieldshouldaddjoin && $fromcontent) {
                                 $searchfrom[$fieldid] = $fieldid;
                             }
                         }
@@ -516,8 +520,8 @@ class datalynx_filter {
      *
      * @return bool True if the field is registered, false otherwise
      */
-    public function register_join_field($field) {
-        if ($field->is_joined()) {
+    public function register_join_field($field): bool {
+        if ($field->use_join()) {
             if (!isset($this->_joins[$field->type])) {
                 $this->_joins[$field->type] = $field;
             }

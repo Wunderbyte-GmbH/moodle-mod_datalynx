@@ -21,5 +21,3 @@
 abstract class datalynxfield_no_content_can_join extends datalynxfield_no_content {
 
 }
-
-?>
