@@ -37,35 +37,32 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
         $fieldid = $field->id();
         $entryid = $entry->id;
 
-        // If we see a 0 in content there are no files stored. Create new draft area.
-        $content = $entry->{"c{$fieldid}_content"} ?? null;
-        if ($content == 0 || !isset($entry->{"c{$fieldid}_id"})) {
-            $contentid = null;
-        } else {
-            $contentid = $entry->{"c{$fieldid}_id"};
-        }
+        $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
 
         $fieldname = "field_{$fieldid}_{$entryid}";
-        $fmoptions = array('subdirs' => 0, 'maxbytes' => $field->get('param1'),
+        $fmoptions = [
+                'subdirs' => 0,
+                'maxbytes' => $field->get('param1'),
                 'maxfiles' => $field->get('param2'),
-                'accepted_types' => explode(',', $field->get('param3')));
+                'accepted_types' => explode(',', $field->get('param3')),
+        ];
 
-        // Redundant draft areas are cleaned by the cronjob eventually.
         $draftitemid = file_get_submitted_draft_itemid("{$fieldname}_filemanager");
 
         file_prepare_draft_area($draftitemid, $field->df()->context->id, 'mod_datalynx', 'content',
                 $contentid, $fmoptions);
 
-        // For behat testing: Much, much better to use the official step there than a bunch of very volatile js/css lines.
         $label = $field->df->name() == "Datalynx Test Instance" ? "File" : "";
-        // File manager.
+
+        // Add file manager element
         $mform->addElement('filemanager', "{$fieldname}_filemanager", $label, null, $fmoptions);
         $mform->setDefault("{$fieldname}_filemanager", $draftitemid);
-        $required = !empty($options['required']);
-        if ($required) {
+
+        if (!empty($options['required'])) {
             $mform->addRule("{$fieldname}_filemanager", null, 'required', null, 'client');
         }
     }
+
 
     /**
      * Render the field of type file.

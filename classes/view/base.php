@@ -107,6 +107,13 @@ abstract class base {
     protected int $_redirect = 0;
 
     /**
+     * Stores info if entries just have been processed. In order to have a different behavior after submitting data than
+     * when just displaying the view.
+     * @var bool
+     */
+    protected bool $entriesprocessedsuccessfully = false;
+
+    /**
      * Constructor
      * View or datalynx or both, each can be id or object
      */
@@ -540,9 +547,9 @@ abstract class base {
     }
 
     /**
-     * process any view specific actions
+     * Process submitted data.
      *
-     * @return mixed <boolean, number, unknown, multitype:>
+     * @return void
      */
     public function process_data(): void {
 
@@ -552,21 +559,22 @@ abstract class base {
             if ($processed[0] === -1) {
                 return;
             }
-            list($strnotify, $processedeids) = $processed;
+            list($strnotify, $successfullyprocessedeids) = $processed;
         } else {
-            list($strnotify, $processedeids) = ['', ''];
+            list($strnotify, $successfullyprocessedeids) = ['', []];
         }
 
-        if (!empty($processedeids)) {
+        if (!empty($successfullyprocessedeids)) {
+            $this->entriesprocessedsuccessfully = true;
             $this->_notifications['good']['entries'] = $strnotify;
         } else {
-            if ($strnotify) {
+            if (!empty($strnotify)) {
                 $this->_notifications['bad']['entries'] = $strnotify;
             }
         }
 
         // TODO: Revise this. Does not seem to make much sense. Old description: With one entry per page show the saved entry.
-        if ($processedeids && !empty($this->_editentries) && !$this->_returntoentriesform) {
+        if ($successfullyprocessedeids && !empty($this->_editentries) && !$this->_returntoentriesform) {
             if ($this->_filter->perpage == 1) {
                 $this->_filter->eids = implode(',', $this->_editentries);
             }
@@ -632,7 +640,14 @@ abstract class base {
                 $entriesform = $this->get_entries_form();
                 $output = $notifications . $entriesform->html();
             } else if ($entryhtml && ($this->_entries->get_count())) {
-                $output = str_replace('##entries##', $entryhtml, $output);
+                // Etnries have been updated or added.
+                if ($this->entriesprocessedsuccessfully) {
+                    $redirectid = $this->_redirect ? $this->_redirect : $this->id();
+                    $url = new moodle_url($this->_baseurl, array('view' => $redirectid));
+                    $output = $notifications . $OUTPUT->continue_button($url);
+                } else {
+                    $output = str_replace('##entries##', $entryhtml, $output);
+                }
             } else {
                 $output = str_replace('##entries##', $this->display_no_entries(), $output);
             }
