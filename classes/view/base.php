@@ -635,17 +635,17 @@ abstract class base {
             } else {
                 $output = '##entries##';
             }
-            $entryhtml = $this->display_entries($options);
             if ($new || !empty($this->_editentries)) {
                 $entriesform = $this->get_entries_form();
                 $output = $notifications . $entriesform->html();
-            } else if ($entryhtml && ($this->_entries->get_count())) {
-                // Etnries have been updated or added.
+            } else if ($this->_entries->get_count()) {
+                // Entries have been updated or added.
                 if ($this->entriesprocessedsuccessfully) {
                     $redirectid = $this->_redirect ? $this->_redirect : $this->id();
                     $url = new moodle_url($this->_baseurl, array('view' => $redirectid));
                     $output = $notifications . $OUTPUT->continue_button($url);
                 } else {
+                    $entryhtml = $this->display_entries($options);
                     $output = str_replace('##entries##', $entryhtml, $output);
                 }
             } else {
@@ -1629,7 +1629,7 @@ abstract class base {
                         return array(implode('<br>', $errors), []);
                     }
                 } else {
-                    $redirectid = $this->_redirect ? $this->_redirect : $this->id();
+                    $redirectid = $this->_redirect ?: $this->id();
                     $url = new moodle_url($this->_baseurl, array('view' => $redirectid
                     ));
                     redirect($url);
