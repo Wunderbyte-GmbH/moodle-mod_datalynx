@@ -111,7 +111,7 @@ abstract class base {
      * when just displaying the view.
      * @var bool
      */
-    protected bool $entriesprocessedsuccessfully = false;
+    public bool $entriesprocessedsuccessfully = false;
 
     /**
      * Constructor
@@ -164,19 +164,15 @@ abstract class base {
         // Set editors and patterns.
         $this->set__editors();
         $this->set__patterns();
-        $this->set_filter($filteroptions, $this->is_forcing_filter()); // If filter is forced ignore URL parameters.
 
         // Base url params.
         $baseurlparams = array();
         $baseurlparams['d'] = $this->_df->id();
         $baseurlparams['view'] = $this->id();
-        $baseurlparams['filter'] = $this->_filter->id;
         if (!empty($eids)) {
             $baseurlparams['eids'] = $eids;
         }
-        if ($this->_filter->page) {
-            $baseurlparams['page'] = $this->_filter->page;
-        }
+
         if ($this->_df->currentgroup) {
             $baseurlparams['currentgroup'] = $this->_df->currentgroup;
         }
@@ -191,10 +187,10 @@ abstract class base {
 
         $this->_baseurl = new moodle_url("/mod/datalynx/{$this->_df->pagefile()}.php", $baseurlparams);
         $this->set_filter($filteroptions, $this->is_forcing_filter()); // If filter is forced ignore URL parameters.
+        $this->_baseurl->param('filter', $this->_filter->id);
         if ($this->_filter->page) {
             $this->_baseurl->param('page', $this->_filter->page);
         }
-        $this->_baseurl->param('filter', $this->_filter->id);
         $this->set_groupby_per_page();
 
         require_once("$CFG->dirroot/mod/datalynx/entries_class.php");
@@ -641,7 +637,7 @@ abstract class base {
             } else if ($this->_entries->get_count()) {
                 // Entries have been updated or added.
                 if ($this->entriesprocessedsuccessfully) {
-                    $redirectid = $this->_redirect ? $this->_redirect : $this->id();
+                    $redirectid = $this->_redirect ?: $this->id();
                     $url = new moodle_url($this->_baseurl, array('view' => $redirectid));
                     $output = $notifications . $OUTPUT->continue_button($url);
                 } else {
@@ -1594,8 +1590,8 @@ abstract class base {
                     $this->_entries->set_content();
                 }
 
-                // Set the display definition for the form.
-                $this->_editentries = explode(',', $update);
+                // Set the display definition for the form. Cast $update to string because PHP has a problem exploding -1 integer.
+                $this->_editentries = explode(',', (string) $update);
                 $this->set__display_definition();
 
                 $entriesform = $this->get_entries_form();

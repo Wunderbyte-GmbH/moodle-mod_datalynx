@@ -348,6 +348,10 @@ class datalynxview_patterns {
                 case '##advancedfilter##':
                     return $this->print_advanced_filter($filter, true);
             }
+            // When we just updated an entry, only a continue button is shown, so do not display the form.
+            if ($this->_view->entriesprocessedsuccessfully) {
+                return '';
+            }
             if (strpos($tag, '##customfilter') !== false && empty($view->user_is_editing())) {
                 return $this->print_custom_filter($tag, true);
             }

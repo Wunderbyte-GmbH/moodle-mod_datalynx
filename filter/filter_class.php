@@ -21,6 +21,9 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+use mod_datalynx\view\base;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -1367,7 +1370,7 @@ class datalynx_filter_manager {
 
     /**
      */
-    public function get_customfilter_frontend_form($filter, $view, $customfilter = false) {
+    public function get_customfilter_frontend_form($filter, base $view, $customfilter = false) {
         global $CFG;
 
         require_once("$CFG->dirroot/mod/datalynx/filter/filter_form.php");
@@ -1396,7 +1399,7 @@ class datalynx_filter_manager {
 
     /**
      */
-    public function set_user_filter($filterid, $view, $advanced = false, $customfilter = false) {
+    public function set_user_filter($filterid, base $view, $advanced = false, $customfilter = false) {
         $df = $this->_df;
         $dfid = $df->id();
         $viewid = $view->id();

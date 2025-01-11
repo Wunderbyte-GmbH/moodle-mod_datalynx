@@ -220,7 +220,8 @@ if (!empty($views)) {
         $viewdescription = shorten_text($view->view->description, 30);
         $viewedit = html_writer::link(
                 new moodle_url($editbaseurl, $linkparams + array('vedit' => $viewid)),
-                $OUTPUT->pix_icon('t/edit', $stredit));
+                $OUTPUT->pix_icon('t/edit', $stredit . " " . $view->name()),
+                array('title' => $stredit . " " . $view->name()));
         $viewduplicate = html_writer::link(
                 new moodle_url($actionbaseurl, $linkparams + array('duplicate' => $viewid)),
                 $OUTPUT->pix_icon('t/copy', $strduplicate));

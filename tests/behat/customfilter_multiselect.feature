@@ -45,8 +45,7 @@ Feature: Create entry, add multiselect and use customfilter
 
     # Make customfilter visible in view.
     When I follow "Views"
-    And I click on "//table/tbody/tr[1]/td[9]/a" "xpath_element"
-    Then I should see "Gridview"
+    And I click on "Edit Gridview" "link"
     And I click on "View template" "link"
     Then I add to "id_esection_editor" editor the text ". ##addnewentry## ##customfilter:mycustomfilter## ##entries## ."
     And I press "Save changes"
@@ -61,6 +60,7 @@ Feature: Create entry, add multiselect and use customfilter
     And I click on "Opt4" item in the autocomplete list
     And I click on "Opt5" item in the autocomplete list
     And I press "Save changes"
+    And I wait until the page is ready
     And I should see "1 entry(s) updated"
     Then I press "Continue"
 
@@ -68,6 +68,7 @@ Feature: Create entry, add multiselect and use customfilter
     And I fill in the entry form fields
       | type             | name               | value                |
       | text             | Text               | testtext2            |
+    And I open the autocomplete suggestions list
     And I click on "Opt2" item in the autocomplete list
     And I press "Save changes"
     And I press "Continue"
@@ -76,6 +77,7 @@ Feature: Create entry, add multiselect and use customfilter
     And I fill in the entry form fields
       | type             | name               | value                |
       | text             | Text               | testtext3            |
+    And I open the autocomplete suggestions list
     And I click on "Opt3" item in the autocomplete list
     And I press "Save changes"
     And I press "Continue"
@@ -84,6 +86,7 @@ Feature: Create entry, add multiselect and use customfilter
     And I fill in the entry form fields
       | type             | name               | value                |
       | text             | Text               | testtext4            |
+    And I open the autocomplete suggestions list
     And I click on "Opt4" item in the autocomplete list
     And I press "Save changes"
     And I press "Continue"
@@ -98,16 +101,18 @@ Feature: Create entry, add multiselect and use customfilter
     Then "Opt2" "autocomplete_suggestions" should exist
     And I click on "Opt2" item in the autocomplete list
     And I close the autocomplete suggestions list
-    And I click on "//input[@value = 'Search']" "xpath_element"
+    And I press the escape key
+    And I press "id_customsearch"
     And I should see "Opt2"
     And I should not see "Opt3"
     And I should not see "Opt5"
 
     # Use customfilter to select Opt1 OR Opt2.
+    When I follow "Search"
     And I open the autocomplete suggestions list
     And I click on "Opt1" item in the autocomplete list
     And I close the autocomplete suggestions list
-    And I click on "//input[@value = 'Search']" "xpath_element"
+    And I press "id_customsearch"
     And I should see "Opt1"
     And I should see "Opt2"
     And I should see "Opt4"
@@ -120,7 +125,7 @@ Feature: Create entry, add multiselect and use customfilter
     And I click on "Opt5" item in the autocomplete list
     And I close the autocomplete suggestions list
     And I click on "All selected options have to be part of the entry" "checkbox"
-    And I click on "//input[@value = 'Search']" "xpath_element"
+    And I press "id_customsearch"
     And I should not see "Opt2"
     And I should not see "testtext2"
 
@@ -139,7 +144,7 @@ Feature: Create entry, add multiselect and use customfilter
     And I open the autocomplete suggestions list
     And I click on "Opt1" item in the autocomplete list
     And I close the autocomplete suggestions list
-    And I click on "//input[@value = 'Search']" "xpath_element"
+    And I press "id_customsearch"
     And I should see "Opt1"
     And I should see "testtext1"
     And I should see "Opt4"
