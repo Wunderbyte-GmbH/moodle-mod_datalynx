@@ -111,6 +111,7 @@ Feature: Create entry, add multiselect and use customfilter
     And I open the autocomplete suggestions list
     And I click on "Opt1" item in the autocomplete list
     And I close the autocomplete suggestions list
+    And I press the escape key
     And I press "id_customsearch"
     And I should see "Opt1"
     And I should see "Opt2"
@@ -123,6 +124,7 @@ Feature: Create entry, add multiselect and use customfilter
     And I open the autocomplete suggestions list
     And I click on "Opt5" item in the autocomplete list
     And I close the autocomplete suggestions list
+    And I press the escape key
     And I click on "All selected options have to be part of the entry" "checkbox"
     And I press "id_customsearch"
     And I should not see "Opt2"
@@ -143,6 +145,7 @@ Feature: Create entry, add multiselect and use customfilter
     And I open the autocomplete suggestions list
     And I click on "Opt1" item in the autocomplete list
     And I close the autocomplete suggestions list
+    And I press the escape key
     And I press "id_customsearch"
     And I should see "Opt1"
     And I should see "testtext1"
