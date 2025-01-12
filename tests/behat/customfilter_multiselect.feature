@@ -50,37 +50,30 @@ Feature: Create entry, add multiselect and use customfilter
     Then I add to "id_esection_editor" editor the text ". ##addnewentry## ##customfilter:mycustomfilter## ##entries## ."
     And I press "Save changes"
 
-    # Add me some fields.
+    # Add some entries.
     When I follow "Browse"
-    And I follow "Add a new entry"
-    And I fill in the entry form fields
-      | type             | name               | value                |
-      | text             | Text               | testtext1            |
-    And I open the autocomplete suggestions list
-    And I click on "Opt4" item in the autocomplete list
-    And I click on "Opt5" item in the autocomplete list
-    And I press "Save changes"
-    And I wait until the page is ready
-    And I should see "1 entry(s) updated"
-    Then I press "Continue"
-
     And I follow "Add a new entry"
     And I fill in the entry form fields
       | type             | name               | value                |
       | text             | Text               | testtext2            |
     And I open the autocomplete suggestions list
-    And I click on "Opt2" item in the autocomplete list
+    And I click on "Opt1" item in the autocomplete list
     And I press "Save changes"
     And I press "Continue"
+    And I should see "Opt1"
 
     And I follow "Add a new entry"
     And I fill in the entry form fields
       | type             | name               | value                |
       | text             | Text               | testtext3            |
     And I open the autocomplete suggestions list
+    And I click on "Opt2" item in the autocomplete list
     And I click on "Opt3" item in the autocomplete list
     And I press "Save changes"
     And I press "Continue"
+    And I should see "Opt1"
+    And I should see "Opt2"
+    And I should see "Opt3"
 
     And I follow "Add a new entry"
     And I fill in the entry form fields
@@ -91,12 +84,25 @@ Feature: Create entry, add multiselect and use customfilter
     And I press "Save changes"
     And I press "Continue"
     Then I should see "testtext3"
+    And I should see "Opt1"
+    And I should see "Opt2"
     And I should see "Opt3"
-    And I should not see "Opt6"
+    And I should see "Opt4"
+    And I should not see "Opt5"
+
+    And I follow "Add a new entry"
+    And I fill in the entry form fields
+      | type             | name               | value                |
+      | text             | Text               | testtext5            |
+    And I open the autocomplete suggestions list
+    And I click on "Opt1" item in the autocomplete list
+    And I click on "Opt5" item in the autocomplete list
+    And I press "Save changes"
+    And I press "Continue"
 
   @javascript
   Scenario: Use customfilter.
-    When I follow "Search" 
+    When I follow "Search"
     And I open the autocomplete suggestions list
     Then "Opt2" "autocomplete_suggestions" should exist
     And I click on "Opt2" item in the autocomplete list
@@ -104,7 +110,9 @@ Feature: Create entry, add multiselect and use customfilter
     And I press the escape key
     And I press "id_customsearch"
     And I should see "Opt2"
-    And I should not see "Opt3"
+    And I should see "Opt3"
+    And I should not see "Opt1"
+    And I should not see "Opt4"
     And I should not see "Opt5"
 
     # Use customfilter to select Opt1 OR Opt2.
@@ -115,9 +123,10 @@ Feature: Create entry, add multiselect and use customfilter
     And I press "id_customsearch"
     And I should see "Opt1"
     And I should see "Opt2"
-    And I should see "Opt4"
-    And I should see "Opt5"
-    And I should not see "Opt3"
+    And I should see "Opt3"
+    And I should see "testtext3"
+    And I should see "testtext2"
+    And I should not see "Opt4"
 
     # Use customfilter to select Opt1 AND Opt5 after deselecting Opt2.
     And I click on "//span[@data-value = '2']" "xpath_element"
@@ -127,28 +136,34 @@ Feature: Create entry, add multiselect and use customfilter
     And I press the escape key
     And I click on "All selected options have to be part of the entry" "checkbox"
     And I press "id_customsearch"
+    And I should see "Opt1"
+    And I should see "Opt5"
     And I should not see "Opt2"
     And I should not see "testtext2"
+    And I should not see "testtext3"
+    And I should not see "testtext4"
 
     # Reopen customfilter and add fulltextsearch.
-    When I follow "Manage"
+    When I follow "Reset filters"
+    Then I wait until the page is ready
+    Then I should see "testtext4"
+    And I click on "Manage" "link" in the "region-main" "region"
     And I follow "Custom Filters"
     And I click on "mycustomfilter" "link"
     # NOTE: name|label did not work.
     And I click on "//input[@id = 'id_fulltextsearch']" "xpath_element"
     And I press "Save changes"
 
-    # Look for Opt1 and testtext1.
+    # Look for Opt2 and testtext3.
     When I follow "Browse"
     And I follow "Search"
-    Then I add to "Search" editor the text "testtext1"
+    Then I add to "Search" editor the text "testtext3"
     And I open the autocomplete suggestions list
-    And I click on "Opt1" item in the autocomplete list
+    And I click on "Opt2" item in the autocomplete list
     And I close the autocomplete suggestions list
     And I press the escape key
     And I press "id_customsearch"
-    And I should see "Opt1"
-    And I should see "testtext1"
-    And I should see "Opt4"
-    And I should see "Opt5"
-    And I should not see "testtext2"
+    And I should see "Opt2"
+    And I should see "testtext3"
+    And I should see "Opt3"
+    And I should not see "testtext4"
