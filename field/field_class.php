@@ -949,15 +949,6 @@ abstract class datalynxfield_option extends datalynxfield_base {
             }
         }
 
-        // NOTE: We don't use this code ever, test till 30.04.2021 and remove after.
-        if ($this->field->type != "multiselect") {
-            $dummyentry = "0";
-            while (array_search($dummyentry, $newvalues) !== false) {
-                $dummyentry .= "0";
-            }
-            $newvalues = array_merge(array(0 => $dummyentry), $newvalues);
-        }
-
         $map = array(0 => 0);
         for ($i = 1; $i <= count($oldvalues); $i++) {
             $j = array_search($oldvalues[$i], $newvalues);
@@ -985,7 +976,6 @@ abstract class datalynxfield_option extends datalynxfield_base {
             $this->update_options($map);
         }
 
-        unset($newvalues[0]);
         $this->field->param1 = implode("\n", $newvalues);
         for ($i = 2; $i <= 10; $i++) {
             $param = "param$i";

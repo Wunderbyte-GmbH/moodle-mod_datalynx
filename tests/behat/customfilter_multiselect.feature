@@ -108,7 +108,6 @@ Feature: Create entry, add multiselect and use customfilter
     And I should not see "Opt5"
 
     # Use customfilter to select Opt1 OR Opt2.
-    When I follow "Search"
     And I open the autocomplete suggestions list
     And I click on "Opt1" item in the autocomplete list
     And I close the autocomplete suggestions list

@@ -610,7 +610,7 @@ class datalynx_filter_manager {
             $view = !empty($options['view']) ? $options['view'] : null;
             $viewid = $view ? $view->id() : 0;
             $advanced = !empty($options['advanced']);
-            $customfilter = $options['customfilter'];
+            $customfilter = !empty($options['customfilter']) ? $options['customfilter'] : null;
 
             // User preferences.
             if (($filterid == self::USER_FILTER_SET || $advanced || $customfilter) && $view && $view->is_active()) {
