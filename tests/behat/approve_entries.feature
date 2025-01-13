@@ -52,7 +52,7 @@ Feature: Filter approved and not approved entries from multiple students
       | description | Behat grid |
     And I follow "Set as default view"
     And I follow "Set as edit view"
-    And I wait "300" seconds
+    And I wait until the page is ready
     And I add to "Datalynx Test Instance" datalynx the view of "Tabular" type with:
       | name | Approved view |
       | description | Approved view |

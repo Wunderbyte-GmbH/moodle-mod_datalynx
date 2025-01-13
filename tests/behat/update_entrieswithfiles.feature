@@ -89,6 +89,9 @@ Feature: In a datalynx instance create, update, and delete entries
   Scenario: Delete one entry
     When  I set the field with xpath "(//input[@name='entryselector'])[1]" to "1"
     And I press "multidelete"
+    And I wait until the page is ready
+    And I press "Continue"
+    And I should see "deleted"
     And I press "Continue"
     Then I should not see "This is 1"
     But I should see "This is 2"
