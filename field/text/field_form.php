@@ -57,14 +57,14 @@ class datalynxfield_text_form extends datalynxfield_form {
             $mform->freeze('param8');
             // Display the duplicate-entries-message and the list of duplicate entries.
             $mform->addElement('static', 'duplicatestext', '',
-                    $OUTPUT->notification(get_string('field_has_duplicate_entries', 'datalynx'), 'notifymessage'));
+                    $OUTPUT->notification(get_string('fieldhasduplicateentries', 'datalynx'), 'notifymessage'));
         } else {
             // If there are no duplicates the default option for unique is "No" as well, but the user can change it.
             $mform->setDefault('param8', 0);
         }
         $dfmenu = $this->get_datalynx_instances_menu();
         $mform->addElement('selectgroups', 'param9', get_string('autocompletion', 'datalynx'), $dfmenu);
-        $mform->addHelpButton('param9', 'autocompletion_textfield', 'datalynx');
+        $mform->addHelpButton('param9', 'autocompletiontextfield', 'datalynx');
 
         // Select textfields of given instance (stored in param10).
         $options = array(0 => get_string('choosedots'));
@@ -94,7 +94,7 @@ class datalynxfield_text_form extends datalynxfield_form {
         $options = array('' => get_string('choosedots'),
                 'alphanumeric' => get_string('err_alphanumeric', 'form'),
                 'lettersonly' => get_string('err_lettersonly', 'form'),
-                'numeric' => get_string('err_numeric', 'form'),
+                'numeric' => get_string('errnumeric', 'form'),
                 'email' => get_string('err_email', 'form'),
                 'nopunctuation' => get_string('err_nopunctuation', 'form'));
         $mform->addElement('select', 'param4', get_string('format'), $options);
@@ -170,7 +170,7 @@ class datalynxfield_text_form extends datalynxfield_form {
             // Unique is activated, we check if there are doubles!
             // Should never happen, because we freeze it to 'no' if there are duplicates!
             if ($this->has_duplicates()) {
-                $errors['param8'] = get_string('field_has_duplicate_entries', 'datalynx');
+                $errors['param8'] = get_string('fieldhasduplicateentries', 'datalynx');
             }
         }
 

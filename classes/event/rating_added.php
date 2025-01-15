@@ -58,7 +58,7 @@ class rating_added extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('datalynx_ratingadded', 'mod_datalynx');
+        return get_string('datalynxratingadded', 'mod_datalynx');
     }
 
     /**

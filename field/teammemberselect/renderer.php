@@ -254,11 +254,11 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
                 // Limit chosen users to max teamsize and ensure min teamsize users are chosen!
                 $teamsize = count($formdata->$formfieldname);
                 if ($teamsize > $this->_field->teamsize) {
-                    $errors[$formfieldname] = get_string('maxteamsize_error_form', 'datalynx',
+                    $errors[$formfieldname] = get_string('maxteamsizeerrorform', 'datalynx',
                             $this->_field->teamsize);
                 }
                 if ($teamsize < $this->_field->minteamsize) {
-                    $errors[$formfieldname] = get_string('minteamsize_error_form', 'datalynx',
+                    $errors[$formfieldname] = get_string('minteamsizeerrorform', 'datalynx',
                             $this->_field->minteamsize);
                 }
             }

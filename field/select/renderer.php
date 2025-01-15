@@ -180,7 +180,7 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
                 $content = clean_param($formdata->{$formfieldname}, PARAM_INT);
                 if (array_search($content, $disabled) !== false) {
                     $menu = $this->_field->options_menu();
-                    $errors[$formfieldname] = get_string('limitchoice_error', 'datalynx', $menu[$content]);
+                    $errors[$formfieldname] = get_string('limitchoiceerror', 'datalynx', $menu[$content]);
                 }
             }
         }

@@ -51,7 +51,7 @@ class rule_updated extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('datalynx_entryupdated', 'mod_datalynx');
+        return get_string('datalynxentryupdated', 'mod_datalynx');
     }
 
     /**

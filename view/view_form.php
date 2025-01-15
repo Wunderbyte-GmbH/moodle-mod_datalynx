@@ -181,18 +181,18 @@ class datalynxview_base_form extends moodleform {
         $mviewid = $DB->get_field('datalynx', 'singleview', array('id' => $dataid));
         $menu = $DB->get_records_sql_menu($query, array('dataid' => $dataid));
         if (isset($menu[$dviewid])) {
-            $menu[$dviewid] .= ' ' . get_string('targetview_default', 'datalynx');
+            $menu[$dviewid] .= ' ' . get_string('targetviewdefault', 'datalynx');
         }
         if (isset($menu[$eviewid])) {
-            $menu[$eviewid] .= ' ' . get_string('targetview_edit', 'datalynx');
+            $menu[$eviewid] .= ' ' . get_string('targetviewedit', 'datalynx');
         }
         if (isset($menu[$mviewid])) {
-            $menu[$mviewid] .= ' ' . get_string('targetview_more', 'datalynx');
+            $menu[$mviewid] .= ' ' . get_string('targetviewmore', 'datalynx');
         }
         if (!$viewid) {
-            $menu = array(0 => get_string('targetview_this_new', 'datalynx')) + $menu;
+            $menu = array(0 => get_string('targetviewthisnew', 'datalynx')) + $menu;
         } else {
-            $menu[$viewid] .= ' ' . get_string('targetview_this', 'datalynx');
+            $menu[$viewid] .= ' ' . get_string('targetviewthis', 'datalynx');
         }
         return $menu;
     }

@@ -100,12 +100,12 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         $this->usercanaddself = $this->field->param7 != 0;
         $this->allowunsubscription = $this->field->param8 != 0;
         $this->separators = array(
-            self::TEAMMEMBERSELECT_FORMAT_NEWLINE => get_string('listformat_newline', 'datalynx'),
-            self::TEAMMEMBERSELECT_FORMAT_SPACE => get_string('listformat_space', 'datalynx'),
-            self::TEAMMEMBERSELECT_FORMAT_COMMA => get_string('listformat_comma', 'datalynx'),
-            self::TEAMMEMBERSELECT_FORMAT_COMMA_SPACE => get_string('listformat_commaspace',
+            self::TEAMMEMBERSELECT_FORMAT_NEWLINE => get_string('listformatnewline', 'datalynx'),
+            self::TEAMMEMBERSELECT_FORMAT_SPACE => get_string('listformatspace', 'datalynx'),
+            self::TEAMMEMBERSELECT_FORMAT_COMMA => get_string('listformatcomma', 'datalynx'),
+            self::TEAMMEMBERSELECT_FORMAT_COMMA_SPACE => get_string('listformatcommaspace',
                     'datalynx'),
-            self::TEAMMEMBERSELECT_FORMAT_UL => get_string('listformat_ul', 'datalynx'));
+            self::TEAMMEMBERSELECT_FORMAT_UL => get_string('listformatul', 'datalynx'));
 
         $query = "SELECT r.id, r.name
                     FROM {datalynx_rules} r

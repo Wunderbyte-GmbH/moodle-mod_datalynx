@@ -198,7 +198,7 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
                                 'content' => $formdata->$formfieldname))
                 ) {
                     // It's not the first of it's kind!
-                    $errors[$formfieldname] = get_string('unique_required', 'datalynx');
+                    $errors[$formfieldname] = get_string('uniquerequired', 'datalynx');
                 }
             }
         }

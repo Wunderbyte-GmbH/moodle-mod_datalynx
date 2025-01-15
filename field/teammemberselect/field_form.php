@@ -45,15 +45,15 @@ class datalynxfield_teammemberselect_form extends datalynxfield_form {
         $mform->addElement('text', 'param1', get_string('teamsize', 'datalynx'), array('size' => 3));
         $mform->addHelpButton('param1', 'teamsize', 'datalynx');
         $mform->setType('param1', PARAM_INT);
-        $mform->addRule('param1', get_string('teamsize_error_required', 'datalynx'), 'required',
+        $mform->addRule('param1', get_string('teamsizeerrorrequired', 'datalynx'), 'required',
                 null, 'client');
-        $mform->addRule(array('param1', 'zero'), get_string('teamsize_error_value', 'datalynx'), 'compare', 'gt');
+        $mform->addRule(array('param1', 'zero'), get_string('teamsizeerrorvalue', 'datalynx'), 'compare', 'gt');
 
         // Minimum required team size.
         $mform->addElement('text', 'param3', get_string('minteamsize', 'datalynx'), array('size' => 3));
         $mform->addHelpButton('param3', 'minteamsize', 'datalynx');
         $mform->setType('param3', PARAM_INT);
-        $mform->addRule(array('param3', 'param1'), get_string('minteamsize_error_value', 'datalynx'), 'compare', 'lte');
+        $mform->addRule(array('param3', 'param1'), get_string('minteamsizeerrorvalue', 'datalynx'), 'compare', 'lte');
         $mform->setDefault('param3', 0);
 
         // Admissible roles.
@@ -66,14 +66,14 @@ class datalynxfield_teammemberselect_form extends datalynxfield_form {
         }
         $mform->addGroup($group, 'param2', get_string('admissibleroles', 'datalynx'), '<br />');
         $mform->addHelpButton('param2', 'admissibleroles', 'datalynx');
-        $mform->addGroupRule('param2', get_string('admissibleroles_error', 'datalynx'), 'required', null, 1, 'client');
+        $mform->addGroupRule('param2', get_string('admissibleroleserror', 'datalynx'), 'required', null, 1, 'client');
 
         $mform->addElement('select', 'param4', get_string('listformat', 'datalynx'), $this->_field->separators);
         $mform->setType('param4', PARAM_INT);
         $mform->setDefault('param4', datalynxfield_teammemberselect::TEAMMEMBERSELECT_FORMAT_UL);
 
-        $mform->addElement('checkbox', 'param7', get_string('user_can_add_self', 'datalynx'), null, 1);
-        $mform->addHelpButton('param7', 'user_can_add_self', 'datalynx');
+        $mform->addElement('checkbox', 'param7', get_string('usercanaddself', 'datalynx'), null, 1);
+        $mform->addHelpButton('param7', 'usercanaddself', 'datalynx');
         $mform->setType('param7', PARAM_BOOL);
 
         $mform->addElement('checkbox', 'param6', get_string('notifyteammembers', 'datalynx'), null, 1);

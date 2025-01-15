@@ -238,31 +238,31 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
                         array(
                                 "{$fieldname}[day]" => array(
                                         array(
-                                                get_string('time_field_required', 'datalynx', get_string('day')),
+                                                get_string('timefieldrequired', 'datalynx', get_string('day')),
                                                 'nonzero', null, 'client'
                                         )
                                 ),
                                 "{$fieldname}[month]" => array(
                                         array(
-                                                get_string('time_field_required', 'datalynx',
+                                                get_string('timefieldrequired', 'datalynx',
                                                         get_string('month')), 'nonzero', null, 'client'
                                         )
                                 ),
                                 "{$fieldname}[year]" => array(
                                         array(
-                                                get_string('time_field_required', 'datalynx',
+                                                get_string('timefieldrequired', 'datalynx',
                                                         get_string('year')), 'nonzero', null, 'client'
                                         )
                                 ),
                                 "{$fieldname}[hour]" => array(
                                         array(
-                                                get_string('time_field_required', 'datalynx',
+                                                get_string('timefieldrequired', 'datalynx',
                                                         get_string('hour')), 'nonzero', null, 'client'
                                         )
                                 ),
                                 "{$fieldname}[minute]" => array(
                                         array(
-                                                get_string('time_field_required', 'datalynx',
+                                                get_string('timefieldrequired', 'datalynx',
                                                         get_string('minute')), 'nonzero', null, 'client'
                                         )
                                 )
@@ -273,19 +273,19 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
                         array(
                                 "{$fieldname}[day]" => array(
                                         array(
-                                                get_string('time_field_required', 'datalynx', get_string('day')),
+                                                get_string('timefieldrequired', 'datalynx', get_string('day')),
                                                 'nonzero', null, 'client'
                                         )
                                 ),
                                 "{$fieldname}[month]" => array(
                                         array(
-                                                get_string('time_field_required', 'datalynx',
+                                                get_string('timefieldrequired', 'datalynx',
                                                         get_string('month')), 'nonzero', null, 'client'
                                         )
                                 ),
                                 "{$fieldname}[year]" => array(
                                         array(
-                                                get_string('time_field_required', 'datalynx',
+                                                get_string('timefieldrequired', 'datalynx',
                                                         get_string('year')), 'nonzero', null, 'client'
                                         )
                                 )
@@ -338,7 +338,7 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
             if ($behavior->is_required() &&
                     !isset(optional_param_array($formfieldname, [], PARAM_RAW)['enabled'])
             ) {
-                $errors[$formfieldname] = get_string('check_enable', 'datalynx');
+                $errors[$formfieldname] = get_string('checkenable', 'datalynx');
             }
         }
 

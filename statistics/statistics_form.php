@@ -97,12 +97,12 @@ class datalynx_statistics_form extends moodleform {
         switch ($data['mode']) {
             case datalynx_statistics_class::MODE_PERIOD:
                 if ($data['from'] && $data['to'] && ($data['from'] > $data['to'])) {
-                    $errors['from'] = get_string('fromto_error', 'datalynx');
+                    $errors['from'] = get_string('fromtoerror', 'datalynx');
                 }
                 break;
             case datalynx_statistics_class::MODE_FROM_DATE:
                 if ($data['from'] && ($data['from'] > time())) {
-                    $errors['from'] = get_string('fromaftertoday_error', 'datalynx');
+                    $errors['from'] = get_string('fromaftertodayerror', 'datalynx');
                 }
                 break;
             case datalynx_statistics_class::MODE_ON_DATE:

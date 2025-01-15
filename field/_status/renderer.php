@@ -100,16 +100,16 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
     private function menu_status($shownotset = false) {
         if ($shownotset) {
             return array(
-                    datalynxfield__status::STATUS_NOT_SET => get_string('status_notcreated', 'datalynx'),
-                    datalynxfield__status::STATUS_DRAFT => get_string('status_draft', 'datalynx'),
+                    datalynxfield__status::STATUS_NOT_SET => get_string('statusnotcreated', 'datalynx'),
+                    datalynxfield__status::STATUS_DRAFT => get_string('statusdraft', 'datalynx'),
                     datalynxfield__status::STATUS_FINAL_SUBMISSION => get_string(
-                            'status_finalsubmission', 'datalynx')
+                            'statusfinalsubmission', 'datalynx')
             );
         } else {
             return array(datalynxfield__status::STATUS_NOT_SET => get_string('choosedots'),
-                    datalynxfield__status::STATUS_DRAFT => get_string('status_draft', 'datalynx'),
+                    datalynxfield__status::STATUS_DRAFT => get_string('statusdraft', 'datalynx'),
                     datalynxfield__status::STATUS_FINAL_SUBMISSION => get_string(
-                            'status_finalsubmission', 'datalynx')
+                            'statusfinalsubmission', 'datalynx')
             );
         }
     }
@@ -142,9 +142,9 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
         $fieldid = $this->_field->id();
         $fieldname = "f_{$i}_$fieldid";
 
-        $statusmenu = array(-1 => get_string('status_notcreated', 'datalynx'),
-                datalynxfield__status::STATUS_DRAFT => get_string('status_draft', 'datalynx'),
-                datalynxfield__status::STATUS_FINAL_SUBMISSION => get_string('status_finalsubmission',
+        $statusmenu = array(-1 => get_string('statusnotcreated', 'datalynx'),
+                datalynxfield__status::STATUS_DRAFT => get_string('statusdraft', 'datalynx'),
+                datalynxfield__status::STATUS_FINAL_SUBMISSION => get_string('statusfinalsubmission',
                         'datalynx'));
 
         $select = &$mform->createElement('select', $fieldname, null, $statusmenu, '');

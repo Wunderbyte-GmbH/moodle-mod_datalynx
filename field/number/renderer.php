@@ -49,7 +49,7 @@ class datalynxfield_number_renderer extends datalynxfield_text_renderer {
         $fieldattr = [];
         $mform->addElement('text', $fieldname, null, $fieldattr);
         $mform->setType($fieldname, PARAM_RAW);
-        $mform->addRule($fieldname, get_string('err_numeric', 'datalynx'), 'numeric', null, 'client');
+        $mform->addRule($fieldname, get_string('errnumeric', 'datalynx'), 'numeric', null, 'client');
         $mform->setDefault($fieldname, $content);
         if ($required) {
             $mform->addRule($fieldname, null, 'required', null, 'client');
@@ -123,7 +123,7 @@ class datalynxfield_number_renderer extends datalynxfield_text_renderer {
             if ($behavior->is_required() && isset($formdata->$formfieldname)) {
                 $value = optional_param($formfieldname, '', PARAM_RAW);
                 if (!is_numeric($value)) {
-                    $errors[$formfieldname] = get_string('err_numeric', 'datalynx');
+                    $errors[$formfieldname] = get_string('errnumeric', 'datalynx');
                 }
             }
         }

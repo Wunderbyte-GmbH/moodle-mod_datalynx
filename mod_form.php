@@ -166,9 +166,9 @@ class mod_datalynx_mod_form extends moodleform_mod {
         $mform->setDefault('timelimit', -1);
         $mform->addRule('timelimit', null, 'numeric', null, 'client');
 
-        $options = array(mod_datalynx\datalynx::APPROVAL_NONE => get_string('approval_none', 'datalynx'),
-                mod_datalynx\datalynx::APPROVAL_ON_UPDATE => get_string('approval_required_update', 'datalynx'),
-                mod_datalynx\datalynx::APPROVAL_ON_NEW => get_string('approval_required_new', 'datalynx'));
+        $options = array(mod_datalynx\datalynx::APPROVAL_NONE => get_string('approvalnone', 'datalynx'),
+                mod_datalynx\datalynx::APPROVAL_ON_UPDATE => get_string('approvalrequiredupdate', 'datalynx'),
+                mod_datalynx\datalynx::APPROVAL_ON_NEW => get_string('approvalrequirednew', 'datalynx'));
         $mform->addElement('select', 'approval', get_string('requireapproval', 'datalynx'), $options);
 
         // Common course elements.

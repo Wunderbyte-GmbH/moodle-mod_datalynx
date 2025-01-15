@@ -58,7 +58,7 @@ class entry_deleted extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('datalynx_entrydeleted', 'mod_datalynx');
+        return get_string('datalynxentrydeleted', 'mod_datalynx');
     }
 
     /**

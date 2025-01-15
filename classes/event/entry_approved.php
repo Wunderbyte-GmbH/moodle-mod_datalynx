@@ -58,7 +58,7 @@ class entry_approved extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('datalynx_entryapproved', 'mod_datalynx');
+        return get_string('datalynxentryapproved', 'mod_datalynx');
     }
 
     /**

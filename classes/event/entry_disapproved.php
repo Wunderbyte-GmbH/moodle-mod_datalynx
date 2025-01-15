@@ -58,7 +58,7 @@ class entry_disapproved extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('datalynx_entrydisapproved', 'mod_datalynx');
+        return get_string('datalynxentrydisapproved', 'mod_datalynx');
     }
 
     /**
