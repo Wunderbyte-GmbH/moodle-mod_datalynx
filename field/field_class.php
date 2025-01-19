@@ -1017,14 +1017,6 @@ abstract class datalynxfield_option extends datalynxfield_base {
     public static function is_customfilterfield() {
         return true;
     }
-
-    public function get_argument_count(string $operator) {
-        if ($operator === "") { // "Empty" operator
-            return 0;
-        } else {
-            return 1;
-        }
-    }
 }
 
 /**
@@ -1256,14 +1248,6 @@ class datalynxfield_option_multiple extends datalynxfield_option {
         return array('ANY_OF' => get_string('anyof', 'datalynx'),
                 'ALL_OF' => get_string('allof', 'datalynx'),
                 'EXACTLY' => get_string('exactly', 'datalynx'), '' => get_string('empty', 'datalynx'));
-    }
-
-    public function get_argument_count(string $operator) {
-        if ($operator === "") { // "Empty" operator
-            return 0;
-        } else {
-            return 1;
-        }
     }
 }
 
