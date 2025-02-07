@@ -967,7 +967,7 @@ class datalynx_filter_manager {
         global $CFG;
         $formurl = new moodle_url('/mod/datalynx/filter/index.php',
                 array('d' => $this->_df->id(), 'fid' => $filter->id, 'update' => 1));
-        $mform = new mod_datalynx_filter_form($formurl); 
+        $mform = new mod_datalynx_filter_form($formurl);
         return $mform;
     }
 
@@ -1437,7 +1437,7 @@ class datalynx_filter_manager {
     public function get_customfilter_frontend_form($filter, base $view, $customfilter = false) {
         global $CFG;
 
-        require_once("$CFG->dirroot/mod/datalynx/filter/filter_form.php");
+        require_once("$CFG->dirroot/mod/datalynx/classes/filter_form.php");
         $cfilter = isset($customfilter->id) ? $customfilter->id : "1";
         $formurl = new moodle_url($view->get_baseurl(), array('filter' => self::USER_FILTER_SET, 'cfilter' => $cfilter));
         $mform = new mod_datalynx_customfilter_frontend_form($this->_df, $filter, $formurl,

@@ -52,11 +52,11 @@ $df = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
 require_capability('mod/datalynx:managetemplates', $df->context);
 
 $module = array(
-    'name' => 'mod_datalynx', 
+    'name' => 'mod_datalynx',
     'fullpath' => '/mod/datalynx/datalynx.js',
     'requires' => array('moodle-core-notification-dialogue')
 );
-$PAGE->requires->js_init_call('M.mod_datalynx.filter_form_init', array(), true, $module);
+$PAGE->requires->js_call_amd('mod_datalynx/dynamicfilter', 'init');
 
 $df->set_page('filter/index', array('modjs' => true, 'urlparams' => $urlparams));
 

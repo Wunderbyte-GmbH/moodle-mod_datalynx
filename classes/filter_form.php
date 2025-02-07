@@ -25,6 +25,7 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->libdir/formslib.php");
 use core_form\dynamic_form;
+use mod_datalynx\datalynx;
 
 /**
  *
@@ -38,7 +39,7 @@ abstract class mod_datalynx_filter_base_form extends dynamic_form {
      *
      * @var datalynx null
      */
-    protected $_df = null;
+    protected ?datalynx $_df = null;
 
     public function get_context_for_dynamic_submission(): context {
         //return context_module::instance($this->_df->cm->id);
@@ -51,40 +52,47 @@ abstract class mod_datalynx_filter_base_form extends dynamic_form {
         require_capability('moodle/site:config', \context_system::instance());
     }
 
+    /**
+     * Set initial data.
+     *
+     * @return void
+     */
     public function set_data_for_dynamic_submission(): void {
-        $datalynx_id = $this->_ajaxformdata["d"];
-        $filter_id = $this->_ajaxformdata["fid"];
+        $datalynxid = $this->_ajaxformdata["d"];
+        $filterid = $this->_ajaxformdata["fid"];
 
-        if ($datalynx_id == null || $filter_id == null) {
+        if ($datalynxid == null || $filterid == null) {
             return;
         }
 
-        $this->_df = \mod_datalynx\datalynx::get_datalynx_by_instance($datalynx_id);
+        $this->_df = datalynx::get_datalynx_by_instance($datalynxid);
         $fm = $this->_df->get_filter_manager();
-        $this->_filter = $fm->get_filter_from_id($filter_id);
-
-        // Update filter parameters based on the current form data (in order to dynamically render new form fields for filter details):
+        $this->_filter = $fm->get_filter_from_id($filterid);
         if ($this->_ajaxformdata["update"] && confirm_sesskey()) {
-            $procesedfilters = $fm->process_filters_for_ajax_refresh('update', $filter_id, $this, true);
+            $procesedfilters = $fm->process_filters_for_ajax_refresh('update', $filterid, $this, true);
             $this->_filter = $procesedfilters[0];
         }
     }
 
-    public function process_dynamic_submission() {
+    /**
+     * Process submitted data.
+     *
+     * @return array|array[]|mixed|void
+     */
+    public function process_dynamic_submission(): array {
+        $datalynxid = $this->_ajaxformdata["d"];
+        $filterid = $this->_ajaxformdata["fid"];
 
-        $datalynx_id = $this->_ajaxformdata["d"];
-        $filter_id = $this->_ajaxformdata["fid"];
-
-        if ($datalynx_id == null || $filter_id == null) {
-            return;
+        if ($datalynxid == null || $filterid == null) {
+            return [];
         }
 
-        $this->_df = \mod_datalynx\datalynx::get_datalynx_by_instance($datalynx_id);
+        $this->_df = datalynx::get_datalynx_by_instance($datalynxid);
         $fm = $this->_df->get_filter_manager();
-        $this->_filter = $fm->get_filter_from_id($filter_id);
+        $this->_filter = $fm->get_filter_from_id($filterid);
 
-        if ($this->_ajaxformdata["update"] && confirm_sesskey()) { // Add/update a new filter.
-            $procesedfilters = $fm->process_filters_for_ajax_submission('update', $filter_id, $this, true);
+        if ($this->_ajaxformdata["update"] && confirm_sesskey()) {
+            $procesedfilters = $fm->process_filters_for_ajax_submission('update', $filterid, $this, true);
             $this->_filter = $procesedfilters[0];
         }
 
@@ -92,7 +100,7 @@ abstract class mod_datalynx_filter_base_form extends dynamic_form {
     }
 
     public function get_page_url_for_dynamic_submission(): moodle_url {
-        return new moodle_url('/mod/datalynx/view.php', array('id' => $this->_df->id));
+        return new moodle_url('/mod/datalynx/view.php', array('id' => $this->_df->cm->id));
     }
 
     /*
@@ -417,10 +425,10 @@ class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
                             get_string('filter', 'datalynx'));
                 }
             } else {
-                // If we do not return any error after a submission, the form will 
-                // be regarded as submitted and will render empty. 
+                // If we do not return any error after a submission, the form will
+                // be regarded as submitted and will render empty.
                 // We need to return a dummy error to prevent this.
-                // This also prevents process_dynamic_submission from being executed in this case, 
+                // This also prevents process_dynamic_submission from being executed in this case,
                 // as the form gets no validated flag:
                 $errors['dummy_error_for_refreshing'] = 'dummy_error_for_refreshing';
             }
