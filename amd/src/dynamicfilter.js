@@ -5,7 +5,7 @@ define(['core_form/dynamicform', 'core/toast'], (DynamicForm, Toast) => {
             return;
         }
 
-        const dynamicForm = new DynamicForm(container, 'mod_datalynx_filter_form');
+        const dynamicForm = new DynamicForm(container, '\mod_datalynx\\mod_datalynx_filter_form');
 
         dynamicForm.addEventListener(dynamicForm.events.FORM_SUBMITTED, (e) => {
             e.detail.good.forEach(successMessage => {
