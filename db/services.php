@@ -24,4 +24,14 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$functions = array();
+$functions = [
+        'mod_datalynx_team_subscription' => [
+                'classname'   => 'mod_datalynx\external\team_subscription',
+                'methodname'  => 'execute',
+                'classpath'   => '',
+                'description' => 'Subscribe or unsubscribe users in a datalynx team.',
+                'type'        => 'write',
+                'capabilities'=> 'mod/datalynx:teamsubscribe',
+                'ajax'        => true
+        ],
+];

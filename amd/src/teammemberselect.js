@@ -1,94 +1,95 @@
-define(["jquery"], function($) {
-
+define(['core/ajax', 'core/toast', 'core/str'], function(Ajax, Toast, Str) {
     return {
-        // We get parameters from initialisation in render.php
-        init: function(fieldid, userurl, username, canunsubscribe) {
+        init(fieldid, userurl, username, canunsubscribe) {
+            Promise.all([
+                Str.get_string('subscribe', 'mod_datalynx'),
+                Str.get_string('unsubscribe', 'mod_datalynx')
+            ]).then(strings => {
+                const subscribeString = strings[0];
+                const unsubscribeString = strings[1];
 
-            // After initialisation we loop through all links for subscribe / unsubscribe.
-            $("a.datalynxfield_subscribe").each(function() {
-                    var href = $(this).attr("href");
-                    var params = extractParams(href.split("?")[1]);
-                    if (params.fieldid !== fieldid) {
+                document.querySelectorAll('a.datalynxfield_subscribe').forEach(link => {
+                    const params = this.extractParams(link.href.split('?')[1]);
+                    if (params.fieldid !== fieldid.toString()) {
                         return;
                     }
-                    params.ajax = true;
 
-                    $("a.datalynxfield_subscribe").off("click");
-                    $("a.datalynxfield_subscribe").click(function(e) {
+                    link.addEventListener('click', (e) => {
                         e.preventDefault();
-                        if (!$(this).prev("ul").length) {
-                            $(this).before("<ul></ul>");
-                        }
-                        var ul = $(this).prev("ul");
-                        // AJAX call
-                        var actionurl = "field/teammemberselect/ajax.php";
-                        $.ajax(
-                            {
-                                method: "POST",
-                                url: actionurl,
-                                data: params,
-                                context: this,
-                                dataType: "json",
-                                success: function(data) {
-                                    if (data && $(this).hasClass("subscribed")) {
-                                        if (canunsubscribe) {
-                                            $(this).toggleClass("subscribed");
-                                            $(this).prop("title", "Eintragen"); // TODO: Multilang.
-                                            $(this).prop("innerHTML", "Eintragen"); // TODO: Multilang.
-                                            params.action = "subscribe";
-                                            $(this).prop("href", $(this).prop("href").replace("unsubscribe", "subscribe"));
-                                        }
-                                    removeUser(ul);
-                                    } else if (data && !$(this).hasClass("subscribed")) {
-                                        $(this).toggleClass("subscribed");
-                                        $(this).prop("title", "Austragen"); // TODO: Multilang.
-                                        $(this).prop("innerHTML", "Austragen"); // TODO: Multilang.
-                                        params.action = "unsubscribe";
-                                        $(this).prop("href", $(this).prop("href").replace("subscribe", "unsubscribe"));
-                                        ul.append("<li><a href=" + userurl + ">" + username + "</a></li>");
-                                    }
-                                },
-                            }
-                        );
+                        const updatedParams = this.extractParams(link.href.split('?')[1]);
+                        this.handleSubscription(link, updatedParams, userurl, username,
+                            canunsubscribe, subscribeString, unsubscribeString);
+                    });
                 });
             });
+        },
 
-            /**
-             * Remove user from selection.
-             *
-             * @param {HTMLElement} listelement
-             */
-            function removeUser(listelement) {
-                var userurlparams = extractParams(userurl.split("?")[1]);
-
-                // Loop through jquery object and find all lis.
-                var listItems = $(listelement).find("li");
-                listItems.find("a").each(function(idx, li) {
-                    var anchorparams = extractParams($(li).prop("href").split("?")[1]);
-                    if (userurlparams.id == anchorparams.id) {
-                        $(li).parent().remove();
+        handleSubscription(link, params, userurl, username, canunsubscribe, subscribeString, unsubscribeString) {
+            Ajax.call([{
+                methodname: 'mod_datalynx_team_subscription',
+                args: params,
+                done: (response) => {
+                    if (response.success) {
+                        if (link.classList.contains('subscribed')) {
+                            if (canunsubscribe) {
+                                this.updateSubscriptionLink(link, 'subscribe', subscribeString);
+                                this.removeUserFromList(link.parentElement, userurl);
+                            }
+                        } else {
+                            this.updateSubscriptionLink(link, 'unsubscribe', unsubscribeString);
+                            this.addUserToList(link.parentElement, userurl, username);
+                        }
+                    } else {
+                        Toast.add({ message: 'Error updating subscription', type: 'danger' });
                     }
-                });
-                // Delete <ul> if no <li> is required.
-                if (listelement.children().length == 0) {
-                    listelement.remove();
+                },
+                fail: () => {
+                    Toast.add({ message: 'Failed to process request.', type: 'danger' });
                 }
+            }]);
+        },
+
+        updateSubscriptionLink(link, action, text) {
+            link.classList.toggle('subscribed');
+            link.title = text;
+            link.textContent = text;
+            link.href = link.href.replace(/(subscribe|unsubscribe)/, action);
+        },
+
+        removeUserFromList(linkContainer, userurl) {
+            if (linkContainer) {
+                const teamMemberList = linkContainer.querySelector('.team-member-list');
+                if (teamMemberList) {
+                    const listItem = teamMemberList.querySelector(`li a[href="${userurl}"]`);
+                    if (listItem) {
+                        listItem.closest('li').remove();
+                        if (teamMemberList.children.length === 0) {
+                            teamMemberList.remove();
+                        }
+                    }
+                }
+            }
+        },
+
+        addUserToList(linkContainer, userurl, username) {
+            let teamMemberList = linkContainer.querySelector('.team-member-list');
+            if (!teamMemberList) {
+                teamMemberList = document.createElement('ul');
+                teamMemberList.classList.add('team-member-list');
+                linkContainer.insertBefore(teamMemberList, linkContainer.querySelector("a.datalynxfield_subscribe"));
             }
 
-            /**
-             * Extract params.
-             * @param {string} paramstring
-             * @returns {{}}
-             */
-            function extractParams(paramstring) {
-                var params = paramstring.split("&");
-                var output = {}; // Create an object.
-                for (var i = 0; i < params.length; i++) {
-                    var param = params[i];
-                    output[param.split("=")[0]] = param.split("=")[1];
-                }
-                return output;
-            }
+            const listItem = document.createElement('li');
+            listItem.innerHTML = `<a href="${userurl}">${username}</a>`;
+            teamMemberList.appendChild(listItem);
+        },
+
+        extractParams(paramString) {
+            return paramString.split('&').reduce((acc, param) => {
+                const [key, value] = param.split('=');
+                acc[key] = decodeURIComponent(value || '');
+                return acc;
+            }, {});
         }
     };
 });

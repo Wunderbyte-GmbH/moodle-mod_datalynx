@@ -43,7 +43,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
             $selected = json_decode($entry->{"c{$fieldid}_content"}, true);
             $selected = $selected ? $selected : [];
 
-            $str = $this->get_user_list($selected);
+            $str = $this->get_user_list((int) $field->df()->course->id, $selected);
 
             switch ($field->listformat) {
                 case datalynxfield_teammemberselect::TEAMMEMBERSELECT_FORMAT_NEWLINE:
@@ -61,7 +61,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
                 case datalynxfield_teammemberselect::TEAMMEMBERSELECT_FORMAT_UL:
                 default:
                     if (count($str) > 0) {
-                        $str = '<ul><li>' . implode('</li><li>', $str) . '</li></ul>';
+                        $str = '<ul class="team-member-list"><li>' . implode('</li><li>', $str) . '</li></ul>';
                     } else {
                         $str = '';
                     }
@@ -83,13 +83,12 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
                 (!$userismember || $canunsubscribe)) {
 
             $str .= html_writer::link(
-                    new moodle_url('/mod/datalynx/field/teammemberselect/ajax.php',
+                    new moodle_url('/mod/datalynx/view.php',
                             array('d' => $field->df()->id(), 'fieldid' => $fieldid,
                                 'entryid' => $entry->id,
-                                'view' => optional_param('view', null, PARAM_INT),
                                 'userid' => $USER->id,
                                 'action' => $userismember ? 'unsubscribe' : 'subscribe',
-                                'sesskey' => sesskey())),
+                                )),
                     get_string($userismember ? 'unsubscribe' : 'subscribe', 'datalynx'),
                     array(
                         'class' => 'datalynxfield_subscribe' . ($userismember ? ' subscribed' : '')));
@@ -97,11 +96,9 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
             $userurl = new moodle_url('/user/view.php',
                     array('course' => $field->df()->course->id, 'id' => $USER->id));
 
-            // Load jquery and parse parameters.
+            // Load JS.
             $PAGE->requires->js_call_amd('mod_datalynx/teammemberselect', 'init',
                     array($fieldid, $userurl->out(false), fullname($USER), $canunsubscribe));
-
-            $PAGE->requires->strings_for_js(array('subscribe', 'unsubscribe'), 'datalynx');
         }
 
         return $str;
@@ -109,8 +106,13 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
 
     private static $userlist = [];
 
-    private function get_user_list($userids) {
-        global $DB, $COURSE;
+    /**
+     * @param int $courseid
+     * @param array $userids
+     * @return array
+     */
+    private function get_user_list(int $courseid, array $userids): array {
+        global $DB;
 
         $list = [];
         $notpresent = [];
@@ -127,7 +129,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         }
 
         if (!empty($notpresent)) {
-            $baseurl = new moodle_url('/user/view.php', array('course' => $COURSE->id));
+            $baseurl = new moodle_url('/user/view.php', array('course' => $courseid));
             list($insql, $params) = $DB->get_in_or_equal($notpresent);
             $sql = "SELECT * FROM {user} WHERE id $insql";
             $users = $DB->get_records_sql($sql, $params);

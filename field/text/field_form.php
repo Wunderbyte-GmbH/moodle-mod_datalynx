@@ -94,7 +94,7 @@ class datalynxfield_text_form extends datalynxfield_form {
         $options = array('' => get_string('choosedots'),
                 'alphanumeric' => get_string('err_alphanumeric', 'form'),
                 'lettersonly' => get_string('err_lettersonly', 'form'),
-                'numeric' => get_string('errnumeric', 'form'),
+                'numeric' => get_string('err_numeric', 'form'),
                 'email' => get_string('err_email', 'form'),
                 'nopunctuation' => get_string('err_nopunctuation', 'form'));
         $mform->addElement('select', 'param4', get_string('format'), $options);
