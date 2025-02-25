@@ -26,6 +26,10 @@ use moodle_exception;
 use core_user;
 use stdClass;
 
+defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->libdir . '/externallib.php');
+
 /**
  * Web service to subscribe/unsubscribe users in datalynx team fields.
  */
