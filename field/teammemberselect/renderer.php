@@ -98,7 +98,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
 
             // Load JS.
             $PAGE->requires->js_call_amd('mod_datalynx/teammemberselect', 'init',
-                    array($fieldid, $userurl->out(false), fullname($USER), $canunsubscribe));
+                    array($field->df()->id(), $fieldid, $userurl->out(false), fullname($USER), $canunsubscribe));
         }
 
         return $str;

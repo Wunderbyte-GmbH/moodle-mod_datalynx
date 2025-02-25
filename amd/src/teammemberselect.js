@@ -1,6 +1,7 @@
 define(['core/ajax', 'core/toast', 'core/str'], function(Ajax, Toast, Str) {
     return {
-        init(fieldid, userurl, username, canunsubscribe) {
+        init(datalynxId, fieldId, userurl, userName, canUnsubscribe) {
+            const viewContainer = document.querySelectorAll(`[data-id="${datalynxId}"]`);
             Promise.all([
                 Str.get_string('subscribe', 'mod_datalynx'),
                 Str.get_string('unsubscribe', 'mod_datalynx')
@@ -8,19 +9,25 @@ define(['core/ajax', 'core/toast', 'core/str'], function(Ajax, Toast, Str) {
                 const subscribeString = strings[0];
                 const unsubscribeString = strings[1];
 
-                document.querySelectorAll('a.datalynxfield_subscribe').forEach(link => {
-                    const params = this.extractParams(link.href.split('?')[1]);
-                    if (params.fieldid !== fieldid.toString()) {
-                        return;
+                viewContainer.forEach(element => {
+                    if (element.getAttribute("data-listeneradded") !== "1") {
+                        // Your conditional code here
+                        element.setAttribute("data-listeneradded", "1");
+                        document.querySelectorAll('a.datalynxfield_subscribe').forEach(link => {
+                            const params = this.extractParams(link.href.split('?')[1]);
+                            if (params.fieldid !== fieldId.toString()) {
+                                return;
+                            }
+                            link.addEventListener('click', (e) => {
+                                e.preventDefault();
+                                const updatedParams = this.extractParams(link.href.split('?')[1]);
+                                this.handleSubscription(link, updatedParams, userurl, userName,
+                                    canUnsubscribe, subscribeString, unsubscribeString);
+                            });
+                        });
                     }
-
-                    link.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        const updatedParams = this.extractParams(link.href.split('?')[1]);
-                        this.handleSubscription(link, updatedParams, userurl, username,
-                            canunsubscribe, subscribeString, unsubscribeString);
-                    });
                 });
+
             });
         },
 
