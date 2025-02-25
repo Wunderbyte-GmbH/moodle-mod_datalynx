@@ -57,14 +57,14 @@ class datalynxfield_teammemberselect_form extends datalynxfield_form {
         $mform->setDefault('param3', 0);
 
         // Admissible roles.
-        $group = array();
+        $group = [];
         $permissions = $this->_df->get_datalynx_permission_names(true);
 
         foreach ($permissions as $key => $label) {
-            $checkbox = &$mform->createElement('checkbox', $key, null, $label, array('group' => 1, 'size' => 1));
+            $checkbox = &$mform->createElement('advcheckbox', 'admissible' . $key, '', $label, ['group' => 1], [0, $key]);
             $group[] = $checkbox;
         }
-        $mform->addGroup($group, 'param2', get_string('admissibleroles', 'datalynx'), '<br />');
+        $mform->addGroup($group, 'param2', get_string('admissibleroles', 'datalynx'), '<br />', false);
         $mform->addHelpButton('param2', 'admissibleroles', 'datalynx');
         $mform->addGroupRule('param2', get_string('admissibleroleserror', 'datalynx'), 'required', null, 1, 'client');
 
@@ -116,12 +116,13 @@ class datalynxfield_teammemberselect_form extends datalynxfield_form {
     public function set_data($data) {
         if (empty($data->param2)) {
             $elements = [];
-            $data->param2 = [];
         } else {
             $elements = json_decode($data->param2, true);
         }
+        $data->param2 = [];
         foreach ($elements as $element) {
-            $data->param2[$element] = 1;
+            $advcheckboxname = 'admissible' . $element;
+            $data->$advcheckboxname = $element;
         }
         $data->param5 = $data->param5 ?? 0;
         $data->param6 = $data->param6 ?? 0;
@@ -140,7 +141,14 @@ class datalynxfield_teammemberselect_form extends datalynxfield_form {
      */
     public function get_data($slashed = true) {
         if ($data = parent::get_data($slashed)) {
-            $data->param2 = json_encode(array_keys($data->param2));
+            $checkedroles = [];
+            foreach ((array) $data as $key => $value) {
+                if (strpos($key, 'admissible') === 0 && is_numeric($value) && $value > 0) {
+                    $checkedroles[] = (int) $value; // Cast to integer for consistency
+                    unset($data->$key);
+                }
+            }
+            $data->param2 = json_encode($checkedroles);
             $data->param5 = $data->param5 ?? 0;
             $data->param6 = $data->param6 ?? 0;
             $data->param7 = $data->param7 ?? 0;

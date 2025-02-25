@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 namespace mod_datalynx\external;
 
 use external_api;
@@ -23,7 +22,6 @@ use external_single_structure;
 use external_value;
 use context_module;
 use moodle_exception;
-use core_user;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
@@ -64,7 +62,7 @@ class team_subscription extends external_api {
         global $DB, $USER;
 
         // Validate parameters.
-        $params = self::validate_parameters(self::execute_parameters(), compact('d', 'entryid', 'fieldid', 'userid','action'));
+        $params = self::validate_parameters(self::execute_parameters(), compact('d', 'entryid', 'fieldid', 'userid', 'action'));
 
         // Get context.
         $cm = get_coursemodule_from_instance('datalynx', $params['d'], 0, false, MUST_EXIST);
@@ -84,7 +82,18 @@ class team_subscription extends external_api {
                 'entryid' => $params['entryid']
         ]), true) ?? [];
 
+        // Fetch max team size setting from the field configuration.
+        $maxteamsize = $DB->get_field('datalynx_fields', 'param1', ['id' => $params['fieldid']]);
+
         if ($params['action'] === 'subscribe') {
+            // Check if max team size is exceeded.
+            if ($maxteamsize > 0 && count($users) >= $maxteamsize) {
+                return [
+                        'success' => false,
+                        'error' => get_string('maxteamsizeexceeded', 'mod_datalynx', $maxteamsize)
+                ];
+            }
+
             $users[] = (string) $params['userid'];
             $users = array_unique(array_filter($users));
 
@@ -99,13 +108,13 @@ class team_subscription extends external_api {
             $data->content = json_encode(array_values($users));
 
             if ($record) {
-                // Update existing record
+                // Update existing record.
                 $DB->set_field('datalynx_contents', 'content', $data->content, [
                         'fieldid' => $params['fieldid'],
                         'entryid' => $params['entryid']
                 ]);
             } else {
-                // Insert new record
+                // Insert new record.
                 $DB->insert_record('datalynx_contents', $data);
             }
         } elseif ($params['action'] === 'unsubscribe') {
@@ -136,7 +145,8 @@ class team_subscription extends external_api {
      */
     public static function execute_returns() {
         return new external_single_structure([
-                'success' => new external_value(PARAM_BOOL, 'Success status')
+                'success' => new external_value(PARAM_BOOL, 'Success status'),
+                'error' => new external_value(PARAM_TEXT, 'Error message (if any)', VALUE_OPTIONAL)
         ]);
     }
 }

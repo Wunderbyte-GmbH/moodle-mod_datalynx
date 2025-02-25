@@ -552,6 +552,7 @@ $string['viewfoverride_help'] = 'Unachtsame Verwendung dieser Funktion kann Nutz
 $string['wrongdataid'] = 'Falsche Datalynx ID';
 
 $string['teamsize'] = 'Höchstzahl an Teammitglieder';
+$string['maxteamsizeexceeded'] = 'Höchstzahl an {$a} Teammitglieder überschreiten';
 $string['teamsize_help'] = 'Geben Sie hier die Höchstzahl der Teammitglieder. Diese muss eine natürliche Zahl sein.';
 $string['teamsizeerrorrequired'] = 'Dieses Feld ist erforderlich!';
 $string['teamsizeerrorvalue'] = 'Der Wert dieses Feldes muss eine natürliche Zahl sein!';

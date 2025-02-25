@@ -647,6 +647,7 @@ $string['maxteamsizeerrorform'] = 'You can select only a maximum of {$a} team me
 $string['minteamsize'] = 'Minimum team size';
 $string['minteamsize_help'] = 'Enter the miminum allowed number of team members here.';
 $string['minteamsizeerrorvalue'] = 'Minimum team size cannot be greater than the maximum team size!';
+$string['maxteamsizeexceeded'] = 'Max team size of {$a} already reached!';
 $string['minteamsizeerrorform'] = 'You must select at least {$a} team members!';
 $string['teamfield'] = 'Team field';
 $string['teamfield_help'] = 'Check this box to designate this field as a team field. When approving an entry with a specified team that entry will be copied and assigned to every team member. Only one field per Datalynx instance may be designated as a team field.';

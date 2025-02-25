@@ -11,7 +11,6 @@ define(['core/ajax', 'core/toast', 'core/str'], function(Ajax, Toast, Str) {
 
                 viewContainer.forEach(element => {
                     if (element.getAttribute("data-listeneradded") !== "1") {
-                        // Your conditional code here
                         element.setAttribute("data-listeneradded", "1");
                         document.querySelectorAll('a.datalynxfield_subscribe').forEach(link => {
                             const params = this.extractParams(link.href.split('?')[1]);
@@ -31,7 +30,8 @@ define(['core/ajax', 'core/toast', 'core/str'], function(Ajax, Toast, Str) {
             });
         },
 
-        handleSubscription(link, params, userurl, username, canunsubscribe, subscribeString, unsubscribeString) {
+        handleSubscription(link, params, userurl, username, canunsubscribe,
+                           subscribeString, unsubscribeString) {
             Ajax.call([{
                 methodname: 'mod_datalynx_team_subscription',
                 args: params,
@@ -47,11 +47,13 @@ define(['core/ajax', 'core/toast', 'core/str'], function(Ajax, Toast, Str) {
                             this.addUserToList(link.parentElement, userurl, username);
                         }
                     } else {
-                        Toast.add({ message: 'Error updating subscription', type: 'danger' });
+                        const errorMessage = response.error;
+                        Toast.add(errorMessage);
                     }
                 },
-                fail: () => {
-                    Toast.add({ message: 'Failed to process request.', type: 'danger' });
+                fail: (error) => {
+                    const errorMessage = error.message;
+                    Toast.add(errorMessage);
                 }
             }]);
         },
