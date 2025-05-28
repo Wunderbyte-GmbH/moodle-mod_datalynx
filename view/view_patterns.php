@@ -338,9 +338,13 @@ class datalynxview_patterns {
      * @param array $options
      * @return string
      */
-    protected function get_userpref_replacements($tag, array $options = null) {
+    protected function get_userpref_replacements($tag, array $options = null): string {
         $view = $this->_view;
         $filter = $view->get_filter();
+        // Do not display quickperpage and similar tags in edit view.
+        if ($view->user_is_editing()) {
+            return '';
+        }
         if (!$view->is_forcing_filter() && (!$filter->id || $filter->customsearch || !empty($options['entriescount']))) {
             switch ($tag) {
                 case '##quickperpage##':
@@ -352,7 +356,7 @@ class datalynxview_patterns {
             if ($this->_view->entriesprocessedsuccessfully) {
                 return '';
             }
-            if (strpos($tag, '##customfilter') !== false && empty($view->user_is_editing())) {
+            if (strpos($tag, '##customfilter') !== false && !$view->user_is_editing()) {
                 return $this->print_custom_filter($tag, true);
             }
         }
@@ -370,9 +374,8 @@ class datalynxview_patterns {
      * @param array $options
      * @return string
      */
-    protected function get_action_replacements($tag, $entry = null, array $options = null) {
+    protected function get_action_replacements($tag, $entry = null, array $options = null): string {
         global $CFG, $OUTPUT;
-
         $replacement = '';
 
         $view = $this->_view;
@@ -380,6 +383,10 @@ class datalynxview_patterns {
         $baseurl = new moodle_url($view->get_baseurl());
         $baseurl->param('sesskey', sesskey());
         $baseurl->param('sourceview', $this->_view->id());
+        // When user is editing then do not render these tags.
+        if ($view->user_is_editing()) {
+            return $replacement;
+        }
 
         $showentryactions = (!empty($options['showentryactions']) ||
                 has_capability('mod/datalynx:manageentries', $df->context));
@@ -408,7 +415,6 @@ class datalynxview_patterns {
                     $select->set_label(get_string('entryaddmultinew', 'datalynx') . '&nbsp;');
                     $replacement = $OUTPUT->render($select);
                 }
-
                 break;
 
             case '##multiduplicate##':
@@ -530,9 +536,9 @@ class datalynxview_patterns {
      * Get HTML that replaces the tag ##pagingbar##
      *
      * @param array $options
-     * @return Ambigous <string, paging_bar>
+     * @return string rendered paging bar
      */
-    protected function get_paging_replacements(array $options = null) {
+    protected function get_paging_replacements(array $options = null): string {
         global $OUTPUT;
 
         $view = $this->_view;
@@ -540,10 +546,8 @@ class datalynxview_patterns {
         $baseurl = $view->get_baseurl();
 
         // Typical entry 'more' request. If not single view (1 per page) show nothing instead of paging bar.
-        if (!empty($filter->eids)) {
-
-            $pagingbar = '';
-
+        if (!empty($filter->eids) || $view->user_is_editing()) {
+            return '';
             // Typical groupby, one group per page case. show paging bar as per number of groups.
         } else {
             if (isset($filter->pagenum)) {
@@ -559,7 +563,7 @@ class datalynxview_patterns {
                     $pagingbar = new paging_bar($options['entriesfiltercount'], $filter->page,
                             $filter->perpage, $baseurl, 'page');
                 } else { // No paging bar case at all:.
-                    $pagingbar = '';
+                    return '';
                 }
             }
         }
@@ -903,7 +907,7 @@ class datalynxview_patterns {
         $view = $this->_view;
 
         // If in edit view filters should never be displayed.
-        if (!empty($view->user_is_editing())) {
+        if ($view->user_is_editing()) {
             return '';
         }
 

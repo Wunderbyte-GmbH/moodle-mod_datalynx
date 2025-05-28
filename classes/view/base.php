@@ -570,7 +570,7 @@ abstract class base {
         }
 
         // TODO: Revise this. Does not seem to make much sense. Old description: With one entry per page show the saved entry.
-        if ($successfullyprocessedeids && !empty($this->_editentries) && !$this->_returntoentriesform) {
+        if ($successfullyprocessedeids && $this->user_is_editing() && !$this->_returntoentriesform) {
             if ($this->_filter->perpage == 1) {
                 $this->_filter->eids = implode(',', $this->_editentries);
             }
@@ -590,7 +590,7 @@ abstract class base {
         if ($this->_returntoentriesform) {
             return;
         }
-        if (!empty($this->_editentries) && $this->_editentries[0] >= 0 || $this->view->perpage != 1) {
+        if ($this->user_is_editing() && $this->_editentries[0] >= 0 || $this->view->perpage != 1) {
             $this->_entries->set_content($options);
         }
     }
@@ -618,7 +618,7 @@ abstract class base {
         $viewoptions = array('pluginfileurl' => $pluginfileurl,
                 'entriescount' => $this->_entries->get_count(),
                 'entriesfiltercount' => $this->_entries->get_count(true),
-                'hidenewentry' => (!empty($this->_editentries) || $new) ? 1 : 0,
+                'hidenewentry' => ($this->user_is_editing() || $new) ? 1 : 0,
                 'showentryactions' => $requiresmanageentries && $showentryactions);
 
         $this->set_view_tags($viewoptions);
@@ -631,18 +631,19 @@ abstract class base {
             } else {
                 $output = '##entries##';
             }
-            if ($new || !empty($this->_editentries)) {
-                $entriesform = $this->get_entries_form();
-                $output = $notifications . $entriesform->html();
+            if ($new || $this->user_is_editing()) {
+                $renderedentries = $this->display_entries($options);
+                $output = str_replace('##entries##', $renderedentries, $output);
             } else if ($this->_entries->get_count()) {
-                // Entries have been updated or added.
+                // Entries have been updated or added. This is an intermediate page displaying the success of the operation.
+                // It would be nice to replace that in the future with a modal or similar.
                 if ($this->entriesprocessedsuccessfully) {
                     $redirectid = $this->_redirect ?: $this->id();
                     $url = new moodle_url($this->_baseurl, array('view' => $redirectid));
                     $output = $notifications . $OUTPUT->continue_button($url);
                 } else {
-                    $entryhtml = $this->display_entries($options);
-                    $output = str_replace('##entries##', $entryhtml, $output);
+                    $renderedentries = $this->display_entries($options);
+                    $output = str_replace('##entries##', $renderedentries, $output);
                 }
             } else {
                 $output = str_replace('##entries##', $this->display_no_entries(), $output);
@@ -720,7 +721,7 @@ abstract class base {
      *
      * @param array $options
      */
-    public function set_view_tags($options) {
+    public function set_view_tags(array $options): void {
         // Rewrite plugin urls.
         $pluginfileurl = !empty($options['pluginfileurl']) ? $options['pluginfileurl'] : null;
         foreach ($this->_editors as $editorname) {
@@ -1174,7 +1175,7 @@ abstract class base {
     public function display_entries(array $options = null): string {
         global $DB, $OUTPUT, $CFG;
 
-        if (empty($this->_editentries)) {
+        if (!$this->user_is_editing()) {
             $html = $this->definition_to_html();
             if (isset($options['pluginfileurl'])) {
                 $html = $this->replace_pluginfile_urls($html, $options['pluginfileurl']);
@@ -1546,9 +1547,15 @@ abstract class base {
     }
 
     /**
+     * When the array is empty then user is not editing.
+     * @return bool true when edit mode false when display mode
      */
-    public function user_is_editing(): array {
-        return $this->_editentries;
+    public function user_is_editing(): bool {
+        if (!empty($this->_editentries)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
