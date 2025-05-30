@@ -30,12 +30,11 @@ defined('MOODLE_INTERNAL') || die();
 class backend_form extends base_form {
 
     /**
-     * @throws \coding_exception
-     * @throws \dml_exception
+     *
      */
     public function definition() {
         if ($id = $this->_customfilter->id) {
-            $customfilter = $this->_getcustomfilter($id);
+            $customfilter = $this->get_customfilter($id);
         } else {
             $customfilter = new stdClass();
             $customfilter->name = "";
@@ -112,7 +111,7 @@ class backend_form extends base_form {
         if ($customfilter->fieldlist) {
             $fieldlist = json_decode($customfilter->fieldlist);
         }
-        $fields = $this->_getpossiblecustomfilterfields($this->_dl);
+        $fields = $this->get_possible_customfilter_fields($this->_dl);
         foreach ($fields as $fieldid => $field) {
             $formfieldname = 'fieldlist[' . $field->field->id . '][name]';
             $formfieldsortablename = 'fieldlist[' . $field->field->id . '][sortable]';
@@ -141,9 +140,8 @@ class backend_form extends base_form {
     /**
      * @param $dl
      * @return array
-     * @throws \dml_exception
      */
-    protected function _getpossiblecustomfilterfields($dl) {
+    protected function get_possible_customfilter_fields($dl): array {
         global $DB;
 
         $fields = array();
@@ -161,14 +159,10 @@ class backend_form extends base_form {
     /**
      * @param $filterid
      * @return mixed
-     * @throws \dml_exception
      */
-    protected function _getcustomfilter($filterid) {
+    protected function get_customfilter($filterid) {
         global $DB;
-
-        $customfilter = $DB->get_record('datalynx_customfilters', array('id' => $filterid));
-
-        return $customfilter;
+        return $DB->get_record('datalynx_customfilters', array('id' => $filterid));
     }
 
     /**

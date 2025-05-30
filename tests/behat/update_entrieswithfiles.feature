@@ -36,9 +36,11 @@ Feature: In a datalynx instance create, update, and delete entries
       | radiobutton      | Radio              |             | Option A,Option B,Option C |          |        |
       | checkbox         | Checkbox           |             | Option 1,Option 2,Option 3 | Option 1 |        |
       | select           | Select             |             | Option X,Option Y,Option Z |          |        |
-      | teammemberselect | Team member select | 3           | 20                         | 1,2,4,8  |        |
       | number           | Number             | 3           | 2                          |          |        |
       | file             | File               | My file     |                            | 2        |        |
+    And I add to the "Datalynx Test Instance" datalynx the following fields:
+      | type             | name               | description | param1                     | admissible1   | admissible2 | admissible4 | admissible8 |
+      | teammemberselect | Team member select | 3           | 20                         | 1             | 1           | 1           | 1           |
     And I add to "Datalynx Test Instance" datalynx the view of "Tabular" type with:
       | name    | Tabular |
       | description | Tabular view |
