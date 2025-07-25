@@ -66,6 +66,7 @@ $PAGE->requires->string_for_js('tagproperties', 'datalynx');
 $PAGE->requires->string_for_js('deletetag', 'datalynx');
 $PAGE->requires->string_for_js('action', 'datalynx');
 $PAGE->requires->string_for_js('field', 'datalynx');
+$PAGE->requires->js('/mod/datalynx/amd/src/patterndialogue.js');
 
 $dl->set_page('view/view_edit', array('modjs' => true, 'urlparams' => $urlparams));
 

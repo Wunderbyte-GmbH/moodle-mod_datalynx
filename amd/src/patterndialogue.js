@@ -45,10 +45,12 @@ function replaceTagsWithButtons(editor) {
  * @param {*} editor - The TinyMCE editor instance
  */
 function reInitializeButtons(editor) {
+    let dataid = 0;
     editor.getBody().querySelectorAll('button[data-action-tag-button="true"], button.datalynx-field-tag').forEach((button) => {
         if (!button.getAttribute('data-click-initialized')) {
             button.addEventListener('click', () => openMoodleDialog(button));
             button.setAttribute('data-click-initialized', 'true');
+            button.setAttribute('data-id', 'datalynx-buton-id-' + dataid);
         }
     });
 }
@@ -75,38 +77,40 @@ function initializeTinyMCEButtons() {
 function openMoodleDialog(button) {
     const isFieldTag = button.classList.contains('datalynx-field-tag');
     const dialogContent = document.createElement('div');
+    dialogContent.setAttribute('id', button.getAttribute('data-id'));
 
     if (isFieldTag) {
         dialogContent.innerHTML = `
             <p>Field tag properties:</p>
             <p>Field: ${button.textContent}</p>
             <label>Behavior:</label>
-            <select id="tag-behavior-select">
+            <select id="tag-behavior-select-${dialogContent.id}">
                 <option value="behavior1">Behavior 1</option>
                 <option value="behavior2">Behavior 2</option>
             </select>
             <label>Renderer:</label>
-            <select id="tag-renderer-select">
+            <select id="tag-renderer-select-${dialogContent.id}">
                 <option value="renderer1">Renderer 1</option>
                 <option value="renderer2">Renderer 2</option>
             </select>
-            <button type="button" id="delete-tag">Delete tag</button>
+            <button type="button" class="delete-tag">Delete tag</button>
         `;
 
-        document.getElementById('tag-behavior-select').value = button.getAttribute('data-datalynx-behavior');
-        document.getElementById('tag-renderer-select').value = button.getAttribute('data-datalynx-renderer');
+        // document.getElementById('tag-behavior-select-' + dialogContent.id).value = button.getAttribute('data-datalynx-behavior');
+        // document.getElementById('tag-renderer-select-' + dialogContent.id).value = button.getAttribute('data-datalynx-renderer');
     } else {
         dialogContent.innerHTML = `
             <p>Action tag properties:</p>
             <p>Action: ${button.textContent}</p>
-            <button type="button" id="delete-tag">Delete tag</button>
+            <button type="button" class="delete-tag">Delete tag</button>
         `;
     }
 
-    const deleteButton = dialogContent.querySelector('#delete-tag');
-    deleteButton.addEventListener('click', () => {
-        button.remove();
-        dialog.hide();
+    dialogContent.querySelectorAll('.delete-tag').forEach((deleteButton) => {
+        deleteButton.addEventListener('click', () => {
+            button.remove();
+            dialog.hide();
+        });
     });
 
     const dialog = new M.core.dialogue({
@@ -124,7 +128,7 @@ function openMoodleDialog(button) {
  */
 function initReplaceTagsWithButtons() {
     window.tinyMCE.get().forEach((editor) => {
-        // Replace tags with buttons when editor is initialized
+        // Replace tags with buttons when the editor is initialized
         editor.on('init', () => replaceTagsWithButtons(editor));
         // Reinitialize buttons after content is loaded or changed
         editor.on('SetContent', () => reInitializeButtons(editor));
@@ -145,7 +149,7 @@ function waitForTinyMCE() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const dropdownMenu = document.getElementById('esection_editor_general_tag_menu');
+    const dropdownMenu = document.getElementById('eparam2_editor_field_tag_menu');
 
     if (typeof tinymce !== 'undefined') {
         waitForTinyMCE();
@@ -169,15 +173,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 const field = fieldTagMatch[1];
                 const behavior = fieldTagMatch[2] || '';
                 const renderer = fieldTagMatch[3] || '';
-                contentToInsert = `<button type="button" contenteditable="false" class="datalynx-field-tag" data-datalynx-field="
-                ${field}" data-datalynx-behavior="${behavior}" data-datalynx-renderer="${renderer}">${field}</button>`;
+                contentToInsert = `<button type="button" contenteditable="false" class="datalynx-field-tag" 
+                data-datalynx-field="${field}" data-datalynx-behavior="${behavior}" 
+                data-datalynx-renderer="${renderer}">${field}</button>`;
             } else {
                 contentToInsert = selectedValue;
             }
 
             window.tinyMCE.get().forEach((editor) => {
-                editor.insertContent(contentToInsert);
-                reInitializeButtons(editor);
+                if (editor.id === "id_eparam2_editor") {
+                    editor.insertContent(contentToInsert);
+                    reInitializeButtons(editor);
+                }
             });
         });
     }
@@ -195,7 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             div.querySelectorAll('button.datalynx-field-tag').forEach((button) => {
-                const field = button.getAttribute('data-datalynx-field');
+                const field = button.getAttribute('data-datalynx-field').trim();
                 const behavior = button.getAttribute('data-datalynx-behavior') || '';
                 const renderer = button.getAttribute('data-datalynx-renderer') || '';
                 const rawFieldTag = `[[${field}${behavior ? '|' + behavior : ''}${renderer ? '|' + renderer : ''}]]`;
