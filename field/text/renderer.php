@@ -120,11 +120,9 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
         $fieldid = $field->id();
         $nolinkend = "";
         $nolinkstart = "";
+        $formatoptions = [];
         if (isset($entry->{"c{$fieldid}_content"}) && !empty($entry->{"c{$fieldid}_content"})) {
             $content = $entry->{"c{$fieldid}_content"};
-
-            $options = new stdClass();
-            $options->para = false;
 
             $format = FORMAT_PLAIN;
             if ($field->get('param1') == '1') { // We are autolinking this field, so disable
@@ -132,10 +130,10 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
                                                 // Within us.
                 $nolinkstart = '<span class="nolink">';
                 $nolinkend = '</span>';
-                $options->filter = false;
+                $formatoptions['filter'] = false;
             }
 
-            $str = $nolinkstart . format_string($content, $format, $options) . $nolinkend;
+            $str = $nolinkstart . format_string($content, $format, $formatoptions) . $nolinkend;
         } else {
             $str = '';
         }
