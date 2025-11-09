@@ -109,6 +109,7 @@ class datalynx_rule_form extends moodleform {
             $attributes=array('size'=>'5');
             $mform->addElement('text', 'param10',
                     get_string('condition', 'datalynxrule_eventnotification'), $attributes);
+            $mform->setType('param10', PARAM_TEXT);
             $mform->addHelpButton('param10', 'condition', 'datalynxrule_eventnotification');
             $mform->disabledIf('param10', 'param5', 'eq', 0);
         }

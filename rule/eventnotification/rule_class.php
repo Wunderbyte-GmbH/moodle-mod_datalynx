@@ -45,9 +45,15 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
 
     protected $sender;
 
-    protected $recipient;
+    /**
+     * @var string
+     */
+    protected string $recipient = '';
 
-    protected $targetviews;
+    /**
+     * @var array
+     */
+    protected array $targetviews = [];
 
     /**
      * Class constructor
@@ -59,8 +65,12 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
         parent::__construct($df, $rule);
 
         $this->sender = $this->rule->param2;
-        $this->recipient = unserialize($this->rule->param3);
-        $this->targetviews = unserialize($this->rule->param4);
+        if (!empty($this->rule->param3)) {
+            $this->recipient = unserialize($this->rule->param3);
+        }
+        if ($this->rule->param4) {
+            $this->targetviews = unserialize($this->rule->param4);
+        }
     }
 
     /**

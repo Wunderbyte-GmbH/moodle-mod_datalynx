@@ -42,7 +42,7 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
         $options = array(
                 datalynx_rule_eventnotification::FROM_AUTHOR => get_string('author', 'datalynx'),
                 datalynx_rule_eventnotification::FROM_CURRENT_USER => get_string('user'));
-        $mform->addElement('select', 'param2', get_string('from'), $options);
+        $mform->addElement('select', 'param2', get_string('fromsender', 'moodle'), $options);
 
         // Recipient.
         $grp = [];
@@ -66,7 +66,7 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
         $allusers = $this->get_allusers();
         $grp[] = $mform->createElement('autocomplete', 'specificuserid', get_string('otheruser', 'datalynx'), $allusers);
 
-        $mform->addGroup($grp, 'recipientgrp', get_string('to'), $br, false);
+        $mform->addGroup($grp, 'recipientgrp', get_string('torecipient'), $br, false);
 
         // Link settings.
         $mform->addElement('header', 'settingshdr', get_string('linksettings', 'datalynx'));
@@ -172,7 +172,9 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
     }
 
     public function set_data($data) {
-        $recipients = unserialize($data->param3);
+        if (!empty($data->param3)) {
+            $recipients = unserialize($data->param3);
+        }
         if (isset($recipients['author'])) {
             $data->author = $recipients['author'];
         }
@@ -186,8 +188,12 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
             $data->specificuserid = $recipients['specificuserid'];
         }
 
-        $data->param4 = unserialize($data->param4);
-        $data->param7 = json_decode($data->param7);
+        if (!empty($data->param4)) {
+            $data->param4 = unserialize($data->param4);
+        }
+        if (!empty($data->param7)) {
+            $data->param7 = json_decode($data->param7);
+        }
         parent::set_data($data);
     }
 
