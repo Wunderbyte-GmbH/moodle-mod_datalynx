@@ -34,5 +34,8 @@ require_login();
 $count = $DB->get_field('datalynx_contents', 'content2', array('id' => $cid));
 $count++;
 $DB->set_field('datalynx_contents', 'content2', $count, array('id' => $cid));
-redirect(new moodle_url("/pluginfile.php/$context/mod_datalynx/content/$cid/$file"));
+
+// Encode filename to handle special characters like #, &, etc.
+$encodedfile = rawurlencode($file);
+redirect(new moodle_url("/pluginfile.php/$context/mod_datalynx/content/$cid/$encodedfile"));
 
