@@ -166,31 +166,31 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
         $mimetype = $file->get_mimetype();
         $pluginfileurl = '/pluginfile.php';
 
+        // Check for specific parameters/patterns first
+        if (!empty($params['url'])) {
+            return moodle_url::make_file_url($pluginfileurl, "$path/$filename");
+        } else if (!empty($params['size'])) {
+            $bsize = $file->get_filesize();
+            if ($bsize < 1000000) {
+                $size = round($bsize / 1000, 1) . 'KB';
+            } else {
+                $size = round($bsize / 1000000, 1) . 'MB';
+            }
+            return $size;
+        } else if (!empty($params['content'])) {
+            return $file->get_content();
+        } else if (!empty($params['download'])) {
+            return $this->display_link($file, $path, $altname, $params);
+        }
+
+        // Embed PDF if it's a PDF file and no specific pattern was requested
         if ($mimetype === 'application/pdf') {
-            // PDF document.
             $moodleurl = moodle_url::make_file_url($pluginfileurl, "$path/$filename");
             return $this->embed_pdf($moodleurl->out(), $fieldname);
         }
 
-        if (!empty($params['url'])) {
-            return moodle_url::make_file_url($pluginfileurl, "$path/$filename");
-        } else {
-            if (!empty($params['size'])) {
-                $bsize = $file->get_filesize();
-                if ($bsize < 1000000) {
-                    $size = round($bsize / 1000, 1) . 'KB';
-                } else {
-                    $size = round($bsize / 1000000, 1) . 'MB';
-                }
-                return $size;
-            } else {
-                if (!empty($params['content'])) {
-                    return $file->get_content();
-                } else {
-                    return $this->display_link($file, $path, $altname, $params);
-                }
-            }
-        }
+        // For all other file types, display as link
+        return $this->display_link($file, $path, $altname, $params);
     }
 
     /**
@@ -232,15 +232,17 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
         global $OUTPUT;
 
         $filename = $file->get_filename();
+        $mimetype = $file->get_mimetype();
         $displayname = $altname ?: $filename;
         $fileicon = html_writer::empty_tag('img',
-                array('src' => $OUTPUT->image_url(file_mimetype_icon($file->get_mimetype())),
-                        'alt' => $file->get_mimetype(), 'height' => 16, 'width' => 16));
+                array('src' => $OUTPUT->image_url(file_mimetype_icon($mimetype)),
+                        'alt' => $mimetype, 'height' => 16, 'width' => 16));
 
         if (!empty($params['download'])) {
             list(, $context, , , $contentid) = explode('/', $path);
             $url = new moodle_url("/mod/datalynx/field/file/download.php",
                     array('cid' => $contentid, 'context' => $context, 'file' => $filename));
+            return html_writer::link($url, "$fileicon&nbsp;$displayname", array('target' => '_blank'));
         } else {
             $url = moodle_url::make_file_url('/pluginfile.php', "$path/$filename");
         }
