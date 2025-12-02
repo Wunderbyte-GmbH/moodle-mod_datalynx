@@ -474,3 +474,53 @@ function bulk_action(elem, url, action, defaultval) {
 M.mod_datalynx.field_gradeitem_form_init = function () {
     Y.one('#mform1').one('select[name="param1"]').set('value', Y.one('#mform1').one('input[type="hidden"][name="param1"]').get('value'));
 };
+
+M.mod_datalynx.filter_form_init = function () {
+    require(['core_form/dynamicform', 'core/toast'], function (DynamicForm, Toast) {
+        const container = document.querySelector('#formcontainer');
+        const dynamicForm = new DynamicForm(container, 'mod_datalynx_filter_form');
+    
+        dynamicForm.addEventListener(dynamicForm.events.FORM_SUBMITTED, e => {
+            e.detail.good.forEach(successMessage => {
+                Toast.add(successMessage, {
+                    type: 'success',
+                });
+            });
+            e.detail.bad.forEach(errorMessage => {
+                Toast.add(errorMessage, {
+                    type: 'danger',
+                });
+            });
+            let searchParams = new URLSearchParams(window.location.search)
+            dynamicForm.load({
+                d: searchParams.get("d"),
+                fid: searchParams.get("fid")
+            });
+        })
+
+        container.addEventListener('change', e => {
+            if (e.target.matches('.custom-select') && (e.target.name.startsWith('searchfield') || e.target.name.startsWith('sortfield'))) {
+                e.preventDefault();
+                document.getElementsByName("refreshonly")[0].value = "1";
+                dynamicForm.submitFormAjax();
+            }
+        });
+
+        container.addEventListener('click', e => {
+            if (e.target.matches('input[type="submit"]')) {
+                e.preventDefault();
+                document.getElementsByName("refreshonly")[0].value = "0";
+                dynamicForm.submitFormAjax();
+            }
+        });
+
+        $(function() {
+            let searchParams = new URLSearchParams(window.location.search)
+            dynamicForm.load({
+                d: searchParams.get("d"),
+                fid: searchParams.get("fid")
+            });
+        });
+
+    });
+};

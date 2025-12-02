@@ -24,11 +24,12 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->libdir/formslib.php");
+use core_form\dynamic_form;
 
 /**
  *
  */
-abstract class mod_datalynx_filter_base_form extends moodleform {
+abstract class mod_datalynx_filter_base_form extends dynamic_form {
 
     protected $_filter = null;
     protected $_customfilter = null;
@@ -39,16 +40,57 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
      */
     protected $_df = null;
 
-    /*
-     *
-     */
-    public function __construct($df, $filter, $action = null, $customdata = null, $method = 'post', $target = '',
-            $attributes = null, $editable = true, $customfilter = false) {
-        $this->_filter = $filter;
-        $this->_customfilter = $customfilter;
-        $this->_df = $df;
+    public function get_context_for_dynamic_submission(): context {
+        return \context_system::instance();
+    }
 
-        parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
+    public function check_access_for_dynamic_submission(): void {
+        // TODO: Implement permissions check.
+        return;
+    }
+
+    public function set_data_for_dynamic_submission(): void {
+        $datalynx_id = $this->_ajaxformdata["d"];
+        $filter_id = $this->_ajaxformdata["fid"];
+
+        if ($datalynx_id == null || $filter_id == null) {
+            return;
+        }
+
+        $this->_df = \mod_datalynx\datalynx::get_datalynx_by_instance($datalynx_id);
+        $fm = $this->_df->get_filter_manager();
+        $this->_filter = $fm->get_filter_from_id($filter_id);
+
+        // Update filter parameters based on the current form data (in order to dynamically render new form fields for filter details):
+        if ($this->_ajaxformdata["update"] && confirm_sesskey()) {
+            $procesedfilters = $fm->process_filters_for_ajax_refresh('update', $filter_id, $this, true);
+            $this->_filter = $procesedfilters[0];
+        }
+    }
+
+    public function process_dynamic_submission() {
+
+        $datalynx_id = $this->_ajaxformdata["d"];
+        $filter_id = $this->_ajaxformdata["fid"];
+
+        if ($datalynx_id == null || $filter_id == null) {
+            return;
+        }
+
+        $this->_df = \mod_datalynx\datalynx::get_datalynx_by_instance($datalynx_id);
+        $fm = $this->_df->get_filter_manager();
+        $this->_filter = $fm->get_filter_from_id($filter_id);
+
+        if ($this->_ajaxformdata["update"] && confirm_sesskey()) { // Add/update a new filter.
+            $procesedfilters = $fm->process_filters_for_ajax_submission('update', $filter_id, $this, true);
+            $this->_filter = $procesedfilters[0];
+        }
+
+        return $this->_df->notifications;
+    }
+
+    public function get_page_url_for_dynamic_submission(): moodle_url {
+        return new moodle_url('/mod/datalynx/view.php', array('id' => $this->_df->id));
     }
 
     /*
@@ -214,9 +256,6 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
                 $mform->disabledIf("searchoption$count", 'searchandor' . ($count - 1), 'eq', 0);
             }
         }
-
-        $mform->registerNoSubmitButton('addsearchsettings');
-        $mform->addElement('submit', 'addsearchsettings', get_string('reload'));
     }
 
     /*
@@ -259,15 +298,18 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
 
 class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
 
+    public function definition() {}
+
     /*
      *
      */
-    public function definition() {
+    public function definition_after_data() {
         $df = $this->_df;
         $filter = $this->_filter;
         $name = empty($filter->name) ? get_string('filternew', 'datalynx') : $filter->name;
         $description = empty($filter->description) ? '' : $filter->description;
         $visible = !isset($filter->visible) ? 1 : $filter->visible;
+
         $fields = $df->get_fields();
         $fieldoptions = array(0 => get_string('choose')) + $df->get_fields(array('entry'), true);
 
@@ -334,8 +376,23 @@ class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
 
         $this->custom_search_definition($filter->customsearch, $fields, $fieldoptions, true);
 
+        // Hidden fields to track the Datalynx instance and the filter id.
+        if ($df !== null) {
+            $mform->addElement('hidden', 'd', $df->id());
+        }
+        if ($filter !== null) {
+            $mform->addElement('hidden', 'fid', $filter->id);
+        }
+        $mform->addElement('hidden', 'refreshonly', '0');
+        $mform->addElement('hidden', 'update', '1');
+
         // Buttons.
         $this->add_action_buttons(true);
+    }
+
+    public function get_ajax_form_data() {
+        // Convert to stdClass:
+        return json_decode(json_encode($this->_ajaxformdata));
     }
 
     /**
@@ -346,16 +403,26 @@ class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
      */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
+        if (array_key_exists('refreshonly', $data)) {
+            if ($data['refreshonly'] == '0') {
 
-        $df = $this->_df;
-        $filter = $this->_filter;
+                $df = $this->_df;
+                $filter = $this->_filter;
 
-        // Validate unique name.
-        if (empty($data['name']) || $df->name_exists('filters', $data['name'], $filter->id)) {
-            $errors['name'] = get_string('invalidname', 'datalynx',
-                    get_string('filter', 'datalynx'));
+                // Validate unique name.
+                if (empty($data['name']) || $df->name_exists('filters', $data['name'], $filter->id)) {
+                    $errors['name'] = get_string('invalidname', 'datalynx',
+                            get_string('filter', 'datalynx'));
+                }
+            } else {
+                // If we do not return any error after a submission, the form will 
+                // be regarded as submitted and will render empty. 
+                // We need to return a dummy error to prevent this.
+                // This also prevents process_dynamic_submission from being executed in this case, 
+                // as the form gets no validated flag:
+                $errors['dummy_error_for_refreshing'] = 'dummy_error_for_refreshing';
+            }
         }
-
         return $errors;
     }
 }
