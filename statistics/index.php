@@ -53,7 +53,7 @@ if ($data = $mform->get_data()) {
     $data->from_old = $data->from;
     $data->to_old = $data->to;
     $data->mode_old = $data->mode;
-    $data->show_old = isset($data->show) ? $data->show : array();
+    $data->show_old = isset($data->show) ? $data->show : [];
     $mform->set_data($data);
 } else {
     if ($mform->is_submitted()) {

@@ -46,7 +46,7 @@ class datalynxfield_tag extends datalynxfield_option_multiple {
         $entryid = $entry->id;
         $fieldid = $this->field->id;
         $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
-        $tags = array();
+        $tags = [];
         $content = "";
 
         // Variable $tags is an array of tagnames or empty.
@@ -180,7 +180,7 @@ class datalynxfield_tag extends datalynxfield_option_multiple {
         $entryids = $DB->get_fieldset_sql($sql, $params);
         $entryidsstr = implode(',', $entryids);
 
-        return array(" e.id $not IN ($entryidsstr)", array(), false);
+        return array(" e.id $not IN ($entryidsstr)", [], false);
     }
 
     public function get_supported_search_operators() {

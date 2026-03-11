@@ -166,7 +166,7 @@ abstract class base {
         $this->set__patterns();
 
         // Base url params.
-        $baseurlparams = array();
+        $baseurlparams = [];
         $baseurlparams['d'] = $this->_df->id();
         $baseurlparams['view'] = $this->id();
         if (!empty($eids)) {
@@ -265,7 +265,7 @@ abstract class base {
     protected function set__patterns() {
         global $DB;
 
-        $patternarray = array();
+        $patternarray = [];
         $text = '';
         foreach ($this->_editors as $editor) {
             $text .= isset($this->view->$editor) ? $this->view->$editor : '';
@@ -297,7 +297,7 @@ abstract class base {
     public function set_filter($filteroptions = true, $ignoreurl = false) {
         $fm = $this->_df->get_filter_manager($this);
         $urlparams = $fm::get_filter_options_from_url();
-        $urloptions = array();
+        $urloptions = [];
 
         // Keep page to allow for pagination.
         if (isset($urlparams['page'])) {
@@ -584,7 +584,7 @@ abstract class base {
      * @param array $options
      * @return void
      */
-    public function set_content(array $options = array()) {
+    public function set_content(array $options = []) {
         // Options: added for datalynxview_field calling external view.
         // Possible options values: filter, users, groups, eids.
         if ($this->_returntoentriesform) {
@@ -768,9 +768,9 @@ abstract class base {
      * @return $text HTML with masked tags
      */
     public function mask_tags($text) {
-        $matches = array();
-        $find = array();
-        $replace = array();
+        $matches = [];
+        $find = [];
+        $replace = [];
         // Regex to mask all known tag patterns. Patterns followed by @ are not masked.
         preg_match_all('/(?:(\[\[[^\]]+\]\])(?!@)|(##[^#]+##)|(%%[^%]+%%)|(#\{\{[^\}#]+\}\}#))/', $text,
                 $matches, PREG_PATTERN_ORDER);
@@ -805,7 +805,7 @@ abstract class base {
      * @return array of field ids
      */
     public function get_view_fields() {
-        $viewfields = array();
+        $viewfields = [];
 
         if (!empty($this->_tags['field'])) {
             $fields = $this->_df->get_fields();
@@ -839,7 +839,7 @@ abstract class base {
      * @return array[]
      */
     public function character_tags(): array {
-        $patterns = array('---' => array('---' => array()));
+        $patterns = array('---' => array('---' => []));
         $patterns['9'] = 'tab';
         $patterns['10'] = 'new line';
 
@@ -853,7 +853,7 @@ abstract class base {
     /**
      */
     public function editors() {
-        $editors = array();
+        $editors = [];
 
         $options = array('trusttext' => true, 'noclean' => true, 'subdirs' => false,
                 'changeformat' => true, 'collapsed' => true, 'rows' => 20, 'style' => 'width:100%',
@@ -901,12 +901,12 @@ abstract class base {
             return $this->_tags;
         } else {
             if (empty($this->_tags)) {
-                return array();
+                return [];
             } else {
                 if ($set == 'view' || $set == 'field') {
                     return $this->_tags[$set];
                 } else {
-                    return array();
+                    return [];
                 }
             }
         }
@@ -928,7 +928,7 @@ abstract class base {
     /**
      */
     public function get_embedded_files($set = null) {
-        $files = array();
+        $files = [];
         $fs = get_file_storage();
 
         // View files.
@@ -944,7 +944,7 @@ abstract class base {
         // Field files.
         if (empty($set) || $set == 'field') {
             // Find which fields actually display files/images in the view.
-            $fids = array();
+            $fids = [];
             if (!empty($this->_tags['field'])) {
                 $fields = $this->_df->get_fields();
                 foreach ($this->_tags['field'] as $fieldid => $tags) {
@@ -976,7 +976,7 @@ abstract class base {
      * @return array
      */
     protected function entry_definition($fielddefinitions) {
-        $elements = array();
+        $elements = [];
 
         // Split the entry template to tags and html.
         $tags = array_keys($fielddefinitions);
@@ -1024,7 +1024,7 @@ abstract class base {
                 $field = $fields[$fieldid];
 
                 if ($definition = $field->get_definitions(array($pattern
-                ), $entry, array())
+                ), $entry, [])
                 ) {
                     $groupbyvalue = $definition[$pattern][1];
                 }
@@ -1050,7 +1050,7 @@ abstract class base {
         $insort = false;
         // TODO: asc order is arbitrary here and should be determined differently.
         $sortdir = 0;
-        $sortfields = array();
+        $sortfields = [];
         if ($this->_filter->customsort) {
             $sortfields = unserialize($this->_filter->customsort);
             if ($insort = in_array($fieldid, array_keys($sortfields))) {
@@ -1086,7 +1086,7 @@ abstract class base {
             $vals = $groupbyvalues;
         }
 
-        $searchfields = array();
+        $searchfields = [];
         if ($this->_filter->customsearch) {
             $searchfields = unserialize($this->_filter->customsearch);
         }
@@ -1234,7 +1234,7 @@ abstract class base {
                 if ($type === 'html') {
                     $mform->addElement('html', $content);
                 } else {
-                    $params = array();
+                    $params = [];
                     $func = $content[0];
                     $entry = $content[1][0];
                     if (isset($content[1][1])) {
@@ -1280,9 +1280,9 @@ abstract class base {
     // TODO THIS IS CRITICAL!!!
     public function get_entries_definition() {
         $displaydefinition = $this->_display_definition;
-        $groupedelements = array();
+        $groupedelements = [];
         foreach ($displaydefinition as $name => $entriesset) {
-            $definitions = array();
+            $definitions = [];
             if ($name == 'newentry') {
                 foreach ($entriesset as $entryid => $unused) {
                     $definitions[$entryid] = $this->new_entry_definition($entryid);
@@ -1298,7 +1298,7 @@ abstract class base {
             $groupedelements[$name] = $this->apply_entry_group_layout($definitions, $name);
         }
         // Flatten the elements.
-        $elements = array();
+        $elements = [];
         foreach ($groupedelements as $group) {
             $elements = array_merge($elements, $group);
         }
@@ -1312,7 +1312,7 @@ abstract class base {
         $fields = $this->_df->get_fields();
         $entry->baseurl = $this->_baseurl;
 
-        $definitions = array();
+        $definitions = [];
         foreach ($this->_tags['field'] as $fieldid => $patterns) {
             if (isset($fields[$fieldid])) {
                 $field = $fields[$fieldid];
@@ -1325,7 +1325,7 @@ abstract class base {
 
         // Enables view tag replacement within the entry template.
         if ($patterns = $this->patternclass()->get_replacements($this->_tags['view'], null, $options)) {
-            $viewdefinitions = array();
+            $viewdefinitions = [];
             foreach ($patterns as $tag => $pattern) {
                 if ((strpos($tag, 'viewlink') !== 0 || strpos($tag, 'viewsesslink') !== 0) &&
                         (!array_key_exists('edit', $options) || !$options['edit'])
@@ -1352,7 +1352,7 @@ abstract class base {
      * @throws coding_exception
      */
     protected function set__display_definition(array $options = null) {
-        $this->_display_definition = array();
+        $this->_display_definition = [];
         // Indicate if there are managable entries in the display for the current user.
         // In which case edit/delete action.
         $requiresmanageentries = false;
@@ -1361,7 +1361,7 @@ abstract class base {
         // Display a new entry to add in its own group.
         if (count($this->_editentries) == 1 && $this->_editentries[0] < 0) {
             if ($this->_df->user_can_manage_entry()) {
-                $this->_display_definition['newentry'] = array();
+                $this->_display_definition['newentry'] = [];
                 for ($i = -1; $i >= $this->_editentries[0]; $i--) {
                     $this->_display_definition['newentry'][$i] = null;
                 }
@@ -1373,7 +1373,7 @@ abstract class base {
         // Compile entries if any.
         if ($entries = $this->_entries->entries()) {
             $groupname = '';
-            $groupdefinition = array();
+            $groupdefinition = [];
 
             // If action buttons should be hidden entries should be unmanageable.
             $displayactions = isset($options['entryactions']) ? $options['entryactions'] : true;
@@ -1398,7 +1398,7 @@ abstract class base {
                         if ($groupname) {
                             // Add the group entries definitions.
                             $this->_display_definition[$groupname] = $groupdefinition;
-                            $groupdefinition = array();
+                            $groupdefinition = [];
                         }
                         // Reset group name.
                         $groupname = $groupbyvalue;
@@ -1424,8 +1424,8 @@ abstract class base {
         if (preg_match_all("/%%F\d*:=[^%]+%%/", $text, $matches)) {
             require_once("$CFG->libdir/mathslib.php");
             sort($matches[0]);
-            $replacements = array();
-            $formulas = array();
+            $replacements = [];
+            $formulas = [];
             foreach ($matches[0] as $pattern) {
                 $cleanpattern = trim($pattern, '%');
                 list($fid, $formula) = explode(':=', $cleanpattern, 2);
@@ -1439,7 +1439,7 @@ abstract class base {
                         }
                     }
                 }
-                isset($formulas[$fid]) || $formulas[$fid] = array();
+                isset($formulas[$fid]) || $formulas[$fid] = [];
                 // Enclose formula in brackets to preserve precedence.
                 $formulas[$fid][] = "($formula)";
                 $replacements[$pattern] = $formula;

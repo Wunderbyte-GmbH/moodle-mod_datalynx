@@ -42,7 +42,7 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
     public function replacements(array $tags = null, $entry = null, array $options = null) {
         $edit = !empty($options['edit']) ? $options['edit'] : false;
 
-        $replacements = array();
+        $replacements = [];
 
         foreach ($tags as $tag) {
             if (!$entry || $edit) {
@@ -73,7 +73,7 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
      * @param datalynx_entry $entry an entry
      * @param array $options unused
      */
-    public function display_edit(&$mform, $entry, array $options = array()) {
+    public function display_edit(&$mform, $entry, array $options = []) {
         $field = $this->_field;
         $fieldid = $field->id();
         $entryid = $entry->id;
@@ -121,7 +121,7 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
      * @param array $params unused
      * @return string HTML representation
      */
-    protected function display_browse($entry, $params = array()) {
+    protected function display_browse($entry, $params = []) {
         $field = $this->_field;
         $menu = $this->menu_status(true);
         if (isset($entry) && isset($entry->status)) {
@@ -164,7 +164,7 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
     protected function patterns() {
         $cat = get_string('actions', 'datalynx');
 
-        $patterns = array();
+        $patterns = [];
         $patterns["##status##"] = array(true, $cat);
         $patterns["##*status##"] = array(true, $cat);
 

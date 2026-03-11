@@ -65,8 +65,8 @@ class datalynxfield_time extends datalynxfield_base {
      */
     protected function format_content($entry, array $values = null) {
         $fieldid = $this->field->id;
-        $oldcontents = array();
-        $contents = array();
+        $oldcontents = [];
+        $contents = [];
         // Old contents.
         if (isset($entry->{"c{$fieldid}_content"})) {
             $oldcontents[] = $entry->{"c{$fieldid}_content"};
@@ -107,7 +107,7 @@ class datalynxfield_time extends datalynxfield_base {
     /**
      */
     public function parse_search($formdata, $i) {
-        $time = array();
+        $time = [];
 
         if (!empty($formdata->{'f_' . $i . '_' . $this->field->id . '_from'})) {
             $time[0] = $formdata->{'f_' . $i . '_' . $this->field->id . '_from'};
@@ -150,7 +150,7 @@ class datalynxfield_time extends datalynxfield_base {
         $namefrom = "df_{$this->field->id}_{$i}_from";
         $nameto = "df_{$this->field->id}_{$i}_to";
         $varcharcontent = $this->get_sql_compare_text();
-        $params = array();
+        $params = [];
 
         switch ($operator) {
             case '=':
@@ -180,7 +180,7 @@ class datalynxfield_time extends datalynxfield_base {
     protected function get_entry_ids_for_empty_content() {
         global $DB;
 
-        $params = array();
+        $params = [];
         $sql = "SELECT id FROM {datalynx_entries} e
                 WHERE e.dataid = :dataid AND NOT EXISTS
                   (SELECT id FROM {datalynx_contents} c WHERE fieldid = :fieldid AND c.entryid =  e.id) ";

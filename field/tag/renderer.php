@@ -71,7 +71,7 @@ class datalynxfield_tag_renderer extends datalynxfield_renderer {
 
         // For csv export we only show rawnames of tags.
         if (optional_param('exportcsv', '', PARAM_ALPHA)) {
-            $exportstring = array();
+            $exportstring = [];
             foreach ($items as $item) {
                 $exportstring[] = $item->rawname;
             }
@@ -129,7 +129,7 @@ class datalynxfield_tag_renderer extends datalynxfield_renderer {
 
         $formfieldname = "field_{$fieldid}_{$entryid}";
 
-        $errors = array();
+        $errors = [];
         foreach ($tags as $tag) {
             list(, $behavior, ) = $this->process_tag($tag);
             // Variable $behavior datalynx_field_behavior.

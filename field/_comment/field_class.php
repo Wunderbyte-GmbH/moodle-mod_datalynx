@@ -41,7 +41,7 @@ class datalynxfield__comment extends datalynxfield_no_content {
     /**
      */
     public static function get_field_objects($dataid) {
-        $fieldobjects = array();
+        $fieldobjects = [];
 
         $fieldobjects[self::_COMMENT] = (object) array('id' => self::_COMMENT, 'dataid' => $dataid,
                 'type' => '_comment', 'name' => get_string('comments', 'datalynx'), 'description' => '',

@@ -91,7 +91,7 @@ class datalynx_rule_form extends moodleform {
 
         // Events.
         $eventmenu = datalynx_rule_manager::get_event_data($this->_df->id());
-        $eventgroup = array();
+        $eventgroup = [];
         foreach ($eventmenu as $eventname => $eventlabel) {
             $eventgroup[] = &$mform->createElement('checkbox', $eventname, null, $eventlabel, array('size' => 32));
         }
@@ -145,7 +145,7 @@ class datalynx_rule_form extends moodleform {
     public function get_data($slashed = true) {
         if ($data = parent::get_data($slashed)) {
             $eventmenu = datalynx_rule_manager::get_event_data($this->_df->id());
-            $selectedevents = array();
+            $selectedevents = [];
             foreach (array_keys($eventmenu) as $eventname) {
                 if (isset($data->$eventname)) {
                     $selectedevents[] = $eventname;
@@ -166,7 +166,7 @@ class datalynx_rule_form extends moodleform {
     public function add_action_buttons($cancel = true, $submit = null) {
         $mform = &$this->_form;
 
-        $buttonarray = array();
+        $buttonarray = [];
         // Save and display.
         $buttonarray[] = &$mform->createElement('submit', 'submitbutton', get_string('savechanges'));
         // Save and continue.

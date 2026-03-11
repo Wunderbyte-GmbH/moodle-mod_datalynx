@@ -282,7 +282,7 @@ $capabilities = array(
                 'riskbitmask' => RISK_PERSONAL,
                 'captype' => 'read',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => array()
+                'archetypes' => []
         ),
 
         'mod/datalynx:viewprivilegemanager' => array(
@@ -317,7 +317,7 @@ $capabilities = array(
                 'riskbitmask' => RISK_PERSONAL, RISK_DATALOSS,
                 'captype' => 'write',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => array()
+                'archetypes' => []
         ),
 
         'mod/datalynx:editprivilegemanager' => array(

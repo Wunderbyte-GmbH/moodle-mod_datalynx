@@ -41,7 +41,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
         // If edit mode or rating not active return.
         if ($edit || (!$this->_field->df()->data->rating)) {
             if ($tags) {
-                $replacements = array();
+                $replacements = [];
                 foreach ($tags as $tag) {
                     switch (trim($tag, '@')) {
                         case '##ratings:count##':
@@ -120,7 +120,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
                         }
                         // Attach the rating record to the entry.
                         if (!isset($entry->rating->records)) {
-                            $entry->rating->records = array();
+                            $entry->rating->records = [];
                         }
                         $entry->rating->records[$recordid] = $raterecord;
                     }
@@ -129,7 +129,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
         }
 
         // No edit mode for this field so just return html.
-        $replacements = array();
+        $replacements = [];
         foreach ($tags as $tag) {
             if ($entry->id > 0 && !empty($entry->rating)) {
                 switch (trim($tag, '@')) {
@@ -232,7 +232,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
                 $table->attributes['class'] = 'generalbox ratingtable';
                 $table->colclasses = array('', 'firstname', 'rating', 'time'
                 );
-                $table->data = array();
+                $table->data = [];
 
                 // If the scale was changed after ratings were submitted some ratings may have av alue above the current maximum.
                 // We can't just do count($scalemenu) - 1 as custom scales start at index 1, not 0.
@@ -403,7 +403,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
         $fieldinternalname = $this->_field->get('internalname');
         $cat = get_string('ratings', 'datalynx');
 
-        $patterns = array();
+        $patterns = [];
         switch ($fieldinternalname) {
             case 'ratings':
                 $patterns['##ratings:rate##'] = array(true, $cat

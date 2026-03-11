@@ -60,8 +60,8 @@ $sections = $modinfo->get_section_info_all();
 $table = new html_table();
 $table->attributes['align'] = 'center';
 $table->attributes['cellpadding'] = '2';
-$table->head = array();
-$table->align = array();
+$table->head = [];
+$table->align = [];
 
 // Section.
 $table->head[] = get_string('sectionname', 'format_' . $course->format);
@@ -105,7 +105,7 @@ $stredit = get_string('edit');
 $strdelete = get_string('delete');
 
 foreach ($datalynxs as $datalynx) {
-    $tablerow = array();
+    $tablerow = [];
 
     $df = new mod_datalynx\datalynx($datalynx->id);
 
@@ -150,7 +150,7 @@ foreach ($datalynxs as $datalynx) {
     }
 
     if ($showeditbuttons) {
-        $buttons = array();
+        $buttons = [];
         $editingurl->param('update', $datalynx->coursemodule);
         $buttons['edit'] = html_writer::link($editingurl, $OUTPUT->pix_icon('t/edit', $stredit));
         $editingurl->remove_params('update');

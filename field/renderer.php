@@ -55,9 +55,9 @@ abstract class datalynxfield_renderer {
      * @return array Field patterns found in the text
      */
     public function search($text) {
-        $found = array();
+        $found = [];
 
-        $matches = array();
+        $matches = [];
         $fieldname = preg_quote($this->_field->name(), '/');
         if (preg_match_all("/\[\[$fieldname(?:\|(?:[^\]]+))?\]\](?:@)?/", $text, $matches)) {
             $found = array_merge($found, $matches[0]);
@@ -97,7 +97,7 @@ abstract class datalynxfield_renderer {
      * @return array
      */
     public function replacements(array $tags = null, stdClass $entry = null, array $options = null) {
-        $replacements = array();
+        $replacements = [];
         foreach ($tags as $tag) {
             $currentoptions = array_merge(self::$defaultoptions, $options);
             list($fieldname, $behavior, $renderer) = $this->process_tag($tag);
@@ -205,7 +205,7 @@ abstract class datalynxfield_renderer {
      */
     protected function process_tag($tag) {
         $pattern = '/\[\[([^\|\]]+)(?:\|([^\|\]]*))?(?:\|([^\|\]]*))?\]\]/';
-        $matches = array();
+        $matches = [];
 
         $fieldname = $this->_field->name();
         $behavior = datalynx_field_behavior::get_default_behavior($this->_field->df());
@@ -321,7 +321,7 @@ abstract class datalynxfield_renderer {
             $content = $entry->{"c{$fieldid}_content"};
         }
 
-        $arr = array();
+        $arr = [];
         $arr[] = &$mform->createElement('text', $fieldname, null,
                 array('size' => '32', 'disabled' => ($options['disabled'] ? 'disabled' : null)
                 ));
@@ -341,7 +341,7 @@ abstract class datalynxfield_renderer {
         $fieldid = $this->_field->id();
         $fieldname = "f_{$i}_$fieldid";
 
-        $arr = array();
+        $arr = [];
         $arr[] = &$mform->createElement('text', $fieldname, null, array('size' => '32'));
         $mform->setType($fieldname, PARAM_NOTAGS);
         $mform->setDefault($fieldname, $value);
@@ -354,7 +354,7 @@ abstract class datalynxfield_renderer {
      */
     final public function get_menu($showall = false) {
         // The default menu category for fields.
-        $patternsmenu = array();
+        $patternsmenu = [];
         foreach ($this->patterns() as $tag => $pattern) {
             if ($showall || $pattern[self::PATTERN_SHOW_IN_MENU]) {
                 // Which category.
@@ -365,7 +365,7 @@ abstract class datalynxfield_renderer {
                 }
                 // Prepare array.
                 if (!isset($patternsmenu[$cat])) {
-                    $patternsmenu[$cat] = array($cat => array());
+                    $patternsmenu[$cat] = array($cat => []);
                 }
                 // Add tag.
                 $patternsmenu[$cat][$cat][$tag] = $tag;
@@ -383,7 +383,7 @@ abstract class datalynxfield_renderer {
      * @return array
      */
     public function validate($entryid, $tags, $data) {
-        return array();
+        return [];
     }
 
     /**
@@ -397,7 +397,7 @@ abstract class datalynxfield_renderer {
     protected function patterns() {
         $fieldname = $this->_field->name();
 
-        $patterns = array();
+        $patterns = [];
         $patterns["[[$fieldname]]"] = array(true);
 
         return $patterns;
@@ -406,6 +406,6 @@ abstract class datalynxfield_renderer {
     /**
      */
     public function pluginfile_patterns() {
-        return array();
+        return [];
     }
 }

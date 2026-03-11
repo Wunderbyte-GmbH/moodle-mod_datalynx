@@ -98,7 +98,7 @@ class datalynxview_patterns {
                 }
                 // Prepare array.
                 if (!isset($patternsmenu[$cat])) {
-                    $patternsmenu[$cat] = array($cat => array());
+                    $patternsmenu[$cat] = array($cat => []);
                 }
                 // Add tag.
                 $patternsmenu[$cat][$cat][$tag] = $tag;

@@ -35,9 +35,9 @@ class datalynxfield_fieldgroup_form extends datalynxfield_form {
         $mform = &$this->_form;
 
         // Fieldgroupfieldids are stored in param1.
-        $fields = array();
+        $fields = [];
         $fields = $this->_df->get_fields(null, false, true);
-        $fieldnames = array();
+        $fieldnames = [];
         foreach ($fields as $fieldid => $field) {
             if ($field->for_use_in_fieldgroup()) {
                 $fieldnames[$fieldid] = $field->name();

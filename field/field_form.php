@@ -67,7 +67,7 @@ class datalynxfield_form extends moodleform {
     public function add_action_buttons($cancel = true, $submit = null) {
         $mform = &$this->_form;
 
-        $buttonarray = array();
+        $buttonarray = [];
         // Save and display.
         $buttonarray[] = &$mform->createElement('submit', 'submitbutton', get_string('savechanges'));
         // Save and continue.
@@ -134,7 +134,7 @@ class datalynxfield_form extends moodleform {
                     " (" . strip_tags(format_string($this->_df->name(), true)) . ")";
             foreach ($datalynxs as $dlid => $dl) {
                 if (!isset($dfmenu[$dl->courseshortname])) {
-                    $dfmenu[$dl->courseshortname] = array();
+                    $dfmenu[$dl->courseshortname] = [];
                 }
                 $dfmenu[$dl->courseshortname][$dlid] = strip_tags(
                         format_string($dl->name, true));
@@ -171,7 +171,7 @@ class datalynxfield_option_form extends datalynxfield_form {
         $mform = &$this->_form;
         $options = $this->_field->get_options();
         if (!empty($options)) {
-            $group = array();
+            $group = [];
             $group[] = &$mform->createElement('static', null, null,
                     '<table><thead><th>' . get_string('option', 'datalynx') . '</th><th>' .
                     get_string('renameoption', 'datalynx') . '</th><th>' .

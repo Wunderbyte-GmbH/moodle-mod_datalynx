@@ -101,7 +101,7 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
         $editable = $field->editable;
         $isediting = $options['edit'];
 
-        $replacements = array();
+        $replacements = [];
         if ($isediting && $manageable && $editable) {
             $replacements[$tag] = array('', array(array($this, 'display_edit'), array($entry)));
             return $replacements;
@@ -210,7 +210,7 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
             if (!empty($this->field->param10)) {
                 $attributes = array('target' => $this->field->param10);
             } else {
-                $attributes = array();
+                $attributes = [];
             }
 
             // Create the link.
@@ -250,7 +250,7 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
         $fieldname = $this->_field->name();
         $cat = get_string('authorinfo', 'datalynx');
 
-        $patterns = array();
+        $patterns = [];
         $patterns["##author:$fieldname##"] = array(true, $cat);
 
         return $patterns;
@@ -261,7 +261,7 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
         $fieldid = $this->_field->id();
         $formfieldname = "field_{$fieldid}_{$entryid}";
 
-        $errors = array();
+        $errors = [];
         if ($entryid == -1) {
             global $USER;
             $userid = $USER->id;

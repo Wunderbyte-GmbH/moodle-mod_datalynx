@@ -47,7 +47,7 @@ class datalynxfield_textarea extends datalynxfield_base {
         $maxbytes = !empty($this->field->param5) ? $this->field->param5 : 0;
         $maxfiles = !empty($this->field->param6) ? $this->field->param6 : -1;
 
-        $this->editoroptions = array();
+        $this->editoroptions = [];
         $this->editoroptions['context'] = $this->df->context;
         $this->editoroptions['trusttext'] = $trust;
         $this->editoroptions['maxbytes'] = $maxbytes;
@@ -120,7 +120,7 @@ class datalynxfield_textarea extends datalynxfield_base {
         if ($this->is_editor()) {
             if (isset($data->{"field_{$fieldid}_{$entryid}"})) {
                 $valuearr = explode('##', $data->{"field_{$fieldid}_{$entryid}"});
-                $content = array();
+                $content = [];
                 if ($csvrecord) {
                     $content['text'] = !empty($valuearr[0]) ? htmlspecialchars_decode($valuearr[0]) : null;
                 } else {

@@ -53,7 +53,7 @@ class datalynxfield_picture_form extends datalynxfield_file_form {
         $mform->setDefault('param2', -1);
 
         // Pic display dimensions.
-        $dispdimgrp = array();
+        $dispdimgrp = [];
         $dispdimgrp[] = &$mform->createElement('text', 'param4', null, array('size' => '8'));
         $dispdimgrp[] = &$mform->createElement('text', 'param5', null, array('size' => '8'));
         $dispdimgrp[] = &$mform->createElement('select', 'param6', null,
@@ -68,7 +68,7 @@ class datalynxfield_picture_form extends datalynxfield_file_form {
                 array('param5' => array(array(null, 'numeric', null, 'client'))));
 
         // Max pic dimensions (crop if needed).
-        $maxpicdimgrp = array();
+        $maxpicdimgrp = [];
         $maxpicdimgrp[] = &$mform->createElement('text', 'param7', null, array('size' => '8'));
         $maxpicdimgrp[] = &$mform->createElement('text', 'param8', null, array('size' => '8'));
         $mform->addGroup($maxpicdimgrp, 'maxpicdim',
@@ -83,7 +83,7 @@ class datalynxfield_picture_form extends datalynxfield_file_form {
         $mform->setDefault('param8', '');
 
         // Thumbnail dimensions (crop if needed).
-        $thumbnailgrp = array();
+        $thumbnailgrp = [];
         $thumbnailgrp[] = &$mform->createElement('text', 'param9', null, array('size' => '8'));
         $thumbnailgrp[] = &$mform->createElement('text', 'param10', null, array('size' => '8'));
         $mform->addGroup($thumbnailgrp, 'thumbnaildim',
@@ -111,7 +111,7 @@ class datalynxfield_picture_form extends datalynxfield_file_form {
         $mform = &$this->_form;
 
         // Accetped types.
-        $options = array();
+        $options = [];
         $options['image'] = get_string('filetypeimage', 'datalynx');
         $options['video'] = get_string('filetypevideo', 'datalynx');
         $options['audio'] = get_string('filetypeaudio', 'datalynx');

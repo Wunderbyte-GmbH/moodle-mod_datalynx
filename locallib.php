@@ -61,7 +61,7 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
      * base supported formats before we know anything about the export
      */
     public static function base_supported_formats() {
-        return array();
+        return [];
     }
 
     /**
@@ -333,7 +333,7 @@ class datalynx_file_info_container extends file_info {
     public function get_children() {
         global $DB;
 
-        $children = array();
+        $children = [];
         $itemids = $DB->get_records('files',
                 array('contextid' => $this->context->id, 'component' => $this->component,
                         'filearea' => $this->filearea

@@ -83,7 +83,7 @@ class datalynxfield_teammemberselect_form extends datalynxfield_form {
         $mform->addHelpButton('param8', 'allowunsubscription', 'datalynx');
         $mform->setType('param8', PARAM_INT);
 
-        $attributes = array();
+        $attributes = [];
         $message = '';
         if ($teamfield = $this->_field->get_teamfield()) {
             if ($this->_field->field->id != $teamfield->id) {

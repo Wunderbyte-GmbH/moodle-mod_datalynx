@@ -56,7 +56,7 @@ class manager {
      */
     public function __construct($dl) {
         $this->_dl = $dl;
-        $this->_customfilters = array();
+        $this->_customfilters = [];
     }
 
     /**
@@ -156,7 +156,7 @@ class manager {
     public function get_filters($exclude = null, $menu = false, $forceget = false) {
         global $DB;
         if (!$this->_customfilters || $forceget) {
-            $this->_filters = array();
+            $this->_filters = [];
             if ($filters = $DB->get_records('datalynx_customfilters', array('dataid' => $this->_dl->id()))) {
                 foreach ($filters as $filterid => $filterdata) {
                     $this->_customfilters[$filterid] = new customfilter($filterdata);
@@ -168,7 +168,7 @@ class manager {
             if (empty($exclude) && !$menu) {
                 return $this->_customfilters;
             } else {
-                $filters = array();
+                $filters = [];
                 foreach ($this->_customfilters as $filterid => $filter) {
                     if (!empty($exclude) && in_array($filterid, $exclude)) {
                         continue;
@@ -203,7 +203,7 @@ class manager {
 
         $dl = $this->_dl;
 
-        $filters = array();
+        $filters = [];
         if (has_capability('mod/datalynx:managetemplates', $dl->context)) {
             if ($fids) {
                 $filters = $DB->get_records_select('datalynx_customfilters', "id IN ($fids)");
@@ -211,7 +211,7 @@ class manager {
                 $filters[] = $this->get_filter_from_id(self::BLANK_FILTER);
             }
         }
-        $processedlids = array();
+        $processedlids = [];
         $strnotify = '';
 
         // TODO update should be roled.
@@ -497,7 +497,7 @@ class manager {
      * @throws \coding_exception
      */
     public function get_user_filters_menu($viewid) {
-        $filters = array();
+        $filters = [];
 
         $dl = $this->_dl;
         $dlid = $dl->id();
@@ -585,7 +585,7 @@ class manager {
             'afilter' => array('afilter', 0, PARAM_INT),
             'usersearch' => array('usersearch', 0, PARAM_RAW));
 
-        $options = array();
+        $options = [];
 
         // Url provided.
         if ($url) {
@@ -645,7 +645,7 @@ class manager {
             'eids' => 'eids', 'users' => 'users', 'groups' => 'groups', 'afilter' => 'afilter',
             'usersearch' => 'usersearch');
 
-        $options = array();
+        $options = [];
 
         $userfilter = false;
         $filterid = optional_param('filter', 0, PARAM_INT);

@@ -105,7 +105,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
             return $altname;
         }
 
-        $strfiles = array();
+        $strfiles = [];
         foreach ($files as $file) {
             if (!$file->is_directory()) {
                 $filename = $file->get_filename();
@@ -144,7 +144,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
     protected function display_file(stored_file $file, int $entryid, string $path, string $altname = '', ?array $params = null) {
         $field = $this->_field;
 
-        $imgattr = array('style' => array());
+        $imgattr = array('style' => []);
         if (isset($params['lightbox']) && $params['lightbox']) {
             $imgattr['class'] = 'zoomable';
         }

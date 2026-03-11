@@ -104,7 +104,7 @@ class datalynxfield_text_form extends datalynxfield_form {
                 'minlength' => get_string('min', 'datalynx'),
                 'maxlength' => get_string('max', 'datalynx'),
                 'rangelength' => get_string('range', 'datalynx'));
-        $grp = array();
+        $grp = [];
         $grp[] = &$mform->createElement('select', 'param5', null, $options);
         $grp[] = &$mform->createElement('text', 'param6', null, array('size' => 8));
         $grp[] = &$mform->createElement('text', 'param7', null, array('size' => 8));

@@ -42,7 +42,7 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
         if ($entryid > 0 && !empty($entry->{"c{$fieldid}_content"})) {
             $content = $entry->{"c{$fieldid}_content"};
         }
-        $fieldattr = array();
+        $fieldattr = [];
         $fieldattr['size'] = 30;
 
         if ($field->get('param4')) {
@@ -145,7 +145,7 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
         $fieldid = $field->id();
         $fieldname = "f_{$i}_$fieldid";
         $autocomplete = $field->get('param9');
-        $arr = array();
+        $arr = [];
 
         if ($autocomplete) {
             $fieldattr['class'] = "datalynxfield_datalynxview datalynxview_{$fieldid}";
@@ -174,7 +174,7 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
         $formfieldname = "field_{$fieldid}_{$entryid}";
         $param8 = $this->_field->get('param8');
 
-        $errors = array();
+        $errors = [];
         foreach ($tags as $tag) {
             list(, $behavior, ) = $this->process_tag($tag);
             // Variable $behavior datalynx_field_behavior.

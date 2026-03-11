@@ -66,7 +66,7 @@ if ($urlparams->run && confirm_sesskey()) { // Run selected tool.
 
 // Get the list of tools.
 $directories = get_list_of_plugins('mod/datalynx/tool/');
-$tools = array();
+$tools = [];
 foreach ($directories as $directory) {
     $tools[$directory] = (object) array(
             'name' => get_string('pluginname', "datalynxtool_$directory"),

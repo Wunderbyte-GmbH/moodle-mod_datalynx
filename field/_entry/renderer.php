@@ -39,7 +39,7 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
                         has_capability('mod/datalynx:manageentries', $this->_field->df->context));
 
         // No edit mode.
-        $replacements = array();
+        $replacements = [];
         foreach ($tags as $tag) {
 
             // New entry displays nothing.
@@ -200,7 +200,7 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
      * Array of patterns this field supports
      */
     protected function patterns() {
-        $patterns = array();
+        $patterns = [];
 
         // Actions.
         $actions = get_string('actions', 'datalynx');

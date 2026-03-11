@@ -95,7 +95,7 @@ class datalynxfield_editor_renderer extends datalynxfield_renderer {
         $fieldid = $this->_field->id();
         $fieldname = "f_{$i}_$fieldid";
 
-        $arr = array();
+        $arr = [];
         $arr[] = &$mform->createElement('text', $fieldname, null, array('size' => '32'));
         $mform->setType($fieldname, PARAM_NOTAGS);
         $mform->setDefault($fieldname, $value);
@@ -121,7 +121,7 @@ class datalynxfield_editor_renderer extends datalynxfield_renderer {
 
         $formfieldname = "field_{$fieldid}_{$entryid}";
 
-        $errors = array();
+        $errors = [];
         foreach ($tags as $tag) {
             list(, $behavior, ) = $this->process_tag($tag);
             // Variable $behavior datalynx_field_behavior.

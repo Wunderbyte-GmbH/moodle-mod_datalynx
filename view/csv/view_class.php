@@ -339,7 +339,7 @@ class datalynxview_csv extends base {
         $entryvalues = [];
         foreach ($exportentries as $entryid => $entry) {
             $patternvalues = [];
-            $definitions = $this->get_entry_tag_replacements($entry, array());
+            $definitions = $this->get_entry_tag_replacements($entry, []);
             foreach ($definitions as $pattern => $definition) {
                 if (is_array($definition)) {
                     list(, $value) = $definition;
@@ -484,7 +484,7 @@ class datalynxview_csv extends base {
         $enclosure = !empty($options['enclosure']) ? $options['enclosure'] : $this->_enclosure;
         $encoding = !empty($options['encoding']) ? $options['encoding'] : $this->_encoding;
         $updateexisting = !empty($options['updateexisting']) ? $options['updateexisting'] : false;
-        $fieldsettings = !empty($options['settings']) ? $options['settings'] : array();
+        $fieldsettings = !empty($options['settings']) ? $options['settings'] : [];
 
         $readcount = $cir->load_csv_content($csvcontent, $encoding, $delimiter);
 

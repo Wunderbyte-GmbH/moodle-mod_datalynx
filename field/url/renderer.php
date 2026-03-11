@@ -46,7 +46,7 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
         $displaylinktextfield = empty($field->field->param5) ? false : true;
         $options = array('title' => s($field->field->description), 'size' => 60);
 
-        $group = array();
+        $group = [];
         $group[] = $mform->createElement('text', "{$fieldname}_url", null, $options);
         $mform->setType("{$fieldname}_url", PARAM_URL);
         $mform->setDefault("{$fieldname}_url", s($url));
@@ -111,7 +111,7 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
             // Media.
             if ($type == 'media') {
                 require_once("$CFG->dirroot/filter/mediaplugin/filter.php");
-                $mpfilter = new filter_mediaplugin($field->df()->context, array());
+                $mpfilter = new filter_mediaplugin($field->df()->context, []);
                 return $mpfilter->filter(html_writer::link($url, '', $attributes));
             }
         }
@@ -123,7 +123,7 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
         $fieldid = $this->_field->id();
         $fieldname = "f_{$i}_$fieldid";
 
-        $arr = array();
+        $arr = [];
         $arr[] = &$mform->createElement('text', $fieldname, null, array('size' => '32'));
         $mform->setType($fieldname, PARAM_NOTAGS);
         $mform->setDefault($fieldname, $value);
@@ -153,7 +153,7 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
         $fieldid = $this->_field->id();
 
         $formfieldname = "field_{$fieldid}_{$entryid}_url";
-        $errors = array();
+        $errors = [];
         foreach ($tags as $tag) {
             list(, $behavior, ) = $this->process_tag($tag);
             // Variable $behavior datalynx_field_behavior.

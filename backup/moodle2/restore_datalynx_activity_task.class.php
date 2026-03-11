@@ -143,7 +143,7 @@ class restore_datalynx_activity_task extends restore_activity_task {
      * processed by the link decoder
      */
     public static function define_decode_contents() {
-        $contents = array();
+        $contents = [];
 
         $contents[] = new restore_decode_content('datalynx', array('intro'), 'datalynx');
         $contents[] = new restore_decode_content('datalynx_fields',
@@ -163,7 +163,7 @@ class restore_datalynx_activity_task extends restore_activity_task {
      * to the activity to be executed by the link decoder
      */
     public static function define_decode_rules() {
-        $rules = array();
+        $rules = [];
 
         $rules[] = new restore_decode_rule('DFINDEX', '/mod/datalynx/index.php?id=$1', 'course');
 
@@ -203,7 +203,7 @@ class restore_datalynx_activity_task extends restore_activity_task {
      * of {@link restore_log_rule} objects
      */
     public static function define_restore_log_rules() {
-        $rules = array();
+        $rules = [];
 
         $rules[] = new restore_log_rule('datalynx', 'add',
                 'view.php?d={datalynx}&eid={datalynx_entry}', '{datalynx}');
@@ -253,7 +253,7 @@ class restore_datalynx_activity_task extends restore_activity_task {
      * activity level. All them are rules not linked to any module instance (cmid = 0)
      */
     public static function define_restore_log_rules_for_course() {
-        $rules = array();
+        $rules = [];
 
         $rules[] = new restore_log_rule('datalynx', 'view all', 'index.php?id={course}', null);
 

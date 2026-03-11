@@ -42,7 +42,7 @@ class datalynxfield__status extends datalynxfield_no_content {
     /**
      */
     public static function get_field_objects($dataid) {
-        $fieldobjects = array();
+        $fieldobjects = [];
 
         $fieldobjects[self::_STATUS] = (object) array('id' => self::_STATUS, 'dataid' => $dataid,
                 'type' => '_status', 'name' => get_string('status', 'datalynx'), 'description' => '',

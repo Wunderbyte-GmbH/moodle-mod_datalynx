@@ -49,7 +49,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
         $edit = !empty($options['edit']) ? $options['edit'] : false;
 
         // No edit mode.
-        $replacements = array();
+        $replacements = [];
 
         // Edit author name.
         if ($fieldname == 'name') {
@@ -127,7 +127,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
                 $users[$entry->userid] = $user;
             }
         }
-        $usermenu = array();
+        $usermenu = [];
         foreach ($users as $userid => $user) {
             $usermenu[$userid] = $user->lastname . ' ' . $user->firstname . ' (' . $user->email . ')';
         }
@@ -351,7 +351,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
         $fieldinternalname = $this->_field->get('internalname');
         $cat = get_string('authorinfo', 'datalynx');
 
-        $patterns = array();
+        $patterns = [];
         $patterns["##author:{$fieldinternalname}##"] = array(true, $cat);
         // For user name add edit tag.
         if ($fieldinternalname == 'name') {

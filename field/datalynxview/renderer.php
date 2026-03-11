@@ -80,14 +80,14 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
      *
      * @returns                 the display-method of the view
      */
-    protected function get_view_display_content($entry, array $options = array()) {
+    protected function get_view_display_content($entry, array $options = []) {
         $field = $this->_field;
 
         $refdatalynx = $field->refdatalynx;
         $refview = $refdatalynx->get_view_from_id($field->refview);
 
         // Options for setting the filter.
-        $foptions = array();
+        $foptions = [];
 
         // Search filter by entry author or group.
         $foptions = $this->get_filter_by_options($foptions, $entry);
@@ -187,7 +187,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         $refdatalynx = $field->refdatalynx;
         $refview = $field->df->get_view_from_id($field->refview);
 
-        $soptions = array();
+        $soptions = [];
         // Custom sort (ref-field-patten,ASC/DESC).
         if (!empty($field->field->param4)) {
             foreach (explode("\n", $field->field->param4) as $key => $sorty) {
@@ -211,7 +211,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
      */
     protected function get_search_options($entry) {
         $field = $this->_field;
-        $soptions = array();
+        $soptions = [];
 
         // Custom search (AND/OR,ref-field-patten,[NOT],OPT,local-field-pattern/value.
         if (empty($field->field->param5)) {
@@ -256,7 +256,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
 
             // Add to the search options.
             if (empty($soptions[$rfieldid])) {
-                $soptions[$rfieldid] = array('AND' => array(), 'OR' => array());
+                $soptions[$rfieldid] = array('AND' => [], 'OR' => []);
             }
             $soptions[$rfieldid][$andor][] = array($not, $operator, $value);
         }
@@ -297,7 +297,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
             $classname = "datalynxview_{$fieldid}_{$entryid}";
             $required = !empty($options['required']);
 
-            $selected = !empty($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : array();
+            $selected = !empty($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : [];
             // A hidden field is added to autocomplete fields by parent Quickform element.
             // The value of the hidden field must be added as option in order to process an empty autocomplete field.
             $menu = array("_qf__force_multiselect_submission" => "...");
@@ -326,7 +326,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         $formfieldname = "field_{$fieldid}_{$entryid}";
         $required = true;
 
-        $errors = array();
+        $errors = [];
         foreach ($tags as $tag) {
             list(, $behavior, ) = $this->process_tag($tag);
             // Variable $behavior datalynx_field_behavior.

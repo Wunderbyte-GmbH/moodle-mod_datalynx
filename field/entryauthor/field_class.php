@@ -65,7 +65,7 @@ class datalynxfield_entryauthor extends datalynxfield_no_content {
     /**
      */
     public static function get_field_objects($dataid) {
-        $fieldobjects = array();
+        $fieldobjects = [];
 
         $fieldobjects[self::_USERID] = (object) array('id' => self::_USERID, 'dataid' => $dataid,
                 'type' => 'entryauthor', 'name' => get_string('userid', 'datalynxfield_entryauthor'),
@@ -200,7 +200,7 @@ class datalynxfield_entryauthor extends datalynxfield_no_content {
                  WHERE e.dataid = ? AND  $contentfull IS NOT NULL
                  ORDER BY $contentfull $sortdir";
 
-        $distinctvalues = array();
+        $distinctvalues = [];
         if ($options = $DB->get_records_sql($sql, array($this->df->id()))) {
             if ($this->field->internalname == 'name') {
                 $internalname = 'id';

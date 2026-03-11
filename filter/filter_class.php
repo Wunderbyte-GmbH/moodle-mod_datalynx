@@ -57,7 +57,7 @@ class datalynx_filter {
 
     protected $_joins = null;
 
-    protected $_entriesexcluded = array();
+    protected $_entriesexcluded = [];
 
     /**
      * constructor
@@ -136,9 +136,9 @@ class datalynx_filter {
      */
     public function init_filter_sql() {
         $this->_filteredtables = null;
-        $this->_searchfields = array();
-        $this->_sortfields = array();
-        $this->_joins = array();
+        $this->_searchfields = [];
+        $this->_sortfields = [];
+        $this->_joins = [];
 
         if ($this->customsearch) {
             $this->_searchfields = is_array($this->customsearch) ? $this->customsearch : unserialize(
@@ -170,17 +170,17 @@ class datalynx_filter {
     public function get_search_sql(array $fields): array {
         global $DB;
 
-        $searchfrom = array();
-        $searchwhere = array();
-        $searchparams = array(); // Named params array.
+        $searchfrom = [];
+        $searchwhere = [];
+        $searchparams = []; // Named params array.
 
         $searchfields = $this->_searchfields;
         $simplesearch = $this->search;
         $searchtables = '';
 
         if ($searchfields) {
-            $whereand = array();
-            $whereor = array();
+            $whereand = [];
+            $whereor = [];
             foreach ($searchfields as $fieldid => $searchfield) {
                 // If we got this far there must be some actual search values.
                 if (empty($fields[$fieldid])) {
@@ -374,9 +374,9 @@ class datalynx_filter {
     public function get_sort_sql($fields) {
         global $DB;
 
-        $sorties = array();
+        $sorties = [];
         $orderby = array("e.timecreated ASC");
-        $params = array();
+        $params = [];
         $sorttables = '';
         $stringindexed = false;
 
@@ -384,7 +384,7 @@ class datalynx_filter {
 
         if ($sortfields) {
 
-            $orderby = array();
+            $orderby = [];
             foreach ($sortfields as $fieldid => $sortdir) {
                 if (empty($fields[$fieldid])) {
                     continue;
@@ -461,14 +461,14 @@ class datalynx_filter {
     public function get_content_sql($fields) {
         $contentfields = $this->contentfields;
 
-        $params = array();
-        $datalynxcontent = array();
+        $params = [];
+        $datalynxcontent = [];
         $whatcontent = ' ';
         $contenttables = ' ';
 
         if ($contentfields) {
-            $whatcontent = array();
-            $contentfrom = array();
+            $whatcontent = [];
+            $contentfrom = [];
             $paramcount = 0;
             foreach ($contentfields as $fieldid) {
                 // Skip non-selectable fields (some of the internal fields e.g. entryauthor which
@@ -537,7 +537,7 @@ class datalynx_filter {
      */
     public function append_sort_options(array $sorties) {
         if ($sorties) {
-            $sortoptions = $this->customsort ? unserialize($this->customsort) : array();
+            $sortoptions = $this->customsort ? unserialize($this->customsort) : [];
             foreach ($sorties as $fieldid => $sortdir) {
                 $sortoptions[$fieldid] = $sortdir;
             }
@@ -550,7 +550,7 @@ class datalynx_filter {
      */
     public function append_search_options(array $searchies) {
         if ($searchies) {
-            $searchoptions = $this->customsearch ? unserialize($this->customsearch) : array();
+            $searchoptions = $this->customsearch ? unserialize($this->customsearch) : [];
             foreach ($searchies as $fieldid => $searchy) {
                 if (empty($searchoptions[$fieldid])) {
                     $searchoptions[$fieldid] = $searchies[$fieldid];
@@ -584,7 +584,7 @@ class datalynx_filter_manager {
      */
     public function __construct($df) {
         $this->_df = $df;
-        $this->_filters = array();
+        $this->_filters = [];
     }
 
     /**
@@ -682,7 +682,7 @@ class datalynx_filter_manager {
     public function get_filters($exclude = null, $menu = false, $forceget = false) {
         global $DB;
         if (!$this->_filters || $forceget) {
-            $this->_filters = array();
+            $this->_filters = [];
             if ($filters = $DB->get_records('datalynx_filters', array('dataid' => $this->_df->id()), 'name')) {
                 foreach ($filters as $filterid => $filterdata) {
                     $this->_filters[$filterid] = new datalynx_filter($filterdata);
@@ -694,7 +694,7 @@ class datalynx_filter_manager {
             if (empty($exclude) && !$menu) {
                 return $this->_filters;
             } else {
-                $filters = array();
+                $filters = [];
                 foreach ($this->_filters as $filterid => $filter) {
                     if (!empty($exclude) && in_array($filterid, $exclude)) {
                         continue;
@@ -722,7 +722,7 @@ class datalynx_filter_manager {
 
         $df = $this->_df;
 
-        $filters = array();
+        $filters = [];
         // TODO may need new roles.
         if (has_capability('mod/datalynx:managetemplates', $df->context)) {
             // Don't need record from database for filter form submission.
@@ -734,7 +734,7 @@ class datalynx_filter_manager {
                 }
             }
         }
-        $processedfids = array();
+        $processedfids = [];
         $strnotify = '';
 
         // TODO update should be roled.
@@ -956,13 +956,13 @@ class datalynx_filter_manager {
     public function get_filter_from_customfilterform($filter, $formdata, $customfilter) {
 
         $customfilterfields = json_decode($customfilter->fieldlist);
-        $customfilterfieldids = array();
+        $customfilterfieldids = [];
         foreach ($customfilterfields as $fid => $field) {
             $customfilterfieldids[] = $fid;
         }
 
         $fields = $this->_df->get_fields();
-        $searchfields = array();
+        $searchfields = [];
         foreach ($formdata as $key => $value) {
             $formfieldarray = explode("_", $key);
             if (count($formfieldarray) >= 3) {
@@ -977,7 +977,7 @@ class datalynx_filter_manager {
                     case ("timemodified"):
                         if (count($formfieldarray) == 4 && $formfieldarray[3] == 'from') {
                             if ($formdata->{$key} > 0) {
-                                $valuearr = array();
+                                $valuearr = [];
                                 $valuearr[] = $key;
                                 $tokeyactive = str_replace('_from', '_to', $key);
                                 if (isset($formdata->{$tokeyactive}) && $formdata->{$tokeyactive} > $formdata->{$key}) {
@@ -1043,7 +1043,7 @@ class datalynx_filter_manager {
     /**
      */
     protected function get_sort_options_from_form($formdata) {
-        $sortfields = array();
+        $sortfields = [];
         $i = 0;
         while (isset($formdata->{"sortfield$i"})) {
             if ($sortfieldid = $formdata->{"sortfield$i"}) {
@@ -1063,7 +1063,7 @@ class datalynx_filter_manager {
      */
     protected function get_search_options_from_form($formdata, $finalize = false) {
         if ($fields = $this->_df->get_fields()) {
-            $searchfields = array();
+            $searchfields = [];
             foreach ($formdata as $var => $unused) {
                 if (strpos($var, 'searchandor') !== 0) {
                     continue;
@@ -1086,10 +1086,10 @@ class datalynx_filter_manager {
                         // Otherwise just make a flat array (of arrays).
                         if ($finalize) {
                             if (!isset($searchfields[$searchfieldid])) {
-                                $searchfields[$searchfieldid] = array();
+                                $searchfields[$searchfieldid] = [];
                             }
                             if (!isset($searchfields[$searchfieldid][$searchandor])) {
-                                $searchfields[$searchfieldid][$searchandor] = array();
+                                $searchfields[$searchfieldid][$searchandor] = [];
                             }
                             $searchfields[$searchfieldid][$searchandor][] = array($not, $operator, $parsedvalue);
                         } else {
@@ -1112,7 +1112,7 @@ class datalynx_filter_manager {
      */
     protected function get_customfilter_search_options_from_form($formdata, $finalize = false) {
         if ($fields = $this->_df->get_fields()) {
-            $searchfields = array();
+            $searchfields = [];
             foreach ($formdata as $var => $unused) {
                 if (strpos($var, 'searchandor') !== 0) {
                     continue;
@@ -1135,10 +1135,10 @@ class datalynx_filter_manager {
                         // otherwise just make a flat array (of arrays).
                         if ($finalize) {
                             if (!isset($searchfields[$searchfieldid])) {
-                                $searchfields[$searchfieldid] = array();
+                                $searchfields[$searchfieldid] = [];
                             }
                             if (!isset($searchfields[$searchfieldid][$searchandor])) {
-                                $searchfields[$searchfieldid][$searchandor] = array();
+                                $searchfields[$searchfieldid][$searchandor] = [];
                             }
                             $searchfields[$searchfieldid][$searchandor][] = array($not, $operator, $parsedvalue);
                         } else {
@@ -1250,14 +1250,14 @@ class datalynx_filter_manager {
                 $fields = $df->get_fields();
 
                 // CUSTOM SORT.
-                $sortfields = array();
+                $sortfields = [];
                 if ($filter->customsort) {
                     $sortfields = unserialize($filter->customsort);
                 }
 
                 if ($sortfields) {
-                    $sortarr = array();
-                    $sorturlarr = array();
+                    $sortarr = [];
+                    $sorturlarr = [];
                     foreach ($sortfields as $fieldid => $sortdir) {
                         if (empty($fields[$fieldid])) {
                             unset($sortfields[$fieldid]);
@@ -1281,21 +1281,21 @@ class datalynx_filter_manager {
                 $sortoptions = !empty($sortoptions) ? $sortoptions : '---';
 
                 // CUSTOM SEARCH.
-                $searchfields = array();
+                $searchfields = [];
                 if ($filter->customsearch) {
                     $searchfields = unserialize($filter->customsearch);
                 }
 
                 // Verbose search criteria.
                 if ($searchfields) {
-                    $searcharr = array();
+                    $searcharr = [];
                     foreach ($searchfields as $fieldid => $searchfield) {
                         if (empty($fields[$fieldid])) {
                             continue;
                         }
-                        $fieldoptions = array();
+                        $fieldoptions = [];
                         if (!empty($searchfield['AND'])) {
-                            $options = array();
+                            $options = [];
                             foreach ($searchfield['AND'] as $option) {
                                 if ($option) {
                                     $options[] = $fields[$fieldid]->format_search_value($option);
@@ -1305,7 +1305,7 @@ class datalynx_filter_manager {
                                     implode(' <b>and</b> ', $options);
                         }
                         if (!empty($searchfield['OR'])) {
-                            $options = array();
+                            $options = [];
                             foreach ($searchfield['OR'] as $option) {
                                 if ($option) {
                                     $options[] = $fields[$fieldid]->format_search_value($option);
@@ -1384,7 +1384,7 @@ class datalynx_filter_manager {
     /**
      */
     public function get_user_filters_menu($viewid) {
-        $filters = array();
+        $filters = [];
 
         $df = $this->_df;
         $dfid = $df->id();
@@ -1500,7 +1500,7 @@ class datalynx_filter_manager {
     /**
      */
     public static function get_filter_url_query($filter) {
-        $urlquery = array();
+        $urlquery = [];
 
         if ($filter->customsort) {
             $urlquery[] = 'usort=' . self::get_sort_url_query(unserialize($filter->customsort));
@@ -1519,7 +1519,7 @@ class datalynx_filter_manager {
      */
     public static function get_sort_url_query(array $sorties) {
         if ($sorties) {
-            $usort = array();
+            $usort = [];
             foreach ($sorties as $fieldid => $dir) {
                 $usort[] = "$fieldid $dir";
             }
@@ -1539,7 +1539,7 @@ class datalynx_filter_manager {
     public static function get_search_url_query(array $searchies) {
         $usearch = null;
         if ($searchies) {
-            $usearch = array();
+            $usearch = [];
             foreach ($searchies as $fieldid => $andor) {
                 foreach ($andor as $key => $soptions) {
                     if (empty($soptions)) {
@@ -1569,7 +1569,7 @@ class datalynx_filter_manager {
     /**
      */
     public static function get_search_options_from_query($query) {
-        $soptions = array();
+        $soptions = [];
         if ($query) {
             $usearch = urldecode($query);
             $searchies = explode('@', $usearch);
@@ -1603,7 +1603,7 @@ class datalynx_filter_manager {
                 'cfilter' => array('cfilter', 0, PARAM_INT),
                 'usersearch' => array('usersearch', 0, PARAM_RAW));
 
-        $options = array();
+        $options = [];
 
         // Url provided.
         if ($url) {
@@ -1671,7 +1671,7 @@ class datalynx_filter_manager {
                 'usersearch' => 'usersearch'
         );
 
-        $options = array();
+        $options = [];
 
         $userfilter = false;
         $filterid = optional_param('filter', 0, PARAM_INT);

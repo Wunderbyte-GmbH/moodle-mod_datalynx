@@ -164,7 +164,7 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
                 new moodle_url('/user/profile.php', array('id' => $userfrom->id)),
                 fullname($userfrom));
 
-        $messagestosend = array();
+        $messagestosend = [];
         foreach ($this->get_recipients($author->id, $entryid) as $userid) {
             // Prepare message object.
             $message = new \core\message\message();
@@ -238,7 +238,7 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
      * @return array array of user IDs
      */
     private function get_recipients($authorid = 0, $entryid = 0) {
-        $recipientids = array();
+        $recipientids = [];
         if (isset($this->recipient['author']) && $authorid) {
             $recipientids[] = $authorid;
         }
@@ -327,7 +327,7 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
      */
     protected function get_team_recipients($teams, $entryid = 0) {
         global $DB;
-        $ids = array();
+        $ids = [];
         if (empty($teams)) {
             return [];
         }

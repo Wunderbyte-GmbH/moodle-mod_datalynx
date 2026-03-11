@@ -148,7 +148,7 @@ class datalynxview_tabular extends base {
     public function display(array $options = []): string {
         parent::display($options);
         global $PAGE;
-        $PAGE->requires->js_init_call('M.datalynxview_tabular.init', array(), false,
+        $PAGE->requires->js_init_call('M.datalynxview_tabular.init', [], false,
                 $this->get_js_module());
         return '';
     }

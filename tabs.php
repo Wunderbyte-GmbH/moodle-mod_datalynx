@@ -31,12 +31,12 @@ if (isloggedin() && $istemplatemanager) {
         throw new moodle_exception('emptytab', 'datalynx');
     }
 
-    $inactive = array();
-    $activated = array();
-    $tabs = array();
+    $inactive = [];
+    $activated = [];
+    $tabs = [];
 
     // Browse/Management.
-    $row = array();
+    $row = [];
     $row[] = new tabobject('browse',
             new moodle_url('/mod/datalynx/view.php', array('d' => $this->id())), get_string('browse', 'datalynx'));
     $row[] = new tabobject('manage',
@@ -56,7 +56,7 @@ if (isloggedin() && $istemplatemanager) {
         $inactive[] = 'manage';
         $activated[] = 'manage';
 
-        $row = array();
+        $row = [];
         // Template manager can do everything.
         if ($istemplatemanager) {
             $row[] = new tabobject('views',
@@ -107,7 +107,7 @@ if (isloggedin() && $istemplatemanager) {
             $currenttab = 'fields2';
         }
 
-        $row = array();
+        $row = [];
         // Template manager can do everything.
         if ($istemplatemanager) {
             $row[] = new tabobject('fields2',

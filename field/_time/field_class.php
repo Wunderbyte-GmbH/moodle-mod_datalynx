@@ -43,7 +43,7 @@ class datalynxfield__time extends datalynxfield_no_content {
     /**
      */
     public static function get_field_objects($dataid) {
-        $fieldobjects = array();
+        $fieldobjects = [];
 
         $fieldobjects[self::_TIMECREATED] = (object) array('id' => self::_TIMECREATED,
                 'dataid' => $dataid, 'type' => '_time', 'name' => get_string('timecreated', 'datalynx'),
@@ -68,7 +68,7 @@ class datalynxfield__time extends datalynxfield_no_content {
      * @return array|false
      */
     public function parse_search($formdata, $i) {
-        $time = array();
+        $time = [];
 
         if (!empty($formdata->{'f_' . $i . '_' . $this->field->id . '_from'})) {
             $time[0] = $formdata->{'f_' . $i . '_' . $this->field->id . '_from'};
@@ -105,7 +105,7 @@ class datalynxfield__time extends datalynxfield_no_content {
         $namefrom = "df__time_{$i}_from";
         $nameto = "df__time_{$i}_to";
         $varcharcontent = $this->get_sql_compare_text();
-        $params = array();
+        $params = [];
 
         if ($operator != 'BETWEEN') {
             if (!$operator || $operator == 'LIKE') {
@@ -152,7 +152,7 @@ class datalynxfield__time extends datalynxfield_no_content {
                     WHERE $contentfull IS NOT NULL
                     ORDER BY $contentfull $sortdir";
 
-        $distinctvalues = array();
+        $distinctvalues = [];
         if ($options = $DB->get_records_sql($sql)) {
             foreach ($options as $data) {
                 $value = $data->{$this->field->internalname};

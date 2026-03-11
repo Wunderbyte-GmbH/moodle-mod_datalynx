@@ -35,7 +35,7 @@ class datalynxfield__approve extends datalynxfield_no_content {
     /**
      */
     public static function get_field_objects($dataid) {
-        $fieldobjects = array();
+        $fieldobjects = [];
 
         $fieldobjects[self::_APPROVED] = (object) array('id' => self::_APPROVED,
                 'dataid' => $dataid, 'type' => '_approve', 'name' => get_string('approved', 'datalynx'),
@@ -68,7 +68,7 @@ class datalynxfield__approve extends datalynxfield_no_content {
      */
     public function get_search_sql(array $search): array {
         $value = $search[2];
-        return array(" e.approved = $value ", array(), false);
+        return array(" e.approved = $value ", [], false);
     }
 
     /**

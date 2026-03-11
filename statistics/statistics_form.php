@@ -45,7 +45,7 @@ class datalynx_statistics_form extends moodleform {
         $mform->addElement('html', '<div style="width: 33%; float: left;">');
         $mform->addElement('date_selector', 'from', get_string('from'));
         $mform->addElement('date_selector', 'to', get_string('to'));
-        $radioarray = array();
+        $radioarray = [];
         $radioarray[] = &$mform->createElement('radio', 'mode', '',
                 get_string('period', 'datalynx'), datalynx_statistics_class::MODE_PERIOD);
         $radioarray[] = &$mform->createElement('radio', 'mode', '',

@@ -40,7 +40,7 @@ class datalynxfield_youtube extends datalynxfield_base {
     }
 
     public function get_supported_search_operators() {
-        return array();
+        return [];
     }
 
     public static function is_customfilterfield() {
@@ -49,8 +49,8 @@ class datalynxfield_youtube extends datalynxfield_base {
 
     protected function format_content($entry, array $values = null) {
         $fieldid = $this->field->id;
-        $oldcontents = array();
-        $contents = array();
+        $oldcontents = [];
+        $contents = [];
 
         if (!empty($values)) {
             if (count($values) === 1) {

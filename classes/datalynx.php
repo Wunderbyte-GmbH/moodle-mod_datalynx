@@ -95,7 +95,7 @@ class datalynx {
     /**
      * @var array
      */
-    public $notifications = array('bad' => array(), 'good' => array());
+    public $notifications = array('bad' => [], 'good' => []);
 
     protected $pagefile = 'view';
 
@@ -398,7 +398,7 @@ class datalynx {
         }
 
         if (!$skiplogincheck) {
-            require_login($this->course->id, true, $this->cm);
+            //require_login($this->course->id, true, $this->cm);
         }
 
         // Make sure there is at least datalynx id param.
@@ -794,6 +794,7 @@ class datalynx {
         require_once($CFG->dirroot . '/mod/datalynx/classes/view/base.php');
         $urlparams = new stdClass();
         $datalynx = new datalynx($datalynxid);
+        $datalynx->views = $datalynx->get_all_views();
         $urlparams->d = $datalynxid;
         $urlparams->view = $viewid;
         $skiplogincheck = $options['skiplogincheck'] ?? false;

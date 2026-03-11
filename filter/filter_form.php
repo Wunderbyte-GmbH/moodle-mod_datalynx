@@ -76,7 +76,7 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
                 $i = $count + 1;
                 $label = $showlabel ? "$fieldlabel$i" : '';
 
-                $optionsarr = array();
+                $optionsarr = [];
                 $optionsarr[] = &$mform->createElement('select', 'sortfield' . $count, '', $fieldoptions);
                 $optionsarr[] = &$mform->createElement('select', 'sortdir' . $count, '',
                         $diroptions);
@@ -91,7 +91,7 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
         for ($prevcount = $count; $count < ($prevcount + 3); $count++) {
             $i = $count + 1;
             $label = $showlabel ? "$fieldlabel$i" : '';
-            $optionsarr = array();
+            $optionsarr = [];
             $optionsarr[] = &$mform->createElement('select', 'sortfield' . $count, '', $fieldoptions);
             $optionsarr[] = &$mform->createElement('select', 'sortdir' . $count, '', $diroptions);
             $mform->addGroup($optionsarr, 'sortoptionarr' . $count, $label, ' ', false);
@@ -130,7 +130,7 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
             // To flatten them. An aggregated array should have a non-zero key.
             // (fieldid) in the first element.
             if (key($searchfields)) {
-                $searcharr = array();
+                $searcharr = [];
                 foreach ($searchfields as $fieldid => $searchfield) {
                     if (empty($fields[$fieldid])) {
                         continue;
@@ -163,7 +163,7 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
 
                 list($fieldid, $andor, $not, $operator, $value) = $searchcriterion;
 
-                $arr = array();
+                $arr = [];
                 // And/or option.
                 $arr[] = &$mform->createElement('select', 'searchandor' . $count, '', $andoroptions);
                 $mform->setDefault('searchandor' . $count, $andor);
@@ -205,7 +205,7 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
             $i = $count + 1;
             $label = $showlabel ? "$fieldlabel$i" : '';
 
-            $arr = array();
+            $arr = [];
             $arr[] = &$mform->createElement('select', "searchandor$count", '', $andoroptions);
             $arr[] = &$mform->createElement('select', "searchfield$count", '', $fieldoptions);
             $mform->addGroup($arr, "customsearcharr$count", $label, ' ', false);
@@ -411,7 +411,7 @@ class mod_datalynx_advanced_filter_form extends mod_datalynx_filter_base_form {
         $this->custom_search_definition($filter->customsearch, $fields, $fieldoptions, true);
 
         // Save button.
-        $grp = array();
+        $grp = [];
         $grp[] = $mform->createElement('submit', 'savebutton', get_string('savechanges'));
         $grp[] = $mform->createElement('submit', 'newbutton', get_string('newfilter', 'filters'));
         $mform->addGroup($grp, "afiltersubmit_grp", null, ' ', false);
@@ -434,13 +434,13 @@ class mod_datalynx_customfilter_frontend_form extends mod_datalynx_filter_base_f
             throw new moodle_exception('nocustomfilter', 'datalynx');
         }
 
-        $customfilterfieldlistfields = array();
+        $customfilterfieldlistfields = [];
         if ($customfilter->fieldlist) {
             $customfilterfieldlistfields = json_decode($customfilter->fieldlist);
         }
         $fields = $view->get_view_fields();
-        $fieldoptions = array();
-        $sortfields = array();
+        $fieldoptions = [];
+        $sortfields = [];
         foreach ($fields as $fieldid => $field) {
             $select = false;
             foreach ($customfilterfieldlistfields as $fid => $listfield) {
@@ -506,7 +506,7 @@ class mod_datalynx_customfilter_frontend_form extends mod_datalynx_filter_base_f
                 INNER JOIN {user} on {datalynx_entries}.userid = {user}.id
                 WHERE {datalynx_entries}.dataid = '. $this->_df->id() .';');
 
-            $menu = array();
+            $menu = [];
             foreach ($entryauthors as $userid => $author) {
                 $menu[$userid] = $author->firstname . " " . $author->lastname;
             }
@@ -524,7 +524,7 @@ class mod_datalynx_customfilter_frontend_form extends mod_datalynx_filter_base_f
             // Important, keep fieldids intact.
             $sortfields = array(0 => get_string('choosedots')) + $sortfields;
 
-            $grp = array();
+            $grp = [];
             $grp[] = $mform->createElement('select', 'customfiltersortfield', '', $sortfields);
             $directions = array( "0" => get_string('asc'), "1" => get_string('desc'));
 
@@ -533,7 +533,7 @@ class mod_datalynx_customfilter_frontend_form extends mod_datalynx_filter_base_f
         }
 
         // Show buttons in line with each other.
-        $buttonarray = array();
+        $buttonarray = [];
         $buttonarray[] = &$mform->createElement('submit', 'customsearch', get_string("search"));
 
         // Add a button that resets all custom filter values at once.

@@ -49,7 +49,7 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
      * @param $fields
      * @return array
      */
-    public static function get_field_objects($dataid, $fields = array()) {
+    public static function get_field_objects($dataid, $fields = []) {
         $fieldobjects = [];
 
         $teammemberselectfields = array_filter($fields, function($field) {

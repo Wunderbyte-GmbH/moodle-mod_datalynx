@@ -36,7 +36,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
     /**
      */
     protected function define_structure() {
-        $paths = array();
+        $paths = [];
         $userinfo = $this->get_setting_value('userinfo'); // Restore content and user info (requires the backup users).
 
         $paths[] = new restore_path_element('datalynx', '/activity/datalynx');
@@ -146,7 +146,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         // In case we restore a fieldgroup we need to update mapping of param1.
         if ($data->type == 'fieldgroup') {
             $oldsubfields = json_decode($data->param1);
-            $newsubfields = array();
+            $newsubfields = [];
             foreach ($oldsubfields as $oldsubfield) {
                 $newsubfields[] = $this->get_mappingid('datalynx_field', $oldsubfield);
             }
@@ -201,7 +201,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         // Adjust customsort field ids.
         if ($data->customsort) {
             $customsort = unserialize($data->customsort);
-            $sortfields = array();
+            $sortfields = [];
             foreach ($customsort as $sortfield => $sortdir) {
                 if (is_numeric($sortfield) && $sortfield > 0) {
                     $sortfields[$this->get_mappingid('datalynx_field', $sortfield)] = $sortdir;
@@ -215,7 +215,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         // Adjust customsearch field ids.
         if ($data->customsearch) {
             $customsearch = unserialize($data->customsearch);
-            $searchfields = array();
+            $searchfields = [];
             foreach ($customsearch as $searchfield => $options) {
                 if (is_numeric($searchfield) && $searchfield > 0) {
                     $searchfields[$this->get_mappingid('datalynx_field', $searchfield)] = $options;
@@ -256,7 +256,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         if ($data->fieldlist) {
 
             $oldfieldlist = json_decode($data->fieldlist);
-            $newfieldlist = array();
+            $newfieldlist = [];
 
             foreach ($oldfieldlist as $oldfieldid => $value) {
                 $newfieldid = $this->get_mappingid('datalynx_field', $oldfieldid);
@@ -574,7 +574,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         foreach ($results as $id => $content) {
             $users = json_decode($content, true);
             if (json_last_error() == JSON_ERROR_NONE && is_array($users)) {
-                $newusers = array();
+                $newusers = [];
                 foreach ($users as $user) {
                     if ($user) {
                         $newuser = $this->get_mappingid('user', $user);

@@ -61,7 +61,7 @@ class datalynxfield__rating extends datalynxfield_no_content {
     }
 
     public static function get_field_objects($dataid) {
-        $fieldobjects = array();
+        $fieldobjects = [];
 
         $fieldobjects[self::_RATING] = (object) array('id' => self::_RATING, 'dataid' => $dataid,
                 'type' => '_rating', 'name' => get_string('ratings', 'datalynx'), 'description' => '',
@@ -121,7 +121,7 @@ class datalynxfield__rating extends datalynxfield_no_content {
     public function get_join_sql() {
         global $USER;
 
-        $params = array();
+        $params = [];
         $params['rcontextid'] = $this->df()->context->id;
         $params['ruserid'] = $USER->id;
         $params['rcomponent'] = 'mod_datalynx';

@@ -37,7 +37,7 @@ class datalynxfield__time_renderer extends datalynxfield_renderer {
         $fieldname = $field->get('internalname');
 
         // No edit mode.
-        $replacements = array();
+        $replacements = [];
 
         foreach ($tags as $tag) {
             // Display nothing on new entries.
@@ -133,7 +133,7 @@ class datalynxfield__time_renderer extends datalynxfield_renderer {
         $fieldname = $this->_field->get('internalname');
         $cat = get_string('entryinfo', 'datalynx');
 
-        $patterns = array();
+        $patterns = [];
         $patterns["##$fieldname##"] = array(true, $cat);
         // Date without time.
         $patterns["##$fieldname:date##"] = array(true, $cat);

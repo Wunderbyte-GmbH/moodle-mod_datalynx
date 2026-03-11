@@ -111,7 +111,7 @@ class datalynx_rating_manager extends rating_manager {
             throw new coding_exception('The items option is a required option when getting ratings.');
         } else {
             if (empty($options->items)) {
-                return array();
+                return [];
             }
         }
 
@@ -148,7 +148,7 @@ class datalynx_rating_manager extends rating_manager {
         }
 
         // Params.
-        $params = array();
+        $params = [];
         $params['contextid'] = $options->context->id;
         $params['userid'] = $userid;
         $params['component'] = $options->component;
@@ -159,7 +159,7 @@ class datalynx_rating_manager extends rating_manager {
             // Ugly hack to work around the exception in generate_settings.
             $options->aggregate = RATING_AGGREGATE_COUNT;
         } else {
-            $aggregatessql = array();
+            $aggregatessql = [];
             foreach ($options->aggregate as $aggregation) {
                 if (empty($aggregation)) {
                     continue;
@@ -216,7 +216,7 @@ class datalynx_rating_manager extends rating_manager {
         }
 
         // Params.
-        $params = array();
+        $params = [];
         $params['contextid'] = $options->context->id;
         $params['userid'] = $userid;
         $params['component'] = $options->component;

@@ -50,7 +50,7 @@ class datalynxfield_entrygroup_renderer extends datalynxfield_renderer {
             $group->picture = $entry->grouppic;
         }
 
-        $replacements = array();
+        $replacements = [];
 
         foreach ($tags as $tag) {
             $replacements[$tag] = '';
@@ -123,7 +123,7 @@ class datalynxfield_entrygroup_renderer extends datalynxfield_renderer {
     protected function patterns() {
         $cat = get_string('groupinfo', 'datalynx');
 
-        $patterns = array();
+        $patterns = [];
         $patterns['##group:id##'] = array(true, $cat);
         $patterns['##group:name##'] = array(true, $cat);
         $patterns['##group:picture##'] = array(true, $cat);

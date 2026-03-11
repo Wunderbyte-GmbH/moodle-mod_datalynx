@@ -52,7 +52,7 @@ class datalynxtool_downloadfiles {
         // Construct the zip file name.
         $filename = clean_filename($dl->course->shortname . '-' . $dl->name() . '-' . '.zip');
 
-        $filesforzipping = array();
+        $filesforzipping = [];
         if (!empty($files)) {
             foreach ($files as $zipfilepath => $file) {
                 $foldername = $fileinfo[$file->get_itemid()]->lastname . "_" . $fileinfo[$file->get_itemid()]->firstname . "/";

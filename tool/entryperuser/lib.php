@@ -41,7 +41,7 @@ class datalynxtool_entryperuser {
         }
 
         // Construct entries data.
-        $data = (object) array('eids' => array());
+        $data = (object) array('eids' => []);
         $fieldid = datalynxfield_entryauthor::_USERID;
         $entryid = -1;
         foreach ($users as $userid => $unused) {

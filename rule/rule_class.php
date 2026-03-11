@@ -116,7 +116,7 @@ abstract class datalynx_rule_base {
      * @return array
      */
     public function get_triggers() {
-        static $triggers = array();
+        static $triggers = [];
         if (empty($triggers)) {
             $triggers = array_map(
                     function($element) {

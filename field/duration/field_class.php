@@ -87,8 +87,8 @@ class datalynxfield_duration extends datalynxfield_base {
 
     protected function format_content($entry, array $values = null) {
         $fieldid = $this->field->id;
-        $contents = array();
-        $oldcontents = array();
+        $contents = [];
+        $oldcontents = [];
         // Old contents.
         if (isset($entry->{"c{$fieldid}_content"})) {
             $oldcontents[] = $entry->{"c{$fieldid}_content"};
@@ -102,7 +102,7 @@ class datalynxfield_duration extends datalynxfield_base {
     /**
      */
     public function parse_search($formdata, $i) {
-        $values = array();
+        $values = [];
 
         $fromfield = optional_param_array('f_' . $i . '_' . $this->field->id . '_from',
                 ['number' => ''], PARAM_RAW);

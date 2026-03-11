@@ -98,7 +98,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
             return '';
         }
 
-        $strfiles = array();
+        $strfiles = [];
         foreach ($files as $file) {
             if (!$file->is_directory()) {
 
@@ -128,7 +128,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
         $fieldid = $this->_field->id();
         $fieldname = "f_{$i}_$fieldid";
 
-        $arr = array();
+        $arr = [];
 
         if ($mform->_formName == 'mod_datalynx_customfilter_frontend_form') {
             $options = array(
@@ -279,7 +279,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
      */
     public function render_csv($strfiles): string {
         $regex = '/https?\:\/\/[^\" ]+/i';
-        $matches = array();
+        $matches = [];
         foreach ($strfiles as $strfile) {
             preg_match($regex, $strfile, $match);
             $matches[] = $match[0];

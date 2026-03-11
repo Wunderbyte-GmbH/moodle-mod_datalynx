@@ -96,7 +96,7 @@ $df->print_header(array('tab' => 'fields', 'urlparams' => $urlparams));
 
 // Display the field form jump list.
 $directories = get_list_of_plugins('mod/datalynx/field/');
-$menufield = array();
+$menufield = [];
 
 foreach ($directories as $directory) {
     if ($directory[0] != '_' && strpos($directory, 'entry') !== 0) {

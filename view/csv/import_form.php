@@ -96,7 +96,7 @@ class datalynxview_csv_import_form extends moodleform {
             $grp = [];
             $grp[] = &$mform->createElement('text', "{$name}_name", null, array('size' => '16'));
 
-            $mform->addGroup($grp, "grp$patternname", $patternname, array(), false);
+            $mform->addGroup($grp, "grp$patternname", $patternname, [], false);
 
             $mform->setType("{$name}_name", PARAM_NOTAGS);
             $mform->setDefault("{$name}_name", $header);

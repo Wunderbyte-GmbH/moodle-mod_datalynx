@@ -83,7 +83,7 @@ class datalynx_entries {
      * @throws coding_exception
      * @throws dml_exception
      */
-    public function set_content(array $options = array()) {
+    public function set_content(array $options = []) {
         if (isset($options['entriesset'])) {
             $entriesset = $options['entriesset'];
         } else {
@@ -91,12 +91,13 @@ class datalynx_entries {
                 $entriesset = $this->get_entries(array('search' => array('userid' => $options['user'])));
             } else {
                 if (!optional_param('new', 0, PARAM_INT)) {
+
                     $entriesset = $this->get_entries($options);
                 }
             }
         }
 
-        $this->_entries = !empty($entriesset->entries) ? $entriesset->entries : array();
+        $this->_entries = !empty($entriesset->entries) ? $entriesset->entries : [];
         $this->_entriestotalcount = !empty($entriesset->max) ? $entriesset->max : count(
                 $this->_entries);
         $this->_entriesfiltercount = !empty($entriesset->found) ? $entriesset->found : count(
@@ -138,7 +139,7 @@ class datalynx_entries {
         list($filtertables, $wheresearch, $sortorder, $whatcontent, $filterparams, $datalynxcontent) = $filter->get_sql($fields);
 
         // Named params array for the sql.
-        $params = array();
+        $params = [];
 
         // USER filtering.
         $whereuser = '';
@@ -245,7 +246,7 @@ class datalynx_entries {
         // Number of entries in this particular view call (with filtering).
         $sqlcount = "SELECT $count FROM $fromsql WHERE $wheresql";
         // Base params + search params.
-        $baseparams = array();
+        $baseparams = [];
         foreach ($params as $paramset) {
             $baseparams = array_merge($paramset, $baseparams);
         }
@@ -449,7 +450,7 @@ class datalynx_entries {
      * @throws coding_exception
      */
     public function get_embedded_files(array $fids) {
-        $files = array();
+        $files = [];
 
         if (!empty($fids) && !empty($this->_entries)) {
             $fs = get_file_storage();
@@ -483,7 +484,7 @@ class datalynx_entries {
      * @return array int[]
      */
     public function get_contentinfo(array $fids) {
-        $contentinfo = array();
+        $contentinfo = [];
 
         if (!empty($fids) && !empty($this->_entries)) {
             foreach ($this->_entries as $entry) {
@@ -626,7 +627,7 @@ class datalynx_entries {
                         echo $OUTPUT->footer();
                         exit(0);
             } else {
-                $processed = array();
+                $processed = [];
                 $completiontype = COMPLETION_UNKNOWN;
                 $strnotify = '';
 
@@ -640,7 +641,7 @@ class datalynx_entries {
 
                             // First parse the data to collate content in an array for each recognized field.
                             $contents = array_fill_keys(array_keys($entries),
-                                    array('info' => array(), 'fields' => array()
+                                    array('info' => [], 'fields' => []
                                     ));
                             $entryinfo = array(datalynxfield__entry::_ENTRY,
                                     datalynxfield__time::_TIMECREATED,
@@ -652,8 +653,8 @@ class datalynx_entries {
                                     datalynxfield__status::_STATUS
                             );
 
-                            $skipnotification = array();
-                            $drafttofinal = array();
+                            $skipnotification = [];
+                            $drafttofinal = [];
 
                             // Iterate the data and extract entry and fields content.
                             foreach ($data as $name => $value) {
@@ -713,19 +714,19 @@ class datalynx_entries {
                             }
 
                             $firstentryid = min(array_keys($contents));
-                            $bulkeditfields = array();
+                            $bulkeditfields = [];
                             foreach ($contents[$firstentryid]['fields'] as $fieldid => $value) {
                                 if (optional_param("field_{$fieldid}_bulkedit", 0, PARAM_BOOL)) {
                                     $bulkeditfields[] = $fieldid;
                                 }
                             }
-                            $newcontents = array();
+                            $newcontents = [];
 
                             foreach ($contents as $entryid => $oldcontent) {
-                                $newcontents[$entryid] = array();
+                                $newcontents[$entryid] = [];
                                 if ($entryid != $firstentryid) {
                                     $newcontents[$entryid]['info'] = $oldcontent['info'];
-                                    $newfields = array();
+                                    $newfields = [];
                                     foreach ($contents[$entryid]['fields'] as $fieldid => $value) {
                                         if (array_search($fieldid, $bulkeditfields) !== false) {
                                             $newfields[$fieldid] = $contents[$firstentryid]['fields'][$fieldid];
@@ -759,7 +760,7 @@ class datalynx_entries {
 
                                 if ($entry->id = $this->update_entry($entry, $contents[$eid]['info'])) {
 
-                                    $emptycontent = array(); // Array with lines and deleted contentids.
+                                    $emptycontent = []; // Array with lines and deleted contentids.
                                     $countfgfields = 0; // Store how many fields exist per line.
 
                                     // Variable $eid should be different from $entryid only in new entries.
@@ -776,7 +777,7 @@ class datalynx_entries {
                                             $fieldname = "field_{$fieldid}_{$eid}";
                                             // Split $content and generate temporary content.
                                             // Look for all content_names like _url or _alt.
-                                            $tempcontent = array();
+                                            $tempcontent = [];
 
                                             foreach ($content as $key => $value) {
 
@@ -856,7 +857,7 @@ class datalynx_entries {
 
                                     // Remove contentids that we have collected.
                                     if ($emptycontent) {
-                                        $deletedcontentids = array();
+                                        $deletedcontentids = [];
                                         foreach ($emptycontent as $line => $contentids) {
                                             // Check if every field is empty, only then remove line.
                                             if (count($contentids) != $countfgfields) {
@@ -1028,7 +1029,7 @@ class datalynx_entries {
             }
         }
 
-        $processed = array();
+        $processed = [];
 
         if ($teamfield) {
             foreach ($entryids as $entryid) {
@@ -1226,7 +1227,7 @@ class datalynx_entries {
      */
     private function sqlparams(&$params, $param, $value) {
         if (!array_key_exists($param, $params)) {
-            $params[$param] = array();
+            $params[$param] = [];
         }
 
         $p = count($params[$param]);

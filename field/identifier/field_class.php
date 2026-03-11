@@ -44,8 +44,8 @@ class datalynxfield_identifier extends datalynxfield_base {
      */
     protected function format_content($entry, array $values = null) {
         $fieldid = $this->field->id;
-        $oldcontents = array();
-        $contents = array();
+        $oldcontents = [];
+        $contents = [];
         // Old content (should not exist if we get here, as update should be triggered only when no content).
         if (isset($entry->{"c{$fieldid}_content"})) {
             $oldcontent = $entry->{"c{$fieldid}_content"};
@@ -100,7 +100,7 @@ class datalynxfield_identifier extends datalynxfield_base {
         $userid = (!empty($entry->userid) ? $entry->userid : $USER->id);
 
         // Collate elements for hashing.
-        $elements = array();
+        $elements = [];
         $elements[] = $entryid;
 
         // Salt.

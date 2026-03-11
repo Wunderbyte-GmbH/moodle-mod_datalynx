@@ -83,7 +83,7 @@ class datalynx_rule_ftpsyncfiles_form extends datalynx_rule_form {
                 $standardfields);
 
         $fields = $this->_df->get_fields(null, false, true);
-        $fieldnames = array();
+        $fieldnames = [];
         foreach ($fields as $fieldid => $field) {
             if ($field->type == 'teammemberselect') {
                 $fieldnames[$fieldid] = $field->name();

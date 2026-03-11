@@ -100,8 +100,8 @@ class datalynxfield_number extends datalynxfield_text {
 
     protected function format_content($entry, array $values = null) {
         $fieldid = $this->field->id;
-        $contents = array();
-        $oldcontents = array();
+        $contents = [];
+        $oldcontents = [];
 
         // Old contents.
         if (isset($entry->{"c{$fieldid}_content"})) {
@@ -122,7 +122,7 @@ class datalynxfield_number extends datalynxfield_text {
      * @see datalynxfield_base::parse_search()
      */
     public function parse_search($formdata, $i) {
-        $values = array();
+        $values = [];
 
         $name = 'f_' . $i . '_' . $this->field->id;
 

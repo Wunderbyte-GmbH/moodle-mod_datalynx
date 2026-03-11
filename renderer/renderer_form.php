@@ -78,7 +78,7 @@ class datalynx_field_renderer_form extends moodleform {
          */
 
         // When not visible.
-        $group = array();
+        $group = [];
         $group[] = $mform->createElement('radio', 'notvisibleoptions', '', get_string('shownothing', 'datalynx'), '___0___');
         $group[] = $mform->createElement('radio', 'notvisibleoptions', '', get_string('custom', 'datalynx'), '___2___');
         $group[] = $mform->createElement('textarea', 'notvisibletemplate', '', '');
@@ -90,7 +90,7 @@ class datalynx_field_renderer_form extends moodleform {
         $mform->setDefault('notvisibleoptions', '___0___');
 
         // Display template.
-        $group = array();
+        $group = [];
         $group[] = $mform->createElement('radio', 'displayoptions', '', get_string('none'), '___4___');
         $group[] = $mform->createElement('radio', 'displayoptions', '', get_string('custom', 'datalynx'), '___2___');
         $group[] = $mform->createElement('textarea', 'displaytemplate', '', '');
@@ -104,7 +104,7 @@ class datalynx_field_renderer_form extends moodleform {
         $mform->setDefault('displayoptions', '___4___');
 
         // When empty.
-        $group = array();
+        $group = [];
         $group[] = $mform->createElement('radio', 'novalueoptions', '',
                 get_string('shownothing', 'datalynx'), '___0___');
         $group[] = $mform->createElement('radio', 'novalueoptions', '',
@@ -119,7 +119,7 @@ class datalynx_field_renderer_form extends moodleform {
         $mform->setDefault('novalueoptions', '___1___');
 
         // Edit template.
-        $group = array();
+        $group = [];
         $group[] = $mform->createElement('radio', 'editoptions', '', get_string('none'), '___4___');
         $group[] = $mform->createElement('radio', 'editoptions', '', get_string('asdisplay', 'datalynx'), '___1___');
         $group[] = $mform->createElement('radio', 'editoptions', '', get_string('custom', 'datalynx'), '___2___');
@@ -133,7 +133,7 @@ class datalynx_field_renderer_form extends moodleform {
         $mform->setDefault('editoptions', '___1___');
 
         // When not editable.
-        $group = array();
+        $group = [];
         $group[] = $mform->createElement('radio', 'noteditableoptions', '', get_string('shownothing', 'datalynx'), '___0___');
         $group[] = $mform->createElement('radio', 'noteditableoptions', '', get_string('asdisplay', 'datalynx'), '___1___');
         $group[] = $mform->createElement('radio', 'noteditableoptions', '', get_string('disabled', 'datalynx'), '___3___');

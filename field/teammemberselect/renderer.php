@@ -172,7 +172,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
                     '<input type="hidden" name="' . $fieldname . '[-1]" value="-999">');
         }
         $selected = !empty($entry->{"c{$fieldid}_content"}) ? json_decode(
-                $entry->{"c{$fieldid}_content"}, true) : array();
+                $entry->{"c{$fieldid}_content"}, true) : [];
         $authorid = isset($entry->userid) ? $entry->userid : $USER->id;
         $menu = $field->options_menu(true, false, $field->usercanaddself ? 0 : $authorid);
 
@@ -194,7 +194,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         $menu = array(-1 => '') + $field->options_menu();
         $options = array('multiple' => true);
 
-        $elements = array();
+        $elements = [];
         $elements[] = $mform->createElement('autocomplete', $fieldname, null, $menu, $options);
         $mform->setType($fieldname, PARAM_INT);
         $mform->setDefault($fieldname, $value);
@@ -225,11 +225,11 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
             $lastvisible = "fieldgroup_" . explode("_", $entryid)[2] . "_lastvisible";
             $lastvisibleline = $formdata->$lastvisible;
             if ($linenumber >= $lastvisibleline) {
-                return array();
+                return [];
             }
         }
 
-        $errors = array();
+        $errors = [];
         foreach ($tags as $tag) {
             list(, $behavior, ) = $this->process_tag($tag);
             // Variable $behavior datalynx_field_behavior.

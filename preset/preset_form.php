@@ -36,7 +36,7 @@ class mod_datalynx_preset_form extends moodleform {
 
         $mform->addElement('header', 'presetshdr', get_string('presetadd', 'datalynx'));
         // Preset source.
-        $grp = array();
+        $grp = [];
         $grp[] = &$mform->createElement('radio', 'preset_source', null,
                 get_string('presetfromdatalynx', 'datalynx'), 'current');
 

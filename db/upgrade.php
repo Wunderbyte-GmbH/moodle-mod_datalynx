@@ -363,7 +363,7 @@ function xmldb_datalynx_upgrade($oldversion) {
                 $update = false;
                 if ($view->patterns) {
                     $patterns = unserialize($view->patterns);
-                    $newpatterns = array('view' => $patterns['view'], 'field' => array());
+                    $newpatterns = array('view' => $patterns['view'], 'field' => []);
                     foreach ($patterns['field'] as $fieldid => $tags) {
                         if ($fieldid < 0 && !empty($newfieldids[$fieldid])) {
                             $newpatterns['field'][$newfieldids[$fieldid]] = $tags;
@@ -387,7 +387,7 @@ function xmldb_datalynx_upgrade($oldversion) {
                 // Adjust customsort field ids.
                 if ($filter->customsort) {
                     $customsort = unserialize($filter->customsort);
-                    $sortfields = array();
+                    $sortfields = [];
                     foreach ($customsort as $fieldid => $sortdir) {
                         if ($fieldid < 0 && !empty($newfieldids[$fieldid])) {
                             $sortfields[$newfieldids[$fieldid]] = $sortdir;
@@ -402,7 +402,7 @@ function xmldb_datalynx_upgrade($oldversion) {
                 // Adjust customsearch field ids.
                 if ($filter->customsearch) {
                     $customsearch = unserialize($filter->customsearch);
-                    $searchfields = array();
+                    $searchfields = [];
                     foreach ($customsearch as $fieldid => $options) {
                         if ($fieldid < 0 && !empty($newfieldids[$fieldid])) {
                             $searchfields[$newfieldids[$fieldid]] = $options;
@@ -1067,7 +1067,7 @@ function mod_datalynx_replace_field_rules() {
             $changed = false;
 
             $regex = '/\[\[\*([^\]]+)\]\]/';
-            $matches = array();
+            $matches = [];
             if (preg_match_all($regex, $view->param2, $matches, PREG_SET_ORDER)) {
                 $behavior = $defaultbehavior;
                 $behavior->name = get_string('required', 'datalynx');
@@ -1084,11 +1084,11 @@ function mod_datalynx_replace_field_rules() {
             }
 
             $regex = '/\[\[\^([^\]]+)\]\]/';
-            $matches = array();
+            $matches = [];
             if (preg_match_all($regex, $view->param2, $matches, PREG_SET_ORDER)) {
                 $behavior = $defaultbehavior;
                 $behavior->name = get_string('hidden', 'datalynx');
-                $behavior->visibleto = array();
+                $behavior->visibleto = [];
                 $behavior->d = $dataid;
                 datalynx_field_behavior::insert_behavior($behavior);
 
@@ -1101,11 +1101,11 @@ function mod_datalynx_replace_field_rules() {
             }
 
             $regex = '/\[\[\!([^\]]+)\]\]/';
-            $matches = array();
+            $matches = [];
             if (preg_match_all($regex, $view->param2, $matches, PREG_SET_ORDER)) {
                 $behavior = $defaultbehavior;
                 $behavior->name = get_string('noedit', 'datalynx');
-                $behavior->editableby = array();
+                $behavior->editableby = [];
                 $behavior->d = $dataid;
                 datalynx_field_behavior::insert_behavior($behavior);
 
@@ -1140,10 +1140,10 @@ function mod_datalynx_replace_field_labels() {
     foreach ($dataids as $dataid) {
         $views = $DB->get_records('datalynx_views', array('dataid' => $dataid), '', 'id, param2');
         foreach ($views as $view) {
-            $fieldtags = array();
+            $fieldtags = [];
             $fieldlabels = $DB->get_records_menu('datalynx_fields', array('dataid' => $dataid), '', 'name, label');
             $regex = '/\[\[([^\]]+)\@\]\]/';
-            $matches = array();
+            $matches = [];
             if (preg_match_all($regex, $view->param2, $matches, PREG_SET_ORDER)) {
                 foreach ($matches as $match) {
                     $oldtag = $match[0];

@@ -39,7 +39,7 @@ class entry extends \core_search\base_mod {
     /**
      * @var array Cache of datalynx entries.
      */
-    protected $entriesdata = array();
+    protected $entriesdata = [];
 
     /**
      * Returns a recordset with all required entry information.
@@ -72,7 +72,7 @@ class entry extends \core_search\base_mod {
      * @param array    $options
      * @return \core_search\document
      */
-    public function get_document($entry, $options = array()) {
+    public function get_document($entry, $options = []) {
         try {
             $cm = $this->get_cm('datalynx', $entry->dataid, $entry->course);
             $context = \context_module::instance($cm->id);
@@ -200,7 +200,7 @@ class entry extends \core_search\base_mod {
     protected function get_fields_for_entries($entry) {
         global $DB;
 
-        $indexfields = array();
+        $indexfields = [];
         $validfieldtypes = array('text', 'textarea', 'url', 'number', 'editor', 'file');
 
         $sql = "SELECT dc.*, df.name AS fieldname, df.type AS fieldtype
@@ -209,7 +209,7 @@ class entry extends \core_search\base_mod {
                 AND dc.entryid = :entryid";
 
         $contents = $DB->get_records_sql($sql, array('entryid' => $entry->id));
-        $filteredcontents = array();
+        $filteredcontents = [];
 
         // Filter invalid fieldtypes.
         foreach ($contents as $content) {

@@ -57,7 +57,7 @@ class datalynx_rule_manager {
             self::$observers = $observers;
         }
 
-        $eventmenu = array();
+        $eventmenu = [];
         foreach (self::$observers as $observer) {
             if ($observer['callback'] == 'datalynx_rule_manager::trigger_rules') {
                 // Eventname is formed as follows: mod_datalynx\event\<name>, trimming backspace.
@@ -89,7 +89,7 @@ class datalynx_rule_manager {
      */
     public function __construct(mod_datalynx\datalynx $datalynx) {
         $this->_df = $datalynx;
-        $this->_customrules = array();
+        $this->_customrules = [];
     }
 
     /**
@@ -134,7 +134,7 @@ class datalynx_rule_manager {
      * @return datalynx_rule_base[]
      */
     public function get_rules_by_plugintype($type, $menu = false) {
-        $typerules = array();
+        $typerules = [];
         foreach ($this->get_rules() as $ruleid => $rule) {
             if ($rule->get_type() === $type) {
                 if ($menu) {
@@ -154,7 +154,7 @@ class datalynx_rule_manager {
      * @return datalynx_rule_base[]
      */
     public function get_rules_for_event($eventname, $enabledonly = true) {
-        $rules = array();
+        $rules = [];
         foreach ($this->get_rules() as $ruleid => $rule) {
             if ($rule->is_triggered_by($eventname) && (!$enabledonly || $rule->is_enabled())) {
                 $rules[$ruleid] = $rule;
@@ -210,7 +210,7 @@ class datalynx_rule_manager {
         global $DB;
 
         if (!$this->_customrules || $forceget) {
-            $this->_customrules = array();
+            $this->_customrules = [];
             // Collate user rules.
             if ($rules = $DB->get_records('datalynx_rules', array('dataid' => $this->_df->id()))) {
                 foreach ($rules as $ruleid => $rule) {
@@ -223,7 +223,7 @@ class datalynx_rule_manager {
         if (empty($exclude) && !$menu) {
             return $rules;
         } else {
-            $retrules = array();
+            $retrules = [];
             foreach ($rules as $ruleid => $rule) {
                 if (!empty($exclude) && in_array($ruleid, $exclude)) {
                     continue;
@@ -251,7 +251,7 @@ class datalynx_rule_manager {
         }
 
         $dfrules = $this->get_rules();
-        $rules = array();
+        $rules = [];
         // Collate the rules for processing.
         if ($ruleids = explode(',', $rids)) {
             foreach ($ruleids as $ruleid) {
@@ -261,7 +261,7 @@ class datalynx_rule_manager {
             }
         }
 
-        $processedrids = array();
+        $processedrids = [];
         $strnotify = '';
 
         if (empty($rules) && $action != 'add') {
@@ -483,7 +483,7 @@ class datalynx_rule_manager {
 
         // Display the rule form jump list.
         $directories = get_list_of_plugins('mod/datalynx/rule/');
-        $rulemenu = array();
+        $rulemenu = [];
 
         foreach ($directories as $directory) {
             if ($directory[0] != '_') {
@@ -540,7 +540,7 @@ class datalynx_rule_manager {
 
         $data->senderprofilelink = html_writer::link(
                 new moodle_url('/user/profile.php', array('id' => $data->userfrom->id)), fullname($data->userfrom));
-        $messagestosend = array();
+        $messagestosend = [];
         foreach ($data->users as $user) {
             // Prepare message object.
             $message = new \core\message\message();

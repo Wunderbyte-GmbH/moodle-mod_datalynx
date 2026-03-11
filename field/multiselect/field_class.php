@@ -58,7 +58,7 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
 
             if ($labels) {
                 $options = $this->options_menu();
-                $selected = array();
+                $selected = [];
                 foreach ($labels as $label) {
                     if ($optionkey = array_search($label, $options)) {
                         $selected[] = $optionkey;
@@ -79,7 +79,7 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
         $rawdefaults = explode("\n", $this->field->param2);
         $options = $this->options_menu();
 
-        $defaults = array();
+        $defaults = [];
         foreach ($rawdefaults as $default) {
             $default = trim($default);
             if ($default && $key = array_search($default, $options)) {

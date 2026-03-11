@@ -68,8 +68,8 @@ class datalynx_field_behavior {
         $this->name = $record->name;
         $this->description = $record->description;
         $this->dataid = $record->dataid;
-        $this->visibleto = isset($record->visibleto) ? unserialize($record->visibleto) : array();
-        $this->editableby = isset($record->editableby) ? unserialize($record->editableby) : array();
+        $this->visibleto = isset($record->visibleto) ? unserialize($record->visibleto) : [];
+        $this->editableby = isset($record->editableby) ? unserialize($record->editableby) : [];
         $this->required = isset($record->required) ? $record->required : false;
 
         if (isset($record->datalynx)) {

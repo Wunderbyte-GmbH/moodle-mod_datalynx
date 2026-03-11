@@ -114,7 +114,7 @@ class datalynxview_pdf extends base {
                         'keep' => !empty($settings->margins->keep) ? $settings->margins->keep : false
                 ),
                 'protection' => (object) array(
-                        'permissions' => !empty($settings->protection->permissions) ? $settings->protection->permissions : array(),
+                        'permissions' => !empty($settings->protection->permissions) ? $settings->protection->permissions : [],
                         'user_pass' => !empty($settings->protection->user_pass) ? $settings->protection->user_pass : '',
                         'owner_pass' => !empty($settings->protection->owner_pass) ? $settings->protection->owner_pass : null,
                         'mode' => !empty($settings->protection->mode) ? $settings->protection->mode : null
@@ -767,7 +767,7 @@ class datalynxview_pdf extends base {
             $entry = reset($entries);
             foreach ($fields as $field) {
                 $addtags = $field->renderer()->search($namepattern);
-                $additional = $field->get_definitions($foundtags, $entry, array());
+                $additional = $field->get_definitions($foundtags, $entry, []);
                 if ($addtags && $additional) {
                     $foundtags += $addtags;
                     $replacements += $additional;

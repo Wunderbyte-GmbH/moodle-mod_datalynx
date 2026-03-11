@@ -52,7 +52,7 @@ class datalynx_preset_manager {
     public function get_user_presets($presetarea) {
         global $USER;
 
-        $presets = array();
+        $presets = [];
         $coursecontext = context_course::instance($this->_df->course->id);
 
         $fs = get_file_storage();
@@ -477,7 +477,7 @@ class datalynx_preset_manager {
             return false;
         }
 
-        $presets = array();
+        $presets = [];
         $fs = get_file_storage();
 
         // Try first course area.

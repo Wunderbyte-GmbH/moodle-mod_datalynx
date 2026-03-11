@@ -67,7 +67,7 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
         if (isset($this->_field->field->param5) && is_numeric($this->_field->field->param5) && $this->_field->field->param5 > 0) {
             $disabled = $this->_field->get_disabled_values_for_user();
         } else {
-            $disabled = array();
+            $disabled = [];
         }
 
         foreach ($menuoptions as $id => $name) {
@@ -116,7 +116,7 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
             $options = $field->options_menu();
 
             if (!empty($options['options'])) {
-                $str = array();
+                $str = [];
                 foreach ($options as $key => $option) {
                     $isselected = (int) ($key == $selected);
                     $str[] = "$isselected $option";
@@ -151,7 +151,7 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
         $fieldname = "f_{$i}_{$fieldid}";
         $menu = array(-1 => '') + $field->options_menu();
         $options = array('multiple' => true);
-        $elements = array();
+        $elements = [];
         $elements[] = $mform->createElement('autocomplete', $fieldname, null, $menu, $options);
         $mform->setType($fieldname, PARAM_INT);
         $value = json_decode($value);
@@ -169,7 +169,7 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
      */
     public function validate($entryid, $tags, $formdata) {
         $fieldid = $this->_field->id();
-        $errors = array();
+        $errors = [];
 
         $formfieldname = "field_{$fieldid}_{$entryid}";
 

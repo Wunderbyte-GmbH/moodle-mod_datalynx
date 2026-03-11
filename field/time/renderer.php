@@ -82,7 +82,7 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         $fieldid = $field->id();
         $fieldname = "f_{$i}_{$fieldid}";
 
-        $elements = array();
+        $elements = [];
 
         // With normal filter display whole form and disable cases.
         if ($mform->_formName != 'mod_datalynx_customfilter_frontend_form') {
@@ -124,7 +124,7 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
     /**
      */
     protected function render_standard_selector(&$mform, $entry, $content, $includetime = true,
-            array $options = array()) {
+            array $options = []) {
         $field = $this->_field;
         $fieldid = $field->id();
         $entryid = $entry->id;
@@ -132,7 +132,7 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
 
         // If date only don't add time to selector.
         $time = $includetime ? 'time_' : '';
-        $elementoptions = array();
+        $elementoptions = [];
         // Optional.
         $elementoptions['optional'] = true;
         // Start year.
@@ -161,7 +161,7 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
      * @throws coding_exception
      */
     protected function render_masked_selector(MoodleQuickForm &$mform, $entry, $content,
-            $includetime = true, array $options = array()) {
+            $includetime = true, array $options = []) {
         $field = $this->_field;
         $entryid = $entry->id;
         $fieldid = $field->id();
@@ -175,20 +175,20 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         $maskmonth = get_string('month');
         $maskyear = get_string('year');
 
-        $days = array();
+        $days = [];
         for ($i = 1; $i <= 31; $i++) {
             $days[$i] = $i;
         }
-        $months = array();
+        $months = [];
         for ($i = 1; $i <= 12; $i++) {
             $months[$i] = userdate(mktime(0, 0, 0, $i, 10), "%B");
         }
-        $years = array();
+        $years = [];
         for ($i = $startyear; $i <= $stopyear; $i++) {
             $years[$i] = $i;
         }
 
-        $grp = array();
+        $grp = [];
         $grp[] = &$mform->createElement('select', "{$fieldname}[day]", null,
                 array(0 => $maskday) + $days);
         $grp[] = &$mform->createElement('select', "{$fieldname}[month]", null,
@@ -201,11 +201,11 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
             $maskhour = get_string('hour', 'datalynxfield_time');
             $maskminute = get_string('minute', 'datalynxfield_time');
 
-            $hours = array();
+            $hours = [];
             for ($i = 0; $i <= 23; $i++) {
                 $hours[$i] = sprintf("%02d", $i);
             }
-            $minutes = array();
+            $minutes = [];
             for ($i = 0; $i < 60; $i += $step) {
                 $minutes[$i] = sprintf("%02d", $i);
             }
@@ -332,7 +332,7 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
 
         $formfieldname = "field_{$fieldid}_{$entryid}";
 
-        $errors = array();
+        $errors = [];
         foreach ($tags as $tag) {
             list(, $behavior, ) = $this->process_tag($tag);
             // Variable $behavior datalynx_field_behavior.

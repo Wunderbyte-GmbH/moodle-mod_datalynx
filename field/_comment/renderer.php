@@ -68,7 +68,7 @@ class datalynxfield__comment_renderer extends datalynxfield_renderer {
 
     /**
      */
-    public function display_browse($entry, $options = array()) {
+    public function display_browse($entry, $options = []) {
         global $CFG;
 
         $df = $this->_field->df();
@@ -104,7 +104,7 @@ class datalynxfield__comment_renderer extends datalynxfield_renderer {
     protected function patterns() {
         $cat = get_string('comments', 'datalynx');
 
-        $patterns = array();
+        $patterns = [];
         $patterns['##comments##'] = array(true, $cat);
         $patterns['##comments:count##'] = array(true, $cat);
         $patterns['##comments:inline##'] = array(true, $cat);

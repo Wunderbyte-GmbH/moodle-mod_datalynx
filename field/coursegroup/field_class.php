@@ -56,8 +56,8 @@ class datalynxfield_coursegroup extends datalynxfield_base {
      */
     protected function format_content($entry, array $values = null) {
         $fieldid = $this->field->id;
-        $oldcontents = array();
-        $contents = array();
+        $oldcontents = [];
+        $contents = [];
 
         // New contents.
         $course = 0;

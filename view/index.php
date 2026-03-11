@@ -302,7 +302,7 @@ if (!empty($views)) {
 
                 $selecturl = new moodle_url($actionbaseurl,
                         $linkparams + array('setfilter' => $viewid));
-                $viewselect = new single_select($selecturl, 'fid', $options, $selected, array());
+                $viewselect = new single_select($selecturl, 'fid', $options, $selected, []);
 
                 $viewfilter = $OUTPUT->render($viewselect);
             }

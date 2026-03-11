@@ -85,7 +85,7 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
         // Content to be included.
         $mform->addElement('header', 'message', get_string('messagecontent', 'datalynxrule_eventnotification'));
         $dlfields = $this->_df->get_fields();
-        $fieldmenu = array();
+        $fieldmenu = [];
         foreach ($dlfields as $fieldid => $field) {
             if ($field->type == 'text' || $field->type == 'editor' || $field->type == 'textarea') {
                 $fieldmenu[$fieldid] = $field->field->name;
@@ -105,7 +105,7 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
      */
     public function get_allusers(): array {
         global $DB;
-        $tempusers = $DB->get_records('user', array(), '', $fields = 'id, firstname, lastname');
+        $tempusers = $DB->get_records('user', [], '', $fields = 'id, firstname, lastname');
 
         $allusers[0] = get_string('noselection', 'datalynx');
         foreach ($tempusers as $userdata) {
@@ -164,7 +164,7 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
      * @return array
      */
     protected function menu_roles_used_in_context(): array {
-        $roles = array();
+        $roles = [];
         foreach (get_roles_used_in_context($this->_df->context) as $roleid => $role) {
             $roles[$roleid] = $role->coursealias ? $role->coursealias : ($role->name ? $role->name : $role->shortname);
         }
@@ -200,7 +200,7 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
     public function get_data($slashed = true) {
         if ($data = parent::get_data($slashed)) {
             // Set recipient.
-            $recipients = array();
+            $recipients = [];
             if (isset($data->author)) {
                 $recipients['author'] = 1;
             }

@@ -52,7 +52,7 @@ class datalynxfield_editor extends datalynxfield_base {
 
         // TODO: provide options for the editor field to configure in the field settings.
 
-        $this->editoroptions = array();
+        $this->editoroptions = [];
         $this->editoroptions['context'] = $this->df->context;
         $this->editoroptions['maxfiles'] = EDITOR_UNLIMITED_FILES;
         $this->editoroptions['trusttext'] = true;
@@ -142,7 +142,7 @@ class datalynxfield_editor extends datalynxfield_base {
         if ($this->is_editor()) {
             if (isset($data->{"field_{$fieldid}_{$entryid}"})) {
                 $valuearr = explode('##', $data->{"field_{$fieldid}_{$entryid}"});
-                $content = array();
+                $content = [];
                 if ($csvrecord) {
                     $content['text'] = !empty($valuearr[0]) ? htmlspecialchars_decode($valuearr[0]) : null;
                 } else {

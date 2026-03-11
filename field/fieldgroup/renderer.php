@@ -33,7 +33,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
      * Fields that are included in the fieldgroup. Fieldid as key.
      * @var array
      */
-    protected $subfields = array();
+    protected $subfields = [];
 
     /**
      *
@@ -59,7 +59,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         $options[$fieldname] = true;
 
         // In case we don't have anything to show there should be an error.
-        $linedispl = $completedispl = array();
+        $linedispl = $completedispl = [];
 
         // Show all lines with content, get rid of all after that.
         $lastlinewithcontent = -1;
@@ -74,7 +74,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 $linedispl['subfield'][] = $subfielddefinition; // Build this multidimensional array for mustache context.
             }
             $completedispl['line'][] = $linedispl;
-            $linedispl = array(); // Reset.
+            $linedispl = []; // Reset.
 
         }
         $subfieldnames = array_unique($subfieldnames);
@@ -232,7 +232,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
      * @see datalynxfield_renderer::validate()
      */
     public function validate($entryid, $tags, $formdata) {
-        return array();
+        return [];
     }
 
     /**
@@ -245,7 +245,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         $cat = get_string('fieldgroups', 'datalynx');
         $fieldname = $this->_field->name();
 
-        $patterns = array();
+        $patterns = [];
         $patterns["[[$fieldname]]"] = array(true, $cat);
 
         return $patterns;
@@ -281,7 +281,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                     $tempcontent = array( $entry->{"c{$subfieldid}_content{$contentid}"} );
                     $tempid = array( $entry->{"c{$subfieldid}_id"} );
                 } else {
-                    $tempcontent = array();
+                    $tempcontent = [];
                 }
             }
 

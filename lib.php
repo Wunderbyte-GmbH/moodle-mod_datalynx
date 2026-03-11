@@ -283,7 +283,7 @@ function datalynx_reset_userdata($data) {
     require_once($CFG->dirroot . '/rating/lib.php');
 
     $componentstr = get_string('modulenameplural', 'datalynx');
-    $status = array();
+    $status = [];
 
     $allrecordssql = "SELECT e.id
                         FROM {datalynx_entries} e
@@ -339,8 +339,8 @@ function datalynx_reset_userdata($data) {
                         WHERE d.course = ? AND e.userid > 0";
 
         $coursecontext = context_course::instance($data->courseid);
-        $notenrolled = array();
-        $fields = array();
+        $notenrolled = [];
+        $fields = [];
         $rs = $DB->get_recordset_sql($recordssql, array($data->courseid));
         foreach ($rs as $record) {
             if (array_key_exists($record->userid, $notenrolled) || !$record->userexists ||
@@ -364,7 +364,7 @@ function datalynx_reset_userdata($data) {
                     if ($fs = $DB->get_records('datalynx_fields', array('dataid' => $record->dataid))) {
                         $fields[$record->dataid] = array_keys($fs);
                     } else {
-                        $fields[$record->dataid] = array();
+                        $fields[$record->dataid] = [];
                     }
                 }
                 foreach ($fields[$record->dataid] as $fieldid) {
@@ -817,7 +817,7 @@ function datalynx_get_participants($dataid) {
                    r.ratingarea = 'activity')";
     $ratings = $DB->get_records_sql($sql, $params);
 
-    $participants = array();
+    $participants = [];
 
     if ($entries) {
         foreach ($entries as $entry) {

@@ -50,7 +50,7 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
 
         $content = !empty($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : null;
 
-        $selected = array();
+        $selected = [];
         if ($entryid > 0 && $content) {
             $contentprepare = str_replace("#", "", $content);
             $selectedraw = explode(',', $contentprepare);
@@ -89,7 +89,7 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
             $menuoptions[-999] = null; // Allow this option for empty values.
 
             // If we see the pattern addnew open up option to add menuoptions.
-            $fieldattr = array();
+            $fieldattr = [];
             if (isset($options['addnew'])) {
                 $fieldattr['tags'] = true;
                 $paramtype = PARAM_NOTAGS;
@@ -135,7 +135,7 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
 
             $contents = explode(',', $contentprepare);
 
-            $str = array();
+            $str = [];
             foreach ($options as $key => $option) {
                 $selected = (int) in_array($key, $contents);
                 if ($selected) {
@@ -173,7 +173,7 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
         $fieldname = "f_{$i}_{$fieldid}";
         $menu = array(-1 => '') + $field->options_menu();
         $options = array('multiple' => true);
-        $elements = array();
+        $elements = [];
         $elements[] = $mform->createElement('autocomplete', $fieldname, null, $menu, $options);
         $mform->setType($fieldname, PARAM_INT);
         $mform->setDefault($fieldname, $value);
@@ -185,7 +185,7 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
         // Add a checkbox to select if any of or all elements are needed, only show this in customfilter forms..
         if ($mform->_formName == 'mod_datalynx_customfilter_frontend_form') {
             // NOTE: Do not set to 0|1 as 1 will be cleared as form input by modform.
-            $elements[] = $mform->createElement('advcheckbox', $fieldname . "[andor]", get_string('customfilterandor', 'datalynx'), '', array(), array(0, -2));
+            $elements[] = $mform->createElement('advcheckbox', $fieldname . "[andor]", get_string('customfilterandor', 'datalynx'), '', [], array(0, -2));
         }
 
         return array($elements, null);
@@ -200,7 +200,7 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
         $fieldid = $this->_field->id();
         $formfieldname = "field_{$fieldid}_{$entryid}";
 
-        $errors = array();
+        $errors = [];
         foreach ($tags as $tag) {
             list(, $behavior, ) = $this->process_tag($tag);
 

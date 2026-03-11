@@ -203,7 +203,7 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
             $member = $course = $group = 0;
         }
 
-        $elements = array();
+        $elements = [];
         // Select yes/no for member.
         $elements[] = &$mform->createElement('selectyesno', "f_{$i}_{$fieldid}_member");
         // Number field for course id.
