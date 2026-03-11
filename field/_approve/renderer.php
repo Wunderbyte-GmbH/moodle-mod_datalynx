@@ -43,12 +43,12 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
 
         if ($df->data->approval) {
             if (!$entry || $edit) {
-                $replacements['##approve##'] = array('', array(array($this, 'display_edit'), array($entry)));
+                $replacements['##approve##'] = ['', [[$this, 'display_edit'], [$entry]]];
 
                 // Existing entry to browse.
             } else {
-                $replacements['##approve##@'] = array('html', $this->display_browse($entry));
-                $replacements['##approve##'] = array('html', $this->display_browse($entry));
+                $replacements['##approve##@'] = ['html', $this->display_browse($entry)];
+                $replacements['##approve##'] = ['html', $this->display_browse($entry)];
             }
         }
 
@@ -61,15 +61,15 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
         $field = $this->_field;
         $fieldid = $field->id();
 
-        $options = array(0 => ucfirst(get_string('approvednot', 'datalynx')),
-                1 => ucfirst(get_string('approved', 'datalynx')));
+        $options = [0 => ucfirst(get_string('approvednot', 'datalynx')),
+                1 => ucfirst(get_string('approved', 'datalynx'))];
         $select = &$mform->createElement('select', "f_{$i}_$fieldid", null, $options);
         $select->setSelected($value);
         // Disable the 'not' and 'operator' fields.
         $mform->disabledIf("searchnot$i", "f_{$i}_$fieldid", 'neq', 2);
         $mform->disabledIf("searchoperator$i", "f_{$i}_$fieldid", 'neq', 2);
 
-        return array(array($select), null);
+        return [[$select], null];
     }
 
     /**
@@ -86,7 +86,7 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
         }
 
         $fieldname = "field_{$fieldid}_{$entryid}";
-        $mform->addElement('advcheckbox', $fieldname, null, null, null, array(0, 1));
+        $mform->addElement('advcheckbox', $fieldname, null, null, null, [0, 1]);
         $mform->setDefault($fieldname, $checked);
     }
 
@@ -108,32 +108,32 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
         $strapproved = get_string($approved, 'datalynx');
         if ($CFG->branch >= 33) {
             $approvedimage = html_writer::empty_tag('img',
-                    array('src' => $OUTPUT->image_url($approvedimagesrc),
+                    ['src' => $OUTPUT->image_url($approvedimagesrc),
                         'class' => "iconsmall" . (isset($entry->approved) && $entry->approved ? ' approved' : ''),
-                        'alt' => $strapproved, 'title' => $strapproved));
+                        'alt' => $strapproved, 'title' => $strapproved]);
         } else {
             $approvedimage = html_writer::empty_tag('img',
-                    array('src' => $OUTPUT->pix_url($approvedimagesrc),
+                    ['src' => $OUTPUT->pix_url($approvedimagesrc),
                         'class' => "iconsmall" . (isset($entry->approved) && $entry->approved ? ' approved' : ''),
-                        'alt' => $strapproved, 'title' => $strapproved));
+                        'alt' => $strapproved, 'title' => $strapproved]);
         }
 
         if (has_capability('mod/datalynx:approve', $field->df()->context)) {
             if ($CFG->branch >= 33) {
                 $PAGE->requires->js_call_amd('mod_datalynx/approve', 'init',
-                        array($OUTPUT->image_url('i/completion-auto-pass')->__toString(),
-                            $OUTPUT->image_url('i/completion-auto-n')->__toString()));
+                        [$OUTPUT->image_url('i/completion-auto-pass')->__toString(),
+                            $OUTPUT->image_url('i/completion-auto-n')->__toString()]);
             } else {
                 $$PAGE->requires->js_call_amd('mod_datalynx/approve', 'init',
-                        array($OUTPUT->pix_url('i/completion-auto-pass')->__toString(),
-                            $OUTPUT->pix_url('i/completion-auto-n')->__toString()));
+                        [$OUTPUT->pix_url('i/completion-auto-pass')->__toString(),
+                            $OUTPUT->pix_url('i/completion-auto-n')->__toString()]);
             }
 
             return html_writer::link(
                     new moodle_url($entry->baseurl,
-                            array($approval => $entry->id, 'sesskey' => sesskey(),
+                            [$approval => $entry->id, 'sesskey' => sesskey(),
                                     'sourceview' => $this->_field->df()->get_current_view()->id()
-                            )), $approvedimage, array('class' => 'datalynxfield__approve'));
+                            ]), $approvedimage, ['class' => 'datalynxfield__approve']);
         } else {
             return $approvedimage;
         }
@@ -146,7 +146,7 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
         $cat = get_string('actions', 'datalynx');
 
         $patterns = [];
-        $patterns["##approve##"] = array(true, $cat);
+        $patterns["##approve##"] = [true, $cat];
 
         return $patterns;
     }

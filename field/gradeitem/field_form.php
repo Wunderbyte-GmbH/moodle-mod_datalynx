@@ -63,9 +63,9 @@ class datalynxfield_gradeitem_form extends datalynxfield_form {
         $mform->addElement('hidden', 'param1');
         $mform->setType('param1', PARAM_INT);
         $mform->addElement('static', '', get_string('gradeitem', 'datalynx'),
-                html_writer::select($actualoptions, "param1", '', array('' => 'choosedots')));
+                html_writer::select($actualoptions, "param1", '', ['' => 'choosedots']));
 
-        $module = array('name' => 'mod_datalynx', 'fullpath' => '/mod/datalynx/datalynx.js');
+        $module = ['name' => 'mod_datalynx', 'fullpath' => '/mod/datalynx/datalynx.js'];
 
         global $PAGE;
 

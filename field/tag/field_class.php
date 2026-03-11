@@ -79,7 +79,7 @@ class datalynxfield_tag extends datalynxfield_option_multiple {
             // Make standard tags.
             foreach ($tagobjects as $tagobject) {
                 if (!$tagobject->isstandard) {
-                    $tagobject->update(array('isstandard' => 1));
+                    $tagobject->update(['isstandard' => 1]);
                 }
             }
         }
@@ -145,7 +145,7 @@ class datalynxfield_tag extends datalynxfield_option_multiple {
                 JOIN {datalynx_fields} df ON df.id = dc.fieldid
                 WHERE ti.itemtype = :itemtype
                 AND ti.component = :component';
-        $params = array('itemtype' => 'datalynx_contents', 'component' => 'mod_datalynx');
+        $params = ['itemtype' => 'datalynx_contents', 'component' => 'mod_datalynx'];
 
         if ($operator === 'EXACTLY' && empty($value)) {
             $operator = '';
@@ -180,13 +180,13 @@ class datalynxfield_tag extends datalynxfield_option_multiple {
         $entryids = $DB->get_fieldset_sql($sql, $params);
         $entryidsstr = implode(',', $entryids);
 
-        return array(" e.id $not IN ($entryidsstr)", [], false);
+        return [" e.id $not IN ($entryidsstr)", [], false];
     }
 
     public function get_supported_search_operators() {
-        return array('ANY_OF' => get_string('anyof', 'datalynx'),
+        return ['ANY_OF' => get_string('anyof', 'datalynx'),
                 'ALL_OF' => get_string('allof', 'datalynx'),
-                '' => get_string('empty', 'datalynx'));
+                '' => get_string('empty', 'datalynx')];
     }
 
     /**

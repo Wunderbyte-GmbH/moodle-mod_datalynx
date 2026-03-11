@@ -45,9 +45,9 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
         }
 
         $fieldname = "field_{$fieldid}_{$entryid}";
-        $fmoptions = array('subdirs' => 0, 'maxbytes' => $field->get('param1'),
+        $fmoptions = ['subdirs' => 0, 'maxbytes' => $field->get('param1'),
                 'maxfiles' => $field->get('param2'),
-                'accepted_types' => explode(',', $field->get('param3')));
+                'accepted_types' => explode(',', $field->get('param3'))];
 
         $draftitemid = file_get_submitted_draft_itemid("{$fieldname}_filemanager");
         file_prepare_draft_area($draftitemid, $field->df()->context->id, 'mod_datalynx', 'content',
@@ -129,8 +129,8 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
      */
     public function pluginfile_patterns(): array {
         $fieldname = $this->_field->name();
-        return array("[[{$fieldname}]]", "[[{$fieldname}:thumb]]", "[[{$fieldname}:linked]]",
-                "[[{$fieldname}:lightbox]]");
+        return ["[[{$fieldname}]]", "[[{$fieldname}:thumb]]", "[[{$fieldname}:linked]]",
+                "[[{$fieldname}:lightbox]]"];
     }
 
     /**
@@ -144,7 +144,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
     protected function display_file(stored_file $file, int $entryid, string $path, string $altname = '', ?array $params = null) {
         $field = $this->_field;
 
-        $imgattr = array('style' => []);
+        $imgattr = ['style' => []];
         if (isset($params['lightbox']) && $params['lightbox']) {
             $imgattr['class'] = 'zoomable';
         }
@@ -179,7 +179,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
                 $imgattr['style'] = implode(';', $imgattr['style']);
                 $img = html_writer::empty_tag('img', $imgattr);
                 if (isset($params['linked'])) {
-                    return html_writer::link($imgpath, $img, array('target' => '_blank'));
+                    return html_writer::link($imgpath, $img, ['target' => '_blank']);
                 } else {
                     return $img;
                 }
@@ -223,11 +223,11 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
         $fieldname = $this->_field->name();
 
         $patterns = parent::patterns();
-        $patterns["[[{$fieldname}:linked]]"] = array(true);
-        $patterns["[[{$fieldname}:tn]]"] = array(false);
-        $patterns["[[{$fieldname}:thumb]]"] = array(true);
-        $patterns["[[{$fieldname}:tn-linked]]"] = array(false);
-        $patterns["[[{$fieldname}:lightbox]]"] = array(true);
+        $patterns["[[{$fieldname}:linked]]"] = [true];
+        $patterns["[[{$fieldname}:tn]]"] = [false];
+        $patterns["[[{$fieldname}:thumb]]"] = [true];
+        $patterns["[[{$fieldname}:tn-linked]]"] = [false];
+        $patterns["[[{$fieldname}:lightbox]]"] = [true];
 
         return $patterns;
     }

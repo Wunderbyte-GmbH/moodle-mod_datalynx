@@ -62,13 +62,13 @@ class datalynx_field_behavior_form extends moodleform {
 
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
-        $mform->addElement('text', 'name', get_string('name'), array('size' => '32'));
+        $mform->addElement('text', 'name', get_string('name'), ['size' => '32']);
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', "Behavior name may not contain the pipe symbol \" | \"!", 'regex',
                 '/^[^\|]+$/', 'client');
 
-        $mform->addElement('text', 'description', get_string('description'), array('size' => '64'));
+        $mform->addElement('text', 'description', get_string('description'), ['size' => '64']);
         $mform->setType('description', PARAM_TEXT);
 
         // VISIBILITY OPTIONS.
@@ -76,26 +76,26 @@ class datalynx_field_behavior_form extends moodleform {
         $mform->addElement('header', 'visibilityoptions', get_string('visibility', 'datalynx'));
         $mform->setExpanded('visibilityoptions');
 
-        $options = array("multiple" => true);
+        $options = ["multiple" => true];
         $mform->addElement('autocomplete', 'visibletopermission', get_string('visibleto', 'datalynx'),
                 $this->datalynx->get_datalynx_permission_names(false, false), $options);
         $mform->addHelpButton('visibletopermission', 'visibleto', 'datalynx');
         $mform->setType('visibletopermission', PARAM_RAW);
         if ($new) {
             $mform->setDefault('visibletopermission',
-                    array(mod_datalynx\datalynx::PERMISSION_MANAGER, mod_datalynx\datalynx::PERMISSION_TEACHER,
-                            mod_datalynx\datalynx::PERMISSION_STUDENT));
+                    [mod_datalynx\datalynx::PERMISSION_MANAGER, mod_datalynx\datalynx::PERMISSION_TEACHER,
+                            mod_datalynx\datalynx::PERMISSION_STUDENT]);
         }
 
         // Interface for single user, this overrules other visibility options.
         $allusers = $this->get_allusers();
-        $options = array("multiple" => true);
+        $options = ["multiple" => true];
         $mform->addElement('autocomplete', 'visibletouser',
                 get_string('otheruser', 'datalynx'), $allusers, $options);
         $mform->setType('visibletouser', PARAM_INT);
 
         // Interface for teammemberselect fields.
-        $options = array("multiple" => true);
+        $options = ["multiple" => true];
         $teammemberselect = $this->get_teammemberselect_fields();
         $mform->addElement('autocomplete', 'visibletoteammember', get_string('teammemberselect', 'datalynx'),
                 $teammemberselect, $options);
@@ -117,8 +117,8 @@ class datalynx_field_behavior_form extends moodleform {
         $mform->setType('editableby', PARAM_RAW);
         if ($new) {
             $mform->setDefault('editableby',
-                    array(mod_datalynx\datalynx::PERMISSION_MANAGER, mod_datalynx\datalynx::PERMISSION_TEACHER,
-                            mod_datalynx\datalynx::PERMISSION_STUDENT));
+                    [mod_datalynx\datalynx::PERMISSION_MANAGER, mod_datalynx\datalynx::PERMISSION_TEACHER,
+                            mod_datalynx\datalynx::PERMISSION_STUDENT]);
         }
         $mform->disabledIf('editableby', 'editable', 'notchecked');
 
@@ -231,7 +231,7 @@ class datalynx_field_behavior_form extends moodleform {
         if ($data['id'] == 0) {
             // To prevent duplicate renderer names when creating a new renderer.
             if ($DB->record_exists('datalynx_behaviors',
-                    array('name' => $data['name'], 'dataid' => $data['d']))) {
+                    ['name' => $data['name'], 'dataid' => $data['d']])) {
                 $errors['name'] = get_string('duplicatename', 'datalynx');
             }
         } else {
@@ -239,7 +239,7 @@ class datalynx_field_behavior_form extends moodleform {
             $sql = "SELECT 'x'
                     FROM {datalynx_behaviors} r
                     WHERE r.name = ? AND r.dataid = ? AND r.id <> ?";
-            $params = array($data['name'], $data['d'], $data['id']);
+            $params = [$data['name'], $data['d'], $data['id']];
             if ($DB->record_exists_sql($sql, $params)) {
                 $errors['name'] = get_string('duplicatename', 'datalynx');
             }

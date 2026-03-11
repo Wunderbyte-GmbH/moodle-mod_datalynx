@@ -62,6 +62,6 @@ class datalynxfield_youtube extends datalynxfield_base {
         parse_str( parse_url( $values, PHP_URL_QUERY ), $vars );
         $contents[] = $vars['v'];
 
-        return array($contents);
+        return [$contents];
     }
 }

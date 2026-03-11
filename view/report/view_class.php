@@ -55,24 +55,24 @@ class datalynxview_report extends base {
 
         $elements = [];
         // Open table and wrap header with thead.
-        $elements[] = array('html',
-                html_writer::start_tag('table', array('class' => 'generaltable')));
+        $elements[] = ['html',
+                html_writer::start_tag('table', ['class' => 'generaltable'])];
 
         // Flatten the set to a list of elements, wrap with tbody and close table.
-        $elements[] = array('html', html_writer::start_tag('tbody'));
+        $elements[] = ['html', html_writer::start_tag('tbody')];
         foreach ($entriesset as $entryid => $entrydefinitions) {
             $elements = array_merge($elements, $entrydefinitions);
         }
-        $elements[] = array('html', html_writer::end_tag('tbody') . html_writer::end_tag('table'));
+        $elements[] = ['html', html_writer::end_tag('tbody') . html_writer::end_tag('table')];
 
         // Add group heading.
         $name = ($name == 'newentry') ? get_string('entrynew', 'datalynx') : $name;
         if ($name) {
-            array_unshift($elements, array('html', $OUTPUT->heading($name, 3, 'main')));
+            array_unshift($elements, ['html', $OUTPUT->heading($name, 3, 'main')]);
         }
         // Wrap with entriesview.
-        array_unshift($elements, array('html', html_writer::start_tag('div', array('class' => 'entriesview'))));
-        $elements[] = array('html', html_writer::end_tag('div'));
+        array_unshift($elements, ['html', html_writer::start_tag('div', ['class' => 'entriesview'])]);
+        $elements[] = ['html', html_writer::end_tag('div')];
 
         return $elements;
     }
@@ -96,27 +96,27 @@ class datalynxview_report extends base {
         $columns = $this->get_columns();
 
         // Generate entry table row.
-        $elements[] = array('html', html_writer::start_tag('tr'));
+        $elements[] = ['html', html_writer::start_tag('tr')];
         foreach ($columns as $column) {
             list($tag, , $class) = array_map('trim', $column);
             if (!empty($fielddefinitions[$tag])) {
                 $fielddefinition = $fielddefinitions[$tag];
                 if ($fielddefinition[0] == 'html') {
-                    $elements[] = array('html',
-                            html_writer::tag('td', $fielddefinition[1], array('class' => $class))
-                    );
+                    $elements[] = ['html',
+                            html_writer::tag('td', $fielddefinition[1], ['class' => $class])
+                    ];
                 } else {
-                    $elements[] = array('html',
-                            html_writer::start_tag('td', array('class' => $class))
-                    );
+                    $elements[] = ['html',
+                            html_writer::start_tag('td', ['class' => $class])
+                    ];
                     $elements[] = $fielddefinition;
-                    $elements[] = array('html', html_writer::end_tag('td'));
+                    $elements[] = ['html', html_writer::end_tag('td')];
                 }
             } else {
-                $elements[] = array('html', html_writer::tag('td', '', array('class' => $class)));
+                $elements[] = ['html', html_writer::tag('td', '', ['class' => $class])];
             }
         }
-        $elements[] = array('html', html_writer::end_tag('tr'));
+        $elements[] = ['html', html_writer::end_tag('tr')];
 
         return $elements;
     }
@@ -561,7 +561,7 @@ class datalynxview_report extends base {
         $filtersmenu = new html_table_cell('##filtersmenu##');
         $quicksearch = new html_table_cell('##quicksearch##');
         $quickperpage = new html_table_cell('##quickperpage##');
-        $row1->cells = array($viewsmenu, $seperator, $filtersmenu, $quicksearch, $quickperpage);
+        $row1->cells = [$viewsmenu, $seperator, $filtersmenu, $quicksearch, $quickperpage];
         foreach ($row1->cells as $cell) {
             $cell->style = 'border:0 none;';
         }
@@ -569,7 +569,7 @@ class datalynxview_report extends base {
         $row2 = new html_table_row();
         $addentries = new html_table_cell('');
         $addentries->colspan = 5;
-        $row2->cells = array($addentries);
+        $row2->cells = [$addentries];
         foreach ($row2->cells as $cell) {
             $cell->style = 'border:0 none;';
         }
@@ -577,15 +577,15 @@ class datalynxview_report extends base {
         $row3 = new html_table_row();
         $pagingbar = new html_table_cell('##pagingbar##');
         $pagingbar->colspan = 5;
-        $row3->cells = array($pagingbar);
+        $row3->cells = [$pagingbar];
         foreach ($row3->cells as $cell) {
             $cell->style = 'border:0 none;';
         }
         // Construct the table.
-        $table->data = array($row1, $row2, $row3);
+        $table->data = [$row1, $row2, $row3];
         $sectiondefault = html_writer::table($table);
         $this->view->esection = html_writer::tag('div', $sectiondefault,
-                        array('class' => 'mdl-align')) . "<div>##entries##</div>";
+                        ['class' => 'mdl-align']) . "<div>##entries##</div>";
 
         // Set content.
         $this->view->param2 = '';

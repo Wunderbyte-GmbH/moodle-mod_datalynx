@@ -22,4 +22,4 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-$definitions = array('patterns' => array('mode' => cache_store::MODE_APPLICATION));
+$definitions = ['patterns' => ['mode' => cache_store::MODE_APPLICATION]];

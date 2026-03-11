@@ -70,7 +70,7 @@ class datalynxfield_file_form extends datalynxfield_form {
         }
 
         // Only allow single choice for now to keep compatible.
-        $options = array("multiple" => false);
+        $options = ["multiple" => false];
 
         // Accepted mimetype is stored in param3.
         $mform->addElement('autocomplete', 'param3', get_string('filetypes', 'datalynx'), $mimetypes, $options);

@@ -43,9 +43,9 @@ class datalynxfield__comment extends datalynxfield_no_content {
     public static function get_field_objects($dataid) {
         $fieldobjects = [];
 
-        $fieldobjects[self::_COMMENT] = (object) array('id' => self::_COMMENT, 'dataid' => $dataid,
+        $fieldobjects[self::_COMMENT] = (object) ['id' => self::_COMMENT, 'dataid' => $dataid,
                 'type' => '_comment', 'name' => get_string('comments', 'datalynx'), 'description' => '',
-                'visible' => 2, 'internalname' => 'comments');
+                'visible' => 2, 'internalname' => 'comments'];
 
         return $fieldobjects;
     }
@@ -66,9 +66,9 @@ class datalynxfield__comment extends datalynxfield_no_content {
                 ($params->commentarea == 'activity' && $params->itemid == $USER->id) ||
                 ($params->commentarea == 'entry')
         ) {
-            return array('post' => true, 'view' => true);
+            return ['post' => true, 'view' => true];
         }
-        return array('post' => false, 'view' => false);
+        return ['post' => false, 'view' => false];
     }
 
     /**
@@ -112,7 +112,7 @@ class datalynxfield__comment extends datalynxfield_no_content {
             if ($params->commentarea == 'entry') {
 
                 // Validate entry.
-                if (!$entry = $DB->get_record('datalynx_entries', array('id' => $params->itemid))) {
+                if (!$entry = $DB->get_record('datalynx_entries', ['id' => $params->itemid])) {
                     throw new comment_exception('invalidcommentitemid');
                 }
 
@@ -132,8 +132,8 @@ class datalynxfield__comment extends datalynxfield_no_content {
 
         // Validation for comment deletion.
         if (!empty($params->commentid)) {
-            if ($comment = $DB->get_record('comments', array('id' => $params->commentid
-            ))
+            if ($comment = $DB->get_record('comments', ['id' => $params->commentid
+            ])
             ) {
                 if ($comment->commentarea != 'entry' && $comment->commentarea != 'activity') {
                     throw new comment_exception('invalidcommentarea');

@@ -89,12 +89,12 @@ class datalynxfield_number extends datalynxfield_text {
                 list($notinids, $params) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED,
                         "df_{$fieldid}_", false);
                 $sql = " e.id $notinids ";
-                return array($sql, $params, false);
+                return [$sql, $params, false];
             } else {
-                return array('', '', '');
+                return ['', '', ''];
             }
         } else {
-            return array($sql, $params, true);
+            return [$sql, $params, true];
         }
     }
 
@@ -113,7 +113,7 @@ class datalynxfield_number extends datalynxfield_text {
         // We want to store empty numbers as well.
         $contents[] = $value;
 
-        return array($contents, $oldcontents);
+        return [$contents, $oldcontents];
     }
 
     /**
@@ -171,10 +171,10 @@ class datalynxfield_number extends datalynxfield_text {
      * @see datalynxfield_text::get_supported_search_operators()
      */
     public function get_supported_search_operators() {
-        return array('' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
+        return ['' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
                 '>' => get_string('greaterthan', 'datalynx'),
                 '>=' => get_string('greater_equal', 'datalynx'),
                 '<' => get_string('less_than', 'datalynx'), '<=' => get_string('less_equal', 'datalynx'),
-                'BETWEEN' => get_string('between', 'datalynx'));
+                'BETWEEN' => get_string('between', 'datalynx')];
     }
 }

@@ -54,7 +54,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
                         default:
                             $str = '';
                     }
-                    $replacements[$tag] = $str ? array('html', $str) : '';
+                    $replacements[$tag] = $str ? ['html', $str] : '';
                 }
 
                 return $replacements;
@@ -167,7 +167,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
                     default:
                         $str = '';
                 }
-                $replacements[$tag] = array('html', $str);
+                $replacements[$tag] = ['html', $str];
             }
         }
         return $replacements;
@@ -176,10 +176,10 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
     /**
      */
     public function get_aggregations($patterns) {
-        $aggr = array(datalynxfield__rating::AGGREGATE_AVG => '##ratings:avg##',
+        $aggr = [datalynxfield__rating::AGGREGATE_AVG => '##ratings:avg##',
                 datalynxfield__rating::AGGREGATE_MAX => '##ratings:max##',
                 datalynxfield__rating::AGGREGATE_MIN => '##ratings:min##',
-                datalynxfield__rating::AGGREGATE_SUM => '##ratings:sum##');
+                datalynxfield__rating::AGGREGATE_SUM => '##ratings:sum##'];
         if ($aggregations = array_intersect($aggr, $patterns)) {
             return array_keys($aggregations);
         } else {
@@ -201,8 +201,8 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
                 $nonpopuplink = $rating->get_view_ratings_url();
                 $popuplink = $rating->get_view_ratings_url(true);
                 $popupaction = new popup_action('click', $popuplink, 'ratings',
-                        array('height' => 400, 'width' => 600
-                        ));
+                        ['height' => 400, 'width' => 600
+                        ]);
 
                 if ($tag == '##ratings:view##') {
                     return $OUTPUT->action_link($nonpopuplink, 'view all', $popupaction);
@@ -230,8 +230,8 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
                 $table->cellpadding = 3;
                 $table->cellspacing = 3;
                 $table->attributes['class'] = 'generalbox ratingtable';
-                $table->colclasses = array('', 'firstname', 'rating', 'time'
-                );
+                $table->colclasses = ['', 'firstname', 'rating', 'time'
+                ];
                 $table->data = [];
 
                 // If the scale was changed after ratings were submitted some ratings may have av alue above the current maximum.
@@ -246,10 +246,10 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
                     $row = new html_table_row();
                     $row->attributes['class'] = 'ratingitemheader';
                     $row->cells[] = $OUTPUT->user_picture($raterecord,
-                            array('courseid' => $this->_field->df()->course->id
-                            ));
-                    $userrecord = $DB->get_record('user', array('id' => $raterecord->userid
-                    ));
+                            ['courseid' => $this->_field->df()->course->id
+                            ]);
+                    $userrecord = $DB->get_record('user', ['id' => $raterecord->userid
+                    ]);
                     $row->cells[] = fullname($userrecord);
                     if ($raterecord->rating > $maxrating) {
                         $raterecord->rating = $maxrating;
@@ -273,8 +273,8 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
 
             $width = round($value / $rating->settings->scale->max * 100);
             $bar = html_writer::tag('div', '.',
-                    array('style' => "width:$width%;height:100%;background:gold;color:gold"
-                    ));
+                    ['style' => "width:$width%;height:100%;background:gold;color:gold"
+                    ]);
             return $bar;
         }
         return '';
@@ -292,21 +292,21 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
 
             $innerstyle = 'width:100%;height:19px;position:absolute;top:0;left:0;';
             $bgdiv = html_writer::tag('div', '.',
-                    array('style' => "background:#ccc;color:#ccc;$innerstyle"
-                    ));
+                    ['style' => "background:#ccc;color:#ccc;$innerstyle"
+                    ]);
             $bar = html_writer::tag('div', $this->display_bar($entry, $value),
-                    array('style' => "z-index:5;$innerstyle"
-                    ));
+                    ['style' => "z-index:5;$innerstyle"
+                    ]);
             $stars = implode('',
                     array_fill(0, $numstars,
                             $OUTPUT->pix_icon('star_grey', '', 'datalynxfield__rating',
-                                    array('style' => 'float:left;'
-                                    ))));
-            $starsdiv = html_writer::tag('div', $stars, array('style' => "z-index:10;$innerstyle"
-            ));
+                                    ['style' => 'float:left;'
+                                    ])));
+            $starsdiv = html_writer::tag('div', $stars, ['style' => "z-index:10;$innerstyle"
+            ]);
             $wrapper = html_writer::tag('div', "$bgdiv $bar $starsdiv",
-                    array('style' => "width:{$width}px;position:relative;"
-                    ));
+                    ['style' => "width:{$width}px;position:relative;"
+                    ]);
             return $wrapper;
         }
         return '';
@@ -331,11 +331,11 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
 
             // Hack to work around the js updating imposed text.
             $ratinghtml .= html_writer::tag('span', '',
-                    array('id' => "ratingaggregate{$rating->itemid}", 'style' => 'display:none;'
-                    ));
+                    ['id' => "ratingaggregate{$rating->itemid}", 'style' => 'display:none;'
+                    ]);
             $ratinghtml .= html_writer::tag('span', '',
-                    array('id' => "ratingcount{$rating->itemid}", 'style' => 'display:none;'
-                    ));
+                    ['id' => "ratingcount{$rating->itemid}", 'style' => 'display:none;'
+                    ]);
 
             $formstart = null;
             // If the item doesn't belong to the current user, the user has permission to rate.
@@ -348,40 +348,40 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
                 $inputs = $rateurl->params();
 
                 // Start the rating form.
-                $formattrs = array('id' => "postrating{$rating->itemid}",
+                $formattrs = ['id' => "postrating{$rating->itemid}",
                         'class' => 'postratingform', 'method' => 'post',
                         'action' => $rateurl->out_omit_querystring()
-                );
+                ];
                 $formstart = html_writer::start_tag('form', $formattrs);
-                $formstart .= html_writer::start_tag('div', array('class' => 'ratingform'
-                ));
+                $formstart .= html_writer::start_tag('div', ['class' => 'ratingform'
+                ]);
 
                 // Add the hidden inputs.
                 foreach ($inputs as $name => $value) {
-                    $attributes = array('type' => 'hidden', 'class' => 'ratinginput',
+                    $attributes = ['type' => 'hidden', 'class' => 'ratinginput',
                             'name' => $name, 'value' => $value
-                    );
+                    ];
                     $formstart .= html_writer::empty_tag('input', $attributes);
                 }
 
                 $ratinghtml = $formstart . $ratinghtml;
 
-                $scalearray = array(RATING_UNSET_RATING => $strrate . '...'
-                        ) + $rating->settings->scale->scaleitems;
-                $scaleattrs = array('class' => 'postratingmenu ratinginput',
+                $scalearray = [RATING_UNSET_RATING => $strrate . '...'
+                        ] + $rating->settings->scale->scaleitems;
+                $scaleattrs = ['class' => 'postratingmenu ratinginput',
                         'id' => 'menurating' . $rating->itemid
-                );
+                ];
                 $ratinghtml .= html_writer::select($scalearray, 'rating', $rating->rating, false,
                         $scaleattrs);
 
                 // Output submit button.
-                $ratinghtml .= html_writer::start_tag('span', array('class' => "ratingsubmit"
-                ));
+                $ratinghtml .= html_writer::start_tag('span', ['class' => "ratingsubmit"
+                ]);
 
-                $attributes = array('type' => 'submit', 'class' => 'postratingmenusubmit',
+                $attributes = ['type' => 'submit', 'class' => 'postratingmenusubmit',
                         'id' => 'postratingsubmit' . $rating->itemid,
                         'value' => s(get_string('rate', 'rating'))
-                );
+                ];
                 $ratinghtml .= html_writer::empty_tag('input', $attributes);
 
                 if (!$rating->settings->scale->isnumeric) {
@@ -406,38 +406,38 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
         $patterns = [];
         switch ($fieldinternalname) {
             case 'ratings':
-                $patterns['##ratings:rate##'] = array(true, $cat
-                );
-                $patterns['##ratings:view##'] = array(true, $cat
-                );
-                $patterns['##ratings:viewurl##'] = array(false
-                );
-                $patterns['##ratings:viewinline##'] = array(true, $cat
-                );
+                $patterns['##ratings:rate##'] = [true, $cat
+                ];
+                $patterns['##ratings:view##'] = [true, $cat
+                ];
+                $patterns['##ratings:viewurl##'] = [false
+                ];
+                $patterns['##ratings:viewinline##'] = [true, $cat
+                ];
                 break;
             case 'avgratings':
-                $patterns['##ratings:avg##'] = array(true, $cat
-                );
-                $patterns['##ratings:avg:bar##'] = array(false
-                );
-                $patterns['##ratings:avg:star##'] = array(false
-                );
+                $patterns['##ratings:avg##'] = [true, $cat
+                ];
+                $patterns['##ratings:avg:bar##'] = [false
+                ];
+                $patterns['##ratings:avg:star##'] = [false
+                ];
                 break;
             case 'countratings':
-                $patterns['##ratings:count##'] = array(true, $cat
-                );
+                $patterns['##ratings:count##'] = [true, $cat
+                ];
                 break;
             case 'maxratings':
-                $patterns['##ratings:max##'] = array(true, $cat
-                );
+                $patterns['##ratings:max##'] = [true, $cat
+                ];
                 break;
             case 'minratings':
-                $patterns['##ratings:min##'] = array(true, $cat
-                );
+                $patterns['##ratings:min##'] = [true, $cat
+                ];
                 break;
             case 'sumratings':
-                $patterns['##ratings:sum##'] = array(true, $cat
-                );
+                $patterns['##ratings:sum##'] = [true, $cat
+                ];
                 break;
         }
 

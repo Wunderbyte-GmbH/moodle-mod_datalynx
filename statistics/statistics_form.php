@@ -57,7 +57,7 @@ class datalynx_statistics_form extends moodleform {
         $radioarray[] = &$mform->createElement('radio', 'mode', '',
                 get_string('alltime', 'datalynx'), datalynx_statistics_class::MODE_ALL_TIME);
         $mform->addGroup($radioarray, 'modearray', get_string('modearray', 'datalynx'),
-                array(' ', ' ', '<br />', ' ', ' '), false);
+                [' ', ' ', '<br />', ' ', ' '], false);
         $mform->addHelpButton('modearray', 'modearray', 'datalynx');
         $mform->disabledIf('from', 'mode', 'eq', datalynx_statistics_class::MODE_UNTIL_DATE);
         $mform->disabledIf('from', 'mode', 'eq', datalynx_statistics_class::MODE_ALL_TIME);

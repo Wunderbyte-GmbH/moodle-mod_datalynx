@@ -33,7 +33,7 @@ $urlparams->vedit = optional_param('vedit', 0, PARAM_INT); // View id to edit.
 $urlparams->import = optional_param('import', 0, PARAM_INT); // Import.
 
 $cm         = get_coursemodule_from_instance('datalynx', $urlparams->d, 0, false, MUST_EXIST);
-$course     = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
+$course     = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
 require_login($course, true, $cm);
 
 // Views list actions.
@@ -57,11 +57,11 @@ if (!has_capability('mod/datalynx:manageentries', $df->context) ||
             'nopermissions', '');
 }
 
-$df->set_page('import', array('modjs' => true, 'urlparams' => $urlparams));
+$df->set_page('import', ['modjs' => true, 'urlparams' => $urlparams]);
 
 // Activate navigation node.
 navigation_node::override_active_url(
-        new moodle_url('/mod/datalynx/import.php', array('id' => $df->cm->id)));
+        new moodle_url('/mod/datalynx/import.php', ['id' => $df->cm->id]));
 
 // DATA PROCESSING.
 // Import.
@@ -71,13 +71,13 @@ if ($urlparams->vid && confirm_sesskey()) {
     // Process import.
     if ($urlparams->import && confirm_sesskey()) {
         if ($view->process_data()) {
-            redirect(new moodle_url('/mod/datalynx/view.php', array('d' => $urlparams->d)));
+            redirect(new moodle_url('/mod/datalynx/view.php', ['d' => $urlparams->d]));
         }
 
         // Or display form.
     } else {
         // Print header.
-        $df->print_header(array('tab' => 'import', 'urlparams' => $urlparams));
+        $df->print_header(['tab' => 'import', 'urlparams' => $urlparams]);
         $mform = $view->get_import_form();
         $mform->set_data(null);
         $mform->display();
@@ -109,14 +109,14 @@ if (!$views) {
 }
 
 // Print header.
-$df->print_header(array('tab' => 'import', 'urlparams' => $urlparams));
+$df->print_header(['tab' => 'import', 'urlparams' => $urlparams]);
 
 // Print add import link.
 $addimporturl = new moodle_url('/mod/datalynx/view/view_edit.php',
-        array('d' => $df->id(), 'type' => 'csv', 'sesskey' => sesskey()));
+        ['d' => $df->id(), 'type' => 'csv', 'sesskey' => sesskey()]);
 $addimportlink = html_writer::link($addimporturl, get_string('importadd', 'datalynx'));
 $br = html_writer::empty_tag('br');
-echo html_writer::tag('div', $addimportlink . $br . $br, array('class' => 'mdl-align'));
+echo html_writer::tag('div', $addimportlink . $br . $br, ['class' => 'mdl-align']);
 
 // If there are import views print admin style list of them.
 if ($views) {
@@ -124,7 +124,7 @@ if ($views) {
     $viewbaseurl = '/mod/datalynx/import.php';
     $editbaseurl = '/mod/datalynx/view/view_edit.php';
     $actionbaseurl = '/mod/datalynx/import.php';
-    $linkparams = array('d' => $df->id(), 'sesskey' => sesskey());
+    $linkparams = ['d' => $df->id(), 'sesskey' => sesskey()];
 
     // Table headings.
     $strviews = get_string('views', 'datalynx');
@@ -135,44 +135,44 @@ if ($views) {
     $strduplicate = get_string('duplicate');
 
     $selectallnone = html_writer::checkbox(null, null, false, null,
-            array('onclick' => 'select_allnone(\'view\'&#44;this.checked)'));
+            ['onclick' => 'select_allnone(\'view\'&#44;this.checked)']);
     $multidelete = html_writer::tag('button',
             $OUTPUT->pix_icon('t/delete', get_string('multidelete', 'datalynx')),
-            array('name' => 'multidelete',
+            ['name' => 'multidelete',
                     'onclick' => 'bulk_action(\'view\'&#44; \'' .
                             htmlspecialchars_decode(new moodle_url($actionbaseurl, $linkparams)) .
                             '\'&#44; \'delete\')'
-            ));
+            ]);
 
     $table = new html_table();
-    $table->head = array($strviews, $strdescription, $stredit, $strduplicate, $strreset,
+    $table->head = [$strviews, $strdescription, $stredit, $strduplicate, $strreset,
             $multidelete, $selectallnone
-    );
-    $table->align = array('left', 'left', 'center', 'center', 'center', 'center', 'center');
-    $table->wrap = array(false, false, false, false, false, false, false);
+    ];
+    $table->align = ['left', 'left', 'center', 'center', 'center', 'center', 'center'];
+    $table->wrap = [false, false, false, false, false, false, false];
     $table->attributes['align'] = 'center';
 
     foreach ($views as $viewid => $view) {
 
         $viewname = html_writer::link(
-                new moodle_url($viewbaseurl, $linkparams + array('vid' => $viewid)), $view->name());
+                new moodle_url($viewbaseurl, $linkparams + ['vid' => $viewid]), $view->name());
         $viewdescription = shorten_text($view->view->description, 30);
         $viewedit = html_writer::link(
-                new moodle_url($editbaseurl, $linkparams + array('vedit' => $viewid)),
+                new moodle_url($editbaseurl, $linkparams + ['vedit' => $viewid]),
                 $OUTPUT->pix_icon('t/edit', $stredit));
         $viewduplicate = html_writer::link(
-                new moodle_url($actionbaseurl, $linkparams + array('duplicate' => $viewid)),
+                new moodle_url($actionbaseurl, $linkparams + ['duplicate' => $viewid]),
                 $OUTPUT->pix_icon('t/copy', $strduplicate));
         $viewreset = html_writer::link(
-                new moodle_url($actionbaseurl, $linkparams + array('reset' => $viewid)),
+                new moodle_url($actionbaseurl, $linkparams + ['reset' => $viewid]),
                 $OUTPUT->pix_icon('t/reload', $strreset));
         $viewdelete = html_writer::link(
-                new moodle_url($actionbaseurl, $linkparams + array('delete' => $viewid)),
+                new moodle_url($actionbaseurl, $linkparams + ['delete' => $viewid]),
                 $OUTPUT->pix_icon('t/delete', $strdelete));
         $viewselector = html_writer::checkbox('viewselector', $viewid, false);
 
-        $table->data[] = array($viewname, $viewdescription, $viewedit, $viewduplicate, $viewreset,
-                $viewdelete, $viewselector);
+        $table->data[] = [$viewname, $viewdescription, $viewedit, $viewduplicate, $viewreset,
+                $viewdelete, $viewselector];
     }
     echo html_writer::table($table);
 }

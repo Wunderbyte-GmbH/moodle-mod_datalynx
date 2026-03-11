@@ -77,7 +77,7 @@ class datalynx_rule_ftpsyncfiles_form extends datalynx_rule_form {
         $mform->addElement('header', 'settingsprofile',
                 get_string('matchfields', 'datalynxrule_ftpsyncfiles'));
 
-        $standardfields = array('idnumber' => 'idnumber', 'email' => 'email', 'id' => 'id', 'username' => 'username');
+        $standardfields = ['idnumber' => 'idnumber', 'email' => 'email', 'id' => 'id', 'username' => 'username'];
         $mform->addElement('autocomplete', 'param7',
                 get_string('identifier', 'datalynxrule_ftpsyncfiles'),
                 $standardfields);
@@ -90,7 +90,7 @@ class datalynx_rule_ftpsyncfiles_form extends datalynx_rule_form {
             }
         }
         asort($fieldnames);
-        $options = array('multiple' => false);
+        $options = ['multiple' => false];
         $mform->addElement('autocomplete', 'param8',
                 get_string('teammemberfield', 'datalynxrule_ftpsyncfiles'), $fieldnames, $options);
         $potentialusers = get_users_by_capability($this->_df->context, 'mod/datalynx:manageentries');

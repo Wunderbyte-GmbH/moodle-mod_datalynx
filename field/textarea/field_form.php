@@ -34,13 +34,13 @@ class datalynxfield_textarea_form extends datalynxfield_form {
 
         // Field width (cols).
         $mform->addElement('text', 'param2', get_string('cols', 'datalynxfield_textarea'),
-                array('size' => '8'));
+                ['size' => '8']);
         $mform->setType('param2', PARAM_INT);
         $mform->addRule('param2', null, 'numeric', null, 'client');
 
         // Field height (rows).
         $mform->addElement('text', 'param3', get_string('rows', 'datalynxfield_textarea'),
-                array('size' => '8'));
+                ['size' => '8']);
         $mform->setType('param3', PARAM_INT);
         $mform->addRule('param3', null, 'numeric', null, 'client');
     }

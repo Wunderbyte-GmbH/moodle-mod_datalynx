@@ -44,11 +44,11 @@ class datalynxview_pdf extends base {
 
     protected string $type = 'pdf';
 
-    protected array $_editors = array('section', 'param2', 'param3', 'param4'
-    );
+    protected array $_editors = ['section', 'param2', 'param3', 'param4'
+    ];
 
-    protected array $_vieweditors = array('section', 'param2', 'param3', 'param4'
-    );
+    protected array $_vieweditors = ['section', 'param2', 'param3', 'param4'
+    ];
 
     protected $_settings = null;
 
@@ -57,13 +57,13 @@ class datalynxview_pdf extends base {
     /**
      */
     public static function get_permission_options() {
-        return array('print' => get_string('perm_print', 'datalynxview_pdf'),
+        return ['print' => get_string('perm_print', 'datalynxview_pdf'),
                 'modify' => get_string('perm_modify', 'datalynxview_pdf'),
                 'copy' => get_string('perm_copy', 'datalynxview_pdf'),
                 'fill-forms' => get_string('perm_fill-forms', 'datalynxview_pdf'),
                 'extract' => get_string('perm_extract', 'datalynxview_pdf'),
                 'assemble' => get_string('perm_assemble', 'datalynxview_pdf'),
-                'print-high' => get_string('perm_print-high', 'datalynxview_pdf'));
+                'print-high' => get_string('perm_print-high', 'datalynxview_pdf')];
     }
 
     /**
@@ -81,7 +81,7 @@ class datalynxview_pdf extends base {
             $settings = new stdClass();
         }
 
-        $this->_settings = (object) array(
+        $this->_settings = (object) [
                 'docname' => !empty($settings->docname) ? $settings->docname : '',
                 'orientation' => !empty($settings->orientation) ? $settings->orientation : '',
                 'unit' => !empty($settings->unit) ? $settings->unit : 'mm',
@@ -90,46 +90,46 @@ class datalynxview_pdf extends base {
                 'pdfframefirstpageonly' => !empty($settings->pdfframefirstpageonly) ? $settings->pdfframefirstpageonly : 0,
                 'transparency' => !empty($settings->transparency) ? $settings->transparency : 0.5,
                 'pagebreak' => !empty($settings->pagebreak) ? $settings->pagebreak : 'auto',
-                'toc' => (object) array(
+                'toc' => (object) [
                         'page' => !empty($settings->toc->page) ? $settings->toc->page : '',
                         'name' => !empty($settings->toc->name) ? $settings->toc->name : '',
                         'title' => !empty($settings->toc->title) ? $settings->toc->title : '',
                         'template' => !empty($settings->toc->template) ? preg_replace('/[\r\n]+/', '',
                                 $settings->toc->template) : ''
-                ),
-                'header' => (object) array(
+                ],
+                'header' => (object) [
                         'enabled' => !empty($settings->header->enabled) ? $settings->header->enabled : false,
                         'margintop' => !empty($settings->header->margintop) ? $settings->header->margintop : 0,
                         'marginleft' => !empty($settings->header->marginleft) ? $settings->header->marginleft : 10
-                ),
-                'footer' => (object) array(
+                ],
+                'footer' => (object) [
                         'text' => !empty($this->view->eparam4) ? $this->view->eparam4 : '',
                         'enabled' => !empty($settings->footer->enabled) ? $settings->footer->enabled : false,
                         'margin' => !empty($settings->footer->margin) ? $settings->footer->margin : 10
-                ),
-                'margins' => (object) array(
+                ],
+                'margins' => (object) [
                         'left' => !empty($settings->margins->left) ? $settings->margins->left : 15,
                         'top' => !empty($settings->margins->top) ? $settings->margins->top : 27,
                         'right' => !empty($settings->margins->right) ? $settings->margins->right : -1,
                         'keep' => !empty($settings->margins->keep) ? $settings->margins->keep : false
-                ),
-                'protection' => (object) array(
+                ],
+                'protection' => (object) [
                         'permissions' => !empty($settings->protection->permissions) ? $settings->protection->permissions : [],
                         'user_pass' => !empty($settings->protection->user_pass) ? $settings->protection->user_pass : '',
                         'owner_pass' => !empty($settings->protection->owner_pass) ? $settings->protection->owner_pass : null,
                         'mode' => !empty($settings->protection->mode) ? $settings->protection->mode : null
-                )
+                ]
         ,
-                'signature' => (object) array(
+                'signature' => (object) [
                         'password' => !empty($settings->signature->password) ? $settings->signature->password : '',
                         'type' => !empty($settings->signature->type) ? $settings->signature->type : 1,
-                        'info' => array(
+                        'info' => [
                          'Name' => !empty($settings->signature->info->Name) ? $settings->signature->info->Name : '',
                          'Location' => !empty($settings->signature->info->Location) ? $settings->signature->info->Location : '',
                          'Reason' => !empty($settings->signature->info->Reason) ? $settings->signature->info->Reason : '',
                      'ContactInfo' => !empty($settings->signature->info->ContactInfo) ? $settings->signature->info->ContactInfo : ''
-                        )
-                ));
+                        ]
+                ]];
     }
 
     /**
@@ -212,7 +212,7 @@ class datalynxview_pdf extends base {
         if ($settings->pagebreak == 'entry') {
             $content = [];
             $totalcontent = $this->display(
-                    array('export' => true, 'tohtml' => true, 'controls' => false, 'entryactions' => false));
+                    ['export' => true, 'tohtml' => true, 'controls' => false, 'entryactions' => false]);
             $totalcontent = preg_replace('/\<\/div\>\<div class\=\"entry\"\>/',
                     '<></div><div class="entry">', $totalcontent);
             $newcontent = explode('<>', $totalcontent);
@@ -224,7 +224,7 @@ class datalynxview_pdf extends base {
         } else {
             $content = explode(self::PAGE_BREAK,
                     $this->display(
-                            array('export' => true, 'tohtml' => true, 'controls' => false, 'entryactions' => false)));
+                            ['export' => true, 'tohtml' => true, 'controls' => false, 'entryactions' => false]));
         }
 
         $pagecount = 0;
@@ -310,10 +310,10 @@ class datalynxview_pdf extends base {
 
         // Save pdf specific template files.
         $contextid = $this->_df->context->id;
-        $imageoptions = array('subdirs' => 0, 'maxbytes' => -1, 'maxfiles' => 1,
-                'accepted_types' => array('image'));
-        $certoptions = array('subdirs' => 0, 'maxbytes' => -1, 'maxfiles' => 1,
-                'accepted_types' => array('.crt'));
+        $imageoptions = ['subdirs' => 0, 'maxbytes' => -1, 'maxfiles' => 1,
+                'accepted_types' => ['image']];
+        $certoptions = ['subdirs' => 0, 'maxbytes' => -1, 'maxfiles' => 1,
+                'accepted_types' => ['.crt']];
 
         // Pdf frame.
         if (isset($data->pdfframe)) {
@@ -344,10 +344,10 @@ class datalynxview_pdf extends base {
 
         // Save pdf specific template files.
         $contextid = $this->_df->context->id;
-        $imageoptions = array('subdirs' => 0, 'maxbytes' => -1, 'maxfiles' => 1,
-                'accepted_types' => array('image'));
-        $certoptions = array('subdirs' => 0, 'maxbytes' => -1, 'maxfiles' => 1,
-                'accepted_types' => array('.crt'));
+        $imageoptions = ['subdirs' => 0, 'maxbytes' => -1, 'maxfiles' => 1,
+                'accepted_types' => ['image']];
+        $certoptions = ['subdirs' => 0, 'maxbytes' => -1, 'maxfiles' => 1,
+                'accepted_types' => ['.crt']];
 
         // Pdf frame.
         $draftitemid = file_get_submitted_draft_itemid('pdfframe');
@@ -419,7 +419,7 @@ class datalynxview_pdf extends base {
         $filtersmenu = new html_table_cell('##filtersmenu##');
         $quicksearch = new html_table_cell('##quicksearch##');
         $quickperpage = new html_table_cell('##quickperpage##');
-        $row1->cells = array($viewsmenu, $seperator, $filtersmenu, $quicksearch, $quickperpage);
+        $row1->cells = [$viewsmenu, $seperator, $filtersmenu, $quicksearch, $quickperpage];
         foreach ($row1->cells as $cell) {
             $cell->style = 'border:0 none;';
         }
@@ -427,7 +427,7 @@ class datalynxview_pdf extends base {
         $row2 = new html_table_row();
         $addentries = new html_table_cell('##addnewentry##     ##export:all##');
         $addentries->colspan = 5;
-        $row2->cells = array($addentries);
+        $row2->cells = [$addentries];
         foreach ($row2->cells as $cell) {
             $cell->style = 'border:0 none;';
         }
@@ -435,15 +435,15 @@ class datalynxview_pdf extends base {
         $row3 = new html_table_row();
         $pagingbar = new html_table_cell('##pagingbar##');
         $pagingbar->colspan = 5;
-        $row3->cells = array($pagingbar);
+        $row3->cells = [$pagingbar];
         foreach ($row3->cells as $cell) {
             $cell->style = 'border:0 none;';
         }
         // Construct the table.
-        $table->data = array($row1, $row2, $row3);
+        $table->data = [$row1, $row2, $row3];
         $sectiondefault = html_writer::table($table);
         $this->view->esection = html_writer::tag('div', $sectiondefault,
-                        array('class' => 'mdl-align')) . "<div>##entries##</div>";
+                        ['class' => 'mdl-align']) . "<div>##entries##</div>";
 
         // Set content.
         $table = new html_table();
@@ -461,7 +461,7 @@ class datalynxview_pdf extends base {
                     $content = new html_table_cell("[[{$field->name()}]]");
                 }
                 $row = new html_table_row();
-                $row->cells = array($name, $content);
+                $row->cells = [$name, $content];
                 $table->data[] = $row;
             }
         }
@@ -469,11 +469,11 @@ class datalynxview_pdf extends base {
         $row = new html_table_row();
         $actions = new html_table_cell('##edit##  ##delete##');
         $actions->colspan = 2;
-        $row->cells = array($actions);
+        $row->cells = [$actions];
         $table->data[] = $row;
         // Construct the table.
         $entrydefault = html_writer::table($table);
-        $this->view->eparam2 = html_writer::tag('div', $entrydefault, array('class' => 'entry'));
+        $this->view->eparam2 = html_writer::tag('div', $entrydefault, ['class' => 'entry']);
     }
 
     /**
@@ -494,12 +494,12 @@ class datalynxview_pdf extends base {
         // Add group heading.
         $name = ($name == 'newentry') ? get_string('entrynew', 'datalynx') : $name;
         if ($name) {
-            array_unshift($elements, array('html', $OUTPUT->heading($name, 3, 'main')));
+            array_unshift($elements, ['html', $OUTPUT->heading($name, 3, 'main')]);
         }
 
         // Wrap with entriesview.
-        array_unshift($elements, array('html', html_writer::start_tag('div', array('class' => 'entriesview'))));
-        array_push($elements, array('html', html_writer::end_tag('div')));
+        array_unshift($elements, ['html', html_writer::start_tag('div', ['class' => 'entriesview'])]);
+        array_push($elements, ['html', html_writer::end_tag('div')]);
 
         return $elements;
     }
@@ -517,7 +517,7 @@ class datalynxview_pdf extends base {
         foreach ($this->_tags['field'] as $fieldid => $patterns) {
             $field = $fields[$fieldid];
             $entry->id = $entryid;
-            $options = array('edit' => true, 'manage' => true);
+            $options = ['edit' => true, 'manage' => true];
             if ($fielddefinitions = $field->get_definitions($patterns, $entry, $options)) {
                 $patterndefinitions = array_merge($patterndefinitions, $fielddefinitions);
             }
@@ -533,7 +533,7 @@ class datalynxview_pdf extends base {
                     $elements[] = $def;
                 }
             } else {
-                $elements[] = array('html', $part);
+                $elements[] = ['html', $part];
             }
         }
 
@@ -683,7 +683,7 @@ class datalynxview_pdf extends base {
         $content = $this->process_content_images($content);
         // Add the Datalynx css to content.
         if ($this->_df->data->css) {
-            $style = html_writer::tag('style', $this->_df->data->css, array('type' => 'text/css'));
+            $style = html_writer::tag('style', $this->_df->data->css, ['type' => 'text/css']);
             $content = $style . $content;
         }
 
@@ -747,7 +747,7 @@ class datalynxview_pdf extends base {
 
         // Add the Datalynx css to content.
         if ($this->_df->data->css) {
-            $style = html_writer::tag('style', $this->_df->data->css, array('type' => 'text/css'));
+            $style = html_writer::tag('style', $this->_df->data->css, ['type' => 'text/css']);
             $content = $style . $content;
         }
         $root = $_SERVER['DOCUMENT_ROOT'];
@@ -918,8 +918,8 @@ class dfpdf extends DynamicParent {
 
     // Phpcs:enable.
     protected function set_page_numbers($text) {
-        $replacements = array('##pagenumber##' => $this->getAliasNumPage(),
-                '##totalpages##' => $this->getAliasNbPages());
+        $replacements = ['##pagenumber##' => $this->getAliasNumPage(),
+                '##totalpages##' => $this->getAliasNbPages()];
         $text = str_replace(array_keys($replacements), $replacements, $text);
         return $text;
     }

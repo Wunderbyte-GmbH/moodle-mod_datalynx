@@ -48,18 +48,18 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
             if (!$entry || $edit) {
                 if (trim($tag, '@') == "##status##" || trim($tag, '@') == "##*status##") {
                     $required = trim($tag, '@') === "##*status##";
-                    $replacements[$tag] = array('',
-                            array(array($this, 'display_edit'
-                            ), array($entry, array('required' => $required
-                            )
-                            )
-                            )
-                    );
+                    $replacements[$tag] = ['',
+                            [[$this, 'display_edit'
+                            ], [$entry, ['required' => $required
+                            ]
+                            ]
+                            ]
+                    ];
                 }
             } else {
                 if (trim($tag, '@') == "##status##" || trim($tag, '@') == "##*status##") {
-                    $replacements[$tag] = array('html', $this->display_browse($entry)
-                    );
+                    $replacements[$tag] = ['html', $this->display_browse($entry)
+                    ];
                 }
             }
         }
@@ -99,18 +99,18 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
      */
     private function menu_status($shownotset = false) {
         if ($shownotset) {
-            return array(
+            return [
                     datalynxfield__status::STATUS_NOT_SET => get_string('statusnotcreated', 'datalynx'),
                     datalynxfield__status::STATUS_DRAFT => get_string('statusdraft', 'datalynx'),
                     datalynxfield__status::STATUS_FINAL_SUBMISSION => get_string(
                             'statusfinalsubmission', 'datalynx')
-            );
+            ];
         } else {
-            return array(datalynxfield__status::STATUS_NOT_SET => get_string('choosedots'),
+            return [datalynxfield__status::STATUS_NOT_SET => get_string('choosedots'),
                     datalynxfield__status::STATUS_DRAFT => get_string('statusdraft', 'datalynx'),
                     datalynxfield__status::STATUS_FINAL_SUBMISSION => get_string(
                             'statusfinalsubmission', 'datalynx')
-            );
+            ];
         }
     }
 
@@ -142,10 +142,10 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
         $fieldid = $this->_field->id();
         $fieldname = "f_{$i}_$fieldid";
 
-        $statusmenu = array(-1 => get_string('statusnotcreated', 'datalynx'),
+        $statusmenu = [-1 => get_string('statusnotcreated', 'datalynx'),
                 datalynxfield__status::STATUS_DRAFT => get_string('statusdraft', 'datalynx'),
                 datalynxfield__status::STATUS_FINAL_SUBMISSION => get_string('statusfinalsubmission',
-                        'datalynx'));
+                        'datalynx')];
 
         $select = &$mform->createElement('select', $fieldname, null, $statusmenu, '');
         $select->setValue($value);
@@ -165,8 +165,8 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
         $cat = get_string('actions', 'datalynx');
 
         $patterns = [];
-        $patterns["##status##"] = array(true, $cat);
-        $patterns["##*status##"] = array(true, $cat);
+        $patterns["##status##"] = [true, $cat];
+        $patterns["##*status##"] = [true, $cat];
 
         return $patterns;
     }

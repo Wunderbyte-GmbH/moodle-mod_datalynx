@@ -37,9 +37,9 @@ class datalynxview_csv_form extends datalynxview_base_form {
         $mform->addElement('header', 'settingshdr', get_string('settings'));
 
         // Export type.
-        $options = array('csv' => get_string('csv', 'datalynxview_csv'),
+        $options = ['csv' => get_string('csv', 'datalynxview_csv'),
                 'ods' => get_string('ods', 'datalynxview_csv'),
-                'xls' => get_string('xls', 'datalynxview_csv'));
+                'xls' => get_string('xls', 'datalynxview_csv')];
         $mform->addElement('select', 'param3', get_string('outputtype', 'datalynxview_csv'), $options);
 
         // Delimiter.
@@ -48,7 +48,7 @@ class datalynxview_csv_form extends datalynxview_base_form {
         $mform->setDefault('delimiter', 'comma');
 
         // Enclosure.
-        $mform->addElement('text', 'enclosure', get_string('csvenclosure', 'datalynx'), array('size' => '10'));
+        $mform->addElement('text', 'enclosure', get_string('csvenclosure', 'datalynx'), ['size' => '10']);
         $mform->setType('enclosure', PARAM_NOTAGS);
         $mform->setDefault('enclosure', '"');
 
@@ -58,7 +58,7 @@ class datalynxview_csv_form extends datalynxview_base_form {
         $mform->setDefault('encoding', 'UTF-8');
 
         // Fields to import.
-        $attributes = array('wrap' => 'soft', 'rows' => 10, 'cols' => 50);
+        $attributes = ['wrap' => 'soft', 'rows' => 10, 'cols' => 50];
         $mform->addElement('textarea', 'param2', get_string('exportfields', 'datalynxview_csv'), $attributes);
         $mform->addHelpButton('param2', 'exportfields', 'datalynxview_csv');
         $mform->setDefault('param2', FORMAT_PLAIN);

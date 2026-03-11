@@ -58,26 +58,26 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
                 if (trim($tag, '@') == "##author:edit##" && $edit &&
                         has_capability('mod/datalynx:manageentries', $field->df()->context)
                 ) {
-                    $replacements[$tag] = array('',
-                            array(array($this, 'display_edit'), array($entry)));
+                    $replacements[$tag] = ['',
+                            [[$this, 'display_edit'], [$entry]]];
                 } else {
-                    $replacements[$tag] = array('html', $this->{"display_$fieldname"}($entry));
+                    $replacements[$tag] = ['html', $this->{"display_$fieldname"}($entry)];
                 }
             }
 
             // If not picture there is only one possible tag so no check.
         } else {
             if ($fieldname != 'picture') {
-                $replacements["##author:{$fieldname}##@"] = array('html', $this->{"display_$fieldname"}($entry));
-                $replacements["##author:{$fieldname}##"] = array('html', $this->{"display_$fieldname"}($entry));
+                $replacements["##author:{$fieldname}##@"] = ['html', $this->{"display_$fieldname"}($entry)];
+                $replacements["##author:{$fieldname}##"] = ['html', $this->{"display_$fieldname"}($entry)];
 
                 // For picture switch on $tags.
             } else {
                 foreach ($tags as $tag) {
                     if (trim($tag, '@') == "##author:picturelarge##") {
-                        $replacements[$tag] = array('html', $this->{"display_$fieldname"}($entry, true));
+                        $replacements[$tag] = ['html', $this->{"display_$fieldname"}($entry, true)];
                     } else {
-                        $replacements[$tag] = array('html', $this->{"display_$fieldname"}($entry));
+                        $replacements[$tag] = ['html', $this->{"display_$fieldname"}($entry)];
                     }
                 }
             }
@@ -151,11 +151,11 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
             $entry->lastname = $USER->lastname;
             $entry->userid = $USER->id;
         }
-        $user = $DB->get_record('user', array('id' => $entry->userid));
+        $user = $DB->get_record('user', ['id' => $entry->userid]);
         $df = $this->_field->df();
         return html_writer::link(
                 new moodle_url('/user/view.php',
-                        array('id' => $entry->userid, 'course' => $df->course->id)), fullname($user));
+                        ['id' => $entry->userid, 'course' => $df->course->id]), fullname($user));
     }
 
     /**
@@ -262,7 +262,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
             }
         }
 
-        $pictureparams = array('courseid' => $this->_field->df()->course->id);
+        $pictureparams = ['courseid' => $this->_field->df()->course->id];
         if ($large) {
             $pictureparams['size'] = 100;
         }
@@ -352,14 +352,14 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
         $cat = get_string('authorinfo', 'datalynx');
 
         $patterns = [];
-        $patterns["##author:{$fieldinternalname}##"] = array(true, $cat);
+        $patterns["##author:{$fieldinternalname}##"] = [true, $cat];
         // For user name add edit tag.
         if ($fieldinternalname == 'name') {
-            $patterns["##author:edit##"] = array(true, $cat);
+            $patterns["##author:edit##"] = [true, $cat];
         }
         // For user picture add the large picture.
         if ($fieldinternalname == 'picture') {
-            $patterns["##author:picturelarge##"] = array(true, $cat);
+            $patterns["##author:picturelarge##"] = [true, $cat];
         }
 
         return $patterns;

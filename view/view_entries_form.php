@@ -52,7 +52,7 @@ class datalynxview_entries_form extends moodleform {
         $buttonarray[] = &$mform->createElement('html', '<input type="button" class="btn btn-secondary"
             onclick="document.getElementById(\'id_cancel\').click();" value="' . get_string('cancel') . '"/>');
 
-        $mform->addGroup($buttonarray, 'delegatebuttonar', '', array(' '), false);
+        $mform->addGroup($buttonarray, 'delegatebuttonar', '', [' '], false);
         $mform->closeHeaderBefore('delegatebuttonar');
     }
 

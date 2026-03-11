@@ -72,7 +72,7 @@ class filter_updated extends \core\event\base {
      */
     public function get_url() {
         return new \moodle_url('/mod/datalynx/filter.php',
-                array('d' => $this->other['dataid'], 'vid' => $this->objectid));
+                ['d' => $this->other['dataid'], 'vid' => $this->objectid]);
     }
 
     /**

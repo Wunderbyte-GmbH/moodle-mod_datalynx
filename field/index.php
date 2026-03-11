@@ -52,11 +52,11 @@ require_login($df->data->course, false, $df->cm);
 
 require_capability('mod/datalynx:managetemplates', $df->context);
 
-$df->set_page('field/index', array('modjs' => true, 'urlparams' => $urlparams));
+$df->set_page('field/index', ['modjs' => true, 'urlparams' => $urlparams]);
 
 // Activate navigation node.
 navigation_node::override_active_url(
-        new moodle_url('/mod/datalynx/field/index.php', array('id' => $df->cm->id)));
+        new moodle_url('/mod/datalynx/field/index.php', ['id' => $df->cm->id]));
 
 // DATA PROCESSING.
 // Duplicate requested fields.
@@ -92,7 +92,7 @@ if (!$fields) {
 }
 
 // Print header.
-$df->print_header(array('tab' => 'fields', 'urlparams' => $urlparams));
+$df->print_header(['tab' => 'fields', 'urlparams' => $urlparams]);
 
 // Display the field form jump list.
 $directories = get_list_of_plugins('mod/datalynx/field/');
@@ -108,19 +108,19 @@ foreach ($directories as $directory) {
 asort($menufield);
 
 $popupurl = new moodle_url('/mod/datalynx/field/field_edit.php',
-        array('d' => $df->id(), 'sesskey' => sesskey()));
-$fieldselect = new single_select($popupurl, 'type', $menufield, null, array('' => 'choosedots'), 'fieldform');
+        ['d' => $df->id(), 'sesskey' => sesskey()]);
+$fieldselect = new single_select($popupurl, 'type', $menufield, null, ['' => 'choosedots'], 'fieldform');
 $fieldselect->set_label(get_string('fieldadd', 'datalynx') . '&nbsp;');
 $br = html_writer::empty_tag('br');
 echo html_writer::tag('div', $br . $OUTPUT->render($fieldselect) . $br,
-        array('class' => 'fieldadd mdl-align'));
+        ['class' => 'fieldadd mdl-align']);
 
 // If there are user fields print admin style list of them.
 if ($fields) {
 
     $editbaseurl = '/mod/datalynx/field/field_edit.php';
     $actionbaseurl = '/mod/datalynx/field/index.php';
-    $linkparams = array('d' => $df->id(), 'sesskey' => sesskey());
+    $linkparams = ['d' => $df->id(), 'sesskey' => sesskey()];
 
     $stredit = get_string('edit');
     $strduplicate = get_string('duplicate');
@@ -134,29 +134,29 @@ if ($fields) {
     // The default value of the type attr of a button is submit, so set it to button so that.
     // It doesn't submit the form.
     $selectallnone = html_writer::checkbox(null, null, false, null,
-            array('onclick' => 'select_allnone(\'field\'&#44;this.checked)'));
+            ['onclick' => 'select_allnone(\'field\'&#44;this.checked)']);
     $multiactionurl = new moodle_url($actionbaseurl, $linkparams);
     $multidelete = html_writer::tag('button',
             $OUTPUT->pix_icon('t/delete', get_string('multidelete', 'datalynx')),
-            array('type' => 'button', 'name' => 'multidelete',
+            ['type' => 'button', 'name' => 'multidelete',
                     'onclick' => 'bulk_action(\'field\'&#44; \'' . $multiactionurl->out(false) .
-                            '\'&#44; \'delete\')'));
+                            '\'&#44; \'delete\')']);
     $multiduplicate = html_writer::tag('button',
             $OUTPUT->pix_icon('t/copy', get_string('multiduplicate', 'datalynx')),
-            array('type' => 'button', 'name' => 'multiduplicate',
+            ['type' => 'button', 'name' => 'multiduplicate',
                     'onclick' => 'bulk_action(\'field\'&#44; \'' . $multiactionurl->out(false) .
-                            '\'&#44; \'duplicate\')'));
+                            '\'&#44; \'duplicate\')']);
 
     // Table headers.
-    $headers = array('name' => get_string('name'), 'type' => get_string('type', 'datalynx'),
+    $headers = ['name' => get_string('name'), 'type' => get_string('type', 'datalynx'),
             'description' => get_string('description'), 'visible' => get_string('visible'),
             'edits' => get_string('fieldeditable', 'datalynx'), 'edit' => $stredit,
             'convert' => get_string('convert', 'datalynx'), 'duplicate' => $multiduplicate,
             'delete' => $multidelete, 'selectallnone' => $selectallnone
-    );
+    ];
 
     $table = new flexible_table('datalynxfieldsindex' . $df->id());
-    $table->define_baseurl(new moodle_url('/mod/datalynx/field/index.php', array('d' => $df->id())));
+    $table->define_baseurl(new moodle_url('/mod/datalynx/field/index.php', ['d' => $df->id()]));
     $table->define_columns(array_keys($headers));
     $table->define_headers(array_values($headers));
 
@@ -186,15 +186,15 @@ if ($fields) {
         }
 
         $fieldname = html_writer::link(
-                new moodle_url($editbaseurl, $linkparams + array('fid' => $fieldid)), $field->name());
+                new moodle_url($editbaseurl, $linkparams + ['fid' => $fieldid]), $field->name());
         $fieldedit = html_writer::link(
-                new moodle_url($editbaseurl, $linkparams + array('fid' => $fieldid)),
+                new moodle_url($editbaseurl, $linkparams + ['fid' => $fieldid]),
                 $OUTPUT->pix_icon('t/edit', $stredit));
         $fieldduplicate = html_writer::link(
-                new moodle_url($actionbaseurl, $linkparams + array('duplicate' => $fieldid)),
+                new moodle_url($actionbaseurl, $linkparams + ['duplicate' => $fieldid]),
                 $OUTPUT->pix_icon('t/copy', $strduplicate));
         $fielddelete = html_writer::link(
-                new moodle_url($actionbaseurl, $linkparams + array('delete' => $fieldid)),
+                new moodle_url($actionbaseurl, $linkparams + ['delete' => $fieldid]),
                 $OUTPUT->pix_icon('t/delete', $strdelete));
         $fieldselector = html_writer::checkbox("fieldselector", $fieldid, false);
 
@@ -209,7 +209,7 @@ if ($fields) {
             $visibleicon = $OUTPUT->pix_icon('t/show', $strshow);
         }
         $fieldvisible = html_writer::link(
-                new moodle_url($actionbaseurl, $linkparams + array('visible' => $fieldid)), $visibleicon);
+                new moodle_url($actionbaseurl, $linkparams + ['visible' => $fieldid]), $visibleicon);
 
         // Editable.
         if ($editable = $field->field->edits) {
@@ -218,20 +218,20 @@ if ($fields) {
             $editableicon = $OUTPUT->pix_icon('t/unlock', $strunlock);
         }
         $fieldeditable = html_writer::link(
-                new moodle_url($actionbaseurl, $linkparams + array('editable' => $fieldid)), $editableicon);
+                new moodle_url($actionbaseurl, $linkparams + ['editable' => $fieldid]), $editableicon);
         // Convert textarea to editor field.
         if ($field->type == "textarea") {
             $converticon = $OUTPUT->pix_icon('t/right', get_string('converttoeditor', 'datalynx'));
             $convert = html_writer::link(
-                    new moodle_url($actionbaseurl, $linkparams + array('convert' => $fieldid)), $converticon);
+                    new moodle_url($actionbaseurl, $linkparams + ['convert' => $fieldid]), $converticon);
         } else {
             $convert = '';
         }
 
         $table->add_data(
-                array($fieldname, $fieldtype, $fielddescription, $fieldvisible, $fieldeditable,
+                [$fieldname, $fieldtype, $fielddescription, $fieldvisible, $fieldeditable,
                         $fieldedit, $convert, $fieldduplicate, $fielddelete, $fieldselector
-                ));
+                ]);
     }
 
     $table->finish_output();

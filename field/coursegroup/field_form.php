@@ -39,17 +39,17 @@ class datalynxfield_coursegroup_form extends datalynxfield_form {
 
         // Course.
         $courses = get_courses("all", "c.sortorder ASC", "c.id,c.fullname");
-        $options = array(0 => get_string('choosedots'));
+        $options = [0 => get_string('choosedots')];
         foreach ($courses as $courseid => $course) {
             $options[$courseid] = $course->fullname;
         }
         $mform->addElement('select', 'param1', get_string('course'), $options);
 
         // Group id.
-        $options = array(0 => get_string('choosedots'));
+        $options = [0 => get_string('choosedots')];
         if (!empty($this->_field->field->param1)) {
             $course = $this->_field->field->param1;
-            $groups = $DB->get_records_menu('groups', array('courseid' => $course), 'name', 'id,name');
+            $groups = $DB->get_records_menu('groups', ['courseid' => $course], 'name', 'id,name');
         } else {
             // An arbitrary limit of 100 registered options.
             $options = $options + range(1, 100);
@@ -58,11 +58,11 @@ class datalynxfield_coursegroup_form extends datalynxfield_form {
         $mform->disabledIf("param2", "param1", 'eq', '');
 
         // Ajax.
-        $options = array('coursefield' => 'param1', 'groupfield' => 'param2',
-                'acturl' => "$CFG->wwwroot/mod/datalynx/field/coursegroup/loadgroups.php");
+        $options = ['coursefield' => 'param1', 'groupfield' => 'param2',
+                'acturl' => "$CFG->wwwroot/mod/datalynx/field/coursegroup/loadgroups.php"];
 
         // Add JQuery
-        $PAGE->requires->js_call_amd('mod_datalynx/coursegroup', 'init', array($options));
+        $PAGE->requires->js_call_amd('mod_datalynx/coursegroup', 'init', [$options]);
 
     }
 }

@@ -67,60 +67,60 @@ class datalynxfield_entryauthor extends datalynxfield_no_content {
     public static function get_field_objects($dataid) {
         $fieldobjects = [];
 
-        $fieldobjects[self::_USERID] = (object) array('id' => self::_USERID, 'dataid' => $dataid,
+        $fieldobjects[self::_USERID] = (object) ['id' => self::_USERID, 'dataid' => $dataid,
                 'type' => 'entryauthor', 'name' => get_string('userid', 'datalynxfield_entryauthor'),
-                'description' => '', 'visible' => 2, 'internalname' => 'id');
+                'description' => '', 'visible' => 2, 'internalname' => 'id'];
 
-        $fieldobjects[self::_USERNAME] = (object) array('id' => self::_USERNAME,
+        $fieldobjects[self::_USERNAME] = (object) ['id' => self::_USERNAME,
                 'dataid' => $dataid, 'type' => 'entryauthor',
                 'name' => get_string('username', 'datalynxfield_entryauthor'), 'description' => '',
-                'visible' => 2, 'internalname' => 'name');
+                'visible' => 2, 'internalname' => 'name'];
 
-        $fieldobjects[self::_USERFIRSTNAME] = (object) array('id' => self::_USERFIRSTNAME,
+        $fieldobjects[self::_USERFIRSTNAME] = (object) ['id' => self::_USERFIRSTNAME,
                 'dataid' => $dataid, 'type' => 'entryauthor',
                 'name' => get_string('userfirstname', 'datalynxfield_entryauthor'), 'description' => '',
-                'visible' => 2, 'internalname' => 'firstname');
+                'visible' => 2, 'internalname' => 'firstname'];
 
-        $fieldobjects[self::_USERLASTNAME] = (object) array('id' => self::_USERLASTNAME,
+        $fieldobjects[self::_USERLASTNAME] = (object) ['id' => self::_USERLASTNAME,
                 'dataid' => $dataid, 'type' => 'entryauthor',
                 'name' => get_string('userlastname', 'datalynxfield_entryauthor'), 'description' => '',
-                'visible' => 2, 'internalname' => 'lastname');
+                'visible' => 2, 'internalname' => 'lastname'];
 
-        $fieldobjects[self::_USERUSERNAME] = (object) array('id' => self::_USERUSERNAME,
+        $fieldobjects[self::_USERUSERNAME] = (object) ['id' => self::_USERUSERNAME,
                 'dataid' => $dataid, 'type' => 'entryauthor',
                 'name' => get_string('userusername', 'datalynxfield_entryauthor'), 'description' => '',
-                'visible' => 2, 'internalname' => 'username');
+                'visible' => 2, 'internalname' => 'username'];
 
-        $fieldobjects[self::_USERIDNUMBER] = (object) array('id' => self::_USERIDNUMBER,
+        $fieldobjects[self::_USERIDNUMBER] = (object) ['id' => self::_USERIDNUMBER,
                 'dataid' => $dataid, 'type' => 'entryauthor',
                 'name' => get_string('useridnumber', 'datalynxfield_entryauthor'), 'description' => '',
-                'visible' => 2, 'internalname' => 'idnumber');
+                'visible' => 2, 'internalname' => 'idnumber'];
 
-        $fieldobjects[self::_USERPICTURE] = (object) array('id' => self::_USERPICTURE,
+        $fieldobjects[self::_USERPICTURE] = (object) ['id' => self::_USERPICTURE,
                 'dataid' => $dataid, 'type' => 'entryauthor',
                 'name' => get_string('userpicture', 'datalynxfield_entryauthor'), 'description' => '',
-                'visible' => 2, 'internalname' => 'picture');
+                'visible' => 2, 'internalname' => 'picture'];
 
-        $fieldobjects[self::_USEREMAIL] = (object) array('id' => self::_USEREMAIL,
+        $fieldobjects[self::_USEREMAIL] = (object) ['id' => self::_USEREMAIL,
                 'dataid' => $dataid, 'type' => 'entryauthor',
                 'name' => get_string('useremail', 'datalynxfield_entryauthor'), 'description' => '',
-                        'visible' => 2, 'internalname' => 'email');
+                        'visible' => 2, 'internalname' => 'email'];
 
-        $fieldobjects[self::_USERINSTITUTION] = (object) array('id' => self::_USERINSTITUTION,
+        $fieldobjects[self::_USERINSTITUTION] = (object) ['id' => self::_USERINSTITUTION,
                         'dataid' => $dataid, 'type' => 'entryauthor',
                         'name' => get_string('institution'), 'description' => '',
-                        'visible' => 2, 'internalname' => 'institution');
+                        'visible' => 2, 'internalname' => 'institution'];
 
-        $fieldobjects[self::_USERDEPARTMENT] = (object) array('id' => self::_USERDEPARTMENT,
+        $fieldobjects[self::_USERDEPARTMENT] = (object) ['id' => self::_USERDEPARTMENT,
                 'dataid' => $dataid, 'type' => 'entryauthor',
                 'name' => get_string('department'), 'description' => '',
-                'visible' => 2, 'internalname' => 'department');
+                'visible' => 2, 'internalname' => 'department'];
 
         // TODO: Multilang.
-        $fieldobjects[self::_BADGES] = (object) array('id' => self::_BADGES,
+        $fieldobjects[self::_BADGES] = (object) ['id' => self::_BADGES,
                         'dataid' => $dataid, 'type' => 'entryauthor',
                         'name' => 'Badges', 'description' => '',
-                        'visible' => 2, 'internalname' => 'badges');
+                        'visible' => 2, 'internalname' => 'badges'];
 
         return $fieldobjects;
     }
@@ -162,7 +162,7 @@ class datalynxfield_entryauthor extends datalynxfield_no_content {
 
         list($sql, $params) = $DB->get_in_or_equal($value, SQL_PARAMS_NAMED);
         $sql = " $not ( e.userid $sql ) ";
-        return array($sql, $params, false);
+        return [$sql, $params, false];
     }
 
     public function parse_search($formdata, $i) {
@@ -201,7 +201,7 @@ class datalynxfield_entryauthor extends datalynxfield_no_content {
                  ORDER BY $contentfull $sortdir";
 
         $distinctvalues = [];
-        if ($options = $DB->get_records_sql($sql, array($this->df->id()))) {
+        if ($options = $DB->get_records_sql($sql, [$this->df->id()])) {
             if ($this->field->internalname == 'name') {
                 $internalname = 'id';
             } else {
@@ -222,10 +222,10 @@ class datalynxfield_entryauthor extends datalynxfield_no_content {
         switch ($this->field->internalname) {
             case 'id':
             case 'name':
-                return array('' => '&lt;' . get_string('choose') . '&gt;',
+                return ['' => '&lt;' . get_string('choose') . '&gt;',
                         'ME' => get_string('me', 'datalynx'),
                         'OTHER_USER' => get_string('otheruser', 'datalynx')
-                );
+                ];
             default:
                 return parent::get_supported_search_operators();
         }

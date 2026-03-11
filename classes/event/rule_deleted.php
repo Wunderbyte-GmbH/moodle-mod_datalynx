@@ -72,7 +72,7 @@ class rule_deleted extends \core\event\base {
      */
     public function get_url() {
         return new \moodle_url('/mod/datalynx/view.php',
-                array('d' => $this->other['dataid'], 'vid' => $this->objectid));
+                ['d' => $this->other['dataid'], 'vid' => $this->objectid]);
     }
 
     /**

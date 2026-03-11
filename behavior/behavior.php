@@ -93,7 +93,7 @@ class datalynx_field_behavior {
      */
     public static function from_name($name, $dataid) {
         global $DB;
-        $record = $DB->get_record('datalynx_behaviors', array('name' => $name, 'dataid' => $dataid));
+        $record = $DB->get_record('datalynx_behaviors', ['name' => $name, 'dataid' => $dataid]);
         if ($record) {
             return new datalynx_field_behavior($record);
         } else {
@@ -112,7 +112,7 @@ class datalynx_field_behavior {
      */
     public static function from_id($id) {
         global $DB;
-        $record = $DB->get_record('datalynx_behaviors', array('id' => $id));
+        $record = $DB->get_record('datalynx_behaviors', ['id' => $id]);
         if ($record) {
             return new datalynx_field_behavior($record);
         } else {
@@ -123,14 +123,14 @@ class datalynx_field_behavior {
     /**
      * @var array default behavior for any field.
      */
-    private static $default = array('id' => 0, 'name' => '', 'description' => '',
-            'visibleto' => array('permissions' => array(mod_datalynx\datalynx::PERMISSION_MANAGER,
+    private static $default = ['id' => 0, 'name' => '', 'description' => '',
+            'visibleto' => ['permissions' => [mod_datalynx\datalynx::PERMISSION_MANAGER,
                     mod_datalynx\datalynx::PERMISSION_TEACHER,
                     mod_datalynx\datalynx::PERMISSION_STUDENT,
                     mod_datalynx\datalynx::PERMISSION_AUTHOR,
-                    mod_datalynx\datalynx::PERMISSION_GUEST)),
+                    mod_datalynx\datalynx::PERMISSION_GUEST]],
             'editableby' => [mod_datalynx\datalynx::PERMISSION_MANAGER, mod_datalynx\datalynx::PERMISSION_TEACHER,
-                    mod_datalynx\datalynx::PERMISSION_STUDENT, mod_datalynx\datalynx::PERMISSION_AUTHOR], 'required' => false);
+                    mod_datalynx\datalynx::PERMISSION_STUDENT, mod_datalynx\datalynx::PERMISSION_AUTHOR], 'required' => false];
 
     /**
      * The default behavior used in any instance without user settings applied.
@@ -315,7 +315,7 @@ class datalynx_field_behavior {
      */
     public static function get_behavior(int $behaviorid): stdClass {
         global $DB;
-        $record = $DB->get_record('datalynx_behaviors', array('id' => $behaviorid));
+        $record = $DB->get_record('datalynx_behaviors', ['id' => $behaviorid]);
         return self::db_to_form($record);
     }
 
@@ -334,7 +334,7 @@ class datalynx_field_behavior {
         do {
             $i++;
             $newname = get_string('copyof', 'datalynx', $object->name) . ' ' . $i;
-        } while ($DB->record_exists('datalynx_behaviors', array('name' => $newname)));
+        } while ($DB->record_exists('datalynx_behaviors', ['name' => $newname]));
         $object->name = $newname;
         return self::insert_behavior($object);
     }
@@ -366,7 +366,7 @@ class datalynx_field_behavior {
     public static function delete_behavior($behaviorid) {
         global $DB;
         self::update_behavior_pattern($behaviorid);
-        return $DB->delete_records('datalynx_behaviors', array('id' => $behaviorid));
+        return $DB->delete_records('datalynx_behaviors', ['id' => $behaviorid]);
     }
 
     /**
@@ -379,9 +379,9 @@ class datalynx_field_behavior {
     public static function update_behavior_pattern($behaviorid, $behaviorname = '') {
         global $DB;
         // Read dataid from DB and find patterns and param2 from all connected views.
-        $behaviorinfo = $DB->get_record('datalynx_behaviors', array('id' => $behaviorid),
+        $behaviorinfo = $DB->get_record('datalynx_behaviors', ['id' => $behaviorid],
                 $fields = 'dataid, name', $strictness = IGNORE_MISSING);
-        $connected = $DB->get_records('datalynx_views', array('dataid' => $behaviorinfo->dataid),
+        $connected = $DB->get_records('datalynx_views', ['dataid' => $behaviorinfo->dataid],
                 null, 'id, patterns, param2');
         // Update every instance that still has the string ||behaviorname in it.
         foreach ($connected as $view) {

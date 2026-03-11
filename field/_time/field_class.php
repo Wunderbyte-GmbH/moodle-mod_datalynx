@@ -45,13 +45,13 @@ class datalynxfield__time extends datalynxfield_no_content {
     public static function get_field_objects($dataid) {
         $fieldobjects = [];
 
-        $fieldobjects[self::_TIMECREATED] = (object) array('id' => self::_TIMECREATED,
+        $fieldobjects[self::_TIMECREATED] = (object) ['id' => self::_TIMECREATED,
                 'dataid' => $dataid, 'type' => '_time', 'name' => get_string('timecreated', 'datalynx'),
-                'description' => '', 'visible' => 2, 'internalname' => 'timecreated');
+                'description' => '', 'visible' => 2, 'internalname' => 'timecreated'];
 
-        $fieldobjects[self::_TIMEMODIFIED] = (object) array('id' => self::_TIMEMODIFIED,
+        $fieldobjects[self::_TIMEMODIFIED] = (object) ['id' => self::_TIMEMODIFIED,
                 'dataid' => $dataid, 'type' => '_time', 'name' => get_string('timemodified', 'datalynx'),
-                'description' => '', 'visible' => 2, 'internalname' => 'timemodified');
+                'description' => '', 'visible' => 2, 'internalname' => 'timemodified'];
 
         return $fieldobjects;
     }
@@ -112,14 +112,14 @@ class datalynxfield__time extends datalynxfield_no_content {
                 $operator = '=';
             }
             $params[$namefrom] = $from;
-            return array(" $not $varcharcontent $operator :$namefrom ", $params, false
-            );
+            return [" $not $varcharcontent $operator :$namefrom ", $params, false
+            ];
         } else {
             $params[$namefrom] = $from;
             $params[$nameto] = $to;
-            return array(" ($not $varcharcontent >= :$namefrom AND $varcharcontent <= :$nameto) ",
+            return [" ($not $varcharcontent >= :$namefrom AND $varcharcontent <= :$nameto) ",
                     $params, false
-            );
+            ];
         }
     }
 
@@ -184,9 +184,9 @@ class datalynxfield__time extends datalynxfield_no_content {
     }
 
     public function get_supported_search_operators() {
-        return array('' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
+        return ['' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
                 '>' => get_string('after', 'datalynx'), '<' => get_string('before', 'datalynx'),
-                'BETWEEN' => get_string('between', 'datalynx'));
+                'BETWEEN' => get_string('between', 'datalynx')];
     }
 
     /**

@@ -136,7 +136,7 @@ class datalynx_field_renderer {
      */
     public static function get_renderer_by_name($name, $dataid) {
         global $DB;
-        $record = $DB->get_record('datalynx_renderers', array('name' => $name, 'dataid' => $dataid),
+        $record = $DB->get_record('datalynx_renderers', ['name' => $name, 'dataid' => $dataid],
                 '*', MUST_EXIST);
         return new datalynx_field_renderer($record);
     }
@@ -150,17 +150,17 @@ class datalynx_field_renderer {
      */
     public static function get_renderer_by_id($id) {
         global $DB;
-        $record = $DB->get_record('datalynx_renderers', array('id' => $id), '*', MUST_EXIST);
+        $record = $DB->get_record('datalynx_renderers', ['id' => $id], '*', MUST_EXIST);
         return new datalynx_field_renderer($record);
     }
 
-    private static $default = array('id' => 0, 'name' => '', 'description' => '',
+    private static $default = ['id' => 0, 'name' => '', 'description' => '',
             'notvisibletemplate' => self::NOT_VISIBLE_SHOW_NOTHING,
             'displaytemplate' => self::DISPLAY_MODE_TEMPLATE_NONE,
             'novaluetemplate' => self::NO_VALUE_SHOW_NOTHING,
             'edittemplate' => self::EDIT_MODE_TEMPLATE_NONE,
             'noteditabletemplate' => self::NOT_EDITABLE_SHOW_NOTHING
-    );
+    ];
 
     /**
      * Static constructor method for default datalynx_field_renderer
@@ -177,7 +177,7 @@ class datalynx_field_renderer {
 
     public static function get_renderer($rendererid) {
         global $DB;
-        $record = $DB->get_record('datalynx_renderers', array('id' => $rendererid));
+        $record = $DB->get_record('datalynx_renderers', ['id' => $rendererid]);
         return self::db_to_form($record);
 
     }
@@ -232,7 +232,7 @@ class datalynx_field_renderer {
      */
     public static function get_record($rendererid) {
         global $DB;
-        return $DB->get_record('datalynx_renderers', array('id' => $rendererid));
+        return $DB->get_record('datalynx_renderers', ['id' => $rendererid]);
     }
 
     /**
@@ -247,7 +247,7 @@ class datalynx_field_renderer {
         do {
             $i++;
             $newname = get_string('copyof', 'datalynx', $object->name) . ' ' . $i;
-        } while ($DB->record_exists('datalynx_renderers', array('name' => $newname)));
+        } while ($DB->record_exists('datalynx_renderers', ['name' => $newname]));
         $object->name = $newname;
         return self::insert_renderer($object);
     }
@@ -278,7 +278,7 @@ class datalynx_field_renderer {
     public static function delete_renderer($rendererid) {
         global $DB;
         self::update_render_pattern($rendererid);
-        return $DB->delete_records('datalynx_renderers', array('id' => $rendererid));
+        return $DB->delete_records('datalynx_renderers', ['id' => $rendererid]);
     }
 
     /**
@@ -294,9 +294,9 @@ class datalynx_field_renderer {
             $renderername = '|' . $renderername;
         }
         // Read dataid from DB and find patterns and param2 from all connected views.
-        $rendererinfo = $DB->get_record('datalynx_renderers', array('id' => $rendererid),
+        $rendererinfo = $DB->get_record('datalynx_renderers', ['id' => $rendererid],
             $fields = 'dataid, name', $strictness = IGNORE_MISSING);
-        $connected = $DB->get_records('datalynx_views', array('dataid' => $rendererinfo->dataid),
+        $connected = $DB->get_records('datalynx_views', ['dataid' => $rendererinfo->dataid],
             null, 'id, patterns, param2');
         // Update every instance that still has the string ||renderername in it.
         foreach ($connected as $view) {

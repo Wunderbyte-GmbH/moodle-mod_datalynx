@@ -66,11 +66,11 @@ class datalynxfield_identifier_renderer extends datalynxfield_renderer {
         $fieldname = "f_{$i}_$fieldid";
 
         $arr = [];
-        $arr[] = &$mform->createElement('text', $fieldname, null, array('size' => '32'));
+        $arr[] = &$mform->createElement('text', $fieldname, null, ['size' => '32']);
         $mform->setType($fieldname, PARAM_NOTAGS);
         $mform->setDefault($fieldname, $value);
         $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
 
-        return array($arr, null);
+        return [$arr, null];
     }
 }

@@ -99,20 +99,20 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         $this->notifyteammembers = $this->field->param6 != 0;
         $this->usercanaddself = $this->field->param7 != 0;
         $this->allowunsubscription = $this->field->param8 != 0;
-        $this->separators = array(
+        $this->separators = [
             self::TEAMMEMBERSELECT_FORMAT_NEWLINE => get_string('listformatnewline', 'datalynx'),
             self::TEAMMEMBERSELECT_FORMAT_SPACE => get_string('listformatspace', 'datalynx'),
             self::TEAMMEMBERSELECT_FORMAT_COMMA => get_string('listformatcomma', 'datalynx'),
             self::TEAMMEMBERSELECT_FORMAT_COMMA_SPACE => get_string('listformatcommaspace',
                     'datalynx'),
-            self::TEAMMEMBERSELECT_FORMAT_UL => get_string('listformatul', 'datalynx'));
+            self::TEAMMEMBERSELECT_FORMAT_UL => get_string('listformatul', 'datalynx')];
 
         $query = "SELECT r.id, r.name
                     FROM {datalynx_rules} r
                    WHERE r.dataid = :dataid
                      AND r.type LIKE :type";
         $this->rules = $DB->get_records_sql_menu($query,
-                array('dataid' => $df->id(), 'type' => 'eventnotification'));
+                ['dataid' => $df->id(), 'type' => 'eventnotification']);
     }
 
     protected function init_user_menu() {
@@ -137,9 +137,9 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
                    WHERE ra.contextid = :contextid
                 ORDER BY u.lastname ASC, u.firstname ASC, u.email ASC, u.username ASC";
 
-        $results = $DB->get_records_sql($query, array('contextid' => $context->id));
+        $results = $DB->get_records_sql($query, ['contextid' => $context->id]);
 
-        $baseurl = new moodle_url('/user/view.php', array('course' => $COURSE->id));
+        $baseurl = new moodle_url('/user/view.php', ['course' => $COURSE->id]);
 
         foreach ($results as $result) {
             // If user was already checked and was marked as forbidden, skip checking any other
@@ -206,7 +206,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
                      AND df.param5 IS NOT NULL
                      AND df.param5 <> '0'";
 
-        return $DB->get_record_sql($query, array('dataid' => $this->df->id()));
+        return $DB->get_record_sql($query, ['dataid' => $this->df->id()]);
     }
 
     /**
@@ -234,7 +234,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
             }
         }
 
-        $field = $DB->get_record('datalynx_fields', array('id' => $this->field->id));
+        $field = $DB->get_record('datalynx_fields', ['id' => $this->field->id]);
         $this->notify_team_members($entry, $field, $oldcontent, $newcontent);
 
         return $newcontentid;
@@ -294,7 +294,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         }
 
         $options = [];
-        $options += array(-999 => null); // NULL to "not" show in lists.
+        $options += [-999 => null]; // NULL to "not" show in lists.
 
         if ($makelinks) {
             if ($allowall) {
@@ -391,7 +391,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
             }
         }
 
-        return array($sql, $params, $usecontent);
+        return [$sql, $params, $usecontent];
     }
 
     public function parse_search($formdata, $i) {
@@ -432,13 +432,13 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         }
 
         $contents[] = json_encode($selected); // Empty values are kept.
-        return array($contents, $oldcontents);
+        return [$contents, $oldcontents];
     }
 
     public function get_supported_search_operators() {
-        return array('' => get_string('empty', 'datalynx'),
+        return ['' => get_string('empty', 'datalynx'),
             'USER' => get_string('iamteammember', 'datalynx'),
-            'OTHER_USER' => get_string('useristeammember', 'datalynx'));
+            'OTHER_USER' => get_string('useristeammember', 'datalynx')];
     }
 
     public function supports_group_by() {
@@ -483,15 +483,15 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
 
         if (!empty($addedmembers)) {
             $event = \mod_datalynx\event\team_updated::create(
-                    array('context' => $this->df->context, 'objectid' => $entry->id,
-                        'other' => $other));
+                    ['context' => $this->df->context, 'objectid' => $entry->id,
+                        'other' => $other]);
             $event->trigger();
         }
 
         if (!empty($removedmembers)) {
             $event = \mod_datalynx\event\team_updated::create(
-                    array('context' => $this->df->context, 'objectid' => $entry->id,
-                        'other' => $other));
+                    ['context' => $this->df->context, 'objectid' => $entry->id,
+                        'other' => $other]);
             $event->trigger();
         }
     }

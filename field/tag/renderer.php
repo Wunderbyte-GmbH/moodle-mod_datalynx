@@ -46,7 +46,7 @@ class datalynxfield_tag_renderer extends datalynxfield_renderer {
 
         $fieldname = "field_{$fieldid}_{$entryid}";
         $mform->addElement('tags', $fieldname, get_string('tags'),
-                array('itemtype' => 'datalynx_contents', 'component' => 'mod_datalynx'));
+                ['itemtype' => 'datalynx_contents', 'component' => 'mod_datalynx']);
         $mform->setDefault($fieldname, $content);
         $required = !empty($options['required']);
         if ($required) {
@@ -91,9 +91,9 @@ class datalynxfield_tag_renderer extends datalynxfield_renderer {
     protected function patterns() {
         $fieldname = $this->_field->name();
         $patterns = parent::patterns();
-        $patterns["[[$fieldname]]"] = array(true);
+        $patterns["[[$fieldname]]"] = [true];
         // Tag without link.
-        $patterns["[[$fieldname:nolink]]"] = array(true);
+        $patterns["[[$fieldname:nolink]]"] = [true];
         return $patterns;
     }
 
@@ -111,12 +111,12 @@ class datalynxfield_tag_renderer extends datalynxfield_renderer {
 
         $fieldname = "f_{$i}_$fieldid";
         $select = &$mform->createElement('tags', $fieldname, get_string('tags'),
-                array('itemtype' => 'datalynx_contents', 'component' => 'mod_datalynx'));
+                ['itemtype' => 'datalynx_contents', 'component' => 'mod_datalynx']);
         $select->setValue($selected);
 
         $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
 
-        return array(array($select), null);
+        return [[$select], null];
     }
 
     /**

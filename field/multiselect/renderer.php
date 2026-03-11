@@ -105,7 +105,7 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
                 $size = count($menuoptions);
             }
 
-            $select = &$mform->addElement('select', $fieldname, null, $menuoptions, array('size' => $size));
+            $select = &$mform->addElement('select', $fieldname, null, $menuoptions, ['size' => $size]);
         }
         $select->setMultiple(true);
         $select->setSelected($selected);
@@ -171,8 +171,8 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
         $field = $this->_field;
         $fieldid = $field->id();
         $fieldname = "f_{$i}_{$fieldid}";
-        $menu = array(-1 => '') + $field->options_menu();
-        $options = array('multiple' => true);
+        $menu = [-1 => ''] + $field->options_menu();
+        $options = ['multiple' => true];
         $elements = [];
         $elements[] = $mform->createElement('autocomplete', $fieldname, null, $menu, $options);
         $mform->setType($fieldname, PARAM_INT);
@@ -185,10 +185,10 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
         // Add a checkbox to select if any of or all elements are needed, only show this in customfilter forms..
         if ($mform->_formName == 'mod_datalynx_customfilter_frontend_form') {
             // NOTE: Do not set to 0|1 as 1 will be cleared as form input by modform.
-            $elements[] = $mform->createElement('advcheckbox', $fieldname . "[andor]", get_string('customfilterandor', 'datalynx'), '', [], array(0, -2));
+            $elements[] = $mform->createElement('advcheckbox', $fieldname . "[andor]", get_string('customfilterandor', 'datalynx'), '', [], [0, -2]);
         }
 
-        return array($elements, null);
+        return [$elements, null];
     }
 
     /**
@@ -240,8 +240,8 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
         $fieldname = $this->_field->name();
 
         $patterns = parent::patterns();
-        $patterns["[[$fieldname]]"] = array(true);
-        $patterns["[[$fieldname:addnew]]"] = array(true);
+        $patterns["[[$fieldname]]"] = [true];
+        $patterns["[[$fieldname:addnew]]"] = [true];
 
         return $patterns;
     }

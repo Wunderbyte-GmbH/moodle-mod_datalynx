@@ -43,9 +43,9 @@ class datalynxfield_entrygroup extends datalynxfield_no_content {
     public static function get_field_objects($dataid) {
         $fieldobjects = [];
 
-        $fieldobjects[self::_GROUP] = (object) array('id' => self::_GROUP, 'dataid' => $dataid,
+        $fieldobjects[self::_GROUP] = (object) ['id' => self::_GROUP, 'dataid' => $dataid,
                 'type' => 'entrygroup', 'name' => get_string('group', 'datalynxfield_entrygroup'),
-                'description' => '', 'visible' => 2, 'internalname' => 'groupid');
+                'description' => '', 'visible' => 2, 'internalname' => 'groupid'];
 
         return $fieldobjects;
     }

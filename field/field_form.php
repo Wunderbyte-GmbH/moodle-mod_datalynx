@@ -45,11 +45,11 @@ class datalynxfield_form extends moodleform {
 
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
-        $mform->addElement('text', 'name', get_string('name'), array('size' => '32'));
+        $mform->addElement('text', 'name', get_string('name'), ['size' => '32']);
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
 
-        $mform->addElement('text', 'description', get_string('description'), array('size' => '64'));
+        $mform->addElement('text', 'description', get_string('description'), ['size' => '64']);
         $mform->setType('description', PARAM_TEXT);
 
         $this->field_definition();
@@ -75,7 +75,7 @@ class datalynxfield_form extends moodleform {
                 get_string('savecontinue', 'datalynx'));
         // Cancel.
         $buttonarray[] = &$mform->createElement('cancel');
-        $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
+        $mform->addGroup($buttonarray, 'buttonar', '', [' '], false);
         $mform->closeHeaderBefore('buttonar');
     }
 
@@ -129,7 +129,7 @@ class datalynxfield_form extends moodleform {
         // Autocompletion with content of other textfield from the same or other datalynx instance.
         // Select Datalynx instance (to be stored in param9).
         if ($datalynxs || $this->_df->id() > 0) {
-            $dfmenu = array('' => array(0 => get_string('noautocompletion', 'datalynx')));
+            $dfmenu = ['' => [0 => get_string('noautocompletion', 'datalynx')]];
             $dfmenu[''][$this->_df->id()] = get_string('thisdatalynx', 'datalynx') .
                     " (" . strip_tags(format_string($this->_df->name(), true)) . ")";
             foreach ($datalynxs as $dlid => $dl) {
@@ -140,7 +140,7 @@ class datalynxfield_form extends moodleform {
                         format_string($dl->name, true));
             }
         } else {
-            $dfmenu = array('' => array(0 => get_string('nodatalynxs', 'datalynx')));
+            $dfmenu = ['' => [0 => get_string('nodatalynxs', 'datalynx')]];
         }
         return $dfmenu;
     }
@@ -180,9 +180,9 @@ class datalynxfield_option_form extends datalynxfield_form {
                 $option = htmlspecialchars($option);
                 $group[] = &$mform->createElement('static', null, null,
                         "<tr><td>{$option}</td><td>");
-                $group[] = &$mform->createElement('text', "renameoption[{$id}]", '', array('size' => 32));
+                $group[] = &$mform->createElement('text', "renameoption[{$id}]", '', ['size' => 32]);
                 $group[] = &$mform->createElement('static', null, null, '</td><td>');
-                $group[] = &$mform->createElement('checkbox', "deleteoption[{$id}]", '', null, array('size' => 1));
+                $group[] = &$mform->createElement('checkbox', "deleteoption[{$id}]", '', null, ['size' => 1]);
                 foreach ($options as $newid => $newoption) {
                     $mform->disabledIf("renameoption[{$id}]", "deleteoption[{$newid}]", 'checked');
                 }

@@ -41,7 +41,7 @@ class datalynxtool_entryperuser {
         }
 
         // Construct entries data.
-        $data = (object) array('eids' => []);
+        $data = (object) ['eids' => []];
         $fieldid = datalynxfield_entryauthor::_USERID;
         $entryid = -1;
         foreach ($users as $userid => $unused) {
@@ -57,9 +57,9 @@ class datalynxtool_entryperuser {
             list($strnotify, $processedeids) = $processed;
             $entriesprocessed = $processedeids ? count($processedeids) : 0;
             if ($entriesprocessed) {
-                return array('good', $strnotify);
+                return ['good', $strnotify];
             }
         }
-        return array('bad', get_string('entriesupdated', 'datalynx', get_string('no')));
+        return ['bad', get_string('entriesupdated', 'datalynx', get_string('no'))];
     }
 }

@@ -40,18 +40,18 @@ class mod_datalynx_preset_form extends moodleform {
         $grp[] = &$mform->createElement('radio', 'preset_source', null,
                 get_string('presetfromdatalynx', 'datalynx'), 'current');
 
-        $packdata = array('nodata' => get_string('presetnodata', 'datalynx'),
+        $packdata = ['nodata' => get_string('presetnodata', 'datalynx'),
                 'data' => get_string('presetdata', 'datalynx'),
-                'dataanon' => get_string('presetdataanon', 'datalynx'));
+                'dataanon' => get_string('presetdataanon', 'datalynx')];
         $grp[] = &$mform->createElement('select', 'preset_data', null, $packdata);
         $grp[] = &$mform->createElement('radio', 'preset_source', null,
                 get_string('presetfromfile', 'datalynx'), 'file');
-        $mform->addGroup($grp, 'psourcegrp', null, array('  ', '<br />'), false);
+        $mform->addGroup($grp, 'psourcegrp', null, ['  ', '<br />'], false);
         $mform->setDefault('preset_source', 'current');
 
         // Upload file.
-        $options = array('subdirs' => 0, 'maxbytes' => $COURSE->maxbytes, 'maxfiles' => 1,
-                'accepted_types' => array('*.zip', '*.mbz'));
+        $options = ['subdirs' => 0, 'maxbytes' => $COURSE->maxbytes, 'maxfiles' => 1,
+                'accepted_types' => ['*.zip', '*.mbz']];
         $mform->addElement('filepicker', 'uploadfile', null, null, $options);
         $mform->disabledIf('uploadfile', 'preset_source', 'neq', 'file');
 

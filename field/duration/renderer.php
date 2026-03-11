@@ -36,7 +36,7 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
         $entryid = $entry->id;
         $fieldname = "field_{$fieldid}_{$entryid}";
 
-        $mform->addElement('duration', $fieldname, '', array('optional' => null));
+        $mform->addElement('duration', $fieldname, '', ['optional' => null]);
         $mform->setType($fieldname, PARAM_ALPHANUMEXT);
 
         if ($entryid > 0 && !empty($entry->{"c{$fieldid}_content"})) {
@@ -116,18 +116,18 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
         $mform->disabledIf("{$fieldname}_to[number]", "searchoperator$i", 'neq', 'BETWEEN');
         $mform->disabledIf("{$fieldname}_to[timeunit]", "searchoperator$i", 'neq', 'BETWEEN');
 
-        return array($arr, null);
+        return [$arr, null];
     }
 
     protected function patterns() {
         $fieldname = $this->_field->name();
 
         $patterns = parent::patterns();
-        $patterns["[[$fieldname]]"] = array(true);
-        $patterns["[[$fieldname:unit]]"] = array(false);
-        $patterns["[[$fieldname:value]]"] = array(false);
-        $patterns["[[$fieldname:seconds]]"] = array(false);
-        $patterns["[[$fieldname:interval]]"] = array(false);
+        $patterns["[[$fieldname]]"] = [true];
+        $patterns["[[$fieldname:unit]]"] = [false];
+        $patterns["[[$fieldname:value]]"] = [false];
+        $patterns["[[$fieldname:seconds]]"] = [false];
+        $patterns["[[$fieldname:interval]]"] = [false];
 
         return $patterns;
     }

@@ -191,7 +191,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         // Hide unused lines.
         global $PAGE;
         $PAGE->requires->js_call_amd('mod_datalynx/fieldgroups', 'init',
-            array($this->_field->field->name, $defaultlines, $maxlines, $requiredlines, $fieldname));
+            [$this->_field->field->name, $defaultlines, $maxlines, $requiredlines, $fieldname]);
 
         // Show a button to add one more line.
         $mform->addElement('button', 'addline', get_string('addline', 'datalynx', $this->_field->field->name));
@@ -246,7 +246,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         $fieldname = $this->_field->name();
 
         $patterns = [];
-        $patterns["[[$fieldname]]"] = array(true, $cat);
+        $patterns["[[$fieldname]]"] = [true, $cat];
 
         return $patterns;
     }
@@ -278,8 +278,8 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
             } else {
                 // If we have exactly one content, show this and leave the rest blank.
                 if (isset($entry->{"c{$subfieldid}_content{$contentid}"})) {
-                    $tempcontent = array( $entry->{"c{$subfieldid}_content{$contentid}"} );
-                    $tempid = array( $entry->{"c{$subfieldid}_id"} );
+                    $tempcontent = [$entry->{"c{$subfieldid}_content{$contentid}"}];
+                    $tempid = [$entry->{"c{$subfieldid}_id"}];
                 } else {
                     $tempcontent = [];
                 }

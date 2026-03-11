@@ -49,9 +49,9 @@ class datalynxfield_duration extends datalynxfield_base {
      */
     public function get_units() {
         if (is_null($this->_units)) {
-            $this->_units = array(604800 => get_string('weeks'), 86400 => get_string('days'),
+            $this->_units = [604800 => get_string('weeks'), 86400 => get_string('days'),
                     3600 => get_string('hours'), 60 => get_string('minutes'), 1 => get_string('seconds')
-            );
+            ];
         }
         return $this->_units;
     }
@@ -66,14 +66,14 @@ class datalynxfield_duration extends datalynxfield_base {
      */
     public function seconds_to_unit($seconds) {
         if ($seconds === 0) {
-            return array(0, 1);
+            return [0, 1];
         }
         foreach ($this->get_units() as $unit => $notused) {
             if (fmod($seconds, $unit) == 0) {
-                return array($seconds / $unit, $unit);
+                return [$seconds / $unit, $unit];
             }
         }
-        return array($seconds, 1);
+        return [$seconds, 1];
     }
 
     /**
@@ -96,7 +96,7 @@ class datalynxfield_duration extends datalynxfield_base {
 
         $value = reset($values);
         $contents[] = $value;
-        return array($contents, $oldcontents);
+        return [$contents, $oldcontents];
     }
 
     /**
@@ -195,12 +195,12 @@ class datalynxfield_duration extends datalynxfield_base {
                 list($notinids, $params) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED,
                         "df_{$fieldid}_", false);
                 $sql = " e.id $notinids ";
-                return array($sql, $params, false);
+                return [$sql, $params, false];
             } else {
-                return array('', '', '');
+                return ['', '', ''];
             }
         } else {
-            return array($sql, $params, true);
+            return [$sql, $params, true];
         }
     }
 
@@ -219,11 +219,11 @@ class datalynxfield_duration extends datalynxfield_base {
     }
 
     public function get_supported_search_operators() {
-        return array('' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
+        return ['' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
                 '>' => get_string('greaterthan', 'datalynx'),
                 '>=' => get_string('greater_equal', 'datalynx'),
                 '<' => get_string('less_than', 'datalynx'), '<=' => get_string('less_equal', 'datalynx'),
-                'BETWEEN' => get_string('between', 'datalynx'));
+                'BETWEEN' => get_string('between', 'datalynx')];
     }
 
     /**

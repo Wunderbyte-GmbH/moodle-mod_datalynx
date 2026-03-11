@@ -42,7 +42,7 @@ class datalynxfield_fieldgroup extends datalynxfield_base {
     }
 
     protected function content_names() {
-        return array('');
+        return [''];
     }
 
     public function supports_group_by() {

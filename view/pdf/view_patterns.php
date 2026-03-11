@@ -45,17 +45,17 @@ class datalynxview_pdf_patterns extends datalynxview_patterns {
         foreach ($tags as $tag) {
             switch ($tag) {
                 case '##export:all##':
-                    $actionurl = new moodle_url($baseurl, array('pdfexportall' => true));
+                    $actionurl = new moodle_url($baseurl, ['pdfexportall' => true]);
                     $label = html_writer::tag('span', get_string('exportall', 'datalynx'));
                     $replacements[$tag] = html_writer::link($actionurl, $label,
-                            array('class' => 'actionlink exportall'));
+                            ['class' => 'actionlink exportall']);
 
                     break;
                 case '##export:page##':
-                    $actionurl = new moodle_url($baseurl, array('pdfexportpage' => true));
+                    $actionurl = new moodle_url($baseurl, ['pdfexportpage' => true]);
                     $label = html_writer::tag('span', get_string('exportpage', 'datalynx'));
                     $replacements[$tag] = html_writer::link($actionurl, $label,
-                            array('class' => 'actionlink exportpage'));
+                            ['class' => 'actionlink exportpage']);
 
                     break;
                 case '##pagebreak##':
@@ -73,9 +73,9 @@ class datalynxview_pdf_patterns extends datalynxview_patterns {
     protected function patterns($checkvisibility = true): array {
         $patterns = parent::patterns($checkvisibility);
         $cat = get_string('pluginname', 'datalynxview_pdf');
-        $patterns['##export:all##'] = array(true, $cat);
-        $patterns['##export:page##'] = array(true, $cat);
-        $patterns['##pagebreak##'] = array(true, $cat);
+        $patterns['##export:all##'] = [true, $cat];
+        $patterns['##export:page##'] = [true, $cat];
+        $patterns['##pagebreak##'] = [true, $cat];
 
         return $patterns;
     }

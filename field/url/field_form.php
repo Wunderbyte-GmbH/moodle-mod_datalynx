@@ -39,13 +39,13 @@ class datalynxfield_url_form extends datalynxfield_form {
         $mform->addElement('selectyesno', 'param1', get_string('usepicker', 'datalynxfield_url'));
 
         // Force link name.
-        $mform->addElement('text', 'param2', get_string('forcename', 'datalynxfield_url'), array('size' => '32'));
+        $mform->addElement('text', 'param2', get_string('forcename', 'datalynxfield_url'), ['size' => '32']);
         $mform->setType('param2', PARAM_TEXT);
 
-        $mform->addElement('text', 'param3', get_string('urlclass', 'datalynx'), array('size' => '32'));
+        $mform->addElement('text', 'param3', get_string('urlclass', 'datalynx'), ['size' => '32']);
         $mform->setType('param3', PARAM_TEXT);
 
-        $mform->addElement('text', 'param4', get_string('urltarget', 'datalynx'), array('size' => '32'));
+        $mform->addElement('text', 'param4', get_string('urltarget', 'datalynx'), ['size' => '32']);
         $mform->setType('param4', PARAM_TEXT);
 
         $mform->addElement('selectyesno', 'param5', get_string('displaylinktext', 'datalynxfield_url'));

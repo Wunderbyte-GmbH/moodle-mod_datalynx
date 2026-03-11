@@ -39,16 +39,16 @@ $df = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
 
 require_login($df->data->course, false, $df->cm);
 
-$pageparams = array('js' => true, 'css' => true, 'rss' => true, 'modjs' => true,
+$pageparams = ['js' => true, 'css' => true, 'rss' => true, 'modjs' => true,
         'completion' => true, 'comments' => true, 'pagelayout' => 'embedded', 'urlparams' => $urlparams
-);
+];
 $df->set_page('embed', $pageparams);
 
 require_capability('mod/datalynx:viewentry', $df->context);
 
 $df->set_content();
 
-$headerparams = array('groups' => true, 'urlparams' => $urlparams);
+$headerparams = ['groups' => true, 'urlparams' => $urlparams];
 $df->print_header($headerparams);
 
 $df->display();

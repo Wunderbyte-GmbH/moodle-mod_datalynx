@@ -102,9 +102,9 @@ class datalynx_statistics_class {
             $dateformat = get_string('strftimedate', 'langconfig');
             $title = get_string('statisticsfor', 'datalynx', $this->_df->name());
             $timestring = get_string("timestring{$params->mode}", 'datalynx',
-                    array('from' => userdate($from, $dateformat),
+                    ['from' => userdate($from, $dateformat),
                             'to' => userdate($to, $dateformat), 'now' => userdate(time(), $dateformat)
-                    ));
+                    ]);
             echo "<hr />$title $timestring";
             $first = true;
             if (isset($params->show[self::VIEW_TOTAL_ENTRIES_COUNT])) {
@@ -150,7 +150,7 @@ class datalynx_statistics_class {
     public function get_form() {
         global $CFG;
         $formclass = 'datalynx_statistics_form';
-        $formparams = array('d' => $this->_df->id());
+        $formparams = ['d' => $this->_df->id()];
         $actionurl = new moodle_url('/mod/datalynx/statistics/index.php', $formparams);
         require_once('statistics_form.php');
         return new $formclass($this, $actionurl);
@@ -159,8 +159,8 @@ class datalynx_statistics_class {
     private function get_count($mode, $from = 0, $to = PHP_INT_MAX) {
         global $DB;
 
-        $params = array('dataid' => $this->_df->id(), 'fromdate' => $from,
-                'todate' => $to + strtotime('+1 day', 0));
+        $params = ['dataid' => $this->_df->id(), 'fromdate' => $from,
+                'todate' => $to + strtotime('+1 day', 0)];
 
         $querytotal = "SELECT COUNT(de.id)
                     FROM {datalynx_entries} de
@@ -191,8 +191,8 @@ class datalynx_statistics_class {
                            AND l.time > :fromdate
                            AND l.time < :todate";
 
-        return array($DB->get_field_sql($querytotal, $params),
+        return [$DB->get_field_sql($querytotal, $params),
                 $DB->get_field_sql($queryapproved, $params), $DB->get_field_sql($querydeleted, $params),
-                $DB->get_field_sql($queryvisits, $params));
+                $DB->get_field_sql($queryvisits, $params)];
     }
 }

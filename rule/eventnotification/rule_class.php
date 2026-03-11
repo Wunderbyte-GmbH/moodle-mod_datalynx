@@ -96,7 +96,7 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
         $eventname = (new \ReflectionClass($event))->getShortName();
         if (strpos($eventname, 'team') !== false) {
             $messagedata->fieldname = $DB->get_field('datalynx_fields', 'name',
-                    array('id' => $event->get_data()['other']['fieldid']));
+                    ['id' => $event->get_data()['other']['fieldid']]);
             if (!$this->checkteam($event)) {
                 return false;
                 // TODO: In else branch: combine added and removed members if notification sent to changed team.
@@ -109,7 +109,7 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
             // If so, test for conditions and stop sending if not met.
             $entryid = $event->get_data()['objectid'];
             $fieldid = $this->rule->param5;
-            $content = $DB->get_record('datalynx_contents', array('fieldid' => $fieldid, 'entryid' => $entryid));
+            $content = $DB->get_record('datalynx_contents', ['fieldid' => $fieldid, 'entryid' => $entryid]);
 
             if (!$content) {
                 return false;
@@ -151,17 +151,17 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
         if (strpos($eventname, 'comment') !== false) {
             $entryid = $event->get_data()['other']['itemid'];
             $commentid = $event->get_data()['objectid'];
-            $messagedata->commenttext = $DB->get_field('comments', 'content', array('id' => $commentid));
+            $messagedata->commenttext = $DB->get_field('comments', 'content', ['id' => $commentid]);
         } else {
             $entryid = $event->get_data()['objectid'];
         }
-        $authorid = $DB->get_field('datalynx_entries', 'userid', array('id' => $entryid));
-        $author = $DB->get_record('user', array('id' => $authorid));
+        $authorid = $DB->get_field('datalynx_entries', 'userid', ['id' => $entryid]);
+        $author = $DB->get_record('user', ['id' => $authorid]);
 
         $userfrom = (strpos($eventname, 'event') !== false &&
                 $this->sender == self::FROM_AUTHOR) ? $author : $USER;
         $messagedata->senderprofilelink = html_writer::link(
-                new moodle_url('/user/profile.php', array('id' => $userfrom->id)),
+                new moodle_url('/user/profile.php', ['id' => $userfrom->id]),
                 fullname($userfrom));
 
         $messagestosend = [];
@@ -178,7 +178,7 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
                 $message->courseid = $df->course->id;
             }
             $message->userfrom = $userfrom;
-            $userto = $DB->get_record('user', array('id' => $userid));
+            $userto = $DB->get_record('user', ['id' => $userid]);
             $message->userto = $userto;
             $messagedata->fullname = fullname($userto);
 
@@ -206,7 +206,7 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
             $messagedata->messagecontent = '';
             if(!empty($messagedfields)) {
                 foreach ($messagedfields AS $fieldid) {
-                    $entrydata = $DB->get_record('datalynx_contents', array('fieldid' => $fieldid, 'entryid' => $entryid));
+                    $entrydata = $DB->get_record('datalynx_contents', ['fieldid' => $fieldid, 'entryid' => $entryid]);
                     $messagedata->messagecontent .= format_text($entrydata->content);
                 }
             }

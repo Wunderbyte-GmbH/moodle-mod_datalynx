@@ -48,7 +48,7 @@ class datalynxfield_file extends datalynxfield_base {
      * @return string[]
      */
     protected function content_names(): array {
-        return array('filemanager', 'alttext', 'delete', 'editor');
+        return ['filemanager', 'alttext', 'delete', 'editor'];
     }
 
     /**
@@ -104,9 +104,9 @@ class datalynxfield_file extends datalynxfield_base {
 
         if (count($files) > 1) {
             // Now save files if we see any.
-            $options = array('subdirs' => 0, 'maxbytes' => $this->field->param1,
+            $options = ['subdirs' => 0, 'maxbytes' => $this->field->param1,
                     'maxfiles' => $this->field->param2, 'accepted_types' => $this->field->param3
-            );
+            ];
 
             $contextid = $this->df->context->id;
             file_save_draft_area_files($filemanager, $contextid, 'mod_datalynx', 'content',
@@ -120,13 +120,13 @@ class datalynxfield_file extends datalynxfield_base {
     /**
      */
     protected function format_content($entry, array $values = null): array {
-        return array(null, null, null);
+        return [null, null, null];
     }
 
     /**
      */
     public function get_content_parts(): array {
-        return array('content', 'content1', 'content2');
+        return ['content', 'content1', 'content2'];
     }
 
     /**
@@ -165,14 +165,14 @@ class datalynxfield_file extends datalynxfield_base {
 
             // Download this file in the temp folder.
             $filename = basename($fileurl);
-            $filerecord = array(
+            $filerecord = [
                 'contextid' => $contextid,
                 'component' => 'user',
                 'filearea' => 'draft',
                 'itemid' => $draftitemid,
                 'filepath' => '/',
                 'filename' => urldecode($filename)
-            );
+            ];
             $fs = get_file_storage();
             $fs->create_file_from_url($filerecord, $fileurl, null, true);
         }
@@ -229,7 +229,7 @@ class datalynxfield_file extends datalynxfield_base {
 
         $contentid = $entry->{"c{$this->field->id}_id"} ?? null;
 
-        $options = array('context' => $this->df->context);
+        $options = ['context' => $this->df->context];
         $data = (object) $values;
         $data = file_postupdate_standard_editor((object) $values, $fieldname, $options,
                 $this->df->context, 'mod_datalynx', 'content', $contentid);
@@ -283,7 +283,7 @@ class datalynxfield_file extends datalynxfield_base {
         // We keep the not and compare with exactly 1 in the content column.
         $value = '1';
         $operator = '=';
-        return parent::get_search_sql(array($not, $operator, $value));
+        return parent::get_search_sql([$not, $operator, $value]);
     }
 
     /**
@@ -304,7 +304,7 @@ class datalynxfield_file extends datalynxfield_base {
         // TODO: We see a draftarea id, need to determine if files are linked to it.
         global $DB;
         $filesizes = $DB->get_records_menu('files',
-            array('itemid' => $value), 'filesize DESC', "id, filesize", '', 1);
+            ['itemid' => $value], 'filesize DESC', "id, filesize", '', 1);
 
         // If the biggest file in the draftarea has a positive filesize, it is not empty.
         if (!reset($filesizes)) {

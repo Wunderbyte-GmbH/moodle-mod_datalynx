@@ -85,7 +85,7 @@ class mobile {
         $html .= '<div class="addon-data-contents">';
 
         // Add content html. Hide edit, remove with entryactions, hide filter with controls.
-        $options = array('tohtml' => true, 'controls' => false, 'entryactions' => $buttons);
+        $options = ['tohtml' => true, 'controls' => false, 'entryactions' => $buttons];
         $options['pagelayout'] = 'mobile';
         $html .= $datalynx->get_content_inline($cm->instance, $view, $entry, $options);
 

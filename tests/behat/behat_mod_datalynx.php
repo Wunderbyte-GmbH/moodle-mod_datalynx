@@ -57,19 +57,19 @@ class behat_mod_datalynx extends behat_base {
 
         $fields = $table->getHash();
         foreach ($fields as $field) {
-            $this->execute("behat_forms::i_select_from_the_singleselect", array($field['name'], 'type'));
+            $this->execute("behat_forms::i_select_from_the_singleselect", [$field['name'], 'type']);
             $field['name'] = "Datalynx field {$field['name']}";
-            $this->execute("behat_forms::set_field_value", array('name', $field['name']));
-            $this->execute("behat_forms::set_field_value", array('description', $field['description']));
+            $this->execute("behat_forms::set_field_value", ['name', $field['name']]);
+            $this->execute("behat_forms::set_field_value", ['description', $field['description']]);
             switch ($field['type']) {
                 case "checkbox":
                 case "radiobutton":
                     $field['addoptions'] = str_replace(',', "\n", $field['param1']);
-                    $this->execute("behat_forms::set_field_value", array('addoptions', $field['addoptions']));
+                    $this->execute("behat_forms::set_field_value", ['addoptions', $field['addoptions']]);
                     $field['param2'] ? "New line" : $field['param2'];
                     $field['param3'] ? "No" : $field['param3'];
-                    $this->execute("behat_forms::set_field_value", array('param2', $field['param2']));
-                    $this->execute("behat_forms::set_field_value", array('param3', $field['param3']));
+                    $this->execute("behat_forms::set_field_value", ['param2', $field['param2']]);
+                    $this->execute("behat_forms::set_field_value", ['param3', $field['param3']]);
                     break;
                 case "gradeitem":
                     break;
@@ -87,72 +87,72 @@ class behat_mod_datalynx extends behat_base {
                     break;
                 case "number":
                     if (!empty($field['param1'])) {
-                        $this->execute("behat_forms::set_field_value", array('param1', $field['param1']));
+                        $this->execute("behat_forms::set_field_value", ['param1', $field['param1']]);
                     }
                     break;
                 case "picture":
                     break;
                 case "select":
                     $field['addoptions'] = str_replace(',', "\n", $field['param1']);
-                    $this->execute("behat_forms::set_field_value", array('addoptions', $field['addoptions']));
+                    $this->execute("behat_forms::set_field_value", ['addoptions', $field['addoptions']]);
                     if (!empty($field['param2'])) {
-                        $this->execute("behat_forms::set_field_value", array('param2', $field['param2']));
+                        $this->execute("behat_forms::set_field_value", ['param2', $field['param2']]);
                     }
                     if (!empty($field['param6'])) {
-                        $this->execute("behat_forms::i_select_from_the_singleselect", array('param6', $field['param6']));
+                        $this->execute("behat_forms::i_select_from_the_singleselect", ['param6', $field['param6']]);
                     }
                     if (!empty($field['param4'])) {
-                        $this->execute("behat_forms::i_select_from_the_singleselect", array('param4', $field['param4']));
+                        $this->execute("behat_forms::i_select_from_the_singleselect", ['param4', $field['param4']]);
                     }
                     if (!empty($field['param5'])) {
-                        $this->execute("behat_forms::i_select_from_the_singleselect", array('param5', $field['param5']));
+                        $this->execute("behat_forms::i_select_from_the_singleselect", ['param5', $field['param5']]);
                     }
                     break;
                 case "multiselect":
                     $field['addoptions'] = str_replace(',', "\n", $field['param1']);
-                    $this->execute("behat_forms::set_field_value", array('addoptions', $field['addoptions']));
+                    $this->execute("behat_forms::set_field_value", ['addoptions', $field['addoptions']]);
                     $field['param2'] ? "New line" : $field['param2'];
                     $field['param3'] ? "No" : $field['param3'];
-                    $this->execute("behat_forms::set_field_value", array('param2', $field['param2']));
-                    $this->execute("behat_forms::set_field_value", array('param3', $field['param3']));
+                    $this->execute("behat_forms::set_field_value", ['param2', $field['param2']]);
+                    $this->execute("behat_forms::set_field_value", ['param3', $field['param3']]);
                     break;
                 case "tag":
                     break;
                 case "teammemberselect":
                     if (!empty($field['param1'])) {
-                        $this->execute("behat_forms::set_field_value", array('param1', $field['param1']));
+                        $this->execute("behat_forms::set_field_value", ['param1', $field['param1']]);
                     }
                     if (!empty($field['param2'])) {
                         $roles = explode(',', $field['param2']);
                         foreach ($roles as $roleid) {
-                            $this->execute("behat_forms::set_field_value", array('param2' . "[{$roleid}]", 1));
+                            $this->execute("behat_forms::set_field_value", ['param2' . "[{$roleid}]", 1]);
                         }
                     }
 
                     break;
                 case "text":
                     if (!empty($field['param1'])) {
-                        $this->execute("behat_forms::set_field_value", array('param1', $field['param1']));
+                        $this->execute("behat_forms::set_field_value", ['param1', $field['param1']]);
                     }
                     if (!empty($field['param8'])) {
-                        $this->execute("behat_forms::i_select_from_the_singleselect", array('param8', $field['param8']));
+                        $this->execute("behat_forms::i_select_from_the_singleselect", ['param8', $field['param8']]);
                     }
                     if (!empty($field['param9'])) {
-                        $this->execute("behat_forms::i_select_from_the_singleselect", array('param9', $field['param9']));
+                        $this->execute("behat_forms::i_select_from_the_singleselect", ['param9', $field['param9']]);
                     }
                     if (!empty($field['param4'])) {
-                        $this->execute("behat_forms::i_select_from_the_singleselect", array('param4', $field['param4']));
+                        $this->execute("behat_forms::i_select_from_the_singleselect", ['param4', $field['param4']]);
                     }
                     if (!empty($field['param5'])) {
-                        $this->execute("behat_forms::i_select_from_the_singleselect", array('param5', $field['param5']));
+                        $this->execute("behat_forms::i_select_from_the_singleselect", ['param5', $field['param5']]);
                     }
                     break;
                 case "textarea":
                     if (!empty($field['param2'])) {
-                        $this->execute("behat_forms::set_field_value", array('param2', $field['param2']));
+                        $this->execute("behat_forms::set_field_value", ['param2', $field['param2']]);
                     }
                     if (!empty($field['param3'])) {
-                        $this->execute("behat_forms::set_field_value", array('param3', $field['param3']));
+                        $this->execute("behat_forms::set_field_value", ['param3', $field['param3']]);
                     }
                     break;
                 case "editor":
@@ -185,7 +185,7 @@ class behat_mod_datalynx extends behat_base {
         $this->execute("behat_general::click_link", $this->escape($activityname));
         $csstarget = '.nav-item [title="Manage"]';
         $this->execute('behat_general::i_click_on', [$csstarget, 'css_element']);
-        $this->execute("behat_forms::i_select_from_the_singleselect", array($viewtype, 'type'));
+        $this->execute("behat_forms::i_select_from_the_singleselect", [$viewtype, 'type']);
         $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $viewformdata);
         $this->execute('behat_forms::press_button', get_string('savechanges'));
     }
@@ -208,12 +208,12 @@ class behat_mod_datalynx extends behat_base {
                     foreach ($values as $value) {
                         $fieldvalue = substr($value, -1);
                         $field = substr($value, 0, -2);
-                        $this->execute("behat_forms::i_set_the_field_to", array($field, $fieldvalue));
+                        $this->execute("behat_forms::i_set_the_field_to", [$field, $fieldvalue]);
                     }
                     break;
                 case "select":
                     $this->execute("behat_forms::i_set_the_field_with_xpath_to",
-                            array("//div[@data-field-type='select']//select", $field['value']));
+                            ["//div[@data-field-type='select']//select", $field['value']]);
                     break;
                 case "multiselect":
                     $this->execute("behat_forms::i_open_the_autocomplete_suggestions_list");
@@ -221,17 +221,17 @@ class behat_mod_datalynx extends behat_base {
                     break;
                 case "radio":
                     $this->execute("behat_forms::i_set_the_field_with_xpath_to",
-                            array("//div[@data-field-type='radiobutton']//label[contains(.,'{$field['value']}')]/input",
-                                    "selected"));
+                            ["//div[@data-field-type='radiobutton']//label[contains(.,'{$field['value']}')]/input",
+                                    "selected"]);
                     break;
                 case "text":
                 case "number":
                     $this->execute("behat_forms::i_set_the_field_with_xpath_to",
-                            array("//div[@data-field-name='Datalynx field {$field['name']}']//input", $field['value']));
+                            ["//div[@data-field-name='Datalynx field {$field['name']}']//input", $field['value']]);
                     break;
                 case "textarea":
                     $this->execute("behat_forms::i_set_the_field_with_xpath_to",
-                            array("//div[@data-field-name='Datalynx field {$field['name']}']//textarea", $field['value']));
+                            ["//div[@data-field-name='Datalynx field {$field['name']}']//textarea", $field['value']]);
                     break;
                 case "file":
                     break;
@@ -242,18 +242,18 @@ class behat_mod_datalynx extends behat_base {
                 case "duration":
                     $values = explode(" ", $field['value']);
                     $this->execute("behat_forms::i_set_the_field_with_xpath_to",
-                            array("//div[@data-field-name='Datalynx field {$field['name']}']//select", $values[1]));
+                            ["//div[@data-field-name='Datalynx field {$field['name']}']//select", $values[1]]);
                     $this->execute("behat_forms::i_set_the_field_with_xpath_to",
-                            array("//div[@data-field-name='Datalynx field {$field['name']}']//input", $values[0]));
+                            ["//div[@data-field-name='Datalynx field {$field['name']}']//input", $values[0]]);
                     break;
                 case "time":
                     $values = explode(".", $field['value']);
                     $this->execute("behat_forms::i_set_the_field_with_xpath_to",
-                            array("//div[@data-field-name='Datalynx field {$field['name']}']//input", 1));
+                            ["//div[@data-field-name='Datalynx field {$field['name']}']//input", 1]);
                     foreach ($values as $key => $value) {
                         $number = $key + 1;
                         $this->execute("behat_forms::i_set_the_field_with_xpath_to",
-                                array("(//div[@data-field-name='Datalynx field {$field['name']}']//select)[{$number}]", $value));
+                                ["(//div[@data-field-name='Datalynx field {$field['name']}']//select)[{$number}]", $value]);
                     }
                     break;
             }

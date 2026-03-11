@@ -49,7 +49,7 @@ class datalynxfield_coursegroup extends datalynxfield_base {
     /**
      */
     protected function content_names() {
-        return array('course', 'group', 'groupid');
+        return ['course', 'group', 'groupid'];
     }
 
     /**
@@ -105,13 +105,13 @@ class datalynxfield_coursegroup extends datalynxfield_base {
             }
         }
 
-        return array($contents, $oldcontents);
+        return [$contents, $oldcontents];
     }
 
     /**
      */
     public function parse_search($formdata, $i) {
-        $coursegroup = array(0, 0, 0);
+        $coursegroup = [0, 0, 0];
         $search = 'f_' . $i . '_' . $this->field->id;
 
         if (!empty($formdata->{$search . '_member'})) {
@@ -134,7 +134,7 @@ class datalynxfield_coursegroup extends datalynxfield_base {
     /**
      */
     public function get_content_parts() {
-        return array('content', 'content1');
+        return ['content', 'content1'];
     }
 
     /**
@@ -162,11 +162,11 @@ class datalynxfield_coursegroup extends datalynxfield_base {
         // For course and group use the parent get_search_sql.
         if ($course) {
             $this->_comparetext = 'content';
-            return parent::get_search_sql(array($not, $operator, $course));
+            return parent::get_search_sql([$not, $operator, $course]);
         } else {
             if ($group) {
                 $this->_comparetext = 'content1';
-                return parent::get_search_sql(array($not, $operator, $group));
+                return parent::get_search_sql([$not, $operator, $group]);
             }
         }
 
@@ -188,15 +188,15 @@ class datalynxfield_coursegroup extends datalynxfield_base {
             $userid = $USER->id;
         }
         // Get user's groups.
-        if (!$usergroups = $DB->get_records_menu('groups_members', array('userid' => $userid),
+        if (!$usergroups = $DB->get_records_menu('groups_members', ['userid' => $userid],
                 'groupid', 'id,groupid')
         ) {
             // Not a member in any group so search for "groupid" -1 to retrieve no entries.
-            $usergroups = array(-1);
+            $usergroups = [-1];
         }
         list($ingroups, $groupids) = $DB->get_in_or_equal($usergroups, SQL_PARAMS_NAMED,
                 "df_{$fieldid}_");
-        return array(" $varcharcontent $ingroups ", $groupids, true);
+        return [" $varcharcontent $ingroups ", $groupids, true];
     }
 
     /**
@@ -235,7 +235,7 @@ class datalynxfield_coursegroup extends datalynxfield_base {
             $fieldname = $this->name();
             $csvname = $importsettings[$fieldname]['name'];
             list($course, $group) = !empty($csvrecord[$csvname]) ? explode(' ',
-                    $csvrecord[$csvname]) : array(0, 0);
+                    $csvrecord[$csvname]) : [0, 0];
 
             if ($course && $group) {
                 $data->{"field_{$fieldid}_{$entryid}_course"} = $course;

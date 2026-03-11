@@ -106,7 +106,7 @@ class datalynxfield_textarea extends datalynxfield_base {
     /**
      */
     public function get_content_parts() {
-        return array('content', 'content1');
+        return ['content', 'content1'];
     }
 
     /**
@@ -136,7 +136,7 @@ class datalynxfield_textarea extends datalynxfield_base {
     }
 
     public function get_supported_search_operators() {
-        return array('' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
-                'LIKE' => get_string('contains', 'datalynx'));
+        return ['' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
+                'LIKE' => get_string('contains', 'datalynx')];
     }
 }

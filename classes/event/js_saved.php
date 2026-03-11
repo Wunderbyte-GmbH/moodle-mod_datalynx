@@ -71,6 +71,6 @@ class js_saved extends \core\event\base {
      */
     public function get_url() {
         return new \moodle_url('/mod/datalynx/view.php',
-                array('d' => $this->objectid, 'jsedit' => 1));
+                ['d' => $this->objectid, 'jsedit' => 1]);
     }
 }

@@ -33,7 +33,7 @@ class datalynxview_grid_form extends datalynxview_base_form {
     public function view_definition_after_gps() {
         $view = $this->_view;
         $editoroptions = $view->editors();
-        $editorattr = array('cols' => 40, 'rows' => 12);
+        $editorattr = ['cols' => 40, 'rows' => 12];
 
         $mform = &$this->_form;
 
@@ -43,7 +43,7 @@ class datalynxview_grid_form extends datalynxview_base_form {
 
         // Cols.
         $range = range(2, 50);
-        $options = array('' => get_string('choosedots')) + array_combine($range, $range);
+        $options = ['' => get_string('choosedots')] + array_combine($range, $range);
         $mform->addElement('select', 'cols', get_string('cols', 'datalynxview_grid'), $options);
 
         // Rows.

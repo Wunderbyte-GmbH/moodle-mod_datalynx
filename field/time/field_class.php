@@ -58,7 +58,7 @@ class datalynxfield_time extends datalynxfield_base {
     /**
      */
     protected function content_names() {
-        return array('', 'year', 'month', 'day', 'hour', 'minute', 'enabled');
+        return ['', 'year', 'month', 'day', 'hour', 'minute', 'enabled'];
     }
 
     /**
@@ -101,7 +101,7 @@ class datalynxfield_time extends datalynxfield_base {
         // We consider 0 a valid input to be stored.
         $contents[] = $timestamp;
 
-        return array($contents, $oldcontents);
+        return [$contents, $oldcontents];
     }
 
     /**
@@ -161,13 +161,13 @@ class datalynxfield_time extends datalynxfield_base {
             case '<':
             case '>':
                 $params[$namefrom] = $from;
-                $return = array(" $not $varcharcontent $operator :$namefrom ", $params, true);
+                $return = [" $not $varcharcontent $operator :$namefrom ", $params, true];
                 break;
             default:
                 $params[$namefrom] = $from;
                 $params[$nameto] = $to;
-                $return = array(" ($not $varcharcontent >= :$namefrom AND $varcharcontent < :$nameto) ",
-                        $params, true);
+                $return = [" ($not $varcharcontent >= :$namefrom AND $varcharcontent < :$nameto) ",
+                        $params, true];
                 break;
         } // End switch.
 
@@ -281,9 +281,9 @@ class datalynxfield_time extends datalynxfield_base {
      * @see datalynxfield_base::get_supported_search_operators()
      */
     public function get_supported_search_operators() {
-        return array('' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
+        return ['' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
                 '>' => get_string('after', 'datalynx'), '<' => get_string('before', 'datalynx'),
-                'BETWEEN' => get_string('between', 'datalynx'));
+                'BETWEEN' => get_string('between', 'datalynx')];
     }
 
     /**

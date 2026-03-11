@@ -29,7 +29,7 @@ $permissionid = optional_param('permissionid', 0, PARAM_INT);
 $forproperty = required_param('forproperty', PARAM_ALPHA);
 
 // Get the datalynxid from the database.
-$dataid = $DB->get_field('datalynx_behaviors', 'dataid', array('id' => $behaviorid));
+$dataid = $DB->get_field('datalynx_behaviors', 'dataid', ['id' => $behaviorid]);
 
 $datalynx = new mod_datalynx\datalynx($dataid);
 require_login($datalynx->data->course, false, $datalynx->cm);
@@ -38,7 +38,7 @@ require_sesskey();
 
 $toggle = "ERROR";
 if ($forproperty == "required") {
-    $required = $DB->get_field('datalynx_behaviors', $forproperty, array('id' => $behaviorid));
+    $required = $DB->get_field('datalynx_behaviors', $forproperty, ['id' => $behaviorid]);
     if ($required) {
         $required = 0;
         $toggle = "OFF";
@@ -47,10 +47,10 @@ if ($forproperty == "required") {
         $toggle = "ON";
     }
 
-    $DB->set_field('datalynx_behaviors', $forproperty, $required, array('id' => $behaviorid));
+    $DB->set_field('datalynx_behaviors', $forproperty, $required, ['id' => $behaviorid]);
 } else {
     $visibleto = unserialize(
-            $DB->get_field('datalynx_behaviors', $forproperty, array('id' => $behaviorid)));
+            $DB->get_field('datalynx_behaviors', $forproperty, ['id' => $behaviorid]));
     if (!in_array($permissionid, $visibleto['permissions'])) {
         $visibleto['permissions'][] = $permissionid;
         $toggle = "ON";
@@ -61,7 +61,7 @@ if ($forproperty == "required") {
         $toggle = "OFF";
     }
     $DB->set_field('datalynx_behaviors', $forproperty, serialize($visibleto),
-            array('id' => $behaviorid));
+            ['id' => $behaviorid]);
 }
 
 echo json_encode($toggle);

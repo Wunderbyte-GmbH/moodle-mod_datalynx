@@ -53,7 +53,7 @@ class cron_trigger extends \core\task\scheduled_task {
             // TODO: In upgrade.php remove all deleted rules.
             if ($DB->record_exists('datalynx', ['id' => $record->dataid])) {
                 $df = new \mod_datalynx\datalynx($record->dataid);
-                $event = \mod_datalynx\event\cron_trigger::create(array('context' => $df->context, 'objectid' => $df->id()));
+                $event = \mod_datalynx\event\cron_trigger::create(['context' => $df->context, 'objectid' => $df->id()]);
                 $event->trigger();
             }
         }

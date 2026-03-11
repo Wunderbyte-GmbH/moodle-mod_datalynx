@@ -84,21 +84,21 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
 
             $str .= html_writer::link(
                     new moodle_url('/mod/datalynx/view.php',
-                            array('d' => $field->df()->id(), 'fieldid' => $fieldid,
+                            ['d' => $field->df()->id(), 'fieldid' => $fieldid,
                                 'entryid' => $entry->id,
                                 'userid' => $USER->id,
                                 'action' => $userismember ? 'unsubscribe' : 'subscribe',
-                                )),
+                            ]),
                     get_string($userismember ? 'unsubscribe' : 'subscribe', 'datalynx'),
-                    array(
-                        'class' => 'datalynxfield_subscribe' . ($userismember ? ' subscribed' : '')));
+                    [
+                        'class' => 'datalynxfield_subscribe' . ($userismember ? ' subscribed' : '')]);
 
             $userurl = new moodle_url('/user/view.php',
-                    array('course' => $field->df()->course->id, 'id' => $USER->id));
+                    ['course' => $field->df()->course->id, 'id' => $USER->id]);
 
             // Load JS.
             $PAGE->requires->js_call_amd('mod_datalynx/teammemberselect', 'init',
-                    array($field->df()->id(), $fieldid, $userurl->out(false), fullname($USER), $canunsubscribe));
+                    [$field->df()->id(), $fieldid, $userurl->out(false), fullname($USER), $canunsubscribe]);
         }
 
         return $str;
@@ -129,7 +129,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         }
 
         if (!empty($notpresent)) {
-            $baseurl = new moodle_url('/user/view.php', array('course' => $courseid));
+            $baseurl = new moodle_url('/user/view.php', ['course' => $courseid]);
             list($insql, $params) = $DB->get_in_or_equal($notpresent);
             $sql = "SELECT * FROM {user} WHERE id $insql";
             $users = $DB->get_records_sql($sql, $params);
@@ -177,8 +177,8 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         $menu = $field->options_menu(true, false, $field->usercanaddself ? 0 : $authorid);
 
         $mform->addElement('autocomplete', $fieldname, null, $menu,
-                array('class' => "datalynxfield_teammemberselect $classname", 'multiple' => true,
-                    'noselectionstring' => "Gerade keine Auswahl."));
+                ['class' => "datalynxfield_teammemberselect $classname", 'multiple' => true,
+                    'noselectionstring' => "Gerade keine Auswahl."]);
         $mform->setType($fieldname, PARAM_INT);
         $mform->setDefault($fieldname, $selected); // Not value after validation fails.
 
@@ -191,8 +191,8 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         $field = $this->_field;
         $fieldid = $field->id();
         $fieldname = "f_{$i}_{$fieldid}";
-        $menu = array(-1 => '') + $field->options_menu();
-        $options = array('multiple' => true);
+        $menu = [-1 => ''] + $field->options_menu();
+        $options = ['multiple' => true];
 
         $elements = [];
         $elements[] = $mform->createElement('autocomplete', $fieldname, null, $menu, $options);
@@ -201,15 +201,15 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         $mform->disabledIf($fieldname, "searchoperator{$i}", 'eq', '');
         $mform->disabledIf($fieldname, "searchoperator{$i}", 'eq', 'USER');
 
-        return array($elements, null);
+        return [$elements, null];
     }
 
     protected function patterns() {
         $fieldname = $this->_field->name();
 
         $patterns = parent::patterns();
-        $patterns["[[$fieldname]]"] = array(true);
-        $patterns["[[$fieldname:subscribe]]"] = array(true);
+        $patterns["[[$fieldname]]"] = [true];
+        $patterns["[[$fieldname:subscribe]]"] = [true];
 
         return $patterns;
     }

@@ -31,9 +31,9 @@ $file = required_param('file', PARAM_FILE);
 // Check user is logged in.
 require_login();
 
-$count = $DB->get_field('datalynx_contents', 'content2', array('id' => $cid));
+$count = $DB->get_field('datalynx_contents', 'content2', ['id' => $cid]);
 $count++;
-$DB->set_field('datalynx_contents', 'content2', $count, array('id' => $cid));
+$DB->set_field('datalynx_contents', 'content2', $count, ['id' => $cid]);
 
 // Encode filename to handle special characters like #, &, etc.
 $encodedfile = rawurlencode($file);

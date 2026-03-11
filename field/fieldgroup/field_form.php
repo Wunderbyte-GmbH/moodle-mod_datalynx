@@ -44,7 +44,7 @@ class datalynxfield_fieldgroup_form extends datalynxfield_form {
             }
         }
         asort($fieldnames);
-        $options = array('multiple' => true);
+        $options = ['multiple' => true];
         $mform->addElement('autocomplete', 'param1', get_string('fieldgroupfields', 'datalynx'),
                 $fieldnames, $options);
         $mform->addHelpButton('param1', 'fieldgroupfields', 'datalynx');

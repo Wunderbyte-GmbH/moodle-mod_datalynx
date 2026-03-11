@@ -27,15 +27,15 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-$logs = array(
-        array('module' => 'datalynx', 'action' => 'view', 'mtable' => 'datalynx', 'field' => 'name'),
-        array('module' => 'datalynx', 'action' => 'add', 'mtable' => 'datalynx', 'field' => 'name'),
-        array('module' => 'datalynx', 'action' => 'update', 'mtable' => 'datalynx', 'field' => 'name'),
-        array('module' => 'datalynx', 'action' => 'record delete', 'mtable' => 'datalynx', 'field' => 'name'),
-        array('module' => 'datalynx', 'action' => 'fields add', 'mtable' => 'datalynx_fields', 'field' => 'name'),
-        array('module' => 'datalynx', 'action' => 'fields update', 'mtable' => 'datalynx_fields', 'field' => 'name'),
-        array('module' => 'datalynx', 'action' => 'views add', 'mtable' => 'datalynx_views', 'field' => 'name'),
-        array('module' => 'datalynx', 'action' => 'views update', 'mtable' => 'datalynx_views', 'field' => 'name'),
-        array('module' => 'datalynx', 'action' => 'filters add', 'mtable' => 'datalynx_filters', 'field' => 'name'),
-        array('module' => 'datalynx', 'action' => 'filters update', 'mtable' => 'datalynx_filters', 'field' => 'name')
-);
+$logs = [
+        ['module' => 'datalynx', 'action' => 'view', 'mtable' => 'datalynx', 'field' => 'name'],
+        ['module' => 'datalynx', 'action' => 'add', 'mtable' => 'datalynx', 'field' => 'name'],
+        ['module' => 'datalynx', 'action' => 'update', 'mtable' => 'datalynx', 'field' => 'name'],
+        ['module' => 'datalynx', 'action' => 'record delete', 'mtable' => 'datalynx', 'field' => 'name'],
+        ['module' => 'datalynx', 'action' => 'fields add', 'mtable' => 'datalynx_fields', 'field' => 'name'],
+        ['module' => 'datalynx', 'action' => 'fields update', 'mtable' => 'datalynx_fields', 'field' => 'name'],
+        ['module' => 'datalynx', 'action' => 'views add', 'mtable' => 'datalynx_views', 'field' => 'name'],
+        ['module' => 'datalynx', 'action' => 'views update', 'mtable' => 'datalynx_views', 'field' => 'name'],
+        ['module' => 'datalynx', 'action' => 'filters add', 'mtable' => 'datalynx_filters', 'field' => 'name'],
+        ['module' => 'datalynx', 'action' => 'filters update', 'mtable' => 'datalynx_filters', 'field' => 'name']
+];

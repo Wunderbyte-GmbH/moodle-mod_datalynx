@@ -68,7 +68,7 @@ class datalynxfield_radiobutton_renderer extends datalynxfield_select_renderer {
 
         $mform->addGroup($elemgrp, "{$fieldname}_group", null, $separator, false);
 
-        $mform->setDefaults(array($fieldname => (int) $selected));
+        $mform->setDefaults([$fieldname => (int) $selected]);
 
         if ($required) {
             $mform->addRule("{$fieldname}_group", null, 'required', null, 'client');

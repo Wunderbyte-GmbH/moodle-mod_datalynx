@@ -39,12 +39,12 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
     /**
      * @var array
      */
-    public $separators = array(array('name' => 'New line', 'chr' => '<br />'),
-            array('name' => 'Space', 'chr' => '&#32;'),
-            array('name' => ',', 'chr' => '&#44;'),
-            array('name' => ', (with space)', 'chr' => '&#44;&#32;'),
-            array('name' => 'Unordered list', 'chr' => '</li><li>')
-    );
+    public $separators = [['name' => 'New line', 'chr' => '<br />'],
+            ['name' => 'Space', 'chr' => '&#32;'],
+            ['name' => ',', 'chr' => '&#44;'],
+            ['name' => ', (with space)', 'chr' => '&#44;&#32;'],
+            ['name' => 'Unordered list', 'chr' => '</li><li>']
+    ];
 
     /**
      */
@@ -154,10 +154,10 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
 
         // If we only see the andor and no value just skip.
         if (is_array($search[2]) && count($search[2]) == 0) {
-            return array('', '', '');
+            return ['', '', ''];
         }
         if (is_array($search[2]) && count($search[2]) == 1 && isset($search[2]['andor'])) {
-            return array('', '', '');
+            return ['', '', ''];
         }
 
         return parent::get_search_sql($search);

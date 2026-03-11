@@ -27,7 +27,7 @@ require_once("$CFG->dirroot/mod/datalynx/classes/datalynx.php");
 require_once("$CFG->dirroot/mod/datalynx/lib.php");
 
 $id = required_param('id', PARAM_INT); // Course id.
-$course = $DB->get_record('course', array('id' => $id));
+$course = $DB->get_record('course', ['id' => $id]);
 if (!$course) {
     throw new moodle_exception('invalidcourseid');
 }
@@ -35,15 +35,15 @@ if (!$course) {
 $context = context_course::instance($course->id);
 require_course_login($course);
 
-$event = \mod_datalynx\event\course_module_instance_list_viewed::create(array('context' => $context));
+$event = \mod_datalynx\event\course_module_instance_list_viewed::create(['context' => $context]);
 $event->trigger();
 
 $modulename = get_string('modulename', 'datalynx');
 $modulenameplural = get_string('modulenameplural', 'datalynx');
 
-$PAGE->set_url('/mod/datalynx/index.php', array('id' => $id));
+$PAGE->set_url('/mod/datalynx/index.php', ['id' => $id]);
 $PAGE->set_pagelayout('incourse');
-$PAGE->navbar->add($modulename, new moodle_url('/mod/datalynx/index.php', array('id' => $course->id)));
+$PAGE->navbar->add($modulename, new moodle_url('/mod/datalynx/index.php', ['id' => $course->id]));
 $PAGE->set_title($modulename);
 $PAGE->set_heading($course->fullname);
 
@@ -51,7 +51,7 @@ echo $OUTPUT->header();
 $datalynxs = get_all_instances_in_course("datalynx", $course);
 if (!$datalynxs) {
     notice(get_string('thereareno', 'moodle', $modulenameplural),
-            new moodle_url('/course/view.php', array('id', $course->id)));
+            new moodle_url('/course/view.php', ['id', $course->id]));
 }
 
 $modinfo = get_fast_modinfo($id);
@@ -95,7 +95,7 @@ if ($rss) {
 if ($showeditbuttons = $PAGE->user_allowed_editing()) {
     $table->head[] = '';
     $table->align[] = 'center';
-    $editingurl = new moodle_url('/course/mod.php', array('sesskey' => sesskey()));
+    $editingurl = new moodle_url('/course/mod.php', ['sesskey' => sesskey()]);
 }
 
 $options = new stdClass();
@@ -125,9 +125,9 @@ foreach ($datalynxs as $datalynx) {
     }
 
     // Name (linked; dim if not visible).
-    $linkparams = !$datalynx->visible ? array('class' => 'dimmed') : null;
+    $linkparams = !$datalynx->visible ? ['class' => 'dimmed'] : null;
     $linkedname = html_writer::link(
-            new moodle_url('/mod/datalynx/view.php', array('id' => $datalynx->coursemodule)),
+            new moodle_url('/mod/datalynx/view.php', ['id' => $datalynx->coursemodule]),
             format_string($datalynx->name, true), $linkparams);
     $tablerow[] = $linkedname;
 
@@ -167,5 +167,5 @@ foreach ($datalynxs as $datalynx) {
 }
 
 echo html_writer::empty_tag('br');
-echo html_writer::tag('div', html_writer::table($table), array('class' => 'no-overflow'));
+echo html_writer::tag('div', html_writer::table($table), ['class' => 'no-overflow']);
 echo $OUTPUT->footer();

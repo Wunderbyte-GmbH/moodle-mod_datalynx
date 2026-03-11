@@ -33,14 +33,14 @@ require_login();
 $retviews = '';
 $rettextfields = '';
 if ($d) {
-    if ($views = $DB->get_records_menu('datalynx_views', array('dataid' => $d), 'name', 'id,name')) {
+    if ($views = $DB->get_records_menu('datalynx_views', ['dataid' => $d], 'name', 'id,name')) {
         $viewmenu = [];
         foreach ($views as $key => $value) {
             $viewmenu[] = "$key " . strip_tags($value);
         }
         $retviews = implode(',', $viewmenu);
     }
-    if ($textfields = $DB->get_records_menu('datalynx_fields', array('dataid' => $d, 'type' => 'text'), 'name', 'id,name')
+    if ($textfields = $DB->get_records_menu('datalynx_fields', ['dataid' => $d, 'type' => 'text'], 'name', 'id,name')
     ) {
         $textfieldmenu = [];
         foreach ($textfields as $key => $value) {
