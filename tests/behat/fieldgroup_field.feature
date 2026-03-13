@@ -28,15 +28,19 @@ Feature: Create entry and add fieldgroups
       | type             | name                | description | param1                     | param2   | param3 |
       | text             | Text                |             |                            |          |        |
       | number           | Number              | 3           | 2                          |          |        |
+      | teammemberselect | Team member select  | 3           | 20                         | 0        | 0      |
 #      | textarea         | Text area           |             |                            | 90       | 15     |
 #      | time             | Time                |             |                            |          |        |
 #      | duration         | Duration            |             |                            |          |        |
 #      | radiobutton      | Radio               |             | Option A,Option B,Option C |          |        |
 #      | checkbox         | Checkbox            |             | Option 1,Option 2,Option 3 | Option 1 |        |
 #      | select           | Select              |             | Option X,Option Y,Option Z |          |        |
-    And I add to the "Datalynx Test Instance" datalynx the following fields:
-      | type             | name               | description | param1                     | admissible1   | admissible2 | admissible4 | admissible8 |
-      | teammemberselect | Team member select | 3           | 20                         | 1             | 1           | 1           | 1           |
+    And I follow "Datalynx field Team member select"
+    And I set the field "Manager" to "1"
+    And I set the field "Teacher" to "1"
+    And I set the field "Student" to "1"
+    And I set the field "Guest" to "1"
+    And I press "Save changes"
     And I add to "Datalynx Test Instance" datalynx the view of "Grid" type with:
       | name | Gridview |
       | description | Testgrid |
@@ -75,9 +79,9 @@ Feature: Create entry and add fieldgroups
 
     ## Add teammembers to the second line as well.
     And I click on "(//*[@class and contains(concat(' ', normalize-space(@class), ' '), ' form-autocomplete-downarrow ')])[2]" "xpath_element"
-    And I click on "(//ul[@class='form-autocomplete-suggestions']//*[contains(concat('|', string(.), '|'),'|Student 1 (student1@example.com)|')])[1]" "xpath_element"
+    And I click on "(//ul[contains(concat(' ', normalize-space(@class), ' '), ' form-autocomplete-suggestions ')]//li[@role='option'][normalize-space(.)='Student 1 (student1@example.com)'])[1]" "xpath_element"
     And I click on "(//*[@class and contains(concat(' ', normalize-space(@class), ' '), ' form-autocomplete-downarrow ')])[2]" "xpath_element"
-    And I click on "(//ul[@class='form-autocomplete-suggestions']//*[contains(concat('|', string(.), '|'),'|Student 2 (student2@example.com)|')])[1]" "xpath_element"
+    And I click on "(//ul[contains(concat(' ', normalize-space(@class), ' '), ' form-autocomplete-suggestions ')]//li[@role='option'][normalize-space(.)='Student 2 (student2@example.com)'])[1]" "xpath_element"
     And I press the escape key
     And I press "Save changes"
     Then I should see "updated"
@@ -88,7 +92,7 @@ Feature: Create entry and add fieldgroups
     ## Add a second entry, this time only to the second line.
     When I follow "Add a new entry"
     And I click on "(//*[@class and contains(concat(' ', normalize-space(@class), ' '), ' form-autocomplete-downarrow ')])[2]" "xpath_element"
-    And I click on "(//ul[@class='form-autocomplete-suggestions']//*[contains(concat('|', string(.), '|'),'|Student 2 (student2@example.com)|')])[2]" "xpath_element"
+    And I click on "(//ul[contains(concat(' ', normalize-space(@class), ' '), ' form-autocomplete-suggestions ')]//li[@role='option'][normalize-space(.)='Student 2 (student2@example.com)'])[2]" "xpath_element"
     And I press "Save changes"
     Then I should see "updated"
     And I press "Continue"

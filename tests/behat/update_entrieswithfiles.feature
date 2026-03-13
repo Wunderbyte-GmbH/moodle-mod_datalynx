@@ -38,9 +38,13 @@ Feature: In a datalynx instance create, update, and delete entries
       | select           | Select             |             | Option X,Option Y,Option Z |          |        |
       | number           | Number             | 3           | 2                          |          |        |
       | file             | File               | My file     |                            | 2        |        |
-    And I add to the "Datalynx Test Instance" datalynx the following fields:
-      | type             | name               | description | param1                     | admissible1   | admissible2 | admissible4 | admissible8 |
-      | teammemberselect | Team member select | 3           | 20                         | 1             | 1           | 1           | 1           |
+      | teammemberselect | Team member select | 3           | 20                         | 0        | 0      |
+    And I follow "Datalynx field Team member select"
+    And I set the field "Manager" to "1"
+    And I set the field "Teacher" to "1"
+    And I set the field "Student" to "1"
+    And I set the field "Guest" to "1"
+    And I press "Save changes"
     And I add to "Datalynx Test Instance" datalynx the view of "Tabular" type with:
       | name    | Tabular |
       | description | Tabular view |

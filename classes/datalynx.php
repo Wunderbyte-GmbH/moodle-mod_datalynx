@@ -439,7 +439,6 @@ class datalynx {
             $urlparams['edit'] = optional_param('edit', -1, PARAM_BOOL);
             $PAGE->set_url("/mod/datalynx/$page.php", $urlparams);
             $PAGE->set_context($this->context);
-
             // Blocks editing button (omit in embedded datalynxs).
             if ($page != 'embed' && $PAGE->user_allowed_editing()) {
                 // Teacher editing mode.

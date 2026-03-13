@@ -40,11 +40,10 @@ $datalynx = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
 $pageparams = ['js' => true, 'css' => true, 'rss' => true, 'modjs' => true,
         'completion' => true, 'comments' => true, 'urlparams' => $urlparams
 ];
+require_login($datalynx->data->course, false, $datalynx->cm);
 
 $datalynx->set_page('view', $pageparams);
 $datalynx->set_content();
-
-require_login($datalynx->data->course, false, $datalynx->cm);
 
 require_capability('mod/datalynx:viewentry', $datalynx->context);
 

@@ -34,9 +34,13 @@ Feature: In a datalynx instance create a new entry
       | checkbox         | Checkbox           |             | Option 1,Option 2,Option 3 | Option 1 |        |
       | select           | Select             |             | Option X,Option Y,Option Z |          |        |
       | number           | Number             | 3           | 2                          |          |        |
-    And I add to the "Datalynx Test Instance" datalynx the following fields:
-      | type             | name               | description | param1                     | admissible1   | admissible2 | admissible4 | admissible8 |
-      | teammemberselect | Team member select | 3           | 20                         | 1             | 1           | 1           | 1           |
+      | teammemberselect | Team member select | 3           | 20                         | 0        | 0      |
+    And I follow "Datalynx field Team member select"
+    And I set the field "Manager" to "1"
+    And I set the field "Teacher" to "1"
+    And I set the field "Student" to "1"
+    And I set the field "Guest" to "1"
+    And I press "Save changes"
     And I follow the datalynx "Filters" link
     And I follow "Add a filter"
     And I select "10" from the "perpage" singleselect
