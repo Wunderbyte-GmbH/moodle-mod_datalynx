@@ -22,6 +22,7 @@
  */
 
 import * as Str from 'core/str';
+import Modal from 'core/modal';
 
 class PatternDialogue {
     constructor(options) {
@@ -30,18 +31,15 @@ class PatternDialogue {
     }
 
     init() {
-        console.log(this.options);
-        document.addEventListener('DOMContentLoaded', () => {
-            this.waitForTinyMCE();
+        this.waitForTinyMCE();
 
-            const dropdownMenu = document.getElementById('eparam2_editor_field_tag_menu');
-            if (dropdownMenu) {
-                dropdownMenu.addEventListener('change', () => this.insertTagFromDropdown(dropdownMenu));
-            }
+        const dropdownMenu = document.getElementById('eparam2_editor_field_tag_menu');
+        if (dropdownMenu) {
+            dropdownMenu.addEventListener('change', () => this.insertTagFromDropdown(dropdownMenu));
+        }
 
-            const form = document.querySelector('#datalynx-view-edit-form');
-            form?.addEventListener('submit', (e) => this.convertButtonsToTagsBeforeSubmit());
-        });
+        const form = document.querySelector('#datalynx-view-edit-form');
+        form?.addEventListener('submit', () => this.convertButtonsToTagsBeforeSubmit());
     }
 
     replaceTagsWithButtons(editor) {
@@ -86,51 +84,53 @@ class PatternDialogue {
         });
     }
 
-    openMoodleDialog(button) {
+    async openMoodleDialog(button) {
         const isFieldTag = button.classList.contains('datalynx-field-tag');
-        const dialogContent = document.createElement('div');
-        dialogContent.id = button.getAttribute('data-id');
+        const buttonId = button.getAttribute('data-id');
 
+        let bodyHtml;
         if (isFieldTag) {
-            dialogContent.innerHTML = `
-                <p>Field tag properties:</p>
-                <p>Field: ${button.textContent}</p>
-                <label>Behavior:</label>
-                <select id="tag-behavior-select-${dialogContent.id}">
-                    <option value="behavior1">Behavior 1</option>
-                    <option value="behavior2">Behavior 2</option>
+            const behaviors = Object.entries(this.options.behaviors || {})
+                .map(([val, label]) => `<option value="${val}">${label}</option>`).join('');
+            const field = button.getAttribute('data-datalynx-field');
+            const fieldType = (this.options.types || {})[field] || '';
+            const renderers = Object.entries((this.options.renderers || {})[field] || {})
+                .map(([val, label]) => `<option value="${val}">${label}</option>`).join('');
+            bodyHtml = `
+                <p data-region="datalynx-tag-field">${field}</p>
+                <p data-region="datalynx-tag-fieldtype">${fieldType}</p>
+                <label>${await Str.get_string('behavior', 'datalynx')}</label>
+                <select data-region="tag-behavior-select">
+                    ${behaviors}
                 </select>
-                <label>Renderer:</label>
-                <select id="tag-renderer-select-${dialogContent.id}">
-                    <option value="renderer1">Renderer 1</option>
-                    <option value="renderer2">Renderer 2</option>
+                <label>${await Str.get_string('renderer', 'datalynx')}</label>
+                <select data-region="tag-renderer-select">
+                    ${renderers}
                 </select>
-                <button type="button" class="delete-tag">Delete tag</button>
+                <button type="button" data-region="delete-tag">${await Str.get_string('deletetag', 'datalynx')}</button>
             `;
         } else {
-            dialogContent.innerHTML = `
-                <p>Action tag properties:</p>
-                <p>Action: ${button.textContent}</p>
-                <button type="button" class="delete-tag">Delete tag</button>
+            bodyHtml = `
+                <p data-region="datalynx-tag-action">${button.textContent}</p>
+                <button type="button" data-region="delete-tag">${await Str.get_string('deletetag', 'datalynx')}</button>
             `;
         }
 
-        dialogContent.querySelectorAll('.delete-tag').forEach((delBtn) =>
-            delBtn.addEventListener('click', () => {
-                button.remove();
-                dialog?.hide();
-            })
-        );
-
-        const dialog = new M.core.dialogue({
-            bodyContent: dialogContent,
-            width: '400px',
-            draggable: true,
-            modal: true,
-            visible: true,
+        const tagtype = isFieldTag ? 'Field' : 'Action';
+        const tagname = isFieldTag ? button.getAttribute('data-datalynx-field') : button.textContent;
+        const modal = await Modal.create({
+            title: await Str.get_string('tagproperties', 'datalynx', {tagtype, tagname}),
+            body: bodyHtml,
+            show: true,
+            removeOnClose: true,
         });
 
-        this.dialogInstances.set(dialogContent.id, dialog);
+        modal.getRoot()[0].querySelector('[data-region="delete-tag"]')?.addEventListener('click', () => {
+            button.remove();
+            modal.hide();
+        });
+
+        this.dialogInstances.set(buttonId, modal);
     }
 
     waitForTinyMCE() {
@@ -200,7 +200,9 @@ class PatternDialogue {
     }
 }
 
-export const init = (options) => {
+export const init = () => {
+    const optionsElement = document.getElementById('mod_datalynx-patterndialogue-options');
+    const options = optionsElement ? JSON.parse(optionsElement.textContent) : {};
     const patterndialogue = new PatternDialogue(options);
     patterndialogue.init();
 };

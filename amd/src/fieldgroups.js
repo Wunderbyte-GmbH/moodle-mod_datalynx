@@ -60,13 +60,15 @@ export default {
             }
         });
 
-        // Clear editor content
-        thisLine.querySelectorAll('.editor_atto_content').forEach(editor => {
-            editor.innerHTML = '';
-        });
-
-        // Clear textareas
+        // Clear editor content (TinyMCE) and textareas
         thisLine.querySelectorAll('textarea').forEach(textarea => {
+            if (window.tinyMCE) {
+                const editor = window.tinyMCE.get(textarea.id);
+                if (editor) {
+                    editor.setContent('');
+                    return;
+                }
+            }
             textarea.value = '';
         });
 

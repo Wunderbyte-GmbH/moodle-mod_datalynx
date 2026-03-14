@@ -53,19 +53,7 @@ foreach ($fields as $field) {
 $options['types'] = $DB->get_records_select_menu('datalynx_fields', 'dataid = :dataid',
         array('dataid' => $urlparams->d), 'name ASC', 'name, type');
 
-$module = array('name' => 'mod_datalynx', 'fullpath' => '/mod/datalynx/datalynx.js',
-        'requires' => array('moodle-core-notification-dialogue')
-);
-
-$PAGE->requires->js_init_call('M.mod_datalynx.tag_manager.init', $options, true, $module);
-$PAGE->requires->string_for_js('behavior', 'datalynx');
-$PAGE->requires->string_for_js('renderer', 'datalynx');
-$PAGE->requires->string_for_js('fieldname', 'datalynx');
-$PAGE->requires->string_for_js('fieldtype', 'datalynx');
-$PAGE->requires->string_for_js('tagproperties', 'datalynx');
-$PAGE->requires->string_for_js('deletetag', 'datalynx');
-$PAGE->requires->string_for_js('action', 'datalynx');
-$PAGE->requires->string_for_js('field', 'datalynx');
+$PAGE->requires->js_call_amd('mod_datalynx/patterndialogue', 'init');
 
 $dl->set_page('view/view_edit', array('modjs' => true, 'urlparams' => $urlparams));
 
@@ -163,10 +151,16 @@ $formheading = $view->id() ? get_string('viewedit', 'datalynx', $view->name()) :
         'viewnew', 'datalynx', $view->typename());
 $output = html_writer::tag('h2', format_string($formheading), ['class' => 'mdl-align']);
 
+// Output options data for patterndialogue.js (avoids js_call_amd argument size limit).
+echo html_writer::tag('script', json_encode($options), [
+        'type' => 'application/json',
+        'id' => 'mod_datalynx-patterndialogue-options',
+]);
+
 // Display form.
 $mform->set_data($view->to_form());
 
-// ToDo: Ugly hack for forcing atto as the only editor available even if user chose another editor.
+// ToDo: Ugly hack for forcing tiny as the only editor available even if user chose another editor.
 $texteditors = $CFG->texteditors;
 $CFG->texteditors = 'tiny';
 $mform->display();
