@@ -133,7 +133,11 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
                     new moodle_url($entry->baseurl,
                             [$approval => $entry->id, 'sesskey' => sesskey(),
                                     'sourceview' => $this->_field->df()->get_current_view()->id()
-                            ]), $approvedimage, ['class' => 'datalynxfield__approve']);
+                            ]), $approvedimage, [
+                                'class' => 'datalynxfield__approve',
+                                'data-action' => 'approve',
+                                'title' => get_string($approval),
+                            ]);
         } else {
             return $approvedimage;
         }

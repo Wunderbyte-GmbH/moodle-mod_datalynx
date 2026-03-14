@@ -97,6 +97,7 @@ class datalynxview_tabular extends base {
         // Set content table.
         $table = new html_table();
         $table->attributes['cellpadding'] = '2';
+        $table->responsive = false; // Prevent wrapping in <div class="table-responsive">.
         $header = [];
         $entry = [];
         $align = [];
@@ -181,6 +182,11 @@ class datalynxview_tabular extends base {
             $elements[] = ['html', $opengroupdiv . $groupheading . $tablehtml . $closegroupdiv];
         } else {
 
+            // Strip the table-responsive wrapper that html_writer::table() adds by default
+            // in newer Moodle versions, so the template starts with <table>.
+            $tablehtml = preg_replace('/^<div[^>]*\btable-responsive\b[^>]*>\s*/i', '', $tablehtml);
+            $tablehtml = trim(preg_replace('/\s*<\/div>$/i', '', $tablehtml));
+
             // Clean any prefix and get the open table tag.
             $tablepattern = '/^<table[^>]*>/i';
             preg_match($tablepattern, $tablehtml, $match); // Must be there.
@@ -190,26 +196,23 @@ class datalynxview_tabular extends base {
             $tablehtml = trim(preg_replace('/<\/table>$/i', '', $tablehtml));
             $closetable = '</table>';
 
-            // Get the header row if required.
+            // Always extract the <thead> block so it never ends up in the entry template.
+            $requireheaderrow = $this->view->param3;
             $headerrow = '';
-            if ($requireheaderrow = $this->view->param3) {
-                if (strpos($tablehtml, '<thead>') === 0) {
-                    // Get the header row and remove from subject.
-                    $theadpattern = '/^<thead>[\s\S]*<\/thead>/i';
-                    preg_match($theadpattern, $tablehtml, $match);
-                    $tablehtml = trim(preg_replace($theadpattern, '', $tablehtml));
+            if (strpos($tablehtml, '<thead>') === 0) {
+                $theadpattern = '/^<thead>[\s\S]*<\/thead>/i';
+                preg_match($theadpattern, $tablehtml, $match);
+                $tablehtml = trim(preg_replace($theadpattern, '', $tablehtml));
+                if ($requireheaderrow) {
                     $headerrow = reset($match);
                 }
             }
-            // We may still need to get the header row.
-            // But first remove tbody tags.
+            // Remove tbody wrapper tags.
             if (strpos($tablehtml, '<tbody>') === 0) {
                 $tablehtml = trim(preg_replace('/^<tbody>|<\/tbody>$/i', '', $tablehtml));
             }
-            // Assuming a simple two rows structure for now.
-            // If no theader the first row should be the header.
+            // Fallback: if header is required but no <thead> was found, use the first <tr>.
             if ($requireheaderrow && empty($headerrow)) {
-                // Assuming header row does not contain nested tables.
                 $trpattern = '/^<tr>[\s\S]*<\/tr>/i';
                 preg_match($trpattern, $tablehtml, $match);
                 $tablehtml = trim(preg_replace($trpattern, '', $tablehtml));

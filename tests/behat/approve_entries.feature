@@ -95,7 +95,7 @@ Feature: Filter approved and not approved entries from multiple students
     And I follow the datalynx "Manage" link
     And I follow the datalynx "Views" link
     And I follow "Manage view"
-    And I click on "//td[text()='Text of student1']/following-sibling::td/a[@class='datalynxfield__approve']" "xpath_element"
+    And I click on "Approve" "link" in the "Text of student1" "table_row"
     Then I wait until "approved" "text" exists
     And I follow the datalynx "Manage" link
     And I follow "Notapproved view"
