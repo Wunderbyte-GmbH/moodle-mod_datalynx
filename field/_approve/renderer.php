@@ -47,8 +47,9 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
 
                 // Existing entry to browse.
             } else {
-                $replacements['##approve##@'] = ['html', $this->display_browse($entry)];
+                // Ensure the link is rendered for the common [[approve]] tag.
                 $replacements['##approve##'] = ['html', $this->display_browse($entry)];
+                $replacements['##approve##@'] = ['html', $this->display_browse($entry)];
             }
         }
 
@@ -97,13 +98,11 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
 
         $field = $this->_field;
         if ($entry && isset($entry->approved) && $entry->approved) {
-            $iconclass = 'fa-regular fa-circle-xmark text-danger';
+            $iconclass = 'fa-regular fa-circle-check text-success   ';
             $labelstring = get_string('unapprove', 'datalynx');
-            $approval = 'disapprove';
         } else {
-            $iconclass = 'fa-regular fa-circle-check text-success';
+            $iconclass = 'fa-regular fa-circle-xmark text-danger';
             $labelstring = get_string('approve');
-            $approval = 'approve';
         }
 
         $icon = html_writer::tag('i', '', [
@@ -114,18 +113,20 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
         $label = html_writer::span($labelstring, 'datalynxfield__approve-label');
 
         if (has_capability('mod/datalynx:approve', $field->df()->context)) {
-            $PAGE->requires->js_call_amd('mod_datalynx/approve', 'init',
-                    [get_string('approve'), get_string('unapprove', 'datalynx')]);
+            $PAGE->requires->js_call_amd('mod_datalynx/approve', 'init');
+
+            $currentviewid = $this->_field->df()->get_current_view()->id();
 
             return html_writer::link(
-                    new moodle_url($entry->baseurl,
-                            [$approval => $entry->id, 'sesskey' => sesskey(),
-                                    'sourceview' => $this->_field->df()->get_current_view()->id()
-                            ]), $icon . $label, [
-                                'class' => 'datalynxfield__approve',
-                                'data-action' => 'toggle-approval',
-                                'title' => $labelstring,
-                            ]);
+                    '#',
+                    $icon . $label, [
+                        'class' => 'datalynxfield__approve',
+                        'data-action' => 'toggle-approval',
+                        'data-entryid' => $entry->id,
+                        'data-d' => $field->df()->data->id,
+                        'data-view' => $currentviewid,
+                        'data-sesskey' => sesskey(),
+                    ]);
         } else {
             return $icon . $label;
         }

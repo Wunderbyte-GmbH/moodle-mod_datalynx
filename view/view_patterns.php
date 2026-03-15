@@ -496,6 +496,7 @@ class datalynxview_patterns {
                                 $OUTPUT->pix_icon('i/grade_correct',
                                         get_string('multiapprove', 'datalynx')),
                                 ['type' => 'button', 'name' => 'multiapprove',
+                                        'title' => trim(get_string('multiapprove', 'datalynx')),
                                         'onclick' => 'bulk_action(\'entry\'&#44; \'' .
                                                 $baseurl->out(false) . '\'&#44; \'approve\')'
                                 ]);
@@ -523,7 +524,9 @@ class datalynxview_patterns {
 
             case '##selectallnone##':
                 $replacement = html_writer::checkbox(null, null, false, null,
-                        ['onclick' => 'select_allnone(\'entry\'&#44;this.checked)'
+                        ['onclick' => 'select_allnone(\'entry\'&#44;this.checked)',
+                                'title' => get_string('multiselect', 'datalynx'),
+                                'id' => 'datalynx-selectallnone',
                         ]);
 
                 break;

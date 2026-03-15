@@ -32,7 +32,8 @@ ob_start();
 
 $d = required_param('d', PARAM_INT);
 $viewid = required_param('view', PARAM_INT);
-$action = required_param('action', PARAM_ALPHA);
+// Allow hyphen in action name.
+$action = required_param('action', PARAM_SAFEDIR); 
 $entryid = required_param('entryid', PARAM_INT);
 $sesskey = required_param('sesskey', PARAM_TEXT);
 
@@ -49,6 +50,14 @@ require_capability('mod/datalynx:approve', $context);
 global $DB;
 $completiontype = COMPLETION_UNKNOWN;
 $df = new mod_datalynx\datalynx($d);
+$newapprovedstate = null;
+
+// Determine the intended action if it's a toggle request.
+if ($action == 'toggle-approval') {
+    $currentapproved = $DB->get_field('datalynx_entries', 'approved', ['id' => $entryid]);
+    $action = $currentapproved ? 'disapprove' : 'approve';
+}
+
 if ($action == 'approve') {
     $DB->set_field('datalynx_entries', 'approved', 1, ['id' => $entryid]);
     $entriesclass = new datalynx_entries($df);
@@ -57,34 +66,43 @@ if ($action == 'approve') {
         $eventdata = (object) ['view' => $df->get_view_from_id($viewid), 'items' => $processed];
         $df->events_trigger("entryapproved", $eventdata);
     }
-    $return = $DB->get_field('datalynx_entries', 'approved', ['id' => $entryid]) == 1;
+    $newapprovedstate = 1;
     $completiontype = COMPLETION_COMPLETE;
-} else {
-    if ($action == 'disapprove') {
-        $DB->set_field('datalynx_entries', 'approved', 0, ['id' => $entryid]);
-        $return = $DB->get_field('datalynx_entries', 'approved', ['id' => $entryid]) == 0;
-        $processed = [$entryid => $DB->get_record('datalynx_entries', ['id' => $entryid])];
-        if ($processed) {
-            $eventdata = (object) ['view' => $df->get_view_from_id($viewid), 'items' => $processed];
-            $df->events_trigger("entrydisapproved", $eventdata);
-        }
-        $completiontype = COMPLETION_INCOMPLETE;
-    } else {
-        $return = false;
+} else if ($action == 'disapprove') {
+    $DB->set_field('datalynx_entries', 'approved', 0, ['id' => $entryid]);
+    $processed = [$entryid => $DB->get_record('datalynx_entries', ['id' => $entryid])];
+    if ($processed) {
+        $eventdata = (object) ['view' => $df->get_view_from_id($viewid), 'items' => $processed];
+        $df->events_trigger("entrydisapproved", $eventdata);
     }
+    $newapprovedstate = 0;
+    $completiontype = COMPLETION_INCOMPLETE;
 }
+
 // Update completion state.
-$completion = new completion_info($course);
-if ($completion->is_enabled($cm) && $cm->completion == COMPLETION_TRACKING_AUTOMATIC &&
-        $data->completionentries
-) {
-    $userid = $DB->get_field('datalynx_entries', 'userid', ['id' => $entryid]);
-    $completion->update_state($cm, $completiontype, $userid);
+if (!is_null($newapprovedstate)) {
+    $completion = new completion_info($course);
+    if ($completion->is_enabled($cm) && $cm->completion == COMPLETION_TRACKING_AUTOMATIC &&
+            $data->completionentries
+    ) {
+        $userid = $DB->get_field('datalynx_entries', 'userid', ['id' => $entryid]);
+        $completion->update_state($cm, $completiontype, $userid);
+    }
 }
 
 if (ob_get_contents()) {
     ob_clean();
 }
-echo json_encode($return);
+
+if (!is_null($newapprovedstate)) {
+    echo json_encode([
+        'entryid' => $entryid,
+        'approved' => $newapprovedstate
+    ]);
+} else {
+    // Action was not valid, return an error.
+    header('HTTP/1.1 400 Bad Request');
+    echo json_encode(['error' => 'Invalid action']);
+}
 
 die();

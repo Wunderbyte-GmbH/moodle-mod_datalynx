@@ -110,3 +110,21 @@ Feature: Filter approved and not approved entries from multiple students
     And I follow "Datalynx Test Instance"
     Then I should see "Text of student2"
     And I should see "Text of student1"
+    When I log out
+    Then I log in as "teacher1"
+    And I am on "Course 1" course homepage
+    And I follow "Datalynx Test Instance"
+    And I follow the datalynx "Manage" link
+    And I follow the datalynx "Views" link
+    And I follow "Manage view"
+    And I click on "datalynx-selectallnone" "checkbox"
+    And I click on "Approve" "button"
+    And I wait until the page is ready
+    And I follow the datalynx "Manage" link
+    And I follow "Approved view"
+    Then I should see "Text of student1"
+    And I should see "Text of student2"
+    And I follow the datalynx "Manage" link
+    And I follow "Notapproved view"
+    Then I should not see "Text of student1"
+    And I should not see "Text of student2"
