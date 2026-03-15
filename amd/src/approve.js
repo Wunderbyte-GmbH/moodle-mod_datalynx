@@ -1,53 +1,7 @@
 export default {
-    init(approvedIcon, disapprovedIcon) {
-        // After initialization, loop through all elements for subscribe/unsubscribe.
-        document.querySelectorAll(".datalynxfield__approve").forEach(element => {
-            const href = element.href;
-            const params = extractParams(href.split('?')[1]);
+    init(approveLabel, unapproveLabel) {
 
-            // Add new click event listener
-            element.addEventListener('click', (e) => {
-                e.preventDefault(); // Don't follow hrefs.
-
-                // AJAX call
-                const actionUrl = "field/_approve/ajax.php";
-                fetch(actionUrl, {
-                    method: "POST",
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: new URLSearchParams(params)
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! Status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    const imgElement = element.querySelector('img');
-                    if (data && imgElement.classList.contains('approved')) {
-                        imgElement.classList.remove('approved');
-                        imgElement.src = disapprovedIcon;
-                        imgElement.alt = 'approve';
-                        imgElement.title = 'approve';
-                        params.action = 'approve';
-                    } else if (data && !imgElement.classList.contains('approved')) {
-                        imgElement.classList.add('approved');
-                        imgElement.src = approvedIcon;
-                        imgElement.alt = 'disapprove';
-                        imgElement.title = 'disapprove';
-                        params.action = 'disapprove';
-                    }
-                    return null;
-                })
-                .catch((error) => {
-                    throw error;
-                });
-            });
-        });
-
-        // Extract params from a query string.
+        // Must be defined before the forEach that calls it.
         const extractParams = (paramString) => {
             const params = new URLSearchParams(paramString);
             const output = {};
@@ -69,5 +23,60 @@ export default {
 
             return output;
         };
+
+        document.querySelectorAll(".datalynxfield__approve").forEach(element => {
+            const href = element.href;
+            const params = extractParams(href.split('?')[1]);
+
+            element.addEventListener('click', (e) => {
+                e.preventDefault();
+
+                fetch("field/_approve/ajax.php", {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams(params)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data) {
+                        return null;
+                    }
+                    const iconElement = element.querySelector('i');
+                    const labelElement = element.querySelector('.datalynxfield__approve-label');
+                    const isApproved = iconElement.classList.contains('fa-circle-xmark');
+
+                    if (isApproved) {
+                        // Was approved — switch to unapproved state: show "Approve" action
+                        iconElement.classList.remove('fa-circle-xmark', 'text-danger');
+                        iconElement.classList.add('fa-circle-check', 'text-success');
+                        labelElement.textContent = approveLabel;
+                        element.title = approveLabel;
+                        params.action = 'approve';
+                        delete params.disapprove;
+                        params.approve = params.entryid;
+                    } else {
+                        // Was not approved — switch to approved state: show "Unapprove" action
+                        iconElement.classList.remove('fa-circle-check', 'text-success');
+                        iconElement.classList.add('fa-circle-xmark', 'text-danger');
+                        labelElement.textContent = unapproveLabel;
+                        element.title = unapproveLabel;
+                        params.action = 'disapprove';
+                        delete params.approve;
+                        params.disapprove = params.entryid;
+                    }
+                    return null;
+                })
+                .catch((error) => {
+                    throw error;
+                });
+            });
+        });
     }
 };

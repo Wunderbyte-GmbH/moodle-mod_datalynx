@@ -124,6 +124,7 @@ $string['dftimeinterval'] = 'Pause bis zum Freischalten des nächsten Eintrags';
 $string['dftimeinterval_help'] = 'Setzen Sie eine Pause bis zum Freischalten des nächsten Eintrags';
 $string['dfupdatefailed'] = 'Aktualisierung der Datalynx fehlgeschlagen!';
 $string['disapproved'] = 'Nicht zugelassen';
+$string['unapprove'] = 'Freischaltung entfernen';
 $string['documenttype'] = 'Dokumententyp';
 $string['dots'] = '...';
 $string['download'] = 'Herunterladen';

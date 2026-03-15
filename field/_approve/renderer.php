@@ -93,53 +93,41 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
     /**
      */
     protected function display_browse($entry, $params = null) {
-        global $OUTPUT, $CFG, $PAGE;
+        global $PAGE;
 
         $field = $this->_field;
         if ($entry && isset($entry->approved) && $entry->approved) {
-            $approved = 'approved';
+            $iconclass = 'fa-regular fa-circle-xmark text-danger';
+            $labelstring = get_string('unapprove', 'datalynx');
             $approval = 'disapprove';
-            $approvedimagesrc = 'i/completion-auto-pass';
         } else {
-            $approved = 'disapproved';
+            $iconclass = 'fa-regular fa-circle-check text-success';
+            $labelstring = get_string('approve');
             $approval = 'approve';
-            $approvedimagesrc = 'i/completion-auto-n';
-        }
-        $strapproved = get_string($approved, 'datalynx');
-        if ($CFG->branch >= 33) {
-            $approvedimage = html_writer::empty_tag('img',
-                    ['src' => $OUTPUT->image_url($approvedimagesrc),
-                        'class' => "iconsmall" . (isset($entry->approved) && $entry->approved ? ' approved' : ''),
-                        'alt' => $strapproved, 'title' => $strapproved]);
-        } else {
-            $approvedimage = html_writer::empty_tag('img',
-                    ['src' => $OUTPUT->pix_url($approvedimagesrc),
-                        'class' => "iconsmall" . (isset($entry->approved) && $entry->approved ? ' approved' : ''),
-                        'alt' => $strapproved, 'title' => $strapproved]);
         }
 
+        $icon = html_writer::tag('i', '', [
+            'class' => "icon {$iconclass} fa-fw",
+            'role' => 'img',
+            'aria-hidden' => 'true',
+        ]);
+        $label = html_writer::span($labelstring, 'datalynxfield__approve-label');
+
         if (has_capability('mod/datalynx:approve', $field->df()->context)) {
-            if ($CFG->branch >= 33) {
-                $PAGE->requires->js_call_amd('mod_datalynx/approve', 'init',
-                        [$OUTPUT->image_url('i/completion-auto-pass')->__toString(),
-                            $OUTPUT->image_url('i/completion-auto-n')->__toString()]);
-            } else {
-                $$PAGE->requires->js_call_amd('mod_datalynx/approve', 'init',
-                        [$OUTPUT->pix_url('i/completion-auto-pass')->__toString(),
-                            $OUTPUT->pix_url('i/completion-auto-n')->__toString()]);
-            }
+            $PAGE->requires->js_call_amd('mod_datalynx/approve', 'init',
+                    [get_string('approve'), get_string('unapprove', 'datalynx')]);
 
             return html_writer::link(
                     new moodle_url($entry->baseurl,
                             [$approval => $entry->id, 'sesskey' => sesskey(),
                                     'sourceview' => $this->_field->df()->get_current_view()->id()
-                            ]), $approvedimage, [
+                            ]), $icon . $label, [
                                 'class' => 'datalynxfield__approve',
-                                'data-action' => 'approve',
-                                'title' => get_string($approval),
+                                'data-action' => 'toggle-approval',
+                                'title' => $labelstring,
                             ]);
         } else {
-            return $approvedimage;
+            return $icon . $label;
         }
     }
 
