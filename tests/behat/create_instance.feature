@@ -41,7 +41,7 @@ Feature: In a datalynx instance create a new entry
     And I set the field "Student" to "1"
     And I set the field "Guest" to "1"
     And I press "Save changes"
-    And I follow the datalynx "Filters" link
+    And I follow the datalynx "View Filters" link
     And I follow "Add a filter"
     And I select "10" from the "perpage" singleselect
     And I select "Time created" from the "sortfield0" singleselect

@@ -46,7 +46,7 @@
 #    And I follow "Manage"
 #    And I follow "Fields"
 #    Then I should see "lehrer"
-#    And I follow "Filters"
+#    And I follow "View Filters"
 #    Then I should see "lehrer_teamselect"
 #    And I follow "Views"
 #    Then I should see "lehrer_teamselector"

@@ -73,7 +73,7 @@ $string['csvenclosure'] = 'enclosure';
 $string['csvfailed'] = 'Unable to read the raw data from the CSV file';
 $string['csvoutput'] = 'CSV output';
 $string['csvsettings'] = 'CSV settings';
-$string['csvwithselecteddelimiter'] = '<acronym title=\"Comma Separated Values\">CSV</acronym> text with selected delimiter:';
+$string['csvwithselecteddelimiter'] = 'CSV text with selected delimiter:';
 $string['customfilter'] = 'Custom filter';
 $string['customfilteradd'] = 'Add a custom filter';
 $string['customfilternew'] = 'New custom filter';
@@ -272,7 +272,7 @@ $string['filtersconfirmduplicate'] = 'You are about to duplicate {$a} filter(s).
 $string['filtersdeleted'] = '{$a} filter(s) deleted';
 $string['filtersduplicated'] = '{$a} filter(s) duplicated';
 $string['filterselection'] = 'Selection';
-$string['filters'] = 'Filters';
+$string['filters'] = 'View Filters';
 $string['filtersimplesearch'] = 'Simple search';
 $string['filtersmax'] = 'Maximum filters';
 $string['filtersnonedefined'] = 'No filters defined';

@@ -22,7 +22,7 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__FILE__) . '/../classes/datalynx.php');
+require_once(dirname(__FILE__) . '/../classes/local/datalynx.php');
 
 class datalynx_field_renderer {
 

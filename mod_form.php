@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/course/moodleform_mod.php");
-require_once($CFG->dirroot . '/mod/datalynx/classes/datalynx.php');
+require_once($CFG->dirroot . '/mod/datalynx/classes/local/datalynx.php');
 
 class mod_datalynx_mod_form extends moodleform_mod {
 

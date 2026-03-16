@@ -149,8 +149,8 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
         if ($field->df()->data->singleedit) {
             $url->param('view', $field->df()->data->singleedit);
         }
-        $str = get_string('copy');
-        return html_writer::link($url->out(false), $OUTPUT->pix_icon('t/copy', $str));
+        $str = get_string('duplicate');
+        return html_writer::link($url->out(false), $str . ' ' . $OUTPUT->pix_icon('t/copy', $str));
     }
 
     /**

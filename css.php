@@ -35,7 +35,7 @@ $course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
 require_login($course, false, $cm);
 
 if ($urlparams->cssedit) {
-    require_once('classes/datalynx.php');
+    require_once('classes/local/datalynx.php');
     require_once($CFG->libdir . '/formslib.php');
 
     class mod_datalynx_css_form extends moodleform {

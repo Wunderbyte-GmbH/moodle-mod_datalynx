@@ -24,7 +24,7 @@
  *
  */
 require_once('../../config.php');
-require_once('classes/datalynx.php');
+require_once('classes/local/datalynx.php');
 
 $urlparams = new stdClass();
 $urlparams->d = optional_param('d', 0, PARAM_INT); // Datalynx id.

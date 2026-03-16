@@ -42,9 +42,10 @@ Feature: Create entry, add multiselect and use customfilter
       | Name           | mycustomfilter       |
     And I click on "//input[@value = 'Datalynx field Select (multiple)']" "xpath_element"
     And I press "Save changes"
+    Then I should see "added"
 
     # Make customfilter visible in view.
-    When I follow "Views"
+    And I follow "Views"
     And I click on "Edit Gridview" "link"
     And I click on "View template" "link"
     Then I add to "id_esection_editor" editor the text " ##pagingbar## ##addnewentry## ##customfilter:mycustomfilter## ##entries## "
@@ -174,17 +175,43 @@ Feature: Create entry, add multiselect and use customfilter
 
     # Perform duplication 3 times
     When I follow "Reset filters"
-    And I click on "Duplicate" "link" in the "testtext2" "table_row"
+    And I follow "Search"
+    Then I add to "Search" editor the text "testtext3"
+    And I press "Search"
+    And I click on "Duplicate" "link"
     And I press "Continue"
     Then I should see "1 entry(s) duplicated"
     And I press "Continue"
 
-    And I click on "Duplicate" "link" in the "testtext2" "table_row"
+    And I follow "Search"
+    Then I add to "Search" editor the text "testtext2"
+    And I press "Search"
+    And I click on "Duplicate" "link"
     And I press "Continue"
     Then I should see "1 entry(s) duplicated"
     And I press "Continue"
 
-    And I click on "Duplicate" "link" in the "testtext2" "table_row"
+    And I follow "Search"
+    Then I add to "Search" editor the text "testtext4"
+    And I press "Search"
+    And I click on "Duplicate" "link"
     And I press "Continue"
     Then I should see "1 entry(s) duplicated"
     And I press "Continue"
+
+    # Now test the paging bar with the customfilter.
+    And I follow the datalynx "Manage" link
+    And I follow "View Filters"
+    And I click on "Add a filter" "link"
+    When I set the following fields to these values:
+      | name | perpagefilter |
+      | perpage   | 2 |
+    And I press "Save changes"
+    And I follow "Views"
+    And I select "perpagefilter" from the "fid" singleselect
+    And I follow "Browse"
+    And I click on "2" "link"
+    Then I should see "testtext4"
+    And I should see "testtext5"
+    And I click on "3" "link"
+    Then I should see "testtext2"

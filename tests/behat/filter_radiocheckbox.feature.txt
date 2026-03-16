@@ -25,7 +25,7 @@ It should show you all entries where A is not chosen
       | radiobutton      | Radio              |             | Option A,Option B,Option C |          |        |
       | checkbox         | Checkbox           |             | Option 1,Option 2,Option 3 | Option 1 |        |
       | select           | Select             |             | Option X,Option Y,Option Z |          |        |
-    And I follow "Filters"
+    And I follow "View Filters"
     And I follow "Add a filter"
     And I set the field "name" to "optionAfilter"
     And I set the field "searchandor0" to "AND"

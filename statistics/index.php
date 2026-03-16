@@ -23,7 +23,7 @@
  */
 
 require_once('../../../config.php');
-require_once('../classes/datalynx.php');
+require_once('../classes/local/datalynx.php');
 require_once('statistics_class.php');
 
 $urlparams = new stdClass();

@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->libdir/portfolio/caller.php");
-require_once("$CFG->dirroot/mod/datalynx/classes/datalynx.php");
+require_once("$CFG->dirroot/mod/datalynx/classes/local/datalynx.php");
 require_once($CFG->libdir . '/filelib.php');
 
 /**

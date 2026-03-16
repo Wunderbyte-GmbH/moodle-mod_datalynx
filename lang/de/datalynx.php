@@ -73,7 +73,7 @@ $string['csvenclosure'] = 'Texttrenner';
 $string['csvfailed'] = 'Originaldaten der CSV Datei können nicht gelesen werden.';
 $string['csvoutput'] = 'CSV Ausgabe';
 $string['csvsettings'] = 'CSV Einstellungen';
-$string['csvwithselecteddelimiter'] = '<acronym title=\"Comma Separated Values\">CSV</acronym> Text mit ausgewähltem Trennzeichen:';
+$string['csvwithselecteddelimiter'] = 'CSV Text mit ausgewähltem Trennzeichen:';
 $string['customfilter'] = 'Benutzerdefinierter Filter';
 $string['customfilteradd'] = 'Einen benutzerdefinierten Filter hinzufügen';
 $string['customfilternew'] = 'Neuer benutzerdefinierter Filter';
@@ -255,7 +255,7 @@ $string['filtersconfirmduplicate'] = 'Sie sind im Begriff, {$a} Filter zu dupliz
 $string['filtersdeleted'] = '{$a} Filter gelöschtd';
 $string['filtersduplicated'] = '{$a} Filter dupliziert';
 $string['filterselection'] = 'Auswahl';
-$string['filters'] = 'Filter';
+$string['filters'] = 'Ansichtsfilter';
 $string['filtersimplesearch'] = 'Einfache Suche';
 $string['filtersmax'] = 'Maximalanzahl an Filtern';
 $string['filtersnonedefined'] = 'Keine Filter angelegt';

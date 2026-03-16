@@ -61,7 +61,7 @@
 #    And I am on "Course 1" course homepage
 #    And I follow "Datalynx Test Instance"
 #    Then I follow "Manage"
-#    And I follow "Filters"
+#    And I follow "View Filters"
 #    And I should see "StatusNotSetFilter"
 #    Then I follow "StatusNotSetFilter"
 #    And I set the field "searchandor0" to "AND"

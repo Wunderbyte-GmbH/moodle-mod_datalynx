@@ -301,9 +301,9 @@ class behat_mod_datalynx extends behat_base {
     public function i_follow_the_datalynx_link($linktext) {
         $page = $this->getSession()->getPage();
         switch ($linktext) {
-            case 'Filters':
-                // Code to handle the "Filters" case.
-                $link = $page->find('css', sprintf('.nav-item [title="Filters"]', $linktext));
+            case 'View Filters':
+                // Code to handle the "View Filters" case.
+                $link = $page->find('css', sprintf('.nav-item [title="View Filters"]', $linktext));
                 break;
             case 'Manage':
                 $link = $page->find('css', sprintf('.nav-item [title="Manage"]', $linktext));

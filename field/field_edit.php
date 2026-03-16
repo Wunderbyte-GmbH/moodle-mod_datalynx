@@ -23,7 +23,7 @@
  */
 
 require_once('../../../config.php');
-require_once("$CFG->dirroot/mod/datalynx/classes/datalynx.php");
+require_once("$CFG->dirroot/mod/datalynx/classes/local/datalynx.php");
 
 $urlparams = new stdClass();
 $urlparams->d = required_param('d', PARAM_INT); // Datalynx ID.

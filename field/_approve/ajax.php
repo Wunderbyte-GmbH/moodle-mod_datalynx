@@ -25,7 +25,7 @@
 define('AJAX_SCRIPT', true);
 
 require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/config.php');
-require_once("$CFG->dirroot/mod/datalynx/classes/datalynx.php");
+require_once("$CFG->dirroot/mod/datalynx/classes/local/datalynx.php");
 require_once("$CFG->dirroot/mod/datalynx/entries_class.php");
 
 ob_start();
