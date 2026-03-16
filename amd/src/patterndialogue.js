@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 // This file is part of Moodle - http:// Moodle.org/.
 //
 // Moodle is free software: you can redistribute it and/or modify
