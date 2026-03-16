@@ -24,11 +24,10 @@ import validation from "ajv/dist/vocabularies/validation";
  */
 
 /**
- * Modal form to manage booking option tags (botags).
+ * Provides functionality to maximise embedded content in datalynx views.
  *
  * @module     mod_datalynx/maximiseembed
- * @copyright  2023 Wunderbyte GmbH
- * @author     David Bogner
+ * @copyright  2025 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

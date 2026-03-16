@@ -17,7 +17,7 @@
  * This module provides functionality for embedding PDFs using pdf.js.
  *
  * @module      mod_datalynx/pdfembed
- * @copyright   2023 David Bogner <david.bogner@wunderbyte.at>
+ * @copyright   2025 Wunderbyte GmbH
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
