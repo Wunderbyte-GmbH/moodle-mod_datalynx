@@ -45,8 +45,9 @@ $urlparams->cancel = optional_param('cancel', 0, PARAM_BOOL);
 $dl = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
 require_capability('mod/datalynx:managetemplates', $dl->context);
 
-$dl->set_page('customfilter/index', ['modjs' => true, 'urlparams' => $urlparams]);
 require_login($dl->data->course, false, $dl->cm);
+
+$dl->set_page('customfilter/index', ['modjs' => true, 'urlparams' => $urlparams]);
 
 navigation_node::override_active_url(
         new moodle_url('/mod/datalynx/customfilter/index.php', ['id' => $dl->cm->id]));

@@ -33,10 +33,10 @@ class PatternDialogue {
     init() {
         this.waitForTinyMCE();
 
-        const dropdownMenu = document.getElementById('eparam2_editor_field_tag_menu');
-        if (dropdownMenu) {
-            dropdownMenu.addEventListener('change', () => this.insertTagFromDropdown(dropdownMenu));
-        }
+        // Add event listeners for all tag menu dropdowns
+        document.querySelectorAll('select[id$="_tag_menu"]').forEach((dropdown) => {
+            dropdown.addEventListener('change', () => this.insertTagFromDropdown(dropdown));
+        });
 
         const form = document.querySelector('#datalynx-view-edit-form');
         form?.addEventListener('submit', () => this.convertButtonsToTagsBeforeSubmit());
@@ -170,12 +170,17 @@ class PatternDialogue {
             contentToInsert = selectedValue;
         }
 
-        window.tinyMCE.get().forEach((editor) => {
-            if (editor.id === "id_eparam2_editor") {
-                editor.insertContent(contentToInsert);
-                this.reInitializeButtons(editor);
-            }
-        });
+        // Extract editor id from dropdown id, e.g., esection_editor_general_tag_menu -> id_esection_editor
+        const editorIdMatch = dropdown.id.match(/^(.+)_editor_.+_tag_menu$/);
+        if (editorIdMatch) {
+            const editorId = `id_${editorIdMatch[1]}_editor`;
+            window.tinyMCE.get().forEach((editor) => {
+                if (editor.id === editorId) {
+                    editor.insertContent(contentToInsert);
+                    this.reInitializeButtons(editor);
+                }
+            });
+        }
     }
 
     convertButtonsToTagsBeforeSubmit() {

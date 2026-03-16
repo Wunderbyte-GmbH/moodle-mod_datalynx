@@ -51,9 +51,9 @@ $urlparams->cancel = optional_param('cancel', 0, PARAM_BOOL);
 $df = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
 require_capability('mod/datalynx:managetemplates', $df->context);
 
-$df->set_page('filter/index', ['modjs' => true, 'urlparams' => $urlparams]);
-
 require_login($df->data->course, false, $df->cm);
+
+$df->set_page('filter/index', ['modjs' => true, 'urlparams' => $urlparams]);
 
 // Activate navigation node.
 navigation_node::override_active_url(

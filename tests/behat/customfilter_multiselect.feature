@@ -47,7 +47,11 @@ Feature: Create entry, add multiselect and use customfilter
     When I follow "Views"
     And I click on "Edit Gridview" "link"
     And I click on "View template" "link"
-    Then I add to "id_esection_editor" editor the text ". ##addnewentry## ##customfilter:mycustomfilter## ##entries## ."
+    Then I add to "id_esection_editor" editor the text " ##pagingbar## ##addnewentry## ##customfilter:mycustomfilter## ##entries## "
+
+    # Add ##duplicate## to entry template
+    And I click on "Entry template" "link"
+    And I select "##duplicate##" from the "eparam2_editor_field_tag_menu" singleselect
     And I press "Save changes"
 
     # Add some entries.
@@ -167,3 +171,20 @@ Feature: Create entry, add multiselect and use customfilter
     And I should see "testtext3"
     And I should see "Opt3"
     And I should not see "testtext4"
+
+    # Perform duplication 3 times
+    When I follow "Reset filters"
+    And I click on "Duplicate" "link" in the "testtext2" "table_row"
+    And I press "Continue"
+    Then I should see "1 entry(s) duplicated"
+    And I press "Continue"
+
+    And I click on "Duplicate" "link" in the "testtext2" "table_row"
+    And I press "Continue"
+    Then I should see "1 entry(s) duplicated"
+    And I press "Continue"
+
+    And I click on "Duplicate" "link" in the "testtext2" "table_row"
+    And I press "Continue"
+    Then I should see "1 entry(s) duplicated"
+    And I press "Continue"
