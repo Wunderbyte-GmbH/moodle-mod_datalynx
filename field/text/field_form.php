@@ -97,7 +97,7 @@ class datalynxfield_text_form extends datalynxfield_form {
                 'numeric' => get_string('err_numeric', 'form'),
                 'email' => get_string('err_email', 'form'),
                 'nopunctuation' => get_string('err_nopunctuation', 'form')];
-        $mform->addElement('select', 'param4', get_string('format'), $options);
+        $mform->addElement('select', 'param4', get_string('format', 'datalynx'), $options);
 
         // Length (param5, 6, 7) minimum, maximum, range.
         $options = ['' => get_string('choosedots'),
@@ -191,11 +191,11 @@ class datalynxfield_text_form extends datalynxfield_form {
             return false;
         }
 
-        // Added id to records to make the first column something unique.
-        $records = $DB->get_records_sql("SELECT c.fieldid, c.content, COUNT(*) as cnt
+        // Check for duplicate content.
+        $records = $DB->get_records_sql("SELECT c.content, COUNT(*) as cnt
                                     FROM {datalynx_contents} c
                                     WHERE c.fieldid = :fieldid AND c.content IS NOT NULL
-                                    GROUP BY c.fieldid, c.content
+                                    GROUP BY c.content
                                     HAVING COUNT(*) > 1", ['fieldid' => $fieldid]);
         if (empty($records)) {
             return false;
