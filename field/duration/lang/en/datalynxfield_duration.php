@@ -16,12 +16,12 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_duration
  * @subpackage duration
  * @copyright 2014 onwards by edulabs.org and associated programmers
  * @copyright based on the work by 2013 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-$string['pluginname'] = 'Duration';
 $string['fixedunit'] = 'Fixed unit';
+$string['pluginname'] = 'Duration';
 $string['privacy:metadata'] = 'Duration does not store personal data.';

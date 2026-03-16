@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_file
  * @subpackage file
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
@@ -29,7 +29,6 @@ require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 /**
  */
 class datalynxfield_file_renderer extends datalynxfield_renderer {
-
     /**
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options = null) {
@@ -49,8 +48,14 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
 
         $draftitemid = file_get_submitted_draft_itemid("{$fieldname}_filemanager");
 
-        file_prepare_draft_area($draftitemid, $field->df()->context->id, 'mod_datalynx', 'content',
-                $contentid, $fmoptions);
+        file_prepare_draft_area(
+            $draftitemid,
+            $field->df()->context->id,
+            'mod_datalynx',
+            'content',
+            $contentid,
+            $fmoptions
+        );
 
         $label = $field->df->name() == "Datalynx Test Instance" ? "File" : "";
 
@@ -92,8 +97,12 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
         $fs = get_file_storage();
 
         // Contentid is stored in itemid for lookup. This is usable with fieldgroups.
-        $files = $fs->get_area_files($field->df()->context->id, 'mod_datalynx', 'content',
-                $contentid);
+        $files = $fs->get_area_files(
+            $field->df()->context->id,
+            'mod_datalynx',
+            'content',
+            $contentid
+        );
         if (!$files || !(count($files) > 1)) {
             return '';
         }
@@ -101,7 +110,6 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
         $strfiles = [];
         foreach ($files as $file) {
             if (!$file->is_directory()) {
-
                 $filename = $file->get_filename();
                 $path = "/{$field->df()->context->id}/mod_datalynx/content/$contentid";
                 // ToDo: Remove or implement altname.
@@ -134,7 +142,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
             $options = [
                     -1  => get_string('choose'),
                     1 => get_string('filemissing', 'datalynx'),
-                    0 => get_string('fileexist', 'datalynx')
+                    0 => get_string('fileexist', 'datalynx'),
             ];
             $arr[] = $mform->createElement('select', $fieldname, '', $options);
             $mform->setType($fieldname, PARAM_INT);
@@ -206,8 +214,11 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
         if (empty($customscale)) {
             $customscale = 1;
         }
-        $PAGE->requires->js_call_amd('mod_datalynx/pdfembed', 'renderPDF',
-                [$fullurl, $fieldname, $customscale]);
+        $PAGE->requires->js_call_amd(
+            'mod_datalynx/pdfembed',
+            'renderPDF',
+            [$fullurl, $fieldname, $customscale]
+        );
 
         $a = html_writer::tag('script', '', [
                 'src' => 'pdfjs/pdf.js']);
@@ -235,14 +246,20 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
         $filename = $file->get_filename();
         $mimetype = $file->get_mimetype();
         $displayname = $altname ?: $filename;
-        $fileicon = html_writer::empty_tag('img',
-                ['src' => $OUTPUT->image_url(file_mimetype_icon($mimetype)),
-                        'alt' => $mimetype, 'height' => 16, 'width' => 16]);
+        $fileicon = html_writer::empty_tag(
+            'img',
+            ['src' => $OUTPUT->image_url(file_mimetype_icon($mimetype)),
+            'alt' => $mimetype,
+            'height' => 16,
+            'width' => 16]
+        );
 
         if (!empty($params['download'])) {
-            list(, $context, , , $contentid) = explode('/', $path);
-            $url = new moodle_url("/mod/datalynx/field/file/download.php",
-                    ['cid' => $contentid, 'context' => $context, 'file' => $filename]);
+            [, $context, , , $contentid] = explode('/', $path);
+            $url = new moodle_url(
+                "/mod/datalynx/field/file/download.php",
+                ['cid' => $contentid, 'context' => $context, 'file' => $filename]
+            );
             return html_writer::link($url, "$fileicon&nbsp;$displayname", ['target' => '_blank']);
         } else {
             $url = moodle_url::make_file_url('/pluginfile.php', "$path/$filename");

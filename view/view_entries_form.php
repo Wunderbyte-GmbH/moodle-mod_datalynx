@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxview
+ * @package mod_datalynx
  * @copyright 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -25,7 +25,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/formslib.php');
 
 class datalynxview_entries_form extends moodleform {
-
     protected function definition() {
         $view = $this->_customdata['view'];
         $mform = &$this->_form;
@@ -66,7 +65,6 @@ class datalynxview_entries_form extends moodleform {
             $entryids = explode(',', $this->_customdata['update']);
 
             foreach ($entryids as $entryid) {
-
                 // If we see a fieldgroup loop through all visible lines.
                 $fieldgroupmarkers = preg_grep('/^fieldgroup_/', array_keys($data));
                 if (count($fieldgroupmarkers) > 0) {
@@ -83,12 +81,13 @@ class datalynxview_entries_form extends moodleform {
                             $errors = array_merge($errors, $newerrors);
                         }
                     }
-
                 } else {
                     // If no fieldgroup use standard behaviour.
                     foreach ($fields as $fid => $field) {
-                        $errors = array_merge($errors,
-                            $field->renderer()->validate($entryid, $patterns[$fid], (object) $data));
+                        $errors = array_merge(
+                            $errors,
+                            $field->renderer()->validate($entryid, $patterns[$fid], (object) $data)
+                        );
                     }
                 }
             }

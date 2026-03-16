@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_teammemberselect
  * @subpackage teammemberselect
  * @copyright 2015 David Bogner {@link http:// Www.edulabs.org}.
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

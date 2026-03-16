@@ -16,14 +16,14 @@
 
 /**
  *
- * @package datalynxview
+ * @package datalynxview_pdf
  * @subpackage pdf
  * @copyright Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+$string['image'] = 'Image';
 $string['pluginname'] = 'PDF';
 
-$string['image'] = 'Image';
 // PDF Settings.
 $string['pdfsettings'] = 'PDF settings';
 $string['docname'] = 'Document name';

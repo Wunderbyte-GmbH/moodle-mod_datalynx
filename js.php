@@ -39,7 +39,6 @@ if ($urlparams->jsedit) {
     require_once($CFG->libdir . '/formslib.php');
 
     class mod_datalynx_js_form extends moodleform {
-
         public function definition() {
             global $CFG, $COURSE;
 
@@ -52,23 +51,32 @@ if ($urlparams->jsedit) {
             $mform->addElement('header', 'generalhdr', get_string('headerjs', 'datalynx'));
 
             // Includes.
-            $attributes = ['wrap' => 'soft', 'rows' => 5, 'cols' => 60
+            $attributes = ['wrap' => 'soft', 'rows' => 5, 'cols' => 60,
             ];
-            $mform->addElement('textarea', 'jsincludes', get_string('jsincludes', 'datalynx'),
-                    $attributes);
+            $mform->addElement(
+                'textarea',
+                'jsincludes',
+                get_string('jsincludes', 'datalynx'),
+                $attributes
+            );
 
             // Code.
-            $attributes = ['wrap' => 'soft', 'rows' => 15, 'cols' => 60
+            $attributes = ['wrap' => 'soft', 'rows' => 15, 'cols' => 60,
             ];
             $mform->addElement('textarea', 'js', get_string('jscode', 'datalynx'), $attributes);
 
             // Uploads.
             $options = ['subdirs' => 0, 'maxbytes' => $COURSE->maxbytes, 'maxfiles' => 10,
-                    'accepted_types' => ['*.js'
-                    ]
+                    'accepted_types' => ['*.js',
+                    ],
             ];
-            $mform->addElement('filemanager', 'jsupload', get_string('jsupload', 'datalynx'), null,
-                    $options);
+            $mform->addElement(
+                'filemanager',
+                'jsupload',
+                get_string('jsupload', 'datalynx'),
+                null,
+                $options
+            );
 
             // Buttons.
             $this->add_action_buttons(true);
@@ -77,17 +85,19 @@ if ($urlparams->jsedit) {
 
     require_capability('mod/datalynx:managetemplates', $df->context);
 
-    $df->set_page('js', ['urlparams' => $urlparams
+    $df->set_page('js', ['urlparams' => $urlparams,
     ]);
 
     // Activate navigation node.
     navigation_node::override_active_url(
-            new moodle_url('/mod/datalynx/js.php', ['id' => $df->cm->id, 'jsedit' => 1
-            ]));
+        new moodle_url('/mod/datalynx/js.php', ['id' => $df->cm->id, 'jsedit' => 1,
+        ])
+    );
 
             $mform = new mod_datalynx_js_form(
-            new moodle_url('/mod/datalynx/js.php', ['d' => $df->id(), 'jsedit' => 1
-            ]));
+                new moodle_url('/mod/datalynx/js.php', ['d' => $df->id(), 'jsedit' => 1,
+                ])
+            );
 
     if (!$mform->is_cancelled()) {
         if ($data = $mform->get_data()) {
@@ -99,8 +109,15 @@ if ($urlparams->jsedit) {
             // Add uploaded files.
             $usercontext = context_user::instance($USER->id);
             $fs = get_file_storage();
-            if ($files = $fs->get_area_files($usercontext->id, 'user', 'draft', $data->jsupload,
-            'sortorder', false)
+            if (
+                $files = $fs->get_area_files(
+                    $usercontext->id,
+                    'user',
+                    'draft',
+                    $data->jsupload,
+                    'sortorder',
+                    false
+                )
             ) {
                 $filerec = new stdClass();
                 $filerec->contextid = $df->context->id;
@@ -116,16 +133,17 @@ if ($urlparams->jsedit) {
             }
 
             $event = \mod_datalynx\event\js_saved::create(
-            ['context' => $df->context, 'objectid' => $df->id()
-            ]);
+                ['context' => $df->context, 'objectid' => $df->id(),
+                ]
+            );
             $event->trigger();
         }
     }
 
-            $df->print_header(['tab' => 'js', 'urlparams' => $urlparams
+            $df->print_header(['tab' => 'js', 'urlparams' => $urlparams,
             ]);
 
-            $options = ['subdirs' => 0, 'maxbytes' => $COURSE->maxbytes, 'maxfiles' => 10
+            $options = ['subdirs' => 0, 'maxbytes' => $COURSE->maxbytes, 'maxfiles' => 10,
             ];
             $draftitemid = file_get_submitted_draft_itemid('jsupload');
             file_prepare_draft_area($draftitemid, $df->context->id, 'mod_datalynx', 'js', 0, $options);
@@ -135,16 +153,16 @@ if ($urlparams->jsedit) {
             $mform->display();
             $df->print_footer();
 } else {
-
     defined('NO_MOODLE_COOKIES') || define('NO_MOODLE_COOKIES', true); // Session not used here.
 
     $lifetime = 0; // Seconds to cache this stylesheet.
 
-    $PAGE->set_url('/mod/datalynx/js.php', ['d' => $urlparams->d
+    $PAGE->set_url('/mod/datalynx/js.php', ['d' => $urlparams->d,
     ]);
 
-    if ($jsdata = $DB->get_field('datalynx', 'js', ['id' => $urlparams->d
-    ])
+    if (
+        $jsdata = $DB->get_field('datalynx', 'js', ['id' => $urlparams->d,
+        ])
     ) {
         header('Last-Modified: ' . gmdate('D, d M Y H:i:s', time()) . ' GMT');
         header('Expires: ' . gmdate("D, d M Y H:i:s", time() + $lifetime) . ' GMT');

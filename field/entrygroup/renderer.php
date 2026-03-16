@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_entrygroup
  * @subpackage entrygroup
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
@@ -29,7 +29,6 @@ require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 /**
  */
 class datalynxfield_entrygroup_renderer extends datalynxfield_renderer {
-
     /**
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
@@ -67,22 +66,25 @@ class datalynxfield_entrygroup_renderer extends datalynxfield_renderer {
 
                 case '##group:picture##':
                     $replacements[$tag] = ['html',
-                            print_group_picture($group, $field->df()->course->id, false, true)
+                            print_group_picture($group, $field->df()->course->id, false, true),
                     ];
                     break;
 
                 case '##group:picturelarge##':
                     $replacements[$tag] = ['html',
-                            print_group_picture($group, $field->df()->course->id, true, true)
+                            print_group_picture($group, $field->df()->course->id, true, true),
                     ];
                     break;
 
                 case '##group:edit##':
-                    if ($edit && has_capability('mod/datalynx:manageentries',
-                                    $field->df()->context)
+                    if (
+                        $edit && has_capability(
+                            'mod/datalynx:manageentries',
+                            $field->df()->context
+                        )
                     ) {
                         $replacements[$tag] = ['',
-                                [[$this, 'display_edit'], [$entry]]
+                                [[$this, 'display_edit'], [$entry]],
                         ];
                     } else {
                         $replacements[$tag] = ['html', $group->name];

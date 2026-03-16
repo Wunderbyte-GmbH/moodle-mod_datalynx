@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxview
+ * @package datalynxview_grid
  * @subpackage grid
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/view/view_form.php");
 
 class datalynxview_grid_form extends datalynxview_base_form {
-
     /**
      */
     public function view_definition_after_gps() {
@@ -38,8 +37,11 @@ class datalynxview_grid_form extends datalynxview_base_form {
         $mform = &$this->_form;
 
         // Grid layout (param3).
-        $mform->addElement('header', 'gridsettingshdr',
-                get_string('gridsettings', 'datalynxview_grid'));
+        $mform->addElement(
+            'header',
+            'gridsettingshdr',
+            get_string('gridsettings', 'datalynxview_grid')
+        );
 
         // Cols.
         $range = range(2, 50);
@@ -65,7 +67,7 @@ class datalynxview_grid_form extends datalynxview_base_form {
         parent::data_preprocessing($data);
         // Grid layout.
         if (!empty($data->param3)) {
-            list($data->cols, $data->rows, ) = explode(' ', $data->param3);
+            [$data->cols, $data->rows, ] = explode(' ', $data->param3);
         }
     }
 

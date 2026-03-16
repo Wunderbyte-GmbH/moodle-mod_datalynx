@@ -27,7 +27,7 @@
 // /config.php.
 require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
-use Behat\Gherkin\Node\TableNode as TableNode;
+use Behat\Gherkin\Node\TableNode;
 
 /**
  * Steps definition for mod_datalynx
@@ -38,7 +38,6 @@ use Behat\Gherkin\Node\TableNode as TableNode;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class behat_mod_datalynx extends behat_base {
-
     /**
      * Sets up fields for the given datalynx instance.
      * Optional, but must be used after instance declaration.
@@ -165,7 +164,6 @@ class behat_mod_datalynx extends behat_base {
                     break;
                 default:
                     break;
-
             }
             $this->execute('behat_forms::press_button', get_string('savechanges'));
         }
@@ -212,26 +210,34 @@ class behat_mod_datalynx extends behat_base {
                     }
                     break;
                 case "select":
-                    $this->execute("behat_forms::i_set_the_field_with_xpath_to",
-                            ["//div[@data-field-type='select']//select", $field['value']]);
+                    $this->execute(
+                        "behat_forms::i_set_the_field_with_xpath_to",
+                        ["//div[@data-field-type='select']//select", $field['value']]
+                    );
                     break;
                 case "multiselect":
                     $this->execute("behat_forms::i_open_the_autocomplete_suggestions_list");
                     $this->execute("behat_forms::i_click_on_item_in_the_autocomplete_list", $field['value']);
                     break;
                 case "radio":
-                    $this->execute("behat_forms::i_set_the_field_with_xpath_to",
-                            ["//div[@data-field-type='radiobutton']//label[contains(.,'{$field['value']}')]/input",
-                                    "selected"]);
+                    $this->execute(
+                        "behat_forms::i_set_the_field_with_xpath_to",
+                        ["//div[@data-field-type='radiobutton']//label[contains(.,'{$field['value']}')]/input",
+                        "selected"]
+                    );
                     break;
                 case "text":
                 case "number":
-                    $this->execute("behat_forms::i_set_the_field_with_xpath_to",
-                            ["//div[@data-field-name='Datalynx field {$field['name']}']//input", $field['value']]);
+                    $this->execute(
+                        "behat_forms::i_set_the_field_with_xpath_to",
+                        ["//div[@data-field-name='Datalynx field {$field['name']}']//input", $field['value']]
+                    );
                     break;
                 case "textarea":
-                    $this->execute("behat_forms::i_set_the_field_with_xpath_to",
-                            ["//div[@data-field-name='Datalynx field {$field['name']}']//textarea", $field['value']]);
+                    $this->execute(
+                        "behat_forms::i_set_the_field_with_xpath_to",
+                        ["//div[@data-field-name='Datalynx field {$field['name']}']//textarea", $field['value']]
+                    );
                     break;
                 case "file":
                     break;
@@ -241,19 +247,27 @@ class behat_mod_datalynx extends behat_base {
                     break;
                 case "duration":
                     $values = explode(" ", $field['value']);
-                    $this->execute("behat_forms::i_set_the_field_with_xpath_to",
-                            ["//div[@data-field-name='Datalynx field {$field['name']}']//select", $values[1]]);
-                    $this->execute("behat_forms::i_set_the_field_with_xpath_to",
-                            ["//div[@data-field-name='Datalynx field {$field['name']}']//input", $values[0]]);
+                    $this->execute(
+                        "behat_forms::i_set_the_field_with_xpath_to",
+                        ["//div[@data-field-name='Datalynx field {$field['name']}']//select", $values[1]]
+                    );
+                    $this->execute(
+                        "behat_forms::i_set_the_field_with_xpath_to",
+                        ["//div[@data-field-name='Datalynx field {$field['name']}']//input", $values[0]]
+                    );
                     break;
                 case "time":
                     $values = explode(".", $field['value']);
-                    $this->execute("behat_forms::i_set_the_field_with_xpath_to",
-                            ["//div[@data-field-name='Datalynx field {$field['name']}']//input", 1]);
+                    $this->execute(
+                        "behat_forms::i_set_the_field_with_xpath_to",
+                        ["//div[@data-field-name='Datalynx field {$field['name']}']//input", 1]
+                    );
                     foreach ($values as $key => $value) {
                         $number = $key + 1;
-                        $this->execute("behat_forms::i_set_the_field_with_xpath_to",
-                                ["(//div[@data-field-name='Datalynx field {$field['name']}']//select)[{$number}]", $value]);
+                        $this->execute(
+                            "behat_forms::i_set_the_field_with_xpath_to",
+                            ["(//div[@data-field-name='Datalynx field {$field['name']}']//select)[{$number}]", $value]
+                        );
                     }
                     break;
             }

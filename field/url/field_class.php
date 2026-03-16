@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_url
  * @subpackage url
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
 class datalynxfield_url extends datalynxfield_base {
-
     public $class;
 
     public $target;
@@ -36,7 +35,7 @@ class datalynxfield_url extends datalynxfield_base {
 
     /**
      * Can this field be used in fieldgroups?
-     * @var boolean
+     * @var bool
      */
     protected $forfieldgroup = true;
 
@@ -68,7 +67,6 @@ class datalynxfield_url extends datalynxfield_base {
         if (!empty($values)) {
             foreach ($values as $name => $value) {
                 if ($name) { // Update from form.
-
                     switch ($name) {
                         case 'url':
                             // TODO: Is this really the place to validate for empty fields?
@@ -78,7 +76,6 @@ class datalynxfield_url extends datalynxfield_base {
                             $linktext = clean_param($value, PARAM_NOTAGS);
                             break;
                     }
-
                 } else { // Update from import.
                     if (strpos($value, '##') !== false) {
                         $value = explode('##', $value);

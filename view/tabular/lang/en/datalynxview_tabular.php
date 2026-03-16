@@ -16,13 +16,13 @@
 
 /**
  *
- * @package datalynxview
+ * @package datalynxview_tabular
  * @subpackage tabular
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-$string['pluginname'] = 'Tabular';
 $string['headerrow'] = 'Table with header row';
-$string['table'] = 'Table design';
+$string['pluginname'] = 'Tabular';
 $string['privacy:metadata'] = 'The tabular view does not store personal data.';
+$string['table'] = 'Table design';

@@ -33,7 +33,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class rule_created extends \core\event\base {
-
     /**
      * Init method.
      *

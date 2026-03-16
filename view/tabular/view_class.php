@@ -18,7 +18,7 @@
  * This file is part of the Datalynx module for Moodle - http:// Moodle.org/.
  *
  *
- * @package datalynxview
+ * @package datalynxview_tabular
  * @subpackage tabular
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
@@ -39,7 +39,6 @@ require_once("$CFG->dirroot/mod/datalynx/classes/view/base.php");
  * param3 - table header
  */
 class datalynxview_tabular extends base {
-
     protected string $type = 'tabular';
 
     protected array $_editors = ['section', 'param2'];
@@ -91,8 +90,11 @@ class datalynxview_tabular extends base {
         // Construct the table.
         $table->data = [$row1, $row2, $row3];
         $sectiondefault = html_writer::table($table);
-        $this->view->esection = html_writer::tag('div', $sectiondefault,
-                        ['class' => 'mdl-align']) . "<div>##entries##</div>";
+        $this->view->esection = html_writer::tag(
+            'div',
+            $sectiondefault,
+            ['class' => 'mdl-align']
+        ) . "<div>##entries##</div>";
 
         // Set content table.
         $table = new html_table();
@@ -149,8 +151,12 @@ class datalynxview_tabular extends base {
     public function display(array $options = []): string {
         parent::display($options);
         global $PAGE;
-        $PAGE->requires->js_init_call('M.datalynxview_tabular.init', [], false,
-                $this->get_js_module());
+        $PAGE->requires->js_init_call(
+            'M.datalynxview_tabular.init',
+            [],
+            false,
+            $this->get_js_module()
+        );
         $PAGE->requires->js_call_amd('mod_datalynx/bulkactions', 'init');
         return '';
     }
@@ -158,7 +164,7 @@ class datalynxview_tabular extends base {
     private function get_js_module() {
         $jsmodule = ['name' => 'datalynxview_tabular',
                 'fullpath' => '/mod/datalynx/view/tabular/tabular.js',
-                'requires' => ['node', 'event', 'node-event-delegate'
+                'requires' => ['node', 'event', 'node-event-delegate',
                 ]];
         return $jsmodule;
     }
@@ -182,7 +188,6 @@ class datalynxview_tabular extends base {
         if (empty($entriesset)) {
             $elements[] = ['html', $opengroupdiv . $groupheading . $tablehtml . $closegroupdiv];
         } else {
-
             // Strip the table-responsive wrapper that html_writer::table() adds by default
             // in newer Moodle versions, so the template starts with <table>.
             $tablehtml = preg_replace('/^<div[^>]*\btable-responsive\b[^>]*>\s*/i', '', $tablehtml);
@@ -223,7 +228,7 @@ class datalynxview_tabular extends base {
             $entrytemplate = $tablehtml;
             // Construct elements.
             // First everything before the entrytemplate as html.
-            $elements[] = ['html', $opengroupdiv . $groupheading . $opentable . $headerrow . '<tbody>'
+            $elements[] = ['html', $opengroupdiv . $groupheading . $opentable . $headerrow . '<tbody>',
             ];
 
             // Do the entries.

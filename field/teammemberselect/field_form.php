@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_teammemberselect
  * @subpackage teammemberselect
  * @copyright 2013 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -26,7 +26,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
 class datalynxfield_teammemberselect_form extends datalynxfield_form {
-
     /**
      * Defines the necessary form elements for field creation
      */
@@ -45,8 +44,13 @@ class datalynxfield_teammemberselect_form extends datalynxfield_form {
         $mform->addElement('text', 'param1', get_string('teamsize', 'datalynx'), ['size' => 3]);
         $mform->addHelpButton('param1', 'teamsize', 'datalynx');
         $mform->setType('param1', PARAM_INT);
-        $mform->addRule('param1', get_string('teamsizeerrorrequired', 'datalynx'), 'required',
-                null, 'client');
+        $mform->addRule(
+            'param1',
+            get_string('teamsizeerrorrequired', 'datalynx'),
+            'required',
+            null,
+            'client'
+        );
         $mform->addRule(['param1', 'zero'], get_string('teamsizeerrorvalue', 'datalynx'), 'compare', 'gt');
 
         // Minimum required team size.
@@ -92,8 +96,13 @@ class datalynxfield_teammemberselect_form extends datalynxfield_form {
             }
         }
 
-        $mform->addElement('checkbox', 'teamfieldenable', get_string('teamfield', 'datalynx'),
-                $message, $attributes);
+        $mform->addElement(
+            'checkbox',
+            'teamfieldenable',
+            get_string('teamfield', 'datalynx'),
+            $message,
+            $attributes
+        );
         $mform->addHelpButton('teamfieldenable', 'teamfield', 'datalynx');
 
         $fieldmenu = $this->_df->get_fields(array_keys($this->_df->get_internal_fields()), true);

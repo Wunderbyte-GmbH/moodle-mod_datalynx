@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_gradeitem
  * @subpackage gradeitem
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
 class datalynxfield_gradeitem_form extends datalynxfield_form {
-
     /**
      */
     public function field_definition() {
@@ -35,8 +34,11 @@ class datalynxfield_gradeitem_form extends datalynxfield_form {
 
         $mform = &$this->_form;
 
-        $mform->addElement('header', 'fieldattributeshdr',
-                get_string('fieldattributes', 'datalynx'));
+        $mform->addElement(
+            'header',
+            'fieldattributeshdr',
+            get_string('fieldattributes', 'datalynx')
+        );
 
         // Info field.
         $sql = "SELECT gi.id, c.fullname,
@@ -62,8 +64,12 @@ class datalynxfield_gradeitem_form extends datalynxfield_form {
 
         $mform->addElement('hidden', 'param1');
         $mform->setType('param1', PARAM_INT);
-        $mform->addElement('static', '', get_string('gradeitem', 'datalynx'),
-                html_writer::select($actualoptions, "param1", '', ['' => 'choosedots']));
+        $mform->addElement(
+            'static',
+            '',
+            get_string('gradeitem', 'datalynx'),
+            html_writer::select($actualoptions, "param1", '', ['' => 'choosedots'])
+        );
 
         $module = ['name' => 'mod_datalynx', 'fullpath' => '/mod/datalynx/amd/src/patterndialogue.js'];
 

@@ -29,7 +29,6 @@ use completion_info;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mobile {
-
     /**
      * Returns all entries of an instance for the mobile app.
      * @param  array $args Arguments from tool_mobile_get_content WS
@@ -45,9 +44,9 @@ class mobile {
         $buttons = true; // Hide buttons if false.
 
         // Capabilities check.
-        require_login($args->courseid , false , $cm, true, true);
+        require_login($args->courseid, false, $cm, true, true);
         $context = context_module::instance($cm->id);
-        require_capability ('mod/datalynx:viewentry', $context);
+        require_capability('mod/datalynx:viewentry', $context);
         if ($args->userid != $USER->id) {
             require_capability('mod/datalynx:manageentries', $context);
         }
@@ -74,7 +73,6 @@ class mobile {
         }
 
         if ($args->action == 'delete') {
-
             // Check if we are allowed to do that.
             require_capability('mod/datalynx:manageentries', $context);
             $html .= "<h1>Mock-deleted entry $args->entry!</h1>";
@@ -96,7 +94,7 @@ class mobile {
             // TODO: Ion-footer does not work, make this look like the plus in data or forum.
             $args = "[args]='{entry: -1, action: \"new\", cmid: $args->cmid, courseid: $args->courseid }'";
             $html .= "<button ion-button core-site-plugins-new-content title='newbutton' component='mod_datalynx'";
-            $html .= " method='mobile_course_view' $args>".get_string('entryaddnew', 'datalynx')."</button>";
+            $html .= " method='mobile_course_view' $args>" . get_string('entryaddnew', 'datalynx') . "</button>";
 
             // Round button icon with plus.
             $html .= '<button ion-fab class="fab fab-md" aria-label="Add a new entry">

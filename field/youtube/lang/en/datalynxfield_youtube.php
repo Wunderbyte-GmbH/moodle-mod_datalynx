@@ -16,14 +16,14 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_youtube
  * @subpackage youtube
  * @copyright 2021 michael pollak <moodle@michaelpollak.org>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+$string['heightpx'] = 'Height in pixels.';
 $string['pluginname'] = 'Youtube';
 $string['privacy:metadata'] = 'Youtubefields do not store personal data.';
-$string['heightpx'] = 'Height in pixels.';
 $string['widthpx'] = 'Width in pixels.';
 $string['youtubeurl'] = 'Youtube URL';
 $string['youtubeurl_help'] = 'Please enter the url of your video, for example https://www.youtube.com/watch?v=dQw4w9WgXcQ';

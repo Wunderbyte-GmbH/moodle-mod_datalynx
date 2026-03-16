@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package mod_datalynx
  * @copyright 2014 onwards by edulabs.org and associated programmers
  * @copyright based on the work by 2013 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -26,14 +26,20 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->libdir/formslib.php");
 
 class datalynxfield_form extends moodleform {
-
     protected $_field = null;
 
     // Variable $_df datalynx.
     protected $_df = null;
 
-    public function __construct($field, $action = null, $customdata = null, $method = 'post', $target = '',
-            $attributes = null, $editable = true) {
+    public function __construct(
+        $field,
+        $action = null,
+        $customdata = null,
+        $method = 'post',
+        $target = '',
+        $attributes = null,
+        $editable = true
+    ) {
         $this->_field = $field;
         $this->_df = $field->df();
 
@@ -71,8 +77,11 @@ class datalynxfield_form extends moodleform {
         // Save and display.
         $buttonarray[] = &$mform->createElement('submit', 'submitbutton', get_string('savechanges'));
         // Save and continue.
-        $buttonarray[] = &$mform->createElement('submit', 'submitbutton',
-                get_string('savecontinue', 'datalynx'));
+        $buttonarray[] = &$mform->createElement(
+            'submit',
+            'submitbutton',
+            get_string('savecontinue', 'datalynx')
+        );
         // Cancel.
         $buttonarray[] = &$mform->createElement('cancel');
         $mform->addGroup($buttonarray, 'buttonar', '', [' '], false);
@@ -137,7 +146,8 @@ class datalynxfield_form extends moodleform {
                     $dfmenu[$dl->courseshortname] = [];
                 }
                 $dfmenu[$dl->courseshortname][$dlid] = strip_tags(
-                        format_string($dl->name, true));
+                    format_string($dl->name, true)
+                );
             }
         } else {
             $dfmenu = ['' => [0 => get_string('nodatalynxs', 'datalynx')]];
@@ -153,7 +163,6 @@ class datalynxfield_form extends moodleform {
  *
  */
 class datalynxfield_option_form extends datalynxfield_form {
-
     /**
      * @var datalynxfield_option
      */
@@ -172,14 +181,22 @@ class datalynxfield_option_form extends datalynxfield_form {
         $options = $this->_field->get_options();
         if (!empty($options)) {
             $group = [];
-            $group[] = &$mform->createElement('static', null, null,
-                    '<table><thead><th>' . get_string('option', 'datalynx') . '</th><th>' .
+            $group[] = &$mform->createElement(
+                'static',
+                null,
+                null,
+                '<table><thead><th>' . get_string('option', 'datalynx') . '</th><th>' .
                     get_string('renameoption', 'datalynx') . '</th><th>' .
-                    get_string('deleteoption', 'datalynx') . '</th></thead><tbody>');
+                get_string('deleteoption', 'datalynx') . '</th></thead><tbody>'
+            );
             foreach ($options as $id => $option) {
                 $option = htmlspecialchars($option);
-                $group[] = &$mform->createElement('static', null, null,
-                        "<tr><td>{$option}</td><td>");
+                $group[] = &$mform->createElement(
+                    'static',
+                    null,
+                    null,
+                    "<tr><td>{$option}</td><td>"
+                );
                 $group[] = &$mform->createElement('text', "renameoption[{$id}]", '', ['size' => 32]);
                 $group[] = &$mform->createElement('static', null, null, '</td><td>');
                 $group[] = &$mform->createElement('checkbox', "deleteoption[{$id}]", '', null, ['size' => 1]);
@@ -189,17 +206,31 @@ class datalynxfield_option_form extends datalynxfield_form {
                 $group[] = &$mform->createElement('static', null, null, '</td></tr>');
             }
             $group[] = &$mform->createElement('static', null, null, '</tbody></table>');
-            $tablerow = &$mform->createElement('group', 'existingoptions',
-                    get_string('existingoptions', 'datalynx'), $group, null, false);
+            $tablerow = &$mform->createElement(
+                'group',
+                'existingoptions',
+                get_string('existingoptions', 'datalynx'),
+                $group,
+                null,
+                false
+            );
             $mform->insertElementBefore($tablerow, 'param2');
-
         }
-        $addnew = &$mform->createElement('textarea', 'addoptions',
-                get_string('addoptions', 'datalynx'), 'wrap="soft" rows="5" cols="30"');
+        $addnew = &$mform->createElement(
+            'textarea',
+            'addoptions',
+            get_string('addoptions', 'datalynx'),
+            'wrap="soft" rows="5" cols="30"'
+        );
         $mform->insertElementBefore($addnew, 'param2');
         if (empty($options)) {
-            $mform->addRule('addoptions',
-                    get_string('err_required', 'form'), 'required', null, 'client');
+            $mform->addRule(
+                'addoptions',
+                get_string('err_required', 'form'),
+                'required',
+                null,
+                'client'
+            );
         }
     }
 
@@ -216,8 +247,10 @@ class datalynxfield_option_form extends datalynxfield_form {
         if (count($oldoptions) == 0 && empty($data['addoptions'])) {
             $errors['existingoptions'] = get_string('nooptions', 'datalynx');
         } else {
-            if (isset($data['deleteoption']) && count($data['deleteoption']) == count(
-                            $oldoptions) && empty($data['addoptions'])
+            if (
+                isset($data['deleteoption']) && count($data['deleteoption']) == count(
+                    $oldoptions
+                ) && empty($data['addoptions'])
             ) {
                 $errors['existingoptions'] = get_string('nooptions', 'datalynx');
             } else {

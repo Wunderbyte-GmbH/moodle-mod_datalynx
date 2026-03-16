@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_entryteammemberprofilefield
  * @subpackage entryauthor
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
@@ -33,7 +33,6 @@ require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 /**
  */
 class datalynxfield_entryteammemberprofilefield_renderer extends datalynxfield_renderer {
-
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
         $fieldid = $this->_field->id();
         $fieldname = "f_{$i}_$fieldid";
@@ -46,5 +45,4 @@ class datalynxfield_entryteammemberprofilefield_renderer extends datalynxfield_r
 
         return [$arr, null];
     }
-
 }

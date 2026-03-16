@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_gradeitem
  * @subpackage gradeitem
  * @copyright 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -28,7 +28,6 @@ require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 /**
  */
 class datalynxfield_gradeitem_renderer extends datalynxfield_renderer {
-
     public function render_display_mode(stdClass $entry, array $options): string {
         $field = $this->_field;
         $fieldid = $field->id();

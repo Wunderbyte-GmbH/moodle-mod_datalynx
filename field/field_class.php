@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package mod_datalynx
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -31,7 +31,6 @@ require_once(dirname(__FILE__) . '/../renderer/renderer.php');
  * Base class for Datalynx Field Types
  */
 abstract class datalynxfield_base {
-
     const VISIBLE_NONE = 0;
 
     const VISIBLE_OWNER = 1;
@@ -70,7 +69,7 @@ abstract class datalynxfield_base {
      * Can this field be used in fieldgroups?
      * Only fields where user can enter data via a form can be used in a fieldgroup.
      * Override if yes.
-     * @var boolean
+     * @var bool
      */
     protected $forfieldgroup = false;
 
@@ -129,7 +128,8 @@ abstract class datalynxfield_base {
         $this->field->label = !empty($forminput->label) ? $forminput->label : '';
         for ($i = 1; $i <= 10; $i++) {
             $this->field->{"param$i"} = !empty($forminput->{"param$i"}) ? trim(
-                    $forminput->{"param$i"}) : null;
+                $forminput->{"param$i"}
+            ) : null;
         }
     }
 
@@ -250,8 +250,10 @@ abstract class datalynxfield_base {
             require_once($CFG->dirroot . '/mod/datalynx/field/field_form.php');
             $formclass = 'datalynxfield_form';
         }
-        $actionurl = new moodle_url('/mod/datalynx/field/field_edit.php',
-                ['d' => $this->df->id(), 'fid' => $this->id(), 'type' => $this->type]);
+        $actionurl = new moodle_url(
+            '/mod/datalynx/field/field_edit.php',
+            ['d' => $this->df->id(), 'fid' => $this->id(), 'type' => $this->type]
+        );
         return new $formclass($this, $actionurl);
     }
 
@@ -285,7 +287,7 @@ abstract class datalynxfield_base {
     }
 
     protected static $defaultoptions = ['manage' => false, 'visible' => false, 'edit' => false,
-            'editable' => false, 'disabled' => false, 'required' => false, 'internal' => false
+            'editable' => false, 'disabled' => false, 'required' => false, 'internal' => false,
     ];
 
     // CONTENT MANAGEMENT.
@@ -299,8 +301,11 @@ abstract class datalynxfield_base {
      * @return array
      */
     public function get_definitions($tags, $entry, array $options) {
-        return $this->renderer()->replacements($tags, $entry,
-                array_merge(self::$defaultoptions, $options));
+        return $this->renderer()->replacements(
+            $tags,
+            $entry,
+            array_merge(self::$defaultoptions, $options)
+        );
     }
 
     /**
@@ -325,7 +330,7 @@ abstract class datalynxfield_base {
 
         $fieldid = $this->field->id;
         $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
-        list($contents, $oldcontents) = $this->format_content($entry, $values);
+        [$contents, $oldcontents] = $this->format_content($entry, $values);
 
         $rec = new stdClass();
         $rec->fieldid = $this->field->id;
@@ -382,8 +387,12 @@ abstract class datalynxfield_base {
         if ($rs->valid()) {
             $fs = get_file_storage();
             foreach ($rs as $content) {
-                $fs->delete_area_files($this->df->context->id, 'mod_datalynx', 'content',
-                        $content->id);
+                $fs->delete_area_files(
+                    $this->df->context->id,
+                    'mod_datalynx',
+                    'content',
+                    $content->id
+                );
             }
         }
         $rs->close();
@@ -628,7 +637,7 @@ abstract class datalynxfield_base {
     public function get_search_sql(array $search): array {
         global $DB;
 
-        list($not, $operator, $value) = $search;
+        [$not, $operator, $value] = $search;
 
         static $i = 0;
         $i++;
@@ -649,20 +658,30 @@ abstract class datalynxfield_base {
         }
 
         if ($operator === '') {
-            list($sql, $params) = $DB->get_in_or_equal('', SQL_PARAMS_NAMED, "df_{$fieldid}_",
-                    false);
+            [$sql, $params] = $DB->get_in_or_equal(
+                '',
+                SQL_PARAMS_NAMED,
+                "df_{$fieldid}_",
+                false
+            );
             $sql = " $varcharcontent $sql ";
         } else {
             if ($operator === '=') {
                 $searchvalue = trim($value);
-                list($sql, $params) = $DB->get_in_or_equal($searchvalue, SQL_PARAMS_NAMED,
-                        "df_{$fieldid}_");
+                [$sql, $params] = $DB->get_in_or_equal(
+                    $searchvalue,
+                    SQL_PARAMS_NAMED,
+                    "df_{$fieldid}_"
+                );
                 $sql = " $varcharcontent $sql ";
             } else {
                 if ($operator === 'IN') {
                     $searchvalue = array_map('trim', $value);
-                    list($sql, $params) = $DB->get_in_or_equal($searchvalue, SQL_PARAMS_NAMED,
-                            "df_{$fieldid}_");
+                    [$sql, $params] = $DB->get_in_or_equal(
+                        $searchvalue,
+                        SQL_PARAMS_NAMED,
+                        "df_{$fieldid}_"
+                    );
                     $sql = " $varcharcontent $sql ";
                 } else {
                     if (in_array($operator, ['LIKE', 'BETWEEN', ''])) {
@@ -680,8 +699,12 @@ abstract class datalynxfield_base {
             // Get entry ids for entries that meet the criterion.
             if ($eids = $this->get_entry_ids_for_content($sql, $params)) {
                 // Get NOT IN sql.
-                list($notinids, $params) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED,
-                        "df_{$fieldid}_", false);
+                [$notinids, $params] = $DB->get_in_or_equal(
+                    $eids,
+                    SQL_PARAMS_NAMED,
+                    "df_{$fieldid}_",
+                    false
+                );
                 $sql = " e.id $notinids ";
                 return [$sql, $params, false];
             } else {
@@ -720,7 +743,7 @@ abstract class datalynxfield_base {
     /**
      */
     public function format_search_value($searchparams) {
-        list($not, $operator, $value) = $searchparams;
+        [$not, $operator, $value] = $searchparams;
         return $not . ' ' . $operator . ' ' . $value;
     }
 
@@ -819,7 +842,6 @@ abstract class datalynxfield_base {
  * Base class for Datalynx field types that require no content. Example: User profile fields.
  */
 abstract class datalynxfield_no_content extends datalynxfield_base {
-
     public function update_content(stdClass $entry, array $values = null) {
         return true;
     }
@@ -854,7 +876,6 @@ abstract class datalynxfield_no_content extends datalynxfield_base {
  * from a set of options
  */
 abstract class datalynxfield_option extends datalynxfield_base {
-
     protected $_options = [];
 
     /**
@@ -929,8 +950,10 @@ abstract class datalynxfield_option extends datalynxfield_base {
         $oldvalues = $newvalues = $this->_options;
         $renames = !empty($forminput->renameoption) ? $forminput->renameoption : [];
         $deletes = !empty($forminput->deleteoption) ? $forminput->deleteoption : [];
-        $adds = preg_split("/[\|\r\n]+/",
-                !empty($forminput->addoptions) ? $forminput->addoptions : '');
+        $adds = preg_split(
+            "/[\|\r\n]+/",
+            !empty($forminput->addoptions) ? $forminput->addoptions : ''
+        );
 
         // Make sure there are no renames when options are deleted. That will not work.
         $delvalues = array_values($deletes);
@@ -991,7 +1014,7 @@ abstract class datalynxfield_option extends datalynxfield_base {
      * @see datalynxfield_base::format_search_value()
      */
     public function format_search_value($searchparams) {
-        list($not, $operator, $value) = $searchparams;
+        [$not, $operator, $value] = $searchparams;
         if (is_array($value)) {
             $selected = implode(', ', $value);
             return $not . ' ' . $operator . ' ' . $selected;
@@ -1031,7 +1054,6 @@ abstract class datalynxfield_option extends datalynxfield_base {
  * Base class for Datalynx field types that offer a set of options with multiple choice
  */
 class datalynxfield_option_multiple extends datalynxfield_option {
-
     /**
      * Update the selected options in the entries. The field value of an entry saves the selected
      * line numbers in a multiselect field. When an option is deleted, a line is deleted. Example:
@@ -1124,7 +1146,7 @@ class datalynxfield_option_multiple extends datalynxfield_option {
     public function get_search_sql(array $search): array {
         global $DB;
 
-        list($not, $operator, $value) = $search;
+        [$not, $operator, $value] = $search;
 
         static $i = 0; // FIXME: might cause problems!
         $i++;
@@ -1205,8 +1227,12 @@ class datalynxfield_option_multiple extends datalynxfield_option {
                         if ($eids = $this->get_entry_ids_for_content($sqlfind, $params)) { // There are.
                             // Non-empty.
                             // Contents.
-                            list($contentids, $paramsnot) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED,
-                                    "df_{$fieldid}_x_", false);
+                            [$contentids, $paramsnot] = $DB->get_in_or_equal(
+                                $eids,
+                                SQL_PARAMS_NAMED,
+                                "df_{$fieldid}_x_",
+                                false
+                            );
                             $params = array_merge($params, $paramsnot);
                             $sql = " (e.id $contentids) ";
                         }
@@ -1221,8 +1247,12 @@ class datalynxfield_option_multiple extends datalynxfield_option {
 
                         if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) { // There are non-empty.
                             // Contents.
-                            list($contentids, $paramsnot) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED,
-                                    "df_{$fieldid}_x_", !!$not);
+                            [$contentids, $paramsnot] = $DB->get_in_or_equal(
+                                $eids,
+                                SQL_PARAMS_NAMED,
+                                "df_{$fieldid}_x_",
+                                !!$not
+                            );
                             $params = array_merge($params, $paramsnot);
                             $sql = " (e.id $contentids) ";
                         } else { // There are no non-empty contents.
@@ -1242,8 +1272,12 @@ class datalynxfield_option_multiple extends datalynxfield_option {
             $sqlnot = str_replace('NOT (', '(', $sqlnot);
             if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) {
                 // Get NOT IN sql.
-                list($notinids, $paramsnot) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED,
-                        "df_{$fieldid}_x_", $notinidsequal);
+                [$notinids, $paramsnot] = $DB->get_in_or_equal(
+                    $eids,
+                    SQL_PARAMS_NAMED,
+                    "df_{$fieldid}_x_",
+                    $notinidsequal
+                );
                 $params = array_merge($params, $paramsnot);
                 $sql = " ($sql OR e.id $notinids) ";
             }
@@ -1271,7 +1305,6 @@ class datalynxfield_option_multiple extends datalynxfield_option {
  * Base class for Datalynx field types that offer a set of options with single choice
  */
 class datalynxfield_option_single extends datalynxfield_option {
-
     /**
      *
      * {@inheritDoc}
@@ -1368,7 +1401,7 @@ class datalynxfield_option_single extends datalynxfield_option {
     public function get_search_sql(array $search): array {
         global $DB;
 
-        list($not, $operator, $value) = $search;
+        [$not, $operator, $value] = $search;
 
         static $i = 0; // FIXME: might cause problems!
         $i++;
@@ -1390,7 +1423,7 @@ class datalynxfield_option_single extends datalynxfield_option {
 
         $usecontent = true;
         if ($operator === 'ANY_OF' || $operator === '=') {
-            list($insql, $params) = $DB->get_in_or_equal($value, SQL_PARAMS_NAMED, "param_{$i}_");
+            [$insql, $params] = $DB->get_in_or_equal($value, SQL_PARAMS_NAMED, "param_{$i}_");
             $sql = " $not ($content $insql) ";
         } else {
             if ($operator === '') {
@@ -1400,8 +1433,12 @@ class datalynxfield_option_single extends datalynxfield_option {
 
                 if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) { // There are non-empty.
                     // Contents.
-                    list($contentids, $paramsnot) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED,
-                            "df_{$fieldid}_x_", !!$not);
+                    [$contentids, $paramsnot] = $DB->get_in_or_equal(
+                        $eids,
+                        SQL_PARAMS_NAMED,
+                        "df_{$fieldid}_x_",
+                        !!$not
+                    );
                     $params = array_merge($params, $paramsnot);
                     $sql = " (e.id $contentids) ";
                 } else { // There are no non-empty contents.
@@ -1419,8 +1456,12 @@ class datalynxfield_option_single extends datalynxfield_option {
             $sqlnot = str_replace('NOT (', '(', $sqlnot);
             if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) {
                 // Get NOT IN sql.
-                list($notinids, $paramsnot) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED,
-                        "df_{$fieldid}_x_", $notinidsequal);
+                [$notinids, $paramsnot] = $DB->get_in_or_equal(
+                    $eids,
+                    SQL_PARAMS_NAMED,
+                    "df_{$fieldid}_x_",
+                    $notinidsequal
+                );
                 $params = array_merge($params, $paramsnot);
                 $sql = " ($sql OR e.id $notinids) ";
             }

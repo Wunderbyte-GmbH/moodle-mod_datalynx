@@ -16,7 +16,7 @@
 
 /**
  *
- * @package mod-datalynx
+ * @package mod_datalynx
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -30,329 +30,329 @@ $capabilities = [
                 'captype' => 'write',
                 'contextlevel' => CONTEXT_COURSE,
                 'archetypes' => ['editingteacher' => CAP_ALLOW, 'manager' => CAP_ALLOW],
-                'clonepermissionsfrom' => 'moodle/course:manageactivities'
+                'clonepermissionsfrom' => 'moodle/course:manageactivities',
         ],
 
-    // Manage templates: do anything in the datalynx.
+        // Manage templates: do anything in the datalynx.
         'mod/datalynx:managetemplates' => [
                 'riskbitmask' => RISK_SPAM | RISK_XSS,
                 'captype' => 'write',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => ['editingteacher' => CAP_ALLOW, 'manager' => CAP_ALLOW]
+                'archetypes' => ['editingteacher' => CAP_ALLOW, 'manager' => CAP_ALLOW],
         ],
 
-    // View index.
+        // View index.
         'mod/datalynx:viewindex' => [
                 'captype' => 'read',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => ['teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW, 'manager' => CAP_ALLOW]
+                'archetypes' => ['teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW, 'manager' => CAP_ALLOW],
         ],
 
-    // ENTRIES.
-    // Manage entries: view, write, delete, export etc.
+        // ENTRIES.
+        // Manage entries: view, write, delete, export etc.
         'mod/datalynx:manageentries' => [
                 'riskbitmask' => RISK_SPAM | RISK_DATALOSS,
                 'captype' => 'write',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => ['editingteacher' => CAP_ALLOW, 'manager' => CAP_ALLOW]
+                'archetypes' => ['editingteacher' => CAP_ALLOW, 'manager' => CAP_ALLOW],
         ],
 
-    // Approve an entry.
+        // Approve an entry.
         'mod/datalynx:approve' => [
                 'riskbitmask' => RISK_SPAM,
                 'captype' => 'write',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => ['teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW, 'manager' => CAP_ALLOW]
+                'archetypes' => ['teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW, 'manager' => CAP_ALLOW],
         ],
 
-    // View entries.
+        // View entries.
         'mod/datalynx:viewentry' => [
                 'captype' => 'read',
                 'contextlevel' => CONTEXT_MODULE,
                 'archetypes' => ['frontpage' => CAP_ALLOW, // Needed for datalynxs on the frontpage.
                         'guest' => CAP_ALLOW, 'user' => CAP_ALLOW, 'student' => CAP_ALLOW, 'teacher' => CAP_ALLOW,
-                        'editingteacher' => CAP_ALLOW, 'manager' => CAP_ALLOW]
+                        'editingteacher' => CAP_ALLOW, 'manager' => CAP_ALLOW],
         ],
 
-    // Write entries.
+        // Write entries.
         'mod/datalynx:writeentry' => [
                 'riskbitmask' => RISK_SPAM,
                 'captype' => 'write',
                 'contextlevel' => CONTEXT_MODULE,
                 'archetypes' => ['student' => CAP_ALLOW, 'teacher' => CAP_ALLOW,
-                        'editingteacher' => CAP_ALLOW, 'manager' => CAP_ALLOW]
+                        'editingteacher' => CAP_ALLOW, 'manager' => CAP_ALLOW],
         ],
 
-    // View anonymous entries.
+        // View anonymous entries.
         'mod/datalynx:viewanonymousentry' => [
                 'captype' => 'read', 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => ['teacher' => CAP_ALLOW, 'manager' => CAP_ALLOW]
+                'archetypes' => ['teacher' => CAP_ALLOW, 'manager' => CAP_ALLOW],
         ],
 
-    // Export entries.
+        // Export entries.
         'mod/datalynx:exportentry' => [
                 'riskbitmask' => RISK_PERSONAL,
                 'captype' => 'read',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => ['manager' => CAP_ALLOW, 'teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW]
+                'archetypes' => ['manager' => CAP_ALLOW, 'teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW],
         ],
 
-    // Export own entries.
+        // Export own entries.
         'mod/datalynx:exportownentry' => [
                 'captype' => 'read',
                 'contextlevel' => CONTEXT_MODULE,
                 'archetypes' => ['manager' => CAP_ALLOW, 'teacher' => CAP_ALLOW,
-                        'editingteacher' => CAP_ALLOW, 'student' => CAP_ALLOW]
+                        'editingteacher' => CAP_ALLOW, 'student' => CAP_ALLOW],
         ],
 
-    // Export all entries.
+        // Export all entries.
         'mod/datalynx:exportallentries' => [
                 'riskbitmask' => RISK_PERSONAL,
                 'captype' => 'read',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => ['manager' => CAP_ALLOW, 'teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW]
+                'archetypes' => ['manager' => CAP_ALLOW, 'teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW],
         ],
 
-    // COMMENTS.
-    // Manage comments.
+        // COMMENTS.
+        // Manage comments.
         'mod/datalynx:managecomments' => [
                 'riskbitmask' => RISK_SPAM,
                 'captype' => 'write',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => ['teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW, 'manager' => CAP_ALLOW]
+                'archetypes' => ['teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW, 'manager' => CAP_ALLOW],
         ],
 
-    // Comment on entries.
+        // Comment on entries.
         'mod/datalynx:comment' => [
                 'riskbitmask' => RISK_SPAM,
                 'captype' => 'write',
                 'contextlevel' => CONTEXT_MODULE,
                 'archetypes' => ['student' => CAP_ALLOW, 'teacher' => CAP_ALLOW,
-                        'editingteacher' => CAP_ALLOW, 'manager' => CAP_ALLOW]
+                        'editingteacher' => CAP_ALLOW, 'manager' => CAP_ALLOW],
         ],
 
-    // RATINGS.
-    // Manage ratings.
+        // RATINGS.
+        // Manage ratings.
         'mod/datalynx:manageratings' => [
                 'riskbitmask' => RISK_SPAM,
                 'captype' => 'write',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => ['teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW, 'manager' => CAP_ALLOW]
+                'archetypes' => ['teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW, 'manager' => CAP_ALLOW],
         ],
 
-    // Rate entries.
+        // Rate entries.
         'mod/datalynx:rate' => [
                 'captype' => 'write',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => ['teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW, 'manager' => CAP_ALLOW]
+                'archetypes' => ['teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW, 'manager' => CAP_ALLOW],
         ],
 
-    // View entry ratings.
+        // View entry ratings.
         'mod/datalynx:ratingsview' => [
                 'captype' => 'read',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => ['teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW, 'manager' => CAP_ALLOW]
+                'archetypes' => ['teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW, 'manager' => CAP_ALLOW],
         ],
 
-    // Moodle.org: Allows the user to view aggregated ratings made on other people's items (but not their own).
+        // Moodle.org: Allows the user to view aggregated ratings made on other people's items (but not their own).
         'mod/datalynx:ratingsviewany' => [
                 'riskbitmask' => RISK_PERSONAL,
                 'captype' => 'read',
                 'contextlevel' => CONTEXT_MODULE,
                 'archetypes' => ['teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW, 'manager' => CAP_ALLOW],
-                'clonepermissionsfrom' => 'mod/datalynx:ratingsview'
+                'clonepermissionsfrom' => 'mod/datalynx:ratingsview',
         ],
 
-    // Moodle.org: Allows the user to see individual ratings.
+        // Moodle.org: Allows the user to see individual ratings.
         'mod/datalynx:ratingsviewall' => [
                 'riskbitmask' => RISK_PERSONAL,
                 'captype' => 'read',
                 'contextlevel' => CONTEXT_MODULE,
                 'archetypes' => ['teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW, 'manager' => CAP_ALLOW],
-                'clonepermissionsfrom' => 'mod/datalynx:ratingsview'
+                'clonepermissionsfrom' => 'mod/datalynx:ratingsview',
         ],
 
-    // PRESETS.
-    // Manage user presets.
+        // PRESETS.
+        // Manage user presets.
         'mod/datalynx:managepresets' => [
                 'riskbitmask' => RISK_SPAM | RISK_XSS,
                 'captype' => 'write',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => ['manager' => CAP_ALLOW]
+                'archetypes' => ['manager' => CAP_ALLOW],
         ],
 
-    // View all user presets.
+        // View all user presets.
         'mod/datalynx:presetsviewall' => [
                 'captype' => 'read',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => ['teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW, 'manager' => CAP_ALLOW]
+                'archetypes' => ['teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW, 'manager' => CAP_ALLOW],
         ],
 
-    // NOTIFICATIONS.
-    // Notified on added entry.
+        // NOTIFICATIONS.
+        // Notified on added entry.
         'mod/datalynx:notifyentryadded' => [
                 'riskbitmask' => RISK_PERSONAL,
                 'captype' => 'read',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => ['teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW]
+                'archetypes' => ['teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW],
         ],
 
-    // Notified on updated entry.
+        // Notified on updated entry.
         'mod/datalynx:notifyentryupdated' => [
                 'riskbitmask' => RISK_PERSONAL,
                 'captype' => 'read',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => ['teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW]
+                'archetypes' => ['teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW],
         ],
 
-    // Notified on deleted entry.
+        // Notified on deleted entry.
         'mod/datalynx:notifyentrydeleted' => [
                 'riskbitmask' => RISK_PERSONAL,
                 'captype' => 'read',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => ['teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW]
+                'archetypes' => ['teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW],
         ],
 
-    // Notified on approved entry.
+        // Notified on approved entry.
         'mod/datalynx:notifyentryapproved' => [
                 'riskbitmask' => RISK_PERSONAL,
                 'captype' => 'read',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => ['teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW]
+                'archetypes' => ['teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW],
         ],
 
-    // Notified on disapproved entry.
+        // Notified on disapproved entry.
         'mod/datalynx:notifyentrydisapproved' => [
                 'riskbitmask' => RISK_PERSONAL,
                 'captype' => 'read',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => ['teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW]
+                'archetypes' => ['teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW],
         ],
 
-    // Notified on added comment.
+        // Notified on added comment.
         'mod/datalynx:notifycommentadded' => [
                 'riskbitmask' => RISK_PERSONAL,
                 'captype' => 'read',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => ['teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW]
+                'archetypes' => ['teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW],
         ],
 
-    // Notified on added rating.
+        // Notified on added rating.
         'mod/datalynx:notifyratingadded' => [
                 'riskbitmask' => RISK_PERSONAL,
                 'captype' => 'read',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => ['teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW]
+                'archetypes' => ['teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW],
         ],
 
-    // Notified on updated rating.
+        // Notified on updated rating.
         'mod/datalynx:notifyratingupdated' => [
                 'riskbitmask' => RISK_PERSONAL,
                 'captype' => 'read',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => ['teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW]
+                'archetypes' => ['teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW],
         ],
 
-    // Notified on updated team.
+        // Notified on updated team.
         'mod/datalynx:notifyteamupdated' => [
                 'riskbitmask' => RISK_PERSONAL,
                 'captype' => 'read',
                 'contextlevel' => CONTEXT_MODULE,
                 'archetypes' => ['manager' => CAP_ALLOW, 'teacher' => CAP_ALLOW,
-                        'editingteacher' => CAP_ALLOW, 'student' => CAP_ALLOW]
+                        'editingteacher' => CAP_ALLOW, 'student' => CAP_ALLOW],
         ],
 
-    // Allow viewing of entries marked as draft.
+        // Allow viewing of entries marked as draft.
         'mod/datalynx:viewdrafts' => [
                 'riskbitmask' => RISK_PERSONAL,
                 'captype' => 'read',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => ['manager' => CAP_ALLOW]
+                'archetypes' => ['manager' => CAP_ALLOW],
         ],
 
-    // Allow viewing of entries marked as draft.
+        // Allow viewing of entries marked as draft.
         'mod/datalynx:editrestrictedfields' => [
                 'riskbitmask' => RISK_PERSONAL,
                 'captype' => 'read',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => ['manager' => CAP_ALLOW]
+                'archetypes' => ['manager' => CAP_ALLOW],
         ],
 
         'mod/datalynx:viewprivilegeadmin' => [
                 'riskbitmask' => RISK_PERSONAL,
                 'captype' => 'read',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => []
+                'archetypes' => [],
         ],
 
         'mod/datalynx:viewprivilegemanager' => [
                 'riskbitmask' => RISK_PERSONAL,
                 'captype' => 'read',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => ['manager' => CAP_ALLOW]
+                'archetypes' => ['manager' => CAP_ALLOW],
         ],
 
         'mod/datalynx:viewprivilegeteacher' => [
                 'riskbitmask' => RISK_PERSONAL,
                 'captype' => 'read',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => ['teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW]
+                'archetypes' => ['teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW],
         ],
 
         'mod/datalynx:viewprivilegestudent' => [
                 'riskbitmask' => RISK_PERSONAL,
                 'captype' => 'read',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => ['student' => CAP_ALLOW]
+                'archetypes' => ['student' => CAP_ALLOW],
         ],
 
         'mod/datalynx:viewprivilegeguest' => [
                 'riskbitmask' => RISK_PERSONAL,
                 'captype' => 'read',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => ['guest' => CAP_ALLOW, 'user' => CAP_ALLOW]
+                'archetypes' => ['guest' => CAP_ALLOW, 'user' => CAP_ALLOW],
         ],
 
         'mod/datalynx:editprivilegeadmin' => [
                 'riskbitmask' => RISK_PERSONAL, RISK_DATALOSS,
                 'captype' => 'write',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => []
+                'archetypes' => [],
         ],
 
         'mod/datalynx:editprivilegemanager' => [
                 'riskbitmask' => RISK_PERSONAL, RISK_DATALOSS,
                 'captype' => 'write',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => ['manager' => CAP_ALLOW]
+                'archetypes' => ['manager' => CAP_ALLOW],
         ],
 
         'mod/datalynx:editprivilegeteacher' => [
                 'riskbitmask' => RISK_PERSONAL, RISK_DATALOSS,
                 'captype' => 'write',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => ['teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW]
+                'archetypes' => ['teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW],
         ],
 
         'mod/datalynx:editprivilegestudent' => [
                 'riskbitmask' => RISK_PERSONAL, RISK_DATALOSS,
                 'captype' => 'write',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => ['student' => CAP_ALLOW]
+                'archetypes' => ['student' => CAP_ALLOW],
         ],
 
         'mod/datalynx:editprivilegeguest' => [
                 'riskbitmask' => RISK_PERSONAL, RISK_DATALOSS,
                 'captype' => 'write',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => ['guest' => CAP_ALLOW, 'user' => CAP_ALLOW]
+                'archetypes' => ['guest' => CAP_ALLOW, 'user' => CAP_ALLOW],
         ],
 
         'mod/datalynx:viewstatistics' => [
                 'riskbitmask' => RISK_PERSONAL,
                 'captype' => 'read',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => ['manager' => CAP_ALLOW, 'teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW]
+                'archetypes' => ['manager' => CAP_ALLOW, 'teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW],
         ],
 
         'mod/datalynx:teamsubscribe' => [
@@ -360,6 +360,6 @@ $capabilities = [
                 'captype' => 'write',
                 'contextlevel' => CONTEXT_MODULE,
                 'archetypes' => ['manager' => CAP_ALLOW, 'teacher' => CAP_ALLOW, 'editingteacher' => CAP_ALLOW,
-                        'student' => CAP_ALLOW]
-        ]
+                        'student' => CAP_ALLOW],
+        ],
 ];

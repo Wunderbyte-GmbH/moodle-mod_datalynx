@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxview
+ * @package datalynxview_pdf
  * @subpackage pdf
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/view/view_form.php");
 
 class datalynxview_pdf_form extends datalynxview_base_form {
-
     /**
      */
     public function view_definition_after_gps() {
@@ -48,19 +47,30 @@ class datalynxview_pdf_form extends datalynxview_base_form {
         $this->add_tags_selector('eparam2_editor', 'character');
 
         // PDF settings (param1).
-        $mform->addElement('header', 'pdfsettingshdr',
-                get_string('pdfsettings', 'datalynxview_pdf'));
+        $mform->addElement(
+            'header',
+            'pdfsettingshdr',
+            get_string('pdfsettings', 'datalynxview_pdf')
+        );
         // Document name.
-        $mform->addElement('text', 'docname', get_string('docname', 'datalynxview_pdf'),
-                ['size' => 64]);
+        $mform->addElement(
+            'text',
+            'docname',
+            get_string('docname', 'datalynxview_pdf'),
+            ['size' => 64]
+        );
         $mform->setType('docname', PARAM_TEXT);
         $mform->addHelpButton('docname', 'docname', 'datalynxview_pdf');
         // Orientation: Portrait, Landscape.
         $options = ['' => get_string('auto', 'datalynxview_pdf'),
                 'P' => get_string('portrait', 'datalynxview_pdf'),
                 'L' => get_string('landscape', 'datalynxview_pdf')];
-        $mform->addElement('select', 'orientation', get_string('orientation', 'datalynxview_pdf'),
-                $options);
+        $mform->addElement(
+            'select',
+            'orientation',
+            get_string('orientation', 'datalynxview_pdf'),
+            $options
+        );
         // Unit.
         $options = ['mm' => get_string('unit_mm', 'datalynxview_pdf'),
                 'pt' => get_string('unit_pt', 'datalynxview_pdf'),
@@ -74,8 +84,12 @@ class datalynxview_pdf_form extends datalynxview_base_form {
         // Destination.
         $options = ['D' => get_string('dest_D', 'datalynxview_pdf'),
                 'I' => get_string('dest_I', 'datalynxview_pdf')];
-        $mform->addElement('select', 'destination', get_string('destination', 'datalynxview_pdf'),
-                $options);
+        $mform->addElement(
+            'select',
+            'destination',
+            get_string('destination', 'datalynxview_pdf'),
+            $options
+        );
 
         // PDF TOC.
         $mform->addElement('header', 'pdftochdr', get_string('pdftoc', 'datalynxview_pdf'));
@@ -88,20 +102,33 @@ class datalynxview_pdf_form extends datalynxview_base_form {
         $mform->setType('tocname', PARAM_TEXT);
         $mform->addHelpButton('tocname', 'tocname', 'datalynxview_pdf');
         // Title.
-        $mform->addElement('textarea', 'toctitle', get_string('toctitle', 'datalynxview_pdf'),
-                ['rows' => 3, 'style' => 'width:100%']);
+        $mform->addElement(
+            'textarea',
+            'toctitle',
+            get_string('toctitle', 'datalynxview_pdf'),
+            ['rows' => 3, 'style' => 'width:100%']
+        );
         $mform->addHelpButton('toctitle', 'toctitle', 'datalynxview_pdf');
         // Template.
-        $mform->addElement('textarea', 'toctmpl', get_string('toctmpl', 'datalynxview_pdf'),
-                ['rows' => 10, 'style' => 'width:100%']);
+        $mform->addElement(
+            'textarea',
+            'toctmpl',
+            get_string('toctmpl', 'datalynxview_pdf'),
+            ['rows' => 10, 'style' => 'width:100%']
+        );
         $mform->addHelpButton('toctmpl', 'toctmpl', 'datalynxview_pdf');
 
         // PDF Frame.
         $mform->addElement('header', 'pdfframehdr', get_string('pdfframe', 'datalynxview_pdf'));
         $fileoptions = ['subdirs' => 0, 'maxbytes' => -1, 'maxfiles' => 1,
                 'accepted_types' => ['image']];
-        $mform->addElement('filemanager', 'pdfframe', get_string('image', 'datalynxview_pdf'), null,
-                $fileoptions);
+        $mform->addElement(
+            'filemanager',
+            'pdfframe',
+            get_string('image', 'datalynxview_pdf'),
+            null,
+            $fileoptions
+        );
         $mform->addHelpButton('pdfframe', 'pdfframe', 'datalynxview_pdf');
         $mform->addElement('selectyesno', 'pdfframefirstpageonly', get_string('pdfframefirstpageonly', 'datalynxview_pdf'));
 
@@ -110,36 +137,59 @@ class datalynxview_pdf_form extends datalynxview_base_form {
         $fileoptions = ['subdirs' => 0, 'maxbytes' => -1, 'maxfiles' => 1,
                 'accepted_types' => ['image']];
         // Watermark image.
-        $mform->addElement('filemanager', 'pdfwmark', get_string('image', 'datalynxview_pdf'), null,
-                $fileoptions);
+        $mform->addElement(
+            'filemanager',
+            'pdfwmark',
+            get_string('image', 'datalynxview_pdf'),
+            null,
+            $fileoptions
+        );
         $mform->addHelpButton('pdfwmark', 'pdfwmark', 'datalynxview_pdf');
         // Watermark Transparency.
         $transunits = range(0, 1, 0.1);
         $options = array_combine($transunits, $transunits);
-        $mform->addElement('select', 'transparency', get_string('transparency', 'datalynxview_pdf'),
-                $options);
+        $mform->addElement(
+            'select',
+            'transparency',
+            get_string('transparency', 'datalynxview_pdf'),
+            $options
+        );
         $mform->addHelpButton('transparency', 'transparency', 'datalynxview_pdf');
 
         // PDF Header.
         $mform->addElement('header', 'pdfheaderhdr', get_string('pdfheader', 'datalynxview_pdf'));
         // Header enbabled.
-        $mform->addElement('selectyesno', 'headerenabled',
-                get_string('enabled', 'datalynxview_pdf'));
+        $mform->addElement(
+            'selectyesno',
+            'headerenabled',
+            get_string('enabled', 'datalynxview_pdf')
+        );
         // Header content (param3).
-        $mform->addElement('editor', 'eparam3_editor', get_string('content'), $editorattr,
-                $editoroptions['param3']);
+        $mform->addElement(
+            'editor',
+            'eparam3_editor',
+            get_string('content'),
+            $editorattr,
+            $editoroptions['param3']
+        );
         $mform->setDefault("eparam3_editor[format]", FORMAT_PLAIN);
         // Header margin top.
-        $mform->addElement('text', 'headermargintop',
-                get_string('margin', 'datalynxview_pdf') . ' ' .
-                get_string('margintop', 'datalynxview_pdf'));
+        $mform->addElement(
+            'text',
+            'headermargintop',
+            get_string('margin', 'datalynxview_pdf') . ' ' .
+            get_string('margintop', 'datalynxview_pdf')
+        );
         $mform->setType('headermargintop', PARAM_INT);
         $mform->addRule('headermargintop', null, 'numeric', null, 'client');
         $mform->disabledIf('headermargintop', 'headerenabled', 'eq', 0);
         // Header margin left.
-        $mform->addElement('text', 'headermarginleft',
-                get_string('margin', 'datalynxview_pdf') . ' ' .
-                get_string('marginleft', 'datalynxview_pdf'));
+        $mform->addElement(
+            'text',
+            'headermarginleft',
+            get_string('margin', 'datalynxview_pdf') . ' ' .
+            get_string('marginleft', 'datalynxview_pdf')
+        );
         $mform->setType('headermarginleft', PARAM_INT);
         $mform->addRule('headermarginleft', null, 'numeric', null, 'client');
         $mform->disabledIf('headermarginleft', 'headerenabled', 'eq', 0);
@@ -148,18 +198,30 @@ class datalynxview_pdf_form extends datalynxview_base_form {
         $mform->addElement('header', 'pdffooterhdr', get_string('pdffooter', 'datalynxview_pdf'));
 
         // Footer enbabled.
-        $mform->addElement('selectyesno', 'footerenabled',
-                get_string('enabled', 'datalynxview_pdf'));
+        $mform->addElement(
+            'selectyesno',
+            'footerenabled',
+            get_string('enabled', 'datalynxview_pdf')
+        );
 
         // Footer content (param4).
-        $mform->addElement('editor', 'eparam4_editor', get_string('content'), $editorattr,
-                $editoroptions['param4']);
+        $mform->addElement(
+            'editor',
+            'eparam4_editor',
+            get_string('content'),
+            $editorattr,
+            $editoroptions['param4']
+        );
         $mform->setDefault("eparam4_editor[format]", FORMAT_PLAIN);
 
         // Footer margin.
         $options = array_combine(range(1, 30), range(1, 30));
-        $mform->addElement('select', 'footermargin', get_string('margin', 'datalynxview_pdf'),
-                $options);
+        $mform->addElement(
+            'select',
+            'footermargin',
+            get_string('margin', 'datalynxview_pdf'),
+            $options
+        );
         $mform->disabledIf('footermargin', 'footerenabled', 'eq', 0);
 
         // PDF margins and paging.
@@ -171,28 +233,49 @@ class datalynxview_pdf_form extends datalynxview_base_form {
         $mform->setType('margintop', PARAM_INT);
         $mform->addElement('text', 'marginright', get_string('marginright', 'datalynxview_pdf'));
         $mform->setType('marginright', PARAM_INT);
-        $mform->addElement('selectyesno', 'marginkeep',
-                get_string('marginkeep', 'datalynxview_pdf'));
+        $mform->addElement(
+            'selectyesno',
+            'marginkeep',
+            get_string('marginkeep', 'datalynxview_pdf')
+        );
 
         // Page break.
         $options = ['none' => get_string('none'),
                 'auto' => get_string('auto', 'datalynxview_pdf'),
                 'entry' => get_string('entry', 'datalynx')];
-        $mform->addElement('select', 'pagebreak', get_string('pagebreak', 'datalynxview_pdf'),
-                $options);
+        $mform->addElement(
+            'select',
+            'pagebreak',
+            get_string('pagebreak', 'datalynxview_pdf'),
+            $options
+        );
 
         // Protection.
-        $mform->addElement('header', 'pdfprotectionhdr',
-                get_string('pdfprotection', 'datalynxview_pdf'));
+        $mform->addElement(
+            'header',
+            'pdfprotectionhdr',
+            get_string('pdfprotection', 'datalynxview_pdf')
+        );
 
         // Permissions.
         $perms = $view::get_permission_options();
         foreach ($perms as $perm => $label) {
-            $elemgrp[] = &$mform->createElement('advcheckbox', "perm_$perm", null, $label, ['size' => 1],
-                    ['', $perm]);
+            $elemgrp[] = &$mform->createElement(
+                'advcheckbox',
+                "perm_$perm",
+                null,
+                $label,
+                ['size' => 1],
+                ['', $perm]
+            );
         }
-        $mform->addGroup($elemgrp, "perms_grp", get_string('protperms', 'datalynxview_pdf'),
-                '<br />', false);
+        $mform->addGroup(
+            $elemgrp,
+            "perms_grp",
+            get_string('protperms', 'datalynxview_pdf'),
+            '<br />',
+            false
+        );
 
         // User Password.
         $mform->addElement('text', 'protuserpass', get_string('protuserpass', 'datalynxview_pdf'));
@@ -207,20 +290,32 @@ class datalynxview_pdf_form extends datalynxview_base_form {
                 1 => get_string('protmode1', 'datalynxview_pdf'),
                 2 => get_string('protmode2', 'datalynxview_pdf'),
                 3 => get_string('protmode3', 'datalynxview_pdf')];
-        $mform->addElement('select', 'protmode', get_string('protmode', 'datalynxview_pdf'),
-                $options);
+        $mform->addElement(
+            'select',
+            'protmode',
+            get_string('protmode', 'datalynxview_pdf'),
+            $options
+        );
 
         // Pub keys.
 
         // Digital Signature.
-        $mform->addElement('header', 'pdfsignaturehdr',
-                get_string('pdfsignature', 'datalynxview_pdf'));
+        $mform->addElement(
+            'header',
+            'pdfsignaturehdr',
+            get_string('pdfsignature', 'datalynxview_pdf')
+        );
 
         // Certification.
         $fileoptions = ['subdirs' => 0, 'maxbytes' => -1, 'maxfiles' => 1,
                 'accepted_types' => ['.crt']];
-        $mform->addElement('filemanager', 'pdfcert',
-                get_string('certification', 'datalynxview_pdf'), null, $fileoptions);
+        $mform->addElement(
+            'filemanager',
+            'pdfcert',
+            get_string('certification', 'datalynxview_pdf'),
+            null,
+            $fileoptions
+        );
 
         // Password.
         $mform->addElement('text', 'certpassword', get_string('certpassword', 'datalynxview_pdf'));
@@ -229,8 +324,12 @@ class datalynxview_pdf_form extends datalynxview_base_form {
         // Type.
         $options = [1 => get_string('none'), 2 => get_string('certperm2', 'datalynxview_pdf'),
                 3 => get_string('certperm3', 'datalynxview_pdf')];
-        $mform->addElement('select', 'certtype', get_string('certtype', 'datalynxview_pdf'),
-                $options);
+        $mform->addElement(
+            'select',
+            'certtype',
+            get_string('certtype', 'datalynxview_pdf'),
+            $options
+        );
 
         // Info.
         $mform->addElement('text', 'certinfoname', get_string('certinfoname', 'datalynxview_pdf'));
@@ -239,12 +338,18 @@ class datalynxview_pdf_form extends datalynxview_base_form {
         $mform->addElement('text', 'certinfoloc', get_string('certinfoloc', 'datalynxview_pdf'));
         $mform->setType('certinfoloc', PARAM_TEXT);
 
-        $mform->addElement('text', 'certinforeason',
-                get_string('certinforeason', 'datalynxview_pdf'));
+        $mform->addElement(
+            'text',
+            'certinforeason',
+            get_string('certinforeason', 'datalynxview_pdf')
+        );
         $mform->setType('certinforeason', PARAM_TEXT);
 
-        $mform->addElement('text', 'certinfocontact',
-                get_string('certinfocontact', 'datalynxview_pdf'));
+        $mform->addElement(
+            'text',
+            'certinfocontact',
+            get_string('certinfocontact', 'datalynxview_pdf')
+        );
         $mform->setType('certinfocontact', PARAM_TEXT);
     }
 

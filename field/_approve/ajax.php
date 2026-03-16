@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package mod_datalynx
  * @subpackage _approve
  * @copyright 2013 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -33,7 +33,7 @@ ob_start();
 $d = required_param('d', PARAM_INT);
 $viewid = required_param('view', PARAM_INT);
 // Allow hyphen in action name.
-$action = required_param('action', PARAM_SAFEDIR); 
+$action = required_param('action', PARAM_SAFEDIR);
 $entryid = required_param('entryid', PARAM_INT);
 $sesskey = required_param('sesskey', PARAM_TEXT);
 
@@ -82,7 +82,8 @@ if ($action == 'approve') {
 // Update completion state.
 if (!is_null($newapprovedstate)) {
     $completion = new completion_info($course);
-    if ($completion->is_enabled($cm) && $cm->completion == COMPLETION_TRACKING_AUTOMATIC &&
+    if (
+        $completion->is_enabled($cm) && $cm->completion == COMPLETION_TRACKING_AUTOMATIC &&
             $data->completionentries
     ) {
         $userid = $DB->get_field('datalynx_entries', 'userid', ['id' => $entryid]);
@@ -97,7 +98,7 @@ if (ob_get_contents()) {
 if (!is_null($newapprovedstate)) {
     echo json_encode([
         'entryid' => $entryid,
-        'approved' => $newapprovedstate
+        'approved' => $newapprovedstate,
     ]);
 } else {
     // Action was not valid, return an error.

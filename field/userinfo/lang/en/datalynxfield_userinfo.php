@@ -16,17 +16,17 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_userinfo
  * @subpackage userinfo
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-$string['pluginname'] = 'User custom info';
 $string['infofield'] = 'Info field';
 $string['infofield_editable'] = 'Editable';
 $string['infofield_editable_help'] = 'Make user information field editable to the user that created an entry.';
 $string['infofield_mandatory'] = 'Mandatory';
 $string['infofield_mandatory_help'] = 'Make this field mandatory, can not be empty.';
+$string['pluginname'] = 'User custom info';
 
 $string['privacy:metadata'] = 'The field user custom info does not store personal data.';

@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynx_rule
+ * @package mod_datalynx
  * @copyright 2014 onwards by edulabs.org and associated programmers
  * @copyright based on the work by 2013 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -29,7 +29,6 @@ require_once(dirname(__FILE__) . "/../classes/local/datalynx.php");
  * Base class for Datalynx Rule Types
  */
 abstract class datalynx_rule_base {
-
     /**
      * Subclasses must override the type with their name.
      * @var string
@@ -104,9 +103,11 @@ abstract class datalynx_rule_base {
     public function is_triggered_by($eventname) {
         $eventname = explode('\\', trim($eventname, '\\'))[2];
         $triggers = array_map(
-                function($element) {
-                    return explode(':', $element)[0];
-                }, unserialize($this->rule->param1));
+            function ($element) {
+                return explode(':', $element)[0];
+            },
+            unserialize($this->rule->param1)
+        );
         return array_search($eventname, $triggers) !== false;
     }
 
@@ -119,9 +120,11 @@ abstract class datalynx_rule_base {
         static $triggers = [];
         if (empty($triggers)) {
             $triggers = array_map(
-                    function($element) {
-                        return explode(':', $element)[0];
-                    }, unserialize($this->rule->param1));
+                function ($element) {
+                    return explode(':', $element)[0];
+                },
+                unserialize($this->rule->param1)
+            );
         }
         return $triggers;
     }
@@ -260,8 +263,10 @@ abstract class datalynx_rule_base {
             require_once($CFG->dirroot . '/mod/datalynx/rule/rule_form.php');
             $formclass = 'datalynx_rule_form';
         }
-        $actionurl = new moodle_url('/mod/datalynx/rule/rule_edit.php',
-                ['d' => $this->df->id(), 'rid' => $this->get_id(), 'type' => $this->type]);
+        $actionurl = new moodle_url(
+            '/mod/datalynx/rule/rule_edit.php',
+            ['d' => $this->df->id(), 'rid' => $this->get_id(), 'type' => $this->type]
+        );
         return new $formclass($this, $actionurl);
     }
 

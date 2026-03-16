@@ -16,13 +16,13 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_number
  * @subpackage number
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['decimals'] = 'Decimals';
+$string['outputemptystring'] = 'When the field ist left empty: Output empty string instead of 0.';
 $string['pluginname'] = 'Number';
 $string['privacy:metadata'] = 'Numbers do not store personal data.';
-$string['outputemptystring'] = 'When the field ist left empty: Output empty string instead of 0.';

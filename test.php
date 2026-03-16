@@ -16,7 +16,7 @@
 
 /**
  * Test file for catquiz
- * @package    local_catquiz
+ * @package    mod_datalynx
  * @copyright  2023 Wunderbyte GmbH
  * @author     Georg Maißer
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -91,7 +91,6 @@ if ($result === false) {
             $filedata = curl_exec($filehandle);
 
             if ($filedata !== false) {
-
                 // TODO: Store Data in Moodle.
 
                 $fs = get_file_storage();

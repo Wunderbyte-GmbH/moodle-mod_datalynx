@@ -33,7 +33,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class rule_deleted extends \core\event\base {
-
     /**
      * Init method.
      *
@@ -71,8 +70,10 @@ class rule_deleted extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/mod/datalynx/view.php',
-                ['d' => $this->other['dataid'], 'vid' => $this->objectid]);
+        return new \moodle_url(
+            '/mod/datalynx/view.php',
+            ['d' => $this->other['dataid'], 'vid' => $this->objectid]
+        );
     }
 
     /**

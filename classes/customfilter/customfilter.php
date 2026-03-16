@@ -31,7 +31,6 @@ defined('MOODLE_INTERNAL') || die();
  * Customfilter class
  */
 class customfilter {
-
     public $id;
 
     public $dataid;
@@ -93,6 +92,4 @@ class customfilter {
 
         return $filter;
     }
-
 }
-

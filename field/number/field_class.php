@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_number
  * @subpackage number
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
@@ -27,12 +27,11 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/text/field_class.php");
 
 class datalynxfield_number extends datalynxfield_text {
-
     public $type = 'number';
 
     /**
      * Can this field be used in fieldgroups? Override if yes.
-     * @var boolean
+     * @var bool
      */
     protected $forfieldgroup = true;
 
@@ -44,7 +43,7 @@ class datalynxfield_number extends datalynxfield_text {
     public function get_search_sql(array $search): array {
         global $DB;
 
-        list($not, $operator, $value) = $search;
+        [$not, $operator, $value] = $search;
 
         static $i = 0;
         $i++;
@@ -86,8 +85,12 @@ class datalynxfield_number extends datalynxfield_text {
             // Get entry ids for entries that meet the criterion.
             if ($eids = $this->get_entry_ids_for_content($sql, $params)) {
                 // Get NOT IN sql.
-                list($notinids, $params) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED,
-                        "df_{$fieldid}_", false);
+                [$notinids, $params] = $DB->get_in_or_equal(
+                    $eids,
+                    SQL_PARAMS_NAMED,
+                    "df_{$fieldid}_",
+                    false
+                );
                 $sql = " e.id $notinids ";
                 return [$sql, $params, false];
             } else {
@@ -154,7 +157,7 @@ class datalynxfield_number extends datalynxfield_text {
      * @see datalynxfield_base::format_search_value()
      */
     public function format_search_value($searchparams) {
-        list($not, $operator, $value) = $searchparams;
+        [$not, $operator, $value] = $searchparams;
         if (is_array($value)) {
             if (count($value) > 1 && $operator == 'BETWEEN') {
                 $value = '(' . implode(',', $value) . ')';

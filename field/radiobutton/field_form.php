@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_radiobutton
  * @subpackage radiobutton
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/select/field_form.php");
 
 class datalynxfield_radiobutton_form extends datalynxfield_select_form {
-
     /**
      */
     public function field_definition() {
@@ -36,8 +35,12 @@ class datalynxfield_radiobutton_form extends datalynxfield_select_form {
         $mform = &$this->_form;
 
         // Options separator.
-        $mform->addElement('select', 'param3', get_string('fieldoptionsseparator', 'datalynx'),
-                array_map('current', $this->_field->separators));
+        $mform->addElement(
+            'select',
+            'param3',
+            get_string('fieldoptionsseparator', 'datalynx'),
+            array_map('current', $this->_field->separators)
+        );
 
         // Hide autocomplete, it does not apply.
         $mform->hideIf('param6', '');

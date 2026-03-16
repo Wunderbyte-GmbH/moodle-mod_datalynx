@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package mod_datalynx
  * @subpackage _approve
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
@@ -29,7 +29,6 @@ require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 /**
  */
 class datalynxfield__approve_renderer extends datalynxfield_renderer {
-
     /**
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
@@ -118,15 +117,17 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
             $currentviewid = $this->_field->df()->get_current_view()->id();
 
             return html_writer::link(
-                    '#',
-                    $icon . $label, [
+                '#',
+                $icon . $label,
+                [
                         'class' => 'datalynxfield__approve',
                         'data-action' => 'toggle-approval',
                         'data-entryid' => $entry->id,
                         'data-d' => $field->df()->data->id,
                         'data-view' => $currentviewid,
                         'data-sesskey' => sesskey(),
-                    ]);
+                ]
+            );
         } else {
             return $icon . $label;
         }

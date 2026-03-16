@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package mod_datalynx
  * @subpackage _time
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
@@ -29,7 +29,6 @@ require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 /**
  */
 class datalynxfield__time_renderer extends datalynxfield_renderer {
-
     /**
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
@@ -44,8 +43,11 @@ class datalynxfield__time_renderer extends datalynxfield_renderer {
             if ($entry->id < 0) {
                 $replacements[$tag] = '';
             } else {
-                $format = (strpos($tag, "{$fieldname}:") !== false ? str_replace("{$fieldname}:",
-                        '', trim($tag, '#@')) : '');
+                $format = (strpos($tag, "{$fieldname}:") !== false ? str_replace(
+                    "{$fieldname}:",
+                    '',
+                    trim($tag, '#@')
+                ) : '');
                 switch ($format) {
                     case 'date':
                         $format = get_string('strftimedate');

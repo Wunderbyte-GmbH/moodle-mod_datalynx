@@ -27,7 +27,6 @@ require_once($CFG->libdir . '/formslib.php');
 /**
  */
 class datalynx_field_renderer_form extends moodleform {
-
     /**
      *
      * @var datalynx
@@ -61,8 +60,13 @@ class datalynx_field_renderer_form extends moodleform {
         $mform->addElement('text', 'name', get_string('name'), ['size' => '32']);
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
-        $mform->addRule('name', "Renderer name may not contain the pipe symbol \" | \"!", 'regex',
-                '/^[^\|]+$/', 'client');
+        $mform->addRule(
+            'name',
+            "Renderer name may not contain the pipe symbol \" | \"!",
+            'regex',
+            '/^[^\|]+$/',
+            'client'
+        );
 
         $mform->addElement('text', 'description', get_string('description'), ['size' => '64']);
         $mform->setType('description', PARAM_TEXT);
@@ -83,9 +87,14 @@ class datalynx_field_renderer_form extends moodleform {
         $group[] = $mform->createElement('radio', 'notvisibleoptions', '', get_string('custom', 'datalynx'), '___2___');
         $group[] = $mform->createElement('textarea', 'notvisibletemplate', '', '');
         $mform->disabledIf('notvisibletemplate', 'notvisibleoptions', 'eq', '___0___');
-        $mform->addGroup($group, 'notvisiblegroup', get_string('notvisible', 'datalynx'),
-                ['<br />'
-                ], false);
+        $mform->addGroup(
+            $group,
+            'notvisiblegroup',
+            get_string('notvisible', 'datalynx'),
+            ['<br />',
+            ],
+            false
+        );
         $mform->setType('notvisibletemplate', PARAM_RAW);
         $mform->setDefault('notvisibleoptions', '___0___');
 
@@ -96,21 +105,41 @@ class datalynx_field_renderer_form extends moodleform {
         $group[] = $mform->createElement('textarea', 'displaytemplate', '', '');
         $mform->setDefault('displaytemplate', '#value');
         $mform->disabledIf('displaytemplate', 'displayoptions', 'eq', '___4___');
-        $mform->addGroup($group, 'displaytemplategroup', get_string('displaytemplate', 'datalynx'),
-                ['<br />'
-                ], false);
+        $mform->addGroup(
+            $group,
+            'displaytemplategroup',
+            get_string('displaytemplate', 'datalynx'),
+            ['<br />',
+            ],
+            false
+        );
         $mform->setType('displaytemplate', PARAM_RAW);
         $mform->addHelpButton('displaytemplategroup', 'displaytemplate', 'datalynx');
         $mform->setDefault('displayoptions', '___4___');
 
         // When empty.
         $group = [];
-        $group[] = $mform->createElement('radio', 'novalueoptions', '',
-                get_string('shownothing', 'datalynx'), '___0___');
-        $group[] = $mform->createElement('radio', 'novalueoptions', '',
-                get_string('asdisplay', 'datalynx'), '___1___');
-        $group[] = $mform->createElement('radio', 'novalueoptions', '',
-                get_string('custom', 'datalynx'), '___2___');
+        $group[] = $mform->createElement(
+            'radio',
+            'novalueoptions',
+            '',
+            get_string('shownothing', 'datalynx'),
+            '___0___'
+        );
+        $group[] = $mform->createElement(
+            'radio',
+            'novalueoptions',
+            '',
+            get_string('asdisplay', 'datalynx'),
+            '___1___'
+        );
+        $group[] = $mform->createElement(
+            'radio',
+            'novalueoptions',
+            '',
+            get_string('custom', 'datalynx'),
+            '___2___'
+        );
         $group[] = $mform->createElement('textarea', 'novaluetemplate', '', '');
         $mform->disabledIf('novaluetemplate', 'novalueoptions', 'eq', '___0___');
         $mform->disabledIf('novaluetemplate', 'novalueoptions', 'eq', '___1___');

@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package mod_datalynx
  * @copyright 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -50,7 +50,8 @@ if ($forproperty == "required") {
     $DB->set_field('datalynx_behaviors', $forproperty, $required, ['id' => $behaviorid]);
 } else {
     $visibleto = unserialize(
-            $DB->get_field('datalynx_behaviors', $forproperty, ['id' => $behaviorid]));
+        $DB->get_field('datalynx_behaviors', $forproperty, ['id' => $behaviorid])
+    );
     if (!in_array($permissionid, $visibleto['permissions'])) {
         $visibleto['permissions'][] = $permissionid;
         $toggle = "ON";
@@ -60,8 +61,12 @@ if ($forproperty == "required") {
         }
         $toggle = "OFF";
     }
-    $DB->set_field('datalynx_behaviors', $forproperty, serialize($visibleto),
-            ['id' => $behaviorid]);
+    $DB->set_field(
+        'datalynx_behaviors',
+        $forproperty,
+        serialize($visibleto),
+        ['id' => $behaviorid]
+    );
 }
 
 echo json_encode($toggle);

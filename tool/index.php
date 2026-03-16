@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxtool
+ * @package mod_datalynx
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -46,7 +46,8 @@ $df->set_page('tool/index', ['modjs' => true, 'urlparams' => $urlparams]);
 
 // Activate navigation node.
 navigation_node::override_active_url(
-        new moodle_url('/mod/datalynx/tool/index.php', ['id' => $df->cm->id]));
+    new moodle_url('/mod/datalynx/tool/index.php', ['id' => $df->cm->id])
+);
 
 // DATA PROCESSING.
 if ($urlparams->run && confirm_sesskey()) { // Run selected tool.
@@ -55,7 +56,7 @@ if ($urlparams->run && confirm_sesskey()) { // Run selected tool.
     if (file_exists($tooldir)) {
         require_once("$tooldir/lib.php");
         if ($result = $toolclass::run($df)) {
-            list($goodbad, $message) = $result;
+            [$goodbad, $message] = $result;
         } else {
             $goodbad = 'bad';
             $message = '';
@@ -70,7 +71,7 @@ $tools = [];
 foreach ($directories as $directory) {
     $tools[$directory] = (object) [
             'name' => get_string('pluginname', "datalynxtool_$directory"),
-            'description' => get_string('pluginname_help', "datalynxtool_$directory")
+            'description' => get_string('pluginname_help', "datalynxtool_$directory"),
     ];
 }
 ksort($tools); // Sort in alphabetical order.
@@ -101,10 +102,10 @@ if ($tools) {
     $table->attributes['align'] = 'center';
 
     foreach ($tools as $dir => $tool) {
-
         $runlink = html_writer::link(
-                new moodle_url($actionbaseurl, $linkparams + ['run' => $dir]),
-                $OUTPUT->pix_icon('t/collapsed', $strrun));
+            new moodle_url($actionbaseurl, $linkparams + ['run' => $dir]),
+            $OUTPUT->pix_icon('t/collapsed', $strrun)
+        );
 
         $table->data[] = [$tool->name, $tool->description, $runlink];
     }
@@ -112,4 +113,3 @@ if ($tools) {
 }
 
 $df->print_footer();
-

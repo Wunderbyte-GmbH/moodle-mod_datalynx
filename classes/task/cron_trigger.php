@@ -36,7 +36,6 @@ defined('MOODLE_INTERNAL') || die();
  *
  */
 class cron_trigger extends \core\task\scheduled_task {
-
     public function get_name() {
         return get_string('cron_trigger', 'mod_datalynx');
     }

@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_multiselect
  * @subpackage multiselect
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
@@ -27,20 +27,30 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
 class datalynxfield_multiselect_form extends datalynxfield_option_form {
-
     public function field_definition() {
         $mform = &$this->_form;
 
-        $mform->addElement('header', 'fieldattributeshdr',
-                get_string('fieldattributes', 'datalynx'));
+        $mform->addElement(
+            'header',
+            'fieldattributeshdr',
+            get_string('fieldattributes', 'datalynx')
+        );
 
         // Default options.
-        $mform->addElement('textarea', 'param2', get_string('fieldoptionsdefault', 'datalynx'),
-                'wrap="soft" rows="5" cols="50"');
+        $mform->addElement(
+            'textarea',
+            'param2',
+            get_string('fieldoptionsdefault', 'datalynx'),
+            'wrap="soft" rows="5" cols="50"'
+        );
 
         // Options separator.
-        $mform->addElement('select', 'param3', get_string('fieldoptionsseparator', 'datalynx'),
-                array_map('current', $this->_field->separators));
+        $mform->addElement(
+            'select',
+            'param3',
+            get_string('fieldoptionsseparator', 'datalynx'),
+            array_map('current', $this->_field->separators)
+        );
 
         // Enable autocompletion for edit mode.
         $mform->addElement('selectyesno', 'param6', get_string('autocompletion', 'datalynx'));

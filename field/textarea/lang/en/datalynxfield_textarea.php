@@ -16,16 +16,16 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_textarea
  * @subpackage textarea
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-$string['pluginname'] = 'Text area';
-$string['rows'] = 'Rows';
 $string['cols'] = 'Columns';
+$string['pluginname'] = 'Text area';
+$string['privacy:metadata'] = 'Textareas do not store personal data.';
+$string['rows'] = 'Rows';
 $string['wordcountmax'] = 'Maximum words';
 $string['wordcountmin'] = 'Minimum words';
 $string['wordcountshow'] = 'Show wordcount bar';
-$string['privacy:metadata'] = 'Textareas do not store personal data.';

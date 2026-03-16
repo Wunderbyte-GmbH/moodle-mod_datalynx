@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_teammemberselect
  * @subpackage teammemberselect
  * @copyright 2013 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -27,7 +27,6 @@ require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
 
 class datalynxfield_teammemberselect extends datalynxfield_base {
-
     public $type = 'teammemberselect';
 
     const TEAMMEMBERSELECT_FORMAT_NEWLINE = 0;
@@ -78,7 +77,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
 
     /**
      * Can this field be used in fieldgroups?
-     * @var boolean
+     * @var bool
      */
     protected $forfieldgroup = true;
 
@@ -89,7 +88,6 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
             $this->admissibleroles = [];
         } else {
             $this->admissibleroles = json_decode($this->field->param2, true);
-
         }
         $this->teamsize = $this->field->param1;
         $this->minteamsize = $this->field->param3;
@@ -103,16 +101,20 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
             self::TEAMMEMBERSELECT_FORMAT_NEWLINE => get_string('listformatnewline', 'datalynx'),
             self::TEAMMEMBERSELECT_FORMAT_SPACE => get_string('listformatspace', 'datalynx'),
             self::TEAMMEMBERSELECT_FORMAT_COMMA => get_string('listformatcomma', 'datalynx'),
-            self::TEAMMEMBERSELECT_FORMAT_COMMA_SPACE => get_string('listformatcommaspace',
-                    'datalynx'),
+            self::TEAMMEMBERSELECT_FORMAT_COMMA_SPACE => get_string(
+                'listformatcommaspace',
+                'datalynx'
+            ),
             self::TEAMMEMBERSELECT_FORMAT_UL => get_string('listformatul', 'datalynx')];
 
         $query = "SELECT r.id, r.name
                     FROM {datalynx_rules} r
                    WHERE r.dataid = :dataid
                      AND r.type LIKE :type";
-        $this->rules = $DB->get_records_sql_menu($query,
-                ['dataid' => $df->id(), 'type' => 'eventnotification']);
+        $this->rules = $DB->get_records_sql_menu(
+            $query,
+            ['dataid' => $df->id(), 'type' => 'eventnotification']
+        );
     }
 
     protected function init_user_menu() {
@@ -188,7 +190,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
 
         foreach ($perms as $permissionid => $capstring) {
             if (in_array($permissionid, $this->admissibleroles)) {
-                list($needed, $forbidden) = get_roles_with_cap_in_context($context, $capstring);
+                [$needed, $forbidden] = get_roles_with_cap_in_context($context, $capstring);
                 $allneeded = array_merge($allneeded, $needed);
                 $allforbidden = array_merge($allforbidden, $forbidden);
             }
@@ -286,8 +288,12 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         return true;
     }
 
-    public function options_menu($addnoselection = false, $makelinks = false, $excludeuser = 0,
-            $allowall = false) {
+    public function options_menu(
+        $addnoselection = false,
+        $makelinks = false,
+        $excludeuser = 0,
+        $allowall = false
+    ) {
         $fieldid = $this->field->id;
         if (!isset(self::$allusers[$fieldid])) {
             $this->init_user_menu();
@@ -323,7 +329,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
     public function get_search_sql(array $search): array {
         global $DB;
         static $i = 0;
-        list($not, $operator, $value) = $search;
+        [$not, $operator, $value] = $search;
         $i++;
         $fieldid = $this->field->id;
         $name = "df_{$fieldid}_{$i}";
@@ -341,8 +347,12 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
                 $like = $DB->sql_like("content", ":{$name}", true, true);
 
                 if ($eids = $this->get_entry_ids_for_content($like, $params)) {
-                    list($notinids, $paramsnot) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED,
-                            "df_{$fieldid}_x_", false);
+                    [$notinids, $paramsnot] = $DB->get_in_or_equal(
+                        $eids,
+                        SQL_PARAMS_NAMED,
+                        "df_{$fieldid}_x_",
+                        false
+                    );
                     $params = array_merge($params, $paramsnot);
                     $sql = " (e.id $notinids)";
                 } else {
@@ -376,8 +386,12 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
                     if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) { // There are
                                                                                       // non-empty.
                                                                                       // Contents.
-                        list($contentids, $paramsnot) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED,
-                                "df_{$fieldid}_x_", !!$not);
+                        [$contentids, $paramsnot] = $DB->get_in_or_equal(
+                            $eids,
+                            SQL_PARAMS_NAMED,
+                            "df_{$fieldid}_x_",
+                            !!$not
+                        );
                         $params = array_merge($params, $paramsnot);
                         $sql = " (e.id $contentids) ";
                     } else { // There are no non-empty contents.
@@ -464,14 +478,14 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         $removedmemberids = array_diff($oldmembers, $newmembers);
 
         if (!empty($addedmemberids)) {
-            list($insql, $params) = $DB->get_in_or_equal($addedmemberids);
+            [$insql, $params] = $DB->get_in_or_equal($addedmemberids);
             $addedmembers = $DB->get_records_sql("SELECT * FROM {user} WHERE id $insql", $params);
         } else {
             $addedmembers = [];
         }
 
         if (!empty($removedmemberids)) {
-            list($insql, $params) = $DB->get_in_or_equal($removedmemberids);
+            [$insql, $params] = $DB->get_in_or_equal($removedmemberids);
             $removedmembers = $DB->get_records_sql("SELECT * FROM {user} WHERE id $insql", $params);
         } else {
             $removedmembers = [];
@@ -483,15 +497,17 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
 
         if (!empty($addedmembers)) {
             $event = \mod_datalynx\event\team_updated::create(
-                    ['context' => $this->df->context, 'objectid' => $entry->id,
-                        'other' => $other]);
+                ['context' => $this->df->context, 'objectid' => $entry->id,
+                'other' => $other]
+            );
             $event->trigger();
         }
 
         if (!empty($removedmembers)) {
             $event = \mod_datalynx\event\team_updated::create(
-                    ['context' => $this->df->context, 'objectid' => $entry->id,
-                        'other' => $other]);
+                ['context' => $this->df->context, 'objectid' => $entry->id,
+                'other' => $other]
+            );
             $event->trigger();
         }
     }
@@ -500,7 +516,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
      * Allow array in filter definition.
      */
     public function format_search_value($searchparams) {
-        list($not, $operator, $value) = $searchparams;
+        [$not, $operator, $value] = $searchparams;
         if (is_array($value)) {
             $selected = implode(', ', $value);
             return $not . ' ' . $operator . ' ' . $selected;
@@ -525,7 +541,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
                   AND e.dataid = :datalynxid";
         $params = [
                 'fieldid' => $this->field->id,
-                'datalynxid' => $this->df->id()
+                'datalynxid' => $this->df->id(),
         ];
         if (!empty($insql)) {
             $sql .= " AND c.entryid $insql";
@@ -577,5 +593,4 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
 
         return false;
     }
-
 }

@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_userinfo
  * @subpackage userinfo
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
 class datalynxfield_userinfo extends datalynxfield_base {
-
     public $type = 'userinfo';
 
     public $infoid;
@@ -137,4 +136,3 @@ class datalynxfield_userinfo extends datalynxfield_base {
         return false;
     }
 }
-

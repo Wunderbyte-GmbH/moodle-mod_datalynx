@@ -16,7 +16,7 @@
 
 /**
  *
- * @package mod-datalynx
+ * @package mod_datalynx
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -30,7 +30,6 @@
  * Define the complete data structure for backup, with file and id annotations
  */
 class backup_datalynx_activity_structure_step extends backup_activity_structure_step {
-
     protected function define_structure() {
         global $DB;
         global $CFG;
@@ -39,84 +38,120 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
         $userinfo = $this->get_setting_value('userinfo');
 
         // Define each element separated.
-        $datalynx = new backup_nested_element('datalynx', ['id'],
-                ['name', 'intro', 'introformat', 'timemodified', 'timeavailable', 'timedue',
+        $datalynx = new backup_nested_element(
+            'datalynx',
+            ['id'],
+            ['name', 'intro', 'introformat', 'timemodified', 'timeavailable', 'timedue',
                         'timeinterval', 'intervalcount', 'allowlate', 'grade', 'grademethod',
                         'anonymous', 'notification', 'notificationformat', 'entriesrequired',
                         'entriestoview', 'maxentries', 'timelimit', 'approval', 'grouped', 'rating',
                         'comments', 'locks', 'singleedit', 'singleview', 'rssarticles', 'rss', 'css',
                         'cssincludes', 'js', 'jsincludes', 'defaultview', 'defaultfilter',
-                        'completionentries'
-                ]);
+                        'completionentries',
+            ]
+        );
 
         $module = new backup_nested_element('module', ['id'], ['groupmode']);
 
         $fields = new backup_nested_element('fields');
-        $field = new backup_nested_element('field', ['id'],
-                ['type', 'name', 'description', 'visible', 'edits', 'label', 'param1',
+        $field = new backup_nested_element(
+            'field',
+            ['id'],
+            ['type', 'name', 'description', 'visible', 'edits', 'label', 'param1',
                         'param2', 'param3', 'param4', 'param5', 'param6', 'param7', 'param8', 'param9',
-                        'param10', 'targetcourse', 'targetinstance', 'targetview', 'targetfilter'
-                ]);
+                        'param10', 'targetcourse', 'targetinstance', 'targetview', 'targetfilter',
+            ]
+        );
 
         $filters = new backup_nested_element('filters');
-        $filter = new backup_nested_element('filter', ['id'],
-                ['name', 'description', 'visible', 'perpage', 'selection', 'groupby', 'search',
-                        'customsort', 'customsearch'
-                ]);
+        $filter = new backup_nested_element(
+            'filter',
+            ['id'],
+            ['name', 'description', 'visible', 'perpage', 'selection', 'groupby', 'search',
+                        'customsort', 'customsearch',
+            ]
+        );
 
         $customfilters = new backup_nested_element('customfilters');
-        $customfilter = new backup_nested_element('customfilter', ['id'],
-                ['name', 'description', 'visible', 'fulltextsearch', 'timecreated', 'timecreated_sortable',
-                        'timemodified', 'timemodified_sortable', 'authorsearch', 'approve', 'status', 'fieldlist'
-                ]);
+        $customfilter = new backup_nested_element(
+            'customfilter',
+            ['id'],
+            ['name', 'description', 'visible', 'fulltextsearch', 'timecreated', 'timecreated_sortable',
+                        'timemodified', 'timemodified_sortable', 'authorsearch', 'approve', 'status', 'fieldlist',
+            ]
+        );
 
         $views = new backup_nested_element('views');
-        $view = new backup_nested_element('view', ['id'],
-                ['type', 'name', 'description', 'visible', 'perpage', 'groupby', 'filter',
+        $view = new backup_nested_element(
+            'view',
+            ['id'],
+            ['type', 'name', 'description', 'visible', 'perpage', 'groupby', 'filter',
                         'patterns', 'section', 'sectionpos', 'param1', 'param2', 'param3', 'param4',
-                        'param5', 'param6', 'param7', 'param8', 'param9', 'param10'
-                ]);
+                        'param5', 'param6', 'param7', 'param8', 'param9', 'param10',
+            ]
+        );
 
         $rules = new backup_nested_element('rules');
-        $rule = new backup_nested_element('rule', ['id'],
-                ['type', 'name', 'description', 'enabled', 'param1', 'param2', 'param3',
-                        'param4', 'param5', 'param6', 'param7', 'param8', 'param9', 'param10'
-                ]);
+        $rule = new backup_nested_element(
+            'rule',
+            ['id'],
+            ['type', 'name', 'description', 'enabled', 'param1', 'param2', 'param3',
+                        'param4', 'param5', 'param6', 'param7', 'param8', 'param9', 'param10',
+            ]
+        );
 
         $entries = new backup_nested_element('entries');
-        $entry = new backup_nested_element('entry', ['id'],
-                ['userid', 'groupid', 'timecreated', 'timemodified', 'approved', 'status'
-                ]);
+        $entry = new backup_nested_element(
+            'entry',
+            ['id'],
+            ['userid', 'groupid', 'timecreated', 'timemodified', 'approved', 'status',
+            ]
+        );
 
         $contents = new backup_nested_element('contents');
-        $content = new backup_nested_element('content', ['id'],
-                ['fieldid', 'content', 'content1', 'content2', 'content3', 'content4']);
+        $content = new backup_nested_element(
+            'content',
+            ['id'],
+            ['fieldid', 'content', 'content1', 'content2', 'content3', 'content4']
+        );
 
         $tags = new backup_nested_element('tags');
         $tag = new backup_nested_element('tag', ['id'], ['rawname']);
 
         $ratings = new backup_nested_element('ratings');
-        $rating = new backup_nested_element('rating', ['id'],
-                ['component', 'ratingarea', 'scaleid', 'value', 'userid', 'timecreated',
-                        'timemodified'
-                ]);
+        $rating = new backup_nested_element(
+            'rating',
+            ['id'],
+            ['component', 'ratingarea', 'scaleid', 'value', 'userid', 'timecreated',
+                        'timemodified',
+            ]
+        );
 
         $grades = new backup_nested_element('grades');
-        $grade = new backup_nested_element('grade', ['id'],
-                ['component', 'ratingarea', 'scaleid', 'value', 'userid', 'timecreated',
-                        'timemodified'
-                ]);
+        $grade = new backup_nested_element(
+            'grade',
+            ['id'],
+            ['component', 'ratingarea', 'scaleid', 'value', 'userid', 'timecreated',
+                        'timemodified',
+            ]
+        );
 
         $behaviors = new backup_nested_element('behaviors');
-        $behavior = new backup_nested_element('behavior', ['id'],
-                ['dataid', 'name', 'description', 'visibleto', 'editableby', 'required'
-                ]);
+        $behavior = new backup_nested_element(
+            'behavior',
+            ['id'],
+            ['dataid', 'name', 'description', 'visibleto', 'editableby', 'required',
+            ]
+        );
 
         $renderers = new backup_nested_element('renderers');
-        $renderer = new backup_nested_element('renderer', ['id'],
-                ['dataid', 'type', 'name', 'description', 'notvisibletemplate',
-                        'displaytemplate', 'novaluetemplate', 'edittemplate', 'noteditabletemplate'
-                ]);
+        $renderer = new backup_nested_element(
+            'renderer',
+            ['id'],
+            ['dataid', 'type', 'name', 'description', 'notvisibletemplate',
+                        'displaytemplate', 'novaluetemplate', 'edittemplate', 'noteditabletemplate',
+            ]
+        );
 
         // Build the tree.
         $datalynx->add_child($module);
@@ -174,7 +209,7 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
 
         if ($CFG->dbtype == 'mysqli' || $CFG->dbtype == 'mysql' || $CFG->dbtype == 'mariadb') {
             $field->set_source_sql(
-                    "SELECT f.*,
+                "SELECT f.*,
                         CASE f.type WHEN 'datalynxview' THEN MAX(c.fullname) ELSE NULL END AS targetcourse,
                         CASE f.type WHEN 'datalynxview' THEN MAX(d.name) ELSE NULL END AS targetinstance,
                         CASE f.type WHEN 'datalynxview' THEN MAX(v.name) ELSE NULL END AS targetview,
@@ -186,13 +221,17 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
               LEFT JOIN {datalynx_views} v ON " . $DB->sql_cast_char2int('f.param2') . " = v.id
               LEFT JOIN {datalynx_filters} fil ON " . $DB->sql_cast_char2int('f.param3') . " = fil.id
                   WHERE f.dataid = :dataid
-               GROUP BY f.id", ['dataid' => backup::VAR_PARENTID]);
+               GROUP BY f.id",
+                ['dataid' => backup::VAR_PARENTID]
+            );
         } else {
                 $field->set_source_sql(
-                        "SELECT f.*
+                    "SELECT f.*
                FROM {datalynx_fields} f
               WHERE f.dataid = :dataid
-                AND f.type != 'datalynxview'", ['dataid' => backup::VAR_PARENTID]);
+                AND f.type != 'datalynxview'",
+                    ['dataid' => backup::VAR_PARENTID]
+                );
         }
 
         $filter->set_source_table('datalynx_filters', ['dataid' => backup::VAR_PARENTID]);
@@ -205,24 +244,30 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
         // All the rest of elements only happen if we are including user info.
         if ($userinfo) {
             $entry->set_source_table('datalynx_entries', ['dataid' => backup::VAR_PARENTID]);
-            $content->set_source_table('datalynx_contents',
-                    ['entryid' => backup::VAR_PARENTID]);
+            $content->set_source_table(
+                'datalynx_contents',
+                ['entryid' => backup::VAR_PARENTID]
+            );
 
             // Entry ratings.
-            $rating->set_source_table('rating',
-                    ['contextid' => backup::VAR_CONTEXTID,
+            $rating->set_source_table(
+                'rating',
+                ['contextid' => backup::VAR_CONTEXTID,
                             'itemid' => backup::VAR_PARENTID,
                             'component' => backup_helper::is_sqlparam('mod_datalynx'),
-                            'ratingarea' => backup_helper::is_sqlparam('entry')
-                    ]);
+                            'ratingarea' => backup_helper::is_sqlparam('entry'),
+                ]
+            );
             $rating->set_source_alias('rating', 'value');
 
             // Activity grade.
-            $grade->set_source_table('rating',
-                    ['contextid' => backup::VAR_CONTEXTID,
+            $grade->set_source_table(
+                'rating',
+                ['contextid' => backup::VAR_CONTEXTID,
                             'component' => backup_helper::is_sqlparam('mod_datalynx'),
-                            'ratingarea' => backup_helper::is_sqlparam('activity')
-                    ]);
+                            'ratingarea' => backup_helper::is_sqlparam('activity'),
+                ]
+            );
             $grade->set_source_alias('rating', 'value');
         }
 

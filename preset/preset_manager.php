@@ -16,8 +16,7 @@
 
 /**
  *
- * @package mod
- * @package preset
+ * @package mod_datalynx
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -27,7 +26,6 @@
  * Preset manager class
  */
 class datalynx_preset_manager {
-
     const PRESET_COURSEAREA = 'course_presets';
 
     const PRESET_SITEAREA = 'site_presets';
@@ -92,7 +90,6 @@ class datalynx_preset_manager {
 
         $targetpage = '/mod/datalynx/preset/index.php';
         if ($localpresets || $sharedpresets) {
-
             $linkparams = ['d' => $this->_df->id(), 'sesskey' => sesskey()];
             $actionurl = htmlspecialchars_decode(new moodle_url($targetpage, $linkparams));
 
@@ -109,29 +106,40 @@ class datalynx_preset_manager {
             $strdelete = get_string('delete');
             $strshare = get_string('presetshare', 'datalynx');
 
-            $selectallnone = html_writer::checkbox(null, null, false, null,
-                    ['onclick' => 'select_allnone(\'preset\'&#44;this.checked)']);
+            $selectallnone = html_writer::checkbox(
+                null,
+                null,
+                false,
+                null,
+                ['onclick' => 'select_allnone(\'preset\'&#44;this.checked)']
+            );
 
-            $multidownload = html_writer::tag('button',
-                    $OUTPUT->pix_icon('t/download', get_string('multidownload', 'datalynx')),
-                    ['name' => 'multidownload',
+            $multidownload = html_writer::tag(
+                'button',
+                $OUTPUT->pix_icon('t/download', get_string('multidownload', 'datalynx')),
+                ['name' => 'multidownload',
                             'onclick' => 'bulk_action(\'preset\'&#44; \'' . $actionurl .
-                                    '\'&#44; \'download\')'
-                    ]);
+                                    '\'&#44; \'download\')',
+                ]
+            );
 
-            $multidelete = html_writer::tag('button',
-                    $OUTPUT->pix_icon('t/delete', get_string('multidelete', 'datalynx')),
-                    ['name' => 'multidelete',
+            $multidelete = html_writer::tag(
+                'button',
+                $OUTPUT->pix_icon('t/delete', get_string('multidelete', 'datalynx')),
+                ['name' => 'multidelete',
                             'onclick' => 'bulk_action(\'preset\'&#44; \'' . $actionurl .
-                                    '\'&#44; \'delete\')'
-                    ]);
+                                    '\'&#44; \'delete\')',
+                ]
+            );
 
-            $multishare = html_writer::tag('button',
-                    $OUTPUT->pix_icon('i/group', get_string('multishare', 'datalynx')),
-                    ['name' => 'multishare',
+            $multishare = html_writer::tag(
+                'button',
+                $OUTPUT->pix_icon('i/group', get_string('multishare', 'datalynx')),
+                ['name' => 'multishare',
                             'onclick' => 'bulk_action(\'preset\'&#44; \'' . $actionurl .
-                                    '\'&#44; \'share\')'
-                    ]);
+                                    '\'&#44; \'share\')',
+                ]
+            );
 
             $table = new html_table();
             $table->head = [$strname, $strdescription, $strscreenshot, $strapply,
@@ -144,8 +152,10 @@ class datalynx_preset_manager {
             if ($localpresets) {
                 // Headingg.
                 $lpheadingcell = new html_table_cell();
-                $lpheadingcell->text = html_writer::tag('h4',
-                        get_string('presetavailableincourse', 'datalynx'));
+                $lpheadingcell->text = html_writer::tag(
+                    'h4',
+                    get_string('presetavailableincourse', 'datalynx')
+                );
                 $lpheadingcell->colspan = 9;
 
                 $lpheadingrow = new html_table_row();
@@ -154,27 +164,34 @@ class datalynx_preset_manager {
                 $table->data[] = $lpheadingrow;
 
                 foreach ($localpresets as $preset) {
-
                     $presetname = $preset->shortname;
                     $presetdescription = '';
                     $presetscreenshot = '';
                     $presetapply = html_writer::link(
-                            new moodle_url($targetpage, $linkparams + ['apply' => $preset->id]),
-                            $OUTPUT->pix_icon('t/switch_whole', $strapply));
+                        new moodle_url($targetpage, $linkparams + ['apply' => $preset->id]),
+                        $OUTPUT->pix_icon('t/switch_whole', $strapply)
+                    );
                     $presetdownload = html_writer::link(
-                            moodle_url::make_file_url("/pluginfile.php",
-                                    "/$preset->contextid/mod_datalynx/course_presets/$preset->itemid/$preset->name"),
-                            $OUTPUT->pix_icon('t/download', $strdownload));
+                        moodle_url::make_file_url(
+                            "/pluginfile.php",
+                            "/$preset->contextid/mod_datalynx/course_presets/$preset->itemid/$preset->name"
+                        ),
+                        $OUTPUT->pix_icon('t/download', $strdownload)
+                    );
                     $presetshare = '';
                     if (has_capability('mod/datalynx:presetsviewall', $this->_df->context)) {
                         $presetshare = html_writer::link(
-                                new moodle_url($targetpage,
-                                        $linkparams + ['share' => $preset->id]),
-                                $OUTPUT->pix_icon('i/group', $strshare));
+                            new moodle_url(
+                                $targetpage,
+                                $linkparams + ['share' => $preset->id]
+                            ),
+                            $OUTPUT->pix_icon('i/group', $strshare)
+                        );
                     }
                     $presetdelete = html_writer::link(
-                            new moodle_url($targetpage, $linkparams + ['delete' => $preset->id]),
-                            $OUTPUT->pix_icon('t/delete', $strdelete));
+                        new moodle_url($targetpage, $linkparams + ['delete' => $preset->id]),
+                        $OUTPUT->pix_icon('t/delete', $strdelete)
+                    );
                     $presetselector = html_writer::checkbox("presetselector", $preset->id, false);
 
                     $table->data[] = [$presetname, $presetdescription, $presetscreenshot,
@@ -186,8 +203,10 @@ class datalynx_preset_manager {
             if ($sharedpresets) {
                 // Heading.
                 $lpheadingcell = new html_table_cell();
-                $lpheadingcell->text = html_writer::tag('h4',
-                        get_string('presetavailableinsite', 'datalynx'));
+                $lpheadingcell->text = html_writer::tag(
+                    'h4',
+                    get_string('presetavailableinsite', 'datalynx')
+                );
                 $lpheadingcell->colspan = 9;
 
                 $lpheadingrow = new html_table_row();
@@ -198,29 +217,35 @@ class datalynx_preset_manager {
                 $linkparams['area'] = self::PRESET_SITEAREA;
 
                 foreach ($sharedpresets as $preset) {
-
                     $presetname = $preset->shortname;
                     $presetdescription = '';
                     $presetscreenshot = '';
                     $presetapply = html_writer::link(
-                            new moodle_url($targetpage, $linkparams + ['apply' => $preset->id]),
-                            $OUTPUT->pix_icon('t/switch_whole', $strapply));
+                        new moodle_url($targetpage, $linkparams + ['apply' => $preset->id]),
+                        $OUTPUT->pix_icon('t/switch_whole', $strapply)
+                    );
                     $presetdownload = html_writer::link(
-                            moodle_url::make_file_url("/pluginfile.php",
-                                    "/$preset->contextid/mod_datalynx/site_presets/$preset->itemid/$preset->name"),
-                            $OUTPUT->pix_icon('t/download', $strdownload));
+                        moodle_url::make_file_url(
+                            "/pluginfile.php",
+                            "/$preset->contextid/mod_datalynx/site_presets/$preset->itemid/$preset->name"
+                        ),
+                        $OUTPUT->pix_icon('t/download', $strdownload)
+                    );
                     $presetshare = '';
                     $presetdelete = '';
                     if (has_capability('mod/datalynx:managepresets', $this->_df->context)) {
                         $presetdelete = html_writer::link(
-                                new moodle_url($targetpage,
-                                        $linkparams + ['delete' => $preset->id]),
-                                $OUTPUT->pix_icon('t/delete', $strdelete));
+                            new moodle_url(
+                                $targetpage,
+                                $linkparams + ['delete' => $preset->id]
+                            ),
+                            $OUTPUT->pix_icon('t/delete', $strdelete)
+                        );
                     }
                     $presetselector = html_writer::checkbox("presetselector", $preset->id, false);
 
                     $table->data[] = [$presetname, $presetdescription, $presetscreenshot,
-                            $presetapply, $presetdownload, $presetshare, $presetdelete, $presetselector
+                            $presetapply, $presetdownload, $presetshare, $presetdelete, $presetselector,
                     ];
                 }
             }
@@ -235,8 +260,11 @@ class datalynx_preset_manager {
     public function print_preset_form() {
         echo html_writer::start_tag('div', ['style' => 'width:80%;margin:auto;']);
         $mform = new mod_datalynx_preset_form(
-                new moodle_url('/mod/datalynx/preset/index.php',
-                        ['d' => $this->_df->id(), 'sesskey' => sesskey(), 'add' => 1]));
+            new moodle_url(
+                '/mod/datalynx/preset/index.php',
+                ['d' => $this->_df->id(), 'sesskey' => sesskey(), 'add' => 1]
+            )
+        );
         $mform->set_data(null);
         $mform->display();
         echo html_writer::end_tag('div');
@@ -248,8 +276,11 @@ class datalynx_preset_manager {
         global $CFG;
 
         $mform = new mod_datalynx_preset_form(
-                new moodle_url('mod/datalynx/preset/index.php',
-                        ['d' => $this->_df->id(), 'sesskey' => sesskey(), 'add' => 1]));
+            new moodle_url(
+                'mod/datalynx/preset/index.php',
+                ['d' => $this->_df->id(), 'sesskey' => sesskey(), 'add' => 1]
+            )
+        );
         // Add presets.
         if ($data = $mform->get_data()) {
             // Preset this datalynx.
@@ -309,8 +340,14 @@ class datalynx_preset_manager {
         // Store preset settings in $SESSION.
         $SESSION->{"datalynx_{$this->_df->cm->id}_preset"} = "$users $anon";
 
-        $bc = new backup_controller(backup::TYPE_1ACTIVITY, $this->_df->cm->id,
-                backup::FORMAT_MOODLE, backup::INTERACTIVE_NO, backup::MODE_GENERAL, $USER->id);
+        $bc = new backup_controller(
+            backup::TYPE_1ACTIVITY,
+            $this->_df->cm->id,
+            backup::FORMAT_MOODLE,
+            backup::INTERACTIVE_NO,
+            backup::MODE_GENERAL,
+            $USER->id
+        );
 
         // Clear preset settings from $SESSION.
         unset($SESSION->{"datalynx_{$this->_df->cm->id}_preset"});
@@ -344,10 +381,11 @@ class datalynx_preset_manager {
                 $preset->filearea = self::PRESET_COURSEAREA;
                 $preset->filepath = '/';
                 $preset->filename = clean_filename(
-                        str_replace(' ', '_', $this->_df->data->name) . '-datalynx-preset-' .
+                    str_replace(' ', '_', $this->_df->data->name) . '-datalynx-preset-' .
                         gmdate("Ymd_Hi") . '-' .
                         str_replace(' ', '-', get_string("preset$userdata", 'datalynx')) .
-                        '.mbz');
+                    '.mbz'
+                );
 
                 $fs->create_file_from_storedfile($preset, $file);
                 $file->delete();
@@ -364,8 +402,15 @@ class datalynx_preset_manager {
 
         $usercontext = context_user::instance($USER->id);
         $fs = get_file_storage();
-        if ($files = $fs->get_area_files($usercontext->id, 'user', 'draft', $draftid, 'sortorder',
-                false)
+        if (
+            $files = $fs->get_area_files(
+                $usercontext->id,
+                'user',
+                'draft',
+                $draftid,
+                'sortorder',
+                false
+            )
         ) {
             $file = reset($files);
             $coursecontext = context_course::instance($this->_df->course->id);
@@ -386,8 +431,15 @@ class datalynx_preset_manager {
                     $file->extract_to_storage($zipper, $usercontext->id, 'user', 'draft', $draftid, '/');
                     $file->delete();
 
-                    if ($files = $fs->get_area_files($usercontext->id, 'user', 'draft', $draftid,
-                            'sortorder', false)
+                    if (
+                        $files = $fs->get_area_files(
+                            $usercontext->id,
+                            'user',
+                            'draft',
+                            $draftid,
+                            'sortorder',
+                            false
+                        )
                     ) {
                         foreach ($files as $file) {
                             $ext = pathinfo($file->get_filename(), PATHINFO_EXTENSION);
@@ -421,12 +473,21 @@ class datalynx_preset_manager {
         require_once("$CFG->dirroot/backup/util/includes/restore_includes.php");
 
         // Anonymous users cleanup.
-        $DB->delete_records_select('user', $DB->sql_like('firstname', '?'),
-                ['%anonfirstname%']);
+        $DB->delete_records_select(
+            'user',
+            $DB->sql_like('firstname', '?'),
+            ['%anonfirstname%']
+        );
 
         $transaction = $DB->start_delegated_transaction();
-        $rc = new restore_controller($folder, $this->_df->course->id, backup::INTERACTIVE_NO,
-                backup::MODE_GENERAL, $USER->id, backup::TARGET_CURRENT_ADDING);
+        $rc = new restore_controller(
+            $folder,
+            $this->_df->course->id,
+            backup::INTERACTIVE_NO,
+            backup::MODE_GENERAL,
+            $USER->id,
+            backup::TARGET_CURRENT_ADDING
+        );
 
         $rc->execute_precheck();
 
@@ -455,8 +516,11 @@ class datalynx_preset_manager {
             // Rc cleanup.
             $rc->destroy();
             // Anonymous users cleanup.
-            $DB->delete_records_select('user', $DB->sql_like('firstname', '?'),
-                    ['%anonfirstname%']);
+            $DB->delete_records_select(
+                'user',
+                $DB->sql_like('firstname', '?'),
+                ['%anonfirstname%']
+            );
 
             redirect(new moodle_url('/mod/datalynx/view.php', ['d' => $this->_df->id()]));
         } else {
@@ -502,8 +566,12 @@ class datalynx_preset_manager {
 
         // Try site area.
         if (!empty($pids)) {
-            if ($files = $fs->get_area_files(self::PRESET_SITECONTEXT, 'mod_datalynx',
-                    self::PRESET_SITEAREA)
+            if (
+                $files = $fs->get_area_files(
+                    self::PRESET_SITECONTEXT,
+                    'mod_datalynx',
+                    self::PRESET_SITEAREA
+                )
             ) {
                 foreach ($files as $file) {
                     if (empty($pids)) {
@@ -597,8 +665,12 @@ class datalynx_preset_manager {
 
         // Try site area.
         if (!empty($pids)) {
-            if ($files = $fs->get_area_files(self::PRESET_SITECONTEXT, 'mod_datalynx',
-                    self::PRESET_SITEAREA)
+            if (
+                $files = $fs->get_area_files(
+                    self::PRESET_SITECONTEXT,
+                    'mod_datalynx',
+                    self::PRESET_SITEAREA
+                )
             ) {
                 foreach ($files as $file) {
                     if (empty($pids)) {

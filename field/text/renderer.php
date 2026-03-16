@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_text
  * @subpackage text
  * @copyright 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -29,7 +29,6 @@ require_once(dirname(__FILE__) . "/../renderer.php");
  * Class datalynxfield_text_renderer Renderer for text field type
  */
 class datalynxfield_text_renderer extends datalynxfield_renderer {
-
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $field = $this->_field;
         $fieldid = $field->id();
@@ -181,7 +180,7 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
 
         $errors = [];
         foreach ($tags as $tag) {
-            list(, $behavior, ) = $this->process_tag($tag);
+            [, $behavior, ] = $this->process_tag($tag);
             // Variable $behavior datalynx_field_behavior.
             if ($behavior->is_required() && isset($formdata->$formfieldname)) {
                 if (!clean_param($formdata->$formfieldname, PARAM_NOTAGS)) {
@@ -191,14 +190,17 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
 
             if (!empty($param8) && isset($formdata->$formfieldname)) {
                 // Check uniquenes!
-                if ($DB->record_exists_sql("SELECT id
+                if (
+                    $DB->record_exists_sql(
+                        "SELECT id
                                               FROM {datalynx_contents} c
                                              WHERE c.fieldid = :fieldid
                                                AND c.entryid <> :entryid
                                                AND c.content LIKE :content",
                         ['fieldid' => $fieldid,
                                 'entryid' => $entryid,
-                                'content' => $formdata->$formfieldname])
+                        'content' => $formdata->$formfieldname]
+                    )
                 ) {
                     // It's not the first of it's kind!
                     $errors[$formfieldname] = get_string('uniquerequired', 'datalynx');

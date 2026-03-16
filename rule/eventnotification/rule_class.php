@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynx_rule
+ * @package datalynxrule_eventnotification
  * @subpackage eventnotification
  * @copyright 2015 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -26,7 +26,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once(dirname(__FILE__) . "/../rule_class.php");
 
 class datalynx_rule_eventnotification extends datalynx_rule_base {
-
     const FROM_AUTHOR = 0;
 
     const FROM_CURRENT_USER = 1;
@@ -95,8 +94,11 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
         $messagedata = new stdClass();
         $eventname = (new \ReflectionClass($event))->getShortName();
         if (strpos($eventname, 'team') !== false) {
-            $messagedata->fieldname = $DB->get_field('datalynx_fields', 'name',
-                    ['id' => $event->get_data()['other']['fieldid']]);
+            $messagedata->fieldname = $DB->get_field(
+                'datalynx_fields',
+                'name',
+                ['id' => $event->get_data()['other']['fieldid']]
+            );
             if (!$this->checkteam($event)) {
                 return false;
                 // TODO: In else branch: combine added and removed members if notification sent to changed team.
@@ -105,7 +107,6 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
 
         // Check if we only trigger on specific checkbox.
         if ($this->rule->param5) {
-
             // If so, test for conditions and stop sending if not met.
             $entryid = $event->get_data()['objectid'];
             $fieldid = $this->rule->param5;
@@ -161,8 +162,9 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
         $userfrom = (strpos($eventname, 'event') !== false &&
                 $this->sender == self::FROM_AUTHOR) ? $author : $USER;
         $messagedata->senderprofilelink = html_writer::link(
-                new moodle_url('/user/profile.php', ['id' => $userfrom->id]),
-                fullname($userfrom));
+            new moodle_url('/user/profile.php', ['id' => $userfrom->id]),
+            fullname($userfrom)
+        );
 
         $messagestosend = [];
         foreach ($this->get_recipients($author->id, $entryid) as $userid) {
@@ -204,16 +206,18 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
             // Include defined field contents in the message.
             $messagedfields = json_decode($this->rule->param7);
             $messagedata->messagecontent = '';
-            if(!empty($messagedfields)) {
-                foreach ($messagedfields AS $fieldid) {
+            if (!empty($messagedfields)) {
+                foreach ($messagedfields as $fieldid) {
                     $entrydata = $DB->get_record('datalynx_contents', ['fieldid' => $fieldid, 'entryid' => $entryid]);
                     $messagedata->messagecontent .= format_text($entrydata->content);
                 }
             }
 
             $entryurl = new moodle_url($viewurl, $viewurlparams);
-            $messagedata->viewlink = html_writer::link($entryurl,
-                    get_string('linktoentry', 'datalynx'));
+            $messagedata->viewlink = html_writer::link(
+                $entryurl,
+                get_string('linktoentry', 'datalynx')
+            );
             $messagedata->datalynxlink = html_writer::link(new moodle_url($viewurl), $datalynxname);
 
             $messagetext = get_string("message_$eventname", 'datalynx', $messagedata);
@@ -243,13 +247,19 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
             $recipientids[] = $authorid;
         }
         if (isset($this->recipient['roles'])) {
-            $recipientids = array_merge($recipientids,
-                    $this->get_recipients_by_permission($this->df->context,
-                            $this->recipient['roles']));
+            $recipientids = array_merge(
+                $recipientids,
+                $this->get_recipients_by_permission(
+                    $this->df->context,
+                    $this->recipient['roles']
+                )
+            );
         }
         if (isset($this->recipient['teams'])) {
-            $recipientids = array_merge($recipientids,
-                    $this->get_team_recipients($this->recipient['teams'], $entryid));
+            $recipientids = array_merge(
+                $recipientids,
+                $this->get_team_recipients($this->recipient['teams'], $entryid)
+            );
         }
 
         if (isset($this->recipient['specificuserid'])) {
@@ -276,22 +286,24 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
                 mod_datalynx\datalynx::PERMISSION_MANAGER => 'mod/datalynx:viewprivilegemanager',
                 mod_datalynx\datalynx::PERMISSION_TEACHER => 'mod/datalynx:viewprivilegeteacher',
                 mod_datalynx\datalynx::PERMISSION_STUDENT => 'mod/datalynx:viewprivilegestudent',
-                mod_datalynx\datalynx::PERMISSION_GUEST => 'mod/datalynx:viewprivilegeguest'
+                mod_datalynx\datalynx::PERMISSION_GUEST => 'mod/datalynx:viewprivilegeguest',
         ];
 
         foreach ($perms as $permissionid => $capstring) {
             if (in_array($permissionid, $permissions)) {
-                list($needed, $forbidden) = get_roles_with_cap_in_context($context, $capstring);
+                [$needed, $forbidden] = get_roles_with_cap_in_context($context, $capstring);
                 $allneeded = array_merge($allneeded, $needed);
                 $allforbidden = array_merge($allforbidden, $forbidden);
             }
         }
 
-        list($contextlist, $params1) = $DB->get_in_or_equal($context->get_parent_context_ids(true),
-                SQL_PARAMS_NAMED);
+        [$contextlist, $params1] = $DB->get_in_or_equal(
+            $context->get_parent_context_ids(true),
+            SQL_PARAMS_NAMED
+        );
 
         if ($allneeded) {
-            list($insqlneeded, $params2) = $DB->get_in_or_equal($allneeded, SQL_PARAMS_NAMED);
+            [$insqlneeded, $params2] = $DB->get_in_or_equal($allneeded, SQL_PARAMS_NAMED);
             $sqlneeded = "SELECT DISTINCT ra.userid
                                  FROM {role_assignments} ra
                                 WHERE ra.roleid $insqlneeded
@@ -303,7 +315,7 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
         }
 
         if ($allforbidden) {
-            list($insqlforbidden, $params3) = $DB->get_in_or_equal($allforbidden, SQL_PARAMS_NAMED);
+            [$insqlforbidden, $params3] = $DB->get_in_or_equal($allforbidden, SQL_PARAMS_NAMED);
             $sqlforbidden = "SELECT DISTINCT ra.userid
                                     FROM {role_assignments} ra
                                    WHERE ra.roleid $insqlforbidden
@@ -331,7 +343,7 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
         if (empty($teams)) {
             return [];
         }
-        list($insql, $params) = $DB->get_in_or_equal($teams, SQL_PARAMS_NAMED);
+        [$insql, $params] = $DB->get_in_or_equal($teams, SQL_PARAMS_NAMED);
         if ($entryid) {
             $entryidsql = "dc.entryid = :entryid";
             $params['entryid'] = $entryid;

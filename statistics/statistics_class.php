@@ -16,14 +16,13 @@
 
 /**
  *
- * @package datalynx
+ * @package mod_datalynx
  * @subpackage statistics
  * @copyright 2013 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 class datalynx_statistics_class {
-
     /*
      * number of total entries ever made / deleted entries
      * number of entries added for a selected time period (week, months, year)
@@ -95,16 +94,23 @@ class datalynx_statistics_class {
                     $to = PHP_INT_MAX;
                     break;
                 default:
-                    throw new moodle_exception('generalexceptionmessage', 'error',
-                            '', 'This should not happen');
+                    throw new moodle_exception(
+                        'generalexceptionmessage',
+                        'error',
+                        '',
+                        'This should not happen'
+                    );
             }
-            list($total, $approved, $deleted, $visits) = $this->get_count($params->mode, $from, $to);
+            [$total, $approved, $deleted, $visits] = $this->get_count($params->mode, $from, $to);
             $dateformat = get_string('strftimedate', 'langconfig');
             $title = get_string('statisticsfor', 'datalynx', $this->_df->name());
-            $timestring = get_string("timestring{$params->mode}", 'datalynx',
-                    ['from' => userdate($from, $dateformat),
-                            'to' => userdate($to, $dateformat), 'now' => userdate(time(), $dateformat)
-                    ]);
+            $timestring = get_string(
+                "timestring{$params->mode}",
+                'datalynx',
+                ['from' => userdate($from, $dateformat),
+                            'to' => userdate($to, $dateformat), 'now' => userdate(time(), $dateformat),
+                ]
+            );
             echo "<hr />$title $timestring";
             $first = true;
             if (isset($params->show[self::VIEW_TOTAL_ENTRIES_COUNT])) {

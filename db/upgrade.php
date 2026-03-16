@@ -16,7 +16,7 @@
 
 /**
  *
- * @package mod-datalynx
+ * @package mod_datalynx
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -53,8 +53,16 @@ function xmldb_datalynx_upgrade($oldversion) {
     if ($oldversion < 2012032100) {
         // Add field selection to datalynx_filters.
         $table = new xmldb_table('datalynx_filters');
-        $field = new xmldb_field('selection', XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED, XMLDB_NOTNULL,
-                null, '0', 'perpage');
+        $field = new xmldb_field(
+            'selection',
+            XMLDB_TYPE_INTEGER,
+            '4',
+            XMLDB_UNSIGNED,
+            XMLDB_NOTNULL,
+            null,
+            '0',
+            'perpage'
+        );
 
         // Launch add field selection.
         if (!$dbman->field_exists($table, $field)) {
@@ -68,8 +76,16 @@ function xmldb_datalynx_upgrade($oldversion) {
     if ($oldversion < 2012040600) {
         // Add field edits to datalynx_fields.
         $table = new xmldb_table('datalynx_fields');
-        $field = new xmldb_field('edits', XMLDB_TYPE_INTEGER, '6', null, XMLDB_NOTNULL, null, '-1',
-                'description');
+        $field = new xmldb_field(
+            'edits',
+            XMLDB_TYPE_INTEGER,
+            '6',
+            null,
+            XMLDB_NOTNULL,
+            null,
+            '-1',
+            'description'
+        );
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
@@ -145,7 +161,7 @@ function xmldb_datalynx_upgrade($oldversion) {
                 if (!empty($view->section)) {
                     $editordata = @unserialize($view->section);
                     if ($editordata !== false) {
-                        list($text, $format, $trust) = $editordata;
+                        [$text, $format, $trust] = $editordata;
                         $view->section = "ft:{$format}tr:{$trust}ct:$text";
                         $update = true;
                     }
@@ -156,7 +172,7 @@ function xmldb_datalynx_upgrade($oldversion) {
                     if (!empty($view->$param)) {
                         $editordata = @unserialize($view->$param);
                         if ($editordata !== false) {
-                            list($text, $format, $trust) = $editordata;
+                            [$text, $format, $trust] = $editordata;
                             $view->$param = "ft:{$format}tr:{$trust}ct:$text";
                             $update = true;
                         }
@@ -174,8 +190,11 @@ function xmldb_datalynx_upgrade($oldversion) {
 
     if ($oldversion < 2012061700) {
         // Remove version record of datalynx views and fields from config_plugin.
-        $DB->delete_records_select('config_plugins', $DB->sql_like('plugin', '?'),
-                ['datalynx%']);
+        $DB->delete_records_select(
+            'config_plugins',
+            $DB->sql_like('plugin', '?'),
+            ['datalynx%']
+        );
         // Change type of view block/blockext to matrix/matrixext.
         $DB->set_field('datalynx_views', 'type', 'matrix', ['type' => 'block']);
         $DB->set_field('datalynx_views', 'type', 'matrixext', ['type' => 'blockext']);
@@ -221,8 +240,16 @@ function xmldb_datalynx_upgrade($oldversion) {
     if ($oldversion < 2012070601) {
         // Add field default filter to datalynx.
         $table = new xmldb_table('datalynx');
-        $field = new xmldb_field('defaultfilter', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL,
-                null, '0', 'defaultview');
+        $field = new xmldb_field(
+            'defaultfilter',
+            XMLDB_TYPE_INTEGER,
+            '10',
+            null,
+            XMLDB_NOTNULL,
+            null,
+            '0',
+            'defaultview'
+        );
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
@@ -260,8 +287,16 @@ function xmldb_datalynx_upgrade($oldversion) {
     if ($oldversion < 2012081801) {
         // Add field visible to datalynx_fields.
         $table = new xmldb_table('datalynx_fields');
-        $field = new xmldb_field('visible', XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED, XMLDB_NOTNULL,
-                null, '2', 'description');
+        $field = new xmldb_field(
+            'visible',
+            XMLDB_TYPE_INTEGER,
+            '4',
+            XMLDB_UNSIGNED,
+            XMLDB_NOTNULL,
+            null,
+            '2',
+            'description'
+        );
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
@@ -273,8 +308,16 @@ function xmldb_datalynx_upgrade($oldversion) {
     if ($oldversion < 2012082600) {
         // Change timelimit field to signed, default -1.
         $table = new xmldb_table('datalynx_fields');
-        $field = new xmldb_field('timelimit', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null,
-                '-1', 'maxentries');
+        $field = new xmldb_field(
+            'timelimit',
+            XMLDB_TYPE_INTEGER,
+            '10',
+            null,
+            XMLDB_NOTNULL,
+            null,
+            '-1',
+            'maxentries'
+        );
         if ($dbman->field_exists($table, $field)) {
             $dbman->change_field_unsigned($table, $field);
             $dbman->change_field_default($table, $field);
@@ -291,7 +334,6 @@ function xmldb_datalynx_upgrade($oldversion) {
             foreach ($datalynxs as $df) {
                 $context = context_course::instance($df->course);
                 if ($presets = $fs->get_area_files($context->id, 'mod_datalynx', 'course_packages')) {
-
                     $filerecord = new stdClass();
                     $filerecord->contextid = $context->id;
                     $filerecord->component = 'mod_datalynx';
@@ -424,7 +466,6 @@ function xmldb_datalynx_upgrade($oldversion) {
     }
 
     if ($oldversion < 2012121900) {
-
         // Changing type of field groupby on table datalynx_views to char.
         $table = new xmldb_table('datalynx_views');
         $field = new xmldb_field('groupby', XMLDB_TYPE_CHAR, '64', null, null, null, '', 'perpage');
@@ -446,8 +487,16 @@ function xmldb_datalynx_upgrade($oldversion) {
     if ($oldversion < 2013051101) {
         // Add notification format column to datalynx.
         $table = new xmldb_table('datalynx');
-        $field = new xmldb_field('notificationformat', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL,
-                null, '1', 'notification');
+        $field = new xmldb_field(
+            'notificationformat',
+            XMLDB_TYPE_INTEGER,
+            '2',
+            null,
+            XMLDB_NOTNULL,
+            null,
+            '1',
+            'notification'
+        );
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
@@ -466,8 +515,16 @@ function xmldb_datalynx_upgrade($oldversion) {
     if ($oldversion < 2013051102) {
         // Add field selection to datalynx_entries.
         $table = new xmldb_table('datalynx_entries');
-        $field = new xmldb_field('status', XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED, XMLDB_NOTNULL,
-                null, '0', 'approved');
+        $field = new xmldb_field(
+            'status',
+            XMLDB_TYPE_INTEGER,
+            '4',
+            XMLDB_UNSIGNED,
+            XMLDB_NOTNULL,
+            null,
+            '0',
+            'approved'
+        );
 
         // Launch add field selection.
         if (!$dbman->field_exists($table, $field)) {
@@ -481,8 +538,16 @@ function xmldb_datalynx_upgrade($oldversion) {
     if ($oldversion < 2013051103) {
         // Add field selection to datalynx_entries.
         $table = new xmldb_table('datalynx');
-        $field = new xmldb_field('completionentries', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED,
-                XMLDB_NOTNULL, null, '0', 'defaultfilter');
+        $field = new xmldb_field(
+            'completionentries',
+            XMLDB_TYPE_INTEGER,
+            '10',
+            XMLDB_UNSIGNED,
+            XMLDB_NOTNULL,
+            null,
+            '0',
+            'defaultfilter'
+        );
 
         // Launch add field selection.
         if (!$dbman->field_exists($table, $field)) {
@@ -494,11 +559,18 @@ function xmldb_datalynx_upgrade($oldversion) {
     }
 
     if ($oldversion < 2013082800) {
-
         // Changing precision of field visible on table datalynx_views to (4).
         $table = new xmldb_table('datalynx_views');
-        $field = new xmldb_field('visible', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0',
-                'description');
+        $field = new xmldb_field(
+            'visible',
+            XMLDB_TYPE_INTEGER,
+            '4',
+            null,
+            XMLDB_NOTNULL,
+            null,
+            '0',
+            'description'
+        );
 
         // Launch change of precision for field visible.
         $dbman->change_field_precision($table, $field);
@@ -588,7 +660,8 @@ function xmldb_datalynx_upgrade($oldversion) {
 
     if ($oldversion < 2015011802) {
         $teamfields = $DB->get_records_sql(
-                "SELECT f.* FROM {datalynx_fields} f WHERE f.type = 'teammemberselect'");
+            "SELECT f.* FROM {datalynx_fields} f WHERE f.type = 'teammemberselect'"
+        );
 
         $map = [1 => 1, 2 => 1, 3 => 2, 4 => 2, 5 => 4, 6 => 8, 7 => 8, 8 => 8];
 
@@ -700,7 +773,6 @@ function xmldb_datalynx_upgrade($oldversion) {
     }
 
     if ($oldversion < 2015032207) {
-
         $sqllike = $DB->sql_like('f.type', ':type');
         $sql = "SELECT f.* FROM {datalynx_fields} f WHERE $sqllike";
 
@@ -708,7 +780,8 @@ function xmldb_datalynx_upgrade($oldversion) {
         $radiofields = $DB->get_fieldset_sql($sql, ['type' => 'radiobutton']);
 
         $filtersearchfields = $DB->get_records_sql_menu(
-                "SELECT id, customsearch FROM {datalynx_filters}");
+            "SELECT id, customsearch FROM {datalynx_filters}"
+        );
         if (!empty($filtersearchfields)) {
             foreach ($filtersearchfields as $filterid => $serializedcustomsearch) {
                 $customsearch = unserialize($serializedcustomsearch);
@@ -718,7 +791,8 @@ function xmldb_datalynx_upgrade($oldversion) {
                         if (in_array($fieldid, $checkboxfields)) {
                             foreach ($queries as $subid => $sub) {
                                 foreach ($sub as $queryid => $query) {
-                                    if ($query[1] !== '' && $query[1] !== 'ANY_OF' &&
+                                    if (
+                                        $query[1] !== '' && $query[1] !== 'ANY_OF' &&
                                             $query[1] !== 'ALL_OF' && $query[1] !== 'EXACTLY'
                                     ) {
                                         $newcustomsearch[$fieldid][$subid][$queryid][1] = 'EXACTLY';
@@ -742,8 +816,12 @@ function xmldb_datalynx_upgrade($oldversion) {
                     }
                 }
                 $serializedcustomsearch = serialize($newcustomsearch);
-                $DB->set_field('datalynx_filters', 'customsearch', $serializedcustomsearch,
-                        ['id' => $filterid]);
+                $DB->set_field(
+                    'datalynx_filters',
+                    'customsearch',
+                    $serializedcustomsearch,
+                    ['id' => $filterid]
+                );
             }
         }
         // Datalynx savepoint reached.
@@ -758,10 +836,16 @@ function xmldb_datalynx_upgrade($oldversion) {
                 $moreview = $DB->get_record('datalynx_views', ['id' => $instance->singleview]);
                 if ($moreview) {
                     foreach ($views as $view) {
-                        $view->section = preg_replace('/\<a.*##moreurl##[^>]*\>(.+)\<\/a\>/',
-                                "#{{viewlink:{$moreview->name};$1;;}}#", $view->section);
-                        $view->param2 = preg_replace('/\<a.*##moreurl##[^>]*\>(.+)\<\/a\>/',
-                                "#{{viewlink:{$moreview->name};$1;;}}#", $view->param2);
+                        $view->section = preg_replace(
+                            '/\<a.*##moreurl##[^>]*\>(.+)\<\/a\>/',
+                            "#{{viewlink:{$moreview->name};$1;;}}#",
+                            $view->section
+                        );
+                        $view->param2 = preg_replace(
+                            '/\<a.*##moreurl##[^>]*\>(.+)\<\/a\>/',
+                            "#{{viewlink:{$moreview->name};$1;;}}#",
+                            $view->param2
+                        );
                         $DB->update_record('datalynx_views', $view);
                     }
                 }
@@ -985,7 +1069,6 @@ function xmldb_datalynx_upgrade($oldversion) {
     }
 
     if ($oldversion < 2019090600) {
-
         // Define field authorsearch to be added to datalynx_customfilters.
         $table = new xmldb_table('datalynx_customfilters');
         $field = new xmldb_field('authorsearch', XMLDB_TYPE_INTEGER, '1', null, null, null, '0', 'timemodified_sortable');
@@ -1015,7 +1098,7 @@ function xmldb_datalynx_upgrade($oldversion) {
 
         $ids = $DB->get_fieldset_select('datalynx', 'id', 'id > 0');
         if (!empty($ids)) {
-            list($sql, $params) = $DB->get_in_or_equal($ids, SQL_PARAMS_QM, 'param', false);
+            [$sql, $params] = $DB->get_in_or_equal($ids, SQL_PARAMS_QM, 'param', false);
             $DB->delete_records_select('datalynx_rules', 'dataid ' . $sql, $params);
         }
         // Datalynx savepoint reached.
@@ -1058,7 +1141,7 @@ function mod_datalynx_replace_field_rules() {
             'visibleto' => [mod_datalynx\datalynx::PERMISSION_MANAGER, mod_datalynx\datalynx::PERMISSION_TEACHER,
                     mod_datalynx\datalynx::PERMISSION_STUDENT, mod_datalynx\datalynx::PERMISSION_AUTHOR],
             'editableby' => [mod_datalynx\datalynx::PERMISSION_MANAGER, mod_datalynx\datalynx::PERMISSION_TEACHER,
-                    mod_datalynx\datalynx::PERMISSION_STUDENT, mod_datalynx\datalynx::PERMISSION_AUTHOR], 'required' => false
+                    mod_datalynx\datalynx::PERMISSION_STUDENT, mod_datalynx\datalynx::PERMISSION_AUTHOR], 'required' => false,
     ];
     $dataids = $DB->get_fieldset_select('datalynx', 'id', "id IS NOT NULL");
     foreach ($dataids as $dataid) {
@@ -1076,8 +1159,11 @@ function mod_datalynx_replace_field_rules() {
                 datalynx_field_behavior::insert_behavior($behavior);
 
                 foreach ($matches as $match) {
-                    $view->param2 = str_replace($match[0], "[[{$match[1]}|{$behavior->name}]]",
-                            $view->param2);
+                    $view->param2 = str_replace(
+                        $match[0],
+                        "[[{$match[1]}|{$behavior->name}]]",
+                        $view->param2
+                    );
                 }
 
                 $changed = true;
@@ -1093,8 +1179,11 @@ function mod_datalynx_replace_field_rules() {
                 datalynx_field_behavior::insert_behavior($behavior);
 
                 foreach ($matches as $match) {
-                    $view->param2 = str_replace($match[0], "[[{$match[1]}|{$behavior->name}]]",
-                            $view->param2);
+                    $view->param2 = str_replace(
+                        $match[0],
+                        "[[{$match[1]}|{$behavior->name}]]",
+                        $view->param2
+                    );
                 }
 
                 $changed = true;
@@ -1110,8 +1199,11 @@ function mod_datalynx_replace_field_rules() {
                 datalynx_field_behavior::insert_behavior($behavior);
 
                 foreach ($matches as $match) {
-                    $view->param2 = str_replace($match[0], "[[{$match[1]}|{$behavior->name}]]",
-                            $view->param2);
+                    $view->param2 = str_replace(
+                        $match[0],
+                        "[[{$match[1]}|{$behavior->name}]]",
+                        $view->param2
+                    );
                 }
 
                 $changed = true;
@@ -1133,7 +1225,7 @@ function mod_datalynx_replace_field_labels() {
             'displaytemplate' => datalynx_field_renderer::DISPLAY_MODE_TEMPLATE_NONE,
             'novaluetemplate' => datalynx_field_renderer::NO_VALUE_SHOW_NOTHING,
             'edittemplate' => datalynx_field_renderer::EDIT_MODE_TEMPLATE_NONE,
-            'noteditabletemplate' => datalynx_field_renderer::NOT_EDITABLE_SHOW_NOTHING
+            'noteditabletemplate' => datalynx_field_renderer::NOT_EDITABLE_SHOW_NOTHING,
     ];
 
     $dataids = $DB->get_fieldset_select('datalynx', 'id', "id IS NOT NULL");
@@ -1152,10 +1244,16 @@ function mod_datalynx_replace_field_labels() {
                         $renderer = $defaultrenderer;
                         $renderer->name = $fieldname . '_' . get_string('label', 'datalynx');
                         $renderer->d = $dataid;
-                        $renderer->displaytemplate = str_replace('[[' . $fieldname . ']]', '#value',
-                                $fieldlabels[$fieldname]);
-                        $renderer->edittemplate = str_replace('[[' . $fieldname . ']]', '#input',
-                                $fieldlabels[$fieldname]);
+                        $renderer->displaytemplate = str_replace(
+                            '[[' . $fieldname . ']]',
+                            '#value',
+                            $fieldlabels[$fieldname]
+                        );
+                        $renderer->edittemplate = str_replace(
+                            '[[' . $fieldname . ']]',
+                            '#input',
+                            $fieldlabels[$fieldname]
+                        );
                         datalynx_field_renderer::insert_renderer($renderer);
                         $fieldtags[$oldtag] = '[[' . $fieldname . '||' . $renderer->name . ']]';
                     }

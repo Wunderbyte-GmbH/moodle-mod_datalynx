@@ -32,7 +32,6 @@ require_once($CFG->libdir . '/filelib.php');
  * The class to handle entry exports of a datalynx module
  */
 class datalynx_portfolio_caller extends portfolio_module_caller_base {
-
     const CONTENT_NOFILES = 0;
 
     const CONTENT_WITHFILES = 1;
@@ -126,7 +125,8 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
         if ($this->exporter->get('formatclass') == PORTFOLIO_FORMAT_SPREADSHEET) {
             $content = $view->display(['controls' => false, 'tohtml' => true]);
             $filename = clean_filename(
-                    $view->name() . '-full.' . $this->get_export_config('spreadsheettype'));
+                $view->name() . '-full.' . $this->get_export_config('spreadsheettype')
+            );
             $this->exporter->write_new_file($content, $filename);
             return;
         }
@@ -148,15 +148,15 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
             if ($exportfiles != self::CONTENT_FILESONLY) {
                 // TODO the user may choose to export without files.
                 $content = $view->display(
-                        ['controls' => false, 'tohtml' => true,
-                                'pluginfileurl' => $this->exporter->get('format')->get_file_directory()
-                        ]);
+                    ['controls' => false, 'tohtml' => true,
+                                'pluginfileurl' => $this->exporter->get('format')->get_file_directory(),
+                    ]
+                );
                 $filename = clean_filename($view->name() . '-full.htm');
                 $this->exporter->write_new_file($content, $filename);
             }
             return;
         }
-
     }
 
     /**
@@ -187,8 +187,12 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
         // Spreadsheet selection.
         $types = ['csv', 'ods', 'xls'];
         $options = array_combine($types, $types);
-        $mform->addElement('select', 'caller_spreadsheettype',
-                get_string('spreadsheettype', 'datalynx'), $options);
+        $mform->addElement(
+            'select',
+            'caller_spreadsheettype',
+            get_string('spreadsheettype', 'datalynx'),
+            $options
+        );
         $mform->setDefault('caller_spreadsheettype', 'csv');
         $mform->disabledIf('caller_spreadsheettype', 'format', 'neq', PORTFOLIO_FORMAT_SPREADSHEET);
 
@@ -196,14 +200,21 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
         $options = [self::CONTENT_NOFILES => 'Exclude embedded files',
                 self::CONTENT_WITHFILES => 'Include embedded files',
                 self::CONTENT_FILESONLY => 'embedded files only'];
-        $mform->addElement('select', 'caller_contentformat',
-                get_string('exportcontent', 'datalynx'), $options);
+        $mform->addElement(
+            'select',
+            'caller_contentformat',
+            get_string('exportcontent', 'datalynx'),
+            $options
+        );
         $mform->setDefault('caller_contentformat', self::CONTENT_NOFILES);
         $mform->disabledIf('caller_contentformat', 'format', 'neq', PORTFOLIO_FORMAT_RICHHTML);
 
         // Each entry in a separate file.
-        $mform->addElement('selectyesno', 'caller_separateentries',
-                get_string('separateentries', 'datalynx'));
+        $mform->addElement(
+            'selectyesno',
+            'caller_separateentries',
+            get_string('separateentries', 'datalynx')
+        );
     }
 
     /**
@@ -217,8 +228,10 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
     public function get_return_url() {
         global $CFG;
 
-        $returnurl = new moodle_url('/mod/datalynx/view.php',
-                ['id' => $this->id, 'view' => $this->vid, 'filter' => $this->fid]);
+        $returnurl = new moodle_url(
+            '/mod/datalynx/view.php',
+            ['id' => $this->id, 'view' => $this->vid, 'filter' => $this->fid]
+        );
         return $returnurl->out(false);
     }
 }
@@ -232,7 +245,6 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class datalynx_file_info_container extends file_info {
-
     /**
      * @var file_browser
      */
@@ -334,13 +346,22 @@ class datalynx_file_info_container extends file_info {
         global $DB;
 
         $children = [];
-        $itemids = $DB->get_records('files',
-                ['contextid' => $this->context->id, 'component' => $this->component,
-                        'filearea' => $this->filearea
-                ], 'itemid DESC', "DISTINCT itemid");
+        $itemids = $DB->get_records(
+            'files',
+            ['contextid' => $this->context->id, 'component' => $this->component,
+                        'filearea' => $this->filearea,
+            ],
+            'itemid DESC',
+            "DISTINCT itemid"
+        );
         foreach ($itemids as $itemid => $unused) {
-            if ($child = $this->browser->get_file_info($this->context, 'mod_datalynx',
-                    $this->filearea, $itemid)
+            if (
+                $child = $this->browser->get_file_info(
+                    $this->context,
+                    'mod_datalynx',
+                    $this->filearea,
+                    $itemid
+                )
             ) {
                 $children[] = $child;
             }

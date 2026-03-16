@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_textarea
  * @subpackage textarea
  * @copyright 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -26,21 +26,28 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
 class datalynxfield_textarea_form extends datalynxfield_form {
-
     public function field_definition() {
         $mform = &$this->_form;
 
         $mform->addElement('header', 'fieldattributeshdr', get_string('fieldattributes', 'datalynx'));
 
         // Field width (cols).
-        $mform->addElement('text', 'param2', get_string('cols', 'datalynxfield_textarea'),
-                ['size' => '8']);
+        $mform->addElement(
+            'text',
+            'param2',
+            get_string('cols', 'datalynxfield_textarea'),
+            ['size' => '8']
+        );
         $mform->setType('param2', PARAM_INT);
         $mform->addRule('param2', null, 'numeric', null, 'client');
 
         // Field height (rows).
-        $mform->addElement('text', 'param3', get_string('rows', 'datalynxfield_textarea'),
-                ['size' => '8']);
+        $mform->addElement(
+            'text',
+            'param3',
+            get_string('rows', 'datalynxfield_textarea'),
+            ['size' => '8']
+        );
         $mform->setType('param3', PARAM_INT);
         $mform->addRule('param3', null, 'numeric', null, 'client');
     }

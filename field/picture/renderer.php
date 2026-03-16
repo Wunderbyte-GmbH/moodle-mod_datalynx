@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_picture
  * @subpackage picture
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
@@ -29,7 +29,6 @@ require_once("$CFG->dirroot/mod/datalynx/field/file/renderer.php");
 /**
  */
 class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
-
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options = null) {
         $field = $this->_field;
         $fieldid = $field->id();
@@ -50,8 +49,14 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
                 'accepted_types' => explode(',', $field->get('param3'))];
 
         $draftitemid = file_get_submitted_draft_itemid("{$fieldname}_filemanager");
-        file_prepare_draft_area($draftitemid, $field->df()->context->id, 'mod_datalynx', 'content',
-                $contentid, $fmoptions);
+        file_prepare_draft_area(
+            $draftitemid,
+            $field->df()->context->id,
+            'mod_datalynx',
+            'content',
+            $contentid,
+            $fmoptions
+        );
 
         // For behat testing: Much, much better to use the official step there than a bunch of very volatile js/css lines.
         $label = $field->df->name() == "Datalynx Test Instance" ? "Picture" : "";

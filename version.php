@@ -30,5 +30,5 @@ $plugin->release = 'v5.2-DataResilience'; // Data words like data science, data 
 $plugin->requires = 2024100700;
 $plugin->maturity = MATURITY_STABLE;
 $plugin->dependencies = [
-    'assignfeedback_editpdf' => ANY_VERSION // We use fpdi from this core module.
+    'assignfeedback_editpdf' => ANY_VERSION, // We use fpdi from this core module.
 ];

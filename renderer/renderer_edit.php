@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package mod_datalynx
  * @copyright 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -61,16 +61,23 @@ switch ($urlparams->action) {
         }
 
         $datalynx->print_header(
-                ['tab' => 'renderers', 'nonotifications' => true, 'urlparams' => $urlparams]);
+            ['tab' => 'renderers', 'nonotifications' => true, 'urlparams' => $urlparams]
+        );
 
         if ($urlparams->id) {
             $data = datalynx_field_renderer::get_record($urlparams->id);
             $mform->set_data($data);
-            echo html_writer::tag('h2', get_string('editingrenderer', 'datalynx', $data->name),
-                    ['class' => 'mdl-align']);
+            echo html_writer::tag(
+                'h2',
+                get_string('editingrenderer', 'datalynx', $data->name),
+                ['class' => 'mdl-align']
+            );
         } else {
-            echo html_writer::tag('h2', get_string('newrenderer', 'datalynx'),
-                    ['class' => 'mdl-align']);
+            echo html_writer::tag(
+                'h2',
+                get_string('newrenderer', 'datalynx'),
+                ['class' => 'mdl-align']
+            );
         }
 
         $mform->display();
@@ -86,13 +93,19 @@ switch ($urlparams->action) {
             $data = datalynx_field_renderer::get_renderer_by_id($urlparams->id);
             $urlparams->confirmed = true;
             $datalynx->print_header(
-                    ['tab' => 'renderers', 'nonotifications' => true,
-                            'urlparams' => $urlparams]);
-            echo html_writer::tag('h2',
-                    get_string('duplicatingrenderer', 'datalynx', $data->get_name()),
-                    ['class' => 'mdl-align']);
-            echo $OUTPUT->confirm(get_string('confirmrendererduplicate', 'datalynx'),
-                    new moodle_url('renderer_edit.php', (array) $urlparams), $returnurl);
+                ['tab' => 'renderers', 'nonotifications' => true,
+                'urlparams' => $urlparams]
+            );
+            echo html_writer::tag(
+                'h2',
+                get_string('duplicatingrenderer', 'datalynx', $data->get_name()),
+                ['class' => 'mdl-align']
+            );
+            echo $OUTPUT->confirm(
+                get_string('confirmrendererduplicate', 'datalynx'),
+                new moodle_url('renderer_edit.php', (array) $urlparams),
+                $returnurl
+            );
             $datalynx->print_footer();
         }
         break;
@@ -105,13 +118,19 @@ switch ($urlparams->action) {
             $data = datalynx_field_renderer::get_renderer_by_id($urlparams->id);
             $urlparams->confirmed = true;
             $datalynx->print_header(
-                    ['tab' => 'renderers', 'nonotifications' => true,
-                            'urlparams' => $urlparams]);
-            echo html_writer::tag('h2',
-                    get_string('deletingrenderer', 'datalynx', $data->get_name()),
-                    ['class' => 'mdl-align']);
-            echo $OUTPUT->confirm(get_string('confirmrendererdelete', 'datalynx'),
-                    new moodle_url('renderer_edit.php', (array) $urlparams), $returnurl);
+                ['tab' => 'renderers', 'nonotifications' => true,
+                'urlparams' => $urlparams]
+            );
+            echo html_writer::tag(
+                'h2',
+                get_string('deletingrenderer', 'datalynx', $data->get_name()),
+                ['class' => 'mdl-align']
+            );
+            echo $OUTPUT->confirm(
+                get_string('confirmrendererdelete', 'datalynx'),
+                new moodle_url('renderer_edit.php', (array) $urlparams),
+                $returnurl
+            );
             $datalynx->print_footer();
         }
         break;

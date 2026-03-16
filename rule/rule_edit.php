@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynx_rule
+ * @package mod_datalynx
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -59,14 +59,14 @@ if ($mform->is_cancelled()) {
 } else {
     if (!$mform->no_submit_button_pressed()) {
         if ($data = $mform->get_data()) {
-
             // Add new rule.
             if (!$rule->get_id()) {
                 $ruleid = $rule->insert_rule($data);
 
                 $other = ['dataid' => $df->id()];
                 $event = \mod_datalynx\event\rule_created::create(
-                        ['context' => $df->context, 'objectid' => $ruleid, 'other' => $other]);
+                    ['context' => $df->context, 'objectid' => $ruleid, 'other' => $other]
+                );
                 $event->trigger();
 
                 // Update rule.
@@ -76,7 +76,8 @@ if ($mform->is_cancelled()) {
 
                 $other = ['dataid' => $df->id()];
                 $event = \mod_datalynx\event\rule_updated::create(
-                        ['context' => $df->context, 'objectid' => $rule->get_id(), 'other' => $other]);
+                    ['context' => $df->context, 'objectid' => $rule->get_id(), 'other' => $other]
+                );
                 $event->trigger();
             }
 
@@ -92,13 +93,17 @@ if ($mform->is_cancelled()) {
 
 // Activate navigation node.
 navigation_node::override_active_url(
-        new moodle_url('/mod/datalynx/rule/index.php', ['id' => $df->cm->id]));
+    new moodle_url('/mod/datalynx/rule/index.php', ['id' => $df->cm->id])
+);
 
 // Print header.
 $df->print_header(['tab' => 'rules', 'nonotifications' => true, 'urlparams' => $urlparams]);
 
 $formheading = $rule->get_id() ? get_string('ruleedit', 'datalynx', $rule->get_name()) : get_string(
-        'rulenew', 'datalynx', $rule->typename());
+    'rulenew',
+    'datalynx',
+    $rule->typename()
+);
 echo html_writer::tag('h2', format_string($formheading), ['class' => 'mdl-align']);
 
 // Display form.

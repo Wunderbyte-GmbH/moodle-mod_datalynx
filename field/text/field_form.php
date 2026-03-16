@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_text
  * @subpackage text
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
 class datalynxfield_text_form extends datalynxfield_form {
-
     /**
      * @return void
      */
@@ -36,8 +35,11 @@ class datalynxfield_text_form extends datalynxfield_form {
 
         $mform = &$this->_form;
 
-        $mform->addElement('header', 'fieldattributeshdr',
-                get_string('fieldattributes', 'datalynx'));
+        $mform->addElement(
+            'header',
+            'fieldattributeshdr',
+            get_string('fieldattributes', 'datalynx')
+        );
 
         // Auto link.
         $mform->addElement('checkbox', 'param1', get_string('fieldallowautolink', 'datalynx'));
@@ -56,8 +58,12 @@ class datalynxfield_text_form extends datalynxfield_form {
             $mform->setConstant('param8', 0);
             $mform->freeze('param8');
             // Display the duplicate-entries-message and the list of duplicate entries.
-            $mform->addElement('static', 'duplicatestext', '',
-                    $OUTPUT->notification(get_string('fieldhasduplicateentries', 'datalynx'), 'notifymessage'));
+            $mform->addElement(
+                'static',
+                'duplicatestext',
+                '',
+                $OUTPUT->notification(get_string('fieldhasduplicateentries', 'datalynx'), 'notifymessage')
+            );
         } else {
             // If there are no duplicates the default option for unique is "No" as well, but the user can change it.
             $mform->setDefault('param8', 0);
@@ -81,7 +87,7 @@ class datalynxfield_text_form extends datalynxfield_form {
                 'presentdlid' => $this->_df->id(),
                 'thisfieldstring' => get_string('thisfield', 'datalynx'),
                 'update' => $this->_field->id() ? $this->_field->id() : 0,
-                'fieldtype' => 'text'
+                'fieldtype' => 'text',
         ];
 
         // Add JQuery
@@ -109,17 +115,20 @@ class datalynxfield_text_form extends datalynxfield_form {
         $grp[] = &$mform->createElement('text', 'param6', null, ['size' => 8]);
         $grp[] = &$mform->createElement('text', 'param7', null, ['size' => 8]);
         $mform->addGroup($grp, 'lengthgrp', get_string('numcharsallowed', 'datalynx'), '    ', false);
-        $mform->addGroupRule('lengthgrp',
-                ['param6' => [[null, 'numeric', null, 'client']]]);
-        $mform->addGroupRule('lengthgrp',
-                ['param7' => [[null, 'numeric', null, 'client']]]);
+        $mform->addGroupRule(
+            'lengthgrp',
+            ['param6' => [[null, 'numeric', null, 'client']]]
+        );
+        $mform->addGroupRule(
+            'lengthgrp',
+            ['param7' => [[null, 'numeric', null, 'client']]]
+        );
         $mform->disabledIf('param6', 'param5', 'eq', '');
         $mform->disabledIf('param6', 'param5', 'eq', 'maxlength');
         $mform->disabledIf('param7', 'param5', 'eq', '');
         $mform->disabledIf('param7', 'param5', 'eq', 'minlength');
         $mform->setType('param6', PARAM_INT);
         $mform->setType('param7', PARAM_INT);
-
     }
 
     /**
@@ -139,8 +148,13 @@ class datalynxfield_text_form extends datalynxfield_form {
         }
 
         if ($refdatalynxid) {
-            if ($textfields = $DB->get_records_menu('datalynx_fields',
-                    ['dataid' => $refdatalynxid, 'type' => 'text'], 'name', 'id,name')
+            if (
+                $textfields = $DB->get_records_menu(
+                    'datalynx_fields',
+                    ['dataid' => $refdatalynxid, 'type' => 'text'],
+                    'name',
+                    'id,name'
+                )
             ) {
                 $formfield = &$this->_form->getElement('param10');
                 // Add the option to choose this new field itself as autocompletion reference field.

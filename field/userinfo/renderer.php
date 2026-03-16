@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_userinfo
  * @subpackage userinfo
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
@@ -30,7 +30,6 @@ require_once("$CFG->dirroot/user/profile/lib.php");
 /**
  */
 class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
-
     public function display_edit(&$mform, $entry, array $options = null) {
         $field = $this->_field;
         $fieldid = $field->id();
@@ -74,7 +73,6 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
         if ($field->mandatory) {
             $mform->addRule($fieldname, null, 'required', null, 'client');
         }
-
     }
 
     /**
@@ -139,8 +137,11 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
             $content = $entry->{"c{$fieldid}_content"};
         } else {
             global $USER, $DB;
-            $content = $DB->get_field('user_info_data', 'data',
-                    ['userid' => $USER->id, 'fieldid' => $field->infoid]);
+            $content = $DB->get_field(
+                'user_info_data',
+                'data',
+                ['userid' => $USER->id, 'fieldid' => $field->infoid]
+            );
         }
 
         $params = ['disabled' => "disabled", 'type' => "checkbox", 'name' => $fieldname];
@@ -160,8 +161,11 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
             $content = $entry->{"c{$fieldid}_content"};
         } else {
             global $USER, $DB;
-            $content = $DB->get_field('user_info_data', 'data',
-                    ['userid' => $USER->id, 'fieldid' => $field->infoid]);
+            $content = $DB->get_field(
+                'user_info_data',
+                'data',
+                ['userid' => $USER->id, 'fieldid' => $field->infoid]
+            );
         }
 
         // Check if time was specified.
@@ -189,8 +193,11 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
             $content = $entry->{"c{$fieldid}_content"};
         } else {
             global $USER, $DB;
-            $content = $DB->get_field('user_info_data', 'data',
-                    ['userid' => $USER->id, 'fieldid' => $field->infoid]);
+            $content = $DB->get_field(
+                'user_info_data',
+                'data',
+                ['userid' => $USER->id, 'fieldid' => $field->infoid]
+            );
         }
 
         if (!$content) {
@@ -214,8 +221,11 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
             }
 
             // Create the link.
-            $str = html_writer::link(str_replace('$$', urlencode($str), $this->field->param9),
-                    htmlspecialchars($this->field->content), $attributes);
+            $str = html_writer::link(
+                str_replace('$$', urlencode($str), $this->field->param9),
+                htmlspecialchars($this->field->content),
+                $attributes
+            );
         }
 
         return $str;
@@ -234,8 +244,11 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
             }
         } else {
             global $USER, $DB;
-            $content = $DB->get_field('user_info_data', 'data',
-                    ['userid' => $USER->id, 'fieldid' => $field->infoid]);
+            $content = $DB->get_field(
+                'user_info_data',
+                'data',
+                ['userid' => $USER->id, 'fieldid' => $field->infoid]
+            );
             $format = FORMAT_PLAIN;
             return format_text($content, $format, ['overflowdiv' => true]);
         }
@@ -285,7 +298,5 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
         }
 
         return $errors;
-
     }
-
 }

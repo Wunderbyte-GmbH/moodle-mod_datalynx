@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynx_rule
+ * @package mod_datalynx
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -59,7 +59,8 @@ $df->set_page('rule/index', ['modjs' => true, 'urlparams' => $urlparams]);
 
 // Activate navigation node.
 navigation_node::override_active_url(
-        new moodle_url('/mod/datalynx/rule/index.php', ['id' => $df->cm->id]));
+    new moodle_url('/mod/datalynx/rule/index.php', ['id' => $df->cm->id])
+);
 
 $rm = $df->get_rule_manager();
 

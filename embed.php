@@ -40,7 +40,7 @@ $df = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
 require_login($df->data->course, false, $df->cm);
 
 $pageparams = ['js' => true, 'css' => true, 'rss' => true, 'modjs' => true,
-        'completion' => true, 'comments' => true, 'pagelayout' => 'embedded', 'urlparams' => $urlparams
+        'completion' => true, 'comments' => true, 'pagelayout' => 'embedded', 'urlparams' => $urlparams,
 ];
 $df->set_page('embed', $pageparams);
 

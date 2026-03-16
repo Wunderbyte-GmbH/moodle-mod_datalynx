@@ -31,7 +31,7 @@ $functions = [
                 'classpath'   => '',
                 'description' => 'Subscribe or unsubscribe users in a datalynx team.',
                 'type'        => 'write',
-                'capabilities'=> 'mod/datalynx:teamsubscribe',
-                'ajax'        => true
+                'capabilities' => 'mod/datalynx:teamsubscribe',
+                'ajax'        => true,
         ],
 ];

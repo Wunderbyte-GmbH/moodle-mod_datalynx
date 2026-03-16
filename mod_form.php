@@ -28,7 +28,6 @@ require_once("$CFG->dirroot/course/moodleform_mod.php");
 require_once($CFG->dirroot . '/mod/datalynx/classes/local/datalynx.php');
 
 class mod_datalynx_mod_form extends moodleform_mod {
-
     protected $_df = null;
 
     public function definition() {
@@ -66,11 +65,19 @@ class mod_datalynx_mod_form extends moodleform_mod {
         $mform->addElement('header', 'timinghdr', get_string('timing', 'form'));
 
         // Time available.
-        $mform->addElement('date_time_selector', 'timeavailable',
-                get_string('dftimeavailable', 'datalynx'), ['optional' => true]);
+        $mform->addElement(
+            'date_time_selector',
+            'timeavailable',
+            get_string('dftimeavailable', 'datalynx'),
+            ['optional' => true]
+        );
         // Time due.
-        $mform->addElement('date_time_selector', 'timedue', get_string('dftimedue', 'datalynx'),
-                ['optional' => true]);
+        $mform->addElement(
+            'date_time_selector',
+            'timedue',
+            get_string('dftimedue', 'datalynx'),
+            ['optional' => true]
+        );
         $mform->disabledIf('timedue', 'interval', 'gt', 0);
 
         // Interval between required entries.
@@ -80,8 +87,12 @@ class mod_datalynx_mod_form extends moodleform_mod {
         $mform->disabledIf('timeinterval', 'timedue[off]');
 
         // Number of intervals.
-        $mform->addElement('select', 'intervalcount', get_string('dfintervalcount', 'datalynx'),
-                array_combine(range(1, 100), range(1, 100)));
+        $mform->addElement(
+            'select',
+            'intervalcount',
+            get_string('dfintervalcount', 'datalynx'),
+            array_combine(range(1, 100), range(1, 100))
+        );
         $mform->addHelpButton('intervalcount', 'dfintervalcount', 'datalynx');
         $mform->setDefault('intervalcount', 1);
         $mform->disabledIf('intervalcount', 'timeavailable[off]', 'checked');
@@ -89,15 +100,23 @@ class mod_datalynx_mod_form extends moodleform_mod {
         $mform->disabledIf('intervalcount', 'timeinterval', 'eq', '');
 
         // Allow late.
-        $mform->addElement('checkbox', 'allowlate', get_string('dflateallow', 'datalynx'),
-                get_string('dflateuse', 'datalynx'));
+        $mform->addElement(
+            'checkbox',
+            'allowlate',
+            get_string('dflateallow', 'datalynx'),
+            get_string('dflateuse', 'datalynx')
+        );
 
         // Rss.
         if ($CFG->enablerssfeeds && $CFG->datalynx_enablerssfeeds) {
             $mform->addElement('header', 'rssshdr', get_string('rss'));
             $countoptions = 0;
-            $mform->addElement('select', 'rssarticles', get_string('numberrssarticles', 'datalynx'),
-                    $countoptions);
+            $mform->addElement(
+                'select',
+                'rssarticles',
+                get_string('numberrssarticles', 'datalynx'),
+                $countoptions
+            );
         }
 
         // Entry settings.
@@ -105,16 +124,25 @@ class mod_datalynx_mod_form extends moodleform_mod {
 
         if ($CFG->datalynx_maxentries > 0) {
             // Admin limit, select from dropdown.
-            $maxoptions = (array_combine(range(0, $CFG->datalynx_maxentries),
-                    range(0, $CFG->datalynx_maxentries)));
+            $maxoptions = (array_combine(
+                range(0, $CFG->datalynx_maxentries),
+                range(0, $CFG->datalynx_maxentries)
+            ));
 
             // Required entries.
-            $mform->addElement('select', 'entriesrequired',
-                    get_string('entriesrequired', 'datalynx'),
-                    [0 => get_string('none')] + $maxoptions);
+            $mform->addElement(
+                'select',
+                'entriesrequired',
+                get_string('entriesrequired', 'datalynx'),
+                [0 => get_string('none')] + $maxoptions
+            );
             // Required entries to view.
-            $mform->addElement('select', 'entriestoview', get_string('entriestoview', 'datalynx'),
-                    [0 => get_string('none')] + $maxoptions);
+            $mform->addElement(
+                'select',
+                'entriestoview',
+                get_string('entriestoview', 'datalynx'),
+                [0 => get_string('none')] + $maxoptions
+            );
             // Max entries.
             $mform->addElement('select', 'maxentries', get_string('entriesmax', 'datalynx'), $maxoptions);
             $mform->setDefault('maxentries', $CFG->datalynx_maxentries);
@@ -149,8 +177,11 @@ class mod_datalynx_mod_form extends moodleform_mod {
 
         // Anonymous entries.
         if ($CFG->datalynx_anonymous) {
-            $mform->addElement('selectyesno', 'anonymous',
-                    get_string('entriesanonymous', 'datalynx'));
+            $mform->addElement(
+                'selectyesno',
+                'anonymous',
+                get_string('entriesanonymous', 'datalynx')
+            );
             $mform->setDefault('anonymous', 0);
         }
 
@@ -213,12 +244,22 @@ class mod_datalynx_mod_form extends moodleform_mod {
         $mform = &$this->_form;
 
         $group = [];
-        $group[] = &$mform->createElement('checkbox', 'completionentriesenabled', '',
-                get_string('completionentries', 'datalynx'), ['size' => 1]);
+        $group[] = &$mform->createElement(
+            'checkbox',
+            'completionentriesenabled',
+            '',
+            get_string('completionentries', 'datalynx'),
+            ['size' => 1]
+        );
         $group[] = &$mform->createElement('text', 'completionentries', '', ['size' => 3]);
         $mform->setType('completionentries', PARAM_INT);
-        $mform->addGroup($group, 'completionentriesgroup',
-                get_string('completionentriesgroup', 'datalynx'), [' '], false);
+        $mform->addGroup(
+            $group,
+            'completionentriesgroup',
+            get_string('completionentriesgroup', 'datalynx'),
+            [' '],
+            false
+        );
         $mform->disabledIf('completionentries', 'completionentriesenabled', 'notchecked');
         $mform->addHelpButton('completionentriesgroup', 'completionentriesgroup', 'datalynx');
 

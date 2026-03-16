@@ -18,7 +18,7 @@
  * This file is part of the Datalynx module for Moodle - http:// Moodle.org/.
  *
  *
- * @package datalynxview
+ * @package datalynxview_csv
  * @subpackage csv
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
@@ -32,11 +32,17 @@ require_once("$CFG->libdir/csvlib.class.php");
 /**
  */
 class datalynxview_csv_import_form extends moodleform {
-
     protected $_view;
 
-    public function __construct($view, $action = null, $customdata = null, $method = 'post', $target = '',
-            $attributes = null, $editable = true) {
+    public function __construct(
+        $view,
+        $action = null,
+        $customdata = null,
+        $method = 'post',
+        $target = '',
+        $attributes = null,
+        $editable = true
+    ) {
         $this->_view = $view;
 
         parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
@@ -74,12 +80,15 @@ class datalynxview_csv_import_form extends moodleform {
         $df = $view->get_dl();
         $mform = &$this->_form;
 
-        $mform->addElement('header', 'fieldsettingshdr',
-                get_string('fieldsimportsettings', 'mod_datalynx'));
+        $mform->addElement(
+            'header',
+            'fieldsettingshdr',
+            get_string('fieldsimportsettings', 'mod_datalynx')
+        );
         $columns = $view->get_columns();
         // Generate the headings and settings for values to import.
         foreach ($columns as $column) {
-            list($pattern, $header, ) = $column;
+            [$pattern, $header, ] = $column;
             $patternname = trim($pattern, '[#]');
             $header = $header ? $header : $patternname;
             $fieldid = $view->get_pattern_fieldid($pattern);
@@ -130,11 +139,14 @@ class datalynxview_csv_import_form extends moodleform {
         $mform->addElement('filepicker', 'importfile', get_string('uploadfile', 'mod_datalynx'));
 
         // Upload text.
-        $mform->addElement('textarea', 'csvtext', get_string('uploadtext', 'mod_datalynx'),
-                ['wrap' => 'soft', 'rows' => '5', 'style' => 'width:100%;']);
+        $mform->addElement(
+            'textarea',
+            'csvtext',
+            get_string('uploadtext', 'mod_datalynx'),
+            ['wrap' => 'soft', 'rows' => '5', 'style' => 'width:100%;']
+        );
 
         // Update existing entries.
         $mform->addElement('selectyesno', 'updateexisting', get_string('updateexisting', 'mod_datalynx'));
-
     }
 }

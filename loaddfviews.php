@@ -40,7 +40,8 @@ if ($d) {
         }
         $retviews = implode(',', $viewmenu);
     }
-    if ($textfields = $DB->get_records_menu('datalynx_fields', ['dataid' => $d, 'type' => 'text'], 'name', 'id,name')
+    if (
+        $textfields = $DB->get_records_menu('datalynx_fields', ['dataid' => $d, 'type' => 'text'], 'name', 'id,name')
     ) {
         $textfieldmenu = [];
         foreach ($textfields as $key => $value) {

@@ -16,26 +16,24 @@
 
 /**
  *
- * @package datalynxrule
+ * @package datalynxrule_ftpsyncfiles
  * @subpackage ftpsyncfiles
  * @copyright 2023 Thomas Winkler
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['event'] = 'Datalynx Ereignis';
+$string['filefield'] = 'Feld in dem die Datei gespeichert werden soll';
+$string['identifier'] = 'Im Dateinamen verwendetes Identifikationsmerkmal, um die Datei dem richtigen User zuzuordnen';
+$string['manager'] = 'Der User, der die Einträge verwaltet';
+$string['matchfields'] = 'Importierte Daten entsprechend den Formularfeldern zuordnen';
 $string['pluginname'] = 'FTP Sync Data';
-$string['triggerspecificevent'] = 'Nur bei markierter Checkbox senden';
-
-$string['sftpsettings'] = 'SFTP Settings';
-$string['sftpserver'] = 'STFP Server';
-$string['sftpusername'] = 'STFP Username';
+$string['regex'] = 'Regulärer Ausdruck, der verwendet wird, um die Kennung aus dem Dateinamen zu extrahieren.
+Wenn leer gelassen, wird standardmäßig /^(\d+)_/ verwendet.';
 $string['sftppassword'] = 'STFP Passwort';
 $string['sftppath'] = 'STFP Path';
 $string['sftpport'] = 'STFP Port';
-
-$string['matchfields'] = 'Importierte Daten entsprechend den Formularfeldern zuordnen';
-$string['identifier'] = 'Im Dateinamen verwendetes Identifikationsmerkmal, um die Datei dem richtigen User zuzuordnen';
+$string['sftpserver'] = 'STFP Server';
+$string['sftpsettings'] = 'SFTP Settings';
+$string['sftpusername'] = 'STFP Username';
 $string['teammemberfield'] = 'Formularfeld, das verwendet wird um den User zu bestimmen, dem die Datei zugeordnet werden soll';
-$string['manager'] = 'Der User, der die Einträge verwaltet';
-$string['filefield'] = 'Feld in dem die Datei gespeichert werden soll';
-$string['regex'] = 'Regulärer Ausdruck, der verwendet wird, um die Kennung aus dem Dateinamen zu extrahieren.
-Wenn leer gelassen, wird standardmäßig /^(\d+)_/ verwendet.';
+$string['triggerspecificevent'] = 'Nur bei markierter Checkbox senden';

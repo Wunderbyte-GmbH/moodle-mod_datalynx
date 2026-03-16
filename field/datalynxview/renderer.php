@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_datalynxview
  * @subpackage datadformview
  * @copyright 2014 onwards by edulabs.org and associated programmers
  * @copyright based on the work by 2013 Itamar Tzadok
@@ -32,7 +32,6 @@ require_once("$CFG->dirroot/mod/datalynx/field/entrygroup/field_class.php");
 /**
  */
 class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
-
     /*
      * Rendering this field in display mode
      * called by the replacement-function of datalynxfield_renderer
@@ -78,7 +77,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
      * stdClass @entry          the entry object this field belongs to
      * array string @options    array of options for the display-method of the view
      *
-     * @returns                 the display-method of the view
+     * @return                 the display-method of the view
      */
     protected function get_view_display_content($entry, array $options = []) {
         $field = $this->_field;
@@ -128,7 +127,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         $field = $this->_field;
 
         if (!empty($field->field->param6)) { // Param6: author,group.
-            list($filterauthor, $filtergroup) = explode(',', $field->field->param6);
+            [$filterauthor, $filtergroup] = explode(',', $field->field->param6);
             // Entry author.
             if ($filterauthor) {
                 if ($entry->id != -1) {
@@ -158,12 +157,16 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         // Then we get the entry-IDs of the entries (eids) which match this content-value.
         // End add them to the options array.
         if ($fieldid = $field->field->param7) {  // Field-ID of the external field.
-            if ($contents = $DB->get_fieldset_select('datalynx_contents', 'content',
+            if (
+                $contents = $DB->get_fieldset_select(
+                    'datalynx_contents',
+                    'content',
                     'entryid = :entryid and fieldid = :fieldid',
-                    ['entryid' => $entry->id, 'fieldid' => $field->field->id])
+                    ['entryid' => $entry->id, 'fieldid' => $field->field->id]
+                )
             ) {
                 $contentsarr = explode(",", $contents[0]);
-                list($insql, $params) = $DB->get_in_or_equal($contentsarr, SQL_PARAMS_NAMED);
+                [$insql, $params] = $DB->get_in_or_equal($contentsarr, SQL_PARAMS_NAMED);
                 $params['fieldid'] = $fieldid;
                 $sql = 'SELECT  c.entryid
                         FROM    {datalynx_contents} c
@@ -172,7 +175,6 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
                 if ($eids = $DB->get_fieldset_sql($sql, $params)) {
                     $options['eids'] = implode(",", $eids);
                 }
-
             }
         }
 
@@ -191,7 +193,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         // Custom sort (ref-field-patten,ASC/DESC).
         if (!empty($field->field->param4)) {
             foreach (explode("\n", $field->field->param4) as $key => $sorty) {
-                list($pattern, $dir) = explode(',', $sorty);
+                [$pattern, $dir] = explode(',', $sorty);
                 // Get the field id from pattern.
                 if (!$rfieldid = $refview->get_pattern_fieldid($pattern)) {
                     continue;
@@ -218,13 +220,14 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
             return $soptions;
         }
 
-        if (!$refdatalynx = $field->refdatalynx || !$refview = $field->refview || !$localview = $field->localview
+        if (
+            !$refdatalynx = $field->refdatalynx || !$refview = $field->refview || !$localview = $field->localview
         ) {
             return $soptions;
         }
 
         foreach (explode("\n", $field->field->param5) as $key => $searchy) {
-            list($andor, $refpattern, $not, $operator, $localpattern) = explode(',', $searchy);
+            [$andor, $refpattern, $not, $operator, $localpattern] = explode(',', $searchy);
             // And/or.
             if (empty($andor) || !in_array($andor, ['AND', 'OR'])) {
                 continue;
@@ -290,7 +293,6 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
         $field = $this->_field;
         // Do not show in edit mode, when nothing can be selected.
         if ($field->refdatalynx !== null && !empty($field->field->param7)) {
-
             $fieldid = $field->id();
             $entryid = $entry->id;
             $fieldname = "field_{$fieldid}_$entryid";
@@ -305,7 +307,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
 
             $mform->addElement('autocomplete', $fieldname, null, $menu, [
                     "class" => "datalynxfield_datalynxview $classname",
-                    "multiple" => "true"
+                    "multiple" => "true",
             ]);
             $mform->setType($fieldname, PARAM_NOTAGS);
             $mform->setDefault($fieldname, $selected);
@@ -328,7 +330,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
 
         $errors = [];
         foreach ($tags as $tag) {
-            list(, $behavior, ) = $this->process_tag($tag);
+            [, $behavior, ] = $this->process_tag($tag);
             // Variable $behavior datalynx_field_behavior.
             if ($behavior->is_required() && (!isset($formdata->$formfieldname))) {
                 $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');

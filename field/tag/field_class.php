@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_tag
  * @subpackage tag
  * @copyright 2016 David Bogner
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -26,13 +26,12 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
 class datalynxfield_tag extends datalynxfield_option_multiple {
-
     public $type = 'tag';
 
     /**
      * Can this field be used in fieldgroups?
      * We don't want to add empty tags to the tag manager, this field can only be used if forced required.
-     * @var boolean
+     * @var bool
      */
     protected $forfieldgroup = false;
 
@@ -112,7 +111,8 @@ class datalynxfield_tag extends datalynxfield_option_multiple {
         $this->field->label = !empty($forminput->label) ? $forminput->label : '';
         for ($i = 1; $i <= 10; $i++) {
             $this->field->{"param$i"} = !empty($forminput->{"param$i"}) ? trim(
-                    $forminput->{"param$i"}) : null;
+                $forminput->{"param$i"}
+            ) : null;
         }
     }
 
@@ -125,7 +125,7 @@ class datalynxfield_tag extends datalynxfield_option_multiple {
         global $DB;
 
         // Variable $not is either empty or "NOT".
-        list($not, $operator, $value) = $search;
+        [$not, $operator, $value] = $search;
 
         static $i = 0; // FIXME: might cause problems!
         $i++;

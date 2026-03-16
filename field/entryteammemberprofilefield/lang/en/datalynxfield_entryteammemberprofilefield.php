@@ -16,13 +16,13 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_entryteammemberprofilefield
  * @subpackage entryteammemberprofilefield
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-$string['pluginname'] = 'Entryteammemberprofilefield';
-$string['myprofilefield'] = 'equal to the value in my profile';
 $string['literalvalue'] = 'literal value:';
+$string['myprofilefield'] = 'equal to the value in my profile';
+$string['pluginname'] = 'Entryteammemberprofilefield';
 $string['privacy:metadata'] = 'The field entryteammemberprofilefield does not store personal data.';

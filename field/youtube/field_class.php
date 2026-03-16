@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_youtube
  * @subpackage youtube
  * @copyright 2021 michael pollak <moodle@michaelpollak.org>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -26,12 +26,11 @@ defined('MOODLE_INTERNAL') || die();
 require_once(dirname(__FILE__) . '/../field_class.php');
 
 class datalynxfield_youtube extends datalynxfield_base {
-
     public $type = 'youtube';
 
     /**
      * Can this field be used in fieldgroups?
-     * @var boolean
+     * @var bool
      */
     protected $forfieldgroup = false;
 
@@ -59,7 +58,7 @@ class datalynxfield_youtube extends datalynxfield_base {
         }
         // Remove youtube prefix and only store the key.
         // Source: https://stackoverflow.com/questions/3392993/php-regex-to-get-youtube-video-id.
-        parse_str( parse_url( $values, PHP_URL_QUERY ), $vars );
+        parse_str(parse_url($values, PHP_URL_QUERY), $vars);
         $contents[] = $vars['v'];
 
         return [$contents];

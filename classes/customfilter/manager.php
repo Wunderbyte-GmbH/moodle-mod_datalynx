@@ -36,7 +36,6 @@ defined('MOODLE_INTERNAL') || die();
  * @package mod_datalynx\customfilter
  */
 class manager {
-
     const USER_FILTER_MAX_NUM = 5;
 
     const BLANK_FILTER = -1;
@@ -88,9 +87,13 @@ class manager {
                 return new customfilter($filter);
             }
 
-            if ($filterid != self::USER_FILTER_SET &&
-                    $filter = get_user_preferences("datalynxcustomfilter-$dlid-$viewid-$filterid",
-                            null)) {
+            if (
+                $filterid != self::USER_FILTER_SET &&
+                    $filter = get_user_preferences(
+                        "datalynxcustomfilter-$dlid-$viewid-$filterid",
+                        null
+                    )
+            ) {
                 $filter = unserialize($filter);
                 $filter->dataid = $dlid;
                 return new customfilter($filter);
@@ -174,8 +177,10 @@ class manager {
                         continue;
                     }
                     if ($menu) {
-                        if ($filter->visible or
-                            has_capability('mod/datalynx:managetemplates', $this->_dl->context)) {
+                        if (
+                            $filter->visible or
+                            has_capability('mod/datalynx:managetemplates', $this->_dl->context)
+                        ) {
                             $filters[$filterid] = $filter->name;
                         }
                     } else {
@@ -222,11 +227,16 @@ class manager {
             if (!$confirmed) {
                 $dl->print_header('customfilters');
                 $message = get_string("filtersconfirm$action", 'datalynx', count($filters));
-                $url1 = new moodle_url('/mod/datalynx/customfilter/index.php',
-                        ['d' => $dl->id(), $action => implode(',', array_keys($filters)),
-                            'sesskey' => sesskey(), 'confirmed' => 1]);
-                $url2 = new moodle_url('/mod/datalynx/customfilter/index.php',
-                        ['d' => $dl->id()]);
+                $url1 = new moodle_url(
+                    '/mod/datalynx/customfilter/index.php',
+                    ['d' => $dl->id(), $action => implode(',', array_keys($filters)),
+                    'sesskey' => sesskey(),
+                    'confirmed' => 1]
+                );
+                $url2 = new moodle_url(
+                    '/mod/datalynx/customfilter/index.php',
+                    ['d' => $dl->id()]
+                );
                 echo $OUTPUT->confirm($message, $url1, $url2);
                 echo $OUTPUT->footer();
                 exit();
@@ -255,19 +265,26 @@ class manager {
 
                                 $other = ['dataid' => $this->_dl->id()];
                                 $event = \mod_datalynx\event\field_updated::create(
-                                        ['context' => $this->_dl->context,
-                                            'objectid' => $filter->id, 'other' => $other]);
+                                    ['context' => $this->_dl->context,
+                                    'objectid' => $filter->id,
+                                    'other' => $other]
+                                );
                                 $event->trigger();
                             } else {
-                                $filter->id = $DB->insert_record('datalynx_customfilters', $filter,
-                                        true);
+                                $filter->id = $DB->insert_record(
+                                    'datalynx_customfilters',
+                                    $filter,
+                                    true
+                                );
                                 $processedlids[] = $filter->id;
                                 $strnotify = 'filtersadded';
 
                                 $other = ['dataid' => $this->_dl->id()];
                                 $event = \mod_datalynx\event\field_created::create(
-                                        ['context' => $this->_dl->context,
-                                            'objectid' => $filter->id, 'other' => $other]);
+                                    ['context' => $this->_dl->context,
+                                    'objectid' => $filter->id,
+                                    'other' => $other]
+                                );
                                 $event->trigger();
                             }
                             $this->_filters[$filter->id] = $filter;
@@ -291,8 +308,10 @@ class manager {
 
                                 $other = ['dataid' => $this->_dl->id()];
                                 $event = \mod_datalynx\event\field_created::create(
-                                        ['context' => $this->_dl->context,
-                                            'objectid' => $filterid, 'other' => $other]);
+                                    ['context' => $this->_dl->context,
+                                    'objectid' => $filterid,
+                                    'other' => $other]
+                                );
                                 $event->trigger();
                             }
                         }
@@ -311,8 +330,10 @@ class manager {
 
                             $other = ['dataid' => $this->_dl->id()];
                             $event = \mod_datalynx\event\field_updated::create(
-                                    ['context' => $this->_dl->context,
-                                        'objectid' => $filter->id, 'other' => $other]);
+                                ['context' => $this->_dl->context,
+                                'objectid' => $filter->id,
+                                'other' => $other]
+                            );
                             $event->trigger();
                         }
 
@@ -328,8 +349,10 @@ class manager {
 
                             $other = ['dataid' => $this->_dl->id()];
                             $event = \mod_datalynx\event\field_deleted::create(
-                                    ['context' => $this->_dl->context,
-                                        'objectid' => $filter->id, 'other' => $other]);
+                                ['context' => $this->_dl->context,
+                                'objectid' => $filter->id,
+                                'other' => $other]
+                            );
                             $event->trigger();
                         }
                         $strnotify = 'filtersdeleted';
@@ -341,8 +364,11 @@ class manager {
 
                 if (!empty($strnotify)) {
                     $filtersprocessed = $processedlids ? count($processedlids) : 'No';
-                    $dl->notifications['good'][] = get_string($strnotify, 'datalynx',
-                            $filtersprocessed);
+                    $dl->notifications['good'][] = get_string(
+                        $strnotify,
+                        'datalynx',
+                        $filtersprocessed
+                    );
                 }
                 return $processedlids;
             }
@@ -353,8 +379,10 @@ class manager {
      */
     public function get_customfilter_backend_form($filter) {
 
-        $formurl = new moodle_url('/mod/datalynx/customfilter/index.php',
-            ['d' => $this->_dl->id(), 'fid' => $filter->id, 'update' => 1]);
+        $formurl = new moodle_url(
+            '/mod/datalynx/customfilter/index.php',
+            ['d' => $this->_dl->id(), 'fid' => $filter->id, 'update' => 1]
+        );
         $mform = new backend_form($this->_dl, $filter, $formurl);
         return $mform;
     }
@@ -434,9 +462,12 @@ class manager {
         $nostr = "---";
         foreach ($this->_customfilters as $filterid => $filter) {
             $filtername = html_writer::link(
-                    new moodle_url($filterbaseurl,
-                            $linkparams + ['fedit' => $filterid, 'fid' => $filterid]),
-                    $filter->name);
+                new moodle_url(
+                    $filterbaseurl,
+                    $linkparams + ['fedit' => $filterid, 'fid' => $filterid]
+                ),
+                $filter->name
+            );
             $filterdescription = shorten_text($filter->description, 30);
             $fulltextsearch = $filter->fulltextsearch ? $yesstr : $nostr;
             if ($filter->fieldlist) {
@@ -457,18 +488,24 @@ class manager {
                 $visibleicon = $OUTPUT->pix_icon('t/show', $strshow);
             }
             $visibleurl = html_writer::link(
-                    new moodle_url($filterbaseurl, $linkparams + ['visible' => $filterid]),
-                    $visibleicon);
+                new moodle_url($filterbaseurl, $linkparams + ['visible' => $filterid]),
+                $visibleicon
+            );
             $filteredit = html_writer::link(
-                    new moodle_url($filterbaseurl,
-                            $linkparams + ['fedit' => $filterid, 'fid' => $filterid]),
-                    $OUTPUT->pix_icon('t/edit', $stredit));
+                new moodle_url(
+                    $filterbaseurl,
+                    $linkparams + ['fedit' => $filterid, 'fid' => $filterid]
+                ),
+                $OUTPUT->pix_icon('t/edit', $stredit)
+            );
             $filterduplicate = html_writer::link(
-                    new moodle_url($filterbaseurl, $linkparams + ['duplicate' => $filterid]),
-                    $OUTPUT->pix_icon('t/copy', $strduplicate));
+                new moodle_url($filterbaseurl, $linkparams + ['duplicate' => $filterid]),
+                $OUTPUT->pix_icon('t/copy', $strduplicate)
+            );
             $filterdelete = html_writer::link(
-                    new moodle_url($filterbaseurl, $linkparams + ['delete' => $filterid]),
-                    $OUTPUT->pix_icon('t/delete', $strdelete));
+                new moodle_url($filterbaseurl, $linkparams + ['delete' => $filterid]),
+                $OUTPUT->pix_icon('t/delete', $strdelete)
+            );
             $table->data[] = [$filtername, $filterdescription, $fulltextsearch, $fieldlist,
                 $visibleurl, $filteredit, $filterduplicate, $filterdelete];
         }
@@ -484,9 +521,12 @@ class manager {
         echo html_writer::empty_tag('br');
         echo html_writer::start_tag('div', ['class' => 'fieldadd mdl-align']);
         echo html_writer::link(
-                new moodle_url('/mod/datalynx/customfilter/index.php',
-                        ['d' => $this->_dl->id(), 'sesskey' => sesskey(), 'new' => 1]),
-                get_string('customfilteradd', 'datalynx'));
+            new moodle_url(
+                '/mod/datalynx/customfilter/index.php',
+                ['d' => $this->_dl->id(), 'sesskey' => sesskey(), 'new' => 1]
+            ),
+            get_string('customfilteradd', 'datalynx')
+        );
         echo html_writer::end_tag('div');
         echo html_writer::empty_tag('br');
     }
@@ -503,7 +543,7 @@ class manager {
         $dlid = $dl->id();
         if ($filternames = get_user_preferences("datalynxcustomfilter-$dlid-$viewid-userfilters", '')) {
             foreach (explode(';', $filternames) as $filteridname) {
-                list($filterid, $name) = explode(' ', $filteridname, 2);
+                [$filterid, $name] = explode(' ', $filteridname, 2);
                 $filters[$filterid] = $name;
             }
         }
@@ -591,7 +631,7 @@ class manager {
         if ($url) {
             if ($url instanceof moodle_url) {
                 foreach ($filteroptions as $option => $args) {
-                    list($name, , ) = $args;
+                    [$name, , ] = $args;
                     if ($val = $url->get_param($name)) {
                         if ($option == 'customsort') {
                             $options[$option] = self::get_sort_options_from_query($val);
@@ -606,7 +646,6 @@ class manager {
                             $options[$option] = $val;
                         }
                     }
-
                 }
             }
             return $options;
@@ -614,7 +653,7 @@ class manager {
 
         // Optional params.
         foreach ($filteroptions as $option => $args) {
-            list($name, $default, $type) = $args;
+            [$name, $default, $type] = $args;
             if ($val = optional_param($name, $default, $type)) {
                 if ($option == 'customsort') {
                     $options[$option] = self::get_sort_options_from_query($val);
@@ -681,6 +720,5 @@ class manager {
         }
 
         return $options;
-
     }
 }

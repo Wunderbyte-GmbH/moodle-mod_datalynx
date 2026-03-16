@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_select
  * @subpackage select
  * @copyright 2014 Ivan Šakić
  * @copyright 2016 David Bogner
@@ -30,7 +30,6 @@ require_once(dirname(__FILE__) . "/../renderer.php");
  * Class datalynxfield_select_renderer Renderer for select field type
  */
 class datalynxfield_select_renderer extends datalynxfield_renderer {
-
     /**
      *
      * @var datalynxfield_select
@@ -79,7 +78,7 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
         // Sort the options alphabetically.
         $sortalphbetically = $field->field->param4;
         if ($sortalphbetically) {
-            usort($menuoptions, function($a, $b) {
+            usort($menuoptions, function ($a, $b) {
                 return strcoll($a->name, $b->name);
             });
         }

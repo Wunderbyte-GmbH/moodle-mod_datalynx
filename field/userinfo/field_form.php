@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_userinfo
  * @subpackage userinfo
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
 class datalynxfield_userinfo_form extends datalynxfield_form {
-
     /**
      */
     public function field_definition() {
@@ -35,8 +34,11 @@ class datalynxfield_userinfo_form extends datalynxfield_form {
 
         $mform = &$this->_form;
 
-        $mform->addElement('header', 'fieldattributeshdr',
-                get_string('fieldattributes', 'datalynx'));
+        $mform->addElement(
+            'header',
+            'fieldattributeshdr',
+            get_string('fieldattributes', 'datalynx')
+        );
 
         // Info field.
         $options = $DB->get_records_menu('user_info_field', [], 'shortname', 'id,shortname');
@@ -50,6 +52,5 @@ class datalynxfield_userinfo_form extends datalynxfield_form {
         // Entry can not be safed with empty userinfo field.
         $mform->addElement('advcheckbox', 'param7', get_string('infofield_mandatory', 'datalynxfield_userinfo'));
         $mform->addHelpButton('param7', 'infofield_mandatory', 'datalynxfield_userinfo');
-
     }
 }

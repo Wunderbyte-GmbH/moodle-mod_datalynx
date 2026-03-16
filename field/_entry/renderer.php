@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package mod_datalynx
  * @subpackage _entry
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
@@ -29,7 +29,6 @@ require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 /**
  */
 class datalynxfield__entry_renderer extends datalynxfield_renderer {
-
     /**
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
@@ -41,7 +40,6 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
         // No edit mode.
         $replacements = [];
         foreach ($tags as $tag) {
-
             // New entry displays nothing.
             if ($entry->id < 0) {
                 $replacements[$tag] = '';
@@ -53,10 +51,10 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
                     case '##entryid##':
                         $str = $entry->id;
                         break;
-                    case '##entryidzerofill##';
+                    case '##entryidzerofill##':
                         $str = str_pad($entry->id, 4, 0, STR_PAD_LEFT);
                         break;
-                    case '##coursevisible##';
+                    case '##coursevisible##':
                         $str = $this->_field->df->course->visible ? get_string('coursevisible', 'datalynx') : '';
                         break;
                     case '##more##':
@@ -188,8 +186,10 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
         $str = '';
         $canexportentry = $this->_field->df()->user_can_export_entry($entry);
         if ($canexportentry) {
-            $url = new moodle_url($entry->baseurl,
-                    ['export' => $entry->id, 'sesskey' => sesskey()]);
+            $url = new moodle_url(
+                $entry->baseurl,
+                ['export' => $entry->id, 'sesskey' => sesskey()]
+            );
             $strexport = get_string('export', 'datalynx');
             return html_writer::link($url, $OUTPUT->pix_icon('t/portfolioadd', $strexport));
         }

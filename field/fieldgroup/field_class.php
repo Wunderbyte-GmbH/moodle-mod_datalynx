@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package datalynxfield
+ * @package datalynxfield_fieldgroup
  * @subpackage fieldgroup
  * @copyright 2018 michael pollak <moodle@michaelpollak.org>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -25,12 +25,11 @@ defined('MOODLE_INTERNAL') || die();
 require_once(dirname(__FILE__) . '/../field_class.php');
 
 class datalynxfield_fieldgroup extends datalynxfield_base {
-
     public $type = 'fieldgroup';
 
     /**
      * Fieldids of the fields belonging to the fieldgroup#
-     * @var integer[]
+     * @var int[]
      */
     public $fieldids = [];
 

@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxview
+ * @package datalynxview_csv
  * @subpackage csv
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
@@ -28,7 +28,6 @@ require_once("$CFG->dirroot/mod/datalynx/view/view_form.php");
 require_once("$CFG->libdir/csvlib.class.php");
 
 class datalynxview_csv_form extends datalynxview_base_form {
-
     /**
      */
     public function view_definition_after_gps() {
@@ -78,7 +77,7 @@ class datalynxview_csv_form extends datalynxview_base_form {
         parent::data_preprocessing($data);
         // CSV settings.
         if (!empty($data->param1)) {
-            list($data->delimiter, $data->enclosure, $data->encoding) = explode(',', $data->param1);
+            [$data->delimiter, $data->enclosure, $data->encoding] = explode(',', $data->param1);
         }
     }
 

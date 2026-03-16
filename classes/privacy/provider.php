@@ -17,7 +17,7 @@
 /**
  * Privacy provider implementation for datalynxfield_checkbox.
  *
- * @package datalynx
+ * @package mod_datalynx
  * @copyright 2018 Michael Pollak <moodle@michaelpollak.org>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * This is heavily based on mod_data from Marina Glancy, thank you.
@@ -47,7 +47,7 @@ class provider implements
      * @param collection $collection a reference to the collection to use to store the metadata.
      * @return collection the updated collection of metadata items.
      */
-    public static function get_metadata(collection $collection) : collection {
+    public static function get_metadata(collection $collection): collection {
 
         // Table datalynx_entries.
         $collection->add_database_table(
@@ -89,7 +89,7 @@ class provider implements
      * @param int $userid the userid.
      * @return contextlist the list of contexts containing user info for the user.
      */
-    public static function get_contexts_for_userid(int $userid) : contextlist {
+    public static function get_contexts_for_userid(int $userid): contextlist {
 
         // Fetch all entries in datalynx created by the user.
         $sql = "SELECT c.id
@@ -125,7 +125,7 @@ class provider implements
 
         $user = $contextlist->get_user();
 
-        list($contextsql, $contextparams) = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
+        [$contextsql, $contextparams] = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
         $sql = "SELECT cm.id AS cmid, dl.name AS dataname, cm.course AS courseid, " . self::sql_fields() . "
                 FROM {context} ctx
                 JOIN {course_modules} cm ON cm.id = ctx.instanceid
@@ -159,8 +159,11 @@ class provider implements
             }
 
             $fieldobj = self::extract_object_from_entry($row, 'field', ['dataid' => $row->dataid]);
-            $contentobj = self::extract_object_from_entry($row, 'content',
-                ['fieldid' => $fieldobj->id, 'entryid' => $recordobj->id]);
+            $contentobj = self::extract_object_from_entry(
+                $row,
+                'content',
+                ['fieldid' => $fieldobj->id, 'entryid' => $recordobj->id]
+            );
             self::export_datalynx_content($context, $recordobj, $fieldobj, $contentobj);
         }
         $rs->close();
@@ -260,8 +263,14 @@ class provider implements
         // Data about the record.
         writer::with_context($context)->export_data([$recordobj->id], (object)$data);
         // Related tags.
-        \core_tag\privacy\provider::export_item_tags($user->id, $context, [$recordobj->id],
-            'mod_datalynx', 'datalynx_entries', $recordobj->id);
+        \core_tag\privacy\provider::export_item_tags(
+            $user->id,
+            $context,
+            [$recordobj->id],
+            'mod_datalynx',
+            'datalynx_entries',
+            $recordobj->id
+        );
     }
 
     /**
@@ -275,7 +284,7 @@ class provider implements
     protected static function extract_object_from_entry($entry, $prefix, $additionalfields = []) {
         $object = new \stdClass();
         foreach ($entry as $key => $value) {
-            if (preg_match('/^'.preg_quote($prefix, '/').'(.*)/', $key, $matches)) {
+            if (preg_match('/^' . preg_quote($prefix, '/') . '(.*)/', $key, $matches)) {
                 $object->{$matches[1]} = $value;
             }
         }
@@ -312,8 +321,11 @@ class provider implements
         $recordobj = self::extract_object_from_entry($row, 'entry', ['dataid' => $row->dataid]);
         if ($row->contentid && $row->fieldid) {
             $fieldobj = self::extract_object_from_entry($row, 'field', ['dataid' => $row->dataid]);
-            $contentobj = self::extract_object_from_entry($row, 'content',
-                ['fieldid' => $fieldobj->id, 'entryid' => $recordobj->id]);
+            $contentobj = self::extract_object_from_entry(
+                $row,
+                'content',
+                ['fieldid' => $fieldobj->id, 'entryid' => $recordobj->id]
+            );
 
             // Allow datafield plugin to implement their own deletion.
             /*
@@ -342,11 +354,16 @@ class provider implements
             return;
         }
 
-        list($sql, $params) = $DB->get_in_or_equal($recordstobedeleted, SQL_PARAMS_NAMED);
+        [$sql, $params] = $DB->get_in_or_equal($recordstobedeleted, SQL_PARAMS_NAMED);
 
         // Delete files.
-        get_file_storage()->delete_area_files_select($context->id, 'mod_datalynx', 'datalynx_entries',
-            "IN (SELECT dc.id FROM {datalynx_contents} dc WHERE dc.entryid $sql)", $params);
+        get_file_storage()->delete_area_files_select(
+            $context->id,
+            'mod_datalynx',
+            'datalynx_entries',
+            "IN (SELECT dc.id FROM {datalynx_contents} dc WHERE dc.entryid $sql)",
+            $params
+        );
 
         // Delete from datalynx_contents.
         $DB->delete_records_select('datalynx_contents', 'entryid ' . $sql, $params);
@@ -371,7 +388,7 @@ class provider implements
                 'description' => $fieldobj->description,
                 'type' => $fieldobj->type,
             ],
-            'content' => $contentobj->content
+            'content' => $contentobj->content,
         ];
         foreach (['content1', 'content2', 'content3', 'content4'] as $key) {
             if ($contentobj->$key !== null) {
@@ -382,8 +399,12 @@ class provider implements
 
         // Data field plugin does not implement datafield_provider, just export default value.
         writer::with_context($context)->export_data([$recordobj->id, $contentobj->id], $value);
-        writer::with_context($context)->export_area_files([$recordobj->id, $contentobj->id], 'mod_datalynx',
-            'content', $contentobj->id);
+        writer::with_context($context)->export_area_files(
+            [$recordobj->id, $contentobj->id],
+            'mod_datalynx',
+            'content',
+            $contentobj->id
+        );
     }
 
     /**
@@ -406,5 +427,4 @@ class provider implements
                   de.assessed AS entryassessed,
                   de.approved AS entryapproved, de.groupid AS entrygroupid, de.userid AS entryuserid';
     }
-
 }

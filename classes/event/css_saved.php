@@ -33,7 +33,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class css_saved extends \core\event\base {
-
     /**
      * Init method.
      *
@@ -70,8 +69,10 @@ class css_saved extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/mod/datalynx/view.php',
-                ['d' => $this->objectid, 'cssedit' => 1
-                ]);
+        return new \moodle_url(
+            '/mod/datalynx/view.php',
+            ['d' => $this->objectid, 'cssedit' => 1,
+            ]
+        );
     }
 }

@@ -24,5 +24,5 @@
 defined('MOODLE_INTERNAL') || die();
 
 $subplugins = ['datalynxfield' => 'mod/datalynx/field', 'datalynxview' => 'mod/datalynx/view',
-        'datalynxrule' => 'mod/datalynx/rule', 'datalynxtool' => 'mod/datalynx/tool'
+        'datalynxrule' => 'mod/datalynx/rule', 'datalynxtool' => 'mod/datalynx/tool',
 ];

@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_entryauthor
  * @subpackage entryauthor
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/mod/datalynx/field/field_class.php');
 
 class datalynxfield_entryauthor extends datalynxfield_no_content {
-
     public $type = 'entryauthor';
 
     const _USERID = 'userid';
@@ -154,13 +153,13 @@ class datalynxfield_entryauthor extends datalynxfield_no_content {
      */
     public function get_search_sql(array $search): array {
         global $USER, $DB;
-        list($not, $operator, $value) = $search;
+        [$not, $operator, $value] = $search;
 
         if ($operator == 'ME') {
             $value = $USER->id;
         }
 
-        list($sql, $params) = $DB->get_in_or_equal($value, SQL_PARAMS_NAMED);
+        [$sql, $params] = $DB->get_in_or_equal($value, SQL_PARAMS_NAMED);
         $sql = " $not ( e.userid $sql ) ";
         return [$sql, $params, false];
     }
@@ -224,7 +223,7 @@ class datalynxfield_entryauthor extends datalynxfield_no_content {
             case 'name':
                 return ['' => '&lt;' . get_string('choose') . '&gt;',
                         'ME' => get_string('me', 'datalynx'),
-                        'OTHER_USER' => get_string('otheruser', 'datalynx')
+                        'OTHER_USER' => get_string('otheruser', 'datalynx'),
                 ];
             default:
                 return parent::get_supported_search_operators();

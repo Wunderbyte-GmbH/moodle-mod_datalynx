@@ -30,9 +30,9 @@ require_once($CFG->libdir . '/externallib.php');
 
 /**
  * Web service to subscribe/unsubscribe users in datalynx team fields.
+ * @package mod_datalynx
  */
 class team_subscription extends external_api {
-
     /**
      * Define parameters for the service.
      *
@@ -44,7 +44,7 @@ class team_subscription extends external_api {
                 'entryid' => new external_value(PARAM_INT, 'Entry ID'),
                 'fieldid' => new external_value(PARAM_INT, 'Field ID'),
                 'userid' => new external_value(PARAM_INT, 'User ID'),
-                'action' => new external_value(PARAM_ALPHA, 'Action: subscribe or unsubscribe')
+                'action' => new external_value(PARAM_ALPHA, 'Action: subscribe or unsubscribe'),
         ]);
     }
 
@@ -79,7 +79,7 @@ class team_subscription extends external_api {
         // Fetch existing users.
         $users = json_decode($DB->get_field('datalynx_contents', 'content', [
                 'fieldid' => $params['fieldid'],
-                'entryid' => $params['entryid']
+                'entryid' => $params['entryid'],
         ]), true) ?? [];
 
         // Fetch max team size setting from the field configuration.
@@ -90,7 +90,7 @@ class team_subscription extends external_api {
             if ($maxteamsize > 0 && count($users) >= $maxteamsize) {
                 return [
                         'success' => false,
-                        'error' => get_string('maxteamsizeexceeded', 'mod_datalynx', $maxteamsize)
+                        'error' => get_string('maxteamsizeexceeded', 'mod_datalynx', $maxteamsize),
                 ];
             }
 
@@ -99,7 +99,7 @@ class team_subscription extends external_api {
 
             $record = $DB->get_record('datalynx_contents', [
                     'fieldid' => $params['fieldid'],
-                    'entryid' => $params['entryid']
+                    'entryid' => $params['entryid'],
             ]);
 
             $data = new stdClass();
@@ -111,24 +111,24 @@ class team_subscription extends external_api {
                 // Update existing record.
                 $DB->set_field('datalynx_contents', 'content', $data->content, [
                         'fieldid' => $params['fieldid'],
-                        'entryid' => $params['entryid']
+                        'entryid' => $params['entryid'],
                 ]);
             } else {
                 // Insert new record.
                 $DB->insert_record('datalynx_contents', $data);
             }
-        } elseif ($params['action'] === 'unsubscribe') {
+        } else if ($params['action'] === 'unsubscribe') {
             $users = array_values(array_diff($users, [(string) $params['userid']]));
 
             if (empty($users)) {
                 $DB->delete_records('datalynx_contents', [
                         'fieldid' => $params['fieldid'],
-                        'entryid' => $params['entryid']
+                        'entryid' => $params['entryid'],
                 ]);
             } else {
                 $DB->set_field('datalynx_contents', 'content', json_encode($users), [
                         'fieldid' => $params['fieldid'],
-                        'entryid' => $params['entryid']
+                        'entryid' => $params['entryid'],
                 ]);
             }
         } else {
@@ -146,7 +146,7 @@ class team_subscription extends external_api {
     public static function execute_returns() {
         return new external_single_structure([
                 'success' => new external_value(PARAM_BOOL, 'Success status'),
-                'error' => new external_value(PARAM_TEXT, 'Error message (if any)', VALUE_OPTIONAL)
+                'error' => new external_value(PARAM_TEXT, 'Error message (if any)', VALUE_OPTIONAL),
         ]);
     }
 }

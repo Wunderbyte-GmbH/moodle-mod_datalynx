@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_file
  * @subpackage file
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
 class datalynxfield_file_form extends datalynxfield_form {
-
     /**
      */
     public function field_definition() {
@@ -35,8 +34,11 @@ class datalynxfield_file_form extends datalynxfield_form {
 
         $mform = &$this->_form;
 
-        $mform->addElement('header', 'fieldattributeshdr',
-                get_string('fieldattributes', 'datalynx'));
+        $mform->addElement(
+            'header',
+            'fieldattributeshdr',
+            get_string('fieldattributes', 'datalynx')
+        );
 
         // Max bytes (param1).
         $options = get_max_upload_sizes($CFG->maxbytes, $this->_df->course->maxbytes);

@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_time
  * @subpackage time
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
 class datalynxfield_time extends datalynxfield_base {
-
     public $type = 'time';
 
     public $dateonly;
@@ -42,7 +41,7 @@ class datalynxfield_time extends datalynxfield_base {
 
     /**
      * Can this field be used in fieldgroups?
-     * @var boolean
+     * @var bool
      */
     protected $forfieldgroup = true;
 
@@ -135,7 +134,7 @@ class datalynxfield_time extends datalynxfield_base {
      * @see datalynxfield_base::get_search_sql()
      */
     public function get_search_sql(array $search): array {
-        list($not, $operator, $value) = $search;
+        [$not, $operator, $value] = $search;
 
         if (is_array($value)) {
             $from = $value[0];
@@ -211,16 +210,17 @@ class datalynxfield_time extends datalynxfield_base {
                 // Temp fix: German month names.
                 $germanmonths = [
                         'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
-                        'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'
+                        'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember',
                 ];
 
                 // English month names
                 $englishmonths = [
                         'January', 'February', 'March', 'April', 'May', 'June',
-                        'July', 'August', 'September', 'October', 'November', 'December'
+                        'July', 'August', 'September', 'October', 'November', 'December',
                 ];
                 // It's a timestamp.
-                if (((string) (int) $timestr === $timestr) && ($timestr <= PHP_INT_MAX) &&
+                if (
+                    ((string) (int) $timestr === $timestr) && ($timestr <= PHP_INT_MAX) &&
                         ($timestr >= ~PHP_INT_MAX)
                 ) {
                     $data->{"field_{$fieldid}_{$entryid}"} = $timestr;
@@ -231,11 +231,11 @@ class datalynxfield_time extends datalynxfield_base {
                         $data->{"field_{$fieldid}_{$entryid}"} = $unixtimestamp;
                     } else {
                         $fmt = new IntlDateFormatter(
-                                'de_DE',
-                                IntlDateFormatter::FULL,
-                                IntlDateFormatter::FULL,
-                                null,
-                                IntlDateFormatter::GREGORIAN
+                            'de_DE',
+                            IntlDateFormatter::FULL,
+                            IntlDateFormatter::FULL,
+                            null,
+                            IntlDateFormatter::GREGORIAN
                         );
                         datefmt_set_lenient($fmt, true);
                         $unixtimestamp = $fmt->parse($timestr);
@@ -254,7 +254,7 @@ class datalynxfield_time extends datalynxfield_base {
     /**
      */
     public function format_search_value($searchparams) {
-        list($not, $operator, $value) = $searchparams;
+        [$not, $operator, $value] = $searchparams;
         if (is_array($value)) {
             if (count($value) > 1) {
                 $value = '(' . implode(',', $value) . ')';

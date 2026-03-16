@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxview
+ * @package datalynxview_grid
  * @subpackage grid
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
@@ -30,7 +30,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/classes/view/base.php");
 
 class datalynxview_grid extends base {
-
     protected string $type = 'grid';
 
     protected array $_editors = ['section', 'param2'];
@@ -83,8 +82,11 @@ class datalynxview_grid extends base {
         // Construct the table.
         $table->data = [$row1, $row2, $row3];
         $sectiondefault = html_writer::table($table);
-        $this->view->esection = html_writer::tag('div', $sectiondefault,
-                        ['class' => 'mdl-align']) . "<div>##entries##</div>";
+        $this->view->esection = html_writer::tag(
+            'div',
+            $sectiondefault,
+            ['class' => 'mdl-align']
+        ) . "<div>##entries##</div>";
 
         // Set content fields in responsive grid.
         $mustache = [];
@@ -116,7 +118,7 @@ class datalynxview_grid extends base {
         // Prepare grid table if needed.
         if ($name != 'newentry' && !empty($this->view->param3)) {
             $entriescount = count($entriesset);
-            list($cols, $rows) = explode(' ', $this->view->param3);
+            [$cols, $rows] = explode(' ', $this->view->param3);
             if ($entriescount < $cols) {
                 $cols = $entriescount;
                 $rows = 1;

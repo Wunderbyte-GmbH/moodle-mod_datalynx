@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynx
+ * @package mod_datalynx
  * @subpackage statistics
  * @copyright 2013 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -29,11 +29,17 @@ require_once("$CFG->libdir/formslib.php");
  * Statistics option form
  */
 class datalynx_statistics_form extends moodleform {
-
     private $_df = null;
 
-    public function __construct($df, $action = null, $customdata = null, $method = 'post', $target = '',
-            $attributes = null, $editable = true) {
+    public function __construct(
+        $df,
+        $action = null,
+        $customdata = null,
+        $method = 'post',
+        $target = '',
+        $attributes = null,
+        $editable = true
+    ) {
         parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
         $this->_df = $df;
     }
@@ -46,18 +52,48 @@ class datalynx_statistics_form extends moodleform {
         $mform->addElement('date_selector', 'from', get_string('fromdate', 'datalynx'));
         $mform->addElement('date_selector', 'to', get_string('todate', 'datalynx'));
         $radioarray = [];
-        $radioarray[] = &$mform->createElement('radio', 'mode', '',
-                get_string('period', 'datalynx'), datalynx_statistics_class::MODE_PERIOD);
-        $radioarray[] = &$mform->createElement('radio', 'mode', '',
-                get_string('ondate', 'datalynx'), datalynx_statistics_class::MODE_ON_DATE);
-        $radioarray[] = &$mform->createElement('radio', 'mode', '',
-                get_string('todate', 'datalynx'), datalynx_statistics_class::MODE_UNTIL_DATE);
-        $radioarray[] = &$mform->createElement('radio', 'mode', '',
-                get_string('fromdate', 'datalynx'), datalynx_statistics_class::MODE_FROM_DATE);
-        $radioarray[] = &$mform->createElement('radio', 'mode', '',
-                get_string('alltime', 'datalynx'), datalynx_statistics_class::MODE_ALL_TIME);
-        $mform->addGroup($radioarray, 'modearray', get_string('modearray', 'datalynx'),
-                [' ', ' ', '<br />', ' ', ' '], false);
+        $radioarray[] = &$mform->createElement(
+            'radio',
+            'mode',
+            '',
+            get_string('period', 'datalynx'),
+            datalynx_statistics_class::MODE_PERIOD
+        );
+        $radioarray[] = &$mform->createElement(
+            'radio',
+            'mode',
+            '',
+            get_string('ondate', 'datalynx'),
+            datalynx_statistics_class::MODE_ON_DATE
+        );
+        $radioarray[] = &$mform->createElement(
+            'radio',
+            'mode',
+            '',
+            get_string('todate', 'datalynx'),
+            datalynx_statistics_class::MODE_UNTIL_DATE
+        );
+        $radioarray[] = &$mform->createElement(
+            'radio',
+            'mode',
+            '',
+            get_string('fromdate', 'datalynx'),
+            datalynx_statistics_class::MODE_FROM_DATE
+        );
+        $radioarray[] = &$mform->createElement(
+            'radio',
+            'mode',
+            '',
+            get_string('alltime', 'datalynx'),
+            datalynx_statistics_class::MODE_ALL_TIME
+        );
+        $mform->addGroup(
+            $radioarray,
+            'modearray',
+            get_string('modearray', 'datalynx'),
+            [' ', ' ', '<br />', ' ', ' '],
+            false
+        );
         $mform->addHelpButton('modearray', 'modearray', 'datalynx');
         $mform->disabledIf('from', 'mode', 'eq', datalynx_statistics_class::MODE_UNTIL_DATE);
         $mform->disabledIf('from', 'mode', 'eq', datalynx_statistics_class::MODE_ALL_TIME);

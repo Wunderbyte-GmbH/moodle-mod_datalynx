@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package datalynxfield
+ * @package datalynxfield_fieldgroup
  * @subpackage fieldgroup
  * @copyright 2018 michael pollak <moodle@michaelpollak.org>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -28,7 +28,6 @@ require_once(dirname(__FILE__) . "/../renderer.php");
  * Class datalynxfield_fieldgroup_renderer Renderer for fieldgroup field type
  */
 class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
-
     /**
      * Fields that are included in the fieldgroup. Fieldid as key.
      * @var array
@@ -75,7 +74,6 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
             }
             $completedispl['line'][] = $linedispl;
             $linedispl = []; // Reset.
-
         }
         $subfieldnames = array_unique($subfieldnames);
         foreach ($subfieldnames as $name) {
@@ -152,7 +150,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 $tempentryid = $entry->id;
                 // Dirty hack to render elements with a unique id.
                 $entry->id = $entry->id . "_{$fieldname}_" . $line; // Add iterator to each line of fieldgroup.
-                $mform->addElement('static', $entry->id . '_' . $fieldid , $subfield->field->name . ': ');
+                $mform->addElement('static', $entry->id . '_' . $fieldid, $subfield->field->name . ': ');
                 // Entry has an tmp id for rendering the subfields.
                 $subfield->renderer()->prerender_edit_mode($mform, $entry, $options);
 
@@ -185,13 +183,16 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         }
 
         // Add line visible anchor, starts at 0.
-        $mform->addElement('hidden', $fieldname.'_lastvisible', $defaultlines);
-        $mform->setType($fieldname.'_lastvisible', PARAM_INT);
+        $mform->addElement('hidden', $fieldname . '_lastvisible', $defaultlines);
+        $mform->setType($fieldname . '_lastvisible', PARAM_INT);
 
         // Hide unused lines.
         global $PAGE;
-        $PAGE->requires->js_call_amd('mod_datalynx/fieldgroups', 'init',
-            [$this->_field->field->name, $defaultlines, $maxlines, $requiredlines, $fieldname]);
+        $PAGE->requires->js_call_amd(
+            'mod_datalynx/fieldgroups',
+            'init',
+            [$this->_field->field->name, $defaultlines, $maxlines, $requiredlines, $fieldname]
+        );
 
         // Show a button to add one more line.
         $mform->addElement('button', 'addline', get_string('addline', 'datalynx', $this->_field->field->name));
@@ -293,7 +294,6 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
                 if ($line > $lastlinewithcontent) {
                     $lastlinewithcontent = $line;
                 }
-
             } else {
                 $entry->{"c{$subfieldid}_content{$contentid}"} = null;
             }

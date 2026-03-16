@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_coursegroup
  * @subpackage coursegroup
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
@@ -151,10 +151,10 @@ class datalynxfield_coursegroup extends datalynxfield_base {
     public function get_search_sql(array $search): array {
         global $DB, $CFG, $USER, $PAGE;
 
-        list($not, $operator, $value) = $search;
+        [$not, $operator, $value] = $search;
 
         if (is_array($value)) {
-            list($member, $course, $group) = $value;
+            [$member, $course, $group] = $value;
         } else {
             $member = $course = $group = 0;
         }
@@ -188,14 +188,22 @@ class datalynxfield_coursegroup extends datalynxfield_base {
             $userid = $USER->id;
         }
         // Get user's groups.
-        if (!$usergroups = $DB->get_records_menu('groups_members', ['userid' => $userid],
-                'groupid', 'id,groupid')
+        if (
+            !$usergroups = $DB->get_records_menu(
+                'groups_members',
+                ['userid' => $userid],
+                'groupid',
+                'id,groupid'
+            )
         ) {
             // Not a member in any group so search for "groupid" -1 to retrieve no entries.
             $usergroups = [-1];
         }
-        list($ingroups, $groupids) = $DB->get_in_or_equal($usergroups, SQL_PARAMS_NAMED,
-                "df_{$fieldid}_");
+        [$ingroups, $groupids] = $DB->get_in_or_equal(
+            $usergroups,
+            SQL_PARAMS_NAMED,
+            "df_{$fieldid}_"
+        );
         return [" $varcharcontent $ingroups ", $groupids, true];
     }
 
@@ -213,8 +221,8 @@ class datalynxfield_coursegroup extends datalynxfield_base {
     /**
      */
     public function format_search_value($searchparams) {
-        list($not, $operator, $value) = $searchparams;
-        list($member, $course, $group) = $value;
+        [$not, $operator, $value] = $searchparams;
+        [$member, $course, $group] = $value;
         if ($member) {
             return get_string('member', 'datalynxfield_coursegroup');
         }
@@ -234,8 +242,10 @@ class datalynxfield_coursegroup extends datalynxfield_base {
             $fieldid = $this->field->id;
             $fieldname = $this->name();
             $csvname = $importsettings[$fieldname]['name'];
-            list($course, $group) = !empty($csvrecord[$csvname]) ? explode(' ',
-                    $csvrecord[$csvname]) : [0, 0];
+            [$course, $group] = !empty($csvrecord[$csvname]) ? explode(
+                ' ',
+                $csvrecord[$csvname]
+            ) : [0, 0];
 
             if ($course && $group) {
                 $data->{"field_{$fieldid}_{$entryid}_course"} = $course;
@@ -246,4 +256,3 @@ class datalynxfield_coursegroup extends datalynxfield_base {
         return true;
     }
 }
-

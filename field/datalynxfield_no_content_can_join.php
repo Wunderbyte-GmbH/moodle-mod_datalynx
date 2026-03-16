@@ -14,10 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
  * Base class for Datalynx field types that require no content. Example: User profile fields.
+ * @package mod_datalynx
  */
 abstract class datalynxfield_no_content_can_join extends datalynxfield_no_content {
-
 }

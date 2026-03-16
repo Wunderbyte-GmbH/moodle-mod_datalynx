@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxtool
+ * @package datalynxtool_entryperuser
  * @subpackage entryperuser
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok

@@ -30,7 +30,6 @@ require_once($CFG->libdir . '/formslib.php');
  * This class is responsible for managin the form for the field behaviors
  */
 class datalynx_field_behavior_form extends moodleform {
-
     /**
      *
      * @var mod_datalynx\datalynx
@@ -65,8 +64,13 @@ class datalynx_field_behavior_form extends moodleform {
         $mform->addElement('text', 'name', get_string('name'), ['size' => '32']);
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
-        $mform->addRule('name', "Behavior name may not contain the pipe symbol \" | \"!", 'regex',
-                '/^[^\|]+$/', 'client');
+        $mform->addRule(
+            'name',
+            "Behavior name may not contain the pipe symbol \" | \"!",
+            'regex',
+            '/^[^\|]+$/',
+            'client'
+        );
 
         $mform->addElement('text', 'description', get_string('description'), ['size' => '64']);
         $mform->setType('description', PARAM_TEXT);
@@ -77,28 +81,45 @@ class datalynx_field_behavior_form extends moodleform {
         $mform->setExpanded('visibilityoptions');
 
         $options = ["multiple" => true];
-        $mform->addElement('autocomplete', 'visibletopermission', get_string('visibleto', 'datalynx'),
-                $this->datalynx->get_datalynx_permission_names(false, false), $options);
+        $mform->addElement(
+            'autocomplete',
+            'visibletopermission',
+            get_string('visibleto', 'datalynx'),
+            $this->datalynx->get_datalynx_permission_names(false, false),
+            $options
+        );
         $mform->addHelpButton('visibletopermission', 'visibleto', 'datalynx');
         $mform->setType('visibletopermission', PARAM_RAW);
         if ($new) {
-            $mform->setDefault('visibletopermission',
-                    [mod_datalynx\datalynx::PERMISSION_MANAGER, mod_datalynx\datalynx::PERMISSION_TEACHER,
-                            mod_datalynx\datalynx::PERMISSION_STUDENT]);
+            $mform->setDefault(
+                'visibletopermission',
+                [mod_datalynx\datalynx::PERMISSION_MANAGER, mod_datalynx\datalynx::PERMISSION_TEACHER,
+                mod_datalynx\datalynx::PERMISSION_STUDENT]
+            );
         }
 
         // Interface for single user, this overrules other visibility options.
         $allusers = $this->get_allusers();
         $options = ["multiple" => true];
-        $mform->addElement('autocomplete', 'visibletouser',
-                get_string('otheruser', 'datalynx'), $allusers, $options);
+        $mform->addElement(
+            'autocomplete',
+            'visibletouser',
+            get_string('otheruser', 'datalynx'),
+            $allusers,
+            $options
+        );
         $mform->setType('visibletouser', PARAM_INT);
 
         // Interface for teammemberselect fields.
         $options = ["multiple" => true];
         $teammemberselect = $this->get_teammemberselect_fields();
-        $mform->addElement('autocomplete', 'visibletoteammember', get_string('teammemberselect', 'datalynx'),
-                $teammemberselect, $options);
+        $mform->addElement(
+            'autocomplete',
+            'visibletoteammember',
+            get_string('teammemberselect', 'datalynx'),
+            $teammemberselect,
+            $options
+        );
         $mform->setType('visibletoteammember', PARAM_RAW);
 
         // EDITING OPTIONS.
@@ -110,15 +131,22 @@ class datalynx_field_behavior_form extends moodleform {
             $mform->setDefault('editable', true);
         }
 
-        $mform->addElement('autocomplete', 'editableby', get_string('editableby', 'datalynx'),
-                $this->datalynx->get_datalynx_permission_names(false, false), $options);
+        $mform->addElement(
+            'autocomplete',
+            'editableby',
+            get_string('editableby', 'datalynx'),
+            $this->datalynx->get_datalynx_permission_names(false, false),
+            $options
+        );
         $mform->addHelpButton('editableby', 'editableby', 'datalynx');
 
         $mform->setType('editableby', PARAM_RAW);
         if ($new) {
-            $mform->setDefault('editableby',
-                    [mod_datalynx\datalynx::PERMISSION_MANAGER, mod_datalynx\datalynx::PERMISSION_TEACHER,
-                            mod_datalynx\datalynx::PERMISSION_STUDENT]);
+            $mform->setDefault(
+                'editableby',
+                [mod_datalynx\datalynx::PERMISSION_MANAGER, mod_datalynx\datalynx::PERMISSION_TEACHER,
+                mod_datalynx\datalynx::PERMISSION_STUDENT]
+            );
         }
         $mform->disabledIf('editableby', 'editable', 'notchecked');
 
@@ -230,8 +258,12 @@ class datalynx_field_behavior_form extends moodleform {
         }
         if ($data['id'] == 0) {
             // To prevent duplicate renderer names when creating a new renderer.
-            if ($DB->record_exists('datalynx_behaviors',
-                    ['name' => $data['name'], 'dataid' => $data['d']])) {
+            if (
+                $DB->record_exists(
+                    'datalynx_behaviors',
+                    ['name' => $data['name'], 'dataid' => $data['d']]
+                )
+            ) {
                 $errors['name'] = get_string('duplicatename', 'datalynx');
             }
         } else {

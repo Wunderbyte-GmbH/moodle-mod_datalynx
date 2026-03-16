@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_duration
  * @subpackage duration
  * @copyright 2014 onwards by edulabs.org and associated programmers
  * @copyright based on the work by 2013 Itamar Tzadok
@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
 class datalynxfield_duration_form extends datalynxfield_form {
-
     /**
      */
     public function field_definition() {

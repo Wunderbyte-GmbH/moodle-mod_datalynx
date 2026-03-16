@@ -39,7 +39,6 @@ if ($urlparams->cssedit) {
     require_once($CFG->libdir . '/formslib.php');
 
     class mod_datalynx_css_form extends moodleform {
-
         public function definition() {
             global $COURSE;
 
@@ -61,10 +60,15 @@ if ($urlparams->cssedit) {
 
             // Uploads.
             $options = ['subdirs' => 0, 'maxbytes' => $COURSE->maxbytes, 'maxfiles' => 10,
-                    'accepted_types' => ['*.css']
+                    'accepted_types' => ['*.css'],
             ];
-            $mform->addElement('filemanager', 'cssupload', get_string('cssupload', 'datalynx'),
-                    null, $options);
+            $mform->addElement(
+                'filemanager',
+                'cssupload',
+                get_string('cssupload', 'datalynx'),
+                null,
+                $options
+            );
 
             // Buttons.
             $this->add_action_buttons(true);
@@ -79,10 +83,12 @@ if ($urlparams->cssedit) {
 
     // Activate navigation node.
     navigation_node::override_active_url(
-            new moodle_url('/mod/datalynx/css.php', ['id' => $df->cm->id, 'cssedit' => 1]));
+        new moodle_url('/mod/datalynx/css.php', ['id' => $df->cm->id, 'cssedit' => 1])
+    );
 
     $mform = new mod_datalynx_css_form(
-            new moodle_url('/mod/datalynx/css.php', ['d' => $df->id(), 'cssedit' => 1]));
+        new moodle_url('/mod/datalynx/css.php', ['d' => $df->id(), 'cssedit' => 1])
+    );
 
     if (!$mform->is_cancelled()) {
         if ($data = $mform->get_data()) {
@@ -95,8 +101,15 @@ if ($urlparams->cssedit) {
             // Add uploaded files.
             $usercontext = context_user::instance($USER->id);
             $fs = get_file_storage();
-            if ($files = $fs->get_area_files($usercontext->id, 'user', 'draft', $data->cssupload,
-                    'sortorder', false)
+            if (
+                $files = $fs->get_area_files(
+                    $usercontext->id,
+                    'user',
+                    'draft',
+                    $data->cssupload,
+                    'sortorder',
+                    false
+                )
             ) {
                 $filerec = new stdClass();
                 $filerec->contextid = $df->context->id;
@@ -112,7 +125,8 @@ if ($urlparams->cssedit) {
             }
 
             $event = \mod_datalynx\event\css_saved::create(
-                    ['context' => $df->context, 'objectid' => $df->id()]);
+                ['context' => $df->context, 'objectid' => $df->id()]
+            );
             $event->trigger();
         }
     }
@@ -128,15 +142,15 @@ if ($urlparams->cssedit) {
     $mform->display();
     $df->print_footer();
 } else {
-
     defined('NO_MOODLE_COOKIES') || define('NO_MOODLE_COOKIES', true); // Session not used here.
 
     $lifetime = 0; // Seconds to cache this stylesheet.
 
     $PAGE->set_url('/mod/datalynx/css.php', ['d' => $urlparams->d]);
 
-    if ($cssdata = $DB->get_field('datalynx', 'css', ['id' => $urlparams->d
-    ])
+    if (
+        $cssdata = $DB->get_field('datalynx', 'css', ['id' => $urlparams->d,
+        ])
     ) {
         header('Last-Modified: ' . gmdate('D, d M Y H:i:s', time()) . ' GMT');
         header('Expires: ' . gmdate("D, d M Y H:i:s", time() + $lifetime) . ' GMT');

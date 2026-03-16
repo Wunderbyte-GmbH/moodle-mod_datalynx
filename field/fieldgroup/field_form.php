@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package datalynxfield
+ * @package datalynxfield_fieldgroup
  * @subpackage fieldgroup
  * @copyright 2018 michael pollak <moodle@michaelpollak.org>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -25,7 +25,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
 class datalynxfield_fieldgroup_form extends datalynxfield_form {
-
     /**
      *
      * {@inheritdoc}
@@ -45,8 +44,13 @@ class datalynxfield_fieldgroup_form extends datalynxfield_form {
         }
         asort($fieldnames);
         $options = ['multiple' => true];
-        $mform->addElement('autocomplete', 'param1', get_string('fieldgroupfields', 'datalynx'),
-                $fieldnames, $options);
+        $mform->addElement(
+            'autocomplete',
+            'param1',
+            get_string('fieldgroupfields', 'datalynx'),
+            $fieldnames,
+            $options
+        );
         $mform->addHelpButton('param1', 'fieldgroupfields', 'datalynx');
 
         // Number of times the field group can be filled out.

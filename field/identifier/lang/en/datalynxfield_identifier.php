@@ -16,16 +16,16 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_identifier
  * @subpackage identifier
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-$string['pluginname'] = 'Identifier';
 $string['entryid'] = 'Entry id';
-$string['saltsource'] = 'Salt source';
+$string['pluginname'] = 'Identifier';
+$string['privacy:metadata'] = 'Identifiers do not store personal data.';
 $string['saltsize'] = 'Salt size';
+$string['saltsource'] = 'Salt source';
 $string['system'] = 'System';
 $string['uniqueness'] = 'Uniqueness';
-$string['privacy:metadata'] = 'Identifiers do not store personal data.';

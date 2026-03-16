@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package mod_datalynx
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -57,7 +57,6 @@ if ($mform->is_cancelled()) {
     // No submit buttons.
 } else if (!$mform->no_submit_button_pressed()) {
     if ($data = $mform->get_data()) {
-
         // Add new field.
         if (!$field->id()) {
             $fieldid = $field->insert_field($data);
@@ -72,7 +71,8 @@ if ($mform->is_cancelled()) {
             }
             $other = ['dataid' => $df->id()];
             $event = \mod_datalynx\event\field_created::create(
-                    ['context' => $df->context, 'objectid' => $fieldid, 'other' => $other]);
+                ['context' => $df->context, 'objectid' => $fieldid, 'other' => $other]
+            );
             $event->trigger();
 
             // Update field.
@@ -82,8 +82,9 @@ if ($mform->is_cancelled()) {
 
             $other = ['dataid' => $df->id()];
             $event = \mod_datalynx\event\field_updated::create(
-                    ['context' => $df->context, 'objectid' => $field->id(), 'other' => $other
-                    ]);
+                ['context' => $df->context, 'objectid' => $field->id(), 'other' => $other,
+                ]
+            );
             $event->trigger();
         }
 
@@ -98,13 +99,17 @@ if ($mform->is_cancelled()) {
 
 // Activate navigation node.
 navigation_node::override_active_url(
-        new moodle_url('/mod/datalynx/field/index.php', ['id' => $df->cm->id]));
+    new moodle_url('/mod/datalynx/field/index.php', ['id' => $df->cm->id])
+);
 
 // Print header.
 $df->print_header(['tab' => 'fields', 'nonotifications' => true, 'urlparams' => $urlparams]);
 
 $formheading = $field->id() ? get_string('fieldedit', 'datalynx', $field->name()) : get_string(
-        'fieldnew', 'datalynx', $field->typename());
+    'fieldnew',
+    'datalynx',
+    $field->typename()
+);
 echo html_writer::tag('h2', format_string($formheading), ['class' => 'mdl-align']);
 
 // Display form.

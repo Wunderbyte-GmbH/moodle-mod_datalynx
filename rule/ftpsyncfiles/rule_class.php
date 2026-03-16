@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynx_rule
+ * @package datalynxrule_ftpsyncfiles
  * @subpackage ftpsyncfiles
  * @copyright 2015 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -33,7 +33,6 @@ require_once(dirname(__FILE__) . "/../rule_class.php");
  * Download files via sftp.
  */
 class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
-
     public $type = 'ftpsyncfiles';
 
     /**
@@ -188,11 +187,11 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
         $port = $this->sftpport;
         $connection = "sftp://$username:$password@$server:$port$remotedir";
         $ch = $this->init_curl($server, $connection);
-        mtrace ("Executing file download for this datalynx instance: {$this->dl->name()} {$this->dl->get_baseurl()}");
+        mtrace("Executing file download for this datalynx instance: {$this->dl->name()} {$this->dl->get_baseurl()}");
         $result = curl_exec($ch);
         if ($result === false) {
             $info = curl_getinfo($ch);
-            mtrace ('cURL error: ' . curl_error($ch) . " Curl error number: " . curl_errno($ch));
+            mtrace('cURL error: ' . curl_error($ch) . " Curl error number: " . curl_errno($ch));
             mtrace(var_export($info, true));
         } else {
             // List of remote files and directories.
@@ -212,7 +211,7 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
                         $draftitemid = file_get_unused_draft_itemid();
                         file_prepare_draft_area($draftitemid, $context->id, 'user', 'content', null);
                         $this->files[$draftitemid] = $this->fs->create_file_from_string(
-                                [
+                            [
                                         'contextid' => $context->id, // Replace with the appropriate context if necessary.
                                         'component' => 'user',
                                         'filearea' => 'draft',
@@ -220,7 +219,7 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
                                         'filepath' => '/',
                                         'filename' => $filename,
                                 ],
-                                $filedata
+                            $filedata
                         );
                         mtrace("Downloaded $filename successfully." . PHP_EOL);
                     } else {
@@ -282,7 +281,7 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
      * @param string $connection
      * @return false|resource
      */
-    public function init_curl(string $server,string $connection) {
+    public function init_curl(string $server, string $connection) {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_SFTP);
         curl_setopt($ch, CURLOPT_URL, $server);

@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_duration
  * @subpackage duration
  * @copyright 2014 onwards by edulabs.org and associated programmers
  * @copyright based on the work by 2013 Itamar Tzadok
@@ -28,7 +28,6 @@ require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 require_once("$CFG->dirroot/mod/datalynx/field/number/field_class.php");
 
 class datalynxfield_duration extends datalynxfield_base {
-
     /**
      * @var string
      */
@@ -38,7 +37,7 @@ class datalynxfield_duration extends datalynxfield_base {
 
     /**
      * Can this field be used in fieldgroups? Override if yes.
-     * @var boolean
+     * @var bool
      */
     protected $forfieldgroup = true;
 
@@ -50,7 +49,7 @@ class datalynxfield_duration extends datalynxfield_base {
     public function get_units() {
         if (is_null($this->_units)) {
             $this->_units = [604800 => get_string('weeks'), 86400 => get_string('days'),
-                    3600 => get_string('hours'), 60 => get_string('minutes'), 1 => get_string('seconds')
+                    3600 => get_string('hours'), 60 => get_string('minutes'), 1 => get_string('seconds'),
             ];
         }
         return $this->_units;
@@ -104,10 +103,16 @@ class datalynxfield_duration extends datalynxfield_base {
     public function parse_search($formdata, $i) {
         $values = [];
 
-        $fromfield = optional_param_array('f_' . $i . '_' . $this->field->id . '_from',
-                ['number' => ''], PARAM_RAW);
-        $tofield = optional_param_array('f_' . $i . '_' . $this->field->id . '_to',
-                ['number' => ''], PARAM_RAW);
+        $fromfield = optional_param_array(
+            'f_' . $i . '_' . $this->field->id . '_from',
+            ['number' => ''],
+            PARAM_RAW
+        );
+        $tofield = optional_param_array(
+            'f_' . $i . '_' . $this->field->id . '_to',
+            ['number' => ''],
+            PARAM_RAW
+        );
 
         $fromfield = isset($formdata->{'f_' . $i . '_' . $this->field->id . '_from'}) ? $formdata->{'f_' .
         $i . '_' . $this->field->id . '_from'} : $fromfield['number'];
@@ -149,7 +154,7 @@ class datalynxfield_duration extends datalynxfield_base {
     public function get_search_sql(array $search): array {
         global $DB;
 
-        list($not, $operator, $value) = $search;
+        [$not, $operator, $value] = $search;
 
         static $i = 0;
         $i++;
@@ -192,8 +197,12 @@ class datalynxfield_duration extends datalynxfield_base {
             // Get entry ids for entries that meet the criterion.
             if ($eids = $this->get_entry_ids_for_content($sql, $params)) {
                 // Get NOT IN sql.
-                list($notinids, $params) = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED,
-                        "df_{$fieldid}_", false);
+                [$notinids, $params] = $DB->get_in_or_equal(
+                    $eids,
+                    SQL_PARAMS_NAMED,
+                    "df_{$fieldid}_",
+                    false
+                );
                 $sql = " e.id $notinids ";
                 return [$sql, $params, false];
             } else {
@@ -207,7 +216,7 @@ class datalynxfield_duration extends datalynxfield_base {
     /**
      */
     public function format_search_value($searchparams) {
-        list($not, $operator, $value) = $searchparams;
+        [$not, $operator, $value] = $searchparams;
         if (is_array($value)) {
             if (count($value) > 1) {
                 $value = '(' . implode(',', $value) . ')';

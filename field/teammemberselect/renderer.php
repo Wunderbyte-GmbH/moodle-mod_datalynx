@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_teammemberselect
  * @subpackage teammemberselect
  * @copyright 2013 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -30,7 +30,6 @@ require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
  * Renderer class for teammemberselect datalynx field
  */
 class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
-
     public function render_display_mode(stdClass $entry, array $options): string {
         global $USER, $PAGE;
 
@@ -71,34 +70,47 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
 
         $subscribeenabled = isset($options['subscribe']);
         $selected = isset($entry->{"c{$fieldid}_content"}) ? json_decode(
-                $entry->{"c{$fieldid}_content"}, true) : [];
+            $entry->{"c{$fieldid}_content"},
+            true
+        ) : [];
         $selected = $selected ? $selected : []; // TODO: Seems obsolete.
         $teamfull = $field->teamsize < count($selected);
         $hasadmissiblerole = array_intersect(
-                $field->df()->get_user_datalynx_permissions($USER->id), $field->admissibleroles);
+            $field->df()->get_user_datalynx_permissions($USER->id),
+            $field->admissibleroles
+        );
         $userismember = in_array($USER->id, $selected);
         $canunsubscribe = $this->_field->allowunsubscription;
 
-        if ($subscribeenabled && $hasadmissiblerole && (!$teamfull || $userismember) &&
-                (!$userismember || $canunsubscribe)) {
-
+        if (
+            $subscribeenabled && $hasadmissiblerole && (!$teamfull || $userismember) &&
+                (!$userismember || $canunsubscribe)
+        ) {
             $str .= html_writer::link(
-                    new moodle_url('/mod/datalynx/view.php',
-                            ['d' => $field->df()->id(), 'fieldid' => $fieldid,
+                new moodle_url(
+                    '/mod/datalynx/view.php',
+                    ['d' => $field->df()->id(), 'fieldid' => $fieldid,
                                 'entryid' => $entry->id,
                                 'userid' => $USER->id,
                                 'action' => $userismember ? 'unsubscribe' : 'subscribe',
-                            ]),
-                    get_string($userismember ? 'unsubscribe' : 'subscribe', 'datalynx'),
-                    [
-                        'class' => 'datalynxfield_subscribe' . ($userismember ? ' subscribed' : '')]);
+                        ]
+                ),
+                get_string($userismember ? 'unsubscribe' : 'subscribe', 'datalynx'),
+                [
+                'class' => 'datalynxfield_subscribe' . ($userismember ? ' subscribed' : '')]
+            );
 
-            $userurl = new moodle_url('/user/view.php',
-                    ['course' => $field->df()->course->id, 'id' => $USER->id]);
+            $userurl = new moodle_url(
+                '/user/view.php',
+                ['course' => $field->df()->course->id, 'id' => $USER->id]
+            );
 
             // Load JS.
-            $PAGE->requires->js_call_amd('mod_datalynx/teammemberselect', 'init',
-                    [$field->df()->id(), $fieldid, $userurl->out(false), fullname($USER), $canunsubscribe]);
+            $PAGE->requires->js_call_amd(
+                'mod_datalynx/teammemberselect',
+                'init',
+                [$field->df()->id(), $fieldid, $userurl->out(false), fullname($USER), $canunsubscribe]
+            );
         }
 
         return $str;
@@ -130,7 +142,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
 
         if (!empty($notpresent)) {
             $baseurl = new moodle_url('/user/view.php', ['course' => $courseid]);
-            list($insql, $params) = $DB->get_in_or_equal($notpresent);
+            [$insql, $params] = $DB->get_in_or_equal($notpresent);
             $sql = "SELECT * FROM {user} WHERE id $insql";
             $users = $DB->get_records_sql($sql, $params);
             foreach ($users as $user) {
@@ -168,17 +180,26 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         // We create a hidden field to force sending. Needs to be done via directly inserting
         // html.
         if (!$required) {
-            $mform->addElement('html',
-                    '<input type="hidden" name="' . $fieldname . '[-1]" value="-999">');
+            $mform->addElement(
+                'html',
+                '<input type="hidden" name="' . $fieldname . '[-1]" value="-999">'
+            );
         }
         $selected = !empty($entry->{"c{$fieldid}_content"}) ? json_decode(
-                $entry->{"c{$fieldid}_content"}, true) : [];
+            $entry->{"c{$fieldid}_content"},
+            true
+        ) : [];
         $authorid = isset($entry->userid) ? $entry->userid : $USER->id;
         $menu = $field->options_menu(true, false, $field->usercanaddself ? 0 : $authorid);
 
-        $mform->addElement('autocomplete', $fieldname, null, $menu,
-                ['class' => "datalynxfield_teammemberselect $classname", 'multiple' => true,
-                    'noselectionstring' => "Gerade keine Auswahl."]);
+        $mform->addElement(
+            'autocomplete',
+            $fieldname,
+            null,
+            $menu,
+            ['class' => "datalynxfield_teammemberselect $classname", 'multiple' => true,
+            'noselectionstring' => "Gerade keine Auswahl."]
+        );
         $mform->setType($fieldname, PARAM_INT);
         $mform->setDefault($fieldname, $selected); // Not value after validation fails.
 
@@ -231,7 +252,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
 
         $errors = [];
         foreach ($tags as $tag) {
-            list(, $behavior, ) = $this->process_tag($tag);
+            [, $behavior, ] = $this->process_tag($tag);
             // Variable $behavior datalynx_field_behavior.
             if ($behavior->is_required()) {
                 $userfound = false;
@@ -256,12 +277,18 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
                 // Limit chosen users to max teamsize and ensure min teamsize users are chosen!
                 $teamsize = count($formdata->$formfieldname);
                 if ($teamsize > $this->_field->teamsize) {
-                    $errors[$formfieldname] = get_string('maxteamsizeerrorform', 'datalynx',
-                            $this->_field->teamsize);
+                    $errors[$formfieldname] = get_string(
+                        'maxteamsizeerrorform',
+                        'datalynx',
+                        $this->_field->teamsize
+                    );
                 }
                 if ($teamsize < $this->_field->minteamsize) {
-                    $errors[$formfieldname] = get_string('minteamsizeerrorform', 'datalynx',
-                            $this->_field->minteamsize);
+                    $errors[$formfieldname] = get_string(
+                        'minteamsizeerrorform',
+                        'datalynx',
+                        $this->_field->minteamsize
+                    );
                 }
             }
         }

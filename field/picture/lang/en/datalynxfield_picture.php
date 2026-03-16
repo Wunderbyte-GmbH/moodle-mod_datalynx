@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_picture
  * @subpackage picture
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
@@ -25,6 +25,6 @@
 $string['displaydimensions'] = 'Display dimensions (width x height)';
 $string['maxdimensions'] = 'Max dimensions (width x height)px';
 $string['pluginname'] = 'Media files';
+$string['privacy:metadata'] = 'Pictures do not store personal data.';
 $string['resizingimages'] = 'Resizing image thumbnails...';
 $string['thumbdimensions'] = 'Thumb dimensions (width x height)px';
-$string['privacy:metadata'] = 'Pictures do not store personal data.';

@@ -35,7 +35,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class entry extends \core_search\base_mod {
-
     /**
      * @var array Cache of datalynx entries.
      */
@@ -51,8 +50,12 @@ class entry extends \core_search\base_mod {
     public function get_document_recordset($modifiedfrom = 0, \context $context = null) {
         global $DB;
 
-        list ($contextjoin, $contextparams) = $this->get_context_restriction_sql(
-                $context, 'datalynx', 'dl', SQL_PARAMS_NAMED);
+         [$contextjoin, $contextparams] = $this->get_context_restriction_sql(
+             $context,
+             'datalynx',
+             'dl',
+             SQL_PARAMS_NAMED
+         );
         if ($contextjoin === null) {
             return null;
         }
@@ -263,7 +266,7 @@ class entry extends \core_search\base_mod {
         try {
             $entry = $this->get_entry($entryid);
         } catch (\dml_missing_record_exception $e) {
-            debugging('Could not get record to attach files to '.$doc->get('id'), DEBUG_DEVELOPER);
+            debugging('Could not get record to attach files to ' . $doc->get('id'), DEBUG_DEVELOPER);
             return;
         }
 

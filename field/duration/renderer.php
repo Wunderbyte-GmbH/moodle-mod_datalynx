@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_duration
  * @subpackage duration
  * @copyright 2014 onwards by edulabs.org and associated programmers
  * @copyright based on the work by 2013 Itamar Tzadok
@@ -29,7 +29,6 @@ require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 /**
  */
 class datalynxfield_duration_renderer extends datalynxfield_renderer {
-
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $field = $this->_field;
         $fieldid = $field->id();
@@ -67,7 +66,7 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
 
         $format = !empty($options['format']) ? $options['format'] : '';
         if ($duration !== '') {
-            list($value, $unit) = $field->seconds_to_unit($duration);
+            [$value, $unit] = $field->seconds_to_unit($duration);
             $units = $field->get_units();
             switch ($format) {
                 case 'unit':
@@ -139,7 +138,7 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
 
         $errors = [];
         foreach ($tags as $tag) {
-            list(, $behavior, ) = $this->process_tag($tag);
+            [, $behavior, ] = $this->process_tag($tag);
             // Variable $behavior datalynx_field_behavior.
             if ($behavior->is_required() && isset($formdata->$formfieldname)) {
                 $value = optional_param_array($formfieldname, [], PARAM_RAW)['number'];
@@ -153,4 +152,3 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
         return $errors;
     }
 }
-

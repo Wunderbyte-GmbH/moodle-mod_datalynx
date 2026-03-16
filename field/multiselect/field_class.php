@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_multiselect
  * @subpackage multiselect
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
@@ -27,12 +27,11 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
 class datalynxfield_multiselect extends datalynxfield_option_multiple {
-
     public $type = 'multiselect';
 
     /**
      * Can this field be used in fieldgroups? Override if yes.
-     * @var boolean
+     * @var bool
      */
     protected $forfieldgroup = true;
 
@@ -43,7 +42,7 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
             ['name' => 'Space', 'chr' => '&#32;'],
             ['name' => ',', 'chr' => '&#44;'],
             ['name' => ', (with space)', 'chr' => '&#44;&#32;'],
-            ['name' => 'Unordered list', 'chr' => '</li><li>']
+            ['name' => 'Unordered list', 'chr' => '</li><li>'],
     ];
 
     /**
@@ -119,7 +118,6 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
         $addoption = null;
         if (!empty($values[''])) {
             foreach ($values[''] as $key => $value) {
-
                 // When left empty multiselect passes 0, catch this.
                 if (!$value || array_key_exists($value, $knownvalues)) {
                     continue;
@@ -138,7 +136,7 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
         // In case we have spotted some addoptions, update field definition.
         if ($addoption) {
             global $DB;
-            $update = new \stdClass;
+            $update = new \stdClass();
             $update->id = $this->field->id;
             $update->param1 = implode("\n", $knownvalues);
             $DB->update_record('datalynx_fields', $update);
@@ -162,5 +160,4 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
 
         return parent::get_search_sql($search);
     }
-
 }

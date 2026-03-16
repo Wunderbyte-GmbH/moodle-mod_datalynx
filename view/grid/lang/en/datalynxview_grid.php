@@ -16,13 +16,13 @@
 
 /**
  *
- * @package datalynxview
+ * @package datalynxview_grid
  * @subpackage grid
  * @copyright Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-$string['pluginname'] = 'Grid';
-$string['gridsettings'] = 'Grid settings';
 $string['cols'] = 'Number of columns';
-$string['rows'] = 'Aligned rows';
+$string['gridsettings'] = 'Grid settings';
+$string['pluginname'] = 'Grid';
 $string['privacy:metadata'] = 'The grid view does not store personal data.';
+$string['rows'] = 'Aligned rows';

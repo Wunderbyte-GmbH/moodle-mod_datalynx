@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_number
  * @subpackage number
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
@@ -29,7 +29,6 @@ require_once("$CFG->dirroot/mod/datalynx/field/text/renderer.php");
 /**
  */
 class datalynxfield_number_renderer extends datalynxfield_text_renderer {
-
     /**
      *
      * {@inheritDoc}
@@ -42,8 +41,11 @@ class datalynxfield_number_renderer extends datalynxfield_text_renderer {
         $fieldname = "field_{$fieldid}_{$entryid}";
         $required = !empty($options['required']);
         $content = '';
-        if (isset($entry->{"c{$fieldid}_content"}) && $entry->{"c{$fieldid}_content"} === "0" || !empty(
-                $entry->{"c{$fieldid}_content"})) {
+        if (
+            isset($entry->{"c{$fieldid}_content"}) && $entry->{"c{$fieldid}_content"} === "0" || !empty(
+                $entry->{"c{$fieldid}_content"}
+            )
+        ) {
             $content = $entry->{"c{$fieldid}_content"};
         }
         $fieldattr = [];
@@ -118,7 +120,7 @@ class datalynxfield_number_renderer extends datalynxfield_text_renderer {
 
         $errors = [];
         foreach ($tags as $tag) {
-            list(, $behavior, ) = $this->process_tag($tag);
+            [, $behavior, ] = $this->process_tag($tag);
             // Variable $behavior datalynx_field_behavior.
             if ($behavior->is_required() && isset($formdata->$formfieldname)) {
                 $value = optional_param($formfieldname, '', PARAM_RAW);

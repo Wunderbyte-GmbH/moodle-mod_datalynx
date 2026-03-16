@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxview
+ * @package datalynxview_report
  * @subpackage report
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
@@ -30,7 +30,6 @@ require_once("$CFG->dirroot/mod/datalynx/view/view_patterns.php");
  * Base class for view patterns
  */
 class datalynxview_report_patterns extends datalynxview_patterns {
-
     /**
      */
     public function get_replacements($tags = null, $entry = null, array $options = []) {
@@ -49,22 +48,31 @@ class datalynxview_report_patterns extends datalynxview_patterns {
                 case '##export:all##':
                     $actionurl = new moodle_url($baseurl, ['exportreport' => $view::EXPORT_ALL]);
                     $label = html_writer::tag('span', get_string('exportall', 'datalynx'));
-                    $replacements[$tag] = html_writer::link($actionurl, $label,
-                            ['class' => 'actionlink exportall']);
+                    $replacements[$tag] = html_writer::link(
+                        $actionurl,
+                        $label,
+                        ['class' => 'actionlink exportall']
+                    );
 
                     break;
                 case '##export:page##':
                     $actionurl = new moodle_url($baseurl, ['exportreport' => $view::EXPORT_PAGE]);
                     $label = html_writer::tag('span', get_string('exportpage', 'datalynx'));
-                    $replacements[$tag] = html_writer::link($actionurl, $label,
-                            ['class' => 'actionlink exportpage']);
+                    $replacements[$tag] = html_writer::link(
+                        $actionurl,
+                        $label,
+                        ['class' => 'actionlink exportpage']
+                    );
 
                     break;
                 case '##import##':
                     $actionurl = new moodle_url($baseurl, ['importreport' => 1]);
                     $label = html_writer::tag('span', get_string('import', 'datalynx'));
-                    $replacements[$tag] = html_writer::link($actionurl, $label,
-                            ['class' => 'actionlink exportall']);
+                    $replacements[$tag] = html_writer::link(
+                        $actionurl,
+                        $label,
+                        ['class' => 'actionlink exportall']
+                    );
 
                     break;
             }

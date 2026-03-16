@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_entryteammemberprofilefield
  * @subpackage entryteammemberprofilefield
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -26,7 +26,6 @@ require_once($CFG->dirroot . '/mod/datalynx/field/field_class.php');
 require_once($CFG->dirroot . '/mod/datalynx/field/datalynxfield_no_content_can_join.php');
 
 class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content_can_join {
-
     public $type = 'entryteammemberprofilefield';
 
     const SQL_NEVERTRUE = "1 = 0";
@@ -52,7 +51,7 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
     public static function get_field_objects($dataid, $fields = []) {
         $fieldobjects = [];
 
-        $teammemberselectfields = array_filter($fields, function($field) {
+        $teammemberselectfields = array_filter($fields, function ($field) {
             return $field instanceof datalynxfield_teammemberselect;
         });
 
@@ -107,7 +106,7 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
         $components = explode("_", $this->field->id);
         return [
             'queriedfieldid' => $components[1],
-            'profilefieldname' => $components[2]
+            'profilefieldname' => $components[2],
         ];
     }
 
@@ -124,7 +123,7 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
     public function get_search_sql(array $search): array {
         global $DB;
 
-        list($not, $operator, $value) = $search;
+        [$not, $operator, $value] = $search;
 
         $fieldidcomponents = $this->get_field_id_components();
         $queriedfieldid = $fieldidcomponents["queriedfieldid"];
@@ -144,7 +143,7 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
             $conditions = [];
             $params = [
                     'dataid' => $this->df->id(),
-                    'fieldid' => $queriedfieldid
+                    'fieldid' => $queriedfieldid,
             ];
 
             foreach ($userids as $key => $userid) {
@@ -249,7 +248,7 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
         return [
             '' => '&lt;' . get_string('choose') . '&gt;',
             self::OPERATOR_LITERAL_VALUE => get_string('literalvalue', 'datalynxfield_entryteammemberprofilefield'),
-            self::OPERATOR_MY_PROFILE_FIELD => get_string('myprofilefield', 'datalynxfield_entryteammemberprofilefield')
+            self::OPERATOR_MY_PROFILE_FIELD => get_string('myprofilefield', 'datalynxfield_entryteammemberprofilefield'),
         ];
     }
 

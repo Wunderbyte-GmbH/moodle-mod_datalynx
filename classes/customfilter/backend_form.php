@@ -28,7 +28,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class backend_form extends base_form {
-
     /**
      *
      */
@@ -72,10 +71,21 @@ class backend_form extends base_form {
 
         $grp = [];
         $attr = ['size' => 1];
-        $grp[] = $mform->createElement('advcheckbox', 'timecreated',
-                get_string('timecreated', 'datalynx'), null, $attr);
-        $grp[] = $mform->createElement('advcheckbox', 'timecreated_sortable', null,
-                get_string('sortable', 'datalynx'), $attr, [0, 1]);
+        $grp[] = $mform->createElement(
+            'advcheckbox',
+            'timecreated',
+            get_string('timecreated', 'datalynx'),
+            null,
+            $attr
+        );
+        $grp[] = $mform->createElement(
+            'advcheckbox',
+            'timecreated_sortable',
+            null,
+            get_string('sortable', 'datalynx'),
+            $attr,
+            [0, 1]
+        );
         $mform->addGroup($grp, '', null, ' ', false);
         $mform->setType('timecreated', PARAM_INT);
         $mform->setDefault('timecreated', $customfilter->timecreated);
@@ -83,10 +93,21 @@ class backend_form extends base_form {
         $mform->setDefault('timecreated_sortable', $customfilter->timecreated_sortable);
 
         $grp = [];
-        $grp[] = $mform->createElement('advcheckbox', 'timemodified',
-                get_string('timemodified', 'datalynx'), null, $attr);
-        $grp[] = $mform->createElement('advcheckbox', 'timemodified_sortable', null,
-                get_string('sortable', 'datalynx'), $attr, [0, 1]);
+        $grp[] = $mform->createElement(
+            'advcheckbox',
+            'timemodified',
+            get_string('timemodified', 'datalynx'),
+            null,
+            $attr
+        );
+        $grp[] = $mform->createElement(
+            'advcheckbox',
+            'timemodified_sortable',
+            null,
+            get_string('sortable', 'datalynx'),
+            $attr,
+            [0, 1]
+        );
         $mform->addGroup($grp, '', null, ' ', false);
         $mform->setType('timemodified', PARAM_INT);
         $mform->setDefault('timemodified', $customfilter->timemodified);
@@ -116,10 +137,22 @@ class backend_form extends base_form {
             $formfieldname = 'fieldlist[' . $field->field->id . '][name]';
             $formfieldsortablename = 'fieldlist[' . $field->field->id . '][sortable]';
             $grp = [];
-            $grp[] = $mform->createElement('advcheckbox', $formfieldname,
-                    $field->field->name . ' (' . $field->type . ')', '', '', $field->field->name);
-            $grp[] = $mform->createElement('advcheckbox', $formfieldsortablename, '',
-                    get_string('sortable', 'datalynx'), '', [0, 1]);
+            $grp[] = $mform->createElement(
+                'advcheckbox',
+                $formfieldname,
+                $field->field->name . ' (' . $field->type . ')',
+                '',
+                '',
+                $field->field->name
+            );
+            $grp[] = $mform->createElement(
+                'advcheckbox',
+                $formfieldsortablename,
+                '',
+                get_string('sortable', 'datalynx'),
+                '',
+                [0, 1]
+            );
             $mform->addGroup($grp, '', null, ' ', false);
             $mform->setType($formfieldname, PARAM_TEXT);
             $mform->setType($formfieldsortablename, PARAM_INT);
@@ -204,11 +237,13 @@ class backend_form extends base_form {
 
         $dl = $this->_dl;
         if (empty($data['name']) || $dl->name_exists('customfilters', $data['name'], $this->_customfilter->id)) {
-            $errors['name'] = get_string('invalidname', 'datalynx',
-                    get_string('filter', 'datalynx'));
+            $errors['name'] = get_string(
+                'invalidname',
+                'datalynx',
+                get_string('filter', 'datalynx')
+            );
         }
 
         return $errors;
     }
-
 }

@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_multiselect
  * @subpackage multiselect
  * @copyright 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -28,7 +28,6 @@ require_once(dirname(__FILE__) . "/../renderer.php");
 /**
  */
 class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
-
     /**
      *
      * @var datalynxfield_multiselect
@@ -71,8 +70,10 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
 
         // We create a hidden field to force sending.
         if (!$required && $autocomplete) {
-            $mform->addElement('html',
-                '<input type="hidden" name="' . $fieldname . '[-1]" value="-999">');
+            $mform->addElement(
+                'html',
+                '<input type="hidden" name="' . $fieldname . '[-1]" value="-999">'
+            );
         }
 
         // Check for default values.
@@ -121,7 +122,7 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
      * (non-PHPdoc)
      *
      * @return string HTML
-     *@see datalynxfield_renderer::render_display_mode()
+     * @see datalynxfield_renderer::render_display_mode()
      */
     public function render_display_mode(stdClass $entry, array $options): string {
         $field = $this->_field;
@@ -202,7 +203,7 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
 
         $errors = [];
         foreach ($tags as $tag) {
-            list(, $behavior, ) = $this->process_tag($tag);
+            [, $behavior, ] = $this->process_tag($tag);
 
             // Remove placeholder for empty autocomplete.
             if (isset($formdata->{$formfieldname}[0]) && $formdata->{$formfieldname}[0] == -999) {

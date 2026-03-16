@@ -29,7 +29,6 @@ require_once("$CFG->libdir/formslib.php");
  *
  */
 abstract class mod_datalynx_filter_base_form extends moodleform {
-
     protected $_filter = null;
     protected $_customfilter = null;
 
@@ -42,8 +41,17 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
     /*
      *
      */
-    public function __construct($df, $filter, $action = null, $customdata = null, $method = 'post', $target = '',
-            $attributes = null, $editable = true, $customfilter = false) {
+    public function __construct(
+        $df,
+        $filter,
+        $action = null,
+        $customdata = null,
+        $method = 'post',
+        $target = '',
+        $attributes = null,
+        $editable = true,
+        $customfilter = false
+    ) {
         $this->_filter = $filter;
         $this->_customfilter = $customfilter;
         $this->_df = $df;
@@ -65,7 +73,6 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
 
         // Add current options.
         if ($customsort) {
-
             $sortfields = unserialize($customsort);
 
             foreach ($sortfields as $fieldid => $sortdir) {
@@ -78,8 +85,12 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
 
                 $optionsarr = [];
                 $optionsarr[] = &$mform->createElement('select', 'sortfield' . $count, '', $fieldoptions);
-                $optionsarr[] = &$mform->createElement('select', 'sortdir' . $count, '',
-                        $diroptions);
+                $optionsarr[] = &$mform->createElement(
+                    'select',
+                    'sortdir' . $count,
+                    '',
+                    $diroptions
+                );
                 $mform->addGroup($optionsarr, 'sortoptionarr' . $count, $label, ' ', false);
                 $mform->setDefault('sortfield' . $count, $fieldid);
                 $mform->setDefault('sortdir' . $count, $sortdir);
@@ -109,8 +120,12 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
      * @param array $fieldoptions
      * @param boolean $showlabel
      */
-    public function custom_search_definition($customsearch, $fields, $fieldoptions,
-            $showlabel = false) {
+    public function custom_search_definition(
+        $customsearch,
+        $fields,
+        $fieldoptions,
+        $showlabel = false
+    ) {
         $mform = &$this->_form;
         $df = $this->_df;
 
@@ -124,7 +139,6 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
 
         // Add current options.
         if ($customsearch) {
-
             $searchfields = unserialize($customsearch);
             // If not from form then the searchfields is aggregated and we need.
             // To flatten them. An aggregated array should have a non-zero key.
@@ -139,12 +153,12 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
                     foreach ($searchfield as $andor => $searchoptions) {
                         foreach ($searchoptions as $searchoption) {
                             if ($searchoption) {
-                                list($not, $operator, $value) = $searchoption;
+                                [$not, $operator, $value] = $searchoption;
                                 if (is_array($value)) {
                                     $value = json_encode($value);
                                 }
                             } else {
-                                list($not, $operator, $value) = ['', '', ''];
+                                [$not, $operator, $value] = ['', '', ''];
                             }
                             $searcharr[] = [$fieldid, $andor, $not, $operator, $value];
                         }
@@ -161,7 +175,7 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
                 $i = $count + 1;
                 $label = $showlabel ? "$fieldlabel$i" : '';
 
-                list($fieldid, $andor, $not, $operator, $value) = $searchcriterion;
+                [$fieldid, $andor, $not, $operator, $value] = $searchcriterion;
 
                 $arr = [];
                 // And/or option.
@@ -177,16 +191,23 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
                 if ($fieldid) {
                     $operatoroptions = $df->get_field_from_id($fieldid)->get_supported_search_operators();
                 }
-                $arr[] = &$mform->createElement('select', 'searchoperator' . $count, '',
-                        $operatoroptions);
+                $arr[] = &$mform->createElement(
+                    'select',
+                    'searchoperator' . $count,
+                    '',
+                    $operatoroptions
+                );
                 $mform->setDefault('searchoperator' . $count, $operator);
                 // Field search elements.
                 // For select options $value is an arry, we have to convert it to string, function param only accepts strings.
                 if (is_array($value)) {
                     $value = json_encode($value);
                 }
-                list($elems, $separators) = $fields[$fieldid]->renderer()->render_search_mode(
-                        $mform, $count, $value);
+                [$elems, $separators] = $fields[$fieldid]->renderer()->render_search_mode(
+                    $mform,
+                    $count,
+                    $value
+                );
 
                 $arr = array_merge($arr, $elems);
                 if ($separators) {
@@ -228,12 +249,11 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
         // List user fields.
         $count = 1;
         foreach ($fieldoptions as $fieldid => $fieldname) {
-
             $label = $fieldname;
 
             $value = '';
 
-            list($elems, $separators) = $fields[$fieldid]->renderer()->render_search_mode($mform, $count, $value);
+            [$elems, $separators] = $fields[$fieldid]->renderer()->render_search_mode($mform, $count, $value);
 
             if ($separators) {
                 $sep = array_merge([' ', ' ', ' '], $separators);
@@ -258,7 +278,6 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
  */
 
 class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
-
     /*
      *
      */
@@ -352,8 +371,11 @@ class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
 
         // Validate unique name.
         if (empty($data['name']) || $df->name_exists('filters', $data['name'], $filter->id)) {
-            $errors['name'] = get_string('invalidname', 'datalynx',
-                    get_string('filter', 'datalynx'));
+            $errors['name'] = get_string(
+                'invalidname',
+                'datalynx',
+                get_string('filter', 'datalynx')
+            );
         }
 
         return $errors;
@@ -365,7 +387,6 @@ class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
  */
 
 class mod_datalynx_advanced_filter_form extends mod_datalynx_filter_base_form {
-
     /*
      * Definition of the advanced filter form which is part of a view
      */
@@ -423,7 +444,6 @@ class mod_datalynx_advanced_filter_form extends mod_datalynx_filter_base_form {
  *
  */
 class mod_datalynx_customfilter_frontend_form extends mod_datalynx_filter_base_form {
-
     /*
      * This customfilter form  predefined by the admin is displayed
      */
@@ -498,13 +518,12 @@ class mod_datalynx_customfilter_frontend_form extends mod_datalynx_filter_base_f
 
         // Search for author.
         if (isset($customfilter->authorsearch) && $customfilter->authorsearch) {
-
             // Add users that have written an entry in the current datalynx instance to list.
             global $DB, $PAGE;
             $entryauthors = $DB->get_records_sql('SELECT DISTINCT userid, firstname, lastname
                 FROM {datalynx_entries}
                 INNER JOIN {user} on {datalynx_entries}.userid = {user}.id
-                WHERE {datalynx_entries}.dataid = '. $this->_df->id() .';');
+                WHERE {datalynx_entries}.dataid = ' . $this->_df->id() . ';');
 
             $menu = [];
             foreach ($entryauthors as $userid => $author) {
@@ -538,10 +557,12 @@ class mod_datalynx_customfilter_frontend_form extends mod_datalynx_filter_base_f
 
         // Add a button that resets all custom filter values at once.
         $clearcustomsearch = '<a class="btn btn-secondary" href="';
-        $clearcustomsearch .= new moodle_url('/mod/datalynx/view.php',
-            ['id' => $this->_df->cm->id, 'view' => $view->view->id, 'filter' => 0]);
+        $clearcustomsearch .= new moodle_url(
+            '/mod/datalynx/view.php',
+            ['id' => $this->_df->cm->id, 'view' => $view->view->id, 'filter' => 0]
+        );
         $clearcustomsearch .= '"> ' . get_string('resetsettings', 'datalynx') . '</a>';
-        $buttonarray[] = &$mform->createElement('static', 'clearcustomsearch', '',  $clearcustomsearch);
+        $buttonarray[] = &$mform->createElement('static', 'clearcustomsearch', '', $clearcustomsearch);
 
         $mform->addGroup($buttonarray, 'buttonar', '', [' '], false);
     }

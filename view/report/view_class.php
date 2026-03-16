@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxview
+ * @package datalynxview_report
  * @subpackage report
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
@@ -30,7 +30,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/classes/view/base.php");
 
 class datalynxview_report extends base {
-
     protected string $type = 'report';
 
     protected string $_output = 'report';
@@ -98,16 +97,16 @@ class datalynxview_report extends base {
         // Generate entry table row.
         $elements[] = ['html', html_writer::start_tag('tr')];
         foreach ($columns as $column) {
-            list($tag, , $class) = array_map('trim', $column);
+            [$tag, , $class] = array_map('trim', $column);
             if (!empty($fielddefinitions[$tag])) {
                 $fielddefinition = $fielddefinitions[$tag];
                 if ($fielddefinition[0] == 'html') {
                     $elements[] = ['html',
-                            html_writer::tag('td', $fielddefinition[1], ['class' => $class])
+                            html_writer::tag('td', $fielddefinition[1], ['class' => $class]),
                     ];
                 } else {
                     $elements[] = ['html',
-                            html_writer::start_tag('td', ['class' => $class])
+                            html_writer::start_tag('td', ['class' => $class]),
                     ];
                     $elements[] = $fielddefinition;
                     $elements[] = ['html', html_writer::end_tag('td')];
@@ -341,7 +340,6 @@ class datalynxview_report extends base {
 
             $output .= html_writer::tag('td', $overallnotyeteditedsum);
             $output .= html_writer::end_tag('tr');
-
         } else {
             $output .= html_writer::start_tag('table', ['class' => 'table table-striped table-bordered']);
 
@@ -393,7 +391,6 @@ class datalynxview_report extends base {
                     $output .= html_writer::end_tag('tr');
                 }
             }
-
         }
         $output .= html_writer::end_tag('tbody');
         $output .= html_writer::end_tag('table');
@@ -411,7 +408,7 @@ class datalynxview_report extends base {
         $dataid = $this->_df->id();
         $entryids = $this->get_report_entryids();
         if (!empty($entryids)) {
-            list($insql, $inparams) = $DB->get_in_or_equal($entryids, SQL_PARAMS_NAMED, 'inparam');
+            [$insql, $inparams] = $DB->get_in_or_equal($entryids, SQL_PARAMS_NAMED, 'inparam');
             $insqlentries = " AND e.id $insql";
         } else {
             $insql = '';
@@ -457,7 +454,7 @@ class datalynxview_report extends base {
             // Initialize the report array for this user.
             $report[$userid] = [
                     'totalentries' => 0,
-                    'monthly' => []
+                    'monthly' => [],
             ];
 
             foreach ($entryids as $entryid) {
@@ -470,7 +467,7 @@ class datalynxview_report extends base {
                     if (!isset($report[$userid]['monthly'][$month])) {
                         $report[$userid]['monthly'][$month] = [
                                 'totalentries' => 0,
-                                'matchingcontents' => []
+                                'matchingcontents' => [],
                         ];
                     }
 
@@ -487,7 +484,7 @@ class datalynxview_report extends base {
                         $params = [
                                 'entryid' => $entryid,
                                 'fieldid' => $fieldid,
-                                'value' => (string)$value // Cast the value to string to ensure proper comparison.
+                                'value' => (string)$value, // Cast the value to string to ensure proper comparison.
                         ];
 
                         $matchingcontents_count = $DB->count_records_sql($sql, $params);
@@ -584,8 +581,11 @@ class datalynxview_report extends base {
         // Construct the table.
         $table->data = [$row1, $row2, $row3];
         $sectiondefault = html_writer::table($table);
-        $this->view->esection = html_writer::tag('div', $sectiondefault,
-                        ['class' => 'mdl-align']) . "<div>##entries##</div>";
+        $this->view->esection = html_writer::tag(
+            'div',
+            $sectiondefault,
+            ['class' => 'mdl-align']
+        ) . "<div>##entries##</div>";
 
         // Set content.
         $this->view->param2 = '';
@@ -620,5 +620,4 @@ class datalynxview_report extends base {
         }
         return $this->_columns;
     }
-
 }

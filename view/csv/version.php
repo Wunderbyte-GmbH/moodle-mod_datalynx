@@ -13,9 +13,10 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
  *
- * @package datalynxview
+ * @package datalynxview_csv
  * @subpackage csv
  * @copyright 2015 David Bogner {@link http:// Www.edulabs.org}.
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_editor
  * @subpackage editor
  * @copyright 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -29,7 +29,6 @@ require_once(dirname(__FILE__) . "/../renderer.php");
  * Class datalynxfield_editor_renderer Renderer for editor field type
  */
 class datalynxfield_editor_renderer extends datalynxfield_renderer {
-
     /**
      * render the editor form for adding content to the editor field
      * TODO: improve editor rendering for including images from repositories
@@ -51,8 +50,15 @@ class datalynxfield_editor_renderer extends datalynxfield_renderer {
         $required = !empty($options['required']);
         // Format.
         $data->{"{$fieldname}format"} = isset($entry->{"c{$fieldid}_content1"}) ? $entry->{"c{$fieldid}_content1"} : FORMAT_HTML;
-        $data = file_prepare_standard_editor($data, $fieldname, $field->editor_options(),
-                $field->df()->context, 'mod_datalynx', 'content', $contentid);
+        $data = file_prepare_standard_editor(
+            $data,
+            $fieldname,
+            $field->editor_options(),
+            $field->df()->context,
+            'mod_datalynx',
+            'content',
+            $contentid
+        );
         $mform->addElement('editor', "{$fieldname}_editor", null, null, $field->editor_options());
         $mform->setDefault("{$fieldname}_editor", $data->{"{$fieldname}_editor"});
         if ($required) {
@@ -76,8 +82,14 @@ class datalynxfield_editor_renderer extends datalynxfield_renderer {
             $format = isset($entry->{"c{$fieldid}_content1"}) ? $entry->{"c{$fieldid}_content1"} : FORMAT_HTML;
             $options = new stdClass();
             $options->para = false;
-            $text = file_rewrite_pluginfile_urls($text, 'pluginfile.php',  $field->df()->context->id, 'mod_datalynx', 'content',
-                $contentid);
+            $text = file_rewrite_pluginfile_urls(
+                $text,
+                'pluginfile.php',
+                $field->df()->context->id,
+                'mod_datalynx',
+                'content',
+                $contentid
+            );
             $str = format_text($text, $format, $options);
             if ($excerpt) {
                 $str = strip_tags($str, '<p><i><b><strong>');
@@ -123,7 +135,7 @@ class datalynxfield_editor_renderer extends datalynxfield_renderer {
 
         $errors = [];
         foreach ($tags as $tag) {
-            list(, $behavior, ) = $this->process_tag($tag);
+            [, $behavior, ] = $this->process_tag($tag);
             // Variable $behavior datalynx_field_behavior.
             if ($behavior->is_required() && isset($formdata->$formfieldname)) {
                 if (!clean_param($formdata->$formfieldname, PARAM_NOTAGS)) {

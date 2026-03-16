@@ -28,7 +28,6 @@ require_once("$CFG->libdir/formslib.php");
 /**
  */
 class mod_datalynx_preset_form extends moodleform {
-
     public function definition() {
         global $COURSE;
 
@@ -37,15 +36,25 @@ class mod_datalynx_preset_form extends moodleform {
         $mform->addElement('header', 'presetshdr', get_string('presetadd', 'datalynx'));
         // Preset source.
         $grp = [];
-        $grp[] = &$mform->createElement('radio', 'preset_source', null,
-                get_string('presetfromdatalynx', 'datalynx'), 'current');
+        $grp[] = &$mform->createElement(
+            'radio',
+            'preset_source',
+            null,
+            get_string('presetfromdatalynx', 'datalynx'),
+            'current'
+        );
 
         $packdata = ['nodata' => get_string('presetnodata', 'datalynx'),
                 'data' => get_string('presetdata', 'datalynx'),
                 'dataanon' => get_string('presetdataanon', 'datalynx')];
         $grp[] = &$mform->createElement('select', 'preset_data', null, $packdata);
-        $grp[] = &$mform->createElement('radio', 'preset_source', null,
-                get_string('presetfromfile', 'datalynx'), 'file');
+        $grp[] = &$mform->createElement(
+            'radio',
+            'preset_source',
+            null,
+            get_string('presetfromfile', 'datalynx'),
+            'file'
+        );
         $mform->addGroup($grp, 'psourcegrp', null, ['  ', '<br />'], false);
         $mform->setDefault('preset_source', 'current');
 

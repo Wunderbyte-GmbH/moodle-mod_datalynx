@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynx_field_behavior
+ * @package mod_datalynx
  * @copyright David Bogner 2021 based on 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -24,7 +24,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once(dirname(__FILE__) . '/../classes/local/datalynx.php');
 
 class datalynx_field_behavior {
-
     private $id;
 
     private $name;
@@ -204,7 +203,9 @@ class datalynx_field_behavior {
             if (!empty($allowedfieldids)) {
                 foreach ($allowedfieldids as $fieldid) {
                     $userids = isset($entry->{"c{$fieldid}_content"}) ? json_decode(
-                            $entry->{"c{$fieldid}_content"}, true) : [];
+                        $entry->{"c{$fieldid}_content"},
+                        true
+                    ) : [];
                     if (in_array($USER->id, $userids)) {
                         return true;
                     }
@@ -379,15 +380,25 @@ class datalynx_field_behavior {
     public static function update_behavior_pattern($behaviorid, $behaviorname = '') {
         global $DB;
         // Read dataid from DB and find patterns and param2 from all connected views.
-        $behaviorinfo = $DB->get_record('datalynx_behaviors', ['id' => $behaviorid],
-                $fields = 'dataid, name', $strictness = IGNORE_MISSING);
-        $connected = $DB->get_records('datalynx_views', ['dataid' => $behaviorinfo->dataid],
-                null, 'id, patterns, param2');
+        $behaviorinfo = $DB->get_record(
+            'datalynx_behaviors',
+            ['id' => $behaviorid],
+            $fields = 'dataid, name',
+            $strictness = IGNORE_MISSING
+        );
+        $connected = $DB->get_records(
+            'datalynx_views',
+            ['dataid' => $behaviorinfo->dataid],
+            null,
+            'id, patterns, param2'
+        );
         // Update every instance that still has the string ||behaviorname in it.
         foreach ($connected as $view) {
             // TODO: Is one check enough or are these separate?
-            if (strpos($view->patterns, '|' . $behaviorinfo->name) !== false ||
-                    strpos($view->param2, '|' . $behaviorinfo->name) !== false) {
+            if (
+                strpos($view->patterns, '|' . $behaviorinfo->name) !== false ||
+                    strpos($view->param2, '|' . $behaviorinfo->name) !== false
+            ) {
                 if (strpos($view->param2, '|' . $behaviorinfo->name . '|')) {
                     $view->patterns = str_replace('|' . $behaviorinfo->name . '|', '|' . $behaviorname . '|', $view->patterns);
                     $view->param2 = str_replace('|' . $behaviorinfo->name . '|', '|' . $behaviorname . '|', $view->param2);

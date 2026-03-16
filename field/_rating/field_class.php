@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package mod_datalynx
  * @subpackage _rating
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once(dirname(__FILE__) . '/../field_class.php');
 
 class datalynxfield__rating extends datalynxfield_no_content {
-
     public $type = '_rating';
 
     const AGGREGATE_AVG = 1;

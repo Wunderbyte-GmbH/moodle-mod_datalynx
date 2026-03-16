@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_tag
  * @subpackage tag
  * @copyright 2016 David Bogner
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -26,7 +26,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
 class datalynxfield_tag_form extends datalynxfield_form {
-
     /**
      * The first option for this field is whether to make tags standard tags or not
      * {@inheritDoc}
@@ -35,8 +34,11 @@ class datalynxfield_tag_form extends datalynxfield_form {
      */
     public function field_definition() {
         $mform = &$this->_form;
-        $mform->addElement('header', 'fieldattributeshdr',
-                get_string('fieldattributes', 'datalynx'));
+        $mform->addElement(
+            'header',
+            'fieldattributeshdr',
+            get_string('fieldattributes', 'datalynx')
+        );
         // Make standard tags?
         $mform->addElement('selectyesno', 'param1', get_string('saveasstandardtags', 'datalynx'));
     }

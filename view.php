@@ -38,7 +38,7 @@ $urlparams->refresh = optional_param('refresh', 0, PARAM_INT);
 $datalynx = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
 
 $pageparams = ['js' => true, 'css' => true, 'rss' => true, 'modjs' => true,
-        'completion' => true, 'comments' => true, 'urlparams' => $urlparams
+        'completion' => true, 'comments' => true, 'urlparams' => $urlparams,
 ];
 require_login($datalynx->data->course, false, $datalynx->cm);
 

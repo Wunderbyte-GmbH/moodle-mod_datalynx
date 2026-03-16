@@ -18,7 +18,7 @@
  * This file is part of the Datalynx module for Moodle - http:// Moodle.org/.
  *
  *
- * @package datalynxview
+ * @package datalynxview_tabular
  * @subpackage tabular
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
@@ -29,7 +29,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/view/view_form.php");
 
 class datalynxview_tabular_form extends datalynxview_base_form {
-
     /**
      */
     public function view_definition_after_gps() {
@@ -45,8 +44,13 @@ class datalynxview_tabular_form extends datalynxview_base_form {
         $mform->addElement('selectyesno', 'param3', get_string('headerrow', 'datalynxview_tabular'));
         $mform->setDefault('param3', 1);
 
-        $mform->addElement('editor', 'eparam2_editor', get_string('table', 'datalynxview_tabular'),
-                $editorattr, $editoroptions['param2']);
+        $mform->addElement(
+            'editor',
+            'eparam2_editor',
+            get_string('table', 'datalynxview_tabular'),
+            $editorattr,
+            $editoroptions['param2']
+        );
         $this->add_tags_selector('eparam2_editor', 'general');
         $this->add_tags_selector('eparam2_editor', 'field');
     }

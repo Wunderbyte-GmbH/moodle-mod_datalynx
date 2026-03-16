@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynx
+ * @package mod_datalynx
  * @subpackage statistics
  * @copyright 2013 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -41,7 +41,8 @@ $df->set_page('statistics/index', ['modjs' => true, 'urlparams' => $urlparams]);
 
 // Activate navigation node.
 navigation_node::override_active_url(
-        new moodle_url('/mod/datalynx/statistics/index.php', ['id' => $df->cm->id]));
+    new moodle_url('/mod/datalynx/statistics/index.php', ['id' => $df->cm->id])
+);
 
 // Print header.
 $df->print_header(['tab' => 'statistics', 'urlparams' => $urlparams]);

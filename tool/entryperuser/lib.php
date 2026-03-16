@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxtool
+ * @package datalynxtool_entryperuser
  * @subpackage entryperuser
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
@@ -28,7 +28,6 @@ require_once("$CFG->dirroot/mod/datalynx/entries_class.php");
 require_once("$CFG->dirroot/mod/datalynx/field/entryauthor/field_class.php");
 
 class datalynxtool_entryperuser {
-
     /**
      */
     public static function run($df) {
@@ -54,7 +53,7 @@ class datalynxtool_entryperuser {
         $processed = $em->process_entries('update', $data->eids, $data, true);
 
         if (is_array($processed)) {
-            list($strnotify, $processedeids) = $processed;
+            [$strnotify, $processedeids] = $processed;
             $entriesprocessed = $processedeids ? count($processedeids) : 0;
             if ($entriesprocessed) {
                 return ['good', $strnotify];

@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxview
+ * @package datalynxview_pdf
  * @subpackage pdf
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
@@ -30,10 +30,9 @@ require_once("$CFG->libdir/pdflib.php");
 use mod_datalynx\view\base;
 use setasign\Fpdi\Tcpdf\Fpdi;
 
-require_once($CFG->dirroot.'/mod/assign/feedback/editpdf/fpdi/autoload.php');
+require_once($CFG->dirroot . '/mod/assign/feedback/editpdf/fpdi/autoload.php');
 
 class datalynxview_pdf extends base {
-
     const EXPORT_ALL = 'all';
 
     const EXPORT_PAGE = 'page';
@@ -44,10 +43,10 @@ class datalynxview_pdf extends base {
 
     protected string $type = 'pdf';
 
-    protected array $_editors = ['section', 'param2', 'param3', 'param4'
+    protected array $_editors = ['section', 'param2', 'param3', 'param4',
     ];
 
-    protected array $_vieweditors = ['section', 'param2', 'param3', 'param4'
+    protected array $_vieweditors = ['section', 'param2', 'param3', 'param4',
     ];
 
     protected $_settings = null;
@@ -94,32 +93,34 @@ class datalynxview_pdf extends base {
                         'page' => !empty($settings->toc->page) ? $settings->toc->page : '',
                         'name' => !empty($settings->toc->name) ? $settings->toc->name : '',
                         'title' => !empty($settings->toc->title) ? $settings->toc->title : '',
-                        'template' => !empty($settings->toc->template) ? preg_replace('/[\r\n]+/', '',
-                                $settings->toc->template) : ''
+                        'template' => !empty($settings->toc->template) ? preg_replace(
+                            '/[\r\n]+/',
+                            '',
+                            $settings->toc->template
+                        ) : '',
                 ],
                 'header' => (object) [
                         'enabled' => !empty($settings->header->enabled) ? $settings->header->enabled : false,
                         'margintop' => !empty($settings->header->margintop) ? $settings->header->margintop : 0,
-                        'marginleft' => !empty($settings->header->marginleft) ? $settings->header->marginleft : 10
+                        'marginleft' => !empty($settings->header->marginleft) ? $settings->header->marginleft : 10,
                 ],
                 'footer' => (object) [
                         'text' => !empty($this->view->eparam4) ? $this->view->eparam4 : '',
                         'enabled' => !empty($settings->footer->enabled) ? $settings->footer->enabled : false,
-                        'margin' => !empty($settings->footer->margin) ? $settings->footer->margin : 10
+                        'margin' => !empty($settings->footer->margin) ? $settings->footer->margin : 10,
                 ],
                 'margins' => (object) [
                         'left' => !empty($settings->margins->left) ? $settings->margins->left : 15,
                         'top' => !empty($settings->margins->top) ? $settings->margins->top : 27,
                         'right' => !empty($settings->margins->right) ? $settings->margins->right : -1,
-                        'keep' => !empty($settings->margins->keep) ? $settings->margins->keep : false
+                        'keep' => !empty($settings->margins->keep) ? $settings->margins->keep : false,
                 ],
                 'protection' => (object) [
                         'permissions' => !empty($settings->protection->permissions) ? $settings->protection->permissions : [],
                         'user_pass' => !empty($settings->protection->user_pass) ? $settings->protection->user_pass : '',
                         'owner_pass' => !empty($settings->protection->owner_pass) ? $settings->protection->owner_pass : null,
-                        'mode' => !empty($settings->protection->mode) ? $settings->protection->mode : null
-                ]
-        ,
+                        'mode' => !empty($settings->protection->mode) ? $settings->protection->mode : null,
+                ],
                 'signature' => (object) [
                         'password' => !empty($settings->signature->password) ? $settings->signature->password : '',
                         'type' => !empty($settings->signature->type) ? $settings->signature->type : 1,
@@ -127,8 +128,8 @@ class datalynxview_pdf extends base {
                          'Name' => !empty($settings->signature->info->Name) ? $settings->signature->info->Name : '',
                          'Location' => !empty($settings->signature->info->Location) ? $settings->signature->info->Location : '',
                          'Reason' => !empty($settings->signature->info->Reason) ? $settings->signature->info->Reason : '',
-                     'ContactInfo' => !empty($settings->signature->info->ContactInfo) ? $settings->signature->info->ContactInfo : ''
-                        ]
+                     'ContactInfo' => !empty($settings->signature->info->ContactInfo) ? $settings->signature->info->ContactInfo : '',
+                        ],
                 ]];
     }
 
@@ -163,8 +164,11 @@ class datalynxview_pdf extends base {
         $pdf = new dfpdf($settings);
 
         // Set margins.
-        $pdf->SetMargins($settings->margins->left, $settings->margins->top,
-                $settings->margins->right);
+        $pdf->SetMargins(
+            $settings->margins->left,
+            $settings->margins->top,
+            $settings->margins->right
+        );
 
         // Set header.
         if (!empty($settings->header->enabled)) {
@@ -182,8 +186,12 @@ class datalynxview_pdf extends base {
 
         // Protection.
         $protection = $settings->protection;
-        $pdf->SetProtection($protection->permissions, $protection->user_pass,
-                $protection->owner_pass, $protection->mode);
+        $pdf->SetProtection(
+            $protection->permissions,
+            $protection->user_pass,
+            $protection->owner_pass,
+            $protection->mode
+        );
 
         // Paging.
         if ($settings->pagebreak == 'none') {
@@ -212,9 +220,13 @@ class datalynxview_pdf extends base {
         if ($settings->pagebreak == 'entry') {
             $content = [];
             $totalcontent = $this->display(
-                    ['export' => true, 'tohtml' => true, 'controls' => false, 'entryactions' => false]);
-            $totalcontent = preg_replace('/\<\/div\>\<div class\=\"entry\"\>/',
-                    '<></div><div class="entry">', $totalcontent);
+                ['export' => true, 'tohtml' => true, 'controls' => false, 'entryactions' => false]
+            );
+            $totalcontent = preg_replace(
+                '/\<\/div\>\<div class\=\"entry\"\>/',
+                '<></div><div class="entry">',
+                $totalcontent
+            );
             $newcontent = explode('<>', $totalcontent);
             foreach ($newcontent as $page) {
                 if ($page) {
@@ -222,9 +234,12 @@ class datalynxview_pdf extends base {
                 }
             }
         } else {
-            $content = explode(self::PAGE_BREAK,
-                    $this->display(
-                            ['export' => true, 'tohtml' => true, 'controls' => false, 'entryactions' => false]));
+            $content = explode(
+                self::PAGE_BREAK,
+                $this->display(
+                    ['export' => true, 'tohtml' => true, 'controls' => false, 'entryactions' => false]
+                )
+            );
         }
 
         $pagecount = 0;
@@ -251,7 +266,6 @@ class datalynxview_pdf extends base {
             $pagecontent = $this->process_content_images($pagecontent);
             $this->write_html($pdf, $pagecontent);
             $pagecount++;
-
         }
 
         // Merge attached pdfs.
@@ -317,20 +331,38 @@ class datalynxview_pdf extends base {
 
         // Pdf frame.
         if (isset($data->pdfframe)) {
-            file_save_draft_area_files($data->pdfframe, $contextid, 'mod_datalynx', 'view_pdfframe',
-                    $this->id(), $imageoptions);
+            file_save_draft_area_files(
+                $data->pdfframe,
+                $contextid,
+                'mod_datalynx',
+                'view_pdfframe',
+                $this->id(),
+                $imageoptions
+            );
         }
 
         // Pdf watermark.
         if (isset($data->pdfwmark)) {
-            file_save_draft_area_files($data->pdfwmark, $contextid, 'mod_datalynx', 'view_pdfwmark',
-                    $this->id(), $imageoptions);
+            file_save_draft_area_files(
+                $data->pdfwmark,
+                $contextid,
+                'mod_datalynx',
+                'view_pdfwmark',
+                $this->id(),
+                $imageoptions
+            );
         }
 
         // Pdf cert.
         if (isset($data->pdfcert)) {
-            file_save_draft_area_files($data->pdfcert, $contextid, 'mod_datalynx', 'view_pdfcert',
-                    $this->id(), $certoptions);
+            file_save_draft_area_files(
+                $data->pdfcert,
+                $contextid,
+                'mod_datalynx',
+                'view_pdfcert',
+                $this->id(),
+                $certoptions
+            );
         }
 
         return $data;
@@ -351,20 +383,38 @@ class datalynxview_pdf extends base {
 
         // Pdf frame.
         $draftitemid = file_get_submitted_draft_itemid('pdfframe');
-        file_prepare_draft_area($draftitemid, $contextid, 'mod_datalynx', 'view_pdfframe',
-                $this->id(), $imageoptions);
+        file_prepare_draft_area(
+            $draftitemid,
+            $contextid,
+            'mod_datalynx',
+            'view_pdfframe',
+            $this->id(),
+            $imageoptions
+        );
         $data->pdfframe = $draftitemid;
 
         // Pdf watermark.
         $draftitemid = file_get_submitted_draft_itemid('pdfwmark');
-        file_prepare_draft_area($draftitemid, $contextid, 'mod_datalynx', 'view_pdfwmark',
-                $this->id(), $imageoptions);
+        file_prepare_draft_area(
+            $draftitemid,
+            $contextid,
+            'mod_datalynx',
+            'view_pdfwmark',
+            $this->id(),
+            $imageoptions
+        );
         $data->pdfwmark = $draftitemid;
 
         // Pdf certification.
         $draftitemid = file_get_submitted_draft_itemid('pdfcert');
-        file_prepare_draft_area($draftitemid, $contextid, 'mod_datalynx', 'view_cert', $this->id(),
-                $certoptions);
+        file_prepare_draft_area(
+            $draftitemid,
+            $contextid,
+            'mod_datalynx',
+            'view_cert',
+            $this->id(),
+            $certoptions
+        );
         $data->pdfcert = $draftitemid;
 
         return $data;
@@ -442,8 +492,11 @@ class datalynxview_pdf extends base {
         // Construct the table.
         $table->data = [$row1, $row2, $row3];
         $sectiondefault = html_writer::table($table);
-        $this->view->esection = html_writer::tag('div', $sectiondefault,
-                        ['class' => 'mdl-align']) . "<div>##entries##</div>";
+        $this->view->esection = html_writer::tag(
+            'div',
+            $sectiondefault,
+            ['class' => 'mdl-align']
+        ) . "<div>##entries##</div>";
 
         // Set content.
         $table = new html_table();
@@ -451,7 +504,6 @@ class datalynxview_pdf extends base {
 
         // Fields.
         foreach ($fields as $field) {
-
             if (is_numeric($field->field->id) && $field->field->id > 0) {
                 $name = new html_table_cell($field->name() . ':');
                 $name->style = 'text-align:right;';
@@ -555,7 +607,7 @@ class datalynxview_pdf extends base {
                 // Add a bookmark for each pattern.
                 foreach ($matches[0] as $bookmark) {
                     $bookmark = trim($bookmark, '#@');
-                    list($bmtype, $bmlevel, $bmtext) = explode(':', $bookmark, 3);
+                    [$bmtype, $bmlevel, $bmtext] = explode(':', $bookmark, 3);
 
                     // Must have a template for the TOC level.
                     if (empty($templates[$bmlevel])) {
@@ -584,8 +636,15 @@ class datalynxview_pdf extends base {
     protected function set_frame($pdf) {
         // Add to pdf frame image if any.
         $fs = get_file_storage();
-        if ($frame = $fs->get_area_files($this->_df->context->id, 'mod_datalynx', 'view_pdfframe',
-                $this->id(), '', false)
+        if (
+            $frame = $fs->get_area_files(
+                $this->_df->context->id,
+                'mod_datalynx',
+                'view_pdfframe',
+                $this->id(),
+                '',
+                false
+            )
         ) {
             $frame = reset($frame);
 
@@ -593,22 +652,25 @@ class datalynxview_pdf extends base {
             $filename = $frame->get_filename();
             $filepath = $tmpdir . "files/$filename";
             if ($frame->copy_content_to($filepath)) {
-                $pdf->Image($filepath, '', // Variable $x = ''.
-                        '', // Variable $y = ''.
-                        0, // Variable $w = 0.
-                        0, // Variable $h = 0.
-                        '', // Variable $type = ''.
-                        '', // Variable $link = ''.
-                        '', // Variable $align = ''.
-                        false, // Variable $resize = false.
-                        300, // Variable $dpi = 300.
-                        '', // Variable $palign = ''.
-                        false, // Variable $ismask = false.
-                        false, // Variable $imgmask = false.
-                        0, // Variable $border = 0.
-                        false, // Variable $fitbox = false.
-                        false, // Variable $hidden = false.
-                        true);
+                $pdf->Image(
+                    $filepath,
+                    '', // Variable $x = ''.
+                    '', // Variable $y = ''.
+                    0, // Variable $w = 0.
+                    0, // Variable $h = 0.
+                    '', // Variable $type = ''.
+                    '', // Variable $link = ''.
+                    '', // Variable $align = ''.
+                    false, // Variable $resize = false.
+                    300, // Variable $dpi = 300.
+                    '', // Variable $palign = ''.
+                    false, // Variable $ismask = false.
+                    false, // Variable $imgmask = false.
+                    0, // Variable $border = 0.
+                    false, // Variable $fitbox = false.
+                    false, // Variable $hidden = false.
+                    true
+                );
             }
             unlink($filepath);
         }
@@ -619,8 +681,15 @@ class datalynxview_pdf extends base {
     protected function set_watermark($pdf) {
         // Add to pdf watermark image if any.
         $fs = get_file_storage();
-        if ($wmark = $fs->get_area_files($this->_df->context->id, 'mod_datalynx', 'view_pdfwmark',
-                $this->id(), '', false)
+        if (
+            $wmark = $fs->get_area_files(
+                $this->_df->context->id,
+                'mod_datalynx',
+                'view_pdfwmark',
+                $this->id(),
+                '',
+                false
+            )
         ) {
             $wmark = reset($wmark);
 
@@ -628,7 +697,7 @@ class datalynxview_pdf extends base {
             $filename = $wmark->get_filename();
             $filepath = $tmpdir . "files/$filename";
             if ($wmark->copy_content_to($filepath)) {
-                list($wmarkwidth, $wmarkheight, ) = array_values($wmark->get_imageinfo());
+                [$wmarkwidth, $wmarkheight, ] = array_values($wmark->get_imageinfo());
                 // TODO 25.4 in Inch (assuming unit in mm) and 72 dpi by default when image dims not.
                 // Specified.
                 $wmarkwidthmm = $wmarkwidth * 25.4 / 72;
@@ -638,8 +707,11 @@ class datalynxview_pdf extends base {
                 $centery = ($pagedim['hk'] - $wmarkheightmm) / 2;
 
                 $pdf->SetAlpha($this->_settings->transparency);
-                $pdf->Image($filepath, $centerx, // Variable $x = '',.
-                        $centery);
+                $pdf->Image(
+                    $filepath,
+                    $centerx, // Variable $x = '',.
+                    $centery
+                );
                 $pdf->SetAlpha(1);
             }
             unlink($filepath);
@@ -650,8 +722,15 @@ class datalynxview_pdf extends base {
      */
     protected function set_signature($pdf) {
         $fs = get_file_storage();
-        if ($cert = $fs->get_area_files($this->_df->context->id, 'mod_datalynx', 'view_pdfcert',
-                $this->id(), '', false)
+        if (
+            $cert = $fs->get_area_files(
+                $this->_df->context->id,
+                'mod_datalynx',
+                'view_pdfcert',
+                $this->id(),
+                '',
+                false
+            )
         ) {
             $cert = reset($cert);
 
@@ -661,8 +740,14 @@ class datalynxview_pdf extends base {
             if ($cert->copy_content_to($filepath)) {
                 $signsettings = $this->_settings->signature;
                 if ($signsettings->password != '') {
-                    $pdf->setSignature("file://$filepath", "file://$filepath",
-                            $signsettings->password, '', $signsettings->type, $signsettings->info);
+                    $pdf->setSignature(
+                        "file://$filepath",
+                        "file://$filepath",
+                        $signsettings->password,
+                        '',
+                        $signsettings->type,
+                        $signsettings->info
+                    );
                 }
             }
             $this->_tmpfiles[] = $filepath;
@@ -677,8 +762,14 @@ class datalynxview_pdf extends base {
         }
 
         // Rewrite plugin file urls.
-        $content = file_rewrite_pluginfile_urls($this->view->eparam3, 'pluginfile.php',
-                $this->_df->context->id, 'mod_datalynx', "viewparam3", $this->id());
+        $content = file_rewrite_pluginfile_urls(
+            $this->view->eparam3,
+            'pluginfile.php',
+            $this->_df->context->id,
+            'mod_datalynx',
+            "viewparam3",
+            $this->id()
+        );
 
         $content = $this->process_content_images($content);
         // Add the Datalynx css to content.
@@ -698,8 +789,14 @@ class datalynxview_pdf extends base {
         }
 
         // Rewrite plugin file urls.
-        $content = file_rewrite_pluginfile_urls($this->view->eparam4, 'pluginfile.php',
-                $this->_df->context->id, 'mod_datalynx', "viewparam4", $this->id());
+        $content = file_rewrite_pluginfile_urls(
+            $this->view->eparam4,
+            'pluginfile.php',
+            $this->_df->context->id,
+            'mod_datalynx',
+            "viewparam4",
+            $this->id()
+        );
 
         $content = $this->process_content_images($content);
         $pdf->SetFooterData('', 0, '', $content);
@@ -806,14 +903,14 @@ class datalynxview_pdf extends base {
         $filestomerge = [];
         foreach ($this->_entries->get_entries()->entries as $entry) {
             foreach ($filefieldids as $fieldid) {
-                if (!isset($entry->{'c'.$fieldid.'_content'})) {
+                if (!isset($entry->{'c' . $fieldid . '_content'})) {
                     continue;
                 }
-                if ($entry->{'c'.$fieldid.'_content'} != 1) {
+                if ($entry->{'c' . $fieldid . '_content'} != 1) {
                     continue;
                 }
                 // If content == 1 and id is set add to merging files.
-                $filestomerge[] = $entry->{'c'.$fieldid.'_id'};
+                $filestomerge[] = $entry->{'c' . $fieldid . '_id'};
             }
         }
         // Stop here if nothing to merge.
@@ -869,7 +966,6 @@ class datalynxview_pdf extends base {
                 }
                 $pagecount = $pagecount + $importpagecount;
             }
-
         }
         return $pagecount;
     }
@@ -887,7 +983,6 @@ if (is_file("$CFG->dirroot/mod/assign/feedback/editpdf/fpdi/autoload.php")) {
 
 // Extend the TCPDF class to create custom Header and Footer.
 class dfpdf extends DynamicParent {
-
     protected $_dfsettings;
 
     public function __construct($settings) {

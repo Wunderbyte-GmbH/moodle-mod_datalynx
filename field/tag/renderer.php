@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_tag
  * @subpackage tag
  * @copyright 2016 David Bogner
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -29,7 +29,6 @@ require_once(dirname(__FILE__) . "/../renderer.php");
  * Class datalynxfield_tag_renderer Renderer for tag field type
  */
 class datalynxfield_tag_renderer extends datalynxfield_renderer {
-
     /**
      *
      * {@inheritDoc}
@@ -41,18 +40,25 @@ class datalynxfield_tag_renderer extends datalynxfield_renderer {
         $entryid = $entry->id;
 
         $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
-        $content = core_tag_tag::get_item_tags_array('mod_datalynx', 'datalynx_contents', $contentid,
-                core_tag_tag::BOTH_STANDARD_AND_NOT);
+        $content = core_tag_tag::get_item_tags_array(
+            'mod_datalynx',
+            'datalynx_contents',
+            $contentid,
+            core_tag_tag::BOTH_STANDARD_AND_NOT
+        );
 
         $fieldname = "field_{$fieldid}_{$entryid}";
-        $mform->addElement('tags', $fieldname, get_string('tags'),
-                ['itemtype' => 'datalynx_contents', 'component' => 'mod_datalynx']);
+        $mform->addElement(
+            'tags',
+            $fieldname,
+            get_string('tags'),
+            ['itemtype' => 'datalynx_contents', 'component' => 'mod_datalynx']
+        );
         $mform->setDefault($fieldname, $content);
         $required = !empty($options['required']);
         if ($required) {
             $mform->addRule($fieldname, null, 'required', null, 'client');
         }
-
     }
 
     /**
@@ -110,8 +116,12 @@ class datalynxfield_tag_renderer extends datalynxfield_renderer {
         $selected = $value;
 
         $fieldname = "f_{$i}_$fieldid";
-        $select = &$mform->createElement('tags', $fieldname, get_string('tags'),
-                ['itemtype' => 'datalynx_contents', 'component' => 'mod_datalynx']);
+        $select = &$mform->createElement(
+            'tags',
+            $fieldname,
+            get_string('tags'),
+            ['itemtype' => 'datalynx_contents', 'component' => 'mod_datalynx']
+        );
         $select->setValue($selected);
 
         $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
@@ -131,7 +141,7 @@ class datalynxfield_tag_renderer extends datalynxfield_renderer {
 
         $errors = [];
         foreach ($tags as $tag) {
-            list(, $behavior, ) = $this->process_tag($tag);
+            [, $behavior, ] = $this->process_tag($tag);
             // Variable $behavior datalynx_field_behavior.
             if ($behavior->is_required() && !is_array($formdata->$formfieldname)) {
                 $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');

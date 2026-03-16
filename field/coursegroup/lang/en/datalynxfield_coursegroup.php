@@ -16,14 +16,14 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_coursegroup
  * @subpackage coursegroup
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-$string['pluginname'] = 'Course group';
-$string['member'] = 'Membership';
 $string['coursenotfound'] = 'Course id {a} not found';
 $string['groupnotfound'] = 'Group id {a} not found';
+$string['member'] = 'Membership';
+$string['pluginname'] = 'Course group';
 $string['privacy:metadata'] = 'Coursegroups do not store personal data.';

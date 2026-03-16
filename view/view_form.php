@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxview
+ * @package mod_datalynx
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -32,13 +32,19 @@ require_once("$CFG->libdir/formslib.php");
  * settings
  */
 class datalynxview_base_form extends moodleform {
-
     protected $_view = null;
 
     protected $_df = null;
 
-    public function __construct($view, $action = null, $customdata = null, $method = 'post', $target = '',
-            $attributes = null, $editable = true) {
+    public function __construct(
+        $view,
+        $action = null,
+        $customdata = null,
+        $method = 'post',
+        $target = '',
+        $attributes = null,
+        $editable = true
+    ) {
         $this->_view = $view;
         $this->_df = $view->get_dl();
         $attributes['id'] = 'datalynx-view-edit-form';
@@ -92,8 +98,12 @@ class datalynxview_base_form extends moodleform {
         $mform->setDefault('_filter', 0);
 
         // Overridefilter.
-        $mform->addElement('advcheckbox', 'param5', get_string('viewfilteroverride', 'datalynx'),
-            get_string('viewfoverride', 'datalynx'));
+        $mform->addElement(
+            'advcheckbox',
+            'param5',
+            get_string('viewfilteroverride', 'datalynx'),
+            get_string('viewfoverride', 'datalynx')
+        );
         $mform->addHelpButton('param5', 'viewfoverride', 'datalynx');
         $mform->setType('param5', PARAM_INT);
         $mform->setDefault('param5', 0);
@@ -223,11 +233,17 @@ class datalynxview_base_form extends moodleform {
         // Save and display.
         $buttonarray[] = &$mform->createElement('submit', 'submitbutton', get_string('savechanges'));
         // Save and continue.
-        $buttonarray[] = &$mform->createElement('submit', 'submitreturnbutton',
-                get_string('savecontinue', 'datalynx'));
+        $buttonarray[] = &$mform->createElement(
+            'submit',
+            'submitreturnbutton',
+            get_string('savecontinue', 'datalynx')
+        );
         // Reset to default.
-        $buttonarray[] = &$mform->createElement('submit', 'resetdefaultbutton',
-                get_string('viewresettodefault', 'datalynx'));
+        $buttonarray[] = &$mform->createElement(
+            'submit',
+            'resetdefaultbutton',
+            get_string('viewresettodefault', 'datalynx')
+        );
         $mform->registerNoSubmitButton('resetdefaultbutton');
         // Switch editor.
         // Cancel.
@@ -270,14 +286,25 @@ class datalynxview_base_form extends moodleform {
         if (!empty($tags)) {
             $name = "{$editorname}_{$tagstype}_tag_menu";
             $grp = [];
-            $grp[] = &$mform->createElement('html',
-                    html_writer::start_tag('div', ['class' => 'fitem']));
-            $grp[] = &$mform->createElement('html',
-                    '<div class="fitemtitle"><label>' . $label . '</label></div>');
-            $grp[] = &$mform->createElement('html',
-                    '<div class="felement fselect">' .
-                    html_writer::select($tags, $name, '', ['' => 'choosedots'],
-                            ['id' => $name]) . '</div>');
+            $grp[] = &$mform->createElement(
+                'html',
+                html_writer::start_tag('div', ['class' => 'fitem'])
+            );
+            $grp[] = &$mform->createElement(
+                'html',
+                '<div class="fitemtitle"><label>' . $label . '</label></div>'
+            );
+            $grp[] = &$mform->createElement(
+                'html',
+                '<div class="felement fselect">' .
+                    html_writer::select(
+                        $tags,
+                        $name,
+                        '',
+                        ['' => 'choosedots'],
+                        ['id' => $name]
+                    ) . '</div>'
+            );
             $grp[] = &$mform->createElement('html', html_writer::end_tag('div'));
             $mform->addGroup($grp, "{$editorname}{$tagstype}tagsgrp", '', [' '], false);
         }
@@ -313,10 +340,8 @@ class datalynxview_base_form extends moodleform {
 
         // We check if fieldgroups is used multiple times or if subfields are repeated.
         if (array_key_exists('Fieldgroups', $view->field_tags())) {
-
             $visiblefieldgroups = 0;
             foreach ($view->field_tags()['Fieldgroups']['Fieldgroups'] as $fieldgroup) {
-
                 // Stop if the fieldgroup is not used in this entryview.
                 if (strpos($entryview, $fieldgroup) === false) {
                     continue;
@@ -330,7 +355,7 @@ class datalynxview_base_form extends moodleform {
                 $lookup = '';
                 foreach ($subfields->fieldids as $subfieldid) {
                     $subfield = $df->get_field_from_id($subfieldid);
-                    $lookup .= " [[".$subfield->field->name."]]";
+                    $lookup .= " [[" . $subfield->field->name . "]]";
                 }
 
                 // Find in view and append tags for individual fields.
@@ -341,7 +366,6 @@ class datalynxview_base_form extends moodleform {
             if ($visiblefieldgroups > 1) {
                 $errors['eparam2_editor'] = get_string('viewmultiplefieldgroups', 'datalynx');
             }
-
         }
 
         // Normalise fields that have filters or behaviours attached.
@@ -355,17 +379,14 @@ class datalynxview_base_form extends moodleform {
 
         if (!empty($fields['Fields'])) {
             foreach ($fields['Fields']['Fields'] as $field) {
-
                 // Error when we find more than one instance of this tag.
                 if (is_array($field)) {
-
                     // Make sure multiple errors are shown.
                     if (!array_key_exists('eparam2_editor', $errors)) {
                         $errors['eparam2_editor'] = get_string('viewrepeatedfields', 'datalynx', substr($field[0], 2, -2));
                     } else {
                         $errors['eparam2_editor'] .= "<br>" . get_string('viewrepeatedfields', 'datalynx', substr($field[0], 2, -2));
                     }
-
                 }
             }
         }

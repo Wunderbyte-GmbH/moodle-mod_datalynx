@@ -40,7 +40,8 @@ $datalynx->set_page('renderer/index', ['urlparams' => $urlparams]);
 
 // Activate navigation node.
 navigation_node::override_active_url(
-        new moodle_url('/mod/datalynx/renderer/index.php', ['id' => $datalynx->cm->id]));
+    new moodle_url('/mod/datalynx/renderer/index.php', ['id' => $datalynx->cm->id])
+);
 
 // TODO: print notifications.
 
@@ -50,9 +51,12 @@ $datalynx->print_header(['tab' => 'renderers', 'urlparams' => $urlparams]);
 echo html_writer::empty_tag('br');
 echo html_writer::start_tag('div', ['class' => 'fieldadd mdl-align']);
 echo html_writer::link(
-        new moodle_url('/mod/datalynx/renderer/renderer_edit.php',
-                ['d' => $datalynx->id(), 'sesskey' => sesskey(), 'id' => 0]),
-        get_string('rendereradd', 'datalynx'));
+    new moodle_url(
+        '/mod/datalynx/renderer/renderer_edit.php',
+        ['d' => $datalynx->id(), 'sesskey' => sesskey(), 'id' => 0]
+    ),
+    get_string('rendereradd', 'datalynx')
+);
 echo html_writer::end_tag('div');
 echo html_writer::empty_tag('br');
 
@@ -62,12 +66,13 @@ $linkparams = ['d' => $datalynx->id(), 'sesskey' => sesskey()];
 // Table headers.
 $headers = ['name' => get_string('name'), 'description' => get_string('description'),
         'edit' => get_string('edit'), 'duplicate' => get_string('duplicate'),
-        'delete' => get_string('delete')
+        'delete' => get_string('delete'),
 ];
 
 $table = new flexible_table('datalynxrenderersindex' . $datalynx->id());
 $table->define_baseurl(
-        new moodle_url('/mod/datalynx/renderer/index.php', ['d' => $datalynx->id()]));
+    new moodle_url('/mod/datalynx/renderer/index.php', ['d' => $datalynx->id()])
+);
 $table->define_columns(array_keys($headers));
 $table->define_headers(array_values($headers));
 
@@ -86,24 +91,33 @@ $table->setup();
 $renderers = $DB->get_records('datalynx_renderers', ['dataid' => $datalynx->id()]);
 
 foreach ($renderers as $rendererid => $renderer) {
-
     $fieldname = html_writer::link(
-            new moodle_url($editbaseurl, $linkparams + ['id' => $rendererid]), $renderer->name);
+        new moodle_url($editbaseurl, $linkparams + ['id' => $rendererid]),
+        $renderer->name
+    );
     $fielddescription = shorten_text($renderer->description, 30);
     $fieldedit = html_writer::link(
-            new moodle_url($editbaseurl, $linkparams + ['id' => $rendererid]),
-            $OUTPUT->pix_icon('t/edit', get_string('edit')));
+        new moodle_url($editbaseurl, $linkparams + ['id' => $rendererid]),
+        $OUTPUT->pix_icon('t/edit', get_string('edit'))
+    );
     $fieldduplicate = html_writer::link(
-            new moodle_url($editbaseurl,
-                    $linkparams + ['action' => 'duplicate', 'id' => $rendererid]),
-            $OUTPUT->pix_icon('t/copy', get_string('duplicate')));
+        new moodle_url(
+            $editbaseurl,
+            $linkparams + ['action' => 'duplicate', 'id' => $rendererid]
+        ),
+        $OUTPUT->pix_icon('t/copy', get_string('duplicate'))
+    );
     $fielddelete = html_writer::link(
-            new moodle_url($editbaseurl,
-                    $linkparams + ['action' => 'delete', 'id' => $rendererid]),
-            $OUTPUT->pix_icon('t/delete', get_string('delete')));
+        new moodle_url(
+            $editbaseurl,
+            $linkparams + ['action' => 'delete', 'id' => $rendererid]
+        ),
+        $OUTPUT->pix_icon('t/delete', get_string('delete'))
+    );
 
     $table->add_data(
-            [$fieldname, $fielddescription, $fieldedit, $fieldduplicate, $fielddelete]);
+        [$fieldname, $fielddescription, $fieldedit, $fieldduplicate, $fielddelete]
+    );
 }
 
 $table->finish_output();

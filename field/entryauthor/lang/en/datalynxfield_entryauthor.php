@@ -16,13 +16,14 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_entryauthor
  * @subpackage entryauthor
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['pluginname'] = 'Entryauthor';
+$string['privacy:metadata'] = 'The field entryauthor does not store personal data.';
 $string['useremail'] = 'User email';
 $string['userfirstname'] = 'User first name';
 $string['userid'] = 'User id';
@@ -31,4 +32,3 @@ $string['userlastname'] = 'User last name';
 $string['username'] = 'User name';
 $string['userpicture'] = 'User picture';
 $string['userusername'] = 'User username';
-$string['privacy:metadata'] = 'The field entryauthor does not store personal data.';

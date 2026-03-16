@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package mod_datalynx
  * @subpackage _status
  * @copyright 2013 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -29,7 +29,6 @@ require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
  * Implementation of internal field for setting entry submission statuses.
  */
 class datalynxfield__status_renderer extends datalynxfield_renderer {
-
     /**
      * Performs replacements of supported patterns depending on the given parameters
      *
@@ -49,16 +48,16 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
                 if (trim($tag, '@') == "##status##" || trim($tag, '@') == "##*status##") {
                     $required = trim($tag, '@') === "##*status##";
                     $replacements[$tag] = ['',
-                            [[$this, 'display_edit'
-                            ], [$entry, ['required' => $required
-                            ]
-                            ]
-                            ]
+                            [[$this, 'display_edit',
+                            ], [$entry, ['required' => $required,
+                            ],
+                            ],
+                            ],
                     ];
                 }
             } else {
                 if (trim($tag, '@') == "##status##" || trim($tag, '@') == "##*status##") {
-                    $replacements[$tag] = ['html', $this->display_browse($entry)
+                    $replacements[$tag] = ['html', $this->display_browse($entry),
                     ];
                 }
             }
@@ -85,8 +84,13 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
         $select = &$mform->addElement('select', $fieldname, '', $menu);
         $mform->setDefault($fieldname, $status);
         if ($required) {
-            $mform->addRule($fieldname, get_string('statusrequired', 'datalynx'), 'nonzero', null,
-                    'client');
+            $mform->addRule(
+                $fieldname,
+                get_string('statusrequired', 'datalynx'),
+                'nonzero',
+                null,
+                'client'
+            );
         }
     }
 
@@ -103,13 +107,17 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
                     datalynxfield__status::STATUS_NOT_SET => get_string('statusnotcreated', 'datalynx'),
                     datalynxfield__status::STATUS_DRAFT => get_string('statusdraft', 'datalynx'),
                     datalynxfield__status::STATUS_FINAL_SUBMISSION => get_string(
-                            'statusfinalsubmission', 'datalynx')
+                        'statusfinalsubmission',
+                        'datalynx'
+                    ),
             ];
         } else {
             return [datalynxfield__status::STATUS_NOT_SET => get_string('choosedots'),
                     datalynxfield__status::STATUS_DRAFT => get_string('statusdraft', 'datalynx'),
                     datalynxfield__status::STATUS_FINAL_SUBMISSION => get_string(
-                            'statusfinalsubmission', 'datalynx')
+                        'statusfinalsubmission',
+                        'datalynx'
+                    ),
             ];
         }
     }
@@ -144,15 +152,17 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
 
         $statusmenu = [-1 => get_string('statusnotcreated', 'datalynx'),
                 datalynxfield__status::STATUS_DRAFT => get_string('statusdraft', 'datalynx'),
-                datalynxfield__status::STATUS_FINAL_SUBMISSION => get_string('statusfinalsubmission',
-                        'datalynx')];
+                datalynxfield__status::STATUS_FINAL_SUBMISSION => get_string(
+                    'statusfinalsubmission',
+                    'datalynx'
+                )];
 
         $select = &$mform->createElement('select', $fieldname, null, $statusmenu, '');
         $select->setValue($value);
 
         $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
-        return [[$select
-        ], null
+        return [[$select,
+        ], null,
         ];
     }
 

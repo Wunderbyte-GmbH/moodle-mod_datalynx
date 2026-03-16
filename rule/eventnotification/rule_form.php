@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynx_rule
+ * @package datalynxrule_eventnotification
  * @subpackage eventnotification
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/rule/rule_form.php");
 
 class datalynx_rule_eventnotification_form extends datalynx_rule_form {
-
     public function rule_definition() {
         $br = html_writer::empty_tag('br');
         $mform = &$this->_form;
@@ -51,18 +50,36 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
         $options = ['multiple' => true];
         $grp[] = &$mform->createElement('static', '', '', "<br><h4 class=\"w-100 mt-3\">" . get_string('roles') . "</h4>");
 
-        $grp[] = &$mform->createElement('autocomplete', 'roles', get_string('roles'),
-                $this->_df->get_datalynx_permission_names(true), $options);
+        $grp[] = &$mform->createElement(
+            'autocomplete',
+            'roles',
+            get_string('roles'),
+            $this->_df->get_datalynx_permission_names(true),
+            $options
+        );
         $grp[] = &$mform->createElement('static', '', '', $br);
 
-        $grp[] = &$mform->createElement('static', '', '',
-                "<br><h4 class=\"w-100 mt-3\">" . get_string('teammembers', 'datalynx') . "</h4>");
-        $grp[] = &$mform->createElement('autocomplete', 'teams', get_string('teams', 'datalynx'),
-                $this->get_datalynx_team_fields(), $options);
+        $grp[] = &$mform->createElement(
+            'static',
+            '',
+            '',
+            "<br><h4 class=\"w-100 mt-3\">" . get_string('teammembers', 'datalynx') . "</h4>"
+        );
+        $grp[] = &$mform->createElement(
+            'autocomplete',
+            'teams',
+            get_string('teams', 'datalynx'),
+            $this->get_datalynx_team_fields(),
+            $options
+        );
 
         // Single userid can be selected.
-        $grp[] = &$mform->createElement('static', '', '',
-                "<br><h4 class=\"w-100 mt-3\">" . get_string('otheruser', 'datalynx') . "</h4>");
+        $grp[] = &$mform->createElement(
+            'static',
+            '',
+            '',
+            "<br><h4 class=\"w-100 mt-3\">" . get_string('otheruser', 'datalynx') . "</h4>"
+        );
         $allusers = $this->get_allusers();
         $grp[] = $mform->createElement('autocomplete', 'specificuserid', get_string('otheruser', 'datalynx'), $allusers);
 
@@ -77,8 +94,12 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
             if (!empty($views)) {
                 $mform->addElement('select', "param4[$permissionid]", $permissionname, $views);
             } else {
-                $mform->addElement('static', '', $permissionname,
-                        get_string('noviewsavailable', 'datalynx'));
+                $mform->addElement(
+                    'static',
+                    '',
+                    $permissionname,
+                    get_string('noviewsavailable', 'datalynx')
+                );
             }
         }
 
@@ -95,7 +116,8 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
                 'multiple' => true,
                 'noselectionstring' => get_string('noselection', 'form'),
         ];
-        $mform->addElement('autocomplete', 'param7', get_string('searcharea', 'search'), $fieldmenu, $options);    }
+        $mform->addElement('autocomplete', 'param7', get_string('searcharea', 'search'), $fieldmenu, $options);
+    }
 
     /**
      * Get all users in moodle instance for autocomplete list.
@@ -125,7 +147,8 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
         foreach ($this->_df->get_datalynx_permission_names(true) as $permissionid => $permissionname) {
             $views = $this->get_views_visible_to_datalynx_permission($permissionid);
             $defaultview = $this->_df->get_default_view_id();
-            if (isset($data) && isset($data->param4[$permissionid]) && $defaultview &&
+            if (
+                isset($data) && isset($data->param4[$permissionid]) && $defaultview &&
                     in_array($defaultview, array_keys($views))
             ) {
                 $mform->setDefault("param4[$permissionid]", $defaultview);

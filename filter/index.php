@@ -57,7 +57,8 @@ $df->set_page('filter/index', ['modjs' => true, 'urlparams' => $urlparams]);
 
 // Activate navigation node.
 navigation_node::override_active_url(
-        new moodle_url('/mod/datalynx/filter/index.php', ['id' => $df->cm->id]));
+    new moodle_url('/mod/datalynx/filter/index.php', ['id' => $df->cm->id])
+);
 
 $fm = $df->get_filter_manager();
 

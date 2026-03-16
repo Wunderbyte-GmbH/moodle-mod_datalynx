@@ -16,18 +16,18 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_url
  * @subpackage url
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['applymediafilter'] = 'Apply media filter';
-$string['linktext'] = 'Link text';
-$string['forcename'] = 'Force name for the link';
-$string['makelink'] = 'Make the url a link';
-$string['makeimage'] = 'Make the url an image';
-$string['pluginname'] = 'Url';
-$string['usepicker'] = 'Use url picker when editing';
 $string['displaylinktext'] = 'Display input field for specifying a link text in edit mode.';
+$string['forcename'] = 'Force name for the link';
+$string['linktext'] = 'Link text';
+$string['makeimage'] = 'Make the url an image';
+$string['makelink'] = 'Make the url a link';
+$string['pluginname'] = 'Url';
 $string['privacy:metadata'] = 'URLs do not store personal data.';
+$string['usepicker'] = 'Use url picker when editing';

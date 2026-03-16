@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_checkbox
  * @subpackage checkbox
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/multiselect/field_class.php");
 
 class datalynxfield_checkbox extends datalynxfield_multiselect {
-
     /**
      * @var string
      */
@@ -35,7 +34,7 @@ class datalynxfield_checkbox extends datalynxfield_multiselect {
 
     /**
      * Can this field be used in fieldgroups?
-     * @var boolean
+     * @var bool
      */
     protected $forfieldgroup = true;
 

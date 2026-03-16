@@ -31,7 +31,6 @@ require_once($CFG->dirroot . '/mod/datalynx/backup/moodle2/backup_datalynx_steps
  * complete backup of the activity
  */
 class backup_datalynx_activity_task extends backup_activity_task {
-
     /**
      * Define (add) particular settings this activity can have
      */
@@ -41,8 +40,8 @@ class backup_datalynx_activity_task extends backup_activity_task {
 
         // For preseting get root settings from SESSION and adjust root task.
         if (isset($SESSION->{"datalynx_{$this->moduleid}_preset"})) {
-            list($users, $anon) = explode(' ', $SESSION->{"datalynx_{$this->moduleid}_preset"});
-            list($roottask, , ) = $this->plan->get_tasks();
+            [$users, $anon] = explode(' ', $SESSION->{"datalynx_{$this->moduleid}_preset"});
+            [$roottask, , ] = $this->plan->get_tasks();
             // Set users setting.
             $userssetting = $roottask->get_setting('users');
             $userssetting->set_value($users);
@@ -68,7 +67,8 @@ class backup_datalynx_activity_task extends backup_activity_task {
     protected function define_my_steps() {
         // Datalynx only has one structure step.
         $this->add_step(
-                new backup_datalynx_activity_structure_step('datalynx_structure', 'datalynx.xml'));
+            new backup_datalynx_activity_structure_step('datalynx_structure', 'datalynx.xml')
+        );
     }
 
     /**

@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_gradeitem
  * @subpackage gradeitem
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
 class datalynxfield_gradeitem extends datalynxfield_base {
-
     public $type = 'gradeitem';
 
     public $itemid;
@@ -116,4 +115,3 @@ class datalynxfield_gradeitem extends datalynxfield_base {
         return false;
     }
 }
-

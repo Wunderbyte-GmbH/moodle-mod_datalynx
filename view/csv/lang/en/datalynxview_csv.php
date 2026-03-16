@@ -16,21 +16,21 @@
 
 /**
  *
- * @package datalynxview
+ * @package datalynxview_csv
  * @subpackage csv
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+$string['csv'] = 'CSV';
 $string['exportfields'] = 'Export fields';
 $string['exportfields_help'] = 'Add fields that will be exported to your csv file like this: [[fieldname]] and seperate by line.';
+$string['fieldsimportsettings'] = 'Import settings';
+$string['ods'] = 'Calc (Open Office)';
 $string['outputtype'] = 'Output type';
 $string['pluginname'] = 'Csv';
-$string['csv'] = 'CSV';
-$string['ods'] = 'Calc (Open Office)';
-$string['xls'] = 'Excel';
-$string['fieldsimportsettings'] = 'Import settings';
+$string['privacy:metadata'] = 'The CSV View does not store personal data.';
+$string['updateexisting'] = 'Update existing';
 $string['uploadfile'] = 'File to import';
 $string['uploadtext'] = 'Text to import';
-$string['updateexisting'] = 'Update existing';
-$string['privacy:metadata'] = 'The CSV View does not store personal data.';
+$string['xls'] = 'Excel';

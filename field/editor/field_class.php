@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_editor
  * @subpackage editor
  * @copyright 2015 David Bogner
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -28,14 +28,13 @@ require_once($CFG->dirroot . '/lib/filelib.php');
 require_once($CFG->dirroot . '/repository/lib.php');
 
 class datalynxfield_editor extends datalynxfield_base {
-
     public $type = 'editor';
 
     protected $editoroptions;
 
     /**
      * Can this field be used in fieldgroups? Override if yes.
-     * @var boolean
+     * @var bool
      */
     protected $forfieldgroup = true;
 
@@ -111,8 +110,15 @@ class datalynxfield_editor extends datalynxfield_base {
         $data->text = $value['text'];
         $data->format = $value['format'];
         $data->content_editor = $value;
-        $data = file_postupdate_standard_editor($data, 'content', $this->editoroptions,
-                $this->df->context, 'mod_datalynx', 'content', $rec->id);
+        $data = file_postupdate_standard_editor(
+            $data,
+            'content',
+            $this->editoroptions,
+            $this->df->context,
+            'mod_datalynx',
+            'content',
+            $rec->id
+        );
         $rec->content = $data->content;
         $rec->content1 = $data->contentformat;
 

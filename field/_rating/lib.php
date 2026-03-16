@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package mod_datalynx
  * @subpackage _rating
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
@@ -32,7 +32,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/rating/lib.php");
 
 class datalynx_rating extends rating {
-
     /**
      * Returns this ratings aggregate value
      *
@@ -60,7 +59,6 @@ class datalynx_rating extends rating {
  * so as to retrieve sets of ratings from the database for sets of entries
  */
 class datalynx_rating_manager extends rating_manager {
-
     /**
      * Adds rating objects to an array of entries
      * Rating objects are available at $item->rating
@@ -89,22 +87,26 @@ class datalynx_rating_manager extends rating_manager {
 
         if (!isset($options->context)) {
             throw new coding_exception(
-                    'The context option is a required option when getting ratings.');
+                'The context option is a required option when getting ratings.'
+            );
         }
 
         if (!isset($options->component)) {
             throw new coding_exception(
-                    'The component option is a required option when getting ratings.');
+                'The component option is a required option when getting ratings.'
+            );
         }
 
         if (!isset($options->ratingarea)) {
             throw new coding_exception(
-                    'The ratingarea option is a required option when getting ratings.');
+                'The ratingarea option is a required option when getting ratings.'
+            );
         }
 
         if (!isset($options->scaleid)) {
             throw new coding_exception(
-                    'The scaleid option is a required option when getting ratings.');
+                'The scaleid option is a required option when getting ratings.'
+            );
         }
 
         if (!isset($options->items)) {
@@ -115,7 +117,7 @@ class datalynx_rating_manager extends rating_manager {
             }
         }
 
-        list($sql, $params) = $this->get_sql_aggregate($options);
+        [$sql, $params] = $this->get_sql_aggregate($options);
         if ($ratingrecords = $DB->get_records_sql($sql, $params)) {
             foreach ($options->items as &$item) {
                 if (array_key_exists($item->id, $ratingrecords)) {
@@ -177,7 +179,7 @@ class datalynx_rating_manager extends rating_manager {
         $andwhereitems = '';
         if (!empty($options->items)) {
             $itemids = array_keys($options->items);
-            list($itemidtest, $paramitems) = $DB->get_in_or_equal($itemids, SQL_PARAMS_NAMED);
+            [$itemidtest, $paramitems] = $DB->get_in_or_equal($itemids, SQL_PARAMS_NAMED);
             $andwhereitems = " AND r.itemid $itemidtest ";
             $params = array_merge($params, $paramitems);
         }
@@ -226,14 +228,14 @@ class datalynx_rating_manager extends rating_manager {
         $andwhereitems = '';
         if (!empty($options->items)) {
             $itemids = array_keys($options->items);
-            list($itemidtest, $paramitems) = $DB->get_in_or_equal($itemids, SQL_PARAMS_NAMED);
+            [$itemidtest, $paramitems] = $DB->get_in_or_equal($itemids, SQL_PARAMS_NAMED);
             $andwhereitems = " AND r.itemid $itemidtest ";
             $params = array_merge($params, $paramitems);
         }
 
         $sql = "SELECT r.id, r.itemid, r.component, r.ratingarea, r.contextid, r.scaleid,
                        r.rating, r.userid, r.timecreated, r.timemodified, " .
-                user_picture::fields('u', ['idnumber', 'username'
+                user_picture::fields('u', ['idnumber', 'username',
                 ], 'uid ') . " FROM {rating} r
                     JOIN {user} u ON u.id = r.userid
                 WHERE r.contextid = :contextid
@@ -282,7 +284,7 @@ class datalynx_rating_manager extends rating_manager {
 
         if (!empty($rec->aggregate)) {
             if (!is_array($rec->aggregate)) {
-                $rec->aggregate = [$rec->aggregate
+                $rec->aggregate = [$rec->aggregate,
                 ];
             }
             foreach ($rec->aggregate as $aggregation) {
@@ -291,8 +293,10 @@ class datalynx_rating_manager extends rating_manager {
                 }
                 $aggrmethod = $this->get_aggregation_method($aggregation);
                 $aggrmethodpref = strtolower($aggrmethod);
-                $options->aggregate[$aggregation] = min($rec->{"{$aggrmethodpref}ratings"},
-                        $rec->settings->scale->max);
+                $options->aggregate[$aggregation] = min(
+                    $rec->{"{$aggrmethodpref}ratings"},
+                    $rec->settings->scale->max
+                );
             }
         }
 

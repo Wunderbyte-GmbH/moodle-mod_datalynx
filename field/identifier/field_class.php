@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_identifier
  * @subpackage identifier
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
 class datalynxfield_identifier extends datalynxfield_base {
-
     public $type = 'identifier';
 
     public static function get_salt_options() {
@@ -131,8 +130,10 @@ class datalynxfield_identifier extends datalynxfield_base {
     protected function is_unique_key($key) {
         global $DB;
 
-        return $DB->record_exists('datalynx_contents',
-                ['fieldid' => $this->fieldid, 'content' => $key]);
+        return $DB->record_exists(
+            'datalynx_contents',
+            ['fieldid' => $this->fieldid, 'content' => $key]
+        );
     }
 
     public function get_supported_search_operators() {
@@ -140,4 +141,3 @@ class datalynxfield_identifier extends datalynxfield_base {
                 'LIKE' => get_string('contains', 'datalynx')];
     }
 }
-

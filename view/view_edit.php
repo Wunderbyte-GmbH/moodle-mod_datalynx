@@ -38,24 +38,43 @@ require_login($dl->data->course, false, $dl->cm);
 
 global $DB;
 $options = [];
-$options['behaviors'] = $DB->get_records_select_menu('datalynx_behaviors', 'dataid = :dataid',
-        ['dataid' => $urlparams->d], 'value ASC', 'name AS value, name AS label');
+$options['behaviors'] = $DB->get_records_select_menu(
+    'datalynx_behaviors',
+    'dataid = :dataid',
+    ['dataid' => $urlparams->d],
+    'value ASC',
+    'name AS value, name AS label'
+);
 $options['behaviors'][''] = get_string('defaultbehavior', 'datalynx');
-$fields = $DB->get_fieldset_select('datalynx_fields', 'name', 'dataid = :dataid',
-        ['dataid' => $urlparams->d]);
+$fields = $DB->get_fieldset_select(
+    'datalynx_fields',
+    'name',
+    'dataid = :dataid',
+    ['dataid' => $urlparams->d]
+);
 $options['renderers'] = [];
-$commonrenderers = $DB->get_records_select_menu('datalynx_renderers', 'dataid = :dataid',
-        array('dataid' => $urlparams->d), 'value ASC', 'name AS value, name AS label');
+$commonrenderers = $DB->get_records_select_menu(
+    'datalynx_renderers',
+    'dataid = :dataid',
+    ['dataid' => $urlparams->d],
+    'value ASC',
+    'name AS value, name AS label'
+);
 foreach ($fields as $field) {
     $options['renderers'][$field] = $commonrenderers; // TODO: add field-specific renderers here.
     $options['renderers'][$field][''] = get_string('defaultrenderer', 'datalynx');
 }
-$options['types'] = $DB->get_records_select_menu('datalynx_fields', 'dataid = :dataid',
-        array('dataid' => $urlparams->d), 'name ASC', 'name, type');
+$options['types'] = $DB->get_records_select_menu(
+    'datalynx_fields',
+    'dataid = :dataid',
+    ['dataid' => $urlparams->d],
+    'name ASC',
+    'name, type'
+);
 
 $PAGE->requires->js_call_amd('mod_datalynx/patterndialogue', 'init');
 
-$dl->set_page('view/view_edit', array('modjs' => true, 'urlparams' => $urlparams));
+$dl->set_page('view/view_edit', ['modjs' => true, 'urlparams' => $urlparams]);
 
 require_sesskey();
 require_capability('mod/datalynx:managetemplates', $dl->context);
@@ -99,8 +118,11 @@ if ($mform->is_cancelled()) {
         if ($resettodefault) {
             $urlparams->resetdefault = 1;
             redirect(
-                    new moodle_url('/mod/datalynx/view/view_edit.php',
-                            ((array) $urlparams) + ['sesskey' => sesskey()]));
+                new moodle_url(
+                    '/mod/datalynx/view/view_edit.php',
+                    ((array) $urlparams) + ['sesskey' => sesskey()]
+                )
+            );
         }
 
         // Process validated.
@@ -112,7 +134,8 @@ if ($mform->is_cancelled()) {
 
                 $other = ['dataid' => $dl->id()];
                 $event = \mod_datalynx\event\view_created::create(
-                        ['context' => $dl->context, 'objectid' => $vid, 'other' => $other]);
+                    ['context' => $dl->context, 'objectid' => $vid, 'other' => $other]
+                );
                 $event->trigger();
                 // Update view.
             } else {
@@ -120,7 +143,8 @@ if ($mform->is_cancelled()) {
 
                 $other = ['dataid' => $dl->id()];
                 $event = \mod_datalynx\event\view_updated::create(
-                        ['context' => $dl->context, 'objectid' => $view->id(), 'other' => $other]);
+                    ['context' => $dl->context, 'objectid' => $view->id(), 'other' => $other]
+                );
                 $event->trigger();
             }
 
@@ -142,13 +166,17 @@ if ($mform->is_cancelled()) {
 
 // Activate navigation node.
 navigation_node::override_active_url(
-        new moodle_url('/mod/datalynx/view/index.php', ['id' => $dl->cm->id]));
+    new moodle_url('/mod/datalynx/view/index.php', ['id' => $dl->cm->id])
+);
 
 // Print header.
 $dl->print_header(['tab' => 'views', 'nonotifications' => true, 'urlparams' => $urlparams]);
 
 $formheading = $view->id() ? get_string('viewedit', 'datalynx', $view->name()) : get_string(
-        'viewnew', 'datalynx', $view->typename());
+    'viewnew',
+    'datalynx',
+    $view->typename()
+);
 $output = html_writer::tag('h2', format_string($formheading), ['class' => 'mdl-align']);
 
 // Output options data for patterndialogue.js (avoids js_call_amd argument size limit).
@@ -167,4 +195,3 @@ $mform->display();
 $CFG->texteditors = $texteditors;
 
 $dl->print_footer();
-

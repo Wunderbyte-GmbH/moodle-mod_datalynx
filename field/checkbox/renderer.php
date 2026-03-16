@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_checkbox
  * @subpackage checkbox
  * @copyright 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -29,7 +29,6 @@ require_once(dirname(__FILE__) . "/../multiselect/renderer.php");
  * Class datalynxfield_checkbox_renderer Renderer for checkbox field type
  */
 class datalynxfield_checkbox_renderer extends datalynxfield_multiselect_renderer {
-
     /**
      *
      * {@inheritDoc}
@@ -53,8 +52,14 @@ class datalynxfield_checkbox_renderer extends datalynxfield_multiselect_renderer
 
         $elemgrp = [];
         foreach ($menuoptions as $i => $option) {
-            $elemgrp[] = &$mform->createElement('advcheckbox', $i, null, $option, ['size' => 1],
-                    [null, $i]);
+            $elemgrp[] = &$mform->createElement(
+                'advcheckbox',
+                $i,
+                null,
+                $option,
+                ['size' => 1],
+                [null, $i]
+            );
         }
 
         $mform->addGroup($elemgrp, $fieldname, null, $separator, true);
@@ -80,5 +85,4 @@ class datalynxfield_checkbox_renderer extends datalynxfield_multiselect_renderer
             $mform->addGroupRule($fieldname, get_string('err_required', 'form'), 'required', null, 1);
         }
     }
-
 }

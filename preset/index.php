@@ -54,7 +54,8 @@ $df->set_page('preset/index', ['modjs' => true, 'urlparams' => $urlparams]);
 
 // Activate navigation node.
 navigation_node::override_active_url(
-        new moodle_url('/mod/datalynx/preset/index.php', ['id' => $df->cm->id]));
+    new moodle_url('/mod/datalynx/preset/index.php', ['id' => $df->cm->id])
+);
 
 $pm = $df->get_preset_manager();
 

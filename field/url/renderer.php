@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_url
  * @subpackage url
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
@@ -29,7 +29,6 @@ require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 /**
  */
 class datalynxfield_url_renderer extends datalynxfield_renderer {
-
     /**
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
@@ -69,7 +68,7 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
 
         $field = $this->_field;
         $fieldid = $field->id();
-        $types = array_intersect(['link', 'image', 'imageflex', 'media'
+        $types = array_intersect(['link', 'image', 'imageflex', 'media',
         ], array_keys($options));
         $type = isset($types[0]) ? $types[0] : '';
 
@@ -155,9 +154,10 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
         $formfieldname = "field_{$fieldid}_{$entryid}_url";
         $errors = [];
         foreach ($tags as $tag) {
-            list(, $behavior, ) = $this->process_tag($tag);
+            [, $behavior, ] = $this->process_tag($tag);
             // Variable $behavior datalynx_field_behavior.
-            if ($behavior->is_required() &&
+            if (
+                $behavior->is_required() &&
                     (!isset($formdata->$formfieldname) || $formdata->$formfieldname === 'http://')
             ) {
                 $errors["field_{$fieldid}_{$entryid}_grp"] = get_string('fieldrequired', 'datalynx');

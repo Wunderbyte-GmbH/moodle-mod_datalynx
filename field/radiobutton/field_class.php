@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_radiobutton
  * @subpackage radiobutton
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
@@ -27,20 +27,18 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/select/field_class.php");
 
 class datalynxfield_radiobutton extends datalynxfield_select {
-
     public $type = 'radiobutton';
 
     /**
      * Can this field be used in fieldgroups?
      * Radiobuttons don't pass form data if nothing is selected.
-     * @var boolean
+     * @var bool
      */
     protected $forfieldgroup = false;
 
     public $separators = [['name' => 'New line', 'chr' => '<br />'],
             ['name' => 'Space', 'chr' => '&#32;'],
             ['name' => ',', 'chr' => '&#44;'],
-            ['name' => ', (with space)', 'chr' => '&#44;&#32;']
+            ['name' => ', (with space)', 'chr' => '&#44;&#32;'],
     ];
-
 }

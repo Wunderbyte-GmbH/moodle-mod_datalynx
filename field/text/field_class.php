@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_text
  * @subpackage text
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
@@ -27,12 +27,11 @@ defined('MOODLE_INTERNAL') || die();
 require_once(dirname(__FILE__) . '/../field_class.php');
 
 class datalynxfield_text extends datalynxfield_base {
-
     public $type = 'text';
 
     /**
      * Can this field be used in fieldgroups?
-     * @var boolean
+     * @var bool
      */
     protected $forfieldgroup = true;
 

@@ -16,7 +16,7 @@
 
 /**
  *
- * @package mod-datalynx
+ * @package mod_datalynx
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -30,7 +30,6 @@
  * Structure step to restore one datalynx activity
  */
 class restore_datalynx_activity_structure_step extends restore_activity_structure_step {
-
     protected $groupmode = 0;
 
     /**
@@ -103,17 +102,27 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
 
         if ($newitemid == $this->task->get_activityid()) {
             // Remap task module id.
-            $this->set_mapping('course_module', $this->task->get_old_moduleid(),
-                    $this->task->get_moduleid());
+            $this->set_mapping(
+                'course_module',
+                $this->task->get_old_moduleid(),
+                $this->task->get_moduleid()
+            );
             // Remap task context id.
-            $this->set_mapping('context', $this->task->get_old_contextid(),
-                    $this->task->get_contextid());
+            $this->set_mapping(
+                'context',
+                $this->task->get_old_contextid(),
+                $this->task->get_contextid()
+            );
         } else {
             // Save activity id in task.
             $this->task->set_activityid($newitemid);
             // Apply the id to course_modules->instance.
-            $DB->set_field('course_modules', 'instance', $newitemid,
-                    ['id' => $this->task->get_moduleid()]);
+            $DB->set_field(
+                'course_modules',
+                'instance',
+                $newitemid,
+                ['id' => $this->task->get_moduleid()]
+            );
         }
         // Do the mapping for modulename, preparing it for files by oldcontext.
         $oldid = $this->task->get_old_activityid();
@@ -128,8 +137,12 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         $data = (object) $data;
         // Adjust groupmode in course_modules->groupmode.
         if (isset($data->groupmode)) {
-            $DB->set_field('course_modules', 'groupmode', $data->groupmode,
-                    ['id' => $this->task->get_moduleid()]);
+            $DB->set_field(
+                'course_modules',
+                'groupmode',
+                $data->groupmode,
+                ['id' => $this->task->get_moduleid()]
+            );
         }
     }
 
@@ -166,12 +179,14 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             $filter = isset($data->targetfilter) ? $data->targetfilter : 'NULL';
 
             $this->log(
-                    "WARNING! datalynxview field type can't be restored if referencing instances are not included in backup!",
-                    backup::LOG_WARNING);
+                "WARNING! datalynxview field type can't be restored if referencing instances are not included in backup!",
+                backup::LOG_WARNING
+            );
             $this->log("* Please verify the references of the field:", backup::LOG_WARNING);
             $this->log(
-                    "* Field '$data->name' original reference: '$course', instance '$instance', view '$view', filter '$filter'",
-                    backup::LOG_WARNING);
+                "* Field '$data->name' original reference: '$course', instance '$instance', view '$view', filter '$filter'",
+                backup::LOG_WARNING
+            );
         }
 
         // Insert the datalynx_fields record.
@@ -254,7 +269,6 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
 
         // Read fieldlist and update field ids.
         if ($data->fieldlist) {
-
             $oldfieldlist = json_decode($data->fieldlist);
             $newfieldlist = [];
 
@@ -521,42 +535,74 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         $datalynxnewid = $this->get_new_parentid('datalynx');
 
         // Default view.
-        if ($defaultview = $DB->get_field('datalynx', 'defaultview',
-                ['id' => $datalynxnewid])
+        if (
+            $defaultview = $DB->get_field(
+                'datalynx',
+                'defaultview',
+                ['id' => $datalynxnewid]
+            )
         ) {
             if ($defaultview = $this->get_mappingid('datalynx_view', $defaultview)) {
-                $DB->set_field('datalynx', 'defaultview', $defaultview,
-                        ['id' => $datalynxnewid]);
+                $DB->set_field(
+                    'datalynx',
+                    'defaultview',
+                    $defaultview,
+                    ['id' => $datalynxnewid]
+                );
             }
         }
 
         // Default filter.
-        if ($defaultfilter = $DB->get_field('datalynx', 'defaultfilter',
-                ['id' => $datalynxnewid])
+        if (
+            $defaultfilter = $DB->get_field(
+                'datalynx',
+                'defaultfilter',
+                ['id' => $datalynxnewid]
+            )
         ) {
             if ($defaultfilter = $this->get_mappingid('datalynx_filter', $defaultfilter)) {
-                $DB->set_field('datalynx', 'defaultfilter', $defaultfilter,
-                        ['id' => $datalynxnewid]);
+                $DB->set_field(
+                    'datalynx',
+                    'defaultfilter',
+                    $defaultfilter,
+                    ['id' => $datalynxnewid]
+                );
             }
         }
 
         // Single edit view.
-        if ($singleedit = $DB->get_field('datalynx', 'singleedit',
-                ['id' => $datalynxnewid])
+        if (
+            $singleedit = $DB->get_field(
+                'datalynx',
+                'singleedit',
+                ['id' => $datalynxnewid]
+            )
         ) {
             if ($singleedit = $this->get_mappingid('datalynx_view', $singleedit)) {
-                $DB->set_field('datalynx', 'singleedit', $singleedit,
-                        ['id' => $datalynxnewid]);
+                $DB->set_field(
+                    'datalynx',
+                    'singleedit',
+                    $singleedit,
+                    ['id' => $datalynxnewid]
+                );
             }
         }
 
         // Single view.
-        if ($singleview = $DB->get_field('datalynx', 'singleview',
-                ['id' => $datalynxnewid])
+        if (
+            $singleview = $DB->get_field(
+                'datalynx',
+                'singleview',
+                ['id' => $datalynxnewid]
+            )
         ) {
             if ($singleview = $this->get_mappingid('datalynx_view', $singleview)) {
-                $DB->set_field('datalynx', 'singleview', $singleview,
-                        ['id' => $datalynxnewid]);
+                $DB->set_field(
+                    'datalynx',
+                    'singleview',
+                    $singleview,
+                    ['id' => $datalynxnewid]
+                );
             }
         }
 
@@ -569,8 +615,10 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             INNER JOIN {datalynx_fields} df ON dc.fieldid = df.id
                  WHERE $sqllike
                    AND df.dataid = :dataid";
-        $results = $DB->get_records_sql_menu($sql,
-                ['type' => 'teammemberselect', 'dataid' => $datalynxnewid]);
+        $results = $DB->get_records_sql_menu(
+            $sql,
+            ['type' => 'teammemberselect', 'dataid' => $datalynxnewid]
+        );
         foreach ($results as $id => $content) {
             $users = json_decode($content, true);
             if (json_last_error() == JSON_ERROR_NONE && is_array($users)) {
@@ -587,8 +635,12 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
                     }
                 }
                 $newcontent = json_encode($newusers);
-                $DB->set_field('datalynx_contents', 'content', $newcontent,
-                        ['id' => $id]);
+                $DB->set_field(
+                    'datalynx_contents',
+                    'content',
+                    $newcontent,
+                    ['id' => $id]
+                );
             }
         }
 
@@ -600,14 +652,20 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
                    AND df.dataid = :dataid
                    AND " .
                 $DB->sql_cast_char2int('df.param5') . " NOT IN (0, -1)";
-        $results = $DB->get_records_sql_menu($sql,
-                ['type' => 'teammemberselect', 'dataid' => $datalynxnewid]);
+        $results = $DB->get_records_sql_menu(
+            $sql,
+            ['type' => 'teammemberselect', 'dataid' => $datalynxnewid]
+        );
 
         foreach ($results as $id => $referencefieldid) {
             $newreferencefieldid = $this->get_mappingid('datalynx_field', $referencefieldid);
             if ($newreferencefieldid) {
-                $DB->set_field('datalynx_fields', 'param5', $newreferencefieldid,
-                        ['id' => $id]);
+                $DB->set_field(
+                    'datalynx_fields',
+                    'param5',
+                    $newreferencefieldid,
+                    ['id' => $id]
+                );
             }
         }
 
@@ -619,22 +677,38 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         foreach ($results as $id => $redirectid) {
             $newredirectid = $this->get_mappingid('datalynx_view', $redirectid);
             if ($newredirectid) {
-                $DB->set_field('datalynx_views', 'param10', $newredirectid,
-                        ['id' => $id]);
+                $DB->set_field(
+                    'datalynx_views',
+                    'param10',
+                    $newredirectid,
+                    ['id' => $id]
+                );
             }
         }
 
         // Update id of userinfo fields if needed.
         // TODO can we condition this on restore to new site?
-        if ($userinfofields = $DB->get_records('datalynx_fields',
-                ['dataid' => $datalynxnewid, 'type' => 'userinfo'], '', 'id,param1,param2')
+        if (
+            $userinfofields = $DB->get_records(
+                'datalynx_fields',
+                ['dataid' => $datalynxnewid, 'type' => 'userinfo'],
+                '',
+                'id,param1,param2'
+            )
         ) {
             foreach ($userinfofields as $fieldid => $uifield) {
-                $infoid = $DB->get_field('user_info_field', 'id',
-                        ['shortname' => $uifield->param2]);
+                $infoid = $DB->get_field(
+                    'user_info_field',
+                    'id',
+                    ['shortname' => $uifield->param2]
+                );
                 if ($infoid != (int) $uifield->param1) {
-                    $DB->set_field('datalynx_fields', 'param1', $infoid,
-                            ['id' => $fieldid]);
+                    $DB->set_field(
+                        'datalynx_fields',
+                        'param1',
+                        $infoid,
+                        ['id' => $fieldid]
+                    );
                 }
             }
         }

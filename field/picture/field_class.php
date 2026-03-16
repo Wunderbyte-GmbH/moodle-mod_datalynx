@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_picture
  * @subpackage picture
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
@@ -27,12 +27,11 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/file/field_class.php");
 
 class datalynxfield_picture extends datalynxfield_file {
-
     public $type = 'picture';
 
     /**
      * Can this field be used in fieldgroups? Override if yes.
-     * @var boolean
+     * @var bool
      */
     protected $forfieldgroup = true;
 
@@ -71,12 +70,17 @@ class datalynxfield_picture extends datalynxfield_file {
         $oldfield->param10 != $this->field->param10;
         if ($oldfield && ($updatefile || $updatethumb)) {
             // Check through all existing records and update the thumbnail.
-            if ($contents = $DB->get_records('datalynx_contents',
-                    ['fieldid' => $this->field->id])
+            if (
+                $contents = $DB->get_records(
+                    'datalynx_contents',
+                    ['fieldid' => $this->field->id]
+                )
             ) {
                 if (count($contents) > 20) {
                     echo $OUTPUT->notification(
-                            get_string('resizingimages', 'datalynxfield_picture'), 'notifysuccess');
+                        get_string('resizingimages', 'datalynxfield_picture'),
+                        'notifysuccess'
+                    );
                     echo "\n\n";
                     // To make sure that ob_flush() has the desired effect.
                     ob_flush();
@@ -84,8 +88,10 @@ class datalynxfield_picture extends datalynxfield_file {
                 foreach ($contents as $content) {
                     @set_time_limit(300);
                     // Might be slow!
-                    $this->update_content_files($content->id,
-                            ['updatefile' => $updatefile, 'updatethumb' => $updatethumb]);
+                    $this->update_content_files(
+                        $content->id,
+                        ['updatefile' => $updatefile, 'updatethumb' => $updatethumb]
+                    );
                 }
             }
         }
@@ -99,8 +105,10 @@ class datalynxfield_picture extends datalynxfield_file {
         global $DB;
 
         if (!empty($this->field->id)) {
-            foreach (['content', 'thumb'
-            ] as $filearea) {
+            foreach (
+                ['content', 'thumb',
+                ] as $filearea
+            ) {
                 $fs = get_file_storage();
                 $fs->delete_area_files($this->df->context->id, 'mod_datalynx', $filearea);
             }
@@ -119,15 +127,19 @@ class datalynxfield_picture extends datalynxfield_file {
         $updatethumb = isset($params['updatethumb']) ? $params['updatethumb'] : true;
 
         $fs = get_file_storage();
-        if (!$files = $fs->get_area_files($this->df->context->id, 'mod_datalynx', 'content',
-                $contentid)
+        if (
+            !$files = $fs->get_area_files(
+                $this->df->context->id,
+                'mod_datalynx',
+                'content',
+                $contentid
+            )
         ) {
             return false;
         }
 
         // Update dimensions and regenerate thumbs.
         foreach ($files as $file) {
-
             // Catch in case we see a directory in this list.
             if ($file->is_directory()) {
                 continue;
@@ -164,11 +176,10 @@ class datalynxfield_picture extends datalynxfield_file {
 
                     // If either width or height try to (re)generate, otherwise delete what exists.
                     if ($thumbwidth || $thumbheight) {
-
                         $filerecord = ['contextid' => $this->df->context->id,
                                 'component' => 'mod_datalynx', 'filearea' => 'thumb',
                                 'itemid' => $contentid, 'filepath' => '/', 'filename' => $thumbname,
-                                'userid' => $file->get_userid()
+                                'userid' => $file->get_userid(),
                         ];
 
                         try {

@@ -34,7 +34,6 @@ defined('MOODLE_INTERNAL') || die();
  * Deals with local_shortcodes regarding booking.
  */
 class shortcodes {
-
     /**
      * This shortcode shows a view of a datalynx instance.
      * Arguments: view="My view name" datalynx=5 (cmid)
@@ -62,8 +61,12 @@ class shortcodes {
             }
 
             // Sanity check in case the designated view has been deleted.
-            if (!$DB->record_exists('datalynx_views',
-                            ['dataid' => $cm->instance, 'name' => $viewname])) {
+            if (
+                !$DB->record_exists(
+                    'datalynx_views',
+                    ['dataid' => $cm->instance, 'name' => $viewname]
+                )
+            ) {
                 return get_string('datalynxview_deleted', 'mod_datalynxcoursepage');
             }
             $dl = new datalynx($cm->instance, $cmid);

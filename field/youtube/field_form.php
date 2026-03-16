@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_youtube
  * @subpackage youtube
  * @copyright 2021 michael pollak <moodle@michaelpollak.org>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -26,7 +26,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
 class datalynxfield_youtube_form extends datalynxfield_form {
-
     /**
      */
     public function field_definition() {
@@ -34,8 +33,11 @@ class datalynxfield_youtube_form extends datalynxfield_form {
 
         $mform = &$this->_form;
 
-        $mform->addElement('header', 'fieldattributeshdr',
-                get_string('fieldattributes', 'datalynx'));
+        $mform->addElement(
+            'header',
+            'fieldattributeshdr',
+            get_string('fieldattributes', 'datalynx')
+        );
 
         // Store height and width.
         $mform->addElement('text', 'param1', get_string('heightpx', 'datalynxfield_youtube'));
@@ -44,6 +46,5 @@ class datalynxfield_youtube_form extends datalynxfield_form {
         $mform->addElement('text', 'param2', get_string('widthpx', 'datalynxfield_youtube'));
         $mform->setType('param2', PARAM_INT);
         $mform->setDefault('param2', 315);
-
     }
 }

@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_coursegroup
  * @subpackage coursegroup
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
@@ -29,7 +29,6 @@ require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 /**
  */
 class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
-
     /**
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
@@ -98,7 +97,7 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
             // Ajax.
             $options = ['coursefield' => "{$fieldname}_course",
                     'groupfield' => "{$fieldname}_group",
-                    'acturl' => "$CFG->wwwroot/mod/datalynx/field/coursegroup/loadgroups.php"
+                    'acturl' => "$CFG->wwwroot/mod/datalynx/field/coursegroup/loadgroups.php",
             ];
 
             // Add JQuery.
@@ -169,7 +168,8 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
                 break;
             case 'group':
                 // Return the group name.
-                if ($groupid &&
+                if (
+                    $groupid &&
                         $groupname = $DB->get_field('groups', 'name', ['id' => $groupid])
                 ) {
                     return $groupname;
@@ -177,15 +177,15 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
                 break;
 
             case 'courseid':
-                Return $courseid;
+                return $courseid;
                 break;
 
             case 'groupid':
-                Return $groupid;
+                return $groupid;
                 break;
 
             case '':
-                Return "$courseid $groupid";
+                return "$courseid $groupid";
                 break;
         }
         return '';
@@ -198,7 +198,7 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
         $fieldid = $this->_field->id();
 
         if (is_array($value)) {
-            list($member, $course, $group) = $value;
+            [$member, $course, $group] = $value;
         } else {
             $member = $course = $group = 0;
         }
@@ -217,7 +217,7 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
 
         return [$elements,
                 [get_string('member', 'datalynxfield_coursegroup'),
-                        '<br />' . get_string('course') . ' ', '<br />' . get_string('group') . ' '
+                        '<br />' . get_string('course') . ' ', '<br />' . get_string('group') . ' ',
                 ]];
     }
 

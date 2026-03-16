@@ -50,8 +50,10 @@ $PAGE->set_heading($course->fullname);
 echo $OUTPUT->header();
 $datalynxs = get_all_instances_in_course("datalynx", $course);
 if (!$datalynxs) {
-    notice(get_string('thereareno', 'moodle', $modulenameplural),
-            new moodle_url('/course/view.php', ['id', $course->id]));
+    notice(
+        get_string('thereareno', 'moodle', $modulenameplural),
+        new moodle_url('/course/view.php', ['id', $course->id])
+    );
 }
 
 $modinfo = get_fast_modinfo($id);
@@ -127,8 +129,10 @@ foreach ($datalynxs as $datalynx) {
     // Name (linked; dim if not visible).
     $linkparams = !$datalynx->visible ? ['class' => 'dimmed'] : null;
     $linkedname = html_writer::link(
-            new moodle_url('/mod/datalynx/view.php', ['id' => $datalynx->coursemodule]),
-            format_string($datalynx->name, true), $linkparams);
+        new moodle_url('/mod/datalynx/view.php', ['id' => $datalynx->coursemodule]),
+        format_string($datalynx->name, true),
+        $linkparams
+    );
     $tablerow[] = $linkedname;
 
     // Description.
@@ -156,8 +160,10 @@ foreach ($datalynxs as $datalynx) {
         $editingurl->remove_params('update');
 
         $editingurl->param('delete', $datalynx->coursemodule);
-        $buttons['delete'] = html_writer::link($editingurl,
-                $OUTPUT->pix_icon('t/delete', $strdelete));
+        $buttons['delete'] = html_writer::link(
+            $editingurl,
+            $OUTPUT->pix_icon('t/delete', $strdelete)
+        );
         $editingurl->remove_params('delete');
 
         $tablerow[] = implode('&nbsp;&nbsp;&nbsp;', $buttons);

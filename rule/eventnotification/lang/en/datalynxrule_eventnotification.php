@@ -16,18 +16,18 @@
 
 /**
  *
- * @package datalynxrule
+ * @package datalynxrule_eventnotification
  * @subpackage eventnotification
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-$string['event'] = 'Datalynx event';
-$string['pluginname'] = 'Event notification';
-$string['privacy:metadata'] = 'Even notifications do not store personal data.';
-$string['triggerspecificevent'] = 'Trigger only if the selected field meets a condition';
-$string['messagecontent'] = 'Field content that is included in the message';
 $string['condition'] = 'The value the selected field has to have';
 $string['condition_help'] = 'The value the selected field has to meet in order to be true.
 For checkboxes the selected rows have to be entered in comma separated way: First row and third row will be: 1,3
 For radio buttons, 1 for the first choice, 2 for the second.';
+$string['event'] = 'Datalynx event';
+$string['messagecontent'] = 'Field content that is included in the message';
+$string['pluginname'] = 'Event notification';
+$string['privacy:metadata'] = 'Even notifications do not store personal data.';
+$string['triggerspecificevent'] = 'Trigger only if the selected field meets a condition';

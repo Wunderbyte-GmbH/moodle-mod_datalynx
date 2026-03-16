@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxview
+ * @package datalynxview_report
  * @subpackage report
  * @copyright 2024 onwards Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -29,16 +29,16 @@ $string['fieldtobecounted'] = 'Field to be counted';
 $string['fieldtobecounted_help'] = 'Select the field whose values should be counted in the report. Only fields of type "select" are available.';
 $string['groupbyfield'] = 'Field to be grouped';
 $string['groupbyfield_help'] = 'For example: all entries of an author';
-$string['sumoffield'] = 'Sum of field values calculated over all entries grouped by author or teammemberselect field';
 $string['noselectfieldsavailable'] = 'No selectable fields are available.';
+$string['nosums'] = 'Do not calculate sums';
 $string['ods'] = 'Calc (Open Office)';
-$string['reporttype'] = 'Report type';
 $string['pluginname'] = 'Report';
 $string['privacy:metadata'] = 'The Report View does not store personal data.';
 $string['report'] = 'Report';
-$string['nosums'] = 'Do not calculate sums';
+$string['reporttype'] = 'Report type';
+$string['selectfield'] = 'Select a field';
 $string['sumfield'] = 'Group the results by this field';
 $string['sumfield_help'] = 'Group the results by this field and calculate the sum of the different columns';
-$string['selectfield'] = 'Select a field';
+$string['sumoffield'] = 'Sum of field values calculated over all entries grouped by author or teammemberselect field';
 $string['updateexisting'] = 'Update existing';
 $string['xls'] = 'Excel';

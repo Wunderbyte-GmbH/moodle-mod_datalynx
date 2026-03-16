@@ -35,7 +35,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 class sendmessage_task extends \core\task\adhoc_task {
-
     /**
      * Send out messages.
      */
@@ -47,5 +46,4 @@ class sendmessage_task extends \core\task\adhoc_task {
             mtrace("Sent.");
         }
     }
-
 }

@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_datalynxview
  * @subpackage datalynxview
  * @copyright 2014 onwards by edulabs.org and associated programmers
  * @copyright based on the work by 2013 Itamar Tzadok
@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
 class datalynxfield_datalynxview_form extends datalynxfield_form {
-
     /**
      * Overrides the field_definition of field/field_form.php for the datalynx_view field-type
      */
@@ -51,12 +50,29 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
         // Special filter by entry attributes "author" AND/OR "group" (to be stored in param6).
         $grp = [];
         $attr = ['size' => 1];
-        $grp[] = &$mform->createElement('advcheckbox', 'entryauthor', null,
-                get_string('entryauthor', 'datalynxfield_datalynxview'), $attr, [0, 1]);
-        $grp[] = &$mform->createElement('advcheckbox', 'entrygroup', null,
-                get_string('entrygroup', 'datalynxfield_datalynxview'), $attr, [0, 1]);
-        $mform->addGroup($grp, 'filterbyarr', get_string('filterby', 'datalynxfield_datalynxview'),
-                '<br />', false);
+        $grp[] = &$mform->createElement(
+            'advcheckbox',
+            'entryauthor',
+            null,
+            get_string('entryauthor', 'datalynxfield_datalynxview'),
+            $attr,
+            [0, 1]
+        );
+        $grp[] = &$mform->createElement(
+            'advcheckbox',
+            'entrygroup',
+            null,
+            get_string('entrygroup', 'datalynxfield_datalynxview'),
+            $attr,
+            [0, 1]
+        );
+        $mform->addGroup(
+            $grp,
+            'filterbyarr',
+            get_string('filterby', 'datalynxfield_datalynxview'),
+            '<br />',
+            false
+        );
         $mform->addHelpButton('filterbyarr', 'filterby', 'datalynxfield_datalynxview');
 
         // Select textfields of given instance (stored in param7).
@@ -74,12 +90,11 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
                 'presentdlid' => $this->_df->id(),
                 'thisfieldstring' => get_string('thisfield', 'datalynx'),
                 'update' => $this->_field->id() ? $this->_field->id() : 0,
-                'fieldtype' => 'datalynxview'
+                'fieldtype' => 'datalynxview',
         ];
 
         // Add JQuery.
         $PAGE->requires->js_call_amd('mod_datalynx/datalynxloadviews', 'init', [$options]);
-
     }
 
     /**
@@ -101,8 +116,13 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
                 }
             }
 
-            if ($textfields = $DB->get_records_menu('datalynx_fields',
-                    ['dataid' => $datalynxid, 'type' => 'text'], 'name', 'id,name')
+            if (
+                $textfields = $DB->get_records_menu(
+                    'datalynx_fields',
+                    ['dataid' => $datalynxid, 'type' => 'text'],
+                    'name',
+                    'id,name'
+                )
             ) {
                 $configtextfields = &$this->_form->getElement('param7');
                 foreach ($textfields as $key => $value) {
@@ -116,7 +136,7 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
      */
     public function data_preprocessing(&$data) {
         if (!empty($data->param6)) {
-            list($data->entryauthor, $data->entrygroup) = explode(',', $data->param6);
+            [$data->entryauthor, $data->entrygroup] = explode(',', $data->param6);
         }
     }
 

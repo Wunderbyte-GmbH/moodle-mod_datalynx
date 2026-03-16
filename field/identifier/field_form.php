@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_identifier
  * @subpackage identifier
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
@@ -27,15 +27,17 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
 class datalynxfield_identifier_form extends datalynxfield_form {
-
     /**
      */
     public function field_definition() {
         $field = &$this->_field;
         $mform = &$this->_form;
 
-        $mform->addElement('header', 'fieldattributeshdr',
-                get_string('fieldattributes', 'datalynx'));
+        $mform->addElement(
+            'header',
+            'fieldattributeshdr',
+            get_string('fieldattributes', 'datalynx')
+        );
 
         // Salt (param1).
         $options = $field::get_salt_options();
@@ -43,8 +45,12 @@ class datalynxfield_identifier_form extends datalynxfield_form {
         $mform->setDefault('param1', 'random');
 
         // Field Salt length (param2).
-        $mform->addElement('text', 'param2', get_string('saltsize', 'datalynxfield_identifier'),
-                ['size' => '8']);
+        $mform->addElement(
+            'text',
+            'param2',
+            get_string('saltsize', 'datalynxfield_identifier'),
+            ['size' => '8']
+        );
         $mform->setType('param2', PARAM_INT);
         $mform->addRule('param2', null, 'numeric', null, 'client');
         $mform->setDefault('param2', 10);

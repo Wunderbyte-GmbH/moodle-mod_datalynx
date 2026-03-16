@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package mod_datalynx
  * @subpackage _time
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
 class datalynxfield__time extends datalynxfield_no_content {
-
     public $type = '_time';
 
     const _TIMECREATED = 'timecreated';
@@ -90,7 +89,7 @@ class datalynxfield__time extends datalynxfield_no_content {
      * @see datalynxfield_base::get_search_sql()
      */
     public function get_search_sql(array $search): array {
-        list($not, $operator, $value) = $search;
+        [$not, $operator, $value] = $search;
 
         if (is_array($value)) {
             $from = $value[0];
@@ -112,13 +111,13 @@ class datalynxfield__time extends datalynxfield_no_content {
                 $operator = '=';
             }
             $params[$namefrom] = $from;
-            return [" $not $varcharcontent $operator :$namefrom ", $params, false
+            return [" $not $varcharcontent $operator :$namefrom ", $params, false,
             ];
         } else {
             $params[$namefrom] = $from;
             $params[$nameto] = $to;
             return [" ($not $varcharcontent >= :$namefrom AND $varcharcontent <= :$nameto) ",
-                    $params, false
+                    $params, false,
             ];
         }
     }
@@ -168,7 +167,7 @@ class datalynxfield__time extends datalynxfield_no_content {
     /**
      */
     public function format_search_value($searchparams) {
-        list($not, $operator, $value) = $searchparams;
+        [$not, $operator, $value] = $searchparams;
         if (is_array($value)) {
             $from = userdate($value[0]);
             $to = userdate($value[1]);

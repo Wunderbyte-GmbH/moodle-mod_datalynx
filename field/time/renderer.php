@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_time
  * @subpackage time
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
@@ -29,7 +29,6 @@ require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 /**
  */
 class datalynxfield_time_renderer extends datalynxfield_renderer {
-
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $field = $this->_field;
         $fieldid = $field->id();
@@ -111,8 +110,12 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         // With customfilter we have to simplify the form.
         if ($mform->_formName == 'mod_datalynx_customfilter_frontend_form') {
             $attr = ['optional' => true]; // Allows date_time to be enabled, passes 0 if disabled.
-            $elements[] = $element = &$mform->createElement('date_time_selector',
-                    "{$fieldname}[0]", get_string('fromdate', 'moodle'), $attr);
+            $elements[] = $element = &$mform->createElement(
+                'date_time_selector',
+                "{$fieldname}[0]",
+                get_string('fromdate', 'moodle'),
+                $attr
+            );
             $element->setAttributes(['size' => 1]);
             $elements[] = &$mform->createElement('date_time_selector', "{$fieldname}[1]", get_string('todate', 'moodle'));
         }
@@ -123,8 +126,13 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
 
     /**
      */
-    protected function render_standard_selector(&$mform, $entry, $content, $includetime = true,
-            array $options = []) {
+    protected function render_standard_selector(
+        &$mform,
+        $entry,
+        $content,
+        $includetime = true,
+        array $options = []
+    ) {
         $field = $this->_field;
         $fieldid = $field->id();
         $entryid = $entry->id;
@@ -160,8 +168,13 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
      * @param array $options
      * @throws coding_exception
      */
-    protected function render_masked_selector(MoodleQuickForm &$mform, $entry, $content,
-            $includetime = true, array $options = []) {
+    protected function render_masked_selector(
+        MoodleQuickForm &$mform,
+        $entry,
+        $content,
+        $includetime = true,
+        array $options = []
+    ) {
         $field = $this->_field;
         $entryid = $entry->id;
         $fieldid = $field->id();
@@ -189,12 +202,24 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         }
 
         $grp = [];
-        $grp[] = &$mform->createElement('select', "{$fieldname}[day]", null,
-                [0 => $maskday] + $days);
-        $grp[] = &$mform->createElement('select', "{$fieldname}[month]", null,
-                [0 => $maskmonth] + $months);
-        $grp[] = &$mform->createElement('select', "{$fieldname}[year]", null,
-                [0 => $maskyear] + $years);
+        $grp[] = &$mform->createElement(
+            'select',
+            "{$fieldname}[day]",
+            null,
+            [0 => $maskday] + $days
+        );
+        $grp[] = &$mform->createElement(
+            'select',
+            "{$fieldname}[month]",
+            null,
+            [0 => $maskmonth] + $months
+        );
+        $grp[] = &$mform->createElement(
+            'select',
+            "{$fieldname}[year]",
+            null,
+            [0 => $maskyear] + $years
+        );
 
         // If time add hours and minutes.
         if ($includetime) {
@@ -210,16 +235,24 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
                 $minutes[$i] = sprintf("%02d", $i);
             }
 
-            $grp[] = &$mform->createElement('select', "{$fieldname}[hour]", null,
-                    [0 => $maskhour] + $hours);
-            $grp[] = &$mform->createElement('select', "{$fieldname}[minute]", null,
-                    [0 => $maskminute] + $minutes);
+            $grp[] = &$mform->createElement(
+                'select',
+                "{$fieldname}[hour]",
+                null,
+                [0 => $maskhour] + $hours
+            );
+            $grp[] = &$mform->createElement(
+                'select',
+                "{$fieldname}[minute]",
+                null,
+                [0 => $maskminute] + $minutes
+            );
         }
 
         $mform->addGroup($grp, "grp$fieldname", null, '', false);
         // Set field values.
         if ($content) {
-            list($day, $month, $year, $hour, $minute) = explode(':', date('d:n:Y:G:i', $content));
+            [$day, $month, $year, $hour, $minute] = explode(':', date('d:n:Y:G:i', $content));
             $mform->setDefault("{$fieldname}[day]", (int) $day);
             $mform->setDefault("{$fieldname}[month]", (int) $month);
             $mform->setDefault("{$fieldname}[year]", (int) $year);
@@ -235,61 +268,81 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         $required = !empty($options['required']);
         if ($required) {
             if ($includetime) {
-                $mform->addGroupRule("grp$fieldname",
-                        [
+                $mform->addGroupRule(
+                    "grp$fieldname",
+                    [
                                 "{$fieldname}[day]" => [
                                         [
                                                 get_string('timefieldrequired', 'datalynx', get_string('day')),
-                                                'nonzero', null, 'client'
-                                        ]
+                                                'nonzero', null, 'client',
+                                        ],
                                 ],
                                 "{$fieldname}[month]" => [
                                         [
-                                                get_string('timefieldrequired', 'datalynx',
-                                                        get_string('month')), 'nonzero', null, 'client'
-                                        ]
+                                                get_string(
+                                                    'timefieldrequired',
+                                                    'datalynx',
+                                                    get_string('month')
+                                                ), 'nonzero', null, 'client',
+                                        ],
                                 ],
                                 "{$fieldname}[year]" => [
                                         [
-                                                get_string('timefieldrequired', 'datalynx',
-                                                        get_string('year')), 'nonzero', null, 'client'
-                                        ]
+                                                get_string(
+                                                    'timefieldrequired',
+                                                    'datalynx',
+                                                    get_string('year')
+                                                ), 'nonzero', null, 'client',
+                                        ],
                                 ],
                                 "{$fieldname}[hour]" => [
                                         [
-                                                get_string('timefieldrequired', 'datalynx',
-                                                        get_string('hour')), 'nonzero', null, 'client'
-                                        ]
+                                                get_string(
+                                                    'timefieldrequired',
+                                                    'datalynx',
+                                                    get_string('hour')
+                                                ), 'nonzero', null, 'client',
+                                        ],
                                 ],
                                 "{$fieldname}[minute]" => [
                                         [
-                                                get_string('timefieldrequired', 'datalynx',
-                                                        get_string('minute')), 'nonzero', null, 'client'
-                                        ]
-                                ]
+                                                get_string(
+                                                    'timefieldrequired',
+                                                    'datalynx',
+                                                    get_string('minute')
+                                                ), 'nonzero', null, 'client',
+                                        ],
+                                ],
                         ]
                 );
             } else {
-                $mform->addGroupRule("grp$fieldname",
-                        [
+                $mform->addGroupRule(
+                    "grp$fieldname",
+                    [
                                 "{$fieldname}[day]" => [
                                         [
                                                 get_string('timefieldrequired', 'datalynx', get_string('day')),
-                                                'nonzero', null, 'client'
-                                        ]
+                                                'nonzero', null, 'client',
+                                        ],
                                 ],
                                 "{$fieldname}[month]" => [
                                         [
-                                                get_string('timefieldrequired', 'datalynx',
-                                                        get_string('month')), 'nonzero', null, 'client'
-                                        ]
+                                                get_string(
+                                                    'timefieldrequired',
+                                                    'datalynx',
+                                                    get_string('month')
+                                                ), 'nonzero', null, 'client',
+                                        ],
                                 ],
                                 "{$fieldname}[year]" => [
                                         [
-                                                get_string('timefieldrequired', 'datalynx',
-                                                        get_string('year')), 'nonzero', null, 'client'
-                                        ]
-                                ]
+                                                get_string(
+                                                    'timefieldrequired',
+                                                    'datalynx',
+                                                    get_string('year')
+                                                ), 'nonzero', null, 'client',
+                                        ],
+                                ],
                         ]
                 );
             }
@@ -334,9 +387,10 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
 
         $errors = [];
         foreach ($tags as $tag) {
-            list(, $behavior, ) = $this->process_tag($tag);
+            [, $behavior, ] = $this->process_tag($tag);
             // Variable $behavior datalynx_field_behavior.
-            if ($behavior->is_required() &&
+            if (
+                $behavior->is_required() &&
                     !isset(optional_param_array($formfieldname, [], PARAM_RAW)['enabled'])
             ) {
                 $errors[$formfieldname] = get_string('checkenable', 'datalynx');

@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_checkbox
  * @subpackage checkbox
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/multiselect/field_form.php");
 
 class datalynxfield_checkbox_form extends datalynxfield_multiselect_form {
-
     public function field_definition() {
         parent::field_definition();
 

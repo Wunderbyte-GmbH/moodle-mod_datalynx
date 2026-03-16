@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_file
  * @subpackage file
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
@@ -38,4 +38,3 @@ $DB->set_field('datalynx_contents', 'content2', $count, ['id' => $cid]);
 // Encode filename to handle special characters like #, &, etc.
 $encodedfile = rawurlencode($file);
 redirect(new moodle_url("/pluginfile.php/$context/mod_datalynx/content/$cid/$encodedfile"));
-

@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_datalynxview
  * @subpackage datalynxview
  * @copyright 2014 onwards by edulabs.org and associated programmers
  * @copyright based on the work by 2013 Itamar Tzadok
@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
 class datalynxfield_datalynxview extends datalynxfield_base {
-
     public $type = 'datalynxview';
 
     public $refdatalynx = null;
@@ -46,7 +45,8 @@ class datalynxfield_datalynxview extends datalynxfield_base {
         parent::__construct($df, $field);
 
         // Get the datalynx.
-        if (empty($this->field->param1) AND
+        if (
+            empty($this->field->param1) and
                 !$DB->record_exists('datalynx', ['id' => $this->field->param1])
         ) {
             return;
@@ -69,4 +69,3 @@ class datalynxfield_datalynxview extends datalynxfield_base {
         return true;
     }
 }
-

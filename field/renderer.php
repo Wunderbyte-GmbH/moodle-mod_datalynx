@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package mod_datalynx
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -30,13 +30,12 @@ require_once(dirname(__FILE__) . '/../renderer/renderer.php');
  * Base class for field patterns
  */
 abstract class datalynxfield_renderer {
-
     const PATTERN_SHOW_IN_MENU = 0;
 
     const PATTERN_CATEGORY = 1;
 
     protected static $defaultoptions = ['manage' => false, 'visible' => false, 'edit' => false,
-            'editable' => false, 'disabled' => false, 'required' => false, 'internal' => false
+            'editable' => false, 'disabled' => false, 'required' => false, 'internal' => false,
     ];
 
     protected $_field = null;
@@ -75,8 +74,13 @@ abstract class datalynxfield_renderer {
                 }
             } else {
                 $strippedpattern = preg_quote(str_replace(['[[', ']]'], ['', ''], $pattern), '/');
-                if (preg_match_all("/\[\[$strippedpattern(?:\|(?:[^\]]+))?\]\](?:@)?/", $text,
-                        $matches)) {
+                if (
+                    preg_match_all(
+                        "/\[\[$strippedpattern(?:\|(?:[^\]]+))?\]\](?:@)?/",
+                        $text,
+                        $matches
+                    )
+                ) {
                     $found = array_merge($found, $matches[0]);
                 }
             }
@@ -100,7 +104,7 @@ abstract class datalynxfield_renderer {
         $replacements = [];
         foreach ($tags as $tag) {
             $currentoptions = array_merge(self::$defaultoptions, $options);
-            list($fieldname, $behavior, $renderer) = $this->process_tag($tag);
+            [$fieldname, $behavior, $renderer] = $this->process_tag($tag);
             // Variable $field datalynxfield_base
             // Variable $behavior datalynx_field_behavior
             // Variable $renderer datalynx_field_renderer.
@@ -128,11 +132,13 @@ abstract class datalynxfield_renderer {
                     // EDIT MODE ===.
                     if (!$currentoptions['editable']) {
                         // NOT EDITABLE ===.
-                        if ($renderer->get_not_editable_template() === $renderer::NOT_EDITABLE_SHOW_NOTHING
+                        if (
+                            $renderer->get_not_editable_template() === $renderer::NOT_EDITABLE_SHOW_NOTHING
                         ) {
                             $replacements[$tag] = ['html', ''];
                         } else {
-                            if ($renderer->get_not_editable_template() === $renderer::NOT_EDITABLE_SHOW_AS_DISPLAY_MODE
+                            if (
+                                $renderer->get_not_editable_template() === $renderer::NOT_EDITABLE_SHOW_AS_DISPLAY_MODE
                             ) {
                                 $currentoptions['template'] = $renderer->get_display_template();
                                 $currentoptions['value'] = $this->render_display_mode($entry, $currentoptions);
@@ -158,7 +164,8 @@ abstract class datalynxfield_renderer {
                         if ($renderer->get_no_value_template() === $renderer::NO_VALUE_SHOW_NOTHING) {
                             $replacements[$tag] = ['html', ''];
                         } else {
-                            if ($renderer->get_no_value_template() === $renderer::NO_VALUE_SHOW_DISPLAY_MODE_TEMPLATE
+                            if (
+                                $renderer->get_no_value_template() === $renderer::NO_VALUE_SHOW_DISPLAY_MODE_TEMPLATE
                             ) {
                                 $replacements[$tag] = ['html',
                                         $this->replace_renderer_template_tags($renderer->get_display_template(), '')];
@@ -168,13 +175,16 @@ abstract class datalynxfield_renderer {
                         }
                     } else {
                         // HAS VALUE ===.
-                        if ($renderer->get_display_template() === $renderer::DISPLAY_MODE_TEMPLATE_NONE
+                        if (
+                            $renderer->get_display_template() === $renderer::DISPLAY_MODE_TEMPLATE_NONE
                         ) {
                             $replacements[$tag] = ['html', $replacement];
                         } else {
                             $replacements[$tag] = ['html',
                                     $this->replace_renderer_template_tags(
-                                            $renderer->get_display_template(), $replacement)
+                                        $renderer->get_display_template(),
+                                        $replacement
+                                    ),
                             ];
                         }
                     }
@@ -260,8 +270,11 @@ abstract class datalynxfield_renderer {
      * @param array $options rendering options
      * @see datalynxfield_renderer::render_edit_mode
      */
-    final public function prerender_edit_mode(MoodleQuickForm &$mform, stdClass $entry,
-            array $options) {
+    final public function prerender_edit_mode(
+        MoodleQuickForm &$mform,
+        stdClass $entry,
+        array $options
+    ) {
         if ($options['editable']) {
             if (isset($options['template']) && strpos($options['template'], '#input') !== false) {
                 $splittemplate = explode('#input', $options['template']);
@@ -269,9 +282,11 @@ abstract class datalynxfield_renderer {
                 $options['suffix'] = $splittemplate[1];
             }
 
-            $mform->addElement('html',
-                    '<div class="datalynx-field-wrapper" data-field-type="' . $this->_field->type .
-                    '" data-field-name="' . $this->_field->field->name . '">');
+            $mform->addElement(
+                'html',
+                '<div class="datalynx-field-wrapper" data-field-type="' . $this->_field->type .
+                '" data-field-name="' . $this->_field->field->name . '">'
+            );
             if (isset($options['prefix'])) {
                 $mform->addElement('html', $options['prefix']);
             }
@@ -287,9 +302,11 @@ abstract class datalynxfield_renderer {
                 $options['suffix'] = $splittemplate[1];
             }
 
-            $mform->addElement('html',
-                    '<div class="datalynx-field-wrapper" data-field-type="' . $this->_field->type .
-                    '" data-field-name="' . $this->_field->field->name . '">');
+            $mform->addElement(
+                'html',
+                '<div class="datalynx-field-wrapper" data-field-type="' . $this->_field->type .
+                '" data-field-name="' . $this->_field->field->name . '">'
+            );
             if (isset($options['prefix'])) {
                 $mform->addElement('html', $options['prefix']);
             }
@@ -322,9 +339,13 @@ abstract class datalynxfield_renderer {
         }
 
         $arr = [];
-        $arr[] = &$mform->createElement('text', $fieldname, null,
-                ['size' => '32', 'disabled' => ($options['disabled'] ? 'disabled' : null)
-                ]);
+        $arr[] = &$mform->createElement(
+            'text',
+            $fieldname,
+            null,
+            ['size' => '32', 'disabled' => ($options['disabled'] ? 'disabled' : null),
+            ]
+        );
         $mform->setType($fieldname, PARAM_NOTAGS);
         $mform->setDefault($fieldname, $content);
     }

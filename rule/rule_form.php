@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynx_rule
+ * @package mod_datalynx
  * @copyright 2014 onwards by edulabs.org and associated programmers
  * @copyright based on the work by 2013 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -27,7 +27,6 @@ require_once("$CFG->libdir/formslib.php");
 require_once('rule_manager.php');
 
 class datalynx_rule_form extends moodleform {
-
     /**
      * @var object
      */
@@ -49,8 +48,15 @@ class datalynx_rule_form extends moodleform {
      * @param null $attributes
      * @param bool $editable
      */
-    public function __construct($rule, $action = null, $customdata = null, $method = 'post', $target = '',
-            $attributes = null, $editable = true) {
+    public function __construct(
+        $rule,
+        $action = null,
+        $customdata = null,
+        $method = 'post',
+        $target = '',
+        $attributes = null,
+        $editable = true
+    ) {
         $this->_rule = $rule;
         $this->_df = $this->_rule->df;
 
@@ -86,8 +92,14 @@ class datalynx_rule_form extends moodleform {
         }
 
         // Enabled.
-        $mform->addElement('advcheckbox', 'enabled', get_string('ruleenabled', 'datalynx'), '',
-                null, [0, 1]);
+        $mform->addElement(
+            'advcheckbox',
+            'enabled',
+            get_string('ruleenabled', 'datalynx'),
+            '',
+            null,
+            [0, 1]
+        );
 
         // Events.
         $eventmenu = datalynx_rule_manager::get_event_data($this->_df->id());
@@ -95,20 +107,33 @@ class datalynx_rule_form extends moodleform {
         foreach ($eventmenu as $eventname => $eventlabel) {
             $eventgroup[] = &$mform->createElement('checkbox', $eventname, null, $eventlabel, ['size' => 32]);
         }
-        $mform->addGroup($eventgroup, 'eventsgroup', get_string('triggeringevent', 'datalynx'),
-                '<br />', false);
+        $mform->addGroup(
+            $eventgroup,
+            'eventsgroup',
+            get_string('triggeringevent', 'datalynx'),
+            '<br />',
+            false
+        );
 
         // If we have selected entry updated, add a new UI when the instance includes a checkbox.
         $checkboxes = $this->_df->get_fields_by_type('checkbox', true);
         $radiobuttons = $this->_df->get_fields_by_type('radiobutton', true);
         $choices = $radiobuttons + $checkboxes;
-        if(!empty($choices)) {
+        if (!empty($choices)) {
             $choices = ['0' => get_string('noselection', 'datalynx')] + $choices;
-            $mform->addElement('select', 'param5',
-                    get_string('triggerspecificevent', 'datalynxrule_eventnotification'), $choices);
-            $attributes= ['size'=>'5'];
-            $mform->addElement('text', 'param10',
-                    get_string('condition', 'datalynxrule_eventnotification'), $attributes);
+            $mform->addElement(
+                'select',
+                'param5',
+                get_string('triggerspecificevent', 'datalynxrule_eventnotification'),
+                $choices
+            );
+            $attributes = ['size' => '5'];
+            $mform->addElement(
+                'text',
+                'param10',
+                get_string('condition', 'datalynxrule_eventnotification'),
+                $attributes
+            );
             $mform->setType('param10', PARAM_TEXT);
             $mform->addHelpButton('param10', 'condition', 'datalynxrule_eventnotification');
             $mform->disabledIf('param10', 'param5', 'eq', 0);
@@ -170,8 +195,11 @@ class datalynx_rule_form extends moodleform {
         // Save and display.
         $buttonarray[] = &$mform->createElement('submit', 'submitbutton', get_string('savechanges'));
         // Save and continue.
-        $buttonarray[] = &$mform->createElement('submit', 'submitbutton',
-                get_string('savecontinue', 'datalynx'));
+        $buttonarray[] = &$mform->createElement(
+            'submit',
+            'submitbutton',
+            get_string('savecontinue', 'datalynx')
+        );
         // Cancel.
         $buttonarray[] = &$mform->createElement('cancel');
         $mform->addGroup($buttonarray, 'buttonar', '', [' '], false);

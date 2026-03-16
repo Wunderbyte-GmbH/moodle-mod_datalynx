@@ -34,8 +34,14 @@ if ($ADMIN->fulltree) {
         $str = get_string('configenablerssfeeds', 'datalynx');
     }
     $settings->add(
-            new admin_setting_configselect('datalynx_enablerssfeeds',
-                    get_string('enablerssfeeds', 'admin'), $str, 0, $options));
+        new admin_setting_configselect(
+            'datalynx_enablerssfeeds',
+            get_string('enablerssfeeds', 'admin'),
+            $str,
+            0,
+            $options
+        )
+    );
 
     $unlimited = get_string('unlimited');
     $keys = range(0, 500);
@@ -45,21 +51,38 @@ if ($ADMIN->fulltree) {
     // Max fields.
     $options = array_combine($keys, $values);
     $settings->add(
-            new admin_setting_configselect('datalynx_maxfields', get_string('fieldsmax', 'datalynx'),
-                    get_string('configmaxfields', 'datalynx'), 0, $options));
+        new admin_setting_configselect(
+            'datalynx_maxfields',
+            get_string('fieldsmax', 'datalynx'),
+            get_string('configmaxfields', 'datalynx'),
+            0,
+            $options
+        )
+    );
 
     // Max views.
     $options = array_combine($keys, $values);
     $settings->add(
-            new admin_setting_configselect('datalynx_maxviews', get_string('viewsmax', 'datalynx'),
-                    get_string('configmaxviews', 'datalynx'), 0, $options));
+        new admin_setting_configselect(
+            'datalynx_maxviews',
+            get_string('viewsmax', 'datalynx'),
+            get_string('configmaxviews', 'datalynx'),
+            0,
+            $options
+        )
+    );
 
     // Max filters.
     $options = array_combine($keys, $values);
     $settings->add(
-            new admin_setting_configselect('datalynx_maxfilters',
-                    get_string('filtersmax', 'datalynx'), get_string('configmaxfilters', 'datalynx'),
-                    0, $options));
+        new admin_setting_configselect(
+            'datalynx_maxfilters',
+            get_string('filtersmax', 'datalynx'),
+            get_string('configmaxfilters', 'datalynx'),
+            0,
+            $options
+        )
+    );
 
     // Max entries.
     $keys = range(-1, 500);
@@ -67,14 +90,24 @@ if ($ADMIN->fulltree) {
     array_unshift($values, $unlimited);
     $options = array_combine($keys, $values);
     $settings->add(
-            new admin_setting_configselect('datalynx_maxentries',
-                    get_string('entriesmax', 'datalynx'), get_string('configmaxentries', 'datalynx'),
-                    -1, $options));
+        new admin_setting_configselect(
+            'datalynx_maxentries',
+            get_string('entriesmax', 'datalynx'),
+            get_string('configmaxentries', 'datalynx'),
+            -1,
+            $options
+        )
+    );
 
     // Allow anonymous entries.
     $options = [0 => get_string('no'), 1 => get_string('yes')];
     $settings->add(
-            new admin_setting_configselect('datalynx_anonymous',
-                    get_string('entriesanonymous', 'datalynx'),
-                    get_string('configanonymousentries', 'datalynx'), 0, $options));
+        new admin_setting_configselect(
+            'datalynx_anonymous',
+            get_string('entriesanonymous', 'datalynx'),
+            get_string('configanonymousentries', 'datalynx'),
+            0,
+            $options
+        )
+    );
 }

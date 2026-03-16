@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_file
  * @subpackage file
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
@@ -30,12 +30,11 @@ require_once("$CFG->dirroot/lib/resourcelib.php");
 /**
  */
 class datalynxfield_file extends datalynxfield_base {
-
     public $type = 'file';
 
     /**
      * Can this field be used in fieldgroups? Override if yes.
-     * @var boolean
+     * @var bool
      */
     protected $forfieldgroup = true;
 
@@ -105,12 +104,18 @@ class datalynxfield_file extends datalynxfield_base {
         if (count($files) > 1) {
             // Now save files if we see any.
             $options = ['subdirs' => 0, 'maxbytes' => $this->field->param1,
-                    'maxfiles' => $this->field->param2, 'accepted_types' => $this->field->param3
+                    'maxfiles' => $this->field->param2, 'accepted_types' => $this->field->param3,
             ];
 
             $contextid = $this->df->context->id;
-            file_save_draft_area_files($filemanager, $contextid, 'mod_datalynx', 'content',
-                    $contentid, $options);
+            file_save_draft_area_files(
+                $filemanager,
+                $contextid,
+                'mod_datalynx',
+                'content',
+                $contentid,
+                $options
+            );
 
             $this->update_content_files($contentid);
         }
@@ -171,7 +176,7 @@ class datalynxfield_file extends datalynxfield_base {
                 'filearea' => 'draft',
                 'itemid' => $draftitemid,
                 'filepath' => '/',
-                'filename' => urldecode($filename)
+                'filename' => urldecode($filename),
             ];
             $fs = get_file_storage();
             $fs->create_file_from_url($filerecord, $fileurl, null, true);
@@ -231,13 +236,26 @@ class datalynxfield_file extends datalynxfield_base {
 
         $options = ['context' => $this->df->context];
         $data = (object) $values;
-        $data = file_postupdate_standard_editor((object) $values, $fieldname, $options,
-                $this->df->context, 'mod_datalynx', 'content', $contentid);
+        $data = file_postupdate_standard_editor(
+            (object) $values,
+            $fieldname,
+            $options,
+            $this->df->context,
+            'mod_datalynx',
+            'content',
+            $contentid
+        );
 
         // Get the file content.
         $fs = get_file_storage();
-        $array = $fs->get_area_files($this->df->context->id, 'mod_datalynx', 'content', $contentid,
-                'sortorder', false);
+        $array = $fs->get_area_files(
+            $this->df->context->id,
+            'mod_datalynx',
+            'content',
+            $contentid,
+            'sortorder',
+            false
+        );
         $file = reset($array);
         $filecontent = $file->get_content();
 
@@ -277,7 +295,7 @@ class datalynxfield_file extends datalynxfield_base {
      * @see datalynxfield_base::get_search_sql()
      */
     public function get_search_sql(array $search): array {
-        list($not, $operator, $value) = $search;
+        [$not, $operator, $value] = $search;
 
         // If we deal with files it is also missing if content is 0.
         // We keep the not and compare with exactly 1 in the content column.
@@ -303,8 +321,14 @@ class datalynxfield_file extends datalynxfield_base {
     public static function is_fieldvalue_empty($value): bool {
         // TODO: We see a draftarea id, need to determine if files are linked to it.
         global $DB;
-        $filesizes = $DB->get_records_menu('files',
-            ['itemid' => $value], 'filesize DESC', "id, filesize", '', 1);
+        $filesizes = $DB->get_records_menu(
+            'files',
+            ['itemid' => $value],
+            'filesize DESC',
+            "id, filesize",
+            '',
+            1
+        );
 
         // If the biggest file in the draftarea has a positive filesize, it is not empty.
         if (!reset($filesizes)) {

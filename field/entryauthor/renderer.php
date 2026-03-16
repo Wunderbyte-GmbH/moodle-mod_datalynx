@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_entryauthor
  * @subpackage entryauthor
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
@@ -33,7 +33,6 @@ require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 /**
  */
 class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
-
     /**
      * Return replacements for all ##author:something## patterns.
      *
@@ -55,7 +54,8 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
         if ($fieldname == 'name') {
             // Two tags are possible.
             foreach ($tags as $tag) {
-                if (trim($tag, '@') == "##author:edit##" && $edit &&
+                if (
+                    trim($tag, '@') == "##author:edit##" && $edit &&
                         has_capability('mod/datalynx:manageentries', $field->df()->context)
                 ) {
                     $replacements[$tag] = ['',
@@ -113,8 +113,12 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
         $selected = $entry->userid;
         static $usersmenu = null;
         if (is_null($usersmenu)) {
-            $users = get_users_by_capability($field->df->context, 'mod/datalynx:writeentry', 'u.*',
-                    'u.lastname ASC');
+            $users = get_users_by_capability(
+                $field->df->context,
+                'mod/datalynx:writeentry',
+                'u.*',
+                'u.lastname ASC'
+            );
             // Add a supervisor's id.
             if (!in_array($entry->userid, array_keys($users))) {
                 $user = new stdClass();
@@ -154,8 +158,12 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
         $user = $DB->get_record('user', ['id' => $entry->userid]);
         $df = $this->_field->df();
         return html_writer::link(
-                new moodle_url('/user/view.php',
-                        ['id' => $entry->userid, 'course' => $df->course->id]), fullname($user));
+            new moodle_url(
+                '/user/view.php',
+                ['id' => $entry->userid, 'course' => $df->course->id]
+            ),
+            fullname($user)
+        );
     }
 
     /**
@@ -338,7 +346,6 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
             return $output->print_badges_list($badges, $userid, true);
         }
         return '';
-
     }
 
     /**

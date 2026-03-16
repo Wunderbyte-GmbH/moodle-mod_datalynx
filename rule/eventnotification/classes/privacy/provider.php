@@ -17,7 +17,7 @@
 /**
  * Privacy provider implementation for datalynxfield_checkbox.
  *
- * @package datalynxfield
+ * @package datalynxrule_eventnotification
  * @subpackage eventnotification
  * @copyright 2018 Michael Pollak <moodle@michaelpollak.org>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -31,14 +31,13 @@ defined('MOODLE_INTERNAL') || die();
 class provider implements
     // This plugin does not store any personal user data.
     \core_privacy\local\metadata\null_provider {
-
     /**
      * Get the language string identifier with the component's language
      * file to explain why this plugin stores no data.
      *
      * @return  string
      */
-    public static function get_reason() : string {
+    public static function get_reason(): string {
         return 'privacy:metadata';
     }
 }

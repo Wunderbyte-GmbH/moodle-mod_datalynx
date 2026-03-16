@@ -16,7 +16,7 @@
 
 /**
  *
- * @package mod-datalynx
+ * @package mod_datalynx
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -37,5 +37,5 @@ $logs = [
         ['module' => 'datalynx', 'action' => 'views add', 'mtable' => 'datalynx_views', 'field' => 'name'],
         ['module' => 'datalynx', 'action' => 'views update', 'mtable' => 'datalynx_views', 'field' => 'name'],
         ['module' => 'datalynx', 'action' => 'filters add', 'mtable' => 'datalynx_filters', 'field' => 'name'],
-        ['module' => 'datalynx', 'action' => 'filters update', 'mtable' => 'datalynx_filters', 'field' => 'name']
+        ['module' => 'datalynx', 'action' => 'filters update', 'mtable' => 'datalynx_filters', 'field' => 'name'],
 ];

@@ -16,7 +16,7 @@
 
 /**
  *
- * @package datalynxfield
+ * @package datalynxfield_radiobutton
  * @subpackage radiobutton
  * @copyright 2014 Ivan Šakić
  * @copyright 2016 David Bogner
@@ -30,7 +30,6 @@ require_once(dirname(__FILE__) . "/../select/renderer.php");
  * Class datalynxfield_radiobutton_renderer Renderer for radiobutton field type
  */
 class datalynxfield_radiobutton_renderer extends datalynxfield_select_renderer {
-
     /**
      *
      * @var datalynxfield_radiobutton

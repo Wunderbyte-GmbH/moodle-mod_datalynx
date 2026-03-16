@@ -17,7 +17,7 @@
 /**
  * Definition of Quiz scheduled tasks.
  *
- * @package   mod _datalynx
+ * @package   mod_datalynx
  * @category  task
  * @copyright 2023 Thomas Winkler <thomas.winkler@wunderbyte.at>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -33,6 +33,6 @@ $tasks = [
         'hour' => '1',
         'day' => '*',
         'dayofweek' => '*',
-        'month' => '*'
-    ]
+        'month' => '*',
+    ],
 ];
