@@ -25,6 +25,7 @@ Feature: In a datalynx instance create, update, and delete entries
     And the following "activities" exist:
       | activity | course | idnumber | name                   |
       | datalynx | C1     | 12345    | Datalynx Test Instance |
+    And I change window size to "large"
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I add to the "Datalynx Test Instance" datalynx the following fields:
@@ -62,6 +63,8 @@ Feature: In a datalynx instance create, update, and delete entries
       | radio            | Radio              | Option A                         |
       | select           | Select             | Option X                         |
       | checkbox         | Checkbox           | Option 1=1,Option 2=0            |
+    And I fill in the entry form fields
+      | type             | name               | value                            |
       | teammemberselect | Team member select | Student 4 (student4@example.com) |
     And I press "Save changes"
     And I press "Continue"
@@ -75,6 +78,8 @@ Feature: In a datalynx instance create, update, and delete entries
       | radio            | Radio              | Option C                         |
       | select           | Select             | Option Y                         |
       | checkbox         | Checkbox           | Option 1=0,Option 3=1            |
+    And I fill in the entry form fields
+      | type             | name               | value                            |
       | teammemberselect | Team member select | Student 2 (student2@example.com) |
     And I upload "lib/tests/fixtures/empty.txt" file to "File" filemanager
     And I press "Save changes"

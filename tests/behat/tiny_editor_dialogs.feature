@@ -26,13 +26,26 @@ Feature: Test TinyMCE tag buttons and dialogs in datalynx view editor
     And I add to "Datalynx Test Instance" datalynx the view of "Grid" type with:
       | name        | Gridview |
       | description | Testgrid |
+    And I follow "Set as default view"
 
   @javascript
   Scenario: Insert a field tag via dropdown and open its properties dialog
-    When I follow "Views"
-    And I click on "Edit Gridview" "link"
+    When I click on "Edit Gridview" "link"
     And I click on "Entry template" "link"
     Then I should see "Field tags"
+
+    # Open dialog and delete the tag
+    When I switch to the "id_eparam2_editor" TinyMCE editor iframe
+    And I click on "Datalynx field Text" "button"
+    And I switch to the main frame
+    Then I should see "Field tag properties"
+    When I click on "[data-region='delete-tag']" "css_element"
+
+    # Verify dialog closed and button is gone from editor
+    Then I should not see "Field tag properties"
+    And I switch to the "id_eparam2_editor" TinyMCE editor iframe
+    Then "button.datalynx-field-tag" "css_element" should not exist
+    And I switch to the main frame
 
     # Select a field tag from the dropdown - patterndialogue.js inserts it as a button
     When I select "[[Datalynx field Text]]" from the "eparam2_editor_field_tag_menu" singleselect
@@ -47,15 +60,14 @@ Feature: Test TinyMCE tag buttons and dialogs in datalynx view editor
     And I switch to the main frame
 
     # Verify the modal dialog opened with the correct content
-    Then I should see "Tag properties"
+    Then I should see "Field tag properties"
     And "[data-region='datalynx-tag-field']" "css_element" should exist
     And "[data-region='tag-behavior-select']" "css_element" should exist
     And "[data-region='tag-renderer-select']" "css_element" should exist
 
   @javascript
   Scenario: Delete a field tag button via the properties dialog
-    When I follow "Views"
-    And I click on "Edit Gridview" "link"
+    When I click on "Edit Gridview" "link"
     And I click on "Entry template" "link"
 
     # Insert a field tag button via dropdown
@@ -65,23 +77,10 @@ Feature: Test TinyMCE tag buttons and dialogs in datalynx view editor
     And I switch to the "id_eparam2_editor" TinyMCE editor iframe
     Then "button.datalynx-field-tag" "css_element" should exist
 
-    # Open dialog and delete the tag
-    When I click on "Datalynx field Text" "button"
-    And I switch to the main frame
-    Then I should see "Tag properties"
-    When I click on "[data-region='delete-tag']" "css_element"
-
-    # Verify dialog closed and button is gone from editor
-    Then I should not see "Tag properties"
-    And I switch to the "id_eparam2_editor" TinyMCE editor iframe
-    Then "button.datalynx-field-tag" "css_element" should not exist
-    And I switch to the main frame
-
   @javascript
   Scenario: Tags in the view template are converted to buttons when editor loads
     # First save a view with a raw field tag in the entry template
-    When I follow "Views"
-    And I click on "Edit Gridview" "link"
+    When I click on "Edit Gridview" "link"
     And I click on "Entry template" "link"
     Then I add to "id_eparam2_editor" editor the text "[[Datalynx field Text]]"
     And I press "Save changes"
@@ -98,7 +97,6 @@ Feature: Test TinyMCE tag buttons and dialogs in datalynx view editor
   @javascript
   Scenario: Saving view template converts tag buttons back to raw tags
     # Insert a field tag button
-    When I follow "Views"
     And I click on "Edit Gridview" "link"
     And I click on "Entry template" "link"
     When I select "[[Datalynx field Text]]" from the "eparam2_editor_field_tag_menu" singleselect
