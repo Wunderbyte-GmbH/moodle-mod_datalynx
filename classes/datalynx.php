@@ -521,16 +521,6 @@ class datalynx {
                 $PAGE->set_title($pagename);
             }
             $PAGE->set_heading($this->course->fullname);
-
-            // Include blocks dragdrop when blocks/moodle editing.
-            if ($PAGE->user_is_editing()) {
-                $paramsforyui = ['courseid' => $this->course->id, 'cmid' => $this->cm->id,
-                        'pagetype' => $PAGE->pagetype, 'pagelayout' => $PAGE->pagelayout,
-                        'regions' => $PAGE->blocks->get_regions()
-                ];
-                $PAGE->requires->yui_module('moodle-core-blocks', 'M.core_blocks.init_dragdrop',
-                        [$paramsforyui], null, true);
-            }
         }
 
         // PAGE setup for datalynx content anywhere.
