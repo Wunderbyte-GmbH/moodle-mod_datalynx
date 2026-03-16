@@ -44,7 +44,6 @@ defined('MOODLE_INTERNAL') || die();
  * @package mod_datalynx
  */
 class datalynx {
-
     const COUNT_ALL = 0;
 
     const COUNT_APPROVED = 1;
@@ -134,34 +133,68 @@ class datalynx {
                 $this->data = $d;
             } else {
                 if (!$this->data = $DB->get_record('datalynx', ['id' => $d])) {
-                    throw new moodle_exception('invaliddatalynx', 'datalynx', null, null,
-                            "Datalynx id: $d");
+                    throw new moodle_exception(
+                        'invaliddatalynx',
+                        'datalynx',
+                        null,
+                        null,
+                        "Datalynx id: $d"
+                    );
                 }
             }
             if (!$this->course = $DB->get_record('course', ['id' => $this->data->course])) {
-                throw new moodle_exception('invalidcourse', 'datalynx', null, null,
-                        "Course id: {$this->data->course}");
+                throw new moodle_exception(
+                    'invalidcourse',
+                    'datalynx',
+                    null,
+                    null,
+                    "Course id: {$this->data->course}"
+                );
             }
-            if (!$this->cm = get_coursemodule_from_instance('datalynx', $this->id(),
-                    $this->course->id)
+            if (
+                !$this->cm = get_coursemodule_from_instance(
+                    'datalynx',
+                    $this->id(),
+                    $this->course->id
+                )
             ) {
-                throw new moodle_exception('invalidcoursemodule', 'datalynx', null, null,
-                        "Cm id: {$this->id()}");
+                throw new moodle_exception(
+                    'invalidcoursemodule',
+                    'datalynx',
+                    null,
+                    null,
+                    "Cm id: {$this->id()}"
+                );
             }
             // Initialize from course module id.
         } else {
             if ($id) {
                 if (!$this->cm = get_coursemodule_from_id('datalynx', $id)) {
-                    throw new moodle_exception('invalidcoursemodule ' . $id, 'datalynx', null, null,
-                            "Cm id: $id");
+                    throw new moodle_exception(
+                        'invalidcoursemodule ' . $id,
+                        'datalynx',
+                        null,
+                        null,
+                        "Cm id: $id"
+                    );
                 }
                 if (!$this->course = $DB->get_record('course', ['id' => $this->cm->course])) {
-                    throw new moodle_exception('invalidcourse', 'datalynx', null, null,
-                            "Course id: {$this->cm->course}");
+                    throw new moodle_exception(
+                        'invalidcourse',
+                        'datalynx',
+                        null,
+                        null,
+                        "Course id: {$this->cm->course}"
+                    );
                 }
                 if (!$this->data = $DB->get_record('datalynx', ['id' => $this->cm->instance])) {
-                    throw new moodle_exception('invaliddatalynx', 'datalynx', null, null,
-                            "Datalynx id: {$this->cm->instance}");
+                    throw new moodle_exception(
+                        'invaliddatalynx',
+                        'datalynx',
+                        null,
+                        null,
+                        "Datalynx id: {$this->cm->instance}"
+                    );
                 }
             }
         }
@@ -176,7 +209,6 @@ class datalynx {
             $this->groupmode = groups_get_activity_groupmode($this->cm);
             $this->currentgroup = groups_get_activity_group($this->cm, true);
         }
-
     }
 
     /**
@@ -304,8 +336,9 @@ class datalynx {
         switch ($type) {
             case self::COUNT_ALL:
                 $count = $DB->count_records_sql(
-                        'SELECT COUNT(e.id) FROM {datalynx_entries} e WHERE e.dataid = ?',
-                        [$this->id()]);
+                    'SELECT COUNT(e.id) FROM {datalynx_entries} e WHERE e.dataid = ?',
+                    [$this->id()]
+                );
                 break;
 
             case self::COUNT_LEFT:
@@ -319,7 +352,8 @@ class datalynx {
                 }
                 $count = $DB->count_records_sql(
                     'SELECT COUNT(e.id) FROM {datalynx_entries} e WHERE e.approved = 0 AND e.dataid = ?',
-                    [$this->id()]);
+                    [$this->id()]
+                );
                 break;
 
             default:
@@ -398,7 +432,7 @@ class datalynx {
         }
 
         if (!$skiplogincheck) {
-            //require_login($this->course->id, true, $this->cm);
+            // require_login($this->course->id, true, $this->cm);
         }
 
         // Make sure there is at least datalynx id param.
@@ -410,13 +444,18 @@ class datalynx {
         if (!$manager) {
             $timenow = time();
             if (!empty($this->data->timeavailable) && $this->data->timeavailable > $timenow) {
-                throw new moodle_exception('notopenyet', 'datalynx', '',
-                        userdate($this->data->timeavailable));
+                throw new moodle_exception(
+                    'notopenyet',
+                    'datalynx',
+                    '',
+                    userdate($this->data->timeavailable)
+                );
             }
         }
 
         // RSS.
-        if (!empty($params->rss) && !empty($CFG->enablerssfeeds) &&
+        if (
+            !empty($params->rss) && !empty($CFG->enablerssfeeds) &&
                 !empty($CFG->datalynx_enablerssfeeds) && $this->data->rssarticles > 0
         ) {
             require_once("$CFG->libdir/rsslib.php");
@@ -476,8 +515,10 @@ class datalynx {
             $PAGE->add_body_class($bodyclass);
 
             $PAGE->requires->css(
-                    new moodle_url(
-                            $CFG->wwwroot . '/mod/datalynx/field/picture/zoomable/zoomable.css'));
+                new moodle_url(
+                    $CFG->wwwroot . '/mod/datalynx/field/picture/zoomable/zoomable.css'
+                )
+            );
 
             // If completion is on: Mark activity as viewed.
             if (!empty($params->completion)) {
@@ -488,7 +529,8 @@ class datalynx {
 
             $modulename = $this->name();
             $viewid = (!empty($urlparams['view']) ? $urlparams['view'] : (!empty(
-            $this->data->defaultview) ? $this->data->defaultview : 0));
+                $this->data->defaultview
+            ) ? $this->data->defaultview : 0));
             if ($page == 'view' && $viewid) {
                 global $DB;
                 $viewname = $DB->get_field('datalynx_views', 'name', ['id' => $viewid]);
@@ -541,8 +583,15 @@ class datalynx {
                 }
             }
             // Uploaded css files.
-            if ($files = $fs->get_area_files($this->context->id, 'mod_datalynx', 'css', 0,
-                    'sortorder', false)
+            if (
+                $files = $fs->get_area_files(
+                    $this->context->id,
+                    'mod_datalynx',
+                    'css',
+                    0,
+                    'sortorder',
+                    false
+                )
             ) {
                 $path = "/{$this->context->id}/mod_datalynx/css/0";
                 foreach ($files as $file) {
@@ -581,8 +630,15 @@ class datalynx {
                 }
             }
             // Uploaded js files.
-            if ($files = $fs->get_area_files($this->context->id, 'mod_datalynx', 'js', 0,
-                    'sortorder', false)
+            if (
+                $files = $fs->get_area_files(
+                    $this->context->id,
+                    'mod_datalynx',
+                    'js',
+                    0,
+                    'sortorder',
+                    false
+                )
             ) {
                 $path = "/{$this->context->id}/mod_datalynx/js/0";
                 foreach ($files as $file) {
@@ -610,23 +666,30 @@ class datalynx {
                 if ($page == 'view' || $page == 'embed') {
                     $getstarted = new stdClass();
                     $getstarted->presets = html_writer::link(
-                            new moodle_url('/mod/datalynx/preset/index.php', ['d' => $thisid]),
-                            get_string('presets', 'datalynx'));
+                        new moodle_url('/mod/datalynx/preset/index.php', ['d' => $thisid]),
+                        get_string('presets', 'datalynx')
+                    );
                     $getstarted->fields = html_writer::link(
-                            new moodle_url('/mod/datalynx/field/index.php', ['d' => $thisid]),
-                            get_string('fields', 'datalynx'));
+                        new moodle_url('/mod/datalynx/field/index.php', ['d' => $thisid]),
+                        get_string('fields', 'datalynx')
+                    );
                     $getstarted->views = html_writer::link(
-                            new moodle_url('/mod/datalynx/view/index.php', ['d' => $thisid]),
-                            get_string('views', 'datalynx'));
+                        new moodle_url('/mod/datalynx/view/index.php', ['d' => $thisid]),
+                        get_string('views', 'datalynx')
+                    );
 
-                    $this->notifications['bad']['getstarted'] = html_writer::tag('div',
-                            get_string('getstarted', 'datalynx', $getstarted), ['class' => 'mdl-left']);
+                    $this->notifications['bad']['getstarted'] = html_writer::tag(
+                        'div',
+                        get_string('getstarted', 'datalynx', $getstarted),
+                        ['class' => 'mdl-left']
+                    );
                 }
             } else {
                 if (!$this->data->defaultview) {
                     $linktoviews = html_writer::link(
-                            new moodle_url('/mod/datalynx/view/index.php', ['d' => $thisid]),
-                            get_string('views', 'datalynx'));
+                        new moodle_url('/mod/datalynx/view/index.php', ['d' => $thisid]),
+                        get_string('views', 'datalynx')
+                    );
                     $this->notifications['bad']['defaultview'] = get_string('viewnodefault', 'datalynx', $linktoviews);
                 }
             }
@@ -702,8 +765,10 @@ class datalynx {
      */
     public function print_groups_menu($view, $filter) {
         if ($this->groupmode && !in_array($this->groupmode, $this->internalgroupmodes)) {
-            $returnurl = new moodle_url("/mod/datalynx/{$this->pagefile}.php",
-                    ['d' => $this->id(), 'view' => $view, 'filter' => $filter]);
+            $returnurl = new moodle_url(
+                "/mod/datalynx/{$this->pagefile}.php",
+                ['d' => $this->id(), 'view' => $view, 'filter' => $filter]
+            );
             groups_print_activity_menu($this->cm, $returnurl . '&amp;');
         }
     }
@@ -714,7 +779,8 @@ class datalynx {
     public function print_rsslink() {
         global $USER, $CFG;
         // Link to the RSS feed.
-        if (!empty($CFG->enablerssfeeds) && !empty($CFG->datalynx_enablerssfeeds) &&
+        if (
+            !empty($CFG->enablerssfeeds) && !empty($CFG->datalynx_enablerssfeeds) &&
                 $this->data->rssarticles > 0
         ) {
             echo '<div style="float:right;">';
@@ -757,7 +823,8 @@ class datalynx {
         global $PAGE;
         if (!empty($this->_currentview)) {
             $event = event\course_module_viewed::create(
-                    ['objectid' => $PAGE->cm->instance, 'context' => $PAGE->context]);
+                ['objectid' => $PAGE->cm->instance, 'context' => $PAGE->context]
+            );
             $event->add_record_snapshot('course', $PAGE->course);
             $event->trigger();
             $this->_currentview->display();
@@ -1148,26 +1215,36 @@ class datalynx {
 
                 $msg = get_string("fieldsconfirm$action", 'datalynx', count($fields));
                 if ($action === 'delete') {
-                    $fieldlist = array_reduce($fields,
-                            function($list, $field) {
-                                return $list . "<li>{$field->field->name}</li>";
-                            }, '');
+                    $fieldlist = array_reduce(
+                        $fields,
+                        function ($list, $field) {
+                            return $list . "<li>{$field->field->name}</li>";
+                        },
+                        ''
+                    );
                     $fieldlist = "<ul>$fieldlist</ul>";
                     $filters = $this->find_filters_using_fields($fields);
-                    $filterlist = array_reduce($filters,
-                            function($list, $filter) {
-                                return $list . "<li>{$filter->name}</li>";
-                            }, '');
+                    $filterlist = array_reduce(
+                        $filters,
+                        function ($list, $filter) {
+                            return $list . "<li>{$filter->name}</li>";
+                        },
+                        ''
+                    );
                     $filterlist = "<ul>$filterlist</ul>";
                     if ($filters) {
                         echo "<div class=\"alert alert-warning\">" .
-                                get_string('deletefieldfilterwarning', 'datalynx',
-                                        ['fieldlist' => $fieldlist, 'filterlist' => $filterlist
-                                        ]) . "</div>";
+                                get_string(
+                                    'deletefieldfilterwarning',
+                                    'datalynx',
+                                    ['fieldlist' => $fieldlist, 'filterlist' => $filterlist,
+                                    ]
+                                ) . "</div>";
                         echo $OUTPUT->continue_button(
-                                new moodle_url('/mod/datalynx/field/index.php',
-                                        ['d' => $this->id()]
-                                )
+                            new moodle_url(
+                                '/mod/datalynx/field/index.php',
+                                ['d' => $this->id()]
+                            )
                         );
 
                         echo $OUTPUT->footer();
@@ -1175,13 +1252,16 @@ class datalynx {
                     }
                 }
 
-                echo $OUTPUT->confirm($msg,
-                        new moodle_url('/mod/datalynx/field/index.php',
-                                ['d' => $this->id(),
+                echo $OUTPUT->confirm(
+                    $msg,
+                    new moodle_url(
+                        '/mod/datalynx/field/index.php',
+                        ['d' => $this->id(),
                                         $action => implode(',', array_keys($fields)),
                                         'sesskey' => sesskey(), 'confirmed' => 1]
-                        ),
-                        new moodle_url('/mod/datalynx/field/index.php', ['d' => $this->id()]));
+                    ),
+                    new moodle_url('/mod/datalynx/field/index.php', ['d' => $this->id()])
+                );
 
                 echo $OUTPUT->footer();
                 exit();
@@ -1199,8 +1279,8 @@ class datalynx {
 
                             $other = ['dataid' => $this->id()];
                             $event = event\field_created::create(
-                                    ['context' => $this->context,
-                                            'objectid' => $field->field->id, 'other' => $other
+                                ['context' => $this->context,
+                                            'objectid' => $field->field->id, 'other' => $other,
                                     ]
                             );
                             $event->trigger();
@@ -1220,8 +1300,8 @@ class datalynx {
 
                             $other = ['dataid' => $this->id()];
                             $event = event\field_updated::create(
-                                    ['context' => $this->context,
-                                            'objectid' => $field->field->id, 'other' => $other
+                                ['context' => $this->context,
+                                            'objectid' => $field->field->id, 'other' => $other,
                                     ]
                             );
                             $event->trigger();
@@ -1238,13 +1318,17 @@ class datalynx {
                         foreach ($fields as $fid => $field) {
                             // Lock = 0; unlock = -1;.
                             $editable = $field->field->edits ? 0 : -1;
-                            $DB->set_field('datalynx_fields', 'edits', $editable,
-                                    ['id' => $fid]);
+                            $DB->set_field(
+                                'datalynx_fields',
+                                'edits',
+                                $editable,
+                                ['id' => $fid]
+                            );
                             $processedfids[] = $fid;
                             $other = ['dataid' => $this->id()];
                             $event = event\field_updated::create(
-                                    ['context' => $this->context, 'objectid' => $fid,
-                                            'other' => $other
+                                ['context' => $this->context, 'objectid' => $fid,
+                                            'other' => $other,
                                     ]
                             );
                             $event->trigger();
@@ -1264,8 +1348,8 @@ class datalynx {
 
                             $other = ['dataid' => $this->id()];
                             $event = event\field_created::create(
-                                    ['context' => $this->context, 'objectid' => $fieldid,
-                                            'other' => $other
+                                ['context' => $this->context, 'objectid' => $fieldid,
+                                            'other' => $other,
                                     ]
                             );
                             $event->trigger();
@@ -1283,8 +1367,8 @@ class datalynx {
 
                             $other = ['dataid' => $this->id()];
                             $event = event\field_deleted::create(
-                                    ['context' => $this->context,
-                                            'objectid' => $field->field->id, 'other' => $other
+                                ['context' => $this->context,
+                                            'objectid' => $field->field->id, 'other' => $other,
                                     ]
                             );
                             $event->trigger();
@@ -1297,8 +1381,12 @@ class datalynx {
                             $processedfids[] = $field->field->id;
 
                             // Convert field content to HTML.
-                            $contents = $DB->get_records('datalynx_contents',
-                                    ['fieldid' => $fid], null, 'id,content');
+                            $contents = $DB->get_records(
+                                'datalynx_contents',
+                                ['fieldid' => $fid],
+                                null,
+                                'id,content'
+                            );
                             $htmlcontent = new stdClass();
                             if ($contents) {
                                 foreach ($contents as $contentid => $content) {
@@ -1315,7 +1403,8 @@ class datalynx {
 
                             $other = ['dataid' => $this->id()];
                             $event = event\field_updated::create(
-                                    ['context' => $this->context, 'objectid' => $fid, 'other' => $other]);
+                                ['context' => $this->context, 'objectid' => $fid, 'other' => $other]
+                            );
                             $event->trigger();
                         }
                         $strnotify = 'fieldsupdated';
@@ -1397,7 +1486,7 @@ class datalynx {
     public function get_view_by_name(string $viewname): stdClass {
         $views = $this->get_view_records(true);
         foreach ($views as $view) {
-            if($view->name === $viewname) {
+            if ($view->name === $viewname) {
                 return $view;
             }
         }
@@ -1713,12 +1802,17 @@ class datalynx {
                 $this->print_header('views');
 
                 // Print a confirmation page.
-                echo $OUTPUT->confirm(get_string("viewsconfirm$action", 'datalynx', count($views)),
-                        new moodle_url('/mod/datalynx/view/index.php',
-                                ['d' => $this->id(),
+                echo $OUTPUT->confirm(
+                    get_string("viewsconfirm$action", 'datalynx', count($views)),
+                    new moodle_url(
+                        '/mod/datalynx/view/index.php',
+                        ['d' => $this->id(),
                                         $action => implode(',', array_keys($views)),
-                                        'sesskey' => sesskey(), 'confirmed' => 1]),
-                        new moodle_url('/mod/datalynx/view/index.php', ['d' => $this->id()]));
+                        'sesskey' => sesskey(),
+                            'confirmed' => 1]
+                    ),
+                    new moodle_url('/mod/datalynx/view/index.php', ['d' => $this->id()])
+                );
 
                 echo $OUTPUT->footer();
                 exit();
@@ -1737,8 +1831,9 @@ class datalynx {
 
                                 $other = ['dataid' => $this->id()];
                                 $event = event\view_updated::create(
-                                        ['context' => $this->context, 'objectid' => $vid,
-                                                'other' => $other]);
+                                    ['context' => $this->context, 'objectid' => $vid,
+                                    'other' => $other]
+                                );
                                 $event->trigger();
 
                                 $processedvids[] = $vid;
@@ -1763,8 +1858,9 @@ class datalynx {
 
                                 $other = ['dataid' => $this->id()];
                                 $event = event\view_updated::create(
-                                        ['context' => $this->context, 'objectid' => $vid,
-                                                'other' => $other]);
+                                    ['context' => $this->context, 'objectid' => $vid,
+                                    'other' => $other]
+                                );
                                 $event->trigger();
 
                                 $processedvids[] = $vid;
@@ -1784,8 +1880,9 @@ class datalynx {
 
                             $other = ['dataid' => $this->id()];
                             $event = event\view_updated::create(
-                                    ['context' => $this->context, 'objectid' => $vid,
-                                            'other' => $other]);
+                                ['context' => $this->context, 'objectid' => $vid,
+                                'other' => $other]
+                            );
                             $event->trigger();
 
                             $processedvids[] = $vid;
@@ -1816,17 +1913,23 @@ class datalynx {
                             $contextid = $this->context->id;
                             $component = 'mod_datalynx';
                             $fs = get_file_storage();
-                            foreach (['viewsection', 'viewparam2'
-                            ] as $filearea) {
-                                $files = $fs->get_area_files($contextid, $component, $filearea,
-                                        $oldviewid);
+                            foreach (
+                                ['viewsection', 'viewparam2',
+                                ] as $filearea
+                            ) {
+                                $files = $fs->get_area_files(
+                                    $contextid,
+                                    $component,
+                                    $filearea,
+                                    $oldviewid
+                                );
                                 foreach ($files as $file) {
                                     if ($file->is_directory() && $file->get_filepath() === '/') {
                                         continue;
                                     }
                                     $filerecord = ['contextid' => $contextid,
                                             'component' => $component, 'filearea' => $filearea,
-                                            'itemid' => $newviewid
+                                            'itemid' => $newviewid,
                                     ];
                                     $fs->create_file_from_storedfile($filerecord, $file);
                                 }
@@ -1834,8 +1937,9 @@ class datalynx {
 
                             $other = ['dataid' => $this->id()];
                             $event = event\view_created::create(
-                                    ['context' => $this->context, 'objectid' => $newviewid,
-                                            'other' => $other]);
+                                ['context' => $this->context, 'objectid' => $newviewid,
+                                'other' => $other]
+                            );
                             $event->trigger();
 
                             $processedvids[] = $viewid;
@@ -1856,8 +1960,9 @@ class datalynx {
 
                             $other = ['dataid' => $this->id()];
                             $event = event\view_deleted::create(
-                                    ['context' => $this->context, 'objectid' => $vid,
-                                            'other' => $other]);
+                                ['context' => $this->context, 'objectid' => $vid,
+                                'other' => $other]
+                            );
                             $event->trigger();
                         }
 
@@ -1923,16 +2028,33 @@ class datalynx {
 
         if (isset($gusers)) {
             if (!empty($gusers)) {
-                list($inuids, $params) = $DB->get_in_or_equal($gusers);
-                return get_role_users($gradebookroles, $this->context, true,
-                        user_picture::fields('u'), 'u.lastname ASC', true, $this->currentgroup, '',
-                        '', "u.id $inuids", $params);
+                [$inuids, $params] = $DB->get_in_or_equal($gusers);
+                return get_role_users(
+                    $gradebookroles,
+                    $this->context,
+                    true,
+                    user_picture::fields('u'),
+                    'u.lastname ASC',
+                    true,
+                    $this->currentgroup,
+                    '',
+                    '',
+                    "u.id $inuids",
+                    $params
+                );
             } else {
                 return null;
             }
         } else {
-            return get_role_users($gradebookroles, $this->context, true,
-                    'u.id, u.lastname, u.firstname', 'u.lastname ASC', true, $this->currentgroup);
+            return get_role_users(
+                $gradebookroles,
+                $this->context,
+                true,
+                'u.id, u.lastname, u.firstname',
+                'u.lastname ASC',
+                true,
+                $this->currentgroup
+            );
         }
     }
 
@@ -1946,7 +2068,8 @@ class datalynx {
      * @throws \dml_exception
      */
     public function user_at_max_entries($perinterval = false) {
-        if ($this->data->maxentries < 0 ||
+        if (
+            $this->data->maxentries < 0 ||
                 has_capability('mod/datalynx:manageentries', $this->context)
         ) {
             return false;
@@ -1978,7 +2101,8 @@ class datalynx {
                 $entriesleft = $this->data->entriesrequired - $numentries;
                 if (!empty($options['notify'])) {
                     echo $OUTPUT->notification(
-                            get_string('entrieslefttoadd', 'datalynx', $entriesleft));
+                        get_string('entrieslefttoadd', 'datalynx', $entriesleft)
+                    );
                 }
             }
 
@@ -1992,7 +2116,8 @@ class datalynx {
                     $entrieslefttoview = $this->data->entriestoview - $numentries;
                     if (!empty($options['notify'])) {
                         echo $OUTPUT->notification(
-                                get_string('entrieslefttoaddtoview', 'datalynx', $entrieslefttoview));
+                            get_string('entrieslefttoaddtoview', 'datalynx', $entrieslefttoview)
+                        );
                     }
                     return false;
                 } else {
@@ -2013,7 +2138,6 @@ class datalynx {
         global $CFG, $USER;
         // We need portfolios for export.
         if (!empty($CFG->enableportfolios)) {
-
             // Can export all entries.
             if (has_capability('mod/datalynx:exportallentries', $this->context)) {
                 return true;
@@ -2052,7 +2176,8 @@ class datalynx {
         }
 
         // Anonymous/guest can only add entries if enabled.
-        if ((!isloggedin() || isguestuser()) && empty($entry->id) && $CFG->datalynx_anonymous &&
+        if (
+            (!isloggedin() || isguestuser()) && empty($entry->id) && $CFG->datalynx_anonymous &&
                 $this->data->anonymous
         ) {
             return true;
@@ -2066,14 +2191,16 @@ class datalynx {
             $now = time();
 
             // If there is an activity timeframe, we must be inside the timeframe right now.
-            if ($timeavailable && !($now >= $timeavailable) ||
+            if (
+                $timeavailable && !($now >= $timeavailable) ||
                     ($timedue && !($now < $timedue) && !$allowlate)
             ) {
                 return false;
             }
 
             // If group mode is enabled user has to be in the right group.
-            if ($this->groupmode && !in_array($this->groupmode, $this->internalgroupmodes) &&
+            if (
+                $this->groupmode && !in_array($this->groupmode, $this->internalgroupmodes) &&
                     !has_capability('moodle/site:accessallgroups', $this->context) && (($this->currentgroup &&
                                     !groups_is_member($this->currentgroup)) ||
                             (!$this->currentgroup && $this->groupmode == VISIBLEGROUPS))
@@ -2085,7 +2212,8 @@ class datalynx {
             if (!empty($entry->id)) {
                 // Entry owner.
                 // TODO groups_is_member queries DB for each entry!
-                if (empty($USER->id) ||
+                if (
+                    empty($USER->id) ||
                         (!$this->data->grouped && $USER->id != $entry->userid && !$this->teammember_can_edit($entry)) ||
                         ($this->data->grouped && !groups_is_member($entry->groupid))
                 ) {
@@ -2094,7 +2222,8 @@ class datalynx {
 
                 // If nor status 'draft' neither status 'not set' user is not allowed to manage this entry.
                 require_once($CFG->dirroot . '/mod/datalynx/field/_status/field_class.php');
-                if (!($entry->status == \datalynxfield__status::STATUS_DRAFT ||
+                if (
+                    !($entry->status == \datalynxfield__status::STATUS_DRAFT ||
                         $entry->status == \datalynxfield__status::STATUS_NOT_SET)
                 ) {
                     return false;
@@ -2145,7 +2274,9 @@ class datalynx {
         foreach ($fieldids as $fieldid) {
             // Extract all userids of teammemberselect field.
             $userids = isset($entry->{"c{$fieldid}_content"}) ? json_decode(
-                    $entry->{"c{$fieldid}_content"}, true) : [];
+                $entry->{"c{$fieldid}_content"},
+                true
+            ) : [];
             // Check if $USER is part of the teammembers who are allowed to edit.
             if (in_array($USER->id, $userids)) {
                 return true;
@@ -2289,37 +2420,55 @@ class datalynx {
         $permissions = [];
 
         if ($type === 'any') {
-            if (has_capability('mod/datalynx:viewprivilegeadmin', $this->context, $user, true) ||
+            if (
+                has_capability('mod/datalynx:viewprivilegeadmin', $this->context, $user, true) ||
                     has_capability('mod/datalynx:editprivilegeadmin', $this->context, $user, true)
             ) {
                 $permissions[] = self::PERMISSION_ADMIN;
             }
-            if (has_capability('mod/datalynx:viewprivilegemanager', $this->context, $user, false) ||
-                    has_capability('mod/datalynx:editprivilegemanager', $this->context, $user,
-                            false)
+            if (
+                has_capability('mod/datalynx:viewprivilegemanager', $this->context, $user, false) ||
+                    has_capability(
+                        'mod/datalynx:editprivilegemanager',
+                        $this->context,
+                        $user,
+                        false
+                    )
             ) {
                 $permissions[] = self::PERMISSION_MANAGER;
             }
-            if (has_capability('mod/datalynx:viewprivilegeteacher', $this->context, $user, false) ||
-                    has_capability('mod/datalynx:editprivilegeteacher', $this->context, $user,
-                            false)
+            if (
+                has_capability('mod/datalynx:viewprivilegeteacher', $this->context, $user, false) ||
+                    has_capability(
+                        'mod/datalynx:editprivilegeteacher',
+                        $this->context,
+                        $user,
+                        false
+                    )
             ) {
                 $permissions[] = self::PERMISSION_TEACHER;
             }
-            if (has_capability('mod/datalynx:viewprivilegestudent', $this->context, $user, false) ||
-                    has_capability('mod/datalynx:editprivilegestudent', $this->context, $user,
-                            false)
+            if (
+                has_capability('mod/datalynx:viewprivilegestudent', $this->context, $user, false) ||
+                    has_capability(
+                        'mod/datalynx:editprivilegestudent',
+                        $this->context,
+                        $user,
+                        false
+                    )
             ) {
                 $permissions[] = self::PERMISSION_STUDENT;
             }
-            if (has_capability('mod/datalynx:viewprivilegeguest', $this->context, $user, false) ||
+            if (
+                has_capability('mod/datalynx:viewprivilegeguest', $this->context, $user, false) ||
                     has_capability('mod/datalynx:editprivilegeguest', $this->context, $user, false)
             ) {
                 $permissions[] = self::PERMISSION_GUEST;
             }
         } else {
             if ($edit || $view) {
-                if ((!$view ||
+                if (
+                    (!$view ||
                                 has_capability('mod/datalynx:viewprivilegeadmin', $this->context, $user, true)) &&
                         (!$edit ||
                                 has_capability('mod/datalynx:editprivilegeadmin', $this->context, $user, true))
@@ -2327,34 +2476,62 @@ class datalynx {
                     $permissions[] = self::PERMISSION_ADMIN;
                     $permissions[] = self::PERMISSION_MANAGER; // Bug#876 Admin has manager permission by default.
                 }
-                if ((!$view ||
-                                has_capability('mod/datalynx:viewprivilegemanager', $this->context, $user,
-                                        false)) &&
+                if (
+                    (!$view ||
+                                has_capability(
+                                    'mod/datalynx:viewprivilegemanager',
+                                    $this->context,
+                                    $user,
+                                    false
+                                )) &&
                         (!$edit ||
-                                has_capability('mod/datalynx:editprivilegemanager', $this->context, $user,
-                                        false))
+                                has_capability(
+                                    'mod/datalynx:editprivilegemanager',
+                                    $this->context,
+                                    $user,
+                                    false
+                                ))
                 ) {
                     $permissions[] = self::PERMISSION_MANAGER;
                 }
-                if ((!$view ||
-                                has_capability('mod/datalynx:viewprivilegeteacher', $this->context, $user,
-                                        false)) &&
+                if (
+                    (!$view ||
+                                has_capability(
+                                    'mod/datalynx:viewprivilegeteacher',
+                                    $this->context,
+                                    $user,
+                                    false
+                                )) &&
                         (!$edit ||
-                                has_capability('mod/datalynx:editprivilegeteacher', $this->context, $user,
-                                        false))
+                                has_capability(
+                                    'mod/datalynx:editprivilegeteacher',
+                                    $this->context,
+                                    $user,
+                                    false
+                                ))
                 ) {
                     $permissions[] = self::PERMISSION_TEACHER;
                 }
-                if ((!$view ||
-                                has_capability('mod/datalynx:viewprivilegestudent', $this->context, $user,
-                                        false)) &&
+                if (
+                    (!$view ||
+                                has_capability(
+                                    'mod/datalynx:viewprivilegestudent',
+                                    $this->context,
+                                    $user,
+                                    false
+                                )) &&
                         (!$edit ||
-                                has_capability('mod/datalynx:editprivilegestudent', $this->context, $user,
-                                        false))
+                                has_capability(
+                                    'mod/datalynx:editprivilegestudent',
+                                    $this->context,
+                                    $user,
+                                    false
+                                ))
                 ) {
                     $permissions[] = self::PERMISSION_STUDENT;
                 }
-                if ((!$view ||
+                if (
+                    (!$view ||
                                 has_capability('mod/datalynx:viewprivilegeguest', $this->context, $user, false)) &&
                         (!$edit ||
                                 has_capability('mod/datalynx:editprivilegeguest', $this->context, $user, false))
@@ -2414,8 +2591,10 @@ class datalynx {
         $data->coursename = $this->course->shortname;
         $data->datalynxname = $this->name();
         if (isset($data->view)) {
-            $data->datalynxbaselink = html_writer::link($data->view->get_dl()->get_baseurl(),
-                    $data->datalynxname);
+            $data->datalynxbaselink = html_writer::link(
+                $data->view->get_dl()->get_baseurl(),
+                $data->datalynxname
+            );
             $data->datalynxlink = html_writer::link($data->view->get_baseurl(), $data->datalynxname);
         }
         $data->context = $this->context->id;
@@ -2429,27 +2608,32 @@ class datalynx {
             switch ($event) {
                 case 'entryadded':
                     $event = event\entry_created::create(
-                            ['context' => $this->context, 'objectid' => $id, 'other' => $other]);
+                        ['context' => $this->context, 'objectid' => $id, 'other' => $other]
+                    );
                     $event->trigger();
                     break;
                 case 'entryupdated':
                     $event = event\entry_updated::create(
-                            ['context' => $this->context, 'objectid' => $id, 'other' => $other]);
+                        ['context' => $this->context, 'objectid' => $id, 'other' => $other]
+                    );
                     $event->trigger();
                     break;
                 case 'entrydeleted':
                     $event = event\entry_deleted::create(
-                            ['context' => $this->context, 'objectid' => $id, 'other' => $other]);
+                        ['context' => $this->context, 'objectid' => $id, 'other' => $other]
+                    );
                     $event->trigger();
                     break;
                 case 'entryapproved':
                     $event = event\entry_approved::create(
-                            ['context' => $this->context, 'objectid' => $id, 'other' => $other]);
+                        ['context' => $this->context, 'objectid' => $id, 'other' => $other]
+                    );
                     $event->trigger();
                     break;
                 case 'entrydisapproved':
                     $event = event\entry_disapproved::create(
-                            ['context' => $this->context, 'objectid' => $id, 'other' => $other]);
+                        ['context' => $this->context, 'objectid' => $id, 'other' => $other]
+                    );
                     $event->trigger();
                     break;
                 default:
