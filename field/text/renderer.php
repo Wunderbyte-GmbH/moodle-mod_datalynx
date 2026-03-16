@@ -75,14 +75,19 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
             $format = 'numeric';
         }
         if ($format) {
-            $mform->addRule($fieldname, null, $format, null, 'client');
+            // Special handling for lettersonly to allow Unicode letters.
+            if ($format === 'lettersonly') {
+                $mform->addRule($fieldname, get_string('err_lettersonly', 'form'), 'regex', '/^[\p{L}]+$/u', 'client');
+            } else {
+                $mform->addRule($fieldname, null, $format, null, 'client');
+            }
             // Adjust type.
             switch ($format) {
                 case 'alphanumeric':
                     $mform->setType($fieldname, PARAM_ALPHANUM);
                     break;
                 case 'lettersonly':
-                    $mform->setType($fieldname, PARAM_ALPHA);
+                    $mform->setType($fieldname, PARAM_TEXT); // Use PARAM_TEXT to allow Unicode.
                     break;
                 case 'numeric':
                     $mform->setType($fieldname, PARAM_INT);
