@@ -26,8 +26,12 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->libdir/formslib.php");
 
 /**
+ * Form for adding a preset to a datalynx instance.
  */
 class mod_datalynx_preset_form extends moodleform {
+    /**
+     * Defines the form elements.
+     */
     public function definition() {
         global $COURSE;
 

@@ -24,6 +24,9 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(__FILE__) . '/../classes/local/datalynx.php');
 
+/**
+ * Renderer class for datalynx fields.
+ */
 class datalynx_field_renderer {
     /*
      * Make this more readable:
@@ -35,55 +38,80 @@ class datalynx_field_renderer {
      * If *template is a signifier we assume it is an option.
      */
 
-    // TODO: Name consts sth. sane and integrate these in renderer form.
+    // Name consts sth. sane and integrate these in renderer form.
+    /** @var string Show nothing when field is not visible. */
     const NOT_VISIBLE_SHOW_NOTHING = '___0___';
 
+    /** @var string Show custom template when field is not visible. */
     const NOT_VISIBLE_SHOW_CUSTOM = '___2___';
 
+    /** @var string Display mode template: none. */
     const DISPLAY_MODE_TEMPLATE_NONE = '___0___';
 
+    /** @var string Display mode template: custom. */
     const DISPLAY_MODE_TEMPLATE_CUSTOM = '___2___';
 
+    /** @var string Show nothing when field has no value. */
     const NO_VALUE_SHOW_NOTHING = '___0___';
 
+    /** @var string Show display mode template when field has no value. */
     const NO_VALUE_SHOW_DISPLAY_MODE_TEMPLATE = '___1___';
 
+    /** @var string Show custom template when field has no value. */
     const NO_VALUE_SHOW_CUSTOM = '___2___';
 
+    /** @var string Edit mode template: none. */
     const EDIT_MODE_TEMPLATE_NONE = '___0___';
 
+    /** @var string Edit mode template: same as display mode. */
     const EDIT_MODE_TEMPLATE_AS_DISPLAY_MODE = '___1___';
 
+    /** @var string Edit mode template: custom. */
     const EDIT_MODE_TEMPLATE_CUSTOM = '___2___';
 
+    /** @var string Show nothing when field is not editable. */
     const NOT_EDITABLE_SHOW_NOTHING = '___0___';
 
+    /** @var string Show as display mode when field is not editable. */
     const NOT_EDITABLE_SHOW_AS_DISPLAY_MODE = '___1___';
 
+    /** @var string Show disabled when field is not editable. */
     const NOT_EDITABLE_SHOW_DISABLED = '___3___';
 
+    /** @var string Show custom template when field is not editable. */
     const NOT_EDITABLE_SHOW_CUSTOM = '___2___';
 
+    /** @var string Tag used to represent the field value in templates. */
     const TAG_FIELD_VALUE = "#value";
 
+    /** @var string Tag used to represent the field name in templates. */
     const TAG_FIELD_NAME = "#name";
 
+    /** @var int Renderer ID. */
     private $id;
 
+    /** @var string Renderer name. */
     private $name;
 
+    /** @var string Renderer description. */
     private $description;
 
+    /** @var int The datalynx instance ID. */
     private $dataid;
 
+    /** @var string Template used when field is not visible. */
     private $notvisibletemplate;
 
+    /** @var string Template used for display mode. */
     private $displaytemplate;
 
+    /** @var string Template used when field has no value. */
     private $novaluetemplate;
 
+    /** @var string Template used for edit mode. */
     private $edittemplate;
 
+    /** @var string Template used when field is not editable. */
     private $noteditabletemplate;
 
     /**
@@ -156,6 +184,7 @@ class datalynx_field_renderer {
         return new datalynx_field_renderer($record);
     }
 
+    /** @var array Default renderer configuration. */
     private static $default = ['id' => 0, 'name' => '', 'description' => '',
             'notvisibletemplate' => self::NOT_VISIBLE_SHOW_NOTHING,
             'displaytemplate' => self::DISPLAY_MODE_TEMPLATE_NONE,
@@ -177,12 +206,24 @@ class datalynx_field_renderer {
         return new datalynx_field_renderer($record);
     }
 
+    /**
+     * Returns the renderer object for the given renderer ID.
+     *
+     * @param int $rendererid
+     * @return stdClass
+     */
     public static function get_renderer($rendererid) {
         global $DB;
         $record = $DB->get_record('datalynx_renderers', ['id' => $rendererid]);
         return self::db_to_form($record);
     }
 
+    /**
+     * Converts a database record to form data.
+     *
+     * @param stdClass $record
+     * @return stdClass
+     */
     public static function db_to_form($record) {
         $formdata = new stdClass();
         $formdata->id = isset($record->id) ? $record->id : 0;
@@ -198,6 +239,12 @@ class datalynx_field_renderer {
         return $formdata;
     }
 
+    /**
+     * Converts form data to a database record.
+     *
+     * @param stdClass $formdata
+     * @return stdClass
+     */
     public static function form_to_db($formdata) {
         $record = new stdClass();
         $record->id = isset($formdata->id) ? $formdata->id : 0;
@@ -309,7 +356,7 @@ class datalynx_field_renderer {
         );
         // Update every instance that still has the string ||renderername in it.
         foreach ($connected as $view) {
-            // TODO: Is one check enough or are these separate?
+            // Check if one check is enough or if these are separate cases.
             if (
                 strpos($view->patterns, '|' . $rendererinfo->name) !== false ||
                 strpos($view->param2, '|' . $rendererinfo->name) !== false
