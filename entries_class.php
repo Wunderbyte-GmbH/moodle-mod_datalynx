@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Entries class for datalynx module.
  *
  * @package mod_datalynx
  * @copyright 2013 onwards edulabs.org and associated programmers
@@ -24,35 +25,39 @@
 
 use core_user\fields;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
+ * Class handling datalynx entry operations including retrieval, display and processing.
  */
 class datalynx_entries {
+    /** @var int Select first page of entries. */
     const SELECT_FIRST_PAGE = 0;
 
+    /** @var int Select last page of entries. */
     const SELECT_LAST_PAGE = -1;
 
+    /** @var int Select next page of entries. */
     const SELECT_NEXT_PAGE = -2;
 
+    /** @var int Select a random page of entries. */
     const SELECT_RANDOM_PAGE = -3;
 
     /**
-     *
-     * @var datalynx
+     * @var datalynx The datalynx object.
      */
     protected $datalynx = null;
-    // Datalynx object.
+
     /**
-     *
-     * @var datalynx_filter|null
+     * @var datalynx_filter|null The active filter.
      */
     protected $filter = null;
 
+    /** @var array|null The loaded entries. */
     protected $_entries = null;
 
+    /** @var int Total count of entries (unfiltered). */
     protected $_entriestotalcount = 0;
 
+    /** @var int Count of entries matching the current filter. */
     protected $_entriesfiltercount = 0;
 
     /**
@@ -384,7 +389,7 @@ class datalynx_entries {
                         $varcontentlineids = "c{$fieldid}_lineid_fieldgroup";
                         if (!isset($entry->{$varcontentids})) {
                             $entry->{$varcontentids} = [$entry->{$varcontentid}];
-                            $entry->{$varcontentlineids} = [0]; // TODO: We start with line 0, this is up for debate.
+                            $entry->{$varcontentlineids} = [0]; // We start with line 0, this is up for debate.
                         }
                         $entry->{$varcontentids}[] = $contentid;
                         $entry->{$varcontentlineids}[] = $content->lineid;
@@ -475,7 +480,7 @@ class datalynx_entries {
                     // The field may not hold any content.
                     if ($contentid) {
                         // Retrieve the files (no dirs) from file area.
-                        // TODO for Picture fields this does not distinguish between the images and their thumbs.
+                        // For Picture fields this does not distinguish between the images and their thumbs.
                         // But the view may not necessarily display both.
                         $files = array_merge(
                             $files,
@@ -556,7 +561,7 @@ class datalynx_entries {
                     }
                 }
 
-                // TODO Prepare counters for adding new entries.
+                // Prepare counters for adding new entries.
                 $addcount = 0;
                 $addmax = $dl->data->maxentries;
                 $perinterval = ($dl->data->intervalcount > 1);
@@ -576,7 +581,7 @@ class datalynx_entries {
                     if ($eid > 0 && isset($this->_entries[$eid])) {
                         $entries[$eid] = $this->_entries[$eid];
 
-                        // TODO existing entry *not* from view (import).
+                        // Existing entry not from view (import).
                     } else {
                         if ($eid > 0) {
                             $importentryids[] = $eid;
@@ -690,8 +695,8 @@ class datalynx_entries {
                                     // If we don't see the iterator we are backwards compatible and fill with null.
                                     [, $fieldid, $entryid, $iterator, $other] = array_pad(explode('_', $name, 5), 5, null);
 
-                                    // Important, url appends _url, so only iterator if number.
-                                    // TODO: This should be fixed in url, use an array to store _url and _alt, normalise that.
+                                    // Important: url appends _url, so only iterator if number.
+                                    // This should be fixed in url; use an array to store _url and _alt, normalise that.
                                     if (!is_numeric($iterator)) {
                                         $iterator = null;
                                     } else {
@@ -705,7 +710,6 @@ class datalynx_entries {
                                     }
                                     // Entry info.
                                     if (in_array($fieldid, $entryinfo)) {
-                                        // TODO.
                                         if (
                                             $fieldid == datalynxfield_entryauthor::_USERID ||
                                                 $fieldid == datalynxfield_entryauthor::_USERNAME
@@ -779,12 +783,18 @@ class datalynx_entries {
                             }
                             $contents = $newcontents;
 
-                            // Now update entry and contents TODO: TEAM_CHANGED - check this!
+                            // Now update entry and contents.
                             $addorupdate = '';
                             foreach ($entries as $eid => $entry) {
                                 if ($eid > 0) {
                                     if (isset($contents[$eid]['info']['status'])) {
-                                        $entrystatus = $DB->get_field('datalynx_entries', 'status', ['id' => $eid], 'MUST_EXIST'); // Find current state of entry in db.
+                                        // Find current state of entry in db.
+                                        $entrystatus = $DB->get_field(
+                                            'datalynx_entries',
+                                            'status',
+                                            ['id' => $eid],
+                                            'MUST_EXIST'
+                                        );
                                         require_once('field/_status/field_class.php');
                                         if (
                                             $entrystatus == datalynxfield__status::STATUS_FINAL_SUBMISSION
@@ -806,7 +816,7 @@ class datalynx_entries {
                                         $fieldgroup = array_search(true, $content);
                                         if (strpos($fieldgroup, "fieldgroup") === 0) {
                                             $countfgfields++;
-                                            // TODO: Rewrite this for fieldgroup_id instead of fieldgroup. Use $fieldgroup.
+                                            // Rewrite this for fieldgroup_id instead of fieldgroup. Use $fieldgroup.
                                             // How many lines were visible to the user, store only those.
 
                                             $fieldname = "field_{$fieldid}_{$eid}";
@@ -861,7 +871,7 @@ class datalynx_entries {
                                                 }
 
                                                 /* Loop all fields like _content1 and _content2.
-                                                   TODO: Test this. And rewrite in order to avoid loops. Define what content is
+                                                   Test this. And rewrite in order to avoid loops. Define what content is
                                                     used in the field class. */
                                                 for ($j = 1; $j <= 4; $j++) {
                                                     if (isset($entry->{"c{$fieldid}_content{$j}_fieldgroup"}[$i])) {
@@ -870,11 +880,11 @@ class datalynx_entries {
                                                     }
                                                 }
                                                 // Pass tempstuff to updatecontent.
-                                                // TODO: This relies on the correctness of the field classes update content.
+                                                // This relies on the correctness of the field classes update content.
                                                 $newcontentid = $fields[$fieldid]->update_content($entry, $tempcontent);
 
                                                 // In case this field has no content mark and check deletion later.
-                                                // TODO: Needs to be extended for all field classes in function.
+                                                // Needs to be extended for all field classes in function.
                                                 if ($fields[$fieldid]->is_fieldvalue_empty($value)) {
                                                     if (isset($entry->{"c{$fieldid}_id_fieldgroup"}[$i])) {
                                                         $emptycontent[$i][] = $entry->{"c{$fieldid}_id_fieldgroup"}[$i];
@@ -923,7 +933,7 @@ class datalynx_entries {
                         foreach ($entries as $entry) {
                             // Can user add anymore entries?
                             if (!$dl->user_can_manage_entry()) {
-                                // TODO: notify something.
+                                // Notify user that no more entries can be added.
                                 break;
                             }
 

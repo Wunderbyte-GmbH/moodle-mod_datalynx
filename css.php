@@ -15,12 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * CSS management page for datalynx module.
  *
  * @package mod_datalynx
  * @copyright 2013 onwards Ivan Šakić, Thomas Niedermaier
  * @copyright based on the work by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
  */
 require_once('../../config.php');
 
@@ -38,7 +38,16 @@ if ($urlparams->cssedit) {
     require_once('classes/local/datalynx.php');
     require_once($CFG->libdir . '/formslib.php');
 
+    /**
+     * Form for editing CSS in datalynx.
+     *
+     * @copyright 2013 onwards Ivan Šakić, Thomas Niedermaier
+     * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+     */
     class mod_datalynx_css_form extends moodleform {
+        /**
+         * Define the CSS edit form elements.
+         */
         public function definition() {
             global $COURSE;
 
