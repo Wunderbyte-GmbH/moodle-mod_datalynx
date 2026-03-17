@@ -16,7 +16,6 @@
 
 namespace mod_datalynx\customfilter;
 use stdClass;
-defined('MOODLE_INTERNAL') || die();
 
 /**
  *
@@ -171,6 +170,8 @@ class backend_form extends base_form {
     }
 
     /**
+     * Get all fields that can be used in a customfilter.
+     *
      * @param $dl
      * @return array
      */
@@ -190,6 +191,8 @@ class backend_form extends base_form {
     }
 
     /**
+     * Get a customfilter record from the database by id.
+     *
      * @param $filterid
      * @return mixed
      */
@@ -199,6 +202,8 @@ class backend_form extends base_form {
     }
 
     /**
+     * Get submitted form data and encode field list as JSON.
+     *
      * @return object
      */
     public function get_data() {
@@ -220,6 +225,8 @@ class backend_form extends base_form {
     }
 
     /**
+     * Render the form as HTML.
+     *
      * @return string
      */
     public function html() {
@@ -227,6 +234,8 @@ class backend_form extends base_form {
     }
 
     /**
+     * Validate the submitted form data.
+     *
      * @param array $data
      * @param array $files
      * @return array

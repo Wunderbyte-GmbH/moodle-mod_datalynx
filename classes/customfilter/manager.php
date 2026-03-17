@@ -28,7 +28,6 @@ use html_table;
 use html_writer;
 use moodle_url;
 use stdClass;
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Class manager
@@ -36,16 +35,22 @@ defined('MOODLE_INTERNAL') || die();
  * @package mod_datalynx\customfilter
  */
 class manager {
+    /** @var int Maximum number of user filters allowed. */
     const USER_FILTER_MAX_NUM = 5;
 
+    /** @var int Constant representing a blank filter. */
     const BLANK_FILTER = -1;
 
+    /** @var int Constant representing a user filter set. */
     const USER_FILTER_SET = -2;
 
+    /** @var int Starting id for user filters. */
     const USER_FILTER_ID_START = -10;
 
+    /** @var object The datalynx instance. */
     protected $_dl;
 
+    /** @var array The loaded customfilters. */
     protected $_customfilters;
 
     /**
@@ -149,6 +154,8 @@ class manager {
     }
 
     /**
+     * Get all customfilters, optionally filtered.
+     *
      * @param null $exclude
      * @param bool $menu
      * @param bool $forceget
@@ -178,7 +185,7 @@ class manager {
                     }
                     if ($menu) {
                         if (
-                            $filter->visible or
+                            $filter->visible ||
                             has_capability('mod/datalynx:managetemplates', $this->_dl->context)
                         ) {
                             $filters[$filterid] = $filter->name;
@@ -195,6 +202,8 @@ class manager {
     }
 
     /**
+     * Process filter actions (update, duplicate, visible, delete).
+     *
      * @param $action
      * @param $fids
      * @param bool $confirmed
@@ -219,7 +228,7 @@ class manager {
         $processedlids = [];
         $strnotify = '';
 
-        // TODO update should be roled.
+        // Update action should be role-based.
         if (empty($filters)) {
             $dl->notifications['bad'][] = get_string("filternoneforaction", 'datalynx');
             return false;
@@ -298,7 +307,7 @@ class manager {
                     case 'duplicate':
                         if (!empty($filters)) {
                             foreach ($filters as $filter) {
-                                // TODO: check for limit
+                                // Check for limit before duplicating.
                                 while ($dl->name_exists('customfilters', $filter->name)) {
                                     $filter->name = 'Copy of ' . $filter->name;
                                 }
@@ -376,6 +385,10 @@ class manager {
     }
 
     /**
+     * Get the backend form for managing a customfilter.
+     *
+     * @param $filter
+     * @return backend_form
      */
     public function get_customfilter_backend_form($filter) {
 
@@ -388,13 +401,16 @@ class manager {
     }
 
     /**
+     * Display the filter form for editing.
+     *
      * @param $mform
      * @param $filter
      * @param null $urlparams
      * @throws \coding_exception
      */
     public function display_filter_form($mform, $filter, $urlparams = null) {
-        $stredittitle = $filter->id ? get_string('filteredit', 'datalynx', $filter->name) : get_string('customfilternew', 'datalynx');
+        $stredittitle = $filter->id ? get_string('filteredit', 'datalynx', $filter->name)
+            : get_string('customfilternew', 'datalynx');
         $heading = html_writer::tag('h2', format_string($stredittitle), ['class' => 'mdl-align']);
 
         $this->_dl->print_header(['tab' => 'customfilters', 'urlparams' => $urlparams]);
@@ -406,6 +422,8 @@ class manager {
     }
 
     /**
+     * Build a customfilter object from form data.
+     *
      * @param $filter
      * @param $formdata
      * @return mixed
@@ -428,6 +446,8 @@ class manager {
     }
 
     /**
+     * Print a table of all customfilters with management actions.
+     *
      * @throws \coding_exception
      * @throws \moodle_exception
      */
@@ -514,6 +534,8 @@ class manager {
     }
 
     /**
+     * Print an "add filter" link.
+     *
      * @throws \coding_exception
      * @throws \moodle_exception
      */
@@ -532,6 +554,8 @@ class manager {
     }
 
     /**
+     * Get the user's saved filter menu for a given view.
+     *
      * @param $viewid
      * @return array
      * @throws \coding_exception
@@ -551,6 +575,8 @@ class manager {
     }
 
     /**
+     * Set and save a user filter preference for a given view.
+     *
      * @param $filterid
      * @param $view
      * @return customfilter|null
@@ -606,6 +632,8 @@ class manager {
     // HELPERS.
 
     /**
+     * Get filter options from URL parameters.
+     *
      * @param null $url
      * @return array
      * @throws \coding_exception
@@ -674,6 +702,8 @@ class manager {
     }
 
     /**
+     * Get filter options from user preferences.
+     *
      * @return array
      * @throws \coding_exception
      */

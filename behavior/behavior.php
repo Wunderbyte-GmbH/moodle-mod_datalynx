@@ -23,34 +23,40 @@
 defined('MOODLE_INTERNAL') || die();
 require_once(dirname(__FILE__) . '/../classes/local/datalynx.php');
 
+/**
+ * Class datalynx_field_behavior
+ *
+ * Manages field-level visibility and editability behaviors for datalynx fields.
+ */
 class datalynx_field_behavior {
+    /** @var int The behavior record id. */
     private $id;
 
+    /** @var string The behavior name. */
     private $name;
 
+    /** @var string The behavior description. */
     private $description;
 
+    /** @var int The datalynx instance id. */
     private $dataid;
 
+    /** @var array Visibility settings for this behavior. */
     private $visibleto;
 
+    /** @var array Editability settings for this behavior. */
     private $editableby;
 
+    /** @var bool Whether this field is required. */
     private $required;
 
     /**
-     *
-     * @var datalynx related datalynx instance object
+     * @var datalynx The related datalynx instance object.
      */
     private $datalynx;
 
     /**
-     *
-     * @var stdClass related datalynx behavior DB record
-     */
-
-    /**
-     * @var stdClass the db record
+     * @var stdClass The db record for this behavior.
      */
     private $record;
 
@@ -96,7 +102,7 @@ class datalynx_field_behavior {
         if ($record) {
             return new datalynx_field_behavior($record);
         } else {
-            return false; // TODO: or throw exception?
+            return false; // Return false if behavior not found by name.
         }
     }
 
@@ -115,7 +121,7 @@ class datalynx_field_behavior {
         if ($record) {
             return new datalynx_field_behavior($record);
         } else {
-            return false; // TODO: or throw exception?
+            return false; // Return false if behavior not found by id.
         }
     }
 
@@ -149,6 +155,12 @@ class datalynx_field_behavior {
         return new datalynx_field_behavior($record);
     }
 
+    /**
+     * Check if the given user is a Moodle site administrator.
+     *
+     * @param stdClass $user
+     * @return bool
+     */
     private function user_is_admin($user) {
         $admins = get_admins();
         return in_array($user->id, array_keys($admins));
@@ -394,7 +406,7 @@ class datalynx_field_behavior {
         );
         // Update every instance that still has the string ||behaviorname in it.
         foreach ($connected as $view) {
-            // TODO: Is one check enough or are these separate?
+            // Check if view patterns or param2 contain the behavior name.
             if (
                 strpos($view->patterns, '|' . $behaviorinfo->name) !== false ||
                     strpos($view->param2, '|' . $behaviorinfo->name) !== false
