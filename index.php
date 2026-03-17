@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Datalynx module index page.
  *
  * @package mod_datalynx
  * @copyright 2013 onwards edulabs.org and associated programmers
@@ -22,6 +23,7 @@
  * @copyright 2016 onwards edulabs.org
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require_once("../../config.php");
 require_once("$CFG->dirroot/mod/datalynx/classes/local/datalynx.php");
 require_once("$CFG->dirroot/mod/datalynx/lib.php");
