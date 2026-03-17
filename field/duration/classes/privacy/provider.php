@@ -25,6 +25,7 @@
 
 namespace datalynxfield_duration\privacy;
 
+/** Privacy provider that declares no personal data is stored by this plugin. */
 class provider implements
     // This plugin does not store any personal user data.
     \core_privacy\local\metadata\null_provider {

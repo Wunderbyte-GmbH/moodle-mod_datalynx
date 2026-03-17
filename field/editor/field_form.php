@@ -25,5 +25,6 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
+/** Form class for the editor field type. */
 class datalynxfield_editor_form extends datalynxfield_form {
 }

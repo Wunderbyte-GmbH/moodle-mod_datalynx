@@ -26,8 +26,10 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
+/** Form class for the duration field type. */
 class datalynxfield_duration_form extends datalynxfield_form {
     /**
+     * Define the form elements for the duration field.
      */
     public function field_definition() {
         $mform = &$this->_form;
