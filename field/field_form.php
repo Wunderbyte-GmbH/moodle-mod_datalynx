@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Base form class for datalynx field types.
  *
  * @package mod_datalynx
  * @copyright 2014 onwards by edulabs.org and associated programmers
@@ -25,12 +26,27 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->libdir/formslib.php");
 
+/**
+ * Base form class for datalynx field editing.
+ */
 class datalynxfield_form extends moodleform {
-    protected $_field = null;
+    /** @var datalynxfield_base The field object being edited. */
+    protected $_field = null; // phpcs:ignore moodle.NamingConventions.ValidVariableName.VariableNameUnderscore
 
-    // Variable $_df datalynx.
-    protected $_df = null;
+    /** @var mod_datalynx\datalynx The datalynx instance. */
+    protected $_df = null; // phpcs:ignore moodle.NamingConventions.ValidVariableName.VariableNameUnderscore
 
+    /**
+     * Constructor.
+     *
+     * @param datalynxfield_base $field The field object.
+     * @param string|null $action Form action URL.
+     * @param mixed $customdata Custom form data.
+     * @param string $method Form submission method.
+     * @param string $target Form target.
+     * @param array|null $attributes HTML attributes.
+     * @param bool $editable Whether the form is editable.
+     */
     public function __construct(
         $field,
         $action = null,
@@ -46,6 +62,11 @@ class datalynxfield_form extends moodleform {
         parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
     }
 
+    /**
+     * Defines the form elements.
+     *
+     * @return void
+     */
     public function definition() {
         $mform = &$this->_form;
 
@@ -64,11 +85,19 @@ class datalynxfield_form extends moodleform {
     }
 
     /**
+     * Defines field-specific form elements. Override in subclasses to add field-specific settings.
+     *
+     * @return void
      */
     public function field_definition() {
     }
 
     /**
+     * Adds action buttons to the form.
+     *
+     * @param bool $cancel Whether to add a cancel button.
+     * @param string|null $submit Label for submit button.
+     * @return void
      */
     public function add_action_buttons($cancel = true, $submit = null) {
         $mform = &$this->_form;
@@ -89,6 +118,11 @@ class datalynxfield_form extends moodleform {
     }
 
     /**
+     * Validates form data.
+     *
+     * @param array $data Submitted form data.
+     * @param array $files Submitted files.
+     * @return array Errors array.
      */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
@@ -107,7 +141,7 @@ class datalynxfield_form extends moodleform {
     public function get_datalynx_instances_menu(): array {
         global $DB;
         // Get all Datalynxs where user has managetemplate capability.
-        // TODO there may be too many.
+        // TODO there may be too many. // phpcs:ignore moodle.Commenting.InlineComment.TodoComment
         $sql = "SELECT DISTINCT d.id
                 FROM {datalynx} d
                 INNER JOIN {course_modules} cm ON d.id = cm.instance
@@ -157,17 +191,22 @@ class datalynxfield_form extends moodleform {
 }
 
 /**
- * base form for fields that use multi and single choice options
+ * Base form for fields that use multi and single choice options.
  *
  * @author david
  *
- */
+ */ // phpcs:ignore moodle.Files.OneClassPerFile
 class datalynxfield_option_form extends datalynxfield_form {
     /**
      * @var datalynxfield_option
      */
-    protected $_field = null;
+    protected $_field = null; // phpcs:ignore moodle.NamingConventions.ValidVariableName.VariableNameUnderscore
 
+    /**
+     * Called after form data is processed; adds the option dialog.
+     *
+     * @return void
+     */
     public function definition_after_data() {
         $this->add_option_dialog();
     }

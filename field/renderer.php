@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Base field renderer class for datalynx.
  *
  * @package mod_datalynx
  * @copyright 2013 onwards edulabs.org and associated programmers
@@ -30,15 +31,19 @@ require_once(dirname(__FILE__) . '/../renderer/renderer.php');
  * Base class for field patterns
  */
 abstract class datalynxfield_renderer {
+    /** @var int Whether to show the pattern in the menu. */
     const PATTERN_SHOW_IN_MENU = 0;
 
+    /** @var int Pattern category. */
     const PATTERN_CATEGORY = 1;
 
+    /** @var array Default rendering options. */
     protected static $defaultoptions = ['manage' => false, 'visible' => false, 'edit' => false,
             'editable' => false, 'disabled' => false, 'required' => false, 'internal' => false,
     ];
 
-    protected $_field = null;
+    /** @var datalynxfield_base The field object this renderer is associated with. */
+    protected $_field = null; // phpcs:ignore moodle.NamingConventions.ValidVariableName.VariableNameUnderscore
 
     /**
      * Constructor
@@ -372,6 +377,10 @@ abstract class datalynxfield_renderer {
     }
 
     /**
+     * Returns the menu representation of the patterns supported by this field.
+     *
+     * @param bool $showall Whether to show all patterns or only those visible in the menu.
+     * @return array The patterns menu array.
      */
     final public function get_menu($showall = false) {
         // The default menu category for fields.
@@ -425,6 +434,9 @@ abstract class datalynxfield_renderer {
     }
 
     /**
+     * Returns array of pluginfile patterns for this field.
+     *
+     * @return array
      */
     public function pluginfile_patterns() {
         return [];

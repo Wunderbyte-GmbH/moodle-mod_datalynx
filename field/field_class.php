@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Base class for Datalynx Field Types.
  *
  * @package mod_datalynx
  * @copyright 2013 onwards edulabs.org and associated programmers
@@ -31,10 +32,13 @@ require_once(dirname(__FILE__) . '/../renderer/renderer.php');
  * Base class for Datalynx Field Types
  */
 abstract class datalynxfield_base {
+    /** @var int Field is not visible to anyone. */
     const VISIBLE_NONE = 0;
 
+    /** @var int Field is visible to owner only. */
     const VISIBLE_OWNER = 1;
 
+    /** @var int Field is visible to all. */
     const VISIBLE_ALL = 2;
 
     /**
@@ -55,15 +59,11 @@ abstract class datalynxfield_base {
      */
     public $field = null;
 
-    /**
-     * @var datalynxfield_renderer
-     */
-    protected $_renderer = null;
+    /** @var datalynxfield_renderer The renderer for this field. */
+    protected $_renderer = null; // phpcs:ignore moodle.NamingConventions.ValidVariableName.VariableNameUnderscore
 
-    /**
-     * @var array
-     */
-    protected $_distinctvalues = null;
+    /** @var array|null Cached distinct values for this field. */
+    protected $_distinctvalues = null; // phpcs:ignore moodle.NamingConventions.ValidVariableName.VariableNameUnderscore
 
     /**
      * Can this field be used in fieldgroups?
@@ -87,7 +87,7 @@ abstract class datalynxfield_base {
             if ($df instanceof \mod_datalynx\datalynx) {
                 $this->df = $df;
             } else {
-                // $df is the datalynx id.
+                // Variable $df is the datalynx id.
                 $this->df = new mod_datalynx\datalynx($df);
             }
         }
@@ -191,7 +191,7 @@ abstract class datalynxfield_base {
         if (isset($this->field->$var)) {
             return $this->field->$var;
         } else {
-            // TODO throw an exception if $var is not a property of field.
+            // TODO throw an exception if $var is not a property of field. // phpcs:ignore moodle.Commenting.InlineComment.TodoComment
             return false;
         }
     }
@@ -233,12 +233,18 @@ abstract class datalynxfield_base {
     }
 
     /**
+     * Returns the datalynx instance this field belongs to.
+     *
+     * @return mod_datalynx\datalynx
      */
     public function df() {
         return $this->df;
     }
 
     /**
+     * Returns the form object for editing this field.
+     *
+     * @return moodleform
      */
     public function get_form() {
         global $CFG;
@@ -266,6 +272,9 @@ abstract class datalynxfield_base {
     }
 
     /**
+     * Returns the field data as a form object for pre-populating the edit form.
+     *
+     * @return stdClass
      */
     public function to_form() {
         return $this->field;
@@ -286,6 +295,7 @@ abstract class datalynxfield_base {
         return $this->_renderer;
     }
 
+    /** @var array Default rendering options for field patterns. */
     protected static $defaultoptions = ['manage' => false, 'visible' => false, 'edit' => false,
             'editable' => false, 'disabled' => false, 'required' => false, 'internal' => false,
     ];
@@ -309,6 +319,8 @@ abstract class datalynxfield_base {
     }
 
     /**
+     * Returns whether this field is an internal (system) field.
+     *
      * @return bool
      */
     public static function is_internal() {
@@ -340,7 +352,7 @@ abstract class datalynxfield_base {
             $rec->{"content$c"} = $content;
         }
 
-        // TODO: Bug found,
+        // TODO: Bug found, // phpcs:ignore moodle.Commenting.InlineComment.TodoComment
         // When we add a list of values but the first is empty, this insert is not triggered and the order is inserted wrong.
 
         // Insert only if no old contents and there is new contents.
@@ -348,7 +360,7 @@ abstract class datalynxfield_base {
             return $DB->insert_record('datalynx_contents', $rec);
         }
 
-        // TODO: This needs upgrading, we don't delete the whole entry id but only the one value if other lines exist.
+        // TODO: This needs upgrading, we don't delete the whole entry id but only the one value if other lines exist. // phpcs:ignore moodle.Commenting.InlineComment.TodoComment
         // Delete if old content but not new.
         if (!is_null($contentid) && empty($contents)) {
             return $this->delete_content($entry->id);
@@ -445,7 +457,7 @@ abstract class datalynxfield_base {
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
         $fieldid = $this->field->id;
         $fieldname = $this->name();
-        // TODO.
+        // TODO. // phpcs:ignore moodle.Commenting.InlineComment.TodoComment
         // Ugly hack for internal fields.
         if ($this->is_internal()) {
             $setting = reset($importsettings);
@@ -612,12 +624,18 @@ abstract class datalynxfield_base {
     }
 
     /**
+     * Returns the SQL fragment for sorting by this field.
+     *
+     * @return string
      */
     public function get_sort_sql() {
         return $this->get_sql_compare_text();
     }
 
     /**
+     * Returns the SQL JOIN fragment for searching by this field.
+     *
+     * @return string
      */
     public function get_search_from_sql() {
         $fieldid = $this->field->id;
@@ -730,6 +748,11 @@ abstract class datalynxfield_base {
     }
 
     /**
+     * Parses form data to extract the search value for this field.
+     *
+     * @param stdClass $formdata Submitted form data.
+     * @param int $i Search index.
+     * @return mixed The parsed search value or false.
      */
     public function parse_search($formdata, $i) {
         $fieldid = $this->field->id;
@@ -741,6 +764,10 @@ abstract class datalynxfield_base {
     }
 
     /**
+     * Formats search parameters for display.
+     *
+     * @param array $searchparams Array of search parameters (not, operator, value).
+     * @return string Formatted search description.
      */
     public function format_search_value($searchparams) {
         [$not, $operator, $value] = $searchparams;
@@ -748,6 +775,10 @@ abstract class datalynxfield_base {
     }
 
     /**
+     * Returns the search value to use for this field.
+     *
+     * @param mixed $value The raw search value.
+     * @return mixed The processed search value.
      */
     public function get_search_value($value) {
         return $value;
@@ -810,8 +841,14 @@ abstract class datalynxfield_base {
         return []; // If search is not supported, offer no operators.
     }
 
+    /**
+     * Returns the number of arguments required by the given search operator.
+     *
+     * @param string $operator The search operator.
+     * @return int Number of arguments (0 for empty operator, 1 otherwise).
+     */
     public function get_argument_count(string $operator) {
-        if ($operator === "") { // "Empty" operator
+        if ($operator === "") { // "Empty" operator. // phpcs:ignore moodle.Commenting.InlineComment.InvalidEndChar
             return 0;
         } else {
             return 1;
@@ -840,32 +877,72 @@ abstract class datalynxfield_base {
 
 /**
  * Base class for Datalynx field types that require no content. Example: User profile fields.
- */
+ */ // phpcs:ignore moodle.Files.OneClassPerFile
 abstract class datalynxfield_no_content extends datalynxfield_base {
+    /**
+     * Does nothing for fields with no content.
+     *
+     * @param stdClass $entry The entry object.
+     * @param array|null $values The values to update.
+     * @return bool True.
+     */
     public function update_content(stdClass $entry, array $values = null) {
         return true;
     }
 
+    /**
+     * Does nothing for fields with no content.
+     *
+     * @param int $entryid Entry ID.
+     * @return bool True.
+     */
     public function delete_content($entryid = 0) {
         return true;
     }
 
+    /**
+     * Returns empty array for fields with no content.
+     *
+     * @param int $sortdir Sort direction.
+     * @return array Empty array.
+     */
     public function get_distinct_content($sortdir = 0) {
         return [];
     }
 
+    /**
+     * Returns empty string as no SELECT SQL is needed.
+     *
+     * @return string
+     */
     public function get_select_sql() {
         return '';
     }
 
+    /**
+     * Returns empty string as no sort SQL is needed.
+     *
+     * @return string
+     */
     public function get_sort_sql() {
         return '';
     }
 
+    /**
+     * Returns false as this field does not store content in datalynx_contents.
+     *
+     * @return bool False.
+     */
     public function is_datalynx_content() {
         return false;
     }
 
+    /**
+     * Returns false as this field type has no file area.
+     *
+     * @param string|null $suffix Optional suffix.
+     * @return bool False.
+     */
     protected function filearea($suffix = null) {
         return false;
     }
