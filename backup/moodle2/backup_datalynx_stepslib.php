@@ -30,6 +30,11 @@
  * Define the complete data structure for backup, with file and id annotations
  */
 class backup_datalynx_activity_structure_step extends backup_activity_structure_step {
+    /**
+     * Define the complete data structure for backup, with file and id annotations.
+     *
+     * @return backup_nested_element
+     */
     protected function define_structure() {
         global $DB;
         global $CFG;

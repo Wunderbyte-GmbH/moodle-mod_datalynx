@@ -22,9 +22,19 @@
  */
 namespace mod_datalynx\event;
 
-defined('MOODLE_INTERNAL') || die();
-
+/**
+ * Event for viewing a course module.
+ *
+ * @package mod_datalynx
+ * @copyright 2015 Ivan Šakić
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class course_module_viewed extends \core\event\course_module_viewed {
+    /**
+     * Initialize the event data.
+     *
+     * @return void
+     */
     protected function init() {
         $this->data['objecttable'] = 'datalynx';
         parent::init();

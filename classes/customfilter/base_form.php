@@ -34,6 +34,7 @@ require_once($CFG->libdir . '/formslib.php');
  * @package mod_datalynx\customfilter
  */
 abstract class base_form extends moodleform {
+    /** @var object|null The customfilter instance being managed. */
     protected $_customfilter = null;
 
     /**
