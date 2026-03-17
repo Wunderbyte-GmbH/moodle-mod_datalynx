@@ -27,8 +27,18 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/entries_class.php");
 require_once("$CFG->dirroot/mod/datalynx/field/entryauthor/field_class.php");
 
+/**
+ * Class datalynxtool_entryperuser
+ *
+ * @package    datalynxtool_entryperuser
+ * @copyright  2013 onwards edulabs.org and associated programmers
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class datalynxtool_entryperuser {
     /**
+     * Run the tool to create entries for each user.
+     *
+     * @param mod_datalynx\datalynx $df
      */
     public static function run($df) {
         global $DB;

@@ -38,7 +38,17 @@ require_login($df->data->course, false, $df->cm);
 if ($urlparams->jsedit) {
     require_once($CFG->libdir . '/formslib.php');
 
+    /**
+     * Form to edit JS
+     *
+     * @package mod_datalynx
+     * @copyright 2013 onwards Ivan Sakic, David Bogner, Thomas Niedermaier
+     * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+     */
     class mod_datalynx_js_form extends moodleform {
+        /**
+         * Form definition
+         */
         public function definition() {
             global $CFG, $COURSE;
 

@@ -27,14 +27,29 @@ use core_user\fields;
 defined('MOODLE_INTERNAL') || die();
 
 /**
+ * Class to manage entries
+ *
+ * @package mod_datalynx
  */
 class datalynx_entries {
+    /**
+     * Select first page
+     */
     const SELECT_FIRST_PAGE = 0;
 
+    /**
+     * Select last page
+     */
     const SELECT_LAST_PAGE = -1;
 
+    /**
+     * Select next page
+     */
     const SELECT_NEXT_PAGE = -2;
 
+    /**
+     * Select random page
+     */
     const SELECT_RANDOM_PAGE = -3;
 
     /**
@@ -49,10 +64,19 @@ class datalynx_entries {
      */
     protected $filter = null;
 
+    /**
+     * @var array|null Entries
+     */
     protected $_entries = null;
 
+    /**
+     * @var int Total count of entries
+     */
     protected $_entriestotalcount = 0;
 
+    /**
+     * @var int Filtered count of entries
+     */
     protected $_entriesfiltercount = 0;
 
     /**
@@ -384,7 +408,8 @@ class datalynx_entries {
                         $varcontentlineids = "c{$fieldid}_lineid_fieldgroup";
                         if (!isset($entry->{$varcontentids})) {
                             $entry->{$varcontentids} = [$entry->{$varcontentid}];
-                            $entry->{$varcontentlineids} = [0]; // TODO: We start with line 0, this is up for debate.
+                            // TODO: MDL-66151 We start with line 0, this is up for debate.
+                            $entry->{$varcontentlineids} = [0];
                         }
                         $entry->{$varcontentids}[] = $contentid;
                         $entry->{$varcontentlineids}[] = $content->lineid;
@@ -475,7 +500,7 @@ class datalynx_entries {
                     // The field may not hold any content.
                     if ($contentid) {
                         // Retrieve the files (no dirs) from file area.
-                        // TODO for Picture fields this does not distinguish between the images and their thumbs.
+                        // TODO: MDL-66151 for Picture fields this does not distinguish between the images and their thumbs.
                         // But the view may not necessarily display both.
                         $files = array_merge(
                             $files,
@@ -556,7 +581,7 @@ class datalynx_entries {
                     }
                 }
 
-                // TODO Prepare counters for adding new entries.
+                // TODO: MDL-66151 Prepare counters for adding new entries.
                 $addcount = 0;
                 $addmax = $dl->data->maxentries;
                 $perinterval = ($dl->data->intervalcount > 1);
@@ -576,7 +601,7 @@ class datalynx_entries {
                     if ($eid > 0 && isset($this->_entries[$eid])) {
                         $entries[$eid] = $this->_entries[$eid];
 
-                        // TODO existing entry *not* from view (import).
+                        // TODO: MDL-66151 existing entry *not* from view (import).
                     } else {
                         if ($eid > 0) {
                             $importentryids[] = $eid;
@@ -691,7 +716,8 @@ class datalynx_entries {
                                     [, $fieldid, $entryid, $iterator, $other] = array_pad(explode('_', $name, 5), 5, null);
 
                                     // Important, url appends _url, so only iterator if number.
-                                    // TODO: This should be fixed in url, use an array to store _url and _alt, normalise that.
+                                    // TODO: MDL-66151 This should be fixed in url, use an array to store _url
+                                    // and _alt, normalise that.
                                     if (!is_numeric($iterator)) {
                                         $iterator = null;
                                     } else {
@@ -705,7 +731,7 @@ class datalynx_entries {
                                     }
                                     // Entry info.
                                     if (in_array($fieldid, $entryinfo)) {
-                                        // TODO.
+                                        // TODO: MDL-66151.
                                         if (
                                             $fieldid == datalynxfield_entryauthor::_USERID ||
                                                 $fieldid == datalynxfield_entryauthor::_USERNAME
@@ -779,7 +805,7 @@ class datalynx_entries {
                             }
                             $contents = $newcontents;
 
-                            // Now update entry and contents TODO: TEAM_CHANGED - check this!
+                            // Now update entry and contents TODO: MDL-66151 TEAM_CHANGED - check this!
                             $addorupdate = '';
                             foreach ($entries as $eid => $entry) {
                                 if ($eid > 0) {
@@ -806,7 +832,8 @@ class datalynx_entries {
                                         $fieldgroup = array_search(true, $content);
                                         if (strpos($fieldgroup, "fieldgroup") === 0) {
                                             $countfgfields++;
-                                            // TODO: Rewrite this for fieldgroup_id instead of fieldgroup. Use $fieldgroup.
+                                            // TODO: MDL-66151 Rewrite this for fieldgroup_id instead of fieldgroup.
+                                            // Use $fieldgroup.
                                             // How many lines were visible to the user, store only those.
 
                                             $fieldname = "field_{$fieldid}_{$eid}";
@@ -861,8 +888,8 @@ class datalynx_entries {
                                                 }
 
                                                 /* Loop all fields like _content1 and _content2.
-                                                   TODO: Test this. And rewrite in order to avoid loops. Define what content is
-                                                    used in the field class. */
+                                                   TODO: MDL-66151 Test this. And rewrite in order to avoid loops.
+                                                   Define what content is used in the field class. */
                                                 for ($j = 1; $j <= 4; $j++) {
                                                     if (isset($entry->{"c{$fieldid}_content{$j}_fieldgroup"}[$i])) {
                                                         $entry->{"c{$fieldid}_content{$j}"} =
@@ -870,11 +897,12 @@ class datalynx_entries {
                                                     }
                                                 }
                                                 // Pass tempstuff to updatecontent.
-                                                // TODO: This relies on the correctness of the field classes update content.
+                                                // TODO: MDL-66151 This relies on the correctness of the field classes
+                                                // update content.
                                                 $newcontentid = $fields[$fieldid]->update_content($entry, $tempcontent);
 
                                                 // In case this field has no content mark and check deletion later.
-                                                // TODO: Needs to be extended for all field classes in function.
+                                                // TODO: MDL-66151 Needs to be extended for all field classes in function.
                                                 if ($fields[$fieldid]->is_fieldvalue_empty($value)) {
                                                     if (isset($entry->{"c{$fieldid}_id_fieldgroup"}[$i])) {
                                                         $emptycontent[$i][] = $entry->{"c{$fieldid}_id_fieldgroup"}[$i];
@@ -923,7 +951,7 @@ class datalynx_entries {
                         foreach ($entries as $entry) {
                             // Can user add anymore entries?
                             if (!$dl->user_can_manage_entry()) {
-                                // TODO: notify something.
+                                // TODO: MDL-66151 notify something.
                                 break;
                             }
 

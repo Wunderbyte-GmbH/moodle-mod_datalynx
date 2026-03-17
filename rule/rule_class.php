@@ -211,6 +211,8 @@ abstract class datalynx_rule_base {
     }
 
     /**
+     * Is enabled
+     *
      * @return boolean
      */
     public function is_enabled() {
@@ -218,6 +220,8 @@ abstract class datalynx_rule_base {
     }
 
     /**
+     * Get type
+     *
      * @return string
      */
     public function get_type() {
@@ -243,6 +247,8 @@ abstract class datalynx_rule_base {
     }
 
     /**
+     * Get datalynx object
+     *
      * @return \mod_datalynx\datalynx|null
      */
     public function df() {
@@ -250,6 +256,8 @@ abstract class datalynx_rule_base {
     }
 
     /**
+     * Get form
+     *
      * @return mixed
      * @throws moodle_exception
      */
@@ -271,6 +279,8 @@ abstract class datalynx_rule_base {
     }
 
     /**
+     * To form
+     *
      * @return object
      */
     public function to_form() {

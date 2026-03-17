@@ -32,10 +32,19 @@ require_once($CFG->libdir . '/filelib.php');
  * The class to handle entry exports of a datalynx module
  */
 class datalynx_portfolio_caller extends portfolio_module_caller_base {
+    /**
+     * Content with no files
+     */
     const CONTENT_NOFILES = 0;
 
+    /**
+     * Content with files
+     */
     const CONTENT_WITHFILES = 1;
 
+    /**
+     * Content files only
+     */
     const CONTENT_FILESONLY = 2;
 
     /**
@@ -92,7 +101,7 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
             }
         }
 
-        // TODO by file sizes.
+        // TODO: MDL-66151 by file sizes.
         // (only if export includes embedded files but this is in config and not yet accessible here ...).
         $filetime = PORTFOLIO_TIME_HIGH;
 
@@ -146,7 +155,7 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
 
             // Export content.
             if ($exportfiles != self::CONTENT_FILESONLY) {
-                // TODO the user may choose to export without files.
+                // TODO: MDL-66151 the user may choose to export without files.
                 $content = $view->display(
                     ['controls' => false, 'tohtml' => true,
                                 'pluginfileurl' => $this->exporter->get('format')->get_file_directory(),
@@ -178,6 +187,10 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
     }
 
     /**
+     * Define the export config form
+     *
+     * @param moodleform $mform
+     * @param object $instance
      */
     public function export_config_form(&$mform, $instance) {
         if (!$this->has_export_config()) {
@@ -218,12 +231,18 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
     }
 
     /**
+     * Get allowed export config
+     *
+     * @return array
      */
     public function get_allowed_export_config() {
         return ['spreadsheettype', 'documenttype', 'contentformat', 'separateentries'];
     }
 
     /**
+     * Get return URL
+     *
+     * @return string
      */
     public function get_return_url() {
         global $CFG;

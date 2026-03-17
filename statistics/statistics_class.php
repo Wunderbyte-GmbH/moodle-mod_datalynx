@@ -15,13 +15,13 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Class for handling datalynx statistics calculations and display.
  *
  * @package mod_datalynx
  * @subpackage statistics
  * @copyright 2013 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 class datalynx_statistics_class {
     /*
      * number of total entries ever made / deleted entries
@@ -35,27 +35,47 @@ class datalynx_statistics_class {
      * So sollte es aussehen:
      * time period selector for all Stats with Time period
      * Date selector for all stats with "defined date"
+     * @var int VIEW_TOTAL_ENTRIES_COUNT
      */
+    /** @var int Total entries view count constant */
     const VIEW_TOTAL_ENTRIES_COUNT = 0;
 
+    /** @var int Added entries view count constant */
     const VIEW_ADDED_ENTRIES_COUNT = 1;
 
+    /** @var int Deleted entries view count constant */
     const VIEW_DELETED_ENTRIES_COUNT = 2;
 
+    /** @var int Visits view count constant */
     const VIEW_VISITS_COUNT = 3;
 
+    /** @var int Statistics period mode constant */
     const MODE_PERIOD = 0;
 
+    /** @var int Statistics on date mode constant */
     const MODE_ON_DATE = 1;
 
+    /** @var int Statistics until date mode constant */
     const MODE_UNTIL_DATE = 2;
 
+    /** @var int Statistics from date mode constant */
     const MODE_FROM_DATE = 3;
 
+    /** @var int Statistics all time mode constant */
     const MODE_ALL_TIME = 4;
 
+    /**
+     * Datalynx instance.
+     * @var mod_datalynx\datalynx
+     */
     private $_df;
 
+    /**
+     * datalynx_statistics_class constructor.
+     *
+     * @param int|mod_datalynx\datalynx $df Datalynx ID or object.
+     * @throws coding_exception
+     */
     public function __construct($df = 0) {
         if (empty($df)) {
             throw new coding_exception('Datalynx id or object must be passed to field constructor.');
@@ -68,6 +88,12 @@ class datalynx_statistics_class {
         }
     }
 
+    /**
+     * Print statistics based on provided parameters.
+     *
+     * @param stdClass $params Statistics parameters.
+     * @throws moodle_exception
+     */
     public function print_statistics($params) {
         if (empty($params) || empty($params->show)) {
             echo "<hr />Nothing to display.<hr />";
@@ -153,6 +179,11 @@ class datalynx_statistics_class {
         }
     }
 
+    /**
+     * Get the statistics options form.
+     *
+     * @return datalynx_statistics_form
+     */
     public function get_form() {
         global $CFG;
         $formclass = 'datalynx_statistics_form';
@@ -162,6 +193,14 @@ class datalynx_statistics_class {
         return new $formclass($this, $actionurl);
     }
 
+    /**
+     * Get statistics counts for a given mode and time range.
+     *
+     * @param int $mode Mode constant.
+     * @param int $from Start timestamp.
+     * @param int $to End timestamp.
+     * @return array Array containing counts for total, approved, deleted, and visits.
+     */
     private function get_count($mode, $from = 0, $to = PHP_INT_MAX) {
         global $DB;
 

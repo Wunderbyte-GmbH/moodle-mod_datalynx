@@ -26,7 +26,15 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/rule/rule_form.php");
 
+/**
+ * Event notification rule form
+ *
+ * @package datalynxrule_eventnotification
+ */
 class datalynx_rule_eventnotification_form extends datalynx_rule_form {
+    /**
+     * Definition of the rule settings form
+     */
     public function rule_definition() {
         $br = html_writer::empty_tag('br');
         $mform = &$this->_form;
@@ -140,6 +148,9 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
         return $allusers;
     }
 
+    /**
+     * Definition after data
+     */
     public function definition_after_data() {
         $mform = &$this->_form;
         $data = $this->get_submitted_data();
@@ -173,6 +184,11 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
         }
     }
 
+    /**
+     * Get team member select fields
+     *
+     * @return array
+     */
     protected function get_datalynx_team_fields() {
         global $DB;
         $sql = "SELECT id, name
@@ -184,6 +200,8 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
     }
 
     /**
+     * Get roles used in context
+     *
      * @return array
      */
     protected function menu_roles_used_in_context(): array {
@@ -194,6 +212,11 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
         return $roles;
     }
 
+    /**
+     * Set data for the form
+     *
+     * @param stdClass $data
+     */
     public function set_data($data) {
         if (!empty($data->param3)) {
             $recipients = unserialize($data->param3);
@@ -220,6 +243,12 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
         parent::set_data($data);
     }
 
+    /**
+     * Get data from the form
+     *
+     * @param bool $slashed
+     * @return stdClass|null
+     */
     public function get_data($slashed = true) {
         if ($data = parent::get_data($slashed)) {
             // Set recipient.

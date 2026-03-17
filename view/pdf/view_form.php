@@ -26,8 +26,14 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/view/view_form.php");
 
+/**
+ * PDF view settings form
+ *
+ * @package datalynxview_pdf
+ */
 class datalynxview_pdf_form extends datalynxview_base_form {
     /**
+     * Add view specific elements to the form
      */
     public function view_definition_after_gps() {
         global $COURSE;
@@ -354,6 +360,9 @@ class datalynxview_pdf_form extends datalynxview_base_form {
     }
 
     /**
+     * Preprocess data for the form
+     *
+     * @param stdClass $data
      */
     public function data_preprocessing(&$data) {
         parent::data_preprocessing($data);
@@ -422,6 +431,10 @@ class datalynxview_pdf_form extends datalynxview_base_form {
     }
 
     /**
+     * Prepare signature settings for being serialized
+     *
+     * @param stdClass $data
+     * @param stdClass $signsettings
      */
     protected function data_preprocess_signature(&$data, $signsettings) {
         $data->certpassword = $signsettings->password;
@@ -433,6 +446,9 @@ class datalynxview_pdf_form extends datalynxview_base_form {
     }
 
     /**
+     * Set data for the form
+     *
+     * @param stdClass $data
      */
     public function set_data($data) {
         $this->data_preprocessing($data);
@@ -505,6 +521,10 @@ class datalynxview_pdf_form extends datalynxview_base_form {
     }
 
     /**
+     * Post process protection settings
+     *
+     * @param stdClass $settings
+     * @param stdClass $data
      */
     protected function data_postprocess_protection(&$settings, $data) {
         $view = $this->_view;
@@ -526,6 +546,10 @@ class datalynxview_pdf_form extends datalynxview_base_form {
     }
 
     /**
+     * Post process signature settings
+     *
+     * @param stdClass $settings
+     * @param stdClass $data
      */
     protected function data_postprocess_signature(&$settings, $data) {
         $signsettings = $settings->signature;

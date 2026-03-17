@@ -41,11 +41,18 @@ require_once("$CFG->dirroot/mod/datalynx/classes/view/base.php");
 class datalynxview_tabular extends base {
     protected string $type = 'tabular';
 
+    /**
+     * @var array List of editors
+     */
     protected array $_editors = ['section', 'param2'];
 
+    /**
+     * @var array List of view editors
+     */
     protected array $_vieweditors = ['section', 'param2'];
 
     /**
+     * Generates the default view
      */
     public function generate_default_view() {
         // Get all the fields.
@@ -148,6 +155,12 @@ class datalynxview_tabular extends base {
         $this->view->eparam2 = html_writer::table($table);
     }
 
+    /**
+     * Display the view
+     *
+     * @param array $options
+     * @return string
+     */
     public function display(array $options = []): string {
         parent::display($options);
         global $PAGE;
@@ -161,6 +174,11 @@ class datalynxview_tabular extends base {
         return '';
     }
 
+    /**
+     * Get JS module
+     *
+     * @return array
+     */
     private function get_js_module() {
         $jsmodule = ['name' => 'datalynxview_tabular',
                 'fullpath' => '/mod/datalynx/view/tabular/tabular.js',
@@ -170,6 +188,11 @@ class datalynxview_tabular extends base {
     }
 
     /**
+     * Apply entry group layout
+     *
+     * @param array $entriesset
+     * @param string $name
+     * @return array
      */
     protected function apply_entry_group_layout($entriesset, $name = '') {
         global $OUTPUT;
@@ -260,6 +283,10 @@ class datalynxview_tabular extends base {
     }
 
     /**
+     * Entry definition
+     *
+     * @param array $fielddefinitions
+     * @return array
      */
     protected function entry_definition($fielddefinitions) {
         $elements = [];
@@ -270,6 +297,10 @@ class datalynxview_tabular extends base {
     }
 
     /**
+     * New entry definition
+     *
+     * @param int $entryid
+     * @return array
      */
     protected function new_entry_definition($entryid = -1) {
         $elements = [];

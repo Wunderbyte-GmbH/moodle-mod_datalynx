@@ -15,12 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * CSV view configuration form.
  *
- * @package datalynxview_csv
- * @subpackage csv
- * @copyright 2013 onwards edulabs.org and associated programmers
- * @copyright based on the work by 2012 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    datalynxview_csv
+ * @copyright  2013 onwards edulabs.org and associated programmers
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 
@@ -29,6 +28,7 @@ require_once("$CFG->libdir/csvlib.class.php");
 
 class datalynxview_csv_form extends datalynxview_base_form {
     /**
+     * Add view specific elements to the form.
      */
     public function view_definition_after_gps() {
         $mform = &$this->_form;
@@ -72,6 +72,9 @@ class datalynxview_csv_form extends datalynxview_base_form {
     }
 
     /**
+     * Preprocess data before setting it to the form.
+     *
+     * @param stdClass $data
      */
     public function data_preprocessing(&$data) {
         parent::data_preprocessing($data);
@@ -82,6 +85,9 @@ class datalynxview_csv_form extends datalynxview_base_form {
     }
 
     /**
+     * Set data to the form.
+     *
+     * @param stdClass $data
      */
     public function set_data($data) {
         $this->data_preprocessing($data);
@@ -89,6 +95,10 @@ class datalynxview_csv_form extends datalynxview_base_form {
     }
 
     /**
+     * Get data from the form.
+     *
+     * @param bool $slashed
+     * @return stdClass
      */
     public function get_data($slashed = true) {
         if ($data = parent::get_data($slashed)) {

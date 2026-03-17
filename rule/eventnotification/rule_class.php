@@ -25,23 +25,37 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(__FILE__) . "/../rule_class.php");
 
+/**
+ * Event notification rule
+ *
+ * @package datalynxrule_eventnotification
+ */
 class datalynx_rule_eventnotification extends datalynx_rule_base {
+    /** @var int From author */
     const FROM_AUTHOR = 0;
 
+    /** @var int From current user */
     const FROM_CURRENT_USER = 1;
 
+    /** @var int To author */
     const TO_AUTHOR = 1;
 
+    /** @var int To user */
     const TO_USER = 2;
 
+    /** @var int To roles */
     const TO_ROLES = 4;
 
+    /** @var int To admin */
     const TO_ADMIN = 8;
 
+    /** @var int To email */
     const TO_EMAIL = 16;
 
+    /** @var string Rule type */
     public $type = 'eventnotification';
 
+    /** @var int Sender */
     protected $sender;
 
     /**
@@ -73,6 +87,7 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
     }
 
     /**
+     * Check team
      *
      * @param \core\event\base $event
      * @return bool
@@ -88,6 +103,12 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
         return false;
     }
 
+    /**
+     * Trigger rule
+     *
+     * @param \core\event\base $event
+     * @return bool
+     */
     public function trigger(\core\event\base $event) {
         global $CFG, $SITE, $DB, $USER;
 
@@ -101,7 +122,7 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
             );
             if (!$this->checkteam($event)) {
                 return false;
-                // TODO: In else branch: combine added and removed members if notification sent to changed team.
+                // TODO: MDL-66151 In else branch: combine added and removed members if notification sent to changed team.
             }
         }
 

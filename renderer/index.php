@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Renderer index file
  *
  * @package datalynx_renderer
  * @copyright 2014 Ivan Šakić
@@ -43,7 +44,7 @@ navigation_node::override_active_url(
     new moodle_url('/mod/datalynx/renderer/index.php', ['id' => $datalynx->cm->id])
 );
 
-// TODO: print notifications.
+// TODO: MDL-66151 print notifications.
 
 // Print header.
 $datalynx->print_header(['tab' => 'renderers', 'urlparams' => $urlparams]);

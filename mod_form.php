@@ -27,9 +27,20 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/course/moodleform_mod.php");
 require_once($CFG->dirroot . '/mod/datalynx/classes/local/datalynx.php');
 
+/**
+ * Module settings form
+ *
+ * @package mod_datalynx
+ */
 class mod_datalynx_mod_form extends moodleform_mod {
+    /**
+     * @var object
+     */
     protected $_df = null;
 
+    /**
+     * Definition of the module settings form
+     */
     public function definition() {
         global $CFG;
 
@@ -216,6 +227,9 @@ class mod_datalynx_mod_form extends moodleform_mod {
     }
 
     /**
+     * Preprocess data
+     *
+     * @param array $data
      */
     public function data_preprocessing(&$data) {
         parent::data_preprocessing($data);
@@ -230,6 +244,10 @@ class mod_datalynx_mod_form extends moodleform_mod {
     }
 
     /**
+     * Get data
+     *
+     * @param bool $slashed
+     * @return object
      */
     public function get_data($slashed = true) {
         if ($data = parent::get_data($slashed)) {
@@ -240,6 +258,11 @@ class mod_datalynx_mod_form extends moodleform_mod {
         return $data;
     }
 
+    /**
+     * Add completion rules
+     *
+     * @return array
+     */
     public function add_completion_rules() {
         $mform = &$this->_form;
 
@@ -266,6 +289,9 @@ class mod_datalynx_mod_form extends moodleform_mod {
         return ['completionentriesgroup'];
     }
 
+    /**
+     * Definition after data
+     */
     public function definition_after_data() {
         parent::definition_after_data();
         parent::data_preprocessing($data);
@@ -279,6 +305,12 @@ class mod_datalynx_mod_form extends moodleform_mod {
         }
     }
 
+    /**
+     * Check if completion rule enabled
+     *
+     * @param array $data
+     * @return bool
+     */
     public function completion_rule_enabled($data) {
         return (!empty($data['completionentriesenabled']) && $data['completionentries'] > 0);
     }

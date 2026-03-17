@@ -29,8 +29,23 @@ require_once("$CFG->libdir/formslib.php");
  * Statistics option form
  */
 class datalynx_statistics_form extends moodleform {
+    /**
+     * Data instance.
+     * @var datalynx|\mod_datalynx\datalynx
+     */
     private $_df = null;
 
+    /**
+     * datalynx_statistics_form constructor.
+     *
+     * @param mod_datalynx\datalynx $df
+     * @param string|null $action
+     * @param mixed $customdata
+     * @param string $method
+     * @param string $target
+     * @param array|null $attributes
+     * @param bool $editable
+     */
     public function __construct(
         $df,
         $action = null,
@@ -44,6 +59,9 @@ class datalynx_statistics_form extends moodleform {
         $this->_df = $df;
     }
 
+    /**
+     * Form definition.
+     */
     public function definition() {
         $df = $this->_df;
         $mform = &$this->_form;
@@ -127,6 +145,13 @@ class datalynx_statistics_form extends moodleform {
         $mform->disable_form_change_checker();
     }
 
+    /**
+     * Form validation.
+     *
+     * @param array $data
+     * @param array $files
+     * @return array
+     */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 

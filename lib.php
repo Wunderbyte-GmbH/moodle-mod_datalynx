@@ -742,6 +742,12 @@ function mod_datalynx_pluginfile($course, $cm, $context, $filearea, $args, $forc
 }
 
 /**
+ * Extend navigation.
+ *
+ * @param navigation_node $navigation The navigation node to extend
+ * @param stdClass $course The course object
+ * @param stdClass $module The module object
+ * @param stdClass $cm The course module object
  */
 function datalynx_extend_navigation($navigation, $course, $module, $cm) {
 }
@@ -980,7 +986,7 @@ function datalynx_user_complete($course, $user, $mod, $data) {
     }
     $sqlparams = ['dataid' => $data->id, 'userid' => $user->id];
     if ($countrecords = $DB->count_records('datalynx_entries', $sqlparams)) {
-        // TODO get the default view add a filter for user only and display.
+        // TODO: MDL-66151 get the default view add a filter for user only and display.
         $x = 1;
     }
 }
@@ -988,12 +994,18 @@ function datalynx_user_complete($course, $user, $mod, $data) {
 // Participantion Reports.
 
 /**
+ * Get view actions
+ *
+ * @return array
  */
 function datalynx_get_view_actions() {
     return ['view'];
 }
 
 /**
+ * Get post actions
+ *
+ * @return array
  */
 function datalynx_get_post_actions() {
     return ['add', 'update', 'record delete'];
@@ -1045,6 +1057,10 @@ function datalynx_comment_validate($commentparam) {
 }
 
 /**
+ * Add a comment
+ *
+ * @param stdClass $newcomment
+ * @param stdClass $commentparam
  */
 function datalynx_comment_add($newcomment, $commentparam) {
     $df = new mod_datalynx\datalynx($commentparam->cm->instance);

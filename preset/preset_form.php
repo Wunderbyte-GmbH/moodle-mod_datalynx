@@ -26,8 +26,12 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->libdir/formslib.php");
 
 /**
+ * Preset form
  */
 class mod_datalynx_preset_form extends moodleform {
+    /**
+     * Define the form
+     */
     public function definition() {
         global $COURSE;
 

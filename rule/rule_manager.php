@@ -75,6 +75,12 @@ class datalynx_rule_manager {
         return $eventmenu;
     }
 
+    /**
+     * Get team fields menu for a given dataid
+     *
+     * @param int $dataid
+     * @return array
+     */
     private static function get_team_fields_menu($dataid) {
         global $DB;
         $params = ['dataid' => $dataid, 'type' => 'teammemberselect'];
@@ -84,7 +90,7 @@ class datalynx_rule_manager {
     /**
      * constructor
      *
-     * @param $datalynx datalynx
+     * @param mod_datalynx\datalynx $datalynx datalynx
      */
     public function __construct(mod_datalynx\datalynx $datalynx) {
         $this->_df = $datalynx;
@@ -238,6 +244,12 @@ class datalynx_rule_manager {
     }
 
     /**
+     * Process rule actions (add, update, enabled, duplicate, delete)
+     *
+     * @param string $action
+     * @param string $rids
+     * @param bool $confirmed
+     * @return array|bool
      */
     public function process_rules($action, $rids, $confirmed = false) {
         global $OUTPUT, $DB;
@@ -245,7 +257,7 @@ class datalynx_rule_manager {
         $df = $this->_df;
 
         if (!has_capability('mod/datalynx:managetemplates', $df->context)) {
-            // TODO throw exception.
+            // TODO MDL-00000 throw exception.
             return false;
         }
 
@@ -288,7 +300,7 @@ class datalynx_rule_manager {
             } else {
                 // Go ahead and perform the requested action.
                 switch ($action) {
-                    case 'add': // TODO add new.
+                    case 'add': // TODO MDL-00000 add new.
                         if ($forminput = data_submitted()) {
                             // Check for arrays and convert to a comma-delimited string.
                             $df->convert_arrays_to_strings($forminput);
@@ -409,6 +421,7 @@ class datalynx_rule_manager {
     }
 
     /**
+     * Print the list of rules in a table
      */
     public function print_rule_list() {
         global $OUTPUT;
@@ -511,6 +524,7 @@ class datalynx_rule_manager {
     }
 
     /**
+     * Print the "Add rule" selection menu
      */
     public function print_add_rule() {
         global $OUTPUT;
@@ -542,6 +556,12 @@ class datalynx_rule_manager {
         );
     }
 
+    /**
+     * Notify team members about an event
+     *
+     * @param stdClass $data
+     * @param \core\event\base $event
+     */
     private static function notify_team_members(stdClass $data, $event) {
         global $CFG, $SITE, $USER, $DB;
 

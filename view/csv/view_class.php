@@ -29,28 +29,73 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/classes/view/base.php");
 
+/**
+ * CSV view class.
+ *
+ * @package    datalynxview_csv
+ * @copyright  2013 onwards edulabs.org and associated programmers
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class datalynxview_csv extends base {
+    /** @var string Export all entries */
     const EXPORT_ALL = 'all';
 
+    /** @var string Export current page */
     const EXPORT_PAGE = 'page';
 
+    /**
+     * View type.
+     * @var string
+     */
     protected string $type = 'csv';
 
+    /**
+     * Output format.
+     * @var string
+     */
     protected string $_output = 'csv';
 
+    /**
+     * CSV delimiter.
+     * @var string
+     */
     protected string $_delimiter = 'comma';
 
+    /**
+     * CSV enclosure.
+     * @var string
+     */
     protected string $_enclosure = '';
 
+    /**
+     * CSV encoding.
+     * @var string
+     */
     protected string $_encoding = 'UTF-8';
 
+    /**
+     * Editors list.
+     * @var array
+     */
     protected array $_editors = ['section'];
 
+    /**
+     * Columns list.
+     * @var array|null
+     */
     protected ?array $_columns = null;
 
+    /**
+     * Show import form flag.
+     * @var bool
+     */
     protected $_showimportform = false;
 
     /**
+     * datalynxview_csv constructor.
+     *
+     * @param int|stdClass $df
+     * @param int|stdClass $view
      */
     public function __construct($df = 0, $view = 0) {
         parent::__construct($df, $view);
@@ -66,6 +111,11 @@ class datalynxview_csv extends base {
     }
 
     /**
+     * Apply entry group layout.
+     *
+     * @param array $entriesset
+     * @param string $name
+     * @return array
      */
     protected function apply_entry_group_layout($entriesset, $name = '') {
         global $OUTPUT;
@@ -128,6 +178,10 @@ class datalynxview_csv extends base {
     }
 
     /**
+     * Entry definition.
+     *
+     * @param array $fielddefinitions
+     * @return array
      */
     protected function entry_definition($fielddefinitions) {
         $elements = [];
@@ -161,6 +215,10 @@ class datalynxview_csv extends base {
     }
 
     /**
+     * New entry definition.
+     *
+     * @param int $entryid
+     * @return array
      */
     protected function new_entry_definition($entryid = -1) {
         $elements = [];
@@ -257,7 +315,9 @@ class datalynxview_csv extends base {
     }
 
     /**
-     * @param $range
+     * Process export.
+     *
+     * @param string $range
      * @return void
      */
     public function process_export(string $range = self::EXPORT_PAGE) {
@@ -306,6 +366,10 @@ class datalynxview_csv extends base {
     }
 
     /**
+     * Get CSV content.
+     *
+     * @param string $range
+     * @return array|null
      */
     public function get_csv_content($range = self::EXPORT_PAGE) {
         // Set content.
@@ -379,6 +443,9 @@ class datalynxview_csv extends base {
     }
 
     /**
+     * Process import.
+     *
+     * @return bool|null
      */
     public function process_import() {
         global $CFG;
@@ -446,7 +513,9 @@ class datalynxview_csv extends base {
     }
 
     /**
-     * @param $data
+     * Execute import.
+     *
+     * @param stdClass $data
      * @return bool|null
      */
     public function execute_import($data) {
@@ -525,8 +594,9 @@ class datalynxview_csv extends base {
     }
 
     /**
+     * Get import form.
+     *
      * @return datalynxview_csv_import_form
-     * @throws moodle_exception
      */
     public function get_import_form() {
         global $CFG;
@@ -634,6 +704,9 @@ class datalynxview_csv extends base {
     }
 
     /**
+     * Check if view has headers.
+     *
+     * @return bool
      */
     protected function has_headers() {
         foreach ($this->get_columns() as $column) {
@@ -646,24 +719,36 @@ class datalynxview_csv extends base {
 
     // GETTERS.
     /**
+     * Get output type.
+     *
+     * @return string
      */
     public function get_output_type() {
         return $this->_output;
     }
 
     /**
+     * Get delimiter.
+     *
+     * @return string
      */
     public function get_delimiter() {
         return $this->_delimiter;
     }
 
     /**
+     * Get enclosure.
+     *
+     * @return string
      */
     public function get_enclosure() {
         return $this->_enclosure;
     }
 
     /**
+     * Get encoding.
+     *
+     * @return string
      */
     public function get_encoding() {
         return $this->_encoding;

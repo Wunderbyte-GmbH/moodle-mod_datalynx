@@ -28,8 +28,14 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/view/view_form.php");
 
+/**
+ * Tabular view settings form
+ *
+ * @package datalynxview_tabular
+ */
 class datalynxview_tabular_form extends datalynxview_base_form {
     /**
+     * Add view specific elements to the form
      */
     public function view_definition_after_gps() {
         $view = $this->_view;

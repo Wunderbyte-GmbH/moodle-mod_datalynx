@@ -30,10 +30,30 @@ require_once("$CFG->libdir/formslib.php");
 require_once("$CFG->libdir/csvlib.class.php");
 
 /**
+ * CSV import form class.
+ *
+ * @package    datalynxview_csv
+ * @copyright  2013 onwards edulabs.org and associated programmers
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class datalynxview_csv_import_form extends moodleform {
+    /**
+     * View instance.
+     * @var datalynxview_csv
+     */
     protected $_view;
 
+    /**
+     * datalynxview_csv_import_form constructor.
+     *
+     * @param datalynxview_csv $view
+     * @param mixed $action
+     * @param mixed $customdata
+     * @param string $method
+     * @param string $target
+     * @param mixed $attributes
+     * @param bool $editable
+     */
     public function __construct(
         $view,
         $action = null,
@@ -49,11 +69,17 @@ class datalynxview_csv_import_form extends moodleform {
     }
 
     /**
+     * Return form HTML.
+     *
+     * @return string
      */
     public function html() {
         return $this->_form->toHtml();
     }
 
+    /**
+     * Form definition.
+     */
     public function definition() {
         $view = $this->_view;
         $fieldsettings = empty($this->_customdata['hidefieldsettings']) ? true : false;
@@ -74,6 +100,7 @@ class datalynxview_csv_import_form extends moodleform {
     }
 
     /**
+     * Field settings.
      */
     protected function field_settings() {
         $view = $this->_view;
@@ -113,6 +140,7 @@ class datalynxview_csv_import_form extends moodleform {
     }
 
     /**
+     * CSV settings.
      */
     protected function csv_settings() {
         $view = $this->_view;

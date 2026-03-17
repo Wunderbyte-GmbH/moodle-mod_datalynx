@@ -23,11 +23,16 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// TODO: Check why namespace is different then component name.
+// TODO: MDL-66151 Check why namespace is different then component name.
 namespace datalynxrule_eventnotification\privacy;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Privacy provider class
+ *
+ * @package datalynxrule_eventnotification
+ */
 class provider implements
     // This plugin does not store any personal user data.
     \core_privacy\local\metadata\null_provider {

@@ -24,7 +24,15 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/formslib.php');
 
+/**
+ * Entries form
+ *
+ * @package mod_datalynx
+ */
 class datalynxview_entries_form extends moodleform {
+    /**
+     * Form definition
+     */
     protected function definition() {
         $view = $this->_customdata['view'];
         $mform = &$this->_form;
@@ -55,6 +63,13 @@ class datalynxview_entries_form extends moodleform {
         $mform->closeHeaderBefore('delegatebuttonar');
     }
 
+    /**
+     * Validation
+     *
+     * @param array $data
+     * @param array $files
+     * @return array
+     */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 

@@ -27,8 +27,15 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/view/view_form.php");
 require_once("$CFG->libdir/csvlib.class.php");
 
+/**
+ * Report view settings form
+ *
+ * @package datalynxview_report
+ */
 class datalynxview_report_form extends datalynxview_base_form {
     /**
+     * Add view specific elements to the form
+     *
      * @return void
      */
     public function view_definition_after_gps(): void {
@@ -67,7 +74,7 @@ class datalynxview_report_form extends datalynxview_base_form {
         }
 
         // The fields to be grouped in order to get the sum: for example the sum of selected values for the author x.
-        // Or the sum of all selected values of the field chosen above for the entry with this teammember
+        // Or the sum of all selected values of the field chosen above for the entry with this teammember.
 
         $fieldnames = [];
         if (!empty($fields)) {
@@ -101,7 +108,7 @@ class datalynxview_report_form extends datalynxview_base_form {
         $options = ['sumoffield' => get_string('sumoffield', 'datalynxview_report')];
         $mform->addElement('select', 'param3', get_string('reporttype', 'datalynxview_report'), $options);
 
-        // Calculate sums for this period
+        // Calculate sums for this period.
         $fieldnames = [];
         $fieldnames['nosums'] = get_string('nosums', 'datalynxview_report');
         $fieldnames['month'] = get_string('month');
@@ -124,12 +131,18 @@ class datalynxview_report_form extends datalynxview_base_form {
     }
 
     /**
+     * Preprocess data for the form
+     *
+     * @param stdClass $data
      */
     public function data_preprocessing(&$data) {
         parent::data_preprocessing($data);
     }
 
     /**
+     * Set data for the form
+     *
+     * @param stdClass $data
      */
     public function set_data($data) {
         $this->data_preprocessing($data);
@@ -137,6 +150,10 @@ class datalynxview_report_form extends datalynxview_base_form {
     }
 
     /**
+     * Get data from the form
+     *
+     * @param bool $slashed
+     * @return stdClass|null
      */
     public function get_data($slashed = true) {
         return parent::get_data($slashed);

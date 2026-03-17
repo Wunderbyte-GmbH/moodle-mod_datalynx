@@ -15,8 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * View edit file
  *
- * @package datalynxview
+ * @package mod_datalynx
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -61,7 +62,8 @@ $commonrenderers = $DB->get_records_select_menu(
     'name AS value, name AS label'
 );
 foreach ($fields as $field) {
-    $options['renderers'][$field] = $commonrenderers; // TODO: add field-specific renderers here.
+    // TODO: MDL-66151 add field-specific renderers here.
+    $options['renderers'][$field] = $commonrenderers;
     $options['renderers'][$field][''] = get_string('defaultrenderer', 'datalynx');
 }
 $options['types'] = $DB->get_records_select_menu(
@@ -113,7 +115,7 @@ if ($mform->is_cancelled()) {
 } else {
     if ($mform->no_submit_button_pressed()) {
         // Reset view to default.
-        // TODO is this the best way?
+        // TODO MDL-66151 is this the best way?
         $resettodefault = optional_param('resetdefaultbutton', '', PARAM_ALPHA);
         if ($resettodefault) {
             $urlparams->resetdefault = 1;
@@ -149,7 +151,7 @@ if ($mform->is_cancelled()) {
             }
 
             if (!isset($data->submitreturnbutton)) {
-                // TODO: set default view.
+                // TODO: MDL-66151 set default view.
 
                 if ($urlparams->returnurl) {
                     redirect($urlparams->returnurl);

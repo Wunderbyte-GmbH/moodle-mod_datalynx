@@ -27,6 +27,11 @@ namespace datalynxview_report\privacy;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Privacy provider class
+ *
+ * @package datalynxview_report
+ */
 class provider implements
     // This plugin does not store any personal user data.
     \core_privacy\local\metadata\null_provider {

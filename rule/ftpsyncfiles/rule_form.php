@@ -26,7 +26,15 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/rule/rule_form.php");
 
+/**
+ * FTP sync files rule form
+ *
+ * @package datalynxrule_ftpsyncfiles
+ */
 class datalynx_rule_ftpsyncfiles_form extends datalynx_rule_form {
+    /**
+     * Define the rule settings form
+     */
     public function rule_definition() {
         $br = html_writer::empty_tag('br');
         $mform = &$this->_form;
@@ -174,13 +182,18 @@ class datalynx_rule_ftpsyncfiles_form extends datalynx_rule_form {
     }
 
     /**
-     * @param $data
+     * Preprocess data for the form
+     *
+     * @param object $data
      * @return void
      */
     public function data_preprocessing(&$data) {
     }
 
     /**
+     * Set data for the form
+     *
+     * @param object $data
      */
     public function set_data($data) {
         if (!empty($data->param2)) {
@@ -205,7 +218,9 @@ class datalynx_rule_ftpsyncfiles_form extends datalynx_rule_form {
     }
 
     /**
-     * @param $slashed
+     * Get data from the form
+     *
+     * @param bool $slashed
      * @return object
      */
     public function get_data($slashed = true) {

@@ -31,6 +31,12 @@ require_once("$CFG->dirroot/mod/datalynx/view/view_patterns.php");
  */
 class datalynxview_pdf_patterns extends datalynxview_patterns {
     /**
+     * Get replacements for tags
+     *
+     * @param array $tags
+     * @param stdClass $entry
+     * @param array $options
+     * @return array
      */
     public function get_replacements($tags = null, $entry = null, array $options = []) {
         global $CFG, $OUTPUT;
@@ -74,6 +80,10 @@ class datalynxview_pdf_patterns extends datalynxview_patterns {
     }
 
     /**
+     * Get patterns
+     *
+     * @param bool $checkvisibility
+     * @return array
      */
     protected function patterns($checkvisibility = true): array {
         $patterns = parent::patterns($checkvisibility);

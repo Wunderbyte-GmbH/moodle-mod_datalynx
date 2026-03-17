@@ -17,20 +17,18 @@
 /**
  * mod_datalynx data generator
  *
- * @package mod_datalynx
- * @category phpunit
- * @copyright 2013 onwards edulabs.org and associated programmers
- * @copyright based on the work by 2012 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    mod_datalynx
+ * @copyright  2013 onwards edulabs.org and associated programmers
+ * @copyright  based on the work by 2012 Itamar Tzadok
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 /**
  * Page module PHPUnit data generator class
  *
- * @package mod_datalynx
- * @category phpunit
- * @copyright 2014 Ivan Šakić
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    mod_datalynx
+ * @copyright  2014 Ivan Šakić
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_datalynx_generator extends testing_module_generator {
     /**

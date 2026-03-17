@@ -30,8 +30,10 @@ defined('MOODLE_INTERNAL') || die();
  * Base class for view patterns
  */
 class datalynxview_patterns {
+    /** @var int Pattern show in menu constant */
     const PATTERN_SHOW_IN_MENU = 0;
 
+    /** @var int Pattern category constant */
     const PATTERN_CATEGORY = 1;
 
     /**
@@ -534,6 +536,7 @@ class datalynxview_patterns {
 
             case '##multiexport##':
                 $buttonval = get_string('multiexport', 'datalynx');
+                // Fall through.
             case '##multiexport:icon##':
                 $buttonval = !isset($buttonval) ? $OUTPUT->pix_icon(
                     't/portfolioadd',
@@ -630,7 +633,9 @@ class datalynxview_patterns {
     }
 
     /**
-     * @param array $fieldinput
+     * Convert array content fields to string
+     *
+     * @param array $contentfields
      * @return string
      */
     protected function contentfield_convert_array_to_string($contentfields) {

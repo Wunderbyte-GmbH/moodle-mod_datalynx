@@ -32,28 +32,64 @@ use setasign\Fpdi\Tcpdf\Fpdi;
 
 require_once($CFG->dirroot . '/mod/assign/feedback/editpdf/fpdi/autoload.php');
 
+/**
+ * PDF view class
+ *
+ * @package datalynxview_pdf
+ */
 class datalynxview_pdf extends base {
+
+    /**
+     * Export all entries
+     */
     const EXPORT_ALL = 'all';
 
+    /**
+     * Export current page
+     */
     const EXPORT_PAGE = 'page';
 
+    /**
+     * Export single entry
+     */
     const EXPORT_ENTRY = 'entry';
 
+    /**
+     * Page break html
+     */
     const PAGE_BREAK = '<div class="pdfpagebreak"></div>';
 
+    /**
+     * @var string View type
+     */
     protected string $type = 'pdf';
 
+    /**
+     * @var array List of editors
+     */
     protected array $_editors = ['section', 'param2', 'param3', 'param4',
     ];
 
+    /**
+     * @var array List of view editors
+     */
     protected array $_vieweditors = ['section', 'param2', 'param3', 'param4',
     ];
 
+    /**
+     * @var stdClass|null PDF settings
+     */
     protected $_settings = null;
 
+    /**
+     * @var array|null Temporary files
+     */
     protected $_tmpfiles = null;
 
     /**
+     * Get permission options for PDF
+     *
+     * @return array
      */
     public static function get_permission_options() {
         return ['print' => get_string('perm_print', 'datalynxview_pdf'),
@@ -66,6 +102,10 @@ class datalynxview_pdf extends base {
     }
 
     /**
+     * Constructor
+     *
+     * @param int $df Datalynx instance id
+     * @param int $view View id
      */
     public function __construct($df = 0, $view = 0) {
         parent::__construct($df, $view);
@@ -86,7 +126,8 @@ class datalynxview_pdf extends base {
                 'unit' => !empty($settings->unit) ? $settings->unit : 'mm',
                 'format' => !empty($settings->format) ? $settings->format : 'LETTER',
                 'destination' => !empty($settings->destination) ? $settings->destination : 'I',
-                'pdfframefirstpageonly' => !empty($settings->pdfframefirstpageonly) ? $settings->pdfframefirstpageonly : 0,
+                'pdfframefirstpageonly' => !empty($settings->pdfframefirstpageonly) ?
+                        $settings->pdfframefirstpageonly : 0,
                 'transparency' => !empty($settings->transparency) ? $settings->transparency : 0.5,
                 'pagebreak' => !empty($settings->pagebreak) ? $settings->pagebreak : 'auto',
                 'toc' => (object) [
@@ -116,9 +157,12 @@ class datalynxview_pdf extends base {
                         'keep' => !empty($settings->margins->keep) ? $settings->margins->keep : false,
                 ],
                 'protection' => (object) [
-                        'permissions' => !empty($settings->protection->permissions) ? $settings->protection->permissions : [],
-                        'user_pass' => !empty($settings->protection->user_pass) ? $settings->protection->user_pass : '',
-                        'owner_pass' => !empty($settings->protection->owner_pass) ? $settings->protection->owner_pass : null,
+                        'permissions' => !empty($settings->protection->permissions) ?
+                                $settings->protection->permissions : [],
+                        'user_pass' => !empty($settings->protection->user_pass) ?
+                                $settings->protection->user_pass : '',
+                        'owner_pass' => !empty($settings->protection->owner_pass) ?
+                                $settings->protection->owner_pass : null,
                         'mode' => !empty($settings->protection->mode) ? $settings->protection->mode : null,
                 ],
                 'signature' => (object) [
@@ -126,9 +170,11 @@ class datalynxview_pdf extends base {
                         'type' => !empty($settings->signature->type) ? $settings->signature->type : 1,
                         'info' => [
                          'Name' => !empty($settings->signature->info->Name) ? $settings->signature->info->Name : '',
-                         'Location' => !empty($settings->signature->info->Location) ? $settings->signature->info->Location : '',
+                         'Location' => !empty($settings->signature->info->Location) ?
+                                 $settings->signature->info->Location : '',
                          'Reason' => !empty($settings->signature->info->Reason) ? $settings->signature->info->Reason : '',
-                     'ContactInfo' => !empty($settings->signature->info->ContactInfo) ? $settings->signature->info->ContactInfo : '',
+                     'ContactInfo' => !empty($settings->signature->info->ContactInfo) ?
+                             $settings->signature->info->ContactInfo : '',
                         ],
                 ]];
     }
@@ -155,6 +201,9 @@ class datalynxview_pdf extends base {
     }
 
     /**
+     * Process PDF export
+     *
+     * @param string|int $export Export type or entry ID
      */
     public function process_export($export = self::EXPORT_PAGE) {
         $settings = $this->_settings;
@@ -311,6 +360,9 @@ class datalynxview_pdf extends base {
     }
 
     /**
+     * Get PDF settings
+     *
+     * @return stdClass
      */
     public function get_pdf_settings() {
         return $this->_settings;
@@ -529,8 +581,10 @@ class datalynxview_pdf extends base {
     }
 
     /**
+     * Apply entry group layout
+     *
      * @param $entriesset
-     * @param $name string
+     * @param string $name
      * @return array
      */
     protected function apply_entry_group_layout($entriesset, $name = '') {
@@ -557,6 +611,10 @@ class datalynxview_pdf extends base {
     }
 
     /**
+     * New entry definition
+     *
+     * @param int $entryid
+     * @return array
      */
     protected function new_entry_definition($entryid = -1) {
         $elements = [];
@@ -593,6 +651,11 @@ class datalynxview_pdf extends base {
     }
 
     /**
+     * Set page bookmarks
+     *
+     * @param dfpdf $pdf
+     * @param string $pagecontent
+     * @return string
      */
     protected function set_page_bookmarks($pdf, $pagecontent) {
         $settings = $this->_settings;
@@ -632,6 +695,9 @@ class datalynxview_pdf extends base {
     }
 
     /**
+     * Set frame
+     *
+     * @param dfpdf $pdf
      */
     protected function set_frame($pdf) {
         // Add to pdf frame image if any.
@@ -677,6 +743,9 @@ class datalynxview_pdf extends base {
     }
 
     /**
+     * Set watermark
+     *
+     * @param dfpdf $pdf
      */
     protected function set_watermark($pdf) {
         // Add to pdf watermark image if any.
@@ -698,8 +767,7 @@ class datalynxview_pdf extends base {
             $filepath = $tmpdir . "files/$filename";
             if ($wmark->copy_content_to($filepath)) {
                 [$wmarkwidth, $wmarkheight, ] = array_values($wmark->get_imageinfo());
-                // TODO 25.4 in Inch (assuming unit in mm) and 72 dpi by default when image dims not.
-                // Specified.
+                // TODO 25.4 in Inch (assuming unit in mm) and 72 dpi by default when image dims not. Specified.
                 $wmarkwidthmm = $wmarkwidth * 25.4 / 72;
                 $wmarkheightmm = $wmarkheight * 25.4 / 72;
                 $pagedim = $pdf->getPageDimensions();
@@ -719,6 +787,9 @@ class datalynxview_pdf extends base {
     }
 
     /**
+     * Set signature
+     *
+     * @param dfpdf $pdf
      */
     protected function set_signature($pdf) {
         $fs = get_file_storage();
@@ -755,6 +826,9 @@ class datalynxview_pdf extends base {
     }
 
     /**
+     * Set header
+     *
+     * @param dfpdf $pdf
      */
     protected function set_header($pdf) {
         if (empty($this->view->eparam3)) {
@@ -782,6 +856,9 @@ class datalynxview_pdf extends base {
     }
 
     /**
+     * Set footer
+     *
+     * @param dfpdf $pdf
      */
     protected function set_footer($pdf) {
         if (empty($this->view->eparam4)) {
@@ -803,6 +880,10 @@ class datalynxview_pdf extends base {
     }
 
     /**
+     * Process content images
+     *
+     * @param string $content
+     * @return string
      */
     protected function process_content_images($content) {
         global $CFG;
@@ -839,6 +920,10 @@ class datalynxview_pdf extends base {
     }
 
     /**
+     * Write HTML content
+     *
+     * @param dfpdf $pdf
+     * @param string $content
      */
     protected function write_html($pdf, $content) {
 
@@ -854,6 +939,10 @@ class datalynxview_pdf extends base {
     }
 
     /**
+     * Get document name
+     *
+     * @param string $namepattern
+     * @return string
      */
     protected function get_documentname($namepattern) {
         $namepattern = !empty($namepattern) ? $namepattern : '';
@@ -974,17 +1063,33 @@ class datalynxview_pdf extends base {
 // TODO: Remove at EOL 3.5
 // Because different implementations in mdl 3.5 and 3.8 we extend dynamically.
 if (is_file("$CFG->dirroot/mod/assign/feedback/editpdf/fpdi/autoload.php")) {
+    /**
+     * DynamicParent class for Moodle 3.8+
+     */
     class DynamicParent extends setasign\Fpdi\Tcpdf\Fpdi {
     }
 } else {
+    /**
+     * DynamicParent class for Moodle 3.5
+     */
     class DynamicParent extends FPDI {
     }
 }
 
-// Extend the TCPDF class to create custom Header and Footer.
+/**
+ * Extend the TCPDF class to create custom Header and Footer.
+ */
 class dfpdf extends DynamicParent {
+    /**
+     * @var stdClass Settings for the PDF
+     */
     protected $_dfsettings;
 
+    /**
+     * Constructor
+     *
+     * @param stdClass $settings Settings object
+     */
     public function __construct($settings) {
         parent::__construct($settings->orientation, $settings->unit, $settings->format);
         $this->_dfsettings = $settings;
@@ -1012,6 +1117,13 @@ class dfpdf extends DynamicParent {
     }
 
     // Phpcs:enable.
+
+    /**
+     * Set page numbers in text
+     *
+     * @param string $text
+     * @return string
+     */
     protected function set_page_numbers($text) {
         $replacements = ['##pagenumber##' => $this->getAliasNumPage(),
                 '##totalpages##' => $this->getAliasNbPages()];

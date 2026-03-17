@@ -29,16 +29,34 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/classes/view/base.php");
 
+/**
+ * Report view class
+ *
+ * @package datalynxview_report
+ */
 class datalynxview_report extends base {
     protected string $type = 'report';
 
+    /**
+     * @var string Output format
+     */
     protected string $_output = 'report';
 
+    /**
+     * @var array List of editors
+     */
     protected array $_editors = ['section'];
 
+    /**
+     * @var array|null List of columns
+     */
     protected ?array $_columns = null;
 
     /**
+     * Constructor
+     *
+     * @param int $df
+     * @param int $view
      */
     public function __construct($df = 0, $view = 0) {
         parent::__construct($df, $view);
@@ -48,6 +66,11 @@ class datalynxview_report extends base {
     }
 
     /**
+     * Apply entry group layout
+     *
+     * @param array $entriesset
+     * @param string $name
+     * @return array
      */
     protected function apply_entry_group_layout($entriesset, $name = '') {
         global $OUTPUT;
@@ -86,7 +109,9 @@ class datalynxview_report extends base {
     }
 
     /**
-     * @param $fielddefinitions
+     * Entry definition
+     *
+     * @param array $fielddefinitions
      * @return array
      */
     protected function entry_definition($fielddefinitions) {
@@ -128,6 +153,8 @@ class datalynxview_report extends base {
     }
 
     /**
+     * Display the view
+     *
      * @param array $options
      * @return string
      */
@@ -150,7 +177,7 @@ class datalynxview_report extends base {
         $output = html_writer::start_tag('div', ['class' => 'table-responsive']);
 
         if ($this->view->param2 === 'month') {
-            // Collect and aggregate data by month
+            // Collect and aggregate data by month.
             $monthlydatabymonth = [];
             $overalltotalentriessum = 0;
             $overallmatchingcontentssums = array_fill_keys($desiredfieldoptions, 0);
@@ -173,10 +200,10 @@ class datalynxview_report extends base {
                 }
             }
 
-            // Sort months in descending order
+            // Sort months in descending order.
             krsort($monthlydatabymonth);
 
-            // Create containers for chart output
+            // Create containers for chart output.
             $chartoutput = '';
             $overallchartdata = [];
             foreach ($desiredfieldoptions as $label) {
@@ -184,18 +211,18 @@ class datalynxview_report extends base {
             }
 
             foreach ($monthlydatabymonth as $month => $usersdata) {
-                // Initialize sum variables for this month's table
+                // Initialize sum variables for this month's table.
                 $totalentriessum = 0;
                 $matchingcontentssums = array_fill_keys($desiredfieldoptions, 0);
                 $notyetansweredsum = 0;
 
                 foreach ($usersdata as $userid => $user_month_data) {
-                    // Total entries for this user in this month
+                    // Total entries for this user in this month.
                     $usertotalentries = $user_month_data['totalentries'];
                     $totalentriessum += $usertotalentries;
                     $overalltotalentriessum += $usertotalentries;
 
-                    // Matching contents counts and "Not Yet Answered" for each user
+                    // Matching contents counts and "Not Yet Answered" for each user.
                     $summatchingcontents = 0;
                     foreach ($desiredfieldoptions as $label) {
                         $count = $user_month_data['matchingcontents'][$label] ?? 0;
@@ -214,7 +241,7 @@ class datalynxview_report extends base {
                             $overallchartdata['notyetanswered'] + $notyetanswered : $notyetanswered;
                 }
 
-                // Create the monthly pie chart
+                // Create the monthly pie chart.
                 $chart = new \core\chart_pie();
                 $chart->set_title(get_string('month') . ": " . $month);
                 $labels = array_merge($desiredfieldoptions, [get_string('notyetanswered', 'question')]);
@@ -227,7 +254,7 @@ class datalynxview_report extends base {
                 $chartoutput .= html_writer::end_div();
             }
 
-            // Create the overall pie chart
+            // Create the overall pie chart.
             $overallchart = new \core\chart_pie();
             $overallchart->set_title(get_string('aggregationsum', 'reportbuilder'));
             $overallseries = new \core\chart_series(get_string('aggregationsum', 'reportbuilder'), array_values($overallchartdata));
@@ -238,25 +265,25 @@ class datalynxview_report extends base {
             $chartoutput .= $OUTPUT->render($overallchart);
             $chartoutput .= html_writer::end_div();
             $chartoutput .= html_writer::end_div();
-            // Output the charts in a responsive grid layout
+            // Output the charts in a responsive grid layout.
             $output .= html_writer::start_div('container');
             $output .= html_writer::start_div('row');
             $output .= $chartoutput;
-            $output .= html_writer::end_div(); // Close row
-            $output .= html_writer::end_div(); // Close container
+            $output .= html_writer::end_div(); // Close row.
+            $output .= html_writer::end_div(); // Close container.
 
-            // Output the tables with the data
+            // Output the tables with the data.
             foreach ($monthlydatabymonth as $month => $usersdata) {
-                // Initialize sum variables for this month's table
+                // Initialize sum variables for this month's table.
                 $totalentriessum = 0;
                 $matchingcontentssums = array_fill_keys($desiredfieldoptions, 0);
                 $notyetansweredsum = 0;
 
-                // Create a new table for the month
+                // Create a new table for the month.
                 $output .= html_writer::tag('h3', get_string('month') . ": " . $month);
                 $output .= html_writer::start_tag('table', ['class' => 'table table-striped table-bordered']);
 
-                // Table header
+                // Table header.
                 $output .= html_writer::start_tag('thead');
                 $output .= html_writer::start_tag('tr');
                 $output .= html_writer::tag('th', get_string('user'));
@@ -274,12 +301,12 @@ class datalynxview_report extends base {
                     $output .= html_writer::start_tag('tr');
                     $output .= html_writer::tag('td', $user_month_data['userinfo']);
 
-                    // Total entries for this user in this month
+                    // Total entries for this user in this month.
                     $usertotalentries = $user_month_data['totalentries'];
                     $output .= html_writer::tag('td', $usertotalentries);
                     $totalentriessum += $usertotalentries;
 
-                    // Matching contents counts and "Not Yet Answered" for each user
+                    // Matching contents counts and "Not Yet Answered" for each user.
                     $summatchingcontents = 0;
                     foreach ($desiredfieldoptions as $label) {
                         $count = $user_month_data['matchingcontents'][$label] ?? 0;
@@ -297,7 +324,7 @@ class datalynxview_report extends base {
                     $output .= html_writer::end_tag('tr');
                 }
 
-                // Totals row for this month
+                // Totals row for this month.
                 $output .= html_writer::start_tag('tr');
                 $output .= html_writer::tag('td', get_string('total'));
                 $output .= html_writer::tag('td', $totalentriessum);
@@ -313,11 +340,11 @@ class datalynxview_report extends base {
                 $output .= html_writer::end_tag('table');
             }
 
-            // Overall totals
+            // Overall totals.
             $output .= html_writer::tag('h3', get_string('aggregationsum', 'reportbuilder'));
             $output .= html_writer::start_tag('table', ['class' => 'table table-striped table-bordered']);
 
-            // Table header
+            // Table header.
             $output .= html_writer::start_tag('thead');
             $output .= html_writer::start_tag('tr');
             $output .= html_writer::tag('th', get_string('total'));
@@ -435,7 +462,7 @@ class datalynxview_report extends base {
             }
         }
 
-        // Get field options and their line number (which is saved in datalynx_contents)
+        // Get field options and their line number (which is saved in datalynx_contents).
         $fields = $this->_df->get_fields();
         foreach ($fields as $field) {
             if ($field->field->id === (int) $this->view->param1) {
@@ -476,10 +503,10 @@ class datalynxview_report extends base {
 
                     // Check for each desired field option in datalynx_contents using SQL.
                     foreach ($desiredfieldoptions as $value => $label) {
-                        $sql = "SELECT COUNT(1) 
-                        FROM {datalynx_contents} 
-                        WHERE entryid = :entryid 
-                          AND fieldid = :fieldid 
+                        $sql = "SELECT COUNT(1)
+                        FROM {datalynx_contents}
+                        WHERE entryid = :entryid
+                          AND fieldid = :fieldid
                           AND " . $DB->sql_compare_text('content') . " = " . $DB->sql_compare_text(':value');
                         $params = [
                                 'entryid' => $entryid,
@@ -511,6 +538,8 @@ class datalynxview_report extends base {
     }
 
     /**
+     * Get report entry IDs
+     *
      * @return array
      */
     public function get_report_entryids(): array {

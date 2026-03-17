@@ -28,6 +28,13 @@ use core\notification;
 require_once("$CFG->dirroot/mod/datalynx/entries_class.php");
 require_once("$CFG->dirroot/mod/datalynx/field/entryauthor/field_class.php");
 
+/**
+ * Class datalynxtool_downloadfiles
+ *
+ * @package    datalynxtool_downloadfiles
+ * @copyright  2017 David Bogner
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class datalynxtool_downloadfiles {
     /**
      * Retrieves all files of all entries adds them to zip and sends them to download

@@ -26,12 +26,16 @@
  * Preset manager class
  */
 class datalynx_preset_manager {
+    /** @var string Preset course area */
     const PRESET_COURSEAREA = 'course_presets';
 
+    /** @var string Preset site area */
     const PRESET_SITEAREA = 'site_presets';
 
+    /** @var int Preset site context */
     const PRESET_SITECONTEXT = SYSCONTEXTID;
 
+    /** @var object Datalynx object */
     protected $_df;
 
     /**
@@ -84,6 +88,10 @@ class datalynx_preset_manager {
     }
 
     /**
+     * Print presets list
+     *
+     * @param array $localpresets
+     * @param array $sharedpresets
      */
     public function print_presets_list($localpresets, $sharedpresets) {
         global $CFG, $OUTPUT;
@@ -256,6 +264,7 @@ class datalynx_preset_manager {
     }
 
     /**
+     * Print preset form
      */
     public function print_preset_form() {
         echo html_writer::start_tag('div', ['style' => 'width:80%;margin:auto;']);
@@ -271,6 +280,9 @@ class datalynx_preset_manager {
     }
 
     /**
+     * Process presets
+     *
+     * @param object $params
      */
     public function process_presets($params) {
         global $CFG;
@@ -322,6 +334,10 @@ class datalynx_preset_manager {
     }
 
     /**
+     * Create preset from backup
+     *
+     * @param string $userdata
+     * @return bool
      */
     public function create_preset_from_backup($userdata) {
         global $CFG, $USER, $SESSION;
@@ -333,6 +349,7 @@ class datalynx_preset_manager {
         switch ($userdata) {
             case 'dataanon':
                 $anon = 1;
+                // Fall through.
             case 'data':
                 $users = 1;
         }
@@ -396,6 +413,10 @@ class datalynx_preset_manager {
     }
 
     /**
+     * Create preset from upload
+     *
+     * @param int $draftid
+     * @return bool
      */
     public function create_preset_from_upload($draftid) {
         global $USER;
@@ -458,6 +479,10 @@ class datalynx_preset_manager {
     }
 
     /**
+     * Apply preset
+     *
+     * @param int $userpreset
+     * @param bool $torestorer
      */
     public function apply_preset($userpreset, $torestorer = true) {
         global $DB, $CFG, $USER;
@@ -529,6 +554,9 @@ class datalynx_preset_manager {
     }
 
     /**
+     * Download presets
+     *
+     * @param string $presetids
      */
     public function download_presets($presetids) {
         global $CFG;
@@ -609,6 +637,10 @@ class datalynx_preset_manager {
     }
 
     /**
+     * Share presets
+     *
+     * @param string $presetids
+     * @return bool
      */
     public function share_presets($presetids) {
         global $CFG, $USER;
@@ -631,6 +663,10 @@ class datalynx_preset_manager {
     }
 
     /**
+     * Delete presets
+     *
+     * @param string $presetids
+     * @return bool
      */
     public function delete_presets($presetids) {
         if (!$pids = explode(',', $presetids)) {

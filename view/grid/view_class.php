@@ -29,10 +29,19 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/classes/view/base.php");
 
+/**
+ * Grid view class.
+ *
+ * @package    datalynxview_grid
+ * @copyright  2013 onwards edulabs.org and associated programmers
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class datalynxview_grid extends base {
+    /** @var string The view type. */
     protected string $type = 'grid';
 
-    protected array $_editors = ['section', 'param2'];
+    /** @var array The editors for this view. */
+    protected array $_editors = ['section', 'param2']; // phpcs:ignore
 
     /**
      * Returns a fieldset of view options
@@ -109,6 +118,11 @@ class datalynxview_grid extends base {
     }
 
     /**
+     * Apply the entry group layout.
+     *
+     * @param array $entriesset
+     * @param string $name
+     * @return array
      */
     protected function apply_entry_group_layout($entriesset, $name = '') {
         global $OUTPUT;
@@ -170,6 +184,10 @@ class datalynxview_grid extends base {
     }
 
     /**
+     * Get the new entry definition.
+     *
+     * @param int $entryid
+     * @return array
      */
     protected function new_entry_definition($entryid = -1) {
         $elements = [];
@@ -208,6 +226,11 @@ class datalynxview_grid extends base {
     }
 
     /**
+     * Make a table for the grid layout.
+     *
+     * @param int $cols
+     * @param int $rows
+     * @return html_table
      */
     protected function make_table($cols, $rows) {
         $table = new html_table();

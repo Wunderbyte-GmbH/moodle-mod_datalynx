@@ -25,6 +25,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/formslib.php');
 
 /**
+ * Renderer form class
  */
 class datalynx_field_renderer_form extends moodleform {
     /**

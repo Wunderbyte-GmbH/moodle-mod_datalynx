@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Tabs
+ *
  * @package mod_datalynx
  * @copyright 2013 onwards Ivan Sakic, Michael Pollak, Thomas Niedermaier, David Bogner
  * @copyright based on the work by 2012 Itamar Tzadok

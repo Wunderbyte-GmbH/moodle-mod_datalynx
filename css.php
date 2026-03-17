@@ -38,7 +38,17 @@ if ($urlparams->cssedit) {
     require_once('classes/local/datalynx.php');
     require_once($CFG->libdir . '/formslib.php');
 
+    /**
+     * Form to edit CSS
+     *
+     * @package mod_datalynx
+     * @copyright 2013 onwards Ivan Šakić, Thomas Niedermaier
+     * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+     */
     class mod_datalynx_css_form extends moodleform {
+        /**
+         * Form definition
+         */
         public function definition() {
             global $COURSE;
 
