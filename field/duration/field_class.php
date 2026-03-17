@@ -27,12 +27,14 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 require_once("$CFG->dirroot/mod/datalynx/field/number/field_class.php");
 
+/** Field class for the duration field type. */
 class datalynxfield_duration extends datalynxfield_base {
     /**
      * @var string
      */
     public $type = 'duration';
 
+    /** @var array|null Cache for time units array. */
     protected $_units = null;
 
     /**
@@ -76,6 +78,8 @@ class datalynxfield_duration extends datalynxfield_base {
     }
 
     /**
+     * Return the SQL expression for comparing the content column as a number.
+     *
      * @param string $column
      * @return string
      */
@@ -84,6 +88,13 @@ class datalynxfield_duration extends datalynxfield_base {
         return $DB->sql_cast_char2int("c{$this->field->id}.$column", true);
     }
 
+    /**
+     * Format the raw form values into content and old-content arrays.
+     *
+     * @param stdClass $entry The entry object.
+     * @param array|null $values The submitted values.
+     * @return array Array with two elements: new contents and old contents.
+     */
     protected function format_content($entry, array $values = null) {
         $fieldid = $this->field->id;
         $contents = [];
@@ -99,6 +110,11 @@ class datalynxfield_duration extends datalynxfield_base {
     }
 
     /**
+     * Parse search form data and return from/to values for a range search.
+     *
+     * @param stdClass $formdata The form data object.
+     * @param int $i The search filter index.
+     * @return array|false Array of search values or false if empty.
      */
     public function parse_search($formdata, $i) {
         $values = [];
@@ -136,6 +152,13 @@ class datalynxfield_duration extends datalynxfield_base {
 
 
     /**
+     * Prepare import content from a CSV record for this field.
+     *
+     * @param stdClass $data The data object to populate.
+     * @param array $importsettings Import settings array.
+     * @param array|null $csvrecord The CSV record row.
+     * @param int|null $entryid The entry id.
+     * @return bool True on success.
      */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
         // Import only from csv.
@@ -214,6 +237,10 @@ class datalynxfield_duration extends datalynxfield_base {
     }
 
     /**
+     * Format a search parameter set for display as a human-readable string.
+     *
+     * @param array $searchparams Array of [not, operator, value].
+     * @return string Human-readable representation.
      */
     public function format_search_value($searchparams) {
         [$not, $operator, $value] = $searchparams;
@@ -227,6 +254,11 @@ class datalynxfield_duration extends datalynxfield_base {
         return $not . ' ' . $operator . ' ' . $value;
     }
 
+    /**
+     * Return the list of supported search operators for this field type.
+     *
+     * @return array Associative array of operator => label.
+     */
     public function get_supported_search_operators() {
         return ['' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
                 '>' => get_string('greaterthan', 'datalynx'),

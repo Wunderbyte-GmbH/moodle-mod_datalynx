@@ -27,8 +27,16 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
+ * Renderer for the duration field type.
  */
 class datalynxfield_duration_renderer extends datalynxfield_renderer {
+    /**
+     * Render the duration field in edit mode.
+     *
+     * @param MoodleQuickForm $mform The form object.
+     * @param stdClass $entry The entry object.
+     * @param array $options Rendering options.
+     */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $field = $this->_field;
         $fieldid = $field->id();
@@ -49,6 +57,13 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
         }
     }
 
+    /**
+     * Render the duration field in display mode.
+     *
+     * @param stdClass $entry The entry object.
+     * @param array $options Rendering options including optional 'format' key.
+     * @return string The rendered output.
+     */
     public function render_display_mode(stdClass $entry, array $options): string {
         $field = $this->_field;
         $fieldid = $field->id();
@@ -93,6 +108,14 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
         return '';
     }
 
+    /**
+     * Render the duration field in search mode with from/to range inputs.
+     *
+     * @param MoodleQuickForm $mform The form object.
+     * @param int $i The search filter index.
+     * @param string $value The current search value.
+     * @return array Array of form elements and null.
+     */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
         $fieldid = $this->_field->id();
         $fieldname = "f_{$i}_$fieldid";
@@ -118,6 +141,11 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
         return [$arr, null];
     }
 
+    /**
+     * Return the tag patterns supported by this renderer.
+     *
+     * @return array Associative array of pattern => options.
+     */
     protected function patterns() {
         $fieldname = $this->_field->name();
 
@@ -131,6 +159,14 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
         return $patterns;
     }
 
+    /**
+     * Validate the submitted field value for the given entry.
+     *
+     * @param int $entryid The entry id.
+     * @param array $tags The field tags being used.
+     * @param stdClass $formdata The submitted form data.
+     * @return array Associative array of errors keyed by field name.
+     */
     public function validate($entryid, $tags, $formdata) {
         $fieldid = $this->_field->id();
 

@@ -27,9 +27,12 @@ require_once($CFG->dirroot . '/mod/datalynx/field/field_class.php');
 require_once($CFG->dirroot . '/lib/filelib.php');
 require_once($CFG->dirroot . '/repository/lib.php');
 
+/** Field class for the editor field type. */
 class datalynxfield_editor extends datalynxfield_base {
+    /** @var string The field type identifier. */
     public $type = 'editor';
 
+    /** @var array Editor options for the field. */
     protected $editoroptions;
 
     /**
@@ -49,7 +52,7 @@ class datalynxfield_editor extends datalynxfield_base {
 
         $maxbytes = get_user_max_upload_file_size($PAGE->context, $CFG->maxbytes, $COURSE->maxbytes);
 
-        // TODO: provide options for the editor field to configure in the field settings.
+        // Editor field options to configure in the field settings are not yet implemented.
 
         $this->editoroptions = [];
         $this->editoroptions['context'] = $this->df->context;
@@ -73,12 +76,18 @@ class datalynxfield_editor extends datalynxfield_base {
     }
 
     /**
+     * Returns true because this field uses an editor element.
+     *
+     * @return bool True always.
      */
     public function is_editor() {
         return true;
     }
 
     /**
+     * Returns the editor options array for this field.
+     *
+     * @return array The editor options.
      */
     public function editor_options() {
         return $this->editoroptions;
@@ -138,6 +147,13 @@ class datalynxfield_editor extends datalynxfield_base {
     }
 
     /**
+     * Prepare import content from a CSV record for the editor field.
+     *
+     * @param stdClass $data The data object to populate.
+     * @param array $importsettings Import settings array.
+     * @param array|null $csvrecord The CSV record row.
+     * @param int|null $entryid The entry id.
+     * @return bool True on success.
      */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
         $fieldid = $this->field->id;
@@ -163,9 +179,12 @@ class datalynxfield_editor extends datalynxfield_base {
         return true;
     }
 
+    /**
+     * Return the list of supported search operators for this field type.
+     *
+     * @return array Associative array of operator => label.
+     */
     public function get_supported_search_operators() {
-        return ['' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
-                'LIKE' => get_string('contains', 'datalynx')];
     }
 
     /**

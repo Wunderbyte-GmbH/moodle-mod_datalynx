@@ -67,9 +67,11 @@ class datalynxfield_editor_renderer extends datalynxfield_renderer {
     }
 
     /**
-     * @param stdClass $entry
-     * @param array $options
-     * @return string
+     * Render the editor field in display mode, rewriting file URLs.
+     *
+     * @param stdClass $entry The entry object.
+     * @param array $options Rendering options including optional 'excerpt' key.
+     * @return string The rendered HTML output.
      */
     public function render_display_mode(stdClass $entry, array $options): string {
         $field = $this->_field;

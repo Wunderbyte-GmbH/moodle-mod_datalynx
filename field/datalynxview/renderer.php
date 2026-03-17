@@ -30,14 +30,17 @@ require_once("$CFG->dirroot/mod/datalynx/field/entryauthor/field_class.php");
 require_once("$CFG->dirroot/mod/datalynx/field/entrygroup/field_class.php");
 
 /**
+ * Renderer for the datalynxview field type.
  */
 class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
-    /*
-     * Rendering this field in display mode
-     * called by the replacement-function of datalynxfield_renderer
-     * stdClass @entry   represents the entry which includes this instance of the field
-     * array @params     the type of the display, "" for default
-     * @returns          the function which displays this field-instance
+    /**
+     * Render this field in display mode.
+     *
+     * Called by the replacement function of datalynxfield_renderer.
+     *
+     * @param stdClass $entry The entry object which includes this field instance.
+     * @param array $options The display options, e.g. empty for default.
+     * @return string The rendered HTML output.
      */
     public function render_display_mode(stdClass $entry, array $options): string {
 
@@ -64,7 +67,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
 
         // Inline.
         if (empty($type)) {
-            // TODO Including controls seems to mess up the hosting view controls.
+            // Including controls here seems to mess up the hosting view controls.
             $voptions = ['controls' => false];
             return $this->get_view_display_content($entry, $voptions);
         }
@@ -182,6 +185,9 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Build sort options from the field's custom sort configuration.
+     *
+     * @return array Array of sort options keyed by ref-field id.
      */
     protected function get_sort_options() {
         $field = $this->_field;
@@ -251,7 +257,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
                         // Extract the value part.
                         $value = $first[1];
                         // Make sure this is the search value.
-                        // (select fields search by key).
+                // Select fields search by key, not value.
                         $value = $localfield->get_search_value($value);
                     }
                 }
