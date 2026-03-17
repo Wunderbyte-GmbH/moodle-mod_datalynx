@@ -16,7 +16,6 @@
 
 namespace mod_datalynx\customfilter;
 use stdClass;
-defined('MOODLE_INTERNAL') || die();
 
 /**
  *
@@ -29,10 +28,10 @@ defined('MOODLE_INTERNAL') || die();
  */
 class backend_form extends base_form {
     /**
-     *
+     * Define the form elements for the backend customfilter form.
      */
     public function definition() {
-        if ($id = $this->_customfilter->id) {
+        if ($id = $this->customfilter->id) {
             $customfilter = $this->get_customfilter($id);
         } else {
             $customfilter = new stdClass();
@@ -132,7 +131,7 @@ class backend_form extends base_form {
         if ($customfilter->fieldlist) {
             $fieldlist = json_decode($customfilter->fieldlist);
         }
-        $fields = $this->get_possible_customfilter_fields($this->_dl);
+        $fields = $this->get_possible_customfilter_fields($this->dl);
         foreach ($fields as $fieldid => $field) {
             $formfieldname = 'fieldlist[' . $field->field->id . '][name]';
             $formfieldsortablename = 'fieldlist[' . $field->field->id . '][sortable]';
@@ -171,6 +170,8 @@ class backend_form extends base_form {
     }
 
     /**
+     * Get the list of fields available for use in customfilters.
+     *
      * @param $dl
      * @return array
      */
@@ -190,6 +191,8 @@ class backend_form extends base_form {
     }
 
     /**
+     * Get a customfilter record from the database by id.
+     *
      * @param $filterid
      * @return mixed
      */
@@ -199,6 +202,8 @@ class backend_form extends base_form {
     }
 
     /**
+     * Get the submitted form data with field list encoded as JSON.
+     *
      * @return object
      */
     public function get_data() {
@@ -220,6 +225,8 @@ class backend_form extends base_form {
     }
 
     /**
+     * Return the form HTML.
+     *
      * @return string
      */
     public function html() {
@@ -227,6 +234,8 @@ class backend_form extends base_form {
     }
 
     /**
+     * Validate the submitted customfilter backend form data.
+     *
      * @param array $data
      * @param array $files
      * @return array
@@ -235,8 +244,8 @@ class backend_form extends base_form {
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
-        $dl = $this->_dl;
-        if (empty($data['name']) || $dl->name_exists('customfilters', $data['name'], $this->_customfilter->id)) {
+        $dl = $this->dl;
+        if (empty($data['name']) || $dl->name_exists('customfilters', $data['name'], $this->customfilter->id)) {
             $errors['name'] = get_string(
                 'invalidname',
                 'datalynx',

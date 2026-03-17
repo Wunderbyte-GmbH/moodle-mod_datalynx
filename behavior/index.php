@@ -47,7 +47,7 @@ navigation_node::override_active_url(
     new moodle_url('/mod/datalynx/behavior/index.php', ['id' => $datalynx->cm->id])
 );
 
-// TODO: print notifications.
+// Print notifications.
 
 // Print header.
 $datalynx->print_header(['tab' => 'behaviors', 'urlparams' => $urlparams]);

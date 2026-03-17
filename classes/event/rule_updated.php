@@ -23,7 +23,6 @@
  */
 namespace mod_datalynx\event;
 
-defined('MOODLE_INTERNAL') || die();
 
 /**
  *

@@ -47,6 +47,8 @@ class datalynx_field_behavior_form extends moodleform {
     }
 
     /**
+     * Define the form elements for the behavior form.
+     *
      * @throws coding_exception
      */
     protected function definition() {
@@ -200,6 +202,8 @@ class datalynx_field_behavior_form extends moodleform {
     }
 
     /**
+     * Get the submitted form data with default values applied.
+     *
      * @return object
      */
     public function get_data() {
@@ -220,6 +224,8 @@ class datalynx_field_behavior_form extends moodleform {
     }
 
     /**
+     * Set default values for the behavior form.
+     *
      * @param array|stdClass $data
      */
     public function set_data($data) {
@@ -241,6 +247,8 @@ class datalynx_field_behavior_form extends moodleform {
     }
 
     /**
+     * Validate the submitted behavior form data.
+     *
      * @param array $data
      * @param array $files
      * @return array

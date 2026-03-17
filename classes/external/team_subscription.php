@@ -30,7 +30,10 @@ require_once($CFG->libdir . '/externallib.php');
 
 /**
  * Web service to subscribe/unsubscribe users in datalynx team fields.
+ *
  * @package mod_datalynx
+ * @copyright 2023 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class team_subscription extends external_api {
     /**

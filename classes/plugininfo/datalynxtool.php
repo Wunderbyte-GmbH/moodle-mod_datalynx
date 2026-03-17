@@ -23,7 +23,12 @@
  */
 namespace mod_datalynx\plugininfo;
 
-defined('MOODLE_INTERNAL') || die();
-
+/**
+ * Datalynx tool subplugin info class.
+ *
+ * @package mod_datalynx
+ * @copyright 2014 Ivan Šakić
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class datalynxtool extends \core\plugininfo\base {
 }

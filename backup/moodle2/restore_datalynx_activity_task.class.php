@@ -30,28 +30,39 @@ require_once("$CFG->dirroot/mod/datalynx/backup/moodle2/restore_datalynx_stepsli
  * complete restore of the activity
  */
 class restore_datalynx_activity_task extends restore_activity_task {
+    /** @var int User id of designated owner of content. */
     protected $ownerid = 0;
-    // User id of designated owner of content.
 
     /**
+     * Get the old module id.
+     *
+     * @return int
      */
     public function get_old_moduleid() {
         return $this->oldmoduleid;
     }
 
     /**
+     * Set the owner id for the restored activity.
+     *
+     * @param int $ownerid
      */
     public function set_ownerid($ownerid) {
         $this->ownerid = $ownerid;
     }
 
     /**
+     * Get the owner id for the restored activity.
+     *
+     * @return int
      */
     public function get_ownerid() {
         return $this->ownerid;
     }
 
     /**
+     * Get the comment mapping item name based on the comment area.
+     *
      * @param string $commentarea
      * @return string
      */

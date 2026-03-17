@@ -25,34 +25,45 @@
 
 namespace mod_datalynx\customfilter;
 use stdClass;
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Customfilter class
  */
 class customfilter {
+    /** @var int The customfilter id. */
     public $id;
 
+    /** @var int The datalynx instance id. */
     public $dataid;
 
+    /** @var string The customfilter name. */
     public $name;
 
+    /** @var string The customfilter description. */
     public $description;
 
+    /** @var int Whether the customfilter is visible. */
     public $visible;
 
+    /** @var int Whether full text search is enabled. */
     public $fulltextsearch;
 
+    /** @var int Timestamp when the customfilter was created. */
     public $timecreated;
 
+    /** @var int Timestamp when the customfilter was last modified. */
     public $timemodified;
 
+    /** @var int Whether author search is enabled. */
     public $authorsearch;
 
+    /** @var int Whether approval filtering is enabled. */
     public $approve;
 
+    /** @var int The customfilter status. */
     public $status;
 
+    /** @var mixed JSON-encoded list of fields to include in the filter. */
     public $fieldlist;
 
     /**
@@ -74,6 +85,9 @@ class customfilter {
     }
 
     /**
+     * Get a stdClass object representing this customfilter's data.
+     *
+     * @return stdClass
      */
     public function get_filter_obj() {
         $filter = new stdClass();

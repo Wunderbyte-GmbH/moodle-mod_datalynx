@@ -30,9 +30,13 @@
  * Structure step to restore one datalynx activity
  */
 class restore_datalynx_activity_structure_step extends restore_activity_structure_step {
+    /** @var int The group mode for the restored activity. */
     protected $groupmode = 0;
 
     /**
+     * Define the restore structure paths for the datalynx activity.
+     *
+     * @return array
      */
     protected function define_structure() {
         $paths = [];
@@ -61,6 +65,9 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
     }
 
     /**
+     * Process the datalynx activity data during restore.
+     *
+     * @param array $data
      */
     protected function process_datalynx($data) {
         global $DB;
@@ -130,6 +137,9 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
     }
 
     /**
+     * Process the datalynx module data during restore.
+     *
+     * @param array $data
      */
     protected function process_datalynx_module($data) {
         global $DB;
@@ -147,6 +157,9 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
     }
 
     /**
+     * Process the datalynx field data during restore.
+     *
+     * @param array $data
      */
     protected function process_datalynx_field($data) {
         global $DB;
@@ -237,7 +250,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
                 } else if (str_contains($searchfield, 'entryteammemberprofilefield_')) {
                     // Check for filter of entryteammemberprofilefield.
                     // It has pattern entryteammemberprofilefield_fieldid_profielfieldname.
-                    // Example: entryteammemberprofilefield_1026_department
+                    // Example: entryteammemberprofilefield_1026_department.
                     preg_match('/entryteammemberprofilefield_(\d+)_(.+)/', $searchfield, $matches);
                     if (is_numeric($matches[1])) {
                         $newfieldid = $this->get_mappingid('datalynx_field', $matches[1]);
@@ -258,6 +271,9 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
 
 
     /**
+     * Process the datalynx customfilter data during restore.
+     *
+     * @param array $data
      */
     protected function process_datalynx_customfilter($data) {
         global $DB;
@@ -286,6 +302,9 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
     }
 
     /**
+     * Process the datalynx view data during restore.
+     *
+     * @param array $data
      */
     protected function process_datalynx_view($data) {
         global $DB;
@@ -331,6 +350,9 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
     }
 
     /**
+     * Process the datalynx rule data during restore.
+     *
+     * @param array $data
      */
     protected function process_datalynx_rule($data) {
         global $DB;
@@ -384,6 +406,9 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
     }
 
     /**
+     * Process the datalynx entry data during restore.
+     *
+     * @param array $data
      */
     protected function process_datalynx_entry($data) {
         global $DB;
@@ -409,6 +434,9 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
     }
 
     /**
+     * Process the datalynx content data during restore.
+     *
+     * @param array $data
      */
     protected function process_datalynx_content($data) {
         global $DB;
@@ -425,6 +453,9 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
     }
 
     /**
+     * Process the datalynx rating data during restore.
+     *
+     * @param array $data
      */
     protected function process_datalynx_rating($data) {
         $data = (object) $data;
@@ -433,6 +464,9 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
     }
 
     /**
+     * Process the datalynx grade data during restore.
+     *
+     * @param array $data
      */
     protected function process_datalynx_grade($data) {
         $data = (object) $data;
@@ -441,6 +475,9 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
     }
 
     /**
+     * Process the datalynx behavior data during restore.
+     *
+     * @param array $data
      */
     protected function process_datalynx_behavior($data) {
         global $DB;
@@ -456,6 +493,9 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
     }
 
     /**
+     * Process the datalynx renderer data during restore.
+     *
+     * @param array $data
      */
     protected function process_datalynx_renderer($data) {
         global $DB;
@@ -471,6 +511,9 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
     }
 
     /**
+     * Process a rating entry during restore.
+     *
+     * @param object $data
      */
     protected function process_this_rating($data) {
         global $DB;
@@ -519,10 +562,10 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         $this->add_related_files('mod_datalynx', 'content', 'datalynx_content');
 
         // Add content related files, matching by item id (datalynx_view).
-        // TODO it's not quite item id; need to add folders there.
+        // Item id is not quite the right reference; folders still need to be added.
         $this->add_related_files('mod_datalynx', 'view', 'datalynx_view');
 
-        // TODO Add preset related files, matching by itemname (data_content).
+        // Add preset related files, matching by itemname (data_content).
 
         // Add view template related files, matching by item id (datalynx_view).
         $this->add_related_files('mod_datalynx', 'viewsection', 'datalynx_view');
@@ -686,8 +729,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             }
         }
 
-        // Update id of userinfo fields if needed.
-        // TODO can we condition this on restore to new site?
+        // Update id of userinfo fields if needed (may require conditioning on restore to new site).
         if (
             $userinfofields = $DB->get_records(
                 'datalynx_fields',

@@ -23,19 +23,31 @@
 defined('MOODLE_INTERNAL') || die();
 require_once(dirname(__FILE__) . '/../classes/local/datalynx.php');
 
+/**
+ * Class datalynx_field_behavior
+ *
+ * Represents a behavior configuration for a datalynx field.
+ */
 class datalynx_field_behavior {
+    /** @var int The behavior id. */
     private $id;
 
+    /** @var string The behavior name. */
     private $name;
 
+    /** @var string The behavior description. */
     private $description;
 
+    /** @var int The datalynx instance id. */
     private $dataid;
 
+    /** @var array Visibility settings for this behavior. */
     private $visibleto;
 
+    /** @var array Editability settings for this behavior. */
     private $editableby;
 
+    /** @var bool Whether the field is required. */
     private $required;
 
     /**
@@ -96,7 +108,7 @@ class datalynx_field_behavior {
         if ($record) {
             return new datalynx_field_behavior($record);
         } else {
-            return false; // TODO: or throw exception?
+            return false; // Returns false if no matching behavior is found.
         }
     }
 
@@ -115,7 +127,7 @@ class datalynx_field_behavior {
         if ($record) {
             return new datalynx_field_behavior($record);
         } else {
-            return false; // TODO: or throw exception?
+            return false; // Returns false if no matching behavior is found.
         }
     }
 
@@ -149,6 +161,12 @@ class datalynx_field_behavior {
         return new datalynx_field_behavior($record);
     }
 
+    /**
+     * Check whether the given user is a site administrator.
+     *
+     * @param object $user
+     * @return bool
+     */
     private function user_is_admin($user) {
         $admins = get_admins();
         return in_array($user->id, array_keys($admins));
@@ -394,7 +412,7 @@ class datalynx_field_behavior {
         );
         // Update every instance that still has the string ||behaviorname in it.
         foreach ($connected as $view) {
-            // TODO: Is one check enough or are these separate?
+            // Check if either patterns or param2 contains the behavior name.
             if (
                 strpos($view->patterns, '|' . $behaviorinfo->name) !== false ||
                     strpos($view->param2, '|' . $behaviorinfo->name) !== false

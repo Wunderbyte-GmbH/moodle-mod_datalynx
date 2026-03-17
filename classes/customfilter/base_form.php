@@ -34,13 +34,14 @@ require_once($CFG->libdir . '/formslib.php');
  * @package mod_datalynx\customfilter
  */
 abstract class base_form extends moodleform {
-    protected $_customfilter = null;
+    /** @var mixed The customfilter instance. */
+    protected $customfilter = null;
 
     /**
      *
      * @var datalynx null
      */
-    protected $_dl = null;
+    protected $dl = null;
 
     /**
      * mod_datalynx_customfilter_base_form constructor.
@@ -64,8 +65,8 @@ abstract class base_form extends moodleform {
         $attributes = null,
         $editable = true
     ) {
-        $this->_customfilter = $customfilter;
-        $this->_dl = $dl;
+        $this->customfilter = $customfilter;
+        $this->dl = $dl;
 
         parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
     }
