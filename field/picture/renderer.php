@@ -27,8 +27,18 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/file/renderer.php");
 
 /**
+ * Renderer for the picture field type.
+ *
+ * @package datalynxfield_picture
  */
 class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
+    /**
+     * Renders the field in edit mode.
+     *
+     * @param MoodleQuickForm $mform The form object.
+     * @param stdClass $entry The entry object.
+     * @param array|null $options Additional options.
+     */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options = null) {
         $field = $this->_field;
         $fieldid = $field->id();
@@ -77,8 +87,8 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
      * @return string
      */
     public function render_display_mode(stdClass $entry, array $options): string {
-        global $CFG, $PAGE;
-        $PAGE->requires->js_call_amd('mod_datalynx/zoomable', 'init');
+        global $CFG;
+        $this->page->requires->js_call_amd('mod_datalynx/zoomable', 'init');
         $field = $this->_field;
         $fieldid = $field->id();
         $entryid = $entry->id;
@@ -131,6 +141,9 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
     }
 
     /**
+     * Returns the patterns for the field.
+     *
+     * @return array
      */
     public function pluginfile_patterns(): array {
         $fieldname = $this->_field->name();
@@ -139,11 +152,13 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
     }
 
     /**
-     * @param stored_file $file
-     * @param int $entryid
-     * @param $path
-     * @param $altname
-     * @param $params
+     * Displays a file.
+     *
+     * @param stored_file $file The file object.
+     * @param int $entryid The entry ID.
+     * @param string $path The file path.
+     * @param string $altname The alternative name.
+     * @param array|null $params Additional parameters.
      * @return moodle_url|string
      */
     protected function display_file(stored_file $file, int $entryid, string $path, string $altname = '', ?array $params = null) {

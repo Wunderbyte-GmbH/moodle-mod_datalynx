@@ -15,11 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Field class for the editor field type.
  *
- * @package datalynxfield_editor
- * @subpackage editor
- * @copyright 2015 David Bogner
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    datalynxfield_editor
+ * @copyright  2015 David Bogner
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 
@@ -52,8 +52,7 @@ class datalynxfield_editor extends datalynxfield_base {
 
         $maxbytes = get_user_max_upload_file_size($PAGE->context, $CFG->maxbytes, $COURSE->maxbytes);
 
-        // Editor field options to configure in the field settings are not yet implemented.
-
+        // MDL-0000 TODO: provide options for the editor field to configure in the field settings.
         $this->editoroptions = [];
         $this->editoroptions['context'] = $this->df->context;
         $this->editoroptions['maxfiles'] = EDITOR_UNLIMITED_FILES;
@@ -85,7 +84,7 @@ class datalynxfield_editor extends datalynxfield_base {
     }
 
     /**
-     * Returns the editor options array for this field.
+     * Get the editor options for this field.
      *
      * @return array The editor options.
      */
@@ -147,7 +146,7 @@ class datalynxfield_editor extends datalynxfield_base {
     }
 
     /**
-     * Prepare import content from a CSV record for the editor field.
+     * Prepare import content for the editor field from CSV or other sources.
      *
      * @param stdClass $data The data object to populate.
      * @param array $importsettings Import settings array.
@@ -180,21 +179,18 @@ class datalynxfield_editor extends datalynxfield_base {
     }
 
     /**
-     * Return the list of supported search operators for this field type.
+     * Get the list of supported search operators for this field type.
      *
-     * @return array Associative array of operator => label.
+     * @return array Array of operator labels keyed by operator.
      */
     public function get_supported_search_operators() {
-    }
-
-    /**
-     * Is $value a valid content or do we see an empty input?
-     * @return bool
-     */
-    public static function is_fieldvalue_empty($value) {
-        if ($value['text'] == '') {
-            return true;
-        }
-        return false;
+        return [
+            'LIKE' => get_string('contains', 'datalynx'),
+            'NOT LIKE' => get_string('notcontains', 'datalynx'),
+            '=' => get_string('equalto', 'datalynx'),
+            '!=' => get_string('notequalto', 'datalynx'),
+            'EMPTY' => get_string('isempty', 'datalynx'),
+            'NOT EMPTY' => get_string('isnotempty', 'datalynx'),
+        ];
     }
 }

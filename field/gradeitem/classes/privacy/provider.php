@@ -25,6 +25,9 @@
 
 namespace datalynxfield_gradeitem\privacy;
 
+/**
+ * Privacy provider for datalynxfield_gradeitem.
+ */
 class provider implements
     // This plugin does not store any personal user data.
     \core_privacy\local\metadata\null_provider {

@@ -28,8 +28,10 @@ require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 require_once("$CFG->dirroot/lib/resourcelib.php");
 
 /**
+ * Datalynx file field class.
  */
 class datalynxfield_file extends datalynxfield_base {
+    /** @var string Plugin type. */
     public $type = 'file';
 
     /**
@@ -51,6 +53,11 @@ class datalynxfield_file extends datalynxfield_base {
     }
 
     /**
+     * Update content for the field.
+     *
+     * @param stdClass $entry The entry object.
+     * @param array|null $values The values to update.
+     * @return int|bool The content ID or false.
      */
     public function update_content(stdClass $entry, array $values = null) {
         global $DB, $USER;
@@ -123,18 +130,33 @@ class datalynxfield_file extends datalynxfield_base {
     }
 
     /**
+     * Format content for display.
+     *
+     * @param stdClass $entry The entry object.
+     * @param array|null $values The values to use.
+     * @return array The formatted content.
      */
     protected function format_content($entry, array $values = null): array {
         return [null, null, null];
     }
 
     /**
+     * Get the names of the content parts.
+     *
+     * @return array The names of the content parts.
      */
     public function get_content_parts(): array {
         return ['content', 'content1', 'content2'];
     }
 
     /**
+     * Prepare content for import.
+     *
+     * @param stdClass $data The data object.
+     * @param array $importsettings The import settings.
+     * @param array|null $csvrecord The CSV record.
+     * @param int|null $entryid The entry ID.
+     * @return bool True if successful, false otherwise.
      */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null): bool {
         global $USER;
@@ -216,15 +238,22 @@ class datalynxfield_file extends datalynxfield_base {
     }
 
     /**
+     * Update content files.
+     *
+     * @param int $contentid The content ID.
+     * @param array|null $params Additional parameters.
+     * @return bool True if successful.
      */
     protected function update_content_files($contentid, $params = null): bool {
         return true;
     }
 
     /**
-     * @param $entry
-     * @param array|null $values
-     * @return bool
+     * Save changes to file.
+     *
+     * @param stdClass $entry The entry object.
+     * @param array|null $values The values to save.
+     * @return bool True if successful.
      * @throws file_exception
      * @throws stored_file_creation_exception
      */
@@ -319,7 +348,7 @@ class datalynxfield_file extends datalynxfield_base {
      * @return bool
      */
     public static function is_fieldvalue_empty($value): bool {
-        // TODO: We see a draftarea id, need to determine if files are linked to it.
+        // TODO: MDL-00000 We see a draftarea id, need to determine if files are linked to it.
         global $DB;
         $filesizes = $DB->get_records_menu(
             'files',

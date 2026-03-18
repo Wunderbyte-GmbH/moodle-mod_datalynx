@@ -27,14 +27,13 @@ defined('MOODLE_INTERNAL') || die();
 require_once(dirname(__FILE__) . "/../renderer.php");
 
 /**
- * Class datalynxfield_select_renderer Renderer for select field type
+ * Renderer class for select datalynx field
  */
 class datalynxfield_select_renderer extends datalynxfield_renderer {
     /**
-     *
-     * @var datalynxfield_select
+     * @var datalynxfield_select The field object.
      */
-    protected $_field = null;
+    protected $_field = null; // phpcs:ignore
 
     /**
      *
@@ -174,7 +173,8 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
 
         // Not every field of this dataynx-instance has to be in the form!
         if (isset($formdata->{$formfieldname})) {
-            if (isset($this->_field->field->param5) && is_numeric($this->_field->field->param5) && $this->_field->field->param5 > 0) {
+            $param5 = $this->_field->field->param5;
+            if (isset($param5) && is_numeric($param5) && $param5 > 0) {
                 $disabled = $this->_field->get_disabled_values_for_user($entryid);
                 $content = clean_param($formdata->{$formfieldname}, PARAM_INT);
                 if (array_search($content, $disabled) !== false) {

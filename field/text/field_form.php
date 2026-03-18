@@ -26,8 +26,13 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
+/**
+ * Text field form class.
+ */
 class datalynxfield_text_form extends datalynxfield_form {
     /**
+     * Define the field attributes.
+     *
      * @return void
      */
     public function field_definition() {
@@ -90,7 +95,7 @@ class datalynxfield_text_form extends datalynxfield_form {
                 'fieldtype' => 'text',
         ];
 
-        // Add JQuery
+        // Add JQuery.
         $PAGE->requires->js_call_amd('mod_datalynx/datalynxloadviews', 'init', [$options]);
 
         // Rules.
@@ -132,6 +137,7 @@ class datalynxfield_text_form extends datalynxfield_form {
     }
 
     /**
+     * Define the field after data.
      */
     public function definition_after_data() {
         global $DB;

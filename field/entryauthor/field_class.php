@@ -26,42 +26,73 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/datalynx/field/field_class.php');
 
+/**
+ * Entry author field class.
+ *
+ * @package    datalynxfield_entryauthor
+ * @copyright  2013 onwards edulabs.org and associated programmers
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class datalynxfield_entryauthor extends datalynxfield_no_content {
+    /** @var string The field type. */
     public $type = 'entryauthor';
 
+    /** @var string User ID constant. */
     const _USERID = 'userid';
 
+    /** @var string User full name constant. */
     const _USERNAME = 'username';
 
+    /** @var string User first name constant. */
     const _USERFIRSTNAME = 'userfirstname';
 
+    /** @var string User last name constant. */
     const _USERLASTNAME = 'userlastname';
 
+    /** @var string User username constant. */
     const _USERUSERNAME = 'userusername';
 
+    /** @var string User ID number constant. */
     const _USERIDNUMBER = 'useridnumber';
 
+    /** @var string User picture constant. */
     const _USERPICTURE = 'userpicture';
 
+    /** @var string User email constant. */
     const _USEREMAIL = 'useremail';
 
+    /** @var string User institution constant. */
     const _USERINSTITUTION = 'userinstitution';
 
+    /** @var string User department constant. */
     const _USERDEPARTMENT = 'userdepartment';
 
+    /** @var string User badges constant. */
     const _BADGES = 'badges';
 
+    /**
+     * Supports grouping by this field.
+     *
+     * @return bool
+     */
     public function supports_group_by() {
         return true;
     }
 
     /**
+     * Check if the field is internal.
+     *
+     * @return bool
      */
     public static function is_internal() {
         return true;
     }
 
     /**
+     * Get field objects for the author field.
+     *
+     * @param int $dataid The datalynx ID.
+     * @return array
      */
     public static function get_field_objects($dataid) {
         $fieldobjects = [];
@@ -115,7 +146,7 @@ class datalynxfield_entryauthor extends datalynxfield_no_content {
                 'name' => get_string('department'), 'description' => '',
                 'visible' => 2, 'internalname' => 'department'];
 
-        // TODO: Multilang.
+        // MDL-0000 TODO: Multilang.
         $fieldobjects[self::_BADGES] = (object) ['id' => self::_BADGES,
                         'dataid' => $dataid, 'type' => 'entryauthor',
                         'name' => 'Badges', 'description' => '',
@@ -125,6 +156,10 @@ class datalynxfield_entryauthor extends datalynxfield_no_content {
     }
 
     /**
+     * Get the SQL expression for comparing text.
+     *
+     * @param string $column
+     * @return string
      */
     protected function get_sql_compare_text(string $column = 'content'): string {
         global $DB;
@@ -133,6 +168,9 @@ class datalynxfield_entryauthor extends datalynxfield_no_content {
     }
 
     /**
+     * Get the SQL for sorting.
+     *
+     * @return string
      */
     public function get_sort_sql() {
         if ($this->field->internalname != 'picture') {
@@ -164,6 +202,13 @@ class datalynxfield_entryauthor extends datalynxfield_no_content {
         return [$sql, $params, false];
     }
 
+    /**
+     * Parse search data.
+     *
+     * @param stdClass $formdata
+     * @param int $i
+     * @return mixed
+     */
     public function parse_search($formdata, $i) {
         global $USER;
         $fieldid = $this->field->id;
@@ -217,6 +262,11 @@ class datalynxfield_entryauthor extends datalynxfield_no_content {
         return $distinctvalues;
     }
 
+    /**
+     * Get the list of supported search operators for this field type.
+     *
+     * @return array
+     */
     public function get_supported_search_operators() {
         switch ($this->field->internalname) {
             case 'id':

@@ -27,17 +27,30 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
 /**
- *
+ * Coursegroup field class.
  */
 class datalynxfield_coursegroup extends datalynxfield_base {
+    /** @var string Field type. */
     public $type = 'coursegroup';
 
+    /** @var int Course ID. */
     public $course;
 
+    /** @var int Group ID. */
     public $group;
 
+    /**
+     * @var string Column to compare text.
+     * @phpcs:ignore
+     */
     protected $_comparetext;
 
+    /**
+     * Field constructor.
+     *
+     * @param int|object $df
+     * @param int|object $field
+     */
     public function __construct($df = 0, $field = 0) {
         parent::__construct($df, $field);
 
@@ -47,12 +60,20 @@ class datalynxfield_coursegroup extends datalynxfield_base {
     }
 
     /**
+     * Return names of content columns.
+     *
+     * @return array
      */
     protected function content_names() {
         return ['course', 'group', 'groupid'];
     }
 
     /**
+     * Format field content for database.
+     *
+     * @param object $entry
+     * @param array $values
+     * @return array
      */
     protected function format_content($entry, array $values = null) {
         $fieldid = $this->field->id;
@@ -109,6 +130,11 @@ class datalynxfield_coursegroup extends datalynxfield_base {
     }
 
     /**
+     * Parse search data.
+     *
+     * @param object $formdata
+     * @param int $i
+     * @return array|false
      */
     public function parse_search($formdata, $i) {
         $coursegroup = [0, 0, 0];
@@ -132,6 +158,9 @@ class datalynxfield_coursegroup extends datalynxfield_base {
     }
 
     /**
+     * Return names of content parts.
+     *
+     * @return array
      */
     public function get_content_parts() {
         return ['content', 'content1'];
@@ -208,6 +237,8 @@ class datalynxfield_coursegroup extends datalynxfield_base {
     }
 
     /**
+     * Return SQL to compare text in database.
+     *
      * @param string $column
      * @return string
      */
@@ -219,6 +250,10 @@ class datalynxfield_coursegroup extends datalynxfield_base {
     }
 
     /**
+     * Format search value for display.
+     *
+     * @param array $searchparams
+     * @return string
      */
     public function format_search_value($searchparams) {
         [$not, $operator, $value] = $searchparams;
@@ -235,6 +270,13 @@ class datalynxfield_coursegroup extends datalynxfield_base {
     }
 
     /**
+     * Prepare field content for import.
+     *
+     * @param object $data
+     * @param array $importsettings
+     * @param array $csvrecord
+     * @param int $entryid
+     * @return bool
      */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
         // Import only from csv.

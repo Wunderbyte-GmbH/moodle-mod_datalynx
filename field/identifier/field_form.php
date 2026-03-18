@@ -26,8 +26,14 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
+/**
+ * Field form for the identifier field type.
+ *
+ * @package datalynxfield_identifier
+ */
 class datalynxfield_identifier_form extends datalynxfield_form {
     /**
+     * Define the field attributes.
      */
     public function field_definition() {
         $field = &$this->_field;

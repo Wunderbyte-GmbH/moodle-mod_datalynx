@@ -25,6 +25,11 @@
 
 namespace datalynxfield_number\privacy;
 
+/**
+ * Privacy provider for datalynxfield_number.
+ *
+ * @package datalynxfield_number
+ */
 class provider implements
     // This plugin does not store any personal user data.
     \core_privacy\local\metadata\null_provider {

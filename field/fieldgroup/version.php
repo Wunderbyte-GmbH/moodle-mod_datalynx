@@ -15,10 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package datalynxfield_fieldgroup
+ * Version information for the fieldgroup field type.
+ *
+ * @package    datalynxfield_fieldgroup
  * @subpackage fieldgroup
- * @copyright 2018 michael pollak <moodle@michaelpollak.org>
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2018 michael pollak <moodle@michaelpollak.org>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 

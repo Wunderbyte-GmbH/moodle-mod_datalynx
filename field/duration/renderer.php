@@ -15,12 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Renderer for the duration field type.
  *
- * @package datalynxfield_duration
- * @subpackage duration
- * @copyright 2014 onwards by edulabs.org and associated programmers
- * @copyright based on the work by 2013 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    datalynxfield_duration
+ * @copyright  2014 onwards by edulabs.org and associated programmers
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 
@@ -109,12 +108,12 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
     }
 
     /**
-     * Render the duration field in search mode with from/to range inputs.
+     * Render the duration field in search mode.
      *
      * @param MoodleQuickForm $mform The form object.
-     * @param int $i The search filter index.
-     * @param string $value The current search value.
-     * @return array Array of form elements and null.
+     * @param int $i The filter index.
+     * @param mixed $value The current search value.
+     * @return array Array of elements.
      */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
         $fieldid = $this->_field->id();
@@ -142,9 +141,9 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
     }
 
     /**
-     * Return the tag patterns supported by this renderer.
+     * Get the tag patterns for this field.
      *
-     * @return array Associative array of pattern => options.
+     * @return array Array of patterns.
      */
     protected function patterns() {
         $fieldname = $this->_field->name();
@@ -160,12 +159,12 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
     }
 
     /**
-     * Validate the submitted field value for the given entry.
+     * Validate the duration field.
      *
-     * @param int $entryid The entry id.
-     * @param array $tags The field tags being used.
+     * @param int $entryid The entry ID.
+     * @param array $tags The field tags.
      * @param stdClass $formdata The submitted form data.
-     * @return array Associative array of errors keyed by field name.
+     * @return array Array of errors.
      */
     public function validate($entryid, $tags, $formdata) {
         $fieldid = $this->_field->id();

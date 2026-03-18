@@ -26,7 +26,13 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/multiselect/field_form.php");
 
+/**
+ * Checkbox field form.
+ */
 class datalynxfield_checkbox_form extends datalynxfield_multiselect_form {
+    /**
+     * Define field settings form.
+     */
     public function field_definition() {
         parent::field_definition();
 

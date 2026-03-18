@@ -25,6 +25,11 @@
 
 namespace datalynxfield_radiobutton\privacy;
 
+/**
+ * Privacy provider for datalynxfield_radiobutton.
+ *
+ * @package datalynxfield_radiobutton
+ */
 class provider implements
     // This plugin does not store any personal user data.
     \core_privacy\local\metadata\null_provider {

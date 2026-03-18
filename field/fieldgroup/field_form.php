@@ -15,15 +15,20 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package datalynxfield_fieldgroup
+ * Form class for the fieldgroup field type.
+ *
+ * @package    datalynxfield_fieldgroup
  * @subpackage fieldgroup
- * @copyright 2018 michael pollak <moodle@michaelpollak.org>
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2018 michael pollak <moodle@michaelpollak.org>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
+/**
+ * Form class for the fieldgroup field type.
+ */
 class datalynxfield_fieldgroup_form extends datalynxfield_form {
     /**
      *
@@ -71,7 +76,7 @@ class datalynxfield_fieldgroup_form extends datalynxfield_form {
         $mform->addRule('param4', null, 'numeric', null, 'client');
         $mform->setType('param4', PARAM_INT);
 
-        // TODO: Select displaymode.
+        // MDL-0000 TODO: Select displaymode.
     }
 
     /**

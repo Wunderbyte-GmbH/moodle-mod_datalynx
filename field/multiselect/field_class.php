@@ -26,7 +26,13 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
+/**
+ * Field class for the multiselect field type.
+ *
+ * @package datalynxfield_multiselect
+ */
 class datalynxfield_multiselect extends datalynxfield_option_multiple {
+    /** @var string The field type. */
     public $type = 'multiselect';
 
     /**
@@ -46,6 +52,13 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
     ];
 
     /**
+     * Prepares the content for import.
+     *
+     * @param stdClass $data The data object.
+     * @param array $importsettings The import settings.
+     * @param array|null $csvrecord The CSV record.
+     * @param int|null $entryid The entry ID.
+     * @return bool
      */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
         // Import only from csv.
@@ -73,6 +86,9 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
     }
 
     /**
+     * Returns the default values for the field.
+     *
+     * @return array
      */
     public function default_values() {
         $rawdefaults = explode("\n", $this->field->param2);
@@ -94,7 +110,7 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
      */
     public static function is_fieldvalue_empty($value) {
         // If array > 1 entry we see actual input from the user, next to -999.
-        // TODO: This needs to consider alternative renderers with the select field.
+        // TODO: MDL-0000 This needs to consider alternative renderers with the select field.
         if (count($value) < 2) {
             return true;
         }
@@ -102,8 +118,10 @@ class datalynxfield_multiselect extends datalynxfield_option_multiple {
     }
 
     /**
-     * @param stdClass $entry
-     * @param array|null $values
+     * Updates the content for the field.
+     *
+     * @param stdClass $entry The entry object.
+     * @param array|null $values The values to update.
      * @return bool|int
      * @throws dml_exception
      */

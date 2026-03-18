@@ -25,6 +25,11 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
+/**
+ * Field form for the tag field type.
+ *
+ * @package datalynxfield_tag
+ */
 class datalynxfield_tag_form extends datalynxfield_form {
     /**
      * The first option for this field is whether to make tags standard tags or not

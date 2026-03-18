@@ -25,6 +25,11 @@
 
 namespace datalynxfield_multiselect\privacy;
 
+/**
+ * Privacy provider for datalynxfield_multiselect.
+ *
+ * @package datalynxfield_multiselect
+ */
 class provider implements
     // This plugin does not store any personal user data.
     \core_privacy\local\metadata\null_provider {

@@ -25,8 +25,14 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
+/**
+ * Field form class for the youtube field type.
+ *
+ * @package datalynxfield_youtube
+ */
 class datalynxfield_youtube_form extends datalynxfield_form {
     /**
+     * Define the field attributes.
      */
     public function field_definition() {
         global $OUTPUT, $DB, $PAGE, $CFG;

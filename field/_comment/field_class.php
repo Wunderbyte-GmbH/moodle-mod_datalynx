@@ -26,18 +26,32 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
+/**
+ * Comment field class for datalynx.
+ *
+ * @package mod_datalynx
+ */
 class datalynxfield__comment extends datalynxfield_no_content {
+    /** @var string Field type. */
     public $type = '_comment';
 
+    /** @var string Comment constant. */
     const _COMMENT = 'comment';
 
     /**
+     * Check if internal.
+     *
+     * @return bool
      */
     public static function is_internal() {
         return true;
     }
 
     /**
+     * Get field objects.
+     *
+     * @param int $dataid
+     * @return array
      */
     public static function get_field_objects($dataid) {
         $fieldobjects = [];
@@ -57,6 +71,10 @@ class datalynxfield__comment extends datalynxfield_no_content {
     }
 
     /**
+     * Get permissions for comments.
+     *
+     * @param stdClass $params
+     * @return array
      */
     public function permissions($params) {
         global $USER;
@@ -72,6 +90,9 @@ class datalynxfield__comment extends datalynxfield_no_content {
     }
 
     /**
+     * Validate comment parameters.
+     *
+     * @param stdClass $params
      */
     public function validation($params) {
         global $DB, $USER;

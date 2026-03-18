@@ -28,8 +28,16 @@ require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 require_once("$CFG->dirroot/user/profile/lib.php");
 
 /**
+ * Renderer for the userinfo field type.
  */
 class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
+    /**
+     * Renders the field in edit mode.
+     *
+     * @param MoodleQuickForm $mform The form object.
+     * @param stdClass $entry The entry object.
+     * @param array|null $options Additional options.
+     */
     public function display_edit(&$mform, $entry, array $options = null) {
         $field = $this->_field;
         $fieldid = $field->id();
@@ -76,6 +84,12 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Replaces tags with their respective content.
+     *
+     * @param array|null $tags The tags to replace.
+     * @param stdClass|null $entry The entry object.
+     * @param array|null $options Additional options.
+     * @return array
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
         global $USER;
@@ -127,6 +141,10 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Displays a checkbox for the user info.
+     *
+     * @param stdClass $entry The entry object.
+     * @return string
      */
     protected function display_checkbox($entry) {
         $field = $this->_field;
@@ -152,6 +170,10 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Displays a date/time for the user info.
+     *
+     * @param stdClass $entry The entry object.
+     * @return string
      */
     protected function display_datetime($entry) {
         $field = $this->_field;
@@ -184,6 +206,10 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Displays text for the user info.
+     *
+     * @param stdClass $entry The entry object.
+     * @return string
      */
     protected function display_text($entry) {
         $field = $this->_field;
@@ -232,6 +258,10 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Displays rich text for the user info.
+     *
+     * @param stdClass $entry The entry object.
+     * @return string
      */
     protected function display_richtext($entry) {
         $field = $this->_field;
@@ -269,6 +299,14 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
         return $patterns;
     }
 
+    /**
+     * Validates the field.
+     *
+     * @param int $entryid The entry ID.
+     * @param array $tags The tags to validate.
+     * @param stdClass $formdata The form data.
+     * @return array
+     */
     public function validate($entryid, $tags, $formdata) {
 
         $fieldid = $this->_field->id();
@@ -279,7 +317,7 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
             global $USER;
             $userid = $USER->id;
         } else {
-            // TODO: Find a way to get rid of this database call to find original author.
+            // TODO: MDL-0000 Find a way to get rid of this database call to find original author.
             global $DB;
             $entry = $DB->get_record('datalynx_entries', ['id' => $entryid], 'userid', MUST_EXIST);
             $userid = $entry->userid;

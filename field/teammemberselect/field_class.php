@@ -26,53 +26,80 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
 
+/**
+ * Team member select field class.
+ */
 class datalynxfield_teammemberselect extends datalynxfield_base {
+    /** @var string Field type */
     public $type = 'teammemberselect';
 
+    /** @var int Newline format constant */
     const TEAMMEMBERSELECT_FORMAT_NEWLINE = 0;
 
+    /** @var int Space format constant */
     const TEAMMEMBERSELECT_FORMAT_SPACE = 1;
 
+    /** @var int Comma format constant */
     const TEAMMEMBERSELECT_FORMAT_COMMA = 2;
 
+    /** @var int Comma space format constant */
     const TEAMMEMBERSELECT_FORMAT_COMMA_SPACE = 3;
 
+    /** @var int UL format constant */
     const TEAMMEMBERSELECT_FORMAT_UL = 4;
 
+    /** @var int Maximum team size */
     public $teamsize;
 
+    /** @var array Admissible roles */
     public $admissibleroles;
 
+    /** @var int Minimum team size */
     public $minteamsize;
 
+    /** @var int List format */
     public $listformat;
 
+    /** @var bool Use team field */
     public $teamfield;
 
+    /** @var int Reference field ID */
     public $referencefieldid;
 
+    /** @var bool Notify team members */
     public $notifyteammembers;
 
+    /** @var bool User can add self */
     public $usercanaddself;
 
+    /** @var bool Allow unsubscription */
     public $allowunsubscription;
 
+    /** @var array Separator options */
     public $separators;
 
+    /** @var array Notification rules */
     public $rules;
 
+    /** @var array Cached all users */
     protected static $allusers = [];
 
+    /** @var array Cached allowed users */
     protected static $allowedusers = [];
 
+    /** @var array Cached all users links */
     protected static $alluserslinks = [];
 
+    /** @var array Cached allowed users links */
     protected static $alloweduserslinks = [];
 
+    /** @var array Cached all user IDs */
     protected static $alluserids = [];
 
+    /** @var array Cached forbidden user IDs */
     protected static $forbiddenuserids = [];
 
+    /** @var array Admissibility settings */
     protected static $admissibility = ['needed' => [], 'forbidden' => []];
 
     /**
@@ -81,6 +108,12 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
      */
     protected $forfieldgroup = true;
 
+    /**
+     * Constructor.
+     *
+     * @param int|object $df Datalynx ID or object
+     * @param int|object $field Field ID or object
+     */
     public function __construct($df = 0, $field = 0) {
         parent::__construct($df, $field);
         global $DB;
@@ -117,6 +150,9 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         );
     }
 
+    /**
+     * Initialize user menu data.
+     */
     protected function init_user_menu() {
         global $DB, $COURSE;
 
@@ -178,6 +214,12 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         }
     }
 
+    /**
+     * Get admissibility for roles in context.
+     *
+     * @param context $context
+     * @return array
+     */
     protected function get_admissibility_for_roles($context) {
         $allneeded = [];
         $allforbidden = [];
@@ -198,6 +240,11 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         return ['needed' => array_unique($allneeded), 'forbidden' => array_unique($allforbidden)];
     }
 
+    /**
+     * Get team field record.
+     *
+     * @return stdClass|false
+     */
     public function get_teamfield() {
         global $DB;
 
@@ -217,7 +264,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
     public function update_content(stdClass $entry, array $values = null) {
         $newcontentid = parent::update_content($entry, $values);
 
-        // TODO: All this is only to notify team members. Check if we really need this here.
+        // TODO: MDL-0000 All this is only to notify team members. Check if we really need this here.
         global $DB;
         $fieldid = $this->field->id;
 
@@ -288,6 +335,15 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         return true;
     }
 
+    /**
+     * Get options menu for selection.
+     *
+     * @param bool $addnoselection
+     * @param bool $makelinks
+     * @param int $excludeuser
+     * @param bool $allowall
+     * @return array
+     */
     public function options_menu(
         $addnoselection = false,
         $makelinks = false,
@@ -408,6 +464,13 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         return [$sql, $params, $usecontent];
     }
 
+    /**
+     * Parse search parameters.
+     *
+     * @param object $formdata
+     * @param int $i
+     * @return mixed
+     */
     public function parse_search($formdata, $i) {
         global $USER;
         $fieldid = $this->field->id;
@@ -424,6 +487,13 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         }
     }
 
+    /**
+     * Format content for storage.
+     *
+     * @param object $entry
+     * @param array $values
+     * @return array
+     */
     protected function format_content($entry, array $values = null) {
         $fieldid = $this->field->id;
         $oldcontents = [];
@@ -449,12 +519,22 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         return [$contents, $oldcontents];
     }
 
+    /**
+     * Get supported search operators.
+     *
+     * @return array
+     */
     public function get_supported_search_operators() {
         return ['' => get_string('empty', 'datalynx'),
             'USER' => get_string('iamteammember', 'datalynx'),
             'OTHER_USER' => get_string('useristeammember', 'datalynx')];
     }
 
+    /**
+     * Check if group by is supported.
+     *
+     * @return bool
+     */
     public function supports_group_by() {
         return false;
     }

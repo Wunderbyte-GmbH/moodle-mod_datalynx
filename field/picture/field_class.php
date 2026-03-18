@@ -26,7 +26,13 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/file/field_class.php");
 
+/**
+ * Field class for the picture field type.
+ *
+ * @package datalynxfield_picture
+ */
 class datalynxfield_picture extends datalynxfield_file {
+    /** @var string The field type. */
     public $type = 'picture';
 
     /**
@@ -36,13 +42,18 @@ class datalynxfield_picture extends datalynxfield_file {
     protected $forfieldgroup = true;
 
     /**
+     * Updates the content for the field.
+     *
+     * @param stdClass $entry The entry object.
+     * @param array|null $values The values to update.
+     * @return bool|int
      */
     public function update_content(stdClass $entry, array $values = null) {
         global $DB;
         $parentcontentid = parent::update_content($entry, $values);
 
         // We can read the contentid from entry and update the right files.
-        // TODO: The parent class should return the correct contentid, why do we do this?
+        // TODO: MDL-0000 The parent class should return the correct contentid, why do we do this?
         $contentid = isset($entry->{"c{$this->field->id}_id"}) ? $entry->{"c{$this->field->id}_id"} : null;
 
         if (!empty($contentid)) {
@@ -53,6 +64,10 @@ class datalynxfield_picture extends datalynxfield_file {
     }
 
     /**
+     * Updates the field definition.
+     *
+     * @param stdClass|null $fromform Data from the form.
+     * @return bool
      */
     public function update_field($fromform = null) {
         global $DB, $OUTPUT;

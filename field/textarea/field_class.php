@@ -28,9 +28,14 @@ require_once($CFG->dirroot . '/mod/datalynx/field/field_class.php');
 require_once($CFG->dirroot . '/lib/filelib.php');
 require_once($CFG->dirroot . '/repository/lib.php');
 
+/**
+ * Textarea field class.
+ */
 class datalynxfield_textarea extends datalynxfield_base {
+    /** @var string Field type */
     public $type = 'textarea';
 
+    /** @var array Editor options */
     protected $editoroptions;
 
     /**
@@ -39,6 +44,12 @@ class datalynxfield_textarea extends datalynxfield_base {
      */
     protected $forfieldgroup = true;
 
+    /**
+     * Constructor.
+     *
+     * @param int|object $df Datalynx ID or object
+     * @param int|object $field Field ID or object
+     */
     public function __construct($df = 0, $field = 0) {
         parent::__construct($df, $field);
 
@@ -58,18 +69,29 @@ class datalynxfield_textarea extends datalynxfield_base {
     }
 
     /**
+     * Check if the field is an editor.
+     *
+     * @return bool
      */
     public function is_editor() {
         return !empty($this->field->param1);
     }
 
     /**
+     * Get editor options.
+     *
+     * @return array
      */
     public function editor_options() {
         return $this->editoroptions;
     }
 
     /**
+     * Update the field content.
+     *
+     * @param stdClass $entry
+     * @param array $values
+     * @return int
      */
     public function update_content(stdClass $entry, array $values = null) {
         global $DB;
@@ -103,12 +125,22 @@ class datalynxfield_textarea extends datalynxfield_base {
     }
 
     /**
+     * Get the content parts of the field.
+     *
+     * @return array
      */
     public function get_content_parts() {
         return ['content', 'content1'];
     }
 
     /**
+     * Prepare content for import.
+     *
+     * @param stdClass $data
+     * @param array $importsettings
+     * @param array $csvrecord
+     * @param int $entryid
+     * @return bool
      */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
         $fieldid = $this->field->id;
@@ -134,6 +166,11 @@ class datalynxfield_textarea extends datalynxfield_base {
         return true;
     }
 
+    /**
+     * Get supported search operators.
+     *
+     * @return array
+     */
     public function get_supported_search_operators() {
         return ['' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
                 'LIKE' => get_string('contains', 'datalynx')];

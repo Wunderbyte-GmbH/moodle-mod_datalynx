@@ -26,20 +26,33 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
+/**
+ * Internal time field.
+ */
 class datalynxfield__time extends datalynxfield_no_content {
+    /** @var string Field type. */
     public $type = '_time';
 
+    /** @var string Time created name. */
     const _TIMECREATED = 'timecreated';
 
+    /** @var string Time modified name. */
     const _TIMEMODIFIED = 'timemodified';
 
     /**
+     * Check if it is internal field.
+     *
+     * @return bool
      */
     public static function is_internal() {
         return true;
     }
 
     /**
+     * Return field objects for this type.
+     *
+     * @param int $dataid
+     * @return array
      */
     public static function get_field_objects($dataid) {
         $fieldobjects = [];
@@ -56,14 +69,19 @@ class datalynxfield__time extends datalynxfield_no_content {
     }
 
     /**
+     * Return internal name.
+     *
+     * @return string
      */
     public function get_internalname() {
         return $this->field->internalname;
     }
 
     /**
-     * @param $formdata
-     * @param $i
+     * Parse search data.
+     *
+     * @param object $formdata
+     * @param int $i
      * @return array|false
      */
     public function parse_search($formdata, $i) {
@@ -123,6 +141,8 @@ class datalynxfield__time extends datalynxfield_no_content {
     }
 
     /**
+     * Return SQL to compare text in database.
+     *
      * @param string $column
      * @return string
      */
@@ -132,6 +152,9 @@ class datalynxfield__time extends datalynxfield_no_content {
     }
 
     /**
+     * Return SQL for ORDER BY clause.
+     *
+     * @return string
      */
     public function get_sort_sql() {
         return 'e.' . $this->field->internalname;
@@ -165,6 +188,10 @@ class datalynxfield__time extends datalynxfield_no_content {
     }
 
     /**
+     * Format search value for display.
+     *
+     * @param array $searchparams
+     * @return string
      */
     public function format_search_value($searchparams) {
         [$not, $operator, $value] = $searchparams;
@@ -182,6 +209,11 @@ class datalynxfield__time extends datalynxfield_no_content {
         }
     }
 
+    /**
+     * Return supported search operators.
+     *
+     * @return array
+     */
     public function get_supported_search_operators() {
         return ['' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
                 '>' => get_string('after', 'datalynx'), '<' => get_string('before', 'datalynx'),

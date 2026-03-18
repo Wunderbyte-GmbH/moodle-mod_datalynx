@@ -25,20 +25,33 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
+/**
+ * Internal status field.
+ */
 class datalynxfield__status extends datalynxfield_no_content {
+    /** @var string Field type. */
     public $type = '_status';
 
+    /** @var string Status name. */
     const _STATUS = 'status';
 
+    /** @var int Constant for Not Set status. */
     const STATUS_NOT_SET = 0;
 
+    /** @var int Constant for Draft status. */
     const STATUS_DRAFT = 1;
 
+    /** @var int Constant for Final Submission status. */
     const STATUS_FINAL_SUBMISSION = 2;
 
+    /** @var int Constant for Submission status. */
     const STATUS_SUBMISSION = 3;
 
     /**
+     * Return field objects for this type.
+     *
+     * @param int $dataid
+     * @return array
      */
     public static function get_field_objects($dataid) {
         $fieldobjects = [];
@@ -59,37 +72,39 @@ class datalynxfield__status extends datalynxfield_no_content {
         return true;
     }
 
+    /**
+     * Check if field is editable.
+     *
+     * @return bool
+     */
     public function is_editable() {
         return true;
     }
 
     /**
+     * Return internal name.
+     *
+     * @return string
      */
     public function get_internalname() {
         return $this->field->internalname;
     }
 
     /**
+     * Return SQL for ORDER BY clause.
+     *
+     * @return string
      */
     public function get_sort_sql() {
         return 'e.status';
     }
 
     /**
-     * {@inheritDoc}
-     * @see datalynxfield_base::get_search_sql()
-     */
-    public function get_search_sql(array $search): array {
-        static $i = 0;
-        $not = $search[0];
-        $value = $search[2];
-        $name = "status_$i";
-        $i++;
-        $value = $value < 0 ? 0 : $value;
-        return [" $not (e.status = :$name) ", [$name => $value], false];
-    }
-
-    /**
+     * Parse search data.
+     *
+     * @param object $formdata
+     * @param int $i
+     * @return mixed
      */
     public function parse_search($formdata, $i) {
         $fieldid = $this->field->id;

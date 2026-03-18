@@ -15,24 +15,36 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package datalynxfield_fieldgroup
+ * Field class for the fieldgroup field type.
+ *
+ * @package    datalynxfield_fieldgroup
  * @subpackage fieldgroup
- * @copyright 2018 michael pollak <moodle@michaelpollak.org>
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2018 michael pollak <moodle@michaelpollak.org>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(__FILE__) . '/../field_class.php');
 
+/**
+ * Field class for the fieldgroup field type.
+ */
 class datalynxfield_fieldgroup extends datalynxfield_base {
+    /** @var string The field type identifier. */
     public $type = 'fieldgroup';
 
     /**
-     * Fieldids of the fields belonging to the fieldgroup#
+     * Fieldids of the fields belonging to the fieldgroup.
      * @var int[]
      */
     public $fieldids = [];
 
+    /**
+     * Constructor for the fieldgroup field.
+     *
+     * @param int $df The datalynx id.
+     * @param int|stdClass $field The field id or object.
+     */
     public function __construct($df = 0, $field = 0) {
         parent::__construct($df, $field);
         if (!empty($this->field->param1)) {
@@ -40,30 +52,66 @@ class datalynxfield_fieldgroup extends datalynxfield_base {
         }
     }
 
+    /**
+     * Get the content names for this field.
+     *
+     * @return string[]
+     */
     protected function content_names() {
         return [''];
     }
 
+    /**
+     * Check if the field supports group by.
+     *
+     * @return bool
+     */
     public function supports_group_by() {
         return false;
     }
 
+    /**
+     * Get the supported search operators for this field.
+     *
+     * @return bool
+     */
     public function get_supported_search_operators() {
         return false;
     }
 
+    /**
+     * Check if the field is a custom filter field.
+     *
+     * @return bool
+     */
     public static function is_customfilterfield() {
         return false;
     }
 
+    /**
+     * Get the select SQL for this field.
+     *
+     * @return string
+     */
     public function get_select_sql() {
         return '';
     }
 
+    /**
+     * Get the sort SQL for this field.
+     *
+     * @return string
+     */
     public function get_sort_sql() {
         return '';
     }
 
+    /**
+     * Get the file area for this field.
+     *
+     * @param string|null $suffix
+     * @return bool
+     */
     protected function filearea($suffix = null) {
         return false;
     }

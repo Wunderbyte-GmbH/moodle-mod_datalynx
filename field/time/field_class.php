@@ -26,17 +26,26 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
+/**
+ * Time field class.
+ */
 class datalynxfield_time extends datalynxfield_base {
+    /** @var string Field type */
     public $type = 'time';
 
+    /** @var bool Date only */
     public $dateonly;
 
+    /** @var bool Masked */
     public $masked;
 
+    /** @var int Start year */
     public $startyear;
 
+    /** @var int Stop year */
     public $stopyear;
 
+    /** @var string Display format */
     public $displayformat;
 
     /**
@@ -45,6 +54,12 @@ class datalynxfield_time extends datalynxfield_base {
      */
     protected $forfieldgroup = true;
 
+    /**
+     * Constructor.
+     *
+     * @param int|object $df Datalynx ID or object
+     * @param int|object $field Field ID or object
+     */
     public function __construct($df = 0, $field = 0) {
         parent::__construct($df, $field);
         $this->dateonly = $this->field->param1;
@@ -55,12 +70,20 @@ class datalynxfield_time extends datalynxfield_base {
     }
 
     /**
+     * Get the content names of the field.
+     *
+     * @return array
      */
     protected function content_names() {
         return ['', 'year', 'month', 'day', 'hour', 'minute', 'enabled'];
     }
 
     /**
+     * Format the field content.
+     *
+     * @param stdClass $entry
+     * @param array $values
+     * @return array
      */
     protected function format_content($entry, array $values = null) {
         $fieldid = $this->field->id;
@@ -104,6 +127,11 @@ class datalynxfield_time extends datalynxfield_base {
     }
 
     /**
+     * Parse the search parameters.
+     *
+     * @param stdClass $formdata
+     * @param int $i
+     * @return array|bool
      */
     public function parse_search($formdata, $i) {
         $time = [];
@@ -123,6 +151,11 @@ class datalynxfield_time extends datalynxfield_base {
         }
     }
 
+    /**
+     * Check if group by is supported.
+     *
+     * @return bool
+     */
     public function supports_group_by() {
         return true;
     }
@@ -157,6 +190,7 @@ class datalynxfield_time extends datalynxfield_base {
                     $fromdate = date("Y-m-d", $from);
                     $from = strtotime($fromdate);
                 }
+                // Fall through.
             case '<':
             case '>':
                 $params[$namefrom] = $from;
@@ -213,7 +247,7 @@ class datalynxfield_time extends datalynxfield_base {
                         'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember',
                 ];
 
-                // English month names
+                // English month names.
                 $englishmonths = [
                         'January', 'February', 'March', 'April', 'May', 'June',
                         'July', 'August', 'September', 'October', 'November', 'December',
@@ -252,6 +286,10 @@ class datalynxfield_time extends datalynxfield_base {
     }
 
     /**
+     * Format the search value.
+     *
+     * @param array $searchparams
+     * @return string
      */
     public function format_search_value($searchparams) {
         [$not, $operator, $value] = $searchparams;

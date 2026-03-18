@@ -26,7 +26,13 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . "/mod/datalynx/field/field_class.php");
 
+/**
+ * Field class for the select field type.
+ *
+ * @package datalynxfield_select
+ */
 class datalynxfield_select extends datalynxfield_option_single {
+    /** @var string The field type. */
     public $type = 'select';
 
     /**
@@ -59,8 +65,14 @@ class datalynxfield_select extends datalynxfield_option_single {
         }
     }
 
+    /**
+     * Returns the number of arguments required by the given operator.
+     *
+     * @param string $operator The operator.
+     * @return int
+     */
     public function get_argument_count(string $operator) {
-        if ($operator === "") { // "Empty" operator
+        if ($operator === "") { // "Empty" operator.
             return 0;
         } else {
             return 1;

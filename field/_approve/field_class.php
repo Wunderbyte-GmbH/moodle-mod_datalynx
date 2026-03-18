@@ -22,16 +22,26 @@
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die();
-
+global $CFG;
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
+/**
+ * Approve field class for datalynx.
+ *
+ * @package mod_datalynx
+ */
 class datalynxfield__approve extends datalynxfield_no_content {
+    /** @var string Field type. */
     public $type = '_approve';
 
+    /** @var string Approved constant. */
     const _APPROVED = 'approve';
 
     /**
+     * Get field objects.
+     *
+     * @param int $dataid
+     * @return array
      */
     public static function get_field_objects($dataid) {
         $fieldobjects = [];
@@ -44,18 +54,27 @@ class datalynxfield__approve extends datalynxfield_no_content {
     }
 
     /**
+     * Check if internal.
+     *
+     * @return bool
      */
     public static function is_internal() {
         return true;
     }
 
     /**
+     * Get internal name.
+     *
+     * @return string
      */
     public function get_internalname() {
         return $this->field->internalname;
     }
 
     /**
+     * Get sort SQL.
+     *
+     * @return string
      */
     public function get_sort_sql() {
         return 'e.approved';
@@ -71,6 +90,11 @@ class datalynxfield__approve extends datalynxfield_no_content {
     }
 
     /**
+     * Parse search data.
+     *
+     * @param stdClass $formdata
+     * @param int $i
+     * @return mixed
      */
     public function parse_search($formdata, $i) {
         $fieldid = $this->field->id;

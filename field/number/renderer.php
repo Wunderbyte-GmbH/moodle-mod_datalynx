@@ -15,12 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Renderer for the number field type.
  *
  * @package datalynxfield_number
- * @subpackage number
- * @copyright 2013 onwards edulabs.org and associated programmers
- * @copyright based on the work  by 2011 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 

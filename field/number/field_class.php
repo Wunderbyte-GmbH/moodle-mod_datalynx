@@ -26,7 +26,13 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/text/field_class.php");
 
+/**
+ * Field class for the number field type.
+ *
+ * @package datalynxfield_number
+ */
 class datalynxfield_number extends datalynxfield_text {
+    /** @var string The field type. */
     public $type = 'number';
 
     /**
@@ -101,6 +107,13 @@ class datalynxfield_number extends datalynxfield_text {
         }
     }
 
+    /**
+     * Formats the content for the field.
+     *
+     * @param stdClass $entry The entry object.
+     * @param array|null $values The values to format.
+     * @return array
+     */
     protected function format_content($entry, array $values = null) {
         $fieldid = $this->field->id;
         $contents = [];

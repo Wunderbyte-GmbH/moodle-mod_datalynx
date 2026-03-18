@@ -26,9 +26,12 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
+/**
+ * Datalynxview field settings form.
+ */
 class datalynxfield_datalynxview_form extends datalynxfield_form {
     /**
-     * Overrides the field_definition of field/field_form.php for the datalynx_view field-type
+     * Define field settings form.
      */
     public function field_definition() {
         global $CFG, $PAGE, $DB;
@@ -98,6 +101,7 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
     }
 
     /**
+     * Additional form definition after data is set.
      */
     public function definition_after_data() {
         global $DB;
@@ -133,6 +137,9 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
     }
 
     /**
+     * Preprocess field data before setting it.
+     *
+     * @param object $data
      */
     public function data_preprocessing(&$data) {
         if (!empty($data->param6)) {
@@ -141,6 +148,9 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
     }
 
     /**
+     * Set field data.
+     *
+     * @param object $data
      */
     public function set_data($data) {
         $this->data_preprocessing($data);
@@ -148,6 +158,10 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
     }
 
     /**
+     * Get field data.
+     *
+     * @param bool $slashed
+     * @return object|bool
      */
     public function get_data($slashed = true) {
         if ($data = parent::get_data($slashed)) {
@@ -162,6 +176,11 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
     }
 
     /**
+     * Validate field data.
+     *
+     * @param array $data
+     * @param array $files
+     * @return array
      */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);

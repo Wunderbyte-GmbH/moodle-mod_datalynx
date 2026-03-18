@@ -15,12 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Field class for the duration field type.
  *
- * @package datalynxfield_duration
- * @subpackage duration
- * @copyright 2014 onwards by edulabs.org and associated programmers
- * @copyright based on the work by 2013 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    datalynxfield_duration
+ * @copyright  2014 onwards by edulabs.org and associated programmers
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 
@@ -35,7 +34,7 @@ class datalynxfield_duration extends datalynxfield_base {
     public $type = 'duration';
 
     /** @var array|null Cache for time units array. */
-    protected $_units = null;
+    protected $unitsarray = null; // phpcs:ignore
 
     /**
      * Can this field be used in fieldgroups? Override if yes.
@@ -49,12 +48,12 @@ class datalynxfield_duration extends datalynxfield_base {
      * @return array unit length in seconds => string unit name.
      */
     public function get_units() {
-        if (is_null($this->_units)) {
-            $this->_units = [604800 => get_string('weeks'), 86400 => get_string('days'),
+        if (is_null($this->unitsarray)) {
+            $this->unitsarray = [604800 => get_string('weeks'), 86400 => get_string('days'),
                     3600 => get_string('hours'), 60 => get_string('minutes'), 1 => get_string('seconds'),
             ];
         }
-        return $this->_units;
+        return $this->unitsarray;
     }
 
     /**
@@ -80,8 +79,8 @@ class datalynxfield_duration extends datalynxfield_base {
     /**
      * Return the SQL expression for comparing the content column as a number.
      *
-     * @param string $column
-     * @return string
+     * @param string $column The column name to compare.
+     * @return string The SQL fragment.
      */
     protected function get_sql_compare_text(string $column = 'content'): string {
         global $DB;
@@ -255,26 +254,18 @@ class datalynxfield_duration extends datalynxfield_base {
     }
 
     /**
-     * Return the list of supported search operators for this field type.
+     * Get the list of supported search operators for this field type.
      *
-     * @return array Associative array of operator => label.
+     * @return array Array of operator labels keyed by operator.
      */
     public function get_supported_search_operators() {
-        return ['' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
-                '>' => get_string('greaterthan', 'datalynx'),
-                '>=' => get_string('greater_equal', 'datalynx'),
-                '<' => get_string('less_than', 'datalynx'), '<=' => get_string('less_equal', 'datalynx'),
-                'BETWEEN' => get_string('between', 'datalynx')];
-    }
-
-    /**
-     * Is $value a valid content or do we see an empty input?
-     * @return bool
-     */
-    public static function is_fieldvalue_empty($value) {
-        if ($value == 0) {
-            return true;
-        }
-        return false;
+        return [
+            '=' => get_string('equalto', 'datalynx'),
+            '>' => get_string('greaterthan', 'datalynx'),
+            '<' => get_string('lessthan', 'datalynx'),
+            '>=' => get_string('greaterthanorequalto', 'datalynx'),
+            '<=' => get_string('lessthanorequalto', 'datalynx'),
+            'BETWEEN' => get_string('between', 'datalynx'),
+        ];
     }
 }

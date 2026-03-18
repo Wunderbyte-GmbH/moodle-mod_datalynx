@@ -29,6 +29,13 @@ require_once(dirname(__FILE__) . "/../renderer.php");
  * Class datalynxfield_youtube_renderer Renderer for text field type
  */
 class datalynxfield_youtube_renderer extends datalynxfield_renderer {
+    /**
+     * Renders the field in edit mode.
+     *
+     * @param MoodleQuickForm $mform The form object.
+     * @param stdClass $entry The entry object.
+     * @param array $options Additional options.
+     */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $field = $this->_field;
         $fieldid = $field->id();
@@ -45,7 +52,7 @@ class datalynxfield_youtube_renderer extends datalynxfield_renderer {
 
         $mform->addElement('text', $fieldname, null, $fieldattr);
         $mform->addHelpButton($fieldname, 'youtubeurl', 'datalynxfield_youtube');
-        // TODO: Add help string.
+        // TODO: MDL-0000 Add help string.
         $mform->setType($fieldname, PARAM_TEXT);
 
         $mform->setDefault($fieldname, $content);
@@ -54,6 +61,13 @@ class datalynxfield_youtube_renderer extends datalynxfield_renderer {
         }
     }
 
+    /**
+     * Renders the field in display mode.
+     *
+     * @param stdClass $entry The entry object.
+     * @param array $options Additional options.
+     * @return string
+     */
     public function render_display_mode(stdClass $entry, array $options): string {
         $field = $this->_field;
         $fieldid = $field->id();
@@ -71,6 +85,14 @@ class datalynxfield_youtube_renderer extends datalynxfield_renderer {
         return '';
     }
 
+    /**
+     * Validates the field.
+     *
+     * @param int $entryid The entry ID.
+     * @param array $tags The tags to validate.
+     * @param stdClass $formdata The form data.
+     * @return array
+     */
     public function validate($entryid, $tags, $formdata) {
         global $DB;
 

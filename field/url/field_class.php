@@ -26,11 +26,17 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
+/**
+ * URL field class.
+ */
 class datalynxfield_url extends datalynxfield_base {
+    /** @var string CSS class */
     public $class;
 
+    /** @var string Link target */
     public $target;
 
+    /** @var string Field type */
     public $type = 'url';
 
     /**
@@ -39,6 +45,12 @@ class datalynxfield_url extends datalynxfield_base {
      */
     protected $forfieldgroup = true;
 
+    /**
+     * Constructor.
+     *
+     * @param int|object $df Datalynx ID or object
+     * @param int|object $field Field ID or object
+     */
     public function __construct($df = 0, $field = 0) {
         parent::__construct($df, $field);
         $this->class = isset($field->param3) ? $field->param3 : '';
@@ -46,11 +58,21 @@ class datalynxfield_url extends datalynxfield_base {
     }
 
     /**
+     * Get the content names of the field.
+     *
+     * @return array
      */
     protected function content_names() {
         return ['url', 'alt'];
     }
 
+    /**
+     * Format the field content for storage.
+     *
+     * @param stdClass $entry
+     * @param array $values
+     * @return array
+     */
     protected function format_content($entry, array $values = null) {
         $fieldid = $this->field->id;
         $oldcontents = [];
@@ -69,7 +91,7 @@ class datalynxfield_url extends datalynxfield_base {
                 if ($name) { // Update from form.
                     switch ($name) {
                         case 'url':
-                            // TODO: Is this really the place to validate for empty fields?
+                            // TODO: MDL-0000 Is this really the place to validate for empty fields?
                             $url = clean_param($value, PARAM_URL);
                             break;
                         case 'alt':
@@ -97,17 +119,32 @@ class datalynxfield_url extends datalynxfield_base {
     }
 
     /**
+     * Get the content parts of the field.
+     *
+     * @return array
      */
     public function get_content_parts() {
         return ['content', 'content1'];
     }
 
+    /**
+     * Get supported search operators.
+     *
+     * @return array
+     */
     public function get_supported_search_operators() {
         return ['' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
                 'LIKE' => get_string('contains', 'datalynx')];
     }
 
     /**
+     * Prepare field content for import.
+     *
+     * @param stdClass $data
+     * @param array $importsettings
+     * @param array $csvrecord
+     * @param int $entryid
+     * @return bool
      */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
         // Import only from csv.

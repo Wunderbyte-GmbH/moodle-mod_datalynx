@@ -30,15 +30,19 @@ require_once(dirname(__FILE__) . '/../renderer/renderer.php');
  * Base class for field patterns
  */
 abstract class datalynxfield_renderer {
+    /** @var int Pattern visibility in menu. */
     const PATTERN_SHOW_IN_MENU = 0;
 
+    /** @var int Pattern category. */
     const PATTERN_CATEGORY = 1;
 
+    /** @var array Default options for rendering. */
     protected static $defaultoptions = ['manage' => false, 'visible' => false, 'edit' => false,
             'editable' => false, 'disabled' => false, 'required' => false, 'internal' => false,
     ];
 
-    protected $_field = null;
+    /** @var datalynxfield_base The field object. */
+    protected $_field = null; // phpcs:ignore
 
     /**
      * Constructor
@@ -372,6 +376,10 @@ abstract class datalynxfield_renderer {
     }
 
     /**
+     * Returns the menu for the field.
+     *
+     * @param bool $showall Whether to show all patterns.
+     * @return array
      */
     final public function get_menu($showall = false) {
         // The default menu category for fields.
@@ -425,6 +433,9 @@ abstract class datalynxfield_renderer {
     }
 
     /**
+     * Returns the patterns for pluginfile.
+     *
+     * @return array
      */
     public function pluginfile_patterns() {
         return [];

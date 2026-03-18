@@ -27,9 +27,15 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
+ * URL field renderer class.
  */
 class datalynxfield_url_renderer extends datalynxfield_renderer {
     /**
+     * Render the field in edit mode.
+     *
+     * @param MoodleQuickForm $mform
+     * @param stdClass $entry
+     * @param array $options
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $field = $this->_field;
@@ -62,6 +68,11 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Render the field in display mode.
+     *
+     * @param stdClass $entry
+     * @param array $options
+     * @return string
      */
     public function render_display_mode(stdClass $entry, array $options): string {
         global $CFG;
@@ -118,6 +129,14 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
         return '';
     }
 
+    /**
+     * Render the field in search mode.
+     *
+     * @param MoodleQuickForm $mform
+     * @param int $i
+     * @param string $value
+     * @return array
+     */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
         $fieldid = $this->_field->id();
         $fieldname = "f_{$i}_$fieldid";
@@ -147,6 +166,14 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
         return $patterns;
     }
 
+    /**
+     * Validate the field input.
+     *
+     * @param int $entryid
+     * @param array $tags
+     * @param stdClass $formdata
+     * @return array
+     */
     public function validate($entryid, $tags, $formdata) {
 
         $fieldid = $this->_field->id();
@@ -169,7 +196,7 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
             if ($isurl || $isdefault || $isempty) {
                 continue;
             } else {
-                $errors["field_{$fieldid}_{$entryid}_grp"] = "Please enter a valid URL."; // TODO: Multilang.
+                $errors["field_{$fieldid}_{$entryid}_grp"] = "Please enter a valid URL."; // TODO: MDL-0000 Multilang.
             }
         }
 

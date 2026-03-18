@@ -31,6 +31,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
+ * Renderer for the entry author field.
  */
 class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
     /**
@@ -254,7 +255,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
      * @return mixed
      */
     public function display_picture($entry, $large = false) {
-        global $OUTPUT, $USER;
+        global $USER;
 
         if ($entry->id < 0) { // New entry.
             $user = $USER;
@@ -274,7 +275,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
         if ($large) {
             $pictureparams['size'] = 100;
         }
-        return $OUTPUT->user_picture($user, $pictureparams);
+        return $this->output->user_picture($user, $pictureparams);
     }
 
     /**
@@ -332,7 +333,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
      * @return string
      */
     public function display_badges($entry) {
-        global $USER, $PAGE;
+        global $USER;
 
         if ($entry->id < 0) { // New entry.
             $userid = $USER->id;
@@ -340,7 +341,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
             $userid = $entry->userid;
         }
 
-        $output = $PAGE->get_renderer('core', 'badges');
+        $output = $this->page->get_renderer('core', 'badges');
 
         if ($badges = badges_get_user_badges($userid)) {
             return $output->print_badges_list($badges, $userid, true);

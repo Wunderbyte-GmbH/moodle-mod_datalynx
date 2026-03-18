@@ -15,17 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Privacy provider implementation for datalynxfield_checkbox.
+ * Privacy provider implementation for mod_datalynx.
  *
  * @package mod_datalynx
- * @copyright 2018 Michael Pollak <moodle@michaelpollak.org>
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * This is heavily based on mod_data from Marina Glancy, thank you.
  */
 
 namespace mod_datalynx\privacy;
 
-// TODO: Which are needed?
+// TODO: MDL-0000 Which are needed?
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_contextlist;
 use core_privacy\local\request\contextlist;
@@ -34,6 +31,11 @@ use core_privacy\local\request\transform;
 use core_privacy\local\request\writer;
 use core_privacy\manager;
 
+/**
+ * Privacy provider implementation for mod_datalynx.
+ *
+ * @package mod_datalynx
+ */
 class provider implements
 
     // This plugin stores personal data.
@@ -308,7 +310,7 @@ class provider implements
         }
         $contextdata = helper::get_context_data($context, $user);
         helper::export_context_files($context, $user);
-        writer::with_context($context)->export_data([], $contextdata); // TODO: Check if this is export_data or not.
+        writer::with_context($context)->export_data([], $contextdata); // TODO: MDL-0000 Check if this is export_data or not.
     }
 
     /**
@@ -328,6 +330,7 @@ class provider implements
             );
 
             // Allow datafield plugin to implement their own deletion.
+            // TODO: MDL-0000 Implement this if needed.
             /*
             $classname = manager::get_provider_classname_for_component('datafield_' . $fieldobj->type);
             if (class_exists($classname) && is_subclass_of($classname, datafield_provider::class)) {
@@ -369,7 +372,7 @@ class provider implements
         $DB->delete_records_select('datalynx_contents', 'entryid ' . $sql, $params);
         // Delete from datalynx_entries.
         $DB->delete_records_select('datalynx_entries', 'id ' . $sql, $params);
-        // NOTE: Keep the space after entryid and id.
+        // Note: Keep the space after entryid and id.
     }
 
     /**

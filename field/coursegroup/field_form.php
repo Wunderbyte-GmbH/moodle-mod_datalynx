@@ -26,8 +26,12 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
+/**
+ * Coursegroup field settings form.
+ */
 class datalynxfield_coursegroup_form extends datalynxfield_form {
     /**
+     * Define field settings form.
      */
     public function field_definition() {
         global $CFG, $PAGE, $DB, $SITE;
@@ -60,7 +64,7 @@ class datalynxfield_coursegroup_form extends datalynxfield_form {
         $options = ['coursefield' => 'param1', 'groupfield' => 'param2',
                 'acturl' => "$CFG->wwwroot/mod/datalynx/field/coursegroup/loadgroups.php"];
 
-        // Add JQuery
+        // Add JQuery.
         $PAGE->requires->js_call_amd('mod_datalynx/coursegroup', 'init', [$options]);
     }
 }

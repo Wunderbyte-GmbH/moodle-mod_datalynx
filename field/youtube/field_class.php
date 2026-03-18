@@ -25,7 +25,11 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(__FILE__) . '/../field_class.php');
 
+/**
+ * Field class for the youtube field type.
+ */
 class datalynxfield_youtube extends datalynxfield_base {
+    /** @var string The field type. */
     public $type = 'youtube';
 
     /**
@@ -34,18 +38,40 @@ class datalynxfield_youtube extends datalynxfield_base {
      */
     protected $forfieldgroup = false;
 
+    /**
+     * Does this field support group by?
+     *
+     * @return bool
+     */
     public function supports_group_by() {
         return false;
     }
 
+    /**
+     * Returns the supported search operators.
+     *
+     * @return array
+     */
     public function get_supported_search_operators() {
         return [];
     }
 
+    /**
+     * Is this a custom filter field?
+     *
+     * @return bool
+     */
     public static function is_customfilterfield() {
         return false;
     }
 
+    /**
+     * Formats the content for the field.
+     *
+     * @param stdClass $entry The entry object.
+     * @param array|null $values The values to format.
+     * @return array
+     */
     protected function format_content($entry, array $values = null) {
         $fieldid = $this->field->id;
         $oldcontents = [];

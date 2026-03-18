@@ -26,8 +26,12 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
+/**
+ * Datalynx gradeitem field form class.
+ */
 class datalynxfield_gradeitem_form extends datalynxfield_form {
     /**
+     * Define the field specific form elements.
      */
     public function field_definition() {
         global $DB;

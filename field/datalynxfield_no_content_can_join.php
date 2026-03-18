@@ -16,7 +16,10 @@
 
 /**
  * Base class for Datalynx field types that require no content. Example: User profile fields.
+ *
  * @package mod_datalynx
+ * @copyright 2013 onwards edulabs.org and associated programmers
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class datalynxfield_no_content_can_join extends datalynxfield_no_content {
 }

@@ -15,29 +15,37 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Entry group field class.
  *
- * @package datalynxfield_entrygroup
- * @subpackage entrygroup
- * @copyright 2013 onwards edulabs.org and associated programmers
- * @copyright based on the work by 2012 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    datalynxfield_entrygroup
+ * @copyright  2013 onwards edulabs.org and associated programmers
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/datalynx/field/field_class.php');
 
 class datalynxfield_entrygroup extends datalynxfield_no_content {
+    /** @var string The field type. */
     public $type = 'entrygroup';
 
+    /** @var string Group constant. */
     const _GROUP = 'entrygroup';
 
     /**
+     * Check if the field is internal.
+     *
+     * @return bool
      */
     public static function is_internal() {
         return true;
     }
 
     /**
+     * Get field objects for the group field.
+     *
+     * @param int $dataid The datalynx ID.
+     * @return array
      */
     public static function get_field_objects($dataid) {
         $fieldobjects = [];
@@ -50,6 +58,9 @@ class datalynxfield_entrygroup extends datalynxfield_no_content {
     }
 
     /**
+     * Get the internal name of the field.
+     *
+     * @return string
      */
     public function get_internalname() {
         return $this->field->internalname;

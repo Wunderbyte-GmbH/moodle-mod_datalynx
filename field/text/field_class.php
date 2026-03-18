@@ -26,7 +26,11 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(__FILE__) . '/../field_class.php');
 
+/**
+ * Text field class.
+ */
 class datalynxfield_text extends datalynxfield_base {
+    /** @var string Field type */
     public $type = 'text';
 
     /**
@@ -35,15 +39,30 @@ class datalynxfield_text extends datalynxfield_base {
      */
     protected $forfieldgroup = true;
 
+    /**
+     * Check if group by is supported.
+     *
+     * @return bool
+     */
     public function supports_group_by() {
         return true;
     }
 
+    /**
+     * Get supported search operators.
+     *
+     * @return array
+     */
     public function get_supported_search_operators() {
         return ['' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
                 'LIKE' => get_string('contains', 'datalynx')];
     }
 
+    /**
+     * Check if field is suitable for custom filters.
+     *
+     * @return bool
+     */
     public static function is_customfilterfield() {
         return true;
     }

@@ -26,9 +26,20 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
+/**
+ * Field class for the identifier field type.
+ *
+ * @package datalynxfield_identifier
+ */
 class datalynxfield_identifier extends datalynxfield_base {
+    /** @var string The field type. */
     public $type = 'identifier';
 
+    /**
+     * Returns the salt options.
+     *
+     * @return array
+     */
     public static function get_salt_options() {
         global $CFG;
 
@@ -40,6 +51,11 @@ class datalynxfield_identifier extends datalynxfield_base {
     }
 
     /**
+     * Formats the content for the field.
+     *
+     * @param stdClass $entry The entry object.
+     * @param array|null $values The values to format.
+     * @return array
      */
     protected function format_content($entry, array $values = null) {
         $fieldid = $this->field->id;
@@ -61,6 +77,10 @@ class datalynxfield_identifier extends datalynxfield_base {
     }
 
     /**
+     * Generates a unique identifier key for an entry.
+     *
+     * @param stdClass $entry The entry object.
+     * @return string
      */
     protected function generate_identifier_key($entry) {
         global $CFG, $USER;
@@ -83,6 +103,11 @@ class datalynxfield_identifier extends datalynxfield_base {
     }
 
     /**
+     * Returns a hash string for an entry.
+     *
+     * @param stdClass $entry The entry object.
+     * @param bool $forcerandomsalt Whether to force a random salt.
+     * @return string
      */
     protected function get_hash_string($entry, $forcerandomsalt = false) {
         global $CFG, $USER;
@@ -126,6 +151,10 @@ class datalynxfield_identifier extends datalynxfield_base {
     }
 
     /**
+     * Checks if a key is unique.
+     *
+     * @param string $key The key to check.
+     * @return bool
      */
     protected function is_unique_key($key) {
         global $DB;
@@ -136,6 +165,11 @@ class datalynxfield_identifier extends datalynxfield_base {
         );
     }
 
+    /**
+     * Returns the supported search operators.
+     *
+     * @return array
+     */
     public function get_supported_search_operators() {
         return ['' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
                 'LIKE' => get_string('contains', 'datalynx')];

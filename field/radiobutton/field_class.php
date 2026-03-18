@@ -26,7 +26,13 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/select/field_class.php");
 
+/**
+ * Field class for the radiobutton field type.
+ *
+ * @package datalynxfield_radiobutton
+ */
 class datalynxfield_radiobutton extends datalynxfield_select {
+    /** @var string The field type. */
     public $type = 'radiobutton';
 
     /**
@@ -36,6 +42,9 @@ class datalynxfield_radiobutton extends datalynxfield_select {
      */
     protected $forfieldgroup = false;
 
+    /**
+     * @var array The separators for the field options.
+     */
     public $separators = [['name' => 'New line', 'chr' => '<br />'],
             ['name' => 'Space', 'chr' => '&#32;'],
             ['name' => ',', 'chr' => '&#44;'],

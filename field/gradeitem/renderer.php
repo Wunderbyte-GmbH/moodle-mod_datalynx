@@ -26,8 +26,16 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
+ * Datalynx gradeitem field renderer class.
  */
 class datalynxfield_gradeitem_renderer extends datalynxfield_renderer {
+    /**
+     * Render the field in display mode.
+     *
+     * @param stdClass $entry The entry object.
+     * @param array $options Additional options.
+     * @return string The rendered content.
+     */
     public function render_display_mode(stdClass $entry, array $options): string {
         $field = $this->_field;
         $fieldid = $field->id();
@@ -48,6 +56,13 @@ class datalynxfield_gradeitem_renderer extends datalynxfield_renderer {
         return $str;
     }
 
+    /**
+     * Render the field in edit mode.
+     *
+     * @param MoodleQuickForm $mform The form object.
+     * @param stdClass $entry The entry object.
+     * @param array $options Additional options.
+     */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         // Not editable.
     }

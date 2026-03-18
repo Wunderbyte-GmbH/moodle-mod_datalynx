@@ -26,8 +26,14 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/select/field_form.php");
 
+/**
+ * Field form for the radiobutton field type.
+ *
+ * @package datalynxfield_radiobutton
+ */
 class datalynxfield_radiobutton_form extends datalynxfield_select_form {
     /**
+     * Define the field attributes.
      */
     public function field_definition() {
         parent::field_definition();

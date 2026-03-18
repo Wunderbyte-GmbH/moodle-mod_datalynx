@@ -25,7 +25,13 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
+/**
+ * Field class for the tag field type.
+ *
+ * @package datalynxfield_tag
+ */
 class datalynxfield_tag extends datalynxfield_option_multiple {
+    /** @var string The field type. */
     public $type = 'tag';
 
     /**
@@ -183,6 +189,11 @@ class datalynxfield_tag extends datalynxfield_option_multiple {
         return [" e.id $not IN ($entryidsstr)", [], false];
     }
 
+    /**
+     * Returns the supported search operators.
+     *
+     * @return array
+     */
     public function get_supported_search_operators() {
         return ['ANY_OF' => get_string('anyof', 'datalynx'),
                 'ALL_OF' => get_string('allof', 'datalynx'),

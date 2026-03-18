@@ -26,39 +26,70 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(__FILE__) . '/../field_class.php');
 
+/**
+ * Internal rating field.
+ */
 class datalynxfield__rating extends datalynxfield_no_content {
+    /** @var string Field type. */
     public $type = '_rating';
 
+    /** @var int Average aggregation. */
     const AGGREGATE_AVG = 1;
 
+    /** @var int Count aggregation. */
     const AGGREGATE_COUNT = 2;
 
+    /** @var int Max aggregation. */
     const AGGREGATE_MAX = 3;
 
+    /** @var int Min aggregation. */
     const AGGREGATE_MIN = 4;
 
+    /** @var int Sum aggregation. */
     const AGGREGATE_SUM = 5;
 
+    /** @var string Rating name. */
     const _RATING = 'rating';
 
+    /** @var string Rating average name. */
     const _RATINGAVG = 'ratingavg';
 
+    /** @var string Rating count name. */
     const _RATINGCOUNT = 'ratingcount';
 
+    /** @var string Rating max name. */
     const _RATINGMAX = 'ratingmax';
 
+    /** @var string Rating min name. */
     const _RATINGMIN = 'ratingmin';
 
+    /** @var string Rating sum name. */
     const _RATINGSUM = 'ratingsum';
 
+    /**
+     * Check if it is internal field.
+     *
+     * @return bool
+     */
     public static function is_internal() {
         return true;
     }
 
+    /**
+     * Check if field should use join in SQL.
+     *
+     * @return bool
+     */
     public function use_join() {
         return true;
     }
 
+    /**
+     * Return field objects for this type.
+     *
+     * @param int $dataid
+     * @return array
+     */
     public static function get_field_objects($dataid) {
         $fieldobjects = [];
 
@@ -90,6 +121,11 @@ class datalynxfield__rating extends datalynxfield_no_content {
         return $fieldobjects;
     }
 
+    /**
+     * Return SQL for SELECT clause.
+     *
+     * @return string
+     */
     public function get_select_sql() {
         return ' er.itemid, er.component, er.ratingarea, er.contextid,
                 er.numratings, er.avgratings, er.sumratings, er.maxratings, er.minratings,
@@ -97,6 +133,8 @@ class datalynxfield__rating extends datalynxfield_no_content {
     }
 
     /**
+     * Return SQL to compare text in database.
+     *
      * @param string $column
      * @return string
      */
@@ -104,6 +142,11 @@ class datalynxfield__rating extends datalynxfield_no_content {
         return $this->get_sort_sql();
     }
 
+    /**
+     * Return SQL for ORDER BY clause.
+     *
+     * @return string
+     */
     public function get_sort_sql() {
         $internalname = $this->field->internalname;
         if ($internalname == 'ratings') {
@@ -117,6 +160,11 @@ class datalynxfield__rating extends datalynxfield_no_content {
         }
     }
 
+    /**
+     * Return SQL for JOIN clause.
+     *
+     * @return string
+     */
     public function get_join_sql() {
         global $USER;
 

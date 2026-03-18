@@ -25,6 +25,11 @@
 
 namespace datalynxfield_picture\privacy;
 
+/**
+ * Privacy provider for datalynxfield_picture.
+ *
+ * @package datalynxfield_picture
+ */
 class provider implements
     // This plugin does not store any personal user data.
     \core_privacy\local\metadata\null_provider {

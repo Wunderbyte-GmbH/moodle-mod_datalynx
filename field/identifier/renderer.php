@@ -27,8 +27,18 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
+ * Renderer for the identifier field type.
+ *
+ * @package datalynxfield_identifier
  */
 class datalynxfield_identifier_renderer extends datalynxfield_renderer {
+    /**
+     * Renders the field in edit mode.
+     *
+     * @param MoodleQuickForm $mform The form object.
+     * @param stdClass $entry The entry object.
+     * @param array $options Additional options.
+     */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $field = $this->_field;
         $fieldid = $field->id();
@@ -48,6 +58,13 @@ class datalynxfield_identifier_renderer extends datalynxfield_renderer {
         }
     }
 
+    /**
+     * Renders the field in display mode.
+     *
+     * @param stdClass $entry The entry object.
+     * @param array $options Additional options.
+     * @return string
+     */
     public function render_display_mode(stdClass $entry, array $options): string {
         $field = $this->_field;
         $fieldid = $field->id();
@@ -60,6 +77,14 @@ class datalynxfield_identifier_renderer extends datalynxfield_renderer {
         return $content;
     }
 
+    /**
+     * Renders the field in search mode.
+     *
+     * @param MoodleQuickForm $mform The form object.
+     * @param int $i The index of the search field.
+     * @param string $value The current search value.
+     * @return array
+     */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
         $fieldid = $this->_field->id();
         $fieldname = "f_{$i}_$fieldid";

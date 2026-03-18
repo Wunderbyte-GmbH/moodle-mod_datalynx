@@ -27,9 +27,15 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
+ * Datalynx file field renderer class.
  */
 class datalynxfield_file_renderer extends datalynxfield_renderer {
     /**
+     * Render the field in edit mode.
+     *
+     * @param MoodleQuickForm $mform The form object.
+     * @param stdClass $entry The entry object.
+     * @param array|null $options Additional options.
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options = null) {
         $field = $this->_field;
@@ -59,7 +65,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
 
         $label = $field->df->name() == "Datalynx Test Instance" ? "File" : "";
 
-        // Add file manager element
+        // Add file manager element.
         $mform->addElement('filemanager', "{$fieldname}_filemanager", $label, null, $fmoptions);
         $mform->setDefault("{$fieldname}_filemanager", $draftitemid);
 
@@ -127,10 +133,12 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
     }
 
     /**
-     * @param MoodleQuickForm $mform
-     * @param int $i
-     * @param string $value
-     * @return array
+     * Render the field in search mode.
+     *
+     * @param MoodleQuickForm $mform The form object.
+     * @param int $i The search index.
+     * @param string $value The search value.
+     * @return array The search elements.
      */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = ''): array {
         $fieldid = $this->_field->id();
@@ -174,7 +182,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
         $mimetype = $file->get_mimetype();
         $pluginfileurl = '/pluginfile.php';
 
-        // Check for specific parameters/patterns first
+        // Check for specific parameters/patterns first.
         if (!empty($params['url'])) {
             return moodle_url::make_file_url($pluginfileurl, "$path/$filename");
         } else if (!empty($params['size'])) {
@@ -191,14 +199,14 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
             return $this->display_link($file, $path, $altname, $params);
         }
 
-        // Embed PDF if it's a PDF file and no specific pattern was requested
+        // Embed PDF if it's a PDF file and no specific pattern was requested.
         if ($mimetype === 'application/pdf') {
             // PDF document.
             $moodleurl = moodle_url::make_file_url($pluginfileurl, "$path/$filename");
             return $this->embed_pdf($moodleurl->out(), $fieldname);
         }
 
-        // For all other file types, display as link
+        // For all other file types, display as link.
         return $this->display_link($file, $path, $altname, $params);
     }
 
@@ -209,12 +217,11 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
      * @return string html
      */
     protected function embed_pdf(string $fullurl, string $fieldname): string {
-        global $PAGE;
         $customscale = $this->_field->get('param4');
         if (empty($customscale)) {
             $customscale = 1;
         }
-        $PAGE->requires->js_call_amd(
+        $this->page->requires->js_call_amd(
             'mod_datalynx/pdfembed',
             'renderPDF',
             [$fullurl, $fieldname, $customscale]
@@ -241,14 +248,12 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
      * @return string
      */
     protected function display_link($file, $path, $altname, $params = null): string {
-        global $OUTPUT;
-
         $filename = $file->get_filename();
         $mimetype = $file->get_mimetype();
         $displayname = $altname ?: $filename;
         $fileicon = html_writer::empty_tag(
             'img',
-            ['src' => $OUTPUT->image_url(file_mimetype_icon($mimetype)),
+            ['src' => $this->output->image_url(file_mimetype_icon($mimetype)),
             'alt' => $mimetype,
             'height' => 16,
             'width' => 16]
@@ -269,6 +274,9 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Get the pluginfile patterns.
+     *
+     * @return array The patterns.
      */
     public function pluginfile_patterns(): array {
         return ["[[{$this->_field->name()}]]"];

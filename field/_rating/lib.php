@@ -24,8 +24,9 @@
  */
 
 /**
- * A class representing a single datalynx rating
- * Extends the core rating class
+ * A class representing a single datalynx rating.
+ *
+ * Extends the core rating class.
  */
 defined('MOODLE_INTERNAL') || die();
 
@@ -55,8 +56,9 @@ class datalynx_rating extends rating {
 }
 
 /**
- * The datalynx_rating_manager class extends the rating_manager class
- * so as to retrieve sets of ratings from the database for sets of entries
+ * The datalynx_rating_manager class extends the rating_manager class.
+ *
+ * So as to retrieve sets of ratings from the database for sets of entries.
  */
 class datalynx_rating_manager extends rating_manager {
     /**

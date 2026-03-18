@@ -26,27 +26,46 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
+/**
+ * User info field class.
+ */
 class datalynxfield_userinfo extends datalynxfield_base {
+    /** @var string Field type */
     public $type = 'userinfo';
 
+    /** @var int Profile field ID */
     public $infoid;
 
+    /** @var string Profile field shortname */
     public $infoshortname;
 
+    /** @var string Profile field type */
     public $infotype;
 
+    /** @var string Default data */
     public $defaultdata;
 
+    /** @var int Default data format */
     public $defaultdataformat;
 
+    /** @var bool Is editable */
     public $editable;
 
+    /** @var bool Is mandatory */
     public $mandatory;
 
-    public $param8; // Dropdown options.
+    /** @var string Profile field param1 (e.g. dropdown options) */
+    public $param8;
 
-    public $param10; // Include time or not.
+    /** @var string Profile field param3 (e.g. include time) */
+    public $param10;
 
+    /**
+     * Constructor.
+     *
+     * @param int|object $df Datalynx ID or object
+     * @param int|object $field Field ID or object
+     */
     public function __construct($df = 0, $field = 0) {
         parent::__construct($df, $field);
         $this->infoid = $this->field->param1;
@@ -84,11 +103,19 @@ class datalynxfield_userinfo extends datalynxfield_base {
         }
     }
 
+    /**
+     * Check if the field is editable.
+     *
+     * @return bool
+     */
     public function is_editable() {
         return true;
     }
 
     /**
+     * Get SELECT SQL.
+     *
+     * @return string
      */
     public function get_select_sql() {
         $id = " c{$this->field->id}.id AS c{$this->field->id}_id ";
@@ -98,6 +125,8 @@ class datalynxfield_userinfo extends datalynxfield_base {
     }
 
     /**
+     * Get SQL compare text.
+     *
      * @param string $column
      * @return string
      */
@@ -107,6 +136,11 @@ class datalynxfield_userinfo extends datalynxfield_base {
     }
 
     /**
+     * Get SORT FROM SQL.
+     *
+     * @param string $paramname
+     * @param string $paramcount
+     * @return array|null
      */
     public function get_sort_from_sql($paramname = 'sortie', $paramcount = '') {
         $fieldid = $this->field->id;
@@ -120,6 +154,9 @@ class datalynxfield_userinfo extends datalynxfield_base {
     }
 
     /**
+     * Get SEARCH FROM SQL.
+     *
+     * @return string
      */
     public function get_search_from_sql() {
         $fieldid = $this->field->id;
@@ -131,6 +168,9 @@ class datalynxfield_userinfo extends datalynxfield_base {
     }
 
     /**
+     * Check if this is datalynx content.
+     *
+     * @return bool
      */
     public function is_datalynx_content() {
         return false;

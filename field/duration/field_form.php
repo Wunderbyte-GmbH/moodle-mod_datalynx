@@ -15,12 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Form class for the duration field type.
  *
- * @package datalynxfield_duration
- * @subpackage duration
- * @copyright 2014 onwards by edulabs.org and associated programmers
- * @copyright based on the work by 2013 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    datalynxfield_duration
+ * @copyright  2014 onwards by edulabs.org and associated programmers
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 

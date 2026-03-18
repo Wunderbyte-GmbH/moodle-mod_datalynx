@@ -24,15 +24,15 @@
 defined('MOODLE_INTERNAL') || die();
 
 $addons = [
-    'mod_datalynx' => [ // Plugin identifier
+    'mod_datalynx' => [ // Plugin identifier.
         'handlers' => [ // Different places where the plugin will display content.
             'datalynx' => [ // Handler unique name (alphanumeric).
                 'displaydata' => [
                     'icon' => $CFG->wwwroot . '/mod/datalynx/pix/icon.png',
                     'class' => '',
                 ],
-                'delegate' => 'CoreCourseModuleDelegate', // Delegate (where to display the link to the plugin)
-                'method' => 'mobile_course_view', // Main function in \mod_certificate\output\mobile
+                'delegate' => 'CoreCourseModuleDelegate', // Delegate (where to display the link to the plugin).
+                'method' => 'mobile_course_view', // Main function in \mod_certificate\output\mobile.
             ],
         ],
     ],

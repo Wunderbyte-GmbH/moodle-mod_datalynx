@@ -105,6 +105,14 @@ class datalynxfield_editor_renderer extends datalynxfield_renderer {
         }
     }
 
+    /**
+     * Render the editor field in search mode.
+     *
+     * @param MoodleQuickForm $mform The form object.
+     * @param int $i The filter index.
+     * @param string $value The current search value.
+     * @return array Array of elements.
+     */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
         $fieldid = $this->_field->id();
         $fieldname = "f_{$i}_$fieldid";
@@ -119,6 +127,8 @@ class datalynxfield_editor_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Returns the list of patterns supported by this field.
+     *
      * @return array field patterns
      */
     protected function patterns() {
@@ -130,6 +140,14 @@ class datalynxfield_editor_renderer extends datalynxfield_renderer {
         return $patterns;
     }
 
+    /**
+     * Validate the editor field.
+     *
+     * @param int $entryid The entry ID.
+     * @param array $tags The tags to validate.
+     * @param stdClass $formdata The submitted form data.
+     * @return array Array of error messages.
+     */
     public function validate($entryid, $tags, $formdata) {
         $fieldid = $this->_field->id();
 

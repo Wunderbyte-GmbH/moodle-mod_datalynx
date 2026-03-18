@@ -27,9 +27,16 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
+ * Renderer for the entry group field type.
  */
 class datalynxfield_entrygroup_renderer extends datalynxfield_renderer {
     /**
+     * Get replacements for the given tags.
+     *
+     * @param array $tags
+     * @param stdClass $entry
+     * @param array $options
+     * @return array
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
         $field = $this->_field;
@@ -97,6 +104,11 @@ class datalynxfield_entrygroup_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Display the group selector for editing.
+     *
+     * @param MoodleQuickForm $mform
+     * @param stdClass $entry
+     * @param array $options
      */
     public function display_edit(&$mform, $entry, array $options = null) {
         $field = $this->_field;

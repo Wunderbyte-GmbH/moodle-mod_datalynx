@@ -23,7 +23,12 @@
  */
 namespace mod_datalynx\plugininfo;
 
-defined('MOODLE_INTERNAL') || die();
-
+/**
+ * Class datalynxfield.
+ *
+ * Information about datalynx fields.
+ *
+ * @package mod_datalynx
+ */
 class datalynxfield extends \core\plugininfo\base {
 }

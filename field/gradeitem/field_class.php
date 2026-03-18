@@ -26,19 +26,34 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
+/**
+ * Datalynx gradeitem field class.
+ */
 class datalynxfield_gradeitem extends datalynxfield_base {
+    /** @var string Plugin type. */
     public $type = 'gradeitem';
 
+    /** @var int Grade item ID. */
     public $itemid;
 
+    /** @var string Grade item name. */
     public $itemname;
 
+    /** @var string Grade item type. */
     public $itemtype;
 
+    /** @var string Grade item module. */
     public $itemmodule;
 
+    /** @var int Grade item instance. */
     public $iteminstance;
 
+    /**
+     * Constructor.
+     *
+     * @param int|object $df Datalynx object or ID.
+     * @param int|object $field Field object or ID.
+     */
     public function __construct($df = 0, $field = 0) {
         parent::__construct($df, $field);
         $this->itemid = $this->field->param1;
@@ -69,6 +84,9 @@ class datalynxfield_gradeitem extends datalynxfield_base {
     }
 
     /**
+     * Get the SQL for selecting the field content.
+     *
+     * @return string The SQL.
      */
     public function get_select_sql() {
         $id = " c{$this->field->id}.id AS c{$this->field->id}_id ";
@@ -77,8 +95,10 @@ class datalynxfield_gradeitem extends datalynxfield_base {
     }
 
     /**
-     * @param string $column
-     * @return string
+     * Get the SQL for comparing text.
+     *
+     * @param string $column The column name.
+     * @return string The SQL.
      */
     protected function get_sql_compare_text(string $column = 'content'): string {
         global $DB;
@@ -86,6 +106,11 @@ class datalynxfield_gradeitem extends datalynxfield_base {
     }
 
     /**
+     * Get the SQL for sorting by this field.
+     *
+     * @param string $paramname The parameter name.
+     * @param string $paramcount The parameter count.
+     * @return array|null The SQL and parameters.
      */
     public function get_sort_from_sql($paramname = 'sortie', $paramcount = '') {
         $fieldid = $this->field->id;
@@ -99,6 +124,9 @@ class datalynxfield_gradeitem extends datalynxfield_base {
     }
 
     /**
+     * Get the SQL for searching this field.
+     *
+     * @return string The SQL.
      */
     public function get_search_from_sql() {
         $fieldid = $this->field->id;
@@ -110,6 +138,9 @@ class datalynxfield_gradeitem extends datalynxfield_base {
     }
 
     /**
+     * Is this field a datalynx content field?
+     *
+     * @return bool True if it is.
      */
     public function is_datalynx_content() {
         return false;

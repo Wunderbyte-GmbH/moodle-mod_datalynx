@@ -26,18 +26,22 @@ defined('MOODLE_INTERNAL') || die();
 require_once(dirname(__FILE__) . "/../renderer.php");
 
 /**
+ * Renderer for the multiselect field type.
+ *
+ * @package datalynxfield_multiselect
  */
 class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
     /**
-     *
-     * @var datalynxfield_multiselect
+     * @var datalynxfield_multiselect The field object.
      */
-    protected $_field = null;
+    protected $_field = null; // phpcs:ignore
 
     /**
+     * Renders the field in edit mode.
      *
-     * {@inheritDoc}
-     * @see datalynxfield_renderer::render_edit_mode()
+     * @param MoodleQuickForm $mform The form object.
+     * @param stdClass $entry The entry object.
+     * @param array $options Additional options.
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $field = $this->_field;
@@ -61,8 +65,7 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
 
         // If we edit an existing entry that is not required we need a workaround.
         if ($entryid > 0 && !$required && $autocomplete) {
-            global $PAGE;
-            $PAGE->requires->js_amd_inline("
+            $this->page->requires->js_amd_inline("
             require(['jquery'], function($) {
                 $('option[value=\"-999\"]').removeAttr('selected');
             });");
@@ -186,7 +189,14 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
         // Add a checkbox to select if any of or all elements are needed, only show this in customfilter forms..
         if ($mform->_formName == 'mod_datalynx_customfilter_frontend_form') {
             // NOTE: Do not set to 0|1 as 1 will be cleared as form input by modform.
-            $elements[] = $mform->createElement('advcheckbox', $fieldname . "[andor]", get_string('customfilterandor', 'datalynx'), '', [], [0, -2]);
+            $elements[] = $mform->createElement(
+                'advcheckbox',
+                $fieldname . "[andor]",
+                get_string('customfilterandor', 'datalynx'),
+                '',
+                [],
+                [0, -2]
+            );
         }
 
         return [$elements, null];

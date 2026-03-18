@@ -25,12 +25,29 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->libdir/formslib.php");
 
+/**
+ * Field form base class.
+ *
+ * @package mod_datalynx
+ */
 class datalynxfield_form extends moodleform {
-    protected $_field = null;
+    /** @var datalynxfield_base The field object. */
+    protected $_field = null; // phpcs:ignore
 
-    // Variable $_df datalynx.
-    protected $_df = null;
+    /** @var mod_datalynx\datalynx The datalynx object. */
+    protected $_df = null; // phpcs:ignore
 
+    /**
+     * Constructor.
+     *
+     * @param datalynxfield_base $field The field object.
+     * @param string|null $action Action URL.
+     * @param array|null $customdata Custom data.
+     * @param string $method Form method.
+     * @param string $target Form target.
+     * @param array|null $attributes Form attributes.
+     * @param bool $editable Whether the form is editable.
+     */
     public function __construct(
         $field,
         $action = null,
@@ -46,6 +63,9 @@ class datalynxfield_form extends moodleform {
         parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
     }
 
+    /**
+     * Defines the form elements.
+     */
     public function definition() {
         $mform = &$this->_form;
 
@@ -64,11 +84,16 @@ class datalynxfield_form extends moodleform {
     }
 
     /**
+     * Defines the field-specific elements.
      */
     public function field_definition() {
     }
 
     /**
+     * Adds the action buttons to the form.
+     *
+     * @param bool $cancel Whether to show the cancel button.
+     * @param string|null $submit The submit button label.
      */
     public function add_action_buttons($cancel = true, $submit = null) {
         $mform = &$this->_form;
@@ -89,6 +114,11 @@ class datalynxfield_form extends moodleform {
     }
 
     /**
+     * Validates the form data.
+     *
+     * @param array $data Form data.
+     * @param array $files Uploaded files.
+     * @return array
      */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
@@ -107,7 +137,7 @@ class datalynxfield_form extends moodleform {
     public function get_datalynx_instances_menu(): array {
         global $DB;
         // Get all Datalynxs where user has managetemplate capability.
-        // TODO there may be too many.
+        // TODO: MDL-0000 there may be too many.
         $sql = "SELECT DISTINCT d.id
                 FROM {datalynx} d
                 INNER JOIN {course_modules} cm ON d.id = cm.instance

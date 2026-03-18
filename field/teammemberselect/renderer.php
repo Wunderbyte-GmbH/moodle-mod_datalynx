@@ -27,11 +27,18 @@ require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 
 /**
- * Renderer class for teammemberselect datalynx field
+ * Renderer class for teammemberselect datalynx field.
  */
 class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
+    /**
+     * Renders the field in display mode.
+     *
+     * @param stdClass $entry The entry object.
+     * @param array $options Additional options.
+     * @return string
+     */
     public function render_display_mode(stdClass $entry, array $options): string {
-        global $USER, $PAGE;
+        global $USER;
 
         // Variable $field datalynxfield_teammemberselect.
         $field = $this->_field;
@@ -73,7 +80,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
             $entry->{"c{$fieldid}_content"},
             true
         ) : [];
-        $selected = $selected ? $selected : []; // TODO: Seems obsolete.
+        $selected = $selected ? $selected : []; // TODO: MDL-0000 Seems obsolete.
         $teamfull = $field->teamsize < count($selected);
         $hasadmissiblerole = array_intersect(
             $field->df()->get_user_datalynx_permissions($USER->id),
@@ -106,7 +113,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
             );
 
             // Load JS.
-            $PAGE->requires->js_call_amd(
+            $this->page->requires->js_call_amd(
                 'mod_datalynx/teammemberselect',
                 'init',
                 [$field->df()->id(), $fieldid, $userurl->out(false), fullname($USER), $canunsubscribe]
@@ -116,9 +123,12 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         return $str;
     }
 
+    /** @var array The user list cache. */
     private static $userlist = [];
 
     /**
+     * Returns the user list.
+     *
      * @param int $courseid
      * @param array $userids
      * @return array
@@ -157,8 +167,15 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         return $list;
     }
 
+    /**
+     * Renders the field in edit mode.
+     *
+     * @param MoodleQuickForm $mform The form object.
+     * @param stdClass $entry The entry object.
+     * @param array|null $options Additional options.
+     */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options = null) {
-        global $USER, $PAGE;
+        global $USER;
 
         // Variable $field datalynxfield_teammemberselect.
         $field = $this->_field;
@@ -171,7 +188,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         // If we edit an existing entry that is not required we need a workaround.
         $newentry = optional_param('new', null, PARAM_INT) === null ? 1 : 0;
         if (!$newentry && !$required) {
-            $PAGE->requires->js_amd_inline("
+            $this->page->requires->js_amd_inline("
             require(['jquery'], function($) {
                 $('option[value=\"-999\"]').removeAttr('selected');
             });");
@@ -208,6 +225,14 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         }
     }
 
+    /**
+     * Renders the field in search mode.
+     *
+     * @param MoodleQuickForm $mform The form object.
+     * @param int $i The index of the search field.
+     * @param string $value The current search value.
+     * @return array
+     */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
         $field = $this->_field;
         $fieldid = $field->id();
@@ -225,6 +250,11 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         return [$elements, null];
     }
 
+    /**
+     * Returns the patterns for the field.
+     *
+     * @return array
+     */
     protected function patterns() {
         $fieldname = $this->_field->name();
 
@@ -235,6 +265,14 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         return $patterns;
     }
 
+    /**
+     * Validates the field.
+     *
+     * @param int $entryid The entry ID.
+     * @param array $tags The tags to validate.
+     * @param stdClass $formdata The form data.
+     * @return array
+     */
     public function validate($entryid, $tags, $formdata) {
         $fieldid = $this->_field->id();
 

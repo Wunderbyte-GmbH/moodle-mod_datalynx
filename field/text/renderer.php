@@ -29,6 +29,14 @@ require_once(dirname(__FILE__) . "/../renderer.php");
  * Class datalynxfield_text_renderer Renderer for text field type
  */
 class datalynxfield_text_renderer extends datalynxfield_renderer {
+    /**
+     * Render the field in edit mode.
+     *
+     * @param MoodleQuickForm $mform
+     * @param stdClass $entry
+     * @param array $options
+     * @return void
+     */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $field = $this->_field;
         $fieldid = $field->id();
@@ -119,6 +127,13 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
         }
     }
 
+    /**
+     * Render the field in display mode.
+     *
+     * @param stdClass $entry
+     * @param array $options
+     * @return string
+     */
     public function render_display_mode(stdClass $entry, array $options): string {
         $field = $this->_field;
         $fieldid = $field->id();
@@ -144,6 +159,14 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
         return $str;
     }
 
+    /**
+     * Render the field in search mode.
+     *
+     * @param MoodleQuickForm $mform
+     * @param int $i
+     * @param string $value
+     * @return array
+     */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
         $field = $this->_field;
         $fieldid = $field->id();
@@ -170,6 +193,14 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
         return [$arr, null];
     }
 
+    /**
+     * Validate the field input.
+     *
+     * @param int $entryid
+     * @param array $tags
+     * @param stdClass $formdata
+     * @return array
+     */
     public function validate($entryid, $tags, $formdata) {
         global $DB;
 

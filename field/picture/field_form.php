@@ -26,8 +26,14 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/file/field_form.php");
 
+/**
+ * Field form for the picture field type.
+ *
+ * @package datalynxfield_picture
+ */
 class datalynxfield_picture_form extends datalynxfield_file_form {
     /**
+     * Define the field attributes.
      */
     public function field_definition() {
         global $CFG;
@@ -138,6 +144,7 @@ class datalynxfield_picture_form extends datalynxfield_file_form {
     }
 
     /**
+     * Define the file types attributes.
      */
     public function filetypes_definition() {
         $mform = &$this->_form;

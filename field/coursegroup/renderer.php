@@ -27,9 +27,16 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
+ * Coursegroup field renderer.
  */
 class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
     /**
+     * Returns tag replacements for the field.
+     *
+     * @param array $tags
+     * @param object $entry
+     * @param array $options
+     * @return array
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
         $field = $this->_field;
@@ -57,10 +64,13 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Display edit form element.
+     *
+     * @param MoodleQuickForm $mform
+     * @param object $entry
+     * @param array $options
      */
     public function display_edit(&$mform, $entry, array $options = null) {
-        global $CFG, $DB, $SITE, $PAGE;
-
         $field = $this->_field;
         $fieldid = $field->id();
         $entryid = $entry->id;
@@ -97,11 +107,11 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
             // Ajax.
             $options = ['coursefield' => "{$fieldname}_course",
                     'groupfield' => "{$fieldname}_group",
-                    'acturl' => "$CFG->wwwroot/mod/datalynx/field/coursegroup/loadgroups.php",
+                    'acturl' => $this->page->url->out(false, ['act' => 'loadgroups']),
             ];
 
             // Add JQuery.
-            $PAGE->requires->js_call_amd('mod_datalynx/coursegroup', 'init', [$options]);
+            $this->page->requires->js_call_amd('mod_datalynx/coursegroup', 'init', [$options]);
         }
 
         // Group id.
@@ -132,6 +142,11 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Display field content in browse mode.
+     *
+     * @param object $entry
+     * @param string $type
+     * @return string
      */
     protected function display_browse($entry, $type = null) {
         global $DB;

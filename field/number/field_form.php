@@ -26,8 +26,14 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
+/**
+ * Field form for the number field type.
+ *
+ * @package datalynxfield_number
+ */
 class datalynxfield_number_form extends datalynxfield_form {
     /**
+     * Define the field attributes.
      */
     public function field_definition() {
         $mform = &$this->_form;

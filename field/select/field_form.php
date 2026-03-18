@@ -26,7 +26,15 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
+/**
+ * Field form class for the select field type.
+ *
+ * @package datalynxfield_select
+ */
 class datalynxfield_select_form extends datalynxfield_option_form {
+    /**
+     * Define the field attributes.
+     */
     public function field_definition() {
         $mform = &$this->_form;
 

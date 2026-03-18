@@ -27,9 +27,16 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
+ * Internal entry field renderer.
  */
 class datalynxfield__entry_renderer extends datalynxfield_renderer {
     /**
+     * Returns tag replacements for the field.
+     *
+     * @param array $tags
+     * @param object $entry
+     * @param array $options
+     * @return array
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
         $manageable = !empty($options['manage']) ? $options['manage'] : false;
@@ -89,10 +96,13 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Display more icon.
+     *
+     * @param object $entry
+     * @param bool $href
+     * @return string
      */
     protected function display_more($entry, $href = false) {
-        global $OUTPUT;
-
         $field = $this->_field;
         $params = ['eids' => $entry->id];
         $url = new moodle_url($entry->baseurl, $params);
@@ -102,17 +112,19 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
         }
         $str = get_string('more', 'datalynx');
         if (!$href) {
-            return html_writer::link($url->out(false), $OUTPUT->pix_icon('i/search', $str));
+            return html_writer::link($url->out(false), $this->output->pix_icon('i/search', $str));
         } else {
             return $url->out(false);
         }
     }
 
     /**
+     * Display edit icon.
+     *
+     * @param object $entry
+     * @return string
      */
     protected function display_edit($entry) {
-        global $OUTPUT;
-
         $field = $this->_field;
         $params = ['editentries' => $entry->id, 'sesskey' => sesskey(),
                 'sourceview' => $this->_field->df()->get_current_view()->id()];
@@ -132,14 +144,16 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
                 component='mod_datalynx' method='mobile_course_view' $args>$str</button>";
         }
 
-        return html_writer::link($url->out(false), $OUTPUT->pix_icon('t/edit', $str));
+        return html_writer::link($url->out(false), $this->output->pix_icon('t/edit', $str));
     }
 
     /**
+     * Display duplicate icon.
+     *
+     * @param object $entry
+     * @return string
      */
     protected function display_duplicate($entry) {
-        global $OUTPUT;
-
         $field = $this->_field;
         $params = ['duplicate' => $entry->id, 'sesskey' => sesskey(),
                 'sourceview' => $this->_field->df()->get_current_view()->id()];
@@ -148,14 +162,16 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
             $url->param('view', $field->df()->data->singleedit);
         }
         $str = get_string('duplicate');
-        return html_writer::link($url->out(false), $str . ' ' . $OUTPUT->pix_icon('t/copy', $str));
+        return html_writer::link($url->out(false), $str . ' ' . $this->output->pix_icon('t/copy', $str));
     }
 
     /**
+     * Display delete icon.
+     *
+     * @param object $entry
+     * @return string
      */
     protected function display_delete($entry) {
-        global $OUTPUT;
-
         $field = $this->_field;
         $params = ['delete' => $entry->id, 'sesskey' => sesskey(),
                 'sourceview' => $this->_field->df()->get_current_view()->id()];
@@ -171,13 +187,17 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
                 component='mod_datalynx' method='mobile_course_view' $args>$str</button>";
         }
 
-        return html_writer::link($url->out(false), $OUTPUT->pix_icon('t/delete', $str));
+        return html_writer::link($url->out(false), $this->output->pix_icon('t/delete', $str));
     }
 
     /**
+     * Display export icon.
+     *
+     * @param object $entry
+     * @return string
      */
     protected function display_export($entry) {
-        global $OUTPUT, $CFG;
+        global $CFG;
 
         if (!$CFG->enableportfolios) {
             return '';
@@ -191,7 +211,7 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
                 ['export' => $entry->id, 'sesskey' => sesskey()]
             );
             $strexport = get_string('export', 'datalynx');
-            return html_writer::link($url, $OUTPUT->pix_icon('t/portfolioadd', $strexport));
+            return html_writer::link($url, $this->output->pix_icon('t/portfolioadd', $strexport));
         }
         return $str;
     }

@@ -26,6 +26,9 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/multiselect/field_class.php");
 
+/**
+ * Checkbox field class.
+ */
 class datalynxfield_checkbox extends datalynxfield_multiselect {
     /**
      * @var string

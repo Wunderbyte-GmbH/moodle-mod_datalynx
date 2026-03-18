@@ -23,7 +23,12 @@
  */
 namespace mod_datalynx\plugininfo;
 
-defined('MOODLE_INTERNAL') || die();
-
+/**
+ * Class datalynxtool.
+ *
+ * Information about datalynx tools.
+ *
+ * @package mod_datalynx
+ */
 class datalynxtool extends \core\plugininfo\base {
 }

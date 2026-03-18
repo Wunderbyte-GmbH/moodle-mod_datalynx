@@ -31,6 +31,10 @@ require_once("$CFG->dirroot/mod/datalynx/field/entrygroup/field_class.php");
 
 /**
  * Renderer for the datalynxview field type.
+ *
+ * @package    datalynxfield_datalynxview
+ * @copyright  2014 onwards by edulabs.org and associated programmers
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
     /**
@@ -67,7 +71,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
 
         // Inline.
         if (empty($type)) {
-            // Including controls here seems to mess up the hosting view controls.
+            // MDL-0000 Including controls here seems to mess up the hosting view controls.
             $voptions = ['controls' => false];
             return $this->get_view_display_content($entry, $voptions);
         }
@@ -213,9 +217,10 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Get search options based on current configuration.
      *
-     * @param unknown $entry
-     * @return unknown[]
+     * @param stdClass $entry
+     * @return array
      */
     protected function get_search_options($entry) {
         $field = $this->_field;
