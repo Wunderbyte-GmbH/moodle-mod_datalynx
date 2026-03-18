@@ -35,7 +35,7 @@ class datalynx_rule_form extends moodleform {
     /**
      * @var \mod_datalynx\datalynx
      */
-    protected $_df = null;
+    protected $dl = null;
 
     /**
      * datalynx_rule_form constructor.
@@ -58,7 +58,7 @@ class datalynx_rule_form extends moodleform {
         $editable = true
     ) {
         $this->_rule = $rule;
-        $this->_df = $this->_rule->df;
+        $this->dl = $this->_rule->df;
 
         parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
     }
@@ -102,7 +102,7 @@ class datalynx_rule_form extends moodleform {
         );
 
         // Events.
-        $eventmenu = datalynx_rule_manager::get_event_data($this->_df->id());
+        $eventmenu = datalynx_rule_manager::get_event_data($this->dl->id());
         $eventgroup = [];
         foreach ($eventmenu as $eventname => $eventlabel) {
             $eventgroup[] = &$mform->createElement('checkbox', $eventname, null, $eventlabel, ['size' => 32]);
@@ -116,8 +116,8 @@ class datalynx_rule_form extends moodleform {
         );
 
         // If we have selected entry updated, add a new UI when the instance includes a checkbox.
-        $checkboxes = $this->_df->get_fields_by_type('checkbox', true);
-        $radiobuttons = $this->_df->get_fields_by_type('radiobutton', true);
+        $checkboxes = $this->dl->get_fields_by_type('checkbox', true);
+        $radiobuttons = $this->dl->get_fields_by_type('radiobutton', true);
         $choices = $radiobuttons + $checkboxes;
         if (!empty($choices)) {
             $choices = ['0' => get_string('noselection', 'datalynx')] + $choices;
@@ -169,7 +169,7 @@ class datalynx_rule_form extends moodleform {
      */
     public function get_data($slashed = true) {
         if ($data = parent::get_data($slashed)) {
-            $eventmenu = datalynx_rule_manager::get_event_data($this->_df->id());
+            $eventmenu = datalynx_rule_manager::get_event_data($this->dl->id());
             $selectedevents = [];
             foreach (array_keys($eventmenu) as $eventname) {
                 if (isset($data->$eventname)) {
@@ -217,7 +217,7 @@ class datalynx_rule_form extends moodleform {
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
-        if ($this->_df->name_exists('rules', $data['name'], $this->_rule->get_id())) {
+        if ($this->dl->name_exists('rules', $data['name'], $this->_rule->get_id())) {
             $errors['name'] = get_string('invalidname', 'datalynx', get_string('rule', 'datalynx'));
         }
 

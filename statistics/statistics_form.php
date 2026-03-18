@@ -33,7 +33,7 @@ class datalynx_statistics_form extends moodleform {
      * Data instance.
      * @var datalynx|\mod_datalynx\datalynx
      */
-    private $_df = null;
+    private $dl = null;
 
     /**
      * datalynx_statistics_form constructor.
@@ -56,14 +56,14 @@ class datalynx_statistics_form extends moodleform {
         $editable = true
     ) {
         parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
-        $this->_df = $df;
+        $this->dl = $df;
     }
 
     /**
      * Form definition.
      */
     public function definition() {
-        $df = $this->_df;
+        $df = $this->dl;
         $mform = &$this->_form;
         $mform->addElement('static', '', '', '');
         $mform->addElement('html', '<div style="width: 33%; float: left;">');

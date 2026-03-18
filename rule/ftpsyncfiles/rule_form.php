@@ -138,7 +138,7 @@ class datalynx_rule_ftpsyncfiles_form extends datalynx_rule_form {
             $standardfields
         );
 
-        $fields = $this->_df->get_fields(null, false, true);
+        $fields = $this->dl->get_fields(null, false, true);
         $fieldnames = [];
         foreach ($fields as $fieldid => $field) {
             if ($field->type == 'teammemberselect') {
@@ -154,7 +154,7 @@ class datalynx_rule_ftpsyncfiles_form extends datalynx_rule_form {
             $fieldnames,
             $options
         );
-        $potentialusers = get_users_by_capability($this->_df->context, 'mod/datalynx:manageentries');
+        $potentialusers = get_users_by_capability($this->dl->context, 'mod/datalynx:manageentries');
         $choosuser = [];
         foreach ($potentialusers as $user) {
             $choosuser[$user->id] = $user->firstname . ' ' . $user->lastname;
@@ -167,7 +167,7 @@ class datalynx_rule_ftpsyncfiles_form extends datalynx_rule_form {
             $options
         );
 
-        $fields = $this->_df->get_fields_by_type('file', true);
+        $fields = $this->dl->get_fields_by_type('file', true);
         $mform->addElement(
             'autocomplete',
             'param3',

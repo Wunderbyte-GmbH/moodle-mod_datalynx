@@ -227,7 +227,7 @@ class datalynxview_csv extends base {
         $columns = $this->get_columns();
 
         // Get field definitions for new entry.
-        $fields = $this->_df->get_fields();
+        $fields = $this->dl->get_fields();
         $entry = (object) ['id' => $entryid];
         $fielddefinitions = [];
         foreach ($this->_tags['field'] as $fieldid => $patterns) {
@@ -278,7 +278,7 @@ class datalynxview_csv extends base {
                 $this->_tags['view'] = array_merge($this->_tags['view'], $patterns);
             }
             // Field patterns.
-            if ($fields = $this->_df->get_fields()) {
+            if ($fields = $this->dl->get_fields()) {
                 foreach ($fields as $fieldid => $field) {
                     if ($patterns = $field->renderer()->search($text)) {
                         $this->_tags['field'][$fieldid] = $patterns;
@@ -327,7 +327,7 @@ class datalynxview_csv extends base {
         if (!$csvcontent) {
             return;
         }
-        $datalynxname = $this->_df->name();
+        $datalynxname = $this->dl->name();
         $delimiter = csv_import_reader::get_delimiter($this->_delimiter);
         $filename = clean_filename("{$datalynxname}-export");
         $filename .= clean_filename('-' . gmdate("Ymd_Hi"));
@@ -374,7 +374,7 @@ class datalynxview_csv extends base {
     public function get_csv_content($range = self::EXPORT_PAGE) {
         // Set content.
         if ($range == self::EXPORT_ALL) {
-            $entries = new datalynx_entries($this->_df, $this->_filter);
+            $entries = new datalynx_entries($this->dl, $this->_filter);
             $options = [];
             // Set a filter to take it all.
             $filter = $this->get_filter();
@@ -500,7 +500,7 @@ class datalynxview_csv extends base {
 
                 // Process fields' non-csv import.
                 foreach ($fieldsettings as $fieldid => $importsettings) {
-                    $field = $this->_df->get_field_from_id($fieldid);
+                    $field = $this->dl->get_field_from_id($fieldid);
                     $field->prepare_import_content($data, $importsettings);
                 }
 
@@ -583,7 +583,7 @@ class datalynxview_csv extends base {
             // Iterate the fields and add their content.
 
             foreach ($fieldsettings as $fieldid => $importsettings) {
-                $field = $this->_df->get_field_from_id($fieldid);
+                $field = $this->dl->get_field_from_id($fieldid);
                 $field->prepare_import_content($data, $importsettings, $csvrecord, $entryid);
             }
         }
@@ -611,7 +611,7 @@ class datalynxview_csv extends base {
      */
     public function generate_default_view() {
         // Get all the fields.
-        if (!$fields = $this->_df->get_fields()) {
+        if (!$fields = $this->dl->get_fields()) {
             return; // You shouldn't get that far if there are no user fields.
         }
 

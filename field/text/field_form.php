@@ -89,7 +89,7 @@ class datalynxfield_text_form extends datalynxfield_form {
                 'dffield' => 'param9',
                 'textfieldfield' => 'param10',
                 'acturl' => "$CFG->wwwroot/mod/datalynx/loaddfviews.php",
-                'presentdlid' => $this->_df->id(),
+                'presentdlid' => $this->dl->id(),
                 'thisfieldstring' => get_string('thisfield', 'datalynx'),
                 'update' => $this->_field->id() ? $this->_field->id() : 0,
                 'fieldtype' => 'text',
@@ -164,7 +164,7 @@ class datalynxfield_text_form extends datalynxfield_form {
             ) {
                 $formfield = &$this->_form->getElement('param10');
                 // Add the option to choose this new field itself as autocompletion reference field.
-                if ($this->_df->id() == $refdatalynxid && $textfieldid == 0) {
+                if ($this->dl->id() == $refdatalynxid && $textfieldid == 0) {
                     $formfield->addOption(get_string('thisfield', 'datalynx'), -1);
                 }
                 foreach ($textfields as $key => $value) {

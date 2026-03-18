@@ -56,7 +56,7 @@ class datalynxview_tabular extends base {
      */
     public function generate_default_view() {
         // Get all the fields.
-        $fields = $this->_df->get_fields();
+        $fields = $this->dl->get_fields();
         if (!$fields) {
             return; // You shouldn't get that far if there are no user fields.
         }
@@ -306,7 +306,7 @@ class datalynxview_tabular extends base {
         $elements = [];
 
         // Get patterns definitions.
-        $fields = $this->_df->get_fields();
+        $fields = $this->dl->get_fields();
         $fielddefinitions = [];
         $entry = new stdClass();
         foreach ($this->_tags['field'] as $fieldid => $patterns) {

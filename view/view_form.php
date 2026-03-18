@@ -34,7 +34,7 @@ require_once("$CFG->libdir/formslib.php");
 class datalynxview_base_form extends moodleform {
     protected $_view = null;
 
-    protected $_df = null;
+    protected $dl = null;
 
     public function __construct(
         $view,
@@ -46,7 +46,7 @@ class datalynxview_base_form extends moodleform {
         $editable = true
     ) {
         $this->_view = $view;
-        $this->_df = $view->get_dl();
+        $this->dl = $view->get_dl();
         $attributes['id'] = 'datalynx-view-edit-form';
         parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
     }
@@ -56,7 +56,7 @@ class datalynxview_base_form extends moodleform {
     public function definition() {
         global $CFG, $DB;
         $view = $this->_view;
-        $df = $this->_df;
+        $df = $this->dl;
         $editoroptions = $view->editors();
         $mform = &$this->_form;
 
@@ -111,7 +111,7 @@ class datalynxview_base_form extends moodleform {
         $mform->addElement('header', 'redirectsettings', get_string('redirectsettings', 'datalynx'));
         $mform->addHelpButton('redirectsettings', 'redirectsettings', 'datalynx');
         $mform->addElement('select', 'param10', get_string('redirectto', 'datalynx'), $this->get_view_menu());
-        $mform->setDefault('param10', $DB->get_field('datalynx', 'defaultview', ['id' => $this->_df->id()]));
+        $mform->setDefault('param10', $DB->get_field('datalynx', 'defaultview', ['id' => $this->dl->id()]));
         $mform->setType('param10', PARAM_INT);
 
         // View specific definition.
@@ -182,7 +182,7 @@ class datalynxview_base_form extends moodleform {
     public function get_view_menu() {
         global $DB;
         $viewid = $this->_view->view->id;
-        $dataid = $this->_df->id();
+        $dataid = $this->dl->id();
         $query = "SELECT dv.id, dv.name
                     FROM {datalynx_views} dv
                    WHERE dv.dataid = :dataid";
@@ -325,7 +325,7 @@ class datalynxview_base_form extends moodleform {
         $errors = parent::validation($data, $files);
 
         $view = $this->_view;
-        $df = $this->_df;
+        $df = $this->dl;
 
         // Check if the view name is already used.
         if ($df->name_exists('views', $data['name'], $view->id())) {

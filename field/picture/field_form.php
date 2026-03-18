@@ -50,7 +50,7 @@ class datalynxfield_picture_form extends datalynxfield_file_form {
         );
 
         // Max bytes (param1).
-        $options = get_max_upload_sizes($CFG->maxbytes, $this->_df->course->maxbytes);
+        $options = get_max_upload_sizes($CFG->maxbytes, $this->dl->course->maxbytes);
         $mform->addElement('select', 'param1', get_string('filemaxsize', 'datalynx'), $options);
 
         // Max files (param2).

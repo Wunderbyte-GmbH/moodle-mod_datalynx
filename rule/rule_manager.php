@@ -31,7 +31,7 @@ class datalynx_rule_manager {
     /**
      * @var datalynx|\mod_datalynx\datalynx
      */
-    protected $_df;
+    protected $dl;
 
     /**
      * @var array
@@ -93,7 +93,7 @@ class datalynx_rule_manager {
      * @param mod_datalynx\datalynx $datalynx datalynx
      */
     public function __construct(mod_datalynx\datalynx $datalynx) {
-        $this->_df = $datalynx;
+        $this->dl = $datalynx;
         $this->_customrules = [];
     }
 
@@ -197,7 +197,7 @@ class datalynx_rule_manager {
             }
             require_once($type . '/rule_class.php');
             $ruleclass = 'datalynx_rule_' . $type;
-            $rule = new $ruleclass($this->_df, $key);
+            $rule = new $ruleclass($this->dl, $key);
             return $rule;
         } else {
             return false;
@@ -217,7 +217,7 @@ class datalynx_rule_manager {
         if (!$this->_customrules || $forceget) {
             $this->_customrules = [];
             // Collate user rules.
-            if ($rules = $DB->get_records('datalynx_rules', ['dataid' => $this->_df->id()])) {
+            if ($rules = $DB->get_records('datalynx_rules', ['dataid' => $this->dl->id()])) {
                 foreach ($rules as $ruleid => $rule) {
                     $this->_customrules[$ruleid] = $this->get_rule($rule);
                 }
@@ -254,7 +254,7 @@ class datalynx_rule_manager {
     public function process_rules($action, $rids, $confirmed = false) {
         global $OUTPUT, $DB;
 
-        $df = $this->_df;
+        $df = $this->dl;
 
         if (!has_capability('mod/datalynx:managetemplates', $df->context)) {
             // TODO MDL-00000 throw exception.
@@ -309,9 +309,9 @@ class datalynx_rule_manager {
                             $rule = $this->get_rule($forminput->type);
                             $ruleid = $rule->insert_rule($forminput);
 
-                            $other = ['dataid' => $this->_df->id()];
+                            $other = ['dataid' => $this->dl->id()];
                             $event = \mod_datalynx\event\rule_created::create(
-                                ['context' => $this->_df->context, 'objectid' => $ruleid,
+                                ['context' => $this->dl->context, 'objectid' => $ruleid,
                                 'other' => $other]
                             );
                             $event->trigger();
@@ -329,9 +329,9 @@ class datalynx_rule_manager {
                             $oldrulename = $rule->rule->name;
                             $rule->update_rule($forminput);
 
-                            $other = ['dataid' => $this->_df->id()];
+                            $other = ['dataid' => $this->dl->id()];
                             $event = \mod_datalynx\event\rule_updated::create(
-                                ['context' => $this->_df->context,
+                                ['context' => $this->dl->context,
                                 'objectid' => $rule->rule->id,
                                 'other' => $other]
                             );
@@ -353,9 +353,9 @@ class datalynx_rule_manager {
 
                             $processedrids[] = $rid;
 
-                            $other = ['dataid' => $this->_df->id()];
+                            $other = ['dataid' => $this->dl->id()];
                             $event = \mod_datalynx\event\rule_updated::create(
-                                ['context' => $this->_df->context, 'objectid' => $rid,
+                                ['context' => $this->dl->context, 'objectid' => $rid,
                                 'other' => $other]
                             );
                             $event->trigger();
@@ -373,9 +373,9 @@ class datalynx_rule_manager {
                             $ruleid = $DB->insert_record('datalynx_rules', $rule->rule);
                             $processedrids[] = $ruleid;
 
-                            $other = ['dataid' => $this->_df->id()];
+                            $other = ['dataid' => $this->dl->id()];
                             $event = \mod_datalynx\event\rule_created::create(
-                                ['context' => $this->_df->context, 'objectid' => $ruleid,
+                                ['context' => $this->dl->context, 'objectid' => $ruleid,
                                 'other' => $other]
                             );
                             $event->trigger();
@@ -388,9 +388,9 @@ class datalynx_rule_manager {
                             $rule->delete_rule();
                             $processedrids[] = $rule->rule->id;
 
-                            $other = ['dataid' => $this->_df->id()];
+                            $other = ['dataid' => $this->dl->id()];
                             $event = \mod_datalynx\event\rule_deleted::create(
-                                ['context' => $this->_df->context,
+                                ['context' => $this->dl->context,
                                 'objectid' => $rule->rule->id,
                                 'other' => $other]
                             );
@@ -426,7 +426,7 @@ class datalynx_rule_manager {
     public function print_rule_list() {
         global $OUTPUT;
 
-        $df = $this->_df;
+        $df = $this->dl;
 
         $editbaseurl = '/mod/datalynx/rule/rule_edit.php';
         $actionbaseurl = '/mod/datalynx/rule/index.php';
@@ -544,7 +544,7 @@ class datalynx_rule_manager {
 
         $popupurl = new moodle_url(
             '/mod/datalynx/rule/rule_edit.php',
-            ['d' => $this->_df->id(), 'sesskey' => sesskey()]
+            ['d' => $this->dl->id(), 'sesskey' => sesskey()]
         );
         $ruleselect = new single_select($popupurl, 'type', $rulemenu, null, ['' => 'choosedots'], 'ruleform');
         $ruleselect->set_label(get_string('ruleadd', 'datalynx') . '&nbsp;');

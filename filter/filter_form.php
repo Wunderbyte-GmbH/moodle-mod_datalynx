@@ -36,7 +36,7 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
      *
      * @var datalynx null
      */
-    protected $_df = null;
+    protected $dl = null;
 
     /*
      *
@@ -54,7 +54,7 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
     ) {
         $this->_filter = $filter;
         $this->_customfilter = $customfilter;
-        $this->_df = $df;
+        $this->dl = $df;
 
         parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
     }
@@ -127,7 +127,7 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
         $showlabel = false
     ) {
         $mform = &$this->_form;
-        $df = $this->_df;
+        $df = $this->dl;
 
         $andoroptions = [0 => get_string('andor', 'datalynx'),
             'AND' => get_string('and', 'datalynx'), 'OR' => get_string('or', 'datalynx')];
@@ -282,7 +282,7 @@ class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
      *
      */
     public function definition() {
-        $df = $this->_df;
+        $df = $this->dl;
         $filter = $this->_filter;
         $name = empty($filter->name) ? get_string('filternew', 'datalynx') : $filter->name;
         $description = empty($filter->description) ? '' : $filter->description;
@@ -366,7 +366,7 @@ class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
-        $df = $this->_df;
+        $df = $this->dl;
         $filter = $this->_filter;
 
         // Validate unique name.
@@ -523,7 +523,7 @@ class mod_datalynx_customfilter_frontend_form extends mod_datalynx_filter_base_f
             $entryauthors = $DB->get_records_sql('SELECT DISTINCT userid, firstname, lastname
                 FROM {datalynx_entries}
                 INNER JOIN {user} on {datalynx_entries}.userid = {user}.id
-                WHERE {datalynx_entries}.dataid = ' . $this->_df->id() . ';');
+                WHERE {datalynx_entries}.dataid = ' . $this->dl->id() . ';');
 
             $menu = [];
             foreach ($entryauthors as $userid => $author) {
@@ -559,7 +559,7 @@ class mod_datalynx_customfilter_frontend_form extends mod_datalynx_filter_base_f
         $clearcustomsearch = '<a class="btn btn-secondary" href="';
         $clearcustomsearch .= new moodle_url(
             '/mod/datalynx/view.php',
-            ['id' => $this->_df->cm->id, 'view' => $view->view->id, 'filter' => 0]
+            ['id' => $this->dl->cm->id, 'view' => $view->view->id, 'filter' => 0]
         );
         $clearcustomsearch .= '"> ' . get_string('resetsettings', 'datalynx') . '</a>';
         $buttonarray[] = &$mform->createElement('static', 'clearcustomsearch', '', $clearcustomsearch);

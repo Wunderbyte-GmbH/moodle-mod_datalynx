@@ -90,7 +90,7 @@ class datalynxfield_datalynxview_form extends datalynxfield_form {
                 'viewfield' => 'param2',
                 'textfieldfield' => 'param7',
                 'acturl' => "$CFG->wwwroot/mod/datalynx/loaddfviews.php",
-                'presentdlid' => $this->_df->id(),
+                'presentdlid' => $this->dl->id(),
                 'thisfieldstring' => get_string('thisfield', 'datalynx'),
                 'update' => $this->_field->id() ? $this->_field->id() : 0,
                 'fieldtype' => 'datalynxview',

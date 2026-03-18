@@ -144,7 +144,7 @@ class datalynxview_report extends base {
         global $DB, $OUTPUT;
         $report = $this->create_report_sql();
         $fieldid = (int) $this->view->param1;
-        $countfield = $this->_df->get_field_from_id($fieldid);
+        $countfield = $this->dl->get_field_from_id($fieldid);
         $desiredfieldoptions = $countfield->get_options();
 
         $output = html_writer::start_tag('div', ['class' => 'table-responsive']);
@@ -405,7 +405,7 @@ class datalynxview_report extends base {
      */
     public function create_report_sql(): array {
         global $DB;
-        $dataid = $this->_df->id();
+        $dataid = $this->dl->id();
         $entryids = $this->get_report_entryids();
         if (!empty($entryids)) {
             [$insql, $inparams] = $DB->get_in_or_equal($entryids, SQL_PARAMS_NAMED, 'inparam');
@@ -420,7 +420,7 @@ class datalynxview_report extends base {
         $userarray = [];
         if ($groupingid > 0) {
             // Get all userids that are associated to an entry with the view filter applied.
-            $teammemberselectfield = $this->_df->get_field_from_id($groupingid);
+            $teammemberselectfield = $this->dl->get_field_from_id($groupingid);
             $userarray = $teammemberselectfield->get_all_userids_in_all_entries($insql, $inparams);
         } else if ($groupingid === -1) {
             // Get all user ids of entry authors when filter is already applied.
@@ -436,7 +436,7 @@ class datalynxview_report extends base {
         }
 
         // Get field options and their line number (which is saved in datalynx_contents)
-        $fields = $this->_df->get_fields();
+        $fields = $this->dl->get_fields();
         foreach ($fields as $field) {
             if ($field->field->id === (int) $this->view->param1) {
                 $fieldoptions = $field->get_options();
@@ -444,7 +444,7 @@ class datalynxview_report extends base {
         }
         // The field used to count the selected values by the user. Must be an option type field.
         $fieldid = (int) $this->view->param1;
-        $countfield = $this->_df->get_field_from_id($fieldid);
+        $countfield = $this->dl->get_field_from_id($fieldid);
         $desiredfieldoptions = $countfield->get_options();
         $report = [];
 
@@ -515,7 +515,7 @@ class datalynxview_report extends base {
      */
     public function get_report_entryids(): array {
         // Set content.
-        $entries = new datalynx_entries($this->_df, $this->_filter);
+        $entries = new datalynx_entries($this->dl, $this->_filter);
         $options = [];
         // Set a filter to take it all.
         $filter = $this->get_filter();
@@ -541,7 +541,7 @@ class datalynxview_report extends base {
      */
     public function generate_default_view() {
         // Get all the fields.
-        if (!$fields = $this->_df->get_fields()) {
+        if (!$fields = $this->dl->get_fields()) {
             return; // You shouldn't get that far if there are no user fields.
         }
 

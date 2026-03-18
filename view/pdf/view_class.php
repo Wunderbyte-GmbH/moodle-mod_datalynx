@@ -375,7 +375,7 @@ class datalynxview_pdf extends base {
         $data = parent::from_form($data);
 
         // Save pdf specific template files.
-        $contextid = $this->_df->context->id;
+        $contextid = $this->dl->context->id;
         $imageoptions = ['subdirs' => 0, 'maxbytes' => -1, 'maxfiles' => 1,
                 'accepted_types' => ['image']];
         $certoptions = ['subdirs' => 0, 'maxbytes' => -1, 'maxfiles' => 1,
@@ -427,7 +427,7 @@ class datalynxview_pdf extends base {
         $data = parent::to_form($data);
 
         // Save pdf specific template files.
-        $contextid = $this->_df->context->id;
+        $contextid = $this->dl->context->id;
         $imageoptions = ['subdirs' => 0, 'maxbytes' => -1, 'maxfiles' => 1,
                 'accepted_types' => ['image']];
         $certoptions = ['subdirs' => 0, 'maxbytes' => -1, 'maxfiles' => 1,
@@ -503,7 +503,7 @@ class datalynxview_pdf extends base {
      */
     public function generate_default_view() {
         // Get all the fields.
-        $fields = $this->_df->get_fields();
+        $fields = $this->dl->get_fields();
         if (!$fields) {
             return; // You shouldn't get that far if there are no user fields.
         }
@@ -620,7 +620,7 @@ class datalynxview_pdf extends base {
         $elements = [];
 
         // Get patterns definitions.
-        $fields = $this->_df->get_fields();
+        $fields = $this->dl->get_fields();
         $tags = [];
         $patterndefinitions = [];
         $entry = new stdClass();
@@ -704,7 +704,7 @@ class datalynxview_pdf extends base {
         $fs = get_file_storage();
         if (
             $frame = $fs->get_area_files(
-                $this->_df->context->id,
+                $this->dl->context->id,
                 'mod_datalynx',
                 'view_pdfframe',
                 $this->id(),
@@ -752,7 +752,7 @@ class datalynxview_pdf extends base {
         $fs = get_file_storage();
         if (
             $wmark = $fs->get_area_files(
-                $this->_df->context->id,
+                $this->dl->context->id,
                 'mod_datalynx',
                 'view_pdfwmark',
                 $this->id(),
@@ -795,7 +795,7 @@ class datalynxview_pdf extends base {
         $fs = get_file_storage();
         if (
             $cert = $fs->get_area_files(
-                $this->_df->context->id,
+                $this->dl->context->id,
                 'mod_datalynx',
                 'view_pdfcert',
                 $this->id(),
@@ -839,7 +839,7 @@ class datalynxview_pdf extends base {
         $content = file_rewrite_pluginfile_urls(
             $this->view->eparam3,
             'pluginfile.php',
-            $this->_df->context->id,
+            $this->dl->context->id,
             'mod_datalynx',
             "viewparam3",
             $this->id()
@@ -847,8 +847,8 @@ class datalynxview_pdf extends base {
 
         $content = $this->process_content_images($content);
         // Add the Datalynx css to content.
-        if ($this->_df->data->css) {
-            $style = html_writer::tag('style', $this->_df->data->css, ['type' => 'text/css']);
+        if ($this->dl->data->css) {
+            $style = html_writer::tag('style', $this->dl->data->css, ['type' => 'text/css']);
             $content = $style . $content;
         }
 
@@ -869,7 +869,7 @@ class datalynxview_pdf extends base {
         $content = file_rewrite_pluginfile_urls(
             $this->view->eparam4,
             'pluginfile.php',
-            $this->_df->context->id,
+            $this->dl->context->id,
             'mod_datalynx',
             "viewparam4",
             $this->id()
@@ -928,8 +928,8 @@ class datalynxview_pdf extends base {
     protected function write_html($pdf, $content) {
 
         // Add the Datalynx css to content.
-        if ($this->_df->data->css) {
-            $style = html_writer::tag('style', $this->_df->data->css, ['type' => 'text/css']);
+        if ($this->dl->data->css) {
+            $style = html_writer::tag('style', $this->dl->data->css, ['type' => 'text/css']);
             $content = $style . $content;
         }
         $root = $_SERVER['DOCUMENT_ROOT'];
@@ -948,7 +948,7 @@ class datalynxview_pdf extends base {
         $namepattern = !empty($namepattern) ? $namepattern : '';
         $foundtags = [];
         $replacements = [];
-        if (count($this->_entries->entries()) == 1 && $fields = $this->_df->get_fields()) {
+        if (count($this->_entries->entries()) == 1 && $fields = $this->dl->get_fields()) {
             $entries = $this->_entries->entries();
             $entry = reset($entries);
             foreach ($fields as $field) {
@@ -1007,7 +1007,7 @@ class datalynxview_pdf extends base {
             return $pagecount;
         }
 
-        $contextid = $this->_df->context->id;
+        $contextid = $this->dl->context->id;
         $fs = get_file_storage();
         $files = $fs->get_area_files($contextid, 'mod_datalynx', 'content');
         foreach ($files as $file) {
@@ -1083,7 +1083,7 @@ class dfpdf extends DynamicParent {
     /**
      * @var stdClass Settings for the PDF
      */
-    protected $_dfsettings;
+    protected $dlsettings;
 
     /**
      * Constructor
@@ -1092,14 +1092,14 @@ class dfpdf extends DynamicParent {
      */
     public function __construct($settings) {
         parent::__construct($settings->orientation, $settings->unit, $settings->format);
-        $this->_dfsettings = $settings;
+        $this->dlsettings = $settings;
     }
 
     // Page header.
     public function Header() { // phpcs:ignore  @codingStandardsIgnoreLine
         // Adjust X to override left margin.
         $x = $this->GetX();
-        $this->SetX($this->_dfsettings->header->marginleft);
+        $this->SetX($this->dlsettings->header->marginleft);
         if (!empty($this->header_string)) {
             $text = $this->set_page_numbers($this->header_string);
             $this->writeHtml($text);
@@ -1110,8 +1110,8 @@ class dfpdf extends DynamicParent {
 
     // Page footer.
     public function Footer() { // phpcs:ignore  @codingStandardsIgnoreLine
-        if (!empty($this->_dfsettings->footer->text)) {
-            $text = $this->set_page_numbers($this->_dfsettings->footer->text);
+        if (!empty($this->dlsettings->footer->text)) {
+            $text = $this->set_page_numbers($this->dlsettings->footer->text);
             $this->writeHtml($text);
         }
     }

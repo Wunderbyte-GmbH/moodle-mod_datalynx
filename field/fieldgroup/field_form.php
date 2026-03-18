@@ -40,7 +40,7 @@ class datalynxfield_fieldgroup_form extends datalynxfield_form {
 
         // Fieldgroupfieldids are stored in param1.
         $fields = [];
-        $fields = $this->_df->get_fields(null, false, true);
+        $fields = $this->dl->get_fields(null, false, true);
         $fieldnames = [];
         foreach ($fields as $fieldid => $field) {
             if ($field->for_use_in_fieldgroup()) {
@@ -94,7 +94,7 @@ class datalynxfield_fieldgroup_form extends datalynxfield_form {
         }
 
         // Check if all fieldnames are actually found and only fieldtypes are entered that have been tested.
-        $fields = $this->_df->get_fields(null, false, true);
+        $fields = $this->dl->get_fields(null, false, true);
         foreach ($data['param1'] as $fieldid) {
             if (!(array_key_exists($fieldid, $fields) && $fields[$fieldid]->for_use_in_fieldgroup())) {
                 $errors['param1'] = get_string('unsupportedfield', 'datalynx', $fields[$fieldid]->type);

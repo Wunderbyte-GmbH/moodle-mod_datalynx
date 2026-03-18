@@ -62,7 +62,7 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
             'autocomplete',
             'roles',
             get_string('roles'),
-            $this->_df->get_datalynx_permission_names(true),
+            $this->dl->get_datalynx_permission_names(true),
             $options
         );
         $grp[] = &$mform->createElement('static', '', '', $br);
@@ -97,7 +97,7 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
         $mform->addElement('header', 'settingshdr', get_string('linksettings', 'datalynx'));
         $mform->addElement('static', '', get_string('targetviewforroles', 'datalynx'));
 
-        foreach ($this->_df->get_datalynx_permission_names(true) as $permissionid => $permissionname) {
+        foreach ($this->dl->get_datalynx_permission_names(true) as $permissionid => $permissionname) {
             $views = $this->get_views_visible_to_datalynx_permission($permissionid);
             if (!empty($views)) {
                 $mform->addElement('select', "param4[$permissionid]", $permissionname, $views);
@@ -113,7 +113,7 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
 
         // Content to be included.
         $mform->addElement('header', 'message', get_string('messagecontent', 'datalynxrule_eventnotification'));
-        $dlfields = $this->_df->get_fields();
+        $dlfields = $this->dl->get_fields();
         $fieldmenu = [];
         foreach ($dlfields as $fieldid => $field) {
             if ($field->type == 'text' || $field->type == 'editor' || $field->type == 'textarea') {
@@ -155,9 +155,9 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
         $mform = &$this->_form;
         $data = $this->get_submitted_data();
 
-        foreach ($this->_df->get_datalynx_permission_names(true) as $permissionid => $permissionname) {
+        foreach ($this->dl->get_datalynx_permission_names(true) as $permissionid => $permissionname) {
             $views = $this->get_views_visible_to_datalynx_permission($permissionid);
-            $defaultview = $this->_df->get_default_view_id();
+            $defaultview = $this->dl->get_default_view_id();
             if (
                 isset($data) && isset($data->param4[$permissionid]) && $defaultview &&
                     in_array($defaultview, array_keys($views))
@@ -177,10 +177,10 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
         global $DB;
         if ($permissionid == mod_datalynx\datalynx::PERMISSION_ADMIN) {
             $sql = "SELECT id, name FROM {datalynx_views} WHERE dataid = :dataid";
-            return $DB->get_records_sql_menu($sql, ['dataid' => $this->_df->id()]);
+            return $DB->get_records_sql_menu($sql, ['dataid' => $this->dl->id()]);
         } else {
             $sql = "SELECT id, name FROM {datalynx_views} WHERE dataid = :dataid AND visible & :permissionid <> 0";
-            return $DB->get_records_sql_menu($sql, ['dataid' => $this->_df->id(), 'permissionid' => $permissionid]);
+            return $DB->get_records_sql_menu($sql, ['dataid' => $this->dl->id(), 'permissionid' => $permissionid]);
         }
     }
 
@@ -195,7 +195,7 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
                   FROM {datalynx_fields}
                  WHERE dataid = :dataid
                    AND " . $DB->sql_like('type', ':type');
-        $params = ['dataid' => $this->_df->id(), 'type' => 'teammemberselect'];
+        $params = ['dataid' => $this->dl->id(), 'type' => 'teammemberselect'];
         return $DB->get_records_sql_menu($sql, $params);
     }
 
@@ -206,7 +206,7 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
      */
     protected function menu_roles_used_in_context(): array {
         $roles = [];
-        foreach (get_roles_used_in_context($this->_df->context) as $roleid => $role) {
+        foreach (get_roles_used_in_context($this->dl->context) as $roleid => $role) {
             $roles[$roleid] = $role->coursealias ? $role->coursealias : ($role->name ? $role->name : $role->shortname);
         }
         return $roles;

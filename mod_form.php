@@ -36,7 +36,7 @@ class mod_datalynx_mod_form extends moodleform_mod {
     /**
      * @var object
      */
-    protected $_df = null;
+    protected $dl = null;
 
     /**
      * Definition of the module settings form
@@ -45,7 +45,7 @@ class mod_datalynx_mod_form extends moodleform_mod {
         global $CFG;
 
         if ($cmid = optional_param('update', 0, PARAM_INT)) {
-            $this->_df = new mod_datalynx\datalynx(0, $cmid);
+            $this->dl = new mod_datalynx\datalynx(0, $cmid);
         }
 
         $mform = &$this->_form;

@@ -35,7 +35,8 @@ Feature: Test TinyMCE tag buttons and dialogs in datalynx view editor
     Then I should see "Field tags"
 
     # Open dialog and delete the tag
-    When I switch to the "id_eparam2_editor" TinyMCE editor iframe
+    When I change window size to "large"
+    And I switch to the "id_eparam2_editor" TinyMCE editor iframe
     And I click on "Datalynx field Text" "button"
     And I switch to the main frame
     Then I should see "Field tag properties"

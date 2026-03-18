@@ -68,7 +68,7 @@ class datalynx_statistics_class {
      * Datalynx instance.
      * @var mod_datalynx\datalynx
      */
-    private $_df;
+    private $dl;
 
     /**
      * datalynx_statistics_class constructor.
@@ -81,9 +81,9 @@ class datalynx_statistics_class {
             throw new coding_exception('Datalynx id or object must be passed to field constructor.');
         } else {
             if ($df instanceof \mod_datalynx\datalynx) {
-                $this->_df = $df;
+                $this->dl = $df;
             } else {
-                $this->_df = new mod_datalynx\datalynx($df);
+                $this->dl = new mod_datalynx\datalynx($df);
             }
         }
     }
@@ -129,7 +129,7 @@ class datalynx_statistics_class {
             }
             [$total, $approved, $deleted, $visits] = $this->get_count($params->mode, $from, $to);
             $dateformat = get_string('strftimedate', 'langconfig');
-            $title = get_string('statisticsfor', 'datalynx', $this->_df->name());
+            $title = get_string('statisticsfor', 'datalynx', $this->dl->name());
             $timestring = get_string(
                 "timestring{$params->mode}",
                 'datalynx',
@@ -187,7 +187,7 @@ class datalynx_statistics_class {
     public function get_form() {
         global $CFG;
         $formclass = 'datalynx_statistics_form';
-        $formparams = ['d' => $this->_df->id()];
+        $formparams = ['d' => $this->dl->id()];
         $actionurl = new moodle_url('/mod/datalynx/statistics/index.php', $formparams);
         require_once('statistics_form.php');
         return new $formclass($this, $actionurl);
@@ -204,7 +204,7 @@ class datalynx_statistics_class {
     private function get_count($mode, $from = 0, $to = PHP_INT_MAX) {
         global $DB;
 
-        $params = ['dataid' => $this->_df->id(), 'fromdate' => $from,
+        $params = ['dataid' => $this->dl->id(), 'fromdate' => $from,
                 'todate' => $to + strtotime('+1 day', 0)];
 
         $querytotal = "SELECT COUNT(de.id)

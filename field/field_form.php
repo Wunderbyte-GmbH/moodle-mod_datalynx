@@ -35,7 +35,7 @@ class datalynxfield_form extends moodleform {
     protected $_field = null; // phpcs:ignore
 
     /** @var mod_datalynx\datalynx The datalynx object. */
-    protected $_df = null; // phpcs:ignore
+    protected $dl = null; // phpcs:ignore
 
     /**
      * Constructor.
@@ -58,7 +58,7 @@ class datalynxfield_form extends moodleform {
         $editable = true
     ) {
         $this->_field = $field;
-        $this->_df = $field->df();
+        $this->dl = $field->df();
 
         parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
     }
@@ -123,7 +123,7 @@ class datalynxfield_form extends moodleform {
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
-        if ($this->_df->name_exists('fields', $data['name'], $this->_field->id())) {
+        if ($this->dl->name_exists('fields', $data['name'], $this->_field->id())) {
             $errors['name'] = get_string('invalidname', 'datalynx', get_string('field', 'datalynx'));
         }
         return $errors;
@@ -152,7 +152,7 @@ class datalynxfield_form extends moodleform {
         $datalynxs = [];
         if ($dlids = $DB->get_fieldset_sql($sql)) {
             foreach ($dlids as $dlid) {
-                if ($dlid != $this->_df->id()) {
+                if ($dlid != $this->dl->id()) {
                     $dl = new mod_datalynx\datalynx($dlid);
                     // Only add if user can manage dl templates.
                     if (has_capability('mod/datalynx:managetemplates', $dl->context)) {
@@ -167,10 +167,10 @@ class datalynxfield_form extends moodleform {
 
         // Autocompletion with content of other textfield from the same or other datalynx instance.
         // Select Datalynx instance (to be stored in param9).
-        if ($datalynxs || $this->_df->id() > 0) {
+        if ($datalynxs || $this->dl->id() > 0) {
             $dfmenu = ['' => [0 => get_string('noautocompletion', 'datalynx')]];
-            $dfmenu[''][$this->_df->id()] = get_string('thisdatalynx', 'datalynx') .
-                    " (" . strip_tags(format_string($this->_df->name(), true)) . ")";
+            $dfmenu[''][$this->dl->id()] = get_string('thisdatalynx', 'datalynx') .
+                    " (" . strip_tags(format_string($this->dl->name(), true)) . ")";
             foreach ($datalynxs as $dlid => $dl) {
                 if (!isset($dfmenu[$dl->courseshortname])) {
                     $dfmenu[$dl->courseshortname] = [];

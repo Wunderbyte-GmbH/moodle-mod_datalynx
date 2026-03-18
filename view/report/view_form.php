@@ -45,7 +45,7 @@ class datalynxview_report_form extends datalynxview_base_form {
 
         // Report count for this field (only select supported right now: A sum of the values choson for this field is being created.
         // Get all fields from the datalynx instance.
-        $fields = $this->_df->get_fields(null, false, true);
+        $fields = $this->dl->get_fields(null, false, true);
         $fieldnames = [];
         foreach ($fields as $fieldid => $field) {
             if ($field->type === "select") {

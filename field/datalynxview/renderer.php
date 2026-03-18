@@ -152,7 +152,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
                     $groups = $urlquery ? $entry->groupid : [$entry->groupid];
                     $options['groups'] = $groups;
                 } else {
-                    $allgroups = groups_get_user_groups($this->_df->course);
+                    $allgroups = groups_get_user_groups($this->dl->course);
                     $groups = $urlquery ? implode(',', $allgroups[0]) : $allgroups[0];
                     $options['groups'] = $groups;
                 }
