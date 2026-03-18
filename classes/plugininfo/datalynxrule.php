@@ -23,12 +23,7 @@
  */
 namespace mod_datalynx\plugininfo;
 
-/**
- * Class datalynxrule.
- *
- * Information about datalynx rules.
- *
- * @package mod_datalynx
- */
+defined('MOODLE_INTERNAL') || die();
+
 class datalynxrule extends \core\plugininfo\base {
 }

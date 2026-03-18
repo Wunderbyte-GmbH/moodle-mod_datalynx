@@ -16,6 +16,8 @@
 
 namespace mod_datalynx\output;
 
+defined('MOODLE_INTERNAL') || die();
+
 use context_module;
 use completion_info;
 
@@ -89,7 +91,7 @@ class mobile {
 
         // Add new button, check if that makes sense first.
         if ($buttons && has_capability('mod/datalynx:writeentry', $context)) {
-            // TODO: MDL-0000 Ion-footer does not work, make this look like the plus in data or forum.
+            // TODO: Ion-footer does not work, make this look like the plus in data or forum.
             $args = "[args]='{entry: -1, action: \"new\", cmid: $args->cmid, courseid: $args->courseid }'";
             $html .= "<button ion-button core-site-plugins-new-content title='newbutton' component='mod_datalynx'";
             $html .= " method='mobile_course_view' $args>" . get_string('entryaddnew', 'datalynx') . "</button>";

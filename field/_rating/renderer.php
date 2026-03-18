@@ -27,16 +27,9 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
- * Internal rating field renderer.
  */
 class datalynxfield__rating_renderer extends datalynxfield_renderer {
     /**
-     * Returns tag replacements for the field.
-     *
-     * @param array $tags
-     * @param object $entry
-     * @param array $options
-     * @return array
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
         global $CFG, $DB;
@@ -79,7 +72,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
             $options->ratingarea = 'entry';
             // Ugly hack to work around the exception in generate_settings.
             $options->aggregate = RATING_AGGREGATE_COUNT;
-            // TODO: MDL-0000 check when scaleid is empty.
+            // TODO check when scaleid is empty.
             $options->scaleid = !empty($entry->scaleid) ? $entry->scaleid : $field->df()->data->rating;
 
             $rec = new stdClass();
@@ -180,10 +173,6 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
     }
 
     /**
-     * Get aggregate types used in the field.
-     *
-     * @param array $patterns
-     * @return array|null
      */
     public function get_aggregations($patterns) {
         $aggr = [datalynxfield__rating::AGGREGATE_AVG => '##ratings:avg##',
@@ -198,13 +187,10 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
     }
 
     /**
-     * Display rating view link.
-     *
-     * @param object $entry
-     * @param string $tag
-     * @return string
      */
     protected function display_view($entry, $tag) {
+        global $OUTPUT;
+
         if (isset($entry->rating)) {
             $rating = $entry->rating;
             if (
@@ -212,62 +198,88 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
                     $rating->settings->pluginpermissions->viewall
             ) {
                 $nonpopuplink = $rating->get_view_ratings_url();
-                if (trim($tag, '@') == '##ratings:viewurl##') {
-                    return $nonpopuplink;
+                $popuplink = $rating->get_view_ratings_url(true);
+                $popupaction = new popup_action(
+                    'click',
+                    $popuplink,
+                    'ratings',
+                    ['height' => 400, 'width' => 600,
+                    ]
+                );
+
+                if ($tag == '##ratings:view##') {
+                    return $OUTPUT->action_link($nonpopuplink, 'view all', $popupaction);
+                } else {
+                    return $popuplink;
                 }
-                $str = get_string('viewratings', 'datalynx');
-                return $this->output->action_link($nonpopuplink, $str, new popup_action('click', $nonpopuplink));
             }
         }
         return '';
     }
 
     /**
-     * Display rating view inline.
-     *
-     * @param object $entry
-     * @return string
      */
     protected function display_view_inline($entry) {
-        if (!isset($entry->rating) || empty($entry->rating->records)) {
-            return '';
-        }
-        $str = '';
-        foreach ($entry->rating->records as $raterecord) {
-            $user = new stdClass();
-            $user->id = $raterecord->userid;
-            $user->firstname = $raterecord->uidfirstname;
-            $user->lastname = $raterecord->uidlastname;
-            $user->imagealt = $raterecord->uidimagealt;
-            $user->picture = $raterecord->uidpicture;
-            $user->email = $raterecord->uidemail;
+        global $OUTPUT, $DB;
 
-            $str .= html_writer::start_tag('div', ['class' => 'datalynx_rating_inline']);
-            $str .= $this->output->user_picture($user, ['size' => 16]);
-            $str .= ' ' . fullname($user) . ': ';
-            if ($entry->rating->settings->scale->isnumeric) {
-                $str .= $raterecord->rating;
-            } else {
-                $str .= $entry->rating->settings->scale->scaleitems[$raterecord->rating];
+        if (isset($entry->rating)) {
+            $rating = $entry->rating;
+            if (
+                $rating->settings->permissions->viewall &&
+                    $rating->settings->pluginpermissions->viewall && !empty($rating->records)
+            ) {
+                $scalemenu = make_grades_menu($rating->settings->scale->id);
+
+                $table = new html_table();
+                $table->cellpadding = 3;
+                $table->cellspacing = 3;
+                $table->attributes['class'] = 'generalbox ratingtable';
+                $table->colclasses = ['', 'firstname', 'rating', 'time',
+                ];
+                $table->data = [];
+
+                // If the scale was changed after ratings were submitted some ratings may have av alue above the current maximum.
+                // We can't just do count($scalemenu) - 1 as custom scales start at index 1, not 0.
+                $maxrating = $rating->settings->scale->max;
+
+                foreach ($rating->records as $raterecord) {
+                    // Undo the aliasing of the user id column from user_picture::fields().
+                    // We could clone the rating object or preserve the rating id if we needed it again.
+                    // But we don't.
+                    $raterecord->id = $raterecord->userid;
+                    $row = new html_table_row();
+                    $row->attributes['class'] = 'ratingitemheader';
+                    $row->cells[] = $OUTPUT->user_picture(
+                        $raterecord,
+                        ['courseid' => $this->_field->df()->course->id,
+                        ]
+                    );
+                    $userrecord = $DB->get_record('user', ['id' => $raterecord->userid,
+                    ]);
+                    $row->cells[] = fullname($userrecord);
+                    if ($raterecord->rating > $maxrating) {
+                        $raterecord->rating = $maxrating;
+                    }
+                    $row->cells[] = $scalemenu[$raterecord->rating];
+                    $row->cells[] = userdate(
+                        $raterecord->timemodified,
+                        get_string('strftimedate', 'langconfig')
+                    );
+                    $table->data[] = $row;
+                }
+                return html_writer::table($table);
             }
-            $str .= html_writer::end_tag('div');
         }
-
-        return $str;
+        return '';
     }
 
     /**
-     * Display aggregate as bar.
-     *
-     * @param object $entry
-     * @param float $aggravg
-     * @return string
      */
-    protected function display_bar($entry, $aggravg) {
-        if (isset($entry->rating) && $aggravg) {
+    protected function display_bar($entry, $value) {
+        if (isset($entry->rating) && $value) {
             $rating = $entry->rating;
 
-            $width = round($aggravg / $rating->settings->scale->max * 100);
+            $width = round($value / $rating->settings->scale->max * 100);
             $bar = html_writer::tag(
                 'div',
                 '.',
@@ -280,50 +292,152 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
     }
 
     /**
-     * Display aggregate as star.
-     *
-     * @param object $entry
-     * @param float $aggravg
-     * @return string
      */
-    protected function display_star($entry, $aggravg) {
-        $str = '';
-        if ($entry->rating->settings->scale->isnumeric) {
-            $max = $entry->rating->settings->scale->max;
-            $fullstar = $this->output->pix_icon('t/star', '');
-            $halfstar = $this->output->pix_icon('t/starhalf', '');
-            $emptystar = $this->output->pix_icon('t/starempty', '');
+    protected function display_star($entry, $value) {
+        global $OUTPUT;
 
-            for ($i = 1; $i <= $max; $i++) {
-                if ($i <= $aggravg) {
-                    $str .= $fullstar;
-                } else if ($i - 0.5 <= $aggravg) {
-                    $str .= $halfstar;
-                } else {
-                    $str .= $emptystar;
-                }
-            }
-        }
-        return $str;
-    }
+        if (isset($entry->rating)) {
+            $rating = $entry->rating;
+            $numstars = $rating->settings->scale->max;
+            $width = $numstars * 20;
 
-    /**
-     * Render rating field.
-     *
-     * @param object $entry
-     * @return string
-     */
-    protected function render_rating($entry) {
-        if (!empty($entry->rating)) {
-            return $this->output->render($entry->rating);
+            $innerstyle = 'width:100%;height:19px;position:absolute;top:0;left:0;';
+            $bgdiv = html_writer::tag(
+                'div',
+                '.',
+                ['style' => "background:#ccc;color:#ccc;$innerstyle",
+                ]
+            );
+            $bar = html_writer::tag(
+                'div',
+                $this->display_bar($entry, $value),
+                ['style' => "z-index:5;$innerstyle",
+                ]
+            );
+            $stars = implode(
+                '',
+                array_fill(
+                    0,
+                    $numstars,
+                    $OUTPUT->pix_icon(
+                        'star_grey',
+                        '',
+                        'datalynxfield__rating',
+                        ['style' => 'float:left;',
+                                ]
+                    )
+                )
+            );
+            $starsdiv = html_writer::tag('div', $stars, ['style' => "z-index:10;$innerstyle",
+            ]);
+            $wrapper = html_writer::tag(
+                'div',
+                "$bgdiv $bar $starsdiv",
+                ['style' => "width:{$width}px;position:relative;",
+                ]
+            );
+            return $wrapper;
         }
         return '';
     }
 
     /**
-     * Returns tag patterns.
-     *
-     * @return array
+     */
+    public function render_rating($entry) {
+        global $OUTPUT, $PAGE;
+
+        $ratinghtml = '';
+
+        if (isset($entry->rating)) {
+            $rating = $entry->rating;
+
+            $rm = new datalynx_rating_manager();
+            // Initialise the JavaScript so ratings can be done by AJAX.
+            $rm->initialise_rating_javascript($PAGE);
+
+            $strrate = get_string("rate", "rating");
+            $ratinghtml = ''; // The string we'll return.
+
+            // Hack to work around the js updating imposed text.
+            $ratinghtml .= html_writer::tag(
+                'span',
+                '',
+                ['id' => "ratingaggregate{$rating->itemid}", 'style' => 'display:none;',
+                ]
+            );
+            $ratinghtml .= html_writer::tag(
+                'span',
+                '',
+                ['id' => "ratingcount{$rating->itemid}", 'style' => 'display:none;',
+                ]
+            );
+
+            $formstart = null;
+            // If the item doesn't belong to the current user, the user has permission to rate.
+            // And we're within the assessable period.
+            if (
+                $rating->user_can_rate() or
+                    has_capability('mod/datalynx:manageratings', $this->_field->df()->context)
+            ) {
+                $rateurl = $rating->get_rate_url();
+                $inputs = $rateurl->params();
+
+                // Start the rating form.
+                $formattrs = ['id' => "postrating{$rating->itemid}",
+                        'class' => 'postratingform', 'method' => 'post',
+                        'action' => $rateurl->out_omit_querystring(),
+                ];
+                $formstart = html_writer::start_tag('form', $formattrs);
+                $formstart .= html_writer::start_tag('div', ['class' => 'ratingform',
+                ]);
+
+                // Add the hidden inputs.
+                foreach ($inputs as $name => $value) {
+                    $attributes = ['type' => 'hidden', 'class' => 'ratinginput',
+                            'name' => $name, 'value' => $value,
+                    ];
+                    $formstart .= html_writer::empty_tag('input', $attributes);
+                }
+
+                $ratinghtml = $formstart . $ratinghtml;
+
+                $scalearray = [RATING_UNSET_RATING => $strrate . '...',
+                        ] + $rating->settings->scale->scaleitems;
+                $scaleattrs = ['class' => 'postratingmenu ratinginput',
+                        'id' => 'menurating' . $rating->itemid,
+                ];
+                $ratinghtml .= html_writer::select(
+                    $scalearray,
+                    'rating',
+                    $rating->rating,
+                    false,
+                    $scaleattrs
+                );
+
+                // Output submit button.
+                $ratinghtml .= html_writer::start_tag('span', ['class' => "ratingsubmit",
+                ]);
+
+                $attributes = ['type' => 'submit', 'class' => 'postratingmenusubmit',
+                        'id' => 'postratingsubmit' . $rating->itemid,
+                        'value' => s(get_string('rate', 'rating')),
+                ];
+                $ratinghtml .= html_writer::empty_tag('input', $attributes);
+
+                if (!$rating->settings->scale->isnumeric) {
+                    $ratinghtml .= $OUTPUT->help_icon_scale($rating->settings->scale->courseid, $rating->settings->scale);
+                }
+                $ratinghtml .= html_writer::end_tag('span');
+                $ratinghtml .= html_writer::end_tag('div');
+                $ratinghtml .= html_writer::end_tag('form');
+            }
+        }
+
+        return $ratinghtml;
+    }
+
+    /**
+     * Array of patterns this field supports
      */
     protected function patterns() {
         $fieldinternalname = $this->_field->get('internalname');

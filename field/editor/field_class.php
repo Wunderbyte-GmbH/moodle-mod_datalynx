@@ -15,11 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Field class for the editor field type.
  *
- * @package    datalynxfield_editor
- * @copyright  2015 David Bogner
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package datalynxfield_editor
+ * @subpackage editor
+ * @copyright 2015 David Bogner
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 
@@ -27,12 +27,9 @@ require_once($CFG->dirroot . '/mod/datalynx/field/field_class.php');
 require_once($CFG->dirroot . '/lib/filelib.php');
 require_once($CFG->dirroot . '/repository/lib.php');
 
-/** Field class for the editor field type. */
 class datalynxfield_editor extends datalynxfield_base {
-    /** @var string The field type identifier. */
     public $type = 'editor';
 
-    /** @var array Editor options for the field. */
     protected $editoroptions;
 
     /**
@@ -52,7 +49,8 @@ class datalynxfield_editor extends datalynxfield_base {
 
         $maxbytes = get_user_max_upload_file_size($PAGE->context, $CFG->maxbytes, $COURSE->maxbytes);
 
-        // MDL-0000 TODO: provide options for the editor field to configure in the field settings.
+        // TODO: provide options for the editor field to configure in the field settings.
+
         $this->editoroptions = [];
         $this->editoroptions['context'] = $this->df->context;
         $this->editoroptions['maxfiles'] = EDITOR_UNLIMITED_FILES;
@@ -75,18 +73,12 @@ class datalynxfield_editor extends datalynxfield_base {
     }
 
     /**
-     * Returns true because this field uses an editor element.
-     *
-     * @return bool True always.
      */
     public function is_editor() {
         return true;
     }
 
     /**
-     * Get the editor options for this field.
-     *
-     * @return array The editor options.
      */
     public function editor_options() {
         return $this->editoroptions;
@@ -146,13 +138,6 @@ class datalynxfield_editor extends datalynxfield_base {
     }
 
     /**
-     * Prepare import content for the editor field from CSV or other sources.
-     *
-     * @param stdClass $data The data object to populate.
-     * @param array $importsettings Import settings array.
-     * @param array|null $csvrecord The CSV record row.
-     * @param int|null $entryid The entry id.
-     * @return bool True on success.
      */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
         $fieldid = $this->field->id;
@@ -178,19 +163,19 @@ class datalynxfield_editor extends datalynxfield_base {
         return true;
     }
 
-    /**
-     * Get the list of supported search operators for this field type.
-     *
-     * @return array Array of operator labels keyed by operator.
-     */
     public function get_supported_search_operators() {
-        return [
-            'LIKE' => get_string('contains', 'datalynx'),
-            'NOT LIKE' => get_string('notcontains', 'datalynx'),
-            '=' => get_string('equalto', 'datalynx'),
-            '!=' => get_string('notequalto', 'datalynx'),
-            'EMPTY' => get_string('isempty', 'datalynx'),
-            'NOT EMPTY' => get_string('isnotempty', 'datalynx'),
-        ];
+        return ['' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
+                'LIKE' => get_string('contains', 'datalynx')];
+    }
+
+    /**
+     * Is $value a valid content or do we see an empty input?
+     * @return bool
+     */
+    public static function is_fieldvalue_empty($value) {
+        if ($value['text'] == '') {
+            return true;
+        }
+        return false;
     }
 }

@@ -16,7 +16,15 @@
 
 /**
  * Privacy provider implementation for datalynxfield_checkbox.
+ *
+ * @package datalynxfield_checkbox
+ * @subpackage checkbox
+ * @copyright 2018 Michael Pollak <moodle@michaelpollak.org>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+namespace datalynxfield_checkbox\privacy;
+
 class provider implements
     // This plugin does not store any personal user data.
     \core_privacy\local\metadata\null_provider {

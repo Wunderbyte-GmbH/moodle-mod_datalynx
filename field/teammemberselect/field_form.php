@@ -25,11 +25,6 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
-/**
- * Field form class for the teammemberselect field type.
- *
- * @package datalynxfield_teammemberselect
- */
 class datalynxfield_teammemberselect_form extends datalynxfield_form {
     /**
      * Defines the necessary form elements for field creation
@@ -77,14 +72,20 @@ class datalynxfield_teammemberselect_form extends datalynxfield_form {
         $mform->addHelpButton('param2', 'admissibleroles', 'datalynx');
         $mform->addGroupRule('param2', get_string('admissibleroleserror', 'datalynx'), 'required', null, 1, 'client');
 
-        $mform->addElement('select', 'param4', get_string('listformat', 'datalynxfield_teammemberselect'), $options);
+        $mform->addElement('select', 'param4', get_string('listformat', 'datalynx'), $this->_field->separators);
+        $mform->setType('param4', PARAM_INT);
+        $mform->setDefault('param4', datalynxfield_teammemberselect::TEAMMEMBERSELECT_FORMAT_UL);
 
-        // Define options for unsubscription.
-        $mform->addElement(
-            'selectyesno',
-            'param5',
-            get_string('allowunsubscription', 'datalynxfield_teammemberselect')
-        );
+        $mform->addElement('checkbox', 'param7', get_string('usercanaddself', 'datalynx'), null, 1);
+        $mform->addHelpButton('param7', 'usercanaddself', 'datalynx');
+        $mform->setType('param7', PARAM_BOOL);
+
+        $mform->addElement('checkbox', 'param6', get_string('notifyteammembers', 'datalynx'), null, 1);
+        $mform->setType('param6', PARAM_BOOL);
+
+        $mform->addElement('checkbox', 'param8', get_string('allowunsubscription', 'datalynx'), null, 1);
+        $mform->addHelpButton('param8', 'allowunsubscription', 'datalynx');
+        $mform->setType('param8', PARAM_INT);
 
         $attributes = [];
         $message = '';

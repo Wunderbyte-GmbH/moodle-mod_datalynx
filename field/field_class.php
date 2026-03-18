@@ -31,13 +31,10 @@ require_once(dirname(__FILE__) . '/../renderer/renderer.php');
  * Base class for Datalynx Field Types
  */
 abstract class datalynxfield_base {
-    /** @var int Field is not visible. */
     const VISIBLE_NONE = 0;
 
-    /** @var int Field is visible to the owner. */
     const VISIBLE_OWNER = 1;
 
-    /** @var int Field is visible to everyone. */
     const VISIBLE_ALL = 2;
 
     /**
@@ -59,14 +56,14 @@ abstract class datalynxfield_base {
     public $field = null;
 
     /**
-     * @var datalynxfield_renderer The renderer object.
+     * @var datalynxfield_renderer
      */
-    protected $_renderer = null; // phpcs:ignore
+    protected $_renderer = null;
 
     /**
-     * @var array The distinct values cache.
+     * @var array
      */
-    protected $_distinctvalues = null; // phpcs:ignore
+    protected $_distinctvalues = null;
 
     /**
      * Can this field be used in fieldgroups?
@@ -236,18 +233,12 @@ abstract class datalynxfield_base {
     }
 
     /**
-     * Returns the datalynx object.
-     *
-     * @return mod_datalynx\datalynx
      */
     public function df() {
         return $this->df;
     }
 
     /**
-     * Returns the field form object.
-     *
-     * @return datalynxfield_form
      */
     public function get_form() {
         global $CFG;
@@ -275,9 +266,6 @@ abstract class datalynxfield_base {
     }
 
     /**
-     * Returns the field data for the form.
-     *
-     * @return stdClass
      */
     public function to_form() {
         return $this->field;
@@ -298,7 +286,6 @@ abstract class datalynxfield_base {
         return $this->_renderer;
     }
 
-    /** @var array Default options for rendering. */
     protected static $defaultoptions = ['manage' => false, 'visible' => false, 'edit' => false,
             'editable' => false, 'disabled' => false, 'required' => false, 'internal' => false,
     ];
@@ -1299,6 +1286,77 @@ class datalynxfield_option_multiple extends datalynxfield_option {
         return [$sql, $params, $usecontent];
     }
 
+    public function get_supported_search_operators() {
+        return ['ANY_OF' => get_string('anyof', 'datalynx'),
+                'ALL_OF' => get_string('allof', 'datalynx'),
+                'EXACTLY' => get_string('exactly', 'datalynx'), '' => get_string('empty', 'datalynx')];
+    }
+
+    public function get_argument_count(string $operator) {
+        if ($operator === "") { // "Empty" operator
+            return 0;
+        } else {
+            return 1;
+        }
+    }
+}
+
+/**
+ * Base class for Datalynx field types that offer a set of options with single choice
+ */
+class datalynxfield_option_single extends datalynxfield_option {
+    /**
+     *
+     * {@inheritDoc}
+     * @see datalynxfield_option::update_options()
+     */
+    public function update_options($map = []) {
+        global $DB;
+
+        $params = [];
+        $i = 0;
+        $updatesql = "UPDATE {datalynx_contents}
+                         SET content = (
+                        CASE";
+        foreach ($map as $old => $new) {
+            $updatesql .= " WHEN content = :old{$i} THEN :new{$i} ";
+            $params["old{$i}"] = $old;
+            $params["new{$i}"] = $new;
+            $i++;
+        }
+        $updatesql .= "ELSE 0 END) WHERE fieldid = :fieldid";
+        $params['fieldid'] = $this->field->id;
+
+        $DB->execute($updatesql, $params);
+    }
+
+    /**
+     *
+     * {@inheritDoc}
+     * @see datalynxfield_base::format_content()
+     */
+    protected function format_content($entry, array $values = null) {
+        $fieldid = $this->field->id;
+        // Old contents.
+        $oldcontents = [];
+        if (isset($entry->{"c{$fieldid}_content"})) {
+            $oldcontents[] = $entry->{"c{$fieldid}_content"};
+        }
+        // New contents.
+        $contents = [];
+
+        $selected = null;
+
+        // We want to store empty values as well.
+        foreach ($values as $value) {
+            $selected = $value;
+        }
+
+        // Add the content.
+        $contents[] = $selected;
+
+        return [$contents, $oldcontents];
+    }
 
     /**
      * Computes which values of this field have already been chosen by the given user and

@@ -15,12 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Renderer for the fieldgroup field type.
- *
- * @package    datalynxfield_fieldgroup
+ * @package datalynxfield_fieldgroup
  * @subpackage fieldgroup
- * @copyright  2018 michael pollak <moodle@michaelpollak.org>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright 2018 michael pollak <moodle@michaelpollak.org>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 
@@ -42,6 +40,8 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
      * @see datalynxfield_renderer::render_display_mode()
      */
     public function render_display_mode(stdClass $entry, array $options): string {
+        global $OUTPUT;
+
         // We want to display these fields.
         $fieldgroupfields = $this->get_subfields();
 
@@ -91,7 +91,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
             $viewtype = ($view->view->type == 'pdf') ? 'pdf' : '';
         }
 
-        return $this->output->render_from_template('mod_datalynx/fieldgroup' . $viewtype, $completedispl);
+        return $OUTPUT->render_from_template('mod_datalynx/fieldgroup' . $viewtype, $completedispl);
     }
 
     /**
@@ -187,7 +187,8 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         $mform->setType($fieldname . '_lastvisible', PARAM_INT);
 
         // Hide unused lines.
-        $this->page->requires->js_call_amd(
+        global $PAGE;
+        $PAGE->requires->js_call_amd(
             'mod_datalynx/fieldgroups',
             'init',
             [$this->_field->field->name, $defaultlines, $maxlines, $requiredlines, $fieldname]
@@ -320,42 +321,5 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
             $patterns[$fieldid][0] = "[[$fieldname]]";
         }
         return ($patterns);
-    }
-
-    /**
-     * Trigger client side validation for all subfields in this fieldgroup.
-     *
-     * @param MoodleQuickForm $mform
-     */
-    public function add_subfield_rules(MoodleQuickForm &$mform) {
-        $fieldid = $this->_field->id();
-        $fieldname = "fieldgroup_{$fieldid}";
-        $maxlines = $this->_field->field->param2;
-
-        foreach ($this->get_subfields() as $subfieldid => $subfield) {
-            for ($line = 0; $line < $maxlines; $line++) {
-                $subfield->renderer()->add_subfield_rules($mform, "_{$fieldname}_" . $line);
-            }
-        }
-    }
-
-    /**
-     * Get replacements for field tags.
-     *
-     * @param array|null $tags
-     * @param stdClass $entry
-     * @param array|null $options
-     * @return array
-     */
-    public function replacements(array $tags = null, $entry = null, array $options = null) {
-        $replacements = [];
-        $fieldid = $this->_field->id();
-        $fieldname = $this->_field->name();
-
-        foreach ($tags as $tag) {
-            $replacements[$tag] = ['html', $this->render_display_mode($entry, $options)];
-        }
-
-        return $replacements;
     }
 }

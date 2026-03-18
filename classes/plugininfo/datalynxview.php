@@ -23,12 +23,7 @@
  */
 namespace mod_datalynx\plugininfo;
 
-/**
- * Class datalynxview.
- *
- * Information about datalynx views.
- *
- * @package mod_datalynx
- */
+defined('MOODLE_INTERNAL') || die();
+
 class datalynxview extends \core\plugininfo\base {
 }

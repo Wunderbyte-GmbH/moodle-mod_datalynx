@@ -26,41 +26,19 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
-/**
- * Field class for the datalynxview field type.
- *
- * @package    datalynxfield_datalynxview
- * @copyright  2014 onwards by edulabs.org and associated programmers
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 class datalynxfield_datalynxview extends datalynxfield_base {
-    /** @var string The field type identifier. */
     public $type = 'datalynxview';
 
-    /** @var \mod_datalynx\datalynx|null The referenced datalynx instance. */
     public $refdatalynx = null;
 
-    /** @var int|null The ID of the referenced view. */
     public $refview = null;
 
-    /** @var int|null The ID of the reference filter. */
     public $reffilterid = null;
 
-    /** @var int|null The ID of the local view. */
     public $localview = null;
 
-    /** @var string|null Custom CSS for the field. */
     public $css = null;
 
-    /** @var stdClass|null The field data. */
-    public $field = null;
-
-    /**
-     * Constructor for the datalynxview field.
-     *
-     * @param int $df The datalynx id.
-     * @param int|stdClass $field The field id or object.
-     */
     public function __construct($df = 0, $field = 0) {
         global $DB;
 
@@ -68,14 +46,14 @@ class datalynxfield_datalynxview extends datalynxfield_base {
 
         // Get the datalynx.
         if (
-            empty($this->field->param1) ||
+            empty($this->field->param1) and
                 !$DB->record_exists('datalynx', ['id' => $this->field->param1])
         ) {
             return;
         }
 
         $datalynx = new mod_datalynx\datalynx($this->field->param1);
-        // MDL-0000 TODO Add capability check on view entries.
+        // TODO Add capability check on view entries.
 
         // Is there a view? Otherwise return.
         if (empty($this->field->param2) || !$viewid = $DB->get_field('datalynx_views', 'id', ['id' => $this->field->param2])) {
@@ -87,11 +65,6 @@ class datalynxfield_datalynxview extends datalynxfield_base {
         $this->localview = $currentview ? $currentview->id() : null;
     }
 
-    /**
-     * Returns true because this field supports editing.
-     *
-     * @return bool True always.
-     */
     public function is_editable() {
         return true;
     }

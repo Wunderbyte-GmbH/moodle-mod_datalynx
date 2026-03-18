@@ -42,6 +42,8 @@
  * Please do not forget to use upgrade_set_timeout()
  * before any action that may take longer time to finish.
  */
+defined('MOODLE_INTERNAL') || die();
+
 function xmldb_datalynx_upgrade($oldversion) {
     global $CFG, $DB;
 
@@ -1105,9 +1107,6 @@ function xmldb_datalynx_upgrade($oldversion) {
     return true;
 }
 
-/**
- * Upgrade behaviors for datalynx.
- */
 function mod_datalynx_upgrade_behaviors() {
     require_once(dirname(__FILE__) . '/../behavior/behavior.php');
     global $DB;
@@ -1134,9 +1133,6 @@ function mod_datalynx_upgrade_behaviors() {
     }
 }
 
-/**
- * Replace field rules for datalynx.
- */
 function mod_datalynx_replace_field_rules() {
     require_once(dirname(__FILE__) . '/../behavior/behavior.php');
     global $DB;
@@ -1220,9 +1216,6 @@ function mod_datalynx_replace_field_rules() {
     }
 }
 
-/**
- * Replace field labels for datalynx.
- */
 function mod_datalynx_replace_field_labels() {
     require_once(dirname(__FILE__) . '/../renderer/renderer.php');
     global $DB;

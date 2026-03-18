@@ -36,6 +36,7 @@ use moodle_url;
 use stdClass;
 use moodle_exception;
 use comment;
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Class datalynx
@@ -43,25 +44,21 @@ use comment;
  * @package mod_datalynx
  */
 class datalynx {
-    /** @var int Count all entries. */
     const COUNT_ALL = 0;
 
-    /** @var int Count approved entries only. */
     const COUNT_APPROVED = 1;
 
-    /** @var int Count unapproved entries only. */
     const COUNT_UNAPPROVED = 2;
 
-    /** @var int Count entries left to be made. */
     const COUNT_LEFT = 3;
 
-    /** @var int No approval required. */
+    // No approval required.
     const APPROVAL_NONE = 0;
 
-    /** @var int Approval for new entries and updates required. */
+    // Approval for new entries and updates required.
     const APPROVAL_ON_UPDATE = 1;
 
-    /** @var int Approval only for new entries required. */
+    // Approval only for new entries required.
     const APPROVAL_ON_NEW = 2;
 
     /**
@@ -99,52 +96,26 @@ class datalynx {
      */
     public $notifications = ['bad' => [], 'good' => []];
 
-    /** @var string The page file used for viewing. */
     protected $pagefile = 'view';
 
-    /** @var array List of fields. */
     protected $fields = [];
 
-    /** @var array List of views. */
     protected $views = [];
 
-    /**
-     * @var datalynx_filter_manager Filter manager instance.
-     * @phpcs:ignore
-     */
     protected $_filtermanager = null;
 
-    /**
-     * @var datalynx_customfilter_manager Custom filter manager instance.
-     * @phpcs:ignore
-     */
     protected $_customfiltermanager = null;
 
-    /**
-     * @var datalynx_rule_manager Rule manager instance.
-     * @phpcs:ignore
-     */
     protected $_rulemanager = null;
 
-    /**
-     * @var datalynx_preset_manager Preset manager instance.
-     * @phpcs:ignore
-     */
     protected $_presetmanager = null;
 
-    /**
-     * @var mod_datalynx\view\base Current view instance.
-     * @phpcs:ignore
-     */
     protected $_currentview = null;
 
-    /** @var array Internal fields. */
     protected $internalfields = [];
 
-    /** @var array Custom filter fields. */
     protected $customfilterfields = [];
 
-    /** @var array Internal group modes. */
     protected $internalgroupmodes = ['separateparticipants' => -1];
 
     /**
@@ -270,8 +241,6 @@ class datalynx {
     }
 
     /**
-     * Get the page file.
-     *
      * @return string
      */
     public function pagefile() {
@@ -759,10 +728,10 @@ class datalynx {
 
         // Print groups menu if needed.
         if (!empty($params->groups)) {
-            $viewid = $params->urlparams->view ?? 0;
-            $filterid = $params->urlparams->filter ?? 0;
-            $this->print_groups_menu($viewid, $filterid);
+            $this->print_groups_menu($params->urlparams->view, $params->urlparams->filter);
         }
+
+        // TODO: explore letting view decide whether to print rsslink and intro.
 
         // Print any notices.
         if (empty($params->nonotifications)) {
@@ -826,14 +795,13 @@ class datalynx {
      */
     public function print_intro() {
         global $OUTPUT;
-        // TODO: MDL-0000 make intro stickily closable. Display the intro only when there are on pages: if ($this->data->intro and empty($page)).
-        $html = '';
+        // TODO: make intro stickily closable.
+        // Display the intro only when there are on pages: if ($this->data->intro and empty($page)).
         if ($this->data->intro) {
             $options = new stdClass();
             $options->noclean = true;
-            $html = $OUTPUT->box(format_module_intro('datalynx', $this->data, $this->cm->id), 'generalbox', 'intro');
+            echo $OUTPUT->box(format_module_intro('datalynx', $this->data, $this->cm->id), 'generalbox', 'intro');
         }
-        echo $html;
     }
 
     /**
@@ -1115,10 +1083,10 @@ class datalynx {
      * @param string $sort
      * @return datalynxfield_base[]
      */
-    public function get_fields($fieldids = null, $type = false, $internal = false, $sort = '') {
+    public function get_fields($exclude = null, $menu = false, $forceget = false, $sort = ''): array {
         global $DB;
 
-        if (!$this->fields || $internal) {
+        if (!$this->fields || $forceget) {
             $this->fields = [];
             // Collate user fields.
             if ($fields = $DB->get_records('datalynx_fields', ['dataid' => $this->id()], $sort)) {
@@ -1131,15 +1099,15 @@ class datalynx {
         // Collate all fields.
         $fields = $this->fields + $this->get_internal_fields();
 
-        if (empty($fieldids) && !$type) {
+        if (empty($exclude) && !$menu) {
             return $fields;
         } else {
             $retfields = [];
             foreach ($fields as $fieldid => $field) {
-                if (!empty($fieldids) && in_array($fieldid, $fieldids)) {
+                if (!empty($exclude) && in_array($fieldid, $exclude)) {
                     continue;
                 }
-                if ($type) {
+                if ($menu) {
                     $retfields[$fieldid] = $field->name();
                 } else {
                     $retfields[$fieldid] = $field;
@@ -1150,11 +1118,11 @@ class datalynx {
     }
 
     /**
-     * Get field names.
-     *
+     * @param string $sort
      * @return array
+     * @throws \dml_exception
      */
-    public function get_fieldnames($fieldids = null) {
+    public function get_fieldnames($sort = '') {
         global $DB;
 
         $fieldnames = [];
@@ -1770,11 +1738,6 @@ class datalynx {
         $this->data->singleview = $viewid;
     }
 
-    /**
-     * Get default view ID.
-     *
-     * @return int
-     */
     public function get_default_view_id() {
         return $this->data->defaultview;
     }
@@ -1860,7 +1823,7 @@ class datalynx {
                         $updateview = new stdClass();
                         foreach ($views as $vid => $view) {
                             if ($vid == $this->data->defaultview) {
-                                // TODO: MDL-0000 notify something.
+                                // TODO: notify something.
                                 continue;
                             } else {
                                 $updateview->id = $vid;
@@ -1930,7 +1893,7 @@ class datalynx {
 
                     case 'duplicate':
                         foreach ($views as $vid => $view) {
-                            // TODO: MDL-0000 check for limit.
+                            // TODO: check for limit.
 
                             // Set name.
                             if ($this->name_exists('views', $view->name())) {
@@ -2603,9 +2566,6 @@ class datalynx {
     }
 
     /**
-     * Convert arrays to strings.
-     *
-     * @param stdClass $fieldinput
      */
     public function convert_arrays_to_strings(&$fieldinput) {
         foreach ($fieldinput as $key => $val) {
@@ -2621,10 +2581,66 @@ class datalynx {
     }
 
     /**
-     * Get base URL.
+     * Method triggering entry-based events
      *
-     * @return moodle_url
+     * @param $event
+     * @param $data
      */
+    public function events_trigger($event, $data) {
+        $data->df = $this;
+        $data->coursename = $this->course->shortname;
+        $data->datalynxname = $this->name();
+        if (isset($data->view)) {
+            $data->datalynxbaselink = html_writer::link(
+                $data->view->get_dl()->get_baseurl(),
+                $data->datalynxname
+            );
+            $data->datalynxlink = html_writer::link($data->view->get_baseurl(), $data->datalynxname);
+        }
+        $data->context = $this->context->id;
+        $data->event = $event;
+        $data->notification = 1;
+        $data->notificationformat = 1;
+
+        $other = ['dataid' => $this->id()];
+
+        foreach ($data->items as $id => $item) {
+            switch ($event) {
+                case 'entryadded':
+                    $event = event\entry_created::create(
+                        ['context' => $this->context, 'objectid' => $id, 'other' => $other]
+                    );
+                    $event->trigger();
+                    break;
+                case 'entryupdated':
+                    $event = event\entry_updated::create(
+                        ['context' => $this->context, 'objectid' => $id, 'other' => $other]
+                    );
+                    $event->trigger();
+                    break;
+                case 'entrydeleted':
+                    $event = event\entry_deleted::create(
+                        ['context' => $this->context, 'objectid' => $id, 'other' => $other]
+                    );
+                    $event->trigger();
+                    break;
+                case 'entryapproved':
+                    $event = event\entry_approved::create(
+                        ['context' => $this->context, 'objectid' => $id, 'other' => $other]
+                    );
+                    $event->trigger();
+                    break;
+                case 'entrydisapproved':
+                    $event = event\entry_disapproved::create(
+                        ['context' => $this->context, 'objectid' => $id, 'other' => $other]
+                    );
+                    $event->trigger();
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
 
     public function get_baseurl() {
         // Base url params.

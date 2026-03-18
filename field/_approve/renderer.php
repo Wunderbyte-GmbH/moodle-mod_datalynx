@@ -22,20 +22,14 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-global $CFG;
+defined('MOODLE_INTERNAL') || die();
+
 require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
- * Approve field renderer class for datalynx.
  */
 class datalynxfield__approve_renderer extends datalynxfield_renderer {
     /**
-     * Get replacements for tags.
-     *
-     * @param array|null $tags
-     * @param stdClass|null $entry
-     * @param array|null $options
-     * @return array
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
         $df = $this->_field->df();
@@ -62,12 +56,6 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
     }
 
     /**
-     * Render search mode.
-     *
-     * @param MoodleQuickForm $mform
-     * @param int $i
-     * @param string $value
-     * @return array
      */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
         $field = $this->_field;
@@ -85,11 +73,6 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
     }
 
     /**
-     * Display edit mode.
-     *
-     * @param HTML_QuickForm $mform
-     * @param stdClass $entry
-     * @param array|null $options
      */
     public function display_edit(&$mform, $entry, array $options = null) {
         $field = $this->_field;
@@ -108,28 +91,46 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
     }
 
     /**
-     * Display browse mode.
-     *
-     * @param stdClass $entry
-     * @param array|null $params
-     * @return string
      */
     protected function display_browse($entry, $params = null) {
+        global $PAGE;
+
         $field = $this->_field;
         if ($entry && isset($entry->approved) && $entry->approved) {
             $iconclass = 'fa-regular fa-circle-check text-success   ';
-            $icon = "<i class='$iconclass' title='" . get_string('approved', 'datalynx') . "'></i>";
+            $labelstring = get_string('unapprove', 'datalynx');
         } else {
-            $iconclass = 'fa-regular fa-circle text-muted';
-            $icon = "<i class='$iconclass' title='" . get_string('approvednot', 'datalynx') . "'></i>";
+            $iconclass = 'fa-regular fa-circle-xmark text-danger';
+            $labelstring = get_string('approve');
         }
 
-        $canapprove = has_capability('mod/datalynx:approve', $field->df()->context);
-        if ($canapprove && $entry) {
-            $url = new moodle_url($this->page->url, ['approve' => $entry->id, 'sesskey' => sesskey()]);
-            return html_writer::link($url, $icon);
+        $icon = html_writer::tag('i', '', [
+            'class' => "icon {$iconclass} fa-fw",
+            'role' => 'img',
+            'aria-hidden' => 'true',
+        ]);
+        $label = html_writer::span($labelstring, 'datalynxfield__approve-label');
+
+        if (has_capability('mod/datalynx:approve', $field->df()->context)) {
+            $PAGE->requires->js_call_amd('mod_datalynx/approve', 'init');
+
+            $currentviewid = $this->_field->df()->get_current_view()->id();
+
+            return html_writer::link(
+                '#',
+                $icon . $label,
+                [
+                        'class' => 'datalynxfield__approve',
+                        'data-action' => 'toggle-approval',
+                        'data-entryid' => $entry->id,
+                        'data-d' => $field->df()->data->id,
+                        'data-view' => $currentviewid,
+                        'data-sesskey' => sesskey(),
+                ]
+            );
+        } else {
+            return $icon . $label;
         }
-        return $icon;
     }
 
     /**

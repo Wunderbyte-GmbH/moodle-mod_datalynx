@@ -15,57 +15,37 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Entry team member profile field class.
  *
- * @package    datalynxfield_entryteammemberprofilefield
+ * @package datalynxfield_entryteammemberprofilefield
  * @subpackage entryteammemberprofilefield
- * @copyright  2024 onwards edulabs.org and associated programmers
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/datalynx/field/field_class.php');
 require_once($CFG->dirroot . '/mod/datalynx/field/datalynxfield_no_content_can_join.php');
 
-/**
- * Entry team member profile field class.
- */
 class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content_can_join {
-    /** @var string The field type. */
     public $type = 'entryteammemberprofilefield';
 
-    /** @var string SQL fragment that is never true. */
     const SQL_NEVERTRUE = "1 = 0";
 
-    /** @var string Search operator for current user's profile field. */
     const OPERATOR_MY_PROFILE_FIELD = 'MY_PROFILE_FIELD';
-
-    /** @var string Search operator for a literal value. */
     const OPERATOR_LITERAL_VALUE = 'LITERAL_VALUE';
 
-    /**
-     * Supports grouping by this field.
-     *
-     * @return bool
-     */
     public function supports_group_by() {
         return false;
     }
 
     /**
-     * Check if the field is internal.
-     *
-     * @return bool
      */
     public static function is_internal() {
         return true;
     }
 
     /**
-     * Get field objects for this field type.
-     *
-     * @param int $dataid
-     * @param array $fields
+     * @param $dataid
+     * @param $fields
      * @return array
      */
     public static function get_field_objects($dataid, $fields = []) {
@@ -92,8 +72,6 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
     }
 
     /**
-     * Get the SQL expression for comparing text.
-     *
      * @param string $column
      * @return string
      */
@@ -113,8 +91,7 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
         $queriedfieldid = $fieldidcomponents["queriedfieldid"];
 
         if (is_numeric($queriedfieldid) && $queriedfieldid > 0) {
-            return " LEFT JOIN {datalynx_contents} c$queriedfieldid ON c$queriedfieldid.entryid = e.id " .
-                    "AND c$queriedfieldid.fieldid = $queriedfieldid ";
+            return " LEFT JOIN {datalynx_contents} c$queriedfieldid ON c$queriedfieldid.entryid = e.id AND c$queriedfieldid.fieldid = $queriedfieldid ";
         } else {
             return "";
         }
@@ -134,9 +111,6 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
     }
 
     /**
-     * Get the SQL for sorting.
-     *
-     * @return string
      */
     public function get_sort_sql() {
         return "";
@@ -173,20 +147,22 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
             ];
 
             foreach ($userids as $key => $userid) {
-                // Use placeholders for user IDs to prevent SQL injection.
+                // Use placeholders for user IDs to prevent SQL injection
                 $conditions[] = $DB->sql_like('dc.content', ':userid' . $key, false, false, false);
-                // Add user ID to the parameters array.
+                // Add user ID to the parameters array
                 $params['userid' . $key] = '%"' . $userid . '"%';
             }
 
             $like = implode(' OR ', $conditions);
 
-            $eidsql = "SELECT dc.entryid
-                         FROM {datalynx_contents} dc
-                         JOIN {datalynx_fields} df ON dc.fieldid = df.id
-                        WHERE df.dataid = :dataid
-                          AND dc.fieldid = :fieldid
-                          AND ($like)";
+            $eidsql = "
+                SELECT dc.entryid 
+                FROM {datalynx_contents} dc
+                JOIN {datalynx_fields} df ON dc.fieldid = df.id
+                WHERE df.dataid = :dataid 
+                  AND dc.fieldid = :fieldid 
+                  AND ($like)
+            ";
 
             $eids = $DB->get_fieldset_sql($eidsql, $params);
             if (empty($eids)) {
@@ -200,25 +176,10 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
         return [$sql, $params, $usecontent];
     }
 
-    /**
-     * Wrap IDs in quotes.
-     *
-     * @param string $value
-     * @return string
-     */
     private function wrap_ids($value) {
         return "\"$value\"";
     }
 
-    /**
-     * Get users with a specific profile field value.
-     *
-     * @param string $profilefieldname
-     * @param string $operator
-     * @param string $value
-     * @param bool $not
-     * @return array
-     */
     private function get_users_with_profile_field_value($profilefieldname, $operator, $value, $not) {
         global $DB, $USER;
 
@@ -235,13 +196,6 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
         return $DB->get_records_sql($sql, [$searchvalue]);
     }
 
-    /**
-     * Parse search data.
-     *
-     * @param stdClass $formdata
-     * @param int $i
-     * @return mixed
-     */
     public function parse_search($formdata, $i) {
         global $USER;
         $fieldid = $this->field->id;
@@ -290,11 +244,6 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
         return $distinctvalues;
     }
 
-    /**
-     * Get the list of supported search operators for this field type.
-     *
-     * @return array
-     */
     public function get_supported_search_operators() {
         return [
             '' => '&lt;' . get_string('choose') . '&gt;',
@@ -303,12 +252,6 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
         ];
     }
 
-    /**
-     * Get the argument count for a given operator.
-     *
-     * @param string $operator
-     * @return int
-     */
     public function get_argument_count(string $operator) {
         if ($operator === self::OPERATOR_MY_PROFILE_FIELD) {
             return 0;

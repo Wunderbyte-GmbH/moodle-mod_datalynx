@@ -15,26 +15,25 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Field class for the duration field type.
  *
- * @package    datalynxfield_duration
- * @copyright  2014 onwards by edulabs.org and associated programmers
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package datalynxfield_duration
+ * @subpackage duration
+ * @copyright 2014 onwards by edulabs.org and associated programmers
+ * @copyright based on the work by 2013 Itamar Tzadok
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 require_once("$CFG->dirroot/mod/datalynx/field/number/field_class.php");
 
-/** Field class for the duration field type. */
 class datalynxfield_duration extends datalynxfield_base {
     /**
      * @var string
      */
     public $type = 'duration';
 
-    /** @var array|null Cache for time units array. */
-    protected $unitsarray = null; // phpcs:ignore
+    protected $_units = null;
 
     /**
      * Can this field be used in fieldgroups? Override if yes.
@@ -48,12 +47,12 @@ class datalynxfield_duration extends datalynxfield_base {
      * @return array unit length in seconds => string unit name.
      */
     public function get_units() {
-        if (is_null($this->unitsarray)) {
-            $this->unitsarray = [604800 => get_string('weeks'), 86400 => get_string('days'),
+        if (is_null($this->_units)) {
+            $this->_units = [604800 => get_string('weeks'), 86400 => get_string('days'),
                     3600 => get_string('hours'), 60 => get_string('minutes'), 1 => get_string('seconds'),
             ];
         }
-        return $this->unitsarray;
+        return $this->_units;
     }
 
     /**
@@ -77,23 +76,14 @@ class datalynxfield_duration extends datalynxfield_base {
     }
 
     /**
-     * Return the SQL expression for comparing the content column as a number.
-     *
-     * @param string $column The column name to compare.
-     * @return string The SQL fragment.
+     * @param string $column
+     * @return string
      */
     protected function get_sql_compare_text(string $column = 'content'): string {
         global $DB;
         return $DB->sql_cast_char2int("c{$this->field->id}.$column", true);
     }
 
-    /**
-     * Format the raw form values into content and old-content arrays.
-     *
-     * @param stdClass $entry The entry object.
-     * @param array|null $values The submitted values.
-     * @return array Array with two elements: new contents and old contents.
-     */
     protected function format_content($entry, array $values = null) {
         $fieldid = $this->field->id;
         $contents = [];
@@ -109,11 +99,6 @@ class datalynxfield_duration extends datalynxfield_base {
     }
 
     /**
-     * Parse search form data and return from/to values for a range search.
-     *
-     * @param stdClass $formdata The form data object.
-     * @param int $i The search filter index.
-     * @return array|false Array of search values or false if empty.
      */
     public function parse_search($formdata, $i) {
         $values = [];
@@ -151,13 +136,6 @@ class datalynxfield_duration extends datalynxfield_base {
 
 
     /**
-     * Prepare import content from a CSV record for this field.
-     *
-     * @param stdClass $data The data object to populate.
-     * @param array $importsettings Import settings array.
-     * @param array|null $csvrecord The CSV record row.
-     * @param int|null $entryid The entry id.
-     * @return bool True on success.
      */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
         // Import only from csv.
@@ -236,10 +214,6 @@ class datalynxfield_duration extends datalynxfield_base {
     }
 
     /**
-     * Format a search parameter set for display as a human-readable string.
-     *
-     * @param array $searchparams Array of [not, operator, value].
-     * @return string Human-readable representation.
      */
     public function format_search_value($searchparams) {
         [$not, $operator, $value] = $searchparams;
@@ -253,19 +227,22 @@ class datalynxfield_duration extends datalynxfield_base {
         return $not . ' ' . $operator . ' ' . $value;
     }
 
-    /**
-     * Get the list of supported search operators for this field type.
-     *
-     * @return array Array of operator labels keyed by operator.
-     */
     public function get_supported_search_operators() {
-        return [
-            '=' => get_string('equalto', 'datalynx'),
-            '>' => get_string('greaterthan', 'datalynx'),
-            '<' => get_string('lessthan', 'datalynx'),
-            '>=' => get_string('greaterthanorequalto', 'datalynx'),
-            '<=' => get_string('lessthanorequalto', 'datalynx'),
-            'BETWEEN' => get_string('between', 'datalynx'),
-        ];
+        return ['' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
+                '>' => get_string('greaterthan', 'datalynx'),
+                '>=' => get_string('greater_equal', 'datalynx'),
+                '<' => get_string('less_than', 'datalynx'), '<=' => get_string('less_equal', 'datalynx'),
+                'BETWEEN' => get_string('between', 'datalynx')];
+    }
+
+    /**
+     * Is $value a valid content or do we see an empty input?
+     * @return bool
+     */
+    public static function is_fieldvalue_empty($value) {
+        if ($value == 0) {
+            return true;
+        }
+        return false;
     }
 }

@@ -27,16 +27,9 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
- * Comment field renderer class for datalynx.
  */
 class datalynxfield__comment_renderer extends datalynxfield_renderer {
     /**
-     * Get replacements for tags.
-     *
-     * @param array|null $tags
-     * @param stdClass|null $entry
-     * @param array|null $options
-     * @return array
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
         global $CFG;
@@ -73,13 +66,8 @@ class datalynxfield__comment_renderer extends datalynxfield_renderer {
     }
 
     /**
-     * Display browse mode.
-     *
-     * @param stdClass $entry
-     * @param array|null $params
-     * @return string
      */
-    public function display_browse($entry, $params = null) {
+    public function display_browse($entry, $options = []) {
         global $CFG;
 
         $df = $this->_field->df();

@@ -24,35 +24,20 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-global $CFG;
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
-/**
- * Entry field class for datalynx.
- *
- * @package mod_datalynx
- */
 class datalynxfield__entry extends datalynxfield_no_content {
-    /** @var string Field type. */
     public $type = '_entry';
 
-    /** @var string Entry constant. */
     const _ENTRY = 'entry';
 
     /**
-     * Check if internal.
-     *
-     * @return bool
      */
     public static function is_internal() {
         return true;
     }
 
     /**
-     * Get field objects.
-     *
-     * @param int $dataid
-     * @return array
      */
     public static function get_field_objects($dataid) {
         $fieldobjects = [];

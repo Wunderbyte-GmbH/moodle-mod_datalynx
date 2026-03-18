@@ -26,34 +26,20 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->libdir/formslib.php");
 
 /**
- * Base filter form class.
+ *
  */
 abstract class mod_datalynx_filter_base_form extends moodleform {
-    /** @var datalynx_filter Filter object */
-    // phpcs:ignore
     protected $_filter = null;
-    /** @var object Custom filter object */
-    // phpcs:ignore
     protected $_customfilter = null;
 
     /**
-     * @var \mod_datalynx\datalynx Data provider
+     *
+     * @var datalynx null
      */
-    // phpcs:ignore
     protected $_df = null;
 
-    /**
-     * Constructor for filter form.
+    /*
      *
-     * @param \mod_datalynx\datalynx $df
-     * @param datalynx_filter $filter
-     * @param string|moodle_url $action
-     * @param mixed $customdata
-     * @param string $method
-     * @param string $target
-     * @param array $attributes
-     * @param bool $editable
-     * @param bool|object $customfilter
      */
     public function __construct(
         $df,
@@ -281,12 +267,303 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
     }
 
     /**
-     * Render as HTML.
-     *
-     * @return string
      */
     public function html() {
         return $this->_form->toHtml();
     }
 }
 
+/*
+ *
+ */
+
+class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
+    /*
+     *
+     */
+    public function definition() {
+        $df = $this->_df;
+        $filter = $this->_filter;
+        $name = empty($filter->name) ? get_string('filternew', 'datalynx') : $filter->name;
+        $description = empty($filter->description) ? '' : $filter->description;
+        $visible = !isset($filter->visible) ? 1 : $filter->visible;
+        $fields = $df->get_fields();
+        $fieldoptions = [0 => get_string('choose')] + $df->get_fields(['entry'], true);
+
+        $mform = &$this->_form;
+
+        // Buttons.
+        $this->add_action_buttons(true);
+
+        $mform->addElement('header', 'general', get_string('general', 'form'));
+
+        // Name and description.
+        $mform->addElement('text', 'name', get_string('name'));
+        $mform->addElement('text', 'description', get_string('description'), ['size' => '64']);
+        $mform->setType('name', PARAM_TEXT);
+        $mform->setType('description', PARAM_TEXT);
+        $mform->setDefault('name', $name);
+        $mform->setDefault('description', $description);
+
+        // Visibility.
+        $visibilityoptions = [0 => 'hidden', 1 => 'visible'];
+        $mform->addElement('select', 'visible', get_string('visible'), $visibilityoptions);
+        $mform->setDefault('visible', $visible);
+
+        $mform->addElement('header', 'filterhdr', get_string('viewfilter', 'datalynx'));
+        $mform->setExpanded('filterhdr');
+
+        // Entries per page.
+        $options = [0 => get_string('choose'), 1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5, 6 => 6,
+                7 => 7, 8 => 8, 9 => 9, 10 => 10, 15 => 15, 20 => 20, 30 => 30, 40 => 40, 50 => 50,
+                100 => 100, 200 => 200, 300 => 300, 400 => 400, 500 => 500, 1000 => 1000];
+        $mform->addElement('select', 'perpage', get_string('viewperpage', 'datalynx'), $options);
+        $mform->setDefault('perpage', $filter->perpage);
+
+        // Selection method.
+        $options = [0 => get_string('filterbypage', 'datalynx'), 1 => get_string('random', 'datalynx')];
+        $mform->addElement('select', 'selection', get_string('filterselection', 'datalynx'), $options);
+        $mform->setDefault('selection', $filter->selection);
+        $mform->disabledIf('selection', 'perpage', 'eq', '0');
+
+        // Group by.
+        $groupbyfieldoptions = [0 => get_string('choose')];
+        foreach ($fields as $field) {
+            if ($field->supports_group_by()) {
+                $groupbyfieldoptions[$field->id()] = $field->name();
+            }
+        }
+        $mform->addElement('select', 'groupby', get_string('filtergroupby', 'datalynx'), $groupbyfieldoptions);
+        $mform->setDefault('groupby', $filter->groupby);
+
+        // Search.
+        $mform->addElement('text', 'search', get_string('search'));
+        $mform->setType('search', PARAM_TEXT);
+        $mform->setDefault('search', $filter->search);
+
+        // Custom sort.
+        $mform->addElement('header', 'customsorthdr', get_string('filtercustomsort', 'datalynx'));
+        $mform->setExpanded('customsorthdr');
+
+        $this->custom_sort_definition($filter->customsort, $fields, $fieldoptions, true);
+
+        // Custom search.
+        $mform->addElement('header', 'customsearchhdr', get_string('filtercustomsearch', 'datalynx'));
+        $mform->setExpanded('customsearchhdr');
+
+        $this->custom_search_definition($filter->customsearch, $fields, $fieldoptions, true);
+
+        // Buttons.
+        $this->add_action_buttons(true);
+    }
+
+    /**
+     * @param array $data
+     * @param array $files
+     * @return array
+     * @throws coding_exception
+     */
+    public function validation($data, $files) {
+        $errors = parent::validation($data, $files);
+
+        $df = $this->_df;
+        $filter = $this->_filter;
+
+        // Validate unique name.
+        if (empty($data['name']) || $df->name_exists('filters', $data['name'], $filter->id)) {
+            $errors['name'] = get_string(
+                'invalidname',
+                'datalynx',
+                get_string('filter', 'datalynx')
+            );
+        }
+
+        return $errors;
+    }
+}
+
+/*
+ *
+ */
+
+class mod_datalynx_advanced_filter_form extends mod_datalynx_filter_base_form {
+    /*
+     * Definition of the advanced filter form which is part of a view
+     */
+    public function definition() {
+        $filter = $this->_filter;
+        $view = $this->_customdata['view'];
+
+        $name = empty($filter->name) ? get_string('filternew', 'datalynx') : $filter->name;
+
+        // Get the fields of this view.
+        $fields = $view->get_view_fields(true);
+        $fieldoptions = [0 => get_string('choose')];
+        foreach ($fields as $fieldid => $field) {
+            $fieldoptions[$fieldid] = $field->name();
+        }
+
+        $mform = &$this->_form;
+
+        $mform->addElement('header', 'advancedfilterhdr', get_string('filteradvanced', 'datalynx'));
+        $mform->setExpanded('advancedfilterhdr', false);
+
+        // Name and description.
+        $mform->addElement('text', 'name', get_string('name'));
+        $mform->setType('name', PARAM_TEXT);
+        $mform->setDefault('name', $name);
+
+        // Entries per page.
+        $options = [0 => get_string('choose'), 1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5, 6 => 6,
+                7 => 7, 8 => 8, 9 => 9, 10 => 10, 15 => 15, 20 => 20, 30 => 30, 40 => 40, 50 => 50,
+                100 => 100, 200 => 200, 300 => 300, 400 => 400, 500 => 500, 1000 => 1000];
+        $mform->addElement('select', 'uperpage', get_string('viewperpage', 'datalynx'), $options);
+        $mform->setDefault('uperpage', $filter->perpage);
+
+        // Search.
+        $mform->addElement('text', 'search', get_string('search'));
+        $mform->setType('search', PARAM_TEXT);
+        $mform->setDefault('search', $filter->search);
+
+        // Custom sort.
+        $this->custom_sort_definition($filter->customsort, $fields, $fieldoptions, true);
+
+        // Custom search.
+        $this->custom_search_definition($filter->customsearch, $fields, $fieldoptions, true);
+
+        // Save button.
+        $grp = [];
+        $grp[] = $mform->createElement('submit', 'savebutton', get_string('savechanges'));
+        $grp[] = $mform->createElement('submit', 'newbutton', get_string('newfilter', 'filters'));
+        $mform->addGroup($grp, "afiltersubmit_grp", null, ' ', false);
+    }
+}
+
+/**
+ * Class customfilter_frontend_form to display the customfilter options in browse mode
+ *
+ */
+class mod_datalynx_customfilter_frontend_form extends mod_datalynx_filter_base_form {
+    /*
+     * This customfilter form  predefined by the admin is displayed
+     */
+    public function definition() {
+        $view = $this->_customdata['view'];
+
+        if (!$customfilter = $this->_customfilter) {
+            throw new moodle_exception('nocustomfilter', 'datalynx');
+        }
+
+        $customfilterfieldlistfields = [];
+        if ($customfilter->fieldlist) {
+            $customfilterfieldlistfields = json_decode($customfilter->fieldlist);
+        }
+        $fields = $view->get_view_fields();
+        $fieldoptions = [];
+        $sortfields = [];
+        foreach ($fields as $fieldid => $field) {
+            $select = false;
+            foreach ($customfilterfieldlistfields as $fid => $listfield) {
+                if ($field->field->id == $fid) {
+                    $select = true;
+                    if ($listfield->sortable) {
+                        $sortfields[$fid] = $listfield->name;
+                    }
+                    break;
+                }
+            }
+            if ($select == false) {
+                switch ($field->field->name) {
+                    case (get_string("approved", "datalynx")):
+                        if ($customfilter->approve) {
+                            $select = true;
+                        }
+                        break;
+                    case (get_string("timecreated", "datalynx")):
+                        if ($customfilter->timecreated) {
+                            $select = true;
+                        }
+                        if ($customfilter->timecreated_sortable) {
+                            $sortfields[$fieldid] = $field->field->name;
+                        }
+                        break;
+                    case (get_string("timemodified", "datalynx")):
+                        if ($customfilter->timemodified) {
+                            $select = true;
+                        }
+                        if ($customfilter->timemodified_sortable) {
+                            $sortfields[$fieldid] = $field->field->name;
+                        }
+                        break;
+                    case (get_string("status", "datalynx")):
+                        if ($customfilter->status) {
+                            $select = true;
+                        }
+                        break;
+                }
+            }
+            if ($select) {
+                $fieldoptions[$fieldid] = $field->field->name;
+            }
+        }
+
+        $mform = &$this->_form;
+        $mform->addElement('header', 'collapseCustomfilter', get_string('search'));
+        $mform->setExpanded('collapseCustomfilter', false);
+
+        if ($customfilter->fulltextsearch) {
+            $mform->addElement('text', 'search', get_string('search'));
+            $mform->setType('search', PARAM_TEXT);
+        }
+
+        // Search for author.
+        if (isset($customfilter->authorsearch) && $customfilter->authorsearch) {
+            // Add users that have written an entry in the current datalynx instance to list.
+            global $DB, $PAGE;
+            $entryauthors = $DB->get_records_sql('SELECT DISTINCT userid, firstname, lastname
+                FROM {datalynx_entries}
+                INNER JOIN {user} on {datalynx_entries}.userid = {user}.id
+                WHERE {datalynx_entries}.dataid = ' . $this->_df->id() . ';');
+
+            $menu = [];
+            foreach ($entryauthors as $userid => $author) {
+                $menu[$userid] = $author->firstname . " " . $author->lastname;
+            }
+            $options = ['multiple' => true];
+            $mform->addElement('autocomplete', 'authorsearch', get_string('authorsearch', 'datalynx'), $menu, $options);
+            $mform->setType('authorsearch', PARAM_INT);
+        }
+
+        // Custom search.
+        if ($customfilter->fieldlist) {
+            $this->customfilter_search_definition($fields, $fieldoptions);
+        }
+
+        if (!empty($sortfields)) {
+            // Important, keep fieldids intact.
+            $sortfields = [0 => get_string('choosedots')] + $sortfields;
+
+            $grp = [];
+            $grp[] = $mform->createElement('select', 'customfiltersortfield', '', $sortfields);
+            $directions = ["0" => get_string('asc'), "1" => get_string('desc')];
+
+            $grp[] = $mform->createElement('select', 'customfiltersortdirection', '', $directions);
+            $mform->addGroup($grp, "customfiltersort_grp", get_string('sortby'), ' ', false);
+        }
+
+        // Show buttons in line with each other.
+        $buttonarray = [];
+        $buttonarray[] = &$mform->createElement('submit', 'customsearch', get_string("search"));
+
+        // Add a button that resets all custom filter values at once.
+        $clearcustomsearch = '<a class="btn btn-secondary" href="';
+        $clearcustomsearch .= new moodle_url(
+            '/mod/datalynx/view.php',
+            ['id' => $this->_df->cm->id, 'view' => $view->view->id, 'filter' => 0]
+        );
+        $clearcustomsearch .= '"> ' . get_string('resetsettings', 'datalynx') . '</a>';
+        $buttonarray[] = &$mform->createElement('static', 'clearcustomsearch', '', $clearcustomsearch);
+
+        $mform->addGroup($buttonarray, 'buttonar', '', [' '], false);
+    }
+}
