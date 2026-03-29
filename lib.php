@@ -23,7 +23,6 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
  */
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * MOD FUNCTIONS WHICH ARE CALLED FROM OUTSIDE THE MODULE
@@ -68,7 +67,6 @@ function datalynx_supports($feature) {
 /**
  * Adds an instance of a datalynx
  *
- * @global object
  * @param object $data
  * @return $int
  */
@@ -114,7 +112,6 @@ function datalynx_add_instance($data) {
 /**
  * updates an instance of a data
  *
- * @global object
  * @param object $data
  * @return bool
  */
@@ -159,7 +156,6 @@ function datalynx_update_instance($data) {
 /**
  * deletes an instance of a data
  *
- * @global object
  * @param int $id
  * @return bool
  */
@@ -253,8 +249,6 @@ function datalynx_reset_course_form_defaults($course) {
 /**
  * Removes all grades from gradebook
  *
- * @global object
- * @global object
  * @param int $courseid
  * @param string $type optional type
  */
@@ -276,8 +270,6 @@ function datalynx_reset_gradebook($courseid, $type = '') {
  * Actual implementation of the rest coures functionality, delete all the
  * data responses for course $data->courseid.
  *
- * @global object
- * @global object
  * @param object $data the data submitted from the reset course.
  * @return array status array
  */
@@ -1284,7 +1276,6 @@ function datalynx_update_grades($data = null, $userid = 0, $nullifnone = true) {
 /**
  * Update all grades in gradebook.
  *
- * @global object
  */
 function datalynx_upgrade_grades() {
     global $DB;
@@ -1425,7 +1416,6 @@ function datalynx_get_completion_state($course, $cm, $userid, $type) {
 /**
  * This function returns if a scale is being used by one datalyxx
  *
- * @global object
  * @param int $dataid
  * @param int $scaleid negative number
  * @return bool
@@ -1448,7 +1438,6 @@ function datalynx_scale_used($dataid, $scaleid) {
  *
  * This is used to find out if scale used anywhere
  *
- * @global object
  * @param $scaleid int
  * @return boolean True if the scale is used by any datalynx
  */
