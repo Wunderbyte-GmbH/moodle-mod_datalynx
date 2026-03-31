@@ -69,7 +69,7 @@ Feature: In a datalynx instance create a new entry
       | duration         | Duration           | 45 days                          |
       | number           | Number             | 9.67                             |
       | time             | Time               | 2.January.2017.20.23             |
-    And I upload "lib/tests/fixtures/empty.txt" file to "File" filemanager
+    And I upload "lib/tests/fixtures/empty.txt" file to "Datalynx field File" filemanager
     And I press "Save changes"
     Then I should see "updated"
     And I press "Continue"

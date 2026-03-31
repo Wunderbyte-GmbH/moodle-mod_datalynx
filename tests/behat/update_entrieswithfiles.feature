@@ -81,7 +81,7 @@ Feature: In a datalynx instance create, update, and delete entries
     And I fill in the entry form fields
       | type             | name               | value                            |
       | teammemberselect | Team member select | Student 2 (student2@example.com) |
-    And I upload "lib/tests/fixtures/empty.txt" file to "File" filemanager
+    And I upload "lib/tests/fixtures/empty.txt" file to "Datalynx field File" filemanager
     And I press "Save changes"
     And I press "Continue"
 

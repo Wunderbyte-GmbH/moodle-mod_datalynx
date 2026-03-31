@@ -145,9 +145,15 @@ class PatternDialogue {
 
     initReplaceTagsWithButtons() {
         window.tinyMCE.get().forEach((editor) => {
-            editor.on('init', () => this.replaceTagsWithButtons(editor));
+            // Register SetContent/change listeners before potentially triggering setContent below.
             editor.on('SetContent', () => this.reInitializeButtons(editor));
             editor.on('change', () => this.reInitializeButtons(editor));
+            if (editor.initialized) {
+                // Editor already initialized — 'init' event has already fired, so run directly.
+                this.replaceTagsWithButtons(editor);
+            } else {
+                editor.on('init', () => this.replaceTagsWithButtons(editor));
+            }
         });
     }
 
