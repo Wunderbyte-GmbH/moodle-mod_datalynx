@@ -33,7 +33,7 @@ class datalynxfield_radiobutton_renderer extends datalynxfield_select_renderer {
     /**
      * @var datalynxfield_radiobutton The field object.
      */
-    protected $_field = null; // phpcs:ignore
+    protected $field = null; // phpcs:ignore
 
     /**
      * Renders the field in edit mode.
@@ -43,7 +43,7 @@ class datalynxfield_radiobutton_renderer extends datalynxfield_select_renderer {
      * @param array $options Additional options.
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
         $menuoptions = $field->options_menu();

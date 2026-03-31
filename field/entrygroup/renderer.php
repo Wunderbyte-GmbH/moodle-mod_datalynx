@@ -39,7 +39,7 @@ class datalynxfield_entrygroup_renderer extends datalynxfield_renderer {
      * @return array
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldname = $field->get('internalname');
         $edit = !empty($options['edit']) ? $options['edit'] : false;
 
@@ -111,7 +111,7 @@ class datalynxfield_entrygroup_renderer extends datalynxfield_renderer {
      * @param array $options
      */
     public function display_edit(&$mform, $entry, array $options = null) {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
         $fieldname = "field_{$fieldid}_{$entryid}";

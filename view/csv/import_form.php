@@ -41,7 +41,7 @@ class datalynxview_csv_import_form extends moodleform {
      * View instance.
      * @var datalynxview_csv
      */
-    protected $_view;
+    protected $view;
 
     /**
      * datalynxview_csv_import_form constructor.
@@ -63,7 +63,7 @@ class datalynxview_csv_import_form extends moodleform {
         $attributes = null,
         $editable = true
     ) {
-        $this->_view = $view;
+        $this->view = $view;
 
         parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
     }
@@ -81,7 +81,7 @@ class datalynxview_csv_import_form extends moodleform {
      * Form definition.
      */
     public function definition() {
-        $view = $this->_view;
+        $view = $this->view;
         $fieldsettings = empty($this->_customdata['hidefieldsettings']) ? true : false;
 
         $mform = &$this->_form;
@@ -103,7 +103,7 @@ class datalynxview_csv_import_form extends moodleform {
      * Field settings.
      */
     protected function field_settings() {
-        $view = $this->_view;
+        $view = $this->view;
         $df = $view->get_dl();
         $mform = &$this->_form;
 
@@ -143,7 +143,7 @@ class datalynxview_csv_import_form extends moodleform {
      * CSV settings.
      */
     protected function csv_settings() {
-        $view = $this->_view;
+        $view = $this->view;
         $mform = &$this->_form;
 
         $mform->addElement('header', 'csvsettingshdr', get_string('csvsettings', 'datalynx'));

@@ -43,7 +43,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
      * @throws coding_exception
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldname = $field->get('internalname');
         $edit = !empty($options['edit']) ? $options['edit'] : false;
 
@@ -106,7 +106,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
             $entry->institution = $USER->institution;
             $entry->department = $USER->department;
         }
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
         $fieldname = "field_{$fieldid}_{$entryid}";
@@ -156,7 +156,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
             $entry->userid = $USER->id;
         }
         $user = $DB->get_record('user', ['id' => $entry->userid]);
-        $df = $this->_field->df();
+        $df = $this->field->df();
         return html_writer::link(
             new moodle_url(
                 '/user/view.php',
@@ -270,7 +270,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
             }
         }
 
-        $pictureparams = ['courseid' => $this->_field->df()->course->id];
+        $pictureparams = ['courseid' => $this->field->df()->course->id];
         if ($large) {
             $pictureparams['size'] = 100;
         }
@@ -355,7 +355,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
      * @throws coding_exception
      */
     protected function patterns() {
-        $fieldinternalname = $this->_field->get('internalname');
+        $fieldinternalname = $this->field->get('internalname');
         $cat = get_string('authorinfo', 'datalynx');
 
         $patterns = [];

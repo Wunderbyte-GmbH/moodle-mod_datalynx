@@ -72,7 +72,7 @@ class datalynxfield_teammemberselect_form extends datalynxfield_form {
         $mform->addHelpButton('param2', 'admissibleroles', 'datalynx');
         $mform->addGroupRule('param2', get_string('admissibleroleserror', 'datalynx'), 'required', null, 1, 'client');
 
-        $mform->addElement('select', 'param4', get_string('listformat', 'datalynx'), $this->_field->separators);
+        $mform->addElement('select', 'param4', get_string('listformat', 'datalynx'), $this->field->separators);
         $mform->setType('param4', PARAM_INT);
         $mform->setDefault('param4', datalynxfield_teammemberselect::TEAMMEMBERSELECT_FORMAT_UL);
 
@@ -89,8 +89,8 @@ class datalynxfield_teammemberselect_form extends datalynxfield_form {
 
         $attributes = [];
         $message = '';
-        if ($teamfield = $this->_field->get_teamfield()) {
-            if ($this->_field->field->id != $teamfield->id) {
+        if ($teamfield = $this->field->get_teamfield()) {
+            if ($this->field->field->id != $teamfield->id) {
                 $message = $teamfield->name . ' is already designated as a team field!';
                 $attributes = ['disabled' => 'disabled'];
             }

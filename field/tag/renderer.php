@@ -35,7 +35,7 @@ class datalynxfield_tag_renderer extends datalynxfield_renderer {
      * @see datalynxfield_renderer::render_edit_mode()
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
 
@@ -70,7 +70,7 @@ class datalynxfield_tag_renderer extends datalynxfield_renderer {
         global $OUTPUT;
 
         $str = '';
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
         $items = core_tag_tag::get_item_tags('mod_datalynx', 'datalynx_contents', $contentid);
@@ -95,7 +95,7 @@ class datalynxfield_tag_renderer extends datalynxfield_renderer {
      * Array of patterns this field supports
      */
     protected function patterns() {
-        $fieldname = $this->_field->name();
+        $fieldname = $this->field->name();
         $patterns = parent::patterns();
         $patterns["[[$fieldname]]"] = [true];
         // Tag without link.
@@ -110,7 +110,7 @@ class datalynxfield_tag_renderer extends datalynxfield_renderer {
      */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
 
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
 
         $selected = $value;
@@ -135,7 +135,7 @@ class datalynxfield_tag_renderer extends datalynxfield_renderer {
      * @see datalynxfield_renderer::validate()
      */
     public function validate($entryid, $tags, $formdata) {
-        $fieldid = $this->_field->id();
+        $fieldid = $this->field->id();
 
         $formfieldname = "field_{$fieldid}_{$entryid}";
 

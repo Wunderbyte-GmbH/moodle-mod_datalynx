@@ -32,7 +32,7 @@ class datalynxfield_number_renderer extends datalynxfield_text_renderer {
      * @see datalynxfield_text_renderer::render_edit_mode()
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
         $fieldname = "field_{$fieldid}_{$entryid}";
@@ -61,7 +61,7 @@ class datalynxfield_number_renderer extends datalynxfield_text_renderer {
      * @see datalynxfield_text_renderer::render_display_mode()
      */
     public function render_display_mode(stdClass $entry, array $options): string {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $outputemptystring = !empty($field->get('param4')) ? $field->get('param4') : 0;
         if (!isset($entry->{"c{$fieldid}_content"}) && !$outputemptystring) {
@@ -87,7 +87,7 @@ class datalynxfield_number_renderer extends datalynxfield_text_renderer {
      * @see datalynxfield_text_renderer::render_search_mode()
      */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
-        $fieldid = $this->_field->id();
+        $fieldid = $this->field->id();
         $fieldname = "f_{$i}_$fieldid";
 
         $arr = [];
@@ -111,7 +111,7 @@ class datalynxfield_number_renderer extends datalynxfield_text_renderer {
      * @see datalynxfield_text_renderer::validate()
      */
     public function validate($entryid, $tags, $formdata) {
-        $fieldid = $this->_field->id();
+        $fieldid = $this->field->id();
 
         $formfieldname = "field_{$fieldid}_{$entryid}";
 

@@ -67,24 +67,24 @@ class datalynxview_pdf extends base {
     /**
      * @var array List of editors
      */
-    protected array $_editors = ['section', 'param2', 'param3', 'param4',
+    protected array $editors = ['section', 'param2', 'param3', 'param4',
     ];
 
     /**
      * @var array List of view editors
      */
-    protected array $_vieweditors = ['section', 'param2', 'param3', 'param4',
+    protected array $vieweditors = ['section', 'param2', 'param3', 'param4',
     ];
 
     /**
      * @var stdClass|null PDF settings
      */
-    protected $_settings = null;
+    protected $settings = null;
 
     /**
      * @var array|null Temporary files
      */
-    protected $_tmpfiles = null;
+    protected $tmpfiles = null;
 
     /**
      * Get permission options for PDF
@@ -120,7 +120,7 @@ class datalynxview_pdf extends base {
             $settings = new stdClass();
         }
 
-        $this->_settings = (object) [
+        $this->settings = (object) [
                 'docname' => !empty($settings->docname) ? $settings->docname : '',
                 'orientation' => !empty($settings->orientation) ? $settings->orientation : '',
                 'unit' => !empty($settings->unit) ? $settings->unit : 'mm',
@@ -206,8 +206,8 @@ class datalynxview_pdf extends base {
      * @param string|int $export Export type or entry ID
      */
     public function process_export($export = self::EXPORT_PAGE) {
-        $settings = $this->_settings;
-        $this->_tmpfiles = [];
+        $settings = $this->settings;
+        $this->tmpfiles = [];
 
         // Generate the pdf.
         $pdf = new dfpdf($settings);
@@ -249,12 +249,12 @@ class datalynxview_pdf extends base {
 
         // Set the content.
         if ($export == self::EXPORT_ALL) {
-            $this->_filter->perpage = 0;
+            $this->filter->perpage = 0;
         } else {
             if ($export != self::EXPORT_PAGE) {
                 if ($export) {
                     // Specific entry requested.
-                    $this->_filter->eids = $export;
+                    $this->filter->eids = $export;
                 }
             }
         }
@@ -262,7 +262,7 @@ class datalynxview_pdf extends base {
         $this->set_content();
 
         // Exit if no entries.
-        if (!$this->_entries->entries()) {
+        if (!$this->entries->entries()) {
             return;
         }
 
@@ -302,10 +302,10 @@ class datalynxview_pdf extends base {
             $pagecontent = $this->set_page_bookmarks($pdf, $pagecontent);
 
             // Set frame.
-            if ($pagecount < 1 && $this->_settings->pdfframefirstpageonly) {
+            if ($pagecount < 1 && $this->settings->pdfframefirstpageonly) {
                 $this->set_frame($pdf);
             }
-            if (!$this->_settings->pdfframefirstpageonly) {
+            if (!$this->settings->pdfframefirstpageonly) {
                 $this->set_frame($pdf);
             }
 
@@ -350,8 +350,8 @@ class datalynxview_pdf extends base {
         $pdf->Output("$documentname", $destination);
 
         // Clean up temp files.
-        if ($this->_tmpfiles) {
-            foreach ($this->_tmpfiles as $filepath) {
+        if ($this->tmpfiles) {
+            foreach ($this->tmpfiles as $filepath) {
                 unlink($filepath);
             }
         }
@@ -365,7 +365,7 @@ class datalynxview_pdf extends base {
      * @return stdClass
      */
     public function get_pdf_settings() {
-        return $this->_settings;
+        return $this->settings;
     }
 
     /**
@@ -624,7 +624,7 @@ class datalynxview_pdf extends base {
         $tags = [];
         $patterndefinitions = [];
         $entry = new stdClass();
-        foreach ($this->_tags['field'] as $fieldid => $patterns) {
+        foreach ($this->tags['field'] as $fieldid => $patterns) {
             $field = $fields[$fieldid];
             $entry->id = $entryid;
             $options = ['edit' => true, 'manage' => true];
@@ -658,7 +658,7 @@ class datalynxview_pdf extends base {
      * @return string
      */
     protected function set_page_bookmarks($pdf, $pagecontent) {
-        $settings = $this->_settings;
+        $settings = $this->settings;
         static $bookmarkgroup = '';
 
         // Find all patterns ##PDFBM:d:any text##.
@@ -774,7 +774,7 @@ class datalynxview_pdf extends base {
                 $centerx = ($pagedim['wk'] - $wmarkwidthmm) / 2;
                 $centery = ($pagedim['hk'] - $wmarkheightmm) / 2;
 
-                $pdf->SetAlpha($this->_settings->transparency);
+                $pdf->SetAlpha($this->settings->transparency);
                 $pdf->Image(
                     $filepath,
                     $centerx, // Variable $x = '',.
@@ -809,7 +809,7 @@ class datalynxview_pdf extends base {
             $filename = $cert->get_filename();
             $filepath = $tmpdir . "files/$filename";
             if ($cert->copy_content_to($filepath)) {
-                $signsettings = $this->_settings->signature;
+                $signsettings = $this->settings->signature;
                 if ($signsettings->password != '') {
                     $pdf->setSignature(
                         "file://$filepath",
@@ -821,7 +821,7 @@ class datalynxview_pdf extends base {
                     );
                 }
             }
-            $this->_tmpfiles[] = $filepath;
+            $this->tmpfiles[] = $filepath;
         }
     }
 
@@ -908,7 +908,7 @@ class datalynxview_pdf extends base {
                 $filepath = "$tmpdir/$filename";
                 if ($file->copy_content_to($filepath)) {
                     $replacements["$CFG->wwwroot/pluginfile.php$imagepath"] = $filepath;
-                    $this->_tmpfiles[] = $filepath;
+                    $this->tmpfiles[] = $filepath;
                 }
             }
         }
@@ -948,8 +948,8 @@ class datalynxview_pdf extends base {
         $namepattern = !empty($namepattern) ? $namepattern : '';
         $foundtags = [];
         $replacements = [];
-        if (count($this->_entries->entries()) == 1 && $fields = $this->dl->get_fields()) {
-            $entries = $this->_entries->entries();
+        if (count($this->entries->entries()) == 1 && $fields = $this->dl->get_fields()) {
+            $entries = $this->entries->entries();
             $entry = reset($entries);
             foreach ($fields as $field) {
                 $addtags = $field->renderer()->search($namepattern);
@@ -990,7 +990,7 @@ class datalynxview_pdf extends base {
 
         // Create a list of files we need to merge to the export pdf.
         $filestomerge = [];
-        foreach ($this->_entries->get_entries()->entries as $entry) {
+        foreach ($this->entries->get_entries()->entries as $entry) {
             foreach ($filefieldids as $fieldid) {
                 if (!isset($entry->{'c' . $fieldid . '_content'})) {
                     continue;
@@ -1026,7 +1026,7 @@ class datalynxview_pdf extends base {
             $filename = $file->get_filename();
             $filepath = "$tmpdir/$filename";
             if ($file->copy_content_to($filepath)) {
-                $this->_tmpfiles[] = $filepath;
+                $this->tmpfiles[] = $filepath;
 
                 // Try if this pdf files version is <= 1.4 to work with pdftk.
                 try {

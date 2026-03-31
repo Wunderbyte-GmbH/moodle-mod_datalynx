@@ -32,10 +32,10 @@ require_once("$CFG->libdir/formslib.php");
  */
 class datalynxfield_form extends moodleform {
     /** @var datalynxfield_base The field object. */
-    protected $_field = null; // phpcs:ignore
+    protected $field = null;
 
     /** @var mod_datalynx\datalynx The datalynx object. */
-    protected $dl = null; // phpcs:ignore
+    protected $dl = null;
 
     /**
      * Constructor.
@@ -57,7 +57,7 @@ class datalynxfield_form extends moodleform {
         $attributes = null,
         $editable = true
     ) {
-        $this->_field = $field;
+        $this->field = $field;
         $this->dl = $field->df();
 
         parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
@@ -123,7 +123,7 @@ class datalynxfield_form extends moodleform {
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
-        if ($this->dl->name_exists('fields', $data['name'], $this->_field->id())) {
+        if ($this->dl->name_exists('fields', $data['name'], $this->field->id())) {
             $errors['name'] = get_string('invalidname', 'datalynx', get_string('field', 'datalynx'));
         }
         return $errors;
@@ -196,7 +196,7 @@ class datalynxfield_option_form extends datalynxfield_form {
     /**
      * @var datalynxfield_option
      */
-    protected $_field = null;
+    protected $field = null;
 
     public function definition_after_data() {
         $this->add_option_dialog();
@@ -208,7 +208,7 @@ class datalynxfield_option_form extends datalynxfield_form {
      */
     protected function add_option_dialog() {
         $mform = &$this->_form;
-        $options = $this->_field->get_options();
+        $options = $this->field->get_options();
         if (!empty($options)) {
             $group = [];
             $group[] = &$mform->createElement(
@@ -273,7 +273,7 @@ class datalynxfield_option_form extends datalynxfield_form {
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
-        $oldoptions = $this->_field->get_options();
+        $oldoptions = $this->field->get_options();
         if (count($oldoptions) == 0 && empty($data['addoptions'])) {
             $errors['existingoptions'] = get_string('nooptions', 'datalynx');
         } else {

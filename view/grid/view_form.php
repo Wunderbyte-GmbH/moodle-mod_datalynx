@@ -30,7 +30,7 @@ class datalynxview_grid_form extends datalynxview_base_form {
      * Add view specific elements to the form.
      */
     public function view_definition_after_gps() {
-        $view = $this->_view;
+        $view = $this->view;
         $editoroptions = $view->editors();
         $editorattr = ['cols' => 40, 'rows' => 12];
 

@@ -50,8 +50,8 @@ class datalynxfield_coursegroup_form extends datalynxfield_form {
 
         // Group id.
         $options = [0 => get_string('choosedots')];
-        if (!empty($this->_field->field->param1)) {
-            $course = $this->_field->field->param1;
+        if (!empty($this->field->field->param1)) {
+            $course = $this->field->field->param1;
             $groups = $DB->get_records_menu('groups', ['courseid' => $course], 'name', 'id,name');
         } else {
             // An arbitrary limit of 100 registered options.

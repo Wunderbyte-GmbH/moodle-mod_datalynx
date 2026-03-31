@@ -32,7 +32,7 @@ require_once("$CFG->libdir/formslib.php");
  * settings
  */
 class datalynxview_base_form extends moodleform {
-    protected $_view = null;
+    protected $view = null;
 
     protected $dl = null;
 
@@ -45,7 +45,7 @@ class datalynxview_base_form extends moodleform {
         $attributes = null,
         $editable = true
     ) {
-        $this->_view = $view;
+        $this->view = $view;
         $this->dl = $view->get_dl();
         $attributes['id'] = 'datalynx-view-edit-form';
         parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
@@ -55,7 +55,7 @@ class datalynxview_base_form extends moodleform {
      */
     public function definition() {
         global $CFG, $DB;
-        $view = $this->_view;
+        $view = $this->view;
         $df = $this->dl;
         $editoroptions = $view->editors();
         $mform = &$this->_form;
@@ -94,8 +94,8 @@ class datalynxview_base_form extends moodleform {
         } else {
             $filtersmenu = [0 => get_string('choose')] + $filtersmenu;
         }
-        $mform->addElement('select', '_filter', get_string('viewfilter', 'datalynx'), $filtersmenu);
-        $mform->setDefault('_filter', 0);
+        $mform->addElement('select', 'filter', get_string('viewfilter', 'datalynx'), $filtersmenu);
+        $mform->setDefault('filter', 0);
 
         // Overridefilter.
         $mform->addElement(
@@ -141,9 +141,9 @@ class datalynxview_base_form extends moodleform {
             // Store the sum in the visible field.
             $data->visible = $visiblesum;
         }
-        if (isset($data->_filter)) {
-            $data->filter = $data->_filter;
-            unset($data->_filter);
+        if (isset($data->filter)) {
+            $data->filter = $data->filter;
+            unset($data->filter);
         }
         return $data;
     }
@@ -173,7 +173,7 @@ class datalynxview_base_form extends moodleform {
             }
         }
         if (isset($data->filter)) {
-            $data->_filter = $data->filter;
+            $data->filter = $data->filter;
             unset($data->filter);
         }
         parent::set_data($data);
@@ -181,7 +181,7 @@ class datalynxview_base_form extends moodleform {
 
     public function get_view_menu() {
         global $DB;
-        $viewid = $this->_view->view->id;
+        $viewid = $this->view->view->id;
         $dataid = $this->dl->id();
         $query = "SELECT dv.id, dv.name
                     FROM {datalynx_views} dv
@@ -261,7 +261,7 @@ class datalynxview_base_form extends moodleform {
      * @param string $tagstype
      */
     public function add_tags_selector($editorname, $tagstype) {
-        $view = $this->_view;
+        $view = $this->view;
         $mform = &$this->_form;
         switch ($tagstype) {
             case 'general':
@@ -324,7 +324,7 @@ class datalynxview_base_form extends moodleform {
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
-        $view = $this->_view;
+        $view = $this->view;
         $df = $this->dl;
 
         // Check if the view name is already used.

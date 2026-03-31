@@ -44,12 +44,12 @@ class datalynxview_tabular extends base {
     /**
      * @var array List of editors
      */
-    protected array $_editors = ['section', 'param2'];
+    protected array $editors = ['section', 'param2'];
 
     /**
      * @var array List of view editors
      */
-    protected array $_vieweditors = ['section', 'param2'];
+    protected array $vieweditors = ['section', 'param2'];
 
     /**
      * Generates the default view
@@ -309,7 +309,7 @@ class datalynxview_tabular extends base {
         $fields = $this->dl->get_fields();
         $fielddefinitions = [];
         $entry = new stdClass();
-        foreach ($this->_tags['field'] as $fieldid => $patterns) {
+        foreach ($this->tags['field'] as $fieldid => $patterns) {
             $field = $fields[$fieldid];
             $entry->id = $entryid;
             $options = ['edit' => true, 'manage' => true];

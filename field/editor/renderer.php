@@ -36,7 +36,7 @@ class datalynxfield_editor_renderer extends datalynxfield_renderer {
      * @see datalynxfield_renderer::render_edit_mode()
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
         $fieldname = "field_{$fieldid}_{$entryid}";
@@ -74,7 +74,7 @@ class datalynxfield_editor_renderer extends datalynxfield_renderer {
      * @return string The rendered HTML output.
      */
     public function render_display_mode(stdClass $entry, array $options): string {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $excerpt = in_array('excerpt', array_keys($options)) ? true : false;
         $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
@@ -114,7 +114,7 @@ class datalynxfield_editor_renderer extends datalynxfield_renderer {
      * @return array Array of elements.
      */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
-        $fieldid = $this->_field->id();
+        $fieldid = $this->field->id();
         $fieldname = "f_{$i}_$fieldid";
 
         $arr = [];
@@ -132,7 +132,7 @@ class datalynxfield_editor_renderer extends datalynxfield_renderer {
      * @return array field patterns
      */
     protected function patterns() {
-        $fieldname = $this->_field->name();
+        $fieldname = $this->field->name();
 
         $patterns = parent::patterns();
         $patterns["[[$fieldname]]"] = [true];
@@ -149,7 +149,7 @@ class datalynxfield_editor_renderer extends datalynxfield_renderer {
      * @return array Array of error messages.
      */
     public function validate($entryid, $tags, $formdata) {
-        $fieldid = $this->_field->id();
+        $fieldid = $this->field->id();
 
         $formfieldname = "field_{$fieldid}_{$entryid}";
 

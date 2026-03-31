@@ -38,7 +38,7 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
      * @return void
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
         $fieldname = "field_{$fieldid}_{$entryid}";
@@ -135,7 +135,7 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
      * @return string
      */
     public function render_display_mode(stdClass $entry, array $options): string {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $nolinkend = "";
         $nolinkstart = "";
@@ -168,7 +168,7 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
      * @return array
      */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $fieldname = "f_{$i}_$fieldid";
         $autocomplete = $field->get('param9');
@@ -204,10 +204,10 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
     public function validate($entryid, $tags, $formdata) {
         global $DB;
 
-        $fieldid = $this->_field->id();
+        $fieldid = $this->field->id();
 
         $formfieldname = "field_{$fieldid}_{$entryid}";
-        $param8 = $this->_field->get('param8');
+        $param8 = $this->field->get('param8');
 
         $errors = [];
         foreach ($tags as $tag) {

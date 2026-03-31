@@ -49,7 +49,7 @@ Feature: In a datalynx instance create a new entry
     And I add to "Datalynx Test Instance" datalynx the view of "Grid" type with:
       | name | Gridview |
       | description | Behad grid |
-      | _filter | New filter |
+      | filter | New filter |
     And I follow "Set as default view"
     And I follow "Set as edit view"
 

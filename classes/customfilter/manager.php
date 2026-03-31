@@ -48,10 +48,10 @@ class manager {
     const USER_FILTER_ID_START = -10;
 
     /** @var object The datalynx instance. */
-    protected $_dl;
+    protected $dl;
 
     /** @var array The loaded customfilters. */
-    protected $_customfilters;
+    protected $customfilters;
 
     /**
      * manager constructor.
@@ -59,8 +59,8 @@ class manager {
      * @param $dl
      */
     public function __construct($dl) {
-        $this->_dl = $dl;
-        $this->_customfilters = [];
+        $this->dl = $dl;
+        $this->customfilters = [];
     }
 
     /**
@@ -72,7 +72,7 @@ class manager {
      * @throws \coding_exception
      */
     public function get_filter_from_id($filterid = 0, array $options = null) {
-        $dl = $this->_dl;
+        $dl = $this->dl;
         $dlid = $dl->id();
 
         if ($filterid == self::BLANK_FILTER) {
@@ -118,8 +118,8 @@ class manager {
             }
         }
 
-        if ($this->get_filters() && isset($this->_customfilters[$filterid])) {
-            return clone ($this->_customfilters[$filterid]);
+        if ($this->get_filters() && isset($this->customfilters[$filterid])) {
+            return clone ($this->customfilters[$filterid]);
         } else {
             $filter = new stdClass();
             $filter->dataid = $dl->id();
@@ -137,7 +137,7 @@ class manager {
      */
     public function get_filter_from_url($url, $raw = false) {
 
-        $dl = $this->_dl;
+        $dl = $this->dl;
         $dlid = $dl->id();
 
         if ($options = self::get_filter_options_from_url($url)) {
@@ -165,28 +165,28 @@ class manager {
      */
     public function get_filters($exclude = null, $menu = false, $forceget = false) {
         global $DB;
-        if (!$this->_customfilters || $forceget) {
-            $this->_filters = [];
-            if ($filters = $DB->get_records('datalynx_customfilters', ['dataid' => $this->_dl->id()])) {
+        if (!$this->customfilters || $forceget) {
+            $this->filters = [];
+            if ($filters = $DB->get_records('datalynx_customfilters', ['dataid' => $this->dl->id()])) {
                 foreach ($filters as $filterid => $filterdata) {
-                    $this->_customfilters[$filterid] = new customfilter($filterdata);
+                    $this->customfilters[$filterid] = new customfilter($filterdata);
                 }
             }
         }
 
-        if ($this->_customfilters) {
+        if ($this->customfilters) {
             if (empty($exclude) && !$menu) {
-                return $this->_customfilters;
+                return $this->customfilters;
             } else {
                 $filters = [];
-                foreach ($this->_customfilters as $filterid => $filter) {
+                foreach ($this->customfilters as $filterid => $filter) {
                     if (!empty($exclude) && in_array($filterid, $exclude)) {
                         continue;
                     }
                     if ($menu) {
                         if (
                             $filter->visible ||
-                            has_capability('mod/datalynx:managetemplates', $this->_dl->context)
+                            has_capability('mod/datalynx:managetemplates', $this->dl->context)
                         ) {
                             $filters[$filterid] = $filter->name;
                         }
@@ -215,7 +215,7 @@ class manager {
     public function process_filters($action, $fids, $confirmed = false) {
         global $DB, $OUTPUT;
 
-        $dl = $this->_dl;
+        $dl = $this->dl;
 
         $filters = [];
         if (has_capability('mod/datalynx:managetemplates', $dl->context)) {
@@ -272,9 +272,9 @@ class manager {
                                 $processedlids[] = $filter->id;
                                 $strnotify = 'filtersupdated';
 
-                                $other = ['dataid' => $this->_dl->id()];
+                                $other = ['dataid' => $this->dl->id()];
                                 $event = \mod_datalynx\event\field_updated::create(
-                                    ['context' => $this->_dl->context,
+                                    ['context' => $this->dl->context,
                                     'objectid' => $filter->id,
                                     'other' => $other]
                                 );
@@ -288,15 +288,15 @@ class manager {
                                 $processedlids[] = $filter->id;
                                 $strnotify = 'filtersadded';
 
-                                $other = ['dataid' => $this->_dl->id()];
+                                $other = ['dataid' => $this->dl->id()];
                                 $event = \mod_datalynx\event\field_created::create(
-                                    ['context' => $this->_dl->context,
+                                    ['context' => $this->dl->context,
                                     'objectid' => $filter->id,
                                     'other' => $other]
                                 );
                                 $event->trigger();
                             }
-                            $this->_filters[$filter->id] = $filter;
+                            $this->filters[$filter->id] = $filter;
                         } else {
                             // Form validation failed so return to form.
                             $this->display_filter_form($filterform, $filter);
@@ -315,9 +315,9 @@ class manager {
 
                                 $processedlids[] = $filterid;
 
-                                $other = ['dataid' => $this->_dl->id()];
+                                $other = ['dataid' => $this->dl->id()];
                                 $event = \mod_datalynx\event\field_created::create(
-                                    ['context' => $this->_dl->context,
+                                    ['context' => $this->dl->context,
                                     'objectid' => $filterid,
                                     'other' => $other]
                                 );
@@ -337,9 +337,9 @@ class manager {
 
                             $processedlids[] = $filter->id;
 
-                            $other = ['dataid' => $this->_dl->id()];
+                            $other = ['dataid' => $this->dl->id()];
                             $event = \mod_datalynx\event\field_updated::create(
-                                ['context' => $this->_dl->context,
+                                ['context' => $this->dl->context,
                                 'objectid' => $filter->id,
                                 'other' => $other]
                             );
@@ -356,9 +356,9 @@ class manager {
 
                             $processedlids[] = $filter->id;
 
-                            $other = ['dataid' => $this->_dl->id()];
+                            $other = ['dataid' => $this->dl->id()];
                             $event = \mod_datalynx\event\field_deleted::create(
-                                ['context' => $this->_dl->context,
+                                ['context' => $this->dl->context,
                                 'objectid' => $filter->id,
                                 'other' => $other]
                             );
@@ -394,9 +394,9 @@ class manager {
 
         $formurl = new moodle_url(
             '/mod/datalynx/customfilter/index.php',
-            ['d' => $this->_dl->id(), 'fid' => $filter->id, 'update' => 1]
+            ['d' => $this->dl->id(), 'fid' => $filter->id, 'update' => 1]
         );
-        $mform = new backend_form($this->_dl, $filter, $formurl);
+        $mform = new backend_form($this->dl, $filter, $formurl);
         return $mform;
     }
 
@@ -413,10 +413,10 @@ class manager {
             : get_string('customfilternew', 'datalynx');
         $heading = html_writer::tag('h2', format_string($stredittitle), ['class' => 'mdl-align']);
 
-        $this->_dl->print_header(['tab' => 'customfilters', 'urlparams' => $urlparams]);
+        $this->dl->print_header(['tab' => 'customfilters', 'urlparams' => $urlparams]);
         echo $heading;
         $mform->display();
-        $this->_dl->print_footer();
+        $this->dl->print_footer();
 
         exit();
     }
@@ -454,7 +454,7 @@ class manager {
     public function print_filter_list() {
         global $OUTPUT;
 
-        $dl = $this->_dl;
+        $dl = $this->dl;
 
         $filterbaseurl = '/mod/datalynx/customfilter/index.php';
         $linkparams = ['d' => $dl->id(), 'sesskey' => sesskey()];
@@ -480,7 +480,7 @@ class manager {
 
         $yesstr = get_string("yes");
         $nostr = "---";
-        foreach ($this->_customfilters as $filterid => $filter) {
+        foreach ($this->customfilters as $filterid => $filter) {
             $filtername = html_writer::link(
                 new moodle_url(
                     $filterbaseurl,
@@ -545,7 +545,7 @@ class manager {
         echo html_writer::link(
             new moodle_url(
                 '/mod/datalynx/customfilter/index.php',
-                ['d' => $this->_dl->id(), 'sesskey' => sesskey(), 'new' => 1]
+                ['d' => $this->dl->id(), 'sesskey' => sesskey(), 'new' => 1]
             ),
             get_string('customfilteradd', 'datalynx')
         );
@@ -563,7 +563,7 @@ class manager {
     public function get_user_filters_menu($viewid) {
         $filters = [];
 
-        $dl = $this->_dl;
+        $dl = $this->dl;
         $dlid = $dl->id();
         if ($filternames = get_user_preferences("datalynxcustomfilter-$dlid-$viewid-userfilters", '')) {
             foreach (explode(';', $filternames) as $filteridname) {
@@ -583,7 +583,7 @@ class manager {
      * @throws \coding_exception
      */
     public function set_user_filter($filterid, $view) {
-        $dl = $this->_dl;
+        $dl = $this->dl;
         $dlid = $dl->id();
         $viewid = $view->id();
 

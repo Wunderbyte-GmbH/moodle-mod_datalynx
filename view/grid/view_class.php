@@ -41,7 +41,7 @@ class datalynxview_grid extends base {
     protected string $type = 'grid';
 
     /** @var array The editors for this view. */
-    protected array $_editors = ['section', 'param2']; // phpcs:ignore
+    protected array $editors = ['section', 'param2']; // phpcs:ignore
 
     /**
      * Returns a fieldset of view options
@@ -197,7 +197,7 @@ class datalynxview_grid extends base {
         $tags = [];
         $patterndefinitions = [];
         $entry = new stdClass();
-        foreach ($this->_tags['field'] as $fieldid => $patterns) {
+        foreach ($this->tags['field'] as $fieldid => $patterns) {
             if (isset($fields[$fieldid])) {
                 $field = $fields[$fieldid];
                 $entry->id = $entryid;

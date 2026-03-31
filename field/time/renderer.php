@@ -30,7 +30,7 @@ require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
  */
 class datalynxfield_time_renderer extends datalynxfield_renderer {
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
 
@@ -49,7 +49,7 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
     }
 
     public function render_display_mode(stdClass $entry, array $options): string {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
 
         $strtime = '';
@@ -77,7 +77,7 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
     }
 
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $fieldname = "f_{$i}_{$fieldid}";
 
@@ -133,7 +133,7 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         $includetime = true,
         array $options = []
     ) {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
         $fieldname = "field_{$fieldid}_{$entryid}";
@@ -175,7 +175,7 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         $includetime = true,
         array $options = []
     ) {
-        $field = $this->_field;
+        $field = $this->field;
         $entryid = $entry->id;
         $fieldid = $field->id();
         $fieldname = "field_{$fieldid}_{$entryid}";
@@ -353,7 +353,7 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
      * Array of patterns this field supports
      */
     protected function patterns() {
-        $fieldname = $this->_field->name();
+        $fieldname = $this->field->name();
 
         $patterns = parent::patterns();
         $patterns["[[$fieldname]]"] = [true];
@@ -381,7 +381,7 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
     }
 
     public function validate($entryid, $tags, $formdata) {
-        $fieldid = $this->_field->id();
+        $fieldid = $this->field->id();
 
         $formfieldname = "field_{$fieldid}_{$entryid}";
 

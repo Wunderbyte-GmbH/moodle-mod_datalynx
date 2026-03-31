@@ -37,7 +37,7 @@ class datalynxfield_gradeitem_renderer extends datalynxfield_renderer {
      * @return string The rendered content.
      */
     public function render_display_mode(stdClass $entry, array $options): string {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
 
         if (!isset($entry->{"c{$fieldid}_content"})) {

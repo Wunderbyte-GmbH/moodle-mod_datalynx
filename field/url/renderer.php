@@ -38,7 +38,7 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
      * @param array $options
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
         $fieldname = "field_{$fieldid}_{$entryid}";
@@ -77,7 +77,7 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
     public function render_display_mode(stdClass $entry, array $options): string {
         global $CFG;
 
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $types = array_intersect(['link', 'image', 'imageflex', 'media',
         ], array_keys($options));
@@ -138,7 +138,7 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
      * @return array
      */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
-        $fieldid = $this->_field->id();
+        $fieldid = $this->field->id();
         $fieldname = "f_{$i}_$fieldid";
 
         $arr = [];
@@ -154,7 +154,7 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
      * Array of patterns this field supports
      */
     protected function patterns() {
-        $fieldname = $this->_field->name();
+        $fieldname = $this->field->name();
 
         $patterns = parent::patterns();
         $patterns["[[$fieldname]]"] = [true];
@@ -176,7 +176,7 @@ class datalynxfield_url_renderer extends datalynxfield_renderer {
      */
     public function validate($entryid, $tags, $formdata) {
 
-        $fieldid = $this->_field->id();
+        $fieldid = $this->field->id();
 
         $formfieldname = "field_{$fieldid}_{$entryid}_url";
         $errors = [];

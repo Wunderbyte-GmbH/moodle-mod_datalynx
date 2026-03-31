@@ -63,7 +63,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
      * string @type     the type of display
      */
     protected function display_browse($entry, $type = null) {
-        $field = $this->_field;
+        $field = $this->field;
 
         if (empty($field->refdatalynx) || empty($field->refview)) {
             return '';
@@ -87,7 +87,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
      * @return                 the display-method of the view
      */
     protected function get_view_display_content($entry, array $options = []) {
-        $field = $this->_field;
+        $field = $this->field;
 
         $refdatalynx = $field->refdatalynx;
         $refview = $refdatalynx->get_view_from_id($field->refview);
@@ -131,7 +131,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
     protected function get_filter_by_options(array $options, $entry, $urlquery = false) {
         global $DB;
 
-        $field = $this->_field;
+        $field = $this->field;
 
         if (!empty($field->field->param6)) { // Param6: author,group.
             [$filterauthor, $filtergroup] = explode(',', $field->field->param6);
@@ -194,7 +194,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
      * @return array Array of sort options keyed by ref-field id.
      */
     protected function get_sort_options() {
-        $field = $this->_field;
+        $field = $this->field;
 
         $refdatalynx = $field->refdatalynx;
         $refview = $field->df->get_view_from_id($field->refview);
@@ -223,7 +223,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
      * @return array
      */
     protected function get_search_options($entry) {
-        $field = $this->_field;
+        $field = $this->field;
         $soptions = [];
 
         // Custom search (AND/OR,ref-field-patten,[NOT],OPT,local-field-pattern/value.
@@ -284,7 +284,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
      * @see datalynxfield_renderer::patterns()
      */
     protected function patterns() {
-        $fieldname = $this->_field->name();
+        $fieldname = $this->field->name();
 
         $patterns = parent::patterns();
         $patterns["[[$fieldname]]"] = [true];
@@ -301,7 +301,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options = null) {
 
         // Variable $field datalynxfield_datalynxview.
-        $field = $this->_field;
+        $field = $this->field;
         // Do not show in edit mode, when nothing can be selected.
         if ($field->refdatalynx !== null && !empty($field->field->param7)) {
             $fieldid = $field->id();
@@ -334,7 +334,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
      * @see datalynxfield_renderer::validate()
      */
     public function validate($entryid, $tags, $formdata) {
-        $fieldid = $this->_field->id();
+        $fieldid = $this->field->id();
 
         $formfieldname = "field_{$fieldid}_{$entryid}";
         $required = true;

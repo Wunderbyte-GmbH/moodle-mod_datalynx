@@ -30,7 +30,7 @@ require_once("$CFG->dirroot/mod/datalynx/field/file/renderer.php");
  */
 class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options = null) {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
 
         $entryid = $entry->id;
@@ -77,7 +77,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
     public function render_display_mode(stdClass $entry, array $options): string {
         global $CFG, $PAGE;
         $PAGE->requires->js_call_amd('mod_datalynx/zoomable', 'init');
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
 
@@ -131,7 +131,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
     /**
      */
     public function pluginfile_patterns(): array {
-        $fieldname = $this->_field->name();
+        $fieldname = $this->field->name();
         return ["[[{$fieldname}]]", "[[{$fieldname}:thumb]]", "[[{$fieldname}:linked]]",
                 "[[{$fieldname}:lightbox]]"];
     }
@@ -145,7 +145,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
      * @return moodle_url|string
      */
     protected function display_file(stored_file $file, int $entryid, string $path, string $altname = '', ?array $params = null) {
-        $field = $this->_field;
+        $field = $this->field;
 
         $imgattr = ['style' => []];
         if (isset($params['lightbox']) && $params['lightbox']) {
@@ -223,7 +223,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
      * Array of patterns this field supports
      */
     public function patterns(): array {
-        $fieldname = $this->_field->name();
+        $fieldname = $this->field->name();
 
         $patterns = parent::patterns();
         $patterns["[[{$fieldname}:linked]]"] = [true];

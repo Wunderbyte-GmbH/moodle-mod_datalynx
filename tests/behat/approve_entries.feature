@@ -56,11 +56,11 @@ Feature: Filter approved and not approved entries from multiple students
     And I add to "Datalynx Test Instance" datalynx the view of "Tabular" type with:
       | name | Approved view |
       | description | Approved view |
-      | _filter | approvedfilter |
+      | filter | approvedfilter |
     And I add to "Datalynx Test Instance" datalynx the view of "Tabular" type with:
       | name | Notapproved view |
       | description | Tabular view |
-      | _filter | notapprovedfilter |
+      | filter | notapprovedfilter |
     And I add to "Datalynx Test Instance" datalynx the view of "Tabular" type with:
       | name | Manage view |
       | description | Manage view |

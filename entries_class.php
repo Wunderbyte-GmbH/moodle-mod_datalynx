@@ -67,17 +67,17 @@ class datalynx_entries {
     /**
      * @var array|null Entries
      */
-    protected $_entries = null;
+    protected $entries = null;
 
     /**
      * @var int Total count of entries
      */
-    protected $_entriestotalcount = 0;
+    protected $entriestotalcount = 0;
 
     /**
      * @var int Filtered count of entries
      */
-    protected $_entriesfiltercount = 0;
+    protected $entriesfiltercount = 0;
 
     /**
      * Constructor
@@ -100,7 +100,7 @@ class datalynx_entries {
 
     /**
      * Populate the entries with content of the content table datalynx_contents. Gets the raw content
-     * for each field for the entry and sets the content in $this->_entries
+     * for each field for the entry and sets the content in $this->entries
      * Performs entries count in order to display number of entries.
      *
      * @param array $options
@@ -120,12 +120,12 @@ class datalynx_entries {
             }
         }
 
-        $this->_entries = !empty($entriesset->entries) ? $entriesset->entries : [];
-        $this->_entriestotalcount = !empty($entriesset->max) ? $entriesset->max : count(
-            $this->_entries
+        $this->entries = !empty($entriesset->entries) ? $entriesset->entries : [];
+        $this->entriestotalcount = !empty($entriesset->max) ? $entriesset->max : count(
+            $this->entries
         );
-        $this->_entriesfiltercount = !empty($entriesset->found) ? $entriesset->found : count(
-            $this->_entries
+        $this->entriesfiltercount = !empty($entriesset->found) ? $entriesset->found : count(
+            $this->entries
         );
     }
 
@@ -465,9 +465,9 @@ class datalynx_entries {
      */
     public function get_count($filtered = false) {
         if ($filtered) {
-            return $this->_entriesfiltercount;
+            return $this->entriesfiltercount;
         } else {
-            return (!empty($this->_entries) ? count($this->_entries) : 0);
+            return (!empty($this->entries) ? count($this->entries) : 0);
         }
     }
 
@@ -477,7 +477,7 @@ class datalynx_entries {
      * @return array:
      */
     public function entries() {
-        return $this->_entries;
+        return $this->entries;
     }
 
     /**
@@ -491,9 +491,9 @@ class datalynx_entries {
     public function get_embedded_files(array $fids) {
         $files = [];
 
-        if (!empty($fids) && !empty($this->_entries)) {
+        if (!empty($fids) && !empty($this->entries)) {
             $fs = get_file_storage();
-            foreach ($this->_entries as $entry) {
+            foreach ($this->entries as $entry) {
                 foreach ($fids as $fieldid) {
                     // Get the content id of the requested field.
                     $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
@@ -532,8 +532,8 @@ class datalynx_entries {
     public function get_contentinfo(array $fids) {
         $contentinfo = [];
 
-        if (!empty($fids) && !empty($this->_entries)) {
-            foreach ($this->_entries as $entry) {
+        if (!empty($fids) && !empty($this->entries)) {
+            foreach ($this->entries as $entry) {
                 foreach ($fids as $fieldid) {
                     $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
                     if ($contentid) {
@@ -598,8 +598,8 @@ class datalynx_entries {
                     $entry = new stdClass();
 
                     // Existing entry from view.
-                    if ($eid > 0 && isset($this->_entries[$eid])) {
-                        $entries[$eid] = $this->_entries[$eid];
+                    if ($eid > 0 && isset($this->entries[$eid])) {
+                        $entries[$eid] = $this->entries[$eid];
 
                         // TODO: MDL-66151 existing entry *not* from view (import).
                     } else {

@@ -32,18 +32,18 @@ require_once("$CFG->dirroot/mod/datalynx/classes/view/base.php");
 class datalynxview_report extends base {
     protected string $type = 'report';
 
-    protected string $_output = 'report';
+    protected string $output = 'report';
 
-    protected array $_editors = ['section'];
+    protected array $editors = ['section'];
 
-    protected ?array $_columns = null;
+    protected ?array $columns = null;
 
     /**
      */
     public function __construct($df = 0, $view = 0) {
         parent::__construct($df, $view);
         if (!empty($this->view->param3)) {
-            $this->_output = $this->view->param3;
+            $this->output = $this->view->param3;
         }
     }
 
@@ -515,7 +515,7 @@ class datalynxview_report extends base {
      */
     public function get_report_entryids(): array {
         // Set content.
-        $entries = new datalynx_entries($this->dl, $this->_filter);
+        $entries = new datalynx_entries($this->dl, $this->filter);
         $options = [];
         // Set a filter to take it all.
         $filter = $this->get_filter();
@@ -606,8 +606,8 @@ class datalynxview_report extends base {
      * @return array|null
      */
     public function get_columns(): ?array {
-        if (empty($this->_columns)) {
-            $this->_columns = [];
+        if (empty($this->columns)) {
+            $this->columns = [];
             $columns = explode("\n", $this->view->param2);
             foreach ($columns as $column) {
                 $column = trim($column);
@@ -615,9 +615,9 @@ class datalynxview_report extends base {
                     continue;
                 }
                 $fieldname = trim($column, '[]#');
-                $this->_columns[] = $fieldname;
+                $this->columns[] = $fieldname;
             }
         }
-        return $this->_columns;
+        return $this->columns;
     }
 }

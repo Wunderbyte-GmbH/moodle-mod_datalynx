@@ -73,7 +73,7 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
      * @param array $options unused
      */
     public function display_edit(&$mform, $entry, array $options = []) {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
         $status = isset($entry->status) ? $entry->status : datalynxfield__status::STATUS_NOT_SET;
@@ -130,7 +130,7 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
      * @return string HTML representation
      */
     protected function display_browse($entry, $params = []) {
-        $field = $this->_field;
+        $field = $this->field;
         $menu = $this->menu_status(true);
         if (isset($entry) && isset($entry->status)) {
             return $menu[$entry->status];
@@ -147,7 +147,7 @@ class datalynxfield__status_renderer extends datalynxfield_renderer {
      * @return array
      */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
-        $fieldid = $this->_field->id();
+        $fieldid = $this->field->id();
         $fieldname = "f_{$i}_$fieldid";
 
         $statusmenu = [-1 => get_string('statusnotcreated', 'datalynx'),

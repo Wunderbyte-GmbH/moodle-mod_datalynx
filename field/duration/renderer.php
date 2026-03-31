@@ -37,7 +37,7 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
      * @param array $options Rendering options.
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
         $fieldname = "field_{$fieldid}_{$entryid}";
@@ -64,7 +64,7 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
      * @return string The rendered output.
      */
     public function render_display_mode(stdClass $entry, array $options): string {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
 
         // A duration of 0 means that this field was not set by the user.
@@ -116,7 +116,7 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
      * @return array Array of elements.
      */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
-        $fieldid = $this->_field->id();
+        $fieldid = $this->field->id();
         $fieldname = "f_{$i}_$fieldid";
 
         $arr = [];
@@ -146,7 +146,7 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
      * @return array Array of patterns.
      */
     protected function patterns() {
-        $fieldname = $this->_field->name();
+        $fieldname = $this->field->name();
 
         $patterns = parent::patterns();
         $patterns["[[$fieldname]]"] = [true];
@@ -167,7 +167,7 @@ class datalynxfield_duration_renderer extends datalynxfield_renderer {
      * @return array Array of errors.
      */
     public function validate($entryid, $tags, $formdata) {
-        $fieldid = $this->_field->id();
+        $fieldid = $this->field->id();
 
         $formfieldname = "field_{$fieldid}_{$entryid}";
 

@@ -37,7 +37,7 @@ class datalynxfield_textarea_renderer extends datalynxfield_renderer {
      * @param array $options
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
         $fieldname = "field_{$fieldid}_{$entryid}";
@@ -65,7 +65,7 @@ class datalynxfield_textarea_renderer extends datalynxfield_renderer {
      * @return string
      */
     public function render_display_mode(stdClass $entry, array $options): string {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
 
         if (isset($entry->{"c{$fieldid}_content"})) {
@@ -91,7 +91,7 @@ class datalynxfield_textarea_renderer extends datalynxfield_renderer {
      * @return array
      */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
-        $fieldid = $this->_field->id();
+        $fieldid = $this->field->id();
         $fieldname = "f_{$i}_$fieldid";
 
         $arr = [];
@@ -111,7 +111,7 @@ class datalynxfield_textarea_renderer extends datalynxfield_renderer {
      * @param stdClass $formdata
      */
     public function validate($entryid, $tags, $formdata) {
-        $fieldid = $this->_field->id();
+        $fieldid = $this->field->id();
 
         $formfieldname = "field_{$fieldid}_{$entryid}";
 

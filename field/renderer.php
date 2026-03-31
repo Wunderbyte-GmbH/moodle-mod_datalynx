@@ -42,13 +42,13 @@ abstract class datalynxfield_renderer {
     ];
 
     /** @var datalynxfield_base The field object. */
-    protected $_field = null; // phpcs:ignore
+    protected $field = null; // phpcs:ignore
 
     /**
      * Constructor
      */
     public function __construct(&$field) {
-        $this->_field = $field;
+        $this->field = $field;
     }
 
     /**
@@ -61,7 +61,7 @@ abstract class datalynxfield_renderer {
         $found = [];
 
         $matches = [];
-        $fieldname = preg_quote($this->_field->name(), '/');
+        $fieldname = preg_quote($this->field->name(), '/');
         if (preg_match_all("/\[\[$fieldname(?:\|(?:[^\]]+))?\]\](?:@)?/", $text, $matches)) {
             $found = array_merge($found, $matches[0]);
         }
@@ -121,7 +121,7 @@ abstract class datalynxfield_renderer {
             $currentoptions['visible'] = $behavior->is_visible_to_user($entry);
             $currentoptions['editable'] = $behavior->is_editable_by_user();
             $currentoptions['required'] = $behavior->is_required();
-            $currentoptions['internal'] = $this->_field->is_internal();
+            $currentoptions['internal'] = $this->field->is_internal();
 
             if (!$currentoptions['visible']) {
                 // NOT VISIBLE ===.
@@ -221,21 +221,21 @@ abstract class datalynxfield_renderer {
         $pattern = '/\[\[([^\|\]]+)(?:\|([^\|\]]*))?(?:\|([^\|\]]*))?\]\]/';
         $matches = [];
 
-        $fieldname = $this->_field->name();
-        $behavior = datalynx_field_behavior::get_default_behavior($this->_field->df());
-        $renderer = datalynx_field_renderer::get_default_renderer($this->_field->df());
+        $fieldname = $this->field->name();
+        $behavior = datalynx_field_behavior::get_default_behavior($this->field->df());
+        $renderer = datalynx_field_renderer::get_default_renderer($this->field->df());
 
         if (preg_match($pattern, $tag, $matches)) {
             $fieldname = isset($matches[1]) ? $matches[1] : false;
 
             $behaviorname = isset($matches[2]) ? $matches[2] : false;
             if ($behaviorname) {
-                $behavior = datalynx_field_behavior::from_name($behaviorname, $this->_field->df()->id());
+                $behavior = datalynx_field_behavior::from_name($behaviorname, $this->field->df()->id());
             }
 
             $renderername = isset($matches[3]) ? $matches[3] : false;
             if ($renderername) {
-                $renderer = datalynx_field_renderer::get_renderer_by_name($renderername, $this->_field->df()->id());
+                $renderer = datalynx_field_renderer::get_renderer_by_name($renderername, $this->field->df()->id());
             }
         }
 
@@ -251,7 +251,7 @@ abstract class datalynxfield_renderer {
      * @return string HTML representation of the field
      */
     public function render_display_mode(stdClass $entry, array $options): string {
-        $fieldid = $this->_field->id();
+        $fieldid = $this->field->id();
 
         if (isset($entry->{"c{$fieldid}_content"})) {
             $content = $entry->{"c{$fieldid}_content"};
@@ -288,8 +288,8 @@ abstract class datalynxfield_renderer {
 
             $mform->addElement(
                 'html',
-                '<div class="datalynx-field-wrapper" data-field-type="' . $this->_field->type .
-                '" data-field-name="' . $this->_field->field->name . '">'
+                '<div class="datalynx-field-wrapper" data-field-type="' . $this->field->type .
+                '" data-field-name="' . $this->field->field->name . '">'
             );
             if (isset($options['prefix'])) {
                 $mform->addElement('html', $options['prefix']);
@@ -308,8 +308,8 @@ abstract class datalynxfield_renderer {
 
             $mform->addElement(
                 'html',
-                '<div class="datalynx-field-wrapper" data-field-type="' . $this->_field->type .
-                '" data-field-name="' . $this->_field->field->name . '">'
+                '<div class="datalynx-field-wrapper" data-field-type="' . $this->field->type .
+                '" data-field-name="' . $this->field->field->name . '">'
             );
             if (isset($options['prefix'])) {
                 $mform->addElement('html', $options['prefix']);
@@ -333,7 +333,7 @@ abstract class datalynxfield_renderer {
      * @see datalynxfield_renderer::prerender_edit_mode
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
-        $fieldid = $this->_field->id();
+        $fieldid = $this->field->id();
 
         $fieldname = "f_{$entry->id}_$fieldid";
 
@@ -363,7 +363,7 @@ abstract class datalynxfield_renderer {
      * @return array
      */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
-        $fieldid = $this->_field->id();
+        $fieldid = $this->field->id();
         $fieldname = "f_{$i}_$fieldid";
 
         $arr = [];
@@ -424,7 +424,7 @@ abstract class datalynxfield_renderer {
      * @return array pattern => array(visible in menu, category)
      */
     protected function patterns() {
-        $fieldname = $this->_field->name();
+        $fieldname = $this->field->name();
 
         $patterns = [];
         $patterns["[[$fieldname]]"] = [true];

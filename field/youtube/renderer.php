@@ -37,7 +37,7 @@ class datalynxfield_youtube_renderer extends datalynxfield_renderer {
      * @param array $options Additional options.
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
         $fieldname = "field_{$fieldid}_{$entryid}";
@@ -69,7 +69,7 @@ class datalynxfield_youtube_renderer extends datalynxfield_renderer {
      * @return string
      */
     public function render_display_mode(stdClass $entry, array $options): string {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $content = $entry->{"c{$fieldid}_content"};
 
@@ -96,7 +96,7 @@ class datalynxfield_youtube_renderer extends datalynxfield_renderer {
     public function validate($entryid, $tags, $formdata) {
         global $DB;
 
-        $fieldid = $this->_field->id();
+        $fieldid = $this->field->id();
 
         $formfieldname = "field_{$fieldid}_{$entryid}";
 

@@ -36,7 +36,7 @@ class datalynx_rule_manager {
     /**
      * @var array
      */
-    protected $_customrules;
+    protected $customrules;
 
     /**
      * @var array
@@ -94,7 +94,7 @@ class datalynx_rule_manager {
      */
     public function __construct(mod_datalynx\datalynx $datalynx) {
         $this->dl = $datalynx;
-        $this->_customrules = [];
+        $this->customrules = [];
     }
 
     /**
@@ -214,17 +214,17 @@ class datalynx_rule_manager {
     public function get_rules($exclude = null, $menu = false, $forceget = false) {
         global $DB;
 
-        if (!$this->_customrules || $forceget) {
-            $this->_customrules = [];
+        if (!$this->customrules || $forceget) {
+            $this->customrules = [];
             // Collate user rules.
             if ($rules = $DB->get_records('datalynx_rules', ['dataid' => $this->dl->id()])) {
                 foreach ($rules as $ruleid => $rule) {
-                    $this->_customrules[$ruleid] = $this->get_rule($rule);
+                    $this->customrules[$ruleid] = $this->get_rule($rule);
                 }
             }
         }
 
-        $rules = $this->_customrules;
+        $rules = $this->customrules;
         if (empty($exclude) && !$menu) {
             return $rules;
         } else {

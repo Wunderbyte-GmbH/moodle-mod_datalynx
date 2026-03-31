@@ -34,7 +34,7 @@ require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
  */
 class datalynxfield_entryteammemberprofilefield_renderer extends datalynxfield_renderer {
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
-        $fieldid = $this->_field->id();
+        $fieldid = $this->field->id();
         $fieldname = "f_{$i}_$fieldid";
 
         $arr = [];

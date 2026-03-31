@@ -36,7 +36,7 @@ class datalynxfield_identifier_form extends datalynxfield_form {
      * Define the field attributes.
      */
     public function field_definition() {
-        $field = &$this->_field;
+        $field = &$this->field;
         $mform = &$this->_form;
 
         $mform->addElement(

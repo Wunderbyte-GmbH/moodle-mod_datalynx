@@ -32,7 +32,7 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
     /**
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
-        $df = $this->_field->df();
+        $df = $this->field->df();
 
         $canapprove = has_capability('mod/datalynx:approve', $df->context);
         $edit = !empty($options['edit']) ? $options['edit'] && $canapprove : false;
@@ -58,7 +58,7 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
     /**
      */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
 
         $options = [0 => ucfirst(get_string('approvednot', 'datalynx')),
@@ -75,7 +75,7 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
     /**
      */
     public function display_edit(&$mform, $entry, array $options = null) {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
 
@@ -95,7 +95,7 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
     protected function display_browse($entry, $params = null) {
         global $PAGE;
 
-        $field = $this->_field;
+        $field = $this->field;
         if ($entry && isset($entry->approved) && $entry->approved) {
             $iconclass = 'fa-regular fa-circle-check text-success   ';
             $labelstring = get_string('unapprove', 'datalynx');
@@ -114,7 +114,7 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
         if (has_capability('mod/datalynx:approve', $field->df()->context)) {
             $PAGE->requires->js_call_amd('mod_datalynx/approve', 'init');
 
-            $currentviewid = $this->_field->df()->get_current_view()->id();
+            $currentviewid = $this->field->df()->get_current_view()->id();
 
             return html_writer::link(
                 '#',

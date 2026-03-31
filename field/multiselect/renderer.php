@@ -32,7 +32,7 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
      *
      * @var datalynxfield_multiselect
      */
-    protected $_field = null;
+    protected $field = null;
 
     /**
      *
@@ -40,7 +40,7 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
      * @see datalynxfield_renderer::render_edit_mode()
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
         $fieldname = "field_{$fieldid}_$entryid";
@@ -125,7 +125,7 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
      * @see datalynxfield_renderer::render_display_mode()
      */
     public function render_display_mode(stdClass $entry, array $options): string {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
 
         if (isset($entry->{"c{$fieldid}_content"})) {
@@ -169,7 +169,7 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
      * @see datalynxfield_renderer::render_search_mode()
      */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $fieldname = "f_{$i}_{$fieldid}";
         $menu = [-1 => ''] + $field->options_menu();
@@ -198,7 +198,7 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
      * @see datalynxfield_renderer::validate()
      */
     public function validate($entryid, $tags, $formdata) {
-        $fieldid = $this->_field->id();
+        $fieldid = $this->field->id();
         $formfieldname = "field_{$fieldid}_{$entryid}";
 
         $errors = [];
@@ -238,7 +238,7 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
      * @return array pattern => array(visible in menu, category)
      */
     protected function patterns() {
-        $fieldname = $this->_field->name();
+        $fieldname = $this->field->name();
 
         $patterns = parent::patterns();
         $patterns["[[$fieldname]]"] = [true];

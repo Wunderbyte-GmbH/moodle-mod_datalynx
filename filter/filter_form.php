@@ -29,8 +29,8 @@ require_once("$CFG->libdir/formslib.php");
  *
  */
 abstract class mod_datalynx_filter_base_form extends moodleform {
-    protected $_filter = null;
-    protected $_customfilter = null;
+    protected $filter = null;
+    protected $customfilter = null;
 
     /**
      *
@@ -52,8 +52,8 @@ abstract class mod_datalynx_filter_base_form extends moodleform {
         $editable = true,
         $customfilter = false
     ) {
-        $this->_filter = $filter;
-        $this->_customfilter = $customfilter;
+        $this->filter = $filter;
+        $this->customfilter = $customfilter;
         $this->dl = $df;
 
         parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
@@ -283,7 +283,7 @@ class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
      */
     public function definition() {
         $df = $this->dl;
-        $filter = $this->_filter;
+        $filter = $this->filter;
         $name = empty($filter->name) ? get_string('filternew', 'datalynx') : $filter->name;
         $description = empty($filter->description) ? '' : $filter->description;
         $visible = !isset($filter->visible) ? 1 : $filter->visible;
@@ -367,7 +367,7 @@ class mod_datalynx_filter_form extends mod_datalynx_filter_base_form {
         $errors = parent::validation($data, $files);
 
         $df = $this->dl;
-        $filter = $this->_filter;
+        $filter = $this->filter;
 
         // Validate unique name.
         if (empty($data['name']) || $df->name_exists('filters', $data['name'], $filter->id)) {
@@ -391,7 +391,7 @@ class mod_datalynx_advanced_filter_form extends mod_datalynx_filter_base_form {
      * Definition of the advanced filter form which is part of a view
      */
     public function definition() {
-        $filter = $this->_filter;
+        $filter = $this->filter;
         $view = $this->_customdata['view'];
 
         $name = empty($filter->name) ? get_string('filternew', 'datalynx') : $filter->name;
@@ -450,7 +450,7 @@ class mod_datalynx_customfilter_frontend_form extends mod_datalynx_filter_base_f
     public function definition() {
         $view = $this->_customdata['view'];
 
-        if (!$customfilter = $this->_customfilter) {
+        if (!$customfilter = $this->customfilter) {
             throw new moodle_exception('nocustomfilter', 'datalynx');
         }
 

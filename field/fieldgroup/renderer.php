@@ -46,10 +46,10 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         $fieldgroupfields = $this->get_subfields();
 
         // Loop through maxlines.
-        $maxlines = $this->_field->field->param2;
+        $maxlines = $this->field->field->param2;
 
         // Field id.
-        $fieldid = $this->_field->id();
+        $fieldid = $this->field->id();
 
         // Fieldname is special for the fieldgroup not including entryid as other fields.
         $fieldname = "fieldgroup_{$fieldid}";
@@ -86,7 +86,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
             unset($completedispl['line'][$line]);
         }
         $viewtype = '';
-        if ($view = $this->_field->df->get_current_view()) {
+        if ($view = $this->field->df->get_current_view()) {
             // Special mustache template for pdf rendering of fieldgroups.
             $viewtype = ($view->view->type == 'pdf') ? 'pdf' : '';
         }
@@ -104,18 +104,18 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         $fieldgroupfields = $this->get_subfields();
 
         // Field id.
-        $fgfieldid = $this->_field->id();
+        $fgfieldid = $this->field->id();
 
         // Fieldname is special for the fieldgroup not including entryid as other fields.
         $fieldname = "fieldgroup_{$fgfieldid}";
 
         // Number of lines to show and generate.
-        $defaultlines = isset($this->_field->field->param3) ? $this->_field->field->param3 : 3;
-        $maxlines = isset($this->_field->field->param2) ? $this->_field->field->param2 : 3;
-        $requiredlines = isset($this->_field->field->param4) ? $this->_field->field->param4 : 0;
+        $defaultlines = isset($this->field->field->param3) ? $this->field->field->param3 : 3;
+        $maxlines = isset($this->field->field->param2) ? $this->field->field->param2 : 3;
+        $requiredlines = isset($this->field->field->param4) ? $this->field->field->param4 : 0;
 
         // Add a fieldgroup marker to the entry data.
-        $mform->addElement('hidden', $fieldname, $this->_field->field->id);
+        $mform->addElement('hidden', $fieldname, $this->field->field->id);
         $mform->setType($fieldname, PARAM_NOTAGS);
 
         // Set every field in this line required.
@@ -191,11 +191,11 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         $PAGE->requires->js_call_amd(
             'mod_datalynx/fieldgroups',
             'init',
-            [$this->_field->field->name, $defaultlines, $maxlines, $requiredlines, $fieldname]
+            [$this->field->field->name, $defaultlines, $maxlines, $requiredlines, $fieldname]
         );
 
         // Show a button to add one more line.
-        $mform->addElement('button', 'addline', get_string('addline', 'datalynx', $this->_field->field->name));
+        $mform->addElement('button', 'addline', get_string('addline', 'datalynx', $this->field->field->name));
     }
 
     /**
@@ -206,9 +206,9 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
     public function get_subfields() {
         if (empty($this->subfields)) {
             // We want to display these fields.
-            $fieldids = $this->_field->fieldids;
+            $fieldids = $this->field->fieldids;
             foreach ($fieldids as $fieldid) {
-                $field = $this->_field->df->get_field_from_id($fieldid);
+                $field = $this->field->df->get_field_from_id($fieldid);
                 if ($field->for_use_in_fieldgroup()) {
                     $this->subfields[$fieldid] = $field;
                 }
@@ -244,7 +244,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
      */
     protected function patterns() {
         $cat = get_string('fieldgroups', 'datalynx');
-        $fieldname = $this->_field->name();
+        $fieldname = $this->field->name();
 
         $patterns = [];
         $patterns["[[$fieldname]]"] = [true, $cat];

@@ -43,7 +43,7 @@ class datalynxfield_coursegroup extends datalynxfield_base {
      * @var string Column to compare text.
      * @phpcs:ignore
      */
-    protected $_comparetext;
+    protected $comparetext;
 
     /**
      * Field constructor.
@@ -56,7 +56,7 @@ class datalynxfield_coursegroup extends datalynxfield_base {
 
         $this->course = $this->field->param1;
         $this->group = $this->field->param2;
-        $this->_comparetext = 'content1';
+        $this->comparetext = 'content1';
     }
 
     /**
@@ -190,11 +190,11 @@ class datalynxfield_coursegroup extends datalynxfield_base {
 
         // For course and group use the parent get_search_sql.
         if ($course) {
-            $this->_comparetext = 'content';
+            $this->comparetext = 'content';
             return parent::get_search_sql([$not, $operator, $course]);
         } else {
             if ($group) {
-                $this->_comparetext = 'content1';
+                $this->comparetext = 'content1';
                 return parent::get_search_sql([$not, $operator, $group]);
             }
         }
@@ -245,7 +245,7 @@ class datalynxfield_coursegroup extends datalynxfield_base {
     protected function get_sql_compare_text(string $column = 'content'): string {
         global $DB;
 
-        $comparetext = $this->_comparetext;
+        $comparetext = $this->comparetext;
         return $DB->sql_compare_text("c{$this->field->id}.$comparetext");
     }
 

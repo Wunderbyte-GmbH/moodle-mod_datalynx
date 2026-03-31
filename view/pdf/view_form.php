@@ -38,7 +38,7 @@ class datalynxview_pdf_form extends datalynxview_base_form {
     public function view_definition_after_gps() {
         global $COURSE;
 
-        $view = $this->_view;
+        $view = $this->view;
         $editoroptions = $view->editors();
         $editorattr = ['cols' => 40, 'rows' => 12];
 
@@ -367,7 +367,7 @@ class datalynxview_pdf_form extends datalynxview_base_form {
     public function data_preprocessing(&$data) {
         parent::data_preprocessing($data);
 
-        $view = $this->_view;
+        $view = $this->view;
 
         // Pdf settings.
         if ($settings = $view->get_pdf_settings()) {
@@ -417,7 +417,7 @@ class datalynxview_pdf_form extends datalynxview_base_form {
      * @param stdClass $protection
      */
     protected function data_preprocess_protection(&$data, $protection) {
-        $view = $this->_view;
+        $view = $this->view;
         $perms = $view::get_permission_options();
         foreach ($perms as $perm => $unused) {
             if (in_array($perm, $protection->permissions)) {
@@ -468,7 +468,7 @@ class datalynxview_pdf_form extends datalynxview_base_form {
         }
 
         // Pdf settings.
-        $view = $this->_view;
+        $view = $this->view;
         if ($settings = $view->get_pdf_settings()) {
             foreach ($settings as $name => $value) {
                 if ($name == 'header') {
@@ -527,7 +527,7 @@ class datalynxview_pdf_form extends datalynxview_base_form {
      * @param stdClass $data
      */
     protected function data_postprocess_protection(&$settings, $data) {
-        $view = $this->_view;
+        $view = $this->view;
 
         $protection = $settings->protection;
         $protection->permissions = [];

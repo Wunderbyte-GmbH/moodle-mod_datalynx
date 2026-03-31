@@ -53,43 +53,43 @@ class datalynxview_csv extends base {
      * Output format.
      * @var string
      */
-    protected string $_output = 'csv';
+    protected string $output = 'csv';
 
     /**
      * CSV delimiter.
      * @var string
      */
-    protected string $_delimiter = 'comma';
+    protected string $delimiter = 'comma';
 
     /**
      * CSV enclosure.
      * @var string
      */
-    protected string $_enclosure = '';
+    protected string $enclosure = '';
 
     /**
      * CSV encoding.
      * @var string
      */
-    protected string $_encoding = 'UTF-8';
+    protected string $encoding = 'UTF-8';
 
     /**
      * Editors list.
      * @var array
      */
-    protected array $_editors = ['section'];
+    protected array $editors = ['section'];
 
     /**
      * Columns list.
      * @var array|null
      */
-    protected ?array $_columns = null;
+    protected ?array $columns = null;
 
     /**
      * Show import form flag.
      * @var bool
      */
-    protected $_showimportform = false;
+    protected $showimportform = false;
 
     /**
      * datalynxview_csv constructor.
@@ -100,10 +100,10 @@ class datalynxview_csv extends base {
     public function __construct($df = 0, $view = 0) {
         parent::__construct($df, $view);
         if (!empty($this->view->param3)) {
-            $this->_output = $this->view->param3;
+            $this->output = $this->view->param3;
         }
         if (!empty($this->view->param1)) {
-            [$this->_delimiter, $this->_enclosure, $this->_encoding] = explode(
+            [$this->delimiter, $this->enclosure, $this->encoding] = explode(
                 ',',
                 $this->view->param1
             );
@@ -133,7 +133,7 @@ class datalynxview_csv extends base {
             $tableheader = html_writer::tag('thead', html_writer::tag('tr', $tableheader));
 
             // Set view tags in header row.
-            $tags = $this->_tags['view'];
+            $tags = $this->tags['view'];
             $replacements = $this->patternclass()->get_replacements($tags);
             $tableheader = str_replace($tags, $replacements, $tableheader);
         }
@@ -230,7 +230,7 @@ class datalynxview_csv extends base {
         $fields = $this->dl->get_fields();
         $entry = (object) ['id' => $entryid];
         $fielddefinitions = [];
-        foreach ($this->_tags['field'] as $fieldid => $patterns) {
+        foreach ($this->tags['field'] as $fieldid => $patterns) {
             $field = $fields[$fieldid];
             $options = ['edit' => true, 'manage' => true];
             if ($definitions = $field->get_definitions($patterns, $entry, $options)) {
@@ -275,18 +275,18 @@ class datalynxview_csv extends base {
         if (trim($text)) {
             // This view patterns.
             if ($patterns = $this->patternclass()->search($text)) {
-                $this->_tags['view'] = array_merge($this->_tags['view'], $patterns);
+                $this->tags['view'] = array_merge($this->tags['view'], $patterns);
             }
             // Field patterns.
             if ($fields = $this->dl->get_fields()) {
                 foreach ($fields as $fieldid => $field) {
                     if ($patterns = $field->renderer()->search($text)) {
-                        $this->_tags['field'][$fieldid] = $patterns;
+                        $this->tags['field'][$fieldid] = $patterns;
                     }
                 }
             }
         }
-        $this->view->patterns = serialize($this->_tags);
+        $this->view->patterns = serialize($this->tags);
     }
 
     /**
@@ -295,7 +295,7 @@ class datalynxview_csv extends base {
      * @return string
      */
     public function display(array $options = []): string {
-        if ($this->_showimportform) {
+        if ($this->showimportform) {
             $mform = $this->get_import_form();
 
             $tohtml = $params['tohtml'] ?? false;
@@ -328,17 +328,17 @@ class datalynxview_csv extends base {
             return;
         }
         $datalynxname = $this->dl->name();
-        $delimiter = csv_import_reader::get_delimiter($this->_delimiter);
+        $delimiter = csv_import_reader::get_delimiter($this->delimiter);
         $filename = clean_filename("{$datalynxname}-export");
         $filename .= clean_filename('-' . gmdate("Ymd_Hi"));
-        $filename .= clean_filename("-{$this->_delimiter}_separated");
-        $filename .= '.' . $this->_output;
+        $filename .= clean_filename("-{$this->delimiter}_separated");
+        $filename .= '.' . $this->output;
 
         $patterns = ["\n"];
         $adjustments = [''];
-        if ($this->_enclosure) {
-            $patterns[] = $this->_enclosure;
-            $adjustments[] = '&#' . ord($this->_enclosure) . ';';
+        if ($this->enclosure) {
+            $patterns[] = $this->enclosure;
+            $adjustments[] = '&#' . ord($this->enclosure) . ';';
         } else {
             $patterns[] = $delimiter;
             $adjustments[] = '&#' . ord($delimiter) . ';';
@@ -347,13 +347,13 @@ class datalynxview_csv extends base {
         foreach ($csvcontent as $row) {
             foreach ($row as $key => $column) {
                 $value = str_replace($patterns, $adjustments, $column);
-                $row[$key] = $this->_enclosure . $value . $this->_enclosure;
+                $row[$key] = $this->enclosure . $value . $this->enclosure;
             }
             $returnstr .= implode($delimiter, $row) . "\n";
         }
 
         // Convert encoding.
-        $returnstr = mb_convert_encoding($returnstr, $this->_encoding, 'UTF-8');
+        $returnstr = mb_convert_encoding($returnstr, $this->encoding, 'UTF-8');
 
         header("Content-Type: application/download\n");
         header("Content-Disposition: attachment; filename=\"$filename\"");
@@ -374,7 +374,7 @@ class datalynxview_csv extends base {
     public function get_csv_content($range = self::EXPORT_PAGE) {
         // Set content.
         if ($range == self::EXPORT_ALL) {
-            $entries = new datalynx_entries($this->dl, $this->_filter);
+            $entries = new datalynx_entries($this->dl, $this->filter);
             $options = [];
             // Set a filter to take it all.
             $filter = $this->get_filter();
@@ -391,7 +391,7 @@ class datalynxview_csv extends base {
             $exportentries = $entries->entries();
         } else {
             $this->set_content();
-            $exportentries = $this->_entries->entries();
+            $exportentries = $this->entries->entries();
         }
 
         // Compile entries if any.
@@ -493,7 +493,7 @@ class datalynxview_csv extends base {
                     if (!empty($csvcontent)) {
                         $data = $this->process_csv($data, $csvcontent, $options);
                         if (!empty($data->error)) {
-                            $this->_showimportform = true;
+                            $this->showimportform = true;
                         }
                     }
                 }
@@ -507,7 +507,7 @@ class datalynxview_csv extends base {
                 return $this->execute_import($data);
             } else {
                 // Set import flag to display the form.
-                $this->_showimportform = true;
+                $this->showimportform = true;
             }
         }
     }
@@ -520,8 +520,8 @@ class datalynxview_csv extends base {
      */
     public function execute_import($data) {
         if ($data->eids) {
-            [$strnotify, $data] = $this->_entries->process_entries('update', $data->eids, $data, true);
-            $this->_notifications['good']['entries'] = $strnotify;
+            [$strnotify, $data] = $this->entries->process_entries('update', $data->eids, $data, true);
+            $this->notifications['good']['entries'] = $strnotify;
             return true;
         } else {
             return null;
@@ -547,9 +547,9 @@ class datalynxview_csv extends base {
         $iid = csv_import_reader::get_new_iid('moddatalynx');
         $cir = new csv_import_reader($iid, 'moddatalynx');
 
-        $delimiter = !empty($options['delimiter']) ? $options['delimiter'] : $this->_delimiter;
-        $enclosure = !empty($options['enclosure']) ? $options['enclosure'] : $this->_enclosure;
-        $encoding = !empty($options['encoding']) ? $options['encoding'] : $this->_encoding;
+        $delimiter = !empty($options['delimiter']) ? $options['delimiter'] : $this->delimiter;
+        $enclosure = !empty($options['enclosure']) ? $options['enclosure'] : $this->enclosure;
+        $encoding = !empty($options['encoding']) ? $options['encoding'] : $this->encoding;
         $updateexisting = !empty($options['updateexisting']) ? $options['updateexisting'] : false;
         $fieldsettings = !empty($options['settings']) ? $options['settings'] : [];
 
@@ -602,7 +602,7 @@ class datalynxview_csv extends base {
         global $CFG;
         require_once("$CFG->dirroot/mod/datalynx/view/csv/import_form.php");
 
-        $actionurl = new moodle_url($this->_baseurl, ['importcsv' => 1]);
+        $actionurl = new moodle_url($this->baseurl, ['importcsv' => 1]);
         return new datalynxview_csv_import_form($this, $actionurl);
     }
 
@@ -683,8 +683,8 @@ class datalynxview_csv extends base {
      * Overridden to add default headers from patterns
      */
     public function get_columns(): ?array {
-        if (empty($this->_columns)) {
-            $this->_columns = [];
+        if (empty($this->columns)) {
+            $this->columns = [];
             $columns = explode("\n", $this->view->param2);
             foreach ($columns as $column) {
                 $column = trim($column);
@@ -697,10 +697,10 @@ class datalynxview_csv extends base {
                 $class = !empty($arr[2]) ? $arr[2] : '';
 
                 $definition = [$tag, $header, $class];
-                $this->_columns[] = $definition;
+                $this->columns[] = $definition;
             }
         }
-        return $this->_columns;
+        return $this->columns;
     }
 
     /**
@@ -724,7 +724,7 @@ class datalynxview_csv extends base {
      * @return string
      */
     public function get_output_type() {
-        return $this->_output;
+        return $this->output;
     }
 
     /**
@@ -733,7 +733,7 @@ class datalynxview_csv extends base {
      * @return string
      */
     public function get_delimiter() {
-        return $this->_delimiter;
+        return $this->delimiter;
     }
 
     /**
@@ -742,7 +742,7 @@ class datalynxview_csv extends base {
      * @return string
      */
     public function get_enclosure() {
-        return $this->_enclosure;
+        return $this->enclosure;
     }
 
     /**
@@ -751,6 +751,6 @@ class datalynxview_csv extends base {
      * @return string
      */
     public function get_encoding() {
-        return $this->_encoding;
+        return $this->encoding;
     }
 }

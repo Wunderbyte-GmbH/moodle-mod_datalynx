@@ -102,15 +102,15 @@ class datalynx {
 
     protected $views = [];
 
-    protected $_filtermanager = null;
+    protected $filtermanager = null;
 
-    protected $_customfiltermanager = null;
+    protected $customfiltermanager = null;
 
-    protected $_rulemanager = null;
+    protected $rulemanager = null;
 
-    protected $_presetmanager = null;
+    protected $presetmanager = null;
 
-    protected $_currentview = null;
+    protected $currentview = null;
 
     protected $internalfields = [];
 
@@ -262,7 +262,7 @@ class datalynx {
      * @return null|object view object
      */
     public function get_current_view() {
-        return $this->_currentview;
+        return $this->currentview;
     }
 
     /**
@@ -273,11 +273,11 @@ class datalynx {
     public function get_filter_manager() {
         global $CFG;
         // Set filters manager.
-        if (!$this->_filtermanager) {
+        if (!$this->filtermanager) {
             require_once($CFG->dirroot . '/mod/datalynx/filter/filter_class.php');
-            $this->_filtermanager = new datalynx_filter_manager($this);
+            $this->filtermanager = new datalynx_filter_manager($this);
         }
-        return $this->_filtermanager;
+        return $this->filtermanager;
     }
 
     /**
@@ -286,10 +286,10 @@ class datalynx {
      * @return customfilter\manager|null
      */
     public function get_customfilter_manager() {
-        if (!$this->_customfiltermanager) {
-            $this->_customfiltermanager = new customfilter\manager($this);
+        if (!$this->customfiltermanager) {
+            $this->customfiltermanager = new customfilter\manager($this);
         }
-        return $this->_customfiltermanager;
+        return $this->customfiltermanager;
     }
 
     /**
@@ -300,11 +300,11 @@ class datalynx {
     public function get_rule_manager() {
         global $CFG;
         // Set rules manager.
-        if (!$this->_rulemanager) {
+        if (!$this->rulemanager) {
             require_once($CFG->dirroot . '/mod/datalynx/rule/rule_manager.php');
-            $this->_rulemanager = new datalynx_rule_manager($this);
+            $this->rulemanager = new datalynx_rule_manager($this);
         }
-        return $this->_rulemanager;
+        return $this->rulemanager;
     }
 
     /**
@@ -315,11 +315,11 @@ class datalynx {
     public function get_preset_manager() {
         global $CFG;
         // Set preset manager.
-        if (!$this->_presetmanager) {
+        if (!$this->presetmanager) {
             require_once($CFG->dirroot . '/mod/datalynx/preset/preset_manager.php');
-            $this->_presetmanager = new datalynx_preset_manager($this);
+            $this->presetmanager = new datalynx_preset_manager($this);
         }
-        return $this->_presetmanager;
+        return $this->presetmanager;
     }
 
     /**
@@ -657,7 +657,7 @@ class datalynx {
 
         // Set current view and view's page requirements.
         $currentview = !empty($urlparams['view']) ? $urlparams['view'] : 0;
-        $this->_currentview = $this->get_current_view_from_id($currentview);
+        $this->currentview = $this->get_current_view_from_id($currentview);
 
         // If a new datalynx or incomplete design, direct manager to manage area.
         if ($manager) {
@@ -808,9 +808,9 @@ class datalynx {
      * Set view content.
      */
     public function set_content() {
-        if (!empty($this->_currentview)) {
-            $this->_currentview->process_data();
-            $this->_currentview->set_content();
+        if (!empty($this->currentview)) {
+            $this->currentview->process_data();
+            $this->currentview->set_content();
         }
     }
 
@@ -821,13 +821,13 @@ class datalynx {
      */
     public function display(): void {
         global $PAGE;
-        if (!empty($this->_currentview)) {
+        if (!empty($this->currentview)) {
             $event = event\course_module_viewed::create(
                 ['objectid' => $PAGE->cm->instance, 'context' => $PAGE->context]
             );
             $event->add_record_snapshot('course', $PAGE->course);
             $event->trigger();
-            $this->_currentview->display();
+            $this->currentview->display();
         }
     }
 
@@ -872,11 +872,11 @@ class datalynx {
         $type = $datalynx->views[$viewid]->type;
         require_once($CFG->dirroot . "/mod/datalynx/view/$type/view_class.php");
         $viewclass = "datalynxview_$type";
-        $datalynx->_currentview = $datalynx->get_current_view_from_id($viewid);
+        $datalynx->currentview = $datalynx->get_current_view_from_id($viewid);
 
         if ($view = new $viewclass($datalynxid, $viewid, $filteroptions)) {
             $view->set_content();
-            $view->get_dl()->_currentview = $datalynx->_currentview;
+            $view->get_dl()->currentview = $datalynx->currentview;
             $viewcontent = $view->display($options);
             return "$viewcontent";
         }

@@ -32,7 +32,7 @@ class datalynxfield__time_renderer extends datalynxfield_renderer {
     /**
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldname = $field->get('internalname');
 
         // No edit mode.
@@ -94,7 +94,7 @@ class datalynxfield__time_renderer extends datalynxfield_renderer {
      * @return array
      */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
-        $fieldid = $this->_field->id();
+        $fieldid = $this->field->id();
 
         $datesarray = json_decode($value);
         if (is_array($datesarray)) {
@@ -132,7 +132,7 @@ class datalynxfield__time_renderer extends datalynxfield_renderer {
      * Array of patterns this field supports
      */
     protected function patterns() {
-        $fieldname = $this->_field->get('internalname');
+        $fieldname = $this->field->get('internalname');
         $cat = get_string('entryinfo', 'datalynx');
 
         $patterns = [];

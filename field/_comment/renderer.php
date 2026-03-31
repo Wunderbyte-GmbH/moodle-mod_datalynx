@@ -34,7 +34,7 @@ class datalynxfield__comment_renderer extends datalynxfield_renderer {
     public function replacements(array $tags = null, $entry = null, array $options = null) {
         global $CFG;
 
-        $field = $this->_field;
+        $field = $this->field;
 
         // No edit mode.
         $replacements = array_fill_keys($tags, '');
@@ -70,7 +70,7 @@ class datalynxfield__comment_renderer extends datalynxfield_renderer {
     public function display_browse($entry, $options = []) {
         global $CFG;
 
-        $df = $this->_field->df();
+        $df = $this->field->df();
         $str = '';
 
         require_once("$CFG->dirroot/comment/lib.php");

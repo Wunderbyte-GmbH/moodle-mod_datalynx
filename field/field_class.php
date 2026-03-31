@@ -58,12 +58,12 @@ abstract class datalynxfield_base {
     /**
      * @var datalynxfield_renderer
      */
-    protected $_renderer = null;
+    protected $renderer = null;
 
     /**
      * @var array
      */
-    protected $_distinctvalues = null;
+    protected $distinctvalues = null;
 
     /**
      * Can this field be used in fieldgroups?
@@ -278,12 +278,12 @@ abstract class datalynxfield_base {
     public function renderer() {
         global $CFG;
 
-        if (!$this->_renderer) {
+        if (!$this->renderer) {
             $rendererclass = "datalynxfield_{$this->type}_renderer";
             require_once("$CFG->dirroot/mod/datalynx/field/{$this->type}/renderer.php");
-            $this->_renderer = new $rendererclass($this);
+            $this->renderer = new $rendererclass($this);
         }
-        return $this->_renderer;
+        return $this->renderer;
     }
 
     protected static $defaultoptions = ['manage' => false, 'visible' => false, 'edit' => false,
@@ -410,8 +410,8 @@ abstract class datalynxfield_base {
     public function get_distinct_content($sortdir = 0) {
         global $DB;
 
-        if (is_null($this->_distinctvalues)) {
-            $this->_distinctvalues = [];
+        if (is_null($this->distinctvalues)) {
+            $this->distinctvalues = [];
             $fieldid = $this->field->id;
             $sortdir = $sortdir ? 'DESC' : 'ASC';
             $contentname = $this->get_sort_sql();
@@ -426,11 +426,11 @@ abstract class datalynxfield_base {
                     if ($value === '') {
                         continue;
                     }
-                    $this->_distinctvalues[] = $value;
+                    $this->distinctvalues[] = $value;
                 }
             }
         }
-        return $this->_distinctvalues;
+        return $this->distinctvalues;
     }
 
     /**
@@ -876,7 +876,7 @@ abstract class datalynxfield_no_content extends datalynxfield_base {
  * from a set of options
  */
 abstract class datalynxfield_option extends datalynxfield_base {
-    protected $_options = [];
+    protected $options = [];
 
     /**
      * TODO: see if this can be changed or merged with function below
@@ -884,18 +884,18 @@ abstract class datalynxfield_option extends datalynxfield_base {
      * @return mixed
      */
     public function get_options() {
-        if (!$this->_options) {
+        if (!$this->options) {
             if (!empty($this->field->param1)) {
                 $rawoptions = explode("\n", $this->field->param1);
                 foreach ($rawoptions as $key => $option) {
                     $option = trim($option);
                     if ($option != '') {
-                        $this->_options[$key + 1] = $option;
+                        $this->options[$key + 1] = $option;
                     }
                 }
             }
         }
-        return $this->_options;
+        return $this->options;
     }
 
     /**
@@ -904,21 +904,21 @@ abstract class datalynxfield_option extends datalynxfield_base {
      * @return Ambigous <multitype:, string>
      */
     public function options_menu($forceget = false, $addnoselection = false) {
-        if (!$this->_options || $forceget) {
+        if (!$this->options || $forceget) {
             if (!empty($this->field->param1)) {
                 if ($addnoselection) {
-                    $this->_options[0] = '...';
+                    $this->options[0] = '...';
                 }
                 $rawoptions = explode("\n", $this->field->param1);
                 foreach ($rawoptions as $key => $option) {
                     $option = trim($option);
                     if ($option != '') {
-                        $this->_options[$key + 1] = $option;
+                        $this->options[$key + 1] = $option;
                     }
                 }
             }
         }
-        return $this->_options;
+        return $this->options;
     }
 
     /**
@@ -947,7 +947,7 @@ abstract class datalynxfield_option extends datalynxfield_base {
         $this->field->edits = isset($forminput->edits) ? $forminput->edits : -1;
         $this->field->label = !empty($forminput->label) ? $forminput->label : '';
 
-        $oldvalues = $newvalues = $this->_options;
+        $oldvalues = $newvalues = $this->options;
         $renames = !empty($forminput->renameoption) ? $forminput->renameoption : [];
         $deletes = !empty($forminput->deleteoption) ? $forminput->deleteoption : [];
         $adds = preg_split(
@@ -995,7 +995,7 @@ abstract class datalynxfield_option extends datalynxfield_base {
             }
         }
 
-        if (!empty($this->_options)) {
+        if (!empty($this->options)) {
             $this->update_options($map);
         }
 

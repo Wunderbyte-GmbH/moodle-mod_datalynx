@@ -91,7 +91,7 @@ class datalynxfield_text_form extends datalynxfield_form {
                 'acturl' => "$CFG->wwwroot/mod/datalynx/loaddfviews.php",
                 'presentdlid' => $this->dl->id(),
                 'thisfieldstring' => get_string('thisfield', 'datalynx'),
-                'update' => $this->_field->id() ? $this->_field->id() : 0,
+                'update' => $this->field->id() ? $this->field->id() : 0,
                 'fieldtype' => 'text',
         ];
 
@@ -185,7 +185,7 @@ class datalynxfield_text_form extends datalynxfield_form {
     public function validation($data, $files) {
         $mform = &$this->_form;
         $errors = parent::validation($data, $files);
-        $fieldid = $this->_field->id();
+        $fieldid = $this->field->id();
         if (!empty($data['param8']) && !empty($fieldid)) {
             // Unique is activated, we check if there are doubles!
             // Should never happen, because we freeze it to 'no' if there are duplicates!
@@ -205,7 +205,7 @@ class datalynxfield_text_form extends datalynxfield_form {
     public function has_duplicates() {
         global $DB;
 
-        $fieldid = $this->_field->id();
+        $fieldid = $this->field->id();
 
         if (empty($fieldid)) {
             return false;

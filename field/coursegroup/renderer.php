@@ -32,7 +32,7 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
     /**
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldname = $field->name();
         $edit = !empty($options['edit']) ? $options['edit'] : false;
 
@@ -61,7 +61,7 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
     public function display_edit(&$mform, $entry, array $options = null) {
         global $CFG, $DB, $SITE, $PAGE;
 
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
 
@@ -136,7 +136,7 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
     protected function display_browse($entry, $type = null) {
         global $DB;
 
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
 
         $courseid = 0;
@@ -195,7 +195,7 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
      * Value is an array of (member,courseid,groupid) only one should be set
      */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
-        $fieldid = $this->_field->id();
+        $fieldid = $this->field->id();
 
         if (is_array($value)) {
             [$member, $course, $group] = $value;
@@ -225,7 +225,7 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
      * Array of patterns this field supports
      */
     protected function patterns() {
-        $fieldname = $this->_field->name();
+        $fieldname = $this->field->name();
 
         $patterns = parent::patterns();
         $patterns["[[$fieldname]]"] = [true];

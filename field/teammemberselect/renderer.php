@@ -34,7 +34,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         global $USER, $PAGE;
 
         // Variable $field datalynxfield_teammemberselect.
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $str = '';
 
@@ -80,7 +80,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
             $field->admissibleroles
         );
         $userismember = in_array($USER->id, $selected);
-        $canunsubscribe = $this->_field->allowunsubscription;
+        $canunsubscribe = $this->field->allowunsubscription;
 
         if (
             $subscribeenabled && $hasadmissiblerole && (!$teamfull || $userismember) &&
@@ -161,7 +161,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         global $USER, $PAGE;
 
         // Variable $field datalynxfield_teammemberselect.
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
         $fieldname = "field_{$fieldid}_$entryid";
@@ -209,7 +209,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
     }
 
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $fieldname = "f_{$i}_{$fieldid}";
         $menu = [-1 => ''] + $field->options_menu();
@@ -226,7 +226,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
     }
 
     protected function patterns() {
-        $fieldname = $this->_field->name();
+        $fieldname = $this->field->name();
 
         $patterns = parent::patterns();
         $patterns["[[$fieldname]]"] = [true];
@@ -236,7 +236,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
     }
 
     public function validate($entryid, $tags, $formdata) {
-        $fieldid = $this->_field->id();
+        $fieldid = $this->field->id();
 
         $formfieldname = "field_{$fieldid}_{$entryid}";
 
@@ -276,18 +276,18 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
 
                 // Limit chosen users to max teamsize and ensure min teamsize users are chosen!
                 $teamsize = count($formdata->$formfieldname);
-                if ($teamsize > $this->_field->teamsize) {
+                if ($teamsize > $this->field->teamsize) {
                     $errors[$formfieldname] = get_string(
                         'maxteamsizeerrorform',
                         'datalynx',
-                        $this->_field->teamsize
+                        $this->field->teamsize
                     );
                 }
-                if ($teamsize < $this->_field->minteamsize) {
+                if ($teamsize < $this->field->minteamsize) {
                     $errors[$formfieldname] = get_string(
                         'minteamsizeerrorform',
                         'datalynx',
-                        $this->_field->minteamsize
+                        $this->field->minteamsize
                     );
                 }
             }

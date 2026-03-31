@@ -45,7 +45,7 @@ class datalynxfield_radiobutton_form extends datalynxfield_select_form {
             'select',
             'param3',
             get_string('fieldoptionsseparator', 'datalynx'),
-            array_map('current', $this->_field->separators)
+            array_map('current', $this->field->separators)
         );
 
         // Hide autocomplete, it does not apply.

@@ -39,7 +39,7 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
      * @param array|null $options Additional options.
      */
     public function display_edit(&$mform, $entry, array $options = null) {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
         $fieldname = "field_{$fieldid}_{$entryid}";
@@ -93,7 +93,7 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
         global $USER;
-        $field = $this->_field;
+        $field = $this->field;
         $fieldname = $field->name();
 
         // There is only one possible tag here, no edit.
@@ -147,7 +147,7 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
      * @return string
      */
     protected function display_checkbox($entry) {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $fieldname = $field->name();
 
@@ -176,7 +176,7 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
      * @return string
      */
     protected function display_datetime($entry) {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
 
         if (isset($entry->{"c{$fieldid}_content"})) {
@@ -212,7 +212,7 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
      * @return string
      */
     protected function display_text($entry) {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
 
         if (isset($entry->{"c{$fieldid}_content"})) {
@@ -264,7 +264,7 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
      * @return string
      */
     protected function display_richtext($entry) {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
 
         if (isset($entry->{"c{$fieldid}_content"})) {
@@ -290,7 +290,7 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
      * Array of patterns this field supports
      */
     protected function patterns() {
-        $fieldname = $this->_field->name();
+        $fieldname = $this->field->name();
         $cat = get_string('authorinfo', 'datalynx');
 
         $patterns = [];
@@ -309,7 +309,7 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
      */
     public function validate($entryid, $tags, $formdata) {
 
-        $fieldid = $this->_field->id();
+        $fieldid = $this->field->id();
         $formfieldname = "field_{$fieldid}_{$entryid}";
 
         $errors = [];
@@ -324,12 +324,12 @@ class datalynxfield_userinfo_renderer extends datalynxfield_renderer {
         }
 
         // Check if required.
-        if ($this->_field->mandatory && $formdata->{$formfieldname} == '') {
+        if ($this->field->mandatory && $formdata->{$formfieldname} == '') {
             $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
         } else {
             // Update.
             $user["id"] = $userid;
-            $user["profile_field_{$this->_field->infoshortname}"] = $formdata->{$formfieldname};
+            $user["profile_field_{$this->field->infoshortname}"] = $formdata->{$formfieldname};
             profile_save_data((object) $user);
             // We don't want these infos to be stored in the datalynx content table.
             unset($formdata->{$formfieldname});

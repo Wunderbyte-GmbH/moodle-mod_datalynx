@@ -34,11 +34,11 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
     public function replacements(array $tags = null, $entry = null, array $options = null) {
         global $CFG, $DB;
 
-        $field = $this->_field;
+        $field = $this->field;
         $edit = !empty($options['edit']) ? $options['edit'] : false;
 
         // If edit mode or rating not active return.
-        if ($edit || (!$this->_field->df()->data->rating)) {
+        if ($edit || (!$this->field->df()->data->rating)) {
             if ($tags) {
                 $replacements = [];
                 foreach ($tags as $tag) {
@@ -251,7 +251,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
                     $row->attributes['class'] = 'ratingitemheader';
                     $row->cells[] = $OUTPUT->user_picture(
                         $raterecord,
-                        ['courseid' => $this->_field->df()->course->id,
+                        ['courseid' => $this->field->df()->course->id,
                         ]
                     );
                     $userrecord = $DB->get_record('user', ['id' => $raterecord->userid,
@@ -377,7 +377,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
             // And we're within the assessable period.
             if (
                 $rating->user_can_rate() or
-                    has_capability('mod/datalynx:manageratings', $this->_field->df()->context)
+                    has_capability('mod/datalynx:manageratings', $this->field->df()->context)
             ) {
                 $rateurl = $rating->get_rate_url();
                 $inputs = $rateurl->params();
@@ -440,7 +440,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
      * Array of patterns this field supports
      */
     protected function patterns() {
-        $fieldinternalname = $this->_field->get('internalname');
+        $fieldinternalname = $this->field->get('internalname');
         $cat = get_string('ratings', 'datalynx');
 
         $patterns = [];

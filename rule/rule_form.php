@@ -30,7 +30,7 @@ class datalynx_rule_form extends moodleform {
     /**
      * @var object
      */
-    protected $_rule = null;
+    protected $rule = null;
 
     /**
      * @var \mod_datalynx\datalynx
@@ -57,8 +57,8 @@ class datalynx_rule_form extends moodleform {
         $attributes = null,
         $editable = true
     ) {
-        $this->_rule = $rule;
-        $this->dl = $this->_rule->df;
+        $this->rule = $rule;
+        $this->dl = $this->rule->df;
 
         parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
     }
@@ -217,7 +217,7 @@ class datalynx_rule_form extends moodleform {
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
-        if ($this->dl->name_exists('rules', $data['name'], $this->_rule->get_id())) {
+        if ($this->dl->name_exists('rules', $data['name'], $this->rule->get_id())) {
             $errors['name'] = get_string('invalidname', 'datalynx', get_string('rule', 'datalynx'));
         }
 

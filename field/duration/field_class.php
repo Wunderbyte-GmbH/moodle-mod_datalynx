@@ -33,7 +33,7 @@ class datalynxfield_duration extends datalynxfield_base {
      */
     public $type = 'duration';
 
-    protected $_units = null;
+    protected $units = null;
 
     /**
      * Can this field be used in fieldgroups? Override if yes.
@@ -47,12 +47,12 @@ class datalynxfield_duration extends datalynxfield_base {
      * @return array unit length in seconds => string unit name.
      */
     public function get_units() {
-        if (is_null($this->_units)) {
-            $this->_units = [604800 => get_string('weeks'), 86400 => get_string('days'),
+        if (is_null($this->units)) {
+            $this->units = [604800 => get_string('weeks'), 86400 => get_string('days'),
                     3600 => get_string('hours'), 60 => get_string('minutes'), 1 => get_string('seconds'),
             ];
         }
-        return $this->_units;
+        return $this->units;
     }
 
     /**

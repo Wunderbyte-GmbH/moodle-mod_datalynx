@@ -34,7 +34,7 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
      *
      * @var datalynxfield_select
      */
-    protected $_field = null;
+    protected $field = null;
 
     /**
      *
@@ -42,7 +42,7 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
      * @see datalynxfield_renderer::render_edit_mode()
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
         $menuoptions = $field->options_menu();
@@ -63,8 +63,8 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
             $select = &$mform->addElement('select', $fieldname, null);
         }
 
-        if (isset($this->_field->field->param5) && is_numeric($this->_field->field->param5) && $this->_field->field->param5 > 0) {
-            $disabled = $this->_field->get_disabled_values_for_user();
+        if (isset($this->field->field->param5) && is_numeric($this->field->field->param5) && $this->field->field->param5 > 0) {
+            $disabled = $this->field->get_disabled_values_for_user();
         } else {
             $disabled = [];
         }
@@ -107,7 +107,7 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
      * @see datalynxfield_renderer::render_display_mode()
      */
     public function render_display_mode(stdClass $entry, array $options): string {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
 
         if (isset($entry->{"c{$fieldid}_content"})) {
@@ -145,7 +145,7 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
      * @see datalynxfield_renderer::render_search_mode()
      */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $fieldname = "f_{$i}_{$fieldid}";
         $menu = [-1 => ''] + $field->options_menu();
@@ -167,18 +167,18 @@ class datalynxfield_select_renderer extends datalynxfield_renderer {
      * @return string[]
      */
     public function validate($entryid, $tags, $formdata) {
-        $fieldid = $this->_field->id();
+        $fieldid = $this->field->id();
         $errors = [];
 
         $formfieldname = "field_{$fieldid}_{$entryid}";
 
         // Not every field of this dataynx-instance has to be in the form!
         if (isset($formdata->{$formfieldname})) {
-            if (isset($this->_field->field->param5) && is_numeric($this->_field->field->param5) && $this->_field->field->param5 > 0) {
-                $disabled = $this->_field->get_disabled_values_for_user($entryid);
+            if (isset($this->field->field->param5) && is_numeric($this->field->field->param5) && $this->field->field->param5 > 0) {
+                $disabled = $this->field->get_disabled_values_for_user($entryid);
                 $content = clean_param($formdata->{$formfieldname}, PARAM_INT);
                 if (array_search($content, $disabled) !== false) {
-                    $menu = $this->_field->options_menu();
+                    $menu = $this->field->options_menu();
                     $errors[$formfieldname] = get_string('limitchoiceerror', 'datalynx', $menu[$content]);
                 }
             }

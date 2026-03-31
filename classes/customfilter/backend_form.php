@@ -31,7 +31,7 @@ class backend_form extends base_form {
      *
      */
     public function definition() {
-        if ($id = $this->_customfilter->id) {
+        if ($id = $this->customfilter->id) {
             $customfilter = $this->get_customfilter($id);
         } else {
             $customfilter = new stdClass();
@@ -131,7 +131,7 @@ class backend_form extends base_form {
         if ($customfilter->fieldlist) {
             $fieldlist = json_decode($customfilter->fieldlist);
         }
-        $fields = $this->get_possible_customfilter_fields($this->_dl);
+        $fields = $this->get_possible_customfilter_fields($this->dl);
         foreach ($fields as $fieldid => $field) {
             $formfieldname = 'fieldlist[' . $field->field->id . '][name]';
             $formfieldsortablename = 'fieldlist[' . $field->field->id . '][sortable]';
@@ -244,8 +244,8 @@ class backend_form extends base_form {
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
-        $dl = $this->_dl;
-        if (empty($data['name']) || $dl->name_exists('customfilters', $data['name'], $this->_customfilter->id)) {
+        $dl = $this->dl;
+        if (empty($data['name']) || $dl->name_exists('customfilters', $data['name'], $this->customfilter->id)) {
             $errors['name'] = get_string(
                 'invalidname',
                 'datalynx',

@@ -57,7 +57,7 @@ class datalynxfield_multiselect_form extends datalynxfield_option_form {
             'select',
             'param3',
             get_string('fieldoptionsseparator', 'datalynx'),
-            array_map('current', $this->_field->separators)
+            array_map('current', $this->field->separators)
         );
 
         // Enable autocompletion for edit mode.

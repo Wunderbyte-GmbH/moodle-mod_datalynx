@@ -32,7 +32,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
     /**
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options = null) {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
 
@@ -75,7 +75,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
      * @return string
      */
     public function render_display_mode(stdClass $entry, array $options): string {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
 
@@ -131,7 +131,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
      * @return array
      */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = ''): array {
-        $fieldid = $this->_field->id();
+        $fieldid = $this->field->id();
         $fieldname = "f_{$i}_$fieldid";
 
         $arr = [];
@@ -165,7 +165,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
      * @return moodle_url|string
      */
     protected function display_file(stored_file $file, int $entryid, string $path, string $altname = '', ?array $params = null) {
-        $field = $this->_field;
+        $field = $this->field;
         $fieldid = $field->id();
         $fieldname = "field_{$fieldid}_{$entryid}";
         $filename = $file->get_filename();
@@ -208,7 +208,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
      */
     protected function embed_pdf(string $fullurl, string $fieldname): string {
         global $PAGE;
-        $customscale = $this->_field->get('param4');
+        $customscale = $this->field->get('param4');
         if (empty($customscale)) {
             $customscale = 1;
         }
@@ -269,14 +269,14 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
     /**
      */
     public function pluginfile_patterns(): array {
-        return ["[[{$this->_field->name()}]]"];
+        return ["[[{$this->field->name()}]]"];
     }
 
     /**
      * Array of patterns this field supports
      */
     protected function patterns(): array {
-        $fieldname = $this->_field->name();
+        $fieldname = $this->field->name();
 
         $patterns = parent::patterns();
         $patterns["[[$fieldname]]"] = [true];

@@ -50,11 +50,11 @@ It should show you all entries where A is not chosen
     And I add to "Datalynx Test Instance" datalynx the view of "Tabular" type with:
       | name | Option A view |
       | description | Option A view |
-      | _filter | optionAfilter |
+      | filter | optionAfilter |
     And I add to "Datalynx Test Instance" datalynx the view of "Tabular" type with:
       | name | optionBfilter view |
       | description | Tabular view |
-      | _filter | optionBfilter |
+      | filter | optionBfilter |
     And I add to "Datalynx Test Instance" datalynx the view of "Tabular" type with:
       | name | Manage view |
       | description | Manage view |
