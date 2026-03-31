@@ -56,7 +56,7 @@ class behat_mod_datalynx extends behat_base {
 
         $fields = $table->getHash();
         foreach ($fields as $field) {
-            $this->execute("behat_forms::i_select_from_the_singleselect", [$field['name'], 'type']);
+            $this->execute("behat_forms::i_select_from_the_singleselect", [$field['type'], 'type']);
             $field['name'] = "Datalynx field {$field['name']}";
             $this->execute("behat_forms::set_field_value", ['name', $field['name']]);
             $this->execute("behat_forms::set_field_value", ['description', $field['description']]);

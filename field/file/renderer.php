@@ -57,10 +57,8 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
             $fmoptions
         );
 
-        $label = $field->df->name() == "Datalynx Test Instance" ? "File" : "";
-
         // Add file manager element
-        $mform->addElement('filemanager', "{$fieldname}_filemanager", $label, null, $fmoptions);
+        $mform->addElement('filemanager', "{$fieldname}_filemanager", $field->name(), null, $fmoptions);
         $mform->setDefault("{$fieldname}_filemanager", $draftitemid);
 
         if (!empty($options['required'])) {

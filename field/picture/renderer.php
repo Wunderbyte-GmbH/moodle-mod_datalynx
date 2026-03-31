@@ -58,10 +58,8 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
             $fmoptions
         );
 
-        // For behat testing: Much, much better to use the official step there than a bunch of very volatile js/css lines.
-        $label = $field->df->name() == "Datalynx Test Instance" ? "Picture" : "";
         // File manager.
-        $mform->addElement('filemanager', "{$fieldname}_filemanager", $label, null, $fmoptions);
+        $mform->addElement('filemanager', "{$fieldname}_filemanager", $field->name(), null, $fmoptions);
         $mform->setDefault("{$fieldname}_filemanager", $draftitemid);
         $required = !empty($options['required']);
         if ($required) {
