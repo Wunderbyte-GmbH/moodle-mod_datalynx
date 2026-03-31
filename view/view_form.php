@@ -141,10 +141,6 @@ class datalynxview_base_form extends moodleform {
             // Store the sum in the visible field.
             $data->visible = $visiblesum;
         }
-        if (isset($data->filter)) {
-            $data->filter = $data->filter;
-            unset($data->filter);
-        }
         return $data;
     }
 
@@ -171,10 +167,6 @@ class datalynxview_base_form extends moodleform {
                     $sum -= $value; // Subtract the value from the sum.
                 }
             }
-        }
-        if (isset($data->filter)) {
-            $data->filter = $data->filter;
-            unset($data->filter);
         }
         parent::set_data($data);
     }
