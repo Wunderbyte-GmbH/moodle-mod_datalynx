@@ -1,4 +1,4 @@
-@mod @mod_datalynx @datalynx_text_behavior_renderer @javascript
+@mod @mod_datalynx @datalynx_text_behavior_renderer @javascript @editor_tiny
 Feature: Test text field behavior and renderer in datalynx
   In order to control field visibility and display formatting
   As a teacher
