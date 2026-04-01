@@ -80,15 +80,23 @@ class PatternDialogue {
     }
 
     init() {
-        // Collect the editor IDs that have field-tag dropdown menus.
+        // _editorsWithMenus: editors that have a FIELD tag menu and therefore need
+        // tag→button replacement and the click dialog.
+        // Editors with only a 'general' tag menu (esection_editor) must NOT get
+        // replaceTagsWithButtons — their ##action## content works fine as plain text
+        // and was working before these JS changes. Touching it causes ## to be lost.
         this._editorsWithMenus = new Set();
+
         document.querySelectorAll('select[id$="_tag_menu"]').forEach((dropdown) => {
             dropdown.addEventListener('change', () => this.insertTagFromDropdown(dropdown));
-            const m = dropdown.id.match(/^(.+_editor)_.+_tag_menu$/);
+
+            // Only 'field' tag menus require button-replacement and dialogs.
+            const m = dropdown.id.match(/^(.+_editor)_field_tag_menu$/);
             if (m) {
                 this._editorsWithMenus.add('id_' + m[1]);
             }
         });
+
         this.waitForTinyMCE();
     }
 
@@ -233,16 +241,17 @@ class PatternDialogue {
             }
             registered.add(editor.id);
 
-            // SaveContent fires inside editor.save() before content reaches the textarea.
-            // Always register it so buttons are converted back to tags regardless of editor type.
-            editor.on('SaveContent', (e) => {
-                e.content = this.convertButtonsInHtml(e.content);
-            });
-
-            // Only editors with tag-menu dropdowns need the button-replacement workflow.
+            // Only editors with a FIELD tag menu need button-replacement and SaveContent.
+            // Editors with only general/character menus (e.g. esection_editor) must be left
+            // untouched — their ##action## content is stored as plain text and works correctly.
             if (!this._editorsWithMenus.has(editor.id)) {
                 return;
             }
+
+            // SaveContent fires inside editor.save() before content reaches the textarea.
+            editor.on('SaveContent', (e) => {
+                e.content = this.convertButtonsInHtml(e.content);
+            });
 
             editor.on('SetContent', () => this.reInitializeButtons(editor));
             editor.on('change', () => this.reInitializeButtons(editor));
