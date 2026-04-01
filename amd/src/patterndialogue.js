@@ -136,7 +136,7 @@ class PatternDialogue {
     /**
      * Convert datalynx buttons in an HTML string back to their tag syntax.
      * Trivial: every button stores the full tag in data-datalynx-field.
-     * Called from the SaveContent hook so it fires before TinyMCE writes to the textarea.
+     * Called from the GetContent hook (with e.save===true) so it fires before TinyMCE writes to the textarea.
      * @param {string} html
      * @returns {string}
      */
@@ -248,9 +248,13 @@ class PatternDialogue {
                 return;
             }
 
-            // SaveContent fires inside editor.save() before content reaches the textarea.
-            editor.on('SaveContent', (e) => {
-                e.content = this.convertButtonsInHtml(e.content);
+            // TinyMCE 6: SaveContent clones saveArgs, so e.content mutations don't propagate.
+            // GetContent IS used by reference (postProcessGetContent returns dispatcherArgs.content).
+            // We only convert when the get is triggered by a save() call (e.save === true).
+            editor.on('GetContent', (e) => {
+                if (e.save) {
+                    e.content = this.convertButtonsInHtml(e.content);
+                }
             });
 
             editor.on('SetContent', () => this.reInitializeButtons(editor));
