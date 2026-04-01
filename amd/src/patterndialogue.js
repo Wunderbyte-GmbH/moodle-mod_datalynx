@@ -30,6 +30,7 @@ import ModalEvents from 'core/modal_events';
 class PatternDialogue {
     constructor(options) {
         this.options = options;
+        this._currentButton = null;
     }
 
     init() {
@@ -92,16 +93,15 @@ class PatternDialogue {
      * @param {object} editor TinyMCE editor instance
      */
     reInitializeButtons(editor) {
-        let dataid = 0;
         editor.getBody().querySelectorAll('button[data-action-tag-button], button.datalynx-field-tag').forEach((button) => {
             if (!button.getAttribute('data-click-initialized')) {
                 button.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
+                    this._currentButton = button;
                     this.openMoodleDialog(button);
                 });
                 button.setAttribute('data-click-initialized', 'true');
-                button.setAttribute('data-id', 'datalynx-button-id-' + dataid++);
             }
             if (button.classList.contains('datalynx-field-tag')) {
                 const field = button.getAttribute('data-datalynx-field') || '';
@@ -127,21 +127,6 @@ class PatternDialogue {
     }
 
     /**
-     * Find a button by its data-id across all TinyMCE editors.
-     * @param {string} buttonId
-     * @returns {HTMLElement|null}
-     */
-    findButtonById(buttonId) {
-        for (const ed of (window.tinyMCE?.get() || [])) {
-            const found = ed.getBody().querySelector('[data-id="' + buttonId + '"]');
-            if (found) {
-                return found;
-            }
-        }
-        return null;
-    }
-
-    /**
      * Open a Moodle dialog for editing a tag button's properties.
      * Field-tag buttons use ModalSaveCancel (reliable footer Save button).
      * Action-tag buttons use a simple Modal with a delete button only.
@@ -149,7 +134,6 @@ class PatternDialogue {
      */
     async openMoodleDialog(button) {
         const isFieldTag = button.classList.contains('datalynx-field-tag');
-        const buttonId = button.getAttribute('data-id');
         const currentBehavior = button.getAttribute('data-datalynx-behavior') || '';
         const currentRenderer = button.getAttribute('data-datalynx-renderer') || '';
 
@@ -212,21 +196,20 @@ class PatternDialogue {
                 const newBehavior = behaviorSelect ? behaviorSelect.value : '';
                 const newRenderer = rendererSelect ? rendererSelect.value : '';
 
-                const liveButton = this.findButtonById(buttonId) || button;
-                const ed = this.findEditorForButton(liveButton);
+                const ed = this.findEditorForButton(button);
                 if (ed) {
-                    ed.dom.setAttrib(liveButton, 'data-datalynx-behavior', newBehavior);
-                    ed.dom.setAttrib(liveButton, 'data-datalynx-renderer', newRenderer);
-                    liveButton.innerHTML = this.buildButtonLabel(
-                        liveButton.getAttribute('data-datalynx-field') || field,
+                    ed.dom.setAttrib(button, 'data-datalynx-behavior', newBehavior);
+                    ed.dom.setAttrib(button, 'data-datalynx-renderer', newRenderer);
+                    button.innerHTML = this.buildButtonLabel(
+                        button.getAttribute('data-datalynx-field') || field,
                         newBehavior,
                         newRenderer
                     );
                     ed.undoManager.add();
                 } else {
-                    liveButton.setAttribute('data-datalynx-behavior', newBehavior);
-                    liveButton.setAttribute('data-datalynx-renderer', newRenderer);
-                    liveButton.innerHTML = this.buildButtonLabel(field, newBehavior, newRenderer);
+                    button.setAttribute('data-datalynx-behavior', newBehavior);
+                    button.setAttribute('data-datalynx-renderer', newRenderer);
+                    button.innerHTML = this.buildButtonLabel(field, newBehavior, newRenderer);
                 }
                 modal.hide();
             });
@@ -234,8 +217,7 @@ class PatternDialogue {
             // Delete button inside the modal body.
             modal.getBody()[0].addEventListener('click', (e) => {
                 if (e.target.closest('[data-action="dlx-delete"]')) {
-                    const liveButton = this.findButtonById(buttonId) || button;
-                    liveButton.remove();
+                    button.remove();
                     modal.hide();
                 }
             });
@@ -255,8 +237,7 @@ class PatternDialogue {
 
             modal.getBody()[0].addEventListener('click', (e) => {
                 if (e.target.closest('[data-action="dlx-delete"]')) {
-                    const liveButton = this.findButtonById(buttonId) || button;
-                    liveButton.remove();
+                    button.remove();
                     modal.hide();
                 }
             });
