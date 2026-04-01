@@ -73,16 +73,33 @@ class PatternDialogue {
         });
     }
 
-    initializeTinyMCEButtons() {
-        if (!window.tinyMCE?.get) {
-            return;
+    /**
+     * Find the TinyMCE editor that owns the given button DOM element.
+     * @param {HTMLElement} btn
+     * @returns {object|null} TinyMCE editor instance or null
+     */
+    findEditorForButton(btn) {
+        for (const ed of (window.tinyMCE?.get() || [])) {
+            if (ed.getBody().contains(btn)) {
+                return ed;
+            }
         }
+        return null;
+    }
 
-        window.tinyMCE.get().forEach((editor) => {
-            editor.on('init', () => this.reInitializeButtons(editor));
-            editor.on('SetContent', () => this.reInitializeButtons(editor));
-            editor.on('change', () => this.reInitializeButtons(editor));
-        });
+    /**
+     * Find a button by its data-id across all TinyMCE editors.
+     * @param {string} buttonId
+     * @returns {HTMLElement|null}
+     */
+    findButtonById(buttonId) {
+        for (const ed of (window.tinyMCE?.get() || [])) {
+            const found = ed.getBody().querySelector(`[data-id="${buttonId}"]`);
+            if (found) {
+                return found;
+            }
+        }
+        return null;
     }
 
     async openMoodleDialog(button) {
@@ -133,17 +150,38 @@ class PatternDialogue {
             removeOnClose: true,
         });
 
+        const modalBody = modal.getBody()[0];
+
         if (isFieldTag) {
-            modal.getRoot()[0].querySelector('[data-region="save-tag"]')?.addEventListener('click', () => {
-                const behaviorSelect = modal.getRoot()[0].querySelector('[data-region="tag-behavior-select"]');
-                const rendererSelect = modal.getRoot()[0].querySelector('[data-region="tag-renderer-select"]');
-                button.setAttribute('data-datalynx-behavior', behaviorSelect?.value || '');
-                button.setAttribute('data-datalynx-renderer', rendererSelect?.value || '');
+            modalBody.querySelector('[data-region="save-tag"]')?.addEventListener('click', () => {
+                const behaviorSelect = modalBody.querySelector('[data-region="tag-behavior-select"]');
+                const rendererSelect = modalBody.querySelector('[data-region="tag-renderer-select"]');
+                const newBehavior = behaviorSelect?.value ?? '';
+                const newRenderer = rendererSelect?.value ?? '';
+
+                // Find the button fresh from the editor to avoid stale references.
+                const liveButton = this.findButtonById(buttonId) ?? button;
+                const ed = this.findEditorForButton(liveButton);
+
+                if (ed) {
+                    ed.dom.setAttrib(liveButton, 'data-datalynx-behavior', newBehavior);
+                    ed.dom.setAttrib(liveButton, 'data-datalynx-renderer', newRenderer);
+                    // Update visual label to reflect the selected behaviour/renderer.
+                    const field = liveButton.getAttribute('data-datalynx-field') || liveButton.textContent;
+                    const label = [field, newBehavior, newRenderer].filter(Boolean).join('|');
+                    liveButton.textContent = label || field;
+                    ed.undoManager.add();
+                    ed.nodeChanged();
+                } else {
+                    liveButton.setAttribute('data-datalynx-behavior', newBehavior);
+                    liveButton.setAttribute('data-datalynx-renderer', newRenderer);
+                }
+
                 modal.hide();
             });
         }
 
-        modal.getRoot()[0].querySelector('[data-region="delete-tag"]')?.addEventListener('click', () => {
+        modalBody.querySelector('[data-region="delete-tag"]')?.addEventListener('click', () => {
             button.remove();
             modal.hide();
         });
@@ -154,7 +192,6 @@ class PatternDialogue {
     waitForTinyMCE() {
         if (window.tinyMCE?.activeEditor && window.tinyMCE.get().length > 0) {
             this.initReplaceTagsWithButtons();
-            this.initializeTinyMCEButtons();
         } else {
             setTimeout(() => this.waitForTinyMCE(), 100);
         }
@@ -209,8 +246,10 @@ class PatternDialogue {
 
     convertButtonsToTagsBeforeSubmit() {
         window.tinyMCE.get().forEach((editor) => {
+            // Work directly on the live editor DOM to avoid any serialiser attribute loss.
+            const body = editor.getBody();
             const div = document.createElement('div');
-            div.innerHTML = editor.getContent();
+            div.innerHTML = body.innerHTML;
 
             div.querySelectorAll('button[data-action-tag-button]').forEach((button) => {
                 button.replaceWith(`##${button.getAttribute('data-datalynx-field')}##`);
@@ -220,7 +259,16 @@ class PatternDialogue {
                 const field = button.getAttribute('data-datalynx-field')?.trim();
                 const behavior = button.getAttribute('data-datalynx-behavior') || '';
                 const renderer = button.getAttribute('data-datalynx-renderer') || '';
-                const rawFieldTag = `[[${field}${behavior ? '|' + behavior : ''}${renderer ? '|' + renderer : ''}]]`;
+                // Always write [[field|behavior|renderer]] when renderer is non-empty so
+                // that an empty behavior is not mistaken for the renderer by the PHP parser.
+                let rawFieldTag;
+                if (renderer) {
+                    rawFieldTag = `[[${field}|${behavior}|${renderer}]]`;
+                } else if (behavior) {
+                    rawFieldTag = `[[${field}|${behavior}]]`;
+                } else {
+                    rawFieldTag = `[[${field}]]`;
+                }
                 button.replaceWith(rawFieldTag);
             });
 
