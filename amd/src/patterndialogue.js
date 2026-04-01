@@ -88,26 +88,33 @@ class PatternDialogue {
     async openMoodleDialog(button) {
         const isFieldTag = button.classList.contains('datalynx-field-tag');
         const buttonId = button.getAttribute('data-id');
+        const currentBehavior = button.getAttribute('data-datalynx-behavior') || '';
+        const currentRenderer = button.getAttribute('data-datalynx-renderer') || '';
 
         let bodyHtml;
         if (isFieldTag) {
             const behaviors = Object.entries(this.options.behaviors || {})
-                .map(([val, label]) => `<option value="${val}">${label}</option>`).join('');
+                .map(([val, label]) =>
+                    `<option value="${val}" ${val === currentBehavior ? 'selected' : ''}>${label}</option>`
+                ).join('');
             const field = button.getAttribute('data-datalynx-field');
             const fieldType = (this.options.types || {})[field] || '';
             const renderers = Object.entries((this.options.renderers || {})[field] || {})
-                .map(([val, label]) => `<option value="${val}">${label}</option>`).join('');
+                .map(([val, label]) =>
+                    `<option value="${val}" ${val === currentRenderer ? 'selected' : ''}>${label}</option>`
+                ).join('');
             bodyHtml = `
                 <p data-region="datalynx-tag-field">${field}</p>
                 <p data-region="datalynx-tag-fieldtype">${fieldType}</p>
                 <label>${await Str.get_string('behavior', 'datalynx')}</label>
-                <select data-region="tag-behavior-select">
+                <select data-region="tag-behavior-select" id="datalynx-tag-behavior-select">
                     ${behaviors}
                 </select>
                 <label>${await Str.get_string('renderer', 'datalynx')}</label>
-                <select data-region="tag-renderer-select">
+                <select data-region="tag-renderer-select" id="datalynx-tag-renderer-select">
                     ${renderers}
                 </select>
+                <button type="button" data-region="save-tag">${await Str.get_string('savechanges', 'moodle')}</button>
                 <button type="button" data-region="delete-tag">${await Str.get_string('deletetag', 'datalynx')}</button>
             `;
         } else {
@@ -125,6 +132,16 @@ class PatternDialogue {
             show: true,
             removeOnClose: true,
         });
+
+        if (isFieldTag) {
+            modal.getRoot()[0].querySelector('[data-region="save-tag"]')?.addEventListener('click', () => {
+                const behaviorSelect = modal.getRoot()[0].querySelector('[data-region="tag-behavior-select"]');
+                const rendererSelect = modal.getRoot()[0].querySelector('[data-region="tag-renderer-select"]');
+                button.setAttribute('data-datalynx-behavior', behaviorSelect?.value || '');
+                button.setAttribute('data-datalynx-renderer', rendererSelect?.value || '');
+                modal.hide();
+            });
+        }
 
         modal.getRoot()[0].querySelector('[data-region="delete-tag"]')?.addEventListener('click', () => {
             button.remove();
