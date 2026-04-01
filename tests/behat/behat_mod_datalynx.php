@@ -275,26 +275,26 @@ class behat_mod_datalynx extends behat_base {
     }
 
     /**
-     * Sets the editor to the given value.
+     * Inserts text into a TinyMCE editor by ID without replacing existing content.
+     * Unlike set_value (which calls setContent and wipes existing content), this uses
+     * insertContent so previously inserted field-tag buttons are preserved.
      *
-     * @Then I add to :fieldlocator editor the text :newvalue
+     * @Then I add to :editorid editor the text :newvalue
      *
-     * @param string $fieldlocator
-     * @param string $newvalue
+     * @param string $editorid  The textarea ID backing the TinyMCE editor, e.g. "id_eparam2_editor"
+     * @param string $newvalue  Content to insert at the current cursor position
      * @throws coding_exception
      */
-    public function i_add_to_editor_the_text($fieldlocator, $newvalue) {
+    public function i_add_to_editor_the_text($editorid, $newvalue) {
         if (!$this->running_javascript()) {
             throw new coding_exception('Updating text requires javascript.');
         }
-        // We delegate to behat_form_field class, it will
-        // guess the type properly.
-        $field = behat_field_manager::get_form_field_from_label($fieldlocator, $this);
-
-        if (!method_exists($field, 'set_value')) {
-            throw new coding_exception('Field does not support the select_text function.');
-        }
-        $field->set_value($newvalue);
+        $safeid      = addslashes($editorid);
+        $safecontent = addslashes($newvalue);
+        $this->getSession()->executeScript(
+            "var ed = window.tinyMCE ? window.tinyMCE.get('{$safeid}') : null;" .
+            "if (ed) { ed.insertContent('{$safecontent}'); }"
+        );
     }
 
     /**

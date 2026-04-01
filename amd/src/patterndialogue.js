@@ -17,6 +17,17 @@
 /**
  * Manages pattern dialogues for inserting tags and editing properties in datalynx editors.
  *
+ * Button convention
+ * -----------------
+ * Every button stores the **complete** datalynx tag in its single
+ * `data-datalynx-field` attribute so that saving is trivial:
+ *
+ *   Action tags  →  data-datalynx-field="##entries##"
+ *   Field tags   →  data-datalynx-field="[[fieldname|behavior|renderer]]"
+ *
+ * `convertButtonsInHtml()` therefore just replaces every button with the
+ * value of that one attribute — no further parsing needed.
+ *
  * @module     mod_datalynx/patterndialogue
  * @copyright  2025 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -27,6 +38,41 @@ import Modal from 'core/modal';
 import ModalSaveCancel from 'core/modal_save_cancel';
 import ModalEvents from 'core/modal_events';
 
+/** Regex that matches a full [[field|behavior|renderer]] tag (behavior and renderer optional). */
+const FIELD_TAG_RE = /^\[\[([^\|\]]+)(?:\|([^\|\]]*))?(?:\|([^\|\]]*))?\]\]$/;
+
+/**
+ * Parse a field tag pattern into its components.
+ * @param {string} pattern  e.g. "[[Text|Behavior|Renderer]]"
+ * @returns {{field:string, behavior:string, renderer:string}}
+ */
+function parseFieldTag(pattern) {
+    const m = pattern.match(FIELD_TAG_RE);
+    return {
+        field:    m ? m[1] : '',
+        behavior: m ? (m[2] || '') : '',
+        renderer: m ? (m[3] || '') : '',
+    };
+}
+
+/**
+ * Build a [[field|behavior|renderer]] pattern string.
+ * Omits trailing empty segments.
+ * @param {string} field
+ * @param {string} behavior
+ * @param {string} renderer
+ * @returns {string}
+ */
+function buildFieldTagPattern(field, behavior, renderer) {
+    if (renderer) {
+        return '[[' + field + '|' + behavior + '|' + renderer + ']]';
+    }
+    if (behavior) {
+        return '[[' + field + '|' + behavior + ']]';
+    }
+    return '[[' + field + ']]';
+}
+
 class PatternDialogue {
     constructor(options) {
         this.options = options;
@@ -34,15 +80,25 @@ class PatternDialogue {
     }
 
     init() {
-        this.waitForTinyMCE();
-
+        // Collect the editor IDs that have field-tag dropdown menus.
+        this._editorsWithMenus = new Set();
         document.querySelectorAll('select[id$="_tag_menu"]').forEach((dropdown) => {
             dropdown.addEventListener('change', () => this.insertTagFromDropdown(dropdown));
+            const m = dropdown.id.match(/^(.+_editor)_.+_tag_menu$/);
+            if (m) {
+                this._editorsWithMenus.add('id_' + m[1]);
+            }
         });
+        this.waitForTinyMCE();
     }
 
+    // -------------------------------------------------------------------------
+    // Button ↔ tag conversion
+    // -------------------------------------------------------------------------
+
     /**
-     * Replace [[field|behavior|renderer]] and ##action## tags in the editor with clickable buttons.
+     * Replace datalynx tag strings in the editor with clickable buttons.
+     * The full tag pattern is stored in data-datalynx-field so saving is trivial.
      * @param {object} editor TinyMCE editor instance
      */
     replaceTagsWithButtons(editor) {
@@ -50,17 +106,18 @@ class PatternDialogue {
         div.innerHTML = editor.getContent();
 
         div.innerHTML = div.innerHTML
-            .replace(/##([^#]+)##/g, (_, action) =>
+            // ##action## tags
+            .replace(/##([^#]+)##/g, (match, action) =>
                 '<button type="button" contenteditable="false" data-action-tag-button="true"' +
-                ' data-datalynx-field="' + action + '">' + action + '</button>'
+                ' data-datalynx-field="' + match + '">' + action + '</button>'
             )
+            // [[field|behavior|renderer]] tags
             .replace(/\[\[([^\|\]]+)(?:\|([^\|\]]*))?(?:\|([^\|\]]*))?\]\]/g,
-                (_, field, behavior, renderer) => {
+                (match, field, behavior, renderer) => {
                     behavior = behavior || '';
                     renderer = renderer || '';
                     return '<button type="button" contenteditable="false" class="datalynx-field-tag"' +
-                        ' data-datalynx-field="' + field + '" data-datalynx-behavior="' + behavior + '"' +
-                        ' data-datalynx-renderer="' + renderer + '">' +
+                        ' data-datalynx-field="' + match + '">' +
                         this.buildButtonLabel(field, behavior, renderer) + '</button>';
                 }
             );
@@ -69,8 +126,31 @@ class PatternDialogue {
     }
 
     /**
-     * Build the inner HTML label for a field tag button, including Bootstrap-compatible
-     * behavior/renderer badges (Bootstrap 4 + 5 compatible class names).
+     * Convert datalynx buttons in an HTML string back to their tag syntax.
+     * Trivial: every button stores the full tag in data-datalynx-field.
+     * Called from the SaveContent hook so it fires before TinyMCE writes to the textarea.
+     * @param {string} html
+     * @returns {string}
+     */
+    convertButtonsInHtml(html) {
+        const div = document.createElement('div');
+        div.innerHTML = html;
+        div.querySelectorAll(
+            'button[data-action-tag-button], button.datalynx-field-tag'
+        ).forEach((btn) => {
+            const tag = btn.getAttribute('data-datalynx-field') || '';
+            btn.replaceWith(tag);
+        });
+        return div.innerHTML;
+    }
+
+    // -------------------------------------------------------------------------
+    // Button label helpers
+    // -------------------------------------------------------------------------
+
+    /**
+     * Build the inner HTML for a field-tag button.
+     * Shows the field name plus Bootstrap-compatible behavior/renderer badges.
      * @param {string} field
      * @param {string} behavior
      * @param {string} renderer
@@ -87,13 +167,18 @@ class PatternDialogue {
         return html;
     }
 
+    // -------------------------------------------------------------------------
+    // Button lifecycle
+    // -------------------------------------------------------------------------
+
     /**
-     * Attach click listeners and data-id attributes to newly created buttons,
-     * and refresh badge labels on field-tag buttons.
+     * Attach click listeners to newly inserted buttons and refresh badge labels.
      * @param {object} editor TinyMCE editor instance
      */
     reInitializeButtons(editor) {
-        editor.getBody().querySelectorAll('button[data-action-tag-button], button.datalynx-field-tag').forEach((button) => {
+        editor.getBody().querySelectorAll(
+            'button[data-action-tag-button], button.datalynx-field-tag'
+        ).forEach((button) => {
             if (!button.getAttribute('data-click-initialized')) {
                 button.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -103,17 +188,22 @@ class PatternDialogue {
                 });
                 button.setAttribute('data-click-initialized', 'true');
             }
+            // Refresh badge label from the stored pattern.
             if (button.classList.contains('datalynx-field-tag')) {
-                const field = button.getAttribute('data-datalynx-field') || '';
-                const behavior = button.getAttribute('data-datalynx-behavior') || '';
-                const renderer = button.getAttribute('data-datalynx-renderer') || '';
+                const {field, behavior, renderer} = parseFieldTag(
+                    button.getAttribute('data-datalynx-field') || ''
+                );
                 button.innerHTML = this.buildButtonLabel(field, behavior, renderer);
             }
         });
     }
 
+    // -------------------------------------------------------------------------
+    // Editor / TinyMCE wiring
+    // -------------------------------------------------------------------------
+
     /**
-     * Find the TinyMCE editor that owns the given button DOM element.
+     * Find the TinyMCE editor that owns a given DOM element.
      * @param {HTMLElement} btn
      * @returns {object|null}
      */
@@ -126,16 +216,62 @@ class PatternDialogue {
         return null;
     }
 
+    waitForTinyMCE() {
+        if (window.tinyMCE) {
+            this.initReplaceTagsWithButtons();
+        } else {
+            setTimeout(() => this.waitForTinyMCE(), 100);
+        }
+    }
+
+    initReplaceTagsWithButtons() {
+        const registered = new Set();
+
+        const registerEditor = (editor) => {
+            if (registered.has(editor.id)) {
+                return;
+            }
+            registered.add(editor.id);
+
+            // SaveContent fires inside editor.save() before content reaches the textarea.
+            // Always register it so buttons are converted back to tags regardless of editor type.
+            editor.on('SaveContent', (e) => {
+                e.content = this.convertButtonsInHtml(e.content);
+            });
+
+            // Only editors with tag-menu dropdowns need the button-replacement workflow.
+            if (!this._editorsWithMenus.has(editor.id)) {
+                return;
+            }
+
+            editor.on('SetContent', () => this.reInitializeButtons(editor));
+            editor.on('change', () => this.reInitializeButtons(editor));
+            if (editor.initialized) {
+                this.replaceTagsWithButtons(editor);
+            } else {
+                editor.on('init', () => this.replaceTagsWithButtons(editor));
+            }
+        };
+
+        // Editors already known (e.g. tab is already visible).
+        window.tinyMCE.get().forEach(registerEditor);
+
+        // Editors that initialize later (accordion / lazy tabs).
+        window.tinyMCE.on('AddEditor', ({editor}) => registerEditor(editor));
+        window.tinyMCE.on('RemoveEditor', ({editor}) => registered.delete(editor.id));
+    }
+
+    // -------------------------------------------------------------------------
+    // Dialog
+    // -------------------------------------------------------------------------
+
     /**
      * Open a Moodle dialog for editing a tag button's properties.
-     * Field-tag buttons use ModalSaveCancel (reliable footer Save button).
-     * Action-tag buttons use a simple Modal with a delete button only.
+     * Field-tag buttons use ModalSaveCancel; action-tag buttons use a plain Modal.
      * @param {HTMLElement} button
      */
     async openMoodleDialog(button) {
         const isFieldTag = button.classList.contains('datalynx-field-tag');
-        const currentBehavior = button.getAttribute('data-datalynx-behavior') || '';
-        const currentRenderer = button.getAttribute('data-datalynx-renderer') || '';
 
         const [behaviorLabel, rendererLabel, deleteLabel] = await Promise.all([
             Str.get_string('behavior', 'datalynx'),
@@ -143,22 +279,25 @@ class PatternDialogue {
             Str.get_string('deletetag', 'datalynx'),
         ]);
 
-        const tagtype = isFieldTag ? 'Field' : 'Action';
-        const tagname = isFieldTag ? button.getAttribute('data-datalynx-field') : button.textContent;
-        const titleStr = await Str.get_string('tagproperties', 'datalynx', {tagtype, tagname});
+        const pattern = button.getAttribute('data-datalynx-field') || '';
 
         if (isFieldTag) {
-            const field = button.getAttribute('data-datalynx-field');
+            const {field, behavior: currentBehavior, renderer: currentRenderer} = parseFieldTag(pattern);
             const fieldType = (this.options.types || {})[field] || '';
+            const tagtype = 'Field';
+            const tagname = field;
+            const titleStr = await Str.get_string('tagproperties', 'datalynx', {tagtype, tagname});
 
             const behaviorsHtml = Object.entries(this.options.behaviors || {})
                 .map(([val, label]) =>
-                    '<option value="' + val + '"' + (val === currentBehavior ? ' selected="selected"' : '') + '>' +
+                    '<option value="' + val + '"' +
+                    (val === currentBehavior ? ' selected="selected"' : '') + '>' +
                     label + '</option>'
                 ).join('');
             const renderersHtml = Object.entries((this.options.renderers || {})[field] || {})
                 .map(([val, label]) =>
-                    '<option value="' + val + '"' + (val === currentRenderer ? ' selected="selected"' : '') + '>' +
+                    '<option value="' + val + '"' +
+                    (val === currentRenderer ? ' selected="selected"' : '') + '>' +
                     label + '</option>'
                 ).join('');
 
@@ -168,16 +307,14 @@ class PatternDialogue {
                 '<div class="form-group">' +
                 '<label for="dlx-behavior-select">' + behaviorLabel + '</label>' +
                 '<select class="form-control custom-select" id="dlx-behavior-select" name="dlx-behavior-select">' +
-                behaviorsHtml +
-                '</select></div>' +
+                behaviorsHtml + '</select></div>' +
                 '<div class="form-group">' +
                 '<label for="dlx-renderer-select">' + rendererLabel + '</label>' +
                 '<select class="form-control custom-select" id="dlx-renderer-select" name="dlx-renderer-select">' +
-                renderersHtml +
-                '</select></div>' +
+                renderersHtml + '</select></div>' +
                 '<div class="mt-2">' +
-                '<button type="button" class="btn btn-danger btn-sm" data-action="dlx-delete">' + deleteLabel + '</button>' +
-                '</div>';
+                '<button type="button" class="btn btn-danger btn-sm" data-action="dlx-delete">' +
+                deleteLabel + '</button></div>';
 
             const modal = await ModalSaveCancel.create({
                 title: titleStr,
@@ -186,35 +323,25 @@ class PatternDialogue {
                 removeOnClose: true,
             });
 
-            // Save: read select values, update button data attributes, rebuild label badges.
             modal.getRoot().on(ModalEvents.save, (e) => {
                 e.preventDefault();
-
                 const modalBody = modal.getBody()[0];
-                const behaviorSelect = modalBody.querySelector('#dlx-behavior-select');
-                const rendererSelect = modalBody.querySelector('#dlx-renderer-select');
-                const newBehavior = behaviorSelect ? behaviorSelect.value : '';
-                const newRenderer = rendererSelect ? rendererSelect.value : '';
+                const newBehavior = modalBody.querySelector('#dlx-behavior-select')?.value || '';
+                const newRenderer = modalBody.querySelector('#dlx-renderer-select')?.value || '';
+                const newPattern = buildFieldTagPattern(field, newBehavior, newRenderer);
 
                 const ed = this.findEditorForButton(button);
                 if (ed) {
-                    ed.dom.setAttrib(button, 'data-datalynx-behavior', newBehavior);
-                    ed.dom.setAttrib(button, 'data-datalynx-renderer', newRenderer);
-                    button.innerHTML = this.buildButtonLabel(
-                        button.getAttribute('data-datalynx-field') || field,
-                        newBehavior,
-                        newRenderer
-                    );
+                    ed.dom.setAttrib(button, 'data-datalynx-field', newPattern);
+                    button.innerHTML = this.buildButtonLabel(field, newBehavior, newRenderer);
                     ed.undoManager.add();
                 } else {
-                    button.setAttribute('data-datalynx-behavior', newBehavior);
-                    button.setAttribute('data-datalynx-renderer', newRenderer);
+                    button.setAttribute('data-datalynx-field', newPattern);
                     button.innerHTML = this.buildButtonLabel(field, newBehavior, newRenderer);
                 }
                 modal.hide();
             });
 
-            // Delete button inside the modal body.
             modal.getBody()[0].addEventListener('click', (e) => {
                 if (e.target.closest('[data-action="dlx-delete"]')) {
                     button.remove();
@@ -223,10 +350,13 @@ class PatternDialogue {
             });
 
         } else {
-            // Action tag: simple modal with only a delete option.
+            // Action tag: display the tag text, allow deletion only.
+            const action = pattern.replace(/^##|##$/g, '');
+            const titleStr = await Str.get_string('tagproperties', 'datalynx', {tagtype: 'Action', tagname: action});
             const bodyHtml =
-                '<p>' + (button.getAttribute('data-datalynx-field') || button.textContent) + '</p>' +
-                '<button type="button" class="btn btn-danger btn-sm" data-action="dlx-delete">' + deleteLabel + '</button>';
+                '<p><code>' + pattern + '</code></p>' +
+                '<button type="button" class="btn btn-danger btn-sm" data-action="dlx-delete">' +
+                deleteLabel + '</button>';
 
             const modal = await Modal.create({
                 title: titleStr,
@@ -244,96 +374,41 @@ class PatternDialogue {
         }
     }
 
-    waitForTinyMCE() {
-        if (window.tinyMCE?.activeEditor && window.tinyMCE.get().length > 0) {
-            this.initReplaceTagsWithButtons();
-        } else {
-            setTimeout(() => this.waitForTinyMCE(), 100);
-        }
-    }
-
-    initReplaceTagsWithButtons() {
-        window.tinyMCE.get().forEach((editor) => {
-            editor.on('SetContent', () => this.reInitializeButtons(editor));
-            editor.on('change', () => this.reInitializeButtons(editor));
-            // SaveContent fires inside editor.save() BEFORE content is written to the textarea.
-            // This is the only reliable interception point to convert buttons back to tags.
-            editor.on('SaveContent', (e) => {
-                e.content = this.convertButtonsInHtml(e.content);
-            });
-            if (editor.initialized) {
-                this.replaceTagsWithButtons(editor);
-            } else {
-                editor.on('init', () => this.replaceTagsWithButtons(editor));
-            }
-        });
-    }
-
-    /**
-     * Convert datalynx button elements in an HTML string back to tag syntax.
-     * Called from the SaveContent hook.
-     * @param {string} html Serialized editor HTML from TinyMCE
-     * @returns {string} HTML with buttons replaced by [[field|behavior|renderer]] / ##action##
-     */
-    convertButtonsInHtml(html) {
-        const div = document.createElement('div');
-        div.innerHTML = html;
-
-        div.querySelectorAll('button[data-action-tag-button]').forEach((btn) => {
-            btn.replaceWith('##' + btn.getAttribute('data-datalynx-field') + '##');
-        });
-
-        div.querySelectorAll('button.datalynx-field-tag').forEach((btn) => {
-            const field = (btn.getAttribute('data-datalynx-field') || '').trim();
-            const behavior = btn.getAttribute('data-datalynx-behavior') || '';
-            const renderer = btn.getAttribute('data-datalynx-renderer') || '';
-            let tag;
-            if (renderer) {
-                tag = '[[' + field + '|' + behavior + '|' + renderer + ']]';
-            } else if (behavior) {
-                tag = '[[' + field + '|' + behavior + ']]';
-            } else {
-                tag = '[[' + field + ']]';
-            }
-            btn.replaceWith(tag);
-        });
-
-        return div.innerHTML;
-    }
+    // -------------------------------------------------------------------------
+    // Dropdown tag insertion
+    // -------------------------------------------------------------------------
 
     insertTagFromDropdown(dropdown) {
         const selectedValue = dropdown.value;
         const actionTagMatch = selectedValue.match(/^##(.+?)##$/);
-        const fieldTagMatch = selectedValue.match(/^\[\[([^\|\]]+)(?:\|([^\|\]]*))?(?:\|([^\|\]]*))?\]\]$/);
-        let contentToInsert = '';
+        const fieldTagMatch  = selectedValue.match(FIELD_TAG_RE);
+        let contentToInsert  = '';
 
         if (actionTagMatch) {
             const action = actionTagMatch[1];
             contentToInsert =
                 '<button type="button" contenteditable="false" data-action-tag-button="true"' +
-                ' data-datalynx-field="' + action + '">' + action + '</button>';
+                ' data-datalynx-field="' + selectedValue + '">' + action + '</button>';
         } else if (fieldTagMatch) {
-            const field = fieldTagMatch[1];
+            const field    = fieldTagMatch[1];
             const behavior = fieldTagMatch[2] || '';
             const renderer = fieldTagMatch[3] || '';
             contentToInsert =
                 '<button type="button" contenteditable="false" class="datalynx-field-tag"' +
-                ' data-datalynx-field="' + field + '" data-datalynx-behavior="' + behavior + '"' +
-                ' data-datalynx-renderer="' + renderer + '">' +
+                ' data-datalynx-field="' + selectedValue + '">' +
                 this.buildButtonLabel(field, behavior, renderer) + '</button>';
         } else {
             contentToInsert = selectedValue;
         }
 
-        const editorIdMatch = dropdown.id.match(/^(.+)_editor_.+_tag_menu$/);
-        if (editorIdMatch) {
-            const editorId = 'id_' + editorIdMatch[1] + '_editor';
-            window.tinyMCE.get().forEach((editor) => {
-                if (editor.id === editorId) {
-                    editor.insertContent(contentToInsert);
-                    this.reInitializeButtons(editor);
-                }
-            });
+        const m = dropdown.id.match(/^(.+_editor)_.+_tag_menu$/);
+        if (m) {
+            const editorId = 'id_' + m[1];
+            const ed = window.tinyMCE?.get(editorId);
+            if (ed) {
+                ed.insertContent(contentToInsert);
+                this.reInitializeButtons(ed);
+            }
         }
     }
 }
