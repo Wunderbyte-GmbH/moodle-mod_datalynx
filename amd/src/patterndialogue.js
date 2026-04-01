@@ -24,48 +24,90 @@
 
 import * as Str from 'core/str';
 import Modal from 'core/modal';
+import ModalSaveCancel from 'core/modal_save_cancel';
+import ModalEvents from 'core/modal_events';
 
 class PatternDialogue {
     constructor(options) {
         this.options = options;
-        this.dialogInstances = new Map();
     }
 
     init() {
         this.waitForTinyMCE();
 
-        // Add event listeners for all tag menu dropdowns
         document.querySelectorAll('select[id$="_tag_menu"]').forEach((dropdown) => {
             dropdown.addEventListener('change', () => this.insertTagFromDropdown(dropdown));
         });
     }
 
+    /**
+     * Replace [[field|behavior|renderer]] and ##action## tags in the editor with clickable buttons.
+     * @param {object} editor TinyMCE editor instance
+     */
     replaceTagsWithButtons(editor) {
         const div = document.createElement('div');
         div.innerHTML = editor.getContent();
 
         div.innerHTML = div.innerHTML
             .replace(/##([^#]+)##/g, (_, action) =>
-                `<button type="button" contenteditable="false" data-action-tag-button="true"
-                data-datalynx-field="${action}">${action}</button>`
+                '<button type="button" contenteditable="false" data-action-tag-button="true"' +
+                ' data-datalynx-field="' + action + '">' + action + '</button>'
             )
             .replace(/\[\[([^\|\]]+)(?:\|([^\|\]]*))?(?:\|([^\|\]]*))?\]\]/g,
-                (_, field, behavior = '', renderer = '') =>
-                    `<button type="button" contenteditable="false" class="datalynx-field-tag"
-                data-datalynx-field="${field}" data-datalynx-behavior="${behavior}"
-                data-datalynx-renderer="${renderer}">${field}</button>`
+                (_, field, behavior, renderer) => {
+                    behavior = behavior || '';
+                    renderer = renderer || '';
+                    return '<button type="button" contenteditable="false" class="datalynx-field-tag"' +
+                        ' data-datalynx-field="' + field + '" data-datalynx-behavior="' + behavior + '"' +
+                        ' data-datalynx-renderer="' + renderer + '">' +
+                        this.buildButtonLabel(field, behavior, renderer) + '</button>';
+                }
             );
 
         editor.setContent(div.innerHTML);
     }
 
+    /**
+     * Build the inner HTML label for a field tag button, including Bootstrap-compatible
+     * behavior/renderer badges (Bootstrap 4 + 5 compatible class names).
+     * @param {string} field
+     * @param {string} behavior
+     * @param {string} renderer
+     * @returns {string}
+     */
+    buildButtonLabel(field, behavior, renderer) {
+        let html = field;
+        if (behavior) {
+            html += ' <span class="badge badge-info bg-info" style="pointer-events:none">' + behavior + '</span>';
+        }
+        if (renderer) {
+            html += ' <span class="badge badge-secondary bg-secondary" style="pointer-events:none">' + renderer + '</span>';
+        }
+        return html;
+    }
+
+    /**
+     * Attach click listeners and data-id attributes to newly created buttons,
+     * and refresh badge labels on field-tag buttons.
+     * @param {object} editor TinyMCE editor instance
+     */
     reInitializeButtons(editor) {
         let dataid = 0;
         editor.getBody().querySelectorAll('button[data-action-tag-button], button.datalynx-field-tag').forEach((button) => {
             if (!button.getAttribute('data-click-initialized')) {
-                button.addEventListener('click', () => this.openMoodleDialog(button));
+                button.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.openMoodleDialog(button);
+                });
                 button.setAttribute('data-click-initialized', 'true');
-                button.setAttribute('data-id', `datalynx-button-id-${dataid++}`);
+                button.setAttribute('data-id', 'datalynx-button-id-' + dataid++);
+            }
+            if (button.classList.contains('datalynx-field-tag')) {
+                const field = button.getAttribute('data-datalynx-field') || '';
+                const behavior = button.getAttribute('data-datalynx-behavior') || '';
+                const renderer = button.getAttribute('data-datalynx-renderer') || '';
+                button.innerHTML = this.buildButtonLabel(field, behavior, renderer);
             }
         });
     }
@@ -73,7 +115,7 @@ class PatternDialogue {
     /**
      * Find the TinyMCE editor that owns the given button DOM element.
      * @param {HTMLElement} btn
-     * @returns {object|null} TinyMCE editor instance or null
+     * @returns {object|null}
      */
     findEditorForButton(btn) {
         for (const ed of (window.tinyMCE?.get() || [])) {
@@ -91,7 +133,7 @@ class PatternDialogue {
      */
     findButtonById(buttonId) {
         for (const ed of (window.tinyMCE?.get() || [])) {
-            const found = ed.getBody().querySelector(`[data-id="${buttonId}"]`);
+            const found = ed.getBody().querySelector('[data-id="' + buttonId + '"]');
             if (found) {
                 return found;
             }
@@ -99,91 +141,126 @@ class PatternDialogue {
         return null;
     }
 
+    /**
+     * Open a Moodle dialog for editing a tag button's properties.
+     * Field-tag buttons use ModalSaveCancel (reliable footer Save button).
+     * Action-tag buttons use a simple Modal with a delete button only.
+     * @param {HTMLElement} button
+     */
     async openMoodleDialog(button) {
         const isFieldTag = button.classList.contains('datalynx-field-tag');
         const buttonId = button.getAttribute('data-id');
         const currentBehavior = button.getAttribute('data-datalynx-behavior') || '';
         const currentRenderer = button.getAttribute('data-datalynx-renderer') || '';
 
-        let bodyHtml;
-        if (isFieldTag) {
-            const behaviors = Object.entries(this.options.behaviors || {})
-                .map(([val, label]) =>
-                    `<option value="${val}" ${val === currentBehavior ? 'selected' : ''}>${label}</option>`
-                ).join('');
-            const field = button.getAttribute('data-datalynx-field');
-            const fieldType = (this.options.types || {})[field] || '';
-            const renderers = Object.entries((this.options.renderers || {})[field] || {})
-                .map(([val, label]) =>
-                    `<option value="${val}" ${val === currentRenderer ? 'selected' : ''}>${label}</option>`
-                ).join('');
-            bodyHtml = `
-                <p data-region="datalynx-tag-field">${field}</p>
-                <p data-region="datalynx-tag-fieldtype">${fieldType}</p>
-                <label>${await Str.get_string('behavior', 'datalynx')}</label>
-                <select data-region="tag-behavior-select" id="datalynx-tag-behavior-select">
-                    ${behaviors}
-                </select>
-                <label>${await Str.get_string('renderer', 'datalynx')}</label>
-                <select data-region="tag-renderer-select" id="datalynx-tag-renderer-select">
-                    ${renderers}
-                </select>
-                <button type="button" data-region="save-tag">${await Str.get_string('savechanges', 'moodle')}</button>
-                <button type="button" data-region="delete-tag">${await Str.get_string('deletetag', 'datalynx')}</button>
-            `;
-        } else {
-            bodyHtml = `
-                <p data-region="datalynx-tag-action">${button.textContent}</p>
-                <button type="button" data-region="delete-tag">${await Str.get_string('deletetag', 'datalynx')}</button>
-            `;
-        }
+        const [behaviorLabel, rendererLabel, deleteLabel] = await Promise.all([
+            Str.get_string('behavior', 'datalynx'),
+            Str.get_string('renderer', 'datalynx'),
+            Str.get_string('deletetag', 'datalynx'),
+        ]);
 
         const tagtype = isFieldTag ? 'Field' : 'Action';
         const tagname = isFieldTag ? button.getAttribute('data-datalynx-field') : button.textContent;
-        const modal = await Modal.create({
-            title: await Str.get_string('tagproperties', 'datalynx', {tagtype, tagname}),
-            body: bodyHtml,
-            show: true,
-            removeOnClose: true,
-        });
-
-        const modalBody = modal.getBody()[0];
+        const titleStr = await Str.get_string('tagproperties', 'datalynx', {tagtype, tagname});
 
         if (isFieldTag) {
-            modalBody.querySelector('[data-region="save-tag"]')?.addEventListener('click', () => {
-                const behaviorSelect = modalBody.querySelector('[data-region="tag-behavior-select"]');
-                const rendererSelect = modalBody.querySelector('[data-region="tag-renderer-select"]');
-                const newBehavior = behaviorSelect?.value ?? '';
-                const newRenderer = rendererSelect?.value ?? '';
+            const field = button.getAttribute('data-datalynx-field');
+            const fieldType = (this.options.types || {})[field] || '';
 
-                // Find the button fresh from the editor to avoid stale references.
-                const liveButton = this.findButtonById(buttonId) ?? button;
+            const behaviorsHtml = Object.entries(this.options.behaviors || {})
+                .map(([val, label]) =>
+                    '<option value="' + val + '"' + (val === currentBehavior ? ' selected="selected"' : '') + '>' +
+                    label + '</option>'
+                ).join('');
+            const renderersHtml = Object.entries((this.options.renderers || {})[field] || {})
+                .map(([val, label]) =>
+                    '<option value="' + val + '"' + (val === currentRenderer ? ' selected="selected"' : '') + '>' +
+                    label + '</option>'
+                ).join('');
+
+            const fieldInfo = field + (fieldType ? ' <small class="text-muted">(' + fieldType + ')</small>' : '');
+            const bodyHtml =
+                '<p><strong>' + fieldInfo + '</strong></p>' +
+                '<div class="form-group">' +
+                '<label for="dlx-behavior-select">' + behaviorLabel + '</label>' +
+                '<select class="form-control custom-select" id="dlx-behavior-select" name="dlx-behavior-select">' +
+                behaviorsHtml +
+                '</select></div>' +
+                '<div class="form-group">' +
+                '<label for="dlx-renderer-select">' + rendererLabel + '</label>' +
+                '<select class="form-control custom-select" id="dlx-renderer-select" name="dlx-renderer-select">' +
+                renderersHtml +
+                '</select></div>' +
+                '<div class="mt-2">' +
+                '<button type="button" class="btn btn-danger btn-sm" data-action="dlx-delete">' + deleteLabel + '</button>' +
+                '</div>';
+
+            const modal = await ModalSaveCancel.create({
+                title: titleStr,
+                body: bodyHtml,
+                show: true,
+                removeOnClose: true,
+            });
+
+            // Save: read select values, update button data attributes, rebuild label badges.
+            modal.getRoot().on(ModalEvents.save, (e) => {
+                e.preventDefault();
+
+                const modalBody = modal.getBody()[0];
+                const behaviorSelect = modalBody.querySelector('#dlx-behavior-select');
+                const rendererSelect = modalBody.querySelector('#dlx-renderer-select');
+                const newBehavior = behaviorSelect ? behaviorSelect.value : '';
+                const newRenderer = rendererSelect ? rendererSelect.value : '';
+
+                const liveButton = this.findButtonById(buttonId) || button;
                 const ed = this.findEditorForButton(liveButton);
-
                 if (ed) {
                     ed.dom.setAttrib(liveButton, 'data-datalynx-behavior', newBehavior);
                     ed.dom.setAttrib(liveButton, 'data-datalynx-renderer', newRenderer);
-                    // Update visual label to reflect the selected behaviour/renderer.
-                    const field = liveButton.getAttribute('data-datalynx-field') || liveButton.textContent;
-                    const label = [field, newBehavior, newRenderer].filter(Boolean).join('|');
-                    liveButton.textContent = label || field;
+                    liveButton.innerHTML = this.buildButtonLabel(
+                        liveButton.getAttribute('data-datalynx-field') || field,
+                        newBehavior,
+                        newRenderer
+                    );
                     ed.undoManager.add();
-                    ed.nodeChanged();
                 } else {
                     liveButton.setAttribute('data-datalynx-behavior', newBehavior);
                     liveButton.setAttribute('data-datalynx-renderer', newRenderer);
+                    liveButton.innerHTML = this.buildButtonLabel(field, newBehavior, newRenderer);
                 }
-
                 modal.hide();
             });
+
+            // Delete button inside the modal body.
+            modal.getBody()[0].addEventListener('click', (e) => {
+                if (e.target.closest('[data-action="dlx-delete"]')) {
+                    const liveButton = this.findButtonById(buttonId) || button;
+                    liveButton.remove();
+                    modal.hide();
+                }
+            });
+
+        } else {
+            // Action tag: simple modal with only a delete option.
+            const bodyHtml =
+                '<p>' + (button.getAttribute('data-datalynx-field') || button.textContent) + '</p>' +
+                '<button type="button" class="btn btn-danger btn-sm" data-action="dlx-delete">' + deleteLabel + '</button>';
+
+            const modal = await Modal.create({
+                title: titleStr,
+                body: bodyHtml,
+                show: true,
+                removeOnClose: true,
+            });
+
+            modal.getBody()[0].addEventListener('click', (e) => {
+                if (e.target.closest('[data-action="dlx-delete"]')) {
+                    const liveButton = this.findButtonById(buttonId) || button;
+                    liveButton.remove();
+                    modal.hide();
+                }
+            });
         }
-
-        modalBody.querySelector('[data-region="delete-tag"]')?.addEventListener('click', () => {
-            button.remove();
-            modal.hide();
-        });
-
-        this.dialogInstances.set(buttonId, modal);
     }
 
     waitForTinyMCE() {
@@ -196,16 +273,14 @@ class PatternDialogue {
 
     initReplaceTagsWithButtons() {
         window.tinyMCE.get().forEach((editor) => {
-            // Register SetContent/change listeners before potentially triggering setContent below.
             editor.on('SetContent', () => this.reInitializeButtons(editor));
             editor.on('change', () => this.reInitializeButtons(editor));
-            // Hook into SaveContent — fires inside editor.save() BEFORE content is written to the
-            // underlying textarea. This is the only reliable place to convert buttons back to tags.
+            // SaveContent fires inside editor.save() BEFORE content is written to the textarea.
+            // This is the only reliable interception point to convert buttons back to tags.
             editor.on('SaveContent', (e) => {
                 e.content = this.convertButtonsInHtml(e.content);
             });
             if (editor.initialized) {
-                // Editor already initialized — 'init' event has already fired, so run directly.
                 this.replaceTagsWithButtons(editor);
             } else {
                 editor.on('init', () => this.replaceTagsWithButtons(editor));
@@ -214,36 +289,32 @@ class PatternDialogue {
     }
 
     /**
-     * Convert datalynx button elements in an HTML string back to [[field|behavior|renderer]] tags.
-     * Also converts action buttons back to ##action## tags.
-     * Called from the SaveContent hook so the converted content is what gets stored.
-     *
-     * @param {string} html Serialized editor HTML
-     * @returns {string} HTML with buttons replaced by their tag equivalents
+     * Convert datalynx button elements in an HTML string back to tag syntax.
+     * Called from the SaveContent hook.
+     * @param {string} html Serialized editor HTML from TinyMCE
+     * @returns {string} HTML with buttons replaced by [[field|behavior|renderer]] / ##action##
      */
     convertButtonsInHtml(html) {
         const div = document.createElement('div');
         div.innerHTML = html;
 
-        div.querySelectorAll('button[data-action-tag-button]').forEach((button) => {
-            button.replaceWith(`##${button.getAttribute('data-datalynx-field')}##`);
+        div.querySelectorAll('button[data-action-tag-button]').forEach((btn) => {
+            btn.replaceWith('##' + btn.getAttribute('data-datalynx-field') + '##');
         });
 
-        div.querySelectorAll('button.datalynx-field-tag').forEach((button) => {
-            const field = button.getAttribute('data-datalynx-field')?.trim();
-            const behavior = button.getAttribute('data-datalynx-behavior') || '';
-            const renderer = button.getAttribute('data-datalynx-renderer') || '';
-            // Always include both pipes when renderer is non-empty so that an empty behavior is
-            // not misread as the renderer by the PHP parser.
-            let rawFieldTag;
+        div.querySelectorAll('button.datalynx-field-tag').forEach((btn) => {
+            const field = (btn.getAttribute('data-datalynx-field') || '').trim();
+            const behavior = btn.getAttribute('data-datalynx-behavior') || '';
+            const renderer = btn.getAttribute('data-datalynx-renderer') || '';
+            let tag;
             if (renderer) {
-                rawFieldTag = `[[${field}|${behavior}|${renderer}]]`;
+                tag = '[[' + field + '|' + behavior + '|' + renderer + ']]';
             } else if (behavior) {
-                rawFieldTag = `[[${field}|${behavior}]]`;
+                tag = '[[' + field + '|' + behavior + ']]';
             } else {
-                rawFieldTag = `[[${field}]]`;
+                tag = '[[' + field + ']]';
             }
-            button.replaceWith(rawFieldTag);
+            btn.replaceWith(tag);
         });
 
         return div.innerHTML;
@@ -256,23 +327,26 @@ class PatternDialogue {
         let contentToInsert = '';
 
         if (actionTagMatch) {
-            contentToInsert = `<button type="button" contenteditable="false" class="action-tag-button"
-                data-action-tag-button="true" data-datalynx-field="${actionTagMatch[1]}">${actionTagMatch[1]}</button>`;
+            const action = actionTagMatch[1];
+            contentToInsert =
+                '<button type="button" contenteditable="false" data-action-tag-button="true"' +
+                ' data-datalynx-field="' + action + '">' + action + '</button>';
         } else if (fieldTagMatch) {
             const field = fieldTagMatch[1];
             const behavior = fieldTagMatch[2] || '';
             const renderer = fieldTagMatch[3] || '';
-            contentToInsert = `<button type="button" contenteditable="false" class="datalynx-field-tag"
-                data-datalynx-field="${field}" data-datalynx-behavior="${behavior}"
-                data-datalynx-renderer="${renderer}">${field}</button>`;
+            contentToInsert =
+                '<button type="button" contenteditable="false" class="datalynx-field-tag"' +
+                ' data-datalynx-field="' + field + '" data-datalynx-behavior="' + behavior + '"' +
+                ' data-datalynx-renderer="' + renderer + '">' +
+                this.buildButtonLabel(field, behavior, renderer) + '</button>';
         } else {
             contentToInsert = selectedValue;
         }
 
-        // Extract editor id from dropdown id, e.g., esection_editor_general_tag_menu -> id_esection_editor
         const editorIdMatch = dropdown.id.match(/^(.+)_editor_.+_tag_menu$/);
         if (editorIdMatch) {
-            const editorId = `id_${editorIdMatch[1]}_editor`;
+            const editorId = 'id_' + editorIdMatch[1] + '_editor';
             window.tinyMCE.get().forEach((editor) => {
                 if (editor.id === editorId) {
                     editor.insertContent(contentToInsert);
@@ -281,7 +355,6 @@ class PatternDialogue {
             });
         }
     }
-
 }
 
 export const init = () => {

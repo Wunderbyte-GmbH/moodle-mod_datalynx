@@ -97,10 +97,10 @@ Feature: Test text field behavior and renderer in datalynx
     And I switch to the "id_eparam2_editor" TinyMCE editor iframe
     And I click on "Datalynx field Text" "button"
     And I switch to the main frame
-    # Select behavior and renderer in the dialog
-    And I select "Text Behavior" from the "datalynx-tag-behavior-select" singleselect
-    And I select "Text Renderer" from the "datalynx-tag-renderer-select" singleselect
-    And I click on "[data-region='save-tag']" "css_element"
+    # Select behavior and renderer in the dialog (selects have id/name dlx-behavior-select / dlx-renderer-select)
+    And I set the field "dlx-behavior-select" to "Text Behavior"
+    And I set the field "dlx-renderer-select" to "Text Renderer"
+    And I click on ".modal [data-action='save']" "css_element"
     # Also insert Team member select field tag
     And I select "[[Datalynx field Team member select]]" from the "eparam2_editor_field_tag_menu" singleselect
     # Add raw ##edit## action tag so users with manageentries can enter edit mode
