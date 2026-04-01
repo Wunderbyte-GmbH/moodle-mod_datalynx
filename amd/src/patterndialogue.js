@@ -38,9 +38,6 @@ class PatternDialogue {
         document.querySelectorAll('select[id$="_tag_menu"]').forEach((dropdown) => {
             dropdown.addEventListener('change', () => this.insertTagFromDropdown(dropdown));
         });
-
-        const form = document.querySelector('#datalynx-view-edit-form');
-        form?.addEventListener('submit', () => this.convertButtonsToTagsBeforeSubmit());
     }
 
     replaceTagsWithButtons(editor) {
@@ -202,6 +199,11 @@ class PatternDialogue {
             // Register SetContent/change listeners before potentially triggering setContent below.
             editor.on('SetContent', () => this.reInitializeButtons(editor));
             editor.on('change', () => this.reInitializeButtons(editor));
+            // Hook into SaveContent — fires inside editor.save() BEFORE content is written to the
+            // underlying textarea. This is the only reliable place to convert buttons back to tags.
+            editor.on('SaveContent', (e) => {
+                e.content = this.convertButtonsInHtml(e.content);
+            });
             if (editor.initialized) {
                 // Editor already initialized — 'init' event has already fired, so run directly.
                 this.replaceTagsWithButtons(editor);
@@ -209,6 +211,42 @@ class PatternDialogue {
                 editor.on('init', () => this.replaceTagsWithButtons(editor));
             }
         });
+    }
+
+    /**
+     * Convert datalynx button elements in an HTML string back to [[field|behavior|renderer]] tags.
+     * Also converts action buttons back to ##action## tags.
+     * Called from the SaveContent hook so the converted content is what gets stored.
+     *
+     * @param {string} html Serialized editor HTML
+     * @returns {string} HTML with buttons replaced by their tag equivalents
+     */
+    convertButtonsInHtml(html) {
+        const div = document.createElement('div');
+        div.innerHTML = html;
+
+        div.querySelectorAll('button[data-action-tag-button]').forEach((button) => {
+            button.replaceWith(`##${button.getAttribute('data-datalynx-field')}##`);
+        });
+
+        div.querySelectorAll('button.datalynx-field-tag').forEach((button) => {
+            const field = button.getAttribute('data-datalynx-field')?.trim();
+            const behavior = button.getAttribute('data-datalynx-behavior') || '';
+            const renderer = button.getAttribute('data-datalynx-renderer') || '';
+            // Always include both pipes when renderer is non-empty so that an empty behavior is
+            // not misread as the renderer by the PHP parser.
+            let rawFieldTag;
+            if (renderer) {
+                rawFieldTag = `[[${field}|${behavior}|${renderer}]]`;
+            } else if (behavior) {
+                rawFieldTag = `[[${field}|${behavior}]]`;
+            } else {
+                rawFieldTag = `[[${field}]]`;
+            }
+            button.replaceWith(rawFieldTag);
+        });
+
+        return div.innerHTML;
     }
 
     insertTagFromDropdown(dropdown) {
@@ -244,37 +282,6 @@ class PatternDialogue {
         }
     }
 
-    convertButtonsToTagsBeforeSubmit() {
-        window.tinyMCE.get().forEach((editor) => {
-            // Work directly on the live editor DOM to avoid any serialiser attribute loss.
-            const body = editor.getBody();
-            const div = document.createElement('div');
-            div.innerHTML = body.innerHTML;
-
-            div.querySelectorAll('button[data-action-tag-button]').forEach((button) => {
-                button.replaceWith(`##${button.getAttribute('data-datalynx-field')}##`);
-            });
-
-            div.querySelectorAll('button.datalynx-field-tag').forEach((button) => {
-                const field = button.getAttribute('data-datalynx-field')?.trim();
-                const behavior = button.getAttribute('data-datalynx-behavior') || '';
-                const renderer = button.getAttribute('data-datalynx-renderer') || '';
-                // Always write [[field|behavior|renderer]] when renderer is non-empty so
-                // that an empty behavior is not mistaken for the renderer by the PHP parser.
-                let rawFieldTag;
-                if (renderer) {
-                    rawFieldTag = `[[${field}|${behavior}|${renderer}]]`;
-                } else if (behavior) {
-                    rawFieldTag = `[[${field}|${behavior}]]`;
-                } else {
-                    rawFieldTag = `[[${field}]]`;
-                }
-                button.replaceWith(rawFieldTag);
-            });
-
-            editor.setContent(div.innerHTML);
-        });
-    }
 }
 
 export const init = () => {
