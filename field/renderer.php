@@ -119,7 +119,11 @@ abstract class datalynxfield_renderer {
             }
 
             $currentoptions['visible'] = $behavior->is_visible_to_user($entry);
-            $currentoptions['editable'] = $behavior->is_editable_by_user();
+            // Pass isentryauthor: for new entries the current user will be the author;
+            // for existing entries compare entry userid with current user.
+            global $USER;
+            $isentryauthor = empty($entry->id) || (isset($entry->userid) && (string)$entry->userid === (string)$USER->id);
+            $currentoptions['editable'] = $behavior->is_editable_by_user(null, $isentryauthor);
             $currentoptions['required'] = $behavior->is_required();
             $currentoptions['internal'] = $this->field->is_internal();
 

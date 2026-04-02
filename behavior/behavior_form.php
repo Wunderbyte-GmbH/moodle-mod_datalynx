@@ -212,7 +212,9 @@ class datalynx_field_behavior_form extends moodleform {
             if (!isset($data->visibleto)) {
                 $data->visibleto = [];
             }
-            if (!isset($data->editableby)) {
+            // When editable is unchecked, disabledIf hides the UI widget but the autocomplete's
+            // hidden inputs still submit previously-selected values. Force empty when unchecked.
+            if (empty($data->editable) || !isset($data->editableby)) {
                 $data->editableby = [];
                 $data->editable = false;
             }
