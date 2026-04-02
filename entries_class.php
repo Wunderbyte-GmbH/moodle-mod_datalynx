@@ -393,7 +393,6 @@ class datalynx_entries {
                     "entryid {$eids} AND fieldid {$fids}",
                     $params
                 );
-
                 // If we see multiple contents to one entry and field, build array with postfix _fieldgroup.
                 foreach ($contents as $contentid => $content) {
                     $entry = $entries->entries[$content->entryid];

@@ -20,6 +20,9 @@
  * @copyright David Bogner 2021 based on 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+use mod_datalynx\datalynx;
+
 defined('MOODLE_INTERNAL') || die();
 require_once(dirname(__FILE__) . '/../classes/local/datalynx.php');
 
@@ -30,43 +33,40 @@ require_once(dirname(__FILE__) . '/../classes/local/datalynx.php');
  */
 class datalynx_field_behavior {
     /** @var int The behavior record id. */
-    private $id;
+    private int $id;
 
     /** @var string The behavior name. */
-    private $name;
+    private string $name;
 
     /** @var string The behavior description. */
-    private $description;
+    private string $description;
 
     /** @var int The datalynx instance id. */
-    private $dataid;
+    private int $dataid;
 
     /** @var array Visibility settings for this behavior. */
-    private $visibleto;
+    private array $visibleto;
 
     /** @var array Editability settings for this behavior. */
-    private $editableby;
+    private array $editableby;
 
     /** @var bool Whether this field is required. */
-    private $required;
+    private bool $required;
 
     /**
      * @var datalynx The related datalynx instance object.
      */
-    private $datalynx;
+    private datalynx $datalynx;
 
     /**
      * @var stdClass The db record for this behavior.
      */
-    private $record;
+    private stdClass $record;
 
     /**
      * Constructor for behavior instance. Unserializes serialized data fetched from behavior table.
      *
      * @param $record
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws moodle_exception
      */
     private function __construct($record) {
         $this->id = $record->id;
@@ -111,9 +111,6 @@ class datalynx_field_behavior {
      *
      * @param $id
      * @return datalynx_field_behavior|false
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws moodle_exception
      */
     public static function from_id($id) {
         global $DB;
@@ -140,7 +137,7 @@ class datalynx_field_behavior {
     /**
      * The default behavior used in any instance without user settings applied.
      *
-     * @param \mod_datalynx\datalynx $datalynx
+     * @param datalynx $datalynx
      * @return datalynx_field_behavior
      * @throws coding_exception
      * @throws dml_exception
@@ -186,7 +183,7 @@ class datalynx_field_behavior {
             return true;
         }
         // If special visibletouser is set overrule other visibility options.
-        if (isset($this->visibleto['users']) && in_array($USER->id, $this->visibleto['users'])) {
+        if (isset($this->visibleto['users']) && in_array((string)$USER->id, array_map('strval', $this->visibleto['users']))) {
             return true;
         }
 
