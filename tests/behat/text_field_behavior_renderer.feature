@@ -91,8 +91,6 @@ Feature: Test text field behavior and renderer in datalynx
     And I change window size to "large"
     And I click on "Edit Behavior Renderer View" "link"
     And I click on "Entry template" "link"
-    # Insert Text field tag from the field tags dropdown
-    And I select "[[Datalynx field Text]]" from the "eparam2_editor_field_tag_menu" singleselect
     # Open the dialog for the Text field tag button to assign behavior and renderer
     And I switch to the "id_eparam2_editor" TinyMCE editor iframe
     And I click on "Datalynx field Text" "button"
@@ -101,10 +99,6 @@ Feature: Test text field behavior and renderer in datalynx
     And I set the field "dlx-behavior-select" to "Text Behavior"
     And I set the field "dlx-renderer-select" to "Text Renderer"
     And I click on ".modal [data-action='save']" "css_element"
-    # Also insert Team member select field tag
-    And I select "[[Datalynx field Team member select]]" from the "eparam2_editor_field_tag_menu" singleselect
-    # Add raw ##edit## action tag so users with manageentries can enter edit mode
-    And I add to "id_eparam2_editor" editor the text " ##edit##"
     And I press "Save changes"
     And I log out
 
@@ -127,24 +121,21 @@ Feature: Test text field behavior and renderer in datalynx
     And I follow "Datalynx Test Instance"
     Then I should see "I am not visible"
     And I should not see "Hello World"
-
-  Scenario: Student 3 explicitly listed sees the display template with value
+    #  Student 3 explicitly listed sees the display template with value
     When I log in as "student3"
     And I am on "Course 1" course homepage
     And I follow "Datalynx Test Instance"
     Then I should see "This is the display template:"
     And I should see "Hello World"
     And I should not see "I am not visible"
-
-  Scenario: Student 4 selected as team member sees the display template with value
+    #  Student 4 selected as team member sees the display template with value
     When I log in as "student4"
     And I am on "Course 1" course homepage
     And I follow "Datalynx Test Instance"
     Then I should see "This is the display template:"
     And I should see "Hello World"
     And I should not see "I am not visible"
-
-  Scenario: Teacher sees display template in view mode and disabled input in edit mode
+    # Teacher sees display template in view mode and disabled input in edit mode
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Datalynx Test Instance"
@@ -154,8 +145,7 @@ Feature: Test text field behavior and renderer in datalynx
     When I follow "Edit"
     Then I should see "This is the display template:"
     And "input[disabled]" "css_element" should exist
-
-  Scenario: Manager sees the edit template with input in edit mode
+    # Manager sees the edit template with input in edit mode
     When I log in as "manager1"
     And I am on "Course 1" course homepage
     And I follow "Datalynx Test Instance"
