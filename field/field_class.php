@@ -330,6 +330,15 @@ abstract class datalynxfield_base {
 
         $fieldid = $this->field->id;
         $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
+
+        // If the field was not submitted at all (e.g. a disabled input is not sent by the browser),
+        // $values is an empty array []. Preserve the existing content in that case.
+        // Note: a field submitted with an empty value produces ['' => ''] (non-empty array),
+        // which correctly bypasses this guard and proceeds to clear the stored content.
+        if (is_array($values) && empty($values) && !is_null($contentid)) {
+            return true;
+        }
+
         [$contents, $oldcontents] = $this->format_content($entry, $values);
 
         $rec = new stdClass();

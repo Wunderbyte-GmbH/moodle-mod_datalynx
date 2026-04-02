@@ -39,24 +39,6 @@ Feature: Test text field behavior and renderer in datalynx
     And I set the field "Student" to "1"
     And I press "Save changes"
 
-    # Add behavior "Text Behavior" via Manage > Fields > Behaviors
-    And I am on "Course 1" course homepage
-    And I follow "Datalynx Test Instance"
-    And I click on ".nav-item [title='Manage']" "css_element"
-    And I follow "Fields"
-    And I follow "Behaviors"
-    And I follow "Add behavior"
-    And I set the field "Name" to "Text Behavior"
-    # Set visibletopermission to Manager and Teacher only (remove Student from default selection)
-    And I set the field "Visible to" to "Manager, Teacher"
-    # Add Student 3 to the explicit user visibility list
-    And I set the field "Other user" to "Student 3"
-    # Add Team member select field to team member visibility
-    And I set the field "Team member select field" to "Datalynx field Team member select"
-    # Disable editing for everyone
-    And I set the field "id_editable" to "0"
-    And I press "Save changes"
-
     # Add renderer "Text Renderer" via Manage > Fields > Renderers
     And I am on "Course 1" course homepage
     And I follow "Datalynx Test Instance"
@@ -86,9 +68,40 @@ Feature: Test text field behavior and renderer in datalynx
       | description | Test behavior renderer |
     And I follow "Set as default view"
     And I follow "Set as edit view"
+    And I log out
+    # Log in as manager1 and add an entry with Text="Hello World" and Student 4 as team member
+    And I log in as "manager1"
+    And I change window size to "large"
+    And I am on "Course 1" course homepage
+    And I follow "Datalynx Test Instance"
+    And I follow "Add a new entry"
+    And I fill in the entry form fields
+      | type             | name               | value                            |
+      | text             | Text               | Hello World                      |
+      | teammemberselect | Team member select | Student 4 (student4@example.com) |
+    And I press "Save changes"
+    And I press "Continue"
+    # After adding an entry we want to make it impossible to edit the text field via adding a behavior
+    # Add behavior "Text Behavior" via Manage > Fields > Behaviors
+    And I am on "Course 1" course homepage
+    And I follow "Datalynx Test Instance"
+    And I click on ".nav-item [title='Manage']" "css_element"
+    And I follow "Fields"
+    And I follow "Behaviors"
+    And I follow "Add behavior"
+    And I set the field "Name" to "Text Behavior"
+    # Set visibletopermission to Manager and Teacher only (remove Student from default selection)
+    And I set the field "Visible to" to "Manager, Teacher"
+    # Add Student 3 to the explicit user visibility list
+    And I set the field "Other user" to "Student 3"
+    # Add Team member select field to team member visibility
+    And I set the field "Team member select field" to "Datalynx field Team member select"
+    # Disable editing for everyone
+    And I set the field "id_editable" to "0"
+    And I press "Save changes"
 
     # Edit view to add entry template with field tags via JavaScript dialog
-    And I change window size to "large"
+    And I follow "Views"
     And I click on "Edit Behavior Renderer View" "link"
     And I click on "Entry template" "link"
     # Open the dialog for the Text field tag button to assign behavior and renderer
@@ -100,19 +113,6 @@ Feature: Test text field behavior and renderer in datalynx
     And I set the field "dlx-renderer-select" to "Text Renderer"
     And I click on ".modal [data-action='save']" "css_element"
     And I press "Save changes"
-    And I log out
-
-    # Log in as manager1 and add an entry with Text="Hello World" and Student 4 as team member
-    And I log in as "manager1"
-    And I am on "Course 1" course homepage
-    And I follow "Datalynx Test Instance"
-    And I follow "Add a new entry"
-    And I fill in the entry form fields
-      | type             | name               | value                            |
-      | text             | Text               | Hello World                      |
-      | teammemberselect | Team member select | Student 4 (student4@example.com) |
-    And I press "Save changes"
-    And I press "Continue"
     And I log out
 
   Scenario: Student with no visibility sees the not-visible custom template
@@ -142,14 +142,14 @@ Feature: Test text field behavior and renderer in datalynx
     Then I should see "This is the display template:"
     And I should see "Hello World"
     # Open edit mode: teacher has manageentries capability so ##edit## renders an Edit link
-    When I follow "Edit"
+    When I click on "a [aria-label='Edit']" "css_element"
     Then "input[disabled]" "css_element" should exist
-    # Manager sees the edit template with input in edit mode
+    # Manager also sees a disabled input in edit mode (editableby=[] means no one can edit)
     When I log in as "manager1"
     And I am on "Course 1" course homepage
     And I follow "Datalynx Test Instance"
     Then I should see "This is the display template:"
     And I should see "Hello World"
-    When I follow "Edit"
-    Then I should see "The edit template"
+    When I click on "a [aria-label='Edit']" "css_element"
+    Then "input[disabled]" "css_element" should exist
     And I should not see "I am not visible"

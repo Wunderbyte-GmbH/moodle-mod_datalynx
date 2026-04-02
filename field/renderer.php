@@ -140,25 +140,26 @@ abstract class datalynxfield_renderer {
                     // EDIT MODE ===.
                     if (!$currentoptions['editable']) {
                         // NOT EDITABLE ===.
+                        $noteditabletemplate = $renderer->get_not_editable_template();
                         if (
-                            $renderer->get_not_editable_template() === $renderer::NOT_EDITABLE_SHOW_NOTHING
+                            $noteditabletemplate === $renderer::NOT_EDITABLE_SHOW_NOTHING
                         ) {
                             $replacements[$tag] = ['html', ''];
                         } else if (
-                            $renderer->get_not_editable_template() === $renderer::NOT_EDITABLE_SHOW_DISABLED
+                            $noteditabletemplate === $renderer::NOT_EDITABLE_SHOW_DISABLED
                         ) {
                             // Show the field input rendered as disabled.
                             $currentoptions['editable'] = true;
                             $currentoptions['disabled'] = true;
                             $replacements[$tag] = ['', [[$this, 'prerender_edit_mode'], [$entry, $currentoptions]]];
                         } else if (
-                            $renderer->get_not_editable_template() === $renderer::NOT_EDITABLE_SHOW_AS_DISPLAY_MODE
+                            $noteditabletemplate === $renderer::NOT_EDITABLE_SHOW_AS_DISPLAY_MODE
                         ) {
                             $currentoptions['template'] = $renderer->get_display_template();
                             $currentoptions['value'] = $this->render_display_mode($entry, $currentoptions);
                             $replacements[$tag] = ['', [[$this, 'prerender_edit_mode'], [$entry, $currentoptions]]];
                         } else {
-                            $replacements[$tag] = ['html', $renderer->get_not_editable_template()];
+                            $replacements[$tag] = ['html', $noteditabletemplate];
                         }
                     } else {
                         // EDITABLE ===.

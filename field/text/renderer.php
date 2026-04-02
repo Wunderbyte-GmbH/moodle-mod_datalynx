@@ -49,6 +49,18 @@ class datalynxfield_text_renderer extends datalynxfield_renderer {
         if ($entryid > 0 && !empty($entry->{"c{$fieldid}_content"})) {
             $content = $entry->{"c{$fieldid}_content"};
         }
+
+        // Render disabled input as raw HTML — Moodle's QuickForm does not reliably
+        // propagate the disabled attribute through its template-based rendering.
+        if (!empty($options['disabled'])) {
+            $mform->addElement(
+                'html',
+                '<input type="text" name="' . $fieldname . '" value="' . s($content) .
+                '" size="30" disabled="disabled" class="form-control">'
+            );
+            return;
+        }
+
         $fieldattr = [];
         $fieldattr['size'] = 30;
 
