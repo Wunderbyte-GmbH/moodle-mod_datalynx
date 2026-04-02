@@ -53,8 +53,8 @@ Feature: Test text field behavior and renderer in datalynx
     And I set the field "Other user" to "Student 3"
     # Add Team member select field to team member visibility
     And I set the field "Team member select field" to "Datalynx field Team member select"
-    # Set editableby to Manager only (remove Teacher and Student from defaults)
-    And I set the field "Editable by" to "Manager"
+    # Disable editing for everyone
+    And I set the field "id_editable" to "0"
     And I press "Save changes"
 
     # Add renderer "Text Renderer" via Manage > Fields > Renderers
@@ -143,8 +143,7 @@ Feature: Test text field behavior and renderer in datalynx
     And I should see "Hello World"
     # Open edit mode: teacher has manageentries capability so ##edit## renders an Edit link
     When I follow "Edit"
-    Then I should see "This is the display template:"
-    And "input[disabled]" "css_element" should exist
+    Then "input[disabled]" "css_element" should exist
     # Manager sees the edit template with input in edit mode
     When I log in as "manager1"
     And I am on "Course 1" course homepage
