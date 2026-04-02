@@ -77,6 +77,11 @@ class PatternDialogue {
     constructor(options) {
         this.options = options;
         this._currentButton = null;
+        // Track which button DOM elements already have a click listener.
+        // Using a WeakSet (keyed on the actual element reference) instead of a
+        // data-attribute so that fresh DOM nodes created after a TinyMCE source-edit
+        // are never falsely considered "already initialized".
+        this._initializedButtons = new WeakSet();
     }
 
     init() {
@@ -116,7 +121,9 @@ class PatternDialogue {
         div.innerHTML = div.innerHTML
             // ##action## tags
             .replace(/##([^#]+)##/g, (match, action) =>
-                '<button type="button" contenteditable="false" data-action-tag-button="true"' +
+                '<button type="button" contenteditable="false"' +
+                ' class="btn btn-sm btn-outline-info"' +
+                ' data-action-tag-button="true"' +
                 ' data-datalynx-field="' + match + '">' + action + '</button>'
             )
             // [[field|behavior|renderer]] tags
@@ -124,7 +131,8 @@ class PatternDialogue {
                 (match, field, behavior, renderer) => {
                     behavior = behavior || '';
                     renderer = renderer || '';
-                    return '<button type="button" contenteditable="false" class="datalynx-field-tag"' +
+                    return '<button type="button" contenteditable="false"' +
+                        ' class="btn btn-sm btn-outline-secondary datalynx-field-tag"' +
                         ' data-datalynx-field="' + match + '">' +
                         this.buildButtonLabel(field, behavior, renderer) + '</button>';
                 }
@@ -187,14 +195,14 @@ class PatternDialogue {
         editor.getBody().querySelectorAll(
             'button[data-action-tag-button], button.datalynx-field-tag'
         ).forEach((button) => {
-            if (!button.getAttribute('data-click-initialized')) {
+            if (!this._initializedButtons.has(button)) {
                 button.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     this._currentButton = button;
                     this.openMoodleDialog(button);
                 });
-                button.setAttribute('data-click-initialized', 'true');
+                this._initializedButtons.add(button);
             }
             // Refresh badge label from the stored pattern.
             if (button.classList.contains('datalynx-field-tag')) {
@@ -400,14 +408,17 @@ class PatternDialogue {
         if (actionTagMatch) {
             const action = actionTagMatch[1];
             contentToInsert =
-                '<button type="button" contenteditable="false" data-action-tag-button="true"' +
+                '<button type="button" contenteditable="false"' +
+                ' class="btn btn-sm btn-outline-info"' +
+                ' data-action-tag-button="true"' +
                 ' data-datalynx-field="' + selectedValue + '">' + action + '</button>';
         } else if (fieldTagMatch) {
             const field    = fieldTagMatch[1];
             const behavior = fieldTagMatch[2] || '';
             const renderer = fieldTagMatch[3] || '';
             contentToInsert =
-                '<button type="button" contenteditable="false" class="datalynx-field-tag"' +
+                '<button type="button" contenteditable="false"' +
+                ' class="btn btn-sm btn-outline-secondary datalynx-field-tag"' +
                 ' data-datalynx-field="' + selectedValue + '">' +
                 this.buildButtonLabel(field, behavior, renderer) + '</button>';
         } else {
