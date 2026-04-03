@@ -25,8 +25,6 @@
 
 namespace mod_datalynx\search;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Search area for mod_datalynx activity entries.
  *
@@ -162,15 +160,33 @@ class entry extends \core_search\base_mod {
     }
 
     // Important for moodle 3.3 support.
+    /**
+     * Returns a recordset of documents modified since the given timestamp.
+     *
+     * @param int $modifiedfrom timestamp
+     * @return \moodle_recordset
+     */
     public function get_recordset_by_timestamp($modifiedfrom = 0) {
         return $this->get_document_recordset($modifiedfrom);
     }
 
+    /**
+     * Returns the URL for a search document.
+     *
+     * @param \core_search\document $doc
+     * @return \moodle_url
+     */
     public function get_doc_url(\core_search\document $doc) {
         $entry = $this->get_entry($doc->get('itemid'));
         return new \moodle_url('/mod/datalynx/view.php', ['d' => $entry->dataid, 'eids' => $entry->id]);
     }
 
+    /**
+     * Returns the context URL for a search document.
+     *
+     * @param \core_search\document $doc
+     * @return \moodle_url
+     */
     public function get_context_url(\core_search\document $doc) {
         $entry = $this->get_entry($doc->get('itemid'));
         return new \moodle_url('/mod/datalynx/view.php', ['d' => $entry->dataid]);

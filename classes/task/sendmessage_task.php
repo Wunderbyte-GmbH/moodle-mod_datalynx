@@ -19,12 +19,10 @@
  *
  * @package    mod_datalynx
  * @copyright 2017 Thomas Niedermaier <thomas.niedermaier@gmail.com>
- * @license    http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace mod_datalynx\task;
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Adhock class, used to send notifications to users.

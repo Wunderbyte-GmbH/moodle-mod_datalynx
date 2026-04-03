@@ -18,6 +18,8 @@
  * Privacy provider implementation for mod_datalynx.
  *
  * @package mod_datalynx
+ * @copyright 2018 onwards The datalynx contributors
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace mod_datalynx\privacy;
@@ -329,15 +331,7 @@ class provider implements
                 ['fieldid' => $fieldobj->id, 'entryid' => $recordobj->id]
             );
 
-            // Allow datafield plugin to implement their own deletion.
-            // TODO: MDL-0000 Implement this if needed.
-            /*
-            $classname = manager::get_provider_classname_for_component('datafield_' . $fieldobj->type);
-            if (class_exists($classname) && is_subclass_of($classname, datafield_provider::class)) {
-                component_class_callback($classname, 'delete_data_content',
-                    [$context, $recordobj, $fieldobj, $contentobj]);
-            }
-            */
+            // Allow datafield plugin to implement their own deletion (not yet implemented).
         }
     }
 
@@ -416,7 +410,7 @@ class provider implements
      * @return string
      */
     protected static function sql_fields() {
-        // Removed df.required AS fieldrequired,
+        // Field df.required AS fieldrequired was removed.
         return 'dl.id AS dataid, dc.id AS contentid, dc.fieldid, df.type AS fieldtype, df.name AS fieldname,
                   df.description AS fielddescription,
                   df.param1 AS fieldparam1, df.param2 AS fieldparam2, df.param3 AS fieldparam3, df.param4 AS fieldparam4,

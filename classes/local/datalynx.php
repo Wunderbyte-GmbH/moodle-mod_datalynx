@@ -36,7 +36,7 @@ use moodle_url;
 use stdClass;
 use moodle_exception;
 use comment;
-defined('MOODLE_INTERNAL') || die();
+
 
 /**
  * Class datalynx
@@ -44,21 +44,25 @@ defined('MOODLE_INTERNAL') || die();
  * @package mod_datalynx
  */
 class datalynx {
+    /** @var int Count all entries. */
     const COUNT_ALL = 0;
 
+    /** @var int Count approved entries. */
     const COUNT_APPROVED = 1;
 
+    /** @var int Count unapproved entries. */
     const COUNT_UNAPPROVED = 2;
 
+    /** @var int Count entries left (within limit). */
     const COUNT_LEFT = 3;
 
-    // No approval required.
+    /** @var int No approval required. */
     const APPROVAL_NONE = 0;
 
-    // Approval for new entries and updates required.
+    /** @var int Approval required for new entries and updates. */
     const APPROVAL_ON_UPDATE = 1;
 
-    // Approval only for new entries required.
+    /** @var int Approval required only for new entries. */
     const APPROVAL_ON_NEW = 2;
 
     /**
@@ -96,26 +100,37 @@ class datalynx {
      */
     public $notifications = ['bad' => [], 'good' => []];
 
+    /** @var string Page file name for URL construction. */
     protected $pagefile = 'view';
 
+    /** @var array Cached field objects indexed by field id. */
     protected $fields = [];
 
+    /** @var array Cached view objects indexed by view id. */
     protected $views = [];
 
+    /** @var object|null Filter manager instance. */
     protected $filtermanager = null;
 
+    /** @var object|null Custom filter manager instance. */
     protected $customfiltermanager = null;
 
+    /** @var object|null Rule manager instance. */
     protected $rulemanager = null;
 
+    /** @var object|null Preset manager instance. */
     protected $presetmanager = null;
 
+    /** @var object|null Currently active view. */
     protected $currentview = null;
 
+    /** @var array Internal (system) fields. */
     protected $internalfields = [];
 
+    /** @var array Fields available for custom filters. */
     protected $customfilterfields = [];
 
+    /** @var array Internal group modes map (name => id). */
     protected $internalgroupmodes = ['separateparticipants' => -1];
 
     /**
@@ -241,6 +256,8 @@ class datalynx {
     }
 
     /**
+     * Returns the page file name used for URL construction.
+     *
      * @return string
      */
     public function pagefile() {
@@ -432,6 +449,7 @@ class datalynx {
         }
 
         if (!$skiplogincheck) {
+            // TODO: MDL-000000 Not sure if we need that.
             // require_login($this->course->id, true, $this->cm);
         }
 
@@ -731,7 +749,7 @@ class datalynx {
             $this->print_groups_menu($params->urlparams->view, $params->urlparams->filter);
         }
 
-        // TODO: explore letting view decide whether to print rsslink and intro.
+        // TODO: MDL-00000 Explore letting view decide whether to print rsslink and intro.
 
         // Print any notices.
         if (empty($params->nonotifications)) {
@@ -795,8 +813,7 @@ class datalynx {
      */
     public function print_intro() {
         global $OUTPUT;
-        // TODO: make intro stickily closable.
-        // Display the intro only when there are on pages: if ($this->data->intro and empty($page)).
+        // TODO: MDL-00000 Make intro stickily closable. Display the intro only when there are no pages.
         if ($this->data->intro) {
             $options = new stdClass();
             $options->noclean = true;
@@ -841,7 +858,12 @@ class datalynx {
      * @param array $options bool skiplogincheck, bool tohtml, string pagelayout.
      * @return string
      */
-    public static function get_content_inline(int $datalynxid, int $viewid = 0, ?int $eids = null, array $options = ['tohtml' => true]) {
+    public static function get_content_inline(
+        int $datalynxid,
+        int $viewid = 0,
+        ?int $eids = null,
+        array $options = ['tohtml' => true]
+    ) {
         global $CFG;
         require_once($CFG->dirroot . '/mod/datalynx/classes/view/base.php');
         $urlparams = new stdClass();
@@ -1118,6 +1140,8 @@ class datalynx {
     }
 
     /**
+     * Returns an array of field names for this datalynx instance.
+     *
      * @param string $sort
      * @return array
      * @throws \dml_exception
@@ -1187,7 +1211,7 @@ class datalynx {
         global $OUTPUT, $DB;
 
         if (!has_capability('mod/datalynx:managetemplates', $this->context)) {
-            // TODO throw exception.
+            // TODO: MDL-00000 Throw exception when capability check fails.
             return false;
         }
 
@@ -1268,7 +1292,7 @@ class datalynx {
             } else {
                 // Go ahead and perform the requested action.
                 switch ($action) {
-                    case 'add': // TODO add new.
+                    case 'add':
                         if ($forminput = data_submitted()) {
                             // Check for arrays and convert to a comma-delimited string.
                             $this->convert_arrays_to_strings($forminput);
@@ -1738,6 +1762,11 @@ class datalynx {
         $this->data->singleview = $viewid;
     }
 
+    /**
+     * Returns the default view id for this datalynx instance.
+     *
+     * @return int
+     */
     public function get_default_view_id() {
         return $this->data->defaultview;
     }
@@ -1776,7 +1805,7 @@ class datalynx {
         global $DB, $OUTPUT;
 
         if (!has_capability('mod/datalynx:managetemplates', $this->context)) {
-            // TODO throw exception.
+            // TODO: MDL-00000 Throw exception when capability check fails.
             return false;
         }
 
@@ -1823,7 +1852,7 @@ class datalynx {
                         $updateview = new stdClass();
                         foreach ($views as $vid => $view) {
                             if ($vid == $this->data->defaultview) {
-                                // TODO: notify something.
+                                // TODO: MDL-00000 Notify when default view cannot be hidden.
                                 continue;
                             } else {
                                 $updateview->id = $vid;
@@ -1893,7 +1922,7 @@ class datalynx {
 
                     case 'duplicate':
                         foreach ($views as $vid => $view) {
-                            // TODO: check for limit.
+                            // TODO: MDL-00000 Check for view count limit before duplicating.
 
                             // Set name.
                             if ($this->name_exists('views', $view->name())) {
@@ -1998,6 +2027,8 @@ class datalynx {
      */
 
     /**
+     * Returns users that appear in the gradebook for this datalynx instance.
+     *
      * @param array|null $userids
      * @return array|null
      * @throws \coding_exception
@@ -2211,7 +2242,7 @@ class datalynx {
             // Managing a certain entry.
             if (!empty($entry->id)) {
                 // Entry owner.
-                // TODO groups_is_member queries DB for each entry!
+                // TODO: MDL-00000 groups_is_member queries the DB for each entry; consider caching.
                 if (
                     empty($USER->id) ||
                         (!$this->data->grouped && $USER->id != $entry->userid && !$this->teammember_can_edit($entry)) ||
@@ -2356,16 +2387,22 @@ class datalynx {
      */
     const PERMISSION_MANAGER = 1;
 
+    /** @var int Permission level: teacher. */
     const PERMISSION_TEACHER = 2;
 
+    /** @var int Permission level: student. */
     const PERMISSION_STUDENT = 4;
 
+    /** @var int Permission level: guest. */
     const PERMISSION_GUEST = 8;
 
+    /** @var int Permission level: entry author. */
     const PERMISSION_AUTHOR = 16;
 
+    /** @var int Permission level: mentor. */
     const PERMISSION_MENTOR = 32;
 
+    /** @var int Permission level: admin. */
     const PERMISSION_ADMIN = 64;
 
     /**
@@ -2566,6 +2603,7 @@ class datalynx {
     }
 
     /**
+     * Converts array values in field input to comma-delimited strings.
      */
     public function convert_arrays_to_strings(&$fieldinput) {
         foreach ($fieldinput as $key => $val) {
@@ -2642,6 +2680,11 @@ class datalynx {
         }
     }
 
+    /**
+     * Returns the base URL for this datalynx instance.
+     *
+     * @return \moodle_url
+     */
     public function get_baseurl() {
         // Base url params.
         $baseurlparams = [];
