@@ -854,6 +854,10 @@ class datalynx_entries {
 
                                                 $getlinenumber = explode("_", $key);
                                                 // Line number is the 6th element of the array.
+                                                if (!isset($getlinenumber[5])) {
+                                                    // Skip keys that don't match the fieldgroup key format.
+                                                    continue;
+                                                }
                                                 $i = $getlinenumber[5];
 
                                                 $fieldcontentpattern = "{$fieldname}_{$fieldgroup}_{$i}";

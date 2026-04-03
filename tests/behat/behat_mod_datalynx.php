@@ -298,6 +298,92 @@ class behat_mod_datalynx extends behat_base {
     }
 
     /**
+     * Replaces the entire content of a TinyMCE editor by ID.
+     * Uses setContent so any previously existing editor content is wiped first.
+     *
+     * @Then I set the :editorid editor to :newvalue
+     *
+     * @param string $editorid  The textarea ID backing the TinyMCE editor, e.g. "id_eparam2_editor"
+     * @param string $newvalue  New content to set in the editor
+     * @throws coding_exception
+     */
+    public function i_set_the_editor_to($editorid, $newvalue) {
+        if (!$this->running_javascript()) {
+            throw new coding_exception('Updating text requires javascript.');
+        }
+        $safeid      = addslashes($editorid);
+        $safecontent = addslashes($newvalue);
+        $this->getSession()->executeScript(
+            "var ed = window.tinyMCE ? window.tinyMCE.get('{$safeid}') : null;" .
+            "if (ed) { ed.setContent('{$safecontent}'); }"
+        );
+    }
+
+    /**
+     * Directly selects options in a hidden select element by visible text, bypassing the
+     * form-autocomplete widget entirely to avoid timing / pending-key issues.
+     * Multiple values can be provided as a comma-separated string.
+     *
+     * @When I select :value in the datalynx fieldgroup fields selector
+     *
+     * @param string $value  Comma-separated option texts to select, e.g. "Field A, Field B"
+     * @throws coding_exception
+     */
+    public function i_select_in_fieldgroup_fields_selector($value) {
+        if (!$this->running_javascript()) {
+            throw new coding_exception('This step requires JavaScript.');
+        }
+        $values = array_map('trim', explode(',', $value));
+        $valuesJson = json_encode($values);
+        $this->getSession()->executeScript(
+            "(function(values) {" .
+            "  var sel = document.getElementById('id_param1');" .
+            "  if (!sel) { return; }" .
+            "  Array.from(sel.options).forEach(function(opt) {" .
+            "    if (values.indexOf(opt.text.trim()) !== -1) {" .
+            "      opt.selected = true;" .
+            "    }" .
+            "  });" .
+            "})($valuesJson);"
+        );
+    }
+
+    /**
+     * Directly selects a user option in the nth datalynx teammemberselect field, bypassing
+     * the form-autocomplete widget to avoid timing / pending-key issues on slow machines.
+     *
+     * @When I select :value for the :nth datalynx teammemberselect field
+     *
+     * @param string $value  Full display text of the option, e.g. "Student 1 (student1@example.com)"
+     * @param int    $nth    1-based index of the teammemberselect on the page
+     * @throws coding_exception
+     */
+    public function i_select_for_teammemberselect($value, $nth) {
+        if (!$this->running_javascript()) {
+            throw new coding_exception('This step requires JavaScript.');
+        }
+        $nth = (int) $nth;
+        $valueJson = json_encode($value);
+        $result = $this->getSession()->evaluateScript(
+            "(function(nth, value) {" .
+            "  var sels = document.querySelectorAll('[data-fieldtype=\"autocomplete\"] select[multiple]');" .
+            "  var sel = sels[nth - 1];" .
+            "  if (!sel) { return 'select-not-found:' + sels.length; }" .
+            "  var opt = Array.from(sel.options).find(function(o) {" .
+            "    return o.text.trim() === value || o.text.trim().indexOf(value) !== -1;" .
+            "  });" .
+            "  if (!opt) { return 'option-not-found in ' + sel.id + ' options:' + Array.from(sel.options).map(function(o){return o.text.trim();}).join('|'); }" .
+            "  opt.selected = true;" .
+            "  sel.dispatchEvent(new Event('change', {bubbles: true}));" .
+            "  return 'ok';" .
+            "})($nth, $valueJson);"
+        );
+        if ($result !== 'ok') {
+            throw new \Exception("Could not select '$value' in teammemberselect #$nth: $result");
+        }
+    }
+
+    /**
      * Close the auto-complete suggestions list (Assuming there is only one on the page.).
      *
      * @Given /^I close the autocomplete suggestions list$/

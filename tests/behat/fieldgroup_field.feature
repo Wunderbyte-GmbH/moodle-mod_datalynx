@@ -58,31 +58,22 @@ Feature: Create entry and add fieldgroups
       | param2         | 4                     |
       | param3         | 4                     |
 
-    And I open the autocomplete suggestions list
-    Then "Datalynx field Team member select" "autocomplete_suggestions" should exist
-    And I click on "Datalynx field Team member select" item in the autocomplete list
+    And I select "Datalynx field Team member select" in the datalynx fieldgroup fields selector
     And I press "Save changes"
     When I follow "Views"
     And I click on "Edit Gridview" "link"
     And I click on "Entry template" "link"
     Then I should see "Field tags"
-    Then I add to "id_eparam2_editor" editor the text "[[Testfieldgroup1]] ##edit##  ##delete##"
+    Then I set the "id_eparam2_editor" editor to "[[Testfieldgroup1]] ##edit##  ##delete##"
     And I press "Save changes"
     When I follow "Browse"
     When I follow "Add a new entry"
-    And I open the autocomplete suggestions list
-    Then "Student 1 (student1@example.com)" "autocomplete_suggestions" should exist
-    And I click on "Student 1 (student1@example.com)" item in the autocomplete list
-    Then "Student 2 (student2@example.com)" "autocomplete_suggestions" should exist
-    And I click on "Student 2 (student2@example.com)" item in the autocomplete list
-    And I press the escape key
+    And I select "Student 1 (student1@example.com)" for the "1" datalynx teammemberselect field
+    And I select "Student 2 (student2@example.com)" for the "1" datalynx teammemberselect field
 
     ## Add teammembers to the second line as well.
-    And I click on "(//*[@class and contains(concat(' ', normalize-space(@class), ' '), ' form-autocomplete-downarrow ')])[2]" "xpath_element"
-    And I click on "(//ul[contains(concat(' ', normalize-space(@class), ' '), ' form-autocomplete-suggestions ')]//li[@role='option'][normalize-space(.)='Student 1 (student1@example.com)'])[1]" "xpath_element"
-    And I click on "(//*[@class and contains(concat(' ', normalize-space(@class), ' '), ' form-autocomplete-downarrow ')])[2]" "xpath_element"
-    And I click on "(//ul[contains(concat(' ', normalize-space(@class), ' '), ' form-autocomplete-suggestions ')]//li[@role='option'][normalize-space(.)='Student 2 (student2@example.com)'])[1]" "xpath_element"
-    And I press the escape key
+    And I select "Student 1 (student1@example.com)" for the "2" datalynx teammemberselect field
+    And I select "Student 2 (student2@example.com)" for the "2" datalynx teammemberselect field
     And I press "Save changes"
     Then I should see "updated"
     And I press "Continue"
@@ -91,8 +82,7 @@ Feature: Create entry and add fieldgroups
 
     ## Add a second entry, this time only to the second line.
     When I follow "Add a new entry"
-    And I click on "(//*[@class and contains(concat(' ', normalize-space(@class), ' '), ' form-autocomplete-downarrow ')])[2]" "xpath_element"
-    And I click on "(//ul[contains(concat(' ', normalize-space(@class), ' '), ' form-autocomplete-suggestions ')]//li[@role='option'][normalize-space(.)='Student 2 (student2@example.com)'])[2]" "xpath_element"
+    And I select "Student 2 (student2@example.com)" for the "2" datalynx teammemberselect field
     And I press "Save changes"
     Then I should see "updated"
     And I press "Continue"
@@ -109,12 +99,7 @@ Feature: Create entry and add fieldgroups
       | param3         | 4                     |
 
     ## Use the autocomplete.
-    And I open the autocomplete suggestions list
-    Then "Datalynx field Text" "autocomplete_suggestions" should exist
-
-    ## TODO: In the current implementation it is not possible to add two textfields.
-    And I click on "Datalynx field Text" item in the autocomplete list
-    And I click on "Datalynx field Number" item in the autocomplete list
+    And I select "Datalynx field Text, Datalynx field Number" in the datalynx fieldgroup fields selector
     And I press "Save changes"
     Then I should see "Testfieldgroup1"
     When I follow "Views"
@@ -123,7 +108,7 @@ Feature: Create entry and add fieldgroups
     Then I should see "Field tags"
 
     ## Add fieldgroup and remove all other fields.
-    Then I add to "id_eparam2_editor" editor the text "[[Testfieldgroup1]] ##edit##  ##delete##"
+    Then I set the "id_eparam2_editor" editor to "[[Testfieldgroup1]] ##edit##  ##delete##"
     And I press "Save changes"
     When I follow "Browse"
 

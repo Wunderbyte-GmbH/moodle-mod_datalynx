@@ -192,9 +192,10 @@ class PatternDialogue {
      * @param {object} editor TinyMCE editor instance
      */
     reInitializeButtons(editor) {
-        editor.getBody().querySelectorAll(
+        const allBtns = editor.getBody().querySelectorAll(
             'button[data-action-tag-button], button.datalynx-field-tag'
-        ).forEach((button) => {
+        );
+        allBtns.forEach((button) => {
             if (!this._initializedButtons.has(button)) {
                 button.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -324,17 +325,19 @@ class PatternDialogue {
 
             const fieldInfo = field + (fieldType ? ' <small class="text-muted">(' + fieldType + ')</small>' : '');
             const bodyHtml =
-                '<p><strong>' + fieldInfo + '</strong></p>' +
+                '<p><strong data-region="datalynx-tag-field">' + fieldInfo + '</strong></p>' +
                 '<div class="form-group">' +
                 '<label for="dlx-behavior-select">' + behaviorLabel + '</label>' +
-                '<select class="form-control custom-select" id="dlx-behavior-select" name="dlx-behavior-select">' +
+                '<select class="form-control custom-select" id="dlx-behavior-select" name="dlx-behavior-select"' +
+                ' data-region="tag-behavior-select">' +
                 behaviorsHtml + '</select></div>' +
                 '<div class="form-group">' +
                 '<label for="dlx-renderer-select">' + rendererLabel + '</label>' +
-                '<select class="form-control custom-select" id="dlx-renderer-select" name="dlx-renderer-select">' +
+                '<select class="form-control custom-select" id="dlx-renderer-select" name="dlx-renderer-select"' +
+                ' data-region="tag-renderer-select">' +
                 renderersHtml + '</select></div>' +
                 '<div class="mt-2">' +
-                '<button type="button" class="btn btn-danger btn-sm" data-action="dlx-delete">' +
+                '<button type="button" class="btn btn-danger btn-sm" data-action="dlx-delete" data-region="delete-tag">' +
                 deleteLabel + '</button></div>';
 
             const modal = await ModalSaveCancel.create({
@@ -363,12 +366,24 @@ class PatternDialogue {
                 modal.hide();
             });
 
-            modal.getBody()[0].addEventListener('click', (e) => {
-                if (e.target.closest('[data-action="dlx-delete"]')) {
-                    button.remove();
+            const deleteTagBtn = modal.getBody()[0].querySelector('[data-action="dlx-delete"]');
+            if (deleteTagBtn) {
+                deleteTagBtn.addEventListener('click', () => {
+                    const ed = this.findEditorForButton(button);
+                    if (ed) {
+                        // Remove the button and the offscreen-selection clone TinyMCE creates
+                        // for contenteditable=false elements when they are selected.
+                        ed.dom.remove(button);
+                        ed.getBody().querySelectorAll('.mce-offscreen-selection').forEach(
+                            el => el.parentNode.removeChild(el)
+                        );
+                        ed.undoManager.add();
+                    } else {
+                        button.remove();
+                    }
                     modal.hide();
-                }
-            });
+                });
+            }
 
         } else {
             // Action tag: display the tag text, allow deletion only.
@@ -376,7 +391,7 @@ class PatternDialogue {
             const titleStr = await Str.get_string('tagproperties', 'datalynx', {tagtype: 'Action', tagname: action});
             const bodyHtml =
                 '<p><code>' + pattern + '</code></p>' +
-                '<button type="button" class="btn btn-danger btn-sm" data-action="dlx-delete">' +
+                '<button type="button" class="btn btn-danger btn-sm" data-action="dlx-delete" data-region="delete-tag">' +
                 deleteLabel + '</button>';
 
             const modal = await Modal.create({
@@ -386,12 +401,22 @@ class PatternDialogue {
                 removeOnClose: true,
             });
 
-            modal.getBody()[0].addEventListener('click', (e) => {
-                if (e.target.closest('[data-action="dlx-delete"]')) {
-                    button.remove();
+            const deleteActionBtn = modal.getBody()[0].querySelector('[data-action="dlx-delete"]');
+            if (deleteActionBtn) {
+                deleteActionBtn.addEventListener('click', () => {
+                    const ed = this.findEditorForButton(button);
+                    if (ed) {
+                        ed.dom.remove(button);
+                        ed.getBody().querySelectorAll('.mce-offscreen-selection').forEach(
+                            el => el.parentNode.removeChild(el)
+                        );
+                        ed.undoManager.add();
+                    } else {
+                        button.remove();
+                    }
                     modal.hide();
-                }
-            });
+                });
+            }
         }
     }
 
