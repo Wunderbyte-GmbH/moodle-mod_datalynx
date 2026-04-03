@@ -20,9 +20,10 @@
  * @subpackage entryteammemberprofilefield
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/mod/datalynx/field/field_class.php');
+use mod_datalynx\local\field\datalynxfield_base;
+
+defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/mod/datalynx/field/datalynxfield_no_content_can_join.php');
 
 class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content_can_join {

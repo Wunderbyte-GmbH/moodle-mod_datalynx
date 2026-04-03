@@ -24,7 +24,7 @@
  */
 
 require_once('../../../../config.php');
-require_once('../../classes/local/datalynx.php');
+require_once('../../classes/datalynx.php');
 require_once("$CFG->libdir/tablelib.php");
 
 $urlparams = new stdClass();

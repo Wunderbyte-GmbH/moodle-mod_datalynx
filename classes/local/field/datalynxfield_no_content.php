@@ -13,14 +13,40 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-use mod_datalynx\local\field\datalynxfield_no_content;
+
+namespace mod_datalynx\local\field;
+
+use stdClass;
 
 /**
  * Base class for Datalynx field types that require no content. Example: User profile fields.
- *
- * @package mod_datalynx
- * @copyright 2013 onwards edulabs.org and associated programmers
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-abstract class datalynxfield_no_content_can_join extends datalynxfield_no_content {
+abstract class datalynxfield_no_content extends datalynxfield_base {
+    public function update_content(stdClass $entry, array $values = null) {
+        return true;
+    }
+
+    public function delete_content($entryid = 0) {
+        return true;
+    }
+
+    public function get_distinct_content($sortdir = 0) {
+        return [];
+    }
+
+    public function get_select_sql() {
+        return '';
+    }
+
+    public function get_sort_sql() {
+        return '';
+    }
+
+    public function is_datalynx_content() {
+        return false;
+    }
+
+    protected function filearea($suffix = null) {
+        return false;
+    }
 }

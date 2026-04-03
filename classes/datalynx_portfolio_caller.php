@@ -1,32 +1,11 @@
 <?php
-// This file is part of mod_datalynx for Moodle - http://moodle.org/
-//
-// It is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// It is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- *
- * @package mod_datalynx
- * @copyright 2013 onwards Ivan Šakić, Thomas Niedermaier
- * @copyright based on the work by 2012 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- */
-defined('MOODLE_INTERNAL') || die();
-
-require_once("$CFG->libdir/portfolio/caller.php");
-require_once("$CFG->dirroot/mod/datalynx/classes/local/datalynx.php");
-require_once($CFG->libdir . '/filelib.php');
+namespace mod_datalynx;
+use mod_datalynx;
+use moodle_url;
+use moodleform;
+use portfolio_caller_exception;
+use portfolio_module_caller_base;
 
 /**
  * The class to handle entry exports of a datalynx module
@@ -121,7 +100,7 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
     /**
      * Prepare the package for export
      *
-     * @return nothing
+     * @return void
      */
     public function prepare_package() {
         // Set the exported view content.
@@ -134,7 +113,7 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
         if ($this->exporter->get('formatclass') == PORTFOLIO_FORMAT_SPREADSHEET) {
             $content = $view->display(['controls' => false, 'tohtml' => true]);
             $filename = clean_filename(
-                $view->name() . '-full.' . $this->get_export_config('spreadsheettype')
+                    $view->name() . '-full.' . $this->get_export_config('spreadsheettype')
             );
             $this->exporter->write_new_file($content, $filename);
             return;
@@ -157,9 +136,9 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
             if ($exportfiles != self::CONTENT_FILESONLY) {
                 // TODO: MDL-66151 the user may choose to export without files.
                 $content = $view->display(
-                    ['controls' => false, 'tohtml' => true,
+                        ['controls' => false, 'tohtml' => true,
                                 'pluginfileurl' => $this->exporter->get('format')->get_file_directory(),
-                    ]
+                        ]
                 );
                 $filename = clean_filename($view->name() . '-full.htm');
                 $this->exporter->write_new_file($content, $filename);
@@ -201,10 +180,10 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
         $types = ['csv', 'ods', 'xls'];
         $options = array_combine($types, $types);
         $mform->addElement(
-            'select',
-            'caller_spreadsheettype',
-            get_string('spreadsheettype', 'datalynx'),
-            $options
+                'select',
+                'caller_spreadsheettype',
+                get_string('spreadsheettype', 'datalynx'),
+                $options
         );
         $mform->setDefault('caller_spreadsheettype', 'csv');
         $mform->disabledIf('caller_spreadsheettype', 'format', 'neq', PORTFOLIO_FORMAT_SPREADSHEET);
@@ -214,19 +193,19 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
                 self::CONTENT_WITHFILES => 'Include embedded files',
                 self::CONTENT_FILESONLY => 'embedded files only'];
         $mform->addElement(
-            'select',
-            'caller_contentformat',
-            get_string('exportcontent', 'datalynx'),
-            $options
+                'select',
+                'caller_contentformat',
+                get_string('exportcontent', 'datalynx'),
+                $options
         );
         $mform->setDefault('caller_contentformat', self::CONTENT_NOFILES);
         $mform->disabledIf('caller_contentformat', 'format', 'neq', PORTFOLIO_FORMAT_RICHHTML);
 
         // Each entry in a separate file.
         $mform->addElement(
-            'selectyesno',
-            'caller_separateentries',
-            get_string('separateentries', 'datalynx')
+                'selectyesno',
+                'caller_separateentries',
+                get_string('separateentries', 'datalynx')
         );
     }
 
@@ -248,153 +227,9 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
         global $CFG;
 
         $returnurl = new moodle_url(
-            '/mod/datalynx/view.php',
-            ['id' => $this->id, 'view' => $this->vid, 'filter' => $this->fid]
+                '/mod/datalynx/view.php',
+                ['id' => $this->id, 'view' => $this->vid, 'filter' => $this->fid]
         );
         return $returnurl->out(false);
-    }
-}
-
-/**
- * Class representing the virtual node with all itemids in the file browser
- *
- * @category files
- * @copyright 2013 onwards edulabs.org and associated programmers
- * @copyright based on the work by 2012 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class datalynx_file_info_container extends file_info {
-    /**
-     * @var file_browser
-     */
-    protected $browser;
-
-    /**
-     * @var stdClass
-     */
-    protected $course;
-
-    /**
-     * @var stdClass
-     */
-    protected $cm;
-
-    /**
-     * @var string
-     */
-    protected $component;
-
-    /**
-     * @var stdClass
-     */
-    protected $context;
-
-    /**
-     * @var array
-     */
-    protected $areas;
-
-    /**
-     * @var string
-     */
-    protected $filearea;
-
-    /**
-     * Constructor (in case you did not realize it ;-)
-     *
-     * @param file_browser $browser
-     * @param stdClass $course
-     * @param stdClass $cm
-     * @param stdClass $context
-     * @param array $areas
-     * @param string $filearea
-     */
-    public function __construct($browser, $course, $cm, $context, $areas, $filearea) {
-        parent::__construct($browser, $context);
-        $this->browser = $browser;
-        $this->course = $course;
-        $this->cm = $cm;
-        $this->component = 'mod_datalynx';
-        $this->context = $context;
-        $this->areas = $areas;
-        $this->filearea = $filearea;
-    }
-
-    /**
-     *
-     * @return array with keys contextid, filearea, itemid, filepath and filename
-     */
-    public function get_params() {
-        return ['contextid' => $this->context->id, 'component' => $this->component,
-                'filearea' => $this->filearea, 'itemid' => null, 'filepath' => null, 'filename' => null];
-    }
-
-    /**
-     * Can new files or directories be added via the file browser
-     *
-     * @return bool
-     */
-    public function is_writable() {
-        return false;
-    }
-
-    /**
-     * Should this node be considered as a folder in the file browser
-     *
-     * @return bool
-     */
-    public function is_directory() {
-        return true;
-    }
-
-    /**
-     * Returns localised visible name of this node
-     *
-     * @return string
-     */
-    public function get_visible_name() {
-        return $this->areas[$this->filearea];
-    }
-
-    /**
-     * Returns list of children nodes
-     *
-     * @return array of file_info instances
-     */
-    public function get_children() {
-        global $DB;
-
-        $children = [];
-        $itemids = $DB->get_records(
-            'files',
-            ['contextid' => $this->context->id, 'component' => $this->component,
-                        'filearea' => $this->filearea,
-            ],
-            'itemid DESC',
-            "DISTINCT itemid"
-        );
-        foreach ($itemids as $itemid => $unused) {
-            if (
-                $child = $this->browser->get_file_info(
-                    $this->context,
-                    'mod_datalynx',
-                    $this->filearea,
-                    $itemid
-                )
-            ) {
-                $children[] = $child;
-            }
-        }
-
-        return $children;
-    }
-
-    /**
-     * Returns parent file_info instance
-     *
-     * @return file_info or null for root
-     */
-    public function get_parent() {
-        return $this->browser->get_file_info($this->context);
     }
 }

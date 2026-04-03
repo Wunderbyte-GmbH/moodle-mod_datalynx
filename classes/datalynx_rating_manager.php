@@ -28,32 +28,16 @@
  *
  * Extends the core rating class.
  */
+
+namespace mod_datalynx;
+use coding_exception;
+use mod_datalynx\datalynx_rating;
+use rating_manager;
+use user_picture;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/rating/lib.php");
-
-class datalynx_rating extends rating {
-    /**
-     * Returns this ratings aggregate value
-     *
-     * @return string
-     */
-    public function get_aggregate_value($aggregation) {
-        $aggregate = isset($this->aggregate[$aggregation]) ? $this->aggregate[$aggregation] : '';
-
-        if ($aggregate && $aggregation != RATING_AGGREGATE_COUNT) {
-            if ($aggregation != RATING_AGGREGATE_SUM && !$this->settings->scale->isnumeric) {
-                // Round aggregate as we're using it as an index.
-                $aggregate = $this->settings->scale->scaleitems[round($aggregate)];
-            } else {
-                // Aggregation is SUM or the scale is numeric.
-                $aggregate = round($aggregate, 1);
-            }
-        }
-
-        return $aggregate;
-    }
-}
 
 /**
  * The datalynx_rating_manager class extends the rating_manager class.

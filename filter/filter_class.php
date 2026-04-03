@@ -22,6 +22,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_datalynx\local\field\datalynxfield_option_multiple;
 use mod_datalynx\view\base;
 
 defined('MOODLE_INTERNAL') || die();

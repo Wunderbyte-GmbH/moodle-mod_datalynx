@@ -25,7 +25,7 @@
  */
 
 require_once("../../config.php");
-require_once("$CFG->dirroot/mod/datalynx/classes/local/datalynx.php");
+require_once("$CFG->dirroot/mod/datalynx/classes/datalynx.php");
 require_once("$CFG->dirroot/mod/datalynx/lib.php");
 
 $id = required_param('id', PARAM_INT); // Course id.

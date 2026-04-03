@@ -21,9 +21,10 @@
  * @copyright 2021 michael pollak <moodle@michaelpollak.org>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__FILE__) . '/../field_class.php');
+use mod_datalynx\local\field\datalynxfield_base;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Field class for the youtube field type.

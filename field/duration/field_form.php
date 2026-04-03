@@ -21,9 +21,11 @@
  * @copyright  2014 onwards by edulabs.org and associated programmers
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+use mod_datalynx\form\datalynxfield_form;
+
 defined('MOODLE_INTERNAL') || die();
 
-require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
 /** Form class for the duration field type. */
 class datalynxfield_duration_form extends datalynxfield_form {

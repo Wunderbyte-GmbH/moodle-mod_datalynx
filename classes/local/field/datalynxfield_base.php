@@ -14,18 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- *
- * @package mod_datalynx
- * @copyright 2013 onwards edulabs.org and associated programmers
- * @copyright based on the work by 2012 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-defined('MOODLE_INTERNAL') || die();
-
-require_once(dirname(__FILE__) . '/../classes/local/datalynx.php');
-require_once(dirname(__FILE__) . '/../behavior/behavior.php');
-require_once(dirname(__FILE__) . '/../renderer/renderer.php');
+namespace mod_datalynx\local\field;
+use coding_exception;
+use mod_datalynx\datalynx;
+use datalynxfield_renderer;
+use dml_exception;
+use mod_datalynx;
+use moodle_exception;
+use moodle_url;
+use stdClass;
 
 /**
  * Base class for Datalynx Field Types
@@ -39,18 +36,21 @@ abstract class datalynxfield_base {
 
     /**
      * Subclasses must override the type with their name.
+     *
      * @var string Fieldtype usually datalynxfield_fieldtype.
      */
     public $type = 'unknown';
 
     /**
      * The datalynx object that this field belongs to.
+     *
      * @var datalynx
      */
     public $df = null;
 
     /**
      * The field object itself, if we know it
+     *
      * @var object
      */
     public $field = null;
@@ -69,6 +69,7 @@ abstract class datalynxfield_base {
      * Can this field be used in fieldgroups?
      * Only fields where user can enter data via a form can be used in a fieldgroup.
      * Override if yes.
+     *
      * @var bool
      */
     protected $forfieldgroup = false;
@@ -77,6 +78,7 @@ abstract class datalynxfield_base {
      * Class constructor
      *
      * TODO: $df should always be an int value.
+     *
      * @param number $df datalynx id or class object
      * @param number $field fieldid or fieldobject
      */
@@ -128,7 +130,7 @@ abstract class datalynxfield_base {
         $this->field->label = !empty($forminput->label) ? $forminput->label : '';
         for ($i = 1; $i <= 10; $i++) {
             $this->field->{"param$i"} = !empty($forminput->{"param$i"}) ? trim(
-                $forminput->{"param$i"}
+                    $forminput->{"param$i"}
             ) : null;
         }
     }
@@ -248,17 +250,18 @@ abstract class datalynxfield_base {
             $formclass = 'datalynxfield_' . $this->type . '_form';
         } else {
             require_once($CFG->dirroot . '/mod/datalynx/field/field_form.php');
-            $formclass = 'datalynxfield_form';
+            $formclass = 'mod_datalynx\form\datalynxfield_form';
         }
         $actionurl = new moodle_url(
-            '/mod/datalynx/field/field_edit.php',
-            ['d' => $this->df->id(), 'fid' => $this->id(), 'type' => $this->type]
+                '/mod/datalynx/field/field_edit.php',
+                ['d' => $this->df->id(), 'fid' => $this->id(), 'type' => $this->type]
         );
         return new $formclass($this, $actionurl);
     }
 
     /**
      * Is this field available for fieldgroups?
+     *
      * @return boolean
      */
     public function for_use_in_fieldgroup() {
@@ -302,9 +305,9 @@ abstract class datalynxfield_base {
      */
     public function get_definitions($tags, $entry, array $options) {
         return $this->renderer()->replacements(
-            $tags,
-            $entry,
-            array_merge(self::$defaultoptions, $options)
+                $tags,
+                $entry,
+                array_merge(self::$defaultoptions, $options)
         );
     }
 
@@ -397,10 +400,10 @@ abstract class datalynxfield_base {
             $fs = get_file_storage();
             foreach ($rs as $content) {
                 $fs->delete_area_files(
-                    $this->df->context->id,
-                    'mod_datalynx',
-                    'content',
-                    $content->id
+                        $this->df->context->id,
+                        'mod_datalynx',
+                        'content',
+                        $content->id
                 );
             }
         }
@@ -484,7 +487,7 @@ abstract class datalynxfield_base {
         $fieldgroups = [];
         foreach ($data as $key => $value) {
             if (strpos($key, 'fieldgroup_') === 0) {
-                $fieldgroups[$value]  = $key;
+                $fieldgroups[$value] = $key;
             }
         }
 
@@ -668,28 +671,28 @@ abstract class datalynxfield_base {
 
         if ($operator === '') {
             [$sql, $params] = $DB->get_in_or_equal(
-                '',
-                SQL_PARAMS_NAMED,
-                "df_{$fieldid}_",
-                false
+                    '',
+                    SQL_PARAMS_NAMED,
+                    "df_{$fieldid}_",
+                    false
             );
             $sql = " $varcharcontent $sql ";
         } else {
             if ($operator === '=') {
                 $searchvalue = trim($value);
                 [$sql, $params] = $DB->get_in_or_equal(
-                    $searchvalue,
-                    SQL_PARAMS_NAMED,
-                    "df_{$fieldid}_"
+                        $searchvalue,
+                        SQL_PARAMS_NAMED,
+                        "df_{$fieldid}_"
                 );
                 $sql = " $varcharcontent $sql ";
             } else {
                 if ($operator === 'IN') {
                     $searchvalue = array_map('trim', $value);
                     [$sql, $params] = $DB->get_in_or_equal(
-                        $searchvalue,
-                        SQL_PARAMS_NAMED,
-                        "df_{$fieldid}_"
+                            $searchvalue,
+                            SQL_PARAMS_NAMED,
+                            "df_{$fieldid}_"
                     );
                     $sql = " $varcharcontent $sql ";
                 } else {
@@ -709,10 +712,10 @@ abstract class datalynxfield_base {
             if ($eids = $this->get_entry_ids_for_content($sql, $params)) {
                 // Get NOT IN sql.
                 [$notinids, $params] = $DB->get_in_or_equal(
-                    $eids,
-                    SQL_PARAMS_NAMED,
-                    "df_{$fieldid}_",
-                    false
+                        $eids,
+                        SQL_PARAMS_NAMED,
+                        "df_{$fieldid}_",
+                        false
                 );
                 $sql = " e.id $notinids ";
                 return [$sql, $params, false];
@@ -829,6 +832,7 @@ abstract class datalynxfield_base {
 
     /**
      * Are fields of this field type suitable for use in customfilters?
+     *
      * @return bool
      */
     public static function is_customfilterfield() {
@@ -837,6 +841,7 @@ abstract class datalynxfield_base {
 
     /**
      * Is $value a valid content or do we see an empty input?
+     *
      * @return bool
      */
     public static function is_fieldvalue_empty($value) {
@@ -844,670 +849,5 @@ abstract class datalynxfield_base {
             return true;
         }
         return false;
-    }
-}
-
-/**
- * Base class for Datalynx field types that require no content. Example: User profile fields.
- */
-abstract class datalynxfield_no_content extends datalynxfield_base {
-    public function update_content(stdClass $entry, array $values = null) {
-        return true;
-    }
-
-    public function delete_content($entryid = 0) {
-        return true;
-    }
-
-    public function get_distinct_content($sortdir = 0) {
-        return [];
-    }
-
-    public function get_select_sql() {
-        return '';
-    }
-
-    public function get_sort_sql() {
-        return '';
-    }
-
-    public function is_datalynx_content() {
-        return false;
-    }
-
-    protected function filearea($suffix = null) {
-        return false;
-    }
-}
-
-/**
- * Base class for Datalynx field types that offer single choice or multiplce choices
- * from a set of options
- */
-abstract class datalynxfield_option extends datalynxfield_base {
-    protected $options = [];
-
-    /**
-     * TODO: see if this can be changed or merged with function below
-     *
-     * @return mixed
-     */
-    public function get_options() {
-        if (!$this->options) {
-            if (!empty($this->field->param1)) {
-                $rawoptions = explode("\n", $this->field->param1);
-                foreach ($rawoptions as $key => $option) {
-                    $option = trim($option);
-                    if ($option != '') {
-                        $this->options[$key + 1] = $option;
-                    }
-                }
-            }
-        }
-        return $this->options;
-    }
-
-    /**
-     *
-     * @param boolean $forceget
-     * @return Ambigous <multitype:, string>
-     */
-    public function options_menu($forceget = false, $addnoselection = false) {
-        if (!$this->options || $forceget) {
-            if (!empty($this->field->param1)) {
-                if ($addnoselection) {
-                    $this->options[0] = '...';
-                }
-                $rawoptions = explode("\n", $this->field->param1);
-                foreach ($rawoptions as $key => $option) {
-                    $option = trim($option);
-                    if ($option != '') {
-                        $this->options[$key + 1] = $option;
-                    }
-                }
-            }
-        }
-        return $this->options;
-    }
-
-    /**
-     *
-     * @param array $map
-     * @return mixed
-     */
-    abstract public function update_options($map = []);
-
-    /**
-     * When an option from a single/multi choice is deleted / renamed or added
-     * the old content will be updated to the new values of the options. If an option
-     * is deleted all the selections for that specific option made in an entry will be deleted
-     * (non-PHPdoc)
-     *
-     * @see datalynxfield_base::set_field()
-     */
-    public function set_field($forminput = null) {
-        $this->field = new stdClass();
-        $this->field->id = !empty($forminput->id) ? $forminput->id : 0;
-        $this->field->type = $this->type;
-        $this->field->dataid = $this->df->id();
-        $this->field->name = !empty($forminput->name) ? trim($forminput->name) : '';
-        $this->field->description = !empty($forminput->description) ? trim($forminput->description) : '';
-        $this->field->visible = isset($forminput->visible) ? $forminput->visible : 2;
-        $this->field->edits = isset($forminput->edits) ? $forminput->edits : -1;
-        $this->field->label = !empty($forminput->label) ? $forminput->label : '';
-
-        $oldvalues = $newvalues = $this->options;
-        $renames = !empty($forminput->renameoption) ? $forminput->renameoption : [];
-        $deletes = !empty($forminput->deleteoption) ? $forminput->deleteoption : [];
-        $adds = preg_split(
-            "/[\|\r\n]+/",
-            !empty($forminput->addoptions) ? $forminput->addoptions : ''
-        );
-
-        // Make sure there are no renames when options are deleted. That will not work.
-        $delvalues = array_values($deletes);
-        if (!empty($delvalues)) {
-            $renames = [];
-        }
-
-        $delkeys = array_keys($deletes);
-        foreach ($delkeys as $id) {
-            $addedid = array_search($oldvalues[$id], $adds);
-            if ($addedid !== false) {
-                unset($adds[$addedid]);
-                unset($deletes[$id]);
-            } else {
-                unset($newvalues[$id]);
-            }
-        }
-
-        $map = [0 => 0];
-        for ($i = 1; $i <= count($oldvalues); $i++) {
-            $j = array_search($oldvalues[$i], $newvalues);
-            if ($j !== false) {
-                $map[$i] = $j;
-            } else {
-                $map[$i] = 0;
-            }
-        }
-
-        foreach ($renames as $id => $newname) {
-            if (!!(trim($newname))) {
-                $newvalues[$id] = $newname;
-            }
-        }
-
-        foreach ($adds as $add) {
-            $add = trim($add);
-            if (!empty($add)) {
-                $newvalues[] = $add;
-            }
-        }
-
-        if (!empty($this->options)) {
-            $this->update_options($map);
-        }
-
-        $this->field->param1 = implode("\n", $newvalues);
-        for ($i = 2; $i <= 10; $i++) {
-            $param = "param$i";
-            if (isset($forminput->$param)) {
-                $this->field->$param = $forminput->$param;
-            }
-        }
-    }
-
-    /**
-     * (non-PHPdoc)
-     *
-     * @see datalynxfield_base::format_search_value()
-     */
-    public function format_search_value($searchparams) {
-        [$not, $operator, $value] = $searchparams;
-        if (is_array($value)) {
-            $selected = implode(', ', $value);
-            return $not . ' ' . $operator . ' ' . $selected;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * (non-PHPdoc)
-     *
-     * @see datalynxfield_base::parse_search()
-     */
-    public function parse_search($formdata, $i) {
-        $fieldname = "f_{$i}_{$this->field->id}";
-        return optional_param_array($fieldname, false, PARAM_NOTAGS);
-    }
-
-    /**
-     * Are fields of this field type suitable for use in customfilters?
-     * @return bool
-     */
-    public static function is_customfilterfield() {
-        return true;
-    }
-
-    public function get_argument_count(string $operator) {
-        if ($operator === "") { // "Empty" operator
-            return 0;
-        } else {
-            return 1;
-        }
-    }
-}
-
-/**
- * Base class for Datalynx field types that offer a set of options with multiple choice
- */
-class datalynxfield_option_multiple extends datalynxfield_option {
-    /**
-     * Update the selected options in the entries. The field value of an entry saves the selected
-     * line numbers in a multiselect field. When an option is deleted, a line is deleted. Example:
-     * line 2 is deleted, therefore line 3 becomes line 2, line 4 becomes line 3 and so on.
-     * Therefore the values of the field in the entries have to be remapped to the new line numbers of the options
-     *
-     * @see datalynxfield_option::update_options()
-     */
-    public function update_options($map = []) {
-        global $DB;
-        $params = [];
-        $i = 0;
-        $where = 'c.fieldid = :fieldid AND (';
-        foreach ($map as $old => $new) {
-            $where .= $DB->sql_like('c.content', ":old{$i}") . ' OR ';
-            $params["old{$i}"] = "%#{$old}#%";
-            $i++;
-        }
-        $where = rtrim($where, "OR ") . ")";
-        $selectsql = "SELECT c.id, c.content
-        FROM {datalynx_contents} c
-        WHERE {$where}
-        ";
-        $params['fieldid'] = $this->field->id;
-
-        $oldcontents = $DB->get_records_sql_menu($selectsql, $params);
-        foreach ($oldcontents as $id => $oldcontent) {
-            $prepareoldcontent = str_replace('#', '', $oldcontent);
-            $prepared = explode(",", $prepareoldcontent);
-            $replaced = [];
-            foreach ($prepared as $value) {
-                if ($map[$value] !== 0) {
-                    $replaced[$map[$value]] = $map[$value];
-                }
-            }
-            $implodedcontent = implode(",", $replaced);
-            $newcontent = "#" . str_replace(",", "#,#", $implodedcontent) . "#";
-
-            $DB->set_field('datalynx_contents', 'content', $newcontent, ['id' => $id]);
-        }
-    }
-
-    /**
-     * does not support group by filter settings
-     *
-     * @see datalynxfield_base::supports_group_by()
-     */
-    public function supports_group_by() {
-        return false;
-    }
-
-    /**
-     * Prepare the content of the field for database storage when an entry
-     * is modified or created
-     * (non-PHPdoc)
-     *
-     * @see datalynxfield_base::format_content()
-     */
-    protected function format_content($entry, array $values = null) {
-        $fieldid = $this->field->id;
-        $contents = [];
-        $oldcontents = [];
-
-        // Old contents.
-        if (isset($entry->{"c{$fieldid}_content"})) {
-            $oldcontents[] = $entry->{"c{$fieldid}_content"};
-        }
-
-        $newvalues = reset($values);
-        foreach ($newvalues as $key => $value) {
-            if (empty($value)) {
-                unset($newvalues[$key]);
-            }
-        }
-        // New contents.
-        if (!empty($newvalues)) {
-            $content = '#' . implode('#,#', $newvalues) . '#';
-            $contents[] = $content;
-        } else {
-            $contents[] = ''; // Keep empties in database.
-        }
-
-        return [$contents, $oldcontents];
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see datalynxfield_base::get_search_sql()
-     */
-    public function get_search_sql(array $search): array {
-        global $DB;
-
-        [$not, $operator, $value] = $search;
-
-        static $i = 0; // FIXME: might cause problems!
-        $i++;
-        $fieldid = $this->field->id;
-        $name = "df_{$fieldid}_{$i}";
-
-        $sql = '';
-        $params = [];
-        $conditions = [];
-        $notinidsequal = false;
-
-        // For all NOT criteria except NOT Empty, exclude entries.
-        // Which don't meet the positive criterion.
-        // Because some fields may not have content records.
-        // And the respective entries may be filter out.
-        // Despite meeting the criterion.
-        $excludeentries = (($not && $operator !== '') || (!$not && $operator === ''));
-
-        if ($operator === 'EXACTLY' && empty($value)) {
-            $operator = '';
-        }
-
-        $content = "c{$this->field->id}.content";
-        $usecontent = true;
-        if ($operator === 'ANY_OF') {
-            foreach ($value as $key => $sel) {
-                $xname = $name . $key;
-                $likesel = str_replace('%', '\%', $sel);
-
-                $conditions[] = $DB->sql_like($content, ":{$xname}");
-                $params[$xname] = "%#$likesel#%";
-            }
-            $sql = " $not (" . implode(" OR ", $conditions) . ") ";
-        } else {
-            if ($operator === 'ALL_OF') {
-                foreach ($value as $key => $sel) {
-                    $xname = $name . $key;
-                    $likesel = str_replace('%', '\%', $sel);
-
-                    $conditions[] = $DB->sql_like($content, ":{$xname}");
-                    $params[$xname] = "%#$likesel#%";
-                }
-                $sql = " $not (" . implode(" AND ", $conditions) . ") ";
-            } else {
-                if ($operator === 'EXACTLY' || $operator === '=') {
-                    if ($not) {
-                        $content = "content";
-                        $usecontent = false;
-                    } else {
-                        $content = "c{$this->field->id}.content";
-                        $usecontent = true;
-                    }
-
-                    $j = 0;
-                    foreach (array_keys($this->options_menu()) as $key) {
-                        if (in_array($key, $value)) {
-                            $xname = $name . $j++;
-                            $likesel = str_replace('%', '\%', $key);
-
-                            $conditions[] = $DB->sql_like($content, ":{$xname}", true, true, false);
-                            $params[$xname] = "%#$likesel#%";
-                        }
-                    }
-                    foreach (array_keys($this->options_menu()) as $key) {
-                        if (!in_array($key, $value)) {
-                            $xname = $name . $j++;
-                            $likesel = str_replace('%', '\%', $key);
-
-                            $conditions[] = $DB->sql_like($content, ":{$xname}", true, true, true);
-                            $params[$xname] = "%#$likesel#%";
-                        }
-                    }
-
-                    if ($not) {
-                        $sqlfind = " (" . implode(" AND ", $conditions) . ") ";
-
-                        $sql = ' 1 ';
-                        if ($eids = $this->get_entry_ids_for_content($sqlfind, $params)) { // There are.
-                            // Non-empty.
-                            // Contents.
-                            [$contentids, $paramsnot] = $DB->get_in_or_equal(
-                                $eids,
-                                SQL_PARAMS_NAMED,
-                                "df_{$fieldid}_x_",
-                                false
-                            );
-                            $params = array_merge($params, $paramsnot);
-                            $sql = " (e.id $contentids) ";
-                        }
-                    } else {
-                        $sql = " (" . implode(" AND ", $conditions) . ") ";
-                    }
-                } else {
-                    if ($operator === '') { // EMPTY.
-                        $usecontent = false;
-                        $sqlnot = $DB->sql_like("content", ":{$name}_hascontent");
-                        $params["{$name}_hascontent"] = "%";
-
-                        if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) { // There are non-empty.
-                            // Contents.
-                            [$contentids, $paramsnot] = $DB->get_in_or_equal(
-                                $eids,
-                                SQL_PARAMS_NAMED,
-                                "df_{$fieldid}_x_",
-                                !!$not
-                            );
-                            $params = array_merge($params, $paramsnot);
-                            $sql = " (e.id $contentids) ";
-                        } else { // There are no non-empty contents.
-                            if ($not) {
-                                $sql = " 1 = 0 ";
-                            } else {
-                                $sql = " 1 = 1 ";
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        if ($excludeentries && $operator !== '' && $operator !== 'EXACTLY') {
-            $sqlnot = str_replace($content, 'content', $sql);
-            $sqlnot = str_replace('NOT (', '(', $sqlnot);
-            if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) {
-                // Get NOT IN sql.
-                [$notinids, $paramsnot] = $DB->get_in_or_equal(
-                    $eids,
-                    SQL_PARAMS_NAMED,
-                    "df_{$fieldid}_x_",
-                    $notinidsequal
-                );
-                $params = array_merge($params, $paramsnot);
-                $sql = " ($sql OR e.id $notinids) ";
-            }
-        }
-
-        return [$sql, $params, $usecontent];
-    }
-
-    public function get_supported_search_operators() {
-        return ['ANY_OF' => get_string('anyof', 'datalynx'),
-                'ALL_OF' => get_string('allof', 'datalynx'),
-                'EXACTLY' => get_string('exactly', 'datalynx'), '' => get_string('empty', 'datalynx')];
-    }
-
-    public function get_argument_count(string $operator) {
-        if ($operator === "") { // "Empty" operator
-            return 0;
-        } else {
-            return 1;
-        }
-    }
-}
-
-/**
- * Base class for Datalynx field types that offer a set of options with single choice
- */
-class datalynxfield_option_single extends datalynxfield_option {
-    /**
-     *
-     * {@inheritDoc}
-     * @see datalynxfield_option::update_options()
-     */
-    public function update_options($map = []) {
-        global $DB;
-
-        $params = [];
-        $i = 0;
-        $updatesql = "UPDATE {datalynx_contents}
-                         SET content = (
-                        CASE";
-        foreach ($map as $old => $new) {
-            $updatesql .= " WHEN content = :old{$i} THEN :new{$i} ";
-            $params["old{$i}"] = $old;
-            $params["new{$i}"] = $new;
-            $i++;
-        }
-        $updatesql .= "ELSE 0 END) WHERE fieldid = :fieldid";
-        $params['fieldid'] = $this->field->id;
-
-        $DB->execute($updatesql, $params);
-    }
-
-    /**
-     *
-     * {@inheritDoc}
-     * @see datalynxfield_base::format_content()
-     */
-    protected function format_content($entry, array $values = null) {
-        $fieldid = $this->field->id;
-        // Old contents.
-        $oldcontents = [];
-        if (isset($entry->{"c{$fieldid}_content"})) {
-            $oldcontents[] = $entry->{"c{$fieldid}_content"};
-        }
-        // New contents.
-        $contents = [];
-
-        $selected = null;
-
-        // We want to store empty values as well.
-        foreach ($values as $value) {
-            $selected = $value;
-        }
-
-        // Add the content.
-        $contents[] = $selected;
-
-        return [$contents, $oldcontents];
-    }
-
-    /**
-     * Computes which values of this field have already been chosen by the given user and
-     * determines which ones have reached their limit
-     *
-     * @param int $userid ID of the user modifying an entry; if not specified defaults to $USER->id
-     * @return array an array of disabled values
-     */
-    public function get_disabled_values_for_user($entryid = 0) {
-        global $DB;
-
-        $sql = "SELECT dc.content, COUNT(dc.id)
-        FROM {datalynx_contents} dc
-        INNER JOIN {datalynx_entries} de ON dc.entryid = de.id
-        WHERE de.dataid = :dataid
-        AND dc.fieldid = :fieldid
-        AND de.id != :entryid
-        GROUP BY dc.content
-        HAVING COUNT(dc.id) >= :selectlimit";
-        $params = ['dataid' => $this->df->id(), 'fieldid' => $this->field->id,
-                'selectlimit' => $this->field->param5, 'entryid' => $entryid];
-
-        $results = $DB->get_records_sql($sql, $params);
-
-        return array_keys($results);
-    }
-
-    /**
-     *
-     * {@inheritDoc}
-     * @see datalynxfield_base::supports_group_by()
-     */
-    public function supports_group_by() {
-        return true;
-    }
-
-    /**
-     * Get search sql for single choice fields.
-     * {@inheritDoc}
-     * @see datalynxfield_base::get_search_sql()
-     */
-    public function get_search_sql(array $search): array {
-        global $DB;
-
-        [$not, $operator, $value] = $search;
-
-        static $i = 0; // FIXME: might cause problems!
-        $i++;
-        $fieldid = $this->field->id;
-
-        $sql = null;
-        $params = [];
-        $name = "df_{$fieldid}_{$i}";
-        $notinidsequal = false;
-
-        // For all NOT criteria except NOT Empty, exclude entries.
-        // Which don't meet the positive criterion.
-        // Because some fields may not have content records.
-        // And the respective entries may be filter out.
-        // Despite meeting the criterion.
-        $excludeentries = (($not && $operator !== '') || (!$not && $operator === ''));
-
-        $content = "c{$this->field->id}.content";
-
-        $usecontent = true;
-        if ($operator === 'ANY_OF' || $operator === '=') {
-            [$insql, $params] = $DB->get_in_or_equal($value, SQL_PARAMS_NAMED, "param_{$i}_");
-            $sql = " $not ($content $insql) ";
-        } else {
-            if ($operator === '') {
-                $usecontent = false;
-                $sqlnot = $DB->sql_like("content", ":{$name}_hascontent");
-                $params["{$name}_hascontent"] = "%";
-
-                if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) { // There are non-empty.
-                    // Contents.
-                    [$contentids, $paramsnot] = $DB->get_in_or_equal(
-                        $eids,
-                        SQL_PARAMS_NAMED,
-                        "df_{$fieldid}_x_",
-                        !!$not
-                    );
-                    $params = array_merge($params, $paramsnot);
-                    $sql = " (e.id $contentids) ";
-                } else { // There are no non-empty contents.
-                    if ($not) {
-                        $sql = " 0 ";
-                    } else {
-                        $sql = " 1 = 1 ";
-                    }
-                }
-            }
-        }
-
-        if ($excludeentries && $operator !== '') {
-            $sqlnot = str_replace($content, 'content', $sql);
-            $sqlnot = str_replace('NOT (', '(', $sqlnot);
-            if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) {
-                // Get NOT IN sql.
-                [$notinids, $paramsnot] = $DB->get_in_or_equal(
-                    $eids,
-                    SQL_PARAMS_NAMED,
-                    "df_{$fieldid}_x_",
-                    $notinidsequal
-                );
-                $params = array_merge($params, $paramsnot);
-                $sql = " ($sql OR e.id $notinids) ";
-            }
-        }
-
-        return [$sql, $params, $usecontent];
-    }
-
-    /**
-     *
-     * {@inheritDoc}
-     * @see datalynxfield_base::prepare_import_content()
-     */
-    public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
-        // Import only from csv.
-        if ($csvrecord) {
-            $fieldid = $this->field->id;
-            $fieldname = $this->name();
-            $csvname = $importsettings[$fieldname]['name'];
-            $label = !empty($csvrecord[$csvname]) ? $csvrecord[$csvname] : null;
-
-            if ($label) {
-                $options = $this->options_menu();
-                if ($optionkey = array_search($label, $options)) {
-                    $data->{"field_{$fieldid}_{$entryid}"} = $optionkey;
-                }
-            }
-        }
-        return true;
-    }
-
-    /**
-     *
-     * {@inheritDoc}
-     * @see datalynxfield_base::get_supported_search_operators()
-     */
-    public function get_supported_search_operators() {
-        return ['ANY_OF' => get_string('anyof', 'datalynx'), '' => get_string('empty', 'datalynx')];
     }
 }

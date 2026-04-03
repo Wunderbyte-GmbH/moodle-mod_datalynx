@@ -24,7 +24,7 @@
 require_once('../../../config.php');
 require_once('behavior_form.php');
 require_once('behavior.php');
-require_once("$CFG->dirroot/mod/datalynx/classes/local/datalynx.php");
+require_once("$CFG->dirroot/mod/datalynx/classes/datalynx.php");
 
 $urlparams = new stdClass();
 $urlparams->d = required_param('d', PARAM_INT);

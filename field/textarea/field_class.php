@@ -22,9 +22,11 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+use mod_datalynx\local\field\datalynxfield_base;
+
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/mod/datalynx/field/field_class.php');
 require_once($CFG->dirroot . '/lib/filelib.php');
 require_once($CFG->dirroot . '/repository/lib.php');
 

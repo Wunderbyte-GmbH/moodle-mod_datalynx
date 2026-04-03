@@ -22,9 +22,13 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+use mod_datalynx\local\field\datalynxfield_base;
+use mod_datalynx\local\field\datalynxfield_option_multiple;
+
 defined('MOODLE_INTERNAL') || die();
 
-require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
+
 
 /**
  * Field class for the multiselect field type.

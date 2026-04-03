@@ -21,9 +21,11 @@
  * @copyright 2021 michael pollak <moodle@michaelpollak.org>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+use mod_datalynx\form\datalynxfield_form;
+
 defined('MOODLE_INTERNAL') || die();
 
-require_once("$CFG->dirroot/mod/datalynx/field/field_form.php");
 
 /**
  * Field form class for the youtube field type.

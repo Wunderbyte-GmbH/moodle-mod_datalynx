@@ -34,7 +34,7 @@ class mobile {
      */
     public static function mobile_course_view($args) {
         global $OUTPUT, $USER, $DB, $CFG;
-        require_once("$CFG->dirroot/mod/datalynx/classes/local/datalynx.php");
+        require_once("$CFG->dirroot/mod/datalynx/classes/datalynx.php");
 
         $args = (object) $args;
         $cm = get_coursemodule_from_id('datalynx', $args->cmid);

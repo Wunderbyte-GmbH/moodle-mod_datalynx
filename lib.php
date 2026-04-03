@@ -28,6 +28,8 @@
  * MOD FUNCTIONS WHICH ARE CALLED FROM OUTSIDE THE MODULE
  */
 
+use mod_datalynx\datalynx_file_info_container;
+
 /**
  * Indicates API features that the datalynx supports.
  *
@@ -1093,7 +1095,7 @@ function datalynx_rating_permissions($contextid, $component, $ratingarea) {
 function datalynx_rating_validate($params) {
     global $DB, $USER;
 
-    require_once(dirname(__FILE__) . "/classes/local/datalynx.php");
+    require_once(dirname(__FILE__) . "/classes/datalynx.php");
 
     $df = new mod_datalynx\datalynx(0, $params['context']->instanceid);
 

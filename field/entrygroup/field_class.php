@@ -21,9 +21,10 @@
  * @copyright  2013 onwards edulabs.org and associated programmers
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/mod/datalynx/field/field_class.php');
+use mod_datalynx\local\field\datalynxfield_no_content;
+
+defined('MOODLE_INTERNAL') || die();
 
 class datalynxfield_entrygroup extends datalynxfield_no_content {
     /** @var string The field type. */

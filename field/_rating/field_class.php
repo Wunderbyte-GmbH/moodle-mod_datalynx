@@ -22,9 +22,10 @@
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__FILE__) . '/../field_class.php');
+use mod_datalynx\local\field\datalynxfield_no_content;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Internal rating field.
