@@ -447,10 +447,8 @@ class datalynx {
                 }
             }
         }
-
         if (!$skiplogincheck) {
-            // TODO: MDL-000000 Not sure if we need that.
-            // require_login($this->course->id, true, $this->cm);
+            require_login($this->course->id, true, $this->cm);
         }
 
         // Make sure there is at least datalynx id param.

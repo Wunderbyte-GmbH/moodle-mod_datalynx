@@ -26,10 +26,24 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
+// phpcs:disable moodle.PHP.ForbiddenGlobalUse.BadGlobal
 /**
+ * Renderer for the internal approval field patterns.
+ *
+ * @package mod_datalynx
+ * @subpackage _approve
+ * @copyright 2013 onwards edulabs.org and associated programmers
+ * @copyright based on the work  by 2011 Itamar Tzadok
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class datalynxfield__approve_renderer extends datalynxfield_renderer {
     /**
+     * Returns tag replacement pairs for the approve field patterns.
+     *
+     * @param array|null  $tags    The list of tag patterns to replace.
+     * @param object|null $entry   The current entry object.
+     * @param array|null  $options Rendering options.
+     * @return array
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
         $df = $this->field->df();
@@ -56,6 +70,12 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Renders the search mode form element for this field.
+     *
+     * @param MoodleQuickForm $mform The form object.
+     * @param int    $i     The search field index.
+     * @param string $value The current search value.
+     * @return array
      */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
         $field = $this->field;
@@ -73,6 +93,12 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Renders the edit mode form element for the approve field.
+     *
+     * @param MoodleQuickForm $mform   The form object.
+     * @param object          $entry   The current entry.
+     * @param array|null      $options Rendering options.
+     * @return void
      */
     public function display_edit(&$mform, $entry, array $options = null) {
         $field = $this->field;
@@ -91,6 +117,11 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Renders the browse (read) mode HTML for the approve toggle.
+     *
+     * @param object     $entry  The current entry.
+     * @param array|null $params Optional display parameters.
+     * @return string
      */
     protected function display_browse($entry, $params = null) {
         global $PAGE;
@@ -145,3 +176,4 @@ class datalynxfield__approve_renderer extends datalynxfield_renderer {
         return $patterns;
     }
 }
+// phpcs:enable moodle.PHP.ForbiddenGlobalUse.BadGlobal

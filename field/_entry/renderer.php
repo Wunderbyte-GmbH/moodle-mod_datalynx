@@ -26,10 +26,24 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
+// phpcs:disable moodle.PHP.ForbiddenGlobalUse.BadGlobal
 /**
+ * Renderer for the internal entry reference field patterns.
+ *
+ * @package mod_datalynx
+ * @subpackage _entry
+ * @copyright 2013 onwards edulabs.org and associated programmers
+ * @copyright based on the work  by 2011 Itamar Tzadok
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class datalynxfield__entry_renderer extends datalynxfield_renderer {
     /**
+     * Returns tag replacement pairs for the entry field patterns.
+     *
+     * @param array|null  $tags    The list of tag patterns to replace.
+     * @param object|null $entry   The current entry object.
+     * @param array|null  $options Rendering options.
+     * @return array
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
         $manageable = !empty($options['manage']) ? $options['manage'] : false;
@@ -89,6 +103,11 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Renders the "more" (single-entry detail) link for an entry.
+     *
+     * @param object $entry The current entry.
+     * @param bool   $href  If true returns the URL string instead of a link element.
+     * @return string
      */
     protected function display_more($entry, $href = false) {
         global $OUTPUT;
@@ -109,6 +128,10 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Renders the edit action link/button for an entry.
+     *
+     * @param object $entry The current entry.
+     * @return string
      */
     protected function display_edit($entry) {
         global $OUTPUT;
@@ -136,6 +159,10 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Renders the duplicate action link for an entry.
+     *
+     * @param object $entry The current entry.
+     * @return string
      */
     protected function display_duplicate($entry) {
         global $OUTPUT;
@@ -152,6 +179,10 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Renders the delete action link/button for an entry.
+     *
+     * @param object $entry The current entry.
+     * @return string
      */
     protected function display_delete($entry) {
         global $OUTPUT;
@@ -175,6 +206,10 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Renders the portfolio export link for an entry.
+     *
+     * @param object $entry The current entry.
+     * @return string
      */
     protected function display_export($entry) {
         global $OUTPUT, $CFG;
@@ -226,3 +261,4 @@ class datalynxfield__entry_renderer extends datalynxfield_renderer {
         return $patterns;
     }
 }
+// phpcs:enable moodle.PHP.ForbiddenGlobalUse.BadGlobal

@@ -42,8 +42,13 @@
  * Please do not forget to use upgrade_set_timeout()
  * before any action that may take longer time to finish.
  */
-defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Upgrade the datalynx database from $oldversion to the current version.
+ *
+ * @param int $oldversion The version number we are upgrading from.
+ * @return bool True on success.
+ */
 function xmldb_datalynx_upgrade($oldversion) {
     global $CFG, $DB;
 
@@ -1107,6 +1112,11 @@ function xmldb_datalynx_upgrade($oldversion) {
     return true;
 }
 
+/**
+ * Migrate existing behavior records to the new permission model.
+ *
+ * @return void
+ */
 function mod_datalynx_upgrade_behaviors() {
     require_once(dirname(__FILE__) . '/../behavior/behavior.php');
     global $DB;
@@ -1133,6 +1143,11 @@ function mod_datalynx_upgrade_behaviors() {
     }
 }
 
+/**
+ * Replace legacy field rules with the new behavior system.
+ *
+ * @return void
+ */
 function mod_datalynx_replace_field_rules() {
     require_once(dirname(__FILE__) . '/../behavior/behavior.php');
     global $DB;
@@ -1216,6 +1231,11 @@ function mod_datalynx_replace_field_rules() {
     }
 }
 
+/**
+ * Replace legacy field labels with the new renderer system.
+ *
+ * @return void
+ */
 function mod_datalynx_replace_field_labels() {
     require_once(dirname(__FILE__) . '/../renderer/renderer.php');
     global $DB;

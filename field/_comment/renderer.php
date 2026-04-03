@@ -27,9 +27,22 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
+ * Renderer for the internal comment field patterns.
+ *
+ * @package mod_datalynx
+ * @subpackage _comment
+ * @copyright 2013 onwards edulabs.org and associated programmers
+ * @copyright based on the work  by 2011 Itamar Tzadok
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class datalynxfield__comment_renderer extends datalynxfield_renderer {
     /**
+     * Returns tag replacement pairs for the comment field patterns.
+     *
+     * @param array|null  $tags    The list of tag patterns to replace.
+     * @param object|null $entry   The current entry object.
+     * @param array|null  $options Rendering options.
+     * @return array
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
         global $CFG;
@@ -66,6 +79,11 @@ class datalynxfield__comment_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Renders the comment widget HTML for browse mode.
+     *
+     * @param object $entry   The current entry.
+     * @param array  $options Optional display options (e.g. count, notoggle, autostart).
+     * @return string
      */
     public function display_browse($entry, $options = []) {
         global $CFG;

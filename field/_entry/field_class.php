@@ -26,18 +26,36 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
+/**
+ * Field class for the internal entry reference field.
+ *
+ * @package mod_datalynx
+ * @subpackage _entry
+ * @copyright 2013 onwards edulabs.org and associated programmers
+ * @copyright based on the work by 2012 Itamar Tzadok
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class datalynxfield__entry extends datalynxfield_no_content {
+    /** @var string The field type identifier. */
     public $type = '_entry';
 
+    /** @var string Internal name constant for the entry field object. */
     const _ENTRY = 'entry';
 
     /**
+     * Returns true because this is an internal field type.
+     *
+     * @return bool
      */
     public static function is_internal() {
         return true;
     }
 
     /**
+     * Returns field objects for each internal entry field variant.
+     *
+     * @param int $dataid The datalynx instance id.
+     * @return array
      */
     public static function get_field_objects($dataid) {
         $fieldobjects = [];

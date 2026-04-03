@@ -28,8 +28,6 @@ namespace mod_datalynx;
 
 use moodle_url;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Deals with local_shortcodes regarding booking.
  */
@@ -81,7 +79,8 @@ class shortcodes {
             $options = ['tohtml' => true, 'skiplogincheck' => true];
             return datalynx::get_content_inline($cm->instance, $view->id, null, $options);
         } else {
-            return "You must set arguments for view and datalynx. Here is an example: [displayview view=\"My datalynx viewname\" cmid=5]";
+            return "You must set arguments for view and datalynx. " .
+                "Here is an example: [displayview view=\"My datalynx viewname\" cmid=5]";
         }
     }
 }

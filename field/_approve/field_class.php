@@ -26,12 +26,27 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/field_class.php");
 
+/**
+ * Field class for the internal approval field.
+ *
+ * @package mod_datalynx
+ * @subpackage _approve
+ * @copyright 2013 onwards edulabs.org and associated programmers
+ * @copyright based on the work by 2012 Itamar Tzadok
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class datalynxfield__approve extends datalynxfield_no_content {
+    /** @var string The field type identifier. */
     public $type = '_approve';
 
+    /** @var string Internal name constant for the approved field object. */
     const _APPROVED = 'approve';
 
     /**
+     * Returns field objects for each internal approve field variant.
+     *
+     * @param int $dataid The datalynx instance id.
+     * @return array
      */
     public static function get_field_objects($dataid) {
         $fieldobjects = [];
@@ -44,18 +59,27 @@ class datalynxfield__approve extends datalynxfield_no_content {
     }
 
     /**
+     * Returns true because this is an internal field type.
+     *
+     * @return bool
      */
     public static function is_internal() {
         return true;
     }
 
     /**
+     * Returns the internal DB column name for this field.
+     *
+     * @return string
      */
     public function get_internalname() {
         return $this->field->internalname;
     }
 
     /**
+     * Returns the SQL fragment used to sort by this field.
+     *
+     * @return string
      */
     public function get_sort_sql() {
         return 'e.approved';
@@ -71,6 +95,11 @@ class datalynxfield__approve extends datalynxfield_no_content {
     }
 
     /**
+     * Parses submitted search form data for this field.
+     *
+     * @param object $formdata The submitted form data.
+     * @param int    $i        The search field index.
+     * @return mixed The parsed search value or false.
      */
     public function parse_search($formdata, $i) {
         $fieldid = $this->field->id;
