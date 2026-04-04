@@ -136,7 +136,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
 
         $arr = [];
 
-        if ($mform->_formName == 'mod_datalynx_customfilter_frontend_form') {
+        if ($mform->_formName == 'mod_datalynx\form\datalynx_customfilter_frontend_form') {
             $options = [
                     -1  => get_string('choose'),
                     1 => get_string('filemissing', 'datalynx'),

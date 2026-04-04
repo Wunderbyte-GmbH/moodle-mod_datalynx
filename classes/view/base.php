@@ -25,7 +25,7 @@ namespace mod_datalynx\view;
 
 use coding_exception;
 use datalynx_entries;
-use datalynx_filter;
+use mod_datalynx\local\filter\datalynx_filter;
 use datalynxfield__rating;
 use datalynxfield__status;
 use datalynxview_entries_form;

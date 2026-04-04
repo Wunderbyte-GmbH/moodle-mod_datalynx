@@ -23,6 +23,7 @@
  */
 
 use core_user\fields;
+use mod_datalynx\local\filter\datalynx_filter;
 
 defined('MOODLE_INTERNAL') || die();
 

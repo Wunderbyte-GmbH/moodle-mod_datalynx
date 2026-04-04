@@ -22,7 +22,10 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_datalynx\local\filter\datalynx_filter_manager;
 use mod_datalynx\view\base;
+
+require_once("$CFG->dirroot/mod/datalynx/classes/local/filter/datalynx_filter_manager.php");
 
 defined('MOODLE_INTERNAL') || die();
 

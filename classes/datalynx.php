@@ -26,7 +26,7 @@ namespace mod_datalynx;
 use completion_info;
 use context_module;
 use core_course_category;
-use datalynx_filter_manager;
+use mod_datalynx\local\filter\datalynx_filter_manager;
 use datalynx_preset_manager;
 use datalynx_rule_manager;
 use html_writer;
@@ -291,7 +291,6 @@ class datalynx {
         global $CFG;
         // Set filters manager.
         if (!$this->filtermanager) {
-            require_once($CFG->dirroot . '/mod/datalynx/filter/filter_class.php');
             $this->filtermanager = new datalynx_filter_manager($this);
         }
         return $this->filtermanager;

@@ -26,7 +26,9 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/classes/view/base.php");
 require_once("$CFG->libdir/pdflib.php");
+require_once("$CFG->dirroot/mod/assign/feedback/editpdf/fpdi/autoload.php");
 
+use mod_datalynx\local\datalynx_tcpdf;
 use mod_datalynx\view\base;
 use setasign\Fpdi\Tcpdf\Fpdi;
 
@@ -210,7 +212,7 @@ class datalynxview_pdf extends base {
         $this->tmpfiles = [];
 
         // Generate the pdf.
-        $pdf = new dfpdf($settings);
+        $pdf = new datalynx_tcpdf($settings);
 
         // Set margins.
         $pdf->SetMargins(
@@ -653,7 +655,7 @@ class datalynxview_pdf extends base {
     /**
      * Set page bookmarks
      *
-     * @param dfpdf $pdf
+     * @param datalynx_tcpdf $pdf
      * @param string $pagecontent
      * @return string
      */
@@ -697,7 +699,7 @@ class datalynxview_pdf extends base {
     /**
      * Set frame
      *
-     * @param dfpdf $pdf
+     * @param datalynx_tcpdf $pdf
      */
     protected function set_frame($pdf) {
         // Add to pdf frame image if any.
@@ -745,7 +747,7 @@ class datalynxview_pdf extends base {
     /**
      * Set watermark
      *
-     * @param dfpdf $pdf
+     * @param datalynx_tcpdf $pdf
      */
     protected function set_watermark($pdf) {
         // Add to pdf watermark image if any.
@@ -789,7 +791,7 @@ class datalynxview_pdf extends base {
     /**
      * Set signature
      *
-     * @param dfpdf $pdf
+     * @param datalynx_tcpdf $pdf
      */
     protected function set_signature($pdf) {
         $fs = get_file_storage();
@@ -828,7 +830,7 @@ class datalynxview_pdf extends base {
     /**
      * Set header
      *
-     * @param dfpdf $pdf
+     * @param datalynx_tcpdf $pdf
      */
     protected function set_header($pdf) {
         if (empty($this->view->eparam3)) {
@@ -858,7 +860,7 @@ class datalynxview_pdf extends base {
     /**
      * Set footer
      *
-     * @param dfpdf $pdf
+     * @param datalynx_tcpdf $pdf
      */
     protected function set_footer($pdf) {
         if (empty($this->view->eparam4)) {
@@ -922,7 +924,7 @@ class datalynxview_pdf extends base {
     /**
      * Write HTML content
      *
-     * @param dfpdf $pdf
+     * @param datalynx_tcpdf $pdf
      * @param string $content
      */
     protected function write_html($pdf, $content) {
@@ -1057,77 +1059,5 @@ class datalynxview_pdf extends base {
             }
         }
         return $pagecount;
-    }
-}
-
-// TODO: Remove at EOL 3.5
-// Because different implementations in mdl 3.5 and 3.8 we extend dynamically.
-if (is_file("$CFG->dirroot/mod/assign/feedback/editpdf/fpdi/autoload.php")) {
-    /**
-     * DynamicParent class for Moodle 3.8+
-     */
-    class DynamicParent extends setasign\Fpdi\Tcpdf\Fpdi {
-    }
-} else {
-    /**
-     * DynamicParent class for Moodle 3.5
-     */
-    class DynamicParent extends FPDI {
-    }
-}
-
-/**
- * Extend the TCPDF class to create custom Header and Footer.
- */
-class dfpdf extends DynamicParent {
-    /**
-     * @var stdClass Settings for the PDF
-     */
-    protected $dlsettings;
-
-    /**
-     * Constructor
-     *
-     * @param stdClass $settings Settings object
-     */
-    public function __construct($settings) {
-        parent::__construct($settings->orientation, $settings->unit, $settings->format);
-        $this->dlsettings = $settings;
-    }
-
-    // Page header.
-    public function Header() { // phpcs:ignore  @codingStandardsIgnoreLine
-        // Adjust X to override left margin.
-        $x = $this->GetX();
-        $this->SetX($this->dlsettings->header->marginleft);
-        if (!empty($this->header_string)) {
-            $text = $this->set_page_numbers($this->header_string);
-            $this->writeHtml($text);
-        }
-        // Reset X to original.
-        $this->SetX($x);
-    }
-
-    // Page footer.
-    public function Footer() { // phpcs:ignore  @codingStandardsIgnoreLine
-        if (!empty($this->dlsettings->footer->text)) {
-            $text = $this->set_page_numbers($this->dlsettings->footer->text);
-            $this->writeHtml($text);
-        }
-    }
-
-    // Phpcs:enable.
-
-    /**
-     * Set page numbers in text
-     *
-     * @param string $text
-     * @return string
-     */
-    protected function set_page_numbers($text) {
-        $replacements = ['##pagenumber##' => $this->getAliasNumPage(),
-                '##totalpages##' => $this->getAliasNbPages()];
-        $text = str_replace(array_keys($replacements), $replacements, $text);
-        return $text;
     }
 }

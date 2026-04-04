@@ -24,7 +24,7 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-require_once("$CFG->dirroot/mod/datalynx/filter/filter_class.php");
+require_once("$CFG->dirroot/mod/datalynx/classes/local/filter/datalynx_filter.php");
 require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 require_once("$CFG->dirroot/mod/datalynx/field/entryauthor/field_class.php");
 require_once("$CFG->dirroot/mod/datalynx/field/entrygroup/field_class.php");
