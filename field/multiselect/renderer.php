@@ -179,13 +179,13 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
         $mform->setType($fieldname, PARAM_INT);
         $mform->setDefault($fieldname, $value);
 
-        if ($mform->_formName == 'mod_datalynx\form\datalynx_filter_form' || $mform->_formName ==
-                'mod_datalynx\form\datalynx_advanced_filter_form') {
+        if ($mform->_formName == 'mod_datalynx_form_datalynx_filter_form' || $mform->_formName ==
+                'mod_datalynx_form_datalynx_advanced_filter_form') {
             $mform->disabledIf($fieldname, "searchoperator{$i}", 'eq', '');
         }
 
         // Add a checkbox to select if any of or all elements are needed, only show this in customfilter forms..
-        if ($mform->_formName == 'mod_datalynx\form\datalynx_customfilter_frontend_form') {
+        if ($mform->_formName == 'mod_datalynx_form_datalynx_customfilter_frontend_form') {
             // NOTE: Do not set to 0|1 as 1 will be cleared as form input by modform.
             $elements[] = $mform->createElement('advcheckbox', $fieldname . "[andor]", get_string('customfilterandor', 'datalynx'), '', [], [0, -2]);
         }

@@ -84,7 +84,7 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         $elements = [];
 
         // With normal filter display whole form and disable cases.
-        if ($mform->_formName != 'mod_datalynx\form\datalynx_customfilter_frontend_form') {
+        if ($mform->_formName != 'mod_datalynx_form_datalynx_customfilter_frontend_form') {
             $elements[] = &$mform->createElement('date_time_selector', "{$fieldname}_from", get_string('from'));
             $elements[] = &$mform->createElement('date_time_selector', "{$fieldname}_to", get_string('to'));
             if (isset($value[0])) {
@@ -108,7 +108,7 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         }
 
         // With customfilter we have to simplify the form.
-        if ($mform->_formName == 'mod_datalynx\form\datalynx_customfilter_frontend_form') {
+        if ($mform->_formName == 'mod_datalynx_form_datalynx_customfilter_frontend_form') {
             $attr = ['optional' => true]; // Allows date_time to be enabled, passes 0 if disabled.
             $elements[] = $element = &$mform->createElement(
                 'date_time_selector',
