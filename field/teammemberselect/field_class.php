@@ -615,7 +615,7 @@ class datalynxfield_teammemberselect extends datalynxfield_base {
         $sql = "SELECT c.id, c.content, c.entryid
                 FROM {datalynx_contents} c
                 JOIN {datalynx_entries} e ON e.id = c.entryid
-                WHERE c.fieldid = :fieldid 
+                WHERE c.fieldid = :fieldid
                   AND e.dataid = :datalynxid";
         $params = [
                 'fieldid' => $this->field->id,

@@ -169,6 +169,7 @@ class behat_mod_datalynx extends behat_base {
         }
     }
 
+    // phpcs:disable moodle.Files.LineLength
     /**
      * Sets up a view for the specified datalynx instance using the specified viewtype.
      *
@@ -187,6 +188,7 @@ class behat_mod_datalynx extends behat_base {
         $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $viewformdata);
         $this->execute('behat_forms::press_button', get_string('savechanges'));
     }
+    // phpcs:enable moodle.Files.LineLength
 
     /**
      * Sets the entry form field to the given value.
@@ -334,7 +336,7 @@ class behat_mod_datalynx extends behat_base {
             throw new coding_exception('This step requires JavaScript.');
         }
         $values = array_map('trim', explode(',', $value));
-        $valuesJson = json_encode($values);
+        $valuesjson = json_encode($values);
         $this->getSession()->executeScript(
             "(function(values) {" .
             "  var sel = document.getElementById('id_param1');" .
@@ -344,7 +346,7 @@ class behat_mod_datalynx extends behat_base {
             "      opt.selected = true;" .
             "    }" .
             "  });" .
-            "})($valuesJson);"
+            "})($valuesjson);"
         );
     }
 
@@ -363,7 +365,7 @@ class behat_mod_datalynx extends behat_base {
             throw new coding_exception('This step requires JavaScript.');
         }
         $nth = (int) $nth;
-        $valueJson = json_encode($value);
+        $valuejson = json_encode($value);
         $result = $this->getSession()->evaluateScript(
             "(function(nth, value) {" .
             "  var sels = document.querySelectorAll('[data-fieldtype=\"autocomplete\"] select[multiple]');" .
@@ -372,11 +374,12 @@ class behat_mod_datalynx extends behat_base {
             "  var opt = Array.from(sel.options).find(function(o) {" .
             "    return o.text.trim() === value || o.text.trim().indexOf(value) !== -1;" .
             "  });" .
-            "  if (!opt) { return 'option-not-found in ' + sel.id + ' options:' + Array.from(sel.options).map(function(o){return o.text.trim();}).join('|'); }" .
+            "  if (!opt) { return 'option-not-found in ' + sel.id +" .
+            "   ' options:' + Array.from(sel.options).map(function(o){return o.text.trim();}).join('|'); }" .
             "  opt.selected = true;" .
             "  sel.dispatchEvent(new Event('change', {bubbles: true}));" .
             "  return 'ok';" .
-            "})($nth, $valueJson);"
+            "})($nth, $valuejson);"
         );
         if ($result !== 'ok') {
             throw new \Exception("Could not select '$value' in teammemberselect #$nth: $result");

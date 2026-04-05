@@ -192,7 +192,14 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
         // Add a checkbox to select if any of or all elements are needed, only show this in customfilter forms..
         if ($mform->_formName == 'mod_datalynx_form_datalynx_customfilter_frontend_form') {
             // NOTE: Do not set to 0|1 as 1 will be cleared as form input by modform.
-            $elements[] = $mform->createElement('advcheckbox', $fieldname . "[andor]", get_string('customfilterandor', 'datalynx'), '', [], [0, -2]);
+            $elements[] = $mform->createElement(
+                'advcheckbox',
+                $fieldname . "[andor]",
+                get_string('customfilterandor', 'datalynx'),
+                '',
+                [],
+                [0, -2]
+            );
         }
 
         return [$elements, null];

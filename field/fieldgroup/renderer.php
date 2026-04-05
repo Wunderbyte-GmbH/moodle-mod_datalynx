@@ -36,13 +36,14 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
      */
     protected $subfields = [];
 
+    // phpcs:disable moodle.PHP.ForbiddenGlobalUse.BadGlobal
     /**
      *
      * {@inheritDoc}
      * @see datalynxfield_renderer::render_display_mode()
      */
     public function render_display_mode(stdClass $entry, array $options): string {
-        global $OUTPUT; // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
+        global $OUTPUT;
 
         // We want to display these fields.
         $fieldgroupfields = $this->get_subfields();
@@ -93,9 +94,14 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
             $viewtype = ($view->view->type == 'pdf') ? 'pdf' : '';
         }
 
-        return $OUTPUT->render_from_template('mod_datalynx/fieldgroup' . $viewtype, $completedispl); // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
+        return $OUTPUT->render_from_template(
+            'mod_datalynx/fieldgroup' . $viewtype,
+            $completedispl
+        );
     }
+    // phpcs:enable moodle.PHP.ForbiddenGlobalUse.BadGlobal
 
+    // phpcs:disable moodle.PHP.ForbiddenGlobalUse.BadGlobal
     /**
      *
      * {@inheritDoc}
@@ -189,8 +195,8 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         $mform->setType($fieldname . '_lastvisible', PARAM_INT);
 
         // Hide unused lines.
-        global $PAGE; // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
-        $PAGE->requires->js_call_amd( // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
+        global $PAGE;
+        $PAGE->requires->js_call_amd(
             'mod_datalynx/fieldgroups',
             'init',
             [$this->field->field->name, $defaultlines, $maxlines, $requiredlines, $fieldname]
@@ -199,6 +205,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         // Show a button to add one more line.
         $mform->addElement('button', 'addline', get_string('addline', 'datalynx', $this->field->field->name));
     }
+    // phpcs:enable moodle.PHP.ForbiddenGlobalUse.BadGlobal
 
     /**
      * Get fields of the fielgroup as an array of fieldobjects where key = fieldid.

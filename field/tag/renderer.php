@@ -61,13 +61,14 @@ class datalynxfield_tag_renderer extends datalynxfield_renderer {
         }
     }
 
+    // phpcs:disable moodle.PHP.ForbiddenGlobalUse.BadGlobal
     /**
      *
      * {@inheritDoc}
      * @see datalynxfield_renderer::render_display_mode()
      */
     public function render_display_mode(stdClass $entry, array $options): string {
-        global $OUTPUT; // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
+        global $OUTPUT;
 
         $str = '';
         $field = $this->field;
@@ -83,13 +84,14 @@ class datalynxfield_tag_renderer extends datalynxfield_renderer {
             }
             return implode("#", $exportstring);
         }
-        $str = $OUTPUT->tag_list($items, null, 'datalynx-tags'); // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
+        $str = $OUTPUT->tag_list($items, null, 'datalynx-tags');
         if (isset($options['nolink'])) {
             $str = preg_replace("/<b>.+<\/b>/i", '', $str);
             $str = preg_replace("/<a[^>]*(href=\"[^\"]+?\")([^>]*?)(\/?)>([^<]+)(<\/a>)/i", '<span$2>$4</span>', $str);
         }
         return $str;
     }
+    // phpcs:enable moodle.PHP.ForbiddenGlobalUse.BadGlobal
 
     /**
      * Array of patterns this field supports

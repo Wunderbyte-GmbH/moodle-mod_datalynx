@@ -25,9 +25,9 @@
 use mod_datalynx\local\filter\datalynx_filter_manager;
 use mod_datalynx\view\base;
 
-require_once("$CFG->dirroot/mod/datalynx/classes/local/filter/datalynx_filter_manager.php");
-
 defined('MOODLE_INTERNAL') || die();
+
+require_once("$CFG->dirroot/mod/datalynx/classes/local/filter/datalynx_filter_manager.php");
 
 /**
  * Base class for view patterns

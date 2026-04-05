@@ -114,7 +114,8 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
         $queriedfieldid = $fieldidcomponents["queriedfieldid"];
 
         if (is_numeric($queriedfieldid) && $queriedfieldid > 0) {
-            return " LEFT JOIN {datalynx_contents} c$queriedfieldid ON c$queriedfieldid.entryid = e.id AND c$queriedfieldid.fieldid = $queriedfieldid ";
+            return " LEFT JOIN {datalynx_contents} c$queriedfieldid"
+                . " ON c$queriedfieldid.entryid = e.id AND c$queriedfieldid.fieldid = $queriedfieldid ";
         } else {
             return "";
         }
@@ -163,7 +164,7 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
         } else {
             $userids = array_keys($userswithprofilefieldvalue);
             $useridsasstring = array_map('strval', $userids);
-            // Get entryids for the users that have the selected field value:
+            // Get entryids for the users that have the selected field value.
             $conditions = [];
             $params = [
                     'dataid' => $this->df->id(),
@@ -171,20 +172,20 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
             ];
 
             foreach ($userids as $key => $userid) {
-                // Use placeholders for user IDs to prevent SQL injection
+                // Use placeholders for user IDs to prevent SQL injection.
                 $conditions[] = $DB->sql_like('dc.content', ':userid' . $key, false, false, false);
-                // Add user ID to the parameters array
+                // Add user ID to the parameters array.
                 $params['userid' . $key] = '%"' . $userid . '"%';
             }
 
             $like = implode(' OR ', $conditions);
 
             $eidsql = "
-                SELECT dc.entryid 
+                SELECT dc.entryid
                 FROM {datalynx_contents} dc
                 JOIN {datalynx_fields} df ON dc.fieldid = df.id
-                WHERE df.dataid = :dataid 
-                  AND dc.fieldid = :fieldid 
+                WHERE df.dataid = :dataid
+                  AND dc.fieldid = :fieldid
                   AND ($like)
             ";
 

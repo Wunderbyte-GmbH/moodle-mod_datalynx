@@ -778,7 +778,7 @@ class datalynxview_pdf extends base {
                 $pdf->SetAlpha($this->settings->transparency);
                 $pdf->Image(
                     $filepath,
-                    $centerx, // Variable $x = '',.
+                    $centerx, // Horizontal center position.
                     $centery
                 );
                 $pdf->SetAlpha(1);

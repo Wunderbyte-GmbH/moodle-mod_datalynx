@@ -59,7 +59,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
             $fmoptions
         );
 
-        // Add file manager element
+        // Add file manager element.
         $mform->addElement('filemanager', "{$fieldname}_filemanager", $field->name(), null, $fmoptions);
         $mform->setDefault("{$fieldname}_filemanager", $draftitemid);
 
@@ -176,7 +176,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
         $mimetype = $file->get_mimetype();
         $pluginfileurl = '/pluginfile.php';
 
-        // Check for specific parameters/patterns first
+        // Check for specific parameters/patterns first.
         if (!empty($params['url'])) {
             return moodle_url::make_file_url($pluginfileurl, "$path/$filename");
         } else if (!empty($params['size'])) {
@@ -193,17 +193,18 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
             return $this->display_link($file, $path, $altname, $params);
         }
 
-        // Embed PDF if it's a PDF file and no specific pattern was requested
+        // Embed PDF if it's a PDF file and no specific pattern was requested.
         if ($mimetype === 'application/pdf') {
             // PDF document.
             $moodleurl = moodle_url::make_file_url($pluginfileurl, "$path/$filename");
             return $this->embed_pdf($moodleurl->out(), $fieldname);
         }
 
-        // For all other file types, display as link
+        // For all other file types, display as link.
         return $this->display_link($file, $path, $altname, $params);
     }
 
+    // phpcs:disable moodle.PHP.ForbiddenGlobalUse.BadGlobal
     /**
      * Returns general link or pdf embedding html.
      * @param string $fullurl
@@ -211,12 +212,12 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
      * @return string html
      */
     protected function embed_pdf(string $fullurl, string $fieldname): string {
-        global $PAGE; // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
+        global $PAGE;
         $customscale = $this->field->get('param4');
         if (empty($customscale)) {
             $customscale = 1;
         }
-        $PAGE->requires->js_call_amd( // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
+        $PAGE->requires->js_call_amd(
             'mod_datalynx/pdfembed',
             'renderPDF',
             [$fullurl, $fieldname, $customscale]
@@ -233,7 +234,9 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
         <div style="width: 1800px; min-height: 1400px;" id="' . $fieldname . '"></div>
         ' . $a . $b;
     }
+    // phpcs:enable moodle.PHP.ForbiddenGlobalUse.BadGlobal
 
+    // phpcs:disable moodle.PHP.ForbiddenGlobalUse.BadGlobal
     /**
      * Render a link.
      * @param $file
@@ -243,14 +246,14 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
      * @return string
      */
     protected function display_link($file, $path, $altname, $params = null): string {
-        global $OUTPUT; // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
+        global $OUTPUT;
 
         $filename = $file->get_filename();
         $mimetype = $file->get_mimetype();
         $displayname = $altname ?: $filename;
         $fileicon = html_writer::empty_tag(
             'img',
-            ['src' => $OUTPUT->image_url(file_mimetype_icon($mimetype)), // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
+            ['src' => $OUTPUT->image_url(file_mimetype_icon($mimetype)),
             'alt' => $mimetype,
             'height' => 16,
             'width' => 16]
@@ -269,6 +272,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
 
         return html_writer::link($url, "$fileicon&nbsp;$displayname");
     }
+    // phpcs:enable moodle.PHP.ForbiddenGlobalUse.BadGlobal
 
     /**
      * Returns pluginfile URL patterns supported by this field.

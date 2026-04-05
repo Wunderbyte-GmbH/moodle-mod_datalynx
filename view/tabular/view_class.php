@@ -28,7 +28,9 @@
 use mod_datalynx\view\base;
 
 
-require_once("$CFG->dirroot/mod/datalynx/classes/view/base.php"); // phpcs:ignore moodle.Files.MoodleInternal.MoodleInternalGlobalState
+require_once( // phpcs:ignore moodle.Files.MoodleInternal.MoodleInternalGlobalState
+    "$CFG->dirroot/mod/datalynx/classes/view/base.php"
+);
 
 /**
  * A template for displaying datalynx entries in a tabular list

@@ -131,15 +131,6 @@ class datalynxview_report_form extends datalynxview_base_form {
     }
 
     /**
-     * Preprocess data for the form
-     *
-     * @param stdClass $data
-     */
-    public function data_preprocessing(&$data) {
-        parent::data_preprocessing($data);
-    }
-
-    /**
      * Set data for the form
      *
      * @param stdClass $data
@@ -147,15 +138,5 @@ class datalynxview_report_form extends datalynxview_base_form {
     public function set_data($data) {
         $this->data_preprocessing($data);
         parent::set_data($data);
-    }
-
-    /**
-     * Get data from the form
-     *
-     * @param bool $slashed
-     * @return stdClass|null
-     */
-    public function get_data($slashed = true) {
-        return parent::get_data($slashed);
     }
 }

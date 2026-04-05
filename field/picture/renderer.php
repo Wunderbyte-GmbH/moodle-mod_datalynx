@@ -75,6 +75,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
         }
     }
 
+    // phpcs:disable moodle.PHP.ForbiddenGlobalUse.BadGlobal
     /**
      * Render the field of type picture.
      *
@@ -83,8 +84,8 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
      * @return string
      */
     public function render_display_mode(stdClass $entry, array $options): string {
-        global $CFG, $PAGE; // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
-        $PAGE->requires->js_call_amd('mod_datalynx/zoomable', 'init'); // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
+        global $CFG, $PAGE;
+        $PAGE->requires->js_call_amd('mod_datalynx/zoomable', 'init');
         $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
@@ -135,6 +136,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
 
         return implode("<br />\n", $strfiles);
     }
+    // phpcs:enable moodle.PHP.ForbiddenGlobalUse.BadGlobal
 
     /**
      * Returns the pluginfile URL patterns for this field.

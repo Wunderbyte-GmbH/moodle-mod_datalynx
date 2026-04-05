@@ -809,7 +809,13 @@ class datalynx_entries {
                             foreach ($entries as $eid => $entry) {
                                 if ($eid > 0) {
                                     if (isset($contents[$eid]['info']['status'])) {
-                                        $entrystatus = $DB->get_field('datalynx_entries', 'status', ['id' => $eid], 'MUST_EXIST'); // Find current state of entry in db.
+                                        // Find current state of entry in db.
+                                        $entrystatus = $DB->get_field(
+                                            'datalynx_entries',
+                                            'status',
+                                            ['id' => $eid],
+                                            'MUST_EXIST'
+                                        );
                                         require_once('field/_status/field_class.php');
                                         if (
                                             $entrystatus == datalynxfield__status::STATUS_FINAL_SUBMISSION

@@ -239,7 +239,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
 
         foreach (explode("\n", $field->field->param5) as $key => $searchy) {
             [$andor, $refpattern, $not, $operator, $localpattern] = explode(',', $searchy);
-            // And/or.
+            // Validate the and/or combinator value.
             if (empty($andor) || !in_array($andor, ['AND', 'OR'])) {
                 continue;
             }

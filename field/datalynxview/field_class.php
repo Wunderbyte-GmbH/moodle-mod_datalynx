@@ -64,7 +64,7 @@ class datalynxfield_datalynxview extends datalynxfield_base {
 
         // Get the datalynx.
         if (
-            empty($this->field->param1) and
+            empty($this->field->param1) &&
                 !$DB->record_exists('datalynx', ['id' => $this->field->param1])
         ) {
             return;

@@ -123,7 +123,12 @@ class datalynxfield__time_renderer extends datalynxfield_renderer {
 
         if ($mform->_formName == 'mod_datalynx_form_datalynx_customfilter_frontend_form') {
             $attr = ['optional' => true]; // Allows date_time to be enabled, passes 0 if disabled.
-            $elements[] = $element = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_from", get_string('from'), $attr);
+            $elements[] = $element = &$mform->createElement(
+                'date_time_selector',
+                "f_{$i}_{$fieldid}_from",
+                get_string('from'),
+                $attr
+            );
             $element->setAttributes(['size' => 1]);
             $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_to", get_string('to'), $attr);
         }

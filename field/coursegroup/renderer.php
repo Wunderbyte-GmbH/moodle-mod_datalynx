@@ -60,11 +60,12 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
         return $replacements;
     }
 
+    // phpcs:disable moodle.PHP.ForbiddenGlobalUse.BadGlobal
     /**
      * Displays the edit form elements for the coursegroup field.
      */
     public function display_edit(&$mform, $entry, array $options = null) {
-        global $CFG, $DB, $SITE, $PAGE; // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
+        global $CFG, $DB, $SITE, $PAGE;
 
         $field = $this->field;
         $fieldid = $field->id();
@@ -106,7 +107,11 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
             ];
 
             // Add JQuery.
-            $PAGE->requires->js_call_amd('mod_datalynx/coursegroup', 'init', [$options]); // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
+            $PAGE->requires->js_call_amd(
+                'mod_datalynx/coursegroup',
+                'init',
+                [$options]
+            );
         }
 
         // Group id.
@@ -135,6 +140,7 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
             $mform->setDefault("{$fieldname}_groupid", $groupid);
         }
     }
+    // phpcs:enable moodle.PHP.ForbiddenGlobalUse.BadGlobal
 
     /**
      * Displays the browse view for the coursegroup field.

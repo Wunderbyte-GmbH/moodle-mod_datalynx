@@ -254,8 +254,8 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
                                         mtrace('All files deleted. The remote directory is now empty.' . PHP_EOL);
                                     } else {
                                         mtrace(var_export($response, true));
-                                        mtrace('The remote directory is not empty. 
-                                        There was a problem deleting all files.' . PHP_EOL);
+                                        mtrace('The remote directory is not empty.' .
+                                        ' There was a problem deleting all files.' . PHP_EOL);
                                     }
                                 }
                                 curl_close($ch1);

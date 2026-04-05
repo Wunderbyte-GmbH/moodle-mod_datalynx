@@ -30,6 +30,7 @@ require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
  * Renderer class for teammemberselect datalynx field
  */
 class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
+    // phpcs:disable moodle.PHP.ForbiddenGlobalUse.BadGlobal
     /**
      * Render the display mode for the teammemberselect field.
      *
@@ -38,7 +39,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
      * @return string
      */
     public function render_display_mode(stdClass $entry, array $options): string {
-        global $USER, $PAGE; // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
+        global $USER, $PAGE;
 
         // Variable $field datalynxfield_teammemberselect.
         $field = $this->field;
@@ -113,7 +114,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
             );
 
             // Load JS.
-            $PAGE->requires->js_call_amd( // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
+            $PAGE->requires->js_call_amd(
                 'mod_datalynx/teammemberselect',
                 'init',
                 [$field->df()->id(), $fieldid, $userurl->out(false), fullname($USER), $canunsubscribe]
@@ -122,6 +123,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
 
         return $str;
     }
+    // phpcs:enable moodle.PHP.ForbiddenGlobalUse.BadGlobal
 
     /** @var array Cached user list. */
     private static $userlist = [];
@@ -167,6 +169,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         return $list;
     }
 
+    // phpcs:disable moodle.PHP.ForbiddenGlobalUse.BadGlobal
     /**
      * Render the edit mode for the teammemberselect field.
      *
@@ -175,7 +178,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
      * @param array $options
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options = null) {
-        global $USER, $PAGE; // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
+        global $USER, $PAGE;
 
         // Variable $field datalynxfield_teammemberselect.
         $field = $this->field;
@@ -188,7 +191,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         // If we edit an existing entry that is not required we need a workaround.
         $newentry = optional_param('new', null, PARAM_INT) === null ? 1 : 0;
         if (!$newentry && !$required) {
-            $PAGE->requires->js_amd_inline( // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
+            $PAGE->requires->js_amd_inline(
                 "
             require(['jquery'], function($) {
                 $('option[value=\"-999\"]').removeAttr('selected');
@@ -226,6 +229,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
             $mform->addRule($fieldname, get_string('fieldrequired', 'datalynx'), 'required', null, 'client');
         }
     }
+    // phpcs:enable moodle.PHP.ForbiddenGlobalUse.BadGlobal
 
     /**
      * Render the search mode for the teammemberselect field.

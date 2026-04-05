@@ -87,10 +87,38 @@ class datalynxview_base_form extends moodleform {
         }
 
         $visiblegrp = [];
-        $visiblegrp[] = $mform->createElement('advcheckbox', 'visible1', '', get_string('visible1', 'datalynx'), ['group' => 1], [0, 1]);
-        $visiblegrp[] = $mform->createElement('advcheckbox', 'visible2', '', get_string('visible2', 'datalynx'), ['group' => 1], [0, 2]);
-        $visiblegrp[] = $mform->createElement('advcheckbox', 'visible4', '', get_string('visible4', 'datalynx'), ['group' => 1], [0, 4]);
-        $visiblegrp[] = $mform->createElement('advcheckbox', 'visible8', '', get_string('visible8', 'datalynx'), ['group' => 1], [0, 8]);
+        $visiblegrp[] = $mform->createElement(
+            'advcheckbox',
+            'visible1',
+            '',
+            get_string('visible1', 'datalynx'),
+            ['group' => 1],
+            [0, 1]
+        );
+        $visiblegrp[] = $mform->createElement(
+            'advcheckbox',
+            'visible2',
+            '',
+            get_string('visible2', 'datalynx'),
+            ['group' => 1],
+            [0, 2]
+        );
+        $visiblegrp[] = $mform->createElement(
+            'advcheckbox',
+            'visible4',
+            '',
+            get_string('visible4', 'datalynx'),
+            ['group' => 1],
+            [0, 4]
+        );
+        $visiblegrp[] = $mform->createElement(
+            'advcheckbox',
+            'visible8',
+            '',
+            get_string('visible8', 'datalynx'),
+            ['group' => 1],
+            [0, 8]
+        );
         $mform->addGroup($visiblegrp, 'visiblegroup', get_string('visibleto', 'datalynx'), null, false);
 
         // Filter.
@@ -393,7 +421,8 @@ class datalynxview_base_form extends moodleform {
                     if (!array_key_exists('eparam2_editor', $errors)) {
                         $errors['eparam2_editor'] = get_string('viewrepeatedfields', 'datalynx', substr($field[0], 2, -2));
                     } else {
-                        $errors['eparam2_editor'] .= "<br>" . get_string('viewrepeatedfields', 'datalynx', substr($field[0], 2, -2));
+                        $errors['eparam2_editor'] .= "<br>" .
+                            get_string('viewrepeatedfields', 'datalynx', substr($field[0], 2, -2));
                     }
                 }
             }

@@ -247,6 +247,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
         }
     }
 
+    // phpcs:disable moodle.PHP.ForbiddenGlobalUse.BadGlobal
     /**
      * Display user picture.
      *
@@ -255,7 +256,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
      * @return mixed
      */
     public function display_picture($entry, $large = false) {
-        global $OUTPUT, $USER; // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
+        global $OUTPUT, $USER;
 
         if ($entry->id < 0) { // New entry.
             $user = $USER;
@@ -275,8 +276,9 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
         if ($large) {
             $pictureparams['size'] = 100;
         }
-        return $OUTPUT->user_picture($user, $pictureparams); // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
+        return $OUTPUT->user_picture($user, $pictureparams);
     }
+    // phpcs:enable moodle.PHP.ForbiddenGlobalUse.BadGlobal
 
     /**
      * Display email.
@@ -326,6 +328,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
         }
     }
 
+    // phpcs:disable moodle.PHP.ForbiddenGlobalUse.BadGlobal
     /**
      * Display all badges a user has earned in an entry view.
      *
@@ -333,7 +336,7 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
      * @return string
      */
     public function display_badges($entry) {
-        global $USER, $PAGE; // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
+        global $USER, $PAGE;
 
         if ($entry->id < 0) { // New entry.
             $userid = $USER->id;
@@ -341,13 +344,14 @@ class datalynxfield_entryauthor_renderer extends datalynxfield_renderer {
             $userid = $entry->userid;
         }
 
-        $output = $PAGE->get_renderer('core', 'badges'); // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
+        $output = $PAGE->get_renderer('core', 'badges');
 
         if ($badges = badges_get_user_badges($userid)) {
             return $output->print_badges_list($badges, $userid, true);
         }
         return '';
     }
+    // phpcs:enable moodle.PHP.ForbiddenGlobalUse.BadGlobal
 
     /**
      * Array of patterns this field supports.

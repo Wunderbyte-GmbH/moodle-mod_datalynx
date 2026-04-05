@@ -159,7 +159,7 @@ class datalynxfield_teammemberselect_form extends datalynxfield_form {
             $checkedroles = [];
             foreach ((array) $data as $key => $value) {
                 if (strpos($key, 'admissible') === 0 && is_numeric($value) && $value > 0) {
-                    $checkedroles[] = (int) $value; // Cast to integer for consistency
+                    $checkedroles[] = (int) $value; // Cast to integer for consistency.
                     unset($data->$key);
                 }
             }
