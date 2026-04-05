@@ -15,13 +15,13 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Page for managing fields in a datalynx instance.
+ * Datalynx field index.
  *
- * @package mod_datalynx
- * @copyright Ivan Šakić, Thomas Niedermaier, David Bogner
- * @copyright based on the work by 2011 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    mod_datalynx
+ * @copyright  2025 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require_once('../../../config.php');
 require_once('../classes/datalynx.php');
 require_once("$CFG->libdir/tablelib.php");

@@ -27,12 +27,17 @@ use stdClass;
 /**
  * Base class for Datalynx Field Types
  * @package mod_datalynx
+ * @copyright 2025 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class datalynxfield_base {
+    /** @var int Field is not visible to anyone. */
     const VISIBLE_NONE = 0;
 
+    /** @var int Field is visible to the owner only. */
     const VISIBLE_OWNER = 1;
 
+    /** @var int Field is visible to all users. */
     const VISIBLE_ALL = 2;
 
     /**
@@ -90,7 +95,7 @@ abstract class datalynxfield_base {
             if ($df instanceof \mod_datalynx\datalynx) {
                 $this->df = $df;
             } else {
-                // $df is the datalynx id.
+                // Construct the datalynx object from the integer id.
                 $this->df = new mod_datalynx\datalynx($df);
             }
         }
@@ -194,7 +199,7 @@ abstract class datalynxfield_base {
         if (isset($this->field->$var)) {
             return $this->field->$var;
         } else {
-            // TODO throw an exception if $var is not a property of field.
+            // Returns false if the property does not exist on the field object.
             return false;
         }
     }
@@ -236,12 +241,18 @@ abstract class datalynxfield_base {
     }
 
     /**
+     * Returns the datalynx instance this field belongs to.
+     *
+     * @return datalynx
      */
     public function df() {
         return $this->df;
     }
 
     /**
+     * Returns the edit form for this field type.
+     *
+     * @return moodleform
      */
     public function get_form() {
         global $CFG;
@@ -270,6 +281,9 @@ abstract class datalynxfield_base {
     }
 
     /**
+     * Returns the field record as a form data object.
+     *
+     * @return stdClass
      */
     public function to_form() {
         return $this->field;
@@ -290,6 +304,9 @@ abstract class datalynxfield_base {
         return $this->renderer;
     }
 
+    /**
+     * @var array Default render options applied when displaying field patterns.
+     */
     protected static $defaultoptions = ['manage' => false, 'visible' => false, 'edit' => false,
             'editable' => false, 'disabled' => false, 'required' => false, 'internal' => false,
     ];
@@ -313,6 +330,8 @@ abstract class datalynxfield_base {
     }
 
     /**
+     * Returns whether this field is an internal (non-user-editable) field.
+     *
      * @return bool
      */
     public static function is_internal() {
@@ -353,16 +372,14 @@ abstract class datalynxfield_base {
             $rec->{"content$c"} = $content;
         }
 
-        // TODO: Bug found,
-        // When we add a list of values but the first is empty, this insert is not triggered and the order is inserted wrong.
+        // Note: when the first value in a list is empty the insert is skipped and ordering may be wrong.
 
         // Insert only if no old contents and there is new contents.
         if (is_null($contentid) && !empty($contents)) {
             return $DB->insert_record('datalynx_contents', $rec);
         }
 
-        // TODO: This needs upgrading, we don't delete the whole entry id but only the one value if other lines exist.
-        // Delete if old content but not new.
+        // Note: only the specific content row is deleted, not all content for the entry id.
         if (!is_null($contentid) && empty($contents)) {
             return $this->delete_content($entry->id);
         }
@@ -458,8 +475,7 @@ abstract class datalynxfield_base {
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
         $fieldid = $this->field->id;
         $fieldname = $this->name();
-        // TODO.
-        // Ugly hack for internal fields.
+        // Internal fields use a different import settings structure.
         if ($this->is_internal()) {
             $setting = reset($importsettings);
             $csvname = $setting['name'];
@@ -625,12 +641,18 @@ abstract class datalynxfield_base {
     }
 
     /**
+     * Returns the SQL fragment used for sorting by this field.
+     *
+     * @return string
      */
     public function get_sort_sql() {
         return $this->get_sql_compare_text();
     }
 
     /**
+     * Returns the SQL JOIN fragment used when searching by this field.
+     *
+     * @return string
      */
     public function get_search_from_sql() {
         $fieldid = $this->field->id;
@@ -743,6 +765,11 @@ abstract class datalynxfield_base {
     }
 
     /**
+     * Extracts the search value for this field from submitted form data.
+     *
+     * @param stdClass $formdata
+     * @param int $i
+     * @return mixed
      */
     public function parse_search($formdata, $i) {
         $fieldid = $this->field->id;
@@ -754,6 +781,10 @@ abstract class datalynxfield_base {
     }
 
     /**
+     * Formats the search parameters for display.
+     *
+     * @param array $searchparams
+     * @return string|false
      */
     public function format_search_value($searchparams) {
         [$not, $operator, $value] = $searchparams;
@@ -761,12 +792,18 @@ abstract class datalynxfield_base {
     }
 
     /**
+     * Normalises and returns the search value ready for SQL comparison.
+     *
+     * @param mixed $value
+     * @return mixed
      */
     public function get_search_value($value) {
         return $value;
     }
 
     /**
+     * Returns the SQL fragment for comparing the field content column.
+     *
      * @param string $column
      * @return string
      */
@@ -823,8 +860,14 @@ abstract class datalynxfield_base {
         return []; // If search is not supported, offer no operators.
     }
 
+    /**
+     * Returns the number of arguments required for the given search operator.
+     *
+     * @param string $operator
+     * @return int
+     */
     public function get_argument_count(string $operator) {
-        if ($operator === "") { // "Empty" operator
+        if ($operator === "") { // Empty operator requires no argument.
             return 0;
         } else {
             return 1;

@@ -24,8 +24,13 @@
 
 use mod_datalynx\local\field\datalynxfield_no_content;
 
-defined('MOODLE_INTERNAL') || die();
-
+/**
+ * Entry group field class.
+ *
+ * @package    datalynxfield_entrygroup
+ * @copyright  2025 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class datalynxfield_entrygroup extends datalynxfield_no_content {
     /** @var string The field type. */
     public $type = 'entrygroup';

@@ -33,6 +33,7 @@ require_once(dirname(__FILE__) . "/../rule_class.php");
  * Download files via sftp.
  */
 class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
+    /** @var string Rule type name. */
     public $type = 'ftpsyncfiles';
 
     /**
@@ -77,8 +78,7 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
     /**
      * The id of the user who should own the entry. This is different from the user matched from the file.
      *
-     * @var
-     */
+     * @var int     */
     private $authorid;
     /**
      * The datalynx object to use.
@@ -207,7 +207,7 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
                     $context = context_user::instance($USER->id);
 
                     if ($filedata !== false) {
-                        // TODO: Store Data in Moodle.
+                        // TODO MDL-000000: Store Data in Moodle.
                         $draftitemid = file_get_unused_draft_itemid();
                         file_prepare_draft_area($draftitemid, $context->id, 'user', 'content', null);
                         $this->files[$draftitemid] = $this->fs->create_file_from_string(
@@ -243,13 +243,13 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
                             if ($deleteresult === false) {
                                 curl_close($ch);
                                 $ch1 = $this->init_curl($server, $connection);
-                                // Tried to delete files using different char encodings. Now checking if dir is empty:
+                                // Tried to delete files using different char encodings. Now checking if dir is empty.
                                 $response = curl_exec($ch1);
                                 if ($response === false) {
-                                    // cURL request failed.
+                                    // CuRL request failed.
                                     mtrace(var_export(curl_errno($ch1), true) . curl_error($ch1) . curl_getinfo($ch1));
                                 } else {
-                                    // cURL request succeeded. Check if the directory is empty.
+                                    // CuRL request succeeded. Check if the directory is empty.
                                     if (empty(trim($response, " \n\r\t\v\0\."))) {
                                         mtrace('All files deleted. The remote directory is now empty.' . PHP_EOL);
                                     } else {

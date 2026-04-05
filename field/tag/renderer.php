@@ -67,7 +67,7 @@ class datalynxfield_tag_renderer extends datalynxfield_renderer {
      * @see datalynxfield_renderer::render_display_mode()
      */
     public function render_display_mode(stdClass $entry, array $options): string {
-        global $OUTPUT;
+        global $OUTPUT; // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
 
         $str = '';
         $field = $this->field;
@@ -83,7 +83,7 @@ class datalynxfield_tag_renderer extends datalynxfield_renderer {
             }
             return implode("#", $exportstring);
         }
-        $str = $OUTPUT->tag_list($items, null, 'datalynx-tags');
+        $str = $OUTPUT->tag_list($items, null, 'datalynx-tags'); // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
         if (isset($options['nolink'])) {
             $str = preg_replace("/<b>.+<\/b>/i", '', $str);
             $str = preg_replace("/<a[^>]*(href=\"[^\"]+?\")([^>]*?)(\/?)>([^<]+)(<\/a>)/i", '<span$2>$4</span>', $str);

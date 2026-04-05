@@ -26,8 +26,6 @@
 // TODO: MDL-66151 Check why namespace is different then component name.
 namespace datalynxrule_eventnotification\privacy;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Privacy provider class
  *

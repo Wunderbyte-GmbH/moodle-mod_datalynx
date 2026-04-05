@@ -32,39 +32,63 @@ use datalynxfield_userinfo;
 use mod_datalynx\local\field\datalynxfield_option_multiple;
 use mod_datalynx\view\base;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Filter class
+ * @package mod_datalynx
+ * @copyright 2013 onwards edulabs.org and associated programmers
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class datalynx_filter {
+    /** @var int Filter record id. */
     public $id;
+    /** @var int Datalynx instance id. */
     public $dataid;
+    /** @var string Filter name. */
     public $name;
+    /** @var string Filter description. */
     public $description;
+    /** @var int Visibility setting. */
     public $visible;
+    /** @var int Entries per page. */
     public $perpage;
+    /** @var int Current page number. */
     public $pagenum;
+    /** @var int Entry selection mode. */
     public $selection;
+    /** @var string Group-by field identifier. */
     public $groupby;
+    /** @var string Serialised custom sort options. */
     public $customsort;
+    /** @var string Serialised custom search options. */
     public $customsearch;
+    /** @var string Simple search string. */
     public $search;
+    /** @var array|null Content fields to fetch. */
     public $contentfields;
+    /** @var string|null Comma-separated entry ids to restrict results. */
     public $eids;
+    /** @var string|null User restriction. */
     public $users;
+    /** @var string|null Group restriction. */
     public $groups;
+    /** @var int Current page offset. */
     public $page;
+    /** @var string Author search string. */
     public $authorsearch;
 
+    /** @var string|null SQL fragment for filtered tables. */
     protected $filteredtables = null;
 
+    /** @var array|null Fields used in search. */
     protected $searchfields = null;
 
+    /** @var array|null Fields used in sort. */
     protected $sortfields = null;
 
+    /** @var array|null JOIN fragments. */
     protected $joins = null;
 
+    /** @var array Entry ids excluded from results. */
     protected $entriesexcluded = [];
 
     /**
@@ -93,7 +117,7 @@ class datalynx_filter {
         }
         $this->contentfields = empty($filterdata->contentfields) ? null : $filterdata->contentfields;
 
-        // TODO: Make eids string only and then do ? '' instead of null value.
+        // Eids may be null when no entry restriction is set.
         $this->eids = empty($filterdata->eids) ? null : $filterdata->eids;
 
         $this->users = empty($filterdata->users) ? null : $filterdata->users;
@@ -102,6 +126,9 @@ class datalynx_filter {
     }
 
     /**
+     * Returns a plain stdClass object representation of this filter.
+     *
+     * @return \stdClass
      */
     public function get_filter_obj() {
         $filter = new stdClass();
@@ -123,6 +150,10 @@ class datalynx_filter {
     }
 
     /**
+     * Builds and returns the full SQL fragments (tables, where, order, content) for this filter.
+     *
+     * @param array $fields
+     * @return array
      */
     public function get_sql($fields) {
         $this->init_filter_sql();
@@ -385,6 +416,10 @@ class datalynx_filter {
     }
 
     /**
+     * Builds the SQL ORDER BY and JOIN fragments for the sort settings of this filter.
+     *
+     * @param array $fields
+     * @return array [$sorttables, $sortorder, $params]
      */
     public function get_sort_sql($fields) {
         global $DB;
@@ -479,6 +514,10 @@ class datalynx_filter {
     }
 
     /**
+     * Builds the SQL SELECT and JOIN fragments for fetching content fields.
+     *
+     * @param array $fields
+     * @return array [$datalynxcontent, $whatcontent, $contenttables, $params]
      */
     public function get_content_sql($fields) {
         $contentfields = $this->contentfields;
@@ -558,6 +597,9 @@ class datalynx_filter {
     }
 
     /**
+     * Appends additional sort options to the current custom sort settings.
+     *
+     * @param array $sorties fieldid => sortdir pairs
      */
     public function append_sort_options(array $sorties) {
         if ($sorties) {
@@ -568,9 +610,11 @@ class datalynx_filter {
             $this->customsort = serialize($sortoptions);
         }
     }
-    // Prepend sort option.
 
     /**
+     * Appends additional search options to the current custom search settings.
+     *
+     * @param array $searchies fieldid => search option pairs
      */
     public function append_search_options(array $searchies) {
         if ($searchies) {
@@ -578,10 +622,9 @@ class datalynx_filter {
             foreach ($searchies as $fieldid => $searchy) {
                 if (empty($searchoptions[$fieldid])) {
                     $searchoptions[$fieldid] = $searchies[$fieldid];
-                } // TODO add capability check in else-branch.
+                }
             }
             $this->customsearch = serialize($searchoptions);
         }
     }
-    // Prepend search option.
 }

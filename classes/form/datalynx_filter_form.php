@@ -17,9 +17,18 @@
 namespace mod_datalynx\form;
 use coding_exception;
 
+/**
+ * Filter form for managing datalynx filter settings.
+ *
+ * @package mod_datalynx
+ * @copyright 2025 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class datalynx_filter_form extends datalynx_filter_base_form {
-    /*
+    /**
+     * Defines the filter form elements.
      *
+     * @return void
      */
     public function definition() {
         $df = $this->dl;
@@ -98,6 +107,8 @@ class datalynx_filter_form extends datalynx_filter_base_form {
     }
 
     /**
+     * Validates the filter form submission.
+     *
      * @param array $data
      * @param array $files
      * @return array

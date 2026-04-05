@@ -32,10 +32,15 @@ require_once("$CFG->libdir/formslib.php");
  * settings
  */
 class datalynxview_base_form extends moodleform {
+    /** @var object The view object. */
     protected $view = null;
 
+    /** @var object The datalynx instance. */
     protected $dl = null;
 
+    /**
+     * Constructor for datalynxview_base_form.
+     */
     public function __construct(
         $view,
         $action = null,
@@ -52,6 +57,7 @@ class datalynxview_base_form extends moodleform {
     }
 
     /**
+     * Define the form elements.
      */
     public function definition() {
         global $CFG, $DB;
@@ -130,6 +136,9 @@ class datalynxview_base_form extends moodleform {
         $this->add_action_buttons();
     }
 
+    /**
+     * Get the submitted form data.
+     */
     public function get_data() {
         $data = parent::get_data();
         if (isset($data)) {
@@ -144,6 +153,9 @@ class datalynxview_base_form extends moodleform {
         return $data;
     }
 
+    /**
+     * Set the form data from a data object.
+     */
     public function set_data($data) {
         // The checkboxes of the view form have an initial value of unchecked.
         $data->visible1 = 0;
@@ -171,6 +183,9 @@ class datalynxview_base_form extends moodleform {
         parent::set_data($data);
     }
 
+    /**
+     * Get the view menu for redirect settings.
+     */
     public function get_view_menu() {
         global $DB;
         $viewid = $this->view->view->id;
@@ -312,6 +327,7 @@ class datalynxview_base_form extends moodleform {
     }
 
     /**
+     * Validate the form data.
      */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);

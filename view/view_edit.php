@@ -15,13 +15,13 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * View edit file
+ * Datalynx view edit page.
  *
- * @package mod_datalynx
- * @copyright 2013 onwards edulabs.org and associated programmers
- * @copyright based on the work  by 2011 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    mod_datalynx
+ * @copyright  2025 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require_once('../../../config.php');
 require_once("$CFG->dirroot/mod/datalynx/classes/datalynx.php");
 

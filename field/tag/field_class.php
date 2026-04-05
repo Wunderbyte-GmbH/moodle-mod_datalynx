@@ -26,10 +26,6 @@ use mod_datalynx\local\field\datalynxfield_base;
 use mod_datalynx\local\field\datalynxfield_option;
 use mod_datalynx\local\field\datalynxfield_option_multiple;
 
-defined('MOODLE_INTERNAL') || die();
-
-
-
 /**
  * Field class for the tag field type.
  *

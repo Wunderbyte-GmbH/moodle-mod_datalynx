@@ -17,6 +17,13 @@
 namespace mod_datalynx;
 use rating;
 
+/**
+ * Extends the core rating class to provide datalynx-specific aggregate value rendering.
+ *
+ * @package mod_datalynx
+ * @copyright 2025 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class datalynx_rating extends rating {
     /**
      * Returns this ratings aggregate value

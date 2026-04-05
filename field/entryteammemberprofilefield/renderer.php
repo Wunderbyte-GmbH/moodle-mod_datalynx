@@ -31,8 +31,17 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
+ * Renderer for the entryteammemberprofilefield field type.
  */
 class datalynxfield_entryteammemberprofilefield_renderer extends datalynxfield_renderer {
+    /**
+     * Renders the search mode form elements for this field.
+     *
+     * @param MoodleQuickForm $mform
+     * @param int $i
+     * @param string $value
+     * @return array
+     */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
         $fieldid = $this->field->id();
         $fieldname = "f_{$i}_$fieldid";

@@ -25,10 +25,6 @@
 
 use mod_datalynx\local\field\datalynxfield_no_content;
 
-defined('MOODLE_INTERNAL') || die();
-
-
-
 /**
  * Field class for the internal entry reference field.
  *

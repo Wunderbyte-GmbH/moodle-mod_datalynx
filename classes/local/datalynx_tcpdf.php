@@ -21,6 +21,8 @@ use stdClass;
 /**
  * Extend the TCPDF class to create custom Header and Footer.
  * @package mod_datalynx
+ * @copyright 2025 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class datalynx_tcpdf extends setasign\Fpdi\Tcpdf\Fpdi {
     /**

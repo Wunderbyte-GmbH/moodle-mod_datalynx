@@ -27,8 +27,16 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
+ * Renderer class for the time field type.
  */
 class datalynxfield_time_renderer extends datalynxfield_renderer {
+    /**
+     * Render the edit mode for the time field.
+     *
+     * @param MoodleQuickForm $mform
+     * @param stdClass $entry
+     * @param array $options
+     */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $field = $this->field;
         $fieldid = $field->id();
@@ -48,6 +56,13 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         }
     }
 
+    /**
+     * Render the display mode for the time field.
+     *
+     * @param stdClass $entry
+     * @param array $options
+     * @return string
+     */
     public function render_display_mode(stdClass $entry, array $options): string {
         $field = $this->field;
         $fieldid = $field->id();
@@ -76,6 +91,14 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         return $strtime;
     }
 
+    /**
+     * Render the search mode for the time field.
+     *
+     * @param MoodleQuickForm $mform
+     * @param int $i
+     * @param string $value
+     * @return array
+     */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
         $field = $this->field;
         $fieldid = $field->id();
@@ -125,6 +148,7 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Render the standard date/time selector for the time field.
      */
     protected function render_standard_selector(
         &$mform,
@@ -180,7 +204,7 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         $fieldid = $field->id();
         $fieldname = "field_{$fieldid}_{$entryid}";
 
-        // TODO some defaults that need to be set in the field settings.
+        // TODO MDL-000000 some defaults that need to be set in the field settings.
         $step = 5;
         $startyear = $field->startyear ? $field->startyear : 1970;
         $stopyear = $field->stopyear ? $field->stopyear : 2020;
@@ -380,6 +404,14 @@ class datalynxfield_time_renderer extends datalynxfield_renderer {
         return $patterns;
     }
 
+    /**
+     * Validate the time field entry data.
+     *
+     * @param int|string $entryid
+     * @param array $tags
+     * @param stdClass $formdata
+     * @return array
+     */
     public function validate($entryid, $tags, $formdata) {
         $fieldid = $this->field->id();
 

@@ -42,6 +42,11 @@ class datalynxfield_option_form extends datalynxfield_form {
      */
     protected $field = null;
 
+    /**
+     * Adds option dialog elements after initial data population.
+     *
+     * @return void
+     */
     public function definition_after_data() {
         $this->add_option_dialog();
     }

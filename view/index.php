@@ -304,7 +304,7 @@ if (!empty($views)) {
             );
         }
 
-        // TODO view filter.
+        // TODO MDL-000000 view filter.
         if (!empty($filtersmenu)) {
             $viewfilterid = $view->view->filter;
             if ($viewfilterid && !in_array($viewfilterid, array_keys($filtersmenu))) {

@@ -25,8 +25,6 @@
 
 namespace datalynxview_tabular\privacy;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Privacy provider class
  *

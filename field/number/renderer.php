@@ -18,12 +18,15 @@
  * Renderer for the number field type.
  *
  * @package datalynxfield_number
+ * @copyright  2025 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->dirroot/mod/datalynx/field/text/renderer.php");
 
 /**
+ * Renderer class for the datalynxfield_number field type.
  */
 class datalynxfield_number_renderer extends datalynxfield_text_renderer {
     /**

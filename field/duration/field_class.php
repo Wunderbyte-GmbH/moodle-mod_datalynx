@@ -27,15 +27,22 @@ use mod_datalynx\local\field\datalynxfield_base;
 
 defined('MOODLE_INTERNAL') || die();
 
-
 require_once("$CFG->dirroot/mod/datalynx/field/number/field_class.php");
 
+/**
+ * Duration field class for datalynx.
+ *
+ * @package    datalynxfield_duration
+ * @copyright  2025 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class datalynxfield_duration extends datalynxfield_base {
     /**
      * @var string
      */
     public $type = 'duration';
 
+    /** @var array|null Unit definitions. */
     protected $units = null;
 
     /**
@@ -79,6 +86,8 @@ class datalynxfield_duration extends datalynxfield_base {
     }
 
     /**
+     * Returns the SQL compare text for the duration field.
+     *
      * @param string $column
      * @return string
      */
@@ -87,6 +96,13 @@ class datalynxfield_duration extends datalynxfield_base {
         return $DB->sql_cast_char2int("c{$this->field->id}.$column", true);
     }
 
+    /**
+     * Formats the field content for database storage.
+     *
+     * @param object $entry
+     * @param array|null $values
+     * @return array
+     */
     protected function format_content($entry, array $values = null) {
         $fieldid = $this->field->id;
         $contents = [];
@@ -102,6 +118,7 @@ class datalynxfield_duration extends datalynxfield_base {
     }
 
     /**
+     * Parses submitted search form data for this field.
      */
     public function parse_search($formdata, $i) {
         $values = [];
@@ -139,6 +156,7 @@ class datalynxfield_duration extends datalynxfield_base {
 
 
     /**
+     * Prepares field content for import.
      */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
         // Import only from csv.
@@ -217,6 +235,7 @@ class datalynxfield_duration extends datalynxfield_base {
     }
 
     /**
+     * Formats a search value for display.
      */
     public function format_search_value($searchparams) {
         [$not, $operator, $value] = $searchparams;
@@ -230,6 +249,11 @@ class datalynxfield_duration extends datalynxfield_base {
         return $not . ' ' . $operator . ' ' . $value;
     }
 
+    /**
+     * Returns the supported search operators for this field.
+     *
+     * @return array
+     */
     public function get_supported_search_operators() {
         return ['' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
                 '>' => get_string('greaterthan', 'datalynx'),

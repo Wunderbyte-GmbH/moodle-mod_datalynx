@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Renderer for the fieldgroup field type.
+ *
  * @package datalynxfield_fieldgroup
  * @subpackage fieldgroup
  * @copyright 2018 michael pollak <moodle@michaelpollak.org>
@@ -40,7 +42,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
      * @see datalynxfield_renderer::render_display_mode()
      */
     public function render_display_mode(stdClass $entry, array $options): string {
-        global $OUTPUT;
+        global $OUTPUT; // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
 
         // We want to display these fields.
         $fieldgroupfields = $this->get_subfields();
@@ -91,7 +93,7 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
             $viewtype = ($view->view->type == 'pdf') ? 'pdf' : '';
         }
 
-        return $OUTPUT->render_from_template('mod_datalynx/fieldgroup' . $viewtype, $completedispl);
+        return $OUTPUT->render_from_template('mod_datalynx/fieldgroup' . $viewtype, $completedispl); // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
     }
 
     /**
@@ -187,8 +189,8 @@ class datalynxfield_fieldgroup_renderer extends datalynxfield_renderer {
         $mform->setType($fieldname . '_lastvisible', PARAM_INT);
 
         // Hide unused lines.
-        global $PAGE;
-        $PAGE->requires->js_call_amd(
+        global $PAGE; // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
+        $PAGE->requires->js_call_amd( // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
             'mod_datalynx/fieldgroups',
             'init',
             [$this->field->field->name, $defaultlines, $maxlines, $requiredlines, $fieldname]

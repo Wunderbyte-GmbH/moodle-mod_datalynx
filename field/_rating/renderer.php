@@ -30,9 +30,13 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
+ * Renderer class for the internal rating field.
+ *
+ * @package    mod_datalynx
  */
 class datalynxfield__rating_renderer extends datalynxfield_renderer {
     /**
+     * Returns replacement values for rating tags.
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
         global $CFG, $DB;
@@ -75,7 +79,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
             $options->ratingarea = 'entry';
             // Ugly hack to work around the exception in generate_settings.
             $options->aggregate = RATING_AGGREGATE_COUNT;
-            // TODO check when scaleid is empty.
+            // TODO MDL-000000 check when scaleid is empty.
             $options->scaleid = !empty($entry->scaleid) ? $entry->scaleid : $field->df()->data->rating;
 
             $rec = new stdClass();
@@ -176,6 +180,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Returns aggregation keys matching the given patterns.
      */
     public function get_aggregations($patterns) {
         $aggr = [datalynxfield__rating::AGGREGATE_AVG => '##ratings:avg##',
@@ -190,9 +195,10 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Displays a link to view all ratings for an entry.
      */
     protected function display_view($entry, $tag) {
-        global $OUTPUT;
+        global $OUTPUT; // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
 
         if (isset($entry->rating)) {
             $rating = $entry->rating;
@@ -211,7 +217,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
                 );
 
                 if ($tag == '##ratings:view##') {
-                    return $OUTPUT->action_link($nonpopuplink, 'view all', $popupaction);
+                    return $OUTPUT->action_link($nonpopuplink, 'view all', $popupaction); // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
                 } else {
                     return $popuplink;
                 }
@@ -221,9 +227,10 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Displays an inline table of all ratings for an entry.
      */
     protected function display_view_inline($entry) {
-        global $OUTPUT, $DB;
+        global $OUTPUT, $DB; // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
 
         if (isset($entry->rating)) {
             $rating = $entry->rating;
@@ -252,7 +259,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
                     $raterecord->id = $raterecord->userid;
                     $row = new html_table_row();
                     $row->attributes['class'] = 'ratingitemheader';
-                    $row->cells[] = $OUTPUT->user_picture(
+                    $row->cells[] = $OUTPUT->user_picture( // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
                         $raterecord,
                         ['courseid' => $this->field->df()->course->id,
                         ]
@@ -277,6 +284,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Displays a bar chart representation of the rating value.
      */
     protected function display_bar($entry, $value) {
         if (isset($entry->rating) && $value) {
@@ -295,9 +303,10 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Displays a star rating widget for an entry.
      */
     protected function display_star($entry, $value) {
-        global $OUTPUT;
+        global $OUTPUT; // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
 
         if (isset($entry->rating)) {
             $rating = $entry->rating;
@@ -322,7 +331,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
                 array_fill(
                     0,
                     $numstars,
-                    $OUTPUT->pix_icon(
+                    $OUTPUT->pix_icon( // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
                         'star_grey',
                         '',
                         'datalynxfield__rating',
@@ -345,9 +354,10 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Renders the interactive rating form for an entry.
      */
     public function render_rating($entry) {
-        global $OUTPUT, $PAGE;
+        global $OUTPUT, $PAGE; // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
 
         $ratinghtml = '';
 
@@ -356,7 +366,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
 
             $rm = new datalynx_rating_manager();
             // Initialise the JavaScript so ratings can be done by AJAX.
-            $rm->initialise_rating_javascript($PAGE);
+            $rm->initialise_rating_javascript($PAGE); // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
 
             $strrate = get_string("rate", "rating");
             $ratinghtml = ''; // The string we'll return.
@@ -428,7 +438,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
                 $ratinghtml .= html_writer::empty_tag('input', $attributes);
 
                 if (!$rating->settings->scale->isnumeric) {
-                    $ratinghtml .= $OUTPUT->help_icon_scale($rating->settings->scale->courseid, $rating->settings->scale);
+                    $ratinghtml .= $OUTPUT->help_icon_scale($rating->settings->scale->courseid, $rating->settings->scale); // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
                 }
                 $ratinghtml .= html_writer::end_tag('span');
                 $ratinghtml .= html_writer::end_tag('div');

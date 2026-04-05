@@ -23,7 +23,10 @@ use portfolio_module_caller_base;
 
 /**
  * The class to handle entry exports of a datalynx module
+ *
  * @package mod_datalynx
+ * @copyright 2025 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class datalynx_portfolio_caller extends portfolio_module_caller_base {
     /**

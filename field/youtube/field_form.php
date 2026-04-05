@@ -24,7 +24,6 @@
 
 use mod_datalynx\form\datalynxfield_form;
 
-defined('MOODLE_INTERNAL') || die();
 
 
 /**

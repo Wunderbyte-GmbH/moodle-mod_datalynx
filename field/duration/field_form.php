@@ -24,10 +24,9 @@
 
 use mod_datalynx\form\datalynxfield_form;
 
-defined('MOODLE_INTERNAL') || die();
-
-
-/** Form class for the duration field type. */
+/**
+ * Form class for the duration field type.
+ */
 class datalynxfield_duration_form extends datalynxfield_form {
     /**
      * Define the form elements for the duration field.

@@ -15,12 +15,13 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Renderer index file
+ * Datalynx renderer index.
  *
- * @package datalynx_renderer
- * @copyright 2014 Ivan Šakić
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    mod_datalynx
+ * @copyright  2025 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require_once('../../../config.php');
 require_once('../classes/datalynx.php');
 require_once("$CFG->libdir/tablelib.php");

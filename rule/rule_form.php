@@ -26,6 +26,13 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->libdir/formslib.php");
 require_once('rule_manager.php');
 
+/**
+ * Datalynx rule form base class.
+ *
+ * @package    mod_datalynx
+ * @copyright  2025 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class datalynx_rule_form extends moodleform {
     /**
      * @var object

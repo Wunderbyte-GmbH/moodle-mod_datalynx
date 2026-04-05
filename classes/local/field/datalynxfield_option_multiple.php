@@ -18,6 +18,8 @@ namespace mod_datalynx\local\field;
 /**
  * Base class for Datalynx field types that offer a set of options with multiple choice
  * @package mod_datalynx
+ * @copyright 2025 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class datalynxfield_option_multiple extends datalynxfield_option {
     /**
@@ -252,14 +254,25 @@ class datalynxfield_option_multiple extends datalynxfield_option {
         return [$sql, $params, $usecontent];
     }
 
+    /**
+     * Returns the search operators supported by multi-select fields.
+     *
+     * @return array
+     */
     public function get_supported_search_operators() {
         return ['ANY_OF' => get_string('anyof', 'datalynx'),
                 'ALL_OF' => get_string('allof', 'datalynx'),
                 'EXACTLY' => get_string('exactly', 'datalynx'), '' => get_string('empty', 'datalynx')];
     }
 
+    /**
+     * Returns the number of arguments required for the given search operator.
+     *
+     * @param string $operator
+     * @return int
+     */
     public function get_argument_count(string $operator) {
-        if ($operator === "") { // "Empty" operator
+        if ($operator === "") { // Empty operator requires no argument.
             return 0;
         } else {
             return 1;

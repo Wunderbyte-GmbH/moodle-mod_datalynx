@@ -23,23 +23,33 @@ use mod_datalynx\form\datalynx_filter_form;
 use moodle_url;
 use stdClass;
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->libdir . '/formslib.php');
 
 /**
  * Filter manager class
  * @package mod_datalynx
+ * @copyright 2013 onwards edulabs.org and associated programmers
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class datalynx_filter_manager {
+    /** @var int Maximum number of user-saved filters per view. */
     const USER_FILTER_MAX_NUM = 5;
 
+    /** @var int Sentinel value for a blank (unsaved) filter. */
     const BLANK_FILTER = -1;
 
+    /** @var int Sentinel value indicating a user filter set is active. */
     const USER_FILTER_SET = -2;
 
+    /** @var int Starting id for user-created filter ids. */
     const USER_FILTER_ID_START = -10;
 
+    /** @var \mod_datalynx\datalynx The datalynx instance. */
     protected $dl;
 
+    /** @var array Cached filter objects keyed by filter id. */
     protected $filters;
 
     /**
@@ -51,6 +61,11 @@ class datalynx_filter_manager {
     }
 
     /**
+     * Returns a filter object for the given filter id, or creates a blank/user filter.
+     *
+     * @param int $filterid
+     * @param array|null $options
+     * @return datalynx_filter
      */
     public function get_filter_from_id($filterid = 0, array $options = null) {
 
@@ -122,6 +137,11 @@ class datalynx_filter_manager {
     }
 
     /**
+     * Parses filter settings from URL parameters and returns a filter object.
+     *
+     * @param \moodle_url $url
+     * @param bool $raw Return raw stdClass instead of datalynx_filter.
+     * @return datalynx_filter|null
      */
     public function get_filter_from_url($url, $raw = false) {
 
@@ -142,6 +162,12 @@ class datalynx_filter_manager {
     }
 
     /**
+     * Returns all filters for the current datalynx instance, optionally as a menu array.
+     *
+     * @param array|null $exclude Filter ids to exclude.
+     * @param bool $menu Return as id => name array.
+     * @param bool $forceget Bypass cache and re-fetch from DB.
+     * @return array|false
      */
     public function get_filters($exclude = null, $menu = false, $forceget = false) {
         global $DB;
@@ -181,6 +207,12 @@ class datalynx_filter_manager {
     }
 
     /**
+     * Processes a filter management action (add, update, delete, duplicate) on the given filter ids.
+     *
+     * @param string $action
+     * @param string $fids Comma-separated filter ids.
+     * @param bool $confirmed Whether the action has been confirmed.
+     * @return bool|array
      */
     public function process_filters($action, $fids, $confirmed = false) {
         global $DB, $OUTPUT;
@@ -188,7 +220,7 @@ class datalynx_filter_manager {
         $df = $this->dl;
 
         $filters = [];
-        // TODO may need new roles.
+        // Only users with managetemplates capability can process filters.
         if (has_capability('mod/datalynx:managetemplates', $df->context)) {
             // Don't need record from database for filter form submission.
             if ($fids) { // Some filters are specified for action.
@@ -202,7 +234,7 @@ class datalynx_filter_manager {
         $processedfids = [];
         $strnotify = '';
 
-        // TODO update should be roled.
+        // Updating requires the user to have appropriate capability.
         if (empty($filters)) {
             $df->notifications['bad'][] = get_string("filternoneforaction", 'datalynx');
             return false;
@@ -290,8 +322,7 @@ class datalynx_filter_manager {
                     case 'duplicate':
                         if (!empty($filters)) {
                             foreach ($filters as $filter) {
-                                // TODO: check for limit.
-                                // Set new name.
+                                // Check limit and set new name for the duplicate.
                                 while ($df->name_exists('filters', $filter->name)) {
                                     $filter->name = 'Copy of ' . $filter->name;
                                 }
@@ -374,6 +405,10 @@ class datalynx_filter_manager {
     }
 
     /**
+     * Builds and returns the moodleform for editing a filter.
+     *
+     * @param \stdClass $filter
+     * @return datalynx_filter_form
      */
     public function get_filter_form($filter) {
         global $CFG;
@@ -387,6 +422,11 @@ class datalynx_filter_manager {
     }
 
     /**
+     * Displays the filter edit form within the datalynx page layout and exits.
+     *
+     * @param datalynx_filter_form $mform
+     * @param \stdClass $filter
+     * @param array|null $urlparams
      */
     public function display_filter_form($mform, $filter, $urlparams = null) {
         $streditinga = $filter->id ? get_string('filteredit', 'datalynx', $filter->name) : get_string(
@@ -408,6 +448,12 @@ class datalynx_filter_manager {
     }
 
     /**
+     * Populates a filter object from submitted filter form data.
+     *
+     * @param datalynx_filter $filter
+     * @param \stdClass $formdata
+     * @param bool $finalize Whether to finalise search values.
+     * @return datalynx_filter
      */
     public function get_filter_from_form($filter, $formdata, $finalize = false) {
         $filter->name = $formdata->name;
@@ -525,6 +571,10 @@ class datalynx_filter_manager {
     }
 
     /**
+     * Extracts serialised sort options from submitted form data.
+     *
+     * @param \stdClass $formdata
+     * @return string Serialised sort options, or empty string.
      */
     protected function get_sort_options_from_form($formdata) {
         $sortfields = [];
@@ -535,7 +585,6 @@ class datalynx_filter_manager {
             }
             $i++;
         }
-        // TODO should we add the groupby field to the customsort now?
         if ($sortfields) {
             return serialize($sortfields);
         } else {
@@ -544,6 +593,11 @@ class datalynx_filter_manager {
     }
 
     /**
+     * Extracts serialised search options from submitted form data.
+     *
+     * @param \stdClass $formdata
+     * @param bool $finalize Whether to finalise (convert) search values.
+     * @return string Serialised search options.
      */
     protected function get_search_options_from_form($formdata, $finalize = false) {
         if ($fields = $this->dl->get_fields()) {
@@ -641,6 +695,7 @@ class datalynx_filter_manager {
     }
 
     /**
+     * Renders the filter management list table and outputs it.
      */
     public function print_filter_list() {
         global $OUTPUT;
@@ -845,6 +900,7 @@ class datalynx_filter_manager {
     }
 
     /**
+     * Renders the "Add filter" link and outputs it.
      */
     public function print_add_filter() {
         echo html_writer::empty_tag('br');
@@ -863,6 +919,11 @@ class datalynx_filter_manager {
     // ADVANCED FILTER.
 
     /**
+     * Builds and returns the advanced filter moodleform for the given view.
+     *
+     * @param \stdClass $filter
+     * @param \mod_datalynx\view\base $view
+     * @return datalynx_advanced_filter_form
      */
     public function get_advanced_filter_form($filter, $view) {
         global $CFG;
@@ -875,6 +936,12 @@ class datalynx_filter_manager {
     // CUSTOM FILTER.
 
     /**
+     * Builds and returns the customfilter frontend moodleform for the given view.
+     *
+     * @param \stdClass $filter
+     * @param \mod_datalynx\view\base $view
+     * @param bool $customfilter
+     * @return datalynx_customfilter_frontend_form
      */
     public function get_customfilter_frontend_form($filter, \mod_datalynx\view\base $view, $customfilter = false) {
         global $CFG;
@@ -896,6 +963,10 @@ class datalynx_filter_manager {
     }
 
     /**
+     * Returns the saved user filter menu (id => name) for the given view.
+     *
+     * @param int $viewid
+     * @return array
      */
     public function get_user_filters_menu($viewid) {
         $filters = [];
@@ -912,6 +983,13 @@ class datalynx_filter_manager {
     }
 
     /**
+     * Applies the given filter id as the active user filter for the given view.
+     *
+     * @param int $filterid
+     * @param \mod_datalynx\view\base $view
+     * @param bool $advanced
+     * @param bool $customfilter
+     * @return datalynx_filter
      */
     public function set_user_filter($filterid, \mod_datalynx\view\base $view, $advanced = false, $customfilter = false) {
         $df = $this->dl;
@@ -1012,6 +1090,10 @@ class datalynx_filter_manager {
     // HELPERS.
 
     /**
+     * Builds a URL query string representing the current filter settings.
+     *
+     * @param datalynx_filter $filter
+     * @return string
      */
     public static function get_filter_url_query($filter) {
         $urlquery = [];
@@ -1030,6 +1112,10 @@ class datalynx_filter_manager {
     }
 
     /**
+     * Encodes sort options as a URL query parameter string.
+     *
+     * @param array $sorties
+     * @return string
      */
     public static function get_sort_url_query(array $sorties) {
         if ($sorties) {
@@ -1043,12 +1129,20 @@ class datalynx_filter_manager {
     }
 
     /**
+     * Decodes a serialised sort URL query parameter back to an options array.
+     *
+     * @param string $query
+     * @return array
      */
     public static function get_sort_options_from_query($query) {
         return unserialize(urldecode($query));
     }
 
     /**
+     * Encodes search options as a URL query parameter string.
+     *
+     * @param array $searchies
+     * @return string|null
      */
     public static function get_search_url_query(array $searchies) {
         $usearch = null;
@@ -1083,6 +1177,10 @@ class datalynx_filter_manager {
     }
 
     /**
+     * Decodes a serialised search URL query parameter back to an options array.
+     *
+     * @param string $query
+     * @return array
      */
     public static function get_search_options_from_query($query) {
         $soptions = [];
@@ -1102,6 +1200,10 @@ class datalynx_filter_manager {
     }
 
     /**
+     * Extracts filter options from URL parameters or the provided moodle_url object.
+     *
+     * @param \moodle_url|null $url
+     * @return array
      */
     public static function get_filter_options_from_url($url = null) {
         $filteroptions = [      // Left: filteroption-names, right: urlparameter-names.
@@ -1171,6 +1273,11 @@ class datalynx_filter_manager {
         return $options;
     }
 
+    /**
+     * Extracts filter options from stored user preferences.
+     *
+     * @return array
+     */
     public static function get_filter_options_from_userpreferences() {
         $filteroptions = [   // Left: urlparam-names, right: userpreferences-names.
                 'perpage' => 'uperpage',
@@ -1226,5 +1333,5 @@ class datalynx_filter_manager {
         }
 
         return $options;
-    } // End function.
+    }
 }

@@ -15,9 +15,18 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 namespace mod_datalynx\form;
+/**
+ * Advanced filter form embedded within a datalynx view.
+ *
+ * @package mod_datalynx
+ * @copyright 2025 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class datalynx_advanced_filter_form extends datalynx_filter_base_form {
-    /*
-     * Definition of the advanced filter form which is part of a view
+    /**
+     * Defines the advanced filter form elements.
+     *
+     * @return void
      */
     public function definition() {
         $filter = $this->filter;

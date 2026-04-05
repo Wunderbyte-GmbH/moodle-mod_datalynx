@@ -24,9 +24,13 @@
 
 use mod_datalynx\form\datalynxfield_form;
 
-defined('MOODLE_INTERNAL') || die();
-
-
+/**
+ * Field form class for the teammemberselect field type.
+ *
+ * @package datalynxfield_teammemberselect
+ * @copyright  2025 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class datalynxfield_teammemberselect_form extends datalynxfield_form {
     /**
      * Defines the necessary form elements for field creation

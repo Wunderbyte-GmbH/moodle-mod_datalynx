@@ -27,9 +27,11 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
+ * Renderer for the file field type.
  */
 class datalynxfield_file_renderer extends datalynxfield_renderer {
     /**
+     * Renders the edit mode form elements for this field.
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options = null) {
         $field = $this->field;
@@ -125,6 +127,8 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Renders the search mode form elements for this field.
+     *
      * @param MoodleQuickForm $mform
      * @param int $i
      * @param string $value
@@ -207,12 +211,12 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
      * @return string html
      */
     protected function embed_pdf(string $fullurl, string $fieldname): string {
-        global $PAGE;
+        global $PAGE; // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
         $customscale = $this->field->get('param4');
         if (empty($customscale)) {
             $customscale = 1;
         }
-        $PAGE->requires->js_call_amd(
+        $PAGE->requires->js_call_amd( // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
             'mod_datalynx/pdfembed',
             'renderPDF',
             [$fullurl, $fieldname, $customscale]
@@ -239,14 +243,14 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
      * @return string
      */
     protected function display_link($file, $path, $altname, $params = null): string {
-        global $OUTPUT;
+        global $OUTPUT; // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
 
         $filename = $file->get_filename();
         $mimetype = $file->get_mimetype();
         $displayname = $altname ?: $filename;
         $fileicon = html_writer::empty_tag(
             'img',
-            ['src' => $OUTPUT->image_url(file_mimetype_icon($mimetype)),
+            ['src' => $OUTPUT->image_url(file_mimetype_icon($mimetype)), // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
             'alt' => $mimetype,
             'height' => 16,
             'width' => 16]
@@ -267,6 +271,7 @@ class datalynxfield_file_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Returns pluginfile URL patterns supported by this field.
      */
     public function pluginfile_patterns(): array {
         return ["[[{$this->field->name()}]]"];

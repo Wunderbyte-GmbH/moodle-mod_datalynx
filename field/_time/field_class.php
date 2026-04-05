@@ -26,10 +26,6 @@
 use mod_datalynx\local\field\datalynxfield_base;
 use mod_datalynx\local\field\datalynxfield_no_content;
 
-defined('MOODLE_INTERNAL') || die();
-
-
-
 /**
  * Internal time field.
  */

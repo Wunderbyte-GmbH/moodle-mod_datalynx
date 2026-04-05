@@ -27,8 +27,16 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/file/renderer.php");
 
 /**
+ * Renderer class for the picture field type.
  */
 class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
+    /**
+     * Render the edit mode for the picture field.
+     *
+     * @param MoodleQuickForm $mform
+     * @param stdClass $entry
+     * @param array $options
+     */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options = null) {
         $field = $this->field;
         $fieldid = $field->id();
@@ -75,8 +83,8 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
      * @return string
      */
     public function render_display_mode(stdClass $entry, array $options): string {
-        global $CFG, $PAGE;
-        $PAGE->requires->js_call_amd('mod_datalynx/zoomable', 'init');
+        global $CFG, $PAGE; // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
+        $PAGE->requires->js_call_amd('mod_datalynx/zoomable', 'init'); // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
         $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
@@ -129,6 +137,7 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
     }
 
     /**
+     * Returns the pluginfile URL patterns for this field.
      */
     public function pluginfile_patterns(): array {
         $fieldname = $this->field->name();
@@ -137,6 +146,8 @@ class datalynxfield_picture_renderer extends datalynxfield_file_renderer {
     }
 
     /**
+     * Display the picture file for the given entry.
+     *
      * @param stored_file $file
      * @param int $entryid
      * @param $path

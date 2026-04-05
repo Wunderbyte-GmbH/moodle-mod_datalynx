@@ -26,6 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once(dirname(__FILE__) . "/../renderer.php");
 
 /**
+ * Renderer for the multiselect field type.
  */
 class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
     /**
@@ -61,11 +62,13 @@ class datalynxfield_multiselect_renderer extends datalynxfield_renderer {
 
         // If we edit an existing entry that is not required we need a workaround.
         if ($entryid > 0 && !$required && $autocomplete) {
-            global $PAGE;
+            global $PAGE; // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
+            // phpcs:disable moodle.PHP.ForbiddenGlobalUse.BadGlobal
             $PAGE->requires->js_amd_inline("
             require(['jquery'], function($) {
                 $('option[value=\"-999\"]').removeAttr('selected');
             });");
+            // phpcs:enable moodle.PHP.ForbiddenGlobalUse.BadGlobal
         }
 
         // We create a hidden field to force sending.

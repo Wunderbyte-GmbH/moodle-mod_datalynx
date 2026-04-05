@@ -25,6 +25,13 @@
 
 namespace datalynxfield_userinfo\privacy;
 
+/**
+ * Privacy provider for datalynxfield_userinfo.
+ *
+ * @package    datalynxfield_userinfo
+ * @copyright  2025 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class provider implements
     // This plugin does not store any personal user data.
     \core_privacy\local\metadata\null_provider {

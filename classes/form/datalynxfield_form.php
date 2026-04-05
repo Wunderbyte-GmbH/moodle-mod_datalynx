@@ -28,6 +28,8 @@ require_once($CFG->libdir . '/formslib.php');
  * Field form base class.
  *
  * @package mod_datalynx
+ * @copyright 2025 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class datalynxfield_form extends moodleform {
     /** @var datalynxfield_base The field object. */

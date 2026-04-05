@@ -396,7 +396,7 @@ class datalynxview_patterns {
 
         $showentryactions = (!empty($options['showentryactions']) ||
                 has_capability('mod/datalynx:manageentries', $df->context));
-        // TODO: move to a view attribute so as to call only once.
+        // TODO MDL-000000: move to a view attribute so as to call only once.
         // Can this user add entries?
         switch ($tag) {
             case '##addnewentry##':

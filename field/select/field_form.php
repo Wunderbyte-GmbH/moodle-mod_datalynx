@@ -25,9 +25,6 @@
 
 use mod_datalynx\form\datalynxfield_option_form;
 
-defined('MOODLE_INTERNAL') || die();
-
-
 /**
  * Field form class for the select field type.
  *

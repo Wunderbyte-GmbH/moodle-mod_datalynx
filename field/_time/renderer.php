@@ -27,9 +27,13 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
+ * Renderer class for the internal time field.
+ *
+ * @package    mod_datalynx
  */
 class datalynxfield__time_renderer extends datalynxfield_renderer {
     /**
+     * Returns replacement values for time tags.
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
         $field = $this->field;

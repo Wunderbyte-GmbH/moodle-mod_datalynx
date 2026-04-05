@@ -26,6 +26,13 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/view/view_form.php");
 require_once("$CFG->libdir/csvlib.class.php");
 
+/**
+ * CSV view configuration form.
+ *
+ * @package    datalynxview_csv
+ * @copyright  2025 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class datalynxview_csv_form extends datalynxview_base_form {
     /**
      * Add view specific elements to the form.

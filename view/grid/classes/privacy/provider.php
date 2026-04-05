@@ -25,8 +25,6 @@
 
 namespace datalynxview_grid\privacy;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Privacy provider for datalynxview_grid.
  *

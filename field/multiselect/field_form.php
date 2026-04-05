@@ -25,8 +25,6 @@
 
 use mod_datalynx\form\datalynxfield_option_form;
 
-defined('MOODLE_INTERNAL') || die();
-
 
 /**
  * Field form for the multiselect field type.

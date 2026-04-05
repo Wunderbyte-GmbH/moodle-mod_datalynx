@@ -27,9 +27,13 @@ defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
 
 /**
+ * Renderer class for the coursegroup field.
+ *
+ * @package    datalynxfield_coursegroup
  */
 class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
     /**
+     * Returns replacement values for coursegroup tags.
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
         $field = $this->field;
@@ -57,9 +61,10 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Displays the edit form elements for the coursegroup field.
      */
     public function display_edit(&$mform, $entry, array $options = null) {
-        global $CFG, $DB, $SITE, $PAGE;
+        global $CFG, $DB, $SITE, $PAGE; // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
 
         $field = $this->field;
         $fieldid = $field->id();
@@ -101,7 +106,7 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
             ];
 
             // Add JQuery.
-            $PAGE->requires->js_call_amd('mod_datalynx/coursegroup', 'init', [$options]);
+            $PAGE->requires->js_call_amd('mod_datalynx/coursegroup', 'init', [$options]); // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
         }
 
         // Group id.
@@ -132,6 +137,7 @@ class datalynxfield_coursegroup_renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Displays the browse view for the coursegroup field.
      */
     protected function display_browse($entry, $type = null) {
         global $DB;

@@ -18,6 +18,7 @@
  *
  * @package datalynxfield_entryteammemberprofilefield
  * @subpackage entryteammemberprofilefield
+ * @copyright 2025 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -26,25 +27,44 @@ use mod_datalynx\local\field\datalynxfield_base;
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/mod/datalynx/field/datalynxfield_no_content_can_join.php');
 
+/**
+ * Field class for the entryteammemberprofilefield field type.
+ *
+ * @package    datalynxfield_entryteammemberprofilefield
+ * @copyright  2025 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content_can_join {
+    /** @var string The field type. */
     public $type = 'entryteammemberprofilefield';
 
+    /** SQL expression that is never true. */
     const SQL_NEVERTRUE = "1 = 0";
 
+    /** Operator constant for matching current user's profile field. */
     const OPERATOR_MY_PROFILE_FIELD = 'MY_PROFILE_FIELD';
+    /** Operator constant for matching a literal value. */
     const OPERATOR_LITERAL_VALUE = 'LITERAL_VALUE';
 
+    /**
+     * Returns false to indicate this field does not support group by.
+     *
+     * @return bool
+     */
     public function supports_group_by() {
         return false;
     }
 
     /**
+     * Returns true to indicate this is an internal field.
      */
     public static function is_internal() {
         return true;
     }
 
     /**
+     * Returns field objects for team member profile fields.
+     *
      * @param $dataid
      * @param $fields
      * @return array
@@ -73,6 +93,8 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
     }
 
     /**
+     * Returns SQL for comparing the field content as text.
+     *
      * @param string $column
      * @return string
      */
@@ -112,6 +134,7 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
     }
 
     /**
+     * Returns empty string as this field has no sort SQL.
      */
     public function get_sort_sql() {
         return "";
@@ -177,10 +200,25 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
         return [$sql, $params, $usecontent];
     }
 
+    /**
+     * Wraps a value in double quotes for use in JSON-style content matching.
+     *
+     * @param mixed $value
+     * @return string
+     */
     private function wrap_ids($value) {
         return "\"$value\"";
     }
 
+    /**
+     * Returns users whose profile field matches the given value.
+     *
+     * @param string $profilefieldname
+     * @param string $operator
+     * @param mixed $value
+     * @param bool $not
+     * @return array
+     */
     private function get_users_with_profile_field_value($profilefieldname, $operator, $value, $not) {
         global $DB, $USER;
 
@@ -197,6 +235,13 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
         return $DB->get_records_sql($sql, [$searchvalue]);
     }
 
+    /**
+     * Parses the search form data and returns the search value.
+     *
+     * @param stdClass $formdata
+     * @param int $i
+     * @return mixed
+     */
     public function parse_search($formdata, $i) {
         global $USER;
         $fieldid = $this->field->id;
@@ -245,6 +290,11 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
         return $distinctvalues;
     }
 
+    /**
+     * Returns the supported search operators for this field.
+     *
+     * @return array
+     */
     public function get_supported_search_operators() {
         return [
             '' => '&lt;' . get_string('choose') . '&gt;',
@@ -253,6 +303,12 @@ class datalynxfield_entryteammemberprofilefield extends datalynxfield_no_content
         ];
     }
 
+    /**
+     * Returns the number of arguments the given operator requires.
+     *
+     * @param string $operator
+     * @return int
+     */
     public function get_argument_count(string $operator) {
         if ($operator === self::OPERATOR_MY_PROFILE_FIELD) {
             return 0;

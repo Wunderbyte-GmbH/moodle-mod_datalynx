@@ -29,9 +29,18 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/lib/filelib.php');
 require_once($CFG->dirroot . '/repository/lib.php');
 
+/**
+ * Editor field class for datalynx.
+ *
+ * @package    datalynxfield_editor
+ * @copyright  2025 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class datalynxfield_editor extends datalynxfield_base {
+    /** @var string Field type. */
     public $type = 'editor';
 
+    /** @var array Editor options. */
     protected $editoroptions;
 
     /**
@@ -51,7 +60,7 @@ class datalynxfield_editor extends datalynxfield_base {
 
         $maxbytes = get_user_max_upload_file_size($PAGE->context, $CFG->maxbytes, $COURSE->maxbytes);
 
-        // TODO: provide options for the editor field to configure in the field settings.
+        // TODO MDL-000000: provide options for the editor field to configure in the field settings.
 
         $this->editoroptions = [];
         $this->editoroptions['context'] = $this->df->context;
@@ -75,12 +84,14 @@ class datalynxfield_editor extends datalynxfield_base {
     }
 
     /**
+     * Returns true to indicate this is an editor field.
      */
     public function is_editor() {
         return true;
     }
 
     /**
+     * Returns the editor options array.
      */
     public function editor_options() {
         return $this->editoroptions;
@@ -140,6 +151,7 @@ class datalynxfield_editor extends datalynxfield_base {
     }
 
     /**
+     * Prepares field content for import.
      */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
         $fieldid = $this->field->id;
@@ -165,6 +177,11 @@ class datalynxfield_editor extends datalynxfield_base {
         return true;
     }
 
+    /**
+     * Returns the supported search operators for this field.
+     *
+     * @return array
+     */
     public function get_supported_search_operators() {
         return ['' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
                 'LIKE' => get_string('contains', 'datalynx')];

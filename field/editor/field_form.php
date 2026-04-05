@@ -24,9 +24,8 @@
 
 use mod_datalynx\form\datalynxfield_form;
 
-defined('MOODLE_INTERNAL') || die();
-
-
-/** Form class for the editor field type. */
+/**
+ * Form class for the editor field type.
+ */
 class datalynxfield_editor_form extends datalynxfield_form {
 }

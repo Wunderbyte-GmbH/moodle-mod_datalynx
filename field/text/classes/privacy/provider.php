@@ -25,6 +25,13 @@
 
 namespace datalynxfield_text\privacy;
 
+/**
+ * Privacy provider for the text field type.
+ *
+ * @package    datalynxfield_text
+ * @copyright  2025 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class provider implements
     // This plugin does not store any personal user data.
     \core_privacy\local\metadata\null_provider {

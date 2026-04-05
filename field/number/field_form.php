@@ -25,9 +25,6 @@
 
 use mod_datalynx\form\datalynxfield_form;
 
-defined('MOODLE_INTERNAL') || die();
-
-
 /**
  * Field form for the number field type.
  *

@@ -36,8 +36,10 @@ require_once("$CFG->libdir/formslib.php");
  *
  */
 class datalynx_customfilter_frontend_form extends datalynx_filter_base_form {
-    /*
-     * This customfilter form  predefined by the admin is displayed
+    /**
+     * Defines the custom filter frontend form elements.
+     *
+     * @return void
      */
     public function definition() {
         $view = $this->_customdata['view'];

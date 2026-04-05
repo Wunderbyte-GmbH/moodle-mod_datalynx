@@ -25,8 +25,6 @@
 
 namespace datalynxview_pdf\privacy;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Privacy provider for datalynxview_pdf.
  *

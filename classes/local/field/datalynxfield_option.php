@@ -22,8 +22,13 @@ use stdClass;
  * Base class for Datalynx field types that offer single choice or multiplce choices
  * from a set of options
  * @package mod_datalynx
+ * @copyright 2025 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class datalynxfield_option extends datalynxfield_base {
+    /**
+     * @var array Cached list of options for this field.
+     */
     protected $options = [];
 
     /**
@@ -190,8 +195,14 @@ abstract class datalynxfield_option extends datalynxfield_base {
         return true;
     }
 
+    /**
+     * Returns the number of arguments required for the given search operator.
+     *
+     * @param string $operator
+     * @return int
+     */
     public function get_argument_count(string $operator) {
-        if ($operator === "") { // "Empty" operator
+        if ($operator === "") { // Empty operator requires no argument.
             return 0;
         } else {
             return 1;

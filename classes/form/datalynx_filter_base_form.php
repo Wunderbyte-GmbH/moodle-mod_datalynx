@@ -19,11 +19,16 @@ use datalynx;
 use moodleform;
 
 /**
+ * Base form class for datalynx filter forms.
  *
  * @package mod_datalynx
+ * @copyright 2025 Wunderbyte GmbH
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class datalynx_filter_base_form extends moodleform {
+    /** @var mixed The current filter object. */
     protected $filter = null;
+    /** @var mixed The custom filter object. */
     protected $customfilter = null;
 
     /**
@@ -32,8 +37,18 @@ abstract class datalynx_filter_base_form extends moodleform {
      */
     protected $dl = null;
 
-    /*
+    /**
+     * Constructs the filter base form and initialises filter/datalynx properties.
      *
+     * @param datalynx $df
+     * @param mixed $filter
+     * @param string|null $action
+     * @param mixed $customdata
+     * @param string $method
+     * @param string $target
+     * @param array|null $attributes
+     * @param bool $editable
+     * @param bool $customfilter
      */
     public function __construct(
         $df,
@@ -53,8 +68,15 @@ abstract class datalynx_filter_base_form extends moodleform {
         parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
     }
 
-    /*
+    /**
+     * Adds custom sort field elements to the form.
      *
+     * @param mixed $customsort
+     * @param array $fields
+     * @param array $fieldoptions
+     * @param bool $showlabel
+     * @param bool $customfilter
+     * @return void
      */
     public function custom_sort_definition($customsort, $fields, $fieldoptions, $showlabel = false, $customfilter = false) {
         $mform = &$this->_form;
@@ -234,8 +256,12 @@ abstract class datalynx_filter_base_form extends moodleform {
         $mform->addElement('submit', 'addsearchsettings', get_string('reload'));
     }
 
-    /*
+    /**
+     * Adds custom search field elements to the form.
      *
+     * @param array $fields
+     * @param array $fieldoptions
+     * @return void
      */
     public function customfilter_search_definition($fields, $fieldoptions) {
         $mform = &$this->_form;
@@ -261,6 +287,9 @@ abstract class datalynx_filter_base_form extends moodleform {
     }
 
     /**
+     * Returns the form HTML as a string.
+     *
+     * @return string
      */
     public function html() {
         return $this->_form->toHtml();

@@ -30,8 +30,15 @@ require_once("$CFG->dirroot/mod/datalynx/field/renderer.php");
  * Renderer class for teammemberselect datalynx field
  */
 class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
+    /**
+     * Render the display mode for the teammemberselect field.
+     *
+     * @param stdClass $entry
+     * @param array $options
+     * @return string
+     */
     public function render_display_mode(stdClass $entry, array $options): string {
-        global $USER, $PAGE;
+        global $USER, $PAGE; // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
 
         // Variable $field datalynxfield_teammemberselect.
         $field = $this->field;
@@ -73,7 +80,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
             $entry->{"c{$fieldid}_content"},
             true
         ) : [];
-        $selected = $selected ? $selected : []; // TODO: Seems obsolete.
+        $selected = $selected ? $selected : []; // TODO MDL-000000: Seems obsolete.
         $teamfull = $field->teamsize < count($selected);
         $hasadmissiblerole = array_intersect(
             $field->df()->get_user_datalynx_permissions($USER->id),
@@ -106,7 +113,7 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
             );
 
             // Load JS.
-            $PAGE->requires->js_call_amd(
+            $PAGE->requires->js_call_amd( // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
                 'mod_datalynx/teammemberselect',
                 'init',
                 [$field->df()->id(), $fieldid, $userurl->out(false), fullname($USER), $canunsubscribe]
@@ -116,9 +123,12 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         return $str;
     }
 
+    /** @var array Cached user list. */
     private static $userlist = [];
 
     /**
+     * Returns a list of formatted user names with profile links.
+     *
      * @param int $courseid
      * @param array $userids
      * @return array
@@ -157,8 +167,15 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         return $list;
     }
 
+    /**
+     * Render the edit mode for the teammemberselect field.
+     *
+     * @param MoodleQuickForm $mform
+     * @param stdClass $entry
+     * @param array $options
+     */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options = null) {
-        global $USER, $PAGE;
+        global $USER, $PAGE; // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
 
         // Variable $field datalynxfield_teammemberselect.
         $field = $this->field;
@@ -171,10 +188,12 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         // If we edit an existing entry that is not required we need a workaround.
         $newentry = optional_param('new', null, PARAM_INT) === null ? 1 : 0;
         if (!$newentry && !$required) {
-            $PAGE->requires->js_amd_inline("
+            $PAGE->requires->js_amd_inline( // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
+                "
             require(['jquery'], function($) {
                 $('option[value=\"-999\"]').removeAttr('selected');
-            });");
+            });"
+            );
         }
 
         // We create a hidden field to force sending. Needs to be done via directly inserting
@@ -208,6 +227,14 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         }
     }
 
+    /**
+     * Render the search mode for the teammemberselect field.
+     *
+     * @param MoodleQuickForm $mform
+     * @param int $i
+     * @param string $value
+     * @return array
+     */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
         $field = $this->field;
         $fieldid = $field->id();
@@ -225,6 +252,11 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         return [$elements, null];
     }
 
+    /**
+     * Returns the field patterns for the teammemberselect field.
+     *
+     * @return array
+     */
     protected function patterns() {
         $fieldname = $this->field->name();
 
@@ -235,6 +267,14 @@ class datalynxfield_teammemberselect_renderer extends datalynxfield_renderer {
         return $patterns;
     }
 
+    /**
+     * Validate the teammemberselect field entry data.
+     *
+     * @param int|string $entryid
+     * @param array $tags
+     * @param stdClass $formdata
+     * @return array
+     */
     public function validate($entryid, $tags, $formdata) {
         $fieldid = $this->field->id();
 

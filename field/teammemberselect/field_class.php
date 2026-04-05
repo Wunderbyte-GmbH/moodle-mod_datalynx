@@ -24,11 +24,6 @@
 
 use mod_datalynx\local\field\datalynxfield_base;
 
-defined('MOODLE_INTERNAL') || die();
-
-
-
-
 /**
  * Team member select field class.
  */

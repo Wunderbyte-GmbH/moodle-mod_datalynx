@@ -25,20 +25,31 @@
 
 use mod_datalynx\view\base;
 
-defined('MOODLE_INTERNAL') || die();
 
-require_once("$CFG->dirroot/mod/datalynx/classes/view/base.php");
+require_once("$CFG->dirroot/mod/datalynx/classes/view/base.php"); // phpcs:ignore moodle.Files.MoodleInternal.MoodleInternalGlobalState
 
+/**
+ * Report view class for datalynx.
+ *
+ * @package    datalynxview_report
+ * @copyright  2025 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class datalynxview_report extends base {
+    /** @var string View type identifier. */
     protected string $type = 'report';
 
+    /** @var string Output format type. */
     protected string $output = 'report';
 
+    /** @var array List of editors. */
     protected array $editors = ['section'];
 
+    /** @var array|null List of columns. */
     protected ?array $columns = null;
 
     /**
+     * Constructor for datalynxview_report.
      */
     public function __construct($df = 0, $view = 0) {
         parent::__construct($df, $view);
@@ -48,6 +59,7 @@ class datalynxview_report extends base {
     }
 
     /**
+     * Apply entry group layout and wrap with table elements.
      */
     protected function apply_entry_group_layout($entriesset, $name = '') {
         global $OUTPUT;
@@ -86,6 +98,7 @@ class datalynxview_report extends base {
     }
 
     /**
+     * Generate entry definition as table row cells.
      * @param $fielddefinitions
      * @return array
      */
@@ -128,6 +141,7 @@ class datalynxview_report extends base {
     }
 
     /**
+     * Display the report view.
      * @param array $options
      * @return string
      */
@@ -511,9 +525,8 @@ class datalynxview_report extends base {
     }
 
     /**
+     * Get entry IDs for the report.
      * @return array
-     */
-    public function get_report_entryids(): array {
         // Set content.
         $entries = new datalynx_entries($this->dl, $this->filter);
         $options = [];

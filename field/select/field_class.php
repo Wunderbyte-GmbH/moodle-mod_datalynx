@@ -26,8 +26,6 @@
 use mod_datalynx\local\field\datalynxfield_base;
 use mod_datalynx\local\field\datalynxfield_option_single;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Field class for the select field type.
  *
@@ -74,7 +72,7 @@ class datalynxfield_select extends datalynxfield_option_single {
      * @return int
      */
     public function get_argument_count(string $operator) {
-        if ($operator === "") { // "Empty" operator.
+        if ($operator === "") { // Empty operator.
             return 0;
         } else {
             return 1;
