@@ -57,20 +57,20 @@ class datalynxfield_option_form extends datalynxfield_form {
         if (!empty($options)) {
             $group = [];
             $group[] = &$mform->createElement(
-                    'static',
-                    null,
-                    null,
-                    '<table><thead><th>' . get_string('option', 'datalynx') . '</th><th>' .
+                'static',
+                null,
+                null,
+                '<table><thead><th>' . get_string('option', 'datalynx') . '</th><th>' .
                     get_string('renameoption', 'datalynx') . '</th><th>' .
                     get_string('deleteoption', 'datalynx') . '</th></thead><tbody>'
             );
             foreach ($options as $id => $option) {
                 $option = htmlspecialchars($option);
                 $group[] = &$mform->createElement(
-                        'static',
-                        null,
-                        null,
-                        "<tr><td>{$option}</td><td>"
+                    'static',
+                    null,
+                    null,
+                    "<tr><td>{$option}</td><td>"
                 );
                 $group[] = &$mform->createElement('text', "renameoption[{$id}]", '', ['size' => 32]);
                 $group[] = &$mform->createElement('static', null, null, '</td><td>');
@@ -82,29 +82,29 @@ class datalynxfield_option_form extends datalynxfield_form {
             }
             $group[] = &$mform->createElement('static', null, null, '</tbody></table>');
             $tablerow = &$mform->createElement(
-                    'group',
-                    'existingoptions',
-                    get_string('existingoptions', 'datalynx'),
-                    $group,
-                    null,
-                    false
+                'group',
+                'existingoptions',
+                get_string('existingoptions', 'datalynx'),
+                $group,
+                null,
+                false
             );
             $mform->insertElementBefore($tablerow, 'param2');
         }
         $addnew = &$mform->createElement(
-                'textarea',
-                'addoptions',
-                get_string('addoptions', 'datalynx'),
-                'wrap="soft" rows="5" cols="30"'
+            'textarea',
+            'addoptions',
+            get_string('addoptions', 'datalynx'),
+            'wrap="soft" rows="5" cols="30"'
         );
         $mform->insertElementBefore($addnew, 'param2');
         if (empty($options)) {
             $mform->addRule(
-                    'addoptions',
-                    get_string('err_required', 'form'),
-                    'required',
-                    null,
-                    'client'
+                'addoptions',
+                get_string('err_required', 'form'),
+                'required',
+                null,
+                'client'
             );
         }
     }
@@ -125,7 +125,7 @@ class datalynxfield_option_form extends datalynxfield_form {
         } else {
             if (
                     isset($data['deleteoption']) && count($data['deleteoption']) == count(
-                            $oldoptions
+                        $oldoptions
                     ) && empty($data['addoptions'])
             ) {
                 $errors['existingoptions'] = get_string('nooptions', 'datalynx');

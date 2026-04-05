@@ -26,6 +26,7 @@ use stdClass;
 
 /**
  * Base class for Datalynx Field Types
+ * @package mod_datalynx
  */
 abstract class datalynxfield_base {
     const VISIBLE_NONE = 0;
@@ -130,7 +131,7 @@ abstract class datalynxfield_base {
         $this->field->label = !empty($forminput->label) ? $forminput->label : '';
         for ($i = 1; $i <= 10; $i++) {
             $this->field->{"param$i"} = !empty($forminput->{"param$i"}) ? trim(
-                    $forminput->{"param$i"}
+                $forminput->{"param$i"}
             ) : null;
         }
     }
@@ -253,8 +254,8 @@ abstract class datalynxfield_base {
             $formclass = 'mod_datalynx\form\datalynxfield_form';
         }
         $actionurl = new moodle_url(
-                '/mod/datalynx/field/field_edit.php',
-                ['d' => $this->df->id(), 'fid' => $this->id(), 'type' => $this->type]
+            '/mod/datalynx/field/field_edit.php',
+            ['d' => $this->df->id(), 'fid' => $this->id(), 'type' => $this->type]
         );
         return new $formclass($this, $actionurl);
     }
@@ -305,9 +306,9 @@ abstract class datalynxfield_base {
      */
     public function get_definitions($tags, $entry, array $options) {
         return $this->renderer()->replacements(
-                $tags,
-                $entry,
-                array_merge(self::$defaultoptions, $options)
+            $tags,
+            $entry,
+            array_merge(self::$defaultoptions, $options)
         );
     }
 
@@ -400,10 +401,10 @@ abstract class datalynxfield_base {
             $fs = get_file_storage();
             foreach ($rs as $content) {
                 $fs->delete_area_files(
-                        $this->df->context->id,
-                        'mod_datalynx',
-                        'content',
-                        $content->id
+                    $this->df->context->id,
+                    'mod_datalynx',
+                    'content',
+                    $content->id
                 );
             }
         }
@@ -671,28 +672,28 @@ abstract class datalynxfield_base {
 
         if ($operator === '') {
             [$sql, $params] = $DB->get_in_or_equal(
-                    '',
-                    SQL_PARAMS_NAMED,
-                    "df_{$fieldid}_",
-                    false
+                '',
+                SQL_PARAMS_NAMED,
+                "df_{$fieldid}_",
+                false
             );
             $sql = " $varcharcontent $sql ";
         } else {
             if ($operator === '=') {
                 $searchvalue = trim($value);
                 [$sql, $params] = $DB->get_in_or_equal(
-                        $searchvalue,
-                        SQL_PARAMS_NAMED,
-                        "df_{$fieldid}_"
+                    $searchvalue,
+                    SQL_PARAMS_NAMED,
+                    "df_{$fieldid}_"
                 );
                 $sql = " $varcharcontent $sql ";
             } else {
                 if ($operator === 'IN') {
                     $searchvalue = array_map('trim', $value);
                     [$sql, $params] = $DB->get_in_or_equal(
-                            $searchvalue,
-                            SQL_PARAMS_NAMED,
-                            "df_{$fieldid}_"
+                        $searchvalue,
+                        SQL_PARAMS_NAMED,
+                        "df_{$fieldid}_"
                     );
                     $sql = " $varcharcontent $sql ";
                 } else {
@@ -712,10 +713,10 @@ abstract class datalynxfield_base {
             if ($eids = $this->get_entry_ids_for_content($sql, $params)) {
                 // Get NOT IN sql.
                 [$notinids, $params] = $DB->get_in_or_equal(
-                        $eids,
-                        SQL_PARAMS_NAMED,
-                        "df_{$fieldid}_",
-                        false
+                    $eids,
+                    SQL_PARAMS_NAMED,
+                    "df_{$fieldid}_",
+                    false
                 );
                 $sql = " e.id $notinids ";
                 return [$sql, $params, false];

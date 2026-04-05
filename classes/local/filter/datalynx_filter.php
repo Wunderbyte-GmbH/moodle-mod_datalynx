@@ -133,7 +133,7 @@ class datalynx_filter {
         [$sorttables, $sortorder, $sortparams] = $this->get_sort_sql($fields);
         // CONTENT sql ($datalynxcontent is an array of fieldid whose content needs to be fetched).
         [$datalynxcontent, $whatcontent, $contenttables, $contentparams] = $this->get_content_sql(
-                $fields
+            $fields
         );
 
         return [" $searchtables $sorttables $contenttables ", $wheresearch, $sortorder,
@@ -151,12 +151,12 @@ class datalynx_filter {
 
         if ($this->customsearch) {
             $this->searchfields = is_array($this->customsearch) ? $this->customsearch : unserialize(
-                    $this->customsearch
+                $this->customsearch
             );
         }
         if ($this->customsort) {
             $this->sortfields = is_array($this->customsort) ? $this->customsort : unserialize(
-                    $this->customsort
+                $this->customsort
             );
         }
         // Defines what field should be sorted by.
@@ -335,14 +335,14 @@ class datalynx_filter {
                                 $paramid = "fieldid$i";
                                 $searchlike[$paramlike] = "(" .
                                         $DB->sql_like(
-                                                "c{$field->id()}.data",
-                                                ":$paramlike",
-                                                false,
-                                                false
+                                            "c{$field->id()}.data",
+                                            ":$paramlike",
+                                            false,
+                                            false
                                         ) . ")";
                                 $searchparams[$paramlike] = '%' . $DB->sql_like_escape(
-                                                $simplesearch
-                                        ) . '%';
+                                    $simplesearch
+                                ) . '%';
                                 $searchparams[$paramid] = $field->id();
                                 $i++;
                             }
@@ -419,10 +419,10 @@ class datalynx_filter {
                 ) {
                     // Read values of field from database.
                     $fieldvalues = $DB->get_field(
-                            'datalynx_fields',
-                            'param1',
-                            ['id' => $fieldid],
-                            MUST_EXIST
+                        'datalynx_fields',
+                        'param1',
+                        ['id' => $fieldid],
+                        MUST_EXIST
                     );
                     $fieldvalues = explode("\n", $fieldvalues);
 
@@ -461,8 +461,8 @@ class datalynx_filter {
                 if (empty($this->filteredtables) || !in_array($fieldid, $this->filteredtables)) {
                     $this->filteredtables[] = $fieldid;
                     [$fromsql, $params["sortie$paramcount"]] = $fields[$fieldid]->get_sort_from_sql(
-                            'sortie',
-                            $paramcount
+                        'sortie',
+                        $paramcount
                     );
                     $sorttables .= $fromsql;
                     $paramcount++;
@@ -521,8 +521,8 @@ class datalynx_filter {
                         $whatcontent[] = $selectsql;
                         $this->filteredtables[] = $fieldid;
                         [$contentfrom[$fieldid], $params["contentie$paramcount"]] = $field->get_sort_from_sql(
-                                'contentie',
-                                $paramcount
+                            'contentie',
+                            $paramcount
                         );
                         $paramcount++;
                     }

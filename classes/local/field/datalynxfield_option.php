@@ -21,6 +21,7 @@ use stdClass;
 /**
  * Base class for Datalynx field types that offer single choice or multiplce choices
  * from a set of options
+ * @package mod_datalynx
  */
 abstract class datalynxfield_option extends datalynxfield_base {
     protected $options = [];
@@ -98,8 +99,8 @@ abstract class datalynxfield_option extends datalynxfield_base {
         $renames = !empty($forminput->renameoption) ? $forminput->renameoption : [];
         $deletes = !empty($forminput->deleteoption) ? $forminput->deleteoption : [];
         $adds = preg_split(
-                "/[\|\r\n]+/",
-                !empty($forminput->addoptions) ? $forminput->addoptions : ''
+            "/[\|\r\n]+/",
+            !empty($forminput->addoptions) ? $forminput->addoptions : ''
         );
 
         // Make sure there are no renames when options are deleted. That will not work.

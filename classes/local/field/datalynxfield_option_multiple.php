@@ -17,6 +17,7 @@
 namespace mod_datalynx\local\field;
 /**
  * Base class for Datalynx field types that offer a set of options with multiple choice
+ * @package mod_datalynx
  */
 class datalynxfield_option_multiple extends datalynxfield_option {
     /**
@@ -193,10 +194,10 @@ class datalynxfield_option_multiple extends datalynxfield_option {
                             // Non-empty.
                             // Contents.
                             [$contentids, $paramsnot] = $DB->get_in_or_equal(
-                                    $eids,
-                                    SQL_PARAMS_NAMED,
-                                    "df_{$fieldid}_x_",
-                                    false
+                                $eids,
+                                SQL_PARAMS_NAMED,
+                                "df_{$fieldid}_x_",
+                                false
                             );
                             $params = array_merge($params, $paramsnot);
                             $sql = " (e.id $contentids) ";
@@ -213,10 +214,10 @@ class datalynxfield_option_multiple extends datalynxfield_option {
                         if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) { // There are non-empty.
                             // Contents.
                             [$contentids, $paramsnot] = $DB->get_in_or_equal(
-                                    $eids,
-                                    SQL_PARAMS_NAMED,
-                                    "df_{$fieldid}_x_",
-                                    !!$not
+                                $eids,
+                                SQL_PARAMS_NAMED,
+                                "df_{$fieldid}_x_",
+                                !!$not
                             );
                             $params = array_merge($params, $paramsnot);
                             $sql = " (e.id $contentids) ";
@@ -238,10 +239,10 @@ class datalynxfield_option_multiple extends datalynxfield_option {
             if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) {
                 // Get NOT IN sql.
                 [$notinids, $paramsnot] = $DB->get_in_or_equal(
-                        $eids,
-                        SQL_PARAMS_NAMED,
-                        "df_{$fieldid}_x_",
-                        $notinidsequal
+                    $eids,
+                    SQL_PARAMS_NAMED,
+                    "df_{$fieldid}_x_",
+                    $notinidsequal
                 );
                 $params = array_merge($params, $paramsnot);
                 $sql = " ($sql OR e.id $notinids) ";

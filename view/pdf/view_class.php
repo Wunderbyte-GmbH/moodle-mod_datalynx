@@ -40,7 +40,6 @@ require_once($CFG->dirroot . '/mod/assign/feedback/editpdf/fpdi/autoload.php');
  * @package datalynxview_pdf
  */
 class datalynxview_pdf extends base {
-
     /**
      * Export all entries
      */

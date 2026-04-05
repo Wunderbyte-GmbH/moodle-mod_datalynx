@@ -144,20 +144,20 @@ class datalynx_file_info_container extends file_info {
 
         $children = [];
         $itemids = $DB->get_records(
-                'files',
-                ['contextid' => $this->context->id, 'component' => $this->component,
+            'files',
+            ['contextid' => $this->context->id, 'component' => $this->component,
                         'filearea' => $this->filearea,
                 ],
-                'itemid DESC',
-                "DISTINCT itemid"
+            'itemid DESC',
+            "DISTINCT itemid"
         );
         foreach ($itemids as $itemid => $unused) {
             if (
                     $child = $this->browser->get_file_info(
-                            $this->context,
-                            'mod_datalynx',
-                            $this->filearea,
-                            $itemid
+                        $this->context,
+                        'mod_datalynx',
+                        $this->filearea,
+                        $itemid
                     )
             ) {
                 $children[] = $child;

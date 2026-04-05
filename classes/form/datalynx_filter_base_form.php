@@ -1,4 +1,18 @@
 <?php
+// This file is part of Moodle - https://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 namespace mod_datalynx\form;
 use datalynx;
@@ -6,6 +20,7 @@ use moodleform;
 
 /**
  *
+ * @package mod_datalynx
  */
 abstract class datalynx_filter_base_form extends moodleform {
     protected $filter = null;
@@ -21,15 +36,15 @@ abstract class datalynx_filter_base_form extends moodleform {
      *
      */
     public function __construct(
-            $df,
-            $filter,
-            $action = null,
-            $customdata = null,
-            $method = 'post',
-            $target = '',
-            $attributes = null,
-            $editable = true,
-            $customfilter = false
+        $df,
+        $filter,
+        $action = null,
+        $customdata = null,
+        $method = 'post',
+        $target = '',
+        $attributes = null,
+        $editable = true,
+        $customfilter = false
     ) {
         $this->filter = $filter;
         $this->customfilter = $customfilter;
@@ -65,10 +80,10 @@ abstract class datalynx_filter_base_form extends moodleform {
                 $optionsarr = [];
                 $optionsarr[] = &$mform->createElement('select', 'sortfield' . $count, '', $fieldoptions);
                 $optionsarr[] = &$mform->createElement(
-                        'select',
-                        'sortdir' . $count,
-                        '',
-                        $diroptions
+                    'select',
+                    'sortdir' . $count,
+                    '',
+                    $diroptions
                 );
                 $mform->addGroup($optionsarr, 'sortoptionarr' . $count, $label, ' ', false);
                 $mform->setDefault('sortfield' . $count, $fieldid);
@@ -100,10 +115,10 @@ abstract class datalynx_filter_base_form extends moodleform {
      * @param boolean $showlabel
      */
     public function custom_search_definition(
-            $customsearch,
-            $fields,
-            $fieldoptions,
-            $showlabel = false
+        $customsearch,
+        $fields,
+        $fieldoptions,
+        $showlabel = false
     ) {
         $mform = &$this->_form;
         $df = $this->dl;
@@ -171,10 +186,10 @@ abstract class datalynx_filter_base_form extends moodleform {
                     $operatoroptions = $df->get_field_from_id($fieldid)->get_supported_search_operators();
                 }
                 $arr[] = &$mform->createElement(
-                        'select',
-                        'searchoperator' . $count,
-                        '',
-                        $operatoroptions
+                    'select',
+                    'searchoperator' . $count,
+                    '',
+                    $operatoroptions
                 );
                 $mform->setDefault('searchoperator' . $count, $operator);
                 // Field search elements.
@@ -183,9 +198,9 @@ abstract class datalynx_filter_base_form extends moodleform {
                     $value = json_encode($value);
                 }
                 [$elems, $separators] = $fields[$fieldid]->renderer()->render_search_mode(
-                        $mform,
-                        $count,
-                        $value
+                    $mform,
+                    $count,
+                    $value
                 );
 
                 $arr = array_merge($arr, $elems);

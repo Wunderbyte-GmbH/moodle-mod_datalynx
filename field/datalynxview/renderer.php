@@ -262,7 +262,7 @@ class datalynxfield_datalynxview_renderer extends datalynxfield_renderer {
                         // Extract the value part.
                         $value = $first[1];
                         // Make sure this is the search value.
-                // Select fields search by key, not value.
+                        // Select fields search by key, not value.
                         $value = $localfield->get_search_value($value);
                     }
                 }
