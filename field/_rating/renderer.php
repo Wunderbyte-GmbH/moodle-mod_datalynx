@@ -39,7 +39,7 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
      * Returns replacement values for rating tags.
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
-        global $CFG, $DB;
+        global $DB;
 
         $field = $this->field;
         $edit = !empty($options['edit']) ? $options['edit'] : false;
@@ -69,7 +69,6 @@ class datalynxfield__rating_renderer extends datalynxfield_renderer {
             }
         }
 
-        require_once("$CFG->dirroot/mod/datalynx/field/_rating/lib.php");
         $rm = new datalynx_rating_manager();
         // Get entry rating objects.
         if ($entry->id > 0) {

@@ -248,7 +248,7 @@ class datalynx_rating_manager extends rating_manager {
     public function get_rating_object($item, $ratingrecord) {
         $rec = $ratingrecord;
 
-        $options = new stdClass();
+        $options = new \stdClass();
         $options->context = $rec->context;
         $options->component = 'mod_datalynx';
         $options->ratingarea = $rec->ratingarea;
