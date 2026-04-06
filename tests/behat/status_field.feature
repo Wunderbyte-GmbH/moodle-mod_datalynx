@@ -112,7 +112,7 @@ Feature: Test datalynx _status internal field
     And I click on "a [aria-label='Edit']" "css_element"
     Then I should not see "It's not allowed to edit this entry."
 
-  Scenario: Status filter separates Draft and Final submission entries (manager sees all)
+  Scenario: Status filter separates Draft and Final submission entries (manager sees all teacher only Fina)
     When I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "Datalynx Test Instance"
@@ -151,4 +151,13 @@ Feature: Test datalynx _status internal field
     When I select "Status A view" from the "view" singleselect
     And I wait until the page is ready
     Then I should see "Draft entry"
+    And I should not see "Final entry"
+    And I log out
+    When I log in as "teacher1"
+    And I am on "Course 1" course homepage
+    And I follow "Datalynx Test Instance"
+    Then I should see "Final entry"
+    And I should not see "Draft entry"
+    When I select "Status A view" from the "view" singleselect
+    Then I should not see "Draft entry"
     And I should not see "Final entry"

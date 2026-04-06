@@ -17,18 +17,9 @@
 /**
  *
  * @package mod_datalynx
- * @copyright 2015 onwards David Bogner
+ * @subpackage _comment
+ * @copyright 2013 onwards edulabs.org and associated programmers
+ * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->component = 'mod_datalynx';
-$plugin->supported = [405, 501];
-$plugin->version = 2026040402;
-$plugin->release = 'v5.3-DataResilience'; // Data words like data science, data mining.
-$plugin->requires = 2024100700;
-$plugin->maturity = MATURITY_STABLE;
-$plugin->dependencies = [
-    'assignfeedback_editpdf' => ANY_VERSION, // We use fpdi from this core module.
-];
+$string['pluginname'] = 'Datalynx Comment Field';

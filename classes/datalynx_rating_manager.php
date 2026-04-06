@@ -33,6 +33,7 @@ namespace mod_datalynx;
 use coding_exception;
 use mod_datalynx\datalynx_rating;
 use rating_manager;
+use stdClass;
 use user_picture;
 
 defined('MOODLE_INTERNAL') || die();
@@ -248,7 +249,7 @@ class datalynx_rating_manager extends rating_manager {
     public function get_rating_object($item, $ratingrecord) {
         $rec = $ratingrecord;
 
-        $options = new \stdClass();
+        $options = new stdClass();
         $options->context = $rec->context;
         $options->component = 'mod_datalynx';
         $options->ratingarea = $rec->ratingarea;

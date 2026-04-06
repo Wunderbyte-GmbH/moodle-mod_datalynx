@@ -27,8 +27,8 @@ use coding_exception;
 use mod_datalynx\local\datalynx_entries;
 use mod_datalynx\local\filter\datalynx_filter;
 use mod_datalynx\local\view\datalynxview_patterns;
-use datalynxfield__rating;
-use datalynxfield__status;
+use datalynxfield_rating;
+use datalynxfield_status;
 use HTML_QuickForm;
 use html_writer;
 use calc_formula;
@@ -1222,23 +1222,23 @@ abstract class base {
     protected function is_rating() {
         global $USER, $CFG;
 
-        require_once("$CFG->dirroot/mod/datalynx/field/_rating/field_class.php");
+        require_once("$CFG->dirroot/mod/datalynx/field/rating/field_class.php");
 
         if (
             !$this->dl->data->rating || empty(
-                $this->tags['field'][datalynxfield__rating::_RATING]
+                $this->tags['field'][datalynxfield_rating::_RATING]
             )
         ) {
             return null;
         }
 
-        $ratingfield = $this->dl->get_field_from_id(datalynxfield__rating::_RATING);
+        $ratingfield = $this->dl->get_field_from_id(datalynxfield_rating::_RATING);
         $ratingoptions = new stdClass();
         $ratingoptions->context = $this->dl->context;
         $ratingoptions->component = 'mod_datalynx';
         $ratingoptions->ratingarea = 'entry';
         $ratingoptions->aggregate = $ratingfield->renderer()->get_aggregations(
-            $this->tags['field'][datalynxfield__rating::_RATING]
+            $this->tags['field'][datalynxfield_rating::_RATING]
         );
         $ratingoptions->scaleid = $this->get_scaleid('entry');
         $ratingoptions->userid = $USER->id;
@@ -1328,10 +1328,10 @@ abstract class base {
                         'status',
                         ['id' => $this->editentries[0]]
                     );
-                    require_once($CFG->dirroot . '/mod/datalynx/field/_status/field_class.php');
+                    require_once($CFG->dirroot . '/mod/datalynx/field/status/field_class.php');
                     if (
                         !has_capability('mod/datalynx:manageentries', $this->dl->context) &&
-                             $entrystatus == datalynxfield__status::STATUS_FINAL_SUBMISSION
+                             $entrystatus == datalynxfield_status::STATUS_FINAL_SUBMISSION
                     ) {
                         $editallowed = false;
                     }

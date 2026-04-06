@@ -2248,10 +2248,10 @@ class datalynx {
                 }
 
                 // If nor status 'draft' neither status 'not set' user is not allowed to manage this entry.
-                require_once($CFG->dirroot . '/mod/datalynx/field/_status/field_class.php');
+                require_once($CFG->dirroot . '/mod/datalynx/field/status/field_class.php');
                 if (
-                    !($entry->status == \datalynxfield__status::STATUS_DRAFT ||
-                        $entry->status == \datalynxfield__status::STATUS_NOT_SET)
+                    !($entry->status == \datalynxfield_status::STATUS_DRAFT ||
+                        $entry->status == \datalynxfield_status::STATUS_NOT_SET)
                 ) {
                     return false;
                 }

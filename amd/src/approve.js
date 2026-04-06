@@ -30,7 +30,7 @@ import {getString} from 'core/str';
  * @param {String} unapproveString The localized string for "Unapprove".
  */
 const registerEventListeners = (approveString, unapproveString) => {
-    document.querySelectorAll(".datalynxfield__approve").forEach(element => {
+    document.querySelectorAll(".datalynxfield_approve").forEach(element => {
         // Prevent multiple listeners on the same element
         if (element.dataset.approveInitialized) {
             return;
@@ -61,7 +61,7 @@ const registerEventListeners = (approveString, unapproveString) => {
                 action: 'toggle-approval'
             };
 
-            fetch("field/_approve/ajax.php", {
+            fetch("field/approve/ajax.php", {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
@@ -83,7 +83,7 @@ const registerEventListeners = (approveString, unapproveString) => {
                 }
 
                 const icon = element.querySelector('i');
-                const label = element.querySelector('.datalynxfield__approve-label');
+                const label = element.querySelector('.datalynxfield_approve-label');
                 const isApproved = (data.approved == 1);
 
                 if (isApproved) {

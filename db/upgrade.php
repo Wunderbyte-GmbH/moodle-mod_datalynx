@@ -1109,6 +1109,24 @@ function xmldb_datalynx_upgrade($oldversion) {
         // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2023101202, 'datalynx');
     }
+    if ($oldversion < 2026040402) {
+        // Rename internal field types: remove leading underscore.
+        $renames = [
+            '_approve' => 'approve',
+            '_comment' => 'comment',
+            '_entry'   => 'entry',
+            '_rating'  => 'rating',
+            '_status'  => 'status',
+            '_time'    => 'entrytime',
+        ];
+        foreach ($renames as $old => $new) {
+            $DB->set_field('datalynx_fields', 'type', $new, ['type' => $old]);
+        }
+        // Clear view patterns cache to force recomputation with renamed field types.
+        $DB->set_field_select('datalynx_views', 'patterns', null, '1=1');
+        // Datalynx savepoint reached.
+        upgrade_mod_savepoint(true, 2026040402, 'datalynx');
+    }
     return true;
 }
 

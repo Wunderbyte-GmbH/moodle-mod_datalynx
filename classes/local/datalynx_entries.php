@@ -28,10 +28,10 @@ use coding_exception;
 use completion_info;
 use core_user\fields;
 use datalynx;
-use datalynxfield__approve;
-use datalynxfield__entry;
-use datalynxfield__status;
-use datalynxfield__time;
+use datalynxfield_approve;
+use datalynxfield_entry;
+use datalynxfield_status;
+use datalynxfield_entrytime;
 use datalynxfield_entryauthor;
 use datalynxfield_entrygroup;
 use dml_exception;
@@ -247,7 +247,7 @@ class datalynx_entries {
         // STATUS filtering (visibility).
         $wherestatus = '';
         if (!has_capability('mod/datalynx:viewdrafts', $datalynx->context)) {
-            $wherestatus = " AND (e.status <> :{$this->sqlparams($params, 'status', datalynxfield__status::STATUS_DRAFT)}
+            $wherestatus = " AND (e.status <> :{$this->sqlparams($params, 'status', datalynxfield_status::STATUS_DRAFT)}
                               OR  e.userid = :{$this->sqlparams($params, 'userid', $USER->id)}) ";
         }
 
@@ -710,14 +710,14 @@ class datalynx_entries {
                                     ['info' => [], 'fields' => [],
                                     ]
                             );
-                            $entryinfo = [datalynxfield__entry::_ENTRY,
-                                    datalynxfield__time::_TIMECREATED,
-                                    datalynxfield__time::_TIMEMODIFIED,
-                                    datalynxfield__approve::_APPROVED,
+                            $entryinfo = [datalynxfield_entry::_ENTRY,
+                                    datalynxfield_entrytime::_TIMECREATED,
+                                    datalynxfield_entrytime::_TIMEMODIFIED,
+                                    datalynxfield_approve::_APPROVED,
                                     datalynxfield_entryauthor::_USERID,
                                     datalynxfield_entryauthor::_USERNAME,
                                     datalynxfield_entrygroup::_GROUP,
-                                    datalynxfield__status::_STATUS,
+                                    datalynxfield_status::_STATUS,
                             ];
 
                             $skipnotification = [];
@@ -756,16 +756,16 @@ class datalynx_entries {
                                             $entryvar = $field->get_internalname();
                                         }
                                         if (
-                                                $fieldid == datalynxfield__status::_STATUS &&
-                                                $value == datalynxfield__status::STATUS_DRAFT
+                                                $fieldid == datalynxfield_status::_STATUS &&
+                                                $value == datalynxfield_status::STATUS_DRAFT
                                         ) {
                                             $skipnotification[] = $entryid;
                                         }
                                         if (
-                                                $fieldid == datalynxfield__status::_STATUS &&
-                                                $value == datalynxfield__status::STATUS_FINAL_SUBMISSION &&
+                                                $fieldid == datalynxfield_status::_STATUS &&
+                                                $value == datalynxfield_status::STATUS_FINAL_SUBMISSION &&
                                                 isset($entry->status) &&
-                                                $entry->status == datalynxfield__status::STATUS_DRAFT
+                                                $entry->status == datalynxfield_status::STATUS_DRAFT
                                         ) {
                                             $drafttofinal[] = $entryid;
                                         }
@@ -832,9 +832,9 @@ class datalynx_entries {
                                                 ['id' => $eid],
                                                 'MUST_EXIST'
                                         );
-                                        require_once('field/_status/field_class.php');
+                                        require_once('field/status/field_class.php');
                                         if (
-                                                $entrystatus == datalynxfield__status::STATUS_FINAL_SUBMISSION
+                                                $entrystatus == datalynxfield_status::STATUS_FINAL_SUBMISSION
                                                 && !has_capability('mod/datalynx:manageentries', $this->datalynx->context)
                                         ) {
                                             continue; // Check user has capacity & status is final. If stop update.

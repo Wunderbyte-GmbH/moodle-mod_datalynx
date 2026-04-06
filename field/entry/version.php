@@ -17,18 +17,12 @@
 /**
  *
  * @package mod_datalynx
- * @copyright 2015 onwards David Bogner
+ * @subpackage _entry
+ * @copyright 2015 David Bogner {@link http:// Www.edulabs.org}.
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'mod_datalynx';
-$plugin->supported = [405, 501];
-$plugin->version = 2026040402;
-$plugin->release = 'v5.3-DataResilience'; // Data words like data science, data mining.
-$plugin->requires = 2024100700;
-$plugin->maturity = MATURITY_STABLE;
-$plugin->dependencies = [
-    'assignfeedback_editpdf' => ANY_VERSION, // We use fpdi from this core module.
-];
+$plugin->component = 'datalynxfield_entry';
+$plugin->version = 2015092200;
+$plugin->requires = 2022112800;
