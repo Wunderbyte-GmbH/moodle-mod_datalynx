@@ -233,11 +233,46 @@ abstract class datalynxfield_base {
     }
 
     /**
-     * Prints the respective type icon
+     * Returns an icon representing this field type using Font Awesome classes.
+     *
+     * @return string HTML for the icon
      */
     public function image() {
-        global $OUTPUT;
-        return $OUTPUT->pix_icon('icon', $this->type, "datalynxfield_{$this->type}");
+        $iconmap = [
+            'approve'                      => 'fa-solid fa-circle-check',
+            'checkbox'                     => 'fa-solid fa-square-check',
+            'comment'                      => 'fa-solid fa-comment',
+            'coursegroup'                  => 'fa-solid fa-sitemap',
+            'datalynxview'                 => 'fa-solid fa-eye',
+            'duration'                     => 'fa-solid fa-hourglass-half',
+            'editor'                       => 'fa-solid fa-pen-fancy',
+            'entry'                        => 'fa-solid fa-database',
+            'entryauthor'                  => 'fa-solid fa-user',
+            'entrygroup'                   => 'fa-solid fa-users',
+            'entryteammemberprofilefield'  => 'fa-solid fa-address-card',
+            'entrytime'                    => 'fa-solid fa-calendar-days',
+            'fieldgroup'                   => 'fa-solid fa-folder',
+            'file'                         => 'fa-solid fa-file',
+            'gradeitem'                    => 'fa-solid fa-graduation-cap',
+            'identifier'                   => 'fa-solid fa-fingerprint',
+            'multiselect'                  => 'fa-solid fa-list-check',
+            'number'                       => 'fa-solid fa-hashtag',
+            'picture'                      => 'fa-solid fa-image',
+            'radiobutton'                  => 'fa-solid fa-circle-dot',
+            'rating'                       => 'fa-solid fa-star',
+            'select'                       => 'fa-solid fa-chevron-down',
+            'status'                       => 'fa-solid fa-flag',
+            'tag'                          => 'fa-solid fa-tag',
+            'teammemberselect'             => 'fa-solid fa-people-group',
+            'text'                         => 'fa-solid fa-font',
+            'textarea'                     => 'fa-solid fa-align-left',
+            'time'                         => 'fa-solid fa-clock',
+            'url'                          => 'fa-solid fa-link',
+            'userinfo'                     => 'fa-solid fa-circle-user',
+            'youtube'                      => 'fa-brands fa-youtube',
+        ];
+        $classes = $iconmap[$this->type] ?? 'fa-solid fa-question-circle';
+        return \html_writer::tag('i', '', ['class' => $classes, 'aria-hidden' => 'true']);
     }
 
     /**
