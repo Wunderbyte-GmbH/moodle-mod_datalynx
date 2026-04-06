@@ -24,6 +24,7 @@
  */
 
 use mod_datalynx\local\datalynx_entries;
+use datalynxfield_entryauthor\field as datalynxfield_entryauthor;
 
 defined('MOODLE_INTERNAL') || die();
 /**

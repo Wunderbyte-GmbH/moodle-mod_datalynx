@@ -36,6 +36,7 @@ use moodle_url;
 use stdClass;
 use moodle_exception;
 use comment;
+use datalynxfield_status\field as datalynxfield_status;
 
 
 /**
@@ -915,7 +916,7 @@ class datalynx {
         if (!$this->internalfields) {
             $fieldplugins = get_list_of_plugins('mod/datalynx/field/');
             foreach ($fieldplugins as $fieldname) {
-                $fieldclass = "datalynxfield_$fieldname";
+                $fieldclass = "datalynxfield_{$fieldname}\\field";
                 if (!$fieldclass::is_internal()) {
                     continue;
                 }
@@ -938,7 +939,7 @@ class datalynx {
         $fieldplugins = get_list_of_plugins('mod/datalynx/field/');
         $internalfieldsnames = [];
         foreach ($fieldplugins as $fieldname) {
-            $fieldclass = "datalynxfield_$fieldname";
+            $fieldclass = "datalynxfield_{$fieldname}\\field";
             if (!$fieldclass::is_internal()) {
                 continue;
             }
@@ -962,7 +963,7 @@ class datalynx {
             // Collate customfilter fields.
             $fieldplugins = get_list_of_plugins('mod/datalynx/field/');
             foreach ($fieldplugins as $fieldname) {
-                $fieldclass = "datalynxfield_$fieldname";
+                $fieldclass = "datalynxfield_{$fieldname}\\field";
                 if ($fieldclass::is_internal()) {
                     continue;
                 }
@@ -1046,7 +1047,7 @@ class datalynx {
                 $type = $key;
                 $key = 0;
             }
-            $fieldclass = 'datalynxfield_' . $type;
+            $fieldclass = 'datalynxfield_' . $type . '\field';
             $field = new $fieldclass($this, $key);
             return $field;
         } else {
@@ -1069,7 +1070,7 @@ class datalynx {
                 $type = $key;
                 $key = 0;
             }
-            $fieldclass = 'datalynxfield_' . $type;
+            $fieldclass = 'datalynxfield_' . $type . '\field';
             $field = new $fieldclass($this, $key);
             return $field;
         } else {
@@ -2234,8 +2235,8 @@ class datalynx {
 
                 // If nor status 'draft' neither status 'not set' user is not allowed to manage this entry.
                 if (
-                    !($entry->status == \datalynxfield_status::STATUS_DRAFT ||
-                        $entry->status == \datalynxfield_status::STATUS_NOT_SET)
+                    !($entry->status == datalynxfield_status::STATUS_DRAFT ||
+                        $entry->status == datalynxfield_status::STATUS_NOT_SET)
                 ) {
                     return false;
                 }

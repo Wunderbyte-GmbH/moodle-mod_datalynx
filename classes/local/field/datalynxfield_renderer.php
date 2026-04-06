@@ -24,6 +24,11 @@
 
 namespace mod_datalynx\local\field;
 
+use datalynx_field_behavior;
+use datalynx_field_renderer as DatalynxCoreFieldRenderer;
+use MoodleQuickForm;
+use stdClass;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/datalynx/behavior/behavior.php');
@@ -103,11 +108,11 @@ abstract class datalynxfield_renderer {
      * so that in turn patterns it may contain could be processed.
      *
      * @param array $tags
-     * @param \stdClass $entry
+     * @param stdClass $entry
      * @param array $options
      * @return array
      */
-    public function replacements(array $tags = null, \stdClass $entry = null, array $options = null) {
+    public function replacements(array $tags = null, stdClass $entry = null, array $options = null) {
         $replacements = [];
         foreach ($tags as $tag) {
             $currentoptions = array_merge(self::$defaultoptions, $options);
@@ -235,20 +240,20 @@ abstract class datalynxfield_renderer {
         $matches = [];
 
         $fieldname = $this->field->name();
-        $behavior = \datalynx_field_behavior::get_default_behavior($this->field->df());
-        $renderer = \datalynx_field_renderer::get_default_renderer($this->field->df());
+        $behavior = datalynx_field_behavior::get_default_behavior($this->field->df());
+        $renderer = DatalynxCoreFieldRenderer::get_default_renderer($this->field->df());
 
         if (preg_match($pattern, $tag, $matches)) {
             $fieldname = isset($matches[1]) ? $matches[1] : false;
 
             $behaviorname = isset($matches[2]) ? $matches[2] : false;
             if ($behaviorname) {
-                $behavior = \datalynx_field_behavior::from_name($behaviorname, $this->field->df()->id());
+                $behavior = datalynx_field_behavior::from_name($behaviorname, $this->field->df()->id());
             }
 
             $renderername = isset($matches[3]) ? $matches[3] : false;
             if ($renderername) {
-                $renderer = \datalynx_field_renderer::get_renderer_by_name($renderername, $this->field->df()->id());
+                $renderer = DatalynxCoreFieldRenderer::get_renderer_by_name($renderername, $this->field->df()->id());
             }
         }
 
@@ -259,11 +264,11 @@ abstract class datalynxfield_renderer {
      * TODO: make abstract once all field types have been updated
      * Outputs the HTML representation of the field and its value
      *
-     * @param \stdClass $entry object containing the entry data being rendered
+     * @param stdClass $entry object containing the entry data being rendered
      * @param array $options rendering options
      * @return string HTML representation of the field
      */
-    public function render_display_mode(\stdClass $entry, array $options): string {
+    public function render_display_mode(stdClass $entry, array $options): string {
         $fieldid = $this->field->id();
 
         if (isset($entry->{"c{$fieldid}_content"})) {
@@ -282,14 +287,14 @@ abstract class datalynxfield_renderer {
      * render_edit_mode. Cannot be overridden, but {@link render_edit_mode()} function can and
      * should be.
      *
-     * @param \MoodleQuickForm $mform form object used to render field input elements
-     * @param \stdClass $entry object containing the entry data being rendered
+     * @param MoodleQuickForm $mform form object used to render field input elements
+     * @param stdClass $entry object containing the entry data being rendered
      * @param array $options rendering options
      * @see datalynxfield_renderer::render_edit_mode
      */
     final public function prerender_edit_mode(
-        \MoodleQuickForm &$mform,
-        \stdClass $entry,
+        MoodleQuickForm &$mform,
+        stdClass $entry,
         array $options
     ) {
         if ($options['editable']) {
@@ -340,12 +345,12 @@ abstract class datalynxfield_renderer {
      * Adds appropriate input elements to the entry form.
      * Called by {@link prerender_edit_mode()}.
      *
-     * @param \MoodleQuickForm $mform form object used to render field input elements
-     * @param \stdClass $entry object containing the entry data being rendered
+     * @param MoodleQuickForm $mform form object used to render field input elements
+     * @param stdClass $entry object containing the entry data being rendered
      * @param array $options rendering options
      * @see datalynxfield_renderer::prerender_edit_mode
      */
-    public function render_edit_mode(\MoodleQuickForm &$mform, \stdClass $entry, array $options) {
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $fieldid = $this->field->id();
 
         $fieldname = "f_{$entry->id}_$fieldid";
@@ -370,12 +375,12 @@ abstract class datalynxfield_renderer {
     /**
      * TODO: make abstract once all field types have been updated
      *
-     * @param \MoodleQuickForm $mform
+     * @param MoodleQuickForm $mform
      * @param int $i
      * @param string $value
      * @return array
      */
-    public function render_search_mode(\MoodleQuickForm &$mform, int $i = 0, string $value = '') {
+    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
         $fieldid = $this->field->id();
         $fieldname = "f_{$i}_$fieldid";
 

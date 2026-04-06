@@ -290,8 +290,8 @@ abstract class datalynxfield_base {
      * @return moodleform
      */
     public function get_form() {
-        if (class_exists('datalynxfield_' . $this->type . '_form')) {
-            $formclass = 'datalynxfield_' . $this->type . '_form';
+        if (class_exists('datalynxfield_' . $this->type . '\form')) {
+            $formclass = 'datalynxfield_' . $this->type . '\form';
         } else {
             $formclass = 'mod_datalynx\form\datalynxfield_form';
         }
@@ -326,7 +326,7 @@ abstract class datalynxfield_base {
      */
     public function renderer() {
         if (!$this->renderer) {
-            $rendererclass = "datalynxfield_{$this->type}_renderer";
+            $rendererclass = "datalynxfield_{$this->type}\\renderer";
             $this->renderer = new $rendererclass($this);
         }
         return $this->renderer;

@@ -29,6 +29,7 @@
  */
 
 use mod_datalynx\datalynx_file_info_container;
+use datalynxfield_comment\field as datalynxfield_comment;
 
 /**
  * Indicates API features that the datalynx supports.
