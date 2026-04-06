@@ -962,23 +962,24 @@ abstract class base {
     }
 
     /**
+     * Return the fully-qualified class name of the patterns class for this view type.
+     * Subclasses with a custom patterns class should override this method.
+     *
+     * @return string
+     */
+    protected function patternclassname(): string {
+        return datalynxview_patterns::class;
+    }
+
+    /**
      * Get the class for view patterns (tag processing)
      *
      * @return datalynxview_patterns
      */
-    public function patternclass() {
-        global $CFG;
-
+    public function patternclass(): datalynxview_patterns {
         if (!$this->patternclass) {
-            $viewtype = $this->type;
-
-            if (file_exists("$CFG->dirroot/mod/datalynx/view/$viewtype/view_patterns.php")) {
-                require_once("$CFG->dirroot/mod/datalynx/view/$viewtype/view_patterns.php");
-                $patternsclass = "datalynxview_{$viewtype}_patterns";
-            } else {
-                $patternsclass = datalynxview_patterns::class;
-            }
-            $this->patternclass = new $patternsclass($this);
+            $class = $this->patternclassname();
+            $this->patternclass = new $class($this);
         }
         return $this->patternclass;
     }

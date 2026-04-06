@@ -30,6 +30,7 @@ require_once("$CFG->dirroot/mod/assign/feedback/editpdf/fpdi/autoload.php");
 use mod_datalynx\local\datalynx_tcpdf;
 use mod_datalynx\local\view\base;
 use setasign\Fpdi\Tcpdf\Fpdi;
+use datalynxview_pdf\view_patterns as pdf_patterns;
 
 require_once($CFG->dirroot . '/mod/assign/feedback/editpdf/fpdi/autoload.php');
 
@@ -63,6 +64,15 @@ class datalynxview_pdf extends base {
      * @var string View type
      */
     protected string $type = 'pdf';
+
+    /**
+     * Return the FQCN of the patterns class for this view type.
+     *
+     * @return string
+     */
+    protected function patternclassname(): string {
+        return pdf_patterns::class;
+    }
 
     /**
      * @var array List of editors

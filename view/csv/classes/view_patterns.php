@@ -16,26 +16,25 @@
 
 /**
  *
- * @package datalynxview_report
- * @subpackage report
+ * @package datalynxview_csv
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace datalynxview_csv;
+
 use mod_datalynx\local\view\datalynxview_patterns;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
- * Base class for view patterns
+ * View patterns for the CSV view type.
  */
-class datalynxview_report_patterns extends datalynxview_patterns {
+class view_patterns extends datalynxview_patterns {
     /**
-     * Get replacements for tags
+     * Get replacements for the given tags.
      *
-     * @param array|null $tags
-     * @param stdClass|null $entry
+     * @param array $tags
+     * @param stdClass $entry
      * @param array $options
      * @return array
      */
@@ -47,15 +46,15 @@ class datalynxview_report_patterns extends datalynxview_patterns {
         $view = $this->view;
         $df = $view->get_dl();
         $filter = $view->get_filter();
-        $baseurl = new moodle_url($view->get_baseurl());
+        $baseurl = new \moodle_url($view->get_baseurl());
         $baseurl->param('sesskey', sesskey());
 
         foreach ($tags as $tag) {
             switch ($tag) {
                 case '##export:all##':
-                    $actionurl = new moodle_url($baseurl, ['exportreport' => $view::EXPORT_ALL]);
-                    $label = html_writer::tag('span', get_string('exportall', 'datalynx'));
-                    $replacements[$tag] = html_writer::link(
+                    $actionurl = new \moodle_url($baseurl, ['exportcsv' => $view::EXPORT_ALL]);
+                    $label = \html_writer::tag('span', get_string('exportall', 'datalynx'));
+                    $replacements[$tag] = \html_writer::link(
                         $actionurl,
                         $label,
                         ['class' => 'actionlink exportall']
@@ -63,9 +62,9 @@ class datalynxview_report_patterns extends datalynxview_patterns {
 
                     break;
                 case '##export:page##':
-                    $actionurl = new moodle_url($baseurl, ['exportreport' => $view::EXPORT_PAGE]);
-                    $label = html_writer::tag('span', get_string('exportpage', 'datalynx'));
-                    $replacements[$tag] = html_writer::link(
+                    $actionurl = new \moodle_url($baseurl, ['exportcsv' => $view::EXPORT_PAGE]);
+                    $label = \html_writer::tag('span', get_string('exportpage', 'datalynx'));
+                    $replacements[$tag] = \html_writer::link(
                         $actionurl,
                         $label,
                         ['class' => 'actionlink exportpage']
@@ -73,9 +72,9 @@ class datalynxview_report_patterns extends datalynxview_patterns {
 
                     break;
                 case '##import##':
-                    $actionurl = new moodle_url($baseurl, ['importreport' => 1]);
-                    $label = html_writer::tag('span', get_string('import', 'datalynx'));
-                    $replacements[$tag] = html_writer::link(
+                    $actionurl = new \moodle_url($baseurl, ['importcsv' => 1]);
+                    $label = \html_writer::tag('span', get_string('import', 'datalynx'));
+                    $replacements[$tag] = \html_writer::link(
                         $actionurl,
                         $label,
                         ['class' => 'actionlink exportall']
@@ -89,14 +88,14 @@ class datalynxview_report_patterns extends datalynxview_patterns {
     }
 
     /**
-     * Get patterns
+     * List of patterns for this view.
      *
      * @param bool $checkvisibility
      * @return array
      */
     protected function patterns($checkvisibility = true): array {
         $patterns = parent::patterns($checkvisibility);
-        $cat = get_string('pluginname', 'datalynxview_report');
+        $cat = get_string('pluginname', 'datalynxview_csv');
         $patterns['##export:all##'] = [true, $cat];
         $patterns['##export:page##'] = [true, $cat];
         $patterns['##import##'] = [true, $cat];

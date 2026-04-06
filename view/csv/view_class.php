@@ -25,6 +25,7 @@
 
 use mod_datalynx\local\datalynx_entries;
 use mod_datalynx\local\view\base;
+use datalynxview_csv\view_patterns as csv_patterns;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -47,6 +48,15 @@ class datalynxview_csv extends base {
      * @var string
      */
     protected string $type = 'csv';
+
+    /**
+     * Return the FQCN of the patterns class for this view type.
+     *
+     * @return string
+     */
+    protected function patternclassname(): string {
+        return csv_patterns::class;
+    }
 
     /**
      * Output format.

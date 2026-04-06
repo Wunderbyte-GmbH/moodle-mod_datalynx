@@ -24,6 +24,7 @@
  */
 
 use mod_datalynx\local\view\base;
+use datalynxview_report\view_patterns as report_patterns;
 
 /**
  * Report view class for datalynx.
@@ -44,6 +45,15 @@ class datalynxview_report extends base {
 
     /** @var array|null List of columns. */
     protected ?array $columns = null;
+
+    /**
+     * Return the FQCN of the patterns class for this view type.
+     *
+     * @return string
+     */
+    protected function patternclassname(): string {
+        return report_patterns::class;
+    }
 
     /**
      * Constructor for datalynxview_report.

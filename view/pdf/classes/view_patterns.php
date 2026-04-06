@@ -16,23 +16,22 @@
 
 /**
  *
- * @package datalynxview_csv
- * @subpackage csv
+ * @package datalynxview_pdf
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace datalynxview_pdf;
+
 use mod_datalynx\local\view\datalynxview_patterns;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
- * Base class for view patterns
+ * View patterns for the PDF view type.
  */
-class datalynxview_csv_patterns extends datalynxview_patterns {
+class view_patterns extends datalynxview_patterns {
     /**
-     * Get replacements for the given tags.
+     * Get replacements for tags.
      *
      * @param array $tags
      * @param stdClass $entry
@@ -45,17 +44,15 @@ class datalynxview_csv_patterns extends datalynxview_patterns {
         $replacements = parent::get_replacements($tags, $entry, $options);
 
         $view = $this->view;
-        $df = $view->get_dl();
-        $filter = $view->get_filter();
-        $baseurl = new moodle_url($view->get_baseurl());
+        $baseurl = new \moodle_url($view->get_baseurl());
         $baseurl->param('sesskey', sesskey());
 
         foreach ($tags as $tag) {
             switch ($tag) {
                 case '##export:all##':
-                    $actionurl = new moodle_url($baseurl, ['exportcsv' => $view::EXPORT_ALL]);
-                    $label = html_writer::tag('span', get_string('exportall', 'datalynx'));
-                    $replacements[$tag] = html_writer::link(
+                    $actionurl = new \moodle_url($baseurl, ['pdfexportall' => true]);
+                    $label = \html_writer::tag('span', get_string('exportall', 'datalynx'));
+                    $replacements[$tag] = \html_writer::link(
                         $actionurl,
                         $label,
                         ['class' => 'actionlink exportall']
@@ -63,23 +60,17 @@ class datalynxview_csv_patterns extends datalynxview_patterns {
 
                     break;
                 case '##export:page##':
-                    $actionurl = new moodle_url($baseurl, ['exportcsv' => $view::EXPORT_PAGE]);
-                    $label = html_writer::tag('span', get_string('exportpage', 'datalynx'));
-                    $replacements[$tag] = html_writer::link(
+                    $actionurl = new \moodle_url($baseurl, ['pdfexportpage' => true]);
+                    $label = \html_writer::tag('span', get_string('exportpage', 'datalynx'));
+                    $replacements[$tag] = \html_writer::link(
                         $actionurl,
                         $label,
                         ['class' => 'actionlink exportpage']
                     );
 
                     break;
-                case '##import##':
-                    $actionurl = new moodle_url($baseurl, ['importcsv' => 1]);
-                    $label = html_writer::tag('span', get_string('import', 'datalynx'));
-                    $replacements[$tag] = html_writer::link(
-                        $actionurl,
-                        $label,
-                        ['class' => 'actionlink exportall']
-                    );
+                case '##pagebreak##':
+                    $replacements[$tag] = $view::PAGE_BREAK;
 
                     break;
             }
@@ -89,17 +80,17 @@ class datalynxview_csv_patterns extends datalynxview_patterns {
     }
 
     /**
-     * List of patterns for this view.
+     * Get patterns.
      *
      * @param bool $checkvisibility
      * @return array
      */
     protected function patterns($checkvisibility = true): array {
         $patterns = parent::patterns($checkvisibility);
-        $cat = get_string('pluginname', 'datalynxview_csv');
+        $cat = get_string('pluginname', 'datalynxview_pdf');
         $patterns['##export:all##'] = [true, $cat];
         $patterns['##export:page##'] = [true, $cat];
-        $patterns['##import##'] = [true, $cat];
+        $patterns['##pagebreak##'] = [true, $cat];
 
         return $patterns;
     }
