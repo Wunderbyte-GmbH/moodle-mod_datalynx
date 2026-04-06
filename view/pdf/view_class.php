@@ -24,12 +24,11 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-require_once("$CFG->dirroot/mod/datalynx/classes/view/base.php");
 require_once("$CFG->libdir/pdflib.php");
 require_once("$CFG->dirroot/mod/assign/feedback/editpdf/fpdi/autoload.php");
 
 use mod_datalynx\local\datalynx_tcpdf;
-use mod_datalynx\view\base;
+use mod_datalynx\local\view\base;
 use setasign\Fpdi\Tcpdf\Fpdi;
 
 require_once($CFG->dirroot . '/mod/assign/feedback/editpdf/fpdi/autoload.php');

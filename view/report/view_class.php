@@ -23,12 +23,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use mod_datalynx\view\base;
-
-
-require_once( // phpcs:ignore moodle.Files.MoodleInternal.MoodleInternalGlobalState
-    "$CFG->dirroot/mod/datalynx/classes/view/base.php"
-);
+use mod_datalynx\local\view\base;
 
 /**
  * Report view class for datalynx.

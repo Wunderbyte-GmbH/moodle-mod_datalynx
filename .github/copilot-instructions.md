@@ -36,10 +36,11 @@ Every PHP file **must** open with:
 - Classes in `mod/datalynx/classes/external/` → namespace `mod_datalynx\external`
 
 ## Database — never use raw SQL
+
 ```php
 // Good
 $records = $DB->get_records('datalynx_contents', ['fieldid' => $fieldid]);
-$DB->insert_record('datalynx_entries', $data);
+$DB->insert_record('mod_datalynx\local\datalynx_entries', $data);
 
 // Bad — never do this
 $DB->execute("SELECT * FROM {datalynx_contents} WHERE fieldid = $fieldid");

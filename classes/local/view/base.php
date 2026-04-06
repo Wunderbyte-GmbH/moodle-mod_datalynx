@@ -21,22 +21,24 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_datalynx\view;
+namespace mod_datalynx\local\view;
 
 use coding_exception;
-use datalynx_entries;
+use mod_datalynx\local\datalynx_entries;
 use mod_datalynx\local\filter\datalynx_filter;
+use mod_datalynx\local\view\datalynxview_patterns;
 use datalynxfield__rating;
 use datalynxfield__status;
-use datalynxview_entries_form;
-use datalynxview_patterns;
 use HTML_QuickForm;
 use html_writer;
 use calc_formula;
 use mod_datalynx\datalynx;
 use moodle_exception;
 use moodle_url;
+use moodleform;
 use stdClass;
+
+require_once("$CFG->libdir/formslib.php");
 
 /**
  * A base class for datalynx views
@@ -238,7 +240,6 @@ abstract class base {
         }
         $this->set_groupby_per_page();
 
-        require_once("$CFG->dirroot/mod/datalynx/entries_class.php");
         $this->entries = new datalynx_entries($this->dl, $this->filter);
     }
 
@@ -482,7 +483,7 @@ abstract class base {
     /**
      * Get the form object of the specific view type (grid, etc)
      *
-     * @return formobject for view type
+     * @return moodleform instance of the form for editing the view settings
      */
     public function get_form() {
         global $CFG;
@@ -757,7 +758,7 @@ abstract class base {
     /**
      * Get message why no entries are shown in this view
      *
-     * @return Ambigous <mixed, string>
+     * @return string message why no entries are shown in this view
      */
     protected function display_no_entries() {
         global $OUTPUT, $DB;
@@ -975,8 +976,7 @@ abstract class base {
                 require_once("$CFG->dirroot/mod/datalynx/view/$viewtype/view_patterns.php");
                 $patternsclass = "datalynxview_{$viewtype}_patterns";
             } else {
-                require_once("$CFG->dirroot/mod/datalynx/view/view_patterns.php");
-                $patternsclass = "datalynxview_patterns";
+                $patternsclass = datalynxview_patterns::class;
             }
             $this->patternclass = new $patternsclass($this);
         }
@@ -1416,8 +1416,7 @@ abstract class base {
             $actionurl = new moodle_url("/mod/datalynx/{$this->dl->pagefile()}.php", $actionparams);
             $customdata = ['view' => $this, 'update' => implode(',', $this->editentries)];
 
-            $formclass = 'datalynxview_entries_form';
-            require_once("$CFG->dirroot/mod/datalynx/view/view_entries_form.php");
+            $formclass = 'mod_datalynx\local\view\datalynxview_entries_form';
             $entriesform = new $formclass($actionurl, $customdata);
         }
 

@@ -21,6 +21,11 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+namespace mod_datalynx\form;
+use html_writer;
+use moodleform;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->libdir/formslib.php");
@@ -42,13 +47,13 @@ class datalynxview_base_form extends moodleform {
      * Constructor for datalynxview_base_form.
      */
     public function __construct(
-        $view,
-        $action = null,
-        $customdata = null,
-        $method = 'post',
-        $target = '',
-        $attributes = null,
-        $editable = true
+            $view,
+            $action = null,
+            $customdata = null,
+            $method = 'post',
+            $target = '',
+            $attributes = null,
+            $editable = true
     ) {
         $this->view = $view;
         $this->dl = $view->get_dl();
@@ -88,36 +93,36 @@ class datalynxview_base_form extends moodleform {
 
         $visiblegrp = [];
         $visiblegrp[] = $mform->createElement(
-            'advcheckbox',
-            'visible1',
-            '',
-            get_string('visible1', 'datalynx'),
-            ['group' => 1],
-            [0, 1]
+                'advcheckbox',
+                'visible1',
+                '',
+                get_string('visible1', 'datalynx'),
+                ['group' => 1],
+                [0, 1]
         );
         $visiblegrp[] = $mform->createElement(
-            'advcheckbox',
-            'visible2',
-            '',
-            get_string('visible2', 'datalynx'),
-            ['group' => 1],
-            [0, 2]
+                'advcheckbox',
+                'visible2',
+                '',
+                get_string('visible2', 'datalynx'),
+                ['group' => 1],
+                [0, 2]
         );
         $visiblegrp[] = $mform->createElement(
-            'advcheckbox',
-            'visible4',
-            '',
-            get_string('visible4', 'datalynx'),
-            ['group' => 1],
-            [0, 4]
+                'advcheckbox',
+                'visible4',
+                '',
+                get_string('visible4', 'datalynx'),
+                ['group' => 1],
+                [0, 4]
         );
         $visiblegrp[] = $mform->createElement(
-            'advcheckbox',
-            'visible8',
-            '',
-            get_string('visible8', 'datalynx'),
-            ['group' => 1],
-            [0, 8]
+                'advcheckbox',
+                'visible8',
+                '',
+                get_string('visible8', 'datalynx'),
+                ['group' => 1],
+                [0, 8]
         );
         $mform->addGroup($visiblegrp, 'visiblegroup', get_string('visibleto', 'datalynx'), null, false);
 
@@ -133,10 +138,10 @@ class datalynxview_base_form extends moodleform {
 
         // Overridefilter.
         $mform->addElement(
-            'advcheckbox',
-            'param5',
-            get_string('viewfilteroverride', 'datalynx'),
-            get_string('viewfoverride', 'datalynx')
+                'advcheckbox',
+                'param5',
+                get_string('viewfilteroverride', 'datalynx'),
+                get_string('viewfoverride', 'datalynx')
         );
         $mform->addHelpButton('param5', 'viewfoverride', 'datalynx');
         $mform->setType('param5', PARAM_INT);
@@ -171,10 +176,10 @@ class datalynxview_base_form extends moodleform {
         $data = parent::get_data();
         if (isset($data)) {
             $visiblesum = 0;
-            $visiblesum += (int)$data->visible1;
-            $visiblesum += (int)$data->visible2;
-            $visiblesum += (int)$data->visible4;
-            $visiblesum += (int)$data->visible8;
+            $visiblesum += (int) $data->visible1;
+            $visiblesum += (int) $data->visible2;
+            $visiblesum += (int) $data->visible4;
+            $visiblesum += (int) $data->visible8;
             // Store the sum in the visible field.
             $data->visible = $visiblesum;
         }
@@ -269,15 +274,15 @@ class datalynxview_base_form extends moodleform {
         $buttonarray[] = &$mform->createElement('submit', 'submitbutton', get_string('savechanges'));
         // Save and continue.
         $buttonarray[] = &$mform->createElement(
-            'submit',
-            'submitreturnbutton',
-            get_string('savecontinue', 'datalynx')
+                'submit',
+                'submitreturnbutton',
+                get_string('savecontinue', 'datalynx')
         );
         // Reset to default.
         $buttonarray[] = &$mform->createElement(
-            'submit',
-            'resetdefaultbutton',
-            get_string('viewresettodefault', 'datalynx')
+                'submit',
+                'resetdefaultbutton',
+                get_string('viewresettodefault', 'datalynx')
         );
         $mform->registerNoSubmitButton('resetdefaultbutton');
         // Switch editor.
@@ -322,22 +327,22 @@ class datalynxview_base_form extends moodleform {
             $name = "{$editorname}_{$tagstype}_tag_menu";
             $grp = [];
             $grp[] = &$mform->createElement(
-                'html',
-                html_writer::start_tag('div', ['class' => 'fitem'])
+                    'html',
+                    html_writer::start_tag('div', ['class' => 'fitem'])
             );
             $grp[] = &$mform->createElement(
-                'html',
-                '<div class="fitemtitle"><label>' . $label . '</label></div>'
+                    'html',
+                    '<div class="fitemtitle"><label>' . $label . '</label></div>'
             );
             $grp[] = &$mform->createElement(
-                'html',
-                '<div class="felement fselect">' .
+                    'html',
+                    '<div class="felement fselect">' .
                     html_writer::select(
-                        $tags,
-                        $name,
-                        '',
-                        ['' => 'choosedots'],
-                        ['id' => $name]
+                            $tags,
+                            $name,
+                            '',
+                            ['' => 'choosedots'],
+                            ['id' => $name]
                     ) . '</div>'
             );
             $grp[] = &$mform->createElement('html', html_writer::end_tag('div'));
@@ -422,7 +427,7 @@ class datalynxview_base_form extends moodleform {
                         $errors['eparam2_editor'] = get_string('viewrepeatedfields', 'datalynx', substr($field[0], 2, -2));
                     } else {
                         $errors['eparam2_editor'] .= "<br>" .
-                            get_string('viewrepeatedfields', 'datalynx', substr($field[0], 2, -2));
+                                get_string('viewrepeatedfields', 'datalynx', substr($field[0], 2, -2));
                     }
                 }
             }

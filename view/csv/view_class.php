@@ -23,11 +23,10 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use mod_datalynx\view\base;
+use mod_datalynx\local\datalynx_entries;
+use mod_datalynx\local\view\base;
 
 defined('MOODLE_INTERNAL') || die();
-
-require_once("$CFG->dirroot/mod/datalynx/classes/view/base.php");
 
 /**
  * CSV view class.

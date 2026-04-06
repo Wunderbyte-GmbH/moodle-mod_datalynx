@@ -30,7 +30,7 @@ use mod_datalynx\local\filter\datalynx_filter_manager;
 use datalynx_preset_manager;
 use datalynx_rule_manager;
 use html_writer;
-use mod_datalynx\view\base;
+use mod_datalynx\local\view\base;
 use moodle_page;
 use moodle_url;
 use stdClass;
@@ -299,11 +299,11 @@ class datalynx {
     /**
      * Get custom filter manager.
      *
-     * @return customfilter\manager|null
+     * @return \mod_datalynx\local\filter\datalynx_customfilter_manager|null
      */
     public function get_customfilter_manager() {
         if (!$this->customfiltermanager) {
-            $this->customfiltermanager = new customfilter\manager($this);
+            $this->customfiltermanager = new local\filter\datalynx_customfilter_manager($this);
         }
         return $this->customfiltermanager;
     }
@@ -862,7 +862,6 @@ class datalynx {
         array $options = ['tohtml' => true]
     ) {
         global $CFG;
-        require_once($CFG->dirroot . '/mod/datalynx/classes/view/base.php');
         $urlparams = new stdClass();
         $datalynx = new datalynx($datalynxid);
         $datalynx->views = $datalynx->get_all_views();

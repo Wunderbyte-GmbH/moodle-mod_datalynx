@@ -922,7 +922,7 @@ class datalynx_filter_manager {
      * Builds and returns the advanced filter moodleform for the given view.
      *
      * @param \stdClass $filter
-     * @param \mod_datalynx\view\base $view
+     * @param \mod_datalynx\local\view\base $view
      * @return datalynx_advanced_filter_form
      */
     public function get_advanced_filter_form($filter, $view) {
@@ -939,11 +939,11 @@ class datalynx_filter_manager {
      * Builds and returns the customfilter frontend moodleform for the given view.
      *
      * @param \stdClass $filter
-     * @param \mod_datalynx\view\base $view
+     * @param \mod_datalynx\local\view\base $view
      * @param bool $customfilter
      * @return datalynx_customfilter_frontend_form
      */
-    public function get_customfilter_frontend_form($filter, \mod_datalynx\view\base $view, $customfilter = false) {
+    public function get_customfilter_frontend_form($filter, \mod_datalynx\local\view\base $view, $customfilter = false) {
         global $CFG;
 
         $cfilter = isset($customfilter->id) ? $customfilter->id : "1";
@@ -986,12 +986,12 @@ class datalynx_filter_manager {
      * Applies the given filter id as the active user filter for the given view.
      *
      * @param int $filterid
-     * @param \mod_datalynx\view\base $view
+     * @param \mod_datalynx\local\view\base $view
      * @param bool $advanced
      * @param bool $customfilter
      * @return datalynx_filter
      */
-    public function set_user_filter($filterid, \mod_datalynx\view\base $view, $advanced = false, $customfilter = false) {
+    public function set_user_filter($filterid, \mod_datalynx\local\view\base $view, $advanced = false, $customfilter = false) {
         $df = $this->dl;
         $dfid = $df->id();
         $viewid = $view->id();

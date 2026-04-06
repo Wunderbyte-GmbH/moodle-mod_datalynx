@@ -56,7 +56,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             $paths[] = new restore_path_element('datalynx_entry', '/activity/datalynx/entries/entry');
             $paths[] = new restore_path_element('datalynx_content', '/activity/datalynx/entries/entry/contents/content');
             $paths[] = new restore_path_element('datalynx_tag', '/activity/datalynx/entries/entry/contents/content/tags/tag');
-            $paths[] = new restore_path_element('mod_datalynx\datalynx_rating', '/activity/datalynx/entries/entry/ratings/rating');
+            $paths[] = new restore_path_element('datalynx_rating', '/activity/datalynx/entries/entry/ratings/rating');
             $paths[] = new restore_path_element('datalynx_grade', '/activity/datalynx/grades/grade');
         }
 

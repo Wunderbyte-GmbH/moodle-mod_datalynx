@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace mod_datalynx\customfilter;
+namespace mod_datalynx\form;
 use stdClass;
 
 /**
@@ -26,9 +26,9 @@ use stdClass;
  * @copyright 2016 Thomas Niedermaier
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class backend_form extends base_form {
+class datalynx_customfilter_backend_form extends datalynx_customfilter_base_form {
     /**
-     *
+     * @return void
      */
     public function definition() {
         if ($id = $this->customfilter->id) {

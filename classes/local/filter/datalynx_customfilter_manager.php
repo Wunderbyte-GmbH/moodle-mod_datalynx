@@ -23,9 +23,11 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_datalynx\customfilter;
+namespace mod_datalynx\local\filter;
 use html_table;
 use html_writer;
+use mod_datalynx\form\datalynx_customfilter_backend_form;
+use mod_datalynx\local\filter\datalynx_customfilter;
 use moodle_url;
 use stdClass;
 
@@ -34,7 +36,7 @@ use stdClass;
  *
  * @package mod_datalynx\customfilter
  */
-class manager {
+class datalynx_customfilter_manager {
     /** @var int Maximum number of user filters allowed. */
     const USER_FILTER_MAX_NUM = 5;
 
@@ -68,7 +70,7 @@ class manager {
      *
      * @param int $filterid
      * @param array|null $options
-     * @return mixed|customfilter
+     * @return mixed|datalynx_customfilter
      * @throws \coding_exception
      */
     public function get_filter_from_id($filterid = 0, array $options = null) {
@@ -80,7 +82,7 @@ class manager {
             $filter->dataid = $dl->id();
             $filter->name = get_string('filternew', 'datalynx');
 
-            return new customfilter($filter);
+            return new datalynx_customfilter($filter);
         }
 
         if ($filterid < 0) {
@@ -89,7 +91,7 @@ class manager {
 
             if ($filterid == self::USER_FILTER_SET && $view && $view->is_active()) {
                 $filter = $this->set_user_filter($filterid, $view);
-                return new customfilter($filter);
+                return new datalynx_customfilter($filter);
             }
 
             if (
@@ -101,7 +103,7 @@ class manager {
             ) {
                 $filter = unserialize($filter);
                 $filter->dataid = $dlid;
-                return new customfilter($filter);
+                return new datalynx_customfilter($filter);
             }
 
             $filterid = 0;
@@ -112,7 +114,7 @@ class manager {
                 $filter = new stdClass();
                 $filter->dataid = $dl->id();
 
-                return new customfilter($filter);
+                return new datalynx_customfilter($filter);
             } else {
                 $filterid = $dl->data->defaultfilter;
             }
@@ -124,7 +126,7 @@ class manager {
             $filter = new stdClass();
             $filter->dataid = $dl->id();
 
-            return new customfilter($filter);
+            return new datalynx_customfilter($filter);
         }
     }
 
@@ -133,7 +135,7 @@ class manager {
      *
      * @param $url
      * @param bool $raw
-     * @return customfilter|null
+     * @return datalynx_customfilter|null
      */
     public function get_filter_from_url($url, $raw = false) {
 
@@ -142,7 +144,7 @@ class manager {
 
         if ($options = self::get_filter_options_from_url($url)) {
             $options['dataid'] = $dlid;
-            $filter = new customfilter((object) $options);
+            $filter = new datalynx_customfilter((object) $options);
 
             if ($raw) {
                 return $filter->get_filter_obj();
@@ -169,7 +171,7 @@ class manager {
             $this->filters = [];
             if ($filters = $DB->get_records('datalynx_customfilters', ['dataid' => $this->dl->id()])) {
                 foreach ($filters as $filterid => $filterdata) {
-                    $this->customfilters[$filterid] = new customfilter($filterdata);
+                    $this->customfilters[$filterid] = new datalynx_customfilter($filterdata);
                 }
             }
         }
@@ -388,7 +390,7 @@ class manager {
      * Get the backend form for managing a customfilter.
      *
      * @param $filter
-     * @return backend_form
+     * @return datalynx_customfilter_backend_form
      */
     public function get_customfilter_backend_form($filter) {
 
@@ -396,7 +398,7 @@ class manager {
             '/mod/datalynx/customfilter/index.php',
             ['d' => $this->dl->id(), 'fid' => $filter->id, 'update' => 1]
         );
-        $mform = new backend_form($this->dl, $filter, $formurl);
+        $mform = new datalynx_customfilter_backend_form($this->dl, $filter, $formurl);
         return $mform;
     }
 
@@ -579,7 +581,7 @@ class manager {
      *
      * @param $filterid
      * @param $view
-     * @return customfilter|null
+     * @return datalynx_customfilter|null
      * @throws \coding_exception
      */
     public function set_user_filter($filterid, $view) {

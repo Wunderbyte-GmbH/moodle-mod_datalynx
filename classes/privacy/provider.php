@@ -272,7 +272,7 @@ class provider implements
             $context,
             [$recordobj->id],
             'mod_datalynx',
-            'datalynx_entries',
+                'datalynx_entries',
             $recordobj->id
         );
     }
@@ -357,7 +357,7 @@ class provider implements
         get_file_storage()->delete_area_files_select(
             $context->id,
             'mod_datalynx',
-            'datalynx_entries',
+                'datalynx_entries',
             "IN (SELECT dc.id FROM {datalynx_contents} dc WHERE dc.entryid $sql)",
             $params
         );

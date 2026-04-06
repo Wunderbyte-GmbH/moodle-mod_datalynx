@@ -23,13 +23,13 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_datalynx\customfilter;
+namespace mod_datalynx\local\filter;
 use stdClass;
 
 /**
  * Customfilter class
  */
-class customfilter {
+class datalynx_customfilter {
     /** @var int The customfilter record id. */
     public $id;
 

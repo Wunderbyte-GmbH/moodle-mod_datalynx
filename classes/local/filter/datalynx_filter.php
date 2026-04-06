@@ -30,7 +30,7 @@ use datalynxfield_select;
 use datalynxfield_teammemberselect;
 use datalynxfield_userinfo;
 use mod_datalynx\local\field\datalynxfield_option_multiple;
-use mod_datalynx\view\base;
+use mod_datalynx\local\view\base;
 
 /**
  * Filter class

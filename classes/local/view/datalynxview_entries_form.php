@@ -20,6 +20,10 @@
  * @copyright 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+namespace mod_datalynx\local\view;
+use moodleform;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/formslib.php');
@@ -49,6 +53,7 @@ class datalynxview_entries_form extends moodleform {
 
     /**
      * Add action buttons that delegate functions to allow multiple buttons on one form.
+     *
      * @return void
      */
     public function add_delegate_action_buttons() {
@@ -100,8 +105,8 @@ class datalynxview_entries_form extends moodleform {
                     // If no fieldgroup use standard behaviour.
                     foreach ($fields as $fid => $field) {
                         $errors = array_merge(
-                            $errors,
-                            $field->renderer()->validate($entryid, $patterns[$fid], (object) $data)
+                                $errors,
+                                $field->renderer()->validate($entryid, $patterns[$fid], (object) $data)
                         );
                     }
                 }

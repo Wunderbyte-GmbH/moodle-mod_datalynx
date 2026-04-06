@@ -22,11 +22,12 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_datalynx\local\datalynx_entries;
+
 define('AJAX_SCRIPT', true);
 
 require_once(dirname(__FILE__, 5) . '/config.php');
 require_once("$CFG->dirroot/mod/datalynx/classes/datalynx.php");
-require_once("$CFG->dirroot/mod/datalynx/entries_class.php");
 
 ob_start();
 

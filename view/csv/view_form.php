@@ -21,9 +21,11 @@
  * @copyright  2013 onwards edulabs.org and associated programmers
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+use mod_datalynx\form\datalynxview_base_form;
+
 defined('MOODLE_INTERNAL') || die();
 
-require_once("$CFG->dirroot/mod/datalynx/view/view_form.php");
 require_once("$CFG->libdir/csvlib.class.php");
 
 /**

@@ -22,9 +22,24 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use core_user\fields;
-use mod_datalynx\local\filter\datalynx_filter;
+namespace mod_datalynx\local;
 
+use coding_exception;
+use completion_info;
+use core_user\fields;
+use datalynx;
+use datalynxfield__approve;
+use datalynxfield__entry;
+use datalynxfield__status;
+use datalynxfield__time;
+use datalynxfield_entryauthor;
+use datalynxfield_entrygroup;
+use dml_exception;
+use mod_datalynx;
+use mod_datalynx\local\filter\datalynx_filter;
+use moodle_exception;
+use moodle_url;
+use stdClass;
 
 /**
  * Class to manage entries
@@ -90,7 +105,7 @@ class datalynx_entries {
     public function __construct(mod_datalynx\datalynx $datalynx, datalynx_filter $filter = null) {
         if (empty($datalynx)) {
             throw new coding_exception(
-                'Datalynx id or object must be passed to entries constructor.'
+                    'Datalynx id or object must be passed to entries constructor.'
             );
         }
 
@@ -122,10 +137,10 @@ class datalynx_entries {
 
         $this->entries = !empty($entriesset->entries) ? $entriesset->entries : [];
         $this->entriestotalcount = !empty($entriesset->max) ? $entriesset->max : count(
-            $this->entries
+                $this->entries
         );
         $this->entriesfiltercount = !empty($entriesset->found) ? $entriesset->found : count(
-            $this->entries
+                $this->entries
         );
     }
 
@@ -178,9 +193,9 @@ class datalynx_entries {
                 // Specific users requested.
                 if (!empty($filter->users)) {
                     [$inusers, $userparams] = $DB->get_in_or_equal(
-                        $filter->users,
-                        SQL_PARAMS_NAMED,
-                        'users'
+                            $filter->users,
+                            SQL_PARAMS_NAMED,
+                            'users'
                     );
                     $whereuser .= " AND e.userid $inusers ";
                     $params = array_merge($params, ['users' => $userparams]);
@@ -205,9 +220,9 @@ class datalynx_entries {
                 // Specific groups requested.
                 if (!empty($filter->groups)) {
                     [$ingroups, $groupparams] = $DB->get_in_or_equal(
-                        $filter->groups,
-                        SQL_PARAMS_NAMED,
-                        'groups'
+                            $filter->groups,
+                            SQL_PARAMS_NAMED,
+                            'groups'
                     );
                     $whereuser .= " AND e.userid $ingroups ";
                     $params = array_merge($params, ['groups' => $groupparams]);
@@ -218,7 +233,7 @@ class datalynx_entries {
         // APPROVE filtering.
         $whereapprove = '';
         if (
-            $datalynx->data->approval &&
+                $datalynx->data->approval &&
                 !has_capability('mod/datalynx:manageentries', $datalynx->context)
         ) {
             if (isloggedin()) {
@@ -335,9 +350,9 @@ class datalynx_entries {
                         $randids = array_rand($entryids, min($perpage, count($entryids)));
                         // Get the entries.
                         [$insql, $paramids] = $DB->get_in_or_equal(
-                            $randids,
-                            SQL_PARAMS_NAMED,
-                            'rand'
+                                $randids,
+                                SQL_PARAMS_NAMED,
+                                'rand'
                         );
                         $andwhereids = " AND e.id $insql ";
                         $sqlselect = "SELECT $what FROM $fromsql WHERE $wheresql $andwhereids";
@@ -384,14 +399,14 @@ class datalynx_entries {
                 // Get the node content of the requested entries.
                 [$fids, $fparams] = $DB->get_in_or_equal($datalynxcontent, SQL_PARAMS_NAMED);
                 [$eids, $eparams] = $DB->get_in_or_equal(
-                    array_keys($entries->entries),
-                    SQL_PARAMS_NAMED
+                        array_keys($entries->entries),
+                        SQL_PARAMS_NAMED
                 );
                 $params = array_merge($eparams, $fparams);
                 $contents = $DB->get_records_select(
-                    'datalynx_contents',
-                    "entryid {$eids} AND fieldid {$fids}",
-                    $params
+                        'datalynx_contents',
+                        "entryid {$eids} AND fieldid {$fids}",
+                        $params
                 );
                 // If we see multiple contents to one entry and field, build array with postfix _fieldgroup.
                 foreach ($contents as $contentid => $content) {
@@ -502,15 +517,15 @@ class datalynx_entries {
                         // TODO: MDL-66151 for Picture fields this does not distinguish between the images and their thumbs.
                         // But the view may not necessarily display both.
                         $files = array_merge(
-                            $files,
-                            $fs->get_area_files(
-                                $this->datalynx->context->id,
-                                'mod_datalynx',
-                                'content',
-                                $contentid,
-                                'sortorder, itemid, filepath, filename',
-                                false
-                            )
+                                $files,
+                                $fs->get_area_files(
+                                        $this->datalynx->context->id,
+                                        'mod_datalynx',
+                                        'content',
+                                        $contentid,
+                                        'sortorder, itemid, filepath, filename',
+                                        false
+                                )
                         );
                     }
                 }
@@ -572,7 +587,7 @@ class datalynx_entries {
             if ($action == 'update') {
                 if (!is_array($eids)) {
                     // Adding new entries.
-                    if ((int)$eids < 0) {
+                    if ((int) $eids < 0) {
                         $eids = array_reverse(range($eids, -1));
                         // Editing existing entries.
                     } else {
@@ -622,7 +637,8 @@ class datalynx_entries {
 
                 // All other types of processing must refer to specific entry ids.
             } else {
-                $entries = $DB->get_records_select('datalynx_entries', "dataid = ? AND id IN ($eids)", [$dl->id()]);
+                $entries =
+                        $DB->get_records_select('datalynx_entries', "dataid = ? AND id IN ($eids)", [$dl->id()]);
             }
 
             if (!empty($importentryids)) {
@@ -635,7 +651,7 @@ class datalynx_entries {
                 foreach ($entries as $eid => $entry) {
                     // Filter approvable entries.
                     if (
-                        ($action == 'approve' || $action == 'disapprove') &&
+                            ($action == 'approve' || $action == 'disapprove') &&
                             !has_capability('mod/datalynx:approve', $dl->context)
                     ) {
                         unset($entries[$eid]);
@@ -662,19 +678,19 @@ class datalynx_entries {
                 // Print a confirmation page.
                 echo $OUTPUT->header();
                 echo $OUTPUT->confirm(
-                    get_string("entriesconfirm$action", 'datalynx', count($entries)),
-                    new moodle_url(
-                        $PAGE->url,
-                        [$action => implode(',', array_keys($entries)),
+                        get_string("entriesconfirm$action", 'datalynx', count($entries)),
+                        new moodle_url(
+                                $PAGE->url,
+                                [$action => implode(',', array_keys($entries)),
                                         'sesskey' => sesskey(), 'confirmed' => true,
                                         'sourceview' => optional_param('sourceview', null, PARAM_INT),
-                            ]
-                    ),
-                    new moodle_url($PAGE->url)
+                                ]
+                        ),
+                        new moodle_url($PAGE->url)
                 );
 
-                        echo $OUTPUT->footer();
-                        exit(0);
+                echo $OUTPUT->footer();
+                exit(0);
             } else {
                 $processed = [];
                 $completiontype = COMPLETION_UNKNOWN;
@@ -690,9 +706,9 @@ class datalynx_entries {
 
                             // First parse the data to collate content in an array for each recognized field.
                             $contents = array_fill_keys(
-                                array_keys($entries),
-                                ['info' => [], 'fields' => [],
-                                ]
+                                    array_keys($entries),
+                                    ['info' => [], 'fields' => [],
+                                    ]
                             );
                             $entryinfo = [datalynxfield__entry::_ENTRY,
                                     datalynxfield__time::_TIMECREATED,
@@ -732,7 +748,7 @@ class datalynx_entries {
                                     if (in_array($fieldid, $entryinfo)) {
                                         // TODO: MDL-66151.
                                         if (
-                                            $fieldid == datalynxfield_entryauthor::_USERID ||
+                                                $fieldid == datalynxfield_entryauthor::_USERID ||
                                                 $fieldid == datalynxfield_entryauthor::_USERNAME
                                         ) {
                                             $entryvar = 'userid';
@@ -740,13 +756,13 @@ class datalynx_entries {
                                             $entryvar = $field->get_internalname();
                                         }
                                         if (
-                                            $fieldid == datalynxfield__status::_STATUS &&
+                                                $fieldid == datalynxfield__status::_STATUS &&
                                                 $value == datalynxfield__status::STATUS_DRAFT
                                         ) {
                                             $skipnotification[] = $entryid;
                                         }
                                         if (
-                                            $fieldid == datalynxfield__status::_STATUS &&
+                                                $fieldid == datalynxfield__status::_STATUS &&
                                                 $value == datalynxfield__status::STATUS_FINAL_SUBMISSION &&
                                                 isset($entry->status) &&
                                                 $entry->status == datalynxfield__status::STATUS_DRAFT
@@ -759,14 +775,14 @@ class datalynx_entries {
                                         // Entry content.
                                     } else {
                                         if (
-                                            !array_key_exists(
-                                                $fieldid,
-                                                $contents[$entryid]['fields']
-                                            )
+                                                !array_key_exists(
+                                                        $fieldid,
+                                                        $contents[$entryid]['fields']
+                                                )
                                         ) {
                                             $contents[$entryid]['fields'][$fieldid] = $field->get_content_from_data(
-                                                $entryid,
-                                                $data
+                                                    $entryid,
+                                                    $data
                                             );
                                         }
                                     }
@@ -811,14 +827,14 @@ class datalynx_entries {
                                     if (isset($contents[$eid]['info']['status'])) {
                                         // Find current state of entry in db.
                                         $entrystatus = $DB->get_field(
-                                            'datalynx_entries',
-                                            'status',
-                                            ['id' => $eid],
-                                            'MUST_EXIST'
+                                                'datalynx_entries',
+                                                'status',
+                                                ['id' => $eid],
+                                                'MUST_EXIST'
                                         );
                                         require_once('field/_status/field_class.php');
                                         if (
-                                            $entrystatus == datalynxfield__status::STATUS_FINAL_SUBMISSION
+                                                $entrystatus == datalynxfield__status::STATUS_FINAL_SUBMISSION
                                                 && !has_capability('mod/datalynx:manageentries', $this->datalynx->context)
                                         ) {
                                             continue; // Check user has capacity & status is final. If stop update.
@@ -880,8 +896,8 @@ class datalynx_entries {
 
                                                 // We know this is a fieldgroup but there is only one line set.
                                                 if (
-                                                    !isset($entry->{"c{$fieldid}_id_fieldgroup"})
-                                                    && isset($entry->{"c{$fieldid}_id"})
+                                                        !isset($entry->{"c{$fieldid}_id_fieldgroup"})
+                                                        && isset($entry->{"c{$fieldid}_id"})
                                                 ) {
                                                     $entry->{"c{$fieldid}_id_fieldgroup"}[0] = $entry->{"c{$fieldid}_id"};
                                                 }
@@ -893,7 +909,7 @@ class datalynx_entries {
                                                 }
                                                 if (isset($entry->{"c{$fieldid}_content_fieldgroup"}[$i])) {
                                                     $entry->{"c{$fieldid}_content"} =
-                                                        $entry->{"c{$fieldid}_content_fieldgroup"}[$i];
+                                                            $entry->{"c{$fieldid}_content_fieldgroup"}[$i];
                                                 }
 
                                                 /* Loop all fields like _content1 and _content2.
@@ -902,7 +918,7 @@ class datalynx_entries {
                                                 for ($j = 1; $j <= 4; $j++) {
                                                     if (isset($entry->{"c{$fieldid}_content{$j}_fieldgroup"}[$i])) {
                                                         $entry->{"c{$fieldid}_content{$j}"} =
-                                                            $entry->{"c{$fieldid}_content{$j}_fieldgroup"}[$i];
+                                                                $entry->{"c{$fieldid}_content{$j}_fieldgroup"}[$i];
                                                     }
                                                 }
                                                 // Pass tempstuff to updatecontent.
@@ -975,7 +991,7 @@ class datalynx_entries {
                             $newentry->timecreated = $newentry->timemodified = time();
 
                             if (
-                                $dl->data->approval &&
+                                    $dl->data->approval &&
                                     !has_capability('mod/datalynx:approve', $dl->context)
                             ) {
                                 $newentry->approved = 0;
@@ -987,10 +1003,10 @@ class datalynx_entries {
                                 $newcontent->entryid = $newentry->id;
                                 if (!$DB->insert_record('datalynx_contents', $newcontent)) {
                                     throw new moodle_exception(
-                                        'cannotinsertrecord',
-                                        null,
-                                        null,
-                                        $newentry->id
+                                            'cannotinsertrecord',
+                                            null,
+                                            null,
+                                            $newentry->id
                                     );
                                 }
                             }
@@ -1011,11 +1027,11 @@ class datalynx_entries {
                         $entryids = array_keys($entries);
                         $ids = implode(',', $entryids);
                         $DB->set_field_select(
-                            'datalynx_entries',
-                            'approved',
-                            1,
-                            " dataid = ? AND id IN ($ids) ",
-                            [$dl->id()]
+                                'datalynx_entries',
+                                'approved',
+                                1,
+                                " dataid = ? AND id IN ($ids) ",
+                                [$dl->id()]
                         );
                         $processed = $entries;
 
@@ -1035,11 +1051,11 @@ class datalynx_entries {
                         $entryids = array_keys($entries);
                         $ids = implode(',', $entryids);
                         $DB->set_field_select(
-                            'datalynx_entries',
-                            'approved',
-                            0,
-                            " dataid = ? AND id IN ($ids) ",
-                            [$dl->id()]
+                                'datalynx_entries',
+                                'approved',
+                                0,
+                                " dataid = ? AND id IN ($ids) ",
+                                [$dl->id()]
                         );
                         $processed = $entries;
                         if ($processed) {
@@ -1078,7 +1094,7 @@ class datalynx_entries {
                     // Update completion state.
                     $completion = new completion_info($dl->course);
                     if (
-                        $completion->is_enabled($dl->cm) &&
+                            $completion->is_enabled($dl->cm) &&
                             $dl->cm->completion == COMPLETION_TRACKING_AUTOMATIC &&
                             $dl->data->completionentries
                     ) {
@@ -1121,17 +1137,17 @@ class datalynx_entries {
         if ($teamfield) {
             foreach ($entryids as $entryid) {
                 $oldcontents = $contents = $DB->get_records(
-                    'datalynx_contents',
-                    ['entryid' => $entryid]
+                        'datalynx_contents',
+                        ['entryid' => $entryid]
                 );
 
                 $teammemberids = json_decode(
-                    $DB->get_field(
-                        'datalynx_contents',
-                        'content',
-                        ['entryid' => $entryid, 'fieldid' => $teamfield->id()]
-                    ),
-                    true
+                        $DB->get_field(
+                                'datalynx_contents',
+                                'content',
+                                ['entryid' => $entryid, 'fieldid' => $teamfield->id()]
+                        ),
+                        true
                 );
 
                 if ($teamfield->referencefieldid != -1) {
@@ -1169,11 +1185,11 @@ class datalynx_entries {
                                  AND dc.fieldid = :fieldid
                                  AND $sqllike";
                         $existingentryid = $DB->get_field_sql(
-                            $query,
-                            ['dataid' => $dl->id(), 'userid' => $teammemberid,
+                                $query,
+                                ['dataid' => $dl->id(), 'userid' => $teammemberid,
                                         'fieldid' => $teamfield->referencefieldid,
                                         'content' => $likecontent,
-                            ]
+                                ]
                         );
                     } else {
                         $existingentryid = false;
@@ -1181,8 +1197,8 @@ class datalynx_entries {
 
                     if ($existingentryid) {
                         $existingentry = $DB->get_record(
-                            'datalynx_entries',
-                            ['id' => $existingentryid]
+                                'datalynx_entries',
+                                ['id' => $existingentryid]
                         );
                         $existingentry->approved = 1;
                         foreach ($contents as $content) {
@@ -1191,12 +1207,12 @@ class datalynx_entries {
                                 $newcontent->content = json_encode($newteammemberids);
                             }
                             $DB->set_field(
-                                'datalynx_contents',
-                                'content',
-                                $newcontent->content,
-                                ['entryid' => $existingentry->id,
+                                    'datalynx_contents',
+                                    'content',
+                                    $newcontent->content,
+                                    ['entryid' => $existingentry->id,
                                             'fieldid' => $newcontent->fieldid,
-                                ]
+                                    ]
                             );
                         }
                         $DB->update_record('datalynx_entries', $existingentry);
@@ -1266,16 +1282,16 @@ class datalynx_entries {
         if ($entry->id > 0) {
             if ($df->user_can_manage_entry($entry)) { // Just in case the user opens two forms at the same time.
                 if (
-                    !has_capability('mod/datalynx:approve', $df->context)
+                        !has_capability('mod/datalynx:approve', $df->context)
                         && ($df->data->approval == mod_datalynx\datalynx::APPROVAL_ON_UPDATE)
                 ) {
                     $entry->approved = 0;
                 }
 
                 $oldapproved = $DB->get_field(
-                    'datalynx_entries',
-                    'approved',
-                    ['id' => $entry->id]
+                        'datalynx_entries',
+                        'approved',
+                        ['id' => $entry->id]
                 );
                 $newapproved = isset($entry->approved) ? $entry->approved : 0;
 

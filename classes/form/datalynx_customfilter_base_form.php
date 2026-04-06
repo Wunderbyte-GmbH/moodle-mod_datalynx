@@ -23,7 +23,8 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_datalynx\customfilter;
+namespace mod_datalynx\form;
+use mod_datalynx\customfilter\datalynx;
 use moodleform;
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/formslib.php');
@@ -33,7 +34,7 @@ require_once($CFG->libdir . '/formslib.php');
  *
  * @package mod_datalynx\customfilter
  */
-abstract class base_form extends moodleform {
+abstract class datalynx_customfilter_base_form extends moodleform {
     /** @var object|null The customfilter instance being managed. */
     protected $customfilter = null;
 
