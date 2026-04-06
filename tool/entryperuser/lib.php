@@ -26,9 +26,6 @@
 use mod_datalynx\local\datalynx_entries;
 
 defined('MOODLE_INTERNAL') || die();
-
-require_once("$CFG->dirroot/mod/datalynx/field/entryauthor/field_class.php");
-
 /**
  * Class datalynxtool_entryperuser
  *

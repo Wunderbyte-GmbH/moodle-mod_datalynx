@@ -1044,8 +1044,6 @@ function datalynx_comment_permissions($commentparam) {
  */
 function datalynx_comment_validate($commentparam) {
     global $CFG;
-
-    require_once("field/comment/field_class.php");
     $comment = new datalynxfield_comment($commentparam->cm->instance);
     return $comment->validation($commentparam);
 }

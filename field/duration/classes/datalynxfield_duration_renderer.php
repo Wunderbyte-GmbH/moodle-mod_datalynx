@@ -1,0 +1,190 @@
+<?php
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
+//
+// It is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// It is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Renderer for the duration field type.
+ *
+ * @package    datalynxfield_duration
+ * @copyright  2014 onwards by edulabs.org and associated programmers
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+use mod_datalynx\local\field\datalynxfield_renderer;
+
+defined('MOODLE_INTERNAL') || die();
+
+
+/**
+ * Renderer for the duration field type.
+ */
+class datalynxfield_duration_renderer extends datalynxfield_renderer {
+    /**
+     * Render the duration field in edit mode.
+     *
+     * @param MoodleQuickForm $mform The form object.
+     * @param stdClass $entry The entry object.
+     * @param array $options Rendering options.
+     */
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
+        $field = $this->field;
+        $fieldid = $field->id();
+        $entryid = $entry->id;
+        $fieldname = "field_{$fieldid}_{$entryid}";
+
+        $mform->addElement('duration', $fieldname, '', ['optional' => null]);
+        $mform->setType($fieldname, PARAM_ALPHANUMEXT);
+
+        if ($entryid > 0 && !empty($entry->{"c{$fieldid}_content"})) {
+            $number = $entry->{"c{$fieldid}_content"};
+            $mform->setDefault($fieldname, $number);
+        }
+
+        $required = !empty($options['required']);
+        if ($required) {
+            $mform->addRule($fieldname, null, 'required', null, 'client');
+        }
+    }
+
+    /**
+     * Render the duration field in display mode.
+     *
+     * @param stdClass $entry The entry object.
+     * @param array $options Rendering options including optional 'format' key.
+     * @return string The rendered output.
+     */
+    public function render_display_mode(stdClass $entry, array $options): string {
+        $field = $this->field;
+        $fieldid = $field->id();
+
+        // A duration of 0 means that this field was not set by the user.
+        if (isset($entry->{"c{$fieldid}_content"}) && $entry->{"c{$fieldid}_content"} != 0) {
+            $duration = (int) $entry->{"c{$fieldid}_content"};
+        } else {
+            $duration = '';
+        }
+        // Durations always are exported as their value in seconds to csv.
+        if ($exportcsv = optional_param('exportcsv', '', PARAM_ALPHA)) {
+            return $duration;
+        }
+
+        $format = !empty($options['format']) ? $options['format'] : '';
+        if ($duration !== '') {
+            [$value, $unit] = $field->seconds_to_unit($duration);
+            $units = $field->get_units();
+            switch ($format) {
+                case 'unit':
+                    return $units[$unit];
+                    break;
+
+                case 'value':
+                    return $value;
+                    break;
+
+                case 'seconds':
+                    return $duration;
+                    break;
+
+                case 'interval':
+                    return format_time($duration);
+                    break;
+
+                default:
+                    return $value . ' ' . $units[$unit];
+                    break;
+            }
+        }
+        return '';
+    }
+
+    /**
+     * Render the duration field in search mode.
+     *
+     * @param MoodleQuickForm $mform The form object.
+     * @param int $i The filter index.
+     * @param mixed $value The current search value.
+     * @return array Array of elements.
+     */
+    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
+        $fieldid = $this->field->id();
+        $fieldname = "f_{$i}_$fieldid";
+
+        $arr = [];
+
+        $arr[] = &$mform->createElement('duration', "{$fieldname}_from");
+        $mform->setType("{$fieldname}_from", PARAM_INT);
+        if (isset($value[0])) {
+            $mform->setDefault("{$fieldname}_from", $value[0]);
+        }
+        $mform->disabledIf("{$fieldname}_from[number]", "searchoperator$i", 'eq', '');
+        $mform->disabledIf("{$fieldname}_from[timeunit]", "searchoperator$i", 'eq', '');
+
+        $arr[] = &$mform->createElement('duration', "{$fieldname}_to");
+        $mform->setType("{$fieldname}_to", PARAM_INT);
+        if (isset($value[1])) {
+            $mform->setDefault("{$fieldname}_to", $value[1]);
+        }
+        $mform->disabledIf("{$fieldname}_to[number]", "searchoperator$i", 'neq', 'BETWEEN');
+        $mform->disabledIf("{$fieldname}_to[timeunit]", "searchoperator$i", 'neq', 'BETWEEN');
+
+        return [$arr, null];
+    }
+
+    /**
+     * Get the tag patterns for this field.
+     *
+     * @return array Array of patterns.
+     */
+    protected function patterns() {
+        $fieldname = $this->field->name();
+
+        $patterns = parent::patterns();
+        $patterns["[[$fieldname]]"] = [true];
+        $patterns["[[$fieldname:unit]]"] = [false];
+        $patterns["[[$fieldname:value]]"] = [false];
+        $patterns["[[$fieldname:seconds]]"] = [false];
+        $patterns["[[$fieldname:interval]]"] = [false];
+
+        return $patterns;
+    }
+
+    /**
+     * Validate the duration field.
+     *
+     * @param int $entryid The entry ID.
+     * @param array $tags The field tags.
+     * @param stdClass $formdata The submitted form data.
+     * @return array Array of errors.
+     */
+    public function validate($entryid, $tags, $formdata) {
+        $fieldid = $this->field->id();
+
+        $formfieldname = "field_{$fieldid}_{$entryid}";
+
+        $errors = [];
+        foreach ($tags as $tag) {
+            [, $behavior, ] = $this->process_tag($tag);
+            // Variable $behavior datalynx_field_behavior.
+            if ($behavior->is_required() && isset($formdata->$formfieldname)) {
+                $value = optional_param_array($formfieldname, [], PARAM_RAW)['number'];
+                $intvalue = intval($value);
+                if ($value !== "$intvalue") {
+                    $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
+                }
+            }
+        }
+
+        return $errors;
+    }
+}

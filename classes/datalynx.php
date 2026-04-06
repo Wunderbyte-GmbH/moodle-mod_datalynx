@@ -288,7 +288,6 @@ class datalynx {
      * @return datalynx_filter_manager|null
      */
     public function get_filter_manager() {
-        global $CFG;
         // Set filters manager.
         if (!$this->filtermanager) {
             $this->filtermanager = new datalynx_filter_manager($this);
@@ -913,12 +912,9 @@ class datalynx {
      * @return array
      */
     public function get_internal_fields(): array {
-        global $CFG;
-
         if (!$this->internalfields) {
             $fieldplugins = get_list_of_plugins('mod/datalynx/field/');
             foreach ($fieldplugins as $fieldname) {
-                require_once("$CFG->dirroot/mod/datalynx/field/$fieldname/field_class.php");
                 $fieldclass = "datalynxfield_$fieldname";
                 if (!$fieldclass::is_internal()) {
                     continue;
@@ -939,12 +935,9 @@ class datalynx {
      * @return array
      */
     public function get_internal_fields_names(): array {
-        global $CFG;
-
         $fieldplugins = get_list_of_plugins('mod/datalynx/field/');
         $internalfieldsnames = [];
         foreach ($fieldplugins as $fieldname) {
-            require_once("$CFG->dirroot/mod/datalynx/field/$fieldname/field_class.php");
             $fieldclass = "datalynxfield_$fieldname";
             if (!$fieldclass::is_internal()) {
                 continue;
@@ -964,14 +957,11 @@ class datalynx {
      * @return array of strings
      */
     public function get_customfilterfieldtypes() {
-        global $CFG;
-
         if (!$this->customfilterfields) {
             $this->customfilterfields = [];
             // Collate customfilter fields.
             $fieldplugins = get_list_of_plugins('mod/datalynx/field/');
             foreach ($fieldplugins as $fieldname) {
-                require_once("$CFG->dirroot/mod/datalynx/field/$fieldname/field_class.php");
                 $fieldclass = "datalynxfield_$fieldname";
                 if ($fieldclass::is_internal()) {
                     continue;
@@ -1049,8 +1039,6 @@ class datalynx {
      * @return bool
      */
     public function get_field($key) {
-        global $CFG;
-
         if ($key) {
             if (is_object($key)) {
                 $type = $key->type;
@@ -1058,7 +1046,6 @@ class datalynx {
                 $type = $key;
                 $key = 0;
             }
-            require_once($CFG->dirroot . '/mod/datalynx/field/' . $type . '/field_class.php');
             $fieldclass = 'datalynxfield_' . $type;
             $field = new $fieldclass($this, $key);
             return $field;
@@ -1075,7 +1062,6 @@ class datalynx {
      * @return stdClass|boolean
      */
     public function get_fieldname($key) {
-        global $CFG;
         if ($key) {
             if (is_object($key)) {
                 $type = $key->type;
@@ -1083,7 +1069,6 @@ class datalynx {
                 $type = $key;
                 $key = 0;
             }
-            require_once($CFG->dirroot . '/mod/datalynx/field/' . $type . '/field_class.php');
             $fieldclass = 'datalynxfield_' . $type;
             $field = new $fieldclass($this, $key);
             return $field;
@@ -2248,7 +2233,6 @@ class datalynx {
                 }
 
                 // If nor status 'draft' neither status 'not set' user is not allowed to manage this entry.
-                require_once($CFG->dirroot . '/mod/datalynx/field/status/field_class.php');
                 if (
                     !($entry->status == \datalynxfield_status::STATUS_DRAFT ||
                         $entry->status == \datalynxfield_status::STATUS_NOT_SET)

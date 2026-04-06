@@ -1221,9 +1221,6 @@ abstract class base {
      */
     protected function is_rating() {
         global $USER, $CFG;
-
-        require_once("$CFG->dirroot/mod/datalynx/field/rating/field_class.php");
-
         if (
             !$this->dl->data->rating || empty(
                 $this->tags['field'][datalynxfield_rating::_RATING]
@@ -1328,7 +1325,6 @@ abstract class base {
                         'status',
                         ['id' => $this->editentries[0]]
                     );
-                    require_once($CFG->dirroot . '/mod/datalynx/field/status/field_class.php');
                     if (
                         !has_capability('mod/datalynx:manageentries', $this->dl->context) &&
                              $entrystatus == datalynxfield_status::STATUS_FINAL_SUBMISSION

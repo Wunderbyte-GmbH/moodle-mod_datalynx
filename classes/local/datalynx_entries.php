@@ -832,7 +832,6 @@ class datalynx_entries {
                                                 ['id' => $eid],
                                                 'MUST_EXIST'
                                         );
-                                        require_once('field/status/field_class.php');
                                         if (
                                                 $entrystatus == datalynxfield_status::STATUS_FINAL_SUBMISSION
                                                 && !has_capability('mod/datalynx:manageentries', $this->datalynx->context)

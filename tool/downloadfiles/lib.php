@@ -26,9 +26,6 @@ defined('MOODLE_INTERNAL') || die();
 use core\notification;
 use mod_datalynx\local\datalynx_entries;
 use mod_datalynx\local\filter\datalynx_filter;
-
-require_once("$CFG->dirroot/mod/datalynx/field/entryauthor/field_class.php");
-
 /**
  * Class datalynxtool_downloadfiles
  *

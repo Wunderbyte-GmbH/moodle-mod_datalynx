@@ -17,7 +17,7 @@
 namespace mod_datalynx\local\field;
 use coding_exception;
 use mod_datalynx\datalynx;
-use datalynxfield_renderer;
+
 use dml_exception;
 use mod_datalynx;
 use moodle_exception;
@@ -290,13 +290,9 @@ abstract class datalynxfield_base {
      * @return moodleform
      */
     public function get_form() {
-        global $CFG;
-
-        if (file_exists($CFG->dirroot . '/mod/datalynx/field/' . $this->type . '/field_form.php')) {
-            require_once($CFG->dirroot . '/mod/datalynx/field/' . $this->type . '/field_form.php');
+        if (class_exists('datalynxfield_' . $this->type . '_form')) {
             $formclass = 'datalynxfield_' . $this->type . '_form';
         } else {
-            require_once($CFG->dirroot . '/mod/datalynx/field/field_form.php');
             $formclass = 'mod_datalynx\form\datalynxfield_form';
         }
         $actionurl = new moodle_url(
@@ -329,11 +325,8 @@ abstract class datalynxfield_base {
      * @return datalynxfield_renderer
      */
     public function renderer() {
-        global $CFG;
-
         if (!$this->renderer) {
             $rendererclass = "datalynxfield_{$this->type}_renderer";
-            require_once("$CFG->dirroot/mod/datalynx/field/{$this->type}/renderer.php");
             $this->renderer = new $rendererclass($this);
         }
         return $this->renderer;
