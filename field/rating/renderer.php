@@ -314,7 +314,6 @@ class datalynxfield_rating_renderer extends datalynxfield_renderer {
      * Displays a star rating widget for an entry.
      */
     protected function display_star($entry, $value) {
-        global $OUTPUT;
 
         if (isset($entry->rating)) {
             $rating = $entry->rating;
@@ -339,13 +338,9 @@ class datalynxfield_rating_renderer extends datalynxfield_renderer {
                 array_fill(
                     0,
                     $numstars,
-                    $OUTPUT->pix_icon(
-                        'star_grey',
-                        '',
-                        'datalynxfield_rating',
-                        ['style' => 'float:left;',
-                                ]
-                    )
+                    html_writer::tag('i', '', ['class' => 'fa-regular fa-star', 'aria-hidden' => 'true',
+                            'style' => 'float:left;color:#ccc;',
+                            ])
                 )
             );
             $starsdiv = html_writer::tag('div', $stars, ['style' => "z-index:10;$innerstyle",
