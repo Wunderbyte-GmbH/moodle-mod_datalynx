@@ -54,6 +54,7 @@ abstract class datalynxfield_option extends datalynxfield_base {
     /**
      *
      * @param boolean $forceget
+     * @param bool $addnoselection Whether to prepend a "no selection" option.
      * @return mixed
      */
     public function options_menu($forceget = false, $addnoselection = false) {
@@ -88,6 +89,7 @@ abstract class datalynxfield_option extends datalynxfield_base {
      * (non-PHPdoc)
      *
      * @see datalynxfield_base::set_field()
+     * @param stdClass|null $forminput Form input data.
      */
     public function set_field($forminput = null) {
         $this->field = new stdClass();
@@ -165,6 +167,8 @@ abstract class datalynxfield_option extends datalynxfield_base {
      * (non-PHPdoc)
      *
      * @see datalynxfield_base::format_search_value()
+     * @param array $searchparams Search parameters array.
+     * @return string|false
      */
     public function format_search_value($searchparams) {
         [$not, $operator, $value] = $searchparams;
@@ -180,6 +184,9 @@ abstract class datalynxfield_option extends datalynxfield_base {
      * (non-PHPdoc)
      *
      * @see datalynxfield_base::parse_search()
+     * @param stdClass $formdata Form data object.
+     * @param int $i Filter index.
+     * @return mixed
      */
     public function parse_search($formdata, $i) {
         $fieldname = "f_{$i}_{$this->field->id}";

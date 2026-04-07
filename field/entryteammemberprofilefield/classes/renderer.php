@@ -27,11 +27,9 @@
 namespace datalynxfield_entryteammemberprofilefield;
 
 use core_user\fields;
-
 use mod_datalynx\local\field\datalynxfield_renderer;
 use MoodleQuickForm;
 
-defined('MOODLE_INTERNAL') || die();
 
 
 /**

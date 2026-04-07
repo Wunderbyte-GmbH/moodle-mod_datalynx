@@ -25,7 +25,6 @@
 
 use mod_datalynx\local\view\base;
 
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Grid view class.

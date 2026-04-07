@@ -27,7 +27,6 @@ use mod_datalynx\local\datalynx_entries;
 use mod_datalynx\local\view\base;
 use datalynxview_csv\view_patterns as csv_patterns;
 
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * CSV view class.

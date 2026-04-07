@@ -52,6 +52,8 @@ abstract class datalynxfield_renderer {
 
     /**
      * Constructor
+     *
+     * @param datalynxfield_base $field The field instance.
      */
     public function __construct(&$field) {
         $this->field = $field;
@@ -282,7 +284,7 @@ abstract class datalynxfield_renderer {
     /**
      * Callback function.
      * Adds preceding and following HTML formatting for field elements and calls
-     * render_edit_mode. Cannot be overridden, but {@link render_edit_mode()} function can and
+     * render_edit_mode. Cannot be overridden, but {@see render_edit_mode()} function can and
      * should be.
      *
      * @param MoodleQuickForm $mform form object used to render field input elements
@@ -341,7 +343,7 @@ abstract class datalynxfield_renderer {
     /**
      * TODO: make abstract once all field types have been updated
      * Adds appropriate input elements to the entry form.
-     * Called by {@link prerender_edit_mode()}.
+     * Called by {@see prerender_edit_mode()}.
      *
      * @param MoodleQuickForm $mform form object used to render field input elements
      * @param stdClass $entry object containing the entry data being rendered

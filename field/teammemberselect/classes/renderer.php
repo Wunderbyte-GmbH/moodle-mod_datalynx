@@ -29,7 +29,6 @@ use MoodleQuickForm;
 use html_writer;
 use moodle_url;
 
-defined('MOODLE_INTERNAL') || die();
 
 
 

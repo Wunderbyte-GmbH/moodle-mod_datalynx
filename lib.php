@@ -241,6 +241,7 @@ function datalynx_reset_course_form_definition(&$mform) {
 /**
  * Course reset form defaults.
  *
+ * @param stdClass $course The course object.
  * @return array
  */
 function datalynx_reset_course_form_defaults($course) {
@@ -864,6 +865,9 @@ function datalynx_extend_settings_navigation(settings_navigation $settings, navi
 
 /**
  * returns a list of participants of this datalynx
+ *
+ * @param int $dataid Datalynx instance ID.
+ * @return array Array of user records.
  */
 function datalynx_get_participants($dataid) {
     global $DB;
@@ -921,6 +925,12 @@ function datalynx_get_participants($dataid) {
 
 /**
  * returns a summary of datalynx activity of this user
+ *
+ * @param stdClass $course Course object.
+ * @param stdClass $user User object.
+ * @param stdClass $mod Course module object.
+ * @param stdClass $data Datalynx instance object.
+ * @return stdClass|null
  */
 function datalynx_user_outline($course, $user, $mod, $data) {
     global $DB, $CFG;
@@ -965,6 +975,11 @@ function datalynx_user_outline($course, $user, $mod, $data) {
 
 /**
  * TODO Prints all the records uploaded by this user
+ *
+ * @param stdClass $course Course object.
+ * @param stdClass $user User object.
+ * @param stdClass $mod Course module object.
+ * @param stdClass $data Datalynx instance object.
  */
 function datalynx_user_complete($course, $user, $mod, $data) {
     global $DB, $CFG;
@@ -1067,10 +1082,7 @@ function datalynx_comment_add($newcomment, $commentparam) {
  * @param string $contextid the context id
  * @param string $component the component to get rating permissions for
  * @param string $ratingarea the rating area to get permissions for
- * @return array * @param bool $type Type of comparison (or/and; can be used as return value if no
- *         conditions)
- * @return bool True if completed, false if not. (If no conditions, then return
- *         value depends on comparison tyay an associative array of the user's rating permissions
+ * @return array An associative array of the user's rating permissions
  */
 function datalynx_rating_permissions($contextid, $component, $ratingarea) {
     $context = context::instance_by_id($contextid, MUST_EXIST);

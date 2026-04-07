@@ -86,6 +86,9 @@ class form extends datalynxfield_form {
      *
      * {@inheritDoc}
      * @see datalynxfield_form::validation()
+     * @param array $data Submitted form data.
+     * @param array $files Uploaded files.
+     * @return array Validation errors.
      */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);

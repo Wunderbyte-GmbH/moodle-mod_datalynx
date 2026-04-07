@@ -16,7 +16,7 @@
 
 /**
  *
- * @package mod_datalynx
+ * @package datalynxfield_entrytime
  * @subpackage _time
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok

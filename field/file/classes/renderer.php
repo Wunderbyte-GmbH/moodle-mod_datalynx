@@ -31,7 +31,6 @@ use html_writer;
 use moodle_url;
 use stored_file;
 
-defined('MOODLE_INTERNAL') || die();
 
 
 /**
@@ -40,6 +39,11 @@ defined('MOODLE_INTERNAL') || die();
 class renderer extends datalynxfield_renderer {
     /**
      * Renders the edit mode form elements for this field.
+     *
+     * @param MoodleQuickForm $mform The Moodle form object.
+     * @param stdClass $entry The entry object.
+     * @param array|null $options Rendering options.
+     * @return void
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options = null) {
         $field = $this->field;
@@ -309,6 +313,9 @@ class renderer extends datalynxfield_renderer {
 
     /**
      * Returns comma seperated list of urls in this entry.
+     *
+     * @param array $strfiles Array of HTML strings containing file links.
+     * @return string Comma-separated list of URLs.
      */
     public function render_csv($strfiles): string {
         $regex = '/https?\:\/\/[^\" ]+/i';

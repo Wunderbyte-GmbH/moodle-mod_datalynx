@@ -50,6 +50,9 @@ class field extends datalynxfield_option_multiple {
     /**
      * Write tags and and associate them with the id of the contents record
      *
+     * @param stdClass $entry The entry object being updated.
+     * @param array|null $values Array of tag values submitted for this field.
+     * @return int|false The content record ID or false on failure.
      * @see datalynxfield_base::update_content()
      */
     public function update_content(stdClass $entry, array $values = null) {
@@ -109,6 +112,7 @@ class field extends datalynxfield_option_multiple {
      * This is exact copy of parent::parent, because I can not access parent::parent::set_field();
      * {@inheritDoc}
      *
+     * @param stdClass|null $forminput Form input data object or null to use defaults.
      * @see datalynxfield_option::set_field()
      */
     public function set_field($forminput = null) {
@@ -131,6 +135,8 @@ class field extends datalynxfield_option_multiple {
     /**
      *
      * {@inheritDoc}
+     * @param array $search Search parameters array [not, operator, value].
+     * @return array SQL fragment, params, and join flag.
      * @see datalynxfield_option_multiple::get_search_sql()
      */
     public function get_search_sql(array $search): array {
@@ -209,6 +215,11 @@ class field extends datalynxfield_option_multiple {
     /**
      *
      * {@inheritDoc}
+     * @param stdClass $data The data object to populate with import values.
+     * @param array $importsettings Import settings keyed by field name.
+     * @param array|null $csvrecord A single CSV record row.
+     * @param int|null $entryid The target entry ID.
+     * @return bool True on success.
      * @see datalynxfield_base::prepare_import_content()
      */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {

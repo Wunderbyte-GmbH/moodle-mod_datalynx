@@ -191,6 +191,8 @@ class field extends datalynxfield_no_content {
     /**
      * {@inheritDoc}
      * @see datalynxfield_base::get_search_sql()
+     * @param array $search Search criteria array.
+     * @return array SQL fragment, params, and join flag.
      */
     public function get_search_sql(array $search): array {
         global $USER, $DB;
@@ -235,6 +237,9 @@ class field extends datalynxfield_no_content {
 
     /**
      * returns an array of distinct content of the field
+     *
+     * @param int $sortdir Sort direction (0=ASC, 1=DESC).
+     * @return array Distinct content values.
      */
     public function get_distinct_content($sortdir = 0) {
         global $DB;

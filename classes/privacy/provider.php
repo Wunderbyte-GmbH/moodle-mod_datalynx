@@ -272,7 +272,7 @@ class provider implements
             $context,
             [$recordobj->id],
             'mod_datalynx',
-                'datalynx_entries',
+            'datalynx_entries',
             $recordobj->id
         );
     }
@@ -338,7 +338,7 @@ class provider implements
     /**
      * Deletes records marked for deletion and all associated data
      *
-     * Should be executed after all records were marked by {@link mark_data_content_for_deletion()}
+     * Should be executed after all records were marked by {@see mark_data_content_for_deletion()}
      *
      * Deletes records from datalynx_contents and datalynx_entries tables, associated files.
      *
@@ -357,7 +357,7 @@ class provider implements
         get_file_storage()->delete_area_files_select(
             $context->id,
             'mod_datalynx',
-                'datalynx_entries',
+            'datalynx_entries',
             "IN (SELECT dc.id FROM {datalynx_contents} dc WHERE dc.entryid $sql)",
             $params
         );

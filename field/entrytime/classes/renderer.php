@@ -16,7 +16,7 @@
 
 /**
  *
- * @package mod_datalynx
+ * @package datalynxfield_entrytime
  * @subpackage entrytime
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
@@ -27,7 +27,6 @@ namespace datalynxfield_entrytime;
 use mod_datalynx\local\field\datalynxfield_renderer;
 use MoodleQuickForm;
 
-defined('MOODLE_INTERNAL') || die();
 
 
 /**
@@ -38,6 +37,11 @@ defined('MOODLE_INTERNAL') || die();
 class renderer extends datalynxfield_renderer {
     /**
      * Returns replacement values for time tags.
+     *
+     * @param array|null $tags The field tags.
+     * @param mixed $entry The entry object.
+     * @param array|null $options Rendering options.
+     * @return array
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
         $field = $this->field;

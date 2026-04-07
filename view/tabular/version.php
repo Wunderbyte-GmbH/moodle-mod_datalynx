@@ -18,7 +18,7 @@
  *
  * @package datalynxview_tabular
  * @subpackage tabular
- * @copyright 2015 David Bogner {@link http:// Www.edulabs.org}.
+ * @copyright 2015 David Bogner {@link https://www.edulabs.org}.
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();

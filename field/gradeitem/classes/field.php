@@ -68,6 +68,9 @@ class field extends datalynxfield_base {
 
     /**
      * Sets up a field object
+     *
+     * @param mixed $forminput Form input data or null.
+     * @return void
      */
     public function set_field($forminput = null) {
         global $DB;

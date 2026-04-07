@@ -36,6 +36,7 @@ class datalynxfield_option_single extends datalynxfield_option {
      *
      * {@inheritDoc}
      * @see datalynxfield_option::update_options()
+     * @param array $map Mapping of old option keys to new option keys.
      */
     public function update_options($map = []) {
         global $DB;
@@ -61,6 +62,9 @@ class datalynxfield_option_single extends datalynxfield_option {
      *
      * {@inheritDoc}
      * @see datalynxfield_base::format_content()
+     * @param stdClass $entry Entry object.
+     * @param array|null $values Values from the entry form.
+     * @return array
      */
     protected function format_content($entry, array $values = null) {
         $fieldid = $this->field->id;
@@ -90,6 +94,7 @@ class datalynxfield_option_single extends datalynxfield_option {
      * determines which ones have reached their limit
      *
      * @param int $userid ID of the user modifying an entry; if not specified defaults to $USER->id
+     * @param int $entryid ID of the entry being edited; 0 for new entries.
      * @return array an array of disabled values
      */
     public function get_disabled_values_for_user($entryid = 0) {
@@ -124,6 +129,8 @@ class datalynxfield_option_single extends datalynxfield_option {
      * Get search sql for single choice fields.
      * {@inheritDoc}
      * @see datalynxfield_base::get_search_sql()
+     * @param array $search Search criteria array.
+     * @return array
      */
     public function get_search_sql(array $search): array {
         global $DB;
@@ -201,6 +208,11 @@ class datalynxfield_option_single extends datalynxfield_option {
      *
      * {@inheritDoc}
      * @see datalynxfield_base::prepare_import_content()
+     * @param stdClass $data Form data object (passed by reference).
+     * @param array $importsettings Import settings.
+     * @param array|null $csvrecord CSV record data.
+     * @param int|null $entryid Entry ID.
+     * @return bool
      */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
         // Import only from csv.

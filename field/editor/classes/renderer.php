@@ -27,7 +27,6 @@ use mod_datalynx\local\field\datalynxfield_renderer;
 use stdClass;
 use MoodleQuickForm;
 
-defined('MOODLE_INTERNAL') || die();
 /**
  * Class datalynxfield_editor_renderer Renderer for editor field type
  */
@@ -36,6 +35,9 @@ class renderer extends datalynxfield_renderer {
      * render the editor form for adding content to the editor field
      * TODO: improve editor rendering for including images from repositories
      *
+     * @param MoodleQuickForm $mform The Moodle form instance.
+     * @param stdClass $entry The entry object.
+     * @param array $options Rendering options.
      * @see datalynxfield_renderer::render_edit_mode()
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {

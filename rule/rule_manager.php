@@ -136,6 +136,8 @@ class datalynx_rule_manager {
      * given a rule type returns the rule object from get_rules
      * Initializes get_rules if necessary
      *
+     * @param string $type Rule plugin type.
+     * @param bool $menu If true, return name-keyed menu array instead of objects.
      * @return datalynx_rule_base[]
      */
     public function get_rules_by_plugintype($type, $menu = false) {
@@ -170,6 +172,9 @@ class datalynx_rule_manager {
 
     /**
      * given a rule name returns the rule object from get_rules
+     *
+     * @param string $name Rule name.
+     * @return datalynx_rule_base|false
      */
     public function get_rule_by_name($name) {
         foreach ($this->get_rules() as $rule) {
@@ -184,6 +189,9 @@ class datalynx_rule_manager {
      * returns a subclass rule object given a record of the rule
      * used to invoke plugin methods
      * input: $param $rule record from db, or rule type
+     *
+     * @param mixed $key Rule record object or rule type string.
+     * @return datalynx_rule_base|false
      */
     public function get_rule($key) {
         global $CFG;

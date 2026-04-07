@@ -29,7 +29,6 @@ use stdClass;
 use MoodleQuickForm;
 use coding_exception;
 
-defined('MOODLE_INTERNAL') || die();
 
 
 /**
@@ -155,6 +154,12 @@ class renderer extends datalynxfield_renderer {
 
     /**
      * Render the standard date/time selector for the time field.
+     *
+     * @param MoodleQuickForm $mform The form object.
+     * @param stdClass $entry The entry object.
+     * @param mixed $content Current field content.
+     * @param bool $includetime Whether to include time selector.
+     * @param array $options Additional options.
      */
     protected function render_standard_selector(
         &$mform,
@@ -191,11 +196,11 @@ class renderer extends datalynxfield_renderer {
 
     /**
      *
-     * @param MoodleQuickForm $mform
-     * @param $entry
-     * @param $content
-     * @param bool $includetime
-     * @param array $options
+     * @param MoodleQuickForm $mform The form object.
+     * @param stdClass $entry The entry object.
+     * @param mixed $content Current field content.
+     * @param bool $includetime Whether to include time selector.
+     * @param array $options Additional options.
      * @throws coding_exception
      */
     protected function render_masked_selector(

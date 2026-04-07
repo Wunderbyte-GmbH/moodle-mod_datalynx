@@ -27,7 +27,6 @@ use datalynxfield_select\renderer as SelectRenderer;
 use stdClass;
 use MoodleQuickForm;
 
-defined('MOODLE_INTERNAL') || die();
 /**
  * Renderer class for radiobutton field type.
  */

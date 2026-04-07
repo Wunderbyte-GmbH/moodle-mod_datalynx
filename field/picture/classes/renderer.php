@@ -30,7 +30,6 @@ use html_writer;
 use moodle_url;
 use stored_file;
 
-defined('MOODLE_INTERNAL') || die();
 
 
 /**
@@ -257,6 +256,8 @@ class renderer extends FileRenderer {
 
     /**
      * Verifies the file is a valid video file based on simplified is_valid_image.
+     *
+     * @param stored_file $file The file to check.
      * @return bool true if file ok
      */
     public function is_valid_video($file) {
@@ -269,6 +270,8 @@ class renderer extends FileRenderer {
 
     /**
      * Verifies the file is a valid audio file based on simplified is_valid_image.
+     *
+     * @param stored_file $file The file to check.
      * @return bool true if file ok
      */
     public function is_valid_audio($file) {

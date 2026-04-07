@@ -27,7 +27,6 @@
 
 use mod_datalynx\form\datalynxview_base_form;
 
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Tabular view settings form

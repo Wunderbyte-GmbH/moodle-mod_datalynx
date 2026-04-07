@@ -93,6 +93,8 @@ class datalynx_filter {
 
     /**
      * constructor
+     *
+     * @param object $filterdata Filter data object.
      */
     public function __construct($filterdata) {
         $this->id = empty($filterdata->id) ? 0 : $filterdata->id;
@@ -396,6 +398,10 @@ class datalynx_filter {
     /**
      * Check if we should add this fieldid to our whereand and whereor clause.
      * Catches all field situations that cause problems.
+     *
+     * @param array $option Search option array (operator at index 1).
+     * @param object $field The field object being evaluated.
+     * @return bool True if the fieldid should be added, false otherwise.
      */
     public function add_fieldid($option, $field) {
 
@@ -584,6 +590,7 @@ class datalynx_filter {
 
     /**
      *
+     * @param object $field The field object to register.
      * @return bool True if the field is registered, false otherwise
      */
     public function register_join_field($field): bool {

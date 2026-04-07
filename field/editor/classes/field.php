@@ -103,6 +103,9 @@ class field extends datalynxfield_base {
     /**
      * write the content of the editor field and editor format to the database
      *
+     * @param stdClass $entry The entry object.
+     * @param array|null $values The submitted field values.
+     * @return int The content record id.
      * @see datalynxfield_base::update_content()
      */
     public function update_content(stdClass $entry, array $values = null) {
@@ -155,6 +158,12 @@ class field extends datalynxfield_base {
 
     /**
      * Prepares field content for import.
+     *
+     * @param mixed $data Import data object, passed by reference.
+     * @param mixed $importsettings Import settings.
+     * @param mixed $csvrecord The raw CSV record.
+     * @param mixed $entryid The entry id.
+     * @return bool
      */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
         $fieldid = $this->field->id;
@@ -192,6 +201,7 @@ class field extends datalynxfield_base {
 
     /**
      * Is $value a valid content or do we see an empty input?
+     * @param mixed $value The field value to check.
      * @return bool
      */
     public static function is_fieldvalue_empty($value) {

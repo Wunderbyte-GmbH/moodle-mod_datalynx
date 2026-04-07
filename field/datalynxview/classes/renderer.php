@@ -28,7 +28,6 @@ use mod_datalynx\local\field\datalynxfield_renderer;
 use stdClass;
 use MoodleQuickForm;
 
-defined('MOODLE_INTERNAL') || die();
 
 
 /**
@@ -63,6 +62,10 @@ class renderer extends datalynxfield_renderer {
      * Check, which type of display, and call the right display-function
      * stdClass @entry  the entry object which holds this field
      * string @type     the type of display
+     *
+     * @param stdClass $entry The entry object which holds this field.
+     * @param string|null $type The type of display.
+     * @return string
      */
     protected function display_browse($entry, $type = null) {
         $field = $this->field;
@@ -86,6 +89,8 @@ class renderer extends datalynxfield_renderer {
      * stdClass @entry          the entry object this field belongs to
      * array string @options    array of options for the display-method of the view
      *
+     * @param stdClass $entry The entry object this field belongs to.
+     * @param array $options Array of options for the display-method of the view.
      * @return                 the display-method of the view
      */
     protected function get_view_display_content($entry, array $options = []) {
@@ -129,6 +134,11 @@ class renderer extends datalynxfield_renderer {
      * - by the author of this entry object
      * - by the group to which this entry object belongs to
      * - by a value, which is stored in datalynx_contents for this field(fieldid) and this entry(entryid)
+     *
+     * @param array $options Current filter options array.
+     * @param stdClass $entry The entry object used to derive filter values.
+     * @param bool $urlquery Whether the filter is for a URL query string.
+     * @return array Updated filter options array.
      */
     protected function get_filter_by_options(array $options, $entry, $urlquery = false) {
         global $DB;
@@ -298,6 +308,9 @@ class renderer extends datalynxfield_renderer {
      *
      * {@inheritdoc}
      *
+     * @param MoodleQuickForm $mform The form object.
+     * @param stdClass $entry The entry being edited.
+     * @param array|null $options Rendering options.
      * @see datalynxfield_renderer::render_edit_mode()
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options = null) {
@@ -333,6 +346,10 @@ class renderer extends datalynxfield_renderer {
     /**
      *
      * {@inheritDoc}
+     * @param int $entryid The entry ID being validated.
+     * @param array $tags The pattern tags for this field.
+     * @param stdClass $formdata The submitted form data.
+     * @return array Array of validation errors keyed by field name.
      * @see datalynxfield_renderer::validate()
      */
     public function validate($entryid, $tags, $formdata) {

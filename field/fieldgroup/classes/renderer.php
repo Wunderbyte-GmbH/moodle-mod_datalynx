@@ -28,7 +28,6 @@ use mod_datalynx\local\field\datalynxfield_renderer;
 use stdClass;
 use MoodleQuickForm;
 
-defined('MOODLE_INTERNAL') || die();
 /**
  * Class datalynxfield_fieldgroup_renderer Renderer for fieldgroup field type
  */
@@ -44,6 +43,9 @@ class renderer extends datalynxfield_renderer {
      *
      * {@inheritDoc}
      * @see datalynxfield_renderer::render_display_mode()
+     * @param stdClass $entry The entry object.
+     * @param array $options Rendering options.
+     * @return string Rendered HTML.
      */
     public function render_display_mode(stdClass $entry, array $options): string {
         global $OUTPUT;
@@ -109,6 +111,9 @@ class renderer extends datalynxfield_renderer {
      *
      * {@inheritDoc}
      * @see datalynxfield_renderer::render_edit_mode()
+     * @param MoodleQuickForm $mform The form object.
+     * @param stdClass $entry The entry object.
+     * @param array $options Rendering options.
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         // We want to display these fields.
@@ -233,6 +238,10 @@ class renderer extends datalynxfield_renderer {
      *
      * {@inheritDoc}
      * @see datalynxfield_renderer::render_search_mode()
+     * @param MoodleQuickForm $mform The form object.
+     * @param int $i Search field index.
+     * @param string $value Current search value.
+     * @return bool Always false.
      */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
         return false; // Remove from search.
@@ -243,6 +252,10 @@ class renderer extends datalynxfield_renderer {
      *
      * {@inheritDoc}
      * @see datalynxfield_renderer::validate()
+     * @param int $entryid The entry ID.
+     * @param array $tags Pattern tags.
+     * @param mixed $formdata Submitted form data.
+     * @return array Validation errors.
      */
     public function validate($entryid, $tags, $formdata) {
         return [];

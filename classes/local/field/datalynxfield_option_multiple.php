@@ -29,6 +29,7 @@ class datalynxfield_option_multiple extends datalynxfield_option {
      * Therefore the values of the field in the entries have to be remapped to the new line numbers of the options
      *
      * @see datalynxfield_option::update_options()
+     * @param array $map Mapping of old option keys to new option keys.
      */
     public function update_options($map = []) {
         global $DB;
@@ -79,6 +80,9 @@ class datalynxfield_option_multiple extends datalynxfield_option {
      * (non-PHPdoc)
      *
      * @see datalynxfield_base::format_content()
+     * @param stdClass $entry Entry object.
+     * @param array|null $values Values from the entry form.
+     * @return array
      */
     protected function format_content($entry, array $values = null) {
         $fieldid = $this->field->id;
@@ -110,6 +114,8 @@ class datalynxfield_option_multiple extends datalynxfield_option {
     /**
      * {@inheritDoc}
      * @see datalynxfield_base::get_search_sql()
+     * @param array $search Search criteria array.
+     * @return array
      */
     public function get_search_sql(array $search): array {
         global $DB;

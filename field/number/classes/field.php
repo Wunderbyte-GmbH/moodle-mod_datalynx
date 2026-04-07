@@ -48,6 +48,8 @@ class field extends TextField {
     /**
      *
      * {@inheritDoc}
+     * @param array $search Search criteria array.
+     * @return array
      * @see datalynxfield_base::get_search_sql()
      */
     public function get_search_sql(array $search): array {
@@ -139,6 +141,9 @@ class field extends TextField {
     /**
      *
      * {@inheritDoc}
+     * @param mixed $formdata The submitted form data.
+     * @param int $i The search index.
+     * @return array|false
      * @see datalynxfield_base::parse_search()
      */
     public function parse_search($formdata, $i) {
@@ -171,6 +176,8 @@ class field extends TextField {
     /**
      *
      * {@inheritDoc}
+     * @param array $searchparams The search parameters array.
+     * @return string
      * @see datalynxfield_base::format_search_value()
      */
     public function format_search_value($searchparams) {

@@ -26,7 +26,6 @@ use datalynxfield_text\renderer as TextRenderer;
 use stdClass;
 use MoodleQuickForm;
 
-defined('MOODLE_INTERNAL') || die();
 
 
 /**
@@ -36,6 +35,9 @@ class renderer extends TextRenderer {
     /**
      *
      * {@inheritDoc}
+     * @param MoodleQuickForm $mform The Moodle form instance.
+     * @param stdClass $entry The entry object.
+     * @param array $options Rendering options.
      * @see datalynxfield_text_renderer::render_edit_mode()
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
@@ -65,6 +67,9 @@ class renderer extends TextRenderer {
     /**
      *
      * {@inheritdoc}
+     * @param stdClass $entry The entry object.
+     * @param array $options Rendering options.
+     * @return string
      * @see datalynxfield_text_renderer::render_display_mode()
      */
     public function render_display_mode(stdClass $entry, array $options): string {
@@ -91,6 +96,10 @@ class renderer extends TextRenderer {
     /**
      *
      * {@inheritDoc}$str
+     * @param MoodleQuickForm $mform The Moodle form instance.
+     * @param int $i The search index.
+     * @param string $value The current search value.
+     * @return array
      * @see datalynxfield_text_renderer::render_search_mode()
      */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
@@ -115,6 +124,10 @@ class renderer extends TextRenderer {
     /**
      *
      * {@inheritDoc}
+     * @param int $entryid The entry id.
+     * @param array $tags The field tags.
+     * @param mixed $formdata The submitted form data.
+     * @return array
      * @see datalynxfield_text_renderer::validate()
      */
     public function validate($entryid, $tags, $formdata) {

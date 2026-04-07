@@ -27,7 +27,6 @@ namespace datalynxfield_duration;
 
 use mod_datalynx\local\field\datalynxfield_base;
 
-defined('MOODLE_INTERNAL') || die();
 
 
 /**
@@ -120,6 +119,10 @@ class field extends datalynxfield_base {
 
     /**
      * Parses submitted search form data for this field.
+     *
+     * @param stdClass $formdata The submitted form data object.
+     * @param int $i The filter index.
+     * @return array|false Array of search values or false if empty.
      */
     public function parse_search($formdata, $i) {
         $values = [];
@@ -158,6 +161,12 @@ class field extends datalynxfield_base {
 
     /**
      * Prepares field content for import.
+     *
+     * @param stdClass $data The data object to populate with import values.
+     * @param array $importsettings Import settings keyed by field name.
+     * @param array|null $csvrecord A single CSV record row.
+     * @param int|null $entryid The target entry ID.
+     * @return bool True on success.
      */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
         // Import only from csv.
@@ -171,6 +180,8 @@ class field extends datalynxfield_base {
 
     /**
      * {@inheritDoc}
+     * @param array $search Search parameters array [not, operator, value].
+     * @return array SQL fragment, params, and join flag.
      * @see datalynxfield_base::get_search_sql()
      */
     public function get_search_sql(array $search): array {
@@ -237,6 +248,9 @@ class field extends datalynxfield_base {
 
     /**
      * Formats a search value for display.
+     *
+     * @param array $searchparams Search parameters array [not, operator, value].
+     * @return string Formatted search value string.
      */
     public function format_search_value($searchparams) {
         [$not, $operator, $value] = $searchparams;
@@ -265,6 +279,8 @@ class field extends datalynxfield_base {
 
     /**
      * Is $value a valid content or do we see an empty input?
+     *
+     * @param mixed $value The field value to check.
      * @return bool
      */
     public static function is_fieldvalue_empty($value) {

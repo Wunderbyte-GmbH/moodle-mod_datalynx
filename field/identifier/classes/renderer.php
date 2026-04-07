@@ -28,7 +28,6 @@ use mod_datalynx\local\field\datalynxfield_renderer;
 use stdClass;
 use MoodleQuickForm;
 
-defined('MOODLE_INTERNAL') || die();
 
 
 /**

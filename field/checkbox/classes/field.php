@@ -27,7 +27,6 @@ namespace datalynxfield_checkbox;
 
 use datalynxfield_multiselect\field as MultiSelectField;
 
-defined('MOODLE_INTERNAL') || die();
 
 
 /**
@@ -70,6 +69,8 @@ class field extends MultiSelectField {
 
     /**
      * Is $value a valid content or do we see an empty input?
+     *
+     * @param mixed $value The value to check.
      * @return bool
      */
     public static function is_fieldvalue_empty($value) {

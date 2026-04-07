@@ -26,7 +26,6 @@ namespace datalynxfield_picture;
 use datalynxfield_file\field as FileField;
 use stdClass;
 
-defined('MOODLE_INTERNAL') || die();
 
 
 /**
@@ -139,6 +138,10 @@ class field extends FileField {
     /**
      * (Re)generate pic and thumbnail images according to the dimensions specified in the field
      * settings.
+     *
+     * @param int $contentid The content record ID.
+     * @param array|null $params Optional parameters controlling what gets updated.
+     * @return bool True on success, false otherwise.
      */
     protected function update_content_files($contentid, $params = null): bool {
         $updatefile = isset($params['updatefile']) ? $params['updatefile'] : true;

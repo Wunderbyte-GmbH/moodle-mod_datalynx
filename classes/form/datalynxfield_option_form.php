@@ -117,9 +117,9 @@ class datalynxfield_option_form extends datalynxfield_form {
     /**
      * Validate form data
      *
-     * @param $data
-     * @param $files
-     * @return array
+     * @param array $data The submitted form data.
+     * @param array $files The submitted files.
+     * @return array Validation errors.
      */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);

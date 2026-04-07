@@ -16,7 +16,7 @@
 
 /**
  *
- * @package mod_datalynx
+ * @package datalynxfield_entry
  * @subpackage _entry
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
@@ -30,7 +30,6 @@ use moodle_url;
 use datalynxfield_status\field as datalynxfield_status;
 use pix_icon;
 
-defined('MOODLE_INTERNAL') || die();
 
 
 // phpcs:disable moodle.PHP.ForbiddenGlobalUse.BadGlobal

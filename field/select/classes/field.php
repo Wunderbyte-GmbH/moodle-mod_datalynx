@@ -46,6 +46,8 @@ class field extends datalynxfield_option_single {
     /**
      *
      * {@inheritDoc}
+     * @param string $column The database column name.
+     * @return string
      * @see datalynxfield_base::get_sql_compare_text()
      */
     protected function get_sql_compare_text(string $column = 'content'): string {
@@ -56,6 +58,8 @@ class field extends datalynxfield_option_single {
     /**
      *
      * {@inheritDoc}
+     * @param mixed $value The search value to look up.
+     * @return mixed The corresponding option key or empty string.
      * @see datalynxfield_base::get_search_value()
      */
     public function get_search_value($value) {

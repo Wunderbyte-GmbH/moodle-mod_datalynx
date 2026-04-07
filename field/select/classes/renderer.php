@@ -28,7 +28,6 @@ use mod_datalynx\local\field\datalynxfield_renderer;
 use stdClass;
 use MoodleQuickForm;
 
-defined('MOODLE_INTERNAL') || die();
 /**
  * Class datalynxfield_select_renderer Renderer for select field type
  */
@@ -42,6 +41,9 @@ class renderer extends datalynxfield_renderer {
     /**
      *
      * {@inheritDoc}
+     * @param MoodleQuickForm $mform The Moodle form instance.
+     * @param stdClass $entry The entry object.
+     * @param array $options Rendering options.
      * @see datalynxfield_renderer::render_edit_mode()
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
@@ -107,6 +109,9 @@ class renderer extends datalynxfield_renderer {
     /**
      *
      * {@inheritDoc}
+     * @param stdClass $entry The entry object.
+     * @param array $options Rendering options.
+     * @return string
      * @see datalynxfield_renderer::render_display_mode()
      */
     public function render_display_mode(stdClass $entry, array $options): string {
@@ -145,6 +150,10 @@ class renderer extends datalynxfield_renderer {
     /**
      *
      * {@inheritDoc}
+     * @param MoodleQuickForm $mform The Moodle form instance.
+     * @param int $i The search index.
+     * @param string $value The current search value.
+     * @return array
      * @see datalynxfield_renderer::render_search_mode()
      */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {

@@ -47,8 +47,8 @@ abstract class datalynx_customfilter_base_form extends moodleform {
     /**
      * mod_datalynx_customfilter_base_form constructor.
      *
-     * @param $dl
-     * @param $customfilter
+     * @param mixed $dl The datalynx instance.
+     * @param mixed $customfilter The customfilter object or null.
      * @param null $action
      * @param null $customdata
      * @param string $method

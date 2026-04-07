@@ -28,6 +28,8 @@ use stdClass;
  */
 class datalynx_customfilter_backend_form extends datalynx_customfilter_base_form {
     /**
+     * Define form elements.
+     *
      * @return void
      */
     public function definition() {
@@ -172,7 +174,7 @@ class datalynx_customfilter_backend_form extends datalynx_customfilter_base_form
     /**
      * Get all fields that can be used in a customfilter.
      *
-     * @param $dl
+     * @param mixed $dl The datalynx instance.
      * @return array
      */
     protected function get_possible_customfilter_fields($dl): array {
@@ -193,7 +195,7 @@ class datalynx_customfilter_backend_form extends datalynx_customfilter_base_form
     /**
      * Get a customfilter record from the database by id.
      *
-     * @param $filterid
+     * @param int $filterid The customfilter record ID.
      * @return mixed
      */
     protected function get_customfilter($filterid) {

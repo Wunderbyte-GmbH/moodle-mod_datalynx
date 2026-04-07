@@ -40,6 +40,8 @@ class datalynx_preset_manager {
 
     /**
      * constructor
+     *
+     * @param \mod_datalynx\datalynx $df Datalynx instance.
      */
     public function __construct($df) {
         $this->dl = $df;

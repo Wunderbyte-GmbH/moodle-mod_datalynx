@@ -28,6 +28,7 @@ class datalynx_rating extends rating {
     /**
      * Returns this ratings aggregate value
      *
+     * @param int $aggregation The aggregation type constant.
      * @return string
      */
     public function get_aggregate_value($aggregation) {

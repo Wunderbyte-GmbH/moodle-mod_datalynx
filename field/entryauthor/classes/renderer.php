@@ -27,7 +27,6 @@
 namespace datalynxfield_entryauthor;
 
 use core_user\fields;
-
 use mod_datalynx\local\field\datalynxfield_renderer;
 use stdClass;
 use html_writer;
@@ -37,7 +36,6 @@ use dml_exception;
 use moodle_exception;
 use user_picture;
 
-defined('MOODLE_INTERNAL') || die();
 
 
 /**
@@ -102,8 +100,8 @@ class renderer extends datalynxfield_renderer {
      * This allows to specify not the editing $USER but another user
      * as author of an entry.
      *
-     * @param $mform
-     * @param $entry
+     * @param MoodleQuickForm $mform The form object.
+     * @param stdClass $entry The entry object.
      * @param array|null $options
      * @throws coding_exception
      */
@@ -153,7 +151,7 @@ class renderer extends datalynxfield_renderer {
     /**
      * Display name.
      *
-     * @param $entry
+     * @param stdClass $entry The entry object.
      * @return string
      * @throws dml_exception
      * @throws moodle_exception
@@ -180,7 +178,7 @@ class renderer extends datalynxfield_renderer {
     /**
      * Display firstname.
      *
-     * @param $entry
+     * @param stdClass $entry The entry object.
      * @return string firstname
      */
     public function display_firstname($entry) {
@@ -196,7 +194,7 @@ class renderer extends datalynxfield_renderer {
     /**
      * Display lastname.
      *
-     * @param $entry
+     * @param stdClass $entry The entry object.
      * @return string lastname
      */
     public function display_lastname($entry) {
@@ -212,7 +210,7 @@ class renderer extends datalynxfield_renderer {
     /**
      * Display username.
      *
-     * @param $entry
+     * @param stdClass $entry The entry object.
      * @return string username
      */
     public function display_username($entry) {
@@ -228,7 +226,7 @@ class renderer extends datalynxfield_renderer {
     /**
      * Display user id.
      *
-     * @param $entry
+     * @param stdClass $entry The entry object.
      * @return integer id
      */
     public function display_id($entry) {
@@ -244,7 +242,7 @@ class renderer extends datalynxfield_renderer {
     /**
      * Display user idnumber (not user id!).
      *
-     * @param $entry
+     * @param stdClass $entry The entry object.
      * @return integer idnumber
      */
     public function display_idnumber($entry) {
@@ -261,7 +259,7 @@ class renderer extends datalynxfield_renderer {
     /**
      * Display user picture.
      *
-     * @param $entry
+     * @param stdClass $entry The entry object.
      * @param bool $large
      * @return mixed
      */
@@ -293,7 +291,7 @@ class renderer extends datalynxfield_renderer {
     /**
      * Display email.
      *
-     * @param $entry
+     * @param stdClass $entry The entry object.
      * @return string email
      */
     public function display_email($entry) {
@@ -309,7 +307,7 @@ class renderer extends datalynxfield_renderer {
     /**
      * Display the institution of user profile.
      *
-     * @param $entry
+     * @param stdClass $entry The entry object.
      * @return mixed
      */
     public function display_institution($entry) {
@@ -325,7 +323,7 @@ class renderer extends datalynxfield_renderer {
     /**
      * Display the department of user profile.
      *
-     * @param $entry
+     * @param stdClass $entry The entry object.
      * @return mixed
      */
     public function display_department($entry) {
@@ -342,7 +340,7 @@ class renderer extends datalynxfield_renderer {
     /**
      * Display all badges a user has earned in an entry view.
      *
-     * @param $entry
+     * @param stdClass $entry The entry object.
      * @return string
      */
     public function display_badges($entry) {

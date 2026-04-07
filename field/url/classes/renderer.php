@@ -29,7 +29,6 @@ use stdClass;
 use MoodleQuickForm;
 use html_writer;
 
-defined('MOODLE_INTERNAL') || die();
 
 
 /**

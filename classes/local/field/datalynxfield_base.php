@@ -17,7 +17,6 @@
 namespace mod_datalynx\local\field;
 use coding_exception;
 use mod_datalynx\datalynx;
-
 use dml_exception;
 use mod_datalynx;
 use moodle_exception;
@@ -143,6 +142,9 @@ abstract class datalynxfield_base {
 
     /**
      * Insert a new field in the database
+     *
+     * @param stdClass|null $fromform Form data.
+     * @return bool|int
      */
     public function insert_field($fromform = null) {
         global $DB, $OUTPUT;
@@ -161,6 +163,9 @@ abstract class datalynxfield_base {
 
     /**
      * Update a field in the database
+     *
+     * @param stdClass|null $fromform Form data.
+     * @return bool
      */
     public function update_field($fromform = null) {
         global $DB, $OUTPUT;
@@ -194,6 +199,9 @@ abstract class datalynxfield_base {
 
     /**
      * Getter
+     *
+     * @param string $var Property name.
+     * @return mixed
      */
     public function get($var) {
         if (isset($this->field->$var)) {
@@ -914,6 +922,7 @@ abstract class datalynxfield_base {
     /**
      * Is $value a valid content or do we see an empty input?
      *
+     * @param mixed $value The value to check.
      * @return bool
      */
     public static function is_fieldvalue_empty($value) {

@@ -28,7 +28,6 @@ use mod_datalynx\local\field\datalynxfield_renderer;
 use MoodleQuickForm;
 use html_writer;
 
-defined('MOODLE_INTERNAL') || die();
 
 
 /**
@@ -39,6 +38,11 @@ defined('MOODLE_INTERNAL') || die();
 class renderer extends datalynxfield_renderer {
     /**
      * Returns replacement values for coursegroup tags.
+     *
+     * @param array|null $tags Array of tag strings to replace.
+     * @param stdClass|null $entry The current entry object.
+     * @param array|null $options Rendering options.
+     * @return array Replacements keyed by tag.
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
         $field = $this->field;
@@ -68,6 +72,10 @@ class renderer extends datalynxfield_renderer {
     // phpcs:disable moodle.PHP.ForbiddenGlobalUse.BadGlobal
     /**
      * Displays the edit form elements for the coursegroup field.
+     *
+     * @param MoodleQuickForm $mform The form object.
+     * @param stdClass $entry The current entry object.
+     * @param array|null $options Rendering options.
      */
     public function display_edit(&$mform, $entry, array $options = null) {
         global $CFG, $DB, $SITE, $PAGE;
@@ -149,6 +157,10 @@ class renderer extends datalynxfield_renderer {
 
     /**
      * Displays the browse view for the coursegroup field.
+     *
+     * @param stdClass $entry The current entry object.
+     * @param string|null $type The display type (course, group, courseid, groupid, or empty).
+     * @return string The rendered output.
      */
     protected function display_browse($entry, $type = null) {
         global $DB;
@@ -210,6 +222,11 @@ class renderer extends datalynxfield_renderer {
 
     /**
      * Value is an array of (member,courseid,groupid) only one should be set
+     *
+     * @param MoodleQuickForm $mform The form object.
+     * @param int $i The filter index.
+     * @param string $value The current search value.
+     * @return array Array of form elements and labels.
      */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
         $fieldid = $this->field->id();

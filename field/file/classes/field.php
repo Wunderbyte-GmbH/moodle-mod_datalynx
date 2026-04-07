@@ -329,11 +329,11 @@ class field extends datalynxfield_base {
      *
      * {@inheritDoc}
      * @see datalynxfield_base::get_search_sql()
+     *
+     * @param array $search Search parameters array with [not, operator, value].
+     * @return array SQL fragments array.
      */
     public function get_search_sql(array $search): array {
-        [$not, $operator, $value] = $search;
-
-        // If we deal with files it is also missing if content is 0.
         // We keep the not and compare with exactly 1 in the content column.
         $value = '1';
         $operator = '=';

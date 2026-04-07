@@ -25,7 +25,6 @@
 namespace datalynxfield_radiobutton;
 use datalynxfield_select\form as SelectForm;
 
-defined('MOODLE_INTERNAL') || die();
 
 
 /**

@@ -16,7 +16,7 @@
 
 /**
  *
- * @package mod_datalynx
+ * @package datalynxfield_status
  * @subpackage _status
  * @copyright 2013 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -56,6 +56,9 @@ class field extends datalynxfield_no_content {
 
     /**
      * Returns field objects for the internal status field.
+     *
+     * @param int $dataid The datalynx activity id.
+     * @return array
      */
     public static function get_field_objects($dataid) {
         $fieldobjects = [];
@@ -105,6 +108,8 @@ class field extends datalynxfield_no_content {
 
     /**
      * {@inheritDoc}
+     * @param array $search Search criteria array.
+     * @return array
      * @see datalynxfield_base::get_search_sql()
      */
     public function get_search_sql(array $search): array {
@@ -119,6 +124,10 @@ class field extends datalynxfield_no_content {
 
     /**
      * Parses submitted search form data for this field.
+     *
+     * @param object $formdata The submitted form data.
+     * @param int $i The search index.
+     * @return mixed The parsed search value or false.
      */
     public function parse_search($formdata, $i) {
         $fieldid = $this->field->id;

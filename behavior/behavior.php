@@ -66,7 +66,7 @@ class datalynx_field_behavior {
     /**
      * Constructor for behavior instance. Unserializes serialized data fetched from behavior table.
      *
-     * @param $record
+     * @param stdClass $record The behavior database record.
      */
     private function __construct($record) {
         $this->id = $record->id;
@@ -89,8 +89,8 @@ class datalynx_field_behavior {
     /**
      * Given the name and tha datalynx id of the behavior instantiate the object.
      *
-     * @param $name
-     * @param $dataid
+     * @param string $name The behavior name.
+     * @param int $dataid The datalynx instance ID.
      * @return datalynx_field_behavior|false
      * @throws coding_exception
      * @throws dml_exception
@@ -109,7 +109,7 @@ class datalynx_field_behavior {
     /**
      * Get behavior object from the behavior id.
      *
-     * @param $id
+     * @param int $id The behavior record ID.
      * @return datalynx_field_behavior|false
      */
     public static function from_id($id) {
@@ -166,8 +166,7 @@ class datalynx_field_behavior {
     /**
      * Checks if a field in an entry is visible to the current user.
      *
-     * @param null $user
-     * @param stdClass $entry
+     * @param stdClass $entry The entry record.
      * @return bool
      */
     public function is_visible_to_user(stdClass $entry): bool {
@@ -332,7 +331,7 @@ class datalynx_field_behavior {
     /**
      * Duplicate a behavior instance.
      *
-     * @param $behaviorid
+     * @param int $behaviorid The behavior record ID.
      * @return bool|int
      * @throws coding_exception
      * @throws dml_exception
@@ -352,7 +351,7 @@ class datalynx_field_behavior {
     /**
      * Write new formdata to existing behavior.
      *
-     * @param $formdata
+     * @param stdClass $formdata The submitted form data.
      * @return mixed
      * @throws dml_exception
      */
@@ -369,7 +368,7 @@ class datalynx_field_behavior {
     /**
      * Deleta a behavior instance.
      *
-     * @param $behaviorid
+     * @param int $behaviorid The behavior record ID.
      * @return bool
      * @throws dml_exception
      */

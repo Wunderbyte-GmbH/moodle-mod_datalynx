@@ -16,7 +16,7 @@
 
 /**
  *
- * @package mod_datalynx
+ * @package datalynxfield_entrytime
  * @subpackage entrytime
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work by 2012 Itamar Tzadok
@@ -106,6 +106,8 @@ class field extends datalynxfield_no_content {
 
     /**
      * {@inheritDoc}
+     * @param array $search Search criteria array.
+     * @return array
      * @see datalynxfield_base::get_search_sql()
      */
     public function get_search_sql(array $search): array {
@@ -164,6 +166,9 @@ class field extends datalynxfield_no_content {
 
     /**
      * returns an array of distinct content of the field
+     *
+     * @param int $sortdir Sort direction: 0 for ASC, 1 for DESC.
+     * @return array
      */
     public function get_distinct_content($sortdir = 0) {
         global $DB;

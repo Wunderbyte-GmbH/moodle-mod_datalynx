@@ -74,6 +74,9 @@ class backup_datalynx_activity_task extends backup_activity_task {
     /**
      * Code the transformations to perform in the activity in
      * order to get transportable (encoded) links
+     *
+     * @param string $content Content to encode.
+     * @return string Encoded content.
      */
     public static function encode_content_links($content) {
         global $CFG;

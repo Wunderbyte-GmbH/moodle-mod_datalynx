@@ -54,6 +54,8 @@ class datalynx_filter_manager {
 
     /**
      * constructor
+     *
+     * @param \mod_datalynx\datalynx $df The datalynx instance.
      */
     public function __construct($df) {
         $this->dl = $df;
@@ -482,6 +484,11 @@ class datalynx_filter_manager {
 
     /**
      * Get filter form data from customfilter form
+     *
+     * @param datalynx_filter $filter The filter object to populate.
+     * @param object $formdata Submitted form data.
+     * @param object $customfilter The customfilter definition object.
+     * @return datalynx_filter The populated filter object.
      */
     public function get_filter_from_customfilterform($filter, $formdata, $customfilter) {
 
@@ -647,6 +654,10 @@ class datalynx_filter_manager {
 
     /**
      * TODO: Returns the search options transmitted by a customfilter form
+     *
+     * @param object $formdata Submitted form data.
+     * @param bool $finalize Whether to finalize (clean up empty criteria).
+     * @return string Serialized search fields, or empty string.
      */
     protected function get_customfilter_search_options_from_form($formdata, $finalize = false) {
         if ($fields = $this->dl->get_fields()) {

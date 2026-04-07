@@ -103,6 +103,8 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
      * This must be invoked immediately after creating/updating the "module" activity record
      * and will adjust the new activity id (the instance) in various places
      * Overriding the parent method to handle restoring into the activity
+     *
+     * @param int $newitemid New activity instance ID.
      */
     protected function apply_activity_instance($newitemid) {
         global $DB;

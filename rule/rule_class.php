@@ -131,6 +131,8 @@ abstract class datalynx_rule_base {
 
     /**
      * Sets up a rule object
+     *
+     * @param stdClass|null $forminput Form input data.
      */
     public function set_rule($forminput = null) {
         $this->rule = new stdClass();

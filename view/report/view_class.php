@@ -57,6 +57,9 @@ class datalynxview_report extends base {
 
     /**
      * Constructor for datalynxview_report.
+     *
+     * @param mixed $df Datalynx instance or ID.
+     * @param mixed $view View record or ID.
      */
     public function __construct($df = 0, $view = 0) {
         parent::__construct($df, $view);
@@ -67,6 +70,10 @@ class datalynxview_report extends base {
 
     /**
      * Apply entry group layout and wrap with table elements.
+     *
+     * @param array $entriesset Set of entry definitions.
+     * @param string $name Optional group name.
+     * @return array
      */
     protected function apply_entry_group_layout($entriesset, $name = '') {
         global $OUTPUT;
@@ -152,6 +159,7 @@ class datalynxview_report extends base {
 
     /**
      * Do not display entries in report view instead display the report.
+     * @param array|null $options Display options.
      * @return string
      */
     public function display_entries(?array $options = null): string {

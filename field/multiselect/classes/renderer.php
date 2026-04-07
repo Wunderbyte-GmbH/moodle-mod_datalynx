@@ -28,7 +28,6 @@ use mod_datalynx\local\field\datalynxfield_renderer;
 use stdClass;
 use MoodleQuickForm;
 
-defined('MOODLE_INTERNAL') || die();
 /**
  * Renderer for the multiselect field type.
  */
@@ -43,6 +42,11 @@ class renderer extends datalynxfield_renderer {
      *
      * {@inheritDoc}
      * @see datalynxfield_renderer::render_edit_mode()
+     *
+     * @param MoodleQuickForm $mform The Moodle form object.
+     * @param stdClass $entry The entry object.
+     * @param array $options Rendering options.
+     * @return void
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $field = $this->field;
@@ -128,6 +132,8 @@ class renderer extends datalynxfield_renderer {
      * transform the raw database value into HTML suitable for displaying on the entry page
      * (non-PHPdoc)
      *
+     * @param stdClass $entry The entry object.
+     * @param array $options Display options.
      * @return string HTML
      * @see datalynxfield_renderer::render_display_mode()
      */
@@ -174,6 +180,11 @@ class renderer extends datalynxfield_renderer {
      *
      * {@inheritDoc}
      * @see datalynxfield_renderer::render_search_mode()
+     *
+     * @param MoodleQuickForm $mform The Moodle form object.
+     * @param int $i Filter index.
+     * @param string $value Default search value.
+     * @return array Array of [$elements, $options].
      */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
         $field = $this->field;
@@ -213,6 +224,11 @@ class renderer extends datalynxfield_renderer {
      *
      * {@inheritDoc}
      * @see datalynxfield_renderer::validate()
+     *
+     * @param int $entryid The entry ID.
+     * @param array $tags Tags to validate.
+     * @param stdClass $formdata Form data submitted by the user.
+     * @return array Associative array of field name => error message.
      */
     public function validate($entryid, $tags, $formdata) {
         $fieldid = $this->field->id();

@@ -176,6 +176,8 @@ class field extends datalynxfield_base {
 
     /**
      * {@inheritDoc}
+     * @param array $search Search parameters array [not, operator, value].
+     * @return array SQL fragment, params, and join flag.
      * @see datalynxfield_base::get_search_sql()
      */
     public function get_search_sql(array $search): array {

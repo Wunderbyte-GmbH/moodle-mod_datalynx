@@ -74,4 +74,3 @@ Feature: Test datalynx _rating internal field
     When I set the field "rating" to "4"
     And I wait until the page is ready
     Then I should see "4"
-

@@ -21,7 +21,6 @@
  * @copyright 2017 David Bogner
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die();
 
 use core\notification;
 use mod_datalynx\local\datalynx_entries;

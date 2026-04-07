@@ -28,7 +28,6 @@ use stdClass;
 use MoodleQuickForm;
 use core_tag_tag;
 
-defined('MOODLE_INTERNAL') || die();
 /**
  * Class datalynxfield_tag_renderer Renderer for tag field type
  */
@@ -36,6 +35,9 @@ class renderer extends datalynxfield_renderer {
     /**
      *
      * {@inheritDoc}
+     * @param MoodleQuickForm $mform The form object.
+     * @param stdClass $entry The entry being edited.
+     * @param array $options Rendering options.
      * @see datalynxfield_renderer::render_edit_mode()
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
@@ -69,6 +71,9 @@ class renderer extends datalynxfield_renderer {
     /**
      *
      * {@inheritDoc}
+     * @param stdClass $entry The entry to display.
+     * @param array $options Display options.
+     * @return string HTML output.
      * @see datalynxfield_renderer::render_display_mode()
      */
     public function render_display_mode(stdClass $entry, array $options): string {
@@ -112,6 +117,10 @@ class renderer extends datalynxfield_renderer {
     /**
      *
      * {@inheritDoc}
+     * @param MoodleQuickForm $mform The form object.
+     * @param int $i The filter index.
+     * @param string $value The current search value.
+     * @return array Array of form elements and labels.
      * @see datalynxfield_renderer::render_search_mode()
      */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
@@ -138,6 +147,10 @@ class renderer extends datalynxfield_renderer {
     /**
      *
      * {@inheritDoc}
+     * @param int $entryid The entry ID being validated.
+     * @param array $tags The pattern tags for this field.
+     * @param stdClass $formdata The submitted form data.
+     * @return array Array of validation errors keyed by field name.
      * @see datalynxfield_renderer::validate()
      */
     public function validate($entryid, $tags, $formdata) {

@@ -16,7 +16,7 @@
 
 /**
  *
- * @package mod_datalynx
+ * @package datalynxfield_comment
  * @subpackage _comment
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
@@ -28,7 +28,6 @@ use mod_datalynx\local\field\datalynxfield_renderer;
 use stdClass;
 use comment;
 
-defined('MOODLE_INTERNAL') || die();
 
 
 /**

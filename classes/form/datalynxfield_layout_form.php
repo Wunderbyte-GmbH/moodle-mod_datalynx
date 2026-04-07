@@ -68,11 +68,11 @@ class datalynxfield_layout_form extends moodleform {
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule(
-                'name',
-                "Renderer name may not contain the pipe symbol \" | \"!",
-                'regex',
-                '/^[^\|]+$/',
-                'client'
+            'name',
+            "Renderer name may not contain the pipe symbol \" | \"!",
+            'regex',
+            '/^[^\|]+$/',
+            'client'
         );
 
         $mform->addElement('text', 'description', get_string('description'), ['size' => '64']);
@@ -95,12 +95,12 @@ class datalynxfield_layout_form extends moodleform {
         $group[] = $mform->createElement('textarea', 'notvisibletemplate', '', '');
         $mform->disabledIf('notvisibletemplate', 'notvisibleoptions', 'eq', '___0___');
         $mform->addGroup(
-                $group,
-                'notvisiblegroup',
-                get_string('notvisible', 'datalynx'),
-                ['<br />',
+            $group,
+            'notvisiblegroup',
+            get_string('notvisible', 'datalynx'),
+            ['<br />',
                 ],
-                false
+            false
         );
         $mform->setType('notvisibletemplate', PARAM_RAW);
         $mform->setDefault('notvisibleoptions', '___0___');
@@ -113,12 +113,12 @@ class datalynxfield_layout_form extends moodleform {
         $mform->setDefault('displaytemplate', '#value');
         $mform->disabledIf('displaytemplate', 'displayoptions', 'eq', '___4___');
         $mform->addGroup(
-                $group,
-                'displaytemplategroup',
-                get_string('displaytemplate', 'datalynx'),
-                ['<br />',
+            $group,
+            'displaytemplategroup',
+            get_string('displaytemplate', 'datalynx'),
+            ['<br />',
                 ],
-                false
+            false
         );
         $mform->setType('displaytemplate', PARAM_RAW);
         $mform->addHelpButton('displaytemplategroup', 'displaytemplate', 'datalynx');
@@ -127,25 +127,25 @@ class datalynxfield_layout_form extends moodleform {
         // When empty.
         $group = [];
         $group[] = $mform->createElement(
-                'radio',
-                'novalueoptions',
-                '',
-                get_string('shownothing', 'datalynx'),
-                '___0___'
+            'radio',
+            'novalueoptions',
+            '',
+            get_string('shownothing', 'datalynx'),
+            '___0___'
         );
         $group[] = $mform->createElement(
-                'radio',
-                'novalueoptions',
-                '',
-                get_string('asdisplay', 'datalynx'),
-                '___1___'
+            'radio',
+            'novalueoptions',
+            '',
+            get_string('asdisplay', 'datalynx'),
+            '___1___'
         );
         $group[] = $mform->createElement(
-                'radio',
-                'novalueoptions',
-                '',
-                get_string('custom', 'datalynx'),
-                '___2___'
+            'radio',
+            'novalueoptions',
+            '',
+            get_string('custom', 'datalynx'),
+            '___2___'
         );
         $group[] = $mform->createElement('textarea', 'novaluetemplate', '', '');
         $mform->disabledIf('novaluetemplate', 'novalueoptions', 'eq', '___0___');
@@ -215,6 +215,7 @@ class datalynxfield_layout_form extends moodleform {
      *  Add data to formfields.
      * {@inheritDoc}
      *
+     * @param mixed $data The data object to populate the form.
      * @see moodleform::set_data()
      */
     public function set_data($data) {
@@ -239,6 +240,9 @@ class datalynxfield_layout_form extends moodleform {
     /**
      *
      * {@inheritDoc}
+     * @param array $data The submitted form data.
+     * @param array $files The submitted files.
+     * @return array Validation errors.
      * @see moodleform::validation()
      */
     public function validation($data, $files) {

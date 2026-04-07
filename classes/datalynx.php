@@ -230,7 +230,7 @@ class datalynx {
     /**
      * Get datalynx object by instanceid (id of datalynx table)
      *
-     * @param $instanceid
+     * @param int $instanceid The instance id of the datalynx activity.
      * @return datalynx
      */
     public static function get_datalynx_by_instance($instanceid): datalynx {
@@ -382,7 +382,7 @@ class datalynx {
     /**
      * Update datalynx settings
      *
-     * @param $params
+     * @param array $params Parameters to update.
      * @param string $notify
      * @return bool
      * @throws \coding_exception
@@ -428,6 +428,7 @@ class datalynx {
      *
      * @param string $page current page
      * @param array $params
+     * @param bool $skiplogincheck If true, skip the login check.
      * @throws moodle_exception
      * @return string output
      */
@@ -777,6 +778,9 @@ class datalynx {
 
     /**
      * TODO: consider moving into the view
+     *
+     * @param mixed $view The view id.
+     * @param mixed $filter The filter id.
      */
     public function print_groups_menu($view, $filter) {
         if ($this->groupmode && !in_array($this->groupmode, $this->internalgroupmodes)) {
@@ -1585,7 +1589,7 @@ class datalynx {
      * invoke plugin methods
      * input: $param $vt - mixed, view record or view type
      *
-     * @param $viewortype
+     * @param mixed $viewortype View record object or view type string.
      * @param bool $active
      * @return mixed
      */
@@ -2176,7 +2180,7 @@ class datalynx {
     /**
      * Has the actual user the right to edit any entries or the optional single entry parameter?
      *
-     * @param $entry
+     * @param object|null $entry The entry object to check, or null for any entry.
      * @return boolean
      * @throws \coding_exception
      */
@@ -2567,6 +2571,11 @@ class datalynx {
     /**
      * Checks if a name exists in the given table.
      * Use $id to exclude known entry when editing.
+     *
+     * @param string $table Table name suffix (without datalynx_ prefix).
+     * @param string $name Name to check for existence.
+     * @param int $id Entry id to exclude (0 for new entries).
+     * @return bool True if the name exists.
      */
     public function name_exists($table, $name, $id = 0) {
         global $DB;
@@ -2585,6 +2594,8 @@ class datalynx {
 
     /**
      * Converts array values in field input to comma-delimited strings.
+     *
+     * @param object $fieldinput Field input object passed by reference.
      */
     public function convert_arrays_to_strings(&$fieldinput) {
         foreach ($fieldinput as $key => $val) {
@@ -2602,8 +2613,8 @@ class datalynx {
     /**
      * Method triggering entry-based events
      *
-     * @param $event
-     * @param $data
+     * @param string $event Event name.
+     * @param object $data Event data object.
      */
     public function events_trigger($event, $data) {
         $data->df = $this;

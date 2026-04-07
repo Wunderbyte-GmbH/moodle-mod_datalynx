@@ -26,7 +26,6 @@ use mod_datalynx\datalynx;
 use mod_datalynx;
 use stdClass;
 
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Field renderer class
@@ -169,10 +168,10 @@ class datalynxfield_layout {
     public static function get_renderer_by_name($name, $dataid) {
         global $DB;
         $record = $DB->get_record(
-                'datalynx_renderers',
-                ['name' => $name, 'dataid' => $dataid],
-                '*',
-                MUST_EXIST
+            'datalynx_renderers',
+            ['name' => $name, 'dataid' => $dataid],
+            '*',
+            MUST_EXIST
         );
         return new datalynxfield_layout($record);
     }
@@ -270,6 +269,7 @@ class datalynxfield_layout {
      * Save renderer to db
      *
      * @param datalynxfield_layout $record
+     * @param mixed $formdata Form data to save.
      * @return bool|int true or new id
      */
     public static function insert_renderer($formdata) {
@@ -349,16 +349,16 @@ class datalynxfield_layout {
         }
         // Read dataid from DB and find patterns and param2 from all connected views.
         $rendererinfo = $DB->get_record(
-                'datalynx_renderers',
-                ['id' => $rendererid],
-                $fields = 'dataid, name',
-                $strictness = IGNORE_MISSING
+            'datalynx_renderers',
+            ['id' => $rendererid],
+            $fields = 'dataid, name',
+            $strictness = IGNORE_MISSING
         );
         $connected = $DB->get_records(
-                'datalynx_views',
-                ['dataid' => $rendererinfo->dataid],
-                null,
-                'id, patterns, param2'
+            'datalynx_views',
+            ['dataid' => $rendererinfo->dataid],
+            null,
+            'id, patterns, param2'
         );
         // Update every instance that still has the string ||renderername in it.
         foreach ($connected as $view) {

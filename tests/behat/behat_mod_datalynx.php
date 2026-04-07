@@ -356,7 +356,7 @@ class behat_mod_datalynx extends behat_base {
      *
      * @When I select :value for the :nth datalynx teammemberselect field
      *
-     * @param string $value  Full display text of the option, e.g. "Student 1 (student1@example.com)"
+     * @param string $value  Full display text of the option, e.g. "Student 1 (student1 at example.com)"
      * @param int    $nth    1-based index of the teammemberselect on the page
      * @throws coding_exception
      */
@@ -400,6 +400,7 @@ class behat_mod_datalynx extends behat_base {
      * Follow the datalynx link of the elements matching the selector.
      *
      * @When /^I follow the datalynx "(?P<link_string>(?:[^"]|\\")*)" link$/
+     * @param string $linktext The link text to follow.
      */
     public function i_follow_the_datalynx_link($linktext) {
         $page = $this->getSession()->getPage();

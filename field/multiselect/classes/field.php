@@ -112,6 +112,7 @@ class field extends datalynxfield_option_multiple {
     /**
      * Is $value a valid content or do we see an empty input?
      *
+     * @param mixed $value The value to check.
      * @return bool
      */
     public static function is_fieldvalue_empty($value) {
@@ -171,6 +172,9 @@ class field extends datalynxfield_option_multiple {
     /**
      * {@inheritDoc}
      * @see datalynxfield_base::get_search_sql()
+     *
+     * @param array $search Search parameters array with [not, operator, value].
+     * @return array SQL fragments array.
      */
     public function get_search_sql(array $search): array {
 

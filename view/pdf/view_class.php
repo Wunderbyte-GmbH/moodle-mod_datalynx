@@ -380,6 +380,9 @@ class datalynxview_pdf extends base {
 
     /**
      * Overridden to process pdf specific area files
+     *
+     * @param stdClass $data Form data to process.
+     * @return stdClass
      */
     public function from_form($data) {
         $data = parent::from_form($data);
@@ -432,6 +435,9 @@ class datalynxview_pdf extends base {
 
     /**
      * Overridden to process pdf specific area files
+     *
+     * @param stdClass|null $data Optional existing data object.
+     * @return stdClass
      */
     public function to_form($data = null) {
         $data = parent::to_form($data);
@@ -484,6 +490,9 @@ class datalynxview_pdf extends base {
 
     /**
      * Override parent to remove pdf bookmark tags
+     *
+     * @param array $options Display options.
+     * @return string
      */
     public function display(array $options = []): string {
         // For export just return the parent.
@@ -982,6 +991,10 @@ class datalynxview_pdf extends base {
     /**
      * Merges all pdfs that were uploaded by users in the field class file.
      * Current code assumes we want to attach all files linked to this context.
+     *
+     * @param datalynx_tcpdf $pdf The PDF object to merge into.
+     * @param int $pagecount Current page count.
+     * @return int Updated page count.
      */
     protected function mergepdfs($pdf, $pagecount) {
         global $CFG;

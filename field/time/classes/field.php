@@ -167,6 +167,8 @@ class field extends datalynxfield_base {
      * Possible criterions: BETWEEN, equal(=), after(>), before(<), IS EMPTY, IS NOT EMPTY
      * {@inheritDoc}
      * @see datalynxfield_base::get_search_sql()
+     * @param array $search Search criteria array.
+     * @return array SQL fragment, params, and join flag.
      */
     public function get_search_sql(array $search): array {
         [$not, $operator, $value] = $search;
@@ -232,6 +234,11 @@ class field extends datalynxfield_base {
      *
      * {@inheritDoc}
      * @see datalynxfield_base::prepare_import_content()
+     * @param mixed $data Data object to populate.
+     * @param array $importsettings Import settings.
+     * @param array|null $csvrecord CSV record data.
+     * @param int|null $entryid Entry ID.
+     * @return bool True on success.
      */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
         // Import only from csv.
@@ -309,6 +316,8 @@ class field extends datalynxfield_base {
      *
      * {@inheritDoc}
      * @see datalynxfield_base::get_sql_compare_text()
+     * @param string $column Column name.
+     * @return string SQL comparison expression.
      */
     public function get_sql_compare_text(string $column = 'content'): string {
         global $DB;
@@ -328,6 +337,7 @@ class field extends datalynxfield_base {
 
     /**
      * Is $value a valid content or do we see an empty input?
+     * @param mixed $value Field value to check.
      * @return bool
      */
     public static function is_fieldvalue_empty($value) {

@@ -68,6 +68,8 @@ class datalynx_customfilter {
 
     /**
      * constructor
+     *
+     * @param object $filterdata Filter data object.
      */
     public function __construct($filterdata) {
         $this->id = empty($filterdata->id) ? 0 : $filterdata->id;

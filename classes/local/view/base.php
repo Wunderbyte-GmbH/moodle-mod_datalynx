@@ -38,6 +38,8 @@ use moodle_url;
 use moodleform;
 use stdClass;
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once("$CFG->libdir/formslib.php");
 
 /**
@@ -163,6 +165,10 @@ abstract class base {
     /**
      * Constructor
      * View or datalynx or both, each can be id or object
+     *
+     * @param int|datalynx $df Datalynx id or object.
+     * @param int|stdClass $view View id or object.
+     * @param bool $filteroptions Whether to apply filter options.
      */
     public function __construct($df = 0, $view = 0, $filteroptions = true) {
         global $DB, $CFG;
@@ -422,6 +428,9 @@ abstract class base {
     /**
      * Insert a new view into the database
      * $this->view is assumed set
+     *
+     * @param stdClass $data View data.
+     * @return int|false New view id or false on failure.
      */
     public function add($data) {
         global $DB, $OUTPUT;
@@ -439,6 +448,9 @@ abstract class base {
     /**
      * Update a view in the database
      * $this->view is assumed set
+     *
+     * @param stdClass|null $data View data.
+     * @return bool True on success, false on failure.
      */
     public function update($data = null) {
         global $DB, $OUTPUT;
@@ -498,6 +510,9 @@ abstract class base {
 
     /**
      * prepare view data for form
+     *
+     * @param stdClass|null $data View data object.
+     * @return stdClass
      */
     public function to_form($data = null) {
         $data = $data ?: $this->view;
@@ -507,6 +522,9 @@ abstract class base {
 
     /**
      * prepare view data for form
+     *
+     * @param stdClass $data Form data.
+     * @return stdClass
      */
     public function from_form($data) {
         $data = $this->update_view_editors($data);
@@ -515,6 +533,9 @@ abstract class base {
 
     /**
      * Prepare view editors for form
+     *
+     * @param stdClass $data View data.
+     * @return stdClass
      */
     public function prepare_view_editors($data) {
         $editors = $this->editors();
@@ -556,6 +577,9 @@ abstract class base {
 
     /**
      * Update view editors from form
+     *
+     * @param stdClass $data Form data.
+     * @return stdClass
      */
     public function update_view_editors($data) {
         $format = FORMAT_HTML;
@@ -589,6 +613,10 @@ abstract class base {
 
     /**
      * Subclass may need to override
+     *
+     * @param string $searchfieldname Field name to search for.
+     * @param string $newfieldname New field name.
+     * @return void
      */
     public function replace_field_in_view($searchfieldname, $newfieldname) {
         $patterns = ['[[' . $searchfieldname . ']]', '[[' . $searchfieldname . '#id]]'];
@@ -610,6 +638,10 @@ abstract class base {
 
     /**
      * Returns the name/type of the view
+     *
+     * @param string $name View name.
+     * @param int $viewid View id.
+     * @return bool
      */
     public function name_exists($name, $viewid) {
         return $this->dl->name_exists('views', $name, $viewid);
@@ -1091,7 +1123,7 @@ abstract class base {
 
     /**
      *
-     * @param $fielddefinitions
+     * @param array $fielddefinitions Field definition map.
      * @return array
      */
     protected function entry_definition($fielddefinitions) {
@@ -1116,7 +1148,9 @@ abstract class base {
 
     /**
      *
-     * @param array $patterns array of arrays of pattern replacement pairs
+     * @param array $patterns Array of pattern strings.
+     * @param string $subject Template string to split.
+     * @return array
      */
     protected function split_template_by_tags($patterns, $subject) {
         foreach ($patterns as $id => $pattern) {
@@ -1130,6 +1164,9 @@ abstract class base {
 
     /**
      * FIXME: there was an error here at get_definitions call!
+     *
+     * @param stdClass $entry Entry record.
+     * @return string
      */
     protected function get_groupby_value($entry) {
         $fields = $this->dl->get_fields();
@@ -1895,7 +1932,7 @@ abstract class base {
      * allowed. This function
      * prevents users to circumvent action restrictions via URL queries.
      *
-     * @param $action String of the action
+     * @param string $action String of the action
      * @return bool true, if the action is allowed; false otherwise.
      */
     private function confirm_view_action($action): bool {
@@ -1926,6 +1963,9 @@ abstract class base {
 
     /**
      * Find all fields that occur within a fieldgroup and remove duplicates.
+     *
+     * @param array $fields Array of field objects.
+     * @return array
      */
     public function remove_duplicates($fields) {
         foreach ($fields as $field) {

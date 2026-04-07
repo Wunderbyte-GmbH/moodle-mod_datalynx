@@ -25,7 +25,6 @@
 namespace datalynxfield_picture;
 use datalynxfield_file\form as FileForm;
 
-defined('MOODLE_INTERNAL') || die();
 
 
 /**

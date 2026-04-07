@@ -25,7 +25,6 @@
 namespace datalynxfield_checkbox;
 use datalynxfield_multiselect\form as MultiSelectForm;
 
-defined('MOODLE_INTERNAL') || die();
 
 
 /**

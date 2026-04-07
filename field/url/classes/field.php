@@ -164,6 +164,8 @@ class field extends datalynxfield_base {
 
     /**
      * Is $value a valid content or do we see an empty input?
+     *
+     * @param mixed $value The value to check.
      * @return bool
      */
     public static function is_fieldvalue_empty($value) {

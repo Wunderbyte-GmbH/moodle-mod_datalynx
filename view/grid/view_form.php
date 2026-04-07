@@ -24,7 +24,6 @@
 
 use mod_datalynx\form\datalynxview_base_form;
 
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Grid view configuration form.

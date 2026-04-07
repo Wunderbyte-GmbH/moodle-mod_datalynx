@@ -16,7 +16,7 @@
 
 /**
  *
- * @package mod_datalynx
+ * @package datalynxfield_rating
  * @subpackage _rating
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @copyright based on the work  by 2011 Itamar Tzadok
@@ -26,7 +26,6 @@
 namespace datalynxfield_rating;
 
 use mod_datalynx\datalynx_rating_manager;
-
 use mod_datalynx\local\field\datalynxfield_renderer;
 use stdClass;
 use html_writer;
@@ -35,7 +34,6 @@ use html_table_row;
 use rating;
 use user_picture;
 
-defined('MOODLE_INTERNAL') || die();
 
 
 /**
@@ -46,6 +44,11 @@ defined('MOODLE_INTERNAL') || die();
 class renderer extends datalynxfield_renderer {
     /**
      * Returns replacement values for rating tags.
+     *
+     * @param array|null $tags List of tag patterns to replace.
+     * @param mixed $entry The entry object.
+     * @param array|null $options Rendering options.
+     * @return array Associative array of tag => replacement pairs.
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
         global $DB;
@@ -189,6 +192,9 @@ class renderer extends datalynxfield_renderer {
 
     /**
      * Returns aggregation keys matching the given patterns.
+     *
+     * @param array $patterns Array of pattern strings to match.
+     * @return array|null Array of matching aggregation keys, or null if none match.
      */
     public function get_aggregations($patterns) {
         $aggr = [field::AGGREGATE_AVG => '##ratings:avg##',
@@ -205,6 +211,10 @@ class renderer extends datalynxfield_renderer {
     // phpcs:disable moodle.PHP.ForbiddenGlobalUse.BadGlobal
     /**
      * Displays a link to view all ratings for an entry.
+     *
+     * @param object $entry The entry object.
+     * @param string $tag The tag pattern being rendered.
+     * @return string HTML string.
      */
     protected function display_view($entry, $tag) {
         global $OUTPUT;
@@ -243,6 +253,9 @@ class renderer extends datalynxfield_renderer {
     // phpcs:disable moodle.PHP.ForbiddenGlobalUse.BadGlobal
     /**
      * Displays an inline table of all ratings for an entry.
+     *
+     * @param object $entry The entry object.
+     * @return string HTML string.
      */
     protected function display_view_inline($entry) {
         global $OUTPUT, $DB;
@@ -301,6 +314,10 @@ class renderer extends datalynxfield_renderer {
 
     /**
      * Displays a bar chart representation of the rating value.
+     *
+     * @param object $entry The entry object.
+     * @param mixed $value The rating value to display.
+     * @return string HTML string.
      */
     protected function display_bar($entry, $value) {
         if (isset($entry->rating) && $value) {
@@ -321,6 +338,10 @@ class renderer extends datalynxfield_renderer {
     // phpcs:disable moodle.PHP.ForbiddenGlobalUse.BadGlobal
     /**
      * Displays a star rating widget for an entry.
+     *
+     * @param object $entry The entry object.
+     * @param mixed $value The current rating value.
+     * @return string HTML string.
      */
     protected function display_star($entry, $value) {
 
@@ -369,6 +390,9 @@ class renderer extends datalynxfield_renderer {
     // phpcs:disable moodle.PHP.ForbiddenGlobalUse.BadGlobal
     /**
      * Renders the interactive rating form for an entry.
+     *
+     * @param object $entry The entry object.
+     * @return string HTML string.
      */
     public function render_rating($entry) {
         global $OUTPUT, $PAGE;

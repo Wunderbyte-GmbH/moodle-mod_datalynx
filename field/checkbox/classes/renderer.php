@@ -26,7 +26,6 @@ use datalynxfield_multiselect\renderer as MultiSelectRenderer;
 use stdClass;
 use MoodleQuickForm;
 
-defined('MOODLE_INTERNAL') || die();
 /**
  * Class datalynxfield_checkbox_renderer Renderer for checkbox field type
  */
@@ -35,6 +34,11 @@ class renderer extends MultiSelectRenderer {
      *
      * {@inheritDoc}
      * @see datalynxfield_renderer::render_edit_mode()
+     *
+     * @param MoodleQuickForm $mform The Moodle form object.
+     * @param stdClass $entry The entry object.
+     * @param array $options Rendering options.
+     * @return void
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
         $field = $this->field;
