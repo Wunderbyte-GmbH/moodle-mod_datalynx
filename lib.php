@@ -499,7 +499,6 @@ function datalynx_get_file_info(
     }
 
     if (is_null($itemid)) {
-        require_once($CFG->dirroot . '/mod/datalynx/locallib.php');
         return new datalynx_file_info_container($browser, $course, $cm, $context, $areas, $filearea);
     }
     $view = $DB->get_record('datalynx_views', ['id' => $itemid]);
@@ -851,7 +850,7 @@ function datalynx_extend_settings_navigation(settings_navigation $settings, navi
             );
             $fields->add(
                 get_string('renderers', 'datalynx'),
-                new moodle_url('/mod/datalynx/renderer/index.php', ['id' => $page->cm->id])
+                new moodle_url('/mod/datalynx/fieldlayout/index.php', ['id' => $page->cm->id])
             );
         }
         $manage->add(

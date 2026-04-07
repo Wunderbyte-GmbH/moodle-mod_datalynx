@@ -27,7 +27,6 @@ namespace mod_datalynx\local\field;
 defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(__FILE__) . '/../../../behavior/behavior.php');
-require_once(dirname(__FILE__) . '/../../../renderer/renderer.php');
 
 /**
  * Base class for Datalynx field types that offer a set of options with single choice

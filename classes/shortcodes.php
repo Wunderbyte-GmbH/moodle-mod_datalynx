@@ -45,7 +45,6 @@ class shortcodes {
      */
     public static function displayview($shortcode, $args, $content, $env, $next) {
         global $DB, $CFG, $PAGE;
-        require_once("{$CFG->dirroot}/mod/datalynx/locallib.php");
         if (isset($args['view']) && isset($args['cmid'])) {
             $viewname = $args['view'];
             $cmid = $args['cmid'];

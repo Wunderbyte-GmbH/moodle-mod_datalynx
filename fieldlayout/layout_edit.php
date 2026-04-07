@@ -22,9 +22,10 @@
  */
 
 use mod_datalynx\datalynx;
+use mod_datalynx\form\datalynxfield_layout_form;
+use mod_datalynx\local\field\datalynxfield_layout;
+
 require_once('../../../config.php');
-require_once('renderer_form.php');
-require_once('renderer.php');
 
 $urlparams = new stdClass();
 $urlparams->d = required_param('d', PARAM_INT);
@@ -41,20 +42,20 @@ $datalynx->set_page('renderer/renderer_edit', ['urlparams' => $urlparams]);
 require_sesskey();
 require_capability('mod/datalynx:managetemplates', $datalynx->context);
 
-$returnurl = new moodle_url('/mod/datalynx/renderer/index.php', ['d' => $datalynx->id()]);
+$returnurl = new moodle_url('/mod/datalynx/fieldlayout/index.php', ['d' => $datalynx->id()]);
 
 switch ($urlparams->action) {
     case "edit":
-        $mform = new datalynx_field_renderer_form($datalynx);
+        $mform = new datalynxfield_layout_form($datalynx);
 
         if ($mform->is_cancelled()) {
             redirect($returnurl);
         } else {
             if ($data = $mform->get_data()) {
                 if (!$data->id) {
-                    $id = datalynx_field_renderer::insert_renderer($data);
+                    $id = datalynxfield_layout::insert_renderer($data);
                 } else {
-                    datalynx_field_renderer::update_renderer($data);
+                    datalynxfield_layout::update_renderer($data);
                 }
                 redirect($returnurl);
             }
@@ -65,7 +66,7 @@ switch ($urlparams->action) {
         );
 
         if ($urlparams->id) {
-            $data = datalynx_field_renderer::get_record($urlparams->id);
+            $data = datalynxfield_layout::get_record($urlparams->id);
             $mform->set_data($data);
             echo html_writer::tag(
                 'h2',
@@ -87,10 +88,10 @@ switch ($urlparams->action) {
 
     case "duplicate":
         if ($urlparams->confirmed) {
-            datalynx_field_renderer::duplicate_renderer($urlparams->id);
+            datalynxfield_layout::duplicate_renderer($urlparams->id);
             redirect($returnurl);
         } else {
-            $data = datalynx_field_renderer::get_renderer_by_id($urlparams->id);
+            $data = datalynxfield_layout::get_renderer_by_id($urlparams->id);
             $urlparams->confirmed = true;
             $datalynx->print_header(
                 ['tab' => 'renderers', 'nonotifications' => true,
@@ -112,10 +113,10 @@ switch ($urlparams->action) {
 
     case "delete":
         if ($urlparams->confirmed) {
-            datalynx_field_renderer::delete_renderer($urlparams->id);
+            datalynxfield_layout::delete_renderer($urlparams->id);
             redirect($returnurl);
         } else {
-            $data = datalynx_field_renderer::get_renderer_by_id($urlparams->id);
+            $data = datalynxfield_layout::get_renderer_by_id($urlparams->id);
             $urlparams->confirmed = true;
             $datalynx->print_header(
                 ['tab' => 'renderers', 'nonotifications' => true,

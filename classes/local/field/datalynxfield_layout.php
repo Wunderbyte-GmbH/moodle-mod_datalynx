@@ -20,16 +20,20 @@
  * @copyright 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__FILE__) . '/../classes/datalynx.php');
+namespace mod_datalynx\local\field;
+use mod_datalynx\datalynx;
+use mod_datalynx;
+use stdClass;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Field renderer class
  *
  * @package mod_datalynx
  */
-class datalynx_field_renderer {
+class datalynxfield_layout {
     /*
      * Make this more readable:
      * shownothing = '___0___'
@@ -131,7 +135,7 @@ class datalynx_field_renderer {
     /**
      * Constructor: Create the datalynx_field_renderer object given the db record
      *
-     * @param fieldset record $record
+     * @param stdClass $record
      */
     private function __construct($record) {
         $this->id = $record->id;
@@ -160,17 +164,17 @@ class datalynx_field_renderer {
      *
      * @param string $name
      * @param int $dataid
-     * @return datalynx_field_renderer
+     * @return datalynxfield_layout
      */
     public static function get_renderer_by_name($name, $dataid) {
         global $DB;
         $record = $DB->get_record(
-            'datalynx_renderers',
-            ['name' => $name, 'dataid' => $dataid],
-            '*',
-            MUST_EXIST
+                'datalynx_renderers',
+                ['name' => $name, 'dataid' => $dataid],
+                '*',
+                MUST_EXIST
         );
-        return new datalynx_field_renderer($record);
+        return new datalynxfield_layout($record);
     }
 
     /**
@@ -178,12 +182,12 @@ class datalynx_field_renderer {
      * Return the renderer object from db providing the renderer id
      *
      * @param int $id
-     * @return datalynx_field_renderer
+     * @return datalynxfield_layout
      */
     public static function get_renderer_by_id($id) {
         global $DB;
         $record = $DB->get_record('datalynx_renderers', ['id' => $id], '*', MUST_EXIST);
-        return new datalynx_field_renderer($record);
+        return new datalynxfield_layout($record);
     }
 
     /** @var array Default renderer values */
@@ -199,13 +203,13 @@ class datalynx_field_renderer {
      * Static constructor method for default datalynx_field_renderer
      *
      * @param datalynx $datalynx
-     * @return datalynx_field_renderer
+     * @return datalynxfield_layout
      */
     public static function get_default_renderer(mod_datalynx\datalynx $datalynx) {
         $record = (object) self::$default;
         $record->datalynx = $datalynx;
         $record->dataid = $datalynx->id();
-        return new datalynx_field_renderer($record);
+        return new datalynxfield_layout($record);
     }
 
     /**
@@ -265,7 +269,7 @@ class datalynx_field_renderer {
     /**
      * Save renderer to db
      *
-     * @param datalynx_field_renderer $record
+     * @param datalynxfield_layout $record
      * @return bool|int true or new id
      */
     public static function insert_renderer($formdata) {
@@ -278,7 +282,7 @@ class datalynx_field_renderer {
      * Get DB record of a field renderer
      *
      * @param integer $rendererid
-     * @return Ambigous <mixed, stdClass, false>
+     * @return stdClass
      */
     public static function get_record($rendererid) {
         global $DB;
@@ -345,23 +349,23 @@ class datalynx_field_renderer {
         }
         // Read dataid from DB and find patterns and param2 from all connected views.
         $rendererinfo = $DB->get_record(
-            'datalynx_renderers',
-            ['id' => $rendererid],
-            $fields = 'dataid, name',
-            $strictness = IGNORE_MISSING
+                'datalynx_renderers',
+                ['id' => $rendererid],
+                $fields = 'dataid, name',
+                $strictness = IGNORE_MISSING
         );
         $connected = $DB->get_records(
-            'datalynx_views',
-            ['dataid' => $rendererinfo->dataid],
-            null,
-            'id, patterns, param2'
+                'datalynx_views',
+                ['dataid' => $rendererinfo->dataid],
+                null,
+                'id, patterns, param2'
         );
         // Update every instance that still has the string ||renderername in it.
         foreach ($connected as $view) {
             // TODO: MDL-66151 Is one check enough or are these separate?
             if (
-                strpos($view->patterns, '|' . $rendererinfo->name) !== false ||
-                strpos($view->param2, '|' . $rendererinfo->name) !== false
+                    strpos($view->patterns, '|' . $rendererinfo->name) !== false ||
+                    strpos($view->param2, '|' . $rendererinfo->name) !== false
             ) {
                 if (strpos($view->param2, '||' . $rendererinfo->name) !== false) {
                     $view->patterns = str_replace('||' . $rendererinfo->name, $renderername, $view->patterns);

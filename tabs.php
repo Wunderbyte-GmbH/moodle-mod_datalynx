@@ -157,7 +157,7 @@ if (isloggedin() && $istemplatemanager) {
             );
             $row[] = new tabobject(
                 'renderers',
-                new moodle_url('/mod/datalynx/renderer/index.php', ['d' => $this->id()]),
+                new moodle_url('/mod/datalynx/fieldlayout/index.php', ['d' => $this->id()]),
                 get_string('renderers', 'datalynx')
             );
             $row[] = new tabobject(

@@ -20,6 +20,12 @@
  * @copyright 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+namespace mod_datalynx\form;
+use mod_datalynx\datalynx;
+use mod_datalynx;
+use moodleform;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/formslib.php');
@@ -27,7 +33,7 @@ require_once($CFG->libdir . '/formslib.php');
 /**
  * Renderer form class
  */
-class datalynx_field_renderer_form extends moodleform {
+class datalynxfield_layout_form extends moodleform {
     /**
      *
      * @var datalynx
@@ -62,11 +68,11 @@ class datalynx_field_renderer_form extends moodleform {
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule(
-            'name',
-            "Renderer name may not contain the pipe symbol \" | \"!",
-            'regex',
-            '/^[^\|]+$/',
-            'client'
+                'name',
+                "Renderer name may not contain the pipe symbol \" | \"!",
+                'regex',
+                '/^[^\|]+$/',
+                'client'
         );
 
         $mform->addElement('text', 'description', get_string('description'), ['size' => '64']);
@@ -89,12 +95,12 @@ class datalynx_field_renderer_form extends moodleform {
         $group[] = $mform->createElement('textarea', 'notvisibletemplate', '', '');
         $mform->disabledIf('notvisibletemplate', 'notvisibleoptions', 'eq', '___0___');
         $mform->addGroup(
-            $group,
-            'notvisiblegroup',
-            get_string('notvisible', 'datalynx'),
-            ['<br />',
-            ],
-            false
+                $group,
+                'notvisiblegroup',
+                get_string('notvisible', 'datalynx'),
+                ['<br />',
+                ],
+                false
         );
         $mform->setType('notvisibletemplate', PARAM_RAW);
         $mform->setDefault('notvisibleoptions', '___0___');
@@ -107,12 +113,12 @@ class datalynx_field_renderer_form extends moodleform {
         $mform->setDefault('displaytemplate', '#value');
         $mform->disabledIf('displaytemplate', 'displayoptions', 'eq', '___4___');
         $mform->addGroup(
-            $group,
-            'displaytemplategroup',
-            get_string('displaytemplate', 'datalynx'),
-            ['<br />',
-            ],
-            false
+                $group,
+                'displaytemplategroup',
+                get_string('displaytemplate', 'datalynx'),
+                ['<br />',
+                ],
+                false
         );
         $mform->setType('displaytemplate', PARAM_RAW);
         $mform->addHelpButton('displaytemplategroup', 'displaytemplate', 'datalynx');
@@ -121,25 +127,25 @@ class datalynx_field_renderer_form extends moodleform {
         // When empty.
         $group = [];
         $group[] = $mform->createElement(
-            'radio',
-            'novalueoptions',
-            '',
-            get_string('shownothing', 'datalynx'),
-            '___0___'
+                'radio',
+                'novalueoptions',
+                '',
+                get_string('shownothing', 'datalynx'),
+                '___0___'
         );
         $group[] = $mform->createElement(
-            'radio',
-            'novalueoptions',
-            '',
-            get_string('asdisplay', 'datalynx'),
-            '___1___'
+                'radio',
+                'novalueoptions',
+                '',
+                get_string('asdisplay', 'datalynx'),
+                '___1___'
         );
         $group[] = $mform->createElement(
-            'radio',
-            'novalueoptions',
-            '',
-            get_string('custom', 'datalynx'),
-            '___2___'
+                'radio',
+                'novalueoptions',
+                '',
+                get_string('custom', 'datalynx'),
+                '___2___'
         );
         $group[] = $mform->createElement('textarea', 'novaluetemplate', '', '');
         $mform->disabledIf('novaluetemplate', 'novalueoptions', 'eq', '___0___');
@@ -208,6 +214,7 @@ class datalynx_field_renderer_form extends moodleform {
     /**
      *  Add data to formfields.
      * {@inheritDoc}
+     *
      * @see moodleform::set_data()
      */
     public function set_data($data) {

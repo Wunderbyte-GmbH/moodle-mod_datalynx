@@ -43,6 +43,8 @@
  * before any action that may take longer time to finish.
  */
 
+use mod_datalynx\local\field\datalynxfield_layout;
+
 /**
  * Upgrade the datalynx database from $oldversion to the current version.
  *
@@ -1255,15 +1257,14 @@ function mod_datalynx_replace_field_rules() {
  * @return void
  */
 function mod_datalynx_replace_field_labels() {
-    require_once(dirname(__FILE__) . '/../renderer/renderer.php');
     global $DB;
 
     $defaultrenderer = (object) ['id' => 0, 'name' => '', 'description' => '',
-            'notvisibletemplate' => datalynx_field_renderer::NOT_VISIBLE_SHOW_NOTHING,
-            'displaytemplate' => datalynx_field_renderer::DISPLAY_MODE_TEMPLATE_NONE,
-            'novaluetemplate' => datalynx_field_renderer::NO_VALUE_SHOW_NOTHING,
-            'edittemplate' => datalynx_field_renderer::EDIT_MODE_TEMPLATE_NONE,
-            'noteditabletemplate' => datalynx_field_renderer::NOT_EDITABLE_SHOW_NOTHING,
+            'notvisibletemplate' => datalynxfield_layout::NOT_VISIBLE_SHOW_NOTHING,
+            'displaytemplate' => datalynxfield_layout::DISPLAY_MODE_TEMPLATE_NONE,
+            'novaluetemplate' => datalynxfield_layout::NO_VALUE_SHOW_NOTHING,
+            'edittemplate' => datalynxfield_layout::EDIT_MODE_TEMPLATE_NONE,
+            'noteditabletemplate' => datalynxfield_layout::NOT_EDITABLE_SHOW_NOTHING,
     ];
 
     $dataids = $DB->get_fieldset_select('datalynx', 'id', "id IS NOT NULL");
@@ -1292,7 +1293,7 @@ function mod_datalynx_replace_field_labels() {
                             '#input',
                             $fieldlabels[$fieldname]
                         );
-                        datalynx_field_renderer::insert_renderer($renderer);
+                        datalynxfield_layout::insert_renderer($renderer);
                         $fieldtags[$oldtag] = '[[' . $fieldname . '||' . $renderer->name . ']]';
                     }
                 }
