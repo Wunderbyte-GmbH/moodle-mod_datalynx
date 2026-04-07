@@ -71,7 +71,6 @@ class datalynx_customfilter_manager {
      * @param int $filterid
      * @param array|null $options
      * @return mixed|datalynx_customfilter
-     * @throws \coding_exception
      */
     public function get_filter_from_id($filterid = 0, array $options = null) {
         $dl = $this->dl;
@@ -162,13 +161,11 @@ class datalynx_customfilter_manager {
      * @param bool $menu
      * @param bool $forceget
      * @return array|bool
-     * @throws \coding_exception
-     * @throws \dml_exception
      */
     public function get_filters($exclude = null, $menu = false, $forceget = false) {
         global $DB;
         if (!$this->customfilters || $forceget) {
-            $this->filters = [];
+            $this->customfilters = [];
             if ($filters = $DB->get_records('datalynx_customfilters', ['dataid' => $this->dl->id()])) {
                 foreach ($filters as $filterid => $filterdata) {
                     $this->customfilters[$filterid] = new datalynx_customfilter($filterdata);
@@ -210,9 +207,6 @@ class datalynx_customfilter_manager {
      * @param array $fids
      * @param bool $confirmed
      * @return array|bool
-     * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws \moodle_exception
      */
     public function process_filters($action, $fids, $confirmed = false) {
         global $DB, $OUTPUT;
@@ -298,12 +292,11 @@ class datalynx_customfilter_manager {
                                 );
                                 $event->trigger();
                             }
-                            $this->filters[$filter->id] = $filter;
+                            $this->customfilters[$filter->id] = $filter;
                         } else {
                             // Form validation failed so return to form.
                             $this->display_filter_form($filterform, $filter);
                         }
-
                         break;
 
                     case 'duplicate':
@@ -408,7 +401,6 @@ class datalynx_customfilter_manager {
      * @param datalynx_customfilter_backend_form $mform
      * @param datalynx_customfilter $filter
      * @param array|null $urlparams
-     * @throws \coding_exception
      */
     public function display_filter_form($mform, $filter, $urlparams = null) {
         $stredittitle = $filter->id ? get_string('filteredit', 'datalynx', $filter->name)
