@@ -104,7 +104,7 @@ class datalynxview_report extends base {
 
     /**
      * No new entry with this view.
-     * @param $entryid
+     * @param int $entryid
      * @return array
      */
     protected function new_entry_definition($entryid = -1) {
@@ -113,7 +113,7 @@ class datalynxview_report extends base {
 
     /**
      * Generate entry definition as table row cells.
-     * @param $fielddefinitions
+     * @param array $fielddefinitions
      * @return array
      */
     protected function entry_definition($fielddefinitions) {

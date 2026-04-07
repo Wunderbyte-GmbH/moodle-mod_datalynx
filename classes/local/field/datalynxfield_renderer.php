@@ -220,8 +220,8 @@ abstract class datalynxfield_renderer {
     /**
      * TODO: add hash escaping option!
      *
-     * @param $template
-     * @param $value
+     * @param string $template
+     * @param mixed $value
      * @return mixed
      */
     private function replace_renderer_template_tags($template, $value) {
@@ -424,9 +424,9 @@ abstract class datalynxfield_renderer {
     /**
      * Validate the form data for this field
      *
-     * @param $entryid
-     * @param $tags
-     * @param $data
+     * @param int $entryid
+     * @param array $tags
+     * @param array $data
      * @return array
      */
     public function validate($entryid, $tags, $data) {

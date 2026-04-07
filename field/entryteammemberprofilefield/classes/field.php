@@ -69,8 +69,8 @@ class field extends datalynxfield_no_content_can_join {
     /**
      * Returns field objects for team member profile fields.
      *
-     * @param $dataid
-     * @param $fields
+     * @param int $dataid
+     * @param array $fields
      * @return array
      */
     public static function get_field_objects($dataid, $fields = []) {

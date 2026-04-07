@@ -233,7 +233,7 @@ class field extends datalynxfield_base {
      * this function is needed to validate URLs containing special chars
      * like ü or ä.
      *
-     * @param $url
+     * @param string $url
      * @return bool
      */
     protected function validate_url($url): bool {
@@ -351,7 +351,7 @@ class field extends datalynxfield_base {
     /**
      * Is $value a valid content or do we see an empty input?
      *
-     * @param $value
+     * @param mixed $value
      * @return bool
      */
     public static function is_fieldvalue_empty($value): bool {

@@ -212,7 +212,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
 
     /**
      * Restore filters
-     * @param $data
+     * @param array|stdClass $data
      * @return void
      */
     protected function process_datalynx_filter($data) {

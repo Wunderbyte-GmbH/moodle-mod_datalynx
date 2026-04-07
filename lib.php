@@ -215,7 +215,7 @@ function datalynx_page_type_list($pagetype, $parentcontext, $currentcontext) {
  * prints the form elements that control
  * whether the course reset functionality affects the data.
  *
- * @param $mform form passed by reference
+ * @param MoodleQuickForm $mform form passed by reference
  */
 function datalynx_reset_course_form_definition(&$mform) {
     $mform->addElement('header', 'datalynxheader', get_string('modulenameplural', 'datalynx'));
@@ -751,7 +751,7 @@ function datalynx_extend_navigation($navigation, $course, $module, $cm) {
  * Adds module specific settings to the settings block
  *
  * @param settings_navigation $settings The settings navigation object
- * @param navigation_node $datanode The node to add module settings to
+ * @param navigation_node $dfnode The node to add module settings to
  */
 function datalynx_extend_settings_navigation(settings_navigation $settings, navigation_node $dfnode) {
     global $USER;
@@ -1097,7 +1097,7 @@ function datalynx_rating_permissions($contextid, $component, $ratingarea) {
 
 /**
  *
- * @param $params
+ * @param array $params
  * @return bool
  * @throws coding_exception
  * @throws rating_exception
@@ -1229,7 +1229,7 @@ function datalynx_rating_validate($params) {
 /**
  * Return grade for given user or all users.
  *
- * @param $data
+ * @param stdClass $data
  * @param int $userid
  * @return array array of grades, false if none
  * @throws coding_exception
@@ -1318,7 +1318,7 @@ function datalynx_upgrade_grades() {
  * Update/create grade item for given datalynx
  *
  * @param object $data object with extra cmidnumber
- * @param mixed optional array/object of grade(s); 'reset' means reset grades in gradebook
+ * @param mixed $grades optional array/object of grade(s); 'reset' means reset grades in gradebook
  * @return object grade_item
  */
 function datalynx_grade_item_update($data, $grades = null) {
@@ -1387,10 +1387,10 @@ function datalynx_grade_item_delete($data) {
  * Obtains the automatic completion state for this forum based on any conditions
  * in datalynx settings.
  *
- * @param $course
- * @param $cm
- * @param $userid
- * @param $type
+ * @param stdClass $course
+ * @param stdClass $cm
+ * @param int $userid
+ * @param bool $type
  * @return bool
  * @throws Exception
  */
@@ -1450,7 +1450,7 @@ function datalynx_scale_used($dataid, $scaleid) {
  *
  * This is used to find out if scale used anywhere
  *
- * @param $scaleid int
+ * @param int $scaleid int
  * @return boolean True if the scale is used by any datalynx
  */
 function datalynx_scale_used_anywhere($scaleid) {

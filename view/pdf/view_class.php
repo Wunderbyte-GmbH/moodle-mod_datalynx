@@ -602,7 +602,7 @@ class datalynxview_pdf extends base {
     /**
      * Apply entry group layout
      *
-     * @param $entriesset
+     * @param array $entriesset
      * @param string $name
      * @return array
      */

@@ -294,7 +294,7 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
      * Retrieves IDs of users that possess given permissions within the context.
      *
      * @param context $context
-     * @param $permissions
+     * @param array $permissions
      * @return array IDs of recipient users
      */
     protected function get_recipients_by_permission(context $context, $permissions) {
@@ -352,8 +352,8 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
     /**
      * Compiles an array of IDs of users that should receive this notification based on team fields
      *
-     * @param $teams
-     * @param $entryid
+     * @param array $teams
+     * @param int $entryid
      * @return array
      * @throws coding_exception
      * @throws dml_exception

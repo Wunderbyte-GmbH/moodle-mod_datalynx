@@ -100,7 +100,7 @@ class renderer extends datalynxfield_renderer {
     /**
      * Creates menu items for submission status
      *
-     * @param boolean $includenotcreated if STATUS_NOT_SET should be included in the menu (default
+     * @param bool $shownotset if STATUS_NOT_SET should be included in the menu (default
      *        false)
      * @return array (int) statusid => (string) label
      */

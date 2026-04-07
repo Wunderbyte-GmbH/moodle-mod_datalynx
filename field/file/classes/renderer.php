@@ -251,10 +251,10 @@ class renderer extends datalynxfield_renderer {
     // phpcs:disable moodle.PHP.ForbiddenGlobalUse.BadGlobal
     /**
      * Render a link.
-     * @param $file
-     * @param $path
-     * @param $altname
-     * @param $params
+     * @param stored_file $file
+     * @param string $path
+     * @param string $altname
+     * @param array|null $params
      * @return string
      */
     protected function display_link($file, $path, $altname, $params = null): string {

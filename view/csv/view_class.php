@@ -539,8 +539,8 @@ class datalynxview_csv extends base {
     /**
      * Process data from csv file.
      *
-     * @param $data
-     * @param $csvcontent
+     * @param array $data
+     * @param string $csvcontent
      * @param null|array $options associative delimiter,enclosure,encoding,updateexisting,settings
      * @return mixed
      */

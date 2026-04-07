@@ -268,7 +268,6 @@ class datalynxfield_layout {
     /**
      * Save renderer to db
      *
-     * @param datalynxfield_layout $record
      * @param mixed $formdata Form data to save.
      * @return bool|int true or new id
      */

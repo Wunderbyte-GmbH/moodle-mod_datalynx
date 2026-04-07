@@ -352,8 +352,8 @@ abstract class datalynxfield_base {
     /**
      * Get definition of tags/pattern
      *
-     * @param $tags
-     * @param $entry
+     * @param array $tags
+     * @param stdClass $entry
      * @param array $options
      * @return array
      */
@@ -502,10 +502,10 @@ abstract class datalynxfield_base {
     /**
      * Prepares content from uploaded csv files to be saved to DB
      *
-     * @param $data
-     * @param $importsettings
-     * @param null $csvrecord
-     * @param null $entryid
+     * @param array $data
+     * @param array $importsettings
+     * @param array|null $csvrecord
+     * @param int|null $entryid
      * @return bool
      */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
@@ -587,7 +587,7 @@ abstract class datalynxfield_base {
     /**
      * Formats content for database storage
      *
-     * @param $entry stdClass object containing all the entry contents (from the database, NOT the
+     * @param stdClass $entry stdClass object containing all the entry contents (from the database, NOT the
      *        form!)
      * @param array $values values from the entry form elements
      * @return array
@@ -789,8 +789,8 @@ abstract class datalynxfield_base {
     /**
      * Get the entry ids for the specific sql using the field id and the field value.
      *
-     * @param $sql
-     * @param $params
+     * @param string $sql
+     * @param array $params
      * @return array
      */
     protected function get_entry_ids_for_content(string $sql, array $params): array {

@@ -58,7 +58,7 @@ class datalynx_customfilter_manager {
     /**
      * manager constructor.
      *
-     * @param $dl
+     * @param mixed $dl
      */
     public function __construct($dl) {
         $this->dl = $dl;
@@ -133,7 +133,7 @@ class datalynx_customfilter_manager {
     /**
      * Get filter from url.
      *
-     * @param $url
+     * @param string $url
      * @param bool $raw
      * @return datalynx_customfilter|null
      */
@@ -206,8 +206,8 @@ class datalynx_customfilter_manager {
     /**
      * Process filter actions (update, duplicate, visible, delete).
      *
-     * @param $action
-     * @param $fids
+     * @param string $action
+     * @param array $fids
      * @param bool $confirmed
      * @return array|bool
      * @throws \coding_exception
@@ -389,7 +389,7 @@ class datalynx_customfilter_manager {
     /**
      * Get the backend form for managing a customfilter.
      *
-     * @param $filter
+     * @param datalynx_customfilter $filter
      * @return datalynx_customfilter_backend_form
      */
     public function get_customfilter_backend_form($filter) {
@@ -405,9 +405,9 @@ class datalynx_customfilter_manager {
     /**
      * Display the filter form for editing.
      *
-     * @param $mform
-     * @param $filter
-     * @param null $urlparams
+     * @param datalynx_customfilter_backend_form $mform
+     * @param datalynx_customfilter $filter
+     * @param array|null $urlparams
      * @throws \coding_exception
      */
     public function display_filter_form($mform, $filter, $urlparams = null) {
@@ -426,8 +426,8 @@ class datalynx_customfilter_manager {
     /**
      * Build a customfilter object from form data.
      *
-     * @param $filter
-     * @param $formdata
+     * @param datalynx_customfilter $filter
+     * @param stdClass $formdata
      * @return mixed
      */
     public function get_filter_from_form($filter, $formdata) {
@@ -558,7 +558,7 @@ class datalynx_customfilter_manager {
     /**
      * Get the user's saved filter menu for a given view.
      *
-     * @param $viewid
+     * @param int $viewid
      * @return array
      * @throws \coding_exception
      */
@@ -579,8 +579,8 @@ class datalynx_customfilter_manager {
     /**
      * Set and save a user filter preference for a given view.
      *
-     * @param $filterid
-     * @param $view
+     * @param int $filterid
+     * @param mixed $view
      * @return datalynx_customfilter|null
      * @throws \coding_exception
      */

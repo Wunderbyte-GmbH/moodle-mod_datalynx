@@ -47,12 +47,12 @@ class datalynx_rule_form extends moodleform {
     /**
      * datalynx_rule_form constructor.
      *
-     * @param $rule
-     * @param null $action
-     * @param null $customdata
+     * @param mixed $rule
+     * @param mixed $action
+     * @param mixed $customdata
      * @param string $method
      * @param string $target
-     * @param null $attributes
+     * @param mixed $attributes
      * @param bool $editable
      */
     public function __construct(

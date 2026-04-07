@@ -116,7 +116,7 @@ class renderer extends datalynxfield_renderer {
      *
      * @param MoodleQuickForm $mform The form object.
      * @param int $i The filter index.
-     * @param mixed $value The current search value.
+     * @param string $value The current search value.
      * @return array Array of elements.
      */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {

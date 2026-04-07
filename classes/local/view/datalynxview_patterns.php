@@ -346,8 +346,7 @@ class datalynxview_patterns {
      * ##quickperpage##
      *
      * @param string $tag
-     * @param string $entry
-     * @param array $options
+     * @param array|null $options
      * @return string
      */
     protected function get_userpref_replacements($tag, array $options = null): string {
