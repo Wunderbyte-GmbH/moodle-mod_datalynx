@@ -206,14 +206,15 @@ class datalynxview_patterns {
         if ($views) {
             foreach ($views as $view) {
                 $viewname = $view->name;
-                $viewlink = strpos($tag, "#{{viewlink:$viewname;");
-                $sesslink = strpos($tag, "#{{viewsesslink:$viewname;");
+                $viewlink = strpos($tag, "##viewlink:$viewname;");
+                $sesslink = strpos($tag, "##viewsesslink:$viewname;");
                 if ($viewlink === 0 || $sesslink === 0) {
                     // Already editing the entry so do not show link for editing entry.
                     if ($currentview->user_is_editing() && is_numeric(strpos($tag, 'editentries') && $sesslink === 0)) {
                         return '';
                     }
-                    $tag = trim($tag, '}}#');
+                    // Strip leading and trailing ## delimiters.
+                    $tag = trim($tag, '#');
                     [, $linktext, $urlquery, $class] = explode(';', $tag);
                     // Pix icon for text.
                     if (strpos($linktext, '_pixicon:') === 0) {
@@ -868,8 +869,8 @@ class datalynxview_patterns {
             $cat = get_string('reference', 'datalynx');
             foreach ($views as $viewname) {
                 $viewname = preg_quote($viewname, '/');
-                $patterns["#{{viewlink:$viewname;[^;]*;[^;]*;[a-z\d\-_\s]*}}#"] = [true, $cat];
-                $patterns["#{{viewsesslink:$viewname;[^;]*;[^;]*;[a-z\d\-_\s]*}}#"] = [true, $cat];
+                $patterns["##viewlink:$viewname;[^;]*;[^;]*;[a-z\d\-_\s]*##"] = [true, $cat];
+                $patterns["##viewsesslink:$viewname;[^;]*;[^;]*;[a-z\d\-_\s]*##"] = [true, $cat];
             }
         }
 
@@ -911,10 +912,10 @@ class datalynxview_patterns {
 
         if ($views) {
             foreach ($views as $viewname) {
-                if (strpos($pattern, "#{{viewlink:$viewname;") === 0) {
+                if (strpos($pattern, "##viewlink:$viewname;") === 0) {
                     return true;
                 }
-                if (strpos($pattern, "#{{viewsesslink:$viewname;") === 0) {
+                if (strpos($pattern, "##viewsesslink:$viewname;") === 0) {
                     return true;
                 }
             }

@@ -888,8 +888,9 @@ abstract class base {
         $find = [];
         $replace = [];
         // Regex to mask all known tag patterns. Patterns followed by @ are not masked.
+        // The ##[^#]+## clause already covers ##viewlink:...## and ##viewsesslink:...## tags.
         preg_match_all(
-            '/(?:(\[\[[^\]]+\]\])(?!@)|(##[^#]+##)|(%%[^%]+%%)|(#\{\{[^\}#]+\}\}#))/',
+            '/(?:(\[\[[^\]]+\]\])(?!@)|(##[^#]+##)|(%%[^%]+%%))/',
             $text,
             $matches,
             PREG_PATTERN_ORDER
@@ -1518,7 +1519,7 @@ abstract class base {
             $viewdefinitions = [];
             foreach ($patterns as $tag => $pattern) {
                 if (
-                    (strpos($tag, 'viewlink') !== 0 || strpos($tag, 'viewsesslink') !== 0) &&
+                    (strpos($tag, '##viewlink:') !== 0 && strpos($tag, '##viewsesslink:') !== 0) &&
                         (!array_key_exists('edit', $options) || !$options['edit'])
                 ) {
                     foreach ($fielddefinitions as $fieldtag => $definition) {

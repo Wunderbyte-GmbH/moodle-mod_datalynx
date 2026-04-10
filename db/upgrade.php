@@ -1129,6 +1129,33 @@ function xmldb_datalynx_upgrade($oldversion) {
         // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2026040402, 'datalynx');
     }
+    if ($oldversion < 2026041000) {
+        // Migrate viewlink and viewsesslink tags from #{{...}}# delimiter style to ##...## style.
+        $views = $DB->get_records('datalynx_views');
+        $textcolumns = ['section', 'param1', 'param2', 'param3', 'param4', 'param5',
+            'param6', 'param7', 'param8', 'param9', 'param10'];
+        foreach ($views as $view) {
+            $changed = false;
+            foreach ($textcolumns as $col) {
+                if (empty($view->$col)) {
+                    continue;
+                }
+                $newval = preg_replace('/#\{\{(viewlink:[^}]+)\}\}#/', '##$1##', $view->$col);
+                $newval = preg_replace('/#\{\{(viewsesslink:[^}]+)\}\}#/', '##$1##', $newval);
+                if ($newval !== $view->$col) {
+                    $view->$col = $newval;
+                    $changed = true;
+                }
+            }
+            if ($changed) {
+                $DB->update_record('datalynx_views', $view);
+            }
+        }
+        // Clear view patterns cache to force recomputation with new tag format.
+        $DB->set_field_select('datalynx_views', 'patterns', null, '1=1');
+        // Datalynx savepoint reached.
+        upgrade_mod_savepoint(true, 2026041000, 'datalynx');
+    }
     return true;
 }
 
