@@ -24,7 +24,6 @@
 
 namespace mod_datalynx\local\view;
 
-use dml_exception;
 use html_writer;
 use mod_datalynx\local\filter\datalynx_filter_manager;
 use mod_datalynx\local\view\base;
@@ -258,7 +257,7 @@ class datalynxview_patterns {
      * Find out if user can add a new entry
      *
      * @param number $userid
-     * @return boolean true if user is allowed to add a new entry
+     * @return bool true if user is allowed to add a new entry
      */
     private function user_can_add_new_entry($userid = 0) {
         global $USER, $DB;
@@ -1192,7 +1191,6 @@ class datalynxview_patterns {
      * @param string $tag Custom filter tag string.
      * @param bool $return Whether to return HTML instead of printing.
      * @return string
-     * @throws dml_exception
      */
     protected function print_custom_filter($tag, $return = false) {
         global $DB;
