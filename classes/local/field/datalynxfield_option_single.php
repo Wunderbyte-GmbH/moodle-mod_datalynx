@@ -93,7 +93,6 @@ class datalynxfield_option_single extends datalynxfield_option {
      * Computes which values of this field have already been chosen by the given user and
      * determines which ones have reached their limit
      *
-     * @param int $userid ID of the user modifying an entry; if not specified defaults to $USER->id
      * @param int $entryid ID of the entry being edited; 0 for new entries.
      * @return array an array of disabled values
      */

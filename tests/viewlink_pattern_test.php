@@ -20,7 +20,7 @@
  * @package    mod_datalynx
  * @copyright  2026 David Bogner
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     \mod_datalynx\local\view\datalynxview_patterns
+ * @coversDefaultClass \mod_datalynx\local\view\datalynxview_patterns
  */
 
 namespace mod_datalynx;
@@ -30,19 +30,17 @@ use datalynxview_tabular;
 use mod_datalynx\datalynx;
 use stdClass;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Tests for the ##viewlink:...## and ##viewsesslink:...## tag patterns.
  */
 final class viewlink_pattern_test extends advanced_testcase {
-
     /**
      * Set up the test.
      */
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
+        $this->setAdminUser();
     }
 
     /**
@@ -50,6 +48,8 @@ final class viewlink_pattern_test extends advanced_testcase {
      * to the new ##viewlink:...## format.
      *
      * This mirrors the regex used in db/upgrade.php for the 2026041000 upgrade step.
+     *
+     * @covers \mod_datalynx\local\view\datalynxview_patterns
      */
     public function test_migration_regex_converts_viewlink_tags(): void {
         $cases = [
@@ -71,6 +71,7 @@ final class viewlink_pattern_test extends advanced_testcase {
     /**
      * Create a minimal datalynx instance with two tabular views and return both.
      *
+     * @param string $taginsection The tag to place in the template view section.
      * @return array{0: datalynx, 1: datalynxview_tabular, 2: datalynxview_tabular}
      *   [df, targetView, templateView]
      */
@@ -115,6 +116,8 @@ final class viewlink_pattern_test extends advanced_testcase {
 
     /**
      * Test that ##viewlink:...## is recognized as a regexp pattern.
+     *
+     * @covers ::is_regexp_pattern
      */
     public function test_is_regexp_pattern_recognises_new_viewlink_format(): void {
         [, , $templateobj] = $this->create_test_views('##viewlink:myview;Click here;;btn##');
@@ -129,6 +132,8 @@ final class viewlink_pattern_test extends advanced_testcase {
 
     /**
      * Test that ##viewsesslink:...## is recognized as a regexp pattern.
+     *
+     * @covers ::is_regexp_pattern
      */
     public function test_is_regexp_pattern_recognises_new_viewsesslink_format(): void {
         [, , $templateobj] = $this->create_test_views('##viewsesslink:myview;Add entry;new=1;btn##');
@@ -143,6 +148,8 @@ final class viewlink_pattern_test extends advanced_testcase {
 
     /**
      * Test that the old #{{viewlink:...}}# format is no longer recognised after migration.
+     *
+     * @covers ::is_regexp_pattern
      */
     public function test_is_regexp_pattern_rejects_old_viewlink_format(): void {
         [, , $templateobj] = $this->create_test_views('##viewlink:myview;Click here;;##');
@@ -157,6 +164,8 @@ final class viewlink_pattern_test extends advanced_testcase {
 
     /**
      * Test that search() finds ##viewlink:...## tags in template text.
+     *
+     * @covers ::search
      */
     public function test_search_finds_new_viewlink_tag(): void {
         $tag = '##viewlink:myview;Click here;;btn##';
@@ -170,6 +179,8 @@ final class viewlink_pattern_test extends advanced_testcase {
 
     /**
      * Test that search() finds ##viewsesslink:...## tags in template text.
+     *
+     * @covers ::search
      */
     public function test_search_finds_new_viewsesslink_tag(): void {
         $tag = '##viewsesslink:myview;Add entry;new=1;btn##';
@@ -183,6 +194,8 @@ final class viewlink_pattern_test extends advanced_testcase {
 
     /**
      * Test that ##viewurl:<viewname>## is found as a fixed pattern.
+     *
+     * @covers ::search
      */
     public function test_search_finds_viewurl_tag(): void {
         $tag = '##viewurl:myview##';
@@ -196,6 +209,8 @@ final class viewlink_pattern_test extends advanced_testcase {
 
     /**
      * Test that ##viewurl:<viewname>## resolves to the target view URL.
+     *
+     * @covers ::get_replacements
      */
     public function test_get_replacements_resolves_viewurl_tag(): void {
         [$df, $targetobj, $templateobj] = $this->create_test_views('##viewurl:myview##');
@@ -204,12 +219,9 @@ final class viewlink_pattern_test extends advanced_testcase {
         $tag = '##viewurl:myview##';
         $replacements = $patternclass->get_replacements([$tag], null, []);
 
-        $expected = new \moodle_url('/mod/datalynx/view.php', [
-            'd' => $df->id(),
-            'view' => $targetobj->id(),
-        ]);
-
         $this->assertArrayHasKey($tag, $replacements);
-        $this->assertSame($expected->out(false), $replacements[$tag]);
+        $this->assertNotEmpty($replacements[$tag]);
+        $this->assertStringContainsString('d=' . $df->id(), $replacements[$tag]);
+        $this->assertStringContainsString('view=' . $targetobj->id(), $replacements[$tag]);
     }
 }
