@@ -1444,7 +1444,7 @@ class datalynx {
      * datalynx instance visible to the current user
      * Updates $this->views
      *
-     * @param bool $forceget if true, the entries will be reread form the database
+     * @param bool $forceget if true, the entries will be reread from the database
      * @param string $sort SQL ORDER BY clause
      * @return array an array of datalynx_views entry objects
      */
