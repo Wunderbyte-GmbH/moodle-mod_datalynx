@@ -1444,7 +1444,7 @@ class datalynx {
      * datalynx instance visible to the current user
      * Updates $this->views
      *
-     * @param boolean $forceget if true, the entries will be reread form the database
+     * @param bool $forceget if true, the entries will be reread from the database
      * @param string $sort SQL ORDER BY clause
      * @return array an array of datalynx_views entry objects
      */
@@ -1636,8 +1636,8 @@ class datalynx {
      * Get the view objects visible to the user as an array indexed by the view id
      *
      * @param array $exclude array of viewids to exclude
-     * @param boolean $forceget true to get from db directly
-     * @param string $sort
+     * @param bool $forceget true to get from db directly
+     * @param string $sort SQL ORDER BY clause
      * @return array of view objects indexed by view id or false if no views are found
      */
     public function get_views(array $exclude = [], bool $forceget = false, string $sort = ''): array {
