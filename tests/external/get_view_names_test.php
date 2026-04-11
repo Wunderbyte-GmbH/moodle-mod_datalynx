@@ -32,6 +32,7 @@ use core_external\external_api;
  * @copyright  2026 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversDefaultClass \mod_datalynx\external\get_view_names
+ * @runTestsInSeparateProcesses
  */
 final class get_view_names_test extends advanced_testcase {
     /**
@@ -85,7 +86,7 @@ final class get_view_names_test extends advanced_testcase {
         $result = get_view_names::execute($instance->id);
         $result = external_api::clean_returnvalue(get_view_names::execute_returns(), $result);
 
-        $filtered = array_values(array_filter($result, static function(array $view): bool {
+        $filtered = array_values(array_filter($result, static function (array $view): bool {
             return in_array($view['name'], ['Alpha', 'Zulu'], true);
         }));
 
