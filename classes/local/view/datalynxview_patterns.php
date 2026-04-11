@@ -734,6 +734,7 @@ class datalynxview_patterns {
             $this->userpref_patterns(),
             $this->action_patterns(),
             $this->paging_patterns(),
+            $this->viewlink_patterns($checkvisibility),
             $this->bulkedit_patterns()
         );
         return $patterns;
@@ -841,8 +842,44 @@ class datalynxview_patterns {
     }
 
     /**
+     * Get viewlink and viewsesslink stub menu patterns for each visible view.
+     *
+     * Each pattern is a concrete (non-regex) stub that can be selected from the dropdown
+     * and inserted into the view template. The JS patterndialogue then handles them
+     * as view-link tags (matched by VIEW_LINK_TAG_RE).
+     *
+     * @param boolean $checkvisibility true if only views visible to the user should be considered
+     * @return array multidimensional with pattern as key and array with showinmenu and category as value
+     */
+    protected function viewlink_patterns($checkvisibility = true) {
+        $df = $this->view->get_dl();
+
+        $views = [];
+        $patterns = [];
+        if ($checkvisibility) {
+            $views = $df->get_views_menu();
+        } else {
+            $viewobjects = $df->get_all_views();
+            if (!empty($viewobjects)) {
+                foreach ($viewobjects as $viewid => $view) {
+                    $views[$viewid] = $view->name;
+                }
+            }
+        }
+
+        if ($views) {
+            $cat = get_string('reference', 'datalynx');
+            foreach ($views as $viewname) {
+                $patterns["##viewlink:$viewname;;;##"] = [true, $cat];
+                $patterns["##viewsesslink:$viewname;;;##"] = [true, $cat];
+            }
+        }
+
+        return $patterns;
+    }
+
+    /**
      * viewlink and viewsesslink tags with localised string
-     * TODO Currently not included in the menu
      *
      * @param boolean $checkvisibility true if only views visible to the user should be considered
      * @return array multidimensional with pattern as key and array with showinmenu and category as value
