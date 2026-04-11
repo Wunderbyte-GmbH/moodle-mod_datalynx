@@ -24,7 +24,6 @@
 
 namespace mod_datalynx\local\view;
 
-use dml_exception;
 use html_writer;
 use mod_datalynx\local\filter\datalynx_filter_manager;
 use mod_datalynx\local\view\base;
@@ -258,7 +257,7 @@ class datalynxview_patterns {
      * Find out if user can add a new entry
      *
      * @param number $userid
-     * @return boolean true if user is allowed to add a new entry
+     * @return bool true if user is allowed to add a new entry
      */
     private function user_can_add_new_entry($userid = 0) {
         global $USER, $DB;
@@ -734,6 +733,7 @@ class datalynxview_patterns {
             $this->userpref_patterns(),
             $this->action_patterns(),
             $this->paging_patterns(),
+            $this->viewlink_patterns($checkvisibility),
             $this->bulkedit_patterns()
         );
         return $patterns;
@@ -841,8 +841,44 @@ class datalynxview_patterns {
     }
 
     /**
+     * Get viewlink and viewsesslink stub menu patterns for each visible view.
+     *
+     * Each pattern is a concrete (non-regex) stub that can be selected from the dropdown
+     * and inserted into the view template. The JS patterndialogue then handles them
+     * as view-link tags (matched by VIEW_LINK_TAG_RE).
+     *
+     * @param bool $checkvisibility true if only views visible to the user should be considered
+     * @return array multidimensional with pattern as key and array with showinmenu and category as value
+     */
+    protected function viewlink_patterns($checkvisibility = true) {
+        $df = $this->view->get_dl();
+
+        $views = [];
+        $patterns = [];
+        if ($checkvisibility) {
+            $views = $df->get_views_menu();
+        } else {
+            $viewobjects = $df->get_all_views();
+            if (!empty($viewobjects)) {
+                foreach ($viewobjects as $viewid => $view) {
+                    $views[$viewid] = $view->name;
+                }
+            }
+        }
+
+        if ($views) {
+            $cat = get_string('reference', 'datalynx');
+            foreach ($views as $viewname) {
+                $patterns["##viewlink:$viewname;;;##"] = [true, $cat];
+                $patterns["##viewsesslink:$viewname;;;##"] = [true, $cat];
+            }
+        }
+
+        return $patterns;
+    }
+
+    /**
      * viewlink and viewsesslink tags with localised string
-     * TODO Currently not included in the menu
      *
      * @param boolean $checkvisibility true if only views visible to the user should be considered
      * @return array multidimensional with pattern as key and array with showinmenu and category as value
@@ -1155,7 +1191,6 @@ class datalynxview_patterns {
      * @param string $tag Custom filter tag string.
      * @param bool $return Whether to return HTML instead of printing.
      * @return string
-     * @throws dml_exception
      */
     protected function print_custom_filter($tag, $return = false) {
         global $DB;
