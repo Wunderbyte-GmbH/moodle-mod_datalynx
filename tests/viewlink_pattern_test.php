@@ -180,4 +180,36 @@ final class viewlink_pattern_test extends advanced_testcase {
 
         $this->assertContains($tag, $found, 'search() should find ##viewsesslink:...## tag in text');
     }
+
+    /**
+     * Test that ##viewurl:<viewname>## is found as a fixed pattern.
+     */
+    public function test_search_finds_viewurl_tag(): void {
+        $tag = '##viewurl:myview##';
+        [, , $templateobj] = $this->create_test_views($tag);
+
+        $patternclass = $templateobj->patternclass();
+        $found = $patternclass->search("Header $tag footer", false);
+
+        $this->assertContains($tag, $found, 'search() should find ##viewurl:...## tag in text');
+    }
+
+    /**
+     * Test that ##viewurl:<viewname>## resolves to the target view URL.
+     */
+    public function test_get_replacements_resolves_viewurl_tag(): void {
+        [$df, $targetobj, $templateobj] = $this->create_test_views('##viewurl:myview##');
+
+        $patternclass = $templateobj->patternclass();
+        $tag = '##viewurl:myview##';
+        $replacements = $patternclass->get_replacements([$tag], null, []);
+
+        $expected = new \moodle_url('/mod/datalynx/view.php', [
+            'd' => $df->id(),
+            'view' => $targetobj->id(),
+        ]);
+
+        $this->assertArrayHasKey($tag, $replacements);
+        $this->assertSame($expected->out(false), $replacements[$tag]);
+    }
 }

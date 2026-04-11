@@ -25,6 +25,15 @@
 defined('MOODLE_INTERNAL') || die();
 
 $functions = [
+        'mod_datalynx_get_view_names' => [
+                'classname'   => 'mod_datalynx\external\get_view_names',
+                'methodname'  => 'execute',
+                'classpath'   => '',
+                'description' => 'Fetch all views for a datalynx instance.',
+                'type'        => 'read',
+                'capabilities' => 'mod/datalynx:managetemplates',
+                'ajax'        => true,
+        ],
         'mod_datalynx_team_subscription' => [
                 'classname'   => 'mod_datalynx\external\team_subscription',
                 'methodname'  => 'execute',

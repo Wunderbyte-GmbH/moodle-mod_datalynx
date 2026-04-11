@@ -33,6 +33,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+import Ajax from 'core/ajax';
 import * as Str from 'core/str';
 import Modal from 'core/modal';
 import ModalSaveCancel from 'core/modal_save_cancel';
@@ -40,6 +41,8 @@ import ModalEvents from 'core/modal_events';
 
 /** Regex that matches a full [[field|behavior|renderer]] tag (behavior and renderer optional). */
 const FIELD_TAG_RE = /^\[\[([^\|\]]+)(?:\|([^\|\]]*))?(?:\|([^\|\]]*))?\]\]$/;
+const VIEW_URL_TAG_RE = /^##viewurl(?::([^#]+))?##$/;
+const VIEW_LINK_TAG_RE = /^##(viewlink|viewsesslink):([^;#]+);([^;#]*);([^;#]*);([^#]*)##$/;
 
 /**
  * Parse a field tag pattern into its components.
@@ -73,10 +76,80 @@ function buildFieldTagPattern(field, behavior, renderer) {
     return '[[' + field + ']]';
 }
 
+/**
+ * Escape HTML special characters for safe inline rendering.
+ * @param {string} value
+ * @returns {string}
+ */
+function escapeHtml(value) {
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+/**
+ * Parse a view-reference pattern into its editable parts.
+ * @param {string} pattern
+ * @returns {{type:string, viewname:string, linktext:string, urlquery:string, cssclass:string}}
+ */
+function parseViewTag(pattern) {
+    let match = pattern.match(VIEW_LINK_TAG_RE);
+    if (match) {
+        return {
+            type: match[1],
+            viewname: match[2] || '',
+            linktext: match[3] || '',
+            urlquery: match[4] || '',
+            cssclass: match[5] || '',
+        };
+    }
+
+    match = pattern.match(VIEW_URL_TAG_RE);
+    if (match) {
+        return {
+            type: 'viewurl',
+            viewname: match[1] || '',
+            linktext: '',
+            urlquery: '',
+            cssclass: '',
+        };
+    }
+
+    return {
+        type: '',
+        viewname: '',
+        linktext: '',
+        urlquery: '',
+        cssclass: '',
+    };
+}
+
+/**
+ * Build a view-reference pattern string.
+ * @param {string} type
+ * @param {string} viewname
+ * @param {string} linktext
+ * @param {string} urlquery
+ * @param {string} cssclass
+ * @returns {string}
+ */
+function buildViewTagPattern(type, viewname, linktext = '', urlquery = '', cssclass = '') {
+    if (type === 'viewurl') {
+        return viewname ? `##viewurl:${viewname}##` : '##viewurl##';
+    }
+
+    return `##${type}:${viewname};${linktext};${urlquery};${cssclass}##`;
+}
+
 class PatternDialogue {
     constructor(options) {
         this.options = options;
-        this._currentButton = null;
+        this._editorModes = new Map();
+        this._referenceEditors = new Set(options.referenceeditors || []);
+        this._viewsPromise = null;
         // Track which button DOM elements already have a click listener.
         // Using a WeakSet (keyed on the actual element reference) instead of a
         // data-attribute so that fresh DOM nodes created after a TinyMCE source-edit
@@ -85,20 +158,21 @@ class PatternDialogue {
     }
 
     init() {
-        // _editorsWithMenus: editors that have a FIELD tag menu and therefore need
-        // tag→button replacement and the click dialog.
-        // Editors with only a 'general' tag menu (esection_editor) must NOT get
-        // replaceTagsWithButtons — their ##action## content works fine as plain text
-        // and was working before these JS changes. Touching it causes ## to be lost.
-        this._editorsWithMenus = new Set();
-
         document.querySelectorAll('select[id$="_tag_menu"]').forEach((dropdown) => {
             dropdown.addEventListener('change', () => this.insertTagFromDropdown(dropdown));
 
-            // Only 'field' tag menus require button-replacement and dialogs.
-            const m = dropdown.id.match(/^(.+_editor)_field_tag_menu$/);
-            if (m) {
-                this._editorsWithMenus.add('id_' + m[1]);
+            const match = dropdown.id.match(/^(.+_editor)_(.+)_tag_menu$/);
+            if (!match) {
+                return;
+            }
+
+            const editorId = 'id_' + match[1];
+            const tagType = match[2];
+
+            if (tagType === 'field') {
+                this._editorModes.set(editorId, 'field');
+            } else if (tagType === 'general' && this._referenceEditors.has(editorId)) {
+                this._editorModes.set(editorId, 'reference');
             }
         });
 
@@ -117,28 +191,35 @@ class PatternDialogue {
     replaceTagsWithButtons(editor) {
         const div = document.createElement('div');
         div.innerHTML = editor.getContent();
+        const mode = this._editorModes.get(editor.id);
 
-        div.innerHTML = div.innerHTML
-            // ##action## tags
-            .replace(/##([^#]+)##/g, (match, action) =>
-                '<button type="button" contenteditable="false"' +
-                ' class="btn btn-sm btn-outline-info"' +
-                ' data-action-tag-button="true"' +
-                ' data-datalynx-field="' + match + '">' + action + '</button>'
-            )
-            // [[field|behavior|renderer]] tags
+        if (mode === 'field') {
+            div.innerHTML = this.replaceFieldTagsInHtml(div.innerHTML);
+        } else if (mode === 'reference') {
+            div.innerHTML = this.replaceReferenceTagsInHtml(div.innerHTML);
+        }
+
+        editor.setContent(div.innerHTML);
+    }
+
+    replaceFieldTagsInHtml(html) {
+        return html
+            .replace(/##([^#]+)##/g, (match, action) => this.buildActionTagButtonHtml(match, action))
             .replace(/\[\[([^\|\]]+)(?:\|([^\|\]]*))?(?:\|([^\|\]]*))?\]\]/g,
                 (match, field, behavior, renderer) => {
                     behavior = behavior || '';
                     renderer = renderer || '';
-                    return '<button type="button" contenteditable="false"' +
-                        ' class="btn btn-sm btn-outline-secondary datalynx-field-tag"' +
-                        ' data-datalynx-field="' + match + '">' +
-                        this.buildButtonLabel(field, behavior, renderer) + '</button>';
+                    return this.buildFieldTagButtonHtml(match, field, behavior, renderer);
                 }
             );
+    }
 
-        editor.setContent(div.innerHTML);
+    replaceReferenceTagsInHtml(html) {
+        return html
+            .replace(/##viewurl(?::[^#]+)?##/g, (match) => this.buildViewTagButtonHtml(match))
+            .replace(/##(?:viewlink|viewsesslink):[^;#]+;[^;#]*;[^;#]*;[^#]*##/g,
+                (match) => this.buildViewTagButtonHtml(match)
+            );
     }
 
     /**
@@ -152,7 +233,7 @@ class PatternDialogue {
         const div = document.createElement('div');
         div.innerHTML = html;
         div.querySelectorAll(
-            'button[data-action-tag-button], button.datalynx-field-tag'
+            'button[data-action-tag-button], button.datalynx-field-tag, button.datalynx-view-tag'
         ).forEach((btn) => {
             const tag = btn.getAttribute('data-datalynx-field') || '';
             btn.replaceWith(tag);
@@ -173,14 +254,49 @@ class PatternDialogue {
      * @returns {string}
      */
     buildButtonLabel(field, behavior, renderer) {
-        let html = field;
+        let html = escapeHtml(field);
         if (behavior) {
-            html += ' <span class="badge badge-info bg-info" style="pointer-events:none">' + behavior + '</span>';
+            html += ' <span class="badge badge-info bg-info" style="pointer-events:none">' + escapeHtml(behavior) + '</span>';
         }
         if (renderer) {
-            html += ' <span class="badge badge-secondary bg-secondary" style="pointer-events:none">' + renderer + '</span>';
+            html += ' <span class="badge badge-secondary bg-secondary" style="pointer-events:none">' +
+                escapeHtml(renderer) + '</span>';
         }
         return html;
+    }
+
+    buildActionTagButtonHtml(pattern, action) {
+        return '<button type="button" contenteditable="false"' +
+            ' class="btn btn-sm btn-outline-info"' +
+            ' data-action-tag-button="true"' +
+            ' data-datalynx-field="' + escapeHtml(pattern) + '">' + escapeHtml(action) + '</button>';
+    }
+
+    buildFieldTagButtonHtml(pattern, field, behavior, renderer) {
+        return '<button type="button" contenteditable="false"' +
+            ' class="btn btn-sm btn-outline-secondary datalynx-field-tag"' +
+            ' data-datalynx-field="' + escapeHtml(pattern) + '">' +
+            this.buildButtonLabel(field, behavior, renderer) + '</button>';
+    }
+
+    buildViewTagButtonLabel(type, viewname, linktext) {
+        let html = escapeHtml(type);
+        if (viewname) {
+            html += ': ' + escapeHtml(viewname);
+        }
+        if (linktext) {
+            html += ' <span class="badge badge-primary bg-primary" style="pointer-events:none">' +
+                escapeHtml(linktext) + '</span>';
+        }
+        return html;
+    }
+
+    buildViewTagButtonHtml(pattern) {
+        const {type, viewname, linktext} = parseViewTag(pattern);
+        return '<button type="button" contenteditable="false"' +
+            ' class="btn btn-sm btn-outline-primary datalynx-view-tag"' +
+            ' data-datalynx-field="' + escapeHtml(pattern) + '">' +
+            this.buildViewTagButtonLabel(type, viewname, linktext) + '</button>';
     }
 
     // -------------------------------------------------------------------------
@@ -193,14 +309,13 @@ class PatternDialogue {
      */
     reInitializeButtons(editor) {
         const allBtns = editor.getBody().querySelectorAll(
-            'button[data-action-tag-button], button.datalynx-field-tag'
+            'button[data-action-tag-button], button.datalynx-field-tag, button.datalynx-view-tag'
         );
         allBtns.forEach((button) => {
             if (!this._initializedButtons.has(button)) {
                 button.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    this._currentButton = button;
                     this.openMoodleDialog(button);
                 });
                 this._initializedButtons.add(button);
@@ -212,7 +327,37 @@ class PatternDialogue {
                 );
                 button.innerHTML = this.buildButtonLabel(field, behavior, renderer);
             }
+            if (button.classList.contains('datalynx-view-tag')) {
+                const {type, viewname, linktext} = parseViewTag(
+                    button.getAttribute('data-datalynx-field') || ''
+                );
+                button.innerHTML = this.buildViewTagButtonLabel(type, viewname, linktext);
+            }
         });
+    }
+
+    async getViews() {
+        if (!this._viewsPromise) {
+            this._viewsPromise = Ajax.call([{
+                methodname: 'mod_datalynx_get_view_names',
+                args: {d: this.options.datalynxid},
+            }])[0];
+        }
+
+        return this._viewsPromise;
+    }
+
+    removeButton(button) {
+        const ed = this.findEditorForButton(button);
+        if (ed) {
+            ed.dom.remove(button);
+            ed.getBody().querySelectorAll('.mce-offscreen-selection').forEach(
+                el => el.parentNode.removeChild(el)
+            );
+            ed.undoManager.add();
+        } else {
+            button.remove();
+        }
     }
 
     // -------------------------------------------------------------------------
@@ -249,11 +394,8 @@ class PatternDialogue {
                 return;
             }
             registered.add(editor.id);
-
-            // Only editors with a FIELD tag menu need button-replacement and SaveContent.
-            // Editors with only general/character menus (e.g. esection_editor) must be left
-            // untouched — their ##action## content is stored as plain text and works correctly.
-            if (!this._editorsWithMenus.has(editor.id)) {
+            const mode = this._editorModes.get(editor.id);
+            if (!mode) {
                 return;
             }
 
@@ -294,11 +436,18 @@ class PatternDialogue {
      */
     async openMoodleDialog(button) {
         const isFieldTag = button.classList.contains('datalynx-field-tag');
+        const isViewTag = button.classList.contains('datalynx-view-tag');
 
-        const [behaviorLabel, rendererLabel, deleteLabel] = await Promise.all([
+        const [behaviorLabel, rendererLabel, deleteLabel, viewLabel, linkTextLabel, urlQueryLabel, classLabel,
+            currentViewLabel] = await Promise.all([
             Str.get_string('behavior', 'datalynx'),
             Str.get_string('renderer', 'datalynx'),
             Str.get_string('deletetag', 'datalynx'),
+            Str.get_string('view', 'datalynx'),
+            Str.get_string('viewpatternlinktext', 'datalynx'),
+            Str.get_string('viewpatternurlquery', 'datalynx'),
+            Str.get_string('viewpatternclass', 'datalynx'),
+            Str.get_string('targetviewthis', 'datalynx'),
         ]);
 
         const pattern = button.getAttribute('data-datalynx-field') || '';
@@ -369,22 +518,107 @@ class PatternDialogue {
             const deleteTagBtn = modal.getBody()[0].querySelector('[data-action="dlx-delete"]');
             if (deleteTagBtn) {
                 deleteTagBtn.addEventListener('click', () => {
-                    const ed = this.findEditorForButton(button);
-                    if (ed) {
-                        // Remove the button and the offscreen-selection clone TinyMCE creates
-                        // for contenteditable=false elements when they are selected.
-                        ed.dom.remove(button);
-                        ed.getBody().querySelectorAll('.mce-offscreen-selection').forEach(
-                            el => el.parentNode.removeChild(el)
-                        );
-                        ed.undoManager.add();
-                    } else {
-                        button.remove();
-                    }
+                    this.removeButton(button);
                     modal.hide();
                 });
             }
 
+        } else if (isViewTag) {
+            const {type, viewname, linktext, urlquery, cssclass} = parseViewTag(pattern);
+            const views = await this.getViews();
+            const titleStr = await Str.get_string('tagproperties', 'datalynx', {
+                tagtype: await Str.get_string('reference', 'datalynx'),
+                tagname: type,
+            });
+            const selectOptions = [];
+
+            if (type === 'viewurl') {
+                selectOptions.push(
+                    '<option value=""' + (!viewname ? ' selected="selected"' : '') + '>' +
+                    escapeHtml(currentViewLabel) + '</option>'
+                );
+            }
+
+            views.forEach((view) => {
+                selectOptions.push(
+                    '<option value="' + escapeHtml(view.name) + '"' +
+                    (view.name === viewname ? ' selected="selected"' : '') + '>' +
+                    escapeHtml(view.name) + '</option>'
+                );
+            });
+
+            const isViewUrl = type === 'viewurl';
+            let bodyHtml =
+                '<div class="form-group">' +
+                '<label for="dlx-view-select">' + viewLabel + '</label>' +
+                '<select class="form-control custom-select" id="dlx-view-select" name="dlx-view-select">' +
+                selectOptions.join('') + '</select></div>';
+
+            if (!isViewUrl) {
+                bodyHtml +=
+                    '<div class="form-group">' +
+                    '<label for="dlx-link-text">' + linkTextLabel + '</label>' +
+                    '<input type="text" class="form-control" id="dlx-link-text" name="dlx-link-text" value="' +
+                    escapeHtml(linktext) + '"></div>' +
+                    '<div class="form-group">' +
+                    '<label for="dlx-url-query">' + urlQueryLabel + '</label>' +
+                    '<input type="text" class="form-control" id="dlx-url-query" name="dlx-url-query" value="' +
+                    escapeHtml(urlquery) + '"></div>' +
+                    '<div class="form-group">' +
+                    '<label for="dlx-css-class">' + classLabel + '</label>' +
+                    '<input type="text" class="form-control" id="dlx-css-class" name="dlx-css-class" value="' +
+                    escapeHtml(cssclass) + '"></div>';
+            }
+
+            bodyHtml +=
+                '<div class="mt-2">' +
+                '<button type="button" class="btn btn-danger btn-sm" data-action="dlx-delete" data-region="delete-tag">' +
+                deleteLabel + '</button></div>';
+
+            const modal = await ModalSaveCancel.create({
+                title: titleStr,
+                body: bodyHtml,
+                show: true,
+                removeOnClose: true,
+            });
+
+            modal.getRoot().on(ModalEvents.save, (e) => {
+                e.preventDefault();
+                const modalBody = modal.getBody()[0];
+                const selectedView = modalBody.querySelector('#dlx-view-select')?.value || '';
+                if (!isViewUrl && !selectedView) {
+                    return;
+                }
+
+                const newPattern = buildViewTagPattern(
+                    type,
+                    selectedView,
+                    modalBody.querySelector('#dlx-link-text')?.value || '',
+                    modalBody.querySelector('#dlx-url-query')?.value || '',
+                    modalBody.querySelector('#dlx-css-class')?.value || ''
+                );
+
+                const ed = this.findEditorForButton(button);
+                const {type: newType, viewname: newViewName, linktext: newLinkText} = parseViewTag(newPattern);
+                if (ed) {
+                    ed.dom.setAttrib(button, 'data-datalynx-field', newPattern);
+                    button.innerHTML = this.buildViewTagButtonLabel(newType, newViewName, newLinkText);
+                    ed.undoManager.add();
+                } else {
+                    button.setAttribute('data-datalynx-field', newPattern);
+                    button.innerHTML = this.buildViewTagButtonLabel(newType, newViewName, newLinkText);
+                }
+
+                modal.hide();
+            });
+
+            const deleteTagBtn = modal.getBody()[0].querySelector('[data-action="dlx-delete"]');
+            if (deleteTagBtn) {
+                deleteTagBtn.addEventListener('click', () => {
+                    this.removeButton(button);
+                    modal.hide();
+                });
+            }
         } else {
             // Action tag: display the tag text, allow deletion only.
             const action = pattern.replace(/^##|##$/g, '');
@@ -404,16 +638,7 @@ class PatternDialogue {
             const deleteActionBtn = modal.getBody()[0].querySelector('[data-action="dlx-delete"]');
             if (deleteActionBtn) {
                 deleteActionBtn.addEventListener('click', () => {
-                    const ed = this.findEditorForButton(button);
-                    if (ed) {
-                        ed.dom.remove(button);
-                        ed.getBody().querySelectorAll('.mce-offscreen-selection').forEach(
-                            el => el.parentNode.removeChild(el)
-                        );
-                        ed.undoManager.add();
-                    } else {
-                        button.remove();
-                    }
+                    this.removeButton(button);
                     modal.hide();
                 });
             }
@@ -428,31 +653,27 @@ class PatternDialogue {
         const selectedValue = dropdown.value;
         const actionTagMatch = selectedValue.match(/^##(.+?)##$/);
         const fieldTagMatch  = selectedValue.match(FIELD_TAG_RE);
+        const viewTagMatch = selectedValue.match(VIEW_LINK_TAG_RE) || selectedValue.match(VIEW_URL_TAG_RE);
         let contentToInsert  = '';
-
-        if (actionTagMatch) {
-            const action = actionTagMatch[1];
-            contentToInsert =
-                '<button type="button" contenteditable="false"' +
-                ' class="btn btn-sm btn-outline-info"' +
-                ' data-action-tag-button="true"' +
-                ' data-datalynx-field="' + selectedValue + '">' + action + '</button>';
-        } else if (fieldTagMatch) {
-            const field    = fieldTagMatch[1];
-            const behavior = fieldTagMatch[2] || '';
-            const renderer = fieldTagMatch[3] || '';
-            contentToInsert =
-                '<button type="button" contenteditable="false"' +
-                ' class="btn btn-sm btn-outline-secondary datalynx-field-tag"' +
-                ' data-datalynx-field="' + selectedValue + '">' +
-                this.buildButtonLabel(field, behavior, renderer) + '</button>';
-        } else {
-            contentToInsert = selectedValue;
-        }
 
         const m = dropdown.id.match(/^(.+_editor)_.+_tag_menu$/);
         if (m) {
             const editorId = 'id_' + m[1];
+            const mode = this._editorModes.get(editorId);
+
+            if (mode === 'field' && actionTagMatch) {
+                contentToInsert = this.buildActionTagButtonHtml(selectedValue, actionTagMatch[1]);
+            } else if (mode === 'field' && fieldTagMatch) {
+                const field = fieldTagMatch[1];
+                const behavior = fieldTagMatch[2] || '';
+                const renderer = fieldTagMatch[3] || '';
+                contentToInsert = this.buildFieldTagButtonHtml(selectedValue, field, behavior, renderer);
+            } else if (mode === 'reference' && viewTagMatch) {
+                contentToInsert = this.buildViewTagButtonHtml(selectedValue);
+            } else {
+                contentToInsert = selectedValue;
+            }
+
             const ed = window.tinyMCE?.get(editorId);
             if (ed) {
                 ed.insertContent(contentToInsert);
