@@ -848,7 +848,7 @@ class datalynxview_patterns {
      * and inserted into the view template. The JS patterndialogue then handles them
      * as view-link tags (matched by VIEW_LINK_TAG_RE).
      *
-     * @param boolean $checkvisibility true if only views visible to the user should be considered
+     * @param bool $checkvisibility true if only views visible to the user should be considered
      * @return array multidimensional with pattern as key and array with showinmenu and category as value
      */
     protected function viewlink_patterns($checkvisibility = true) {
