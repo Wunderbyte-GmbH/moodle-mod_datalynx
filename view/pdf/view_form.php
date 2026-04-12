@@ -49,6 +49,7 @@ class datalynxview_pdf_form extends datalynxview_base_form {
 
         $mform->addElement('editor', 'eparam2_editor', '', $editorattr, $editoroptions['param2']);
         $mform->setDefault("eparam2_editor[format]", FORMAT_PLAIN);
+        $this->add_tags_selector('eparam2_editor', 'general');
         $this->add_tags_selector('eparam2_editor', 'field');
         $this->add_tags_selector('eparam2_editor', 'character');
 

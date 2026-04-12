@@ -224,4 +224,52 @@ final class viewlink_pattern_test extends advanced_testcase {
         $this->assertStringContainsString('d=' . $df->id(), $replacements[$tag]);
         $this->assertStringContainsString('view=' . $targetobj->id(), $replacements[$tag]);
     }
+
+    /**
+     * Test that ##viewlink:<viewname>## keeps link text, params, and CSS classes.
+     *
+     * @covers ::get_replacements
+     */
+    public function test_get_replacements_resolves_viewlink_tag_with_params_and_class(): void {
+        [$df, $targetobj, $templateobj] = $this->create_test_views(
+            '##viewlink:myview;Read more;foo=1|bar=2;btn btn-primary##'
+        );
+
+        $patternclass = $templateobj->patternclass();
+        $tag = '##viewlink:myview;Read more;foo=1|bar=2;btn btn-primary##';
+        $replacements = $patternclass->get_replacements([$tag], null, []);
+
+        $this->assertArrayHasKey($tag, $replacements);
+        $this->assertStringContainsString('href="', $replacements[$tag]);
+        $this->assertStringContainsString('d=' . $df->id(), $replacements[$tag]);
+        $this->assertStringContainsString('view=' . $targetobj->id(), $replacements[$tag]);
+        $this->assertStringContainsString('foo=1&amp;bar=2', $replacements[$tag]);
+        $this->assertStringContainsString('class="btn btn-primary"', $replacements[$tag]);
+        $this->assertStringContainsString('>Read more<', $replacements[$tag]);
+    }
+
+    /**
+     * Test that ##viewsesslink:<viewname>## keeps session params for edit links.
+     *
+     * @covers ::get_replacements
+     */
+    public function test_get_replacements_resolves_viewsesslink_tag_with_session_data(): void {
+        [$df, $targetobj, $templateobj] = $this->create_test_views(
+            '##viewsesslink:myview;Add entry;new=1;btn btn-secondary##'
+        );
+
+        $patternclass = $templateobj->patternclass();
+        $tag = '##viewsesslink:myview;Add entry;new=1;btn btn-secondary##';
+        $replacements = $patternclass->get_replacements([$tag], null, []);
+
+        $this->assertArrayHasKey($tag, $replacements);
+        $this->assertStringContainsString('href="', $replacements[$tag]);
+        $this->assertStringContainsString('d=' . $df->id(), $replacements[$tag]);
+        $this->assertStringContainsString('view=' . $targetobj->id(), $replacements[$tag]);
+        $this->assertStringContainsString('new=1', $replacements[$tag]);
+        $this->assertStringContainsString('sesskey=', $replacements[$tag]);
+        $this->assertStringContainsString('sourceview=', $replacements[$tag]);
+        $this->assertStringContainsString('class="btn btn-secondary"', $replacements[$tag]);
+        $this->assertStringContainsString('>Add entry<', $replacements[$tag]);
+    }
 }

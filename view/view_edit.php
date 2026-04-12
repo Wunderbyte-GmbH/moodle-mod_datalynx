@@ -74,7 +74,7 @@ $options['types'] = $DB->get_records_select_menu(
     'name, type'
 );
 $options['datalynxid'] = $urlparams->d;
-$options['referenceeditors'] = ['id_esection_editor'];
+$options['referenceeditors'] = ['id_esection_editor', 'id_eparam2_editor'];
 
 $PAGE->requires->js_call_amd('mod_datalynx/patterndialogue', 'init');
 

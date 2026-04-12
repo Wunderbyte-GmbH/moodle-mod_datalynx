@@ -147,14 +147,21 @@ function buildViewTagPattern(type, viewname, linktext = '', urlquery = '', csscl
 class PatternDialogue {
     constructor(options) {
         this.options = options;
-        this._editorModes = new Map();
+        this._editorConfigs = new Map();
         this._referenceEditors = new Set(options.referenceeditors || []);
         this._viewsPromise = null;
-        // Track which button DOM elements already have a click listener.
-        // Using a WeakSet (keyed on the actual element reference) instead of a
-        // data-attribute so that fresh DOM nodes created after a TinyMCE source-edit
-        // are never falsely considered "already initialized".
-        this._initializedButtons = new WeakSet();
+    }
+
+    getEditorConfig(editorId) {
+        if (!this._editorConfigs.has(editorId)) {
+            this._editorConfigs.set(editorId, {
+                supportsFieldTags: false,
+                supportsReferenceTags: false,
+                initializedButtons: new WeakSet(),
+            });
+        }
+
+        return this._editorConfigs.get(editorId);
     }
 
     init() {
@@ -168,11 +175,12 @@ class PatternDialogue {
 
             const editorId = 'id_' + match[1];
             const tagType = match[2];
+            const config = this.getEditorConfig(editorId);
 
             if (tagType === 'field') {
-                this._editorModes.set(editorId, 'field');
+                config.supportsFieldTags = true;
             } else if (tagType === 'general' && this._referenceEditors.has(editorId)) {
-                this._editorModes.set(editorId, 'reference');
+                config.supportsReferenceTags = true;
             }
         });
 
@@ -189,36 +197,43 @@ class PatternDialogue {
      * @param {object} editor TinyMCE editor instance
      */
     replaceTagsWithButtons(editor) {
-        const div = document.createElement('div');
-        div.innerHTML = editor.getContent();
-        const mode = this._editorModes.get(editor.id);
+        const config = this.getEditorConfig(editor.id);
+        let html = editor.getContent();
 
-        if (mode === 'field') {
-            div.innerHTML = this.replaceFieldTagsInHtml(div.innerHTML);
-        } else if (mode === 'reference') {
-            div.innerHTML = this.replaceReferenceTagsInHtml(div.innerHTML);
+        if (config.supportsReferenceTags) {
+            html = this.replaceReferenceTagsInHtml(html, editor.id);
         }
 
-        editor.setContent(div.innerHTML);
+        if (config.supportsFieldTags) {
+            html = this.replaceFieldTagsInHtml(html, editor.id);
+        }
+
+        editor.setContent(html);
     }
 
-    replaceFieldTagsInHtml(html) {
+    replaceFieldTagsInHtml(html, editorId = '') {
         return html
-            .replace(/##([^#]+)##/g, (match, action) => this.buildActionTagButtonHtml(match, action))
+            .replace(/##([^#]+)##/g, (match, action) => {
+                if (VIEW_URL_TAG_RE.test(match) || VIEW_LINK_TAG_RE.test(match)) {
+                    return match;
+                }
+
+                return this.buildActionTagButtonHtml(match, action, editorId);
+            })
             .replace(/\[\[([^\|\]]+)(?:\|([^\|\]]*))?(?:\|([^\|\]]*))?\]\]/g,
                 (match, field, behavior, renderer) => {
                     behavior = behavior || '';
                     renderer = renderer || '';
-                    return this.buildFieldTagButtonHtml(match, field, behavior, renderer);
+                    return this.buildFieldTagButtonHtml(match, field, behavior, renderer, editorId);
                 }
             );
     }
 
-    replaceReferenceTagsInHtml(html) {
+    replaceReferenceTagsInHtml(html, editorId = '') {
         return html
-            .replace(/##viewurl(?::[^#]+)?##/g, (match) => this.buildViewTagButtonHtml(match))
+            .replace(/##viewurl(?::[^#]+)?##/g, (match) => this.buildViewTagButtonHtml(match, editorId))
             .replace(/##(?:viewlink|viewsesslink):[^;#]+;[^;#]*;[^;#]*;[^#]*##/g,
-                (match) => this.buildViewTagButtonHtml(match)
+                (match) => this.buildViewTagButtonHtml(match, editorId)
             );
     }
 
@@ -265,16 +280,22 @@ class PatternDialogue {
         return html;
     }
 
-    buildActionTagButtonHtml(pattern, action) {
+    buildEditorIdAttribute(editorId = '') {
+        return editorId ? ' data-datalynx-editor-id="' + escapeHtml(editorId) + '"' : '';
+    }
+
+    buildActionTagButtonHtml(pattern, action, editorId = '') {
         return '<button type="button" contenteditable="false"' +
             ' class="btn btn-sm btn-outline-info"' +
             ' data-action-tag-button="true"' +
+            this.buildEditorIdAttribute(editorId) +
             ' data-datalynx-field="' + escapeHtml(pattern) + '">' + escapeHtml(action) + '</button>';
     }
 
-    buildFieldTagButtonHtml(pattern, field, behavior, renderer) {
+    buildFieldTagButtonHtml(pattern, field, behavior, renderer, editorId = '') {
         return '<button type="button" contenteditable="false"' +
             ' class="btn btn-sm btn-outline-secondary datalynx-field-tag"' +
+            this.buildEditorIdAttribute(editorId) +
             ' data-datalynx-field="' + escapeHtml(pattern) + '">' +
             this.buildButtonLabel(field, behavior, renderer) + '</button>';
     }
@@ -291,10 +312,11 @@ class PatternDialogue {
         return html;
     }
 
-    buildViewTagButtonHtml(pattern) {
+    buildViewTagButtonHtml(pattern, editorId = '') {
         const {type, viewname, linktext} = parseViewTag(pattern);
         return '<button type="button" contenteditable="false"' +
             ' class="btn btn-sm btn-outline-primary datalynx-view-tag"' +
+            this.buildEditorIdAttribute(editorId) +
             ' data-datalynx-field="' + escapeHtml(pattern) + '">' +
             this.buildViewTagButtonLabel(type, viewname, linktext) + '</button>';
     }
@@ -308,17 +330,20 @@ class PatternDialogue {
      * @param {object} editor TinyMCE editor instance
      */
     reInitializeButtons(editor) {
+        const config = this.getEditorConfig(editor.id);
         const allBtns = editor.getBody().querySelectorAll(
             'button[data-action-tag-button], button.datalynx-field-tag, button.datalynx-view-tag'
         );
         allBtns.forEach((button) => {
-            if (!this._initializedButtons.has(button)) {
+            button.setAttribute('data-datalynx-editor-id', editor.id);
+
+            if (!config.initializedButtons.has(button)) {
                 button.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    this.openMoodleDialog(button);
+                    this.openMoodleDialog(button, editor);
                 });
-                this._initializedButtons.add(button);
+                config.initializedButtons.add(button);
             }
             // Refresh badge label from the stored pattern.
             if (button.classList.contains('datalynx-field-tag')) {
@@ -347,8 +372,8 @@ class PatternDialogue {
         return this._viewsPromise;
     }
 
-    removeButton(button) {
-        const ed = this.findEditorForButton(button);
+    removeButton(button, editor = null) {
+        const ed = editor || this.findEditorForButton(button);
         if (ed) {
             ed.dom.remove(button);
             ed.getBody().querySelectorAll('.mce-offscreen-selection').forEach(
@@ -370,6 +395,14 @@ class PatternDialogue {
      * @returns {object|null}
      */
     findEditorForButton(btn) {
+        const editorId = btn.getAttribute('data-datalynx-editor-id');
+        if (editorId) {
+            const editor = window.tinyMCE?.get(editorId);
+            if (editor) {
+                return editor;
+            }
+        }
+
         for (const ed of (window.tinyMCE?.get() || [])) {
             if (ed.getBody().contains(btn)) {
                 return ed;
@@ -394,8 +427,8 @@ class PatternDialogue {
                 return;
             }
             registered.add(editor.id);
-            const mode = this._editorModes.get(editor.id);
-            if (!mode) {
+            const config = this.getEditorConfig(editor.id);
+            if (!config.supportsFieldTags && !config.supportsReferenceTags) {
                 return;
             }
 
@@ -433,8 +466,10 @@ class PatternDialogue {
      * Open a Moodle dialog for editing a tag button's properties.
      * Field-tag buttons use ModalSaveCancel; action-tag buttons use a plain Modal.
      * @param {HTMLElement} button
+     * @param {object|null} editor
      */
-    async openMoodleDialog(button) {
+    async openMoodleDialog(button, editor = null) {
+        const owningEditor = editor || this.findEditorForButton(button);
         const isFieldTag = button.classList.contains('datalynx-field-tag');
         const isViewTag = button.classList.contains('datalynx-view-tag');
 
@@ -503,11 +538,10 @@ class PatternDialogue {
                 const newRenderer = modalBody.querySelector('#dlx-renderer-select')?.value || '';
                 const newPattern = buildFieldTagPattern(field, newBehavior, newRenderer);
 
-                const ed = this.findEditorForButton(button);
-                if (ed) {
-                    ed.dom.setAttrib(button, 'data-datalynx-field', newPattern);
+                if (owningEditor) {
+                    owningEditor.dom.setAttrib(button, 'data-datalynx-field', newPattern);
                     button.innerHTML = this.buildButtonLabel(field, newBehavior, newRenderer);
-                    ed.undoManager.add();
+                    owningEditor.undoManager.add();
                 } else {
                     button.setAttribute('data-datalynx-field', newPattern);
                     button.innerHTML = this.buildButtonLabel(field, newBehavior, newRenderer);
@@ -518,7 +552,7 @@ class PatternDialogue {
             const deleteTagBtn = modal.getBody()[0].querySelector('[data-action="dlx-delete"]');
             if (deleteTagBtn) {
                 deleteTagBtn.addEventListener('click', () => {
-                    this.removeButton(button);
+                    this.removeButton(button, owningEditor);
                     modal.hide();
                 });
             }
@@ -551,7 +585,8 @@ class PatternDialogue {
             let bodyHtml =
                 '<div class="form-group">' +
                 '<label for="dlx-view-select">' + viewLabel + '</label>' +
-                '<select class="form-control custom-select" id="dlx-view-select" name="dlx-view-select">' +
+                '<select class="form-control custom-select" id="dlx-view-select" name="dlx-view-select"' +
+                ' data-region="tag-view-select">' +
                 selectOptions.join('') + '</select></div>';
 
             if (!isViewUrl) {
@@ -559,15 +594,15 @@ class PatternDialogue {
                     '<div class="form-group">' +
                     '<label for="dlx-link-text">' + linkTextLabel + '</label>' +
                     '<input type="text" class="form-control" id="dlx-link-text" name="dlx-link-text" value="' +
-                    escapeHtml(linktext) + '"></div>' +
+                    escapeHtml(linktext) + '" data-region="tag-linktext-input"></div>' +
                     '<div class="form-group">' +
                     '<label for="dlx-url-query">' + urlQueryLabel + '</label>' +
                     '<input type="text" class="form-control" id="dlx-url-query" name="dlx-url-query" value="' +
-                    escapeHtml(urlquery) + '"></div>' +
+                    escapeHtml(urlquery) + '" data-region="tag-urlquery-input"></div>' +
                     '<div class="form-group">' +
                     '<label for="dlx-css-class">' + classLabel + '</label>' +
                     '<input type="text" class="form-control" id="dlx-css-class" name="dlx-css-class" value="' +
-                    escapeHtml(cssclass) + '"></div>';
+                    escapeHtml(cssclass) + '" data-region="tag-cssclass-input"></div>';
             }
 
             bodyHtml +=
@@ -598,12 +633,11 @@ class PatternDialogue {
                     modalBody.querySelector('#dlx-css-class')?.value || ''
                 );
 
-                const ed = this.findEditorForButton(button);
                 const {type: newType, viewname: newViewName, linktext: newLinkText} = parseViewTag(newPattern);
-                if (ed) {
-                    ed.dom.setAttrib(button, 'data-datalynx-field', newPattern);
+                if (owningEditor) {
+                    owningEditor.dom.setAttrib(button, 'data-datalynx-field', newPattern);
                     button.innerHTML = this.buildViewTagButtonLabel(newType, newViewName, newLinkText);
-                    ed.undoManager.add();
+                    owningEditor.undoManager.add();
                 } else {
                     button.setAttribute('data-datalynx-field', newPattern);
                     button.innerHTML = this.buildViewTagButtonLabel(newType, newViewName, newLinkText);
@@ -615,7 +649,7 @@ class PatternDialogue {
             const deleteTagBtn = modal.getBody()[0].querySelector('[data-action="dlx-delete"]');
             if (deleteTagBtn) {
                 deleteTagBtn.addEventListener('click', () => {
-                    this.removeButton(button);
+                    this.removeButton(button, owningEditor);
                     modal.hide();
                 });
             }
@@ -638,7 +672,7 @@ class PatternDialogue {
             const deleteActionBtn = modal.getBody()[0].querySelector('[data-action="dlx-delete"]');
             if (deleteActionBtn) {
                 deleteActionBtn.addEventListener('click', () => {
-                    this.removeButton(button);
+                    this.removeButton(button, owningEditor);
                     modal.hide();
                 });
             }
@@ -659,17 +693,17 @@ class PatternDialogue {
         const m = dropdown.id.match(/^(.+_editor)_.+_tag_menu$/);
         if (m) {
             const editorId = 'id_' + m[1];
-            const mode = this._editorModes.get(editorId);
+            const config = this.getEditorConfig(editorId);
 
-            if (mode === 'field' && actionTagMatch) {
-                contentToInsert = this.buildActionTagButtonHtml(selectedValue, actionTagMatch[1]);
-            } else if (mode === 'field' && fieldTagMatch) {
+            if (config.supportsReferenceTags && viewTagMatch) {
+                contentToInsert = this.buildViewTagButtonHtml(selectedValue, editorId);
+            } else if (config.supportsFieldTags && actionTagMatch) {
+                contentToInsert = this.buildActionTagButtonHtml(selectedValue, actionTagMatch[1], editorId);
+            } else if (config.supportsFieldTags && fieldTagMatch) {
                 const field = fieldTagMatch[1];
                 const behavior = fieldTagMatch[2] || '';
                 const renderer = fieldTagMatch[3] || '';
-                contentToInsert = this.buildFieldTagButtonHtml(selectedValue, field, behavior, renderer);
-            } else if (mode === 'reference' && viewTagMatch) {
-                contentToInsert = this.buildViewTagButtonHtml(selectedValue);
+                contentToInsert = this.buildFieldTagButtonHtml(selectedValue, field, behavior, renderer, editorId);
             } else {
                 contentToInsert = selectedValue;
             }
