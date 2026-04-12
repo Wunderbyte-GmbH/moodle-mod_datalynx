@@ -159,6 +159,15 @@ class datalynxfield_behavior {
     }
 
     /**
+     * Get the datalynx instance id for this behavior.
+     *
+     * @return int
+     */
+    public function get_dataid(): int {
+        return $this->dataid;
+    }
+
+    /**
      * Check if the given user is a Moodle site administrator.
      *
      * @param stdClass $user
@@ -217,8 +226,8 @@ class datalynxfield_behavior {
             if (!empty($allowedfieldids)) {
                 foreach ($allowedfieldids as $fieldid) {
                     $userids = isset($entry->{"c{$fieldid}_content"}) ? json_decode(
-                            $entry->{"c{$fieldid}_content"},
-                            true
+                        $entry->{"c{$fieldid}_content"},
+                        true
                     ) : [];
                     if (in_array($USER->id, $userids)) {
                         return true;
@@ -385,6 +394,24 @@ class datalynxfield_behavior {
     }
 
     /**
+     * Toggle a behavior property and persist the updated state.
+     *
+     * @param string $forproperty
+     * @param int $permissionid
+     * @return bool
+     */
+    public function toggle_property(string $forproperty, int $permissionid = 0): bool {
+        if ($forproperty === 'required') {
+            $this->required = !$this->required;
+            $this->record->required = (int) $this->required;
+            $this->persist_record();
+            return $this->required;
+        }
+
+        return $this->toggle_permission_property($forproperty, $permissionid);
+    }
+
+    /**
      * Delete behaviorer when $behaviorname is empty otherwise update view patterns.
      *
      * @param integer $behaviorid
@@ -395,16 +422,16 @@ class datalynxfield_behavior {
         global $DB;
         // Read dataid from DB and find patterns and param2 from all connected views.
         $behaviorinfo = $DB->get_record(
-                'datalynx_behaviors',
-                ['id' => $behaviorid],
-                $fields = 'dataid, name',
-                $strictness = IGNORE_MISSING
+            'datalynx_behaviors',
+            ['id' => $behaviorid],
+            $fields = 'dataid, name',
+            $strictness = IGNORE_MISSING
         );
         $connected = $DB->get_records(
-                'datalynx_views',
-                ['dataid' => $behaviorinfo->dataid],
-                null,
-                'id, patterns, param2'
+            'datalynx_views',
+            ['dataid' => $behaviorinfo->dataid],
+            null,
+            'id, patterns, param2'
         );
         // Update every instance that still has the string ||behaviorname in it.
         foreach ($connected as $view) {
@@ -426,6 +453,73 @@ class datalynxfield_behavior {
             }
             $DB->update_record('datalynx_views', $view, $bulk = true);
         }
+    }
+
+    /**
+     * Toggle a permission-based property and persist it.
+     *
+     * @param string $forproperty
+     * @param int $permissionid
+     * @return bool
+     */
+    private function toggle_permission_property(string $forproperty, int $permissionid): bool {
+        if ($permissionid < 1) {
+            throw new coding_exception('Permission-based behavior toggles require a permission id.');
+        }
+
+        if ($forproperty === 'visibleto') {
+            $permissions = $this->visibleto['permissions'] ?? [];
+            $enabled = $this->toggle_permission_membership($permissions, $permissionid);
+            $this->visibleto['permissions'] = $permissions;
+            $this->record->visibleto = serialize($this->visibleto);
+            $this->persist_record();
+            return $enabled;
+        }
+
+        if ($forproperty === 'editableby') {
+            $permissions = $this->editableby;
+            $enabled = $this->toggle_permission_membership($permissions, $permissionid);
+            $this->editableby = $permissions;
+            $this->record->editableby = serialize($this->editableby);
+            $this->persist_record();
+            return $enabled;
+        }
+
+        throw new coding_exception('Unsupported behavior property: ' . $forproperty);
+    }
+
+    /**
+     * Toggle membership in a permission list.
+     *
+     * @param array $permissions
+     * @param int $permissionid
+     * @return bool
+     */
+    private function toggle_permission_membership(array &$permissions, int $permissionid): bool {
+        $permissions = array_values(array_map('intval', $permissions));
+
+        if (!in_array($permissionid, $permissions, true)) {
+            $permissions[] = $permissionid;
+            $permissions = array_values(array_unique($permissions));
+            return true;
+        }
+
+        $permissions = array_values(array_filter($permissions, static function (int $existingpermission) use ($permissionid): bool {
+            return $existingpermission !== $permissionid;
+        }));
+
+        return false;
+    }
+
+    /**
+     * Persist the current record.
+     *
+     * @return void
+     */
+    private function persist_record(): void {
+        global $DB;
+
+        $DB->update_record('datalynx_behaviors', $this->record);
     }
 
     /**

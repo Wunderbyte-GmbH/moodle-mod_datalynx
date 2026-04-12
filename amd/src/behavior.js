@@ -21,67 +21,73 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+import Ajax from 'core/ajax';
+import Notification from 'core/notification';
+
+const setToggleState = (toggle, enabled) => {
+    const icon = toggle.querySelector('i');
+    toggle.dataset.enabled = enabled ? '1' : '0';
+    toggle.setAttribute('aria-pressed', enabled ? 'true' : 'false');
+
+    const enabledLabel = toggle.getAttribute('data-enabled-label');
+    const disabledLabel = toggle.getAttribute('data-disabled-label');
+    const currentLabel = enabled ? enabledLabel : disabledLabel;
+    if (currentLabel) {
+        toggle.setAttribute('title', currentLabel);
+        toggle.setAttribute('aria-label', currentLabel);
+
+        const toggleLabel = toggle.querySelector('.datalynx-behavior-toggle-label');
+        if (toggleLabel) {
+            toggleLabel.textContent = currentLabel;
+        }
+    }
+
+    if (icon) {
+        icon.classList.toggle('fa-circle-check', enabled);
+        icon.classList.toggle('fa-circle-xmark', !enabled);
+        icon.classList.toggle('text-success', enabled);
+        icon.classList.toggle('text-danger', !enabled);
+    }
+};
+
 export default {
     init() {
-        document.querySelectorAll('img[data-for]').forEach((img) => {
-            img.addEventListener("click", (event) => {
-                const clickedImg = event.target;
-                const behaviorid = clickedImg.getAttribute('data-behavior-id');
-                const permissionid = clickedImg.getAttribute('data-permission-id');
-                const forproperty = clickedImg.getAttribute('data-for');
-                const sesskey = document.querySelector('table.datalynx-behaviors')?.getAttribute('data-sesskey') || M.cfg.sesskey;
-                const actionurl = "behavior_edit_ajax.php";
+        document.querySelectorAll('.datalynx-behavior-toggle').forEach((toggle) => {
+            if (toggle.dataset.behaviorToggleInitialized) {
+                return;
+            }
 
-                // Construct the object
-                const obj = {
-                    behaviorid,
-                    permissionid,
-                    forproperty,
-                    sesskey
-                };
+            toggle.dataset.behaviorToggleInitialized = 'true';
+            toggle.addEventListener('click', (event) => {
+                event.preventDefault();
 
-                // Serialize the object to a query string
-                const list = Object.keys(obj).map((k) => {
-                    const encodedKey = encodeURIComponent(k);
-                    const value = obj[k];
-                    if (Array.isArray(value)) {
-                        return value.map(v => `${encodedKey}[]=${encodeURIComponent(v)}`).join('&');
-                    } else {
-                        return `${encodedKey}=${encodeURIComponent(value)}`;
+                const behaviorid = Number(toggle.getAttribute('data-behavior-id'));
+                const permissionid = Number(toggle.getAttribute('data-permission-id') || 0);
+                const forproperty = toggle.getAttribute('data-for');
+
+                if (!behaviorid || !forproperty) {
+                    return;
+                }
+
+                toggle.disabled = true;
+                Ajax.call([{
+                    methodname: 'mod_datalynx_toggle_behavior',
+                    args: {
+                        behaviorid,
+                        permissionid,
+                        forproperty
                     }
-                }).join('&');
-
-                // Create an AbortController to implement timeout
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 5000);
-
-                // Fetch API request with abort signal
-                fetch(actionurl, {
-                    method: "POST",
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: list,
-                    signal: controller.signal
+                }])[0]
+                .then((response) => {
+                    setToggleState(toggle, response.enabled);
+                    return response;
                 })
-                .then(response => {
-                    clearTimeout(timeoutId);
-                    return response.text();  // Ensure that you return the result of response.text()
+                .catch((error) => {
+                    Notification.exception(error);
+                    return false;
                 })
-                .then(data => {
-                    if (data !== '') {
-                        let src = clickedImg.getAttribute("src");
-                        if (src.includes("-enabled")) {
-                            src = src.replace("-enabled", "-n");
-                        } else if (src.includes("-n")) {
-                            src = src.replace("-n", "-enabled");
-                        }
-                        clickedImg.setAttribute("src", src);
-                    }
-                    return true; // Return a value to satisfy the ESLint rule
-                })
-                .catch((err) => {
-                    throw err;
+                .finally(() => {
+                    toggle.disabled = false;
                 });
             });
         });

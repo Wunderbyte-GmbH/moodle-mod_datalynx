@@ -43,4 +43,13 @@ $functions = [
                 'capabilities' => 'mod/datalynx:teamsubscribe',
                 'ajax'        => true,
         ],
+        'mod_datalynx_toggle_behavior' => [
+                'classname'   => 'mod_datalynx\external\toggle_behavior',
+                'methodname'  => 'execute',
+                'classpath'   => '',
+                'description' => 'Toggle behavior settings from the behavior management table.',
+                'type'        => 'write',
+                'capabilities' => 'mod/datalynx:managetemplates',
+                'ajax'        => true,
+        ],
 ];

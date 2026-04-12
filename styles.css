@@ -175,13 +175,17 @@ body.jsenabled div.editor_atto_content_wrap button.datalynx-tag.datalynx-action-
     background-size: contain;
 }
 
-table.datalynx-behaviors img {
+table.datalynx-behaviors .datalynx-behavior-toggle {
     margin-left: 0.125em;
     margin-right: 0.125em;
 }
 
-body.jsenabled table.datalynx-behaviors img {
+body.jsenabled table.datalynx-behaviors .datalynx-behavior-toggle {
     cursor: pointer;
+}
+
+table.datalynx-behaviors .datalynx-behavior-toggle:disabled {
+    opacity: 0.65;
 }
 
 form.mform div.entry div.fitem {

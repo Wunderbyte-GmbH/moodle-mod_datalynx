@@ -63,6 +63,44 @@ echo html_writer::empty_tag('br');
 
 $editbaseurl = '/mod/datalynx/behavior/behavior_edit.php';
 $linkparams = ['d' => $datalynx->id(), 'sesskey' => sesskey()];
+$renderbehaviortoggle = static function (
+    string $label,
+    int $behaviorid,
+    string $forproperty,
+    bool $enabled,
+    ?int $permissionid = null,
+    ?string $disabledlabel = null
+): string {
+    $disabledlabel = $disabledlabel ?? $label;
+    $currentlabel = $enabled ? $label : $disabledlabel;
+    $iconclass = $enabled ? 'fa-regular fa-circle-check text-success' : 'fa-regular fa-circle-xmark text-danger';
+    $icon = html_writer::tag('i', '', [
+        'class' => "icon {$iconclass} fa-fw",
+        'aria-hidden' => 'true',
+    ]);
+    $attributes = [
+        'type' => 'button',
+        'class' => 'btn btn-link p-0 border-0 datalynx-behavior-toggle',
+        'data-behavior-id' => $behaviorid,
+        'data-for' => $forproperty,
+        'data-enabled' => $enabled ? 1 : 0,
+        'data-enabled-label' => $label,
+        'data-disabled-label' => $disabledlabel,
+        'title' => $currentlabel,
+        'aria-label' => $currentlabel,
+        'aria-pressed' => $enabled ? 'true' : 'false',
+    ];
+
+    if ($permissionid !== null) {
+        $attributes['data-permission-id'] = $permissionid;
+    }
+
+    return html_writer::tag(
+        'button',
+        $icon . html_writer::span($currentlabel, 'accesshide datalynx-behavior-toggle-label'),
+        $attributes
+    );
+};
 
 // Table headers.
 $headers = ['name' => get_string('name'), 'description' => get_string('description'),
@@ -83,7 +121,6 @@ $table->sortable(false);
 
 // Column styles.
 $table->set_attribute('class', 'generaltable generalbox boxaligncenter boxwidthwide datalynx-behaviors');
-$table->set_attribute('data-sesskey', sesskey());
 $table->column_style('visibleto', 'text-align', 'center');
 $table->column_style('editableby', 'text-align', 'center');
 $table->column_style('required', 'text-align', 'center');
@@ -122,18 +159,22 @@ foreach ($behaviors as $behaviorid => $behavior) {
     );
 
     if ($behavior->required) {
-        $fieldrequired = $OUTPUT->pix_icon(
-            'i/completion-manual-enabled',
+        $fieldrequired = $renderbehaviortoggle(
             get_string('required'),
-            'moodle',
-            ['data-behavior-id' => $behaviorid, 'data-for' => 'required']
+            $behaviorid,
+            'required',
+            true,
+            null,
+            get_string('notrequired', 'datalynx')
         );
     } else {
-        $fieldrequired = $OUTPUT->pix_icon(
-            'i/completion-manual-n',
-            get_string('notrequired', 'datalynx'),
-            'moodle',
-            ['data-behavior-id' => $behaviorid, 'data-for' => 'required']
+        $fieldrequired = $renderbehaviortoggle(
+            get_string('required'),
+            $behaviorid,
+            'required',
+            false,
+            null,
+            get_string('notrequired', 'datalynx')
         );
     }
 
@@ -142,45 +183,25 @@ foreach ($behaviors as $behaviorid => $behavior) {
 
     $fieldvisible = '';
     foreach ($permissionnames as $permissionid => $permissionname) {
-        if (isset($visibleto['permissions']) && in_array($permissionid, $visibleto['permissions'])) {
-            $fieldvisible .= $OUTPUT->pix_icon(
-                'i/completion-manual-enabled',
-                $permissionname,
-                'moodle',
-                ['data-behavior-id' => $behaviorid, 'data-permission-id' => $permissionid,
-                'data-for' => 'visibleto']
-            );
-        } else {
-            $fieldvisible .= $OUTPUT->pix_icon(
-                'i/completion-manual-n',
-                $permissionname,
-                'moodle',
-                ['data-behavior-id' => $behaviorid, 'data-permission-id' => $permissionid,
-                'data-for' => 'visibleto']
-            );
-        }
+        $fieldvisible .= $renderbehaviortoggle(
+            $permissionname,
+            $behaviorid,
+            'visibleto',
+            isset($visibleto['permissions']) && in_array($permissionid, $visibleto['permissions']),
+            (int) $permissionid
+        );
     }
 
     $editableby = unserialize($behavior->editableby);
     $fieldeditable = '';
     foreach ($permissionnames as $permissionid => $permissionname) {
-        if (in_array($permissionid, $editableby)) {
-            $fieldeditable .= $OUTPUT->pix_icon(
-                'i/completion-manual-enabled',
-                $permissionname,
-                'moodle',
-                ['data-behavior-id' => $behaviorid, 'data-permission-id' => $permissionid,
-                'data-for' => 'editableby']
-            );
-        } else {
-            $fieldeditable .= $OUTPUT->pix_icon(
-                'i/completion-manual-n',
-                $permissionname,
-                'moodle',
-                ['data-behavior-id' => $behaviorid, 'data-permission-id' => $permissionid,
-                'data-for' => 'editableby']
-            );
-        }
+        $fieldeditable .= $renderbehaviortoggle(
+            $permissionname,
+            $behaviorid,
+            'editableby',
+            in_array($permissionid, $editableby),
+            (int) $permissionid
+        );
     }
 
     $table->add_data([$fieldname, $fielddescription, $fieldvisible, $fieldeditable, $fieldrequired,
