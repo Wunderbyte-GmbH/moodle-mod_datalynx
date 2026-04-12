@@ -272,4 +272,37 @@ final class viewlink_pattern_test extends advanced_testcase {
         $this->assertStringContainsString('class="btn btn-secondary"', $replacements[$tag]);
         $this->assertStringContainsString('>Add entry<', $replacements[$tag]);
     }
+
+    /**
+     * Test that the edit-time general tag menu includes hidden views.
+     *
+     * @covers ::get_menu
+     */
+    public function test_get_menu_without_visibility_check_includes_hidden_views(): void {
+        global $DB;
+
+        [, , $templateobj] = $this->create_test_views('##viewurl##');
+
+        $hiddenview = (object) [
+            'dataid' => $templateobj->get_dl()->id(),
+            'type' => 'tabular',
+            'name' => 'hiddenview',
+            'description' => '',
+            'visible' => 0,
+            'filter' => 0,
+            'perpage' => 0,
+            'groupby' => '',
+            'param5' => 0,
+            'param10' => 0,
+            'section' => '',
+        ];
+        $DB->insert_record('datalynx_views', $hiddenview);
+
+        $menu = $templateobj->patternclass()->get_menu(false, false);
+        $this->assertArrayHasKey(get_string('reference', 'datalynx'), $menu);
+
+        $referencecategory = $menu[get_string('reference', 'datalynx')][get_string('reference', 'datalynx')];
+        $this->assertArrayHasKey('##viewlink:hiddenview;;;##', $referencecategory);
+        $this->assertArrayHasKey('##viewsesslink:hiddenview;;;##', $referencecategory);
+    }
 }

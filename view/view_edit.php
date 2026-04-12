@@ -74,6 +74,7 @@ $options['types'] = $DB->get_records_select_menu(
     'name, type'
 );
 $options['datalynxid'] = $urlparams->d;
+$options['views'] = [];
 $options['referenceeditors'] = ['id_esection_editor', 'id_eparam2_editor'];
 
 $PAGE->requires->js_call_amd('mod_datalynx/patterndialogue', 'init');
@@ -82,6 +83,14 @@ $dl->set_page('view/view_edit', ['modjs' => true, 'urlparams' => $urlparams]);
 
 require_sesskey();
 require_capability('mod/datalynx:managetemplates', $dl->context);
+
+$viewrecords = $DB->get_records('datalynx_views', ['dataid' => $urlparams->d], 'name ASC', 'id, name');
+foreach ($viewrecords as $viewrecord) {
+    $options['views'][] = [
+        'id' => (int) $viewrecord->id,
+        'name' => $viewrecord->name,
+    ];
+}
 
 if ($urlparams->vedit) {
     $views = $dl->get_views_editable_by_user('');

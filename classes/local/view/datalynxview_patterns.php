@@ -90,13 +90,14 @@ class datalynxview_patterns {
     /**
      * Returns tags menu to be rendered as dropdown
      *
-     * @param string $showall
+     * @param bool $showall
+     * @param bool $checkvisibility if true only views visible to user are considered
      * @return array
      */
-    final public function get_menu($showall = false) {
+    final public function get_menu($showall = false, $checkvisibility = true) {
         // The default menu category for views.
         $patternsmenu = [];
-        foreach ($this->patterns() as $tag => $pattern) {
+        foreach ($this->patterns($checkvisibility) as $tag => $pattern) {
             if ($showall || $pattern[self::PATTERN_SHOW_IN_MENU]) {
                 // Which category.
                 if (!empty($pattern[self::PATTERN_CATEGORY])) {

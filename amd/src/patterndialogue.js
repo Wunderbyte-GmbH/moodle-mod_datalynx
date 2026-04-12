@@ -149,6 +149,8 @@ class PatternDialogue {
         this.options = options;
         this._editorConfigs = new Map();
         this._referenceEditors = new Set(options.referenceeditors || []);
+        this._hasPreloadedViews = Array.isArray(options.views);
+        this._preloadedViews = this._hasPreloadedViews ? options.views : [];
         this._viewsPromise = null;
     }
 
@@ -363,10 +365,14 @@ class PatternDialogue {
 
     async getViews() {
         if (!this._viewsPromise) {
-            this._viewsPromise = Ajax.call([{
-                methodname: 'mod_datalynx_get_view_names',
-                args: {d: this.options.datalynxid},
-            }])[0];
+            if (this._hasPreloadedViews) {
+                this._viewsPromise = Promise.resolve(this._preloadedViews);
+            } else {
+                this._viewsPromise = Ajax.call([{
+                    methodname: 'mod_datalynx_get_view_names',
+                    args: {d: this.options.datalynxid},
+                }])[0];
+            }
         }
 
         return this._viewsPromise;
