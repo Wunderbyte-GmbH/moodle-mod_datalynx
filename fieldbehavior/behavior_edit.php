@@ -42,7 +42,7 @@ $datalynx->set_page('behavior/behavior_edit', ['urlparams' => $urlparams]);
 require_sesskey();
 require_capability('mod/datalynx:managetemplates', $datalynx->context);
 
-$returnurl = new moodle_url('/mod/datalynx/behavior/index.php', ['d' => $datalynx->id()]);
+$returnurl = new moodle_url('/mod/datalynx/fieldbehavior/index.php', ['d' => $datalynx->id()]);
 
 switch ($urlparams->action) {
     case "edit":

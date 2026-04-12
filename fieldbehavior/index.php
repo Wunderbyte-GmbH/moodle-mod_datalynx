@@ -44,7 +44,7 @@ $datalynx->set_page('behavior/index', ['urlparams' => $urlparams]);
 
 // Activate navigation node.
 navigation_node::override_active_url(
-    new moodle_url('/mod/datalynx/behavior/index.php', ['id' => $datalynx->cm->id])
+    new moodle_url('/mod/datalynx/fieldbehavior/index.php', ['id' => $datalynx->cm->id])
 );
 
 // Print notifications (not yet implemented).
@@ -55,13 +55,13 @@ $datalynx->print_header(['tab' => 'behaviors', 'urlparams' => $urlparams]);
 echo html_writer::empty_tag('br');
 echo html_writer::start_tag('div', ['class' => 'fieldadd mdl-align']);
 echo html_writer::link(new moodle_url(
-    '/mod/datalynx/behavior/behavior_edit.php',
+    '/mod/datalynx/fieldbehavior/behavior_edit.php',
     ['d' => $datalynx->id(), 'sesskey' => sesskey(), 'id' => 0]
 ), get_string('behavioradd', 'datalynx'));
 echo html_writer::end_tag('div');
 echo html_writer::empty_tag('br');
 
-$editbaseurl = '/mod/datalynx/behavior/behavior_edit.php';
+$editbaseurl = '/mod/datalynx/fieldbehavior/behavior_edit.php';
 $linkparams = ['d' => $datalynx->id(), 'sesskey' => sesskey()];
 $renderbehaviortoggle = static function (
     string $label,
@@ -111,7 +111,7 @@ $headers = ['name' => get_string('name'), 'description' => get_string('descripti
 
 $table = new flexible_table('datalynxbehaviorsindex' . $datalynx->id());
 $table->define_baseurl(
-    new moodle_url('/mod/datalynx/behavior/index.php', ['d' => $datalynx->id()])
+    new moodle_url('/mod/datalynx/fieldbehavior/index.php', ['d' => $datalynx->id()])
 );
 $table->define_columns(array_keys($headers));
 $table->define_headers(array_values($headers));

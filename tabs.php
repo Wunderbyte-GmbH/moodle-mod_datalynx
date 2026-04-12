@@ -152,7 +152,7 @@ if (isloggedin() && $istemplatemanager) {
             );
             $row[] = new tabobject(
                 'behaviors',
-                new moodle_url('/mod/datalynx/behavior/index.php', ['d' => $this->id()]),
+                new moodle_url('/mod/datalynx/fieldbehavior/index.php', ['d' => $this->id()]),
                 get_string('behaviors', 'datalynx')
             );
             $row[] = new tabobject(
