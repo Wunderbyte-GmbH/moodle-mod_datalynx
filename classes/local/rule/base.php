@@ -21,14 +21,19 @@
  * @copyright based on the work by 2013 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__FILE__) . "/../classes/datalynx.php");
+namespace mod_datalynx\local\rule;
+
+use stdClass;
+use coding_exception;
+use moodle_url;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Base class for Datalynx Rule Types
  */
-abstract class datalynx_rule_base {
+abstract class base {
     /**
      * Subclasses must override the type with their name.
      * @var string
@@ -90,7 +95,6 @@ abstract class datalynx_rule_base {
      *
      * @param \core\event\base $event
      * @return bool
-     * @throws coding_exception
      */
     abstract public function trigger(\core\event\base $event);
 
@@ -242,7 +246,6 @@ abstract class datalynx_rule_base {
      * Returns the type name of the rule
      *
      * @return string
-     * @throws coding_exception
      */
     public function typename() {
         return get_string('pluginname', "datalynxrule_{$this->type}");

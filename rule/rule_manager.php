@@ -22,14 +22,15 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(dirname(__FILE__)) . '/classes/datalynx.php');
+use mod_datalynx\datalynx;
+use mod_datalynx\local\rule\base as datalynx_rule_base;
 
 /**
  * Class that manages and triggers rules
  */
 class datalynx_rule_manager {
     /**
-     * @var datalynx|\mod_datalynx\datalynx
+     * @var datalynx
      */
     protected $dl;
 

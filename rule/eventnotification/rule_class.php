@@ -23,14 +23,14 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__FILE__) . "/../rule_class.php");
+use mod_datalynx\local\rule\base;
 
 /**
  * Event notification rule
  *
  * @package datalynxrule_eventnotification
  */
-class datalynx_rule_eventnotification extends datalynx_rule_base {
+class datalynx_rule_eventnotification extends base {
     /** @var int From author */
     const FROM_AUTHOR = 0;
 

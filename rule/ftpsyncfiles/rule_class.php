@@ -25,11 +25,10 @@
 use core\event\base;
 use mod_datalynx\datalynx;
 use mod_datalynx\local\datalynx_entries;
+use mod_datalynx\local\rule\base as datalynx_rule_base;
 use datalynxfield_entryauthor\field as datalynxfield_entryauthor;
 
 defined('MOODLE_INTERNAL') || die();
-
-require_once(dirname(__FILE__) . "/../rule_class.php");
 
 /**
  * Download files via sftp.
