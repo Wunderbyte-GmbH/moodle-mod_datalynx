@@ -24,9 +24,11 @@
 
 namespace mod_datalynx\local\rule;
 
-use stdClass;
 use coding_exception;
+use mod_datalynx\datalynx;
+use moodle_exception;
 use moodle_url;
+use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -53,9 +55,9 @@ abstract class base {
     public $rule = null;
 
     /**
-     * datalynx_rule_base constructor.
+     * base constructor.
      *
-     * @param int|mod_datalynx\datalynx $df
+     * @param int|datalynx $df
      * @param int|object $rule
      * @throws coding_exception
      * @throws moodle_exception
@@ -64,10 +66,10 @@ abstract class base {
         if (empty($df)) {
             throw new coding_exception('Datalynx id or object must be passed to view constructor.');
         } else {
-            if ($df instanceof \mod_datalynx\datalynx) {
+            if ($df instanceof datalynx) {
                 $this->df = $df;
             } else { // Datalynx id/object.
-                $this->df = new mod_datalynx\datalynx($df);
+                $this->df = new datalynx($df);
             }
         }
 
@@ -267,15 +269,7 @@ abstract class base {
      * @throws moodle_exception
      */
     public function get_form() {
-        global $CFG;
-
-        if (file_exists($CFG->dirroot . '/mod/datalynx/rule/' . $this->type . '/rule_form.php')) {
-            require_once($CFG->dirroot . '/mod/datalynx/rule/' . $this->type . '/rule_form.php');
-            $formclass = 'datalynx_rule_' . $this->type . '_form';
-        } else {
-            require_once($CFG->dirroot . '/mod/datalynx/rule/rule_form.php');
-            $formclass = 'datalynx_rule_form';
-        }
+        $formclass = manager::get_rule_form_class_name($this->type);
         $actionurl = new moodle_url(
             '/mod/datalynx/rule/rule_edit.php',
             ['d' => $this->df->id(), 'rid' => $this->get_id(), 'type' => $this->type]

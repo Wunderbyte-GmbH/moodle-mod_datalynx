@@ -14,24 +14,24 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- *
- * @package datalynxrule_eventnotification
- * @subpackage eventnotification
- * @copyright 2013 onwards edulabs.org and associated programmers
- * @copyright based on the work by 2012 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-defined('MOODLE_INTERNAL') || die();
+namespace datalynxrule_eventnotification\form;
 
-require_once("$CFG->dirroot/mod/datalynx/rule/rule_form.php");
+use datalynxrule_eventnotification\rule;
+use html_writer;
+use mod_datalynx\datalynx;
+use mod_datalynx\form\rule_form as base_rule_form;
+use stdClass;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Event notification rule form
  *
- * @package datalynxrule_eventnotification
+ * @package    datalynxrule_eventnotification
+ * @copyright  2026 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class datalynx_rule_eventnotification_form extends datalynx_rule_form {
+class rule_form extends base_rule_form {
     /**
      * Definition of the rule settings form
      */
@@ -47,8 +47,8 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
 
         // Sender.
         $options = [
-                datalynx_rule_eventnotification::FROM_AUTHOR => get_string('author', 'datalynx'),
-                datalynx_rule_eventnotification::FROM_CURRENT_USER => get_string('user')];
+                rule::FROM_AUTHOR => get_string('author', 'datalynx'),
+                rule::FROM_CURRENT_USER => get_string('user')];
         $mform->addElement('select', 'param2', get_string('fromsender', 'moodle'), $options);
 
         // Recipient.
@@ -175,7 +175,7 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
      */
     private function get_views_visible_to_datalynx_permission(int $permissionid): array {
         global $DB;
-        if ($permissionid == mod_datalynx\datalynx::PERMISSION_ADMIN) {
+        if ($permissionid == datalynx::PERMISSION_ADMIN) {
             $sql = "SELECT id, name FROM {datalynx_views} WHERE dataid = :dataid";
             return $DB->get_records_sql_menu($sql, ['dataid' => $this->dl->id()]);
         } else {

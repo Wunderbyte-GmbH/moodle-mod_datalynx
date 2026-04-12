@@ -27,8 +27,8 @@ use completion_info;
 use context_module;
 use core_course_category;
 use mod_datalynx\local\filter\datalynx_filter_manager;
+use mod_datalynx\local\rule\manager;
 use datalynx_preset_manager;
-use datalynx_rule_manager;
 use html_writer;
 use mod_datalynx\local\view\base;
 use moodle_page;
@@ -311,14 +311,12 @@ class datalynx {
     /**
      * Get rule manager.
      *
-     * @return datalynx_rule_manager|null
+     * @return manager|null
      */
     public function get_rule_manager() {
-        global $CFG;
         // Set rules manager.
         if (!$this->rulemanager) {
-            require_once($CFG->dirroot . '/mod/datalynx/rule/rule_manager.php');
-            $this->rulemanager = new datalynx_rule_manager($this);
+            $this->rulemanager = new manager($this);
         }
         return $this->rulemanager;
     }

@@ -14,24 +14,21 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- *
- * @package datalynxrule_ftpsyncfiles
- * @subpackage ftpsyncfiles
- * @copyright 2013 onwards edulabs.org and associated programmers
- * @copyright based on the work by 2012 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-defined('MOODLE_INTERNAL') || die();
+namespace datalynxrule_ftpsyncfiles\form;
 
-require_once("$CFG->dirroot/mod/datalynx/rule/rule_form.php");
+use html_writer;
+use mod_datalynx\form\rule_form as base_rule_form;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * FTP sync files rule form
  *
- * @package datalynxrule_ftpsyncfiles
+ * @package    datalynxrule_ftpsyncfiles
+ * @copyright  2026 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class datalynx_rule_ftpsyncfiles_form extends datalynx_rule_form {
+class rule_form extends base_rule_form {
     /**
      * Define the rule settings form
      */

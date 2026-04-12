@@ -14,23 +14,25 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- *
- * @package datalynxrule_eventnotification
- * @subpackage eventnotification
- * @copyright 2015 Ivan Šakić
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-defined('MOODLE_INTERNAL') || die();
+namespace datalynxrule_eventnotification;
 
+use context;
+use html_writer;
+use mod_datalynx\datalynx;
 use mod_datalynx\local\rule\base;
+use moodle_url;
+use stdClass;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Event notification rule
  *
- * @package datalynxrule_eventnotification
+ * @package    datalynxrule_eventnotification
+ * @copyright  2026 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class datalynx_rule_eventnotification extends base {
+class rule extends base {
     /** @var int From author */
     const FROM_AUTHOR = 0;
 
@@ -314,11 +316,11 @@ class datalynx_rule_eventnotification extends base {
         $allneeded = [];
         $allforbidden = [];
 
-        $perms = [mod_datalynx\datalynx::PERMISSION_ADMIN => 'mod/datalynx:viewprivilegeadmin',
-                mod_datalynx\datalynx::PERMISSION_MANAGER => 'mod/datalynx:viewprivilegemanager',
-                mod_datalynx\datalynx::PERMISSION_TEACHER => 'mod/datalynx:viewprivilegeteacher',
-                mod_datalynx\datalynx::PERMISSION_STUDENT => 'mod/datalynx:viewprivilegestudent',
-                mod_datalynx\datalynx::PERMISSION_GUEST => 'mod/datalynx:viewprivilegeguest',
+        $perms = [datalynx::PERMISSION_ADMIN => 'mod/datalynx:viewprivilegeadmin',
+                datalynx::PERMISSION_MANAGER => 'mod/datalynx:viewprivilegemanager',
+                datalynx::PERMISSION_TEACHER => 'mod/datalynx:viewprivilegeteacher',
+                datalynx::PERMISSION_STUDENT => 'mod/datalynx:viewprivilegestudent',
+                datalynx::PERMISSION_GUEST => 'mod/datalynx:viewprivilegeguest',
         ];
 
         foreach ($perms as $permissionid => $capstring) {

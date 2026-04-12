@@ -14,26 +14,27 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- *
- * @package datalynxrule_ftpsyncfiles
- * @subpackage ftpsyncfiles
- * @copyright 2015 Ivan Šakić
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+namespace datalynxrule_ftpsyncfiles;
 
-use core\event\base;
+use context_user;
+use core\event\base as core_event_base;
+use datalynxfield_entryauthor\field as datalynxfield_entryauthor;
+use file_storage;
 use mod_datalynx\datalynx;
 use mod_datalynx\local\datalynx_entries;
-use mod_datalynx\local\rule\base as datalynx_rule_base;
-use datalynxfield_entryauthor\field as datalynxfield_entryauthor;
+use mod_datalynx\local\rule\base;
+use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * Download files via sftp.
+ *
+ * @package    datalynxrule_ftpsyncfiles
+ * @copyright  2026 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
+class rule extends base {
     /** @var string Rule type name. */
     public $type = 'ftpsyncfiles';
 
@@ -136,15 +137,13 @@ class datalynx_rule_ftpsyncfiles extends datalynx_rule_base {
      * @param base $event
      * @return true
      */
-    public function trigger(base $event) {
+    public function trigger(core_event_base $event) {
         global $CFG, $USER;
-        require_once("$CFG->dirroot/mod/datalynx/classes/datalynx.php");
-        require_once("$CFG->dirroot/mod/datalynx/view/csv/view_class.php");
         require_once($CFG->libdir . '/filelib.php');
         require_once($CFG->libdir . '/completionlib.php');
 
         $did = $event->get_data()['objectid'];
-        $this->dl = new mod_datalynx\datalynx($did);
+        $this->dl = new datalynx($did);
 
         $this->fs = get_file_storage();
         // Download files to $this->files array indexed by draftitemid.

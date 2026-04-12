@@ -14,17 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- *
- * @package mod_datalynx
- * @copyright 2014 onwards by edulabs.org and associated programmers
- * @copyright based on the work by 2013 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+namespace mod_datalynx\form;
+
+use coding_exception;
+use mod_datalynx\local\rule\manager;
+use moodleform;
+use stdClass;
+
 defined('MOODLE_INTERNAL') || die();
 
-require_once("$CFG->libdir/formslib.php");
-require_once('rule_manager.php');
+require_once($CFG->libdir . '/formslib.php');
 
 /**
  * Datalynx rule form base class.
@@ -33,7 +32,7 @@ require_once('rule_manager.php');
  * @copyright  2025 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class datalynx_rule_form extends moodleform {
+class rule_form extends moodleform {
     /**
      * @var object
      */
@@ -45,7 +44,7 @@ class datalynx_rule_form extends moodleform {
     protected $dl = null;
 
     /**
-     * datalynx_rule_form constructor.
+     * rule_form constructor.
      *
      * @param mixed $rule
      * @param mixed $action
@@ -109,7 +108,7 @@ class datalynx_rule_form extends moodleform {
         );
 
         // Events.
-        $eventmenu = datalynx_rule_manager::get_event_data($this->dl->id());
+        $eventmenu = manager::get_event_data($this->dl->id());
         $eventgroup = [];
         foreach ($eventmenu as $eventname => $eventlabel) {
             $eventgroup[] = &$mform->createElement('checkbox', $eventname, null, $eventlabel, ['size' => 32]);
@@ -176,7 +175,7 @@ class datalynx_rule_form extends moodleform {
      */
     public function get_data($slashed = true) {
         if ($data = parent::get_data($slashed)) {
-            $eventmenu = datalynx_rule_manager::get_event_data($this->dl->id());
+            $eventmenu = manager::get_event_data($this->dl->id());
             $selectedevents = [];
             foreach (array_keys($eventmenu) as $eventname) {
                 if (isset($data->$eventname)) {

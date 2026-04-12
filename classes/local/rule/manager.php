@@ -14,21 +14,25 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- *
- * @package mod_datalynx
- * @copyright 2015 Ivan Šakić
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-defined('MOODLE_INTERNAL') || die();
+namespace mod_datalynx\local\rule;
 
+use html_table;
+use html_writer;
 use mod_datalynx\datalynx;
-use mod_datalynx\local\rule\base as datalynx_rule_base;
+use moodle_url;
+use single_select;
+use stdClass;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Class that manages and triggers rules
+ *
+ * @package    mod_datalynx
+ * @copyright  2026 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class datalynx_rule_manager {
+class manager {
     /**
      * @var datalynx
      */
@@ -52,14 +56,13 @@ class datalynx_rule_manager {
      * @throws coding_exception
      */
     public static function get_event_data($dataid = 0) {
-        if (!self::$observers) {
-            require_once('../db/events.php');
-            self::$observers = $observers;
+        if (self::$observers === null) {
+            self::$observers = self::load_observers();
         }
 
         $eventmenu = [];
         foreach (self::$observers as $observer) {
-            if ($observer['callback'] == 'datalynx_rule_manager::trigger_rules') {
+            if ($observer['callback'] == self::class . '::trigger_rules') {
                 // Eventname is formed as follows: mod_datalynx\event\<name>, trimming backspace.
                 // Chars just in case.
                 $eventname = explode('\\', trim($observer['eventname'], '\\'))[2];
@@ -77,6 +80,20 @@ class datalynx_rule_manager {
     }
 
     /**
+     * Load observer definitions from db/events.php.
+     *
+     * @return array
+     */
+    private static function load_observers(): array {
+        global $CFG;
+
+        $observers = [];
+        require($CFG->dirroot . '/mod/datalynx/db/events.php');
+
+        return $observers;
+    }
+
+    /**
      * Get team fields menu for a given dataid
      *
      * @param int $dataid
@@ -91,9 +108,9 @@ class datalynx_rule_manager {
     /**
      * constructor
      *
-     * @param mod_datalynx\datalynx $datalynx datalynx
+     * @param datalynx $datalynx datalynx
      */
-    public function __construct(mod_datalynx\datalynx $datalynx) {
+    public function __construct(datalynx $datalynx) {
         $this->dl = $datalynx;
         $this->customrules = [];
     }
@@ -108,7 +125,7 @@ class datalynx_rule_manager {
         global $DB;
         $cmid = $event->get_data()['contextinstanceid'];
         $dataid = $DB->get_field('course_modules', 'instance', ['id' => $cmid]);
-        $rulemanager = new datalynx_rule_manager(new mod_datalynx\datalynx($dataid));
+        $rulemanager = new self(new datalynx($dataid));
         $rules = $rulemanager->get_rules_for_event($event->eventname);
         foreach ($rules as $rule) {
             $rule->trigger($event);
@@ -121,7 +138,7 @@ class datalynx_rule_manager {
      *
      * @param int $ruleid
      * @param bool $forceget
-     * @return datalynx_rule_base|null
+     * @return base|null
      */
     public function get_rule_from_id($ruleid, $forceget = false) {
         $rules = $this->get_rules(null, false, $forceget);
@@ -139,7 +156,7 @@ class datalynx_rule_manager {
      *
      * @param string $type Rule plugin type.
      * @param bool $menu If true, return name-keyed menu array instead of objects.
-     * @return datalynx_rule_base[]
+     * @return base[]
      */
     public function get_rules_by_plugintype($type, $menu = false) {
         $typerules = [];
@@ -159,7 +176,7 @@ class datalynx_rule_manager {
      *
      * @param string $eventname
      * @param bool $enabledonly
-     * @return datalynx_rule_base[]
+     * @return base[]
      */
     public function get_rules_for_event($eventname, $enabledonly = true) {
         $rules = [];
@@ -175,7 +192,7 @@ class datalynx_rule_manager {
      * given a rule name returns the rule object from get_rules
      *
      * @param string $name Rule name.
-     * @return datalynx_rule_base|false
+     * @return base|false
      */
     public function get_rule_by_name($name) {
         foreach ($this->get_rules() as $rule) {
@@ -192,11 +209,9 @@ class datalynx_rule_manager {
      * input: $param $rule record from db, or rule type
      *
      * @param mixed $key Rule record object or rule type string.
-     * @return datalynx_rule_base|false
+     * @return base|false
      */
     public function get_rule($key) {
-        global $CFG;
-
         if ($key) {
             if (is_object($key)) {
                 $type = $key->type;
@@ -204,8 +219,10 @@ class datalynx_rule_manager {
                 $type = $key;
                 $key = 0;
             }
-            require_once($type . '/rule_class.php');
-            $ruleclass = 'datalynx_rule_' . $type;
+            $ruleclass = self::get_rule_class_name($type);
+            if (!class_exists($ruleclass)) {
+                throw new \coding_exception('Invalid rule type: ' . $type);
+            }
             $rule = new $ruleclass($this->dl, $key);
             return $rule;
         } else {
@@ -218,7 +235,7 @@ class datalynx_rule_manager {
      * @param null $exclude
      * @param bool $menu
      * @param bool $forceget
-     * @return datalynx_rule_base[] array of all rules
+     * @return base[] array of all rules
      */
     public function get_rules($exclude = null, $menu = false, $forceget = false) {
         global $DB;
@@ -250,6 +267,31 @@ class datalynx_rule_manager {
             }
             return $retrules;
         }
+    }
+
+    /**
+     * Resolve the autoloaded rule class for a rule type.
+     *
+     * @param string $type
+     * @return string
+     */
+    public static function get_rule_class_name(string $type): string {
+        return "\\datalynxrule_{$type}\\rule";
+    }
+
+    /**
+     * Resolve the autoloaded rule form class for a rule type.
+     *
+     * @param string $type
+     * @return string
+     */
+    public static function get_rule_form_class_name(string $type): string {
+        $pluginformclass = "\\datalynxrule_{$type}\\form\\rule_form";
+        if (class_exists($pluginformclass)) {
+            return $pluginformclass;
+        }
+
+        return \mod_datalynx\form\rule_form::class;
     }
 
     /**
