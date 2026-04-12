@@ -218,8 +218,10 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
      * @param stdClass $data
      */
     public function set_data($data) {
+        $recipients = [];
         if (!empty($data->param3)) {
-            $recipients = unserialize($data->param3);
+            $unserialized = @unserialize($data->param3);
+            $recipients = is_array($unserialized) ? $unserialized : [];
         }
         if (isset($recipients['author'])) {
             $data->author = $recipients['author'];
@@ -235,10 +237,14 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
         }
 
         if (!empty($data->param4)) {
-            $data->param4 = unserialize($data->param4);
+            $unserialized = @unserialize($data->param4);
+            $data->param4 = is_array($unserialized) ? $unserialized : [];
         }
         if (!empty($data->param7)) {
-            $data->param7 = json_decode($data->param7);
+            $decoded = json_decode($data->param7);
+            $data->param7 = is_array($decoded) ? $decoded : [];
+        } else {
+            $data->param7 = [];
         }
         parent::set_data($data);
     }
@@ -268,8 +274,8 @@ class datalynx_rule_eventnotification_form extends datalynx_rule_form {
                 $recipients['specificuserid'] = $data->specificuserid;
             }
             $data->param3 = serialize($recipients);
-            $data->param4 = serialize($data->param4);
-            $data->param7 = json_encode($data->param7);
+            $data->param4 = serialize(!empty($data->param4) && is_array($data->param4) ? $data->param4 : []);
+            $data->param7 = json_encode(!empty($data->param7) && is_array($data->param7) ? $data->param7 : []);
         }
         return $data;
     }

@@ -59,9 +59,9 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
     protected $sender;
 
     /**
-     * @var string
+     * @var array
      */
-    protected string $recipient = '';
+    protected array $recipient = [];
 
     /**
      * @var array
@@ -78,12 +78,23 @@ class datalynx_rule_eventnotification extends datalynx_rule_base {
         parent::__construct($df, $rule);
 
         $this->sender = $this->rule->param2;
-        if (!empty($this->rule->param3)) {
-            $this->recipient = unserialize($this->rule->param3);
+        $this->recipient = $this->unserialize_array($this->rule->param3 ?? null);
+        $this->targetviews = $this->unserialize_array($this->rule->param4 ?? null);
+    }
+
+    /**
+     * Normalize serialized rule values that are expected to decode to arrays.
+     *
+     * @param mixed $value
+     * @return array
+     */
+    private function unserialize_array($value): array {
+        if (empty($value)) {
+            return [];
         }
-        if ($this->rule->param4) {
-            $this->targetviews = unserialize($this->rule->param4);
-        }
+
+        $unserialized = @unserialize($value);
+        return is_array($unserialized) ? $unserialized : [];
     }
 
     /**
