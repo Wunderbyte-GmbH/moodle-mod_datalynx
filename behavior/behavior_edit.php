@@ -21,10 +21,11 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_datalynx\form\datalynxfield_behavior_form;
+use mod_datalynx\local\field\datalynxfield_behavior;
+use mod_datalynx\datalynx;
+
 require_once('../../../config.php');
-require_once('behavior_form.php');
-require_once('behavior.php');
-require_once("$CFG->dirroot/mod/datalynx/classes/datalynx.php");
 
 $urlparams = new stdClass();
 $urlparams->d = required_param('d', PARAM_INT);
@@ -45,16 +46,16 @@ $returnurl = new moodle_url('/mod/datalynx/behavior/index.php', ['d' => $datalyn
 
 switch ($urlparams->action) {
     case "edit":
-        $mform = new datalynx_field_behavior_form($datalynx);
+        $mform = new datalynxfield_behavior_form($datalynx);
 
         if ($mform->is_cancelled()) {
             redirect($returnurl);
         } else {
             if ($data = $mform->get_data()) {
                 if (!$data->id) {
-                    $id = datalynx_field_behavior::insert_behavior($data);
+                    $id = datalynxfield_behavior::insert_behavior($data);
                 } else {
-                    datalynx_field_behavior::update_behavior($data);
+                    datalynxfield_behavior::update_behavior($data);
                 }
                 redirect($returnurl);
             }
@@ -63,7 +64,7 @@ switch ($urlparams->action) {
         $datalynx->print_header(['tab' => 'behaviors', 'nonotifications' => true, 'urlparams' => $urlparams]);
 
         if ($urlparams->id) {
-            $data = datalynx_field_behavior::get_behavior($urlparams->id);
+            $data = datalynxfield_behavior::get_behavior($urlparams->id);
             $mform->set_data($data);
             echo html_writer::tag(
                 'h2',
@@ -85,10 +86,10 @@ switch ($urlparams->action) {
 
     case "duplicate":
         if ($urlparams->confirmed) {
-            datalynx_field_behavior::duplicate_behavior($urlparams->id);
+            datalynxfield_behavior::duplicate_behavior($urlparams->id);
             redirect($returnurl);
         } else {
-            $data = datalynx_field_behavior::get_behavior($urlparams->id);
+            $data = datalynxfield_behavior::get_behavior($urlparams->id);
             $urlparams->confirmed = true;
             $datalynx->print_header(['tab' => 'behaviors', 'nonotifications' => true, 'urlparams' => $urlparams]);
             echo html_writer::tag(
@@ -107,10 +108,10 @@ switch ($urlparams->action) {
 
     case "delete":
         if ($urlparams->confirmed) {
-            datalynx_field_behavior::delete_behavior($urlparams->id);
+            datalynxfield_behavior::delete_behavior($urlparams->id);
             redirect($returnurl);
         } else {
-            $data = datalynx_field_behavior::get_behavior($urlparams->id);
+            $data = datalynxfield_behavior::get_behavior($urlparams->id);
             $urlparams->confirmed = true;
             $datalynx->print_header(
                 ['tab' => 'behaviors', 'nonotifications' => true,

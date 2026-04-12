@@ -24,13 +24,11 @@
 
 namespace mod_datalynx\local\field;
 
-use datalynx_field_behavior;
+use mod_datalynx\local\field\datalynxfield_behavior;
 use MoodleQuickForm;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
-
-require_once($CFG->dirroot . '/mod/datalynx/behavior/behavior.php');
 
 /**
  * Base class for field patterns
@@ -240,7 +238,7 @@ abstract class datalynxfield_renderer {
         $matches = [];
 
         $fieldname = $this->field->name();
-        $behavior = datalynx_field_behavior::get_default_behavior($this->field->df());
+        $behavior = datalynxfield_behavior::get_default_behavior($this->field->df());
         $renderer = datalynxfield_layout::get_default_renderer($this->field->df());
 
         if (preg_match($pattern, $tag, $matches)) {
@@ -248,7 +246,7 @@ abstract class datalynxfield_renderer {
 
             $behaviorname = isset($matches[2]) ? $matches[2] : false;
             if ($behaviorname) {
-                $behavior = datalynx_field_behavior::from_name($behaviorname, $this->field->df()->id());
+                $behavior = datalynxfield_behavior::from_name($behaviorname, $this->field->df()->id());
             }
 
             $renderername = isset($matches[3]) ? $matches[3] : false;

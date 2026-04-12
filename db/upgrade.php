@@ -43,6 +43,7 @@
  * before any action that may take longer time to finish.
  */
 
+use mod_datalynx\local\field\datalynxfield_behavior;
 use mod_datalynx\local\field\datalynxfield_layout;
 
 /**
@@ -1165,13 +1166,12 @@ function xmldb_datalynx_upgrade($oldversion) {
  * @return void
  */
 function mod_datalynx_upgrade_behaviors() {
-    require_once(dirname(__FILE__) . '/../behavior/behavior.php');
     global $DB;
     $existingdata = [];
     $allbehaviorids = $DB->get_fieldset_select('datalynx_behaviors', 'id', 'id > 0');
     if (!empty($allbehaviorids)) {
         foreach ($allbehaviorids as $behaviorid) {
-            $formdata = datalynx_field_behavior::get_behavior($behaviorid);
+            $formdata = datalynxfield_behavior::get_behavior($behaviorid);
             $visibleto = $DB->get_field('datalynx_behaviors', 'visibleto', ['id' => $behaviorid]);
             $visibletoperm = unserialize($visibleto);
             if (!empty($visibletoperm)) {
@@ -1184,7 +1184,7 @@ function mod_datalynx_upgrade_behaviors() {
                 $formdata->visibletopermission = array_values($visibletoperm);
                 $formdata->visibletouser = [];
                 $formdata->visibletoteammember = [];
-                datalynx_field_behavior::update_behavior($formdata);
+                datalynxfield_behavior::update_behavior($formdata);
             }
         }
     }
@@ -1196,7 +1196,6 @@ function mod_datalynx_upgrade_behaviors() {
  * @return void
  */
 function mod_datalynx_replace_field_rules() {
-    require_once(dirname(__FILE__) . '/../behavior/behavior.php');
     global $DB;
 
     $defaultbehavior = (object) ['name' => '', 'description' => '',
@@ -1218,7 +1217,7 @@ function mod_datalynx_replace_field_rules() {
                 $behavior->name = get_string('required', 'datalynx');
                 $behavior->required = true;
                 $behavior->d = $dataid;
-                datalynx_field_behavior::insert_behavior($behavior);
+                datalynxfield_behavior::insert_behavior($behavior);
 
                 foreach ($matches as $match) {
                     $view->param2 = str_replace(
@@ -1238,7 +1237,7 @@ function mod_datalynx_replace_field_rules() {
                 $behavior->name = get_string('hidden', 'datalynx');
                 $behavior->visibleto = [];
                 $behavior->d = $dataid;
-                datalynx_field_behavior::insert_behavior($behavior);
+                datalynxfield_behavior::insert_behavior($behavior);
 
                 foreach ($matches as $match) {
                     $view->param2 = str_replace(
@@ -1258,7 +1257,7 @@ function mod_datalynx_replace_field_rules() {
                 $behavior->name = get_string('noedit', 'datalynx');
                 $behavior->editableby = [];
                 $behavior->d = $dataid;
-                datalynx_field_behavior::insert_behavior($behavior);
+                datalynxfield_behavior::insert_behavior($behavior);
 
                 foreach ($matches as $match) {
                     $view->param2 = str_replace(

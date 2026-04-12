@@ -21,17 +21,23 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace mod_datalynx\local\field;
+
+use coding_exception;
+use dml_exception;
+use mod_datalynx;
 use mod_datalynx\datalynx;
+use moodle_exception;
+use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
-require_once(dirname(__FILE__) . '/../classes/datalynx.php');
 
 /**
  * Class datalynx_field_behavior
  *
  * Manages field-level visibility and editability behaviors for datalynx fields.
  */
-class datalynx_field_behavior {
+class datalynxfield_behavior {
     /** @var int The behavior record id. */
     private int $id;
 
@@ -91,7 +97,7 @@ class datalynx_field_behavior {
      *
      * @param string $name The behavior name.
      * @param int $dataid The datalynx instance ID.
-     * @return datalynx_field_behavior|false
+     * @return datalynxfield_behavior|false
      * @throws coding_exception
      * @throws dml_exception
      * @throws moodle_exception
@@ -100,7 +106,7 @@ class datalynx_field_behavior {
         global $DB;
         $record = $DB->get_record('datalynx_behaviors', ['name' => $name, 'dataid' => $dataid]);
         if ($record) {
-            return new datalynx_field_behavior($record);
+            return new datalynxfield_behavior($record);
         } else {
             return false; // Return false if behavior not found by name.
         }
@@ -110,13 +116,13 @@ class datalynx_field_behavior {
      * Get behavior object from the behavior id.
      *
      * @param int $id The behavior record ID.
-     * @return datalynx_field_behavior|false
+     * @return datalynxfield_behavior|false
      */
     public static function from_id($id) {
         global $DB;
         $record = $DB->get_record('datalynx_behaviors', ['id' => $id]);
         if ($record) {
-            return new datalynx_field_behavior($record);
+            return new datalynxfield_behavior($record);
         } else {
             return false; // Return false if behavior not found by id.
         }
@@ -138,7 +144,7 @@ class datalynx_field_behavior {
      * The default behavior used in any instance without user settings applied.
      *
      * @param datalynx $datalynx
-     * @return datalynx_field_behavior
+     * @return datalynxfield_behavior
      * @throws coding_exception
      * @throws dml_exception
      * @throws moodle_exception
@@ -149,7 +155,7 @@ class datalynx_field_behavior {
         $record->editableby = serialize($record->editableby);
         $record->datalynx = $datalynx;
         $record->dataid = $datalynx->id();
-        return new datalynx_field_behavior($record);
+        return new datalynxfield_behavior($record);
     }
 
     /**
@@ -182,7 +188,7 @@ class datalynx_field_behavior {
             return true;
         }
         // If special visibletouser is set overrule other visibility options.
-        if (isset($this->visibleto['users']) && in_array((string)$USER->id, array_map('strval', $this->visibleto['users']))) {
+        if (isset($this->visibleto['users']) && in_array((string) $USER->id, array_map('strval', $this->visibleto['users']))) {
             return true;
         }
 
@@ -211,8 +217,8 @@ class datalynx_field_behavior {
             if (!empty($allowedfieldids)) {
                 foreach ($allowedfieldids as $fieldid) {
                     $userids = isset($entry->{"c{$fieldid}_content"}) ? json_decode(
-                        $entry->{"c{$fieldid}_content"},
-                        true
+                            $entry->{"c{$fieldid}_content"},
+                            true
                     ) : [];
                     if (in_array($USER->id, $userids)) {
                         return true;
@@ -389,22 +395,22 @@ class datalynx_field_behavior {
         global $DB;
         // Read dataid from DB and find patterns and param2 from all connected views.
         $behaviorinfo = $DB->get_record(
-            'datalynx_behaviors',
-            ['id' => $behaviorid],
-            $fields = 'dataid, name',
-            $strictness = IGNORE_MISSING
+                'datalynx_behaviors',
+                ['id' => $behaviorid],
+                $fields = 'dataid, name',
+                $strictness = IGNORE_MISSING
         );
         $connected = $DB->get_records(
-            'datalynx_views',
-            ['dataid' => $behaviorinfo->dataid],
-            null,
-            'id, patterns, param2'
+                'datalynx_views',
+                ['dataid' => $behaviorinfo->dataid],
+                null,
+                'id, patterns, param2'
         );
         // Update every instance that still has the string ||behaviorname in it.
         foreach ($connected as $view) {
             // Check if view patterns or param2 contain the behavior name.
             if (
-                strpos($view->patterns, '|' . $behaviorinfo->name) !== false ||
+                    strpos($view->patterns, '|' . $behaviorinfo->name) !== false ||
                     strpos($view->param2, '|' . $behaviorinfo->name) !== false
             ) {
                 if (strpos($view->param2, '|' . $behaviorinfo->name . '|')) {
