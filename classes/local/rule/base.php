@@ -107,6 +107,10 @@ abstract class base {
      * @return bool
      */
     public function is_triggered_by($eventname) {
+        if (!is_string($eventname) || $eventname === '') {
+            return false;
+        }
+
         $eventname = explode('\\', trim($eventname, '\\'))[2];
         $triggers = array_map(
             function ($element) {
@@ -145,11 +149,19 @@ abstract class base {
         $this->rule->id = !empty($forminput->id) ? $forminput->id : 0;
         $this->rule->type = $this->type;
         $this->rule->dataid = $this->df->id();
-        $this->rule->name = !empty($forminput->name) ? trim($forminput->name) : '';
-        $this->rule->description = !empty($forminput->description) ? trim($forminput->description) : '';
+        $this->rule->name = !empty($forminput->name) && is_scalar($forminput->name) ? trim((string) $forminput->name) : '';
+        $this->rule->description = !empty($forminput->description) && is_scalar($forminput->description) ?
+                trim((string) $forminput->description) : '';
         $this->rule->enabled = isset($forminput->enabled) ? $forminput->enabled : 1;
         for ($i = 1; $i <= 10; $i++) {
-            $this->rule->{"param$i"} = !empty($forminput->{"param$i"}) ? trim($forminput->{"param$i"}) : null;
+            $value = $forminput->{"param$i"} ?? null;
+            if (is_string($value)) {
+                $this->rule->{"param$i"} = $value !== '' ? trim($value) : null;
+            } else if (is_scalar($value)) {
+                $this->rule->{"param$i"} = (string) $value;
+            } else {
+                $this->rule->{"param$i"} = $value ?: null;
+            }
         }
     }
 

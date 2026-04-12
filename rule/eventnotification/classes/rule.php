@@ -178,10 +178,11 @@ class rule extends base {
 
         $pluginname = get_string('pluginname', 'datalynx');
         $sitename = format_string($SITE->fullname);
-        if (empty(trim($this->rule->param6))) {
+        $customsubject = is_scalar($this->rule->param6 ?? null) ? trim((string) $this->rule->param6) : '';
+        if ($customsubject === '') {
             $subject = "$sitename -> $coursename -> $pluginname $datalynxname:  $notename";
         } else {
-            $subject = format_string(trim($this->rule->param6));
+            $subject = format_string($customsubject);
         }
         if (strpos($eventname, 'comment') !== false) {
             $entryid = $event->get_data()['other']['itemid'];
