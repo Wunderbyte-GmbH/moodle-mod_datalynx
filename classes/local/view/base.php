@@ -163,6 +163,15 @@ abstract class base {
     public bool $entriesprocessedsuccessfully = false;
 
     /**
+     * Whether this view is only meant for internal/template use and must stay out of browse UX.
+     *
+     * @return bool
+     */
+    public function is_internal_view(): bool {
+        return false;
+    }
+
+    /**
      * Constructor
      * View or datalynx or both, each can be id or object
      *
@@ -720,11 +729,12 @@ abstract class base {
         $requiresmanageentries = $this->set_display_definition($options);
 
         // Set view specific tags.
-        $viewoptions = ['pluginfileurl' => $pluginfileurl,
+        $viewoptions = array_merge($options, ['pluginfileurl' => $pluginfileurl,
                 'entriescount' => $this->entries->get_count(),
                 'entriesfiltercount' => $this->entries->get_count(true),
                 'hidenewentry' => ($this->user_is_editing() || $new) ? 1 : 0,
-                'showentryactions' => $requiresmanageentries && $showentryactions];
+                'showentryactions' => $requiresmanageentries && $showentryactions,
+        ]);
 
         $this->set_view_tags($viewoptions);
 

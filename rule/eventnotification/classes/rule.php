@@ -71,6 +71,11 @@ class rule extends base {
     protected array $targetviews = [];
 
     /**
+     * @var int Selected email template view id.
+     */
+    protected int $emailtemplateviewid = 0;
+
+    /**
      * Class constructor
      *
      * @param datalynx|int $df datalynx id or class object
@@ -82,6 +87,7 @@ class rule extends base {
         $this->sender = $this->rule->param2;
         $this->recipient = $this->unserialize_array($this->rule->param3 ?? null);
         $this->targetviews = $this->unserialize_array($this->rule->param4 ?? null);
+        $this->emailtemplateviewid = !empty($this->rule->param8) ? (int) $this->rule->param8 : 0;
     }
 
     /**
@@ -253,11 +259,17 @@ class rule extends base {
                 $entryurl,
                 get_string('linktoentry', 'datalynx')
             );
-            $messagedata->datalynxlink = html_writer::link(new moodle_url($viewurl), $datalynxname);
+            $datalynxurl = new moodle_url($viewurl);
+            $messagedata->datalynxlink = html_writer::link($datalynxurl, $datalynxname);
 
-            $messagetext = get_string("message_$eventname", 'datalynx', $messagedata);
-            $message->fullmessage = html_to_text($messagetext);
-            $message->fullmessagehtml = text_to_html($messagetext, false, false, true);
+            [$message->fullmessage, $message->fullmessagehtml] = $this->build_message_body(
+                $eventname,
+                $entryid,
+                $entryurl,
+                $datalynxurl,
+                $messagedata,
+                $userto
+            );
             $messagestosend[] = $message;
         }
         if ($messagestosend) {
@@ -267,6 +279,85 @@ class rule extends base {
             \core\task\manager::queue_adhoc_task($adhocktask);
         }
         return true;
+    }
+
+    /**
+     * Build the notification message body using either the selected email view or the legacy text.
+     *
+     * @param string $eventname
+     * @param int $entryid
+     * @param moodle_url $entryurl
+     * @param moodle_url $datalynxurl
+     * @param stdClass $messagedata
+     * @param stdClass $recipient
+     * @return array{0:string,1:string}
+     */
+    private function build_message_body(
+        string $eventname,
+        int $entryid,
+        moodle_url $entryurl,
+        moodle_url $datalynxurl,
+        stdClass $messagedata,
+        stdClass $recipient
+    ): array {
+        $templatehtml = $this->render_email_template($entryid, $entryurl, $datalynxurl, $recipient);
+        if ($templatehtml !== null) {
+            return [html_to_text($templatehtml), $templatehtml];
+        }
+
+        $messagetext = get_string("message_$eventname", 'datalynx', $messagedata);
+        return [html_to_text($messagetext), text_to_html($messagetext, false, false, true)];
+    }
+
+    /**
+     * Render the selected email template view for a specific entry.
+     *
+     * @param int $entryid
+     * @param moodle_url $entryurl
+     * @param moodle_url $datalynxurl
+     * @param stdClass $recipient
+     * @return string|null
+     */
+    private function render_email_template(
+        int $entryid,
+        moodle_url $entryurl,
+        moodle_url $datalynxurl,
+        stdClass $recipient
+    ): ?string {
+        global $USER;
+
+        if (empty($this->emailtemplateviewid)) {
+            return null;
+        }
+
+        $originaluser = $USER;
+        \core\session\manager::set_user($recipient);
+
+        try {
+            $df = new datalynx($this->df()->id());
+            $viewrecord = $df->get_all_views()[$this->emailtemplateviewid] ?? null;
+            if (!$viewrecord || $viewrecord->type !== datalynx::INTERNAL_VIEW_EMAIL) {
+                return null;
+            }
+
+            $view = $df->get_view($viewrecord);
+            $df->set_current_view($view);
+            $view->set_filter(['eids' => $entryid], true);
+            $view->set_content(['filter' => $view->get_filter()]);
+
+            return $view->display([
+                'controls' => false,
+                'entryactions' => false,
+                'notify' => false,
+                'tohtml' => true,
+                'notificationentryurl' => $entryurl->out(false),
+                'notificationentrylink' => html_writer::link($entryurl, get_string('linktoentry', 'datalynx')),
+                'notificationdatalynxurl' => $datalynxurl->out(false),
+                'notificationdatalynxlink' => html_writer::link($datalynxurl, format_string($df->name(), true)),
+            ]);
+        } finally {
+            \core\session\manager::set_user($originaluser);
+        }
     }
 
     /**

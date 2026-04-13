@@ -78,6 +78,7 @@ class datalynxview_base_form extends moodleform {
         $df = $this->dl;
         $editoroptions = $view->editors();
         $mform = &$this->_form;
+        $internalview = $view->is_internal_view();
 
         // Buttons.
         $this->add_action_buttons();
@@ -99,76 +100,80 @@ class datalynxview_base_form extends moodleform {
             $mform->setType('description', PARAM_TEXT);
         }
 
-        $visiblegrp = [];
-        $visiblegrp[] = $mform->createElement(
-            'advcheckbox',
-            'visible1',
-            '',
-            get_string('visible1', 'datalynx'),
-            ['group' => 1],
-            [0, 1]
-        );
-        $visiblegrp[] = $mform->createElement(
-            'advcheckbox',
-            'visible2',
-            '',
-            get_string('visible2', 'datalynx'),
-            ['group' => 1],
-            [0, 2]
-        );
-        $visiblegrp[] = $mform->createElement(
-            'advcheckbox',
-            'visible4',
-            '',
-            get_string('visible4', 'datalynx'),
-            ['group' => 1],
-            [0, 4]
-        );
-        $visiblegrp[] = $mform->createElement(
-            'advcheckbox',
-            'visible8',
-            '',
-            get_string('visible8', 'datalynx'),
-            ['group' => 1],
-            [0, 8]
-        );
-        $mform->addGroup($visiblegrp, 'visiblegroup', get_string('visibleto', 'datalynx'), null, false);
+        if (!$internalview) {
+            $visiblegrp = [];
+            $visiblegrp[] = $mform->createElement(
+                'advcheckbox',
+                'visible1',
+                '',
+                get_string('visible1', 'datalynx'),
+                ['group' => 1],
+                [0, 1]
+            );
+            $visiblegrp[] = $mform->createElement(
+                'advcheckbox',
+                'visible2',
+                '',
+                get_string('visible2', 'datalynx'),
+                ['group' => 1],
+                [0, 2]
+            );
+            $visiblegrp[] = $mform->createElement(
+                'advcheckbox',
+                'visible4',
+                '',
+                get_string('visible4', 'datalynx'),
+                ['group' => 1],
+                [0, 4]
+            );
+            $visiblegrp[] = $mform->createElement(
+                'advcheckbox',
+                'visible8',
+                '',
+                get_string('visible8', 'datalynx'),
+                ['group' => 1],
+                [0, 8]
+            );
+            $mform->addGroup($visiblegrp, 'visiblegroup', get_string('visibleto', 'datalynx'), null, false);
 
-        // Filter.
-        $filtersmenu = $df->get_filter_manager()->get_filters(null, true);
-        if (!$filtersmenu) {
-            $filtersmenu = [0 => get_string('filtersnonedefined', 'datalynx')];
-        } else {
-            $filtersmenu = [0 => get_string('choose')] + $filtersmenu;
+            // Filter.
+            $filtersmenu = $df->get_filter_manager()->get_filters(null, true);
+            if (!$filtersmenu) {
+                $filtersmenu = [0 => get_string('filtersnonedefined', 'datalynx')];
+            } else {
+                $filtersmenu = [0 => get_string('choose')] + $filtersmenu;
+            }
+            $mform->addElement('select', 'filter', get_string('viewfilter', 'datalynx'), $filtersmenu);
+            $mform->setDefault('filter', 0);
+
+            // Overridefilter.
+            $mform->addElement(
+                'advcheckbox',
+                'param5',
+                get_string('viewfilteroverride', 'datalynx'),
+                get_string('viewfoverride', 'datalynx')
+            );
+            $mform->addHelpButton('param5', 'viewfoverride', 'datalynx');
+            $mform->setType('param5', PARAM_INT);
+            $mform->setDefault('param5', 0);
+
+            $mform->addElement('header', 'redirectsettings', get_string('redirectsettings', 'datalynx'));
+            $mform->addHelpButton('redirectsettings', 'redirectsettings', 'datalynx');
+            $mform->addElement('select', 'param10', get_string('redirectto', 'datalynx'), $this->get_view_menu());
+            $mform->setDefault('param10', $DB->get_field('datalynx', 'defaultview', ['id' => $this->dl->id()]));
+            $mform->setType('param10', PARAM_INT);
         }
-        $mform->addElement('select', 'filter', get_string('viewfilter', 'datalynx'), $filtersmenu);
-        $mform->setDefault('filter', 0);
-
-        // Overridefilter.
-        $mform->addElement(
-            'advcheckbox',
-            'param5',
-            get_string('viewfilteroverride', 'datalynx'),
-            get_string('viewfoverride', 'datalynx')
-        );
-        $mform->addHelpButton('param5', 'viewfoverride', 'datalynx');
-        $mform->setType('param5', PARAM_INT);
-        $mform->setDefault('param5', 0);
-
-        $mform->addElement('header', 'redirectsettings', get_string('redirectsettings', 'datalynx'));
-        $mform->addHelpButton('redirectsettings', 'redirectsettings', 'datalynx');
-        $mform->addElement('select', 'param10', get_string('redirectto', 'datalynx'), $this->get_view_menu());
-        $mform->setDefault('param10', $DB->get_field('datalynx', 'defaultview', ['id' => $this->dl->id()]));
-        $mform->setType('param10', PARAM_INT);
 
         // View specific definition.
         $this->view_definition_before_gps();
 
         // View template: header and editor for view template.
-        $mform->addElement('header', 'viewtemplatehdr', get_string('viewtemplate', 'datalynx'));
-        $mform->addHelpButton('viewtemplatehdr', 'viewtemplate', 'datalynx');
-        $mform->addElement('editor', 'esection_editor', '', null, $editoroptions['section']);
-        $this->add_tags_selector('esection_editor', 'general');
+        if (!$internalview) {
+            $mform->addElement('header', 'viewtemplatehdr', get_string('viewtemplate', 'datalynx'));
+            $mform->addHelpButton('viewtemplatehdr', 'viewtemplate', 'datalynx');
+            $mform->addElement('editor', 'esection_editor', '', null, $editoroptions['section']);
+            $this->add_tags_selector('esection_editor', 'general');
+        }
 
         // View specific definition.
         $this->view_definition_after_gps();
@@ -183,11 +188,19 @@ class datalynxview_base_form extends moodleform {
     public function get_data() {
         $data = parent::get_data();
         if (isset($data)) {
+            if ($this->view->is_internal_view()) {
+                $data->visible = 1;
+                $data->filter = 0;
+                $data->param5 = 0;
+                $data->param10 = 0;
+                return $data;
+            }
+
             $visiblesum = 0;
-            $visiblesum += (int) $data->visible1;
-            $visiblesum += (int) $data->visible2;
-            $visiblesum += (int) $data->visible4;
-            $visiblesum += (int) $data->visible8;
+            $visiblesum += (int) ($data->visible1 ?? 0);
+            $visiblesum += (int) ($data->visible2 ?? 0);
+            $visiblesum += (int) ($data->visible4 ?? 0);
+            $visiblesum += (int) ($data->visible8 ?? 0);
             // Store the sum in the visible field.
             $data->visible = $visiblesum;
         }
@@ -235,11 +248,12 @@ class datalynxview_base_form extends moodleform {
         $dataid = $this->dl->id();
         $query = "SELECT dv.id, dv.name
                     FROM {datalynx_views} dv
-                   WHERE dv.dataid = :dataid";
+                   WHERE dv.dataid = :dataid
+                     AND dv.type <> :internaltype";
         $dviewid = $DB->get_field('datalynx', 'defaultview', ['id' => $dataid]);
         $eviewid = $DB->get_field('datalynx', 'singleedit', ['id' => $dataid]);
         $mviewid = $DB->get_field('datalynx', 'singleview', ['id' => $dataid]);
-        $menu = $DB->get_records_sql_menu($query, ['dataid' => $dataid]);
+        $menu = $DB->get_records_sql_menu($query, ['dataid' => $dataid, 'internaltype' => 'email']);
         if (isset($menu[$dviewid])) {
             $menu[$dviewid] .= ' ' . get_string('targetviewdefault', 'datalynx');
         }

@@ -43,6 +43,14 @@ class rule_form extends base_rule_form {
         $mform->addElement('text', 'param6', get_string('asyncmessagesubject', 'backup'), ['size' => '64']);
         $mform->setType('param6', PARAM_TEXT);
 
+        $mform->addElement(
+            'select',
+            'param8',
+            get_string('emailtemplate', 'datalynxrule_eventnotification'),
+            $this->get_email_template_menu()
+        );
+        $mform->addHelpButton('param8', 'emailtemplate', 'datalynxrule_eventnotification');
+
         $mform->addElement('header', 'settingshdr', get_string('settings'));
 
         // Sender.
@@ -176,12 +184,43 @@ class rule_form extends base_rule_form {
     private function get_views_visible_to_datalynx_permission(int $permissionid): array {
         global $DB;
         if ($permissionid == datalynx::PERMISSION_ADMIN) {
-            $sql = "SELECT id, name FROM {datalynx_views} WHERE dataid = :dataid";
-            return $DB->get_records_sql_menu($sql, ['dataid' => $this->dl->id()]);
+            $sql = "SELECT id, name
+                      FROM {datalynx_views}
+                     WHERE dataid = :dataid
+                       AND type <> :internaltype";
+            return $DB->get_records_sql_menu($sql, ['dataid' => $this->dl->id(), 'internaltype' => datalynx::INTERNAL_VIEW_EMAIL]);
         } else {
-            $sql = "SELECT id, name FROM {datalynx_views} WHERE dataid = :dataid AND visible & :permissionid <> 0";
-            return $DB->get_records_sql_menu($sql, ['dataid' => $this->dl->id(), 'permissionid' => $permissionid]);
+            $sql = "SELECT id, name
+                      FROM {datalynx_views}
+                     WHERE dataid = :dataid
+                       AND type <> :internaltype
+                       AND visible & :permissionid <> 0";
+            return $DB->get_records_sql_menu($sql, ['dataid' => $this->dl->id(), 'internaltype' => datalynx::INTERNAL_VIEW_EMAIL,
+                    'permissionid' => $permissionid]);
         }
+    }
+
+    /**
+     * Get the selectable email template views.
+     *
+     * @return array
+     */
+    private function get_email_template_menu(): array {
+        $views = [0 => get_string('emailtemplatenone', 'datalynxrule_eventnotification')];
+        foreach ($this->dl->get_all_views() as $view) {
+            if ($view->type === datalynx::INTERNAL_VIEW_EMAIL) {
+                $views[$view->id] = $view->name;
+            }
+        }
+
+        if (count($views) > 1) {
+            $templates = $views;
+            unset($templates[0]);
+            asort($templates);
+            $views = [0 => get_string('emailtemplatenone', 'datalynxrule_eventnotification')] + $templates;
+        }
+
+        return $views;
     }
 
     /**

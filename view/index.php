@@ -111,7 +111,7 @@ if (empty($views)) {
     // Now views defined yet.
     $dl->notifications['bad']['getstartedviews'] = get_string('viewnoneindatalynx', 'datalynx');
 } else {
-    if (empty($dl->data->defaultview)) {
+    if (empty($dl->data->defaultview) && !empty($dl->get_view_records(true))) {
         $dl->notifications['bad']['defaultview'] = get_string('viewnodefault', 'datalynx', '');
     }
 }
@@ -232,10 +232,15 @@ if (!empty($views)) {
     $table->setup();
 
     foreach ($views as $viewid => $view) {
-        $viewname = html_writer::link(
-            new moodle_url($viewbaseurl, ['d' => $dl->id(), 'view' => $viewid]),
-            $view->name()
-        );
+        $internalview = $view->is_internal_view();
+        if ($internalview) {
+            $viewname = format_string($view->name());
+        } else {
+            $viewname = html_writer::link(
+                new moodle_url($viewbaseurl, ['d' => $dl->id(), 'view' => $viewid]),
+                $view->name()
+            );
+        }
         $viewtype = $view->typename();
         $viewdescription = shorten_text($view->view->description, 30);
         $viewedit = html_writer::link(
@@ -257,19 +262,24 @@ if (!empty($views)) {
         );
         $viewselector = html_writer::checkbox("viewselector", $viewid, false);
 
-        $viewvisible = '';
-        for ($i = 1; $i < 16; $i = $i << 1) {
-            $viewvisible .= html_writer::checkbox(
-                "visible[{$i}]",
-                1,
-                ($i & $view->view->visible),
-                '',
-                ['disabled' => '', 'title' => get_string("visible{$i}", 'datalynx')]
-            );
+        $viewvisible = '&mdash;';
+        if (!$internalview) {
+            $viewvisible = '';
+            for ($i = 1; $i < 16; $i = $i << 1) {
+                $viewvisible .= html_writer::checkbox(
+                    "visible[{$i}]",
+                    1,
+                    ($i & $view->view->visible),
+                    '',
+                    ['disabled' => '', 'title' => get_string("visible{$i}", 'datalynx')]
+                );
+            }
         }
 
         // Default view.
-        if ($viewid == $dl->data->defaultview) {
+        if ($internalview) {
+            $defaultview = '&mdash;';
+        } else if ($viewid == $dl->data->defaultview) {
             $defaultview = $OUTPUT->pix_icon('t/approve', get_string('isdefault', 'mod_datalynx'));
         } else {
             $defaultview = html_writer::link(
@@ -279,7 +289,9 @@ if (!empty($views)) {
         }
 
         // Single edit view.
-        if ($viewid == $dl->data->singleedit) {
+        if ($internalview) {
+            $singleedit = '&mdash;';
+        } else if ($viewid == $dl->data->singleedit) {
             $singleedit = html_writer::link(
                 new moodle_url($actionbaseurl, $linkparams + ['singleedit' => -1]),
                 $OUTPUT->pix_icon('t/approve', get_string('isedit', 'mod_datalynx'))
@@ -292,7 +304,9 @@ if (!empty($views)) {
         }
 
         // Single more view.
-        if ($viewid == $dl->data->singleview) {
+        if ($internalview) {
+            $singlemore = '&mdash;';
+        } else if ($viewid == $dl->data->singleview) {
             $singlemore = html_writer::link(
                 new moodle_url($actionbaseurl, $linkparams + ['singlemore' => -1]),
                 $OUTPUT->pix_icon('t/approve', get_string('ismore', 'mod_datalynx'))
@@ -305,7 +319,9 @@ if (!empty($views)) {
         }
 
         // TODO MDL-000000 view filter.
-        if (!empty($filtersmenu)) {
+        if ($internalview) {
+            $viewfilter = '&mdash;';
+        } else if (!empty($filtersmenu)) {
             $viewfilterid = $view->view->filter;
             if ($viewfilterid && !in_array($viewfilterid, array_keys($filtersmenu))) {
                 $viewfilter = html_writer::link(

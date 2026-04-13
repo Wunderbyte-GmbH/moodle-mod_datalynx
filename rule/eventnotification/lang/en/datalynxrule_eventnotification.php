@@ -26,6 +26,9 @@ $string['condition'] = 'The value the selected field has to have';
 $string['condition_help'] = 'The value the selected field has to meet in order to be true.
 For checkboxes the selected rows have to be entered in comma separated way: First row and third row will be: 1,3
 For radio buttons, 1 for the first choice, 2 for the second.';
+$string['emailtemplate'] = 'Email template';
+$string['emailtemplate_help'] = 'Select an internal Email view to render the notification body. If no template is selected, the legacy notification message body is used.';
+$string['emailtemplatenone'] = 'No template';
 $string['event'] = 'Datalynx event';
 $string['messagecontent'] = 'Field content that is included in the message';
 $string['pluginname'] = 'Event notification';

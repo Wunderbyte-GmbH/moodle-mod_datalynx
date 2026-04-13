@@ -25,6 +25,9 @@ $string['condition'] = 'Der Wert, den das ausgewählte Feld haben muss';
 $string['condition_help'] = 'Der Wert, den das ausgewählte Feld erfüllen muss, um die Bedingung zu erfüllen.
 Bei Checkboxen müssen die ausgewählten Zeilen eingegeben werden, getrennt durch einen Beistrich: Für erste Zeile und dritte Zeile: 1,3
 Bei Optionsfeldern: 1 für die erste Auswahl, 2 für die zweite.';
+$string['emailtemplate'] = 'E-Mail-Vorlage';
+$string['emailtemplate_help'] = 'Wählen Sie eine interne E-Mail-Ansicht aus, um den Nachrichtentext zu erzeugen. Wenn keine Vorlage ausgewählt ist, wird weiterhin der bisherige Nachrichtentext verwendet.';
+$string['emailtemplatenone'] = 'Keine Vorlage';
 $string['event'] = 'Datalynx Ereignis';
 $string['messagecontent'] = 'Felder deren Inhalt in der Nachricht inkludiert wird';
 $string['pluginname'] = 'Ereignisbenachrichtigung';

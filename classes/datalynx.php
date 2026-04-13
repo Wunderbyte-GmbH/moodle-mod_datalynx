@@ -66,6 +66,9 @@ class datalynx {
     /** @var int Approval required only for new entries. */
     const APPROVAL_ON_NEW = 2;
 
+    /** @var string Internal-only email template view type. */
+    const INTERNAL_VIEW_EMAIL = 'email';
+
     /**
      * @var stdClass course module
      */
@@ -281,6 +284,19 @@ class datalynx {
      */
     public function get_current_view() {
         return $this->currentview;
+    }
+
+    /**
+     * Set current view explicitly.
+     *
+     * Used by internal rendering paths that do not go through the regular
+     * request-based current view resolution.
+     *
+     * @param base|null $view
+     * @return void
+     */
+    public function set_current_view(?base $view): void {
+        $this->currentview = $view;
     }
 
     /**
@@ -1456,7 +1472,7 @@ class datalynx {
                 return $views;
             }
             foreach ($views as $viewid => $view) {
-                if ($this->is_visible_to_user($view)) {
+                if ($this->is_visible_to_user($view) && $this->is_browsable_view($view)) {
                     $this->views[$viewid] = $view;
                 }
             }
@@ -1530,6 +1546,26 @@ class datalynx {
         $mask |= has_capability('mod/datalynx:viewprivilegestudent', $this->context, null, false) ? 4 : 0;
         $mask |= has_capability('mod/datalynx:viewprivilegeguest', $this->context, null, false) ? 8 : 0;
         return $isadmin || ($view->visible & $mask);
+    }
+
+    /**
+     * Whether a view type is internal-only and excluded from the browse experience.
+     *
+     * @param string $type
+     * @return bool
+     */
+    public function is_internal_view_type(string $type): bool {
+        return $type === self::INTERNAL_VIEW_EMAIL;
+    }
+
+    /**
+     * Whether a view record should participate in the browse experience.
+     *
+     * @param stdClass $view
+     * @return bool
+     */
+    public function is_browsable_view(stdClass $view): bool {
+        return !$this->is_internal_view_type($view->type);
     }
 
     /**
@@ -1686,6 +1722,10 @@ class datalynx {
     public function set_default_view(int $viewid = 0): void {
         global $DB;
 
+        if ($viewid && $this->is_internal_view_id($viewid)) {
+            throw new moodle_exception('invalidview', 'datalynx', '', $viewid);
+        }
+
         $rec = new stdClass();
         $rec->id = $this->id();
         $rec->defaultview = $viewid;
@@ -1720,6 +1760,10 @@ class datalynx {
     public function set_single_edit_view(int $viewid = 0): void {
         global $DB;
 
+        if ($viewid && $this->is_internal_view_id($viewid)) {
+            throw new moodle_exception('invalidview', 'datalynx', '', $viewid);
+        }
+
         $rec = new stdClass();
         $rec->id = $this->id();
         $rec->singleedit = $viewid;
@@ -1737,6 +1781,10 @@ class datalynx {
     public function set_single_more_view(int $viewid = 0): void {
         global $DB;
 
+        if ($viewid && $this->is_internal_view_id($viewid)) {
+            throw new moodle_exception('invalidview', 'datalynx', '', $viewid);
+        }
+
         $rec = new stdClass();
         $rec->id = $this->id();
         $rec->singleview = $viewid;
@@ -1744,6 +1792,19 @@ class datalynx {
             throw new moodle_exception('Failed to update the database');
         }
         $this->data->singleview = $viewid;
+    }
+
+    /**
+     * Whether the given stored view id belongs to an internal-only view.
+     *
+     * @param int $viewid
+     * @return bool
+     */
+    protected function is_internal_view_id(int $viewid): bool {
+        global $DB;
+
+        $type = $DB->get_field('datalynx_views', 'type', ['id' => $viewid]);
+        return !empty($type) && $this->is_internal_view_type($type);
     }
 
     /**

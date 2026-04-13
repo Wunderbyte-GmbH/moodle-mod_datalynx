@@ -18,6 +18,7 @@ namespace mod_datalynx\form;
 use mod_datalynx\local\field\datalynxfield_base;
 use mod_datalynx;
 use moodleform;
+use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 
