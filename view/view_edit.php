@@ -104,8 +104,9 @@ if ($urlparams->vedit) {
     }
 } else {
     if ($urlparams->type) {
-        $view = $dl->get_view($urlparams->type);
-        if (!$view) {
+        try {
+            $view = $dl->get_view($urlparams->type);
+        } catch (\coding_exception $e) {
             throw new moodle_exception('The requested view type does not exist.');
         }
         $view->generate_default_view();

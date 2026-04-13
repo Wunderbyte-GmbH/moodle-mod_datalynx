@@ -104,9 +104,10 @@ class datalynxview_csv extends base {
      *
      * @param int|stdClass $df
      * @param int|stdClass $view
+     * @param bool $filteroptions
      */
-    public function __construct($df = 0, $view = 0) {
-        parent::__construct($df, $view);
+    public function __construct($df = 0, $view = 0, $filteroptions = true) {
+        parent::__construct($df, $view, $filteroptions);
         if (!empty($this->view->param3)) {
             $this->output = $this->view->param3;
         }

@@ -178,7 +178,7 @@ final class email_view_test extends advanced_testcase {
             1
         );
 
-        $view = $df->get_view($viewrecord);
+        $view = $df->get_view($viewrecord->type, $viewrecord);
         $patternclass = $view->patternclass();
         $tagentry = '##notificationentrylink##';
         $tagdatalynx = '##notificationdatalynxurl##';

@@ -116,9 +116,10 @@ class datalynxview_pdf extends base {
      *
      * @param int $df Datalynx instance id
      * @param int $view View id
+     * @param bool $filteroptions
      */
-    public function __construct($df = 0, $view = 0) {
-        parent::__construct($df, $view);
+    public function __construct($df = 0, $view = 0, $filteroptions = true) {
+        parent::__construct($df, $view, $filteroptions);
 
         if (!empty($this->view->param1)) {
             if (base64_decode($this->view->param1, true)) {

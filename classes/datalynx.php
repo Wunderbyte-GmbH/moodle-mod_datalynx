@@ -23,6 +23,7 @@
  */
 
 namespace mod_datalynx;
+use coding_exception;
 use completion_info;
 use context_module;
 use core_course_category;
@@ -906,17 +907,12 @@ class datalynx {
                 'completion' => true, 'comments' => true, 'urlparams' => $urlparams];
         $datalynx->set_page('external', $pageparams, $skiplogincheck);
         $type = $datalynx->views[$viewid]->type;
-        require_once($CFG->dirroot . "/mod/datalynx/view/$type/view_class.php");
-        $viewclass = "datalynxview_$type";
-        $datalynx->currentview = $datalynx->get_current_view_from_id($viewid);
+        $view = $datalynx->get_view($type, $viewid, $filteroptions);
+        $datalynx->currentview = $view;
+        $view->set_content();
 
-        if ($view = new $viewclass($datalynxid, $viewid, $filteroptions)) {
-            $view->set_content();
-            $view->get_dl()->currentview = $datalynx->currentview;
-            $viewcontent = $view->display($options);
-            return "$viewcontent";
-        }
-        return null;
+        $viewcontent = $view->display($options);
+        return "$viewcontent";
     }
 
     /**
@@ -1493,7 +1489,7 @@ class datalynx {
             $returnviews = [];
             if (!empty($views)) {
                 foreach ($views as $viewid => $view) {
-                    $returnviews[$viewid] = $this->get_view($view);
+                    $returnviews[$viewid] = $this->get_view($view->type, $view);
                 }
             }
             return $returnviews;
@@ -1587,7 +1583,7 @@ class datalynx {
                     return false;
                 }
             }
-            return $this->get_view($view, true);
+            return $this->get_view($view->type, $view);
         }
         return false;
     }
@@ -1613,34 +1609,50 @@ class datalynx {
                     return false;
                 }
             }
-            return $this->get_view($view);
+            return $this->get_view($view->type, $view);
         }
         return false;
     }
 
     /**
-     * returns a view subclass object given a view record or view type
-     * invoke plugin methods
-     * input: $param $vt - mixed, view record or view type
+     * Resolve the concrete class name for a datalynx view type.
      *
-     * @param mixed $viewortype View record object or view type string.
-     * @param bool $active
-     * @return mixed
+     * @param string $type
+     * @return string
      */
-    public function get_view($viewortype, $active = false): base {
+    private function get_view_classname(string $type): string {
         global $CFG;
 
-        if ($viewortype) {
-            if (is_object($viewortype)) {
-                $type = $viewortype->type;
-            } else {
-                $type = $viewortype;
-                $viewortype = 0;
-            }
-            require_once($CFG->dirroot . '/mod/datalynx/view/' . $type . '/view_class.php');
-            $viewclass = 'datalynxview_' . $type;
-            return new $viewclass($this, $viewortype, $active);
+        $type = trim($type);
+        if ($type === '') {
+            throw new coding_exception('View type must be provided.');
         }
+
+        $viewpath = $CFG->dirroot . '/mod/datalynx/view/' . $type . '/view_class.php';
+        if (!is_readable($viewpath)) {
+            throw new coding_exception('Invalid view type: ' . $type);
+        }
+
+        require_once($viewpath);
+        $viewclass = 'datalynxview_' . $type;
+        if (!class_exists($viewclass)) {
+            throw new coding_exception('Missing view class for type: ' . $type);
+        }
+
+        return $viewclass;
+    }
+
+    /**
+     * Instantiate a datalynx view by type.
+     *
+     * @param string $type View type.
+     * @param stdClass|int $view Existing view record or id, or 0 for a new unsaved view.
+     * @param bool $filteroptions Whether to apply filter options.
+     * @return base
+     */
+    public function get_view(string $type, stdClass|int $view = 0, bool $filteroptions = true): base {
+        $viewclass = $this->get_view_classname($type);
+        return new $viewclass($this, $view, $filteroptions);
     }
 
     /**
@@ -1660,7 +1672,7 @@ class datalynx {
         $typeviews = [];
         foreach ($views as $viewid => $view) {
             if ($view->type === $type) {
-                $typeviews[$viewid] = $this->get_view($view);
+                $typeviews[$viewid] = $this->get_view($view->type, $view);
             }
         }
         return $typeviews;
@@ -1686,7 +1698,7 @@ class datalynx {
                 if (!empty($exclude) && in_array($viewid, $exclude)) {
                     continue;
                 }
-                $views[$viewid] = $this->get_view($view);
+                $views[$viewid] = $this->get_view($view->type, $view);
             }
         }
         return $views;

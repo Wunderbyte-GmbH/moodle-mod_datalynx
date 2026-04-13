@@ -340,7 +340,7 @@ class rule extends base {
                 return null;
             }
 
-            $view = $df->get_view($viewrecord);
+            $view = $df->get_view($viewrecord->type, $viewrecord);
             $df->set_current_view($view);
             $view->set_filter(['eids' => $entryid], true);
             $view->set_content(['filter' => $view->get_filter()]);

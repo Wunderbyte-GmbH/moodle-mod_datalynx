@@ -60,9 +60,10 @@ class datalynxview_report extends base {
      *
      * @param mixed $df Datalynx instance or ID.
      * @param mixed $view View record or ID.
+     * @param bool $filteroptions
      */
-    public function __construct($df = 0, $view = 0) {
-        parent::__construct($df, $view);
+    public function __construct($df = 0, $view = 0, $filteroptions = true) {
+        parent::__construct($df, $view, $filteroptions);
         if (!empty($this->view->param3)) {
             $this->output = $this->view->param3;
         }
