@@ -23,9 +23,18 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace datalynxview_csv;
+
+use csv_import_reader;
+use datalynxview_csv_import_form;
+use html_table;
+use html_table_cell;
+use html_table_row;
+use html_writer;
 use mod_datalynx\local\datalynx_entries;
 use mod_datalynx\local\view\base;
-use datalynxview_csv\view_patterns as csv_patterns;
+use moodle_url;
+use stdClass;
 
 
 /**
@@ -35,7 +44,7 @@ use datalynxview_csv\view_patterns as csv_patterns;
  * @copyright  2013 onwards edulabs.org and associated programmers
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class datalynxview_csv extends base {
+class view extends base {
     /** @var string Export all entries */
     const EXPORT_ALL = 'all';
 

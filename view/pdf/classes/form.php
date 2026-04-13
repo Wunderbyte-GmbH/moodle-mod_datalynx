@@ -23,6 +23,8 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace datalynxview_pdf;
+
 use mod_datalynx\form\datalynxview_base_form;
 
 
@@ -31,7 +33,7 @@ use mod_datalynx\form\datalynxview_base_form;
  *
  * @package datalynxview_pdf
  */
-class datalynxview_pdf_form extends datalynxview_base_form {
+class form extends datalynxview_base_form {
     /**
      * Add view specific elements to the form
      */

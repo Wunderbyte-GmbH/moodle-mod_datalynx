@@ -14,50 +14,38 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * This file is part of the Datalynx module for Moodle - http:// Moodle.org/.
- *
- *
- * @package datalynxview_tabular
- * @subpackage tabular
- * @copyright 2013 onwards edulabs.org and associated programmers
- * @copyright based on the work by 2012 Itamar Tzadok
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+namespace datalynxview_email;
 
 use mod_datalynx\form\datalynxview_base_form;
 
-
 /**
- * Tabular view settings form
+ * Email view settings form.
  *
- * @package datalynxview_tabular
+ * @package    datalynxview_email
+ * @copyright  2026 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class datalynxview_tabular_form extends datalynxview_base_form {
+class form extends datalynxview_base_form {
     /**
-     * Add view specific elements to the form
+     * Add email-specific elements to the form.
      */
     public function view_definition_after_gps() {
         $view = $this->view;
         $editoroptions = $view->editors();
-        $editorattr = ['cols' => 40, 'rows' => 12];
+        $editorattr = ['cols' => 40, 'rows' => 16];
 
         $mform = &$this->_form;
 
-        // Content.
         $mform->addElement('header', 'entrytemplatehdr', get_string('entrytemplate', 'datalynx'));
-
-        $mform->addElement('selectyesno', 'param3', get_string('headerrow', 'datalynxview_tabular'));
-        $mform->setDefault('param3', 1);
-
         $mform->addElement(
             'editor',
             'eparam2_editor',
-            get_string('table', 'datalynxview_tabular'),
+            get_string('emailbodytemplate', 'datalynxview_email'),
             $editorattr,
             $editoroptions['param2']
         );
         $this->add_tags_selector('eparam2_editor', 'general');
         $this->add_tags_selector('eparam2_editor', 'field');
+        $this->add_tags_selector('eparam2_editor', 'character');
     }
 }

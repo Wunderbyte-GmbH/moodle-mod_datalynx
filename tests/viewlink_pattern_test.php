@@ -26,7 +26,7 @@
 namespace mod_datalynx;
 
 use advanced_testcase;
-use datalynxview_tabular;
+use datalynxview_tabular\view as tabular_view;
 use mod_datalynx\datalynx;
 use stdClass;
 
@@ -72,13 +72,11 @@ final class viewlink_pattern_test extends advanced_testcase {
      * Create a minimal datalynx instance with two tabular views and return both.
      *
      * @param string $taginsection The tag to place in the template view section.
-     * @return array{0: datalynx, 1: datalynxview_tabular, 2: datalynxview_tabular}
+     * @return array{0: datalynx, 1: tabular_view, 2: tabular_view}
      *   [df, targetView, templateView]
      */
     private function create_test_views(string $taginsection): array {
-        global $CFG, $DB;
-
-        require_once($CFG->dirroot . '/mod/datalynx/view/tabular/view_class.php');
+        global $DB;
 
         $generator = $this->getDataGenerator();
         $course = $generator->create_course();
@@ -108,8 +106,8 @@ final class viewlink_pattern_test extends advanced_testcase {
         $templateview->id = $DB->insert_record('datalynx_views', $templateview);
 
         // Instantiate view objects (filteroptions=false avoids URL param processing).
-        $targetobj   = new datalynxview_tabular($df, $targetview, false);
-        $templateobj = new datalynxview_tabular($df, $templateview, false);
+        $targetobj = new tabular_view($df, $targetview, false);
+        $templateobj = new tabular_view($df, $templateview, false);
 
         return [$df, $targetobj, $templateobj];
     }

@@ -23,8 +23,14 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace datalynxview_report;
+
+use html_table;
+use html_table_cell;
+use html_table_row;
+use html_writer;
+use mod_datalynx\local\datalynx_entries;
 use mod_datalynx\local\view\base;
-use datalynxview_report\view_patterns as report_patterns;
 
 /**
  * Report view class for datalynx.
@@ -33,7 +39,7 @@ use datalynxview_report\view_patterns as report_patterns;
  * @copyright  2025 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class datalynxview_report extends base {
+class view extends base {
     /** @var string View type identifier. */
     protected string $type = 'report';
 

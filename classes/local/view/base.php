@@ -509,11 +509,11 @@ abstract class base {
     public function get_form() {
         global $CFG;
 
-        $formclass = 'datalynxview_' . $this->type . '_form';
+        $formclass = 'datalynxview_' . $this->type . '\\form';
         $formparams = ['d' => $this->dl->id(), 'vedit' => $this->id(), 'type' => $this->type];
         $actionurl = new moodle_url('/mod/datalynx/view/view_edit.php', $formparams);
 
-        require_once($CFG->dirroot . '/mod/datalynx/view/' . $this->type . '/view_form.php');
+        require_once($CFG->dirroot . '/mod/datalynx/view/' . $this->type . '/classes/form.php');
         return new $formclass($this, $actionurl);
     }
 

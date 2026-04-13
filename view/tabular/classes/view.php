@@ -25,7 +25,14 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace datalynxview_tabular;
+
+use html_table;
+use html_table_cell;
+use html_table_row;
+use html_writer;
 use mod_datalynx\local\view\base;
+use stdClass;
 
 /**
  * A template for displaying datalynx entries in a tabular list
@@ -34,7 +41,7 @@ use mod_datalynx\local\view\base;
  * param2 - repeated entry section
  * param3 - table header
  */
-class datalynxview_tabular extends base {
+class view extends base {
     /** @var string View type identifier. */
     protected string $type = 'tabular';
 

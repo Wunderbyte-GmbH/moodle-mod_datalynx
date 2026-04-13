@@ -22,15 +22,22 @@
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+namespace datalynxview_pdf;
+
+use html_table;
+use html_table_cell;
+use html_table_row;
+use html_writer;
+use mod_datalynx\local\datalynx_tcpdf;
+use mod_datalynx\local\view\base;
+use setasign\Fpdi\Tcpdf\Fpdi;
+use stdClass;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->libdir/pdflib.php");
 require_once("$CFG->dirroot/mod/assign/feedback/editpdf/fpdi/autoload.php");
-
-use mod_datalynx\local\datalynx_tcpdf;
-use mod_datalynx\local\view\base;
-use setasign\Fpdi\Tcpdf\Fpdi;
-use datalynxview_pdf\view_patterns as pdf_patterns;
 
 require_once($CFG->dirroot . '/mod/assign/feedback/editpdf/fpdi/autoload.php');
 
@@ -39,7 +46,7 @@ require_once($CFG->dirroot . '/mod/assign/feedback/editpdf/fpdi/autoload.php');
  *
  * @package datalynxview_pdf
  */
-class datalynxview_pdf extends base {
+class view extends base {
     /**
      * Export all entries
      */

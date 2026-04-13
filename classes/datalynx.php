@@ -1628,13 +1628,13 @@ class datalynx {
             throw new coding_exception('View type must be provided.');
         }
 
-        $viewpath = $CFG->dirroot . '/mod/datalynx/view/' . $type . '/view_class.php';
+        $viewpath = $CFG->dirroot . '/mod/datalynx/view/' . $type . '/classes/view.php';
         if (!is_readable($viewpath)) {
             throw new coding_exception('Invalid view type: ' . $type);
         }
 
         require_once($viewpath);
-        $viewclass = 'datalynxview_' . $type;
+        $viewclass = 'datalynxview_' . $type . '\\view';
         if (!class_exists($viewclass)) {
             throw new coding_exception('Missing view class for type: ' . $type);
         }

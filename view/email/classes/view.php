@@ -14,8 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace datalynxview_email;
+
+use html_writer;
 use mod_datalynx\local\view\base;
-use datalynxview_email\view_patterns as email_patterns;
+use stdClass;
 
 /**
  * Internal email template view.
@@ -24,7 +27,7 @@ use datalynxview_email\view_patterns as email_patterns;
  * @copyright  2026 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class datalynxview_email extends base {
+class view extends base {
     /** @var string View type identifier. */
     protected string $type = 'email';
 

@@ -26,6 +26,7 @@ namespace mod_datalynx;
 
 use advanced_testcase;
 use coding_exception;
+use datalynxview_email\view as email_view;
 
 /**
  * Tests for strict view factory behaviour.
@@ -61,7 +62,7 @@ final class view_factory_test extends advanced_testcase {
 
         $view = $df->get_view('email');
 
-        $this->assertInstanceOf(\datalynxview_email::class, $view);
+        $this->assertInstanceOf(email_view::class, $view);
         $this->assertSame('email', $view->type());
         $this->assertSame(0, $view->id());
         $this->assertSame($df->id(), $view->get_dl()->id());

@@ -23,7 +23,14 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace datalynxview_grid;
+
+use html_table;
+use html_table_cell;
+use html_table_row;
+use html_writer;
 use mod_datalynx\local\view\base;
+use stdClass;
 
 
 /**
@@ -33,7 +40,7 @@ use mod_datalynx\local\view\base;
  * @copyright  2013 onwards edulabs.org and associated programmers
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class datalynxview_grid extends base {
+class view extends base {
     /** @var string The view type. */
     protected string $type = 'grid';
 

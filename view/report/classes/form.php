@@ -23,6 +23,8 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace datalynxview_report;
+
 use mod_datalynx\form\datalynxview_base_form;
 
 defined('MOODLE_INTERNAL') || die();
@@ -34,7 +36,7 @@ require_once("$CFG->libdir/csvlib.class.php");
  *
  * @package datalynxview_report
  */
-class datalynxview_report_form extends datalynxview_base_form {
+class form extends datalynxview_base_form {
     /**
      * Add view specific elements to the form
      *
