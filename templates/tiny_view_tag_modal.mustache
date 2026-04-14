@@ -1,0 +1,46 @@
+{{!
+    @template mod_datalynx/tiny_view_tag_modal
+
+    Context variables required for this template:
+    * fieldids.viewselect
+    * fieldids.linktext
+    * fieldids.urlquery
+    * fieldids.cssclass
+    * labels.view
+    * labels.linktext
+    * labels.urlquery
+    * labels.cssclass
+    * labels.delete
+    * options[] { value, name, selected }
+    * showlinkoptions
+    * values.linktext
+    * values.urlquery
+    * values.cssclass
+}}
+<div class="form-group">
+    <label for="{{fieldids.viewselect}}">{{labels.view}}</label>
+    <select class="form-control custom-select" id="{{fieldids.viewselect}}" name="{{fieldids.viewselect}}" data-region="tag-view-select">
+        {{#options}}
+            <option value="{{value}}"{{#selected}} selected="selected"{{/selected}}>{{name}}</option>
+        {{/options}}
+    </select>
+</div>
+
+{{#showlinkoptions}}
+    <div class="form-group">
+        <label for="{{fieldids.linktext}}">{{labels.linktext}}</label>
+        <input type="text" class="form-control" id="{{fieldids.linktext}}" name="{{fieldids.linktext}}" value="{{values.linktext}}" data-region="tag-linktext-input">
+    </div>
+    <div class="form-group">
+        <label for="{{fieldids.urlquery}}">{{labels.urlquery}}</label>
+        <input type="text" class="form-control" id="{{fieldids.urlquery}}" name="{{fieldids.urlquery}}" value="{{values.urlquery}}" data-region="tag-urlquery-input">
+    </div>
+    <div class="form-group">
+        <label for="{{fieldids.cssclass}}">{{labels.cssclass}}</label>
+        <input type="text" class="form-control" id="{{fieldids.cssclass}}" name="{{fieldids.cssclass}}" value="{{values.cssclass}}" data-region="tag-cssclass-input">
+    </div>
+{{/showlinkoptions}}
+
+<div class="mt-2">
+    <button type="button" class="btn btn-danger btn-sm" data-action="dlx-delete" data-region="delete-tag">{{labels.delete}}</button>
+</div>

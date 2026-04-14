@@ -38,6 +38,7 @@ import * as Str from 'core/str';
 import Modal from 'core/modal';
 import ModalSaveCancel from 'core/modal_save_cancel';
 import ModalEvents from 'core/modal_events';
+import Templates from 'core/templates';
 
 /** Regex that matches a full [[field|behavior|renderer]] tag (behavior and renderer optional). */
 const FIELD_TAG_RE = /^\[\[([^\|\]]+)(?:\|([^\|\]]*))?(?:\|([^\|\]]*))?\]\]$/;
@@ -142,6 +143,45 @@ function buildViewTagPattern(type, viewname, linktext = '', urlquery = '', csscl
     }
 
     return `##${type}:${viewname};${linktext};${urlquery};${cssclass}##`;
+}
+
+/**
+ * Build a stable field id suffix for a view-reference dialog.
+ *
+ * @param {string} editorId
+ * @returns {string}
+ */
+function getViewDialogFieldSuffix(editorId = '') {
+    if (editorId.includes('esection_editor')) {
+        return 'view';
+    }
+
+    if (editorId.includes('eparam2_editor')) {
+        return 'entry';
+    }
+
+    return editorId
+        .replace(/^id_/, '')
+        .replace(/[^a-z0-9]+/gi, '-')
+        .replace(/^-+|-+$/g, '')
+        .toLowerCase() || 'dialog';
+}
+
+/**
+ * Build the DOM ids used in the view-reference dialog.
+ *
+ * @param {string} editorId
+ * @returns {{viewselect: string, linktext: string, urlquery: string, cssclass: string}}
+ */
+function getViewDialogFieldIds(editorId = '') {
+    const suffix = getViewDialogFieldSuffix(editorId);
+
+    return {
+        viewselect: `dlx-view-select-${suffix}`,
+        linktext: `dlx-link-text-${suffix}`,
+        urlquery: `dlx-url-query-${suffix}`,
+        cssclass: `dlx-css-class-${suffix}`,
+    };
 }
 
 class PatternDialogue {
@@ -566,6 +606,8 @@ class PatternDialogue {
         } else if (isViewTag) {
             const {type, viewname, linktext, urlquery, cssclass} = parseViewTag(pattern);
             const views = await this.getViews();
+            const editorId = owningEditor?.id || button.getAttribute('data-datalynx-editor-id') || '';
+            const fieldids = getViewDialogFieldIds(editorId);
             const titleStr = await Str.get_string('tagproperties', 'datalynx', {
                 tagtype: await Str.get_string('reference', 'datalynx'),
                 tagname: type,
@@ -574,51 +616,45 @@ class PatternDialogue {
 
             if (type === 'viewurl') {
                 selectOptions.push(
-                    '<option value=""' + (!viewname ? ' selected="selected"' : '') + '>' +
-                    escapeHtml(currentViewLabel) + '</option>'
+                    {
+                        value: '',
+                        name: currentViewLabel,
+                        selected: !viewname,
+                    }
                 );
             }
 
             views.forEach((view) => {
                 selectOptions.push(
-                    '<option value="' + escapeHtml(view.name) + '"' +
-                    (view.name === viewname ? ' selected="selected"' : '') + '>' +
-                    escapeHtml(view.name) + '</option>'
+                    {
+                        value: view.name,
+                        name: view.name,
+                        selected: view.name === viewname,
+                    }
                 );
             });
 
             const isViewUrl = type === 'viewurl';
-            let bodyHtml =
-                '<div class="form-group">' +
-                '<label for="dlx-view-select">' + viewLabel + '</label>' +
-                '<select class="form-control custom-select" id="dlx-view-select" name="dlx-view-select"' +
-                ' data-region="tag-view-select">' +
-                selectOptions.join('') + '</select></div>';
-
-            if (!isViewUrl) {
-                bodyHtml +=
-                    '<div class="form-group">' +
-                    '<label for="dlx-link-text">' + linkTextLabel + '</label>' +
-                    '<input type="text" class="form-control" id="dlx-link-text" name="dlx-link-text" value="' +
-                    escapeHtml(linktext) + '" data-region="tag-linktext-input"></div>' +
-                    '<div class="form-group">' +
-                    '<label for="dlx-url-query">' + urlQueryLabel + '</label>' +
-                    '<input type="text" class="form-control" id="dlx-url-query" name="dlx-url-query" value="' +
-                    escapeHtml(urlquery) + '" data-region="tag-urlquery-input"></div>' +
-                    '<div class="form-group">' +
-                    '<label for="dlx-css-class">' + classLabel + '</label>' +
-                    '<input type="text" class="form-control" id="dlx-css-class" name="dlx-css-class" value="' +
-                    escapeHtml(cssclass) + '" data-region="tag-cssclass-input"></div>';
-            }
-
-            bodyHtml +=
-                '<div class="mt-2">' +
-                '<button type="button" class="btn btn-danger btn-sm" data-action="dlx-delete" data-region="delete-tag">' +
-                deleteLabel + '</button></div>';
 
             const modal = await ModalSaveCancel.create({
                 title: titleStr,
-                body: bodyHtml,
+                body: Templates.render('mod_datalynx/tiny_view_tag_modal', {
+                    fieldids,
+                    labels: {
+                        view: viewLabel,
+                        linktext: linkTextLabel,
+                        urlquery: urlQueryLabel,
+                        cssclass: classLabel,
+                        delete: deleteLabel,
+                    },
+                    options: selectOptions,
+                    showlinkoptions: !isViewUrl,
+                    values: {
+                        linktext,
+                        urlquery,
+                        cssclass,
+                    },
+                }),
                 show: true,
                 removeOnClose: true,
             });
@@ -626,7 +662,7 @@ class PatternDialogue {
             modal.getRoot().on(ModalEvents.save, (e) => {
                 e.preventDefault();
                 const modalBody = modal.getBody()[0];
-                const selectedView = modalBody.querySelector('#dlx-view-select')?.value || '';
+                const selectedView = modalBody.querySelector(`#${fieldids.viewselect}`)?.value || '';
                 if (!isViewUrl && !selectedView) {
                     return;
                 }
@@ -634,9 +670,9 @@ class PatternDialogue {
                 const newPattern = buildViewTagPattern(
                     type,
                     selectedView,
-                    modalBody.querySelector('#dlx-link-text')?.value || '',
-                    modalBody.querySelector('#dlx-url-query')?.value || '',
-                    modalBody.querySelector('#dlx-css-class')?.value || ''
+                    modalBody.querySelector(`#${fieldids.linktext}`)?.value || '',
+                    modalBody.querySelector(`#${fieldids.urlquery}`)?.value || '',
+                    modalBody.querySelector(`#${fieldids.cssclass}`)?.value || ''
                 );
 
                 const {type: newType, viewname: newViewName, linktext: newLinkText} = parseViewTag(newPattern);
