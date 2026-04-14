@@ -111,14 +111,13 @@ Feature: Test TinyMCE tag buttons and dialogs in datalynx view editor
     Then "button.datalynx-field-tag" "css_element" should exist
     And I switch to the main frame
 
-  @javascript
+  @javascript @debugmodal
   Scenario: View link modals save independently in the view and entry Tiny editors
     When I click on "Edit Gridview" "link"
+    And I change window size to "large"
+    And I click on "View template" "link"
     Then I should see "General tags"
-    And I click on "Entry template" "link"
-    And I should see "General tags"
     When I select "##viewlink:Gridview;;;##" from the "esection_editor_general_tag_menu" singleselect
-    And I select "##viewlink:Gridview;;;##" from the "eparam2_editor_general_tag_menu" singleselect
     And I switch to the "id_esection_editor" TinyMCE editor iframe
     And I click on "viewlink: Gridview" "button"
     And I switch to the main frame
@@ -126,21 +125,28 @@ Feature: Test TinyMCE tag buttons and dialogs in datalynx view editor
     And "[data-region='tag-linktext-input']" "css_element" should exist
     And "[data-region='tag-urlquery-input']" "css_element" should exist
     And "[data-region='tag-cssclass-input']" "css_element" should exist
-    When I set the field "dlx-link-text" to "Section link"
-    And I set the field "dlx-url-query" to "foo=1|bar=2"
+    When I set the field "dlx-link-text" to "View link"
+    And I set the field "dlx-url-query" to "new=1|bar=2"
     And I set the field "dlx-css-class" to "btn btn-primary"
     And I click on ".modal [data-action='save']" "css_element"
+    And I click on "View template" "link"
+    And I click on "Entry template" "link"
+    When I select "##viewsesslink:Gridview;;;##" from the "eparam2_editor_general_tag_menu" singleselect
     And I switch to the "id_eparam2_editor" TinyMCE editor iframe
-    And I click on "viewlink: Gridview" "button"
+    And I click on "viewsesslink: Gridview" "button"
     And I switch to the main frame
-    When I set the field "dlx-link-text" to "Entry link"
+    Then "[data-region='tag-view-select']" "css_element" should exist
+    And "[data-region='tag-linktext-input']" "css_element" should exist
+    And "[data-region='tag-urlquery-input']" "css_element" should exist
+    And "[data-region='tag-cssclass-input']" "css_element" should exist
+    Then I set the field "dlx-link-text" in the ".modal-dialog" "css_element" to "Entry link"
     And I set the field "dlx-url-query" to "new=1"
     And I set the field "dlx-css-class" to "btn btn-secondary"
     And I click on ".modal [data-action='save']" "css_element"
     And I press "Save changes"
     When I click on "Edit Gridview" "link"
     And I switch to the "id_esection_editor" TinyMCE editor iframe
-    Then I should see "Section link"
+    Then I should see "View link"
     And "button.datalynx-view-tag" "css_element" should exist
     And I switch to the main frame
     And I click on "Entry template" "link"
