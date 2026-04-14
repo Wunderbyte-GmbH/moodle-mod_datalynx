@@ -191,6 +191,21 @@ final class viewlink_pattern_test extends advanced_testcase {
     }
 
     /**
+     * Test that search() finds ##viewsesslink:...## tags whose URL query contains ##entryid##.
+     *
+     * @covers ::search
+     */
+    public function test_search_finds_viewsesslink_tag_with_nested_entryid(): void {
+        $tag = '##viewsesslink:myview;Add entry;new=1|entryid=##entryid##;btn##';
+        [, , $templateobj] = $this->create_test_views($tag);
+
+        $patternclass = $templateobj->patternclass();
+        $found = $patternclass->search("Header $tag footer", false);
+
+        $this->assertContains($tag, $found, 'search() should find viewsesslink tags with nested ##entryid##');
+    }
+
+    /**
      * Test that ##viewurl:<viewname>## is found as a fixed pattern.
      *
      * @covers ::search
@@ -265,6 +280,32 @@ final class viewlink_pattern_test extends advanced_testcase {
         $this->assertStringContainsString('d=' . $df->id(), $replacements[$tag]);
         $this->assertStringContainsString('view=' . $targetobj->id(), $replacements[$tag]);
         $this->assertStringContainsString('new=1', $replacements[$tag]);
+        $this->assertStringContainsString('sesskey=', $replacements[$tag]);
+        $this->assertStringContainsString('sourceview=', $replacements[$tag]);
+        $this->assertStringContainsString('class="btn btn-secondary"', $replacements[$tag]);
+        $this->assertStringContainsString('>Add entry<', $replacements[$tag]);
+    }
+
+    /**
+     * Test that ##viewsesslink:<viewname>## resolves nested ##entryid## in the URL query.
+     *
+     * @covers ::get_replacements
+     */
+    public function test_get_replacements_resolves_viewsesslink_tag_with_nested_entryid(): void {
+        [$df, $targetobj, $templateobj] = $this->create_test_views(
+            '##viewsesslink:myview;Add entry;new=1|entryid=##entryid##;btn btn-secondary##'
+        );
+
+        $patternclass = $templateobj->patternclass();
+        $tag = '##viewsesslink:myview;Add entry;new=1|entryid=##entryid##;btn btn-secondary##';
+        $entry = (object) ['id' => 42];
+        $replacements = $patternclass->get_replacements([$tag], $entry, []);
+
+        $this->assertArrayHasKey($tag, $replacements);
+        $this->assertStringContainsString('href="', $replacements[$tag]);
+        $this->assertStringContainsString('d=' . $df->id(), $replacements[$tag]);
+        $this->assertStringContainsString('view=' . $targetobj->id(), $replacements[$tag]);
+        $this->assertStringContainsString('new=1&amp;entryid=42', $replacements[$tag]);
         $this->assertStringContainsString('sesskey=', $replacements[$tag]);
         $this->assertStringContainsString('sourceview=', $replacements[$tag]);
         $this->assertStringContainsString('class="btn btn-secondary"', $replacements[$tag]);

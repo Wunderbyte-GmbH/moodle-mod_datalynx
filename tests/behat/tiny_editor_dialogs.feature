@@ -140,11 +140,12 @@ Feature: Test TinyMCE tag buttons and dialogs in datalynx view editor
     And "[data-region='tag-urlquery-input']" "css_element" should exist
     And "[data-region='tag-cssclass-input']" "css_element" should exist
     Then I set the field "dlx-link-text-entry" to "Entry link"
-    And I set the field "dlx-url-query-entry" to "new=1"
+    And I set the field "dlx-url-query-entry" to "new=1|entryid=##entryid##"
     And I set the field "dlx-css-class-entry" to "btn btn-secondary"
     And I click on ".modal.show.datalynx-view-tag-modal .datalynx-tag-modal-save" "css_element"
     And I press "Save changes"
     When I click on "Edit Gridview" "link"
+    And I click on "View template" "link"
     And I switch to the "id_esection_editor" TinyMCE editor iframe
     Then I should see "View link"
     And "button.datalynx-view-tag" "css_element" should exist

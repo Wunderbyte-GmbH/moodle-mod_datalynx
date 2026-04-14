@@ -223,6 +223,7 @@ class datalynxview_patterns {
                     }
                     // Replace pipes in urlquery with &.
                     $urlquery = str_replace('|', '&', $urlquery);
+                    $urlquery = $this->resolve_nested_entry_tags($urlquery, $entry, $options ?? []);
                     $linkparams = [];
                     // If it is a link with session (viewsesslink).
                     if ($sesslink === 0) {
@@ -281,6 +282,44 @@ class datalynxview_patterns {
         } else {
             return false;
         }
+    }
+
+    /**
+     * Resolve nested entry field tags inside a view-link URL query string.
+     *
+     * @param string $text
+     * @param mixed $entry
+     * @param array $options
+     * @return string
+     */
+    protected function resolve_nested_entry_tags(string $text, $entry = null, array $options = []): string {
+        if (!$entry || strpos($text, '##') === false) {
+            return $text;
+        }
+
+        preg_match_all('/##[^#]+##/', $text, $matches);
+        $tags = array_unique($matches[0] ?? []);
+        if (!$tags) {
+            return $text;
+        }
+
+        $replacements = [];
+        foreach ($this->view->get_dl()->get_fields() as $field) {
+            $definitions = $field->get_definitions($tags, $entry, $options);
+            foreach ($definitions as $tag => $definition) {
+                if (is_array($definition) && array_key_exists(1, $definition)) {
+                    $replacements[$tag] = (string) $definition[1];
+                } else if (is_scalar($definition)) {
+                    $replacements[$tag] = (string) $definition;
+                }
+            }
+        }
+
+        if (!$replacements) {
+            return $text;
+        }
+
+        return str_replace(array_keys($replacements), array_values($replacements), $text);
     }
 
     /**

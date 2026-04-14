@@ -43,7 +43,7 @@ import Templates from 'core/templates';
 /** Regex that matches a full [[field|behavior|renderer]] tag (behavior and renderer optional). */
 const FIELD_TAG_RE = /^\[\[([^\|\]]+)(?:\|([^\|\]]*))?(?:\|([^\|\]]*))?\]\]$/;
 const VIEW_URL_TAG_RE = /^##viewurl(?::([^#]+))?##$/;
-const VIEW_LINK_TAG_RE = /^##(viewlink|viewsesslink):([^;#]+);([^;#]*);([^;#]*);([^#]*)##$/;
+const VIEW_LINK_TAG_RE = /^##(viewlink|viewsesslink):([^;#]+);([^;]*);([^;]*);([^#]*)##$/;
 
 /**
  * Parse a field tag pattern into its components.
@@ -286,7 +286,7 @@ class PatternDialogue {
     replaceReferenceTagsInHtml(html, editorId = '') {
         return html
             .replace(/##viewurl(?::[^#]+)?##/g, (match) => this.buildViewTagButtonHtml(match, editorId))
-            .replace(/##(?:viewlink|viewsesslink):[^;#]+;[^;#]*;[^;#]*;[^#]*##/g,
+            .replace(/##(?:viewlink|viewsesslink):[^;#]+;[^;]*;[^;]*;[^#]*##/g,
                 (match) => this.buildViewTagButtonHtml(match, editorId)
             );
     }
