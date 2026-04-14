@@ -184,6 +184,18 @@ function getViewDialogFieldIds(editorId = '') {
     };
 }
 
+/**
+ * Add stable selectors to Datalynx save/cancel modals.
+ * @param {object} modal Moodle modal instance
+ * @param {string} modalClass Specific modal type class
+ */
+function decorateSaveCancelModal(modal, modalClass) {
+    const root = modal.getRoot();
+    root.addClass('datalynx-tag-modal');
+    root.addClass(modalClass);
+    root.find('[data-action="save"]').addClass('datalynx-tag-modal-save');
+}
+
 class PatternDialogue {
     constructor(options) {
         this.options = options;
@@ -576,6 +588,7 @@ class PatternDialogue {
                 show: true,
                 removeOnClose: true,
             });
+            decorateSaveCancelModal(modal, 'datalynx-field-tag-modal');
 
             modal.getRoot().on(ModalEvents.save, (e) => {
                 e.preventDefault();
@@ -658,6 +671,7 @@ class PatternDialogue {
                 show: true,
                 removeOnClose: true,
             });
+            decorateSaveCancelModal(modal, 'datalynx-view-tag-modal');
 
             modal.getRoot().on(ModalEvents.save, (e) => {
                 e.preventDefault();
