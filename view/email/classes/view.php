@@ -70,7 +70,7 @@ class view extends base {
      * @return string
      */
     protected function patternclassname(): string {
-        return email_patterns::class;
+        return view_patterns::class;
     }
 
     /**

@@ -210,7 +210,10 @@ class datalynxview_patterns {
                 $sesslink = strpos($tag, "##viewsesslink:$viewname;");
                 if ($viewlink === 0 || $sesslink === 0) {
                     // Already editing the entry so do not show link for editing entry.
-                    if ($currentview->user_is_editing() && is_numeric(strpos($tag, 'editentries') && $sesslink === 0)) {
+                    if (
+                        $sesslink === 0 && $currentview && $currentview->user_is_editing() &&
+                        strpos($tag, 'editentries') !== false
+                    ) {
                         return '';
                     }
                     // Strip leading and trailing ## delimiters.
