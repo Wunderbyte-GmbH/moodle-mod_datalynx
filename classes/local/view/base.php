@@ -247,7 +247,7 @@ abstract class base {
             $baseurlparams['uperpage'] = $uperpage;
         }
 
-        $this->baseurl = new moodle_url("/mod/datalynx/{$this->dl->pagefile()}.php", $baseurlparams);
+        $this->baseurl = new moodle_url("/mod/datalynx/{$this->dl->pagefile_for_urls()}.php", $baseurlparams);
         $this->set_filter($filteroptions, $this->is_forcing_filter()); // If filter is forced ignore URL parameters.
         $this->baseurl->param('filter', $this->filter->id);
         if ($this->filter->page) {
@@ -1468,7 +1468,7 @@ abstract class base {
                 'update' => implode(',', $this->editentries),
                 'sourceview' => optional_param('sourceview', null, PARAM_INT),
             ];
-            $actionurl = new moodle_url("/mod/datalynx/{$this->dl->pagefile()}.php", $actionparams);
+            $actionurl = new moodle_url("/mod/datalynx/{$this->dl->pagefile_for_urls()}.php", $actionparams);
             $customdata = ['view' => $this, 'update' => implode(',', $this->editentries)];
 
             $formclass = 'mod_datalynx\local\view\datalynxview_entries_form';

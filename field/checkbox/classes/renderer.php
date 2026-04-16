@@ -88,7 +88,8 @@ class renderer extends MultiSelectRenderer {
         $mform->getElement($fieldname)->setValue($selected);
 
         if ($required) {
-            $mform->addGroupRule($fieldname, get_string('err_required', 'form'), 'required', null, 1);
+            $mform->addGroupRule($fieldname, get_string('err_required', 'form'),
+                    'required', null, 1, 'client');
         }
     }
 }

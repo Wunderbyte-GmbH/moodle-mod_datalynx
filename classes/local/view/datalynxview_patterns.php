@@ -198,7 +198,7 @@ class datalynxview_patterns {
                 $baseurlparams['view'] = $view->id;
 
                 $view->baseurl = new moodle_url(
-                    "/mod/datalynx/{$this->view->get_dl()->pagefile()}.php",
+                    "/mod/datalynx/{$this->view->get_dl()->pagefile_for_urls()}.php",
                     $baseurlparams
                 );
             }

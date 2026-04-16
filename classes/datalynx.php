@@ -270,6 +270,22 @@ class datalynx {
     }
 
     /**
+     * Returns the canonical page file name for generated user-facing URLs.
+     *
+     * Internal rendering contexts such as "external" must not leak into action
+     * links, menus, or other URLs that users can follow.
+     *
+     * @return string
+     */
+    public function pagefile_for_urls(): string {
+        if ($this->pagefile === 'external') {
+            return 'view';
+        }
+
+        return $this->pagefile;
+    }
+
+    /**
      * Get internal group modes.
      *
      * @return array
@@ -2752,7 +2768,7 @@ class datalynx {
         // Base url params.
         $baseurlparams = [];
         $baseurlparams['d'] = $this->id();
-        return new moodle_url("/mod/datalynx/{$this->pagefile()}.php", $baseurlparams);
+        return new moodle_url("/mod/datalynx/{$this->pagefile_for_urls()}.php", $baseurlparams);
     }
 
     /**

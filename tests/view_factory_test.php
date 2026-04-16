@@ -87,4 +87,27 @@ final class view_factory_test extends advanced_testcase {
         $this->expectException(coding_exception::class);
         $df->get_view('definitelymissing');
     }
+
+    /**
+     * Inline rendering must keep user-facing URLs on the canonical activity page.
+     */
+    public function test_inline_external_context_still_uses_view_php_for_urls(): void {
+        $df = $this->create_test_datalynx();
+
+        $pageparams = [
+            'js' => true,
+            'css' => true,
+            'rss' => true,
+            'modjs' => true,
+            'completion' => true,
+            'comments' => true,
+            'urlparams' => (object) ['d' => $df->id(), 'view' => 0],
+        ];
+        $df->set_page('external', $pageparams, true);
+
+        $this->assertStringContainsString('/mod/datalynx/view.php', $df->get_baseurl()->out(false));
+
+        $view = $df->get_view('tabular');
+        $this->assertStringContainsString('/mod/datalynx/view.php', $view->get_baseurl()->out(false));
+    }
 }
