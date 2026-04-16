@@ -65,15 +65,6 @@ class view extends base {
     }
 
     /**
-     * Return the patterns class used by the email view.
-     *
-     * @return string
-     */
-    protected function patternclassname(): string {
-        return view_patterns::class;
-    }
-
-    /**
      * Generate the default email template.
      */
     public function generate_default_view() {

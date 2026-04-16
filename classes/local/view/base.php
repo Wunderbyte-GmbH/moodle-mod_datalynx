@@ -1006,11 +1006,21 @@ abstract class base {
 
     /**
      * Return the fully-qualified class name of the patterns class for this view type.
-     * Subclasses with a custom patterns class should override this method.
+     * By convention, namespaced view subplugins may provide a sibling view_patterns
+     * class in the same namespace. If none exists, fall back to the shared base
+     * patterns implementation.
      *
      * @return string
      */
     protected function patternclassname(): string {
+        $namespace = (new \ReflectionClass($this))->getNamespaceName();
+        if ($namespace) {
+            $viewpatternsclass = $namespace . '\\view_patterns';
+            if (class_exists($viewpatternsclass)) {
+                return $viewpatternsclass;
+            }
+        }
+
         return datalynxview_patterns::class;
     }
 

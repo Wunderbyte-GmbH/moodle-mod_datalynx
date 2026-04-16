@@ -53,15 +53,6 @@ class view extends base {
     protected ?array $columns = null;
 
     /**
-     * Return the FQCN of the patterns class for this view type.
-     *
-     * @return string
-     */
-    protected function patternclassname(): string {
-        return report_patterns::class;
-    }
-
-    /**
      * Constructor for datalynxview_report.
      *
      * @param mixed $df Datalynx instance or ID.

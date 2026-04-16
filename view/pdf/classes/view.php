@@ -73,15 +73,6 @@ class view extends base {
     protected string $type = 'pdf';
 
     /**
-     * Return the FQCN of the patterns class for this view type.
-     *
-     * @return string
-     */
-    protected function patternclassname(): string {
-        return pdf_patterns::class;
-    }
-
-    /**
      * @var array List of editors
      */
     protected array $editors = ['section', 'param2', 'param3', 'param4',

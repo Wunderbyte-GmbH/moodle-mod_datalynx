@@ -58,15 +58,6 @@ class view extends base {
     protected string $type = 'csv';
 
     /**
-     * Return the FQCN of the patterns class for this view type.
-     *
-     * @return string
-     */
-    protected function patternclassname(): string {
-        return csv_patterns::class;
-    }
-
-    /**
      * Output format.
      * @var string
      */
