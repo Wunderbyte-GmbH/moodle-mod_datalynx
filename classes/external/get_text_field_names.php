@@ -28,13 +28,13 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/externallib.php');
 
 /**
- * Web service to fetch all views for a datalynx instance.
+ * Web service to fetch text fields for a datalynx instance.
  *
  * @package    mod_datalynx
  * @copyright  2026 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class get_view_names extends external_api {
+class get_text_field_names extends external_api {
     /**
      * Define service parameters.
      *
@@ -47,7 +47,7 @@ class get_view_names extends external_api {
     }
 
     /**
-     * Return all views for a datalynx instance.
+     * Return all text fields for a datalynx instance.
      *
      * @param int $d
      * @return array
@@ -60,16 +60,17 @@ class get_view_names extends external_api {
         $cm = get_coursemodule_from_instance('datalynx', $params['d'], 0, false, MUST_EXIST);
         $context = context_module::instance($cm->id);
 
+        self::validate_context($context);
         require_login($cm->course, true, $cm);
         require_capability('mod/datalynx:managetemplates', $context);
 
-        $views = $DB->get_records('datalynx_views', ['dataid' => $params['d']], 'name ASC', 'id, name');
+        $textfields = $DB->get_records('datalynx_fields', ['dataid' => $params['d'], 'type' => 'text'], 'name ASC', 'id, name');
         $result = [];
 
-        foreach ($views as $view) {
+        foreach ($textfields as $textfield) {
             $result[] = [
-                'id' => (int) $view->id,
-                'name' => strip_tags(format_string($view->name, true, ['context' => $context])),
+                'id' => (int) $textfield->id,
+                'name' => strip_tags(format_string($textfield->name, true, ['context' => $context])),
             ];
         }
 
@@ -84,8 +85,8 @@ class get_view_names extends external_api {
     public static function execute_returns(): external_multiple_structure {
         return new external_multiple_structure(
             new external_single_structure([
-                'id' => new external_value(PARAM_INT, 'View ID'),
-                'name' => new external_value(PARAM_TEXT, 'View name'),
+                'id' => new external_value(PARAM_INT, 'Text field ID'),
+                'name' => new external_value(PARAM_TEXT, 'Text field name'),
             ])
         );
     }

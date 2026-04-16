@@ -35,7 +35,7 @@ class form extends datalynxfield_form {
      * Define field settings form.
      */
     public function field_definition() {
-        global $CFG, $PAGE, $DB;
+        global $PAGE, $DB;
 
         $mform = &$this->_form;
 
@@ -90,7 +90,6 @@ class form extends datalynxfield_form {
                 'dffield' => 'param1',
                 'viewfield' => 'param2',
                 'textfieldfield' => 'param7',
-                'acturl' => "$CFG->wwwroot/mod/datalynx/loaddfviews.php",
                 'presentdlid' => $this->dl->id(),
                 'thisfieldstring' => get_string('thisfield', 'datalynx'),
                 'update' => $this->field->id() ? $this->field->id() : 0,
