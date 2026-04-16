@@ -25,6 +25,7 @@
 namespace datalynxview_pdf;
 
 use mod_datalynx\local\view\datalynxview_patterns;
+use stdClass;
 
 /**
  * View patterns for the PDF view type.
@@ -39,8 +40,6 @@ class view_patterns extends datalynxview_patterns {
      * @return array
      */
     public function get_replacements($tags = null, $entry = null, array $options = []) {
-        global $CFG, $OUTPUT;
-
         $replacements = parent::get_replacements($tags, $entry, $options);
 
         $view = $this->view;
