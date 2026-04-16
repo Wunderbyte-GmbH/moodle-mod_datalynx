@@ -16,6 +16,33 @@
     * values.linktext
     * values.urlquery
     * values.cssclass
+
+    Example context (json):
+    {
+        "fieldids": {
+            "viewselect": "dlx-view-select-view",
+            "linktext": "dlx-link-text-view",
+            "urlquery": "dlx-url-query-view",
+            "cssclass": "dlx-css-class-view"
+        },
+        "labels": {
+            "view": "View",
+            "linktext": "Link text",
+            "urlquery": "URL query",
+            "cssclass": "CSS class",
+            "delete": "Delete tag"
+        },
+        "options": [
+            {"value": "gridview", "name": "Gridview", "selected": true},
+            {"value": "tabularview", "name": "Tabular view", "selected": false}
+        ],
+        "showlinkoptions": true,
+        "values": {
+            "linktext": "View link",
+            "urlquery": "new=1|bar=2",
+            "cssclass": "btn btn-primary"
+        }
+    }
 }}
 <div class="form-group">
     <label for="{{fieldids.viewselect}}">{{labels.view}}</label>
