@@ -81,8 +81,8 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
         $customfilter = new backup_nested_element(
             'customfilter',
             ['id'],
-            ['name', 'description', 'visible', 'fulltextsearch', 'timecreated', 'timecreated_sortable',
-                        'timemodified', 'timemodified_sortable', 'authorsearch', 'approve', 'status', 'fieldlist',
+            ['name', 'description', 'visible', 'fulltextsearch', 'timecreated', 'timecreatedsortable',
+                        'timemodified', 'timemodifiedsortable', 'authorsearch', 'approve', 'status', 'fieldlist',
             ]
         );
 

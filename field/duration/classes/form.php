@@ -29,11 +29,4 @@ use mod_datalynx\form\datalynxfield_form;
 /**
  * Form class for the duration field type.
  */
-class form extends datalynxfield_form {
-    /**
-     * Define the form elements for the duration field.
-     */
-    public function field_definition() {
-        parent::field_definition();
-    }
-}
+class form extends datalynxfield_form {}

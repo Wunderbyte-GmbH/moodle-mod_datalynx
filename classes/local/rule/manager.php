@@ -23,8 +23,6 @@ use moodle_url;
 use single_select;
 use stdClass;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Class that manages and triggers rules
  *

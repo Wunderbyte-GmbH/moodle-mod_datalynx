@@ -19,8 +19,6 @@ namespace datalynxrule_ftpsyncfiles\form;
 use html_writer;
 use mod_datalynx\form\rule_form as base_rule_form;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * FTP sync files rule form
  *

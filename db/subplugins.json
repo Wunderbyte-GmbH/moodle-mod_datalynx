@@ -1,4 +1,10 @@
 {
+    "subplugintypes": {
+        "datalynxfield": "field",
+        "datalynxview": "view",
+        "datalynxrule": "rule",
+        "datalynxtool": "tool"
+    },
     "plugintypes": {
         "datalynxfield": "mod\/datalynx\/field",
         "datalynxview": "mod\/datalynx\/view",

@@ -22,8 +22,6 @@ use mod_datalynx\datalynx;
 use mod_datalynx\form\rule_form as base_rule_form;
 use stdClass;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Event notification rule form
  *

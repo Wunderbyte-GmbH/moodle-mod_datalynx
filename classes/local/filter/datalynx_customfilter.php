@@ -52,13 +52,13 @@ class datalynx_customfilter {
     public $timecreated;
 
     /** @var int Is sortable using timecreated timestamp. */
-    public $timecreated_sortable;
+    public $timecreatedsortable;
 
     /** @var int Timestamp when the customfilter was last modified. */
     public $timemodified;
 
     /** @var int Is sortable using timemodified timestamp. */
-    public $timemodified_sortable;
+    public $timemodifiedsortable;
 
     /** @var int Whether author search is enabled. */
     public $authorsearch;
@@ -85,9 +85,11 @@ class datalynx_customfilter {
         $this->visible = !isset($filterdata->visible) ? 0 : $filterdata->visible;
         $this->fulltextsearch = !isset($filterdata->fulltextsearch) ? 0 : $filterdata->fulltextsearch;
         $this->timecreated = empty($filterdata->timecreated) ? 0 : $filterdata->timecreated;
-        $this->timecreated_sortable = empty($filterdata->timecreated_sortable) ? 0 : $filterdata->timecreated_sortable;
+        $this->timecreatedsortable = isset($filterdata->timecreatedsortable) ? $filterdata->timecreatedsortable :
+            (isset($filterdata->timecreated_sortable) ? $filterdata->timecreated_sortable : 0);
         $this->timemodified = empty($filterdata->timemodified) ? 0 : $filterdata->timemodified;
-        $this->timemodified_sortable = empty($filterdata->timemodified_sortable) ? 0 : $filterdata->timemodified_sortable;
+        $this->timemodifiedsortable = isset($filterdata->timemodifiedsortable) ? $filterdata->timemodifiedsortable :
+            (isset($filterdata->timemodified_sortable) ? $filterdata->timemodified_sortable : 0);
         $this->authorsearch = !isset($filterdata->authorsearch) ? 0 : $filterdata->authorsearch;
         $this->approve = empty($filterdata->approve) ? 0 : $filterdata->approve;
         $this->status = empty($filterdata->status) ? 0 : $filterdata->status;
@@ -108,7 +110,9 @@ class datalynx_customfilter {
         $filter->visible = $this->visible;
         $filter->fulltextsearch = $this->fulltextsearch;
         $filter->timecreated = $this->timecreated;
+        $filter->timecreatedsortable = $this->timecreatedsortable;
         $filter->timemodified = $this->timemodified;
+        $filter->timemodifiedsortable = $this->timemodifiedsortable;
         $filter->authorsearch = $this->authorsearch;
         $filter->approve = $this->approve;
         $filter->status = $this->status;

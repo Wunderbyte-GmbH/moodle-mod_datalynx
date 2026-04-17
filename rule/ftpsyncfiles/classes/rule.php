@@ -25,8 +25,6 @@ use mod_datalynx\local\datalynx_entries;
 use mod_datalynx\local\rule\base;
 use stdClass;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Download files via sftp.
  *
@@ -134,8 +132,9 @@ class rule extends base {
 
     /**
      * Based on a triggered event we start downloading files.
-     * @param base $event
-     * @return true
+     *
+     * @param core_event_base $event Triggering event.
+     * @return bool
      */
     public function trigger(core_event_base $event) {
         global $CFG;

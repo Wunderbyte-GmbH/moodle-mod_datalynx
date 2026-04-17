@@ -23,8 +23,6 @@ use mod_datalynx\local\rule\base;
 use moodle_url;
 use stdClass;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Event notification rule
  *

@@ -221,6 +221,15 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         $data = (object) $data;
         $oldid = $data->id;
 
+        if (isset($data->timecreated_sortable) && !isset($data->timecreatedsortable)) {
+            $data->timecreatedsortable = $data->timecreated_sortable;
+            unset($data->timecreated_sortable);
+        }
+        if (isset($data->timemodified_sortable) && !isset($data->timemodifiedsortable)) {
+            $data->timemodifiedsortable = $data->timemodified_sortable;
+            unset($data->timemodified_sortable);
+        }
+
         $data->dataid = $this->get_new_parentid('datalynx');
 
         // Adjust groupby field id.

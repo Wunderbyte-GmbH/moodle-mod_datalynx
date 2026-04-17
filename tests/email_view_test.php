@@ -148,6 +148,10 @@ final class email_view_test extends advanced_testcase {
 
     /**
      * Internal email views must stay out of the browse view lists.
+     *
+     * @covers \mod_datalynx\datalynx::get_view_records
+     * @covers \mod_datalynx\datalynx::get_views_editable_by_user
+     * @covers \mod_datalynx\datalynx::get_current_view_from_id
      */
     public function test_email_views_are_excluded_from_browse_records(): void {
         $df = $this->create_test_datalynx();
@@ -166,6 +170,8 @@ final class email_view_test extends advanced_testcase {
 
     /**
      * Email view placeholders should resolve with the notification link data passed by the rule.
+     *
+     * @covers \datalynxview_email\view_patterns::get_replacements
      */
     public function test_email_view_notification_placeholders_resolve(): void {
         $df = $this->create_test_datalynx();
@@ -193,6 +199,8 @@ final class email_view_test extends advanced_testcase {
 
     /**
      * Missing email templates should fall back to the legacy event notification body.
+     *
+     * @covers \datalynxrule_eventnotification\rule::build_message_body
      */
     public function test_eventnotification_falls_back_when_email_template_is_missing(): void {
         $df = $this->create_test_datalynx();
@@ -225,6 +233,8 @@ final class email_view_test extends advanced_testcase {
 
     /**
      * Selected email templates should render the configured entry body with notification links.
+     *
+     * @covers \datalynxrule_eventnotification\rule::render_email_template
      */
     public function test_eventnotification_renders_selected_email_template(): void {
         $df = $this->create_test_datalynx();
@@ -257,6 +267,8 @@ final class email_view_test extends advanced_testcase {
 
     /**
      * Selected email templates should only render the triggering entry.
+     *
+     * @covers \datalynxrule_eventnotification\rule::render_email_template
      */
     public function test_eventnotification_renders_only_the_requested_entry(): void {
         $df = $this->create_test_datalynx();

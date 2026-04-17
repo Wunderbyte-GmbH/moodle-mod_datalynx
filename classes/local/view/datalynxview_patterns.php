@@ -308,7 +308,12 @@ class datalynxview_patterns {
 
         $replacements = [];
         foreach ($this->view->get_dl()->get_fields() as $field) {
-            $definitions = $field->get_definitions($tags, $entry, $options);
+            $fieldtags = $field->renderer()->search($text);
+            if (!$fieldtags) {
+                continue;
+            }
+
+            $definitions = $field->get_definitions($fieldtags, $entry, $options);
             foreach ($definitions as $tag => $definition) {
                 if (is_array($definition) && array_key_exists(1, $definition)) {
                     $replacements[$tag] = (string) $definition[1];

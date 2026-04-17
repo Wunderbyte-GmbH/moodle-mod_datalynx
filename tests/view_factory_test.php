@@ -30,6 +30,8 @@ use datalynxview_email\view as email_view;
 
 /**
  * Tests for strict view factory behaviour.
+ *
+ * @coversDefaultClass \mod_datalynx\datalynx
  */
 final class view_factory_test extends advanced_testcase {
     /**
@@ -56,6 +58,8 @@ final class view_factory_test extends advanced_testcase {
 
     /**
      * The factory should instantiate a view from an explicit type string.
+     *
+     * @covers ::get_view
      */
     public function test_get_view_instantiates_requested_type(): void {
         $df = $this->create_test_datalynx();
@@ -70,6 +74,8 @@ final class view_factory_test extends advanced_testcase {
 
     /**
      * Empty view types should fail as a programmer error.
+     *
+     * @covers ::get_view
      */
     public function test_get_view_throws_for_empty_type(): void {
         $df = $this->create_test_datalynx();
@@ -80,6 +86,8 @@ final class view_factory_test extends advanced_testcase {
 
     /**
      * Unknown view types should fail as a programmer error.
+     *
+     * @covers ::get_view
      */
     public function test_get_view_throws_for_invalid_type(): void {
         $df = $this->create_test_datalynx();
@@ -90,6 +98,11 @@ final class view_factory_test extends advanced_testcase {
 
     /**
      * Inline rendering must keep user-facing URLs on the canonical activity page.
+     *
+     * @covers ::set_page
+     * @covers ::pagefile_for_urls
+     * @covers ::get_baseurl
+     * @covers \mod_datalynx\local\view\base::get_baseurl
      */
     public function test_inline_external_context_still_uses_view_php_for_urls(): void {
         $df = $this->create_test_datalynx();

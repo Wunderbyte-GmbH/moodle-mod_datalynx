@@ -428,9 +428,9 @@ class datalynx_customfilter_manager {
         $filter->visible = !isset($formdata->visible) ? 0 : $formdata->visible;
         $filter->fulltextsearch = !isset($formdata->fulltextsearch) ? 0 : $formdata->fulltextsearch;
         $filter->timecreated = empty($formdata->timecreated) ? 0 : $formdata->timecreated;
-        $filter->timecreated_sortable = empty($formdata->timecreated_sortable) ? 0 : $formdata->timecreated_sortable;
+        $filter->timecreatedsortable = empty($formdata->timecreatedsortable) ? 0 : $formdata->timecreatedsortable;
         $filter->timemodified = empty($formdata->timemodified) ? 0 : $formdata->timemodified;
-        $filter->timemodified_sortable = empty($formdata->timemodified_sortable) ? 0 : $formdata->timemodified_sortable;
+        $filter->timemodifiedsortable = empty($formdata->timemodifiedsortable) ? 0 : $formdata->timemodifiedsortable;
         $filter->authorsearch = !isset($formdata->authorsearch) ? 0 : $formdata->authorsearch;
         $filter->approve = empty($formdata->approve) ? 0 : $formdata->approve;
         $filter->status = empty($formdata->status) ? 0 : $formdata->status;

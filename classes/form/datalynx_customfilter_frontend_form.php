@@ -77,7 +77,7 @@ class datalynx_customfilter_frontend_form extends datalynx_filter_base_form {
                         if ($customfilter->timecreated) {
                             $select = true;
                         }
-                        if ($customfilter->timecreated_sortable) {
+                        if ($customfilter->timecreatedsortable) {
                             $sortfields[$fieldid] = $field->field->name;
                         }
                         break;
@@ -85,7 +85,7 @@ class datalynx_customfilter_frontend_form extends datalynx_filter_base_form {
                         if ($customfilter->timemodified) {
                             $select = true;
                         }
-                        if ($customfilter->timemodified_sortable) {
+                        if ($customfilter->timemodifiedsortable) {
                             $sortfields[$fieldid] = $field->field->name;
                         }
                         break;

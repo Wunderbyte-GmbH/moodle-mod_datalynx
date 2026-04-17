@@ -1079,7 +1079,7 @@ function xmldb_datalynx_upgrade($oldversion) {
     if ($oldversion < 2019090600) {
         // Define field authorsearch to be added to datalynx_customfilters.
         $table = new xmldb_table('datalynx_customfilters');
-        $field = new xmldb_field('authorsearch', XMLDB_TYPE_INTEGER, '1', null, null, null, '0', 'timemodified_sortable');
+        $field = new xmldb_field('authorsearch', XMLDB_TYPE_INTEGER, '1', null, null, null, '0', 'timemodifiedsortable');
 
         // Conditionally launch add field authorsearch.
         if (!$dbman->field_exists($table, $field)) {
@@ -1156,6 +1156,23 @@ function xmldb_datalynx_upgrade($oldversion) {
         $DB->set_field_select('datalynx_views', 'patterns', null, '1=1');
         // Datalynx savepoint reached.
         upgrade_mod_savepoint(true, 2026041000, 'datalynx');
+    }
+    if ($oldversion < 2026041700) {
+        $table = new xmldb_table('datalynx_customfilters');
+
+        $oldfield = new xmldb_field('timecreated_sortable');
+        $newfield = new xmldb_field('timecreatedsortable', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'timecreated');
+        if ($dbman->field_exists($table, $oldfield) && !$dbman->field_exists($table, $newfield)) {
+            $dbman->rename_field($table, $oldfield, 'timecreatedsortable');
+        }
+
+        $oldfield = new xmldb_field('timemodified_sortable');
+        $newfield = new xmldb_field('timemodifiedsortable', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'timemodified');
+        if ($dbman->field_exists($table, $oldfield) && !$dbman->field_exists($table, $newfield)) {
+            $dbman->rename_field($table, $oldfield, 'timemodifiedsortable');
+        }
+
+        upgrade_mod_savepoint(true, 2026041700, 'datalynx');
     }
     return true;
 }

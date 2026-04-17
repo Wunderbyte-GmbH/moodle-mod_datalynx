@@ -30,8 +30,6 @@ use moodle_exception;
 use moodle_url;
 use stdClass;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Base class for Datalynx Rule Types
  */

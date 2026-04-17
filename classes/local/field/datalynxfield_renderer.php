@@ -28,8 +28,6 @@ use mod_datalynx\local\field\datalynxfield_behavior;
 use MoodleQuickForm;
 use stdClass;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Base class for field patterns
  */

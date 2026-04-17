@@ -993,10 +993,6 @@ function datalynx_user_complete($course, $user, $mod, $data) {
             echo '<p>' . get_string('feedback') . ': ' . $grade->str_feedback . '</p>';
         }
     }
-    $sqlparams = ['dataid' => $data->id, 'userid' => $user->id];
-    if ($DB->count_records('datalynx_entries', $sqlparams)) {
-        // TODO: MDL-66151 get the default view add a filter for user only and display.
-    }
 }
 
 // Participantion Reports.

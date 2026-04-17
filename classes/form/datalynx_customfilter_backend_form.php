@@ -42,9 +42,9 @@ class datalynx_customfilter_backend_form extends datalynx_customfilter_base_form
             $customfilter->fulltextsearch = false;
             $customfilter->visible = true;
             $customfilter->timecreated = false;
-            $customfilter->timecreated_sortable = false;
+            $customfilter->timecreatedsortable = false;
             $customfilter->timemodified = false;
-            $customfilter->timemodified_sortable = false;
+            $customfilter->timemodifiedsortable = false;
             $customfilter->authorsearch = false;
             $customfilter->approve = false;
             $customfilter->status = false;
@@ -81,7 +81,7 @@ class datalynx_customfilter_backend_form extends datalynx_customfilter_base_form
         );
         $grp[] = $mform->createElement(
             'advcheckbox',
-            'timecreated_sortable',
+            'timecreatedsortable',
             null,
             get_string('sortable', 'datalynx'),
             $attr,
@@ -90,8 +90,8 @@ class datalynx_customfilter_backend_form extends datalynx_customfilter_base_form
         $mform->addGroup($grp, '', null, ' ', false);
         $mform->setType('timecreated', PARAM_INT);
         $mform->setDefault('timecreated', $customfilter->timecreated);
-        $mform->setType('timecreated_sortable', PARAM_INT);
-        $mform->setDefault('timecreated_sortable', $customfilter->timecreated_sortable);
+        $mform->setType('timecreatedsortable', PARAM_INT);
+        $mform->setDefault('timecreatedsortable', $customfilter->timecreatedsortable);
 
         $grp = [];
         $grp[] = $mform->createElement(
@@ -103,7 +103,7 @@ class datalynx_customfilter_backend_form extends datalynx_customfilter_base_form
         );
         $grp[] = $mform->createElement(
             'advcheckbox',
-            'timemodified_sortable',
+            'timemodifiedsortable',
             null,
             get_string('sortable', 'datalynx'),
             $attr,
@@ -112,8 +112,8 @@ class datalynx_customfilter_backend_form extends datalynx_customfilter_base_form
         $mform->addGroup($grp, '', null, ' ', false);
         $mform->setType('timemodified', PARAM_INT);
         $mform->setDefault('timemodified', $customfilter->timemodified);
-        $mform->setType('timemodified_sortable', PARAM_INT);
-        $mform->setDefault('timemodified_sortable', $customfilter->timemodified_sortable);
+        $mform->setType('timemodifiedsortable', PARAM_INT);
+        $mform->setDefault('timemodifiedsortable', $customfilter->timemodifiedsortable);
 
         $mform->addElement('advcheckbox', 'authorsearch', get_string('authorsearch', 'datalynx'), null, $attr);
         $mform->setType('authorsearch', PARAM_INT);
