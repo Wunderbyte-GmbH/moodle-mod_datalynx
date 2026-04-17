@@ -335,7 +335,7 @@ class field extends datalynxfield_base {
      */
     public function get_search_sql(array $search): array {
         // We keep the not and compare with exactly 1 in the content column.
-	[$not, $operator, $value] = $search;
+        [$not, $operator, $value] = $search;
         $value = '1';
         $operator = '=';
         return parent::get_search_sql([$not, $operator, $value]);

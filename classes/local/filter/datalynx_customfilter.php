@@ -51,8 +51,14 @@ class datalynx_customfilter {
     /** @var int Timestamp when the customfilter was created. */
     public $timecreated;
 
+    /** @var int Is sortable using timecreated timestamp. */
+    public $timecreated_sortable;
+
     /** @var int Timestamp when the customfilter was last modified. */
     public $timemodified;
+
+    /** @var int Is sortable using timemodified timestamp. */
+    public $timemodified_sortable;
 
     /** @var int Whether author search is enabled. */
     public $authorsearch;
@@ -79,7 +85,9 @@ class datalynx_customfilter {
         $this->visible = !isset($filterdata->visible) ? 0 : $filterdata->visible;
         $this->fulltextsearch = !isset($filterdata->fulltextsearch) ? 0 : $filterdata->fulltextsearch;
         $this->timecreated = empty($filterdata->timecreated) ? 0 : $filterdata->timecreated;
+        $this->timecreated_sortable = empty($filterdata->timecreated_sortable) ? 0 : $filterdata->timecreated_sortable;
         $this->timemodified = empty($filterdata->timemodified) ? 0 : $filterdata->timemodified;
+        $this->timemodified_sortable = empty($filterdata->timemodified_sortable) ? 0 : $filterdata->timemodified_sortable;
         $this->authorsearch = !isset($filterdata->authorsearch) ? 0 : $filterdata->authorsearch;
         $this->approve = empty($filterdata->approve) ? 0 : $filterdata->approve;
         $this->status = empty($filterdata->status) ? 0 : $filterdata->status;

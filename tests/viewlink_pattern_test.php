@@ -293,11 +293,11 @@ final class viewlink_pattern_test extends advanced_testcase {
      */
     public function test_get_replacements_resolves_viewsesslink_tag_with_nested_entryid(): void {
         [$df, $targetobj, $templateobj] = $this->create_test_views(
-            '##viewsesslink:myview;Add entry;new=1|entryid=##entryid##;btn btn-secondary##'
+            '##viewsesslink:myview;Edit entry;editentries=##entryid##;btn btn-secondary##'
         );
 
         $patternclass = $templateobj->patternclass();
-        $tag = '##viewsesslink:myview;Add entry;new=1|entryid=##entryid##;btn btn-secondary##';
+        $tag = '##viewsesslink:myview;Edit entry;editentries=##entryid##;btn btn-secondary##';
         $entry = (object) ['id' => 42];
         $replacements = $patternclass->get_replacements([$tag], $entry, []);
 
@@ -305,11 +305,11 @@ final class viewlink_pattern_test extends advanced_testcase {
         $this->assertStringContainsString('href="', $replacements[$tag]);
         $this->assertStringContainsString('d=' . $df->id(), $replacements[$tag]);
         $this->assertStringContainsString('view=' . $targetobj->id(), $replacements[$tag]);
-        $this->assertStringContainsString('new=1&amp;entryid=42', $replacements[$tag]);
+        $this->assertStringContainsString('editentries=42', $replacements[$tag]);
         $this->assertStringContainsString('sesskey=', $replacements[$tag]);
         $this->assertStringContainsString('sourceview=', $replacements[$tag]);
         $this->assertStringContainsString('class="btn btn-secondary"', $replacements[$tag]);
-        $this->assertStringContainsString('>Add entry<', $replacements[$tag]);
+        $this->assertStringContainsString('>Edit entry<', $replacements[$tag]);
     }
 
     /**

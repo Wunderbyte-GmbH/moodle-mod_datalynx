@@ -420,7 +420,7 @@ class datalynx_customfilter_manager {
      *
      * @param datalynx_customfilter $filter
      * @param stdClass $formdata
-     * @return mixed
+     * @return \mod_datalynx\local\filter\datalynx_customfilter
      */
     public function get_filter_from_form($filter, $formdata) {
         $filter->name = $formdata->name;

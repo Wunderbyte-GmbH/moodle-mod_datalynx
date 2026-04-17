@@ -69,9 +69,9 @@ class form extends datalynxfield_form {
             $actualoptions[] = [$key => $optionset];
         }
         // Note: $options should be a flat associative array or grouped array for Moodle's select
-    
+
         $mform->addElement('header', 'fieldattributeshdr', get_string('fieldattributes', 'datalynx'));
-    
+
         // Create a standard select element named 'param1'
         // Moodle handles the value setting automatically from the database/form data
         $mform->addElement('selectgroups', 'param1', get_string('gradeitem', 'datalynx'), $options);
