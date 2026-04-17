@@ -29,4 +29,5 @@ use mod_datalynx\form\datalynxfield_form;
 /**
  * Form class for the duration field type.
  */
-class form extends datalynxfield_form {}
+class form extends datalynxfield_form {
+}

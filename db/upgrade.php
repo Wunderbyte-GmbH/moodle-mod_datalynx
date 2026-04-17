@@ -1167,7 +1167,16 @@ function xmldb_datalynx_upgrade($oldversion) {
         }
 
         $oldfield = new xmldb_field('timemodified_sortable');
-        $newfield = new xmldb_field('timemodifiedsortable', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'timemodified');
+        $newfield = new xmldb_field(
+            'timemodifiedsortable',
+            XMLDB_TYPE_INTEGER,
+            '4',
+            null,
+            XMLDB_NOTNULL,
+            null,
+            '0',
+            'timemodified',
+        );
         if ($dbman->field_exists($table, $oldfield) && !$dbman->field_exists($table, $newfield)) {
             $dbman->rename_field($table, $oldfield, 'timemodifiedsortable');
         }
