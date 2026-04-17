@@ -242,8 +242,6 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
      * @return string
      */
     public function get_return_url() {
-        global $CFG;
-
         $returnurl = new moodle_url(
             '/mod/datalynx/view.php',
             ['id' => $this->id, 'view' => $this->vid, 'filter' => $this->fid]

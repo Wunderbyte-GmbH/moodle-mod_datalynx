@@ -35,7 +35,7 @@ class form extends datalynxfield_form {
      * Define field settings form.
      */
     public function field_definition() {
-        global $CFG, $PAGE, $DB, $SITE;
+        global $CFG, $PAGE, $DB;
 
         $mform = &$this->_form;
 
@@ -53,7 +53,7 @@ class form extends datalynxfield_form {
         $options = [0 => get_string('choosedots')];
         if (!empty($this->field->field->param1)) {
             $course = $this->field->field->param1;
-            $groups = $DB->get_records_menu('groups', ['courseid' => $course], 'name', 'id,name');
+            $options = $options + $DB->get_records_menu('groups', ['courseid' => $course], 'name', 'id,name');
         } else {
             // An arbitrary limit of 100 registered options.
             $options = $options + range(1, 100);

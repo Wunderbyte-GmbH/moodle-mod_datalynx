@@ -48,7 +48,6 @@ class renderer extends datalynxfield_renderer {
         $entryid = $entry->id;
         $fieldname = "field_{$fieldid}_{$entryid}";
 
-        $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
         $url = isset($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : null;
         $alt = isset($entry->{"c{$fieldid}_content1"}) ? $entry->{"c{$fieldid}_content1"} : null;
 

@@ -94,7 +94,6 @@ class renderer extends datalynxfield_renderer {
         $entryid = $entry->id;
 
         $content = $entry->{"c{$fieldid}_content"} ?? null;
-        $content1 = $entry->{"c{$fieldid}_content1"} ?? null;
         $content2 = $entry->{"c{$fieldid}_content2"} ?? null;
         $contentid = $entry->{"c{$fieldid}_id"} ?? null;
 
@@ -122,7 +121,6 @@ class renderer extends datalynxfield_renderer {
         $strfiles = [];
         foreach ($files as $file) {
             if (!$file->is_directory()) {
-                $filename = $file->get_filename();
                 $path = "/{$field->df()->context->id}/mod_datalynx/content/$contentid";
                 // ToDo: Remove or implement altname.
                 $altname = "";
@@ -131,7 +129,7 @@ class renderer extends datalynxfield_renderer {
         }
 
         // For csv export we simply show link to first file.
-        if ($exportcsv = optional_param('exportcsv', '', PARAM_ALPHA)) {
+        if (optional_param('exportcsv', '', PARAM_ALPHA)) {
             return $this->render_csv($strfiles);
         }
 

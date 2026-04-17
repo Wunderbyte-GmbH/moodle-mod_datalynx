@@ -728,7 +728,7 @@ class datalynx_entries {
                                 // Assuming only field names contain field_.
                                 if (strpos($name, 'field_') !== false) {
                                     // If we don't see the iterator we are backwards compatible and fill with null.
-                                    [, $fieldid, $entryid, $iterator, $other] = array_pad(explode('_', $name, 5), 5, null);
+                                    [, $fieldid, $entryid, $iterator] = array_pad(explode('_', $name, 4), 4, null);
 
                                     // Important, url appends _url, so only iterator if number.
                                     // TODO: MDL-66151 This should be fixed in url, use an array to store _url
@@ -944,7 +944,7 @@ class datalynx_entries {
                                     // Remove contentids that we have collected.
                                     if ($emptycontent) {
                                         $deletedcontentids = [];
-                                        foreach ($emptycontent as $line => $contentids) {
+                                        foreach ($emptycontent as $contentids) {
                                             // Check if every field is empty, only then remove line.
                                             if (count($contentids) != $countfgfields) {
                                                 continue;

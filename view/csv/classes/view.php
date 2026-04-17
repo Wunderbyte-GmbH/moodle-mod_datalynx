@@ -152,7 +152,7 @@ class view extends base {
 
         // Flatten the set to a list of elements, wrap with tbody and close table.
         $elements[] = ['html', html_writer::start_tag('tbody')];
-        foreach ($entriesset as $entryid => $entrydefinitions) {
+        foreach ($entriesset as $entrydefinitions) {
             $elements = array_merge($elements, $entrydefinitions);
         }
         $elements[] = ['html', html_writer::end_tag('tbody') . html_writer::end_tag('table')];
@@ -173,15 +173,13 @@ class view extends base {
      * process any view specific actions
      */
     public function process_data(): void {
-        global $CFG;
-
         // Proces csv export request.
         if ($exportcsv = optional_param('exportcsv', '', PARAM_ALPHA)) {
             $this->process_export($exportcsv);
         }
 
         // Proces csv import request.
-        if ($importcsv = optional_param('importcsv', 0, PARAM_INT)) {
+        if (optional_param('importcsv', 0, PARAM_INT)) {
             $this->process_import();
         }
     }
@@ -307,7 +305,7 @@ class view extends base {
         if ($this->showimportform) {
             $mform = $this->get_import_form();
 
-            $tohtml = $params['tohtml'] ?? false;
+            $tohtml = $options['tohtml'] ?? false;
             // Print view.
             $viewname = 'datalynxview-' . preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $this->name()));
             if ($tohtml) {
@@ -457,8 +455,6 @@ class view extends base {
      * @return bool|null
      */
     public function process_import() {
-        global $CFG;
-
         $mform = $this->get_import_form();
 
         if ($mform->is_cancelled()) {
@@ -557,7 +553,6 @@ class view extends base {
         $cir = new csv_import_reader($iid, 'moddatalynx');
 
         $delimiter = !empty($options['delimiter']) ? $options['delimiter'] : $this->delimiter;
-        $enclosure = !empty($options['enclosure']) ? $options['enclosure'] : $this->enclosure;
         $encoding = !empty($options['encoding']) ? $options['encoding'] : $this->encoding;
         $updateexisting = !empty($options['updateexisting']) ? $options['updateexisting'] : false;
         $fieldsettings = !empty($options['settings']) ? $options['settings'] : [];
@@ -577,7 +572,7 @@ class view extends base {
         }
 
         // Process each csv record.
-        $updateexisting = $updateexisting && !empty($csvfieldnames['Entry']);
+        $updateexisting = $updateexisting && !empty($fieldnames['Entry']);
         $i = 0;
         $cir->init();
         while ($csvrecord = $cir->next()) {

@@ -575,7 +575,7 @@ class datalynx_filter {
             }
 
             // Process join fields.
-            foreach ($this->joins as $joinfield) {
+            foreach ($this->joins as $fieldid => $field) {
                 $whatcontent[] = $field->get_select_sql();
                 [$sqlfrom, $fieldparams] = $field->get_join_sql();
                 $contentfrom[$fieldid] = $sqlfrom;
@@ -626,7 +626,7 @@ class datalynx_filter {
     public function append_search_options(array $searchies) {
         if ($searchies) {
             $searchoptions = $this->customsearch ? unserialize($this->customsearch) : [];
-            foreach ($searchies as $fieldid => $searchy) {
+            foreach (array_keys($searchies) as $fieldid) {
                 if (empty($searchoptions[$fieldid])) {
                     $searchoptions[$fieldid] = $searchies[$fieldid];
                 }

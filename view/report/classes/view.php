@@ -83,7 +83,7 @@ class view extends base {
 
         // Flatten the set to a list of elements, wrap with tbody and close table.
         $elements[] = ['html', html_writer::start_tag('tbody')];
-        foreach ($entriesset as $entryid => $entrydefinitions) {
+        foreach ($entriesset as $entrydefinitions) {
             $elements = array_merge($elements, $entrydefinitions);
         }
         $elements[] = ['html', html_writer::end_tag('tbody') . html_writer::end_tag('table')];
@@ -457,11 +457,6 @@ class view extends base {
 
         // Get field options and their line number (which is saved in datalynx_contents).
         $fields = $this->dl->get_fields();
-        foreach ($fields as $field) {
-            if ($field->field->id === (int) $this->view->param1) {
-                $fieldoptions = $field->get_options();
-            }
-        }
         // The field used to count the selected values by the user. Must be an option type field.
         $fieldid = (int) $this->view->param1;
         $countfield = $this->dl->get_field_from_id($fieldid);

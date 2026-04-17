@@ -116,8 +116,7 @@ class renderer extends datalynxfield_renderer {
                 'comments' => true];
 
         // Ref datalynx page type defaults to external.
-        $refpagetype = !empty($options['pagetype']) ? $options['pagetype'] : 'external';
-        $pageoutput = $refdatalynx->set_page('external', $params, true);
+        $refdatalynx->set_page('external', $params, true);
 
         $refview->set_content(['filter' => $refview->get_filter()]);
         // Set to return html.
@@ -208,13 +207,12 @@ class renderer extends datalynxfield_renderer {
     protected function get_sort_options() {
         $field = $this->field;
 
-        $refdatalynx = $field->refdatalynx;
         $refview = $field->df->get_view_from_id($field->refview);
 
         $soptions = [];
         // Custom sort (ref-field-patten,ASC/DESC).
         if (!empty($field->field->param4)) {
-            foreach (explode("\n", $field->field->param4) as $key => $sorty) {
+            foreach (explode("\n", $field->field->param4) as $sorty) {
                 [$pattern, $dir] = explode(',', $sorty);
                 // Get the field id from pattern.
                 if (!$rfieldid = $refview->get_pattern_fieldid($pattern)) {
@@ -244,12 +242,12 @@ class renderer extends datalynxfield_renderer {
         }
 
         if (
-            !$refdatalynx = $field->refdatalynx || !$refview = $field->refview || !$localview = $field->localview
+            empty($field->refdatalynx) || !$refview = $field->refview || !$localview = $field->localview
         ) {
             return $soptions;
         }
 
-        foreach (explode("\n", $field->field->param5) as $key => $searchy) {
+        foreach (explode("\n", $field->field->param5) as $searchy) {
             [$andor, $refpattern, $not, $operator, $localpattern] = explode(',', $searchy);
             // Validate the and/or combinator value.
             if (empty($andor) || !in_array($andor, ['AND', 'OR'])) {
@@ -356,7 +354,6 @@ class renderer extends datalynxfield_renderer {
         $fieldid = $this->field->id();
 
         $formfieldname = "field_{$fieldid}_{$entryid}";
-        $required = true;
 
         $errors = [];
         foreach ($tags as $tag) {

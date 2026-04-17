@@ -111,7 +111,6 @@ class datalynx_preset_manager {
             $strdescription = get_string('description');
             $strscreenshot = get_string('screenshot');
             $strapply = get_string('presetapply', 'datalynx');
-            $strmap = get_string('presetmap', 'datalynx');
             $strdownload = get_string('download', 'datalynx');
             $strdelete = get_string('delete');
             $strshare = get_string('presetshare', 'datalynx');
@@ -287,8 +286,6 @@ class datalynx_preset_manager {
      * @param object $params
      */
     public function process_presets($params) {
-        global $CFG;
-
         $mform = new mod_datalynx_preset_form(
             new moodle_url(
                 'mod/datalynx/preset/index.php',
@@ -561,8 +558,6 @@ class datalynx_preset_manager {
      * @param string $presetids
      */
     public function download_presets($presetids) {
-        global $CFG;
-
         if (headers_sent()) {
             throw new moodle_exception('headerssent');
         }
@@ -645,8 +640,6 @@ class datalynx_preset_manager {
      * @return bool
      */
     public function share_presets($presetids) {
-        global $CFG, $USER;
-
         if (!has_capability('mod/datalynx:presetsviewall', $this->dl->context)) {
             return false;
         }

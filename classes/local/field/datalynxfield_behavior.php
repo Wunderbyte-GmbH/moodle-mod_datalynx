@@ -424,8 +424,8 @@ class datalynxfield_behavior {
         $behaviorinfo = $DB->get_record(
             'datalynx_behaviors',
             ['id' => $behaviorid],
-            $fields = 'dataid, name',
-            $strictness = IGNORE_MISSING
+            'dataid, name',
+            IGNORE_MISSING
         );
         $connected = $DB->get_records(
             'datalynx_views',
@@ -451,7 +451,7 @@ class datalynxfield_behavior {
                     $view->param2 = str_replace('|' . $behaviorinfo->name, $behaviorname, $view->param2);
                 }
             }
-            $DB->update_record('datalynx_views', $view, $bulk = true);
+            $DB->update_record('datalynx_views', $view, true);
         }
     }
 

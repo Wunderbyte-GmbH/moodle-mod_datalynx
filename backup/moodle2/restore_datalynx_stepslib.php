@@ -332,7 +332,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             $haystack = $data->section;
             $search = preg_match_all($searchpattern, $haystack, $matches);
             if ($search > 0 && !empty($matches[1])) {
-                foreach ($matches[1] as $key => $filterid) {
+                foreach ($matches[1] as $filterid) {
                     $newfilterid = $this->get_mappingid('datalynx_filter', $filterid);
                     $toreplace[] = ";filter=" . $filterid . ";";
                     $replacements[] = ";filter=" . $newfilterid . ";";
@@ -530,7 +530,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         $data->timecreated = $this->apply_date_offset($data->timecreated);
         $data->timemodified = $this->apply_date_offset($data->timemodified);
 
-        $newitemid = $DB->insert_record('rating', $data);
+        $DB->insert_record('rating', $data);
     }
 
     /**

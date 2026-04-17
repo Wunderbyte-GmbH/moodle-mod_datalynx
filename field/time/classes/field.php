@@ -282,8 +282,6 @@ class field extends datalynxfield_base {
                         );
                         datefmt_set_lenient($fmt, true);
                         $unixtimestamp = $fmt->parse($timestr);
-                        $errormsg = datefmt_get_error_message($fmt);
-                        $errorcode = datefmt_get_error_code($fmt);
                         if ($unixtimestamp) {
                             $data->{"field_{$fieldid}_{$entryid}"} = $unixtimestamp;
                         }

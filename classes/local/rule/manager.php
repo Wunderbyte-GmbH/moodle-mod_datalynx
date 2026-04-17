@@ -377,7 +377,6 @@ class manager {
 
                             // Create a rule object to collect and store the data safely.
                             $rule = reset($rules);
-                            $oldrulename = $rule->rule->name;
                             $rule->update_rule($forminput);
 
                             $other = ['dataid' => $this->dl->id()];
@@ -556,7 +555,7 @@ class manager {
             $ruledescription = shorten_text($rule->rule->description, 30);
 
             // Enabled.
-            if ($enabled = $rule->rule->enabled) {
+            if ($rule->rule->enabled) {
                 $enabledicon = $OUTPUT->pix_icon('t/hide', $strhide);
             } else {
                 $enabledicon = $OUTPUT->pix_icon('t/show', $strshow);

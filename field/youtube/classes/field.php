@@ -76,8 +76,6 @@ class field extends datalynxfield_base {
      * @return array
      */
     protected function format_content($entry, array $values = null) {
-        $fieldid = $this->field->id;
-        $oldcontents = [];
         $contents = [];
 
         if (!empty($values)) {

@@ -134,7 +134,7 @@ class datalynx_customfilter_backend_form extends datalynx_customfilter_base_form
             $fieldlist = json_decode($customfilter->fieldlist);
         }
         $fields = $this->get_possible_customfilter_fields($this->dl);
-        foreach ($fields as $fieldid => $field) {
+        foreach ($fields as $field) {
             $formfieldname = 'fieldlist[' . $field->field->id . '][name]';
             $formfieldsortablename = 'fieldlist[' . $field->field->id . '][sortable]';
             $grp = [];

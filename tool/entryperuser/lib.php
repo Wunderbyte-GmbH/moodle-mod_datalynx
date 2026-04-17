@@ -40,8 +40,6 @@ class datalynxtool_entryperuser {
      * @param mod_datalynx\datalynx $df
      */
     public static function run($df) {
-        global $DB;
-
         // Get gradebook users.
         $users = $df->get_gradebook_users();
         if (!$users) {
@@ -52,7 +50,7 @@ class datalynxtool_entryperuser {
         $data = (object) ['eids' => []];
         $fieldid = datalynxfield_entryauthor::_USERID;
         $entryid = -1;
-        foreach ($users as $userid => $unused) {
+        foreach (array_keys($users) as $userid) {
             $data->eids[$entryid] = $entryid;
             $data->{"field_{$fieldid}_{$entryid}"} = $userid;
             $entryid--;

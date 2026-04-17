@@ -40,8 +40,6 @@ class datalynxtool_downloadfiles {
      * @param datalynx $dl
      */
     public static function run(mod_datalynx\datalynx $dl) {
-        global $DB, $CFG;
-
         // Create filter in order to get all files of all entries of a dl instance.
         $fields = $dl->get_fields_by_type('file');
         $filterdata = new stdClass();
@@ -58,7 +56,7 @@ class datalynxtool_downloadfiles {
 
         $filesforzipping = [];
         if (!empty($files)) {
-            foreach ($files as $zipfilepath => $file) {
+            foreach ($files as $file) {
                 $foldername = $fileinfo[$file->get_itemid()]->lastname . "_" . $fileinfo[$file->get_itemid()]->firstname . "/";
                 $pathfilename = $foldername . $file->get_filename();
                 $pathfilename = clean_param($pathfilename, PARAM_PATH);
@@ -67,7 +65,7 @@ class datalynxtool_downloadfiles {
         }
 
         if (count($filesforzipping) == 0) {
-            $result = notification::warning(get_string('entrynoneforaction', 'mod_datalynx'));
+            notification::warning(get_string('entrynoneforaction', 'mod_datalynx'));
         } else if ($zipfile = self::pack_files($filesforzipping)) {
             // Send file and delete after sending.
             send_temp_file($zipfile, $filename);

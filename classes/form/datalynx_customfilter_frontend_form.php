@@ -113,7 +113,7 @@ class datalynx_customfilter_frontend_form extends datalynx_filter_base_form {
         // Search for author.
         if (isset($customfilter->authorsearch) && $customfilter->authorsearch) {
             // Add users that have written an entry in the current datalynx instance to list.
-            global $DB, $PAGE;
+            global $DB;
             $entryauthors = $DB->get_records_sql('SELECT DISTINCT userid, firstname, lastname
                 FROM {datalynx_entries}
                 INNER JOIN {user} on {datalynx_entries}.userid = {user}.id

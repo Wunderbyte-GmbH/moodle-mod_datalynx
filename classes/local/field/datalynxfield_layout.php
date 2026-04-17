@@ -350,8 +350,8 @@ class datalynxfield_layout {
         $rendererinfo = $DB->get_record(
             'datalynx_renderers',
             ['id' => $rendererid],
-            $fields = 'dataid, name',
-            $strictness = IGNORE_MISSING
+            'dataid, name',
+            IGNORE_MISSING
         );
         $connected = $DB->get_records(
             'datalynx_views',
@@ -373,7 +373,7 @@ class datalynxfield_layout {
                     $view->patterns = str_replace('|' . $rendererinfo->name, $renderername, $view->patterns);
                     $view->param2 = str_replace('|' . $rendererinfo->name, $renderername, $view->param2);
                 }
-                $DB->update_record('datalynx_views', $view, $bulk = true);
+                $DB->update_record('datalynx_views', $view, true);
             }
         }
     }

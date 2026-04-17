@@ -153,7 +153,6 @@ class field extends datalynxfield_option_multiple {
         $sql = '';
         $params = [];
         $conditions = [];
-        $notinidsequal = false;
 
         $sql = 'SELECT DISTINCT dc.entryid
                 FROM {datalynx_contents} dc

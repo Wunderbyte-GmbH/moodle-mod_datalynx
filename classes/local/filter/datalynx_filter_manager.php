@@ -413,8 +413,6 @@ class datalynx_filter_manager {
      * @return datalynx_filter_form
      */
     public function get_filter_form($filter) {
-        global $CFG;
-
         $formurl = new moodle_url(
             '/mod/datalynx/filter/index.php',
             ['d' => $this->dl->id(), 'fid' => $filter->id, 'update' => 1]
@@ -494,7 +492,7 @@ class datalynx_filter_manager {
 
         $customfilterfields = json_decode($customfilter->fieldlist);
         $customfilterfieldids = [];
-        foreach ($customfilterfields as $fid => $field) {
+        foreach (array_keys((array) $customfilterfields) as $fid) {
             $customfilterfieldids[] = $fid;
         }
 
@@ -609,7 +607,7 @@ class datalynx_filter_manager {
     protected function get_search_options_from_form($formdata, $finalize = false) {
         if ($fields = $this->dl->get_fields()) {
             $searchfields = [];
-            foreach ($formdata as $var => $unused) {
+            foreach (array_keys((array) $formdata) as $var) {
                 if (strpos($var, 'searchandor') !== 0) {
                     continue;
                 }
@@ -662,7 +660,7 @@ class datalynx_filter_manager {
     protected function get_customfilter_search_options_from_form($formdata, $finalize = false) {
         if ($fields = $this->dl->get_fields()) {
             $searchfields = [];
-            foreach ($formdata as $var => $unused) {
+            foreach (array_keys((array) $formdata) as $var) {
                 if (strpos($var, 'searchandor') !== 0) {
                     continue;
                 }
@@ -937,8 +935,6 @@ class datalynx_filter_manager {
      * @return datalynx_advanced_filter_form
      */
     public function get_advanced_filter_form($filter, $view) {
-        global $CFG;
-
         $formurl = new moodle_url($view->get_baseurl(), ['filter' => self::USER_FILTER_SET, 'afilter' => 1]);
         $mform = new datalynx_advanced_filter_form($this->dl, $filter, $formurl, ['view' => $view]);
         return $mform;
@@ -955,8 +951,6 @@ class datalynx_filter_manager {
      * @return datalynx_customfilter_frontend_form
      */
     public function get_customfilter_frontend_form($filter, \mod_datalynx\local\view\base $view, $customfilter = false) {
-        global $CFG;
-
         $cfilter = isset($customfilter->id) ? $customfilter->id : "1";
         $formurl = new moodle_url($view->get_baseurl(), ['filter' => self::USER_FILTER_SET, 'cfilter' => $cfilter]);
         $mform = new datalynx_customfilter_frontend_form(
@@ -1198,7 +1192,7 @@ class datalynx_filter_manager {
         if ($query) {
             $usearch = urldecode($query);
             $searchies = explode('@', $usearch);
-            foreach ($searchies as $key => $searchy) {
+            foreach ($searchies as $searchy) {
                 [$fieldid, $andor, $options] = explode(':', $searchy);
                 $soptions[$fieldid] = [
                         $andor => array_map(function ($a) {

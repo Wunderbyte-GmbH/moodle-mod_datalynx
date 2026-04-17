@@ -77,7 +77,7 @@ class field extends datalynxfield_base {
         if ($seconds === 0) {
             return [0, 1];
         }
-        foreach ($this->get_units() as $unit => $notused) {
+        foreach (array_keys($this->get_units()) as $unit) {
             if (fmod($seconds, $unit) == 0) {
                 return [$seconds / $unit, $unit];
             }

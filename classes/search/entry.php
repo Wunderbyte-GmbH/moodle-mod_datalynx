@@ -275,8 +275,6 @@ class entry extends \core_search\base_mod {
      * @return void
      */
     public function attach_files($doc) {
-        global $DB;
-
         $entryid = $doc->get('itemid');
 
         try {

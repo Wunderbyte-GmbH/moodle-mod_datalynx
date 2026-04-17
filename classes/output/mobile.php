@@ -33,7 +33,7 @@ class mobile {
      * @return array HTML, javascript and otherdata
      */
     public static function mobile_course_view($args) {
-        global $OUTPUT, $USER, $DB, $CFG;
+        global $USER, $CFG;
         require_once("$CFG->dirroot/mod/datalynx/classes/datalynx.php");
 
         $args = (object) $args;

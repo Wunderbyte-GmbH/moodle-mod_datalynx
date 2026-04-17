@@ -78,7 +78,7 @@ class renderer extends datalynxfield_renderer {
             $duration = '';
         }
         // Durations always are exported as their value in seconds to csv.
-        if ($exportcsv = optional_param('exportcsv', '', PARAM_ALPHA)) {
+        if (optional_param('exportcsv', '', PARAM_ALPHA)) {
             return $duration;
         }
 

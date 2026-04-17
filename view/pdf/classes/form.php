@@ -38,8 +38,6 @@ class form extends datalynxview_base_form {
      * Add view specific elements to the form
      */
     public function view_definition_after_gps() {
-        global $COURSE;
-
         $view = $this->view;
         $editoroptions = $view->editors();
         $editorattr = ['cols' => 40, 'rows' => 12];
@@ -422,7 +420,7 @@ class form extends datalynxview_base_form {
     protected function data_preprocess_protection(&$data, $protection) {
         $view = $this->view;
         $perms = $view::get_permission_options();
-        foreach ($perms as $perm => $unused) {
+        foreach (array_keys($perms) as $perm) {
             if (in_array($perm, $protection->permissions)) {
                 $var = "perm_$perm";
                 $data->$var = $perm;
@@ -475,7 +473,7 @@ class form extends datalynxview_base_form {
         // Pdf settings.
         $view = $this->view;
         if ($settings = $view->get_pdf_settings()) {
-            foreach ($settings as $name => $value) {
+            foreach (array_keys(get_object_vars($settings)) as $name) {
                 if ($name == 'header') {
                     $settings->header->enabled = $data->headerenabled;
                     if ($data->headerenabled) {
@@ -537,7 +535,7 @@ class form extends datalynxview_base_form {
         $protection = $settings->protection;
         $protection->permissions = [];
         $perms = $view::get_permission_options();
-        foreach ($perms as $perm => $unused) {
+        foreach (array_keys($perms) as $perm) {
             $var = "perm_$perm";
             if (!empty($data->$var)) {
                 $protection->permissions[] = $perm;

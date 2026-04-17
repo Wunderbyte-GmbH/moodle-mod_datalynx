@@ -197,7 +197,7 @@ class datalynxfield_behavior_form extends moodleform {
     public function get_allusers() {
         global $DB;
         $allusers = [];
-        $tempusers = $DB->get_records('user', [], '', $fields = 'id, firstname, lastname');
+        $tempusers = $DB->get_records('user', [], '', 'id, firstname, lastname');
 
         foreach ($tempusers as $userdata) {
             // Remove empties to make list more usable.

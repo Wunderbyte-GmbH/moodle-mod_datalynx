@@ -37,7 +37,7 @@ class form extends datalynxfield_form {
      * @return void
      */
     public function field_definition() {
-        global $OUTPUT, $DB, $PAGE;
+        global $OUTPUT, $PAGE;
 
         $mform = &$this->_form;
 
@@ -183,7 +183,6 @@ class form extends datalynxfield_form {
      * @return string[] Associative array with errors
      */
     public function validation($data, $files) {
-        $mform = &$this->_form;
         $errors = parent::validation($data, $files);
         $fieldid = $this->field->id();
         if (!empty($data['param8']) && !empty($fieldid)) {

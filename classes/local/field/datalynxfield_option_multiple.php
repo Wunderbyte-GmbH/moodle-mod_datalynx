@@ -36,7 +36,7 @@ class datalynxfield_option_multiple extends datalynxfield_option {
         $params = [];
         $i = 0;
         $where = 'c.fieldid = :fieldid AND (';
-        foreach ($map as $old => $new) {
+        foreach (array_keys($map) as $old) {
             $where .= $DB->sql_like('c.content', ":old{$i}") . ' OR ';
             $params["old{$i}"] = "%#{$old}#%";
             $i++;

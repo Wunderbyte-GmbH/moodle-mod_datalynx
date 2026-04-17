@@ -50,7 +50,7 @@ if ($urlparams->jsedit) {
          * Form definition
          */
         public function definition() {
-            global $CFG, $COURSE;
+            global $COURSE;
 
             $mform = &$this->_form;
 

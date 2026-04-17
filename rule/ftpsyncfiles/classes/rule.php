@@ -138,7 +138,7 @@ class rule extends base {
      * @return true
      */
     public function trigger(core_event_base $event) {
-        global $CFG, $USER;
+        global $CFG;
         require_once($CFG->libdir . '/filelib.php');
         require_once($CFG->libdir . '/completionlib.php');
 
@@ -164,7 +164,7 @@ class rule extends base {
                 // Set teammember from filename.
                 $userid = $this->get_userid_from_filename($filename);
                 $data->{"field_{$this->teammemberfieldid}_{$entryid}"} = ["$userid"];
-                $processed = $dlentries->process_entries('update', $data->eids, $data, true);
+                $dlentries->process_entries('update', $data->eids, $data, true);
             }
         }
         return true;

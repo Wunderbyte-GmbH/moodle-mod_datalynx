@@ -1167,7 +1167,6 @@ function xmldb_datalynx_upgrade($oldversion) {
  */
 function mod_datalynx_upgrade_behaviors() {
     global $DB;
-    $existingdata = [];
     $allbehaviorids = $DB->get_fieldset_select('datalynx_behaviors', 'id', 'id > 0');
     if (!empty($allbehaviorids)) {
         foreach ($allbehaviorids as $behaviorid) {

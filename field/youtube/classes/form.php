@@ -38,8 +38,6 @@ class form extends datalynxfield_form {
      * Define the field attributes.
      */
     public function field_definition() {
-        global $OUTPUT, $DB, $PAGE, $CFG;
-
         $mform = &$this->_form;
 
         $mform->addElement(

@@ -63,7 +63,6 @@ class datalynx_statistics_form extends moodleform {
      * Form definition.
      */
     public function definition() {
-        $df = $this->dl;
         $mform = &$this->_form;
         $mform->addElement('static', '', '', '');
         $mform->addElement('html', '<div style="width: 33%; float: left;">');

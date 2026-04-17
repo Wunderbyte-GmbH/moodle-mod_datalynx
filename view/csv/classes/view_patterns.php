@@ -39,13 +39,9 @@ class view_patterns extends datalynxview_patterns {
      * @return array
      */
     public function get_replacements($tags = null, $entry = null, array $options = []) {
-        global $CFG, $OUTPUT;
-
         $replacements = parent::get_replacements($tags, $entry, $options);
 
         $view = $this->view;
-        $df = $view->get_dl();
-        $filter = $view->get_filter();
         $baseurl = new \moodle_url($view->get_baseurl());
         $baseurl->param('sesskey', sesskey());
 

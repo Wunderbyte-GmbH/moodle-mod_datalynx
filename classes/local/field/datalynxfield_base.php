@@ -189,7 +189,7 @@ abstract class datalynxfield_base {
         if (!empty($this->field->id)) {
             if ($filearea = $this->filearea()) {
                 $fs = get_file_storage();
-                $success = $fs->delete_area_files($this->df->context->id, 'mod_datalynx', $filearea);
+                $fs->delete_area_files($this->df->context->id, 'mod_datalynx', $filearea);
             }
             $this->delete_content();
             $DB->delete_records('datalynx_fields', ['id' => $this->field->id]);
@@ -385,8 +385,6 @@ abstract class datalynxfield_base {
     public function update_content(stdClass $entry, array $values = null) {
         global $DB;
         $fieldid = $this->field->id;
-        $fieldgroup = false;
-
         $fieldid = $this->field->id;
         $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
 

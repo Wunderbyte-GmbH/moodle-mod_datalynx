@@ -488,7 +488,7 @@ class datalynx_customfilter_manager {
                 $fieldlist = "";
                 $connector = "";
                 $fieldlistdecode = json_decode($filter->fieldlist);
-                foreach ($fieldlistdecode as $fid => $listfield) {
+                foreach ($fieldlistdecode as $listfield) {
                     $fieldlist .= $connector . $listfield->name;
                     $connector = ", ";
                 }

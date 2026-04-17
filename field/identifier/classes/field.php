@@ -63,8 +63,6 @@ class field extends datalynxfield_base {
      */
     protected function format_content($entry, array $values = null) {
         $fieldid = $this->field->id;
-        $oldcontents = [];
-        $contents = [];
         // Old content (should not exist if we get here, as update should be triggered only when no content).
         if (isset($entry->{"c{$fieldid}_content"})) {
             $oldcontent = $entry->{"c{$fieldid}_content"};
@@ -87,8 +85,6 @@ class field extends datalynxfield_base {
      * @return string
      */
     protected function generate_identifier_key($entry) {
-        global $CFG, $USER;
-
         $identifierkey = $this->get_hash_string($entry);
         $uniqueness = !empty($this->field->param4) ? $this->field->param4 : false;
         if ($uniqueness) {

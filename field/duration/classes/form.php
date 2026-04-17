@@ -34,6 +34,6 @@ class form extends datalynxfield_form {
      * Define the form elements for the duration field.
      */
     public function field_definition() {
-        $mform = &$this->_form;
+        parent::field_definition();
     }
 }

@@ -90,7 +90,7 @@ class renderer extends FileRenderer {
      * @return string
      */
     public function render_display_mode(stdClass $entry, array $options): string {
-        global $CFG, $PAGE;
+        global $PAGE;
         $PAGE->requires->js_call_amd('mod_datalynx/zoomable', 'init');
         $field = $this->field;
         $fieldid = $field->id();
@@ -127,7 +127,6 @@ class renderer extends FileRenderer {
         foreach ($files as $file) {
             if (!$file->is_directory()) {
                 $filename = $file->get_filename();
-                $filenameinfo = pathinfo($filename);
                 $path = "/{$field->df()->context->id}/mod_datalynx/content/$contentid";
                 if (strpos($filename, 'thumb_') === false) {
                     $strfiles[] = $this->display_file($file, $entryid, $path, $altname, $options);
@@ -136,7 +135,7 @@ class renderer extends FileRenderer {
         }
 
         // For csv export we simply show link to first file.
-        if ($exportcsv = optional_param('exportcsv', '', PARAM_ALPHA)) {
+        if (optional_param('exportcsv', '', PARAM_ALPHA)) {
             return $this->render_csv($strfiles);
         }
 

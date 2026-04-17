@@ -70,7 +70,7 @@ class datalynx_rating_manager extends rating_manager {
      * @throws coding_exception
      */
     public function get_ratings($options) {
-        global $DB, $USER;
+        global $DB;
 
         if (!isset($options->context)) {
             throw new coding_exception(

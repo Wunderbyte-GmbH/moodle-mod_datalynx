@@ -35,7 +35,7 @@ class form extends datalynxfield_form {
      * Define field settings form.
      */
     public function field_definition() {
-        global $PAGE, $DB;
+        global $PAGE;
 
         $mform = &$this->_form;
 

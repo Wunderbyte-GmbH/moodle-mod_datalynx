@@ -44,7 +44,6 @@ class renderer extends datalynxfield_renderer {
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
         $field = $this->field;
-        $fieldname = $field->get('internalname');
         $edit = !empty($options['edit']) ? $options['edit'] : false;
 
         // Set the group object.

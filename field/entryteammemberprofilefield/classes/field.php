@@ -169,7 +169,6 @@ class field extends datalynxfield_no_content_can_join {
             $params = [];
         } else {
             $userids = array_keys($userswithprofilefieldvalue);
-            $useridsasstring = array_map('strval', $userids);
             // Get entryids for the users that have the selected field value.
             $conditions = [];
             $params = [
@@ -250,9 +249,7 @@ class field extends datalynxfield_no_content_can_join {
      * @return mixed
      */
     public function parse_search($formdata, $i) {
-        global $USER;
         $fieldid = $this->field->id;
-        $internalname = $this->field->internalname;
         $operator = !empty($formdata->{"searchoperator{$i}"}) ? $formdata->{"searchoperator{$i}"} : '';
         $fieldvalue = !empty($formdata->{"f_{$i}_$fieldid"}) ? $formdata->{"f_{$i}_$fieldid"} : false;
         if ($operator == self::OPERATOR_MY_PROFILE_FIELD) {

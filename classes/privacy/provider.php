@@ -325,7 +325,7 @@ class provider implements
         $recordobj = self::extract_object_from_entry($row, 'entry', ['dataid' => $row->dataid]);
         if ($row->contentid && $row->fieldid) {
             $fieldobj = self::extract_object_from_entry($row, 'field', ['dataid' => $row->dataid]);
-            $contentobj = self::extract_object_from_entry(
+            self::extract_object_from_entry(
                 $row,
                 'content',
                 ['fieldid' => $fieldobj->id, 'entryid' => $recordobj->id]
@@ -392,7 +392,7 @@ class provider implements
                 $value->$key = $contentobj->$key;
             }
         }
-        $classname = manager::get_provider_classname_for_component('datafield_' . $fieldobj->type);
+        manager::get_provider_classname_for_component('datafield_' . $fieldobj->type);
 
         // Data field plugin does not implement datafield_provider, just export default value.
         writer::with_context($context)->export_data([$recordobj->id, $contentobj->id], $value);

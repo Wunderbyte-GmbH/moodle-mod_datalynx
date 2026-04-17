@@ -51,8 +51,6 @@ class renderer extends datalynxfield_renderer {
     public function replacements(array $tags = null, $entry = null, array $options = null) {
         global $CFG;
 
-        $field = $this->field;
-
         // No edit mode.
         $replacements = array_fill_keys($tags, '');
 

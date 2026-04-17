@@ -84,7 +84,7 @@ class renderer extends datalynxfield_renderer {
 
         $fieldname = "field_{$fieldid}_{$entryid}";
         $menu = $this->menu_status();
-        $select = &$mform->addElement('select', $fieldname, '', $menu);
+        $mform->addElement('select', $fieldname, '', $menu);
         $mform->setDefault($fieldname, $status);
         if ($required) {
             $mform->addRule(
@@ -133,7 +133,6 @@ class renderer extends datalynxfield_renderer {
      * @return string HTML representation
      */
     protected function display_browse($entry, $params = []) {
-        $field = $this->field;
         $menu = $this->menu_status(true);
         if (isset($entry) && isset($entry->status)) {
             return $menu[$entry->status];

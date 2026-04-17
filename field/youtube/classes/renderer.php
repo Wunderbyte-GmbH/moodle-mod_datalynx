@@ -96,8 +96,6 @@ class renderer extends datalynxfield_renderer {
      * @return array
      */
     public function validate($entryid, $tags, $formdata) {
-        global $DB;
-
         $fieldid = $this->field->id();
 
         $formfieldname = "field_{$fieldid}_{$entryid}";

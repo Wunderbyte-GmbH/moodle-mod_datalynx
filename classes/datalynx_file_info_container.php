@@ -151,7 +151,7 @@ class datalynx_file_info_container extends file_info {
             'itemid DESC',
             "DISTINCT itemid"
         );
-        foreach ($itemids as $itemid => $unused) {
+        foreach (array_keys($itemids) as $itemid) {
             if (
                     $child = $this->browser->get_file_info(
                         $this->context,

@@ -46,7 +46,6 @@ class renderer extends datalynxfield_renderer {
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
         $field = $this->field;
-        $fieldname = $field->name();
         $edit = !empty($options['edit']) ? $options['edit'] : false;
 
         $replacements = array_fill_keys($tags, '');
@@ -78,7 +77,7 @@ class renderer extends datalynxfield_renderer {
      * @param array|null $options Rendering options.
      */
     public function display_edit(&$mform, $entry, array $options = null) {
-        global $CFG, $DB, $SITE, $PAGE;
+        global $CFG, $DB, $PAGE;
 
         $field = $this->field;
         $fieldid = $field->id();

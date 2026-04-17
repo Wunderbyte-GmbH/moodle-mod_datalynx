@@ -896,7 +896,6 @@ class datalynx {
         ?int $eids = null,
         array $options = ['tohtml' => true]
     ) {
-        global $CFG;
         $urlparams = new stdClass();
         $datalynx = new datalynx($datalynxid);
         $datalynx->views = $datalynx->get_all_views();
@@ -1208,7 +1207,7 @@ class datalynx {
      * @return boolean
      */
     private function is_html($string) {
-        return preg_match("/<[^<]+>/", $string, $m) != 0;
+        return preg_match("/<[^<]+>/", $string) != 0;
     }
 
     /**
@@ -2396,7 +2395,7 @@ class datalynx {
      * @throws \dml_exception
      */
     public function user_num_entries($perinterval = false) {
-        global $USER, $CFG, $DB;
+        global $USER, $DB;
 
         static $numentries = null;
         static $numentriesintervaled = null;
@@ -2721,7 +2720,7 @@ class datalynx {
 
         $other = ['dataid' => $this->id()];
 
-        foreach ($data->items as $id => $item) {
+        foreach (array_keys($data->items) as $id) {
             switch ($event) {
                 case 'entryadded':
                     $event = event\entry_created::create(

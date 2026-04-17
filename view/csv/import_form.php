@@ -81,11 +81,6 @@ class datalynxview_csv_import_form extends moodleform {
      * Form definition.
      */
     public function definition() {
-        $view = $this->view;
-        $fieldsettings = empty($this->_customdata['hidefieldsettings']) ? true : false;
-
-        $mform = &$this->_form;
-
         // Action buttons.
         $this->add_action_buttons(true, get_string('import', 'datalynx'));
 

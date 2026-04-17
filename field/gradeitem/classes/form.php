@@ -68,7 +68,16 @@ class form extends datalynxfield_form {
         foreach ($options as $key => $optionset) {
             $actualoptions[] = [$key => $optionset];
         }
-
+        // Note: $options should be a flat associative array or grouped array for Moodle's select
+    
+        $mform->addElement('header', 'fieldattributeshdr', get_string('fieldattributes', 'datalynx'));
+    
+        // Create a standard select element named 'param1'
+        // Moodle handles the value setting automatically from the database/form data
+        $mform->addElement('selectgroups', 'param1', get_string('gradeitem', 'datalynx'), $options);
+        $mform->addRule('param1', null, 'required', null, 'client');
+        $mform->setType('param1', PARAM_INT);
+        /*
         $mform->addElement('hidden', 'param1');
         $mform->setType('param1', PARAM_INT);
         $mform->addElement(
@@ -78,13 +87,12 @@ class form extends datalynxfield_form {
             html_writer::select($actualoptions, "param1", '', ['' => 'choosedots'])
         );
 
-        $module = ['name' => 'mod_datalynx', 'fullpath' => '/mod/datalynx/amd/src/patterndialogue.js'];
-
         global $PAGE;
 
         $PAGE->requires->js_amd_inline("
         require(['jquery'], function($) {
             $('select[name=param1]').val($('input[type=\"hidden\"][name=\"param1\"]').val());
         });");
+        */
     }
 }

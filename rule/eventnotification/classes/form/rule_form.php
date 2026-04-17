@@ -143,7 +143,7 @@ class rule_form extends base_rule_form {
      */
     public function get_allusers(): array {
         global $DB;
-        $tempusers = $DB->get_records('user', [], '', $fields = 'id, firstname, lastname');
+        $tempusers = $DB->get_records('user', [], '', 'id, firstname, lastname');
 
         $allusers[0] = get_string('noselection', 'datalynx');
         foreach ($tempusers as $userdata) {
@@ -163,7 +163,7 @@ class rule_form extends base_rule_form {
         $mform = &$this->_form;
         $data = $this->get_submitted_data();
 
-        foreach ($this->dl->get_datalynx_permission_names(true) as $permissionid => $permissionname) {
+        foreach (array_keys($this->dl->get_datalynx_permission_names(true)) as $permissionid) {
             $views = $this->get_views_visible_to_datalynx_permission($permissionid);
             $defaultview = $this->dl->get_default_view_id();
             if (

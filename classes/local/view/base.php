@@ -180,7 +180,7 @@ abstract class base {
      * @param bool $filteroptions Whether to apply filter options.
      */
     public function __construct($df = 0, $view = 0, $filteroptions = true) {
-        global $DB, $CFG;
+        global $DB;
 
         if (empty($df)) {
             throw new coding_exception('Datalynx id or object must be passed to field constructor.');
@@ -1088,7 +1088,7 @@ abstract class base {
 
         // View files.
         if (empty($set) || $set == 'view') {
-            foreach ($this->editors as $key => $editorname) {
+            foreach (array_keys($this->editors) as $key) {
                 // Build editor item id from the editor position key.
                 $files = array_merge(
                     $files,
@@ -1225,7 +1225,6 @@ abstract class base {
 
         $fieldid = $this->filter->groupby;
         // Set sorting to begin with this field.
-        $insort = false;
         // TODO: MDL-00000 asc order is arbitrary here and should be determined differently.
         $sortdir = 0;
         $sortfields = [];
@@ -1257,13 +1256,6 @@ abstract class base {
             $this->filter->page = 0;
         }
 
-        if ($this->filter->perpage) {
-            $offset = $this->filter->page * $this->filter->perpage;
-            $vals = array_slice($groupbyvalues, $offset, $this->filter->perpage);
-        } else {
-            $vals = $groupbyvalues;
-        }
-
         $searchfields = [];
         if ($this->filter->customsearch) {
             $searchfields = unserialize($this->filter->customsearch);
@@ -1278,7 +1270,7 @@ abstract class base {
      * @return stdClass|null
      */
     protected function is_rating() {
-        global $USER, $CFG;
+        global $USER;
         if (
             !$this->dl->data->rating || empty(
                 $this->tags['field'][datalynxfield_rating::_RATING]
@@ -1366,7 +1358,7 @@ abstract class base {
      * @return string
      */
     public function display_entries(array $options = null): string {
-        global $DB, $OUTPUT, $CFG;
+        global $DB, $OUTPUT;
 
         if (!$this->user_is_editing()) {
             $html = $this->definition_to_html();
@@ -1458,7 +1450,6 @@ abstract class base {
         static $entriesform = null;
 
         if ($entriesform == null) {
-            global $CFG;
             // Prepare params for for content management.
             $actionparams = [
                 'd' => $this->dl->id(),
@@ -1490,7 +1481,7 @@ abstract class base {
         foreach ($displaydefinition as $name => $entriesset) {
             $definitions = [];
             if ($name == 'newentry') {
-                foreach ($entriesset as $entryid => $unused) {
+                foreach (array_keys($entriesset) as $entryid) {
                     $definitions[$entryid] = $this->new_entry_definition($entryid);
                 }
             } else {
@@ -1542,7 +1533,7 @@ abstract class base {
                     (strpos($tag, '##viewlink:') !== 0 && strpos($tag, '##viewsesslink:') !== 0) &&
                         (!array_key_exists('edit', $options) || !$options['edit'])
                 ) {
-                    foreach ($fielddefinitions as $fieldtag => $definition) {
+                    foreach (array_keys($fielddefinitions) as $fieldtag) {
                         $pattern = str_replace(
                             $fieldtag,
                             isset($definitions[$fieldtag][1]) ? $definitions[$fieldtag][1] : '',

@@ -489,7 +489,7 @@ function datalynx_get_file_info(
     $filepath,
     $filename
 ) {
-    global $CFG, $DB, $USER;
+    global $CFG, $DB;
 
     if ($context->contextlevel != CONTEXT_MODULE) {
         return null;
@@ -543,7 +543,7 @@ function datalynx_get_file_info(
  * @return bool false if file not found, does not return if found - justsend the file
  */
 function mod_datalynx_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload) {
-    global $CFG, $DB, $USER;
+    global $DB, $USER;
 
     // Check permissions, if anonymous access is allowed login user.
     require_course_login($course, true, $cm);
@@ -994,9 +994,8 @@ function datalynx_user_complete($course, $user, $mod, $data) {
         }
     }
     $sqlparams = ['dataid' => $data->id, 'userid' => $user->id];
-    if ($countrecords = $DB->count_records('datalynx_entries', $sqlparams)) {
+    if ($DB->count_records('datalynx_entries', $sqlparams)) {
         // TODO: MDL-66151 get the default view add a filter for user only and display.
-        $x = 1;
     }
 }
 
@@ -1040,8 +1039,6 @@ function datalynx_get_post_actions() {
  * @return array
  */
 function datalynx_comment_permissions($commentparam) {
-    global $CFG;
-
     return ['post' => true, 'view' => true];
 }
 
@@ -1058,7 +1055,6 @@ function datalynx_comment_permissions($commentparam) {
  * @return boolean
  */
 function datalynx_comment_validate($commentparam) {
-    global $CFG;
     $comment = new datalynxfield_comment($commentparam->cm->instance);
     return $comment->validation($commentparam);
 }
@@ -1070,8 +1066,6 @@ function datalynx_comment_validate($commentparam) {
  * @param stdClass $commentparam
  */
 function datalynx_comment_add($newcomment, $commentparam) {
-    $df = new mod_datalynx\datalynx($commentparam->cm->instance);
-    $eventdata = (object) ['items' => $newcomment];
 }
 
 // Grading.
@@ -1206,7 +1200,7 @@ function datalynx_rating_validate($params) {
 
     // Make sure groups allow this user to see the item they're rating.
     $groupid = $df->currentgroup;
-    if ($groupid > 0 && $groupmode = groups_get_activity_groupmode($df->cm, $df->course)) {
+    if ($groupid > 0 && groups_get_activity_groupmode($df->cm, $df->course)) {
         // Groups are being used.
         if (!groups_group_exists($groupid)) {
             // Can't find group.
@@ -1264,7 +1258,7 @@ function datalynx_get_user_grades($data, $userid = 0) {
  * @param bool $nullifnone
  */
 function datalynx_update_grades($data = null, $userid = 0, $nullifnone = true) {
-    global $CFG, $DB;
+    global $CFG;
     require_once("$CFG->libdir/gradelib.php");
 
     if (!$data->assessed) {
@@ -1395,7 +1389,7 @@ function datalynx_grade_item_delete($data) {
  * @throws Exception
  */
 function datalynx_get_completion_state($course, $cm, $userid, $type) {
-    global $CFG, $DB;
+    global $DB;
 
     if (!($datalynx = $DB->get_record('datalynx', ['id' => $cm->instance]))) {
         throw new Exception("Can't find datalynx {$cm->instance}");

@@ -51,7 +51,6 @@ class field extends FileField {
      * @return bool|int
      */
     public function update_content(stdClass $entry, array $values = null) {
-        global $DB;
         $parentcontentid = parent::update_content($entry, $values);
 
         // We can read the contentid from entry and update the right files.
