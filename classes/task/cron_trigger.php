@@ -24,6 +24,8 @@
  */
 namespace mod_datalynx\task;
 
+use mod_datalynx\datalynx;
+
 /**
  * Trigger an event in a periodic time
  *
@@ -54,7 +56,7 @@ class cron_trigger extends \core\task\scheduled_task {
             // Needed to prevent errors. In the past datalynx_rules was not deleted when dl instance was deleted.
             // TODO: MDL-00000 In upgrade.php remove all deleted rules.
             if ($DB->record_exists('datalynx', ['id' => $record->dataid])) {
-                $df = new \mod_datalynx\datalynx($record->dataid);
+                $df = new datalynx($record->dataid);
                 $event = \mod_datalynx\event\cron_trigger::create(['context' => $df->context, 'objectid' => $df->id()]);
                 $event->trigger();
             }

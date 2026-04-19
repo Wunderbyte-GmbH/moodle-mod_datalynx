@@ -311,7 +311,7 @@ class renderer extends datalynxfield_renderer {
      * @param array|null $options Rendering options.
      * @see datalynxfield_renderer::render_edit_mode()
      */
-    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options = null) {
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, ?array $options = null) {
 
         // Variable $field datalynxfield_datalynxview.
         $field = $this->field;

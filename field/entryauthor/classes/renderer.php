@@ -51,7 +51,7 @@ class renderer extends datalynxfield_renderer {
      * @return array
      * @throws coding_exception
      */
-    public function replacements(array $tags = null, $entry = null, array $options = null) {
+    public function replacements(?array $tags = null, $entry = null, ?array $options = null) {
         $field = $this->field;
         $fieldname = $field->get('internalname');
         $edit = !empty($options['edit']) ? $options['edit'] : false;
@@ -105,7 +105,7 @@ class renderer extends datalynxfield_renderer {
      * @param array|null $options
      * @throws coding_exception
      */
-    public function display_edit(&$mform, $entry, array $options = null) {
+    public function display_edit(&$mform, $entry, ?array $options = null) {
         global $USER;
         if ($entry->id < 0) { // New entry.
             $entry->firstname = $USER->firstname;

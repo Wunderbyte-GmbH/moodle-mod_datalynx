@@ -103,7 +103,7 @@ class field extends datalynxfield_base {
      * @param array|null $values
      * @return array
      */
-    protected function format_content($entry, array $values = null) {
+    protected function format_content($entry, ?array $values = null) {
         $fieldid = $this->field->id;
         $contents = [];
         $oldcontents = [];

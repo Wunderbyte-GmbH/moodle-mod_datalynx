@@ -183,7 +183,7 @@ class renderer extends datalynxfield_renderer {
      * @param stdClass $entry
      * @param array $options
      */
-    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options = null) {
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, ?array $options = null) {
         global $USER, $PAGE;
 
         // Variable $field datalynxfield_teammemberselect.

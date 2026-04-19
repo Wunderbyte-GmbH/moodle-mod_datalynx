@@ -132,7 +132,7 @@ class field extends datalynxfield_option_multiple {
      * @return bool|int
      * @throws dml_exception
      */
-    public function update_content(stdClass $entry, array $values = null) {
+    public function update_content(stdClass $entry, ?array $values = null) {
 
         // Check if all values are known in field definition.
         $knownvalues = explode("\n", $this->field->param1);

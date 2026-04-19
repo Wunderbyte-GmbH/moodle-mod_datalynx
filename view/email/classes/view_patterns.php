@@ -52,7 +52,7 @@ class view_patterns extends base_patterns {
      * @param array|null $options
      * @return string
      */
-    protected function get_ref_replacements($tag, $entry = null, array $options = null) {
+    protected function get_ref_replacements($tag, $entry = null, ?array $options = null) {
         switch ($tag) {
             case '##notificationentryurl##':
                 return $options['notificationentryurl'] ?? '';

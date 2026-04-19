@@ -102,7 +102,7 @@ class datalynx_entries {
      * @param datalynx_filter|null $filter
      * @throws coding_exception
      */
-    public function __construct(mod_datalynx\datalynx $datalynx, datalynx_filter $filter = null) {
+    public function __construct(mod_datalynx\datalynx $datalynx, ?datalynx_filter $filter = null) {
         if (empty($datalynx)) {
             throw new coding_exception(
                 'Datalynx id or object must be passed to entries constructor.'

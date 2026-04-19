@@ -153,7 +153,7 @@ class view extends base {
     public function display(array $options = []): string {
         echo parent::display(['tohtml' => true]);
         return '';
-    }
+    }x
 
     /**
      * Do not display entries in report view instead display the report.

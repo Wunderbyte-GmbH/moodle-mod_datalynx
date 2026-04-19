@@ -268,7 +268,7 @@ class field extends datalynxfield_base {
      * @param array|null $values Field values.
      * @return mixed New content ID.
      */
-    public function update_content(stdClass $entry, array $values = null) {
+    public function update_content(stdClass $entry, ?array $values = null) {
         $newcontentid = parent::update_content($entry, $values);
 
         // TODO: MDL-0000 All this is only to notify team members. Check if we really need this here.
@@ -511,7 +511,7 @@ class field extends datalynxfield_base {
      * @param array $values
      * @return array
      */
-    protected function format_content($entry, array $values = null) {
+    protected function format_content($entry, ?array $values = null) {
         $fieldid = $this->field->id;
         $oldcontents = [];
         $contents = [];

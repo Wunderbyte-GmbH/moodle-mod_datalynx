@@ -181,7 +181,7 @@ class datalynxview_patterns {
      * @param array $options
      * @return string
      */
-    protected function get_regexp_replacements($tag, $entry = null, array $options = null) {
+    protected function get_regexp_replacements($tag, $entry = null, ?array $options = null) {
         global $OUTPUT;
 
         $df = $this->view->get_dl();
@@ -335,10 +335,10 @@ class datalynxview_patterns {
      *
      * @param string $tag
      * @param string $entry
-     * @param array $options
+     * @param ?array $options
      * @return string
      */
-    protected function get_info_replacements($tag, $entry = null, array $options = null) {
+    protected function get_info_replacements($tag, $entry = null, ?array $options = null) {
         $replacement = '';
 
         switch ($tag) {
@@ -360,7 +360,7 @@ class datalynxview_patterns {
      * @param array $options
      * @return string
      */
-    protected function get_ref_replacements($tag, $entry = null, array $options = null) {
+    protected function get_ref_replacements($tag, $entry = null, ?array $options = null) {
         if ($tag == '##viewsmenu##') {
             return $this->print_views_menu($options, true);
         }
@@ -396,7 +396,7 @@ class datalynxview_patterns {
      * @param array|null $options
      * @return string
      */
-    protected function get_userpref_replacements($tag, array $options = null): string {
+    protected function get_userpref_replacements($tag, ?array $options = null): string {
         $view = $this->view;
         $filter = $view->get_filter();
         // Do not display quickperpage and similar tags in edit view.
@@ -432,7 +432,7 @@ class datalynxview_patterns {
      * @param array $options
      * @return string
      */
-    protected function get_action_replacements($tag, $entry = null, array $options = null): string {
+    protected function get_action_replacements($tag, $entry = null, ?array $options = null): string {
         global $CFG, $OUTPUT;
         $replacement = '';
 
@@ -637,7 +637,7 @@ class datalynxview_patterns {
      * @param array $options
      * @return string rendered paging bar
      */
-    protected function get_paging_replacements(array $options = null): string {
+    protected function get_paging_replacements(?array $options = null): string {
         global $OUTPUT;
 
         $view = $this->view;

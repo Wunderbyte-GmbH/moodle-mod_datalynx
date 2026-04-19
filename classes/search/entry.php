@@ -25,6 +25,18 @@
 
 namespace mod_datalynx\search;
 
+use context;
+use context_module;
+use core_search\base_mod;
+use core_search\document;
+use core_search\document_factory;
+use core_search\manager;
+use dml_exception;
+use dml_missing_record_exception;
+use moodle_recordset;
+use moodle_url;
+use stdClass;
+
 /**
  * Search area for mod_datalynx activity entries.
  *
@@ -32,20 +44,20 @@ namespace mod_datalynx\search;
  * @copyright  2019 Michael Pollak <moodle@michaelpollak.org>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class entry extends \core_search\base_mod {
+class entry extends base_mod {
     /**
      * @var array Cache of datalynx entries.
      */
-    protected $entriesdata = [];
+    protected array $entriesdata = [];
 
     /**
      * Returns a recordset with all required entry information.
      *
      * @param int $modifiedfrom timestamp
-     * @param \context|null $context Optional context to restrict scope of returned results
+     * @param context|null $context Optional context to restrict scope of returned results
      * @return moodle_recordset|null Recordset (or null if no results)
      */
-    public function get_document_recordset($modifiedfrom = 0, \context $context = null) {
+    public function get_document_recordset($modifiedfrom = 0, ?context $context = null) {
         global $DB;
 
          [$contextjoin, $contextparams] = $this->get_context_restriction_sql(
@@ -71,32 +83,30 @@ class entry extends \core_search\base_mod {
      *
      * @param stdClass $entry
      * @param array    $options
-     * @return \core_search\document
+     * @return document
      */
     public function get_document($entry, $options = []) {
         try {
             $cm = $this->get_cm('datalynx', $entry->dataid, $entry->course);
-            $context = \context_module::instance($cm->id);
-        } catch (\dml_missing_record_exception $ex) {
+            $context = context_module::instance($cm->id);
+        } catch (dml_missing_record_exception $ex) {
             // Notify it as we run here as admin, we should see everything.
             debugging('Error retrieving mod_data ' . $entry->id . ' document, not all required data is available: ' .
                 $ex->getMessage(), DEBUG_DEVELOPER);
-            return false;
-        } catch (\dml_exception $ex) {
+        } catch (dml_exception $ex) {
             // Notify it as we run here as admin, we should see everything.
             debugging('Error retrieving mod_datalynx' . $entry->id . ' document: ' . $ex->getMessage(), DEBUG_DEVELOPER);
-            return false;
         }
 
         // Prepare associative array with data from DB.
-        $doc = \core_search\document_factory::instance($entry->id, $this->componentname, $this->areaname);
+        $doc = document_factory::instance($entry->id, $this->componentname, $this->areaname);
         $doc->set('contextid', $context->id);
         $doc->set('courseid', $entry->course);
         $doc->set('userid', $entry->userid);
         if ($entry->groupid > 0) {
             $doc->set('groupid', $entry->groupid);
         }
-        $doc->set('owneruserid', \core_search\manager::NO_OWNER_ID);
+        $doc->set('owneruserid', manager::NO_OWNER_ID);
         $doc->set('modified', $entry->timemodified);
 
         $indexfields = $this->get_fields_for_entries($entry);
@@ -126,8 +136,8 @@ class entry extends \core_search\base_mod {
     /**
      * Check if the current user has access.
      *
-     * @throws \dml_missing_record_exception
-     * @throws \dml_exception
+     * @throws dml_missing_record_exception
+     * @throws dml_exception
      * @param int $id
      * @return bool
      */
@@ -135,7 +145,7 @@ class entry extends \core_search\base_mod {
         global $DB;
 
         if (isguestuser()) {
-            return \core_search\manager::ACCESS_DENIED;
+            return manager::ACCESS_DENIED;
         }
 
         $sql = "SELECT de.*, dl.*
@@ -146,17 +156,17 @@ class entry extends \core_search\base_mod {
         $entry = $DB->get_record_sql($sql, [$id], IGNORE_MISSING);
 
         if (!$entry) {
-            return \core_search\manager::ACCESS_DELETED;
+            return manager::ACCESS_DELETED;
         }
 
         $cm = $this->get_cm('datalynx', $entry->dataid, $entry->course);
-        $context = \context_module::instance($cm->id);
+        $context = context_module::instance($cm->id);
 
         if (!has_capability('mod/datalynx:viewentry', $context)) {
-            return \core_search\manager::ACCESS_DENIED;
+            return manager::ACCESS_DENIED;
         }
 
-        return \core_search\manager::ACCESS_GRANTED;
+        return manager::ACCESS_GRANTED;
     }
 
     // Important for moodle 3.3 support.
@@ -164,7 +174,7 @@ class entry extends \core_search\base_mod {
      * Returns a recordset of documents modified since the given timestamp.
      *
      * @param int $modifiedfrom timestamp
-     * @return \moodle_recordset
+     * @return moodle_recordset
      */
     public function get_recordset_by_timestamp($modifiedfrom = 0) {
         return $this->get_document_recordset($modifiedfrom);
@@ -173,29 +183,29 @@ class entry extends \core_search\base_mod {
     /**
      * Returns the URL for a search document.
      *
-     * @param \core_search\document $doc
-     * @return \moodle_url
+     * @param document $doc
+     * @return moodle_url
      */
-    public function get_doc_url(\core_search\document $doc) {
+    public function get_doc_url(document $doc) {
         $entry = $this->get_entry($doc->get('itemid'));
-        return new \moodle_url('/mod/datalynx/view.php', ['d' => $entry->dataid, 'eids' => $entry->id]);
+        return new moodle_url('/mod/datalynx/view.php', ['d' => $entry->dataid, 'eids' => $entry->id]);
     }
 
     /**
      * Returns the context URL for a search document.
      *
-     * @param \core_search\document $doc
-     * @return \moodle_url
+     * @param document $doc
+     * @return moodle_url
      */
-    public function get_context_url(\core_search\document $doc) {
+    public function get_context_url(document $doc) {
         $entry = $this->get_entry($doc->get('itemid'));
-        return new \moodle_url('/mod/datalynx/view.php', ['d' => $entry->dataid]);
+        return new moodle_url('/mod/datalynx/view.php', ['d' => $entry->dataid]);
     }
 
     /**
      * Get database entry data.
      *
-     * @throws \dml_exception
+     * @throws dml_exception
      * @param int $entryid
      * @return stdClass
      */
@@ -271,7 +281,7 @@ class entry extends \core_search\base_mod {
     /**
      * Add the database entries attachments.
      *
-     * @param \core_search\document $doc
+     * @param document $doc
      * @return void
      */
     public function attach_files($doc) {
@@ -279,13 +289,13 @@ class entry extends \core_search\base_mod {
 
         try {
             $entry = $this->get_entry($entryid);
-        } catch (\dml_missing_record_exception $e) {
+        } catch (dml_missing_record_exception $e) {
             debugging('Could not get record to attach files to ' . $doc->get('id'), DEBUG_DEVELOPER);
             return;
         }
 
         $cm = $this->get_cm('datalynx', $entry->dataid, $doc->get('courseid'));
-        $context = \context_module::instance($cm->id);
+        $context = context_module::instance($cm->id);
 
         // Get the files and attach them.
         $fs = get_file_storage();

@@ -43,7 +43,7 @@ class renderer extends FileRenderer {
      * @param stdClass $entry
      * @param array $options
      */
-    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options = null) {
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, ?array $options = null) {
         $field = $this->field;
         $fieldid = $field->id();
 

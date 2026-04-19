@@ -44,7 +44,7 @@ class renderer extends datalynxfield_renderer {
      * @param array|null $options Rendering options.
      * @return array Replacements keyed by tag.
      */
-    public function replacements(array $tags = null, $entry = null, array $options = null) {
+    public function replacements(?array $tags = null, $entry = null, ?array $options = null) {
         $field = $this->field;
         $edit = !empty($options['edit']) ? $options['edit'] : false;
 
@@ -76,7 +76,7 @@ class renderer extends datalynxfield_renderer {
      * @param stdClass $entry The current entry object.
      * @param array|null $options Rendering options.
      */
-    public function display_edit(&$mform, $entry, array $options = null) {
+    public function display_edit(&$mform, $entry, ?array $options = null) {
         global $CFG, $DB, $PAGE;
 
         $field = $this->field;

@@ -69,10 +69,10 @@ class datalynx_customfilter_manager {
      * Get filter
      *
      * @param int $filterid
-     * @param array|null $options
+     * @param ?array $options
      * @return mixed|datalynx_customfilter
      */
-    public function get_filter_from_id($filterid = 0, array $options = null) {
+    public function get_filter_from_id($filterid = 0, ?array $options = null) {
         $dl = $this->dl;
         $dlid = $dl->id();
 

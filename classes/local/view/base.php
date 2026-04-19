@@ -1357,7 +1357,7 @@ abstract class base {
      * @param ?array $options
      * @return string
      */
-    public function display_entries(array $options = null): string {
+    public function display_entries(?array $options = null): string {
         global $DB, $OUTPUT;
 
         if (!$this->user_is_editing()) {
@@ -1556,7 +1556,7 @@ abstract class base {
      * @return bool
      * @throws coding_exception
      */
-    protected function set_display_definition(array $options = null) {
+    protected function set_display_definition(?array $options = null) {
         $this->displaydefinition = [];
         // Indicate if there are managable entries in the display for the current user.
         // In which case edit/delete action.

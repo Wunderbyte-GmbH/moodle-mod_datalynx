@@ -382,7 +382,7 @@ abstract class datalynxfield_base {
      * @return bool|int
      * @throws dml_exception
      */
-    public function update_content(stdClass $entry, array $values = null) {
+    public function update_content(stdClass $entry, ?array $values = null) {
         global $DB;
         $fieldid = $this->field->id;
         $fieldid = $this->field->id;
@@ -590,7 +590,7 @@ abstract class datalynxfield_base {
      * @param array $values values from the entry form elements
      * @return array
      */
-    protected function format_content($entry, array $values = null) {
+    protected function format_content($entry, ?array $values = null) {
         $fieldid = $this->field->id;
 
         $newcontent = null;

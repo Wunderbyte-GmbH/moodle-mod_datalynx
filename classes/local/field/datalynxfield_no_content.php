@@ -32,7 +32,7 @@ abstract class datalynxfield_no_content extends datalynxfield_base {
      * @param array|null $values
      * @return bool
      */
-    public function update_content(stdClass $entry, array $values = null) {
+    public function update_content(stdClass $entry, ?array $values = null) {
         return true;
     }
 

@@ -66,7 +66,7 @@ class field extends datalynxfield_base {
      * @param array|null $values The values to update.
      * @return int|bool The content ID or false.
      */
-    public function update_content(stdClass $entry, array $values = null) {
+    public function update_content(stdClass $entry, ?array $values = null) {
         global $DB, $USER;
 
         $entryid = $entry->id;
@@ -143,7 +143,7 @@ class field extends datalynxfield_base {
      * @param array|null $values The values to use.
      * @return array The formatted content.
      */
-    protected function format_content($entry, array $values = null): array {
+    protected function format_content($entry, ?array $values = null): array {
         return [null, null, null];
     }
 
@@ -264,7 +264,7 @@ class field extends datalynxfield_base {
      * @throws file_exception
      * @throws stored_file_creation_exception
      */
-    protected function save_changes_to_file($entry, array $values = null): bool {
+    protected function save_changes_to_file($entry, ?array $values = null): bool {
         $fieldid = $this->field->id;
         $fieldname = "field_{$fieldid}_{$entry->id}";
 

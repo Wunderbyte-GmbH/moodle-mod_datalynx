@@ -61,7 +61,7 @@ class field extends datalynxfield_base {
      * @param array|null $values The values to format.
      * @return array
      */
-    protected function format_content($entry, array $values = null) {
+    protected function format_content($entry, ?array $values = null) {
         $fieldid = $this->field->id;
         // Old content (should not exist if we get here, as update should be triggered only when no content).
         if (isset($entry->{"c{$fieldid}_content"})) {

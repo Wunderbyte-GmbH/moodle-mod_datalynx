@@ -38,7 +38,7 @@ class mod_datalynx_generator extends testing_module_generator {
      * @param array $options (mostly course_module properties)
      * @return stdClass activity record with extra cmid field
      */
-    public function create_instance($record = null, array $options = null) {
+    public function create_instance($record = null, ?array $options = null) {
         $record = (object) (array) $record;
 
         $defaults = ['intro' => null, 'introformat' => 0, 'timemodified' => time(),

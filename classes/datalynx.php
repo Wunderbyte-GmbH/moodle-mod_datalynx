@@ -71,17 +71,17 @@ class datalynx {
     const INTERNAL_VIEW_EMAIL = 'email';
 
     /**
-     * @var stdClass course module
+     * @var ?stdClass course module
      */
     public $cm = null;
 
     /**
-     * @var stdClass fieldset object of the course
+     * @var ?stdClass fieldset object of the course
      */
     public $course = null;
 
     /**
-     * @var stdClass fieldset record of datalynx instance
+     * @var ?stdClass fieldset record of datalynx instance
      */
     public $data = null;
 
@@ -2106,7 +2106,7 @@ class datalynx {
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    public function get_gradebook_users(array $userids = null) {
+    public function get_gradebook_users(?array $userids = null) {
         global $DB, $CFG;
 
         // Get the list of users by gradebook roles.
@@ -2193,7 +2193,7 @@ class datalynx {
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    public function user_can_view_all_entries(array $options = null) {
+    public function user_can_view_all_entries(?array $options = null) {
         global $OUTPUT;
         if (has_capability('mod/datalynx:manageentries', $this->context)) {
             return true;

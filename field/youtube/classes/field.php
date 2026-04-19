@@ -75,7 +75,7 @@ class field extends datalynxfield_base {
      * @param array|null $values The values to format.
      * @return array
      */
-    protected function format_content($entry, array $values = null) {
+    protected function format_content($entry, ?array $values = null) {
         $contents = [];
 
         if (!empty($values)) {

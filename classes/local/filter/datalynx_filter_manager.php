@@ -69,7 +69,7 @@ class datalynx_filter_manager {
      * @param array|null $options
      * @return datalynx_filter
      */
-    public function get_filter_from_id($filterid = 0, array $options = null) {
+    public function get_filter_from_id($filterid = 0, ?array $options = null) {
 
         $df = $this->dl;
         $dfid = $df->id();

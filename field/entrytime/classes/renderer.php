@@ -43,7 +43,7 @@ class renderer extends datalynxfield_renderer {
      * @param array|null $options Rendering options.
      * @return array
      */
-    public function replacements(array $tags = null, $entry = null, array $options = null) {
+    public function replacements(?array $tags = null, $entry = null, ?array $options = null) {
         $field = $this->field;
         $fieldname = $field->get('internalname');
 

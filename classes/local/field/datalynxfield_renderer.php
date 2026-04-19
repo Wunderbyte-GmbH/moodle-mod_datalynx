@@ -103,12 +103,12 @@ abstract class datalynxfield_renderer {
      * so that it is processed first in view templates
      * so that in turn patterns it may contain could be processed.
      *
-     * @param array $tags
-     * @param stdClass $entry
-     * @param array $options
+     * @param ?array $tags
+     * @param ?stdClass $entry
+     * @param ?array $options
      * @return array
      */
-    public function replacements(array $tags = null, stdClass $entry = null, array $options = null) {
+    public function replacements(?array $tags = null, ?stdClass $entry = null, ?array $options = null) {
         $replacements = [];
         foreach ($tags as $tag) {
             $currentoptions = array_merge(self::$defaultoptions, $options);

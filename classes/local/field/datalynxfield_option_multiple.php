@@ -84,7 +84,7 @@ class datalynxfield_option_multiple extends datalynxfield_option {
      * @param array|null $values Values from the entry form.
      * @return array
      */
-    protected function format_content($entry, array $values = null) {
+    protected function format_content($entry, ?array $values = null) {
         $fieldid = $this->field->id;
         $contents = [];
         $oldcontents = [];

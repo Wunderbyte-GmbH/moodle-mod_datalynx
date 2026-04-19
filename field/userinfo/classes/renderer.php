@@ -44,7 +44,7 @@ class renderer extends datalynxfield_renderer {
      * @param stdClass $entry The entry object.
      * @param array|null $options Additional options.
      */
-    public function display_edit(&$mform, $entry, array $options = null) {
+    public function display_edit(&$mform, $entry, ?array $options = null) {
         $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
@@ -97,7 +97,7 @@ class renderer extends datalynxfield_renderer {
      * @param array|null $options Additional options.
      * @return array
      */
-    public function replacements(array $tags = null, $entry = null, array $options = null) {
+    public function replacements(?array $tags = null, $entry = null, ?array $options = null) {
         global $USER;
         $field = $this->field;
         $fieldname = $field->name();
