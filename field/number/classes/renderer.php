@@ -23,10 +23,8 @@
  */
 namespace datalynxfield_number;
 use datalynxfield_text\renderer as TextRenderer;
-use stdClass;
 use MoodleQuickForm;
-
-
+use stdClass;
 
 /**
  * Renderer class for the datalynxfield_number field type.

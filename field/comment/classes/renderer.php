@@ -24,11 +24,9 @@
  */
 namespace datalynxfield_comment;
 
+use comment;
 use mod_datalynx\local\field\datalynxfield_renderer;
 use stdClass;
-use comment;
-
-
 
 /**
  * Renderer for the internal comment field patterns.
@@ -43,9 +41,9 @@ class renderer extends datalynxfield_renderer {
     /**
      * Returns tag replacement pairs for the comment field patterns.
      *
-     * @param array|null  $tags    The list of tag patterns to replace.
-     * @param object|null $entry   The current entry object.
-     * @param array|null  $options Rendering options.
+     * @param ?array  $tags    The list of tag patterns to replace.
+     * @param ?object $entry   The current entry object.
+     * @param ?array  $options Rendering options.
      * @return array
      */
     public function replacements(?array $tags = null, $entry = null, ?array $options = null) {

@@ -25,8 +25,6 @@
 namespace datalynxfield_picture;
 use datalynxfield_file\form as FileForm;
 
-
-
 /**
  * Field form for the picture field type.
  *

@@ -29,7 +29,6 @@ use html_table;
 use html_table_cell;
 use html_table_row;
 use html_writer;
-use mod_datalynx\local\datalynx_entries;
 use mod_datalynx\local\view\base;
 
 /**
@@ -49,7 +48,7 @@ class view extends base {
     /** @var array List of editors. */
     protected array $editors = ['section'];
 
-    /** @var array|null List of columns. */
+    /** @var ?array List of columns. */
     protected ?array $columns = null;
 
     /**
@@ -153,11 +152,11 @@ class view extends base {
     public function display(array $options = []): string {
         echo parent::display(['tohtml' => true]);
         return '';
-    }x
+    }
 
     /**
      * Do not display entries in report view instead display the report.
-     * @param array|null $options Display options.
+     * @param ?array $options Display options.
      * @return string
      */
     public function display_entries(?array $options = null): string {
@@ -617,7 +616,7 @@ class view extends base {
 
     /**
      * Retrieves defined fields based on field patterns in param2.
-     * @return array|null
+     * @return ?array
      */
     public function get_columns(): ?array {
         if (empty($this->columns)) {

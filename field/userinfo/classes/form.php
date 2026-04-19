@@ -27,8 +27,6 @@ namespace datalynxfield_userinfo;
 
 use mod_datalynx\form\datalynxfield_form;
 
-
-
 /**
  * User info field form class.
  */

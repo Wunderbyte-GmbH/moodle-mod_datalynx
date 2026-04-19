@@ -28,7 +28,6 @@ namespace datalynxfield_fieldgroup;
 use mod_datalynx\form\datalynxfield_form;
 use stdClass;
 
-
 /**
  * Form class for the fieldgroup field type.
  */

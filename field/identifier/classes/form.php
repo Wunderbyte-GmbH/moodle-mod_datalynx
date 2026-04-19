@@ -27,7 +27,6 @@ namespace datalynxfield_identifier;
 
 use mod_datalynx\form\datalynxfield_form;
 
-
 /**
  * Field form for the identifier field type.
  *

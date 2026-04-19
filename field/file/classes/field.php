@@ -25,9 +25,9 @@
 
 namespace datalynxfield_file;
 
+use context_user;
 use mod_datalynx\local\field\datalynxfield_base;
 use stdClass;
-use context_user;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -63,7 +63,7 @@ class field extends datalynxfield_base {
      * Update content for the field.
      *
      * @param stdClass $entry The entry object.
-     * @param array|null $values The values to update.
+     * @param ?array $values The values to update.
      * @return int|bool The content ID or false.
      */
     public function update_content(stdClass $entry, ?array $values = null) {
@@ -140,7 +140,7 @@ class field extends datalynxfield_base {
      * Format content for display.
      *
      * @param stdClass $entry The entry object.
-     * @param array|null $values The values to use.
+     * @param ?array $values The values to use.
      * @return array The formatted content.
      */
     protected function format_content($entry, ?array $values = null): array {
@@ -161,8 +161,8 @@ class field extends datalynxfield_base {
      *
      * @param stdClass $data The data object.
      * @param array $importsettings The import settings.
-     * @param array|null $csvrecord The CSV record.
-     * @param int|null $entryid The entry ID.
+     * @param ?array $csvrecord The CSV record.
+     * @param ?int $entryid The entry ID.
      * @return bool True if successful, false otherwise.
      */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null): bool {
@@ -248,7 +248,7 @@ class field extends datalynxfield_base {
      * Update content files.
      *
      * @param int $contentid The content ID.
-     * @param array|null $params Additional parameters.
+     * @param ?array $params Additional parameters.
      * @return bool True if successful.
      */
     protected function update_content_files($contentid, $params = null): bool {
@@ -259,7 +259,7 @@ class field extends datalynxfield_base {
      * Save changes to file.
      *
      * @param stdClass $entry The entry object.
-     * @param array|null $values The values to save.
+     * @param ?array $values The values to save.
      * @return bool True if successful.
      * @throws file_exception
      * @throws stored_file_creation_exception

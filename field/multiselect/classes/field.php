@@ -61,8 +61,8 @@ class field extends datalynxfield_option_multiple {
      *
      * @param stdClass $data The data object.
      * @param array $importsettings The import settings.
-     * @param array|null $csvrecord The CSV record.
-     * @param int|null $entryid The entry ID.
+     * @param ?array $csvrecord The CSV record.
+     * @param ?int $entryid The entry ID.
      * @return bool
      */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
@@ -128,7 +128,7 @@ class field extends datalynxfield_option_multiple {
      * Updates the content for the field.
      *
      * @param stdClass $entry The entry object.
-     * @param array|null $values The values to update.
+     * @param ?array $values The values to update.
      * @return bool|int
      * @throws dml_exception
      */

@@ -23,8 +23,8 @@
  */
 namespace datalynxfield_checkbox;
 use datalynxfield_multiselect\renderer as MultiSelectRenderer;
-use stdClass;
 use MoodleQuickForm;
+use stdClass;
 
 /**
  * Class datalynxfield_checkbox_renderer Renderer for checkbox field type

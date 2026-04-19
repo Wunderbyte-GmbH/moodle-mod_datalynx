@@ -28,8 +28,8 @@
  * MOD FUNCTIONS WHICH ARE CALLED FROM OUTSIDE THE MODULE
  */
 
-use mod_datalynx\datalynx_file_info_container;
 use datalynxfield_comment\field as datalynxfield_comment;
+use mod_datalynx\datalynx_file_info_container;
 
 /**
  * Indicates API features that the datalynx supports.
@@ -930,7 +930,7 @@ function datalynx_get_participants($dataid) {
  * @param stdClass $user User object.
  * @param stdClass $mod Course module object.
  * @param stdClass $data Datalynx instance object.
- * @return stdClass|null
+ * @return ?stdClass
  */
 function datalynx_user_outline($course, $user, $mod, $data) {
     global $DB, $CFG;

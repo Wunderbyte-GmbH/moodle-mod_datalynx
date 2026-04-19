@@ -28,9 +28,6 @@ namespace datalynxfield_url;
 use mod_datalynx\local\field\datalynxfield_base;
 use stdClass;
 
-
-
-
 /**
  * URL field class.
  */
@@ -75,10 +72,10 @@ class field extends datalynxfield_base {
      * Format the field content for storage.
      *
      * @param stdClass $entry
-     * @param array $values
+     * @param ?array $values
      * @return array
      */
-    protected function format_content($entry, ?array $values = null) {
+    protected function format_content(stdClass $entry, ?array $values = null) {
         $fieldid = $this->field->id;
         $oldcontents = [];
         $contents = [];
@@ -147,11 +144,11 @@ class field extends datalynxfield_base {
      *
      * @param stdClass $data
      * @param array $importsettings
-     * @param array $csvrecord
-     * @param int $entryid
+     * @param ?array $csvrecord
+     * @param ?int $entryid
      * @return bool
      */
-    public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
+    public function prepare_import_content(&$data, $importsettings, ?array $csvrecord = null, ?int $entryid = null) {
         // Import only from csv.
         if ($csvrecord) {
             $fieldid = $this->field->id;

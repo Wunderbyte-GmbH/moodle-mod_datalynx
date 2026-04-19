@@ -6,7 +6,7 @@
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
@@ -66,7 +66,7 @@ class datalynx_filter_manager {
      * Returns a filter object for the given filter id, or creates a blank/user filter.
      *
      * @param int $filterid
-     * @param array|null $options
+     * @param ?array $options
      * @return datalynx_filter
      */
     public function get_filter_from_id($filterid = 0, ?array $options = null) {
@@ -141,9 +141,9 @@ class datalynx_filter_manager {
     /**
      * Parses filter settings from URL parameters and returns a filter object.
      *
-     * @param \moodle_url $url
+     * @param moodle_url $url
      * @param bool $raw Return raw stdClass instead of datalynx_filter.
-     * @return datalynx_filter|null
+     * @return ?datalynx_filter
      */
     public function get_filter_from_url($url, $raw = false) {
 
@@ -166,7 +166,7 @@ class datalynx_filter_manager {
     /**
      * Returns all filters for the current datalynx instance, optionally as a menu array.
      *
-     * @param array|null $exclude Filter ids to exclude.
+     * @param ?array $exclude Filter ids to exclude.
      * @param bool $menu Return as id => name array.
      * @param bool $forceget Bypass cache and re-fetch from DB.
      * @return array|false
@@ -243,7 +243,7 @@ class datalynx_filter_manager {
         } else {
             if (!$confirmed) {
                 // Print header.
-                $df->print_header('filters');
+                $df->print_header(['tab' => 'filters']);
 
                 // Print a confirmation page.
                 echo $OUTPUT->confirm(
@@ -426,7 +426,7 @@ class datalynx_filter_manager {
      *
      * @param datalynx_filter_form $mform
      * @param \stdClass $filter
-     * @param array|null $urlparams
+     * @param ?array $urlparams
      */
     public function display_filter_form($mform, $filter, $urlparams = null) {
         $streditinga = $filter->id ? get_string('filteredit', 'datalynx', $filter->name) : get_string(
@@ -601,7 +601,7 @@ class datalynx_filter_manager {
      * Extracts serialised search options from submitted form data.
      *
      * @param \stdClass $formdata
-     * @param bool $finalize Whether to finalise (convert) search values.
+     * @param bool $finalize Whether to finalise search values.
      * @return string Serialised search options.
      */
     protected function get_search_options_from_form($formdata, $finalize = false) {
@@ -1147,7 +1147,7 @@ class datalynx_filter_manager {
      * Encodes search options as a URL query parameter string.
      *
      * @param array $searchies
-     * @return string|null
+     * @return ?string
      */
     public static function get_search_url_query(array $searchies) {
         $usearch = null;
@@ -1207,7 +1207,7 @@ class datalynx_filter_manager {
     /**
      * Extracts filter options from URL parameters or the provided moodle_url object.
      *
-     * @param \moodle_url|null $url
+     * @param ?moodle_url $url
      * @return array
      */
     public static function get_filter_options_from_url($url = null) {

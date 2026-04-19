@@ -26,8 +26,6 @@ namespace datalynxfield_picture;
 use datalynxfield_file\field as FileField;
 use stdClass;
 
-
-
 /**
  * Field class for the picture field type.
  *
@@ -47,7 +45,7 @@ class field extends FileField {
      * Updates the content for the field.
      *
      * @param stdClass $entry The entry object.
-     * @param array|null $values The values to update.
+     * @param ?array $values The values to update.
      * @return bool|int
      */
     public function update_content(stdClass $entry, ?array $values = null) {
@@ -67,7 +65,7 @@ class field extends FileField {
     /**
      * Updates the field definition.
      *
-     * @param stdClass|null $fromform Data from the form.
+     * @param ?stdClass $fromform Data from the form.
      * @return bool
      */
     public function update_field($fromform = null) {
@@ -139,7 +137,7 @@ class field extends FileField {
      * settings.
      *
      * @param int $contentid The content record ID.
-     * @param array|null $params Optional parameters controlling what gets updated.
+     * @param ?array $params Optional parameters controlling what gets updated.
      * @return bool True on success, false otherwise.
      */
     protected function update_content_files($contentid, $params = null): bool {

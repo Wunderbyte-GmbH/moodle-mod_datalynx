@@ -25,8 +25,6 @@
 namespace datalynxfield_radiobutton;
 use datalynxfield_select\form as SelectForm;
 
-
-
 /**
  * Field form for the radiobutton field type.
  *

@@ -95,7 +95,7 @@ class field extends datalynxfield_base {
      * Update the field content.
      *
      * @param stdClass $entry
-     * @param array $values
+     * @param ?array $values
      * @return int
      */
     public function update_content(stdClass $entry, ?array $values = null) {

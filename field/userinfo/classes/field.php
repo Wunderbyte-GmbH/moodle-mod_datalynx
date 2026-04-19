@@ -27,9 +27,6 @@ namespace datalynxfield_userinfo;
 
 use mod_datalynx\local\field\datalynxfield_base;
 
-
-
-
 /**
  * User info field class.
  */
@@ -146,7 +143,7 @@ class field extends datalynxfield_base {
      *
      * @param string $paramname
      * @param string $paramcount
-     * @return array|null
+     * @return ?array
      */
     public function get_sort_from_sql($paramname = 'sortie', $paramcount = '') {
         $fieldid = $this->field->id;

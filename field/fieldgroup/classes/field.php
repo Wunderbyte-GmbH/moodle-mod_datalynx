@@ -111,7 +111,7 @@ class field extends datalynxfield_base {
     /**
      * Get the file area for this field.
      *
-     * @param string|null $suffix
+     * @param ?string $suffix
      * @return bool
      */
     protected function filearea($suffix = null) {

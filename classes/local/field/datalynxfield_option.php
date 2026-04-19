@@ -89,7 +89,7 @@ abstract class datalynxfield_option extends datalynxfield_base {
      * (non-PHPdoc)
      *
      * @see datalynxfield_base::set_field()
-     * @param stdClass|null $forminput Form input data.
+     * @param ?stdClass $forminput Form input data.
      */
     public function set_field($forminput = null) {
         $this->field = new stdClass();

@@ -24,12 +24,10 @@
  */
 namespace datalynxfield_url;
 
-use mod_datalynx\local\field\datalynxfield_renderer;
-use stdClass;
-use MoodleQuickForm;
 use html_writer;
-
-
+use mod_datalynx\local\field\datalynxfield_renderer;
+use MoodleQuickForm;
+use stdClass;
 
 /**
  * URL field renderer class.

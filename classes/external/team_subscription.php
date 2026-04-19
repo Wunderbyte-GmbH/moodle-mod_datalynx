@@ -16,11 +16,11 @@
 
 namespace mod_datalynx\external;
 
+use context_module;
 use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
-use context_module;
 use moodle_exception;
 use stdClass;
 

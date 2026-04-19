@@ -25,10 +25,8 @@
 namespace datalynxfield_datalynxview;
 
 use mod_datalynx\local\field\datalynxfield_renderer;
-use stdClass;
 use MoodleQuickForm;
-
-
+use stdClass;
 
 /**
  * Renderer for the datalynxview field type.
@@ -64,7 +62,7 @@ class renderer extends datalynxfield_renderer {
      * string @type     the type of display
      *
      * @param stdClass $entry The entry object which holds this field.
-     * @param string|null $type The type of display.
+     * @param ?string $type The type of display.
      * @return string
      */
     protected function display_browse($entry, $type = null) {
@@ -308,7 +306,7 @@ class renderer extends datalynxfield_renderer {
      *
      * @param MoodleQuickForm $mform The form object.
      * @param stdClass $entry The entry being edited.
-     * @param array|null $options Rendering options.
+     * @param ?array $options Rendering options.
      * @see datalynxfield_renderer::render_edit_mode()
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, ?array $options = null) {

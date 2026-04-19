@@ -14,7 +14,6 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 // eslint-disable-next-line no-unused-vars
-import validation from "ajv/dist/vocabularies/validation";
 
 /*
  * @package    mod_datalynx

@@ -28,8 +28,6 @@ namespace datalynxfield_identifier;
 use mod_datalynx\local\field\datalynxfield_base;
 use stdClass;
 
-
-
 /**
  * Field class for the identifier field type.
  *
@@ -58,7 +56,7 @@ class field extends datalynxfield_base {
      * Formats the content for the field.
      *
      * @param stdClass $entry The entry object.
-     * @param array|null $values The values to format.
+     * @param ?array $values The values to format.
      * @return array
      */
     protected function format_content($entry, ?array $values = null) {

@@ -24,9 +24,9 @@
 
 namespace datalynxfield_entryteammemberprofilefield;
 
+use datalynxfield_no_content_can_join;
 use mod_datalynx\local\field\datalynxfield_base;
 use stdClass;
-use datalynxfield_no_content_can_join;
 
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/mod/datalynx/field/datalynxfield_no_content_can_join.php');

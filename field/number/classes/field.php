@@ -25,10 +25,9 @@
 
 namespace datalynxfield_number;
 
+use datalynxfield_text\field as TextField;
 use mod_datalynx\local\field\datalynxfield_base;
 use stdClass;
-use datalynxfield_text\field as TextField;
-
 
 /**
  * Field class for the number field type.
@@ -117,7 +116,7 @@ class field extends TextField {
      * Formats the content for the field.
      *
      * @param stdClass $entry The entry object.
-     * @param array|null $values The values to format.
+     * @param ?array $values The values to format.
      * @return array
      */
     protected function format_content($entry, ?array $values = null) {

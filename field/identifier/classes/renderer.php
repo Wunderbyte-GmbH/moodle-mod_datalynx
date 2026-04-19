@@ -25,10 +25,8 @@
 namespace datalynxfield_identifier;
 
 use mod_datalynx\local\field\datalynxfield_renderer;
-use stdClass;
 use MoodleQuickForm;
-
-
+use stdClass;
 
 /**
  * Renderer for the identifier field type.

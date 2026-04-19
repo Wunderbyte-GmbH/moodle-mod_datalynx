@@ -27,7 +27,6 @@ namespace mod_datalynx\local\filter;
 use html_table;
 use html_writer;
 use mod_datalynx\form\datalynx_customfilter_backend_form;
-use mod_datalynx\local\filter\datalynx_customfilter;
 use moodle_url;
 use stdClass;
 
@@ -134,7 +133,7 @@ class datalynx_customfilter_manager {
      *
      * @param string $url
      * @param bool $raw
-     * @return datalynx_customfilter|null
+     * @return ?datalynx_customfilter
      */
     public function get_filter_from_url($url, $raw = false) {
 
@@ -400,7 +399,7 @@ class datalynx_customfilter_manager {
      *
      * @param datalynx_customfilter_backend_form $mform
      * @param datalynx_customfilter $filter
-     * @param array|null $urlparams
+     * @param ?array $urlparams
      */
     public function display_filter_form($mform, $filter, $urlparams = null) {
         $stredittitle = $filter->id ? get_string('filteredit', 'datalynx', $filter->name)
@@ -573,7 +572,7 @@ class datalynx_customfilter_manager {
      *
      * @param int $filterid
      * @param mixed $view
-     * @return datalynx_customfilter|null
+     * @return ?datalynx_customfilter
      * @throws \coding_exception
      */
     public function set_user_filter($filterid, $view) {

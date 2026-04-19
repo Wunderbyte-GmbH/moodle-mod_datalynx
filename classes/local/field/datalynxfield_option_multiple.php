@@ -15,8 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace mod_datalynx\local\field;
+use stdClass;
+
 /**
  * Base class for Datalynx field types that offer a set of options with multiple choice
+ *
  * @package mod_datalynx
  * @copyright 2025 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -81,7 +84,7 @@ class datalynxfield_option_multiple extends datalynxfield_option {
      *
      * @see datalynxfield_base::format_content()
      * @param stdClass $entry Entry object.
-     * @param array|null $values Values from the entry form.
+     * @param ?array $values Values from the entry form.
      * @return array
      */
     protected function format_content($entry, ?array $values = null) {

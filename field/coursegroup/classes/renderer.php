@@ -24,11 +24,10 @@
  */
 namespace datalynxfield_coursegroup;
 
+use html_writer;
 use mod_datalynx\local\field\datalynxfield_renderer;
 use MoodleQuickForm;
-use html_writer;
-
-
+use stdClass;
 
 /**
  * Renderer class for the coursegroup field.
@@ -39,9 +38,9 @@ class renderer extends datalynxfield_renderer {
     /**
      * Returns replacement values for coursegroup tags.
      *
-     * @param array|null $tags Array of tag strings to replace.
-     * @param stdClass|null $entry The current entry object.
-     * @param array|null $options Rendering options.
+     * @param ?array $tags Array of tag strings to replace.
+     * @param ?stdClass $entry The current entry object.
+     * @param ?array $options Rendering options.
      * @return array Replacements keyed by tag.
      */
     public function replacements(?array $tags = null, $entry = null, ?array $options = null) {
@@ -74,7 +73,7 @@ class renderer extends datalynxfield_renderer {
      *
      * @param MoodleQuickForm $mform The form object.
      * @param stdClass $entry The current entry object.
-     * @param array|null $options Rendering options.
+     * @param ?array $options Rendering options.
      */
     public function display_edit(&$mform, $entry, ?array $options = null) {
         global $CFG, $DB, $PAGE;
@@ -158,7 +157,7 @@ class renderer extends datalynxfield_renderer {
      * Displays the browse view for the coursegroup field.
      *
      * @param stdClass $entry The current entry object.
-     * @param string|null $type The display type (course, group, courseid, groupid, or empty).
+     * @param ?string $type The display type (course, group, courseid, groupid, or empty).
      * @return string The rendered output.
      */
     protected function display_browse($entry, $type = null) {

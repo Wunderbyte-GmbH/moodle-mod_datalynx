@@ -25,6 +25,7 @@
 namespace datalynxview_report;
 
 use mod_datalynx\local\view\datalynxview_patterns;
+use stdClass;
 
 /**
  * View patterns for the report view type.
@@ -33,8 +34,8 @@ class view_patterns extends datalynxview_patterns {
     /**
      * Get replacements for tags.
      *
-     * @param array|null $tags
-     * @param stdClass|null $entry
+     * @param ?array $tags
+     * @param ?stdClass $entry
      * @param array $options
      * @return array
      */

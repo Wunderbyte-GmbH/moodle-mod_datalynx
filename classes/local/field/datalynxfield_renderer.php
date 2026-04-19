@@ -24,7 +24,6 @@
 
 namespace mod_datalynx\local\field;
 
-use mod_datalynx\local\field\datalynxfield_behavior;
 use MoodleQuickForm;
 use stdClass;
 

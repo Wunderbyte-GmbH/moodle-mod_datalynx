@@ -27,6 +27,7 @@ namespace datalynxfield_time;
 
 use mod_datalynx\local\field\datalynxfield_base;
 use stdClass;
+use IntlDateFormatter;
 
 /**
  * Time field class.
@@ -84,10 +85,10 @@ class field extends datalynxfield_base {
      * Format the field content.
      *
      * @param stdClass $entry
-     * @param array $values
+     * @param ?array $values
      * @return array
      */
-    protected function format_content($entry, ?array $values = null) {
+    protected function format_content(stdClass $entry, ?array $values = null) {
         $fieldid = $this->field->id;
         $oldcontents = [];
         $contents = [];
@@ -236,11 +237,11 @@ class field extends datalynxfield_base {
      * @see datalynxfield_base::prepare_import_content()
      * @param mixed $data Data object to populate.
      * @param array $importsettings Import settings.
-     * @param array|null $csvrecord CSV record data.
-     * @param int|null $entryid Entry ID.
+     * @param ?array $csvrecord CSV record data.
+     * @param ?int $entryid Entry ID.
      * @return bool True on success.
      */
-    public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
+    public function prepare_import_content(&$data, $importsettings, ?array $csvrecord = null, ?int $entryid = null) {
         // Import only from csv.
         if ($csvrecord) {
             $fieldid = $this->field->id;
@@ -280,7 +281,7 @@ class field extends datalynxfield_base {
                             null,
                             IntlDateFormatter::GREGORIAN
                         );
-                        datefmt_set_lenient($fmt, true);
+                        $fmt->setLenient(true);
                         $unixtimestamp = $fmt->parse($timestr);
                         if ($unixtimestamp) {
                             $data->{"field_{$fieldid}_{$entryid}"} = $unixtimestamp;

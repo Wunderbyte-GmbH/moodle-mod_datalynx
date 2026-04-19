@@ -35,7 +35,7 @@ class mod_datalynx_generator extends testing_module_generator {
      * Create new datalynx module instance
      *
      * @param array|stdClass $record
-     * @param array $options (mostly course_module properties)
+     * @param ?array $options (mostly course_module properties)
      * @return stdClass activity record with extra cmid field
      */
     public function create_instance($record = null, ?array $options = null) {

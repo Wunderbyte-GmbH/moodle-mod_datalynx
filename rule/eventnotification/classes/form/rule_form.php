@@ -290,7 +290,7 @@ class rule_form extends base_rule_form {
      * Get data from the form
      *
      * @param bool $slashed
-     * @return stdClass|null
+     * @return ?stdClass
      */
     public function get_data($slashed = true) {
         if ($data = parent::get_data($slashed)) {

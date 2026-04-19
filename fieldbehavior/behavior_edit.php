@@ -23,7 +23,6 @@
 
 use mod_datalynx\form\datalynxfield_behavior_form;
 use mod_datalynx\local\field\datalynxfield_behavior;
-use mod_datalynx\datalynx;
 
 require_once('../../../config.php');
 

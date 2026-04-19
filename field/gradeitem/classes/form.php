@@ -27,7 +27,6 @@ namespace datalynxfield_gradeitem;
 
 use mod_datalynx\form\datalynxfield_form;
 
-
 /**
  * Datalynx gradeitem field form class.
  */

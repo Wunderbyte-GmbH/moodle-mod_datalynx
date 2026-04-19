@@ -30,10 +30,10 @@ use core_user\fields;
 use datalynx;
 use datalynxfield_approve\field as datalynxfield_approve;
 use datalynxfield_entry\field as datalynxfield_entry;
-use datalynxfield_status\field as datalynxfield_status;
-use datalynxfield_entrytime\field as datalynxfield_entrytime;
 use datalynxfield_entryauthor\field as datalynxfield_entryauthor;
 use datalynxfield_entrygroup\field as datalynxfield_entrygroup;
+use datalynxfield_entrytime\field as datalynxfield_entrytime;
+use datalynxfield_status\field as datalynxfield_status;
 use dml_exception;
 use mod_datalynx;
 use mod_datalynx\local\filter\datalynx_filter;
@@ -75,12 +75,12 @@ class datalynx_entries {
     // Datalynx object.
     /**
      *
-     * @var datalynx_filter|null
+     * @var ?datalynx_filter
      */
     protected $filter = null;
 
     /**
-     * @var array|null Entries
+     * @var ?array Entries
      */
     protected $entries = null;
 
@@ -99,7 +99,7 @@ class datalynx_entries {
      * View or datalynx or both, each can be id or object
      *
      * @param datalynx $datalynx
-     * @param datalynx_filter|null $filter
+     * @param ?datalynx_filter $filter
      * @throws coding_exception
      */
     public function __construct(mod_datalynx\datalynx $datalynx, ?datalynx_filter $filter = null) {

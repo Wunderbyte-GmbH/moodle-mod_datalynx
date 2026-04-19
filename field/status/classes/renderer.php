@@ -24,9 +24,8 @@
 namespace datalynxfield_status;
 
 use mod_datalynx\local\field\datalynxfield_renderer;
+use moodleform;
 use MoodleQuickForm;
-
-
 
 /**
  * Implementation of internal field for setting entry submission statuses.
@@ -35,9 +34,9 @@ class renderer extends datalynxfield_renderer {
     /**
      * Performs replacements of supported patterns depending on the given parameters
      *
-     * @param array $tags unused
-     * @param datalynx_entry $entry an entry object
-     * @param array $options array of viewing options. Supported: 'edit'
+     * @param ?array $tags unused
+     * @param object $entry an entry object
+     * @param ?array $options array of viewing options. Supported: 'edit'
      * @return array an array of replacements (either HTML for browse mode or callback info for the
      *         edit mode)
      */

@@ -26,8 +26,6 @@ namespace datalynxfield_youtube;
 
 use mod_datalynx\form\datalynxfield_form;
 
-
-
 /**
  * Field form class for the youtube field type.
  *

@@ -24,10 +24,8 @@
 namespace datalynxfield_gradeitem;
 
 use mod_datalynx\local\field\datalynxfield_renderer;
-use stdClass;
 use MoodleQuickForm;
-
-
+use stdClass;
 
 /**
  * Datalynx gradeitem field renderer class.

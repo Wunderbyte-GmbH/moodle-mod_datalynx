@@ -27,8 +27,6 @@ namespace datalynxfield_gradeitem;
 
 use mod_datalynx\local\field\datalynxfield_base;
 
-
-
 /**
  * Datalynx gradeitem field class.
  */
@@ -116,7 +114,7 @@ class field extends datalynxfield_base {
      *
      * @param string $paramname The parameter name.
      * @param string $paramcount The parameter count.
-     * @return array|null The SQL and parameters.
+     * @return ?array The SQL and parameters.
      */
     public function get_sort_from_sql($paramname = 'sortie', $paramcount = '') {
         $fieldid = $this->field->id;

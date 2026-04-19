@@ -24,13 +24,10 @@
  */
 namespace datalynxfield_entry;
 
-use mod_datalynx\local\field\datalynxfield_renderer;
-use html_writer;
-use moodle_url;
 use datalynxfield_status\field as datalynxfield_status;
-use pix_icon;
-
-
+use html_writer;
+use mod_datalynx\local\field\datalynxfield_renderer;
+use moodle_url;
 
 // phpcs:disable moodle.PHP.ForbiddenGlobalUse.BadGlobal
 /**
@@ -46,9 +43,9 @@ class renderer extends datalynxfield_renderer {
     /**
      * Returns tag replacement pairs for the entry field patterns.
      *
-     * @param array|null  $tags    The list of tag patterns to replace.
-     * @param object|null $entry   The current entry object.
-     * @param array|null  $options Rendering options.
+     * @param ?array  $tags    The list of tag patterns to replace.
+     * @param ?object $entry   The current entry object.
+     * @param ?array  $options Rendering options.
      * @return array
      */
     public function replacements(?array $tags = null, $entry = null, ?array $options = null) {

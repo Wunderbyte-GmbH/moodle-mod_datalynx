@@ -26,7 +26,6 @@ namespace datalynxview_grid;
 
 use mod_datalynx\form\datalynxview_base_form;
 
-
 /**
  * Grid view configuration form.
  *

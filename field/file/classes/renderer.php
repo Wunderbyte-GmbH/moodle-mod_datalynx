@@ -24,14 +24,12 @@
  */
 namespace datalynxfield_file;
 
-use mod_datalynx\local\field\datalynxfield_renderer;
-use stdClass;
-use MoodleQuickForm;
 use html_writer;
+use mod_datalynx\local\field\datalynxfield_renderer;
 use moodle_url;
+use MoodleQuickForm;
+use stdClass;
 use stored_file;
-
-
 
 /**
  * Renderer for the file field type.
@@ -42,7 +40,7 @@ class renderer extends datalynxfield_renderer {
      *
      * @param MoodleQuickForm $mform The Moodle form object.
      * @param stdClass $entry The entry object.
-     * @param array|null $options Rendering options.
+     * @param ?array $options Rendering options.
      * @return void
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, ?array $options = null) {
@@ -175,7 +173,7 @@ class renderer extends datalynxfield_renderer {
      * @param int $entryid
      * @param string $path
      * @param string $altname
-     * @param array|null $params
+     * @param ?array $params
      * @return moodle_url|string
      */
     protected function display_file(stored_file $file, int $entryid, string $path, string $altname = '', ?array $params = null) {
@@ -252,7 +250,7 @@ class renderer extends datalynxfield_renderer {
      * @param stored_file $file
      * @param string $path
      * @param string $altname
-     * @param array|null $params
+     * @param ?array $params
      * @return string
      */
     protected function display_link($file, $path, $altname, $params = null): string {

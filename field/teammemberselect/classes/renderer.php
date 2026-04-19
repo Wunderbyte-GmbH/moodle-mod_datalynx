@@ -23,14 +23,11 @@
  */
 namespace datalynxfield_teammemberselect;
 
-use mod_datalynx\local\field\datalynxfield_renderer;
-use stdClass;
-use MoodleQuickForm;
 use html_writer;
+use mod_datalynx\local\field\datalynxfield_renderer;
 use moodle_url;
-
-
-
+use MoodleQuickForm;
+use stdClass;
 
 /**
  * Renderer class for teammemberselect datalynx field
@@ -181,7 +178,7 @@ class renderer extends datalynxfield_renderer {
      *
      * @param MoodleQuickForm $mform
      * @param stdClass $entry
-     * @param array $options
+     * @param ?array $options
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, ?array $options = null) {
         global $USER, $PAGE;

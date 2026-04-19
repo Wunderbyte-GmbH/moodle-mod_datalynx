@@ -25,8 +25,8 @@
 namespace datalynxfield_select;
 
 use mod_datalynx\local\field\datalynxfield_renderer;
-use stdClass;
 use MoodleQuickForm;
+use stdClass;
 
 /**
  * Class datalynxfield_select_renderer Renderer for select field type

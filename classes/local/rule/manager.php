@@ -136,7 +136,7 @@ class manager {
      *
      * @param int $ruleid
      * @param bool $forceget
-     * @return base|null
+     * @return ?base
      */
     public function get_rule_from_id($ruleid, $forceget = false) {
         $rules = $this->get_rules(null, false, $forceget);

@@ -24,8 +24,8 @@
  */
 namespace datalynxfield_radiobutton;
 use datalynxfield_select\renderer as SelectRenderer;
-use stdClass;
 use MoodleQuickForm;
+use stdClass;
 
 /**
  * Renderer class for radiobutton field type.

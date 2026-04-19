@@ -15,8 +15,8 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 namespace mod_datalynx\form;
-use mod_datalynx\local\field\datalynxfield_base;
 use mod_datalynx;
+use mod_datalynx\local\field\datalynxfield_base;
 use moodleform;
 use stdClass;
 
@@ -43,11 +43,11 @@ class datalynxfield_form extends moodleform {
      * Constructor.
      *
      * @param datalynxfield_base $field The field object.
-     * @param string|null $action Action URL.
-     * @param array|null $customdata Custom data.
+     * @param ?string $action Action URL.
+     * @param ?array $customdata Custom data.
      * @param string $method Form method.
      * @param string $target Form target.
-     * @param array|null $attributes Form attributes.
+     * @param ?array $attributes Form attributes.
      * @param bool $editable Whether the form is editable.
      */
     public function __construct(
@@ -95,7 +95,7 @@ class datalynxfield_form extends moodleform {
      * Adds the action buttons to the form.
      *
      * @param bool $cancel Whether to show the cancel button.
-     * @param string|null $submit The submit button label.
+     * @param ?string $submit The submit button label.
      */
     public function add_action_buttons($cancel = true, $submit = null) {
         $mform = &$this->_form;

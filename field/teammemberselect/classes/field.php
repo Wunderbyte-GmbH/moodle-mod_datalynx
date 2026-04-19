@@ -24,10 +24,11 @@
 
 namespace datalynxfield_teammemberselect;
 
-use mod_datalynx\local\field\datalynxfield_base;
-use stdClass;
-use moodle_url;
 use context_course;
+use DOMDocument;
+use mod_datalynx\local\field\datalynxfield_base;
+use moodle_url;
+use stdClass;
 
 /**
  * Team member select field class.
@@ -141,7 +142,8 @@ class field extends datalynxfield_base {
                 'listformatcommaspace',
                 'datalynx'
             ),
-            self::TEAMMEMBERSELECT_FORMAT_UL => get_string('listformatul', 'datalynx')];
+            self::TEAMMEMBERSELECT_FORMAT_UL => get_string('listformatul', 'datalynx'),
+        ];
 
         $query = "SELECT r.id, r.name
                     FROM {datalynx_rules} r
@@ -220,7 +222,7 @@ class field extends datalynxfield_base {
     /**
      * Get admissibility for roles in context.
      *
-     * @param context $context
+     * @param \context $context
      * @return array
      */
     protected function get_admissibility_for_roles($context) {
@@ -265,8 +267,8 @@ class field extends datalynxfield_base {
      * Update a teammemberselectfield when editing an entry and notify teammembers of changes
      *
      * @param stdClass $entry The entry object.
-     * @param array|null $values Field values.
-     * @return mixed New content ID.
+     * @param ?array $values Field values.
+     * @return bool|int New content ID.
      */
     public function update_content(stdClass $entry, ?array $values = null) {
         $newcontentid = parent::update_content($entry, $values);
@@ -302,11 +304,11 @@ class field extends datalynxfield_base {
      * @see datalynxfield_base::prepare_import_content()
      * @param mixed $data Data object to populate.
      * @param array $importsettings Import settings.
-     * @param array|null $csvrecord CSV record data.
-     * @param int|null $entryid Entry ID.
+     * @param ?array $csvrecord CSV record data.
+     * @param ?int $entryid Entry ID.
      * @return bool True on success.
      */
-    public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
+    public function prepare_import_content(&$data, $importsettings, ?array $csvrecord = null, ?int $entryid = null) {
         // Import only from csv.
         if ($csvrecord) {
             $fieldid = $this->field->id;
@@ -334,7 +336,7 @@ class field extends datalynxfield_base {
     /**
      * Update a field in the database
      *
-     * @param stdClass|null $fromform Form data to update from.
+     * @param ?stdClass $fromform Form data to update from.
      * @return bool True on success.
      */
     public function update_field($fromform = null) {
@@ -440,6 +442,7 @@ class field extends datalynxfield_base {
         } else {
             // Customfilter adds ANY_OF instead of OTHER_USER.
             if ($operator === 'OTHER_USER' || $operator === 'ANY_OF') {
+                $conditions = [];
                 foreach ($value as $key => $userid) {
                     $xname = $name . $key; // Unique name for every parameter.
                     $conditions[] = $DB->sql_like($content, ":{$xname}");
@@ -507,11 +510,11 @@ class field extends datalynxfield_base {
     /**
      * Format content for storage.
      *
-     * @param object $entry
-     * @param array $values
+     * @param stdClass $entry
+     * @param ?array $values
      * @return array
      */
-    protected function format_content($entry, ?array $values = null) {
+    protected function format_content(stdClass $entry, ?array $values = null) {
         $fieldid = $this->field->id;
         $oldcontents = [];
         $contents = [];
@@ -560,8 +563,8 @@ class field extends datalynxfield_base {
      * Trigger events to notify the team members when new members were
      * added to the field "teammemeberselect" in a specific entry
      *
-     * @param object $entry
-     * @param object $field
+     * @param stdClass $entry
+     * @param stdClass $field
      * @param array $oldmembers
      * @param array $newmembers
      */

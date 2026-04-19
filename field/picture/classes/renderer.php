@@ -24,13 +24,11 @@
  */
 namespace datalynxfield_picture;
 use datalynxfield_file\renderer as FileRenderer;
-use stdClass;
-use MoodleQuickForm;
 use html_writer;
 use moodle_url;
+use MoodleQuickForm;
+use stdClass;
 use stored_file;
-
-
 
 /**
  * Renderer class for the picture field type.
@@ -41,7 +39,7 @@ class renderer extends FileRenderer {
      *
      * @param MoodleQuickForm $mform
      * @param stdClass $entry
-     * @param array $options
+     * @param ?array $options
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, ?array $options = null) {
         $field = $this->field;
@@ -159,7 +157,7 @@ class renderer extends FileRenderer {
      * @param int $entryid
      * @param string $path
      * @param string $altname
-     * @param array|null $params
+     * @param ?array $params
      * @return moodle_url|string
      */
     protected function display_file(stored_file $file, int $entryid, string $path, string $altname = '', ?array $params = null) {

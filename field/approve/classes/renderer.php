@@ -24,11 +24,9 @@
  */
 namespace datalynxfield_approve;
 
+use html_writer;
 use mod_datalynx\local\field\datalynxfield_renderer;
 use MoodleQuickForm;
-use html_writer;
-
-
 
 // phpcs:disable moodle.PHP.ForbiddenGlobalUse.BadGlobal
 /**
@@ -44,9 +42,9 @@ class renderer extends datalynxfield_renderer {
     /**
      * Returns tag replacement pairs for the approve field patterns.
      *
-     * @param array|null  $tags    The list of tag patterns to replace.
-     * @param object|null $entry   The current entry object.
-     * @param array|null  $options Rendering options.
+     * @param ?array  $tags    The list of tag patterns to replace.
+     * @param ?object $entry   The current entry object.
+     * @param ?array  $options Rendering options.
      * @return array
      */
     public function replacements(array $tags = null, $entry = null, array $options = null) {
@@ -101,7 +99,7 @@ class renderer extends datalynxfield_renderer {
      *
      * @param MoodleQuickForm $mform   The form object.
      * @param object          $entry   The current entry.
-     * @param array|null      $options Rendering options.
+     * @param ?array      $options Rendering options.
      * @return void
      */
     public function display_edit(&$mform, $entry, array $options = null) {
@@ -124,7 +122,7 @@ class renderer extends datalynxfield_renderer {
      * Renders the browse (read) mode HTML for the approve toggle.
      *
      * @param object     $entry  The current entry.
-     * @param array|null $params Optional display parameters.
+     * @param ?array $params Optional display parameters.
      * @return string
      */
     protected function display_browse($entry, $params = null) {

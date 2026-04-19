@@ -380,4 +380,25 @@ class restore_datalynx_activity_task extends restore_activity_task {
 
         return $rules;
     }
+
+    /**
+     * Post-execution custom actions.
+     */
+    public function after_restore() {
+        // 1. Get the version of datalynx used when the backup was created.
+        $info = $this->get_info();
+        $backupversion = $info->metadata->plugin_mod_datalynx_version ?? 0;
+
+        // 2. Check if the backup version is older than our breaking change.
+        if ($backupversion > 0 && $backupversion < 2026041000) {
+            // 3. Queue an ad-hoc task to process this specific course.
+            // We do this via ad-hoc task to avoid slowing down the user's restore UI.
+            $task = new \mod_datalynx\task\migrate_tags_task();
+            $task->set_custom_data([
+                'courseid' => $this->get_courseid(),
+                'datalynxid' => $this->get_activityid(),
+            ]);
+            \core\task\manager::queue_adhoc_task($task);
+        }
+    }
 }

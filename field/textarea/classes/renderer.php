@@ -24,8 +24,8 @@
 namespace datalynxfield_textarea;
 
 use mod_datalynx\local\field\datalynxfield_renderer;
-use stdClass;
 use MoodleQuickForm;
+use stdClass;
 
 /**
  * Class datalynxfield_textarea_renderer Renderer for textarea field type

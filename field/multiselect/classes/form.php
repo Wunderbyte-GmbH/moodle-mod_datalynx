@@ -27,7 +27,6 @@ namespace datalynxfield_multiselect;
 
 use mod_datalynx\form\datalynxfield_option_form;
 
-
 /**
  * Field form for the multiselect field type.
  *

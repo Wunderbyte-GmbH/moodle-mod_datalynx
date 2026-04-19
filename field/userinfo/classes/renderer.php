@@ -24,10 +24,10 @@
  */
 namespace datalynxfield_userinfo;
 
-use mod_datalynx\local\field\datalynxfield_renderer;
-use stdClass;
-use MoodleQuickForm;
 use html_writer;
+use mod_datalynx\local\field\datalynxfield_renderer;
+use MoodleQuickForm;
+use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -42,7 +42,7 @@ class renderer extends datalynxfield_renderer {
      *
      * @param MoodleQuickForm $mform The form object.
      * @param stdClass $entry The entry object.
-     * @param array|null $options Additional options.
+     * @param ?array $options Additional options.
      */
     public function display_edit(&$mform, $entry, ?array $options = null) {
         $field = $this->field;
@@ -92,9 +92,9 @@ class renderer extends datalynxfield_renderer {
     /**
      * Replaces tags with their respective content.
      *
-     * @param array|null $tags The tags to replace.
-     * @param stdClass|null $entry The entry object.
-     * @param array|null $options Additional options.
+     * @param ?array $tags The tags to replace.
+     * @param ?stdClass $entry The entry object.
+     * @param ?array $options Additional options.
      * @return array
      */
     public function replacements(?array $tags = null, $entry = null, ?array $options = null) {

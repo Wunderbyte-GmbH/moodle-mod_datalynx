@@ -26,6 +26,7 @@
 namespace datalynxfield_coursegroup;
 
 use mod_datalynx\local\field\datalynxfield_base;
+use stdClass;
 
 /**
  * Coursegroup field class.
@@ -72,11 +73,11 @@ class field extends datalynxfield_base {
     /**
      * Format field content for database.
      *
-     * @param object $entry
-     * @param array $values
+     * @param stdClass $entry
+     * @param ?array $values
      * @return array
      */
-    protected function format_content($entry, ?array $values = null) {
+    protected function format_content(stdClass $entry, ?array $values = null) {
         $fieldid = $this->field->id;
         $oldcontents = [];
         $contents = [];
@@ -277,11 +278,11 @@ class field extends datalynxfield_base {
      *
      * @param object $data
      * @param array $importsettings
-     * @param array $csvrecord
-     * @param int $entryid
+     * @param ?array $csvrecord
+     * @param ?int $entryid
      * @return bool
      */
-    public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
+    public function prepare_import_content(&$data, $importsettings, ?array $csvrecord = null, ?int $entryid = null) {
         // Import only from csv.
         if ($csvrecord) {
             $fieldid = $this->field->id;

@@ -26,6 +26,7 @@
 namespace mod_datalynx\form;
 use mod_datalynx\customfilter\datalynx;
 use moodleform;
+
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/formslib.php');
 
@@ -35,7 +36,7 @@ require_once($CFG->libdir . '/formslib.php');
  * @package mod_datalynx\customfilter
  */
 abstract class datalynx_customfilter_base_form extends moodleform {
-    /** @var object|null The customfilter instance being managed. */
+    /** @var ?object The customfilter instance being managed. */
     protected $customfilter = null;
 
     /**

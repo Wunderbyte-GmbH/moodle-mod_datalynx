@@ -54,8 +54,8 @@ class entry extends base_mod {
      * Returns a recordset with all required entry information.
      *
      * @param int $modifiedfrom timestamp
-     * @param context|null $context Optional context to restrict scope of returned results
-     * @return moodle_recordset|null Recordset (or null if no results)
+     * @param ?context $context Optional context to restrict scope of returned results
+     * @return ?moodle_recordset Recordset (or null if no results)
      */
     public function get_document_recordset($modifiedfrom = 0, ?context $context = null) {
         global $DB;

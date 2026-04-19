@@ -16,9 +16,9 @@
 
 namespace mod_datalynx\local\field;
 use coding_exception;
-use mod_datalynx\datalynx;
 use dml_exception;
 use mod_datalynx;
+use mod_datalynx\datalynx;
 use moodle_exception;
 use moodle_url;
 use stdClass;
@@ -143,7 +143,7 @@ abstract class datalynxfield_base {
     /**
      * Insert a new field in the database
      *
-     * @param stdClass|null $fromform Form data.
+     * @param ?stdClass $fromform Form data.
      * @return bool|int
      */
     public function insert_field($fromform = null) {
@@ -164,7 +164,7 @@ abstract class datalynxfield_base {
     /**
      * Update a field in the database
      *
-     * @param stdClass|null $fromform Form data.
+     * @param ?stdClass $fromform Form data.
      * @return bool
      */
     public function update_field($fromform = null) {
@@ -378,7 +378,7 @@ abstract class datalynxfield_base {
      * Update the content of a field in an entry. That happens in table datalynx_conents.
      *
      * @param stdClass $entry
-     * @param array|null $values
+     * @param ?array $values
      * @return bool|int
      * @throws dml_exception
      */
@@ -502,11 +502,11 @@ abstract class datalynxfield_base {
      *
      * @param array $data
      * @param array $importsettings
-     * @param array|null $csvrecord
-     * @param int|null $entryid
+     * @param ?array $csvrecord
+     * @param ?int $entryid
      * @return bool
      */
-    public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
+    public function prepare_import_content(&$data, $importsettings, ?array $csvrecord = null, ?int $entryid = null) {
         $fieldid = $this->field->id;
         $fieldname = $this->name();
         // Internal fields use a different import settings structure.
@@ -587,10 +587,10 @@ abstract class datalynxfield_base {
      *
      * @param stdClass $entry stdClass object containing all the entry contents (from the database, NOT the
      *        form!)
-     * @param array $values values from the entry form elements
+     * @param ?array $values values from the entry form elements
      * @return array
      */
-    protected function format_content($entry, ?array $values = null) {
+    protected function format_content(stdClass $entry, ?array $values = null) {
         $fieldid = $this->field->id;
 
         $newcontent = null;
@@ -661,7 +661,7 @@ abstract class datalynxfield_base {
      *
      * @param string $paramname
      * @param string $paramcount
-     * @return array|null
+     * @return ?array
      */
     public function get_sort_from_sql($paramname = 'sortie', $paramcount = '') {
         $fieldid = $this->field->id;

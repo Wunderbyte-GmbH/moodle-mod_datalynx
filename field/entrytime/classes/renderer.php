@@ -27,8 +27,6 @@ namespace datalynxfield_entrytime;
 use mod_datalynx\local\field\datalynxfield_renderer;
 use MoodleQuickForm;
 
-
-
 /**
  * Renderer class for the internal time field.
  *
@@ -38,9 +36,9 @@ class renderer extends datalynxfield_renderer {
     /**
      * Returns replacement values for time tags.
      *
-     * @param array|null $tags The field tags.
+     * @param ?array $tags The field tags.
      * @param mixed $entry The entry object.
-     * @param array|null $options Rendering options.
+     * @param ?array $options Rendering options.
      * @return array
      */
     public function replacements(?array $tags = null, $entry = null, ?array $options = null) {

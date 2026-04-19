@@ -42,11 +42,11 @@ abstract class datalynx_filter_base_form extends moodleform {
      *
      * @param datalynx $df
      * @param mixed $filter
-     * @param string|null $action
+     * @param ?string $action
      * @param mixed $customdata
      * @param string $method
      * @param string $target
-     * @param array|null $attributes
+     * @param ?array $attributes
      * @param bool $editable
      * @param bool $customfilter
      */

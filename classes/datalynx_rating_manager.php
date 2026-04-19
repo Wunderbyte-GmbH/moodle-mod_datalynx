@@ -31,7 +31,6 @@
 
 namespace mod_datalynx;
 use coding_exception;
-use mod_datalynx\datalynx_rating;
 use rating_manager;
 use stdClass;
 use user_picture;
@@ -239,7 +238,7 @@ class datalynx_rating_manager extends rating_manager {
     /**
      *
      * @param object $options Rating options object.
-     * @return array the array of items with their ratings attached at $items[0]->rating
+     * @return object the array of items with their ratings attached at $items[0]->rating
      */
     public function get_rating_settings_object($options) {
         return $this->generate_rating_settings_object($options);

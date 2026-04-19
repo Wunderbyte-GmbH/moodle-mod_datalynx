@@ -25,10 +25,8 @@
 namespace datalynxfield_entrygroup;
 
 use mod_datalynx\local\field\datalynxfield_renderer;
-use stdClass;
 use MoodleQuickForm;
-
-
+use stdClass;
 
 /**
  * Renderer for the entry group field type.
@@ -37,9 +35,9 @@ class renderer extends datalynxfield_renderer {
     /**
      * Get replacements for the given tags.
      *
-     * @param array $tags
+     * @param ?array $tags
      * @param stdClass $entry
-     * @param array $options
+     * @param ?array $options
      * @return array
      */
     public function replacements(?array $tags = null, $entry = null, ?array $options = null) {
@@ -111,7 +109,7 @@ class renderer extends datalynxfield_renderer {
      *
      * @param MoodleQuickForm $mform
      * @param stdClass $entry
-     * @param array $options
+     * @param ?array $options
      */
     public function display_edit(&$mform, $entry, ?array $options = null) {
         $field = $this->field;

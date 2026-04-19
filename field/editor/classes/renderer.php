@@ -24,8 +24,8 @@
 namespace datalynxfield_editor;
 
 use mod_datalynx\local\field\datalynxfield_renderer;
-use stdClass;
 use MoodleQuickForm;
+use stdClass;
 
 /**
  * Class datalynxfield_editor_renderer Renderer for editor field type

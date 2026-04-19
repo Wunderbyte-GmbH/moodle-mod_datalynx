@@ -22,10 +22,9 @@
  */
 
 namespace mod_datalynx\local\field;
-use mod_datalynx\datalynx;
 use mod_datalynx;
+use mod_datalynx\datalynx;
 use stdClass;
-
 
 /**
  * Field renderer class

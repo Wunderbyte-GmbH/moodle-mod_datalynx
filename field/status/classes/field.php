@@ -24,9 +24,9 @@
 
 namespace datalynxfield_status;
 
+use coding_exception;
 use mod_datalynx\local\field\datalynxfield_base;
 use mod_datalynx\local\field\datalynxfield_no_content;
-use coding_exception;
 
 /**
  * Status field class for datalynx.

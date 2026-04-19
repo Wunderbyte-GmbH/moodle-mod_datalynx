@@ -27,8 +27,6 @@ namespace datalynxfield_checkbox;
 
 use datalynxfield_multiselect\field as MultiSelectField;
 
-
-
 /**
  * Checkbox field class.
  */

@@ -26,11 +26,9 @@ namespace mod_datalynx\local\view;
 
 use html_writer;
 use mod_datalynx\local\filter\datalynx_filter_manager;
-use mod_datalynx\local\view\base;
 use moodle_url;
 use paging_bar;
 use single_select;
-
 
 /**
  * Base class for view patterns
@@ -177,8 +175,8 @@ class datalynxview_patterns {
      * Get the values for tags that contain a viewname or a fieldname
      *
      * @param string $tag
-     * @param string $entry
-     * @param array $options
+     * @param mixed $entry
+     * @param ?array $options
      * @return string
      */
     protected function get_regexp_replacements($tag, $entry = null, ?array $options = null) {
@@ -334,7 +332,7 @@ class datalynxview_patterns {
      * Returns the values for number of total entries and number of entries displayed
      *
      * @param string $tag
-     * @param string $entry
+     * @param mixed $entry
      * @param ?array $options
      * @return string
      */
@@ -356,8 +354,8 @@ class datalynxview_patterns {
      * Return the value of a tag that references a view (viewurl, etc.)
      *
      * @param string $tag
-     * @param string $entry
-     * @param array $options
+     * @param mixed $entry
+     * @param ?array $options
      * @return string
      */
     protected function get_ref_replacements($tag, $entry = null, ?array $options = null) {
@@ -393,7 +391,7 @@ class datalynxview_patterns {
      * ##quickperpage##
      *
      * @param string $tag
-     * @param array|null $options
+     * @param ?array $options
      * @return string
      */
     protected function get_userpref_replacements($tag, ?array $options = null): string {
@@ -428,8 +426,8 @@ class datalynxview_patterns {
      * Get the HTML code that replaces action tags like ##edit##
      *
      * @param string $tag
-     * @param string $entry
-     * @param array $options
+     * @param mixed $entry
+     * @param ?array $options
      * @return string
      */
     protected function get_action_replacements($tag, $entry = null, ?array $options = null): string {
@@ -634,7 +632,7 @@ class datalynxview_patterns {
     /**
      * Get HTML that replaces the tag ##pagingbar##
      *
-     * @param array $options
+     * @param ?array $options
      * @return string rendered paging bar
      */
     protected function get_paging_replacements(?array $options = null): string {
@@ -643,6 +641,8 @@ class datalynxview_patterns {
         $view = $this->view;
         $filter = $view->get_filter();
         $baseurl = $view->get_baseurl();
+
+        $pagingbar = null;
 
         // Typical entry 'more' request. If not single view (1 per page) show nothing instead of paging bar.
         if (!empty($filter->eids) || $view->user_is_editing()) {
@@ -708,10 +708,10 @@ class datalynxview_patterns {
      * If viewname is not specified, return the URL of the current view
      * else return the URL of the $viewname
      *
-     * @param string $viewname
+     * @param ?string $viewname
      * @return string base URL of the view, empty string if view does not exist
      */
-    protected function get_viewurl_replacement($viewname = null) {
+    protected function get_viewurl_replacement(?string $viewname = null) {
         $view = $this->view;
 
         // Return this view's url.
@@ -1020,11 +1020,11 @@ class datalynxview_patterns {
     /**
      * Echo or return views menu HTML (Dropdown of available views for the user)
      *
-     * @param array $options
-     * @param string $return
+     * @param ?array $options
+     * @param bool $return
      * @return string
      */
-    protected function print_views_menu($options, $return = false) {
+    protected function print_views_menu(?array $options = null, $return = false) {
         global $OUTPUT;
         $view = $this->view;
         $dl = $view->get_dl();
@@ -1058,11 +1058,11 @@ class datalynxview_patterns {
     /**
      * Echo or return filter menu HTML (Dropdown of available filters for the user)
      *
-     * @param array $options
-     * @param string $return
+     * @param ?array $options
+     * @param bool $return
      * @return string
      */
-    protected function print_filters_menu($options, $return = false) {
+    protected function print_filters_menu(?array $options = null, $return = false) {
         global $OUTPUT;
 
         $view = $this->view;
@@ -1113,8 +1113,8 @@ class datalynxview_patterns {
     /**
      * Echo or return quicksearch HTML (input field for text to search for)
      *
-     * @param array $options
-     * @param string $return
+     * @param ?mixed $options
+     * @param bool $return
      * @return string
      */
     protected function print_quick_search($options, $return = false) {
@@ -1161,7 +1161,7 @@ class datalynxview_patterns {
     /**
      * Echo or return the HTML for entries per page dropdown menu
      *
-     * @param string $return
+     * @param bool $return
      * @return string
      */
     protected function print_quick_perpage($return = false) {
@@ -1208,10 +1208,11 @@ class datalynxview_patterns {
     /**
      * Retrieve and print advanced filter
      *
+     * @param ?mixed $options
      * @param bool $return
      * @return string
      */
-    protected function print_advanced_filter($return = false) {
+    protected function print_advanced_filter($options, $return = false) {
 
         $view = $this->view;
         $df = $view->get_dl();

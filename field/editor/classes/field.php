@@ -104,7 +104,7 @@ class field extends datalynxfield_base {
      * write the content of the editor field and editor format to the database
      *
      * @param stdClass $entry The entry object.
-     * @param array|null $values The submitted field values.
+     * @param ?array $values The submitted field values.
      * @return int The content record id.
      * @see datalynxfield_base::update_content()
      */

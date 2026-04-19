@@ -27,7 +27,6 @@ namespace mod_datalynx;
 
 use advanced_testcase;
 use datalynxview_tabular\view as tabular_view;
-use mod_datalynx\datalynx;
 use stdClass;
 
 /**

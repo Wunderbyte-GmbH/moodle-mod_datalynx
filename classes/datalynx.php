@@ -24,21 +24,21 @@
 
 namespace mod_datalynx;
 use coding_exception;
+use comment;
 use completion_info;
 use context_module;
 use core_course_category;
+use datalynx_preset_manager;
+use datalynxfield_status\field as datalynxfield_status;
+use html_writer;
 use mod_datalynx\local\filter\datalynx_filter_manager;
 use mod_datalynx\local\rule\manager;
-use datalynx_preset_manager;
-use html_writer;
 use mod_datalynx\local\view\base;
+use moodle_exception;
 use moodle_page;
 use moodle_url;
 use stdClass;
-use moodle_exception;
-use comment;
-use datalynxfield_status\field as datalynxfield_status;
-
+use user_picture;
 
 /**
  * Class datalynx
@@ -86,7 +86,7 @@ class datalynx {
     public $data = null;
 
     /**
-     * @var context_module|null
+     * @var ?context_module
      */
     public $context = null;
 
@@ -114,19 +114,19 @@ class datalynx {
     /** @var array Cached view objects indexed by view id. */
     protected $views = [];
 
-    /** @var object|null Filter manager instance. */
+    /** @var ?object Filter manager instance. */
     protected $filtermanager = null;
 
-    /** @var object|null Custom filter manager instance. */
+    /** @var ?object Custom filter manager instance. */
     protected $customfiltermanager = null;
 
-    /** @var object|null Rule manager instance. */
+    /** @var ?object Rule manager instance. */
     protected $rulemanager = null;
 
-    /** @var object|null Preset manager instance. */
+    /** @var ?object Preset manager instance. */
     protected $presetmanager = null;
 
-    /** @var object|null Currently active view. */
+    /** @var ?object Currently active view. */
     protected $currentview = null;
 
     /** @var array Internal (system) fields. */
@@ -141,10 +141,10 @@ class datalynx {
     /**
      * datalynx constructor
      *
-     * @param int $d (id of datalynx instance fetched from db table)
+     * @param int|object $d (id of datalynx instance fetched from db table)
      * @param int $id (course module id)
      */
-    public function __construct(int $d = 0, int $id = 0) {
+    public function __construct($d = 0, int $id = 0) {
         global $DB;
 
         // Initialize from datalynx id or object.
@@ -297,7 +297,7 @@ class datalynx {
     /**
      * Get current view.
      *
-     * @return null|object view object
+     * @return ?object view object
      */
     public function get_current_view() {
         return $this->currentview;
@@ -309,7 +309,7 @@ class datalynx {
      * Used by internal rendering paths that do not go through the regular
      * request-based current view resolution.
      *
-     * @param base|null $view
+     * @param ?base $view
      * @return void
      */
     public function set_current_view(?base $view): void {
@@ -319,7 +319,7 @@ class datalynx {
     /**
      * Get filter manager.
      *
-     * @return datalynx_filter_manager|null
+     * @return ?datalynx_filter_manager
      */
     public function get_filter_manager() {
         // Set filters manager.
@@ -332,7 +332,7 @@ class datalynx {
     /**
      * Get custom filter manager.
      *
-     * @return \mod_datalynx\local\filter\datalynx_customfilter_manager|null
+     * @return ?\mod_datalynx\local\filter\datalynx_customfilter_manager
      */
     public function get_customfilter_manager() {
         if (!$this->customfiltermanager) {
@@ -344,7 +344,7 @@ class datalynx {
     /**
      * Get rule manager.
      *
-     * @return manager|null
+     * @return ?manager
      */
     public function get_rule_manager() {
         // Set rules manager.
@@ -357,7 +357,7 @@ class datalynx {
     /**
      * Get preset manager.
      *
-     * @return datalynx_preset_manager|null
+     * @return ?datalynx_preset_manager
      */
     public function get_preset_manager() {
         global $CFG;
@@ -414,7 +414,7 @@ class datalynx {
      * Update datalynx settings
      *
      * @param array $params Parameters to update.
-     * @param string $notify
+     * @param mixed $notify
      * @return bool
      * @throws \coding_exception
      * @throws \dml_exception
@@ -458,12 +458,12 @@ class datalynx {
      * Sets the datalynx page
      *
      * @param string $page current page
-     * @param array $params
+     * @param ?array $params
      * @param bool $skiplogincheck If true, skip the login check.
      * @throws moodle_exception
      * @return string output
      */
-    public function set_page($page = 'view', $params = null, $skiplogincheck = false) {
+    public function set_page($page = 'view', ?array $params = null, $skiplogincheck = false) {
         global $CFG, $PAGE, $USER;
 
         $this->pagefile = $page;
@@ -748,9 +748,9 @@ class datalynx {
     /**
      * prints the header of the current datalynx page
      *
-     * @param array $params
+     * @param ?array $params
      */
-    public function print_header($params = null) {
+    public function print_header(?array $params = null) {
         global $OUTPUT, $CFG;
 
         $params = (object) $params;
@@ -799,9 +799,9 @@ class datalynx {
     /**
      * prints the footer of the current datalynx page
      *
-     * @param array $params
+     * @param ?array $params
      */
-    public function print_footer($params = null) {
+    public function print_footer(?array $params = null) {
         global $OUTPUT;
 
         echo $OUTPUT->footer();
@@ -1009,9 +1009,9 @@ class datalynx {
      * Given a field id return the field object from get_fields
      * Initializes get_fields if necessary
      *
-     * @param number $fieldid
-     * @param boolean $forceget
-     * @return boolean|datalynxfield_base
+     * @param int $fieldid
+     * @param bool $forceget
+     * @return \datalynxfield_base|bool
      */
     public function get_field_from_id($fieldid, $forceget = false) {
         $fields = $this->get_fields(null, false, $forceget);
@@ -1028,8 +1028,8 @@ class datalynx {
      * Initializes get_fields if necessary
      *
      * @param string $type
-     * @param string $menu
-     * @return datalynxfield_base[]
+     * @param bool $menu
+     * @return \datalynxfield_base[]
      */
     public function get_fields_by_type($type, $menu = false): array {
         $typefields = [];
@@ -1049,7 +1049,7 @@ class datalynx {
      * Given a field name returns the field object from get_fields
      *
      * @param string $name
-     * @return datalynxfield_base|boolean
+     * @return \datalynxfield_base|bool
      */
     public function get_field_by_name($name) {
         foreach ($this->get_fields() as $field) {
@@ -1065,8 +1065,8 @@ class datalynx {
      * used to invoke plugin methods
      * input: $param $field record from db, or field type
      *
-     * @param int|object $key
-     * @return bool
+     * @param mixed $key
+     * @return bool|\datalynxfield_base
      */
     public function get_field($key) {
         if ($key) {
@@ -1088,8 +1088,8 @@ class datalynx {
      * Returns a subclass field object given a record of the field
      * used to invoke plugin methods
      *
-     * @param string $key
-     * @return stdClass|boolean
+     * @param mixed $key
+     * @return bool|\datalynxfield_base
      */
     public function get_fieldname($key) {
         if ($key) {
@@ -1110,13 +1110,13 @@ class datalynx {
     /**
      * Get fields of datalynx instance
      *
-     * @param null $exclude
+     * @param ?array $exclude
      * @param bool $menu
      * @param bool $forceget
      * @param string $sort
-     * @return datalynxfield_base[]
+     * @return \datalynxfield_base[]
      */
-    public function get_fields($exclude = null, $menu = false, $forceget = false, $sort = ''): array {
+    public function get_fields(?array $exclude = null, $menu = false, $forceget = false, $sort = ''): array {
         global $DB;
 
         if (!$this->fields || $forceget) {
@@ -1216,7 +1216,7 @@ class datalynx {
      * @param string $action
      * @param string $fids (comma separated numbers of field ids)
      * @param boolean $confirmed
-     * @return boolean
+     * @return array|bool
      */
     public function process_fields($action, $fids, $confirmed = false) {
         global $OUTPUT, $DB;
@@ -1584,7 +1584,7 @@ class datalynx {
      * this function creates an instance of the particular subtemplate class
      *
      * @param int $viewid
-     * @return bool|mixed
+     * @return \mod_datalynx\local\view\base|bool
      */
     public function get_current_view_from_id(int $viewid = 0) {
         if ($views = $this->get_view_records()) {
@@ -1608,7 +1608,7 @@ class datalynx {
      * this function creates an instance of the particular subtemplate class *
      *
      * @param int $viewid
-     * @return bool|mixed
+     * @return \mod_datalynx\local\view\base|bool
      */
     public function get_view_from_id(int $viewid = 0) {
         // Get views visible to user.
@@ -1680,7 +1680,7 @@ class datalynx {
      */
     public function get_views_by_type($type, $forceget = false) {
         $views = $this->get_view_records($forceget);
-        if (!empty($views)) {
+        if (empty($views)) {
             return false;
         }
 
@@ -1699,7 +1699,7 @@ class datalynx {
      * @param array $exclude array of viewids to exclude
      * @param bool $forceget true to get from db directly
      * @param string $sort SQL ORDER BY clause
-     * @return array of view objects indexed by view id or false if no views are found
+     * @return \mod_datalynx\local\view\base[] array of view objects indexed by view id or empty array if no views are found
      */
     public function get_views(array $exclude = [], bool $forceget = false, string $sort = ''): array {
         if (empty($this->get_view_records($forceget, $sort))) {
@@ -1722,12 +1722,12 @@ class datalynx {
     /**
      * Get all viewnames visible to the user of a datalynx instance as an array indexed by viewid
      *
-     * @param string $exclude
+     * @param ?array $exclude
      * @param boolean $forceget
      * @param string $sort
      * @return array $viewids[viewid]
      */
-    public function get_views_menu($exclude = null, $forceget = false, $sort = '') {
+    public function get_views_menu(?array $exclude = null, $forceget = false, $sort = '') {
         $views = [];
 
         if (!empty($this->get_view_records($forceget, $sort))) {
@@ -2101,8 +2101,8 @@ class datalynx {
     /**
      * Returns users that appear in the gradebook for this datalynx instance.
      *
-     * @param array|null $userids
-     * @return array|null
+     * @param ?array $userids
+     * @return ?array
      * @throws \coding_exception
      * @throws \dml_exception
      */
@@ -2188,10 +2188,10 @@ class datalynx {
     /**
      * Check if user has permission to view all entries.
      *
-     * @param array $options
+     * @param ?array $options
      * @return bool
-     * @throws \coding_exception
      * @throws \dml_exception
+     * @throws coding_exception
      */
     public function user_can_view_all_entries(?array $options = null) {
         global $OUTPUT;
@@ -2233,11 +2233,11 @@ class datalynx {
     /**
      * Check if user is allowed to export an entry.
      *
-     * @param stdClass $entry
+     * @param ?stdClass $entry
      * @return bool
      * @throws \coding_exception
      */
-    public function user_can_export_entry($entry = null) {
+    public function user_can_export_entry(?stdClass $entry = null) {
         global $CFG, $USER;
         // We need portfolios for export.
         if (!empty($CFG->enableportfolios)) {
@@ -2266,11 +2266,11 @@ class datalynx {
     /**
      * Has the actual user the right to edit any entries or the optional single entry parameter?
      *
-     * @param object|null $entry The entry object to check, or null for any entry.
+     * @param ?object $entry The entry object to check, or null for any entry.
      * @return boolean
      * @throws \coding_exception
      */
-    public function user_can_manage_entry($entry = null) {
+    public function user_can_manage_entry(?object $entry = null) {
         global $USER, $CFG;
 
         // Teachers can always manage entries.
@@ -2357,13 +2357,14 @@ class datalynx {
     /**
      * Checks if team member can edit the entry.
      *
-     * @param null $entry
+     * @param ?stdClass $entry
      * @return bool
      */
-    public function teammember_can_edit($entry = null) {
+    public function teammember_can_edit(?stdClass $entry = null) {
         global $USER;
         // Get all teammemberselect fields, that allow editing of entry.
         $teammemberfields = $this->get_fields_by_type('teammemberselect');
+        $fieldids = [];
         foreach ($teammemberfields as $fieldid => $field) {
             if ($field->field->param9 == "1") {
                 $fieldids[] = $fieldid;
@@ -2372,7 +2373,6 @@ class datalynx {
         if (empty($fieldids)) {
             return false;
         }
-        $userids = [];
         foreach ($fieldids as $fieldid) {
             // Extract all userids of teammemberselect field.
             $userids = isset($entry->{"c{$fieldid}_content"}) ? json_decode(
@@ -2390,8 +2390,8 @@ class datalynx {
     /**
      * returns the number of entries already made by this user; defaults to all entries
      *
-     * @param boolean $perinterval output int
-     * @return integer
+     * @param bool $perinterval output int
+     * @return int
      * @throws \dml_exception
      */
     public function user_num_entries($perinterval = false) {
@@ -2723,34 +2723,34 @@ class datalynx {
         foreach (array_keys($data->items) as $id) {
             switch ($event) {
                 case 'entryadded':
-                    $event = event\entry_created::create(
+                    $eventobj = event\entry_created::create(
                         ['context' => $this->context, 'objectid' => $id, 'other' => $other]
                     );
-                    $event->trigger();
+                    $eventobj->trigger();
                     break;
                 case 'entryupdated':
-                    $event = event\entry_updated::create(
+                    $eventobj = event\entry_updated::create(
                         ['context' => $this->context, 'objectid' => $id, 'other' => $other]
                     );
-                    $event->trigger();
+                    $eventobj->trigger();
                     break;
                 case 'entrydeleted':
-                    $event = event\entry_deleted::create(
+                    $eventobj = event\entry_deleted::create(
                         ['context' => $this->context, 'objectid' => $id, 'other' => $other]
                     );
-                    $event->trigger();
+                    $eventobj->trigger();
                     break;
                 case 'entryapproved':
-                    $event = event\entry_approved::create(
+                    $eventobj = event\entry_approved::create(
                         ['context' => $this->context, 'objectid' => $id, 'other' => $other]
                     );
-                    $event->trigger();
+                    $eventobj->trigger();
                     break;
                 case 'entrydisapproved':
-                    $event = event\entry_disapproved::create(
+                    $eventobj = event\entry_disapproved::create(
                         ['context' => $this->context, 'objectid' => $id, 'other' => $other]
                     );
-                    $event->trigger();
+                    $eventobj->trigger();
                     break;
                 default:
                     break;
@@ -2761,7 +2761,7 @@ class datalynx {
     /**
      * Returns the base URL for this datalynx instance.
      *
-     * @return \moodle_url
+     * @return moodle_url
      */
     public function get_baseurl() {
         // Base url params.

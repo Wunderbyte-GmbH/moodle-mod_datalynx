@@ -25,6 +25,7 @@
 namespace mod_datalynx\local\rule;
 
 use coding_exception;
+use dml_exception;
 use mod_datalynx\datalynx;
 use moodle_exception;
 use moodle_url;
@@ -42,7 +43,8 @@ abstract class base {
 
     /**
      * The datalynx object that this rule belongs to.
-     * @var \mod_datalynx\datalynx|null
+     *
+     * @var ?datalynx
      */
     public $df = null;
 
@@ -140,7 +142,7 @@ abstract class base {
     /**
      * Sets up a rule object
      *
-     * @param stdClass|null $forminput Form input data.
+     * @param ?stdClass $forminput Form input data.
      */
     public function set_rule($forminput = null) {
         $this->rule = new stdClass();
@@ -266,7 +268,7 @@ abstract class base {
     /**
      * Get datalynx object
      *
-     * @return \mod_datalynx\datalynx|null
+     * @return ?datalynx
      */
     public function df() {
         return $this->df;
@@ -316,7 +318,7 @@ abstract class base {
      *
      * @param string $paramname
      * @param string $paramcount
-     * @return array|null
+     * @return ?array
      */
     public function get_sort_from_sql($paramname = 'sortie', $paramcount = '') {
         $ruleid = $this->rule->id;

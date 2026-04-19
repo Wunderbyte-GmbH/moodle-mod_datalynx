@@ -25,16 +25,12 @@
 
 namespace datalynxfield_rating;
 
+use html_table;
+use html_table_row;
+use html_writer;
 use mod_datalynx\datalynx_rating_manager;
 use mod_datalynx\local\field\datalynxfield_renderer;
 use stdClass;
-use html_writer;
-use html_table;
-use html_table_row;
-use rating;
-use user_picture;
-
-
 
 /**
  * Renderer class for the internal rating field.
@@ -45,9 +41,9 @@ class renderer extends datalynxfield_renderer {
     /**
      * Returns replacement values for rating tags.
      *
-     * @param array|null $tags List of tag patterns to replace.
+     * @param ?array $tags List of tag patterns to replace.
      * @param mixed $entry The entry object.
-     * @param array|null $options Rendering options.
+     * @param ?array $options Rendering options.
      * @return array Associative array of tag => replacement pairs.
      */
     public function replacements(?array $tags = null, $entry = null, ?array $options = null) {
@@ -194,7 +190,7 @@ class renderer extends datalynxfield_renderer {
      * Returns aggregation keys matching the given patterns.
      *
      * @param array $patterns Array of pattern strings to match.
-     * @return array|null Array of matching aggregation keys, or null if none match.
+     * @return ?array Array of matching aggregation keys, or null if none match.
      */
     public function get_aggregations($patterns) {
         $aggr = [field::AGGREGATE_AVG => '##ratings:avg##',

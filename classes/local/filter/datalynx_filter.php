@@ -30,7 +30,7 @@ use datalynxfield_select;
 use datalynxfield_teammemberselect;
 use datalynxfield_userinfo;
 use mod_datalynx\local\field\datalynxfield_option_multiple;
-use mod_datalynx\local\view\base;
+use stdClass;
 
 /**
  * Filter class
@@ -63,29 +63,29 @@ class datalynx_filter {
     public $customsearch;
     /** @var string Simple search string. */
     public $search;
-    /** @var array|null Content fields to fetch. */
+    /** @var ?array Content fields to fetch. */
     public $contentfields;
-    /** @var string|null Comma-separated entry ids to restrict results. */
+    /** @var ?string Comma-separated entry ids to restrict results. */
     public $eids;
-    /** @var string|null User restriction. */
+    /** @var ?string User restriction. */
     public $users;
-    /** @var string|null Group restriction. */
+    /** @var ?string Group restriction. */
     public $groups;
     /** @var int Current page offset. */
     public $page;
     /** @var string Author search string. */
     public $authorsearch;
 
-    /** @var string|null SQL fragment for filtered tables. */
+    /** @var ?string SQL fragment for filtered tables. */
     protected $filteredtables = null;
 
-    /** @var array|null Fields used in search. */
+    /** @var ?array Fields used in search. */
     protected $searchfields = null;
 
-    /** @var array|null Fields used in sort. */
+    /** @var ?array Fields used in sort. */
     protected $sortfields = null;
 
-    /** @var array|null JOIN fragments. */
+    /** @var ?array JOIN fragments. */
     protected $joins = null;
 
     /** @var array Entry ids excluded from results. */
@@ -130,7 +130,7 @@ class datalynx_filter {
     /**
      * Returns a plain stdClass object representation of this filter.
      *
-     * @return \stdClass
+     * @return stdClass
      */
     public function get_filter_obj() {
         $filter = new stdClass();

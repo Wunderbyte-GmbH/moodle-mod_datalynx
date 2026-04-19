@@ -36,7 +36,6 @@ use mod_datalynx\local\view\base;
 use moodle_url;
 use stdClass;
 
-
 /**
  * CSV view class.
  *
@@ -89,7 +88,7 @@ class view extends base {
 
     /**
      * Columns list.
-     * @var array|null
+     * @var ?array
      */
     protected ?array $columns = null;
 
@@ -376,7 +375,7 @@ class view extends base {
      * Get CSV content.
      *
      * @param string $range
-     * @return array|null
+     * @return ?array
      */
     public function get_csv_content($range = self::EXPORT_PAGE) {
         // Set content.
@@ -452,7 +451,7 @@ class view extends base {
     /**
      * Process import.
      *
-     * @return bool|null
+     * @return ?bool
      */
     public function process_import() {
         $mform = $this->get_import_form();
@@ -521,7 +520,7 @@ class view extends base {
      * Execute import.
      *
      * @param stdClass $data
-     * @return bool|null
+     * @return ?bool
      */
     public function execute_import($data) {
         if ($data->eids) {

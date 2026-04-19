@@ -32,7 +32,6 @@ use html_writer;
 use mod_datalynx\local\view\base;
 use stdClass;
 
-
 /**
  * Grid view class.
  *

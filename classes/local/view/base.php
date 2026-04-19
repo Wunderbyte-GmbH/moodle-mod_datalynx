@@ -23,16 +23,15 @@
 
 namespace mod_datalynx\local\view;
 
+use calc_formula;
 use coding_exception;
-use mod_datalynx\local\datalynx_entries;
-use mod_datalynx\local\filter\datalynx_filter;
-use mod_datalynx\local\view\datalynxview_patterns;
 use datalynxfield_rating\field as datalynxfield_rating;
 use datalynxfield_status\field as datalynxfield_status;
 use HTML_QuickForm;
 use html_writer;
-use calc_formula;
 use mod_datalynx\datalynx;
+use mod_datalynx\local\datalynx_entries;
+use mod_datalynx\local\filter\datalynx_filter;
 use moodle_exception;
 use moodle_url;
 use moodleform;
@@ -294,7 +293,7 @@ abstract class base {
     /**
      * Synchronize editor values between form payload and view record.
      *
-     * @param stdClass|null $data Submitted form data.
+     * @param ?stdClass $data Submitted form data.
      */
     protected function set__editors($data = null) {
         $text = '';
@@ -458,7 +457,7 @@ abstract class base {
      * Update a view in the database
      * $this->view is assumed set
      *
-     * @param stdClass|null $data View data.
+     * @param ?stdClass $data View data.
      * @return bool True on success, false on failure.
      */
     public function update($data = null) {
@@ -520,7 +519,7 @@ abstract class base {
     /**
      * prepare view data for form
      *
-     * @param stdClass|null $data View data object.
+     * @param ?stdClass $data View data object.
      * @return stdClass
      */
     public function to_form($data = null) {
@@ -1040,7 +1039,7 @@ abstract class base {
     /**
      * Get either all tags ($set = null) or field tags ($set = field) as an array.
      *
-     * @param string|null $set Current: field or view.
+     * @param ?string $set Current: field or view.
      * @return array
      */
     public function get__patterns($set = null) {
@@ -1063,7 +1062,7 @@ abstract class base {
      * Resolve the field id associated with a pattern.
      *
      * @param string $pattern Pattern token.
-     * @return int|null
+     * @return ?int
      */
     public function get_pattern_fieldid($pattern) {
         if (!empty($this->tags['field'])) {
@@ -1079,7 +1078,7 @@ abstract class base {
     /**
      * Collect embedded files used by this view and optionally by fields.
      *
-     * @param string|null $set Restrict to view or field set.
+     * @param ?string $set Restrict to view or field set.
      * @return array
      */
     public function get_embedded_files($set = null) {
@@ -1267,7 +1266,7 @@ abstract class base {
     /**
      * Build rating options when rating patterns are present.
      *
-     * @return stdClass|null
+     * @return ?stdClass
      */
     protected function is_rating() {
         global $USER;
@@ -1332,7 +1331,7 @@ abstract class base {
     /**
      * Build grading options for the activity grade area.
      *
-     * @return stdClass|null
+     * @return ?stdClass
      */
     protected function get_grading_options() {
         global $USER;
@@ -1552,7 +1551,7 @@ abstract class base {
     /**
      * Set display definition
      *
-     * @param array|null $options
+     * @param ?array $options
      * @return bool
      * @throws coding_exception
      */
@@ -1726,7 +1725,7 @@ abstract class base {
     /**
      * Return current filter instance.
      *
-     * @return datalynx_filter|null
+     * @return ?datalynx_filter
      */
     public function get_filter() {
         return $this->filter;

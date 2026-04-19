@@ -17,7 +17,6 @@
 namespace mod_datalynx\output;
 
 use context_module;
-use completion_info;
 
 /**
  * Mobile output class for datalynx based on mod_certificate and mod_questionnaire.

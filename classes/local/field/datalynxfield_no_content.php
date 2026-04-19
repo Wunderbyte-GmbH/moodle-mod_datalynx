@@ -29,7 +29,7 @@ abstract class datalynxfield_no_content extends datalynxfield_base {
      * No content to update; always returns true.
      *
      * @param stdClass $entry
-     * @param array|null $values
+     * @param ?array $values
      * @return bool
      */
     public function update_content(stdClass $entry, ?array $values = null) {
@@ -86,7 +86,7 @@ abstract class datalynxfield_no_content extends datalynxfield_base {
     /**
      * No file area for this field type.
      *
-     * @param string|null $suffix
+     * @param ?string $suffix
      * @return false
      */
     protected function filearea($suffix = null) {

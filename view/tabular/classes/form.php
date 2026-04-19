@@ -29,7 +29,6 @@ namespace datalynxview_tabular;
 
 use mod_datalynx\form\datalynxview_base_form;
 
-
 /**
  * Tabular view settings form
  *

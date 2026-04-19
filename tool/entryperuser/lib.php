@@ -23,8 +23,8 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use mod_datalynx\local\datalynx_entries;
 use datalynxfield_entryauthor\field as datalynxfield_entryauthor;
+use mod_datalynx\local\datalynx_entries;
 
 /**
  * Class datalynxtool_entryperuser

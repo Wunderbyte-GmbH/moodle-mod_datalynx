@@ -26,7 +26,6 @@
 namespace datalynxfield_rating;
 
 use mod_datalynx\local\field\datalynxfield_no_content;
-use rating;
 
 /**
  * Internal rating field.

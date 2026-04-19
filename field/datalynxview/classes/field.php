@@ -38,19 +38,19 @@ class field extends datalynxfield_base {
     /** @var string Field type. */
     public $type = 'datalynxview';
 
-    /** @var object|null Referenced datalynx instance. */
+    /** @var ?object Referenced datalynx instance. */
     public $refdatalynx = null;
 
-    /** @var int|null Referenced view id. */
+    /** @var ?int Referenced view id. */
     public $refview = null;
 
-    /** @var int|null Referenced filter id. */
+    /** @var ?int Referenced filter id. */
     public $reffilterid = null;
 
-    /** @var int|null Local view id. */
+    /** @var ?int Local view id. */
     public $localview = null;
 
-    /** @var string|null CSS for the field. */
+    /** @var ?string CSS for the field. */
     public $css = null;
 
     /**

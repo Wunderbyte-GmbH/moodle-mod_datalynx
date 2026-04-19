@@ -22,8 +22,8 @@
  */
 
 namespace mod_datalynx\form;
-use mod_datalynx\datalynx;
 use mod_datalynx;
+use mod_datalynx\datalynx;
 use moodleform;
 
 defined('MOODLE_INTERNAL') || die();

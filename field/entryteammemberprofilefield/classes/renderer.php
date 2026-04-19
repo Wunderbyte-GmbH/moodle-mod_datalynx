@@ -26,11 +26,8 @@
 
 namespace datalynxfield_entryteammemberprofilefield;
 
-use core_user\fields;
 use mod_datalynx\local\field\datalynxfield_renderer;
 use MoodleQuickForm;
-
-
 
 /**
  * Renderer for the entryteammemberprofilefield field type.

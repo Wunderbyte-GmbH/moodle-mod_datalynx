@@ -38,7 +38,7 @@ class shortcodes {
      *
      * @param string $shortcode
      * @param array $args
-     * @param string|null $content
+     * @param ?string $content
      * @param object $env
      * @param Closure $next
      * @return string

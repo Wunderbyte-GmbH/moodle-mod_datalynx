@@ -25,7 +25,7 @@
 use core\notification;
 use mod_datalynx\local\datalynx_entries;
 use mod_datalynx\local\filter\datalynx_filter;
-use datalynxfield_entryauthor\field as datalynxfield_entryauthor;
+
 /**
  * Class datalynxtool_downloadfiles
  *

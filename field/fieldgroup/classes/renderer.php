@@ -25,8 +25,8 @@
 namespace datalynxfield_fieldgroup;
 
 use mod_datalynx\local\field\datalynxfield_renderer;
-use stdClass;
 use MoodleQuickForm;
+use stdClass;
 
 /**
  * Class datalynxfield_fieldgroup_renderer Renderer for fieldgroup field type

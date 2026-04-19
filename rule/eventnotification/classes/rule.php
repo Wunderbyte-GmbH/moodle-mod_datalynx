@@ -314,7 +314,7 @@ class rule extends base {
      * @param moodle_url $entryurl
      * @param moodle_url $datalynxurl
      * @param stdClass $recipient
-     * @return string|null
+     * @return ?string
      */
     private function render_email_template(
         int $entryid,

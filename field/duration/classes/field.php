@@ -27,8 +27,6 @@ namespace datalynxfield_duration;
 
 use mod_datalynx\local\field\datalynxfield_base;
 
-
-
 /**
  * Duration field class for datalynx.
  *
@@ -42,7 +40,7 @@ class field extends datalynxfield_base {
      */
     public $type = 'duration';
 
-    /** @var array|null Unit definitions. */
+    /** @var ?array Unit definitions. */
     protected $units = null;
 
     /**
@@ -100,7 +98,7 @@ class field extends datalynxfield_base {
      * Formats the field content for database storage.
      *
      * @param object $entry
-     * @param array|null $values
+     * @param ?array $values
      * @return array
      */
     protected function format_content($entry, ?array $values = null) {
@@ -164,8 +162,8 @@ class field extends datalynxfield_base {
      *
      * @param stdClass $data The data object to populate with import values.
      * @param array $importsettings Import settings keyed by field name.
-     * @param array|null $csvrecord A single CSV record row.
-     * @param int|null $entryid The target entry ID.
+     * @param ?array $csvrecord A single CSV record row.
+     * @param ?int $entryid The target entry ID.
      * @return bool True on success.
      */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {

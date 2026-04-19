@@ -27,7 +27,6 @@ namespace datalynxview_pdf;
 
 use mod_datalynx\form\datalynxview_base_form;
 
-
 /**
  * PDF view settings form
  *
@@ -462,7 +461,7 @@ class form extends datalynxview_base_form {
      * {@inheritDoc}
      * @see datalynxview_base_form::get_data()
      * @param bool $slashed Whether to apply slashes to the data.
-     * @return stdClass|null
+     * @return ?stdClass
      */
     public function get_data($slashed = true) {
         $data = parent::get_data($slashed);

@@ -27,8 +27,6 @@ namespace datalynxfield_url;
 
 use mod_datalynx\form\datalynxfield_form;
 
-
-
 /**
  * URL field form class.
  */

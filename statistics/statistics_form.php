@@ -39,11 +39,11 @@ class datalynx_statistics_form extends moodleform {
      * datalynx_statistics_form constructor.
      *
      * @param mod_datalynx\datalynx $df
-     * @param string|null $action
+     * @param ?string $action
      * @param mixed $customdata
      * @param string $method
      * @param string $target
-     * @param array|null $attributes
+     * @param ?array $attributes
      * @param bool $editable
      */
     public function __construct(

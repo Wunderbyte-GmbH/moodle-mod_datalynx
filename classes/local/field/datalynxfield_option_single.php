@@ -24,6 +24,8 @@
 
 namespace mod_datalynx\local\field;
 
+use stdClass;
+
 /**
  * Base class for Datalynx field types that offer a set of options with single choice
  */
@@ -59,7 +61,7 @@ class datalynxfield_option_single extends datalynxfield_option {
      * {@inheritDoc}
      * @see datalynxfield_base::format_content()
      * @param stdClass $entry Entry object.
-     * @param array|null $values Values from the entry form.
+     * @param ?array $values Values from the entry form.
      * @return array
      */
     protected function format_content($entry, ?array $values = null) {
@@ -205,8 +207,8 @@ class datalynxfield_option_single extends datalynxfield_option {
      * @see datalynxfield_base::prepare_import_content()
      * @param stdClass $data Form data object (passed by reference).
      * @param array $importsettings Import settings.
-     * @param array|null $csvrecord CSV record data.
-     * @param int|null $entryid Entry ID.
+     * @param ?array $csvrecord CSV record data.
+     * @param ?int $entryid Entry ID.
      * @return bool
      */
     public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {

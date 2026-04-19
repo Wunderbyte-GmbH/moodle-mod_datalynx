@@ -49,7 +49,7 @@ class view_patterns extends base_patterns {
      *
      * @param string $tag
      * @param mixed $entry
-     * @param array|null $options
+     * @param ?array $options
      * @return string
      */
     protected function get_ref_replacements($tag, $entry = null, ?array $options = null) {

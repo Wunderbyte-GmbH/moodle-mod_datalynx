@@ -27,7 +27,6 @@ namespace datalynxfield_file;
 
 use mod_datalynx\form\datalynxfield_form;
 
-
 /**
  * Datalynx file field form class.
  */

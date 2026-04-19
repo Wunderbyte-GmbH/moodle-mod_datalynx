@@ -31,7 +31,6 @@ use html_table_row;
 use html_writer;
 use mod_datalynx\local\datalynx_tcpdf;
 use mod_datalynx\local\view\base;
-use setasign\Fpdi\Tcpdf\Fpdi;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
@@ -85,12 +84,12 @@ class view extends base {
     ];
 
     /**
-     * @var stdClass|null PDF settings
+     * @var ?stdClass PDF settings
      */
     protected $settings = null;
 
     /**
-     * @var array|null Temporary files
+     * @var ?array Temporary files
      */
     protected $tmpfiles = null;
 
@@ -435,7 +434,7 @@ class view extends base {
     /**
      * Overridden to process pdf specific area files
      *
-     * @param stdClass|null $data Optional existing data object.
+     * @param ?stdClass $data Optional existing data object.
      * @return stdClass
      */
     public function to_form($data = null) {

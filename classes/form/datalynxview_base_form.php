@@ -47,11 +47,11 @@ class datalynxview_base_form extends moodleform {
      * Constructor for datalynxview_base_form.
      *
      * @param mixed $view The view object.
-     * @param string|null $action Form action URL.
+     * @param ?string $action Form action URL.
      * @param mixed $customdata Custom data passed to the form.
      * @param string $method Form method (post or get).
      * @param string $target Form target attribute.
-     * @param array|null $attributes Additional HTML attributes.
+     * @param ?array $attributes Additional HTML attributes.
      * @param bool $editable Whether the form is editable.
      */
     public function __construct(
@@ -289,7 +289,7 @@ class datalynxview_base_form extends moodleform {
      * override standard moodle action buttons
      *
      * @param bool $cancel Whether to show a cancel button.
-     * @param string|null $submit Submit button label.
+     * @param ?string $submit Submit button label.
      * @see moodleform::add_action_buttons()
      */
     public function add_action_buttons($cancel = true, $submit = null) {

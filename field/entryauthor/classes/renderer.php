@@ -26,17 +26,14 @@
 
 namespace datalynxfield_entryauthor;
 
-use core_user\fields;
-use mod_datalynx\local\field\datalynxfield_renderer;
-use stdClass;
-use html_writer;
-use moodle_url;
 use coding_exception;
+use core_user\fields;
 use dml_exception;
+use html_writer;
+use mod_datalynx\local\field\datalynxfield_renderer;
 use moodle_exception;
-use user_picture;
-
-
+use moodle_url;
+use stdClass;
 
 /**
  * Renderer for the entryauthor field type.
@@ -45,9 +42,9 @@ class renderer extends datalynxfield_renderer {
     /**
      * Return replacements for all ##author:something## patterns.
      *
-     * @param array|null $tags
+     * @param ?array $tags
      * @param null $entry
-     * @param array|null $options
+     * @param ?array $options
      * @return array
      * @throws coding_exception
      */
@@ -102,7 +99,7 @@ class renderer extends datalynxfield_renderer {
      *
      * @param MoodleQuickForm $mform The form object.
      * @param stdClass $entry The entry object.
-     * @param array|null $options
+     * @param ?array $options
      * @throws coding_exception
      */
     public function display_edit(&$mform, $entry, ?array $options = null) {
