@@ -25,8 +25,9 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_datalynx';
 $plugin->supported = [405, 501];
-$plugin->version = 2026041700;
-$plugin->release = 'v5.3-DataResilience'; // Data words like data science, data mining.
+$plugin->version = 2026041800;
+// Release: Highest supported Moodle, followed by internal version, followed by dataword.
+$plugin->release = 'v501.0-DataDream';
 $plugin->requires = 2024100700;
 $plugin->maturity = MATURITY_STABLE;
 $plugin->dependencies = [
