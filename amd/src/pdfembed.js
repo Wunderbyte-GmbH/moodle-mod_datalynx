@@ -1,4 +1,4 @@
-// This file is part of the mod_coursecertificate plugin for Moodle - http://moodle.org/
+// This file is part of mod_datalynx for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -21,92 +21,103 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// import * as pdfjsLib from 'mod_datalynx/pdf';
-// import * as pdfjsWorker from 'mod_datalynx/pdf.worker';
+import Config from 'core/config';
+import Notification from 'core/notification';
 
 /**
- * Renders a PDF document onto a canvas element.
- * @param {string} url - The URL of the PDF document to render.
- * @param {HTMLElement} canvasContainer - The container element where the canvas will be appended.
- * @param {number} customScale - The custom scale for rendering the PDF.
+ * Returns the vendored PDF.js module and configures its worker path.
+ *
+ * @returns {Promise<*>}
  */
-function renderPDFfunction(url, canvasContainer, customScale) {
-
-    /**
-     * Renders a single page of the PDF document onto a canvas element.
-     * @param {Object} page - The PDF page object to render.
-     */
-    function renderPage(page) {
-        var viewport = page.getViewport({ scale: 1 });
-        var canvas = document.createElement('canvas');
-        var ctx = canvas.getContext('2d');
-
-        var desiredWidth = 595;
-        var desiredHeight = 841;
-
-        canvas.width = Math.floor(viewport.width * customScale);
-        canvas.height = Math.floor(viewport.height * customScale);
-        canvas.style.width = Math.floor(viewport.width) + "px";
-        canvas.style.height = Math.floor(viewport.height) + "px";
-
-        var transform = customScale !== 1
-            ? [customScale, 0, 0, customScale, 0, 0]
-            : null;
-
-        var renderContext = {
-            canvasContext: ctx,
-            transform: transform,
-            viewport: viewport
-        };
-        canvas.height = desiredHeight * customScale;
-        canvas.width = desiredWidth * customScale;
-        canvas.style = "width: " + (desiredWidth * customScale) + "px; height: " + (desiredHeight * customScale) + "px;";
-
-        canvasContainer.appendChild(canvas);
-
-        // eslint-disable-next-line no-console
-        console.log(canvasContainer, canvas, canvas.height);
-
-        page.render(renderContext);
+const getPdfJsModule = async() => {
+    if (!window.modDatalynxPdfJsModulePromise) {
+        throw new Error('PDF.js module was not preloaded.');
     }
 
-    /**
-     * Renders all pages of the PDF document.
-     * @param {Object} pdfDoc - The PDF document object.
-     */
-    function renderPages(pdfDoc) {
-        for (var num = 1; num <= pdfDoc.numPages; num++) {
-            // eslint-disable-next-line promise/catch-or-return
-            pdfDoc.getPage(num).then(renderPage);
-        }
+    const pdfJs = await window.modDatalynxPdfJsModulePromise;
+    pdfJs.GlobalWorkerOptions.workerSrc = `${Config.wwwroot}/mod/datalynx/pdfjs/pdf.worker.mjs`;
+
+    return pdfJs;
+};
+
+/**
+ * Renders a single page of a PDF document onto a canvas element.
+ *
+ * @param {*} page The PDF.js page object to render.
+ * @param {HTMLElement} canvasContainer The container element where the canvas is appended.
+ * @param {number} customScale The custom scale for rendering the PDF.
+ */
+const renderPage = (page, canvasContainer, customScale) => {
+    const viewport = page.getViewport({scale: 1});
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    const desiredWidth = 595;
+    const desiredHeight = 841;
+    const transform = customScale !== 1 ? [customScale, 0, 0, customScale, 0, 0] : null;
+    const renderContext = {
+        canvasContext: context,
+        transform,
+        viewport,
+    };
+
+    canvas.height = desiredHeight * customScale;
+    canvas.width = desiredWidth * customScale;
+    canvas.style.width = `${desiredWidth * customScale}px`;
+    canvas.style.height = `${desiredHeight * customScale}px`;
+
+    canvasContainer.appendChild(canvas);
+
+    return page.render(renderContext).promise;
+};
+
+/**
+ * Renders all pages of a PDF document into the target container.
+ *
+ * @param {*} pdfDocument The PDF.js document object.
+ * @param {HTMLElement} canvasContainer The container element where the canvases are appended.
+ * @param {number} customScale The custom scale for rendering the PDF.
+ * @returns {Promise<void>}
+ */
+const renderPdfDocument = async(pdfDocument, canvasContainer, customScale) => {
+    for (let pageNumber = 1; pageNumber <= pdfDocument.numPages; pageNumber++) {
+        const page = await pdfDocument.getPage(pageNumber);
+        await renderPage(page, canvasContainer, customScale);
     }
+};
 
-    // eslint-disable-next-line no-undef
-    pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
-
-    // eslint-disable-next-line no-console, no-undef
-    console.log(pdfjsLib.version, pdfjsWorker);
-
-    // eslint-disable-next-line promise/catch-or-return, no-undef
-    pdfjsLib.getDocument(url).promise.then(renderPages);
-}
+/**
+ * Renders a PDF document into the target container.
+ *
+ * @param {string} url The URL of the PDF document to render.
+ * @param {HTMLElement} canvasContainer The container element where the canvases are appended.
+ * @param {number} customScale The custom scale for rendering the PDF.
+ * @returns {Promise<void>}
+ */
+const renderPdf = async(url, canvasContainer, customScale) => {
+    const pdfJs = await getPdfJsModule();
+    const pdfDocument = await pdfJs.getDocument(url).promise;
+    await renderPdfDocument(pdfDocument, canvasContainer, customScale);
+};
 
 /**
  * Renders a PDF document onto a specified container.
- * @param {string} pdfUrl - The URL of the PDF document to render.
- * @param {string} canvasContainerId - The ID of the container element where the canvas will be appended.
- * @param {number} customScale - The custom scale for rendering the PDF.
+ *
+ * @param {string} pdfUrl The URL of the PDF document to render.
+ * @param {string} canvasContainerId The ID of the container element where the canvas will be appended.
+ * @param {number} customScale The custom scale for rendering the PDF.
+ * @returns {Promise<void>}
  */
-export function renderPDF(pdfUrl, canvasContainerId, customScale) {
-    /* eslint-disable no-console */
-    console.log(pdfUrl, canvasContainerId, customScale);
-
+export const renderPDF = async(pdfUrl, canvasContainerId, customScale = 1) => {
     const container = document.querySelector(`#${canvasContainerId}`);
+    if (!container) {
+        return;
+    }
 
-    // eslint-disable-next-line no-undef
-    console.log(pdfjsLib);
-    console.log(pdfUrl);
-    console.log(container);
-    /* eslint-enable no-console */
-    renderPDFfunction(pdfUrl, container, customScale);
-}
+    container.innerHTML = '';
+
+    try {
+        await renderPdf(pdfUrl, container, customScale);
+    } catch (error) {
+        Notification.exception(error);
+    }
+};

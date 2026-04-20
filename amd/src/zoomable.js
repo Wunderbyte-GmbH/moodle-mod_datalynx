@@ -35,7 +35,7 @@ define([], () => {
 
         init() {
             if (!window.tools) {
-                window.tools = { version: '@VERSION' };
+                window.tools = {version: '@VERSION'};
             }
 
             window.tools.overlay = {
@@ -59,7 +59,7 @@ define([], () => {
                 },
             };
 
-            window.tools.overlay.addEffect('default', function (pos, onLoad) {
+            window.tools.overlay.addEffect('default', function(pos, onLoad) {
                 const conf = this.getConf();
                 const scrollTop = window.scrollY || document.documentElement.scrollTop;
                 const scrollLeft = window.scrollX || document.documentElement.scrollLeft;
@@ -74,7 +74,7 @@ define([], () => {
                 this.getOverlay().style.left = `${pos.left}px`;
                 this.getOverlay().style.display = 'block';
                 setTimeout(onLoad, conf.speed === 'fast' ? 200 : 400); // Mocking fade-in timing
-            }, function (onClose) {
+            }, function(onClose) {
                 const overlay = this.getOverlay();
                 overlay.style.display = 'none';
                 setTimeout(onClose, this.getConf().closeSpeed === 'fast' ? 200 : 400); // Mocking fade-out timing
@@ -84,7 +84,7 @@ define([], () => {
         Overlay(trigger, conf) {
             const self = this;
             const fireEvent = (type, detail) => {
-                trigger.dispatchEvent(new CustomEvent(type, { detail }));
+                trigger.dispatchEvent(new CustomEvent(type, {detail}));
             };
 
             let overlay = conf.target || document.querySelector(trigger.getAttribute("rel")) || trigger;
@@ -129,7 +129,7 @@ define([], () => {
                     let left = conf.left === 'center' ?
                         Math.max((windowWidth - overlayRect.width) / 2, 0) : parseInt(conf.left, 10);
 
-                    eff[0].call(self, { top, left }, () => {
+                    eff[0].call(self, {top, left}, () => {
                         if (opened) {
                             fireEvent('onLoad', e);
                         }
@@ -161,7 +161,7 @@ define([], () => {
 
                     fireEvent('onBeforeClose', e);
                     if (e.defaultPrevented) {
-                        return;
+                        return self;
                     }
 
                     opened = false;
@@ -204,8 +204,8 @@ define([], () => {
             const img = document.createElement('img');
             img.src = trigger.src;
 
-            img.onload = function () {
-                let { width, height } = img;
+            img.onload = function() {
+                let {width, height} = img;
                 const windowHeight = window.innerHeight - 60;
                 const windowWidth = window.innerWidth - 60;
 
@@ -237,7 +237,7 @@ define([], () => {
                 document.body.appendChild(overlayDiv);
 
                 trigger.setAttribute('rel', `#${divname}`);
-                new Zoomable().Overlay(trigger, { load: true, top: 'center' });
+                new Zoomable().Overlay(trigger, {load: true, top: 'center'});
             };
         }
     }

@@ -25,7 +25,7 @@ define(['core/ajax', 'core/toast', 'core/str'], function(Ajax, Toast, Str) {
     return {
         init(datalynxId, fieldId, userurl, userName, canUnsubscribe) {
             const viewContainer = document.querySelectorAll(`[data-id="${datalynxId}"]`);
-            Promise.all([
+            return Promise.all([
                 Str.get_string('subscribe', 'mod_datalynx'),
                 Str.get_string('unsubscribe', 'mod_datalynx')
             ]).then(strings => {
@@ -49,7 +49,10 @@ define(['core/ajax', 'core/toast', 'core/str'], function(Ajax, Toast, Str) {
                         });
                     }
                 });
-
+                return strings;
+            }).catch(error => {
+                Toast.add(error.message);
+                return null;
             });
         },
 

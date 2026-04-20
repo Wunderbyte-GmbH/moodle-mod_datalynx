@@ -13,8 +13,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-// eslint-disable-next-line no-unused-vars
-
 /*
  * @package    mod_datalynx
  * @author     David Bogner

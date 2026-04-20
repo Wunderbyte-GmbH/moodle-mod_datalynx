@@ -41,7 +41,7 @@ import ModalEvents from 'core/modal_events';
 import Templates from 'core/templates';
 
 /** Regex that matches a full [[field|behavior|renderer]] tag (behavior and renderer optional). */
-const FIELD_TAG_RE = /^\[\[([^\|\]]+)(?:\|([^\|\]]*))?(?:\|([^\|\]]*))?\]\]$/;
+const FIELD_TAG_RE = /^\[\[([^|\]]+)(?:\|([^|\]]*))?(?:\|([^|\]]*))?\]\]$/;
 const VIEW_URL_TAG_RE = /^##viewurl(?::([^#]+))?##$/;
 const VIEW_LINK_TAG_RE = /^##(viewlink|viewsesslink):([^;#]+);([^;]*);([^;]*);([^#]*)##$/;
 
@@ -274,7 +274,7 @@ class PatternDialogue {
 
                 return this.buildActionTagButtonHtml(match, action, editorId);
             })
-            .replace(/\[\[([^\|\]]+)(?:\|([^\|\]]*))?(?:\|([^\|\]]*))?\]\]/g,
+            .replace(/\[\[([^|\]]+)(?:\|([^|\]]*))?(?:\|([^|\]]*))?\]\]/g,
                 (match, field, behavior, renderer) => {
                     behavior = behavior || '';
                     renderer = renderer || '';
@@ -658,7 +658,7 @@ class PatternDialogue {
                         linktext: linkTextLabel,
                         urlquery: urlQueryLabel,
                         cssclass: classLabel,
-                        delete: deleteLabel,
+                        'delete': deleteLabel,
                     },
                     options: selectOptions,
                     showlinkoptions: !isViewUrl,
@@ -742,9 +742,9 @@ class PatternDialogue {
     insertTagFromDropdown(dropdown) {
         const selectedValue = dropdown.value;
         const actionTagMatch = selectedValue.match(/^##(.+?)##$/);
-        const fieldTagMatch  = selectedValue.match(FIELD_TAG_RE);
+        const fieldTagMatch = selectedValue.match(FIELD_TAG_RE);
         const viewTagMatch = selectedValue.match(VIEW_LINK_TAG_RE) || selectedValue.match(VIEW_URL_TAG_RE);
-        let contentToInsert  = '';
+        let contentToInsert = '';
 
         const m = dropdown.id.match(/^(.+_editor)_.+_tag_menu$/);
         if (m) {

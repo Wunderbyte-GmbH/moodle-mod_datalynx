@@ -23,13 +23,16 @@
 
 export default {
     init() {
-        window.select_allnone = (group, checked) => {
+        // These global names are kept for backward compatibility with existing inline handlers.
+        // eslint-disable-next-line dot-notation
+        window['select_allnone'] = (group, checked) => {
             document.querySelectorAll(`input[type="checkbox"][name="${group}selector"]`).forEach(cb => {
                 cb.checked = checked;
             });
         };
 
-        window.bulk_action = (group, url, action) => {
+        // eslint-disable-next-line dot-notation
+        window['bulk_action'] = (group, url, action) => {
             const checkboxes = document.querySelectorAll(
                 `input[type="checkbox"][name="${group}selector"]:checked`
             );

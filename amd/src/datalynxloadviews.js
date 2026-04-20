@@ -86,6 +86,7 @@ export default {
                         }
 
                         populateSelect(textfieldElement, textfieldOptions);
+                        return textfieldOptions;
                     })
                     .catch(Notification.exception);
             });

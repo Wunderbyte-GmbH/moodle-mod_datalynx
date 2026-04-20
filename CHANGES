@@ -1,0 +1,9 @@
+mod_datalynx changes
+====================
+
+2026-04-20
+----------
+
+- Updated the bundled PDF.js third-party library to 5.6.205.
+- Added `thirdpartylibs.xml` and `pdfjs/readme_moodle.txt` to document the
+  vendored PDF.js library and its upgrade process.

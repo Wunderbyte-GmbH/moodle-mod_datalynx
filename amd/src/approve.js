@@ -79,7 +79,7 @@ const registerEventListeners = (approveString, unapproveString) => {
                 if (!data || typeof data.approved === 'undefined') {
                     // Unexpected response format, reload to be safe
                     window.location.href = fallbackUrl;
-                    return;
+                    return null;
                 }
 
                 const icon = element.querySelector('i');
@@ -103,6 +103,8 @@ const registerEventListeners = (approveString, unapproveString) => {
                         icon.classList.add('fa-circle-xmark', 'text-danger');
                     }
                 }
+
+                return data;
             })
             .catch(() => {
                 // AJAX failed — fall back to full page reload via original href.
@@ -115,7 +117,7 @@ const registerEventListeners = (approveString, unapproveString) => {
 /**
  * Initialize the module.
  */
-export const init = async () => {
+export const init = async() => {
     const [approveString, unapproveString] = await Promise.all([
         getString('approve', 'core'),
         getString('unapprove', 'mod_datalynx')

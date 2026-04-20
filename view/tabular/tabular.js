@@ -22,9 +22,11 @@
  * @license http:// Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
 
-M.datalynxview_tabular = {};
+// eslint-disable-next-line dot-notation
+M['datalynxview_tabular'] = {};
 
-M.datalynxview_tabular.init = function (Y) {
+// eslint-disable-next-line dot-notation
+M['datalynxview_tabular'].init = function(Y) {
     var firstentryfield = Y.one('div.felement [name^="field_"]');
     if (!firstentryfield) {
         Y.all('input[type="checkbox"][name$="bulkedit"]').hide();
@@ -32,12 +34,16 @@ M.datalynxview_tabular.init = function (Y) {
     }
     var firstentryid = firstentryfield.get('name').split('_')[2].replace(/\[.+\]/, '');
 
-    Y.all('input[type="checkbox"][name$="bulkedit"]').on('change', function (e) {
+    Y.all('input[type="checkbox"][name$="bulkedit"]').on('change', function(e) {
         var checkbox = e.target;
         var fieldid = checkbox.get('name').split('_')[1];
 
-        Y.all('[name^="field_' + fieldid + '"]:not([name^="field_' + fieldid + '_' + firstentryid + '"])' + ':not([name^="field_' + fieldid + '_bulkedit"])').each(function () {
-                this.set('disabled', (checkbox.get('checked') ? 'disabled' : null ));
+        var selector = '[name^="field_' + fieldid + '"]' +
+            ':not([name^="field_' + fieldid + '_' + firstentryid + '"])' +
+            ':not([name^="field_' + fieldid + '_bulkedit"])';
+
+        Y.all(selector).each(function() {
+            this.set('disabled', (checkbox.get('checked') ? 'disabled' : null));
         });
     });
-}
+};
