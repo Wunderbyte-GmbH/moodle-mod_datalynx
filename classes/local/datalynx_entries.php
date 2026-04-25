@@ -881,15 +881,17 @@ class datalynx_entries {
                                                 $i = $getlinenumber[5];
 
                                                 $fieldcontentpattern = "{$fieldname}_{$fieldgroup}_{$i}";
-                                                if (0 === strpos($key, $fieldcontentpattern)) {
-                                                    // If we found sth. relevant, split it up and rebuild key.
-                                                    // Either it has content_name after the iterator or not.
-                                                    $contentname = explode("{$fieldcontentpattern}_", $key);
-                                                    if (isset($contentname[1])) {
-                                                        $tempcontent[$contentname[1]] = $value; // No need for fieldname.
-                                                    } else {
-                                                        $tempcontent[$fieldname] = $value;
-                                                    }
+                                                if (0 !== strpos($key, $fieldcontentpattern)) {
+                                                    continue;
+                                                }
+
+                                                // If we found sth. relevant, split it up and rebuild key.
+                                                // Either it has content_name after the iterator or not.
+                                                $contentname = explode("{$fieldcontentpattern}_", $key);
+                                                if (isset($contentname[1])) {
+                                                    $tempcontent[$contentname[1]] = $value; // No need for fieldname.
+                                                } else {
+                                                    $tempcontent[$fieldname] = $value;
                                                 }
 
                                                 // We know this is a fieldgroup but there is only one line set.

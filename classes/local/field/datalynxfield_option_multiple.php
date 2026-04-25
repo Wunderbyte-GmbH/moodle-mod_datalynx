@@ -97,7 +97,10 @@ class datalynxfield_option_multiple extends datalynxfield_option {
             $oldcontents[] = $entry->{"c{$fieldid}_content"};
         }
 
-        $newvalues = reset($values);
+        $newvalues = is_array($values) ? reset($values) : [];
+        if (!is_array($newvalues)) {
+            $newvalues = [];
+        }
         foreach ($newvalues as $key => $value) {
             if (empty($value)) {
                 unset($newvalues[$key]);
