@@ -277,6 +277,58 @@ class behat_mod_datalynx extends behat_base {
     }
 
     /**
+     * Checks a checkbox option inside a visible fieldgroup row.
+     *
+     * @When /^I check the "(?P<option_string>(?:[^"]|\\")*)" option for the "(?P<fieldname_string>(?:[^"]|\\")*)" fieldgroup field in row "(?P<row_number>\d+)"$/
+     *
+     * @param string $option
+     * @param string $fieldname
+     * @param int $row
+     * @throws coding_exception
+     * @throws Exception
+     */
+    public function i_check_the_option_for_the_fieldgroup_field_in_row($option, $fieldname, $row) {
+        if (!$this->running_javascript()) {
+            throw new coding_exception('This step requires JavaScript.');
+        }
+
+        $row = (int) $row;
+        $optionjson = json_encode($option);
+        $fieldnamejson = json_encode($fieldname);
+        $result = $this->getSession()->evaluateScript(
+            "(function(fieldname, option, row) {" .
+            "  var fieldgroup = document.querySelector('.datalynx-field-wrapper[data-field-type=\"fieldgroup\"]');" .
+            "  if (!fieldgroup) { return 'fieldgroup-not-found'; }" .
+            "  var line = Array.from(fieldgroup.querySelectorAll('.lines')).find(function(element) {" .
+            "    return parseInt(element.dataset.line, 10) === row && window.getComputedStyle(element).display !== 'none';" .
+            "  });" .
+            "  if (!line) { return 'visible-row-not-found:' + row; }" .
+            "  var field = Array.from(line.querySelectorAll('[data-field-name]')).find(function(element) {" .
+            "    return element.dataset.fieldName === fieldname;" .
+            "  });" .
+            "  if (!field) { return 'field-not-found:' + fieldname; }" .
+            "  var labels = Array.from(field.querySelectorAll('label'));" .
+            "  var label = labels.find(function(element) {" .
+            "    return element.textContent.trim() === option;" .
+            "  });" .
+            "  if (!label) {" .
+            "    return 'option-not-found:' + option + ' labels:' + labels.map(function(element) {" .
+            "      return element.textContent.trim();" .
+            "    }).join('|');" .
+            "  }" .
+            "  var input = label.querySelector('input[type=\"checkbox\"]');" .
+            "  if (!input) { return 'checkbox-not-found:' + option; }" .
+            "  if (!input.checked) { input.click(); }" .
+            "  return 'ok';" .
+            "})($fieldnamejson, $optionjson, $row);"
+        );
+
+        if ($result !== 'ok') {
+            throw new Exception("Unable to check fieldgroup checkbox option: {$result}");
+        }
+    }
+
+    /**
      * Inserts text into a TinyMCE editor by ID without replacing existing content.
      * Unlike set_value (which calls setContent and wipes existing content), this uses
      * insertContent so previously inserted field-tag buttons are preserved.

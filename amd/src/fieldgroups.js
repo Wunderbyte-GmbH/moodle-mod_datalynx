@@ -38,13 +38,14 @@ export default {
             button.addEventListener('click', (e) => {
                 e.preventDefault(); // Prevent default button behavior
                 const wrapper = button.closest(".datalynx-field-wrapper");
-                const firstHiddenLine = wrapper.querySelector("[data-line]:not([style*='display: none'])");
+                const firstHiddenLine = Array.from(wrapper.querySelectorAll("[data-line]"))
+                    .find(line => line.style.display === 'none');
                 if (firstHiddenLine) {
                     firstHiddenLine.style.display = ''; // Show the first hidden line
                 }
 
                 // Increment lastvisible if less than maxlines
-                const lastVisibleInput = document.querySelector(`input[name='${fieldgroup}_lastvisible']`);
+                const lastVisibleInput = wrapper.querySelector(`input[name='${fieldgroup}_lastvisible']`);
                 if (parseInt(lastVisibleInput.value, 10) < maxlines) {
                     lastVisibleInput.value = parseInt(lastVisibleInput.value, 10) + 1;
                 }
@@ -106,7 +107,7 @@ export default {
         });
 
         // Update last visible line
-        const lastVisibleInput = document.querySelector(`input[name='${fieldgroup}_lastvisible']`);
+        const lastVisibleInput = parentContainer.querySelector(`input[name='${fieldgroup}_lastvisible']`);
         lastVisibleInput.value = parseInt(lastVisibleInput.value, 10) - 1;
 
         // Hide the line if not required
