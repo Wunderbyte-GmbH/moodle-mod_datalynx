@@ -20,9 +20,9 @@ Feature: Basic fieldgroup entry flow with repeated checkbox rows
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I add to the "Datalynx Test Instance" datalynx the following fields:
-      | type     | name              | description | param1 | param2   | param3 |
-      | checkbox | Checkbox letters  |             | A,B,C  | New line | No     |
-      | checkbox | Checkbox numbers  |             | 1,2,3  | New line | No     |
+      | type     | name              | description | param1 | param2 | param3   |
+      | checkbox | Checkbox letters  |             | A,B,C  |        | New line |
+      | checkbox | Checkbox numbers  |             | 1,2,3  |        | New line |
     And I add to "Datalynx Test Instance" datalynx the view of "Grid" type with:
       | name        | Gridview |
       | description | Testgrid |
@@ -62,6 +62,12 @@ Feature: Basic fieldgroup entry flow with repeated checkbox rows
     And I should see "A"
     And I should see "B"
     And I should see "2"
+    And I click on "(//a/i[@title='Edit'])[1]" "xpath_element"
+    And I check the "C" option for the "Datalynx field Checkbox letters" fieldgroup field in row "2"
+    And I press "Save changes"
+    Then I should see "updated"
+    And I press "Continue"
+    And I should see "C"
 
     When I follow "Add a new entry"
     And I check the "C" option for the "Datalynx field Checkbox letters" fieldgroup field in row "1"
@@ -72,21 +78,39 @@ Feature: Basic fieldgroup entry flow with repeated checkbox rows
     And I press "Add Fieldgroup"
     And I check the "B" option for the "Datalynx field Checkbox letters" fieldgroup field in row "3"
     And I check the "3" option for the "Datalynx field Checkbox numbers" fieldgroup field in row "3"
+    And I should not see "Add Fieldgroup"
+    And I delete the fieldgroup row "3"
+    And I should see "Add Fieldgroup"
+    And I press "Add Fieldgroup"
+    And I check the "B" option for the "Datalynx field Checkbox letters" fieldgroup field in row "3"
+    And I check the "3" option for the "Datalynx field Checkbox numbers" fieldgroup field in row "3"
+    And I should not see "Add Fieldgroup"
     And I press "Save changes"
     Then I should see "updated"
     And I press "Continue"
     And I should see "3"
 
-    When I follow "Fieldgroups"
+    When I follow the datalynx "Manage" link
+    And I follow "Fields"
+    And I follow "Fieldgroups"
     And I follow "Fieldgroup"
     And I set the field "param4" to "2"
     And I press "Save changes"
     And I follow "Browse"
-    And I click on "(//a/i[@title='Edit'])[1]" "xpath_element"
-    And I check the "C" option for the "Datalynx field Checkbox letters" fieldgroup field in row "2"
-    And I check the "3" option for the "Datalynx field Checkbox numbers" fieldgroup field in row "2"
+    And I click on "(//a/i[@title='Edit'])[2]" "xpath_element"
+    And I delete the fieldgroup row "1"
+    And the "A" option should be checked for the "Datalynx field Checkbox letters" fieldgroup field in row "1"
+    And the "2" option should be checked for the "Datalynx field Checkbox numbers" fieldgroup field in row "1"
+    And the "B" option should be checked for the "Datalynx field Checkbox letters" fieldgroup field in row "2"
+    And the "3" option should be checked for the "Datalynx field Checkbox numbers" fieldgroup field in row "2"
+    And fieldgroup row "3" should be hidden
+    And I should see "Add Fieldgroup"
     And I press "Save changes"
     Then I should see "updated"
     And I press "Continue"
-    And I should see "C"
-    And I should see "3"
+    And I click on "(//a/i[@title='Edit'])[2]" "xpath_element"
+    And the "A" option should be checked for the "Datalynx field Checkbox letters" fieldgroup field in row "1"
+    And the "2" option should be checked for the "Datalynx field Checkbox numbers" fieldgroup field in row "1"
+    And the "B" option should be checked for the "Datalynx field Checkbox letters" fieldgroup field in row "2"
+    And the "3" option should be checked for the "Datalynx field Checkbox numbers" fieldgroup field in row "2"
+    And fieldgroup row "3" should be hidden

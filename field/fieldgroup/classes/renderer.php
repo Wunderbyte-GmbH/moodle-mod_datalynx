@@ -24,6 +24,7 @@
  */
 namespace datalynxfield_fieldgroup;
 
+use html_writer;
 use mod_datalynx\local\field\datalynxfield_renderer;
 use MoodleQuickForm;
 use stdClass;
@@ -130,9 +131,15 @@ class renderer extends datalynxfield_renderer {
         $maxlines = isset($this->field->field->param2) ? $this->field->field->param2 : 3;
         $requiredlines = isset($this->field->field->param4) ? $this->field->field->param4 : 0;
 
-        // Add a fieldgroup marker to the entry data.
-        $mform->addElement('hidden', $fieldname, $this->field->field->id);
-        $mform->setType($fieldname, PARAM_NOTAGS);
+        $mform->addElement(
+            'html',
+            html_writer::empty_tag('input', [
+                'type' => 'hidden',
+                'name' => $fieldname,
+                'value' => $this->field->field->id,
+                'class' => 'fieldgroup-marker',
+            ])
+        );
 
         // Set every field in this line required.
         $options['required'] = true;
@@ -194,24 +201,55 @@ class renderer extends datalynxfield_renderer {
         }
 
         // In case there are extra lines, change default lines to show.
-        if ($lastlinewithcontent > $defaultlines) {
+        if ($lastlinewithcontent + 1 > $defaultlines) {
             $defaultlines = $lastlinewithcontent + 1;
         }
 
         // Add line visible anchor, starts at 0.
-        $mform->addElement('hidden', $fieldname . '_lastvisible', $defaultlines);
-        $mform->setType($fieldname . '_lastvisible', PARAM_INT);
+        $mform->addElement(
+            'html',
+            html_writer::empty_tag('input', [
+                'type' => 'hidden',
+                'name' => $fieldname . '_lastvisible',
+                'value' => $defaultlines,
+                'class' => 'fieldgroup-lastvisible',
+            ])
+        );
 
         // Hide unused lines.
         global $PAGE;
         $PAGE->requires->js_call_amd(
             'mod_datalynx/fieldgroups',
             'init',
-            [$this->field->field->name, $defaultlines, $maxlines, $requiredlines, $fieldname]
+            [$this->field->field->name, $defaultlines, $maxlines, $requiredlines]
         );
 
         // Show a button to add one more line.
-        $mform->addElement('button', 'addline', get_string('addline', 'datalynx', $this->field->field->name));
+        $mform->addElement(
+            'html',
+            html_writer::tag(
+                'div',
+                html_writer::tag(
+                    'div',
+                    html_writer::tag(
+                        'button',
+                        get_string('addline', 'datalynx', $this->field->field->name),
+                        [
+                            'class' => 'btn btn-secondary ms-0 fieldgroup-addline',
+                            'name' => 'addline',
+                            'id' => 'id_addline',
+                            'type' => 'button',
+                            'data-fieldgroup' => $fieldname,
+                        ]
+                    ),
+                    [
+                        'class' => 'col-md-9 d-flex flex-wrap align-items-start felement',
+                        'data-fieldtype' => 'button',
+                    ]
+                ),
+                ['class' => 'mb-3 row fitem femptylabel fieldgroup-addline-wrapper']
+            )
+        );
     }
     // phpcs:enable moodle.PHP.ForbiddenGlobalUse.BadGlobal
 
