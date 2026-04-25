@@ -280,7 +280,7 @@ final class viewlink_pattern_test extends advanced_testcase {
         $this->assertStringContainsString('view=' . $targetobj->id(), $replacements[$tag]);
         $this->assertStringContainsString('new=1', $replacements[$tag]);
         $this->assertStringContainsString('sesskey=', $replacements[$tag]);
-        $this->assertStringContainsString('sourceview=', $replacements[$tag]);
+        $this->assertStringNotContainsString('sourceview=', $replacements[$tag]);
         $this->assertStringContainsString('class="btn btn-secondary"', $replacements[$tag]);
         $this->assertStringContainsString('>Add entry<', $replacements[$tag]);
     }
@@ -306,7 +306,7 @@ final class viewlink_pattern_test extends advanced_testcase {
         $this->assertStringContainsString('view=' . $targetobj->id(), $replacements[$tag]);
         $this->assertStringContainsString('editentries=42', $replacements[$tag]);
         $this->assertStringContainsString('sesskey=', $replacements[$tag]);
-        $this->assertStringContainsString('sourceview=', $replacements[$tag]);
+        $this->assertStringNotContainsString('sourceview=', $replacements[$tag]);
         $this->assertStringContainsString('class="btn btn-secondary"', $replacements[$tag]);
         $this->assertStringContainsString('>Edit entry<', $replacements[$tag]);
     }

@@ -683,7 +683,6 @@ class datalynx_entries {
                         $PAGE->url,
                         [$action => implode(',', array_keys($entries)),
                                         'sesskey' => sesskey(), 'confirmed' => true,
-                                        'sourceview' => optional_param('sourceview', null, PARAM_INT),
                                 ]
                     ),
                     new moodle_url($PAGE->url)

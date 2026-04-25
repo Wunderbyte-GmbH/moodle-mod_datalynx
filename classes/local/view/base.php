@@ -1456,7 +1456,6 @@ abstract class base {
                 'page' => $this->filter->page,
                 'eids' => $this->filter->eids,
                 'update' => implode(',', $this->editentries),
-                'sourceview' => optional_param('sourceview', null, PARAM_INT),
             ];
             $actionurl = new moodle_url("/mod/datalynx/{$this->dl->pagefile_for_urls()}.php", $actionparams);
             $customdata = ['view' => $this, 'update' => implode(',', $this->editentries)];
@@ -1928,8 +1927,7 @@ abstract class base {
         }
 
         if ($illegalaction) {
-            $sourceview = optional_param('sourceview', $this->id(), PARAM_INT);
-            $url = new moodle_url('view.php', ['d' => $this->dl->id(), 'view' => $sourceview]);
+            $url = new moodle_url('view.php', ['d' => $this->dl->id(), 'view' => $this->id()]);
             redirect($url);
         }
 

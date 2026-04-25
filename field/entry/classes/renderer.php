@@ -140,8 +140,7 @@ class renderer extends datalynxfield_renderer {
         global $OUTPUT;
 
         $field = $this->field;
-        $params = ['editentries' => $entry->id, 'sesskey' => sesskey(),
-                'sourceview' => $this->field->df()->get_current_view()->id()];
+        $params = ['editentries' => $entry->id, 'sesskey' => sesskey()];
         $url = new moodle_url($entry->baseurl, $params);
         if ($field->df()->data->singleedit) {
             $url->param('view', $field->df()->data->singleedit);
@@ -171,8 +170,7 @@ class renderer extends datalynxfield_renderer {
         global $OUTPUT;
 
         $field = $this->field;
-        $params = ['duplicate' => $entry->id, 'sesskey' => sesskey(),
-                'sourceview' => $this->field->df()->get_current_view()->id()];
+        $params = ['duplicate' => $entry->id, 'sesskey' => sesskey()];
         $url = new moodle_url($entry->baseurl, $params);
         if ($field->df()->data->singleedit) {
             $url->param('view', $field->df()->data->singleedit);
@@ -191,8 +189,7 @@ class renderer extends datalynxfield_renderer {
         global $OUTPUT;
 
         $field = $this->field;
-        $params = ['delete' => $entry->id, 'sesskey' => sesskey(),
-                'sourceview' => $this->field->df()->get_current_view()->id()];
+        $params = ['delete' => $entry->id, 'sesskey' => sesskey()];
         $url = new moodle_url($entry->baseurl, $params);
         $str = get_string('delete');
 

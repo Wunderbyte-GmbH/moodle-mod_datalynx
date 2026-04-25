@@ -229,7 +229,6 @@ class datalynxview_patterns {
                     // If it is a link with session (viewsesslink).
                     if ($sesslink === 0) {
                         $linkparams['sesskey'] = sesskey();
-                        $linkparams['sourceview'] = $this->view->id();
                     }
                     $viewurl = new moodle_url($view->baseurl, $linkparams);
                     if ($sesslink === 0) {
@@ -438,7 +437,6 @@ class datalynxview_patterns {
         $df = $view->get_dl();
         $baseurl = new moodle_url($view->get_baseurl());
         $baseurl->param('sesskey', sesskey());
-        $baseurl->param('sourceview', $this->view->id());
         // When user is editing then do not render these tags.
         if ($view->user_is_editing()) {
             return $replacement;
