@@ -55,7 +55,7 @@ class field extends datalynxfield_no_content {
 
         $fieldobjects[self::_APPROVED] = (object) ['id' => self::_APPROVED,
                 'dataid' => $dataid, 'type' => 'approve', 'name' => get_string('approved', 'datalynx'),
-                'description' => '', 'visible' => 2, 'internalname' => 'approved'];
+                'description' => '', 'internalname' => 'approved'];
 
         return $fieldobjects;
     }

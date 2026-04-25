@@ -60,7 +60,7 @@ class field extends datalynxfield_no_content {
 
         $fieldobjects[self::_COMMENT] = (object) ['id' => self::_COMMENT, 'dataid' => $dataid,
                 'type' => 'comment', 'name' => get_string('comments', 'datalynx'), 'description' => '',
-                'visible' => 2, 'internalname' => 'comments'];
+                'internalname' => 'comments'];
 
         return $fieldobjects;
     }

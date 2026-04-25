@@ -89,7 +89,7 @@ class field extends datalynxfield_no_content_can_join {
                 $fieldobjects[$fieldid] = (object) ['id' => $fieldid,
                     'dataid' => $dataid, 'type' => 'entryteammemberprofilefield',
                     'name' => $fieldname . ' ' . get_string($profilefield), 'description' => '',
-                    'visible' => 2, 'internalname' => $fieldid];
+                    'internalname' => $fieldid];
             }
         }
 

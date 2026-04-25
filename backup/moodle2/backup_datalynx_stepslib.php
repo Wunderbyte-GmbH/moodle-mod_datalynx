@@ -62,7 +62,7 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
         $field = new backup_nested_element(
             'field',
             ['id'],
-            ['type', 'name', 'description', 'visible', 'edits', 'label', 'param1',
+            ['type', 'name', 'description', 'label', 'param1',
                         'param2', 'param3', 'param4', 'param5', 'param6', 'param7', 'param8', 'param9',
                         'param10', 'targetcourse', 'targetinstance', 'targetview', 'targetfilter',
             ]

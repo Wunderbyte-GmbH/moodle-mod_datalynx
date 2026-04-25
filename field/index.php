@@ -38,9 +38,6 @@ $urlparams->delete = optional_param('delete', 0, PARAM_SEQUENCE); // Ids (comma 
 // Fields to delete.
 $urlparams->duplicate = optional_param('duplicate', 0, PARAM_SEQUENCE); // Ids (comma delimited) of.
 // Fields to duplicate.
-$urlparams->visible = optional_param('visible', 0, PARAM_INT); // Id of field to hide/(show to.
-// Owner)/show to all.
-$urlparams->editable = optional_param('editable', 0, PARAM_INT); // Id of field to set editing.
 $urlparams->convert = optional_param('convert', 0, PARAM_INT); // Id of field to be converted.
 
 $urlparams->confirmed = optional_param('confirmed', 0, PARAM_INT);
@@ -67,20 +64,8 @@ if ($urlparams->duplicate && confirm_sesskey()) {
 } else {
     if ($urlparams->delete && confirm_sesskey()) {
         $df->process_fields('delete', $urlparams->delete, $urlparams->confirmed);
-        // Set field visibility.
-    } else {
-        if ($urlparams->visible && confirm_sesskey()) {
-            $df->process_fields('visible', $urlparams->visible, true); // Confirmed by default.
-            // Set field editability.
-        } else {
-            if ($urlparams->editable && confirm_sesskey()) {
-                $df->process_fields('editable', $urlparams->editable, true); // Confirmed by default.
-            } else {
-                if ($urlparams->convert && confirm_sesskey()) {
-                    $df->process_fields('convert', $urlparams->convert, true); // Confirmed by default.
-                }
-            }
-        }
+    } else if ($urlparams->convert && confirm_sesskey()) {
+        $df->process_fields('convert', $urlparams->convert, true); // Confirmed by default.
     }
 }
 
@@ -134,10 +119,6 @@ if ($fields) {
     $stredit = get_string('edit');
     $strduplicate = get_string('duplicate');
     $strdelete = get_string('delete');
-    $strhide = get_string('hide');
-    $strshow = get_string('show');
-    $strlock = get_string('lock', 'datalynx');
-    $strunlock = get_string('unlock', 'datalynx');
     $strconvert = get_string('convert', 'datalynx');
 
     // The default value of the type attr of a button is submit, so set it to button so that.
@@ -167,8 +148,7 @@ if ($fields) {
 
     // Table headers.
     $headers = ['name' => get_string('name'), 'type' => get_string('type', 'datalynx'),
-            'description' => get_string('description'), 'visible' => get_string('visible'),
-            'edits' => get_string('fieldeditable', 'datalynx'), 'edit' => $stredit,
+            'description' => get_string('description'), 'edit' => $stredit,
             'convert' => get_string('convert', 'datalynx'), 'duplicate' => $multiduplicate,
             'delete' => $multidelete, 'selectallnone' => $selectallnone,
     ];
@@ -189,8 +169,6 @@ if ($fields) {
 
     // Column styles.
     $table->set_attribute('class', 'generaltable generalbox boxaligncenter boxwidthwide');
-    $table->column_style('visible', 'text-align', 'center');
-    $table->column_style('edits', 'text-align', 'center');
     $table->column_style('edit', 'text-align', 'center');
     $table->column_style('duplicate', 'text-align', 'center');
     $table->column_style('delete', 'text-align', 'center');
@@ -224,28 +202,6 @@ if ($fields) {
         $fieldtype = $field->image() . '&nbsp;' . $field->typename();
         $fielddescription = shorten_text($field->field->description, 30);
 
-        // Visible.
-        if ($visible = $field->field->visible) {
-            $visibleicon = $OUTPUT->pix_icon('t/hide', $strhide);
-            $visibleicon = ($visible == 1 ? "($visibleicon)" : $visibleicon);
-        } else {
-            $visibleicon = $OUTPUT->pix_icon('t/show', $strshow);
-        }
-        $fieldvisible = html_writer::link(
-            new moodle_url($actionbaseurl, $linkparams + ['visible' => $fieldid]),
-            $visibleicon
-        );
-
-        // Editable.
-        if ($editable = $field->field->edits) {
-            $editableicon = $OUTPUT->pix_icon('t/lock', $strlock);
-        } else {
-            $editableicon = $OUTPUT->pix_icon('t/unlock', $strunlock);
-        }
-        $fieldeditable = html_writer::link(
-            new moodle_url($actionbaseurl, $linkparams + ['editable' => $fieldid]),
-            $editableicon
-        );
         // Convert textarea to editor field.
         if ($field->type == "textarea") {
             $converticon = $OUTPUT->pix_icon('t/right', get_string('converttoeditor', 'datalynx'));
@@ -258,8 +214,7 @@ if ($fields) {
         }
 
         $table->add_data(
-            [$fieldname, $fieldtype, $fielddescription, $fieldvisible, $fieldeditable,
-                        $fieldedit, $convert, $fieldduplicate, $fielddelete, $fieldselector,
+            [$fieldname, $fieldtype, $fielddescription, $fieldedit, $convert, $fieldduplicate, $fielddelete, $fieldselector,
             ]
         );
     }

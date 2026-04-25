@@ -61,11 +61,11 @@ class field extends datalynxfield_no_content {
 
         $fieldobjects[self::_TIMECREATED] = (object) ['id' => self::_TIMECREATED,
                 'dataid' => $dataid, 'type' => 'entrytime', 'name' => get_string('timecreated', 'datalynx'),
-                'description' => '', 'visible' => 2, 'internalname' => 'timecreated'];
+                'description' => '', 'internalname' => 'timecreated'];
 
         $fieldobjects[self::_TIMEMODIFIED] = (object) ['id' => self::_TIMEMODIFIED,
                 'dataid' => $dataid, 'type' => 'entrytime', 'name' => get_string('timemodified', 'datalynx'),
-                'description' => '', 'visible' => 2, 'internalname' => 'timemodified'];
+                'description' => '', 'internalname' => 'timemodified'];
 
         return $fieldobjects;
     }

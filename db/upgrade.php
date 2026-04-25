@@ -1209,6 +1209,21 @@ function xmldb_datalynx_upgrade($oldversion) {
 
         upgrade_mod_savepoint(true, 2026041700, 'datalynx');
     }
+    if ($oldversion < 2026042500) {
+        $table = new xmldb_table('datalynx_fields');
+
+        $field = new xmldb_field('visible');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        $field = new xmldb_field('edits');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2026042500, 'datalynx');
+    }
     return true;
 }
 

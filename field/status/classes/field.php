@@ -65,7 +65,7 @@ class field extends datalynxfield_no_content {
 
         $fieldobjects[self::_STATUS] = (object) ['id' => self::_STATUS, 'dataid' => $dataid,
                 'type' => 'status', 'name' => get_string('status', 'datalynx'), 'description' => '',
-                'visible' => 2, 'internalname' => 'status'];
+                'internalname' => 'status'];
 
         return $fieldobjects;
     }

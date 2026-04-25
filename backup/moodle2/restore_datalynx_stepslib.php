@@ -204,6 +204,8 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             );
         }
 
+        unset($data->visible, $data->edits);
+
         // Insert the datalynx_fields record.
         $newitemid = $DB->insert_record('datalynx_fields', $data);
         // Files by this item id.

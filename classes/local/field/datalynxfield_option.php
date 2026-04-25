@@ -98,8 +98,6 @@ abstract class datalynxfield_option extends datalynxfield_base {
         $this->field->dataid = $this->df->id();
         $this->field->name = !empty($forminput->name) ? trim($forminput->name) : '';
         $this->field->description = !empty($forminput->description) ? trim($forminput->description) : '';
-        $this->field->visible = isset($forminput->visible) ? $forminput->visible : 2;
-        $this->field->edits = isset($forminput->edits) ? $forminput->edits : -1;
         $this->field->label = !empty($forminput->label) ? $forminput->label : '';
 
         $oldvalues = $newvalues = $this->options;

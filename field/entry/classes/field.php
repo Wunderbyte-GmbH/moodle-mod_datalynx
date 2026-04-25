@@ -63,7 +63,7 @@ class field extends datalynxfield_no_content {
 
         $fieldobjects[self::_ENTRY] = (object) ['id' => self::_ENTRY, 'dataid' => $dataid,
                 'type' => 'entry', 'name' => get_string('entry', 'datalynx'), 'description' => '',
-                'visible' => 2, 'internalname' => ''];
+                'internalname' => ''];
 
         return $fieldobjects;
     }

@@ -60,7 +60,7 @@ class field extends datalynxfield_no_content {
 
         $fieldobjects[self::_GROUP] = (object) ['id' => self::_GROUP, 'dataid' => $dataid,
                 'type' => 'entrygroup', 'name' => get_string('group', 'datalynxfield_entrygroup'),
-                'description' => '', 'visible' => 2, 'internalname' => 'groupid'];
+                'description' => '', 'internalname' => 'groupid'];
 
         return $fieldobjects;
     }

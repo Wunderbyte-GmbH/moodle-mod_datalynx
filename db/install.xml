@@ -59,8 +59,6 @@
         <FIELD NAME="type" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="description" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="visible" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="2" SEQUENCE="false"/>
-        <FIELD NAME="edits" TYPE="int" LENGTH="6" NOTNULL="true" DEFAULT="-1" SEQUENCE="false"/>
         <FIELD NAME="label" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="param1" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="param2" TYPE="text" NOTNULL="false" SEQUENCE="false"/>

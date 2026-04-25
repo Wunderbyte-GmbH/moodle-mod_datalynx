@@ -30,15 +30,6 @@ use stdClass;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class datalynxfield_base {
-    /** @var int Field is not visible to anyone. */
-    const VISIBLE_NONE = 0;
-
-    /** @var int Field is visible to the owner only. */
-    const VISIBLE_OWNER = 1;
-
-    /** @var int Field is visible to all users. */
-    const VISIBLE_ALL = 2;
-
     /**
      * Subclasses must override the type with their name.
      *
@@ -130,8 +121,6 @@ abstract class datalynxfield_base {
         $this->field->dataid = $this->df->id();
         $this->field->name = !empty($forminput->name) ? trim($forminput->name) : '';
         $this->field->description = !empty($forminput->description) ? trim($forminput->description) : '';
-        $this->field->visible = isset($forminput->visible) ? $forminput->visible : 2;
-        $this->field->edits = isset($forminput->edits) ? $forminput->edits : -1;
         $this->field->label = !empty($forminput->label) ? $forminput->label : '';
         for ($i = 1; $i <= 10; $i++) {
             $this->field->{"param$i"} = !empty($forminput->{"param$i"}) ? trim(

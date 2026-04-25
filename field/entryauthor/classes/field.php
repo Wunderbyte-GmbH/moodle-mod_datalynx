@@ -102,58 +102,58 @@ class field extends datalynxfield_no_content {
 
         $fieldobjects[self::_USERID] = (object) ['id' => self::_USERID, 'dataid' => $dataid,
                 'type' => 'entryauthor', 'name' => get_string('userid', 'datalynxfield_entryauthor'),
-                'description' => '', 'visible' => 2, 'internalname' => 'id'];
+                'description' => '', 'internalname' => 'id'];
 
         $fieldobjects[self::_USERNAME] = (object) ['id' => self::_USERNAME,
                 'dataid' => $dataid, 'type' => 'entryauthor',
                 'name' => get_string('username', 'datalynxfield_entryauthor'), 'description' => '',
-                'visible' => 2, 'internalname' => 'name'];
+                'internalname' => 'name'];
 
         $fieldobjects[self::_USERFIRSTNAME] = (object) ['id' => self::_USERFIRSTNAME,
                 'dataid' => $dataid, 'type' => 'entryauthor',
                 'name' => get_string('userfirstname', 'datalynxfield_entryauthor'), 'description' => '',
-                'visible' => 2, 'internalname' => 'firstname'];
+                'internalname' => 'firstname'];
 
         $fieldobjects[self::_USERLASTNAME] = (object) ['id' => self::_USERLASTNAME,
                 'dataid' => $dataid, 'type' => 'entryauthor',
                 'name' => get_string('userlastname', 'datalynxfield_entryauthor'), 'description' => '',
-                'visible' => 2, 'internalname' => 'lastname'];
+                'internalname' => 'lastname'];
 
         $fieldobjects[self::_USERUSERNAME] = (object) ['id' => self::_USERUSERNAME,
                 'dataid' => $dataid, 'type' => 'entryauthor',
                 'name' => get_string('userusername', 'datalynxfield_entryauthor'), 'description' => '',
-                'visible' => 2, 'internalname' => 'username'];
+                'internalname' => 'username'];
 
         $fieldobjects[self::_USERIDNUMBER] = (object) ['id' => self::_USERIDNUMBER,
                 'dataid' => $dataid, 'type' => 'entryauthor',
                 'name' => get_string('useridnumber', 'datalynxfield_entryauthor'), 'description' => '',
-                'visible' => 2, 'internalname' => 'idnumber'];
+                'internalname' => 'idnumber'];
 
         $fieldobjects[self::_USERPICTURE] = (object) ['id' => self::_USERPICTURE,
                 'dataid' => $dataid, 'type' => 'entryauthor',
                 'name' => get_string('userpicture', 'datalynxfield_entryauthor'), 'description' => '',
-                'visible' => 2, 'internalname' => 'picture'];
+                'internalname' => 'picture'];
 
         $fieldobjects[self::_USEREMAIL] = (object) ['id' => self::_USEREMAIL,
                 'dataid' => $dataid, 'type' => 'entryauthor',
                 'name' => get_string('useremail', 'datalynxfield_entryauthor'), 'description' => '',
-                        'visible' => 2, 'internalname' => 'email'];
+                        'internalname' => 'email'];
 
         $fieldobjects[self::_USERINSTITUTION] = (object) ['id' => self::_USERINSTITUTION,
                         'dataid' => $dataid, 'type' => 'entryauthor',
                         'name' => get_string('institution'), 'description' => '',
-                        'visible' => 2, 'internalname' => 'institution'];
+                        'internalname' => 'institution'];
 
         $fieldobjects[self::_USERDEPARTMENT] = (object) ['id' => self::_USERDEPARTMENT,
                 'dataid' => $dataid, 'type' => 'entryauthor',
                 'name' => get_string('department'), 'description' => '',
-                'visible' => 2, 'internalname' => 'department'];
+                'internalname' => 'department'];
 
         // MDL-0000 TODO: Multilang.
         $fieldobjects[self::_BADGES] = (object) ['id' => self::_BADGES,
                         'dataid' => $dataid, 'type' => 'entryauthor',
                         'name' => 'Badges', 'description' => '',
-                        'visible' => 2, 'internalname' => 'badges'];
+                        'internalname' => 'badges'];
 
         return $fieldobjects;
     }

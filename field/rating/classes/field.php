@@ -96,28 +96,28 @@ class field extends datalynxfield_no_content {
 
         $fieldobjects[self::_RATING] = (object) ['id' => self::_RATING, 'dataid' => $dataid,
                 'type' => 'rating', 'name' => get_string('ratings', 'datalynx'), 'description' => '',
-                'visible' => 2, 'internalname' => 'ratings'];
+                'internalname' => 'ratings'];
 
         $fieldobjects[self::_RATINGAVG] = (object) ['id' => self::_RATINGAVG,
                 'dataid' => $dataid, 'type' => 'rating', 'name' => get_string('ratingsavg', 'datalynx'),
-                'description' => '', 'visible' => 2, 'internalname' => 'avgratings'];
+                'description' => '', 'internalname' => 'avgratings'];
 
         $fieldobjects[self::_RATINGCOUNT] = (object) ['id' => self::_RATINGCOUNT,
                 'dataid' => $dataid, 'type' => 'rating',
-                'name' => get_string('ratingscount', 'datalynx'), 'description' => '', 'visible' => 2,
+                'name' => get_string('ratingscount', 'datalynx'), 'description' => '',
                 'internalname' => 'countratings'];
 
         $fieldobjects[self::_RATINGMAX] = (object) ['id' => self::_RATINGMAX,
                 'dataid' => $dataid, 'type' => 'rating', 'name' => get_string('ratingsmax', 'datalynx'),
-                'description' => '', 'visible' => 2, 'internalname' => 'maxratings'];
+                'description' => '', 'internalname' => 'maxratings'];
 
         $fieldobjects[self::_RATINGMIN] = (object) ['id' => self::_RATINGMIN,
                 'dataid' => $dataid, 'type' => 'rating', 'name' => get_string('ratingsmin', 'datalynx'),
-                'description' => '', 'visible' => 2, 'internalname' => 'minratings'];
+                'description' => '', 'internalname' => 'minratings'];
 
         $fieldobjects[self::_RATINGSUM] = (object) ['id' => self::_RATINGSUM,
                 'dataid' => $dataid, 'type' => 'rating', 'name' => get_string('ratingssum', 'datalynx'),
-                'description' => '', 'visible' => 2, 'internalname' => 'sumratings'];
+                'description' => '', 'internalname' => 'sumratings'];
 
         return $fieldobjects;
     }

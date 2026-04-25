@@ -1349,29 +1349,6 @@ class datalynx {
                         $strnotify = 'fieldsupdated';
                         break;
 
-                    case 'editable':
-                        foreach ($fields as $fid => $field) {
-                            // Lock = 0; unlock = -1;.
-                            $editable = $field->field->edits ? 0 : -1;
-                            $DB->set_field(
-                                'datalynx_fields',
-                                'edits',
-                                $editable,
-                                ['id' => $fid]
-                            );
-                            $processedfids[] = $fid;
-                            $other = ['dataid' => $this->id()];
-                            $event = event\field_updated::create(
-                                ['context' => $this->context, 'objectid' => $fid,
-                                            'other' => $other,
-                                    ]
-                            );
-                            $event->trigger();
-                        }
-
-                        $strnotify = '';
-                        break;
-
                     case 'duplicate':
                         foreach ($fields as $field) {
                             // Set new name.
