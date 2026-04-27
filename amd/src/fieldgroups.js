@@ -26,13 +26,102 @@ export default {
         return wrapper.querySelector('.fieldgroup-lastvisible');
     },
 
+    getRows(wrapper) {
+        return Array.from(wrapper.querySelectorAll('.lines[data-line]'));
+    },
+
+    getFieldgroupName(wrapper) {
+        return wrapper.querySelector('.fieldgroup-marker')?.getAttribute('name') || '';
+    },
+
     getVisibleLineCount(wrapper) {
-        return Array.from(wrapper.querySelectorAll('.lines[data-line]'))
+        return this.getRows(wrapper)
             .filter(line => window.getComputedStyle(line).display !== 'none').length;
+    },
+
+    lineHasContent(line) {
+        if (line.querySelector('.fp-file, .form-autocomplete-selection .tag')) {
+            return true;
+        }
+
+        const inputs = Array.from(line.querySelectorAll('input'));
+        if (inputs.some(input => {
+            if (input.type === 'hidden' || input.disabled) {
+                return false;
+            }
+
+            if (input.type === 'checkbox' || input.type === 'radio') {
+                return input.checked;
+            }
+
+            return input.value !== '';
+        })) {
+            return true;
+        }
+
+        if (Array.from(line.querySelectorAll('textarea')).some(textarea => textarea.value !== '')) {
+            return true;
+        }
+
+        return Array.from(line.querySelectorAll('select')).some(select =>
+            Array.from(select.options).some(option => option.selected && option.value !== '' && option.value !== '-999')
+        );
+    },
+
+    getInitialVisibleLineCount(wrapper, defaultlines, requiredlines) {
+        const lastPrefilledLine = this.getRows(wrapper).reduce((highestVisibleLine, line) => {
+            const currentLine = parseInt(line.dataset.line, 10);
+            if (this.lineHasContent(line) && currentLine > highestVisibleLine) {
+                return currentLine;
+            }
+
+            return highestVisibleLine;
+        }, 0);
+
+        return Math.max(parseInt(defaultlines, 10), parseInt(requiredlines, 10), lastPrefilledLine);
     },
 
     getAddButton(wrapper) {
         return wrapper.querySelector('.fieldgroup-addline');
+    },
+
+    replaceLineIndex(value, fieldgroupname, oldline, newline) {
+        if (!value || !fieldgroupname || oldline === newline) {
+            return value;
+        }
+
+        const oldtoken = `${fieldgroupname}_${oldline - 1}`;
+        const newtoken = `${fieldgroupname}_${newline - 1}`;
+
+        return value.split(oldtoken).join(newtoken);
+    },
+
+    renumberLine(line, fieldgroupname, newline) {
+        const oldline = parseInt(line.dataset.line, 10);
+        if (oldline === newline) {
+            return;
+        }
+
+        const attrs = ['name', 'id', 'for', 'aria-describedby', 'data-groupname'];
+        [line, ...line.querySelectorAll('*')].forEach(element => {
+            attrs.forEach(attr => {
+                if (!element.hasAttribute(attr)) {
+                    return;
+                }
+
+                element.setAttribute(
+                    attr,
+                    this.replaceLineIndex(element.getAttribute(attr), fieldgroupname, oldline, newline)
+                );
+            });
+        });
+
+        const removeButton = line.querySelector('[data-removeline]');
+        if (removeButton) {
+            removeButton.dataset.removeline = newline;
+        }
+
+        line.dataset.line = newline;
     },
 
     updateAddButtonState(wrapper, maxlines) {
@@ -104,7 +193,12 @@ export default {
     init(fieldgroupname, defaultlines, maxlines, requiredlines) {
         document.querySelectorAll(`div.datalynx-field-wrapper[data-field-type='fieldgroup'][data-field-name='${fieldgroupname}']`)
             .forEach(wrapper => {
-                const visiblelines = parseInt(defaultlines, 10);
+                const visiblelines = this.getInitialVisibleLineCount(wrapper, defaultlines, requiredlines);
+                const lastVisibleInput = this.getLastVisibleInput(wrapper);
+
+                if (lastVisibleInput) {
+                    lastVisibleInput.value = visiblelines;
+                }
 
                 // Hide lines after the visible range.
                 for (let line = visiblelines + 1; line <= maxlines; line++) {
@@ -118,19 +212,18 @@ export default {
                     return;
                 }
 
-            button.addEventListener('click', (e) => {
-                e.preventDefault(); // Prevent default button behavior
-                const firstHiddenLine = Array.from(wrapper.querySelectorAll("[data-line]"))
-                    .find(line => window.getComputedStyle(line).display === 'none');
-                if (firstHiddenLine) {
-                    firstHiddenLine.style.display = ''; // Show the first hidden line
-                }
+                button.addEventListener('click', (e) => {
+                    e.preventDefault(); // Prevent default button behavior
+                    const firstHiddenLine = this.getRows(wrapper)
+                        .find(line => window.getComputedStyle(line).display === 'none');
+                    if (firstHiddenLine) {
+                        firstHiddenLine.style.display = ''; // Show the first hidden line
+                    }
 
-                // Increment lastvisible if less than maxlines
-                const lastVisibleInput = this.getLastVisibleInput(wrapper);
-                if (lastVisibleInput && parseInt(lastVisibleInput.value, 10) < maxlines) {
-                    lastVisibleInput.value = parseInt(lastVisibleInput.value, 10) + 1;
-                }
+                    // Increment lastvisible if less than maxlines
+                    if (lastVisibleInput && parseInt(lastVisibleInput.value, 10) < maxlines) {
+                        lastVisibleInput.value = parseInt(lastVisibleInput.value, 10) + 1;
+                    }
 
                 this.updateAddButtonState(wrapper, maxlines);
             });
@@ -166,6 +259,7 @@ export default {
 
         // If there are extra visible rows, collapse the later rows upward.
         if (lineId >= 1) {
+            const fieldgroupname = this.getFieldgroupName(parentContainer);
             thisLine.style.display = 'none';
             if (lastVisibleInput) {
                 lastVisibleInput.value = currentVisibleLines - 1;
@@ -174,9 +268,9 @@ export default {
             parentContainer.querySelectorAll('.lines[data-line]').forEach(line => {
                 const currentLineId = parseInt(line.dataset.line, 10);
                 if (currentLineId > lineId && currentLineId <= currentVisibleLines) {
-                    line.dataset.line = currentLineId - 1;
+                    this.renumberLine(line, fieldgroupname, currentLineId - 1);
                 } else if (currentLineId === lineId) {
-                    line.dataset.line = currentVisibleLines;
+                    this.renumberLine(line, fieldgroupname, currentVisibleLines);
                 }
             });
 

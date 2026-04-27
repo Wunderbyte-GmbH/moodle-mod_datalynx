@@ -529,6 +529,16 @@ abstract class datalynxfield_base {
             if (strpos($key, 'fieldgroup_') === 0) {
                 $fieldgroups[$value] = $key;
             }
+
+            if (
+                preg_match(
+                    "/^field_{$fieldid}_{$entryid}_fieldgroup_(\\d+)_\\d+(?:_|$)/",
+                    $key,
+                    $matches
+                )
+            ) {
+                $fieldgroups[$matches[1]] = "fieldgroup_{$matches[1]}";
+            }
         }
 
         // Keeping this for backwards compatibility.
