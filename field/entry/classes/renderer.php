@@ -140,11 +140,10 @@ class renderer extends datalynxfield_renderer {
         global $OUTPUT;
 
         $field = $this->field;
-        $params = ['editentries' => $entry->id, 'sesskey' => sesskey()];
+        $params = ['editentries' => $entry->id, 'eids' => $entry->id, 'sesskey' => sesskey()];
         $url = new moodle_url($entry->baseurl, $params);
         if ($field->df()->data->singleedit) {
             $url->param('view', $field->df()->data->singleedit);
-            $url->param('eids', $entry->id);
         }
         $str = get_string('edit');
 
