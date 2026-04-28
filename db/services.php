@@ -43,6 +43,15 @@ $functions = [
                 'capabilities' => 'mod/datalynx:managetemplates',
                 'ajax'        => true,
         ],
+        'mod_datalynx_get_grid_view_data' => [
+                'classname'   => 'mod_datalynx\external\get_grid_view_data',
+                'methodname'  => 'execute',
+                'classpath'   => '',
+                'description' => 'Fetch structured browse data for a Grid view pilot.',
+                'type'        => 'read',
+                'capabilities' => 'mod/datalynx:viewentry',
+                'ajax'        => true,
+        ],
         'mod_datalynx_team_subscription' => [
                 'classname'   => 'mod_datalynx\external\team_subscription',
                 'methodname'  => 'execute',
