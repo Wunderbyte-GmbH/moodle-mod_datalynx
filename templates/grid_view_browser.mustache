@@ -1,0 +1,88 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_datalynx/grid_view_browser
+
+    Structured Grid browse rendering for the manager -> external -> Mustache pilot.
+
+    Example context (json):
+    {
+        "datalynxid": 1,
+        "viewid": 2,
+        "viewname": "Grid",
+        "viewtype": "grid",
+        "entriescount": 1,
+        "entriesfiltercount": 1,
+        "hasentries": true,
+        "groups": [
+            {
+                "name": "",
+                "hasname": false,
+                "entries": [
+                    {
+                        "id": 3,
+                        "fields": [
+                            {
+                                "name": "Title",
+                                "size": 3,
+                                "valuehtml": "<span>Hello</span>"
+                            }
+                        ],
+                        "edithtml": "<a href=\"#\">Edit</a>",
+                        "deletehtml": "<a href=\"#\">Delete</a>",
+                        "hasactions": true
+                    }
+                ]
+            }
+        ],
+        "emptycontent": "No entries"
+    }
+}}
+<div class="mod-datalynx-grid-view-browser"
+     data-datalynxid="{{datalynxid}}"
+     data-viewid="{{viewid}}"
+     data-viewtype="{{viewtype}}">
+    {{#hasentries}}
+        {{#groups}}
+            {{#hasname}}
+                <h3 class="main">{{name}}</h3>
+            {{/hasname}}
+            <div class="mod-datalynx-grid-view-browser__group">
+                {{#entries}}
+                    <div class="entry" data-entryid="{{id}}">
+                        <div class="row justify-content-start">
+                            {{#fields}}
+                                <div class="col-lg-{{size}}" data-field-name="{{name}}">
+                                    <small>{{name}}:</small> {{{valuehtml}}}
+                                </div>
+                            {{/fields}}
+                        </div>
+                        {{#hasactions}}
+                            <div class="row">
+                                <div class="col">{{{edithtml}}} {{{deletehtml}}}</div>
+                            </div>
+                        {{/hasactions}}
+                        <hr>
+                    </div>
+                {{/entries}}
+            </div>
+        {{/groups}}
+    {{/hasentries}}
+    {{^hasentries}}
+        <div class="alert alert-info">{{emptycontent}}</div>
+    {{/hasentries}}
+</div>

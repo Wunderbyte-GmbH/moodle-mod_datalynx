@@ -98,7 +98,7 @@ class view extends base {
             'div',
             $sectiondefault,
             ['class' => 'mdl-align']
-        ) . "<div>##entries##</div>";
+        ) . '<div class="mod-datalynx-grid-entries" data-region="grid-view-browser">##entries##</div>';
 
         // Set content fields in responsive grid.
         $mustache = [];
@@ -118,6 +118,62 @@ class view extends base {
         }
         $entrydefault = $OUTPUT->render_from_template('mod_datalynx/gridview', $mustache);
         $this->view->eparam2 = html_writer::tag('div', $entrydefault, ['class' => 'entry']);
+    }
+
+    /**
+     * Display the view.
+     *
+     * In browse mode, progressively enhance only the entries region with the
+     * new manager -> external -> Mustache pilot flow while preserving the
+     * legacy Grid shell, controls, and edit/new-entry handling.
+     *
+     * @param array $options
+     * @return string
+     */
+    public function display(array $options = []): string {
+        global $PAGE;
+
+        $tohtml = $options['tohtml'] ?? false;
+        $browsemode = !$this->returntoentriesform && !$this->user_is_editing() && !optional_param('new', 0, PARAM_INT) &&
+            !$this->entriesprocessedsuccessfully;
+        $output = parent::display(array_merge($options, ['tohtml' => true]));
+
+        if ($browsemode) {
+            $legacyentries = $this->entries->get_count() ? $this->display_entries($options) : $this->display_no_entries();
+            $browserregion = html_writer::tag(
+                'div',
+                $legacyentries,
+                ['class' => 'mod-datalynx-grid-entries', 'data-region' => 'grid-view-browser']
+            );
+            $position = strpos($output, $legacyentries);
+            if ($position !== false) {
+                $output = substr_replace($output, $browserregion, $position, strlen($legacyentries));
+            }
+        }
+
+        if ($tohtml) {
+            return $output;
+        }
+        echo $output;
+
+        if ($browsemode) {
+            $selector = '[data-id="' . $this->dl->id() . '"][data-viewid="' . $this->id() . '"] [data-region="grid-view-browser"]';
+            $args = [
+                'd' => (int) $this->dl->id(),
+                'view' => (int) $this->id(),
+                'page' => (int) ($this->filter->page ?? 0),
+            ];
+            if (!empty($this->filter->perpage)) {
+                $args['perpage'] = (int) $this->filter->perpage;
+            }
+            if (!empty($this->filter->eids)) {
+                $args['eids'] = is_array($this->filter->eids) ? implode(',', $this->filter->eids) : (string) $this->filter->eids;
+            }
+
+            $PAGE->requires->js_call_amd('mod_datalynx/gridviewpilot', 'init', [$selector, $args]);
+        }
+
+        return '';
     }
 
     /**
