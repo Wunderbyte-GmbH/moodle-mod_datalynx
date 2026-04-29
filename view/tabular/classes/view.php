@@ -280,7 +280,7 @@ class view extends base {
     private function annotate_bulkedit_controls(string $html): string {
         $html = preg_replace_callback(
             '/<(input|select|textarea)\b([^>]*\bname=(["\'])field_(\d+)_bulkedit\3[^>]*?)(\s*\/?)>/i',
-            static function(array $matches): string {
+            static function (array $matches): string {
                 [$fullmatch, $tagname, $attributes, , $fieldid, $selfclosing] = $matches;
 
                 if (strpos($attributes, 'data-datalynx-bulkedit-toggle') !== false) {
@@ -298,7 +298,7 @@ class view extends base {
 
         return preg_replace_callback(
             '/<(input|select|textarea)\b([^>]*\bname=(["\'])field_(\d+)_(\d+)(?:\[[^"\']*\])?\3[^>]*?)(\s*\/?)>/i',
-            static function(array $matches): string {
+            static function (array $matches): string {
                 [$fullmatch, $tagname, $attributes, , $fieldid, $entryid, $selfclosing] = $matches;
 
                 if (strpos($attributes, 'data-datalynx-bulkedit-input') !== false) {
