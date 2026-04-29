@@ -168,27 +168,9 @@ class view extends base {
     public function display(array $options = []): string {
         parent::display($options);
         global $PAGE;
-        $PAGE->requires->js_init_call(
-            'M.datalynxview_tabular.init',
-            [],
-            false,
-            $this->get_js_module()
-        );
         $PAGE->requires->js_call_amd('mod_datalynx/bulkactions', 'init');
+        $PAGE->requires->js_call_amd('mod_datalynx/tabularbulkedit', 'init');
         return '';
-    }
-
-    /**
-     * Get JS module
-     *
-     * @return array
-     */
-    private function get_js_module() {
-        $jsmodule = ['name' => 'datalynxview_tabular',
-                'fullpath' => '/mod/datalynx/view/tabular/tabular.js',
-                'requires' => ['node', 'event', 'node-event-delegate',
-                ]];
-        return $jsmodule;
     }
 
     /**
@@ -219,6 +201,7 @@ class view extends base {
             // in newer Moodle versions, so the template starts with <table>.
             $tablehtml = preg_replace('/^<div[^>]*\btable-responsive\b[^>]*>\s*/i', '', $tablehtml);
             $tablehtml = trim(preg_replace('/\s*<\/div>$/i', '', $tablehtml));
+            $tablehtml = $this->annotate_bulkedit_controls($tablehtml);
 
             // Clean any prefix and get the open table tag.
             $tablepattern = '/^<table[^>]*>/i';
@@ -284,6 +267,73 @@ class view extends base {
         }
 
         return $elements;
+    }
+
+    /**
+     * Add stable bulk-edit data attributes to rendered tabular controls.
+     *
+     * This lets the AMD module target inputs without parsing generated field names.
+     *
+     * @param string $html
+     * @return string
+     */
+    private function annotate_bulkedit_controls(string $html): string {
+        $html = preg_replace_callback(
+            '/<(input|select|textarea)\b([^>]*\bname=(["\'])field_(\d+)_bulkedit\3[^>]*?)(\s*\/?)>/i',
+            static function(array $matches): string {
+                [$fullmatch, $tagname, $attributes, , $fieldid, $selfclosing] = $matches;
+
+                if (strpos($attributes, 'data-datalynx-bulkedit-toggle') !== false) {
+                    return $fullmatch;
+                }
+
+                $attributes = self::append_css_class($attributes, 'datalynx-tabular-bulkedit-toggle');
+                $attributes .= ' data-datalynx-bulkedit-toggle="1"';
+                $attributes .= ' data-datalynx-bulkedit-field="' . $fieldid . '"';
+
+                return "<{$tagname}{$attributes}{$selfclosing}>";
+            },
+            $html
+        );
+
+        return preg_replace_callback(
+            '/<(input|select|textarea)\b([^>]*\bname=(["\'])field_(\d+)_(\d+)(?:\[[^"\']*\])?\3[^>]*?)(\s*\/?)>/i',
+            static function(array $matches): string {
+                [$fullmatch, $tagname, $attributes, , $fieldid, $entryid, $selfclosing] = $matches;
+
+                if (strpos($attributes, 'data-datalynx-bulkedit-input') !== false) {
+                    return $fullmatch;
+                }
+
+                $attributes = self::append_css_class($attributes, 'datalynx-tabular-bulkedit-input');
+                $attributes .= ' data-datalynx-bulkedit-input="1"';
+                $attributes .= ' data-datalynx-bulkedit-field="' . $fieldid . '"';
+                $attributes .= ' data-datalynx-entryid="' . $entryid . '"';
+
+                return "<{$tagname}{$attributes}{$selfclosing}>";
+            },
+            $html
+        );
+    }
+
+    /**
+     * Append a CSS class to an HTML attribute fragment.
+     *
+     * @param string $attributes
+     * @param string $classname
+     * @return string
+     */
+    private static function append_css_class(string $attributes, string $classname): string {
+        if (preg_match('/\bclass=(["\'])([^"\']*)\1/i', $attributes, $matches)) {
+            $currentclasses = preg_split('/\s+/', trim($matches[2]));
+            if (!in_array($classname, $currentclasses)) {
+                $currentclasses[] = $classname;
+            }
+            $replacement = 'class=' . $matches[1] . trim(implode(' ', array_filter($currentclasses))) . $matches[1];
+            return preg_replace('/\bclass=(["\'])([^"\']*)\1/i', $replacement, $attributes, 1);
+        }
+
+        return $attributes . ' class="' . $classname . '"';
     }
 
     /**
