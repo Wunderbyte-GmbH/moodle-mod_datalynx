@@ -14,9 +14,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Fetches and renders the Grid view pilot payload.
+ * Fetches structured browse payloads and renders Mustache templates into a target region.
  *
- * @module      mod_datalynx/gridviewpilot
+ * @module      mod_datalynx/viewbrowser
  * @copyright   2026 David Bogner
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -26,40 +26,37 @@ import Notification from 'core/notification';
 import Templates from 'core/templates';
 
 /**
- * Fetch the Grid view payload from the external function.
+ * Fetch the browse payload from the configured external function.
  *
- * @param {Object} args
+ * @param {Object} options
  * @returns {Promise<Object>}
  */
-const fetchPayload = (args) => Ajax.call([{
-    methodname: 'mod_datalynx_get_grid_view_data',
-    args,
+const fetchPayload = (options) => Ajax.call([{
+    methodname: options.methodname,
+    args: options.args || {},
 }])[0];
 
 export default {
     /**
-     * Fetch and render the pilot template into the supplied element.
-     *
-     * This is intentionally not wired into the legacy Grid view automatically yet;
-     * it provides the browser-side fetch/render seam for the first migration slice.
+     * Fetch and render one browse region into the supplied element.
      *
      * @param {string|HTMLElement} target
-     * @param {Object} args
+     * @param {Object} options
      * @returns {Promise<void>}
      */
-    init(target, args) {
+    init(target, options) {
         const element = typeof target === 'string' ? document.querySelector(target) : target;
         if (!element) {
             return Promise.resolve();
         }
 
-        return fetchPayload(args)
-            .then((payload) => Templates.renderForPromise('mod_datalynx/grid_view_browser', payload))
+        return fetchPayload(options)
+            .then((payload) => Templates.renderForPromise(options.template, payload))
             .then(({html, js}) => Templates.replaceNodeContents(element, html, js))
             .catch(Notification.exception);
     },
 
-    fetch(args) {
-        return fetchPayload(args);
+    fetch(options) {
+        return fetchPayload(options);
     }
 };

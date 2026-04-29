@@ -170,7 +170,11 @@ class view extends base {
                 $args['eids'] = is_array($this->filter->eids) ? implode(',', $this->filter->eids) : (string) $this->filter->eids;
             }
 
-            $PAGE->requires->js_call_amd('mod_datalynx/gridviewpilot', 'init', [$selector, $args]);
+            $PAGE->requires->js_call_amd('mod_datalynx/viewbrowser', 'init', [$selector, [
+                'methodname' => 'mod_datalynx_get_grid_view_data',
+                'template' => 'mod_datalynx/grid_view_browser',
+                'args' => $args,
+            ]]);
         }
 
         return '';

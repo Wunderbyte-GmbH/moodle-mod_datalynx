@@ -315,9 +315,55 @@ class view extends base {
                 echo html_writer::end_tag('div');
                 return '';
             }
-        } else {
-            return parent::display($options);
         }
+
+        global $PAGE;
+
+        $tohtml = $options['tohtml'] ?? false;
+        $browsemode = !$this->showimportform && !$this->user_is_editing() && !optional_param('new', 0, PARAM_INT);
+        $output = parent::display(array_merge($options, ['tohtml' => true]));
+
+        if ($browsemode) {
+            $legacyentries = $this->entries->get_count() ? $this->display_entries($options) : $this->display_no_entries();
+            $browserregion = html_writer::tag(
+                'div',
+                $legacyentries,
+                ['class' => 'mod-datalynx-csv-entries', 'data-region' => 'csv-view-browser']
+            );
+            $position = strpos($output, $legacyentries);
+            if ($position !== false) {
+                $output = substr_replace($output, $browserregion, $position, strlen($legacyentries));
+            }
+        }
+
+        if ($tohtml) {
+            return $output;
+        }
+
+        echo $output;
+
+        if ($browsemode) {
+            $selector = '[data-id="' . $this->dl->id() . '"][data-viewid="' . $this->id() . '"] [data-region="csv-view-browser"]';
+            $args = [
+                'd' => (int) $this->dl->id(),
+                'view' => (int) $this->id(),
+                'page' => (int) ($this->filter->page ?? 0),
+            ];
+            if (!empty($this->filter->perpage)) {
+                $args['perpage'] = (int) $this->filter->perpage;
+            }
+            if (!empty($this->filter->eids)) {
+                $args['eids'] = is_array($this->filter->eids) ? implode(',', $this->filter->eids) : (string) $this->filter->eids;
+            }
+
+            $PAGE->requires->js_call_amd('mod_datalynx/viewbrowser', 'init', [$selector, [
+                'methodname' => 'mod_datalynx_get_csv_view_data',
+                'template' => 'mod_datalynx/csv_view_browser',
+                'args' => $args,
+            ]]);
+        }
+
+        return '';
     }
 
     /**
@@ -666,7 +712,7 @@ class view extends base {
             'div',
             $sectiondefault,
             ['class' => 'mdl-align']
-        ) . "<div>##entries##</div>";
+        ) . '<div class="mod-datalynx-csv-entries" data-region="csv-view-browser">##entries##</div>';
 
         // Set content.
         $this->view->param2 = '';
@@ -718,6 +764,15 @@ class view extends base {
             }
         }
         return false;
+    }
+
+    /**
+     * Public wrapper for browse rendering code that needs to know whether the table has headers.
+     *
+     * @return bool
+     */
+    public function has_headers_for_browser(): bool {
+        return $this->has_headers();
     }
 
     // GETTERS.

@@ -63,8 +63,8 @@ class renderer extends datalynxfield_renderer {
                 // Existing entry to browse.
             } else {
                 // Ensure the link is rendered for the common [[approve]] tag.
-                $replacements['##approve##'] = ['html', $this->display_browse($entry)];
-                $replacements['##approve##@'] = ['html', $this->display_browse($entry)];
+                $replacements['##approve##'] = ['html', $this->display_browse($entry, $options)];
+                $replacements['##approve##@'] = ['html', $this->display_browse($entry, $options)];
             }
         }
 
@@ -147,7 +147,8 @@ class renderer extends datalynxfield_renderer {
         if (has_capability('mod/datalynx:approve', $field->df()->context)) {
             $PAGE->requires->js_call_amd('mod_datalynx/approve', 'init');
 
-            $currentviewid = $this->field->df()->get_current_view()->id();
+            $currentview = $this->field->df()->get_current_view();
+            $currentviewid = !empty($params['viewid']) ? (int) $params['viewid'] : ($currentview ? $currentview->id() : 0);
 
             return html_writer::link(
                 '#',

@@ -22,13 +22,13 @@ use templatable;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Renderable wrapper for the Grid browser pilot payload.
+ * Renderable wrapper for the CSV browser payload.
  *
  * @package    mod_datalynx
  * @copyright  2026 David Bogner
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class grid_view_browser implements renderable, templatable {
+class csv_view_browser implements renderable, templatable {
     /** @var array */
     protected array $payload;
 
