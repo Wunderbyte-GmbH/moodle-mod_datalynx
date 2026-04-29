@@ -1,0 +1,43 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+}}
+{{!
+    @template mod_datalynx/csv_view_browser
+}}
+<div class="mod-datalynx-csv-view-browser"
+     data-datalynxid="{{datalynxid}}"
+     data-viewid="{{viewid}}"
+     data-viewtype="{{viewtype}}">
+    {{#hasentries}}
+        {{#groups}}
+            {{#hasname}}
+                <h3 class="main">{{name}}</h3>
+            {{/hasname}}
+            <div class="entriesview">
+                <table class="table table-striped">
+                    {{#hasheaders}}
+                        <thead>
+                            <tr>
+                                {{#columns}}
+                                    <th class="{{cellclass}}">{{{headerhtml}}}</th>
+                                {{/columns}}
+                            </tr>
+                        </thead>
+                    {{/hasheaders}}
+                    <tbody>
+                        {{#rows}}
+                            <tr data-entryid="{{id}}">
+                                {{#cells}}
+                                    <td class="{{cellclass}}">{{{valuehtml}}}</td>
+                                {{/cells}}
+                            </tr>
+                        {{/rows}}
+                    </tbody>
+                </table>
+            </div>
+        {{/groups}}
+    {{/hasentries}}
+    {{^hasentries}}
+        <div class="alert alert-info">{{emptycontent}}</div>
+    {{/hasentries}}
+</div>

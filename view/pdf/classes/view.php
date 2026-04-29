@@ -497,22 +497,102 @@ class view extends base {
         if (!empty($options['export'])) {
             return parent::display($options);
         }
-        // For display we need to clean up the bookmark patterns.
-        if (!empty($options['tohtml'])) {
-            $displaycontent = parent::display($options);
-            // Remove the bookmark patterns.
-            $displaycontent = preg_replace("%#@PDF-G?BM:\d+:[^@#]*@?#%", '', $displaycontent);
 
-            return $displaycontent;
-        } else {
-            $options['tohtml'] = true;
-            $displaycontent = parent::display($options);
-            // Remove the bookmark patterns.
-            $displaycontent = preg_replace("%#@PDF-G?BM:\d+:[^@#]*@?#%", '', $displaycontent);
+        global $PAGE;
 
-            echo $displaycontent;
+        $tohtml = $options['tohtml'] ?? false;
+        $browsemode = !$this->user_is_editing() && !optional_param('new', 0, PARAM_INT) && !$this->entriesprocessedsuccessfully;
+        $output = parent::display(array_merge($options, ['tohtml' => true]));
+        $output = $this->cleanup_bookmark_patterns_for_browser($output);
+
+        if ($browsemode) {
+            $legacyentries = $this->entries->get_count() ? $this->display_entries($options) : $this->display_no_entries();
+            $legacyentries = $this->cleanup_bookmark_patterns_for_browser($legacyentries);
+            $browserregion = html_writer::tag(
+                'div',
+                $legacyentries,
+                ['class' => 'mod-datalynx-pdf-entries', 'data-region' => 'pdf-view-browser']
+            );
+            $position = strpos($output, $legacyentries);
+            if ($position !== false) {
+                $output = substr_replace($output, $browserregion, $position, strlen($legacyentries));
+            }
         }
+
+        if ($tohtml) {
+            return $output;
+        }
+
+        echo $output;
+
+        if ($browsemode) {
+            $selector = '[data-id="' . $this->dl->id() . '"][data-viewid="' . $this->id() . '"] [data-region="pdf-view-browser"]';
+            $args = [
+                'd' => (int) $this->dl->id(),
+                'view' => (int) $this->id(),
+                'page' => (int) ($this->filter->page ?? 0),
+            ];
+            if (!empty($this->filter->perpage)) {
+                $args['perpage'] = (int) $this->filter->perpage;
+            }
+            if (!empty($this->filter->eids)) {
+                $args['eids'] = is_array($this->filter->eids) ? implode(',', $this->filter->eids) : (string) $this->filter->eids;
+            }
+
+            $PAGE->requires->js_call_amd('mod_datalynx/viewbrowser', 'init', [$selector, [
+                'methodname' => 'mod_datalynx_get_pdf_view_data',
+                'template' => 'mod_datalynx/pdf_view_browser',
+                'args' => $args,
+            ]]);
+        }
+
         return '';
+    }
+
+    /**
+     * Render one browse entry using the current PDF entry template.
+     *
+     * @param stdClass $entry
+     * @param bool $manage
+     * @return string
+     */
+    public function render_browse_entry_html(stdClass $entry, bool $manage): string {
+        $elements = $this->entry_definition($this->get_entry_tag_replacements($entry, [
+            'edit' => false,
+            'manage' => $manage,
+        ]));
+        $html = $this->render_browse_elements_to_html($elements);
+        $html = $this->process_calculations($html);
+
+        return $this->cleanup_bookmark_patterns_for_browser($html);
+    }
+
+    /**
+     * Remove bookmark markers from browse HTML output.
+     *
+     * @param string $html
+     * @return string
+     */
+    public function cleanup_bookmark_patterns_for_browser(string $html): string {
+        return preg_replace("%#@PDF-G?BM:\d+:[^@#]*@?#%", '', $html);
+    }
+
+    /**
+     * Flatten rendered browse elements to HTML.
+     *
+     * @param array $elements
+     * @return string
+     */
+    protected function render_browse_elements_to_html(array $elements): string {
+        $html = '';
+
+        foreach ($elements as $element) {
+            if (is_array($element) && ($element[0] ?? null) === 'html') {
+                $html .= $element[1] ?? '';
+            }
+        }
+
+        return $html;
     }
 
     /**
@@ -565,7 +645,7 @@ class view extends base {
             'div',
             $sectiondefault,
             ['class' => 'mdl-align']
-        ) . "<div>##entries##</div>";
+        ) . '<div class="mod-datalynx-pdf-entries" data-region="pdf-view-browser">##entries##</div>';
 
         // Set content.
         $table = new html_table();

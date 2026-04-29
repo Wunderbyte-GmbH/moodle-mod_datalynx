@@ -1,0 +1,23 @@
+{{!
+    @template mod_datalynx/pdf_view_browser
+}}
+<div class="mod-datalynx-pdf-view-browser"
+     data-datalynxid="{{datalynxid}}"
+     data-viewid="{{viewid}}"
+     data-viewtype="{{viewtype}}">
+    {{#hasentries}}
+        {{#groups}}
+            {{#hasname}}
+                <h3 class="main">{{name}}</h3>
+            {{/hasname}}
+            <div class="entriesview">
+                {{#entries}}
+                    {{{entryhtml}}}
+                {{/entries}}
+            </div>
+        {{/groups}}
+    {{/hasentries}}
+    {{^hasentries}}
+        <div class="alert alert-info">{{emptycontent}}</div>
+    {{/hasentries}}
+</div>
