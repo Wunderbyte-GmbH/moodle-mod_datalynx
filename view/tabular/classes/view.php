@@ -105,7 +105,7 @@ class view extends base {
             'div',
             $sectiondefault,
             ['class' => 'mdl-align']
-        ) . "<div>##entries##</div>";
+        ) . '<div class="mod-datalynx-tabular-entries" data-region="tabular-view-browser">##entries##</div>';
 
         // Set content table.
         $table = new html_table();
@@ -168,8 +168,60 @@ class view extends base {
     public function display(array $options = []): string {
         parent::display($options);
         global $PAGE;
+
+        $tohtml = $options['tohtml'] ?? false;
+        $browsemode = !$this->returntoentriesform && !$this->user_is_editing() && !optional_param('new', 0, PARAM_INT) &&
+            !$this->entriesprocessedsuccessfully;
+        $output = parent::display(array_merge($options, ['tohtml' => true]));
+
+        if ($browsemode) {
+            $legacyentries = $this->entries->get_count() ? $this->display_entries($options) : $this->display_no_entries();
+            $browserregion = html_writer::tag(
+                'div',
+                $legacyentries,
+                ['class' => 'mod-datalynx-tabular-entries', 'data-region' => 'tabular-view-browser']
+            );
+            $position = strpos($output, $legacyentries);
+            if ($position !== false) {
+                $output = substr_replace($output, $browserregion, $position, strlen($legacyentries));
+            }
+        }
+
+        if ($tohtml) {
+            return $output;
+        }
+
+        echo $output;
+
+        $PAGE->requires->js_init_call(
+            'M.datalynxview_tabular.init',
+            [],
+            false,
+            $this->get_js_module()
+        );
         $PAGE->requires->js_call_amd('mod_datalynx/bulkactions', 'init');
         $PAGE->requires->js_call_amd('mod_datalynx/tabularbulkedit', 'init');
+        if ($browsemode) {
+            $selector = '[data-id="' . $this->dl->id() . '"][data-viewid="' . $this->id() . '"] [data-region="tabular-view-browser"]';
+            $args = [
+                'd' => (int) $this->dl->id(),
+                'view' => (int) $this->id(),
+                'page' => (int) ($this->filter->page ?? 0),
+            ];
+            if (!empty($this->filter->perpage)) {
+                $args['perpage'] = (int) $this->filter->perpage;
+            }
+            if (!empty($this->filter->eids)) {
+                $args['eids'] = is_array($this->filter->eids) ? implode(',', $this->filter->eids) : (string) $this->filter->eids;
+            }
+
+            $PAGE->requires->js_call_amd('mod_datalynx/viewbrowser', 'init', [$selector, [
+                'methodname' => 'mod_datalynx_get_tabular_view_data',
+                'template' => 'mod_datalynx/tabular_view_browser',
+                'args' => $args,
+            ]]);
+        }
+
         return '';
     }
 
