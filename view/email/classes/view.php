@@ -148,4 +148,48 @@ class view extends base {
 
         return $elements;
     }
+
+    /**
+     * Render the email template body for one entry.
+     *
+     * @param stdClass $entry
+     * @param array $options
+     * @return string
+     */
+    public function render_email_entry(stdClass $entry, array $options = []): string {
+        $originaltemplate = $this->view->eparam2;
+        $this->view->eparam2 = file_rewrite_pluginfile_urls(
+            $this->view->eparam2,
+            'pluginfile.php',
+            $this->dl->context->id,
+            'mod_datalynx',
+            'viewparam2',
+            $this->id()
+        );
+
+        try {
+            $html = $this->render_entry_html($entry, array_merge([
+                'edit' => false,
+                'manage' => false,
+            ], $options));
+        } finally {
+            $this->view->eparam2 = $originaltemplate;
+        }
+
+        return $this->process_calculations($html);
+    }
+
+    /**
+     * Load one entry through the current view filter.
+     *
+     * @param int $entryid
+     * @return ?stdClass
+     */
+    public function get_filtered_entry(int $entryid): ?stdClass {
+        $this->set_filter(['eids' => $entryid], true);
+        $this->set_content(['filter' => $this->get_filter()]);
+        $entries = $this->entries ? $this->entries->entries() : [];
+
+        return $entries[$entryid] ?? null;
+    }
 }
