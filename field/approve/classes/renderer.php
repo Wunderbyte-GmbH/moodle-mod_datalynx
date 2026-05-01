@@ -102,7 +102,7 @@ class renderer extends datalynxfield_renderer {
      * @param ?array      $options Rendering options.
      * @return void
      */
-    public function display_edit(&$mform, $entry, array $options = null) {
+    public function display_edit(&$mform, $entry, ?array $options = null) {
         $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
