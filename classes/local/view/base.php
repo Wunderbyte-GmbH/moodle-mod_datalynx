@@ -392,6 +392,7 @@ abstract class base {
         $csort = !empty($urloptions['customsort']) ? $urloptions['customsort'] : null;
         $csearch = !empty($urloptions['customsearch']) ? $urloptions['customsearch'] : null;
 
+        $search = !empty($urloptions['search']) ? $urloptions['search'] : '';
         $usersearch = !empty($urloptions['usersearch']) ? $urloptions['usersearch'] : '';
 
         $filterid = $fid ? $fid : ($this->view->filter ? $this->view->filter : 0);
@@ -414,7 +415,7 @@ abstract class base {
 
         $this->filter->groupby = $groupby ? $groupby : $this->filter->groupby;
 
-        $this->filter->search = $usersearch ? $usersearch : $this->filter->search;
+        $this->filter->search = $search ? $search : ($usersearch ? $usersearch : $this->filter->search);
 
         // Add page.
         $this->filter->page = $page ? $page : 0;
@@ -1502,6 +1503,27 @@ abstract class base {
     }
 
     /**
+     * Render a single entry using the configured entry template.
+     *
+     * @param stdClass $entry Entry record.
+     * @param array $options Rendering options.
+     * @return string
+     */
+    public function render_entry_html(stdClass $entry, array $options = []): string {
+        $fielddefinitions = $this->get_entry_tag_replacements($entry, $options);
+        $elements = $this->entry_definition($fielddefinitions);
+        $html = '';
+
+        foreach ($elements as $element) {
+            if (isset($element[1]) && is_string($element[1])) {
+                $html .= $element[1];
+            }
+        }
+
+        return $html;
+    }
+
+    /**
      * Build field and view tag replacements for a single entry.
      *
      * @param stdClass $entry Entry record.
@@ -1513,7 +1535,7 @@ abstract class base {
         $entry->baseurl = $this->baseurl;
 
         $definitions = [];
-        foreach ($this->tags['field'] as $fieldid => $patterns) {
+        foreach ($this->tags['field'] ?? [] as $fieldid => $patterns) {
             if (isset($fields[$fieldid])) {
                 $field = $fields[$fieldid];
                 if ($fielddefinitions = $field->get_definitions($patterns, $entry, $options)) {
@@ -1524,7 +1546,7 @@ abstract class base {
         $fielddefinitions = $definitions;
 
         // Enables view tag replacement within the entry template.
-        if ($patterns = $this->patternclass()->get_replacements($this->tags['view'], null, $options)) {
+        if ($patterns = $this->patternclass()->get_replacements($this->tags['view'] ?? [], null, $options)) {
             $viewdefinitions = [];
             foreach ($patterns as $tag => $pattern) {
                 if (

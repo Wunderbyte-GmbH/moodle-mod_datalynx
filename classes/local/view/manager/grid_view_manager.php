@@ -18,6 +18,7 @@ namespace mod_datalynx\local\view\manager;
 
 use coding_exception;
 use datalynxfield_entry\field as entry_field;
+use datalynxfield_fieldgroup\field as fieldgroup_field;
 use mod_datalynx\datalynx;
 use mod_datalynx\local\datalynx_entries;
 use stdClass;
@@ -61,7 +62,7 @@ class grid_view_manager {
             $view->set_filter($filteroptions, $view->is_forcing_filter());
         }
         $fields = $view->remove_duplicates($view->get_dl()->get_fields());
-        $view->get_filter()->contentfields = array_keys($fields);
+        $view->get_filter()->contentfields = $this->expand_content_field_ids($fields);
 
         $entries = new datalynx_entries($datalynx, $view->get_filter());
         $entries->set_content();
@@ -103,30 +104,25 @@ class grid_view_manager {
      */
     protected function build_entries(\mod_datalynx\local\view\base $view, array $fields, array $entryrecords): array {
         $entryfield = new entry_field($view->get_dl());
+        $useentryhtml = $this->requires_rendered_entry_html($view);
         $entries = [];
 
         foreach ($entryrecords as $entry) {
+            $manageable = $view->get_dl()->user_can_manage_entry($entry);
             $entry->baseurl = $view->get_baseurl();
             $entries[] = [
                 'id' => (int) $entry->id,
+                'entryhtml' => $useentryhtml ? $view->render_entry_html($entry, ['edit' => false, 'manage' => $manageable]) : '',
                 'fields' => $this->build_field_values($fields, $entry),
-                'edithtml' => $this->resolve_definition_html(
-                    $entryfield->get_definitions(
-                        ['##edit##'],
-                        $entry,
-                        ['manage' => $view->get_dl()->user_can_manage_entry($entry)]
-                    ),
+                'edithtml' => $useentryhtml ? '' : $this->resolve_definition_html(
+                    $entryfield->get_definitions(['##edit##'], $entry, ['manage' => $manageable]),
                     '##edit##'
                 ),
-                'deletehtml' => $this->resolve_definition_html(
-                    $entryfield->get_definitions(
-                        ['##delete##'],
-                        $entry,
-                        ['manage' => $view->get_dl()->user_can_manage_entry($entry)]
-                    ),
+                'deletehtml' => $useentryhtml ? '' : $this->resolve_definition_html(
+                    $entryfield->get_definitions(['##delete##'], $entry, ['manage' => $manageable]),
                     '##delete##'
                 ),
-                'hasactions' => $view->get_dl()->user_can_manage_entry($entry),
+                'hasactions' => !$useentryhtml && $manageable,
             ];
         }
 
@@ -166,6 +162,50 @@ class grid_view_manager {
     }
 
     /**
+     * Expand displayed field ids to include composite subfields needed for rendering.
+     *
+     * @param array $fields
+     * @return int[]
+     */
+    protected function expand_content_field_ids(array $fields): array {
+        $contentfieldids = [];
+
+        foreach ($fields as $fieldid => $field) {
+            $contentfieldids[] = is_numeric($fieldid) ? (int) $fieldid : $fieldid;
+
+            if ($field instanceof fieldgroup_field) {
+                $contentfieldids = array_merge($contentfieldids, array_map('intval', $field->fieldids));
+            }
+        }
+
+        return array_values(array_unique($contentfieldids));
+    }
+
+    /**
+     * Determine whether the configured entry template needs full rendered HTML.
+     *
+     * @param \mod_datalynx\local\view\base $view
+     * @return bool
+     */
+    protected function requires_rendered_entry_html(\mod_datalynx\local\view\base $view): bool {
+        $template = trim((string) ($view->view->eparam2 ?? ''));
+        if ($template === '') {
+            return false;
+        }
+
+        $simpletags = ['##edit##', '##delete##'];
+        foreach ($view->get__patterns('field') as $patterns) {
+            $simpletags = array_merge($simpletags, $patterns);
+        }
+
+        foreach (array_unique($simpletags) as $tag) {
+            $template = str_replace($tag, '', $template);
+        }
+
+        return trim($template) !== '';
+    }
+
+    /**
      * Resolve the rendered HTML string from a field definition map.
      *
      * @param array $definitions
@@ -179,4 +219,5 @@ class grid_view_manager {
 
         return $definitions[$tag][1];
     }
+
 }
