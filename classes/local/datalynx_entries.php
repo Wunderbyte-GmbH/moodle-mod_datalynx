@@ -114,6 +114,15 @@ class datalynx_entries {
     }
 
     /**
+     * Return the current timestamp using Moodle's clock service.
+     *
+     * @return int
+     */
+    protected function current_time(): int {
+        return \core\di::get(\core\clock::class)->time();
+    }
+
+    /**
      * Populate the entries with content of the content table datalynx_contents. Gets the raw content
      * for each field for the entry and sets the content in $this->entries
      * Performs entries count in order to display number of entries.
@@ -988,7 +997,7 @@ class datalynx_entries {
                             $newentry->userid = $USER->id;
                             $newentry->dataid = $dl->id();
                             $newentry->groupid = $dl->currentgroup;
-                            $newentry->timecreated = $newentry->timemodified = time();
+                            $newentry->timecreated = $newentry->timemodified = $this->current_time();
 
                             if (
                                     $dl->data->approval &&
@@ -1222,7 +1231,7 @@ class datalynx_entries {
                         $newentry->userid = $teammemberid;
                         $newentry->dataid = $dl->id();
                         $newentry->groupid = $dl->currentgroup;
-                        $newentry->timecreated = $newentry->timemodified = time();
+                        $newentry->timecreated = $newentry->timemodified = $this->current_time();
                         $newentry->approved = 1;
                         $newentry->id = $DB->insert_record('datalynx_entries', $newentry);
 
@@ -1296,7 +1305,7 @@ class datalynx_entries {
                 $newapproved = isset($entry->approved) ? $entry->approved : 0;
 
                 if ($updatetime) {
-                    $entry->timemodified = time();
+                    $entry->timemodified = $this->current_time();
                 }
 
                 $entry->status = isset($data['status']) ? $data['status'] : $entry->status;
@@ -1322,10 +1331,10 @@ class datalynx_entries {
                     $entry->groupid = $df->currentgroup;
                 }
                 if (!isset($entry->timecreated)) {
-                    $entry->timecreated = time();
+                    $entry->timecreated = $this->current_time();
                 }
                 if (!isset($entry->timemodified)) {
-                    $entry->timemodified = time();
+                    $entry->timemodified = $this->current_time();
                 }
                 $entry->status = isset($data['status']) ? $data['status'] : 0;
                 $entryid = $DB->insert_record('datalynx_entries', $entry);

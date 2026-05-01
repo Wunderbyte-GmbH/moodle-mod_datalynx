@@ -32,15 +32,15 @@
                         <thead>
                             <tr>
                                 {{#columns}}
-                                    <th class="{{alignclass}}">{{{headerhtml}}}</th>
+                                    <th class="header {{columnclass}}{{#islast}} lastcol{{/islast}}" style="text-align:{{alignstyle}};" scope="col">{{{headerhtml}}}</th>
                                 {{/columns}}
                             </tr>
                         </thead>
                         <tbody>
                             {{#rows}}
-                                <tr data-entryid="{{id}}">
+                                <tr class="{{rowclass}}" data-entryid="{{id}}">
                                     {{#cells}}
-                                        <td class="{{alignclass}}">{{{valuehtml}}}</td>
+                                        <td class="cell {{columnclass}}{{#islast}} lastcol{{/islast}}" style="text-align:{{alignstyle}};">{{{valuehtml}}}</td>
                                     {{/cells}}
                                 </tr>
                             {{/rows}}

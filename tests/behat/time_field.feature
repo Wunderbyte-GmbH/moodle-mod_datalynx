@@ -38,6 +38,7 @@ Feature: Test datalynx _time internal field
 
   Scenario: Time created and modified display after entry is added
     When I log in as "student1"
+    And the time is frozen at "2026-04-15 12:00"
     And I am on "Course 1" course homepage
     And I follow "Datalynx Test Instance"
     And I follow "Add a new entry"

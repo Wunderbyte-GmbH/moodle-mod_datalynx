@@ -153,6 +153,14 @@ class tabular_view_manager {
             ];
         }
 
+        $lastindex = count($columns) - 1;
+        foreach ($columns as $index => &$column) {
+            $column['columnclass'] = 'c' . $index;
+            $column['islast'] = $index === $lastindex;
+            $column['alignstyle'] = $column['alignclass'] === 'text-center' ? 'center' : 'left';
+        }
+        unset($column);
+
         return $columns;
     }
 
@@ -254,8 +262,17 @@ class tabular_view_manager {
                 'alignclass' => 'text-center',
             ];
 
+            $lastindex = count($cells) - 1;
+            foreach ($cells as $index => &$cell) {
+                $cell['columnclass'] = 'c' . $index;
+                $cell['islast'] = $index === $lastindex;
+                $cell['alignstyle'] = $cell['alignclass'] === 'text-center' ? 'center' : 'left';
+            }
+            unset($cell);
+
             $rows[] = [
                 'id' => (int) $entry->id,
+                'rowclass' => 'lastrow',
                 'cells' => $cells,
             ];
         }
