@@ -21,19 +21,46 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+const getActionContext = () => document.activeElement instanceof Element ? document.activeElement : null;
+
+const getScopeRoot = (group) => {
+    const context = getActionContext();
+    const rootSelectors = [
+        '.datalynxview-Tabular',
+        '.mod-datalynx-tabular-view-browser',
+        '.mod-datalynx-grid-view-browser',
+    ];
+
+    for (const selector of rootSelectors) {
+        const root = context?.closest(selector);
+        if (root) {
+            return root;
+        }
+    }
+
+    const scopedCheckbox = context?.closest('table, [data-region], .entriesview')?.querySelector(
+        `input[type="checkbox"][name="${group}selector"]`
+    );
+    if (scopedCheckbox) {
+        return scopedCheckbox.closest('table, [data-region], .entriesview');
+    }
+
+    return document;
+};
+
 export default {
     init() {
         // These global names are kept for backward compatibility with existing inline handlers.
         // eslint-disable-next-line dot-notation
         window['select_allnone'] = (group, checked) => {
-            document.querySelectorAll(`input[type="checkbox"][name="${group}selector"]`).forEach(cb => {
+            getScopeRoot(group).querySelectorAll(`input[type="checkbox"][name="${group}selector"]`).forEach(cb => {
                 cb.checked = checked;
             });
         };
 
         // eslint-disable-next-line dot-notation
         window['bulk_action'] = (group, url, action) => {
-            const checkboxes = document.querySelectorAll(
+            const checkboxes = getScopeRoot(group).querySelectorAll(
                 `input[type="checkbox"][name="${group}selector"]:checked`
             );
             if (!checkboxes.length) {

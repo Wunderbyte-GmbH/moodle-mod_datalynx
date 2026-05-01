@@ -166,15 +166,57 @@ class view extends base {
      * @return string
      */
     public function display(array $options = []): string {
-        parent::display($options);
         global $PAGE;
+
+        if (!$this->returntoentriesform && !$this->user_is_editing()) {
+            $filteroptions = [
+                'page' => (int) ($this->filter->page ?? 0),
+            ];
+            $activefilterid = optional_param('filter', 0, PARAM_INT);
+            if (!empty($activefilterid)) {
+                $filteroptions['filterid'] = $activefilterid;
+            } else if (!empty($this->filter->id)) {
+                $filteroptions['filterid'] = (int) $this->filter->id;
+            }
+            if (!empty($this->filter->perpage)) {
+                $filteroptions['perpage'] = (int) $this->filter->perpage;
+            }
+            if (!empty($this->filter->eids)) {
+                $filteroptions['eids'] = $this->filter->eids;
+            }
+            if (!empty($this->filter->customsort)) {
+                $filteroptions['customsort'] = $this->filter->customsort;
+            }
+            if (!empty($this->filter->customsearch)) {
+                $filteroptions['customsearch'] = unserialize($this->filter->customsearch);
+            }
+            if (!empty($this->filter->search)) {
+                $filteroptions['search'] = (string) $this->filter->search;
+            }
+            if (!empty($this->filter->selection)) {
+                $filteroptions['selection'] = (int) $this->filter->selection;
+            }
+            if (!empty($this->filter->groupby)) {
+                $filteroptions['groupby'] = (string) $this->filter->groupby;
+            }
+            if (!empty($this->filter->users)) {
+                $filteroptions['users'] = $this->filter->users;
+            }
+            if (!empty($this->filter->groups)) {
+                $filteroptions['groups'] = $this->filter->groups;
+            }
+
+            $this->set_filter($filteroptions, $this->is_forcing_filter());
+            $this->set_content();
+        }
 
         $tohtml = $options['tohtml'] ?? false;
         $browsemode = !$this->returntoentriesform && !$this->user_is_editing() && !optional_param('new', 0, PARAM_INT) &&
             !$this->entriesprocessedsuccessfully;
+        $useajaxbrowser = false;
         $output = parent::display(array_merge($options, ['tohtml' => true]));
 
-        if ($browsemode) {
+        if ($useajaxbrowser) {
             $legacyentries = $this->entries->get_count() ? $this->display_entries($options) : $this->display_no_entries();
             $browserregion = html_writer::tag(
                 'div',
@@ -193,19 +235,14 @@ class view extends base {
 
         echo $output;
 
-        $PAGE->requires->js_init_call(
-            'M.datalynxview_tabular.init',
-            [],
-            false,
-            $this->get_js_module()
-        );
         $PAGE->requires->js_call_amd('mod_datalynx/bulkactions', 'init');
         $PAGE->requires->js_call_amd('mod_datalynx/tabularbulkedit', 'init');
-        if ($browsemode) {
+        if ($useajaxbrowser) {
             $selector = '[data-id="' . $this->dl->id() . '"][data-viewid="' . $this->id() . '"] [data-region="tabular-view-browser"]';
             $args = [
                 'd' => (int) $this->dl->id(),
                 'view' => (int) $this->id(),
+                'filterid' => (int) ($this->filter->id ?? 0),
                 'page' => (int) ($this->filter->page ?? 0),
             ];
             if (!empty($this->filter->perpage)) {
@@ -213,6 +250,27 @@ class view extends base {
             }
             if (!empty($this->filter->eids)) {
                 $args['eids'] = is_array($this->filter->eids) ? implode(',', $this->filter->eids) : (string) $this->filter->eids;
+            }
+            if (!empty($this->filter->customsort)) {
+                $args['customsort'] = $this->filter->customsort;
+            }
+            if (!empty($this->filter->customsearch)) {
+                $args['customsearch'] = $this->filter->customsearch;
+            }
+            if (!empty($this->filter->search)) {
+                $args['search'] = (string) $this->filter->search;
+            }
+            if (!empty($this->filter->selection)) {
+                $args['selection'] = (int) $this->filter->selection;
+            }
+            if (!empty($this->filter->groupby)) {
+                $args['groupby'] = (string) $this->filter->groupby;
+            }
+            if (!empty($this->filter->users)) {
+                $args['users'] = is_array($this->filter->users) ? implode(',', $this->filter->users) : (string) $this->filter->users;
+            }
+            if (!empty($this->filter->groups)) {
+                $args['groups'] = is_array($this->filter->groups) ? implode(',', $this->filter->groups) : (string) $this->filter->groups;
             }
 
             $PAGE->requires->js_call_amd('mod_datalynx/viewbrowser', 'init', [$selector, [
