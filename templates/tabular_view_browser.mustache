@@ -16,6 +16,43 @@
 }}
 {{!
     @template mod_datalynx/tabular_view_browser
+
+    Example context (json):
+    {
+        "datalynxid": 1,
+        "viewid": 2,
+        "viewtype": "tabular",
+        "hasentries": true,
+        "groups": [
+            {
+                "name": "",
+                "hasname": false,
+                "columns": [
+                    {
+                        "headerhtml": "Title",
+                        "alignstyle": "left",
+                        "columnclass": "c0",
+                        "islast": true
+                    }
+                ],
+                "rows": [
+                    {
+                        "id": 3,
+                        "rowclass": "r0",
+                        "cells": [
+                            {
+                                "valuehtml": "Example tabular entry",
+                                "alignstyle": "left",
+                                "columnclass": "c0",
+                                "islast": true
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        "emptycontent": "No entries"
+    }
 }}
 <div class="mod-datalynx-tabular-view-browser"
      data-datalynxid="{{datalynxid}}"

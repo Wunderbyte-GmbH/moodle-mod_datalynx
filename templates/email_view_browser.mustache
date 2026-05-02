@@ -1,5 +1,14 @@
 {{!
     @template mod_datalynx/email_view_browser
+
+    Example context (json):
+    {
+        "datalynxid": 1,
+        "viewid": 2,
+        "entryid": 3,
+        "hascontent": true,
+        "bodyhtml": "<p>Hello world</p>"
+    }
 }}
 {{#hascontent}}
 <div class="mod-datalynx-email-view-browser"

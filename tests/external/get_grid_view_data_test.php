@@ -110,6 +110,7 @@ final class get_grid_view_data_test extends advanced_testcase {
     private function create_grid_fieldgroup_fixture(): array {
         global $DB;
 
+        $this->redirectMessages();
         $course = $this->getDataGenerator()->create_course();
         $teacher = $this->getDataGenerator()->create_and_enrol($course, 'editingteacher');
         $student1 = $this->getDataGenerator()->create_and_enrol($course, 'student');

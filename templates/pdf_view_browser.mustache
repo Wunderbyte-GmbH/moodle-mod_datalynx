@@ -1,5 +1,26 @@
 {{!
     @template mod_datalynx/pdf_view_browser
+
+    Example context (json):
+    {
+        "datalynxid": 1,
+        "viewid": 2,
+        "viewtype": "pdf",
+        "hasentries": true,
+        "groups": [
+            {
+                "name": "",
+                "hasname": false,
+                "entries": [
+                    {
+                        "id": 3,
+                        "entryhtml": "<div class=\"entry\">Example PDF entry</div>"
+                    }
+                ]
+            }
+        ],
+        "emptycontent": "No entries"
+    }
 }}
 <div class="mod-datalynx-pdf-view-browser"
      data-datalynxid="{{datalynxid}}"
