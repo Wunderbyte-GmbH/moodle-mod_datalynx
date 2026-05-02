@@ -3,6 +3,40 @@
 }}
 {{!
     @template mod_datalynx/csv_view_browser
+
+    Example context (json):
+    {
+        "datalynxid": 1,
+        "viewid": 2,
+        "viewtype": "csv",
+        "hasentries": true,
+        "groups": [
+            {
+                "name": "",
+                "hasname": false,
+                "hasheaders": true,
+                "columns": [
+                    {
+                        "tag": "[[Title]]",
+                        "headerhtml": "Title",
+                        "cellclass": "csv-title-column"
+                    }
+                ],
+                "rows": [
+                    {
+                        "id": 3,
+                        "cells": [
+                            {
+                                "valuehtml": "Example CSV entry",
+                                "cellclass": "csv-title-column"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        "emptycontent": "No entries"
+    }
 }}
 <div class="mod-datalynx-csv-view-browser"
      data-datalynxid="{{datalynxid}}"

@@ -260,8 +260,8 @@ class datalynxview_patterns {
                         return '';
                     }
                     // Strip leading and trailing ## delimiters.
-                    $tag = trim($tag, '#');
-                    [, $linktext, $urlquery, $class] = explode(';', $tag);
+                    $tagdefinition = substr($tag, 2, -2);
+                    [, $linktext, $urlquery, $class] = array_pad(explode(';', $tagdefinition, 4), 4, '');
                     // Pix icon for text.
                     if (strpos($linktext, '_pixicon:') === 0) {
                         [, $icon, $titletext] = explode(':', $linktext);
@@ -281,7 +281,11 @@ class datalynxview_patterns {
                             return '';
                         }
                     }
-                    return html_writer::link($viewurl->out(false) . "&$urlquery", $linktext, ['class' => $class]);
+                    $linkurl = $viewurl->out(false);
+                    if ($urlquery !== '') {
+                        $linkurl .= "&$urlquery";
+                    }
+                    return html_writer::link($linkurl, $linktext, ['class' => $class]);
                 }
             }
         }

@@ -2,6 +2,38 @@
     @template mod_datalynx/report_view_browser
 
     Structured Report browse rendering.
+
+    Example context (json):
+    {
+        "datalynxid": 1,
+        "viewid": 2,
+        "viewtype": "report",
+        "hasdata": true,
+        "ismonthly": false,
+        "userlabel": "User",
+        "monthlabel": "Month",
+        "totallabel": "Total",
+        "notyetansweredlabel": "Not yet answered",
+        "optioncolumns": [
+            {
+                "label": "Option A"
+            }
+        ],
+        "rows": [
+            {
+                "userhtml": "<span>Student 1</span>",
+                "month": "2026-05",
+                "totalentries": 2,
+                "optioncells": [
+                    {
+                        "count": 1
+                    }
+                ],
+                "notyetanswered": 1
+            }
+        ],
+        "emptycontent": "<div class=\"alert alert-info\">No report data</div>"
+    }
 }}
 <div class="mod-datalynx-report-view-browser"
      data-datalynxid="{{datalynxid}}"
