@@ -185,21 +185,16 @@ class datalynxview_patterns {
         $df = $this->view->get_dl();
         $currentview = $df->get_current_view();
 
-        static $views = null;
-        if ($views === null) {
-            $views = $df->get_all_views();
-            foreach ($views as $view) {
-                $viewname = $view->name;
+        $views = $df->get_all_views();
+        foreach ($views as $view) {
+            $baseurlparams = [];
+            $baseurlparams['d'] = $view->dataid;
+            $baseurlparams['view'] = $view->id;
 
-                $baseurlparams = [];
-                $baseurlparams['d'] = $view->dataid;
-                $baseurlparams['view'] = $view->id;
-
-                $view->baseurl = new moodle_url(
-                    "/mod/datalynx/{$this->view->get_dl()->pagefile_for_urls()}.php",
-                    $baseurlparams
-                );
-            }
+            $view->baseurl = new moodle_url(
+                "/mod/datalynx/{$this->view->get_dl()->pagefile_for_urls()}.php",
+                $baseurlparams
+            );
         }
         if ($views) {
             foreach ($views as $view) {
@@ -215,8 +210,8 @@ class datalynxview_patterns {
                         return '';
                     }
                     // Strip leading and trailing ## delimiters.
-                    $tag = trim($tag, '#');
-                    [, $linktext, $urlquery, $class] = explode(';', $tag);
+                    $tagdefinition = substr($tag, 2, -2);
+                    [, $linktext, $urlquery, $class] = array_pad(explode(';', $tagdefinition, 4), 4, '');
                     // Pix icon for text.
                     if (strpos($linktext, '_pixicon:') === 0) {
                         [, $icon, $titletext] = explode(':', $linktext);
@@ -236,15 +231,16 @@ class datalynxview_patterns {
                             return '';
                         }
                     }
-                    return html_writer::link($viewurl->out(false) . "&$urlquery", $linktext, ['class' => $class]);
+                    $linkurl = $viewurl->out(false);
+                    if ($urlquery !== '') {
+                        $linkurl .= "&$urlquery";
+                    }
+                    return html_writer::link($linkurl, $linktext, ['class' => $class]);
                 }
             }
         }
 
-        static $fields = null;
-        if ($fields === null) {
-            $fields = $df->get_fields(null, true);
-        }
+        $fields = $df->get_fields(null, true);
 
         foreach ($fields as $id => $fieldname) {
             if (strpos($tag, "%%{$fieldname}:bulkedit%%") === 0) {
@@ -718,14 +714,11 @@ class datalynxview_patterns {
         }
 
         $df = $this->view->get_dl();
-        static $views = null;
-        if ($views === null) {
-            $views = [];
-            $theviews = $df->get_views();
-            if (!empty($theviews)) {
-                foreach ($theviews as $theview) {
-                    $views[$theview->name()] = $theview;
-                }
+        $views = [];
+        $theviews = $df->get_views();
+        if (!empty($theviews)) {
+            foreach ($theviews as $theview) {
+                $views[$theview->name()] = $theview;
             }
         }
 
@@ -743,14 +736,11 @@ class datalynxview_patterns {
      */
     protected function get_viewcontent_replacement(?string $viewname = null): string {
         $df = $this->view->get_dl();
-        static $views = null;
-        if ($views === null) {
-            $views = [];
-            $theviews = $df->get_views();
-            if (!empty($theviews)) {
-                foreach ($theviews as $theview) {
-                    $views[$theview->name()] = $theview;
-                }
+        $views = [];
+        $theviews = $df->get_views();
+        if (!empty($theviews)) {
+            foreach ($theviews as $theview) {
+                $views[$theview->name()] = $theview;
             }
         }
 
@@ -813,16 +803,14 @@ class datalynxview_patterns {
 
         $df = $this->view->get_dl();
 
-        static $views = null;
-        if ($views === null && $checkvisibility) {
+        $views = [];
+        if ($checkvisibility) {
             $views = $df->get_views_menu();
         } else {
-            if ($checkvisibility == false) {
-                $viewojects = $df->get_all_views();
-                if (!empty($viewojects)) {
-                    foreach ($viewojects as $viewid => $view) {
-                        $views[$viewid] = $view->name;
-                    }
+            $viewojects = $df->get_all_views();
+            if (!empty($viewojects)) {
+                foreach ($viewojects as $viewid => $view) {
+                    $views[$viewid] = $view->name;
                 }
             }
         }
@@ -986,10 +974,7 @@ class datalynxview_patterns {
     public function is_regexp_pattern($pattern) {
         $df = $this->view->get_dl();
 
-        static $views = null;
-        if ($views === null) {
-            $views = $df->get_views_menu();
-        }
+        $views = $df->get_views_menu();
 
         if ($views) {
             foreach ($views as $viewname) {
@@ -1002,10 +987,7 @@ class datalynxview_patterns {
             }
         }
 
-        static $fields = null;
-        if ($fields === null) {
-            $fields = $df->get_fields(null, true);
-        }
+        $fields = $df->get_fields(null, true);
 
         foreach ($fields as $fieldname) {
             if (strpos($pattern, "%%{$fieldname}:bulkedit%%") === 0) {
