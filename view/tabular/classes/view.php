@@ -238,7 +238,8 @@ class view extends base {
         $PAGE->requires->js_call_amd('mod_datalynx/bulkactions', 'init');
         $PAGE->requires->js_call_amd('mod_datalynx/tabularbulkedit', 'init');
         if ($useajaxbrowser) {
-            $selector = '[data-id="' . $this->dl->id() . '"][data-viewid="' . $this->id() . '"] [data-region="tabular-view-browser"]';
+            $selector = '[data-id="' . $this->dl->id() . '"][data-viewid="' . $this->id() .
+                '"] [data-region="tabular-view-browser"]';
             $args = [
                 'd' => (int) $this->dl->id(),
                 'view' => (int) $this->id(),
@@ -267,10 +268,14 @@ class view extends base {
                 $args['groupby'] = (string) $this->filter->groupby;
             }
             if (!empty($this->filter->users)) {
-                $args['users'] = is_array($this->filter->users) ? implode(',', $this->filter->users) : (string) $this->filter->users;
+                $args['users'] = is_array($this->filter->users)
+                    ? implode(',', $this->filter->users)
+                    : (string) $this->filter->users;
             }
             if (!empty($this->filter->groups)) {
-                $args['groups'] = is_array($this->filter->groups) ? implode(',', $this->filter->groups) : (string) $this->filter->groups;
+                $args['groups'] = is_array($this->filter->groups)
+                    ? implode(',', $this->filter->groups)
+                    : (string) $this->filter->groups;
             }
 
             $PAGE->requires->js_call_amd('mod_datalynx/viewbrowser', 'init', [$selector, [
