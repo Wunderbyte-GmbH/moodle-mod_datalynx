@@ -347,6 +347,7 @@ class view extends base {
             $args = [
                 'd' => (int) $this->dl->id(),
                 'view' => (int) $this->id(),
+                'filterid' => (int) ($this->filter->id ?? 0),
                 'page' => (int) ($this->filter->page ?? 0),
             ];
             if (!empty($this->filter->perpage)) {
@@ -354,6 +355,27 @@ class view extends base {
             }
             if (!empty($this->filter->eids)) {
                 $args['eids'] = is_array($this->filter->eids) ? implode(',', $this->filter->eids) : (string) $this->filter->eids;
+            }
+            if (!empty($this->filter->customsort)) {
+                $args['customsort'] = $this->filter->customsort;
+            }
+            if (!empty($this->filter->customsearch)) {
+                $args['customsearch'] = $this->filter->customsearch;
+            }
+            if (!empty($this->filter->search)) {
+                $args['search'] = (string) $this->filter->search;
+            }
+            if (!empty($this->filter->selection)) {
+                $args['selection'] = (int) $this->filter->selection;
+            }
+            if (!empty($this->filter->groupby)) {
+                $args['groupby'] = (string) $this->filter->groupby;
+            }
+            if (!empty($this->filter->users)) {
+                $args['users'] = is_array($this->filter->users) ? implode(',', $this->filter->users) : (string) $this->filter->users;
+            }
+            if (!empty($this->filter->groups)) {
+                $args['groups'] = is_array($this->filter->groups) ? implode(',', $this->filter->groups) : (string) $this->filter->groups;
             }
 
             $PAGE->requires->js_call_amd('mod_datalynx/viewbrowser', 'init', [$selector, [

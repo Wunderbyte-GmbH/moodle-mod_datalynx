@@ -105,6 +105,215 @@ final class get_csv_view_data_test extends advanced_testcase {
     }
 
     /**
+     * Build a CSV fixture with a multiselect field and multiple entries.
+     *
+     * @return array
+     */
+    private function create_csv_multiselect_fixture(): array {
+        global $DB, $USER;
+
+        $course = $this->getDataGenerator()->create_course();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $df = new datalynx($instance->id);
+
+        $view = (object) [
+            'dataid' => $df->id(),
+            'type' => 'csv',
+            'name' => 'Pilot CSV',
+            'description' => '',
+            'visible' => 7,
+            'filter' => 0,
+            'perpage' => 0,
+            'groupby' => '',
+            'param1' => '',
+            'param2' => '[[Title]]|Title|csv-title-column' . "\n" . '[[Tags]]|Tags|csv-tags-column',
+            'param3' => 'csv',
+            'param5' => 0,
+            'param10' => 0,
+            'section' => '',
+        ];
+        $view->id = (int) $DB->insert_record('datalynx_views', $view);
+
+        $textfield = (object) [
+            'dataid' => $df->id(),
+            'type' => 'text',
+            'name' => 'Title',
+            'description' => '',
+            'param1' => '',
+            'param2' => '',
+            'param3' => '',
+            'param4' => '',
+            'param5' => '',
+            'param6' => '',
+            'param7' => '',
+            'param8' => '',
+            'param9' => '',
+            'param10' => '',
+        ];
+        $textfield->id = (int) $DB->insert_record('datalynx_fields', $textfield);
+
+        $multiselectfield = (object) [
+            'dataid' => $df->id(),
+            'type' => 'multiselect',
+            'name' => 'Tags',
+            'description' => '',
+            'param1' => "Opt1\nOpt2\nOpt3",
+            'param2' => '',
+            'param3' => '',
+            'param4' => '',
+            'param5' => '',
+            'param6' => '',
+            'param7' => '',
+            'param8' => '',
+            'param9' => '',
+            'param10' => '',
+        ];
+        $multiselectfield->id = (int) $DB->insert_record('datalynx_fields', $multiselectfield);
+
+        $entryone = (int) $DB->insert_record('datalynx_entries', (object) [
+            'dataid' => $df->id(),
+            'userid' => $USER->id,
+            'groupid' => 0,
+            'approved' => 1,
+            'status' => 0,
+            'timecreated' => time(),
+            'timemodified' => time(),
+        ]);
+        $entrytwo = (int) $DB->insert_record('datalynx_entries', (object) [
+            'dataid' => $df->id(),
+            'userid' => $USER->id,
+            'groupid' => 0,
+            'approved' => 1,
+            'status' => 0,
+            'timecreated' => time() + 1,
+            'timemodified' => time() + 1,
+        ]);
+
+        $DB->insert_record('datalynx_contents', (object) [
+            'fieldid' => $textfield->id,
+            'entryid' => $entryone,
+            'lineid' => 0,
+            'content' => 'Entry one',
+        ]);
+        $DB->insert_record('datalynx_contents', (object) [
+            'fieldid' => $textfield->id,
+            'entryid' => $entrytwo,
+            'lineid' => 0,
+            'content' => 'Entry two',
+        ]);
+        $DB->insert_record('datalynx_contents', (object) [
+            'fieldid' => $multiselectfield->id,
+            'entryid' => $entryone,
+            'lineid' => 0,
+            'content' => '#1#',
+        ]);
+        $DB->insert_record('datalynx_contents', (object) [
+            'fieldid' => $multiselectfield->id,
+            'entryid' => $entrytwo,
+            'lineid' => 0,
+            'content' => '#2#,#3#',
+        ]);
+
+        return [$df, $view, $multiselectfield->id, $entryone, $entrytwo];
+    }
+
+    /**
+     * Build a CSV fixture with two entries and a saved filter record.
+     *
+     * @return array
+     */
+    private function create_csv_filter_fixture(): array {
+        global $DB, $USER;
+
+        $course = $this->getDataGenerator()->create_course();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $df = new datalynx($instance->id);
+
+        $view = (object) [
+            'dataid' => $df->id(),
+            'type' => 'csv',
+            'name' => 'Pilot CSV',
+            'description' => '',
+            'visible' => 7,
+            'filter' => 0,
+            'perpage' => 0,
+            'groupby' => '',
+            'param1' => '',
+            'param2' => '[[Title]]|Title|csv-title-column',
+            'param3' => 'csv',
+            'param5' => 0,
+            'param10' => 0,
+            'section' => '',
+        ];
+        $view->id = (int) $DB->insert_record('datalynx_views', $view);
+
+        $field = (object) [
+            'dataid' => $df->id(),
+            'type' => 'text',
+            'name' => 'Title',
+            'description' => '',
+            'param1' => '',
+            'param2' => '',
+            'param3' => '',
+            'param4' => '',
+            'param5' => '',
+            'param6' => '',
+            'param7' => '',
+            'param8' => '',
+            'param9' => '',
+            'param10' => '',
+        ];
+        $field->id = (int) $DB->insert_record('datalynx_fields', $field);
+
+        $entryone = (int) $DB->insert_record('datalynx_entries', (object) [
+            'dataid' => $df->id(),
+            'userid' => $USER->id,
+            'groupid' => 0,
+            'approved' => 1,
+            'status' => 0,
+            'timecreated' => time(),
+            'timemodified' => time(),
+        ]);
+        $entrytwo = (int) $DB->insert_record('datalynx_entries', (object) [
+            'dataid' => $df->id(),
+            'userid' => $USER->id,
+            'groupid' => 0,
+            'approved' => 1,
+            'status' => 0,
+            'timecreated' => time() + 1,
+            'timemodified' => time() + 1,
+        ]);
+
+        $DB->insert_record('datalynx_contents', (object) [
+            'fieldid' => $field->id,
+            'entryid' => $entryone,
+            'lineid' => 0,
+            'content' => 'Alpha entry',
+        ]);
+        $DB->insert_record('datalynx_contents', (object) [
+            'fieldid' => $field->id,
+            'entryid' => $entrytwo,
+            'lineid' => 0,
+            'content' => 'Beta entry',
+        ]);
+
+        $filterid = (int) $DB->insert_record('datalynx_filters', (object) [
+            'dataid' => $df->id(),
+            'name' => 'Beta only',
+            'description' => '',
+            'visible' => 1,
+            'perpage' => 0,
+            'selection' => 0,
+            'groupby' => '',
+            'customsort' => '',
+            'customsearch' => '',
+            'search' => 'Beta',
+        ]);
+
+        return [$df, $view, $filterid, $entryone, $entrytwo];
+    }
+
+    /**
      * The external function should return a cleaned CSV browse payload.
      *
      * @covers ::execute
@@ -126,5 +335,50 @@ final class get_csv_view_data_test extends advanced_testcase {
         $this->assertCount(1, $result['groups'][0]['rows']);
         $this->assertSame($entryid, $result['groups'][0]['rows'][0]['id']);
         $this->assertStringContainsString('Hello External CSV', $result['groups'][0]['rows'][0]['cells'][0]['valuehtml']);
+    }
+
+    /**
+     * CSV AJAX payloads must preserve active custom search state.
+     *
+     * @covers ::execute
+     */
+    public function test_execute_applies_customsearch_filter_options(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        [$df, $view, $fieldid, $entryone, $entrytwo] = $this->create_csv_multiselect_fixture();
+        $customsearch = serialize([
+            $fieldid => [
+                'AND' => [['', 'ANY_OF', ['2']]],
+            ],
+        ]);
+
+        $result = get_csv_view_data::execute($df->id(), $view->id, 0, 0, 0, '', '', '', '', 0, '', $customsearch);
+        $result = external_api::clean_returnvalue(get_csv_view_data::execute_returns(), $result);
+
+        $this->assertCount(1, $result['groups'][0]['rows']);
+        $this->assertSame($entrytwo, $result['groups'][0]['rows'][0]['id']);
+        $this->assertNotSame($entryone, $result['groups'][0]['rows'][0]['id']);
+        $this->assertStringContainsString('Entry two', $result['groups'][0]['rows'][0]['cells'][0]['valuehtml']);
+    }
+
+    /**
+     * CSV AJAX payloads must preserve a selected runtime filter.
+     *
+     * @covers ::execute
+     */
+    public function test_execute_applies_selected_filterid(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        [$df, $view, $filterid, $entryone, $entrytwo] = $this->create_csv_filter_fixture();
+
+        $result = get_csv_view_data::execute($df->id(), $view->id, $filterid);
+        $result = external_api::clean_returnvalue(get_csv_view_data::execute_returns(), $result);
+
+        $this->assertCount(1, $result['groups'][0]['rows']);
+        $this->assertSame($entrytwo, $result['groups'][0]['rows'][0]['id']);
+        $this->assertNotSame($entryone, $result['groups'][0]['rows'][0]['id']);
+        $this->assertStringContainsString('Beta entry', $result['groups'][0]['rows'][0]['cells'][0]['valuehtml']);
     }
 }
