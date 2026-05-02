@@ -33,13 +33,6 @@ use mod_datalynx\local\datalynx_tcpdf;
 use mod_datalynx\local\view\base;
 use stdClass;
 
-defined('MOODLE_INTERNAL') || die();
-
-require_once("$CFG->libdir/pdflib.php");
-require_once("$CFG->dirroot/mod/assign/feedback/editpdf/fpdi/autoload.php");
-
-require_once($CFG->dirroot . '/mod/assign/feedback/editpdf/fpdi/autoload.php');
-
 /**
  * PDF view class
  *
