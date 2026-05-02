@@ -372,10 +372,14 @@ class view extends base {
                 $args['groupby'] = (string) $this->filter->groupby;
             }
             if (!empty($this->filter->users)) {
-                $args['users'] = is_array($this->filter->users) ? implode(',', $this->filter->users) : (string) $this->filter->users;
+                $args['users'] = is_array($this->filter->users)
+                    ? implode(',', $this->filter->users)
+                    : (string) $this->filter->users;
             }
             if (!empty($this->filter->groups)) {
-                $args['groups'] = is_array($this->filter->groups) ? implode(',', $this->filter->groups) : (string) $this->filter->groups;
+                $args['groups'] = is_array($this->filter->groups)
+                    ? implode(',', $this->filter->groups)
+                    : (string) $this->filter->groups;
             }
 
             $PAGE->requires->js_call_amd('mod_datalynx/viewbrowser', 'init', [$selector, [

@@ -203,7 +203,7 @@ class behat_mod_datalynx extends behat_base {
         $record = $DB->get_record('datalynx', ['name' => $activityname], '*', MUST_EXIST);
         $datalynx = new \mod_datalynx\datalynx($record->id);
         $fields = $datalynx->get_fields();
-        $normalizefieldname = static function(string $name): string {
+        $normalizefieldname = static function (string $name): string {
             return preg_replace('/^Datalynx field\s+/u', '', trim($name));
         };
 
@@ -291,7 +291,7 @@ class behat_mod_datalynx extends behat_base {
         $record = $DB->get_record('datalynx', ['name' => $activityname], '*', MUST_EXIST);
         $datalynx = new \mod_datalynx\datalynx($record->id);
         $fields = $datalynx->get_fields();
-        $normalizefieldname = static function(string $name): string {
+        $normalizefieldname = static function (string $name): string {
             return preg_replace('/^Datalynx field\s+/u', '', trim($name));
         };
 

@@ -19,8 +19,6 @@ namespace mod_datalynx\local\view\manager;
 use coding_exception;
 use mod_datalynx\datalynx;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Builds the structured payload for one internal Email view render.
  *

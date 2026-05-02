@@ -23,8 +23,6 @@ use mod_datalynx\datalynx;
 use mod_datalynx\local\datalynx_entries;
 use stdClass;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Builds the structured browse payload for the Grid view pilot.
  *
@@ -51,7 +49,6 @@ class grid_view_manager {
         if (empty($viewrecords[$viewid])) {
             throw new coding_exception('Invalid view id for grid browse payload.');
         }
-
         $viewrecord = $viewrecords[$viewid];
         if ($viewrecord->type !== 'grid') {
             throw new coding_exception('Grid browse payload manager only supports Grid views.');
@@ -219,5 +216,4 @@ class grid_view_manager {
 
         return $definitions[$tag][1];
     }
-
 }

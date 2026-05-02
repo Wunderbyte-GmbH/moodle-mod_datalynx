@@ -21,8 +21,6 @@ use mod_datalynx\datalynx;
 use mod_datalynx\local\datalynx_entries;
 use stdClass;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Builds the structured browse payload for the CSV view.
  *
