@@ -15,8 +15,13 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 namespace mod_datalynx\local;
+
 use setasign;
 use stdClass;
+
+defined('MOODLE_INTERNAL') || die();
+
+pdf_library::ensure_fpdi_loaded();
 
 /**
  * Extend the TCPDF class to create custom Header and Footer.
