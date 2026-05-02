@@ -20,8 +20,6 @@ use coding_exception;
 use mod_datalynx\datalynx;
 use mod_datalynx\local\datalynx_entries;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Builds the structured browse payload for the PDF view.
  *

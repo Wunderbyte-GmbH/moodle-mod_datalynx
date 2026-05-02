@@ -19,8 +19,6 @@ namespace mod_datalynx\output;
 use renderable;
 use templatable;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Renderable wrapper for the CSV browser payload.
  *

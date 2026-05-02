@@ -24,8 +24,6 @@ use mod_datalynx\datalynx;
 use mod_datalynx\local\datalynx_entries;
 use stdClass;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Builds the structured browse payload for the Tabular view.
  *
@@ -141,12 +139,14 @@ class tabular_view_manager {
             ];
         }
 
-        foreach ([
-            '##multiedit:icon##',
-            '##multidelete:icon##',
-            '##multiapprove:icon##',
-            '##selectallnone##',
-        ] as $tag) {
+        foreach (
+            [
+                '##multiedit:icon##',
+                '##multidelete:icon##',
+                '##multiapprove:icon##',
+                '##selectallnone##',
+            ] as $tag
+        ) {
             $columns[] = [
                 'headerhtml' => $this->resolve_pattern_html($view, $tag, ['showentryactions' => $showentryactions]),
                 'alignclass' => 'text-center',
@@ -228,10 +228,12 @@ class tabular_view_manager {
                 ];
             }
 
-            foreach ([
-                '##edit##',
-                '##delete##',
-            ] as $tag) {
+            foreach (
+                [
+                    '##edit##',
+                    '##delete##',
+                ] as $tag
+            ) {
                 $cells[] = [
                     'valuehtml' => $this->resolve_definition_html(
                         $entryfield->get_definitions([$tag], $entry, ['edit' => false, 'manage' => $manageable]),
