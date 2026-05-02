@@ -46,9 +46,17 @@ class get_pdf_view_data extends external_api {
         return new external_function_parameters([
             'd' => new external_value(PARAM_INT, 'Datalynx instance ID'),
             'view' => new external_value(PARAM_INT, 'PDF view ID'),
+            'filterid' => new external_value(PARAM_INT, 'Active filter ID', VALUE_DEFAULT, 0),
             'page' => new external_value(PARAM_INT, 'Page number', VALUE_DEFAULT, 0),
             'perpage' => new external_value(PARAM_INT, 'Entries per page override', VALUE_DEFAULT, 0),
             'eids' => new external_value(PARAM_SEQUENCE, 'Optional entry ids filter', VALUE_DEFAULT, ''),
+            'users' => new external_value(PARAM_SEQUENCE, 'Optional user ids filter', VALUE_DEFAULT, ''),
+            'groups' => new external_value(PARAM_SEQUENCE, 'Optional group ids filter', VALUE_DEFAULT, ''),
+            'groupby' => new external_value(PARAM_RAW, 'Optional group-by field', VALUE_DEFAULT, ''),
+            'selection' => new external_value(PARAM_INT, 'Optional selection mode override', VALUE_DEFAULT, 0),
+            'customsort' => new external_value(PARAM_RAW, 'Optional serialized custom sort options', VALUE_DEFAULT, ''),
+            'customsearch' => new external_value(PARAM_RAW, 'Optional serialized custom search options', VALUE_DEFAULT, ''),
+            'search' => new external_value(PARAM_RAW, 'Optional search string', VALUE_DEFAULT, ''),
         ]);
     }
 
@@ -57,20 +65,50 @@ class get_pdf_view_data extends external_api {
      *
      * @param int $d
      * @param int $view
+     * @param int $filterid
      * @param int $page
      * @param int $perpage
      * @param string $eids
+     * @param string $users
+     * @param string $groups
+     * @param string $groupby
+     * @param int $selection
+     * @param string $customsort
+     * @param string $customsearch
+     * @param string $search
      * @return array
      */
-    public static function execute(int $d, int $view, int $page = 0, int $perpage = 0, string $eids = ''): array {
+    public static function execute(
+        int $d,
+        int $view,
+        int $filterid = 0,
+        int $page = 0,
+        int $perpage = 0,
+        string $eids = '',
+        string $users = '',
+        string $groups = '',
+        string $groupby = '',
+        int $selection = 0,
+        string $customsort = '',
+        string $customsearch = '',
+        string $search = ''
+    ): array {
         global $OUTPUT;
 
         $params = self::validate_parameters(self::execute_parameters(), [
             'd' => $d,
             'view' => $view,
+            'filterid' => $filterid,
             'page' => $page,
             'perpage' => $perpage,
             'eids' => $eids,
+            'users' => $users,
+            'groups' => $groups,
+            'groupby' => $groupby,
+            'selection' => $selection,
+            'customsort' => $customsort,
+            'customsearch' => $customsearch,
+            'search' => $search,
         ]);
 
         $cm = get_coursemodule_from_instance('datalynx', $params['d'], 0, false, MUST_EXIST);
@@ -80,6 +118,7 @@ class get_pdf_view_data extends external_api {
         require_capability('mod/datalynx:viewentry', $context);
 
         $filteroptions = [
+            'filterid' => $params['filterid'],
             'page' => $params['page'],
         ];
         if (!empty($params['perpage'])) {
@@ -87,6 +126,27 @@ class get_pdf_view_data extends external_api {
         }
         if (!empty($params['eids'])) {
             $filteroptions['eids'] = $params['eids'];
+        }
+        if (!empty($params['users'])) {
+            $filteroptions['users'] = $params['users'];
+        }
+        if (!empty($params['groups'])) {
+            $filteroptions['groups'] = $params['groups'];
+        }
+        if (!empty($params['groupby'])) {
+            $filteroptions['groupby'] = $params['groupby'];
+        }
+        if (!empty($params['selection'])) {
+            $filteroptions['selection'] = $params['selection'];
+        }
+        if (!empty($params['customsort'])) {
+            $filteroptions['customsort'] = unserialize($params['customsort']);
+        }
+        if (!empty($params['customsearch'])) {
+            $filteroptions['customsearch'] = unserialize($params['customsearch']);
+        }
+        if ($params['search'] !== '') {
+            $filteroptions['search'] = $params['search'];
         }
 
         $manager = new pdf_view_manager();
