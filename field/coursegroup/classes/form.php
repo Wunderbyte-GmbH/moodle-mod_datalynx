@@ -65,7 +65,7 @@ class form extends datalynxfield_form {
         $options = ['coursefield' => 'param1', 'groupfield' => 'param2',
                 'acturl' => "$CFG->wwwroot/mod/datalynx/field/coursegroup/loadgroups.php"];
 
-        // Add JQuery.
+        // Add amd JavaScript.
         $PAGE->requires->js_call_amd('mod_datalynx/coursegroup', 'init', [$options]);
     }
 }

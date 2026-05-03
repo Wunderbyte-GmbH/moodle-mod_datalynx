@@ -95,7 +95,7 @@ class form extends datalynxfield_form {
                 'fieldtype' => 'text',
         ];
 
-        // Add JQuery.
+        // Add amd JavaScript.
         $PAGE->requires->js_call_amd('mod_datalynx/datalynxloadviews', 'init', [$options]);
 
         // Rules.

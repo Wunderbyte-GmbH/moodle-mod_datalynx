@@ -194,12 +194,11 @@ class renderer extends datalynxfield_renderer {
         // If we edit an existing entry that is not required we need a workaround.
         $newentry = optional_param('new', null, PARAM_INT) === null ? 1 : 0;
         if (!$newentry && !$required) {
-            $PAGE->requires->js_amd_inline(
-                "
-            require(['jquery'], function($) {
-                $('option[value=\"-999\"]').removeAttr('selected');
-            });"
-            );
+            $PAGE->requires->js_amd_inline("
+                document.querySelectorAll('option[value=\"-999\"]').forEach(option => {
+                    option.selected = false;
+                });
+            ");
         }
 
         // We create a hidden field to force sending. Needs to be done via directly inserting

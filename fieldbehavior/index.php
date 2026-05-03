@@ -37,7 +37,7 @@ require_login($datalynx->data->course, false, $datalynx->cm);
 
 require_capability('mod/datalynx:managetemplates', $datalynx->context);
 
-// Add JQuery.
+// Add amd JavaScript.
 $PAGE->requires->js_call_amd('mod_datalynx/behavior', 'init', []);
 
 $datalynx->set_page('behavior/index', ['urlparams' => $urlparams]);
