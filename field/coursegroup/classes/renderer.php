@@ -117,7 +117,7 @@ class renderer extends datalynxfield_renderer {
                     'acturl' => "$CFG->wwwroot/mod/datalynx/field/coursegroup/loadgroups.php",
             ];
 
-            // Add JQuery.
+            // Add amd JavaScript.
             $PAGE->requires->js_call_amd(
                 'mod_datalynx/coursegroup',
                 'init',

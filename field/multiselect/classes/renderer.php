@@ -73,9 +73,10 @@ class renderer extends datalynxfield_renderer {
             global $PAGE; // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
             // phpcs:disable moodle.PHP.ForbiddenGlobalUse.BadGlobal
             $PAGE->requires->js_amd_inline("
-            require(['jquery'], function($) {
-                $('option[value=\"-999\"]').removeAttr('selected');
-            });");
+                document.querySelectorAll('option[value=\"-999\"]').forEach(option => {
+                    option.selected = false;
+                });
+            ");
             // phpcs:enable moodle.PHP.ForbiddenGlobalUse.BadGlobal
         }
 
