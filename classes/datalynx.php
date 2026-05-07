@@ -1246,7 +1246,7 @@ class datalynx {
         } else {
             if (!$confirmed) {
                 // Print header.
-                $this->print_header('fields');
+                $this->print_header(['tab' => 'fields']);
 
                 $msg = get_string("fieldsconfirm$action", 'datalynx', count($fields));
                 if ($action === 'delete') {
@@ -1877,7 +1877,7 @@ class datalynx {
         } else {
             if (!$confirmed) {
                 // Print header.
-                $this->print_header('views');
+                $this->print_header(['tab' => 'views']);
 
                 // Print a confirmation page.
                 echo $OUTPUT->confirm(
