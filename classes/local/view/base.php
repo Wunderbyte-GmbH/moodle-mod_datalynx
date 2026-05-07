@@ -424,6 +424,9 @@ abstract class base {
 
         // Append custom sort options.
         if ($csort) {
+            if (is_string($csort)) {
+                $csort = unserialize($csort);
+            }
             $this->filter->append_sort_options($csort);
         }
         // Append custom search options.

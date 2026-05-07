@@ -185,7 +185,7 @@ class view extends base {
                 $filteroptions['eids'] = $this->filter->eids;
             }
             if (!empty($this->filter->customsort)) {
-                $filteroptions['customsort'] = $this->filter->customsort;
+                $filteroptions['customsort'] = unserialize($this->filter->customsort);
             }
             if (!empty($this->filter->customsearch)) {
                 $filteroptions['customsearch'] = unserialize($this->filter->customsearch);
