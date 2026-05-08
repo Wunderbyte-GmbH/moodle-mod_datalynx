@@ -188,6 +188,160 @@ class behat_mod_datalynx extends behat_base {
         $this->execute("behat_forms::i_set_the_following_fields_to_these_values", $viewformdata);
         $this->execute('behat_forms::press_button', get_string('savechanges'));
     }
+
+    /**
+     * Creates a report view directly for the specified datalynx instance.
+     *
+     * @Given /^the "(?P<activityname_string>(?:[^"]|\\")*)" datalynx has the following report view:$/
+     *
+     * @param string $activityname
+     * @param TableNode $viewdata
+     */
+    public function the_datalynx_has_the_following_report_view($activityname, TableNode $viewdata) {
+        global $DB;
+
+        $record = $DB->get_record('datalynx', ['name' => $activityname], '*', MUST_EXIST);
+        $datalynx = new \mod_datalynx\datalynx($record->id);
+        $fields = $datalynx->get_fields();
+        $normalizefieldname = static function(string $name): string {
+            return preg_replace('/^Datalynx field\s+/u', '', trim($name));
+        };
+
+        $values = [];
+        foreach ($viewdata->getRowsHash() as $key => $value) {
+            $values[$key] = $value;
+        }
+
+        $countfieldid = 0;
+        foreach ($fields as $field) {
+            if ($normalizefieldname($field->name()) === $normalizefieldname($values['param1'])) {
+                $countfieldid = (int) $field->field->id;
+                break;
+            }
+        }
+        if (!$countfieldid) {
+            throw new \Exception('Unable to find the report count field "' . $values['param1'] . '".');
+        }
+
+        $groupingid = -1;
+        if (($values['param4'] ?? '') === get_string('entryauthor', 'datalynxfield_datalynxview')) {
+            $groupingid = -1;
+        } else {
+            foreach ($fields as $field) {
+                if ($normalizefieldname($field->name()) === $normalizefieldname($values['param4'])) {
+                    $groupingid = (int) $field->field->id;
+                    break;
+                }
+            }
+        }
+
+        $period = $values['param2'] ?? '';
+        if ($period === get_string('nosums', 'datalynxview_report')) {
+            $period = 'nosums';
+        } else if ($period === get_string('month')) {
+            $period = 'month';
+        }
+
+        $DB->insert_record('datalynx_views', (object) [
+            'dataid' => $datalynx->id(),
+            'type' => 'report',
+            'name' => $values['name'] ?? get_string('pluginname', 'datalynxview_report'),
+            'description' => $values['description'] ?? '',
+            'visible' => 7,
+            'filter' => 0,
+            'perpage' => 0,
+            'groupby' => '',
+            'section' => '',
+            'param1' => $countfieldid,
+            'param2' => $period,
+            'param3' => 'sumoffield',
+            'param4' => $groupingid,
+            'param5' => 0,
+            'param10' => 0,
+        ]);
+    }
+
+    /**
+     * Opens the specified datalynx view directly.
+     *
+     * @When /^I open the "(?P<viewname_string>(?:[^"]|\\")*)" view of "(?P<activityname_string>(?:[^"]|\\")*)" datalynx$/
+     *
+     * @param string $viewname
+     * @param string $activityname
+     */
+    public function i_open_the_view_of_datalynx($viewname, $activityname) {
+        global $DB;
+
+        $record = $DB->get_record('datalynx', ['name' => $activityname], '*', MUST_EXIST);
+        $view = $DB->get_record('datalynx_views', ['dataid' => $record->id, 'name' => $viewname], '*', MUST_EXIST);
+        $this->execute('behat_general::i_visit', ["/mod/datalynx/view.php?d={$record->id}&view={$view->id}"]);
+    }
+
+    /**
+     * Creates datalynx entries directly for the specified activity.
+     *
+     * @Given /^the "(?P<activityname_string>(?:[^"]|\\")*)" datalynx has the following entries:$/
+     *
+     * @param string $activityname
+     * @param TableNode $entriesdata
+     */
+    public function the_datalynx_has_the_following_entries($activityname, TableNode $entriesdata) {
+        global $DB;
+
+        $record = $DB->get_record('datalynx', ['name' => $activityname], '*', MUST_EXIST);
+        $datalynx = new \mod_datalynx\datalynx($record->id);
+        $fields = $datalynx->get_fields();
+        $normalizefieldname = static function(string $name): string {
+            return preg_replace('/^Datalynx field\s+/u', '', trim($name));
+        };
+
+        $fieldmap = [];
+        foreach ($fields as $field) {
+            $fieldmap[$normalizefieldname($field->name())] = $field;
+        }
+
+        foreach ($entriesdata->getHash() as $entrydata) {
+            $user = $DB->get_record('user', ['username' => $entrydata['user']], '*', MUST_EXIST);
+            $timestamp = \core\di::get(\core\clock::class)->time();
+            $entryid = (int) $DB->insert_record('datalynx_entries', (object) [
+                'dataid' => $datalynx->id(),
+                'userid' => $user->id,
+                'groupid' => 0,
+                'approved' => 1,
+                'status' => 0,
+                'timecreated' => $timestamp,
+                'timemodified' => $timestamp,
+            ]);
+
+            foreach ($entrydata as $fieldname => $value) {
+                if ($fieldname === 'user' || $value === '') {
+                    continue;
+                }
+                $normalizedname = $normalizefieldname($fieldname);
+                if (empty($fieldmap[$normalizedname])) {
+                    continue;
+                }
+
+                $field = $fieldmap[$normalizedname];
+                $content = $value;
+                if ($field->type === 'select' && method_exists($field, 'get_options')) {
+                    $optionid = array_search($value, $field->get_options(), true);
+                    if ($optionid === false) {
+                        throw new \Exception('Unknown select option "' . $value . '" for field "' . $fieldname . '".');
+                    }
+                    $content = (string) $optionid;
+                }
+
+                $DB->insert_record('datalynx_contents', (object) [
+                    'fieldid' => $field->field->id,
+                    'entryid' => $entryid,
+                    'lineid' => 0,
+                    'content' => $content,
+                ]);
+            }
+        }
+    }
+
     // phpcs:enable moodle.Files.LineLength
 
     /**

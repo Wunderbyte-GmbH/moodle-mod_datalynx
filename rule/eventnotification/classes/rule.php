@@ -20,6 +20,8 @@ use context;
 use html_writer;
 use mod_datalynx\datalynx;
 use mod_datalynx\local\rule\base;
+use mod_datalynx\local\view\manager\email_view_manager;
+use mod_datalynx\output\email_view_browser;
 use moodle_url;
 use stdClass;
 
@@ -322,7 +324,7 @@ class rule extends base {
         moodle_url $datalynxurl,
         stdClass $recipient
     ): ?string {
-        global $USER;
+        global $OUTPUT, $USER;
 
         if (empty($this->emailtemplateviewid)) {
             return null;
@@ -338,21 +340,22 @@ class rule extends base {
                 return null;
             }
 
-            $view = $df->get_view($viewrecord->type, $viewrecord);
-            $df->set_current_view($view);
-            $view->set_filter(['eids' => $entryid], true);
-            $view->set_content(['filter' => $view->get_filter()]);
-
-            return $view->display([
-                'controls' => false,
-                'entryactions' => false,
-                'notify' => false,
-                'tohtml' => true,
+            $manager = new email_view_manager();
+            $payload = $manager->get_entry_payload($df->id(), (int) $viewrecord->id, $entryid, [
                 'notificationentryurl' => $entryurl->out(false),
                 'notificationentrylink' => html_writer::link($entryurl, get_string('linktoentry', 'datalynx')),
                 'notificationdatalynxurl' => $datalynxurl->out(false),
                 'notificationdatalynxlink' => html_writer::link($datalynxurl, format_string($df->name(), true)),
             ]);
+            if (!$payload['hascontent']) {
+                return null;
+            }
+
+            $renderable = new email_view_browser($payload);
+            return $OUTPUT->render_from_template(
+                'mod_datalynx/email_view_browser',
+                $renderable->export_for_template($OUTPUT)
+            );
         } finally {
             \core\session\manager::set_user($originaluser);
         }

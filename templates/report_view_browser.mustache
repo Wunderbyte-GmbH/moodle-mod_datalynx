@@ -1,0 +1,117 @@
+{{!
+    @template mod_datalynx/report_view_browser
+
+    Structured Report browse rendering.
+}}
+<div class="mod-datalynx-report-view-browser"
+     data-datalynxid="{{datalynxid}}"
+     data-viewid="{{viewid}}"
+     data-viewtype="{{viewtype}}">
+    {{#hasdata}}
+        {{#ismonthly}}
+            {{#monthlysections}}
+                <section class="mod-datalynx-report-view-browser__section mb-4">
+                    <h3 class="main">{{heading}}</h3>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered mod-datalynx-report-view-browser__table">
+                            <thead>
+                                <tr>
+                                    <th>{{userlabel}}</th>
+                                    <th>{{totallabel}}</th>
+                                    {{#optioncolumns}}
+                                        <th>{{label}}</th>
+                                    {{/optioncolumns}}
+                                    <th>{{notyetansweredlabel}}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{#rows}}
+                                    <tr>
+                                        <td>{{{userhtml}}}</td>
+                                        <td>{{totalentries}}</td>
+                                        {{#optioncells}}
+                                            <td>{{count}}</td>
+                                        {{/optioncells}}
+                                        <td>{{notyetanswered}}</td>
+                                    </tr>
+                                {{/rows}}
+                                <tr class="font-weight-bold">
+                                    <td>{{totallabel}}</td>
+                                    <td>{{totalentries}}</td>
+                                    {{#optioncells}}
+                                        <td>{{count}}</td>
+                                    {{/optioncells}}
+                                    <td>{{notyetanswered}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            {{/monthlysections}}
+            {{#hasoverall}}
+                {{#overall}}
+                    <section class="mod-datalynx-report-view-browser__section">
+                        <h3 class="main">{{heading}}</h3>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered mod-datalynx-report-view-browser__table">
+                                <thead>
+                                    <tr>
+                                        <th>{{totallabel}}</th>
+                                        <th>{{aggregationsumlabel}}</th>
+                                        {{#optioncolumns}}
+                                            <th>{{label}}</th>
+                                        {{/optioncolumns}}
+                                        <th>{{notyetansweredlabel}}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="font-weight-bold">
+                                        <td>{{totallabel}}</td>
+                                        <td>{{totalentries}}</td>
+                                        {{#optioncells}}
+                                            <td>{{count}}</td>
+                                        {{/optioncells}}
+                                        <td>{{notyetanswered}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                {{/overall}}
+            {{/hasoverall}}
+        {{/ismonthly}}
+        {{^ismonthly}}
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered mod-datalynx-report-view-browser__table">
+                    <thead>
+                        <tr>
+                            <th>{{userlabel}}</th>
+                            <th>{{monthlabel}}</th>
+                            <th>{{totallabel}}</th>
+                            {{#optioncolumns}}
+                                <th>{{label}}</th>
+                            {{/optioncolumns}}
+                            <th>{{notyetansweredlabel}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#rows}}
+                            <tr>
+                                <td>{{{userhtml}}}</td>
+                                <td>{{month}}</td>
+                                <td>{{totalentries}}</td>
+                                {{#optioncells}}
+                                    <td>{{count}}</td>
+                                {{/optioncells}}
+                                <td>{{notyetanswered}}</td>
+                            </tr>
+                        {{/rows}}
+                    </tbody>
+                </table>
+            </div>
+        {{/ismonthly}}
+    {{/hasdata}}
+    {{^hasdata}}
+        {{{emptycontent}}}
+    {{/hasdata}}
+</div>
