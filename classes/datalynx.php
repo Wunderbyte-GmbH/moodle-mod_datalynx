@@ -114,6 +114,13 @@ class datalynx {
     /** @var array Cached view objects indexed by view id. */
     protected $views = [];
 
+    /**
+     * Cached instantiated views scoped to the current datalynx object, user, and sort order.
+     *
+     * @var array<string, array<int, base>>
+     */
+    protected static array $viewinstancecache = [];
+
     /** @var ?object Filter manager instance. */
     protected $filtermanager = null;
 
@@ -1506,6 +1513,15 @@ class datalynx {
     }
 
     /**
+     * Reset static caches that hold instantiated view objects.
+     *
+     * @return void
+     */
+    public static function reset_static_caches(): void {
+        self::$viewinstancecache = [];
+    }
+
+    /**
      * Get all views of a datalynx instance
      *
      * @return array of view objects indexed by view id, empty array if no views are found
@@ -1683,17 +1699,27 @@ class datalynx {
             return [];
         }
 
-        static $views = null;
-        if ($views === null || $forceget) {
-            $views = [];
+        global $USER;
+
+        $cachekey = implode(':', [
+            spl_object_id($this),
+            $this->id(),
+            (string) ($USER->id ?? 0),
+            md5($sort),
+        ]);
+
+        if (!array_key_exists($cachekey, self::$viewinstancecache) || $forceget) {
+            self::$viewinstancecache[$cachekey] = [];
             foreach ($this->views as $viewid => $view) {
-                if (!empty($exclude) && in_array($viewid, $exclude)) {
-                    continue;
-                }
-                $views[$viewid] = $this->get_view($view->type, $view);
+                self::$viewinstancecache[$cachekey][$viewid] = $this->get_view($view->type, $view);
             }
         }
-        return $views;
+
+        if (empty($exclude)) {
+            return self::$viewinstancecache[$cachekey];
+        }
+
+        return array_diff_key(self::$viewinstancecache[$cachekey], array_flip($exclude));
     }
 
     /**

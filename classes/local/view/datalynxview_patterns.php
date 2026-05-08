@@ -47,12 +47,60 @@ class datalynxview_patterns {
     protected ?base $view = null;
 
     /**
+     * Cached view records indexed by the current Datalynx object.
+     *
+     * @var array<string, array<int, \stdClass>>
+     */
+    protected static array $allviewrecordcache = [];
+
+    /**
+     * Cached visible view objects indexed by the current Datalynx object and user.
+     *
+     * @var array<string, array<string, base>>
+     */
+    protected static array $namedviewcache = [];
+
+    /**
+     * Cached visible view names indexed by the current Datalynx object and user.
+     *
+     * @var array<string, array<int, string>>
+     */
+    protected static array $visibleviewnamecache = [];
+
+    /**
+     * Cached all view names indexed by the current Datalynx object.
+     *
+     * @var array<string, array<int, string>>
+     */
+    protected static array $allviewnamecache = [];
+
+    /**
+     * Cached fields indexed by the current Datalynx object.
+     *
+     * @var array<string, array>
+     */
+    protected static array $fieldcache = [];
+
+    /**
      * Constructor
      *
      * @param base $view View instance.
      */
     public function __construct(&$view) {
         $this->view = $view;
+    }
+
+    /**
+     * Reset static caches used by pattern lookups.
+     *
+     * @return void
+     */
+    public static function reset_static_caches(): void {
+        self::$allviewrecordcache = [];
+        self::$namedviewcache = [];
+        self::$visibleviewnamecache = [];
+        self::$allviewnamecache = [];
+        self::$fieldcache = [];
     }
 
     /**
@@ -185,12 +233,9 @@ class datalynxview_patterns {
         $df = $this->view->get_dl();
         $currentview = $df->get_current_view();
 
-        static $views = null;
-        if ($views === null) {
-            $views = $df->get_all_views();
+        $views = $this->get_cached_all_view_records();
+        if ($views) {
             foreach ($views as $view) {
-                $viewname = $view->name;
-
                 $baseurlparams = [];
                 $baseurlparams['d'] = $view->dataid;
                 $baseurlparams['view'] = $view->id;
@@ -241,10 +286,7 @@ class datalynxview_patterns {
             }
         }
 
-        static $fields = null;
-        if ($fields === null) {
-            $fields = $df->get_fields(null, true);
-        }
+        $fields = $this->get_cached_fields();
 
         foreach ($fields as $id => $fieldname) {
             if (strpos($tag, "%%{$fieldname}:bulkedit%%") === 0) {
@@ -717,17 +759,7 @@ class datalynxview_patterns {
             return $view->get_baseurl()->out(false);
         }
 
-        $df = $this->view->get_dl();
-        static $views = null;
-        if ($views === null) {
-            $views = [];
-            $theviews = $df->get_views();
-            if (!empty($theviews)) {
-                foreach ($theviews as $theview) {
-                    $views[$theview->name()] = $theview;
-                }
-            }
-        }
+        $views = $this->get_cached_named_views();
 
         if (!empty($views[$viewname])) {
             return $views[$viewname]->get_baseurl()->out(false);
@@ -742,17 +774,7 @@ class datalynxview_patterns {
      * @return string
      */
     protected function get_viewcontent_replacement(?string $viewname = null): string {
-        $df = $this->view->get_dl();
-        static $views = null;
-        if ($views === null) {
-            $views = [];
-            $theviews = $df->get_views();
-            if (!empty($theviews)) {
-                foreach ($theviews as $theview) {
-                    $views[$theview->name()] = $theview;
-                }
-            }
-        }
+        $views = $this->get_cached_named_views();
 
         if (!empty($views[$viewname])) {
             // Cannot display current view or else infinite loop.
@@ -811,21 +833,7 @@ class datalynxview_patterns {
                 '##viewsmenu##' => [true, $cat],
                 '##filtersmenu##' => [true, $cat]];
 
-        $df = $this->view->get_dl();
-
-        static $views = null;
-        if ($views === null && $checkvisibility) {
-            $views = $df->get_views_menu();
-        } else {
-            if ($checkvisibility == false) {
-                $viewojects = $df->get_all_views();
-                if (!empty($viewojects)) {
-                    foreach ($viewojects as $viewid => $view) {
-                        $views[$viewid] = $view->name;
-                    }
-                }
-            }
-        }
+        $views = $checkvisibility ? $this->get_cached_visible_view_names() : $this->get_cached_all_view_names();
 
         if ($views) {
             foreach ($views as $viewname) {
@@ -930,20 +938,8 @@ class datalynxview_patterns {
      * @return array multidimensional with pattern as key and array with showinmenu and category as value
      */
     protected function regexp_patterns($checkvisibility = true) {
-        $df = $this->view->get_dl();
-
-        $views = [];
+        $views = $checkvisibility ? $this->get_cached_visible_view_names() : $this->get_cached_all_view_names();
         $patterns = [];
-        if ($checkvisibility) {
-            $views = $df->get_views_menu();
-        } else {
-            $viewojects = $df->get_all_views();
-            if (!empty($viewojects)) {
-                foreach ($viewojects as $viewid => $view) {
-                    $views[$viewid] = $view->name;
-                }
-            }
-        }
         // Get list of views.
         if ($views) {
             // View link.
@@ -984,12 +980,7 @@ class datalynxview_patterns {
      * @return boolean true if $pattern is a viewname or fieldame
      */
     public function is_regexp_pattern($pattern) {
-        $df = $this->view->get_dl();
-
-        static $views = null;
-        if ($views === null) {
-            $views = $df->get_views_menu();
-        }
+        $views = $this->get_cached_visible_view_names();
 
         if ($views) {
             foreach ($views as $viewname) {
@@ -1002,10 +993,7 @@ class datalynxview_patterns {
             }
         }
 
-        static $fields = null;
-        if ($fields === null) {
-            $fields = $df->get_fields(null, true);
-        }
+        $fields = $this->get_cached_fields();
 
         foreach ($fields as $fieldname) {
             if (strpos($pattern, "%%{$fieldname}:bulkedit%%") === 0) {
@@ -1013,6 +1001,104 @@ class datalynxview_patterns {
             }
         }
         return false;
+    }
+
+    /**
+     * Cache key for data shared within the current Datalynx object.
+     *
+     * @return string
+     */
+    protected function get_cache_context_key(): string {
+        $df = $this->view->get_dl();
+
+        return spl_object_id($df) . ':' . $df->id();
+    }
+
+    /**
+     * Cache key for data that depends on the current user.
+     *
+     * @return string
+     */
+    protected function get_user_cache_context_key(): string {
+        global $USER;
+
+        return $this->get_cache_context_key() . ':' . ($USER->id ?? 0);
+    }
+
+    /**
+     * Get cached view records for the current Datalynx object.
+     *
+     * @return array<int, \stdClass>
+     */
+    protected function get_cached_all_view_records(): array {
+        $cachekey = $this->get_cache_context_key();
+        if (!array_key_exists($cachekey, self::$allviewrecordcache)) {
+            self::$allviewrecordcache[$cachekey] = $this->view->get_dl()->get_all_views();
+        }
+
+        return self::$allviewrecordcache[$cachekey];
+    }
+
+    /**
+     * Get cached visible views keyed by view name.
+     *
+     * @return array<string, base>
+     */
+    protected function get_cached_named_views(): array {
+        $cachekey = $this->get_user_cache_context_key();
+        if (!array_key_exists($cachekey, self::$namedviewcache)) {
+            self::$namedviewcache[$cachekey] = [];
+            foreach ($this->view->get_dl()->get_views() as $view) {
+                self::$namedviewcache[$cachekey][$view->name()] = $view;
+            }
+        }
+
+        return self::$namedviewcache[$cachekey];
+    }
+
+    /**
+     * Get cached visible view names.
+     *
+     * @return array<int, string>
+     */
+    protected function get_cached_visible_view_names(): array {
+        $cachekey = $this->get_user_cache_context_key();
+        if (!array_key_exists($cachekey, self::$visibleviewnamecache)) {
+            self::$visibleviewnamecache[$cachekey] = $this->view->get_dl()->get_views_menu();
+        }
+
+        return self::$visibleviewnamecache[$cachekey];
+    }
+
+    /**
+     * Get cached view names without visibility filtering.
+     *
+     * @return array<int, string>
+     */
+    protected function get_cached_all_view_names(): array {
+        $cachekey = $this->get_cache_context_key();
+        if (!array_key_exists($cachekey, self::$allviewnamecache)) {
+            self::$allviewnamecache[$cachekey] = [];
+            foreach ($this->get_cached_all_view_records() as $viewid => $view) {
+                self::$allviewnamecache[$cachekey][$viewid] = $view->name;
+            }
+        }
+
+        return self::$allviewnamecache[$cachekey];
+    }
+
+    /**
+     * Get cached Datalynx fields for nested tag resolution and bulk-edit patterns.
+     *
+     * @return array
+     */
+    protected function get_cached_fields(): array {
+        $cachekey = $this->get_cache_context_key();
+        if (!array_key_exists($cachekey, self::$fieldcache)) {
+            self::$fieldcache[$cachekey] = $this->view->get_dl()->get_fields(null, true);
+        }
+
+        return self::$fieldcache[$cachekey];
     }
 
     /**

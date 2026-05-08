@@ -27,6 +27,7 @@ namespace mod_datalynx;
 
 use advanced_testcase;
 use datalynxview_tabular\view as tabular_view;
+use mod_datalynx\local\view\datalynxview_patterns;
 use stdClass;
 
 /**
@@ -40,6 +41,8 @@ final class viewlink_pattern_test extends advanced_testcase {
         parent::setUp();
         $this->resetAfterTest();
         $this->setAdminUser();
+        datalynx::reset_static_caches();
+        datalynxview_patterns::reset_static_caches();
     }
 
     /**
@@ -74,7 +77,7 @@ final class viewlink_pattern_test extends advanced_testcase {
      * @return array{0: datalynx, 1: tabular_view, 2: tabular_view}
      *   [df, targetView, templateView]
      */
-    private function create_test_views(string $taginsection): array {
+    private function create_test_views(string $taginsection, string $targetviewname = 'myview'): array {
         global $DB;
 
         $generator = $this->getDataGenerator();
@@ -86,7 +89,7 @@ final class viewlink_pattern_test extends advanced_testcase {
         $targetview = new stdClass();
         $targetview->dataid  = $datalynxrecord->id;
         $targetview->type    = 'tabular';
-        $targetview->name    = 'myview';
+        $targetview->name    = $targetviewname;
         $targetview->description = '';
         $targetview->visible = 7;
         $targetview->filter  = 0;
@@ -230,6 +233,29 @@ final class viewlink_pattern_test extends advanced_testcase {
         $patternclass = $templateobj->patternclass();
         $tag = '##viewurl:myview##';
         $replacements = $patternclass->get_replacements([$tag], null, []);
+
+        $this->assertArrayHasKey($tag, $replacements);
+        $this->assertNotEmpty($replacements[$tag]);
+        $this->assertStringContainsString('d=' . $df->id(), $replacements[$tag]);
+        $this->assertStringContainsString('view=' . $targetobj->id(), $replacements[$tag]);
+    }
+
+    /**
+     * Test that view-name based URL replacements do not leak across Datalynx instances.
+     *
+     * @covers ::get_replacements
+     */
+    public function test_get_replacements_resolves_viewurl_tag_across_datalynx_instances(): void {
+        [, , $firsttemplateobj] = $this->create_test_views('##viewurl:firstview##', 'firstview');
+
+        $firsttag = '##viewurl:firstview##';
+        $firstreplacements = $firsttemplateobj->patternclass()->get_replacements([$firsttag], null, []);
+        $this->assertNotEmpty($firstreplacements[$firsttag]);
+
+        [$df, $targetobj, $templateobj] = $this->create_test_views('##viewurl:myview##');
+
+        $tag = '##viewurl:myview##';
+        $replacements = $templateobj->patternclass()->get_replacements([$tag], null, []);
 
         $this->assertArrayHasKey($tag, $replacements);
         $this->assertNotEmpty($replacements[$tag]);
