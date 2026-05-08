@@ -74,6 +74,7 @@ final class viewlink_pattern_test extends advanced_testcase {
      * Create a minimal datalynx instance with two tabular views and return both.
      *
      * @param string $taginsection The tag to place in the template view section.
+     * @param string targetviewname The viewname of the view in question.
      * @return array{0: datalynx, 1: tabular_view, 2: tabular_view}
      *   [df, targetView, templateView]
      */

@@ -27,7 +27,6 @@ use advanced_testcase;
  * @covers \mod_datalynx\datalynx::process_views
  */
 final class datalynx_process_views_test extends advanced_testcase {
-
     /**
      * Create a minimal datalynx fixture with one tabular view.
      *
