@@ -59,6 +59,8 @@ Feature: Multi-edit selected entries in a tabular Datalynx view
 
   @javascript
   Scenario: Multi-edit only the selected entries after deselecting one
+    When I wait until the page is ready
+    Then ".mod-datalynx-tabular-view-browser" "css_element" should exist
     When I set the field with xpath "//th[contains(concat(' ', @class, ' '), ' lastcol')]//input[@type='checkbox']" to "1"
     And I set the field with xpath "(//input[@name='entryselector'])[2]" to "0"
     And I press "multiedit"

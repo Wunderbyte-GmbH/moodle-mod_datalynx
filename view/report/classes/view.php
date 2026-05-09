@@ -119,11 +119,13 @@ class view extends base {
             !optional_param('new', 0, PARAM_INT) && !$this->entriesprocessedsuccessfully;
 
         $this->set_view_tags($options);
-        $browserregion = html_writer::tag(
-            'div',
-            $this->render_report_browser(),
-            ['class' => 'mod-datalynx-report-entries', 'data-region' => 'report-view-browser']
-        );
+        $browserregion = $browsemode
+            ? $this->render_view_browser_region('mod-datalynx-report-entries', 'report-view-browser')
+            : html_writer::tag(
+                'div',
+                $this->render_report_browser(),
+                ['class' => 'mod-datalynx-report-entries', 'data-region' => 'report-view-browser']
+            );
         $section = !empty($this->view->esection) ? $this->view->esection : '##entries##';
         $output = $this->print_notifications() . str_replace('##entries##', $browserregion, $section);
         $viewname = 'datalynxview-' . preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $this->name()));
@@ -141,51 +143,11 @@ class view extends base {
         echo $output;
 
         if ($browsemode) {
-            $selector = '[data-id="' . $this->dl->id() . '"][data-viewid="' . $this->id() .
-                '"] [data-region="report-view-browser"]';
-            $args = [
-                'd' => (int) $this->dl->id(),
-                'view' => (int) $this->id(),
-                'filterid' => (int) ($this->filter->id ?? 0),
-                'page' => (int) ($this->filter->page ?? 0),
-            ];
-            if (!empty($this->filter->perpage)) {
-                $args['perpage'] = (int) $this->filter->perpage;
-            }
-            if (!empty($this->filter->eids)) {
-                $args['eids'] = is_array($this->filter->eids) ? implode(',', $this->filter->eids) : (string) $this->filter->eids;
-            }
-            if (!empty($this->filter->customsort)) {
-                $args['customsort'] = $this->filter->customsort;
-            }
-            if (!empty($this->filter->customsearch)) {
-                $args['customsearch'] = $this->filter->customsearch;
-            }
-            if (!empty($this->filter->search)) {
-                $args['search'] = (string) $this->filter->search;
-            }
-            if (!empty($this->filter->selection)) {
-                $args['selection'] = (int) $this->filter->selection;
-            }
-            if (!empty($this->filter->groupby)) {
-                $args['groupby'] = (string) $this->filter->groupby;
-            }
-            if (!empty($this->filter->users)) {
-                $args['users'] = is_array($this->filter->users)
-                    ? implode(',', $this->filter->users)
-                    : (string) $this->filter->users;
-            }
-            if (!empty($this->filter->groups)) {
-                $args['groups'] = is_array($this->filter->groups)
-                    ? implode(',', $this->filter->groups)
-                    : (string) $this->filter->groups;
-            }
-
-            $PAGE->requires->js_call_amd('mod_datalynx/viewbrowser', 'init', [$selector, [
-                'methodname' => 'mod_datalynx_get_report_view_data',
-                'template' => 'mod_datalynx/report_view_browser',
-                'args' => $args,
-            ]]);
+            $this->initialise_view_browser(
+                'report-view-browser',
+                'mod_datalynx_get_report_view_data',
+                'mod_datalynx/report_view_browser'
+            );
         }
 
         return '';
