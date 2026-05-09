@@ -21,143 +21,142 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import {getString} from 'core/str';
+import Config from 'core/config';
 
 /** @type {boolean} */
 let isListeningForUpdates = false;
 
 /**
- * Return all approval links inside one root element.
+ * CSS selector for one approval control.
  *
- * @param {Document|Element} root
- * @returns {HTMLElement[]}
+ * @type {string}
  */
-const getApprovalElements = (root) => {
-    const elements = [];
+const APPROVE_SELECTOR = '.datalynxfield_approve[role="switch"]';
 
-    if (root instanceof Element && root.matches('.datalynxfield_approve')) {
-        elements.push(root);
+/**
+ * Return the localized label for the supplied state.
+ *
+ * @param {HTMLButtonElement} control
+ * @param {boolean} isApproved
+ * @returns {string}
+ */
+const getStateLabel = (control, isApproved) => isApproved
+    ? control.dataset.approvedLabel || ''
+    : control.dataset.notApprovedLabel || '';
+
+/**
+ * Sync the switch UI with the persisted approval state.
+ *
+ * @param {HTMLButtonElement} control
+ * @param {boolean} isApproved
+ */
+const updateApprovalControl = (control, isApproved) => {
+    const label = control.querySelector('.datalynxfield_approve-label');
+    const statelabel = getStateLabel(control, isApproved);
+
+    control.dataset.approved = isApproved ? '1' : '0';
+    control.setAttribute('aria-checked', isApproved ? 'true' : 'false');
+    control.setAttribute('aria-label', statelabel);
+    control.setAttribute('title', statelabel);
+
+    if (label) {
+        label.textContent = statelabel;
     }
-
-    if ('querySelectorAll' in root) {
-        elements.push(...root.querySelectorAll('.datalynxfield_approve'));
-    }
-
-    return elements;
 };
 
 /**
- * Registers event listeners for the approval buttons.
- *
- * @param {Document|Element} root Root element to scan.
- * @param {String} approveString The localized string for "Approve".
- * @param {String} unapproveString The localized string for "Unapprove".
+ * Reload the page when the switch cannot recover from an AJAX failure.
  */
-const registerEventListeners = (root, approveString, unapproveString) => {
-    getApprovalElements(root).forEach(element => {
-        // Prevent multiple listeners on the same element
-        if (element.dataset.approveInitialized) {
-            return;
-        }
-        element.dataset.approveInitialized = "true";
+const reloadPage = () => {
+    window.location.reload();
+};
 
-        element.addEventListener('click', (e) => {
-            e.preventDefault();
-            const fallbackUrl = element.href;
+/**
+ * Toggle approval for one entry via AJAX.
+ *
+ * @param {HTMLButtonElement} control
+ * @returns {Promise<void>}
+ */
+const toggleApproval = (control) => {
+    const {entryid, d, view, sesskey} = control.dataset;
 
-            // Get parameters from data attributes
-            const entryid = element.dataset.entryid;
-            const d = element.dataset.d;
-            const view = element.dataset.view;
-            const sesskey = element.dataset.sesskey;
+    if (!entryid || !d || !sesskey) {
+        reloadPage();
+        return Promise.resolve();
+    }
 
-            if (!entryid || !d || !sesskey) {
-                // Missing required data, fallback to normal link behavior
-                window.location.href = fallbackUrl;
+    control.disabled = true;
+    control.setAttribute('aria-busy', 'true');
+
+    return fetch(`${Config.wwwroot}/mod/datalynx/field/approve/ajax.php`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+            entryid,
+            d,
+            view: view || '0',
+            sesskey,
+            action: 'toggle-approval'
+        })
+    })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            return response.json();
+        })
+        .then((data) => {
+            if (!data || typeof data.approved === 'undefined') {
+                reloadPage();
                 return;
             }
 
-            const params = {
-                entryid: entryid,
-                d: d,
-                view: view,
-                sesskey: sesskey,
-                action: 'toggle-approval'
-            };
-
-            fetch("field/approve/ajax.php", {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: new URLSearchParams(params)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                // Expecting { entryid: ..., approved: 1/0 }
-                if (!data || typeof data.approved === 'undefined') {
-                    // Unexpected response format, reload to be safe
-                    window.location.href = fallbackUrl;
-                    return null;
-                }
-
-                const icon = element.querySelector('i');
-                const label = element.querySelector('.datalynxfield_approve-label');
-                const isApproved = (data.approved == 1);
-
-                if (isApproved) {
-                    if (label) {
-                        label.innerHTML = unapproveString;
-                    }
-                    if (icon) {
-                        icon.classList.remove('fa-circle-xmark', 'text-danger');
-                        icon.classList.add('fa-circle-check', 'text-success');
-                    }
-                } else {
-                    if (label) {
-                        label.innerHTML = approveString;
-                    }
-                    if (icon) {
-                        icon.classList.remove('fa-circle-check', 'text-success');
-                        icon.classList.add('fa-circle-xmark', 'text-danger');
-                    }
-                }
-
-                return data;
-            })
-            .catch(() => {
-                // AJAX failed — fall back to full page reload via original href.
-                window.location.href = fallbackUrl;
-            });
+            updateApprovalControl(control, Number(data.approved) === 1);
+        })
+        .catch(() => {
+            reloadPage();
+        })
+        .finally(() => {
+            control.disabled = false;
+            control.removeAttribute('aria-busy');
         });
-    });
+};
+
+/**
+ * Handle click events from approval switches.
+ *
+ * @param {MouseEvent} event
+ */
+const handleApprovalClick = (event) => {
+    const target = event.target instanceof Element
+        ? event.target
+        : event.target instanceof Node
+            ? event.target.parentElement
+            : null;
+    if (!target) {
+        return;
+    }
+
+    const control = target.closest(APPROVE_SELECTOR);
+    if (!(control instanceof HTMLButtonElement) || control.disabled) {
+        return;
+    }
+
+    event.preventDefault();
+    void toggleApproval(control);
 };
 
 /**
  * Initialize the module.
  */
-export const init = async() => {
-    const [approveString, unapproveString] = await Promise.all([
-        getString('approve', 'core'),
-        getString('unapprove', 'mod_datalynx')
-    ]);
-
-    registerEventListeners(document, approveString, unapproveString);
-
+export const init = () => {
     if (isListeningForUpdates) {
         return;
     }
 
-    document.addEventListener('mod_datalynx:viewContentUpdated', (event) => {
-        const root = event.detail?.target;
-        if (root) {
-            registerEventListeners(root, approveString, unapproveString);
-        }
-    });
+    document.addEventListener('click', handleApprovalClick);
     isListeningForUpdates = true;
 };

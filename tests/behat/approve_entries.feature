@@ -95,8 +95,9 @@ Feature: Filter approved and not approved entries from multiple students
     And I follow the datalynx "Manage" link
     And I follow the datalynx "Views" link
     And I follow "Manage view"
-    And I click on "Approve" "link" in the "Text of student1" "table_row"
-    Then I wait until "approved" "text" exists
+    And I click on "Not approved" "button" in the "Text of student1" "table_row"
+    Then I wait until ".datalynxfield_approve[aria-checked='true']" "css_element" exists
+    And I should see "Approved" in the "Text of student1" "table_row"
     And I follow the datalynx "Manage" link
     And I follow "Notapproved view"
     Then I should not see "Text of student1"
