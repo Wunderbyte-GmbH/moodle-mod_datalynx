@@ -25,6 +25,7 @@
 namespace datalynxfield_comment;
 
 use comment;
+use html_writer;
 use mod_datalynx\local\field\datalynxfield_renderer;
 use stdClass;
 
@@ -110,9 +111,35 @@ class renderer extends datalynxfield_renderer {
             }
             $comment = new comment($cmt);
             $str = $comment->output(true);
+            global $PAGE; // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
+            // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
+            $PAGE->requires->js_call_amd('mod_datalynx/comments', 'init');
+            $str = $this->wrap_comment_widget($comment, $cmt, $str);
         }
 
         return $str;
+    }
+
+    /**
+     * Wrap the rendered comment widget with the metadata needed for AJAX re-initialisation.
+     *
+     * @param comment $comment Comment helper instance.
+     * @param stdClass $options Comment options used to build the widget.
+     * @param string $content Rendered widget HTML.
+     * @return string
+     */
+    protected function wrap_comment_widget(comment $comment, stdClass $options, string $content): string {
+        return html_writer::tag('div', $content, [
+            'class' => 'datalynx-comment-widget',
+            'data-comment-client-id' => $comment->get_cid(),
+            'data-comment-area' => $options->area,
+            'data-comment-itemid' => $options->itemid,
+            'data-comment-courseid' => $options->courseid,
+            'data-comment-contextid' => $options->context->id,
+            'data-comment-component' => $options->component,
+            'data-comment-notoggle' => !empty($options->notoggle) ? '1' : '0',
+            'data-comment-autostart' => !empty($options->autostart) ? '1' : '0',
+        ]);
     }
 
     /**

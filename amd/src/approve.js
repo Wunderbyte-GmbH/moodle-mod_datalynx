@@ -23,14 +23,38 @@
 
 import {getString} from 'core/str';
 
+/** @type {boolean} */
+let isListeningForUpdates = false;
+
+/**
+ * Return all approval links inside one root element.
+ *
+ * @param {Document|Element} root
+ * @returns {HTMLElement[]}
+ */
+const getApprovalElements = (root) => {
+    const elements = [];
+
+    if (root instanceof Element && root.matches('.datalynxfield_approve')) {
+        elements.push(root);
+    }
+
+    if ('querySelectorAll' in root) {
+        elements.push(...root.querySelectorAll('.datalynxfield_approve'));
+    }
+
+    return elements;
+};
+
 /**
  * Registers event listeners for the approval buttons.
  *
+ * @param {Document|Element} root Root element to scan.
  * @param {String} approveString The localized string for "Approve".
  * @param {String} unapproveString The localized string for "Unapprove".
  */
-const registerEventListeners = (approveString, unapproveString) => {
-    document.querySelectorAll(".datalynxfield_approve").forEach(element => {
+const registerEventListeners = (root, approveString, unapproveString) => {
+    getApprovalElements(root).forEach(element => {
         // Prevent multiple listeners on the same element
         if (element.dataset.approveInitialized) {
             return;
@@ -123,5 +147,17 @@ export const init = async() => {
         getString('unapprove', 'mod_datalynx')
     ]);
 
-    registerEventListeners(approveString, unapproveString);
+    registerEventListeners(document, approveString, unapproveString);
+
+    if (isListeningForUpdates) {
+        return;
+    }
+
+    document.addEventListener('mod_datalynx:viewContentUpdated', (event) => {
+        const root = event.detail?.target;
+        if (root) {
+            registerEventListeners(root, approveString, unapproveString);
+        }
+    });
+    isListeningForUpdates = true;
 };
