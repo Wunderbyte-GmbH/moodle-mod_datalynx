@@ -26,6 +26,20 @@ import Notification from 'core/notification';
 import Templates from 'core/templates';
 
 /**
+ * Notify feature scripts that a browse region received fresh DOM from AJAX.
+ *
+ * @param {HTMLElement} element
+ */
+const notifyContentUpdated = (element) => {
+    element.dispatchEvent(new CustomEvent('mod_datalynx:viewContentUpdated', {
+        bubbles: true,
+        detail: {
+            target: element,
+        }
+    }));
+};
+
+/**
  * Fetch the browse payload from the configured external function.
  *
  * @param {Object} options
@@ -69,6 +83,7 @@ export default {
         return fetchPayload(options)
             .then((payload) => Templates.renderForPromise(options.template, payload))
             .then(({html, js}) => Templates.replaceNodeContents(element, html, js))
+            .then(() => notifyContentUpdated(element))
             .catch((error) => {
                 renderErrorState(element, options.errormessage || 'Unable to load view entries.');
                 Notification.exception(error);
