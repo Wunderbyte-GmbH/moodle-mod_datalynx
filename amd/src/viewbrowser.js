@@ -36,6 +36,22 @@ const fetchPayload = (options) => Ajax.call([{
     args: options.args || {},
 }])[0];
 
+/**
+ * Render a visible error state into the browser region.
+ *
+ * @param {HTMLElement} element
+ * @param {string} message
+ */
+const renderErrorState = (element, message) => {
+    element.replaceChildren();
+
+    const alert = document.createElement('div');
+    alert.className = 'alert alert-danger';
+    alert.textContent = message;
+
+    element.appendChild(alert);
+};
+
 export default {
     /**
      * Fetch and render one browse region into the supplied element.
@@ -53,7 +69,10 @@ export default {
         return fetchPayload(options)
             .then((payload) => Templates.renderForPromise(options.template, payload))
             .then(({html, js}) => Templates.replaceNodeContents(element, html, js))
-            .catch(Notification.exception);
+            .catch((error) => {
+                renderErrorState(element, options.errormessage || 'Unable to load view entries.');
+                Notification.exception(error);
+            });
     },
 
     fetch(options) {

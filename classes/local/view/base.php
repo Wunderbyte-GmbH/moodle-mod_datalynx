@@ -727,6 +727,7 @@ abstract class base {
         $notify = $options['notify'] ?? true;
         $tohtml = $options['tohtml'] ?? false;
         $pluginfileurl = $options['pluginfileurl'] ?? null;
+        $entriesplaceholder = $options['entriesplaceholder'] ?? null;
 
         // Build entries display definition.
         $requiresmanageentries = $this->set_display_definition($options);
@@ -752,6 +753,8 @@ abstract class base {
             if ($new || $this->user_is_editing()) {
                 $renderedentries = $this->display_entries($options);
                 $output = str_replace('##entries##', $renderedentries, $output);
+            } else if ($entriesplaceholder !== null && !$this->entriesprocessedsuccessfully) {
+                $output = str_replace('##entries##', $entriesplaceholder, $output);
             } else if ($this->entries->get_count()) {
                 // Entries have been updated or added. This is an intermediate page displaying the success of the operation.
                 // It would be nice to replace that in the future with a modal or similar.
@@ -781,6 +784,105 @@ abstract class base {
             echo $output;
         }
         return '';
+    }
+
+    /**
+     * Build the placeholder region that will be populated by the AJAX browser.
+     *
+     * @param string $regionclass
+     * @param string $region
+     * @return string
+     */
+    protected function render_view_browser_region(string $regionclass, string $region): string {
+        global $OUTPUT;
+
+        $loadingcontent = $OUTPUT->pix_icon('i/loading', get_string('loading', 'moodle'), 'moodle', ['class' => 'loadingicon']) .
+            html_writer::span(get_string('ajaxviewloading', 'datalynx'), 'mod-datalynx-view-browser-state__label');
+        $loadingstate = html_writer::tag('div', $loadingcontent, [
+            'class' => 'mod-datalynx-view-browser-state mod-datalynx-view-browser-state-loading alert alert-secondary',
+            'data-region' => 'view-browser-loading',
+        ]);
+
+        return html_writer::tag('div', $loadingstate, [
+            'class' => $regionclass,
+            'data-region' => $region,
+        ]);
+    }
+
+    /**
+     * Build the shared filter-aware arguments for AJAX browser requests.
+     *
+     * @return array
+     */
+    protected function get_view_browser_arguments(): array {
+        $args = [
+            'd' => (int) $this->dl->id(),
+            'view' => (int) $this->id(),
+            'filterid' => (int) ($this->filter->id ?? 0),
+            'page' => (int) ($this->filter->page ?? 0),
+        ];
+        if (!empty($this->filter->perpage)) {
+            $args['perpage'] = (int) $this->filter->perpage;
+        }
+        if (!empty($this->filter->eids)) {
+            $args['eids'] = is_array($this->filter->eids) ? implode(',', $this->filter->eids) : (string) $this->filter->eids;
+        }
+        if (!empty($this->filter->customsort)) {
+            $args['customsort'] = $this->filter->customsort;
+        }
+        if (!empty($this->filter->customsearch)) {
+            $args['customsearch'] = $this->filter->customsearch;
+        }
+        if (!empty($this->filter->search)) {
+            $args['search'] = (string) $this->filter->search;
+        }
+        if (!empty($this->filter->selection)) {
+            $args['selection'] = (int) $this->filter->selection;
+        }
+        if (!empty($this->filter->groupby)) {
+            $args['groupby'] = (string) $this->filter->groupby;
+        }
+        if (!empty($this->filter->users)) {
+            $args['users'] = is_array($this->filter->users)
+                ? implode(',', $this->filter->users)
+                : (string) $this->filter->users;
+        }
+        if (!empty($this->filter->groups)) {
+            $args['groups'] = is_array($this->filter->groups)
+                ? implode(',', $this->filter->groups)
+                : (string) $this->filter->groups;
+        }
+
+        return $args;
+    }
+
+    /**
+     * Return the selector for one AJAX browser region.
+     *
+     * @param string $region
+     * @return string
+     */
+    protected function get_view_browser_selector(string $region): string {
+        return '[data-id="' . $this->dl->id() . '"][data-viewid="' . $this->id() . '"] [data-region="' . $region . '"]';
+    }
+
+    /**
+     * Register the AMD bootstrap for one AJAX browser region.
+     *
+     * @param string $region
+     * @param string $methodname
+     * @param string $template
+     * @return void
+     */
+    protected function initialise_view_browser(string $region, string $methodname, string $template): void {
+        global $PAGE;
+
+        $PAGE->requires->js_call_amd('mod_datalynx/viewbrowser', 'init', [$this->get_view_browser_selector($region), [
+            'methodname' => $methodname,
+            'template' => $template,
+            'args' => $this->get_view_browser_arguments(),
+            'errormessage' => get_string('ajaxviewloaderror', 'datalynx'),
+        ]]);
     }
 
     /**
