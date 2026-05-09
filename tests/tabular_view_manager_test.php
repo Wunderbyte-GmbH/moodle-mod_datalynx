@@ -250,7 +250,10 @@ final class tabular_view_manager_test extends advanced_testcase {
         // Verify the generated ORDER BY SQL contains an ASC clause for the duration field content.
         $fields = $df->get_fields(null, false, true);
         [, , $sortorder] = $view->get_filter()->get_sql($fields);
-        $this->assertStringContainsString('ASC', $sortorder,
-            'ORDER BY clause must contain ASC direction for duration field sort');
+        $this->assertStringContainsString(
+            'ASC',
+            $sortorder,
+            'ORDER BY clause must contain ASC direction for duration field sort'
+        );
     }
 }
