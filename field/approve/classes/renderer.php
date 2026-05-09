@@ -129,20 +129,19 @@ class renderer extends datalynxfield_renderer {
         global $PAGE;
 
         $field = $this->field;
-        if ($entry && isset($entry->approved) && $entry->approved) {
-            $iconclass = 'fa-regular fa-circle-check text-success   ';
-            $labelstring = get_string('unapprove', 'datalynx');
-        } else {
-            $iconclass = 'fa-regular fa-circle-xmark text-danger';
-            $labelstring = get_string('approve');
-        }
-
-        $icon = html_writer::tag('i', '', [
-            'class' => "icon {$iconclass} fa-fw",
-            'role' => 'img',
-            'aria-hidden' => 'true',
-        ]);
-        $label = html_writer::span($labelstring, 'datalynxfield_approve-label');
+        $isapproved = !empty($entry->approved);
+        $statelabel = $isapproved
+            ? get_string('approvalstateapproved', 'mod_datalynx')
+            : get_string('approvalstatenotapproved', 'mod_datalynx');
+        $togglecontent = html_writer::span('', 'datalynxfield_approve-switch', ['aria-hidden' => 'true']);
+        $togglecontent .= html_writer::span($statelabel, 'datalynxfield_approve-label');
+        $baseattributes = [
+            'class' => 'datalynxfield_approve',
+            'data-approved' => $isapproved ? 1 : 0,
+            'data-approved-label' => get_string('approvalstateapproved', 'mod_datalynx'),
+            'data-not-approved-label' => get_string('approvalstatenotapproved', 'mod_datalynx'),
+            'aria-label' => $statelabel,
+        ];
 
         if (has_capability('mod/datalynx:approve', $field->df()->context)) {
             $PAGE->requires->js_call_amd('mod_datalynx/approve', 'init');
@@ -150,20 +149,22 @@ class renderer extends datalynxfield_renderer {
             $currentview = $this->field->df()->get_current_view();
             $currentviewid = !empty($params['viewid']) ? (int) $params['viewid'] : ($currentview ? $currentview->id() : 0);
 
-            return html_writer::link(
-                '#',
-                $icon . $label,
-                [
-                        'class' => 'datalynxfield_approve',
-                        'data-action' => 'toggle-approval',
-                        'data-entryid' => $entry->id,
-                        'data-d' => $field->df()->data->id,
-                        'data-view' => $currentviewid,
-                        'data-sesskey' => sesskey(),
-                ]
-            );
+            return html_writer::tag('button', $togglecontent, $baseattributes + [
+                'type' => 'button',
+                'role' => 'switch',
+                'aria-checked' => $isapproved ? 'true' : 'false',
+                'title' => $statelabel,
+                'data-entryid' => $entry->id,
+                'data-d' => $field->df()->data->id,
+                'data-view' => $currentviewid,
+                'data-sesskey' => sesskey(),
+            ]);
         } else {
-            return $icon . $label;
+            return html_writer::tag(
+                'span',
+                $togglecontent,
+                $baseattributes + ['class' => 'datalynxfield_approve datalynxfield_approve-readonly', 'role' => 'status']
+            );
         }
     }
 

@@ -36,6 +36,79 @@
     height: 34px;
 }
 
+.datalynxfield_approve {
+    appearance: none;
+    -webkit-appearance: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    line-height: 1.2;
+    text-align: left;
+    box-shadow: none;
+    cursor: pointer;
+}
+
+.datalynxfield_approve:focus-visible {
+    outline: 2px solid #0f6cbf;
+    outline-offset: 2px;
+}
+
+.datalynxfield_approve-switch {
+    flex-shrink: 0;
+    position: relative;
+    display: inline-block;
+    width: 2.5rem;
+    height: 1.5rem;
+    border-radius: 999px;
+    background-color: #6c757d;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.datalynxfield_approve-switch::after {
+    content: "";
+    position: absolute;
+    top: 0.125rem;
+    left: 0.125rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 50%;
+    background-color: #fff;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 20%);
+    transition: transform 0.2s ease-in-out;
+}
+
+.datalynxfield_approve[data-approved="1"] .datalynxfield_approve-switch {
+    background-color: #2e7d32;
+}
+
+.datalynxfield_approve[data-approved="1"] .datalynxfield_approve-switch::after {
+    transform: translateX(1rem);
+}
+
+.datalynxfield_approve[aria-busy="true"],
+.datalynxfield_approve:disabled {
+    opacity: 0.65;
+    cursor: progress;
+}
+
+.datalynxfield_approve-readonly {
+    cursor: default;
+}
+
+.datalynxfield_approve-readonly .datalynxfield_approve-switch {
+    opacity: 0.85;
+}
+
+.datalynxfield_approve-label {
+    line-height: 1.2;
+}
+
 #page-mod-datalynx-view .tabtree {
     margin-bottom: 1em;
 }
