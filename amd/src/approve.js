@@ -21,7 +21,7 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import Config from 'core/config';
+import Ajax from 'core/ajax';
 
 /** @type {boolean} */
 let isListeningForUpdates = false;
@@ -78,9 +78,9 @@ const reloadPage = () => {
  * @returns {Promise<void>}
  */
 const toggleApproval = (control) => {
-    const {entryid, d, view, sesskey} = control.dataset;
+    const {entryid, d, view} = control.dataset;
 
-    if (!entryid || !d || !sesskey) {
+    if (!entryid || !d) {
         reloadPage();
         return Promise.resolve();
     }
@@ -88,26 +88,15 @@ const toggleApproval = (control) => {
     control.disabled = true;
     control.setAttribute('aria-busy', 'true');
 
-    return fetch(`${Config.wwwroot}/mod/datalynx/field/approve/ajax.php`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: new URLSearchParams({
-            entryid,
-            d,
-            view: view || '0',
-            sesskey,
+    return Ajax.call([{
+        methodname: 'mod_datalynx_toggle_entry_approval',
+        args: {
+            entryid: Number(entryid),
+            d: Number(d),
+            viewid: Number(view || 0),
             action: 'toggle-approval'
-        })
-    })
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-
-            return response.json();
-        })
+        }
+    }])[0]
         .then((data) => {
             if (!data || typeof data.approved === 'undefined') {
                 reloadPage();
