@@ -115,4 +115,13 @@ $functions = [
                 'capabilities' => 'mod/datalynx:managetemplates',
                 'ajax'        => true,
         ],
+        'mod_datalynx_toggle_entry_approval' => [
+                'classname'   => 'mod_datalynx\external\toggle_entry_approval',
+                'methodname'  => 'execute',
+                'classpath'   => '',
+                'description' => 'Toggle the approval state of a datalynx entry.',
+                'type'        => 'write',
+                'capabilities' => 'mod/datalynx:approve',
+                'ajax'        => true,
+        ],
 ];
