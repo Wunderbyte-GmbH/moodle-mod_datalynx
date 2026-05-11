@@ -141,11 +141,6 @@ class view extends base {
                 : null,
         ]));
 
-        if ($tohtml) {
-            return $output;
-        }
-        echo $output;
-
         if ($browsemode) {
             $this->initialise_view_browser(
                 'grid-view-browser',
@@ -153,6 +148,11 @@ class view extends base {
                 'mod_datalynx/grid_view_browser'
             );
         }
+
+        if ($tohtml) {
+            return $output;
+        }
+        echo $output;
 
         return '';
     }

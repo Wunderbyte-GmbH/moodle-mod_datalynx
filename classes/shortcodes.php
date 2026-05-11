@@ -26,10 +26,8 @@
 
 namespace mod_datalynx;
 
-use moodle_url;
-
 /**
- * Deals with local_shortcodes regarding booking.
+ * Deals with filter_shortcodes callbacks for mod_datalynx.
  */
 class shortcodes {
     /**
@@ -44,7 +42,7 @@ class shortcodes {
      * @return string
      */
     public static function displayview($shortcode, $args, $content, $env, $next) {
-        global $DB, $PAGE;
+        global $DB;
         if (isset($args['view']) && isset($args['cmid'])) {
             $viewname = $args['view'];
             $cmid = $args['cmid'];
@@ -73,8 +71,6 @@ class shortcodes {
                 // No right to view datalynx instance or view or entry. Return empty string.
                 return '';
             }
-            $jsurl = new moodle_url('/mod/datalynxcoursepage/js.php', ['id' => $cmid]);
-            $PAGE->requires->js($jsurl);
             $options = ['tohtml' => true, 'skiplogincheck' => true];
             return datalynx::get_content_inline($cm->instance, $view->id, null, $options);
         } else {

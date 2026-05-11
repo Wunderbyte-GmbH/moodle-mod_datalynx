@@ -623,6 +623,38 @@ class behat_mod_datalynx extends behat_base {
         throw new \Exception("Could not find the comment '$content' for the latest entry in '$activityname'.");
     }
 
+    // phpcs:disable moodle.Files.LineLength
+    /**
+     * Adds a displayview shortcode to the site homepage summary section for a datalynx activity.
+     *
+     * @Given /^the site frontpage contains the displayview shortcode for "(?P<activityname_string>(?:[^"]|\\")*)" datalynx view "(?P<viewname_string>(?:[^"]|\\")*)"$/
+     *
+     * @param string $activityname
+     * @param string $viewname
+     * @return void
+     */
+    public function the_site_frontpage_contains_the_displayview_shortcode_for_datalynx_view($activityname, $viewname) {
+        global $CFG, $DB, $SITE;
+
+        require_once($CFG->dirroot . '/course/lib.php');
+
+        course_create_sections_if_missing($SITE, 1);
+
+        $record = $DB->get_record('datalynx', ['name' => $activityname], '*', MUST_EXIST);
+        $cm = get_coursemodule_from_instance('datalynx', $record->id, $record->course, false, MUST_EXIST);
+        $section = $DB->get_record('course_sections', ['course' => $SITE->id, 'section' => 1], '*', MUST_EXIST);
+        $shortcode = '[displayview cmid=' . $cm->id . ' view="' . $viewname . '"]';
+
+        $DB->update_record('course_sections', (object) [
+            'id' => $section->id,
+            'summary' => $shortcode,
+            'summaryformat' => FORMAT_HTML,
+        ]);
+
+        \core_courseformat\base::reset_course_cache($SITE->id);
+    }
+    // phpcs:enable moodle.Files.LineLength
+
     /**
      * Close the auto-complete suggestions list (Assuming there is only one on the page.).
      *

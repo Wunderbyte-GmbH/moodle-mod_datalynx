@@ -136,12 +136,6 @@ class view extends base {
             'data-viewid' => $this->view->id,
         ]);
 
-        if ($tohtml) {
-            return $output;
-        }
-
-        echo $output;
-
         if ($browsemode) {
             $this->initialise_view_browser(
                 'report-view-browser',
@@ -149,6 +143,12 @@ class view extends base {
                 'mod_datalynx/report_view_browser'
             );
         }
+
+        if ($tohtml) {
+            return $output;
+        }
+
+        echo $output;
 
         return '';
     }

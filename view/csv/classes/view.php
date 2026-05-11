@@ -326,15 +326,15 @@ class view extends base {
                 : null,
         ]));
 
+        if ($browsemode) {
+            $this->initialise_view_browser('csv-view-browser', 'mod_datalynx_get_csv_view_data', 'mod_datalynx/csv_view_browser');
+        }
+
         if ($tohtml) {
             return $output;
         }
 
         echo $output;
-
-        if ($browsemode) {
-            $this->initialise_view_browser('csv-view-browser', 'mod_datalynx_get_csv_view_data', 'mod_datalynx/csv_view_browser');
-        }
 
         return '';
     }
