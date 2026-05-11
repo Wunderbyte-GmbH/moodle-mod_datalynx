@@ -116,6 +116,7 @@ const handleApprovalClick = (event) => {
     }
 
     event.preventDefault();
+    event.stopPropagation();
     void toggleApproval(control);
 };
 
@@ -135,6 +136,7 @@ const handleApprovalKeydown = (event) => {
     }
 
     event.preventDefault();
+    event.stopPropagation();
     void toggleApproval(control);
 };
 
