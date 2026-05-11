@@ -21,7 +21,11 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-export default {
+const fieldGroupConfigs = new Map();
+let isListeningForClicks = false;
+let isListeningForUpdates = false;
+
+const fieldGroups = {
     getLastVisibleInput(wrapper) {
         return wrapper.querySelector('.fieldgroup-lastvisible');
     },
@@ -37,6 +41,11 @@ export default {
     getVisibleLineCount(wrapper) {
         return this.getRows(wrapper)
             .filter(line => window.getComputedStyle(line).display !== 'none').length;
+    },
+
+    getConfig(wrapper) {
+        const fieldgroupname = this.getFieldgroupName(wrapper);
+        return fieldGroupConfigs.get(fieldgroupname) || null;
     },
 
     lineHasContent(line) {
@@ -144,8 +153,8 @@ export default {
         // Remove all associated files.
         thisLine.querySelectorAll('.fp-file').forEach(file => {
             file.click();
-            document.querySelector(".fp-file-delete:visible")?.click();
-            document.querySelector(".fp-dlg-butconfirm:visible")?.click();
+            document.querySelector('.fp-file-delete:visible')?.click();
+            document.querySelector('.fp-dlg-butconfirm:visible')?.click();
         });
 
         // Clear input fields (except hidden).
@@ -190,61 +199,76 @@ export default {
         });
     },
 
-    init(fieldgroupname, defaultlines, maxlines, requiredlines) {
-        document.querySelectorAll(`div.datalynx-field-wrapper[data-field-type='fieldgroup'][data-field-name='${fieldgroupname}']`)
-            .forEach(wrapper => {
-                const visiblelines = this.getInitialVisibleLineCount(wrapper, defaultlines, requiredlines);
-                const lastVisibleInput = this.getLastVisibleInput(wrapper);
+    initialiseWrapper(wrapper) {
+        const config = this.getConfig(wrapper);
+        if (!config || wrapper.dataset.fieldgroupInitialised === '1') {
+            return;
+        }
 
-                if (lastVisibleInput) {
-                    lastVisibleInput.value = visiblelines;
-                }
+        const visiblelines = this.getInitialVisibleLineCount(wrapper, config.defaultlines, config.requiredlines);
+        const lastVisibleInput = this.getLastVisibleInput(wrapper);
 
-                // Hide lines after the visible range.
-                for (let line = visiblelines + 1; line <= maxlines; line++) {
-                    wrapper.querySelectorAll(`[data-line='${line}']`).forEach(element => {
-                        element.style.display = 'none';
-                    });
-                }
+        if (lastVisibleInput) {
+            lastVisibleInput.value = visiblelines;
+        }
 
-                const button = this.getAddButton(wrapper);
-                if (!button) {
-                    return;
-                }
-
-                button.addEventListener('click', (e) => {
-                    e.preventDefault(); // Prevent default button behavior
-                    const firstHiddenLine = this.getRows(wrapper)
-                        .find(line => window.getComputedStyle(line).display === 'none');
-                    if (firstHiddenLine) {
-                        firstHiddenLine.style.display = ''; // Show the first hidden line
-                    }
-
-                    // Increment lastvisible if less than maxlines
-                    if (lastVisibleInput && parseInt(lastVisibleInput.value, 10) < maxlines) {
-                        lastVisibleInput.value = parseInt(lastVisibleInput.value, 10) + 1;
-                    }
-
-                this.updateAddButtonState(wrapper, maxlines);
+        for (let line = 1; line <= config.maxlines; line++) {
+            wrapper.querySelectorAll(`[data-line='${line}']`).forEach(element => {
+                element.style.display = line <= visiblelines ? '' : 'none';
             });
+        }
 
-                this.updateAddButtonState(wrapper, maxlines);
+        this.updateAddButtonState(wrapper, config.maxlines);
+        wrapper.dataset.fieldgroupInitialised = '1';
+    },
 
-                // Remove line functionality.
-                wrapper.querySelectorAll('[data-removeline]').forEach(removeButton => {
-                    removeButton.removeEventListener('click', this.handleRemoveLine);
-                    removeButton.addEventListener('click', this.handleRemoveLine
-                        .bind(this, removeButton, maxlines, requiredlines));
-                });
+    initialiseWrappers(root = document, fieldgroupname = null) {
+        const selector = fieldgroupname
+            ? `div.datalynx-field-wrapper[data-field-type='fieldgroup'][data-field-name='${fieldgroupname}']`
+            : 'div.datalynx-field-wrapper[data-field-type="fieldgroup"]';
+
+        root.querySelectorAll(selector).forEach(wrapper => {
+            this.initialiseWrapper(wrapper);
         });
     },
 
-    handleRemoveLine(removeButton, maxlines, requiredlines, e) {
-        e.preventDefault(); // Prevent default link behavior
+    handleAddLine(addButton, event) {
+        const wrapper = addButton.closest('.datalynx-field-wrapper');
+        const config = wrapper ? this.getConfig(wrapper) : null;
+        if (!wrapper || !config) {
+            return;
+        }
 
+        this.initialiseWrapper(wrapper);
+        event.preventDefault();
+
+        const firstHiddenLine = this.getRows(wrapper)
+            .find(line => window.getComputedStyle(line).display === 'none');
+        if (firstHiddenLine) {
+            firstHiddenLine.style.display = '';
+        }
+
+        const lastVisibleInput = this.getLastVisibleInput(wrapper);
+        if (lastVisibleInput && parseInt(lastVisibleInput.value, 10) < config.maxlines) {
+            lastVisibleInput.value = parseInt(lastVisibleInput.value, 10) + 1;
+        }
+
+        this.updateAddButtonState(wrapper, config.maxlines);
+    },
+
+    handleRemoveLine(removeButton, event) {
         const thisLine = removeButton.closest('.lines');
+        const parentContainer = thisLine?.closest('.datalynx-field-wrapper');
+        const config = parentContainer ? this.getConfig(parentContainer) : null;
+
+        if (!thisLine || !parentContainer || !config) {
+            return;
+        }
+
+        this.initialiseWrapper(parentContainer);
+        event.preventDefault();
+
         const lineId = parseInt(thisLine.dataset.line, 10);
-        const parentContainer = thisLine.closest('.datalynx-field-wrapper');
         const lastVisibleInput = this.getLastVisibleInput(parentContainer);
         const currentVisibleLines = lastVisibleInput
             ? parseInt(lastVisibleInput.value, 10)
@@ -252,12 +276,11 @@ export default {
 
         this.clearLine(thisLine);
 
-        if (currentVisibleLines <= requiredlines) {
-            this.updateAddButtonState(parentContainer, maxlines);
+        if (currentVisibleLines <= config.requiredlines) {
+            this.updateAddButtonState(parentContainer, config.maxlines);
             return;
         }
 
-        // If there are extra visible rows, collapse the later rows upward.
         if (lineId >= 1) {
             const fieldgroupname = this.getFieldgroupName(parentContainer);
             thisLine.style.display = 'none';
@@ -287,6 +310,51 @@ export default {
                 });
         }
 
-        this.updateAddButtonState(parentContainer, maxlines);
+        this.updateAddButtonState(parentContainer, config.maxlines);
+    },
+
+    registerDelegatedHandlers() {
+        if (!isListeningForClicks) {
+            document.addEventListener('click', (event) => {
+                if (!(event.target instanceof Element)) {
+                    return;
+                }
+
+                const addButton = event.target.closest('.fieldgroup-addline');
+                if (addButton) {
+                    this.handleAddLine(addButton, event);
+                    return;
+                }
+
+                const removeButton = event.target.closest('[data-removeline]');
+                if (removeButton) {
+                    this.handleRemoveLine(removeButton, event);
+                }
+            });
+            isListeningForClicks = true;
+        }
+
+        if (!isListeningForUpdates) {
+            document.addEventListener('mod_datalynx:viewContentUpdated', (event) => {
+                const root = event.detail?.target;
+                if (root instanceof Element || root instanceof DocumentFragment || root instanceof Document) {
+                    this.initialiseWrappers(root);
+                }
+            });
+            isListeningForUpdates = true;
+        }
+    },
+
+    init(fieldgroupname, defaultlines, maxlines, requiredlines) {
+        fieldGroupConfigs.set(fieldgroupname, {
+            defaultlines: parseInt(defaultlines, 10),
+            maxlines: parseInt(maxlines, 10),
+            requiredlines: parseInt(requiredlines, 10),
+        });
+
+        this.registerDelegatedHandlers();
+        this.initialiseWrappers(document, fieldgroupname);
     }
 };
+
+export default fieldGroups;

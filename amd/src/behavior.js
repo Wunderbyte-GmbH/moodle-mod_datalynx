@@ -24,6 +24,10 @@
 import Ajax from 'core/ajax';
 import Notification from 'core/notification';
 
+const TOGGLE_SELECTOR = '.datalynx-behavior-toggle';
+
+let isListening = false;
+
 const setToggleState = (toggle, enabled) => {
     const icon = toggle.querySelector('i');
     toggle.dataset.enabled = enabled ? '1' : '0';
@@ -50,46 +54,63 @@ const setToggleState = (toggle, enabled) => {
     }
 };
 
+const setBusyState = (toggle, busy) => {
+    toggle.dataset.behaviorToggleBusy = busy ? '1' : '0';
+
+    if ('disabled' in toggle) {
+        toggle.disabled = busy;
+    }
+};
+
+const handleDocumentClick = (event) => {
+    if (!(event.target instanceof Element)) {
+        return;
+    }
+
+    const toggle = event.target.closest(TOGGLE_SELECTOR);
+    if (!toggle || toggle.dataset.behaviorToggleBusy === '1') {
+        return;
+    }
+
+    event.preventDefault();
+
+    const behaviorid = Number(toggle.getAttribute('data-behavior-id'));
+    const permissionid = Number(toggle.getAttribute('data-permission-id') || 0);
+    const forproperty = toggle.getAttribute('data-for');
+
+    if (!behaviorid || !forproperty) {
+        return;
+    }
+
+    setBusyState(toggle, true);
+    Ajax.call([{
+        methodname: 'mod_datalynx_toggle_behavior',
+        args: {
+            behaviorid,
+            permissionid,
+            forproperty
+        }
+    }])[0]
+    .then((response) => {
+        setToggleState(toggle, response.enabled);
+        return response;
+    })
+    .catch((error) => {
+        Notification.exception(error);
+        return false;
+    })
+    .finally(() => {
+        setBusyState(toggle, false);
+    });
+};
+
 export default {
     init() {
-        document.querySelectorAll('.datalynx-behavior-toggle').forEach((toggle) => {
-            if (toggle.dataset.behaviorToggleInitialized) {
-                return;
-            }
+        if (isListening) {
+            return;
+        }
 
-            toggle.dataset.behaviorToggleInitialized = 'true';
-            toggle.addEventListener('click', (event) => {
-                event.preventDefault();
-
-                const behaviorid = Number(toggle.getAttribute('data-behavior-id'));
-                const permissionid = Number(toggle.getAttribute('data-permission-id') || 0);
-                const forproperty = toggle.getAttribute('data-for');
-
-                if (!behaviorid || !forproperty) {
-                    return;
-                }
-
-                toggle.disabled = true;
-                Ajax.call([{
-                    methodname: 'mod_datalynx_toggle_behavior',
-                    args: {
-                        behaviorid,
-                        permissionid,
-                        forproperty
-                    }
-                }])[0]
-                .then((response) => {
-                    setToggleState(toggle, response.enabled);
-                    return response;
-                })
-                .catch((error) => {
-                    Notification.exception(error);
-                    return false;
-                })
-                .finally(() => {
-                    toggle.disabled = false;
-                });
-            });
-        });
+        document.addEventListener('click', handleDocumentClick);
+        isListening = true;
     }
 };

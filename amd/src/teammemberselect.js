@@ -22,33 +22,43 @@
  */
 
 define(['core/ajax', 'core/toast', 'core/str'], function(Ajax, Toast, Str) {
-    return {
-        init(datalynxId, fieldId, userurl, userName, canUnsubscribe) {
-            const viewContainer = document.querySelectorAll(`[data-id="${datalynxId}"]`);
-            return Promise.all([
+    const configs = [];
+    let isListening = false;
+    let stringsPromise;
+
+    const getStrings = () => {
+        if (!stringsPromise) {
+            stringsPromise = Promise.all([
                 Str.get_string('subscribe', 'mod_datalynx'),
                 Str.get_string('unsubscribe', 'mod_datalynx')
-            ]).then(strings => {
-                const subscribeString = strings[0];
-                const unsubscribeString = strings[1];
+            ]);
+        }
 
-                viewContainer.forEach(element => {
-                    if (element.getAttribute("data-listeneradded") !== "1") {
-                        element.setAttribute("data-listeneradded", "1");
-                        document.querySelectorAll('a.datalynxfield_subscribe').forEach(link => {
-                            const params = this.extractParams(link.href.split('?')[1]);
-                            if (params.fieldid !== fieldId.toString()) {
-                                return;
-                            }
-                            link.addEventListener('click', (e) => {
-                                e.preventDefault();
-                                const updatedParams = this.extractParams(link.href.split('?')[1]);
-                                this.handleSubscription(link, updatedParams, userurl, userName,
-                                    canUnsubscribe, subscribeString, unsubscribeString);
-                            });
-                        });
-                    }
-                });
+        return stringsPromise;
+    };
+
+    const api = {
+        init(datalynxId, fieldId, userurl, userName, canUnsubscribe) {
+            return getStrings().then(strings => {
+                if (!configs.some(config =>
+                    config.datalynxId === String(datalynxId) && config.fieldId === String(fieldId)
+                )) {
+                    configs.push({
+                        datalynxId: String(datalynxId),
+                        fieldId: String(fieldId),
+                        userurl,
+                        userName,
+                        canUnsubscribe,
+                        subscribeString: strings[0],
+                        unsubscribeString: strings[1],
+                    });
+                }
+
+                if (!isListening) {
+                    document.addEventListener('click', handleDocumentClick);
+                    isListening = true;
+                }
+
                 return strings;
             }).catch(error => {
                 Toast.add(error.message);
@@ -127,4 +137,45 @@ define(['core/ajax', 'core/toast', 'core/str'], function(Ajax, Toast, Str) {
             }, {});
         }
     };
+
+    const getConfigForLink = (link) => {
+        const params = api.extractParams(link.href.split('?')[1] || '');
+        if (!params.fieldid) {
+            return null;
+        }
+
+        return configs.find(config =>
+            config.fieldId === params.fieldid && !!link.closest(`[data-id="${config.datalynxId}"]`)
+        ) || null;
+    };
+
+    const handleDocumentClick = (event) => {
+        if (!(event.target instanceof Element)) {
+            return;
+        }
+
+        const link = event.target.closest('a.datalynxfield_subscribe');
+        if (!link) {
+            return;
+        }
+
+        const config = getConfigForLink(link);
+        if (!config) {
+            return;
+        }
+
+        event.preventDefault();
+        const updatedParams = api.extractParams(link.href.split('?')[1] || '');
+        api.handleSubscription(
+            link,
+            updatedParams,
+            config.userurl,
+            config.userName,
+            config.canUnsubscribe,
+            config.subscribeString,
+            config.unsubscribeString
+        );
+    };
+
+    return api;
 });

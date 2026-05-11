@@ -21,54 +21,103 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+const configs = [];
+let isListening = false;
+
+const getElementId = (field) => `id_${field}`;
+
+const updateSelectedGroup = (config, groupSelect = document.getElementById(getElementId(config.groupfield))) => {
+    const hiddenInput = document.getElementById(`${getElementId(config.groupfield)}id`);
+    if (hiddenInput && groupSelect) {
+        hiddenInput.value = groupSelect.value;
+    }
+};
+
+const populateGroupOptions = (groupSelect, data) => {
+    groupSelect.innerHTML = '';
+
+    if (!data) {
+        updateSelectedGroup({groupfield: groupSelect.id.replace(/^id_/, '')}, groupSelect);
+        return;
+    }
+
+    data.split(',').forEach(group => {
+        const value = group.split(' ', 1)[0];
+        const option = document.createElement('option');
+        option.value = value;
+        option.textContent = group;
+        groupSelect.appendChild(option);
+    });
+};
+
+const loadGroups = (config, selectedCourseId) => {
+    const groupSelect = document.getElementById(getElementId(config.groupfield));
+    if (!groupSelect) {
+        return Promise.resolve();
+    }
+
+    groupSelect.innerHTML = '';
+
+    if (selectedCourseId === '0') {
+        updateSelectedGroup(config, groupSelect);
+        return Promise.resolve();
+    }
+
+    return fetch(config.acturl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: `courseid=${selectedCourseId}`
+    })
+    .then(response => response.text())
+    .then(data => {
+        populateGroupOptions(groupSelect, data);
+        updateSelectedGroup(config, groupSelect);
+        return null;
+    })
+    .catch(() => {
+        throw new Error('Group loading failed');
+    });
+};
+
+const getConfigForTarget = (target) => configs.find((config) =>
+    target.id === getElementId(config.coursefield) || target.id === getElementId(config.groupfield)
+);
+
+const handleDocumentChange = (event) => {
+    if (!(event.target instanceof HTMLSelectElement)) {
+        return;
+    }
+
+    const config = getConfigForTarget(event.target);
+    if (!config) {
+        return;
+    }
+
+    if (event.target.id === getElementId(config.groupfield)) {
+        updateSelectedGroup(config, event.target);
+        return;
+    }
+
+    if (event.target.id === getElementId(config.coursefield)) {
+        void loadGroups(config, event.target.value);
+    }
+};
+
 export default {
     init(options) {
-      const {coursefield, groupfield, acturl: actionurl} = options;
-      // Update input field with the selected group id
-      document.getElementById(`id_${groupfield}`).addEventListener('change', function() {
-        const selectedValue = document.querySelector(`#id_${groupfield} option:checked`).value;
-        document.getElementById(`id_${groupfield}id`).value = selectedValue;
-      });
-      // When the course is changed, fetch groups using AJAX
-      document.getElementById(`id_${coursefield}`).addEventListener('change', function() {
-        const groupSelect = document.getElementById(`id_${groupfield}`);
-        const selectedCourseId = document.querySelector(`#id_${coursefield} option:checked`).value;
-        // Remove current options
-        groupSelect.innerHTML = '';
-        // Load groups for selected course
-        if (selectedCourseId !== '0') {
-          // Fetch groups via fetch API
-          return fetch(actionurl, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: `courseid=${selectedCourseId}`
-          })
-          .then(response => {
-            // Return the response text to the next .then()
-            return response.text();
-          })
-          .then(data => {
-            if (data) {
-              // Populate group options
-              data.split(',').forEach(group => {
-                const value = group.split(' ', 1)[0];
-                const option = document.createElement('option');
-                option.value = value;
-                option.textContent = group;
-                groupSelect.appendChild(option);
-              });
-            }
-            // Return null if there's nothing further to do
-            return null;
-          })
-          .catch(() => {
-            throw new Error('Group loading failed');
-          });
-        } else {
-          return Promise.resolve(); // Return a resolved promise if no action is needed
+        if (!configs.some((config) =>
+            config.coursefield === options.coursefield && config.groupfield === options.groupfield
+        )) {
+            configs.push(options);
         }
-      });
+
+        if (isListening) {
+            return;
+        }
+
+        document.addEventListener('change', handleDocumentChange);
+        isListening = true;
     }
-  };
+};

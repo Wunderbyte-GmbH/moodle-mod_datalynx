@@ -24,10 +24,7 @@
 import Ajax from 'core/ajax';
 
 /** @type {boolean} */
-let isListeningForUpdates = false;
-
-/** @type {boolean} */
-let isListeningForViewUpdates = false;
+let isListeningForEvents = false;
 
 /**
  * CSS selector for one approval control.
@@ -93,13 +90,28 @@ const reloadPage = () => {
 };
 
 /**
- * Handle click events from one approval switch.
+ * Extract one approval control from a delegated event.
+ *
+ * @param {Event} event
+ * @returns {?HTMLButtonElement}
+ */
+const getApprovalControlFromEvent = (event) => {
+    if (!(event.target instanceof Element)) {
+        return null;
+    }
+
+    const control = event.target.closest(APPROVE_SELECTOR);
+    return control instanceof HTMLButtonElement ? control : null;
+};
+
+/**
+ * Handle delegated click events from approval switches.
  *
  * @param {MouseEvent} event
  */
 const handleApprovalClick = (event) => {
-    const control = event.currentTarget;
-    if (!(control instanceof HTMLButtonElement) || control.disabled) {
+    const control = getApprovalControlFromEvent(event);
+    if (!control || control.disabled) {
         return;
     }
 
@@ -108,7 +120,7 @@ const handleApprovalClick = (event) => {
 };
 
 /**
- * Handle keyboard toggling for one approval switch.
+ * Handle delegated keyboard toggling for approval switches.
  *
  * @param {KeyboardEvent} event
  */
@@ -117,51 +129,13 @@ const handleApprovalKeydown = (event) => {
         return;
     }
 
-    const control = event.currentTarget;
-    if (!(control instanceof HTMLButtonElement) || control.disabled) {
+    const control = getApprovalControlFromEvent(event);
+    if (!control || control.disabled) {
         return;
     }
 
     event.preventDefault();
     void toggleApproval(control);
-};
-
-/**
- * Bind approval switch handlers inside one DOM root.
- *
- * @param {ParentNode} root
- */
-const initialiseApprovalControls = (root) => {
-    if (!('querySelectorAll' in root)) {
-        return;
-    }
-
-    root.querySelectorAll(APPROVE_SELECTOR).forEach((control) => {
-        if (!(control instanceof HTMLButtonElement) || control.dataset.approvalInitialized === '1') {
-            return;
-        }
-
-        control.dataset.approvalInitialized = '1';
-        control.addEventListener('click', handleApprovalClick);
-        control.addEventListener('keydown', handleApprovalKeydown);
-    });
-};
-
-/**
- * Start listening for refreshed AJAX browse regions.
- */
-const listenForViewUpdates = () => {
-    if (isListeningForViewUpdates) {
-        return;
-    }
-
-    document.addEventListener('mod_datalynx:viewContentUpdated', (event) => {
-        const root = event.detail?.target;
-        if (root instanceof HTMLElement) {
-            initialiseApprovalControls(root);
-        }
-    });
-    isListeningForViewUpdates = true;
 };
 
 /**
@@ -204,7 +178,6 @@ const toggleApproval = (control) => {
 
             const shouldRestoreFocus = document.activeElement === control;
             control.replaceWith(replacement);
-            initialiseApprovalControls(replacement.parentNode || replacement);
             updateApprovalControl(replacement, Number(data.approved) === 1);
 
             if (shouldRestoreFocus) {
@@ -222,22 +195,13 @@ const toggleApproval = (control) => {
 
 /**
  * Initialize the module.
- *
- * @param {string|ParentNode} root
  */
-export const init = (root = document) => {
-    const container = typeof root === 'string' ? document.querySelector(root) : root;
-    if (!container) {
+export const init = () => {
+    if (isListeningForEvents) {
         return;
     }
 
-    initialiseApprovalControls(container);
-    listenForViewUpdates();
-
-    if (isListeningForUpdates) {
-        return;
-    }
-
-    initialiseApprovalControls(document);
-    isListeningForUpdates = true;
+    document.addEventListener('click', handleApprovalClick);
+    document.addEventListener('keydown', handleApprovalKeydown);
+    isListeningForEvents = true;
 };

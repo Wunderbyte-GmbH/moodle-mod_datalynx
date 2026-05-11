@@ -26,6 +26,11 @@ import YUI from 'core/yui';
 /** @type {boolean} */
 let isListeningForUpdates = false;
 
+/** @type {boolean} */
+let isListeningForBootstrap = false;
+
+const COMMENT_WIDGET_SELECTOR = '.datalynx-comment-widget';
+
 /**
  * Convert one widget wrapper into the option object expected by M.core_comment.init.
  *
@@ -45,42 +50,75 @@ const getCommentOptions = (widget) => ({
 });
 
 /**
- * Initialise all comment widgets inside one updated DOM root.
+ * Initialise one comment widget if it has not been bootstrapped yet.
+ *
+ * @param {HTMLElement} widget
+ */
+const initialiseCommentWidget = (widget) => {
+    if (widget.dataset.commentInitialized === '1' || widget.dataset.commentInitializing === '1') {
+        return;
+    }
+
+    widget.dataset.commentInitializing = '1';
+    const options = getCommentOptions(widget);
+
+    YUI.use('moodle-core-comment', (Y) => {
+        M.core_comment.init(Y, options);
+        widget.dataset.commentInitialized = '1';
+        delete widget.dataset.commentInitializing;
+    });
+};
+
+/**
+ * Initialise autostart comment widgets inside one DOM root.
  *
  * @param {Document|Element} root
  */
-const initialiseCommentWidgets = (root) => {
+const initialiseAutostartCommentWidgets = (root) => {
     if (!('querySelectorAll' in root)) {
         return;
     }
 
-    root.querySelectorAll('.datalynx-comment-widget').forEach((widget) => {
-        if (widget.dataset.commentInitialized === '1') {
-            return;
-        }
-
-        widget.dataset.commentInitialized = '1';
-        const options = getCommentOptions(widget);
-
-        YUI.use('moodle-core-comment', (Y) => {
-            M.core_comment.init(Y, options);
-        });
+    root.querySelectorAll(`${COMMENT_WIDGET_SELECTOR}[data-comment-autostart="1"]`).forEach((widget) => {
+        initialiseCommentWidget(widget);
     });
+};
+
+/**
+ * Lazily bootstrap a comment widget from a delegated document event.
+ *
+ * @param {Event} event
+ */
+const bootstrapCommentWidget = (event) => {
+    if (!(event.target instanceof Element)) {
+        return;
+    }
+
+    const widget = event.target.closest(COMMENT_WIDGET_SELECTOR);
+    if (widget instanceof HTMLElement) {
+        initialiseCommentWidget(widget);
+    }
 };
 
 /**
  * Initialise the module.
  */
 export const init = () => {
-    if (isListeningForUpdates) {
-        return;
+    initialiseAutostartCommentWidgets(document);
+
+    if (!isListeningForBootstrap) {
+        document.addEventListener('pointerdown', bootstrapCommentWidget);
+        document.addEventListener('focusin', bootstrapCommentWidget);
+        isListeningForBootstrap = true;
     }
 
-    document.addEventListener('mod_datalynx:viewContentUpdated', (event) => {
-        const root = event.detail?.target;
-        if (root) {
-            initialiseCommentWidgets(root);
-        }
-    });
-    isListeningForUpdates = true;
+    if (!isListeningForUpdates) {
+        document.addEventListener('mod_datalynx:viewContentUpdated', (event) => {
+            const root = event.detail?.target;
+            if (root) {
+                initialiseAutostartCommentWidgets(root);
+            }
+        });
+        isListeningForUpdates = true;
+    }
 };
