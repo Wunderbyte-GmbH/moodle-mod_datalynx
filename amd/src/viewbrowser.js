@@ -24,6 +24,7 @@
 import Ajax from 'core/ajax';
 import Notification from 'core/notification';
 import Templates from 'core/templates';
+import {init as initApprove} from 'mod_datalynx/approve';
 
 /**
  * Notify feature scripts that a browse region received fresh DOM from AJAX.
@@ -83,7 +84,10 @@ export default {
         return fetchPayload(options)
             .then((payload) => Templates.renderForPromise(options.template, payload))
             .then(({html, js}) => Templates.replaceNodeContents(element, html, js))
-            .then(() => notifyContentUpdated(element))
+            .then(() => {
+                initApprove(element);
+                notifyContentUpdated(element);
+            })
             .catch((error) => {
                 renderErrorState(element, options.errormessage || 'Unable to load view entries.');
                 Notification.exception(error);
