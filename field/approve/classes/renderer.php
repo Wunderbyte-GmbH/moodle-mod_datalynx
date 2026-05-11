@@ -169,6 +169,17 @@ class renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Render one approval toggle for AJAX refreshes.
+     *
+     * @param object $entry The current entry.
+     * @param array $params Optional display parameters.
+     * @return string
+     */
+    public function render_toggle($entry, array $params = []): string {
+        return $this->display_browse($entry, $params);
+    }
+
+    /**
      * Array of patterns this field supports
      */
     protected function patterns() {

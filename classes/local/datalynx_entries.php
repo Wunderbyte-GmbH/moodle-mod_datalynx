@@ -1151,6 +1151,7 @@ class datalynx_entries {
 
         if ($action === 'approve') {
             $DB->set_field('datalynx_entries', 'approved', 1, ['id' => $entryid]);
+            $entry->approved = 1;
             $processed = $this->create_approved_entries_for_team([$entryid]);
             if ($processed) {
                 $eventdata = (object) ['view' => $this->datalynx->get_view_from_id($viewid), 'items' => $processed];
@@ -1183,7 +1184,26 @@ class datalynx_entries {
         return [
             'entryid' => $entryid,
             'approved' => (bool) $newapprovedstate,
+            'controlhtml' => $this->render_entry_approval_control($entry, $viewid),
         ];
+    }
+
+    /**
+     * Render the approval toggle markup for one entry.
+     *
+     * @param stdClass $entry Entry record.
+     * @param int $viewid Current view ID.
+     * @return string
+     */
+    private function render_entry_approval_control(stdClass $entry, int $viewid): string {
+        $fields = $this->datalynx->get_fields();
+        $approvefield = $fields[datalynxfield_approve::_APPROVED] ?? null;
+
+        if (!$approvefield) {
+            return '';
+        }
+
+        return $approvefield->renderer()->render_toggle($entry, ['viewid' => $viewid]);
     }
 
     /**

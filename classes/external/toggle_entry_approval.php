@@ -89,6 +89,7 @@ class toggle_entry_approval extends external_api {
         return new external_single_structure([
             'entryid' => new external_value(PARAM_INT, 'Entry ID'),
             'approved' => new external_value(PARAM_BOOL, 'The resulting approval state'),
+            'controlhtml' => new external_value(PARAM_RAW, 'Rendered approval toggle HTML'),
         ]);
     }
 }

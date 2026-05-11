@@ -68,6 +68,24 @@ const updateApprovalControl = (control, isApproved) => {
 };
 
 /**
+ * Parse one rendered approval toggle from the web service response.
+ *
+ * @param {string} controlhtml
+ * @returns {?HTMLButtonElement}
+ */
+const createReplacementControl = (controlhtml) => {
+    if (typeof controlhtml !== 'string' || !controlhtml.trim()) {
+        return null;
+    }
+
+    const template = document.createElement('template');
+    template.innerHTML = controlhtml.trim();
+
+    const replacement = template.content.firstElementChild;
+    return replacement instanceof HTMLButtonElement ? replacement : null;
+};
+
+/**
  * Reload the page when the switch cannot recover from an AJAX failure.
  */
 const reloadPage = () => {
@@ -173,12 +191,25 @@ const toggleApproval = (control) => {
         }
     }])[0]
         .then((data) => {
-            if (!data || typeof data.approved === 'undefined') {
+            if (!data || typeof data.approved === 'undefined' || typeof data.controlhtml !== 'string') {
                 reloadPage();
                 return;
             }
 
-            updateApprovalControl(control, Number(data.approved) === 1);
+            const replacement = createReplacementControl(data.controlhtml);
+            if (!replacement) {
+                reloadPage();
+                return;
+            }
+
+            const shouldRestoreFocus = document.activeElement === control;
+            control.replaceWith(replacement);
+            initialiseApprovalControls(replacement.parentNode || replacement);
+            updateApprovalControl(replacement, Number(data.approved) === 1);
+
+            if (shouldRestoreFocus) {
+                replacement.focus();
+            }
         })
         .catch(() => {
             reloadPage();
