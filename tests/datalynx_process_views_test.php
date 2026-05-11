@@ -30,17 +30,17 @@ final class datalynx_process_views_test extends advanced_testcase {
     /**
      * Create a minimal datalynx fixture with one tabular view.
      *
-     * @return array [$df, $viewid]
+     * @return array [$dlx, $viewid]
      */
     private function create_fixture(): array {
         global $DB;
 
         $course = $this->getDataGenerator()->create_course();
         $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
-        $df = new datalynx($instance->id);
+        $dlx = new datalynx($instance->id);
 
         $viewid = (int) $DB->insert_record('datalynx_views', (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'type' => 'tabular',
             'name' => 'My Tabular View',
             'description' => '',
@@ -57,7 +57,7 @@ final class datalynx_process_views_test extends advanced_testcase {
             'section' => '',
         ]);
 
-        return [$df, $viewid];
+        return [$dlx, $viewid];
     }
 
     /**
@@ -69,17 +69,17 @@ final class datalynx_process_views_test extends advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
 
-        [$df, $viewid] = $this->create_fixture();
+        [$dlx, $viewid] = $this->create_fixture();
 
-        $before = $DB->count_records('datalynx_views', ['dataid' => $df->id()]);
+        $before = $DB->count_records('datalynx_views', ['dataid' => $dlx->id()]);
 
-        $df->process_views('duplicate', (string) $viewid, true);
+        $dlx->process_views('duplicate', (string) $viewid, true);
 
-        $after = $DB->count_records('datalynx_views', ['dataid' => $df->id()]);
+        $after = $DB->count_records('datalynx_views', ['dataid' => $dlx->id()]);
         $this->assertSame($before + 1, $after, 'A new view record should be created after duplicate.');
 
         $copy = $DB->get_record('datalynx_views', [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'name' => 'Copy of My Tabular View',
         ]);
         $this->assertNotFalse($copy, 'The duplicated view should be named "Copy of My Tabular View".');
@@ -95,12 +95,12 @@ final class datalynx_process_views_test extends advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
 
-        [$df, $viewid] = $this->create_fixture();
+        [$dlx, $viewid] = $this->create_fixture();
 
-        $df->process_views('duplicate', (string) $viewid, true);
-        $df->process_views('duplicate', (string) $viewid, true);
+        $dlx->process_views('duplicate', (string) $viewid, true);
+        $dlx->process_views('duplicate', (string) $viewid, true);
 
-        $copies = $DB->get_records('datalynx_views', ['dataid' => $df->id(), 'type' => 'tabular']);
+        $copies = $DB->get_records('datalynx_views', ['dataid' => $dlx->id(), 'type' => 'tabular']);
         $names = array_column($copies, 'name');
 
         $this->assertContains('Copy of My Tabular View', $names);

@@ -85,7 +85,7 @@ class rule extends base {
      *
      * @var datalynx
      */
-    private datalynx $dl;
+    private datalynx $dlx;
     /**
      * @var ?file_storage
      */
@@ -110,11 +110,11 @@ class rule extends base {
     /**
      * Class constructor
      *
-     * @param int $df datalynx id or class object
+     * @param int $dlx datalynx id or class object
      * @param int $rule rule id or DB record
      */
-    public function __construct($df = 0, $rule = 0) {
-        parent::__construct($df, $rule);
+    public function __construct($dlx = 0, $rule = 0) {
+        parent::__construct($dlx, $rule);
         if (isset($this->rule->param2)) {
             $this->sftpsetting = unserialize($this->rule->param2);
             $this->sftpserver = $this->sftpsetting['sftpserver'];
@@ -142,7 +142,7 @@ class rule extends base {
         require_once($CFG->libdir . '/completionlib.php');
 
         $did = $event->get_data()['objectid'];
-        $this->dl = new datalynx($did);
+        $this->dlx = new datalynx($did);
 
         $this->fs = get_file_storage();
         // Download files to $this->files array indexed by draftitemid.
@@ -159,7 +159,7 @@ class rule extends base {
                 $data->{"field_{$fieldid}_{$entryid}"} = $this->authorid;
                 $data->{"field_{$this->filefieldid}_{$entryid}_filemanager"} = $draftitemid;
                 $data->{"field_{$this->filefieldid}_{$entryid}_alttext"} = "PDF";
-                $dlentries = new datalynx_entries($this->dl);
+                $dlentries = new datalynx_entries($this->dlx);
                 // Set teammember from filename.
                 $userid = $this->get_userid_from_filename($filename);
                 $data->{"field_{$this->teammemberfieldid}_{$entryid}"} = ["$userid"];
@@ -184,7 +184,7 @@ class rule extends base {
         $port = $this->sftpport;
         $connection = "sftp://$username:$password@$server:$port$remotedir";
         $ch = $this->init_curl($server, $connection);
-        mtrace("Executing file download for this datalynx instance: {$this->dl->name()} {$this->dl->get_baseurl()}");
+        mtrace("Executing file download for this datalynx instance: {$this->dlx->name()} {$this->dlx->get_baseurl()}");
         $result = curl_exec($ch);
         if ($result === false) {
             $info = curl_getinfo($ch);

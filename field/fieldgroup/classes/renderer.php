@@ -95,7 +95,7 @@ class renderer extends datalynxfield_renderer {
             unset($completedispl['line'][$line]);
         }
         $viewtype = '';
-        if ($view = $this->field->df->get_current_view()) {
+        if ($view = $this->field->dlx->get_current_view()) {
             // Special mustache template for pdf rendering of fieldgroups.
             $viewtype = ($view->view->type == 'pdf') ? 'pdf' : '';
         }
@@ -263,7 +263,7 @@ class renderer extends datalynxfield_renderer {
             // We want to display these fields.
             $fieldids = $this->field->fieldids;
             foreach ($fieldids as $fieldid) {
-                $field = $this->field->df->get_field_from_id($fieldid);
+                $field = $this->field->dlx->get_field_from_id($fieldid);
                 if ($field->for_use_in_fieldgroup()) {
                     $this->subfields[$fieldid] = $field;
                 }

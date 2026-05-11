@@ -40,12 +40,12 @@ class view extends base {
     /**
      * Constructor.
      *
-     * @param int|\mod_datalynx\datalynx $df
+     * @param int|\mod_datalynx\datalynx $dlx
      * @param int|\stdClass $view
      * @param bool $filteroptions
      */
-    public function __construct($df = 0, $view = 0, $filteroptions = true) {
-        parent::__construct($df, $view, $filteroptions);
+    public function __construct($dlx = 0, $view = 0, $filteroptions = true) {
+        parent::__construct($dlx, $view, $filteroptions);
 
         if (empty($this->view->id)) {
             $this->view->visible = 1;
@@ -68,7 +68,7 @@ class view extends base {
      * Generate the default email template.
      */
     public function generate_default_view() {
-        $fields = $this->dl->get_fields();
+        $fields = $this->dlx->get_fields();
         if (!$fields) {
             return;
         }
@@ -117,7 +117,7 @@ class view extends base {
     protected function new_entry_definition($entryid = -1) {
         $elements = [];
 
-        $fields = $this->dl->get_fields();
+        $fields = $this->dlx->get_fields();
         $tags = [];
         $patterndefinitions = [];
         $entry = new stdClass();
@@ -161,7 +161,7 @@ class view extends base {
         $this->view->eparam2 = file_rewrite_pluginfile_urls(
             $this->view->eparam2,
             'pluginfile.php',
-            $this->dl->context->id,
+            $this->dlx->context->id,
             'mod_datalynx',
             'viewparam2',
             $this->id()

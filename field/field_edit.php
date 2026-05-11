@@ -32,27 +32,27 @@ $urlparams->type = optional_param('type', '', PARAM_ALPHA); // Type of a field t
 $urlparams->fid = optional_param('fid', 0, PARAM_INT); // Field id to edit.
 
 // Set a datalynx object.
-$df = new mod_datalynx\datalynx($urlparams->d);
+$dlx = new mod_datalynx\datalynx($urlparams->d);
 
-require_login($df->data->course, false, $df->cm);
+require_login($dlx->data->course, false, $dlx->cm);
 
-$df->set_page('field/field_edit', ['urlparams' => $urlparams]);
+$dlx->set_page('field/field_edit', ['urlparams' => $urlparams]);
 
 require_sesskey();
-require_capability('mod/datalynx:managetemplates', $df->context);
+require_capability('mod/datalynx:managetemplates', $dlx->context);
 
 if ($urlparams->fid) {
-    $field = $df->get_field_from_id($urlparams->fid, true); // Force get.
+    $field = $dlx->get_field_from_id($urlparams->fid, true); // Force get.
 } else {
     if ($urlparams->type) {
-        $field = $df->get_field($urlparams->type);
+        $field = $dlx->get_field($urlparams->type);
     }
 }
 
 $mform = $field->get_form();
 
 if ($mform->is_cancelled()) {
-    redirect(new moodle_url('/mod/datalynx/field/index.php', ['d' => $df->id()]));
+    redirect(new moodle_url('/mod/datalynx/field/index.php', ['d' => $dlx->id()]));
 
     // No submit buttons.
 } else if (!$mform->no_submit_button_pressed()) {
@@ -66,12 +66,12 @@ if ($mform->is_cancelled()) {
                 $param10 = $data->param10;
             }
             // For text fields: Store the field itself as autocompletion reference field if no other field is chosen.
-            if ($field->type == 'text' && $param10 <= 0 && $data->param9 == $df->id()) {
+            if ($field->type == 'text' && $param10 <= 0 && $data->param9 == $dlx->id()) {
                 $DB->set_field('datalynx_fields', 'param10', $fieldid, ['id' => $fieldid]);
             }
-            $other = ['dataid' => $df->id()];
+            $other = ['dataid' => $dlx->id()];
             $event = \mod_datalynx\event\field_created::create(
-                ['context' => $df->context, 'objectid' => $fieldid, 'other' => $other]
+                ['context' => $dlx->context, 'objectid' => $fieldid, 'other' => $other]
             );
             $event->trigger();
 
@@ -80,16 +80,16 @@ if ($mform->is_cancelled()) {
             $data->id = $field->id();
             $field->update_field($data);
 
-            $other = ['dataid' => $df->id()];
+            $other = ['dataid' => $dlx->id()];
             $event = \mod_datalynx\event\field_updated::create(
-                ['context' => $df->context, 'objectid' => $field->id(), 'other' => $other,
+                ['context' => $dlx->context, 'objectid' => $field->id(), 'other' => $other,
                 ]
             );
             $event->trigger();
         }
 
         if ($data->submitbutton != get_string('savecontinue', 'datalynx')) {
-            redirect(new moodle_url('/mod/datalynx/field/index.php', ['d' => $df->id()]));
+            redirect(new moodle_url('/mod/datalynx/field/index.php', ['d' => $dlx->id()]));
         }
 
         // Continue to edit so refresh the form.
@@ -99,11 +99,11 @@ if ($mform->is_cancelled()) {
 
 // Activate navigation node.
 navigation_node::override_active_url(
-    new moodle_url('/mod/datalynx/field/index.php', ['id' => $df->cm->id])
+    new moodle_url('/mod/datalynx/field/index.php', ['id' => $dlx->cm->id])
 );
 
 // Print header.
-$df->print_header(['tab' => 'fields', 'nonotifications' => true, 'urlparams' => $urlparams]);
+$dlx->print_header(['tab' => 'fields', 'nonotifications' => true, 'urlparams' => $urlparams]);
 
 $formheading = $field->id() ? get_string('fieldedit', 'datalynx', $field->name()) : get_string(
     'fieldnew',
@@ -116,4 +116,4 @@ echo html_writer::tag('h2', format_string($formheading), ['class' => 'mdl-align'
 $mform->set_data($field->to_form());
 $mform->display();
 
-$df->print_footer();
+$dlx->print_footer();

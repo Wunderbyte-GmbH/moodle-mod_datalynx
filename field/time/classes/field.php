@@ -60,11 +60,11 @@ class field extends datalynxfield_base {
     /**
      * Constructor.
      *
-     * @param int|object $df Datalynx ID or object
+     * @param int|object $dlx Datalynx ID or object
      * @param int|object $field Field ID or object
      */
-    public function __construct($df = 0, $field = 0) {
-        parent::__construct($df, $field);
+    public function __construct($dlx = 0, $field = 0) {
+        parent::__construct($dlx, $field);
         $this->dateonly = $this->field->param1;
         $this->masked = $this->field->param5;
         $this->startyear = $this->field->param2;

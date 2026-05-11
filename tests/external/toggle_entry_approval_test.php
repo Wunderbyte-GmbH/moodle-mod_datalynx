@@ -40,14 +40,14 @@ final class toggle_entry_approval_test extends advanced_testcase {
     /**
      * Create a minimal datalynx view for event payloads.
      *
-     * @param datalynx $df
+     * @param datalynx $dlx
      * @return stdClass
      */
-    private function create_view_record(datalynx $df, string $type = 'tabular', string $param2 = ''): stdClass {
+    private function create_view_record(datalynx $dlx, string $type = 'tabular', string $param2 = ''): stdClass {
         global $DB;
 
         $view = (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'type' => $type,
             'name' => 'Approval view',
             'description' => '',
@@ -68,16 +68,16 @@ final class toggle_entry_approval_test extends advanced_testcase {
     /**
      * Create a minimal datalynx entry.
      *
-     * @param datalynx $df
+     * @param datalynx $dlx
      * @param int $userid
      * @param int $approved
      * @return int
      */
-    private function create_entry(datalynx $df, int $userid, int $approved = 0): int {
+    private function create_entry(datalynx $dlx, int $userid, int $approved = 0): int {
         global $DB;
 
         return (int) $DB->insert_record('datalynx_entries', (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'userid' => $userid,
             'groupid' => 0,
             'approved' => $approved,
@@ -108,9 +108,9 @@ final class toggle_entry_approval_test extends advanced_testcase {
             'course' => $course->id,
             'approval' => 1,
         ]);
-        $df = new datalynx($instance->id);
-        $view = $this->create_view_record($df);
-        $entryid = $this->create_entry($df, $teacher->id, 0);
+        $dlx = new datalynx($instance->id);
+        $view = $this->create_view_record($dlx);
+        $entryid = $this->create_entry($dlx, $teacher->id, 0);
 
         $approvedresult = toggle_entry_approval::execute($instance->id, $view->id, $entryid, 'toggle-approval');
         $approvedresult = external_api::clean_returnvalue(toggle_entry_approval::execute_returns(), $approvedresult);

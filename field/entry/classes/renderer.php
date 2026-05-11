@@ -52,7 +52,7 @@ class renderer extends datalynxfield_renderer {
         $manageable = !empty($options['manage']) ? $options['manage'] : false;
         $manageable = $manageable && ((isset($entry->status) &&
                                 $entry->status != datalynxfield_status::STATUS_FINAL_SUBMISSION) ||
-                        has_capability('mod/datalynx:manageentries', $this->field->df->context));
+                        has_capability('mod/datalynx:manageentries', $this->field->dlx->context));
 
         // No edit mode.
         $replacements = [];
@@ -72,7 +72,7 @@ class renderer extends datalynxfield_renderer {
                         $str = str_pad($entry->id, 4, 0, STR_PAD_LEFT);
                         break;
                     case '##coursevisible##':
-                        $str = $this->field->df->course->visible ? get_string('coursevisible', 'datalynx') : '';
+                        $str = $this->field->dlx->course->visible ? get_string('coursevisible', 'datalynx') : '';
                         break;
                     case '##more##':
                         $str = $this->display_more($entry);
@@ -118,9 +118,9 @@ class renderer extends datalynxfield_renderer {
         $field = $this->field;
         $params = ['eids' => $entry->id];
         $url = new moodle_url($entry->baseurl, $params);
-        if ($field->df()->data->singleview) {
+        if ($field->dlx()->data->singleview) {
             $url->param('ret', $url->param('view'));
-            $url->param('view', $field->df()->data->singleview);
+            $url->param('view', $field->dlx()->data->singleview);
         }
         $str = get_string('more', 'datalynx');
         if (!$href) {
@@ -142,15 +142,15 @@ class renderer extends datalynxfield_renderer {
         $field = $this->field;
         $params = ['editentries' => $entry->id, 'eids' => $entry->id, 'sesskey' => sesskey()];
         $url = new moodle_url($entry->baseurl, $params);
-        if ($field->df()->data->singleedit) {
-            $url->param('view', $field->df()->data->singleedit);
+        if ($field->dlx()->data->singleedit) {
+            $url->param('view', $field->dlx()->data->singleedit);
         }
         $str = get_string('edit');
 
         // In case we serve the app show a nice button for mobile devices.
         if (WS_SERVER) {
-            $cmid = $field->df()->cm->id;
-            $courseid = $field->df()->cm->course;
+            $cmid = $field->dlx()->cm->id;
+            $courseid = $field->dlx()->cm->course;
             $args = "[args]='{entry: $entry->id, action: \"edit\", cmid: $cmid, courseid: $courseid }'";
             return "<button ion-button core-site-plugins-new-content title='editbutton'
                 component='mod_datalynx' method='mobile_course_view' $args>$str</button>";
@@ -171,8 +171,8 @@ class renderer extends datalynxfield_renderer {
         $field = $this->field;
         $params = ['duplicate' => $entry->id, 'sesskey' => sesskey()];
         $url = new moodle_url($entry->baseurl, $params);
-        if ($field->df()->data->singleedit) {
-            $url->param('view', $field->df()->data->singleedit);
+        if ($field->dlx()->data->singleedit) {
+            $url->param('view', $field->dlx()->data->singleedit);
         }
         $str = get_string('duplicate');
         return html_writer::link($url->out(false), $str . ' ' . $OUTPUT->pix_icon('t/copy', $str));
@@ -194,8 +194,8 @@ class renderer extends datalynxfield_renderer {
 
         // In case we serve the app show a nice button for mobile devices.
         if (WS_SERVER) {
-            $cmid = $field->df()->cm->id;
-            $courseid = $field->df()->cm->course;
+            $cmid = $field->dlx()->cm->id;
+            $courseid = $field->dlx()->cm->course;
             $args = "[args]='{entry: $entry->id, action: \"delete\", cmid: $cmid, courseid: $courseid }'";
             return "<button ion-button core-site-plugins-new-content title='deletebutton'
                 component='mod_datalynx' method='mobile_course_view' $args>$str</button>";
@@ -218,7 +218,7 @@ class renderer extends datalynxfield_renderer {
         }
 
         $str = '';
-        $canexportentry = $this->field->df()->user_can_export_entry($entry);
+        $canexportentry = $this->field->dlx()->user_can_export_entry($entry);
         if ($canexportentry) {
             $url = new moodle_url(
                 $entry->baseurl,

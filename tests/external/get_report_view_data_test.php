@@ -48,10 +48,10 @@ final class get_report_view_data_test extends advanced_testcase {
         $student1 = $this->getDataGenerator()->create_and_enrol($course, 'student');
         $student2 = $this->getDataGenerator()->create_and_enrol($course, 'student');
         $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
-        $df = new datalynx($instance->id);
+        $dlx = new datalynx($instance->id);
 
         $selectfield = (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'type' => 'select',
             'name' => 'Choice',
             'description' => '',
@@ -69,7 +69,7 @@ final class get_report_view_data_test extends advanced_testcase {
         $selectfield->id = (int) $DB->insert_record('datalynx_fields', $selectfield);
 
         $view = (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'type' => 'report',
             'name' => 'Author report',
             'description' => '',
@@ -88,7 +88,7 @@ final class get_report_view_data_test extends advanced_testcase {
         $view->id = (int) $DB->insert_record('datalynx_views', $view);
 
         $entryone = (int) $DB->insert_record('datalynx_entries', (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'userid' => $student1->id,
             'groupid' => 0,
             'approved' => 1,
@@ -97,7 +97,7 @@ final class get_report_view_data_test extends advanced_testcase {
             'timemodified' => strtotime('2026-04-15 12:00:00'),
         ]);
         $entrytwo = (int) $DB->insert_record('datalynx_entries', (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'userid' => $student2->id,
             'groupid' => 0,
             'approved' => 1,
@@ -119,7 +119,7 @@ final class get_report_view_data_test extends advanced_testcase {
             'content' => '2',
         ]);
 
-        return [$df, $view, $student1, $student2];
+        return [$dlx, $view, $student1, $student2];
     }
 
     /**
@@ -131,12 +131,12 @@ final class get_report_view_data_test extends advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
 
-        [$df, $view, $student1, $student2] = $this->create_report_fixture();
+        [$dlx, $view, $student1, $student2] = $this->create_report_fixture();
 
-        $result = get_report_view_data::execute($df->id(), $view->id);
+        $result = get_report_view_data::execute($dlx->id(), $view->id);
         $result = external_api::clean_returnvalue(get_report_view_data::execute_returns(), $result);
 
-        $this->assertSame((int) $df->id(), $result['datalynxid']);
+        $this->assertSame((int) $dlx->id(), $result['datalynxid']);
         $this->assertSame($view->id, $result['viewid']);
         $this->assertSame('report', $result['viewtype']);
         $this->assertTrue($result['hasdata']);

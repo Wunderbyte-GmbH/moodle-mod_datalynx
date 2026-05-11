@@ -33,20 +33,20 @@ $urlparams->id = required_param('id', PARAM_INT);
 $urlparams->action = optional_param('action', 'edit', PARAM_ALPHA);
 $urlparams->confirmed = optional_param('confirmed', false, PARAM_BOOL);
 
-$datalynx = new datalynx($urlparams->d);
+$dlx = new datalynx($urlparams->d);
 
-require_login($datalynx->data->course, false, $datalynx->cm);
+require_login($dlx->data->course, false, $dlx->cm);
 
-$datalynx->set_page('renderer/renderer_edit', ['urlparams' => $urlparams]);
+$dlx->set_page('renderer/renderer_edit', ['urlparams' => $urlparams]);
 
 require_sesskey();
-require_capability('mod/datalynx:managetemplates', $datalynx->context);
+require_capability('mod/datalynx:managetemplates', $dlx->context);
 
-$returnurl = new moodle_url('/mod/datalynx/fieldlayout/index.php', ['d' => $datalynx->id()]);
+$returnurl = new moodle_url('/mod/datalynx/fieldlayout/index.php', ['d' => $dlx->id()]);
 
 switch ($urlparams->action) {
     case "edit":
-        $mform = new datalynxfield_layout_form($datalynx);
+        $mform = new datalynxfield_layout_form($dlx);
 
         if ($mform->is_cancelled()) {
             redirect($returnurl);
@@ -61,7 +61,7 @@ switch ($urlparams->action) {
             }
         }
 
-        $datalynx->print_header(
+        $dlx->print_header(
             ['tab' => 'renderers', 'nonotifications' => true, 'urlparams' => $urlparams]
         );
 
@@ -82,7 +82,7 @@ switch ($urlparams->action) {
         }
 
         $mform->display();
-        $datalynx->print_footer();
+        $dlx->print_footer();
 
         break;
 
@@ -93,7 +93,7 @@ switch ($urlparams->action) {
         } else {
             $data = datalynxfield_layout::get_renderer_by_id($urlparams->id);
             $urlparams->confirmed = true;
-            $datalynx->print_header(
+            $dlx->print_header(
                 ['tab' => 'renderers', 'nonotifications' => true,
                 'urlparams' => $urlparams]
             );
@@ -107,7 +107,7 @@ switch ($urlparams->action) {
                 new moodle_url('renderer_edit.php', (array) $urlparams),
                 $returnurl
             );
-            $datalynx->print_footer();
+            $dlx->print_footer();
         }
         break;
 
@@ -118,7 +118,7 @@ switch ($urlparams->action) {
         } else {
             $data = datalynxfield_layout::get_renderer_by_id($urlparams->id);
             $urlparams->confirmed = true;
-            $datalynx->print_header(
+            $dlx->print_header(
                 ['tab' => 'renderers', 'nonotifications' => true,
                 'urlparams' => $urlparams]
             );
@@ -132,7 +132,7 @@ switch ($urlparams->action) {
                 new moodle_url('renderer_edit.php', (array) $urlparams),
                 $returnurl
             );
-            $datalynx->print_footer();
+            $dlx->print_footer();
         }
         break;
 

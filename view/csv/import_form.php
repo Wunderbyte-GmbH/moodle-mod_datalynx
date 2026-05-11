@@ -99,7 +99,7 @@ class datalynxview_csv_import_form extends moodleform {
      */
     protected function field_settings() {
         $view = $this->view;
-        $df = $view->get_dl();
+        $dlx = $view->get_dlx();
         $mform = &$this->_form;
 
         $mform->addElement(
@@ -117,7 +117,7 @@ class datalynxview_csv_import_form extends moodleform {
             if (!$fieldid) {
                 continue;
             }
-            $field = $df->get_field_from_id($fieldid);
+            $field = $dlx->get_field_from_id($fieldid);
             if (!$field) {
                 continue;
             }

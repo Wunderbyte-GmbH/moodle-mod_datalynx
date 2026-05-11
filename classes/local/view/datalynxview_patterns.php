@@ -230,8 +230,8 @@ class datalynxview_patterns {
     protected function get_regexp_replacements($tag, $entry = null, ?array $options = null) {
         global $OUTPUT;
 
-        $df = $this->view->get_dl();
-        $currentview = $df->get_current_view();
+        $dlx = $this->view->get_dlx();
+        $currentview = $dlx->get_current_view();
 
         $views = $this->get_cached_all_view_records();
         if ($views) {
@@ -241,7 +241,7 @@ class datalynxview_patterns {
                 $baseurlparams['view'] = $view->id;
 
                 $view->baseurl = new moodle_url(
-                    "/mod/datalynx/{$this->view->get_dl()->pagefile_for_urls()}.php",
+                    "/mod/datalynx/{$this->view->get_dlx()->pagefile_for_urls()}.php",
                     $baseurlparams
                 );
             }
@@ -310,14 +310,14 @@ class datalynxview_patterns {
     private function user_can_add_new_entry($userid = 0) {
         global $USER, $DB;
         $userid = $userid ? $userid : $USER->id;
-        $df = $this->view->get_dl();
-        $maxentries = $df->data->maxentries;
-        $writeentry = has_capability('mod/datalynx:writeentry', $df->context);
+        $dlx = $this->view->get_dlx();
+        $maxentries = $dlx->data->maxentries;
+        $writeentry = has_capability('mod/datalynx:writeentry', $dlx->context);
         if ($writeentry) {
             if ($maxentries == -1) {
                 return true;
             }
-            $params = ['userid' => $userid, 'dataid' => $df->id()];
+            $params = ['userid' => $userid, 'dataid' => $dlx->id()];
             $sql = "SELECT COUNT(1)
                       FROM {datalynx_entries} de
                      WHERE de.userid = :userid
@@ -350,7 +350,7 @@ class datalynxview_patterns {
         }
 
         $replacements = [];
-        foreach ($this->view->get_dl()->get_fields() as $field) {
+        foreach ($this->view->get_dlx()->get_fields() as $field) {
             $fieldtags = $field->renderer()->search($text);
             if (!$fieldtags) {
                 continue;
@@ -480,7 +480,7 @@ class datalynxview_patterns {
         $replacement = '';
 
         $view = $this->view;
-        $df = $view->get_dl();
+        $dlx = $view->get_dlx();
         $baseurl = new moodle_url($view->get_baseurl());
         $baseurl->param('sesskey', sesskey());
         // When user is editing then do not render these tags.
@@ -489,7 +489,7 @@ class datalynxview_patterns {
         }
 
         $showentryactions = (!empty($options['showentryactions']) ||
-                has_capability('mod/datalynx:manageentries', $df->context));
+                has_capability('mod/datalynx:manageentries', $dlx->context));
         // TODO MDL-000000: move to a view attribute so as to call only once.
         // Can this user add entries?
         switch ($tag) {
@@ -500,8 +500,8 @@ class datalynxview_patterns {
                 }
 
                 if ($tag == '##addnewentry##') {
-                    if (!empty($df->data->singleedit)) {
-                        $baseurl->param('view', $df->data->singleedit);
+                    if (!empty($dlx->data->singleedit)) {
+                        $baseurl->param('view', $dlx->data->singleedit);
                     }
                     $baseurl->param('new', 1);
                     $label = html_writer::tag('span', get_string('entryaddnew', 'datalynx'));
@@ -604,7 +604,7 @@ class datalynxview_patterns {
 
             case '##multiapprove##':
             case '##multiapprove:icon##':
-                if ($df->data->approval && has_capability('mod/datalynx:approve', $df->context)) {
+                if ($dlx->data->approval && has_capability('mod/datalynx:approve', $dlx->context)) {
                     if ($tag == '##multiapprove##') {
                         $replacement = html_writer::empty_tag(
                             'input',
@@ -909,14 +909,14 @@ class datalynxview_patterns {
      * @return array multidimensional with pattern as key and array with showinmenu and category as value
      */
     protected function viewlink_patterns($checkvisibility = true) {
-        $df = $this->view->get_dl();
+        $dlx = $this->view->get_dlx();
 
         $views = [];
         $patterns = [];
         if ($checkvisibility) {
-            $views = $df->get_views_menu();
+            $views = $dlx->get_views_menu();
         } else {
-            $viewobjects = $df->get_all_views();
+            $viewobjects = $dlx->get_all_views();
             if (!empty($viewobjects)) {
                 foreach ($viewobjects as $viewid => $view) {
                     $views[$viewid] = $view->name;
@@ -964,11 +964,11 @@ class datalynxview_patterns {
      * @return array multitype:multitype:boolean string
      */
     protected function bulkedit_patterns() {
-        $df = $this->view->get_dl();
+        $dlx = $this->view->get_dlx();
 
         $patterns = [];
 
-        $fieldnames = $df->get_fieldnames();
+        $fieldnames = $dlx->get_fieldnames();
         $cat = get_string('reference', 'datalynx');
         foreach ($fieldnames as $fieldname) {
             $fieldname = preg_quote($fieldname, '/');
@@ -1013,9 +1013,9 @@ class datalynxview_patterns {
      * @return string
      */
     protected function get_cache_context_key(): string {
-        $df = $this->view->get_dl();
+        $dlx = $this->view->get_dlx();
 
-        return spl_object_id($df) . ':' . $df->id();
+        return spl_object_id($dlx) . ':' . $dlx->id();
     }
 
     /**
@@ -1037,7 +1037,7 @@ class datalynxview_patterns {
     protected function get_cached_all_view_records(): array {
         $cachekey = $this->get_cache_context_key();
         if (!array_key_exists($cachekey, self::$allviewrecordcache)) {
-            self::$allviewrecordcache[$cachekey] = $this->view->get_dl()->get_all_views();
+            self::$allviewrecordcache[$cachekey] = $this->view->get_dlx()->get_all_views();
         }
 
         return self::$allviewrecordcache[$cachekey];
@@ -1052,7 +1052,7 @@ class datalynxview_patterns {
         $cachekey = $this->get_user_cache_context_key();
         if (!array_key_exists($cachekey, self::$namedviewcache)) {
             self::$namedviewcache[$cachekey] = [];
-            foreach ($this->view->get_dl()->get_views() as $view) {
+            foreach ($this->view->get_dlx()->get_views() as $view) {
                 self::$namedviewcache[$cachekey][$view->name()] = $view;
             }
         }
@@ -1068,7 +1068,7 @@ class datalynxview_patterns {
     protected function get_cached_visible_view_names(): array {
         $cachekey = $this->get_user_cache_context_key();
         if (!array_key_exists($cachekey, self::$visibleviewnamecache)) {
-            self::$visibleviewnamecache[$cachekey] = $this->view->get_dl()->get_views_menu();
+            self::$visibleviewnamecache[$cachekey] = $this->view->get_dlx()->get_views_menu();
         }
 
         return self::$visibleviewnamecache[$cachekey];
@@ -1099,7 +1099,7 @@ class datalynxview_patterns {
     protected function get_cached_fields(): array {
         $cachekey = $this->get_cache_context_key();
         if (!array_key_exists($cachekey, self::$fieldcache)) {
-            self::$fieldcache[$cachekey] = $this->view->get_dl()->get_fields(null, true);
+            self::$fieldcache[$cachekey] = $this->view->get_dlx()->get_fields(null, true);
         }
 
         return self::$fieldcache[$cachekey];
@@ -1115,15 +1115,15 @@ class datalynxview_patterns {
     protected function print_views_menu(?array $options = null, $return = false) {
         global $OUTPUT;
         $view = $this->view;
-        $dl = $view->get_dl();
+        $dlx = $view->get_dlx();
         $baseurl = $view->get_baseurl();
         $viewjump = '';
-        $menuviews = $dl->get_views_menu();
+        $menuviews = $dlx->get_views_menu();
 
         if (!empty($menuviews) && (count($menuviews) > 1)) {
             // Display the view form jump list.
             $baseurl = $baseurl->out_omit_querystring();
-            $baseurlparams = ['d' => $dl->id(), 'sesskey' => sesskey()];
+            $baseurlparams = ['d' => $dlx->id(), 'sesskey' => sesskey()];
             $viewselect = new single_select(
                 new moodle_url($baseurl, $baseurlparams),
                 'view',
@@ -1160,14 +1160,14 @@ class datalynxview_patterns {
             return '';
         }
 
-        $df = $view->get_dl();
+        $dlx = $view->get_dlx();
         $filter = $view->get_filter();
         $baseurl = $view->get_baseurl();
 
         $filterjump = '';
 
         if (!$view->is_forcing_filter() && ($filter->id || !empty($options['entriescount']))) {
-            $fm = $df->get_filter_manager();
+            $fm = $dlx->get_filter_manager();
             if (!$menufilters = $fm->get_filters(null, true)) {
                 $menufilters = [];
             }
@@ -1176,7 +1176,7 @@ class datalynxview_patterns {
             }
 
             $baseurl = $baseurl->out_omit_querystring();
-            $baseurlparams = ['d' => $df->id(), 'sesskey' => sesskey(), 'view' => $view->id()];
+            $baseurlparams = ['d' => $dlx->id(), 'sesskey' => sesskey(), 'view' => $view->id()];
 
             // Display the filter form jump list.
             $filterselect = new single_select(
@@ -1207,12 +1207,12 @@ class datalynxview_patterns {
      */
     protected function print_quick_search($options, $return = false) {
         $view = $this->view;
-        $df = $view->get_dl();
+        $dlx = $view->get_dlx();
         $filter = $view->get_filter();
         $baseurl = $view->get_baseurl();
 
         $baseurl = $baseurl->out_omit_querystring();
-        $baseurlparams = ['d' => $df->id(), 'sesskey' => sesskey(), 'view' => $view->id(),
+        $baseurlparams = ['d' => $dlx->id(), 'sesskey' => sesskey(), 'view' => $view->id(),
                 'filter' => $filter->id];
         $searchvalue = $filter->search;
         // Display the quick search form.
@@ -1256,12 +1256,12 @@ class datalynxview_patterns {
         global $OUTPUT;
 
         $view = $this->view;
-        $df = $view->get_dl();
+        $dlx = $view->get_dlx();
         $filter = $view->get_filter();
         $baseurl = $view->get_baseurl();
 
         $baseurl = $baseurl->out_omit_querystring();
-        $baseurlparams = ['d' => $df->id(), 'sesskey' => sesskey(), 'view' => $view->id(),
+        $baseurlparams = ['d' => $dlx->id(), 'sesskey' => sesskey(), 'view' => $view->id(),
                 'filter' => datalynx_filter_manager::USER_FILTER_SET];
 
         if ($filter->id < 0 && $filter->perpage) {
@@ -1303,10 +1303,10 @@ class datalynxview_patterns {
     protected function print_advanced_filter($options, $return = false) {
 
         $view = $this->view;
-        $df = $view->get_dl();
+        $dlx = $view->get_dlx();
         $filter = $view->get_filter();
 
-        $fm = $df->get_filter_manager();
+        $fm = $dlx->get_filter_manager();
         $filterform = $fm->get_advanced_filter_form($filter, $view);
 
         if ($return) {
@@ -1334,11 +1334,11 @@ class datalynxview_patterns {
 
         $view = $this->view;
         $filter = $view->get_filter();
-        $dl = $view->get_dl();
+        $dlx = $view->get_dlx();
         $customfiltername = str_replace('##', '', str_replace('##customfilter:', '', $tag));
-        $where = ['name' => $customfiltername, 'dataid' => $dl->id()];
+        $where = ['name' => $customfiltername, 'dataid' => $dlx->id()];
         $customfilter = $DB->get_record('datalynx_customfilters', $where);
-        $fm = $dl->get_filter_manager();
+        $fm = $dlx->get_filter_manager();
         $filterform = $fm->get_customfilter_frontend_form($filter, $view, $customfilter);
 
         if ($return) {

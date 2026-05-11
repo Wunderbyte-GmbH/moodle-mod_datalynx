@@ -43,46 +43,46 @@ $urlparams->convert = optional_param('convert', 0, PARAM_INT); // Id of field to
 $urlparams->confirmed = optional_param('confirmed', 0, PARAM_INT);
 
 // Set a datalynx object.
-$df = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
+$dlx = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
 
-require_login($df->data->course, false, $df->cm);
+require_login($dlx->data->course, false, $dlx->cm);
 
-require_capability('mod/datalynx:managetemplates', $df->context);
+require_capability('mod/datalynx:managetemplates', $dlx->context);
 
-$df->set_page('field/index', ['modjs' => true, 'urlparams' => $urlparams]);
+$dlx->set_page('field/index', ['modjs' => true, 'urlparams' => $urlparams]);
 
 // Activate navigation node.
 navigation_node::override_active_url(
-    new moodle_url('/mod/datalynx/field/index.php', ['id' => $df->cm->id])
+    new moodle_url('/mod/datalynx/field/index.php', ['id' => $dlx->cm->id])
 );
 
 // DATA PROCESSING.
 // Duplicate requested fields.
 if ($urlparams->duplicate && confirm_sesskey()) {
-    $df->process_fields('duplicate', $urlparams->duplicate, $urlparams->confirmed);
+    $dlx->process_fields('duplicate', $urlparams->duplicate, $urlparams->confirmed);
     // Delete requested fields.
 } else {
     if ($urlparams->delete && confirm_sesskey()) {
-        $df->process_fields('delete', $urlparams->delete, $urlparams->confirmed);
+        $dlx->process_fields('delete', $urlparams->delete, $urlparams->confirmed);
     } else if ($urlparams->convert && confirm_sesskey()) {
-        $df->process_fields('convert', $urlparams->convert, true); // Confirmed by default.
+        $dlx->process_fields('convert', $urlparams->convert, true); // Confirmed by default.
     }
 }
 
 // Any notifications.
-$fields = $df->get_fields(
+$fields = $dlx->get_fields(
     null,
     false,
     true,
-    flexible_table::get_sort_for_table('datalynxfieldsindex' . $df->id())
+    flexible_table::get_sort_for_table('datalynxfieldsindex' . $dlx->id())
 );
 if (!$fields) {
-    $df->notifications['bad'][] = get_string('fieldnoneindatalynx', 'datalynx'); // Nothing in.
+    $dlx->notifications['bad'][] = get_string('fieldnoneindatalynx', 'datalynx'); // Nothing in.
     // Datalynx.
 }
 
 // Print header.
-$df->print_header(['tab' => 'fields', 'urlparams' => $urlparams]);
+$dlx->print_header(['tab' => 'fields', 'urlparams' => $urlparams]);
 
 // Display the field form jump list.
 $directories = get_list_of_plugins('mod/datalynx/field/');
@@ -99,7 +99,7 @@ asort($menufield);
 
 $popupurl = new moodle_url(
     '/mod/datalynx/field/field_edit.php',
-    ['d' => $df->id(), 'sesskey' => sesskey()]
+    ['d' => $dlx->id(), 'sesskey' => sesskey()]
 );
 $fieldselect = new single_select($popupurl, 'type', $menufield, null, ['' => 'choosedots'], 'fieldform');
 $fieldselect->set_label(get_string('fieldadd', 'datalynx') . '&nbsp;');
@@ -114,7 +114,7 @@ echo html_writer::tag(
 if ($fields) {
     $editbaseurl = '/mod/datalynx/field/field_edit.php';
     $actionbaseurl = '/mod/datalynx/field/index.php';
-    $linkparams = ['d' => $df->id(), 'sesskey' => sesskey()];
+    $linkparams = ['d' => $dlx->id(), 'sesskey' => sesskey()];
 
     $stredit = get_string('edit');
     $strduplicate = get_string('duplicate');
@@ -153,8 +153,8 @@ if ($fields) {
             'delete' => $multidelete, 'selectallnone' => $selectallnone,
     ];
 
-    $table = new flexible_table('datalynxfieldsindex' . $df->id());
-    $table->define_baseurl(new moodle_url('/mod/datalynx/field/index.php', ['d' => $df->id()]));
+    $table = new flexible_table('datalynxfieldsindex' . $dlx->id());
+    $table->define_baseurl(new moodle_url('/mod/datalynx/field/index.php', ['d' => $dlx->id()]));
     $table->define_columns(array_keys($headers));
     $table->define_headers(array_values($headers));
 
@@ -222,4 +222,4 @@ if ($fields) {
     $table->finish_output();
 }
 
-$df->print_footer();
+$dlx->print_footer();

@@ -54,19 +54,19 @@ class field extends datalynxfield_base {
 
     /**
      *
-     * @param number $df
+     * @param number $dlx
      * @param number $field
      */
-    public function __construct($df = 0, $field = 0) {
+    public function __construct($dlx = 0, $field = 0) {
         global $COURSE, $PAGE, $CFG;
-        parent::__construct($df, $field);
+        parent::__construct($dlx, $field);
 
         $maxbytes = get_user_max_upload_file_size($PAGE->context, $CFG->maxbytes, $COURSE->maxbytes);
 
         // TODO MDL-000000: provide options for the editor field to configure in the field settings.
 
         $this->editoroptions = [];
-        $this->editoroptions['context'] = $this->df->context;
+        $this->editoroptions['context'] = $this->dlx->context;
         $this->editoroptions['maxfiles'] = EDITOR_UNLIMITED_FILES;
         $this->editoroptions['trusttext'] = true;
         $this->editoroptions['maxbytes'] = $maxbytes;
@@ -133,7 +133,7 @@ class field extends datalynxfield_base {
             $data,
             'content',
             $this->editoroptions,
-            $this->df->context,
+            $this->dlx->context,
             'mod_datalynx',
             'content',
             $rec->id

@@ -72,7 +72,7 @@ class datalynx_entries {
      *
      * @var datalynx
      */
-    protected $datalynx = null;
+    protected $dlx = null;
     // Datalynx object.
     /**
      *
@@ -99,18 +99,18 @@ class datalynx_entries {
      * Constructor
      * View or datalynx or both, each can be id or object
      *
-     * @param datalynx $datalynx
+     * @param datalynx $dlx
      * @param ?datalynx_filter $filter
      * @throws coding_exception
      */
-    public function __construct(mod_datalynx\datalynx $datalynx, ?datalynx_filter $filter = null) {
-        if (empty($datalynx)) {
+    public function __construct(mod_datalynx\datalynx $dlx, ?datalynx_filter $filter = null) {
+        if (empty($dlx)) {
             throw new coding_exception(
                 'Datalynx id or object must be passed to entries constructor.'
             );
         }
 
-        $this->datalynx = $datalynx;
+        $this->dlx = $dlx;
         $this->filter = $filter;
     }
 
@@ -166,8 +166,8 @@ class datalynx_entries {
     public function get_entries($options = null) {
         global $DB, $USER;
 
-        $datalynx = &$this->datalynx;
-        $fields = $datalynx->get_fields();
+        $dlx = &$this->dlx;
+        $fields = $dlx->get_fields();
 
         // Get the filter.
         if (empty($options['filter'])) {
@@ -196,7 +196,7 @@ class datalynx_entries {
         if (isset($optionsfilterusers)) { // Datalynxview_field goes first.
             $whereuser = " AND e.userid = :{$this->sqlparams($params, 'userid', $optionsfilterusers)} ";
         } else {
-            if (!$datalynx->user_can_view_all_entries()) {
+            if (!$dlx->user_can_view_all_entries()) {
                 // Include only the user's entries.
                 $whereuser = " AND e.userid = :{$this->sqlparams($params, 'userid', $USER->id)} ";
             } else {
@@ -212,7 +212,7 @@ class datalynx_entries {
                 }
 
                 // Exclude guest/anonymous.
-                if (!has_capability('mod/datalynx:viewanonymousentry', $datalynx->context)) {
+                if (!has_capability('mod/datalynx:viewanonymousentry', $dlx->context)) {
                     $whereuser .= " AND e.userid <> :{$this->sqlparams($params, 'guestid', 1)} ";
                 }
             }
@@ -224,8 +224,8 @@ class datalynx_entries {
         if (isset($optionsfiltergroups)) { // Datalynxview_field goes first.
             $wheregroup = " AND e.groupid = :{$this->sqlparams($params, 'groupid', $optionsfiltergroups)} ";
         } else {
-            if ($datalynx->currentgroup) {
-                $wheregroup = " AND e.groupid = :{$this->sqlparams($params, 'groupid', $datalynx->currentgroup)} ";
+            if ($dlx->currentgroup) {
+                $wheregroup = " AND e.groupid = :{$this->sqlparams($params, 'groupid', $dlx->currentgroup)} ";
             } else {
                 // Specific groups requested.
                 if (!empty($filter->groups)) {
@@ -243,8 +243,8 @@ class datalynx_entries {
         // APPROVE filtering.
         $whereapprove = '';
         if (
-                $datalynx->data->approval &&
-                !has_capability('mod/datalynx:manageentries', $datalynx->context)
+                $dlx->data->approval &&
+                !has_capability('mod/datalynx:manageentries', $dlx->context)
         ) {
             if (isloggedin()) {
                 $whereapprove = " AND (e.approved = :{$this->sqlparams($params, 'approved', 1)}
@@ -256,7 +256,7 @@ class datalynx_entries {
 
         // STATUS filtering (visibility).
         $wherestatus = '';
-        if (!has_capability('mod/datalynx:viewdrafts', $datalynx->context)) {
+        if (!has_capability('mod/datalynx:viewdrafts', $dlx->context)) {
             $wherestatus = " AND (e.status <> :{$this->sqlparams($params, 'status', datalynxfield_status::STATUS_DRAFT)}
                               OR  e.userid = :{$this->sqlparams($params, 'userid', $USER->id)}) ";
         }
@@ -278,7 +278,7 @@ class datalynx_entries {
         $tables = ' {datalynx_entries} e
                     JOIN {user} u ON u.id = e.userid
                     LEFT JOIN {groups} g ON g.id = e.groupid ';
-        $wheredfid = " e.dataid = :{$this->sqlparams($params, 'dataid', $datalynx->id())} ";
+        $wheredfid = " e.dataid = :{$this->sqlparams($params, 'dataid', $dlx->id())} ";
         $whereoptions = '';
         if (!empty($options['search'])) {
             foreach ($options['search'] as $key => $val) {
@@ -529,7 +529,7 @@ class datalynx_entries {
                         $files = array_merge(
                             $files,
                             $fs->get_area_files(
-                                $this->datalynx->context->id,
+                                $this->dlx->context->id,
                                 'mod_datalynx',
                                 'content',
                                 $contentid,
@@ -586,7 +586,7 @@ class datalynx_entries {
      */
     public function process_entries(string $action, $eids, $data = null, bool $confirmed = false): array {
         global $DB, $USER, $OUTPUT, $PAGE;
-        $dl = $this->datalynx;
+        $dlx = $this->dlx;
         $errorstring = '';
 
         $entries = [];
@@ -607,13 +607,13 @@ class datalynx_entries {
 
                 // TODO: MDL-66151 Prepare counters for adding new entries.
                 $addcount = 0;
-                $addmax = $dl->data->maxentries;
-                $perinterval = ($dl->data->intervalcount > 1);
-                if ($addmax != -1 && has_capability('mod/datalynx:manageentries', $dl->context)) {
+                $addmax = $dlx->data->maxentries;
+                $perinterval = ($dlx->data->intervalcount > 1);
+                if ($addmax != -1 && has_capability('mod/datalynx:manageentries', $dlx->context)) {
                     $addmax = -1;
                 } else {
                     if ($addmax != -1) {
-                        $addmax = max(0, $addmax - $dl->user_num_entries($perinterval));
+                        $addmax = max(0, $addmax - $dlx->user_num_entries($perinterval));
                     }
                 }
 
@@ -636,7 +636,7 @@ class datalynx_entries {
                                 $addcount++;
                                 if ($addmax == -1 || $addmax >= $addcount) {
                                     $entry->id = 0;
-                                    $entry->groupid = $dl->currentgroup;
+                                    $entry->groupid = $dlx->currentgroup;
                                     $entry->userid = $USER->id;
                                     $entries[$eid] = $entry;
                                 }
@@ -648,11 +648,11 @@ class datalynx_entries {
                 // All other types of processing must refer to specific entry ids.
             } else {
                 $entries =
-                        $DB->get_records_select('datalynx_entries', "dataid = ? AND id IN ($eids)", [$dl->id()]);
+                        $DB->get_records_select('datalynx_entries', "dataid = ? AND id IN ($eids)", [$dlx->id()]);
             }
 
             if (!empty($importentryids)) {
-                $filterdata = ['dataid' => $dl->id(), 'eids' => $importentryids];
+                $filterdata = ['dataid' => $dlx->id(), 'eids' => $importentryids];
                 $filter = new datalynx_filter((object) $filterdata);
                 $entries += $this->get_entries(['filter' => $filter])->entries;
             }
@@ -662,7 +662,7 @@ class datalynx_entries {
                     // Filter approvable entries.
                     if (
                             ($action == 'approve' || $action == 'disapprove') &&
-                            !has_capability('mod/datalynx:approve', $dl->context)
+                            !has_capability('mod/datalynx:approve', $dlx->context)
                     ) {
                         unset($entries[$eid]);
                         $capname = get_string('datalynx:approve', 'mod_datalynx');
@@ -670,7 +670,7 @@ class datalynx_entries {
                         $errorstring .= get_string('affectedid', 'mod_datalynx', $eid) . '<br>';
                         // Filter managable entries.
                     } else {
-                        if (!$dl->user_can_manage_entry($entry)) {
+                        if (!$dlx->user_can_manage_entry($entry)) {
                             unset($entries[$eid]);
                             $capname = get_string('updateentry', 'mod_datalynx');
                             $errorstring .= get_string('missingrequiredcapability', 'webservice', $capname);
@@ -711,7 +711,7 @@ class datalynx_entries {
                         $strnotify = 'entriesupdated';
 
                         if (!is_null($data)) {
-                            $fields = $dl->get_fields();
+                            $fields = $dlx->get_fields();
 
                             // First parse the data to collate content in an array for each recognized field.
                             $contents = array_fill_keys(
@@ -843,7 +843,7 @@ class datalynx_entries {
                                         );
                                         if (
                                                 $entrystatus == datalynxfield_status::STATUS_FINAL_SUBMISSION
-                                                && !has_capability('mod/datalynx:manageentries', $this->datalynx->context)
+                                                && !has_capability('mod/datalynx:manageentries', $this->dlx->context)
                                         ) {
                                             continue; // Check user has capacity & status is final. If stop update.
                                         }
@@ -976,7 +976,7 @@ class datalynx_entries {
                             }
                             if ($processed) {
                                 $eventdata = (object) ['items' => $processed];
-                                $dl->events_trigger("entry$addorupdate", $eventdata);
+                                $dlx->events_trigger("entry$addorupdate", $eventdata);
                             }
                         }
                         break;
@@ -985,7 +985,7 @@ class datalynx_entries {
                         $completiontype = COMPLETION_COMPLETE;
                         foreach ($entries as $entry) {
                             // Can user add anymore entries?
-                            if (!$dl->user_can_manage_entry()) {
+                            if (!$dlx->user_can_manage_entry()) {
                                 // TODO: MDL-66151 notify something.
                                 break;
                             }
@@ -996,13 +996,13 @@ class datalynx_entries {
                             // Add a duplicated entry and content.
                             $newentry = $entry;
                             $newentry->userid = $USER->id;
-                            $newentry->dataid = $dl->id();
-                            $newentry->groupid = $dl->currentgroup;
+                            $newentry->dataid = $dlx->id();
+                            $newentry->groupid = $dlx->currentgroup;
                             $newentry->timecreated = $newentry->timemodified = $this->current_time();
 
                             if (
-                                    $dl->data->approval &&
-                                    !has_capability('mod/datalynx:approve', $dl->context)
+                                    $dlx->data->approval &&
+                                    !has_capability('mod/datalynx:approve', $dlx->context)
                             ) {
                                 $newentry->approved = 0;
                             }
@@ -1025,7 +1025,7 @@ class datalynx_entries {
 
                         if ($processed) {
                             $eventdata = (object) ['items' => $processed];
-                            $dl->events_trigger("entryadded", $eventdata);
+                            $dlx->events_trigger("entryadded", $eventdata);
                         }
 
                         $strnotify = 'entriesduplicated';
@@ -1041,7 +1041,7 @@ class datalynx_entries {
                             'approved',
                             1,
                             " dataid = ? AND id IN ($ids) ",
-                            [$dl->id()]
+                            [$dlx->id()]
                         );
                         $processed = $entries;
 
@@ -1049,7 +1049,7 @@ class datalynx_entries {
 
                         if ($processed) {
                             $eventdata = (object) ['items' => $processed];
-                            $dl->events_trigger("entryapproved", $eventdata);
+                            $dlx->events_trigger("entryapproved", $eventdata);
                         }
 
                         $strnotify = 'entriesapproved';
@@ -1065,12 +1065,12 @@ class datalynx_entries {
                             'approved',
                             0,
                             " dataid = ? AND id IN ($ids) ",
-                            [$dl->id()]
+                            [$dlx->id()]
                         );
                         $processed = $entries;
                         if ($processed) {
                             $eventdata = (object) ['items' => $processed];
-                            $dl->events_trigger("entrydisapproved", $eventdata);
+                            $dlx->events_trigger("entrydisapproved", $eventdata);
                         }
 
                         $strnotify = 'entriesdisapproved';
@@ -1080,7 +1080,7 @@ class datalynx_entries {
                         $completiontype = COMPLETION_INCOMPLETE;
                         // Deletable entries should be filtered above.
                         foreach ($entries as $entry) {
-                            $fields = $dl->get_fields();
+                            $fields = $dlx->get_fields();
                             foreach ($fields as $field) {
                                 $field->delete_content($entry->id);
                             }
@@ -1090,7 +1090,7 @@ class datalynx_entries {
                         }
                         if ($processed) {
                             $eventdata = (object) ['items' => $processed];
-                            $dl->events_trigger("entrydeleted", $eventdata);
+                            $dlx->events_trigger("entrydeleted", $eventdata);
                         }
 
                         $strnotify = 'entriesdeleted';
@@ -1102,14 +1102,14 @@ class datalynx_entries {
 
                 if ($processed) {
                     // Update completion state.
-                    $completion = new completion_info($dl->course);
+                    $completion = new completion_info($dlx->course);
                     if (
-                            $completion->is_enabled($dl->cm) &&
-                            $dl->cm->completion == COMPLETION_TRACKING_AUTOMATIC &&
-                            $dl->data->completionentries
+                            $completion->is_enabled($dlx->cm) &&
+                            $dlx->cm->completion == COMPLETION_TRACKING_AUTOMATIC &&
+                            $dlx->data->completionentries
                     ) {
                         foreach ($processed as $entry) {
-                            $completion->update_state($dl->cm, $completiontype, $entry->userid);
+                            $completion->update_state($dlx->cm, $completiontype, $entry->userid);
                         }
                     }
                     $strnotify = get_string($strnotify, 'datalynx', count($processed));
@@ -1135,7 +1135,7 @@ class datalynx_entries {
 
         $entry = $DB->get_record('datalynx_entries', [
             'id' => $entryid,
-            'dataid' => $this->datalynx->id(),
+            'dataid' => $this->dlx->id(),
         ], '*', MUST_EXIST);
 
         if ($action === 'toggle-approval') {
@@ -1154,8 +1154,8 @@ class datalynx_entries {
             $entry->approved = 1;
             $processed = $this->create_approved_entries_for_team([$entryid]);
             if ($processed) {
-                $eventdata = (object) ['view' => $this->datalynx->get_view_from_id($viewid), 'items' => $processed];
-                $this->datalynx->events_trigger('entryapproved', $eventdata);
+                $eventdata = (object) ['view' => $this->dlx->get_view_from_id($viewid), 'items' => $processed];
+                $this->dlx->events_trigger('entryapproved', $eventdata);
             }
             $newapprovedstate = 1;
             $completiontype = COMPLETION_COMPLETE;
@@ -1164,20 +1164,20 @@ class datalynx_entries {
             $entry->approved = 0;
             $processed = [$entryid => $entry];
             if ($processed) {
-                $eventdata = (object) ['view' => $this->datalynx->get_view_from_id($viewid), 'items' => $processed];
-                $this->datalynx->events_trigger('entrydisapproved', $eventdata);
+                $eventdata = (object) ['view' => $this->dlx->get_view_from_id($viewid), 'items' => $processed];
+                $this->dlx->events_trigger('entrydisapproved', $eventdata);
             }
             $completiontype = COMPLETION_INCOMPLETE;
         }
 
         if ($completiontype !== COMPLETION_UNKNOWN) {
-            $completion = new completion_info($this->datalynx->course);
+            $completion = new completion_info($this->dlx->course);
             if (
-                $completion->is_enabled($this->datalynx->cm) &&
-                $this->datalynx->cm->completion == COMPLETION_TRACKING_AUTOMATIC &&
-                $this->datalynx->data->completionentries
+                $completion->is_enabled($this->dlx->cm) &&
+                $this->dlx->cm->completion == COMPLETION_TRACKING_AUTOMATIC &&
+                $this->dlx->data->completionentries
             ) {
-                $completion->update_state($this->datalynx->cm, $completiontype, $entry->userid);
+                $completion->update_state($this->dlx->cm, $completiontype, $entry->userid);
             }
         }
 
@@ -1196,7 +1196,7 @@ class datalynx_entries {
      * @return string
      */
     private function render_entry_approval_control(stdClass $entry, int $viewid): string {
-        $fields = $this->datalynx->get_fields();
+        $fields = $this->dlx->get_fields();
         $approvefield = $fields[datalynxfield_approve::_APPROVED] ?? null;
 
         if (!$approvefield) {
@@ -1215,9 +1215,9 @@ class datalynx_entries {
      */
     public function create_approved_entries_for_team(array $entryids) {
         global $DB;
-        $dl = $this->datalynx;
+        $dlx = $this->dlx;
 
-        $fields = $dl->get_fields();
+        $fields = $dlx->get_fields();
         $teamfield = false;
         foreach ($fields as $field) {
             if ($field->type == 'teammemberselect' && $field->referencefieldid) {
@@ -1280,7 +1280,7 @@ class datalynx_entries {
                                  AND $sqllike";
                         $existingentryid = $DB->get_field_sql(
                             $query,
-                            ['dataid' => $dl->id(), 'userid' => $teammemberid,
+                            ['dataid' => $dlx->id(), 'userid' => $teammemberid,
                                         'fieldid' => $teamfield->referencefieldid,
                                         'content' => $likecontent,
                                 ]
@@ -1314,8 +1314,8 @@ class datalynx_entries {
                     } else {
                         $newentry = clone $entry;
                         $newentry->userid = $teammemberid;
-                        $newentry->dataid = $dl->id();
-                        $newentry->groupid = $dl->currentgroup;
+                        $newentry->dataid = $dlx->id();
+                        $newentry->groupid = $dlx->currentgroup;
                         $newentry->timecreated = $newentry->timemodified = $this->current_time();
                         $newentry->approved = 1;
                         $newentry->id = $DB->insert_record('datalynx_entries', $newentry);
@@ -1357,9 +1357,9 @@ class datalynx_entries {
     public function update_entry($entry, $data = null, $updatetime = true) {
         global $CFG, $DB, $USER;
 
-        $df = $this->datalynx;
+        $dlx = $this->dlx;
 
-        if ($data && has_capability('mod/datalynx:manageentries', $df->context)) {
+        if ($data && has_capability('mod/datalynx:manageentries', $dlx->context)) {
             foreach ($data as $key => $value) {
                 if ($key == 'name') {
                     $entry->userid = $value;
@@ -1374,10 +1374,10 @@ class datalynx_entries {
 
         // Update existing entry (only authenticated users).
         if ($entry->id > 0) {
-            if ($df->user_can_manage_entry($entry)) { // Just in case the user opens two forms at the same time.
+            if ($dlx->user_can_manage_entry($entry)) { // Just in case the user opens two forms at the same time.
                 if (
-                        !has_capability('mod/datalynx:approve', $df->context)
-                        && ($df->data->approval == mod_datalynx\datalynx::APPROVAL_ON_UPDATE)
+                        !has_capability('mod/datalynx:approve', $dlx->context)
+                        && ($dlx->data->approval == mod_datalynx\datalynx::APPROVAL_ON_UPDATE)
                 ) {
                     $entry->approved = 0;
                 }
@@ -1407,13 +1407,13 @@ class datalynx_entries {
 
             // Add new entry (authenticated or anonymous (if enabled)).
         } else {
-            if ($df->user_can_manage_entry(null)) {
+            if ($dlx->user_can_manage_entry(null)) {
                 // Identify non-logged-in users (in anonymous entries) as guests.
                 $userid = empty($USER->id) ? $CFG->siteguest : $USER->id;
-                $entry->dataid = $df->id();
+                $entry->dataid = $dlx->id();
                 $entry->userid = !empty($entry->userid) ? $entry->userid : $userid;
                 if (!isset($entry->groupid)) {
-                    $entry->groupid = $df->currentgroup;
+                    $entry->groupid = $dlx->currentgroup;
                 }
                 if (!isset($entry->timecreated)) {
                     $entry->timecreated = $this->current_time();

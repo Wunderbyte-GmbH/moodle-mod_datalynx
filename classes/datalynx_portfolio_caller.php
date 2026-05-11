@@ -122,8 +122,8 @@ class datalynx_portfolio_caller extends portfolio_module_caller_base {
      */
     public function prepare_package() {
         // Set the exported view content.
-        $df = new mod_datalynx\datalynx(0, $this->id);
-        $view = $df->get_view_from_id($this->vid);
+        $dlx = new mod_datalynx\datalynx(0, $this->id);
+        $view = $dlx->get_view_from_id($this->vid);
         $view->set_filter(['filterid' => $this->fid, 'eids' => $this->eids]);
         $view->set_content();
 

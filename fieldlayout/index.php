@@ -30,32 +30,32 @@ $urlparams = new stdClass();
 $urlparams->d = optional_param('d', 0, PARAM_INT); // Datalynx id.
 $urlparams->id = optional_param('id', 0, PARAM_INT); // Course module id.
 
-$datalynx = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
-$urlparams->d = $datalynx->id();
-$urlparams->id = $datalynx->cm->id;
+$dlx = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
+$urlparams->d = $dlx->id();
+$urlparams->id = $dlx->cm->id;
 
-require_login($datalynx->data->course, false, $datalynx->cm);
+require_login($dlx->data->course, false, $dlx->cm);
 
-require_capability('mod/datalynx:managetemplates', $datalynx->context);
+require_capability('mod/datalynx:managetemplates', $dlx->context);
 
-$datalynx->set_page('renderer/index', ['urlparams' => $urlparams]);
+$dlx->set_page('renderer/index', ['urlparams' => $urlparams]);
 
 // Activate navigation node.
 navigation_node::override_active_url(
-    new moodle_url('/mod/datalynx/fieldlayout/index.php', ['id' => $datalynx->cm->id])
+    new moodle_url('/mod/datalynx/fieldlayout/index.php', ['id' => $dlx->cm->id])
 );
 
 // TODO: MDL-66151 print notifications.
 
 // Print header.
-$datalynx->print_header(['tab' => 'renderers', 'urlparams' => $urlparams]);
+$dlx->print_header(['tab' => 'renderers', 'urlparams' => $urlparams]);
 
 echo html_writer::empty_tag('br');
 echo html_writer::start_tag('div', ['class' => 'fieldadd mdl-align']);
 echo html_writer::link(
     new moodle_url(
         '/mod/datalynx/fieldlayout/layout_edit.php',
-        ['d' => $datalynx->id(), 'sesskey' => sesskey(), 'id' => 0]
+        ['d' => $dlx->id(), 'sesskey' => sesskey(), 'id' => 0]
     ),
     get_string('rendereradd', 'datalynx')
 );
@@ -63,7 +63,7 @@ echo html_writer::end_tag('div');
 echo html_writer::empty_tag('br');
 
 $editbaseurl = '/mod/datalynx/fieldlayout/layout_edit.php';
-$linkparams = ['d' => $datalynx->id(), 'sesskey' => sesskey()];
+$linkparams = ['d' => $dlx->id(), 'sesskey' => sesskey()];
 
 // Table headers.
 $headers = ['name' => get_string('name'), 'description' => get_string('description'),
@@ -71,9 +71,9 @@ $headers = ['name' => get_string('name'), 'description' => get_string('descripti
         'delete' => get_string('delete'),
 ];
 
-$table = new flexible_table('datalynxrenderersindex' . $datalynx->id());
+$table = new flexible_table('datalynxrenderersindex' . $dlx->id());
 $table->define_baseurl(
-    new moodle_url('/mod/datalynx/fieldlayout/index.php', ['d' => $datalynx->id()])
+    new moodle_url('/mod/datalynx/fieldlayout/index.php', ['d' => $dlx->id()])
 );
 $table->define_columns(array_keys($headers));
 $table->define_headers(array_values($headers));
@@ -90,7 +90,7 @@ $table->column_style('delete', 'text-align', 'center');
 
 $table->setup();
 
-$renderers = $DB->get_records('datalynx_renderers', ['dataid' => $datalynx->id()]);
+$renderers = $DB->get_records('datalynx_renderers', ['dataid' => $dlx->id()]);
 
 foreach ($renderers as $rendererid => $renderer) {
     $fieldname = html_writer::link(
@@ -124,4 +124,4 @@ foreach ($renderers as $rendererid => $renderer) {
 
 $table->finish_output();
 
-$datalynx->print_footer();
+$dlx->print_footer();

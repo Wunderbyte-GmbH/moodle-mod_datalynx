@@ -48,15 +48,15 @@ class renderer extends datalynxfield_renderer {
      * @return array
      */
     public function replacements(?array $tags = null, $entry = null, ?array $options = null) {
-        $df = $this->field->df();
+        $dlx = $this->field->dlx();
 
-        $canapprove = has_capability('mod/datalynx:approve', $df->context);
+        $canapprove = has_capability('mod/datalynx:approve', $dlx->context);
         $edit = !empty($options['edit']) ? $options['edit'] && $canapprove : false;
         $replacements = [];
         // Just one tag, empty until we check df settings.
         $replacements['##approve##'] = '';
 
-        if ($df->data->approval) {
+        if ($dlx->data->approval) {
             if (!$entry || $edit) {
                 $replacements['##approve##'] = ['', [[$this, 'display_edit'], [$entry]]];
 
@@ -143,10 +143,10 @@ class renderer extends datalynxfield_renderer {
             'aria-label' => $statelabel,
         ];
 
-        if (has_capability('mod/datalynx:approve', $field->df()->context)) {
+        if (has_capability('mod/datalynx:approve', $field->dlx()->context)) {
             $PAGE->requires->js_call_amd('mod_datalynx/approve', 'init');
 
-            $currentview = $this->field->df()->get_current_view();
+            $currentview = $this->field->dlx()->get_current_view();
             $currentviewid = !empty($params['viewid']) ? (int) $params['viewid'] : ($currentview ? $currentview->id() : 0);
 
             return html_writer::tag('button', $togglecontent, $baseattributes + [
@@ -155,7 +155,7 @@ class renderer extends datalynxfield_renderer {
                 'aria-checked' => $isapproved ? 'true' : 'false',
                 'title' => $statelabel,
                 'data-entryid' => $entry->id,
-                'data-d' => $field->df()->data->id,
+                'data-d' => $field->dlx()->data->id,
                 'data-view' => $currentviewid,
                 'data-sesskey' => sesskey(),
             ]);

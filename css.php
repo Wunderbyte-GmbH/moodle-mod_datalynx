@@ -86,18 +86,18 @@ if ($urlparams->cssedit) {
     }
 
     // Set a datalynx object.
-    $df = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
-    require_capability('mod/datalynx:managetemplates', $df->context);
+    $dlx = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
+    require_capability('mod/datalynx:managetemplates', $dlx->context);
 
-    $df->set_page('css', ['urlparams' => $urlparams]);
+    $dlx->set_page('css', ['urlparams' => $urlparams]);
 
     // Activate navigation node.
     navigation_node::override_active_url(
-        new moodle_url('/mod/datalynx/css.php', ['id' => $df->cm->id, 'cssedit' => 1])
+        new moodle_url('/mod/datalynx/css.php', ['id' => $dlx->cm->id, 'cssedit' => 1])
     );
 
     $mform = new mod_datalynx_css_form(
-        new moodle_url('/mod/datalynx/css.php', ['d' => $df->id(), 'cssedit' => 1])
+        new moodle_url('/mod/datalynx/css.php', ['d' => $dlx->id(), 'cssedit' => 1])
     );
 
     if (!$mform->is_cancelled()) {
@@ -106,7 +106,7 @@ if ($urlparams->cssedit) {
             $rec = new stdClass();
             $rec->css = $data->css;
             $rec->cssincludes = $data->cssincludes;
-            $df->update($rec, get_string('csssaved', 'datalynx'));
+            $dlx->update($rec, get_string('csssaved', 'datalynx'));
 
             // Add uploaded files.
             $usercontext = context_user::instance($USER->id);
@@ -122,7 +122,7 @@ if ($urlparams->cssedit) {
                 )
             ) {
                 $filerec = new stdClass();
-                $filerec->contextid = $df->context->id;
+                $filerec->contextid = $dlx->context->id;
                 $filerec->component = 'mod_datalynx';
                 $filerec->filearea = 'css';
                 $filerec->filepath = '/';
@@ -135,22 +135,22 @@ if ($urlparams->cssedit) {
             }
 
             $event = \mod_datalynx\event\css_saved::create(
-                ['context' => $df->context, 'objectid' => $df->id()]
+                ['context' => $dlx->context, 'objectid' => $dlx->id()]
             );
             $event->trigger();
         }
     }
 
-    $df->print_header(['tab' => 'css', 'urlparams' => $urlparams]);
+    $dlx->print_header(['tab' => 'css', 'urlparams' => $urlparams]);
 
     $options = ['subdirs' => 0, 'maxbytes' => $COURSE->maxbytes, 'maxfiles' => 10];
     $draftitemid = file_get_submitted_draft_itemid('cssupload');
-    file_prepare_draft_area($draftitemid, $df->context->id, 'mod_datalynx', 'css', 0, $options);
-    $df->data->cssupload = $draftitemid;
+    file_prepare_draft_area($draftitemid, $dlx->context->id, 'mod_datalynx', 'css', 0, $options);
+    $dlx->data->cssupload = $draftitemid;
 
-    $mform->set_data($df->data);
+    $mform->set_data($dlx->data);
     $mform->display();
-    $df->print_footer();
+    $dlx->print_footer();
 } else {
     defined('NO_MOODLE_COOKIES') || define('NO_MOODLE_COOKIES', true); // Session not used here.
 

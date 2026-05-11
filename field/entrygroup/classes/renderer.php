@@ -47,7 +47,7 @@ class renderer extends datalynxfield_renderer {
         // Set the group object.
         $group = new stdClass();
         if ($entry->id < 0) { // New record.
-            $entry->groupid = $field->df()->currentgroup;
+            $entry->groupid = $field->dlx()->currentgroup;
             $group->id = $entry->groupid;
             $group->name = null;
             $group->picture = null;
@@ -74,13 +74,13 @@ class renderer extends datalynxfield_renderer {
 
                 case '##group:picture##':
                     $replacements[$tag] = ['html',
-                            print_group_picture($group, $field->df()->course->id, false, true),
+                            print_group_picture($group, $field->dlx()->course->id, false, true),
                     ];
                     break;
 
                 case '##group:picturelarge##':
                     $replacements[$tag] = ['html',
-                            print_group_picture($group, $field->df()->course->id, true, true),
+                            print_group_picture($group, $field->dlx()->course->id, true, true),
                     ];
                     break;
 
@@ -88,7 +88,7 @@ class renderer extends datalynxfield_renderer {
                     if (
                         $edit && has_capability(
                             'mod/datalynx:manageentries',
-                            $field->df()->context
+                            $field->dlx()->context
                         )
                     ) {
                         $replacements[$tag] = ['',
@@ -121,7 +121,7 @@ class renderer extends datalynxfield_renderer {
         static $groupsmenu = null;
         if (is_null($groupsmenu)) {
             $groupsmenu = [0 => get_string('choosedots')];
-            if ($groups = groups_get_activity_allowed_groups($field->df()->cm)) {
+            if ($groups = groups_get_activity_allowed_groups($field->dlx()->cm)) {
                 foreach ($groups as $groupid => $group) {
                     $groupsmenu[$groupid] = $group->name;
                 }

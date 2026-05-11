@@ -84,7 +84,7 @@ final class viewlink_pattern_test extends advanced_testcase {
         $generator = $this->getDataGenerator();
         $course = $generator->create_course();
         $datalynxrecord = $generator->create_module('datalynx', ['course' => $course->id]);
-        $df = new datalynx($datalynxrecord->id);
+        $dlx = new datalynx($datalynxrecord->id);
 
         // Insert a visible target view so it appears in get_views_menu().
         $targetview = new stdClass();
@@ -109,10 +109,10 @@ final class viewlink_pattern_test extends advanced_testcase {
         $templateview->id = $DB->insert_record('datalynx_views', $templateview);
 
         // Instantiate view objects (filteroptions=false avoids URL param processing).
-        $targetobj = new tabular_view($df, $targetview, false);
-        $templateobj = new tabular_view($df, $templateview, false);
+        $targetobj = new tabular_view($dlx, $targetview, false);
+        $templateobj = new tabular_view($dlx, $templateview, false);
 
-        return [$df, $targetobj, $templateobj];
+        return [$dlx, $targetobj, $templateobj];
     }
 
     /**
@@ -229,7 +229,7 @@ final class viewlink_pattern_test extends advanced_testcase {
      * @covers ::get_replacements
      */
     public function test_get_replacements_resolves_viewurl_tag(): void {
-        [$df, $targetobj, $templateobj] = $this->create_test_views('##viewurl:myview##');
+        [$dlx, $targetobj, $templateobj] = $this->create_test_views('##viewurl:myview##');
 
         $patternclass = $templateobj->patternclass();
         $tag = '##viewurl:myview##';
@@ -237,7 +237,7 @@ final class viewlink_pattern_test extends advanced_testcase {
 
         $this->assertArrayHasKey($tag, $replacements);
         $this->assertNotEmpty($replacements[$tag]);
-        $this->assertStringContainsString('d=' . $df->id(), $replacements[$tag]);
+        $this->assertStringContainsString('d=' . $dlx->id(), $replacements[$tag]);
         $this->assertStringContainsString('view=' . $targetobj->id(), $replacements[$tag]);
     }
 
@@ -253,14 +253,14 @@ final class viewlink_pattern_test extends advanced_testcase {
         $firstreplacements = $firsttemplateobj->patternclass()->get_replacements([$firsttag], null, []);
         $this->assertNotEmpty($firstreplacements[$firsttag]);
 
-        [$df, $targetobj, $templateobj] = $this->create_test_views('##viewurl:myview##');
+        [$dlx, $targetobj, $templateobj] = $this->create_test_views('##viewurl:myview##');
 
         $tag = '##viewurl:myview##';
         $replacements = $templateobj->patternclass()->get_replacements([$tag], null, []);
 
         $this->assertArrayHasKey($tag, $replacements);
         $this->assertNotEmpty($replacements[$tag]);
-        $this->assertStringContainsString('d=' . $df->id(), $replacements[$tag]);
+        $this->assertStringContainsString('d=' . $dlx->id(), $replacements[$tag]);
         $this->assertStringContainsString('view=' . $targetobj->id(), $replacements[$tag]);
     }
 
@@ -270,7 +270,7 @@ final class viewlink_pattern_test extends advanced_testcase {
      * @covers ::get_replacements
      */
     public function test_get_replacements_resolves_viewlink_tag_with_params_and_class(): void {
-        [$df, $targetobj, $templateobj] = $this->create_test_views(
+        [$dlx, $targetobj, $templateobj] = $this->create_test_views(
             '##viewlink:myview;Read more;foo=1|bar=2;btn btn-primary##'
         );
 
@@ -280,7 +280,7 @@ final class viewlink_pattern_test extends advanced_testcase {
 
         $this->assertArrayHasKey($tag, $replacements);
         $this->assertStringContainsString('href="', $replacements[$tag]);
-        $this->assertStringContainsString('d=' . $df->id(), $replacements[$tag]);
+        $this->assertStringContainsString('d=' . $dlx->id(), $replacements[$tag]);
         $this->assertStringContainsString('view=' . $targetobj->id(), $replacements[$tag]);
         $this->assertStringContainsString('foo=1&amp;bar=2', $replacements[$tag]);
         $this->assertStringContainsString('class="btn btn-primary"', $replacements[$tag]);
@@ -293,7 +293,7 @@ final class viewlink_pattern_test extends advanced_testcase {
      * @covers ::get_replacements
      */
     public function test_get_replacements_resolves_viewsesslink_tag_with_session_data(): void {
-        [$df, $targetobj, $templateobj] = $this->create_test_views(
+        [$dlx, $targetobj, $templateobj] = $this->create_test_views(
             '##viewsesslink:myview;Add entry;new=1;btn btn-secondary##'
         );
 
@@ -303,7 +303,7 @@ final class viewlink_pattern_test extends advanced_testcase {
 
         $this->assertArrayHasKey($tag, $replacements);
         $this->assertStringContainsString('href="', $replacements[$tag]);
-        $this->assertStringContainsString('d=' . $df->id(), $replacements[$tag]);
+        $this->assertStringContainsString('d=' . $dlx->id(), $replacements[$tag]);
         $this->assertStringContainsString('view=' . $targetobj->id(), $replacements[$tag]);
         $this->assertStringContainsString('new=1', $replacements[$tag]);
         $this->assertStringContainsString('sesskey=', $replacements[$tag]);
@@ -318,7 +318,7 @@ final class viewlink_pattern_test extends advanced_testcase {
      * @covers ::get_replacements
      */
     public function test_get_replacements_resolves_viewsesslink_tag_with_nested_entryid(): void {
-        [$df, $targetobj, $templateobj] = $this->create_test_views(
+        [$dlx, $targetobj, $templateobj] = $this->create_test_views(
             '##viewsesslink:myview;Edit entry;editentries=##entryid##;btn btn-secondary##'
         );
 
@@ -329,7 +329,7 @@ final class viewlink_pattern_test extends advanced_testcase {
 
         $this->assertArrayHasKey($tag, $replacements);
         $this->assertStringContainsString('href="', $replacements[$tag]);
-        $this->assertStringContainsString('d=' . $df->id(), $replacements[$tag]);
+        $this->assertStringContainsString('d=' . $dlx->id(), $replacements[$tag]);
         $this->assertStringContainsString('view=' . $targetobj->id(), $replacements[$tag]);
         $this->assertStringContainsString('editentries=42', $replacements[$tag]);
         $this->assertStringContainsString('sesskey=', $replacements[$tag]);
@@ -349,7 +349,7 @@ final class viewlink_pattern_test extends advanced_testcase {
         [, , $templateobj] = $this->create_test_views('##viewurl##');
 
         $hiddenview = (object) [
-            'dataid' => $templateobj->get_dl()->id(),
+            'dataid' => $templateobj->get_dlx()->id(),
             'type' => 'tabular',
             'name' => 'hiddenview',
             'description' => '',

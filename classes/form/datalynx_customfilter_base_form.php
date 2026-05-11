@@ -43,12 +43,12 @@ abstract class datalynx_customfilter_base_form extends moodleform {
      *
      * @var datalynx null
      */
-    protected $dl = null;
+    protected $dlx = null;
 
     /**
      * mod_datalynx_customfilter_base_form constructor.
      *
-     * @param mixed $dl The datalynx instance.
+     * @param mixed $dlx The datalynx instance.
      * @param mixed $customfilter The customfilter object or null.
      * @param null $action
      * @param null $customdata
@@ -58,7 +58,7 @@ abstract class datalynx_customfilter_base_form extends moodleform {
      * @param bool $editable
      */
     public function __construct(
-        $dl,
+        $dlx,
         $customfilter,
         $action = null,
         $customdata = null,
@@ -68,7 +68,7 @@ abstract class datalynx_customfilter_base_form extends moodleform {
         $editable = true
     ) {
         $this->customfilter = $customfilter;
-        $this->dl = $dl;
+        $this->dlx = $dlx;
 
         parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
     }

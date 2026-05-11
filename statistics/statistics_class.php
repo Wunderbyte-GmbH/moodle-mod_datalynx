@@ -68,22 +68,22 @@ class datalynx_statistics_class {
      * Datalynx instance.
      * @var mod_datalynx\datalynx
      */
-    private $dl;
+    private $dlx;
 
     /**
      * datalynx_statistics_class constructor.
      *
-     * @param int|mod_datalynx\datalynx $df Datalynx ID or object.
+     * @param int|mod_datalynx\datalynx $dlx Datalynx ID or object.
      * @throws coding_exception
      */
-    public function __construct($df = 0) {
-        if (empty($df)) {
+    public function __construct($dlx = 0) {
+        if (empty($dlx)) {
             throw new coding_exception('Datalynx id or object must be passed to field constructor.');
         } else {
-            if ($df instanceof \mod_datalynx\datalynx) {
-                $this->dl = $df;
+            if ($dlx instanceof \mod_datalynx\datalynx) {
+                $this->dlx = $dlx;
             } else {
-                $this->dl = new mod_datalynx\datalynx($df);
+                $this->dlx = new mod_datalynx\datalynx($dlx);
             }
         }
     }
@@ -129,7 +129,7 @@ class datalynx_statistics_class {
             }
             [$total, $approved, $deleted, $visits] = $this->get_count($params->mode, $from, $to);
             $dateformat = get_string('strftimedate', 'langconfig');
-            $title = get_string('statisticsfor', 'datalynx', $this->dl->name());
+            $title = get_string('statisticsfor', 'datalynx', $this->dlx->name());
             $timestring = get_string(
                 "timestring{$params->mode}",
                 'datalynx',
@@ -186,7 +186,7 @@ class datalynx_statistics_class {
      */
     public function get_form() {
         $formclass = 'datalynx_statistics_form';
-        $formparams = ['d' => $this->dl->id()];
+        $formparams = ['d' => $this->dlx->id()];
         $actionurl = new moodle_url('/mod/datalynx/statistics/index.php', $formparams);
         require_once('statistics_form.php');
         return new $formclass($this, $actionurl);
@@ -203,7 +203,7 @@ class datalynx_statistics_class {
     private function get_count($mode, $from = 0, $to = PHP_INT_MAX) {
         global $DB;
 
-        $params = ['dataid' => $this->dl->id(), 'fromdate' => $from,
+        $params = ['dataid' => $this->dlx->id(), 'fromdate' => $from,
                 'todate' => $to + strtotime('+1 day', 0)];
 
         $querytotal = "SELECT COUNT(de.id)

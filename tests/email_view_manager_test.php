@@ -44,15 +44,15 @@ final class email_view_manager_test extends advanced_testcase {
     /**
      * Insert an Email view record for the supplied datalynx instance.
      *
-     * @param datalynx $df
+     * @param datalynx $dlx
      * @param string $param2
      * @return \stdClass
      */
-    private function create_email_view_record(datalynx $df, string $param2): \stdClass {
+    private function create_email_view_record(datalynx $dlx, string $param2): \stdClass {
         global $DB;
 
         $view = (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'type' => 'email',
             'name' => 'Email view',
             'description' => '',
@@ -73,14 +73,14 @@ final class email_view_manager_test extends advanced_testcase {
     /**
      * Create a minimal entry for the supplied datalynx instance.
      *
-     * @param datalynx $df
+     * @param datalynx $dlx
      * @return int
      */
-    private function create_entry(datalynx $df): int {
+    private function create_entry(datalynx $dlx): int {
         global $DB, $USER;
 
         return (int) $DB->insert_record('datalynx_entries', (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'userid' => $USER->id,
             'groupid' => 0,
             'approved' => 1,
@@ -99,17 +99,17 @@ final class email_view_manager_test extends advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
 
-        $df = $this->create_test_datalynx();
-        $view = $this->create_email_view_record($df, '<p>##notificationentrylink##</p><p>##entryid##</p>');
-        $entryid = $this->create_entry($df);
-        $otherentryid = $this->create_entry($df);
+        $dlx = $this->create_test_datalynx();
+        $view = $this->create_email_view_record($dlx, '<p>##notificationentrylink##</p><p>##entryid##</p>');
+        $entryid = $this->create_entry($dlx);
+        $otherentryid = $this->create_entry($dlx);
 
         $manager = new email_view_manager();
-        $payload = $manager->get_entry_payload($df->id(), $view->id, $entryid, [
+        $payload = $manager->get_entry_payload($dlx->id(), $view->id, $entryid, [
             'notificationentrylink' => '<a href="https://example.invalid/entry">Entry</a>',
         ]);
 
-        $this->assertSame($df->id(), $payload['datalynxid']);
+        $this->assertSame($dlx->id(), $payload['datalynxid']);
         $this->assertSame($view->id, $payload['viewid']);
         $this->assertSame('email', $payload['viewtype']);
         $this->assertTrue($payload['hascontent']);
@@ -127,11 +127,11 @@ final class email_view_manager_test extends advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
 
-        $df = $this->create_test_datalynx();
-        $view = $this->create_email_view_record($df, '<p>##entryid##</p>');
+        $dlx = $this->create_test_datalynx();
+        $view = $this->create_email_view_record($dlx, '<p>##entryid##</p>');
 
         $manager = new email_view_manager();
-        $payload = $manager->get_entry_payload($df->id(), $view->id, 99999);
+        $payload = $manager->get_entry_payload($dlx->id(), $view->id, 99999);
 
         $this->assertFalse($payload['hascontent']);
         $this->assertSame('', $payload['bodyhtml']);

@@ -31,36 +31,36 @@ $urlparams = new stdClass();
 $urlparams->d = optional_param('d', 0, PARAM_INT); // Datalynx id.
 $urlparams->id = optional_param('id', 0, PARAM_INT); // Course module id.
 
-$datalynx = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
-$urlparams->d = $datalynx->id();
-$urlparams->id = $datalynx->cm->id;
+$dlx = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
+$urlparams->d = $dlx->id();
+$urlparams->id = $dlx->cm->id;
 
-require_login($datalynx->data->course, false, $datalynx->cm);
+require_login($dlx->data->course, false, $dlx->cm);
 
-require_capability('mod/datalynx:managetemplates', $datalynx->context);
+require_capability('mod/datalynx:managetemplates', $dlx->context);
 
-$datalynx->set_page('fieldgroups/index', ['urlparams' => $urlparams]);
+$dlx->set_page('fieldgroups/index', ['urlparams' => $urlparams]);
 
 // Activate navigation node.
 navigation_node::override_active_url(
-    new moodle_url('/mod/datalynx/flield/fieldgroup/index.php', ['id' => $datalynx->cm->id])
+    new moodle_url('/mod/datalynx/flield/fieldgroup/index.php', ['id' => $dlx->cm->id])
 );
 
 // Print header.
-$datalynx->print_header(['tab' => 'fieldgroups', 'urlparams' => $urlparams]);
+$dlx->print_header(['tab' => 'fieldgroups', 'urlparams' => $urlparams]);
 
 echo html_writer::empty_tag('br');
 echo html_writer::start_tag('div', ['class' => 'fieldadd mdl-align']);
 echo html_writer::link(new moodle_url(
     '/mod/datalynx/field/field_edit.php',
-    ['d' => $datalynx->id(), 'sesskey' => sesskey(), 'type' => 'fieldgroup']
+    ['d' => $dlx->id(), 'sesskey' => sesskey(), 'type' => 'fieldgroup']
 ), get_string('fieldgroupsadd', 'datalynx'));
 echo html_writer::end_tag('div');
 echo html_writer::empty_tag('br');
 
 $editbaseurl = '/mod/datalynx/field/field_edit.php';
 $deletebaseurl = '/mod/datalynx/field/index.php'; // Deletelink is via index.
-$linkparams = ['d' => $datalynx->id(), 'sesskey' => sesskey()];
+$linkparams = ['d' => $dlx->id(), 'sesskey' => sesskey()];
 
 // Table headers.
 $headers = ['name' => get_string('name'), 'description' => get_string('description'),
@@ -69,9 +69,9 @@ $headers = ['name' => get_string('name'), 'description' => get_string('descripti
         'edit' => get_string('edit'), 'duplicate' => get_string('duplicate'),
         'delete' => get_string('delete')];
 
-$table = new flexible_table('datalynxbehaviorsindex' . $datalynx->id());
+$table = new flexible_table('datalynxbehaviorsindex' . $dlx->id());
 $table->define_baseurl(
-    new moodle_url('/mod/datalynx/field/fieldgroup/index.php', ['d' => $datalynx->id()])
+    new moodle_url('/mod/datalynx/field/fieldgroup/index.php', ['d' => $dlx->id()])
 );
 $table->define_columns(array_keys($headers));
 $table->define_headers(array_values($headers));
@@ -90,7 +90,7 @@ $table->column_style('delete', 'text-align', 'center');
 
 $table->setup();
 
-$fieldgroups = $DB->get_records('datalynx_fields', ['dataid' => $datalynx->id(), 'type' => 'fieldgroup']);
+$fieldgroups = $DB->get_records('datalynx_fields', ['dataid' => $dlx->id(), 'type' => 'fieldgroup']);
 
 // Create table entries from fieldgroups.
 foreach ($fieldgroups as $fieldgroupid => $fieldgroup) {
@@ -130,4 +130,4 @@ foreach ($fieldgroups as $fieldgroupid => $fieldgroup) {
 // Print table.
 $table->finish_output();
 
-$datalynx->print_footer();
+$dlx->print_footer();

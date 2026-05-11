@@ -44,18 +44,18 @@ $urlparams->confirmed = optional_param('confirmed', 0, PARAM_INT);
 $urlparams->update = optional_param('update', 0, PARAM_INT); // Update filter.
 $urlparams->cancel = optional_param('cancel', 0, PARAM_BOOL);
 
-$dl = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
-require_capability('mod/datalynx:managetemplates', $dl->context);
+$dlx = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
+require_capability('mod/datalynx:managetemplates', $dlx->context);
 
-require_login($dl->data->course, false, $dl->cm);
+require_login($dlx->data->course, false, $dlx->cm);
 
-$dl->set_page('customfilter/index', ['modjs' => true, 'urlparams' => $urlparams]);
+$dlx->set_page('customfilter/index', ['modjs' => true, 'urlparams' => $urlparams]);
 
 navigation_node::override_active_url(
-    new moodle_url('/mod/datalynx/customfilter/index.php', ['id' => $dl->cm->id])
+    new moodle_url('/mod/datalynx/customfilter/index.php', ['id' => $dlx->cm->id])
 );
 
-$fm = $dl->get_customfilter_manager();
+$fm = $dlx->get_customfilter_manager();
 
 // DATA PROCESSING.
 // ADD, UPDATE a new filter.
@@ -80,10 +80,10 @@ if ($urlparams->new && confirm_sesskey()) {
     $fm->display_filter_form($filterform, $filter, $urlparams);
 } else { // Or display the filters list.
     if (!$filters = $fm->get_filters(null, false, true)) { // Any notifications?
-        $dl->notifications['bad'][] = get_string('customfiltersnoneindatalynx', 'datalynx');
+        $dlx->notifications['bad'][] = get_string('customfiltersnoneindatalynx', 'datalynx');
     }
     // Print header.
-    $dl->print_header(['tab' => 'customfilters', 'urlparams' => $urlparams]);
+    $dlx->print_header(['tab' => 'customfilters', 'urlparams' => $urlparams]);
     // Print the filter add link.
     $fm->print_add_filter();
     // If there are filters print admin style list of them.
@@ -92,4 +92,4 @@ if ($urlparams->new && confirm_sesskey()) {
     }
 }
 
-$dl->print_footer();
+$dlx->print_footer();

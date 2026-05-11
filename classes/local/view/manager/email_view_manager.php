@@ -37,8 +37,8 @@ class email_view_manager {
      * @return array
      */
     public function get_entry_payload(int $datalynxid, int $viewid, int $entryid, array $options = []): array {
-        $datalynx = new datalynx($datalynxid);
-        $viewrecords = $datalynx->get_all_views();
+        $dlx = new datalynx($datalynxid);
+        $viewrecords = $dlx->get_all_views();
 
         if (empty($viewrecords[$viewid])) {
             throw new coding_exception('Invalid view id for email payload.');
@@ -50,11 +50,11 @@ class email_view_manager {
         }
 
         /** @var \datalynxview_email\view $view */
-        $view = $datalynx->get_view($viewrecord->type, $viewrecord);
+        $view = $dlx->get_view($viewrecord->type, $viewrecord);
         $entry = $view->get_filtered_entry($entryid);
 
         $payload = [
-            'datalynxid' => $datalynx->id(),
+            'datalynxid' => $dlx->id(),
             'viewid' => (int) $viewrecord->id,
             'viewname' => format_string($view->name()),
             'viewtype' => $view->type(),

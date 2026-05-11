@@ -133,7 +133,7 @@ class rule_form extends base_rule_form {
             $standardfields
         );
 
-        $fields = $this->dl->get_fields(null, false, true);
+        $fields = $this->dlx->get_fields(null, false, true);
         $fieldnames = [];
         foreach ($fields as $fieldid => $field) {
             if ($field->type == 'teammemberselect') {
@@ -149,7 +149,7 @@ class rule_form extends base_rule_form {
             $fieldnames,
             $options
         );
-        $potentialusers = get_users_by_capability($this->dl->context, 'mod/datalynx:manageentries');
+        $potentialusers = get_users_by_capability($this->dlx->context, 'mod/datalynx:manageentries');
         $choosuser = [];
         foreach ($potentialusers as $user) {
             $choosuser[$user->id] = $user->firstname . ' ' . $user->lastname;
@@ -162,7 +162,7 @@ class rule_form extends base_rule_form {
             $options
         );
 
-        $fields = $this->dl->get_fields_by_type('file', true);
+        $fields = $this->dlx->get_fields_by_type('file', true);
         $mform->addElement(
             'autocomplete',
             'param3',

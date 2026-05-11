@@ -42,15 +42,15 @@ class datalynxfield_behavior_form extends moodleform {
      *
      * @var mod_datalynx\datalynx
      */
-    private $datalynx;
+    private $dlx;
 
     /**
      * datalynx_field_behavior_form constructor.
      *
-     * @param \mod_datalynx\datalynx $datalynx
+     * @param \mod_datalynx\datalynx $dlx
      */
-    public function __construct(mod_datalynx\datalynx $datalynx) {
-        $this->datalynx = $datalynx;
+    public function __construct(mod_datalynx\datalynx $dlx) {
+        $this->dlx = $dlx;
         parent::__construct();
     }
 
@@ -66,7 +66,7 @@ class datalynxfield_behavior_form extends moodleform {
 
         $mform->addElement('hidden', 'id', 0);
         $mform->setType('id', PARAM_INT);
-        $mform->addElement('hidden', 'd', $this->datalynx->id());
+        $mform->addElement('hidden', 'd', $this->dlx->id());
         $mform->setType('d', PARAM_INT);
 
         $mform->addElement('header', 'general', get_string('general', 'form'));
@@ -95,7 +95,7 @@ class datalynxfield_behavior_form extends moodleform {
             'autocomplete',
             'visibletopermission',
             get_string('visibleto', 'datalynx'),
-            $this->datalynx->get_datalynx_permission_names(false, false),
+            $this->dlx->get_datalynx_permission_names(false, false),
             $options
         );
         $mform->addHelpButton('visibletopermission', 'visibleto', 'datalynx');
@@ -145,7 +145,7 @@ class datalynxfield_behavior_form extends moodleform {
             'autocomplete',
             'editableby',
             get_string('editableby', 'datalynx'),
-            $this->datalynx->get_datalynx_permission_names(false, false),
+            $this->dlx->get_datalynx_permission_names(false, false),
             $options
         );
         $mform->addHelpButton('editableby', 'editableby', 'datalynx');
@@ -175,7 +175,7 @@ class datalynxfield_behavior_form extends moodleform {
      * @return array fieldid => fieldname
      */
     public function get_teammemberselect_fields(): array {
-        $allfields = $this->datalynx->get_fields();
+        $allfields = $this->dlx->get_fields();
         $fields = [];
         if (!empty($allfields)) {
             foreach ($allfields as $fieldid => $field) {

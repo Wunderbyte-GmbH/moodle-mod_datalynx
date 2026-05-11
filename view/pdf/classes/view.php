@@ -104,12 +104,12 @@ class view extends base {
     /**
      * Constructor
      *
-     * @param int $df Datalynx instance id
+     * @param int $dlx Datalynx instance id
      * @param int $view View id
      * @param bool $filteroptions
      */
-    public function __construct($df = 0, $view = 0, $filteroptions = true) {
-        parent::__construct($df, $view, $filteroptions);
+    public function __construct($dlx = 0, $view = 0, $filteroptions = true) {
+        parent::__construct($dlx, $view, $filteroptions);
 
         if (!empty($this->view->param1)) {
             if (base64_decode($this->view->param1, true)) {
@@ -379,7 +379,7 @@ class view extends base {
         $data = parent::from_form($data);
 
         // Save pdf specific template files.
-        $contextid = $this->dl->context->id;
+        $contextid = $this->dlx->context->id;
         $imageoptions = ['subdirs' => 0, 'maxbytes' => -1, 'maxfiles' => 1,
                 'accepted_types' => ['image']];
         $certoptions = ['subdirs' => 0, 'maxbytes' => -1, 'maxfiles' => 1,
@@ -434,7 +434,7 @@ class view extends base {
         $data = parent::to_form($data);
 
         // Save pdf specific template files.
-        $contextid = $this->dl->context->id;
+        $contextid = $this->dlx->context->id;
         $imageoptions = ['subdirs' => 0, 'maxbytes' => -1, 'maxfiles' => 1,
                 'accepted_types' => ['image']];
         $certoptions = ['subdirs' => 0, 'maxbytes' => -1, 'maxfiles' => 1,
@@ -565,7 +565,7 @@ class view extends base {
      */
     public function generate_default_view() {
         // Get all the fields.
-        $fields = $this->dl->get_fields();
+        $fields = $this->dlx->get_fields();
         if (!$fields) {
             return; // You shouldn't get that far if there are no user fields.
         }
@@ -682,7 +682,7 @@ class view extends base {
         $elements = [];
 
         // Get patterns definitions.
-        $fields = $this->dl->get_fields();
+        $fields = $this->dlx->get_fields();
         $tags = [];
         $patterndefinitions = [];
         $entry = new stdClass();
@@ -766,7 +766,7 @@ class view extends base {
         $fs = get_file_storage();
         if (
             $frame = $fs->get_area_files(
-                $this->dl->context->id,
+                $this->dlx->context->id,
                 'mod_datalynx',
                 'view_pdfframe',
                 $this->id(),
@@ -814,7 +814,7 @@ class view extends base {
         $fs = get_file_storage();
         if (
             $wmark = $fs->get_area_files(
-                $this->dl->context->id,
+                $this->dlx->context->id,
                 'mod_datalynx',
                 'view_pdfwmark',
                 $this->id(),
@@ -857,7 +857,7 @@ class view extends base {
         $fs = get_file_storage();
         if (
             $cert = $fs->get_area_files(
-                $this->dl->context->id,
+                $this->dlx->context->id,
                 'mod_datalynx',
                 'view_pdfcert',
                 $this->id(),
@@ -901,7 +901,7 @@ class view extends base {
         $content = file_rewrite_pluginfile_urls(
             $this->view->eparam3,
             'pluginfile.php',
-            $this->dl->context->id,
+            $this->dlx->context->id,
             'mod_datalynx',
             "viewparam3",
             $this->id()
@@ -909,8 +909,8 @@ class view extends base {
 
         $content = $this->process_content_images($content);
         // Add the Datalynx css to content.
-        if ($this->dl->data->css) {
-            $style = html_writer::tag('style', $this->dl->data->css, ['type' => 'text/css']);
+        if ($this->dlx->data->css) {
+            $style = html_writer::tag('style', $this->dlx->data->css, ['type' => 'text/css']);
             $content = $style . $content;
         }
 
@@ -931,7 +931,7 @@ class view extends base {
         $content = file_rewrite_pluginfile_urls(
             $this->view->eparam4,
             'pluginfile.php',
-            $this->dl->context->id,
+            $this->dlx->context->id,
             'mod_datalynx',
             "viewparam4",
             $this->id()
@@ -990,8 +990,8 @@ class view extends base {
     protected function write_html($pdf, $content) {
 
         // Add the Datalynx css to content.
-        if ($this->dl->data->css) {
-            $style = html_writer::tag('style', $this->dl->data->css, ['type' => 'text/css']);
+        if ($this->dlx->data->css) {
+            $style = html_writer::tag('style', $this->dlx->data->css, ['type' => 'text/css']);
             $content = $style . $content;
         }
         $root = $_SERVER['DOCUMENT_ROOT'];
@@ -1010,7 +1010,7 @@ class view extends base {
         $namepattern = !empty($namepattern) ? $namepattern : '';
         $foundtags = [];
         $replacements = [];
-        if (count($this->entries->entries()) == 1 && $fields = $this->dl->get_fields()) {
+        if (count($this->entries->entries()) == 1 && $fields = $this->dlx->get_fields()) {
             $entries = $this->entries->entries();
             $entry = reset($entries);
             foreach ($fields as $field) {
@@ -1073,7 +1073,7 @@ class view extends base {
             return $pagecount;
         }
 
-        $contextid = $this->dl->context->id;
+        $contextid = $this->dlx->context->id;
         $fs = get_file_storage();
         $files = $fs->get_area_files($contextid, 'mod_datalynx', 'content');
         foreach ($files as $file) {

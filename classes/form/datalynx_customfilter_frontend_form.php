@@ -117,7 +117,7 @@ class datalynx_customfilter_frontend_form extends datalynx_filter_base_form {
             $entryauthors = $DB->get_records_sql('SELECT DISTINCT userid, firstname, lastname
                 FROM {datalynx_entries}
                 INNER JOIN {user} on {datalynx_entries}.userid = {user}.id
-                WHERE {datalynx_entries}.dataid = ' . $this->dl->id() . ';');
+                WHERE {datalynx_entries}.dataid = ' . $this->dlx->id() . ';');
 
             $menu = [];
             foreach ($entryauthors as $userid => $author) {
@@ -153,7 +153,7 @@ class datalynx_customfilter_frontend_form extends datalynx_filter_base_form {
         $clearcustomsearch = '<a class="btn btn-secondary" href="';
         $clearcustomsearch .= new moodle_url(
             '/mod/datalynx/view.php',
-            ['id' => $this->dl->cm->id, 'view' => $view->view->id, 'filter' => 0]
+            ['id' => $this->dlx->cm->id, 'view' => $view->view->id, 'filter' => 0]
         );
         $clearcustomsearch .= '"> ' . get_string('resetsettings', 'datalynx') . '</a>';
         $buttonarray[] = &$mform->createElement('static', 'clearcustomsearch', '', $clearcustomsearch);

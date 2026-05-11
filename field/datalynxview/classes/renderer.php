@@ -161,7 +161,7 @@ class renderer extends datalynxfield_renderer {
                     $groups = $urlquery ? $entry->groupid : [$entry->groupid];
                     $options['groups'] = $groups;
                 } else {
-                    $allgroups = groups_get_user_groups($this->dl->course);
+                    $allgroups = groups_get_user_groups($this->dlx->course);
                     $groups = $urlquery ? implode(',', $allgroups[0]) : $allgroups[0];
                     $options['groups'] = $groups;
                 }
@@ -205,7 +205,7 @@ class renderer extends datalynxfield_renderer {
     protected function get_sort_options() {
         $field = $this->field;
 
-        $refview = $field->df->get_view_from_id($field->refview);
+        $refview = $field->dlx->get_view_from_id($field->refview);
 
         $soptions = [];
         // Custom sort (ref-field-patten,ASC/DESC).
@@ -252,17 +252,17 @@ class renderer extends datalynxfield_renderer {
                 continue;
             }
             // Get the ref field id from pattern.
-            $refviewview = $field->df->get_view_from_id($refview);
+            $refviewview = $field->dlx->get_view_from_id($refview);
             if (!$rfieldid = $refviewview->get_pattern_fieldid($refpattern)) {
                 continue;
             }
             // Get value for local pattern or use as value.
             $value = '';
-            $localviewview = $field->df->get_view_from_id($localview);
+            $localviewview = $field->dlx->get_view_from_id($localview);
             if (!$localfieldid = $localviewview->get_pattern_fieldid($localpattern)) {
                 $value = $localpattern;
             } else {
-                if ($localfield = $field->df->get_field_from_id($localfieldid)) {
+                if ($localfield = $field->dlx->get_field_from_id($localfieldid)) {
                     // Get the array of values for the patterns.
                     if ($replacements = $localfield->renderer()->replacements([$localpattern], $entry)) {
                         // Take the first: array('html', value).

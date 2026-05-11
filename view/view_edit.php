@@ -33,9 +33,9 @@ $urlparams->vedit = optional_param('vedit', 0, PARAM_INT); // View id to edit.
 $urlparams->returnurl = optional_param('returnurl', '', PARAM_URL);
 
 // Set a datalynx object.
-$dl = new mod_datalynx\datalynx($urlparams->d);
+$dlx = new mod_datalynx\datalynx($urlparams->d);
 
-require_login($dl->data->course, false, $dl->cm);
+require_login($dlx->data->course, false, $dlx->cm);
 
 global $DB;
 $options = [];
@@ -79,10 +79,10 @@ $options['referenceeditors'] = ['id_esection_editor', 'id_eparam2_editor'];
 
 $PAGE->requires->js_call_amd('mod_datalynx/patterndialogue', 'init');
 
-$dl->set_page('view/view_edit', ['modjs' => true, 'urlparams' => $urlparams]);
+$dlx->set_page('view/view_edit', ['modjs' => true, 'urlparams' => $urlparams]);
 
 require_sesskey();
-require_capability('mod/datalynx:managetemplates', $dl->context);
+require_capability('mod/datalynx:managetemplates', $dlx->context);
 
 $viewrecords = $DB->get_records('datalynx_views', ['dataid' => $urlparams->d], 'name ASC', 'id, name');
 foreach ($viewrecords as $viewrecord) {
@@ -93,7 +93,7 @@ foreach ($viewrecords as $viewrecord) {
 }
 
 if ($urlparams->vedit) {
-    $views = $dl->get_views_editable_by_user('');
+    $views = $dlx->get_views_editable_by_user('');
     if (!empty($views) && array_key_exists($urlparams->vedit, $views)) {
         $view = $views[$urlparams->vedit];
         if ($default = optional_param('resetdefault', 0, PARAM_INT)) {
@@ -105,7 +105,7 @@ if ($urlparams->vedit) {
 } else {
     if ($urlparams->type) {
         try {
-            $view = $dl->get_view($urlparams->type);
+            $view = $dlx->get_view($urlparams->type);
         } catch (\coding_exception $e) {
             throw new moodle_exception('The requested view type does not exist.');
         }
@@ -146,18 +146,18 @@ if ($mform->is_cancelled()) {
             if (!$view->id()) {
                 $vid = $view->add($data);
 
-                $other = ['dataid' => $dl->id()];
+                $other = ['dataid' => $dlx->id()];
                 $event = \mod_datalynx\event\view_created::create(
-                    ['context' => $dl->context, 'objectid' => $vid, 'other' => $other]
+                    ['context' => $dlx->context, 'objectid' => $vid, 'other' => $other]
                 );
                 $event->trigger();
                 // Update view.
             } else {
                 $view->update($data);
 
-                $other = ['dataid' => $dl->id()];
+                $other = ['dataid' => $dlx->id()];
                 $event = \mod_datalynx\event\view_updated::create(
-                    ['context' => $dl->context, 'objectid' => $view->id(), 'other' => $other]
+                    ['context' => $dlx->context, 'objectid' => $view->id(), 'other' => $other]
                 );
                 $event->trigger();
             }
@@ -180,11 +180,11 @@ if ($mform->is_cancelled()) {
 
 // Activate navigation node.
 navigation_node::override_active_url(
-    new moodle_url('/mod/datalynx/view/index.php', ['id' => $dl->cm->id])
+    new moodle_url('/mod/datalynx/view/index.php', ['id' => $dlx->cm->id])
 );
 
 // Print header.
-$dl->print_header(['tab' => 'views', 'nonotifications' => true, 'urlparams' => $urlparams]);
+$dlx->print_header(['tab' => 'views', 'nonotifications' => true, 'urlparams' => $urlparams]);
 
 $formheading = $view->id() ? get_string('viewedit', 'datalynx', $view->name()) : get_string(
     'viewnew',
@@ -208,4 +208,4 @@ $CFG->texteditors = 'tiny';
 $mform->display();
 $CFG->texteditors = $texteditors;
 
-$dl->print_footer();
+$dlx->print_footer();

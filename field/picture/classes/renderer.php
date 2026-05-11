@@ -63,7 +63,7 @@ class renderer extends FileRenderer {
         $draftitemid = file_get_submitted_draft_itemid("{$fieldname}_filemanager");
         file_prepare_draft_area(
             $draftitemid,
-            $field->df()->context->id,
+            $field->dlx()->context->id,
             'mod_datalynx',
             'content',
             $contentid,
@@ -108,7 +108,7 @@ class renderer extends FileRenderer {
         }
 
         $fs = get_file_storage();
-        $files = $fs->get_area_files($field->df()->context->id, 'mod_datalynx', 'content', $contentid);
+        $files = $fs->get_area_files($field->dlx()->context->id, 'mod_datalynx', 'content', $contentid);
 
         // If we see no file attached we are done here.
         if (!$files || !(count($files) > 1)) {
@@ -125,7 +125,7 @@ class renderer extends FileRenderer {
         foreach ($files as $file) {
             if (!$file->is_directory()) {
                 $filename = $file->get_filename();
-                $path = "/{$field->df()->context->id}/mod_datalynx/content/$contentid";
+                $path = "/{$field->dlx()->context->id}/mod_datalynx/content/$contentid";
                 if (strpos($filename, 'thumb_') === false) {
                     $strfiles[] = $this->display_file($file, $entryid, $path, $altname, $options);
                 }

@@ -121,7 +121,7 @@ class field extends datalynxfield_base {
                     'maxfiles' => $this->field->param2, 'accepted_types' => $this->field->param3,
             ];
 
-            $contextid = $this->df->context->id;
+            $contextid = $this->dlx->context->id;
             file_save_draft_area_files(
                 $filemanager,
                 $contextid,
@@ -270,13 +270,13 @@ class field extends datalynxfield_base {
 
         $contentid = $entry->{"c{$this->field->id}_id"} ?? null;
 
-        $options = ['context' => $this->df->context];
+        $options = ['context' => $this->dlx->context];
         $data = (object) $values;
         $data = file_postupdate_standard_editor(
             (object) $values,
             $fieldname,
             $options,
-            $this->df->context,
+            $this->dlx->context,
             'mod_datalynx',
             'content',
             $contentid
@@ -285,7 +285,7 @@ class field extends datalynxfield_base {
         // Get the file content.
         $fs = get_file_storage();
         $array = $fs->get_area_files(
-            $this->df->context->id,
+            $this->dlx->context->id,
             'mod_datalynx',
             'content',
             $contentid,
@@ -305,7 +305,7 @@ class field extends datalynxfield_base {
 
         // Prepare new file record.
         $rec = new stdClass();
-        $rec->contextid = $this->df->context->id;
+        $rec->contextid = $this->dlx->context->id;
         $rec->component = 'mod_datalynx';
         $rec->filearea = 'content';
         $rec->itemid = $contentid;
@@ -318,7 +318,7 @@ class field extends datalynxfield_base {
         $rec->license = $file->get_license();
 
         // Delete old file.
-        $fs->delete_area_files($this->df->context->id, 'mod_datalynx', 'content', $contentid);
+        $fs->delete_area_files($this->dlx->context->id, 'mod_datalynx', 'content', $contentid);
 
         // Create a new file from string.
         $fs->create_file_from_string($rec, $filecontent);

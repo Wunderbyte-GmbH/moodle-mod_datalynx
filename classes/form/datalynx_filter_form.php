@@ -31,13 +31,13 @@ class datalynx_filter_form extends datalynx_filter_base_form {
      * @return void
      */
     public function definition() {
-        $df = $this->dl;
+        $dlx = $this->dlx;
         $filter = $this->filter;
         $name = empty($filter->name) ? get_string('filternew', 'datalynx') : $filter->name;
         $description = empty($filter->description) ? '' : $filter->description;
         $visible = !isset($filter->visible) ? 1 : $filter->visible;
-        $fields = $df->get_fields();
-        $fieldoptions = [0 => get_string('choose')] + $df->get_fields(['entry'], true);
+        $fields = $dlx->get_fields();
+        $fieldoptions = [0 => get_string('choose')] + $dlx->get_fields(['entry'], true);
 
         $mform = &$this->_form;
 
@@ -117,11 +117,11 @@ class datalynx_filter_form extends datalynx_filter_base_form {
     public function validation($data, $files) {
         $errors = datalynx_filter_base_form::validation($data, $files);
 
-        $df = $this->dl;
+        $dlx = $this->dlx;
         $filter = $this->filter;
 
         // Validate unique name.
-        if (empty($data['name']) || $df->name_exists('filters', $data['name'], $filter->id)) {
+        if (empty($data['name']) || $dlx->name_exists('filters', $data['name'], $filter->id)) {
             $errors['name'] = get_string(
                 'invalidname',
                 'datalynx',

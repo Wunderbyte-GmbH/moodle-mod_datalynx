@@ -32,20 +32,20 @@ $urlparams->id = required_param('id', PARAM_INT);
 $urlparams->action = optional_param('action', 'edit', PARAM_ALPHA);
 $urlparams->confirmed = optional_param('confirmed', false, PARAM_BOOL);
 
-$datalynx = new mod_datalynx\datalynx($urlparams->d);
+$dlx = new mod_datalynx\datalynx($urlparams->d);
 
-require_login($datalynx->data->course, false, $datalynx->cm);
+require_login($dlx->data->course, false, $dlx->cm);
 
-$datalynx->set_page('behavior/behavior_edit', ['urlparams' => $urlparams]);
+$dlx->set_page('behavior/behavior_edit', ['urlparams' => $urlparams]);
 
 require_sesskey();
-require_capability('mod/datalynx:managetemplates', $datalynx->context);
+require_capability('mod/datalynx:managetemplates', $dlx->context);
 
-$returnurl = new moodle_url('/mod/datalynx/fieldbehavior/index.php', ['d' => $datalynx->id()]);
+$returnurl = new moodle_url('/mod/datalynx/fieldbehavior/index.php', ['d' => $dlx->id()]);
 
 switch ($urlparams->action) {
     case "edit":
-        $mform = new datalynxfield_behavior_form($datalynx);
+        $mform = new datalynxfield_behavior_form($dlx);
 
         if ($mform->is_cancelled()) {
             redirect($returnurl);
@@ -60,7 +60,7 @@ switch ($urlparams->action) {
             }
         }
 
-        $datalynx->print_header(['tab' => 'behaviors', 'nonotifications' => true, 'urlparams' => $urlparams]);
+        $dlx->print_header(['tab' => 'behaviors', 'nonotifications' => true, 'urlparams' => $urlparams]);
 
         if ($urlparams->id) {
             $data = datalynxfield_behavior::get_behavior($urlparams->id);
@@ -79,7 +79,7 @@ switch ($urlparams->action) {
         }
 
         $mform->display();
-        $datalynx->print_footer();
+        $dlx->print_footer();
 
         break;
 
@@ -90,7 +90,7 @@ switch ($urlparams->action) {
         } else {
             $data = datalynxfield_behavior::get_behavior($urlparams->id);
             $urlparams->confirmed = true;
-            $datalynx->print_header(['tab' => 'behaviors', 'nonotifications' => true, 'urlparams' => $urlparams]);
+            $dlx->print_header(['tab' => 'behaviors', 'nonotifications' => true, 'urlparams' => $urlparams]);
             echo html_writer::tag(
                 'h2',
                 get_string('duplicatingbehavior', 'datalynx', $data->name),
@@ -101,7 +101,7 @@ switch ($urlparams->action) {
                 new moodle_url('behavior_edit.php', (array) $urlparams),
                 $returnurl
             );
-            $datalynx->print_footer();
+            $dlx->print_footer();
         }
         break;
 
@@ -112,7 +112,7 @@ switch ($urlparams->action) {
         } else {
             $data = datalynxfield_behavior::get_behavior($urlparams->id);
             $urlparams->confirmed = true;
-            $datalynx->print_header(
+            $dlx->print_header(
                 ['tab' => 'behaviors', 'nonotifications' => true,
                 'urlparams' => $urlparams]
             );
@@ -126,7 +126,7 @@ switch ($urlparams->action) {
                 new moodle_url('behavior_edit.php', (array) $urlparams),
                 $returnurl
             );
-            $datalynx->print_footer();
+            $dlx->print_footer();
         }
         break;
 

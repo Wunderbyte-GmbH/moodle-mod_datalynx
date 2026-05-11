@@ -53,7 +53,7 @@ class view extends base {
         global $OUTPUT; // Needed for mustache implementation.
 
         // Get all the fields.
-        $fields = $this->dl->get_fields();
+        $fields = $this->dlx->get_fields();
         if (!$fields) {
             return; // You shouldn't get that far if there are no user fields.
         }
@@ -233,7 +233,7 @@ class view extends base {
         $elements = [];
 
         // Get patterns definitions.
-        $fields = $this->dl->get_fields();
+        $fields = $this->dlx->get_fields();
         $tags = [];
         $patterndefinitions = [];
         $entry = new stdClass();

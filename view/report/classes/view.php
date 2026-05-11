@@ -60,12 +60,12 @@ class view extends base {
     /**
      * Constructor for datalynxview_report.
      *
-     * @param mixed $df Datalynx instance or ID.
+     * @param mixed $dlx Datalynx instance or ID.
      * @param mixed $view View record or ID.
      * @param bool $filteroptions Whether to apply filter options.
      */
-    public function __construct($df = 0, $view = 0, $filteroptions = true) {
-        parent::__construct($df, $view, $filteroptions);
+    public function __construct($dlx = 0, $view = 0, $filteroptions = true) {
+        parent::__construct($dlx, $view, $filteroptions);
         if (!empty($this->view->param3)) {
             $this->output = $this->view->param3;
         }
@@ -132,7 +132,7 @@ class view extends base {
         $output = html_writer::tag('div', $output, [
             'class' => $viewname,
             'data-viewname' => $this->name(),
-            'data-id' => $this->dl->id(),
+            'data-id' => $this->dlx->id(),
             'data-viewid' => $this->view->id,
         ]);
 
@@ -176,7 +176,7 @@ class view extends base {
         }
 
         $payload = [
-            'datalynxid' => $this->dl->id(),
+            'datalynxid' => $this->dlx->id(),
             'viewid' => (int) $this->id(),
             'viewname' => format_string($this->name()),
             'viewtype' => $this->type(),
@@ -203,7 +203,7 @@ class view extends base {
         ];
 
         $countfieldid = (int) ($this->view->param1 ?? 0);
-        $countfield = $countfieldid ? $this->dl->get_field_from_id($countfieldid) : null;
+        $countfield = $countfieldid ? $this->dlx->get_field_from_id($countfieldid) : null;
         if (!$countfield || !method_exists($countfield, 'get_options')) {
             $this->reportpayload = $payload;
             return $this->reportpayload;
@@ -547,7 +547,7 @@ class view extends base {
 
         $groupingid = (int) ($this->view->param4 ?? 0);
         if ($groupingid > 0) {
-            $groupfield = $this->dl->get_field_from_id($groupingid);
+            $groupfield = $this->dlx->get_field_from_id($groupingid);
             if (!$groupfield || !method_exists($groupfield, 'get_all_userids_in_all_entries')) {
                 return [];
             }
@@ -617,7 +617,7 @@ class view extends base {
      * @return int[]
      */
     protected function get_report_entryids(): array {
-        $entries = new datalynx_entries($this->dl, $this->filter);
+        $entries = new datalynx_entries($this->dlx, $this->filter);
         $options = [];
         $filter = clone $this->get_filter();
         $filter->perpage = 0;
@@ -640,7 +640,7 @@ class view extends base {
      * Generates the view with default settings.
      */
     public function generate_default_view() {
-        if (!$fields = $this->dl->get_fields()) {
+        if (!$fields = $this->dlx->get_fields()) {
             return;
         }
 

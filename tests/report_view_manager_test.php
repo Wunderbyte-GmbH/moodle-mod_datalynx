@@ -42,10 +42,10 @@ final class report_view_manager_test extends advanced_testcase {
         $student1 = $this->getDataGenerator()->create_and_enrol($course, 'student');
         $student2 = $this->getDataGenerator()->create_and_enrol($course, 'student');
         $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
-        $df = new datalynx($instance->id);
+        $dlx = new datalynx($instance->id);
 
         $view = (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'type' => 'report',
             'name' => 'Author report',
             'description' => '',
@@ -63,7 +63,7 @@ final class report_view_manager_test extends advanced_testcase {
         ];
 
         $selectfield = (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'type' => 'select',
             'name' => 'Choice',
             'description' => '',
@@ -84,7 +84,7 @@ final class report_view_manager_test extends advanced_testcase {
         $view->id = (int) $DB->insert_record('datalynx_views', $view);
 
         $entryone = (int) $DB->insert_record('datalynx_entries', (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'userid' => $student1->id,
             'groupid' => 0,
             'approved' => 1,
@@ -93,7 +93,7 @@ final class report_view_manager_test extends advanced_testcase {
             'timemodified' => strtotime('2026-04-15 12:00:00'),
         ]);
         $entrytwo = (int) $DB->insert_record('datalynx_entries', (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'userid' => $student1->id,
             'groupid' => 0,
             'approved' => 1,
@@ -102,7 +102,7 @@ final class report_view_manager_test extends advanced_testcase {
             'timemodified' => strtotime('2026-04-16 12:00:00'),
         ]);
         $entrythree = (int) $DB->insert_record('datalynx_entries', (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'userid' => $student2->id,
             'groupid' => 0,
             'approved' => 1,
@@ -130,7 +130,7 @@ final class report_view_manager_test extends advanced_testcase {
             'content' => '1',
         ]);
 
-        return [$df, $view, $teacher, $student1, $student2];
+        return [$dlx, $view, $teacher, $student1, $student2];
     }
 
     /**
@@ -142,12 +142,12 @@ final class report_view_manager_test extends advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
 
-        [$df, $view, , $student1, $student2] = $this->create_report_fixture();
+        [$dlx, $view, , $student1, $student2] = $this->create_report_fixture();
 
         $manager = new report_view_manager();
-        $payload = $manager->get_browse_payload($df->id(), $view->id);
+        $payload = $manager->get_browse_payload($dlx->id(), $view->id);
 
-        $this->assertSame($df->id(), $payload['datalynxid']);
+        $this->assertSame($dlx->id(), $payload['datalynxid']);
         $this->assertSame($view->id, $payload['viewid']);
         $this->assertTrue($payload['hasdata']);
         $this->assertFalse($payload['ismonthly']);
@@ -171,10 +171,10 @@ final class report_view_manager_test extends advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
 
-        [$df, $view] = $this->create_report_fixture('month');
+        [$dlx, $view] = $this->create_report_fixture('month');
 
         $manager = new report_view_manager();
-        $payload = $manager->get_browse_payload($df->id(), $view->id);
+        $payload = $manager->get_browse_payload($dlx->id(), $view->id);
 
         $this->assertTrue($payload['ismonthly']);
         $this->assertTrue($payload['hasmonthlysections']);

@@ -46,10 +46,10 @@ final class get_grid_view_data_test extends advanced_testcase {
 
         $course = $this->getDataGenerator()->create_course();
         $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
-        $df = new datalynx($instance->id);
+        $dlx = new datalynx($instance->id);
 
         $view = (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'type' => 'grid',
             'name' => 'Pilot Grid',
             'description' => '',
@@ -65,7 +65,7 @@ final class get_grid_view_data_test extends advanced_testcase {
         $view->id = (int) $DB->insert_record('datalynx_views', $view);
 
         $field = (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'type' => 'text',
             'name' => 'Title',
             'description' => '',
@@ -83,7 +83,7 @@ final class get_grid_view_data_test extends advanced_testcase {
         $field->id = (int) $DB->insert_record('datalynx_fields', $field);
 
         $entryid = (int) $DB->insert_record('datalynx_entries', (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'userid' => $USER->id,
             'groupid' => 0,
             'approved' => 1,
@@ -99,7 +99,7 @@ final class get_grid_view_data_test extends advanced_testcase {
             'content' => 'Hello External Grid',
         ]);
 
-        return [$df, $view, $entryid];
+        return [$dlx, $view, $entryid];
     }
 
     /**
@@ -116,10 +116,10 @@ final class get_grid_view_data_test extends advanced_testcase {
         $student1 = $this->getDataGenerator()->create_and_enrol($course, 'student');
         $student2 = $this->getDataGenerator()->create_and_enrol($course, 'student');
         $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
-        $df = new datalynx($instance->id);
+        $dlx = new datalynx($instance->id);
 
         $view = (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'type' => 'grid',
             'name' => 'Pilot Grid',
             'description' => '',
@@ -135,7 +135,7 @@ final class get_grid_view_data_test extends advanced_testcase {
         $view->id = (int) $DB->insert_record('datalynx_views', $view);
 
         $teammemberfield = (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'type' => 'teammemberselect',
             'name' => 'Team member select',
             'description' => '',
@@ -153,7 +153,7 @@ final class get_grid_view_data_test extends advanced_testcase {
         $teammemberfield->id = (int) $DB->insert_record('datalynx_fields', $teammemberfield);
 
         $fieldgroup = (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'type' => 'fieldgroup',
             'name' => 'Teamgroup',
             'description' => '',
@@ -171,7 +171,7 @@ final class get_grid_view_data_test extends advanced_testcase {
         $fieldgroup->id = (int) $DB->insert_record('datalynx_fields', $fieldgroup);
 
         $entryid = (int) $DB->insert_record('datalynx_entries', (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'userid' => $teacher->id,
             'groupid' => 0,
             'approved' => 1,
@@ -187,7 +187,7 @@ final class get_grid_view_data_test extends advanced_testcase {
             'content' => json_encode([$student1->id, $student2->id]),
         ]);
 
-        return [$df, $view, $entryid, $student1, $student2];
+        return [$dlx, $view, $entryid, $student1, $student2];
     }
 
     /**
@@ -200,10 +200,10 @@ final class get_grid_view_data_test extends advanced_testcase {
 
         $course = $this->getDataGenerator()->create_course();
         $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
-        $df = new datalynx($instance->id);
+        $dlx = new datalynx($instance->id);
 
         $view = (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'type' => 'grid',
             'name' => 'Pilot Grid',
             'description' => '',
@@ -219,7 +219,7 @@ final class get_grid_view_data_test extends advanced_testcase {
         $view->id = (int) $DB->insert_record('datalynx_views', $view);
 
         $textfield = (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'type' => 'text',
             'name' => 'Title',
             'description' => '',
@@ -237,7 +237,7 @@ final class get_grid_view_data_test extends advanced_testcase {
         $textfield->id = (int) $DB->insert_record('datalynx_fields', $textfield);
 
         $multiselectfield = (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'type' => 'multiselect',
             'name' => 'Tags',
             'description' => '',
@@ -255,7 +255,7 @@ final class get_grid_view_data_test extends advanced_testcase {
         $multiselectfield->id = (int) $DB->insert_record('datalynx_fields', $multiselectfield);
 
         $entryone = (int) $DB->insert_record('datalynx_entries', (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'userid' => $USER->id,
             'groupid' => 0,
             'approved' => 1,
@@ -264,7 +264,7 @@ final class get_grid_view_data_test extends advanced_testcase {
             'timemodified' => time(),
         ]);
         $entrytwo = (int) $DB->insert_record('datalynx_entries', (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'userid' => $USER->id,
             'groupid' => 0,
             'approved' => 1,
@@ -298,7 +298,7 @@ final class get_grid_view_data_test extends advanced_testcase {
             'content' => '#2#,#3#',
         ]);
 
-        return [$df, $view, $multiselectfield->id, $entryone, $entrytwo];
+        return [$dlx, $view, $multiselectfield->id, $entryone, $entrytwo];
     }
 
     /**
@@ -310,12 +310,12 @@ final class get_grid_view_data_test extends advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
 
-        [$df, $view, $entryid] = $this->create_grid_fixture();
+        [$dlx, $view, $entryid] = $this->create_grid_fixture();
 
-        $result = get_grid_view_data::execute($df->id(), $view->id);
+        $result = get_grid_view_data::execute($dlx->id(), $view->id);
         $result = external_api::clean_returnvalue(get_grid_view_data::execute_returns(), $result);
 
-        $this->assertSame((int) $df->id(), $result['datalynxid']);
+        $this->assertSame((int) $dlx->id(), $result['datalynxid']);
         $this->assertSame($view->id, $result['viewid']);
         $this->assertSame('grid', $result['viewtype']);
         $this->assertTrue($result['hasentries']);
@@ -337,9 +337,9 @@ final class get_grid_view_data_test extends advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
 
-        [$df, $view, , $student1, $student2] = $this->create_grid_fieldgroup_fixture();
+        [$dlx, $view, , $student1, $student2] = $this->create_grid_fieldgroup_fixture();
 
-        $result = get_grid_view_data::execute($df->id(), $view->id);
+        $result = get_grid_view_data::execute($dlx->id(), $view->id);
         $result = external_api::clean_returnvalue(get_grid_view_data::execute_returns(), $result);
 
         $fieldhtml = implode('', array_column($result['groups'][0]['entries'][0]['fields'], 'valuehtml'));
@@ -359,14 +359,14 @@ final class get_grid_view_data_test extends advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
 
-        [$df, $view, $fieldid, $entryone, $entrytwo] = $this->create_grid_multiselect_fixture();
+        [$dlx, $view, $fieldid, $entryone, $entrytwo] = $this->create_grid_multiselect_fixture();
         $customsearch = serialize([
             $fieldid => [
                 'AND' => [['', 'ANY_OF', ['2']]],
             ],
         ]);
 
-        $result = get_grid_view_data::execute($df->id(), $view->id, 0, 0, 0, '', '', '', '', 0, '', $customsearch);
+        $result = get_grid_view_data::execute($dlx->id(), $view->id, 0, 0, 0, '', '', '', '', 0, '', $customsearch);
         $result = external_api::clean_returnvalue(get_grid_view_data::execute_returns(), $result);
 
         $this->assertCount(1, $result['groups'][0]['entries']);

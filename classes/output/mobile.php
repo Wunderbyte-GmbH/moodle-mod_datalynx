@@ -48,16 +48,16 @@ class mobile {
             require_capability('mod/datalynx:manageentries', $context);
         }
 
-        $datalynx = new \mod_datalynx\datalynx($cm->instance);
+        $dlx = new \mod_datalynx\datalynx($cm->instance);
 
         $view = 0;
-        if (!empty($datalynx->data->defaultview)) {
-            $view = $datalynx->data->defaultview;
+        if (!empty($dlx->data->defaultview)) {
+            $view = $dlx->data->defaultview;
         }
 
         // Add intro in native blob.
         $html = '<core-course-module-description description="';
-        $html .= $datalynx->data->intro;
+        $html .= $dlx->data->intro;
         $html .= '" component="mod_datalynx"></core-course-module-description>';
 
         $entry = null;
@@ -82,7 +82,7 @@ class mobile {
         // Add content html. Hide edit, remove with entryactions, hide filter with controls.
         $options = ['tohtml' => true, 'controls' => false, 'entryactions' => $buttons];
         $options['pagelayout'] = 'mobile';
-        $html .= $datalynx->get_content_inline($cm->instance, $view, $entry, $options);
+        $html .= $dlx->get_content_inline($cm->instance, $view, $entry, $options);
 
         $html .= "</div>";
 

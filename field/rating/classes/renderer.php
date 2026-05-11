@@ -53,7 +53,7 @@ class renderer extends datalynxfield_renderer {
         $edit = !empty($options['edit']) ? $options['edit'] : false;
 
         // If edit mode or rating not active return.
-        if ($edit || (!$this->field->df()->data->rating)) {
+        if ($edit || (!$this->field->dlx()->data->rating)) {
             if ($tags) {
                 $replacements = [];
                 foreach ($tags as $tag) {
@@ -81,17 +81,17 @@ class renderer extends datalynxfield_renderer {
         // Get entry rating objects.
         if ($entry->id > 0) {
             $options = new stdClass();
-            $options->context = $field->df()->context;
+            $options->context = $field->dlx()->context;
             $options->component = 'mod_datalynx';
             $options->ratingarea = 'entry';
             // Ugly hack to work around the exception in generate_settings.
             $options->aggregate = RATING_AGGREGATE_COUNT;
             // TODO MDL-000000 check when scaleid is empty.
-            $options->scaleid = !empty($entry->scaleid) ? $entry->scaleid : $field->df()->data->rating;
+            $options->scaleid = !empty($entry->scaleid) ? $entry->scaleid : $field->dlx()->data->rating;
 
             $rec = new stdClass();
             $rec->itemid = $entry->id;
-            $rec->context = $field->df()->context;
+            $rec->context = $field->dlx()->context;
             $rec->component = 'mod_datalynx';
             $rec->ratingarea = 'entry';
             $rec->settings = $rm->get_rating_settings_object($options);
@@ -285,7 +285,7 @@ class renderer extends datalynxfield_renderer {
                     $row->attributes['class'] = 'ratingitemheader';
                     $row->cells[] = $OUTPUT->user_picture(
                         $raterecord,
-                        ['courseid' => $this->field->df()->course->id,
+                        ['courseid' => $this->field->dlx()->course->id,
                         ]
                     );
                     $userrecord = $DB->get_record('user', ['id' => $raterecord->userid,
@@ -424,7 +424,7 @@ class renderer extends datalynxfield_renderer {
             // And we're within the assessable period.
             if (
                 $rating->user_can_rate() ||
-                    has_capability('mod/datalynx:manageratings', $this->field->df()->context)
+                    has_capability('mod/datalynx:manageratings', $this->field->dlx()->context)
             ) {
                 $rateurl = $rating->get_rate_url();
                 $inputs = $rateurl->params();

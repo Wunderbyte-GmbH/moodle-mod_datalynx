@@ -46,10 +46,10 @@ final class get_pdf_view_data_test extends advanced_testcase {
 
         $course = $this->getDataGenerator()->create_course();
         $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
-        $df = new datalynx($instance->id);
+        $dlx = new datalynx($instance->id);
 
         $view = (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'type' => 'pdf',
             'name' => 'Pilot PDF',
             'description' => '',
@@ -68,7 +68,7 @@ final class get_pdf_view_data_test extends advanced_testcase {
         $view->id = (int) $DB->insert_record('datalynx_views', $view);
 
         $field = (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'type' => 'text',
             'name' => 'Title',
             'description' => '',
@@ -86,7 +86,7 @@ final class get_pdf_view_data_test extends advanced_testcase {
         $field->id = (int) $DB->insert_record('datalynx_fields', $field);
 
         $entryid = (int) $DB->insert_record('datalynx_entries', (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'userid' => $USER->id,
             'groupid' => 0,
             'approved' => 1,
@@ -102,7 +102,7 @@ final class get_pdf_view_data_test extends advanced_testcase {
             'content' => 'Hello External PDF',
         ]);
 
-        return [$df, $view, $entryid];
+        return [$dlx, $view, $entryid];
     }
 
     /**
@@ -115,10 +115,10 @@ final class get_pdf_view_data_test extends advanced_testcase {
 
         $course = $this->getDataGenerator()->create_course();
         $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
-        $df = new datalynx($instance->id);
+        $dlx = new datalynx($instance->id);
 
         $view = (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'type' => 'pdf',
             'name' => 'Pilot PDF',
             'description' => '',
@@ -137,7 +137,7 @@ final class get_pdf_view_data_test extends advanced_testcase {
         $view->id = (int) $DB->insert_record('datalynx_views', $view);
 
         $textfield = (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'type' => 'text',
             'name' => 'Title',
             'description' => '',
@@ -155,7 +155,7 @@ final class get_pdf_view_data_test extends advanced_testcase {
         $textfield->id = (int) $DB->insert_record('datalynx_fields', $textfield);
 
         $multiselectfield = (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'type' => 'multiselect',
             'name' => 'Tags',
             'description' => '',
@@ -173,7 +173,7 @@ final class get_pdf_view_data_test extends advanced_testcase {
         $multiselectfield->id = (int) $DB->insert_record('datalynx_fields', $multiselectfield);
 
         $entryone = (int) $DB->insert_record('datalynx_entries', (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'userid' => $USER->id,
             'groupid' => 0,
             'approved' => 1,
@@ -182,7 +182,7 @@ final class get_pdf_view_data_test extends advanced_testcase {
             'timemodified' => time(),
         ]);
         $entrytwo = (int) $DB->insert_record('datalynx_entries', (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'userid' => $USER->id,
             'groupid' => 0,
             'approved' => 1,
@@ -216,7 +216,7 @@ final class get_pdf_view_data_test extends advanced_testcase {
             'content' => '#2#,#3#',
         ]);
 
-        return [$df, $view, $multiselectfield->id, $entryone, $entrytwo];
+        return [$dlx, $view, $multiselectfield->id, $entryone, $entrytwo];
     }
 
     /**
@@ -229,10 +229,10 @@ final class get_pdf_view_data_test extends advanced_testcase {
 
         $course = $this->getDataGenerator()->create_course();
         $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
-        $df = new datalynx($instance->id);
+        $dlx = new datalynx($instance->id);
 
         $view = (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'type' => 'pdf',
             'name' => 'Pilot PDF',
             'description' => '',
@@ -251,7 +251,7 @@ final class get_pdf_view_data_test extends advanced_testcase {
         $view->id = (int) $DB->insert_record('datalynx_views', $view);
 
         $field = (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'type' => 'text',
             'name' => 'Title',
             'description' => '',
@@ -269,7 +269,7 @@ final class get_pdf_view_data_test extends advanced_testcase {
         $field->id = (int) $DB->insert_record('datalynx_fields', $field);
 
         $entryone = (int) $DB->insert_record('datalynx_entries', (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'userid' => $USER->id,
             'groupid' => 0,
             'approved' => 1,
@@ -278,7 +278,7 @@ final class get_pdf_view_data_test extends advanced_testcase {
             'timemodified' => time(),
         ]);
         $entrytwo = (int) $DB->insert_record('datalynx_entries', (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'userid' => $USER->id,
             'groupid' => 0,
             'approved' => 1,
@@ -301,7 +301,7 @@ final class get_pdf_view_data_test extends advanced_testcase {
         ]);
 
         $filterid = (int) $DB->insert_record('datalynx_filters', (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'name' => 'Beta only',
             'description' => '',
             'visible' => 1,
@@ -313,7 +313,7 @@ final class get_pdf_view_data_test extends advanced_testcase {
             'search' => 'Beta',
         ]);
 
-        return [$df, $view, $filterid, $entryone, $entrytwo];
+        return [$dlx, $view, $filterid, $entryone, $entrytwo];
     }
 
     /**
@@ -325,12 +325,12 @@ final class get_pdf_view_data_test extends advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
 
-        [$df, $view, $entryid] = $this->create_pdf_fixture();
+        [$dlx, $view, $entryid] = $this->create_pdf_fixture();
 
-        $result = get_pdf_view_data::execute($df->id(), $view->id);
+        $result = get_pdf_view_data::execute($dlx->id(), $view->id);
         $result = external_api::clean_returnvalue(get_pdf_view_data::execute_returns(), $result);
 
-        $this->assertSame((int) $df->id(), $result['datalynxid']);
+        $this->assertSame((int) $dlx->id(), $result['datalynxid']);
         $this->assertSame($view->id, $result['viewid']);
         $this->assertSame('pdf', $result['viewtype']);
         $this->assertTrue($result['hasentries']);
@@ -349,14 +349,14 @@ final class get_pdf_view_data_test extends advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
 
-        [$df, $view, $fieldid, $entryone, $entrytwo] = $this->create_pdf_multiselect_fixture();
+        [$dlx, $view, $fieldid, $entryone, $entrytwo] = $this->create_pdf_multiselect_fixture();
         $customsearch = serialize([
             $fieldid => [
                 'AND' => [['', 'ANY_OF', ['2']]],
             ],
         ]);
 
-        $result = get_pdf_view_data::execute($df->id(), $view->id, 0, 0, 0, '', '', '', '', 0, '', $customsearch);
+        $result = get_pdf_view_data::execute($dlx->id(), $view->id, 0, 0, 0, '', '', '', '', 0, '', $customsearch);
         $result = external_api::clean_returnvalue(get_pdf_view_data::execute_returns(), $result);
 
         $this->assertCount(1, $result['groups'][0]['entries']);
@@ -374,9 +374,9 @@ final class get_pdf_view_data_test extends advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
 
-        [$df, $view, $filterid, $entryone, $entrytwo] = $this->create_pdf_filter_fixture();
+        [$dlx, $view, $filterid, $entryone, $entrytwo] = $this->create_pdf_filter_fixture();
 
-        $result = get_pdf_view_data::execute($df->id(), $view->id, $filterid);
+        $result = get_pdf_view_data::execute($dlx->id(), $view->id, $filterid);
         $result = external_api::clean_returnvalue(get_pdf_view_data::execute_returns(), $result);
 
         $this->assertCount(1, $result['groups'][0]['entries']);

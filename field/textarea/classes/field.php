@@ -52,18 +52,18 @@ class field extends datalynxfield_base {
     /**
      * Constructor.
      *
-     * @param int|object $df Datalynx ID or object
+     * @param int|object $dlx Datalynx ID or object
      * @param int|object $field Field ID or object
      */
-    public function __construct($df = 0, $field = 0) {
-        parent::__construct($df, $field);
+    public function __construct($dlx = 0, $field = 0) {
+        parent::__construct($dlx, $field);
 
         $trust = !empty($this->field->param4) ? $this->field->param4 : 0;
         $maxbytes = !empty($this->field->param5) ? $this->field->param5 : 0;
         $maxfiles = !empty($this->field->param6) ? $this->field->param6 : -1;
 
         $this->editoroptions = [];
-        $this->editoroptions['context'] = $this->df->context;
+        $this->editoroptions['context'] = $this->dlx->context;
         $this->editoroptions['trusttext'] = $trust;
         $this->editoroptions['maxbytes'] = $maxbytes;
         $this->editoroptions['maxfiles'] = $maxfiles;

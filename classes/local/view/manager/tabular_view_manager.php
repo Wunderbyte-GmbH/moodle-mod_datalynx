@@ -41,8 +41,8 @@ class tabular_view_manager {
      * @return array
      */
     public function get_browse_payload(int $datalynxid, int $viewid, array $filteroptions = []): array {
-        $datalynx = new datalynx($datalynxid);
-        $viewrecords = $datalynx->get_view_records(true);
+        $dlx = new datalynx($datalynxid);
+        $viewrecords = $dlx->get_view_records(true);
 
         if (empty($viewrecords[$viewid])) {
             throw new coding_exception('Invalid view id for tabular browse payload.');
@@ -53,22 +53,22 @@ class tabular_view_manager {
             throw new coding_exception('Tabular browse payload manager only supports Tabular views.');
         }
 
-        $view = $datalynx->get_view($viewrecord->type, $viewrecord, false);
+        $view = $dlx->get_view($viewrecord->type, $viewrecord, false);
         if (!empty($filteroptions)) {
             $view->set_filter($filteroptions, $view->is_forcing_filter());
         }
 
-        $allfields = $view->get_dl()->get_fields();
+        $allfields = $view->get_dlx()->get_fields();
         $fields = $view->remove_duplicates($allfields);
         $view->get_filter()->contentfields = array_keys($fields);
 
-        $entries = new datalynx_entries($datalynx, $view->get_filter());
+        $entries = new datalynx_entries($dlx, $view->get_filter());
         $entries->set_content();
         $entryrecords = $entries->entries();
         $showentryactions = $this->has_manageable_entries($view, $entryrecords);
 
         $payload = [
-            'datalynxid' => $datalynx->id(),
+            'datalynxid' => $dlx->id(),
             'viewid' => (int) $viewrecord->id,
             'viewname' => format_string($view->name()),
             'viewtype' => $view->type(),
@@ -103,7 +103,7 @@ class tabular_view_manager {
      */
     protected function has_manageable_entries(\mod_datalynx\local\view\base $view, array $entryrecords): bool {
         foreach ($entryrecords as $entry) {
-            if ($view->get_dl()->user_can_manage_entry($entry)) {
+            if ($view->get_dlx()->user_can_manage_entry($entry)) {
                 return true;
             }
         }
@@ -179,7 +179,7 @@ class tabular_view_manager {
         array $fields,
         array $entryrecords
     ): array {
-        $entryfield = new entry_field($view->get_dl());
+        $entryfield = new entry_field($view->get_dlx());
         $approvefield = $allfields[approve_field::_APPROVED] ?? null;
         $authorpicturefield = $allfields[entryauthor_field::_USERPICTURE] ?? null;
         $authornamefield = $allfields[entryauthor_field::_USERNAME] ?? null;
@@ -187,7 +187,7 @@ class tabular_view_manager {
 
         foreach ($entryrecords as $entry) {
             $entry->baseurl = $view->get_baseurl();
-            $manageable = $view->get_dl()->user_can_manage_entry($entry);
+            $manageable = $view->get_dlx()->user_can_manage_entry($entry);
             $cells = [];
 
             $cells[] = [

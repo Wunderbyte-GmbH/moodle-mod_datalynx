@@ -31,23 +31,23 @@ $urlparams->d = optional_param('d', 0, PARAM_INT); // Datalynx id.
 $urlparams->id = optional_param('id', 0, PARAM_INT); // Course module id.
 
 // Set a datalynx object.
-$df = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
+$dlx = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
 
-require_login($df->data->course, false, $df->cm);
+require_login($dlx->data->course, false, $dlx->cm);
 
-require_capability('mod/datalynx:viewstatistics', $df->context);
+require_capability('mod/datalynx:viewstatistics', $dlx->context);
 
-$df->set_page('statistics/index', ['modjs' => true, 'urlparams' => $urlparams]);
+$dlx->set_page('statistics/index', ['modjs' => true, 'urlparams' => $urlparams]);
 
 // Activate navigation node.
 navigation_node::override_active_url(
-    new moodle_url('/mod/datalynx/statistics/index.php', ['id' => $df->cm->id])
+    new moodle_url('/mod/datalynx/statistics/index.php', ['id' => $dlx->cm->id])
 );
 
 // Print header.
-$df->print_header(['tab' => 'statistics', 'urlparams' => $urlparams]);
+$dlx->print_header(['tab' => 'statistics', 'urlparams' => $urlparams]);
 
-$stats = new datalynx_statistics_class($df);
+$stats = new datalynx_statistics_class($dlx);
 
 $mform = $stats->get_form();
 if ($data = $mform->get_data()) {
@@ -73,6 +73,6 @@ $mform->display();
 
 $stats->print_statistics($data);
 
-$df->print_footer();
+$dlx->print_footer();
 
 die();

@@ -122,7 +122,7 @@ class datalynxfield_layout {
      *
      * @var datalynx related datalynx instance object
      */
-    private $datalynx;
+    private $dlx;
 
     /**
      *
@@ -141,10 +141,10 @@ class datalynxfield_layout {
         $this->description = $record->description;
         $this->dataid = $record->dataid;
 
-        if (isset($record->datalynx)) {
-            $this->datalynx = $record->datalynx;
+        if (isset($record->dlx)) {
+            $this->dlx = $record->dlx;
         } else {
-            $this->datalynx = new mod_datalynx\datalynx($record->dataid);
+            $this->dlx = new mod_datalynx\datalynx($record->dataid);
         }
 
         $this->notvisibletemplate = $record->notvisibletemplate;
@@ -200,13 +200,13 @@ class datalynxfield_layout {
     /**
      * Static constructor method for default datalynx_field_renderer
      *
-     * @param datalynx $datalynx
+     * @param datalynx $dlx
      * @return datalynxfield_layout
      */
-    public static function get_default_renderer(mod_datalynx\datalynx $datalynx) {
+    public static function get_default_renderer(mod_datalynx\datalynx $dlx) {
         $record = (object) self::$default;
-        $record->datalynx = $datalynx;
-        $record->dataid = $datalynx->id();
+        $record->dlx = $dlx;
+        $record->dataid = $dlx->id();
         return new datalynxfield_layout($record);
     }
 

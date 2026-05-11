@@ -264,8 +264,8 @@ function datalynx_reset_gradebook($courseid, $type = '') {
              WHERE m.name='datalynx' AND m.id=cm.module AND cm.instance=d.id AND d.course=?";
 
     if ($datalynxs = $DB->get_records_sql($sql, [$courseid])) {
-        foreach ($datalynxs as $datalynx) {
-            datalynx_grade_item_update($datalynx, 'reset');
+        foreach ($datalynxs as $dlx) {
+            datalynx_grade_item_update($dlx, 'reset');
         }
     }
 }
@@ -566,19 +566,19 @@ function mod_datalynx_pluginfile($course, $cm, $context, $filearea, $args, $forc
         if (!$entry) {
             return false;
         }
-        $datalynx = $DB->get_record('datalynx', ['id' => $field->dataid]);
-        if (!$datalynx) {
+        $dlx = $DB->get_record('datalynx', ['id' => $field->dataid]);
+        if (!$dlx) {
             return false;
         }
 
-        if ($datalynx->id != $cm->instance) {
+        if ($dlx->id != $cm->instance) {
             // Hacker attempt - context does not match the contentid.
             return false;
         }
 
         // Check if approved.
         if (
-            $datalynx->approval && !has_capability('mod/datalynx:approve', $context) &&
+            $dlx->approval && !has_capability('mod/datalynx:approve', $context) &&
                 !$entry->approved && $USER->id != $entry->userid
         ) {
             return false;
@@ -1097,7 +1097,7 @@ function datalynx_rating_validate($params) {
 
     require_once(dirname(__FILE__) . "/classes/datalynx.php");
 
-    $df = new mod_datalynx\datalynx(0, $params['context']->instanceid);
+    $dlx = new mod_datalynx\datalynx(0, $params['context']->instanceid);
 
     // Check the component is mod_datalynx.
     if ($params['component'] != 'mod_datalynx') {
@@ -1113,7 +1113,7 @@ function datalynx_rating_validate($params) {
     }
 
     // If the supplied context doesnt match the item's context.
-    if ($params['context']->id != $df->context->id) {
+    if ($params['context']->id != $dlx->context->id) {
         throw new rating_exception('invalidcontext');
     }
 
@@ -1122,7 +1122,7 @@ function datalynx_rating_validate($params) {
         throw new rating_exception('invalidratingarea');
     }
 
-    $data = $df->data;
+    $data = $dlx->data;
 
     // Vaildate activity scale and rating range.
     if ($params['ratingarea'] == 'activity') {
@@ -1195,8 +1195,8 @@ function datalynx_rating_validate($params) {
     }
 
     // Make sure groups allow this user to see the item they're rating.
-    $groupid = $df->currentgroup;
-    if ($groupid > 0 && groups_get_activity_groupmode($df->cm, $df->course)) {
+    $groupid = $dlx->currentgroup;
+    if ($groupid > 0 && groups_get_activity_groupmode($dlx->cm, $dlx->course)) {
         // Groups are being used.
         if (!groups_group_exists($groupid)) {
             // Can't find group.
@@ -1205,7 +1205,7 @@ function datalynx_rating_validate($params) {
 
         if (
             !groups_is_member($groupid) &&
-                !has_capability('moodle/site:accessallgroups', $df->context)
+                !has_capability('moodle/site:accessallgroups', $dlx->context)
         ) {
             // Do not allow rating of posts from other groups when in SEPARATEGROUPS or.
             // VISIBLEGROUPS.
@@ -1387,18 +1387,18 @@ function datalynx_grade_item_delete($data) {
 function datalynx_get_completion_state($course, $cm, $userid, $type) {
     global $DB;
 
-    if (!($datalynx = $DB->get_record('datalynx', ['id' => $cm->instance]))) {
+    if (!($dlx = $DB->get_record('datalynx', ['id' => $cm->instance]))) {
         throw new Exception("Can't find datalynx {$cm->instance}");
     }
 
-    if (!isset($datalynx->completionentries)) {
+    if (!isset($dlx->completionentries)) {
         throw new Exception(
             "'completionentries' field does not exist in 'datalynx' table! Upgrade your database!"
         );
     }
 
-    $params = ['userid' => $userid, 'dataid' => $datalynx->id];
-    if ($datalynx->approval) {
+    $params = ['userid' => $userid, 'dataid' => $dlx->id];
+    if ($dlx->approval) {
         $sql = "SELECT COUNT(1)
               FROM {datalynx_entries} de
              WHERE de.userid = :userid
@@ -1412,7 +1412,7 @@ function datalynx_get_completion_state($course, $cm, $userid, $type) {
     }
     $count = $DB->get_field_sql($sql, $params);
 
-    return $count >= $datalynx->completionentries;
+    return $count >= $dlx->completionentries;
 }
 
 /**
@@ -1523,17 +1523,17 @@ function mod_datalynx_get_tagged_entries($tag, $exclusivemode = false, $fromctx 
                 if ($taggeditem->courseid == $courseid) {
                     $accessible = false;
                     if (($cm = $modinfo->get_cm($taggeditem->cmid)) && $cm->uservisible) {
-                        $datalynx = (object) ['id' => $taggeditem->datalynxid,
+                        $dlx = (object) ['id' => $taggeditem->datalynxid,
                                 'course' => $cm->course,
                         ];
-                        $datalynx = new mod_datalynx\datalynx($taggeditem->datalynxid);
-                        if (!$datalynx->user_can_view_all_entries()) {
+                        $dlx = new mod_datalynx\datalynx($taggeditem->datalynxid);
+                        if (!$dlx->user_can_view_all_entries()) {
                             if ($taggeditem->userid === $USER->id) {
                                 $accessible = true;
                             }
                             if (
-                                $datalynx->data->approval &&
-                                    !has_capability('mod/datalynx:manageentries', $datalynx->context)
+                                $dlx->data->approval &&
+                                    !has_capability('mod/datalynx:manageentries', $dlx->context)
                             ) {
                                 if (isloggedin() && $taggeditem->approved == 1) {
                                     $accessible = true;

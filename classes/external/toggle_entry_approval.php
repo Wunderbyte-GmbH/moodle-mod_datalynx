@@ -74,8 +74,8 @@ class toggle_entry_approval extends external_api {
         require_login($cm->course, true, $cm);
         require_capability('mod/datalynx:approve', $context);
 
-        $df = new datalynx($params['d']);
-        $entries = new datalynx_entries($df);
+        $dlx = new datalynx($params['d']);
+        $entries = new datalynx_entries($dlx);
 
         return $entries->toggle_entry_approval($params['entryid'], $params['viewid'], $params['action']);
     }

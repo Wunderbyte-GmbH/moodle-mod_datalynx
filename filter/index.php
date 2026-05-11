@@ -50,19 +50,19 @@ $urlparams->update = optional_param('update', 0, PARAM_INT); // Update filter.
 $urlparams->cancel = optional_param('cancel', 0, PARAM_BOOL);
 
 // Set a datalynx object.
-$df = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
-require_capability('mod/datalynx:managetemplates', $df->context);
+$dlx = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
+require_capability('mod/datalynx:managetemplates', $dlx->context);
 
-require_login($df->data->course, false, $df->cm);
+require_login($dlx->data->course, false, $dlx->cm);
 
-$df->set_page('filter/index', ['modjs' => true, 'urlparams' => $urlparams]);
+$dlx->set_page('filter/index', ['modjs' => true, 'urlparams' => $urlparams]);
 
 // Activate navigation node.
 navigation_node::override_active_url(
-    new moodle_url('/mod/datalynx/filter/index.php', ['id' => $df->cm->id])
+    new moodle_url('/mod/datalynx/filter/index.php', ['id' => $dlx->cm->id])
 );
 
-$fm = $df->get_filter_manager();
+$fm = $dlx->get_filter_manager();
 
 // DATA PROCESSING.
 if ($urlparams->update && confirm_sesskey()) { // Add/update a new filter.
@@ -79,9 +79,9 @@ if ($urlparams->update && confirm_sesskey()) { // Add/update a new filter.
             } else {
                 if ($urlparams->default && confirm_sesskey()) { // Set filter to default.
                     if ($urlparams->default == -1) {
-                        $df->set_default_filter(); // Reset.
+                        $dlx->set_default_filter(); // Reset.
                     } else {
-                        $df->set_default_filter($urlparams->default);
+                        $dlx->set_default_filter($urlparams->default);
                     }
                 }
             }
@@ -106,12 +106,12 @@ if ($urlparams->new && confirm_sesskey()) {
     } else {
         // Any notifications?
         if (!$filters = $fm->get_filters(null, false, true)) {
-            $df->notifications['bad'][] = get_string('filtersnoneindatalynx', 'datalynx'); // Nothing in.
+            $dlx->notifications['bad'][] = get_string('filtersnoneindatalynx', 'datalynx'); // Nothing in.
             // Datalynx.
         }
 
         // Print header.
-        $df->print_header(['tab' => 'filters', 'urlparams' => $urlparams]);
+        $dlx->print_header(['tab' => 'filters', 'urlparams' => $urlparams]);
 
         // Print the filter add link.
         $fm->print_add_filter();
@@ -123,4 +123,4 @@ if ($urlparams->new && confirm_sesskey()) {
     }
 }
 
-$df->print_footer();
+$dlx->print_footer();

@@ -50,11 +50,11 @@ class field extends datalynxfield_base {
     /**
      * Field constructor.
      *
-     * @param int|object $df
+     * @param int|object $dlx
      * @param int|object $field
      */
-    public function __construct($df = 0, $field = 0) {
-        parent::__construct($df, $field);
+    public function __construct($dlx = 0, $field = 0) {
+        parent::__construct($dlx, $field);
 
         $this->course = $this->field->param1;
         $this->group = $this->field->param2;

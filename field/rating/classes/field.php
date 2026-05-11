@@ -170,7 +170,7 @@ class field extends datalynxfield_no_content {
         global $USER;
 
         $params = [];
-        $params['rcontextid'] = $this->df()->context->id;
+        $params['rcontextid'] = $this->dlx()->context->id;
         $params['ruserid'] = $USER->id;
         $params['rcomponent'] = 'mod_datalynx';
         $params['ratingarea'] = 'entry';

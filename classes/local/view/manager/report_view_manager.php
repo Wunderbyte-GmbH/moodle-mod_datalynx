@@ -36,8 +36,8 @@ class report_view_manager {
      * @return array
      */
     public function get_browse_payload(int $datalynxid, int $viewid, array $filteroptions = []): array {
-        $datalynx = new datalynx($datalynxid);
-        $viewrecords = $datalynx->get_view_records(true);
+        $dlx = new datalynx($datalynxid);
+        $viewrecords = $dlx->get_view_records(true);
 
         if (empty($viewrecords[$viewid])) {
             throw new coding_exception('Invalid view id for report browse payload.');
@@ -49,7 +49,7 @@ class report_view_manager {
         }
 
         /** @var \datalynxview_report\view $view */
-        $view = $datalynx->get_view($viewrecord->type, $viewrecord, false);
+        $view = $dlx->get_view($viewrecord->type, $viewrecord, false);
         if (!empty($filteroptions)) {
             $view->set_filter($filteroptions, $view->is_forcing_filter());
         }

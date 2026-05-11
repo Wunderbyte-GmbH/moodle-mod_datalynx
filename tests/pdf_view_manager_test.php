@@ -38,10 +38,10 @@ final class pdf_view_manager_test extends advanced_testcase {
 
         $course = $this->getDataGenerator()->create_course();
         $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
-        $df = new datalynx($instance->id);
+        $dlx = new datalynx($instance->id);
 
         $view = (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'type' => 'pdf',
             'name' => 'Pilot PDF',
             'description' => '',
@@ -60,7 +60,7 @@ final class pdf_view_manager_test extends advanced_testcase {
         $view->id = (int) $DB->insert_record('datalynx_views', $view);
 
         $field = (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'type' => 'text',
             'name' => 'Title',
             'description' => '',
@@ -78,7 +78,7 @@ final class pdf_view_manager_test extends advanced_testcase {
         $field->id = (int) $DB->insert_record('datalynx_fields', $field);
 
         $entryid = (int) $DB->insert_record('datalynx_entries', (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'userid' => $USER->id,
             'groupid' => 0,
             'approved' => 1,
@@ -94,7 +94,7 @@ final class pdf_view_manager_test extends advanced_testcase {
             'content' => 'Hello PDF',
         ]);
 
-        return [$df, $view, $entryid];
+        return [$dlx, $view, $entryid];
     }
 
     /**
@@ -106,12 +106,12 @@ final class pdf_view_manager_test extends advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
 
-        [$df, $view, $entryid] = $this->create_pdf_fixture();
+        [$dlx, $view, $entryid] = $this->create_pdf_fixture();
 
         $manager = new pdf_view_manager();
-        $payload = $manager->get_browse_payload($df->id(), $view->id);
+        $payload = $manager->get_browse_payload($dlx->id(), $view->id);
 
-        $this->assertSame((int) $df->id(), $payload['datalynxid']);
+        $this->assertSame((int) $dlx->id(), $payload['datalynxid']);
         $this->assertSame($view->id, $payload['viewid']);
         $this->assertTrue($payload['hasentries']);
         $this->assertCount(1, $payload['groups']);
