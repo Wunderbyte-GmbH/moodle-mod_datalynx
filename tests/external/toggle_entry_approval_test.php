@@ -117,6 +117,9 @@ final class toggle_entry_approval_test extends advanced_testcase {
 
         $this->assertTrue($approvedresult['approved']);
         $this->assertSame($entryid, $approvedresult['entryid']);
+        $this->assertStringContainsString('data-entryid="' . $entryid . '"', $approvedresult['controlhtml']);
+        $this->assertStringContainsString('data-approved="1"', $approvedresult['controlhtml']);
+        $this->assertStringContainsString('aria-checked="true"', $approvedresult['controlhtml']);
         $this->assertSame(1, (int) $DB->get_field('datalynx_entries', 'approved', ['id' => $entryid]));
 
         $disapprovedresult = toggle_entry_approval::execute($instance->id, $view->id, $entryid, 'toggle-approval');
@@ -124,6 +127,9 @@ final class toggle_entry_approval_test extends advanced_testcase {
 
         $this->assertFalse($disapprovedresult['approved']);
         $this->assertSame($entryid, $disapprovedresult['entryid']);
+        $this->assertStringContainsString('data-entryid="' . $entryid . '"', $disapprovedresult['controlhtml']);
+        $this->assertStringContainsString('data-approved="0"', $disapprovedresult['controlhtml']);
+        $this->assertStringContainsString('aria-checked="false"', $disapprovedresult['controlhtml']);
         $this->assertSame(0, (int) $DB->get_field('datalynx_entries', 'approved', ['id' => $entryid]));
     }
 }
