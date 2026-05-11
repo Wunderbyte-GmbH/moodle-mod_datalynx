@@ -43,12 +43,12 @@ final class toggle_entry_approval_test extends advanced_testcase {
      * @param datalynx $df
      * @return stdClass
      */
-    private function create_view_record(datalynx $df): stdClass {
+    private function create_view_record(datalynx $df, string $type = 'tabular', string $param2 = ''): stdClass {
         global $DB;
 
         $view = (object) [
             'dataid' => $df->id(),
-            'type' => 'tabular',
+            'type' => $type,
             'name' => 'Approval view',
             'description' => '',
             'visible' => 7,
@@ -58,7 +58,7 @@ final class toggle_entry_approval_test extends advanced_testcase {
             'param5' => 0,
             'param10' => 0,
             'section' => '',
-            'param2' => '',
+            'param2' => $param2,
         ];
         $view->id = $DB->insert_record('datalynx_views', $view);
 
