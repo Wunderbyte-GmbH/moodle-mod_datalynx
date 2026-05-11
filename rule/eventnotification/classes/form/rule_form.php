@@ -68,7 +68,7 @@ class rule_form extends base_rule_form {
             'autocomplete',
             'roles',
             get_string('roles'),
-            $this->dl->get_datalynx_permission_names(true),
+            $this->dlx->get_datalynx_permission_names(true),
             $options
         );
         $grp[] = &$mform->createElement('static', '', '', $br);
@@ -103,7 +103,7 @@ class rule_form extends base_rule_form {
         $mform->addElement('header', 'settingshdr', get_string('linksettings', 'datalynx'));
         $mform->addElement('static', '', get_string('targetviewforroles', 'datalynx'));
 
-        foreach ($this->dl->get_datalynx_permission_names(true) as $permissionid => $permissionname) {
+        foreach ($this->dlx->get_datalynx_permission_names(true) as $permissionid => $permissionname) {
             $views = $this->get_views_visible_to_datalynx_permission($permissionid);
             if (!empty($views)) {
                 $mform->addElement('select', "param4[$permissionid]", $permissionname, $views);
@@ -119,7 +119,7 @@ class rule_form extends base_rule_form {
 
         // Content to be included.
         $mform->addElement('header', 'message', get_string('messagecontent', 'datalynxrule_eventnotification'));
-        $dlfields = $this->dl->get_fields();
+        $dlfields = $this->dlx->get_fields();
         $fieldmenu = [];
         foreach ($dlfields as $fieldid => $field) {
             if ($field->type == 'text' || $field->type == 'editor' || $field->type == 'textarea') {
@@ -161,9 +161,9 @@ class rule_form extends base_rule_form {
         $mform = &$this->_form;
         $data = $this->get_submitted_data();
 
-        foreach (array_keys($this->dl->get_datalynx_permission_names(true)) as $permissionid) {
+        foreach (array_keys($this->dlx->get_datalynx_permission_names(true)) as $permissionid) {
             $views = $this->get_views_visible_to_datalynx_permission($permissionid);
-            $defaultview = $this->dl->get_default_view_id();
+            $defaultview = $this->dlx->get_default_view_id();
             if (
                 isset($data) && isset($data->param4[$permissionid]) && $defaultview &&
                     in_array($defaultview, array_keys($views))
@@ -186,14 +186,14 @@ class rule_form extends base_rule_form {
                       FROM {datalynx_views}
                      WHERE dataid = :dataid
                        AND type <> :internaltype";
-            return $DB->get_records_sql_menu($sql, ['dataid' => $this->dl->id(), 'internaltype' => datalynx::INTERNAL_VIEW_EMAIL]);
+            return $DB->get_records_sql_menu($sql, ['dataid' => $this->dlx->id(), 'internaltype' => datalynx::INTERNAL_VIEW_EMAIL]);
         } else {
             $sql = "SELECT id, name
                       FROM {datalynx_views}
                      WHERE dataid = :dataid
                        AND type <> :internaltype
                        AND visible & :permissionid <> 0";
-            return $DB->get_records_sql_menu($sql, ['dataid' => $this->dl->id(), 'internaltype' => datalynx::INTERNAL_VIEW_EMAIL,
+            return $DB->get_records_sql_menu($sql, ['dataid' => $this->dlx->id(), 'internaltype' => datalynx::INTERNAL_VIEW_EMAIL,
                     'permissionid' => $permissionid]);
         }
     }
@@ -205,7 +205,7 @@ class rule_form extends base_rule_form {
      */
     private function get_email_template_menu(): array {
         $views = [0 => get_string('emailtemplatenone', 'datalynxrule_eventnotification')];
-        foreach ($this->dl->get_all_views() as $view) {
+        foreach ($this->dlx->get_all_views() as $view) {
             if ($view->type === datalynx::INTERNAL_VIEW_EMAIL) {
                 $views[$view->id] = $view->name;
             }
@@ -232,7 +232,7 @@ class rule_form extends base_rule_form {
                   FROM {datalynx_fields}
                  WHERE dataid = :dataid
                    AND " . $DB->sql_like('type', ':type');
-        $params = ['dataid' => $this->dl->id(), 'type' => 'teammemberselect'];
+        $params = ['dataid' => $this->dlx->id(), 'type' => 'teammemberselect'];
         return $DB->get_records_sql_menu($sql, $params);
     }
 
@@ -243,7 +243,7 @@ class rule_form extends base_rule_form {
      */
     protected function menu_roles_used_in_context(): array {
         $roles = [];
-        foreach (get_roles_used_in_context($this->dl->context) as $roleid => $role) {
+        foreach (get_roles_used_in_context($this->dlx->context) as $roleid => $role) {
             $roles[$roleid] = $role->coursealias ? $role->coursealias : ($role->name ? $role->name : $role->shortname);
         }
         return $roles;

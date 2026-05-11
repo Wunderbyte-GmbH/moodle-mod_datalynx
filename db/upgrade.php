@@ -265,15 +265,15 @@ function xmldb_datalynx_upgrade($oldversion) {
         // Move content of datalynx->defaultsort to a new default filter.
         if ($datalynxs = $DB->get_records('datalynx')) {
             $strdefault = get_string('default');
-            foreach ($datalynxs as $dfid => $datalynx) {
-                if (!empty($datalynx->defaultsort)) {
+            foreach ($datalynxs as $dfid => $dlx) {
+                if (!empty($dlx->defaultsort)) {
                     // Add a new 'Default filter' filter.
                     $filter = new stdClass();
                     $filter->dataid = $dfid;
                     $filter->name = $strdefault . '_0';
                     $filter->description = '';
                     $filter->visible = 0;
-                    $filter->customsort = $datalynx->defaultsort;
+                    $filter->customsort = $dlx->defaultsort;
 
                     if ($filterid = $DB->insert_record('datalynx_filters', $filter)) {
                         $DB->set_field('datalynx', 'defaultfilter', $filterid, ['id' => $dfid]);
@@ -339,8 +339,8 @@ function xmldb_datalynx_upgrade($oldversion) {
         $fs = get_file_storage();
         // Move presets from course_packages to course_presets.
         if ($datalynxs = $DB->get_records('datalynx')) {
-            foreach ($datalynxs as $df) {
-                $context = context_course::instance($df->course);
+            foreach ($datalynxs as $dlx) {
+                $context = context_course::instance($dlx->course);
                 if ($presets = $fs->get_area_files($context->id, 'mod_datalynx', 'course_packages')) {
                     $filerecord = new stdClass();
                     $filerecord->contextid = $context->id;

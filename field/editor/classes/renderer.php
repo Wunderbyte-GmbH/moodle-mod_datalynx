@@ -59,7 +59,7 @@ class renderer extends datalynxfield_renderer {
             $data,
             $fieldname,
             $field->editor_options(),
-            $field->df()->context,
+            $field->dlx()->context,
             'mod_datalynx',
             'content',
             $contentid
@@ -92,7 +92,7 @@ class renderer extends datalynxfield_renderer {
             $text = file_rewrite_pluginfile_urls(
                 $text,
                 'pluginfile.php',
-                $field->df()->context->id,
+                $field->dlx()->context->id,
                 'mod_datalynx',
                 'content',
                 $contentid

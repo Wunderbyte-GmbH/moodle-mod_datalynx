@@ -60,7 +60,7 @@ class datalynxfield_behavior {
     /**
      * @var datalynx The related datalynx instance object.
      */
-    private datalynx $datalynx;
+    private datalynx $dlx;
 
     /**
      * @var stdClass The db record for this behavior.
@@ -81,10 +81,10 @@ class datalynxfield_behavior {
         $this->editableby = isset($record->editableby) ? unserialize($record->editableby) : [];
         $this->required = isset($record->required) ? $record->required : false;
 
-        if (isset($record->datalynx)) {
-            $this->datalynx = $record->datalynx;
+        if (isset($record->dlx)) {
+            $this->dlx = $record->dlx;
         } else {
-            $this->datalynx = new mod_datalynx\datalynx($record->dataid);
+            $this->dlx = new mod_datalynx\datalynx($record->dataid);
         }
 
         $this->record = $record;
@@ -141,18 +141,18 @@ class datalynxfield_behavior {
     /**
      * The default behavior used in any instance without user settings applied.
      *
-     * @param datalynx $datalynx
+     * @param datalynx $dlx
      * @return datalynxfield_behavior
      * @throws coding_exception
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public static function get_default_behavior(mod_datalynx\datalynx $datalynx) {
+    public static function get_default_behavior(mod_datalynx\datalynx $dlx) {
         $record = (object) self::$default;
         $record->visibleto = serialize($record->visibleto);
         $record->editableby = serialize($record->editableby);
-        $record->datalynx = $datalynx;
-        $record->dataid = $datalynx->id();
+        $record->dlx = $dlx;
+        $record->dataid = $dlx->id();
         return new datalynxfield_behavior($record);
     }
 
@@ -199,7 +199,7 @@ class datalynxfield_behavior {
             return true;
         }
 
-        $permissions = $this->datalynx->get_user_datalynx_permissions($USER->id, 'view');
+        $permissions = $this->dlx->get_user_datalynx_permissions($USER->id, 'view');
         $visible = [];
         if (isset($this->visibleto['permissions'])) {
             $visible = array_values($this->visibleto['permissions']);
@@ -248,7 +248,7 @@ class datalynxfield_behavior {
     public function is_editable_by_user($user = null, bool $isentryauthor = false, bool $ismentor = false) {
         global $USER;
         $user = $user ? $user : $USER;
-        $permissions = $this->datalynx->get_user_datalynx_permissions($user->id, 'edit');
+        $permissions = $this->dlx->get_user_datalynx_permissions($user->id, 'edit');
         return (array_intersect($permissions, $this->editableby)) ||
                 ($isentryauthor && in_array(mod_datalynx\datalynx::PERMISSION_AUTHOR, $this->editableby)) ||
                 ($ismentor && in_array(mod_datalynx\datalynx::PERMISSION_MENTOR, $this->editableby)) ||

@@ -62,7 +62,7 @@ class renderer extends datalynxfield_renderer {
 
         file_prepare_draft_area(
             $draftitemid,
-            $field->df()->context->id,
+            $field->dlx()->context->id,
             'mod_datalynx',
             'content',
             $contentid,
@@ -107,7 +107,7 @@ class renderer extends datalynxfield_renderer {
 
         // Contentid is stored in itemid for lookup. This is usable with fieldgroups.
         $files = $fs->get_area_files(
-            $field->df()->context->id,
+            $field->dlx()->context->id,
             'mod_datalynx',
             'content',
             $contentid
@@ -119,7 +119,7 @@ class renderer extends datalynxfield_renderer {
         $strfiles = [];
         foreach ($files as $file) {
             if (!$file->is_directory()) {
-                $path = "/{$field->df()->context->id}/mod_datalynx/content/$contentid";
+                $path = "/{$field->dlx()->context->id}/mod_datalynx/content/$contentid";
                 // ToDo: Remove or implement altname.
                 $altname = "";
                 $strfiles[] = $this->display_file($file, $entryid, $path, $altname, $options);

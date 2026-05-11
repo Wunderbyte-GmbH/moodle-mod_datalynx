@@ -37,7 +37,7 @@ class datalynxfield_form extends moodleform {
     protected $field = null;
 
     /** @var mod_datalynx\datalynx The datalynx object. */
-    protected $dl = null;
+    protected $dlx = null;
 
     /**
      * Constructor.
@@ -60,7 +60,7 @@ class datalynxfield_form extends moodleform {
         $editable = true
     ) {
         $this->field = $field;
-        $this->dl = $field->df();
+        $this->dlx = $field->dlx();
 
         parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
     }
@@ -125,7 +125,7 @@ class datalynxfield_form extends moodleform {
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
-        if ($this->dl->name_exists('fields', $data['name'], $this->field->id())) {
+        if ($this->dlx->name_exists('fields', $data['name'], $this->field->id())) {
             $errors['name'] = get_string('invalidname', 'datalynx', get_string('field', 'datalynx'));
         }
         return $errors;
@@ -155,13 +155,13 @@ class datalynxfield_form extends moodleform {
         $datalynxs = [];
         if ($dlids = $DB->get_fieldset_sql($sql)) {
             foreach ($dlids as $dlid) {
-                if ($dlid != $this->dl->id()) {
-                    $dl = new mod_datalynx\datalynx($dlid);
+                if ($dlid != $this->dlx->id()) {
+                    $dlx = new mod_datalynx\datalynx($dlid);
                     // Only add if user can manage dl templates.
-                    if (has_capability('mod/datalynx:managetemplates', $dl->context)) {
+                    if (has_capability('mod/datalynx:managetemplates', $dlx->context)) {
                         $dlinfo = new stdClass();
-                        $dlinfo->courseshortname = $dl->course->shortname;
-                        $dlinfo->name = $dl->name();
+                        $dlinfo->courseshortname = $dlx->course->shortname;
+                        $dlinfo->name = $dlx->name();
                         $datalynxs[$dlid] = $dlinfo;
                     }
                 }
@@ -170,16 +170,16 @@ class datalynxfield_form extends moodleform {
 
         // Autocompletion with content of other textfield from the same or other datalynx instance.
         // Select Datalynx instance (to be stored in param9).
-        if ($datalynxs || $this->dl->id() > 0) {
+        if ($datalynxs || $this->dlx->id() > 0) {
             $dfmenu = ['' => [0 => get_string('noautocompletion', 'datalynx')]];
-            $dfmenu[''][$this->dl->id()] = get_string('thisdatalynx', 'datalynx') .
-                    " (" . strip_tags(format_string($this->dl->name(), true)) . ")";
-            foreach ($datalynxs as $dlid => $dl) {
-                if (!isset($dfmenu[$dl->courseshortname])) {
-                    $dfmenu[$dl->courseshortname] = [];
+            $dfmenu[''][$this->dlx->id()] = get_string('thisdatalynx', 'datalynx') .
+                    " (" . strip_tags(format_string($this->dlx->name(), true)) . ")";
+            foreach ($datalynxs as $dlid => $dlx) {
+                if (!isset($dfmenu[$dlx->courseshortname])) {
+                    $dfmenu[$dlx->courseshortname] = [];
                 }
-                $dfmenu[$dl->courseshortname][$dlid] = strip_tags(
-                    format_string($dl->name, true)
+                $dfmenu[$dlx->courseshortname][$dlid] = strip_tags(
+                    format_string($dlx->name, true)
                 );
             }
         } else {

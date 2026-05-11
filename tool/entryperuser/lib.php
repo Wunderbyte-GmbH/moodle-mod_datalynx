@@ -37,11 +37,11 @@ class datalynxtool_entryperuser {
     /**
      * Run the tool to create entries for each user.
      *
-     * @param mod_datalynx\datalynx $df
+     * @param mod_datalynx\datalynx $dlx
      */
-    public static function run($df) {
+    public static function run($dlx) {
         // Get gradebook users.
-        $users = $df->get_gradebook_users();
+        $users = $dlx->get_gradebook_users();
         if (!$users) {
             return;
         }
@@ -56,7 +56,7 @@ class datalynxtool_entryperuser {
             $entryid--;
         }
         // Add entries.
-        $em = new datalynx_entries($df);
+        $em = new datalynx_entries($dlx);
         $processed = $em->process_entries('update', $data->eids, $data, true);
 
         if (is_array($processed)) {

@@ -37,22 +37,22 @@ class datalynxtool_downloadfiles {
     /**
      * Retrieves all files of all entries adds them to zip and sends them to download
      *
-     * @param datalynx $dl
+     * @param datalynx $dlx
      */
-    public static function run(mod_datalynx\datalynx $dl) {
+    public static function run(mod_datalynx\datalynx $dlx) {
         // Create filter in order to get all files of all entries of a dl instance.
-        $fields = $dl->get_fields_by_type('file');
+        $fields = $dlx->get_fields_by_type('file');
         $filterdata = new stdClass();
-        $filterdata->dataid = $dl->id();
+        $filterdata->dataid = $dlx->id();
         $filterdata->contentfields = array_keys($fields);
         $filter = new datalynx_filter($filterdata);
-        $em = new datalynx_entries($dl, $filter);
+        $em = new datalynx_entries($dlx, $filter);
         $em->set_content();
         $files = $em->get_embedded_files($filterdata->contentfields);
         $fileinfo = $em->get_contentinfo($filterdata->contentfields);
 
         // Construct the zip file name.
-        $filename = clean_filename($dl->course->shortname . '-' . $dl->name() . '-' . '.zip');
+        $filename = clean_filename($dlx->course->shortname . '-' . $dlx->name() . '-' . '.zip');
 
         $filesforzipping = [];
         if (!empty($files)) {

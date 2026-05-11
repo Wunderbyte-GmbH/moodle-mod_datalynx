@@ -38,10 +38,10 @@ final class tabular_view_manager_test extends advanced_testcase {
 
         $course = $this->getDataGenerator()->create_course();
         $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
-        $df = new datalynx($instance->id);
+        $dlx = new datalynx($instance->id);
 
         $view = (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'type' => 'tabular',
             'name' => 'Pilot Tabular',
             'description' => '',
@@ -57,7 +57,7 @@ final class tabular_view_manager_test extends advanced_testcase {
         $view->id = (int) $DB->insert_record('datalynx_views', $view);
 
         $field = (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'type' => 'text',
             'name' => 'Title',
             'description' => '',
@@ -75,7 +75,7 @@ final class tabular_view_manager_test extends advanced_testcase {
         $field->id = (int) $DB->insert_record('datalynx_fields', $field);
 
         $entryid = (int) $DB->insert_record('datalynx_entries', (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'userid' => $USER->id,
             'groupid' => 0,
             'approved' => 1,
@@ -91,7 +91,7 @@ final class tabular_view_manager_test extends advanced_testcase {
             'content' => 'Hello Tabular',
         ]);
 
-        return [$df, $view, $entryid];
+        return [$dlx, $view, $entryid];
     }
 
     /**
@@ -103,12 +103,12 @@ final class tabular_view_manager_test extends advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
 
-        [$df, $view, $entryid] = $this->create_tabular_fixture();
+        [$dlx, $view, $entryid] = $this->create_tabular_fixture();
 
         $manager = new tabular_view_manager();
-        $payload = $manager->get_browse_payload($df->id(), $view->id);
+        $payload = $manager->get_browse_payload($dlx->id(), $view->id);
 
-        $this->assertSame($df->id(), $payload['datalynxid']);
+        $this->assertSame($dlx->id(), $payload['datalynxid']);
         $this->assertSame($view->id, $payload['viewid']);
         $this->assertTrue($payload['hasentries']);
         $this->assertCount(1, $payload['groups']);
@@ -141,11 +141,11 @@ final class tabular_view_manager_test extends advanced_testcase {
 
         $course = $this->getDataGenerator()->create_course();
         $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
-        $df = new datalynx($instance->id);
+        $dlx = new datalynx($instance->id);
 
         // Create a duration field named 'dur'.
         $fieldrecord = (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'type' => 'duration',
             'name' => 'dur',
             'description' => '',
@@ -164,7 +164,7 @@ final class tabular_view_manager_test extends advanced_testcase {
 
         // Create a filter: approved entries only (selection=1), sort by duration field ASC (0=ASC).
         $filterrecord = (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'name' => 'Duration Sort Filter',
             'description' => '',
             'visible' => 1,
@@ -179,7 +179,7 @@ final class tabular_view_manager_test extends advanced_testcase {
 
         // Create a tabular view with the filter assigned.
         $viewrecord = (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'type' => 'tabular',
             'name' => 'Duration Tabular',
             'description' => '',
@@ -196,7 +196,7 @@ final class tabular_view_manager_test extends advanced_testcase {
 
         // Create two approved entries with different duration values (in seconds).
         $entry1id = (int) $DB->insert_record('datalynx_entries', (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'userid' => $USER->id,
             'groupid' => 0,
             'approved' => 1,
@@ -212,7 +212,7 @@ final class tabular_view_manager_test extends advanced_testcase {
         ]);
 
         $entry2id = (int) $DB->insert_record('datalynx_entries', (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'userid' => $USER->id,
             'groupid' => 0,
             'approved' => 1,
@@ -229,7 +229,7 @@ final class tabular_view_manager_test extends advanced_testcase {
 
         // Instantiate the tabular view. The constructor calls set_filter(true) which loads the
         // filter from the DB. This must not throw a TypeError.
-        $view = $df->get_view('tabular', $viewrecord);
+        $view = $dlx->get_view('tabular', $viewrecord);
 
         // Reproduce the exact pre-fix bug path: pass customsort as a raw serialised string,
         // exactly as tabular/view.php::display() was forwarding it before the fix.
@@ -248,7 +248,7 @@ final class tabular_view_manager_test extends advanced_testcase {
         $this->assertSame(0, $sortoptions[$fieldid], 'Sort direction must be 0 (ASC)');
 
         // Verify the generated ORDER BY SQL contains an ASC clause for the duration field content.
-        $fields = $df->get_fields(null, false, true);
+        $fields = $dlx->get_fields(null, false, true);
         [, , $sortorder] = $view->get_filter()->get_sql($fields);
         $this->assertStringContainsString(
             'ASC',

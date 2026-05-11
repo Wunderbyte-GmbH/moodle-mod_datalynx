@@ -115,11 +115,11 @@ class field extends datalynxfield_base {
     /**
      * Constructor.
      *
-     * @param int|object $df Datalynx ID or object
+     * @param int|object $dlx Datalynx ID or object
      * @param int|object $field Field ID or object
      */
-    public function __construct($df = 0, $field = 0) {
-        parent::__construct($df, $field);
+    public function __construct($dlx = 0, $field = 0) {
+        parent::__construct($dlx, $field);
         global $DB;
         if (empty($this->field->param2)) {
             $this->admissibleroles = [];
@@ -151,7 +151,7 @@ class field extends datalynxfield_base {
                      AND r.type LIKE :type";
         $this->rules = $DB->get_records_sql_menu(
             $query,
-            ['dataid' => $df->id(), 'type' => 'eventnotification']
+            ['dataid' => $dlx->id(), 'type' => 'eventnotification']
         );
     }
 
@@ -260,7 +260,7 @@ class field extends datalynxfield_base {
                      AND df.param5 IS NOT NULL
                      AND df.param5 <> '0'";
 
-        return $DB->get_record_sql($query, ['dataid' => $this->df->id()]);
+        return $DB->get_record_sql($query, ['dataid' => $this->dlx->id()]);
     }
 
     /**
@@ -597,7 +597,7 @@ class field extends datalynxfield_base {
 
         if (!empty($addedmembers)) {
             $event = \mod_datalynx\event\team_updated::create(
-                ['context' => $this->df->context, 'objectid' => $entry->id,
+                ['context' => $this->dlx->context, 'objectid' => $entry->id,
                 'other' => $other]
             );
             $event->trigger();
@@ -605,7 +605,7 @@ class field extends datalynxfield_base {
 
         if (!empty($removedmembers)) {
             $event = \mod_datalynx\event\team_updated::create(
-                ['context' => $this->df->context, 'objectid' => $entry->id,
+                ['context' => $this->dlx->context, 'objectid' => $entry->id,
                 'other' => $other]
             );
             $event->trigger();
@@ -644,7 +644,7 @@ class field extends datalynxfield_base {
                   AND e.dataid = :datalynxid";
         $params = [
                 'fieldid' => $this->field->id,
-                'datalynxid' => $this->df->id(),
+                'datalynxid' => $this->dlx->id(),
         ];
         if (!empty($insql)) {
             $sql .= " AND c.entryid $insql";

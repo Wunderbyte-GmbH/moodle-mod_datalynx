@@ -89,14 +89,14 @@ class renderer extends datalynxfield_renderer {
     public function display_browse($entry, $options = []) {
         global $CFG;
 
-        $df = $this->field->df();
+        $dlx = $this->field->dlx();
         $str = '';
 
         require_once("$CFG->dirroot/comment/lib.php");
         $cmt = new stdClass();
-        $cmt->context = $df->context;
-        $cmt->courseid = $df->course->id;
-        $cmt->cm = $df->cm;
+        $cmt->context = $dlx->context;
+        $cmt->courseid = $dlx->course->id;
+        $cmt->cm = $dlx->cm;
         $cmt->itemid = $entry->id;
         $cmt->component = 'mod_datalynx';
         $cmt->area = !empty($options['area']) ? $options['area'] : 'entry';

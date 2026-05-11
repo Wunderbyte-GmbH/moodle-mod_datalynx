@@ -60,7 +60,7 @@ class view extends base {
      */
     public function generate_default_view() {
         // Get all the fields.
-        $fields = $this->dl->get_fields();
+        $fields = $this->dlx->get_fields();
         if (!$fields) {
             return; // You shouldn't get that far if there are no user fields.
         }
@@ -427,7 +427,7 @@ class view extends base {
         $elements = [];
 
         // Get patterns definitions.
-        $fields = $this->dl->get_fields();
+        $fields = $this->dlx->get_fields();
         $fielddefinitions = [];
         $entry = new stdClass();
         foreach ($this->tags['field'] as $fieldid => $patterns) {

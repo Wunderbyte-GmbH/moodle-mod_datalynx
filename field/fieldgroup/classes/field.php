@@ -44,11 +44,11 @@ class field extends datalynxfield_base {
     /**
      * Constructor for the fieldgroup field.
      *
-     * @param int $df The datalynx id.
+     * @param int $dlx The datalynx id.
      * @param int|stdClass $field The field id or object.
      */
-    public function __construct($df = 0, $field = 0) {
-        parent::__construct($df, $field);
+    public function __construct($dlx = 0, $field = 0) {
+        parent::__construct($dlx, $field);
         if (!empty($this->field->param1)) {
             $this->fieldids = json_decode($this->field->param1, true);
         }

@@ -35,12 +35,12 @@ abstract class datalynx_filter_base_form extends moodleform {
      *
      * @var datalynx null
      */
-    protected $dl = null;
+    protected $dlx = null;
 
     /**
      * Constructs the filter base form and initialises filter/datalynx properties.
      *
-     * @param datalynx $df
+     * @param datalynx $dlx
      * @param mixed $filter
      * @param ?string $action
      * @param mixed $customdata
@@ -51,7 +51,7 @@ abstract class datalynx_filter_base_form extends moodleform {
      * @param bool $customfilter
      */
     public function __construct(
-        $df,
+        $dlx,
         $filter,
         $action = null,
         $customdata = null,
@@ -63,7 +63,7 @@ abstract class datalynx_filter_base_form extends moodleform {
     ) {
         $this->filter = $filter;
         $this->customfilter = $customfilter;
-        $this->dl = $df;
+        $this->dlx = $dlx;
 
         parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
     }
@@ -143,7 +143,7 @@ abstract class datalynx_filter_base_form extends moodleform {
         $showlabel = false
     ) {
         $mform = &$this->_form;
-        $df = $this->dl;
+        $dlx = $this->dlx;
 
         $andoroptions = [0 => get_string('andor', 'datalynx'),
                 'AND' => get_string('and', 'datalynx'), 'OR' => get_string('or', 'datalynx')];
@@ -205,7 +205,7 @@ abstract class datalynx_filter_base_form extends moodleform {
                 $mform->setDefault('searchnot' . $count, $not);
                 // Search operator.
                 if ($fieldid) {
-                    $operatoroptions = $df->get_field_from_id($fieldid)->get_supported_search_operators();
+                    $operatoroptions = $dlx->get_field_from_id($fieldid)->get_supported_search_operators();
                 }
                 $arr[] = &$mform->createElement(
                     'select',

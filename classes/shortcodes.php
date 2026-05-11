@@ -64,10 +64,10 @@ class shortcodes {
             ) {
                 return get_string('datalynxview_deleted', 'mod_datalynxcoursepage');
             }
-            $dl = new datalynx($cm->instance, $cmid);
-            $view = $dl->get_view_by_name($viewname);
+            $dlx = new datalynx($cm->instance, $cmid);
+            $view = $dlx->get_view_by_name($viewname);
             // If view has not been found, the user has no right to view it. Return an empty string instead.
-            if (!has_capability('mod/datalynx:viewentry', $dl->context) || empty((array) $view)) {
+            if (!has_capability('mod/datalynx:viewentry', $dlx->context) || empty((array) $view)) {
                 // No right to view datalynx instance or view or entry. Return empty string.
                 return '';
             }

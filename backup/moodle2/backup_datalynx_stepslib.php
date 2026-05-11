@@ -43,7 +43,7 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
         $userinfo = $this->get_setting_value('userinfo');
 
         // Define each element separated.
-        $datalynx = new backup_nested_element(
+        $dlx = new backup_nested_element(
             'datalynx',
             ['id'],
             ['name', 'intro', 'introformat', 'timemodified', 'timeavailable', 'timedue',
@@ -159,24 +159,24 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
         );
 
         // Build the tree.
-        $datalynx->add_child($module);
+        $dlx->add_child($module);
 
-        $datalynx->add_child($fields);
+        $dlx->add_child($fields);
         $fields->add_child($field);
 
-        $datalynx->add_child($filters);
+        $dlx->add_child($filters);
         $filters->add_child($filter);
 
-        $datalynx->add_child($customfilters);
+        $dlx->add_child($customfilters);
         $customfilters->add_child($customfilter);
 
-        $datalynx->add_child($views);
+        $dlx->add_child($views);
         $views->add_child($view);
 
-        $datalynx->add_child($rules);
+        $dlx->add_child($rules);
         $rules->add_child($rule);
 
-        $datalynx->add_child($entries);
+        $dlx->add_child($entries);
         $entries->add_child($entry);
 
         $entry->add_child($contents);
@@ -188,17 +188,17 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
         $entry->add_child($ratings);
         $ratings->add_child($rating);
 
-        $datalynx->add_child($grades);
+        $dlx->add_child($grades);
         $grades->add_child($grade);
 
-        $datalynx->add_child($behaviors);
+        $dlx->add_child($behaviors);
         $behaviors->add_child($behavior);
 
-        $datalynx->add_child($renderers);
+        $dlx->add_child($renderers);
         $renderers->add_child($renderer);
 
         // Define sources.
-        $datalynx->set_source_table('datalynx', ['id' => backup::VAR_ACTIVITYID]);
+        $dlx->set_source_table('datalynx', ['id' => backup::VAR_ACTIVITYID]);
         $module->set_source_table('course_modules', ['id' => backup::VAR_MODID]);
 
         // Tags.
@@ -277,8 +277,8 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
         }
 
         // Define id annotations.
-        $datalynx->annotate_ids('scale', 'grade');
-        $datalynx->annotate_ids('scale', 'rating');
+        $dlx->annotate_ids('scale', 'grade');
+        $dlx->annotate_ids('scale', 'rating');
 
         $entry->annotate_ids('user', 'userid');
         $entry->annotate_ids('group', 'groupid');
@@ -287,7 +287,7 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
         $rating->annotate_ids('user', 'userid');
 
         // Define file annotations.
-        $datalynx->annotate_files('mod_datalynx', 'intro', null); // This file area hasn't itemid.
+        $dlx->annotate_files('mod_datalynx', 'intro', null); // This file area hasn't itemid.
         $view->annotate_files('mod_datalynx', 'viewsection', 'id'); // By view->id.
         for ($i = 2; $i <= 9; $i++) {
             $view->annotate_files('mod_datalynx', "viewparam{$i}", 'id'); // By view->id.
@@ -295,6 +295,6 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
         $content->annotate_files('mod_datalynx', 'content', 'id'); // By content->id.
 
         // Return the root element (data), wrapped into standard activity structure.
-        return $this->prepare_activity_structure($datalynx);
+        return $this->prepare_activity_structure($dlx);
     }
 }

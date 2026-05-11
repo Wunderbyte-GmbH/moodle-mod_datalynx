@@ -48,53 +48,53 @@ $urlparams->setfilter = optional_param('setfilter', 0, PARAM_INT); // Id of view
 $urlparams->confirmed = optional_param('confirmed', 0, PARAM_INT);
 
 // Set a datalynx object.
-$dl = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
+$dlx = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
 
-require_login($dl->data->course, false, $dl->cm);
+require_login($dlx->data->course, false, $dlx->cm);
 
-require_capability('mod/datalynx:managetemplates', $dl->context);
+require_capability('mod/datalynx:managetemplates', $dlx->context);
 
-$dl->set_page('view/index', ['modjs' => true, 'urlparams' => $urlparams]);
+$dlx->set_page('view/index', ['modjs' => true, 'urlparams' => $urlparams]);
 
 // Activate navigation node.
 navigation_node::override_active_url(
-    new moodle_url('/mod/datalynx/view/index.php', ['id' => $dl->cm->id])
+    new moodle_url('/mod/datalynx/view/index.php', ['id' => $dlx->cm->id])
 );
 
 // DATA PROCESSING.
 if ($urlparams->duplicate && confirm_sesskey()) { // Duplicate any requested views.
-    $dl->process_views('duplicate', $urlparams->duplicate, $urlparams->confirmed);
+    $dlx->process_views('duplicate', $urlparams->duplicate, $urlparams->confirmed);
 } else {
     if ($urlparams->reset && confirm_sesskey()) { // Reset to default any requested views.
         $patterncache = cache::make('mod_datalynx', 'patterns');
         $patterncache->delete($urlparams->vedit, true);
-        $dl->process_views('reset', $urlparams->reset, true);
+        $dlx->process_views('reset', $urlparams->reset, true);
     } else {
         if ($urlparams->delete && confirm_sesskey()) { // Delete any requested views.
-            $dl->process_views('delete', $urlparams->delete, $urlparams->confirmed);
+            $dlx->process_views('delete', $urlparams->delete, $urlparams->confirmed);
         } else {
             if ($urlparams->visible && confirm_sesskey()) { // Set view's visibility.
-                $dl->process_views('visible', $urlparams->visible, true); // Confirmed by default.
+                $dlx->process_views('visible', $urlparams->visible, true); // Confirmed by default.
             } else {
                 if ($urlparams->default && confirm_sesskey()) { // Set view to default.
-                    $dl->process_views('default', $urlparams->default, true); // Confirmed by default.
+                    $dlx->process_views('default', $urlparams->default, true); // Confirmed by default.
                 } else {
                     if ($urlparams->singleedit && confirm_sesskey()) { // Set view to single edit.
                         if ($urlparams->singleedit == -1) {
-                            $dl->set_single_edit_view(); // Reset.
+                            $dlx->set_single_edit_view(); // Reset.
                         } else {
-                            $dl->set_single_edit_view($urlparams->singleedit);
+                            $dlx->set_single_edit_view($urlparams->singleedit);
                         }
                     } else {
                         if ($urlparams->singlemore && confirm_sesskey()) { // Set view to single more.
                             if ($urlparams->singlemore == -1) {
-                                $dl->set_single_more_view(); // Reset.
+                                $dlx->set_single_more_view(); // Reset.
                             } else {
-                                $dl->set_single_more_view($urlparams->singlemore);
+                                $dlx->set_single_more_view($urlparams->singlemore);
                             }
                         } else {
                             if ($urlparams->setfilter && confirm_sesskey()) { // Re/set view filter.
-                                $dl->process_views('filter', $urlparams->setfilter, true); // Confirmed by default.
+                                $dlx->process_views('filter', $urlparams->setfilter, true); // Confirmed by default.
                             }
                         }
                     }
@@ -105,19 +105,19 @@ if ($urlparams->duplicate && confirm_sesskey()) { // Duplicate any requested vie
 }
 
 // Any notifications?
-$dl->notifications['bad']['defaultview'] = '';
-$views = $dl->get_views_editable_by_user(flexible_table::get_sort_for_table('datalynxviewsindex' . $dl->id()));
+$dlx->notifications['bad']['defaultview'] = '';
+$views = $dlx->get_views_editable_by_user(flexible_table::get_sort_for_table('datalynxviewsindex' . $dlx->id()));
 if (empty($views)) {
     // Now views defined yet.
-    $dl->notifications['bad']['getstartedviews'] = get_string('viewnoneindatalynx', 'datalynx');
+    $dlx->notifications['bad']['getstartedviews'] = get_string('viewnoneindatalynx', 'datalynx');
 } else {
-    if (empty($dl->data->defaultview) && !empty($dl->get_view_records(true))) {
-        $dl->notifications['bad']['defaultview'] = get_string('viewnodefault', 'datalynx', '');
+    if (empty($dlx->data->defaultview) && !empty($dlx->get_view_records(true))) {
+        $dlx->notifications['bad']['defaultview'] = get_string('viewnodefault', 'datalynx', '');
     }
 }
 
 // Print header.
-$dl->print_header(['tab' => 'views', 'urlparams' => $urlparams]);
+$dlx->print_header(['tab' => 'views', 'urlparams' => $urlparams]);
 
 // Display the view form jump list.
 $directories = get_list_of_plugins('mod/datalynx/view/');
@@ -133,7 +133,7 @@ foreach ($directories as $directory) {
 asort($menuview); // Sort in alphabetical order.
 
 $br = html_writer::empty_tag('br');
-$popupurl = $CFG->wwwroot . '/mod/datalynx/view/view_edit.php?d=' . $dl->id() . '&amp;sesskey=' . sesskey();
+$popupurl = $CFG->wwwroot . '/mod/datalynx/view/view_edit.php?d=' . $dlx->id() . '&amp;sesskey=' . sesskey();
 $viewselect = new single_select(
     new moodle_url($popupurl),
     'type',
@@ -154,7 +154,7 @@ if (!empty($views)) {
     $viewbaseurl = '/mod/datalynx/view.php';
     $editbaseurl = '/mod/datalynx/view/view_edit.php';
     $actionbaseurl = '/mod/datalynx/view/index.php';
-    $linkparams = ['d' => $dl->id(), 'sesskey' => sesskey()];
+    $linkparams = ['d' => $dlx->id(), 'sesskey' => sesskey()];
 
     // Table headings.
     $strdefault = get_string('defaultview', 'datalynx');
@@ -193,7 +193,7 @@ if (!empty($views)) {
     $strshow = get_string('show');
     $strreset = get_string('reset');
 
-    $filtersmenu = $dl->get_filter_manager()->get_filters(null, true);
+    $filtersmenu = $dlx->get_filter_manager()->get_filters(null, true);
 
     // Table headers.
     $headers = ['name' => get_string('name'), 'type' => get_string('type', 'datalynx'),
@@ -203,8 +203,8 @@ if (!empty($views)) {
             'duplicate' => $multiduplicate, 'delete' => $multidelete, 'selectallnone' => $selectallnone,
     ];
 
-    $table = new flexible_table('datalynxviewsindex' . $dl->id());
-    $table->define_baseurl(new moodle_url('/mod/datalynx/view/index.php', ['d' => $dl->id()]));
+    $table = new flexible_table('datalynxviewsindex' . $dlx->id());
+    $table->define_baseurl(new moodle_url('/mod/datalynx/view/index.php', ['d' => $dlx->id()]));
     $table->define_columns(array_keys($headers));
     $table->define_headers(array_values($headers));
 
@@ -237,7 +237,7 @@ if (!empty($views)) {
             $viewname = format_string($view->name());
         } else {
             $viewname = html_writer::link(
-                new moodle_url($viewbaseurl, ['d' => $dl->id(), 'view' => $viewid]),
+                new moodle_url($viewbaseurl, ['d' => $dlx->id(), 'view' => $viewid]),
                 $view->name()
             );
         }
@@ -279,7 +279,7 @@ if (!empty($views)) {
         // Default view.
         if ($internalview) {
             $defaultview = '&mdash;';
-        } else if ($viewid == $dl->data->defaultview) {
+        } else if ($viewid == $dlx->data->defaultview) {
             $defaultview = $OUTPUT->pix_icon('t/approve', get_string('isdefault', 'mod_datalynx'));
         } else {
             $defaultview = html_writer::link(
@@ -291,7 +291,7 @@ if (!empty($views)) {
         // Single edit view.
         if ($internalview) {
             $singleedit = '&mdash;';
-        } else if ($viewid == $dl->data->singleedit) {
+        } else if ($viewid == $dlx->data->singleedit) {
             $singleedit = html_writer::link(
                 new moodle_url($actionbaseurl, $linkparams + ['singleedit' => -1]),
                 $OUTPUT->pix_icon('t/approve', get_string('isedit', 'mod_datalynx'))
@@ -306,7 +306,7 @@ if (!empty($views)) {
         // Single more view.
         if ($internalview) {
             $singlemore = '&mdash;';
-        } else if ($viewid == $dl->data->singleview) {
+        } else if ($viewid == $dlx->data->singleview) {
             $singlemore = html_writer::link(
                 new moodle_url($actionbaseurl, $linkparams + ['singlemore' => -1]),
                 $OUTPUT->pix_icon('t/approve', get_string('ismore', 'mod_datalynx'))
@@ -333,8 +333,8 @@ if (!empty($views)) {
                 );
             } else {
                 $blankfilteroption = [-1 => get_string('blankfilter', 'datalynx')];
-                if ($dl->data->defaultfilter) {
-                    $defaultfilter = $dl->get_filter_manager()->get_filter_from_id($dl->data->defaultfilter);
+                if ($dlx->data->defaultfilter) {
+                    $defaultfilter = $dlx->get_filter_manager()->get_filter_from_id($dlx->data->defaultfilter);
                     $defaultfiltername = $defaultfilter->name;
                     $defaultfilteroption = [
                             0 => get_string('defaultfilterlabel', 'datalynx', $defaultfiltername),
@@ -376,4 +376,4 @@ if (!empty($views)) {
     $table->finish_output();
 }
 
-$dl->print_footer();
+$dlx->print_footer();

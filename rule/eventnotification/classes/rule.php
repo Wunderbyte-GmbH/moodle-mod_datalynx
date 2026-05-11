@@ -78,11 +78,11 @@ class rule extends base {
     /**
      * Class constructor
      *
-     * @param datalynx|int $df datalynx id or class object
+     * @param datalynx|int $dlx datalynx id or class object
      * @param stdClass|int $rule rule id or DB record
      */
-    public function __construct($df = 0, $rule = 0) {
-        parent::__construct($df, $rule);
+    public function __construct($dlx = 0, $rule = 0) {
+        parent::__construct($dlx, $rule);
 
         $this->sender = $this->rule->param2;
         $this->recipient = $this->unserialize_array($this->rule->param3 ?? null);
@@ -156,7 +156,7 @@ class rule extends base {
                 return false;
             }
             // For now only checkbox and radiobutton are supported.
-            $field = $this->df()->get_field_from_id($fieldid);
+            $field = $this->dlx()->get_field_from_id($fieldid);
             if ($field->type === 'radiobutton') {
                 $compare = $content->content;
                 $condition = $this->rule->param10;
@@ -170,11 +170,11 @@ class rule extends base {
             }
         }
 
-        $df = $this->df;
-        $viewurl = "$CFG->wwwroot/mod/datalynx/view.php?d=" . $df->id();
+        $dlx = $this->dlx;
+        $viewurl = "$CFG->wwwroot/mod/datalynx/view.php?d=" . $dlx->id();
 
-        $datalynxname = $df->name() ? format_string($df->name(), true) : 'Unspecified datalynx';
-        $coursename = $df->course->shortname ? format_string($df->course->shortname, true) : 'Unspecified datalynx';
+        $datalynxname = $dlx->name() ? format_string($dlx->name(), true) : 'Unspecified datalynx';
+        $coursename = $dlx->course->shortname ? format_string($dlx->course->shortname, true) : 'Unspecified datalynx';
 
         $messagedata->siteurl = $CFG->wwwroot;
 
@@ -218,7 +218,7 @@ class rule extends base {
             $message->smallmessage = '';
             $message->notification = 1;
             if ($CFG->branch > 31) {
-                $message->courseid = $df->course->id;
+                $message->courseid = $dlx->course->id;
             }
             $message->userfrom = $userfrom;
             $userto = $DB->get_record('user', ['id' => $userid]);
@@ -227,7 +227,7 @@ class rule extends base {
 
             $viewurlparams = ['eids' => $entryid];
 
-            $roleids = $this->df()->get_user_datalynx_permissions($userid);
+            $roleids = $this->dlx()->get_user_datalynx_permissions($userid);
             foreach ($roleids as $roleid) {
                 if (isset($this->targetviews[$roleid])) {
                     $viewurlparams['view'] = $this->targetviews[$roleid];
@@ -235,11 +235,11 @@ class rule extends base {
                 }
             }
             if (!isset($viewurlparams['view'])) {
-                if ($df->data->singleview) {
-                    $viewurlparams['view'] = $df->data->singleview;
+                if ($dlx->data->singleview) {
+                    $viewurlparams['view'] = $dlx->data->singleview;
                 } else {
-                    if ($df->data->defaultview) {
-                        $viewurlparams['view'] = $df->data->defaultview;
+                    if ($dlx->data->defaultview) {
+                        $viewurlparams['view'] = $dlx->data->defaultview;
                     }
                 }
             }
@@ -334,18 +334,18 @@ class rule extends base {
         \core\session\manager::set_user($recipient);
 
         try {
-            $df = new datalynx($this->df()->id());
-            $viewrecord = $df->get_all_views()[$this->emailtemplateviewid] ?? null;
+            $dlx = new datalynx($this->dlx()->id());
+            $viewrecord = $dlx->get_all_views()[$this->emailtemplateviewid] ?? null;
             if (!$viewrecord || $viewrecord->type !== datalynx::INTERNAL_VIEW_EMAIL) {
                 return null;
             }
 
             $manager = new email_view_manager();
-            $payload = $manager->get_entry_payload($df->id(), (int) $viewrecord->id, $entryid, [
+            $payload = $manager->get_entry_payload($dlx->id(), (int) $viewrecord->id, $entryid, [
                 'notificationentryurl' => $entryurl->out(false),
                 'notificationentrylink' => html_writer::link($entryurl, get_string('linktoentry', 'datalynx')),
                 'notificationdatalynxurl' => $datalynxurl->out(false),
-                'notificationdatalynxlink' => html_writer::link($datalynxurl, format_string($df->name(), true)),
+                'notificationdatalynxlink' => html_writer::link($datalynxurl, format_string($dlx->name(), true)),
             ]);
             if (!$payload['hascontent']) {
                 return null;
@@ -377,7 +377,7 @@ class rule extends base {
             $recipientids = array_merge(
                 $recipientids,
                 $this->get_recipients_by_permission(
-                    $this->df->context,
+                    $this->dlx->context,
                     $this->recipient['roles']
                 )
             );
@@ -483,7 +483,7 @@ class rule extends base {
                  WHERE dataid = :dataid
                    AND $entryidsql
                    AND df.id $insql";
-        $params = array_merge($params, ['dataid' => $this->df->id()]);
+        $params = array_merge($params, ['dataid' => $this->dlx->id()]);
         $contents = $DB->get_fieldset_sql($sql, $params);
         foreach ($contents as $content) {
             $ids = array_merge($ids, json_decode($content, true));

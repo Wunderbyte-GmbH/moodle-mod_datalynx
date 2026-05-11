@@ -39,10 +39,10 @@ final class grid_view_manager_test extends advanced_testcase {
 
         $course = $this->getDataGenerator()->create_course();
         $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
-        $df = new datalynx($instance->id);
+        $dlx = new datalynx($instance->id);
 
         $view = (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'type' => 'grid',
             'name' => 'Pilot Grid',
             'description' => '',
@@ -58,7 +58,7 @@ final class grid_view_manager_test extends advanced_testcase {
         $view->id = (int) $DB->insert_record('datalynx_views', $view);
 
         $field = (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'type' => 'text',
             'name' => 'Title',
             'description' => '',
@@ -76,7 +76,7 @@ final class grid_view_manager_test extends advanced_testcase {
         $field->id = (int) $DB->insert_record('datalynx_fields', $field);
 
         $entryid = (int) $DB->insert_record('datalynx_entries', (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'userid' => $USER->id,
             'groupid' => 0,
             'approved' => 1,
@@ -92,7 +92,7 @@ final class grid_view_manager_test extends advanced_testcase {
             'content' => 'Hello Grid',
         ]);
 
-        return [$df, $view, $field, $entryid];
+        return [$dlx, $view, $field, $entryid];
     }
 
     /**
@@ -104,12 +104,12 @@ final class grid_view_manager_test extends advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
 
-        [$df, $view, , $entryid] = $this->create_grid_fixture();
+        [$dlx, $view, , $entryid] = $this->create_grid_fixture();
 
         $manager = new grid_view_manager();
-        $payload = $manager->get_browse_payload($df->id(), $view->id);
+        $payload = $manager->get_browse_payload($dlx->id(), $view->id);
 
-        $this->assertSame($df->id(), $payload['datalynxid']);
+        $this->assertSame($dlx->id(), $payload['datalynxid']);
         $this->assertSame($view->id, $payload['viewid']);
         $this->assertTrue($payload['hasentries']);
         $this->assertCount(1, $payload['groups']);

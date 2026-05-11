@@ -70,7 +70,7 @@ class form extends datalynxfield_form {
 
         // Admissible roles.
         $group = [];
-        $permissions = $this->dl->get_datalynx_permission_names(true);
+        $permissions = $this->dlx->get_datalynx_permission_names(true);
 
         foreach ($permissions as $key => $label) {
             $checkbox = &$mform->createElement('advcheckbox', 'admissible' . $key, '', $label, ['group' => 1], [0, $key]);
@@ -113,7 +113,7 @@ class form extends datalynxfield_form {
         );
         $mform->addHelpButton('teamfieldenable', 'teamfield', 'datalynx');
 
-        $fieldmenu = $this->dl->get_fields(array_keys($this->dl->get_internal_fields()), true);
+        $fieldmenu = $this->dlx->get_fields(array_keys($this->dlx->get_internal_fields()), true);
         $fieldmenu = ['-1' => 'No field'] + $fieldmenu;
         $mform->addElement('select', 'param5', get_string('referencefield', 'datalynx'), $fieldmenu);
         $mform->addHelpButton('param5', 'referencefield', 'datalynx');

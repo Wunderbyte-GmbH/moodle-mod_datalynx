@@ -62,7 +62,7 @@ class renderer extends datalynxfield_renderer {
             foreach ($tags as $tag) {
                 if (
                     trim($tag, '@') == "##author:edit##" && $edit &&
-                        has_capability('mod/datalynx:manageentries', $field->df()->context)
+                        has_capability('mod/datalynx:manageentries', $field->dlx()->context)
                 ) {
                     $replacements[$tag] = ['',
                             [[$this, 'display_edit'], [$entry]]];
@@ -120,7 +120,7 @@ class renderer extends datalynxfield_renderer {
         static $usersmenu = null;
         if (is_null($usersmenu)) {
             $users = get_users_by_capability(
-                $field->df->context,
+                $field->dlx->context,
                 'mod/datalynx:writeentry',
                 'u.*',
                 'u.lastname ASC'
@@ -162,11 +162,11 @@ class renderer extends datalynxfield_renderer {
             $entry->userid = $USER->id;
         }
         $user = $DB->get_record('user', ['id' => $entry->userid]);
-        $df = $this->field->df();
+        $dlx = $this->field->dlx();
         return html_writer::link(
             new moodle_url(
                 '/user/view.php',
-                ['id' => $entry->userid, 'course' => $df->course->id]
+                ['id' => $entry->userid, 'course' => $dlx->course->id]
             ),
             fullname($user)
         );
@@ -277,7 +277,7 @@ class renderer extends datalynxfield_renderer {
             }
         }
 
-        $pictureparams = ['courseid' => $this->field->df()->course->id];
+        $pictureparams = ['courseid' => $this->field->dlx()->course->id];
         if ($large) {
             $pictureparams['size'] = 100;
         }

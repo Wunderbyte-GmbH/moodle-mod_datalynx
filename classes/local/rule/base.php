@@ -46,7 +46,7 @@ abstract class base {
      *
      * @var ?datalynx
      */
-    public $df = null;
+    public $dlx = null;
 
     /**
      * The rule object itself, if we know it.
@@ -57,19 +57,19 @@ abstract class base {
     /**
      * base constructor.
      *
-     * @param int|datalynx $df
+     * @param int|datalynx $dlx
      * @param int|object $rule
      * @throws coding_exception
      * @throws moodle_exception
      */
-    public function __construct($df = 0, $rule = 0) {
-        if (empty($df)) {
+    public function __construct($dlx = 0, $rule = 0) {
+        if (empty($dlx)) {
             throw new coding_exception('Datalynx id or object must be passed to view constructor.');
         } else {
-            if ($df instanceof datalynx) {
-                $this->df = $df;
+            if ($dlx instanceof datalynx) {
+                $this->dlx = $dlx;
             } else { // Datalynx id/object.
-                $this->df = new datalynx($df);
+                $this->dlx = new datalynx($dlx);
             }
         }
 
@@ -80,7 +80,7 @@ abstract class base {
 
                 // Variable $rule is a rule id.
             } else {
-                if ($ruleobj = $this->df->get_rule_from_id($rule)) {
+                if ($ruleobj = $this->dlx->get_rule_from_id($rule)) {
                     $this->rule = $ruleobj->rule;
                 } else {
                     throw new moodle_exception('invalidrule', 'datalynx', null, null, $rule);
@@ -148,7 +148,7 @@ abstract class base {
         $this->rule = new stdClass();
         $this->rule->id = !empty($forminput->id) ? $forminput->id : 0;
         $this->rule->type = $this->type;
-        $this->rule->dataid = $this->df->id();
+        $this->rule->dataid = $this->dlx->id();
         $this->rule->name = !empty($forminput->name) && is_scalar($forminput->name) ? trim((string) $forminput->name) : '';
         $this->rule->description = !empty($forminput->description) && is_scalar($forminput->description) ?
                 trim((string) $forminput->description) : '';
@@ -270,8 +270,8 @@ abstract class base {
      *
      * @return ?datalynx
      */
-    public function df() {
-        return $this->df;
+    public function dlx() {
+        return $this->dlx;
     }
 
     /**
@@ -284,7 +284,7 @@ abstract class base {
         $formclass = manager::get_rule_form_class_name($this->type);
         $actionurl = new moodle_url(
             '/mod/datalynx/rule/rule_edit.php',
-            ['d' => $this->df->id(), 'rid' => $this->get_id(), 'type' => $this->type]
+            ['d' => $this->dlx->id(), 'rid' => $this->get_id(), 'type' => $this->type]
         );
         return new $formclass($this, $actionurl);
     }

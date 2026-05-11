@@ -82,7 +82,7 @@ class field extends datalynxfield_no_content {
         global $USER;
 
         if (
-            has_capability('mod/datalynx:managecomments', $this->df->context) ||
+            has_capability('mod/datalynx:managecomments', $this->dlx->context) ||
                 ($params->commentarea == 'activity' && $params->itemid == $USER->id) ||
                 ($params->commentarea == 'entry')
         ) {
@@ -100,17 +100,17 @@ class field extends datalynxfield_no_content {
         global $DB, $USER;
 
         // Validate context.
-        if (empty($params->context) || $params->context->id != $this->df->context->id) {
+        if (empty($params->context) || $params->context->id != $this->dlx->context->id) {
             throw new comment_exception('invalidcontextid', 'datalynx');
         }
 
         // Validate course.
-        if ($params->courseid != $this->df->course->id) {
+        if ($params->courseid != $this->dlx->course->id) {
             throw new comment_exception('invalidcourseid', 'datalynx');
         }
 
         // Validate cm.
-        if ($params->cm->id != $this->df->cm->id) {
+        if ($params->cm->id != $this->dlx->cm->id) {
             throw new comment_exception('invalidcmid', 'datalynx');
         }
 
@@ -120,7 +120,7 @@ class field extends datalynxfield_no_content {
         }
 
         // Validation for non-comment-managers.
-        if (!has_capability('mod/datalynx:managecomments', $this->df->context)) {
+        if (!has_capability('mod/datalynx:managecomments', $this->dlx->context)) {
             // Non-comment-managers can add/view comments on their own entries.
             // But require df->data->comments for add/view on other entries (excluding grading entries).
 
@@ -139,10 +139,10 @@ class field extends datalynxfield_no_content {
 
                 // Group access.
                 if ($entry->groupid) {
-                    $groupmode = groups_get_activity_groupmode($this->df->cm, $this->df->course);
+                    $groupmode = groups_get_activity_groupmode($this->dlx->cm, $this->dlx->course);
                     if (
                         $groupmode == SEPARATEGROUPS &&
-                            !has_capability('moodle/site:accessallgroups', $this->df->context)
+                            !has_capability('moodle/site:accessallgroups', $this->dlx->context)
                     ) {
                         if (!groups_is_member($entry->groupid)) {
                             throw new comment_exception('notmemberofgroup');

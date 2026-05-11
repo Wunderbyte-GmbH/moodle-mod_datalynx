@@ -49,7 +49,7 @@ class form extends FileForm {
         );
 
         // Max bytes (param1).
-        $options = get_max_upload_sizes($CFG->maxbytes, $this->dl->course->maxbytes);
+        $options = get_max_upload_sizes($CFG->maxbytes, $this->dlx->course->maxbytes);
         $mform->addElement('select', 'param1', get_string('filemaxsize', 'datalynx'), $options);
 
         // Max files (param2).

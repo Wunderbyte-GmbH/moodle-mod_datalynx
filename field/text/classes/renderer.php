@@ -75,7 +75,7 @@ class renderer extends datalynxfield_renderer {
             $reffieldid = $field->field->param10 ? $field->field->param10 : $field->field->id;
             $menu = [
                     '_qf__force_multiselect_submission'
-                    => get_string('choose')] + $field->df->get_distinct_textfieldvalues_by_id($reffieldid);
+                    => get_string('choose')] + $field->dlx->get_distinct_textfieldvalues_by_id($reffieldid);
         }
 
         if ($autocomplete) {  // Render as autocomplete field if param9 is not empty.
@@ -194,7 +194,7 @@ class renderer extends datalynxfield_renderer {
             $reffieldid = $field->field->param10 ? $field->field->param10 : $field->field->id;
             $menu = [
                     '_qf__force_multiselect_submission'
-                    => get_string('choose')] + $field->df->get_distinct_textfieldvalues_by_id($reffieldid);
+                    => get_string('choose')] + $field->dlx->get_distinct_textfieldvalues_by_id($reffieldid);
             $fieldattr['tags'] = true;
             $arr[] = &$mform->createElement('autocomplete', $fieldname, null, $menu, $fieldattr);
             $mform->setType($fieldname, PARAM_NOTAGS);

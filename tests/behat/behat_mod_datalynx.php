@@ -201,8 +201,8 @@ class behat_mod_datalynx extends behat_base {
         global $DB;
 
         $record = $DB->get_record('datalynx', ['name' => $activityname], '*', MUST_EXIST);
-        $datalynx = new \mod_datalynx\datalynx($record->id);
-        $fields = $datalynx->get_fields();
+        $dlx = new \mod_datalynx\datalynx($record->id);
+        $fields = $dlx->get_fields();
         $normalizefieldname = static function (string $name): string {
             return preg_replace('/^Datalynx field\s+/u', '', trim($name));
         };
@@ -243,7 +243,7 @@ class behat_mod_datalynx extends behat_base {
         }
 
         $DB->insert_record('datalynx_views', (object) [
-            'dataid' => $datalynx->id(),
+            'dataid' => $dlx->id(),
             'type' => 'report',
             'name' => $values['name'] ?? get_string('pluginname', 'datalynxview_report'),
             'description' => $values['description'] ?? '',
@@ -289,8 +289,8 @@ class behat_mod_datalynx extends behat_base {
         global $DB;
 
         $record = $DB->get_record('datalynx', ['name' => $activityname], '*', MUST_EXIST);
-        $datalynx = new \mod_datalynx\datalynx($record->id);
-        $fields = $datalynx->get_fields();
+        $dlx = new \mod_datalynx\datalynx($record->id);
+        $fields = $dlx->get_fields();
         $normalizefieldname = static function (string $name): string {
             return preg_replace('/^Datalynx field\s+/u', '', trim($name));
         };
@@ -304,7 +304,7 @@ class behat_mod_datalynx extends behat_base {
             $user = $DB->get_record('user', ['username' => $entrydata['user']], '*', MUST_EXIST);
             $timestamp = \core\di::get(\core\clock::class)->time();
             $entryid = (int) $DB->insert_record('datalynx_entries', (object) [
-                'dataid' => $datalynx->id(),
+                'dataid' => $dlx->id(),
                 'userid' => $user->id,
                 'groupid' => 0,
                 'approved' => 1,

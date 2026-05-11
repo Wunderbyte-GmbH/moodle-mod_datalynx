@@ -86,7 +86,7 @@ class field extends datalynxfield_option_multiple {
         if (!$rec->id) {
             $rec->id = $DB->insert_record('datalynx_contents', $rec);
         }
-        core_tag_tag::set_item_tags('mod_datalynx', 'datalynx_contents', $rec->id, $this->df->context, $tags);
+        core_tag_tag::set_item_tags('mod_datalynx', 'datalynx_contents', $rec->id, $this->dlx->context, $tags);
         $collid = core_tag_area::get_collection('mod_datalynx', 'datalynx_contents');
         if ($this->field->param1) {
             $tagobjects = core_tag_tag::create_if_missing($collid, $tags, true);
@@ -119,7 +119,7 @@ class field extends datalynxfield_option_multiple {
         $this->field = new stdClass();
         $this->field->id = !empty($forminput->id) ? $forminput->id : 0;
         $this->field->type = $this->type;
-        $this->field->dataid = $this->df->id();
+        $this->field->dataid = $this->dlx->id();
         $this->field->name = !empty($forminput->name) ? trim($forminput->name) : '';
         $this->field->description = !empty($forminput->description) ? trim($forminput->description) : '';
         $this->field->label = !empty($forminput->label) ? $forminput->label : '';

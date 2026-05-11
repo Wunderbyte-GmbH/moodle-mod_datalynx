@@ -124,7 +124,7 @@ class field extends FileField {
                 ] as $filearea
             ) {
                 $fs = get_file_storage();
-                $fs->delete_area_files($this->df->context->id, 'mod_datalynx', $filearea);
+                $fs->delete_area_files($this->dlx->context->id, 'mod_datalynx', $filearea);
             }
             $this->delete_content();
             $DB->delete_records('datalynx_fields', ['id' => $this->field->id]);
@@ -147,7 +147,7 @@ class field extends FileField {
         $fs = get_file_storage();
         if (
             !$files = $fs->get_area_files(
-                $this->df->context->id,
+                $this->dlx->context->id,
                 'mod_datalynx',
                 'content',
                 $contentid
@@ -188,13 +188,13 @@ class field extends FileField {
                     $thumbheight = !empty($this->field->param10) ? $this->field->param10 : '';
                     $thumbname = 'thumb_' . $file->get_filename();
 
-                    if ($thumbfile = $fs->get_file($this->df->context->id, 'mod_datalynx', 'thumb', $contentid, '/', $thumbname)) {
+                    if ($thumbfile = $fs->get_file($this->dlx->context->id, 'mod_datalynx', 'thumb', $contentid, '/', $thumbname)) {
                         $thumbfile->delete();
                     }
 
                     // If either width or height try to (re)generate, otherwise delete what exists.
                     if ($thumbwidth || $thumbheight) {
-                        $filerecord = ['contextid' => $this->df->context->id,
+                        $filerecord = ['contextid' => $this->dlx->context->id,
                                 'component' => 'mod_datalynx', 'filearea' => 'thumb',
                                 'itemid' => $contentid, 'filepath' => '/', 'filename' => $thumbname,
                                 'userid' => $file->get_userid(),

@@ -36,17 +36,17 @@ $urlparams->run = optional_param('run', '', PARAM_PLUGIN); // Tool plugin to run
 $urlparams->confirmed = optional_param('confirmed', 0, PARAM_INT);
 
 // Set a datalynx object.
-$df = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
+$dlx = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
 
-require_login($df->data->course, false, $df->cm);
+require_login($dlx->data->course, false, $dlx->cm);
 
-require_capability('mod/datalynx:managetemplates', $df->context);
+require_capability('mod/datalynx:managetemplates', $dlx->context);
 
-$df->set_page('tool/index', ['modjs' => true, 'urlparams' => $urlparams]);
+$dlx->set_page('tool/index', ['modjs' => true, 'urlparams' => $urlparams]);
 
 // Activate navigation node.
 navigation_node::override_active_url(
-    new moodle_url('/mod/datalynx/tool/index.php', ['id' => $df->cm->id])
+    new moodle_url('/mod/datalynx/tool/index.php', ['id' => $dlx->cm->id])
 );
 
 // DATA PROCESSING.
@@ -55,13 +55,13 @@ if ($urlparams->run && confirm_sesskey()) { // Run selected tool.
     $toolclass = "datalynxtool_$urlparams->run";
     if (file_exists($tooldir)) {
         require_once("$tooldir/lib.php");
-        if ($result = $toolclass::run($df)) {
+        if ($result = $toolclass::run($dlx)) {
             [$goodbad, $message] = $result;
         } else {
             $goodbad = 'bad';
             $message = '';
         }
-        $df->notifications[$goodbad][] = $message;
+        $dlx->notifications[$goodbad][] = $message;
     }
 }
 
@@ -78,17 +78,17 @@ ksort($tools); // Sort in alphabetical order.
 
 // Any notifications?
 if (!$tools) {
-    $df->notifications['bad'][] = get_string('toolnoneindatalynx', 'datalynx'); // Nothing in.
+    $dlx->notifications['bad'][] = get_string('toolnoneindatalynx', 'datalynx'); // Nothing in.
     // Database.
 }
 
 // Print header.
-$df->print_header(['tab' => 'tools', 'urlparams' => $urlparams]);
+$dlx->print_header(['tab' => 'tools', 'urlparams' => $urlparams]);
 
 // If there are tools print admin style list of them.
 if ($tools) {
     $actionbaseurl = '/mod/datalynx/tool/index.php';
-    $linkparams = ['d' => $df->id(), 'sesskey' => sesskey()];
+    $linkparams = ['d' => $dlx->id(), 'sesskey' => sesskey()];
 
     // Table headings.
     $strname = get_string('name');
@@ -112,4 +112,4 @@ if ($tools) {
     echo html_writer::table($table);
 }
 
-$df->print_footer();
+$dlx->print_footer();

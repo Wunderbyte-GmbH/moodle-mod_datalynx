@@ -2745,12 +2745,12 @@ class datalynx {
      * @param object $data Event data object.
      */
     public function events_trigger($event, $data) {
-        $data->df = $this;
+        $data->dlx = $this;
         $data->coursename = $this->course->shortname;
         $data->datalynxname = $this->name();
         if (isset($data->view)) {
             $data->datalynxbaselink = html_writer::link(
-                $data->view->get_dl()->get_baseurl(),
+                $data->view->get_dlx()->get_baseurl(),
                 $data->datalynxname
             );
             $data->datalynxlink = html_writer::link($data->view->get_baseurl(), $data->datalynxname);

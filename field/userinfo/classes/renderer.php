@@ -109,7 +109,7 @@ class renderer extends datalynxfield_renderer {
         if ($entry->id == -1) {
             $manageable = true;
         }
-        if (has_capability('mod/datalynx:manageentries', $field->df()->context)) {
+        if (has_capability('mod/datalynx:manageentries', $field->dlx()->context)) {
             $manageable = true;
         }
         if ($USER->id == $entry->userid) {

@@ -48,32 +48,32 @@ $urlparams->duplicate = optional_param('duplicate', 0, PARAM_SEQUENCE); // Ids (
 $urlparams->confirmed = optional_param('confirmed', 0, PARAM_INT);
 
 // Set a datalynx object.
-$df = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
+$dlx = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
 
 // Require capability.
 if (
-    !has_capability('mod/datalynx:manageentries', $df->context) ||
-        !has_capability('mod/datalynx:managetemplates', $df->context)
+    !has_capability('mod/datalynx:manageentries', $dlx->context) ||
+        !has_capability('mod/datalynx:managetemplates', $dlx->context)
 ) {
     throw new required_capability_exception(
-        $df->context,
+        $dlx->context,
         'mod/datalynx:manageentries',
         'nopermissions',
         ''
     );
 }
 
-$df->set_page('import', ['modjs' => true, 'urlparams' => $urlparams]);
+$dlx->set_page('import', ['modjs' => true, 'urlparams' => $urlparams]);
 
 // Activate navigation node.
 navigation_node::override_active_url(
-    new moodle_url('/mod/datalynx/import.php', ['id' => $df->cm->id])
+    new moodle_url('/mod/datalynx/import.php', ['id' => $dlx->cm->id])
 );
 
 // DATA PROCESSING.
 // Import.
 if ($urlparams->vid && confirm_sesskey()) {
-    $view = $df->get_view_from_id($urlparams->vid);
+    $view = $dlx->get_view_from_id($urlparams->vid);
 
     // Process import.
     if ($urlparams->import && confirm_sesskey()) {
@@ -84,44 +84,44 @@ if ($urlparams->vid && confirm_sesskey()) {
         // Or display form.
     } else {
         // Print header.
-        $df->print_header(['tab' => 'import', 'urlparams' => $urlparams]);
+        $dlx->print_header(['tab' => 'import', 'urlparams' => $urlparams]);
         $mform = $view->get_import_form();
         $mform->set_data(null);
         $mform->display();
-        $df->print_footer();
+        $dlx->print_footer();
         die();
     }
 }
 
 // View actions.
 if ($urlparams->duplicate && confirm_sesskey()) { // Duplicate any requested views.
-    $df->process_views('duplicate', $urlparams->duplicate, true);
+    $dlx->process_views('duplicate', $urlparams->duplicate, true);
 } else {
     if ($urlparams->reset && confirm_sesskey()) { // Reset to default any requested views.
-        $df->process_views('reset', $urlparams->reset, true);
+        $dlx->process_views('reset', $urlparams->reset, true);
     } else {
         if ($urlparams->delete && confirm_sesskey()) { // Delete any requested views.
-            $df->process_views('delete', $urlparams->delete, true);
+            $dlx->process_views('delete', $urlparams->delete, true);
         }
     }
 }
 
 // Any notifications?
-$df->notifications['bad']['defaultview'] = '';
-$df->notifications['bad']['getstartedviews'] = '';
-$views = $df->get_views_by_type('csv', true);
+$dlx->notifications['bad']['defaultview'] = '';
+$dlx->notifications['bad']['getstartedviews'] = '';
+$views = $dlx->get_views_by_type('csv', true);
 if (!$views) {
-    $df->notifications['bad'][] = get_string('importnoneindatalynx', 'datalynx'); // Nothing in.
+    $dlx->notifications['bad'][] = get_string('importnoneindatalynx', 'datalynx'); // Nothing in.
     // Database.
 }
 
 // Print header.
-$df->print_header(['tab' => 'import', 'urlparams' => $urlparams]);
+$dlx->print_header(['tab' => 'import', 'urlparams' => $urlparams]);
 
 // Print add import link.
 $addimporturl = new moodle_url(
     '/mod/datalynx/view/view_edit.php',
-    ['d' => $df->id(), 'type' => 'csv', 'sesskey' => sesskey()]
+    ['d' => $dlx->id(), 'type' => 'csv', 'sesskey' => sesskey()]
 );
 $addimportlink = html_writer::link($addimporturl, get_string('importadd', 'datalynx'));
 $br = html_writer::empty_tag('br');
@@ -132,7 +132,7 @@ if ($views) {
     $viewbaseurl = '/mod/datalynx/import.php';
     $editbaseurl = '/mod/datalynx/view/view_edit.php';
     $actionbaseurl = '/mod/datalynx/import.php';
-    $linkparams = ['d' => $df->id(), 'sesskey' => sesskey()];
+    $linkparams = ['d' => $dlx->id(), 'sesskey' => sesskey()];
 
     // Table headings.
     $strviews = get_string('views', 'datalynx');
@@ -197,4 +197,4 @@ if ($views) {
     echo html_writer::table($table);
 }
 
-$df->print_footer();
+$dlx->print_footer();

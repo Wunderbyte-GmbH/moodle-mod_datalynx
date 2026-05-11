@@ -52,11 +52,11 @@ class field extends datalynxfield_base {
     /**
      * Constructor.
      *
-     * @param int|object $df Datalynx object or ID.
+     * @param int|object $dlx Datalynx object or ID.
      * @param int|object $field Field object or ID.
      */
-    public function __construct($df = 0, $field = 0) {
-        parent::__construct($df, $field);
+    public function __construct($dlx = 0, $field = 0) {
+        parent::__construct($dlx, $field);
         $this->itemid = $this->field->param1;
         $this->itemname = $this->field->param2;
         $this->itemtype = $this->field->param3;

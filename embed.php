@@ -36,22 +36,22 @@ $urlparams->refresh = optional_param('refresh', 0, PARAM_INT);
 $urlparams->eids = optional_param('eids', 0, PARAM_SEQUENCE);
 
 // Set a datalynx object with guest autologin.
-$df = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
+$dlx = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
 
-require_login($df->data->course, false, $df->cm);
+require_login($dlx->data->course, false, $dlx->cm);
 
 $pageparams = ['js' => true, 'css' => true, 'rss' => true, 'modjs' => true,
         'completion' => true, 'comments' => true, 'pagelayout' => 'embedded', 'urlparams' => $urlparams,
 ];
-$df->set_page('embed', $pageparams);
+$dlx->set_page('embed', $pageparams);
 
-require_capability('mod/datalynx:viewentry', $df->context);
+require_capability('mod/datalynx:viewentry', $dlx->context);
 
-$df->set_content();
+$dlx->set_content();
 
 $headerparams = ['groups' => true, 'urlparams' => $urlparams];
-$df->print_header($headerparams);
+$dlx->print_header($headerparams);
 
-$df->display();
+$dlx->display();
 
-$df->print_footer();
+$dlx->print_footer();

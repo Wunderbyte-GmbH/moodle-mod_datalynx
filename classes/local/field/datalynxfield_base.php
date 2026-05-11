@@ -42,7 +42,7 @@ abstract class datalynxfield_base {
      *
      * @var datalynx
      */
-    public $df = null;
+    public $dlx = null;
 
     /**
      * The field object itself, if we know it
@@ -73,20 +73,20 @@ abstract class datalynxfield_base {
     /**
      * Class constructor
      *
-     * TODO: $df should always be an int value.
+     * TODO: $dlx should always be an int value.
      *
-     * @param number $df datalynx id or class object
+     * @param number $dlx datalynx id or class object
      * @param number $field fieldid or fieldobject
      */
-    public function __construct($df = 0, $field = 0) {
-        if (empty($df)) {
+    public function __construct($dlx = 0, $field = 0) {
+        if (empty($dlx)) {
             throw new coding_exception('Datalynx id or object must be passed to view constructor.');
         } else {
-            if ($df instanceof \mod_datalynx\datalynx) {
-                $this->df = $df;
+            if ($dlx instanceof \mod_datalynx\datalynx) {
+                $this->dlx = $dlx;
             } else {
                 // Construct the datalynx object from the integer id.
-                $this->df = new mod_datalynx\datalynx($df);
+                $this->dlx = new mod_datalynx\datalynx($dlx);
             }
         }
 
@@ -96,7 +96,7 @@ abstract class datalynxfield_base {
                 $this->field = $field; // Programmer knows what they are doing, we hope.
                 // Variable $field is a field id.
             } else {
-                if ($fieldobj = $this->df->get_field_from_id($field)) {
+                if ($fieldobj = $this->dlx->get_field_from_id($field)) {
                     $this->field = $fieldobj->field;
                 } else {
                     throw new moodle_exception('invalidfield', 'datalynx', null, null, $field);
@@ -118,7 +118,7 @@ abstract class datalynxfield_base {
         $this->field = new stdClass();
         $this->field->id = !empty($forminput->id) ? $forminput->id : 0;
         $this->field->type = $this->type;
-        $this->field->dataid = $this->df->id();
+        $this->field->dataid = $this->dlx->id();
         $this->field->name = !empty($forminput->name) ? trim($forminput->name) : '';
         $this->field->description = !empty($forminput->description) ? trim($forminput->description) : '';
         $this->field->label = !empty($forminput->label) ? $forminput->label : '';
@@ -178,7 +178,7 @@ abstract class datalynxfield_base {
         if (!empty($this->field->id)) {
             if ($filearea = $this->filearea()) {
                 $fs = get_file_storage();
-                $fs->delete_area_files($this->df->context->id, 'mod_datalynx', $filearea);
+                $fs->delete_area_files($this->dlx->context->id, 'mod_datalynx', $filearea);
             }
             $this->delete_content();
             $DB->delete_records('datalynx_fields', ['id' => $this->field->id]);
@@ -277,8 +277,8 @@ abstract class datalynxfield_base {
      *
      * @return datalynx
      */
-    public function df() {
-        return $this->df;
+    public function dlx() {
+        return $this->dlx;
     }
 
     /**
@@ -294,7 +294,7 @@ abstract class datalynxfield_base {
         }
         $actionurl = new moodle_url(
             '/mod/datalynx/field/field_edit.php',
-            ['d' => $this->df->id(), 'fid' => $this->id(), 'type' => $this->type]
+            ['d' => $this->dlx->id(), 'fid' => $this->id(), 'type' => $this->type]
         );
         return new $formclass($this, $actionurl);
     }
@@ -441,7 +441,7 @@ abstract class datalynxfield_base {
             $fs = get_file_storage();
             foreach ($rs as $content) {
                 $fs->delete_area_files(
-                    $this->df->context->id,
+                    $this->dlx->context->id,
                     'mod_datalynx',
                     'content',
                     $content->id

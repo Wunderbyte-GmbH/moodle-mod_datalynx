@@ -53,7 +53,7 @@ class renderer extends datalynxfield_renderer {
             $selected = json_decode($entry->{"c{$fieldid}_content"}, true);
             $selected = $selected ? $selected : [];
 
-            $str = $this->get_user_list((int) $field->df()->course->id, $selected);
+            $str = $this->get_user_list((int) $field->dlx()->course->id, $selected);
 
             switch ($field->listformat) {
                 case field::TEAMMEMBERSELECT_FORMAT_NEWLINE:
@@ -87,7 +87,7 @@ class renderer extends datalynxfield_renderer {
         $selected = $selected ? $selected : []; // TODO MDL-000000: Seems obsolete.
         $teamfull = $field->teamsize < count($selected);
         $hasadmissiblerole = array_intersect(
-            $field->df()->get_user_datalynx_permissions($USER->id),
+            $field->dlx()->get_user_datalynx_permissions($USER->id),
             $field->admissibleroles
         );
         $userismember = in_array($USER->id, $selected);
@@ -100,7 +100,7 @@ class renderer extends datalynxfield_renderer {
             $str .= html_writer::link(
                 new moodle_url(
                     '/mod/datalynx/view.php',
-                    ['d' => $field->df()->id(), 'fieldid' => $fieldid,
+                    ['d' => $field->dlx()->id(), 'fieldid' => $fieldid,
                                 'entryid' => $entry->id,
                                 'userid' => $USER->id,
                                 'action' => $userismember ? 'unsubscribe' : 'subscribe',
@@ -113,14 +113,14 @@ class renderer extends datalynxfield_renderer {
 
             $userurl = new moodle_url(
                 '/user/view.php',
-                ['course' => $field->df()->course->id, 'id' => $USER->id]
+                ['course' => $field->dlx()->course->id, 'id' => $USER->id]
             );
 
             // Load JS.
             $PAGE->requires->js_call_amd(
                 'mod_datalynx/teammemberselect',
                 'init',
-                [$field->df()->id(), $fieldid, $userurl->out(false), fullname($USER), $canunsubscribe]
+                [$field->dlx()->id(), $fieldid, $userurl->out(false), fullname($USER), $canunsubscribe]
             );
         }
 

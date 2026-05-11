@@ -123,7 +123,7 @@ class renderer extends datalynxfield_renderer {
             // Media.
             if ($type == 'media') {
                 require_once("$CFG->dirroot/filter/mediaplugin/filter.php");
-                $mpfilter = new filter_mediaplugin($field->df()->context, []);
+                $mpfilter = new filter_mediaplugin($field->dlx()->context, []);
                 return $mpfilter->filter(html_writer::link($url, '', $attributes));
             }
         }

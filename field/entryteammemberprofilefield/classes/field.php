@@ -172,7 +172,7 @@ class field extends datalynxfield_no_content_can_join {
             // Get entryids for the users that have the selected field value.
             $conditions = [];
             $params = [
-                    'dataid' => $this->df->id(),
+                    'dataid' => $this->dlx->id(),
                     'fieldid' => $queriedfieldid,
             ];
 
@@ -280,7 +280,7 @@ class field extends datalynxfield_no_content_can_join {
                  ORDER BY $contentfull $sortdir";
 
         $distinctvalues = [];
-        if ($options = $DB->get_records_sql($sql, [$this->df->id()])) {
+        if ($options = $DB->get_records_sql($sql, [$this->dlx->id()])) {
             if ($this->field->internalname == 'name') {
                 $internalname = 'id';
             } else {

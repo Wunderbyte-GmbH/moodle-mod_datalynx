@@ -231,7 +231,7 @@ class field extends datalynxfield_no_content {
                 }
             }
         } else {
-            return parent::parse_search($this->df(), $i);
+            return parent::parse_search($this->dlx(), $i);
         }
     }
 
@@ -253,7 +253,7 @@ class field extends datalynxfield_no_content {
                  ORDER BY $contentfull $sortdir";
 
         $distinctvalues = [];
-        if ($options = $DB->get_records_sql($sql, [$this->df->id()])) {
+        if ($options = $DB->get_records_sql($sql, [$this->dlx->id()])) {
             if ($this->field->internalname == 'name') {
                 $internalname = 'id';
             } else {

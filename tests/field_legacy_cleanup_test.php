@@ -60,9 +60,9 @@ final class field_legacy_cleanup_test extends advanced_testcase {
      * New field instances should no longer carry legacy visibility/editability properties.
      */
     public function test_new_field_definition_omits_legacy_columns(): void {
-        $df = $this->create_test_datalynx();
+        $dlx = $this->create_test_datalynx();
 
-        $field = $df->get_field('text');
+        $field = $dlx->get_field('text');
 
         $this->assertFalse(property_exists($field->field, 'visible'));
         $this->assertFalse(property_exists($field->field, 'edits'));
@@ -72,9 +72,9 @@ final class field_legacy_cleanup_test extends advanced_testcase {
      * Internal field definitions should no longer expose legacy visibility data.
      */
     public function test_internal_field_objects_omit_legacy_visibility(): void {
-        $df = $this->create_test_datalynx();
+        $dlx = $this->create_test_datalynx();
 
-        $fields = \datalynxfield_approve\field::get_field_objects($df->id());
+        $fields = \datalynxfield_approve\field::get_field_objects($dlx->id());
         $approvedfield = reset($fields);
 
         $this->assertFalse(property_exists($approvedfield, 'visible'));

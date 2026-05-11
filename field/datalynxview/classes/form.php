@@ -90,7 +90,7 @@ class form extends datalynxfield_form {
                 'dffield' => 'param1',
                 'viewfield' => 'param2',
                 'textfieldfield' => 'param7',
-                'presentdlid' => $this->dl->id(),
+                'presentdlid' => $this->dlx->id(),
                 'thisfieldstring' => get_string('thisfield', 'datalynx'),
                 'update' => $this->field->id() ? $this->field->id() : 0,
                 'fieldtype' => 'datalynxview',

@@ -46,10 +46,10 @@ final class get_email_view_data_test extends advanced_testcase {
 
         $course = $this->getDataGenerator()->create_course();
         $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
-        $df = new datalynx($instance->id);
+        $dlx = new datalynx($instance->id);
 
         $view = (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'type' => 'email',
             'name' => 'Email view',
             'description' => '',
@@ -65,7 +65,7 @@ final class get_email_view_data_test extends advanced_testcase {
         $view->id = (int) $DB->insert_record('datalynx_views', $view);
 
         $entryid = (int) $DB->insert_record('datalynx_entries', (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'userid' => $USER->id,
             'groupid' => 0,
             'approved' => 1,
@@ -74,7 +74,7 @@ final class get_email_view_data_test extends advanced_testcase {
             'timemodified' => time(),
         ]);
         $DB->insert_record('datalynx_entries', (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'userid' => $USER->id,
             'groupid' => 0,
             'approved' => 1,
@@ -83,7 +83,7 @@ final class get_email_view_data_test extends advanced_testcase {
             'timemodified' => time(),
         ]);
 
-        return [$df, $view, $entryid];
+        return [$dlx, $view, $entryid];
     }
 
     /**
@@ -95,10 +95,10 @@ final class get_email_view_data_test extends advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
 
-        [$df, $view, $entryid] = $this->create_email_fixture();
+        [$dlx, $view, $entryid] = $this->create_email_fixture();
 
         $result = get_email_view_data::execute(
-            $df->id(),
+            $dlx->id(),
             $view->id,
             $entryid,
             '',
@@ -106,7 +106,7 @@ final class get_email_view_data_test extends advanced_testcase {
         );
         $result = external_api::clean_returnvalue(get_email_view_data::execute_returns(), $result);
 
-        $this->assertSame((int) $df->id(), $result['datalynxid']);
+        $this->assertSame((int) $dlx->id(), $result['datalynxid']);
         $this->assertSame($view->id, $result['viewid']);
         $this->assertSame('email', $result['viewtype']);
         $this->assertSame($entryid, $result['entryid']);

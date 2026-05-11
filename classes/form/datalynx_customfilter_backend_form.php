@@ -133,7 +133,7 @@ class datalynx_customfilter_backend_form extends datalynx_customfilter_base_form
         if ($customfilter->fieldlist) {
             $fieldlist = json_decode($customfilter->fieldlist);
         }
-        $fields = $this->get_possible_customfilter_fields($this->dl);
+        $fields = $this->get_possible_customfilter_fields($this->dlx);
         foreach ($fields as $field) {
             $formfieldname = 'fieldlist[' . $field->field->id . '][name]';
             $formfieldsortablename = 'fieldlist[' . $field->field->id . '][sortable]';
@@ -174,18 +174,18 @@ class datalynx_customfilter_backend_form extends datalynx_customfilter_base_form
     /**
      * Get all fields that can be used in a customfilter.
      *
-     * @param mixed $dl The datalynx instance.
+     * @param mixed $dlx The datalynx instance.
      * @return array
      */
-    protected function get_possible_customfilter_fields($dl): array {
+    protected function get_possible_customfilter_fields($dlx): array {
         global $DB;
 
         $fields = [];
-        $customfilterfieldtypes = $dl->get_customfilterfieldtypes();
-        $fieldsdb = $DB->get_records('datalynx_fields', ['dataid' => $dl->id()], 'name asc');
+        $customfilterfieldtypes = $dlx->get_customfilterfieldtypes();
+        $fieldsdb = $DB->get_records('datalynx_fields', ['dataid' => $dlx->id()], 'name asc');
         foreach ($fieldsdb as $fieldid => $field) {
             if (in_array($field->type, $customfilterfieldtypes)) {
-                $fields[$fieldid] = $dl->get_field($field);
+                $fields[$fieldid] = $dlx->get_field($field);
             }
         }
 
@@ -246,8 +246,8 @@ class datalynx_customfilter_backend_form extends datalynx_customfilter_base_form
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
-        $dl = $this->dl;
-        if (empty($data['name']) || $dl->name_exists('customfilters', $data['name'], $this->customfilter->id)) {
+        $dlx = $this->dlx;
+        if (empty($data['name']) || $dlx->name_exists('customfilters', $data['name'], $this->customfilter->id)) {
             $errors['name'] = get_string(
                 'invalidname',
                 'datalynx',

@@ -38,14 +38,14 @@ class datalynxfield_layout_form extends moodleform {
      *
      * @var datalynx
      */
-    private $datalynx;
+    private $dlx;
 
     /**
      *
-     * @param datalynx $datalynx
+     * @param datalynx $dlx
      */
-    public function __construct(mod_datalynx\datalynx $datalynx) {
-        $this->datalynx = $datalynx;
+    public function __construct(mod_datalynx\datalynx $dlx) {
+        $this->dlx = $dlx;
         parent::__construct();
     }
 
@@ -59,7 +59,7 @@ class datalynxfield_layout_form extends moodleform {
 
         $mform->addElement('hidden', 'id', 0);
         $mform->setType('id', PARAM_INT);
-        $mform->addElement('hidden', 'd', $this->datalynx->id());
+        $mform->addElement('hidden', 'd', $this->dlx->id());
         $mform->setType('d', PARAM_INT);
 
         $mform->addElement('header', 'general', get_string('general', 'form'));

@@ -44,20 +44,20 @@ $urlparams->download = optional_param('download', '', PARAM_SEQUENCE); // Ids of
 $urlparams->confirmed = optional_param('confirmed', 0, PARAM_INT);
 
 // Set a datalynx object.
-$df = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
+$dlx = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
 
-require_login($df->data->course, false, $df->cm);
+require_login($dlx->data->course, false, $dlx->cm);
 
-require_capability('mod/datalynx:managetemplates', $df->context);
+require_capability('mod/datalynx:managetemplates', $dlx->context);
 
-$df->set_page('preset/index', ['modjs' => true, 'urlparams' => $urlparams]);
+$dlx->set_page('preset/index', ['modjs' => true, 'urlparams' => $urlparams]);
 
 // Activate navigation node.
 navigation_node::override_active_url(
-    new moodle_url('/mod/datalynx/preset/index.php', ['id' => $df->cm->id])
+    new moodle_url('/mod/datalynx/preset/index.php', ['id' => $dlx->cm->id])
 );
 
-$pm = $df->get_preset_manager();
+$pm = $dlx->get_preset_manager();
 
 // DATA PROCESSING.
 $pm->process_presets($urlparams);
@@ -67,12 +67,12 @@ $sharedpresets = $pm->get_user_presets($pm::PRESET_SITEAREA);
 
 // Any notifications.
 if (!$localpresets && !$sharedpresets) {
-    $df->notifications['bad'][] = get_string('presetnoneavailable', 'datalynx'); // No presets in.
+    $dlx->notifications['bad'][] = get_string('presetnoneavailable', 'datalynx'); // No presets in.
     // Datalynx.
 }
 
 // Print header.
-$df->print_header(['tab' => 'presets', 'urlparams' => $urlparams]);
+$dlx->print_header(['tab' => 'presets', 'urlparams' => $urlparams]);
 
 // Print the preset form.
 $pm->print_preset_form();
@@ -80,4 +80,4 @@ $pm->print_preset_form();
 // If there are presets print admin style list of them.
 $pm->print_presets_list($localpresets, $sharedpresets);
 
-$df->print_footer();
+$dlx->print_footer();

@@ -56,13 +56,13 @@ class field extends datalynxfield_base {
     /**
      * Constructs the datalynxview field instance.
      *
-     * @param int|object $df
+     * @param int|object $dlx
      * @param int|object $field
      */
-    public function __construct($df = 0, $field = 0) {
+    public function __construct($dlx = 0, $field = 0) {
         global $DB;
 
-        parent::__construct($df, $field);
+        parent::__construct($dlx, $field);
 
         // Get the datalynx.
         if (
@@ -72,16 +72,16 @@ class field extends datalynxfield_base {
             return;
         }
 
-        $datalynx = new \mod_datalynx\datalynx($this->field->param1);
+        $dlx = new \mod_datalynx\datalynx($this->field->param1);
         // TODO MDL-000000 Add capability check on view entries.
 
         // Is there a view? Otherwise return.
         if (empty($this->field->param2) || !$viewid = $DB->get_field('datalynx_views', 'id', ['id' => $this->field->param2])) {
             return;
         }
-        $this->refdatalynx = $datalynx;
+        $this->refdatalynx = $dlx;
         $this->refview = $viewid;
-        $currentview = $this->df->get_current_view();
+        $currentview = $this->dlx->get_current_view();
         $this->localview = $currentview ? $currentview->id() : null;
     }
 

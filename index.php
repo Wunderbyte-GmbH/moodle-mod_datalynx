@@ -108,48 +108,48 @@ $currentsection = null;
 $stredit = get_string('edit');
 $strdelete = get_string('delete');
 
-foreach ($datalynxs as $datalynx) {
+foreach ($datalynxs as $dlx) {
     $tablerow = [];
 
-    $df = new mod_datalynx\datalynx($datalynx->id);
+    $dlx = new mod_datalynx\datalynx($dlx->id);
 
-    if (!has_capability('mod/datalynx:viewindex', $df->context)) {
+    if (!has_capability('mod/datalynx:viewindex', $dlx->context)) {
         continue;
     }
 
     // Section.
-    if ($datalynx->section !== $currentsection) {
+    if ($dlx->section !== $currentsection) {
         if ($currentsection !== null) {
             $table->data[] = 'hr';
         }
-        $currentsection = $datalynx->section;
-        $tablerow[] = get_section_name($course, $sections[$datalynx->section]);
+        $currentsection = $dlx->section;
+        $tablerow[] = get_section_name($course, $sections[$dlx->section]);
     } else {
         $tablerow[] = '';
     }
 
     // Name (linked; dim if not visible).
-    $linkparams = !$datalynx->visible ? ['class' => 'dimmed'] : null;
+    $linkparams = !$dlx->visible ? ['class' => 'dimmed'] : null;
     $linkedname = html_writer::link(
-        new moodle_url('/mod/datalynx/view.php', ['id' => $datalynx->coursemodule]),
-        format_string($datalynx->name, true),
+        new moodle_url('/mod/datalynx/view.php', ['id' => $dlx->coursemodule]),
+        format_string($dlx->name, true),
         $linkparams
     );
     $tablerow[] = $linkedname;
 
     // Description.
-    $tablerow[] = format_text($datalynx->intro, $datalynx->introformat, $options);
+    $tablerow[] = format_text($dlx->intro, $dlx->introformat, $options);
 
     // Number of entries.
-    $tablerow[] = $df->get_entriescount(mod_datalynx\datalynx::COUNT_ALL);
+    $tablerow[] = $dlx->get_entriescount(mod_datalynx\datalynx::COUNT_ALL);
 
     // Number of pending entries.
-    $tablerow[] = $df->get_entriescount(mod_datalynx\datalynx::COUNT_UNAPPROVED);
+    $tablerow[] = $dlx->get_entriescount(mod_datalynx\datalynx::COUNT_UNAPPROVED);
 
     // Rss.
     if ($rss) {
-        if ($datalynx->rssarticles > 0) {
-            $tablerow[] = rss_get_link($course->id, $USER->id, 'datalynx', $datalynx->id, 'RSS');
+        if ($dlx->rssarticles > 0) {
+            $tablerow[] = rss_get_link($course->id, $USER->id, 'datalynx', $dlx->id, 'RSS');
         } else {
             $tablerow[] = '';
         }
@@ -157,11 +157,11 @@ foreach ($datalynxs as $datalynx) {
 
     if ($showeditbuttons) {
         $buttons = [];
-        $editingurl->param('update', $datalynx->coursemodule);
+        $editingurl->param('update', $dlx->coursemodule);
         $buttons['edit'] = html_writer::link($editingurl, $OUTPUT->pix_icon('t/edit', $stredit));
         $editingurl->remove_params('update');
 
-        $editingurl->param('delete', $datalynx->coursemodule);
+        $editingurl->param('delete', $dlx->coursemodule);
         $buttons['delete'] = html_writer::link(
             $editingurl,
             $OUTPUT->pix_icon('t/delete', $strdelete)

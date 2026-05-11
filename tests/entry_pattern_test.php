@@ -50,15 +50,15 @@ final class entry_pattern_test extends advanced_testcase {
     public function test_display_edit_sets_matching_editentries_and_eids(): void {
         $course = $this->getDataGenerator()->create_course();
         $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
-        $df = new datalynx($instance->id);
+        $dlx = new datalynx($instance->id);
 
-        $fieldrecord = entry_field::get_field_objects($df->id())[entry_field::_ENTRY];
-        $field = new entry_field($df, $fieldrecord);
+        $fieldrecord = entry_field::get_field_objects($dlx->id())[entry_field::_ENTRY];
+        $field = new entry_field($dlx, $fieldrecord);
         $renderer = $field->renderer();
 
         $entry = (object) [
             'id' => 42,
-            'baseurl' => new moodle_url('/mod/datalynx/view.php', ['d' => $df->id()]),
+            'baseurl' => new moodle_url('/mod/datalynx/view.php', ['d' => $dlx->id()]),
         ];
 
         $method = new ReflectionMethod($renderer, 'display_edit');

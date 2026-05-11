@@ -235,20 +235,20 @@ abstract class datalynxfield_renderer {
         $matches = [];
 
         $fieldname = $this->field->name();
-        $behavior = datalynxfield_behavior::get_default_behavior($this->field->df());
-        $renderer = datalynxfield_layout::get_default_renderer($this->field->df());
+        $behavior = datalynxfield_behavior::get_default_behavior($this->field->dlx());
+        $renderer = datalynxfield_layout::get_default_renderer($this->field->dlx());
 
         if (preg_match($pattern, $tag, $matches)) {
             $fieldname = isset($matches[1]) ? $matches[1] : false;
 
             $behaviorname = isset($matches[2]) ? $matches[2] : false;
             if ($behaviorname) {
-                $behavior = datalynxfield_behavior::from_name($behaviorname, $this->field->df()->id());
+                $behavior = datalynxfield_behavior::from_name($behaviorname, $this->field->dlx()->id());
             }
 
             $renderername = isset($matches[3]) ? $matches[3] : false;
             if ($renderername) {
-                $renderer = datalynxfield_layout::get_renderer_by_name($renderername, $this->field->df()->id());
+                $renderer = datalynxfield_layout::get_renderer_by_name($renderername, $this->field->dlx()->id());
             }
         }
 

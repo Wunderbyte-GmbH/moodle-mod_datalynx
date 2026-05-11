@@ -41,7 +41,7 @@ class datalynxview_base_form extends moodleform {
     protected $view = null;
 
     /** @var object The datalynx instance. */
-    protected $dl = null;
+    protected $dlx = null;
 
     /**
      * Constructor for datalynxview_base_form.
@@ -64,7 +64,7 @@ class datalynxview_base_form extends moodleform {
         $editable = true
     ) {
         $this->view = $view;
-        $this->dl = $view->get_dl();
+        $this->dlx = $view->get_dlx();
         $attributes['id'] = 'datalynx-view-edit-form';
         parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
     }
@@ -75,7 +75,7 @@ class datalynxview_base_form extends moodleform {
     public function definition() {
         global $CFG, $DB;
         $view = $this->view;
-        $df = $this->dl;
+        $dlx = $this->dlx;
         $editoroptions = $view->editors();
         $mform = &$this->_form;
         $internalview = $view->is_internal_view();
@@ -137,7 +137,7 @@ class datalynxview_base_form extends moodleform {
             $mform->addGroup($visiblegrp, 'visiblegroup', get_string('visibleto', 'datalynx'), null, false);
 
             // Filter.
-            $filtersmenu = $df->get_filter_manager()->get_filters(null, true);
+            $filtersmenu = $dlx->get_filter_manager()->get_filters(null, true);
             if (!$filtersmenu) {
                 $filtersmenu = [0 => get_string('filtersnonedefined', 'datalynx')];
             } else {
@@ -160,7 +160,7 @@ class datalynxview_base_form extends moodleform {
             $mform->addElement('header', 'redirectsettings', get_string('redirectsettings', 'datalynx'));
             $mform->addHelpButton('redirectsettings', 'redirectsettings', 'datalynx');
             $mform->addElement('select', 'param10', get_string('redirectto', 'datalynx'), $this->get_view_menu());
-            $mform->setDefault('param10', $DB->get_field('datalynx', 'defaultview', ['id' => $this->dl->id()]));
+            $mform->setDefault('param10', $DB->get_field('datalynx', 'defaultview', ['id' => $this->dlx->id()]));
             $mform->setType('param10', PARAM_INT);
         }
 
@@ -245,7 +245,7 @@ class datalynxview_base_form extends moodleform {
     public function get_view_menu() {
         global $DB;
         $viewid = $this->view->view->id;
-        $dataid = $this->dl->id();
+        $dataid = $this->dlx->id();
         $query = "SELECT dv.id, dv.name
                     FROM {datalynx_views} dv
                    WHERE dv.dataid = :dataid
@@ -396,10 +396,10 @@ class datalynxview_base_form extends moodleform {
         $errors = parent::validation($data, $files);
 
         $view = $this->view;
-        $df = $this->dl;
+        $dlx = $this->dlx;
 
         // Check if the view name is already used.
-        if ($df->name_exists('views', $data['name'], $view->id())) {
+        if ($dlx->name_exists('views', $data['name'], $view->id())) {
             $errors['name'] = get_string('invalidname', 'datalynx', get_string('view', 'datalynx'));
         }
 
@@ -420,12 +420,12 @@ class datalynxview_base_form extends moodleform {
 
                 $visiblefieldgroups++;
 
-                $fieldid = array_search(substr($fieldgroup, 2, -2), $df->get_fieldnames());
-                $subfields = $df->get_field_from_id($fieldid);
+                $fieldid = array_search(substr($fieldgroup, 2, -2), $dlx->get_fieldnames());
+                $subfields = $dlx->get_field_from_id($fieldid);
 
                 $lookup = '';
                 foreach ($subfields->fieldids as $subfieldid) {
-                    $subfield = $df->get_field_from_id($subfieldid);
+                    $subfield = $dlx->get_field_from_id($subfieldid);
                     $lookup .= " [[" . $subfield->field->name . "]]";
                 }
 

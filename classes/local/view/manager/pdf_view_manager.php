@@ -37,8 +37,8 @@ class pdf_view_manager {
      * @return array
      */
     public function get_browse_payload(int $datalynxid, int $viewid, array $filteroptions = []): array {
-        $datalynx = new datalynx($datalynxid);
-        $viewrecords = $datalynx->get_view_records(true);
+        $dlx = new datalynx($datalynxid);
+        $viewrecords = $dlx->get_view_records(true);
 
         if (empty($viewrecords[$viewid])) {
             throw new coding_exception('Invalid view id for PDF browse payload.');
@@ -50,22 +50,22 @@ class pdf_view_manager {
         }
 
         /** @var \datalynxview_pdf\view $view */
-        $view = $datalynx->get_view($viewrecord->type, $viewrecord, false);
+        $view = $dlx->get_view($viewrecord->type, $viewrecord, false);
         if (!empty($filteroptions)) {
             $view->set_filter($filteroptions, $view->is_forcing_filter());
         }
 
         $contentfields = $view->get_view_fields();
         if (empty($contentfields)) {
-            $contentfields = $view->remove_duplicates($view->get_dl()->get_fields());
+            $contentfields = $view->remove_duplicates($view->get_dlx()->get_fields());
         }
         $view->get_filter()->contentfields = array_keys($contentfields);
 
-        $entries = new datalynx_entries($datalynx, $view->get_filter());
+        $entries = new datalynx_entries($dlx, $view->get_filter());
         $entries->set_content();
 
         $payload = [
-            'datalynxid' => (int) $datalynx->id(),
+            'datalynxid' => (int) $dlx->id(),
             'viewid' => (int) $viewrecord->id,
             'viewname' => format_string($view->name()),
             'viewtype' => $view->type(),
@@ -108,7 +108,7 @@ class pdf_view_manager {
      */
     protected function has_manageable_entries(\datalynxview_pdf\view $view, array $entryrecords): bool {
         foreach ($entryrecords as $entry) {
-            if ($view->get_dl()->user_can_manage_entry($entry)) {
+            if ($view->get_dlx()->user_can_manage_entry($entry)) {
                 return true;
             }
         }
@@ -131,7 +131,7 @@ class pdf_view_manager {
                 'id' => (int) $entry->id,
                 'entryhtml' => $view->render_browse_entry_html(
                     $entry,
-                    $view->get_dl()->user_can_manage_entry($entry)
+                    $view->get_dlx()->user_can_manage_entry($entry)
                 ),
             ];
         }

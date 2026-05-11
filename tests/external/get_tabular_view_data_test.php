@@ -46,10 +46,10 @@ final class get_tabular_view_data_test extends advanced_testcase {
 
         $course = $this->getDataGenerator()->create_course();
         $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
-        $df = new datalynx($instance->id);
+        $dlx = new datalynx($instance->id);
 
         $view = (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'type' => 'tabular',
             'name' => 'Pilot Tabular',
             'description' => '',
@@ -65,7 +65,7 @@ final class get_tabular_view_data_test extends advanced_testcase {
         $view->id = (int) $DB->insert_record('datalynx_views', $view);
 
         $field = (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'type' => 'text',
             'name' => 'Title',
             'description' => '',
@@ -83,7 +83,7 @@ final class get_tabular_view_data_test extends advanced_testcase {
         $field->id = (int) $DB->insert_record('datalynx_fields', $field);
 
         $entryid = (int) $DB->insert_record('datalynx_entries', (object) [
-            'dataid' => $df->id(),
+            'dataid' => $dlx->id(),
             'userid' => $USER->id,
             'groupid' => 0,
             'approved' => 1,
@@ -99,7 +99,7 @@ final class get_tabular_view_data_test extends advanced_testcase {
             'content' => 'Hello External Tabular',
         ]);
 
-        return [$df, $view, $entryid];
+        return [$dlx, $view, $entryid];
     }
 
     /**
@@ -111,12 +111,12 @@ final class get_tabular_view_data_test extends advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
 
-        [$df, $view, $entryid] = $this->create_tabular_fixture();
+        [$dlx, $view, $entryid] = $this->create_tabular_fixture();
 
-        $result = get_tabular_view_data::execute($df->id(), $view->id);
+        $result = get_tabular_view_data::execute($dlx->id(), $view->id);
         $result = external_api::clean_returnvalue(get_tabular_view_data::execute_returns(), $result);
 
-        $this->assertSame((int) $df->id(), $result['datalynxid']);
+        $this->assertSame((int) $dlx->id(), $result['datalynxid']);
         $this->assertSame($view->id, $result['viewid']);
         $this->assertSame('tabular', $result['viewtype']);
         $this->assertTrue($result['hasentries']);

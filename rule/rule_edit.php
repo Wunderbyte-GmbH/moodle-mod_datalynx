@@ -32,15 +32,15 @@ $urlparams->type = optional_param('type', '', PARAM_ALPHA); // Type of a rule to
 $urlparams->rid = optional_param('rid', 0, PARAM_INT); // Rule id to edit.
 
 // Set a datalynx object.
-$df = new mod_datalynx\datalynx($urlparams->d);
+$dlx = new mod_datalynx\datalynx($urlparams->d);
 
-require_login($df->data->course, false, $df->cm);
+require_login($dlx->data->course, false, $dlx->cm);
 
-require_capability('mod/datalynx:managetemplates', $df->context);
+require_capability('mod/datalynx:managetemplates', $dlx->context);
 
-$df->set_page('rule/rule_edit', ['urlparams' => $urlparams]);
+$dlx->set_page('rule/rule_edit', ['urlparams' => $urlparams]);
 
-$rm = $df->get_rule_manager();
+$rm = $dlx->get_rule_manager();
 
 if ($urlparams->rid) {
     $rule = $rm->get_rule_from_id($urlparams->rid, true); // Force get.
@@ -53,7 +53,7 @@ if ($urlparams->rid) {
 $mform = $rule->get_form();
 
 if ($mform->is_cancelled()) {
-    redirect(new moodle_url('/mod/datalynx/rule/index.php', ['d' => $df->id()]));
+    redirect(new moodle_url('/mod/datalynx/rule/index.php', ['d' => $dlx->id()]));
 
     // No submit buttons.
 } else {
@@ -63,9 +63,9 @@ if ($mform->is_cancelled()) {
             if (!$rule->get_id()) {
                 $ruleid = $rule->insert_rule($data);
 
-                $other = ['dataid' => $df->id()];
+                $other = ['dataid' => $dlx->id()];
                 $event = \mod_datalynx\event\rule_created::create(
-                    ['context' => $df->context, 'objectid' => $ruleid, 'other' => $other]
+                    ['context' => $dlx->context, 'objectid' => $ruleid, 'other' => $other]
                 );
                 $event->trigger();
 
@@ -74,15 +74,15 @@ if ($mform->is_cancelled()) {
                 $data->id = $rule->get_id();
                 $rule->update_rule($data);
 
-                $other = ['dataid' => $df->id()];
+                $other = ['dataid' => $dlx->id()];
                 $event = \mod_datalynx\event\rule_updated::create(
-                    ['context' => $df->context, 'objectid' => $rule->get_id(), 'other' => $other]
+                    ['context' => $dlx->context, 'objectid' => $rule->get_id(), 'other' => $other]
                 );
                 $event->trigger();
             }
 
             if ($data->submitbutton != get_string('savecontinue', 'datalynx')) {
-                redirect(new moodle_url('/mod/datalynx/rule/index.php', ['d' => $df->id()]));
+                redirect(new moodle_url('/mod/datalynx/rule/index.php', ['d' => $dlx->id()]));
             }
 
             // Continue to edit so refresh the form.
@@ -93,11 +93,11 @@ if ($mform->is_cancelled()) {
 
 // Activate navigation node.
 navigation_node::override_active_url(
-    new moodle_url('/mod/datalynx/rule/index.php', ['id' => $df->cm->id])
+    new moodle_url('/mod/datalynx/rule/index.php', ['id' => $dlx->cm->id])
 );
 
 // Print header.
-$df->print_header(['tab' => 'rules', 'nonotifications' => true, 'urlparams' => $urlparams]);
+$dlx->print_header(['tab' => 'rules', 'nonotifications' => true, 'urlparams' => $urlparams]);
 
 $formheading = $rule->get_id() ? get_string('ruleedit', 'datalynx', $rule->get_name()) : get_string(
     'rulenew',
@@ -110,4 +110,4 @@ echo html_writer::tag('h2', format_string($formheading), ['class' => 'mdl-align'
 $mform->set_data($rule->to_form());
 $mform->display();
 
-$df->print_footer();
+$dlx->print_footer();

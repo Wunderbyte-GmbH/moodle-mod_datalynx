@@ -62,14 +62,14 @@ final class view_factory_test extends advanced_testcase {
      * @covers ::get_view
      */
     public function test_get_view_instantiates_requested_type(): void {
-        $df = $this->create_test_datalynx();
+        $dlx = $this->create_test_datalynx();
 
-        $view = $df->get_view('email');
+        $view = $dlx->get_view('email');
 
         $this->assertInstanceOf(email_view::class, $view);
         $this->assertSame('email', $view->type());
         $this->assertSame(0, $view->id());
-        $this->assertSame($df->id(), $view->get_dl()->id());
+        $this->assertSame($dlx->id(), $view->get_dlx()->id());
     }
 
     /**
@@ -78,10 +78,10 @@ final class view_factory_test extends advanced_testcase {
      * @covers ::get_view
      */
     public function test_get_view_throws_for_empty_type(): void {
-        $df = $this->create_test_datalynx();
+        $dlx = $this->create_test_datalynx();
 
         $this->expectException(coding_exception::class);
-        $df->get_view('');
+        $dlx->get_view('');
     }
 
     /**
@@ -90,10 +90,10 @@ final class view_factory_test extends advanced_testcase {
      * @covers ::get_view
      */
     public function test_get_view_throws_for_invalid_type(): void {
-        $df = $this->create_test_datalynx();
+        $dlx = $this->create_test_datalynx();
 
         $this->expectException(coding_exception::class);
-        $df->get_view('definitelymissing');
+        $dlx->get_view('definitelymissing');
     }
 
     /**
@@ -105,7 +105,7 @@ final class view_factory_test extends advanced_testcase {
      * @covers \mod_datalynx\local\view\base::get_baseurl
      */
     public function test_inline_external_context_still_uses_view_php_for_urls(): void {
-        $df = $this->create_test_datalynx();
+        $dlx = $this->create_test_datalynx();
 
         $pageparams = [
             'js' => true,
@@ -114,13 +114,13 @@ final class view_factory_test extends advanced_testcase {
             'modjs' => true,
             'completion' => true,
             'comments' => true,
-            'urlparams' => (object) ['d' => $df->id(), 'view' => 0],
+            'urlparams' => (object) ['d' => $dlx->id(), 'view' => 0],
         ];
-        $df->set_page('external', $pageparams, true);
+        $dlx->set_page('external', $pageparams, true);
 
-        $this->assertStringContainsString('/mod/datalynx/view.php', $df->get_baseurl()->out(false));
+        $this->assertStringContainsString('/mod/datalynx/view.php', $dlx->get_baseurl()->out(false));
 
-        $view = $df->get_view('tabular');
+        $view = $dlx->get_view('tabular');
         $this->assertStringContainsString('/mod/datalynx/view.php', $view->get_baseurl()->out(false));
     }
 }

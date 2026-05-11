@@ -49,20 +49,20 @@ $urlparams->update = optional_param('update', 0, PARAM_INT); // Update rule.
 $urlparams->cancel = optional_param('cancel', 0, PARAM_BOOL);
 
 // Set a datalynx object.
-$df = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
+$dlx = new mod_datalynx\datalynx($urlparams->d, $urlparams->id);
 
-require_login($df->data->course, false, $df->cm);
+require_login($dlx->data->course, false, $dlx->cm);
 
-require_capability('mod/datalynx:managetemplates', $df->context);
+require_capability('mod/datalynx:managetemplates', $dlx->context);
 
-$df->set_page('rule/index', ['modjs' => true, 'urlparams' => $urlparams]);
+$dlx->set_page('rule/index', ['modjs' => true, 'urlparams' => $urlparams]);
 
 // Activate navigation node.
 navigation_node::override_active_url(
-    new moodle_url('/mod/datalynx/rule/index.php', ['id' => $df->cm->id])
+    new moodle_url('/mod/datalynx/rule/index.php', ['id' => $dlx->cm->id])
 );
 
-$rm = $df->get_rule_manager();
+$rm = $dlx->get_rule_manager();
 
 // DATA PROCESSING.
 if ($urlparams->duplicate && confirm_sesskey()) { // Duplicate any requested rules.
@@ -84,12 +84,12 @@ if ($urlparams->duplicate && confirm_sesskey()) { // Duplicate any requested rul
 // Any notifications?
 $rules = $rm->get_rules();
 if (!$rules) {
-    $df->notifications['bad'][] = get_string('rulesnoneindatalynx', 'datalynx'); // Nothing in.
+    $dlx->notifications['bad'][] = get_string('rulesnoneindatalynx', 'datalynx'); // Nothing in.
     // Datalynx.
 }
 
 // Print header.
-$df->print_header(['tab' => 'rules', 'urlparams' => $urlparams]);
+$dlx->print_header(['tab' => 'rules', 'urlparams' => $urlparams]);
 
 // Print the rule add link.
 $rm->print_add_rule();
@@ -99,4 +99,4 @@ if ($rules) {
     $rm->print_rule_list();
 }
 
-$df->print_footer();
+$dlx->print_footer();
