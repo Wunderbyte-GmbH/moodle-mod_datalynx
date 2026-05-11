@@ -24,6 +24,9 @@
 import Ajax from 'core/ajax';
 import Notification from 'core/notification';
 
+const configs = [];
+let isListening = false;
+
 /**
  * Replace all options in a select with the provided entries.
  *
@@ -44,52 +47,88 @@ function populateSelect(element, options) {
     });
 }
 
+const getElementId = (field) => `id_${field}`;
+
+const getSelectElement = (field) => field ? document.getElementById(getElementId(field)) : null;
+
+const loadDependentOptions = (config, dffieldElement) => {
+    const {dffield, viewfield, textfieldfield, presentdlid, thisfieldstring, update, fieldtype} = config;
+    if (dffieldElement.id !== getElementId(dffield)) {
+        return;
+    }
+
+    const viewElement = getSelectElement(viewfield);
+    const textfieldElement = getSelectElement(textfieldfield);
+    const dfid = Number(dffieldElement.value);
+
+    populateSelect(viewElement, []);
+    populateSelect(textfieldElement, []);
+
+    if (!dfid) {
+        return;
+    }
+
+    const requests = [{
+        methodname: 'mod_datalynx_get_text_field_names',
+        args: {d: dfid},
+    }];
+
+    if (viewfield) {
+        requests.unshift({
+            methodname: 'mod_datalynx_get_view_names',
+            args: {d: dfid},
+        });
+    }
+
+    const [firstRequest, secondRequest] = Ajax.call(requests);
+    const viewsPromise = viewfield ? firstRequest : Promise.resolve([]);
+    const textfieldsPromise = viewfield ? secondRequest : firstRequest;
+
+    return Promise.all([viewsPromise, textfieldsPromise])
+        .then(([views, textfields]) => {
+            populateSelect(viewElement, views);
+
+            const textfieldOptions = [...textfields];
+            if (dfid === presentdlid && update === 0 && fieldtype === 'text') {
+                textfieldOptions.unshift({
+                    id: -1,
+                    name: thisfieldstring,
+                });
+            }
+
+            populateSelect(textfieldElement, textfieldOptions);
+            return textfieldOptions;
+        })
+        .catch(Notification.exception);
+};
+
+const handleDocumentChange = (event) => {
+    if (!(event.target instanceof HTMLSelectElement)) {
+        return;
+    }
+
+    configs.forEach((config) => {
+        if (event.target.id === getElementId(config.dffield)) {
+            void loadDependentOptions(config, event.target);
+        }
+    });
+};
+
 export default {
     init(options) {
-        const {dffield, viewfield, textfieldfield, presentdlid, thisfieldstring, update, fieldtype} = options;
-        const dffieldElement = document.getElementById(`id_${dffield}`);
-        const viewElement = document.getElementById(`id_${viewfield}`);
-        const textfieldElement = document.getElementById(`id_${textfieldfield}`);
-
-        if (dffieldElement) {
-            dffieldElement.addEventListener("change", function() {
-                const dfid = Number(this.value);
-
-                populateSelect(viewElement, []);
-                populateSelect(textfieldElement, []);
-
-                if (!dfid) {
-                    return undefined;
-                }
-
-                const [viewsRequest, textfieldsRequest] = Ajax.call([
-                    {
-                        methodname: 'mod_datalynx_get_view_names',
-                        args: {d: dfid},
-                    },
-                    {
-                        methodname: 'mod_datalynx_get_text_field_names',
-                        args: {d: dfid},
-                    }
-                ]);
-
-                return Promise.all([viewsRequest, textfieldsRequest])
-                    .then(([views, textfields]) => {
-                        populateSelect(viewElement, views);
-
-                        const textfieldOptions = [...textfields];
-                        if (dfid === presentdlid && update === 0 && fieldtype === 'text') {
-                            textfieldOptions.unshift({
-                                id: -1,
-                                name: thisfieldstring,
-                            });
-                        }
-
-                        populateSelect(textfieldElement, textfieldOptions);
-                        return textfieldOptions;
-                    })
-                    .catch(Notification.exception);
-            });
+        if (!configs.some((config) =>
+            config.dffield === options.dffield &&
+            config.viewfield === options.viewfield &&
+            config.textfieldfield === options.textfieldfield
+        )) {
+            configs.push(options);
         }
+
+        if (isListening) {
+            return;
+        }
+
+        document.addEventListener('change', handleDocumentChange);
+        isListening = true;
     }
 };

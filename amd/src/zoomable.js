@@ -5,7 +5,7 @@
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// It is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
@@ -21,12 +21,7 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 define([], () => {
-    /**
-     * @constructor
-     * @alias module:mod_datalynx/zoomable
-     */
     class Zoomable {
         constructor() {
             this.instances = [];
@@ -73,12 +68,15 @@ define([], () => {
                 this.getOverlay().style.top = `${pos.top}px`;
                 this.getOverlay().style.left = `${pos.left}px`;
                 this.getOverlay().style.display = 'block';
-                setTimeout(onLoad, conf.speed === 'fast' ? 200 : 400); // Mocking fade-in timing
+                setTimeout(onLoad, conf.speed === 'fast' ? 200 : 400);
             }, function(onClose) {
                 const overlay = this.getOverlay();
                 overlay.style.display = 'none';
-                setTimeout(onClose, this.getConf().closeSpeed === 'fast' ? 200 : 400); // Mocking fade-out timing
+                setTimeout(onClose, this.getConf().closeSpeed === 'fast' ? 200 : 400);
             });
+
+            Zoomable.registerGlobalHandlers();
+            Zoomable.decorateZoomableImages(document);
         }
 
         Overlay(trigger, conf) {
@@ -87,17 +85,12 @@ define([], () => {
                 trigger.dispatchEvent(new CustomEvent(type, {detail}));
             };
 
-            let overlay = conf.target || document.querySelector(trigger.getAttribute("rel")) || trigger;
+            const overlay = conf.target || document.querySelector(trigger.getAttribute('rel')) || trigger;
             let opened = false;
 
             if (!overlay) {
                 throw new Error(`Could not find Overlay: ${conf.target || trigger.getAttribute('rel')}`);
             }
-
-            trigger.addEventListener('click', (e) => {
-                e.preventDefault();
-                self.load(e);
-            });
 
             Object.assign(self, {
                 load(e = new Event('load')) {
@@ -107,11 +100,6 @@ define([], () => {
                     const eff = this.effects[conf.effect];
                     if (!eff) {
                         throw new Error(`Overlay: cannot find effect: "${conf.effect}"`);
-                    }
-                    if (conf.oneInstance) {
-                        this.instances.forEach((instance) => {
-                            instance.close(e);
-                        });
                     }
 
                     fireEvent('onBeforeLoad', e);
@@ -124,9 +112,9 @@ define([], () => {
                     const windowHeight = window.innerHeight;
                     const windowWidth = window.innerWidth;
                     const overlayRect = overlay.getBoundingClientRect();
-                    let top = conf.top === 'center' ?
+                    const top = conf.top === 'center' ?
                         Math.max((windowHeight - overlayRect.height) / 2, 0) : parseInt(conf.top, 10);
-                    let left = conf.left === 'center' ?
+                    const left = conf.left === 'center' ?
                         Math.max((windowWidth - overlayRect.width) / 2, 0) : parseInt(conf.left, 10);
 
                     eff[0].call(self, {top, left}, () => {
@@ -134,22 +122,6 @@ define([], () => {
                             fireEvent('onLoad', e);
                         }
                     });
-
-                    if (conf.closeOnClick) {
-                        document.addEventListener('click', (ev) => {
-                            if (!overlay.contains(ev.target)) {
-                                self.close(ev);
-                            }
-                        });
-                    }
-
-                    if (conf.closeOnEsc) {
-                        document.addEventListener('keydown', (ev) => {
-                            if (ev.key === 'Escape') {
-                                self.close(ev);
-                            }
-                        });
-                    }
 
                     return self;
                 },
@@ -185,20 +157,39 @@ define([], () => {
                 }
             });
 
-            const closers = overlay.querySelectorAll(conf.close || '.close');
-            closers.forEach((closer) => {
-                closer.addEventListener('click', (e) => {
-                    self.close(e);
-                });
-            });
-
             if (conf.load) {
                 self.load();
             }
+
+            return self;
+        }
+
+        static decorateZoomableImages(root) {
+            if (!('querySelectorAll' in root)) {
+                return;
+            }
+
+            root.querySelectorAll('img.zoomable').forEach((img) => {
+                img.setAttribute('title', 'Zum Vergrößern klicken');
+            });
+        }
+
+        static closeOverlayElement(overlay) {
+            const selector = `#${overlay.id}`;
+            document.querySelectorAll(`img.zoomable[rel="${selector}"]`).forEach((trigger) => {
+                trigger.removeAttribute('rel');
+            });
+            overlay.remove();
+        }
+
+        static closeAllOverlays() {
+            document.querySelectorAll('.m3e-overlay').forEach((overlay) => {
+                Zoomable.closeOverlayElement(overlay);
+            });
         }
 
         static writeNewOverlay(trigger) {
-            let divname = `zoomable${Zoomable.index}`;
+            const divname = `zoomable${Zoomable.index}`;
             Zoomable.index += 1;
 
             const img = document.createElement('img');
@@ -240,40 +231,74 @@ define([], () => {
                 new Zoomable().Overlay(trigger, {load: true, top: 'center'});
             };
         }
+
+        static handleDocumentClick(event) {
+            if (!(event.target instanceof Element)) {
+                return;
+            }
+
+            const trigger = event.target.closest('img.zoomable');
+            if (trigger) {
+                event.preventDefault();
+                Zoomable.closeAllOverlays();
+                Zoomable.writeNewOverlay(trigger);
+                return;
+            }
+
+            const closeTarget = event.target.closest('.m3e-overlay .close');
+            if (closeTarget) {
+                const overlay = closeTarget.closest('.m3e-overlay');
+                if (overlay) {
+                    Zoomable.closeOverlayElement(overlay);
+                }
+                return;
+            }
+
+            document.querySelectorAll('.m3e-overlay').forEach((overlay) => {
+                if (!overlay.contains(event.target)) {
+                    Zoomable.closeOverlayElement(overlay);
+                }
+            });
+        }
+
+        static handleDocumentKeydown(event) {
+            if (event.key === 'Escape') {
+                Zoomable.closeAllOverlays();
+            }
+        }
+
+        static handleWindowResize() {
+            document.querySelectorAll('img.zoomable[rel]').forEach((trigger) => {
+                const overlay = document.querySelector(trigger.getAttribute('rel'));
+                if (!overlay) {
+                    return;
+                }
+
+                Zoomable.closeOverlayElement(overlay);
+                Zoomable.writeNewOverlay(trigger);
+            });
+        }
+
+        static registerGlobalHandlers() {
+            if (Zoomable.globalHandlersRegistered) {
+                return;
+            }
+
+            document.addEventListener('click', Zoomable.handleDocumentClick);
+            document.addEventListener('keydown', Zoomable.handleDocumentKeydown);
+            document.addEventListener('mod_datalynx:viewContentUpdated', (event) => {
+                const root = event.detail?.target;
+                if (root) {
+                    Zoomable.decorateZoomableImages(root);
+                }
+            });
+            window.addEventListener('resize', Zoomable.handleWindowResize);
+            Zoomable.globalHandlersRegistered = true;
+        }
     }
 
     Zoomable.index = 0;
-
-    document.addEventListener('DOMContentLoaded', () => {
-        const zoomableImages = document.querySelectorAll('img.zoomable');
-        zoomableImages.forEach((img) => {
-            img.setAttribute('title', 'Zum Vergrößern klicken');
-            img.addEventListener('click', () => {
-                if (img.getAttribute('rel')) {
-                    const overlay = document.querySelector(img.getAttribute('rel'));
-                    if (overlay) {
-                        img.removeAttribute('rel');
-                        overlay.remove();
-                    }
-                }
-                Zoomable.writeNewOverlay(img);
-            });
-        });
-
-        window.addEventListener('resize', () => {
-            document.querySelectorAll('[rel]').forEach((el) => {
-                const api = el.dataset.overlay;
-                if (api && api.isOpened()) {
-                    const overlay = document.querySelector(el.getAttribute('rel'));
-                    if (overlay) {
-                        el.removeAttribute('rel');
-                        overlay.remove();
-                        Zoomable.writeNewOverlay(el);
-                    }
-                }
-            });
-        });
-    });
+    Zoomable.globalHandlersRegistered = false;
 
     return new Zoomable();
 });

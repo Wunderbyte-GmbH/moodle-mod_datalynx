@@ -40,6 +40,8 @@ import ModalSaveCancel from 'core/modal_save_cancel';
 import ModalEvents from 'core/modal_events';
 import Templates from 'core/templates';
 
+let isListeningForDropdownChanges = false;
+
 /** Regex that matches a full [[field|behavior|renderer]] tag (behavior and renderer optional). */
 const FIELD_TAG_RE = /^\[\[([^|\]]+)(?:\|([^|\]]*))?(?:\|([^|\]]*))?\]\]$/;
 const VIEW_URL_TAG_RE = /^##viewurl(?::([^#]+))?##$/;
@@ -211,33 +213,52 @@ class PatternDialogue {
             this._editorConfigs.set(editorId, {
                 supportsFieldTags: false,
                 supportsReferenceTags: false,
-                initializedButtons: new WeakSet(),
             });
         }
 
         return this._editorConfigs.get(editorId);
     }
 
-    init() {
-        document.querySelectorAll('select[id$="_tag_menu"]').forEach((dropdown) => {
-            dropdown.addEventListener('change', () => this.insertTagFromDropdown(dropdown));
+    registerDropdown(dropdown) {
+        const match = dropdown.id.match(/^(.+_editor)_(.+)_tag_menu$/);
+        if (!match) {
+            return;
+        }
 
-            const match = dropdown.id.match(/^(.+_editor)_(.+)_tag_menu$/);
-            if (!match) {
+        const editorId = 'id_' + match[1];
+        const tagType = match[2];
+        const config = this.getEditorConfig(editorId);
+
+        if (tagType === 'field') {
+            config.supportsFieldTags = true;
+        } else if (tagType === 'general' && this._referenceEditors.has(editorId)) {
+            config.supportsReferenceTags = true;
+        }
+    }
+
+    registerDelegatedDropdownHandling() {
+        if (isListeningForDropdownChanges) {
+            return;
+        }
+
+        document.addEventListener('change', (event) => {
+            if (!(event.target instanceof HTMLSelectElement) || !event.target.matches('select[id$="_tag_menu"]')) {
                 return;
             }
 
-            const editorId = 'id_' + match[1];
-            const tagType = match[2];
-            const config = this.getEditorConfig(editorId);
-
-            if (tagType === 'field') {
-                config.supportsFieldTags = true;
-            } else if (tagType === 'general' && this._referenceEditors.has(editorId)) {
-                config.supportsReferenceTags = true;
-            }
+            this.registerDropdown(event.target);
+            this.insertTagFromDropdown(event.target);
         });
 
+        isListeningForDropdownChanges = true;
+    }
+
+    init() {
+        document.querySelectorAll('select[id$="_tag_menu"]').forEach((dropdown) => {
+            this.registerDropdown(dropdown);
+        });
+
+        this.registerDelegatedDropdownHandling();
         this.waitForTinyMCE();
     }
 
@@ -384,21 +405,11 @@ class PatternDialogue {
      * @param {object} editor TinyMCE editor instance
      */
     reInitializeButtons(editor) {
-        const config = this.getEditorConfig(editor.id);
         const allBtns = editor.getBody().querySelectorAll(
             'button[data-action-tag-button], button.datalynx-field-tag, button.datalynx-view-tag'
         );
         allBtns.forEach((button) => {
             button.setAttribute('data-datalynx-editor-id', editor.id);
-
-            if (!config.initializedButtons.has(button)) {
-                button.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    this.openMoodleDialog(button, editor);
-                });
-                config.initializedButtons.add(button);
-            }
             // Refresh badge label from the stored pattern.
             if (button.classList.contains('datalynx-field-tag')) {
                 const {field, behavior, renderer} = parseFieldTag(
@@ -499,6 +510,22 @@ class PatternDialogue {
                 }
             });
 
+            editor.on('click', (e) => {
+                if (!(e.target instanceof Element)) {
+                    return;
+                }
+
+                const button = e.target.closest(
+                    'button[data-action-tag-button], button.datalynx-field-tag, button.datalynx-view-tag'
+                );
+                if (!button) {
+                    return;
+                }
+
+                e.preventDefault();
+                e.stopPropagation();
+                this.openMoodleDialog(button, editor);
+            });
             editor.on('SetContent', () => this.reInitializeButtons(editor));
             editor.on('change', () => this.reInitializeButtons(editor));
             if (editor.initialized) {
@@ -608,13 +635,11 @@ class PatternDialogue {
                 modal.hide();
             });
 
-            const deleteTagBtn = modal.getBody()[0].querySelector('[data-action="dlx-delete"]');
-            if (deleteTagBtn) {
-                deleteTagBtn.addEventListener('click', () => {
-                    this.removeButton(button, owningEditor);
-                    modal.hide();
-                });
-            }
+            modal.getRoot().on('click', '[data-action="dlx-delete"]', (e) => {
+                e.preventDefault();
+                this.removeButton(button, owningEditor);
+                modal.hide();
+            });
 
         } else if (isViewTag) {
             const {type, viewname, linktext, urlquery, cssclass} = parseViewTag(pattern);
@@ -702,13 +727,11 @@ class PatternDialogue {
                 modal.hide();
             });
 
-            const deleteTagBtn = modal.getBody()[0].querySelector('[data-action="dlx-delete"]');
-            if (deleteTagBtn) {
-                deleteTagBtn.addEventListener('click', () => {
-                    this.removeButton(button, owningEditor);
-                    modal.hide();
-                });
-            }
+            modal.getRoot().on('click', '[data-action="dlx-delete"]', (e) => {
+                e.preventDefault();
+                this.removeButton(button, owningEditor);
+                modal.hide();
+            });
         } else {
             // Action tag: display the tag text, allow deletion only.
             const action = pattern.replace(/^##|##$/g, '');
@@ -725,13 +748,11 @@ class PatternDialogue {
                 removeOnClose: true,
             });
 
-            const deleteActionBtn = modal.getBody()[0].querySelector('[data-action="dlx-delete"]');
-            if (deleteActionBtn) {
-                deleteActionBtn.addEventListener('click', () => {
-                    this.removeButton(button, owningEditor);
-                    modal.hide();
-                });
-            }
+            modal.getRoot().on('click', '[data-action="dlx-delete"]', (e) => {
+                e.preventDefault();
+                this.removeButton(button, owningEditor);
+                modal.hide();
+            });
         }
     }
 
