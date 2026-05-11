@@ -14,9 +14,8 @@ jobs:
       # min_php: "7.4"  # Optional: Set minimum PHP version
 
       # Command to install more dependencies
-      # extra_plugin_runners: |
-      #   moodle-plugin-ci add-plugin --branch main Wunderbyte-GmbH/moodle-local_wunderbyte_table
-      #   moodle-plugin-ci add-plugin --branch master branchup/moodle-filter_shortcodes
+      extra_plugin_runners: |
+        moodle-plugin-ci add-plugin --branch master branchup/moodle-filter_shortcodes
 
       # If you need to ignore specific paths (third-party libraries are ignored by default)
       # ignore_paths: 'vue3,moodle/tests/fixtures,moodle/Sniffs,moodle/vue3,OpenTBS,TinyButStrong'

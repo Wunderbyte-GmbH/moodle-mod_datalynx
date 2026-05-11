@@ -220,12 +220,6 @@ class view extends base {
                 : null,
         ]));
 
-        if ($tohtml) {
-            return $output;
-        }
-
-        echo $output;
-
         $PAGE->requires->js_call_amd('mod_datalynx/approve', 'init');
         $PAGE->requires->js_call_amd('mod_datalynx/bulkactions', 'init');
         $PAGE->requires->js_call_amd('mod_datalynx/tabularbulkedit', 'init');
@@ -236,6 +230,12 @@ class view extends base {
                 'mod_datalynx/tabular_view_browser'
             );
         }
+
+        if ($tohtml) {
+            return $output;
+        }
+
+        echo $output;
 
         return '';
     }

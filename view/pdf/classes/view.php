@@ -501,15 +501,15 @@ class view extends base {
         ]));
         $output = $this->cleanup_bookmark_patterns_for_browser($output);
 
+        if ($browsemode) {
+            $this->initialise_view_browser('pdf-view-browser', 'mod_datalynx_get_pdf_view_data', 'mod_datalynx/pdf_view_browser');
+        }
+
         if ($tohtml) {
             return $output;
         }
 
         echo $output;
-
-        if ($browsemode) {
-            $this->initialise_view_browser('pdf-view-browser', 'mod_datalynx_get_pdf_view_data', 'mod_datalynx/pdf_view_browser');
-        }
 
         return '';
     }
