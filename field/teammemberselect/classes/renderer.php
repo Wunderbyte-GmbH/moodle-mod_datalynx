@@ -165,7 +165,12 @@ class renderer extends datalynxfield_renderer {
                 $fullname = fullname($user);
                 $item = "<a href=\"$baseurl\">$fullname</a>";
                 self::$userlist[$user->id] = $item;
-                $list[] = $item;
+            }
+
+            foreach ($notpresent as $userid) {
+                if (isset(self::$userlist[$userid])) {
+                    $list[] = self::$userlist[$userid];
+                }
             }
         }
 

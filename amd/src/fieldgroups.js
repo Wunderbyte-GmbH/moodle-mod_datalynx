@@ -35,6 +35,10 @@ const fieldGroups = {
     },
 
     getFieldgroupName(wrapper) {
+        return wrapper.getAttribute('data-field-name') || '';
+    },
+
+    getFieldgroupToken(wrapper) {
         return wrapper.querySelector('.fieldgroup-marker')?.getAttribute('name') || '';
     },
 
@@ -135,6 +139,7 @@ const fieldGroups = {
 
     updateAddButtonState(wrapper, maxlines) {
         const addButton = this.getAddButton(wrapper);
+        const addButtonWrapper = addButton?.closest('.fieldgroup-addline-wrapper');
         const lastVisibleInput = this.getLastVisibleInput(wrapper);
 
         if (!addButton) {
@@ -145,8 +150,20 @@ const fieldGroups = {
             ? parseInt(lastVisibleInput.value, 10)
             : this.getVisibleLineCount(wrapper);
         const canAddMoreLines = visibleLineCount < maxlines;
+        if (typeof addButton.dataset.originalLabel === 'undefined') {
+            addButton.dataset.originalLabel = addButton.textContent.trim();
+        }
+
         addButton.disabled = !canAddMoreLines;
+        addButton.hidden = !canAddMoreLines;
         addButton.style.display = canAddMoreLines ? '' : 'none';
+        addButton.textContent = canAddMoreLines ? addButton.dataset.originalLabel : '';
+        addButton.setAttribute('aria-hidden', canAddMoreLines ? 'false' : 'true');
+
+        if (addButtonWrapper) {
+            addButtonWrapper.hidden = !canAddMoreLines;
+            addButtonWrapper.style.display = canAddMoreLines ? '' : 'none';
+        }
     },
 
     clearLine(thisLine) {
@@ -282,7 +299,7 @@ const fieldGroups = {
         }
 
         if (lineId >= 1) {
-            const fieldgroupname = this.getFieldgroupName(parentContainer);
+            const fieldgroupname = this.getFieldgroupToken(parentContainer);
             thisLine.style.display = 'none';
             if (lastVisibleInput) {
                 lastVisibleInput.value = currentVisibleLines - 1;
@@ -356,5 +373,7 @@ const fieldGroups = {
         this.initialiseWrappers(document, fieldgroupname);
     }
 };
+
+export const init = (...args) => fieldGroups.init(...args);
 
 export default fieldGroups;

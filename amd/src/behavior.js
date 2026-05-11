@@ -104,6 +104,15 @@ const handleDocumentClick = (event) => {
     });
 };
 
+export const init = () => {
+    if (isListening) {
+        return;
+    }
+
+    document.addEventListener('click', handleDocumentClick);
+    isListening = true;
+};
+
 export default {
     init() {
         if (isListening) {
