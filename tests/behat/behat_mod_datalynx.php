@@ -541,6 +541,89 @@ class behat_mod_datalynx extends behat_base {
     }
 
     /**
+     * Adds a comment to the newest entry in a datalynx instance as the active Behat session user.
+     *
+     * @When /^I add the comment "(?P<content_string>(?:[^"]|\\")*)" to the latest entry in "(?P<activityname_string>(?:[^"]|\\")*)" datalynx$/
+     *
+     * @param string $content
+     * @param string $activityname
+     * @return void
+     */
+    public function i_add_the_comment_to_the_latest_entry_in_datalynx($content, $activityname) {
+        global $CFG, $DB;
+
+        require_once($CFG->dirroot . '/comment/lib.php');
+        require_once($CFG->dirroot . '/course/lib.php');
+
+        $record = $DB->get_record('datalynx', ['name' => $activityname], '*', MUST_EXIST);
+        $course = $DB->get_record('course', ['id' => $record->course], '*', MUST_EXIST);
+        $cm = get_coursemodule_from_instance('datalynx', $record->id, $course->id, false, MUST_EXIST);
+        $context = \context_module::instance($cm->id);
+
+        $entries = $DB->get_records('datalynx_entries', ['dataid' => $record->id], 'id DESC', '*', 0, 1);
+        if (empty($entries)) {
+            throw new \Exception("No entries found for datalynx '$activityname'.");
+        }
+        $entry = reset($entries);
+
+        self::set_user($this->get_session_user());
+
+        $manager = new \comment((object) [
+            'context' => $context,
+            'course' => $course,
+            'cm' => $cm,
+            'area' => 'entry',
+            'itemid' => $entry->id,
+            'component' => 'mod_datalynx',
+        ]);
+        $manager->add($content);
+
+        $this->getSession()->reload();
+    }
+
+    /**
+     * Asserts that the newest entry in a datalynx instance contains the expected stored comment.
+     *
+     * @Then /^the latest entry in "(?P<activityname_string>(?:[^"]|\\")*)" datalynx should have the comment "(?P<content_string>(?:[^"]|\\")*)"$/
+     *
+     * @param string $activityname
+     * @param string $content
+     * @return void
+     */
+    public function the_latest_entry_in_datalynx_should_have_the_comment($activityname, $content) {
+        global $DB;
+
+        $record = $DB->get_record('datalynx', ['name' => $activityname], '*', MUST_EXIST);
+        $cm = get_coursemodule_from_instance('datalynx', $record->id, $record->course, false, MUST_EXIST);
+        $context = \context_module::instance($cm->id);
+
+        $entries = $DB->get_records('datalynx_entries', ['dataid' => $record->id], 'id DESC', '*', 0, 1);
+        if (empty($entries)) {
+            throw new \Exception("No entries found for datalynx '$activityname'.");
+        }
+        $entry = reset($entries);
+
+        $comments = $DB->get_records('comments', [
+            'contextid' => $context->id,
+            'commentarea' => 'entry',
+            'itemid' => $entry->id,
+            'component' => 'mod_datalynx',
+        ]);
+
+        foreach ($comments as $comment) {
+            if ($comment->content === $content) {
+                return;
+            }
+        }
+
+        if (!$comments) {
+            throw new \Exception("Could not find any comments for the latest entry in '$activityname'.");
+        }
+
+        throw new \Exception("Could not find the comment '$content' for the latest entry in '$activityname'.");
+    }
+
+    /**
      * Close the auto-complete suggestions list (Assuming there is only one on the page.).
      *
      * @Given /^I close the autocomplete suggestions list$/
