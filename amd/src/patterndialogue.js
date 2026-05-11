@@ -42,6 +42,30 @@ import Templates from 'core/templates';
 
 let isListeningForDropdownChanges = false;
 
+/**
+ * Return the nearest matching element for a potentially cross-realm event target.
+ *
+ * TinyMCE iframe events can provide Element instances from a different window,
+ * so `instanceof Element` is not reliable here.
+ *
+ * @param {*} target
+ * @param {string} selector
+ * @returns {?Element}
+ */
+function closestMatchingElement(target, selector) {
+    let element = target;
+
+    if (!element || typeof element !== 'object') {
+        return null;
+    }
+
+    if (element.nodeType !== 1) {
+        element = element.parentElement || element.parentNode || null;
+    }
+
+    return element && typeof element.closest === 'function' ? element.closest(selector) : null;
+}
+
 /** Regex that matches a full [[field|behavior|renderer]] tag (behavior and renderer optional). */
 const FIELD_TAG_RE = /^\[\[([^|\]]+)(?:\|([^|\]]*))?(?:\|([^|\]]*))?\]\]$/;
 const VIEW_URL_TAG_RE = /^##viewurl(?::([^#]+))?##$/;
@@ -242,12 +266,13 @@ class PatternDialogue {
         }
 
         document.addEventListener('change', (event) => {
-            if (!(event.target instanceof HTMLSelectElement) || !event.target.matches('select[id$="_tag_menu"]')) {
+            const dropdown = closestMatchingElement(event.target, 'select[id$="_tag_menu"]');
+            if (!dropdown) {
                 return;
             }
 
-            this.registerDropdown(event.target);
-            this.insertTagFromDropdown(event.target);
+            this.registerDropdown(dropdown);
+            this.insertTagFromDropdown(dropdown);
         });
 
         isListeningForDropdownChanges = true;
@@ -511,11 +536,8 @@ class PatternDialogue {
             });
 
             editor.on('click', (e) => {
-                if (!(e.target instanceof Element)) {
-                    return;
-                }
-
-                const button = e.target.closest(
+                const button = closestMatchingElement(
+                    e.target,
                     'button[data-action-tag-button], button.datalynx-field-tag, button.datalynx-view-tag'
                 );
                 if (!button) {

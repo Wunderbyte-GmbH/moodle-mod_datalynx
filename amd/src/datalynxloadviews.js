@@ -114,21 +114,23 @@ const handleDocumentChange = (event) => {
     });
 };
 
-export default {
-    init(options) {
-        if (!configs.some((config) =>
-            config.dffield === options.dffield &&
-            config.viewfield === options.viewfield &&
-            config.textfieldfield === options.textfieldfield
-        )) {
-            configs.push(options);
-        }
-
-        if (isListening) {
-            return;
-        }
-
-        document.addEventListener('change', handleDocumentChange);
-        isListening = true;
+export const init = (options) => {
+    if (!configs.some((config) =>
+        config.dffield === options.dffield &&
+        config.viewfield === options.viewfield &&
+        config.textfieldfield === options.textfieldfield
+    )) {
+        configs.push(options);
     }
+
+    if (isListening) {
+        return;
+    }
+
+    document.addEventListener('change', handleDocumentChange);
+    isListening = true;
+};
+
+export default {
+    init,
 };

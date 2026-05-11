@@ -105,19 +105,21 @@ const handleDocumentChange = (event) => {
     }
 };
 
-export default {
-    init(options) {
-        if (!configs.some((config) =>
-            config.coursefield === options.coursefield && config.groupfield === options.groupfield
-        )) {
-            configs.push(options);
-        }
-
-        if (isListening) {
-            return;
-        }
-
-        document.addEventListener('change', handleDocumentChange);
-        isListening = true;
+export const init = (options) => {
+    if (!configs.some((config) =>
+        config.coursefield === options.coursefield && config.groupfield === options.groupfield
+    )) {
+        configs.push(options);
     }
+
+    if (isListening) {
+        return;
+    }
+
+    document.addEventListener('change', handleDocumentChange);
+    isListening = true;
+};
+
+export default {
+    init,
 };
