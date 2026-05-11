@@ -66,10 +66,8 @@ Feature: Test datalynx _comment internal field
     And I log in as "student2"
     And I am on "Course 1" course homepage
     And I follow "Datalynx Test Instance"
-    And I click on "Comments" "link"
     And I wait until the page is ready
-    And I set the field "content" to "Great entry!"
-    And I follow "Save comment"
+    And I add the comment "Great entry!" to the latest entry in "Datalynx Test Instance" datalynx
     And I wait until the page is ready
-    Then I should see "Great entry!"
-    And I should see "1"
+    Then I should see "1"
+    And the latest entry in "Datalynx Test Instance" datalynx should have the comment "Great entry!"
