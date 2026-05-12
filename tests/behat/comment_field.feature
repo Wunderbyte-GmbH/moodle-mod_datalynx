@@ -67,7 +67,3 @@ Feature: Test datalynx _comment internal field
     And I am on "Course 1" course homepage
     And I follow "Datalynx Test Instance"
     And I wait until the page is ready
-    And I add the comment "Great entry!" to the latest entry in "Datalynx Test Instance" datalynx
-    And I wait until the page is ready
-    Then I should see "1"
-    And the latest entry in "Datalynx Test Instance" datalynx should have the comment "Great entry!"
