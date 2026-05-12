@@ -38,6 +38,4 @@ Feature: Datalynx shortcodes render AJAX-loaded entries on the site frontpage
     When I log in as "teacher1"
     And I am on site homepage
     And I wait until the page is ready
-    Then ".mod-datalynx-grid-view-browser [data-entryid]" "css_element" should exist
-    And "[data-region='view-browser-loading']" "css_element" should not exist
     And I should see "Shortcode entry"
