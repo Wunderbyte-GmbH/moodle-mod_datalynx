@@ -66,4 +66,9 @@ Feature: Test datalynx _comment internal field
     And I log in as "student2"
     And I am on "Course 1" course homepage
     And I follow "Datalynx Test Instance"
-    And I wait until the page is ready
+    And I press "Comments"
+    Then I should see "Save comment"
+    And I set the field "Comment" to "This is my test comment"
+    And I follow "Save comment"
+    Then I should see "This is my test comment"
+    And I should see "Student 2"
