@@ -27,9 +27,12 @@ import YUI from 'core/yui';
 let isListeningForUpdates = false;
 
 /** @type {boolean} */
-let isListeningForBootstrap = false;
+let isListeningForInteraction = false;
 
 const COMMENT_WIDGET_SELECTOR = '.datalynx-comment-widget';
+const COMMENT_TOGGLE_SELECTOR = '.comment-link';
+const COMMENT_OPEN_KEYS = ['Enter', ' ', 'Spacebar'];
+const commentWidgetInitialisation = new WeakMap();
 
 /**
  * Convert one widget wrapper into the option object expected by M.core_comment.init.
@@ -53,70 +56,134 @@ const getCommentOptions = (widget) => ({
  * Initialise one comment widget if it has not been bootstrapped yet.
  *
  * @param {HTMLElement} widget
+ * @returns {Promise<void>}
  */
 const initialiseCommentWidget = (widget) => {
-    if (widget.dataset.commentInitialized === '1' || widget.dataset.commentInitializing === '1') {
-        return;
+    if (widget.dataset.commentInitialized === '1') {
+        return Promise.resolve();
+    }
+
+    const initialisation = commentWidgetInitialisation.get(widget);
+    if (initialisation) {
+        return initialisation;
     }
 
     widget.dataset.commentInitializing = '1';
     const options = getCommentOptions(widget);
 
-    YUI.use('moodle-core-comment', (Y) => {
-        M.core_comment.init(Y, options);
-        widget.dataset.commentInitialized = '1';
-        delete widget.dataset.commentInitializing;
+    const promise = new Promise((resolve) => {
+        YUI.use('moodle-core-comment', (Y) => {
+            M.core_comment.init(Y, options);
+            widget.dataset.commentInitialized = '1';
+            delete widget.dataset.commentInitializing;
+            commentWidgetInitialisation.delete(widget);
+            resolve();
+        });
     });
+
+    commentWidgetInitialisation.set(widget, promise);
+    return promise;
 };
 
 /**
- * Initialise autostart comment widgets inside one DOM root.
+ * Initialise comment widgets inside one DOM root.
  *
  * @param {Document|Element} root
  */
-const initialiseAutostartCommentWidgets = (root) => {
+const initialiseCommentWidgets = (root) => {
     if (!('querySelectorAll' in root)) {
         return;
     }
 
-    root.querySelectorAll(`${COMMENT_WIDGET_SELECTOR}[data-comment-autostart="1"]`).forEach((widget) => {
+    root.querySelectorAll(COMMENT_WIDGET_SELECTOR).forEach((widget) => {
         initialiseCommentWidget(widget);
     });
 };
 
 /**
- * Lazily bootstrap a comment widget from a delegated document event.
+ * Find the wrapped Datalynx comment widget for a document event target.
  *
- * @param {Event} event
+ * @param {EventTarget|null} target
+ * @returns {HTMLElement|null}
  */
-const bootstrapCommentWidget = (event) => {
-    if (!(event.target instanceof Element)) {
+const getCommentWidgetFromTarget = (target) => {
+    if (!(target instanceof Element)) {
+        return null;
+    }
+
+    const widget = target.closest(COMMENT_WIDGET_SELECTOR);
+    return widget instanceof HTMLElement ? widget : null;
+};
+
+/**
+ * Open a lazily-rendered comment widget after its handlers are attached.
+ *
+ * @param {HTMLElement} widget
+ */
+const openCommentWidget = (widget) => {
+    initialiseCommentWidget(widget).then(() => {
+        const toggle = widget.querySelector(COMMENT_TOGGLE_SELECTOR);
+        if (toggle instanceof HTMLElement) {
+            toggle.click();
+        }
+    });
+};
+
+/**
+ * Intercept the first click on a lazy comment toggle so the anchor never wins.
+ *
+ * @param {MouseEvent} event
+ */
+const handleCommentClick = (event) => {
+    const toggle = event.target instanceof Element ? event.target.closest(COMMENT_TOGGLE_SELECTOR) : null;
+    const widget = toggle ? getCommentWidgetFromTarget(toggle) : null;
+
+    if (!widget || widget.dataset.commentInitialized === '1') {
         return;
     }
 
-    const widget = event.target.closest(COMMENT_WIDGET_SELECTOR);
-    if (widget instanceof HTMLElement) {
-        initialiseCommentWidget(widget);
+    event.preventDefault();
+    openCommentWidget(widget);
+};
+
+/**
+ * Intercept keyboard activation on a lazy comment toggle before the anchor scrolls the page.
+ *
+ * @param {KeyboardEvent} event
+ */
+const handleCommentKeydown = (event) => {
+    if (!COMMENT_OPEN_KEYS.includes(event.key)) {
+        return;
     }
+
+    const toggle = event.target instanceof Element ? event.target.closest(COMMENT_TOGGLE_SELECTOR) : null;
+    const widget = toggle ? getCommentWidgetFromTarget(toggle) : null;
+
+    if (!widget || widget.dataset.commentInitialized === '1') {
+        return;
+    }
+
+    event.preventDefault();
+    openCommentWidget(widget);
 };
 
 /**
  * Initialise the module.
  */
 export const init = () => {
-    initialiseAutostartCommentWidgets(document);
+    initialiseCommentWidgets(document);
 
-    if (!isListeningForBootstrap) {
-        document.addEventListener('pointerdown', bootstrapCommentWidget);
-        document.addEventListener('focusin', bootstrapCommentWidget);
-        isListeningForBootstrap = true;
+    if (!isListeningForInteraction) {
+        document.addEventListener('click', handleCommentClick);
+        document.addEventListener('keydown', handleCommentKeydown);
+        isListeningForInteraction = true;
     }
 
     if (!isListeningForUpdates) {
         document.addEventListener('mod_datalynx:viewContentUpdated', (event) => {
             const root = event.detail?.target;
             if (root) {
-                initialiseAutostartCommentWidgets(root);
+                initialiseCommentWidgets(root);
             }
         });
         isListeningForUpdates = true;
