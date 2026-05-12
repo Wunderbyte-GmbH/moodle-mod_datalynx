@@ -543,7 +543,8 @@ class behat_mod_datalynx extends behat_base {
     /**
      * Adds a comment to the newest entry in a datalynx instance as the active Behat session user.
      *
-     * @When /^I add the comment "(?P<content_string>(?:[^"]|\\")*)" to the latest entry in "(?P<activityname_string>(?:[^"]|\\")*)" datalynx$/
+     * @When /^I add the comment "(?P<content_string>(?:[^"]|\\")*)" to the latest
+     * entry in "(?P<activityname_string>(?:[^"]|\\")*)" datalynx$/
      *
      * @param string $content
      * @param string $activityname
@@ -584,7 +585,8 @@ class behat_mod_datalynx extends behat_base {
     /**
      * Asserts that the newest entry in a datalynx instance contains the expected stored comment.
      *
-     * @Then /^the latest entry in "(?P<activityname_string>(?:[^"]|\\")*)" datalynx should have the comment "(?P<content_string>(?:[^"]|\\")*)"$/
+     * @Then /^the latest entry in "(?P<activityname_string>(?:[^"]|\\")*)" datalynx
+     * should have the comment "(?P<content_string>(?:[^"]|\\")*)"$/
      *
      * @param string $activityname
      * @param string $content

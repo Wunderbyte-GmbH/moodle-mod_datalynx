@@ -41,6 +41,8 @@ final class toggle_entry_approval_test extends advanced_testcase {
      * Create a minimal datalynx view for event payloads.
      *
      * @param datalynx $dlx
+     * @param string $type
+     * @param string $param2
      * @return stdClass
      */
     private function create_view_record(datalynx $dlx, string $type = 'tabular', string $param2 = ''): stdClass {
