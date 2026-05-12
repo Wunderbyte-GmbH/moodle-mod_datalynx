@@ -1638,6 +1638,9 @@ abstract class base {
     protected function get_entry_tag_replacements($entry, $options) {
         $fields = $this->dlx->get_fields();
         $entry->baseurl = $this->baseurl;
+        if (empty($options['viewid'])) {
+            $options['viewid'] = $this->id();
+        }
 
         $definitions = [];
         foreach ($this->tags['field'] ?? [] as $fieldid => $patterns) {
