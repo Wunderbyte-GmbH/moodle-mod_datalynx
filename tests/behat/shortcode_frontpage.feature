@@ -35,6 +35,9 @@ Feature: Datalynx shortcodes render AJAX-loaded entries on the site frontpage
 
   Scenario: Frontpage shortcode loads grid entries via the AJAX browser
     Given the site frontpage contains the displayview shortcode for "Datalynx Test Instance" datalynx view "Gridview"
+    And the following config values are set as admin:
+      | enablemyhome    | 1 |
+      | defaulthomepage | 0 |
     When I log in as "teacher1"
     And I am on site homepage
     And I wait until the page is ready
