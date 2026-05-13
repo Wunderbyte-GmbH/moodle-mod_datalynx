@@ -104,7 +104,7 @@ Feature: Datalynx view links respect view privileges
     And I press "Save changes"
     And I log out
 
-  Scenario: Teacher only sees teacher and public view links and falls back from protected direct opens
+  Scenario: Roles only see the views they have the viewprivilege to see
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Datalynx Test Instance"
@@ -125,8 +125,7 @@ Feature: Datalynx view links respect view privileges
     When I open the "ManagerTarget" view of "Datalynx Test Instance" datalynx
     Then I should see "Default view marker"
     And I should not see "Manager target marker"
-
-  Scenario: Manager only sees manager and public view links and falls back from protected direct opens
+    # Manager only sees manager and public view links and falls back from protected direct opens
     When I log in as "manager1"
     And I am on "Course 1" course homepage
     And I follow "Datalynx Test Instance"
@@ -147,8 +146,7 @@ Feature: Datalynx view links respect view privileges
     When I open the "TeacherTarget" view of "Datalynx Test Instance" datalynx
     Then I should see "Default view marker"
     And I should not see "Teacher target marker"
-
-  Scenario: Student only sees student and public view links and falls back from protected direct opens
+    # Student only sees student and public view links and falls back from protected direct opens
     When I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "Datalynx Test Instance"
@@ -169,8 +167,8 @@ Feature: Datalynx view links respect view privileges
     When I open the "TeacherTarget" view of "Datalynx Test Instance" datalynx
     Then I should see "Default view marker"
     And I should not see "Teacher target marker"
-
-  Scenario: Guest only sees guest and public view links and falls back from protected direct opens
+    And I log out
+    # Guest only sees guest and public view links and falls back from protected direct opens
     When I am on "Course 1" course homepage
     And I press "Access as a guest"
     And I follow "Datalynx Test Instance"
@@ -191,3 +189,4 @@ Feature: Datalynx view links respect view privileges
     When I open the "TeacherTarget" view of "Datalynx Test Instance" datalynx
     Then I should see "Default view marker"
     And I should not see "Teacher target marker"
+

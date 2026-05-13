@@ -917,7 +917,6 @@ class datalynx {
     ) {
         $urlparams = new stdClass();
         $dlx = new datalynx($datalynxid);
-        $dlx->views = $dlx->get_all_views();
         $urlparams->d = $datalynxid;
         $urlparams->view = $viewid;
         $skiplogincheck = $options['skiplogincheck'] ?? false;
@@ -940,9 +939,10 @@ class datalynx {
         $pageparams = ['js' => true, 'css' => true, 'rss' => true, 'modjs' => true,
                 'completion' => true, 'comments' => true, 'urlparams' => $urlparams];
         $dlx->set_page('external', $pageparams, $skiplogincheck);
-        $type = $dlx->views[$viewid]->type;
-        $view = $dlx->get_view($type, $viewid, $filteroptions);
-        $dlx->currentview = $view;
+        $view = $dlx->get_current_view();
+        if (empty($view)) {
+            return '';
+        }
         $view->set_content();
 
         $viewcontent = $view->display($options);
