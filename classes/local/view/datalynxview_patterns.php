@@ -233,22 +233,9 @@ class datalynxview_patterns {
         $df = $this->view->get_dl();
         $currentview = $df->get_current_view();
 
-        $views = $this->get_cached_all_view_records();
+        $views = $this->get_cached_named_views();
         if ($views) {
-            foreach ($views as $view) {
-                $baseurlparams = [];
-                $baseurlparams['d'] = $view->dataid;
-                $baseurlparams['view'] = $view->id;
-
-                $view->baseurl = new moodle_url(
-                    "/mod/datalynx/{$this->view->get_dl()->pagefile_for_urls()}.php",
-                    $baseurlparams
-                );
-            }
-        }
-        if ($views) {
-            foreach ($views as $view) {
-                $viewname = $view->name;
+            foreach ($views as $viewname => $view) {
                 $viewlink = strpos($tag, "##viewlink:$viewname;");
                 $sesslink = strpos($tag, "##viewsesslink:$viewname;");
                 if ($viewlink === 0 || $sesslink === 0) {
@@ -275,7 +262,7 @@ class datalynxview_patterns {
                     if ($sesslink === 0) {
                         $linkparams['sesskey'] = sesskey();
                     }
-                    $viewurl = new moodle_url($view->baseurl, $linkparams);
+                    $viewurl = new moodle_url($view->get_baseurl(), $linkparams);
                     if ($sesslink === 0) {
                         if (!((strpos($urlquery, 'new=1') === false || $this->user_can_add_new_entry()))) {
                             return '';

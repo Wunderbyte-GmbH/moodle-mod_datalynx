@@ -904,8 +904,7 @@ class datalynx {
         array $options = ['tohtml' => true]
     ) {
         $urlparams = new stdClass();
-        $datalynx = new datalynx($datalynxid);
-        $datalynx->views = $datalynx->get_all_views();
+        $dlx = new datalynx($datalynxid);
         $urlparams->d = $datalynxid;
         $urlparams->view = $viewid;
         $skiplogincheck = $options['skiplogincheck'] ?? false;
@@ -927,10 +926,11 @@ class datalynx {
 
         $pageparams = ['js' => true, 'css' => true, 'rss' => true, 'modjs' => true,
                 'completion' => true, 'comments' => true, 'urlparams' => $urlparams];
-        $datalynx->set_page('external', $pageparams, $skiplogincheck);
-        $type = $datalynx->views[$viewid]->type;
-        $view = $datalynx->get_view($type, $viewid, $filteroptions);
-        $datalynx->currentview = $view;
+        $dlx->set_page('external', $pageparams, $skiplogincheck);
+        $view = $dlx->get_current_view();
+        if (empty($view)) {
+            return '';
+        }
         $view->set_content();
 
         $viewcontent = $view->display($options);

@@ -277,6 +277,22 @@ class behat_mod_datalynx extends behat_base {
     }
 
     /**
+     * Opens the specified datalynx view directly.
+     *
+     * @When /^I open the "(?P<viewname_string>(?:[^"]|\\")*)" view of "(?P<activityname_string>(?:[^"]|\\")*)" datalynx$/
+     *
+     * @param string $viewname
+     * @param string $activityname
+     */
+    public function i_open_the_view_of_datalynx($viewname, $activityname) {
+        global $DB;
+
+        $record = $DB->get_record('datalynx', ['name' => $activityname], '*', MUST_EXIST);
+        $view = $DB->get_record('datalynx_views', ['dataid' => $record->id, 'name' => $viewname], '*', MUST_EXIST);
+        $this->execute('behat_general::i_visit', ["/mod/datalynx/view.php?d={$record->id}&view={$view->id}"]);
+    }
+
+    /**
      * Inserts text into a TinyMCE editor by ID without replacing existing content.
      * Unlike set_value (which calls setContent and wipes existing content), this uses
      * insertContent so previously inserted field-tag buttons are preserved.

@@ -166,10 +166,20 @@ class view extends base {
      * @return string
      */
     public function display(array $options = []): string {
-        parent::display($options);
         global $PAGE;
+
+        $tohtml = $options['tohtml'] ?? false;
+        $output = parent::display(array_merge($options, ['tohtml' => true]));
+
         $PAGE->requires->js_call_amd('mod_datalynx/bulkactions', 'init');
         $PAGE->requires->js_call_amd('mod_datalynx/tabularbulkedit', 'init');
+
+        if ($tohtml) {
+            return $output;
+        }
+
+        echo $output;
+
         return '';
     }
 

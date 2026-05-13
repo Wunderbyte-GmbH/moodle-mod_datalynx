@@ -116,6 +116,68 @@ final class viewlink_pattern_test extends advanced_testcase {
     }
 
     /**
+     * Create a datalynx fixture with a student user and two views with explicit visibility masks.
+     *
+     * @param string $taginsection Tag to place in the template view section.
+     * @param int $targetvisibility Visibility mask for the target view.
+     * @param int $templatevisibility Visibility mask for the template view.
+     * @return array{0: datalynx, 1: stdClass, 2: stdClass, 3: stdClass}
+     *   [dlx, targetviewrecord, templateviewrecord, student]
+     */
+    private function create_student_visibility_fixture(
+        string $taginsection,
+        int $targetvisibility,
+        int $templatevisibility
+    ): array {
+        global $DB;
+
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course();
+        $student = $generator->create_user();
+        $generator->enrol_user($student->id, $course->id, 'student');
+
+        $datalynxrecord = $generator->create_module('datalynx', ['course' => $course->id]);
+        $dlx = new datalynx($datalynxrecord->id);
+
+        $targetview = (object) [
+            'dataid' => $datalynxrecord->id,
+            'type' => 'tabular',
+            'name' => 'restrictedview',
+            'description' => '',
+            'visible' => $targetvisibility,
+            'filter' => 0,
+            'perpage' => 0,
+            'groupby' => '',
+            'param5' => 0,
+            'param10' => 0,
+            'section' => 'Restricted marker',
+        ];
+        $targetview->id = $DB->insert_record('datalynx_views', $targetview);
+
+        $templateview = (object) [
+            'dataid' => $datalynxrecord->id,
+            'type' => 'tabular',
+            'name' => 'templateview',
+            'description' => '',
+            'visible' => $templatevisibility,
+            'filter' => 0,
+            'perpage' => 0,
+            'groupby' => '',
+            'param5' => 0,
+            'param10' => 0,
+            'section' => $taginsection,
+        ];
+        $templateview->id = $DB->insert_record('datalynx_views', $templateview);
+
+        $DB->update_record('datalynx', (object) [
+            'id' => $datalynxrecord->id,
+            'defaultview' => $templateview->id,
+        ]);
+
+        return [$dlx, $targetview, $templateview, $student];
+    }
+
+    /**
      * Test that ##viewlink:...## is recognized as a regexp pattern.
      *
      * @covers ::is_regexp_pattern
@@ -336,6 +398,56 @@ final class viewlink_pattern_test extends advanced_testcase {
         $this->assertStringNotContainsString('sourceview=', $replacements[$tag]);
         $this->assertStringContainsString('class="btn btn-secondary"', $replacements[$tag]);
         $this->assertStringContainsString('>Edit entry<', $replacements[$tag]);
+    }
+
+    /**
+     * Test that runtime replacements do not render links to views hidden from the current user.
+     *
+     * @covers ::get_replacements
+     */
+    public function test_get_replacements_omits_hidden_view_links_for_student(): void {
+        [, $targetview, $templateview, $student] = $this->create_student_visibility_fixture(
+            '##viewlink:restrictedview;Restricted link;;##',
+            datalynx::PERMISSION_MANAGER,
+            datalynx::PERMISSION_STUDENT
+        );
+
+        $this->setUser($student);
+        datalynx::reset_static_caches();
+        datalynxview_patterns::reset_static_caches();
+
+        $dlx = new datalynx($targetview->dataid);
+        $templateobj = new tabular_view($dlx, $templateview, false);
+        $tag = '##viewlink:restrictedview;Restricted link;;##';
+        $replacements = $templateobj->patternclass()->get_replacements([$tag], null, []);
+
+        $this->assertArrayHasKey($tag, $replacements);
+        $this->assertSame('', $replacements[$tag]);
+    }
+
+    /**
+     * Test that inline rendering respects view privileges for embedded view links.
+     *
+     * @covers \mod_datalynx\datalynx::get_content_inline
+     */
+    public function test_get_content_inline_omits_hidden_view_links_for_student(): void {
+        [$dlx, , $templateview, $student] = $this->create_student_visibility_fixture(
+            'Visible marker ##viewlink:restrictedview;Restricted link;;##',
+            datalynx::PERMISSION_MANAGER,
+            datalynx::PERMISSION_STUDENT
+        );
+
+        $this->setUser($student);
+        datalynx::reset_static_caches();
+        datalynxview_patterns::reset_static_caches();
+
+        $content = datalynx::get_content_inline($dlx->id(), $templateview->id, null, [
+            'tohtml' => true,
+            'skiplogincheck' => true,
+        ]);
+
+        $this->assertStringContainsString('Visible marker', $content);
+        $this->assertStringNotContainsString('Restricted link', $content);
     }
 
     /**
