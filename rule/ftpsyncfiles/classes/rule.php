@@ -81,12 +81,6 @@ class rule extends base {
      * @var int     */
     private $authorid;
     /**
-     * The datalynx object to use.
-     *
-     * @var datalynx
-     */
-    private datalynx $dlx;
-    /**
      * @var ?file_storage
      */
     private ?file_storage $fs;

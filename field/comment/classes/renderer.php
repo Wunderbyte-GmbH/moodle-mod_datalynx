@@ -28,6 +28,7 @@ use comment;
 use html_writer;
 use mod_datalynx\local\field\datalynxfield_renderer;
 use stdClass;
+use moodle_url;
 
 /**
  * Renderer for the internal comment field patterns.
@@ -79,6 +80,7 @@ class renderer extends datalynxfield_renderer {
         return $replacements;
     }
 
+    // phpcs:disable moodle.PHP.ForbiddenGlobalUse.BadGlobal
     /**
      * Renders the comment widget HTML for browse mode.
      *
@@ -87,7 +89,7 @@ class renderer extends datalynxfield_renderer {
      * @return string
      */
     public function display_browse($entry, $options = []) {
-        global $CFG;
+        global $CFG, $PAGE;
 
         $dlx = $this->field->dlx();
         $str = '';
@@ -101,6 +103,9 @@ class renderer extends datalynxfield_renderer {
         $cmt->component = 'mod_datalynx';
         $cmt->area = !empty($options['area']) ? $options['area'] : 'entry';
         $cmt->showcount = isset($options['showcount']) ? $options['showcount'] : true;
+        if (!$PAGE->has_set_url()) {
+            $PAGE->set_url(new moodle_url('/mod/datalynx/view.php', ['id' => $dlx->cm->id]));
+        }
 
         if (!empty($options['count'])) {
             $comment = new comment($cmt);
@@ -119,6 +124,7 @@ class renderer extends datalynxfield_renderer {
 
         return $str;
     }
+    // phpcs:enable moodle.PHP.ForbiddenGlobalUse.BadGlobal
 
     /**
      * Wrap the rendered comment widget with the metadata needed for AJAX re-initialisation.

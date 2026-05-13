@@ -653,7 +653,7 @@ class behat_mod_datalynx extends behat_base {
             'summaryformat' => FORMAT_HTML,
         ]);
 
-        \core_courseformat\base::reset_course_cache($SITE->id);
+        rebuild_course_cache($SITE->id, true);
     }
     // phpcs:enable moodle.Files.LineLength
 
