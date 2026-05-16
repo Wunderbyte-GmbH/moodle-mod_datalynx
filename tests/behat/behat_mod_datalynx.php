@@ -403,6 +403,7 @@ class behat_mod_datalynx extends behat_base {
      *
      * @param string $viewname
      * @param string $activityname
+     * @throws dml_missing_record_exception if the datalynx instance or view is not found
      */
     public function i_open_the_view_of_datalynx($viewname, $activityname) {
         global $DB;
@@ -416,7 +417,7 @@ class behat_mod_datalynx extends behat_base {
      * Confirms guest access by pressing the "Access as a guest" button if it is shown.
      * In Moodle 5.2+ this confirmation step was removed, so this step is a no-op in that case.
      *
-     * @When I confirm guest access if required
+     * @When /^I confirm guest access if required$/
      */
     public function i_confirm_guest_access_if_required() {
         $page = $this->getSession()->getPage();
