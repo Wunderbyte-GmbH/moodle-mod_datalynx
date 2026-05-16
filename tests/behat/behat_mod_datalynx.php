@@ -397,6 +397,36 @@ class behat_mod_datalynx extends behat_base {
     }
 
     /**
+     * Opens the specified datalynx view directly by navigating to its URL.
+     *
+     * @When /^I open the "(?P<viewname_string>(?:[^"]|\\")*)" view of "(?P<activityname_string>(?:[^"]|\\")*)" datalynx$/
+     *
+     * @param string $viewname
+     * @param string $activityname
+     */
+    public function i_open_the_view_of_datalynx($viewname, $activityname) {
+        global $DB;
+
+        $record = $DB->get_record('datalynx', ['name' => $activityname], '*', MUST_EXIST);
+        $view = $DB->get_record('datalynx_views', ['dataid' => $record->id, 'name' => $viewname], '*', MUST_EXIST);
+        $this->execute('behat_general::i_visit', ["/mod/datalynx/view.php?d={$record->id}&view={$view->id}"]);
+    }
+
+    /**
+     * Confirms guest access by pressing the "Access as a guest" button if it is shown.
+     * In Moodle 5.2+ this confirmation step was removed, so this step is a no-op in that case.
+     *
+     * @When I confirm guest access if required
+     */
+    public function i_confirm_guest_access_if_required() {
+        $page = $this->getSession()->getPage();
+        $button = $page->findButton('Access as a guest');
+        if ($button !== null) {
+            $button->click();
+        }
+    }
+
+    /**
      * Follow the datalynx link of the elements matching the selector.
      *
      * @When /^I follow the datalynx "(?P<link_string>(?:[^"]|\\")*)" link$/
