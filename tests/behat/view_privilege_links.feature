@@ -188,4 +188,3 @@ Feature: Datalynx view links respect view privileges
     When I open the "TeacherTarget" view of "Datalynx Test Instance" datalynx
     Then I should see "Default view marker"
     And I should not see "Teacher target marker"
-
