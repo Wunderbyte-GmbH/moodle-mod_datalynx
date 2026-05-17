@@ -174,7 +174,8 @@ Datalynx can be extended with additional building blocks:
 
 After your fields are stable, continue with:
 
-- User Guide — Views *(planned in this documentation set)*
-- User Guide — Rules *(planned in this documentation set)*
-- User Guide — Managing Entries *(planned in this documentation set)*
-- User Guide — Permissions *(planned in this documentation set)*
+- [User Guide — Views](user_guide_views.md)
+- [User Guide — Rules](user_guide_rules.md)
+- [User Guide — Managing Entries](user_guide_managing_entries.md)
+- [User Guide — Permissions](user_guide_permissions.md)
+- [User Guide — Patterns, Styling, and Tools](user_guide_patterns_and_styling.md)
