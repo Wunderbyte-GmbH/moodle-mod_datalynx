@@ -431,9 +431,9 @@ class rule extends base {
 
         $users = [];
         if (!empty($allneeded)) {
-            // Loop through the actual Moodle Role IDs found by get_roles_with_cap_in_context
+            // Loop through the actual Moodle role IDs found by get_roles_with_cap_in_context.
             foreach ($allneeded as $roleid) {
-                // get_role_users looks at BOTH explicit role assignments AND course enrollments
+                // Get role users from both explicit role assignments and course enrolments.
                 $roleusers = get_role_users($roleid, $context, false, 'u.id', 'u.id ASC');
                 if ($roleusers) {
                     $users = array_merge($users, array_keys($roleusers));

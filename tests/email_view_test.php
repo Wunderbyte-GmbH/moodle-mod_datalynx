@@ -121,9 +121,14 @@ final class email_view_test extends advanced_testcase {
      *
      * @param datalynx $dlx
      * @param int $templateviewid
+     * @param array $recipients
      * @return eventnotification_rule
      */
-    private function create_notification_rule(datalynx $dlx, int $templateviewid = 0): eventnotification_rule {
+    private function create_notification_rule(
+        datalynx $dlx,
+        int $templateviewid = 0,
+        array $recipients = []
+    ): eventnotification_rule {
         $rule = (object) [
             'id' => 1,
             'dataid' => $dlx->id(),
@@ -133,7 +138,7 @@ final class email_view_test extends advanced_testcase {
             'enabled' => 1,
             'param1' => serialize(['entry_created']),
             'param2' => eventnotification_rule::FROM_CURRENT_USER,
-            'param3' => serialize([]),
+            'param3' => serialize($recipients),
             'param4' => serialize([]),
             'param5' => 0,
             'param6' => '',
@@ -144,6 +149,35 @@ final class email_view_test extends advanced_testcase {
         ];
 
         return new eventnotification_rule($dlx, $rule);
+    }
+
+    /**
+     * Create a Datalynx fixture with one teacher and one student.
+     *
+     * @return array{0: datalynx, 1: stdClass, 2: stdClass}
+     */
+    private function create_recipient_fixture(): array {
+        global $DB;
+
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course();
+        $teacher = $generator->create_user();
+        $student = $generator->create_user();
+        $instance = $generator->create_module('datalynx', ['course' => $course->id]);
+        $context = \context_module::instance($instance->cmid);
+        $teacherroleid = (int) $DB->get_field('role', 'id', ['shortname' => 'editingteacher']);
+        $studentroleid = (int) $DB->get_field('role', 'id', ['shortname' => 'student']);
+
+        role_assign($teacherroleid, $teacher->id, $context->id);
+        role_assign($studentroleid, $student->id, $context->id);
+        assign_capability('mod/datalynx:viewprivilegeteacher', CAP_ALLOW, $teacherroleid, $context->id, true);
+        assign_capability('mod/datalynx:viewprivilegestudent', CAP_PREVENT, $teacherroleid, $context->id, true);
+        assign_capability('mod/datalynx:viewprivilegestudent', CAP_ALLOW, $studentroleid, $context->id, true);
+        assign_capability('mod/datalynx:viewprivilegeteacher', CAP_PREVENT, $studentroleid, $context->id, true);
+        accesslib_clear_all_caches_for_unit_testing();
+        \course_modinfo::clear_instance_cache();
+
+        return [new datalynx($instance->id), $teacher, $student];
     }
 
     /**
@@ -297,5 +331,45 @@ final class email_view_test extends advanced_testcase {
         $this->assertIsString($html);
         $this->assertStringContainsString('<p>' . $entryid . '</p>', $html);
         $this->assertStringNotContainsString('<p>' . $otherentryid . '</p>', $html);
+    }
+
+    /**
+     * Student recipient selection must not include teacher-only users.
+     *
+     * @covers \datalynxrule_eventnotification\rule::get_recipients
+     */
+    public function test_eventnotification_student_recipients_exclude_teacher_only_users(): void {
+        [$dlx, $teacher, $student] = $this->create_recipient_fixture();
+        $rule = $this->create_notification_rule($dlx, 0, [
+            'roles' => [datalynx::PERMISSION_STUDENT],
+        ]);
+
+        $method = new ReflectionMethod($rule, 'get_recipients');
+        $method->setAccessible(true);
+        $recipientids = $method->invoke($rule);
+        sort($recipientids);
+
+        $this->assertSame([(int) $student->id], $recipientids);
+        $this->assertNotContains($teacher->id, $recipientids);
+    }
+
+    /**
+     * Teacher recipient selection must not include student-only users.
+     *
+     * @covers \datalynxrule_eventnotification\rule::get_recipients
+     */
+    public function test_eventnotification_teacher_recipients_exclude_student_only_users(): void {
+        [$dlx, $teacher, $student] = $this->create_recipient_fixture();
+        $rule = $this->create_notification_rule($dlx, 0, [
+            'roles' => [datalynx::PERMISSION_TEACHER],
+        ]);
+
+        $method = new ReflectionMethod($rule, 'get_recipients');
+        $method->setAccessible(true);
+        $recipientids = $method->invoke($rule);
+        sort($recipientids);
+
+        $this->assertSame([(int) $teacher->id], $recipientids);
+        $this->assertNotContains($student->id, $recipientids);
     }
 }
