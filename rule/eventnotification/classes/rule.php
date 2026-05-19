@@ -429,27 +429,28 @@ class rule extends base {
             SQL_PARAMS_NAMED
         );
 
-        if ($allneeded) {
-            [$insqlneeded, $params2] = $DB->get_in_or_equal($allneeded, SQL_PARAMS_NAMED);
-            $sqlneeded = "SELECT DISTINCT ra.userid
-                                 FROM {role_assignments} ra
-                                WHERE ra.roleid $insqlneeded
-                                  AND ra.contextid $contextlist";
-
-            $users = $DB->get_fieldset_sql($sqlneeded, $params1 + $params2);
-        } else {
-            $users = [];
+        $users = [];
+        if (!empty($allneeded)) {
+            // Loop through the actual Moodle Role IDs found by get_roles_with_cap_in_context
+            foreach ($allneeded as $roleid) {
+                // get_role_users looks at BOTH explicit role assignments AND course enrollments
+                $roleusers = get_role_users($roleid, $context, false, 'u.id', 'u.id ASC');
+                if ($roleusers) {
+                    $users = array_merge($users, array_keys($roleusers));
+                }
+            }
+            $users = array_unique($users);
         }
 
-        if ($allforbidden) {
-            [$insqlforbidden, $params3] = $DB->get_in_or_equal($allforbidden, SQL_PARAMS_NAMED);
-            $sqlforbidden = "SELECT DISTINCT ra.userid
-                                    FROM {role_assignments} ra
-                                   WHERE ra.roleid $insqlforbidden
-                                     AND ra.contextid $contextlist";
-            $forbiddenusers = $DB->get_fieldset_sql($sqlforbidden, $params1 + $params3);
-        } else {
-            $forbiddenusers = [];
+        $forbiddenusers = [];
+        if (!empty($allforbidden)) {
+            foreach ($allforbidden as $roleid) {
+                $roleusers = get_role_users($roleid, $context, false, 'u.id', 'u.id ASC');
+                if ($roleusers) {
+                    $forbiddenusers = array_merge($forbiddenusers, array_keys($roleusers));
+                }
+            }
+            $forbiddenusers = array_unique($forbiddenusers);
         }
 
         return array_diff($users, $forbiddenusers);
