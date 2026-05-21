@@ -229,7 +229,7 @@ class datalynx_customfilter_manager {
             return false;
         } else {
             if (!$confirmed) {
-                $dlx->print_header('customfilters');
+                $dlx->print_header(['tab' => 'customfilters']);
                 $message = get_string("filtersconfirm$action", 'datalynx', count($filters));
                 $url1 = new moodle_url(
                     '/mod/datalynx/customfilter/index.php',

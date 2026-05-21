@@ -330,7 +330,7 @@ class manager {
         } else {
             if (!$confirmed) {
                 // Print header.
-                $dlx->print_header('rules');
+                $dlx->print_header(['tab' => 'rules']);
 
                 // Print a confirmation page.
                 echo $OUTPUT->confirm(
