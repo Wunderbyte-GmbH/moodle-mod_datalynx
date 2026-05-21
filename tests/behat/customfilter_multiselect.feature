@@ -43,6 +43,12 @@ Feature: Create entry, add multiselect and use customfilter
     And I click on "//input[@value = 'Datalynx field Select (multiple)']" "xpath_element"
     And I press "Save changes"
     Then I should see "added"
+    And I click on "Duplicate" "link" in the "mycustomfilter" "table_row"
+    And I press "Continue"
+    Then "Copy of mycustomfilter" "table_row" should exist
+    And I click on "Delete" "link" in the "Copy of mycustomfilter" "table_row"
+    And I press "Continue"
+    Then "Copy of mycustomfilter" "table_row" should not exist
 
     # Make customfilter visible in view.
     And I follow "Views"
