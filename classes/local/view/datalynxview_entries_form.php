@@ -80,30 +80,44 @@ class datalynxview_entries_form extends moodleform {
 
         if (empty($errors)) {
             $view = $this->_customdata['view'];
-            $patterns = $view->get__patterns('field');
-            $fields = $view->get_view_fields();
+            $patterns = $view->get_entry_form_patterns();
+            $fields = $view->get_entry_form_fields();
             $entryids = explode(',', $this->_customdata['update']);
 
+            if (empty($patterns) || empty($fields)) {
+                return $errors;
+            }
+
             foreach ($entryids as $entryid) {
+                $currentpatterns = $patterns;
                 // If we see a fieldgroup loop through all visible lines.
                 $fieldgroupmarkers = preg_grep('/^fieldgroup_/', array_keys($data));
                 if (count($fieldgroupmarkers) > 0) {
                     $fieldgroupid = $data[reset($fieldgroupmarkers)];
 
                     // Append the correct patterns to match.
-                    $patterns = $fields[$fieldgroupid]->renderer()->get_fieldgroup_patterns($patterns);
+                    if (!isset($fields[$fieldgroupid])) {
+                        continue;
+                    }
+                    $currentpatterns = $fields[$fieldgroupid]->renderer()->get_fieldgroup_patterns($patterns);
 
                     $maxlines = $fields[$fieldgroupid]->field->param2;
                     for ($i = 0; $i < $maxlines; $i++) {
                         $thisentryid = "{$entryid}_fieldgroup_{$fieldgroupid}_{$i}";
                         foreach ($fields as $fid => $field) {
-                            $newerrors = $field->renderer()->validate($thisentryid, $patterns[$fid], (object) $data);
+                            if (!isset($currentpatterns[$fid])) {
+                                continue;
+                            }
+                            $newerrors = $field->renderer()->validate($thisentryid, $currentpatterns[$fid], (object) $data);
                             $errors = array_merge($errors, $newerrors);
                         }
                     }
                 } else {
                     // If no fieldgroup use standard behaviour.
                     foreach ($fields as $fid => $field) {
+                        if (!isset($patterns[$fid])) {
+                            continue;
+                        }
                         $errors = array_merge(
                             $errors,
                             $field->renderer()->validate($entryid, $patterns[$fid], (object) $data)

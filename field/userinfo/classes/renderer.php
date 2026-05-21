@@ -105,9 +105,9 @@ class renderer extends datalynxfield_renderer {
         // There is only one possible tag here, no edit.
         $tag = "##author:$fieldname##";
 
-        $manageable = ($entry->id == -1) 
-        || (!empty($entry->userid) && $USER->id == $entry->userid) 
-        || has_capability('mod/datalynx:manageentries', $field->dlx()->context);
+        $manageable = ($entry->id == -1)
+            || (!empty($entry->userid) && $USER->id == $entry->userid)
+            || has_capability('mod/datalynx:manageentries', $field->dlx()->context);
         $editable = $field->editable;
         $isediting = $options['edit'];
 
@@ -311,6 +311,11 @@ class renderer extends datalynxfield_renderer {
         $formfieldname = "field_{$fieldid}_{$entryid}";
 
         $errors = [];
+        if (!property_exists($formdata, $formfieldname)) {
+            return $errors;
+        }
+
+        $value = $formdata->{$formfieldname};
         if ($entryid == -1) {
             global $USER;
             $userid = $USER->id;
@@ -322,12 +327,12 @@ class renderer extends datalynxfield_renderer {
         }
 
         // Check if required.
-        if ($this->field->mandatory && $formdata->{$formfieldname} == '') {
+        if ($this->field->mandatory && $value == '') {
             $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
         } else {
             // Update.
             $user["id"] = $userid;
-            $user["profile_field_{$this->field->infoshortname}"] = $formdata->{$formfieldname};
+            $user["profile_field_{$this->field->infoshortname}"] = $value;
             profile_save_data((object) $user);
             // We don't want these infos to be stored in the datalynx content table.
             unset($formdata->{$formfieldname});
