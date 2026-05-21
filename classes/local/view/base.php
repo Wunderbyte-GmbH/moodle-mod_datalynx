@@ -1055,6 +1055,62 @@ abstract class base {
     }
 
     /**
+     * Get the field patterns that are actually rendered in the entry form template.
+     *
+     * @return array
+     */
+    public function get_entry_form_patterns(): array {
+        if (empty($this->tags['field']) || empty($this->view->param2)) {
+            return [];
+        }
+
+        $allpatterns = [];
+        foreach ($this->tags['field'] as $patterns) {
+            $allpatterns = array_merge($allpatterns, $patterns);
+        }
+
+        if (empty($allpatterns)) {
+            return [];
+        }
+
+        $usedtags = array_values(array_intersect(
+            $this->split_template_by_tags($allpatterns, $this->view->param2),
+            $allpatterns
+        ));
+        if (empty($usedtags)) {
+            return [];
+        }
+
+        $entrypatterns = [];
+        foreach ($this->tags['field'] as $fieldid => $patterns) {
+            $matchedpatterns = array_values(array_intersect($patterns, $usedtags));
+            if (!empty($matchedpatterns)) {
+                $entrypatterns[$fieldid] = $matchedpatterns;
+            }
+        }
+
+        return $entrypatterns;
+    }
+
+    /**
+     * Get the fields that are actually rendered in the entry form template.
+     *
+     * @return array
+     */
+    public function get_entry_form_fields(): array {
+        $fields = $this->dlx->get_fields();
+        $formfields = [];
+
+        foreach (array_keys($this->get_entry_form_patterns()) as $fieldid) {
+            if (array_key_exists($fieldid, $fields)) {
+                $formfields[$fieldid] = $fields[$fieldid];
+            }
+        }
+
+        return $formfields;
+    }
+
+    /**
      * Renders fields as patterns
      *
      * @return array of strings (field pattern used in the view)
