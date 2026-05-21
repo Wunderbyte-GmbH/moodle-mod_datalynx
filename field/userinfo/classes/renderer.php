@@ -105,17 +105,9 @@ class renderer extends datalynxfield_renderer {
         // There is only one possible tag here, no edit.
         $tag = "##author:$fieldname##";
 
-        $manageable = false;
-        if ($entry->id == -1) {
-            $manageable = true;
-        }
-        if (has_capability('mod/datalynx:manageentries', $field->dlx()->context)) {
-            $manageable = true;
-        }
-        if ($USER->id == $entry->userid) {
-            $manageable = true;
-        }
-
+        $manageable = ($entry->id == -1) 
+        || (!empty($entry->userid) && $USER->id == $entry->userid) 
+        || has_capability('mod/datalynx:manageentries', $field->dlx()->context);
         $editable = $field->editable;
         $isediting = $options['edit'];
 
