@@ -115,7 +115,8 @@ class view extends base {
         global $PAGE;
 
         $tohtml = $options['tohtml'] ?? false;
-        $browsemode = !$this->returntoentriesform && !$this->user_is_editing() &&
+        $inlinefieldview = !empty($options['fieldview']);
+        $browsemode = !$inlinefieldview && !$this->returntoentriesform && !$this->user_is_editing() &&
             !optional_param('new', 0, PARAM_INT) && !$this->entriesprocessedsuccessfully;
 
         $this->set_view_tags($options);

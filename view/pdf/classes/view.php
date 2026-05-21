@@ -492,7 +492,9 @@ class view extends base {
         }
 
         $tohtml = $options['tohtml'] ?? false;
-        $browsemode = !$this->user_is_editing() && !optional_param('new', 0, PARAM_INT) && !$this->entriesprocessedsuccessfully;
+        $inlinefieldview = !empty($options['fieldview']);
+        $browsemode = !$inlinefieldview && !$this->user_is_editing() && !optional_param('new', 0, PARAM_INT) &&
+            !$this->entriesprocessedsuccessfully;
         $output = parent::display(array_merge($options, [
             'tohtml' => true,
             'entriesplaceholder' => $browsemode
