@@ -117,8 +117,16 @@ class renderer extends datalynxfield_renderer {
 
         if ($mform->_formName != 'mod_datalynx_form_datalynx_customfilter_frontend_form') {
             $elements = [];
-            $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_from", get_string('from'));
-            $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_to", get_string('to'));
+            $elements[] = &$mform->createElement(
+                'date_time_selector',
+                "f_{$i}_{$fieldid}_from",
+                get_string('fromdate', 'moodle')
+            );
+            $elements[] = &$mform->createElement(
+                'date_time_selector',
+                "f_{$i}_{$fieldid}_to",
+                get_string('todate', 'moodle')
+            );
 
             $mform->setDefault("f_{$i}_{$fieldid}_from", (int) $from);
             $mform->setDefault("f_{$i}_{$fieldid}_to", (int) $to);
@@ -132,11 +140,16 @@ class renderer extends datalynxfield_renderer {
             $elements[] = $element = &$mform->createElement(
                 'date_time_selector',
                 "f_{$i}_{$fieldid}_from",
-                get_string('from'),
+                get_string('fromdate', 'moodle'),
                 $attr
             );
             $element->setAttributes(['size' => 1]);
-            $elements[] = &$mform->createElement('date_time_selector', "f_{$i}_{$fieldid}_to", get_string('to'), $attr);
+            $elements[] = &$mform->createElement(
+                'date_time_selector',
+                "f_{$i}_{$fieldid}_to",
+                get_string('todate', 'moodle'),
+                $attr
+            );
         }
 
         $separators = ['<div class="w-100"><br></div>', '<div class="w-100"><br></div>'];

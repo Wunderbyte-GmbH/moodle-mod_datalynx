@@ -111,8 +111,16 @@ class renderer extends datalynxfield_renderer {
 
         // With normal filter display whole form and disable cases.
         if ($mform->_formName != 'mod_datalynx_form_datalynx_customfilter_frontend_form') {
-            $elements[] = &$mform->createElement('date_time_selector', "{$fieldname}_from", get_string('from'));
-            $elements[] = &$mform->createElement('date_time_selector', "{$fieldname}_to", get_string('to'));
+            $elements[] = &$mform->createElement(
+                'date_time_selector',
+                "{$fieldname}_from",
+                get_string('fromdate', 'moodle')
+            );
+            $elements[] = &$mform->createElement(
+                'date_time_selector',
+                "{$fieldname}_to",
+                get_string('todate', 'moodle')
+            );
             if (isset($value[0])) {
                 $mform->setDefault("{$fieldname}_from", $value[0]);
             }
