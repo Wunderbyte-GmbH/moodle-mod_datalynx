@@ -101,40 +101,41 @@ class datalynxview_base_form extends moodleform {
         }
 
         if (!$internalview) {
-            $visiblegrp = [];
-            $visiblegrp[] = $mform->createElement(
-                'advcheckbox',
+            $mform->addElement(
+                'static',
+                'visibleto_header',
+                '',
+                html_writer::tag('strong', get_string('visibleto', 'datalynx'))
+            );
+            $mform->addHelpButton('visibleto_header', 'visibleto', 'datalynx');
+            $this->add_visibility_checkbox(
+                $mform,
                 'visible1',
-                '',
                 get_string('visible1', 'datalynx'),
-                ['group' => 1],
-                [0, 1]
+                'mod/datalynx:viewprivilegemanager',
+                1
             );
-            $visiblegrp[] = $mform->createElement(
-                'advcheckbox',
+            $this->add_visibility_checkbox(
+                $mform,
                 'visible2',
-                '',
                 get_string('visible2', 'datalynx'),
-                ['group' => 1],
-                [0, 2]
+                'mod/datalynx:viewprivilegeteacher',
+                2
             );
-            $visiblegrp[] = $mform->createElement(
-                'advcheckbox',
+            $this->add_visibility_checkbox(
+                $mform,
                 'visible4',
-                '',
                 get_string('visible4', 'datalynx'),
-                ['group' => 1],
-                [0, 4]
+                'mod/datalynx:viewprivilegestudent',
+                4
             );
-            $visiblegrp[] = $mform->createElement(
-                'advcheckbox',
+            $this->add_visibility_checkbox(
+                $mform,
                 'visible8',
-                '',
                 get_string('visible8', 'datalynx'),
-                ['group' => 1],
-                [0, 8]
+                'mod/datalynx:viewprivilegeguest',
+                8
             );
-            $mform->addGroup($visiblegrp, 'visiblegroup', get_string('visibleto', 'datalynx'), null, false);
 
             // Filter.
             $filtersmenu = $dlx->get_filter_manager()->get_filters(null, true);
@@ -463,5 +464,67 @@ class datalynxview_base_form extends moodleform {
             }
         }
         return $errors;
+    }
+
+    /**
+     * Get the names of the roles that have a capability allowed in the current context.
+     *
+     * @param string $capability
+     * @return array List of localized role names.
+     */
+    protected function get_allowed_role_names($capability) {
+        $context = $this->dlx->context;
+        $allroles = role_get_names($context, ROLENAME_ALIAS, true);
+        $roleswithcap = get_roles_with_capability($capability, CAP_ALLOW, $context);
+        $matchingrolenames = [];
+        foreach ($roleswithcap as $role) {
+            if (isset($allroles[$role->id])) {
+                $matchingrolenames[] = $allroles[$role->id];
+            }
+        }
+        return $matchingrolenames;
+    }
+
+    /**
+     * Add a visibility checkbox to the form with dynamic role mapping feedback.
+     *
+     * @param \MoodleQuickForm $mform
+     * @param string $elementname
+     * @param string $label
+     * @param string $capability
+     * @param int $value
+     */
+    protected function add_visibility_checkbox($mform, $elementname, $label, $capability, $value) {
+        $allowedroles = $this->get_allowed_role_names($capability);
+
+        $html = '<div class="d-inline-block align-middle ml-2">';
+        $html .= '<div><small class="text-muted">' .
+                get_string('visible_capability', 'datalynx', $capability) . '</small></div>';
+
+        if (empty($allowedroles)) {
+            $warningtext = get_string('visible_no_roles_warning', 'datalynx');
+            $warningicon = '<i class="fa fa-exclamation-triangle"></i> ';
+            $warninghtml = '<span class="badge badge-warning bg-warning text-dark">' .
+                    $warningicon . $warningtext . '</span>';
+            $html .= '<div class="mt-1">' . $warninghtml . '</div>';
+        } else {
+            $badges = [];
+            foreach ($allowedroles as $rolename) {
+                $badges[] = html_writer::span($rolename, 'badge badge-secondary bg-secondary text-white mr-1');
+            }
+            $allowedlabel = get_string('visible_allowed_roles', 'datalynx');
+            $html .= '<div class="mt-1"><small><strong>' . $allowedlabel . ' </strong>' .
+                    implode(' ', $badges) . '</small></div>';
+        }
+        $html .= '</div>';
+
+        $mform->addElement(
+            'advcheckbox',
+            $elementname,
+            $label,
+            $html,
+            ['group' => 1],
+            [0, $value]
+        );
     }
 }
