@@ -898,4 +898,7 @@ $string['visibleto_help'] = 'Users who have the corresponding Moodle capability 
 $string['visible_capability'] = 'Moodle Capability: {$a}';
 $string['visible_allowed_roles'] = 'Allowed roles in this course:';
 $string['visible_no_roles_warning'] = 'Warning: No roles have this capability assigned in this course!';
+$string['dynamic_check'] = 'Dynamic check:';
+$string['dynamic_check_author_desc'] = 'Granted to the user who created/owns the entry (e.g. no capability check).';
+$string['dynamic_check_mentor_desc'] = 'Granted to users who are mentors for the team/group (e.g. no capability check).';
 $string['wrongdataid'] = 'Wrong datalynx id provided';

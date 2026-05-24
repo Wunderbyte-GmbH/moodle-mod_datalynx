@@ -869,4 +869,7 @@ $string['visibleto_help'] = 'Nutzer/innen, denen die entsprechende Moodle-Berech
 $string['visible_capability'] = 'Moodle-Recht: {$a}';
 $string['visible_allowed_roles'] = 'Erlaubte Rollen in diesem Kurs:';
 $string['visible_no_roles_warning'] = 'Warnung: Keine Rollen haben dieses Recht in diesem Kurs zugewiesen!';
+$string['dynamic_check'] = 'Dynamische Prüfung:';
+$string['dynamic_check_author_desc'] = 'Wird dem/der Nutzer/in gewährt, der/die den Eintrag erstellt hat/besitzt (keine Moodle-Rechte-Prüfung).';
+$string['dynamic_check_mentor_desc'] = 'Wird Nutzer/innen gewährt, die Mentoren für das Team/die Gruppe sind (keine Moodle-Rechte-Prüfung).';
 $string['wrongdataid'] = 'Falsche Datalynx ID';
