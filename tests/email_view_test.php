@@ -168,8 +168,9 @@ final class email_view_test extends advanced_testcase {
         $teacherroleid = (int) $DB->get_field('role', 'id', ['shortname' => 'editingteacher']);
         $studentroleid = (int) $DB->get_field('role', 'id', ['shortname' => 'student']);
 
-        role_assign($teacherroleid, $teacher->id, $context->id);
-        role_assign($studentroleid, $student->id, $context->id);
+        $coursecontext = \context_course::instance($course->id);
+        role_assign($teacherroleid, $teacher->id, $coursecontext->id);
+        role_assign($studentroleid, $student->id, $coursecontext->id);
         assign_capability('mod/datalynx:viewprivilegeteacher', CAP_ALLOW, $teacherroleid, $context->id, true);
         assign_capability('mod/datalynx:viewprivilegestudent', CAP_PREVENT, $teacherroleid, $context->id, true);
         assign_capability('mod/datalynx:viewprivilegestudent', CAP_ALLOW, $studentroleid, $context->id, true);

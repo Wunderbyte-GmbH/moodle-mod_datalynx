@@ -71,6 +71,12 @@ class rule_form extends base_rule_form {
             $this->dlx->get_datalynx_permission_names(true),
             $options
         );
+        $grp[] = &$mform->createElement(
+            'static',
+            'roles_help_info',
+            '',
+            '<div class="form-text text-muted">' . get_string('roles_help_info', 'datalynxrule_eventnotification') . '</div>'
+        );
         $grp[] = &$mform->createElement('static', '', '', $br);
 
         $grp[] = &$mform->createElement(
