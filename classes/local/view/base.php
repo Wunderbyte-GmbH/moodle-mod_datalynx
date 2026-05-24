@@ -1141,6 +1141,32 @@ abstract class base {
     }
 
     /**
+     * Get the modern default control bar HTML for the view template (esection).
+     *
+     * @param string $viewtype The view type (e.g. 'grid', 'tabular', 'report', 'csv', 'pdf')
+     * @param string $actionshtml The action tags html (e.g. '##addnewentry##' or '##export:all##')
+     * @param string $entriesclass Additional CSS class for the entries container
+     * @return string
+     */
+    protected function get_default_esection_html(string $viewtype, string $actionshtml = '', string $entriesclass = ''): string {
+        global $OUTPUT;
+
+        $context = [
+            'viewtype' => $viewtype,
+            'hasviewsmenu' => true,
+            'hasfiltersmenu' => true,
+            'hasquicksearch' => true,
+            'hasquickperpage' => true,
+            'hasactions' => !empty($actionshtml),
+            'actionshtml' => $actionshtml,
+            'entriesclass' => $entriesclass ?: "mod-datalynx-{$viewtype}-entries",
+            'haspagingbar' => true,
+        ];
+
+        return $OUTPUT->render_from_template('mod_datalynx/default_control_bar', $context);
+    }
+
+    /**
      * Generate a default template definition for this view type.
      */
     abstract public function generate_default_view();

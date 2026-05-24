@@ -643,51 +643,7 @@ class view extends base {
         $fields = parent::remove_duplicates($fields);
 
         // Set views and filters menus and quick search.
-        $table = new html_table();
-        $table->attributes['cellpadding'] = '2';
-        // First row: menus.
-        $row1 = new html_table_row();
-        $viewsmenu = new html_table_cell('##viewsmenu##');
-        $seperator = new html_table_cell('     ');
-        $filtersmenu = new html_table_cell('##filtersmenu##');
-        $quicksearch = new html_table_cell('##quicksearch##');
-        $quickperpage = new html_table_cell('##quickperpage##');
-        $row1->cells = [$viewsmenu, $seperator, $filtersmenu, $quicksearch, $quickperpage];
-        foreach ($row1->cells as $cell) {
-            $cell->style = 'border:0 none;';
-        }
-        // Don't show addnewentries, it has no functionality..
-        $row2 = new html_table_row();
-        $addentries = new html_table_cell('');
-        $addentries->colspan = 5;
-        $row2->cells = [$addentries];
-        foreach ($row2->cells as $cell) {
-            $cell->style = 'border:0 none;';
-        }
-        // Next row: export import.
-        $row2a = new html_table_row();
-        $addentries = new html_table_cell('##export:all## | ##export:page## | ##import##');
-        $addentries->colspan = 5;
-        $row2a->cells = [$addentries];
-        foreach ($row2a->cells as $cell) {
-            $cell->style = 'border:0 none;';
-        }
-        // Third row: paging bar.
-        $row3 = new html_table_row();
-        $pagingbar = new html_table_cell('##pagingbar##');
-        $pagingbar->colspan = 5;
-        $row3->cells = [$pagingbar];
-        foreach ($row3->cells as $cell) {
-            $cell->style = 'border:0 none;';
-        }
-        // Construct the table.
-        $table->data = [$row1, $row2, $row2a, $row3];
-        $sectiondefault = html_writer::table($table);
-        $this->view->esection = html_writer::tag(
-            'div',
-            $sectiondefault,
-            ['class' => 'mdl-align']
-        ) . '<div class="mod-datalynx-csv-entries" data-region="csv-view-browser">##entries##</div>';
+        $this->view->esection = $this->get_default_esection_html('csv', '##export:all## | ##export:page## | ##import##');
 
         // Set content.
         $this->view->param2 = '';

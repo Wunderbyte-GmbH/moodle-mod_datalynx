@@ -62,43 +62,11 @@ class view extends base {
         $fields = parent::remove_duplicates($fields);
 
         // Set views and filters menus and quick search.
-        $table = new html_table();
-        $table->attributes['cellpadding'] = '2';
-        // First row: menus.
-        $row1 = new html_table_row();
-        $viewsmenu = new html_table_cell('##viewsmenu##');
-        $seperator = new html_table_cell('     ');
-        $filtersmenu = new html_table_cell('##filtersmenu##');
-        $quicksearch = new html_table_cell('##quicksearch##');
-        $quickperpage = new html_table_cell('##quickperpage##');
-        $row1->cells = [$viewsmenu, $seperator, $filtersmenu, $quicksearch, $quickperpage];
-        foreach ($row1->cells as $cell) {
-            $cell->style = 'border:0 none;';
-        }
-        // Second row: add entries.
-        $row2 = new html_table_row();
-        $addentries = new html_table_cell('##addnewentry##');
-        $addentries->colspan = 5;
-        $row2->cells = [$addentries];
-        foreach ($row2->cells as $cell) {
-            $cell->style = 'border:0 none;';
-        }
-        // Third row: paging bar.
-        $row3 = new html_table_row();
-        $pagingbar = new html_table_cell('##pagingbar##');
-        $pagingbar->colspan = 5;
-        $row3->cells = [$pagingbar];
-        foreach ($row3->cells as $cell) {
-            $cell->style = 'border:0 none;';
-        }
-        // Construct the table.
-        $table->data = [$row1, $row2, $row3];
-        $sectiondefault = html_writer::table($table);
-        $this->view->esection = html_writer::tag(
-            'div',
-            $sectiondefault,
-            ['class' => 'mdl-align']
-        ) . '<div class="mod-datalynx-grid-entries" data-region="grid-view-browser">##entries##</div>';
+        $this->view->esection = $this->get_default_esection_html(
+            'grid',
+            '##addnewentry##',
+            'mod-datalynx-grid-entries row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4'
+        );
 
         // Set content fields in responsive grid.
         $mustache = [];
@@ -117,7 +85,7 @@ class view extends base {
             }
         }
         $entrydefault = $OUTPUT->render_from_template('mod_datalynx/gridview', $mustache);
-        $this->view->eparam2 = html_writer::tag('div', $entrydefault, ['class' => 'entry']);
+        $this->view->eparam2 = html_writer::tag('div', $entrydefault, ['class' => 'col entry']);
     }
 
     /**

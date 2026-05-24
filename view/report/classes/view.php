@@ -647,42 +647,7 @@ class view extends base {
 
         $fields = parent::remove_duplicates($fields);
 
-        $table = new html_table();
-        $table->attributes['cellpadding'] = '2';
-
-        $row1 = new html_table_row();
-        $viewsmenu = new html_table_cell('##viewsmenu##');
-        $seperator = new html_table_cell('     ');
-        $filtersmenu = new html_table_cell('##filtersmenu##');
-        $quicksearch = new html_table_cell('##quicksearch##');
-        $quickperpage = new html_table_cell('##quickperpage##');
-        $row1->cells = [$viewsmenu, $seperator, $filtersmenu, $quicksearch, $quickperpage];
-        foreach ($row1->cells as $cell) {
-            $cell->style = 'border:0 none;';
-        }
-
-        $row2 = new html_table_row();
-        $addentries = new html_table_cell('');
-        $addentries->colspan = 5;
-        $row2->cells = [$addentries];
-        foreach ($row2->cells as $cell) {
-            $cell->style = 'border:0 none;';
-        }
-
-        $row3 = new html_table_row();
-        $pagingbar = new html_table_cell('##pagingbar##');
-        $pagingbar->colspan = 5;
-        $row3->cells = [$pagingbar];
-        foreach ($row3->cells as $cell) {
-            $cell->style = 'border:0 none;';
-        }
-
-        $table->data = [$row1, $row2, $row3];
-        $sectiondefault = html_writer::table($table);
-        $this->view->esection = html_writer::tag(
-            'div',
-            $sectiondefault,
-            ['class' => 'mdl-align']
-        ) . '<div class="mod-datalynx-report-entries" data-region="report-view-browser">##entries##</div>';
+        // Set views and filters menus and quick search.
+        $this->view->esection = $this->get_default_esection_html('report');
     }
 }
