@@ -434,7 +434,7 @@ class rule extends base {
             // Loop through the actual Moodle role IDs found by get_roles_with_cap_in_context.
             foreach ($allneeded as $roleid) {
                 // Get role users from both explicit role assignments and course enrolments.
-                $roleusers = get_role_users($roleid, $context, false, 'u.id', 'u.id ASC');
+                $roleusers = get_role_users($roleid, $context, true, 'u.id', 'u.id ASC');
                 if ($roleusers) {
                     $users = array_merge($users, array_keys($roleusers));
                 }
@@ -445,7 +445,7 @@ class rule extends base {
         $forbiddenusers = [];
         if (!empty($allforbidden)) {
             foreach ($allforbidden as $roleid) {
-                $roleusers = get_role_users($roleid, $context, false, 'u.id', 'u.id ASC');
+                $roleusers = get_role_users($roleid, $context, true, 'u.id', 'u.id ASC');
                 if ($roleusers) {
                     $forbiddenusers = array_merge($forbiddenusers, array_keys($roleusers));
                 }

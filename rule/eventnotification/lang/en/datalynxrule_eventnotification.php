@@ -33,4 +33,5 @@ $string['event'] = 'Datalynx event';
 $string['messagecontent'] = 'Field content that is included in the message';
 $string['pluginname'] = 'Event notification';
 $string['privacy:metadata'] = 'Even notifications do not store personal data.';
+$string['roles_help_info'] = 'Note: Recipients in the selected roles must have the corresponding notification capability (e.g., "mod/datalynx:notifyentryadded" for entry creation) enabled in their Moodle permissions to receive these notifications.';
 $string['triggerspecificevent'] = 'Trigger only if the selected field meets a condition';

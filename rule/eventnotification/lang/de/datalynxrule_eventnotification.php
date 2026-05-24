@@ -33,4 +33,5 @@ $string['messagecontent'] = 'Felder deren Inhalt in der Nachricht inkludiert wir
 $string['pluginname'] = 'Ereignisbenachrichtigung';
 $string['regex'] = 'Regulärer Ausdruck, der verwendet wird, um die Kennung aus dem Dateinamen zu extrahieren';
 $string['regex_desc'] = 'Wenn leer gelassen, wird es standardmäßig auf /^(\d+)_/ gesetzt.';
+$string['roles_help_info'] = 'Hinweis: Empfänger in den ausgewählten Rollen müssen die entsprechende Benachrichtigungsberechtigung (z. B. "mod/datalynx:notifyentryadded" für die Erstellung von Einträgen) in ihren Moodle-Rechten aktiviert haben, um diese Benachrichtigungen zu erhalten.';
 $string['triggerspecificevent'] = 'Nur wenn folgendes Feld eine Bedingung erfüllt senden';
