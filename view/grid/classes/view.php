@@ -171,49 +171,9 @@ class view extends base {
 
         $elements = [];
 
-        // Prepare grid table if needed.
-        if ($name != 'newentry' && !empty($this->view->param3)) {
-            $entriescount = count($entriesset);
-            [$cols, $rows] = explode(' ', $this->view->param3);
-            if ($entriescount < $cols) {
-                $cols = $entriescount;
-                $rows = 1;
-            } else {
-                if ($rows) {
-                    $rows = ceil($entriescount / $cols);
-                } else {
-                    $rows = 1;
-                    $percol = ceil($entriescount / $cols) > 1 ? ceil($entriescount / $cols) : null;
-                }
-            }
-
-            $table = $this->make_table($cols, $rows);
-            $grouphtml = html_writer::table($table);
-            // Now split $tablehtml to cells by ##begintablecell##.
-            $cells = explode('##begintablecell##', $grouphtml);
-            // The first part is everything before first cell.
-            $elements[] = ['html', array_shift($cells)];
-        }
-
         // Flatten the set to a list of elements.
-        $count = 0;
         foreach ($entriesset as $entrydefinitions) {
             $elements = array_merge($elements, $entrydefinitions);
-            if (!empty($cells)) {
-                if (empty($percol) || $count >= $percol - 1) {
-                    $count = 0;
-                    $elements[] = ['html', array_shift($cells)];
-                } else {
-                    $count++;
-                }
-            }
-        }
-
-        // Add remaining cells.
-        if (!empty($cells)) {
-            foreach ($cells as $cell) {
-                $elements[] = ['html', $cell];
-            }
         }
 
         // Add group heading.
@@ -265,28 +225,5 @@ class view extends base {
         }
 
         return $elements;
-    }
-
-    /**
-     * Make a table for the grid layout.
-     *
-     * @param int $cols
-     * @param int $rows
-     * @return html_table
-     */
-    protected function make_table($cols, $rows) {
-        $table = new html_table();
-        $table->align = array_fill(0, $cols, 'center');
-        for ($r = 0; $r < $rows; $r++) {
-            $row = new html_table_row();
-            for ($c = 0; $c < $cols; $c++) {
-                $cell = new html_table_cell();
-                $cell->text = '##begintablecell##';
-                $row->cells[] = $cell;
-            }
-            $table->data[] = $row;
-        }
-
-        return $table;
     }
 }

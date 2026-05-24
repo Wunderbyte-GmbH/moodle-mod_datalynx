@@ -44,22 +44,6 @@ class form extends datalynxview_base_form {
 
         $mform = &$this->_form;
 
-        // Grid layout (param3).
-        $mform->addElement(
-            'header',
-            'gridsettingshdr',
-            get_string('gridsettings', 'datalynxview_grid')
-        );
-
-        // Cols.
-        $range = range(2, 50);
-        $options = ['' => get_string('choosedots')] + array_combine($range, $range);
-        $mform->addElement('select', 'cols', get_string('cols', 'datalynxview_grid'), $options);
-
-        // Rows.
-        $mform->addElement('selectyesno', 'rows', get_string('rows', 'datalynxview_grid'));
-        $mform->disabledIf('rows', 'cols', 'eq', '');
-
         // Repeated entry (param2).
         $mform->addElement('header', 'entrytemplatehdr', get_string('entrytemplate', 'datalynx'));
 
@@ -68,46 +52,5 @@ class form extends datalynxview_base_form {
         $this->add_tags_selector('eparam2_editor', 'general');
         $this->add_tags_selector('eparam2_editor', 'field');
         $this->add_tags_selector('eparam2_editor', 'character');
-    }
-
-    /**
-     * Preprocess data before setting it to the form.
-     *
-     * @param stdClass $data
-     */
-    public function data_preprocessing(&$data) {
-        parent::data_preprocessing($data);
-        // Grid layout.
-        if (!empty($data->param3)) {
-            [$data->cols, $data->rows, ] = explode(' ', $data->param3);
-        }
-    }
-
-    /**
-     * Set data to the form.
-     *
-     * @param stdClass $data
-     */
-    public function set_data($data) {
-        $this->data_preprocessing($data);
-        parent::set_data($data);
-    }
-
-    /**
-     * Get data from the form.
-     *
-     * @param bool $slashed
-     * @return stdClass
-     */
-    public function get_data($slashed = true) {
-        if ($data = parent::get_data($slashed)) {
-            // Grid layout.
-            if (!empty($data->cols)) {
-                $data->param3 = $data->cols . ' ' . (int) !empty($data->rows);
-            } else {
-                $data->param3 = '';
-            }
-        }
-        return $data;
     }
 }
