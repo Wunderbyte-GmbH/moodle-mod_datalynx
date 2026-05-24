@@ -157,7 +157,7 @@ const toggleApproval = (control) => {
     control.disabled = true;
     control.setAttribute('aria-busy', 'true');
 
-    return Ajax.call([{
+    return Promise.resolve(Ajax.call([{
         methodname: 'mod_datalynx_toggle_entry_approval',
         args: {
             entryid: Number(entryid),
@@ -165,7 +165,7 @@ const toggleApproval = (control) => {
             viewid: Number(view || 0),
             action: 'toggle-approval'
         }
-    }])[0]
+    }])[0])
         .then((data) => {
             if (!data || typeof data.approved === 'undefined' || typeof data.controlhtml !== 'string') {
                 reloadPage();

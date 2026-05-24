@@ -83,14 +83,14 @@ const handleDocumentClick = (event) => {
     }
 
     setBusyState(toggle, true);
-    Ajax.call([{
+    Promise.resolve(Ajax.call([{
         methodname: 'mod_datalynx_toggle_behavior',
         args: {
             behaviorid,
             permissionid,
             forproperty
         }
-    }])[0]
+    }])[0])
     .then((response) => {
         setToggleState(toggle, response.enabled);
         return response;
