@@ -25,6 +25,7 @@
 namespace mod_datalynx\form;
 use coding_exception;
 use dml_exception;
+use html_writer;
 use mod_datalynx;
 use moodleform;
 use stdClass;
@@ -90,23 +91,60 @@ class datalynxfield_behavior_form extends moodleform {
         $mform->addElement('header', 'visibilityoptions', get_string('visibility', 'datalynx'));
         $mform->setExpanded('visibilityoptions');
 
-        $options = ["multiple" => true];
         $mform->addElement(
-            'autocomplete',
-            'visibletopermission',
-            get_string('visibleto', 'datalynx'),
-            $this->dlx->get_datalynx_permission_names(false, false),
-            $options
+            'static',
+            'visibletopermission_header',
+            '',
+            html_writer::tag('strong', get_string('visibleto', 'datalynx'))
         );
-        $mform->addHelpButton('visibletopermission', 'visibleto', 'datalynx');
-        $mform->setType('visibletopermission', PARAM_RAW);
-        if ($new) {
-            $mform->setDefault(
-                'visibletopermission',
-                [mod_datalynx\datalynx::PERMISSION_MANAGER, mod_datalynx\datalynx::PERMISSION_TEACHER,
-                            mod_datalynx\datalynx::PERMISSION_STUDENT]
-            );
-        }
+        $mform->addHelpButton('visibletopermission_header', 'visibleto', 'datalynx');
+
+        $this->add_permission_checkbox(
+            $mform,
+            'visibletopermission_1',
+            get_string('visible1', 'datalynx'),
+            'mod/datalynx:viewprivilegemanager',
+            1
+        );
+        $this->add_permission_checkbox(
+            $mform,
+            'visibletopermission_2',
+            get_string('visible2', 'datalynx'),
+            'mod/datalynx:viewprivilegeteacher',
+            2
+        );
+        $this->add_permission_checkbox(
+            $mform,
+            'visibletopermission_4',
+            get_string('visible4', 'datalynx'),
+            'mod/datalynx:viewprivilegestudent',
+            4
+        );
+        $this->add_permission_checkbox(
+            $mform,
+            'visibletopermission_8',
+            get_string('visible8', 'datalynx'),
+            'mod/datalynx:viewprivilegeguest',
+            8
+        );
+        $this->add_permission_checkbox(
+            $mform,
+            'visibletopermission_16',
+            get_string('author', 'datalynx'),
+            '',
+            16,
+            false,
+            get_string('dynamic_check_author_desc', 'datalynx')
+        );
+        $this->add_permission_checkbox(
+            $mform,
+            'visibletopermission_32',
+            get_string('mentor', 'datalynx'),
+            '',
+            32,
+            false,
+            get_string('dynamic_check_mentor_desc', 'datalynx')
+        );
 
         // Interface for single user, this overrules other visibility options.
         $allusers = $this->get_allusers();
@@ -142,23 +180,64 @@ class datalynxfield_behavior_form extends moodleform {
         }
 
         $mform->addElement(
-            'autocomplete',
-            'editableby',
-            get_string('editableby', 'datalynx'),
-            $this->dlx->get_datalynx_permission_names(false, false),
-            $options
+            'static',
+            'editableby_header',
+            '',
+            html_writer::tag('strong', get_string('editableby', 'datalynx'))
         );
-        $mform->addHelpButton('editableby', 'editableby', 'datalynx');
+        $mform->addHelpButton('editableby_header', 'editableby', 'datalynx');
 
-        $mform->setType('editableby', PARAM_RAW);
-        if ($new) {
-            $mform->setDefault(
-                'editableby',
-                [mod_datalynx\datalynx::PERMISSION_MANAGER, mod_datalynx\datalynx::PERMISSION_TEACHER,
-                            mod_datalynx\datalynx::PERMISSION_STUDENT]
-            );
+        $this->add_permission_checkbox(
+            $mform,
+            'editableby_1',
+            get_string('visible1', 'datalynx'),
+            'mod/datalynx:editprivilegemanager',
+            1
+        );
+        $this->add_permission_checkbox(
+            $mform,
+            'editableby_2',
+            get_string('visible2', 'datalynx'),
+            'mod/datalynx:editprivilegeteacher',
+            2
+        );
+        $this->add_permission_checkbox(
+            $mform,
+            'editableby_4',
+            get_string('visible4', 'datalynx'),
+            'mod/datalynx:editprivilegestudent',
+            4
+        );
+        $this->add_permission_checkbox(
+            $mform,
+            'editableby_8',
+            get_string('visible8', 'datalynx'),
+            'mod/datalynx:editprivilegeguest',
+            8
+        );
+        $this->add_permission_checkbox(
+            $mform,
+            'editableby_16',
+            get_string('author', 'datalynx'),
+            '',
+            16,
+            false,
+            get_string('dynamic_check_author_desc', 'datalynx')
+        );
+        $this->add_permission_checkbox(
+            $mform,
+            'editableby_32',
+            get_string('mentor', 'datalynx'),
+            '',
+            32,
+            false,
+            get_string('dynamic_check_mentor_desc', 'datalynx')
+        );
+
+        $permissions = [1, 2, 4, 8, 16, 32];
+        foreach ($permissions as $perm) {
+            $mform->disabledIf("editableby_{$perm}", 'editable', 'notchecked');
         }
-        $mform->disabledIf('editableby', 'editable', 'notchecked');
 
         $mform->addElement('advcheckbox', 'required', get_string('required', 'datalynx'));
         if ($new) {
@@ -217,12 +296,29 @@ class datalynxfield_behavior_form extends moodleform {
     public function get_data() {
         $data = parent::get_data();
         if ($data) {
-            if (!isset($data->visibleto)) {
-                $data->visibleto = [];
+            $permissions = [1, 2, 4, 8, 16, 32];
+
+            $visibletopermission = [];
+            foreach ($permissions as $perm) {
+                if (!empty($data->{"visibletopermission_{$perm}"})) {
+                    $visibletopermission[] = $perm;
+                }
+                unset($data->{"visibletopermission_{$perm}"});
             }
-            // When editable is unchecked, disabledIf hides the UI widget but the autocomplete's
-            // hidden inputs still submit previously-selected values. Force empty when unchecked.
-            if (empty($data->editable) || !isset($data->editableby)) {
+            $data->visibletopermission = $visibletopermission;
+
+            $editableby = [];
+            foreach ($permissions as $perm) {
+                if (!empty($data->{"editableby_{$perm}"})) {
+                    $editableby[] = $perm;
+                }
+                unset($data->{"editableby_{$perm}"});
+            }
+            $data->editableby = $editableby;
+
+            // When editable is unchecked, disabledIf hides the UI widget but the checkbox inputs
+            // still submit previously-selected values. Force empty when unchecked.
+            if (empty($data->editable)) {
                 $data->editableby = [];
                 $data->editable = false;
             }
@@ -239,12 +335,19 @@ class datalynxfield_behavior_form extends moodleform {
      * @param array|stdClass $data
      */
     public function set_data($data) {
-        if (!isset($data->visibleto)) {
-            $data->visibleto = [];
+        if (!isset($data->visibletopermission)) {
+            $data->visibletopermission = [];
         }
         if (!isset($data->editableby)) {
             $data->editableby = [];
         }
+
+        $permissions = [1, 2, 4, 8, 16, 32];
+        foreach ($permissions as $perm) {
+            $data->{"visibletopermission_{$perm}"} = in_array($perm, $data->visibletopermission) ? 1 : 0;
+            $data->{"editableby_{$perm}"} = in_array($perm, $data->editableby) ? 1 : 0;
+        }
+
         if (empty($data->editableby)) {
             $data->editable = false;
         } else {
@@ -295,5 +398,76 @@ class datalynxfield_behavior_form extends moodleform {
             }
         }
         return $errors;
+    }
+
+    /**
+     * Get the names of the roles that have a capability allowed in the current context.
+     *
+     * @param string $capability
+     * @return array List of localized role names.
+     */
+    protected function get_allowed_role_names($capability) {
+        $context = $this->dlx->context;
+        $allroles = role_get_names($context, ROLENAME_ALIAS, true);
+        $roleswithcap = get_roles_with_capability($capability, CAP_ALLOW, $context);
+        $matchingrolenames = [];
+        foreach ($roleswithcap as $role) {
+            if (isset($allroles[$role->id])) {
+                $matchingrolenames[] = $allroles[$role->id];
+            }
+        }
+        return $matchingrolenames;
+    }
+
+    /**
+     * Add a permission checkbox to the form with dynamic feedback (roles or description).
+     *
+     * @param \MoodleQuickForm $mform
+     * @param string $elementname
+     * @param string $label
+     * @param string $capability
+     * @param int $value
+     * @param bool $is_capability
+     * @param string $desc
+     */
+    protected function add_permission_checkbox($mform, $elementname, $label, $capability, $value, $is_capability = true, $desc = '') {
+        if ($is_capability) {
+            $allowedroles = $this->get_allowed_role_names($capability);
+
+            $html = '<div class="d-inline-block align-middle ml-2">';
+            $html .= '<div><small class="text-muted">' .
+                    get_string('visible_capability', 'datalynx', $capability) . '</small></div>';
+
+            if (empty($allowedroles)) {
+                $warningtext = get_string('visible_no_roles_warning', 'datalynx');
+                $warningicon = '<i class="fa fa-exclamation-triangle"></i> ';
+                $warninghtml = '<span class="badge badge-warning bg-warning text-dark">' .
+                        $warningicon . $warningtext . '</span>';
+                $html .= '<div class="mt-1">' . $warninghtml . '</div>';
+            } else {
+                $badges = [];
+                foreach ($allowedroles as $rolename) {
+                    $badges[] = html_writer::span($rolename, 'badge badge-secondary bg-secondary text-white mr-1');
+                }
+                $allowedlabel = get_string('visible_allowed_roles', 'datalynx');
+                $html .= '<div class="mt-1"><small><strong>' . $allowedlabel . ' </strong>' .
+                        implode(' ', $badges) . '</small></div>';
+            }
+            $html .= '</div>';
+        } else {
+            $html = '<div class="d-inline-block align-middle ml-2">';
+            $html .= '<div><small class="text-muted"><strong>' .
+                    get_string('dynamic_check', 'datalynx') . '</strong> ' . $desc . '</small></div>';
+            $html .= '</div>';
+        }
+
+        $mform->addElement(
+            'advcheckbox',
+            $elementname,
+            $label,
+            $html,
+            ['group' => 1],
+            [0, $value]
+        );
     }
 }

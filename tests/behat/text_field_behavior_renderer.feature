@@ -91,7 +91,7 @@ Feature: Test text field behavior and renderer in datalynx
     And I follow "Add behavior"
     And I set the field "Name" to "Text Behavior"
     # Set visibletopermission to Manager and Teacher only (remove Student from default selection)
-    And I set the field "Visible to" to "Manager, Teacher"
+    And I set the field "id_visibletopermission_4" to "0"
     # Add Student 3 to the explicit user visibility list
     And I set the field "Other user" to "Student 3"
     # Add Team member select field to team member visibility
