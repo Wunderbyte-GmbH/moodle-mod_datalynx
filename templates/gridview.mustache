@@ -17,31 +17,30 @@
 {{!
     @template mod_datalynx/gridview
 
-    Displays gridview within datalynx as responsive columns.
-
-    Classes required for JS:
-    * none
-
-    Data attributes required for JS:
-    * none
-
-    Context variables required for this template:
-    * none
+    Displays gridview entry within datalynx as a modern responsive card.
 
     Example context (json):
     {
         "fields":[
-            {"name":"a","tag":"a0"},{"name":"b","tag":"b0"}
+            {"name":"Title","tag":"[[Title]]"}
         ]
     }
 }}
-
-<div class="row justify-content-start">
-    {{#fields}}
-    <div class="col-lg-{{size}}" data-field-name="{{name}}"><small>{{name}}:</small> {{{tag}}}</div>
-    {{/fields}}
+<div class="card h-100 shadow-sm border rounded hover-shadow transition">
+    <div class="card-body p-3 d-flex flex-column">
+        {{#fields}}
+            <div class="mb-3 datalynx-field-display" data-field-name="{{name}}">
+                <span class="text-muted d-block small font-weight-bold text-uppercase tracking-wider mb-1">{{name}}</span>
+                <div class="datalynx-field-value text-dark">
+                    {{{tag}}}
+                </div>
+            </div>
+        {{/fields}}
+    </div>
+    <div class="card-footer bg-white border-top-0 pt-0 pb-3 px-3 d-flex justify-content-end gap-2">
+        <div class="datalynx-entry-actions">
+            ##edit##
+            ##delete##
+        </div>
+    </div>
 </div>
-<div class="row">
-    <div class="col">##edit##  ##delete##</div>
-</div>
-<hr>
