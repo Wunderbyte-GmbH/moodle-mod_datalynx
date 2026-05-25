@@ -137,7 +137,6 @@ final class csv_view_customfilter_test extends advanced_testcase {
         [$dlx, $viewrecord, $fieldid, $entryone, $entrytwo, $entrythree] = $this->create_multiselect_fixture();
 
         // Build a customsearch that matches only entries with Opt2 (key '2').
-        // Structure: [fieldid => ['AND' => [[not, operator, [values...]]]]]
         $searchfields = [$fieldid => ['AND' => [['', 'ANY_OF', ['2']]]]];
 
         $view = new csv_view($dlx, $viewrecord->id, ['customsearch' => $searchfields]);
@@ -174,7 +173,10 @@ final class csv_view_customfilter_test extends advanced_testcase {
         $view = new csv_view($dlx, $viewrecord->id, ['customsearch' => $searchfields]);
         $url = $view->get_baseurl()->out(false);
 
-        $this->assertStringContainsString('usearch=', $url,
-            'Export links are built from baseurl; without usearch the custom filter is silently ignored on export.');
+        $this->assertStringContainsString(
+            'usearch=',
+            $url,
+            'Export links are built from baseurl; without usearch the custom filter is silently ignored on export.'
+        );
     }
 }
