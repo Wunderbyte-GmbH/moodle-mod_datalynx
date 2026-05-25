@@ -59,12 +59,29 @@ class datalynxview_entries_form extends moodleform {
     public function add_delegate_action_buttons() {
         $mform =& $this->_form;
         $buttonarray = [];
-        $buttonarray[] = &$mform->createElement('html', '<input type="button" class="form-group btn btn-primary"
-            onclick="document.getElementById(\'id_submitbutton\').click();" value="' . get_string('savechanges') . '"/>');
-        $buttonarray[] = &$mform->createElement('html', '<input type="button" class="btn btn-secondary"
-            onclick="document.getElementById(\'id_cancel\').click();" value="' . get_string('cancel') . '"/>');
 
-        $mform->addGroup($buttonarray, 'delegatebuttonar', '', [' '], false);
+        $mform->addElement('static', 'button_spacer', '', '<div class="w-100 my-4"></div>');
+        // Save Button (Primary)
+        $buttonarray[] = $mform->createElement(
+            'static', 
+            'delegate_save', 
+            '', 
+            '<button type="button" class="btn btn-primary" id="id_delegate_save" name="delegate_save" ' .
+            'onclick="document.getElementById(\'id_submitbutton\').click(); return false;">' . 
+            get_string('savechanges') . '</button>'
+        );
+
+        // Cancel Button (Secondary)
+        $buttonarray[] = $mform->createElement(
+            'static', 
+            'delegate_cancel', 
+            '', 
+            '<button type="button" class="btn btn-secondary" id="id_delegate_cancel" name="delegate_cancel" ' .
+            'onclick="document.getElementById(\'id_cancel\').click(); return false;">' . 
+            get_string('cancel') . '</button>'
+        );
+
+        $mform->addGroup($buttonarray, 'delegatebuttonar', '', null, false);
         $mform->closeHeaderBefore('delegatebuttonar');
     }
 
