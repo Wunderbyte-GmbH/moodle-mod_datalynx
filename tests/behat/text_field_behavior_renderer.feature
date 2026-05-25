@@ -143,7 +143,7 @@ Feature: Test text field behavior and renderer in datalynx
     Then I should see "This is the display template:"
     And I should see "Hello World"
     # Open edit mode: teacher has manageentries capability so ##edit## renders an Edit link
-    When I click on "a [aria-label='Edit']" "css_element"
+    When I click on the 1st entry "Edit" link
     Then "input[disabled]" "css_element" should exist
     # Manager also sees a disabled input in edit mode (editableby=[] means no one can edit)
     When I log in as "manager1"
@@ -151,6 +151,6 @@ Feature: Test text field behavior and renderer in datalynx
     And I follow "Datalynx Test Instance"
     Then I should see "This is the display template:"
     And I should see "Hello World"
-    When I click on "a [aria-label='Edit']" "css_element"
+    When I click on the 1st entry "Edit" link
     Then "input[disabled]" "css_element" should exist
     And I should not see "I am not visible"

@@ -131,6 +131,9 @@ Feature: Test TinyMCE tag buttons and dialogs in datalynx view editor
     And I click on ".modal.show.datalynx-view-tag-modal .datalynx-tag-modal-save" "css_element"
     And I click on "View template" "link"
     And I click on "Entry template" "link"
+    And I switch to the "id_eparam2_editor" TinyMCE editor iframe
+    And I click on "span:contains('Datalynx field Text')" "css_element"
+    And I switch to the main frame
     When I select "##viewsesslink:Gridview;;;##" from the "eparam2_editor_general_tag_menu" singleselect
     And I switch to the "id_eparam2_editor" TinyMCE editor iframe
     And I click on "viewsesslink: Gridview" "button"
