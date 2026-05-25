@@ -85,7 +85,8 @@ class view extends base {
             }
         }
         $entrydefault = $OUTPUT->render_from_template('mod_datalynx/gridview', $mustache);
-        $this->view->eparam2 = html_writer::tag('div', $entrydefault, ['class' => 'col entry']);
+        $this->view->eparam2 = $entrydefault;
+        $this->view->param3 = 'col';
     }
 
     /**

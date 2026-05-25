@@ -120,4 +120,42 @@ final class grid_view_manager_test extends advanced_testcase {
         $this->assertStringContainsString('editentries=' . $entryid, $payload['groups'][0]['entries'][0]['edithtml']);
         $this->assertStringContainsString('eids=' . $entryid, $payload['groups'][0]['entries'][0]['edithtml']);
     }
+
+    /**
+     * Test wrapper settings payload output.
+     *
+     * @covers ::get_browse_payload
+     */
+    public function test_get_browse_payload_with_wrapper_settings(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        [$dlx, $view, , ] = $this->create_grid_fixture();
+
+        // 1. Default (legacy) wrapper setting when param3 is empty.
+        $manager = new grid_view_manager();
+        $payload = $manager->get_browse_payload($dlx->id(), $view->id);
+        $this->assertFalse($payload['nowrapper']);
+        $this->assertSame('entry', $payload['entrywrapperclass']);
+
+        // 2. Bootstrap row-cols setting.
+        $DB->set_field('datalynx_views', 'param3', 'col', ['id' => $view->id]);
+        $payload = $manager->get_browse_payload($dlx->id(), $view->id);
+        $this->assertFalse($payload['nowrapper']);
+        $this->assertSame('col', $payload['entrywrapperclass']);
+
+        // 3. Custom class setting.
+        $DB->set_field('datalynx_views', 'param3', 'custom', ['id' => $view->id]);
+        $DB->set_field('datalynx_views', 'param4', 'my-custom-col', ['id' => $view->id]);
+        $payload = $manager->get_browse_payload($dlx->id(), $view->id);
+        $this->assertFalse($payload['nowrapper']);
+        $this->assertSame('my-custom-col', $payload['entrywrapperclass']);
+
+        // 4. No wrapper setting.
+        $DB->set_field('datalynx_views', 'param3', 'none', ['id' => $view->id]);
+        $payload = $manager->get_browse_payload($dlx->id(), $view->id);
+        $this->assertTrue($payload['nowrapper']);
+        $this->assertSame('', $payload['entrywrapperclass']);
+    }
 }

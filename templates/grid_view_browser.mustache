@@ -63,7 +63,7 @@
             {{/hasname}}
             <div class="mod-datalynx-grid-view-browser__group">
                 {{#entries}}
-                    <div class="entry" data-entryid="{{id}}">
+                    {{#nowrapper}}
                         {{#entryhtml}}
                             {{{entryhtml}}}
                         {{/entryhtml}}
@@ -82,7 +82,29 @@
                             {{/hasactions}}
                             <hr>
                         {{/entryhtml}}
-                    </div>
+                    {{/nowrapper}}
+                    {{^nowrapper}}
+                        <div class="{{entrywrapperclass}} entry" data-entryid="{{id}}">
+                            {{#entryhtml}}
+                                {{{entryhtml}}}
+                            {{/entryhtml}}
+                            {{^entryhtml}}
+                                <div class="row justify-content-start">
+                                    {{#fields}}
+                                        <div class="col-lg-{{size}}" data-field-name="{{name}}">
+                                            <small>{{name}}:</small> {{{valuehtml}}}
+                                        </div>
+                                    {{/fields}}
+                                </div>
+                                {{#hasactions}}
+                                    <div class="row">
+                                        <div class="col">{{{edithtml}}} {{{deletehtml}}}</div>
+                                    </div>
+                                {{/hasactions}}
+                                <hr>
+                            {{/entryhtml}}
+                        </div>
+                    {{/nowrapper}}
                 {{/entries}}
             </div>
         {{/groups}}

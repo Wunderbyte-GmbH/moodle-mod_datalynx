@@ -357,6 +357,14 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             $data->patterns = null;
         }
 
+        // Overwrite param3/param4 to defaults if restoring a grid view backup from before today.
+        $info = $this->task->get_info();
+        $backupversion = $info->metadata->plugin_mod_datalynx_version ?? 0;
+        if ($data->type === 'grid' && ($backupversion === 0 || $backupversion < 2026052500)) {
+            $data->param3 = 'entry';
+            $data->param4 = '';
+        }
+
         // Insert the datalynx_views record.
         $newitemid = $DB->insert_record('datalynx_views', $data);
         $this->set_mapping('datalynx_view', $oldid, $newitemid, true); // Files by this item id.
