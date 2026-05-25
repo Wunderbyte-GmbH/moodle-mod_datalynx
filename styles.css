@@ -343,3 +343,8 @@ form.mform div.entry div.datalynx-field-wrapper {
     letter-spacing: 0.05em;
     color: #6c757d;
 }
+
+/* Ensure autocomplete suggestions list is always displayed on top of other form elements (e.g. labels or buttons) */
+.datalynx-field-value .form-autocomplete-suggestions {
+    z-index: 1050;
+}

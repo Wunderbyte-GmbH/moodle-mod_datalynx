@@ -54,7 +54,7 @@ Feature: Create entry, add multiselect and use customfilter
     And I follow "Views"
     And I click on "Edit Gridview" "link"
     And I click on "View template" "link"
-    Then I add to "id_esection_editor" editor the text " ##pagingbar## ##addnewentry## ##customfilter:mycustomfilter## ##entries## "
+    And I set the "id_esection_editor" editor to " ##pagingbar## ##addnewentry## ##customfilter:mycustomfilter## ##entries## "
 
     # Add ##duplicate## to entry template
     And I click on "Entry template" "link"
