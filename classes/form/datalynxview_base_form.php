@@ -326,13 +326,15 @@ class datalynxview_base_form extends moodleform {
      *
      * @param string $editorname
      * @param string $tagstype
+     * @param bool $forentrytemplate if true, view-level tags (info, user prefs, actions, paging)
+     *        are excluded from the general tag menu
      */
-    public function add_tags_selector($editorname, $tagstype) {
+    public function add_tags_selector($editorname, $tagstype, $forentrytemplate = false) {
         $view = $this->view;
         $mform = &$this->_form;
         switch ($tagstype) {
             case 'general':
-                $tags = $view->patternclass()->get_menu(false, false);
+                $tags = $view->patternclass()->get_menu(false, false, $forentrytemplate);
                 $label = get_string('viewgeneraltags', 'datalynx');
                 break;
 

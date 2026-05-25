@@ -263,8 +263,7 @@ abstract class base {
             $searchfields = unserialize($this->filter->customsearch);
             $usearch = datalynx_filter_manager::get_search_url_query($searchfields);
             if ($usearch !== null) {
-                // get_search_url_query returns a urlencode()'d string; decode it here because.
-                // moodle_url->param() re-encodes on output, so double-encoding must be avoided.
+                // Decode get_search_url_query urlencoded string because it is encoded again with ->param().
                 $this->baseurl->param('usearch', urldecode($usearch));
             }
         }

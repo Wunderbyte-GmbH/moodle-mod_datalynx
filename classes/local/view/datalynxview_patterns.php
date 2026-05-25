@@ -138,12 +138,23 @@ class datalynxview_patterns {
      *
      * @param bool $showall
      * @param bool $checkvisibility if true only views visible to user are considered
+     * @param bool $forentrytemplate if true, excludes tags that are only meaningful in the
+     *        view-level template (info, user preferences, general actions, paging)
      * @return array
      */
-    final public function get_menu($showall = false, $checkvisibility = true) {
+    final public function get_menu($showall = false, $checkvisibility = true, $forentrytemplate = false) {
         // The default menu category for views.
         $patternsmenu = [];
+        $excludedtags = $forentrytemplate ? array_merge(
+            array_keys($this->info_patterns()),
+            array_keys($this->userpref_patterns()),
+            array_keys($this->action_patterns()),
+            array_keys($this->paging_patterns())
+        ) : [];
         foreach ($this->patterns($checkvisibility) as $tag => $pattern) {
+            if ($forentrytemplate && in_array($tag, $excludedtags)) {
+                continue;
+            }
             if ($showall || $pattern[self::PATTERN_SHOW_IN_MENU]) {
                 // Which category.
                 if (!empty($pattern[self::PATTERN_CATEGORY])) {

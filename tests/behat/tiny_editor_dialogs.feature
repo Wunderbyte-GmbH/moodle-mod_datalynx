@@ -126,7 +126,7 @@ Feature: Test TinyMCE tag buttons and dialogs in datalynx view editor
     And "[data-region='tag-urlquery-input']" "css_element" should exist
     And "[data-region='tag-cssclass-input']" "css_element" should exist
     When I set the field "dlx-link-text-view" to "View link"
-    And I set the field "dlx-url-query-view" to "new=1|bar=2"
+    And I set the field "dlx-url-query-view" to "testvar=8|bar=2"
     And I set the field "dlx-css-class-view" to "btn btn-primary"
     And I click on ".modal.show.datalynx-view-tag-modal .datalynx-tag-modal-save" "css_element"
     And I click on "View template" "link"
@@ -143,7 +143,7 @@ Feature: Test TinyMCE tag buttons and dialogs in datalynx view editor
     And "[data-region='tag-urlquery-input']" "css_element" should exist
     And "[data-region='tag-cssclass-input']" "css_element" should exist
     Then I set the field "dlx-link-text-entry" to "Entry link"
-    And I set the field "dlx-url-query-entry" to "new=1|entryid=##entryid##"
+    And I set the field "dlx-url-query-entry" to "entryid=##entryid##"
     And I set the field "dlx-css-class-entry" to "btn btn-secondary"
     And I click on ".modal.show.datalynx-view-tag-modal .datalynx-tag-modal-save" "css_element"
     And I press "Save changes"
