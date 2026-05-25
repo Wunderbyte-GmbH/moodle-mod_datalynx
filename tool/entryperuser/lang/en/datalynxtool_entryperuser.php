@@ -22,6 +22,18 @@
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+$string['back'] = 'Back';
+$string['createviewsuggestion'] = 'Alternatively, you can select or <a href="{$a}">create a new view</a> that does not contain required fields.';
+$string['generateentries'] = 'Generate entries';
+$string['next'] = 'Next';
+$string['norequiredfields'] = 'This view has no required fields. It is safe to generate entries without default values.';
+$string['nousers'] = 'No gradable users found in this course.';
+$string['noviews'] = 'No views with edit capability (containing the ##edit## tag) were found in this activity.';
 $string['pluginname'] = 'Entry per user';
 $string['pluginname_help'] = 'Adds one blank entry for each gradable user in the course';
 $string['privacy:metadata'] = 'This entryperuser tool does not store personal data.';
+$string['requiredfieldswarning'] = 'This view contains required fields. Please specify default values for them below.';
+$string['selectview'] = 'Select view';
+$string['selectview_help'] = 'Select the view to be used for the entry template and structure.';
+$string['success'] = 'Successfully generated entries for each user.';
