@@ -58,7 +58,7 @@ class form extends datalynxview_base_form {
             $editorattr,
             $editoroptions['param2']
         );
-        $this->add_tags_selector('eparam2_editor', 'general');
+        $this->add_tags_selector('eparam2_editor', 'general', true);
         $this->add_tags_selector('eparam2_editor', 'field');
     }
 }
