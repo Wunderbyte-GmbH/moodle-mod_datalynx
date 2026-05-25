@@ -61,23 +61,23 @@ class datalynxview_entries_form extends moodleform {
         $buttonarray = [];
 
         $mform->addElement('static', 'button_spacer', '', '<div class="w-100 my-4"></div>');
-        // Save Button (Primary)
+        // Save Button (Primary).
         $buttonarray[] = $mform->createElement(
-            'static', 
-            'delegate_save', 
-            '', 
+            'static',
+            'delegate_save',
+            '',
             '<button type="button" class="btn btn-primary" id="id_delegate_save" name="delegate_save" ' .
-            'onclick="document.getElementById(\'id_submitbutton\').click(); return false;">' . 
+            'onclick="document.getElementById(\'id_submitbutton\').click(); return false;">' .
             get_string('savechanges') . '</button>'
         );
 
-        // Cancel Button (Secondary)
+        // Cancel Button (Secondary).
         $buttonarray[] = $mform->createElement(
-            'static', 
-            'delegate_cancel', 
-            '', 
+            'static',
+            'delegate_cancel',
+            '',
             '<button type="button" class="btn btn-secondary" id="id_delegate_cancel" name="delegate_cancel" ' .
-            'onclick="document.getElementById(\'id_cancel\').click(); return false;">' . 
+            'onclick="document.getElementById(\'id_cancel\').click(); return false;">' .
             get_string('cancel') . '</button>'
         );
 

@@ -58,7 +58,7 @@ Feature: Create entry, add multiselect and use customfilter
 
     # Add ##duplicate## to entry template
     And I click on "Entry template" "link"
-    And I select "##duplicate##" from the "eparam2_editor_field_tag_menu" singleselect
+    And I set the "id_eparam2_editor" editor to "[[Datalynx field Text]] [[Datalynx field Select (multiple)]] ##duplicate## ##edit## ##delete##"
     And I press "Save changes"
 
     # Add some entries.
