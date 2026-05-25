@@ -52,10 +52,26 @@ navigation_node::override_active_url(
 // DATA PROCESSING.
 if ($urlparams->run && confirm_sesskey()) { // Run selected tool.
     $tooldir = "$CFG->dirroot/mod/datalynx/tool/$urlparams->run";
+    $autoloadclass = "\\datalynxtool_$urlparams->run\\tool";
     $toolclass = "datalynxtool_$urlparams->run";
-    if (file_exists($tooldir)) {
-        require_once("$tooldir/lib.php");
-        if ($result = $toolclass::run($dlx)) {
+    $result = null;
+    $runsuccessful = false;
+
+    if (class_exists($autoloadclass)) {
+        $result = $autoloadclass::run($dlx);
+        $runsuccessful = true;
+    } else if (file_exists($tooldir)) {
+        if (file_exists("$tooldir/lib.php")) {
+            require_once("$tooldir/lib.php");
+            if (class_exists($toolclass)) {
+                $result = $toolclass::run($dlx);
+                $runsuccessful = true;
+            }
+        }
+    }
+
+    if ($runsuccessful) {
+        if ($result) {
             [$goodbad, $message] = $result;
         } else {
             $goodbad = 'bad';
