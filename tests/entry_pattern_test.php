@@ -70,4 +70,86 @@ final class entry_pattern_test extends advanced_testcase {
         $this->assertStringContainsString('eids=42', $html);
         $this->assertStringContainsString('sesskey=', $html);
     }
+
+    /**
+     * The ##edit## link must include an sr-only span with the entry ID in the accessible label,
+     * enabling Behat steps like: I click on "Edit Entryid 42" "link".
+     *
+     * @covers \datalynxfield_entry\renderer::display_edit
+     */
+    public function test_display_edit_has_accessible_sr_only_label(): void {
+        $course = $this->getDataGenerator()->create_course();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $dlx = new datalynx($instance->id);
+
+        $fieldrecord = entry_field::get_field_objects($dlx->id())[entry_field::_ENTRY];
+        $field = new entry_field($dlx, $fieldrecord);
+        $renderer = $field->renderer();
+
+        $entry = (object) [
+            'id' => 42,
+            'baseurl' => new moodle_url('/mod/datalynx/view.php', ['d' => $dlx->id()]),
+        ];
+
+        $method = new ReflectionMethod($renderer, 'display_edit');
+        $method->setAccessible(true);
+        $html = $method->invoke($renderer, $entry);
+
+        $this->assertStringContainsString('sr-only', $html);
+        $this->assertStringContainsString('Edit Entryid 42', $html);
+    }
+
+    /**
+     * The ##delete## link must include an sr-only span with the entry ID.
+     *
+     * @covers \datalynxfield_entry\renderer::display_delete
+     */
+    public function test_display_delete_has_accessible_sr_only_label(): void {
+        $course = $this->getDataGenerator()->create_course();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $dlx = new datalynx($instance->id);
+
+        $fieldrecord = entry_field::get_field_objects($dlx->id())[entry_field::_ENTRY];
+        $field = new entry_field($dlx, $fieldrecord);
+        $renderer = $field->renderer();
+
+        $entry = (object) [
+            'id' => 7,
+            'baseurl' => new moodle_url('/mod/datalynx/view.php', ['d' => $dlx->id()]),
+        ];
+
+        $method = new ReflectionMethod($renderer, 'display_delete');
+        $method->setAccessible(true);
+        $html = $method->invoke($renderer, $entry);
+
+        $this->assertStringContainsString('sr-only', $html);
+        $this->assertStringContainsString('Delete Entryid 7', $html);
+    }
+
+    /**
+     * The ##duplicate## link must include an sr-only span with the entry ID.
+     *
+     * @covers \datalynxfield_entry\renderer::display_duplicate
+     */
+    public function test_display_duplicate_has_accessible_sr_only_label(): void {
+        $course = $this->getDataGenerator()->create_course();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $dlx = new datalynx($instance->id);
+
+        $fieldrecord = entry_field::get_field_objects($dlx->id())[entry_field::_ENTRY];
+        $field = new entry_field($dlx, $fieldrecord);
+        $renderer = $field->renderer();
+
+        $entry = (object) [
+            'id' => 99,
+            'baseurl' => new moodle_url('/mod/datalynx/view.php', ['d' => $dlx->id()]),
+        ];
+
+        $method = new ReflectionMethod($renderer, 'display_duplicate');
+        $method->setAccessible(true);
+        $html = $method->invoke($renderer, $entry);
+
+        $this->assertStringContainsString('sr-only', $html);
+        $this->assertStringContainsString('Duplicate Entryid 99', $html);
+    }
 }

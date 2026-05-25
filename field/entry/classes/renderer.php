@@ -145,7 +145,7 @@ class renderer extends datalynxfield_renderer {
         if ($field->dlx()->data->singleedit) {
             $url->param('view', $field->dlx()->data->singleedit);
         }
-        $str = get_string('edit');
+        $str = get_string('editentryid', 'datalynx', $entry->id);
 
         // In case we serve the app show a nice button for mobile devices.
         if (WS_SERVER) {
@@ -156,7 +156,10 @@ class renderer extends datalynxfield_renderer {
                 component='mod_datalynx' method='mobile_course_view' $args>$str</button>";
         }
 
-        return html_writer::link($url->out(false), $OUTPUT->pix_icon('t/edit', $str));
+        // Icon alt is empty so the accessible name comes solely from the sr-only span,
+        // avoiding a duplicate "Edit Edit Entryid 123" announcement by screen readers.
+        $sronly = html_writer::span($str, 'sr-only');
+        return html_writer::link($url->out(false), $OUTPUT->pix_icon('t/edit', '') . $sronly);
     }
 
     /**
@@ -174,8 +177,9 @@ class renderer extends datalynxfield_renderer {
         if ($field->dlx()->data->singleedit) {
             $url->param('view', $field->dlx()->data->singleedit);
         }
-        $str = get_string('duplicate');
-        return html_writer::link($url->out(false), $str . ' ' . $OUTPUT->pix_icon('t/copy', $str));
+        $str = get_string('duplicateentryid', 'datalynx', $entry->id);
+        $sronly = html_writer::span($str, 'sr-only');
+        return html_writer::link($url->out(false), $OUTPUT->pix_icon('t/copy', '') . $sronly);
     }
 
     /**
@@ -190,7 +194,7 @@ class renderer extends datalynxfield_renderer {
         $field = $this->field;
         $params = ['delete' => $entry->id, 'sesskey' => sesskey()];
         $url = new moodle_url($entry->baseurl, $params);
-        $str = get_string('delete');
+        $str = get_string('deleteentryid', 'datalynx', $entry->id);
 
         // In case we serve the app show a nice button for mobile devices.
         if (WS_SERVER) {
@@ -201,7 +205,8 @@ class renderer extends datalynxfield_renderer {
                 component='mod_datalynx' method='mobile_course_view' $args>$str</button>";
         }
 
-        return html_writer::link($url->out(false), $OUTPUT->pix_icon('t/delete', $str));
+        $sronly = html_writer::span($str, 'sr-only');
+        return html_writer::link($url->out(false), $OUTPUT->pix_icon('t/delete', '') . $sronly);
     }
 
     /**
