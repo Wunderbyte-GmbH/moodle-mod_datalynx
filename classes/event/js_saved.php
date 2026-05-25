@@ -49,7 +49,7 @@ class js_saved extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('datalynx_jssaved', 'mod_datalynx');
+        return get_string('datalynxjssaved', 'mod_datalynx');
     }
 
     /**

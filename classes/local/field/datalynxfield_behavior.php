@@ -157,6 +157,20 @@ class datalynxfield_behavior {
     }
 
     /**
+     * Get default form data for a new behavior.
+     *
+     * @param mod_datalynx\datalynx $dlx
+     * @return stdClass
+     */
+    public static function get_default_form_data(mod_datalynx\datalynx $dlx): stdClass {
+        $record = (object) self::$default;
+        $record->dataid = $dlx->id();
+        $record->visibleto = serialize($record->visibleto);
+        $record->editableby = serialize($record->editableby);
+        return self::db_to_form($record);
+    }
+
+    /**
      * Get the datalynx instance id for this behavior.
      *
      * @return int

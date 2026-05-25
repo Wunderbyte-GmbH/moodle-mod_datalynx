@@ -270,8 +270,8 @@ class field extends datalynxfield_base {
     public function get_supported_search_operators() {
         return ['' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
                 '>' => get_string('greaterthan', 'datalynx'),
-                '>=' => get_string('greater_equal', 'datalynx'),
-                '<' => get_string('less_than', 'datalynx'), '<=' => get_string('less_equal', 'datalynx'),
+                '>=' => get_string('greaterequal', 'datalynx'),
+                '<' => get_string('lessthan', 'datalynx'), '<=' => get_string('lessequal', 'datalynx'),
                 'BETWEEN' => get_string('between', 'datalynx')];
     }
 

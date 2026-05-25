@@ -52,7 +52,7 @@ $observers = [
                 'callback' => 'mod_datalynx\local\rule\manager::trigger_rules',
                 'includefile' => 'mod/datalynx/classes/local/rule/manager.php',
         ],
-        ['eventname' => 'mod_datalynx\event\cron_trigger',
+        ['eventname' => 'mod_datalynx\event\crontrigger',
                 'callback' => 'mod_datalynx\local\rule\manager::trigger_rules',
                 'includefile' => 'mod/datalynx/classes/local/rule/manager.php',
         ],

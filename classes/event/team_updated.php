@@ -56,7 +56,7 @@ class team_updated extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('datalynx_team_updated', 'mod_datalynx');
+        return get_string('datalynxteamupdated', 'mod_datalynx');
     }
 
     /**
