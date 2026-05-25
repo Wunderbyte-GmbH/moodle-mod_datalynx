@@ -499,10 +499,10 @@ class datalynxview_base_form extends moodleform {
 
         $html = '<div class="d-inline-block align-middle ml-2">';
         $html .= '<div><small class="text-muted">' .
-                get_string('visible_capability', 'datalynx', $capability) . '</small></div>';
+                get_string('visiblecapability', 'datalynx', $capability) . '</small></div>';
 
         if (empty($allowedroles)) {
-            $warningtext = get_string('visible_no_roles_warning', 'datalynx');
+            $warningtext = get_string('visiblenoroleswarning', 'datalynx');
             $warningicon = '<i class="fa fa-exclamation-triangle"></i> ';
             $warninghtml = '<span class="badge badge-warning bg-warning text-dark">' .
                     $warningicon . $warningtext . '</span>';
@@ -512,7 +512,7 @@ class datalynxview_base_form extends moodleform {
             foreach ($allowedroles as $rolename) {
                 $badges[] = html_writer::span($rolename, 'badge badge-secondary bg-secondary text-white mr-1');
             }
-            $allowedlabel = get_string('visible_allowed_roles', 'datalynx');
+            $allowedlabel = get_string('visibleallowedroles', 'datalynx');
             $html .= '<div class="mt-1"><small><strong>' . $allowedlabel . ' </strong>' .
                     implode(' ', $badges) . '</small></div>';
         }

@@ -32,7 +32,7 @@ namespace mod_datalynx\event;
  * @copyright 2023 Thomas Winkler
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class cron_trigger extends \core\event\base {
+class crontrigger extends \core\event\base {
     /**
      * Init method.
      *
@@ -50,7 +50,7 @@ class cron_trigger extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('cron_trigger', 'mod_datalynx');
+        return get_string('crontrigger', 'mod_datalynx');
     }
 
     /**

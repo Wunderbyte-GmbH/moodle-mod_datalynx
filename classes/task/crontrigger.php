@@ -35,14 +35,14 @@ use mod_datalynx\datalynx;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
  */
-class cron_trigger extends \core\task\scheduled_task {
+class crontrigger extends \core\task\scheduled_task {
     /**
      * Returns the name of this task.
      *
      * @return string
      */
     public function get_name() {
-        return get_string('cron_trigger', 'mod_datalynx');
+        return get_string('crontrigger', 'mod_datalynx');
     }
 
     /**
@@ -57,7 +57,7 @@ class cron_trigger extends \core\task\scheduled_task {
             // TODO: MDL-00000 In upgrade.php remove all deleted rules.
             if ($DB->record_exists('datalynx', ['id' => $record->dataid])) {
                 $dlx = new datalynx($record->dataid);
-                $event = \mod_datalynx\event\cron_trigger::create(['context' => $dlx->context, 'objectid' => $dlx->id()]);
+                $event = \mod_datalynx\event\crontrigger::create(['context' => $dlx->context, 'objectid' => $dlx->id()]);
                 $event->trigger();
             }
         }

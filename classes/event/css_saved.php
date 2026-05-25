@@ -49,7 +49,7 @@ class css_saved extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('datalynx_csssaved', 'mod_datalynx');
+        return get_string('datalynxcsssaved', 'mod_datalynx');
     }
 
     /**

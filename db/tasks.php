@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $tasks = [
     [
-        'classname' => 'mod_datalynx\task\cron_trigger',
+        'classname' => 'mod_datalynx\task\crontrigger',
         'blocking' => 0,
         'minute' => '0',
         'hour' => '1',

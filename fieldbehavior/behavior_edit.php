@@ -71,6 +71,8 @@ switch ($urlparams->action) {
                 ['class' => 'mdl-align']
             );
         } else {
+            $defaultdata = datalynxfield_behavior::get_default_form_data($dlx);
+            $mform->set_data($defaultdata);
             echo html_writer::tag(
                 'h2',
                 get_string('newbehavior', 'datalynx'),

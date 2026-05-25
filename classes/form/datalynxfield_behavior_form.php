@@ -134,7 +134,7 @@ class datalynxfield_behavior_form extends moodleform {
             '',
             16,
             false,
-            get_string('dynamic_check_author_desc', 'datalynx')
+            get_string('dynamiccheckauthor_desc', 'datalynx')
         );
         $this->add_permission_checkbox(
             $mform,
@@ -143,7 +143,7 @@ class datalynxfield_behavior_form extends moodleform {
             '',
             32,
             false,
-            get_string('dynamic_check_mentor_desc', 'datalynx')
+            get_string('dynamiccheckmentor_desc', 'datalynx')
         );
 
         // Interface for single user, this overrules other visibility options.
@@ -222,7 +222,7 @@ class datalynxfield_behavior_form extends moodleform {
             '',
             16,
             false,
-            get_string('dynamic_check_author_desc', 'datalynx')
+            get_string('dynamiccheckauthor_desc', 'datalynx')
         );
         $this->add_permission_checkbox(
             $mform,
@@ -231,7 +231,7 @@ class datalynxfield_behavior_form extends moodleform {
             '',
             32,
             false,
-            get_string('dynamic_check_mentor_desc', 'datalynx')
+            get_string('dynamiccheckmentor_desc', 'datalynx')
         );
 
         $permissions = [1, 2, 4, 8, 16, 32];
@@ -344,8 +344,8 @@ class datalynxfield_behavior_form extends moodleform {
 
         $permissions = [1, 2, 4, 8, 16, 32];
         foreach ($permissions as $perm) {
-            $data->{"visibletopermission_{$perm}"} = in_array($perm, $data->visibletopermission) ? 1 : 0;
-            $data->{"editableby_{$perm}"} = in_array($perm, $data->editableby) ? 1 : 0;
+            $data->{"visibletopermission_{$perm}"} = in_array($perm, $data->visibletopermission) ? $perm : 0;
+            $data->{"editableby_{$perm}"} = in_array($perm, $data->editableby) ? $perm : 0;
         }
 
         if (empty($data->editableby)) {
@@ -427,19 +427,27 @@ class datalynxfield_behavior_form extends moodleform {
      * @param string $label
      * @param string $capability
      * @param int $value
-     * @param bool $is_capability
+     * @param bool $iscapability
      * @param string $desc
      */
-    protected function add_permission_checkbox($mform, $elementname, $label, $capability, $value, $is_capability = true, $desc = '') {
-        if ($is_capability) {
+    protected function add_permission_checkbox(
+        $mform,
+        $elementname,
+        $label,
+        $capability,
+        $value,
+        $iscapability = true,
+        $desc = ''
+    ) {
+        if ($iscapability) {
             $allowedroles = $this->get_allowed_role_names($capability);
 
             $html = '<div class="d-inline-block align-middle ml-2">';
             $html .= '<div><small class="text-muted">' .
-                    get_string('visible_capability', 'datalynx', $capability) . '</small></div>';
+                    get_string('visiblecapability', 'datalynx', $capability) . '</small></div>';
 
             if (empty($allowedroles)) {
-                $warningtext = get_string('visible_no_roles_warning', 'datalynx');
+                $warningtext = get_string('visiblenoroleswarning', 'datalynx');
                 $warningicon = '<i class="fa fa-exclamation-triangle"></i> ';
                 $warninghtml = '<span class="badge badge-warning bg-warning text-dark">' .
                         $warningicon . $warningtext . '</span>';
@@ -449,7 +457,7 @@ class datalynxfield_behavior_form extends moodleform {
                 foreach ($allowedroles as $rolename) {
                     $badges[] = html_writer::span($rolename, 'badge badge-secondary bg-secondary text-white mr-1');
                 }
-                $allowedlabel = get_string('visible_allowed_roles', 'datalynx');
+                $allowedlabel = get_string('visibleallowedroles', 'datalynx');
                 $html .= '<div class="mt-1"><small><strong>' . $allowedlabel . ' </strong>' .
                         implode(' ', $badges) . '</small></div>';
             }
@@ -457,7 +465,7 @@ class datalynxfield_behavior_form extends moodleform {
         } else {
             $html = '<div class="d-inline-block align-middle ml-2">';
             $html .= '<div><small class="text-muted"><strong>' .
-                    get_string('dynamic_check', 'datalynx') . '</strong> ' . $desc . '</small></div>';
+                    get_string('dynamiccheck', 'datalynx') . '</strong> ' . $desc . '</small></div>';
             $html .= '</div>';
         }
 
