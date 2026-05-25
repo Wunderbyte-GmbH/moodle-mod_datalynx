@@ -451,12 +451,12 @@ class datalynx_filter {
                 // Add non-internal fields to sorties.
                 if (!$field::is_internal()) {
                     $sorties[$fieldid] = $sortname;
+                    $sortname = "c{$fieldid}_content";
                 }
 
                 // Here we can check if fields are special.
                 if (
-                        $field instanceof datalynxfield_option_multiple ||
-                        $field instanceof datalynxfield_option_single
+                        false // Disable the complex REPLACE sorting that breaks SELECT DISTINCT.
                 ) {
                     // Read values of field from database.
                     $fieldvalues = $DB->get_field(
