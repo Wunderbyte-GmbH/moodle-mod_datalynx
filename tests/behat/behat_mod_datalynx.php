@@ -692,4 +692,42 @@ class behat_mod_datalynx extends behat_base {
         }
         $link->click();
     }
+
+    /**
+     * Clicks the Nth entry action link (Edit, Delete, or Duplicate) on the page.
+     *
+     * The ##edit##, ##delete##, and ##duplicate## patterns each render an <a> element whose
+     * accessible name is provided by a <span class="sr-only"> child, e.g. "Edit Entryid 42".
+     * This step finds all such links whose sr-only text starts with "<action> Entryid" and
+     * clicks the Nth one (1-based), so tests do not need to know the DB entry ID.
+     *
+     * Example usage:
+     *   When I click on the 1st entry "Edit" link
+     *   And  I click on the 2nd entry "Edit" link
+     *
+     * @When /^I click on the (?P<n>\d+)(?:st|nd|rd|th) entry "(?P<action>[^"]*)" link$/
+     *
+     * @param int    $n      1-based position of the link among all matching links on the page.
+     * @param string $action Action label prefix, e.g. "Edit", "Delete", "Duplicate".
+     */
+    public function i_click_on_the_nth_entry_action_link(int $n, string $action): void {
+        $page = $this->getSession()->getPage();
+        $spans = $page->findAll('css', 'a .sr-only');
+        $prefix = $action . ' Entryid';
+        $found = [];
+        foreach ($spans as $span) {
+            if (str_starts_with(trim($span->getText()), $prefix)) {
+                $found[] = $span->getParent();
+            }
+        }
+        if (count($found) < $n) {
+            throw new \RuntimeException(sprintf(
+                'Cannot find %d "%s" entry action link(s) on the page; only %d found.',
+                $n,
+                $prefix,
+                count($found)
+            ));
+        }
+        $found[$n - 1]->click();
+    }
 }

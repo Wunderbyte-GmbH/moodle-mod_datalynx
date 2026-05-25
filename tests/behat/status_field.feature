@@ -76,12 +76,12 @@ Feature: Test datalynx _status internal field
     And I press "Save changes"
     And I press "Continue"
     Then I should see "Not set"
-    When I click on "a [aria-label='Edit']" "css_element"
+    When I click on the 1st entry "Edit" link
     And I set the field with xpath "//select[contains(@name,'field_status_')]" to "1"
     And I press "Save changes"
     And I press "Continue"
     Then I should see "Draft"
-    When I click on "a [aria-label='Edit']" "css_element"
+    When I click on the 1st entry "Edit" link
     And I set the field with xpath "//select[contains(@name,'field_status_')]" to "2"
     And I press "Save changes"
     And I press "Continue"
@@ -98,18 +98,18 @@ Feature: Test datalynx _status internal field
     And I press "Save changes"
     And I press "Continue"
     Then I should see "Not set"
-    When I click on "a [aria-label='Edit']" "css_element"
+    When I click on the 1st entry "Edit" link
     And I set the field with xpath "//select[contains(@name,'field_status_')]" to "2"
     And I press "Save changes"
     And I press "Continue"
     Then I should see "Final submission"
-    And "a [aria-label='Edit']" "css_element" should not exist
+    And I should not see "Edit Entryid"
     And I log out
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Datalynx Test Instance"
-    Then "a [aria-label='Edit']" "css_element" should exist
-    And I click on "a [aria-label='Edit']" "css_element"
+    Then I should see "Edit Entryid"
+    And I click on the 1st entry "Edit" link
     Then I should not see "It's not allowed to edit this entry."
 
   Scenario: Status filter separates Draft and Final submission entries (manager sees all teacher only Fina)
@@ -122,7 +122,7 @@ Feature: Test datalynx _status internal field
       | text | Text | Draft entry |
     And I press "Save changes"
     And I press "Continue"
-    When I click on "a [aria-label='Edit']" "css_element"
+    When I click on the 1st entry "Edit" link
     And I set the field with xpath "//select[contains(@name,'field_status_')]" to "1"
     And I press "Save changes"
     And I press "Continue"
@@ -136,7 +136,7 @@ Feature: Test datalynx _status internal field
       | text | Text | Final entry  |
     And I press "Save changes"
     And I press "Continue"
-    When I click on "a [aria-label='Edit']" "css_element"
+    When I click on the 1st entry "Edit" link
     And I set the field with xpath "//select[contains(@name,'field_status_')]" to "2"
     And I press "Save changes"
     And I press "Continue"

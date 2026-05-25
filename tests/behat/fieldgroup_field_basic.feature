@@ -62,7 +62,7 @@ Feature: Basic fieldgroup entry flow with repeated checkbox rows
     And I should see "A"
     And I should see "B"
     And I should see "2"
-    And I click on "(//a/i[@title='Edit'])[1]" "xpath_element"
+    And I click on the 1st entry "Edit" link
     And I click on "//form[contains(@class,'mform')]//div[@data-field-type='fieldgroup']//div[contains(@class,'lines') and @data-line='2']//div[@data-field-name='Datalynx field Checkbox letters']//label[normalize-space()='C']" "xpath_element"
     And I press "Save changes"
     Then I should see "updated"
@@ -97,7 +97,7 @@ Feature: Basic fieldgroup entry flow with repeated checkbox rows
     And I set the field "param4" to "2"
     And I press "Save changes"
     And I follow "Browse"
-    And I click on "(//a/i[@title='Edit'])[2]" "xpath_element"
+    And I click on the 2nd entry "Edit" link
     And I click on "//form[contains(@class,'mform')]//div[@data-field-type='fieldgroup']//div[contains(@class,'lines') and @data-line='1']//button[@data-removeline='1']" "xpath_element"
     And the field with xpath "//form[contains(@class,'mform')]//div[@data-field-type='fieldgroup']//div[contains(@class,'lines') and @data-line='1']//div[@data-field-name='Datalynx field Checkbox letters']//label[normalize-space()='A']/input[@type='checkbox']" matches value "1"
     And the field with xpath "//form[contains(@class,'mform')]//div[@data-field-type='fieldgroup']//div[contains(@class,'lines') and @data-line='1']//div[@data-field-name='Datalynx field Checkbox numbers']//label[normalize-space()='2']/input[@type='checkbox']" matches value "1"
@@ -108,7 +108,7 @@ Feature: Basic fieldgroup entry flow with repeated checkbox rows
     And I press "Save changes"
     Then I should see "updated"
     And I press "Continue"
-    And I click on "(//a/i[@title='Edit'])[2]" "xpath_element"
+    And I click on the 2nd entry "Edit" link
     And the field with xpath "//form[contains(@class,'mform')]//div[@data-field-type='fieldgroup']//div[contains(@class,'lines') and @data-line='1']//div[@data-field-name='Datalynx field Checkbox letters']//label[normalize-space()='A']/input[@type='checkbox']" matches value "1"
     And the field with xpath "//form[contains(@class,'mform')]//div[@data-field-type='fieldgroup']//div[contains(@class,'lines') and @data-line='1']//div[@data-field-name='Datalynx field Checkbox numbers']//label[normalize-space()='2']/input[@type='checkbox']" matches value "1"
     And the field with xpath "//form[contains(@class,'mform')]//div[@data-field-type='fieldgroup']//div[contains(@class,'lines') and @data-line='2']//div[@data-field-name='Datalynx field Checkbox letters']//label[normalize-space()='B']/input[@type='checkbox']" matches value "1"
