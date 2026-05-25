@@ -32,6 +32,7 @@ use html_writer;
 use mod_datalynx\datalynx;
 use mod_datalynx\local\datalynx_entries;
 use mod_datalynx\local\filter\datalynx_filter;
+use mod_datalynx\local\filter\datalynx_filter_manager;
 use moodle_exception;
 use moodle_url;
 use moodleform;
@@ -251,6 +252,21 @@ abstract class base {
         $this->baseurl->param('filter', $this->filter->id);
         if ($this->filter->page) {
             $this->baseurl->param('page', $this->filter->page);
+        }
+        // Propagate active custom-filter search and filter ID into the base URL so
+        // that all derived links (e.g. CSV export, pagination) carry the full filter state.
+        $cfilter = optional_param('cfilter', 0, PARAM_INT);
+        if ($cfilter) {
+            $this->baseurl->param('cfilter', $cfilter);
+        }
+        if (!empty($this->filter->customsearch)) {
+            $searchfields = unserialize($this->filter->customsearch);
+            $usearch = datalynx_filter_manager::get_search_url_query($searchfields);
+            if ($usearch !== null) {
+                // get_search_url_query returns a urlencode()'d string; decode it here because
+                // moodle_url->param() re-encodes on output, so double-encoding must be avoided.
+                $this->baseurl->param('usearch', urldecode($usearch));
+            }
         }
         $this->set_groupby_per_page();
 
