@@ -64,11 +64,32 @@ class grid_view_manager {
         $entries = new datalynx_entries($dlx, $view->get_filter());
         $entries->set_content();
 
+        $param3 = isset($viewrecord->param3) ? trim($viewrecord->param3) : '';
+        $param4 = isset($viewrecord->param4) ? trim($viewrecord->param4) : '';
+
+        // Default to 'entry' for existing views where no setting is saved.
+        if ($param3 === '') {
+            $param3 = 'entry';
+        }
+
+        $nowrapper = ($param3 === 'none');
+        $entrywrapperclass = '';
+
+        if (!$nowrapper) {
+            if ($param3 === 'custom') {
+                $entrywrapperclass = ($param4 !== '') ? $param4 : 'entry';
+            } else {
+                $entrywrapperclass = $param3;
+            }
+        }
+
         $payload = [
             'datalynxid' => $dlx->id(),
             'viewid' => (int) $viewrecord->id,
             'viewname' => format_string($view->name()),
             'viewtype' => $view->type(),
+            'nowrapper' => $nowrapper,
+            'entrywrapperclass' => $entrywrapperclass,
             'entriescount' => (int) $entries->get_count(),
             'entriesfiltercount' => (int) $entries->get_count(true),
             'hasentries' => false,

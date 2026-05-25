@@ -1224,6 +1224,15 @@ function xmldb_datalynx_upgrade($oldversion) {
 
         upgrade_mod_savepoint(true, 2026042500, 'datalynx');
     }
+
+    if ($oldversion < 2026052500) {
+        // Set param3 default to 'entry' and param4 to empty string for backward compatibility in existing grid views.
+        $DB->set_field_select('datalynx_views', 'param3', 'entry', "type = 'grid'");
+        $DB->set_field_select('datalynx_views', 'param4', '', "type = 'grid'");
+
+        upgrade_mod_savepoint(true, 2026052500, 'datalynx');
+    }
+
     return true;
 }
 

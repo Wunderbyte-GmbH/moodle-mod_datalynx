@@ -24,5 +24,5 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'datalynxview_grid';
-$plugin->version = 2015092200;
+$plugin->version = 2026052500;
 $plugin->requires = 2022112800;
