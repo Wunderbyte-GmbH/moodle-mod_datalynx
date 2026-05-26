@@ -169,6 +169,7 @@ class get_grid_view_data extends external_api {
             'viewtype' => new external_value(PARAM_ALPHA, 'View type'),
             'nowrapper' => new external_value(PARAM_BOOL, 'Whether to omit the single entry wrapper tag'),
             'entrywrapperclass' => new external_value(PARAM_TEXT, 'CSS class for single entry wrapper'),
+            'groupclass' => new external_value(PARAM_TEXT, 'CSS class for entry group wrapper'),
             'entriescount' => new external_value(PARAM_INT, 'Visible entries count'),
             'entriesfiltercount' => new external_value(PARAM_INT, 'Filtered entries count'),
             'hasentries' => new external_value(PARAM_BOOL, 'Whether the payload has entries'),
