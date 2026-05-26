@@ -58,6 +58,10 @@ class entryperuser_form extends moodleform {
 
     /**
      * Definition for Step 1: Select View.
+     *
+     * @param \MoodleQuickForm $mform The form.
+     * @param \mod_datalynx\datalynx $dlx The datalynx instance.
+     * @param int|null $selectedviewid The selected view ID.
      */
     protected function definition_step_1(&$mform, $dlx, $selectedviewid) {
         $views = $dlx->get_views();
@@ -102,6 +106,10 @@ class entryperuser_form extends moodleform {
 
     /**
      * Definition for Step 2: Input default values.
+     *
+     * @param \MoodleQuickForm $mform The form.
+     * @param \mod_datalynx\datalynx $dlx The datalynx instance.
+     * @param int $selectedviewid The selected view ID.
      */
     protected function definition_step_2(&$mform, $dlx, $selectedviewid) {
         $mform->addElement('hidden', 'viewid', $selectedviewid);
@@ -166,6 +174,10 @@ class entryperuser_form extends moodleform {
 
     /**
      * Form validation.
+     *
+     * @param array $data The data.
+     * @param array $files The files.
+     * @return array The validation errors.
      */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
