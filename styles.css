@@ -316,17 +316,20 @@ form.mform div.entry div.datalynx-field-wrapper {
     font-weight: 500;
 }
 /* Premium Grid Card Hover Animations & Styles */
-.entry.col {
+.entry.col,
+.entry[class*="col-"] {
     display: flex;
 }
-.entry.col .card {
+.entry.col .card,
+.entry[class*="col-"] .card {
     width: 100%;
     border: 1px solid rgba(0, 0, 0, 0.125);
     border-radius: 0.5rem;
     background-color: #fff;
     transition: transform 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
 }
-.entry.col .card:hover {
+.entry.col .card:hover,
+.entry[class*="col-"] .card:hover {
     transform: translateY(-5px);
     box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1);
     border-color: rgba(0, 0, 0, 0.18);
@@ -334,16 +337,20 @@ form.mform div.entry div.datalynx-field-wrapper {
 /* Suppress hover movement while the card contains a form (entry edit mode),
    so that autocomplete dropdowns and other interactive elements remain stable. */
 .entry.col .card:has(form):hover,
-.entry.col .card:has(:focus):hover {
+.entry.col .card:has(:focus):hover,
+.entry[class*="col-"] .card:has(form):hover,
+.entry[class*="col-"] .card:has(:focus):hover {
     transform: none;
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
     border-color: rgba(0, 0, 0, 0.125);
     transition: none;
 }
-.entry.col .card-body {
+.entry.col .card-body,
+.entry[class*="col-"] .card-body {
     flex: 1 1 auto;
 }
-.entry.col .card-footer {
+.entry.col .card-footer,
+.entry[class*="col-"] .card-footer {
     background-color: transparent;
     border-top: none;
 }

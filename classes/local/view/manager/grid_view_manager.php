@@ -83,6 +83,13 @@ class grid_view_manager {
             }
         }
 
+        $groupclass = '';
+        if ($entrywrapperclass === 'col') {
+            $groupclass = 'row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4';
+        } else if (strpos($entrywrapperclass, 'col-') !== false) {
+            $groupclass = 'row g-4';
+        }
+
         $payload = [
             'datalynxid' => $dlx->id(),
             'viewid' => (int) $viewrecord->id,
@@ -90,6 +97,7 @@ class grid_view_manager {
             'viewtype' => $view->type(),
             'nowrapper' => $nowrapper,
             'entrywrapperclass' => $entrywrapperclass,
+            'groupclass' => $groupclass,
             'entriescount' => (int) $entries->get_count(),
             'entriesfiltercount' => (int) $entries->get_count(true),
             'hasentries' => false,

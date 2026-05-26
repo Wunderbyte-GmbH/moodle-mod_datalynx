@@ -138,24 +138,36 @@ final class grid_view_manager_test extends advanced_testcase {
         $payload = $manager->get_browse_payload($dlx->id(), $view->id);
         $this->assertFalse($payload['nowrapper']);
         $this->assertSame('entry', $payload['entrywrapperclass']);
+        $this->assertSame('', $payload['groupclass']);
 
         // 2. Bootstrap row-cols setting.
         $DB->set_field('datalynx_views', 'param3', 'col', ['id' => $view->id]);
         $payload = $manager->get_browse_payload($dlx->id(), $view->id);
         $this->assertFalse($payload['nowrapper']);
         $this->assertSame('col', $payload['entrywrapperclass']);
+        $this->assertSame('row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4', $payload['groupclass']);
 
-        // 3. Custom class setting.
+        // 3. Custom class setting with col- definition.
         $DB->set_field('datalynx_views', 'param3', 'custom', ['id' => $view->id]);
-        $DB->set_field('datalynx_views', 'param4', 'my-custom-col', ['id' => $view->id]);
+        $DB->set_field('datalynx_views', 'param4', 'col-12 col-md-6 col-lg-3', ['id' => $view->id]);
         $payload = $manager->get_browse_payload($dlx->id(), $view->id);
         $this->assertFalse($payload['nowrapper']);
-        $this->assertSame('my-custom-col', $payload['entrywrapperclass']);
+        $this->assertSame('col-12 col-md-6 col-lg-3', $payload['entrywrapperclass']);
+        $this->assertSame('row g-4', $payload['groupclass']);
 
-        // 4. No wrapper setting.
+        // 4. Custom class setting without col- definition.
+        $DB->set_field('datalynx_views', 'param3', 'custom', ['id' => $view->id]);
+        $DB->set_field('datalynx_views', 'param4', 'my-custom-class', ['id' => $view->id]);
+        $payload = $manager->get_browse_payload($dlx->id(), $view->id);
+        $this->assertFalse($payload['nowrapper']);
+        $this->assertSame('my-custom-class', $payload['entrywrapperclass']);
+        $this->assertSame('', $payload['groupclass']);
+
+        // 5. No wrapper setting.
         $DB->set_field('datalynx_views', 'param3', 'none', ['id' => $view->id]);
         $payload = $manager->get_browse_payload($dlx->id(), $view->id);
         $this->assertTrue($payload['nowrapper']);
         $this->assertSame('', $payload['entrywrapperclass']);
+        $this->assertSame('', $payload['groupclass']);
     }
 }
