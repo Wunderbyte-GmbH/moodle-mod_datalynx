@@ -64,7 +64,7 @@ Feature: Create entry and add fieldgroups
     And I click on "Edit Gridview" "link"
     And I click on "Entry template" "link"
     Then I should see "Field tags"
-    Then I set the "id_eparam2_editor" editor to "<div> [[Testfieldgroup1]]</div><div class='ml-5'> ##edit##  ##delete##</div>"
+    Then I set the "id_eparam2_editor" editor to "<div class='card w-100'><div class='card-body'> [[Testfieldgroup1]]</div><div class='card-footer'> ##edit##  ##delete##</div></div>"
     And I press "Save changes"
     When I follow "Browse"
     When I follow "Add a new entry"
@@ -108,7 +108,7 @@ Feature: Create entry and add fieldgroups
     Then I should see "Field tags"
 
     ## Add fieldgroup and remove all other fields.
-    Then I set the "id_eparam2_editor" editor to "<div> [[Testfieldgroup1]]</div><div class='ml-5'> ##edit##  ##delete##</div>"
+    Then I set the "id_eparam2_editor" editor to "<div class='card w-100'><div class='card-body'> [[Testfieldgroup1]]</div><div class='card-footer'> ##edit##  ##delete##</div></div>"
     And I press "Save changes"
     When I follow "Browse"
 

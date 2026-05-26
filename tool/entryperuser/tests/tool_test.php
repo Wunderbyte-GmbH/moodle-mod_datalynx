@@ -213,6 +213,8 @@ final class tool_test extends advanced_testcase {
 
     /**
      * Test required fields detection in step 2 form definition.
+     *
+     * @covers \datalynxtool_entryperuser\form\entryperuser_form
      */
     public function test_form_definition_step_2_detects_required_fields(): void {
         global $DB;
@@ -225,7 +227,7 @@ final class tool_test extends advanced_testcase {
             'type' => 'tabular',
             'name' => 'View with required fields',
             'description' => '',
-            'param2' => '[[testfield|req]]', // Field name with required behavior
+            'param2' => '[[testfield|req]]', // Field name with required behavior.
             'eparam2' => '',
             'visible' => 7,
             'param5' => 0,
