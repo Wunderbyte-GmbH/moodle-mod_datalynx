@@ -46,7 +46,7 @@ Feature: Basic fieldgroup entry flow with repeated checkbox rows
     When I follow "Views"
     And I click on "Edit Gridview" "link"
     And I click on "Entry template" "link"
-    And I set the "id_eparam2_editor" editor to "<div>[[Fieldgroup]]</div> <div class='ml-5'>##edit## ##delete##</div>"
+    And I set the "id_eparam2_editor" editor to "<div class='card w-100'><div class='card-body'>[[Fieldgroup]]</div><div class='card-footer'>##edit## ##delete##</div></div>"
     And I press "Save changes"
     And I follow "Browse"
 
