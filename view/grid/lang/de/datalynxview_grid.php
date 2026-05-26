@@ -25,20 +25,20 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['cols'] = 'Anzahl Spalten';
+$string['customwrapperclass'] = 'Benutzerdefinierte Eintrags-Wrapper-CSS-Klassen';
+$string['customwrapperclass_help'] = 'Geben Sie benutzerdefinierte CSS-Klassen durch Leerzeichen getrennt ein.';
+$string['entrywrapper'] = 'Eintrags-Wrapper';
+$string['entrywrapper_help'] = 'Wählen Sie, wie der Wrapper um jeden einzelnen Eintrag gestaltet werden soll. Empfohlen wird der Bootstrap-Grid-Spalten-Wrapper, der zu den Zeileneinstellungen passt.';
 $string['gridsettings'] = 'Grid-Einstellungen';
 $string['pluginname'] = 'Grid';
 $string['privacy:metadata'] = 'Die Grid-Ansicht speichert keine personenbezogenen Daten.';
 $string['rows'] = 'Ausgerichtete Zeilen';
 
-$string['entrywrapper'] = 'Eintrags-Wrapper';
-$string['entrywrapper_help'] = 'Wählen Sie, wie der Wrapper um jeden einzelnen Eintrag gestaltet werden soll. Empfohlen wird der Bootstrap-Grid-Spalten-Wrapper, der zu den Zeileneinstellungen passt.';
-$string['customwrapperclass'] = 'Benutzerdefinierte Eintrags-Wrapper-CSS-Klassen';
-$string['customwrapperclass_help'] = 'Geben Sie benutzerdefinierte CSS-Klassen durch Leerzeichen getrennt ein.';
-$string['wrapperbootstraprowcols'] = 'Bootstrap Grid Spalte (Empfohlen, passt sich den Spalten der übergeordneten Zeile an)';
 $string['wrapperbootstrapcol12'] = '1 Spalte pro Zeile (col-12)';
-$string['wrapperbootstrapcol6'] = '2 Spalten pro Zeile (col-12 col-md-6)';
-$string['wrapperbootstrapcol4'] = '3 Spalten pro Zeile (col-12 col-md-6 col-lg-4)';
 $string['wrapperbootstrapcol3'] = '4 Spalten pro Zeile (col-12 col-md-6 col-lg-3)';
-$string['wrapperlegacy'] = 'Standard-Wrapper (entry)';
+$string['wrapperbootstrapcol4'] = '3 Spalten pro Zeile (col-12 col-md-6 col-lg-4)';
+$string['wrapperbootstrapcol6'] = '2 Spalten pro Zeile (col-12 col-md-6)';
+$string['wrapperbootstraprowcols'] = 'Bootstrap Grid Spalte (Empfohlen, passt sich den Spalten der übergeordneten Zeile an)';
 $string['wrappercustom'] = 'Benutzerdefinierte CSS-Klassen';
+$string['wrapperlegacy'] = 'Standard-Wrapper (entry)';
 $string['wrappernone'] = 'Kein Wrapper-Tag (Umschließendes HTML-Element weglassen)';
