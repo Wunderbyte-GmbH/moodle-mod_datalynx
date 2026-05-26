@@ -210,4 +210,59 @@ final class tool_test extends advanced_testcase {
             $this->assertEquals('MyDefaultText', $content->content);
         }
     }
+
+    /**
+     * Test required fields detection in step 2 form definition.
+     */
+    public function test_form_definition_step_2_detects_required_fields(): void {
+        global $DB;
+
+        $dlx = $this->create_test_datalynx();
+
+        // Create a view.
+        $view = (object) [
+            'dataid' => $dlx->id(),
+            'type' => 'tabular',
+            'name' => 'View with required fields',
+            'description' => '',
+            'param2' => '[[testfield|req]]', // Field name with required behavior
+            'eparam2' => '',
+            'visible' => 7,
+            'param5' => 0,
+            'param10' => 0,
+        ];
+        $view->id = $DB->insert_record('datalynx_views', $view);
+
+        // Add a text field.
+        $fieldrecord = (object) [
+            'dataid' => $dlx->id(),
+            'type' => 'text',
+            'name' => 'testfield',
+            'description' => '',
+        ];
+        $fieldid = $DB->insert_record('datalynx_fields', $fieldrecord);
+
+        // Add a required behavior.
+        $behaviorrecord = (object) [
+            'dataid' => $dlx->id(),
+            'name' => 'req',
+            'description' => '',
+            'visibleto' => serialize([]),
+            'editableby' => serialize([]),
+            'required' => 1,
+            'timecreated' => time(),
+            'timemodified' => time(),
+        ];
+        $DB->insert_record('datalynx_behaviors', $behaviorrecord);
+
+        // Instantiate the form. This will run the definition and definition_step_2.
+        // It shouldn't crash now.
+        $form = new \datalynxtool_entryperuser\form\entryperuser_form(null, [
+            'dlx' => $dlx,
+            'step' => 2,
+            'selectedviewid' => $view->id,
+        ], 'post', '', null, true);
+
+        $this->assertInstanceOf(\datalynxtool_entryperuser\form\entryperuser_form::class, $form);
+    }
 }

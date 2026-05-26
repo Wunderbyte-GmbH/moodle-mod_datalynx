@@ -1781,7 +1781,7 @@ abstract class base {
      * @return bool
      * @throws coding_exception
      */
-    protected function set_display_definition(?array $options = null) {
+    public function set_display_definition(?array $options = null) {
         $this->displaydefinition = [];
         // Indicate if there are managable entries in the display for the current user.
         // In which case edit/delete action.
@@ -2212,5 +2212,23 @@ abstract class base {
             }
         }
         return $fields;
+    }
+
+    /**
+     * Set the entries to be edited.
+     *
+     * @param array $editentries
+     */
+    public function set_editentries(array $editentries): void {
+        $this->editentries = $editentries;
+    }
+
+    /**
+     * Get the entries to be edited.
+     *
+     * @return array
+     */
+    public function get_editentries(): array {
+        return $this->editentries;
     }
 }

@@ -125,10 +125,27 @@ class entryperuser_form extends moodleform {
 
         // Detect required fields.
         $fields = $view->get_entry_form_fields();
+        $entrypatterns = $view->get_entry_form_patterns();
         $requiredfields = [];
         foreach ($fields as $field) {
-            if ($field->get_behavior()->is_required()) {
-                $requiredfields[] = $field;
+            $fieldid = $field->field->id;
+            $patterns = $entrypatterns[$fieldid] ?? [];
+            foreach ($patterns as $tag) {
+                $behavior = \mod_datalynx\local\field\datalynxfield_behavior::get_default_behavior($dlx);
+                $matches = [];
+                if (preg_match('/\[\[([^\|\]]+)(?:\|([^\|\]]*))?(?:\|([^\|\]]*))?\]\]/', $tag, $matches)) {
+                    $behaviorname = isset($matches[2]) ? trim($matches[2]) : '';
+                    if ($behaviorname !== '') {
+                        $custombehavior = \mod_datalynx\local\field\datalynxfield_behavior::from_name($behaviorname, $dlx->id());
+                        if ($custombehavior) {
+                            $behavior = $custombehavior;
+                        }
+                    }
+                }
+                if ($behavior->is_required()) {
+                    $requiredfields[] = $field;
+                    break; // No need to check other patterns for this field.
+                }
             }
         }
 
@@ -151,7 +168,7 @@ class entryperuser_form extends moodleform {
         $mform->addElement('static', 'suggestion_msg', '', html_writer::div($suggestion, 'text-muted mb-3'));
 
         // Render view form elements.
-        $view->editentries = [-1];
+        $view->set_editentries([-1]);
         $view->set_display_definition();
         $view->definition_to_form($mform);
 
@@ -166,7 +183,7 @@ class entryperuser_form extends moodleform {
             'submit',
             'backbutton',
             get_string('back', 'datalynxtool_entryperuser'),
-            ['class' => 'btn btn-secondary']
+            ['class' => 'btn-secondary']
         );
         $buttonarray[] = &$mform->createElement('cancel', 'cancelbutton', get_string('cancel'));
         $mform->addGroup($buttonarray, 'buttonar', '', [' '], false);
@@ -175,9 +192,9 @@ class entryperuser_form extends moodleform {
     /**
      * Form validation.
      *
-     * @param array $data The data.
-     * @param array $files The files.
-     * @return array The validation errors.
+     * @param array $data Submitted data.
+     * @param array $files Uploaded files.
+     * @return array Array of errors.
      */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
@@ -191,7 +208,7 @@ class entryperuser_form extends moodleform {
             $view = $dlx->get_view_from_id($viewid);
 
             if ($view) {
-                $view->editentries = [-1];
+                $view->set_editentries([-1]);
                 $view->set_display_definition();
                 $patterns = $view->get_entry_form_patterns();
                 $fields = $view->get_entry_form_fields();
