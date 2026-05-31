@@ -92,11 +92,25 @@ Datalynx supports role-targeted view links and privilege mapping so different us
 
 ## Field-level and view-level permission design
 
-| Layer | Control type | Example |
+Permission layers in Datalynx are strictly integrated with Moodle's capability system rather than hardcoding visibility to specific roles:
+
+| Layer | Control type | Description & Capability Mapping |
 |---|---|---|
-| **Field** | Visible by / Editable by | Teachers can edit status; students cannot |
-| **View** | View visibility by role | Teacher review view hidden from students |
-| **Entry actions** | Edit/delete/approve availability | Approval action shown only to reviewers |
+| **Field** | Visible to / Editable by | Mapped to specific view/edit capabilities (e.g. `mod/datalynx:viewprivilegestudent` or `mod/datalynx:editprivilegestudent`). Checked individually. |
+| **View** | View visibility | Controls who can view a view layout, checking Moodle capabilities (e.g. `mod/datalynx:viewprivilegeteacher` for review views). |
+| **Entry actions** | Edit/delete/approve | Governed by capabilities (e.g. `mod/datalynx:approve` for moderation, `mod/datalynx:writeentry` for additions). |
+
+### Dynamic feedback on permissions
+
+When configuring visibility and editability settings for fields, behaviors, or views:
+- **Allowed Roles badges**: Beside each capability checkbox, Datalynx displays dynamic feedback badges listing the actual roles (e.g., *Student*, *Teacher*) that currently have that capability allowed in the course context.
+- **Warning badges**: If a capability checkbox is checked but no Moodle roles in the course are currently granted that permission, Datalynx displays a prominent warning badge: `Warning: No roles have this capability assigned in this course!`.
+
+### Dynamic context checks
+
+In addition to capability checkboxes, **Field behaviors** support special dynamic, context-aware permission checks that bypass standard capabilities:
+- **Dynamic Check: Author**: Automatically grants visibility or editability to the user who created or owns the entry. (Useful for allowing students to edit their own submissions but not others).
+- **Dynamic Check: Mentor**: Automatically grants visibility or editability to users who are registered mentors for the entry's group or team.
 
 ---
 

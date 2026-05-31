@@ -29,9 +29,11 @@ A good view strategy usually includes:
 
 ## Available view types
 
+In Moodle 4.5+, Datalynx views use **progressive AJAX-based browse loading** powered by Mustache templates and Web Services. This allows you to page, filter, and sort entries dynamically without performing a full page reload, resulting in a much faster and smoother browsing experience.
+
 | View Type | Best used for | Typical audience |
 |---|---|---|
-| **Grid** | Card-style layout with visual grouping | Students, teachers |
+| **Grid** | Card-style layout with visual grouping and automatic grid column wrapping | Students, teachers |
 | **Tabular** | Row/column list for operational work | Teachers, managers |
 | **Report** | Structured reporting and export-oriented display | Managers, teachers |
 | **Csv** | Data extraction and CSV-centric workflows | Managers |
@@ -52,9 +54,20 @@ Even when exact labels vary by site configuration, most teams build three layout
 
 1. In **Views**, click **Add a view**.
 2. Select **Grid**.
-3. In your layout section, insert entry tags such as `[[Text]]` and `##comments##`.
-4. Add navigation components such as `##viewsmenu##` and `##pagingbar##`.
-5. Click **Save view** and test with sample entries.
+3. In **Grid settings**, select the appropriate **Entry wrapper** to configure how your cards are wrapped:
+   - **Bootstrap Grid Column (Recommended)**: Wraps entries in a responsive Bootstrap row-cols layout (`col`). The columns automatically match the parent row settings.
+   - **Columns per row**: Force format entries into 1, 2, 3, or 4 columns per row (e.g. `col-12`, `col-12 col-md-6`, etc.).
+   - **Legacy Datalynx wrapper (entry)**: Wraps each entry in the standard `entry` class div.
+   - **Custom CSS classes**: Specify custom space-separated CSS classes. If they contain `col-`, an outer row container is automatically generated.
+   - **No wrapper tag**: Omit wrapper elements completely for raw output rendering.
+4. Check the **Applied Grid Wrappers** infobox directly in the settings form to see the live HTML tag preview that will be generated for your view and entry templates.
+5. In your layout section, insert entry tags such as `[[Text]]` and `##comments##`. (Note: Since wrappers are automatically applied, you do not need to wrap your templates in Bootstrap rows/columns manually).
+6. Add navigation components such as `##viewsmenu##` and `##pagingbar##`.
+7. Click **Save view** and test with sample entries.
+
+> **Important Note on Obsolete Table-based Settings**  
+> The old table-based layout configurations (the **Cols** and **Rows** parameters that forced entries into HTML table markup) have been **completely removed**. The `##begintablecell##` tag is no longer supported and has been deprecated. Grid layouts are now fully responsive and rely on CSS/Bootstrap grid wrappers.
+
 
 ### How to build a List-style view
 
@@ -153,6 +166,7 @@ Even when exact labels vary by site configuration, most teams build three layout
 | Users cannot switch views | `##viewsmenu##` not present or no permission | Add tag and verify role visibility |
 | Search box not visible | `##quicksearch##` not in template | Add and save template |
 | Teachers cannot find pending records | No review filter in view | Add filters and save a review-specific view |
+| Layout broken or cells not rendering properly | Legacy `##begintablecell##` tag or cols/rows used | Obsolete table-based layout settings were removed. Configure the new **Entry wrapper** in Grid settings to automatically generate Bootstrap row/columns wrappers instead. |
 
 ---
 

@@ -64,15 +64,18 @@ Field behaviors let you control how fields behave in entry forms.
 
 Typical controls include:
 
-- Required vs not required behavior
-- Visibility by permission/role
-- Editability by permission/role
+- Required vs not required behavior.
+- Visibility by Moodle capability.
+- Editability by Moodle capability.
+- **Dynamic Context checks**: Define dynamic visibility/editability rules bypassing capabilities:
+  - **Dynamic Check: Author**: Limits visibility or editability of a field strictly to the creator/owner of the entry.
+  - **Dynamic Check: Mentor**: Restricts visibility or editability of a field strictly to the mentors assigned to the entry's group or team.
 
 ### Workflow
 
 1. Open **Field behaviors**.
 2. Click **Add** or edit an existing behavior.
-3. Set visibility and editability rules.
+3. Set visibility and editability rules using capability checkboxes and dynamic context checks.
 4. Configure required behavior where needed.
 5. Save and test with role-based accounts.
 
@@ -113,6 +116,9 @@ Patterns are placeholders that Datalynx replaces with live content.
 | `##quickperpage##` | Per-page selector |
 | `##pagingbar##` | Pagination bar |
 | `##entries##` | Main entries container |
+
+> **Important Note on Tag Placement**  
+> View-level navigation and filter patterns (like `##viewsmenu##`, `##filtersmenu##`, `##quicksearch##`, `##quickperpage##`, `##pagingbar##`, and `##entries##`) are designed for use **only in the View template**. To prevent configuration errors, these patterns are explicitly excluded from the Entry template editor's general tag selection menu.
 
 ### Bulk operation patterns
 
