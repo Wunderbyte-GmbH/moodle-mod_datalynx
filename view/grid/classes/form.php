@@ -65,6 +65,15 @@ class form extends datalynxview_base_form {
         $mform->addHelpButton('param4', 'customwrapperclass', 'datalynxview_grid');
         $mform->hideIf('param4', 'param3', 'neq', 'custom');
 
+        // Dynamic infobox showing the generated HTML wrappers for view and entry.
+        $wrapperhtml = '<div id="grid-wrapper-info" class="alert alert-info mt-2" ' .
+            'style="display: none;"></div>';
+        $mform->addElement('static', 'wrapperinfo', '', $wrapperhtml);
+
+        // Require the dynamic JS module for previewing wrappers.
+        global $PAGE;
+        $PAGE->requires->js_call_amd('mod_datalynx/gridsettings', 'init');
+
         // Repeated entry (param2).
         $mform->addElement('header', 'entrytemplatehdr', get_string('entrytemplate', 'datalynx'));
 
