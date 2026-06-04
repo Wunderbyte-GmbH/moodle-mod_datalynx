@@ -143,7 +143,6 @@ class datalynxview_patterns {
      * @return array
      */
     final public function get_menu($showall = false, $checkvisibility = true, $forentrytemplate = false) {
-        // The default menu category for views.
         $patternsmenu = [];
         $excludedtags = $forentrytemplate ? array_merge(
             array_keys($this->info_patterns()),
@@ -152,8 +151,14 @@ class datalynxview_patterns {
             array_keys($this->paging_patterns())
         ) : [];
         foreach ($this->patterns($checkvisibility) as $tag => $pattern) {
-            if ($forentrytemplate && in_array($tag, $excludedtags)) {
-                continue;
+            if ($forentrytemplate) {
+                if (in_array($tag, $excludedtags)) {
+                    continue;
+                }
+            } else {
+                if (in_array($tag, array_keys($this->form_patterns()))) {
+                    continue;
+                }
             }
             if ($showall || $pattern[self::PATTERN_SHOW_IN_MENU]) {
                 // Which category.
@@ -214,10 +219,14 @@ class datalynxview_patterns {
                                 if (in_array($tag, $paging)) {
                                     $replacements[$tag] = $this->get_paging_replacements($options);
                                 } else {
-                                    if ($this->is_regexp_pattern($tag)) {
-                                        $replacements[$tag] = $this->get_regexp_replacements($tag, $entry, $options);
-                                    } else {
+                                    if (in_array($tag, array_keys($this->form_patterns()))) {
                                         $replacements[$tag] = '';
+                                    } else {
+                                        if ($this->is_regexp_pattern($tag)) {
+                                            $replacements[$tag] = $this->get_regexp_replacements($tag, $entry, $options);
+                                        } else {
+                                            $replacements[$tag] = '';
+                                        }
                                     }
                                 }
                             }
@@ -804,7 +813,8 @@ class datalynxview_patterns {
             $this->action_patterns(),
             $this->paging_patterns(),
             $this->viewlink_patterns($checkvisibility),
-            $this->bulkedit_patterns()
+            $this->bulkedit_patterns(),
+            $this->form_patterns()
         );
         return $patterns;
     }
@@ -972,6 +982,20 @@ class datalynxview_patterns {
             $fieldname = preg_quote($fieldname, '/');
             $patterns["%%{$fieldname}:bulkedit%%"] = [true, $cat];
         }
+        return $patterns;
+    }
+
+    /**
+     * Get form action tags (submit, cancel) with localised string.
+     *
+     * @return array multidimensional
+     */
+    protected function form_patterns() {
+        $cat = get_string('formactions', 'datalynx');
+        $patterns = [
+            '##submit##' => [true, $cat],
+            '##cancel##' => [true, $cat],
+        ];
         return $patterns;
     }
 

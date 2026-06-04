@@ -138,7 +138,7 @@ class view extends base {
         $parts = $this->split_template_by_tags($tags, $this->view->eparam2);
         foreach ($parts as $part) {
             if (in_array($part, $tags)) {
-                if ($def = $patterndefinitions[$part]) {
+                if (isset($patterndefinitions[$part]) && $def = $patterndefinitions[$part]) {
                     $elements[] = $def;
                 }
             } else {

@@ -667,7 +667,7 @@ class view extends base {
 
         foreach ($parts as $part) {
             if (in_array($part, $tags)) {
-                if ($def = $patterndefinitions[$part]) {
+                if (isset($patterndefinitions[$part]) && $def = $patterndefinitions[$part]) {
                     $elements[] = $def;
                 }
             } else {

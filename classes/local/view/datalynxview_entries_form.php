@@ -43,12 +43,22 @@ class datalynxview_entries_form extends moodleform {
         $mform->addElement('hidden', 'new', optional_param('new', 0, PARAM_INT));
         $mform->setType('new', PARAM_INT);
 
-        $this->add_action_buttons();
+        $hassubmit = (strpos($view->view->eparam2 ?? '', '##submit##') !== false)
+            || (strpos($view->view->param2 ?? '', '##submit##') !== false);
+        $hascancel = (strpos($view->view->eparam2 ?? '', '##cancel##') !== false)
+            || (strpos($view->view->param2 ?? '', '##cancel##') !== false);
+        $hascustombuttons = ($hassubmit || $hascancel);
+
+        if (!$hascustombuttons) {
+            $this->add_action_buttons();
+        }
 
         $view->definition_to_form($mform);
 
-        // Add delegate action button... try.
-        $this->add_delegate_action_buttons();
+        if (!$hascustombuttons) {
+            // Add delegate action button... try.
+            $this->add_delegate_action_buttons();
+        }
     }
 
     /**
