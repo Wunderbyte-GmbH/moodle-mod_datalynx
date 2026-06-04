@@ -61,6 +61,12 @@ class renderer extends datalynxfield_renderer {
         $userprofile = profile_user_record($userid);
         $content = $userprofile->{$field->infoshortname};
 
+        $mform->addElement(
+            'html',
+            '<div class="datalynx-field-wrapper" data-field-type="' . $field->type .
+            '" data-field-name="' . $field->name() . '">'
+        );
+
         switch ($field->infotype) {
             case 'datetime':
                 $fieldtype = 'date_selector';
@@ -87,6 +93,8 @@ class renderer extends datalynxfield_renderer {
         if ($field->mandatory) {
             $mform->addRule($fieldname, null, 'required', null, 'client');
         }
+
+        $mform->addElement('html', '</div>');
     }
 
     /**

@@ -163,6 +163,16 @@ class datalynxview_base_form extends moodleform {
             $mform->addElement('select', 'param10', get_string('redirectto', 'datalynx'), $this->get_view_menu());
             $mform->setDefault('param10', $DB->get_field('datalynx', 'defaultview', ['id' => $this->dlx->id()]));
             $mform->setType('param10', PARAM_INT);
+
+            $mform->addElement(
+                'advcheckbox',
+                'param9',
+                get_string('redirectandcontinue', 'datalynx'),
+                get_string('redirectandcontinue_desc', 'datalynx')
+            );
+            $mform->addHelpButton('param9', 'redirectandcontinue', 'datalynx');
+            $mform->setType('param9', PARAM_INT);
+            $mform->setDefault('param9', 0);
         }
 
         // View specific definition.
@@ -193,6 +203,7 @@ class datalynxview_base_form extends moodleform {
                 $data->visible = 1;
                 $data->filter = 0;
                 $data->param5 = 0;
+                $data->param9 = 0;
                 $data->param10 = 0;
                 return $data;
             }

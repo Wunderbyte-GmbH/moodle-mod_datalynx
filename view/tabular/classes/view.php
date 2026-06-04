@@ -285,7 +285,7 @@ class view extends base {
 
                 foreach ($parts as $part) {
                     if (in_array($part, $tags)) {
-                        if ($def = $definitions[$part]) {
+                        if (isset($definitions[$part]) && $def = $definitions[$part]) {
                             $elements[] = $def;
                         }
                     } else {

@@ -219,6 +219,11 @@ abstract class base {
             $this->view->groupby = '';
             $this->view->param10 = 0;
             $this->view->param5 = 0; // Overridefilter.
+            $this->view->param9 = 0;
+        }
+
+        if (!isset($this->view->param9)) {
+            $this->view->param9 = 0;
         }
 
         $this->redirect = $this->view->param10;
@@ -695,6 +700,33 @@ abstract class base {
         if (!empty($successfullyprocessedeids)) {
             $this->entriesprocessedsuccessfully = true;
             $this->notifications['good']['entries'] = $strnotify;
+
+            $redirectid = $this->redirect ?: 0;
+            if ($redirectid && $redirectid != $this->id()) {
+                if (!empty($strnotify)) {
+                    \core\notification::success($strnotify);
+                }
+                $params = ['view' => $redirectid];
+                if (!empty($this->view->param9)) {
+                    $entryid = reset($successfullyprocessedeids);
+                    $params['editentries'] = $entryid;
+                    $params['eids'] = $entryid;
+                }
+                $url = new moodle_url($this->baseurl, $params);
+                redirect($url);
+            } else if (!empty($this->view->param9)) {
+                if (!empty($strnotify)) {
+                    \core\notification::success($strnotify);
+                }
+                $redirectid = $this->id();
+                $entryid = reset($successfullyprocessedeids);
+                $url = new moodle_url($this->baseurl, [
+                    'view' => $redirectid,
+                    'editentries' => $entryid,
+                    'eids' => $entryid,
+                ]);
+                redirect($url);
+            }
         } else {
             if (!empty($strnotify)) {
                 $this->notifications['bad']['entries'] = $strnotify;
@@ -997,7 +1029,18 @@ abstract class base {
             $text = $this->mask_tags($text);
             $text = format_text($text, FORMAT_HTML, ['trusted' => 1, 'filter' => true]);
             $text = $this->unmask_tags($text);
-            $this->view->{"e$editor"} = str_replace($tags, $replacements, $text);
+
+            $editortags = [];
+            $editorreplacements = [];
+            foreach ($tags as $tag) {
+                if ($editor === 'param2' && ($tag === '##submit##' || $tag === '##cancel##')) {
+                    continue;
+                }
+                $editortags[] = $tag;
+                $editorreplacements[] = $replacements[$tag];
+            }
+
+            $this->view->{"e$editor"} = str_replace($editortags, $editorreplacements, $text);
         }
         // Remove customfilter tags after we have displayed them.
         foreach ($tags as $key => $value) {
@@ -1358,7 +1401,7 @@ abstract class base {
 
         foreach ($parts as $part) {
             if (in_array($part, $tags)) {
-                if ($def = $fielddefinitions[$part]) {
+                if (isset($fielddefinitions[$part]) && $def = $fielddefinitions[$part]) {
                     $elements[] = $def;
                 }
             } else {
@@ -1625,6 +1668,7 @@ abstract class base {
      */
     public function definition_to_form(HTML_QuickForm &$mform) {
         $elements = $this->get_entries_definition();
+
         foreach ($elements as $element) {
             if (!empty($element)) {
                 [$type, $content] = $element;
@@ -1754,19 +1798,25 @@ abstract class base {
         if ($patterns = $this->patternclass()->get_replacements($this->tags['view'] ?? [], null, $options)) {
             $viewdefinitions = [];
             foreach ($patterns as $tag => $pattern) {
-                if (
-                    (strpos($tag, '##viewlink:') !== 0 && strpos($tag, '##viewsesslink:') !== 0) &&
-                        (!array_key_exists('edit', $options) || !$options['edit'])
-                ) {
-                    foreach (array_keys($fielddefinitions) as $fieldtag) {
-                        $pattern = str_replace(
-                            $fieldtag,
-                            isset($definitions[$fieldtag][1]) ? $definitions[$fieldtag][1] : '',
-                            $pattern
-                        );
+                if (!empty($options['edit']) && $tag === '##submit##') {
+                    $viewdefinitions[$tag] = ['', [[$this, 'render_form_submit'], [$entry, $options]]];
+                } else if (!empty($options['edit']) && $tag === '##cancel##') {
+                    $viewdefinitions[$tag] = ['', [[$this, 'render_form_cancel'], [$entry, $options]]];
+                } else {
+                    if (
+                        (strpos($tag, '##viewlink:') !== 0 && strpos($tag, '##viewsesslink:') !== 0) &&
+                            (!array_key_exists('edit', $options) || !$options['edit'])
+                    ) {
+                        foreach (array_keys($fielddefinitions) as $fieldtag) {
+                            $pattern = str_replace(
+                                $fieldtag,
+                                isset($definitions[$fieldtag][1]) ? $definitions[$fieldtag][1] : '',
+                                $pattern
+                            );
+                        }
                     }
+                    $viewdefinitions[$tag] = ['html', $pattern];
                 }
-                $viewdefinitions[$tag] = ['html', $pattern];
             }
             $definitions = array_merge($definitions, $viewdefinitions);
         }
@@ -2175,9 +2225,27 @@ abstract class base {
         global $DB;
         $targetview = optional_param('view', 0, PARAM_INT);
         $view = $DB->get_record('datalynx_views', ['id' => $targetview]);
-        return $view && $this->dlx->is_visible_to_user($this->view) &&
-        ((strpos($view->param2, "##$action##") !== false) ||
-                (strpos($view->section, "##$action##") !== false));
+        if (!$view) {
+            return false;
+        }
+        if (!$this->dlx->is_visible_to_user($this->view)) {
+            return false;
+        }
+        if (
+            (strpos($view->param2 ?? '', "##$action##") !== false) ||
+                (strpos($view->section ?? '', "##$action##") !== false)
+        ) {
+            return true;
+        }
+        if ($action === 'edit' || $action === 'addnewentry') {
+            if (
+                (strpos($view->param2 ?? '', '##submit##') !== false) ||
+                    (strpos($view->section ?? '', '##submit##') !== false)
+            ) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -2230,5 +2298,29 @@ abstract class base {
      */
     public function get_editentries(): array {
         return $this->editentries;
+    }
+
+    /**
+     * Render the submit button inline within the form template.
+     *
+     * @param HTML_QuickForm $mform Target form.
+     * @param stdClass $entry Entry object.
+     * @param array $params Custom parameters.
+     */
+    public function render_form_submit(\HTML_QuickForm &$mform, $entry, $params) {
+        $mform->addElement('submit', 'submitbutton', get_string('savechanges'), [
+            'class' => 'btn btn-primary datalynx-custom-submit',
+        ]);
+    }
+
+    /**
+     * Render the cancel button inline within the form template.
+     *
+     * @param HTML_QuickForm $mform Target form.
+     * @param stdClass $entry Entry object.
+     * @param array $params Custom parameters.
+     */
+    public function render_form_cancel(\HTML_QuickForm &$mform, $entry, $params) {
+        $mform->addElement('cancel', 'cancel', get_string('cancel'), ['class' => 'btn btn-secondary datalynx-custom-cancel']);
     }
 }

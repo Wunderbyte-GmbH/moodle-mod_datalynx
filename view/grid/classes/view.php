@@ -161,38 +161,10 @@ class view extends base {
      * @return array
      */
     protected function new_entry_definition($entryid = -1) {
-        $elements = [];
-
-        // Get patterns definitions.
-        $fields = $this->dlx->get_fields();
-        $tags = [];
-        $patterndefinitions = [];
         $entry = new stdClass();
-        foreach ($this->tags['field'] as $fieldid => $patterns) {
-            if (isset($fields[$fieldid])) {
-                $field = $fields[$fieldid];
-                $entry->id = $entryid;
-                $options = ['edit' => true, 'manage' => true];
-                if ($fielddefinitions = $field->get_definitions($patterns, $entry, $options)) {
-                    $patterndefinitions = array_merge($patterndefinitions, $fielddefinitions);
-                }
-                $tags = array_merge($tags, $patterns);
-            }
-        }
-
-        // Split the entry template to tags and html.
-        $parts = $this->split_template_by_tags($tags, $this->view->eparam2);
-
-        foreach ($parts as $part) {
-            if (in_array($part, $tags)) {
-                if ($def = $patterndefinitions[$part]) {
-                    $elements[] = $def;
-                }
-            } else {
-                $elements[] = ['html', $part];
-            }
-        }
-
-        return $elements;
+        $entry->id = $entryid;
+        $options = ['edit' => true, 'manage' => true];
+        $fielddefinitions = $this->get_entry_tag_replacements($entry, $options);
+        return $this->entry_definition($fielddefinitions);
     }
 }
