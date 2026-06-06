@@ -1260,7 +1260,8 @@ function xmldb_datalynx_upgrade($oldversion) {
             $formats = $DB->get_records('datalynx_field_formats');
             foreach ($formats as $formatrec) {
                 // Skip records that already have meaningful settings.
-                $existing = json_decode($formatrec->settings ?? '{}', true);
+                $decoded = json_decode($formatrec->settings ?? '{}', true);
+                $existing = (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) ? $decoded : [];
                 if (!empty($existing)) {
                     continue;
                 }

@@ -899,4 +899,5 @@ $string['fieldformat_add'] = 'Add format';
 $string['fieldformat_edit'] = 'Edit format';
 $string['fieldformat_delete'] = 'Delete format';
 $string['fieldformat_confirmdelete'] = 'You are about to delete the format "{$a}". Would you like to proceed?';
+$string['fieldformat_name_error'] = 'Format name may only contain letters, digits and underscores (no spaces or special characters).';
 $string['fieldformat_tagusage_help'] = 'After creating a format, reference it in the Entry Template by appending :formatname to the field tag, e.g. ##author:myformat## or ##timecreated:myformat##.';

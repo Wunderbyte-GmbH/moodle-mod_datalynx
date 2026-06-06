@@ -61,7 +61,13 @@ abstract class field_format_form_base extends moodleform {
         $mform->addElement('text', 'name', get_string('name'), ['size' => '32']);
         $mform->setType('name', PARAM_ALPHANUMEXT);
         $mform->addRule('name', null, 'required', null, 'client');
-        $mform->addRule('name', get_string('err_numeric', 'form'), 'regex', '/^[a-zA-Z0-9_]+$/', 'client');
+        $mform->addRule(
+            'name',
+            get_string('fieldformat_name_error', 'datalynx'),
+            'regex',
+            '/^[a-zA-Z0-9_]+$/',
+            'client'
+        );
 
         // Field-type-specific settings.
         $mform->addElement('header', 'formatsettings', get_string('fieldformat_settings', 'datalynx'));

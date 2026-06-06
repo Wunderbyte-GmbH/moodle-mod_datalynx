@@ -100,7 +100,7 @@ foreach ($formats as $format) {
 
     // Summarise settings.
     $settingssummary = implode(', ', array_map(
-        fn($k, $v) => "$k: $v",
+        fn($k, $v) => s($k) . ': ' . s($v),
         array_keys($format->get_settings()),
         array_values($format->get_settings())
     ));
@@ -108,12 +108,14 @@ foreach ($formats as $format) {
     $table->add_data([
         s($format->get_name()),
         s($format->get_fieldtype()),
-        s($settingssummary),
+        $settingssummary,
         html_writer::link($editurl, get_string('edit')),
         html_writer::link(
             $deleteurl,
             get_string('delete'),
-            ['onclick' => "return confirm('" . s(get_string('fieldformat_confirmdelete', 'datalynx', $format->get_name())) . "');"]
+            ['onclick' => 'return confirm(' . json_encode(
+                get_string('fieldformat_confirmdelete', 'datalynx', $format->get_name())
+            ) . ');']
         ),
     ]);
 }
