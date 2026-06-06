@@ -151,14 +151,8 @@ class datalynxview_patterns {
             array_keys($this->paging_patterns())
         ) : [];
         foreach ($this->patterns($checkvisibility) as $tag => $pattern) {
-            if ($forentrytemplate) {
-                if (in_array($tag, $excludedtags)) {
-                    continue;
-                }
-            } else {
-                if (in_array($tag, array_keys($this->form_patterns()))) {
-                    continue;
-                }
+            if ($forentrytemplate && in_array($tag, $excludedtags)) {
+                continue;
             }
             if ($showall || $pattern[self::PATTERN_SHOW_IN_MENU]) {
                 // Which category.
@@ -219,14 +213,10 @@ class datalynxview_patterns {
                                 if (in_array($tag, $paging)) {
                                     $replacements[$tag] = $this->get_paging_replacements($options);
                                 } else {
-                                    if (in_array($tag, array_keys($this->form_patterns()))) {
-                                        $replacements[$tag] = '';
+                                    if ($this->is_regexp_pattern($tag)) {
+                                        $replacements[$tag] = $this->get_regexp_replacements($tag, $entry, $options);
                                     } else {
-                                        if ($this->is_regexp_pattern($tag)) {
-                                            $replacements[$tag] = $this->get_regexp_replacements($tag, $entry, $options);
-                                        } else {
-                                            $replacements[$tag] = '';
-                                        }
+                                        $replacements[$tag] = '';
                                     }
                                 }
                             }
@@ -813,8 +803,7 @@ class datalynxview_patterns {
             $this->action_patterns(),
             $this->paging_patterns(),
             $this->viewlink_patterns($checkvisibility),
-            $this->bulkedit_patterns(),
-            $this->form_patterns()
+            $this->bulkedit_patterns()
         );
         return $patterns;
     }
@@ -985,19 +974,7 @@ class datalynxview_patterns {
         return $patterns;
     }
 
-    /**
-     * Get form action tags (submit, cancel) with localised string.
-     *
-     * @return array multidimensional
-     */
-    protected function form_patterns() {
-        $cat = get_string('formactions', 'datalynx');
-        $patterns = [
-            '##submit##' => [true, $cat],
-            '##cancel##' => [true, $cat],
-        ];
-        return $patterns;
-    }
+
 
     /**
      * Find out if pattern contains a viewname or fieldname
