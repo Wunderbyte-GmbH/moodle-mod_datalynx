@@ -26,18 +26,21 @@ import Notification from 'core/notification';
 
 /**
  * Returns the vendored PDF.js module and configures its worker path.
+ * Uses a dynamic function to prevent Babel/Webpack compilation of native import().
  *
  * @returns {Promise<*>}
  */
 const getPdfJsModule = async() => {
     if (!window.modDatalynxPdfJsModulePromise) {
-        window.modDatalynxPdfJsModulePromise = import(`${Config.wwwroot}/mod/datalynx/pdfjs/pdf.js`);
+        window.modDatalynxPdfJsModulePromise = new Promise((resolve, reject) => {
+            window.require([`${Config.wwwroot}/mod/datalynx/pdfjs/pdf.js`], (pdfJs) => {
+                pdfJs.GlobalWorkerOptions.workerSrc = `${Config.wwwroot}/mod/datalynx/pdfjs/pdf.worker.js`;
+                resolve(pdfJs);
+            }, reject);
+        });
     }
 
-    const pdfJs = await window.modDatalynxPdfJsModulePromise;
-    pdfJs.GlobalWorkerOptions.workerSrc = `${Config.wwwroot}/mod/datalynx/pdfjs/pdf.worker.js`;
-
-    return pdfJs;
+    return window.modDatalynxPdfJsModulePromise;
 };
 
 /**
@@ -121,3 +124,59 @@ export const renderPDF = async(pdfUrl, canvasContainerId, customScale = 1) => {
         Notification.exception(error);
     }
 };
+
+/**
+ * Process and render all PDF embeds within the given element.
+ *
+ * @param {HTMLElement|Document} root
+ */
+export const processEmbeds = (root) => {
+    if (!root || !('querySelectorAll' in root)) {
+        return;
+    }
+
+    const selector = '.datalynx-pdf-embed:not(.datalynx-pdf-rendered)';
+    const embeds = root.querySelectorAll(selector);
+    embeds.forEach((container) => {
+        container.classList.add('datalynx-pdf-rendered');
+        const pdfUrl = container.dataset.pdfUrl;
+        const customScale = parseFloat(container.dataset.customScale || '1');
+        void renderPdf(pdfUrl, container, customScale);
+    });
+
+    if (root.classList && root.classList.contains('datalynx-pdf-embed') && !root.classList.contains('datalynx-pdf-rendered')) {
+        root.classList.add('datalynx-pdf-rendered');
+        const pdfUrl = root.dataset.pdfUrl;
+        const customScale = parseFloat(root.dataset.customScale || '1');
+        void renderPdf(pdfUrl, root, customScale);
+    }
+};
+
+/**
+ * Initialize mutation observer to watch for and automatically render PDF embeds.
+ *
+ * @param {HTMLElement|Document} [root] Optional root element to search initially.
+ */
+export const init = (root = document) => {
+    // Process initial DOM elements.
+    processEmbeds(root);
+
+    // Watch for dynamic DOM changes (e.g. AJAX pagination/reloading).
+    if (!window.modDatalynxPdfObserver) {
+        window.modDatalynxPdfObserver = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                mutation.addedNodes.forEach((node) => {
+                    if (node instanceof HTMLElement) {
+                        processEmbeds(node);
+                    }
+                });
+            });
+        });
+        window.modDatalynxPdfObserver.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    }
+};
+
+

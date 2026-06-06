@@ -3823,7 +3823,7 @@ async function JBig2(moduleArg = {}) {
   var quit_ = (status, toThrow) => {
     throw toThrow;
   };
-  var _scriptName = import.meta.url;
+  var _scriptName = (typeof document !== 'undefined' ? document.currentScript.src : self.location.href);
   var scriptDirectory = "";
   var readAsync, readBinary;
   if (ENVIRONMENT_IS_WEB || ENVIRONMENT_IS_WORKER) {
@@ -8475,7 +8475,7 @@ async function OpenJPEG(moduleArg = {}) {
   var quit_ = (status, toThrow) => {
     throw toThrow;
   };
-  var _scriptName = import.meta.url;
+  var _scriptName = (typeof document !== 'undefined' ? document.currentScript.src : self.location.href);
   var scriptDirectory = "";
   var readAsync, readBinary;
   if (ENVIRONMENT_IS_WEB || ENVIRONMENT_IS_WORKER) {
@@ -63415,6 +63415,6 @@ globalThis.pdfjsWorker = {
   WorkerMessageHandler: WorkerMessageHandler
 };
 
-export { WorkerMessageHandler };
+// export { WorkerMessageHandler };
 
 //# sourceMappingURL=pdf.worker.js.map

@@ -18,12 +18,11 @@ namespace datalynxfield_cancel;
 
 use mod_datalynx\local\field\datalynxfield_no_content;
 
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Cancel field class for datalynx.
  *
- * @package    mod_datalynx
+ * @package    datalynxfield_cancel
  * @copyright  2026 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -45,7 +44,7 @@ class field extends datalynxfield_no_content {
             'type' => 'cancel',
             'name' => get_string('cancel', 'datalynxfield_cancel'),
             'description' => '',
-            'internalname' => 'cancel'
+            'internalname' => 'cancel',
         ];
         return $fieldobjects;
     }

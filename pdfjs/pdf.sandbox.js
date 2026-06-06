@@ -52,7 +52,7 @@ var __webpack_exports__ = {};
 async function Module(moduleArg = {}) {
   var moduleRtn;
   var e = moduleArg,
-    aa = import.meta.url;
+    aa = (typeof document !== 'undefined' ? document.currentScript.src : '');
   try {
     new URL(".", aa);
   } catch {}
@@ -622,6 +622,6 @@ globalThis.pdfjsSandbox = {
   QuickJSSandbox
 };
 
-export { QuickJSSandbox };
+// export { QuickJSSandbox };
 
 //# sourceMappingURL=pdf.sandbox.js.map

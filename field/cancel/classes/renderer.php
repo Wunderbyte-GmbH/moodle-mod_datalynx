@@ -20,12 +20,11 @@ use mod_datalynx\local\field\datalynxfield_renderer;
 use MoodleQuickForm;
 use stdClass;
 
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Renderer for the cancel button field.
  *
- * @package    mod_datalynx
+ * @package    datalynxfield_cancel
  * @copyright  2026 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -61,9 +60,9 @@ class renderer extends datalynxfield_renderer {
         foreach ($tags as $tag) {
             if ($edit) {
                 $tagoptions = [];
-                $clean = trim($tag, '#@'); // e.g., "cancel:arrow:text=Back"
+                $clean = trim($tag, '#@'); // E.g., "cancel:arrow:text=Back".
                 $parts = explode(':', $clean);
-                // Shift off the prefix 'cancel'
+                // Shift off the prefix 'cancel'.
                 array_shift($parts);
                 foreach ($parts as $part) {
                     $tagoptions[$part] = true;
