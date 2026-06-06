@@ -78,7 +78,9 @@ class renderer extends datalynxfield_renderer {
                     $dateformat = get_string('strftimedate');
                     break;
                 case 'timestamp':
-                    $replacements[$tag] = ['html', (string) ($entry->{$fieldname} ?? '')];
+                    // Output raw Unix timestamp; use '0' explicitly for zero timestamps.
+                    $ts = $entry->{$fieldname} ?? null;
+                    $replacements[$tag] = ['html', $ts !== null ? (string) $ts : ''];
                     continue 2;
                 case 'minute':
                     $dateformat = '%M';
