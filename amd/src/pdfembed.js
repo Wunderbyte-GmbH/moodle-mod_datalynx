@@ -31,11 +31,11 @@ import Notification from 'core/notification';
  */
 const getPdfJsModule = async() => {
     if (!window.modDatalynxPdfJsModulePromise) {
-        throw new Error('PDF.js module was not preloaded.');
+        window.modDatalynxPdfJsModulePromise = import(`${Config.wwwroot}/mod/datalynx/pdfjs/pdf.js`);
     }
 
     const pdfJs = await window.modDatalynxPdfJsModulePromise;
-    pdfJs.GlobalWorkerOptions.workerSrc = `${Config.wwwroot}/mod/datalynx/pdfjs/pdf.worker.mjs`;
+    pdfJs.GlobalWorkerOptions.workerSrc = `${Config.wwwroot}/mod/datalynx/pdfjs/pdf.worker.js`;
 
     return pdfJs;
 };
