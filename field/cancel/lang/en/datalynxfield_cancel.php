@@ -24,5 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['buttontext'] = 'Button text';
 $string['cancel'] = 'Cancel';
+$string['cssclasses'] = 'CSS classes';
 $string['pluginname'] = 'Cancel button';
+$string['showarrow'] = 'Show arrow';

@@ -299,6 +299,7 @@ class PatternDialogue {
     replaceTagsWithButtons(editor) {
         const config = this.getEditorConfig(editor.id);
         let html = editor.getContent();
+        let original = html;
 
         if (config.supportsReferenceTags) {
             html = this.replaceReferenceTagsInHtml(html, editor.id);
@@ -308,33 +309,49 @@ class PatternDialogue {
             html = this.replaceFieldTagsInHtml(html, editor.id);
         }
 
-        editor.setContent(html);
+        if (html !== original) {
+            this._isReplacing = true;
+            editor.setContent(html);
+            this._isReplacing = false;
+        }
     }
 
     replaceFieldTagsInHtml(html, editorId = '') {
-        return html
-            .replace(/##([^#]+)##/g, (match, action) => {
-                if (VIEW_URL_TAG_RE.test(match) || VIEW_LINK_TAG_RE.test(match)) {
+        html = html.replace(/(<[^>]+>)|##([^#]+)##/g, (match, htmlTag, action) => {
+            if (htmlTag) {
+                return match;
+            }
+            if (VIEW_URL_TAG_RE.test(match) || VIEW_LINK_TAG_RE.test(match)) {
+                return match;
+            }
+
+            return this.buildActionTagButtonHtml(match, action, editorId);
+        });
+
+        html = html.replace(/(<[^>]+>)|\[\[([^|\]]+)(?:\|([^|\]]*))?(?:\|([^|\]]*))?\]\]/g,
+            (match, htmlTag, field, behavior, renderer) => {
+                if (htmlTag) {
                     return match;
                 }
+                behavior = behavior || '';
+                renderer = renderer || '';
+                return this.buildFieldTagButtonHtml(match, field, behavior, renderer, editorId);
+            }
+        );
 
-                return this.buildActionTagButtonHtml(match, action, editorId);
-            })
-            .replace(/\[\[([^|\]]+)(?:\|([^|\]]*))?(?:\|([^|\]]*))?\]\]/g,
-                (match, field, behavior, renderer) => {
-                    behavior = behavior || '';
-                    renderer = renderer || '';
-                    return this.buildFieldTagButtonHtml(match, field, behavior, renderer, editorId);
-                }
-            );
+        return html;
     }
 
     replaceReferenceTagsInHtml(html, editorId = '') {
-        return html
-            .replace(/##viewurl(?::[^#]+)?##/g, (match) => this.buildViewTagButtonHtml(match, editorId))
-            .replace(/##(?:viewlink|viewsesslink):[^;#]+;[^;]*;[^;]*;[^#]*##/g,
-                (match) => this.buildViewTagButtonHtml(match, editorId)
-            );
+        return html.replace(
+            /(<[^>]+>)|(##viewurl(?::[^#]+)?##)|(##(?:viewlink|viewsesslink):[^;#]+;[^;]*;[^;]*;[^#]*##)/g,
+            (match, htmlTag) => {
+                if (htmlTag) {
+                    return match;
+                }
+                return this.buildViewTagButtonHtml(match, editorId);
+            }
+        );
     }
 
     /**
@@ -548,7 +565,13 @@ class PatternDialogue {
                 e.stopPropagation();
                 this.openMoodleDialog(button, editor);
             });
-            editor.on('SetContent', () => this.reInitializeButtons(editor));
+            editor.on('SetContent', () => {
+                if (this._isReplacing) {
+                    return;
+                }
+                this.replaceTagsWithButtons(editor);
+                this.reInitializeButtons(editor);
+            });
             editor.on('change', () => this.reInitializeButtons(editor));
             if (editor.initialized) {
                 this.replaceTagsWithButtons(editor);

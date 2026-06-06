@@ -51,6 +51,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         $paths[] = new restore_path_element('datalynx_rule', '/activity/datalynx/rules/rule');
         $paths[] = new restore_path_element('datalynx_behavior', '/activity/datalynx/behaviors/behavior');
         $paths[] = new restore_path_element('datalynx_renderer', '/activity/datalynx/renderers/renderer');
+        $paths[] = new restore_path_element('datalynx_field_format', '/activity/datalynx/fieldformats/fieldformat');
 
         if ($userinfo) {
             $paths[] = new restore_path_element('datalynx_entry', '/activity/datalynx/entries/entry');
@@ -532,6 +533,24 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
     }
 
     /**
+     * Process datalynx fieldformat data during restore.
+     *
+     * @param array $data
+     */
+    protected function process_datalynx_field_format($data) {
+        global $DB;
+
+        $data = (object) $data;
+        $oldid = $data->id;
+
+        $data->dataid = $this->get_new_parentid('datalynx');
+
+        // Insert the datalynx_field_formats record.
+        $newitemid = $DB->insert_record('datalynx_field_formats', $data);
+        $this->set_mapping('datalynx_field_format', $oldid, $newitemid, false); // No files.
+    }
+
+    /**
      * Process rating data during restore.
      *
      * @param object $data
@@ -775,5 +794,8 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
                 }
             }
         }
+
+        // Auto-create formats from restored templates.
+        \mod_datalynx\local\field_format\manager::auto_create_formats_from_templates($datalynxnewid);
     }
 }

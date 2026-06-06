@@ -80,7 +80,13 @@ class renderer extends datalynxfield_renderer {
             return $duration;
         }
 
-        $format = !empty($options['format']) ? $options['format'] : '';
+        $fieldformat = $options['field_format'] ?? null;
+        $formatmode = '';
+        if ($fieldformat) {
+            $settings = $fieldformat->get_settings();
+            $formatmode = $settings['mode'] ?? '';
+        }
+        $format = !empty($options['format']) ? $options['format'] : $formatmode;
         if ($duration !== '') {
             [$value, $unit] = $field->seconds_to_unit($duration);
             $units = $field->get_units();

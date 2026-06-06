@@ -184,10 +184,17 @@ class renderer extends datalynxfield_renderer {
         $mimetype = $file->get_mimetype();
         $pluginfileurl = '/pluginfile.php';
 
+        $format = $params['field_format'] ?? null;
+        $mode = '';
+        if ($format) {
+            $settings = $format->get_settings();
+            $mode = $settings['mode'] ?? '';
+        }
+
         // Check for specific parameters/patterns first.
-        if (!empty($params['url'])) {
+        if (!empty($params['url']) || $mode === 'url') {
             return moodle_url::make_file_url($pluginfileurl, "$path/$filename");
-        } else if (!empty($params['size'])) {
+        } else if (!empty($params['size']) || $mode === 'size') {
             $bsize = $file->get_filesize();
             if ($bsize < 1000000) {
                 $size = round($bsize / 1000, 1) . 'KB';
@@ -195,9 +202,9 @@ class renderer extends datalynxfield_renderer {
                 $size = round($bsize / 1000000, 1) . 'MB';
             }
             return $size;
-        } else if (!empty($params['content'])) {
+        } else if (!empty($params['content']) || $mode === 'content') {
             return $file->get_content();
-        } else if (!empty($params['download'])) {
+        } else if (!empty($params['download']) || $mode === 'download') {
             return $this->display_link($file, $path, $altname, $params);
         }
 
@@ -230,7 +237,9 @@ class renderer extends datalynxfield_renderer {
         return '<div><a href="' . $fullurl . '" target="_blank" class="btn btn-primary">' .
                 get_string('download', 'core_repository') . ' ' .
                 get_string('application/pdf', 'core_mimetypes') . '</a></div><br>
-        <div style="width: 1800px; min-height: 1400px;" class="datalynx-pdf-embed" data-pdf-url="' . s($fullurl) . '" data-custom-scale="' . s($customscale) . '" id="' . $fieldname . '"></div>';
+        <div style="width: 1800px; min-height: 1400px;" class="datalynx-pdf-embed" ' .
+                'data-pdf-url="' . s($fullurl) . '" data-custom-scale="' . s($customscale) . '" ' .
+                'id="' . $fieldname . '"></div>';
     }
     // phpcs:enable moodle.PHP.ForbiddenGlobalUse.BadGlobal
 

@@ -81,7 +81,14 @@ class renderer extends datalynxfield_renderer {
     public function render_display_mode(stdClass $entry, array $options): string {
         $field = $this->field;
         $fieldid = $field->id();
-        $excerpt = in_array('excerpt', array_keys($options)) ? true : false;
+        $format = $options['field_format'] ?? null;
+        $excerpt = false;
+        if ($format) {
+            $settings = $format->get_settings();
+            $excerpt = !empty($settings['excerpt']);
+        } else {
+            $excerpt = in_array('excerpt', array_keys($options)) ? true : false;
+        }
         $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
 
         if (isset($entry->{"c{$fieldid}_content"})) {

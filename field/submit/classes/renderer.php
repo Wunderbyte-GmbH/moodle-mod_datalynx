@@ -60,12 +60,25 @@ class renderer extends datalynxfield_renderer {
         foreach ($tags as $tag) {
             if ($edit) {
                 $tagoptions = [];
-                $clean = trim($tag, '#@'); // E.g., "submit:arrow:text=Save".
+                $clean = trim($tag, '#@'); // E.g., "submit:arrow:text=Save" or "submit:myformat".
                 $parts = explode(':', $clean);
                 // Shift off the prefix 'submit'.
                 array_shift($parts);
-                foreach ($parts as $part) {
-                    $tagoptions[$part] = true;
+
+                if (!empty($parts[0])) {
+                    $format = \mod_datalynx\local\field_format\manager::get_format_by_name(
+                        $this->field->dlx()->id(),
+                        $parts[0]
+                    );
+                    if ($format && $format->get_fieldtype() === 'submit') {
+                        $tagoptions['field_format'] = $format;
+                    }
+                }
+
+                if (!isset($tagoptions['field_format'])) {
+                    foreach ($parts as $part) {
+                        $tagoptions[$part] = true;
+                    }
                 }
 
                 $replacements[$tag] = ['', [[$this, 'display_edit'], [$entry, $tagoptions]]];
@@ -88,16 +101,30 @@ class renderer extends datalynxfield_renderer {
         $label = get_string('savechanges');
         $class = 'btn btn-primary datalynx-custom-submit';
 
-        // Process options from pattern (e.g. ##submit:arrow:text=Create##).
-        foreach (array_keys($options) as $option) {
-            if ($option === 'arrow') {
+        $format = $options['field_format'] ?? null;
+        if ($format) {
+            $settings = $format->get_settings();
+            if (!empty($settings['buttontext'])) {
+                $label = $settings['buttontext'];
+            }
+            if (!empty($settings['cssclasses'])) {
+                $class = $settings['cssclasses'];
+            }
+            if (!empty($settings['showarrow'])) {
                 $label .= ' →';
-            } else if (strpos($option, 'text=') === 0) {
-                $label = substr($option, 5);
-                $label = str_replace('_', ' ', $label);
-            } else if (strpos($option, 'class=') === 0) {
-                $class = substr($option, 6);
-                $class = str_replace('_', ' ', $class);
+            }
+        } else {
+            // Process options from pattern (e.g. ##submit:arrow:text=Create##).
+            foreach (array_keys($options) as $option) {
+                if ($option === 'arrow') {
+                    $label .= ' →';
+                } else if (strpos($option, 'text=') === 0) {
+                    $label = substr($option, 5);
+                    $label = str_replace('_', ' ', $label);
+                } else if (strpos($option, 'class=') === 0) {
+                    $class = substr($option, 6);
+                    $class = str_replace('_', ' ', $class);
+                }
             }
         }
 

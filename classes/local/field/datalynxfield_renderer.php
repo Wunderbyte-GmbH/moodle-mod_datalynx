@@ -118,7 +118,15 @@ abstract class datalynxfield_renderer {
 
             $splitfieldname = explode(':', $fieldname);
             if (isset($splitfieldname[1])) {
-                $currentoptions[$splitfieldname[1]] = true;
+                $format = \mod_datalynx\local\field_format\manager::get_format_by_name(
+                    $this->field->dlx()->id(),
+                    $splitfieldname[1]
+                );
+                if ($format && $format->get_fieldtype() === $this->field->type) {
+                    $currentoptions['field_format'] = $format;
+                } else {
+                    $currentoptions[$splitfieldname[1]] = true;
+                }
             }
 
             $currentoptions['visible'] = $behavior->is_visible_to_user($entry);

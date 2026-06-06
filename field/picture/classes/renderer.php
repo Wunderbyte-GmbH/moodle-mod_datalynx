@@ -99,11 +99,18 @@ class renderer extends FileRenderer {
         $content2 = isset($entry->{"c{$fieldid}_content2"}) ? $entry->{"c{$fieldid}_content2"} : null;
         $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
 
+        $format = $options['field_format'] ?? null;
+        $mode = '';
+        if ($format) {
+            $settings = $format->get_settings();
+            $mode = $settings['mode'] ?? '';
+        }
+
         if (empty($content)) {
             return '';
         }
 
-        if (!empty($options['downloadcount'])) {
+        if (!empty($options['downloadcount']) || $mode === 'downloadcount') {
             return $content2;
         }
 
@@ -117,7 +124,7 @@ class renderer extends FileRenderer {
 
         $altname = empty($content1) ? '' : s($content1);
 
-        if (!empty($options['alt'])) {
+        if (!empty($options['alt']) || $mode === 'alt') {
             return $altname;
         }
 
@@ -163,8 +170,15 @@ class renderer extends FileRenderer {
     protected function display_file(stored_file $file, int $entryid, string $path, string $altname = '', ?array $params = null) {
         $field = $this->field;
 
+        $format = $params['field_format'] ?? null;
+        $mode = '';
+        if ($format) {
+            $settings = $format->get_settings();
+            $mode = $settings['mode'] ?? '';
+        }
+
         $imgattr = ['style' => []];
-        if (isset($params['lightbox']) && $params['lightbox']) {
+        if ((isset($params['lightbox']) && $params['lightbox']) || $mode === 'lightbox') {
             $imgattr['class'] = 'zoomable';
         }
 
@@ -173,14 +187,14 @@ class renderer extends FileRenderer {
             $pluginfileurl = new moodle_url('/pluginfile.php');
             $imgpath = moodle_url::make_file_url($pluginfileurl, "$path/$filename");
 
-            if (isset($params['thumb'])) {
+            if (isset($params['thumb']) || $mode === 'thumb' || $mode === 'linked_thumb') {
                 $thumbpath = moodle_url::make_file_url($pluginfileurl, "$path/thumb_$filename");
                 $thumbpath = str_replace('mod_datalynx/content/', 'mod_datalynx/thumb/', $thumbpath);
                 $imgattr['style'] = implode(';', $imgattr['style']);
                 $imgattr['src'] = $thumbpath;
                 $thumb = html_writer::empty_tag('img', $imgattr);
 
-                if (isset($params['linked'])) {
+                if (isset($params['linked']) || $mode === 'linked_thumb') {
                     return html_writer::link($imgpath, $thumb);
                 } else {
                     return $thumb;
@@ -197,7 +211,7 @@ class renderer extends FileRenderer {
                 $imgattr['src'] = $imgpath;
                 $imgattr['style'] = implode(';', $imgattr['style']);
                 $img = html_writer::empty_tag('img', $imgattr);
-                if (isset($params['linked'])) {
+                if (isset($params['linked']) || $mode === 'linked') {
                     return html_writer::link($imgpath, $img, ['target' => '_blank']);
                 } else {
                     return $img;

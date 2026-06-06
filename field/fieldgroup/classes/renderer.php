@@ -74,10 +74,23 @@ class renderer extends datalynxfield_renderer {
         $subfieldnames = [];
 
         for ($line = 0; $line < $maxlines; $line++) {
-            foreach ($fieldgroupfields as $fieldid => $subfield) {
-                $lastlinewithcontent = $this->renderer_split_content($entry, $fieldid, $line, $lastlinewithcontent);
+            foreach ($fieldgroupfields as $key => $subfield) {
+                $parts = explode(':', $key);
+                $subfieldid = (int)$parts[0];
+                $formatname = $parts[1] ?? '';
+
+                $lastlinewithcontent = $this->renderer_split_content($entry, $subfieldid, $line, $lastlinewithcontent);
                 $subfielddefinition['name'] = $subfield->field->name;
-                $subfielddefinition['content'] = $subfield->renderer()->render_display_mode($entry, $options);
+
+                $suboptions = $options;
+                if ($formatname) {
+                    $format = \mod_datalynx\local\field_format\manager::get_format_by_name($this->field->dlx->id(), $formatname);
+                    if ($format) {
+                        $suboptions['field_format'] = $format;
+                    }
+                }
+
+                $subfielddefinition['content'] = $subfield->renderer()->render_display_mode($entry, $suboptions);
                 $subfieldnames[] = $subfield->field->name;
                 $linedispl['subfield'][] = $subfielddefinition; // Build this multidimensional array for mustache context.
             }
@@ -157,7 +170,11 @@ class renderer extends datalynxfield_renderer {
             // Instead of collapsing header we use simple divs.
             $mform->addElement('html', '<div class="row mb-4 lines" data-line="' . $thisline . '">');
             $counter = 0;
-            foreach ($fieldgroupfields as $fieldid => $subfield) {
+            foreach ($fieldgroupfields as $key => $subfield) {
+                $parts = explode(':', $key);
+                $subfieldid = (int)$parts[0];
+                $formatname = $parts[1] ?? '';
+
                 if ($counter % 3 == 0) {
                     $mform->addElement('html', '<div class="w-100 p-10"></div>');
                 }
@@ -165,22 +182,31 @@ class renderer extends datalynxfield_renderer {
                 $mform->addElement('html', '<div class="col">');
 
                 // Keep contentid in _id for later.
-                $resetcontentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : false;
+                $resetcontentid = isset($entry->{"c{$subfieldid}_id"}) ? $entry->{"c{$subfieldid}_id"} : false;
 
-                $lastlinewithcontent = $this->renderer_split_content($entry, $fieldid, $line, $lastlinewithcontent);
+                $lastlinewithcontent = $this->renderer_split_content($entry, $subfieldid, $line, $lastlinewithcontent);
 
                 // Add a static label.
                 $tempentryid = $entry->id;
                 // Dirty hack to render elements with a unique id.
                 $entry->id = $entry->id . "_{$fieldname}_" . $line; // Add iterator to each line of fieldgroup.
-                $mform->addElement('static', $entry->id . '_' . $fieldid, $subfield->field->name . ': ');
+                $mform->addElement('static', $entry->id . '_' . $subfieldid, $subfield->field->name . ': ');
+
+                $suboptions = $options;
+                if ($formatname) {
+                    $format = \mod_datalynx\local\field_format\manager::get_format_by_name($this->field->dlx->id(), $formatname);
+                    if ($format) {
+                        $suboptions['field_format'] = $format;
+                    }
+                }
+
                 // Entry has an tmp id for rendering the subfields.
-                $subfield->renderer()->prerender_edit_mode($mform, $entry, $options);
+                $subfield->renderer()->prerender_edit_mode($mform, $entry, $suboptions);
 
                 // Restore relevant parts of entry to prior state.
                 $entry->id = $tempentryid;
                 if ($resetcontentid) {
-                    $entry->{"c{$fieldid}_id"} = $resetcontentid;
+                    $entry->{"c{$subfieldid}_id"} = $resetcontentid;
                 }
                 $mform->addElement('html', '</div>');
             }
@@ -262,10 +288,12 @@ class renderer extends datalynxfield_renderer {
         if (empty($this->subfields)) {
             // We want to display these fields.
             $fieldids = $this->field->fieldids;
-            foreach ($fieldids as $fieldid) {
+            foreach ($fieldids as $val) {
+                $parts = explode(':', $val);
+                $fieldid = (int)$parts[0];
                 $field = $this->field->dlx->get_field_from_id($fieldid);
-                if ($field->for_use_in_fieldgroup()) {
-                    $this->subfields[$fieldid] = $field;
+                if ($field && $field->for_use_in_fieldgroup()) {
+                    $this->subfields[$val] = $field;
                 }
             }
         }

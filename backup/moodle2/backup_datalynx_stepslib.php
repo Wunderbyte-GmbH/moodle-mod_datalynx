@@ -158,6 +158,13 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
             ]
         );
 
+        $fieldformats = new backup_nested_element('fieldformats');
+        $fieldformat = new backup_nested_element(
+            'fieldformat',
+            ['id'],
+            ['dataid', 'name', 'fieldtype', 'settings']
+        );
+
         // Build the tree.
         $dlx->add_child($module);
 
@@ -196,6 +203,9 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
 
         $dlx->add_child($renderers);
         $renderers->add_child($renderer);
+
+        $dlx->add_child($fieldformats);
+        $fieldformats->add_child($fieldformat);
 
         // Define sources.
         $dlx->set_source_table('datalynx', ['id' => backup::VAR_ACTIVITYID]);
@@ -245,6 +255,7 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
         $rule->set_source_table('datalynx_rules', ['dataid' => backup::VAR_PARENTID]);
         $behavior->set_source_table('datalynx_behaviors', ['dataid' => backup::VAR_PARENTID]);
         $renderer->set_source_table('datalynx_renderers', ['dataid' => backup::VAR_PARENTID]);
+        $fieldformat->set_source_table('datalynx_field_formats', ['dataid' => backup::VAR_PARENTID]);
 
         // All the rest of elements only happen if we are including user info.
         if ($userinfo) {

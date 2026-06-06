@@ -132,7 +132,7 @@ if (isloggedin() && $istemplatemanager) {
 
     if (
         $currenttab == 'fields' || $currenttab == 'fields2' || $currenttab == 'behaviors' ||
-            $currenttab == 'renderers' || $currenttab == 'fieldgroups'
+            $currenttab == 'renderers' || $currenttab == 'fieldgroups' || $currenttab == 'fieldformats'
     ) {
         $inactive[] = 'fields';
         $activated[] = 'fields';
@@ -159,6 +159,11 @@ if (isloggedin() && $istemplatemanager) {
                 'renderers',
                 new moodle_url('/mod/datalynx/fieldlayout/index.php', ['d' => $this->id()]),
                 get_string('renderers', 'datalynx')
+            );
+            $row[] = new tabobject(
+                'fieldformats',
+                new moodle_url('/mod/datalynx/fieldformat/index.php', ['d' => $this->id()]),
+                get_string('fieldformats', 'datalynx')
             );
             $row[] = new tabobject(
                 'fieldgroups',
