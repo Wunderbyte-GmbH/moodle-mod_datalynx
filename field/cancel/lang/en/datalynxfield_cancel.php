@@ -14,7 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * English strings for cancel Datalynx field.
+ *
+ * @package    datalynxfield_cancel
+ * @copyright  2026 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Cancel button';
 $string['cancel'] = 'Cancel';
+$string['pluginname'] = 'Cancel button';

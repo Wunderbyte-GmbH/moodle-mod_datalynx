@@ -225,27 +225,12 @@ class renderer extends datalynxfield_renderer {
         if (empty($customscale)) {
             $customscale = 1;
         }
-        $pdfmoduleurl = (new moodle_url('/mod/datalynx/pdfjs/pdf.js'))->out(false);
-        $moduleloader = html_writer::script(
-            'if (!window.modDatalynxPdfJsModulePromise) {' .
-                ' window.modDatalynxPdfJsModulePromise = import(' . json_encode($pdfmoduleurl) . ')' .
-                '.then((pdfJs) => {' .
-                    ' window.modDatalynxPdfJsModule = pdfJs;' .
-                    ' return pdfJs;' .
-                '});' .
-            '}'
-        );
-        $PAGE->requires->js_call_amd(
-            'mod_datalynx/pdfembed',
-            'renderPDF',
-            [$fullurl, $fieldname, $customscale]
-        );
+        $PAGE->requires->js_call_amd('mod_datalynx/pdfembed', 'init');
 
         return '<div><a href="' . $fullurl . '" target="_blank" class="btn btn-primary">' .
                 get_string('download', 'core_repository') . ' ' .
                 get_string('application/pdf', 'core_mimetypes') . '</a></div><br>
-        <div style="width: 1800px; min-height: 1400px;" id="' . $fieldname . '"></div>
-        ' . $moduleloader;
+        <div style="width: 1800px; min-height: 1400px;" class="datalynx-pdf-embed" data-pdf-url="' . s($fullurl) . '" data-custom-scale="' . s($customscale) . '" id="' . $fieldname . '"></div>';
     }
     // phpcs:enable moodle.PHP.ForbiddenGlobalUse.BadGlobal
 

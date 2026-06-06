@@ -25,6 +25,7 @@ import Ajax from 'core/ajax';
 import Notification from 'core/notification';
 import Templates from 'core/templates';
 import {init as initApprove} from 'mod_datalynx/approve';
+import {init as initPdf} from 'mod_datalynx/pdfembed';
 
 /**
  * Notify feature scripts that a browse region received fresh DOM from AJAX.
@@ -86,6 +87,7 @@ export default {
             .then(({html, js}) => Templates.replaceNodeContents(element, html, js))
             .then(() => {
                 initApprove(element);
+                initPdf(element);
                 notifyContentUpdated(element);
             })
             .catch((error) => {
