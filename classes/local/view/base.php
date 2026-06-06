@@ -1033,9 +1033,6 @@ abstract class base {
             $editortags = [];
             $editorreplacements = [];
             foreach ($tags as $tag) {
-                if ($editor === 'param2' && ($tag === '##submit##' || $tag === '##cancel##')) {
-                    continue;
-                }
                 $editortags[] = $tag;
                 $editorreplacements[] = $replacements[$tag];
             }
@@ -1798,25 +1795,19 @@ abstract class base {
         if ($patterns = $this->patternclass()->get_replacements($this->tags['view'] ?? [], null, $options)) {
             $viewdefinitions = [];
             foreach ($patterns as $tag => $pattern) {
-                if (!empty($options['edit']) && $tag === '##submit##') {
-                    $viewdefinitions[$tag] = ['', [[$this, 'render_form_submit'], [$entry, $options]]];
-                } else if (!empty($options['edit']) && $tag === '##cancel##') {
-                    $viewdefinitions[$tag] = ['', [[$this, 'render_form_cancel'], [$entry, $options]]];
-                } else {
-                    if (
-                        (strpos($tag, '##viewlink:') !== 0 && strpos($tag, '##viewsesslink:') !== 0) &&
-                            (!array_key_exists('edit', $options) || !$options['edit'])
-                    ) {
-                        foreach (array_keys($fielddefinitions) as $fieldtag) {
-                            $pattern = str_replace(
-                                $fieldtag,
-                                isset($definitions[$fieldtag][1]) ? $definitions[$fieldtag][1] : '',
-                                $pattern
-                            );
-                        }
+                if (
+                    (strpos($tag, '##viewlink:') !== 0 && strpos($tag, '##viewsesslink:') !== 0) &&
+                        (!array_key_exists('edit', $options) || !$options['edit'])
+                ) {
+                    foreach (array_keys($fielddefinitions) as $fieldtag) {
+                        $pattern = str_replace(
+                            $fieldtag,
+                            isset($definitions[$fieldtag][1]) ? $definitions[$fieldtag][1] : '',
+                            $pattern
+                        );
                     }
-                    $viewdefinitions[$tag] = ['html', $pattern];
                 }
+                $viewdefinitions[$tag] = ['html', $pattern];
             }
             $definitions = array_merge($definitions, $viewdefinitions);
         }
@@ -2239,8 +2230,8 @@ abstract class base {
         }
         if ($action === 'edit' || $action === 'addnewentry') {
             if (
-                (strpos($view->param2 ?? '', '##submit##') !== false) ||
-                    (strpos($view->section ?? '', '##submit##') !== false)
+                (strpos($view->param2 ?? '', '##submit') !== false) ||
+                    (strpos($view->section ?? '', '##submit') !== false)
             ) {
                 return true;
             }
@@ -2298,29 +2289,5 @@ abstract class base {
      */
     public function get_editentries(): array {
         return $this->editentries;
-    }
-
-    /**
-     * Render the submit button inline within the form template.
-     *
-     * @param HTML_QuickForm $mform Target form.
-     * @param stdClass $entry Entry object.
-     * @param array $params Custom parameters.
-     */
-    public function render_form_submit(\HTML_QuickForm &$mform, $entry, $params) {
-        $mform->addElement('submit', 'submitbutton', get_string('savechanges'), [
-            'class' => 'btn btn-primary datalynx-custom-submit',
-        ]);
-    }
-
-    /**
-     * Render the cancel button inline within the form template.
-     *
-     * @param HTML_QuickForm $mform Target form.
-     * @param stdClass $entry Entry object.
-     * @param array $params Custom parameters.
-     */
-    public function render_form_cancel(\HTML_QuickForm &$mform, $entry, $params) {
-        $mform->addElement('cancel', 'cancel', get_string('cancel'), ['class' => 'btn btn-secondary datalynx-custom-cancel']);
     }
 }

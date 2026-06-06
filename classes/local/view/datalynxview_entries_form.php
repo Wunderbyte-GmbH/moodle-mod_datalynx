@@ -43,10 +43,10 @@ class datalynxview_entries_form extends moodleform {
         $mform->addElement('hidden', 'new', optional_param('new', 0, PARAM_INT));
         $mform->setType('new', PARAM_INT);
 
-        $hassubmit = (strpos($view->view->eparam2 ?? '', '##submit##') !== false)
-            || (strpos($view->view->param2 ?? '', '##submit##') !== false);
-        $hascancel = (strpos($view->view->eparam2 ?? '', '##cancel##') !== false)
-            || (strpos($view->view->param2 ?? '', '##cancel##') !== false);
+        $hassubmit = (strpos($view->view->eparam2 ?? '', '##submit') !== false)
+            || (strpos($view->view->param2 ?? '', '##submit') !== false);
+        $hascancel = (strpos($view->view->eparam2 ?? '', '##cancel') !== false)
+            || (strpos($view->view->param2 ?? '', '##cancel') !== false);
         $hascustombuttons = ($hassubmit || $hascancel);
 
         if (!$hascustombuttons) {
