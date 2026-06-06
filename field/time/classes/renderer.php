@@ -73,7 +73,16 @@ class renderer extends datalynxfield_renderer {
         $strtime = '';
         if (isset($entry->{"c{$fieldid}_content"})) {
             if ($content = $entry->{"c{$fieldid}_content"}) {
-                if (!empty($options['format'])) {
+                $format = $options['field_format'] ?? null;
+                if ($format) {
+                    $settings = $format->get_settings();
+                    $dateformat = $settings['dateformat'] ?? '';
+                    if ($dateformat === 'timestamp') {
+                        $strtime = $content;
+                    } else if (!empty($dateformat)) {
+                        $strtime = userdate($content, $dateformat);
+                    }
+                } else if (!empty($options['format'])) {
                     $strtime = userdate($content, $options['format']);
                 } else if (isset($options['date']) || $field->dateonly) {
                     $strtime = userdate($content, get_string("strftimedate"));

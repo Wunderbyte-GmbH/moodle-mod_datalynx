@@ -41,12 +41,18 @@ class form extends datalynxfield_form {
         $mform = &$this->_form;
 
         // Fieldgroupfieldids are stored in param1.
-        $fields = [];
         $fields = $this->dlx->get_fields(null, false, true);
+        $fieldformats = \mod_datalynx\local\field_format\manager::get_formats_for_instance($this->dlx->id());
         $fieldnames = [];
         foreach ($fields as $fieldid => $field) {
             if ($field->for_use_in_fieldgroup()) {
                 $fieldnames[$fieldid] = $field->name();
+                foreach ($fieldformats as $format) {
+                    if ($format->get_fieldtype() === $field->type) {
+                        $formatname = $format->get_name();
+                        $fieldnames["{$fieldid}:{$formatname}"] = $field->name() . ':' . $formatname;
+                    }
+                }
             }
         }
         asort($fieldnames);
@@ -100,7 +106,9 @@ class form extends datalynxfield_form {
 
         // Check if all fieldnames are actually found and only fieldtypes are entered that have been tested.
         $fields = $this->dlx->get_fields(null, false, true);
-        foreach ($data['param1'] as $fieldid) {
+        foreach ($data['param1'] as $val) {
+            $parts = explode(':', $val);
+            $fieldid = (int)$parts[0];
             if (!(array_key_exists($fieldid, $fields) && $fields[$fieldid]->for_use_in_fieldgroup())) {
                 $errors['param1'] = get_string('unsupportedfield', 'datalynx', $fields[$fieldid]->type);
             }

@@ -60,12 +60,25 @@ class renderer extends datalynxfield_renderer {
         foreach ($tags as $tag) {
             if ($edit) {
                 $tagoptions = [];
-                $clean = trim($tag, '#@'); // E.g., "cancel:arrow:text=Back".
+                $clean = trim($tag, '#@'); // E.g., "cancel:arrow:text=Back" or "cancel:myformat".
                 $parts = explode(':', $clean);
                 // Shift off the prefix 'cancel'.
                 array_shift($parts);
-                foreach ($parts as $part) {
-                    $tagoptions[$part] = true;
+
+                if (!empty($parts[0])) {
+                    $format = \mod_datalynx\local\field_format\manager::get_format_by_name(
+                        $this->field->dlx()->id(),
+                        $parts[0]
+                    );
+                    if ($format && $format->get_fieldtype() === 'cancel') {
+                        $tagoptions['field_format'] = $format;
+                    }
+                }
+
+                if (!isset($tagoptions['field_format'])) {
+                    foreach ($parts as $part) {
+                        $tagoptions[$part] = true;
+                    }
                 }
 
                 $replacements[$tag] = ['', [[$this, 'display_edit'], [$entry, $tagoptions]]];
@@ -88,16 +101,30 @@ class renderer extends datalynxfield_renderer {
         $label = get_string('cancel');
         $class = 'btn btn-secondary datalynx-custom-cancel';
 
-        // Process options from pattern (e.g. ##cancel:arrow:text=Go_Back##).
-        foreach (array_keys($options) as $option) {
-            if ($option === 'arrow') {
+        $format = $options['field_format'] ?? null;
+        if ($format) {
+            $settings = $format->get_settings();
+            if (!empty($settings['buttontext'])) {
+                $label = $settings['buttontext'];
+            }
+            if (!empty($settings['cssclasses'])) {
+                $class = $settings['cssclasses'];
+            }
+            if (!empty($settings['showarrow'])) {
                 $label = '← ' . $label;
-            } else if (strpos($option, 'text=') === 0) {
-                $label = substr($option, 5);
-                $label = str_replace('_', ' ', $label);
-            } else if (strpos($option, 'class=') === 0) {
-                $class = substr($option, 6);
-                $class = str_replace('_', ' ', $class);
+            }
+        } else {
+            // Process options from pattern (e.g. ##cancel:arrow:text=Go_Back##).
+            foreach (array_keys($options) as $option) {
+                if ($option === 'arrow') {
+                    $label = '← ' . $label;
+                } else if (strpos($option, 'text=') === 0) {
+                    $label = substr($option, 5);
+                    $label = str_replace('_', ' ', $label);
+                } else if (strpos($option, 'class=') === 0) {
+                    $class = substr($option, 6);
+                    $class = str_replace('_', ' ', $class);
+                }
             }
         }
 

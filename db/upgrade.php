@@ -1233,6 +1233,33 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2026052500, 'datalynx');
     }
 
+    if ($oldversion < 2026060600) {
+        // Define table datalynx_field_formats to be created.
+        $table = new xmldb_table('datalynx_field_formats');
+
+        // Adding fields to table datalynx_field_formats.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('dataid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('fieldtype', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('settings', XMLDB_TYPE_TEXT, null, null, null, null, null);
+
+        // Adding keys to table datalynx_field_formats.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('dataid', XMLDB_KEY_FOREIGN, ['dataid'], 'datalynx', ['id']);
+
+        // Conditionally launch create table for datalynx_field_formats.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Migrate existing legacy field formats by scanning views.
+        \mod_datalynx\local\field_format\manager::auto_create_formats_from_all_instances();
+
+        // Datalynx savepoint reached.
+        upgrade_mod_savepoint(true, 2026060600, 'datalynx');
+    }
+
     return true;
 }
 

@@ -79,7 +79,14 @@ class renderer extends datalynxfield_renderer {
             }
         }
 
-        $subscribeenabled = isset($options['subscribe']);
+        $format = $options['field_format'] ?? null;
+        $subscribeenabled = false;
+        if ($format) {
+            $settings = $format->get_settings();
+            $subscribeenabled = !empty($settings['subscribe']);
+        } else {
+            $subscribeenabled = isset($options['subscribe']);
+        }
         $selected = isset($entry->{"c{$fieldid}_content"}) ? json_decode(
             $entry->{"c{$fieldid}_content"},
             true

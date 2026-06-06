@@ -60,6 +60,14 @@ class renderer extends datalynxfield_renderer {
                 } else {
                     $type = '';
                 }
+                $format = \mod_datalynx\local\field_format\manager::get_format_by_name(
+                    $this->field->dlx()->id(),
+                    $type
+                );
+                if ($format && $format->get_fieldtype() === $this->field->type) {
+                    $settings = $format->get_settings();
+                    $type = $settings['mode'] ?? '';
+                }
                 $replacements[$tag] = ['html', $this->display_browse($entry, $type)];
             }
         }
