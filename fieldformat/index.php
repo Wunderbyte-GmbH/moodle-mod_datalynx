@@ -98,7 +98,7 @@ foreach ($formats as $format) {
         array_merge($linkparams, ['id' => $format->get_id(), 'action' => 'delete'])
     );
 
-    // Summarise settings.
+    // Build a human-readable summary of format settings as "key: value" pairs.
     $settingssummary = implode(', ', array_map(
         fn($k, $v) => s($k) . ': ' . s($v),
         array_keys($format->get_settings()),
