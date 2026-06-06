@@ -25,6 +25,7 @@
 namespace datalynxfield_entrytime;
 
 use mod_datalynx\local\field\datalynxfield_renderer;
+use mod_datalynx\local\field_format\manager as format_manager;
 use MoodleQuickForm;
 
 /**
@@ -36,60 +37,75 @@ class renderer extends datalynxfield_renderer {
     /**
      * Returns replacement values for time tags.
      *
+     * Resolves the dateformat from the DB format record's settings, falling back to the
+     * legacy keyword/strftime behaviour for backwards compatibility.
+     *
      * @param ?array $tags The field tags.
      * @param mixed $entry The entry object.
      * @param ?array $options Rendering options.
      * @return array
      */
     public function replacements(?array $tags = null, $entry = null, ?array $options = null) {
-        $field = $this->field;
+        $field     = $this->field;
         $fieldname = $field->get('internalname');
+        $dlxid     = $field->df()->id();
 
-        // No edit mode.
         $replacements = [];
 
         foreach ($tags as $tag) {
             // Display nothing on new entries.
             if ($entry->id < 0) {
                 $replacements[$tag] = '';
-            } else {
-                $format = (strpos($tag, "{$fieldname}:") !== false ? str_replace(
-                    "{$fieldname}:",
-                    '',
-                    trim($tag, '#@')
-                ) : '');
-                switch ($format) {
-                    case 'date':
-                        $format = get_string('strftimedate');
-                        break;
-                    case 'timestamp':
-                        $format = '';
-                        break;
-                    case 'minute':
-                        $format = '%M';
-                        break;
-                    case 'hour':
-                        $format = '%H';
-                        break;
-                    case 'day':
-                        $format = '%a';
-                        break;
-                    case 'week':
-                        $format = '%V';
-                        break;
-                    case 'month':
-                        $format = '%b';
-                        break;
-                    case 'm':
-                        $format = '%m';
-                        break;
-                    case 'year':
-                    case 'Y':
-                        $format = '%Y';
-                        break;
-                }
-                $replacements[$tag] = ['html', userdate($entry->{$fieldname}, $format)];
+                continue;
             }
+
+            // Extract the suffix (e.g. 'date', 'myformat') from ##fieldname:suffix##.
+            $suffix = (strpos($tag, "{$fieldname}:") !== false)
+                ? str_replace("{$fieldname}:", '', trim($tag, '#@'))
+                : '';
+
+            // Check if suffix is a DB format name.
+            $format = format_manager::get_format_by_name($dlxid, $suffix);
+            if ($format && $format->get_fieldtype() === 'entrytime') {
+                $dateformat = $format->get_setting('dateformat') ?: $suffix;
+            } else {
+                $dateformat = $suffix;
+            }
+
+            // Resolve keyword aliases (legacy compat when dateformat is a keyword).
+            switch ($dateformat) {
+                case 'date':
+                    $dateformat = get_string('strftimedate');
+                    break;
+                case 'timestamp':
+                    $replacements[$tag] = ['html', (string) ($entry->{$fieldname} ?? '')];
+                    continue 2;
+                case 'minute':
+                    $dateformat = '%M';
+                    break;
+                case 'hour':
+                    $dateformat = '%H';
+                    break;
+                case 'day':
+                case 'd':
+                    $dateformat = '%a';
+                    break;
+                case 'week':
+                    $dateformat = '%V';
+                    break;
+                case 'month':
+                    $dateformat = '%b';
+                    break;
+                case 'm':
+                    $dateformat = '%m';
+                    break;
+                case 'year':
+                case 'Y':
+                    $dateformat = '%Y';
+                    break;
+            }
+
+            $replacements[$tag] = ['html', userdate($entry->{$fieldname}, $dateformat)];
         }
 
         return $replacements;
@@ -157,33 +173,24 @@ class renderer extends datalynxfield_renderer {
     }
 
     /**
-     * Array of patterns this field supports
+     * Array of patterns this field supports.
+     *
+     * Patterns are dynamically generated from DB format records for the 'entrytime' type.
+     * Both timecreated and timemodified instances include all entrytime formats.
+     *
+     * @return array
      */
     protected function patterns() {
-        $fieldname = $this->field->get('internalname');
+        $fieldname = $this->field->get('internalname'); // 'timecreated' or 'timemodified'.
         $cat = get_string('entryinfo', 'datalynx');
+        $dlxid = $this->field->df()->id();
 
         $patterns = [];
-        $patterns["##$fieldname##"] = [true, $cat];
-        // Date without time.
-        $patterns["##$fieldname:date##"] = [true, $cat];
-        // Date with time.
-        $patterns["##$fieldname:timestamp##"] = [true, $cat];
-        // Minute (M).
-        $patterns["##$fieldname:minute##"] = [false];
-        // Hour (H).
-        $patterns["##$fieldname:hour##"] = [false];
-        // Day (a).
-        $patterns["##$fieldname:day##"] = [false];
-        $patterns["##$fieldname:d##"] = [false];
-        // Week (V).
-        $patterns["##$fieldname:week##"] = [false];
-        // Month (b).
-        $patterns["##$fieldname:month##"] = [false];
-        $patterns["##$fieldname:m##"] = [false];
-        // Year (G).
-        $patterns["##$fieldname:year##"] = [false];
-        $patterns["##$fieldname:Y##"] = [false];
+
+        $formats = format_manager::get_formats_for_instance($dlxid, 'entrytime');
+        foreach ($formats as $format) {
+            $patterns["##{$fieldname}:{$format->get_name()}##"] = [true, $cat];
+        }
 
         return $patterns;
     }

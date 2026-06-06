@@ -25,14 +25,19 @@ namespace mod_datalynx\local\field_format;
  */
 class manager {
     /**
-     * Fetch all formats defined for a specific Datalynx instance.
+     * Fetch all formats defined for a specific Datalynx instance, optionally filtered by field type.
      *
-     * @param int $datalynxid The datalynx instance ID.
+     * @param int    $datalynxid The datalynx instance ID.
+     * @param string $fieldtype  Optional field type filter (e.g. 'entryauthor').
      * @return base[] List of format objects.
      */
-    public static function get_formats_for_instance(int $datalynxid): array {
+    public static function get_formats_for_instance(int $datalynxid, string $fieldtype = ''): array {
         global $DB;
-        $records = $DB->get_records('datalynx_field_formats', ['dataid' => $datalynxid], 'name ASC');
+        $params = ['dataid' => $datalynxid];
+        if ($fieldtype !== '') {
+            $params['fieldtype'] = $fieldtype;
+        }
+        $records = $DB->get_records('datalynx_field_formats', $params, 'name ASC');
         $formats = [];
         foreach ($records as $record) {
             $instance = self::get_format_instance($record);

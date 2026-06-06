@@ -14,22 +14,64 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace datalynxfield_entrygroup;
-
 /**
- * Field format implementation for entrygroup fields.
+ * Field format class for the entrygroup field type.
  *
  * @package    datalynxfield_entrygroup
- * @copyright  2026 David Bogner
+ * @copyright  2026 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class field_format extends \mod_datalynx\local\field_format\base {
+
+namespace datalynxfield_entrygroup;
+
+use mod_datalynx\local\field_format\base;
+use MoodleQuickForm;
+
+/**
+ * Field format for entrygroup: controls which group attribute is displayed.
+ */
+class field_format extends base {
+    /** @var array Valid display_field values for entrygroup. */
+    const VALID_FIELDS = ['id', 'name', 'picture', 'picturelarge'];
+
     /**
-     * Defines configuration elements on the form.
+     * Adds a 'display_field' select to the format config form.
      *
-     * @param \MoodleQuickForm $mform
+     * @param MoodleQuickForm $mform The form object.
      */
-    public function config_form(\MoodleQuickForm &$mform) {
-        // Default implementation does not add any extra elements.
+    public function config_form(MoodleQuickForm &$mform): void {
+        $options = [
+            'id'           => get_string('groupid',          'datalynxfield_entrygroup'),
+            'name'         => get_string('groupname',        'datalynxfield_entrygroup'),
+            'picture'      => get_string('grouppicture',     'datalynxfield_entrygroup'),
+            'picturelarge' => get_string('grouppicturelarge', 'datalynxfield_entrygroup'),
+        ];
+        $mform->addElement(
+            'select',
+            'display_field',
+            get_string('fieldformat_displayfield', 'datalynxfield_entrygroup'),
+            $options
+        );
+        $mform->setType('display_field', PARAM_ALPHA);
+        $mform->addHelpButton('display_field', 'fieldformat_displayfield', 'datalynxfield_entrygroup');
+
+        // Set default from existing settings.
+        $current = $this->get_setting('display_field');
+        if ($current !== null) {
+            $mform->setDefault('display_field', $current);
+        }
+    }
+
+    /**
+     * Returns inferred default settings from a legacy hardcoded format name.
+     *
+     * @param string $name The format name detected from the template tag.
+     * @return array
+     */
+    public function get_default_settings_for_name(string $name): array {
+        if (in_array($name, self::VALID_FIELDS, true)) {
+            return ['display_field' => $name];
+        }
+        return [];
     }
 }

@@ -17,17 +17,32 @@
 namespace datalynxfield_entrytime\form;
 
 /**
- * Form class for entrytime field formats.
+ * Field format form for the entrytime field type.
  *
  * @package    datalynxfield_entrytime
- * @copyright  2026 David Bogner
+ * @copyright  2026 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+/**
+ * Moodle form for creating/editing an entrytime field format.
  */
 class field_format_form extends \mod_datalynx\form\field_format_base_form {
     /**
-     * Define the specific elements for the entrytime format.
+     * Adds a dateformat text field and collapsible cheatsheet.
      */
     protected function format_definition() {
-        // Default implementation has no extra elements.
+        $mform = $this->_form;
+
+        $mform->addElement(
+            'text',
+            'dateformat',
+            get_string('fieldformat_dateformat', 'datalynxfield_entrytime'),
+            ['size' => '48']
+        );
+        $mform->setType('dateformat', PARAM_TEXT);
+        $mform->addHelpButton('dateformat', 'fieldformat_dateformat', 'datalynxfield_entrytime');
+
+        $mform->addElement('html', get_string('fieldformat_dateformat_examples', 'datalynxfield_entrytime'));
     }
 }

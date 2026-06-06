@@ -25,6 +25,7 @@
 namespace datalynxfield_entrygroup;
 
 use mod_datalynx\local\field\datalynxfield_renderer;
+use mod_datalynx\local\field_format\manager as format_manager;
 use MoodleQuickForm;
 use stdClass;
 
@@ -35,6 +36,9 @@ class renderer extends datalynxfield_renderer {
     /**
      * Get replacements for the given tags.
      *
+     * Resolves the display_field from the DB format record's settings, falling back to
+     * using the suffix directly as the display field name (legacy compatibility).
+     *
      * @param ?array $tags
      * @param stdClass $entry
      * @param ?array $options
@@ -42,7 +46,8 @@ class renderer extends datalynxfield_renderer {
      */
     public function replacements(?array $tags = null, $entry = null, ?array $options = null) {
         $field = $this->field;
-        $edit = !empty($options['edit']) ? $options['edit'] : false;
+        $edit  = !empty($options['edit']) ? $options['edit'] : false;
+        $dlxid = $field->df()->id();
 
         // Set the group object.
         $group = new stdClass();
@@ -61,30 +66,43 @@ class renderer extends datalynxfield_renderer {
 
         foreach ($tags as $tag) {
             $replacements[$tag] = '';
-            switch (trim($tag, '@')) {
-                case '##group:id##':
+            $stripped = trim($tag, '@');
+
+            // Extract suffix from ##group:suffix##.
+            $suffix = substr($stripped, strlen('##group:'), -2);
+
+            // Resolve display_field from DB format settings, fall back to suffix.
+            $format = format_manager::get_format_by_name($dlxid, $suffix);
+            if ($format && $format->get_fieldtype() === 'entrygroup') {
+                $displayfield = $format->get_setting('display_field') ?: $suffix;
+            } else {
+                $displayfield = $suffix;
+            }
+
+            switch ($displayfield) {
+                case 'id':
                     if (!empty($group->id)) {
                         $replacements[$tag] = ['html', $group->id];
                     }
                     break;
 
-                case '##group:name##':
+                case 'name':
                     $replacements[$tag] = ['html', $group->name];
                     break;
 
-                case '##group:picture##':
+                case 'picture':
                     $replacements[$tag] = ['html',
                             print_group_picture($group, $field->dlx()->course->id, false, true),
                     ];
                     break;
 
-                case '##group:picturelarge##':
+                case 'picturelarge':
                     $replacements[$tag] = ['html',
                             print_group_picture($group, $field->dlx()->course->id, true, true),
                     ];
                     break;
 
-                case '##group:edit##':
+                case 'edit':
                     if (
                         $edit && has_capability(
                             'mod/datalynx:manageentries',
@@ -133,17 +151,22 @@ class renderer extends datalynxfield_renderer {
     }
 
     /**
-     * Array of patterns this field supports
+     * Array of patterns this field supports.
+     *
+     * Patterns are dynamically generated from DB format records for the 'entrygroup' type.
+     *
+     * @return array
      */
     protected function patterns() {
         $cat = get_string('groupinfo', 'datalynx');
+        $dlxid = $this->field->df()->id();
 
         $patterns = [];
-        $patterns['##group:id##'] = [true, $cat];
-        $patterns['##group:name##'] = [true, $cat];
-        $patterns['##group:picture##'] = [true, $cat];
-        $patterns['##group:picturelarge##'] = [false, $cat];
-        $patterns['##group:edit##'] = [true, $cat];
+
+        $formats = format_manager::get_formats_for_instance($dlxid, 'entrygroup');
+        foreach ($formats as $format) {
+            $patterns["##group:{$format->get_name()}##"] = [true, $cat];
+        }
 
         return $patterns;
     }

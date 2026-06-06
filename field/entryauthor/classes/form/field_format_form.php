@@ -17,17 +17,44 @@
 namespace datalynxfield_entryauthor\form;
 
 /**
- * Form class for entryauthor field formats.
+ * Field format form for the entryauthor field type.
  *
  * @package    datalynxfield_entryauthor
- * @copyright  2026 David Bogner
+ * @copyright  2026 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+/**
+ * Moodle form for creating/editing an entryauthor field format.
  */
 class field_format_form extends \mod_datalynx\form\field_format_base_form {
     /**
-     * Define the specific elements for the entryauthor format.
+     * Adds field-type-specific form elements for the entryauthor format.
      */
     protected function format_definition() {
-        // Default implementation has no extra elements.
+        $mform = $this->_form;
+
+        $options = [
+            'id'           => get_string('userid',           'datalynxfield_entryauthor'),
+            'name'         => get_string('username',         'datalynxfield_entryauthor'),
+            'firstname'    => get_string('userfirstname',    'datalynxfield_entryauthor'),
+            'lastname'     => get_string('userlastname',     'datalynxfield_entryauthor'),
+            'username'     => get_string('userusername',     'datalynxfield_entryauthor'),
+            'idnumber'     => get_string('useridnumber',     'datalynxfield_entryauthor'),
+            'email'        => get_string('useremail',        'datalynxfield_entryauthor'),
+            'institution'  => get_string('userinstitution',  'datalynxfield_entryauthor'),
+            'department'   => get_string('userdepartment',   'datalynxfield_entryauthor'),
+            'picture'      => get_string('userpicture',      'datalynxfield_entryauthor'),
+            'picturelarge' => get_string('userpicturelarge', 'datalynxfield_entryauthor'),
+            'badges'       => get_string('userbadges',       'datalynxfield_entryauthor'),
+        ];
+        $mform->addElement(
+            'select',
+            'display_field',
+            get_string('fieldformat_displayfield', 'datalynxfield_entryauthor'),
+            $options
+        );
+        $mform->setType('display_field', PARAM_ALPHA);
+        $mform->addHelpButton('display_field', 'fieldformat_displayfield', 'datalynxfield_entryauthor');
     }
 }

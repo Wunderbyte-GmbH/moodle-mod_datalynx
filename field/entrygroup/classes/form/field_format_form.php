@@ -17,17 +17,36 @@
 namespace datalynxfield_entrygroup\form;
 
 /**
- * Form class for entrygroup field formats.
+ * Field format form for the entrygroup field type.
  *
  * @package    datalynxfield_entrygroup
- * @copyright  2026 David Bogner
+ * @copyright  2026 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+/**
+ * Moodle form for creating/editing an entrygroup field format.
  */
 class field_format_form extends \mod_datalynx\form\field_format_base_form {
     /**
-     * Define the specific elements for the entrygroup format.
+     * Adds a display_field select element.
      */
     protected function format_definition() {
-        // Default implementation has no extra elements.
+        $mform = $this->_form;
+
+        $options = [
+            'id'           => get_string('groupid',           'datalynxfield_entrygroup'),
+            'name'         => get_string('groupname',         'datalynxfield_entrygroup'),
+            'picture'      => get_string('grouppicture',      'datalynxfield_entrygroup'),
+            'picturelarge' => get_string('grouppicturelarge', 'datalynxfield_entrygroup'),
+        ];
+        $mform->addElement(
+            'select',
+            'display_field',
+            get_string('fieldformat_displayfield', 'datalynxfield_entrygroup'),
+            $options
+        );
+        $mform->setType('display_field', PARAM_ALPHA);
+        $mform->addHelpButton('display_field', 'fieldformat_displayfield', 'datalynxfield_entrygroup');
     }
 }
