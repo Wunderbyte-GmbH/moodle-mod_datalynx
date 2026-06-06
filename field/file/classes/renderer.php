@@ -225,7 +225,7 @@ class renderer extends datalynxfield_renderer {
         if (empty($customscale)) {
             $customscale = 1;
         }
-        $pdfmoduleurl = (new moodle_url('/mod/datalynx/pdfjs/pdf.mjs'))->out(false);
+        $pdfmoduleurl = (new moodle_url('/mod/datalynx/pdfjs/pdf.js'))->out(false);
         $moduleloader = html_writer::script(
             'if (!window.modDatalynxPdfJsModulePromise) {' .
                 ' window.modDatalynxPdfJsModulePromise = import(' . json_encode($pdfmoduleurl) . ')' .
@@ -233,8 +233,7 @@ class renderer extends datalynxfield_renderer {
                     ' window.modDatalynxPdfJsModule = pdfJs;' .
                     ' return pdfJs;' .
                 '});' .
-            '}',
-            ['type' => 'module']
+            '}'
         );
         $PAGE->requires->js_call_amd(
             'mod_datalynx/pdfembed',
