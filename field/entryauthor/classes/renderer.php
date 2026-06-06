@@ -31,6 +31,7 @@ use core_user\fields;
 use dml_exception;
 use html_writer;
 use mod_datalynx\local\field\datalynxfield_renderer;
+use mod_datalynx\local\field_format\manager as format_manager;
 use moodle_exception;
 use moodle_url;
 use stdClass;
@@ -42,6 +43,9 @@ class renderer extends datalynxfield_renderer {
     /**
      * Return replacements for all ##author:something## patterns.
      *
+     * Resolves the display_field from the DB format record's settings, falling back to
+     * using the suffix directly as the display field name (legacy compatibility).
+     *
      * @param ?array $tags
      * @param null $entry
      * @param ?array $options
@@ -49,43 +53,46 @@ class renderer extends datalynxfield_renderer {
      * @throws coding_exception
      */
     public function replacements(?array $tags = null, $entry = null, ?array $options = null) {
-        $field = $this->field;
-        $fieldname = $field->get('internalname');
-        $edit = !empty($options['edit']) ? $options['edit'] : false;
-
-        // No edit mode.
+        $field   = $this->field;
+        $edit    = !empty($options['edit']) ? $options['edit'] : false;
+        $dlxid   = $field->df()->id();
         $replacements = [];
 
-        // Edit author name.
-        if ($fieldname == 'name') {
-            // Two tags are possible.
-            foreach ($tags as $tag) {
-                if (
-                    trim($tag, '@') == "##author:edit##" && $edit &&
-                        has_capability('mod/datalynx:manageentries', $field->df()->context)
-                ) {
-                    $replacements[$tag] = ['',
-                            [[$this, 'display_edit'], [$entry]]];
-                } else {
-                    $replacements[$tag] = ['html', $this->{"display_$fieldname"}($entry)];
-                }
+        foreach ($tags as $tag) {
+            // Extract the suffix from ##author:suffix## (strip trailing @).
+            $stripped = trim($tag, '@');
+            // Remove leading ##author: and trailing ##.
+            $suffix = substr($stripped, strlen('##author:'), -2);
+
+            // Resolve display_field: prefer DB format settings, fall back to suffix.
+            $format = format_manager::get_format_by_name($dlxid, $suffix);
+            if ($format && $format->get_fieldtype() === 'entryauthor') {
+                $displayfield = $format->get_setting('display_field') ?: $suffix;
+            } else {
+                $displayfield = $suffix;
             }
 
-            // If not picture there is only one possible tag so no check.
-        } else {
-            if ($fieldname != 'picture') {
-                $replacements["##author:{$fieldname}##@"] = ['html', $this->{"display_$fieldname"}($entry)];
-                $replacements["##author:{$fieldname}##"] = ['html', $this->{"display_$fieldname"}($entry)];
-
-                // For picture switch on $tags.
-            } else {
-                foreach ($tags as $tag) {
-                    if (trim($tag, '@') == "##author:picturelarge##") {
-                        $replacements[$tag] = ['html', $this->{"display_$fieldname"}($entry, true)];
-                    } else {
-                        $replacements[$tag] = ['html', $this->{"display_$fieldname"}($entry)];
-                    }
+            // Special case: edit selector.
+            if ($displayfield === 'edit') {
+                if ($edit && has_capability('mod/datalynx:manageentries', $field->df()->context)) {
+                    $replacements[$tag] = ['', [[$this, 'display_edit'], [$entry]]];
+                } else {
+                    $replacements[$tag] = ['html', $this->display_name($entry)];
                 }
+                continue;
+            }
+
+            // Special case: picturelarge.
+            if ($displayfield === 'picturelarge') {
+                $replacements[$tag] = ['html', $this->display_picture($entry, true)];
+                continue;
+            }
+
+            $method = "display_{$displayfield}";
+            if (method_exists($this, $method)) {
+                $replacements[$tag] = ['html', $this->$method($entry)];
+            } else {
+                $replacements[$tag] = ['html', ''];
             }
         }
 
@@ -361,22 +368,37 @@ class renderer extends datalynxfield_renderer {
     /**
      * Array of patterns this field supports.
      *
+     * Patterns are dynamically generated from DB format records for the 'entryauthor' type.
+     * Each physical instance (e.g. 'name', 'picture') only claims formats whose
+     * display_field matches its own internalname (including special cases).
+     *
      * @return array
      * @throws coding_exception
      */
     protected function patterns() {
         $fieldinternalname = $this->field->get('internalname');
         $cat = get_string('authorinfo', 'datalynx');
+        $dlxid = $this->field->df()->id();
 
         $patterns = [];
-        $patterns["##author:{$fieldinternalname}##"] = [true, $cat];
-        // For user name add edit tag.
-        if ($fieldinternalname == 'name') {
-            $patterns["##author:edit##"] = [true, $cat];
-        }
-        // For user picture add the large picture.
-        if ($fieldinternalname == 'picture') {
-            $patterns["##author:picturelarge##"] = [true, $cat];
+
+        $formats = format_manager::get_formats_for_instance($dlxid, 'entryauthor');
+        foreach ($formats as $format) {
+            // Use display_field setting, or fall back to the format name itself.
+            $displayfield = $format->get_setting('display_field') ?: $format->get_name();
+
+            // Determine which internalname(s) this physical instance handles.
+            $handles = [$fieldinternalname];
+            if ($fieldinternalname === 'name') {
+                $handles[] = 'edit'; // 'name' instance also handles edit.
+            }
+            if ($fieldinternalname === 'picture') {
+                $handles[] = 'picturelarge'; // 'picture' instance handles both sizes.
+            }
+
+            if (in_array($displayfield, $handles, true)) {
+                $patterns["##author:{$format->get_name()}##"] = [true, $cat];
+            }
         }
 
         return $patterns;

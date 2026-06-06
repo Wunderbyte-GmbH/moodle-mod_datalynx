@@ -248,5 +248,22 @@
         <KEY NAME="dataid" TYPE="foreign" FIELDS="dataid" REFTABLE="datalynx" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
+    <TABLE NAME="datalynx_field_formats" COMMENT="Field format definitions — controls how virtual field tags are rendered">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="dataid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="fieldtype" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="settings" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="dataid" TYPE="foreign" FIELDS="dataid" REFTABLE="datalynx" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="dataid_fieldtype" UNIQUE="false" FIELDS="dataid, fieldtype"/>
+        <INDEX NAME="dataid_name" UNIQUE="true" FIELDS="dataid, name"/>
+      </INDEXES>
+    </TABLE>
   </TABLES>
 </XMLDB>

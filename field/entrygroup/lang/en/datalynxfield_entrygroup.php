@@ -28,3 +28,12 @@ $string['##group:name##'] = '##group:name##';
 $string['group'] = 'Group';
 $string['pluginname'] = 'Entrygroup';
 $string['privacy:metadata'] = 'The field entrygroup does not store personal data.';
+$string['fieldformat_displayfield'] = 'Display attribute';
+$string['fieldformat_displayfield_help'] = 'Choose what group information this format displays.
+Use ##group:formatname## in the Entry Template.';
+$string['fieldformat_description'] = 'Controls which attribute of the entry group is shown.
+Use ##group:formatname## in Entry Templates.';
+$string['groupid'] = 'Group ID';
+$string['groupname'] = 'Group name';
+$string['grouppicture'] = 'Group picture (small)';
+$string['grouppicturelarge'] = 'Group picture (large)';

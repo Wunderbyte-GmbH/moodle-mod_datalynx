@@ -1224,6 +1224,62 @@ function xmldb_datalynx_upgrade($oldversion) {
 
         upgrade_mod_savepoint(true, 2026042500, 'datalynx');
     }
+
+    if ($oldversion < 2026060600) {
+        // Create the datalynx_field_formats table.
+        $table = new xmldb_table('datalynx_field_formats');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('dataid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('fieldtype', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('settings', XMLDB_TYPE_TEXT, null, null, null, null, null);
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('dataid', XMLDB_KEY_FOREIGN, ['dataid'], 'datalynx', ['id']);
+
+        $table->add_index('dataid_fieldtype', XMLDB_INDEX_NOTUNIQUE, ['dataid', 'fieldtype']);
+        $table->add_index('dataid_name', XMLDB_INDEX_UNIQUE, ['dataid', 'name']);
+
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Auto-create format records from existing view templates for all datalynx instances.
+        $dataids = $DB->get_fieldset_select('datalynx', 'id', 'id IS NOT NULL');
+        foreach ($dataids as $dataid) {
+            \mod_datalynx\local\field_format\manager::auto_create_formats_from_templates((int) $dataid);
+        }
+
+        upgrade_mod_savepoint(true, 2026060600, 'datalynx');
+    }
+
+    if ($oldversion < 2026060601) {
+        // Backfill default settings for datalynx_field_formats records that were created
+        // with empty settings={} by the initial auto-create scan in version 2026060600.
+        if ($dbman->table_exists('datalynx_field_formats')) {
+            $formats = $DB->get_records('datalynx_field_formats');
+            foreach ($formats as $formatrec) {
+                // Skip records that already have meaningful settings.
+                $existing = json_decode($formatrec->settings ?? '{}', true);
+                if (!empty($existing)) {
+                    continue;
+                }
+                $classname = "\\datalynxfield_{$formatrec->fieldtype}\\field_format";
+                if (!class_exists($classname)) {
+                    continue;
+                }
+                $instance  = new $classname($formatrec);
+                $defaults  = $instance->get_default_settings_for_name($formatrec->name);
+                if (!empty($defaults)) {
+                    $formatrec->settings = json_encode((object) $defaults);
+                    $DB->update_record('datalynx_field_formats', $formatrec);
+                }
+            }
+        }
+
+        upgrade_mod_savepoint(true, 2026060601, 'datalynx');
+    }
+
     return true;
 }
 

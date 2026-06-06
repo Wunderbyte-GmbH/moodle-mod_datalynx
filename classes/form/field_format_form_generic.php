@@ -15,21 +15,23 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Generic field format form for field types that have no dedicated format form class.
  *
- * @package mod_datalynx
- * @copyright 2015 onwards David Bogner
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    mod_datalynx
+ * @copyright  2026 Wunderbyte GmbH
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace mod_datalynx\form;
 
-$plugin->component = 'mod_datalynx';
-$plugin->supported = [405, 502];
-$plugin->version = 2026060601;
-// Release: Highest supported Moodle, followed by internal version, followed by dataword.
-$plugin->release = 'v502.1-DataDream';
-$plugin->requires = 2024100700;
-$plugin->maturity = MATURITY_STABLE;
-$plugin->dependencies = [
-    'assignfeedback_editpdf' => ANY_VERSION, // We use fpdi from this core module.
-];
+/**
+ * Minimal field format form: just the common name/hidden fields, no type-specific settings.
+ */
+class field_format_form_generic extends field_format_form_base {
+    /**
+     * No field-type-specific settings.
+     */
+    protected function format_definition(): void {
+        // No additional settings for this generic form.
+    }
+}

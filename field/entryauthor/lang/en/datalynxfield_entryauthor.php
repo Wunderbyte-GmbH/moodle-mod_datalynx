@@ -32,3 +32,14 @@ $string['userlastname'] = 'User last name';
 $string['username'] = 'User name';
 $string['userpicture'] = 'User picture';
 $string['userusername'] = 'User username';
+$string['userbadges'] = 'User badges';
+$string['userinstitution'] = 'Institution';
+$string['userdepartment'] = 'Department';
+$string['userpicturelarge'] = 'Profile picture (large)';
+$string['fieldformat_displayfield'] = 'Display attribute';
+$string['fieldformat_displayfield_help'] = 'Select which piece of author information this format displays.
+After saving, use ##author:formatname## in your Entry Template.
+If you have existing templates with ##author:id##, an upgrade automatically creates a format named "id"
+pointing to the User ID — you can rename or reconfigure it here.';
+$string['fieldformat_description'] = 'Controls which attribute of the entry author is displayed.
+Tip: use ##author:formatname## in the Entry Template.';
