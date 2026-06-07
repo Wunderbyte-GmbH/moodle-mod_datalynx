@@ -1382,6 +1382,15 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2026060700, 'datalynx');
     }
 
+    if ($oldversion < 2026060701) {
+        // The userinfo field does not use the Field Format API.
+        // Remove any field format records that were erroneously created for userinfo fields
+        // during earlier upgrade steps or template scans.
+        $DB->delete_records('datalynx_field_formats', ['fieldtype' => 'userinfo']);
+
+        upgrade_mod_savepoint(true, 2026060701, 'datalynx');
+    }
+
     return true;
 }
 

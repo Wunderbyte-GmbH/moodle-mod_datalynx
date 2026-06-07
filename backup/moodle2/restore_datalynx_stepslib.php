@@ -559,6 +559,12 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         $data = (object) $data;
         $oldid = $data->id;
 
+        // The userinfo field does not use the Field Format API.
+        // Skip any userinfo format records that may exist in older backups.
+        if (isset($data->fieldtype) && $data->fieldtype === 'userinfo') {
+            return;
+        }
+
         $data->dataid = $this->get_new_parentid('datalynx');
 
         // Insert the datalynx_field_formats record.
