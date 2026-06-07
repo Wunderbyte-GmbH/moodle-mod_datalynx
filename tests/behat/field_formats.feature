@@ -9,11 +9,13 @@ Feature: Manage and use Datalynx Field Formats
       | fullname | shortname | category | groupmode |
       | Course 1 | C1        | 0        | 1         |
     And the following "users" exist:
-      | username | firstname | lastname | email                |
-      | teacher1 | Teacher   | 1        | teacher1@example.com |
+      | username | firstname | lastname | email                | idnumber | institution | department |
+      | teacher1 | Teacher   | 1        | teacher1@example.com | T123     | Uni1        | Dept1      |
+      | student1 | Student   | 1        | student1@example.com | S123     | Uni1        | Dept1      |
     And the following "course enrolments" exist:
       | user     | course | role           |
       | teacher1 | C1     | editingteacher |
+      | student1 | C1     | student        |
     And the following "activities" exist:
       | activity | course | idnumber | name                   |
       | datalynx | C1     | 12345    | Datalynx Test Instance |
@@ -21,19 +23,78 @@ Feature: Manage and use Datalynx Field Formats
     And I am on "Course 1" course homepage
     And I follow "Datalynx Test Instance"
 
-  Scenario: Create, use, edit, and delete a submit button field format
+  Scenario: Configure and use entryauthor and teammemberselect field formats
     And I follow the datalynx "Manage" link
     And I follow "Fields"
-    And I follow "Field Formats"
-    And I set the field "Add field format" to "Submit button"
-    And I wait until the page is ready
-    And I set the field "Name" to "mysubmit"
-    And I set the field "Button text" to "My Custom Submit"
-    And I set the field "CSS classes" to "btn-success"
-    And I click on "Show arrow" "checkbox"
+    And I add to the "Datalynx Test Instance" datalynx the following fields:
+      | type             | name | description | param1 | param2 | param3 |
+      | teammemberselect | Team |             | 3      | 0      | 0      |
+    And I follow "Datalynx field Team"
+    And I set the field "Student" to "1"
+    And I set the field "Allow manual unsubscription" to "1"
     And I press "Save changes"
-    Then I should see "mysubmit"
-    And I should see "Submit button"
+
+    # Create field formats for entryauthor
+    And I follow "Field Formats"
+    And I set the field "Add field format" to "Entryauthor"
+    And I wait until the page is ready
+    And I set the field "Name" to "id"
+    And I press "Save changes"
+    And I set the field "Add field format" to "Entryauthor"
+    And I wait until the page is ready
+    And I set the field "Name" to "name"
+    And I press "Save changes"
+    And I set the field "Add field format" to "Entryauthor"
+    And I wait until the page is ready
+    And I set the field "Name" to "firstname"
+    And I press "Save changes"
+    And I set the field "Add field format" to "Entryauthor"
+    And I wait until the page is ready
+    And I set the field "Name" to "lastname"
+    And I press "Save changes"
+    And I set the field "Add field format" to "Entryauthor"
+    And I wait until the page is ready
+    And I set the field "Name" to "username"
+    And I press "Save changes"
+    And I set the field "Add field format" to "Entryauthor"
+    And I wait until the page is ready
+    And I set the field "Name" to "idnumber"
+    And I press "Save changes"
+    And I set the field "Add field format" to "Entryauthor"
+    And I wait until the page is ready
+    And I set the field "Name" to "email"
+    And I press "Save changes"
+    And I set the field "Add field format" to "Entryauthor"
+    And I wait until the page is ready
+    And I set the field "Name" to "institution"
+    And I press "Save changes"
+    And I set the field "Add field format" to "Entryauthor"
+    And I wait until the page is ready
+    And I set the field "Name" to "department"
+    And I press "Save changes"
+    And I set the field "Add field format" to "Entryauthor"
+    And I wait until the page is ready
+    And I set the field "Name" to "picture"
+    And I press "Save changes"
+    And I set the field "Add field format" to "Entryauthor"
+    And I wait until the page is ready
+    And I set the field "Name" to "picturelarge"
+    And I press "Save changes"
+    And I set the field "Add field format" to "Entryauthor"
+    And I wait until the page is ready
+    And I set the field "Name" to "badges"
+    And I press "Save changes"
+    And I set the field "Add field format" to "Entryauthor"
+    And I wait until the page is ready
+    And I set the field "Name" to "edit"
+    And I press "Save changes"
+
+    # Create field format for teammemberselect with subscribe option
+    And I set the field "Add field format" to "Team member select"
+    And I wait until the page is ready
+    And I set the field "Name" to "subscribe"
+    And I click on "Subscribe" "checkbox"
+    And I press "Save changes"
 
     # Use format in view template
     And I follow the datalynx "Views" link
@@ -44,32 +105,30 @@ Feature: Manage and use Datalynx Field Formats
     And I follow "Set as edit view"
     And I click on "Edit Gridview" "link"
     And I click on "Entry template" "link"
-    And I set the "id_eparam2_editor" editor to "<p>##submit:mysubmit##</p>"
+    And I set the "id_eparam2_editor" editor to "Author info: ##author:id## ##author:name## ##author:firstname## ##author:lastname## ##author:username## ##author:idnumber## ##author:email## ##author:institution## ##author:department## ##author:picture## ##author:picturelarge## ##author:badges## ##author:edit## Team members: [[Datalynx field Team:subscribe]]"
     And I press "Save changes"
 
-    # Test display in edit mode (add entry)
+    # Add an entry where teacher1 is the author
+    And the "Datalynx Test Instance" datalynx has the following entries:
+      | user     |
+      | teacher1 |
+
+    # Log in as student1 and view the entry
+    And I log out
+    And I log in as "student1"
+    And I am on "Course 1" course homepage
     And I follow "Datalynx Test Instance"
-    And I follow "Add a new entry"
-    Then "My Custom Submit →" "button" should exist
-    And ".btn-success" "css_element" should exist
-
-    # Try to delete format, verify it is blocked
-    And I follow the datalynx "Manage" link
-    And I follow "Fields"
-    And I follow "Field Formats"
-    And I click on "Delete" "link" in the "mysubmit" "table_row"
-    Then I should see "The field format cannot be deleted because it is currently in use in the following views: Gridview"
-
-    # Edit the template to remove format reference
-    And I follow the datalynx "Views" link
-    And I click on "Edit Gridview" "link"
-    And I click on "Entry template" "link"
-    And I set the "id_eparam2_editor" editor to "<p>##submit##</p>"
-    And I press "Save changes"
-
-    # Delete format again, verify it works
-    And I follow the datalynx "Manage" link
-    And I follow "Fields"
-    And I follow "Field Formats"
-    And I click on "Delete" "link" in the "mysubmit" "table_row"
-    Then I should not see "mysubmit"
+    Then I should see "Author info:"
+    And I should see "Teacher 1"
+    And I should see "Teacher"
+    And I should see "1"
+    And I should see "teacher1"
+    And I should see "T123"
+    And I should see "teacher1@example.com"
+    And I should see "Uni1"
+    And I should see "Dept1"
+    And I should see "Subscribe"
+    And I click on "Subscribe" "link"
+    And I wait until the page is ready
+    Then I should see "Unsubscribe"
+    And I should see "Student 1"
