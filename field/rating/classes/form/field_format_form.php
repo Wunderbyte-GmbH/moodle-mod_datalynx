@@ -25,9 +25,25 @@ namespace datalynxfield_rating\form;
  */
 class field_format_form extends \mod_datalynx\form\field_format_base_form {
     /**
-     * Define the specific elements for the rating format.
+     * Defines configuration elements on the form.
      */
     protected function format_definition() {
-        // Default implementation has no extra elements.
+        $mform = &$this->_form;
+        $options = [
+            'rate' => 'Rate (widget)',
+            'view' => 'View link',
+            'viewurl' => 'View URL',
+            'viewinline' => 'View inline (table)',
+            'count' => 'Count',
+            'avg' => 'Average (text)',
+            'avgbar' => 'Average using bars',
+            'avgstar' => 'Average using stars',
+            'max' => 'Maximum',
+            'min' => 'Minimum',
+            'sum' => 'Sum',
+        ];
+        $mform->addElement('select', 'option', get_string('fieldformatoption', 'mod_datalynx'), $options);
+        $mform->setType('option', PARAM_ALPHANUM);
+        $mform->addRule('option', get_string('required'), 'required', null, 'client');
     }
 }

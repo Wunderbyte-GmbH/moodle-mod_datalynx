@@ -158,7 +158,25 @@ class renderer extends datalynxfield_renderer {
                 }
             }
 
-            $separator = $field->separators[(int) $field->get('param3')]['chr'];
+            $fieldformat = $options['field_format'] ?? null;
+            $formatmode = '';
+            if ($fieldformat) {
+                $formatmode = $fieldformat->get_setting('option');
+            }
+
+            if ($formatmode === 'newline') {
+                $separator = '<br />';
+            } else if ($formatmode === 'space') {
+                $separator = '&#32;';
+            } else if ($formatmode === 'comma') {
+                $separator = '&#44;';
+            } else if ($formatmode === 'commaspace') {
+                $separator = '&#44;&#32;';
+            } else if ($formatmode === 'list') {
+                $separator = '</li><li>';
+            } else {
+                $separator = $field->separators[(int) $field->get('param3')]['chr'];
+            }
 
             // If we see a fieldgroup we simply display comma separations for now.
             if (isset($options['fieldgroup'])) {

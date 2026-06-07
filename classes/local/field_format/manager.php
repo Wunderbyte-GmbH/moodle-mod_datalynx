@@ -196,7 +196,14 @@ class manager {
                 // Dynamic check to make sure the class is loaded and is a subclass of base.
                 $classname = "\\datalynxfield_{$type}\\field_format";
                 if (class_exists($classname) && is_subclass_of($classname, 'mod_datalynx\local\field_format\base')) {
-                    $types[$type] = get_string('pluginname', "datalynxfield_$type");
+                    $dummy = new \stdClass();
+                    $dummy->fieldtype = $type;
+                    $dummy->name = '';
+                    $dummy->settings = json_encode([]);
+                    $formatinstance = new $classname($dummy);
+                    if ($formatinstance->has_options()) {
+                        $types[$type] = get_string('pluginname', "datalynxfield_$type");
+                    }
                 }
             }
         }
@@ -323,7 +330,20 @@ class manager {
                     $newrecord->dataid = $datalynxid;
                     $newrecord->name = $formatname;
                     $newrecord->fieldtype = $fieldtype;
-                    $newrecord->settings = json_encode(new \stdClass());
+                    $settings = new \stdClass();
+                    $classname = "\\datalynxfield_{$fieldtype}\\field_format";
+                    if (class_exists($classname)) {
+                        $dummy = new \stdClass();
+                        $dummy->fieldtype = $fieldtype;
+                        $dummy->name = $formatname;
+                        $dummy->settings = json_encode([]);
+                        $formatobj = new $classname($dummy);
+                        $defaultsettings = $formatobj->get_default_settings_for_name($formatname);
+                        if (!empty($defaultsettings)) {
+                            $settings = (object)$defaultsettings;
+                        }
+                    }
+                    $newrecord->settings = json_encode($settings);
                     self::save_format($newrecord);
                 }
             }

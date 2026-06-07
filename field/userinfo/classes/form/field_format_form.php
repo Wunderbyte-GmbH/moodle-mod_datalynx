@@ -28,6 +28,26 @@ class field_format_form extends \mod_datalynx\form\field_format_base_form {
      * Define the specific elements for the userinfo format.
      */
     protected function format_definition() {
-        // Default implementation has no extra elements.
+        $mform = &$this->_form;
+        $options = [
+            'text' => 'Text',
+            'checkbox' => 'Checkbox',
+            'datetime' => 'Date/time',
+            'richtext' => 'Rich text / Textarea',
+        ];
+
+        global $DB;
+        $customfields = $DB->get_records('user_info_field', null, 'sortorder ASC', 'shortname, name');
+        if ($customfields) {
+            foreach ($customfields as $cf) {
+                if (preg_match('/^[a-zA-Z0-9]+$/', $cf->shortname)) {
+                    $options[$cf->shortname] = format_string($cf->name);
+                }
+            }
+        }
+
+        $mform->addElement('select', 'option', get_string('fieldformatoption', 'mod_datalynx'), $options);
+        $mform->setType('option', PARAM_ALPHANUM);
+        $mform->addRule('option', get_string('required'), 'required', null, 'client');
     }
 }

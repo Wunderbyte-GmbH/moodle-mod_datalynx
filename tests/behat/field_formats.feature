@@ -39,54 +39,67 @@ Feature: Manage and use Datalynx Field Formats
     And I set the field "Add field format" to "Entryauthor"
     And I wait until the page is ready
     And I set the field "Name" to "id"
+    And I set the field "Format option" to "id"
     And I press "Save changes"
     And I set the field "Add field format" to "Entryauthor"
     And I wait until the page is ready
     And I set the field "Name" to "name"
+    And I set the field "Format option" to "name"
     And I press "Save changes"
     And I set the field "Add field format" to "Entryauthor"
     And I wait until the page is ready
     And I set the field "Name" to "firstname"
+    And I set the field "Format option" to "firstname"
     And I press "Save changes"
     And I set the field "Add field format" to "Entryauthor"
     And I wait until the page is ready
     And I set the field "Name" to "lastname"
+    And I set the field "Format option" to "lastname"
     And I press "Save changes"
     And I set the field "Add field format" to "Entryauthor"
     And I wait until the page is ready
     And I set the field "Name" to "username"
+    And I set the field "Format option" to "username"
     And I press "Save changes"
     And I set the field "Add field format" to "Entryauthor"
     And I wait until the page is ready
     And I set the field "Name" to "idnumber"
+    And I set the field "Format option" to "idnumber"
     And I press "Save changes"
     And I set the field "Add field format" to "Entryauthor"
     And I wait until the page is ready
     And I set the field "Name" to "email"
+    And I set the field "Format option" to "email"
     And I press "Save changes"
     And I set the field "Add field format" to "Entryauthor"
     And I wait until the page is ready
     And I set the field "Name" to "institution"
+    And I set the field "Format option" to "institution"
     And I press "Save changes"
     And I set the field "Add field format" to "Entryauthor"
     And I wait until the page is ready
     And I set the field "Name" to "department"
+    And I set the field "Format option" to "department"
     And I press "Save changes"
     And I set the field "Add field format" to "Entryauthor"
     And I wait until the page is ready
     And I set the field "Name" to "picture"
+    And I set the field "Format option" to "picture"
     And I press "Save changes"
     And I set the field "Add field format" to "Entryauthor"
     And I wait until the page is ready
     And I set the field "Name" to "picturelarge"
+    And I set the field "Format option" to "picturelarge"
     And I press "Save changes"
     And I set the field "Add field format" to "Entryauthor"
     And I wait until the page is ready
     And I set the field "Name" to "badges"
+    And I set the field "Format option" to "badges"
     And I press "Save changes"
     And I set the field "Add field format" to "Entryauthor"
     And I wait until the page is ready
     And I set the field "Name" to "edit"
+    And I set the field "Format option" to "edit"
     And I press "Save changes"
 
     # Create field format for teammemberselect with subscribe option

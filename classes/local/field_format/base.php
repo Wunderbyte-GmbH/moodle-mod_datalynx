@@ -142,4 +142,14 @@ abstract class base {
     public function get_default_settings_for_name(string $name): array {
         return [];
     }
+
+    /**
+     * Returns whether this field format supports custom configuration options.
+     * Subclasses can override this to return false if they should be hidden from the UI.
+     *
+     * @return bool
+     */
+    public function has_options(): bool {
+        return true;
+    }
 }

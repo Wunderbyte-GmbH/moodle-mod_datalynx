@@ -366,6 +366,22 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             $data->param4 = '';
         }
 
+        // Replace double colons for ratings fields.
+        $textfields = [
+            'patterns', 'section', 'param1', 'param2', 'param3',
+            'param4', 'param5', 'param6', 'param7', 'param8',
+            'param9', 'param10',
+        ];
+        foreach ($textfields as $textfield) {
+            if (!empty($data->$textfield)) {
+                $data->$textfield = str_replace(
+                    ['##ratings:avg:bar##', '##ratings:avg:star##', '[[ratings:avg:bar]]', '[[ratings:avg:star]]'],
+                    ['##ratings:avgbar##', '##ratings:avgstar##', '[[ratings:avgbar]]', '[[ratings:avgstar]]'],
+                    $data->$textfield
+                );
+            }
+        }
+
         // Insert the datalynx_views record.
         $newitemid = $DB->insert_record('datalynx_views', $data);
         $this->set_mapping('datalynx_view', $oldid, $newitemid, true); // Files by this item id.

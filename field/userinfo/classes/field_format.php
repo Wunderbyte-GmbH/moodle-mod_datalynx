@@ -30,6 +30,36 @@ class field_format extends \mod_datalynx\local\field_format\base {
      * @param \MoodleQuickForm $mform
      */
     public function config_form(\MoodleQuickForm &$mform) {
-        // Default implementation does not add any extra elements.
+        $options = [
+            'text' => 'Text',
+            'checkbox' => 'Checkbox',
+            'datetime' => 'Date/time',
+            'richtext' => 'Rich text / Textarea',
+        ];
+
+        global $DB;
+        $customfields = $DB->get_records('user_info_field', null, 'sortorder ASC', 'shortname, name');
+        if ($customfields) {
+            foreach ($customfields as $cf) {
+                if (preg_match('/^[a-zA-Z0-9]+$/', $cf->shortname)) {
+                    $options[$cf->shortname] = format_string($cf->name);
+                }
+            }
+        }
+
+        $mform->addElement('select', 'option', get_string('fieldformatoption', 'mod_datalynx'), $options);
+        $mform->setType('option', PARAM_ALPHANUM);
+        $mform->addRule('option', get_string('required'), 'required', null, 'client');
+    }
+
+    /**
+     * Returns inferred default settings when a format is auto-created from a legacy
+     * hardcoded tag name.
+     *
+     * @param string $name The format name as detected from the template tag.
+     * @return array Key-value settings array, empty if no defaults apply.
+     */
+    public function get_default_settings_for_name(string $name): array {
+        return ['option' => $name];
     }
 }

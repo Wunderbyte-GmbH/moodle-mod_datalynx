@@ -81,9 +81,15 @@ class renderer extends datalynxfield_renderer {
 
         $field = $this->field;
         $fieldid = $field->id();
-        $types = array_intersect(['link', 'image', 'imageflex', 'media',
-        ], array_keys($options));
-        $type = isset($types[0]) ? $types[0] : '';
+
+        $fieldformat = $options['field_format'] ?? null;
+        if ($fieldformat) {
+            $type = $fieldformat->get_setting('option');
+        } else {
+            $types = array_intersect(['link', 'image', 'imageflex', 'media',
+            ], array_keys($options));
+            $type = isset($types[0]) ? $types[0] : '';
+        }
 
         $attributes = ['class' => $field->class, 'target' => $field->target];
 

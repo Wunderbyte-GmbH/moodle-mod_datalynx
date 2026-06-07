@@ -65,7 +65,7 @@ class renderer extends datalynxfield_renderer {
             // Check if format exists.
             $format = \mod_datalynx\local\field_format\manager::get_format_by_name($dlxid, $suffix);
             if ($format && $format->get_fieldtype() === 'entryauthor') {
-                $displayfield = $format->get_name();
+                $displayfield = $format->get_setting('option', $suffix);
             } else {
                 $displayfield = $suffix;
             }
@@ -91,14 +91,27 @@ class renderer extends datalynxfield_renderer {
             if (method_exists($this, $method)) {
                 $replacements[$tag] = ['html', $this->$method($entry)];
             } else {
-                // Fallback to user record field.
+                // Fallback to user record field or custom user profile field.
                 global $DB, $USER;
                 $userid = ($entry->id < 0) ? $USER->id : ($entry->userid ?? 0);
                 if ($userid > 0) {
                     $user = $DB->get_record('user', ['id' => $userid]);
-                    if ($user && isset($user->{$displayfield})) {
-                        $replacements[$tag] = ['html', s($user->{$displayfield})];
-                        continue;
+                    if ($user) {
+                        if (isset($user->{$displayfield})) {
+                            $replacements[$tag] = ['html', s($user->{$displayfield})];
+                            continue;
+                        }
+                        // Custom user profile field check.
+                        $customfieldid = $DB->get_field('user_info_field', 'id', ['shortname' => $displayfield]);
+                        if ($customfieldid) {
+                            $customdata = $DB->get_field(
+                                'user_info_data',
+                                'data',
+                                ['userid' => $userid, 'fieldid' => $customfieldid]
+                            );
+                            $replacements[$tag] = ['html', s($customdata !== false ? $customdata : '')];
+                            continue;
+                        }
                     }
                 }
                 $replacements[$tag] = '';
@@ -402,7 +415,8 @@ class renderer extends datalynxfield_renderer {
 
         foreach ($formats as $format) {
             $name = $format->get_name();
-            $ispictureformat = ($name === 'picture' || $name === 'picturelarge');
+            $option = $format->get_setting('option', $name);
+            $ispictureformat = ($option === 'picture' || $option === 'picturelarge');
             $ispicturefield = ($fieldinternalname === 'picture');
 
             if ($ispictureformat) {
@@ -410,20 +424,20 @@ class renderer extends datalynxfield_renderer {
                     $patterns["##author:{$name}##"] = [true, $cat];
                 }
             } else {
-                $exactfields = array_filter($this->field->dlx()->get_fields(), function ($f) use ($name) {
-                    return $f->type === 'entryauthor' && $f->get('internalname') === $name;
+                $exactfields = array_filter($this->field->dlx()->get_fields(), function ($f) use ($option) {
+                    return $f->type === 'entryauthor' && $f->get('internalname') === $option;
                 });
                 if (!empty($exactfields)) {
-                    if ($fieldinternalname === $name) {
+                    if ($fieldinternalname === $option) {
                         $patterns["##author:{$name}##"] = [true, $cat];
-                        if ($name === 'name') {
+                        if ($option === 'name') {
                             $patterns["##author:edit##"] = [true, $cat];
                         }
                     }
                 } else {
                     if ($fieldinternalname === 'name') {
                         $patterns["##author:{$name}##"] = [true, $cat];
-                        if ($name === 'name') {
+                        if ($option === 'name') {
                             $patterns["##author:edit##"] = [true, $cat];
                         }
                     }

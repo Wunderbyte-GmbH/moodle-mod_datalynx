@@ -30,6 +30,20 @@ class field_format extends \mod_datalynx\local\field_format\base {
      * @param \MoodleQuickForm $mform
      */
     public function config_form(\MoodleQuickForm &$mform) {
-        // Default implementation does not add any extra elements.
+        $mform->addElement('text', 'decimals', 'Decimal places');
+        $mform->setType('decimals', PARAM_INT);
+    }
+
+    /**
+     * Get legacy/default settings for name.
+     *
+     * @param string $name
+     * @return array
+     */
+    public function get_default_settings_for_name(string $name): array {
+        if (is_numeric($name)) {
+            return ['decimals' => (int)$name];
+        }
+        return [];
     }
 }

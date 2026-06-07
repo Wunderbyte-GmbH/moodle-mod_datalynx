@@ -155,14 +155,13 @@ class renderer extends datalynxfield_renderer {
                 }
 
                 // Check if format exists.
+                $option = $suffix;
                 $format = \mod_datalynx\local\field_format\manager::get_format_by_name($dlxid, $suffix);
                 if ($format && $format->get_fieldtype() === 'rating') {
-                    $displayfield = $format->get_name();
-                } else {
-                    $displayfield = $suffix;
+                    $option = $format->get_setting('option', $suffix);
                 }
 
-                switch ($displayfield) {
+                switch ($option) {
                     case 'count':
                         $str = !empty($entry->rating->count) ? $entry->rating->count : '-';
                         break;
@@ -188,9 +187,11 @@ class renderer extends datalynxfield_renderer {
                     case 'rate':
                         $str = $this->render_rating($entry);
                         break;
+                    case 'avgbar':
                     case 'avg:bar':
                         $str = $this->display_bar($entry, $aggravg);
                         break;
+                    case 'avgstar':
                     case 'avg:star':
                         $str = $this->display_star($entry, $aggravg);
                         break;
@@ -526,8 +527,8 @@ class renderer extends datalynxfield_renderer {
                     break;
                 case 'avgratings':
                     $patterns['##ratings:avg##'] = [true, $cat];
-                    $patterns['##ratings:avg:bar##'] = [false];
-                    $patterns['##ratings:avg:star##'] = [false];
+                    $patterns['##ratings:avgbar##'] = [false];
+                    $patterns['##ratings:avgstar##'] = [false];
                     break;
                 case 'countratings':
                     $patterns['##ratings:count##'] = [true, $cat];
@@ -553,7 +554,7 @@ class renderer extends datalynxfield_renderer {
                     $handles = in_array($name, ['rate', 'view', 'viewurl', 'viewinline'], true);
                     break;
                 case 'avgratings':
-                    $handles = in_array($name, ['avg', 'avg:bar', 'avg:star'], true);
+                    $handles = in_array($name, ['avg', 'avgbar', 'avgstar', 'avg:bar', 'avg:star'], true);
                     break;
                 case 'countratings':
                     $handles = ($name === 'count');

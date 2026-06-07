@@ -76,8 +76,14 @@ class renderer extends datalynxfield_renderer {
         $content = $entry->{"c{$fieldid}_content"};
 
         if (isset($content)) {
-            $width = $field->field->param1;
-            $height = $field->field->param2;
+            $fieldformat = $options['field_format'] ?? null;
+            if ($fieldformat) {
+                $width = $fieldformat->get_setting('width') ?: $field->field->param1;
+                $height = $fieldformat->get_setting('height') ?: $field->field->param2;
+            } else {
+                $width = $field->field->param1;
+                $height = $field->field->param2;
+            }
             $allow = "encrypted-media";
             $src = "https://www.youtube-nocookie.com/embed/" . $content;
             $str = "<iframe width='$width' height='$height' src='$src' ";

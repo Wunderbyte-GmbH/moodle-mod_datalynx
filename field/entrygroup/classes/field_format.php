@@ -32,4 +32,13 @@ class field_format extends \mod_datalynx\local\field_format\base {
     public function config_form(\MoodleQuickForm &$mform) {
         // Default implementation does not add any extra elements.
     }
+
+    /**
+     * Returns whether this field format supports custom configuration options.
+     *
+     * @return bool
+     */
+    public function has_options(): bool {
+        return false;
+    }
 }

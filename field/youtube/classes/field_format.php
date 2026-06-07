@@ -30,6 +30,9 @@ class field_format extends \mod_datalynx\local\field_format\base {
      * @param \MoodleQuickForm $mform
      */
     public function config_form(\MoodleQuickForm &$mform) {
-        // Default implementation does not add any extra elements.
+        $mform->addElement('text', 'width', 'Player Width');
+        $mform->setType('width', PARAM_INT);
+        $mform->addElement('text', 'height', 'Player Height');
+        $mform->setType('height', PARAM_INT);
     }
 }

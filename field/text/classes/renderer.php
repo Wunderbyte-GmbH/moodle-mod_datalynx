@@ -166,7 +166,17 @@ class renderer extends datalynxfield_renderer {
                 $formatoptions['filter'] = false;
             }
 
-            $str = $nolinkstart . format_string($content, $format, $formatoptions) . $nolinkend;
+            $str = format_string($content, $format, $formatoptions);
+
+            $fieldformat = $options['field_format'] ?? null;
+            if ($fieldformat) {
+                $maxlength = $fieldformat->get_setting('maxlength');
+                if (!empty($maxlength) && \core_text::strlen($str) > $maxlength) {
+                    $str = \core_text::substr($str, 0, $maxlength) . '...';
+                }
+            }
+
+            $str = $nolinkstart . $str . $nolinkend;
         } else {
             $str = '';
         }
