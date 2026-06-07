@@ -130,4 +130,16 @@ abstract class base {
         $settings = $this->get_settings();
         return $settings[$name] ?? $default;
     }
+
+    /**
+     * Returns inferred default settings when a format is auto-created from a legacy
+     * hardcoded tag name (e.g. ##author:firstname## -> name='firstname').
+     * Subclasses override this to populate meaningful default settings.
+     *
+     * @param string $name The format name as detected from the template tag.
+     * @return array Key-value settings array, empty if no defaults apply.
+     */
+    public function get_default_settings_for_name(string $name): array {
+        return [];
+    }
 }

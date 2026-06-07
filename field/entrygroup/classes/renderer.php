@@ -43,6 +43,7 @@ class renderer extends datalynxfield_renderer {
     public function replacements(?array $tags = null, $entry = null, ?array $options = null) {
         $field = $this->field;
         $edit = !empty($options['edit']) ? $options['edit'] : false;
+        $dlxid = $field->dlx()->id();
 
         // Set the group object.
         $group = new stdClass();
@@ -60,37 +61,40 @@ class renderer extends datalynxfield_renderer {
         $replacements = [];
 
         foreach ($tags as $tag) {
-            $replacements[$tag] = '';
-            switch (trim($tag, '@')) {
-                case '##group:id##':
-                    if (!empty($group->id)) {
-                        $replacements[$tag] = ['html', $group->id];
-                    }
-                    break;
+            $stripped = trim($tag, '@');
+            if (strpos($stripped, '##group:') === 0) {
+                $suffix = substr($stripped, strlen('##group:'), -2);
+            } else {
+                continue;
+            }
 
-                case '##group:name##':
+            // Check if format exists.
+            $format = \mod_datalynx\local\field_format\manager::get_format_by_name($dlxid, $suffix);
+            if ($format && $format->get_fieldtype() === 'entrygroup') {
+                $displayfield = $format->get_name();
+            } else {
+                $displayfield = $suffix;
+            }
+
+            switch ($displayfield) {
+                case 'id':
+                    $replacements[$tag] = !empty($group->id) ? ['html', $group->id] : '';
+                    break;
+                case 'name':
                     $replacements[$tag] = ['html', $group->name];
                     break;
-
-                case '##group:picture##':
+                case 'picture':
                     $replacements[$tag] = ['html',
                             print_group_picture($group, $field->dlx()->course->id, false, true),
                     ];
                     break;
-
-                case '##group:picturelarge##':
+                case 'picturelarge':
                     $replacements[$tag] = ['html',
                             print_group_picture($group, $field->dlx()->course->id, true, true),
                     ];
                     break;
-
-                case '##group:edit##':
-                    if (
-                        $edit && has_capability(
-                            'mod/datalynx:manageentries',
-                            $field->dlx()->context
-                        )
-                    ) {
+                case 'edit':
+                    if ($edit && has_capability('mod/datalynx:manageentries', $field->dlx()->context)) {
                         $replacements[$tag] = ['',
                                 [[$this, 'display_edit'], [$entry]],
                         ];
@@ -98,6 +102,16 @@ class renderer extends datalynxfield_renderer {
                         $replacements[$tag] = ['html', $group->name];
                     }
                     break;
+                default:
+                    // Fallback to core group record fields.
+                    if (!empty($group->id)) {
+                        $grouprecord = groups_get_group($group->id);
+                        if ($grouprecord && isset($grouprecord->{$displayfield})) {
+                            $replacements[$tag] = ['html', s($grouprecord->{$displayfield})];
+                            continue 2;
+                        }
+                    }
+                    $replacements[$tag] = '';
             }
         }
 
@@ -137,13 +151,24 @@ class renderer extends datalynxfield_renderer {
      */
     protected function patterns() {
         $cat = get_string('groupinfo', 'datalynx');
-
         $patterns = [];
-        $patterns['##group:id##'] = [true, $cat];
-        $patterns['##group:name##'] = [true, $cat];
-        $patterns['##group:picture##'] = [true, $cat];
-        $patterns['##group:picturelarge##'] = [false, $cat];
-        $patterns['##group:edit##'] = [true, $cat];
+
+        $formats = \mod_datalynx\local\field_format\manager::get_formats_for_instance(
+            $this->field->dlx()->id(),
+            'entrygroup'
+        );
+        if (empty($formats)) {
+            $patterns['##group:id##'] = [true, $cat];
+            $patterns['##group:name##'] = [true, $cat];
+            $patterns['##group:picture##'] = [true, $cat];
+            $patterns['##group:picturelarge##'] = [false, $cat];
+            $patterns['##group:edit##'] = [true, $cat];
+            return $patterns;
+        }
+
+        foreach ($formats as $format) {
+            $patterns["##group:{$format->get_name()}##"] = [true, $cat];
+        }
 
         return $patterns;
     }

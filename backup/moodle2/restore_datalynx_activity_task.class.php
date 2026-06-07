@@ -389,6 +389,11 @@ class restore_datalynx_activity_task extends restore_activity_task {
         $info = $this->get_info();
         $backupversion = $info->metadata->plugin_mod_datalynx_version ?? 0;
 
+        // Auto-create formats from templates if the backup is from an older version that didn't have field formats.
+        if ($backupversion > 0 && $backupversion < 2026060600) {
+            \mod_datalynx\local\field_format\manager::auto_create_formats_from_templates($this->get_activityid());
+        }
+
         // 2. Check if the backup version is older than our breaking change.
         if ($backupversion > 0 && $backupversion < 2026041000) {
             // 3. Queue an ad-hoc task to process this specific course.

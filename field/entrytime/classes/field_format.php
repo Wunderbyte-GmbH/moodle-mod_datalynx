@@ -30,6 +30,41 @@ class field_format extends \mod_datalynx\local\field_format\base {
      * @param \MoodleQuickForm $mform
      */
     public function config_form(\MoodleQuickForm &$mform) {
-        // Default implementation does not add any extra elements.
+        $mform->addElement('text', 'dateformat', get_string('fieldformat_dateformat', 'datalynxfield_entrytime'));
+        $mform->setType('dateformat', PARAM_TEXT);
+        $mform->addHelpButton('dateformat', 'fieldformat_dateformat', 'datalynxfield_entrytime');
+        $mform->addElement(
+            'static',
+            'dateformat_examples',
+            '',
+            get_string('fieldformat_dateformat_examples', 'datalynxfield_entrytime')
+        );
+    }
+
+
+    /**
+     * Inferred defaults mapping legacy tag suffixes.
+     *
+     * @param string $name
+     * @return array
+     */
+    public function get_default_settings_for_name(string $name): array {
+        $map = [
+            'date'      => get_string('strftimedate'),
+            'timestamp' => 'timestamp',
+            'minute'    => '%M',
+            'hour'      => '%H',
+            'day'       => '%a',
+            'd'         => '%a',
+            'week'      => '%V',
+            'month'     => '%b',
+            'm'         => '%m',
+            'year'      => '%Y',
+            'Y'         => '%Y',
+        ];
+        if (isset($map[$name])) {
+            return ['dateformat' => $map[$name]];
+        }
+        return [];
     }
 }

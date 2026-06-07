@@ -143,38 +143,55 @@ class renderer extends datalynxfield_renderer {
 
         // No edit mode for this field so just return html.
         $replacements = [];
+        $dlxid = $field->dlx()->id();
+
         foreach ($tags as $tag) {
             if ($entry->id > 0 && !empty($entry->rating)) {
-                switch (trim($tag, '@')) {
-                    case '##ratings:count##':
+                $stripped = trim($tag, '@');
+                if (strpos($stripped, '##ratings:') === 0) {
+                    $suffix = substr($stripped, strlen('##ratings:'), -2);
+                } else {
+                    continue;
+                }
+
+                // Check if format exists.
+                $format = \mod_datalynx\local\field_format\manager::get_format_by_name($dlxid, $suffix);
+                if ($format && $format->get_fieldtype() === 'rating') {
+                    $displayfield = $format->get_name();
+                } else {
+                    $displayfield = $suffix;
+                }
+
+                switch ($displayfield) {
+                    case 'count':
                         $str = !empty($entry->rating->count) ? $entry->rating->count : '-';
                         break;
-                    case '##ratings:avg##':
+                    case 'avg':
                         $str = !empty($aggravg) ? $aggravg : '-';
                         break;
-                    case '##ratings:max##':
+                    case 'max':
                         $str = !empty($aggrmax) ? $aggrmax : '-';
                         break;
-                    case '##ratings:min##':
+                    case 'min':
                         $str = !empty($aggrmin) ? $aggrmin : '-';
                         break;
-                    case '##ratings:sum##':
+                    case 'sum':
                         $str = !empty($aggrsum) ? $aggrsum : '-';
                         break;
-                    case '##ratings:view##':
-                    case '##ratings:viewurl##':
+                    case 'view':
+                    case 'viewurl':
                         $str = $this->display_view($entry, $tag);
                         break;
-                    case '##ratings:viewinline##':
+                    case 'viewinline':
                         $str = $this->display_view_inline($entry);
                         break;
-                    case '##ratings:rate##':
+                    case 'rate':
                         $str = $this->render_rating($entry);
                         break;
-                    case '##ratings:avg:bar##':
+                    case 'avg:bar':
                         $str = $this->display_bar($entry, $aggravg);
                         break;
-                    case '##ratings:avg:star##':
+                    case 'avg:star':
                         $str = $this->display_star($entry, $aggravg);
                         break;
                     default:
@@ -493,43 +510,67 @@ class renderer extends datalynxfield_renderer {
     protected function patterns() {
         $fieldinternalname = $this->field->get('internalname');
         $cat = get_string('ratings', 'datalynx');
-
         $patterns = [];
-        switch ($fieldinternalname) {
-            case 'ratings':
-                $patterns['##ratings:rate##'] = [true, $cat,
-                ];
-                $patterns['##ratings:view##'] = [true, $cat,
-                ];
-                $patterns['##ratings:viewurl##'] = [false,
-                ];
-                $patterns['##ratings:viewinline##'] = [true, $cat,
-                ];
-                break;
-            case 'avgratings':
-                $patterns['##ratings:avg##'] = [true, $cat,
-                ];
-                $patterns['##ratings:avg:bar##'] = [false,
-                ];
-                $patterns['##ratings:avg:star##'] = [false,
-                ];
-                break;
-            case 'countratings':
-                $patterns['##ratings:count##'] = [true, $cat,
-                ];
-                break;
-            case 'maxratings':
-                $patterns['##ratings:max##'] = [true, $cat,
-                ];
-                break;
-            case 'minratings':
-                $patterns['##ratings:min##'] = [true, $cat,
-                ];
-                break;
-            case 'sumratings':
-                $patterns['##ratings:sum##'] = [true, $cat,
-                ];
-                break;
+
+        $formats = \mod_datalynx\local\field_format\manager::get_formats_for_instance(
+            $this->field->dlx()->id(),
+            'rating'
+        );
+        if (empty($formats)) {
+            switch ($fieldinternalname) {
+                case 'ratings':
+                    $patterns['##ratings:rate##'] = [true, $cat];
+                    $patterns['##ratings:view##'] = [true, $cat];
+                    $patterns['##ratings:viewurl##'] = [false];
+                    $patterns['##ratings:viewinline##'] = [true, $cat];
+                    break;
+                case 'avgratings':
+                    $patterns['##ratings:avg##'] = [true, $cat];
+                    $patterns['##ratings:avg:bar##'] = [false];
+                    $patterns['##ratings:avg:star##'] = [false];
+                    break;
+                case 'countratings':
+                    $patterns['##ratings:count##'] = [true, $cat];
+                    break;
+                case 'maxratings':
+                    $patterns['##ratings:max##'] = [true, $cat];
+                    break;
+                case 'minratings':
+                    $patterns['##ratings:min##'] = [true, $cat];
+                    break;
+                case 'sumratings':
+                    $patterns['##ratings:sum##'] = [true, $cat];
+                    break;
+            }
+            return $patterns;
+        }
+
+        foreach ($formats as $format) {
+            $name = $format->get_name();
+            $handles = false;
+            switch ($fieldinternalname) {
+                case 'ratings':
+                    $handles = in_array($name, ['rate', 'view', 'viewurl', 'viewinline'], true);
+                    break;
+                case 'avgratings':
+                    $handles = in_array($name, ['avg', 'avg:bar', 'avg:star'], true);
+                    break;
+                case 'countratings':
+                    $handles = ($name === 'count');
+                    break;
+                case 'maxratings':
+                    $handles = ($name === 'max');
+                    break;
+                case 'minratings':
+                    $handles = ($name === 'min');
+                    break;
+                case 'sumratings':
+                    $handles = ($name === 'sum');
+                    break;
+            }
+            if ($handles) {
+                $patterns["##ratings:{$name}##"] = [true, $cat];
+            }
         }
 
         return $patterns;

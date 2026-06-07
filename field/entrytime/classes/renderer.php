@@ -44,6 +44,7 @@ class renderer extends datalynxfield_renderer {
     public function replacements(?array $tags = null, $entry = null, ?array $options = null) {
         $field = $this->field;
         $fieldname = $field->get('internalname');
+        $dlxid = $field->dlx()->id();
 
         // No edit mode.
         $replacements = [];
@@ -53,42 +54,52 @@ class renderer extends datalynxfield_renderer {
             if ($entry->id < 0) {
                 $replacements[$tag] = '';
             } else {
-                $format = (strpos($tag, "{$fieldname}:") !== false ? str_replace(
+                $suffix = (strpos($tag, "{$fieldname}:") !== false ? str_replace(
                     "{$fieldname}:",
                     '',
                     trim($tag, '#@')
                 ) : '');
-                switch ($format) {
+
+                // Check if format exists.
+                $format = \mod_datalynx\local\field_format\manager::get_format_by_name($dlxid, $suffix);
+                if ($format && $format->get_fieldtype() === 'entrytime') {
+                    $dateformat = $format->get_setting('dateformat') ?: $suffix;
+                } else {
+                    $dateformat = $suffix;
+                }
+
+                switch ($dateformat) {
                     case 'date':
-                        $format = get_string('strftimedate');
+                        $dateformat = get_string('strftimedate');
                         break;
                     case 'timestamp':
-                        $format = '';
-                        break;
+                        $replacements[$tag] = ['html', (string)($entry->{$fieldname} ?? '')];
+                        continue 2;
                     case 'minute':
-                        $format = '%M';
+                        $dateformat = '%M';
                         break;
                     case 'hour':
-                        $format = '%H';
+                        $dateformat = '%H';
                         break;
                     case 'day':
-                        $format = '%a';
+                    case 'd':
+                        $dateformat = '%a';
                         break;
                     case 'week':
-                        $format = '%V';
+                        $dateformat = '%V';
                         break;
                     case 'month':
-                        $format = '%b';
+                        $dateformat = '%b';
                         break;
                     case 'm':
-                        $format = '%m';
+                        $dateformat = '%m';
                         break;
                     case 'year':
                     case 'Y':
-                        $format = '%Y';
+                        $dateformat = '%Y';
                         break;
                 }
-                $replacements[$tag] = ['html', userdate($entry->{$fieldname}, $format)];
+                $replacements[$tag] = ['html', userdate($entry->{$fieldname}, $dateformat)];
             }
         }
 
@@ -162,28 +173,32 @@ class renderer extends datalynxfield_renderer {
     protected function patterns() {
         $fieldname = $this->field->get('internalname');
         $cat = get_string('entryinfo', 'datalynx');
-
         $patterns = [];
+
+        $formats = \mod_datalynx\local\field_format\manager::get_formats_for_instance(
+            $this->field->dlx()->id(),
+            'entrytime'
+        );
+        if (empty($formats)) {
+            $patterns["##$fieldname##"] = [true, $cat];
+            $patterns["##$fieldname:date##"] = [true, $cat];
+            $patterns["##$fieldname:timestamp##"] = [true, $cat];
+            $patterns["##$fieldname:minute##"] = [false];
+            $patterns["##$fieldname:hour##"] = [false];
+            $patterns["##$fieldname:day##"] = [false];
+            $patterns["##$fieldname:d##"] = [false];
+            $patterns["##$fieldname:week##"] = [false];
+            $patterns["##$fieldname:month##"] = [false];
+            $patterns["##$fieldname:m##"] = [false];
+            $patterns["##$fieldname:year##"] = [false];
+            $patterns["##$fieldname:Y##"] = [false];
+            return $patterns;
+        }
+
         $patterns["##$fieldname##"] = [true, $cat];
-        // Date without time.
-        $patterns["##$fieldname:date##"] = [true, $cat];
-        // Date with time.
-        $patterns["##$fieldname:timestamp##"] = [true, $cat];
-        // Minute (M).
-        $patterns["##$fieldname:minute##"] = [false];
-        // Hour (H).
-        $patterns["##$fieldname:hour##"] = [false];
-        // Day (a).
-        $patterns["##$fieldname:day##"] = [false];
-        $patterns["##$fieldname:d##"] = [false];
-        // Week (V).
-        $patterns["##$fieldname:week##"] = [false];
-        // Month (b).
-        $patterns["##$fieldname:month##"] = [false];
-        $patterns["##$fieldname:m##"] = [false];
-        // Year (G).
-        $patterns["##$fieldname:year##"] = [false];
-        $patterns["##$fieldname:Y##"] = [false];
+        foreach ($formats as $format) {
+            $patterns["##{$fieldname}:{$format->get_name()}##"] = [true, $cat];
+        }
 
         return $patterns;
     }

@@ -51,23 +51,41 @@ class renderer extends datalynxfield_renderer {
     public function replacements(?array $tags = null, $entry = null, ?array $options = null) {
         global $CFG;
 
-        // No edit mode.
         $replacements = array_fill_keys($tags, '');
+        $dlxid = $this->field->dlx()->id();
 
-        // No edit mode for this field so just return html.
         if ($entry->id > 0 && !empty($CFG->usecomments)) {
             foreach ($tags as $tag) {
-                switch (trim($tag, '@')) {
-                    case '##comments:count##':
-                        $options = ['count' => true];
-                        $str = $this->display_browse($entry, $options);
+                $stripped = trim($tag, '@');
+
+                if ($stripped === '##comments##') {
+                    $str = $this->display_browse($entry);
+                    $replacements[$tag] = ['html', $str];
+                    continue;
+                }
+
+                if (strpos($stripped, '##comments:') === 0) {
+                    $suffix = substr($stripped, strlen('##comments:'), -2);
+                } else {
+                    continue;
+                }
+
+                // Check if format exists.
+                $format = \mod_datalynx\local\field_format\manager::get_format_by_name($dlxid, $suffix);
+                if ($format && $format->get_fieldtype() === 'comment') {
+                    $displayfield = $format->get_name();
+                } else {
+                    $displayfield = $suffix;
+                }
+
+                switch ($displayfield) {
+                    case 'count':
+                        $str = $this->display_browse($entry, ['count' => true]);
                         break;
-                    case '##comments:inline##':
-                        $options = ['notoggle' => true, 'autostart' => true];
-                        $str = $this->display_browse($entry, $options);
+                    case 'inline':
+                        $str = $this->display_browse($entry, ['notoggle' => true, 'autostart' => true]);
                         break;
-                    case '##comments##':
-                    case '##comments:add##':
+                    case 'add':
                         $str = $this->display_browse($entry);
                         break;
                     default:
@@ -153,12 +171,24 @@ class renderer extends datalynxfield_renderer {
      */
     protected function patterns() {
         $cat = get_string('comments', 'datalynx');
-
         $patterns = [];
+
+        $formats = \mod_datalynx\local\field_format\manager::get_formats_for_instance(
+            $this->field->dlx()->id(),
+            'comment'
+        );
+        if (empty($formats)) {
+            $patterns['##comments##'] = [true, $cat];
+            $patterns['##comments:count##'] = [true, $cat];
+            $patterns['##comments:inline##'] = [true, $cat];
+            $patterns['##comments:add##'] = [false];
+            return $patterns;
+        }
+
         $patterns['##comments##'] = [true, $cat];
-        $patterns['##comments:count##'] = [true, $cat];
-        $patterns['##comments:inline##'] = [true, $cat];
-        $patterns['##comments:add##'] = [false];
+        foreach ($formats as $format) {
+            $patterns["##comments:{$format->get_name()}##"] = [true, $cat];
+        }
 
         return $patterns;
     }

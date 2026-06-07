@@ -1260,6 +1260,31 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2026060600, 'datalynx');
     }
 
+    if ($oldversion < 2026060601) {
+        // Re-run the scan to auto-create formats for newly supported virtual field tags (ratings, comments, etc.).
+        \mod_datalynx\local\field_format\manager::auto_create_formats_from_all_instances();
+
+        // Populate inferred default settings (like dateformat for entrytime formats).
+        $formats = $DB->get_records('datalynx_field_formats');
+        foreach ($formats as $formatrec) {
+            $existing = json_decode($formatrec->settings ?? '{}', true);
+            if (!empty($existing)) {
+                continue;
+            }
+            $classname = "\\datalynxfield_{$formatrec->fieldtype}\\field_format";
+            if (class_exists($classname)) {
+                $instance  = new $classname($formatrec);
+                $defaults  = $instance->get_default_settings_for_name($formatrec->name);
+                if (!empty($defaults)) {
+                    $formatrec->settings = json_encode($defaults);
+                    $DB->update_record('datalynx_field_formats', $formatrec);
+                }
+            }
+        }
+
+        upgrade_mod_savepoint(true, 2026060601, 'datalynx');
+    }
+
     return true;
 }
 
