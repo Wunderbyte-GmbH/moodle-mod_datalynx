@@ -22,4 +22,5 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+$string['fieldformat_desc'] = 'Controls how the rating is displayed. Type one of the following options as the format Name: rate, view, viewurl, viewinline, avg, count, max, min, sum.';
 $string['pluginname'] = 'Datalynx Rating Field';

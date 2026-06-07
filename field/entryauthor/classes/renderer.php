@@ -50,42 +50,58 @@ class renderer extends datalynxfield_renderer {
      */
     public function replacements(?array $tags = null, $entry = null, ?array $options = null) {
         $field = $this->field;
-        $fieldname = $field->get('internalname');
         $edit = !empty($options['edit']) ? $options['edit'] : false;
-
-        // No edit mode.
+        $dlxid = $field->dlx()->id();
         $replacements = [];
 
-        // Edit author name.
-        if ($fieldname == 'name') {
-            // Two tags are possible.
-            foreach ($tags as $tag) {
-                if (
-                    trim($tag, '@') == "##author:edit##" && $edit &&
-                        has_capability('mod/datalynx:manageentries', $field->dlx()->context)
-                ) {
-                    $replacements[$tag] = ['',
-                            [[$this, 'display_edit'], [$entry]]];
-                } else {
-                    $replacements[$tag] = ['html', $this->{"display_$fieldname"}($entry)];
-                }
+        foreach ($tags as $tag) {
+            $stripped = trim($tag, '@');
+            if (strpos($stripped, '##author:') === 0) {
+                $suffix = substr($stripped, strlen('##author:'), -2);
+            } else {
+                continue;
             }
 
-            // If not picture there is only one possible tag so no check.
-        } else {
-            if ($fieldname != 'picture') {
-                $replacements["##author:{$fieldname}##@"] = ['html', $this->{"display_$fieldname"}($entry)];
-                $replacements["##author:{$fieldname}##"] = ['html', $this->{"display_$fieldname"}($entry)];
-
-                // For picture switch on $tags.
+            // Check if format exists.
+            $format = \mod_datalynx\local\field_format\manager::get_format_by_name($dlxid, $suffix);
+            if ($format && $format->get_fieldtype() === 'entryauthor') {
+                $displayfield = $format->get_name();
             } else {
-                foreach ($tags as $tag) {
-                    if (trim($tag, '@') == "##author:picturelarge##") {
-                        $replacements[$tag] = ['html', $this->{"display_$fieldname"}($entry, true)];
-                    } else {
-                        $replacements[$tag] = ['html', $this->{"display_$fieldname"}($entry)];
+                $displayfield = $suffix;
+            }
+
+            // Edit tag case.
+            if ($displayfield === 'edit') {
+                if ($edit && has_capability('mod/datalynx:manageentries', $field->dlx()->context)) {
+                    $replacements[$tag] = ['', [[$this, 'display_edit'], [$entry]]];
+                } else {
+                    $replacements[$tag] = ['html', $this->display_name($entry)];
+                }
+                continue;
+            }
+
+            // Picture large case.
+            if ($displayfield === 'picturelarge') {
+                $replacements[$tag] = ['html', $this->display_picture($entry, true)];
+                continue;
+            }
+
+            // Call display method if it exists.
+            $method = "display_{$displayfield}";
+            if (method_exists($this, $method)) {
+                $replacements[$tag] = ['html', $this->$method($entry)];
+            } else {
+                // Fallback to user record field.
+                global $DB, $USER;
+                $userid = ($entry->id < 0) ? $USER->id : ($entry->userid ?? 0);
+                if ($userid > 0) {
+                    $user = $DB->get_record('user', ['id' => $userid]);
+                    if ($user && isset($user->{$displayfield})) {
+                        $replacements[$tag] = ['html', s($user->{$displayfield})];
+                        continue;
                     }
                 }
+                $replacements[$tag] = '';
             }
         }
 
@@ -367,16 +383,49 @@ class renderer extends datalynxfield_renderer {
     protected function patterns() {
         $fieldinternalname = $this->field->get('internalname');
         $cat = get_string('authorinfo', 'datalynx');
-
         $patterns = [];
-        $patterns["##author:{$fieldinternalname}##"] = [true, $cat];
-        // For user name add edit tag.
-        if ($fieldinternalname == 'name') {
-            $patterns["##author:edit##"] = [true, $cat];
+
+        $formats = \mod_datalynx\local\field_format\manager::get_formats_for_instance(
+            $this->field->dlx()->id(),
+            'entryauthor'
+        );
+        if (empty($formats)) {
+            $patterns["##author:{$fieldinternalname}##"] = [true, $cat];
+            if ($fieldinternalname === 'name') {
+                $patterns["##author:edit##"] = [true, $cat];
+            }
+            if ($fieldinternalname === 'picture') {
+                $patterns["##author:picturelarge##"] = [true, $cat];
+            }
+            return $patterns;
         }
-        // For user picture add the large picture.
-        if ($fieldinternalname == 'picture') {
-            $patterns["##author:picturelarge##"] = [true, $cat];
+
+        foreach ($formats as $format) {
+            $name = $format->get_name();
+            $ispictureformat = ($name === 'picture' || $name === 'picturelarge');
+            $ispicturefield = ($fieldinternalname === 'picture');
+
+            if ($ispictureformat) {
+                if ($ispicturefield) {
+                    $patterns["##author:{$name}##"] = [true, $cat];
+                }
+            } else {
+                $exactfields = array_filter($this->field->dlx()->get_fields(), function ($f) use ($name) {
+                    return $f->type === 'entryauthor' && $f->internalname === $name;
+                });
+                if (!empty($exactfields)) {
+                    if ($fieldinternalname === $name) {
+                        $patterns["##author:{$name}##"] = [true, $cat];
+                    }
+                } else {
+                    if ($fieldinternalname === 'name') {
+                        $patterns["##author:{$name}##"] = [true, $cat];
+                        if ($name === 'name') {
+                            $patterns["##author:edit##"] = [true, $cat];
+                        }
+                    }
+                }
+            }
         }
 
         return $patterns;

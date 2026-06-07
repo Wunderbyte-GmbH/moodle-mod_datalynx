@@ -22,6 +22,7 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+$string['fieldformat_desc'] = 'Controls which attribute of the entry author is displayed. Type one of the following attributes as the format Name: id, name, firstname, lastname, username, idnumber, email, institution, department, picture, picturelarge, badges, edit.';
 $string['pluginname'] = 'Entryauthor';
 $string['privacy:metadata'] = 'The field entryauthor does not store personal data.';
 $string['useremail'] = 'User email';

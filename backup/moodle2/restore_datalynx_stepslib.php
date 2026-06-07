@@ -794,8 +794,5 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
                 }
             }
         }
-
-        // Auto-create formats from restored templates.
-        \mod_datalynx\local\field_format\manager::auto_create_formats_from_templates($datalynxnewid);
     }
 }

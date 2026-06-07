@@ -22,4 +22,5 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+$string['fieldformat_desc'] = 'Controls comments display. Type one of the following options as the format Name: count, inline, add.';
 $string['pluginname'] = 'Datalynx Comment Field';

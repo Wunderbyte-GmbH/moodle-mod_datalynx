@@ -24,15 +24,31 @@ namespace mod_datalynx\local\field_format;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class manager {
+    /** @var array<string, base[]> Static cache for instance formats. */
+    private static array $instancecache = [];
+
+    /** @var array<string, base|null> Static cache for formats by name. */
+    private static array $namecache = [];
+
     /**
      * Fetch all formats defined for a specific Datalynx instance.
      *
      * @param int $datalynxid The datalynx instance ID.
+     * @param string $fieldtype Optional field type to filter by.
      * @return base[] List of format objects.
      */
-    public static function get_formats_for_instance(int $datalynxid): array {
+    public static function get_formats_for_instance(int $datalynxid, string $fieldtype = ''): array {
         global $DB;
-        $records = $DB->get_records('datalynx_field_formats', ['dataid' => $datalynxid], 'name ASC');
+        $cachekey = $datalynxid . ':' . $fieldtype;
+        if (isset(self::$instancecache[$cachekey])) {
+            return self::$instancecache[$cachekey];
+        }
+
+        $params = ['dataid' => $datalynxid];
+        if ($fieldtype !== '') {
+            $params['fieldtype'] = $fieldtype;
+        }
+        $records = $DB->get_records('datalynx_field_formats', $params, 'name ASC');
         $formats = [];
         foreach ($records as $record) {
             $instance = self::get_format_instance($record);
@@ -40,6 +56,7 @@ class manager {
                 $formats[$record->id] = $instance;
             }
         }
+        self::$instancecache[$cachekey] = $formats;
         return $formats;
     }
 
@@ -67,11 +84,15 @@ class manager {
      */
     public static function get_format_by_name(int $datalynxid, string $name): ?base {
         global $DB;
-        $record = $DB->get_record('datalynx_field_formats', ['dataid' => $datalynxid, 'name' => $name]);
-        if ($record) {
-            return self::get_format_instance($record);
+        $cachekey = $datalynxid . ':' . $name;
+        if (array_key_exists($cachekey, self::$namecache)) {
+            return self::$namecache[$cachekey];
         }
-        return null;
+
+        $record = $DB->get_record('datalynx_field_formats', ['dataid' => $datalynxid, 'name' => $name]);
+        $result = $record ? self::get_format_instance($record) : null;
+        self::$namecache[$cachekey] = $result;
+        return $result;
     }
 
     /**
@@ -82,6 +103,8 @@ class manager {
      */
     public static function save_format(\stdClass $record): int {
         global $DB;
+        self::$instancecache = [];
+        self::$namecache = [];
         if (empty($record->id)) {
             return $DB->insert_record('datalynx_field_formats', $record);
         } else {
@@ -99,6 +122,8 @@ class manager {
      */
     public static function delete_format(int $formatid): bool {
         global $DB;
+        self::$instancecache = [];
+        self::$namecache = [];
         $format = self::get_format_by_id($formatid);
         if (!$format) {
             return false;
@@ -212,6 +237,11 @@ class manager {
 
         // Add special handling for "author" as "entryauthor" field type.
         $fieldsbyname['author'] = 'entryauthor';
+        $fieldsbyname['group'] = 'entrygroup';
+        $fieldsbyname['timecreated'] = 'entrytime';
+        $fieldsbyname['timemodified'] = 'entrytime';
+        $fieldsbyname['ratings'] = 'rating';
+        $fieldsbyname['comments'] = 'comment';
 
         // Fetch all views for this datalynx instance.
         $views = $DB->get_records('datalynx_views', ['dataid' => $datalynxid]);
@@ -294,7 +324,7 @@ class manager {
                     $newrecord->name = $formatname;
                     $newrecord->fieldtype = $fieldtype;
                     $newrecord->settings = json_encode(new \stdClass());
-                    $DB->insert_record('datalynx_field_formats', $newrecord);
+                    self::save_format($newrecord);
                 }
             }
         }

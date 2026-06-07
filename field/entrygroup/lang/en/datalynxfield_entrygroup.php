@@ -22,9 +22,7 @@
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-$string['##group:description##'] = '##group:description##';
-$string['##group:id##'] = '##group:id##';
-$string['##group:name##'] = '##group:name##';
+$string['fieldformat_desc'] = 'Controls which attribute of the entry group is displayed. Type one of the following attributes as the format Name: id, name, picture, picturelarge, edit.';
 $string['group'] = 'Group';
 $string['pluginname'] = 'Entrygroup';
 $string['privacy:metadata'] = 'The field entrygroup does not store personal data.';
