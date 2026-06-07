@@ -104,6 +104,11 @@ class renderer extends datalynxfield_renderer {
             $subscribeenabled && $hasadmissiblerole && (!$teamfull || $userismember) &&
                 (!$userismember || $canunsubscribe)
         ) {
+            $userurl = new moodle_url(
+                '/user/view.php',
+                ['course' => $field->dlx()->course->id, 'id' => $USER->id]
+            );
+
             $str .= html_writer::link(
                 new moodle_url(
                     '/mod/datalynx/view.php',
@@ -115,12 +120,13 @@ class renderer extends datalynxfield_renderer {
                 ),
                 get_string($userismember ? 'unsubscribe' : 'subscribe', 'datalynx'),
                 [
-                'class' => 'datalynxfield_subscribe' . ($userismember ? ' subscribed' : '')]
-            );
-
-            $userurl = new moodle_url(
-                '/user/view.php',
-                ['course' => $field->dlx()->course->id, 'id' => $USER->id]
+                    'class' => 'datalynxfield_subscribe' . ($userismember ? ' subscribed' : ''),
+                    'data-userurl' => $userurl->out(false),
+                    'data-username' => fullname($USER),
+                    'data-canunsubscribe' => $canunsubscribe ? 1 : 0,
+                    'data-subscribestring' => get_string('subscribe', 'datalynx'),
+                    'data-unsubscribestring' => get_string('unsubscribe', 'datalynx'),
+                ]
             );
 
             // Load JS.

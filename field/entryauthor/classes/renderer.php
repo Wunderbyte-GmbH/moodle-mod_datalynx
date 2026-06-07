@@ -411,11 +411,14 @@ class renderer extends datalynxfield_renderer {
                 }
             } else {
                 $exactfields = array_filter($this->field->dlx()->get_fields(), function ($f) use ($name) {
-                    return $f->type === 'entryauthor' && $f->internalname === $name;
+                    return $f->type === 'entryauthor' && $f->get('internalname') === $name;
                 });
                 if (!empty($exactfields)) {
                     if ($fieldinternalname === $name) {
                         $patterns["##author:{$name}##"] = [true, $cat];
+                        if ($name === 'name') {
+                            $patterns["##author:edit##"] = [true, $cat];
+                        }
                     }
                 } else {
                     if ($fieldinternalname === 'name') {

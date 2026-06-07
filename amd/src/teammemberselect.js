@@ -21,161 +21,186 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['core/ajax', 'core/toast', 'core/str'], function(Ajax, Toast, Str) {
-    const configs = [];
-    let isListening = false;
-    let stringsPromise;
+import Ajax from 'core/ajax';
+import Toast from 'core/toast';
+import * as Str from 'core/str';
 
-    const getStrings = () => {
-        if (!stringsPromise) {
-            stringsPromise = Promise.all([
-                Str.get_string('subscribe', 'mod_datalynx'),
-                Str.get_string('unsubscribe', 'mod_datalynx')
-            ]);
-        }
+const configs = [];
+let isListening = false;
+let stringsPromise;
 
-        return stringsPromise;
-    };
+const getStrings = () => {
+    if (!stringsPromise) {
+        stringsPromise = Promise.all([
+            Str.get_string('subscribe', 'mod_datalynx'),
+            Str.get_string('unsubscribe', 'mod_datalynx')
+        ]);
+    }
 
-    const api = {
-        init(datalynxId, fieldId, userurl, userName, canUnsubscribe) {
-            return getStrings().then(strings => {
-                if (!configs.some(config =>
-                    config.datalynxId === String(datalynxId) && config.fieldId === String(fieldId)
-                )) {
-                    configs.push({
-                        datalynxId: String(datalynxId),
-                        fieldId: String(fieldId),
-                        userurl,
-                        userName,
-                        canUnsubscribe,
-                        subscribeString: strings[0],
-                        unsubscribeString: strings[1],
-                    });
-                }
+    return stringsPromise;
+};
 
-                if (!isListening) {
-                    document.addEventListener('click', handleDocumentClick);
-                    isListening = true;
-                }
-
-                return strings;
-            }).catch(error => {
-                Toast.add(error.message);
-                return null;
-            });
-        },
-
-        handleSubscription(link, params, userurl, username, canunsubscribe,
-                           subscribeString, unsubscribeString) {
-            Ajax.call([{
-                methodname: 'mod_datalynx_team_subscription',
-                args: params,
-                done: (response) => {
-                    if (response.success) {
-                        if (link.classList.contains('subscribed')) {
-                            if (canunsubscribe) {
-                                this.updateSubscriptionLink(link, 'subscribe', subscribeString);
-                                this.removeUserFromList(link.parentElement, userurl);
-                            }
-                        } else {
-                            this.updateSubscriptionLink(link, 'unsubscribe', unsubscribeString);
-                            this.addUserToList(link.parentElement, userurl, username);
+const api = {
+    handleSubscription(link, params, userurl, username, canunsubscribe,
+                       subscribeString, unsubscribeString) {
+        Ajax.call([{
+            methodname: 'mod_datalynx_team_subscription',
+            args: params,
+            done: (response) => {
+                if (response.success) {
+                    if (link.classList.contains('subscribed')) {
+                        if (canunsubscribe) {
+                            this.updateSubscriptionLink(link, 'subscribe', subscribeString);
+                            this.removeUserFromList(link.parentElement, userurl);
                         }
                     } else {
-                        const errorMessage = response.error;
-                        Toast.add(errorMessage);
+                        this.updateSubscriptionLink(link, 'unsubscribe', unsubscribeString);
+                        this.addUserToList(link.parentElement, userurl, username);
                     }
-                },
-                fail: (error) => {
-                    const errorMessage = error.message;
+                } else {
+                    const errorMessage = response.error;
                     Toast.add(errorMessage);
                 }
-            }]);
-        },
+            },
+            fail: (error) => {
+                const errorMessage = error.message;
+                Toast.add(errorMessage);
+            }
+        }]);
+    },
 
-        updateSubscriptionLink(link, action, text) {
-            link.classList.toggle('subscribed');
-            link.title = text;
-            link.textContent = text;
-            link.href = link.href.replace(/(subscribe|unsubscribe)/, action);
-        },
+    updateSubscriptionLink(link, action, text) {
+        link.classList.toggle('subscribed');
+        link.title = text;
+        link.textContent = text;
+        link.href = link.href.replace(/(subscribe|unsubscribe)/, action);
+    },
 
-        removeUserFromList(linkContainer, userurl) {
-            if (linkContainer) {
-                const teamMemberList = linkContainer.querySelector('.team-member-list');
-                if (teamMemberList) {
-                    const listItem = teamMemberList.querySelector(`li a[href="${userurl}"]`);
-                    if (listItem) {
-                        listItem.closest('li').remove();
-                        if (teamMemberList.children.length === 0) {
-                            teamMemberList.remove();
-                        }
+    removeUserFromList(linkContainer, userurl) {
+        if (linkContainer) {
+            const teamMemberList = linkContainer.querySelector('.team-member-list');
+            if (teamMemberList) {
+                const listItem = teamMemberList.querySelector(`li a[href="${userurl}"]`);
+                if (listItem) {
+                    listItem.closest('li').remove();
+                    if (teamMemberList.children.length === 0) {
+                        teamMemberList.remove();
                     }
                 }
             }
-        },
+        }
+    },
 
-        addUserToList(linkContainer, userurl, username) {
-            let teamMemberList = linkContainer.querySelector('.team-member-list');
-            if (!teamMemberList) {
-                teamMemberList = document.createElement('ul');
-                teamMemberList.classList.add('team-member-list');
-                linkContainer.insertBefore(teamMemberList, linkContainer.querySelector("a.datalynxfield_subscribe"));
+    addUserToList(linkContainer, userurl, username) {
+        let teamMemberList = linkContainer.querySelector('.team-member-list');
+        if (!teamMemberList) {
+            teamMemberList = document.createElement('ul');
+            teamMemberList.classList.add('team-member-list');
+            linkContainer.insertBefore(teamMemberList, linkContainer.querySelector("a.datalynxfield_subscribe"));
+        }
+
+        const listItem = document.createElement('li');
+        listItem.innerHTML = `<a href="${userurl}">${username}</a>`;
+        teamMemberList.appendChild(listItem);
+    },
+
+    extractParams(paramString) {
+        return paramString.split('&').reduce((acc, param) => {
+            const [key, value] = param.split('=');
+            acc[key] = decodeURIComponent(value || '');
+            return acc;
+        }, {});
+    }
+};
+
+const getConfigForLink = (link) => {
+    const params = api.extractParams(link.href.split('?')[1] || '');
+    if (!params.fieldid) {
+        return null;
+    }
+
+    let config = configs.find(config =>
+        config.fieldId === params.fieldid && !!link.closest(`[data-id="${config.datalynxId}"]`)
+    );
+
+    if (!config && link.dataset.username) {
+        config = {
+            datalynxId: params.d,
+            fieldId: params.fieldid,
+            userurl: link.dataset.userurl,
+            userName: link.dataset.username,
+            canUnsubscribe: link.dataset.canunsubscribe === '1',
+            subscribeString: link.dataset.subscribestring || 'Subscribe',
+            unsubscribeString: link.dataset.unsubscribestring || 'Unsubscribe',
+        };
+    }
+
+    return config || null;
+};
+
+const handleDocumentClick = (event) => {
+    if (!(event.target instanceof Element)) {
+        return;
+    }
+
+    const link = event.target.closest('a.datalynxfield_subscribe');
+    if (!link) {
+        return;
+    }
+
+    const config = getConfigForLink(link);
+    if (!config) {
+        return;
+    }
+
+    event.preventDefault();
+    const updatedParams = api.extractParams(link.href.split('?')[1] || '');
+    api.handleSubscription(
+        link,
+        updatedParams,
+        config.userurl,
+        config.userName,
+        config.canUnsubscribe,
+        config.subscribeString,
+        config.unsubscribeString
+    );
+};
+
+/**
+ * Initialize the module.
+ *
+ * @param {string} datalynxId
+ * @param {string} fieldId
+ * @param {string} userurl
+ * @param {string} userName
+ * @param {boolean} canUnsubscribe
+ */
+export const init = (datalynxId, fieldId, userurl, userName, canUnsubscribe) => {
+    return getStrings().then(strings => {
+        if (datalynxId && fieldId) {
+            if (!configs.some(config =>
+                config.datalynxId === String(datalynxId) && config.fieldId === String(fieldId)
+            )) {
+                configs.push({
+                    datalynxId: String(datalynxId),
+                    fieldId: String(fieldId),
+                    userurl,
+                    userName,
+                    canUnsubscribe,
+                    subscribeString: strings[0],
+                    unsubscribeString: strings[1],
+                });
             }
-
-            const listItem = document.createElement('li');
-            listItem.innerHTML = `<a href="${userurl}">${username}</a>`;
-            teamMemberList.appendChild(listItem);
-        },
-
-        extractParams(paramString) {
-            return paramString.split('&').reduce((acc, param) => {
-                const [key, value] = param.split('=');
-                acc[key] = decodeURIComponent(value || '');
-                return acc;
-            }, {});
-        }
-    };
-
-    const getConfigForLink = (link) => {
-        const params = api.extractParams(link.href.split('?')[1] || '');
-        if (!params.fieldid) {
-            return null;
         }
 
-        return configs.find(config =>
-            config.fieldId === params.fieldid && !!link.closest(`[data-id="${config.datalynxId}"]`)
-        ) || null;
-    };
-
-    const handleDocumentClick = (event) => {
-        if (!(event.target instanceof Element)) {
-            return;
+        if (!isListening) {
+            document.addEventListener('click', handleDocumentClick);
+            isListening = true;
         }
 
-        const link = event.target.closest('a.datalynxfield_subscribe');
-        if (!link) {
-            return;
-        }
-
-        const config = getConfigForLink(link);
-        if (!config) {
-            return;
-        }
-
-        event.preventDefault();
-        const updatedParams = api.extractParams(link.href.split('?')[1] || '');
-        api.handleSubscription(
-            link,
-            updatedParams,
-            config.userurl,
-            config.userName,
-            config.canUnsubscribe,
-            config.subscribeString,
-            config.unsubscribeString
-        );
-    };
-
-    return api;
-});
+        return strings;
+    }).catch(error => {
+        Toast.add(error.message);
+        return null;
+    });
+};
