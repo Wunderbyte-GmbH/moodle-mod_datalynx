@@ -30,6 +30,27 @@ class field_format extends \mod_datalynx\local\field_format\base {
      * @param \MoodleQuickForm $mform
      */
     public function config_form(\MoodleQuickForm &$mform) {
-        // Default implementation does not add any extra elements.
+        $options = [
+            'link' => 'Link',
+            'image' => 'Image',
+            'imageflex' => 'Image flexible',
+            'media' => 'Media player',
+        ];
+        $mform->addElement('select', 'option', get_string('fieldformatoption', 'mod_datalynx'), $options);
+        $mform->setType('option', PARAM_ALPHA);
+        $mform->addRule('option', get_string('required'), 'required', null, 'client');
+    }
+
+    /**
+     * Get legacy/default settings for name.
+     *
+     * @param string $name
+     * @return array
+     */
+    public function get_default_settings_for_name(string $name): array {
+        if (in_array($name, ['link', 'image', 'imageflex', 'media'])) {
+            return ['option' => $name];
+        }
+        return [];
     }
 }

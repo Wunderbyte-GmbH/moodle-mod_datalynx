@@ -1285,6 +1285,103 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2026060601, 'datalynx');
     }
 
+    if ($oldversion < 2026060602) {
+        // 1. Update views template text to replace rating double colon tags with single colon tags.
+        $textfields = [
+            'patterns', 'section', 'param1', 'param2', 'param3',
+            'param4', 'param5', 'param6', 'param7', 'param8',
+            'param9', 'param10',
+        ];
+        $views = $DB->get_records('datalynx_views');
+        foreach ($views as $view) {
+            $changed = false;
+            foreach ($textfields as $textfield) {
+                if (!empty($view->$textfield)) {
+                    $newtext = str_replace(
+                        ['##ratings:avg:bar##', '##ratings:avg:star##', '[[ratings:avg:bar]]', '[[ratings:avg:star]]'],
+                        ['##ratings:avgbar##', '##ratings:avgstar##', '[[ratings:avgbar]]', '[[ratings:avgstar]]'],
+                        $view->$textfield
+                    );
+                    if ($newtext !== $view->$textfield) {
+                        $view->$textfield = $newtext;
+                        $changed = true;
+                    }
+                }
+            }
+            if ($changed) {
+                $DB->update_record('datalynx_views', $view);
+            }
+        }
+
+        // 2. Update existing datalynx_field_formats database records for rating double colons.
+        $formats = $DB->get_records('datalynx_field_formats', ['fieldtype' => 'rating']);
+        foreach ($formats as $formatrec) {
+            $name = $formatrec->name;
+            if ($name === 'avg:bar' || $name === 'avg:star') {
+                $newname = str_replace(':', '', $name);
+                $exists = $DB->record_exists('datalynx_field_formats', [
+                    'dataid' => $formatrec->dataid,
+                    'fieldtype' => 'rating',
+                    'name' => $newname,
+                ]);
+                if (!$exists) {
+                    $formatrec->name = $newname;
+                    $formatrec->settings = json_encode(['option' => $newname]);
+                    $DB->update_record('datalynx_field_formats', $formatrec);
+                } else {
+                    // Delete the duplicate.
+                    $DB->delete_records('datalynx_field_formats', ['id' => $formatrec->id]);
+                }
+            }
+        }
+
+        // 3. Re-run scan to auto-create formats and populate missing default settings.
+        \mod_datalynx\local\field_format\manager::auto_create_formats_from_all_instances();
+
+        $formats = $DB->get_records('datalynx_field_formats');
+        foreach ($formats as $formatrec) {
+            $existing = json_decode($formatrec->settings ?? '{}', true);
+            if (!empty($existing)) {
+                continue;
+            }
+            $classname = "\\datalynxfield_{$formatrec->fieldtype}\\field_format";
+            if (class_exists($classname)) {
+                $instance  = new $classname($formatrec);
+                $defaults  = $instance->get_default_settings_for_name($formatrec->name);
+                if (!empty($defaults)) {
+                    $formatrec->settings = json_encode($defaults);
+                    $DB->update_record('datalynx_field_formats', $formatrec);
+                }
+            }
+        }
+
+        upgrade_mod_savepoint(true, 2026060602, 'datalynx');
+    }
+
+    if ($oldversion < 2026060700) {
+        // Auto-create formats from templates and populate missing defaults (including new option fields).
+        \mod_datalynx\local\field_format\manager::auto_create_formats_from_all_instances();
+
+        $formats = $DB->get_records('datalynx_field_formats');
+        foreach ($formats as $formatrec) {
+            $existing = json_decode($formatrec->settings ?? '{}', true);
+            if (!empty($existing)) {
+                continue;
+            }
+            $classname = "\\datalynxfield_{$formatrec->fieldtype}\\field_format";
+            if (class_exists($classname)) {
+                $instance  = new $classname($formatrec);
+                $defaults  = $instance->get_default_settings_for_name($formatrec->name);
+                if (!empty($defaults)) {
+                    $formatrec->settings = json_encode($defaults);
+                    $DB->update_record('datalynx_field_formats', $formatrec);
+                }
+            }
+        }
+
+        upgrade_mod_savepoint(true, 2026060700, 'datalynx');
+    }
+
     return true;
 }
 

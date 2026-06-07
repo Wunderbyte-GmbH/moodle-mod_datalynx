@@ -47,13 +47,17 @@ class renderer extends datalynxfield_renderer {
         }
 
         $number = (float) $entry->{"c{$fieldid}_content"};
-        $decimals = 2;
-        // Only apply number formatting if param1 contains an integer number >= 0:.
-        if ($decimals) {
-            // Removes leading zeros (eg. '007' -> '7'; '00' -> '0').
+        $fieldformat = $options['field_format'] ?? null;
+        if ($fieldformat) {
+            $decimals = $fieldformat->get_setting('decimals');
+        } else {
+            $decimals = 2;
+        }
+        if ($decimals !== null && $decimals !== '') {
+            $decimals = (int) $decimals;
             $str = sprintf("%4.{$decimals}f", $number);
         } else {
-            $str = (int) $number;
+            $str = (float) $number;
         }
         return $str;
     }

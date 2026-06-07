@@ -30,6 +30,38 @@ class field_format extends \mod_datalynx\local\field_format\base {
      * @param \MoodleQuickForm $mform
      */
     public function config_form(\MoodleQuickForm &$mform) {
-        // Default implementation does not add any extra elements.
+        $options = [
+            'rate' => 'Rate (widget)',
+            'view' => 'View link',
+            'viewurl' => 'View URL',
+            'viewinline' => 'View inline (table)',
+            'count' => 'Count',
+            'avg' => 'Average (text)',
+            'avgbar' => 'Average using bars',
+            'avgstar' => 'Average using stars',
+            'max' => 'Maximum',
+            'min' => 'Minimum',
+            'sum' => 'Sum',
+        ];
+        $mform->addElement('select', 'option', get_string('fieldformatoption', 'mod_datalynx'), $options);
+        $mform->setType('option', PARAM_ALPHANUM);
+        $mform->addRule('option', get_string('required'), 'required', null, 'client');
+    }
+
+    /**
+     * Returns inferred default settings when a format is auto-created from a legacy
+     * hardcoded tag name.
+     *
+     * @param string $name The format name as detected from the template tag.
+     * @return array Key-value settings array, empty if no defaults apply.
+     */
+    public function get_default_settings_for_name(string $name): array {
+        $option = $name;
+        if ($name === 'avg:bar' || $name === 'avgbar') {
+            $option = 'avgbar';
+        } else if ($name === 'avg:star' || $name === 'avgstar') {
+            $option = 'avgstar';
+        }
+        return ['option' => $option];
     }
 }

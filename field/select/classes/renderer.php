@@ -120,11 +120,17 @@ class renderer extends datalynxfield_renderer {
 
         if (isset($entry->{"c{$fieldid}_content"})) {
             $selected = (int) $entry->{"c{$fieldid}_content"};
-            $options = $field->options_menu();
+            $menuoptions = $field->options_menu();
 
-            if (!empty($options['options'])) {
+            $fieldformat = $options['field_format'] ?? null;
+            $formatmode = '';
+            if ($fieldformat) {
+                $formatmode = $fieldformat->get_setting('option');
+            }
+
+            if (!empty($options['options']) || $formatmode === 'options') {
                 $str = [];
-                foreach ($options as $key => $option) {
+                foreach ($menuoptions as $key => $option) {
                     $isselected = (int) ($key == $selected);
                     $str[] = "$isselected $option";
                 }
@@ -132,7 +138,7 @@ class renderer extends datalynxfield_renderer {
                 return format_string($str);
             }
 
-            if (!empty($options['key'])) {
+            if (!empty($options['key']) || $formatmode === 'key') {
                 if ($selected) {
                     return format_string($selected);
                 } else {
@@ -140,8 +146,8 @@ class renderer extends datalynxfield_renderer {
                 }
             }
 
-            if ($selected && $selected <= count($options)) {
-                return format_string($options[$selected]);
+            if ($selected && isset($menuoptions[$selected])) {
+                return format_string($menuoptions[$selected]);
             }
         }
         return '';

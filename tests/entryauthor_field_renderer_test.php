@@ -72,4 +72,87 @@ final class entryauthor_field_renderer_test extends advanced_testcase {
         $this->assertArrayHasKey('##author:name##', $patterns);
         $this->assertArrayHasKey('##author:edit##', $patterns);
     }
+
+    /**
+     * Test that view->field_tags() correctly merges fields without converting array to string.
+     */
+    public function test_field_tags_with_multiple_fields_does_not_convert_array_to_string(): void {
+        global $DB;
+        $course = $this->getDataGenerator()->create_course();
+        $dlx = new datalynx($this->getDataGenerator()->create_module('datalynx', ['course' => $course->id])->id);
+
+        // Add a view.
+        $viewrecord = new \stdClass();
+        $viewrecord->dataid = $dlx->id();
+        $viewrecord->name = 'testgrid';
+        $viewrecord->type = 'grid';
+        $viewrecord->description = '';
+        $viewrecord->param10 = 0;
+        $viewid = $DB->insert_record('datalynx_views', $viewrecord);
+
+        // Call get_view on $dlx.
+        $view = $dlx->get_view('grid', $viewid);
+
+        // Call field_tags on the view.
+        $tags = $view->field_tags();
+
+        $this->assertIsArray($tags);
+        // Ensure no option values are arrays (which would cause the HTML writer error).
+        foreach ($tags as $cat => $sub) {
+            $this->assertIsArray($sub);
+            foreach ($sub as $subcat => $items) {
+                $this->assertIsArray($items);
+                foreach ($items as $tag => $label) {
+                    $this->assertIsString($label);
+                }
+            }
+        }
+    }
+
+    /**
+     * Test pattern replacement for custom user profile fields.
+     */
+    public function test_replacements_with_custom_user_profile_field(): void {
+        global $DB;
+
+        $course = $this->getDataGenerator()->create_course();
+        $dlx = new datalynx($this->getDataGenerator()->create_module('datalynx', ['course' => $course->id])->id);
+
+        // Add a custom user profile field.
+        $fieldid = $DB->insert_record('user_info_field', [
+            'shortname' => 'zweitname',
+            'name' => 'Zweitname',
+            'datatype' => 'text',
+            'categoryid' => 1, // Default category.
+        ]);
+
+        // Add custom profile field data for a user.
+        $user = $this->getDataGenerator()->create_user();
+        $DB->insert_record('user_info_data', [
+            'userid' => $user->id,
+            'fieldid' => $fieldid,
+            'data' => 'Hubert',
+        ]);
+
+        // Create an entry where this user is the author.
+        $entryid = (int) $DB->insert_record('datalynx_entries', (object) [
+            'dataid' => $dlx->id(),
+            'userid' => $user->id,
+            'timecreated' => time(),
+            'timemodified' => time(),
+        ]);
+        $entry = $DB->get_record('datalynx_entries', ['id' => $entryid]);
+
+        // Get entryauthor field.
+        $fieldrecord = entryauthor_field::get_field_objects($dlx->id())[entryauthor_field::_USERNAME];
+        $field = new entryauthor_field($dlx, $fieldrecord);
+        $renderer = $field->renderer();
+
+        // Call replacements.
+        $replacements = $renderer->replacements(['##author:zweitname##'], $entry);
+
+        $this->assertIsArray($replacements);
+        $this->assertArrayHasKey('##author:zweitname##', $replacements);
+        $this->assertEquals('Hubert', $replacements['##author:zweitname##'][1]);
+    }
 }

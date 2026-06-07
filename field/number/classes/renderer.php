@@ -80,9 +80,15 @@ class renderer extends TextRenderer {
             return '';
         }
         $number = (float) $entry->{"c{$fieldid}_content"};
-        $decimals = (float) trim($field->get('param1'));
-        // Only apply number formatting if param1 contains an integer number >= 0:.
-        if ($decimals) {
+        $fieldformat = $options['field_format'] ?? null;
+        if ($fieldformat) {
+            $decimals = $fieldformat->get_setting('decimals');
+        } else {
+            $decimals = trim($field->get('param1'));
+        }
+        // Only apply number formatting if decimals is set and is an integer >= 0.
+        if ($decimals !== null && $decimals !== '') {
+            $decimals = (int) $decimals;
             // Removes leading zeros (eg. '007' -> '7'; '00' -> '0').
             $str = sprintf("%4.{$decimals}f", $number);
         } else {

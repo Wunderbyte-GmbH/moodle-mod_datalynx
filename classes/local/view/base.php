@@ -1175,7 +1175,19 @@ abstract class base {
         if ($fields = $this->dlx->get_fields()) {
             foreach ($fields as $field) {
                 if ($fieldpatterns = $field->renderer()->get_menu()) {
-                    $patterns = array_merge_recursive($patterns, $fieldpatterns);
+                    foreach ($fieldpatterns as $cat => $sub) {
+                        if (!isset($patterns[$cat])) {
+                            $patterns[$cat] = [];
+                        }
+                        foreach ($sub as $subcat => $tags) {
+                            if (!isset($patterns[$cat][$subcat])) {
+                                $patterns[$cat][$subcat] = [];
+                            }
+                            foreach ($tags as $tag => $label) {
+                                $patterns[$cat][$subcat][$tag] = $label;
+                            }
+                        }
+                    }
                 }
             }
         }

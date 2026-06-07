@@ -75,9 +75,18 @@ class renderer extends datalynxfield_renderer {
             $text = str_replace("\r", "", $text); // Remove carriage returns, bug#887.
             $format = isset($entry->{"c{$fieldid}_content1"}) ? $entry->{"c{$fieldid}_content1"} : FORMAT_PLAIN;
 
-            $options = new stdClass();
-            $options->para = false;
-            $str = format_text($text, $format, $options);
+            $textoptions = new stdClass();
+            $textoptions->para = false;
+            $str = format_text($text, $format, $textoptions);
+
+            $fieldformat = $options['field_format'] ?? null;
+            if ($fieldformat) {
+                $maxlength = $fieldformat->get_setting('maxlength');
+                if (!empty($maxlength) && \core_text::strlen($str) > $maxlength) {
+                    $str = \core_text::substr($str, 0, $maxlength) . '...';
+                }
+            }
+
             return $str;
         } else {
             return '';
