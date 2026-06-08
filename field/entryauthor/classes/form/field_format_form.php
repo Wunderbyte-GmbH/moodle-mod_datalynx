@@ -75,6 +75,9 @@ class field_format_form extends \mod_datalynx\form\field_format_base_form {
 
     /**
      * Returns an HTML info block describing a custom user profile field.
+     *
+     * @param \stdClass $cf The custom profile field record.
+     * @return string HTML fragment.
      */
     private function render_profile_field_info(\stdClass $cf): string {
         $typestr = get_string_manager()->string_exists('pluginname', 'profilefield_' . $cf->datatype)

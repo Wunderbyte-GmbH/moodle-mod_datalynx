@@ -126,6 +126,7 @@ Datalynx can be extended with additional building blocks:
 
 | Area | What it is | Typical user-facing result |
 |---|---|---|
+| **Field formats** | Named display configurations for fields (for example, author name style, truncation length, date format) | Consistent, reusable rendering across views without repeating settings |
 | **Field behaviors** | Rules attached to fields (for example, making fields required in specific situations) | Smarter forms with guided completion |
 | **Field layouts** | Reusable presentation structures for fields | Cleaner, consistent entry design |
 | **Tools** | Extra actions such as creating entries in bulk or downloading files | Faster administration workflows |
@@ -146,6 +147,8 @@ Datalynx can be extended with additional building blocks:
 | `##comments##` | Shows the comments section for discussion |
 | `##viewsmenu##` | Shows a view-switch menu if user has access |
 | `[[FieldName@]]` | Shows field label/content style based on label/template setup |
+| `[[FieldName:formatname]]` | Shows a field value rendered with a named Field Format (for example, `[[Description:excerpt]]`) |
+| `##author:formatname##` | Shows entry author information in a named format (for example, `##author:firstname##`) |
 
 ---
 
@@ -174,6 +177,7 @@ Datalynx can be extended with additional building blocks:
 
 After your fields are stable, continue with:
 
+- [User Guide — Field Formats](user_guide_field_formats.md)
 - [User Guide — Views](user_guide_views.md)
 - [User Guide — Rules](user_guide_rules.md)
 - [User Guide — Managing Entries](user_guide_managing_entries.md)

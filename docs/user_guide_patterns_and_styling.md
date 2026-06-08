@@ -94,7 +94,12 @@ Patterns are placeholders that Datalynx replaces with live content.
 |---|---|
 | `[[Text]]` | Shows value of the Text field |
 | `[[FieldName@]]` | Shows field label/template-aware output |
-| `[[FieldName:date]]` | Shows a date-format variant for time-like fields |
+| `[[FieldName:formatname]]` | Shows field value rendered with a named **Field Format** (for example, `[[Description:excerpt]]` for a truncated excerpt) |
+| `##author:formatname##` | Shows entry author info via a named **Field Format** (for example, `##author:firstname##`) |
+| `##ratings:formatname##` | Shows rating output via a named **Field Format** (for example, `##ratings:avg##` for average) |
+
+> **Important Note**  
+> The `:formatname` suffix references a **Field Format** you define in the **Field Formats** management area. See [User Guide — Field Formats](user_guide_field_formats.md) for the full reference.
 
 ### Entry and action patterns
 
@@ -216,5 +221,6 @@ JavaScript can add interaction enhancements to advanced templates.
 ## Next
 
 - [Documentation home](README.md)
+- [User Guide — Field Formats](user_guide_field_formats.md)
 - [User Guide — Views](user_guide_views.md)
 - [User Guide — Permissions](user_guide_permissions.md)
