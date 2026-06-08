@@ -80,7 +80,7 @@ class view extends base {
                 continue;
             }
 
-            $tag = $field->type == 'userinfo' ? "##author:{$field->name()}##" : "[[{$field->name()}]]";
+            $tag = "[[{$field->name()}]]";
             $parts[] = html_writer::tag('p', $tag);
         }
 

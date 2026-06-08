@@ -54,6 +54,19 @@ class renderer extends datalynxfield_renderer {
         $dlxid = $field->dlx()->id();
         $replacements = [];
 
+        // Dedicated inline user-profile-field editor / display (replaces the legacy userinfo field).
+        if ($field->get('internalname') === 'profileeditor') {
+            foreach ((array) $tags as $tag) {
+                $editable = !empty($field->get('editable'));
+                if ($edit && $editable && $this->profile_edit_allowed($entry)) {
+                    $replacements[$tag] = ['', [[$this, 'display_edit_profile'], [$entry]]];
+                } else {
+                    $replacements[$tag] = ['html', $this->display_profile_value($entry)];
+                }
+            }
+            return $replacements;
+        }
+
         foreach ($tags as $tag) {
             $stripped = trim($tag, '@');
             if (strpos($stripped, '##author:') === 0) {
@@ -388,6 +401,199 @@ class renderer extends datalynxfield_renderer {
     // phpcs:enable moodle.PHP.ForbiddenGlobalUse.BadGlobal
 
     /**
+     * Resolve the user whose profile is targeted by this profile-editor field for a given entry.
+     *
+     * @param stdClass $entry The entry object.
+     * @return int The target user id (0 if unknown).
+     */
+    protected function get_target_userid($entry): int {
+        global $USER;
+        if (empty($entry) || (isset($entry->id) && $entry->id < 0)) {
+            return (int) $USER->id;
+        }
+        return (int) ($entry->userid ?? 0);
+    }
+
+    /**
+     * Whether the current user may edit the profile field of the entry author.
+     *
+     * @param stdClass $entry The entry object.
+     * @return bool
+     */
+    protected function profile_edit_allowed($entry): bool {
+        return $this->profile_edit_allowed_for_user($this->get_target_userid($entry));
+    }
+
+    /**
+     * Whether the current user may edit the given user's profile, on a site level.
+     *
+     * @param int $userid The target (entry author) user id.
+     * @return bool
+     */
+    protected function profile_edit_allowed_for_user($userid): bool {
+        global $USER;
+        if (empty($userid)) {
+            return false;
+        }
+        if ((int) $userid === (int) $USER->id) {
+            return has_capability('moodle/user:editownprofile', \context_system::instance());
+        }
+        return has_capability('moodle/user:editprofile', \context_user::instance($userid));
+    }
+
+    /**
+     * Render the read-only value of the targeted user profile field for the entry author.
+     *
+     * @param stdClass $entry The entry object.
+     * @return string
+     */
+    protected function display_profile_value($entry): string {
+        global $CFG;
+        require_once("$CFG->dirroot/user/profile/lib.php");
+
+        $field = $this->field;
+        $userid = $this->get_target_userid($entry);
+        if (empty($userid)) {
+            return '';
+        }
+        $userprofile = profile_user_record($userid);
+        $shortname = $field->get('infoshortname');
+        $content = ($shortname && isset($userprofile->{$shortname})) ? $userprofile->{$shortname} : '';
+        if ($content === '' || $content === null) {
+            return '';
+        }
+
+        switch ($field->get('infotype')) {
+            case 'checkbox':
+                $params = ['disabled' => 'disabled', 'type' => 'checkbox', 'name' => $field->name()];
+                if (intval($content) === 1) {
+                    $params['checked'] = 'checked';
+                }
+                return html_writer::empty_tag('input', $params);
+            case 'datetime':
+                $format = $field->get('param10')
+                    ? get_string('strftimedaydatetime', 'langconfig')
+                    : get_string('strftimedate', 'langconfig');
+                return userdate($content, $format);
+            case 'textarea':
+                return format_text($content, FORMAT_HTML, ['overflowdiv' => true]);
+            default:
+                $options = new stdClass();
+                $options->para = false;
+                return format_text($content, FORMAT_MOODLE, $options);
+        }
+    }
+
+    /**
+     * Render the inline edit widget for the targeted user profile field.
+     *
+     * @param \MoodleQuickForm $mform The form object.
+     * @param stdClass $entry The entry object.
+     * @param ?array $options Additional options.
+     */
+    public function display_edit_profile(&$mform, $entry, ?array $options = null) {
+        global $CFG;
+        require_once("$CFG->dirroot/user/profile/lib.php");
+
+        $field = $this->field;
+        $fieldid = $field->id();
+        $entryid = $entry->id;
+        $fieldname = "field_{$fieldid}_{$entryid}";
+
+        $userid = $this->get_target_userid($entry);
+        $userprofile = $userid ? profile_user_record($userid) : null;
+        $shortname = $field->get('infoshortname');
+        $content = ($userprofile && $shortname && isset($userprofile->{$shortname}))
+            ? $userprofile->{$shortname} : '';
+
+        $mform->addElement(
+            'html',
+            '<div class="datalynx-field-wrapper" data-field-type="entryauthor" data-field-name="' .
+            s($field->name()) . '">'
+        );
+
+        switch ($field->get('infotype')) {
+            case 'datetime':
+                $fieldtype = $field->get('param10') ? 'date_time_selector' : 'date_selector';
+                $mform->addElement($fieldtype, $fieldname, $shortname);
+                break;
+            case 'menu':
+                $dropdown = explode("\n", (string) $field->get('param8'));
+                $dropdown = array_combine($dropdown, $dropdown);
+                $mform->addElement('select', $fieldname, $shortname, $dropdown);
+                break;
+            case 'checkbox':
+                $mform->addElement('advcheckbox', $fieldname, $shortname);
+                break;
+            default:
+                $mform->addElement('text', $fieldname, $shortname);
+                $mform->setType($fieldname, PARAM_TEXT);
+        }
+        $mform->setDefault($fieldname, $content);
+
+        if (!empty($field->get('mandatory'))) {
+            $mform->addRule($fieldname, null, 'required', null, 'client');
+        }
+
+        $mform->addElement('html', '</div>');
+    }
+
+    /**
+     * Validate and persist an inline profile-field edit. The value is saved to the entry author's
+     * user profile field (NOT to datalynx content), then removed from the form data.
+     *
+     * @param int|string $entryid The entry id (or composite fieldgroup id).
+     * @param array $tags The tags handled by this field.
+     * @param stdClass $formdata The submitted form data.
+     * @return array Validation errors keyed by form element name.
+     */
+    public function validate($entryid, $tags, $formdata) {
+        global $USER, $DB, $CFG;
+
+        $field = $this->field;
+        $errors = [];
+
+        // Only the dedicated inline profile editor persists anything here.
+        if ($field->get('internalname') !== 'profileeditor' || empty($field->get('editable'))) {
+            return $errors;
+        }
+
+        $formfieldname = "field_{$field->id()}_{$entryid}";
+        if (!property_exists($formdata, $formfieldname)) {
+            return $errors;
+        }
+        $value = $formdata->{$formfieldname};
+
+        // Resolve the entry author whose profile will be written.
+        if (!is_numeric($entryid) || (int) $entryid < 0) {
+            $userid = (int) $USER->id;
+        } else {
+            $entry = $DB->get_record('datalynx_entries', ['id' => $entryid], 'userid', IGNORE_MISSING);
+            $userid = $entry ? (int) $entry->userid : 0;
+        }
+
+        // Enforce the site-level capability to edit this user's profile.
+        if (!$userid || !$this->profile_edit_allowed_for_user($userid)) {
+            unset($formdata->{$formfieldname});
+            return $errors;
+        }
+
+        if (!empty($field->get('mandatory')) && ($value === '' || $value === null)) {
+            $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
+            return $errors;
+        }
+
+        require_once("$CFG->dirroot/user/profile/lib.php");
+        $user = ['id' => $userid, "profile_field_{$field->get('infoshortname')}" => $value];
+        profile_save_data((object) $user);
+
+        // The value lives in the user profile, never in datalynx content.
+        unset($formdata->{$formfieldname});
+
+        return $errors;
+    }
+
+    /**
      * Array of patterns this field supports.
      *
      * @return array
@@ -397,6 +603,11 @@ class renderer extends datalynxfield_renderer {
         $fieldinternalname = $this->field->get('internalname');
         $cat = get_string('authorinfo', 'datalynx');
         $patterns = [];
+
+        // A dedicated profile-editor pseudo-field exclusively owns its own format tag.
+        if ($fieldinternalname === 'profileeditor') {
+            return ["##author:{$this->field->name()}##" => [true, $cat]];
+        }
 
         $formats = \mod_datalynx\local\field_format\manager::get_formats_for_instance(
             $this->field->dlx()->id(),
@@ -414,6 +625,11 @@ class renderer extends datalynxfield_renderer {
         }
 
         foreach ($formats as $format) {
+            // Custom profile-field formats are owned by their dedicated profile-editor pseudo-field
+            // (see field::get_field_objects), so the built-in author fields must not claim them too.
+            if (method_exists($format, 'is_profile_editor') && $format->is_profile_editor()) {
+                continue;
+            }
             $name = $format->get_name();
             $option = $format->get_setting('option', $name);
             $ispictureformat = ($option === 'picture' || $option === 'picturelarge');

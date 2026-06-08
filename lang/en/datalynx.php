@@ -856,7 +856,6 @@ $string['usercanaddself'] = 'User can add him/herself';
 $string['usercanaddself_help'] = 'Check this option to allow the user who owns the entry to add themselves to the team in this field.';
 $string['userfields'] = 'User defined fields';
 $string['userid'] = 'User ID';
-$string['userinfo'] = 'User info';
 $string['useristeammember'] = 'A user is a teammember';
 $string['userpref'] = 'User preferences';
 $string['usersubmissions'] = 'User submissions';

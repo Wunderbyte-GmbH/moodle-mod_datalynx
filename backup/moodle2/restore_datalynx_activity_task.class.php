@@ -394,6 +394,10 @@ class restore_datalynx_activity_task extends restore_activity_task {
             \mod_datalynx\local\field_format\manager::auto_create_formats_from_templates($this->get_activityid());
         }
 
+        // Older backups may still carry `userinfo` field rows; migrate them into entryauthor field
+        // formats for this restored instance (mirrors the 2026060702 upgrade step).
+        \mod_datalynx\local\field_format\manager::migrate_userinfo_fields($this->get_activityid());
+
         // 2. Check if the backup version is older than our breaking change.
         if ($backupversion > 0 && $backupversion < 2026041000) {
             // 3. Queue an ad-hoc task to process this specific course.

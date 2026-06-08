@@ -351,6 +351,131 @@ class manager {
     }
 
     /**
+     * Migrate legacy `userinfo` field instances into `entryauthor` field formats.
+     *
+     * The removed `userinfo` field type let a user inline-edit one of their own user profile
+     * fields. That behaviour now lives in an `entryauthor` field format whose option targets a
+     * custom user profile field, with `editable`/`mandatory` settings. This converter is pure DB
+     * (it never instantiates the removed userinfo classes) so it is safe to run from both the
+     * upgrade step and from restore of older course backups.
+     *
+     * For each `datalynx_fields` row of type `userinfo` it:
+     *  - derives an alphanumeric format name from the field name (the `##author:{name}##` tag);
+     *  - if the name had to be sanitised/disambiguated, rewrites the tag in all view templates;
+     *  - upserts an `entryauthor` field format {option: shortname, editable, mandatory};
+     *  - deletes the legacy `userinfo` field row.
+     *
+     * Idempotent: re-running updates the existing format and is a no-op once the field rows are gone.
+     *
+     * @param int|null $datalynxid Restrict to a single instance, or null for all instances.
+     * @return void
+     */
+    public static function migrate_userinfo_fields(?int $datalynxid = null): void {
+        global $DB;
+
+        $conditions = ['type' => 'userinfo'];
+        if ($datalynxid !== null) {
+            $conditions['dataid'] = $datalynxid;
+        }
+
+        if (!$userinfofields = $DB->get_records('datalynx_fields', $conditions)) {
+            return;
+        }
+
+        // Pseudo-field ids and built-in option names the format name must not collide with.
+        $reserved = ['name', 'firstname', 'lastname', 'username', 'id', 'idnumber', 'picture',
+                'picturelarge', 'email', 'institution', 'department', 'badges', 'edit',
+                'userid', 'userfirstname', 'userlastname', 'userusername', 'useridnumber',
+                'userpicture', 'useremail', 'userinstitution', 'userdepartment'];
+
+        foreach ($userinfofields as $field) {
+            $dataid = (int) $field->dataid;
+            $oldname = (string) $field->name;
+            $shortname = (string) $field->param2;
+
+            if ($shortname === '') {
+                // No target profile field; nothing meaningful to migrate. Drop the dangling field.
+                $DB->delete_records('datalynx_fields', ['id' => $field->id]);
+                continue;
+            }
+
+            // Derive an alphanumeric, non-reserved format name.
+            $cleanname = preg_replace('/[^A-Za-z0-9]/', '', $oldname);
+            if ($cleanname === '' || in_array(strtolower($cleanname), $reserved, true)) {
+                $cleanname = 'userinfo' . $field->id;
+            }
+
+            // If the name changed, the existing `##author:{oldname}##` tag must be rewritten.
+            if ($cleanname !== $oldname) {
+                self::rewrite_author_tag($dataid, $oldname, $cleanname);
+            }
+
+            // Upsert the entryauthor field format.
+            $settings = json_encode([
+                'option' => $shortname,
+                'editable' => empty($field->param6) ? 0 : 1,
+                'mandatory' => empty($field->param7) ? 0 : 1,
+            ]);
+            $existing = $DB->get_record(
+                'datalynx_field_formats',
+                ['dataid' => $dataid, 'fieldtype' => 'entryauthor', 'name' => $cleanname]
+            );
+            if ($existing) {
+                $existing->settings = $settings;
+                $DB->update_record('datalynx_field_formats', $existing);
+            } else {
+                $record = new \stdClass();
+                $record->dataid = $dataid;
+                $record->name = $cleanname;
+                $record->fieldtype = 'entryauthor';
+                $record->settings = $settings;
+                $DB->insert_record('datalynx_field_formats', $record);
+            }
+
+            // Remove the legacy field row (userinfo stored no datalynx content of its own).
+            $DB->delete_records('datalynx_fields', ['id' => $field->id]);
+        }
+
+        // Drop cached formats so freshly created ones are visible immediately.
+        self::$instancecache = [];
+        self::$namecache = [];
+    }
+
+    /**
+     * Rewrite a `##author:{oldname}##` tag to `##author:{newname}##` across all view templates of
+     * a datalynx instance and invalidate the cached pattern column.
+     *
+     * @param int $datalynxid The datalynx instance id.
+     * @param string $oldname The original (tag) name.
+     * @param string $newname The sanitised format name.
+     * @return void
+     */
+    protected static function rewrite_author_tag(int $datalynxid, string $oldname, string $newname): void {
+        global $DB;
+
+        $search = "##author:{$oldname}##";
+        $replace = "##author:{$newname}##";
+        $textfields = ['section', 'param1', 'param2', 'param3', 'param4', 'param5',
+                'param6', 'param7', 'param8', 'param9', 'param10'];
+
+        $views = $DB->get_records('datalynx_views', ['dataid' => $datalynxid]);
+        foreach ($views as $view) {
+            $changed = false;
+            foreach ($textfields as $textfield) {
+                if (!empty($view->$textfield) && strpos($view->$textfield, $search) !== false) {
+                    $view->$textfield = str_replace($search, $replace, $view->$textfield);
+                    $changed = true;
+                }
+            }
+            if ($changed) {
+                // Invalidate the serialized pattern cache so it is re-derived from the new tags.
+                $view->patterns = null;
+                $DB->update_record('datalynx_views', $view);
+            }
+        }
+    }
+
+    /**
      * Scan and migrate legacy formats for all datalynx instances.
      *
      * @return void

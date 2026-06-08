@@ -27,6 +27,7 @@ namespace datalynxfield_entryauthor;
 
 use mod_datalynx\local\field\datalynxfield_base;
 use mod_datalynx\local\field\datalynxfield_no_content;
+use mod_datalynx\local\field_format\manager;
 use stdClass;
 
 /**
@@ -95,9 +96,10 @@ class field extends datalynxfield_no_content {
      * Get field objects for the author field.
      *
      * @param int $dataid The datalynx ID.
+     * @param array|null $fields Existing user-defined fields (unused here; kept for signature compatibility).
      * @return array
      */
-    public static function get_field_objects($dataid) {
+    public static function get_field_objects($dataid, $fields = null) {
         $fieldobjects = [];
 
         $fieldobjects[self::_USERID] = (object) ['id' => self::_USERID, 'dataid' => $dataid,
@@ -155,7 +157,73 @@ class field extends datalynxfield_no_content {
                         'name' => 'Badges', 'description' => '',
                         'internalname' => 'badges'];
 
+        // Append a dedicated pseudo-field for each entryauthor field format that targets a custom
+        // user profile field. Each such field exclusively owns the ##author:{formatname}## tag, so it
+        // can be displayed (and optionally edited inline) without colliding with the built-in author tags.
+        // IMPORTANT: source formats only via the manager (a cached direct DB query) and never call
+        // get_fields() here, to avoid recursion (get_fields() -> get_internal_fields() -> get_field_objects()).
+        foreach (self::get_profile_editor_field_objects($dataid) as $fid => $field) {
+            // Never clobber a built-in pseudo-field id (e.g. a format literally named 'username').
+            if (!isset($fieldobjects[$fid])) {
+                $fieldobjects[$fid] = $field;
+            }
+        }
+
         return $fieldobjects;
+    }
+
+    /**
+     * Build pseudo-field objects for entryauthor field formats that target a custom user profile
+     * field (i.e. inline profile editors / read-only profile displays).
+     *
+     * @param int $dataid The datalynx instance id.
+     * @return array Keyed by format name (used as the pseudo-field id).
+     */
+    protected static function get_profile_editor_field_objects($dataid): array {
+        global $DB;
+
+        $objects = [];
+        if (empty($dataid)) {
+            return $objects;
+        }
+
+        $formats = manager::get_formats_for_instance((int) $dataid, 'entryauthor');
+        foreach ($formats as $format) {
+            if (!$format->is_profile_editor()) {
+                continue;
+            }
+            $formatname = $format->get_name();
+            $shortname = $format->get_profile_shortname();
+            if ($formatname === '' || $shortname === null || $shortname === '') {
+                continue;
+            }
+
+            // Look up the targeted profile field live, mirroring the old userinfo field behaviour.
+            // Degrade gracefully (plain text, no menu/time) if the profile field no longer exists.
+            $info = $DB->get_record(
+                'user_info_field',
+                ['shortname' => $shortname],
+                'datatype, param1, param3'
+            );
+
+            $objects[$formatname] = (object) [
+                'id' => $formatname,
+                'dataid' => $dataid,
+                'type' => 'entryauthor',
+                'name' => $formatname,
+                'description' => '',
+                'internalname' => 'profileeditor',
+                'option' => $shortname,
+                'infoshortname' => $shortname,
+                'infotype' => $info ? $info->datatype : 'text',
+                'param8' => $info ? $info->param1 : null,
+                'param10' => $info ? $info->param3 : null,
+                'editable' => $format->is_editable() ? 1 : 0,
+                'mandatory' => $format->is_mandatory() ? 1 : 0,
+            ];
+        }
+
+        return $objects;
     }
 
     /**

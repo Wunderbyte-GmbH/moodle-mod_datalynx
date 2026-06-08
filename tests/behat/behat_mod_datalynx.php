@@ -160,17 +160,6 @@ class behat_mod_datalynx extends behat_base {
                     break;
                 case "url":
                     break;
-                case "userinfo":
-                    if (!empty($field['param1'])) {
-                        $this->execute("behat_forms::i_select_from_the_singleselect", [$field['param1'], 'param1']);
-                    }
-                    if (isset($field['param6']) && $field['param6'] !== '') {
-                        $this->execute("behat_forms::set_field_value", ['param6', $field['param6']]);
-                    }
-                    if (isset($field['param7']) && $field['param7'] !== '') {
-                        $this->execute("behat_forms::set_field_value", ['param7', $field['param7']]);
-                    }
-                    break;
                 default:
                     break;
             }
@@ -434,12 +423,6 @@ class behat_mod_datalynx extends behat_base {
                             ["(//div[@data-field-name='Datalynx field {$field['name']}']//select)[{$number}]", $value]
                         );
                     }
-                    break;
-                case "userinfo":
-                    $this->execute(
-                        "behat_forms::i_set_the_field_with_xpath_to",
-                        ["//div[@data-field-name='Datalynx field {$field['name']}']//input", $field['value']]
-                    );
                     break;
             }
         }

@@ -172,9 +172,6 @@ class grid_view_manager {
 
             $name = format_string($field->field->name);
             $tag = '[[' . $field->field->name . ']]';
-            if ($field->type === 'userinfo') {
-                $tag = "##author:{$field->field->name}##";
-            }
 
             $definitions = $field->get_definitions([$tag], $entry, ['edit' => false, 'manage' => false]);
             $values[] = [

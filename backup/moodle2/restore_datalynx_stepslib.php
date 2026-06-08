@@ -791,30 +791,8 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             }
         }
 
-        // Update id of userinfo fields if needed (consider conditioning this on restore to new site).
-        if (
-            $userinfofields = $DB->get_records(
-                'datalynx_fields',
-                ['dataid' => $datalynxnewid, 'type' => 'userinfo'],
-                '',
-                'id,param1,param2'
-            )
-        ) {
-            foreach ($userinfofields as $fieldid => $uifield) {
-                $infoid = $DB->get_field(
-                    'user_info_field',
-                    'id',
-                    ['shortname' => $uifield->param2]
-                );
-                if ($infoid != (int) $uifield->param1) {
-                    $DB->set_field(
-                        'datalynx_fields',
-                        'param1',
-                        $infoid,
-                        ['id' => $fieldid]
-                    );
-                }
-            }
-        }
+        // Legacy userinfo fields are migrated to entryauthor field formats in
+        // restore_datalynx_activity_task::after_restore(), so no userinfo-specific id remap is
+        // needed here any more.
     }
 }
