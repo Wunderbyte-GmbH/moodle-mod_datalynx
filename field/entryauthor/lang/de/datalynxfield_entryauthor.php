@@ -21,6 +21,8 @@
  * @copyright 2013 onwards edulabs.org and associated programmers
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+$string['infofield_editable'] = 'Inline-Bearbeitung';
 $string['infofield_editable_help'] = 'Erlaubt dem Eintragsautor (und Personen, die dessen Profil bearbeiten dürfen), dieses Nutzerprofilfeld direkt zu bearbeiten. Gilt nur, wenn das Format auf ein benutzerdefiniertes Profilfeld verweist.';
+$string['infofield_mandatory'] = 'Pflichtfeld';
 $string['infofield_mandatory_help'] = 'Dieses Feld als Pflichtfeld festlegen; es darf nicht leer gespeichert werden. Gilt nur, wenn das Feld bearbeitbar ist.';
 $string['profilefieldtype'] = 'Typ';

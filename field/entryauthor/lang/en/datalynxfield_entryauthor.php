@@ -23,7 +23,9 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['fieldformat_desc'] = 'Controls which attribute of the entry author is displayed. Type one of the following attributes as the format Name: id, name, firstname, lastname, username, idnumber, email, institution, department, picture, picturelarge, badges, edit. When a custom user profile field shortname is used, the field can optionally be made editable.';
+$string['infofield_editable'] = 'Inline editing';
 $string['infofield_editable_help'] = 'Allow the entry author (and users who may edit their profile) to edit this user profile field inline. Only applies when the format targets a custom user profile field.';
+$string['infofield_mandatory'] = 'Required';
 $string['infofield_mandatory_help'] = 'Make this field mandatory; it cannot be saved empty. Only applies when the field is editable.';
 $string['pluginname'] = 'Entryauthor';
 $string['privacy:metadata'] = 'The field entryauthor does not store personal data.';

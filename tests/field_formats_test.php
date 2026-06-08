@@ -237,7 +237,7 @@ final class field_formats_test extends advanced_testcase {
             'datatype' => 'text', 'shortname' => 'zweitname', 'name' => 'Zweitname',
         ]);
 
-        // entryauthor profile-editor format named 'custominfo' -> ##author:custominfo##.
+        // Entryauthor profile-editor format named 'custominfo' -> ##author:custominfo##.
         \mod_datalynx\local\field_format\manager::save_format((object) [
             'dataid' => $dlx->id(),
             'name' => 'custominfo',
